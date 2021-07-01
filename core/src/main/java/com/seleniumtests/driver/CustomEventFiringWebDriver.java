@@ -1220,7 +1220,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 				throw new ScenarioException("leftClicOnDesktopAt: problem using Robot: " + e.getMessage());
 			}
 		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
-			gridConnector.leftClic(x, y);
+			gridConnector.leftClic(onlyMainScreen, x, y);
 		} else {
 			throw new ScenarioException("driver supports leftClicOnDesktopAt only in local and grid mode");
 		}
@@ -1274,7 +1274,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 				throw new ScenarioException("doubleClickOnDesktopAt: problem using Robot: " + e.getMessage());
 			}
 		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
-			gridConnector.doubleClick(x, y);
+			gridConnector.doubleClick(onlyMainScreen, x, y);
 		} else {
 			throw new ScenarioException("driver supports doubleClickOnDesktopAt only in local and grid mode");
 		}
@@ -1304,7 +1304,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 				throw new ScenarioException("rightClicOnDesktopAt: problem using Robot: " + e.getMessage());
 			}
 		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
-			gridConnector.rightClic(x, y);
+			gridConnector.rightClic(onlyMainScreen, x, y);
 		} else {
 			throw new ScenarioException("driver supports sendKeysToDesktop only in local and grid mode");
 		}

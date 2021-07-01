@@ -277,6 +277,29 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		verify(req).queryString("action", "leftClic");
 		verify(req).queryString("x", 100);
 		verify(req).queryString("y", 0);
+		verify(req).queryString("onlyMainScreen", false);
+		verify(gridLogger, never()).warn(anyString());
+		verify(gridLogger, never()).error(anyString());
+	}
+	
+	/**
+	 * Test left click on main screen
+	 * @throws UnsupportedOperationException
+	 * @throws IOException
+	 * @throws UnirestException
+	 */
+	@Test(groups={"ut"})
+	public void testLeftClickOnMainScreen() throws UnsupportedOperationException, IOException {
+		
+		HttpRequestWithBody req = (HttpRequestWithBody) createServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
+		
+		connector.leftClic(true, 100, 0);	
+		
+		// no error encountered
+		verify(req).queryString("action", "leftClic");
+		verify(req).queryString("x", 100);
+		verify(req).queryString("y", 0);
+		verify(req).queryString("onlyMainScreen", true);
 		verify(gridLogger, never()).warn(anyString());
 		verify(gridLogger, never()).error(anyString());
 	}
@@ -344,6 +367,29 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		verify(req).queryString("action", "doubleClick");
 		verify(req).queryString("x", 100);
 		verify(req).queryString("y", 0);
+		verify(req).queryString("onlyMainScreen", false);
+		verify(gridLogger, never()).warn(anyString());
+		verify(gridLogger, never()).error(anyString());
+	}
+	
+	/**
+	 * Test double click on main screen
+	 * @throws UnsupportedOperationException
+	 * @throws IOException
+	 * @throws UnirestException
+	 */
+	@Test(groups={"ut"})
+	public void testDoubleClickOnMainScreen() throws UnsupportedOperationException, IOException {
+		
+		HttpRequestWithBody req = (HttpRequestWithBody) createServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
+		
+		connector.doubleClick(true, 100, 0);	
+		
+		// no error encountered
+		verify(req).queryString("action", "doubleClick");
+		verify(req).queryString("x", 100);
+		verify(req).queryString("y", 0);
+		verify(req).queryString("onlyMainScreen", true);
 		verify(gridLogger, never()).warn(anyString());
 		verify(gridLogger, never()).error(anyString());
 	}
@@ -411,6 +457,29 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		verify(req).queryString("action", "rightClic");
 		verify(req).queryString("x", 100);
 		verify(req).queryString("y", 0);
+		verify(req).queryString("onlyMainScreen", false);
+		verify(gridLogger, never()).warn(anyString());
+		verify(gridLogger, never()).error(anyString());
+	}
+	
+	/**
+	 * Test right click on main screen
+	 * @throws UnsupportedOperationException
+	 * @throws IOException
+	 * @throws UnirestException
+	 */
+	@Test(groups={"ut"})
+	public void testRightClickOnMainScreen() throws UnsupportedOperationException, IOException {
+		
+		HttpRequestWithBody req = (HttpRequestWithBody) createServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
+		
+		connector.rightClic(true, 100, 0);	
+		
+		// no error encountered
+		verify(req).queryString("action", "rightClic");
+		verify(req).queryString("x", 100);
+		verify(req).queryString("y", 0);
+		verify(req).queryString("onlyMainScreen", true);
 		verify(gridLogger, never()).warn(anyString());
 		verify(gridLogger, never()).error(anyString());
 	}
