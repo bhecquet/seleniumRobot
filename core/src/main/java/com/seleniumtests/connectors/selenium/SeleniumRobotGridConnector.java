@@ -239,6 +239,17 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	 */
 	@Override
 	public void leftClic(int x, int y) {
+		leftClic(false, x, y);
+	}
+		
+	/**
+	 * Left click on desktop at x,y
+	 * @param x		x coordinate
+	 * @param y		y coordinate
+	 * @param onlyMainScreen	if true, click coordinates are on the main screen
+	 */
+	@Override
+	public void leftClic(boolean onlyMainScreen, int x, int y) {
 		if (nodeUrl == null) {
 			throw new ScenarioException("You cannot click left before driver has been created and corresponding node instanciated");
 		}
@@ -249,6 +260,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 				.queryString(ACTION_FIELD, "leftClic")
 				.queryString(X_FIELD, x)
 				.queryString(Y_FIELD, y)
+				.queryString("onlyMainScreen", onlyMainScreen)
 				.asString();
 			if (response.getStatus() != 200) {
 				logger.error(String.format("Left click error: %s", response.getBody()));
@@ -258,6 +270,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		}
 	}
 	
+	
 	/**
 	 * Double click on desktop at x,y
 	 * @param x		x coordinate
@@ -265,6 +278,17 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	 */
 	@Override
 	public void doubleClick(int x, int y) {
+		doubleClick(false, x, y);
+	}
+	
+	/**
+	 * Double click on desktop at x,y
+	 * @param x		x coordinate
+	 * @param y		y coordinate
+	 * @param onlyMainScreen	if true, click coordinates are on the main screen
+	 */
+	@Override
+	public void doubleClick(boolean onlyMainScreen, int x, int y) {
 		if (nodeUrl == null) {
 			throw new ScenarioException("You cannot double click before driver has been created and corresponding node instanciated");
 		}
@@ -275,6 +299,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			.queryString(ACTION_FIELD, "doubleClick")
 			.queryString(X_FIELD, x)
 			.queryString(Y_FIELD, y)
+			.queryString("onlyMainScreen", onlyMainScreen)
 			.asString();
 			if (response.getStatus() != 200) {
 				logger.error(String.format("Double click error: %s", response.getBody()));
@@ -291,6 +316,17 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	 */
 	@Override
 	public void rightClic(int x, int y) {
+		rightClic(false, x, y);
+	}
+	
+	/**
+	 * right click on desktop at x,y
+	 * @param x		x coordinate
+	 * @param y		y coordinate
+	 * @param onlyMainScreen	if true, click coordinates are on the main screen
+	 */
+	@Override
+	public void rightClic(boolean onlyMainScreen, int x, int y) {
 		if (nodeUrl == null) {
 			throw new ScenarioException("You cannot click right before driver has been created and corresponding node instanciated");
 		}
@@ -301,6 +337,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 				.queryString(ACTION_FIELD, "rightClic")
 				.queryString(X_FIELD, x)
 				.queryString(Y_FIELD, y)
+				.queryString("onlyMainScreen", onlyMainScreen)
 				.asString();
 			if (response.getStatus() != 200) {
 				logger.error(String.format("Right click error: %s", response.getBody()));
@@ -316,6 +353,11 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	 */
 	@Override
 	public String captureDesktopToBuffer() {
+		return captureDesktopToBuffer(false);
+	}
+	
+	@Override
+	public String captureDesktopToBuffer(boolean onlyMainScreen) {
 		if (nodeUrl == null) {
 			throw new ScenarioException("You cannot take screenshot before driver has been created and corresponding node instanciated");
 		}
@@ -324,6 +366,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		try {
 			HttpResponse<String> response =  Unirest.get(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString(ACTION_FIELD, "screenshot")
+				.queryString("onlyMainScreen", onlyMainScreen)
 				.asString();
 			
 			if (response.getStatus() != 200) {

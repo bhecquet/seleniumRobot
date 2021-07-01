@@ -129,6 +129,16 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	 * @param x		x coordinate
 	 * @param y		y coordinate
 	 */
+	public void leftClic(boolean onlyMainScreen, int x, int y) {
+		logger.warn("left clic is only available with seleniumRobot grid");
+	}
+	
+	/**
+	 * Left clic on desktop at x,y
+	 * @param x		x coordinate
+	 * @param y		y coordinate
+	 * @param onlyMainScreen	if true, click coordinates are on the main screen
+	 */
 	public void leftClic(int x, int y) {
 		logger.warn("left clic is only available with seleniumRobot grid");
 	}
@@ -142,10 +152,30 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	 * double clic on desktop at x,y
 	 * @param x		x coordinate
 	 * @param y		y coordinate
+	 * @param onlyMainScreen	if true, click coordinates are on the main screen
+	 */
+	public void doubleClick(boolean onlyMainScreen, int x, int y) {
+		logger.warn("left clic is only available with seleniumRobot grid");
+	}
+	/**
+	 * double clic on desktop at x,y
+	 * @param x		x coordinate
+	 * @param y		y coordinate
 	 */
 	public void doubleClick(int x, int y) {
 		logger.warn("left clic is only available with seleniumRobot grid");
 	}
+	
+	/**
+	 * right clic on desktop at x,y
+	 * @param x		x coordinate
+	 * @param y		y coordinate
+	 * @param onlyMainScreen	if true, click coordinates are on the main screen
+	 */
+	public void rightClic(boolean onlyMainScreen, int x, int y) {
+		logger.warn("right clic is only available with seleniumRobot grid");
+	}
+	
 	
 	/**
 	 * right clic on desktop at x,y
@@ -161,6 +191,17 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	 * @return
 	 */
 	public String captureDesktopToBuffer() {
+		logger.warn("captureDesktopToBuffer is only available with seleniumRobot grid");
+		return null;
+	}
+	
+
+	/**
+	 * Take screenshot of the full desktop and return a base64 string of the image
+	 * @param onlyMainScreen	if true, only take screenshot of the default screen
+	 * @return
+	 */
+	public String captureDesktopToBuffer(boolean onlyMainScreen) {
 		logger.warn("captureDesktopToBuffer is only available with seleniumRobot grid");
 		return null;
 	}
