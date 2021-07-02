@@ -36,36 +36,28 @@ import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.ScreenshotException;
 
 import com.seleniumtests.connectors.selenium.fielddetector.Field;
 import com.seleniumtests.connectors.selenium.fielddetector.FieldDetectorConnector;
+import com.seleniumtests.connectors.selenium.fielddetector.ImageFieldDetector;
+import com.seleniumtests.connectors.selenium.fielddetector.Label;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.customexception.ScenarioException;
-import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
-import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.SnapshotTarget;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.ReplayOnError;
-import com.seleniumtests.uipage.htmlelements.GenericPictureElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.imaging.ImageDetector;
 import com.seleniumtests.util.imaging.ImageProcessor;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
-
-import io.appium.java_client.touch.TapOptions;
-import io.appium.java_client.touch.WaitOptions;
-import io.appium.java_client.touch.offset.PointOption;
 
 /**
  * Element which is found inside driver snapshot
@@ -81,58 +73,25 @@ public class UiElement {
 	 */
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(UiElement.class);
-	private static FieldDetectorConnector fieldDetectorConnector;
 	private static Map<String, List<Field>> fieldsPerPage;
+	private static Map<String, List<Label>> labelsPerPage;
 	
 	// coordinates of the top-left corner of the viewport in the screen
 	private static Map<String, Point> offsetPerPage;
 	
 	static {
 		fieldsPerPage = Collections.synchronizedMap(new HashMap<>());
+		labelsPerPage = Collections.synchronizedMap(new HashMap<>());
 		offsetPerPage = Collections.synchronizedMap(new HashMap<>());
 	}
 	
-	public enum ElementType {
-		
-		
-		TEXT_FIELD("field_with_label", "field_line_with_label", "field"),
-		BUTTON("button"),
-		RADIO("radio_with_label", "radio"),
-		CHECKBOX("checkbox_with_label", "checkbox"),
-		UNKNOWN;
-		
-
-		private List<String> classes;
-		
-		private ElementType(String ... classes) {
-			this.classes = Arrays.asList(classes);
-		}
-		
-		/**
-		 * Returns the element type from class name
-		 * @param className
-		 */
-		public static ElementType fromClassName(String className) {
-			try {
-				return ElementType.valueOf(className);
-			} catch (IllegalArgumentException ex) {
-				for (ElementType type : ElementType.values()) {
-			        for (String matcher : type.classes) {
-			          if (className.equalsIgnoreCase(matcher)) {
-			            return type;
-			          }
-			        }
-			      }
-			      return UNKNOWN;
-			} 
-		}
-	}
 	
 	private HtmlElement intoElement;
 	private long actionDuration;
 	private ElementType elementType;
 	private ScreenshotUtil screenshotUtil;
 	private Pattern label;
+	private ByUI by;
     private String origin  = null;
 	protected Clock clock = Clock.systemUTC();
 
@@ -153,6 +112,21 @@ public class UiElement {
 		this(Pattern.compile(label), elementType);
 	}
 	
+	public UiElement(ByUI by) {
+		this.by = by;
+		this.elementType = by.getType();
+		
+
+		if (SeleniumTestsContextManager.isWebTest()) {
+			this.intoElement = new HtmlElement("", By.tagName("body"));
+		} else {
+			this.intoElement = new HtmlElement("", By.xpath("/*"));
+		}
+
+		origin = PageObject.getCallingPage(Thread.currentThread().getStackTrace());
+	}
+	
+	@Deprecated
 	public UiElement(Pattern pattern, ElementType elementType) {		
 		this.label = pattern;
 		this.elementType = elementType;
@@ -166,12 +140,6 @@ public class UiElement {
 		
 	}
 	
-	private static FieldDetectorConnector getInstance() {
-		if (fieldDetectorConnector == null) {
-			fieldDetectorConnector = new FieldDetectorConnector(SeleniumTestsContextManager.getThreadContext().getImageFieldDetectorServerUrl());
-		}
-		return fieldDetectorConnector;
-	}
 	
 	public ScreenshotUtil getScreenshotUtil() {
 		return new ScreenshotUtil();
@@ -179,7 +147,6 @@ public class UiElement {
 	
 
 	public void findElement() {
-		FieldDetectorConnector detector = getInstance();
 
 		LocalDateTime start = LocalDateTime.now();
 	
@@ -197,28 +164,78 @@ public class UiElement {
 			Rectangle viewportPosition = detectViewPortPosition(screenshotFile);
 			offsetPerPage.put(origin, new Point(viewportPosition.x, viewportPosition.y));
 			
-			List<Field> fields = detector.detect(screenshotFile);
+			ImageFieldDetector detector = new ImageFieldDetector(screenshotFile);
+			List<Field> fields = detector.detectFields();
 			for (Field field: fields) {
 				field.changePosition(viewportPosition.x, viewportPosition.y);
 			}
 			fieldsPerPage.put(origin, fields);
+			
+			List<Label> labels = detector.detectLabels();
+			for (Label lbl: labels) {
+				lbl.changePosition(viewportPosition.x, viewportPosition.y);
+			}
+			labelsPerPage.put(origin, labels);
 		}
 		
-		for (Field field: fieldsPerPage.get(origin)) {
-			if (field.getText() == null || field.getClassName() == null) {
-				continue;
-			} else if (ElementType.fromClassName(field.getClassName()) == elementType && this.label.matcher(field.getText().trim()).matches()) {
-				if (field.getRelatedField() != null) {
-					detectedObjectRectangle = field.getRelatedField().getRectangle();
-				} else {
-					detectedObjectRectangle = field.getRectangle();
-				}
-			}
-		}
+		findElementByPosition();
 		
 		actionDuration = Duration.between(start, LocalDateTime.now()).toMillis();
 		
 		doAfterPictureSearch();
+	}
+	
+	private void findElementByPosition() {
+
+		// search the fields with label
+		// right of
+		Label labelRightOf = null;
+		Label labelLeftOf = null;
+		Label labelAbove = null;
+		Label labelBelow = null;
+		Label labelText = null;
+		if (by.getRightOf() != null) {
+			for (Label lbl: labelsPerPage.get(origin)) {
+				if (by.getRightOf().matcher(lbl.getText().trim()).matches()) {
+					labelRightOf = lbl;
+					break;
+				}
+			}
+		}
+		if (by.getLeftOf() != null) {
+			for (Label lbl: labelsPerPage.get(origin)) {
+				if (by.getLeftOf().matcher(lbl.getText().trim()).matches()) {
+					labelLeftOf = lbl;
+					break;
+				}
+			}
+		}
+		if (by.getText() != null) {
+			for (Label lbl: labelsPerPage.get(origin)) {
+				if (by.getText().matcher(lbl.getText().trim()).matches()) {
+					labelText = lbl;
+					break;
+				}
+			}
+		}
+		
+		if (labelLeftOf == null && labelRightOf == null && labelText == null && labelAbove == null && labelBelow == null) {
+			throw new ConfigurationException("At least one of 'above', 'below', 'rightOf', 'leftOf', 'text' must be defined");
+		}
+		
+		
+		// TODO: above and below
+		for (Field field: fieldsPerPage.get(origin)) {
+
+			if (ElementType.fromClassName(field.getClassName()) == elementType
+					&& (labelText == null || labelText.isInside(field)) 
+					&& (labelRightOf == null || labelRightOf.isFieldRightOf(field))
+					&& (labelLeftOf == null || labelLeftOf.isFieldLeftOf(field))
+					) {
+				detectedObjectRectangle = field.getRectangle();
+			} 
+		
+		}
 	}
 	
 	/**

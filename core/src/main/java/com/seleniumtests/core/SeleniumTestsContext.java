@@ -48,6 +48,7 @@ import com.seleniumtests.connectors.bugtracker.BugTracker;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
+import com.seleniumtests.connectors.selenium.fielddetector.FieldDetectorConnector;
 import com.seleniumtests.connectors.tms.TestManager;
 import com.seleniumtests.core.config.ConfigReader;
 import com.seleniumtests.core.utils.TestNGResultUtils;
@@ -305,6 +306,7 @@ public class SeleniumTestsContext {
     private List<SeleniumGridConnector> seleniumGridConnectors;
     private TestManager testManagerInstance;
     private BugTracker	bugtrackerInstance;
+    private FieldDetectorConnector	fieldDetectorInstance;
     private TestStepManager testStepManager; // handles logging of test steps in this context
     private boolean driverCreationBlocked = false;		// if true, inside this thread, driver creation will be forbidden
     
@@ -318,6 +320,7 @@ public class SeleniumTestsContext {
     	seleniumGridConnectors = new ArrayList<>();
     	testManagerInstance = null;
     	bugtrackerInstance = null;
+    	fieldDetectorInstance = null;
     	testStepManager = new TestStepManager();
     }
     
@@ -350,6 +353,7 @@ public class SeleniumTestsContext {
     	if (!allowRequestsToDependencies) {
     		testManagerInstance = toCopy.testManagerInstance;
     		bugtrackerInstance = toCopy.bugtrackerInstance;
+    		fieldDetectorInstance = toCopy.fieldDetectorInstance;
     	}
     	
     	testNGResult = toCopy.testNGResult;
@@ -823,6 +827,8 @@ public class SeleniumTestsContext {
     	testManagerInstance = initTestManager();
     	
     	bugtrackerInstance = initBugtracker();
+    	
+    	fieldDetectorInstance = initFieldDetectorConnector();
     }
     
     /**
@@ -1019,6 +1025,21 @@ public class SeleniumTestsContext {
 			return BugTracker.getInstance(getBugtrackerType(), getBugtrackerUrl(), getBugtrackerProject(), getBugtrackerUser(), getBugtrackerPassword(), bugtrackerOptions);
 		}
 		return null;
+	}
+	
+	/**
+	 * initialize the image field detector
+	 * @return
+	 */
+	public FieldDetectorConnector initFieldDetectorConnector() {
+		
+		if (getImageFieldDetectorServerUrl() != null) {
+			
+			return new FieldDetectorConnector(getImageFieldDetectorServerUrl());
+		} else {
+			return null;
+		}
+		
 	}
 	
 	// ------------------------- accessors ------------------------------------------------------
@@ -1714,6 +1735,10 @@ public class SeleniumTestsContext {
     	return bugtrackerInstance;
     }
     
+    public FieldDetectorConnector getFieldDetectorInstance() {
+    	return fieldDetectorInstance;
+    }
+    
 
 	public Map<String, Object> getContextDataMap() {
 		return contextDataMap;
@@ -2065,6 +2090,10 @@ public class SeleniumTestsContext {
     
     public void setBugtrackerProject(String project){
     	setAttribute(BUGTRACKER_PROJECT, project);
+    }
+    
+    public void setFieldDetectorInstance(FieldDetectorConnector fieldDetectorInstance) {
+    	this.fieldDetectorInstance = fieldDetectorInstance;
     }
     
     public void setRunMode(String runMode) {

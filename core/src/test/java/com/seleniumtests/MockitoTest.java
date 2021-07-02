@@ -17,11 +17,15 @@
  */
 package com.seleniumtests;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.mockito.MockitoAnnotations;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.testng.PowerMockTestCase;
@@ -89,6 +93,16 @@ public class MockitoTest  extends PowerMockTestCase {
 		}
 
 		GenericTest.resetTestNGREsultAndLogger();
+	}
+	
+
+	protected File createImageFromResource(String resource) throws IOException {
+		File tempFile = File.createTempFile("img", "." + FilenameUtils.getExtension(resource));
+		tempFile.deleteOnExit();
+		FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream(resource),
+				tempFile);
+
+		return tempFile;
 	}
 	
 	@AfterClass(groups={"ut", "it", "ie"}, alwaysRun=true)
