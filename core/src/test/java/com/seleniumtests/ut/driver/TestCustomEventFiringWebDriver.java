@@ -19,6 +19,8 @@ package com.seleniumtests.ut.driver;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -487,7 +489,17 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		verify(robot).mousePress(InputEvent.BUTTON1_DOWN_MASK);
 		verify(robot).mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
 		verify(robot).mouseMove(0, 0);
-		verify(gridConnector, never()).leftClic(0, 0);
+		verify(gridConnector, never()).leftClic(anyBoolean(), anyInt(), anyInt());
+	}
+	
+	@Test(groups = {"ut"})
+	public void testLeftClickOnDesktopMainScreen() {
+		CustomEventFiringWebDriver.leftClicOnDesktopAt(true, 0, 0, DriverMode.LOCAL, gridConnector);
+		
+		verify(robot).mousePress(InputEvent.BUTTON1_DOWN_MASK);
+		verify(robot).mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+		verify(robot).mouseMove(0, 0);
+		verify(gridConnector, never()).leftClic(anyBoolean(), anyInt(), anyInt());
 	}
 	
 	/**
@@ -519,8 +531,18 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		
 		verify(robot, never()).mousePress(InputEvent.BUTTON1_DOWN_MASK);
 		verify(robot, never()).mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
-		verify(robot, never()).mouseMove(0, 0);
-		verify(gridConnector).leftClic(0, 0);
+		verify(robot, never()).mouseMove(anyInt(), anyInt());
+		verify(gridConnector).leftClic(false, 0, 0);
+	}
+	
+	@Test(groups = {"ut"})
+	public void testLeftClickOnDesktopWithGridMainScreen() {
+		CustomEventFiringWebDriver.leftClicOnDesktopAt(true, 0, 0, DriverMode.GRID, gridConnector);
+		
+		verify(robot, never()).mousePress(InputEvent.BUTTON1_DOWN_MASK);
+		verify(robot, never()).mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+		verify(robot, never()).mouseMove(anyInt(), anyInt());
+		verify(gridConnector).leftClic(true, 0, 0);
 	}
 	
 	/**
@@ -533,7 +555,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		verify(robot, times(2)).mousePress(InputEvent.BUTTON1_DOWN_MASK);
 		verify(robot, times(2)).mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
 		verify(robot).mouseMove(0, 0);
-		verify(gridConnector, never()).doubleClick(0, 0);
+		verify(gridConnector, never()).doubleClick(anyBoolean(), anyInt(), anyInt());
 	}
 	
 	/**
@@ -565,8 +587,18 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		
 		verify(robot, never()).mousePress(InputEvent.BUTTON1_DOWN_MASK);
 		verify(robot, never()).mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
-		verify(robot, never()).mouseMove(0, 0);
-		verify(gridConnector).doubleClick(0, 0);
+		verify(robot, never()).mouseMove(anyInt(), anyInt());
+		verify(gridConnector).doubleClick(false, 0, 0);
+	}
+	
+	@Test(groups = {"ut"})
+	public void testDoubleClickOnDesktopWithGridMainScreen() {
+		CustomEventFiringWebDriver.doubleClickOnDesktopAt(true, 0, 0, DriverMode.GRID, gridConnector);
+		
+		verify(robot, never()).mousePress(InputEvent.BUTTON1_DOWN_MASK);
+		verify(robot, never()).mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+		verify(robot, never()).mouseMove(anyInt(), anyInt());
+		verify(gridConnector).doubleClick(true, 0, 0);
 	}
 	
 	/**
@@ -579,7 +611,17 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		verify(robot).mousePress(InputEvent.BUTTON2_DOWN_MASK);
 		verify(robot).mouseRelease(InputEvent.BUTTON2_DOWN_MASK);
 		verify(robot).mouseMove(0, 0);
-		verify(gridConnector, never()).rightClic(0, 0);
+		verify(gridConnector, never()).rightClic(anyBoolean(), anyInt(), anyInt());
+	}
+	
+	@Test(groups = {"ut"})
+	public void testRightClickOnDesktopMainScreen() {
+		CustomEventFiringWebDriver.rightClicOnDesktopAt(true, 0, 0, DriverMode.LOCAL, gridConnector);
+		
+		verify(robot).mousePress(InputEvent.BUTTON2_DOWN_MASK);
+		verify(robot).mouseRelease(InputEvent.BUTTON2_DOWN_MASK);
+		verify(robot).mouseMove(0, 0);
+		verify(gridConnector, never()).rightClic(anyBoolean(), anyInt(), anyInt());
 	}
 	
 	/**
@@ -611,8 +653,18 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		
 		verify(robot, never()).mousePress(InputEvent.BUTTON2_DOWN_MASK);
 		verify(robot, never()).mouseRelease(InputEvent.BUTTON2_DOWN_MASK);
-		verify(robot, never()).mouseMove(0, 0);
-		verify(gridConnector).rightClic(0, 0);
+		verify(robot, never()).mouseMove(anyInt(), anyInt());
+		verify(gridConnector).rightClic(false, 0, 0);
+	}
+	
+	@Test(groups = {"ut"})
+	public void testRightClickOnDesktopWithGridMainScreen() {
+		CustomEventFiringWebDriver.rightClicOnDesktopAt(true, 0, 0, DriverMode.GRID, gridConnector);
+		
+		verify(robot, never()).mousePress(InputEvent.BUTTON2_DOWN_MASK);
+		verify(robot, never()).mouseRelease(InputEvent.BUTTON2_DOWN_MASK);
+		verify(robot, never()).mouseMove(anyInt(), anyInt());
+		verify(gridConnector).rightClic(true, 0, 0);
 	}
 	
 	/**
