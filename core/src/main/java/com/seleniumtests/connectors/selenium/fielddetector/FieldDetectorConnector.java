@@ -42,7 +42,7 @@ public class FieldDetectorConnector {
 		}
 	}
 	
-	public List<Field> detect(File imageFile) {
+	public JSONObject detect(File imageFile) {
 		if (imageFile == null) {
 			throw new ScenarioException("Image file is null");
 		}
@@ -59,13 +59,7 @@ public class FieldDetectorConnector {
 			}
 		}
 		
-		List<JSONObject> jsonFields = fieldDefinition.getBody().getObject().getJSONObject(imageFile.getName()).getJSONArray("fields").toList();
-		List<Field> fields = new ArrayList<>();
+		return fieldDefinition.getBody().getObject().getJSONObject(imageFile.getName());
 		
-		for (JSONObject jsonNode: jsonFields) {
-			fields.add(Field.fromJson(jsonNode));
-		}
-		
-		return fields;
 	}
 }

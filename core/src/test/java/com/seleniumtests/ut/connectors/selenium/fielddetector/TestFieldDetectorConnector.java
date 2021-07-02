@@ -6,15 +6,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.ConnectorsTest;
-import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
-import com.seleniumtests.connectors.selenium.fielddetector.Field;
 import com.seleniumtests.connectors.selenium.fielddetector.FieldDetectorConnector;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
@@ -22,18 +18,11 @@ import com.seleniumtests.customexception.ScenarioException;
 import kong.unirest.HttpRequest;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
+import kong.unirest.json.JSONObject;
 
 @PrepareForTest({ Unirest.class })
 public class TestFieldDetectorConnector extends ConnectorsTest {
 
-	private File createImageFromResource(String resource) throws IOException {
-		File tempFile = File.createTempFile("img", "." + FilenameUtils.getExtension(resource));
-		tempFile.deleteOnExit();
-		FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream(resource),
-				tempFile);
-
-		return tempFile;
-	}
 
 	@Test(groups = { "ut" })
 	public void testIsAlive() {
@@ -126,7 +115,7 @@ public class TestFieldDetectorConnector extends ConnectorsTest {
 		createServerMock("GET", "/status", 200, "OK");	
 		createServerMock("POST", "/detect", 200, detectionReply);	
 		FieldDetectorConnector fieldDetectorConnector = new FieldDetectorConnector("http://localhost:4321");
-		List<Field> fields = fieldDetectorConnector.detect(image);
+		List<JSONObject> fields = fieldDetectorConnector.detect(image).getJSONArray("fields").toList();
 		
 		Assert.assertEquals(fields.size(), 2);
 	}

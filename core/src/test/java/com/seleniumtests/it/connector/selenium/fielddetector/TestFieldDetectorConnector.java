@@ -9,18 +9,22 @@ import org.apache.commons.io.FilenameUtils;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.SkipException;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.connectors.selenium.fielddetector.Field;
 import com.seleniumtests.connectors.selenium.fielddetector.FieldDetectorConnector;
+import com.seleniumtests.connectors.selenium.fielddetector.ImageFieldDetector;
+import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
+
+import kong.unirest.json.JSONObject;
 
 public class TestFieldDetectorConnector extends GenericTest {
 
-	FieldDetectorConnector connector;
-	
 
 	private File createImageFromResource(String resource) throws IOException {
 		File tempFile = File.createTempFile("img", "." + FilenameUtils.getExtension(resource));
@@ -32,18 +36,22 @@ public class TestFieldDetectorConnector extends GenericTest {
 
 	@BeforeMethod(groups={"it"})
 	public void init(ITestContext ctx) {
-		initThreadContext(ctx);
-		
+		System.setProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL, "http://localhost:5000");
 		try {
-			connector = new FieldDetectorConnector("http://127.0.0.1:5000");
+			initThreadContext(ctx);
 		} catch (ConfigurationException e) {
 			throw new SkipException("no field detector server available");
 		}
 	}
 	
+	@AfterMethod(groups= {"it"}, alwaysRun = true)
+	public void reinit() {
+		System.clearProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL);
+	}
+	
 	@Test(groups="it")
 	public void testFieldDetection() throws IOException {
-		List<Field> fields = connector.detect(createImageFromResource("ti/form_picture.png"));
+		List<Field> fields = new ImageFieldDetector(createImageFromResource("ti/form_picture.png")).detectFields();
 		Assert.assertTrue(fields.size() > 10);
 	}
 }
