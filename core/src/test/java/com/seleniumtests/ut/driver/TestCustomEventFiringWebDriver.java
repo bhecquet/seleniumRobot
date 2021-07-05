@@ -710,6 +710,38 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	}
 	
 	/**
+	 * write to desktop in local mode
+	 */
+	@Test(groups = {"ut"})
+	public void testDisplayRunningStep() {
+		CustomEventFiringWebDriver.displayStepOnScreen("text", DriverMode.LOCAL, gridConnector, videoRecorder);
+		
+		verify(videoRecorder).displayRunningStep("text");
+		verify(gridConnector, never()).displayRunningStep(anyString());
+	}
+	
+	/**
+	 * write textk with device providers: this is not supported, so exception should be raised
+	 * @throws Exception 
+	 */
+	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
+	public void testDisplayRunningStepWithDeviceProviders() throws Exception {
+		CustomEventFiringWebDriver.displayStepOnScreen("text", DriverMode.SAUCELABS, gridConnector, videoRecorder);
+	}
+	
+	/**
+	 * write to desktop in grid mode
+	 */
+	@Test(groups = {"ut"})
+	public void testDisplayRunningStepWithGrid() {
+		CustomEventFiringWebDriver.displayStepOnScreen("text", DriverMode.GRID, gridConnector, videoRecorder);
+		
+
+		verify(videoRecorder, never()).displayRunningStep("text");
+		verify(gridConnector).displayRunningStep(anyString());
+	}
+	
+	/**
 	 * send keys to desktop in local mode
 	 */
 	@Test(groups = {"ut"})
