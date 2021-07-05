@@ -512,7 +512,7 @@ public class LogAction {
 		
 		BrowserMobProxy mobProxy = WebUIDriver.getBrowserMobProxy();
 		NLWebDriver neoloadDriver = WebUIDriver.getNeoloadDriver();
-		VideoRecorder videoRecorder = WebUIDriver.getVideoRecorder().get();
+		VideoRecorder videoRecorder = WebUIDriver.getThreadVideoRecorder();
 		
 		// check if any root step is already registered (a main step)
 		// happens when using cucumber where a cucumber method can call an other method intercepted by this pointcut

@@ -477,7 +477,7 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 		TestStep tearDownStep = new TestStep(TestStepManager.LAST_STEP_NAME, testResult, new ArrayList<>(), true);
 		
 		// add step to video
-		VideoRecorder videoRecorder = WebUIDriver.getVideoRecorder().get();
+		VideoRecorder videoRecorder = WebUIDriver.getThreadVideoRecorder();
 		if (videoRecorder != null) {
 			CustomEventFiringWebDriver.displayStepOnScreen(tearDownStep.getName(), 
 					SeleniumTestsContextManager.getThreadContext().getRunMode(), 
