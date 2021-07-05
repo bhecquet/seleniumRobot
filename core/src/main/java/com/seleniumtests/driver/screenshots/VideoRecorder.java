@@ -83,9 +83,9 @@ public class VideoRecorder {
 			//Create a instance of GraphicsConfiguration to get the Graphics configuration
 			//of the Screen. This is needed for ScreenRecorder class.
 			GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-			startStepDisplay(gc);
-			
+				
 			try {
+				startStepDisplay(gc);
 				screenRecorder = new ScreenRecorder(gc, 
 								null,
 								new Format(MediaTypeKey, MediaType.FILE, MimeTypeKey, MIME_AVI),
