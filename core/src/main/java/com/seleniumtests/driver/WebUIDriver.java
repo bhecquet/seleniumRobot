@@ -705,6 +705,19 @@ public class WebUIDriver {
 		return videoRecorder;
 	}
 	
+	/**
+	 * Get the video recorder for this thread
+	 * May be null if no driver has been initialized
+	 * @return
+	 */
+	public static VideoRecorder getThreadVideoRecorder() {
+		if (videoRecorder != null) {
+			return videoRecorder.get();
+		}
+		return null;
+	}
+	
+	
 	public static void resetCurrentWebUiDriverName() {
 		setCurrentWebUiDriverName(DEFAULT_DRIVER_NAME);
 	}
