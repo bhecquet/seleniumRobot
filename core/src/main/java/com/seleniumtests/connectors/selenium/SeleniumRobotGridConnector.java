@@ -450,7 +450,9 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		try {
 			HttpResponse<String> response = Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 					.queryString(ACTION_FIELD, "displayRunningStep")
-					.queryString("stepName", stepName).asString();
+					.queryString("stepName", stepName)
+					.queryString(SESSION_FIELD, sessionId)
+					.asString();
 			
 			if (response.getStatus() != 200) {
 				logger.error(String.format("display running step error: %s", response.getBody()));

@@ -796,6 +796,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		// no error encountered
 		verify(req).queryString("action", "displayRunningStep");
 		verify(req).queryString("stepName", "foo");
+		verify(req).queryString("session", new SessionId("1234"));
 		verify(gridLogger, never()).warn(anyString());
 		verify(gridLogger, never()).error(anyString());
 	}
