@@ -438,6 +438,29 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	}
 	
 	/**
+	 * Display running step
+	 * @param text
+	 */
+	@Override
+	public void displayRunningStep(String stepName) {
+		if (nodeUrl == null) {
+			throw new ScenarioException("You cannot display running step before driver has been created and corresponding node instanciated");
+		}
+		
+		try {
+			HttpResponse<String> response = Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+					.queryString(ACTION_FIELD, "displayRunningStep")
+					.queryString("stepName", stepName).asString();
+			
+			if (response.getStatus() != 200) {
+				logger.error(String.format("display running step error: %s", response.getBody()));
+			}
+		} catch (UnirestException e) {
+			logger.warn(String.format("Could not display running step: %s", e.getMessage()));
+		}
+	}
+	
+	/**
 	 * Write text to desktop using keyboard
 	 * @param text
 	 */
