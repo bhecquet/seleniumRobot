@@ -253,6 +253,7 @@ public class ConnectorsTest extends MockitoTest {
 				when(postRequest.queryString(anyString(), anyString())).thenReturn(postRequest);
 				when(postRequest.queryString(anyString(), anyInt())).thenReturn(postRequest);
 				when(postRequest.queryString(anyString(), anyBoolean())).thenReturn(postRequest);
+				when(postRequest.queryString(anyString(), any(SessionId.class))).thenReturn(postRequest);
 				when(postRequest.header(anyString(), anyString())).thenReturn(postRequest);
 				when(requestMultipartBody.field(anyString(), anyString())).thenReturn(requestMultipartBody);
 				when(requestMultipartBody.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
