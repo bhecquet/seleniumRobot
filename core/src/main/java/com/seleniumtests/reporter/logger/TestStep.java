@@ -19,6 +19,7 @@ package com.seleniumtests.reporter.logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -55,6 +56,7 @@ public class TestStep extends TestAction {
 	private List<TestAction> stepActions;
 	private Long duration;
 	private Date startDate;
+	private long videoTimeStamp;
 	private List<HarCapture> harCaptures;
 	private List<GenericFile> files;
 	private List<Snapshot> snapshots;
@@ -452,6 +454,7 @@ public class TestStep extends TestAction {
 		
 		step.duration = duration;
 		step.startDate = startDate;
+		step.videoTimeStamp = videoTimeStamp;
 		step.harCaptures = new ArrayList<>();
 		for (HarCapture har: harCaptures) {
 			step.harCaptures.add(har);
@@ -472,6 +475,12 @@ public class TestStep extends TestAction {
 	@Override
 	public TestStep deepCopy() {
 		return encode(null);
+	}
+	public long getVideoTimeStamp() {
+		return videoTimeStamp;
+	}
+	public void setVideoTimeStamp(long videoTimeStamp) {
+		this.videoTimeStamp = videoTimeStamp;
 	}
 	
 }

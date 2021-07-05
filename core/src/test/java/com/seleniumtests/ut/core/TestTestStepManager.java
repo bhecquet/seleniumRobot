@@ -9,16 +9,29 @@ import org.testng.annotations.Test;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.util.helper.WaitHelper;
 
 public class TestTestStepManager extends GenericTest {
 
 	
 	@Test(groups= {"ut"})
-	public void testCurrentRootTestStep() {
+	public void testCurrentRootTestStepWithoutVideoTimeStamp() {
 		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
 		TestStepManager.setCurrentRootTestStep(step1);
 		
 		Assert.assertEquals(TestStepManager.getCurrentRootTestStep(), step1);
+		Assert.assertEquals(step1.getVideoTimeStamp(), 0);
+	}
+	
+	@Test(groups= {"ut"})
+	public void testCurrentRootTestStepWithVideoTimeStamp() {
+		TestStepManager.setVideoStartDate();
+		WaitHelper.waitForSeconds(1); // wait a bit so that step video timestamp is not 0
+		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
+		TestStepManager.setCurrentRootTestStep(step1);
+		
+		Assert.assertEquals(TestStepManager.getCurrentRootTestStep(), step1);
+		Assert.assertTrue(step1.getVideoTimeStamp() > 0);
 	}
 	
 	/**

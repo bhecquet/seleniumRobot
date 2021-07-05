@@ -151,6 +151,7 @@
 									#set ($stepObject = $step.get(3))
 									#set ($stepErrorCause = $step.get(4))
 									#set ($stepErrorCauseDetails = $step.get(5))
+									#set ($stepVideoTimeStamp = $step.get(6))
 									
 									#if ($stepStatus.toString().equals("passed"))
 										<div class="box collapsed-box success">
@@ -162,7 +163,10 @@
 										<div class="box collapsed-box skipped">
 									#end
 										<div class="box-header with-border">
-											<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button> $stepName - $stepDuration secs
+											<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button><span class="step-title"> $stepName - $stepDuration secs</span>
+											#if ($stepVideoTimeStamp)
+											     <span><i class="fa fa-file-video-o"></i>$stepVideoTimeStamp s</span>
+											#end
 										</div>
 										<div class="box-body">
 											#if ($stepErrorCause)

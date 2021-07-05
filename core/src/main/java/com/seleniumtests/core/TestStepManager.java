@@ -2,8 +2,10 @@ package com.seleniumtests.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 
 import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestStep;
@@ -14,6 +16,7 @@ public class TestStepManager {
 	List<TestStep> testSteps;  // list of root steps
 	TestStep runningStep;
 	TestStep rootStep;
+	Date videoStartDate;
 	
 	public TestStepManager() {
 		runningStep = null;
@@ -118,9 +121,22 @@ public class TestStepManager {
     	TestStepManager.logTestStep(testStep, true);
     }
     
+    public static void setVideoStartDate() {
+    	try {
+    		SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().setVideoStartDate(new Date());
+    	} catch (IndexOutOfBoundsException e) {
+    		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
+    	}
+    }
+    
     public static void setCurrentRootTestStep(TestStep testStep) {
 		try {
-			SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().setRootTestStep(testStep);
+			TestStepManager stepManager = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager();
+			stepManager.setRootTestStep(testStep);
+			
+			if (stepManager.getVideoStartDate() != null) {
+				testStep.setVideoTimeStamp(TimeUnit.MILLISECONDS.convert(testStep.getStartDate().getTime() - stepManager.getVideoStartDate().getTime(), TimeUnit.MILLISECONDS));
+			}
     	} catch (IndexOutOfBoundsException e) {
     		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
     	}
@@ -207,5 +223,13 @@ public class TestStepManager {
 		for (TestStep testStep: getTestSteps()) {
 			testStep.moveAttachments(outputSubDirectory);
 		}
+	}
+
+	public Date getVideoStartDate() {
+		return videoStartDate;
+	}
+
+	public void setVideoStartDate(Date videoStartDate) {
+		this.videoStartDate = videoStartDate;
 	}
 }

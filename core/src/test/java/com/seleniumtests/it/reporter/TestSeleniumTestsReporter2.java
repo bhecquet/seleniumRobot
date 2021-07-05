@@ -1349,9 +1349,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-snapshot\">Output 'drv:main-my snapshot' browser: my snapshot:"));	
 	}
 	
-	
 	/**
-	 * Check that video capture file is present in result
+	 * Check that video capture file is not present in result if not requested
 	 * 
 	 * @throws Exception
 	 */
