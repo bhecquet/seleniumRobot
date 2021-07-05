@@ -1467,38 +1467,12 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 		}
 	}
 	
-	public static void displayStepOnScreen(String textToWrite, DriverMode driverMode, SeleniumGridConnector gridConnector) {
+	public static void displayStepOnScreen(String textToWrite, DriverMode driverMode, SeleniumGridConnector gridConnector, VideoRecorder recorder) {
 		if (driverMode == DriverMode.LOCAL) {
 			
-
-			try {
-				GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-				Rectangle screenBounds = gc.getBounds();
-				
-				JFrame window = new JFrame("JFrame with text"); 
-				window.setAlwaysOnTop (true);
-				window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-				window.setUndecorated(true); 
-				try {
-					window.setOpacity(0.4f);
-				} catch (UnsupportedOperationException e) {
-					// nothing to do
-				}
-				window.setBounds(screenBounds.width / 3, 0, screenBounds.width * 2 / 3 - 100, 20);
-				window.setLayout(new BorderLayout());
-				JLabel label = new JLabel("Hello World");
-				label.setFont (label.getFont ().deriveFont (20.0f));
-				window.add(label, BorderLayout.CENTER);
-	
-				window.setVisible(true);
-				
-				label.setText("coucou la planètecoucou la planètecoucou la planètecoucou la planètecoucou la planète");
-	
-			} catch (Exception e) {
-				throw new ScenarioException("writeToDesktop: could not initialize robot to type keys: " + e.getMessage());
-			}
+			recorder.displayRunningStep(textToWrite);
 		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
-			gridConnector.writeText(textToWrite);
+			gridConnector.displayRunningStep(textToWrite);
 		} else {
 			throw new ScenarioException("driver supports writeToDesktop only in local and grid mode");
 		}
