@@ -251,6 +251,14 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	}
 	
 	/**
+	 * Display running step
+	 * @param text
+	 */
+	public void displayRunningStep(String stepName) {
+		logger.warn("displayRunningStep is only available with seleniumRobot grid");
+	}
+	
+	/**
 	 * Write text to desktop using keyboard
 	 * @param text
 	 */

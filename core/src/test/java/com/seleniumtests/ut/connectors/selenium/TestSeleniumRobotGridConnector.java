@@ -781,6 +781,72 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	}
 	
 	/**
+	 * Test display running step
+	 * @throws UnsupportedOperationException
+	 * @throws IOException
+	 * @throws UnirestException
+	 */
+	@Test(groups={"ut"})
+	public void testDisplayRunningStep() throws UnsupportedOperationException, IOException {
+		
+		HttpRequestWithBody req = (HttpRequestWithBody) createServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
+		
+		connector.displayRunningStep("foo");	
+		
+		// no error encountered
+		verify(req).queryString("action", "displayRunningStep");
+		verify(req).queryString("stepName", "foo");
+		verify(gridLogger, never()).warn(anyString());
+		verify(gridLogger, never()).error(anyString());
+	}
+	
+	/**
+	 * Testdisplay running step with status code different from 200
+	 * @throws UnsupportedOperationException
+	 * @throws IOException
+	 * @throws UnirestException
+	 */
+	@Test(groups={"ut"})
+	public void testDisplayRunningStepError500() throws UnsupportedOperationException, IOException {
+		
+		createServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "");	
+		
+		connector.displayRunningStep("foo");	
+		
+		// error clicking
+		verify(gridLogger, never()).warn(anyString());
+		verify(gridLogger).error(anyString());
+	}
+	
+	/**
+	 * Testdisplay running step when connection error occurs
+	 * @throws UnsupportedOperationException
+	 * @throws IOException
+	 * @throws UnirestException
+	 */
+	@Test(groups={"ut"})
+	public void testDisplayRunningStepNoConnection() throws UnsupportedOperationException, IOException {
+		
+		HttpRequest<HttpRequest> req = createServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "");
+		when(req.asString()).thenThrow(new UnirestException("connection error"));
+		
+		connector.displayRunningStep("foo");			
+		
+		// error connecting to node
+		verify(gridLogger).warn(anyString());
+		verify(gridLogger, never()).error(anyString());
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
+	public void testDisplayRunningStepWithoutNodeUrl() throws UnsupportedOperationException, IOException {
+		
+		createServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
+		
+		connector.setNodeUrl(null);
+		connector.displayRunningStep("foo");	
+	}
+	
+	/**
 	 * Test killing process
 	 * @throws UnsupportedOperationException
 	 * @throws IOException
