@@ -59,8 +59,10 @@ import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.core.testretry.TestRetryAnalyzer;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.driver.screenshots.VideoRecorder;
 import com.seleniumtests.reporter.logger.ArchiveMode;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.reporters.CommonReporter;
@@ -473,6 +475,16 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 		}
 		
 		TestStep tearDownStep = new TestStep(TestStepManager.LAST_STEP_NAME, testResult, new ArrayList<>(), true);
+		
+		// add step to video
+		VideoRecorder videoRecorder = WebUIDriver.getVideoRecorder().get();
+		if (videoRecorder != null) {
+			CustomEventFiringWebDriver.displayStepOnScreen(tearDownStep.getName(), 
+					SeleniumTestsContextManager.getThreadContext().getRunMode(), 
+					SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(), 
+					videoRecorder);
+		}
+		
 		TestStepManager.setCurrentRootTestStep(tearDownStep);
 		
 		if (testResult.isSuccess()) {

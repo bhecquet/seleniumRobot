@@ -46,7 +46,9 @@ import com.seleniumtests.core.Step.RootCause;
 import com.seleniumtests.core.StepName;
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.driver.screenshots.VideoRecorder;
 import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.uipage.PageObject;
@@ -510,6 +512,7 @@ public class LogAction {
 		
 		BrowserMobProxy mobProxy = WebUIDriver.getBrowserMobProxy();
 		NLWebDriver neoloadDriver = WebUIDriver.getNeoloadDriver();
+		VideoRecorder videoRecorder = WebUIDriver.getVideoRecorder().get();
 		
 		// check if any root step is already registered (a main step)
 		// happens when using cucumber where a cucumber method can call an other method intercepted by this pointcut
@@ -526,6 +529,13 @@ public class LogAction {
 			if (neoloadDriver != null) {
 				neoloadDriver.startTransaction(currentStep.getName());
 			}
+			if (videoRecorder != null) {
+				CustomEventFiringWebDriver.displayStepOnScreen(currentStep.getName(), 
+						SeleniumTestsContextManager.getThreadContext().getRunMode(), 
+						SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(), 
+						videoRecorder);
+			}
+			
 			
 		} else {
 			TestStepManager.getParentTestStep().addStep(currentStep);

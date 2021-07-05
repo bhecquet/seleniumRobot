@@ -43,11 +43,21 @@ public class TestVideoRecorder extends ReporterTest {
 	public void testVideoRecording() throws IOException {
 		VideoRecorder recorder = new VideoRecorder(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()), "testFile.avi");
 		recorder.start();
+		
+		// check JFrame is displayed
+		Assert.assertNotNull(recorder.getLabel());
+		Assert.assertEquals(recorder.getLabel().getText(), "Starting");
+		Assert.assertTrue(recorder.getWindow().isShowing());
+		Assert.assertNotNull(recorder.getWindow());
+		
 		WaitHelper.waitForSeconds(2);
 		File recorded = recorder.stop();
 		Assert.assertTrue("testFile.avi".equals(recorded.getName()));
 		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "testFile.avi").toFile().exists());
 		Assert.assertEquals(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()).listFiles().length, 1);
+		
+		// check JFrame is reset
+		Assert.assertFalse(recorder.getWindow().isShowing());
 	}
 	
 
@@ -70,6 +80,14 @@ public class TestVideoRecorder extends ReporterTest {
 
 			String detailedReportContent = readTestMethodResultFile("testDriverShort");
 			Assert.assertTrue(detailedReportContent.contains("Video capture: <a href='videoCapture.avi'>file</a></div>"));
+			
+			// check steps have the timestamp on video capture
+			Assert.assertTrue(detailedReportContent.contains("<span><i class=\"fa fa-file-video-o\"></i>"));
+			
+			// step where timestamp is 0 do not display it
+			Assert.assertTrue(detailedReportContent.contains("<span class=\"step-title\"> getPageUrl with args: (CHROME, ) - 0.0 secs</span></div>"));
+			
+			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
 		}
@@ -140,7 +158,7 @@ public class TestVideoRecorder extends ReporterTest {
 	}
 	
 	/**
-	 * video should be produced when on success and tests are KO
+	 * video should be not produced when on error and tests are OK
 	 * @param testContext
 	 * @throws Exception
 	 */
@@ -155,6 +173,9 @@ public class TestVideoRecorder extends ReporterTest {
 			Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverShort", "videoCapture.avi").toFile().exists());			
 			String detailedReportContent = readTestMethodResultFile("testDriverShort");
 			Assert.assertFalse(detailedReportContent.contains("Video capture: <a href='videoCapture.avi'>file</a></div>"));
+
+			// check steps have not the timestamp on video capture because video capture is not there
+			Assert.assertFalse(detailedReportContent.contains("<span><i class=\"fa fa-file-video-o\"></i>"));
 		} finally {
 			
 			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
@@ -178,6 +199,10 @@ public class TestVideoRecorder extends ReporterTest {
 
 			String detailedReportContent = readTestMethodResultFile("testDriverShortKo");
 			Assert.assertFalse(detailedReportContent.contains("Video capture: <a href='videoCapture.avi'>file</a></div>"));
+			
+			// check steps have not the timestamp on video capture because video capture is not there
+			Assert.assertFalse(detailedReportContent.contains("<span><i class=\"fa fa-file-video-o\"></i>"));
+			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
 		}

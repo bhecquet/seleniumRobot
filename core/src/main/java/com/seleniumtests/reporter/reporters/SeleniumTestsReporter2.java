@@ -52,6 +52,7 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.TestType;
+import com.seleniumtests.reporter.logger.GenericFile;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.logger.TestStep.StepStatus;
 import com.seleniumtests.util.StringUtility;
@@ -205,6 +206,20 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		}  
 	}
 	
+	private boolean isVideoInReport(ITestResult testResult) {
+
+		boolean videoInReport = false;
+		TestStep lastTestStep = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getLastTestStep();
+		if (lastTestStep != null) {
+			for (GenericFile f: lastTestStep.getFiles()) {
+				if (f.getFile().getName().contains("video")) {
+					videoInReport = true;
+				}
+			}
+		}
+		return videoInReport;
+	}
+	
 	public void generateExecutionReport(SeleniumTestsContext testContext, ITestResult testResult, String testStatus, boolean resourcesFromCdn) throws IOException  {
 	
 		VelocityEngine ve = initVelocityEngine();
@@ -257,6 +272,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			testSteps = new ArrayList<>();
 		}
 		
+		boolean videoInReport = isVideoInReport(testResult);
 		List<List<Object>> steps = new ArrayList<>();
 		for (TestStep testStep: testSteps) {
 			
@@ -278,6 +294,13 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			stepInfo.add(encodedTestStep);	
 			stepInfo.add(encodedTestStep.getErrorCause());	
 			stepInfo.add(encodedTestStep.getErrorCauseDetails());	
+			
+			// do not display video timestamp if video is not taken, or removed
+			if (encodedTestStep.getVideoTimeStamp() > 0 && videoInReport) {
+				stepInfo.add(encodedTestStep.getVideoTimeStamp() / (double)1000);
+			} else {
+				stepInfo.add(null);
+			}
 			steps.add(stepInfo);
 		}
 		context.put("steps", steps);

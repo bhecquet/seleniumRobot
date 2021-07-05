@@ -178,6 +178,7 @@ public class WebUIDriver {
 																						new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()),
 																						"videoCapture.avi");
 					videoRecorder.set(recorder);
+					TestStepManager.setVideoStartDate();
 				} catch (ScenarioException e) {
 					logger.warn("Video capture won't start: " + e.getMessage());
 				}

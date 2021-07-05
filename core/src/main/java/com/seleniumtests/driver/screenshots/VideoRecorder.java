@@ -28,13 +28,18 @@ import static org.monte.media.VideoFormatKeys.DepthKey;
 import static org.monte.media.VideoFormatKeys.ENCODING_AVI_TECHSMITH_SCREEN_CAPTURE;
 import static org.monte.media.VideoFormatKeys.QualityKey;
 
+import java.awt.BorderLayout;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -53,6 +58,8 @@ public class VideoRecorder {
 	private ScreenRecorder screenRecorder;
 	private String fileName;
 	private File folderPath;
+	private JLabel label;
+	private JFrame window;
 	private static final Logger logger = SeleniumRobotLogger.getLogger(VideoRecorder.class);
 	
 	/**
@@ -76,6 +83,7 @@ public class VideoRecorder {
 			//Create a instance of GraphicsConfiguration to get the Graphics configuration
 			//of the Screen. This is needed for ScreenRecorder class.
 			GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+			startStepDisplay(gc);
 			
 			try {
 				screenRecorder = new ScreenRecorder(gc, 
@@ -92,6 +100,31 @@ public class VideoRecorder {
 		
 		this.fileName = fileName;
 		this.folderPath = folderPath;
+	}
+	
+	/**
+	 * Display the JFrame
+	 */
+	private void startStepDisplay(GraphicsConfiguration gc) {
+		Rectangle screenBounds = gc.getBounds();
+		
+		window = new JFrame("SeleniumRobot"); 
+		window.setAlwaysOnTop (true);
+		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		window.setUndecorated(true); 
+		try {
+			window.setOpacity(0.7f);
+		} catch (UnsupportedOperationException e) {
+			// nothing to do
+		}
+		window.setBounds(screenBounds.width / 3, 0, screenBounds.width * 2 / 3 - 200, 25);
+		window.setLayout(new BorderLayout());
+		label = new JLabel("Starting");
+		label.setFont (label.getFont ().deriveFont (12.0f));
+		window.add(label, BorderLayout.CENTER);
+
+		window.setVisible(true);
+
 	}
 	
 	/**
@@ -118,7 +151,8 @@ public class VideoRecorder {
 		}
 		
 		if (screenRecorder.getState() == State.RECORDING) {
-		
+			
+			window.dispose();
 			screenRecorder.stop();
 			List<File> createdFiles = screenRecorder.getCreatedMovieFiles();
 			if (!createdFiles.isEmpty()) {
@@ -143,6 +177,12 @@ public class VideoRecorder {
 			return null;
 		}
 	}
+	
+	public void displayRunningStep(String stepName) {	
+		if (label != null) {
+			label.setText(stepName);
+		}
+	}
 
 	public String getFileName() {
 		return fileName;
@@ -150,6 +190,14 @@ public class VideoRecorder {
 
 	public File getFolderPath() {
 		return folderPath;
+	}
+
+	public JLabel getLabel() {
+		return label;
+	}
+
+	public JFrame getWindow() {
+		return window;
 	}
 
 }

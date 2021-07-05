@@ -46,7 +46,7 @@ import com.seleniumtests.driver.screenshots.VideoCaptureMode;
  *
  */
 
-@PowerMockIgnore({"javax.net.ssl.*", "com.google.inject.*", "javax.imageio.*"})
+@PowerMockIgnore({"javax.net.ssl.*", "com.google.inject.*", "javax.imageio.*", "javax.swing.*"})
 public class MockitoTest  extends PowerMockTestCase {
 
 	protected static final String SERVER_URL = "http://localhost:4321";

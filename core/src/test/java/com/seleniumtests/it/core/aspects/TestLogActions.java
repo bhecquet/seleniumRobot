@@ -20,26 +20,29 @@ package com.seleniumtests.it.core.aspects;
 import java.io.IOException;
 import java.util.List;
 
+import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.Step.RootCause;
+import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.util.helper.WaitHelper;
 
 public class TestLogActions extends GenericTest {
 	
-	@BeforeClass(groups={"it"})
+	@BeforeMethod(groups={"it"})
 	public void init(ITestContext testContext) {
 		System.setProperty("browser", "none");
 		SeleniumTestsContextManager.initGlobalContext(testContext);
@@ -62,6 +65,51 @@ public class TestLogActions extends GenericTest {
 		resetCurrentTestResult();
 	}
 
+	@Test(groups={"it"})
+	public void testVideoStartDateSetWhenVideoRecordingEnabled() throws Exception {
+		WebDriver driver = null;
+		try {
+			SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
+			SeleniumTestsContextManager.getThreadContext().setVideoCapture("true");
+			driver = WebUIDriver.getWebDriver(true);
+			DriverTestPage testPage = new DriverTestPage(true);
+			WaitHelper.waitForSeconds(1);
+			testPage._writeSomething();
+			
+			TestStepManager stepManager = SeleniumTestsContextManager.getThreadContext().getTestStepManager();
+			TestStep step = stepManager.getTestSteps().get(2);
+			
+			Assert.assertTrue(step.getVideoTimeStamp() > 0);
+			Assert.assertNotNull(stepManager.getVideoStartDate());
+		} finally {
+			if (driver != null) {
+				WebUIDriver.cleanUp();
+			}
+		}
+	}
+	
+	@Test(groups={"it"})
+	public void testVideoStartDateSetWhenVideoRecordingDisabled() throws Exception {
+		WebDriver driver = null;
+		try {
+			SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
+			SeleniumTestsContextManager.getThreadContext().setVideoCapture("false");
+			driver = WebUIDriver.getWebDriver(true);
+			DriverTestPage testPage = new DriverTestPage(true);
+			WaitHelper.waitForSeconds(1);
+			testPage._writeSomething();
+			
+			TestStepManager stepManager = SeleniumTestsContextManager.getThreadContext().getTestStepManager();
+			TestStep step = stepManager.getTestSteps().get(2);
+			
+			Assert.assertEquals(step.getVideoTimeStamp(), 0);
+			Assert.assertNull(stepManager.getVideoStartDate());
+		} finally {
+			if (driver != null) {
+				WebUIDriver.cleanUp();
+			}
+		}
+	}
 	
 	/**
 	 * Only test presence of root steps. there should be:
