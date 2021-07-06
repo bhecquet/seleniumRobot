@@ -33,6 +33,7 @@ import com.seleniumtests.uipage.htmlelements.PictureElement;
 import com.seleniumtests.uipage.htmlelements.ScreenZone;
 import com.seleniumtests.uipage.htmlelements.Table;
 import com.seleniumtests.uipage.htmlelements.TextFieldElement;
+import com.seleniumtests.uipage.uielements.ByUI;
 import com.seleniumtests.uipage.uielements.TextFieldUiElement;
 
 /**
@@ -58,7 +59,8 @@ public class DriverTestPageWithoutFixedPattern extends PageObject {
 	public static final FrameElement iframe = new FrameElement("IFrame", By.id("myIFrame"));
 	public static final TextFieldElement textElementIFrame = new TextFieldElement("Text", By.id("textInIFrameWithValue"), iframe);
 	
-	public static final TextFieldUiElement uiTextElement = new TextFieldUiElement("Mon label.*");
+	public static final TextFieldUiElement uiTextElement = new TextFieldUiElement(ByUI.toRightOf("Mon label.*"));
+	public static final TextFieldUiElement uiTextElementBelow = new TextFieldUiElement(ByUI.below(".* onblur"));
 	
 	private String openedPageUrl;
 	

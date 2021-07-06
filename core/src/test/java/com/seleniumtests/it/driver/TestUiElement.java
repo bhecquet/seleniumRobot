@@ -68,13 +68,24 @@ public class TestUiElement extends GenericMultiBrowserTest {
 	}
 	
 	@Test(groups= {"it"})
-	public void testClickOnPicture() {
+	public void testSendKeysWithLabelOnTheLeft() {
 //		testPageWithoutPattern.move();
 		DriverTestPageWithoutFixedPattern.uiTextElement.sendKeys("foo");
 //		
 //		WaitHelper.waitForMilliSeconds(500); // in case of browser slowness
 //		Assert.assertEquals(DriverTestPageWithoutFixedPattern.logoText.getValue(), "ff logo");
 	}
+	
+	@Test(groups= {"it"})
+	public void testSendKeysWithLabelAbove() {
+//		testPageWithoutPattern.move();
+		DriverTestPageWithoutFixedPattern.uiTextElementBelow.sendKeys("foo");
+//		
+//		WaitHelper.waitForMilliSeconds(500); // in case of browser slowness
+//		Assert.assertEquals(DriverTestPageWithoutFixedPattern.logoText.getValue(), "ff logo");
+	}
+	
+	
 	
 	
 	public void testDoubleClickOnPicture() {

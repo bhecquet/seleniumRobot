@@ -1,5 +1,7 @@
 package com.seleniumtests.connectors.selenium.fielddetector;
 
+import java.awt.Rectangle;
+
 import kong.unirest.json.JSONObject;
 
 public class Label {
@@ -11,6 +13,19 @@ public class Label {
 	private int right;
 	private int width;
 	private int height;
+	
+	public Label() {}
+	
+	// for test purpose
+	public Label(int left, int right, int top, int bottom, String text) {
+		this.left = left;
+		this.right = right;
+		this.top = top;
+		this.bottom = bottom;
+		this.text = text;
+		this.width = right - left;
+		this.height = bottom - top;
+	}
 	
 	
 	public String getText() {
@@ -41,6 +56,10 @@ public class Label {
 		return height;
 	}
 
+	public Rectangle getRectangle() {
+		return new Rectangle(left, top, width, height);
+	}
+
 	
 	public static Label fromJson(JSONObject json) {
 		Label label = new Label();
@@ -64,14 +83,10 @@ public class Label {
 		int centerX = (right + left) / 2;
 		int centerY = (top + bottom) / 2;
 		
-		if (centerX > field.getLabel().left 
+		return centerX > field.getLabel().left 
 				&& centerX < field.getLabel().right
 				&& centerY > field.getLabel().top
-				&& centerY < field.getLabel().bottom) {
-			return true;
-		} else {
-			return false;
-		}
+				&& centerY < field.getLabel().bottom;
 	}
 	
 	/**
@@ -86,13 +101,9 @@ public class Label {
 		int fieldCenterX = (field.getLabel().right + field.getLabel().left) / 2;
 		int fieldCenterY = (field.getLabel().top + field.getLabel().bottom) / 2;
 
-		if (centerX < fieldCenterX 
+		return centerX < fieldCenterX 
 				&& fieldCenterY > top
-				&& fieldCenterY < bottom) {
-			return true;
-		} else {
-			return false;
-		}
+				&& fieldCenterY < bottom;
 	}
 	
 	/**
@@ -107,13 +118,44 @@ public class Label {
 		int fieldCenterX = (field.getLabel().right + field.getLabel().left) / 2;
 		int fieldCenterY = (field.getLabel().top + field.getLabel().bottom) / 2;
 		
-		if (centerX > fieldCenterX 
+		return centerX > fieldCenterX 
 				&& fieldCenterY > top
-				&& fieldCenterY < bottom) {
-			return true;
-		} else {
-			return false;
-		}
+				&& fieldCenterY < bottom;
+	}
+	
+	/**
+	 * Is field above this label
+	 * 
+	 * - center (Y) of field is on the top of center of label
+	 * - center (X) of field is between left and right of label
+	 * @param field
+	 * @return
+	 */
+	public boolean isFieldAbove(Field field) {
+		int labelCenterY = (top + bottom) / 2;
+		int fieldCenterX = (field.getLabel().right + field.getLabel().left) / 2;
+		int fieldCenterY = (field.getLabel().top + field.getLabel().bottom) / 2;
+		
+		return labelCenterY > fieldCenterY
+				&& fieldCenterX > left
+				&& fieldCenterX < right;
+	}
+	
+	/**
+	 * Is field below this label
+	 * - center (Y) of field is on the top of center of label
+	 * - center (X) of field is between left and right of label
+	 * @param field
+	 * @return
+	 */
+	public boolean isFieldBelow(Field field) {
+		int labelCenterY = (top + bottom) / 2;
+		int fieldCenterX = (field.getLabel().right + field.getLabel().left) / 2;
+		int fieldCenterY = (field.getLabel().top + field.getLabel().bottom) / 2;
+		
+		return labelCenterY < fieldCenterY
+				&& fieldCenterX > left
+				&& fieldCenterX < right;
 	}
 	
 	

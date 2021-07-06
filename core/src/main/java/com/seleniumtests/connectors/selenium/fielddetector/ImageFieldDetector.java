@@ -7,7 +7,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.uipage.uielements.UiElement;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 import kong.unirest.json.JSONException;
@@ -28,6 +28,9 @@ public class ImageFieldDetector {
 	public ImageFieldDetector(File image) {
 		this.image = image;
 		fieldDetectorInstance = SeleniumTestsContextManager.getThreadContext().getFieldDetectorInstance();
+		if (fieldDetectorInstance == null) {
+			throw new ConfigurationException("Image Field detector has not been properly configured");
+		}
 	}
 	
 	/**
