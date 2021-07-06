@@ -828,7 +828,6 @@ public class SeleniumTestsContext {
     	
     	bugtrackerInstance = initBugtracker();
     	
-    	fieldDetectorInstance = initFieldDetectorConnector();
     }
     
     /**
@@ -1736,6 +1735,9 @@ public class SeleniumTestsContext {
     }
     
     public FieldDetectorConnector getFieldDetectorInstance() {
+    	if (fieldDetectorInstance == null) {
+        	fieldDetectorInstance = initFieldDetectorConnector();
+    	}
     	return fieldDetectorInstance;
     }
     
