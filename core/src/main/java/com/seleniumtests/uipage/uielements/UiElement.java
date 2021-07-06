@@ -40,7 +40,6 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.remote.ScreenshotException;
 
 import com.seleniumtests.connectors.selenium.fielddetector.Field;
-import com.seleniumtests.connectors.selenium.fielddetector.FieldDetectorConnector;
 import com.seleniumtests.connectors.selenium.fielddetector.ImageFieldDetector;
 import com.seleniumtests.connectors.selenium.fielddetector.Label;
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -68,7 +67,6 @@ public class UiElement {
 	
 	/* 
 	 * TODO
-	 * - ne pas refaire de recherche si on en a déjà fait une pour cette page
 	 * - faire un reset entre 2 tests
 	 */
 	
@@ -80,18 +78,14 @@ public class UiElement {
 	private static Map<String, Point> offsetPerPage;
 	
 	static {
-		fieldsPerPage = Collections.synchronizedMap(new HashMap<>());
-		labelsPerPage = Collections.synchronizedMap(new HashMap<>());
-		offsetPerPage = Collections.synchronizedMap(new HashMap<>());
+		resetPageInformation();
 	}
 	
-	
-	private HtmlElement intoElement;
 	private long actionDuration;
 	private ElementType elementType;
 	private ScreenshotUtil screenshotUtil;
-	private Pattern label;
 	private ByUI by;
+	private boolean resetSearch;
     private String origin  = null;
 	protected Clock clock = Clock.systemUTC();
 
@@ -101,55 +95,70 @@ public class UiElement {
 		// for mocks
 	}
 	
-
-
-	/**
-	 * 
-	 * @param label					Text to find
-	 * @param elementType			type of element to find
-	 */
-	public UiElement(String label, ElementType elementType) {
-		this(Pattern.compile(label), elementType);
+	public UiElement(ByUI by) {
+		this(by, false);
 	}
 	
-	public UiElement(ByUI by) {
+	/**
+	 * 
+	 * @param by			search criteria
+	 * @param resetSearch	if true, a new capture will be taken to refresh screen (in case GUI changed on this page)
+	 */
+	public UiElement(ByUI by, boolean resetSearch) {
 		this.by = by;
 		this.elementType = by.getType();
 		
-
-		if (SeleniumTestsContextManager.isWebTest()) {
-			this.intoElement = new HtmlElement("", By.tagName("body"));
-		} else {
-			this.intoElement = new HtmlElement("", By.xpath("/*"));
-		}
-
 		origin = PageObject.getCallingPage(Thread.currentThread().getStackTrace());
+		this.resetSearch = resetSearch;
+	}
+
+	/**
+	 * Reset any information for any page. Mainly used for tests
+	 */
+	public static void resetPageInformation() {
+		fieldsPerPage = Collections.synchronizedMap(new HashMap<>());
+		labelsPerPage = Collections.synchronizedMap(new HashMap<>());
+		offsetPerPage = Collections.synchronizedMap(new HashMap<>());
 	}
 	
-	@Deprecated
-	public UiElement(Pattern pattern, ElementType elementType) {		
-		this.label = pattern;
-		this.elementType = elementType;
-		
-		if (SeleniumTestsContextManager.isWebTest()) {
-			this.intoElement = new HtmlElement("", By.tagName("body"));
-		} else {
-			this.intoElement = new HtmlElement("", By.xpath("/*"));
-		}
-		origin = PageObject.getCallingPage(Thread.currentThread().getStackTrace());
-		
+	/**
+	 * remove information relative to a specific page
+	 * @param pageName
+	 */
+	private void resetPageInformation(String pageName) {
+		fieldsPerPage.remove(pageName);
+		labelsPerPage.remove(pageName);
+		offsetPerPage.remove(pageName);
 	}
-	
 	
 	public ScreenshotUtil getScreenshotUtil() {
 		return new ScreenshotUtil();
 	}
 	
+	public ImageFieldDetector getImageFieldDetector(File screenshotFile) {
+		return new ImageFieldDetector(screenshotFile);
+	}
+	
+	/**
+	 * Check search criteria has the required information
+	 */
+	private void checkElementToSearch() {
+		if (by.getType() == null) {
+			throw new ConfigurationException("Element type is mandatory to search a field");
+		} else if (by.getLeftOf() == null && by.getRightOf() == null && by.getAbove() == null && by.getBelow() == null && by.getText() == null) {
+			throw new ConfigurationException("At least one of 'above', 'below', 'rightOf', 'leftOf', 'text' must be defined");
+		}
+	}
 
 	public void findElement() {
 
 		LocalDateTime start = LocalDateTime.now();
-	
+		
+		checkElementToSearch();
+		
+		if (resetSearch) {
+			resetPageInformation(origin);
+		}
 		
 		// search fields if we do not have one for this page
 		if (!fieldsPerPage.containsKey(origin)) {
@@ -164,7 +173,7 @@ public class UiElement {
 			Rectangle viewportPosition = detectViewPortPosition(screenshotFile);
 			offsetPerPage.put(origin, new Point(viewportPosition.x, viewportPosition.y));
 			
-			ImageFieldDetector detector = new ImageFieldDetector(screenshotFile);
+			ImageFieldDetector detector = getImageFieldDetector(screenshotFile);
 			List<Field> fields = detector.detectFields();
 			for (Field field: fields) {
 				field.changePosition(viewportPosition.x, viewportPosition.y);
@@ -182,13 +191,11 @@ public class UiElement {
 		
 		actionDuration = Duration.between(start, LocalDateTime.now()).toMillis();
 		
-		doAfterPictureSearch();
 	}
 	
 	private void findElementByPosition() {
 
 		// search the fields with label
-		// right of
 		Label labelRightOf = null;
 		Label labelLeftOf = null;
 		Label labelAbove = null;
@@ -210,6 +217,22 @@ public class UiElement {
 				}
 			}
 		}
+		if (by.getAbove() != null) {
+			for (Label lbl: labelsPerPage.get(origin)) {
+				if (by.getAbove().matcher(lbl.getText().trim()).matches()) {
+					labelAbove = lbl;
+					break;
+				}
+			}
+		}
+		if (by.getBelow() != null) {
+			for (Label lbl: labelsPerPage.get(origin)) {
+				if (by.getBelow().matcher(lbl.getText().trim()).matches()) {
+					labelBelow = lbl;
+					break;
+				}
+			}
+		}
 		if (by.getText() != null) {
 			for (Label lbl: labelsPerPage.get(origin)) {
 				if (by.getText().matcher(lbl.getText().trim()).matches()) {
@@ -220,22 +243,26 @@ public class UiElement {
 		}
 		
 		if (labelLeftOf == null && labelRightOf == null && labelText == null && labelAbove == null && labelBelow == null) {
-			throw new ConfigurationException("At least one of 'above', 'below', 'rightOf', 'leftOf', 'text' must be defined");
+			throw new ConfigurationException(String.format("No label could be found matching search criteria [%s]", by));
 		}
 		
 		
-		// TODO: above and below
 		for (Field field: fieldsPerPage.get(origin)) {
 
 			if (ElementType.fromClassName(field.getClassName()) == elementType
+					&& field.getRelatedField() == null // only use raw fields
 					&& (labelText == null || labelText.isInside(field)) 
 					&& (labelRightOf == null || labelRightOf.isFieldRightOf(field))
 					&& (labelLeftOf == null || labelLeftOf.isFieldLeftOf(field))
+					&& (labelAbove == null || labelAbove.isFieldAbove(field))
+					&& (labelBelow == null || labelBelow.isFieldBelow(field))
 					) {
 				detectedObjectRectangle = field.getRectangle();
+				return;
 			} 
 		
 		}
+		throw new ConfigurationException(String.format("No field could be found matching search criteria [%s]", by));
 	}
 	
 	/**
@@ -281,15 +308,8 @@ public class UiElement {
 		
 		return screenshotUtil.capture(SnapshotTarget.MAIN_SCREEN, File.class, true);		
 	}
-	
-	protected void doAfterPictureSearch() {
-		// scroll to element where our picture is so that we will be able to act on it
-		// scrolling will display, on top of window, the top of the element
-		intoElement.scrollToElement(0);
-		WaitHelper.waitForMilliSeconds(500);
-	}
-	
-	private CustomEventFiringWebDriver getDriver() {
+
+	public CustomEventFiringWebDriver getDriver() {
 		WebUIDriver uiDriver = WebUIDriver.getWebUIDriver(false);
 		if (uiDriver == null) {
 			throw new ScenarioException("Driver has not already been created");
@@ -301,62 +321,68 @@ public class UiElement {
     	return driver;
 	}
 
+	public void click() {
+		clickAt(0, 0);
+	}
+	
 	
 	@ReplayOnError
 	public void clickAt(int xOffset, int yOffset) {
-		findElement();
-
-		getDriver().scrollTo(detectedObjectRectangle.x, detectedObjectRectangle.y);
-		Point scrollPosition = getDriver().getScrollPosition();
-
-		int relativeX = detectedObjectRectangle.x + getViewportOffset().x - scrollPosition.x + detectedObjectRectangle.width / 2;
-		int relativeY = detectedObjectRectangle.y + getViewportOffset().y - scrollPosition.y + detectedObjectRectangle.height / 2;
+		Point relativePoint = findElementPosition(xOffset, yOffset);
 		
-		CustomEventFiringWebDriver.leftClicOnDesktopAt(true, relativeX, relativeY, 
+		CustomEventFiringWebDriver.leftClicOnDesktopAt(true, relativePoint.x, relativePoint.y, 
 				SeleniumTestsContextManager.getThreadContext().getRunMode(), 
 				SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector());
 
+	}
+	
+	/**
+	 * Find the element
+	 * Scroll to it
+	 * Compute mouse position to be able to click on it
+	 * 
+	 * @param xOffset	offset from the center of the element to click on 
+	 * @param yOffset	offset from the center of the element to click on 
+	 * @return
+	 */
+	private Point findElementPosition(int xOffset, int yOffset) {
+		findElement();
+
+		// as field and label positions has been modified to be relative to screen and not to viewport, when scrolling in viewport, we must take into account viewport position
+		getDriver().scrollTo(detectedObjectRectangle.x - getViewportOffset().x, detectedObjectRectangle.y - getViewportOffset().y);
+		Point scrollPosition = getDriver().getScrollPosition();
+
+		// TODO: handle negative offset when scrolling
+		int relativeX = detectedObjectRectangle.x - scrollPosition.x + detectedObjectRectangle.width / 2 + xOffset;
+		int relativeY = detectedObjectRectangle.y - scrollPosition.y + detectedObjectRectangle.height / 2 + yOffset;
+		
+		return new Point(relativeX, relativeY);
+	}
+	
+	public void doubleClick() {
+		doubleClickAt(0, 0);
 	}
 	
 	@ReplayOnError
 	public void doubleClickAt(int xOffset, int yOffset) {
-		findElement();
+		Point relativePoint = findElementPosition(xOffset, yOffset);
 		
-		int relativeX = detectedObjectRectangle.x + detectedObjectRectangle.width / 2;
-		int relativeY = detectedObjectRectangle.y + detectedObjectRectangle.height / 2;
-		
-		moveAndDoubleClick(relativeX + (int)(xOffset), relativeY + (int)(yOffset));
+		CustomEventFiringWebDriver.doubleClickOnDesktopAt(true, relativePoint.x, relativePoint.y, 
+				SeleniumTestsContextManager.getThreadContext().getRunMode(), 
+				SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector());
+	}
+	
+	public void rightClick() {
+		rightClickAt(0, 0);
 	}
 	
 	@ReplayOnError
 	public void rightClickAt(int xOffset, int yOffset) {
-		findElement();
+		Point relativePoint = findElementPosition(xOffset, yOffset);
 		
-		int relativeX = detectedObjectRectangle.x + detectedObjectRectangle.width / 2;
-		int relativeY = detectedObjectRectangle.y + detectedObjectRectangle.height / 2;
-		
-		moveAndRightClick(relativeX + (int)(xOffset), relativeY + (int)(yOffset));
-	}
-	
-    public void swipe(int xMove, int yMove) {
-		throw new ScenarioException("swipe is not supported for desktop capture");
-	}
-	
-    public void tap() {
-		throw new ScenarioException("tap is not supported for desktop capture");
-	}
-	
-	public void moveAndDoubleClick(int coordX, int coordY) {
-		CustomEventFiringWebDriver.doubleClickOnDesktopAt(coordX, coordY, 
+		CustomEventFiringWebDriver.rightClicOnDesktopAt(true, relativePoint.x, relativePoint.y, 
 				SeleniumTestsContextManager.getThreadContext().getRunMode(), 
 				SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector());
-	}
-	
-	public void moveAndRightClick(int coordX, int coordY) {
-		CustomEventFiringWebDriver.rightClicOnDesktopAt(coordX, coordY, 
-				SeleniumTestsContextManager.getThreadContext().getRunMode(), 
-				SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector());
-		
 	}
 	
 	/**
@@ -420,7 +446,7 @@ public class UiElement {
 			try {
 				findElement();
 				return true;
-			} catch (ImageSearchException e) {
+			} catch (ImageSearchException | ConfigurationException e) {
 				if (waitMs == 0) {
 					return false;
 				}
@@ -432,7 +458,7 @@ public class UiElement {
 	
 	@Override
 	public String toString() {
-		return String.format("%s labeled '%s'", elementType, label);
+		return String.format("Element located by %s", by);
 	}
 
 	public Rectangle getDetectedObjectRectangle() {
@@ -445,5 +471,17 @@ public class UiElement {
 
 	public void setActionDuration(long actionDuration) {
 		this.actionDuration = actionDuration;
+	}
+
+	public static Map<String, List<Field>> getFieldsPerPage() {
+		return fieldsPerPage;
+	}
+
+	public static Map<String, List<Label>> getLabelsPerPage() {
+		return labelsPerPage;
+	}
+
+	public static Map<String, Point> getOffsetPerPage() {
+		return offsetPerPage;
 	}
 }

@@ -100,8 +100,24 @@ public class TestLabel extends GenericTest {
 		Assert.assertTrue(label.isInside(field));
 		Assert.assertFalse(label.isFieldLeftOf(field));
 		Assert.assertFalse(label.isFieldRightOf(field));
+		Assert.assertFalse(label.isFieldAbove(field));
+		Assert.assertFalse(label.isFieldBelow(field));
 	}
 	
+
+	/**
+	 * Label is on the top of field
+	 * 
+	 * 	 		------
+	 * 			Label
+	 * 			------
+	 * 	
+	 * 			-----
+	 * 			Field
+	 * 			-----
+	 * 
+	 * 
+	 */
 	@Test(groups= {"ut"})
 	public void testIsNotInsideAbove() {
 		Label label = Label.fromJson(new JSONObject("{"
@@ -128,7 +144,23 @@ public class TestLabel extends GenericTest {
 				+ "	}"));
 		
 		Assert.assertFalse(label.isInside(field));
+		Assert.assertFalse(label.isFieldLeftOf(field));
+		Assert.assertFalse(label.isFieldRightOf(field));
+		Assert.assertFalse(label.isFieldAbove(field));
+		Assert.assertTrue(label.isFieldBelow(field));
 	}
+
+	/**
+	 * Label is on the bottom of field
+	 * 	 		------
+	 * 			Field
+	 * 			------
+	 * 	
+	 * 			-----
+	 * 			Label
+	 * 			-----
+	 * 
+	 */
 	@Test(groups= {"ut"})
 	public void testIsNotInsideBelow() {
 		Label label = Label.fromJson(new JSONObject("{"
@@ -155,8 +187,20 @@ public class TestLabel extends GenericTest {
 				+ "	}"));
 		
 		Assert.assertFalse(label.isInside(field));
+		Assert.assertFalse(label.isFieldLeftOf(field));
+		Assert.assertFalse(label.isFieldRightOf(field));
+		Assert.assertTrue(label.isFieldAbove(field));
+		Assert.assertFalse(label.isFieldBelow(field));
 	}
 	
+
+	/**
+	 * Label is on the left of field
+	 * 	-----		------
+	 * 	Label		Field
+	 * 	-----		------	
+	 * 
+	 */
 	@Test(groups= {"ut"})
 	public void testIsNotInsideLeft() {
 		Label label = Label.fromJson(new JSONObject("{"
@@ -183,9 +227,19 @@ public class TestLabel extends GenericTest {
 				+ "	}"));
 		
 		Assert.assertFalse(label.isInside(field));
+		Assert.assertFalse(label.isFieldLeftOf(field));
 		Assert.assertTrue(label.isFieldRightOf(field));
+		Assert.assertFalse(label.isFieldAbove(field));
+		Assert.assertFalse(label.isFieldBelow(field));
 	}
 	
+	/**
+	 * Label is on the right of field
+	 * 	-----		------
+	 * 	Field		Label
+	 * 	-----		------
+	 * 
+	 */
 	@Test(groups= {"ut"})
 	public void testIsNotInsideRight() {
 		Label label = Label.fromJson(new JSONObject("{"
@@ -213,5 +267,97 @@ public class TestLabel extends GenericTest {
 		
 		Assert.assertFalse(label.isInside(field));
 		Assert.assertTrue(label.isFieldLeftOf(field));
+		Assert.assertFalse(label.isFieldRightOf(field));
+		Assert.assertFalse(label.isFieldAbove(field));
+		Assert.assertFalse(label.isFieldBelow(field));
+	}
+	
+
+	/**
+	 * Field on the left, but not aligned horizontally
+	 * 
+	 * 			------
+	 * 			Field
+	 * 			------
+	 * 	
+	 * 	-----
+	 * 	Label
+	 * 	-----
+	 * 
+	 */
+	@Test(groups= {"ut"})
+	public void testFieldAndLabelNotAligned1() {
+		Label label = Label.fromJson(new JSONObject("{"
+				+ "		\"top\": 200,"
+				+ "		\"left\": 100,"
+				+ "		\"width\": 100,"
+				+ "		\"height\": 20,"
+				+ "		\"right\": 200,"
+				+ "		\"bottom\": 220,"
+				+ "		\"text\": \"My link Parent\""
+				+ "	}"));
+		Field field = Field.fromJson(new JSONObject("{"
+				+ "		\"class_id\": 3,"
+				+ "		\"top\": 100,"
+				+ "		\"left\": 200,"
+				+ "		\"width\": 100,"
+				+ "		\"height\": 20,"
+				+ "		\"right\": 300,"
+				+ "		\"bottom\": 120,"
+				+ "		\"class_name\": \"radio_with_label\","
+				+ "		\"text\": \"= Value 4\","
+				+ "		\"related_field\": null,"
+				+ "		\"with_label\": true"
+				+ "	}"));
+		
+		Assert.assertFalse(label.isInside(field));
+		Assert.assertFalse(label.isFieldLeftOf(field));
+		Assert.assertFalse(label.isFieldRightOf(field));
+		Assert.assertFalse(label.isFieldAbove(field));
+		Assert.assertFalse(label.isFieldBelow(field));
+	}
+	
+	/**
+	 * Field on the right, but not aligned horizontally
+	 * 
+	 * 			------
+	 * 			Field
+	 * 			------
+	 * 	
+	 * 					-----
+	 * 					Label
+	 * 					-----
+	 * 
+	 */
+	@Test(groups= {"ut"})
+	public void testFieldAndLabelNotAligned2() {
+		Label label = Label.fromJson(new JSONObject("{"
+				+ "		\"top\": 200,"
+				+ "		\"left\": 300,"
+				+ "		\"width\": 100,"
+				+ "		\"height\": 20,"
+				+ "		\"right\": 400,"
+				+ "		\"bottom\": 220,"
+				+ "		\"text\": \"My link Parent\""
+				+ "	}"));
+		Field field = Field.fromJson(new JSONObject("{"
+				+ "		\"class_id\": 3,"
+				+ "		\"top\": 100,"
+				+ "		\"left\": 200,"
+				+ "		\"width\": 100,"
+				+ "		\"height\": 20,"
+				+ "		\"right\": 300,"
+				+ "		\"bottom\": 120,"
+				+ "		\"class_name\": \"radio_with_label\","
+				+ "		\"text\": \"= Value 4\","
+				+ "		\"related_field\": null,"
+				+ "		\"with_label\": true"
+				+ "	}"));
+		
+		Assert.assertFalse(label.isInside(field));
+		Assert.assertFalse(label.isFieldLeftOf(field));
+		Assert.assertFalse(label.isFieldRightOf(field));
+		Assert.assertFalse(label.isFieldAbove(field));
+		Assert.assertFalse(label.isFieldBelow(field));
 	}
 }

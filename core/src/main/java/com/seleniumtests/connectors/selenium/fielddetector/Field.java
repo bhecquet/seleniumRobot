@@ -9,6 +9,19 @@ public class Field {
 	private String className;
 	private Field relatedField;
 	
+	public Field() {}
+	
+	public Field(int left, int right, int top, int bottom, String text, String className) {
+		this.label = new Label(left, right, top, bottom, text);
+		this.className = className;
+	}
+	
+	public Field(int left, int right, int top, int bottom, String text, String className, Field relatedField) {
+		this.label = new Label(left, right, top, bottom, text);
+		this.className = className;
+		this.relatedField = relatedField;
+	}
+	
 	public Label getLabel() {
 		return label;
 	}
@@ -33,7 +46,7 @@ public class Field {
 	}
 	
 	public Rectangle getRectangle() {
-		return new Rectangle(label.getLeft(), label.getTop(), label.getWidth(), label.getHeight());
+		return label.getRectangle();
 	}
 	
 	public String getClassName() {
