@@ -134,7 +134,7 @@ public class TestReporterControler extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.contains("<div>class com.seleniumtests.customexception.ConfigurationException: Some error before method</div>"));
 		
 		// check we have a step for BeforeMethod and it's marked as failed
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> Pre test step: beforeMethod"));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button><span class=\"step-title\"> Pre test step: beforeMethod"));
 		
 		// Check details of the configuration error is displayed in report
 		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error\">\\s+class com.seleniumtests.customexception.ConfigurationException: Some error before method.*"));
@@ -174,7 +174,7 @@ public class TestReporterControler extends ReporterTest {
 		Assert.assertFalse(detailedReportContent.contains("<div>class com.seleniumtests.customexception.ConfigurationException: Some error after method</div>"));
 		
 		// check we have a step for AfterMethod and it's marked as failed
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> Post test step: afterMethod"));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button><span class=\"step-title\"> Post test step: afterMethod"));
 		
 		// check logs written in @AfterXXX are present in execution logs
 		Assert.assertTrue(detailedReportContent.contains("[main] ScenarioLogger: some warning</div>"));
@@ -196,22 +196,22 @@ public class TestReporterControler extends ReporterTest {
 		
 		String detailedReportContent = readTestMethodResultFile("test1Listener1");
 		
-		Assert.assertTrue(detailedReportContent.contains("</i></button> Pre test step: beforeMethod -"));
-		Assert.assertTrue(detailedReportContent.contains("</i></button> Pre test step: beforeTest -"));
-		Assert.assertTrue(detailedReportContent.contains("</i></button> Pre test step: beforeClass -"));
-		Assert.assertTrue(detailedReportContent.contains("</i></button> Post test step: afterMethod -"));
-		Assert.assertTrue(detailedReportContent.contains("</i></button> Post test step: afterClass -"));
-		Assert.assertTrue(detailedReportContent.contains("</i></button> Post test step: afterTest -"));
+		Assert.assertTrue(detailedReportContent.contains("</i></button><span class=\"step-title\"> Pre test step: beforeMethod -"));
+		Assert.assertTrue(detailedReportContent.contains("</i></button><span class=\"step-title\"> Pre test step: beforeTest -"));
+		Assert.assertTrue(detailedReportContent.contains("</i></button><span class=\"step-title\"> Pre test step: beforeClass -"));
+		Assert.assertTrue(detailedReportContent.contains("</i></button><span class=\"step-title\"> Post test step: afterMethod -"));
+		Assert.assertTrue(detailedReportContent.contains("</i></button><span class=\"step-title\"> Post test step: afterClass -"));
+		Assert.assertTrue(detailedReportContent.contains("</i></button><span class=\"step-title\"> Post test step: afterTest -"));
 		
 		// check reference to configuration methods for class / test / method are in both results (some are common)
 		String detailedReportContent2 = readTestMethodResultFile("test2Listener1");
 		
-		Assert.assertTrue(detailedReportContent2.contains("</i></button> Pre test step: beforeMethod -"));
-		Assert.assertTrue(detailedReportContent2.contains("</i></button> Pre test step: beforeTest -"));
-		Assert.assertTrue(detailedReportContent2.contains("</i></button> Pre test step: beforeClass -"));
-		Assert.assertTrue(detailedReportContent2.contains("</i></button> Post test step: afterMethod -"));
-		Assert.assertTrue(detailedReportContent2.contains("</i></button> Post test step: afterClass -"));
-		Assert.assertTrue(detailedReportContent2.contains("</i></button> Post test step: afterTest -"));
+		Assert.assertTrue(detailedReportContent2.contains("</i></button><span class=\"step-title\"> Pre test step: beforeMethod -"));
+		Assert.assertTrue(detailedReportContent2.contains("</i></button><span class=\"step-title\"> Pre test step: beforeTest -"));
+		Assert.assertTrue(detailedReportContent2.contains("</i></button><span class=\"step-title\"> Pre test step: beforeClass -"));
+		Assert.assertTrue(detailedReportContent2.contains("</i></button><span class=\"step-title\"> Post test step: afterMethod -"));
+		Assert.assertTrue(detailedReportContent2.contains("</i></button><span class=\"step-title\"> Post test step: afterClass -"));
+		Assert.assertTrue(detailedReportContent2.contains("</i></button><span class=\"step-title\"> Post test step: afterTest -"));
 	}
 	
 	/**
@@ -224,17 +224,17 @@ public class TestReporterControler extends ReporterTest {
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 		
 		String detailedReportContent = readTestMethodResultFile("testAndSubActions");
-		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "</i></button> Pre test step: set -"), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "</i></button><span class=\"step-title\"> Pre test step: set -"), 1);
 		
 		String detailedReportContent2 = readTestMethodResultFile("testInError");
-		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "</i></button> Pre test step: set -"), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "</i></button><span class=\"step-title\"> Pre test step: set -"), 1);
 		
 		// check that when test is KO, error cause is displayed
 		Assert.assertTrue(detailedReportContent2.contains("[main] ScenarioLogger: Test is KO with error: error"));
 		
 		String detailedReportContent3 = readTestMethodResultFile("testWithException");
-		Assert.assertEquals(StringUtils.countMatches(detailedReportContent3, "</i></button> Pre test step: set -"), 1);
-		Assert.assertEquals(StringUtils.countMatches(detailedReportContent3, "</i></button> Post test step: reset -"), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent3, "</i></button><span class=\"step-title\"> Pre test step: set -"), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent3, "</i></button><span class=\"step-title\"> Post test step: reset -"), 1);
 		
 		// in case of test method error, it is retried so each Before/After method is also replayed. Check it's the last one we have
 		Assert.assertTrue(detailedReportContent3.contains("<div class=\"message-info\">before count: 2</div>"));
