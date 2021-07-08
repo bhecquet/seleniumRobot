@@ -37,11 +37,7 @@ public class TestFieldDetectorConnector extends GenericTest {
 	@BeforeMethod(groups={"it"})
 	public void init(ITestContext ctx) {
 		System.setProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL, "http://localhost:5000");
-		try {
-			initThreadContext(ctx);
-		} catch (ConfigurationException e) {
-			throw new SkipException("no field detector server available");
-		}
+		initThreadContext(ctx);
 	}
 	
 	@AfterMethod(groups= {"it"}, alwaysRun = true)
@@ -49,9 +45,15 @@ public class TestFieldDetectorConnector extends GenericTest {
 		System.clearProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL);
 	}
 	
-	@Test(groups="it")
+	@Test(groups="it", enabled = false)
 	public void testFieldDetection() throws IOException {
-		List<Field> fields = new ImageFieldDetector(createImageFromResource("ti/form_picture.png")).detectFields();
+		ImageFieldDetector imageFieldDetector;
+		try {
+			imageFieldDetector = new ImageFieldDetector(createImageFromResource("ti/form_picture.png"));
+		} catch (ConfigurationException e) {
+			throw new SkipException("no field detector server available");
+		}
+		List<Field> fields = imageFieldDetector.detectFields();
 		Assert.assertTrue(fields.size() > 10);
 	}
 }
