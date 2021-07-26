@@ -2012,8 +2012,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent = readTestMethodResultFile("testCauseWithErrorAndDetails");
 		
 		// Only failing step contains the information message
-		Assert.assertTrue(detailedReportContent.matches(".*<i class\\=\"fa fa-plus\"></i></button><span class=\"step-title\"> add - 0\\.0 secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fa fa-info-circle\"></i><span>Possibly caused by REGRESSION: Check your scripts</span></div>.*"));
-		Assert.assertFalse(detailedReportContent.matches(".*<i class\\=\"fa fa-plus\"></i></button><span class=\"step-title\"> Test end - 0\\.0 secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fa fa-info-circle\"></i><span>Possibly caused by REGRESSION: Check your scripts</span></div>.*"));
+		Assert.assertTrue(detailedReportContent.matches(".*<i class\\=\"fa fa-plus\"></i></button><span class=\"step-title\"> add - 0\\.\\d+ secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fa fa-info-circle\"></i><span>Possibly caused by REGRESSION: Check your scripts</span></div>.*"));
+		Assert.assertFalse(detailedReportContent.matches(".*<i class\\=\"fa fa-plus\"></i></button><span class=\"step-title\"> Test end - 0\\.\\d+ secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fa fa-info-circle\"></i><span>Possibly caused by REGRESSION: Check your scripts</span></div>.*"));
 	}
 	
 	@Test(groups={"it"})
@@ -2025,8 +2025,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent = readTestMethodResultFile("testCauseWithErrorNoDetails");
 		
 		// Only failing step contains the information message
-		Assert.assertTrue(detailedReportContent.matches(".*<i class\\=\"fa fa-plus\"></i></button><span class=\"step-title\"> add - 0\\.0 secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fa fa-info-circle\"></i><span>Possibly caused by REGRESSION: </span></div>.*"));
-		Assert.assertFalse(detailedReportContent.matches(".*<i class\\=\"fa fa-plus\"></i></button><span class=\"step-title\"> Test end - 0\\.0 secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fa fa-info-circle\"></i><span>Possibly caused by REGRESSION: </span></div>.*"));
+		Assert.assertTrue(detailedReportContent.matches(".*<i class\\=\"fa fa-plus\"></i></button><span class=\"step-title\"> add - 0\\.\\d+ secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fa fa-info-circle\"></i><span>Possibly caused by REGRESSION: </span></div>.*"));
+		Assert.assertFalse(detailedReportContent.matches(".*<i class\\=\"fa fa-plus\"></i></button><span class=\"step-title\"> Test end - 0\\.\\d+ secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fa fa-info-circle\"></i><span>Possibly caused by REGRESSION: </span></div>.*"));
 	}
 	
 	@Test(groups={"it"})
