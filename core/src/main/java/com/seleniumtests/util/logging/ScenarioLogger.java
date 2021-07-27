@@ -13,6 +13,7 @@ import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
+import com.seleniumtests.reporter.info.Info;
 import com.seleniumtests.reporter.info.StringInfo;
 import com.seleniumtests.reporter.logger.GenericFile;
 import com.seleniumtests.reporter.logger.HarCapture;
@@ -110,10 +111,10 @@ public class ScenarioLogger extends Logger {
      * @param key
      * @param value. A StringInfo object (either StringInfo or HyperlinkInfo)
      */
-    public void logTestInfo(String key, StringInfo value) {
+    public void logTestInfo(String key, Info value) {
     	logTestInfo(key, value, Reporter.getCurrentTestResult());
     }
-    public void logTestInfo(String key, StringInfo value, ITestResult testResult) {
+    public void logTestInfo(String key, Info value, ITestResult testResult) {
     	TestNGResultUtils.setTestInfo(testResult, key, value);
     	super.info(String.format("Storing into test result %s: %s", key, value.getInfo() ));
     }

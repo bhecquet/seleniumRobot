@@ -34,6 +34,7 @@ import org.testng.internal.TestResult;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.core.runner.CucumberScenarioWrapper;
+import com.seleniumtests.reporter.info.Info;
 import com.seleniumtests.reporter.info.StringInfo;
 import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -331,8 +332,8 @@ public class TestNGResultUtils {
     }
     
     // information about test
-    public static Map<String, StringInfo> getTestInfo(ITestResult testNGResult) {
-    	Map<String, StringInfo> testInfo = (Map<String, StringInfo>) testNGResult.getAttribute(TEST_INFO);
+    public static Map<String, Info> getTestInfo(ITestResult testNGResult) {
+    	Map<String, Info> testInfo = (Map<String, Info>) testNGResult.getAttribute(TEST_INFO);
     	if (testInfo != null) {
     		return testInfo;
     	} else {
@@ -349,15 +350,15 @@ public class TestNGResultUtils {
     public static Map<String, String> getTestInfoEncoded(ITestResult testNGResult, String format) {
 
     	Map<String, String> encodedTestInfos = new HashMap<>();
-		for (Entry<String, StringInfo> infoEntry: getTestInfo(testNGResult).entrySet()) {
+		for (Entry<String, Info> infoEntry: getTestInfo(testNGResult).entrySet()) {
 			encodedTestInfos.put(StringUtility.encodeString(infoEntry.getKey(), format.toLowerCase()), 
 									infoEntry.getValue().encode(format.toLowerCase()));
 		}
 		return encodedTestInfos;
     }
     
-    public static void setTestInfo(ITestResult testNGResult, String key, StringInfo value) {
-    	Map<String, StringInfo> testInfo = (Map<String, StringInfo>) testNGResult.getAttribute(TEST_INFO);
+    public static void setTestInfo(ITestResult testNGResult, String key, Info value) {
+    	Map<String, Info> testInfo = (Map<String, Info>) testNGResult.getAttribute(TEST_INFO);
     	if (testInfo == null) {
     		testInfo = new HashMap<>();
     	} 

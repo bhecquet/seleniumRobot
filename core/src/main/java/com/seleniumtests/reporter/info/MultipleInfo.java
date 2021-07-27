@@ -8,23 +8,23 @@ import java.util.List;
  * @author S047432
  *
  */
-public class MultipleInfo extends StringInfo {
+public class MultipleInfo extends Info {
 
-	private List<StringInfo> infos;
+	private List<Info> infos;
 	
 	public MultipleInfo(String info) {
 		super(info);
 		infos = new ArrayList<>();
 	}
 	
-	public void addInfo(StringInfo info) {
+	public void addInfo(Info info) {
 		infos.add(info);
 	}
 	
 	@Override
 	public String encode(String format) {
 		StringBuilder out = new StringBuilder();
-		for (StringInfo info: infos) {
+		for (Info info: infos) {
 			out.append(info.encode(format));
 		}
 		return out.toString();

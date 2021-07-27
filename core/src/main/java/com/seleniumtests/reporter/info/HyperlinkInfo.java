@@ -3,7 +3,7 @@ package com.seleniumtests.reporter.info;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.util.StringUtility;
 
-public class HyperlinkInfo extends StringInfo {
+public class HyperlinkInfo extends Info {
 
 	protected String link;
 	
