@@ -35,6 +35,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
+import org.testng.ITestResult;
 
 import com.neotys.selenium.proxies.NLWebDriver;
 import com.neotys.selenium.proxies.NLWebDriverFactory;
@@ -64,7 +65,11 @@ import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.driver.screenshots.SnapshotTarget;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.driver.screenshots.VideoRecorder;
+import com.seleniumtests.reporter.logger.ImageLinkInfo;
+import com.seleniumtests.reporter.logger.MultipleInfo;
+import com.seleniumtests.reporter.logger.StringInfo;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.reporter.logger.VideoLinkInfo;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -252,11 +257,11 @@ public class WebUIDriver {
      * extract the video file recorded by test
      */
  
-    public static File logFinalDriversState() {
+    public static File logFinalDriversState(ITestResult testResult) {
     	if (uxDriverSession.get() != null) {
     		for (WebUIDriver webuiDriver: uxDriverSession.get().values()) {
         		if (webuiDriver != null) {
-        			webuiDriver.logFinalDriverState();
+        			webuiDriver.logFinalDriverState(testResult);
         		}
         	}
     	}
@@ -292,7 +297,7 @@ public class WebUIDriver {
     /**
      * Logs current state of the browser
      */
-    private void logFinalDriverState() {
+    private void logFinalDriverState(ITestResult testResult) {
     	if (driver != null) {
 			try {
 				
@@ -302,6 +307,11 @@ public class WebUIDriver {
 				// force screenshotUtil to use the driver of this WebUiDriver, not the currently selected one
 				for (ScreenShot screenshot: new ScreenshotUtil(driver).capture(SnapshotTarget.PAGE, ScreenShot.class, true, true)) {
 					scenarioLogger.logScreenshot(screenshot, null, name, SnapshotCheckType.FALSE);
+					
+					StringInfo lastStateInfo = TestNGResultUtils.getTestInfo(testResult).get(TestStepManager.LAST_STATE_NAME);
+		        	if (lastStateInfo != null) {
+		        		((MultipleInfo)lastStateInfo).addInfo(new ImageLinkInfo(TestNGResultUtils.getUniqueTestName(testResult) + "/" + screenshot.getImagePath()));
+		        	}
 				}
 			} catch (Exception e) {
 				scenarioLogger.log("Error while logging: " + e.getMessage());

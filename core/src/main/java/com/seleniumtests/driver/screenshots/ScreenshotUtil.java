@@ -723,10 +723,9 @@ public class ScreenshotUtil {
         screenShot.setLocation(namedImage.url);
         screenShot.setTitle(namedImage.title);
         
-        String outputSubDirectory = new File(outputDirectory).getName();
         try {
             FileUtils.writeStringToFile(Paths.get(outputDirectory, HTML_DIR + filename + ".html").toFile(), namedImage.pageSource);
-            screenShot.setHtmlSourcePath(String.format("../%s/%s%s.html", outputSubDirectory, HTML_DIR, filename));
+            screenShot.setHtmlSourcePath(String.format("%s%s.html", HTML_DIR, filename));
         } catch (IOException e) {
             logger.warn("Ex", e);
         }
@@ -737,7 +736,7 @@ public class ScreenshotUtil {
     		Path pathAbsolute = Paths.get(screenshotFile.getAbsolutePath());
 	        Path pathBase = Paths.get(outputDirectory);
 
-    		screenShot.setImagePath(String.format("../%s/%s", outputSubDirectory, pathBase.relativize(pathAbsolute).toString()));
+    		screenShot.setImagePath(pathBase.relativize(pathAbsolute).toString());
     	}
 		return screenShot;
     }

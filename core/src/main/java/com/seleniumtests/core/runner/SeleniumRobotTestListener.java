@@ -64,6 +64,8 @@ import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.VideoRecorder;
 import com.seleniumtests.reporter.logger.ArchiveMode;
+import com.seleniumtests.reporter.logger.ImageLinkInfo;
+import com.seleniumtests.reporter.logger.MultipleInfo;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.reporters.CommonReporter;
 import com.seleniumtests.reporter.reporters.ReporterControler;
@@ -475,6 +477,7 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 		}
 		
 		TestStep tearDownStep = new TestStep(TestStepManager.LAST_STEP_NAME, testResult, new ArrayList<>(), true);
+		scenarioLogger.logTestInfo(TestStepManager.LAST_STATE_NAME, new MultipleInfo(TestStepManager.LAST_STATE_NAME));
 		
 		// add step to video
 		VideoRecorder videoRecorder = WebUIDriver.getThreadVideoRecorder();
@@ -507,7 +510,7 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 		}
 		
 		logThrowableToTestEndStep(testResult);
-		WebUIDriver.logFinalDriversState();
+		WebUIDriver.logFinalDriversState(testResult);
 		tearDownStep.updateDuration();
 		TestStepManager.logTestStep(tearDownStep);
 		

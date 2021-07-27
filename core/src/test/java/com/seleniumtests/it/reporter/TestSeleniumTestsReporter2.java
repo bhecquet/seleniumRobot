@@ -1344,13 +1344,64 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// read 'testDriver' report. This contains calls to HtmlElement actions
 		String detailedReportContent1 = readTestMethodResultFile("testDriverCustomSnapshot");
 		
-		Assert.assertTrue(detailedReportContent1.contains("<a href='../testDriverCustomSnapshot/screenshots/my_snapshot"));	
-		Assert.assertTrue(detailedReportContent1.contains("<a href='../testDriverCustomSnapshot/htmls/my_snapshot"));	
+		Assert.assertTrue(detailedReportContent1.contains("<a href='screenshots/my_snapshot"));	
+		Assert.assertTrue(detailedReportContent1.contains("<a href='htmls/my_snapshot"));	
 		Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-snapshot\">Output 'drv:main-my snapshot' browser: my snapshot:"));	
 	}
 	
 	/**
+	 * Check test information shows a link to last test step
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportContainsTestEndScreenshotQuicklink() throws Exception {
+		
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverCustomSnapshot"});
+		
+		// read 'testDriverCustomSnapshot' report. This contains calls to HtmlElement actions
+		String detailedReportContent1 = readTestMethodResultFile("testDriverCustomSnapshot");
+		
+		Assert.assertTrue(detailedReportContent1.matches(".*<th>Last State</th><td><a href=\"screenshots/testDriverCustomSnapshot_7-1_Test_end--\\w+.png\"><i class=\"fa fa-file-image-o\" aria-hidden=\"true\"></i></a></td>.*"));
+		
+		// check shortcut to last state is displayed
+		String mainReportContent = readSummaryFile();
+		Assert.assertTrue(mainReportContent.matches(".*<td class=\"info\"><a href=\"testDriverCustomSnapshot/screenshots/testDriverCustomSnapshot_7-1_Test_end--\\w+.png\"><i class=\"fa fa-file-image-o\" aria-hidden=\"true\"></i></a></td>.*"));
+		
+	}
+	
+	/**
 	 * Check that video capture file is not present in result if not requested
+	 * 
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportContainsNoVideoCapture() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "false");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriver"});
+			
+			// read 'testDriver' report. This contains calls to HtmlElement actions
+			String detailedReportContent1 = readTestMethodResultFile("testDriver");
+			
+			Assert.assertFalse(detailedReportContent1.contains("Video capture: <a href='videoCapture.avi'>file</a>"));
+			
+			// check shortcut to video is NOT present in detailed report
+			Assert.assertFalse(detailedReportContent1.matches(".*<th>Last State</th><td><a href=\"screenshots/testDriver_8-1_Test_end--\\w+.png\"><i class=\"fa fa-file-image-o\" aria-hidden=\"true\"></i></a><a href=\"videoCapture.avi\"><i class=\"fa fa-video-camera\" aria-hidden=\"true\"></i></a></td>.*"));
+			
+			// check shortcut to video is NOT present in summary report
+			String mainReportContent = readSummaryFile();
+			Assert.assertFalse(mainReportContent.matches(".*<td class=\"info\"><a href=\"testDriver/screenshots/testDriver_8-1_Test_end--\\w+.png\"><i class=\"fa fa-file-image-o\" aria-hidden=\"true\"></i></a><a href=\"testDriver/videoCapture.avi\"><i class=\"fa fa-video-camera\" aria-hidden=\"true\"></i></a></td>.*"));
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
+		}
+		
+	}
+	
+	/**
+	 * Check that video capture file is present in result if requested
 	 * 
 	 * @throws Exception
 	 */
@@ -1365,7 +1416,14 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			// read 'testDriver' report. This contains calls to HtmlElement actions
 			String detailedReportContent1 = readTestMethodResultFile("testDriver");
 			
-			Assert.assertTrue(detailedReportContent1.contains("Video capture: <a href='videoCapture.avi'>file</a>"));	
+			Assert.assertTrue(detailedReportContent1.contains("Video capture: <a href='videoCapture.avi'>file</a>"));
+			
+			// check shortcut to video is present in detailed report
+			Assert.assertTrue(detailedReportContent1.matches(".*<th>Last State</th><td><a href=\"screenshots/testDriver_8-1_Test_end--\\w+.png\"><i class=\"fa fa-file-image-o\" aria-hidden=\"true\"></i></a><a href=\"videoCapture.avi\"><i class=\"fa fa-video-camera\" aria-hidden=\"true\"></i></a></td>.*"));
+			
+			// check shortcut to video is present in summary report
+			String mainReportContent = readSummaryFile();
+			Assert.assertTrue(mainReportContent.matches(".*<td class=\"info\"><a href=\"testDriver/screenshots/testDriver_8-1_Test_end--\\w+.png\"><i class=\"fa fa-file-image-o\" aria-hidden=\"true\"></i></a><a href=\"testDriver/videoCapture.avi\"><i class=\"fa fa-video-camera\" aria-hidden=\"true\"></i></a></td>.*"));
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);

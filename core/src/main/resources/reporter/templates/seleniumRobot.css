@@ -71,6 +71,10 @@ a.failedStepsTooltip {
 	color: black;
 }
 
+.fa-file-video-o, .fa-video-camera, .fa-file-image-o {
+    padding-right: 4px;
+}
+
 .testSuccess{
 	border-bottom: 2px solid #2BC400;
 	background-color: rgba(151,208,134,0.2);

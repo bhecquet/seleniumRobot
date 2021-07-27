@@ -78,15 +78,15 @@ public class ScreenShot {
         return location;
     }
 
-    public void setLocation(final String location) {
+    public void setLocation(String location) {
         this.location = location;
     }
 
-    public void setHtmlSourcePath(final String htmlSourcePath) {
+    public void setHtmlSourcePath(String htmlSourcePath) {
         this.htmlSourcePath = htmlSourcePath;
     }
 
-    public void setImagePath(final String imagePath) {
+    public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
     }
 

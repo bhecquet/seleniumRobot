@@ -5,7 +5,7 @@ import com.seleniumtests.util.StringUtility;
 
 public class HyperlinkInfo extends StringInfo {
 
-	private String link;
+	protected String link;
 	
 	public HyperlinkInfo(String info, String link) {
 		super(info);
