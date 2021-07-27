@@ -999,6 +999,13 @@ This file may be empty if seleniumRobot server is used
 
 Selenium robot server allows to store variables of all your test applications in a centralized place. See details in [chap6_Test_Manager_interfaces.md](chap6_Test_Manager_interfaces.md)
 
+If variables are present in 'env.ini' and SeleniumRobot server, those from SeleniumRobot server have priority.
+
+To access variables from an other application (in case you navigate through multiple application (app1 -> app2 -> app1), it may be useful to get variables from app2 at the same time as variables from app1.
+To do so, in SeleniumRobot server, configure your application to depend on an other
+
+In seleniumRobot, variables from 'app2' will then be accessible with `param("app2.myVar")`
+
 #### Using configurations (aka business configuration) in test scripts ####
 Each webpage can use the configurations defined above using (getting variable `text` from configuration):
 
