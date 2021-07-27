@@ -1,7 +1,7 @@
 <link rel="stylesheet" type="text/css" href="${staticPathPrefix}resources/templates/AdminLTE.min.css">
 <link rel="stylesheet" type="text/css" href="${staticPathPrefix}resources/templates/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="${staticPathPrefix}resources/templates/lobsterTwo.css"> 
-<link rel="stylesheet" type="text/css" href="${staticPathPrefix}resources/templates/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="${staticPathPrefix}resources/templates/css/all.min.css">
 
 <script src="${staticPathPrefix}resources/templates/jquery-3.4.1.min.js"></script>
 <script src="${staticPathPrefix}resources/templates/bootstrap.bundle.min.js"></script>

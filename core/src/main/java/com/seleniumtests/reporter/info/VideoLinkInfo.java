@@ -11,7 +11,7 @@ public class VideoLinkInfo extends HyperlinkInfo {
 	public String encode(String format) {
 		
 		if ("html".equals(format)) {
-			return String.format("<a href=\"%s\"><i class=\"fa fa-video-camera\" aria-hidden=\"true\"></i></a>", link);
+			return String.format("<a href=\"%s\"><i class=\"fas fa-video\" aria-hidden=\"true\"></i></a>", link);
 		} else {
 			return super.encode(format);
 		}

@@ -93,8 +93,8 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			
 			// check we have automatic steps corresponding to the single test method "jcommander"
 			Assert.assertFalse(detailedReportContent1.contains("</button> new window link - ")); // manual step is not there
-			Assert.assertTrue(detailedReportContent1.contains("><i class=\"fa fa-plus\"></i></button><span class=\"step-title\"> mainPage  - ")); // auto step is there
-			Assert.assertTrue(detailedReportContent1.contains("<i class=\"fa fa-plus\"></i></button><span class=\"step-title\"> openPage with args: (null, ) - "));
+			Assert.assertTrue(detailedReportContent1.contains("><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> mainPage  - ")); // auto step is there
+			Assert.assertTrue(detailedReportContent1.contains("<i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> openPage with args: (null, ) - "));
 			Assert.assertTrue(detailedReportContent1.contains("<li>click on HtmlElement , by={By.id: image} </li>")); // action
 			Assert.assertTrue(detailedReportContent1.contains("<li>frame </li>")); // auto sub-step
 			Assert.assertTrue(detailedReportContent1.contains("<li>click on HtmlElement , by={By.id: buttonIFrame} </li>"));

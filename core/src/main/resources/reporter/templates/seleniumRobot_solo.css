@@ -106,8 +106,9 @@ body{
 	padding-right: 4px;
 }
 
-.fa-file-video-o, .fa-video-camera, .fa-file-image-o, .fa-file-text-o {
+.fa-file-video, .fa-video, .fa-file-image, .fa-file-alt {
     padding-right: 4px;
+    font-size: 20px;
 }
 
 a.errorTooltip {
