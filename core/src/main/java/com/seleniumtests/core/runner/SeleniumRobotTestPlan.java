@@ -40,10 +40,13 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.core.TestTasks;
+import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
+import com.seleniumtests.reporter.logger.MultipleInfo;
 import com.seleniumtests.reporter.logger.StringInfo;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.reporter.logger.VideoLinkInfo;
 import com.seleniumtests.util.logging.ScenarioLogger;
 
 @Listeners({com.seleniumtests.reporter.reporters.ReporterControler.class,
@@ -101,6 +104,12 @@ public class SeleniumRobotTestPlan {
 	        		|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_ERROR && !testResult.isSuccess())) {
 
 	        	((ScenarioLogger)logger).logFileToTestEnd(videoFile.getAbsoluteFile(), "Video capture");
+
+	        	StringInfo lastStateInfo = TestNGResultUtils.getTestInfo(testResult).get(TestStepManager.LAST_STATE_NAME);
+	        	if (lastStateInfo != null) {
+	        		((MultipleInfo)lastStateInfo).addInfo(new VideoLinkInfo(TestNGResultUtils.getUniqueTestName(testResult) + "/videoCapture.avi"));
+	        	}
+	        	
 	        	logger.info("Video file copied to " + videoFile.getAbsolutePath());
 	        	
 			} else {

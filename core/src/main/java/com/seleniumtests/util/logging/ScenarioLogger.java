@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.testng.ITestResult;
 import org.testng.Reporter;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -18,9 +19,9 @@ import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.StringInfo;
 import com.seleniumtests.reporter.logger.TestMessage;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
-import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.logger.TestValue;
+import com.seleniumtests.uipage.PageObject;
 
 import net.lightbody.bmp.core.har.Har;
 
@@ -110,7 +111,10 @@ public class ScenarioLogger extends Logger {
      * @param value. A StringInfo object (either StringInfo or HyperlinkInfo)
      */
     public void logTestInfo(String key, StringInfo value) {
-    	TestNGResultUtils.setTestInfo(Reporter.getCurrentTestResult(), key, value);
+    	logTestInfo(key, value, Reporter.getCurrentTestResult());
+    }
+    public void logTestInfo(String key, StringInfo value, ITestResult testResult) {
+    	TestNGResultUtils.setTestInfo(testResult, key, value);
     	super.info(String.format("Storing into test result %s: %s", key, value.getInfo() ));
     }
 

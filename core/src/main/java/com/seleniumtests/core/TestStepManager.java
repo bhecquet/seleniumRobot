@@ -13,6 +13,7 @@ import com.seleniumtests.reporter.logger.TestStep;
 public class TestStepManager {
 	
 	public static final String LAST_STEP_NAME = "Test end";
+	public static final String LAST_STATE_NAME = "Last State";
 	List<TestStep> testSteps;  // list of root steps
 	TestStep runningStep;
 	TestStep rootStep;

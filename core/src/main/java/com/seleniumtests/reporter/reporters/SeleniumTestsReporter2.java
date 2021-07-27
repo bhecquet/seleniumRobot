@@ -261,7 +261,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		
 		context.put("testName", testName);
 		context.put("description", StringUtility.encodeString(TestNGResultUtils.getTestDescription(testResult), "html"));
-		context.put("testInfos", TestNGResultUtils.getTestInfoEncoded(testResult, "html"));
+		context.put("testInfos", relocateTestInfos(testResult, TestNGResultUtils.getTestInfoEncoded(testResult, "html")));
 		
 		// Application information
 		fillContextWithTestParams(context, testResult);      
@@ -345,6 +345,22 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		StringWriter writer = new StringWriter();
 		t.merge(context, writer);
 		generateReport(Paths.get(testContext.getOutputDirectory(), "TestReport.html").toFile(), writer.toString());
+	}
+	
+	/**
+	 * for test HyperlinkInfo that reference a local file (image, video), change path when this info is presented from detailed result HTML file so that link is correct
+	 * @return
+	 */
+	private Map<String, String> relocateTestInfos(ITestResult testResult, Map<String, String> testInfos) {
+		Map<String, String> relocatedTestInfos = new LinkedHashMap<String, String>();
+		for (Entry<String, String> testInfo: testInfos.entrySet()) {
+			if (testInfo.getValue().contains(String.format("<a href=\"%s/", TestNGResultUtils.getUniqueTestName(testResult)))) {
+				relocatedTestInfos.put(testInfo.getKey(), testInfo.getValue().replace(TestNGResultUtils.getUniqueTestName(testResult) + "/", ""));
+			} else {
+				relocatedTestInfos.put(testInfo.getKey(), testInfo.getValue());
+			}
+		}
+		return relocatedTestInfos;
 	}
 
 	/**

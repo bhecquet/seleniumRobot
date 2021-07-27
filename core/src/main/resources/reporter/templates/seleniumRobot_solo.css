@@ -106,7 +106,7 @@ body{
 	padding-right: 4px;
 }
 
-.fa-file-video-o {
+.fa-file-video-o, .fa-video-camera, .fa-file-image-o {
     padding-right: 4px;
 }
 
