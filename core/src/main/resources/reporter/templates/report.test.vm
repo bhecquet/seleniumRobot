@@ -251,10 +251,15 @@
 			#end
 		</div>
 
+        <script>
+             // activate popover
+             $('[data-toggle="popover"]').popover();
+        </script>
 		
 		#if ($snapshots)
 			<script>
-			
+			    
+			     
 				const frames = iFrameResize({ log: true, autoResize: false}, '#snapshot-iframe')
 				$('#snapshot-tab').on('shown.bs.tab', function (e) {
 					console.log("resizing iframe");

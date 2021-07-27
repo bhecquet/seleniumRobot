@@ -63,7 +63,8 @@ import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.VideoRecorder;
-import com.seleniumtests.reporter.info.ImageLinkInfo;
+import com.seleniumtests.reporter.info.Info;
+import com.seleniumtests.reporter.info.LogInfo;
 import com.seleniumtests.reporter.info.MultipleInfo;
 import com.seleniumtests.reporter.logger.ArchiveMode;
 import com.seleniumtests.reporter.logger.TestStep;
@@ -505,6 +506,8 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 				
 			String error = testResult.getThrowable() != null ? testResult.getThrowable().getMessage(): "no error found";
 			scenarioLogger.log("Test is KO with error: " + error);
+			
+			
 		} else {
 			scenarioLogger.log("Test has not started or has been skipped");
 		}
@@ -536,6 +539,9 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 				lastStep.setFailed(true);
 				lastStep.setActionException(testResult.getThrowable());
 			}
+			
+			Info lastStateInfo = TestNGResultUtils.getTestInfo(testResult).get(TestStepManager.LAST_STATE_NAME);
+			((MultipleInfo)lastStateInfo).addInfo(new LogInfo(testResult.getThrowable().getMessage()));
 		}
 	}
 	

@@ -1679,6 +1679,14 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		// check that when test is KO, error cause is displayed
 		Assert.assertTrue(detailedReportContent.contains("[main] ScenarioLogger: Test is KO with error: "));
+		
+		//
+		Assert.assertTrue(detailedReportContent.contains("<th>Last State</th><td><a class=\"errorTooltip\"><i class=\"fa fa-file-text-o\" aria-hidden=\"true\" data-toggle=\"popover\" title=\"Exception\" data-content=\"error\"></i></a></td>"));
+		
+		String mainReportContent = readSummaryFile();
+		Assert.assertTrue(mainReportContent.contains("<td class=\"info\"><a class=\"errorTooltip\"><i class=\"fa fa-file-text-o\" aria-hidden=\"true\" data-toggle=\"popover\" title=\"Exception\" data-content=\"error\"></i></a></td>"));
+		Assert.assertTrue(mainReportContent.contains("<td class=\"info\"><a class=\"errorTooltip\"><i class=\"fa fa-file-text-o\" aria-hidden=\"true\" data-toggle=\"popover\" title=\"Exception\" data-content=\"some exception\"></i></a></td>"));
+		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "<td class=\"info\"><a class=\"errorTooltip\"><i class=\"fa fa-file-text-o\" aria-hidden=\"true\" data-toggle=\"popover\""), 2); // only the failed tests have error log
 	}	
 	
 	/**

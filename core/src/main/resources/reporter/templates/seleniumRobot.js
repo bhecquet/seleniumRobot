@@ -35,4 +35,5 @@ $(function () {
 			var myChart = new Chart(ctx).Doughnut(data, options);
 			//document.getElementById('pieChartLegend').innerHTML = myChart.generateLegend();
 
+            $('[data-toggle="popover"]').popover();
 		});

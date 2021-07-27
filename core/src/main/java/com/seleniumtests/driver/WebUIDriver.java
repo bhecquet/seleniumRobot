@@ -67,6 +67,7 @@ import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.driver.screenshots.VideoRecorder;
 import com.seleniumtests.reporter.info.ImageLinkInfo;
 import com.seleniumtests.reporter.info.MultipleInfo;
+import com.seleniumtests.reporter.info.Info;
 import com.seleniumtests.reporter.info.StringInfo;
 import com.seleniumtests.reporter.info.VideoLinkInfo;
 import com.seleniumtests.reporter.logger.TestStep;
@@ -308,7 +309,7 @@ public class WebUIDriver {
 				for (ScreenShot screenshot: new ScreenshotUtil(driver).capture(SnapshotTarget.PAGE, ScreenShot.class, true, true)) {
 					scenarioLogger.logScreenshot(screenshot, null, name, SnapshotCheckType.FALSE);
 					
-					StringInfo lastStateInfo = TestNGResultUtils.getTestInfo(testResult).get(TestStepManager.LAST_STATE_NAME);
+					Info lastStateInfo = TestNGResultUtils.getTestInfo(testResult).get(TestStepManager.LAST_STATE_NAME);
 		        	if (lastStateInfo != null) {
 		        		((MultipleInfo)lastStateInfo).addInfo(new ImageLinkInfo(TestNGResultUtils.getUniqueTestName(testResult) + "/" + screenshot.getImagePath()));
 		        	}

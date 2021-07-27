@@ -43,6 +43,7 @@ import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
+import com.seleniumtests.reporter.info.Info;
 import com.seleniumtests.reporter.info.MultipleInfo;
 import com.seleniumtests.reporter.info.StringInfo;
 import com.seleniumtests.reporter.info.VideoLinkInfo;
@@ -105,7 +106,7 @@ public class SeleniumRobotTestPlan {
 
 	        	((ScenarioLogger)logger).logFileToTestEnd(videoFile.getAbsoluteFile(), "Video capture");
 
-	        	StringInfo lastStateInfo = TestNGResultUtils.getTestInfo(testResult).get(TestStepManager.LAST_STATE_NAME);
+	        	Info lastStateInfo = TestNGResultUtils.getTestInfo(testResult).get(TestStepManager.LAST_STATE_NAME);
 	        	if (lastStateInfo != null) {
 	        		((MultipleInfo)lastStateInfo).addInfo(new VideoLinkInfo(TestNGResultUtils.getUniqueTestName(testResult) + "/videoCapture.avi"));
 	        	}
@@ -302,7 +303,7 @@ public class SeleniumRobotTestPlan {
      * @param key	name of the information to display
      * @param value	A StringInfo or HyperlinkInfo instance to display the value 
      */
-    public void addTestInfo(String key, StringInfo value) {
+    public void addTestInfo(String key, Info value) {
     	((ScenarioLogger)logger).logTestInfo(key, value);
     }
 }

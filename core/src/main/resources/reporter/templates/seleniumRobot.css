@@ -71,7 +71,12 @@ a.failedStepsTooltip {
 	color: black;
 }
 
-.fa-file-video-o, .fa-video-camera, .fa-file-image-o {
+a.errorTooltip {
+    color: #007bff;
+	cursor: pointer;
+}
+
+.fa-file-video-o, .fa-video-camera, .fa-file-image-o, .fa-file-text-o {
     padding-right: 4px;
 }
 

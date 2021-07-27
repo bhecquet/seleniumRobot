@@ -3,16 +3,10 @@ package com.seleniumtests.reporter.info;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.util.StringUtility;
 
-public class StringInfo {
+public class StringInfo extends Info {
 	
-	public String getInfo() {
-		return info;
-	}
-
-	protected String info;
-
 	public StringInfo(String info) {
-		this.info = info;
+		super(info);
 	}
 	
 	public String encode(String format) {
