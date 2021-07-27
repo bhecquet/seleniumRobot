@@ -4,8 +4,8 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
-import com.seleniumtests.reporter.logger.HyperlinkInfo;
-import com.seleniumtests.reporter.logger.StringInfo;
+import com.seleniumtests.reporter.info.HyperlinkInfo;
+import com.seleniumtests.reporter.info.StringInfo;
 
 public class TestStringInfo extends GenericTest {
 

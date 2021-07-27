@@ -1,4 +1,4 @@
-package com.seleniumtests.reporter.logger;
+package com.seleniumtests.reporter.info;
 
 import java.util.ArrayList;
 import java.util.List;

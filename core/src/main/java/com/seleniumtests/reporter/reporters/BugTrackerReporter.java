@@ -15,8 +15,8 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.core.utils.TestNGResultUtils;
-import com.seleniumtests.reporter.logger.HyperlinkInfo;
-import com.seleniumtests.reporter.logger.StringInfo;
+import com.seleniumtests.reporter.info.HyperlinkInfo;
+import com.seleniumtests.reporter.info.StringInfo;
 import com.seleniumtests.reporter.logger.TestStep;
 
 public class BugTrackerReporter extends CommonReporter implements IReporter {

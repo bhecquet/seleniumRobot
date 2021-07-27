@@ -1,4 +1,4 @@
-package com.seleniumtests.reporter.logger;
+package com.seleniumtests.reporter.info;
 
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.util.StringUtility;

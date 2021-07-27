@@ -43,10 +43,10 @@ import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
-import com.seleniumtests.reporter.logger.MultipleInfo;
-import com.seleniumtests.reporter.logger.StringInfo;
+import com.seleniumtests.reporter.info.MultipleInfo;
+import com.seleniumtests.reporter.info.StringInfo;
+import com.seleniumtests.reporter.info.VideoLinkInfo;
 import com.seleniumtests.reporter.logger.TestStep;
-import com.seleniumtests.reporter.logger.VideoLinkInfo;
 import com.seleniumtests.util.logging.ScenarioLogger;
 
 @Listeners({com.seleniumtests.reporter.reporters.ReporterControler.class,

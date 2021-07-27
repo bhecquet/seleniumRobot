@@ -32,6 +32,7 @@ import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
+import com.seleniumtests.reporter.info.StringInfo;
 import com.seleniumtests.util.logging.ScenarioLogger;
 
 import net.lightbody.bmp.core.har.Har;
