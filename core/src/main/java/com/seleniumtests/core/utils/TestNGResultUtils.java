@@ -34,7 +34,7 @@ import org.testng.internal.TestResult;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.core.runner.CucumberScenarioWrapper;
-import com.seleniumtests.reporter.logger.StringInfo;
+import com.seleniumtests.reporter.info.StringInfo;
 import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
