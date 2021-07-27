@@ -82,7 +82,7 @@ public class TestVideoRecorder extends ReporterTest {
 			Assert.assertTrue(detailedReportContent.contains("Video capture: <a href='videoCapture.avi'>file</a></div>"));
 			
 			// check steps have the timestamp on video capture
-			Assert.assertTrue(detailedReportContent.contains("<span><i class=\"fa fa-file-video-o\"></i>"));
+			Assert.assertTrue(detailedReportContent.contains("<span><i class=\"fas fa-file-video\"></i>"));
 			
 			// step where timestamp is 0 do not display it
 			Assert.assertTrue(detailedReportContent.contains("<span class=\"step-title\"> getPageUrl with args: (CHROME, ) - 0.0 secs</span></div>"));
@@ -175,7 +175,7 @@ public class TestVideoRecorder extends ReporterTest {
 			Assert.assertFalse(detailedReportContent.contains("Video capture: <a href='videoCapture.avi'>file</a></div>"));
 
 			// check steps have not the timestamp on video capture because video capture is not there
-			Assert.assertFalse(detailedReportContent.contains("<span><i class=\"fa fa-file-video-o\"></i>"));
+			Assert.assertFalse(detailedReportContent.contains("<span><i class=\"fas fa-file-video\"></i>"));
 		} finally {
 			
 			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
@@ -201,7 +201,7 @@ public class TestVideoRecorder extends ReporterTest {
 			Assert.assertFalse(detailedReportContent.contains("Video capture: <a href='videoCapture.avi'>file</a></div>"));
 			
 			// check steps have not the timestamp on video capture because video capture is not there
-			Assert.assertFalse(detailedReportContent.contains("<span><i class=\"fa fa-file-video-o\"></i>"));
+			Assert.assertFalse(detailedReportContent.contains("<span><i class=\"fas fa-file-video\"></i>"));
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);

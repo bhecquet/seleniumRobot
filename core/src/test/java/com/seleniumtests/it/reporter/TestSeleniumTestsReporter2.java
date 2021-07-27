@@ -73,7 +73,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		// no bullet as no snapshot comparison is done
 		String summaryReport = readSummaryFile();
-		Assert.assertFalse(summaryReport.contains("<i class=\"fa fa-circle "));
+		Assert.assertFalse(summaryReport.contains("<i class=\"fas fa-circle "));
 		
 		String detailedReportContent = readTestMethodResultFile("testAndSubActions");
 		Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\"  style=\"display: none;\" >"));
@@ -102,7 +102,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			
 			// check result is ok and comparison result is shown through green bullet
 			String summaryReport = readSummaryFile();
-			Assert.assertFalse(summaryReport.contains("<i class=\"fa fa-circle circle")); // no snapshot comparison has been performed
+			Assert.assertFalse(summaryReport.contains("<i class=\"fas fa-circle circle")); // no snapshot comparison has been performed
 			Assert.assertTrue(summaryReport.contains("info=\"ok\" data-toggle=\"tooltip\""));
 			
 			String detailedReportContent = readTestMethodResultFile("testAndSubActions");
@@ -144,7 +144,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			
 			// check result is ok and comparison result is shown through green bullet
 			String summaryReport = readSummaryFile();
-			Assert.assertTrue(summaryReport.contains("<i class=\"fa fa-circle circleSuccess\" data-toggle=\"tooltip\" title=\"snapshot comparison successfull\">"));
+			Assert.assertTrue(summaryReport.contains("<i class=\"fas fa-circle circleSuccess\" data-toggle=\"tooltip\" title=\"snapshot comparison successfull\">"));
 			Assert.assertTrue(summaryReport.contains("info=\"ok\" data-toggle=\"tooltip\""));
 			
 			String detailedReportContent = readTestMethodResultFile("testAndSubActions");
@@ -154,7 +154,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			
 			// successful step has been added for comparison
 			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-info\">Comparison successful</div>"));
-			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box success\">.*?<i class=\"fa fa-plus\"></i></button><span class=\"step-title\"> Snapshot comparison.*"));
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box success\">.*?<i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> Snapshot comparison.*"));
 			
 			// snapshot tab not active
 			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link  tab-success \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
@@ -192,7 +192,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			
 			// check result is ok and comparison result is shown through blue bullet (no comparison to do)
 			String summaryReport = readSummaryFile();
-			Assert.assertTrue(summaryReport.contains("<i class=\"fa fa-circle circleSkipped\" data-toggle=\"tooltip\" title=\"snapshot comparison skipped\">"));
+			Assert.assertTrue(summaryReport.contains("<i class=\"fas fa-circle circleSkipped\" data-toggle=\"tooltip\" title=\"snapshot comparison skipped\">"));
 			Assert.assertTrue(summaryReport.contains("info=\"ok\" data-toggle=\"tooltip\""));
 			
 			String detailedReportContent = readTestMethodResultFile("testAndSubActions");
@@ -202,7 +202,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			
 			// successful step has been added for comparison
 			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">No comparison to do (no snapshots)</div>"));
-			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box success\">.*?<i class=\"fa fa-plus\"></i></button><span class=\"step-title\"> Snapshot comparison.*"));
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box success\">.*?<i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> Snapshot comparison.*"));
 			
 			// snapshot tab active / skipped
 			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link  tab-skipped \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
@@ -241,7 +241,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 			// check result is ok and comparison result is shown through red bullet (comparison KO)
 			String summaryReport = readSummaryFile();
-			Assert.assertTrue(summaryReport.contains("<i class=\"fa fa-circle circleFailed\" data-toggle=\"tooltip\" title=\"snapshot comparison failed\">"));
+			Assert.assertTrue(summaryReport.contains("<i class=\"fas fa-circle circleFailed\" data-toggle=\"tooltip\" title=\"snapshot comparison failed\">"));
 			Assert.assertTrue(summaryReport.contains("info=\"ok\" data-toggle=\"tooltip\""));
 			
 			String detailedReportContent = readTestMethodResultFile("testAndSubActions");
@@ -251,7 +251,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			
 			// failed step has been added for comparison
 			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Comparison failed: </div>"));
-			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fa fa-plus\"></i></button><span class=\"step-title\"> Snapshot comparison.*"));
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> Snapshot comparison.*"));
 			
 			// snapshot tab not active
 			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link  tab-failed \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
@@ -290,7 +290,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 			// check result is KO (due to option 'changeTestResult') and comparison result is shown through red bullet (comparison KO)
 			String summaryReport = readSummaryFile();
-			Assert.assertTrue(summaryReport.contains("<i class=\"fa fa-circle circleFailed\" data-toggle=\"tooltip\" title=\"snapshot comparison failed\">"));
+			Assert.assertTrue(summaryReport.contains("<i class=\"fas fa-circle circleFailed\" data-toggle=\"tooltip\" title=\"snapshot comparison failed\">"));
 			Assert.assertTrue(summaryReport.contains("info=\"ko\" data-toggle=\"tooltip\""));
 			
 			String detailedReportContent = readTestMethodResultFile("testAndSubActions");
@@ -300,7 +300,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			
 			// failed step has been added for comparison
 			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Comparison failed: </div>"));
-			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fa fa-plus\"></i></button><span class=\"step-title\"> Snapshot comparison.*"));
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> Snapshot comparison.*"));
 			
 			// snapshot tab not active
 			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link  tab-failed \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
@@ -340,8 +340,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			
 			// check there are 2 results. first one is the selenium test (OK) and second one is the snapshot comparison (KO)
 			String summaryReport = readSummaryFile();
-			Assert.assertTrue(summaryReport.contains("<i class=\"fa fa-circle circleFailed\" data-toggle=\"tooltip\" title=\"snapshot comparison failed\"></i><a href='testAndSubActions/TestReport.html' info=\"ok\" "));
-			Assert.assertTrue(summaryReport.contains("<i class=\"fa fa-circle circleFailed\" data-toggle=\"tooltip\" title=\"snapshot comparison failed\"></i><a href='snapshots-testAndSubActions/TestReport.html' info=\"ko\""));
+			Assert.assertTrue(summaryReport.contains("<i class=\"fas fa-circle circleFailed\" data-toggle=\"tooltip\" title=\"snapshot comparison failed\"></i><a href='testAndSubActions/TestReport.html' info=\"ok\" "));
+			Assert.assertTrue(summaryReport.contains("<i class=\"fas fa-circle circleFailed\" data-toggle=\"tooltip\" title=\"snapshot comparison failed\"></i><a href='snapshots-testAndSubActions/TestReport.html' info=\"ko\""));
 			
 			String detailedReportContent = readTestMethodResultFile("snapshots-testAndSubActions");
 			
@@ -350,7 +350,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			
 			// failed step has been added for comparison
 			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Comparison failed: </div>"));
-			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fa fa-plus\"></i></button><span class=\"step-title\"> Snapshot comparison.*"));
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> Snapshot comparison.*"));
 			
 			// snapshot tab not active
 			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link  tab-failed \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
@@ -386,7 +386,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			
 			// check result is ok and comparison result is shown through red bullet (comparison KO)
 			String summaryReport = readSummaryFile();
-			Assert.assertTrue(summaryReport.contains("<i class=\"fa fa-circle circleSkipped\" data-toggle=\"tooltip\" title=\"snapshot comparison skipped\">"));
+			Assert.assertTrue(summaryReport.contains("<i class=\"fas fa-circle circleSkipped\" data-toggle=\"tooltip\" title=\"snapshot comparison skipped\">"));
 			Assert.assertTrue(summaryReport.contains("info=\"ok\" data-toggle=\"tooltip\""));
 			
 			String detailedReportContent = readTestMethodResultFile("testAndSubActions");
@@ -397,7 +397,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			
 			// failed step has been added for comparison
 			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Comparison skipped: &quot;error computing&quot;</div>"));
-			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fa fa-plus\"></i></button><span class=\"step-title\"> Snapshot comparison.*"));
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> Snapshot comparison.*"));
 			
 			// snapshot tab not active
 			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link  tab-skipped \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
@@ -437,7 +437,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			
 			// check result is OK (even with option 'changeTestResult' because comparison is skipped) and comparison result is shown through blue bullet (comparison Skipped)
 			String summaryReport = readSummaryFile();
-			Assert.assertTrue(summaryReport.contains("<i class=\"fa fa-circle circleSkipped\" data-toggle=\"tooltip\" title=\"snapshot comparison skipped\">"));
+			Assert.assertTrue(summaryReport.contains("<i class=\"fas fa-circle circleSkipped\" data-toggle=\"tooltip\" title=\"snapshot comparison skipped\">"));
 			Assert.assertTrue(summaryReport.contains("info=\"ok\" data-toggle=\"tooltip\""));
 			
 			String detailedReportContent = readTestMethodResultFile("testAndSubActions");
@@ -448,7 +448,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			
 			// failed step has been added for comparison
 			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Comparison skipped: &quot;error computing&quot;</div>"));
-			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fa fa-plus\"></i></button><span class=\"step-title\"> Snapshot comparison.*"));
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> Snapshot comparison.*"));
 			
 			// snapshot tab not active
 			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link  tab-skipped \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
@@ -489,8 +489,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			
 			// check there are 2 results. first one is the selenium test (OK) and second one is the snapshot comparison (KO)
 			String summaryReport = readSummaryFile();
-			Assert.assertTrue(summaryReport.contains("<i class=\"fa fa-circle circleSkipped\" data-toggle=\"tooltip\" title=\"snapshot comparison skipped\"></i><a href='testAndSubActions/TestReport.html' info=\"ok\" "));
-			Assert.assertTrue(summaryReport.contains("<i class=\"fa fa-circle circleSkipped\" data-toggle=\"tooltip\" title=\"snapshot comparison skipped\"></i><a href='snapshots-testAndSubActions/TestReport.html' info=\"skipped\""));
+			Assert.assertTrue(summaryReport.contains("<i class=\"fas fa-circle circleSkipped\" data-toggle=\"tooltip\" title=\"snapshot comparison skipped\"></i><a href='testAndSubActions/TestReport.html' info=\"ok\" "));
+			Assert.assertTrue(summaryReport.contains("<i class=\"fas fa-circle circleSkipped\" data-toggle=\"tooltip\" title=\"snapshot comparison skipped\"></i><a href='snapshots-testAndSubActions/TestReport.html' info=\"skipped\""));
 			
 			String detailedReportContent = readTestMethodResultFile("snapshots-testAndSubActions");
 			
@@ -499,7 +499,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			
 			// failed step has been added for comparison
 			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Comparison skipped: &quot;error computing&quot;</div>"));
-			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fa fa-plus\"></i></button><span class=\"step-title\"> Snapshot comparison.*"));
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> Snapshot comparison.*"));
 			
 			// snapshot tab not active
 			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link  tab-skipped \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
@@ -701,22 +701,22 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			
 			// check step with assertion inside is failed
 			Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\">"
-					+ "<button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button><span class=\"step-title\"> assertAction"));
+					+ "<button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> assertAction"));
 			Assert.assertTrue(detailedReportContent.contains("</div><div class=\"box-body\"><ul><div class=\"message-error\">!!!FAILURE ALERT!!! - Assertion Failure: false error expected [true] but found [false]</div>"));
 			
 			// that assertion raised in test scenario is attached to previous step
 			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box failed\"><div class\\=\"box-header with-border\">"
-					+ "<button type\\=\"button\" class\\=\"btn btn-box-tool\" data-widget\\=\"collapse\"><i class\\=\"fa fa-plus\"></i></button><span class=\"step-title\"> getResult  - \\d+\\.\\d+ secs\\s*</div><div class\\=\"box-body\">"
+					+ "<button type\\=\"button\" class\\=\"btn btn-box-tool\" data-widget\\=\"collapse\"><i class\\=\"fas fa-plus\"></i></button><span class=\"step-title\"> getResult  - \\d+\\.\\d+ secs\\s*</div><div class\\=\"box-body\">"
 					+ "<ul><div class\\=\"message-error\">!!!FAILURE ALERT!!! - Assertion Failure: Error in result expected \\[1\\] but found \\[2\\]</div>.*"));
 			
 			// check last step shows the assertion					
-			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box failed\">.*?<i class\\=\"fa fa-plus\"></i>"
+			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box failed\">.*?<i class\\=\"fas fa-plus\"></i>"
 					+ "</button><span class=\"step-title\"> Test end - \\d+\\.\\d+ secs\\s*</div><div class\\=\"box-body\"><ul><div class\\=\"message-log\">Test is KO with error: !!! Many Test Failures \\(2\\)<br/>"
 					+ "<br/>class java.lang.AssertionError: <br/>\\.<br/>Failure 1 of 2.*Failure 2 of 2.*"
 					+ "<div class\\=\"message-error\">\\s+class java.lang.AssertionError: !!! Many Test Failures \\(2\\)<br/>.*"));
 			
 			// check last step before test end is OK because no error occurs in it
-			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box success\">.*?<i class\\=\"fa fa-plus\"></i></button><span class=\"step-title\"> add with args: \\(3, \\).*"));
+			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box success\">.*?<i class\\=\"fas fa-plus\"></i></button><span class=\"step-title\"> add with args: \\(3, \\).*"));
 			
 		} finally {
 			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
@@ -740,7 +740,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			String detailedReportContent = readTestMethodResultFile("testWithAssertInSubStep");
 			
 			// check that sub step failure (with assertion) caused the step to fail itself				
-			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box failed\">.*?<i class\\=\"fa fa-plus\"></i>" // => step failed
+			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box failed\">.*?<i class\\=\"fas fa-plus\"></i>" // => step failed
 					+ "</button><span class=\"step-title\"> assertWithSubStep  - \\d+\\.\\d+ secs</span></div><div class\\=\"box-body\"><ul><li>doNothing </li>"
 					+ "<ul><li>doNothing on HtmlElement none, by=\\{By\\.id: none\\} </li></ul>"
 					+ "<li>assertAction </li><ul>" // => sub step with error
@@ -769,12 +769,12 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			String detailedReportContent = readTestMethodResultFile("testWithAssertInTest");
 			
 			// check step with assertion inside is failed
-			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box failed\">.*?<i class\\=\"fa fa-plus\"></i>"
+			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box failed\">.*?<i class\\=\"fas fa-plus\"></i>"
 					+ "</button><span class=\"step-title\"> getResult  - \\d+\\.\\d+ secs</span></div><div class\\=\"box-body\">.*?"
 					+ "<div class\\=\"message-error\">\\s*Assertion Failure: Error in result expected \\[1\\] but found \\[2\\].*"));
 
 			// Test end step also displays the error
-			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box failed\">.*?<i class\\=\"fa fa-plus\"></i>"
+			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box failed\">.*?<i class\\=\"fas fa-plus\"></i>"
 					+ "</button><span class=\"step-title\"> Test end - \\d+\\.\\d+ secs</span></div><div class\\=\"box-body\"><ul><div class\\=\"message-log\">Test is KO with error: Error in result expected \\[1\\] but found \\[2\\]</div>"
 					+ "<div class\\=\"message-log\">\\[NOT RETRYING\\] due to failed Assertion</div>.*?"
 					+ "<div class\\=\"message-error\">\\s+class java.lang.AssertionError: Error in result expected \\[1\\] but found \\[2\\].*"
@@ -1178,11 +1178,11 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent2 = readTestMethodResultFile("testWithAssert");
 		
 		// check execution logs are in error
-		Assert.assertTrue(detailedReportContent2.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> Execution logs"));
+		Assert.assertTrue(detailedReportContent2.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button> Execution logs"));
 		
 		// test first step is OK and second one is failed (this shows indirectly that internal step is marked as failed
-		Assert.assertTrue(detailedReportContent2.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button><span class=\"step-title\"> Test start"));
-		Assert.assertTrue(detailedReportContent2.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button><span class=\"step-title\"> assert exception"));
+		Assert.assertTrue(detailedReportContent2.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> Test start"));
+		Assert.assertTrue(detailedReportContent2.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> assert exception"));
 		
 		// check exception is present in step
 		Assert.assertTrue(detailedReportContent2.contains("<div class=\"message-log\">Test is KO with error: false error expected [true] but found [false]</div>"));
@@ -1319,10 +1319,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// Check each step is recorded in file: 2 test steps + test end + logs
 		
 		// step in warning because some actions are failed
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box warning\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button><span class=\"step-title\"> step 1 - "));
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button><span class=\"step-title\"> step 2 - "));
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button><span class=\"step-title\"> Test end - "));
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> Execution logs"));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box warning\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> step 1 - "));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> step 2 - "));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> Test end - "));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button> Execution logs"));
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Test is OK</div>"));
 		
 		// check failed steps are in red
@@ -1361,11 +1361,11 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// read 'testDriverCustomSnapshot' report. This contains calls to HtmlElement actions
 		String detailedReportContent1 = readTestMethodResultFile("testDriverCustomSnapshot");
 		
-		Assert.assertTrue(detailedReportContent1.matches(".*<th>Last State</th><td><a href=\"screenshots/testDriverCustomSnapshot_7-1_Test_end--\\w+.png\"><i class=\"fa fa-file-image-o\" aria-hidden=\"true\"></i></a></td>.*"));
+		Assert.assertTrue(detailedReportContent1.matches(".*<th>Last State</th><td><a href=\"screenshots/testDriverCustomSnapshot_7-1_Test_end--\\w+.png\"><i class=\"fas fa-file-image\" aria-hidden=\"true\"></i></a></td>.*"));
 		
 		// check shortcut to last state is displayed
 		String mainReportContent = readSummaryFile();
-		Assert.assertTrue(mainReportContent.matches(".*<td class=\"info\"><a href=\"testDriverCustomSnapshot/screenshots/testDriverCustomSnapshot_7-1_Test_end--\\w+.png\"><i class=\"fa fa-file-image-o\" aria-hidden=\"true\"></i></a></td>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<td class=\"info\"><a href=\"testDriverCustomSnapshot/screenshots/testDriverCustomSnapshot_7-1_Test_end--\\w+.png\"><i class=\"fas fa-file-image\" aria-hidden=\"true\"></i></a></td>.*"));
 		
 	}
 	
@@ -1388,11 +1388,11 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			Assert.assertFalse(detailedReportContent1.contains("Video capture: <a href='videoCapture.avi'>file</a>"));
 			
 			// check shortcut to video is NOT present in detailed report
-			Assert.assertFalse(detailedReportContent1.matches(".*<th>Last State</th><td><a href=\"screenshots/testDriver_8-1_Test_end--\\w+.png\"><i class=\"fa fa-file-image-o\" aria-hidden=\"true\"></i></a><a href=\"videoCapture.avi\"><i class=\"fa fa-video-camera\" aria-hidden=\"true\"></i></a></td>.*"));
+			Assert.assertFalse(detailedReportContent1.matches(".*<th>Last State</th><td><a href=\"screenshots/testDriver_8-1_Test_end--\\w+.png\"><i class=\"fas fa-file-image\" aria-hidden=\"true\"></i></a><a href=\"videoCapture.avi\"><i class=\"fas fa-video\" aria-hidden=\"true\"></i></a></td>.*"));
 			
 			// check shortcut to video is NOT present in summary report
 			String mainReportContent = readSummaryFile();
-			Assert.assertFalse(mainReportContent.matches(".*<td class=\"info\"><a href=\"testDriver/screenshots/testDriver_8-1_Test_end--\\w+.png\"><i class=\"fa fa-file-image-o\" aria-hidden=\"true\"></i></a><a href=\"testDriver/videoCapture.avi\"><i class=\"fa fa-video-camera\" aria-hidden=\"true\"></i></a></td>.*"));
+			Assert.assertFalse(mainReportContent.matches(".*<td class=\"info\"><a href=\"testDriver/screenshots/testDriver_8-1_Test_end--\\w+.png\"><i class=\"fas fa-file-image\" aria-hidden=\"true\"></i></a><a href=\"testDriver/videoCapture.avi\"><i class=\"fas fa-video\" aria-hidden=\"true\"></i></a></td>.*"));
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
@@ -1419,11 +1419,11 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			Assert.assertTrue(detailedReportContent1.contains("Video capture: <a href='videoCapture.avi'>file</a>"));
 			
 			// check shortcut to video is present in detailed report
-			Assert.assertTrue(detailedReportContent1.matches(".*<th>Last State</th><td><a href=\"screenshots/testDriver_8-1_Test_end--\\w+.png\"><i class=\"fa fa-file-image-o\" aria-hidden=\"true\"></i></a><a href=\"videoCapture.avi\"><i class=\"fa fa-video-camera\" aria-hidden=\"true\"></i></a></td>.*"));
+			Assert.assertTrue(detailedReportContent1.matches(".*<th>Last State</th><td><a href=\"screenshots/testDriver_8-1_Test_end--\\w+.png\"><i class=\"fas fa-file-image\" aria-hidden=\"true\"></i></a><a href=\"videoCapture.avi\"><i class=\"fas fa-video\" aria-hidden=\"true\"></i></a></td>.*"));
 			
 			// check shortcut to video is present in summary report
 			String mainReportContent = readSummaryFile();
-			Assert.assertTrue(mainReportContent.matches(".*<td class=\"info\"><a href=\"testDriver/screenshots/testDriver_8-1_Test_end--\\w+.png\"><i class=\"fa fa-file-image-o\" aria-hidden=\"true\"></i></a><a href=\"testDriver/videoCapture.avi\"><i class=\"fa fa-video-camera\" aria-hidden=\"true\"></i></a></td>.*"));
+			Assert.assertTrue(mainReportContent.matches(".*<td class=\"info\"><a href=\"testDriver/screenshots/testDriver_8-1_Test_end--\\w+.png\"><i class=\"fas fa-file-image\" aria-hidden=\"true\"></i></a><a href=\"testDriver/videoCapture.avi\"><i class=\"fas fa-video\" aria-hidden=\"true\"></i></a></td>.*"));
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
@@ -1681,12 +1681,12 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.contains("[main] ScenarioLogger: Test is KO with error: "));
 		
 		//
-		Assert.assertTrue(detailedReportContent.contains("<th>Last State</th><td><a class=\"errorTooltip\"><i class=\"fa fa-file-text-o\" aria-hidden=\"true\" data-toggle=\"popover\" title=\"Exception\" data-content=\"error\"></i></a></td>"));
+		Assert.assertTrue(detailedReportContent.contains("<th>Last State</th><td><a class=\"errorTooltip\"><i class=\"fas fa-file-alt\" aria-hidden=\"true\" data-toggle=\"popover\" title=\"Exception\" data-content=\"error\"></i></a></td>"));
 		
 		String mainReportContent = readSummaryFile();
-		Assert.assertTrue(mainReportContent.contains("<td class=\"info\"><a class=\"errorTooltip\"><i class=\"fa fa-file-text-o\" aria-hidden=\"true\" data-toggle=\"popover\" title=\"Exception\" data-content=\"error\"></i></a></td>"));
-		Assert.assertTrue(mainReportContent.contains("<td class=\"info\"><a class=\"errorTooltip\"><i class=\"fa fa-file-text-o\" aria-hidden=\"true\" data-toggle=\"popover\" title=\"Exception\" data-content=\"some exception\"></i></a></td>"));
-		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "<td class=\"info\"><a class=\"errorTooltip\"><i class=\"fa fa-file-text-o\" aria-hidden=\"true\" data-toggle=\"popover\""), 2); // only the failed tests have error log
+		Assert.assertTrue(mainReportContent.contains("<td class=\"info\"><a class=\"errorTooltip\"><i class=\"fas fa-file-alt\" aria-hidden=\"true\" data-toggle=\"popover\" title=\"Exception\" data-content=\"error\"></i></a></td>"));
+		Assert.assertTrue(mainReportContent.contains("<td class=\"info\"><a class=\"errorTooltip\"><i class=\"fas fa-file-alt\" aria-hidden=\"true\" data-toggle=\"popover\" title=\"Exception\" data-content=\"some exception\"></i></a></td>"));
+		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "<td class=\"info\"><a class=\"errorTooltip\"><i class=\"fas fa-file-alt\" aria-hidden=\"true\" data-toggle=\"popover\""), 2); // only the failed tests have error log
 	}	
 	
 	/**
@@ -1733,7 +1733,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent = readTestMethodResultFile("core_3");
 		
 		// Check each step is recorded in file: 2 test steps + test end + logs
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button><span class=\"step-title\"> write (\\w+) with args: (tutu, )"));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> write (\\w+) with args: (tutu, )"));
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Test is OK</div>"));
 	}
 	
@@ -1752,7 +1752,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent = readTestMethodResultFile("core_7");
 		
 		// Check each step is recorded in file: 2 test steps + test end + logs
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button><span class=\"step-title\"> write2 (\\w+) with args: (tutu, )"));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> write2 (\\w+) with args: (tutu, )"));
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Test is OK</div>"));
 	}
 	
@@ -1820,7 +1820,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent = readTestMethodResultFile("my_beautiful_scenario_.._ok_..-");
 		
 		// Check each step is recorded in file: 2 test steps + test end + logs
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button><span class=\"step-title\"> write (\\w+) with args: (tatu, )"));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> write (\\w+) with args: (tatu, )"));
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Test is OK</div>"));
 		
 		
@@ -2078,8 +2078,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent = readTestMethodResultFile("testCauseWithErrorAndDetails");
 		
 		// Only failing step contains the information message
-		Assert.assertTrue(detailedReportContent.matches(".*<i class\\=\"fa fa-plus\"></i></button><span class=\"step-title\"> add - 0\\.\\d+ secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fa fa-info-circle\"></i><span>Possibly caused by REGRESSION: Check your scripts</span></div>.*"));
-		Assert.assertFalse(detailedReportContent.matches(".*<i class\\=\"fa fa-plus\"></i></button><span class=\"step-title\"> Test end - 0\\.\\d+ secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fa fa-info-circle\"></i><span>Possibly caused by REGRESSION: Check your scripts</span></div>.*"));
+		Assert.assertTrue(detailedReportContent.matches(".*<i class\\=\"fas fa-plus\"></i></button><span class=\"step-title\"> add - 0\\.\\d+ secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fa fa-info-circle\"></i><span>Possibly caused by REGRESSION: Check your scripts</span></div>.*"));
+		Assert.assertFalse(detailedReportContent.matches(".*<i class\\=\"fas fa-plus\"></i></button><span class=\"step-title\"> Test end - 0\\.\\d+ secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fa fa-info-circle\"></i><span>Possibly caused by REGRESSION: Check your scripts</span></div>.*"));
 	}
 	
 	@Test(groups={"it"})
@@ -2091,8 +2091,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent = readTestMethodResultFile("testCauseWithErrorNoDetails");
 		
 		// Only failing step contains the information message
-		Assert.assertTrue(detailedReportContent.matches(".*<i class\\=\"fa fa-plus\"></i></button><span class=\"step-title\"> add - 0\\.\\d+ secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fa fa-info-circle\"></i><span>Possibly caused by REGRESSION: </span></div>.*"));
-		Assert.assertFalse(detailedReportContent.matches(".*<i class\\=\"fa fa-plus\"></i></button><span class=\"step-title\"> Test end - 0\\.\\d+ secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fa fa-info-circle\"></i><span>Possibly caused by REGRESSION: </span></div>.*"));
+		Assert.assertTrue(detailedReportContent.matches(".*<i class\\=\"fas fa-plus\"></i></button><span class=\"step-title\"> add - 0\\.\\d+ secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fa fa-info-circle\"></i><span>Possibly caused by REGRESSION: </span></div>.*"));
+		Assert.assertFalse(detailedReportContent.matches(".*<i class\\=\"fas fa-plus\"></i></button><span class=\"step-title\"> Test end - 0\\.\\d+ secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fa fa-info-circle\"></i><span>Possibly caused by REGRESSION: </span></div>.*"));
 	}
 	
 	@Test(groups={"it"})
@@ -2104,7 +2104,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent = readTestMethodResultFile("testCauseNoError");
 		
 		// add step is not in error, error cause is not displayed
-		Assert.assertFalse(detailedReportContent.contains("<div class=\"step-info\"><i class=\"fa fa-info-circle\"></i>"));
+		Assert.assertFalse(detailedReportContent.contains("<div class=\"step-info\"><i class=\"fas fa-info-circle\"></i>"));
 		
 	}
 	
@@ -2117,7 +2117,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent = readTestMethodResultFile("testNoCauseAndError");
 		
 		// add step is not in error, error cause is not displayed
-		Assert.assertFalse(detailedReportContent.contains("<div class=\"step-info\"><i class=\"fa fa-info-circle\"></i>"));
+		Assert.assertFalse(detailedReportContent.contains("<div class=\"step-info\"><i class=\"fas fa-info-circle\"></i>"));
 		
 	}
 }

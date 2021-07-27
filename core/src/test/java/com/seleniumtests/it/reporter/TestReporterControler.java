@@ -134,7 +134,7 @@ public class TestReporterControler extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.contains("<div>class com.seleniumtests.customexception.ConfigurationException: Some error before method</div>"));
 		
 		// check we have a step for BeforeMethod and it's marked as failed
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button><span class=\"step-title\"> Pre test step: beforeMethod"));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> Pre test step: beforeMethod"));
 		
 		// Check details of the configuration error is displayed in report
 		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error\">\\s+class com.seleniumtests.customexception.ConfigurationException: Some error before method.*"));
@@ -174,7 +174,7 @@ public class TestReporterControler extends ReporterTest {
 		Assert.assertFalse(detailedReportContent.contains("<div>class com.seleniumtests.customexception.ConfigurationException: Some error after method</div>"));
 		
 		// check we have a step for AfterMethod and it's marked as failed
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button><span class=\"step-title\"> Post test step: afterMethod"));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> Post test step: afterMethod"));
 		
 		// check logs written in @AfterXXX are present in execution logs
 		Assert.assertTrue(detailedReportContent.contains("[main] ScenarioLogger: some warning</div>"));

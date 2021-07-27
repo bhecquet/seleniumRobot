@@ -163,15 +163,15 @@
 										<div class="box collapsed-box skipped">
 									#end
 										<div class="box-header with-border">
-											<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button><span class="step-title"> $stepName - $stepDuration secs</span>
+											<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fas fa-plus"></i></button><span class="step-title"> $stepName - $stepDuration secs</span>
 											#if ($stepVideoTimeStamp)
-											     <span><i class="fa fa-file-video-o"></i>$stepVideoTimeStamp s</span>
+											     <span><i class="fas fa-file-video"></i>$stepVideoTimeStamp s</span>
 											#end
 										</div>
 										<div class="box-body">
 											#if ($stepErrorCause)
 												<div class="step-info">
-													<i class="fa fa-info-circle"></i><span>Possibly caused by $stepErrorCause: $stepErrorCauseDetails</span>
+													<i class="fas fa-info-circle"></i><span>Possibly caused by $stepErrorCause: $stepErrorCauseDetails</span>
 												</div>
 											#end
 											#stepActions($stepObject true)
@@ -195,7 +195,7 @@
 									<div class="box collapsed-box skipped">
 								#end
 									<div class="box-header with-border">
-										<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button> Execution logs
+										<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fas fa-plus"></i></button> Execution logs
 									</div>
 									<div class="box-body logs">
 										#if ($stacktrace)
@@ -222,7 +222,7 @@
 								#if ($title)
 								<div class="box collapsed-box success">
 									<div class="box-header with-border">
-										<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button> $title
+										<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fas fa-plus"></i></button> $title
 									</div>
 									<div class="box-body">
 										#foreach($line in $files)

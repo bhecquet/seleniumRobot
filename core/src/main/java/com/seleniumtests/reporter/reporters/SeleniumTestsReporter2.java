@@ -100,13 +100,13 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			styleFiles.add("jquery-3.4.1.min.js");
 			styleFiles.add("AdminLTE.min.css");
 			styleFiles.add("lobsterTwo.css");
-			styleFiles.add("css/font-awesome.min.css");
-			styleFiles.add("fonts/fontawesome-webfont.eot");
-			styleFiles.add("fonts/fontawesome-webfont.svg");
-			styleFiles.add("fonts/fontawesome-webfont.ttf");
-			styleFiles.add("fonts/fontawesome-webfont.woff");
-			styleFiles.add("fonts/fontawesome-webfont.woff2");
-			styleFiles.add("fonts/FontAwesome.otf");
+			
+			styleFiles.add("css/all.min.css");
+			styleFiles.add("webfonts/fa-solid-900.eot");
+			styleFiles.add("webfonts/fa-solid-900.svg");
+			styleFiles.add("webfonts/fa-solid-900.ttf");
+			styleFiles.add("webfonts/fa-solid-900.woff");
+			styleFiles.add("webfonts/fa-solid-900.woff2");
 		} 
 		
 		for (String fileName: styleFiles) {

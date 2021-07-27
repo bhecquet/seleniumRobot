@@ -93,11 +93,11 @@
 				                			#if ("$!testResult.getAttribute('snapshotComparisonResult')" == "")
 				                				#set ($circle = "")
 				                			#elseif ($testResult.getAttribute("snapshotComparisonResult") == 1)
-				                				#set ($circle = "<i class=""fa fa-circle circleSuccess"" data-toggle=""tooltip"" title=""snapshot comparison successfull""></i>")
+				                				#set ($circle = "<i class=""fas fa-circle circleSuccess"" data-toggle=""tooltip"" title=""snapshot comparison successfull""></i>")
 				                			#elseif ($testResult.getAttribute("snapshotComparisonResult") == 3)
-				                				#set ($circle = "<i class=""fa fa-circle circleSkipped"" data-toggle=""tooltip"" title=""snapshot comparison skipped""></i>")
+				                				#set ($circle = "<i class=""fas fa-circle circleSkipped"" data-toggle=""tooltip"" title=""snapshot comparison skipped""></i>")
 				                			#else
-				                				#set ($circle = "<i class=""fa fa-circle circleFailed"" data-toggle=""tooltip"" title=""snapshot comparison failed""></i>")
+				                				#set ($circle = "<i class=""fas fa-circle circleFailed"" data-toggle=""tooltip"" title=""snapshot comparison failed""></i>")
 				                			#end
 				                			
 				                			#if ($testResult.getStatus() == 1)
