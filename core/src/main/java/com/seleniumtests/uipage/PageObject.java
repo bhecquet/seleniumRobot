@@ -656,6 +656,16 @@ public class PageObject extends BasePage implements IPage {
     }
     
     /**
+     * Capture the desktop
+     * @param <T>
+     * @return
+     */
+    public <T extends PageObject> T captureDesktopSnapshot() {
+    	captureDesktopSnapshot(null);
+    	return (T)this;
+    }
+    
+    /**
      * Capture a page snapshot for storing in test step
      * @param snapshotName	the snapshot name
      */
@@ -669,6 +679,14 @@ public class PageObject extends BasePage implements IPage {
      */
     public void captureViewportSnapshot(String snapshotName) {
     	capturePageSnapshot(snapshotName, SnapshotCheckType.FALSE);
+    }
+    
+    /**
+     * Capture a viewport snapshot for storing in test step
+     * @param snapshotName	the snapshot name
+     */
+    public void captureDesktopSnapshot(String snapshotName) {
+    	captureDesktopSnapshot(snapshotName, SnapshotCheckType.FALSE);
     }
     
     /**
@@ -698,6 +716,17 @@ public class PageObject extends BasePage implements IPage {
     	// check SnapshotCheckType configuration is compatible with the snapshot
     	checkSnapshot.check(SnapshotTarget.VIEWPORT);
     	
+    	storeSnapshot(snapshotName, screenShot, checkSnapshot);
+    }
+    
+    /**
+     * Capture a desktop snapshot (only the main screen in multiple screen environment) for storing in test step
+     * @param snapshotName		the snapshot name
+     * @param checkSnapshot		if true, will send snapshot to server (when seleniumRobot is configured for this) for comparison 
+     */
+    public void captureDesktopSnapshot(String snapshotName, SnapshotCheckType checkSnapshot) {
+    	
+    	ScreenShot screenShot = screenshotUtil.capture(SnapshotTarget.MAIN_SCREEN, ScreenShot.class);	
     	storeSnapshot(snapshotName, screenShot, checkSnapshot);
     }
     
