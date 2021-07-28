@@ -543,8 +543,27 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(StringUtils.indexOf(logs, "testAndSubActions/PERF-result.xml") < StringUtils.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
 		Assert.assertTrue(StringUtils.indexOf(logs, "testWithException/PERF-result.xml") < StringUtils.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
 		
-		// issue #319: check that if no test info is recorded, columns are not there
-		Assert.assertFalse(mainReportContent.contains("<td class=\"info\">"));
+		// issue #319: check that if no test info is recorded, columns are not there / Last State info is always there
+		Assert.assertTrue(mainReportContent.contains("<td class=\"info\">"));
+		Assert.assertTrue(mainReportContent.contains("<th> Last State </th>"));
+	}
+	
+	/**
+	 * Check "Last State" is always there even if nothing needs to be displayed (should never happen as we should have at least the last screen capture
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testMonothreadReportTestOk() throws Exception {
+		
+		SeleniumTestsContextManager.removeThreadContext();
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+		
+		// check content of summary report file
+		String mainReportContent = readSummaryFile();
+		
+		// issue #319: check that if no test info is recorded, columns are not there / Last State info is always there
+		Assert.assertTrue(mainReportContent.contains("<td class=\"info\">"));
+		Assert.assertTrue(mainReportContent.contains("<th> Last State </th>"));
 	}
 	
 	/**
@@ -1051,8 +1070,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// check all files are displayed
 		Assert.assertTrue(detailedReportContent1.contains("<a href='screenshots/N-A_2-1_Pre_test_step._beforeMethod-"));
 		Assert.assertTrue(detailedReportContent1.contains("<a href='htmls/N-A_2-1_Pre_test_step._beforeMethod-"));
-		Assert.assertTrue(detailedReportContent1.contains("<a href='../test1Listener5/screenshots/test1Listener5_3-1_Test_end"));
-		Assert.assertTrue(detailedReportContent1.contains("<a href='../test1Listener5/htmls/test1Listener5_3-1_Test_end"));
+		Assert.assertTrue(detailedReportContent1.contains("<a href='screenshots/test1Listener5_3-1_Test_end"));
+		Assert.assertTrue(detailedReportContent1.contains("<a href='htmls/test1Listener5_3-1_Test_end"));
 
 		
 	}
@@ -1863,6 +1882,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		// check no HTML code remains in file
 		Assert.assertFalse(detailedReportContent.contains("<strong>"));
+		
+		// check exception info is correctly encoded
+		Assert.assertTrue(detailedReportContent.contains("<th>Last State</th><td><a class=\"errorTooltip\"><i class=\"fas fa-file-alt\" aria-hidden=\"true\" data-toggle=\"popover\" title=\"Exception\" data-content=\"&amp; some exception &quot;with &quot; &lt;strong&gt;&lt;a href='http://someurl/link' style='background-color: red;'&gt;HTML to encode&lt;/a&gt;&lt;/strong&gt;\"></i></a></td>"));
 	}
 	
 	/**
