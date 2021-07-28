@@ -231,7 +231,11 @@ public class ScenarioLogger extends Logger {
     public void logScreenshot(ScreenShot screenshot, String screenshotName, String driverName, SnapshotCheckType checkSnapshot) {
 
     	try {
-	    	TestStep runningStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
+	    	TestStep runningStep = TestStepManager.getParentTestStep();
+	    	if (runningStep == null) {
+	    		runningStep = TestStepManager.getCurrentOrPreviousStep();
+	    	}
+	    	
 	    	if (runningStep != null) {
 	    		try {
 	    			String displayedScreenshotName = screenshotName == null ? "": "-" + screenshotName;

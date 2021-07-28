@@ -24,6 +24,7 @@ import org.testng.Reporter;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestStepManager;
+import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.logging.ScenarioLogger;
 
@@ -53,6 +54,7 @@ public class SoftAssert {
 			if (SeleniumTestsContextManager.getThreadContext().isSoftAssertEnabled()) {
 				SeleniumTestsContextManager.getThreadContext().addVerificationFailures(Reporter.getCurrentTestResult(), e);
 				logger.error("!!!FAILURE ALERT!!! - Assertion Failure: " + e.getMessage());
+				TestTasks.capturePageSnapshot();
 		        return null;
 			} else {
 				logger.error("Assertion Failure: " + e.getMessage());

@@ -702,6 +702,51 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 	
 	/**
+	 * A snapshot is taken when soft assertion is enabled and assertion fails
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testDetailedReportContainsCaptureOnSoftAssertionEnabled() throws Exception {
+
+		try {
+			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "true");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverWithAssert"});
+			
+			String detailedReportContent = readTestMethodResultFile("testDriverWithAssert");
+			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
+			
+			// check that with assertion error, snapshot is present
+			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">!!!FAILURE ALERT!!! - Assertion Failure: expected [true] but found [false]</div>"
+					+ "<div class=\"message-snapshot\">Output 'drv:main' browser: Current Window: Test page:"));
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);
+		}
+	}
+	
+	@Test(groups={"it"})
+	public void testDetailedReportDoesNotContainCaptureOnSoftAssertionDisabled() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "false");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverWithAssert"});
+			
+			String detailedReportContent = readTestMethodResultFile("testDriverWithAssert");
+			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
+			
+			// check that with assertion error, snapshot is present
+			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Assertion Failure: expected [true] but found [false]</div>"));
+			Assert.assertFalse(detailedReportContent.contains("<div class=\"message-error\">!!!FAILURE ALERT!!! - Assertion Failure: expected [true] but found [false]</div>"
+					+ "<div class=\"message-snapshot\">Output 'drv:main' browser: Current Window: Test page:"));
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);
+		}
+	}
+	
+	/**
 	 * Check behaviour when Assert is used in test scenario (not in webpage)
 	 * Assertion in scenario should be attached to the previous step which will be marked as failed
 	 * Test end will also be in red
@@ -714,6 +759,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "true");
 			
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testWithAssertInTest"});
+
+			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 			
 			// check content of summary report file
 			String detailedReportContent = readTestMethodResultFile("testWithAssertInTest");
@@ -725,12 +772,12 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			
 			// that assertion raised in test scenario is attached to previous step
 			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box failed\"><div class\\=\"box-header with-border\">"
-					+ "<button type\\=\"button\" class\\=\"btn btn-box-tool\" data-widget\\=\"collapse\"><i class\\=\"fas fa-plus\"></i></button><span class=\"step-title\"> getResult  - \\d+\\.\\d+ secs\\s*</div><div class\\=\"box-body\">"
+					+ "<button type\\=\"button\" class\\=\"btn btn-box-tool\" data-widget\\=\"collapse\"><i class\\=\"fas fa-plus\"></i></button><span class=\"step-title\"> getResult  - \\d+\\.\\d+ secs\\s*</span></div><div class\\=\"box-body\">"
 					+ "<ul><div class\\=\"message-error\">!!!FAILURE ALERT!!! - Assertion Failure: Error in result expected \\[1\\] but found \\[2\\]</div>.*"));
 			
 			// check last step shows the assertion					
 			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box failed\">.*?<i class\\=\"fas fa-plus\"></i>"
-					+ "</button><span class=\"step-title\"> Test end - \\d+\\.\\d+ secs\\s*</div><div class\\=\"box-body\"><ul><div class\\=\"message-log\">Test is KO with error: !!! Many Test Failures \\(2\\)<br/>"
+					+ "</button><span class=\"step-title\"> Test end - \\d+\\.\\d+ secs\\s*</span></div><div class\\=\"box-body\"><ul><div class\\=\"message-log\">Test is KO with error: !!! Many Test Failures \\(2\\)<br/>"
 					+ "<br/>class java.lang.AssertionError: <br/>\\.<br/>Failure 1 of 2.*Failure 2 of 2.*"
 					+ "<div class\\=\"message-error\">\\s+class java.lang.AssertionError: !!! Many Test Failures \\(2\\)<br/>.*"));
 			
@@ -738,7 +785,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box success\">.*?<i class\\=\"fas fa-plus\"></i></button><span class=\"step-title\"> add with args: \\(3, \\).*"));
 			
 		} finally {
-			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);
 		}
 	}
@@ -754,6 +800,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "true");
 			
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testWithAssertInSubStep"});
+
+			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 			
 			// check content of summary report file
 			String detailedReportContent = readTestMethodResultFile("testWithAssertInSubStep");
@@ -766,7 +814,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 					+ "<div class\\=\"message-error\">!!!FAILURE ALERT!!! - Assertion Failure: false error expected \\[true\\] but found \\[false\\].*")); // error displayed
 			
 		} finally {
-			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);
 		}
 	}
@@ -783,6 +830,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "false");
 			
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testWithAssertInTest"});
+
+			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 			
 			// check content of summary report file
 			String detailedReportContent = readTestMethodResultFile("testWithAssertInTest");
