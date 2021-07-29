@@ -932,11 +932,13 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "resources", "templates", "AdminLTE.min.css").toFile().exists());
 		Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "resources", "templates", "bootstrap.min.css").toFile().exists());
-		Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "resources", "templates", "fonts").toFile().exists());
+		Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "resources", "templates", "webfonts").toFile().exists());
 		
 		String detailedReportContent = readTestMethodResultFile("testAndSubActions");
 		Assert.assertTrue(detailedReportContent.contains("<script src=\"https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js\""));
 		Assert.assertTrue(detailedReportContent.contains("<script src=\"https://cdn.jsdelivr.net/npm/iframe-resizer@4.2.10/js/iframeResizer.min.js\">"));
+		Assert.assertTrue(detailedReportContent.contains("<link rel=\"stylesheet\" href=\"https://use.fontawesome.com/releases/v5.15.3/css/all.css\">"));
+		Assert.assertTrue(detailedReportContent.contains("<link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css\""));
 	}
 	
 	/**
@@ -960,7 +962,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "resources", "templates", "AdminLTE.min.css").toFile().exists());
 		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "resources", "templates", "bootstrap.min.css").toFile().exists());
-		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "resources", "templates", "fonts").toFile().exists());
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "resources", "templates", "webfonts").toFile().exists());
 
 		String detailedReportContent = readTestMethodResultFile("testAndSubActions");
 		Assert.assertTrue(detailedReportContent.contains("<script src=\"resources/iframeResizer.min.js\"></script>"));
@@ -1397,7 +1399,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent2 = readTestMethodResultFile("testInError");
 		
 		// Check each step is recorded in file: 2 test steps + test end + logs
-		Assert.assertTrue(detailedReportContent2.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button><span class=\"step-title\"> Test end"));
+		Assert.assertTrue(detailedReportContent2.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> Test end"));
 		
 		// check logs are written only once 
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "[main] ScenarioLogger: Test is OK</div>"), 1);
@@ -2149,8 +2151,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent = readTestMethodResultFile("testCauseWithErrorAndDetails");
 		
 		// Only failing step contains the information message
-		Assert.assertTrue(detailedReportContent.matches(".*<i class\\=\"fas fa-plus\"></i></button><span class=\"step-title\"> add - 0\\.\\d+ secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fa fa-info-circle\"></i><span>Possibly caused by REGRESSION: Check your scripts</span></div>.*"));
-		Assert.assertFalse(detailedReportContent.matches(".*<i class\\=\"fas fa-plus\"></i></button><span class=\"step-title\"> Test end - 0\\.\\d+ secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fa fa-info-circle\"></i><span>Possibly caused by REGRESSION: Check your scripts</span></div>.*"));
+		Assert.assertTrue(detailedReportContent.matches(".*<i class\\=\"fas fa-plus\"></i></button><span class=\"step-title\"> add - 0\\.\\d+ secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fas fa-info-circle\"></i><span>Possibly caused by REGRESSION: Check your scripts</span></div>.*"));
+		Assert.assertFalse(detailedReportContent.matches(".*<i class\\=\"fas fa-plus\"></i></button><span class=\"step-title\"> Test end - 0\\.\\d+ secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fas fa-info-circle\"></i><span>Possibly caused by REGRESSION: Check your scripts</span></div>.*"));
 	}
 	
 	@Test(groups={"it"})
@@ -2162,8 +2164,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent = readTestMethodResultFile("testCauseWithErrorNoDetails");
 		
 		// Only failing step contains the information message
-		Assert.assertTrue(detailedReportContent.matches(".*<i class\\=\"fas fa-plus\"></i></button><span class=\"step-title\"> add - 0\\.\\d+ secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fa fa-info-circle\"></i><span>Possibly caused by REGRESSION: </span></div>.*"));
-		Assert.assertFalse(detailedReportContent.matches(".*<i class\\=\"fas fa-plus\"></i></button><span class=\"step-title\"> Test end - 0\\.\\d+ secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fa fa-info-circle\"></i><span>Possibly caused by REGRESSION: </span></div>.*"));
+		Assert.assertTrue(detailedReportContent.matches(".*<i class\\=\"fas fa-plus\"></i></button><span class=\"step-title\"> add - 0\\.\\d+ secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fas fa-info-circle\"></i><span>Possibly caused by REGRESSION: </span></div>.*"));
+		Assert.assertFalse(detailedReportContent.matches(".*<i class\\=\"fas fa-plus\"></i></button><span class=\"step-title\"> Test end - 0\\.\\d+ secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fas fa-info-circle\"></i><span>Possibly caused by REGRESSION: </span></div>.*"));
 	}
 	
 	@Test(groups={"it"})

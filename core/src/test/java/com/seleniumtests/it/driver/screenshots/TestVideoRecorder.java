@@ -85,7 +85,7 @@ public class TestVideoRecorder extends ReporterTest {
 			Assert.assertTrue(detailedReportContent.contains("<span><i class=\"fas fa-file-video\"></i>"));
 			
 			// step where timestamp is 0 do not display it
-			Assert.assertTrue(detailedReportContent.contains("<span class=\"step-title\"> getPageUrl with args: (CHROME, ) - 0.0 secs</span></div>"));
+			Assert.assertTrue(detailedReportContent.matches(".*<span class\\=\"step-title\"> getPageUrl with args: \\(CHROME, \\) - \\d+\\.\\d+ secs</span></div>.*"));
 			
 			
 		} finally {
