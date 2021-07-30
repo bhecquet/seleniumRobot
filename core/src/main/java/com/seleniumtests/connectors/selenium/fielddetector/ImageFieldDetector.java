@@ -22,11 +22,16 @@ public class ImageFieldDetector {
 
 	private static final Logger logger = SeleniumRobotLogger.getLogger(ImageFieldDetector.class);
 	private File image;
+	private double resizeFactor;
 	private FieldDetectorConnector fieldDetectorInstance;
 	private JSONObject detectionJsonData;
 	
 	public ImageFieldDetector(File image) {
+		this(image, 1);
+	}
+	public ImageFieldDetector(File image, double resizeFactor) {
 		this.image = image;
+		this.resizeFactor = resizeFactor;
 		fieldDetectorInstance = SeleniumTestsContextManager.getThreadContext().getFieldDetectorInstance();
 		if (fieldDetectorInstance == null) {
 			throw new ConfigurationException("Image Field detector has not been properly configured");
@@ -40,7 +45,7 @@ public class ImageFieldDetector {
 	 */
 	public List<Field> detectFields() {
 		if (detectionJsonData == null) {
-			detectionJsonData = fieldDetectorInstance.detect(image);
+			detectionJsonData = fieldDetectorInstance.detect(image, resizeFactor);
 		}
 		
 		List<Field> fields = new ArrayList<>();
@@ -65,7 +70,7 @@ public class ImageFieldDetector {
 	 */
 	public List<Label> detectLabels() {
 		if (detectionJsonData == null) {
-			detectionJsonData = fieldDetectorInstance.detect(image);
+			detectionJsonData = fieldDetectorInstance.detect(image, resizeFactor);
 		}
 
 		List<Label> labels = new ArrayList<>();

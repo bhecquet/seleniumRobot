@@ -45,11 +45,13 @@ public class TestFieldDetectorConnector extends GenericTest {
 		System.clearProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL);
 	}
 	
-	@Test(groups="it", enabled = true)
+	@Test(groups="it", enabled = false)
 	public void testFieldDetection() throws IOException {
 		ImageFieldDetector imageFieldDetector;
 		try {
-			imageFieldDetector = new ImageFieldDetector(createImageFromResource("ti/form_picture.png"));
+//			imageFieldDetector = new ImageFieldDetector(createImageFromResource("tu/imageFieldDetection/browserCapture.png"), 0.75);
+			imageFieldDetector = new ImageFieldDetector(new File("D:\\Dev\\yolo\\yolo-training-data\\field-detector\\dataset_real\\10 Web Form Examples Youll Want to Copy Immediately-5.jpg"), 0.75);
+//			imageFieldDetector = new ImageFieldDetector(createImageFromResource("ti/form_picture.png"), 0.75);
 		} catch (ConfigurationException e) {
 			throw new SkipException("no field detector server available");
 		}
