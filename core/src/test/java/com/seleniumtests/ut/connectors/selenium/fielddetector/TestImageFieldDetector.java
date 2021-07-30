@@ -80,7 +80,7 @@ public class TestImageFieldDetector extends MockitoTest {
 		
 		File image = createImageFromResource("ti/form_picture.png");
 		
-		when(fieldDetectorConnector.detect(image)).thenReturn(obj);
+		when(fieldDetectorConnector.detect(image, 1)).thenReturn(obj);
 		
 		SeleniumTestsContextManager.getThreadContext().setFieldDetectorInstance(fieldDetectorConnector);
 		List<Field> fields = new ImageFieldDetector(image).detectFields();
@@ -115,7 +115,7 @@ public class TestImageFieldDetector extends MockitoTest {
 		
 		File image = createImageFromResource("ti/form_picture.png");
 		
-		when(fieldDetectorConnector.detect(image)).thenReturn(obj);
+		when(fieldDetectorConnector.detect(image, 1)).thenReturn(obj);
 		
 		SeleniumTestsContextManager.getThreadContext().setFieldDetectorInstance(fieldDetectorConnector);
 		List<Field> fields = new ImageFieldDetector(image).detectFields();
@@ -176,7 +176,7 @@ public class TestImageFieldDetector extends MockitoTest {
 		
 		File image = createImageFromResource("ti/form_picture.png");
 		
-		when(fieldDetectorConnector.detect(image)).thenReturn(obj);
+		when(fieldDetectorConnector.detect(image, 1)).thenReturn(obj);
 		
 		SeleniumTestsContextManager.getThreadContext().setFieldDetectorInstance(fieldDetectorConnector);
 		List<Label> labels = new ImageFieldDetector(image).detectLabels();
@@ -219,7 +219,7 @@ public class TestImageFieldDetector extends MockitoTest {
 		
 		File image = createImageFromResource("ti/form_picture.png");
 		
-		when(fieldDetectorConnector.detect(image)).thenReturn(obj);
+		when(fieldDetectorConnector.detect(image, 1)).thenReturn(obj);
 		
 		SeleniumTestsContextManager.getThreadContext().setFieldDetectorInstance(fieldDetectorConnector);
 		List<Label> labels = new ImageFieldDetector(image).detectLabels();
@@ -284,7 +284,7 @@ public class TestImageFieldDetector extends MockitoTest {
 		
 		File image = createImageFromResource("ti/form_picture.png");
 		
-		when(fieldDetectorConnector.detect(image)).thenReturn(obj);
+		when(fieldDetectorConnector.detect(image, 1)).thenReturn(obj);
 		
 		SeleniumTestsContextManager.getThreadContext().setFieldDetectorInstance(fieldDetectorConnector);
 		ImageFieldDetector detector = new ImageFieldDetector(image);
@@ -292,6 +292,6 @@ public class TestImageFieldDetector extends MockitoTest {
 		List<Label> labels = detector.detectLabels();
 		
 		// detector is called only once
-		verify(fieldDetectorConnector).detect(image);
+		verify(fieldDetectorConnector).detect(image, 1);
 	}
 }
