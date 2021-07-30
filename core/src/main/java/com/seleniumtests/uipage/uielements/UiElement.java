@@ -30,12 +30,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
-import org.openqa.selenium.By;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.remote.ScreenshotException;
 
@@ -52,7 +50,6 @@ import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.SnapshotTarget;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.ReplayOnError;
-import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.imaging.ImageDetector;
 import com.seleniumtests.util.imaging.ImageProcessor;

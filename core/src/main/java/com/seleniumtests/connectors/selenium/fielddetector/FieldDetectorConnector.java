@@ -43,6 +43,9 @@ public class FieldDetectorConnector {
 	}
 	
 	public JSONObject detect(File imageFile) {
+		return detect(imageFile, 1);
+	}
+	public JSONObject detect(File imageFile, double resizeFactor) {
 		if (imageFile == null) {
 			throw new ScenarioException("Image file is null");
 		}
@@ -50,7 +53,10 @@ public class FieldDetectorConnector {
 			throw new ScenarioException(String.format("Image file %s not found", imageFile.getAbsolutePath()));
 		}
 		
-		HttpResponse<JsonNode> fieldDefinition = Unirest.post(url).field("image", imageFile).asJson();
+		HttpResponse<JsonNode> fieldDefinition = Unirest.post(url)
+				.field("resize", resizeFactor)
+				.field("image", imageFile)
+				.asJson();
 		if (fieldDefinition.getStatus() != 200) {
 			try {
 				throw new ScenarioException("Field detector returned error: " + fieldDefinition.getBody().getObject().get("error"));
