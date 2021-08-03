@@ -62,7 +62,6 @@ import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.driver.screenshots.VideoRecorder;
 import com.seleniumtests.reporter.info.Info;
 import com.seleniumtests.reporter.info.LogInfo;
 import com.seleniumtests.reporter.info.MultipleInfo;
@@ -73,6 +72,7 @@ import com.seleniumtests.reporter.reporters.ReporterControler;
 import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
+import com.seleniumtests.util.video.VideoRecorder;
 
 import kong.unirest.Unirest;
 

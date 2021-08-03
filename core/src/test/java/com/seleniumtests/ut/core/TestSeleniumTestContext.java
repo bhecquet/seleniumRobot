@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import org.json.JSONObject;
 import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Proxy.ProxyType;
 import org.testng.Assert;
@@ -45,7 +44,6 @@ import com.seleniumtests.driver.DriverExceptionListener;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.screenshots.SnapshotComparisonBehaviour;
-import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.reporter.logger.ArchiveMode;
 import com.seleniumtests.reporter.reporters.JUnitReporter;
 import com.seleniumtests.reporter.reporters.ReportInfo;
@@ -54,6 +52,7 @@ import com.seleniumtests.uipage.htmlelements.ElementInfo;
 import com.seleniumtests.ut.driver.WebDriverListener1;
 import com.seleniumtests.ut.driver.WebDriverListener2;
 import com.seleniumtests.util.logging.DebugMode;
+import com.seleniumtests.util.video.VideoCaptureMode;
 
 /**
  * Test parsing of test options into SeleniumTestContext

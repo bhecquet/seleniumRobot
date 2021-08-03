@@ -45,9 +45,9 @@ import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.WebUIDriverFactory;
-import com.seleniumtests.driver.screenshots.VideoRecorder;
 import com.seleniumtests.it.stubclasses.StubTestPage;
 import com.seleniumtests.uipage.PageObject;
+import com.seleniumtests.util.video.VideoRecorder;
 
 import net.lightbody.bmp.BrowserMobProxy;
 

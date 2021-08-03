@@ -41,9 +41,9 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
+import com.seleniumtests.util.video.VideoCaptureMode;
 
 public class GenericTest {
 	
