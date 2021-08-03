@@ -28,7 +28,7 @@ import org.testng.annotations.BeforeMethod;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.driver.screenshots.VideoCaptureMode;
+import com.seleniumtests.util.video.VideoCaptureMode;
 
 /**
  * Parent test class for tests when driver needs to be closed after each test

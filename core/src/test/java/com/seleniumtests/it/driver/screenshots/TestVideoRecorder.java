@@ -20,7 +20,6 @@ package com.seleniumtests.it.driver.screenshots;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.Arrays;
 
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -29,9 +28,9 @@ import org.testng.xml.XmlSuite.ParallelMode;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.driver.screenshots.VideoRecorder;
 import com.seleniumtests.it.reporter.ReporterTest;
 import com.seleniumtests.util.helper.WaitHelper;
+import com.seleniumtests.util.video.VideoRecorder;
 
 public class TestVideoRecorder extends ReporterTest {
 

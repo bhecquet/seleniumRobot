@@ -34,9 +34,9 @@ import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.proxy.ProxyConfig;
 import com.seleniumtests.customexception.DriverExceptions;
-import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
+import com.seleniumtests.util.video.VideoCaptureMode;
 
 import net.lightbody.bmp.BrowserMobProxy;
 

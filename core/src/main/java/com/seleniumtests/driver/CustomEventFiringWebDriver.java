@@ -19,8 +19,6 @@ package com.seleniumtests.driver;
 
 import java.awt.AWTError;
 import java.awt.AWTException;
-import java.awt.BorderLayout;
-import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
@@ -46,8 +44,6 @@ import java.util.TreeSet;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Base64OutputStream;
@@ -82,10 +78,10 @@ import com.seleniumtests.core.StatisticsStorage.DriverUsage;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.customexception.WebSessionEndedException;
-import com.seleniumtests.driver.screenshots.VideoRecorder;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
+import com.seleniumtests.util.video.VideoRecorder;
 
 import net.lightbody.bmp.BrowserMobProxy;
 

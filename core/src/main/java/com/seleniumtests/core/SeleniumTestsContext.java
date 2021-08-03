@@ -58,7 +58,6 @@ import com.seleniumtests.driver.DriverExceptionListener;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.screenshots.SnapshotComparisonBehaviour;
-import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.reporter.logger.ArchiveMode;
 import com.seleniumtests.reporter.reporters.BugTrackerReporter;
 import com.seleniumtests.reporter.reporters.CustomReporter;
@@ -71,6 +70,7 @@ import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtility;
+import com.seleniumtests.util.video.VideoCaptureMode;
 
 /**
  * Defines TestNG context used in STF.
