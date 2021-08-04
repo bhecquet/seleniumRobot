@@ -39,17 +39,23 @@
 			#end
 	    #end
 	#end
+	<div class="row">
 	#foreach( $snapshot in $localStep.getSnapshots() )
 		#set($snapshotLog = $snapshot.buildScreenshotLog())
-		<div class="message-snapshot">$snapshotLog</div>
+		#set($snapshotCheckTypeName = $snapshot.getCheckSnapshot().getName())
+		#if ($snapshotCheckTypeName != "NONE_REFERENCE")
+		  <div class="message-snapshot col">$snapshotLog</div>
+		 #end
 	#end
+	</div>
+	
 	#foreach( $file in $localStep.getFiles() )
 		#set($log = $file.buildLog())
 		<div class="message-snapshot">$log</div>
 	#end
 	#foreach( $har in $localStep.getHarCaptures() )
 		#set($harLog = $har.buildHarLog())
-		<div class="message-snapshot">$harLog</div>
+		<div class="message-har">$harLog</div>
 	#end
 	</ul>
 #end
@@ -108,6 +114,21 @@
 			</ul>
 		</div>
 		<div class="tab-content" id="myTabContent">
+		
+		     <!-- Modal for displaying pictures -->
+		    <div class="modal fade" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        </div>
+                        <div class="modal-body">
+                            <img src="" id="imagepreview" style="width: 80%;" >
+                        </div>
+                    </div>
+                </div>
+            </div>
+		
 			<div class="tab-pane fade show active" id="results" role="tabpanel" aria-labelledby="result-tab">
 
 				<div class="container-fluid">

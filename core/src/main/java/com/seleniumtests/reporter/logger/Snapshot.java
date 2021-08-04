@@ -24,6 +24,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -62,21 +63,35 @@ public class Snapshot extends TestAction {
     public String buildScreenshotLog() {
 
         StringBuilder sbMessage = new StringBuilder("");
-        sbMessage.append(String.format(OUTPUT_PATTERN, name) + StringEscapeUtils.escapeHtml4(screenshot.getTitle()) + ": ");
+        
+        
+        if (screenshot.getImagePath() != null) {
+        	String uuid = UUID.randomUUID().toString();
+        	sbMessage.append(String.format("<div class=\"text-center\">\n"
+        			+ "      <a href=\"#\" onclick=\"$('#imagepreview').attr('src', $('#%s').attr('src'));$('#imagemodal').modal('show');\">\n"
+        			+ "          <img id=\"%s\" src=\"%s\" style=\"width: 300px\">\n"
+        			+ "      </a>"
+        			+ "</div>\n", uuid, uuid, screenshot.getImagePath()));
+        }
+        
+        String snapshotTitle = name;
+        if (screenshot.getTitle() != null) {
+        	snapshotTitle = snapshotTitle + ": " + screenshot.getTitle();
+        }
+        sbMessage.append("<div class=\"text-center\">" + StringEscapeUtils.escapeHtml4(snapshotTitle) + "</div>\n");
+        sbMessage.append("<div class=\"text-center font-weight-lighter\">");
         
         if (screenshot.getLocation() != null) {
-            sbMessage.append("<a href='" + screenshot.getLocation() + "' target=url>Application URL</a>");
+            sbMessage.append("<a href='" + screenshot.getLocation() + "' target=url>URL</a>\n");
         }
 
         if (screenshot.getHtmlSourcePath() != null) {
-            sbMessage.append(" | <a href='" + screenshot.getHtmlSourcePath()
-                    + "' target=html>Application HTML Source</a>");
+            sbMessage.append(" | <a href='" + screenshot.getHtmlSourcePath() + "' target=html>HTML Source</a>\n");
         }
 
-        if (screenshot.getImagePath() != null) {
-            sbMessage.append(" | <a href='" + screenshot.getImagePath()
-                    + "' class='lightbox'>" + SNAPSHOT_PATTERN + "</a>");
-        }
+        sbMessage.append("</div>\n");
+
+        
 
         return sbMessage.toString();
     }
@@ -203,6 +218,10 @@ public class Snapshot extends TestAction {
 	
 	public SnapshotCheckType getCheckSnapshot() {
 		return checkSnapshot;
+	}
+
+	public void setCheckSnapshot(SnapshotCheckType checkSnapshot) {
+		this.checkSnapshot = checkSnapshot;
 	}
 
 }
