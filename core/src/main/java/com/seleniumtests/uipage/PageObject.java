@@ -678,7 +678,7 @@ public class PageObject extends BasePage implements IPage {
      * @param snapshotName	the snapshot name
      */
     public void captureViewportSnapshot(String snapshotName) {
-    	capturePageSnapshot(snapshotName, SnapshotCheckType.FALSE);
+    	captureViewportSnapshot(snapshotName, SnapshotCheckType.FALSE);
     }
     
     /**
