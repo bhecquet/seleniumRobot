@@ -17,12 +17,18 @@
  */
 package com.seleniumtests.reporter.reporters;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 import org.openqa.selenium.Rectangle;
 import org.testng.IReporter;
@@ -35,6 +41,8 @@ import com.seleniumtests.core.utils.TestNGContextUtils;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
+import com.seleniumtests.driver.screenshots.ScreenShot;
+import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -150,7 +158,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 					continue;
 				}
 				
-				recordSteps(serverConnector, sessionId, testCaseInSessionId, testSteps);
+				recordSteps(serverConnector, sessionId, testCaseInSessionId, testSteps, testResult);
 				
 				logger.info(String.format("Snapshots has been recorded with TestCaseSessionId: %d", testCaseInSessionId));
 				TestNGResultUtils.setSnapshotTestCaseInSessionId(testResult, testCaseInSessionId);
@@ -166,7 +174,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 	 * @param testCaseInSessionId
 	 * @param testSteps
 	 */
-	private void recordSteps(SeleniumRobotSnapshotServerConnector serverConnector, Integer sessionId, Integer testCaseInSessionId, List<TestStep> testSteps) {
+	private void recordSteps(SeleniumRobotSnapshotServerConnector serverConnector, Integer sessionId, Integer testCaseInSessionId, List<TestStep> testSteps, ITestResult testResult) {
 		for (TestStep testStep: testSteps) {
 			
 			// record test step
@@ -176,9 +184,9 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			Integer stepResultId = serverConnector.recordStepResult(!testStep.getFailed(), stepLogs, testStep.getDuration(), sessionId, testCaseInSessionId, testStepId);
 			
 			// sends all snapshots that are flagged as comparable
-			for (Snapshot snapshot: testStep.getSnapshots()) {
+			for (Snapshot snapshot: new ArrayList<>(testStep.getSnapshots())) {
 				
-				if (snapshot.getCheckSnapshot().recordSnapshotOnServer()) {
+				if (snapshot.getCheckSnapshot().recordSnapshotOnServerForComparison()) {
 					if (snapshot.getName() == null || snapshot.getName().isEmpty()) {
 						logger.warn("Snapshot hasn't any name, it won't be sent to server");
 						continue;
@@ -191,6 +199,31 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 						}
 					} catch (SeleniumRobotServerException e) {
 						logger.error("Could not create snapshot on server", e);
+					}
+					
+				// record reference image on server if step is successful
+				} else if (snapshot.getCheckSnapshot().recordSnapshotOnServerForReference()) {
+					if (Boolean.FALSE.equals(testStep.getFailed())) {
+						try {
+							serverConnector.createStepReferenceSnapshot(snapshot, stepResultId);
+						} catch (SeleniumRobotServerException e) {
+							logger.error("Could not create reference snapshot on server", e);
+						}
+					} else {
+						try {
+							File referenceSnapshot = serverConnector.getReferenceSnapshot(stepResultId);
+							
+							if (referenceSnapshot != null) {
+								Path newPath = Paths.get(TestNGResultUtils.getSeleniumRobotTestContext(testResult).getScreenshotOutputDirectory(), referenceSnapshot.getName()).toAbsolutePath(); 
+								FileUtils.moveFile(referenceSnapshot, newPath.toFile());
+								testStep.addSnapshot(new Snapshot(new ScreenShot(newPath.getParent().getParent().relativize(newPath).toString()), "Valid-reference", SnapshotCheckType.FALSE), 0, null);
+								snapshot.setCheckSnapshot(SnapshotCheckType.FALSE); // change snapshot check type so that it's displayed in report
+							}
+						} catch (SeleniumRobotServerException e) {
+							logger.error("Could not get reference snapshot from server", e);
+						} catch (IOException e) {
+							logger.error("Could not copy reference snapshot", e);
+						}
 					}
 				}
 			}

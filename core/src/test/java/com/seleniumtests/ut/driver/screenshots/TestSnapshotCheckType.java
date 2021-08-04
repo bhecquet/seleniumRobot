@@ -32,17 +32,17 @@ public class TestSnapshotCheckType extends MockitoTest {
 	
 	@Test(groups= {"ut"})
 	public void testRecordSnapshotOnServer() {
-		Assert.assertTrue(SnapshotCheckType.FULL.recordSnapshotOnServer());
+		Assert.assertTrue(SnapshotCheckType.FULL.recordSnapshotOnServerForComparison());
 	}
 	
 	@Test(groups= {"ut"})
 	public void testDoNotRecordSnapshotOnServer() {
-		Assert.assertFalse(SnapshotCheckType.FALSE.recordSnapshotOnServer());
+		Assert.assertFalse(SnapshotCheckType.FALSE.recordSnapshotOnServerForComparison());
 	}
 	
 	@Test(groups= {"ut"})
 	public void testRecordSnapshotOnServerLayoutOnly() {
-		Assert.assertTrue(SnapshotCheckType.LAYOUT.recordSnapshotOnServer());
+		Assert.assertTrue(SnapshotCheckType.LAYOUT.recordSnapshotOnServerForComparison());
 	}
 
 	@Test(groups= {"ut"})

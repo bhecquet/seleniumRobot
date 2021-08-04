@@ -18,6 +18,7 @@
 package com.seleniumtests.connectors.selenium;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.openqa.selenium.Rectangle;
 import org.testng.ITestResult;
@@ -36,9 +38,11 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.util.helper.WaitHelper;
 
+import kong.unirest.HttpResponse;
 import kong.unirest.MultipartBody;
 import kong.unirest.UnirestException;
 import kong.unirest.json.JSONObject;
+import rp.com.google.common.io.Files;
 
 public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerConnector {
 	
@@ -54,6 +58,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	public static final String STEPRESULT_API_URL = "/snapshot/api/stepresult/";
 	public static final String EXCLUDE_API_URL = "/snapshot/api/exclude/";
 	public static final String SNAPSHOT_API_URL = "/snapshot/upload/image";
+	public static final String STEP_REFERENCE_API_URL = "/snapshot/stepReference/";
 	private String sessionUUID;
 	private static SeleniumRobotSnapshotServerConnector snapshotConnector;
 
@@ -198,6 +203,67 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			return testStepId;
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 			throw new SeleniumRobotServerException("cannot create test step", e);
+		}
+	}
+	
+	/**
+	 * Get reference snapshot from server
+	 * This is useful when a step fails and we want to get the reference to allow comparison
+	 */
+	public File getReferenceSnapshot(Integer stepResultId) {
+		if (!active) {
+			return null;
+		}
+
+		if (stepResultId == null) {
+			throw new ConfigurationException("Step result must be previously recorded");
+		}
+		
+		try {
+
+			File tmpFile = File.createTempFile("img", ".png");
+			HttpResponse<byte[]> response = buildGetRequest(url + STEP_REFERENCE_API_URL + stepResultId + "/").asBytes();
+			
+			
+			if (response.getStatus() == 200) {
+				Files.write(response.getBody(), tmpFile);
+				return tmpFile;
+			} else {
+				logger.warn("No reference found");
+				return null;
+			}
+			
+		} catch (UnirestException | SeleniumRobotServerException | IOException e) {
+			throw new SeleniumRobotServerException("cannot get reference snapshot", e);
+		}
+	}
+	
+	/**
+	 * Create snapshot that shows the status of a step
+	 */
+	public void createStepReferenceSnapshot(Snapshot snapshot, Integer stepResultId) {
+		if (!active) {
+			return ;
+		}
+
+		if (stepResultId == null) {
+			throw new ConfigurationException("Step result must be previously recorded");
+		}
+		if (snapshot == null || snapshot.getScreenshot() == null || snapshot.getScreenshot().getFullImagePath() == null) {
+			throw new SeleniumRobotServerException("Provided snapshot does not exist");
+		}
+		
+		try {
+			File pictureFile = new File(snapshot.getScreenshot().getFullImagePath());
+			
+			getJSonResponse(buildPostRequest(url + STEP_REFERENCE_API_URL)
+					.field("stepResult", stepResultId)
+					.field("image", pictureFile)
+					
+					);
+			
+		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
+			throw new SeleniumRobotServerException("cannot create test snapshot", e);
 		}
 	}
 	
