@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import org.monte.media.FormatKeys.MediaType;
 import org.monte.media.math.Rational;
 
+import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.reporter.logger.Snapshot;
@@ -60,7 +61,9 @@ public class VideoUtils {
             
     		Map<Long, TestStep> samples = new HashMap<>();
     		for (TestStep testStep: testSteps) {
-    			samples.put(min(in.timeToSample(trackId, new Rational(testStep.getVideoTimeStamp(), 1000)), in.getSampleNumber(trackId) - 1), testStep);
+    			if (!testStep.getName().equals(TestStepManager.LAST_STEP_NAME)) {
+    				samples.put(min(in.timeToSample(trackId, new Rational(testStep.getVideoTimeStamp(), 1000)), in.getSampleNumber(trackId) - 1), testStep);
+    			}
     		}
     			
             // Read images from the track

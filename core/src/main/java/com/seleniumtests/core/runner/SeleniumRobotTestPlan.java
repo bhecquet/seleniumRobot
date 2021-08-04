@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
@@ -48,6 +49,7 @@ import com.seleniumtests.reporter.info.VideoLinkInfo;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.video.VideoCaptureMode;
+import com.seleniumtests.util.video.VideoUtils;
 
 @Listeners({com.seleniumtests.reporter.reporters.ReporterControler.class,
 	com.seleniumtests.core.runner.SeleniumRobotTestListener.class//,
@@ -97,6 +99,8 @@ public class SeleniumRobotTestPlan {
 		
 		// stop video capture and log file
 		File videoFile = WebUIDriver.stopVideoCapture();
+		VideoUtils.extractReferenceForSteps(videoFile, TestStepManager.getInstance().getTestSteps(), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
+		
 		if (videoFile != null) {
 
 	        if (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.TRUE
