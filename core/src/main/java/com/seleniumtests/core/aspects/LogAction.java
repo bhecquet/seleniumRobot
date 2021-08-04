@@ -543,6 +543,9 @@ public class LogAction {
 			TestStepManager.setParentTestStep(currentStep);
 		}
 		
+		// set the start date once step is initialized so that when we get the video frame associated to step, step name displayed on screen is the same as the running step name
+		currentStep.setStartDate();
+		
 		try {
 			reply = joinPoint.proceed(joinPoint.getArgs());	
 		} catch (Throwable e) {
