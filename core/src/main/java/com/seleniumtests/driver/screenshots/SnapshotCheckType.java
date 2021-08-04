@@ -30,7 +30,8 @@ public class SnapshotCheckType {
 	public enum Control {
 		NONE,
 		FULL,
-		LAYOUT
+		LAYOUT,
+		NONE_REFERENCE // no comparison done, it's a reference picture when step fails so that we can show to user what should have been the application if step succeed
 	}
 	
 	// snapshot will be compared to baseline if requested by option seleniumRobotServerCompareSnapshots
@@ -42,6 +43,9 @@ public class SnapshotCheckType {
 	
 	// snapshot will not be compared
 	public static final SnapshotCheckType FALSE = new SnapshotCheckType(Control.NONE);
+	
+	// snapshot will be used for reference, when test fails, no comparison should be done on these pictures
+	public static final SnapshotCheckType REFERENCE_ONLY = new SnapshotCheckType(Control.NONE_REFERENCE);
 			
 	private SnapshotCheckType(Control controlType) {
 		this.control = controlType;
@@ -52,11 +56,19 @@ public class SnapshotCheckType {
 	}
 	
 	/**
-	 * Says whether snasphots will be sent to seleniumRobot server or not.
+	 * Says whether snasphots will be sent to seleniumRobot server or not for comparing with previous test sessions
 	 * @return
 	 */
-	public boolean recordSnapshotOnServer() {
-		return control != Control.NONE;
+	public boolean recordSnapshotOnServerForComparison() {
+		return control != Control.NONE && control != Control.NONE_REFERENCE;
+	}
+	
+	/**
+	 * return true if snapshot is a reference image that show what is the application status when step succeed
+	 * @return
+	 */
+	public boolean recordSnapshotOnServerForReference() {
+		return control == Control.NONE_REFERENCE;
 	}
 	
 	private String rectangleToString(Rectangle rect) {

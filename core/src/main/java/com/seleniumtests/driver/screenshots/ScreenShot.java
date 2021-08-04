@@ -44,10 +44,17 @@ public class ScreenShot {
     private String outputDirectory;
 
     public ScreenShot() {
-        if (SeleniumTestsContextManager.getGlobalContext().getTestNGContext() != null) {
+        this(null);
+    }
+    
+    public ScreenShot(String imagePath) {
+    	if (SeleniumTestsContextManager.getGlobalContext().getTestNGContext() != null) {
             suiteName = SeleniumTestsContextManager.getGlobalContext().getTestNGContext().getSuite().getName();
             outputDirectory = SeleniumTestsContextManager.getThreadContext().getOutputDirectory();
         }
+    	
+    	this.imagePath = imagePath;
+    	this.duration = 0;
     }
 
     public boolean isException() {
@@ -58,6 +65,7 @@ public class ScreenShot {
         this.isException = isException;
     }
 
+    @Deprecated
     public String getSuiteName() {
         return suiteName;
     }
@@ -74,6 +82,10 @@ public class ScreenShot {
         this.suiteName = suiteName;
     }
 
+    /**
+     * URL of the page for which this screenshot has been taken
+     * @return
+     */
     public String getLocation() {
         return location;
     }
@@ -107,10 +119,18 @@ public class ScreenShot {
     	}
     }
 
+    /**
+     * Get the image path relative to outputDirectory (directory where info for a specific test are recorded)
+     * @return
+     */
     public String getImagePath() {
         return imagePath;
     }
 
+    /**
+     * Get the title of the page associated to this screenshot
+     * @return
+     */
     public String getTitle() {
         return title;
     }
@@ -149,6 +169,11 @@ public class ScreenShot {
 		this.duration = duration;
 	}
 	
+	/**
+	 * Move physically the image to 'destOutputDirectory'
+	 * @param destOutputDirectory
+	 * @throws IOException
+	 */
 	public void relocate(String destOutputDirectory) throws IOException {
 
 		new File(destOutputDirectory).mkdirs();

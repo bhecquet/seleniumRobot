@@ -57,6 +57,7 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverExceptionListener;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
+import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.SnapshotComparisonBehaviour;
 import com.seleniumtests.reporter.logger.ArchiveMode;
 import com.seleniumtests.reporter.reporters.BugTrackerReporter;
@@ -1409,6 +1410,10 @@ public class SeleniumTestsContext {
 
     public String getOutputDirectory() {
         return (String) getAttribute(OUTPUT_DIRECTORY);
+    }
+    
+    public String getScreenshotOutputDirectory() {
+    	return (String) Paths.get((String)getAttribute(OUTPUT_DIRECTORY), ScreenshotUtil.SCREENSHOT_DIR).toString();
     }
     
     public String getDefaultOutputDirectory() {

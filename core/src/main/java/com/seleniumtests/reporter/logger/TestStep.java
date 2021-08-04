@@ -105,6 +105,14 @@ public class TestStep extends TestAction {
 		return Math.max(0, consolidatedDuration);
 	}
 	
+	public void setStartDate() {
+		startDate = new Date();
+	}
+	
+	public void setStartDate(Date date) {
+		startDate = date;
+	}
+	
 	@Override
 	public long getDurationToExclude() {
 		long consolidatedDurationToExclude = durationToExclude; 
