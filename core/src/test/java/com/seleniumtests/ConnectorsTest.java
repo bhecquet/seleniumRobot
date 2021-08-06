@@ -29,10 +29,12 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.function.Function;
 
+import org.apache.commons.io.FileUtils;
 import org.mockito.Mock;
 import org.mockito.stubbing.OngoingStubbing;
 import org.openqa.selenium.By;
@@ -181,6 +183,7 @@ public class ConnectorsTest extends MockitoTest {
 		HttpResponse<String> response = mock(HttpResponse.class);
 		HttpResponse<JsonNode> jsonResponse = mock(HttpResponse.class);
 		HttpResponse<File> streamResponse = mock(HttpResponse.class);
+		HttpResponse<byte[]> bytestremResponse = mock(HttpResponse.class);
 		HttpRequest request = mock(HttpRequest.class);
 		JsonNode json = mock(JsonNode.class);
 		MultipartBody requestMultipartBody = mock(MultipartBody.class);
@@ -213,6 +216,14 @@ public class ConnectorsTest extends MockitoTest {
 			when(streamResponse.getStatus()).thenReturn(statusCode);
 			when(streamResponse.getStatusText()).thenReturn("TEXT");
 			when(streamResponse.getBody()).thenReturn((File)replyData);
+			
+			try {
+				when(bytestremResponse.getBody()).thenReturn(FileUtils.readFileToByteArray((File)replyData));
+				when(bytestremResponse.getStatus()).thenReturn(statusCode);
+				when(bytestremResponse.getStatusText()).thenReturn("BYTES");
+			} catch (IOException e) {
+				logger.error("Cannot read file to bytes, this may be a problem for test");
+			}
 		}
 		
 		
@@ -228,6 +239,7 @@ public class ConnectorsTest extends MockitoTest {
 				when(getRequest.asString()).thenReturn(response);
 				when(getRequest.asJson()).thenReturn(jsonResponse);
 				when(getRequest.asFile(anyString())).thenReturn(streamResponse);
+				when(getRequest.asBytes()).thenReturn(bytestremResponse);
 				when(getRequest.queryString(anyString(), anyString())).thenReturn(getRequest);
 				when(getRequest.queryString(anyString(), anyInt())).thenReturn(getRequest);
 				when(getRequest.queryString(anyString(), anyBoolean())).thenReturn(getRequest);
@@ -438,6 +450,8 @@ public class ConnectorsTest extends MockitoTest {
 		createServerMock("GET", SeleniumRobotServerConnector.NAMED_ENVIRONMENT_API_URL, 200, "{'id': 10}");		
 		createServerMock("GET", SeleniumRobotServerConnector.NAMED_TESTCASE_API_URL, 200, "{'id': 12}");		
 		createServerMock("GET", SeleniumRobotServerConnector.NAMED_VERSION_API_URL, 200, "{'id': 11}");	
+		
+		createServerMock("POST", SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL, 200, "{'result': 'OK'}"); // upload reference image for step
 		
 		SeleniumRobotSnapshotServerConnector connector = new SeleniumRobotSnapshotServerConnector(true, SERVER_URL);
 		

@@ -24,6 +24,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.driver.BrowserType;
@@ -37,7 +38,9 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	public void init(Method method) {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 		SeleniumTestsContextManager.getThreadContext().setOverrideSeleniumNativeAction(true);
-		SeleniumTestsContextManager.getThreadContext().setTestRetryCount(1);
+		if (System.getProperty(SeleniumTestsContext.TEST_RETRY_COUNT) == null) {
+			SeleniumTestsContextManager.getThreadContext().setTestRetryCount(0);
+		}
 	}
 	
 	/**

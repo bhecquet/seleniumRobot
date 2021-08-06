@@ -1501,6 +1501,224 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 	}
 	
+
+	/**
+	 * Check reference image for step is displayed when "recordResult" option is set and video capture is enabled
+	 * This reference is only shown when test fails
+	 * 
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportContainsStepReferenceForFailedStep() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
+			
+			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			
+			// simulate the case where a reference exists
+			createServerMock("GET", SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL + "17/", 200, createImageFromResource("tu/ffLogo1.png"));	
+					
+			
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShortKo"});
+			
+			// read 'testDriver' report. This contains calls to HtmlElement actions
+			String detailedReportContent1 = readTestMethodResultFile("testDriverShortKo");
+			
+			// reference and current state should be displayed
+			Assert.assertTrue(detailedReportContent1.matches(".* class\\=\"step-title\"> _writeSomethingOnNonExistentElement  - .*"
+					+ "at com\\.seleniumtests\\.it\\.driver\\.support\\.pages\\.DriverTestPage\\._writeSomethingOnNonExistentElement\\(DriverTestPage\\.java.*?"
+					+ "<div class\\=\"row\">"
+					+ "<div class\\=\"message-snapshot col\"><div class\\=\"text-center\">"
+					+ "<a href\\=\"#\" onclick\\=\"\\$\\('#imagepreview'\\).*"
+					+ "<img id.*"
+					+ "<div class\\=\"text-center\">Step beginning state</div>" // the current state
+					+ "<div class\\=\"text-center font-weight-lighter\"></div>.*"
+					+ "<div class\\=\"message-snapshot col\"><div class\\=\"text-center\">.*"
+					+ "<img id.*"
+					+ "<div class\\=\"text-center\">Valid-reference</div>.*")); // the reference
+			
+			// only one extraction of step state is presented (the one for failed step)
+			Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Step beginning state</div>"), 1);
+			
+			// check no picture extracted from video is kept
+			Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverShortKo", "video").toFile().exists());
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+		}
+	}
+	
+	/**
+	 * Check step state is not displayed when reference image does not exist on server
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportDoesNotContainStepImageWithoutReference() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
+			
+			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			
+			// simulate the case where a reference exists
+			createServerMock("GET", SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL + "17/", 404, createImageFromResource("tu/ffLogo1.png"));	
+		
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShortKo"});
+			
+			// read 'testDriver' report. This contains calls to HtmlElement actions
+			String detailedReportContent1 = readTestMethodResultFile("testDriverShortKo");
+			
+			// reference and current state should be displayed
+			Assert.assertFalse(detailedReportContent1.matches(".* class\\=\"step-title\"> _writeSomethingOnNonExistentElement  - .*"
+					+ "at com\\.seleniumtests\\.it\\.driver\\.support\\.pages\\.DriverTestPage\\._writeSomethingOnNonExistentElement\\(DriverTestPage\\.java.*?"
+					+ "<div class\\=\"row\">"
+					+ "<div class\\=\"message-snapshot col\"><div class\\=\"text-center\">"
+					+ "<a href\\=\"#\" onclick\\=\"\\$\\('#imagepreview'\\).*"
+					+ "<img id.*"
+					+ "<div class\\=\"text-center\">Step beginning state</div>" // the current state
+					+ "<div class\\=\"text-center font-weight-lighter\"></div>.*"
+					+ "<div class\\=\"message-snapshot col\"><div class\\=\"text-center\">.*"
+					+ "<img id.*"
+					+ "<div class\\=\"text-center\">Valid-reference</div>.*")); // the reference
+			
+			// only one extraction of step state is presented (the one for failed step)
+			Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Step beginning state</div>"), 0);
+			
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+		}
+		
+	}
+	
+	/**
+	 * Check reference is not get if server recording is disabled
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportDoesNotContainStepReferenceWhenRecordingDisabled() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "false");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
+			
+			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			
+			// simulate the case where a reference exists
+			createServerMock("GET", SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL + "17/", 200, createImageFromResource("tu/ffLogo1.png"));	
+			
+			
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShortKo"});
+			
+			// read 'testDriver' report. This contains calls to HtmlElement actions
+			String detailedReportContent1 = readTestMethodResultFile("testDriverShortKo");
+			
+			// reference and current state should be displayed
+			Assert.assertFalse(detailedReportContent1.matches(".* class\\=\"step-title\"> _writeSomethingOnNonExistentElement  - .*"
+					+ "at com\\.seleniumtests\\.it\\.driver\\.support\\.pages\\.DriverTestPage\\._writeSomethingOnNonExistentElement\\(DriverTestPage\\.java.*?"
+					+ "<div class\\=\"row\">"
+					+ "<div class\\=\"message-snapshot col\"><div class\\=\"text-center\">"
+					+ "<a href\\=\"#\" onclick\\=\"\\$\\('#imagepreview'\\).*"
+					+ "<img id.*"
+					+ "<div class\\=\"text-center\">Step beginning state</div>" // the current state
+					+ "<div class\\=\"text-center font-weight-lighter\"></div>.*"
+					+ "<div class\\=\"message-snapshot col\"><div class\\=\"text-center\">.*"
+					+ "<img id.*"
+					+ "<div class\\=\"text-center\">Valid-reference</div>.*")); // the reference
+			
+			// only one extraction of step state is presented (the one for failed step)
+			Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Step beginning state</div>"), 0);
+			
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+		}
+		
+	}
+	
+	/**
+	 * In case test is OK, no reference image is displayed in report
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportDoesNotContainReferenceStep() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
+			
+			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			
+			// simulate the case where a reference exists
+			createServerMock("GET", SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL + "17/", 200, createImageFromResource("tu/ffLogo1.png"));	
+	
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
+			
+			// read 'testDriver' report. This contains calls to HtmlElement actions
+			String detailedReportContent1 = readTestMethodResultFile("testDriverShort");
+			
+			// reference and current state should be displayed
+			Assert.assertFalse(detailedReportContent1.matches(".*<div class\\=\"row\">"
+					+ "<div class\\=\"message-snapshot col\"><div class\\=\"text-center\">"
+					+ "<a href\\=\"#\" onclick\\=\"\\$\\('#imagepreview'\\).*"
+					+ "<img id.*"
+					+ "<div class\\=\"text-center\">Step beginning state</div>" // the current state
+					+ "<div class\\=\"text-center font-weight-lighter\"></div>.*"
+					+ "<div class\\=\"message-snapshot col\"><div class\\=\"text-center\">.*"
+					+ "<img id.*"
+					+ "<div class\\=\"text-center\">Valid-reference</div>.*")); // the reference
+			
+			// only one extraction of step state is presented (the one for failed step)
+			Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Step beginning state</div>"), 0);
+			
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+		}
+		
+	}
+	
 	/**
 	 * issue #406
 	 * @throws Exception

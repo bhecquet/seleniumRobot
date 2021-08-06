@@ -19,9 +19,10 @@ package com.seleniumtests.ut.reporter;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.testng.Assert;
@@ -352,16 +353,31 @@ public class TestTestLogging extends GenericTest {
 		screenshot.setHtmlSourcePath("file.html");
 		screenshot.setImagePath("file.png");
 		Snapshot snapshotLogger = new Snapshot(screenshot, "main", SnapshotCheckType.TRUE);
-		String screenshotStr = snapshotLogger.buildScreenshotLog();
-		Assert.assertEquals(screenshotStr, "Output 'main' browser: title: <a href='http://location' target=url>Application URL</a> | <a href='file.html' target=html>Application HTML Source</a> | <a href='file.png' class='lightbox'>Application Snapshot</a>");
+		String screenshotStr = snapshotLogger.buildScreenshotLog().replace("\n", "").replaceAll(">\\s+<", "><");
+		Matcher matcher = Pattern.compile(".*<img id\\=\"(.+)\" src\\=.*").matcher(screenshotStr);
+		String imageId = "";
+		if (matcher.matches()) {
+			imageId = matcher.group(1);
+		} else {
+			throw new IndexOutOfBoundsException("no match");
+		}
+		
+		Assert.assertEquals(screenshotStr, String.format("<div class=\"text-center\">"
+				+ 	"<a href=\"#\" onclick=\"$('#imagepreview').attr('src', $('#%s').attr('src'));$('#imagemodal').modal('show');\">"
+				+ 		"<img id=\"%s\" src=\"file.png\" style=\"width: 300px\">"
+				+ 	"</a>"
+				+ "</div>"
+				+ "<div class=\"text-center\">main: title</div>"
+				+ "<div class=\"text-center font-weight-lighter\"><a href='http://location' target=url>URL</a> | <a href='file.html' target=html>HTML Source</a></div>", imageId, imageId));
 	}
 	
 	@Test(groups={"ut"})
 	public void testBuildScreenshotStringWithoutInfo() {
 		ScreenShot screenshot = new ScreenShot();
 		Snapshot snapshotLogger = new Snapshot(screenshot, "main", SnapshotCheckType.FALSE);
-		String screenshotStr = snapshotLogger.buildScreenshotLog();
-		Assert.assertEquals(screenshotStr, "Output 'main' browser: null: ");
+		String screenshotStr = snapshotLogger.buildScreenshotLog().replace("\n", "");
+		Assert.assertEquals(screenshotStr, "<div class=\"text-center\">main</div>"
+				+ "<div class=\"text-center font-weight-lighter\"></div>");
 	}
 	
 	@Test(groups={"ut"})
@@ -371,8 +387,8 @@ public class TestTestLogging extends GenericTest {
 		screenshot.setLocation("http://location");
 		screenshot.setHtmlSourcePath("file.html");
 		Snapshot snapshotLogger = new Snapshot(screenshot, "main", SnapshotCheckType.TRUE);
-		String screenshotStr = snapshotLogger.buildScreenshotLog();
-		Assert.assertEquals(screenshotStr, "Output 'main' browser: title: <a href='http://location' target=url>Application URL</a> | <a href='file.html' target=html>Application HTML Source</a>");
+		String screenshotStr = snapshotLogger.buildScreenshotLog().replace("\n", "").replaceAll(">\\s+<", "><");
+		Assert.assertEquals(screenshotStr, "<div class=\"text-center\">main: title</div><div class=\"text-center font-weight-lighter\"><a href='http://location' target=url>URL</a> | <a href='file.html' target=html>HTML Source</a></div>");
 	}
 	
 	@Test(groups={"ut"})
@@ -382,8 +398,22 @@ public class TestTestLogging extends GenericTest {
 		screenshot.setLocation("http://location");
 		screenshot.setImagePath("file.png");
 		Snapshot snapshotLogger = new Snapshot(screenshot, "main", SnapshotCheckType.FALSE);
-		String screenshotStr = snapshotLogger.buildScreenshotLog();
-		Assert.assertEquals(screenshotStr, "Output 'main' browser: title: <a href='http://location' target=url>Application URL</a> | <a href='file.png' class='lightbox'>Application Snapshot</a>");
+		String screenshotStr = snapshotLogger.buildScreenshotLog().replace("\n", "").replaceAll(">\\s+<", "><");
+		
+		Matcher matcher = Pattern.compile(".*<img id\\=\"(.+)\" src\\=.*").matcher(screenshotStr);
+		String imageId = "";
+		if (matcher.matches()) {
+			imageId = matcher.group(1);
+		} else {
+			throw new IndexOutOfBoundsException("no match");
+		}
+		
+		Assert.assertEquals(screenshotStr, String.format("<div class=\"text-center\">"
+				+ 	"<a href=\"#\" onclick=\"$('#imagepreview').attr('src', $('#%s').attr('src'));$('#imagemodal').modal('show');\">"
+				+ 		"<img id=\"%s\" src=\"file.png\" style=\"width: 300px\">"
+				+ 	"</a>"
+				+ "</div>"
+				+ "<div class=\"text-center\">main: title</div><div class=\"text-center font-weight-lighter\"><a href='http://location' target=url>URL</a></div>", imageId, imageId));
 	}
 	
 	@Test(groups={"ut"})
@@ -393,8 +423,22 @@ public class TestTestLogging extends GenericTest {
 		screenshot.setHtmlSourcePath("file.html");
 		screenshot.setImagePath("file.png");
 		Snapshot snapshotLogger = new Snapshot(screenshot, "main", SnapshotCheckType.TRUE);
-		String screenshotStr = snapshotLogger.buildScreenshotLog();
-		Assert.assertEquals(screenshotStr, "Output 'main' browser: title:  | <a href='file.html' target=html>Application HTML Source</a> | <a href='file.png' class='lightbox'>Application Snapshot</a>");
+		String screenshotStr = snapshotLogger.buildScreenshotLog().replace("\n", "").replaceAll(">\\s+<", "><");
+		
+		Matcher matcher = Pattern.compile(".*<img id\\=\"(.+)\" src\\=.*").matcher(screenshotStr);
+		String imageId = "";
+		if (matcher.matches()) {
+			imageId = matcher.group(1);
+		} else {
+			throw new IndexOutOfBoundsException("no match");
+		}
+		Assert.assertEquals(screenshotStr, String.format("<div class=\"text-center\">"
+				+ 	"<a href=\"#\" onclick=\"$('#imagepreview').attr('src', $('#%s').attr('src'));$('#imagemodal').modal('show');\">"
+				+ 		"<img id=\"%s\" src=\"file.png\" style=\"width: 300px\">"
+				+ 	"</a>"
+				+ "</div>"
+				+ "<div class=\"text-center\">main: title</div>"
+				+ "<div class=\"text-center font-weight-lighter\"> | <a href='file.html' target=html>HTML Source</a></div>", imageId, imageId));
 	}
 	
 
