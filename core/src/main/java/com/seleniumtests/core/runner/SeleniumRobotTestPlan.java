@@ -99,9 +99,9 @@ public class SeleniumRobotTestPlan {
 		
 		// stop video capture and log file
 		File videoFile = WebUIDriver.stopVideoCapture();
-		VideoUtils.extractReferenceForSteps(videoFile, TestStepManager.getInstance().getTestSteps(), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
 		
 		if (videoFile != null) {
+			VideoUtils.extractReferenceForSteps(videoFile, TestStepManager.getInstance().getTestSteps(), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
 
 	        if (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.TRUE
 	        		|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_SUCCESS && testResult.isSuccess())

@@ -62,7 +62,12 @@ public class VideoUtils {
     		Map<Long, TestStep> samples = new HashMap<>();
     		for (TestStep testStep: testSteps) {
     			if (!testStep.getName().equals(TestStepManager.LAST_STEP_NAME)) {
-    				samples.put(min(in.timeToSample(trackId, new Rational(testStep.getVideoTimeStamp(), 1000)), in.getSampleNumber(trackId) - 1), testStep);
+    				// timestamp outside of video, do not try to extract as we would get the last picture
+    				if (testStep.getVideoTimeStamp() / 1000 * in.getTimeScale(trackId) > in.getChunkCount(0)) {
+    					continue;
+    				}
+    				
+    				samples.put(min(in.timeToSample(trackId, new Rational(testStep.getVideoTimeStamp(), 1000)), in.getChunkCount(trackId) - 1), testStep);
     			}
     		}
     			
@@ -77,7 +82,7 @@ public class VideoUtils {
                 if (samples.containsKey(i)) {
 	            	Path extractedPicture = videoOutputDirectory.resolve(String.format("video-%d.jpg", j));
 	                FileUtility.writeImage(extractedPicture.toString(), img);
-	                samples.get(i).addSnapshot(new Snapshot(new ScreenShot(outputDirectory.relativize(extractedPicture).toString()), extractedPicture.getFileName().toString(), SnapshotCheckType.REFERENCE_ONLY), j, null);
+	                samples.get(i).addSnapshot(new Snapshot(new ScreenShot(outputDirectory.relativize(extractedPicture).toString()), "Step beginning state", SnapshotCheckType.REFERENCE_ONLY), j, null);
 	                j++;
                 }
                 i++;

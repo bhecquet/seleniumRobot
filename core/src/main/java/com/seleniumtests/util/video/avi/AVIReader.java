@@ -339,10 +339,6 @@ public class AVIReader extends AVIInputStream implements MovieReader {
         }
     }
     
-    public int getSampleNumber(int track) {
-    	Track tr = tracks.get(track);
-    	return tr.samples.size();
-    }
 
     @Override
     public int findTrack(int fromTrack, Format format) throws IOException {

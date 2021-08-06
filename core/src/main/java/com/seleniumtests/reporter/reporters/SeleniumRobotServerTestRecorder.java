@@ -101,10 +101,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 				// do not create application / version / environment from script, they should already be present or created by user to avoid fill database with wrong data
 				// create session only if it has not been before
 				for (ITestContext testContext: resultSet.keySet()) {
-					if (TestNGContextUtils.getTestSessionCreated(testContext) == null) {
-						Integer sessionId = serverConnector.createSession(testContext.getName());
-						TestNGContextUtils.setTestSessionCreated(testContext, sessionId);
-					}
+					recordTestSession(testContext);
 				}
 			} catch (SeleniumRobotServerException | ConfigurationException e) {
 				logger.error("Error contacting selenium robot server", e);
@@ -116,6 +113,14 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			recordResults(serverConnector, resultSet);
 		} catch (SeleniumRobotServerException | ConfigurationException e) {
 			logger.error("Error recording result on selenium robot server", e);
+		}
+	}
+	
+	public void recordTestSession(ITestContext testContext) {
+		SeleniumRobotSnapshotServerConnector serverConnector = getServerConnector();
+		if (TestNGContextUtils.getTestSessionCreated(testContext) == null) {
+			Integer sessionId = serverConnector.createSession(testContext.getName());
+			TestNGContextUtils.setTestSessionCreated(testContext, sessionId);
 		}
 	}
 
@@ -209,8 +214,14 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 						} catch (SeleniumRobotServerException e) {
 							logger.error("Could not create reference snapshot on server", e);
 						}
+						
+						// remove this snapshot, extracted from video as it won't be used anymore
+						testStep.getSnapshots().remove(snapshot);
+
 					} else {
 						try {
+							// move snapshot to "screenshots" directory as "video" directory will be removed at the end of the test
+							snapshot.relocate(TestNGResultUtils.getSeleniumRobotTestContext(testResult).getScreenshotOutputDirectory());
 							File referenceSnapshot = serverConnector.getReferenceSnapshot(stepResultId);
 							
 							if (referenceSnapshot != null) {

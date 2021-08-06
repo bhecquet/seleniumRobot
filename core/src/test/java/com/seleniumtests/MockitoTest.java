@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.log4j.Logger;
 import org.mockito.MockitoAnnotations;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.testng.PowerMockTestCase;
@@ -37,7 +38,9 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.video.VideoCaptureMode;
+import com.seleniumtests.util.video.VideoUtils;
 
 /**
  * Redefine calls to PowerMockTestCase methods as they are not called when using TestNG groups
@@ -48,6 +51,8 @@ import com.seleniumtests.util.video.VideoCaptureMode;
 
 @PowerMockIgnore({"javax.net.ssl.*", "com.google.inject.*", "javax.imageio.*", "javax.swing.*"})
 public class MockitoTest  extends PowerMockTestCase {
+	
+	protected static final Logger logger = SeleniumRobotLogger.getLogger(MockitoTest.class);
 
 	protected static final String SERVER_URL = "http://localhost:4321";
 	private static Map<Method, Boolean> beforeMethodDone = Collections.synchronizedMap(new HashMap<>());

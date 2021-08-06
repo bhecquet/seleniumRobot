@@ -50,7 +50,7 @@ public class TestFieldDetectorConnector extends GenericTest {
 		ImageFieldDetector imageFieldDetector;
 		try {
 //			imageFieldDetector = new ImageFieldDetector(createImageFromResource("tu/imageFieldDetection/browserCapture.png"), 0.75);
-			imageFieldDetector = new ImageFieldDetector(new File("D:\\Dev\\yolo\\yolo-training-data\\field-detector\\dataset_real\\10 Web Form Examples Youll Want to Copy Immediately-5.jpg"), 0.75);
+			imageFieldDetector = new ImageFieldDetector(new File("D:\\Dev\\seleniumRobot\\seleniumRobot-core\\core\\test-output\\testSendKeysWithLabelOnTheLeft\\screenshots\\f5972501f7e893bfa3aa0281e4f647e1.png"), 0.75);
 //			imageFieldDetector = new ImageFieldDetector(createImageFromResource("ti/form_picture.png"), 0.75);
 		} catch (ConfigurationException e) {
 			throw new SkipException("no field detector server available");
