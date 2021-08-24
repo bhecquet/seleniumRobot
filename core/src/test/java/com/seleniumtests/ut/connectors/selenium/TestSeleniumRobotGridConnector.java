@@ -1065,7 +1065,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	@Test(groups={"ut"})
 	public void testStopVideoCapture() throws UnsupportedOperationException, IOException {
 		
-		File stream = mock(File.class);
+		File stream = createImageFromResource("tu/video/videoCapture.avi");
 		GetRequest req = (GetRequest) createServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, stream);	
 		
 		File out = connector.stopVideoCapture("out.mp4");
@@ -1088,7 +1088,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	@Test(groups={"ut"})
 	public void testStopVideoCaptureError500() throws UnsupportedOperationException, IOException {
 
-		File stream = mock(File.class);
+		File stream = createImageFromResource("tu/video/videoCapture.avi");
 		createServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, stream);	
 		
 		File out = connector.stopVideoCapture("out.mp4");
