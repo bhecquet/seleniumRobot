@@ -42,6 +42,7 @@ import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
+import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestStep;
@@ -221,7 +222,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 					} else {
 						try {
 							// move snapshot to "screenshots" directory as "video" directory will be removed at the end of the test
-							snapshot.relocate(TestNGResultUtils.getSeleniumRobotTestContext(testResult).getScreenshotOutputDirectory());
+							snapshot.relocate(TestNGResultUtils.getSeleniumRobotTestContext(testResult).getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR + "/" + snapshot.getScreenshot().getImageName());
 							File referenceSnapshot = serverConnector.getReferenceSnapshot(stepResultId);
 							
 							if (referenceSnapshot != null) {
