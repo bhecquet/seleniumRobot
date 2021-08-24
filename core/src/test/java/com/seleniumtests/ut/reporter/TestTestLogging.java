@@ -106,7 +106,7 @@ public class TestTestLogging extends GenericTest {
 			ScreenShot screenshot = new ScreenShot();
 			String htmlSourcePath = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.HTML_DIR, "capture.html").toString();
 			FileUtils.write(new File(htmlSourcePath), "<html>");
-			screenshot.setHtmlSourcePath(String.format("../%s/%s%s.html", "testRelocateScreenshotHtmlOnly", ScreenshotUtil.HTML_DIR, "capture")); // copied from ScreeshotUtils class
+			screenshot.setHtmlSourcePath(String.format("../%s/%s/%s.html", "testRelocateScreenshotHtmlOnly", ScreenshotUtil.HTML_DIR, "capture")); // copied from ScreeshotUtils class
 			
 			logger.logScreenshot(screenshot);
 			File initialFile = new File(TestStepManager.getParentTestStep().getSnapshots().get(0).getScreenshot().getFullHtmlPath());
