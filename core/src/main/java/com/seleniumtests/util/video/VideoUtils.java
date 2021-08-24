@@ -7,11 +7,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.monte.media.FormatKeys.MediaType;
@@ -35,7 +33,12 @@ public class VideoUtils {
 	
 
 	private static final Logger logger = SeleniumRobotLogger.getLogger(VideoUtils.class);
+	public static final String VIDEO_DIR = "video";
 
+	private VideoUtils() {
+		// do nothing
+	}
+	
 	/**
 	 * Extract the picture associated to the beginning of a step to <output_dir>/video
 	 * @param videoFile
@@ -45,7 +48,7 @@ public class VideoUtils {
 	public static void extractReferenceForSteps(File videoFile, List<TestStep> testSteps, Path outputDirectory) {
 		
 		// create output
-		Path videoOutputDirectory = outputDirectory.resolve("video");
+		Path videoOutputDirectory = outputDirectory.resolve(VIDEO_DIR);
 		videoOutputDirectory.toFile().mkdirs();
 		AVIReader in = null;
 		try {

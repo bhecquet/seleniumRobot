@@ -1547,8 +1547,50 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			// only one extraction of step state is presented (the one for failed step)
 			Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Step beginning state</div>"), 1);
 			
+			// check step beginning state is present with valid path
+			Assert.assertTrue(detailedReportContent1.contains("src=\"screenshots/testDriverShortKo_4-1__writeSomethingOnNonExistent-ideo-1.jpg\""));
+			
 			// check no picture extracted from video is kept
-			Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverShortKo", "video").toFile().exists());
+			Assert.assertEquals(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverShortKo", "video").toFile().listFiles().length, 0);
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+		}
+	}
+	
+	@Test(groups={"it"})
+	public void testReportDoeNotContainStepReferenceForFailedStepWhenVideoDisabled() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "false");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
+			
+			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			
+			// simulate the case where a reference exists
+			createServerMock("GET", SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL + "17/", 200, createImageFromResource("tu/ffLogo1.png"));	
+					
+			
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShortKo"});
+			
+			// read 'testDriver' report. This contains calls to HtmlElement actions
+			String detailedReportContent1 = readTestMethodResultFile("testDriverShortKo");
+			
+			// no image reference
+			Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Step beginning state</div>"), 0);
+			
+			// check step beginning state is not present with valid path
+			Assert.assertFalse(detailedReportContent1.contains("src=\"screenshots/testDriverShortKo_4-1__writeSomethingOnNonExistent-ideo-1.jpg\""));
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
@@ -1622,7 +1664,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
-			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "false");
