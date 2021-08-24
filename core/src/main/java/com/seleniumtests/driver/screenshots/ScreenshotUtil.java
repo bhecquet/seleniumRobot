@@ -60,8 +60,8 @@ public class ScreenshotUtil {
     private WebDriver driver;
     private WebUIDriver uiDriver;
     private String filename;
-    public static final String SCREENSHOT_DIR = "screenshots/";
-    public static final String HTML_DIR = "htmls/";
+    public static final String SCREENSHOT_DIR = "screenshots";
+    public static final String HTML_DIR = "htmls";
     
     /**
      * @deprecated  use {@link SnapshotTarget} instead
@@ -701,7 +701,7 @@ public class ScreenshotUtil {
      */
     private File exportToFile(BufferedImage image) {
     	filename = HashCodeGenerator.getRandomHashCode("web");
-        String filePath = Paths.get(outputDirectory, SCREENSHOT_DIR + filename + ".png").toString();
+        String filePath = Paths.get(outputDirectory, SCREENSHOT_DIR, filename + ".png").toString();
         FileUtility.writeImage(filePath, image);
         logger.debug("Captured image copied to " + filePath);
         return new File(filePath);
@@ -724,8 +724,8 @@ public class ScreenshotUtil {
         screenShot.setTitle(namedImage.title);
         
         try {
-            FileUtils.writeStringToFile(Paths.get(outputDirectory, HTML_DIR + filename + ".html").toFile(), namedImage.pageSource);
-            screenShot.setHtmlSourcePath(String.format("%s%s.html", HTML_DIR, filename));
+            FileUtils.writeStringToFile(Paths.get(outputDirectory, HTML_DIR, filename + ".html").toFile(), namedImage.pageSource);
+            screenShot.setHtmlSourcePath(String.format("%s/%s.html", HTML_DIR, filename));
         } catch (IOException e) {
             logger.warn("Ex", e);
         }
