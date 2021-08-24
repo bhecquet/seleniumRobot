@@ -50,11 +50,13 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.SnapshotComparisonBehaviour;
 import com.seleniumtests.reporter.logger.TestMessage;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
+import com.seleniumtests.util.video.VideoUtils;
 
 /**
  * This reporter controls the execution of all other reporter because TestNG
@@ -418,26 +420,7 @@ public class ReporterControler implements IReporter {
 				
 			}
 			
-			String outputSubDirectory = new File(testContext.getOutputDirectory()).getName();
-			String outputDirectoryParent = new File(testContext.getOutputDirectory()).getParent();
-			File htmlDir = Paths.get(outputDirectoryParent, outputSubDirectory, "htmls").toFile();
-			File htmlBeforeDir = Paths.get(outputDirectoryParent, "before-" + outputSubDirectory, "htmls").toFile();
-			File screenshotDir = Paths.get(outputDirectoryParent, outputSubDirectory, "screenshots").toFile();
-			File screenshotBeforeDir = Paths.get(outputDirectoryParent, "before-" + outputSubDirectory, "screenshots").toFile();
-			
-			// get list of existing files
-			if (htmlDir.isDirectory()) {
-				allFiles.addAll(Arrays.asList(htmlDir.listFiles()));
-			}
-			if (screenshotDir.isDirectory()) {
-				allFiles.addAll(Arrays.asList(screenshotDir.listFiles()));
-			}
-			if (htmlBeforeDir.isDirectory()) {
-				allFiles.addAll(Arrays.asList(htmlBeforeDir.listFiles()));
-			}
-			if (screenshotBeforeDir.isDirectory()) {
-				allFiles.addAll(Arrays.asList(screenshotBeforeDir.listFiles()));
-			}
+			allFiles.addAll(listAttachments(testContext));
 		}		
 		
 		for (File file: allFiles) {
@@ -449,6 +432,43 @@ public class ReporterControler implements IReporter {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * List all attachments in output directory folder
+	 * @param testContext
+	 * @return
+	 */
+	private List<File> listAttachments(SeleniumTestsContext testContext) {
+		
+		List<File> allFiles = new ArrayList<>();
+
+		String outputSubDirectory = new File(testContext.getOutputDirectory()).getName();
+		String outputDirectoryParent = new File(testContext.getOutputDirectory()).getParent();
+		File htmlDir = Paths.get(outputDirectoryParent, outputSubDirectory, ScreenshotUtil.HTML_DIR).toFile();
+		File htmlBeforeDir = Paths.get(outputDirectoryParent, "before-" + outputSubDirectory, ScreenshotUtil.HTML_DIR).toFile();
+		File screenshotDir = Paths.get(outputDirectoryParent, outputSubDirectory, ScreenshotUtil.SCREENSHOT_DIR).toFile();
+		File screenshotBeforeDir = Paths.get(outputDirectoryParent, "before-" + outputSubDirectory, ScreenshotUtil.SCREENSHOT_DIR).toFile();
+		File videoDir = Paths.get(outputDirectoryParent, outputSubDirectory, VideoUtils.VIDEO_DIR).toFile();
+		
+		// get list of existing files
+		if (htmlDir.isDirectory()) {
+			allFiles.addAll(Arrays.asList(htmlDir.listFiles()));
+		}
+		if (screenshotDir.isDirectory()) {
+			allFiles.addAll(Arrays.asList(screenshotDir.listFiles()));
+		}
+		if (htmlBeforeDir.isDirectory()) {
+			allFiles.addAll(Arrays.asList(htmlBeforeDir.listFiles()));
+		}
+		if (screenshotBeforeDir.isDirectory()) {
+			allFiles.addAll(Arrays.asList(screenshotBeforeDir.listFiles()));
+		}
+		if (videoDir.isDirectory()) {
+			allFiles.addAll(Arrays.asList(videoDir.listFiles()));
+		}
+		
+		return allFiles;
 	}
 
 	/**
