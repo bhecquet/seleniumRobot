@@ -139,7 +139,7 @@ public class TestTestLogging extends GenericTest {
 			ScreenShot screenshot = new ScreenShot();
 			String imgSourcePath = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR, "capture.png").toString();
 			FileUtils.write(new File(imgSourcePath), "<img>");
-			screenshot.setImagePath(String.format("../%s/%s%s.png", "testRelocateScreenshotImageOnly", ScreenshotUtil.SCREENSHOT_DIR, "capture")); // copied from ScreeshotUtils class
+			screenshot.setImagePath(String.format("%s/%s.png", ScreenshotUtil.SCREENSHOT_DIR, "capture")); // copied from ScreeshotUtils class
 			
 			logger.logScreenshot(screenshot);
 			File initialFile = new File(TestStepManager.getParentTestStep().getSnapshots().get(0).getScreenshot().getFullImagePath());
@@ -168,7 +168,7 @@ public class TestTestLogging extends GenericTest {
 			ScreenShot screenshot = new ScreenShot();
 			String imgSourcePath = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR, "capture.png").toString();
 			FileUtils.write(new File(imgSourcePath), "<img>");
-			screenshot.setImagePath(String.format("../%s/%s%s.png", "testRelocateScreenshotSamePath", ScreenshotUtil.SCREENSHOT_DIR, "capture")); // copied from ScreeshotUtils class
+			screenshot.setImagePath(String.format("%s/%s.png", ScreenshotUtil.SCREENSHOT_DIR, "capture")); // copied from ScreeshotUtils class
 			
 			logger.logScreenshot(screenshot);
 			File initialFile = new File(TestStepManager.getParentTestStep().getSnapshots().get(0).getScreenshot().getFullImagePath());
