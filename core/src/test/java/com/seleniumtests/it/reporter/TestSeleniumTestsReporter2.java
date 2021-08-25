@@ -717,8 +717,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 			
 			// check that with assertion error, snapshot is present
-			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">!!!FAILURE ALERT!!! - Assertion Failure: expected [true] but found [false]</div>"
-					+ "<div class=\"message-snapshot\">Output 'drv:main' browser: Current Window: Test page:"));
+			Assert.assertTrue(detailedReportContent.contains("!!!FAILURE ALERT!!! - Assertion Failure: expected [true] but found [false]</div><div class=\"row\"><div class=\"message-snapshot col\"><div class=\"text-center\"><a href=\"#\" onclick=\"$('#imagepreview').attr('src', $('#"));
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);
@@ -809,7 +808,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			// check that sub step failure (with assertion) caused the step to fail itself				
 			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box failed\">.*?<i class\\=\"fas fa-plus\"></i>" // => step failed
 					+ "</button><span class=\"step-title\"> assertWithSubStep  - \\d+\\.\\d+ secs</span></div><div class\\=\"box-body\"><ul><li>doNothing </li>"
-					+ "<ul><li>doNothing on HtmlElement none, by=\\{By\\.id: none\\} </li></ul>"
+					+ "<ul><li>doNothing on HtmlElement none, by=\\{By\\.id: none\\} </li><div class\\=\"row\"></div></ul>"
 					+ "<li>assertAction </li><ul>" // => sub step with error
 					+ "<div class\\=\"message-error\">!!!FAILURE ALERT!!! - Assertion Failure: false error expected \\[true\\] but found \\[false\\].*")); // error displayed
 			
@@ -1119,9 +1118,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent1 = readTestMethodResultFile("test1Listener5");
 		
 		// check all files are displayed
-		Assert.assertTrue(detailedReportContent1.contains("<a href='screenshots/N-A_2-1_Pre_test_step._beforeMethod-"));
+		Assert.assertTrue(detailedReportContent1.contains("src=\"screenshots/N-A_2-1_Pre_test_step._beforeMethod"));
 		Assert.assertTrue(detailedReportContent1.contains("<a href='htmls/N-A_2-1_Pre_test_step._beforeMethod-"));
-		Assert.assertTrue(detailedReportContent1.contains("<a href='screenshots/test1Listener5_3-1_Test_end"));
+		Assert.assertTrue(detailedReportContent1.contains("src=\"screenshots/test1Listener5_3-1_Test_end"));
 		Assert.assertTrue(detailedReportContent1.contains("<a href='htmls/test1Listener5_3-1_Test_end"));
 
 		
@@ -1183,8 +1182,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 
 		String detailedReportContent1 = readTestMethodResultFile("testAndSubActions");
-		Assert.assertTrue(detailedReportContent1.contains(" | <a href='screenshot/testAndSubActions_0-1_step_1--rtened.png'"));		
-		Assert.assertTrue(detailedReportContent1.contains(" | <a href='htmls/testAndSubActions_0-1_step_1--tened.html' target=html>"));	
+		Assert.assertTrue(detailedReportContent1.contains("src=\"screenshot/testAndSubActions_0-1_step_1--rtened.png\""));		
+		Assert.assertTrue(detailedReportContent1.contains("<a href='htmls/testAndSubActions_0-1_step_1--tened.html' target=html>"));	
 		
 		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "htmls", "testAndSubActions_0-1_step_1--tened.html").toFile().exists());
 	}
@@ -1199,7 +1198,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		}
 		
 		String detailedReportContent1 = readTestMethodResultFile("testAndSubActions");
-		Assert.assertTrue(detailedReportContent1.contains(" | <a href='screenshot/testAndSubActions_0-1_step_1--rtened.png'"));		
+		Assert.assertTrue(detailedReportContent1.contains("src=\"screenshot/testAndSubActions_0-1_step_1--rtened.png\""));		
 		Assert.assertTrue(detailedReportContent1.contains(" | <a href='htmls/testAndSubActions_0-1_step_1--tened.html.zip' target=html>"));	
 		
 		// check file has been moved / compressed
@@ -1341,19 +1340,18 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// check content of summary report file
 		String detailedReportContent = readTestMethodResultFile("testAndSubActions");
 
-		Assert.assertTrue(detailedReportContent.contains(
-				"<ul>"													// root step
+		Assert.assertTrue(detailedReportContent.matches(
+				".*<ul>"													// root step
 					+ "<li>click button</li>"
 					+ "<li>sendKeys to text field</li>"
 					+ "<li>step 1.3: open page</li>"					// sub-step
 					+ "<ul>"
 						+ "<li>click link</li>"							// action in sub step
-						+ "<div class=\"message-log\">a message</div>"	// message in sub step
+						+ "<div class\\=\"message-log\">a message</div>"	// message in sub step
 						+ "<li>sendKeys to password field</li>"			// action in sub step
-					+ "</ul>" 
-					+ "<div class=\"message-snapshot\">Output 'main' browser: null:  | <a href='htmls/testAndSubActions_0-1_step_1--tened.html' target=html>Application HTML Source</a> | <a href='screenshot/testAndSubActions_0-1_step_1--rtened.png' class='lightbox'>Application Snapshot</a></div>"
-					+ "<div class=\"message-snapshot\">Output 'null' browser: null:  | <a href='htmls/testAndSubActions_0-2_step_1--tened.html' target=html>Application HTML Source</a> | <a href='screenshot/testAndSubActions_0-2_step_1--rtened.png' class='lightbox'>Application Snapshot</a></div>"
-				+ "</ul>"));
+					+ "<div class\\=\"row\"></div></ul><div class=\"row\">" 
+					+ "<div class\\=\"message-snapshot col\"><div class\\=\"text-center\">.*src\\=\"screenshot/testAndSubActions_0-1_step_1--rtened\\.png\" style\\=\"width: 300px\">.*"
+					));
 		
 	}
 	
@@ -1414,9 +1412,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// read 'testDriver' report. This contains calls to HtmlElement actions
 		String detailedReportContent1 = readTestMethodResultFile("testDriverCustomSnapshot");
 		
-		Assert.assertTrue(detailedReportContent1.contains("<a href='screenshots/my_snapshot"));	
+		Assert.assertTrue(detailedReportContent1.contains("src=\"screenshots/my_snapshot"));	
 		Assert.assertTrue(detailedReportContent1.contains("<a href='htmls/my_snapshot"));	
-		Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-snapshot\">Output 'drv:main-my snapshot' browser: my snapshot:"));	
+		Assert.assertTrue(detailedReportContent1.contains("<div class=\"text-center\">drv:main-my snapshot: my snapshot</div>"));	
+		Assert.assertTrue(detailedReportContent1.contains(" src=\"screenshots/my_snapshot-"));	
 	}
 	
 	/**
@@ -1936,7 +1935,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		 
 		Assert.assertTrue(detailedReportContent1.contains("<li>sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [a text,], )</li>"));
 		Assert.assertTrue(detailedReportContent1.contains("<li>click on ButtonElement Reset, by={By.id: button2} </li>"));
-		Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-snapshot\">Output 'drv:main' browser: Current Window: Test page: <a href="));
+		Assert.assertTrue(detailedReportContent1.contains("<div class=\"text-center\">drv:main: Current Window: Test page</div>"));
+		Assert.assertTrue(detailedReportContent1.matches(".*<img id\\=\".*?\" src\\=\"screenshots/testDriver_3-1_openPage_with_args.*<div class\\=\"text-center\">drv:main: Current Window: Test page</div>.*"));
 		
 		// check that only on reference to 'click' is present for this buttonelement. This means that only the replayed action has been logged, not the ButtonElement.click() one
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "click on"), 1);
@@ -1955,12 +1955,12 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertFalse(detailedReportContent3.contains("<li>click on HtmlElement , by={By.id: button2} </li>"));
 		
 		// check that without override, native actions are logged
-		Assert.assertTrue(detailedReportContent3.contains("<ul><li>sendKeys on Element located by id: text2 with args: ([some text,], )</li></ul>"));
-		Assert.assertTrue(detailedReportContent3.contains("<ul><li>click on Element located by id: button2 </li></ul>"));
-		Assert.assertTrue(detailedReportContent3.contains("<ul><li>selectByVisibleText on Select with args: (option1, )</li></ul>"));
+		Assert.assertTrue(detailedReportContent3.contains("<ul><li>sendKeys on Element located by id: text2 with args: ([some text,], )</li>"));
+		Assert.assertTrue(detailedReportContent3.contains("<ul><li>click on Element located by id: button2 </li>"));
+		Assert.assertTrue(detailedReportContent3.contains("<ul><li>selectByVisibleText on Select with args: (option1, )</li>"));
 				
 		// check composite actions. We must have the moveToElement, click and sendKeys actions 
-		Assert.assertTrue(detailedReportContent1.contains("<ul><li>moveToElement with args: (TextFieldElement Text, by={By.id: text2}, )</li><li>sendKeys with args: ([composite,], )</li><li>moveToElement with args: (ButtonElement Reset, by={By.id: button2}, )</li><li>click </li></ul>"));
+		Assert.assertTrue(detailedReportContent1.contains("<ul><li>moveToElement with args: (TextFieldElement Text, by={By.id: text2}, )</li><li>sendKeys with args: ([composite,], )</li><li>moveToElement with args: (ButtonElement Reset, by={By.id: button2}, )</li><li>click </li>"));
 		
 		// check PictureElement action is logged
 		Assert.assertTrue(detailedReportContent1.contains("<ul><li>clickAt on Picture picture from resource tu/images/logo_text_field.png with args: (0, -30, )</li>"));
