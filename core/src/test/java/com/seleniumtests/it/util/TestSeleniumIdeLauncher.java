@@ -148,7 +148,9 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			Assert.assertTrue(detailedReportContent1.contains("li>click on HtmlElement , by={By.id: buttonIFrame} </li>"));
 			
 			// screenshot is present for the step (taken at the beginning of the step: see anchor)
-			Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-snapshot\">Output 'drv:main' browser: Current Window: : <a href='http://localhost:55555/testWithoutFixedPattern.html'"));
+			Assert.assertTrue(detailedReportContent1.matches(".*<div class\\=\"message-snapshot col\"><div class\\=\"text-center\">.*"
+					+ "src\\=\"screenshots/mainPage_0-1_new_window_link.*<div class\\=\"text-center\">drv:main: Current Window: </div>"
+					+ "<div class=\"text-center font-weight-lighter\"><a href='http://localhost:55555/testWithoutFixedPattern.html' target=url>URL</a>.*"));
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.BROWSER);
