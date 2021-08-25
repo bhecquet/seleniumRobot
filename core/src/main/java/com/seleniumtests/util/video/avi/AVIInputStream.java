@@ -365,20 +365,22 @@ public class AVIInputStream extends AbstractAVIStream {
     /**
      * Reads the AVI Main Header and returns a MainHeader object.
      */
-    private MainHeader readAVIH(byte[] data) throws IOException, ParseException {
-        ByteArrayImageInputStream in = new ByteArrayImageInputStream(data, ByteOrder.LITTLE_ENDIAN);
-        MainHeader mh = new MainHeader();
-        mh.microSecPerFrame = in.readUnsignedInt();
-        mh.maxBytesPerSec = in.readUnsignedInt();
-        mh.paddingGranularity = in.readUnsignedInt();
-        mh.flags = in.readInt();
-        mh.totalFrames = in.readUnsignedInt();
-        mh.initialFrames = in.readUnsignedInt();
-        mh.streams = in.readUnsignedInt();
-        mh.suggestedBufferSize = in.readUnsignedInt();
-
-        mh.size = new Dimension(in.readInt(), in.readInt());
-        return mh;
+    private MainHeader readAVIH(byte[] data) throws IOException {
+    	try (
+        ByteArrayImageInputStream inputStream = new ByteArrayImageInputStream(data, ByteOrder.LITTLE_ENDIAN);) {
+	        MainHeader mh = new MainHeader();
+	        mh.microSecPerFrame = inputStream.readUnsignedInt();
+	        mh.maxBytesPerSec = inputStream.readUnsignedInt();
+	        mh.paddingGranularity = inputStream.readUnsignedInt();
+	        mh.flags = inputStream.readInt();
+	        mh.totalFrames = inputStream.readUnsignedInt();
+	        mh.initialFrames = inputStream.readUnsignedInt();
+	        mh.streams = inputStream.readUnsignedInt();
+	        mh.suggestedBufferSize = inputStream.readUnsignedInt();
+	
+	        mh.size = new Dimension(inputStream.readInt(), inputStream.readInt());
+	        return mh;
+    	}
     }
 
     /**
@@ -404,45 +406,47 @@ public class AVIInputStream extends AbstractAVIStream {
      *    aviRectangle frame;
      * } AVISTREAMHEADER;     */
     private Track readSTRH(byte[] data) throws IOException, ParseException {
-        ByteArrayImageInputStream in = new ByteArrayImageInputStream(data, ByteOrder.LITTLE_ENDIAN);
-        Track tr = null;
-
-        in.setByteOrder(ByteOrder.BIG_ENDIAN);
-        String type = intToType(in.readInt());
-        in.setByteOrder(ByteOrder.LITTLE_ENDIAN);
-        int handler = in.readInt();
-
-        if (type.equals(AVIMediaType.AUDIO.fccType)) {
-            tr = new AudioTrack(tracks.size(), handler);
-        } else if (type.equals(AVIMediaType.VIDEO.fccType)) {
-            tr = new VideoTrack(tracks.size(), handler, null);
-        } else if (type.equals(AVIMediaType.MIDI.fccType)) {
-            tr = new MidiTrack(tracks.size(), handler);
-        } else if (type.equals(AVIMediaType.TEXT.fccType)) {
-            tr = new TextTrack(tracks.size(), handler);
-        } else {
-            throw new ParseException("Unknown track type " + type);
-        }
-
-        tr.fccHandler = handler;
-
-        tr.flags = in.readInt();
-        tr.priority = in.readUnsignedShort();
-        tr.language = in.readUnsignedShort();
-        tr.initialFrames = in.readUnsignedInt();
-        tr.scale = in.readUnsignedInt();
-        tr.rate = in.readUnsignedInt();
-        tr.startTime = in.readUnsignedInt();
-        tr.length = in.readUnsignedInt();
-        /*tr.suggestedBufferSize=*/ in.readUnsignedInt();
-        tr.quality = in.readInt();
-        /*tr.sampleSize=*/ in.readUnsignedInt();
-        tr.frameLeft = in.readShort();
-        tr.frameTop = in.readShort();
-        tr.frameRight = in.readShort();
-        tr.frameBottom = in.readShort();
-
-        return tr;
+    	try (
+    			ByteArrayImageInputStream inputStream = new ByteArrayImageInputStream(data, ByteOrder.LITTLE_ENDIAN);) {
+	        Track tr = null;
+	
+	        inputStream.setByteOrder(ByteOrder.BIG_ENDIAN);
+	        String type = intToType(inputStream.readInt());
+	        inputStream.setByteOrder(ByteOrder.LITTLE_ENDIAN);
+	        int handler = inputStream.readInt();
+	
+	        if (type.equals(AVIMediaType.AUDIO.fccType)) {
+	            tr = new AudioTrack(tracks.size(), handler);
+	        } else if (type.equals(AVIMediaType.VIDEO.fccType)) {
+	            tr = new VideoTrack(tracks.size(), handler, null);
+	        } else if (type.equals(AVIMediaType.MIDI.fccType)) {
+	            tr = new MidiTrack(tracks.size(), handler);
+	        } else if (type.equals(AVIMediaType.TEXT.fccType)) {
+	            tr = new TextTrack(tracks.size(), handler);
+	        } else {
+	            throw new ParseException("Unknown track type " + type);
+	        }
+	
+	        tr.fccHandler = handler;
+	
+	        tr.flags = inputStream.readInt();
+	        tr.priority = inputStream.readUnsignedShort();
+	        tr.language = inputStream.readUnsignedShort();
+	        tr.initialFrames = inputStream.readUnsignedInt();
+	        tr.scale = inputStream.readUnsignedInt();
+	        tr.rate = inputStream.readUnsignedInt();
+	        tr.startTime = inputStream.readUnsignedInt();
+	        tr.length = inputStream.readUnsignedInt();
+	        /*tr.suggestedBufferSize=*/ inputStream.readUnsignedInt();
+	        tr.quality = inputStream.readInt();
+	        /*tr.sampleSize=*/ inputStream.readUnsignedInt();
+	        tr.frameLeft = inputStream.readShort();
+	        tr.frameTop = inputStream.readShort();
+	        tr.frameRight = inputStream.readShort();
+	        tr.frameBottom = inputStream.readShort();
+	
+	        return tr;
+    	}
     }
 
     /**
@@ -486,36 +490,38 @@ public class AVIInputStream extends AbstractAVIStream {
      * @throws IOException
      */
     private void readVideoSTRF(VideoTrack tr, byte[] data) throws IOException {
-        ByteArrayImageInputStream in = new ByteArrayImageInputStream(data, ByteOrder.LITTLE_ENDIAN);
+        try (
+        		ByteArrayImageInputStream inputStream = new ByteArrayImageInputStream(data, ByteOrder.LITTLE_ENDIAN);) {
 
-
-        long structSize = in.readUnsignedInt();
-        tr.width = in.readInt();
-        tr.height = in.readInt();
-        tr.planes = in.readUnsignedShort();
-        tr.bitCount = in.readUnsignedShort();
-        in.setByteOrder(ByteOrder.BIG_ENDIAN);
-        tr.compression = intToType(in.readInt());
-        in.setByteOrder(ByteOrder.LITTLE_ENDIAN);
-        long imageSizeInBytes = in.readUnsignedInt();
-        tr.xPelsPerMeter = in.readUnsignedInt();
-        tr.yPelsPerMeter = in.readUnsignedInt();
-        tr.clrUsed = in.readUnsignedInt();
-        tr.clrImportant = in.readUnsignedInt();
-        if (tr.bitCount == 0) {
-            tr.bitCount = (int) (imageSizeInBytes / tr.width / tr.height * 8);
+	
+	        inputStream.readUnsignedInt(); // structSize
+	        tr.width = inputStream.readInt();
+	        tr.height = inputStream.readInt();
+	        tr.planes = inputStream.readUnsignedShort();
+	        tr.bitCount = inputStream.readUnsignedShort();
+	        inputStream.setByteOrder(ByteOrder.BIG_ENDIAN);
+	        tr.compression = intToType(inputStream.readInt());
+	        inputStream.setByteOrder(ByteOrder.LITTLE_ENDIAN);
+	        long imageSizeInBytes = inputStream.readUnsignedInt();
+	        tr.xPelsPerMeter = inputStream.readUnsignedInt();
+	        tr.yPelsPerMeter = inputStream.readUnsignedInt();
+	        tr.clrUsed = inputStream.readUnsignedInt();
+	        tr.clrImportant = inputStream.readUnsignedInt();
+	        if (tr.bitCount == 0) {
+	            tr.bitCount = (int) (imageSizeInBytes / tr.width / tr.height * 8);
+	        }
+	
+	        tr.format = new Format(MimeTypeKey, MIME_AVI,
+	                MediaTypeKey, MediaType.VIDEO,
+	                EncodingKey, tr.compression,
+	                DataClassKey, byte[].class,
+	                WidthKey, tr.width,
+	                HeightKey, tr.height,
+	                DepthKey, tr.bitCount,
+	                PixelAspectRatioKey, new Rational(1, 1),
+	                FrameRateKey, new Rational(tr.rate, tr.scale),
+	                FixedFrameRateKey, true);
         }
-
-        tr.format = new Format(MimeTypeKey, MIME_AVI,
-                MediaTypeKey, MediaType.VIDEO,
-                EncodingKey, tr.compression,
-                DataClassKey, byte[].class,
-                WidthKey, tr.width,
-                HeightKey, tr.height,
-                DepthKey, tr.bitCount,
-                PixelAspectRatioKey, new Rational(1, 1),
-                FrameRateKey, new Rational(tr.rate, tr.scale),
-                FixedFrameRateKey, true);
     }
 
     /**
@@ -557,29 +563,31 @@ public class AVIInputStream extends AbstractAVIStream {
      * @throws IOException
      */
     private void readAudioSTRF(AudioTrack tr, byte[] data) throws IOException {
-        ByteArrayImageInputStream in = new ByteArrayImageInputStream(data, ByteOrder.LITTLE_ENDIAN);
+    	try (
+    			ByteArrayImageInputStream inputStream = new ByteArrayImageInputStream(data, ByteOrder.LITTLE_ENDIAN);) {
 
-        String formatTag = RIFFParser.idToString(in.readUnsignedShort());
-        tr.channels = in.readUnsignedShort();
-        tr.samplesPerSec = in.readUnsignedInt();
-        tr.avgBytesPerSec = in.readUnsignedInt();
-        tr.blockAlign = in.readUnsignedShort();
-        tr.bitsPerSample = in.readUnsignedShort();
-        if (data.length > 16) {
-            long cbSize = in.readUnsignedShort();
-            // FIXME - Don't ignore extra format information
-        }
-
-        tr.format = new Format(MimeTypeKey, MIME_AVI,
-                MediaTypeKey, MediaType.AUDIO,
-                EncodingKey, formatTag,
-                SampleRateKey, Rational.valueOf(tr.samplesPerSec),
-                SampleSizeInBitsKey, tr.bitsPerSample,
-                ChannelsKey, tr.channels,
-                FrameSizeKey, tr.blockAlign,
-                FrameRateKey, new Rational(tr.samplesPerSec, 1),
-                SignedKey, tr.bitsPerSample != 8,
-                ByteOrderKey, ByteOrder.LITTLE_ENDIAN);
+	        String formatTag = RIFFParser.idToString(inputStream.readUnsignedShort());
+	        tr.channels = inputStream.readUnsignedShort();
+	        tr.samplesPerSec = inputStream.readUnsignedInt();
+	        tr.avgBytesPerSec = inputStream.readUnsignedInt();
+	        tr.blockAlign = inputStream.readUnsignedShort();
+	        tr.bitsPerSample = inputStream.readUnsignedShort();
+	        if (data.length > 16) {
+	            inputStream.readUnsignedShort(); // cbSize
+	            // FIXME - Don't ignore extra format information
+	        }
+	
+	        tr.format = new Format(MimeTypeKey, MIME_AVI,
+	                MediaTypeKey, MediaType.AUDIO,
+	                EncodingKey, formatTag,
+	                SampleRateKey, Rational.valueOf(tr.samplesPerSec),
+	                SampleSizeInBitsKey, tr.bitsPerSample,
+	                ChannelsKey, tr.channels,
+	                FrameSizeKey, tr.blockAlign,
+	                FrameRateKey, new Rational(tr.samplesPerSec, 1),
+	                SignedKey, tr.bitsPerSample != 8,
+	                ByteOrderKey, ByteOrder.LITTLE_ENDIAN);
+    	}
 
     }
 
@@ -622,50 +630,52 @@ public class AVIInputStream extends AbstractAVIStream {
      * @throws IOException
      */
     private void readIDX1(ArrayList<Track> tracks, ArrayList<Sample> idx1, byte[] data) throws IOException {
-        ByteArrayImageInputStream in = new ByteArrayImageInputStream(data, ByteOrder.LITTLE_ENDIAN);
-
-        long[] trReadTimeStamp = new long[tracks.size()];
-
-        Sample paletteChange = null;
-        while (in.getStreamPosition() < data.length) {
-            in.setByteOrder(ByteOrder.BIG_ENDIAN);
-            int chunkIdInt = in.readInt();
-            in.setByteOrder(ByteOrder.LITTLE_ENDIAN);
-            int chunkId = chunkIdInt;
-            int track = (((chunkIdInt>>>24) & 0xff) - '0') * 10 + (((chunkIdInt >>> 16) & 0xff) - '0');
-            if (track < 0 || track > 99 || track > tracks.size()) {
-                throw new IOException("Illegal chunkId in IDX1:" + chunkId);
-            }
-            int flags = in.readInt();
-            long offset = in.readUnsignedInt();
-            long size = in.readUnsignedInt();
-            Track tr = tracks.get(track);
-            int duration = ((flags & 0x100) != 0) ? 0 : 1;
-            if (tr.mediaType == AVIMediaType.AUDIO) {
-                Format af = tr.format;
-                duration = (int) (size * duration / af.get(FrameSizeKey));
-                flags |= 0x10; // all audio samples are keyframes
-            }
-            Sample s = new Sample(chunkId, duration, offset + moviOffset, size, (flags & 0x10) != 0);
-            s.timeStamp = trReadTimeStamp[track];
-            idx1.add(s);
-            trReadTimeStamp[track] += duration;
-
-            // special treatment for palette changes
-            // FIXME - We should coalesce multiple palette changes
-            if ((s.chunkType & CHUNK_SUBTYPE_MASK) == PC_ID) {
-                paletteChange = s;
-            } else {
-                if (paletteChange != null) {
-                    s.header = paletteChange;
-                }
-                tr.samples.add(s);
-            }
-        }
-
-        for (Track tr : tracks) {
-            tr.readIndex = 0;
-        }
+    	try (
+    			ByteArrayImageInputStream inputStream = new ByteArrayImageInputStream(data, ByteOrder.LITTLE_ENDIAN);) {
+	
+	        long[] trReadTimeStamp = new long[tracks.size()];
+	
+	        Sample paletteChange = null;
+	        while (inputStream.getStreamPosition() < data.length) {
+	            inputStream.setByteOrder(ByteOrder.BIG_ENDIAN);
+	            int chunkIdInt = inputStream.readInt();
+	            inputStream.setByteOrder(ByteOrder.LITTLE_ENDIAN);
+	            int chunkId = chunkIdInt;
+	            int track = (((chunkIdInt>>>24) & 0xff) - '0') * 10 + (((chunkIdInt >>> 16) & 0xff) - '0');
+	            if (track < 0 || track > 99 || track > tracks.size()) {
+	                throw new IOException("Illegal chunkId in IDX1:" + chunkId);
+	            }
+	            int flags = inputStream.readInt();
+	            long offset = inputStream.readUnsignedInt();
+	            long size = inputStream.readUnsignedInt();
+	            Track tr = tracks.get(track);
+	            int duration = ((flags & 0x100) != 0) ? 0 : 1;
+	            if (tr.mediaType == AVIMediaType.AUDIO) {
+	                Format af = tr.format;
+	                duration = (int) (size * duration / af.get(FrameSizeKey));
+	                flags |= 0x10; // all audio samples are keyframes
+	            }
+	            Sample s = new Sample(chunkId, duration, offset + moviOffset, size, (flags & 0x10) != 0);
+	            s.timeStamp = trReadTimeStamp[track];
+	            idx1.add(s);
+	            trReadTimeStamp[track] += duration;
+	
+	            // special treatment for palette changes
+	            // FIXME - We should coalesce multiple palette changes
+	            if ((s.chunkType & CHUNK_SUBTYPE_MASK) == PC_ID) {
+	                paletteChange = s;
+	            } else {
+	                if (paletteChange != null) {
+	                    s.header = paletteChange;
+	                }
+	                tr.samples.add(s);
+	            }
+	        }
+	
+	        for (Track tr : tracks) {
+	            tr.readIndex = 0;
+	        }
+    	}
     }
 
     public void close() throws IOException {

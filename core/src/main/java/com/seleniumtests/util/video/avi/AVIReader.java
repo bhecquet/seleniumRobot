@@ -317,7 +317,7 @@ public class AVIReader extends AVIInputStream implements MovieReader {
     public Rational sampleToTime(int track, long sampleIndex) throws IOException {
         ensureRealized();
         Track tr = tracks.get(track);
-        Sample sample = tr.samples.get((int) max(0, min(tr.samples.size() - 1, sampleIndex)));
+        Sample sample = tr.samples.get((int) max(0, min(tr.samples.size() - (long)1, sampleIndex)));
         long time = (tr.startTime + sample.timeStamp) * tr.scale;//
         if (sampleIndex >= tr.samples.size()) {
             time += sample.duration * tr.scale;
@@ -330,7 +330,7 @@ public class AVIReader extends AVIInputStream implements MovieReader {
         ensureRealized();
         for (int t = 0, n = tracks.size(); t < n; t++) {
             Track tr = tracks.get(t);
-            int sample = (int) min(timeToSample(t, newValue), tr.samples.size() - 1);
+            int sample = (int) min(timeToSample(t, newValue), tr.samples.size() - (long)1);
             if (tr.readIndex > sample) {
                 tr.readIndex = 0;
             }
