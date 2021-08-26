@@ -17,7 +17,6 @@
  */
 package com.seleniumtests.ut.browserfactory;
 
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -27,13 +26,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.SystemUtils;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriverService;
 import org.openqa.selenium.remote.CapabilityType;
 import org.powermock.api.mockito.PowerMockito;
@@ -42,6 +40,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.microsoft.edge.seleniumtools.EdgeOptions;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.browserfactory.EdgeCapabilitiesFactory;
@@ -80,8 +79,8 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		PowerMockito.mockStatic(OSUtilityFactory.class);
 		PowerMockito.when(OSUtilityFactory.getInstance()).thenReturn(osUtility);
 
-		Mockito.when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.NONE));
-		Mockito.when(config.getPageLoadStrategy()).thenReturn(PageLoadStrategy.NORMAL);
+		when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.NONE));
+		when(config.getPageLoadStrategy()).thenReturn(PageLoadStrategy.NORMAL);
 		
 		when(osUtility.getProgramExtension()).thenReturn(".exe");
 	}
@@ -92,9 +91,9 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilities() {
 		
-		Mockito.when(config.isEnableJavascript()).thenReturn(true);
-		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
-		Mockito.when(config.getNodeTags()).thenReturn(new ArrayList<>());
+		when(config.isEnableJavascript()).thenReturn(true);
+		when(config.getProxy()).thenReturn(proxyConfig);
+		when(config.getNodeTags()).thenReturn(new ArrayList<>());
 		
 		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
 		
@@ -113,10 +112,10 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithNodeTagsInGridMode() {
 		
-		Mockito.when(config.isEnableJavascript()).thenReturn(true);
-		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
-		Mockito.when(config.getNodeTags()).thenReturn(Arrays.asList("foo", "bar"));
-		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
+		when(config.isEnableJavascript()).thenReturn(true);
+		when(config.getProxy()).thenReturn(proxyConfig);
+		when(config.getNodeTags()).thenReturn(Arrays.asList("foo", "bar"));
+		when(config.getMode()).thenReturn(DriverMode.GRID);
 		
 		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
 		
@@ -130,8 +129,8 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithNodeTagsInLocalMode() {
 		
-		Mockito.when(config.getNodeTags()).thenReturn(Arrays.asList("foo", "bar"));
-		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		when(config.getNodeTags()).thenReturn(Arrays.asList("foo", "bar"));
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		
 		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
 		
@@ -141,9 +140,9 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithPlatform() {
 		
-		Mockito.when(config.isEnableJavascript()).thenReturn(true);
-		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
-		Mockito.when(config.getWebPlatform()).thenReturn(Platform.WINDOWS);
+		when(config.isEnableJavascript()).thenReturn(true);
+		when(config.getProxy()).thenReturn(proxyConfig);
+		when(config.getWebPlatform()).thenReturn(Platform.WINDOWS);
 		
 		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
 		
@@ -154,8 +153,8 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithJavascriptDisabled() {
 		
-		Mockito.when(config.isEnableJavascript()).thenReturn(false);
-		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
+		when(config.isEnableJavascript()).thenReturn(false);
+		when(config.getProxy()).thenReturn(proxyConfig);
 		
 		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
 		
@@ -166,9 +165,9 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithVersion() {
 		
-		Mockito.when(config.isEnableJavascript()).thenReturn(true);
-		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
-		Mockito.when(config.getBrowserVersion()).thenReturn("10240");
+		when(config.isEnableJavascript()).thenReturn(true);
+		when(config.getProxy()).thenReturn(proxyConfig);
+		when(config.getBrowserVersion()).thenReturn("10240");
 		
 		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
 		
@@ -187,11 +186,11 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateEdgeCapabilitiesStandardDriverPathLocal() {
 		try {
-			Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
+			when(config.getMode()).thenReturn(DriverMode.LOCAL);
 			
 			new EdgeCapabilitiesFactory(config).createCapabilities();
 			
-			Assert.assertTrue(System.getProperty(EdgeDriverService.EDGE_DRIVER_EXE_PROPERTY).replace(File.separator, "/").contains("/drivers/MicrosoftWebDriver_"));
+			Assert.assertTrue(System.getProperty(EdgeDriverService.EDGE_DRIVER_EXE_PROPERTY).replace(File.separator, "/").contains("/drivers/edgedriver_"));
 		} finally {
 			System.clearProperty(EdgeDriverService.EDGE_DRIVER_EXE_PROPERTY);
 		}
@@ -200,8 +199,8 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateEdgeCapabilitiesOverrideDriverPathLocal() {
 		try {
-			Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
-			Mockito.when(config.getEdgeDriverPath()).thenReturn("/opt/edge/driver/edgedriver");
+			when(config.getMode()).thenReturn(DriverMode.LOCAL);
+			when(config.getEdgeDriverPath()).thenReturn("/opt/edge/driver/edgedriver");
 			
 			new EdgeCapabilitiesFactory(config).createCapabilities();
 			
@@ -213,10 +212,47 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testCreateEdgeCapabilitiesStandardDriverPathGrid() {
-		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
+		when(config.getMode()).thenReturn(DriverMode.GRID);
 		
 		new EdgeCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertNull(System.getProperty(EdgeDriverService.EDGE_DRIVER_EXE_PROPERTY));
+	}
+
+	/**
+	 * check the case where we have a beta browser. The last one is choosen
+	 */
+	@Test(groups={"ut"})
+	public void testCreateEdgeCapabilitiesOverrideBinPath() {
+		
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
+
+		// SeleniumTestsContext class adds a browserInfo when binary path is set
+		Map<BrowserType, List<BrowserInfo>> updatedBrowserInfos = new HashMap<>();
+		updatedBrowserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, "92.0", "", false), 
+																	new BrowserInfo(BrowserType.EDGE, "93.0", "/opt/edge/bin/edge", false)));
+
+		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(updatedBrowserInfos);
+		
+		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
+		
+		Assert.assertEquals(((Map<?,?>)(((EdgeOptions)capa).asMap().get(EdgeOptions.CAPABILITY))).get("binary").toString(), "/opt/edge/bin/edge");
+	}
+	
+
+	@Test(groups={"ut"})
+	public void testCreateChromeCapabilitiesWithLogging() {
+
+		try {
+			when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.DRIVER));
+			when(config.getMode()).thenReturn(DriverMode.LOCAL);
+			new EdgeCapabilitiesFactory(config).createCapabilities();
+			
+			Assert.assertEquals(System.getProperty(EdgeDriverService.EDGE_DRIVER_VERBOSE_LOG_PROPERTY), "true");
+			Assert.assertTrue(System.getProperty(EdgeDriverService.EDGE_DRIVER_LOG_PROPERTY).endsWith("edgedriver.log"));
+		} finally {
+			System.clearProperty(EdgeDriverService.EDGE_DRIVER_VERBOSE_LOG_PROPERTY);
+			System.clearProperty(EdgeDriverService.EDGE_DRIVER_LOG_PROPERTY);
+		}
 	}
 }

@@ -21,11 +21,15 @@ import java.lang.management.ManagementFactory;
 import java.util.List;
 
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.OSUtility;
@@ -44,6 +48,13 @@ public class TestOsUtility extends GenericTest {
 		final String jvmName = ManagementFactory.getRuntimeMXBean().getName();
         final int index = jvmName.indexOf('@');
         processId = Long.parseLong(jvmName.substring(0, index));
+	}
+	
+	@AfterMethod(groups={"it"}, alwaysRun=true)
+	public void destroyDriver() {
+		if (WebUIDriver.getWebDriver(false) != null) {
+			WebUIDriver.cleanUp();
+		}
 	}
 	
 	@Test(groups={"it"})
@@ -83,10 +94,190 @@ public class TestOsUtility extends GenericTest {
 			Assert.fail("no sysmond process found");
 		}
 	}
+	
 	@Test(groups={"it"})
 	public void testIsProcessNotRunning() {		
 		Assert.assertFalse(osUtil.isProcessRunning("anUnknownProcess"), String.format("process anUnknownProcess should not be found"));
 	}
+	
+
+	@Test(groups={"it"})
+	public void testIsProcessRunningByPid() {
+		String processName = "";
+		if (OSUtility.isWindows()) {
+			processName = "svchost";
+		} else if (OSUtility.isLinux()) {
+			processName = "dbus-daemon";
+		} else if (OSUtility.isMac()) {
+			processName = "sysmond";
+		}
+			
+		ProcessInfo pi = osUtil.getRunningProcess(processName);
+		Assert.assertTrue(osUtil.isProcessRunningByPid(pi.getPid()));
+			
+	}
+	
+	@Test(groups={"it"})
+	public void testIsProcessNotRunningByPid() {
+		Assert.assertFalse(osUtil.isProcessRunningByPid("999999"));
+	}
+	
+	@Test(groups={"it"})
+	public void testIsChromeWebBrowserRunning() {
+		osUtil.killAllWebBrowserProcess(true);
+		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
+		WebUIDriver.getWebDriver(true);
+		Assert.assertTrue(osUtil.isWebBrowserRunning(true));
+	}
+	
+	@Test(groups={"it"})
+	public void testIsFirefoxWebBrowserRunning() {
+		osUtil.killAllWebBrowserProcess(true);
+		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
+		WebUIDriver.getWebDriver(true);
+		Assert.assertTrue(osUtil.isWebBrowserRunning(true));
+	}
+	
+	@Test(groups={"it"})
+	public void testIsInternetExplorerWebBrowserRunning() {
+		if (OSUtility.isWindows()) {
+			osUtil.killAllWebBrowserProcess(true);
+			SeleniumTestsContextManager.getThreadContext().setBrowser("iexplore");
+			WebUIDriver.getWebDriver(true);
+			Assert.assertTrue(osUtil.isWebBrowserRunning(true));
+		}
+	}
+	
+	@Test(groups={"it"})
+	public void testIsEdgeWebBrowserRunning() {
+		if (OSUtility.isWindows10()) {
+			osUtil.killAllWebBrowserProcess(true);
+			SeleniumTestsContextManager.getThreadContext().setBrowser("edge");
+			WebUIDriver.getWebDriver(true);
+			Assert.assertTrue(osUtil.isWebBrowserRunning(true));
+		}
+	}
+	
+	@Test(groups={"it"})
+	public void testIsSafariWebBrowserRunning() {
+		if (OSUtility.isMac()) {
+			osUtil.killAllWebBrowserProcess(true);
+			SeleniumTestsContextManager.getThreadContext().setBrowser("safari");
+			WebUIDriver.getWebDriver(true);
+			Assert.assertTrue(osUtil.isWebBrowserRunning(true));
+		}
+	}
+	
+	@Test(groups={"it"})
+	public void testWhichChromeWebBrowserRunning() {
+		osUtil.killAllWebBrowserProcess(true);
+		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
+		WebUIDriver.getWebDriver(true);
+		List<ProcessInfo> pis = osUtil.whichWebBrowserRunning();
+		for (ProcessInfo pi: pis) {
+			if (pi.getName().contains("chrome")) {
+				return;
+			}
+		} 
+		Assert.fail("Chrome has not been found");
+	}
+	
+	@Test(groups={"it"})
+	public void testWhichFirefoxWebBrowserRunning() {
+		osUtil.killAllWebBrowserProcess(true);
+		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
+		WebUIDriver.getWebDriver(true);
+		List<ProcessInfo> pis = osUtil.whichWebBrowserRunning(true);
+		for (ProcessInfo pi: pis) {
+			if (pi.getName().contains("firefox")) {
+				return;
+			}
+		} 
+		Assert.fail("Firefox has not been found");
+	}
+	
+	@Test(groups={"it"})
+	public void testWhichInternetExplorerWebBrowserRunning() {
+		if (OSUtility.isWindows()) {
+			osUtil.killAllWebBrowserProcess(true);
+			SeleniumTestsContextManager.getThreadContext().setBrowser("iexplore");
+			WebUIDriver.getWebDriver(true);
+			List<ProcessInfo> pis = osUtil.whichWebBrowserRunning();
+			for (ProcessInfo pi: pis) {
+				if (pi.getName().contains("iexplore")) {
+					return;
+				}
+			} 
+			Assert.fail("Internet Explorer has not been found");
+		}
+	}
+	
+	@Test(groups={"it"})
+	public void testWhichEdgeWebBrowserRunning() {
+		if (OSUtility.isWindows10()) {
+			osUtil.killAllWebBrowserProcess(true);
+			SeleniumTestsContextManager.getThreadContext().setBrowser("edge");
+			WebUIDriver.getWebDriver(true);
+			List<ProcessInfo> pis = osUtil.whichWebBrowserRunning();
+			for (ProcessInfo pi: pis) {
+				if (pi.getName().contains("edge")) {
+					return;
+				}
+			} 
+			Assert.fail("Edge has not been found");
+		}
+	}
+	
+	@Test(groups={"it"})
+	public void testWhichSafariWebBrowserRunning() {
+		if (OSUtility.isMac()) {
+			osUtil.killAllWebBrowserProcess(true);
+			SeleniumTestsContextManager.getThreadContext().setBrowser("safari");
+			WebUIDriver.getWebDriver(true);
+			List<ProcessInfo> pis = osUtil.whichWebBrowserRunning();
+			for (ProcessInfo pi: pis) {
+				if (pi.getName().contains("safari")) {
+					return;
+				}
+			} 
+			Assert.fail("Safari has not been found");
+		}
+	}
+
+	/**
+	 * Here we test both browser and driver killing because this test is long and duplicating it would increase test time by 3 mins
+	 */
+	@Test(groups={"it"})
+	public void testKillAllWebBrowserProcess() {
+		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
+		WebUIDriver.getWebDriver(true);
+		WebUIDriver.getWebDriver(true, BrowserType.FIREFOX, "ff", null);
+		if (OSUtility.isWindows()) {
+			WebUIDriver.getWebDriver(true, BrowserType.INTERNET_EXPLORER, "ie", null);
+		}
+		if (OSUtility.isWindows10()) {
+			WebUIDriver.getWebDriver(true, BrowserType.EDGE, "edge", null);
+		}
+		if (OSUtility.isMac()) {
+			WebUIDriver.getWebDriver(true, BrowserType.SAFARI, "safari", null);
+		}
+		osUtil.killAllWebBrowserProcess(true);
+		osUtil.killAllWebDriverProcess();
+		
+		Assert.assertNull(osUtil.getRunningProcess("chrome"));
+		Assert.assertNull(osUtil.getRunningProcess("firefox"));
+		Assert.assertNull(osUtil.getRunningProcess("msedge"));
+		Assert.assertNull(osUtil.getRunningProcess("iexplore"));
+		Assert.assertNull(osUtil.getRunningProcess("safari"));
+		
+		Assert.assertNull(osUtil.getRunningProcess("chromedriver"));
+		Assert.assertNull(osUtil.getRunningProcess("geckodriver"));
+		Assert.assertNull(osUtil.getRunningProcess("iedriverserver"));
+		Assert.assertNull(osUtil.getRunningProcess("microsoftwebdriver"));
+		Assert.assertNull(osUtil.getRunningProcess("edgedriver"));
+		
+	}
+	
 	
 	@Test(groups={"it"})
 	public void testGetProcessNameFromPid() {
@@ -158,6 +349,20 @@ public class TestOsUtility extends GenericTest {
 	public void testGetProcessNameFromPidLinux() {
 		if (OSUtility.isLinux()) {
 			Assert.assertEquals(osUtil.getProgramNameFromPid(processId).trim(), "java");
+		}
+	}
+	
+	@Test(groups={"it"})
+	public void testOsArchitecture() {
+		if (OSUtility.isWindows()) {
+			Assert.assertEquals(OSUtility.getArchitecture(), "amd64");
+		}
+	}
+	
+	@Test(groups={"it"})
+	public void testOsBits() {
+		if (OSUtility.isWindows()) {
+			Assert.assertEquals(OSUtility.getOSBits(), "64");
 		}
 	}
 }

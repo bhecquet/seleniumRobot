@@ -21,6 +21,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -29,6 +31,8 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.io.FileUtils;
 
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.customexception.ConfigurationException;
@@ -185,6 +189,55 @@ public class OSUtilityWindows extends OSUtility {
 		throw new ConfigurationException("Chrome version could not be get from folder");
 	}
 	
+	/**
+	 * Search for a folder with version name where msedge.exe is located (e.g: 58.0.3029.81)
+	 * @param chromePath
+	 * @return
+	 */
+	public String getEdgeVersionFromFolder(String edgePath) {
+		if (!new File(edgePath).exists()) {
+			throw new ConfigurationException("Edge version could not be get from folder, edge path does not exist");
+		}
+		for (File file: new File(edgePath.replace("msedge.exe", "")).listFiles()) {
+			if (file.isDirectory() && file.getName().matches("^\\d++.*")) {
+				return file.getName();
+			}
+		}
+		throw new ConfigurationException("Edge version could not be get from folder");
+	}
+
+	private String getEdgeVersionFromRegistry() {
+		return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "Version");
+	}
+	
+	private String getEdgeBetaVersionFromRegistry() {
+		return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge Beta", "Version");
+	}
+	
+	private String getWindowsBetaEdgeVersion(String edgeBetaPath) {
+		String versionBeta;
+		try {
+			versionBeta = getEdgeBetaVersionFromRegistry();
+		} catch (Win32Exception e) {
+			versionBeta = getEdgeVersionFromFolder(edgeBetaPath);
+		}
+		return versionBeta;
+	}
+
+	/**
+	 * @param chromePath
+	 * @return
+	 */
+	private String getWindowsEdgeVersion(String edgeBetaPath) {
+		String version;
+		try {
+			version = getEdgeVersionFromRegistry();
+		} catch (Win32Exception e) {
+			version = getEdgeVersionFromFolder(edgeBetaPath);
+		}
+		return version;
+	}
+	
 	private String getIeVersionFromRegistry() {
 		try {
 			return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Internet Explorer", "svcVersion");
@@ -271,25 +324,36 @@ public class OSUtilityWindows extends OSUtility {
 			browserList.put(BrowserType.INTERNET_EXPLORER, Arrays.asList(new BrowserInfo(BrowserType.INTERNET_EXPLORER, extractIEVersion(version), null)));
 		} catch (Win32Exception | ConfigurationException e) {
 			logger.warn("Error searching Internet explorer installations: " + e.getMessage());
-			}
+		}
 		
-		// look for edge legacy
-		try {
-			String version = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main", "EdgeSwitchingOSBuildNumber");
-			browserList.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, extractEdgeVersion(version), null)));
-		} catch (Win32Exception | ConfigurationException e) {
-			logger.warn("Error searching Edge legacy installations: " + e.getMessage());
-			}
 		
 		// look for edge chromium
 		try {
-			String version = OSCommand.executeCommandAndWait("powershell.exe \"(Get-AppxPackage Microsoft.MicrosoftEdge).Version\"");
+			browserList.put(BrowserType.EDGE, new ArrayList<>());
+			String edgePath = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "InstallLocation");
+			String version = getWindowsEdgeVersion(edgePath);
+			
 			if (version != null && !version.isEmpty()) {
-				Integer.parseInt(extractEdgeVersion(version));
-				browserList.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, extractEdgeVersion(version), null)));
+				browserList.get(BrowserType.EDGE).add(new BrowserInfo(BrowserType.EDGE, extractEdgeVersion(version), Paths.get(edgePath, "msedge.exe").toString()));
 			}
-		} catch (Win32Exception | ConfigurationException | NumberFormatException e) {
+		} catch (Win32Exception | ConfigurationException e) {
 			logger.warn("Error searching Edge chromium installations: " + e.getMessage());
+		}
+		
+		
+		if (discoverBetaBrowsers) {
+			try {
+				// beta edge version
+				String edgePathBeta = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge Beta", "InstallLocation");
+				String versionBeta = getWindowsBetaEdgeVersion(edgePathBeta);
+				
+				if (versionBeta != null && !versionBeta.isEmpty()) {
+					browserList.get(BrowserType.EDGE).add(new BrowserInfo(BrowserType.EDGE, extractEdgeVersion(versionBeta), Paths.get(edgePathBeta, "msedge.exe").toString()));
+				}
+	
+			} catch (Win32Exception | ConfigurationException e) {
+				logger.warn("Error searching Beta Edge chromium installations: " + e.getMessage());
+			}
 		}
 		
 		return browserList;

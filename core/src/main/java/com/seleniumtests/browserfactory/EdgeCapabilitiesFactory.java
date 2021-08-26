@@ -17,14 +17,18 @@
  */
 package com.seleniumtests.browserfactory;
 
-import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.edge.EdgeDriverService;
-import org.openqa.selenium.edge.EdgeOptions;
+import java.nio.file.Paths;
 
+import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.chrome.ChromeDriverService;
+
+import com.microsoft.edge.seleniumtools.EdgeDriverService;
+import com.microsoft.edge.seleniumtools.EdgeOptions;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
+import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.osutility.OSUtility;
 
 public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
@@ -40,9 +44,29 @@ public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
         }
         
         EdgeOptions options = new EdgeOptions();
-        options.setPageLoadStrategy(webDriverConfig.getPageLoadStrategy().toString());
+        options.setPageLoadStrategy(webDriverConfig.getPageLoadStrategy());
+        
+
+        if (webDriverConfig.getMode() == DriverMode.LOCAL) {
+        	setLogging();
+        }
         
 		return options;
+	}
+	
+
+	private void setLogging() {
+
+    	// driver logging
+    	if (webDriverConfig.getDebug().contains(DebugMode.DRIVER)) {
+    		String edgeDriverLogPath = Paths.get(webDriverConfig.getOutputDirectory(), "edgedriver.log").toString();
+        	System.setProperty(EdgeDriverService.EDGE_DRIVER_VERBOSE_LOG_PROPERTY, "true");
+        	System.setProperty(EdgeDriverService.EDGE_DRIVER_LOG_PROPERTY, edgeDriverLogPath);
+        	logger.info("Edgedriver logs will be written to " + edgeDriverLogPath);
+    	} else {
+    		System.clearProperty(EdgeDriverService.EDGE_DRIVER_VERBOSE_LOG_PROPERTY);
+    		System.clearProperty(EdgeDriverService.EDGE_DRIVER_LOG_PROPERTY);
+    	}
 	}
 
 	@Override
@@ -62,7 +86,7 @@ public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
 
 	@Override
 	protected void updateOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
-		// TODO Auto-generated method stub
+		((EdgeOptions)options).setBinary(selectedBrowserInfo.getPath());
 	}
 
 	@Override

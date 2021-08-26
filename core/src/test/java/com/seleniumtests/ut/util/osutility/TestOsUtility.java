@@ -61,6 +61,11 @@ public class TestOsUtility extends GenericTest {
 	}
 	
 	@Test(groups={"ut"})
+	public void testExtractChromiumVersion2() {
+		Assert.assertEquals(OSUtility.extractChromeOrChromiumVersion("Chromium 57.0.2924.76 Built on Ubuntu , running on Ubuntu 16.04\n"), "57.0");
+	}
+	
+	@Test(groups={"ut"})
 	public void testExtractChromiumVersionNotFound() {
 		Assert.assertEquals(OSUtility.extractChromiumVersion("Chromium 56"), "");
 	}

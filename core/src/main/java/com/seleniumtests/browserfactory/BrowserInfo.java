@@ -53,6 +53,7 @@ public class BrowserInfo {
 	private static final Logger logger = SeleniumRobotLogger.getLogger(BrowserInfo.class);
 
 	private static final Pattern REG_CHROME_VERSION = Pattern.compile(".*chrome-(\\d++)-(\\d++).*");
+	private static final Pattern REG_EDGE_VERSION = Pattern.compile(".*edge-(\\d++)-(\\d++).*");
 	private static final Pattern REG_ANDROID_VERSION = Pattern.compile(".*android-(\\d++\\.\\d++).*");
 	public static final String LATEST_VERSION = "999.9";
 	public static final String GRID_BROWSER = "grid-browser";
@@ -353,9 +354,54 @@ public class BrowserInfo {
 	
 	/**
 	 * Edge driver depends on windows build
+	 * @throws IOException 
 	 */
-	private void addEdgeDriverFile() {
-		driverFileName = "MicrosoftWebDriver_" + version;
+	private void addEdgeDriverFile() throws IOException {
+
+		List<String> driverFiles = getDriverFiles();
+		driverFiles = driverFiles.stream()
+				.filter(s -> s.contains("edge-") && s.startsWith("edgedriver_"))
+				.map(s -> s.replace(".exe", ""))
+				.sorted()
+				.collect(Collectors.toList());
+
+		if (driverFiles.isEmpty()) {
+			throw new ConfigurationException("no edgedriver in resources");
+		}
+		
+		Map<Integer, String> driverVersion = new HashMap<>();
+		
+		for (String fileName: driverFiles) {
+			Matcher matcher = REG_EDGE_VERSION.matcher(fileName);
+			if (matcher.matches()) {
+				int minVersion = Integer.parseInt(matcher.group(1));
+				int maxVersion = Integer.parseInt(matcher.group(2));
+				if (maxVersion < minVersion) {
+					throw new ConfigurationException(String.format("Edge driver file %s version is incorrect, max version should be > to min version", fileName));
+				} else {
+					for (int i = minVersion; i <= maxVersion; i++) {
+						driverVersion.put(i, fileName);
+					}
+				}
+			} else {
+				throw new ConfigurationException(String.format("Driver %s is excluded as it does not match the pattern 'edgedriver_<version>_edge-<minVersion>-<maxVersion>'", fileName));
+			}
+		}
+		
+		int edgeVersion = Integer.parseInt(version.split("\\.")[0]);
+		driverFileName = driverVersion.get(edgeVersion);
+		
+		// when chrome version is greater than driver version, take the last driver and display warning as something may go wrong
+		if (driverFileName == null && edgeVersion > Collections.max(driverVersion.keySet())) {
+			driverFileName = driverFiles.get(driverFiles.size() - 1);
+			
+			logger.warn("--------------------------------------------------------------------");
+			logger.warn(String.format("Edge version %d does not have any associated driver, update seleniumRobot driver version, the latest driver has been used", edgeVersion));
+			logger.warn("--------------------------------------------------------------------");
+		} else if (driverFileName == null) {
+			throw new ConfigurationException(String.format("Edge version %d does not have any associated driver, update seleniumRobot driver version", edgeVersion));
+		}
+		
 	}
 	
 	/**

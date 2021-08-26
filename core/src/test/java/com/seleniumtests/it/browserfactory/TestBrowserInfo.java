@@ -86,11 +86,11 @@ public class TestBrowserInfo extends GenericDriverTest {
 			throw new SkipException("This test can only be done on Windows 10");
 		}
 
-		BrowserInfo browserInfo = new BrowserInfo(BrowserType.EDGE, "14393", "/some/path", false);
+		BrowserInfo browserInfo = new BrowserInfo(BrowserType.EDGE, "92.0", "/some/path", false);
 		browserInfo.getDriverFileName();
 		
 		Assert.assertTrue(browserInfo.isDriverFileSearched());
-		Assert.assertEquals(browserInfo.getDriverFileName(), "MicrosoftWebDriver_14393");
+		Assert.assertEquals(browserInfo.getDriverFileName(), "edgedriver_92.0_edge-92-93");
 	}
 	
 	@Test(groups={"it"})
