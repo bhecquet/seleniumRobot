@@ -17,9 +17,8 @@
  */
 package com.seleniumtests.ut.util.osutility;
 
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.when;
-import static org.mockito.ArgumentMatchers.contains;
-import static org.mockito.ArgumentMatchers.contains;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +31,6 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.SystemUtils;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
@@ -64,6 +62,12 @@ public class TestWindowsOsUtility extends MockitoTest {
 	
 	@Mock
 	private Path path2;
+	
+	@Mock
+	private Path path3;
+	
+	@Mock
+	private Path path4;
 	
 	@Mock
 	private File browserFile2;
@@ -194,7 +198,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "")).thenThrow(Win32Exception.class);
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeBHTML\\shell\\open\\command", "")).thenThrow(Win32Exception.class); // chrome beta not installed
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenThrow(Win32Exception.class);
-		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main", "EdgeSwitchingOSBuildNumber")).thenThrow(Win32Exception.class);
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "InstallLocation")).thenThrow(Win32Exception.class);
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_CLASSES_ROOT, "FirefoxHTML\\shell\\open\\command", "")).thenReturn("\"C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe\" -osint -url \"%1\"");
 		when(OSCommand.executeCommandAndWait("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe --version | more")).thenReturn("Mozilla Firefox 56.0");
 		when(OSCommand.executeCommandAndWait(new String[] {"REG", "QUERY", "HKCR",  "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("\r\n" +
@@ -228,7 +232,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "")).thenThrow(Win32Exception.class);
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeBHTML\\shell\\open\\command", "")).thenThrow(Win32Exception.class); // chrome beta not installed
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenThrow(Win32Exception.class);
-		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main", "EdgeSwitchingOSBuildNumber")).thenThrow(Win32Exception.class);
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "InstallLocation")).thenThrow(Win32Exception.class);
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_CLASSES_ROOT, "FirefoxHTML-AC250DEAA7389F99\\shell\\open\\command", "")).thenReturn("\"C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe\" -osint -url \"%1\"");
 																			
 		when(OSCommand.executeCommandAndWait("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe --version | more")).thenReturn("Mozilla Firefox 56.0");
@@ -265,7 +269,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "")).thenThrow(Win32Exception.class);
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeBHTML\\shell\\open\\command", "")).thenThrow(Win32Exception.class); // chrome beta not installed
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenThrow(Win32Exception.class);
-		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main", "EdgeSwitchingOSBuildNumber")).thenThrow(Win32Exception.class);
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "InstallLocation")).thenThrow(Win32Exception.class);
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_CLASSES_ROOT, "FirefoxHTML\\shell\\open\\command", "")).thenReturn("\"C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe\" -osint -url \"%1\"");
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_CLASSES_ROOT, "FirefoxHTML-AC250DEAA7389F99\\shell\\open\\command", "")).thenReturn("\"C:\\Program Files (x86)\\Mozilla2 Firefox\\firefox.exe\" -osint -url \"%1\"");
 		when(OSCommand.executeCommandAndWait("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe --version | more")).thenReturn("Mozilla Firefox 56.0");
@@ -343,7 +347,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Google Chrome", "version")).thenThrow(Win32Exception.class);
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Google\\Chrome\\BLBeacon", "version")).thenReturn("57.0.2987.110");
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenThrow(Win32Exception.class);
-		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main", "EdgeSwitchingOSBuildNumber")).thenThrow(Win32Exception.class);
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "InstallLocation")).thenThrow(Win32Exception.class);
 		when(OSCommand.executeCommandAndWait(new String[] {"REG", "QUERY", "HKCR",  "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("");
 
 		OSUtility.refreshBrowserList();
@@ -373,7 +377,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Google Chrome", "version")).thenThrow(Win32Exception.class);
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Google\\Chrome\\BLBeacon", "version")).thenThrow(Win32Exception.class);
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenThrow(Win32Exception.class);
-		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main", "EdgeSwitchingOSBuildNumber")).thenThrow(Win32Exception.class);
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "InstallLocation")).thenThrow(Win32Exception.class);
 		when(OSCommand.executeCommandAndWait(new String[] {"REG", "QUERY", "HKCR",  "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("");
 		
 		OSUtility.refreshBrowserList();
@@ -406,7 +410,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Google Chrome", "version")).thenReturn("76.0.2987.110");
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Google\\Chrome\\BLBeacon", "version")).thenReturn("57.0.2987.110");
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenThrow(Win32Exception.class);
-		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main", "EdgeSwitchingOSBuildNumber")).thenThrow(Win32Exception.class);
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "InstallLocation")).thenThrow(Win32Exception.class);
 		when(OSCommand.executeCommandAndWait(new String[] {"REG", "QUERY", "HKCR",  "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("");
 		
 		OSUtility.refreshBrowserList(true); // force detecting beta browser
@@ -438,7 +442,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Google Chrome", "version")).thenReturn("76.0.2987.110");
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Google\\Chrome\\BLBeacon", "version")).thenReturn("57.0.2987.110");
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenThrow(Win32Exception.class);
-		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main", "EdgeSwitchingOSBuildNumber")).thenThrow(Win32Exception.class);
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "InstallLocation")).thenThrow(Win32Exception.class);
 		when(OSCommand.executeCommandAndWait(new String[] {"REG", "QUERY", "HKCR",  "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("");
 		
 		OSUtility.refreshBrowserList();
@@ -467,7 +471,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Google Chrome", "version")).thenThrow(Win32Exception.class);
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Google\\Chrome\\BLBeacon", "version")).thenReturn("57.0.2987.110");
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenThrow(Win32Exception.class);
-		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main", "EdgeSwitchingOSBuildNumber")).thenThrow(Win32Exception.class);
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "InstallLocation")).thenThrow(Win32Exception.class);
 		when(OSCommand.executeCommandAndWait(new String[] {"REG", "QUERY", "HKCR",  "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("");
 		
 		OSUtility.refreshBrowserList();
@@ -493,7 +497,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeBHTML\\shell\\open\\command", "")).thenThrow(Win32Exception.class); // chrome beta not installed
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenReturn("C:\\Program Files\\Internet_Explorer\\IEXPLORE.EXE");
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Internet Explorer", "svcVersion")).thenReturn("11.0.9600.18000");
-		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main", "EdgeSwitchingOSBuildNumber")).thenThrow(Win32Exception.class);
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "InstallLocation")).thenThrow(Win32Exception.class);
 		when(OSCommand.executeCommandAndWait(new String[] {"REG", "QUERY", "HKCR",  "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("");
 		
 		OSUtility.refreshBrowserList();
@@ -513,40 +517,66 @@ public class TestWindowsOsUtility extends MockitoTest {
 		PowerMockito.mockStatic(Advapi32Util.class);
 		PowerMockito.mockStatic(Paths.class);
 		
+		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application\\msedge.exe")).thenReturn(path);
+		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application", "msedge.exe")).thenReturn(path2);
+		when(path.toFile()).thenReturn(browserFile);
+		when(path.toFile()).thenReturn(browserFile);
+		when(path2.toString()).thenReturn("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application\\msedge.exe");
+		when(browserFile.exists()).thenReturn(true);
+		
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "")).thenThrow(Win32Exception.class);
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeBHTML\\shell\\open\\command", "")).thenThrow(Win32Exception.class); // chrome beta not installed
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenThrow(Win32Exception.class);
-		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main", "EdgeSwitchingOSBuildNumber")).thenThrow(Win32Exception.class);
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "InstallLocation")).thenReturn("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application");
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "Version")).thenReturn("92.0.902.780");
 		when(OSCommand.executeCommandAndWait(new String[] {"REG", "QUERY", "HKCR",  "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("");
-		when(OSCommand.executeCommandAndWait("powershell.exe \"(Get-AppxPackage Microsoft.MicrosoftEdge).Version\"")).thenReturn("44.18362.449.0");
 		
 		OSUtility.refreshBrowserList();
 		Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
 		Assert.assertTrue(browsers.keySet().contains(BrowserType.EDGE));
 		Assert.assertEquals(browsers.get(BrowserType.EDGE).size(), 1);
-		Assert.assertNull(browsers.get(BrowserType.EDGE).get(0).getPath());
-		Assert.assertEquals(browsers.get(BrowserType.EDGE).get(0).getVersion(), "44");
+		Assert.assertEquals(browsers.get(BrowserType.EDGE).get(0).getPath(), "C:\\Program Files (x86)\\Microsoft_\\Edge\\Application\\msedge.exe");
+		Assert.assertEquals(browsers.get(BrowserType.EDGE).get(0).getVersion(), "92.0");
 	}
 	
 	/**
-	 * Error message is thrown on some old windows not supporting Get-AppxPackage.
-	 * Moreover, we should not get Edge browser if it's not installed
+	 * Search Edge chromium Beta
 	 */
 	@Test(groups={"ut"})
-	public void testEdgeChromiumOnOldWindows() {
+	public void testEdgeChromiumBetaStandardWindowsInstallation() {
 		PowerMockito.mockStatic(OSCommand.class);
 		PowerMockito.mockStatic(Advapi32Util.class);
 		PowerMockito.mockStatic(Paths.class);
 		
+		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application\\msedge.exe")).thenReturn(path);
+		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application", "msedge.exe")).thenReturn(path2);
+		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Microsoft_\\Edge Beta\\Application\\msedge.exe")).thenReturn(path3);
+		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Microsoft_\\Edge Beta\\Application", "msedge.exe")).thenReturn(path4);
+		when(path.toFile()).thenReturn(browserFile);
+		when(path2.toFile()).thenReturn(browserFile);
+		when(path3.toFile()).thenReturn(browserFile);
+		when(path4.toFile()).thenReturn(browserFile);
+		when(path2.toString()).thenReturn("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application\\msedge.exe");
+		when(path4.toString()).thenReturn("C:\\Program Files (x86)\\Microsoft_\\Edge Beta\\Application\\msedge.exe");
+		when(browserFile.exists()).thenReturn(true);
+		
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "")).thenThrow(Win32Exception.class);
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeBHTML\\shell\\open\\command", "")).thenThrow(Win32Exception.class); // chrome beta not installed
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenThrow(Win32Exception.class);
-		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main", "EdgeSwitchingOSBuildNumber")).thenThrow(Win32Exception.class);
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "InstallLocation")).thenReturn("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application");
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "Version")).thenReturn("92.0.902.780");
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge Beta", "InstallLocation")).thenReturn("C:\\Program Files (x86)\\Microsoft_\\Edge Beta\\Application");
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge Beta", "Version")).thenReturn("93.0.902.780");
 		when(OSCommand.executeCommandAndWait(new String[] {"REG", "QUERY", "HKCR",  "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("");
-		when(OSCommand.executeCommandAndWait("powershell.exe \"(Get-AppxPackage Microsoft.MicrosoftEdge).Version\"")).thenReturn("Get-AppxPackage : The term 'Get-AppxPackage' is not recognized as the name of");
 		
-		OSUtility.refreshBrowserList();
+		OSUtility.refreshBrowserList(true); // search beta browsers
 		Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
-		Assert.assertFalse(browsers.keySet().contains(BrowserType.EDGE));
+		Assert.assertTrue(browsers.keySet().contains(BrowserType.EDGE));
+		Assert.assertEquals(browsers.get(BrowserType.EDGE).size(), 2);
+		Assert.assertEquals(browsers.get(BrowserType.EDGE).get(0).getPath(), "C:\\Program Files (x86)\\Microsoft_\\Edge\\Application\\msedge.exe");
+		Assert.assertEquals(browsers.get(BrowserType.EDGE).get(0).getVersion(), "92.0");
+		Assert.assertEquals(browsers.get(BrowserType.EDGE).get(1).getPath(), "C:\\Program Files (x86)\\Microsoft_\\Edge Beta\\Application\\msedge.exe");
+		Assert.assertEquals(browsers.get(BrowserType.EDGE).get(1).getVersion(), "93.0");
 	}
+	
 }

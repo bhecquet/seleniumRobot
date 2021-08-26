@@ -17,6 +17,8 @@
  */
 package com.seleniumtests.ut.browserfactory;
 
+import static org.mockito.Mockito.when;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -70,9 +72,9 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "72.0", "", false)));
 		PowerMockito.mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion()).thenReturn(browserInfos);
-		Mockito.when(config.getTestContext()).thenReturn(context);
-		Mockito.when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.NONE));
-		Mockito.when(config.getPageLoadStrategy()).thenReturn(PageLoadStrategy.NORMAL);
+		when(config.getTestContext()).thenReturn(context);
+		when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.NONE));
+		when(config.getPageLoadStrategy()).thenReturn(PageLoadStrategy.NORMAL);
 	}
 	
 	/**
@@ -81,9 +83,9 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilities() {
 		
-		Mockito.when(config.isEnableJavascript()).thenReturn(true);
-		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
-		Mockito.when(config.getNodeTags()).thenReturn(new ArrayList<>());
+		when(config.isEnableJavascript()).thenReturn(true);
+		when(config.getProxy()).thenReturn(proxyConfig);
+		when(config.getNodeTags()).thenReturn(new ArrayList<>());
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
@@ -102,10 +104,10 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithNodeTagsInGridMode() {
 		
-		Mockito.when(config.isEnableJavascript()).thenReturn(true);
-		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
-		Mockito.when(config.getNodeTags()).thenReturn(Arrays.asList("foo", "bar"));
-		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
+		when(config.isEnableJavascript()).thenReturn(true);
+		when(config.getProxy()).thenReturn(proxyConfig);
+		when(config.getNodeTags()).thenReturn(Arrays.asList("foo", "bar"));
+		when(config.getMode()).thenReturn(DriverMode.GRID);
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
@@ -119,8 +121,8 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithNodeTagsInLocalMode() {
 		
-		Mockito.when(config.getNodeTags()).thenReturn(Arrays.asList("foo", "bar"));
-		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		when(config.getNodeTags()).thenReturn(Arrays.asList("foo", "bar"));
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
@@ -130,9 +132,9 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithPlatform() {
 		
-		Mockito.when(config.isEnableJavascript()).thenReturn(true);
-		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
-		Mockito.when(config.getWebPlatform()).thenReturn(Platform.WINDOWS);
+		when(config.isEnableJavascript()).thenReturn(true);
+		when(config.getProxy()).thenReturn(proxyConfig);
+		when(config.getWebPlatform()).thenReturn(Platform.WINDOWS);
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
@@ -143,8 +145,8 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithJavascriptDisabled() {
 		
-		Mockito.when(config.isEnableJavascript()).thenReturn(false);
-		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
+		when(config.isEnableJavascript()).thenReturn(false);
+		when(config.getProxy()).thenReturn(proxyConfig);
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
@@ -155,9 +157,9 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithVersion() {
 		
-		Mockito.when(config.isEnableJavascript()).thenReturn(true);
-		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
-		Mockito.when(config.getBrowserVersion()).thenReturn("60.0");
+		when(config.isEnableJavascript()).thenReturn(true);
+		when(config.getProxy()).thenReturn(proxyConfig);
+		when(config.getBrowserVersion()).thenReturn("60.0");
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
@@ -177,7 +179,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateChromeCapabilitiesOverrideUserAgent() {
 		
-		Mockito.when(config.getUserAgentOverride()).thenReturn("CHROME 55");
+		when(config.getUserAgentOverride()).thenReturn("CHROME 55");
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
@@ -187,7 +189,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateChromeCapabilitiesHeadless() {
 		
-		Mockito.when(config.isHeadlessBrowser()).thenReturn(true);
+		when(config.isHeadlessBrowser()).thenReturn(true);
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
@@ -197,8 +199,8 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateChromeCapabilitiesUserDefinedProfile() {
 		
-		Mockito.when(config.getChromeProfilePath()).thenReturn("/home/foo/chrome");
-		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		when(config.getChromeProfilePath()).thenReturn("/home/foo/chrome");
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
@@ -208,8 +210,8 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateChromeCapabilitiesDefaultProfile() {
 		
-		Mockito.when(config.getChromeProfilePath()).thenReturn("default");
-		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		when(config.getChromeProfilePath()).thenReturn("default");
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
@@ -221,8 +223,8 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateChromeCapabilitiesWrongProfile() {
 		
-		Mockito.when(config.getChromeProfilePath()).thenReturn("wrongName");
-		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		when(config.getChromeProfilePath()).thenReturn("wrongName");
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
@@ -236,8 +238,8 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateChromeCapabilitiesOverrideBinPath() {
 		
-		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
-		Mockito.when(config.getChromeBinPath()).thenReturn("/opt/chrome/bin/chrome");
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		when(config.getChromeBinPath()).thenReturn("/opt/chrome/bin/chrome");
 
 		// SeleniumTestsContext class adds a browserInfo when binary path is set
 		Map<BrowserType, List<BrowserInfo>> updatedBrowserInfos = new HashMap<>();
@@ -254,7 +256,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateChromeCapabilitiesStandardDriverPathLocal() {
 		try {
-			Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
+			when(config.getMode()).thenReturn(DriverMode.LOCAL);
 			
 			new ChromeCapabilitiesFactory(config).createCapabilities();
 			
@@ -267,8 +269,8 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateChromeCapabilitiesOverrideDriverPathLocal() {
 		try {
-			Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
-			Mockito.when(config.getChromeDriverPath()).thenReturn("/opt/chrome/driver/chromedriver");
+			when(config.getMode()).thenReturn(DriverMode.LOCAL);
+			when(config.getChromeDriverPath()).thenReturn("/opt/chrome/driver/chromedriver");
 			
 			new ChromeCapabilitiesFactory(config).createCapabilities();
 			
@@ -280,7 +282,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testCreateChromeCapabilitiesStandardDriverPathGrid() {
-		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
+		when(config.getMode()).thenReturn(DriverMode.GRID);
 		
 		new ChromeCapabilitiesFactory(config).createCapabilities();
 		
@@ -293,8 +295,8 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultMobileCapabilities() {
 		
-		Mockito.when(config.isEnableJavascript()).thenReturn(true);
-		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
+		when(config.isEnableJavascript()).thenReturn(true);
+		when(config.getProxy()).thenReturn(proxyConfig);
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createMobileCapabilities(config);
 		
@@ -306,7 +308,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testCreateMobileCapabilitiesOverrideUserAgent() {
-		Mockito.when(config.getUserAgentOverride()).thenReturn("CHROME 55");
+		when(config.getUserAgentOverride()).thenReturn("CHROME 55");
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createMobileCapabilities(config);
 		
@@ -317,8 +319,8 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateChromeCapabilitiesWithDefaultProfileGrid() {
 		
-		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
-		Mockito.when(config.getChromeProfilePath()).thenReturn(BrowserInfo.DEFAULT_BROWSER_PRODFILE);
+		when(config.getMode()).thenReturn(DriverMode.GRID);
+		when(config.getChromeProfilePath()).thenReturn(BrowserInfo.DEFAULT_BROWSER_PRODFILE);
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
@@ -329,8 +331,8 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateChromeCapabilitiesWithUserProfileGrid() {
 		
-		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
-		Mockito.when(config.getChromeProfilePath()).thenReturn("/home/user/profile");
+		when(config.getMode()).thenReturn(DriverMode.GRID);
+		when(config.getChromeProfilePath()).thenReturn("/home/user/profile");
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
@@ -342,7 +344,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateChromeCapabilitiesWithoutDefaultProfileGrid() {
 		
-		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
+		when(config.getMode()).thenReturn(DriverMode.GRID);
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
@@ -354,8 +356,8 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateChromeCapabilitiesWrongProfileGrid() {
 		
-		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
-		Mockito.when(config.getChromeProfilePath()).thenReturn("foo");
+		when(config.getMode()).thenReturn(DriverMode.GRID);
+		when(config.getChromeProfilePath()).thenReturn("foo");
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 
@@ -367,7 +369,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 
 	@Test(groups={"ut"})
 	public void testCreateMobileCapabilitiesWithOptions() {
-		Mockito.when(config.getChromeOptions()).thenReturn("--key1=value1 --key2=value2");
+		when(config.getChromeOptions()).thenReturn("--key1=value1 --key2=value2");
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createMobileCapabilities(config);
 		
@@ -376,10 +378,26 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateChromeCapabilitiesWithOptions() {
 
-		Mockito.when(config.getChromeOptions()).thenReturn("--key1=value1 --key2=value2");
+		when(config.getChromeOptions()).thenReturn("--key1=value1 --key2=value2");
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process, --key1=value1, --key2=value2]");
+	}
+	
+	@Test(groups={"ut"})
+	public void testCreateChromeCapabilitiesWithLogging() {
+
+		try {
+			when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.DRIVER));
+			when(config.getMode()).thenReturn(DriverMode.LOCAL);
+			new ChromeCapabilitiesFactory(config).createCapabilities();
+			
+			Assert.assertEquals(System.getProperty(ChromeDriverService.CHROME_DRIVER_VERBOSE_LOG_PROPERTY), "true");
+			Assert.assertTrue(System.getProperty(ChromeDriverService.CHROME_DRIVER_LOG_PROPERTY).endsWith("chromedriver.log"));
+		} finally {
+			System.clearProperty(ChromeDriverService.CHROME_DRIVER_VERBOSE_LOG_PROPERTY);
+			System.clearProperty(ChromeDriverService.CHROME_DRIVER_LOG_PROPERTY);
+		}
 	}
 }

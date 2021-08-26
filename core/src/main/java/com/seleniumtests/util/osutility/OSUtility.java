@@ -44,9 +44,9 @@ public abstract class OSUtility {
 	
 	protected static final String LATEST_VERSION = "latest";
 	
-	private String[] webBrowserProcessList = {"chrome", "firefox", "iexplore", "safari"};
+	private String[] webBrowserProcessList = {"chrome", "firefox", "iexplore", "safari", "msedge"};
 
-	private String[] webDriverProcessList = {"chromedriver", "geckodriver", "iedriverserver", "microsoftwebdriver"};
+	private String[] webDriverProcessList = {"chromedriver", "geckodriver", "iedriverserver", "microsoftwebdriver", "edgedriver"};
 		
 	private static Map<BrowserType, List<BrowserInfo>> installedBrowsersWithVersion;
 	
@@ -196,36 +196,48 @@ public abstract class OSUtility {
     }
     
     /**
+     * @param pid : pId of the process
+     * @return true if the key is found in the running process list.
+     */
+    public ProcessInfo getProcessRunningByPid(String pid) {
+    	
+    	for (ProcessInfo processInfo : getRunningProcessList()) {
+    		if (pid.equals(processInfo.getPid())){
+    			return processInfo;
+    		}
+    	}
+    	return null;
+    }
+    
+    /**
      * @param showAll running process found
      * @return true if one of the running process is a known web browser.
      */
     public boolean isWebBrowserRunning(boolean showAll) {
     	
-    	boolean isRunning = false;
-    	for (ProcessInfo processInfo : getRunningProcessList()) {
-    		for (String processName : webBrowserProcessList){
-	    		if (processInfo.getName().equalsIgnoreCase(processName)){
-					isRunning = true;
-					if (!showAll) {
-						break;
-					}
-					logger.info("Web browser process is still running : " + processInfo.getName());
-	    		}
-    		}
-    	}
-    	return isRunning;
+    	return !whichWebBrowserRunning().isEmpty();
     }
     
     /**
      * @return the list of the running known web browser processes.
      */
     public List<ProcessInfo> whichWebBrowserRunning() {
+    	return whichWebBrowserRunning(false);
+    }
+
+    /**
+     * @return the list of the running known web browser processes.
+     * @param showAll running process found
+     */
+    public List<ProcessInfo> whichWebBrowserRunning(boolean showAll) {
     	
     	List<ProcessInfo> webBrowserRunningList = new ArrayList<>();
     	for (ProcessInfo processInfo : getRunningProcessList()) {
     		for (String processName : webBrowserProcessList){
-	    		if (processInfo.getName().equalsIgnoreCase(processName)){
-	    			logger.info("Web browser process still running : " + processInfo.getName());
+	    		if (processInfo.getName().equalsIgnoreCase(processName)) {
+	    			if (showAll) {
+	    				logger.info("Web browser process still running : " + processInfo.getName());
+	    			}
 	    			webBrowserRunningList.add(processInfo);
 	    		}
     		}
@@ -279,13 +291,11 @@ public abstract class OSUtility {
      */
     public void killAllWebBrowserProcess(boolean force){
     	
-    	for (ProcessInfo processInfo : getRunningProcessList()) {
-    		for (String processName : webBrowserProcessList) {
-    			if (processInfo.getName().equalsIgnoreCase(processName)){
-					logger.info("Asked system to terminate browser: " + processInfo.getName());
-		    		killProcess(processInfo.getPid(), force);
-    			}
-    		}
+    	List<ProcessInfo> browserProcesses = whichWebBrowserRunning(false);
+    	
+    	for (ProcessInfo processInfo : browserProcesses) {
+			logger.info("Asked system to terminate browser: " + processInfo.getName());
+    		killProcess(processInfo.getPid(), force);
     	}
     }
     
@@ -303,22 +313,7 @@ public abstract class OSUtility {
     		}
     	}
     }
-    
-    /**
-     * Terminate Internet explorer.
-     * @param force to kill the process
-     * @return output command lines
-     * @throws IOException
-     */
-    public String killIEProcess() {
-    	ProcessInfo processInfo = getRunningProcess("iexplore");
-		if (processInfo.getName() != null){
-			logger.info("Asked system to terminate : " + processInfo.getName());
-			return killProcess(processInfo.getPid(), true);	
-		}
-		return "Internet Explorer has not been found.";
-    }
-    
+   
     public abstract int getIEVersion();
     
     public abstract String getOSBuild();
@@ -453,7 +448,13 @@ public abstract class OSUtility {
      * @return
      */
     public static String extractEdgeVersion(String versionString) {
-    	return versionString.split("\\.")[0];
+    	Pattern regEdge = Pattern.compile("^(\\d+\\.\\d+).*");
+    	Matcher versionMatcher = regEdge.matcher(versionString.trim());
+    	if (versionMatcher.matches()) {
+    		return versionMatcher.group(1);
+    	} else {
+    		return "";
+    	}
     }
 
     /**

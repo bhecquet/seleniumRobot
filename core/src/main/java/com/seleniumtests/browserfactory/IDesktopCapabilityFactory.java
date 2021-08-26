@@ -51,6 +51,16 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
 		super(webDriverConfig);
 	}
 	
+	/**
+	 * Select the right browser info, depending on type, version and binary
+	 * If several version are available, the highest is selected. This means that if betaVersion option is selected, we will get the beta browser.
+	 * 
+	 * @param browserType		the browser to select (chrome, firefox, ...)
+	 * @param binPath			the browser binary to start, if specifically set by user through option. Else, installed browser will be used
+	 * @param driverPath		user defined driver. if null, default driver will be selected depending on browser and version
+	 * @param version			user defined version if user needs to start a specific version of the browser and this version is installed
+	 * @return
+	 */
     private BrowserInfo prepareBinaryAndDriver(final BrowserType browserType, final String binPath, final String driverPath, final String version) {
 
     	// automatic list from OS + binary added as launch option (see SeleniumTestsContext.updateInstalledBrowsers())

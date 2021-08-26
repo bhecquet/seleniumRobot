@@ -133,8 +133,6 @@ public class DriverExceptionListener implements WebDriverEventListener {
         		|| ex instanceof UnsupportedCommandException
         		|| ex.getMessage().contains(" read-only")
         		|| ex.getMessage().contains("not implemented")
-        		|| ex instanceof org.openqa.selenium.remote.UnreachableBrowserException
-        		|| ex instanceof NoSuchSessionException
         		|| ex instanceof org.openqa.selenium.UnsupportedCommandException
         		|| ex instanceof MoveTargetOutOfBoundsException  // exception raised when element is non clickable
         		|| ex instanceof InvalidElementStateException    // exception raised when element is non clickable
@@ -184,11 +182,16 @@ public class DriverExceptionListener implements WebDriverEventListener {
         } else {
             String message = ex.getMessage().split("\\n")[0];
             logger.warn("Got exception:" + message);
-            if (message.matches("Session .*? was terminated due to(.|\\n)*")
+            if (
+            		ex instanceof org.openqa.selenium.remote.UnreachableBrowserException
+            		|| ex instanceof NoSuchSessionException
+            		|| message.matches("Session .*? was terminated due to(.|\\n)*")
             		|| message.matches("Session .*? not available .*")
                     || message.matches("cannot forward the request .*")
                     || message.matches("Session is closed")
                     || message.contains("Unable to get browser")
+                    || message.contains("not reachable")
+                    || message.contains("Tried to run command without establishing a connection")
                     || message.matches("Session ID is null.*")
                     || message.contains("java.net.ConnectException: Failed to connect")
                     || message.contains("java.net.ConnectException: Connection refused")
