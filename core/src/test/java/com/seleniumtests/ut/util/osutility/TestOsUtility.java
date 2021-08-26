@@ -82,12 +82,12 @@ public class TestOsUtility extends GenericTest {
 	
 	@Test(groups={"ut"})
 	public void testExtractEdgeVersion() {
-		Assert.assertEquals(OSUtility.extractEdgeVersion("10240.th1.160802-1852"), "10240");
+		Assert.assertEquals(OSUtility.extractEdgeVersion("92.0.902.78"), "92.0");
 	}
 	
 	@Test(groups={"ut"})
 	public void testExtractEdgeVersionNotFound() {
-		Assert.assertEquals(OSUtility.extractEdgeVersion("Edge 10240"), "Edge 10240");
+		Assert.assertEquals(OSUtility.extractEdgeVersion("Edge 92.0.902.78"), "");
 	}
 	
 	
