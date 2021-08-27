@@ -83,7 +83,7 @@ public class TestBrowserInfo extends MockitoTest {
 	
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testDriverDoesNotExist() {
-		BrowserInfo bInfo = new BrowserInfo(BrowserType.EDGE, "10241", null);
+		BrowserInfo bInfo = new BrowserInfo(BrowserType.EDGE, "10", null);
 		bInfo.getDriverFileName();
 	}
 	
