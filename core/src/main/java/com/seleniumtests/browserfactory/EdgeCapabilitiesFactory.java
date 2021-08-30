@@ -20,16 +20,13 @@ package com.seleniumtests.browserfactory;
 import java.nio.file.Paths;
 
 import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.chrome.ChromeDriverService;
 
 import com.microsoft.edge.seleniumtools.EdgeDriverService;
 import com.microsoft.edge.seleniumtools.EdgeOptions;
-import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.logging.DebugMode;
-import com.seleniumtests.util.osutility.OSUtility;
 
 public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
 
@@ -39,9 +36,6 @@ public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
 
 	@Override
 	protected MutableCapabilities getDriverOptions() {
-        if (!OSUtility.isWindows10() && webDriverConfig.getMode() == DriverMode.LOCAL) {
-        	throw new ConfigurationException("Edge browser is only available on Windows 10");
-        }
         
         EdgeOptions options = new EdgeOptions();
         options.setPageLoadStrategy(webDriverConfig.getPageLoadStrategy());
