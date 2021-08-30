@@ -436,7 +436,7 @@ public class TestWebUiDriver extends ReporterTest {
 		int port = GenericDriverTest.findFreePort();
 		
 		// create chrome browser with the right option
-		new BrowserLauncher(BrowserType.CHROME, port, path, 0).run();
+		new BrowserLauncher(BrowserType.CHROME, port, path, 0, null).run();
 			
 		// creates the driver
 		WebDriver driver1 = WebUIDriver.getWebDriver(true, BrowserType.CHROME, "main", port);
@@ -458,7 +458,7 @@ public class TestWebUiDriver extends ReporterTest {
 		int port = GenericDriverTest.findFreePort();
 		
 		logger.info("will start browser in 15 secs");
-		new BrowserLauncher(BrowserType.CHROME, port, path, 30).run();
+		new BrowserLauncher(BrowserType.CHROME, port, path, 30, null).run();
 
 		logger.info("Waiting for driver");
 		
@@ -482,43 +482,49 @@ public class TestWebUiDriver extends ReporterTest {
 	
 	/**
 	 * Check we can attach Selenium to a internet explorer process if it's through API
+	 * @throws Exception 
 	 */
 	@Test(groups={"it"})
-	public void testAttachExternalIEBrowser() {
+	public void testAttachExternalIEBrowser() throws Exception {
 		
 		if (!SystemUtils.IS_OS_WINDOWS) {
 			throw new SkipException("This test can only be done on Windows");
 		}
+		exposeWebServer();
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 
 		// creates the first driver so that an internet explorer process is created the right way
-		new BrowserLauncher(BrowserType.INTERNET_EXPLORER, 0, null, 0).run();
+		new BrowserLauncher(BrowserType.INTERNET_EXPLORER, 0, null, 0, serverUrl).run();
 		
-		// attached a second driver to the previous browser
+		// attach a second driver to the previous browser
 		WebDriver driverAttached = WebUIDriver.getWebDriver(true, BrowserType.INTERNET_EXPLORER, "second", 0);
-		driverAttached.get("about:blank");
+		Assert.assertEquals(driverAttached.getCurrentUrl(), serverUrl); // check we are connected to the first started browser
+		driverAttached.get("about:blank"); // check we can control the browser
 	}
 
 	/**
 	 * Be sure that we can still attach driver even if it takes a long time to start
 	 * For IE, max wait time is 2 minutes
+	 * @throws Exception 
 	 */
 	@Test(groups={"it"})
-	public void testAttachExternalInternetExplorerStartingLate() {
+	public void testAttachExternalInternetExplorerStartingLate() throws Exception {
 
 		if (!SystemUtils.IS_OS_WINDOWS) {
 			throw new SkipException("This test can only be done on Windows");
 		}
-		
+
+		exposeWebServer();
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 		
 		logger.info("will start browser in 30 secs");
-		new BrowserLauncher(BrowserType.INTERNET_EXPLORER, 0, null, 30).run();
+		new BrowserLauncher(BrowserType.INTERNET_EXPLORER, 0, null, 30, serverUrl).run();
 		logger.info("Waiting for driver");
 		
 		// creates the driver
 		WebDriver driverAttached = WebUIDriver.getWebDriver(true, BrowserType.INTERNET_EXPLORER, "second", 0);
-		driverAttached.get("about:blank");
+		Assert.assertEquals(driverAttached.getCurrentUrl(), serverUrl); // check we are connected to the first started browser
+		driverAttached.get("about:blank"); // check we can control the browser
 	}
 
 	/**
@@ -548,12 +554,14 @@ public class TestWebUiDriver extends ReporterTest {
 		private int port;
 		private int delay;
 		private BrowserType browserType;
+		private String startupUrl;
 		
-		public BrowserLauncher(BrowserType browserType, int port, String path, int delay) {
+		public BrowserLauncher(BrowserType browserType, int port, String path, int delay, String startupUrl) {
 			this.port = port;
 			this.path = path;
 			this.delay = delay;
 			this.browserType = browserType;
+			this.startupUrl = startupUrl;
 		}
 		
 		public void run() {
@@ -564,7 +572,10 @@ public class TestWebUiDriver extends ReporterTest {
 				// create chrome browser with the right option
 				OSCommand.executeCommand(new String[] {path, "--remote-debugging-port=" + port, "about:blank"});
 			} else if (BrowserType.INTERNET_EXPLORER == browserType) {
-				WebUIDriver.getWebDriver(true, BrowserType.INTERNET_EXPLORER, "main", null);
+				WebDriver driver = WebUIDriver.getWebDriver(true, BrowserType.INTERNET_EXPLORER, "main", null);
+				if (startupUrl != null) {
+					driver.get(startupUrl);
+				}
 			}
 		 }
 	}

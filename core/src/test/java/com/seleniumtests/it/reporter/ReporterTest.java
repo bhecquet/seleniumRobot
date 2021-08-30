@@ -20,6 +20,7 @@ package com.seleniumtests.it.reporter;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.Inet4Address;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,12 +32,12 @@ import java.util.Random;
 import org.apache.commons.io.FileUtils;
 import org.testng.ITestContext;
 import org.testng.TestNG;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.xml.XmlClass;
 import org.testng.xml.XmlInclude;
 import org.testng.xml.XmlPackage;
 import org.testng.xml.XmlSuite;
-import org.testng.xml.XmlSuite.FailurePolicy;
 import org.testng.xml.XmlSuite.ParallelMode;
 import org.testng.xml.XmlTest;
 
@@ -45,10 +46,38 @@ import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.StatisticsStorage;
+import com.seleniumtests.it.driver.support.server.WebServer;
 
 public class ReporterTest extends ConnectorsTest {
 	
 
+	protected String serverUrl;
+	protected WebServer server;
+	
+	protected Map<String, String> getPageMapping() {
+		Map<String, String> mapping = new HashMap<>();
+		mapping.put("/tu/test.html", "/test.html");
+		return mapping;
+	}
+	
+	@AfterClass(groups={"it", "ut"}, alwaysRun=true)
+	public void stop() throws Exception {
+		if (server != null) {
+			logger.info("stopping web server");
+			server.stop();
+		}
+	}
+
+	public void exposeWebServer() throws Exception {
+		String localAddress = Inet4Address.getLocalHost().getHostAddress();
+		//localAddress = Inet4Address.getByName("localhost").getHostAddress();
+        server = new WebServer(localAddress, getPageMapping());
+        server.expose();
+
+		serverUrl = String.format("http://%s:%d/test.html", localAddress, server.getServerHost().getPort());
+        logger.info(String.format("exposing server on http://%s:%d", localAddress, server.getServerHost().getPort()));
+	}
+	
 	@BeforeMethod(groups={"it"})
 	public void setLogs(Method method, ITestContext context) throws IOException {
 		GenericTest.resetTestNGREsultAndLogger();
