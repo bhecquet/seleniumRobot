@@ -31,7 +31,6 @@ import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriverService;
 import org.openqa.selenium.remote.CapabilityType;
 import org.powermock.api.mockito.PowerMockito;
@@ -241,7 +240,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 	
 
 	@Test(groups={"ut"})
-	public void testCreateChromeCapabilitiesWithLogging() {
+	public void testCreateEdgeCapabilitiesWithLogging() {
 
 		try {
 			when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.DRIVER));
@@ -254,5 +253,80 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 			System.clearProperty(EdgeDriverService.EDGE_DRIVER_VERBOSE_LOG_PROPERTY);
 			System.clearProperty(EdgeDriverService.EDGE_DRIVER_LOG_PROPERTY);
 		}
+	}
+
+	@Test(groups={"ut"})
+	public void testCreateEdgeCapabilitiesWithDefaultProfileGrid() {
+		
+		when(config.getMode()).thenReturn(DriverMode.GRID);
+		when(config.getEdgeProfilePath()).thenReturn(BrowserInfo.DEFAULT_BROWSER_PRODFILE);
+		
+		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
+		
+		// check 'chromeProfile' is set to 'default'
+		Assert.assertEquals(capa.getCapability("edgeProfile"), BrowserInfo.DEFAULT_BROWSER_PRODFILE);
+	}
+	
+	@Test(groups={"ut"})
+	public void testCreateEdgeCapabilitiesWithUserProfileGrid() {
+		
+		when(config.getMode()).thenReturn(DriverMode.GRID);
+		when(config.getEdgeProfilePath()).thenReturn("/home/user/profile");
+		
+		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
+		
+		// check option is added with user profile
+		Assert.assertNull(capa.getCapability("edgeProfile"));
+		Assert.assertTrue(((Map<String, List<String>>)(((EdgeOptions)capa).asMap().get(EdgeOptions.CAPABILITY))).get("args").contains("--user-data-dir=/home/user/profile"));
+	}
+	
+	@Test(groups={"ut"})
+	public void testCreateEdgeCapabilitiesWithoutDefaultProfileGrid() {
+		
+		when(config.getMode()).thenReturn(DriverMode.GRID);
+		
+		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
+		
+		// check 'edgeProfile' is not set as not requested, and no option added
+		Assert.assertNull(capa.getCapability("edgeProfile"));
+		Assert.assertFalse(((Map<String, List<String>>)(((EdgeOptions)capa).asMap().get(EdgeOptions.CAPABILITY))).get("args").toString().contains("--user-data-dir=/home/user/profile"));
+	}
+	
+	@Test(groups={"ut"})
+	public void testCreateEdgeCapabilitiesWrongProfileGrid() {
+		
+		when(config.getMode()).thenReturn(DriverMode.GRID);
+		when(config.getEdgeProfilePath()).thenReturn("foo");
+		
+		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
+
+		// check 'edgeProfile' is not set as it's wrong profile path, and no option added
+		Assert.assertNull(capa.getCapability("edgeProfile"));
+		Assert.assertFalse(((Map<String, List<String>>)(((EdgeOptions)capa).asMap().get(EdgeOptions.CAPABILITY))).get("args").toString().contains("--user-data-dir=/home/user/profile"));
+	}
+
+	@Test(groups={"ut"})
+	public void testCreateEdgeCapabilitiesDefaultProfile() {
+		
+		when(config.getEdgeProfilePath()).thenReturn("default");
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		
+		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
+		
+		// a user data dir is configured
+		Assert.assertNotEquals(((Map<?,?>)(((EdgeOptions)capa).asMap().get(EdgeOptions.CAPABILITY))).get("args").toString(), "[--user-data-dir=/home/foo/chrome]");
+		Assert.assertTrue(((Map<?,?>)(((EdgeOptions)capa).asMap().get(EdgeOptions.CAPABILITY))).get("args").toString().startsWith("[--user-data-dir="));
+	}
+	
+	@Test(groups={"ut"})
+	public void testCreateEdgeCapabilitiesWrongProfile() {
+		
+		when(config.getEdgeProfilePath()).thenReturn("wrongName");
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		
+		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
+		
+		// a user data dir is configured
+		Assert.assertEquals(((Map<?,?>)(((EdgeOptions)capa).asMap().get(EdgeOptions.CAPABILITY))).get("args").toString(), "[]");
 	}
 }

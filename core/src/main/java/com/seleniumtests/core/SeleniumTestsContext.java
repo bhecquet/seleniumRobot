@@ -107,6 +107,7 @@ public class SeleniumTestsContext {
     public static final String FIREFOX_USER_PROFILE_PATH = "firefoxUserProfilePath";	// firefox user profile
     public static final String OPERA_USER_PROFILE_PATH = "operaUserProfilePath";	// profile utilisateur opéra
     public static final String CHROME_USER_PROFILE_PATH = "chromeUserProfilePath";	// chrome user profile
+    public static final String EDGE_USER_PROFILE_PATH = "edgeUserProfilePath";	// edge user profile
     public static final String CHROME_OPTIONS = "chromeOptions";				// options to give to chrome at startup
     public static final String FIREFOX_BINARY_PATH = "firefoxBinaryPath";		// chemin vers le binaire firefox (firefox portable ou pour utiliser une version spécifique
     public static final String CHROME_DRIVER_PATH = "chromeDriverPath";			// chemin vers chromeDriver si on souhaite utiliser une version différente
@@ -116,7 +117,8 @@ public class SeleniumTestsContext {
     public static final String IE_DRIVER_PATH = "ieDriverPath";					// chemin vers le driver Internet Explorer
     public static final String USER_AGENT = "userAgent";						// user agent utilisé pour les tests. Permet d'écraser le user-agent par défaut du navigateur, sur firefox et chrome uniquement
     public static final String BETA_BROWSER = "betaBrowser";					// enable usage of beta browsers	
-
+    public static final String EDGE_IE_MODE  = "edgeIeMode";					// if true, Edge is started in IE mode
+    
     public static final String VIEWPORT_WIDTH = "viewPortWidth";					// width of viewport	
     public static final String VIEWPORT_HEIGHT = "viewPortHeight";					// height of viewport
     
@@ -288,6 +290,7 @@ public class SeleniumTestsContext {
 	public static final boolean DEFAULT_REPORTPORTAL_ACTIVE = false;
 	public static final ElementInfo.Mode DEFAULT_ADVANCED_ELEMENT_SEARCH = ElementInfo.Mode.FALSE;
 	public static final String DEFAULT_IMAGE_FIELD_DETECTOR_SERVER_URL = null;
+	public static final boolean DEFAULT_EDGE_IE_MODE = false;
     
     public static final int DEFAULT_REPLAY_TIME_OUT = 30;
     
@@ -416,6 +419,7 @@ public class SeleniumTestsContext {
         setFirefoxUserProfilePath(getValueForTest(FIREFOX_USER_PROFILE_PATH, System.getProperty(FIREFOX_USER_PROFILE_PATH)));
         setOperaUserProfilePath(getValueForTest(OPERA_USER_PROFILE_PATH, System.getProperty(OPERA_USER_PROFILE_PATH)));
         setChromeUserProfilePath(getValueForTest(CHROME_USER_PROFILE_PATH, System.getProperty(CHROME_USER_PROFILE_PATH)));
+        setEdgeUserProfilePath(getValueForTest(EDGE_USER_PROFILE_PATH, System.getProperty(EDGE_USER_PROFILE_PATH)));
         setChromeOptions(getValueForTest(CHROME_OPTIONS, System.getProperty(CHROME_OPTIONS)));
         setFirefoxBinary(getValueForTest(FIREFOX_BINARY_PATH, System.getProperty(FIREFOX_BINARY_PATH)));
         setChromeBinary(getValueForTest(CHROME_BINARY_PATH, System.getProperty(CHROME_BINARY_PATH)));
@@ -1194,6 +1198,10 @@ public class SeleniumTestsContext {
     	return (String) getAttribute(EDGE_DRIVER_PATH);
     }
     
+    public Boolean getEdgeIeMode() {
+    	return (Boolean) getAttribute(EDGE_IE_MODE);
+    }
+    
     public Boolean getBetaBrowser() {
     	return (Boolean) getAttribute(BETA_BROWSER);
     }
@@ -1402,6 +1410,10 @@ public class SeleniumTestsContext {
     
     public String getChromeUserProfilePath() {
     	return (String) getAttribute(CHROME_USER_PROFILE_PATH);
+    }
+    
+    public String getEdgeUserProfilePath() {
+    	return (String) getAttribute(EDGE_USER_PROFILE_PATH);
     }
     
     public String getChromeOptions() {
@@ -2168,6 +2180,9 @@ public class SeleniumTestsContext {
     	if (getPlatform() != null) {
         	configureTestType();
     	}
+
+    	setEdgeIeMode("iexploreEdge".equals(browser));
+
     }
     
     public void setBrowserVersion(String browserVersion) {
@@ -2203,6 +2218,16 @@ public class SeleniumTestsContext {
     	}  		
     }
     
+    public void setEdgeUserProfilePath(String path) {
+    	if (path != null && getBrowser() == BrowserType.EDGE) {
+    		if ((new File(path).exists() && getRunMode() == DriverMode.LOCAL) || getRunMode() != DriverMode.LOCAL || BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(path)) {
+    			setAttribute(EDGE_USER_PROFILE_PATH, path);
+    		} else {
+    			throw new ConfigurationException(String.format("Edge user profile does not exist at %s", path));
+    		}
+    	}  		
+    }
+    
     public void setFirefoxBinary(String path) {
     	if (path != null && !new File(path).exists()) {
     		throw new ConfigurationException("Firefox path does not exist: " + path);
@@ -2227,6 +2252,10 @@ public class SeleniumTestsContext {
     
     public void setEdgeDriverPath(String path) {
     	setAttribute(EDGE_DRIVER_PATH, path);
+    }
+    
+    public void setEdgeIeMode(boolean ieMode) {
+    	setAttribute(EDGE_IE_MODE, ieMode);
     }
     
     public void setIEDriverPath(String path) {

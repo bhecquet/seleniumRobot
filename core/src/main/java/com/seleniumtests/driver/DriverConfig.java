@@ -113,6 +113,10 @@ public class DriverConfig {
         return testContext.getChromeDriverPath();
     }
     
+    public Boolean getIeMode() {
+    	return testContext.getEdgeIeMode();
+    }
+    
     public List<String> getNodeTags() {
     	return testContext.getNodeTags();
     }
@@ -147,6 +151,10 @@ public class DriverConfig {
     
     public String getChromeProfilePath() {
     	return testContext.getChromeUserProfilePath();
+    }
+    
+    public String getEdgeProfilePath() {
+    	return testContext.getEdgeUserProfilePath();
     }
 
     public List<String> getHubUrl() {

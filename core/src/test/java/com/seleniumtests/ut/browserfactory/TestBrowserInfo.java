@@ -385,6 +385,33 @@ public class TestBrowserInfo extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
+	public void testGetDefaultEdgeWindowsProfile() throws Exception {
+		PowerMockito.mockStatic(OSUtility.class);
+		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
+		
+		BrowserInfo bi = new BrowserInfo(BrowserType.EDGE, "90.0", null);
+		Assert.assertTrue(bi.getDefaultProfilePath().replace("\\",  "/").matches("C:/Users/.*?/AppData/Local/Microsoft/Edge/User Data"));
+	}
+
+	@Test(groups={"ut"})
+	public void testGetDefaultEdgeLinuxProfile() throws Exception {
+		PowerMockito.mockStatic(OSUtility.class);
+		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.LINUX);
+		
+		BrowserInfo bi = new BrowserInfo(BrowserType.EDGE, "90.0", null);
+		Assert.assertTrue(bi.getDefaultProfilePath().matches("/home/.*?/.config/edge/default"));
+	}
+
+	@Test(groups={"ut"})
+	public void testGetDefaultEdgeMacProfile() throws Exception {
+		PowerMockito.mockStatic(OSUtility.class);
+		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
+		
+		BrowserInfo bi = new BrowserInfo(BrowserType.EDGE, "90.0", null);
+		Assert.assertTrue(bi.getDefaultProfilePath().matches("/Users/.*?/Library/Application Support/Microsoft/Edge"));
+	}
+	
+	@Test(groups={"ut"})
 	public void testGetDefaultChromeWindowsProfile() throws Exception {
 		PowerMockito.mockStatic(OSUtility.class);
 		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
@@ -393,8 +420,9 @@ public class TestBrowserInfo extends MockitoTest {
 		Assert.assertTrue(bi.getDefaultProfilePath().replace("\\",  "/").matches("C:/Users/.*?/AppData/Local/Google/Chrome/User Data"));
 	}
 	
+	
 	@Test(groups={"ut"})
-	public void testGetDefaultChromeLinuxsProfile() throws Exception {
+	public void testGetDefaultChromeLinuxProfile() throws Exception {
 		PowerMockito.mockStatic(OSUtility.class);
 		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.LINUX);
 		
