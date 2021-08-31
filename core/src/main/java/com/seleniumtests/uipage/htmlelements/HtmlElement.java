@@ -363,7 +363,8 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 
         String mouseOverScript;
         if ((driverConfig.getBrowserType() == BrowserType.FIREFOX && FirefoxDriverFactory.isMarionetteMode())
-            	|| (driverConfig.getBrowserType() == BrowserType.CHROME 
+            	|| driverConfig.getBrowserType() == BrowserType.EDGE
+        		|| (driverConfig.getBrowserType() == BrowserType.CHROME 
 	        			&& driverConfig.getMajorBrowserVersion() >= 75)) {
         		mouseOverScript = "var event = new MouseEvent('mouseover', {view: window, bubbles: true, cancelable: true}) ; arguments[0].dispatchEvent(event);";
             } else {
@@ -375,6 +376,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         
         String clickScript = "";
         if ((driverConfig.getBrowserType() == BrowserType.FIREFOX && FirefoxDriverFactory.isMarionetteMode())
+        		|| driverConfig.getBrowserType() == BrowserType.EDGE
             	|| (driverConfig.getBrowserType() == BrowserType.CHROME 
 	        			&& driverConfig.getMajorBrowserVersion() >= 75)) {
         	clickScript = "var event = new MouseEvent('click', {view: window, bubbles: true, cancelable: true}) ;"
@@ -396,6 +398,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         
         String doubleClickScript;
         if ((driverConfig.getBrowserType() == BrowserType.FIREFOX && FirefoxDriverFactory.isMarionetteMode())
+        		|| driverConfig.getBrowserType() == BrowserType.EDGE
             	|| (driverConfig.getBrowserType() == BrowserType.CHROME 
 	        			&& driverConfig.getMajorBrowserVersion() >= 75)) {
         		doubleClickScript = "var event = new MouseEvent('dblclick', {view: window, bubbles: true, cancelable: true}) ;"
@@ -421,6 +424,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         // handlitee org.openqa.selenium.UnsupportedCommandException: sendKeysToActiveElement which are not available for firefox and IE
         if ((driverConfig.getBrowserType() == BrowserType.FIREFOX && FirefoxDriverFactory.isMarionetteMode())
         		|| driverConfig.getBrowserType() == BrowserType.INTERNET_EXPLORER
+        		|| driverConfig.getBrowserType() == BrowserType.EDGE
 	        	|| (driverConfig.getBrowserType() == BrowserType.CHROME 
 	        			&& driverConfig.getMajorBrowserVersion() >= 75)) {
         	logger.warn("using specific Marionette method");

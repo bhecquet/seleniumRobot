@@ -232,7 +232,8 @@ public class ReplayAction {
 				
 				// chrome automatically scrolls to element before interacting but it may scroll behind fixed header and no error is 
 				// raised if action cannot be performed
-				if (((CustomEventFiringWebDriver)WebUIDriver.getWebDriver(false)).getBrowserInfo().getBrowser() == BrowserType.CHROME) {
+				if (((CustomEventFiringWebDriver)WebUIDriver.getWebDriver(false)).getBrowserInfo().getBrowser() == BrowserType.CHROME
+						|| ((CustomEventFiringWebDriver)WebUIDriver.getWebDriver(false)).getBrowserInfo().getBrowser() == BrowserType.EDGE) {
 					updateScrollFlagForElement(joinPoint, true, null);
 				}
 				
