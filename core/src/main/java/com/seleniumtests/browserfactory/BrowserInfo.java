@@ -122,6 +122,9 @@ public class BrowserInfo {
 			case CHROME:
 				addChromeDefaultProfilePath();
 				break;
+			case EDGE:
+				addEdgeDefaultProfilePath();
+				break;
 			case FIREFOX:
 				addFirefoxDefaultProfilePath();
 				break;
@@ -323,6 +326,17 @@ public class BrowserInfo {
 			defaultProfilePath = String.format("/home/%s/.config/google-chrome/default", System.getProperty(USER_NAME));
 		} else if (platform == Platform.MAC) {
 			defaultProfilePath = String.format("/Users/%s/Library/Application Support/Google/Chrome", System.getProperty(USER_NAME));
+		}
+	}
+	
+	private void addEdgeDefaultProfilePath() {
+		Platform platform = OSUtility.getCurrentPlatorm();
+		if (platform == Platform.WINDOWS) {
+			defaultProfilePath = String.format("C:\\Users\\%s\\AppData\\Local\\Microsoft\\Edge\\User Data", System.getProperty(USER_NAME));
+		} else if (platform == Platform.LINUX) {
+			defaultProfilePath = String.format("/home/%s/.config/edge/default", System.getProperty(USER_NAME));
+		} else if (platform == Platform.MAC) {
+			defaultProfilePath = String.format("/Users/%s/Library/Application Support/Microsoft/Edge", System.getProperty(USER_NAME));
 		}
 	}
 	

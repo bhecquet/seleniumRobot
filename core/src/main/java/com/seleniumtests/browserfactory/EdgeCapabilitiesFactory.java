@@ -20,6 +20,7 @@ package com.seleniumtests.browserfactory;
 import java.nio.file.Paths;
 
 import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.chrome.ChromeOptions;
 
 import com.microsoft.edge.seleniumtools.EdgeDriverService;
 import com.microsoft.edge.seleniumtools.EdgeOptions;
@@ -29,6 +30,8 @@ import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.logging.DebugMode;
 
 public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
+
+	private static final String USER_DATA_DIR_OPTION = "--user-data-dir=";
 
     public EdgeCapabilitiesFactory(DriverConfig webDriverConfig) {
 		super(webDriverConfig);
@@ -81,6 +84,16 @@ public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
 	@Override
 	protected void updateOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
 		((EdgeOptions)options).setBinary(selectedBrowserInfo.getPath());
+		
+		if (webDriverConfig.getEdgeProfilePath() != null) {
+        	if (!BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getEdgeProfilePath()) && (webDriverConfig.getEdgeProfilePath().contains("/") || webDriverConfig.getEdgeProfilePath().contains("\\"))) {
+        		((EdgeOptions)options).addArguments(USER_DATA_DIR_OPTION + webDriverConfig.getEdgeProfilePath()); // e.g: C:\\Users\\MyUser\\AppData\\Local\\Microsoft\\Edge\\User Data
+        	} else if (BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getEdgeProfilePath())) {
+        		((EdgeOptions)options).addArguments(USER_DATA_DIR_OPTION + selectedBrowserInfo.getDefaultProfilePath()); 
+        	} else {
+        		logger.warn(String.format("Edge profile %s could not be set", webDriverConfig.getEdgeProfilePath()));
+        	}
+        }
 	}
 
 	@Override
@@ -90,7 +103,15 @@ public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
 
 	@Override
 	protected void updateGridOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
-		// TODO Auto-generated method stub
+		if (webDriverConfig.getEdgeProfilePath() != null) {
+        	if (!BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getEdgeProfilePath()) && (webDriverConfig.getEdgeProfilePath().contains("/") || webDriverConfig.getEdgeProfilePath().contains("\\"))) {
+        		((EdgeOptions)options).addArguments(USER_DATA_DIR_OPTION + webDriverConfig.getEdgeProfilePath()); // e.g: C:\\Users\\MyUser\\AppData\\Local\\Microsoft\\Edge\\User Data
+        	} else if (BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getEdgeProfilePath())) {
+        		options.setCapability("edgeProfile", BrowserInfo.DEFAULT_BROWSER_PRODFILE);
+        	} else {
+        		logger.warn(String.format("Edge profile %s could not be set", webDriverConfig.getEdgeProfilePath()));
+        	}
+        }
 		
 	} 
 }

@@ -681,6 +681,44 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	
 	@Test(groups="ut context")
+	public void testEdgeProfilePath(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setBrowser("edge");
+		SeleniumTestsContextManager.getThreadContext().setEdgeUserProfilePath("default");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getEdgeUserProfilePath(), BrowserInfo.DEFAULT_BROWSER_PRODFILE);
+	}
+	@Test(groups="ut context")
+	public void testEdgeProfilePathForGrid(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("edge");
+		SeleniumTestsContextManager.getThreadContext().setEdgeUserProfilePath("/home/user/edge");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getEdgeUserProfilePath(), "/home/user/edge");
+	}
+	@Test(groups="ut context", expectedExceptions = ConfigurationException.class)
+	public void testWrongEdgeProfilePathForLocal(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setRunMode("local");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("edge");
+		SeleniumTestsContextManager.getThreadContext().setEdgeUserProfilePath("/home/user/edge");
+	}
+	@Test(groups="ut context")
+	public void testEdgeProfilePathForLocal(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setRunMode("local");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("edge");
+		SeleniumTestsContextManager.getThreadContext().setEdgeUserProfilePath(SeleniumTestsContextManager.getApplicationDataPath());
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getEdgeUserProfilePath(), SeleniumTestsContextManager.getApplicationDataPath());
+	}
+	@Test(groups="ut context")
+	public void testEdgeProfilePathWithOtherBrowser(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
+		SeleniumTestsContextManager.getThreadContext().setEdgeUserProfilePath("default");
+		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getEdgeUserProfilePath());
+	}
+	
+	@Test(groups="ut context")
 	public void testFirefoxProfilePath(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
