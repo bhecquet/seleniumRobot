@@ -256,7 +256,10 @@ typical / minimal configuration would be
 ```
 Many transitions may be defined so that several steps of the workflow can be run through.
 for example: `To Analyze/To resolve/Resolve`
-SeleniumRobot will look for the current available transition of the issue and then run through all the remaining ones
+SeleniumRobot will look for the current available transition of the issue and then run through all the remaining ones.
+**Configured user MUST have the rights to perform transitions on projet. Else, you will get the following error**
+`Error generating report
+com.seleniumtests.customexception.ConfigurationException: 'bugtracker.jira.closeTransition' values [xxx/yyy] are unknown for this issue, allowed transitions are []`
 
 
 Depending on jira project, you may need to specify additional options if the fields (components and custom fields) are mandatory
