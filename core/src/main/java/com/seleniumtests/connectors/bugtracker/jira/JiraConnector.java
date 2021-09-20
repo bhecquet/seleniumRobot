@@ -631,11 +631,12 @@ public class JiraConnector extends BugTracker {
 	 * 		password => password to connect to jira
 	 * 		project => projectkey
 	 * 		issueType => type of the issue that will be created
+	 * 		issueKey (optional) => give the transitions for a specific issue 
 	 * 		
 	 */
 	public static void main(String[] args) {
 		
-		if (args.length != 5) {
+		if (args.length < 5) {
 			System.out.println("Usage: JiraConnector <server> <projectKey> <user> <password> <issueType>");
 			System.exit(1);
 		}
@@ -668,6 +669,20 @@ public class JiraConnector extends BugTracker {
     		for (String value: entry.getValue()) {
     			System.out.println(String.format(ITEM, value));
     		}
+    	}
+    	
+    	if (args.length >= 6) {
+    		IssueRestClient issueClient = jiraConnector.restClient.getIssueClient();
+            Issue issue;
+            try {
+            	issue = issueClient.getIssue(args[5]).claim();
+            } catch (RestClientException e) {
+            	throw new ScenarioException(String.format("Jira issue %s does not exist, cannot close it", args[5]));
+            }
+
+            Map<String, Transition> transitions = new HashMap<>();
+            issueClient.getTransitions(issue).claim().forEach(transition -> transitions.put(transition.getName(), transition));
+            System.out.println(transitions);
     	}
     	
     	
