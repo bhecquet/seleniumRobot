@@ -190,7 +190,7 @@ public class TestBugTracker extends MockitoTest {
 		BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
 			
 		bugtracker.createIssue("selenium", "DEV", "ngName", "testUpdateIssue", "some description", 
-				Arrays.asList(step2, stepEnd), issueOptions);
+				Arrays.asList(step1, step2, stepEnd), issueOptions);
 		
 		// check that we check if the issue already exists
 		verify(fbt).issueAlreadyExists(any(IssueBean.class));
@@ -212,7 +212,7 @@ public class TestBugTracker extends MockitoTest {
 		BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
 	
 		bugtracker.createIssue("selenium", "DEV", "ngName", "testDoNotUpdateIssue", "some description", 
-				Arrays.asList(step2, stepEnd), issueOptions);
+				Arrays.asList(step1, step2, stepEnd), issueOptions);
 		
 		// check that we check if the issue already exists
 		verify(fbt).issueAlreadyExists(any(IssueBean.class));
