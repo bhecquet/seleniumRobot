@@ -260,14 +260,8 @@ public abstract class BugTracker {
 			return null;
 		}
 		
-		// get index of the last step to know where we failed
-		int stepIdx = 0;
-		for (TestStep testStep: testSteps) {
-			if (testStep.getName().startsWith(TestStepManager.LAST_STEP_NAME)) {
-				break;
-			}
-			stepIdx += 1;
-		}
+		// get index of the last step to know where we failed (issueBean.getTestStep() cannot be null)
+		int stepIdx = issueBean.getTestStep().getPosition();
 		
 		// check that an issue does not already exist for the same test / appication / version. Else, complete it if the step is error is not the same
 		IssueBean currentIssue = issueAlreadyExists(issueBean);
