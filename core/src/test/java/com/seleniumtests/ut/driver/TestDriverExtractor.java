@@ -71,14 +71,14 @@ public class TestDriverExtractor extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testDriverExtraction() throws IOException {
 		
-		extractor.extractDriver("chromedriver_85.0_chrome-85-86");
+		extractor.extractDriver("chromedriver_94.0_chrome-94-95");
 		
 		if (OSUtility.isWindows()) {
-			Assert.assertTrue(Paths.get(driverPath.toString(), "chromedriver_85.0_chrome-85-86.exe").toFile().exists());
+			Assert.assertTrue(Paths.get(driverPath.toString(), "chromedriver_94.0_chrome-94-95.exe").toFile().exists());
 		} else {
-			Assert.assertTrue(Paths.get(driverPath.toString(), "chromedriver_85.0_chrome-85-86").toFile().exists());
+			Assert.assertTrue(Paths.get(driverPath.toString(), "chromedriver_94.0_chrome-94-95").toFile().exists());
 		}
-		Assert.assertTrue(Paths.get(driverPath.toString(), "version_chromedriver_85.0_chrome-85-86.txt").toFile().exists());
+		Assert.assertTrue(Paths.get(driverPath.toString(), "version_chromedriver_94.0_chrome-94-95.txt").toFile().exists());
 	}
 	
 	/**
@@ -88,13 +88,13 @@ public class TestDriverExtractor extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testDriverNotExtractedAlreadyExists() throws IOException {
 
-		extractor.extractDriver("chromedriver_85.0_chrome-85-86");
+		extractor.extractDriver("chromedriver_94.0_chrome-94-95");
 		
 		DriverExtractor driverExtractor = spy(new DriverExtractor(rootPath));
-		driverExtractor.extractDriver("chromedriver_85.0_chrome-85-86");
+		driverExtractor.extractDriver("chromedriver_94.0_chrome-94-95");
 		
 		// check driver has not been copied as it already exists in the right version
-		verify(driverExtractor, never()).copyDriver("chromedriver_85.0_chrome-85-86");
+		verify(driverExtractor, never()).copyDriver("chromedriver_94.0_chrome-94-95");
 	}
 	
 	/**
@@ -113,16 +113,16 @@ public class TestDriverExtractor extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testDriverNotExtractedAlreadyExistsNoVersion() throws IOException {
 
-		extractor.extractDriver("chromedriver_85.0_chrome-85-86");
+		extractor.extractDriver("chromedriver_94.0_chrome-94-95");
 		
 		// remove version to force copy
-		Paths.get(driverPath.toString(), "version_chromedriver_85.0_chrome-85-86.txt").toFile().delete();
+		Paths.get(driverPath.toString(), "version_chromedriver_94.0_chrome-94-95.txt").toFile().delete();
 		
 		DriverExtractor driverExtractor = spy(new DriverExtractor(rootPath));
-		driverExtractor.extractDriver("chromedriver_85.0_chrome-85-86");
+		driverExtractor.extractDriver("chromedriver_94.0_chrome-94-95");
 		
 		// check driver has been copied as it already exists but no version has been specified
-		verify(driverExtractor).copyDriver("chromedriver_85.0_chrome-85-86");
+		verify(driverExtractor).copyDriver("chromedriver_94.0_chrome-94-95");
 		
 	}
 }
