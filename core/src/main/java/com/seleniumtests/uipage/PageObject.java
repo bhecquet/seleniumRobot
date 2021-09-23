@@ -416,8 +416,13 @@ public class PageObject extends BasePage implements IPage {
             outputDirectory = SeleniumTestsContextManager.getGlobalContext().getTestNGContext().getOutputDirectory();
         }
         
-        // creates the driver and switch to it. It may be done twice as when the driver is created, we automatically switch to it, but in cas driver
-        // is already created, 
+        // set the URL to context if it has been provided. This will then be used on Edge(IE-mode) creation to avoid cross zone boundaries
+        if (SeleniumTestsContextManager.getThreadContext() != null && url != null) {
+        	SeleniumTestsContextManager.getThreadContext().setInitialUrl(url);
+        }
+        
+        // creates the driver and switch to it. It may be done twice as when the driver is created, we automatically switch to it, but in case driver
+        // is already created,
         driver = WebUIDriver.getWebDriver(true, browserType, driverName, attachExistingDriverPort);
         
         if (driver == null && url != null) {

@@ -88,6 +88,10 @@ public class DriverConfig {
 	public String getBrowserDownloadDir() {
         return testContext.getBrowserDownloadDir();
     }
+	
+	public String getInitialUrl() {
+		return testContext.getInitialUrl();
+	}
 
     public String getBrowserVersion() {
         return testContext.getWebBrowserVersion();

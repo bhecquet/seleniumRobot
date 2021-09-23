@@ -86,6 +86,7 @@ public class SeleniumTestsContext {
     public static final String TEST_CONFIGURATION = "testConfig"; 				// parameter name for additional configuration to load (should only be used in XML)
     public static final String LOAD_INI = "loadIni";							// comma separated list of files to load. They are searched in data/<app>/config folder. They will append to env.ini file with variable overwriting. Last file will overwrite previous ones
     public static final String STARTED_BY = "startedBy";						// any string saying who started the test. It may be a URL where to find result, for reports in bugtrackers
+    public static final String INITIAL_URL = "initialUrl";						// the initial URL the browser will connect to
     
     public static final String DEVICE_LIST = "deviceList"; 						// List of known devices in json format (internal use only)
     public static final String WEB_SESSION_TIME_OUT = "webSessionTimeOut";		// timeout de la session du navigateur
@@ -247,6 +248,7 @@ public class SeleniumTestsContext {
 	public static final boolean DEFAULT_ENABLE_EXCEPTION_LISTENER = true;
 	public static final boolean DEFAULT_CAPTURE_SNAPSHOT = true;
 	public static final boolean DEFAULT_CAPTURE_NETWORK = false;
+	public static final String DEFAULT_INITIAL_URL = "about:blank";
 	public static final String DEFAULT_VIDEO_CAPTURE = "onError";
 	public static final Integer DEFAULT_SNAPSHOT_TOP_CROPPING = null;
 	public static final Integer DEFAULT_SNAPSHOT_BOTTOM_CROPPING = null;
@@ -1425,11 +1427,15 @@ public class SeleniumTestsContext {
     }
     
     public String getScreenshotOutputDirectory() {
-    	return (String) Paths.get((String)getAttribute(OUTPUT_DIRECTORY), ScreenshotUtil.SCREENSHOT_DIR).toString();
+    	return Paths.get((String)getAttribute(OUTPUT_DIRECTORY), ScreenshotUtil.SCREENSHOT_DIR).toString();
     }
     
     public String getDefaultOutputDirectory() {
     	return (String) getAttribute(DEFAULT_OUTPUT_DIRECTORY);
+    }
+    
+    public String getInitialUrl() {
+    	return (String) getAttribute(INITIAL_URL);
     }
     
 	public Boolean getMaskedPassword() {
@@ -2053,6 +2059,14 @@ public class SeleniumTestsContext {
     
     public void setConfiguration(Map<String, TestVariable> variables){
     	setAttribute(TEST_VARIABLES, variables);
+    }
+    
+    public void setInitialUrl(String url) {
+    	if (url != null) {
+    		setAttribute(INITIAL_URL, url);
+    	} else {
+    		setAttribute(INITIAL_URL, DEFAULT_INITIAL_URL);
+    	}
     }
     
     public void setTmsUrl(String url) {
