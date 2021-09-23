@@ -104,7 +104,7 @@ In this case, this user passed value will overwrite test or suite parameters
 | webDriverGrid 			| 			| Address of seleniumGrid server. It's possible to specify several URL `http://grid1.company.com,http://grid2.company.com`. This way, seleniumRobot will choose one of the available grid | 
 | runMode 					| LOCAL		| `local`: current computer<br/>`grid`: seleniumGrid<br/>`sauceLabs`: run on sauceLabs device<br/> | 
 | nodeTags					| null		| Commat seperated list of strings. Requests that this test should execute only on a node (grid mode only) announcing all of these tags. On grid, this is declared with option `-nodeTags <tag1>,<tag2>`. If no slot matches the requested tags, session is not created |
-| browser 					| firefox	| Browser used to start test. Valid values are:<br/>`firefox`, `chrome`, `safari`, `iexplore`, `htmlunit`, `opera`, `phantomjs`, `none` for no driver, `browser` for android default browser | 
+| browser 					| firefox	| Browser used to start test. Valid values are:<br/>`firefox`, `chrome`, `safari`, `iexplore`, `edge`, `iexploreEdge` for Edge in Internet Explorer mode, `htmlunit`, `opera`, `phantomjs`, `none` for no driver, `browser` for android default browser | 
 | env 						| DEV		| Test environment for the SUT. Allow accessing param values defined in env.ini file  
 | captureVideo				| onError	| If `true`, always capture video. Other possible values are: `onSuccess` (keep video when test is OK), `false` and `onError` (capture video when test is KO) |
 | captureNetwork			| false		| If true, creates a HAR file which capture traffic. This is only available with MANUAL and DIRECT proxy settings because there is no way, when automatic mode is used, to know which proxy is used by browser and the authentication used. |
