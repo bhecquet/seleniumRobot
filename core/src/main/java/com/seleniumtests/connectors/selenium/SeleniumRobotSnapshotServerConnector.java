@@ -263,7 +263,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					);
 			
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
-			throw new SeleniumRobotServerException("cannot create test snapshot", e);
+			throw new SeleniumRobotServerException("cannot create step reference snapshot", e);
 		}
 	}
 	
