@@ -17,13 +17,14 @@
  */
 package com.seleniumtests.reporter.logger;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
+import org.openqa.selenium.WebDriverException;
 
+import com.seleniumtests.util.ExceptionUtility;
 import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -156,7 +157,7 @@ public class TestAction {
 		}
 		encodedAction.durationToExclude = durationToExclude;
 		if (actionException != null) {
-			encodedAction.actionExceptionMessage = actionException.getClass().toString() + ": " + encodeString(actionException.getMessage(), format);
+			encodedAction.actionExceptionMessage = encodeString(ExceptionUtility.getExceptionMessage(actionException), format);;
 		}
 		return encodedAction;
 	}

@@ -28,10 +28,12 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.openqa.selenium.WebDriverException;
 import org.testng.ITestResult;
 
 import com.seleniumtests.core.Step.RootCause;
 import com.seleniumtests.reporter.reporters.CommonReporter;
+import com.seleniumtests.util.ExceptionUtility;
 
 /**
  * Group of test actions
@@ -170,7 +172,7 @@ public class TestStep extends TestAction {
 			return "";
 		}
 		StringBuilder stackString = new StringBuilder();
-		CommonReporter.generateTheStackTrace(actionException, actionException.getMessage(), stackString, format);
+		ExceptionUtility.generateTheStackTrace(actionException, actionException.getMessage(), stackString, format);
 		return stackString.toString();
 	}
 
@@ -469,7 +471,7 @@ public class TestStep extends TestAction {
 		}
 		step.actionException = actionException;
 		if (actionException != null) {
-			step.actionExceptionMessage = actionException.getClass().toString() + ": " + encodeString(actionException.getMessage(), format);
+			step.actionExceptionMessage = encodeString(ExceptionUtility.getExceptionMessage(actionException), format);
 		}
 		
 
