@@ -69,6 +69,7 @@ import com.seleniumtests.reporter.logger.ArchiveMode;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.reporters.CommonReporter;
 import com.seleniumtests.reporter.reporters.ReporterControler;
+import com.seleniumtests.util.ExceptionUtility;
 import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -504,7 +505,7 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 				increaseMaxRetry();
 			}
 				
-			String error = testResult.getThrowable() != null ? testResult.getThrowable().getMessage(): "no error found";
+			String error = testResult.getThrowable() != null ? ExceptionUtility.getExceptionMessage(testResult.getThrowable()): "no error found";
 			scenarioLogger.log("Test is KO with error: " + error);
 			
 			
@@ -569,7 +570,7 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 			StringBuilder stackString = new StringBuilder("!!! Many Test Failures (").append(size).append(")\n\n");
 			
 			for (int i = 0; i < size - 1; i++) {
-				CommonReporter.generateTheStackTrace(verificationFailures.get(i), String.format("%n.%nFailure %d of %d%n", i + 1, size), stackString, "text");
+				ExceptionUtility.generateTheStackTrace(verificationFailures.get(i), String.format("%n.%nFailure %d of %d%n", i + 1, size), stackString, "text");
 			}
 			
 			Throwable last = verificationFailures.get(size - 1);

@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
+import org.openqa.selenium.NoSuchElementException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -40,8 +41,8 @@ import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestMessage;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
-import com.seleniumtests.reporter.logger.TestStep.StepStatus;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.reporter.logger.TestStep.StepStatus;
 import com.seleniumtests.reporter.logger.TestValue;
 
 import net.lightbody.bmp.core.har.Har;
@@ -451,9 +452,22 @@ public class TestTestStep extends GenericTest {
 	@Test(groups = { "ut" })
 	public void testTestStepEncodeXmlExceptionKept() {
 		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>(), true);
-		step.setActionException(new Throwable());
+		step.setActionException(new Throwable("foo"));
 		TestStep encodedTestStep = step.encode("xml");
 		Assert.assertNotNull(encodedTestStep.getActionException());
+		Assert.assertEquals(encodedTestStep.getActionExceptionMessage(), "class java.lang.Throwable: foo");
+	}
+	
+	/**
+	 * Check that in case of a webdriver exception, platform information and capabilities are not returned 
+	 */
+	@Test(groups = { "ut" })
+	public void testTestStepEncodeXmlWebDriverExceptionKept() {
+		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>(), true);
+		step.setActionException(new NoSuchElementException("foo"));
+		TestStep encodedTestStep = step.encode("xml");
+		Assert.assertNotNull(encodedTestStep.getActionException());
+		Assert.assertEquals(encodedTestStep.getActionExceptionMessage(), "class org.openqa.selenium.NoSuchElementException: foo\n");
 	}
 
 	@Test(groups = { "ut" })
@@ -525,9 +539,19 @@ public class TestTestStep extends GenericTest {
 	@Test(groups = { "ut" })
 	public void testTestActionEncodeXmlExceptionKept() {
 		TestAction action = new TestAction("action2 \"'<>&", false, new ArrayList<>());
-		action.setActionException(new Throwable());
+		action.setActionException(new Throwable("foo"));
 		TestAction encodedAction = action.encode("xml");
 		Assert.assertNotNull(encodedAction.getActionException());
+		Assert.assertEquals(encodedAction.getActionExceptionMessage(), "class java.lang.Throwable: foo");
+	}
+	
+	@Test(groups = { "ut" })
+	public void testTestActionEncodeXmlWebDriverExceptionKept() {
+		TestAction action = new TestAction("action2 \"'<>&", false, new ArrayList<>());
+		action.setActionException(new NoSuchElementException("foo"));
+		TestAction encodedAction = action.encode("xml");
+		Assert.assertNotNull(encodedAction.getActionException());
+		Assert.assertEquals(encodedAction.getActionExceptionMessage(), "class org.openqa.selenium.NoSuchElementException: foo\n");
 	}
 
 	@Test(groups = { "ut" })

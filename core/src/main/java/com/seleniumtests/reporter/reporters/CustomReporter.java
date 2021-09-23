@@ -42,6 +42,7 @@ import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.util.ExceptionUtility;
 import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -151,7 +152,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			List<String> stack = null;
 			if (testResult.getThrowable() != null) {
 				StringBuilder stackString = new StringBuilder();
-				generateTheStackTrace(testResult.getThrowable(), testResult.getThrowable().getMessage(), stackString, reportFormat.toLowerCase());
+				ExceptionUtility.generateTheStackTrace(testResult.getThrowable(), testResult.getThrowable().getMessage(), stackString, reportFormat.toLowerCase());
 				stack = Arrays.asList(stackString.toString().split("\n"));
 			}
 			

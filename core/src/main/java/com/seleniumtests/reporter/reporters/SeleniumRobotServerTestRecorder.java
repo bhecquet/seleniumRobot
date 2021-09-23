@@ -46,6 +46,7 @@ import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.util.ExceptionUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class SeleniumRobotServerTestRecorder extends CommonReporter implements IReporter {
@@ -67,7 +68,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 		// exception handling
 		StringBuilder stackString = new StringBuilder();
 		if (testResult.getThrowable() != null) {
-			generateTheStackTrace(testResult.getThrowable(), testResult.getThrowable().getMessage(), stackString, "html");
+			ExceptionUtility.generateTheStackTrace(testResult.getThrowable(), testResult.getThrowable().getMessage(), stackString, "html");
 		}
 		
 		executionLogs.put("stacktrace", stackString.toString());

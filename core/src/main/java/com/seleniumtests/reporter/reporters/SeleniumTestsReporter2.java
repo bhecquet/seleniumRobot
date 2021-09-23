@@ -55,6 +55,7 @@ import com.seleniumtests.driver.TestType;
 import com.seleniumtests.reporter.logger.GenericFile;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.logger.TestStep.StepStatus;
+import com.seleniumtests.util.ExceptionUtility;
 import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -315,7 +316,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		String[] stack = null;
 		if (testResult.getThrowable() != null) {
 			StringBuilder stackString = new StringBuilder();
-			generateTheStackTrace(testResult.getThrowable(), testResult.getThrowable().getMessage(), stackString, "html");
+			ExceptionUtility.generateTheStackTrace(testResult.getThrowable(), testResult.getThrowable().getMessage(), stackString, "html");
 			stack = stackString.toString().split("\n");
 		}
 		

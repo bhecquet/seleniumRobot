@@ -27,6 +27,7 @@ import org.testng.reporters.XMLConstants;
 import org.testng.reporters.XMLStringBuffer;
 
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
+import com.seleniumtests.util.ExceptionUtility;
 import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -187,7 +188,7 @@ public class JUnitReporter extends CommonReporter {
 			
 
 			StringBuilder stackString = new StringBuilder();
-			generateTheStackTrace(testResult.getThrowable(), testResult.getThrowable().getMessage(), stackString, "xml");
+			ExceptionUtility.generateTheStackTrace(testResult.getThrowable(), testResult.getThrowable().getMessage(), stackString, "xml");
 
 			testTag.message = testResult.getThrowable().getMessage();
 			testTag.type = testResult.getThrowable().getClass().getName();
