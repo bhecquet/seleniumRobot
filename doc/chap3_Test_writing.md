@@ -386,7 +386,7 @@ Default driver strategy (that applies to all pages) can be set using `pageLoadSt
 
 ##### Attach to an existing browser #####
 
-See [11 Attach an existing browser inside your scenario](#11-attach-an-existing-browser-inside-your-scenario)
+See [Attach an existing browser inside your scenario](#attach-an-existing-browser-inside-your-scenario)
 
 #### Search elements ####
 
@@ -528,6 +528,74 @@ or
 captureElementSnapshot(<pic_name>, <myWebElement>, SnapshotCheckType.TRUE);
 ```
 
+#### Work with multiple browsers ####
+
+##### Use several browsers inside one test scenario #####
+
+Some rare tests require to start several browsers (one for each application which should be tested at the same time). For example, you have to create a client account on front-office with Chrome, then delete this client onto the back-office with Internet Explorer.
+To do so, you can request a PageObject to create a new driver. By default, it creates it only if none already exists.
+
+- Test is driven by Chrome, it's configured so in TestNG XML file. With the code below, we will create a chrome browser on URL "http://front-office.mycompany.com". Chrome will be referenced under the name `main` which is the default name for the first created driver
+
+```java
+    public FrontOfficePage() throws Exception {
+        super(myFOElementToCheck, "http://front-office.mycompany.com");
+    }
+```
+    
+- After having created the client, we will connect to the back-office using Internet Explorer. At this point, the default driver becomes the newly created one (Internet Explorer). It's referenced under the name `bo-browser`
+    
+```java
+    public BackOfficePage() throws Exception {
+        super(myBOElementToCheck, "http://back-office.mycompany.com", BrowserType.INTERNET_EXPLORER, "bo-browser", null);
+    }
+```
+
+- The test will look like this
+    
+```java
+    // create client on front-office
+    FrontOfficePage foPage = new FrontOfficePage()._createClient()
+        ._doSomethingElse();
+                                
+    // delete client on back-office
+    new BackOfficePage()._accessClient()
+        ._deleteClient();
+                                
+    // switch back to Chrome for any other operations. 'main' is the name of Chrome when it has been created
+    switchToDriver("main");
+    
+    foPage._recreateClient();
+```
+
+    
+
+##### Attach an existing browser inside your scenario #####
+
+Sometimes, a scenario needs a browser launched by an other application (web or not)
+By default, selenium does not permit this easily but with seleniumRobot, you can do this (only for Internet Explorer and Chrome for now)
+
+This attaching can be done only from a page creation
+
+- For Internet Explorer, note the last parameter when creating the new page (any integer is valid):
+
+```java
+    public BackOfficePage() throws Exception {
+        super(myBOElementToCheck, "http://back-office.mycompany.com", BrowserType.INTERNET_EXPLORER, "bo-browser", 0);
+    }
+```
+    
+- For Chrome, start your browser with `--remote-debugging-port=xxxx`. In the example below, xxxx = 11111. Then, in your page creation (note the 11111 as last parameter which tells robot to connect to chrome on debugger port 11111)
+
+```java
+    public BackOfficePage() throws Exception {
+        super(myBOElementToCheck, "http://back-office.mycompany.com", BrowserType.CHROME, "bo-browser", 11111);
+    }
+```
+    
+**WARN**: for Internet explorer, a modified version of IEDriverServer is required. Provided in seleniumRobot-driver artifact
+
+**LIMIT**: This approach is limited to one Internet Explorer started programmatically. It will not work with IE started manually as IE must be started the same way IEDriverServer starts it.
 
 
 ### 3 Write a test ###
@@ -848,6 +916,28 @@ Finally, when using dataprovider, method parameters can also be used as placehol
 	}
 ```
 
+#### Execute or kill a process ####
+
+If, for some reason, you need to access a system process: 
+
+##### Kill an existing process #####
+e.g: you click on a link that opens a PDF document and you need to close it
+Inside the @Test, write
+
+```
+killProcess(<myProcessName>);
+```
+
+
+##### Start a process / execute a command #####
+- execute an init script inside the test
+
+```
+executeCommand(<my_program>, <arg1>, <arg2>)
+```
+
+When using this in grid mode, you must declare the program name in the white list of grid node: `-extProgramWhiteList my_program`
+
 ### 4 Write a cucumber test ###
 Cucumber styled tests rely on a `.feature` file where each test step is defined. Look at [https://cucumber.io/docs/gherkin/reference/](https://cucumber.io/docs/gherkin/reference/) for more information about writing a feature file.
 
@@ -1081,7 +1171,7 @@ As PageObject exposes the `driver` object, it's possible to write standard Selen
 	
 	driver.findElement(By.id("myId")).click();
 	
-SeleniumRobot intercept selenium calls to create HtmlElement objects (the same as in §2) and thus benefit all SelniumRobot behaviour
+SeleniumRobot intercept selenium calls to create HtmlElement objects (the same as in §2) and thus benefit all SelniumRobot behavior
 The constraints are:
 - this code *MUST* be placed in a PageObject sub-class.
 - add `<parameter name="overrideSeleniumNativeAction" value="true" />` to your TestNG XML file 
@@ -1097,73 +1187,9 @@ The handled methods are the most used in selenium writing:
 - switchTo().defaultContent()
 - switchTo().parentFrame()
 
-### 10 Use several browsers inside on test scenario ###
 
-Some rare tests require to start several browsers (one for each application which should be tested at the same time). For example, you have to create a client account on front-office with Chrome, then delete this client onto the back-office with Internet Explorer.
-To do so, you can request a PageObject to create a new driver. By default, it creates it only if none already exists.
 
-- Test is driven by Chrome, it's configured so in TestNG XML file. With the code below, we will create a chrome browser on URL "http://front-office.mycompany.com". Chrome will be referenced under the name `main` which is the default name for the first created driver
-
-```java
-	public FrontOfficePage() throws Exception {
-    	super(myFOElementToCheck, "http://front-office.mycompany.com");
-    }
-```
-    
-- After having created the client, we will connect to the back-office using Internet Explorer. At this point, the default driver becomes the newly created one (Internet Explorer). It's referenced under the name `bo-browser`
-	
-```java
-	public BackOfficePage() throws Exception {
-		super(myBOElementToCheck, "http://back-office.mycompany.com", BrowserType.INTERNET_EXPLORER, "bo-browser", null);
-	}
-```
-
-- The test will look like this
-	
-```java
-	// create client on front-office
-	FrontOfficePage foPage = new FrontOfficePage()._createClient()
-		._doSomethingElse();
-								
-	// delete client on back-office
-	new BackOfficePage()._accessClient()
-		._deleteClient();
-								
-	// switch back to Chrome for any other operations. 'main' is the name of Chrome when it has been created
-	switchToDriver("main");
-	
-	foPage._recreateClient();
-```
-
-	
-### 11 Attach an existing browser inside your scenario ###
-
-Sometimes, a scenario needs a browser launched by an other application (web or not)
-By default, selenium does not permit this easily but with seleniumRobot, you can do this (only for Internet Explorer and Chrome for now)
-
-This attaching can be done only from a page creation
-
-- For Internet Explorer, note the last parameter when creating the new page (any integer is valid):
-
-```java
-	public BackOfficePage() throws Exception {
-		super(myBOElementToCheck, "http://back-office.mycompany.com", BrowserType.INTERNET_EXPLORER, "bo-browser", 0);
-	}
-```
-	
-- For Chrome, start your browser with `--remote-debugging-port=xxxx`. In the example below, xxxx = 11111. Then, in your page creation (note the 11111 as last parameter which tells robot to connect to chrome on debugger port 11111)
-
-```java
-	public BackOfficePage() throws Exception {
-		super(myBOElementToCheck, "http://back-office.mycompany.com", BrowserType.CHROME, "bo-browser", 11111);
-	}
-```
-	
-**WARN**: for Internet explorer, a modified version of IEDriverServer is required. Provided in seleniumRobot-driver artifact
-
-**LIMIT**: This approach is limited to one Internet Explorer started programmatically. It will not work with IE started manually as IE must be started the same way IEDriverServer starts it.
-
-### 12 Use external dependencies ###
+### 10 Use external dependencies ###
 
 If for some reason, you need to include dependencies to your test application, add them as dependencies in your pom.xml **without any scope**, so that they can be included automatically in the generated zip file.
 
@@ -1206,7 +1232,7 @@ If the dependency needs other dependencues, we have to change configuration to (
 
 The key point is `excludeTransitive` which is set to false to allow sub-dependecies to be retrieved, and then we filter by groupdId and artifactId to avoid retrieving to many dependencies
 
-### 13 Customize Selenium IDE tests ###
+### 11 Customize Selenium IDE tests ###
 
 SeleniumRobot adds execution of Selenium IDE tests when they are exported to Java/JUnit file.
 Details about launching can be found in §4.8
@@ -1219,7 +1245,7 @@ By default, your test will only contain 1 running step, which is the full scenar
 
 ![](images/selenium_ide_step.png)
 
-### 14 Write mobile tests ###
+### 12 Write mobile tests ###
 
 SeleniumRobot supports appium (see chap4_Run_tests, §3 to configure execution) out of the box. Be default, seleniumRobot will start the appium server itself for running the test locally, and stop it at the end of the test.
 For writing test, this is easier to use Appium desktop which provides an inspector.
@@ -1239,7 +1265,7 @@ It's also possible to attach to a remote appium server the same way (change URL)
 - provide the device id (`-DdeviceId=<UDID or android ID`) to the test. iOS UDID can be found with command `instruments -s devices`. Android Id can be found with `adb devices` command.
 - provide a local path (local the the remote machine) to the application. An HTTP path may also be provided but you may have trouble with android
 
-### 15 Implement custom SelectList ###
+### 13 Implement custom SelectList ###
 
 It's possible to implement new SelectList that adapt to your web interface. The purpose of this custom select list is to give seleniumRobot the way to search
 
@@ -1304,7 +1330,7 @@ To ease the implementation, if your custom SelectList is an Angular one, you can
 	}
 ```
 
-### 16 Using custom UI libraries ###
+### 14 Using custom UI libraries ###
 
 Most of the web sites use JS development frameworks like Angular or react and associated GUI elements (angular material, ...)
 For SelectList especialy (see above), handling elements change from one framework to another.
