@@ -62,6 +62,7 @@ public class ExceptionUtility {
 			|| message.startsWith("java.lang.Thread")
 			|| message.startsWith("java.util.concurrent.")
 			|| message.startsWith("org.aspectj.runtime.reflect")
+			|| message.startsWith("org.apache.maven.")
 				) {
 			return null;
 		}
