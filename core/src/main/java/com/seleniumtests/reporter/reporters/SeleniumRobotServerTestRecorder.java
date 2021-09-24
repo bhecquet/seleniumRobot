@@ -88,7 +88,8 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 		
 		// issue #81: use global context because these parameters are known from there (thread context is too narrow)
 		if (!Boolean.TRUE.equals(SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerActive())
-				|| !SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerRecordResults()) {
+				|| !SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerRecordResults() 
+				&& !SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshot()) {
 			return;
 		}
 		
@@ -208,7 +209,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 					}
 					
 				// record reference image on server if step is successful
-				} else if (snapshot.getCheckSnapshot().recordSnapshotOnServerForReference()) {
+				} else if (snapshot.getCheckSnapshot().recordSnapshotOnServerForReference() && SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerRecordResults()) {
 					if (Boolean.FALSE.equals(testStep.getFailed())) {
 						try {
 							serverConnector.createStepReferenceSnapshot(snapshot, stepResultId);
