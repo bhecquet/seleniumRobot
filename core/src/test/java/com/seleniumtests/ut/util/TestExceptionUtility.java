@@ -71,7 +71,7 @@ public class TestExceptionUtility extends GenericTest {
 		Assert.assertTrue(content.toString().matches("class org.openqa.selenium.WebDriverException: Failure\n"
 				+ "\n"
 				+ "at com.seleniumtests.ut.util.TestExceptionUtility.testGenerateStackTraceNoCause\\(TestExceptionUtility.java:\\d+\\)\n"
-				+ "at java.util.ArrayList.forEach\\(Unknown Source\\)"));
+				+ "at java.util.ArrayList.forEach\\(.*?\\)"));
 	}
 	
 	@Test(groups= {"ut"})
@@ -90,7 +90,7 @@ public class TestExceptionUtility extends GenericTest {
 				+ "Driver info: driver.version: unknown\n"
 				+ "\n"
 				+ "at com.seleniumtests.ut.util.TestExceptionUtility.testGenerateStackTraceWithCause\\(TestExceptionUtility.java:\\d+\\)\n"
-				+ "at java.util.ArrayList.forEach\\(Unknown Source\\)"));
+				+ "at java.util.ArrayList.forEach\\(.*?\\)"));
 		
 	}
 }
