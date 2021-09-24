@@ -88,8 +88,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 		
 		// issue #81: use global context because these parameters are known from there (thread context is too narrow)
 		if (!Boolean.TRUE.equals(SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerActive())
-				|| !SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerRecordResults() 
-				&& !SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshot()) {
+				|| !SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerRecordResults()) {
 			return;
 		}
 		
@@ -193,7 +192,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			// sends all snapshots that are flagged as comparable
 			for (Snapshot snapshot: new ArrayList<>(testStep.getSnapshots())) {
 				
-				if (snapshot.getCheckSnapshot().recordSnapshotOnServerForComparison()) {
+				if (snapshot.getCheckSnapshot().recordSnapshotOnServerForComparison() && SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshot()) {
 					if (snapshot.getName() == null || snapshot.getName().isEmpty()) {
 						logger.warn("Snapshot hasn't any name, it won't be sent to server");
 						continue;

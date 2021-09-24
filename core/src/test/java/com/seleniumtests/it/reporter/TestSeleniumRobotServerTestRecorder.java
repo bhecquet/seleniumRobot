@@ -167,6 +167,51 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	}
 	
 	/**
+	 * Test that focuses on snapshots: if flag SELENIUMROBOTSERVER_COMPARE_SNAPSHOT is set to false, snapshots are not sent
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportGenerationWithoutSnapshots() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "false");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			
+			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null)).thenReturn(variableServer);
+			when(variableServer.isAlive()).thenReturn(true);
+			
+			reporter = spy(new SeleniumRobotServerTestRecorder());
+			PowerMockito.mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+			PowerMockito.when(CommonReporter.getInstance(SeleniumRobotServerTestRecorder.class)).thenReturn(reporter);
+			
+			when(reporter.getServerConnector()).thenReturn(serverConnector);
+			when(serverConnector.getActive()).thenReturn(true);
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverCustomSnapshot"});
+			
+			// check server has been called for all aspects of test (app, version, ...)
+			// they may be called for each test but server is responsible for uniqueness of the value
+			verify(serverConnector, atLeastOnce()).createSession(anyString());
+			
+			// issue #331: check all test cases are created, call MUST be done only once to avoid result to be recorded several times
+			verify(serverConnector).createTestCase("testDriverCustomSnapshot");
+			verify(serverConnector).addLogsToTestCaseInSession(anyInt(), anyString());
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testDriverCustomSnapshot")); 
+			verify(serverConnector).createTestStep(eq("_captureSnapshot with args: (my snapshot, )"), anyInt());
+			verify(serverConnector, never()).createSnapshot(any(Snapshot.class), anyInt(), anyInt(), anyInt()); // 1 custom snapshot taken with name
+			verify(serverConnector, never()).createExcludeZones(any(Rectangle.class), anyInt()); // one exclude zone created with that snapshot
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+		}
+	}
+	
+	/**
 	 * Test when no seleniumrobot server is present
 	 */
 	@Test(groups={"it"})
@@ -253,7 +298,6 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
-			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
@@ -282,7 +326,6 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
-			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
 			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
@@ -300,7 +343,6 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
-			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
@@ -331,7 +373,6 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
-			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
 			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
@@ -348,7 +389,6 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
-			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
@@ -379,7 +419,6 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
-			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
 			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
