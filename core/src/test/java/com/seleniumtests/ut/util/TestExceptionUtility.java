@@ -67,7 +67,7 @@ public class TestExceptionUtility extends GenericTest {
 		Exception ex = new WebDriverException("foo");
 		StringBuilder content = new StringBuilder();
 		ExceptionUtility.generateTheStackTrace(ex, "Failure", content, "html");
-		
+		System.out.println(content.toString());
 		Assert.assertTrue(content.toString().matches("class org.openqa.selenium.WebDriverException: Failure\n"
 				+ "\n"
 				+ "at com.seleniumtests.ut.util.TestExceptionUtility.testGenerateStackTraceNoCause\\(TestExceptionUtility.java:\\d+\\)\n"
@@ -80,7 +80,7 @@ public class TestExceptionUtility extends GenericTest {
 		Exception ex2 = new WebDriverException("foo1", ex);
 		StringBuilder content = new StringBuilder();
 		ExceptionUtility.generateTheStackTrace(ex2, "Failure", content, "html");
-		
+		System.out.println(content.toString());
 		Assert.assertTrue(content.toString().matches("class org.openqa.selenium.WebDriverException: Failure\n"
 				+ "\n"
 				+ "at com.seleniumtests.ut.util.TestExceptionUtility.testGenerateStackTraceWithCause\\(TestExceptionUtility.java:\\d+\\)\n"
