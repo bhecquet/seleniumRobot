@@ -185,7 +185,7 @@ public class DriverExceptionListener implements WebDriverEventListener {
             if (
             		ex instanceof org.openqa.selenium.remote.UnreachableBrowserException
             		|| ex instanceof NoSuchSessionException
-            		|| message.matches("Session .*? was terminated due to(.|\\n)*")
+            		|| message.matches("Session .*? was terminated due to.*")
             		|| message.matches("Session .*? not available .*")
                     || message.matches("cannot forward the request .*")
                     || message.matches("Session is closed")
