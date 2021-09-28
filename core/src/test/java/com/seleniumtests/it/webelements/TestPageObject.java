@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.testng.Assert;
 import org.testng.ITestContext;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -31,10 +32,12 @@ import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.TestType;
+import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.support.pages.DriverSubTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.OSUtility;
+import com.seleniumtests.util.osutility.OSUtilityFactory;
 
 /**
  * Test PageObject
@@ -47,11 +50,26 @@ public class TestPageObject extends GenericTest {
 
 	@BeforeMethod(groups= {"it", "pageobject"})
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
+
+		OSUtilityFactory.getInstance().killProcessByName("chrome", true);
+		
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 		testPage = new DriverTestPage(true);
 	}
 	
+	@AfterMethod(groups= {"it", "pageobject"}, alwaysRun=true)
+	public void destroyDriver() {
+		if (WebUIDriver.getWebDriver(false) != null) {
+			WebUIDriver.cleanUp();
+		}
+
+		GenericTest.resetTestNGREsultAndLogger();
+	}
+	
+	/**
+	 * Depends on TestNG XML file so it won't work when launched from IDE 
+	 */
 	@Test(groups= {"it", "pageobject"})
 	public void testPageParam() {
 		Assert.assertEquals(DriverTestPage.param("variable1"), "value3");
@@ -104,6 +122,7 @@ public class TestPageObject extends GenericTest {
 	 */
 	@Test(groups= {"it", "pageobject"})
 	public void testPageObjectForExternalDriver() throws Exception {
+		
 		try {
 			SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 			
