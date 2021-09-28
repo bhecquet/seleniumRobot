@@ -58,7 +58,7 @@
 		</repository>
 		<repository>
 			<id>neotys-public-releases</id>
-			<url>http://maven.neotys.com/content/repositories/releases/</url>
+			<url>https://maven.neotys.com/content/repositories/releases/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>

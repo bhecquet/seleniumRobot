@@ -21,14 +21,6 @@
 	</properties>
 
 	<repositories> 
-	     <repository>
-	        <snapshots>
-	          <enabled>false</enabled>
-	        </snapshots>
-	        <id>bintray-epam-reportportal</id>
-	        <name>bintray</name>
-	        <url>http://dl.bintray.com/epam/reportportal</url>
-	     </repository>
 	 	<repository>
 			<snapshots>
 			  	<enabled>false</enabled>
