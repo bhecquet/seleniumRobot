@@ -134,12 +134,8 @@
 			<dependency>
 				<groupId>com.neotys.selenium</groupId>
 				<artifactId>neotys-selenium-proxy</artifactId>
-				<version>2.1.4</version>
+				<version>3.0.1</version>
 				<exclusions>
-					<exclusion>
-						<groupId>javassist</groupId>
-						<artifactId>javassist</artifactId>
-					</exclusion>
 					<exclusion>
 						<groupId>com.google.guava</groupId>
 						<artifactId>guava</artifactId>
@@ -151,9 +147,9 @@
 				</exclusions>
 			</dependency>
 			<dependency> <!-- version retrieved by powermock, but also needed by neotys -->
-				<groupId>javassist</groupId>
+				<groupId>org.javassist</groupId>
 				<artifactId>javassist</artifactId>
-				<version>3.21.0-GA</version>
+				<version>3.27.0-GA</version>
 			</dependency>
 			<dependency>
 				<groupId>com.infotel.seleniumRobot</groupId>
