@@ -230,7 +230,7 @@ public class TestReporterControler extends ReporterTest {
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "</i></button><span class=\"step-title\"> Pre test step: set -"), 1);
 		
 		// check that when test is KO, error cause is displayed
-		Assert.assertTrue(detailedReportContent2.contains("[main] ScenarioLogger: Test is KO with error: error"));
+		Assert.assertTrue(detailedReportContent2.contains("[main] ScenarioLogger: Test is KO with error: class java.lang.AssertionError: error"));
 		
 		String detailedReportContent3 = readTestMethodResultFile("testWithException");
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent3, "</i></button><span class=\"step-title\"> Pre test step: set -"), 1);
