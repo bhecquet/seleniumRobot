@@ -776,7 +776,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			
 			// check last step shows the assertion					
 			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box failed\">.*?<i class\\=\"fas fa-plus\"></i>"
-					+ "</button><span class=\"step-title\"> Test end - \\d+\\.\\d+ secs\\s*</span></div><div class\\=\"box-body\"><ul><div class\\=\"message-log\">Test is KO with error: !!! Many Test Failures \\(2\\)<br/>"
+					+ "</button><span class=\"step-title\"> Test end - \\d+\\.\\d+ secs\\s*</span></div><div class\\=\"box-body\"><ul><div class\\=\"message-log\">Test is KO with error: class java.lang.AssertionError: !!! Many Test Failures \\(2\\)<br/>"
 					+ "<br/>class java.lang.AssertionError: <br/>\\.<br/>Failure 1 of 2.*Failure 2 of 2.*"
 					+ "<div class\\=\"message-error\">\\s+class java.lang.AssertionError: !!! Many Test Failures \\(2\\)<br/>.*"));
 			
@@ -842,7 +842,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 			// Test end step also displays the error
 			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box failed\">.*?<i class\\=\"fas fa-plus\"></i>"
-					+ "</button><span class=\"step-title\"> Test end - \\d+\\.\\d+ secs</span></div><div class\\=\"box-body\"><ul><div class\\=\"message-log\">Test is KO with error: Error in result expected \\[1\\] but found \\[2\\]</div>"
+					+ "</button><span class=\"step-title\"> Test end - \\d+\\.\\d+ secs</span></div><div class\\=\"box-body\"><ul><div class\\=\"message-log\">Test is KO with error: class java.lang.AssertionError: Error in result expected \\[1\\] but found \\[2\\]</div>"
 					+ "<div class\\=\"message-log\">\\[NOT RETRYING\\] due to failed Assertion</div>.*?"
 					+ "<div class\\=\"message-error\">\\s+class java.lang.AssertionError: Error in result expected \\[1\\] but found \\[2\\].*"
 					));
@@ -906,7 +906,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		// check log contain the 2 executions
 		String detailedReportContent1 = readTestMethodResultFile("testWithExceptionOnFirstExec");
-		Assert.assertTrue(detailedReportContent1.contains("Test is KO with error: some exception"));
+		Assert.assertTrue(detailedReportContent1.contains("Test is KO with error: class com.seleniumtests.customexception.DriverExceptions: some exception"));
 		Assert.assertTrue(detailedReportContent1.contains("Test is OK"));
 	}
 	
@@ -1254,7 +1254,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent2.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> assert exception"));
 		
 		// check exception is present in step
-		Assert.assertTrue(detailedReportContent2.contains("<div class=\"message-log\">Test is KO with error: false error expected [true] but found [false]</div>"));
+		Assert.assertTrue(detailedReportContent2.contains("<div class=\"message-log\">Test is KO with error: class java.lang.AssertionError: false error expected [true] but found [false]</div>"));
 		
 	}
 	
@@ -1993,7 +1993,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent = readTestMethodResultFile("testInError");
 		
 		// Check error is present is Last test step
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"box-body\"><ul><div class=\"message-log\">Test is KO with error: error</div>"));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"box-body\"><ul><div class=\"message-log\">Test is KO with error: class java.lang.AssertionError: error</div>"));
 		System.out.println(detailedReportContent);
 		// Check exception is logged and filtered
 		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error\"><div>class java.lang.AssertionError: error</div>"
@@ -2007,7 +2007,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.matches(".*</ul><div class=\"message-error\">\\s+class java.lang.AssertionError: error\\s+</div></div>.*"));
 		
 		// check that when test is KO, error cause is displayed
-		Assert.assertTrue(detailedReportContent.contains("[main] ScenarioLogger: Test is KO with error: "));
+		Assert.assertTrue(detailedReportContent.contains("[main] ScenarioLogger: Test is KO with error: class java.lang.AssertionError: "));
 		
 		//
 		Assert.assertTrue(detailedReportContent.contains("<th>Last State</th><td><a class=\"errorTooltip\"><i class=\"fas fa-file-alt\" aria-hidden=\"true\" data-toggle=\"popover\" title=\"Exception\" data-content=\"error\"></i></a></td>"));
@@ -2182,10 +2182,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent = readTestMethodResultFile("testWithException");
 		
 		// check step 1 has been encoded
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Test is KO with error: &amp; some exception &quot;with &quot; &lt;strong&gt;&lt;a href='http://someurl/link' style='background-color: red;'&gt;HTML to encode&lt;/a&gt;&lt;/strong&gt;"));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Test is KO with error: class com.seleniumtests.customexception.DriverExceptions: &amp; some exception &quot;with &quot; &lt;strong&gt;&lt;a href='http://someurl/link' style='background-color: red;'&gt;HTML to encode&lt;/a&gt;&lt;/strong&gt;"));
 		
 		// check logs are also encoded
-		Assert.assertTrue(detailedReportContent.contains("[main] ScenarioLogger: Test is KO with error: &amp; some exception &quot;with &quot; &lt;strong&gt;&lt;a href='http://someurl/link' style='background-color: red;'&gt;HTML to encode&lt;/a&gt;&lt;/strong&gt;"));
+		Assert.assertTrue(detailedReportContent.contains("[main] ScenarioLogger: Test is KO with error: class com.seleniumtests.customexception.DriverExceptions: &amp; some exception &quot;with &quot; &lt;strong&gt;&lt;a href='http://someurl/link' style='background-color: red;'&gt;HTML to encode&lt;/a&gt;&lt;/strong&gt;"));
 		
 		// check exception stack trace is encoded
 		Assert.assertTrue(detailedReportContent.contains("class com.seleniumtests.customexception.DriverExceptions: &amp; some exception &quot;with &quot; &lt;strong&gt;&lt;a href='http://someurl/link' style='background-color: red;'&gt;HTML to encode&lt;/a&gt;&lt;/strong&gt;"));

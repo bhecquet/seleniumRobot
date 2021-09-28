@@ -281,8 +281,8 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 			Assert.assertTrue(logs.contains("Cannot create driver on grid, it may be fully used [0 times]"));
 			Assert.assertTrue(logs.contains("Cannot create driver on grid, it may be fully used [1 times]"));
 			Assert.assertFalse(logs.contains("Cannot create driver on grid, it may be fully used [2 times]"));
-			Assert.assertEquals(StringUtils.countMatches(logs, "Test is KO with error: Cannot create driver"), 2); // 2 tests KO (the first ones)
-			Assert.assertEquals(StringUtils.countMatches(logs, "Test is KO"), 2); // 2 tests OK because we got nodes
+			Assert.assertEquals(StringUtils.countMatches(logs, "Test is KO with error: class com.seleniumtests.customexception.SeleniumGridNodeNotAvailable: Cannot create driver"), 2); // 2 tests KO (the first ones)
+			Assert.assertEquals(StringUtils.countMatches(logs, "Test is OK"), 2); // 2 tests OK because we got nodes
 			Assert.assertFalse(logs.contains("Skipping as the 3 previous tests could not get any matching node"));
 			
 			Assert.assertEquals(SeleniumGridDriverFactory.getCounter(), 0);
