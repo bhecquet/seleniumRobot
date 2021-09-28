@@ -698,10 +698,24 @@ public class TestJiraConnector extends MockitoTest {
 		Assert.assertEquals(transitionArgument.getAllValues().get(1).getId(), 1); // transition to closed state
 	}
 	
-	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class)
+	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "'bugtracker.jira.closeTransition' values \\[closed\\] are unknown for this issue, allowed transitions are \\[reopen, close\\]")
 	public void testCloseIssueInvalidTransition() {
 
 		jiraOptions.put("jira.closeTransition", "closed");
+		ArgumentCaptor<TransitionInput> transitionArgument = ArgumentCaptor.forClass(TransitionInput.class);
+		
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
+		jiraConnector.closeIssue("ISSUE-1", "closed");
+		
+		verify(issueRestClient).transition(eq(issue1), transitionArgument.capture());
+		Assert.assertEquals(transitionArgument.getValue().getId(), 1);
+	}
+	
+	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "'bugtracker.jira.closeTransition': value \\[closeQuickly\\] is invalid for this issue in its current state, allowed transitions are \\[reopen, close\\]")
+	public void testCloseIssueInvalidTransitionInSecondPosition() {
+		when(promiseTransitions.claim()).thenReturn(Arrays.asList(transition3)).thenReturn(Arrays.asList(transition1, transition2));
+		jiraOptions.put("jira.closeTransition", "review/closeQuickly");
+		
 		ArgumentCaptor<TransitionInput> transitionArgument = ArgumentCaptor.forClass(TransitionInput.class);
 		
 		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
