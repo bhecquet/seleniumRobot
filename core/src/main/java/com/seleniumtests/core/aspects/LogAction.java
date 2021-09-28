@@ -526,15 +526,16 @@ public class LogAction {
 			if (mobProxy != null) {
 				mobProxy.newPage(currentStep.getName());
 			}
-			if (neoloadDriver != null) {
-				neoloadDriver.startTransaction(currentStep.getName());
-			}
 			if (videoRecorder != null) {
 				CustomEventFiringWebDriver.displayStepOnScreen(currentStep.getName(), 
 						SeleniumTestsContextManager.getThreadContext().getRunMode(), 
 						SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(), 
 						videoRecorder);
 			}
+			if (neoloadDriver != null) {
+				neoloadDriver.startTransaction(currentStep.getName());
+			}
+			
 			
 			
 		} else {
