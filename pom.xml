@@ -134,7 +134,7 @@
 			<dependency>
 				<groupId>com.neotys.selenium</groupId>
 				<artifactId>neotys-selenium-proxy</artifactId>
-				<version>3.0.1</version>
+				<version>2.1.4</version>
 				<exclusions>
 					<exclusion>
 						<groupId>com.google.guava</groupId>
