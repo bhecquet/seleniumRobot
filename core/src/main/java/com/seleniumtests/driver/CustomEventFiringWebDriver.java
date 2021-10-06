@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -1044,7 +1045,10 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 		
 		// close windows before quitting (this is the only way to close chrome attached browser when it's not started by selenium)
 		try {
-			for (String handle: getWindowHandles()) {
+			List<String> handles = new ArrayList<>(((CustomEventFiringWebDriver)driver).getWebDriver().getWindowHandles());
+	        Collections.reverse(handles);
+
+	        for (String handle: handles) {
 				driver.switchTo().window(handle);
 				driver.close();
 			}
