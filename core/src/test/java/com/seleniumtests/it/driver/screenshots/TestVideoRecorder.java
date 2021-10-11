@@ -92,6 +92,37 @@ public class TestVideoRecorder extends ReporterTest {
 		}
 	}
 	
+
+	/**
+	 * Check that video capture file is present in result if requested
+	 * 
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportContainsVideoCaptureWithBeforeMethod() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest2"}, ParallelMode.METHODS, new String[] {"testDriver"});
+			
+			// read 'testDriver' report. This contains calls to HtmlElement actions
+			String detailedReportContent1 = readTestMethodResultFile("testDriver");
+			
+			Assert.assertTrue(detailedReportContent1.contains("Video capture: <a href='videoCapture.avi'>file</a>"));
+			
+			// check shortcut to video is present in detailed report
+			Assert.assertTrue(detailedReportContent1.matches(".*<th>Last State</th><td><a href=\"screenshots/testDriver_6-1_Test_end--\\w+.png\"><i class=\"fas fa-file-image\" aria-hidden=\"true\"></i></a><a href=\"videoCapture.avi\"><i class=\"fas fa-video\" aria-hidden=\"true\"></i></a></td>.*"));
+			
+			// check steps have the timestamp on video capture
+			Assert.assertTrue(detailedReportContent1.contains("<span><i class=\"fas fa-file-video\"></i>"));
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
+		}
+		
+	}
+	
 	/**
 	 * video must be produced when on success and tests are OK
 	 * @param testContext
