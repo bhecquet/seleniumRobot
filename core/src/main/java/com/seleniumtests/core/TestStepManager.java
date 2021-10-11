@@ -36,6 +36,7 @@ public class TestStepManager {
 		}
 		runningStep = managerToCopy.runningStep;
 		rootStep = managerToCopy.rootStep;
+		videoStartDate = managerToCopy.videoStartDate;
 	}
 	
 	/**
