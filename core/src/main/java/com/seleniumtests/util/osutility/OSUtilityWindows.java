@@ -287,21 +287,7 @@ public class OSUtilityWindows extends OSUtility {
 		} catch (IndexOutOfBoundsException e) {
 			// ignore
 		}
-		
-		
-		// look for chrome
-		try {
-			browserList.put(BrowserType.CHROME, new ArrayList<>());
-			
-			// main chrome version
-			String chromePath = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "");
-			chromePath = chromePath.split(EXE_EXT_QUOTE)[0].replace("\"", "") + ".exe";
-			String version = getWindowsChromeVersion(chromePath);
-			browserList.get(BrowserType.CHROME).add(new BrowserInfo(BrowserType.CHROME, extractChromeVersion("Google Chrome " + version), chromePath));
-		} catch (Win32Exception | ConfigurationException e) {
-			logger.warn("Error searching chrome installations: " + e.getMessage());
-		}
-			
+
 		if (discoverBetaBrowsers) {
 			try {
 				// beta chrome version
@@ -310,11 +296,26 @@ public class OSUtilityWindows extends OSUtility {
 				String versionBeta;
 				versionBeta = getWindowsBetaChromeVersion(chromeBetaPath);
 				browserList.get(BrowserType.CHROME).add(new BrowserInfo(BrowserType.CHROME, extractChromeVersion("Google Chrome " + versionBeta), chromeBetaPath));
-	
+
 			} catch (Win32Exception | ConfigurationException e) {
 				logger.warn("Error searching Beta chrome installations: " + e.getMessage());
 			}
+		} else {
+
+			// look for chrome
+			try {
+				browserList.put(BrowserType.CHROME, new ArrayList<>());
+
+				// main chrome version
+				String chromePath = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "");
+				chromePath = chromePath.split(EXE_EXT_QUOTE)[0].replace("\"", "") + ".exe";
+				String version = getWindowsChromeVersion(chromePath);
+				browserList.get(BrowserType.CHROME).add(new BrowserInfo(BrowserType.CHROME, extractChromeVersion("Google Chrome " + version), chromePath));
+			} catch (Win32Exception | ConfigurationException e) {
+				logger.warn("Error searching chrome installations: " + e.getMessage());
+			}
 		}
+
 		
 		// look for ie
 		try {
