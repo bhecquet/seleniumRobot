@@ -45,8 +45,8 @@ public class Snapshot extends TestAction {
 	public static final String SNAPSHOT_PATTERN = "Application Snapshot";
 	public static final String OUTPUT_PATTERN = "Output '%s' browser: ";
 
-	public Snapshot(final ScreenShot screenshot, String driverName, SnapshotCheckType checkSnapshot) {
-		super(driverName, false, new ArrayList<>());
+	public Snapshot(final ScreenShot screenshot, String snaphotName, SnapshotCheckType checkSnapshot) {
+		super(snaphotName, false, new ArrayList<>());
 		this.screenshot = screenshot;
 		this.checkSnapshot = checkSnapshot;
 		durationToExclude = screenshot.getDuration();

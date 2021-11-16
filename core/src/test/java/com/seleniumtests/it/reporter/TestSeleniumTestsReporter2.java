@@ -270,7 +270,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	/**
 	 * Check that when snapshot server is used, we see a tab pointing to snapshot comparison results
 	 * Moreover, a red bullet should be visible on summary result when comparison is KO
-	 * Result remains OK as behaviour is "displayOnly"
+	 * Result is KO as behavior is 'changeTestResult'
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})

@@ -186,9 +186,7 @@ public class ConnectorsTest extends MockitoTest {
 		HttpResponse<byte[]> bytestremResponse = mock(HttpResponse.class);
 		HttpRequest request = mock(HttpRequest.class);
 		JsonNode json = mock(JsonNode.class);
-		MultipartBody requestMultipartBody = mock(MultipartBody.class);
 		HttpRequestWithBody postRequest = spy(HttpRequestWithBody.class);
-		RequestBodyEntity requestBodyEntity = mock(RequestBodyEntity.class);
 
 		PagedList<JsonNode> pageList = new PagedList<>(); // for asPaged method
 
@@ -233,6 +231,7 @@ public class ConnectorsTest extends MockitoTest {
 				GetRequest getRequest = mock(GetRequest.class); 
 				
 				when(Unirest.get(serverUrl + apiPath)).thenReturn(getRequest);
+				when(getRequest.socketTimeout(anyInt())).thenReturn(getRequest);
 				when(unirestInstance.get(serverUrl + apiPath)).thenReturn(getRequest);
 				
 				when(getRequest.header(anyString(), anyString())).thenReturn(getRequest);
@@ -252,42 +251,59 @@ public class ConnectorsTest extends MockitoTest {
 			case "POST":
 				when(Unirest.post(serverUrl + apiPath)).thenReturn(postRequest);
 				when(unirestInstance.post(serverUrl + apiPath)).thenReturn(postRequest);
+				return preparePostRequest(serverUrl, responseType, postRequest, response, jsonResponse);
 			case "PATCH":
 				when(Unirest.patch(serverUrl + apiPath)).thenReturn(postRequest);
 				when(unirestInstance.patch(serverUrl + apiPath)).thenReturn(postRequest);
-				when(postRequest.field(anyString(), anyString())).thenReturn(requestMultipartBody);
-				when(postRequest.field(anyString(), anyInt())).thenReturn(requestMultipartBody);
-				when(postRequest.field(anyString(), anyLong())).thenReturn(requestMultipartBody);
-				when(postRequest.field(anyString(), anyDouble())).thenReturn(requestMultipartBody);
-				when(postRequest.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
-				when(postRequest.basicAuth(anyString(), anyString())).thenReturn(postRequest);
-				when(postRequest.headerReplace(anyString(), anyString())).thenReturn(postRequest);
-				when(postRequest.queryString(anyString(), anyString())).thenReturn(postRequest);
-				when(postRequest.queryString(anyString(), anyInt())).thenReturn(postRequest);
-				when(postRequest.queryString(anyString(), anyBoolean())).thenReturn(postRequest);
-				when(postRequest.queryString(anyString(), any(SessionId.class))).thenReturn(postRequest);
-				when(postRequest.header(anyString(), anyString())).thenReturn(postRequest);
-				when(requestMultipartBody.field(anyString(), anyString())).thenReturn(requestMultipartBody);
-				when(requestMultipartBody.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
-				when(requestMultipartBody.asString()).thenReturn(response);
-				doReturn(response).when(postRequest).asString();
-				when(postRequest.getUrl()).thenReturn(serverUrl);
-				when(postRequest.body(any(JSONObject.class))).thenReturn(requestBodyEntity);
-				when(postRequest.asJson()).thenReturn(jsonResponse);
-				when(requestBodyEntity.asJson()).thenReturn(jsonResponse);
-				when(requestMultipartBody.getUrl()).thenReturn(serverUrl);
-				when(requestMultipartBody.asJson()).thenReturn(jsonResponse);
+				return preparePostRequest(serverUrl, responseType, postRequest, response, jsonResponse);
+			case "PUT":
+				when(Unirest.put(serverUrl + apiPath)).thenReturn(postRequest);
+				when(unirestInstance.put(serverUrl + apiPath)).thenReturn(postRequest);
+				return preparePostRequest(serverUrl, responseType, postRequest, response, jsonResponse);
 				
-				if ("request".equals(responseType)) {
-					return postRequest;
-				} else if ("body".equals(responseType)) {
-					return requestMultipartBody;
-				} else if ("requestBodyEntity".equals(responseType)) {
-					return requestBodyEntity;
-				}
 
 		}
 		return null;	
+	}
+	
+	private HttpRequest preparePostRequest(String serverUrl, String responseType, HttpRequestWithBody postRequest, HttpResponse<String> response, HttpResponse<JsonNode> jsonResponse) {
+
+		RequestBodyEntity requestBodyEntity = mock(RequestBodyEntity.class);
+		MultipartBody requestMultipartBody = mock(MultipartBody.class);
+
+		when(postRequest.socketTimeout(anyInt())).thenReturn(postRequest);
+		when(postRequest.field(anyString(), anyString())).thenReturn(requestMultipartBody);
+		when(postRequest.field(anyString(), anyInt())).thenReturn(requestMultipartBody);
+		when(postRequest.field(anyString(), anyLong())).thenReturn(requestMultipartBody);
+		when(postRequest.field(anyString(), anyDouble())).thenReturn(requestMultipartBody);
+		when(postRequest.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
+		when(postRequest.basicAuth(anyString(), anyString())).thenReturn(postRequest);
+		when(postRequest.headerReplace(anyString(), anyString())).thenReturn(postRequest);
+		when(postRequest.queryString(anyString(), anyString())).thenReturn(postRequest);
+		when(postRequest.queryString(anyString(), anyInt())).thenReturn(postRequest);
+		when(postRequest.queryString(anyString(), anyBoolean())).thenReturn(postRequest);
+		when(postRequest.queryString(anyString(), any(SessionId.class))).thenReturn(postRequest);
+		when(postRequest.header(anyString(), anyString())).thenReturn(postRequest);
+		when(requestMultipartBody.field(anyString(), anyString())).thenReturn(requestMultipartBody);
+		when(requestMultipartBody.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
+		when(requestMultipartBody.asString()).thenReturn(response);
+		doReturn(response).when(postRequest).asString();
+		when(postRequest.getUrl()).thenReturn(serverUrl);
+		when(postRequest.body(any(JSONObject.class))).thenReturn(requestBodyEntity);
+		when(postRequest.asJson()).thenReturn(jsonResponse);
+		when(requestBodyEntity.asJson()).thenReturn(jsonResponse);
+		when(requestMultipartBody.getUrl()).thenReturn(serverUrl);
+		when(requestMultipartBody.asJson()).thenReturn(jsonResponse);
+		
+		if ("request".equals(responseType)) {
+			return postRequest;
+		} else if ("body".equals(responseType)) {
+			return requestMultipartBody;
+		} else if ("requestBodyEntity".equals(responseType)) {
+			return requestBodyEntity;
+		} else {
+			return null;
+		}
 	}
 
 	protected OngoingStubbing<JsonNode> createJsonServerMock(String requestType, String apiPath, int statusCode, String ... replyData) throws UnirestException {
@@ -438,7 +454,8 @@ public class ConnectorsTest extends MockitoTest {
 		createServerMock("POST", SeleniumRobotSnapshotServerConnector.VERSION_API_URL, 200, "{'id': '11'}");	
 		createServerMock("POST", SeleniumRobotSnapshotServerConnector.TESTCASE_API_URL, 200, "{'id': '12'}");
 		createServerMock("POST", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL, 200, "{'id': '15'}");
-		createServerMock("POST", SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL, 200, "{'id': '16'}");
+		createServerMock("POST", SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL, 200, "{'id': '16', 'computed': true, 'computingError': '', 'diffPixelPercentage': 0.0, 'tooManyDiffs': false}");
+		createServerMock("PUT", SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL, 200, "{'id': '16', 'computed': true, 'computingError': '', 'diffPixelPercentage': 0.0, 'tooManyDiffs': false}");
 		createServerMock("POST", SeleniumRobotSnapshotServerConnector.EXCLUDE_API_URL, 200, "{'id': '18'}");
 		createServerMock("POST", SeleniumRobotSnapshotServerConnector.STEPRESULT_API_URL, 200, "{'id': '17'}");
 		createServerMock("POST", SeleniumRobotSnapshotServerConnector.SESSION_API_URL, 200, "{'id': '13'}");	

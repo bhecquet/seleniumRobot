@@ -32,7 +32,6 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.apache.log4j.Logger;
 
 import com.seleniumtests.core.SeleniumTestsContext;
-import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;

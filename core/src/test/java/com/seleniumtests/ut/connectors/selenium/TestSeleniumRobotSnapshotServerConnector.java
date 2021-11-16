@@ -42,6 +42,7 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
+import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector.SnapshotComparisonResult;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
@@ -666,6 +667,69 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL));
 		
 		Assert.assertNull(snapshotId);
+	}
+	
+	/**
+	 * Check the case were seleniumRobot server is not up to date and createSnapshot API only returns id
+	 * @throws UnirestException
+	 */
+	@Test(groups= {"ut"})
+	public void testCheckSnapshotHasNoDifferencesWithOutdatedServer() throws UnirestException {
+		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
+		connector.setVersionId(11); // set it directly has it has been reset on creation
+		
+		createServerMock("PUT", SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL, 200, "{'id': '16'}");
+		
+		SnapshotComparisonResult snapshotHasNoDifference = connector.checkSnapshotHasNoDifferences(snapshot, "Test 1", "Step 1");
+		
+		// In case API is not up to date, checkSnapshotHasNoDifferences returns 'NOT_DONE'
+		Assert.assertEquals(snapshotHasNoDifference, SnapshotComparisonResult.NOT_DONE);
+	}
+
+	@Test(groups= {"ut"})
+	public void testCheckSnapshotHasNoDifferences() throws UnirestException {
+		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
+		connector.setVersionId(11); // set it directly has it has been reset on creation
+
+		SnapshotComparisonResult snapshotHasNoDifference = connector.checkSnapshotHasNoDifferences(snapshot, "Test 1", "Step 1");
+
+		// When no difference is found, return true
+		Assert.assertEquals(snapshotHasNoDifference, SnapshotComparisonResult.OK);
+	}
+	
+	@Test(groups= {"ut"})
+	public void testCheckSnapshotHasNoDifferencesWithDiff() throws UnirestException {
+		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
+		connector.setVersionId(11); // set it directly has it has been reset on creation
+		
+		createServerMock("PUT", SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL, 200, "{'id': null, 'computed': true, 'computingError': '', 'diffPixelPercentage': 10.0, 'tooManyDiffs': true}");
+		
+		SnapshotComparisonResult snapshotHasNoDifference = connector.checkSnapshotHasNoDifferences(snapshot, "Test 1", "Step 1");
+		
+		// When there are differences, return false
+		Assert.assertEquals(snapshotHasNoDifference, SnapshotComparisonResult.KO);
+	}
+	
+	@Test(groups= {"ut"})
+	public void testCheckSnapshotHasNoDifferencesWithComputingError() throws UnirestException {
+		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
+		connector.setVersionId(11); // set it directly has it has been reset on creation
+		createServerMock("PUT", SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL, 200, "{'id': null, 'computed': true, 'computingError': 'Error computing', 'diffPixelPercentage': 0.0, 'tooManyDiffs': false}");
+
+		SnapshotComparisonResult snapshotHasNoDifference = connector.checkSnapshotHasNoDifferences(snapshot, "Test 1", "Step 1");
+		
+		// In case of computing errors, it may be due to server problem, so do not retry
+		Assert.assertEquals(snapshotHasNoDifference, SnapshotComparisonResult.NOT_DONE);
+	}
+	
+	@Test(groups= {"ut"})
+	public void testCheckSnapshotHasNoDifferencesServerInactive() throws UnirestException {
+		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
+		
+		SnapshotComparisonResult snapshotHasNoDifference = connector.checkSnapshotHasNoDifferences(snapshot, "Test 1", "Step 1");
+		
+		// When server is not there, no error should be raised for this check
+		Assert.assertEquals(snapshotHasNoDifference, SnapshotComparisonResult.NOT_DONE);
 	}
 	
 	
