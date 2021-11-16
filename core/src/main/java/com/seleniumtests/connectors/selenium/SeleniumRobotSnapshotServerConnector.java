@@ -26,8 +26,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.IOUtils;
-import org.json.JSONException;
 import org.openqa.selenium.Rectangle;
 import org.testng.ITestResult;
 
@@ -41,6 +39,7 @@ import com.seleniumtests.util.helper.WaitHelper;
 import kong.unirest.HttpResponse;
 import kong.unirest.MultipartBody;
 import kong.unirest.UnirestException;
+import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
 import rp.com.google.common.io.Files;
 
@@ -66,6 +65,12 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	protected static final int MAX_TESTCASEINSESSION_NAME_LENGHT = 100;
 	protected static final int MAX_SNAPSHOT_NAME_LENGHT = 100;
 	protected static final int MAX_TESTSTEP_NAME_LENGHT = 100;
+	
+	public enum SnapshotComparisonResult {
+		OK,
+		KO,
+		NOT_DONE
+	}
 	
 	public static SeleniumRobotSnapshotServerConnector getInstance() {
 		if (snapshotConnector == null) {
@@ -181,6 +186,14 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		}
 	}
 	
+	/**
+	 * Returns testStepName or a shorter version if it's too long
+	 * @return
+	 */
+	private String getTestStepName(String testStepName) {
+		return testStepName.length() > MAX_TESTSTEP_NAME_LENGHT ? testStepName.substring(0, MAX_TESTSTEP_NAME_LENGHT): testStepName;
+	}
+	
 
 	/**
 	 * Create test step and add it to the current test case
@@ -193,7 +206,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			return null;
 		}
 		
-		String strippedName = testStep.length() > MAX_TESTSTEP_NAME_LENGHT ? testStep.substring(0, MAX_TESTSTEP_NAME_LENGHT): testStep;
+		String strippedName = getTestStepName(testStep);
 		
 		try {
 			JSONObject stepJson = getJSonResponse(buildPostRequest(url + TESTSTEP_API_URL)
@@ -267,10 +280,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		}
 	}
 	
-	/**
-	 * Create snapshot
-	 */
-	public Integer createSnapshot(Snapshot snapshot, Integer sessionId, Integer testCaseInSessionId, Integer stepResultId) {
+	private JSONObject sendSnapshotToServer(Snapshot snapshot, Integer sessionId, Integer testCaseInSessionId, Integer stepResultId) {
 		if (!active) {
 			return null;
 		}
@@ -292,7 +302,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		try {
 			File pictureFile = new File(snapshot.getScreenshot().getFullImagePath());
 			
-			JSONObject snapshotJson = getJSonResponse(buildPostRequest(url + SNAPSHOT_API_URL)
+			return getJSonResponse(buildPostRequest(url + SNAPSHOT_API_URL)
 					.field("stepResult", stepResultId)
 					.field("sessionId", sessionUUID)
 					.field(FIELD_TEST_CASE, testCaseInSessionId.toString())
@@ -301,11 +311,96 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field("compare", snapshot.getCheckSnapshot().getName())
 					.field("diffTolerance", String.valueOf(snapshot.getCheckSnapshot().getErrorThreshold()))
 					);
-			return snapshotJson.getInt("id");
 			
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
-			throw new SeleniumRobotServerException("cannot create test snapshot", e);
+			throw new SeleniumRobotServerException("cannot send snapshot to server", e);
 		}
+	}
+	
+	/**
+	 * Send snapshot to server, for comparison, and check there is no difference with the reference picture
+	 * This method will return true if
+	 * - comparison is OK
+	 * It returns null if:
+	 * - server is inactive
+	 * - computing error occurred
+	 * - server side error ( e.g: if the server is not up to date)
+	 */
+	public SnapshotComparisonResult checkSnapshotHasNoDifferences(Snapshot snapshot, String testName, String stepName) {
+		
+		if (!active) {
+			return SnapshotComparisonResult.NOT_DONE;
+		}
+		if (testName == null) {
+			throw new ConfigurationException("testName must not be null");
+		}
+		if (stepName == null) {
+			throw new ConfigurationException("stepName must not be null");
+		}
+		if (snapshot == null || snapshot.getScreenshot() == null || snapshot.getScreenshot().getFullImagePath() == null) {
+			throw new SeleniumRobotServerException("Provided snapshot does not exist");
+		}
+		
+		String snapshotName = snapshot.getName().length() > MAX_SNAPSHOT_NAME_LENGHT ? snapshot.getName().substring(0, MAX_SNAPSHOT_NAME_LENGHT): snapshot.getName(); 
+		
+		try {
+			File pictureFile = new File(snapshot.getScreenshot().getFullImagePath());
+			BrowserType browser = SeleniumTestsContextManager.getGlobalContext().getBrowser();
+			browser = browser == null ? BrowserType.NONE : browser;
+			String strippedTestName = getTestName(testName);
+			String strippedStepName = getTestStepName(stepName);
+			
+			JSONObject snapshotJson = getJSonResponse(buildPutRequest(url + SNAPSHOT_API_URL)
+					.socketTimeout(5000)
+					.field("image", pictureFile)
+					.field(FIELD_NAME, snapshotName)
+					.field("compare", snapshot.getCheckSnapshot().getName())
+					.field("diffTolerance", String.valueOf(snapshot.getCheckSnapshot().getErrorThreshold()))
+					.field("versionId", versionId.toString())
+					.field("environmentId", environmentId.toString())
+					.field("browser", browser.getBrowserType())
+					.field("testCaseName", strippedTestName)
+					.field("stepName", strippedStepName)
+					);
+			
+			if (snapshotJson != null) {
+				String computingError = snapshotJson.getString(FIELD_COMPUTING_ERROR);
+				Float diffPixelPercentage = snapshotJson.getFloat("diffPixelPercentage");
+				Boolean tooManyDiffs = snapshotJson.getBoolean("tooManyDiffs");
+				
+				if (!computingError.isEmpty()) {
+					return SnapshotComparisonResult.NOT_DONE;
+				} else if (Boolean.TRUE.equals(tooManyDiffs)) {
+					logger.error(String.format("Snapshot comparison for %s has a difference of %.2f%% with reference", snapshot.getName(), diffPixelPercentage));
+					return SnapshotComparisonResult.KO;
+				} else {
+					return SnapshotComparisonResult.OK;
+				}
+			} else {
+				return SnapshotComparisonResult.NOT_DONE;
+			}
+			
+		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
+			// in case selenium server is not up to date, we shall not raise an error / retry
+			logger.error("cannot send snapshot to server", e);
+			return SnapshotComparisonResult.NOT_DONE;
+		}
+		
+		
+		
+	}
+	/**
+	 * Create snapshot on server that will be used to show differences between 2 versions of the application
+	 */
+	public Integer createSnapshot(Snapshot snapshot, Integer sessionId, Integer testCaseInSessionId, Integer stepResultId) {
+
+		JSONObject snapshotJson = sendSnapshotToServer(snapshot, sessionId, testCaseInSessionId, stepResultId);
+		if (snapshotJson != null) {
+			return snapshotJson.getInt("id");
+		} else {
+			return 0;
+		}
+
 	}
 	/**
 	 * Send exclude zones, stored in snapshot to the server

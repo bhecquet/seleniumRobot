@@ -50,6 +50,8 @@ import org.testng.internal.annotations.DisabledRetryAnalyzer;
 
 import com.epam.reportportal.testng.BaseTestNGListener;
 import com.google.common.collect.Iterables;
+import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
+import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector.SnapshotComparisonResult;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import com.seleniumtests.connectors.tms.reportportal.ReportPortalService;
 import com.seleniumtests.core.SeleniumTestsContext;
@@ -59,6 +61,7 @@ import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.core.testretry.TestRetryAnalyzer;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.WebUIDriver;
@@ -66,6 +69,7 @@ import com.seleniumtests.reporter.info.Info;
 import com.seleniumtests.reporter.info.LogInfo;
 import com.seleniumtests.reporter.info.MultipleInfo;
 import com.seleniumtests.reporter.logger.ArchiveMode;
+import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.reporters.CommonReporter;
 import com.seleniumtests.reporter.reporters.ReporterControler;
@@ -518,6 +522,8 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 		tearDownStep.updateDuration();
 		TestStepManager.logTestStep(tearDownStep);
 		
+		// at this stage we have the pictures of the last state. Try to find error cause if test is failed
+		
 	}
 	
 	private void logThrowableToTestEndStep(ITestResult testResult) {
@@ -546,50 +552,8 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 		}
 	}
 	
+	
 
-	/**
-	 * In case test result is SUCCESS but some softAssertions were raised, change test result to 
-	 * FAILED
-	 * 
-	 * @param result
-	 */
-	public void changeTestResult(final ITestResult result) {
-		List<Throwable> verificationFailures = SeleniumTestsContextManager.getThreadContext().getVerificationFailures(Reporter.getCurrentTestResult());
-
-		int size = verificationFailures.size();
-		if (size == 0 || result.getStatus() == ITestResult.FAILURE) {
-			return;
-		}
-
-		result.setStatus(ITestResult.FAILURE);
-
-		if (size == 1) {
-			result.setThrowable(verificationFailures.get(0));
-		} else {
-			
-			StringBuilder stackString = new StringBuilder("!!! Many Test Failures (").append(size).append(")\n\n");
-			
-			for (int i = 0; i < size - 1; i++) {
-				ExceptionUtility.generateTheStackTrace(verificationFailures.get(i), String.format("%n.%nFailure %d of %d%n", i + 1, size), stackString, "text");
-			}
-			
-			Throwable last = verificationFailures.get(size - 1);
-			stackString.append(String.format("%n.%nFailure %d of %d%n", size, size));
-			stackString.append(last.toString());
-
-			// set merged throwable
-			Throwable merged = new AssertionError(stackString.toString());
-			merged.setStackTrace(last.getStackTrace());
-
-			result.setThrowable(merged);
-		}
-
-		// move test from passedTests to failedTests if test is not already in failed tests
-		if (result.getTestContext().getPassedTests().getAllMethods().contains(result.getMethod())) {
-			result.getTestContext().getPassedTests().removeResult(result);
-			result.getTestContext().getFailedTests().addResult(result, result.getMethod());
-		}
-	}	
 
 	/**
 	 * put in thread context the test / class / method context that may have already be defined in other \@BeforeXXX method
@@ -653,7 +617,8 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 
 		// Handle Soft CustomAssertion
 		if (method.isTestMethod()) {
-			changeTestResult(testResult);
+			TestNGResultUtils.changeTestResultWithSoftAssertion(testResult);
+			TestNGResultUtils.changeTestResultWithSnapshotComparison(testResult);
 		}
 		
 		// store context in test result

@@ -307,6 +307,7 @@ public class WebUIDriver {
 				for (ScreenShot screenshot: new ScreenshotUtil(driver).capture(SnapshotTarget.PAGE, ScreenShot.class, true, true)) {
 					scenarioLogger.logScreenshot(screenshot, null, name, SnapshotCheckType.FALSE);
 					
+					// add the last screenshots to TestInfo so that there is a quicklink on reports
 					Info lastStateInfo = TestNGResultUtils.getTestInfo(testResult).get(TestStepManager.LAST_STATE_NAME);
 		        	if (lastStateInfo != null) {
 		        		((MultipleInfo)lastStateInfo).addInfo(new ImageLinkInfo(TestNGResultUtils.getUniqueTestName(testResult) + "/" + screenshot.getImagePath()));

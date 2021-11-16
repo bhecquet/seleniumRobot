@@ -198,6 +198,15 @@ public abstract class SeleniumRobotServerConnector {
 		return versionId;
 	}
 	
+	/**
+	 * returns the test name or a shorter version if it's too long
+	 * @param testName
+	 * @return
+	 */
+	protected String getTestName(String testName) {
+		return testName.length() > MAX_TESTCASE_NAME_LENGHT ? testName.substring(0, MAX_TESTCASE_NAME_LENGHT): testName;
+	}
+	
 
 	/**
 	 * Create test case and add it to the current session
@@ -214,7 +223,7 @@ public abstract class SeleniumRobotServerConnector {
 			createApplication();
 		}
 		
-		String strippedTestName = testName.length() > MAX_TESTCASE_NAME_LENGHT ? testName.substring(0, MAX_TESTCASE_NAME_LENGHT): testName;
+		String strippedTestName = getTestName(testName);
 
 		try {
 			JSONObject testJson = getJSonResponse(buildPostRequest(url + TESTCASE_API_URL)
@@ -289,6 +298,14 @@ public abstract class SeleniumRobotServerConnector {
 		}
 	}
 	
+	protected HttpRequestWithBody buildPutRequest(String url) {
+		if (authToken != null) {
+			return Unirest.put(url).header(AUTHORIZATION_HEADER, authToken);
+		} else {
+			return Unirest.put(url);
+		}
+	}
+	
 	protected HttpRequestWithBody buildPatchRequest(String url) {
 		if (authToken != null) {
 			return Unirest.patch(url).header(AUTHORIZATION_HEADER, authToken);
@@ -313,7 +330,7 @@ public abstract class SeleniumRobotServerConnector {
 		if (response.getStatus() == 204) {
 			return new JSONObject();
 		}
-		new org.json.JSONObject(response.getBody());
+		
 		return new JSONObject(response.getBody());
 	}
 	
