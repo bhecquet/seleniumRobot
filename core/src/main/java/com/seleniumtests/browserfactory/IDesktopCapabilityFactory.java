@@ -64,18 +64,30 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
     private BrowserInfo prepareBinaryAndDriver(final BrowserType browserType, final String binPath, final String driverPath, final String version) {
 
     	// automatic list from OS + binary added as launch option (see SeleniumTestsContext.updateInstalledBrowsers())
+
+		// OSUtility.getInstalledBrowsersWithVersion(webDriverConfig.getBetaBrowser()) => [CHROME: 'chrome1', 'chrome2', FIREFOX: ff1, ...]
+		// .get(CHROME) => 'chrome1', 'chrome2'
+
     	List<BrowserInfo> browserInfos = OSUtility.getInstalledBrowsersWithVersion(webDriverConfig.getBetaBrowser()).get(browserType);
-    	
-    	if (version != null) { 
+
+		if (version != null) {
     		selectedBrowserInfo = BrowserInfo.getInfoFromVersion(version, browserInfos);
     	} else if (binPath != null) {
     		selectedBrowserInfo = BrowserInfo.getInfoFromBinary(binPath, browserInfos);
     		logger.info("Using user defined browser binary from: " + selectedBrowserInfo.getPath());
-    	} else {
-    		selectedBrowserInfo = BrowserInfo.getHighestDriverVersion(browserInfos);
-    	}
-    	
-    	// in case of legacy firefox driverFileName is null
+    	} else  {
+			// chrome 95
+			// chrome 95 beta
+			// chrome 96
+			// chrome 96 beta
+			for (BrowserInfo browser : browserInfos) {
+				if (webDriverConfig.getBetaBrowser().equals(browser.getBeta())) {
+					selectedBrowserInfo = browser;
+				}
+			}
+		}
+
+		// in case of legacy firefox driverFileName is null
     	String newDriverPath = new DriverExtractor().extractDriver(selectedBrowserInfo.getDriverFileName());
     	if (driverPath != null) {
     		newDriverPath = driverPath;
