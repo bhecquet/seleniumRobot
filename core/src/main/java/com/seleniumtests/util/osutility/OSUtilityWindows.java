@@ -288,33 +288,34 @@ public class OSUtilityWindows extends OSUtility {
 			// ignore
 		}
 
-		if (discoverBetaBrowsers) {
-			try {
-				// beta chrome version
-				String chromeBetaPath = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeBHTML\\shell\\open\\command", "");
-				chromeBetaPath = chromeBetaPath.split(EXE_EXT_QUOTE)[0].replace("\"", "") + ".exe";
-				String versionBeta;
-				versionBeta = getWindowsBetaChromeVersion(chromeBetaPath);
-				browserList.get(BrowserType.CHROME).add(new BrowserInfo(BrowserType.CHROME, extractChromeVersion("Google Chrome " + versionBeta), chromeBetaPath));
 
-			} catch (Win32Exception | ConfigurationException e) {
-				logger.warn("Error searching Beta chrome installations: " + e.getMessage());
-			}
-		} else {
+		// look for chrome
+		try {
+			browserList.put(BrowserType.CHROME, new ArrayList<>());
 
-			// look for chrome
-			try {
-				browserList.put(BrowserType.CHROME, new ArrayList<>());
-
-				// main chrome version
-				String chromePath = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "");
-				chromePath = chromePath.split(EXE_EXT_QUOTE)[0].replace("\"", "") + ".exe";
-				String version = getWindowsChromeVersion(chromePath);
-				browserList.get(BrowserType.CHROME).add(new BrowserInfo(BrowserType.CHROME, extractChromeVersion("Google Chrome " + version), chromePath));
-			} catch (Win32Exception | ConfigurationException e) {
-				logger.warn("Error searching chrome installations: " + e.getMessage());
-			}
+			// main chrome version
+			String chromePath = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "");
+			chromePath = chromePath.split(EXE_EXT_QUOTE)[0].replace("\"", "") + ".exe";
+			String version = getWindowsChromeVersion(chromePath);
+			browserList.get(BrowserType.CHROME).add(new BrowserInfo(BrowserType.CHROME, extractChromeVersion("Google Chrome " + version), false, chromePath));
+		} catch (Win32Exception | ConfigurationException e) {
+			logger.warn("Error searching chrome installations: " + e.getMessage());
 		}
+
+		try {
+			// beta chrome version
+			String chromeBetaPath = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeBHTML\\shell\\open\\command", "");
+			chromeBetaPath = chromeBetaPath.split(EXE_EXT_QUOTE)[0].replace("\"", "") + ".exe";
+			String versionBeta;
+			versionBeta = getWindowsBetaChromeVersion(chromeBetaPath);
+			browserList.get(BrowserType.CHROME).add(new BrowserInfo(BrowserType.CHROME, extractChromeVersion("Google Chrome " + versionBeta), true, chromeBetaPath));
+
+		} catch (Win32Exception | ConfigurationException e) {
+			logger.warn("Error searching Beta chrome installations: " + e.getMessage());
+		}
+
+
+
 
 		
 		// look for ie
@@ -335,28 +336,26 @@ public class OSUtilityWindows extends OSUtility {
 			String version = getWindowsEdgeVersion(edgePath);
 			
 			if (version != null && !version.isEmpty()) {
-				browserList.get(BrowserType.EDGE).add(new BrowserInfo(BrowserType.EDGE, extractEdgeVersion(version), Paths.get(edgePath, "msedge.exe").toString()));
+				browserList.get(BrowserType.EDGE).add(new BrowserInfo(BrowserType.EDGE, extractEdgeVersion(version), false, Paths.get(edgePath, "msedge.exe").toString()));
 			}
 		} catch (Win32Exception | ConfigurationException e) {
 			logger.warn("Error searching Edge chromium installations: " + e.getMessage());
 		}
 		
-		
-		if (discoverBetaBrowsers) {
-			try {
-				// beta edge version
-				String edgePathBeta = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge Beta", "InstallLocation");
-				String versionBeta = getWindowsBetaEdgeVersion(edgePathBeta);
-				
-				if (versionBeta != null && !versionBeta.isEmpty()) {
-					browserList.get(BrowserType.EDGE).add(new BrowserInfo(BrowserType.EDGE, extractEdgeVersion(versionBeta), Paths.get(edgePathBeta, "msedge.exe").toString()));
-				}
-	
-			} catch (Win32Exception | ConfigurationException e) {
-				logger.warn("Error searching Beta Edge chromium installations: " + e.getMessage());
+
+		try {
+			// beta edge version
+			String edgePathBeta = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge Beta", "InstallLocation");
+			String versionBeta = getWindowsBetaEdgeVersion(edgePathBeta);
+
+			if (versionBeta != null && !versionBeta.isEmpty()) {
+				browserList.get(BrowserType.EDGE).add(new BrowserInfo(BrowserType.EDGE, extractEdgeVersion(versionBeta), true, Paths.get(edgePathBeta, "msedge.exe").toString()));
 			}
+
+		} catch (Win32Exception | ConfigurationException e) {
+			logger.warn("Error searching Beta Edge chromium installations: " + e.getMessage());
 		}
-		
+
 		return browserList;
 	}
 
