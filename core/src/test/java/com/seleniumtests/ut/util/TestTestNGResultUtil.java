@@ -72,7 +72,7 @@ public class TestTestNGResultUtil extends MockitoTest {
 	@Mock
 	CucumberScenarioWrapper cucumberScenarioWrapper;
 	
-	@BeforeMethod
+	@BeforeMethod(alwaysRun = true)
 	private void init() {
 		
 		when(testContext.getName()).thenReturn("a test");
