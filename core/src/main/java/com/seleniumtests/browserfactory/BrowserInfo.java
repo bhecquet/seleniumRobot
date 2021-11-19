@@ -61,7 +61,7 @@ public class BrowserInfo {
 	private static List<String> driverList;
 	
 	private String version;
-	private static boolean beta;
+	private boolean beta;
 	private String path;
 	private String driverFileName;
 	private String os;
