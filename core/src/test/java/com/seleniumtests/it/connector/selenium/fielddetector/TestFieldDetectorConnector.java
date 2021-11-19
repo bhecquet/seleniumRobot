@@ -45,7 +45,7 @@ public class TestFieldDetectorConnector extends GenericTest {
 		System.clearProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL);
 	}
 	
-	@Test(groups="it", enabled = true)
+	@Test(groups="it", enabled = false)
 	public void testFieldDetection() throws IOException {
 		ImageFieldDetector imageFieldDetector;
 		try {

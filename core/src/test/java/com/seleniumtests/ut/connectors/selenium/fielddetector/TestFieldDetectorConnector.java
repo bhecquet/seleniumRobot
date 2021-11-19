@@ -120,6 +120,56 @@ public class TestFieldDetectorConnector extends ConnectorsTest {
 		Assert.assertEquals(fields.size(), 2);
 	}
 	
+	@Test(groups={"ut"})
+	public void testDetectErrorOk() throws IOException  {
+		File image = createImageFromResource("ti/form_picture.png");
+		
+		String detectionReply = String.format("{" 
+				+ "	\"error\": null,"
+				+ "	\"%s\": {"
+				+ "		\"fields\": ["
+				+ "		{"
+				+ "			\"bottom\": 204,"
+				+ "			\"class_id\": 0,"
+				+ "			\"class_name\": \"error_field\","
+				+ "			\"height\": 21,"
+				+ "			\"left\": 611,"
+				+ "			\"related_field\": null,"
+				+ "			\"right\": 711,"
+				+ "			\"text\": null,"
+				+ "			\"top\": 183,"
+				+ "			\"width\": 100,"
+				+ "			\"with_label\": false"
+				+ "		}],"
+				+ "		\"labels\": [{"
+				+ "			\"bottom\": 20,"
+				+ "			\"height\": 15,"
+				+ "			\"left\": 159,"
+				+ "			\"right\": 460,"
+				+ "			\"text\": \"Dossier Client S3]HOMOLOGATIO\","
+				+ "			\"top\": 5,"
+				+ "			\"width\": 301"
+				+ "		},"
+				+ "		{"
+				+ "			\"bottom\": 262,"
+				+ "			\"height\": 8,"
+				+ "			\"left\": 939,"
+				+ "			\"right\": 999,"
+				+ "			\"text\": \"Rechercher\","
+				+ "			\"top\": 254,"
+				+ "			\"width\": 60"
+				+ "		}]"
+				+ "	}"
+				+ "}", image.getName());
+		
+		createServerMock("GET", "/status", 200, "OK");	
+		createServerMock("POST", "/detectError", 200, detectionReply);	
+		FieldDetectorConnector fieldDetectorConnector = new FieldDetectorConnector("http://localhost:4321");
+		List<JSONObject> fields = fieldDetectorConnector.detectError(image).getJSONArray("fields").toList();
+		
+		Assert.assertEquals(fields.size(), 2);
+	}
+	
 	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class, expectedExceptionsMessageRegExp = "Field detector returned error: some error occured")
 	public void testDetectKoWithMessage() throws IOException  {
 		File image = createImageFromResource("ti/form_picture.png");
