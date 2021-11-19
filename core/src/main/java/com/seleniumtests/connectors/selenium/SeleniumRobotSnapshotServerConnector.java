@@ -280,43 +280,6 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		}
 	}
 	
-	private JSONObject sendSnapshotToServer(Snapshot snapshot, Integer sessionId, Integer testCaseInSessionId, Integer stepResultId) {
-		if (!active) {
-			return null;
-		}
-		if (sessionId == null) {
-			throw new ConfigurationException("Session must be previously recorded");
-		}
-		if (testCaseInSessionId == null) {
-			throw new ConfigurationException("TestCaseInSession must be previously recorded");
-		}
-		if (stepResultId == null) {
-			throw new ConfigurationException("Step result must be previously recorded");
-		}
-		if (snapshot == null || snapshot.getScreenshot() == null || snapshot.getScreenshot().getFullImagePath() == null) {
-			throw new SeleniumRobotServerException("Provided snapshot does not exist");
-		}
-		
-		String snapshotName = snapshot.getName().length() > MAX_SNAPSHOT_NAME_LENGHT ? snapshot.getName().substring(0, MAX_SNAPSHOT_NAME_LENGHT): snapshot.getName(); 
-		
-		try {
-			File pictureFile = new File(snapshot.getScreenshot().getFullImagePath());
-			
-			return getJSonResponse(buildPostRequest(url + SNAPSHOT_API_URL)
-					.field("stepResult", stepResultId)
-					.field("sessionId", sessionUUID)
-					.field(FIELD_TEST_CASE, testCaseInSessionId.toString())
-					.field("image", pictureFile)
-					.field(FIELD_NAME, snapshotName)
-					.field("compare", snapshot.getCheckSnapshot().getName())
-					.field("diffTolerance", String.valueOf(snapshot.getCheckSnapshot().getErrorThreshold()))
-					);
-			
-		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
-			throw new SeleniumRobotServerException("cannot send snapshot to server", e);
-		}
-	}
-	
 	/**
 	 * Send snapshot to server, for comparison, and check there is no difference with the reference picture
 	 * This method will return true if
@@ -389,19 +352,48 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		
 		
 	}
+	
 	/**
 	 * Create snapshot on server that will be used to show differences between 2 versions of the application
 	 */
 	public Integer createSnapshot(Snapshot snapshot, Integer sessionId, Integer testCaseInSessionId, Integer stepResultId) {
-
-		JSONObject snapshotJson = sendSnapshotToServer(snapshot, sessionId, testCaseInSessionId, stepResultId);
-		if (snapshotJson != null) {
-			return snapshotJson.getInt("id");
-		} else {
-			return 0;
+		if (!active) {
+			return null;
 		}
-
+		if (sessionId == null) {
+			throw new ConfigurationException("Session must be previously recorded");
+		}
+		if (testCaseInSessionId == null) {
+			throw new ConfigurationException("TestCaseInSession must be previously recorded");
+		}
+		if (stepResultId == null) {
+			throw new ConfigurationException("Step result must be previously recorded");
+		}
+		if (snapshot == null || snapshot.getScreenshot() == null || snapshot.getScreenshot().getFullImagePath() == null) {
+			throw new SeleniumRobotServerException("Provided snapshot does not exist");
+		}
+		
+		String snapshotName = snapshot.getName().length() > MAX_SNAPSHOT_NAME_LENGHT ? snapshot.getName().substring(0, MAX_SNAPSHOT_NAME_LENGHT): snapshot.getName(); 
+		
+		try {
+			File pictureFile = new File(snapshot.getScreenshot().getFullImagePath());
+			
+			JSONObject snapshotJson = getJSonResponse(buildPostRequest(url + SNAPSHOT_API_URL)
+					.field("stepResult", stepResultId)
+					.field("sessionId", sessionUUID)
+					.field(FIELD_TEST_CASE, testCaseInSessionId.toString())
+					.field("image", pictureFile)
+					.field(FIELD_NAME, snapshotName)
+					.field("compare", snapshot.getCheckSnapshot().getName())
+					.field("diffTolerance", String.valueOf(snapshot.getCheckSnapshot().getErrorThreshold()))
+					);
+			return snapshotJson.getInt("id");
+			
+		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
+			throw new SeleniumRobotServerException("cannot create test snapshot", e);
+		}
 	}
+	
 	/**
 	 * Send exclude zones, stored in snapshot to the server
 	 */
