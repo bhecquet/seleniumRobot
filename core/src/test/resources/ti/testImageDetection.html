@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <script>
+        function showError() {
+        	document.getElementById("errorMessage").innerHTML = "Big error occured on your form"
+        }
+        </script>
+    </head>
+
+    <body>
+        <div id="errorMessage" style="color: crimson;width: fit-content;"></div>
+        <input type="text">
+        <input type="button" value="Error" id="errorButton" onclick="javascript:showError()">
+    </body>
+</html>

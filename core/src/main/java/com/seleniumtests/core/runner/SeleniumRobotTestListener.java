@@ -58,6 +58,7 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.core.TestTasks;
+import com.seleniumtests.core.testanalysis.ErrorCauseFinder;
 import com.seleniumtests.core.testretry.TestRetryAnalyzer;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
@@ -523,6 +524,7 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 		TestStepManager.logTestStep(tearDownStep);
 		
 		// at this stage we have the pictures of the last state. Try to find error cause if test is failed
+		new ErrorCauseFinder().findErrorCause();
 		
 	}
 	
