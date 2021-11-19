@@ -95,7 +95,7 @@ public class WebUIDriver {
     private IWebDriverFactory webDriverBuilder;
     private static final Object createDriverLock = new Object();
 
-    public WebUIDriver(String name) {
+	public WebUIDriver(String name) {
     	if (SeleniumTestsContextManager.getThreadContext() == null) {
             return;
         }
@@ -624,15 +624,29 @@ public class WebUIDriver {
     }
     
     private void checkBrowserRunnable() {
-    	if (config.getMode() == DriverMode.LOCAL && !config.getTestType().isMobile()) {
-    		Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion(config.getBetaBrowser());
-    		if (!browsers.containsKey(config.getBrowserType())) {
-    			throw new ConfigurationException(String.format("Browser %s is not available. Available browsers are %s", 
-    					config.getBrowserType(), browsers));
-    		}
-    	}
-    }
-    
+		if (config.getMode() == DriverMode.LOCAL && !config.getTestType().isMobile()) {
+			Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion(config.getBetaBrowser());
+			if (!browsers.containsKey(config.getBrowserType()) || browsers.get(config.getBrowserType()).isEmpty()) {
+				throw new ConfigurationException(String.format("Browser %s is not available. Available browsers are %s",
+						config.getBrowserType(), browsers));
+			}
+
+			boolean browserFound = false;
+			for (BrowserInfo browserInfo : browsers.get(config.getBrowserType())) {
+
+				if (config.getBetaBrowser().equals(browserInfo.getBeta())) {
+					browserFound = true;
+					break;
+				}
+			}
+			if (!browserFound) {
+				throw new ConfigurationException(String.format("Browser %s %s is not available. Available browsers are %s",
+						config.getBrowserType(), config.getBetaBrowser() ? "beta" : "", browsers));
+
+			}
+		}
+	}
+
     /**
      * Get version from browser capabilities and display it
      */
