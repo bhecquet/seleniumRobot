@@ -47,6 +47,7 @@ import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnecto
 import com.seleniumtests.connectors.tms.reportportal.ReportPortalService;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.testanalysis.ErrorCauseFinder;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.ScenarioException;
@@ -147,8 +148,28 @@ public class ReporterControler implements IReporter {
 					logger.error("Error generating report", e);
 				}
 			}
+			
+			
+			if (!suiteFinished) {
+				findErrorCauses(resultSet);
+			}
 
 		}
+	}
+	
+	private void findErrorCauses(Map<ITestContext, Set<ITestResult>> resultSet) {
+		for (Set<ITestResult> rs: resultSet.values()) {
+			for (ITestResult testResult: rs) {
+				
+				// When SeleniumRobotTestRecorded has been run, results are stored on seleniumRobot server and it's then possible 
+				// to compare reference snapshot with current failed step (if any)
+				if (TestNGResultUtils.isSeleniumServerReportCreated(testResult)) {
+					new ErrorCauseFinder(testResult).findErrorCause();
+				}
+			}
+		}
+		
+		
 	}
 	
 	/**
