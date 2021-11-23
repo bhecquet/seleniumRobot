@@ -65,6 +65,7 @@ public class TestStep extends TestAction {
 	private ITestResult testResult;
 	private RootCause errorCause;
 	private String errorCauseDetails;
+	private Integer stepResultId;  // the stepResult if it has been recorded on seleniumRobot-server
 	private boolean disableBugtracker;
 	
 	public enum StepStatus {
@@ -491,6 +492,12 @@ public class TestStep extends TestAction {
 	}
 	public void setVideoTimeStamp(long videoTimeStamp) {
 		this.videoTimeStamp = videoTimeStamp;
+	}
+	public Integer getStepResultId() {
+		return stepResultId;
+	}
+	public void setStepResultId(Integer stepResultId) {
+		this.stepResultId = stepResultId;
 	}
 	
 }
