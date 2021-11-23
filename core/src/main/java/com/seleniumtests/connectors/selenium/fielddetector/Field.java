@@ -71,4 +71,15 @@ public class Field {
 	public String toString() {
 		return String.format("%s[text=%s]: %s", className, getText(), getRectangle());
 	}
+	
+	/**
+	 * 2 fields match if the are of the same class and their positions match
+	 * @param anOtherField
+	 * @return
+	 */
+	public boolean match(Field anOtherField) {
+		return className != null 
+				&& className.equals(anOtherField.className) 
+				&& label.match(anOtherField.label);
+	}
 }
