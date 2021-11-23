@@ -141,7 +141,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 				
 				// do not record this result twice if it's already recorded
 				if (TestNGResultUtils.isSeleniumServerReportCreated(testResult) 
-					// NoMoreRetry is set to false when test is being retried
+					// NoMoreRetry is set to false when test is being retried => we do not want to record a temp result, only the last one
 					|| (TestNGResultUtils.getNoMoreRetry(testResult) != null && !TestNGResultUtils.getNoMoreRetry(testResult))) {
 					continue;
 				}
@@ -189,6 +189,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			String stepLogs = testStep.toJson().toString();
 			
 			Integer stepResultId = serverConnector.recordStepResult(!testStep.getFailed(), stepLogs, testStep.getDuration(), sessionId, testCaseInSessionId, testStepId);
+			testStep.setStepResultId(stepResultId);
 			
 			// sends all snapshots that are flagged as comparable
 			for (Snapshot snapshot: new ArrayList<>(testStep.getSnapshots())) {
