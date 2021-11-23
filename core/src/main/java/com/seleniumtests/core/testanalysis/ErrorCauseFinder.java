@@ -2,17 +2,23 @@ package com.seleniumtests.core.testanalysis;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
+import org.testng.ITestResult;
 
+import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.connectors.selenium.fielddetector.Field;
 import com.seleniumtests.connectors.selenium.fielddetector.ImageFieldDetector;
-import com.seleniumtests.connectors.selenium.fielddetector.Label;
 import com.seleniumtests.connectors.selenium.fielddetector.ImageFieldDetector.FieldType;
+import com.seleniumtests.connectors.selenium.fielddetector.Label;
 import com.seleniumtests.core.TestStepManager;
+import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.util.imaging.StepReferenceComparator;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 /**
@@ -37,15 +43,23 @@ public class ErrorCauseFinder {
 	/*
 	 *  TESTS:
 	 *  - si le ImageFieldDetector ne s'initialise pas, il ne faut pas planter
+	 *  - on n'a pas le stepResultId => on doit renvoyer null
+	 *  - Label.match()
+	 *  - Field.match()
+	 *  - StepReferenceComparator
 	 */
 	
 	private static final String[] ERROR_WORDS = new String[] {"error", "erreur", "problem", "problème"};
 
 	private static final Logger logger = SeleniumRobotLogger.getLogger(ErrorCauseFinder.class);
 	
+	private ITestResult testResult;
+	
 	public enum ErrorType {
-		ERROR_MESSAGE,
-		ERROR_IN_FIELD
+		ERROR_MESSAGE,			// error message displayed
+		ERROR_IN_FIELD,			// some field shows an error (it's coloured in red)
+		APPLICATION_CHANGED,	// compared to the page we expect, the page we are on is slightly different
+		SELENIUM_ERROR			// we are not on the right page to perform our actions, it may be due to a problem when clicking during previous step
 	}
 	
 	public class ErrorCause {
@@ -97,15 +111,140 @@ public class ErrorCauseFinder {
 		
 	}
 	
-	public void findErrorCause() {
-		findErrorInLastStepSnapshots();
+	public ErrorCauseFinder(ITestResult testResult) {
+		this.testResult = testResult;
 	}
 	
+	/**
+	 * Try to find what caused the test to fail
+	 * @return
+	 */
+	public List<ErrorCause> findErrorCause() {
+		
+		
+		
+		List<ErrorCause> causes = new ArrayList<>();
+		
+		causes.addAll(findErrorInLastStepSnapshots());
+		
+		return causes;
+	}
+	
+	/**
+	 * Compare the failed step with it's reference that can be found on seleniumRobot server
+	 * If reference cannot be found, skip this step
+	 * @return
+	 */
+	private List<ErrorCause> compareStepInErrorWithReference() {
+		List<ErrorCause> causes = new ArrayList<>();
+		
+		// don't analyze if result has not been recorded on seleniumRobot server
+		TestStepManager testStepManager = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager();
+		if (testStepManager.getLastTestStep().getStepResultId() == null) {
+			return causes;
+		}
+		
+		for (TestStep testStep: testStepManager.getTestSteps()) {
+
+			Integer stepResultId = testStep.getStepResultId();
+			if (Boolean.TRUE.equals(testStep.getFailed()) && !(testStep.getActionException() instanceof AssertionError) && stepResultId != null) {
+				
+				try {
+					Snapshot stepSnapshot = testStep.getSnapshots()
+						.stream()
+						.filter(s -> s.getCheckSnapshot().recordSnapshotOnServerForReference())
+						.collect(Collectors.toList()).get(0);
+					File stepSnapshotFile = new File(stepSnapshot.getScreenshot().getFullImagePath());
+					
+					File referenceSnapshot = SeleniumRobotSnapshotServerConnector.getInstance().getReferenceSnapshot(stepResultId);
+					int matching = compareReferenceToStepSnapshot(stepSnapshotFile, referenceSnapshot);
+					
+					// bad matching: the reference does not match at all the current step, we will check with other reference steps
+					if (matching < 50) {
+						searchMatchingInPreviousStep(testStepManager, testStep, stepSnapshotFile, causes);
+						
+					// middle matching: we may be on the right web page but the page has changed (some fields appeared or disappeared)
+					// or the text changed slightly. This could mean application changed
+					} else if (matching < 90) {
+						causes.add(new ErrorCause(ErrorType.APPLICATION_CHANGED, null));
+					}
+					
+					// else, very good matching: we are on the same web page, error does not come from there
+					
+					
+					break;
+					
+				} catch (IndexOutOfBoundsException e) {
+					// skip this step
+				}
+				
+
+				
+				
+				// à partir de la référence de ce step, on va comparer le nombre de champs avec l'image prise au début de l'étape du test qui nous intéresse
+				// - nombre et position des champs
+				// - ressemblance et position du texte / des labels
+				// Si la correspondance n'est pas bonne (la plupart des champs de la référence ne sont pas présents), on va chercher par rapport à l'une des étapes précedente
+				// 		On va considérer qu'il y a eu une erreur dans les clics, qui font qu'on n'est pas sur la bonne page au démarrage de l'étape
+				// Si la correspondance est moyenne (X % des champs présents et texte similaire), on considère qu'il y a eu évolution de l'application
+				// Si la correspondance est bonne, il n'y a rien de plus à faire de ce côté
+				
+			}
+		}
+		
+
+		TestNGResultUtils.setErrorCauseInReferencePicture(testResult, true);
+		
+		return causes;
+	}
+	
+	/**
+	 * Search a test step before 'testStep' which is matching the current failed step
+	 * e.g: we failed on step 3 so we search in 'step 2', then 'step 1' to see if one of them matches our 'step 3' visually
+	 * @param testStepManager		the TestStepManager
+	 * @param testStep				the TestStep on which we fail
+	 * @param stepSnapshotFile		the snapshot taken at the beginning of the step (which will be compared to references
+	 * @param errorCauses			the list of error causes
+	 */
+	private void searchMatchingInPreviousStep(TestStepManager testStepManager, TestStep testStep, File stepSnapshotFile, List<ErrorCause> errorCauses) {
+		
+
+		// read the list in reverse order to find the best matching reference
+		List<TestStep> testStepsSubList = testStepManager.getTestSteps().subList(0, testStep.getPosition());
+		Collections.reverse(testStepsSubList);
+		for (TestStep testStep2: testStepsSubList) {
+			if (testStep2.getStepResultId() != null) {
+				File referenceSnapshot = SeleniumRobotSnapshotServerConnector.getInstance().getReferenceSnapshot(testStep2.getStepResultId());
+				int matching = compareReferenceToStepSnapshot(stepSnapshotFile, referenceSnapshot);
+				
+				if (matching > 80) {
+					errorCauses.add(new ErrorCause(ErrorType.SELENIUM_ERROR, String.format("Wrong page found, we are on the page of step '%s'", testStep2.getName())));
+					break;
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Compare the reference snapshot for this step to the version of the current test
+	 * @param stepSnapshot
+	 * @param referenceSnapshot
+	 * @return an integer representing the matching (0: no matching, 100 very good matching) 
+	 */
+	private int compareReferenceToStepSnapshot(File stepSnapshot, File referenceSnapshot) {
+		return new StepReferenceComparator(stepSnapshot, referenceSnapshot).compare();
+	}
+	
+	/**
+	 * Search in snapshots of the last step if there are any displayed errors (error messages or fields in error)
+	 * @return
+	 */
 	private List<ErrorCause> findErrorInLastStepSnapshots() {
 		
 		List<ErrorCause> causes = new ArrayList<>();
 		
-		TestStep lastTestStep = TestStepManager.getInstance().getLastTestStep();
+		TestStep lastTestStep = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getLastTestStep();
+		
 		if (lastTestStep != null) {
 			for (Snapshot snapshot: lastTestStep.getSnapshots()) {
 				try {
@@ -142,13 +281,9 @@ public class ErrorCauseFinder {
 					logger.error("Error searching for errors in last snapshots: " + e.getMessage());
 					break;
 				}
-				
-				/*
-				 *  les "error_field" vont nous dire qu'il y a X champs en erreur, on ne pourra pas nécessairement faire plus
-				 *  Cela dit juste que dans le formulaire, il y a des erreurs de saisie (champs manquants ou valeurs incorrectes)
-				 *  les "error_message" doivent être mis en relation avec les labels qui sont trouvés pour disposer du texte 
-				 */
+
 			}
+			TestNGResultUtils.setErrorCauseInLastStep(testResult, true);
 		}
 		
 		return causes;
