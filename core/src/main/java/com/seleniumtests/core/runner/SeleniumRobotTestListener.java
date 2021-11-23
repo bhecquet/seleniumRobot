@@ -521,11 +521,7 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 		logThrowableToTestEndStep(testResult);
 		WebUIDriver.logFinalDriversState(testResult);
 		tearDownStep.updateDuration();
-		TestStepManager.logTestStep(tearDownStep);
-		
-		// at this stage we have the pictures of the last state. Try to find error cause if test is failed
-		new ErrorCauseFinder().findErrorCause();
-		
+		TestStepManager.logTestStep(tearDownStep);		
 	}
 	
 	private void logThrowableToTestEndStep(ITestResult testResult) {
