@@ -40,6 +40,7 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.core.runner.CucumberScenarioWrapper;
+import com.seleniumtests.core.testanalysis.ErrorCauseFinder.ErrorCause;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.driver.screenshots.SnapshotComparisonBehaviour;
@@ -70,7 +71,10 @@ public class TestNGResultUtils {
 	private static final String CUSTOM_REPORT = "customReport";			// true if the custom result has already been generated
 	private static final String METHOD_NAME = "methodName";				// name of the test method (or the cucumber scenario)
 	private static final String SNAPSHOT_COMPARISON_RESULT = "snapshotComparisonResult";	// the result of snapshot comparison, when enabled
-	private static final String DESCRIPTION = "description";	// description of the test method, if any
+	private static final String DESCRIPTION = "description";			// description of the test method, if any
+	private static final String ERROR_CAUSES = "errorCauses"; 			// list of causes of the test error
+	private static final String ERROR_CAUSE_IN_LAST_STEP = "errorCauseInLastStep"; // true when we have searched for error cause in the last step
+	private static final String ERROR_CAUSE_IN_REFERENCE = "errorCauseInLastStep"; // true when we have searched for error cause by comparing reference picture of the failed step
 
 	private TestNGResultUtils() {
 		// nothing to do
@@ -415,7 +419,7 @@ public class TestNGResultUtils {
 		
 		SeleniumRobotSnapshotServerConnector serverConnector = SeleniumRobotSnapshotServerConnector.getInstance();
 		
-		List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
+		List<TestStep> testSteps = getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
 		if (testSteps == null) {
 			return;
 		}
@@ -496,4 +500,34 @@ public class TestNGResultUtils {
 			result.getTestContext().getFailedTests().addResult(result, result.getMethod());
 		}
 	}	
+	
+
+    public static List<ErrorCause> getErrorCauses(ITestResult testNGResult) {
+    	return (List<ErrorCause>) testNGResult.getAttribute(ERROR_CAUSES);
+    }
+    
+    /**
+     * Store the list of detected error causes
+     * @param testNGResult
+     * @param errorCauses
+     */
+    public static void setErrorCauses(ITestResult testNGResult, List<ErrorCause> errorCauses) {
+    	testNGResult.setAttribute(ERROR_CAUSES, errorCauses);
+    }
+    
+    public static Boolean getErrorCauseInLastStep(ITestResult testNGResult) {
+    	return isReportCreated(testNGResult, ERROR_CAUSE_IN_LAST_STEP);
+    }
+    
+    public static void setErrorCauseInLastStep(ITestResult testNGResult, Boolean errorCauseInLastStep) {
+    	testNGResult.setAttribute(ERROR_CAUSE_IN_LAST_STEP, errorCauseInLastStep);
+    }
+    
+    public static Boolean getErrorCauseInReferencePicture(ITestResult testNGResult) {
+    	return isReportCreated(testNGResult, ERROR_CAUSE_IN_REFERENCE);
+    }
+    
+    public static void setErrorCauseInReferencePicture(ITestResult testNGResult, Boolean errorCauseInReferencePicture) {
+    	testNGResult.setAttribute(ERROR_CAUSE_IN_REFERENCE, errorCauseInReferencePicture);
+    }
 }
