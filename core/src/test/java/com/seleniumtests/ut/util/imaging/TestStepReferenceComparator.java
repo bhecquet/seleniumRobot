@@ -112,6 +112,4 @@ public class TestStepReferenceComparator extends MockitoTest {
 		Assert.assertEquals(comparator.compare(), 100);
 	}
 	
-
-	// avec une partie du matching seulement
 }

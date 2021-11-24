@@ -44,9 +44,6 @@ public class ErrorCauseFinder {
 	 *  TESTS:
 	 *  - si le ImageFieldDetector ne s'initialise pas, il ne faut pas planter
 	 *  - on n'a pas le stepResultId => on doit renvoyer null
-	 *  - Label.match()
-	 *  - Field.match()
-	 *  - StepReferenceComparator
 	 */
 	
 	private static final String[] ERROR_WORDS = new String[] {"error", "erreur", "problem", "problème"};
@@ -55,61 +52,8 @@ public class ErrorCauseFinder {
 	
 	private ITestResult testResult;
 	
-	public enum ErrorType {
-		ERROR_MESSAGE,			// error message displayed
-		ERROR_IN_FIELD,			// some field shows an error (it's coloured in red)
-		APPLICATION_CHANGED,	// compared to the page we expect, the page we are on is slightly different
-		SELENIUM_ERROR			// we are not on the right page to perform our actions, it may be due to a problem when clicking during previous step
-	}
 	
-	public class ErrorCause {
-		
-		private ErrorType type;
-		private String description;
 	
-		public ErrorCause(ErrorType type, String description) {
-			this.type = type;
-			this.description = description;
-		}
-
-		public ErrorType getType() {
-			return type;
-		}
-
-		public String getDescription() {
-			return description;
-		}
-		
-		@Override
-		public boolean equals(Object obj) {
-			if (obj == null) {
-				return false;
-			}
-
-			if (obj instanceof ErrorCause && this == obj) {
-				return true;
-			}
-			
-			ErrorCause cause = (ErrorCause)obj;
-			if (cause.description != null && cause.description.equals(description) && cause.type == type) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-		
-		@Override
-		public int hashCode() {
-			if (description != null) {
-				return description.hashCode();
-			} else {
-				return 0;
-			}
-			
-		}
-		
-		
-	}
 	
 	public ErrorCauseFinder(ITestResult testResult) {
 		this.testResult = testResult;
