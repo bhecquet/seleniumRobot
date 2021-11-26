@@ -70,6 +70,7 @@ public class ErrorCauseFinder {
 		List<ErrorCause> causes = new ArrayList<>();
 		
 		causes.addAll(findErrorInLastStepSnapshots());
+		causes.addAll(compareStepInErrorWithReference());
 		
 		return causes;
 	}
@@ -79,8 +80,13 @@ public class ErrorCauseFinder {
 	 * If reference cannot be found, skip this step
 	 * @return
 	 */
-	private List<ErrorCause> compareStepInErrorWithReference() {
+	public List<ErrorCause> compareStepInErrorWithReference() {
 		List<ErrorCause> causes = new ArrayList<>();
+		
+		// do not seearch again
+		if (TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult)) {
+			return causes; 
+		}
 		
 		// don't analyze if result has not been recorded on seleniumRobot server
 		TestStepManager testStepManager = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager();
@@ -137,7 +143,7 @@ public class ErrorCauseFinder {
 		}
 		
 
-		TestNGResultUtils.setErrorCauseInReferencePicture(testResult, true);
+		TestNGResultUtils.setErrorCauseSearchedInReferencePicture(testResult, true);
 		
 		return causes;
 	}
@@ -183,9 +189,14 @@ public class ErrorCauseFinder {
 	 * Search in snapshots of the last step if there are any displayed errors (error messages or fields in error)
 	 * @return
 	 */
-	private List<ErrorCause> findErrorInLastStepSnapshots() {
+	public List<ErrorCause> findErrorInLastStepSnapshots() {
 		
 		List<ErrorCause> causes = new ArrayList<>();
+		
+		// do not seearch again
+		if (TestNGResultUtils.isErrorCauseSearchedInLastStep(testResult)) {
+			return causes; 
+		}
 		
 		TestStep lastTestStep = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getLastTestStep();
 		
@@ -195,7 +206,6 @@ public class ErrorCauseFinder {
 					ImageFieldDetector imageFieldDetector = new ImageFieldDetector(new File(snapshot.getScreenshot().getFullImagePath()), 1, FieldType.ERROR_MESSAGES_AND_FIELDS);
 					List<Field> fields = imageFieldDetector.detectFields();
 					List<Label> labels = imageFieldDetector.detectLabels();
-					
 					
 					// are some text considered as error messages (mainly in red on page)
 					for (Field field: fields) {
@@ -227,7 +237,7 @@ public class ErrorCauseFinder {
 				}
 
 			}
-			TestNGResultUtils.setErrorCauseInLastStep(testResult, true);
+			TestNGResultUtils.setErrorCauseSearchedInLastStep(testResult, true);
 		}
 		
 		return causes;
