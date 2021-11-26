@@ -10,7 +10,7 @@ import com.seleniumtests.it.reporter.ReporterTest;
 
 public class TestErrorCauseFInder extends GenericTest {
 	
-	@Test(groups={"it"})
+	@Test(groups={"it"}, enabled=false)
 	public void testMultiThreadTests(ITestContext testContext) throws Exception {
 		
 		try {

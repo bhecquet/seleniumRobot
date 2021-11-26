@@ -330,6 +330,30 @@ public class TestTestNGResultUtil extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
+	public void testErrorCauseSearchedInLastStep() {
+		ITestResult tr = Reporter.getCurrentTestResult(); 
+		TestNGResultUtils.setErrorCauseSearchedInLastStep(tr, true);
+		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInLastStep(tr));
+	}
+	@Test(groups={"ut"})
+	public void testErrorCauseSearchedInLastStepNull() {
+		ITestResult tr = Reporter.getCurrentTestResult(); 
+		Assert.assertFalse(TestNGResultUtils.isErrorCauseSearchedInLastStep(tr));
+	}
+	
+	@Test(groups={"ut"})
+	public void testErrorCauseSearchedInReferencePicture() {
+		ITestResult tr = Reporter.getCurrentTestResult(); 
+		TestNGResultUtils.setErrorCauseSearchedInReferencePicture(tr, true);
+		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(tr));
+	}
+	@Test(groups={"ut"})
+	public void testErrorCauseSearchedInReferencePictureNull() {
+		ITestResult tr = Reporter.getCurrentTestResult(); 
+		Assert.assertFalse(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(tr));
+	}
+	
+	@Test(groups={"ut"})
 	public void testNoMoreRetry() {
 		ITestResult tr = Reporter.getCurrentTestResult(); 
 		TestNGResultUtils.setNoMoreRetry(tr, true);

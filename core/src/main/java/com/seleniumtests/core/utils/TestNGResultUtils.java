@@ -73,7 +73,7 @@ public class TestNGResultUtils {
 	private static final String DESCRIPTION = "description";			// description of the test method, if any
 	private static final String ERROR_CAUSES = "errorCauses"; 			// list of causes of the test error
 	private static final String ERROR_CAUSE_IN_LAST_STEP = "errorCauseInLastStep"; // true when we have searched for error cause in the last step
-	private static final String ERROR_CAUSE_IN_REFERENCE = "errorCauseInLastStep"; // true when we have searched for error cause by comparing reference picture of the failed step
+	private static final String ERROR_CAUSE_IN_REFERENCE = "errorCauseInReference"; // true when we have searched for error cause by comparing reference picture of the failed step
 
 	private TestNGResultUtils() {
 		// nothing to do
@@ -514,19 +514,19 @@ public class TestNGResultUtils {
     	testNGResult.setAttribute(ERROR_CAUSES, errorCauses);
     }
     
-    public static Boolean getErrorCauseInLastStep(ITestResult testNGResult) {
+    public static boolean isErrorCauseSearchedInLastStep(ITestResult testNGResult) {
     	return isReportCreated(testNGResult, ERROR_CAUSE_IN_LAST_STEP);
     }
     
-    public static void setErrorCauseInLastStep(ITestResult testNGResult, Boolean errorCauseInLastStep) {
+    public static void setErrorCauseSearchedInLastStep(ITestResult testNGResult, Boolean errorCauseInLastStep) {
     	testNGResult.setAttribute(ERROR_CAUSE_IN_LAST_STEP, errorCauseInLastStep);
     }
     
-    public static Boolean getErrorCauseInReferencePicture(ITestResult testNGResult) {
+    public static boolean isErrorCauseSearchedInReferencePicture(ITestResult testNGResult) {
     	return isReportCreated(testNGResult, ERROR_CAUSE_IN_REFERENCE);
     }
     
-    public static void setErrorCauseInReferencePicture(ITestResult testNGResult, Boolean errorCauseInReferencePicture) {
+    public static void setErrorCauseSearchedInReferencePicture(ITestResult testNGResult, Boolean errorCauseInReferencePicture) {
     	testNGResult.setAttribute(ERROR_CAUSE_IN_REFERENCE, errorCauseInReferencePicture);
     }
 }
