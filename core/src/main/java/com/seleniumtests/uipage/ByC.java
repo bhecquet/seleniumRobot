@@ -21,17 +21,24 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections.ListUtils;
+import org.apache.commons.lang.NotImplementedException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.FindsByXPath;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.RemoteWebElement;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.WebUIDriver;
 
 public class ByC extends By {
@@ -664,9 +671,29 @@ public class ByC extends By {
 				}
 				JavascriptExecutor js = (JavascriptExecutor)WebUIDriver.getWebDriver(false);
 				
-				for (WebElement host: hosts) {
-					elements.add((WebElement)(js.executeScript("return arguments[0].shadowRoot", host)));
-				}	
+				DriverConfig driverConfig = WebUIDriver.getWebUIDriver(false).getConfig();
+
+		        if ((driverConfig.getBrowserType() == BrowserType.CHROME || driverConfig.getBrowserType() == BrowserType.EDGE) && driverConfig.getMajorBrowserVersion() >= 96) {
+		        	for (WebElement host: hosts) {
+		        		Map<String, Object> roots = ((Map<String, Object>)js.executeScript("return arguments[0].shadowRoot", host));
+		   
+		        		RemoteWebElement shadowRootElement = new RemoteWebElement();
+		        		shadowRootElement.setParent((RemoteWebDriver) ((CustomEventFiringWebDriver)WebUIDriver.getWebUIDriver(false).getDriver()).getWebDriver());
+		        		shadowRootElement.setId((String) roots.values().toArray()[0]);
+		        		
+		        		elements.add(shadowRootElement);
+		        		
+		        	}
+		        } else if (driverConfig.getBrowserType() == BrowserType.CHROME && driverConfig.getMajorBrowserVersion() < 96) {
+		        	for (WebElement host: hosts) {
+						elements.add((WebElement)(js.executeScript("return arguments[0].shadowRoot", host)));						
+					}	
+		        } else {
+		        	throw new NotImplementedException("Shadow DOM not supported for " + driverConfig.getBrowserType());
+		        }
+				
+				
+				
 				
 				// stop if no element is found
 				if (elements.isEmpty()) {
