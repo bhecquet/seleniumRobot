@@ -167,7 +167,7 @@ public class TestFieldDetectorConnector extends ConnectorsTest {
 		FieldDetectorConnector fieldDetectorConnector = new FieldDetectorConnector("http://localhost:4321");
 		List<JSONObject> fields = fieldDetectorConnector.detectError(image).getJSONArray("fields").toList();
 		
-		Assert.assertEquals(fields.size(), 2);
+		Assert.assertEquals(fields.size(), 1);
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class, expectedExceptionsMessageRegExp = "Field detector returned error: some error occured")
