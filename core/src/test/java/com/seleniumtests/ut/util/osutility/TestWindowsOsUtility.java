@@ -422,8 +422,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 		Assert.assertEquals(browsers.get(BrowserType.CHROME).get(1).getVersion(), "77.0");
 	}
 	/**
-	 * Issue #308: check we do not detect chrome beta on its location in registry when we only request mainstream browsers
-	 * Check also we get 1 chrome instances
+	 * issue #458: Check that even with 'discoverBetaBrowsers' set to false, we get all chrome browsers (filtering is done elsewhere)
 	 */
 	@Test(groups={"ut"})
 	public void testChromeBetaNotDiscoveredStandardWindowsInstallation() {
@@ -448,9 +447,10 @@ public class TestWindowsOsUtility extends MockitoTest {
 		OSUtility.refreshBrowserList();
 		Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
 		Assert.assertTrue(browsers.keySet().contains(BrowserType.CHROME));
-		Assert.assertEquals(browsers.get(BrowserType.CHROME).size(), 1);
+		Assert.assertEquals(browsers.get(BrowserType.CHROME).size(), 2);
 		Assert.assertTrue(browsers.get(BrowserType.CHROME).get(0).getPath().contains("Application"));
 		Assert.assertEquals(browsers.get(BrowserType.CHROME).get(0).getVersion(), "76.0");
+		Assert.assertEquals(browsers.get(BrowserType.CHROME).get(1).getVersion(), "77.0");
 	}
 	
 	/**
