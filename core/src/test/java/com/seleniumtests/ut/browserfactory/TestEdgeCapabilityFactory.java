@@ -227,6 +227,8 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithVersion() {
 		
+		when(config.getMode()).thenReturn(DriverMode.GRID);
+		
 		when(config.isEnableJavascript()).thenReturn(true);
 		when(config.getProxy()).thenReturn(proxyConfig);
 		when(config.getBrowserVersion()).thenReturn("10240");
