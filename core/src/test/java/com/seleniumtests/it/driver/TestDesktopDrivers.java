@@ -99,44 +99,6 @@ public class TestDesktopDrivers extends GenericDriverTest {
 		if (SystemUtils.IS_OS_WINDOWS) {
 			Assert.assertTrue(OSCommand.executeCommandAndWait(String.format("wmic process where \"ProcessID=%s\" get ExecutablePath", newEdge.get(0))).contains("Beta"));
 		}
-		
-		
-	}
-
-	@Test(groups={"it"})
-	public void testChromeBetaStartup2(final ITestContext testNGCtx, final XmlTest xmlTest) {
-
-		// check Edge is available and Edge beta is installed
-		OSUtility.refreshBrowserList(false);
-
-		// initial list of edge processes in case some are running
-		List<String> executingEdge = OSUtilityFactory.getInstance().getRunningProcesses("chrome")
-					.stream()
-					.map(ProcessInfo::getPid)
-					.collect(Collectors.toList());
-
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
-		SeleniumTestsContextManager.getThreadContext().setBetaBrowser(false);
-		driver = WebUIDriver.getWebDriver(true);
-		Assert.assertEquals(driver.getCurrentUrl(), "data:,");
-
-
-		// issue #280: check BrowserInfo exists
-		Assert.assertNotNull(((CustomEventFiringWebDriver)driver).getBrowserInfo());
-		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getBrowserInfo().getBrowser(), BrowserType.CHROME);
-
-		// check that Edge Beta has been started
-		List<String> newEdge = OSUtilityFactory.getInstance().getRunningProcesses("chrome")
-			.stream()
-			.map(ProcessInfo::getPid)
-			.filter(pid -> !executingEdge.contains(pid))
-			.collect(Collectors.toList());
-
-		if (SystemUtils.IS_OS_WINDOWS) {
-			Assert.assertTrue(OSCommand.executeCommandAndWait(String.format("wmic process where \"ProcessID=%s\" get ExecutablePath", newEdge.get(0))).contains("Beta"));
-		}
-
 
 	}
 	
