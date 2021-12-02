@@ -28,7 +28,7 @@ public class TestFieldDetectorConnector extends ConnectorsTest {
 	public void testIsAlive() {
 
 		createServerMock("GET", "/status", 200, "OK");
-		new FieldDetectorConnector("http://localhost:4321");
+		FieldDetectorConnector.getInstance("http://localhost:4321");
 	}
 
 	@Test(groups = { "ut" }, expectedExceptions = ConfigurationException.class)
@@ -36,14 +36,14 @@ public class TestFieldDetectorConnector extends ConnectorsTest {
 		HttpRequest<HttpRequest> req = createServerMock("GET", "/status", 500, "KO", "body");
 		when(req.asString()).thenThrow(UnirestException.class);
 
-		new FieldDetectorConnector("http://localhost:4321");
+		FieldDetectorConnector.getInstance("http://localhost:4321");
 	}
 
 	@Test(groups = { "ut" }, expectedExceptions = ConfigurationException.class)
 	public void testIsNotAlive() {
 
 		createServerMock("GET", "/status", 500, "Error");
-		new FieldDetectorConnector("http://localhost:4321");
+		FieldDetectorConnector.getInstance("http://localhost:4321");
 	}
 
 	@Test(groups={"ut"})
@@ -114,7 +114,7 @@ public class TestFieldDetectorConnector extends ConnectorsTest {
 		
 		createServerMock("GET", "/status", 200, "OK");	
 		createServerMock("POST", "/detect", 200, detectionReply);	
-		FieldDetectorConnector fieldDetectorConnector = new FieldDetectorConnector("http://localhost:4321");
+		FieldDetectorConnector fieldDetectorConnector = FieldDetectorConnector.getInstance("http://localhost:4321");
 		List<JSONObject> fields = fieldDetectorConnector.detect(image).getJSONArray("fields").toList();
 		
 		Assert.assertEquals(fields.size(), 2);
@@ -164,7 +164,7 @@ public class TestFieldDetectorConnector extends ConnectorsTest {
 		
 		createServerMock("GET", "/status", 200, "OK");	
 		createServerMock("POST", "/detectError", 200, detectionReply);	
-		FieldDetectorConnector fieldDetectorConnector = new FieldDetectorConnector("http://localhost:4321");
+		FieldDetectorConnector fieldDetectorConnector = FieldDetectorConnector.getInstance("http://localhost:4321");
 		List<JSONObject> fields = fieldDetectorConnector.detectError(image).getJSONArray("fields").toList();
 		
 		Assert.assertEquals(fields.size(), 1);
@@ -178,7 +178,7 @@ public class TestFieldDetectorConnector extends ConnectorsTest {
 		
 		createServerMock("GET", "/status", 200, "OK");	
 		createServerMock("POST", "/detect", 500, detectionReply);	
-		FieldDetectorConnector fieldDetectorConnector = new FieldDetectorConnector("http://localhost:4321");
+		FieldDetectorConnector fieldDetectorConnector = FieldDetectorConnector.getInstance("http://localhost:4321");
 		fieldDetectorConnector.detect(image);
 		
 	}
@@ -191,7 +191,7 @@ public class TestFieldDetectorConnector extends ConnectorsTest {
 		
 		createServerMock("GET", "/status", 200, "OK");	
 		createServerMock("POST", "/detect", 500, detectionReply);	
-		FieldDetectorConnector fieldDetectorConnector = new FieldDetectorConnector("http://localhost:4321");
+		FieldDetectorConnector fieldDetectorConnector = FieldDetectorConnector.getInstance("http://localhost:4321");
 		fieldDetectorConnector.detect(image);
 		
 	}
@@ -200,7 +200,7 @@ public class TestFieldDetectorConnector extends ConnectorsTest {
 	public void testDetectKoImageNull() throws IOException  {	
 
 		createServerMock("GET", "/status", 200, "OK");	
-		FieldDetectorConnector fieldDetectorConnector = new FieldDetectorConnector("http://localhost:4321");
+		FieldDetectorConnector fieldDetectorConnector = FieldDetectorConnector.getInstance("http://localhost:4321");
 		fieldDetectorConnector.detect(null);
 		
 	}
@@ -209,7 +209,7 @@ public class TestFieldDetectorConnector extends ConnectorsTest {
 	public void testDetectKoImageDoesNotExist() throws IOException  {	
 		
 		createServerMock("GET", "/status", 200, "OK");	
-		FieldDetectorConnector fieldDetectorConnector = new FieldDetectorConnector("http://localhost:4321");
+		FieldDetectorConnector fieldDetectorConnector = FieldDetectorConnector.getInstance("http://localhost:4321");
 		fieldDetectorConnector.detect(new File("noPath.png"));
 		
 	}

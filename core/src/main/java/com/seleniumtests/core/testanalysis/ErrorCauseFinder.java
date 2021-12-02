@@ -96,7 +96,7 @@ public class ErrorCauseFinder {
 		
 		for (TestStep testStep: testStepManager.getTestSteps()) {
 
-			Integer stepResultId = testStep.getStepResultId();
+			Integer stepResultId = testStep.getStepResultId(); // stepResultId is set when step recording is done on server
 			if (Boolean.TRUE.equals(testStep.getFailed()) && !(testStep.getActionException() instanceof AssertionError) && stepResultId != null) {
 				
 				try {

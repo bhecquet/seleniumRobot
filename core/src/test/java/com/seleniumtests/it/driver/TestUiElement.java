@@ -45,7 +45,7 @@ public class TestUiElement extends GenericMultiBrowserTest {
 
 		SeleniumTestsContextManager.getThreadContext().setImageFieldDetectorServerUrl("http://localhost:5000");
 		try {
-			new FieldDetectorConnector(SeleniumTestsContextManager.getThreadContext().getImageFieldDetectorServerUrl());
+			FieldDetectorConnector.getInstance(SeleniumTestsContextManager.getThreadContext().getImageFieldDetectorServerUrl());
 		} catch (ConfigurationException e) {
 			throw new SkipException("Field detector is not available at address 'http://localhost:5000', skipping");
 		}

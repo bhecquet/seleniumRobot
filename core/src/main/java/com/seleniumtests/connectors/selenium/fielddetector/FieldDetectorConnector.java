@@ -23,12 +23,20 @@ public class FieldDetectorConnector {
 	private static final String STATUS_URL = "/status";
 	private static final String DETECT_URL = "/detect";
 	private static final String DETECT_ERROR_URL = "/detectError";
+	private static FieldDetectorConnector fieldDetectorConnector;
+	
+	public static FieldDetectorConnector getInstance(String url) {
+		if (fieldDetectorConnector == null) {
+			fieldDetectorConnector = new FieldDetectorConnector(url);
+		} 
+		return fieldDetectorConnector;
+	}
 	
 	/**
 	 * 
 	 * @param url	URL of the service
 	 */
-	public FieldDetectorConnector(String url) {
+	private FieldDetectorConnector(String url) {
 		this.url = url;
 		
 		try {
