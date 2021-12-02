@@ -46,6 +46,7 @@ import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.browserfactory.ChromeCapabilitiesFactory;
 import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
@@ -75,6 +76,76 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		when(config.getTestContext()).thenReturn(context);
 		when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.NONE));
 		when(config.getPageLoadStrategy()).thenReturn(PageLoadStrategy.NORMAL);
+		when(config.getBrowserType()).thenReturn(BrowserType.CHROME);
+	}
+	
+
+	/**
+	 * If beta is not requested, get the non beta version even if both are present
+	 */
+	@Test(groups= {"ut"})
+	public void testNonBetaVersionBrowserChoosen() {
+
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
+		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "96.0", "", false, false), 
+				new BrowserInfo(BrowserType.CHROME, "97.0", "", false, true)));
+		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
+		
+		ChromeCapabilitiesFactory capaFactory = new ChromeCapabilitiesFactory(config);
+		capaFactory.createCapabilities();
+		Assert.assertFalse(capaFactory.getSelectedBrowserInfo().getBeta());
+		Assert.assertEquals(capaFactory.getSelectedBrowserInfo().getVersion(), "96.0");
+	}
+	
+	/**
+	 * If beta is not requested, and non beta browser not installed, return null
+	 */
+	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Browser CHROME  is not available")
+	public void testNonBetaVersionBrowserAbsent() {
+
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
+		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "97.0", "", false, true)));
+		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
+
+		ChromeCapabilitiesFactory capaFactory = new ChromeCapabilitiesFactory(config);
+		capaFactory.createCapabilities();
+	}
+	
+	/**
+	 * If beta is requested, get the beta version even if both are present
+	 */
+	@Test(groups= {"ut"})
+	public void testBetaVersionBrowserChoosen() {
+
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
+		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "96.0", "", false, false), 
+				new BrowserInfo(BrowserType.CHROME, "97.0", "", false, true)));
+		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(true)).thenReturn(browserInfos);
+		when(config.getBetaBrowser()).thenReturn(true);
+
+		ChromeCapabilitiesFactory capaFactory = new ChromeCapabilitiesFactory(config);
+		capaFactory.createCapabilities();
+		Assert.assertTrue(capaFactory.getSelectedBrowserInfo().getBeta());
+		Assert.assertEquals(capaFactory.getSelectedBrowserInfo().getVersion(), "97.0");
+	}
+
+	/**
+	 * If beta is not requested, and non beta browser not installed, return null
+	 */
+	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Browser CHROME beta is not available")
+	public void testBetaVersionBrowserAbsent() {
+
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
+		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "96.0", "", false, false)));
+		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(true)).thenReturn(browserInfos);
+		when(config.getBetaBrowser()).thenReturn(true);
+
+		ChromeCapabilitiesFactory capaFactory = new ChromeCapabilitiesFactory(config);
+		capaFactory.createCapabilities();
 	}
 	
 	/**

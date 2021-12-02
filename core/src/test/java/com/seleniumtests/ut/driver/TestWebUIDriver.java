@@ -1,6 +1,7 @@
 package com.seleniumtests.ut.driver;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -12,8 +13,11 @@ import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -39,6 +43,7 @@ import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.StatisticsStorage;
 import com.seleniumtests.core.StatisticsStorage.DriverUsage;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
@@ -47,11 +52,20 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.WebUIDriverFactory;
 import com.seleniumtests.it.stubclasses.StubTestPage;
 import com.seleniumtests.uipage.PageObject;
+import com.seleniumtests.util.osutility.OSUtility;
+import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.video.VideoRecorder;
 
 import net.lightbody.bmp.BrowserMobProxy;
 
-@PrepareForTest({NLWebDriverFactory.class, CustomEventFiringWebDriver.class, SeleniumGridConnectorFactory.class, SeleniumGridDriverFactory.class, WebUIDriver.class, PageObject.class})
+@PrepareForTest({OSUtility.class, 
+				OSUtilityFactory.class, 
+				NLWebDriverFactory.class, 
+				CustomEventFiringWebDriver.class, 
+				SeleniumGridConnectorFactory.class, 
+				SeleniumGridDriverFactory.class, 
+				WebUIDriver.class, 
+				PageObject.class})
 public class TestWebUIDriver extends MockitoTest {
 	
 	@Mock
@@ -95,6 +109,63 @@ public class TestWebUIDriver extends MockitoTest {
 		Capabilities caps = ((CustomEventFiringWebDriver)driver).getInternalCapabilities();
 		Assert.assertNotNull(caps.getCapability(DriverUsage.START_TIME));
 		Assert.assertNotNull(caps.getCapability(DriverUsage.STARTUP_DURATION));
+	}
+	
+	/**
+	 * No list for the selected driver
+	 */
+	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Browser HTMLUNIT is not available.*")
+	public void testDriverCreationBrowserNotAvailable() {
+		
+		PowerMockito.mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
+		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
+		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "96.0", "", false, false)));
+		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(anyBoolean())).thenReturn(browserInfos);
+		
+		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
+		WebUIDriver.getWebDriver(true);
+	}
+	
+	/**
+	 * Empty list for the selected driver
+	 */
+	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Browser HTMLUNIT is not available.*")
+	public void testDriverCreationBrowserNotAvailable2() {
+		
+		PowerMockito.mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
+		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
+		browserInfos.put(BrowserType.HTMLUNIT, new ArrayList<>());
+		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(anyBoolean())).thenReturn(browserInfos);
+		
+		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
+		WebUIDriver.getWebDriver(true);
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Browser CHROME beta is not available.*")
+	public void testDriverCreationBrowserBetaNotAvailable() {
+		
+		PowerMockito.mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
+		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
+		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "96.0", "", false, false)));
+		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(anyBoolean())).thenReturn(browserInfos);
+		
+		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
+		SeleniumTestsContextManager.getThreadContext().setBetaBrowser(true);
+		WebUIDriver.getWebDriver(true);
+	}
+	
+	
+	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Browser CHROME  is not available.*")
+	public void testDriverCreationBrowserNonBetaNotAvailable() {
+		
+		PowerMockito.mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
+		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
+		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "96.0", "", false, true)));
+		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(anyBoolean())).thenReturn(browserInfos);
+		
+		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
+		SeleniumTestsContextManager.getThreadContext().setBetaBrowser(false);
+		WebUIDriver.getWebDriver(true);
 	}
 	
 	/**
