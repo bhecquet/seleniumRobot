@@ -1041,7 +1041,7 @@ public class SeleniumTestsContext {
 		
 		if (getImageFieldDetectorServerUrl() != null) {
 			
-			return new FieldDetectorConnector(getImageFieldDetectorServerUrl());
+			return FieldDetectorConnector.getInstance(getImageFieldDetectorServerUrl());
 		} else {
 			return null;
 		}
