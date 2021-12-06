@@ -92,7 +92,7 @@ public class ErrorCauseFinder {
 		
 		// don't analyze if result has not been recorded on seleniumRobot server
 		TestStepManager testStepManager = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager();
-		if (testStepManager.getLastTestStep().getStepResultId() == null) {
+		if (testStepManager.getLastTestStep() == null || testStepManager.getLastTestStep().getStepResultId() == null) {
 			return causes;
 		}
 		
@@ -109,6 +109,10 @@ public class ErrorCauseFinder {
 					File stepSnapshotFile = new File(stepSnapshot.getScreenshot().getFullImagePath());
 					
 					File referenceSnapshot = SeleniumRobotSnapshotServerConnector.getInstance().getReferenceSnapshot(stepResultId);
+					if (referenceSnapshot == null) {
+						continue;
+					}
+					
 					int matching = compareReferenceToStepSnapshot(stepSnapshotFile, referenceSnapshot);
 					
 					// bad matching: the reference does not match at all the current step, we will check with other reference steps
@@ -128,6 +132,8 @@ public class ErrorCauseFinder {
 					
 				} catch (IndexOutOfBoundsException e) {
 					// skip this step
+				} catch (Exception e) {
+					logger.error(e);
 				}
 				
 
