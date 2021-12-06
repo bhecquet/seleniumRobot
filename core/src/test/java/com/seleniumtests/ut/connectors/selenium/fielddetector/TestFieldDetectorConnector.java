@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.ConnectorsTest;
@@ -23,6 +24,10 @@ import kong.unirest.json.JSONObject;
 @PrepareForTest({ Unirest.class })
 public class TestFieldDetectorConnector extends ConnectorsTest {
 
+	@BeforeMethod(alwaysRun = true)
+	public void init() {
+		FieldDetectorConnector.resetFieldDetectorConnector();
+	}
 
 	@Test(groups = { "ut" })
 	public void testIsAlive() {
