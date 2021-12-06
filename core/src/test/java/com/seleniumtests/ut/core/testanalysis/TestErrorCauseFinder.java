@@ -1,5 +1,7 @@
 package com.seleniumtests.ut.core.testanalysis;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -30,6 +32,7 @@ import com.seleniumtests.core.testanalysis.ErrorCauseFinder;
 import com.seleniumtests.core.testanalysis.ErrorType;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.reporter.logger.Snapshot;
@@ -222,17 +225,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 		
 		Assert.assertEquals(causes.size(), 0);
 	}
-	
-	// pas de step
-	// pas de snapshot
-	// pas de step en erreur
-	// pas d'ID au step
-	// assertionError
-	// pas de step reference
-	// getReferenceSnapshot renvoie null / exception
-	// matching < 90
-	// recherche déjà faite
-	// echec lors de la comparaison (exception)
+
 	// bad match => pas de step avant celle qui plante
 	
 	/**
@@ -251,6 +244,30 @@ public class TestErrorCauseFinder extends MockitoTest {
 		when(stepReferenceComparatorStep2.compare()).thenReturn(90);
 		
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
+		
+		Assert.assertEquals(causes.size(), 0);
+		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
+	}
+	
+	@Test(groups= {"ut"})
+	public void testCompareStepInErrorWithReferenceSearchAlreadyDone() throws Exception {
+		
+		ITestResult testResult = Reporter.getCurrentTestResult();
+		
+		TestNGResultUtils.setErrorCauseSearchedInReferencePicture(testResult, true);
+		
+		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
+		
+		// comparison successful
+		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep2).thenReturn(stepReferenceComparatorStep2);
+		when(stepReferenceComparatorStep2.compare()).thenReturn(90);
+		
+		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
+		
+		// no comparison done
+		PowerMockito.verifyNew(StepReferenceComparator.class, never()).withArguments(any(File.class), any(File.class));
+				
 		
 		Assert.assertEquals(causes.size(), 0);
 		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
@@ -333,6 +350,30 @@ public class TestErrorCauseFinder extends MockitoTest {
 		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
 	}
 	
+	/**
+	 * Matching between reference picture stored on server and the one for current test is bad (we are not on the right page)
+	 * No previous step can be found
+	 * @throws Exception
+	 */
+	@Test(groups= {"ut"})
+	public void testCompareStepInErrorWithReferenceBadMatchNoPreviousStep() throws Exception {
+		
+		ITestResult testResult = Reporter.getCurrentTestResult();
+		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(stepFailed, lastStep));
+		
+		// comparison successful
+		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep2).thenReturn(stepReferenceComparatorStep2);
+		when(stepReferenceComparatorStep2.compare()).thenReturn(49); // bad comparison with step2 reference
+		
+		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
+		
+		Assert.assertEquals(causes.size(), 1);
+		Assert.assertEquals(causes.get(0).getType(), ErrorType.UNKNOWN_PAGE);
+		Assert.assertNull(causes.get(0).getDescription());
+		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
+	}
+	
 	
 	/**
 	 * Bad match: an error occurs when getting reference snapshot
@@ -390,5 +431,209 @@ public class TestErrorCauseFinder extends MockitoTest {
 		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
 	}
 	
+	/**
+	 * Check the case where no TestStep is available
+	 * @throws Exception
+	 */
+	@Test(groups= {"ut"})
+	public void testCompareStepInErrorWithReferenceNoStep() throws Exception {
+		
+		ITestResult testResult = Reporter.getCurrentTestResult();
+		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(new ArrayList<>());
+		
+		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
+		
+		Assert.assertEquals(causes.size(), 0);
+		Assert.assertFalse(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
+	}
+	
+	/**
+	 * Failed test step does not contain a "reference snapshot" so there is no way to compare it to the one stored on server
+	 * No error should be raised
+	 * @throws Exception
+	 */
+	@Test(groups= {"ut"})
+	public void testCompareStepInErrorWithReferenceNoReferenceSnapshot() throws Exception {
+		
+		stepFailed.getSnapshots().removeAll(stepFailed.getSnapshots());
+		
+		ITestResult testResult = Reporter.getCurrentTestResult();
+		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
+		
+		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep2);
+		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
+		
+		// no comparison done
+		PowerMockito.verifyNew(StepReferenceComparator.class, never()).withArguments(any(File.class), any(File.class));;
+		
+		Assert.assertEquals(causes.size(), 0);
+		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
+	}
+	
+	/**
+	 * No failed step in test, no error should be returned
+	 * @throws Exception
+	 */
+	@Test(groups= {"ut"})
+	public void testCompareStepInErrorWithReferenceNoFailedStep() throws Exception {
+		
+		ITestResult testResult = Reporter.getCurrentTestResult();
+		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, lastStep));
+		
+		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep2);
+		
+		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
 
+		// no comparison done
+		PowerMockito.verifyNew(StepReferenceComparator.class, never()).withArguments(any(File.class), any(File.class));;
+		
+		Assert.assertEquals(causes.size(), 0);
+		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
+	}
+	
+	/**
+	 * When step has not been stored on server, they have no ID. Check that without ID, no comparison performed, and no error is raised
+	 * @throws Exception
+	 */
+	@Test(groups= {"ut"})
+	public void testCompareStepInErrorWithReferenceNoIDForStep() throws Exception {
+		
+		step1.setStepResultId(null);
+		stepFailed.setStepResultId(null);
+		lastStep.setStepResultId(null);
+		
+		ITestResult testResult = Reporter.getCurrentTestResult();
+		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
+		
+		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep2);
+		
+		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
+		
+		// no comparison done
+		PowerMockito.verifyNew(StepReferenceComparator.class, never()).withArguments(any(File.class), any(File.class));;
+		
+		Assert.assertEquals(causes.size(), 0);
+		Assert.assertFalse(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
+	}
+	
+	/**
+	 * Same thing as above but only the failed step has no ID
+	 * In this case, we consider comparison has been performed because other steps have IDs
+	 * @throws Exception
+	 */
+	@Test(groups= {"ut"})
+	public void testCompareStepInErrorWithReferenceNoIDForStep2() throws Exception {
+		
+		stepFailed.setStepResultId(null);
+		
+		ITestResult testResult = Reporter.getCurrentTestResult();
+		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
+		
+		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep2);
+		
+		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
+		
+		// no comparison done
+		PowerMockito.verifyNew(StepReferenceComparator.class, never()).withArguments(any(File.class), any(File.class));;
+		
+		Assert.assertEquals(causes.size(), 0);
+		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
+	}
+	
+	/**
+	 * When step fails due to assertion error, we do not compare snapshot with reference as the failure is expected
+	 * @throws Exception
+	 */
+	@Test(groups= {"ut"})
+	public void testCompareStepInErrorWithReferenceAssertionError() throws Exception {
+		
+		stepFailed.setActionException(new AssertionError("result is not the expected one"));
+		
+		ITestResult testResult = Reporter.getCurrentTestResult();
+		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
+		
+		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep2);
+		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
+		
+		// no comparison done
+		PowerMockito.verifyNew(StepReferenceComparator.class, never()).withArguments(any(File.class), any(File.class));;
+		
+		Assert.assertEquals(causes.size(), 0);
+		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
+	}
+	
+	/**
+	 * There is no reference for this step on server
+	 * Search is considered as done
+	 * @throws Exception
+	 */
+	@Test(groups= {"ut"})
+	public void testCompareStepInErrorWithReferenceNoReferenceOnServer() throws Exception {
+		
+		ITestResult testResult = Reporter.getCurrentTestResult();
+		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
+		
+		// no reference exists for stepFailed on server
+		when(serverConnector.getReferenceSnapshot(1)).thenReturn(null);
+		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep2);
+		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
+		
+		// no comparison done
+		PowerMockito.verifyNew(StepReferenceComparator.class, never()).withArguments(any(File.class), any(File.class));
+		
+		Assert.assertEquals(causes.size(), 0);
+		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
+	}
+	
+	/**
+	 * We get an error when trying to get reference snapshot from server
+	 * @throws Exception
+	 */
+	@Test(groups= {"ut"})
+	public void testCompareStepInErrorWithReferenceErrorGettingReferenceOnServer() throws Exception {
+		
+		ITestResult testResult = Reporter.getCurrentTestResult();
+		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
+		
+		// no reference exists for stepFailed on server
+		when(serverConnector.getReferenceSnapshot(1)).thenThrow(new SeleniumRobotServerException("error"));
+		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep2);
+		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
+		
+		// no comparison done
+		PowerMockito.verifyNew(StepReferenceComparator.class, never()).withArguments(any(File.class), any(File.class));
+		
+		Assert.assertEquals(causes.size(), 0);
+		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
+	}
+	
+	/**
+	 * If any error occurs in comparison, continue
+	 * @throws Exception
+	 */
+	@Test(groups= {"ut"})
+	public void testCompareStepInErrorWithReferenceErrorInComparison() throws Exception {
+		
+		ITestResult testResult = Reporter.getCurrentTestResult();
+		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
+		
+		// comparison successful
+		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep2).thenReturn(stepReferenceComparatorStep2);
+		when(stepReferenceComparatorStep2.compare()).thenThrow(new ConfigurationException("error on init"));
+		
+		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
+		
+		Assert.assertEquals(causes.size(), 0);
+		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
+	}
+	
 }
