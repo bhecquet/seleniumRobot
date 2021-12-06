@@ -16,6 +16,8 @@ import com.seleniumtests.connectors.selenium.fielddetector.ImageFieldDetector.Fi
 import com.seleniumtests.connectors.selenium.fielddetector.Label;
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.core.utils.TestNGResultUtils;
+import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.imaging.StepReferenceComparator;
@@ -164,15 +166,25 @@ public class ErrorCauseFinder {
 		Collections.reverse(testStepsSubList);
 		for (TestStep testStep2: testStepsSubList) {
 			if (testStep2.getStepResultId() != null) {
-				File referenceSnapshot = SeleniumRobotSnapshotServerConnector.getInstance().getReferenceSnapshot(testStep2.getStepResultId());
-				int matching = compareReferenceToStepSnapshot(stepSnapshotFile, referenceSnapshot);
+				try {
+					File referenceSnapshot = SeleniumRobotSnapshotServerConnector.getInstance().getReferenceSnapshot(testStep2.getStepResultId());
 				
-				if (matching > 80) {
-					errorCauses.add(new ErrorCause(ErrorType.SELENIUM_ERROR, String.format("Wrong page found, we are on the page of step '%s'", testStep2.getName())));
-					break;
+					if (referenceSnapshot == null) {
+						continue;
+					}
+					int matching = compareReferenceToStepSnapshot(stepSnapshotFile, referenceSnapshot);
+					
+					if (matching > 80) {
+						errorCauses.add(new ErrorCause(ErrorType.SELENIUM_ERROR, String.format("Wrong page found, we are on the page of step '%s'", testStep2.getName())));
+						return;
+					}
+				} catch (ConfigurationException | SeleniumRobotServerException e) {
+					logger.error(e.getMessage());
 				}
 			}
 		}
+		
+		errorCauses.add(new ErrorCause(ErrorType.UNKNOWN_PAGE, null));
 	}
 	
 	/**
