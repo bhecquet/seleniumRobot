@@ -25,6 +25,15 @@ public class FieldDetectorConnector {
 	private static final String DETECT_ERROR_URL = "/detectError";
 	private static FieldDetectorConnector fieldDetectorConnector;
 	
+	
+	/**
+	 * For test only
+	 * @param fieldDetectorConnector
+	 */
+	public static void resetFieldDetectorConnector() {
+		FieldDetectorConnector.fieldDetectorConnector = null;
+	}
+
 	public static FieldDetectorConnector getInstance(String url) {
 		if (fieldDetectorConnector == null) {
 			fieldDetectorConnector = new FieldDetectorConnector(url);
