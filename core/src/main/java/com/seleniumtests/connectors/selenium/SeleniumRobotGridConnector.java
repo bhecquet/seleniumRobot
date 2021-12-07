@@ -59,6 +59,7 @@ import kong.unirest.json.JSONObject;
 
 public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 
+	private static final String ONLY_MAIN_SCREEN = "onlyMainScreen";
 	private static final String Y_FIELD = "y";
 	private static final String X_FIELD = "x";
 	private static final String NAME_FIELD = "name";
@@ -260,7 +261,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 				.queryString(ACTION_FIELD, "leftClic")
 				.queryString(X_FIELD, x)
 				.queryString(Y_FIELD, y)
-				.queryString("onlyMainScreen", onlyMainScreen)
+				.queryString(ONLY_MAIN_SCREEN, onlyMainScreen)
 				.asString();
 			if (response.getStatus() != 200) {
 				logger.error(String.format("Left click error: %s", response.getBody()));
@@ -299,7 +300,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			.queryString(ACTION_FIELD, "doubleClick")
 			.queryString(X_FIELD, x)
 			.queryString(Y_FIELD, y)
-			.queryString("onlyMainScreen", onlyMainScreen)
+			.queryString(ONLY_MAIN_SCREEN, onlyMainScreen)
 			.asString();
 			if (response.getStatus() != 200) {
 				logger.error(String.format("Double click error: %s", response.getBody()));
@@ -337,7 +338,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 				.queryString(ACTION_FIELD, "rightClic")
 				.queryString(X_FIELD, x)
 				.queryString(Y_FIELD, y)
-				.queryString("onlyMainScreen", onlyMainScreen)
+				.queryString(ONLY_MAIN_SCREEN, onlyMainScreen)
 				.asString();
 			if (response.getStatus() != 200) {
 				logger.error(String.format("Right click error: %s", response.getBody()));
@@ -366,7 +367,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		try {
 			HttpResponse<String> response =  Unirest.get(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString(ACTION_FIELD, "screenshot")
-				.queryString("onlyMainScreen", onlyMainScreen)
+				.queryString(ONLY_MAIN_SCREEN, onlyMainScreen)
 				.asString();
 			
 			if (response.getStatus() != 200) {

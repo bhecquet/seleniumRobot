@@ -33,7 +33,9 @@ import com.seleniumtests.util.osutility.OSUtility;
 
 public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
 
-    public IECapabilitiesFactory(DriverConfig webDriverConfig) {
+    private static final String SE_IE_OPTIONS = "se:ieOptions";
+
+	public IECapabilitiesFactory(DriverConfig webDriverConfig) {
 		super(webDriverConfig);
 	}
 
@@ -55,7 +57,7 @@ public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
         
         if (webDriverConfig.getAttachExistingDriverPort() != null) {
 	        options.setCapability("attachExistingBrowser", true);
-			((Map<String, Object>) options.getCapability("se:ieOptions")).put("attachExistingBrowser", true);
+			((Map<String, Object>) options.getCapability(SE_IE_OPTIONS)).put("attachExistingBrowser", true);
         }
         
         if (Boolean.TRUE.equals(webDriverConfig.getIeMode())) {
@@ -65,9 +67,9 @@ public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
         	}
         	
         	// put in both location as Selenium3 does not handle edge chromium properly
-        	((Map<String, Object>) options.getCapability("se:ieOptions")).put("ie.edgechromium", true);
+        	((Map<String, Object>) options.getCapability(SE_IE_OPTIONS)).put("ie.edgechromium", true);
 	        options.setCapability("ie.edgechromium", true); 
-        	((Map<String, Object>) options.getCapability("se:ieOptions")).put("ie.edgepath", edgeBrowserInfos.get(0).getPath());
+        	((Map<String, Object>) options.getCapability(SE_IE_OPTIONS)).put("ie.edgepath", edgeBrowserInfos.get(0).getPath());
 	        options.setCapability("ie.edgepath", edgeBrowserInfos.get(0).getPath());
 	        options.setCapability(InternetExplorerDriver.INITIAL_BROWSER_URL, webDriverConfig.getInitialUrl());
         } else {

@@ -230,29 +230,10 @@ public class ErrorCauseFinder {
 					List<Label> labels = imageFieldDetector.detectLabels();
 					
 					// are some text considered as error messages (mainly in red on page)
-					for (Field field: fields) {
-						if (CLASS_ERROR_MESSAGE.equals(field.getClassName())) {
-							// find the related label
-							for (Label label: labels) {
-								if (label.isInside(field)) {
-									causes.add(new ErrorCause(ErrorType.ERROR_MESSAGE, label.getText()));
-									break;
-								}
-							}
-						} else if (CLASS_ERROR_FIELD.equals(field.getClassName())) {
-							causes.add(new ErrorCause(ErrorType.ERROR_IN_FIELD, "At least one field in error"));
-						}
-					}
+					parseFields(causes, fields, labels);
 
 					// do some label contain "error" or "problem"
-					for (Label label: labels) {
-						for (String errorWord: ERROR_WORDS) {
-							ErrorCause possibleErrorCause = new ErrorCause(ErrorType.ERROR_MESSAGE, label.getText());
-							if (label.getText().contains(errorWord) && !causes.contains(possibleErrorCause)) {
-								causes.add(possibleErrorCause);
-							}
-						}
-					}
+					parseLabels(causes, labels);
 					
 				} catch (Exception e) {
 					logger.error("Error searching for errors in last snapshots: " + e.getMessage());
@@ -264,6 +245,42 @@ public class ErrorCauseFinder {
 		}
 		
 		return causes;
+	}
+
+	/**
+	 * @param causes
+	 * @param labels
+	 */
+	private void parseLabels(List<ErrorCause> causes, List<Label> labels) {
+		for (Label label: labels) {
+			for (String errorWord: ERROR_WORDS) {
+				ErrorCause possibleErrorCause = new ErrorCause(ErrorType.ERROR_MESSAGE, label.getText());
+				if (label.getText().contains(errorWord) && !causes.contains(possibleErrorCause)) {
+					causes.add(possibleErrorCause);
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param causes
+	 * @param fields
+	 * @param labels
+	 */
+	private void parseFields(List<ErrorCause> causes, List<Field> fields, List<Label> labels) {
+		for (Field field: fields) {
+			if (CLASS_ERROR_MESSAGE.equals(field.getClassName())) {
+				// find the related label
+				for (Label label: labels) {
+					if (label.isInside(field)) {
+						causes.add(new ErrorCause(ErrorType.ERROR_MESSAGE, label.getText()));
+						break;
+					}
+				}
+			} else if (CLASS_ERROR_FIELD.equals(field.getClassName())) {
+				causes.add(new ErrorCause(ErrorType.ERROR_IN_FIELD, "At least one field in error"));
+			}
+		}
 	}
 
 }

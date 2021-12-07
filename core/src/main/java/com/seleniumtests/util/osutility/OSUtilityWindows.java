@@ -41,6 +41,7 @@ import com.sun.jna.platform.win32.WinReg;
 
 public class OSUtilityWindows extends OSUtility {
 	
+	private static final String MSEDGE_EXE = "msedge.exe";
 	private static final String EXE_EXT_QUOTE = ".exe\"";
 	private static final String KEY_VERSION = "version";
 	Pattern versionPattern = Pattern.compile(".*?(\\d++\\.\\d++\\.\\d++).*?");
@@ -195,7 +196,7 @@ public class OSUtilityWindows extends OSUtility {
 		if (!new File(edgePath).exists()) {
 			throw new ConfigurationException("Edge version could not be get from folder, edge path does not exist");
 		}
-		for (File file: new File(edgePath.replace("msedge.exe", "")).listFiles()) {
+		for (File file: new File(edgePath.replace(MSEDGE_EXE, "")).listFiles()) {
 			if (file.isDirectory() && file.getName().matches("^\\d++.*")) {
 				return file.getName();
 			}
@@ -333,7 +334,7 @@ public class OSUtilityWindows extends OSUtility {
 			String version = getWindowsEdgeVersion(edgePath);
 			
 			if (version != null && !version.isEmpty()) {
-				browserList.get(BrowserType.EDGE).add(new BrowserInfo(BrowserType.EDGE, extractEdgeVersion(version), false, Paths.get(edgePath, "msedge.exe").toString()));
+				browserList.get(BrowserType.EDGE).add(new BrowserInfo(BrowserType.EDGE, extractEdgeVersion(version), false, Paths.get(edgePath, MSEDGE_EXE).toString()));
 			}
 		} catch (Win32Exception | ConfigurationException e) {
 			logger.warn("Error searching Edge chromium installations: " + e.getMessage());
@@ -346,7 +347,7 @@ public class OSUtilityWindows extends OSUtility {
 			String versionBeta = getWindowsBetaEdgeVersion(edgePathBeta);
 
 			if (versionBeta != null && !versionBeta.isEmpty()) {
-				browserList.get(BrowserType.EDGE).add(new BrowserInfo(BrowserType.EDGE, extractEdgeVersion(versionBeta), true, Paths.get(edgePathBeta, "msedge.exe").toString()));
+				browserList.get(BrowserType.EDGE).add(new BrowserInfo(BrowserType.EDGE, extractEdgeVersion(versionBeta), true, Paths.get(edgePathBeta, MSEDGE_EXE).toString()));
 			}
 
 		} catch (Win32Exception | ConfigurationException e) {
