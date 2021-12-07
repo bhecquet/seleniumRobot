@@ -45,6 +45,7 @@ import rp.com.google.common.io.Files;
 
 public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerConnector {
 	
+	private static final String FIELD_IMAGE = "image";
 	private static final String FIELD_IS_OK_WITH_SNAPSHOTS = "isOkWithSnapshots";
 	private static final String FIELD_COMPUTING_ERROR = "computingError";
 	private static final String FIELD_STEP = "step";
@@ -228,9 +229,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			return null;
 		}
 
-		if (stepResultId == null) {
-			throw new ConfigurationException("Step result must be previously recorded");
-		}
+		checkStepResult(stepResultId);
 		
 		try {
 
@@ -250,6 +249,15 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			throw new SeleniumRobotServerException("cannot get reference snapshot", e);
 		}
 	}
+
+	/**
+	 * @param stepResultId
+	 */
+	private void checkStepResult(Integer stepResultId) {
+		if (stepResultId == null) {
+			throw new ConfigurationException("Step result must be previously recorded");
+		}
+	}
 	
 	/**
 	 * Create snapshot that shows the status of a step
@@ -259,9 +267,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			return ;
 		}
 
-		if (stepResultId == null) {
-			throw new ConfigurationException("Step result must be previously recorded");
-		}
+		checkStepResult(stepResultId);
 		if (snapshot == null || snapshot.getScreenshot() == null || snapshot.getScreenshot().getFullImagePath() == null) {
 			throw new SeleniumRobotServerException("Provided snapshot does not exist");
 		}
@@ -271,7 +277,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			
 			getJSonResponse(buildPostRequest(url + STEP_REFERENCE_API_URL)
 					.field("stepResult", stepResultId)
-					.field("image", pictureFile)
+					.field(FIELD_IMAGE, pictureFile)
 					
 					);
 			
@@ -315,7 +321,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			
 			JSONObject snapshotJson = getJSonResponse(buildPutRequest(url + SNAPSHOT_API_URL)
 					.socketTimeout(5000)
-					.field("image", pictureFile)
+					.field(FIELD_IMAGE, pictureFile)
 					.field(FIELD_NAME, snapshotName)
 					.field("compare", snapshot.getCheckSnapshot().getName())
 					.field("diffTolerance", String.valueOf(snapshot.getCheckSnapshot().getErrorThreshold()))
@@ -366,9 +372,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		if (testCaseInSessionId == null) {
 			throw new ConfigurationException("TestCaseInSession must be previously recorded");
 		}
-		if (stepResultId == null) {
-			throw new ConfigurationException("Step result must be previously recorded");
-		}
+		checkStepResult(stepResultId);
 		if (snapshot == null || snapshot.getScreenshot() == null || snapshot.getScreenshot().getFullImagePath() == null) {
 			throw new SeleniumRobotServerException("Provided snapshot does not exist");
 		}
@@ -382,7 +386,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field("stepResult", stepResultId)
 					.field("sessionId", sessionUUID)
 					.field(FIELD_TEST_CASE, testCaseInSessionId.toString())
-					.field("image", pictureFile)
+					.field(FIELD_IMAGE, pictureFile)
 					.field(FIELD_NAME, snapshotName)
 					.field("compare", snapshot.getCheckSnapshot().getName())
 					.field("diffTolerance", String.valueOf(snapshot.getCheckSnapshot().getErrorThreshold()))

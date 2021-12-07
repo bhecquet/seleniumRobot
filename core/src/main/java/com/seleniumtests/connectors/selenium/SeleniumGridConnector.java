@@ -155,7 +155,7 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	 * @param onlyMainScreen	if true, click coordinates are on the main screen
 	 */
 	public void doubleClick(boolean onlyMainScreen, int x, int y) {
-		logger.warn("left clic is only available with seleniumRobot grid");
+		logger.warn("double clic is only available with seleniumRobot grid");
 	}
 	/**
 	 * double clic on desktop at x,y
@@ -163,7 +163,7 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	 * @param y		y coordinate
 	 */
 	public void doubleClick(int x, int y) {
-		logger.warn("left clic is only available with seleniumRobot grid");
+		logger.warn("double clic is only available with seleniumRobot grid");
 	}
 	
 	/**

@@ -204,17 +204,17 @@ public class AVIReader extends AVIInputStream implements MovieReader {
         Codec codec = createCodec(fmt);
         String enc = fmt.get(EncodingKey);
         if (codec == null) {
-            throw new UnsupportedOperationException("Track " + tr + " no codec found for format " + fmt);
+            throw new UnsupportedOperationException(String.format("Track %s no codec found for format %s", tr, fmt));
         } else {
             if (fmt.get(MediaTypeKey) == MediaType.VIDEO) {
                 if (null == codec.setInputFormat(fmt)) {
-                    throw new UnsupportedOperationException("Track " + tr + " codec does not support input format " + fmt + ". codec=" + codec);
+                    throw new UnsupportedOperationException(String.format("Track %s codec does not support input format %s. codec=%s", tr, fmt, codec));
                 }
                 Format outFormat = fmt.prepend(MediaTypeKey, MediaType.VIDEO,//
                         MimeTypeKey, MIME_JAVA,
                         EncodingKey, ENCODING_BUFFERED_IMAGE, DataClassKey, BufferedImage.class);
                 if (null == codec.setOutputFormat(outFormat)) {
-                    throw new UnsupportedOperationException("Track " + tr + " codec does not support output format " + outFormat + ". codec=" + codec);
+                    throw new UnsupportedOperationException(String.format("Track %s codec does not support output format %s. codec=", tr, outFormat, codec));
                 }
             }
         }
