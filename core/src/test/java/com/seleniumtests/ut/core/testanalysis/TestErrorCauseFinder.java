@@ -162,6 +162,97 @@ public class TestErrorCauseFinder extends MockitoTest {
 	}
 	
 	/**
+	 * Check error is only logged when something goes wrong while analyzing picture
+	 * @throws Exception
+	 */
+	@Test(groups= {"ut"})
+	public void testSearchInLastStepErrorMessageWithException() throws Exception {
+		
+		ITestResult testResult = Reporter.getCurrentTestResult();
+		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, lastStep));
+		
+		PowerMockito.whenNew(ImageFieldDetector.class).withArguments(new File(lastStep.getSnapshots().get(0).getScreenshot().getFullImagePath()), (double)1, FieldType.ERROR_MESSAGES_AND_FIELDS).thenReturn(imageFieldDetector);
+		
+		List<Label> labels = new ArrayList<>();
+		labels.add(new Label(0, 100, 20, 50, "il y a eu un gros problème"));
+		labels.add(new Label(0, 100, 100, 120, "some error"));
+		List<Field> fields = new ArrayList<>();
+		fields.add(new Field(0, 100, 0, 20, "", "field"));
+		fields.add(new Field(0, 100, 200, 220, "", "field"));
+		
+		when(imageFieldDetector.detectFields()).thenThrow(new ConfigurationException("error"));
+		when(imageFieldDetector.detectLabels()).thenReturn(labels);
+		
+		List<ErrorCause> causes = new ErrorCauseFinder(testResult).findErrorInLastStepSnapshots();
+		
+		Assert.assertEquals(causes.size(), 0);
+		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInLastStep(testResult));
+	}
+	
+	/**
+	 * In case an error_field is found, check we show it as an error
+	 * @throws Exception
+	 */
+	@Test(groups= {"ut"})
+	public void testSearchInLastStepDetectedErrorField() throws Exception {
+		
+		ITestResult testResult = Reporter.getCurrentTestResult();
+		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, lastStep));
+		
+		PowerMockito.whenNew(ImageFieldDetector.class).withArguments(new File(lastStep.getSnapshots().get(0).getScreenshot().getFullImagePath()), (double)1, FieldType.ERROR_MESSAGES_AND_FIELDS).thenReturn(imageFieldDetector);
+		
+		List<Label> labels = new ArrayList<>();
+		labels.add(new Label(0, 100, 20, 50, "ok"));
+		labels.add(new Label(0, 100, 100, 120, "nothing"));
+		List<Field> fields = new ArrayList<>();
+		fields.add(new Field(0, 100, 0, 20, "", ErrorCauseFinder.CLASS_ERROR_FIELD));
+		fields.add(new Field(0, 100, 200, 220, "", "field"));
+		
+		when(imageFieldDetector.detectFields()).thenReturn(fields);
+		when(imageFieldDetector.detectLabels()).thenReturn(labels);
+		
+		List<ErrorCause> causes = new ErrorCauseFinder(testResult).findErrorInLastStepSnapshots();
+		
+		Assert.assertEquals(causes.size(), 1);
+		Assert.assertEquals(causes.get(0).getType(), ErrorType.ERROR_IN_FIELD);
+		Assert.assertEquals(causes.get(0).getDescription(), "At least one field in error");
+		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInLastStep(testResult));
+	}
+	
+	/**
+	 * An error_message field is found. We try to relate it to a label 
+	 * @throws Exception
+	 */
+	@Test(groups= {"ut"})
+	public void testSearchInLastStepDetectedErrorMessage() throws Exception {
+		
+		ITestResult testResult = Reporter.getCurrentTestResult();
+		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, lastStep));
+		
+		PowerMockito.whenNew(ImageFieldDetector.class).withArguments(new File(lastStep.getSnapshots().get(0).getScreenshot().getFullImagePath()), (double)1, FieldType.ERROR_MESSAGES_AND_FIELDS).thenReturn(imageFieldDetector);
+		
+		List<Label> labels = new ArrayList<>();
+		labels.add(new Label(0, 100, 0, 20, "ko"));
+		labels.add(new Label(0, 100, 100, 120, "nothing"));
+		List<Field> fields = new ArrayList<>();
+		fields.add(new Field(0, 100, 0, 20, "", ErrorCauseFinder.CLASS_ERROR_MESSAGE));
+		fields.add(new Field(0, 100, 200, 220, "", "field"));
+		
+		when(imageFieldDetector.detectFields()).thenReturn(fields);
+		when(imageFieldDetector.detectLabels()).thenReturn(labels);
+		
+		List<ErrorCause> causes = new ErrorCauseFinder(testResult).findErrorInLastStepSnapshots();
+		
+		Assert.assertEquals(causes.size(), 1);
+		Assert.assertEquals(causes.get(0).getType(), ErrorType.ERROR_MESSAGE);
+		Assert.assertEquals(causes.get(0).getDescription(), "ko");
+		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInLastStep(testResult));
+	}
+	
+	/**
 	 * no error message in the page, no cause should be found
 	 * @throws Exception
 	 */
@@ -543,6 +634,33 @@ public class TestErrorCauseFinder extends MockitoTest {
 		
 		Assert.assertEquals(causes.size(), 0);
 		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
+	}
+	
+	/**
+	 * Same thing as above but only step1 has no ID with bad match so we cannot look for previous step reference
+	 * In this case, we get an unknown_page cause
+	 * @throws Exception
+	 */
+	@Test(groups= {"ut"})
+	public void testCompareStepInErrorWithReferenceNoIDForStep3() throws Exception {
+		
+		step1.setStepResultId(null);
+		
+		ITestResult testResult = Reporter.getCurrentTestResult();
+		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
+		
+		// comparison successful
+		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep2).thenReturn(stepReferenceComparatorStep2);
+		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep1).thenReturn(stepReferenceComparatorStep1);
+		when(stepReferenceComparatorStep2.compare()).thenReturn(49); // bad comparison with step2 reference
+		when(stepReferenceComparatorStep1.compare()).thenReturn(81); // good comparison with step1 reference
+		
+		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
+
+		Assert.assertEquals(causes.size(), 1);
+		Assert.assertEquals(causes.get(0).getType(), ErrorType.UNKNOWN_PAGE);
+		Assert.assertNull(causes.get(0).getDescription());
 	}
 	
 	/**

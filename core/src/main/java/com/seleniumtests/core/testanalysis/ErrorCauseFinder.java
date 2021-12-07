@@ -40,6 +40,10 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
  */
 public class ErrorCauseFinder {
 	
+	public static final String CLASS_ERROR_FIELD = "error_field";
+
+	public static final String CLASS_ERROR_MESSAGE = "error_message";
+
 	// TODO: link to RootCause and RootCause details from the Step annotation which can indicate what is the root cause of this error (declarative for a step)
 	
 	/*
@@ -227,14 +231,15 @@ public class ErrorCauseFinder {
 					
 					// are some text considered as error messages (mainly in red on page)
 					for (Field field: fields) {
-						if ("error_message".equals(field.getClassName())) {
+						if (CLASS_ERROR_MESSAGE.equals(field.getClassName())) {
 							// find the related label
 							for (Label label: labels) {
 								if (label.isInside(field)) {
 									causes.add(new ErrorCause(ErrorType.ERROR_MESSAGE, label.getText()));
+									break;
 								}
 							}
-						} else if ("error_field".equals(field.getClassName())) {
+						} else if (CLASS_ERROR_FIELD.equals(field.getClassName())) {
 							causes.add(new ErrorCause(ErrorType.ERROR_IN_FIELD, "At least one field in error"));
 						}
 					}
