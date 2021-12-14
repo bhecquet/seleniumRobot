@@ -35,4 +35,9 @@ public interface SeleniumRobotCapabilityType {
 	 * name of the running test
 	 */
 	String TEST_NAME = "testName";
+	
+	/**
+	 * Capability giving information on the beta status of the browser
+	 */
+	String BETA_BROWSER = "beta";
 }
