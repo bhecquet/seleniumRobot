@@ -52,7 +52,7 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
 	}
 	
 	/**
-	 * Select the right browser info, depending on type, version and binary
+	 * In local mode, select the right browser info, depending on type, version and binary
 	 * If several version are available, the highest is selected. This means that if betaVersion option is selected, we will get the beta browser.
 	 * 
 	 * @param browserType		the browser to select (chrome, firefox, ...)
@@ -121,6 +121,7 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
             if (!webDriverConfig.getNodeTags().isEmpty()) {
             	options.setCapability(SeleniumRobotCapabilityType.NODE_TAGS, webDriverConfig.getNodeTags());
             }
+            options.setCapability(SeleniumRobotCapabilityType.BETA_BROWSER, webDriverConfig.getBetaBrowser());
             updateGridOptionsWithSelectedBrowserInfo(options);
         }
 
