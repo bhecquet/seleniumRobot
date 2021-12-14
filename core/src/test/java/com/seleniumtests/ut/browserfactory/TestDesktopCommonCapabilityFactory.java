@@ -90,6 +90,24 @@ public class TestDesktopCommonCapabilityFactory extends MockitoTest {
 	}
 	
 	/**
+	 * Check default behaviour when beta browser is defined in grid mode
+	 * tags are transferred to driver
+	 */
+	@Test(groups={"ut"})
+	public void testCreateDefaultCapabilitiesWithBetaInGridMode() {
+		
+		when(config.isEnableJavascript()).thenReturn(true);
+		when(config.getProxy()).thenReturn(proxyConfig);
+		when(config.getNodeTags()).thenReturn(Arrays.asList("foo", "bar"));
+		when(config.getMode()).thenReturn(DriverMode.GRID);
+		when(config.getBetaBrowser()).thenReturn(true);
+		
+		MutableCapabilities capa = new HtmlUnitCapabilitiesFactory(config).createCapabilities();
+		
+		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.BETA_BROWSER), true);
+	}
+	
+	/**
 	 * Check default behaviour when node tags are defined in local mode
 	 * tags are not transferred to driver 
 	 */

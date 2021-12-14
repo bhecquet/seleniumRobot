@@ -29,6 +29,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.http.HttpHost;
@@ -210,7 +212,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		}
 		
 		String responseBody = null;
-		logger.info(String.format("Mouse coordinates"));
+		logger.info("Mouse coordinates");
 		try {
 			// we get a string with x,y
 			HttpResponse<String> response = Unirest.get(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
@@ -392,13 +394,19 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		if (nodeUrl == null) {
 			throw new ScenarioException("You cannot upload file to browser before driver has been created and corresponding node instanciated");
 		}
+		
+		
 
 		logger.info("uploading file to browser: " + fileName);
 		try {
+			byte[] byteArray = base64Content.getBytes();
+			byte[] decodeBuffer = Base64.decodeBase64(byteArray);
+		
 			HttpResponse<String> response = Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+				.header(HttpHeaders.CONTENT_TYPE, MediaType.OCTET_STREAM.toString())
 				.queryString(ACTION_FIELD, "uploadFile")
 				.queryString(NAME_FIELD, fileName)
-				.field("content", base64Content)
+				.body(decodeBuffer)
 				.asString();
 			
 			if (response.getStatus() != 200) {
@@ -406,7 +414,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			}
 		} catch (UnirestException e) {
 			logger.warn(String.format("Cannot upload file: %s", e.getMessage()));
-		}
+		} 
 	}
 	
 	/**
