@@ -40,4 +40,9 @@ public interface SeleniumRobotCapabilityType {
 	 * Capability giving information on the beta status of the browser
 	 */
 	String BETA_BROWSER = "beta";
+	
+	/**
+	 * Whether Edge should be started in IE mode
+	 */
+	String EDGE_IE_MODE = "ieMode";
 }

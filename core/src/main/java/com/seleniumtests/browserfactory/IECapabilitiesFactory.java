@@ -28,12 +28,13 @@ import org.openqa.selenium.ie.InternetExplorerOptions;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
+import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.osutility.OSUtility;
 
 public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
 
-    private static final String SE_IE_OPTIONS = "se:ieOptions";
+    public static final String SE_IE_OPTIONS = "se:ieOptions";
 
 	public IECapabilitiesFactory(DriverConfig webDriverConfig) {
 		super(webDriverConfig);
@@ -56,22 +57,15 @@ public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
         }
         
         if (webDriverConfig.getAttachExistingDriverPort() != null) {
+        	
+        	// when attaching to an existing Internet Explorer, give the option to driver which will then not create a new Internet Explorer
 	        options.setCapability("attachExistingBrowser", true);
 			((Map<String, Object>) options.getCapability(SE_IE_OPTIONS)).put("attachExistingBrowser", true);
         }
         
         if (Boolean.TRUE.equals(webDriverConfig.getIeMode())) {
-        	List<BrowserInfo> edgeBrowserInfos = OSUtility.getInstalledBrowsersWithVersion(webDriverConfig.getBetaBrowser()).get(BrowserType.EDGE);
-        	if (edgeBrowserInfos.isEmpty()) {
-        		throw new ConfigurationException("Edge not available");
-        	}
+        	configureEdgeIeMode(options);
         	
-        	// put in both location as Selenium3 does not handle edge chromium properly
-        	((Map<String, Object>) options.getCapability(SE_IE_OPTIONS)).put("ie.edgechromium", true);
-	        options.setCapability("ie.edgechromium", true); 
-        	((Map<String, Object>) options.getCapability(SE_IE_OPTIONS)).put("ie.edgepath", edgeBrowserInfos.get(0).getPath());
-	        options.setCapability("ie.edgepath", edgeBrowserInfos.get(0).getPath());
-	        options.setCapability(InternetExplorerDriver.INITIAL_BROWSER_URL, webDriverConfig.getInitialUrl());
         } else {
         	// initial URL is not set for Edge in IE mode, as about:blank is not a real URL and this prevent driver from finding the IE window
         	options.setCapability(InternetExplorerDriver.INITIAL_BROWSER_URL, "about:blank");
@@ -80,6 +74,28 @@ public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
         options.setPageLoadStrategy(webDriverConfig.getPageLoadStrategy());
 
         return options;
+	}
+
+	/**
+	 * @param options
+	 */
+	private void configureEdgeIeMode(InternetExplorerOptions options) {
+		if (webDriverConfig.getMode() == DriverMode.LOCAL) {
+			List<BrowserInfo> edgeBrowserInfos = OSUtility.getInstalledBrowsersWithVersion(webDriverConfig.getBetaBrowser()).get(BrowserType.EDGE);
+			if (edgeBrowserInfos == null || edgeBrowserInfos.isEmpty()) {
+				throw new ConfigurationException("Edge not available");
+			}
+			
+			// put in both location as Selenium3 does not handle edge chromium properly
+			((Map<String, Object>) options.getCapability(SE_IE_OPTIONS)).put("ie.edgechromium", true);
+		    options.setCapability("ie.edgechromium", true); 
+			((Map<String, Object>) options.getCapability(SE_IE_OPTIONS)).put("ie.edgepath", edgeBrowserInfos.get(0).getPath());
+		    options.setCapability("ie.edgepath", edgeBrowserInfos.get(0).getPath());
+		} else {
+			options.setCapability(SeleniumRobotCapabilityType.EDGE_IE_MODE, true);
+		}
+
+	    options.setCapability(InternetExplorerDriver.INITIAL_BROWSER_URL, webDriverConfig.getInitialUrl());
 	}
 
 	@Override
