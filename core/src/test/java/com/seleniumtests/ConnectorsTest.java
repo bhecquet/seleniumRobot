@@ -290,8 +290,10 @@ public class ConnectorsTest extends MockitoTest {
 		doReturn(response).when(postRequest).asString();
 		when(postRequest.getUrl()).thenReturn(serverUrl);
 		when(postRequest.body(any(JSONObject.class))).thenReturn(requestBodyEntity);
+		when(postRequest.body(any(byte[].class))).thenReturn(requestBodyEntity);
 		when(postRequest.asJson()).thenReturn(jsonResponse);
 		when(requestBodyEntity.asJson()).thenReturn(jsonResponse);
+		when(requestBodyEntity.asString()).thenReturn(response);
 		when(requestMultipartBody.getUrl()).thenReturn(serverUrl);
 		when(requestMultipartBody.asJson()).thenReturn(jsonResponse);
 		
