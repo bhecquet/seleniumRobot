@@ -4,6 +4,10 @@ import org.openqa.selenium.WebDriverException;
 
 public class ExceptionUtility {
 
+	private ExceptionUtility() {
+		// nothing to do
+	}
+	
 	/**
 	 * return the exception message
 	 * Remove extra information in case of WebDriverException

@@ -11,9 +11,9 @@ public class StringInfo extends Info {
 	
 	public String encode(String format) {
 		try {
-			return StringUtility.encodeString(info, format);
+			return StringUtility.encodeString(description, format);
 		} catch (CustomSeleniumTestsException e) {
-			return info;
+			return description;
 		}
 	}
 }
