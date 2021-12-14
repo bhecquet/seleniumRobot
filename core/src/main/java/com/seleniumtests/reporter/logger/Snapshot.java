@@ -189,17 +189,17 @@ public class Snapshot extends TestAction {
 			}
 			
 			FileUtils.copyFile(oldFile, new File(screenshot.getFullHtmlPath()));
-			
-
-			try {
-				Files.delete(Paths.get(new File(oldFullPath).getCanonicalPath()));
-			} catch (IOException e) {
-				// do not consider it as an error if old file cannot be deleted
-				logger.warn(String.format("Could not delete %s", oldFullPath));
-			}	
 		} catch (IOException e) {
 			screenshot.setHtmlSourcePath(oldPath);
 		}
+
+		try {
+			Files.delete(Paths.get(new File(oldFullPath).getCanonicalPath()));
+		} catch (IOException e) {
+			// do not consider it as an error if old file cannot be deleted
+			logger.warn(String.format("Could not delete %s", oldFullPath));
+		}	
+		
 	}
     
 	public ScreenShot getScreenshot() {

@@ -16,12 +16,12 @@ public class HyperlinkInfo extends Info {
 	public String encode(String format) {
 		
 		if ("html".equals(format)) {
-			return String.format("<a href=\"%s\">%s</a>", link, StringUtility.encodeString(info, format));
+			return String.format("<a href=\"%s\">%s</a>", link, StringUtility.encodeString(description, format));
 		} else {
 			try {
-				return StringUtility.encodeString(String.format("link %s;info %s", link, info), format);
+				return StringUtility.encodeString(String.format("link %s;info %s", link, description), format);
 			} catch (CustomSeleniumTestsException e) {
-				return info;
+				return description;
 			}
 		}
 	}

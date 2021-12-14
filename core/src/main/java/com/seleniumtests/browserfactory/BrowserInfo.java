@@ -228,6 +228,34 @@ public class BrowserInfo {
 	}
 	
 	/**
+	 * Get version from chromium based browsers (chrome, edge)
+	 * @param driverFiles
+	 * @param versionRegex
+	 * @return
+	 */
+	private Map<Integer, String> getChromiumDriverVersion(List<String> driverFiles, Pattern versionRegex) {
+		Map<Integer, String> driverVersion = new HashMap<>();
+		
+		for (String fileName: driverFiles) {
+			Matcher matcher = versionRegex.matcher(fileName);
+			if (matcher.matches()) {
+				int minVersion = Integer.parseInt(matcher.group(1));
+				int maxVersion = Integer.parseInt(matcher.group(2));
+				if (maxVersion < minVersion) {
+					throw new ConfigurationException(String.format("Chrome driver file %s version is incorrect, max version should be > to min version", fileName));
+				} else {
+					for (int i = minVersion; i <= maxVersion; i++) {
+						driverVersion.put(i, fileName);
+					}
+				}
+			} else {
+				throw new ConfigurationException(String.format("Driver %s is excluded as it does not match the pattern 'chromedriver_<version>_chrome-<minVersion>-<maxVersion>'", fileName));
+			}
+		}
+		return driverVersion;
+	}
+	
+	/**
 	 * Find the most suitable driver when using chrome browser
 	 * @throws IOException
 	 */
@@ -243,24 +271,7 @@ public class BrowserInfo {
 			throw new ConfigurationException("no chromedriver in resources");
 		}
 		
-		Map<Integer, String> driverVersion = new HashMap<>();
-		
-		for (String fileName: driverFiles) {
-			Matcher matcher = REG_CHROME_VERSION.matcher(fileName);
-			if (matcher.matches()) {
-				int minVersion = Integer.parseInt(matcher.group(1));
-				int maxVersion = Integer.parseInt(matcher.group(2));
-				if (maxVersion < minVersion) {
-					throw new ConfigurationException(String.format("Chrome driver file %s version is incorrect, max version should be > to min version", fileName));
-				} else {
-					for (int i = minVersion; i <= maxVersion; i++) {
-						driverVersion.put(i, fileName);
-					}
-				}
-			} else {
-				throw new ConfigurationException(String.format("Driver %s is excluded as it does not match the pattern 'chromedriver_<version>_chrome-<minVersion>-<maxVersion>'", fileName));
-			}
-		}
+		Map<Integer, String> driverVersion = getChromiumDriverVersion(driverFiles, REG_CHROME_VERSION);
 		
 		int chromeVersion = Integer.parseInt(version.split("\\.")[0]);
 		driverFileName = driverVersion.get(chromeVersion);
@@ -400,24 +411,7 @@ public class BrowserInfo {
 			throw new ConfigurationException("no edgedriver in resources");
 		}
 		
-		Map<Integer, String> driverVersion = new HashMap<>();
-		
-		for (String fileName: driverFiles) {
-			Matcher matcher = REG_EDGE_VERSION.matcher(fileName);
-			if (matcher.matches()) {
-				int minVersion = Integer.parseInt(matcher.group(1));
-				int maxVersion = Integer.parseInt(matcher.group(2));
-				if (maxVersion < minVersion) {
-					throw new ConfigurationException(String.format("Edge driver file %s version is incorrect, max version should be > to min version", fileName));
-				} else {
-					for (int i = minVersion; i <= maxVersion; i++) {
-						driverVersion.put(i, fileName);
-					}
-				}
-			} else {
-				throw new ConfigurationException(String.format("Driver %s is excluded as it does not match the pattern 'edgedriver_<version>_edge-<minVersion>-<maxVersion>'", fileName));
-			}
-		}
+		Map<Integer, String> driverVersion = getChromiumDriverVersion(driverFiles, REG_EDGE_VERSION);
 		
 		int edgeVersion = Integer.parseInt(version.split("\\.")[0]);
 		driverFileName = driverVersion.get(edgeVersion);

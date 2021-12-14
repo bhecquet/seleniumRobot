@@ -4,13 +4,13 @@ public abstract class Info {
 
 
 	public String getInfo() {
-		return info;
+		return description;
 	}
 	
-	protected String info;
+	protected String description;
 	
 	protected Info(String info) {
-		this.info = info;
+		this.description = info;
 	}
 	
 	public abstract String encode(String format);
