@@ -17,20 +17,32 @@
  */
 package com.seleniumtests.it.reporter;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
+
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
 import org.apache.commons.lang3.StringUtils;
+import org.mockito.Mock;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.testanalysis.ErrorCauseFinder;
+import com.seleniumtests.reporter.reporters.ReporterControler;
 
+@PrepareForTest({ErrorCauseFinder.class, ReporterControler.class, SeleniumTestsContext.class})
 public class TestReporterControler extends ReporterTest {
 
+	
+	@Mock
+	private ErrorCauseFinder errorCauseFinder;
 	
 	/**
 	 * Check that files created by robot but not integrated to tests are deleted
@@ -239,5 +251,104 @@ public class TestReporterControler extends ReporterTest {
 		// in case of test method error, it is retried so each Before/After method is also replayed. Check it's the last one we have
 		Assert.assertTrue(detailedReportContent3.contains("<div class=\"message-info\">before count: 2</div>"));
 		Assert.assertTrue(detailedReportContent3.contains("<div class=\"message-info\">after count: 3</div>"));
+	}
+	
+	/**
+	 * Check we try to find error cause when
+	 * - findErrorCause=true
+	 * - seleniumServer is active
+	 * - result recording is active (meaning we also record step references)
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testErrorCauseSearched() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.FIND_ERROR_CAUSE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			
+			PowerMockito.whenNew(ErrorCauseFinder.class).withAnyArguments().thenReturn(errorCauseFinder);
+			configureMockedSnapshotServerConnection();
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverNativeActions"});
+			
+			// we search only once for each test result, at the end of test suite
+			verify(errorCauseFinder).findErrorCause();
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.FIND_ERROR_CAUSE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+		}
+		
+	}
+	
+	/**
+	 * Check we do not try to find error cause when
+	 * - findErrorCause=false
+	 * - seleniumServer is active
+	 * - result recording is active (meaning we also record step references)
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testErrorCauseNotSearchedFlagFalse() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.FIND_ERROR_CAUSE, "false");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			
+			PowerMockito.whenNew(ErrorCauseFinder.class).withAnyArguments().thenReturn(errorCauseFinder);
+			configureMockedSnapshotServerConnection();
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverNativeActions"});
+			
+			// we search only once for each test result, at the end of test suite
+			verify(errorCauseFinder, never()).findErrorCause();
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.FIND_ERROR_CAUSE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+		}
+		
+	}
+	
+	/**
+	 * Check we do not try to find error cause when
+	 * - findErrorCause=true
+	 * - seleniumServer is active
+	 * - result recording is inactive 
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testErrorCauseNotSearchedNoRecordResult() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.FIND_ERROR_CAUSE, "false");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "false");
+			
+			PowerMockito.whenNew(ErrorCauseFinder.class).withAnyArguments().thenReturn(errorCauseFinder);
+			configureMockedSnapshotServerConnection();
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverNativeActions"});
+			
+			// we search only once for each test result, at the end of test suite
+			verify(errorCauseFinder, never()).findErrorCause();
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.FIND_ERROR_CAUSE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+		}
+		
 	}
 }

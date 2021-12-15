@@ -1364,6 +1364,19 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	
 	@Test(groups="ut context")
+	public void testFindErrorCause(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setFindErrorCause(true);
+		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().isFindErrorCause());
+	}
+	@Test(groups="ut context")
+	public void testFindErrorCauseNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setFindErrorCause(null);
+		Assert.assertFalse(SeleniumTestsContextManager.getThreadContext().isFindErrorCause());
+	}
+	
+	@Test(groups="ut context")
 	public void testCustomTestsReports(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setCustomTestReports("PERF::xml::reporter/templates/report.test.vm,SUPERVISION::xml::reporter/templates/report.perf.vm");
