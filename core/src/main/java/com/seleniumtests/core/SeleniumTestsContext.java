@@ -126,6 +126,7 @@ public class SeleniumTestsContext {
     public static final String ADVANCED_ELEMENT_SEARCH = "advancedElementSearch";	// 'false' (default), 'full', 'dom'. if 'dom', store and possibly use found element information to adapt to changes in DOM, using only DOM information. If element is not found, it will try to use other element information to find it
     																				// if 'full', search will also be done using element picture, if available
     
+    public static final String FIND_ERROR_CAUSE = "findErrorCause";				// if 'true', try to find why the test failed
 
     public static final String IMAGE_FIELD_DETECTOR_SERVER_URL = "imageFieldDetectorServerUrl";		// URL of the server that can find fields in an image
     
@@ -261,6 +262,7 @@ public class SeleniumTestsContext {
 	public static final boolean DEFAULT_MANUAL_TEST_STEPS = false;
 	public static final boolean DEFAULT_HEADLESS_BROWSER = false;
 	public static final boolean DEFAULT_MASK_PASSWORD = true;
+	public static final boolean DEFAULT_FIND_ERROR_CAUSE = false;
 	public static final String DEFAULT_RUN_MODE = "LOCAL";
 	public static final boolean DEFAULT_OVERRIDE_SELENIUM_NATIVE_ACTION = false;
 	public static final boolean DEFAULT_SELENIUMROBOTSERVER_RECORD_RESULTS = false;
@@ -388,6 +390,8 @@ public class SeleniumTestsContext {
         setSeleniumRobotServerCompareSnapshotBehaviour(getValueForTest(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, System.getProperty(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR)));
         setSeleniumRobotServerRecordResults(getBoolValueForTest(SELENIUMROBOTSERVER_RECORD_RESULTS, System.getProperty(SELENIUMROBOTSERVER_RECORD_RESULTS)));
         setSeleniumRobotServerVariableOlderThan(getIntValueForTest(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN, System.getProperty(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN)));
+        
+        setFindErrorCause(getBoolValueForTest(FIND_ERROR_CAUSE, System.getProperty(FIND_ERROR_CAUSE)));
         
         setTmsType(getValueForTest(TMS_TYPE, System.getProperty(TMS_TYPE)));
         setTmsUrl(getValueForTest(TMS_URL, System.getProperty(TMS_URL)));
@@ -1624,6 +1628,10 @@ public class SeleniumTestsContext {
     public boolean isManualTestSteps() {
     	return (Boolean) getAttribute(MANUAL_TEST_STEPS);
     }
+
+    public boolean isFindErrorCause() {
+    	return (Boolean) getAttribute(FIND_ERROR_CAUSE);
+    }
     
 	public Map<String, String> getDeviceList() {
     	HashMap<String, String> deviceList = new HashMap<>();
@@ -1927,6 +1935,14 @@ public class SeleniumTestsContext {
     	}
     }
     
+    public void setFindErrorCause(Boolean active) {
+    	if (active != null) {
+    		setAttribute(FIND_ERROR_CAUSE, active);
+    	} else {
+    		setAttribute(FIND_ERROR_CAUSE, DEFAULT_FIND_ERROR_CAUSE);
+    	}
+    }
+    
 
     public void setReportPortalActive(Boolean active) {
     	if (active != null) {
@@ -2011,9 +2027,9 @@ public class SeleniumTestsContext {
     	}
     }
     
-    public void setSeleniumRobotServerRecordResults(Boolean record) {
-    	if (record != null) {
-    		setAttribute(SELENIUMROBOTSERVER_RECORD_RESULTS, record);
+    public void setSeleniumRobotServerRecordResults(Boolean recordResult) {
+    	if (recordResult != null) {
+    		setAttribute(SELENIUMROBOTSERVER_RECORD_RESULTS, recordResult);
     	} else {
     		setAttribute(SELENIUMROBOTSERVER_RECORD_RESULTS, DEFAULT_SELENIUMROBOTSERVER_RECORD_RESULTS);
     	}
@@ -2023,9 +2039,9 @@ public class SeleniumTestsContext {
 		this.variableAlreadyRequestedFromServer = variableAlreadyRequestedFromServer;
 	}
 
-	public void setOverrideSeleniumNativeAction(Boolean record) {
-    	if (record != null) {
-    		setAttribute(OVERRIDE_SELENIUM_NATIVE_ACTION, record);
+	public void setOverrideSeleniumNativeAction(Boolean override) {
+    	if (override != null) {
+    		setAttribute(OVERRIDE_SELENIUM_NATIVE_ACTION, override);
     	} else {
     		setAttribute(OVERRIDE_SELENIUM_NATIVE_ACTION, DEFAULT_OVERRIDE_SELENIUM_NATIVE_ACTION);
     	}

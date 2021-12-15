@@ -149,8 +149,8 @@ public class ReporterControler implements IReporter {
 				}
 			}
 			
-			
-			if (!suiteFinished) {
+			// find error causes once tests are finished
+			if (suiteFinished && SeleniumTestsContextManager.getGlobalContext().isFindErrorCause()) {
 				findErrorCauses(resultSet);
 			}
 
