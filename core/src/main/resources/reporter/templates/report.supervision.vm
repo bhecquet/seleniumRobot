@@ -31,11 +31,4 @@
         </step>
 #end
 	</steps>
-	<params>
-#foreach ($param in $parameters.entrySet())
-#if ($param.value)
-		<param name="$param.key" value="$param.value"/>
-#end
-#end
-	</params>
 </report>
