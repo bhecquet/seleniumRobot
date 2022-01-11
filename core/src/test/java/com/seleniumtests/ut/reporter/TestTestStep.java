@@ -31,6 +31,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.Step.RootCause;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
@@ -145,6 +146,36 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(),
 				"N-A_0-1_step1--" + tmpHtmlFile.getName().substring(tmpHtmlFile.getName().length() - 10));
 
+		tmpImgFile.deleteOnExit();
+		tmpHtmlFile.deleteOnExit();
+	}
+	
+	/**
+	 * Check case where random part of attachment is removed
+	 * @throws IOException
+	 */
+	@Test(groups = { "ut" })
+	public void testSnapshotRenamingNoRandom() throws IOException {
+		SeleniumTestsContextManager.getThreadContext().setRandomInAttachmentNames(false);
+		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+		ScreenShot screenshot = new ScreenShot();
+		
+		File tmpImgFile = File.createTempFile("img", ".png");
+		File tmpHtmlFile = File.createTempFile("html", ".html");
+		
+		screenshot.setOutputDirectory(tmpImgFile.getParent());
+		screenshot.setLocation("http://mysite.com");
+		screenshot.setTitle("mysite");
+		screenshot.setImagePath(tmpImgFile.getName());
+		screenshot.setHtmlSourcePath(tmpHtmlFile.getName());
+		
+		step.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.TRUE), 0, null);
+		
+		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(),
+				"N-A_0-1_step1-.png");
+		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(),
+				"N-A_0-1_step1-.html");
+		
 		tmpImgFile.deleteOnExit();
 		tmpHtmlFile.deleteOnExit();
 	}
