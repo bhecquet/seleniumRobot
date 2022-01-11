@@ -25,15 +25,16 @@ public class StepReferenceComparator {
 	
 	/**
 	 * Compare each field of stepSnapshot with each field of the referenceSnapshot and compute a ratio
+	 * A match is done on presence / position / text of fields between referenceSnapshot and stepSnapshot
 	 * @return the ratio (100 means best matching, 0 no matching)
 	 */
 	public int compare() {
 
-		ImageFieldDetector stepSnapshotImageFieldDetector = new ImageFieldDetector(stepSnapshot, 1, FieldType.ERROR_MESSAGES_AND_FIELDS);
+		ImageFieldDetector stepSnapshotImageFieldDetector = new ImageFieldDetector(stepSnapshot, 1, FieldType.ALL_FORM_FIELDS);
 		List<Field> stepSnapshotFields = stepSnapshotImageFieldDetector.detectFields();
 		List<Label> stepSnapshotLabels = stepSnapshotImageFieldDetector.detectLabels();
 		
-		ImageFieldDetector referenceSnapshotImageFieldDetector = new ImageFieldDetector(referenceSnapshot, 1, FieldType.ERROR_MESSAGES_AND_FIELDS);
+		ImageFieldDetector referenceSnapshotImageFieldDetector = new ImageFieldDetector(referenceSnapshot, 1, FieldType.ALL_FORM_FIELDS);
 		List<Field> referenceSnapshotFields = referenceSnapshotImageFieldDetector.detectFields();
 		List<Label> referenceSnapshotLabels = referenceSnapshotImageFieldDetector.detectLabels();
 		

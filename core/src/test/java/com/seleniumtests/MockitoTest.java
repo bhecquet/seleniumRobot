@@ -40,7 +40,6 @@ import org.testng.annotations.BeforeMethod;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.video.VideoCaptureMode;
-import com.seleniumtests.util.video.VideoUtils;
 
 /**
  * Redefine calls to PowerMockTestCase methods as they are not called when using TestNG groups
