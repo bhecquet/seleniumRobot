@@ -231,7 +231,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 								Path newPath = Paths.get(TestNGResultUtils.getSeleniumRobotTestContext(testResult).getScreenshotOutputDirectory(), referenceSnapshot.getName()).toAbsolutePath(); 
 								FileUtils.moveFile(referenceSnapshot, newPath.toFile());
 								testStep.addSnapshot(new Snapshot(new ScreenShot(newPath.getParent().getParent().relativize(newPath).toString()), "Valid-reference", SnapshotCheckType.FALSE), 0, null);
-								snapshot.setCheckSnapshot(SnapshotCheckType.FALSE); // change snapshot check type so that it's displayed in report
+								snapshot.setDisplayInReport(true); // change flag so that it's displayed in report (by default reference image extracted from video are not displayed)
 							}
 						} catch (SeleniumRobotServerException e) {
 							logger.error("Could not get reference snapshot from server", e);

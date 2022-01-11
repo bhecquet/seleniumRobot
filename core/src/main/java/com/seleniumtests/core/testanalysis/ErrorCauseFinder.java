@@ -45,13 +45,7 @@ public class ErrorCauseFinder {
 	public static final String CLASS_ERROR_MESSAGE = "error_message";
 
 	// TODO: link to RootCause and RootCause details from the Step annotation which can indicate what is the root cause of this error (declarative for a step)
-	
-	/*
-	 *  TESTS:
-	 *  - si le ImageFieldDetector ne s'initialise pas, il ne faut pas planter
-	 *  - on n'a pas le stepResultId => on doit renvoyer null
-	 */
-	
+
 	private static final String[] ERROR_WORDS = new String[] {"error", "erreur", "problem", "problème"};
 
 	private static final Logger logger = SeleniumRobotLogger.getLogger(ErrorCauseFinder.class);
@@ -117,6 +111,8 @@ public class ErrorCauseFinder {
 						continue;
 					}
 					
+					// perform a match between the picture of this step and the reference stored on server
+					// We look at presence, position and text of each field
 					int matching = compareReferenceToStepSnapshot(stepSnapshotFile, referenceSnapshot);
 					
 					// bad matching: the reference does not match at all the current step, we will check with other reference steps
@@ -138,19 +134,7 @@ public class ErrorCauseFinder {
 					// skip this step
 				} catch (Exception e) {
 					logger.error(e);
-				}
-				
-
-				
-				
-				// à partir de la référence de ce step, on va comparer le nombre de champs avec l'image prise au début de l'étape du test qui nous intéresse
-				// - nombre et position des champs
-				// - ressemblance et position du texte / des labels
-				// Si la correspondance n'est pas bonne (la plupart des champs de la référence ne sont pas présents), on va chercher par rapport à l'une des étapes précedente
-				// 		On va considérer qu'il y a eu une erreur dans les clics, qui font qu'on n'est pas sur la bonne page au démarrage de l'étape
-				// Si la correspondance est moyenne (X % des champs présents et texte similaire), on considère qu'il y a eu évolution de l'application
-				// Si la correspondance est bonne, il n'y a rien de plus à faire de ce côté
-				
+				}				
 			}
 		}
 		

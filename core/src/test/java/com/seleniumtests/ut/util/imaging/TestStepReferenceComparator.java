@@ -1,6 +1,10 @@
 package com.seleniumtests.ut.util.imaging;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -15,6 +19,7 @@ import org.testng.annotations.Test;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.selenium.fielddetector.Field;
 import com.seleniumtests.connectors.selenium.fielddetector.ImageFieldDetector;
+import com.seleniumtests.connectors.selenium.fielddetector.ImageFieldDetector.FieldType;
 import com.seleniumtests.connectors.selenium.fielddetector.Label;
 import com.seleniumtests.util.imaging.StepReferenceComparator;
 
@@ -48,8 +53,11 @@ public class TestStepReferenceComparator extends MockitoTest {
 		when(refImageFieldDetector.detectFields()).thenReturn(referenceFields);
 		
 		StepReferenceComparator comparator = new StepReferenceComparator(File.createTempFile("img", ".png"), File.createTempFile("img", ".png"));
+		int matching = comparator.compare();
 		
-		Assert.assertEquals(comparator.compare(), 100);
+		Assert.assertEquals(matching, 100);
+		PowerMockito.verifyNew(ImageFieldDetector.class, times(2)).withArguments(any(File.class), anyDouble(), eq(FieldType.ALL_FORM_FIELDS));
+		
 	}
 	
 	@Test(groups= {"ut"})

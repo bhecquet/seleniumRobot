@@ -269,6 +269,10 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 		}
 	}
 	
+	/**
+	 * Check reference snapshot is retrieved when step fails
+	 * @throws Exception
+	 */
 	@Test(groups={"it"})
 	public void testReportContainsStepReferenceForFailedStep() throws Exception {
 		

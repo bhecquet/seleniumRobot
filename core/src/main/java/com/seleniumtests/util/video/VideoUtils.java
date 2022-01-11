@@ -85,7 +85,9 @@ public class VideoUtils {
                 if (samples.containsKey(i)) {
 	            	Path extractedPicture = videoOutputDirectory.resolve(String.format("video-%d.jpg", j));
 	                FileUtility.writeImage(extractedPicture.toString(), img);
-	                samples.get(i).addSnapshot(new Snapshot(new ScreenShot(outputDirectory.relativize(extractedPicture).toString()), "Step beginning state", SnapshotCheckType.REFERENCE_ONLY), j, null);
+	                Snapshot snapshot = new Snapshot(new ScreenShot(outputDirectory.relativize(extractedPicture).toString()), "Step beginning state", SnapshotCheckType.REFERENCE_ONLY);
+	                snapshot.setDisplayInReport(false); // by default, reference snapshot won't be displayed in report. This flag will be set to "true" only if step fails and we have a reference picture from server
+					samples.get(i).addSnapshot(snapshot, j, null);
 	                j++;
                 }
                 i++;
