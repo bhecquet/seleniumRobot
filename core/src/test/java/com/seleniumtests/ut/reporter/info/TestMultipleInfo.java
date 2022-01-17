@@ -41,5 +41,4 @@ public class TestMultipleInfo extends GenericTest {
         String encoded = mInfo.encode(null);
         Assert.assertEquals(encoded, "");
     }
-
 }
