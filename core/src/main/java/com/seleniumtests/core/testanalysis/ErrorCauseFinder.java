@@ -122,7 +122,7 @@ public class ErrorCauseFinder {
 					// middle matching: we may be on the right web page but the page has changed (some fields appeared or disappeared)
 					// or the text changed slightly. This could mean application changed
 					} else if (matching < 90) {
-						causes.add(new ErrorCause(ErrorType.APPLICATION_CHANGED, null));
+						causes.add(new ErrorCause(ErrorType.APPLICATION_CHANGED, null, testStep));
 					}
 					
 					// else, very good matching: we are on the same web page, error does not come from there
@@ -169,7 +169,7 @@ public class ErrorCauseFinder {
 					int matching = compareReferenceToStepSnapshot(stepSnapshotFile, referenceSnapshot);
 					
 					if (matching > 80) {
-						errorCauses.add(new ErrorCause(ErrorType.SELENIUM_ERROR, String.format("Wrong page found, we are on the page of step '%s'", testStep2.getName())));
+						errorCauses.add(new ErrorCause(ErrorType.SELENIUM_ERROR, String.format("Wrong page found, we are on the page of step '%s'", testStep2.getName()), testStep));
 						return;
 					}
 				} catch (ConfigurationException | SeleniumRobotServerException e) {
@@ -178,7 +178,7 @@ public class ErrorCauseFinder {
 			}
 		}
 		
-		errorCauses.add(new ErrorCause(ErrorType.UNKNOWN_PAGE, null));
+		errorCauses.add(new ErrorCause(ErrorType.UNKNOWN_PAGE, null, testStep));
 	}
 	
 	/**
@@ -204,7 +204,14 @@ public class ErrorCauseFinder {
 			return causes; 
 		}
 		
+
 		TestStep lastTestStep = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getLastTestStep();
+		TestStep lastFailedStep = lastTestStep;
+		for (TestStep testStep: TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps()) {
+			if (Boolean.TRUE.equals(testStep.getFailed()) && testStep != lastTestStep) {
+				lastFailedStep = testStep;
+			}
+		}
 		
 		if (lastTestStep != null) {
 			for (Snapshot snapshot: lastTestStep.getSnapshots()) {
@@ -214,10 +221,10 @@ public class ErrorCauseFinder {
 					List<Label> labels = imageFieldDetector.detectLabels();
 					
 					// are some text considered as error messages (mainly in red on page)
-					parseFields(causes, fields, labels);
+					parseFields(causes, fields, labels, lastFailedStep);
 
 					// do some label contain "error" or "problem"
-					parseLabels(causes, labels);
+					parseLabels(causes, labels, lastFailedStep);
 					
 				} catch (Exception e) {
 					logger.error("Error searching for errors in last snapshots: " + e.getMessage());
@@ -235,10 +242,10 @@ public class ErrorCauseFinder {
 	 * @param causes
 	 * @param labels
 	 */
-	private void parseLabels(List<ErrorCause> causes, List<Label> labels) {
+	private void parseLabels(List<ErrorCause> causes, List<Label> labels, TestStep testStep) {
 		for (Label label: labels) {
 			for (String errorWord: ERROR_WORDS) {
-				ErrorCause possibleErrorCause = new ErrorCause(ErrorType.ERROR_MESSAGE, label.getText());
+				ErrorCause possibleErrorCause = new ErrorCause(ErrorType.ERROR_MESSAGE, label.getText(), testStep);
 				if (label.getText().contains(errorWord) && !causes.contains(possibleErrorCause)) {
 					causes.add(possibleErrorCause);
 				}
@@ -251,18 +258,18 @@ public class ErrorCauseFinder {
 	 * @param fields
 	 * @param labels
 	 */
-	private void parseFields(List<ErrorCause> causes, List<Field> fields, List<Label> labels) {
+	private void parseFields(List<ErrorCause> causes, List<Field> fields, List<Label> labels, TestStep testStep) {
 		for (Field field: fields) {
 			if (CLASS_ERROR_MESSAGE.equals(field.getClassName())) {
 				// find the related label
 				for (Label label: labels) {
 					if (label.isInside(field)) {
-						causes.add(new ErrorCause(ErrorType.ERROR_MESSAGE, label.getText()));
+						causes.add(new ErrorCause(ErrorType.ERROR_MESSAGE, label.getText(), testStep));
 						break;
 					}
 				}
 			} else if (CLASS_ERROR_FIELD.equals(field.getClassName())) {
-				causes.add(new ErrorCause(ErrorType.ERROR_IN_FIELD, "At least one field in error"));
+				causes.add(new ErrorCause(ErrorType.ERROR_IN_FIELD, "At least one field in error", testStep));
 			}
 		}
 	}
