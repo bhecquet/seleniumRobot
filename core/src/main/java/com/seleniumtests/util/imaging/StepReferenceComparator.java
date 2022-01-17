@@ -47,6 +47,7 @@ public class StepReferenceComparator {
 			for (Label stepSnapshotLabel: stepSnapshotLabels) {
 				if (stepSnapshotLabel.match(referenceSnapshotLabel)) {
 					matchedLabels++;
+					break;
 				}
 			}
 		}
@@ -60,6 +61,7 @@ public class StepReferenceComparator {
 			for (Field stepSnapshotField: stepSnapshotFields) {
 				if (stepSnapshotField.match(referenceSnapshotField)) {
 					matchedFields++;
+					break;
 				}
 			}
 		}

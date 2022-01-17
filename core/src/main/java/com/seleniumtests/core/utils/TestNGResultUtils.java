@@ -501,8 +501,13 @@ public class TestNGResultUtils {
 	}	
 	
 
-    public static List<ErrorCause> getErrorCauses(ITestResult testNGResult) {
-    	return (List<ErrorCause>) testNGResult.getAttribute(ERROR_CAUSES);
+    @SuppressWarnings("unchecked")
+	public static List<ErrorCause> getErrorCauses(ITestResult testNGResult) {
+    	if (testNGResult.getAttribute(ERROR_CAUSES) == null) {
+    		return new ArrayList<>();
+    	} else {
+    		return (List<ErrorCause>) testNGResult.getAttribute(ERROR_CAUSES);
+    	}
     }
     
     /**
