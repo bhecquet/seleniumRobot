@@ -42,8 +42,8 @@
 	<div class="row">
 	#foreach( $snapshot in $localStep.getSnapshots() )
 		#set($snapshotLog = $snapshot.buildScreenshotLog())
-		#set($snapshotCheckTypeName = $snapshot.getCheckSnapshot().getName())
-		#if ($snapshotCheckTypeName != "NONE_REFERENCE")
+		#set($displaySnapshot = $snapshot.isDisplayInReport())
+		#if ($displaySnapshot)
 		  <div class="message-snapshot col">$snapshotLog</div>
 		 #end
 	#end

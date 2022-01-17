@@ -20,9 +20,9 @@ import kong.unirest.json.JSONObject;
 public class FieldDetectorConnector {
 
 	private String url;
-	private static final String STATUS_URL = "/status";
-	private static final String DETECT_URL = "/detect";
-	private static final String DETECT_ERROR_URL = "/detectError";
+	public static final String STATUS_URL = "/status";
+	public static final String DETECT_URL = "/detect";
+	public static final String DETECT_ERROR_URL = "/detectError";
 	private static FieldDetectorConnector fieldDetectorConnector;
 	
 	

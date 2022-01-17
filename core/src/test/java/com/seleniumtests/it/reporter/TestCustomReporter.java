@@ -94,8 +94,8 @@ public class TestCustomReporter extends ReporterTest {
 			detailedReportContent2 = detailedReportContent2.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 			Assert.assertTrue(detailedReportContent2.contains("<errors></errors>"));
 			
-			// check parameters are there
-			Assert.assertTrue(detailedReportContent2.contains("<param name=\"runMode\" value=\"LOCAL\"/>"));
+			// check parameters are not there
+			Assert.assertFalse(detailedReportContent2.contains("<param name=\"runMode\" value=\"LOCAL\"/>"));
 		} finally {
 			System.clearProperty("customTestReports");
 		}
