@@ -225,17 +225,18 @@ public class SeleniumTestsContext {
     public static final String PLATFORM = "platform";							// platform on which test should execute. Ex: Windows 7, Android, iOS, Linux, OS X 10.10. 	
     public static final String CLOUD_API_KEY = "cloudApiKey";					// clé d'accès (dépend des services)
 
-    public static final String TEST_NAME = "testName";
-    public static final String RELATIVE_OUTPUT_DIR = "relativeOutputDir";
-    
     // Neoload specific properties
     public static final String NEOLOAD_USER_PATH = "neoloadUserPath";			// name of the neoload "user path" that will be created in Design mode
     
     public static final String REPORTPORTAL_ACTIVE = "reportPortalActive";		// whether report portal is activated
     
-    // internal storage
+    // internal use
     public static final String TEST_VARIABLES = "testVariables"; 				// configuration (aka variables, get via 'param()' method) used for the current test. It is not updated via XML file
-    																		
+    public static final String TEST_NAME = "testName";
+    public static final String RELATIVE_OUTPUT_DIR = "relativeOutputDir";
+    public static final String RANDOM_IN_ATTACHMENT_NAME = "randomInAttachmentName"; // by default, snapshots are renamed with a random part so that if several steps have the same name, their snapshot do not overwrite.
+    																				// this option disables the behaviour FOR TEST PURPOSE
+    
     // default values
     protected static final List<ReportInfo> DEFAULT_CUSTOM_TEST_REPORTS = Arrays.asList(new ReportInfo("PERF::xml::reporter/templates/report.perf.vm"));
     protected static final List<ReportInfo> DEFAULT_CUSTOM_SUMMARY_REPORTS = Arrays.asList(new ReportInfo("results::json::reporter/templates/report.summary.json.vm"));
@@ -292,6 +293,7 @@ public class SeleniumTestsContext {
 	public static final String DEFAULT_BUGTRACKER_TYPE = null;
 	public static final String DEFAULT_STARTED_BY = null;
 	public static final boolean DEFAULT_REPORTPORTAL_ACTIVE = false;
+	public static final boolean DEFAULT_RANDOM_IN_ATTACHMENT_NAME = true;
 	public static final ElementInfo.Mode DEFAULT_ADVANCED_ELEMENT_SEARCH = ElementInfo.Mode.FALSE;
 	public static final String DEFAULT_IMAGE_FIELD_DETECTOR_SERVER_URL = null;
 	public static final boolean DEFAULT_EDGE_IE_MODE = false;
@@ -505,6 +507,8 @@ public class SeleniumTestsContext {
         setViewPortHeight(getIntValueForTest(VIEWPORT_HEIGHT, System.getProperty(VIEWPORT_HEIGHT)));
         
         setNeoloadUserPath(getValueForTest(NEOLOAD_USER_PATH, System.getProperty(NEOLOAD_USER_PATH)));
+        
+        setRandomInAttachmentNames(getBoolValueForTest(RANDOM_IN_ATTACHMENT_NAME, System.getProperty(RANDOM_IN_ATTACHMENT_NAME)));
         
         //setReportPortalActive(getBoolValueForTest(REPORTPORTAL_ACTIVE, System.getProperty(REPORTPORTAL_ACTIVE)));
         
@@ -1446,6 +1450,10 @@ public class SeleniumTestsContext {
 		return (Boolean) getAttribute(MASK_PASSWORD);
 	}
 	
+	public Boolean getRandomInAttachments() {
+		return (Boolean) getAttribute(RANDOM_IN_ATTACHMENT_NAME);
+	}
+	
 	public ITestResult getTestNGResult() {
 		return testNGResult;
 	}
@@ -2167,6 +2175,14 @@ public class SeleniumTestsContext {
     		setAttribute(MASK_PASSWORD, maskPassword);
     	} else {
     		setAttribute(MASK_PASSWORD, DEFAULT_MASK_PASSWORD);
+    	}
+    }
+    
+    public void setRandomInAttachmentNames(Boolean random) {
+    	if (random != null) {
+    		setAttribute(RANDOM_IN_ATTACHMENT_NAME, random);
+    	} else {
+    		setAttribute(RANDOM_IN_ATTACHMENT_NAME, DEFAULT_RANDOM_IN_ATTACHMENT_NAME);
     	}
     }
     

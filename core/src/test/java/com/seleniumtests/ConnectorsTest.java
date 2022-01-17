@@ -31,6 +31,7 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.function.Function;
 
@@ -183,7 +184,7 @@ public class ConnectorsTest extends MockitoTest {
 		HttpResponse<String> response = mock(HttpResponse.class);
 		HttpResponse<JsonNode> jsonResponse = mock(HttpResponse.class);
 		HttpResponse<File> streamResponse = mock(HttpResponse.class);
-		HttpResponse<byte[]> bytestremResponse = mock(HttpResponse.class);
+		HttpResponse<byte[]> bytestreamResponse = mock(HttpResponse.class);
 		HttpRequest request = mock(HttpRequest.class);
 		JsonNode json = mock(JsonNode.class);
 		HttpRequestWithBody postRequest = spy(HttpRequestWithBody.class);
@@ -216,9 +217,9 @@ public class ConnectorsTest extends MockitoTest {
 			when(streamResponse.getBody()).thenReturn((File)replyData);
 			
 			try {
-				when(bytestremResponse.getBody()).thenReturn(FileUtils.readFileToByteArray((File)replyData));
-				when(bytestremResponse.getStatus()).thenReturn(statusCode);
-				when(bytestremResponse.getStatusText()).thenReturn("BYTES");
+				when(bytestreamResponse.getBody()).thenReturn(FileUtils.readFileToByteArray((File)replyData));
+				when(bytestreamResponse.getStatus()).thenReturn(statusCode);
+				when(bytestreamResponse.getStatusText()).thenReturn("BYTES");
 			} catch (IOException e) {
 				logger.error("Cannot read file to bytes, this may be a problem for test");
 			}
@@ -238,7 +239,7 @@ public class ConnectorsTest extends MockitoTest {
 				when(getRequest.asString()).thenReturn(response);
 				when(getRequest.asJson()).thenReturn(jsonResponse);
 				when(getRequest.asFile(anyString())).thenReturn(streamResponse);
-				when(getRequest.asBytes()).thenReturn(bytestremResponse);
+				when(getRequest.asBytes()).thenReturn(bytestreamResponse);
 				when(getRequest.queryString(anyString(), anyString())).thenReturn(getRequest);
 				when(getRequest.queryString(anyString(), anyInt())).thenReturn(getRequest);
 				when(getRequest.queryString(anyString(), anyBoolean())).thenReturn(getRequest);
@@ -471,6 +472,7 @@ public class ConnectorsTest extends MockitoTest {
 		createServerMock("GET", SeleniumRobotServerConnector.NAMED_VERSION_API_URL, 200, "{'id': 11}");	
 		
 		createServerMock("POST", SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL, 200, "{'result': 'OK'}"); // upload reference image for step
+		createServerMock("GET", SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL + "17/", 200, Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "images", "googleSearch.png").toFile()); // get reference image
 		
 		SeleniumRobotSnapshotServerConnector connector = new SeleniumRobotSnapshotServerConnector(true, SERVER_URL);
 		
@@ -478,6 +480,7 @@ public class ConnectorsTest extends MockitoTest {
 		connector.setVersionId(null);
 		return connector;
 	}
+	
 	
 	/**
 	 * simulate an alive variable sever responding to all requests
