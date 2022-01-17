@@ -23,7 +23,7 @@ public class TestMultipleInfo extends GenericTest {
         MultipleInfo mInfo = new MultipleInfo("medusa.sea");
         mInfo.addInfo(null);
         String encoded = mInfo.encode("html");
-        Assert.assertEquals(encoded, "format cannot be null");
+        Assert.assertEquals(encoded, "");
     }
 
     @Test(groups = {"ut"})
@@ -36,10 +36,10 @@ public class TestMultipleInfo extends GenericTest {
 
     @Test(groups = {"ut"})
     public void testEncodeNull() {
-        MultipleInfo mInfo = new MultipleInfo("medusa.sea");
-        mInfo.addInfo(new StringInfo("wandering in the waves"));
+        MultipleInfo mInfo = new MultipleInfo(null);
+        mInfo.addInfo(null);
         String encoded = mInfo.encode(null);
-        Assert.assertEquals(encoded, "format cannot be null");
+        Assert.assertEquals(encoded, "");
     }
 
 }
