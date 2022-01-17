@@ -35,7 +35,7 @@ public class MultipleInfo extends Info {
 				out.append(info.encode(format));
 			} catch (NullPointerException message) {
 				logger.error("format cannot be null");
-				return "format cannot be null";
+				return "";
 			}
 		}
 		return out.toString();
