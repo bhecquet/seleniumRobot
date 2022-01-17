@@ -17,6 +17,8 @@
  */
 package com.seleniumtests.ut.util;
 
+import com.seleniumtests.customexception.CustomSeleniumTestsException;
+import com.seleniumtests.customexception.DatasetException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -104,7 +106,12 @@ public class TestStringUtility extends GenericTest {
 	public void testKeepNewLineInHtmlWithNullMessage() {
 		Assert.assertNull(StringUtility.encodeString(null, "html"));
 	}
-	
+
+	@Test(groups={"ut"}, expectedExceptions = CustomSeleniumTestsException.class)
+	public void testKeepNewLineInHtmlWithNullFormat() {
+		Assert.assertNull(StringUtility.encodeString("foo\nbar", null));
+	}
+
 	@Test(groups={"ut"})
 	public void testInterpolateString() {
 		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("url", new TestVariable("url", "http://mysite"));
