@@ -32,6 +32,8 @@ import org.ini4j.Profile.Section;
 
 import com.seleniumtests.customexception.ConfigurationException;
 
+import javax.print.attribute.standard.NumberUp;
+
 public class IniHelper {
 
 	private IniHelper() {
@@ -44,8 +46,7 @@ public class IniHelper {
 	 *            hashMap we want to fill
 	 * @return the HashMap completed with data from the file
 	 */
-	public static Map<String, HashMap<String, String>> readIniFile(File fileToRead,
-			Map<String, HashMap<String, String>> hashMapToComplete) {
+	public static Map<String, Map<String, String>> readIniFile(File fileToRead, Map<String, Map<String, String>> hashMapToComplete) {
 
 		try {
 			Ini ini = new Ini();
@@ -57,7 +58,7 @@ public class IniHelper {
 			Set<Entry<String, Section>> sections = ini.entrySet();
 
 			for (Entry<String, Section> section : sections) {
-				HashMap<String, String> inter = new HashMap<>(); 
+				Map<String, String> inter = new HashMap<>();
 				String actualSection = section.getKey();
 				if (hashMapToComplete.containsKey(actualSection)) {
 					inter.putAll(hashMapToComplete.get(actualSection)); // recup datas already read
@@ -67,7 +68,7 @@ public class IniHelper {
 				}
 				hashMapToComplete.put(actualSection, inter);
 			}
-		} catch (InvalidFileFormatException e) {
+		} catch (InvalidFileFormatException | NullPointerException e) {
 			throw new ConfigurationException("Invalid file: " + fileToRead);
 		} catch (IOException e) {
 			throw new ConfigurationException(String.format("File does not exist %s: %s", fileToRead, e.getMessage()));
