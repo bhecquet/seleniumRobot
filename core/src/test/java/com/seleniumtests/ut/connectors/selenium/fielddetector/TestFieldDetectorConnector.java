@@ -188,6 +188,19 @@ public class TestFieldDetectorConnector extends ConnectorsTest {
 		
 	}
 	
+	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class, expectedExceptionsMessageRegExp = "Field detector did not return any information: some error occured")
+	public void testDetectKoWithMessage2() throws IOException  {
+		File image = createImageFromResource("ti/form_picture.png");
+		
+		String detectionReply = "{\"error\": \"some error occured\"}";
+		
+		createServerMock("GET", "/status", 200, "OK");	
+		createServerMock("POST", "/detect", 200, detectionReply);	
+		FieldDetectorConnector fieldDetectorConnector = FieldDetectorConnector.getInstance("http://localhost:4321");
+		fieldDetectorConnector.detect(image);
+		
+	}
+	
 	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class, expectedExceptionsMessageRegExp = "Field detector returned error")
 	public void testDetectKoWithoutMessage() throws IOException  {
 		File image = createImageFromResource("ti/form_picture.png");
