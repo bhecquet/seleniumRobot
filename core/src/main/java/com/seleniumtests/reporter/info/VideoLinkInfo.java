@@ -16,7 +16,7 @@ public class VideoLinkInfo extends HyperlinkInfo {
 
 		if (format == null) {
 			logger.error("format cannot be null");
-			return "WRONG_FORMAT";
+			return description;
 		} else if ("html".equals(format)) {
 			return String.format("<a href=\"%s\"><i class=\"fas fa-video\" aria-hidden=\"true\"></i></a>", link);
 		} else {
