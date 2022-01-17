@@ -14,7 +14,6 @@ public class TestVideoLinkInfo extends GenericTest {
         Assert.assertEquals(formatHtml, "<a href=\"/videoCapture.html\"><i class=\"fas fa-video\" aria-hidden=\"true\"></i></a>");
     }
 
-
     @Test(groups = {"ut"})
     public void testOtherFormatLink() {
         String formatOther = new VideoLinkInfo("/videoCapture.avi")
@@ -27,8 +26,7 @@ public class TestVideoLinkInfo extends GenericTest {
     public void testNullFormatLink() {
         String formatNull = new VideoLinkInfo("/videoCapture.avi")
                 .encode(null);
-        Assert.assertEquals(formatNull, null);
+        Assert.assertEquals(formatNull, "Video");
     }
-
 }
 

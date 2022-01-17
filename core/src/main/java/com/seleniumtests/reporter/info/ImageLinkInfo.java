@@ -24,7 +24,7 @@ public class ImageLinkInfo extends HyperlinkInfo {
 			}
 		}
 
-		return format;
+		return description;
 	}
 
 }
