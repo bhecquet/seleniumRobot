@@ -17,52 +17,17 @@
  */
 package com.seleniumtests.core.runner;
 
-import java.io.File;
-import java.lang.reflect.Method;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
-
-import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.apache.log4j.Logger;
-import org.openqa.selenium.WebDriverException;
-import org.testng.IConfigurationListener;
-import org.testng.IExecutionListener;
-import org.testng.IInvokedMethod;
-import org.testng.IInvokedMethodListener;
-import org.testng.ISuite;
-import org.testng.ISuiteListener;
-import org.testng.ISuiteResult;
-import org.testng.ITestContext;
-import org.testng.ITestListener;
-import org.testng.ITestNGMethod;
-import org.testng.ITestResult;
-import org.testng.Reporter;
-import org.testng.internal.ConfigurationMethod;
-import org.testng.internal.annotations.DisabledRetryAnalyzer;
-
 import com.epam.reportportal.testng.BaseTestNGListener;
 import com.google.common.collect.Iterables;
-import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
-import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector.SnapshotComparisonResult;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import com.seleniumtests.connectors.tms.reportportal.ReportPortalService;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.core.TestTasks;
-import com.seleniumtests.core.testanalysis.ErrorCauseFinder;
 import com.seleniumtests.core.testretry.TestRetryAnalyzer;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
-import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.WebUIDriver;
@@ -70,7 +35,6 @@ import com.seleniumtests.reporter.info.Info;
 import com.seleniumtests.reporter.info.LogInfo;
 import com.seleniumtests.reporter.info.MultipleInfo;
 import com.seleniumtests.reporter.logger.ArchiveMode;
-import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.reporters.CommonReporter;
 import com.seleniumtests.reporter.reporters.ReporterControler;
@@ -79,8 +43,19 @@ import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.video.VideoRecorder;
-
 import kong.unirest.Unirest;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.log4j.Logger;
+import org.openqa.selenium.WebDriverException;
+import org.testng.*;
+import org.testng.internal.ConfigurationMethod;
+import org.testng.internal.annotations.DisabledRetryAnalyzer;
+
+import java.io.File;
+import java.lang.reflect.Method;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class SeleniumRobotTestListener extends BaseTestNGListener implements ITestListener, IInvokedMethodListener, ISuiteListener, IExecutionListener, IConfigurationListener {
 	
