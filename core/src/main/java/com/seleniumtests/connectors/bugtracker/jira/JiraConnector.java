@@ -21,6 +21,7 @@ import com.atlassian.jira.rest.client.api.SearchRestClient;
 import com.atlassian.jira.rest.client.api.domain.BasicComponent;
 import com.atlassian.jira.rest.client.api.domain.BasicIssue;
 import com.atlassian.jira.rest.client.api.domain.BasicPriority;
+import com.atlassian.jira.rest.client.api.domain.BasicProject;
 import com.atlassian.jira.rest.client.api.domain.CimFieldInfo;
 import com.atlassian.jira.rest.client.api.domain.Comment;
 import com.atlassian.jira.rest.client.api.domain.CustomFieldOption;
@@ -45,6 +46,7 @@ import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.util.helper.WaitHelper;
 
 public class JiraConnector extends BugTracker {
 
@@ -88,8 +90,12 @@ public class JiraConnector extends BugTracker {
         }
         
         try {
+        	
         	project = restClient.getProjectClient().getProject(projectKey).claim();
         } catch (RestClientException e) {
+        	for (BasicProject project: restClient.getProjectClient().getAllProjects().claim()) {
+        		logger.info(project.getKey());
+        	}
         	throw new ConfigurationException(String.format("Project with key '%s' cannot be found on jira server %s", projectKey, server));
         }
         
@@ -521,6 +527,7 @@ public class JiraConnector extends BugTracker {
      */
     public void closeIssue(String issueId, String closingMessage){
 
+    	logger.info(String.format("closing issue %s", issueId));
         IssueRestClient issueClient = restClient.getIssueClient();
         Issue issue;
         try {
@@ -544,19 +551,41 @@ public class JiraConnector extends BugTracker {
         	throw new ConfigurationException(String.format("'bugtracker.jira.closeTransition' values [%s] are unknown for this issue, allowed transitions are %s", closeTransition, transitions.keySet()));
         } else {
         	for (String transitionName: closeWorkflow.subList(workflowPosition, closeWorkflow.size())) {
-        		
-        		if (transitions.get(transitionName) == null) {
-        			throw new ConfigurationException(String.format("'bugtracker.jira.closeTransition': value [%s] is invalid for this issue in its current state, allowed transitions are %s", transitionName, transitions.keySet()));
-        		}
-        		
-        		issueClient.transition(issue, new TransitionInput(transitions.get(transitionName).getId(), new ArrayList<>()));
-        		
-        		// update available transitions
-        		transitions.clear();
-        		issueClient.getTransitions(issue).claim().forEach(transition -> transitions.put(transition.getName(), transition));
+        		transitionIssue(issueClient, issue, transitions, transitionName);
         	}
         }
     }
+
+
+	/**
+	 * Transition issue
+	 * @param issueClient
+	 * @param issue
+	 * @param transitions
+	 * @param transitionName
+	 */
+	private void transitionIssue(IssueRestClient issueClient, Issue issue, Map<String, Transition> transitions,
+			String transitionName) {
+		
+		for (int i = 0; i < 5; i++) {
+			
+			if (transitions.get(transitionName) == null) {
+				
+				// update available transitions
+				WaitHelper.waitForMilliSeconds(500);
+				transitions.clear();
+				issueClient.getTransitions(issue).claim().forEach(transition -> transitions.put(transition.getName(), transition));
+				continue;
+			}
+			
+			issueClient.transition(issue, new TransitionInput(transitions.get(transitionName).getId(), new ArrayList<>()));
+			return;
+			
+		}
+		throw new ConfigurationException(String.format("'bugtracker.jira.closeTransition': value [%s] is invalid for this issue in its current state, allowed transitions are %s", transitionName, transitions.keySet()));
+	}
+    
+
 
     /**
      * Create description for issue update
