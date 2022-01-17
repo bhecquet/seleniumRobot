@@ -1,5 +1,6 @@
 package com.seleniumtests.it.core.testanalysis;
 
+import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
@@ -10,7 +11,7 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.it.reporter.ReporterTest;
 import com.seleniumtests.util.video.VideoCaptureMode;
 
-public class TestErrorCauseFInder extends ConnectorsTest {
+public class TestErrorCauseFInder extends ReporterTest {
 	
 	private static final String DETECT_FIELD_REPLY = "{" // add it to a formatting with picture name
 			+ "	\"error\": null,"
@@ -138,6 +139,11 @@ public class TestErrorCauseFInder extends ConnectorsTest {
 			+ "}";
 	
 	
+	/**
+	 * Test  when there is an error in last step, check we display the analysis in report
+	 * @param testContext
+	 * @throws Exception
+	 */
 	@Test(groups={"it"}, enabled=true)
 	public void testErrorInLastStep(ITestContext testContext) throws Exception {
 		
@@ -157,6 +163,9 @@ public class TestErrorCauseFInder extends ConnectorsTest {
 			
 			ReporterTest.executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.NONE,  new String[] {"testImageDetection"});
 			
+			// check the error cause is displayed at the top of the report
+			String output = readTestMethodResultFile("testImageDetection");
+			Assert.assertTrue(output.contains("<th>Possible error causes</th><td><ul><li>Field in error: At least one field in error on step '_clickErrorButton '</li></ul></td>"));
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL);
@@ -171,6 +180,10 @@ public class TestErrorCauseFInder extends ConnectorsTest {
 	}
 	
 	// test quand on ne demande pas à trouver les causes d'erreurs
-
+	// teste quand il n'y a pas de cause
+	// teste avec une erreur dans une des étapes (reference)
+	// Si le test est KO à cause d'une assertion, on ne fait pas la recherche des causes, car a priori, on suppose que c'est juste un problème de valeur.
+	// Prendre en compte RootCause et RootCauseDetails du testStep: on l'ajoute à la description de "ErrorCause"
+	// Quand il y a plusieurs erreurs, quel est le type de l'erreur remontée ?
 
 }

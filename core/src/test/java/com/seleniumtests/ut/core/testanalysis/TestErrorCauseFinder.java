@@ -155,9 +155,46 @@ public class TestErrorCauseFinder extends MockitoTest {
 		
 		Assert.assertEquals(causes.size(), 2);
 		Assert.assertEquals(causes.get(0).getType(), ErrorType.ERROR_MESSAGE);
+		Assert.assertEquals(causes.get(0).getTestStep(), lastStep); // no failed step except "last step", keep association
 		Assert.assertEquals(causes.get(0).getDescription(), "il y a eu un gros problème");
 		Assert.assertEquals(causes.get(1).getType(), ErrorType.ERROR_MESSAGE);
 		Assert.assertEquals(causes.get(1).getDescription(), "some error");
+		Assert.assertEquals(causes.get(1).getTestStep(), lastStep);
+		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInLastStep(testResult));
+	}
+	
+	/**
+	 * When a failed step is present, attach ErrorCause to this one instead of "Last Step"
+	 * @throws Exception
+	 */
+	@Test(groups= {"ut"})
+	public void testSearchInLastStepErrorMessageWithFailedStep() throws Exception {
+		
+		ITestResult testResult = Reporter.getCurrentTestResult();
+		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
+		
+		PowerMockito.whenNew(ImageFieldDetector.class).withArguments(new File(lastStep.getSnapshots().get(0).getScreenshot().getFullImagePath()), (double)1, FieldType.ERROR_MESSAGES_AND_FIELDS).thenReturn(imageFieldDetector);
+		
+		List<Label> labels = new ArrayList<>();
+		labels.add(new Label(0, 100, 20, 50, "il y a eu un gros problème"));
+		labels.add(new Label(0, 100, 100, 120, "some error"));
+		List<Field> fields = new ArrayList<>();
+		fields.add(new Field(0, 100, 0, 20, "", "field"));
+		fields.add(new Field(0, 100, 200, 220, "", "field"));
+		
+		when(imageFieldDetector.detectFields()).thenReturn(fields);
+		when(imageFieldDetector.detectLabels()).thenReturn(labels);
+		
+		List<ErrorCause> causes = new ErrorCauseFinder(testResult).findErrorInLastStepSnapshots();
+		
+		Assert.assertEquals(causes.size(), 2);
+		Assert.assertEquals(causes.get(0).getType(), ErrorType.ERROR_MESSAGE);
+		Assert.assertEquals(causes.get(0).getDescription(), "il y a eu un gros problème");
+		Assert.assertEquals(causes.get(0).getTestStep(), stepFailed); // error cause is associated to the last failed step
+		Assert.assertEquals(causes.get(1).getType(), ErrorType.ERROR_MESSAGE);
+		Assert.assertEquals(causes.get(1).getDescription(), "some error");
+		Assert.assertEquals(causes.get(1).getTestStep(), stepFailed); // error cause is associated to the last failed step
 		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInLastStep(testResult));
 	}
 	
