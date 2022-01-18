@@ -421,7 +421,7 @@ public class TestTestStep extends GenericTest {
 		step.setFailed(true); // mandatory so that errorCauseDetails is not null
 		TestStep encodedTestStep = step.encode("html");
 		Assert.assertEquals(encodedTestStep.toString(), "Step step1 &quot;'&lt;&gt;&amp;&fnof;");
-		Assert.assertEquals(encodedTestStep.getErrorCauseDetails(), "&quot;'&lt;&gt;&amp;&fnof;");
+		Assert.assertEquals(encodedTestStep.getRootCauseDetails(), "&quot;'&lt;&gt;&amp;&fnof;");
 	}
 
 	@Test(groups = { "ut" })
@@ -431,7 +431,7 @@ public class TestTestStep extends GenericTest {
 		step.setFailed(true); // mandatory so that errorCauseDetails is not null
 		TestStep encodedTestStep = step.encode("json");
 		Assert.assertEquals(encodedTestStep.toString(), "Step step1 \\\"\\/\\\\");
-		Assert.assertEquals(encodedTestStep.getErrorCauseDetails(), "\\\"\\/\\\\");
+		Assert.assertEquals(encodedTestStep.getRootCauseDetails(), "\\\"\\/\\\\");
 	}
 
 	@Test(groups = { "ut" })
@@ -440,7 +440,7 @@ public class TestTestStep extends GenericTest {
 		step.setFailed(true); // mandatory so that errorCauseDetails is not null
 		TestStep encodedTestStep = step.encode("xml");
 		Assert.assertEquals(encodedTestStep.toString(), "Step step1 &quot;&apos;&lt;&gt;&amp;");
-		Assert.assertEquals(encodedTestStep.getErrorCauseDetails(), "&quot;&apos;&lt;&gt;&amp;");
+		Assert.assertEquals(encodedTestStep.getRootCauseDetails(), "&quot;&apos;&lt;&gt;&amp;");
 	}
 	
 	@Test(groups = { "ut" })
@@ -456,8 +456,8 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(step.getStartDate(), encodedTestStep.getStartDate());
 		Assert.assertEquals(step.getHarCaptures(), encodedTestStep.getHarCaptures());
 		Assert.assertEquals(step.getActionException(), encodedTestStep.getActionException());
-		Assert.assertEquals(step.getErrorCause(), encodedTestStep.getErrorCause());
-		Assert.assertEquals(step.getErrorCauseDetails(), encodedTestStep.getErrorCauseDetails());
+		Assert.assertEquals(step.getRootCause(), encodedTestStep.getRootCause());
+		Assert.assertEquals(step.getRootCauseDetails(), encodedTestStep.getRootCauseDetails());
 		Assert.assertEquals(step.isDisableBugtracker(), encodedTestStep.isDisableBugtracker());
 		Assert.assertNull(step.getActionExceptionMessage());
 	}
@@ -1024,8 +1024,19 @@ public class TestTestStep extends GenericTest {
 		TestStep step = new TestStep("step1", null, new ArrayList<>(), true, RootCause.REGRESSION, "details", false);
 
 		step.setFailed(true); // mandatory so that errorCauseDetails is not null
-		Assert.assertEquals(step.getErrorCause(), RootCause.REGRESSION);
-		Assert.assertEquals(step.getErrorCauseDetails(), "details");
+		Assert.assertEquals(step.getRootCause(), RootCause.REGRESSION);
+		Assert.assertEquals(step.getRootCauseDetails(), "details");
+	}
+	
+	/**
+	 * When step is successful, root cause is null
+	 */
+	@Test(groups = { "ut" })
+	public void testTestStepSuccessWithrootCause() {
+		TestStep step = new TestStep("step1", null, new ArrayList<>(), true, RootCause.REGRESSION, "details", false);
+		
+		Assert.assertNull(step.getRootCause());
+		Assert.assertNull(step.getRootCauseDetails());
 	}
 	
 	/**
@@ -1038,14 +1049,14 @@ public class TestTestStep extends GenericTest {
 
 		subStep.setFailed(true); // mandatory so that errorCauseDetails is not null
 		step.addStep(subStep);
-		Assert.assertEquals(step.getErrorCause(), RootCause.REGRESSION);
-		Assert.assertEquals(step.getErrorCauseDetails(), "details");
+		Assert.assertEquals(step.getRootCause(), RootCause.REGRESSION);
+		Assert.assertEquals(step.getRootCauseDetails(), "details");
 	}
 	
 	@Test(groups = { "ut" })
 	public void testTestStepWithRootCauseNone() {
 		TestStep step = new TestStep("step1", null, new ArrayList<>(), true, RootCause.NONE, "details", false);
-		Assert.assertNull(step.getErrorCause());
-		Assert.assertNull(step.getErrorCauseDetails());
+		Assert.assertNull(step.getRootCause());
+		Assert.assertNull(step.getRootCauseDetails());
 	}
 }
