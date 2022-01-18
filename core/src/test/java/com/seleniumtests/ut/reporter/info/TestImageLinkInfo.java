@@ -21,7 +21,7 @@ public class TestImageLinkInfo extends GenericTest {
     public void testOtherFormatLink() {
         String formatOther = new ImageLinkInfo("/imageCapture.png")
                 .encode("avi");
-        Assert.assertEquals(formatOther, "Video");
+        Assert.assertEquals(formatOther, "Image");
     }
 
 
@@ -29,7 +29,7 @@ public class TestImageLinkInfo extends GenericTest {
     public void testNullFormatLink() {
         String formatNull = new ImageLinkInfo("/imageCapture.png")
                 .encode(null);
-        Assert.assertEquals(formatNull, null);
+        Assert.assertEquals(formatNull, "Image");
     }
 
 }
