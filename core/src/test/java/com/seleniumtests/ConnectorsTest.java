@@ -227,9 +227,18 @@ public class ConnectorsTest extends MockitoTest {
 			when(jsonResponse.getBody()).thenReturn(json);
 			when(jsonResponse.getStatusText()).thenReturn("TEXT");
 			try {
+				// check data is compatible with JSON
+				for (Object d: replyData) {
+					if (((String)d).isEmpty()) {
+						d = "{}";
+					}
+					new JSONObject((String)d);
+				}
+				
 				
 //				JSONObject jsonReply = new JSONObject((String)replyData);
 //				when(json.getObject()).thenReturn(jsonReply);
+				
 				when(json.getObject()).then(new Answer<JSONObject>() {
 				    private int count = -1;
 
@@ -253,6 +262,8 @@ public class ConnectorsTest extends MockitoTest {
 				pageList.add(jsonResponse);
 				
 			} catch (JSONException e) {}
+
+			
 		} else if (replyData.get(0) instanceof File) {
 			when(streamResponse.getStatus()).thenReturn(statusCode);
 			when(streamResponse.getStatusText()).thenReturn("TEXT");
