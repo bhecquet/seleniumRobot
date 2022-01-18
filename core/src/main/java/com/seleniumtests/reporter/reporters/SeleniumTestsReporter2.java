@@ -68,7 +68,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
  */
 public class SeleniumTestsReporter2 extends CommonReporter implements IReporter {
 
-	private static final String RESOURCES_FOLDER = "resources";
+	public static final String RESOURCES_FOLDER = "resources";
 	private static final String STATUS = "status";
 	private static final String HEADER = "header";
 	private static final String APPLICATION = "application";
@@ -309,8 +309,8 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			}
 			stepInfo.add(encodedTestStep.getDuration() / (double)1000);
 			stepInfo.add(encodedTestStep);	
-			stepInfo.add(encodedTestStep.getErrorCause());	
-			stepInfo.add(encodedTestStep.getErrorCauseDetails());	
+			stepInfo.add(encodedTestStep.getRootCause());	
+			stepInfo.add(encodedTestStep.getRootCauseDetails());	
 			
 			// do not display video timestamp if video is not taken, or removed
 			if (encodedTestStep.getVideoTimeStamp() > 0 && videoInReport) {
