@@ -287,6 +287,66 @@ public class TestReporterControler extends ReporterTest {
 	}
 	
 	/**
+	 * Check we do not try to find ErrorCause when error is an AssertionError as we consider this error is raised when a control fails, the application / environment is OK
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testErrorCauseNotSearchedAssertionError() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.FIND_ERROR_CAUSE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			
+			PowerMockito.whenNew(ErrorCauseFinder.class).withAnyArguments().thenReturn(errorCauseFinder);
+			configureMockedSnapshotServerConnection();
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverWithAssert"});
+			
+			// we search only once for each test result, at the end of test suite
+			verify(errorCauseFinder, never()).findErrorCause();
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.FIND_ERROR_CAUSE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+		}
+		
+	}
+	
+	/**
+	 * Error cause won't be searched as test is successful
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testErrorCauseNotSearchedTestSuccess() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.FIND_ERROR_CAUSE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			
+			PowerMockito.whenNew(ErrorCauseFinder.class).withAnyArguments().thenReturn(errorCauseFinder);
+			configureMockedSnapshotServerConnection();
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
+			
+			// we search only once for each test result, at the end of test suite
+			verify(errorCauseFinder, never()).findErrorCause();
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.FIND_ERROR_CAUSE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+		}
+		
+	}
+	
+	/**
 	 * Check we do not try to find error cause when
 	 * - findErrorCause=false
 	 * - seleniumServer is active

@@ -16,6 +16,7 @@ public enum ErrorType {
 		this.description = description;
 	}
 	
+	@Override
 	public String toString() {
 		return description;
 	}
