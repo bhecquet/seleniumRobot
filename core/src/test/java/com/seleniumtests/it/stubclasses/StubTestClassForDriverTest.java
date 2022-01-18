@@ -19,6 +19,7 @@ package com.seleniumtests.it.stubclasses;
 
 import java.lang.reflect.Method;
 
+import org.openqa.selenium.WebDriverException;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -226,8 +227,22 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	public void testImageDetection() throws Exception {
 
 		new ImageDetectorPage()
-			._clickErrorButton();
-		Assert.assertTrue(false); // force test to fail
+			._clickErrorButtonInError();// force test to fail
+	}
+	
+	@Test(groups="stub")
+	public void testImageDetectionAssertionError() throws Exception {
+		
+		new ImageDetectorPage()
+		._clickErrorButtonInError();
+		Assert.assertTrue(false);
+	}
+	
+	@Test(groups="stub")
+	public void testImageDetectionNoError() throws Exception {
+		
+		new ImageDetectorPage()
+		._clickErrorButton();
 	}
 
 }
