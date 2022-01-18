@@ -25,6 +25,7 @@ import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.reporter.reporters.SeleniumTestsReporter2;
 import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -95,10 +96,10 @@ public abstract class BugTracker {
 		File zipFile = null;
 		Path outRoot = null;
 		try {
-			File resourcesFolder = Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "resources").toFile().getAbsoluteFile();
+			File resourcesFolder = Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), SeleniumTestsReporter2.RESOURCES_FOLDER).toFile().getAbsoluteFile();
 			File testResultFolder = Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), testName).toFile().getAbsoluteFile();
 			outRoot = Files.createTempDirectory("result");
-			Path tempResourcesFolder = Files.createDirectory(Paths.get(outRoot.toString(), "resources"));
+			Path tempResourcesFolder = Files.createDirectory(Paths.get(outRoot.toString(), SeleniumTestsReporter2.RESOURCES_FOLDER));
 			Path tempResultFolder = Files.createDirectory(Paths.get(outRoot.toString(), testName));
 
 			IOFileFilter aviFiles = FileFilterUtils.notFileFilter(
