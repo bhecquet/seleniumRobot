@@ -33,10 +33,14 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.mockito.stubbing.OngoingStubbing;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -65,6 +69,7 @@ import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnecto
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.WebUIDriverFactory;
+import com.seleniumtests.ut.exceptions.TestConfigurationException;
 
 import kong.unirest.Config;
 import kong.unirest.GetRequest;
@@ -178,7 +183,14 @@ public class ConnectorsTest extends MockitoTest {
 		return createServerMock(serverUrl, requestType, apiPath, statusCode, (Object)replyData, responseType);
 	}
 	
-	private HttpRequest createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, Object replyData, String responseType) throws UnirestException {
+	protected HttpRequest createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, Object replyData, String responseType) throws UnirestException {
+		return createServerMock(serverUrl, requestType, apiPath, statusCode, Arrays.asList(replyData), responseType);
+	}
+	protected HttpRequest createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, final List<Object> replyData, String responseType) throws UnirestException {
+		
+		if (replyData.isEmpty()) {
+			throw new TestConfigurationException("No replyData specified");
+		}
 		
 		@SuppressWarnings("unchecked")
 		HttpResponse<String> response = mock(HttpResponse.class);
@@ -192,37 +204,90 @@ public class ConnectorsTest extends MockitoTest {
 		PagedList<JsonNode> pageList = new PagedList<>(); // for asPaged method
 
 		when(request.getUrl()).thenReturn(serverUrl);
-		if (replyData instanceof String) {
+		if (replyData.get(0) instanceof String) {
 			when(response.getStatus()).thenReturn(statusCode);
-			when(response.getBody()).thenReturn((String)replyData);
+			//when(response.getBody()).thenReturn(replyData.toArray(new String[] {}));
+
+			when(response.getBody()).then(new Answer<String>() {
+			    private int count = -1;
+
+			    public String answer(InvocationOnMock invocation) {
+
+			        count++;
+			    	if (count >= replyData.size() - 1) {
+			    		return (String)replyData.get(replyData.size() - 1);
+			    	} else {
+			    		return (String)replyData.get(count);
+			    	}
+			    }
+			});
 			when(response.getStatusText()).thenReturn("TEXT");
 			
 			when(jsonResponse.getStatus()).thenReturn(statusCode);
 			when(jsonResponse.getBody()).thenReturn(json);
 			when(jsonResponse.getStatusText()).thenReturn("TEXT");
 			try {
-				if (((String) replyData).isEmpty()) {
-					replyData = "{}";
-				}
-				JSONObject jsonReply = new JSONObject((String)replyData);
-				when(json.getObject()).thenReturn(jsonReply);
+				
+//				JSONObject jsonReply = new JSONObject((String)replyData);
+//				when(json.getObject()).thenReturn(jsonReply);
+				when(json.getObject()).then(new Answer<JSONObject>() {
+				    private int count = -1;
+
+				    public JSONObject answer(InvocationOnMock invocation) {
+
+				        count++;
+				        String reply;
+				    	if (count >= replyData.size() - 1) {
+				    		reply = (String)replyData.get(replyData.size() - 1);
+				    	} else {
+				    		reply = (String)replyData.get(count);
+				    	}
+				    	if (reply.isEmpty()) {
+							reply = "{}";
+						}
+				    	return new JSONObject(reply);
+				    }
+				});
 				
 				pageList = new PagedList<>();
 				pageList.add(jsonResponse);
 				
 			} catch (JSONException e) {}
-		} else if (replyData instanceof File) {
+		} else if (replyData.get(0) instanceof File) {
 			when(streamResponse.getStatus()).thenReturn(statusCode);
 			when(streamResponse.getStatusText()).thenReturn("TEXT");
-			when(streamResponse.getBody()).thenReturn((File)replyData);
+			when(streamResponse.getBody()).then(new Answer<File>() {
+			    private int count = -1;
+
+			    public File answer(InvocationOnMock invocation) {
+
+			        count++;
+			    	if (count >= replyData.size() - 1) {
+			    		return (File)replyData.get(replyData.size() - 1);
+			    	} else {
+			    		return (File)replyData.get(count);
+			    	}
+			    }
+			});
+
+			//when(bytestreamResponse.getBody()).thenReturn(FileUtils.readFileToByteArray((File)replyData));
+			when(bytestreamResponse.getBody()).then(new Answer<byte[]>() {
+			    private int count = -1;
+			    
+			    public byte[] answer(InvocationOnMock invocation) throws IOException {
+			    	
+			        count++;
+			    	if (count >= replyData.size() - 1) {
+			    		return (byte[])FileUtils.readFileToByteArray((File)replyData.get(replyData.size() - 1));
+			    	} else {
+			    		return (byte[])FileUtils.readFileToByteArray((File)replyData.get(count));
+			    	}
+			    }
+			});
 			
-			try {
-				when(bytestreamResponse.getBody()).thenReturn(FileUtils.readFileToByteArray((File)replyData));
-				when(bytestreamResponse.getStatus()).thenReturn(statusCode);
-				when(bytestreamResponse.getStatusText()).thenReturn("BYTES");
-			} catch (IOException e) {
-				logger.error("Cannot read file to bytes, this may be a problem for test");
-			}
+			when(bytestreamResponse.getStatus()).thenReturn(statusCode);
+			when(bytestreamResponse.getStatusText()).thenReturn("BYTES");
+
 		}
 		
 		
