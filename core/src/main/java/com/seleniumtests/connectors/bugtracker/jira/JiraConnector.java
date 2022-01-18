@@ -319,8 +319,8 @@ public class JiraConnector extends BugTracker {
 			fullDescription.append("h2. Steps in error\n");
 			for (TestStep failedStep: failedSteps) {
 				fullDescription.append(String.format("* *" + STEP_KO_PATTERN + "%s*\n", failedStep.getPosition(), failedStep.getName().trim()));
-				if (failedStep.getErrorCause() != null) {
-					fullDescription.append(String.format("+Possible cause:+ %s%s\n", failedStep.getErrorCause(), failedStep.getErrorCauseDetails() == null || failedStep.getErrorCauseDetails().trim().isEmpty() ? "": " => " + failedStep.getErrorCauseDetails()));
+				if (failedStep.getRootCause() != null) {
+					fullDescription.append(String.format("+Possible cause:+ %s%s\n", failedStep.getRootCause(), failedStep.getRootCauseDetails() == null || failedStep.getRootCauseDetails().trim().isEmpty() ? "": " => " + failedStep.getRootCauseDetails()));
 				}
 				fullDescription.append(String.format("{code:java}%s{code}\n\n", failedStep.toString()));
 			}
