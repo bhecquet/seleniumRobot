@@ -1,9 +1,8 @@
 package com.seleniumtests.core.testanalysis;
 
+import com.seleniumtests.core.Step.RootCause;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.reporter.logger.TestStep;
-
-import gherkin.StringUtils.ToString;
 
 public class ErrorCause {
 	
@@ -42,6 +41,15 @@ public class ErrorCause {
 		}
 		if (testStep != null) {
 			message.append(String.format(" on step '%s'", testStep.getName()));
+		}
+		if ((type == ErrorType.UNKNOWN_PAGE || type == ErrorType.ERROR_MESSAGE) 
+				&& testStep != null 
+				&& testStep.getRootCause() != null
+				&& testStep.getRootCause() != RootCause.NONE) {
+			message.append(String.format("\nDeclared root Cause: %s", testStep.getRootCause()));
+			if (testStep.getRootCauseDetails() != null && !testStep.getRootCauseDetails().isEmpty()) {
+				message.append(" => " + testStep.getRootCauseDetails());
+			}
 		}
 		return message.toString();
 	}
