@@ -124,14 +124,10 @@ public class ProcessInfo {
         if (this.getClass() != obj.getClass()) {
             return false;
         }
-        ProcessInfo info;
-        try {
-        	info = (ProcessInfo) obj;
-        } catch (Exception e) {
-        	return false;
-        }
+        ProcessInfo info = (ProcessInfo) obj;
 
-        return this.toString() !=null ? this.toString().equals(info.toString()) : this.toString() == info.toString();
+        return this.toString().equals(info.toString());
+
     }
 
     @Override
