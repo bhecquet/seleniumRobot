@@ -1,6 +1,7 @@
 package com.seleniumtests.it.driver.support.pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriverException;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
@@ -35,6 +36,12 @@ public class ImageDetectorPage extends PageObject {
     public ImageDetectorPage _clickErrorButton() {
     	errorButton.click();
     	return this;
+    }
+    
+    public ImageDetectorPage _clickErrorButtonInError() {
+    	errorButton.click();
+    	throw new WebDriverException("failure");
+    	
     }
 
 }

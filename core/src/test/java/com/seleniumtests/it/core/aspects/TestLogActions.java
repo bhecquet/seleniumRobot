@@ -451,7 +451,7 @@ public class TestLogActions extends GenericTest {
 		
 		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
 		Assert.assertEquals(steps.size(), 2);
-		Assert.assertEquals(steps.get(1).getErrorCause(), RootCause.REGRESSION);
-		Assert.assertEquals(steps.get(1).getErrorCauseDetails(), "Check your scripts");
+		Assert.assertEquals(steps.get(1).getRootCause(), RootCause.REGRESSION);
+		Assert.assertEquals(steps.get(1).getRootCauseDetails(), "Check your scripts");
 	}
 }

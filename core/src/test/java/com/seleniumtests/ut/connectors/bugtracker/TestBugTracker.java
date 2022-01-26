@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +31,7 @@ import com.seleniumtests.connectors.bugtracker.BugTracker;
 import com.seleniumtests.connectors.bugtracker.FakeBugTracker;
 import com.seleniumtests.connectors.bugtracker.IssueBean;
 import com.seleniumtests.connectors.bugtracker.jira.JiraConnector;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.Step.RootCause;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
@@ -37,6 +39,7 @@ import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.reporter.reporters.SeleniumTestsReporter2;
 
 @PrepareForTest({BugTracker.class})
 public class TestBugTracker extends MockitoTest {
@@ -229,6 +232,9 @@ public class TestBugTracker extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testCreateIssueBean() throws Exception {
+		// copy resources so that we can be sure something has been copied to zip file
+		new SeleniumTestsReporter2().copyResources();
+		
 		FakeBugTracker fbt = spy(new FakeBugTracker());
 		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
 		BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
@@ -261,7 +267,7 @@ public class TestBugTracker extends MockitoTest {
 		Assert.assertEquals(issueBean.getDateTime().getDayOfMonth(),  ZonedDateTime.now().plusHours(3).getDayOfMonth()); 
 		Assert.assertTrue(issueBean.getDetailedResult().isFile());
 		Assert.assertEquals(issueBean.getDetailedResult().getName(), "detailedResult.zip");
-		Assert.assertTrue(issueBean.getDetailedResult().length() > 1000);
+		Assert.assertTrue(issueBean.getDetailedResult().length() > 900000);
 		Assert.assertNull(issueBean.getId()); // not initialized by default
 	}
 	
