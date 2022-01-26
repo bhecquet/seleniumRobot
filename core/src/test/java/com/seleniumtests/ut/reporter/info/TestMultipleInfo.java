@@ -33,12 +33,4 @@ public class TestMultipleInfo extends GenericTest {
         String encoded = mInfo.encode("doc");
         Assert.assertEquals(encoded, "wandering in the waves");
     }
-
-    @Test(groups = {"ut"})
-    public void testEncodeNull() {
-        MultipleInfo mInfo = new MultipleInfo(null);
-        mInfo.addInfo(null);
-        String encoded = mInfo.encode(null);
-        Assert.assertEquals(encoded, "");
-    }
 }
