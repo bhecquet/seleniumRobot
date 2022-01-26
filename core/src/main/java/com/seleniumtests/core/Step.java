@@ -37,7 +37,7 @@ public @interface Step {
 		DEPENDENCIES,	// error raised due to an other system failing / not present
 		SCRIPTING,
 		REGRESSION,		// may be used when no dependency is implied in this particular step
-		UNDEFINED,		// no reason defined, the default behaviour
+
 	}
 	
 	public String name() default "";

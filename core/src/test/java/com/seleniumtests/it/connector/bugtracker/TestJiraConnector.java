@@ -56,14 +56,14 @@ public class TestJiraConnector extends GenericTest {
 
 		Map<String, String> jiraOptions = new HashMap<>();
 		jiraOptions.put("jira.openStates", "Open,To Do");
-		jiraOptions.put("jira.closeTransition", "Start Progress/Start Review/Done");
+		jiraOptions.put("jira.closeTransition", "Prêt/Démarrer/Livrer/A valider/Validation effectuée/Clore");
 		jiraOptions.put("jira.issueType", "Bogue");
 		jiraOptions.put("priority", "Important");
 		
 		JiraConnector jiraConnector = new JiraConnector(System.getProperty("server"), "FFC", System.getProperty("user"), System.getProperty("password"), jiraOptions);
-		jiraConnector.createIssue(null, null, "core", "DEV", "testng  http://confluence.covea.priv/display/portailSM/Selenium+-+Descriptions+des+scenarios", Arrays.asList(step1, step2, stepEnd), jiraOptions);
+		jiraConnector.createIssue(null, null, "core", "testJira", "testng  http://confluence.covea.priv/display/portailSM/Selenium+-+Descriptions+des+scenarios", Arrays.asList(step1, step2, stepEnd), jiraOptions);
 //		jiraConnector.issueAlreadyExists(new JiraBean(null, "[Selenium][core][DEV][testng] test myTest KO", "", "Bogue"));
 //		jiraConnector.updateIssue("FFC-573", "commentaire", Arrays.asList(screenshot));
-//		jiraConnector.closeIssue("FFC-574", "Terminé");
+		jiraConnector.closeIssue("FFC-837", "Terminé");
 	}
 }

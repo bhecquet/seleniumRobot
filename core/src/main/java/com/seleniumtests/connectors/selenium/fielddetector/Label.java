@@ -188,13 +188,13 @@ public class Label {
 	 * @return
 	 */
 	public boolean match(Label anOtherLabel) {
-		if (text != null && anOtherLabel.text != null
-				&& (text.equals(anOtherLabel.text) 
-				|| stringService.score(text, anOtherLabel.text) > 0.9)
-				&& isInside(anOtherLabel)) {
-			return true;
-		} else {
+		if (anOtherLabel == null) {
 			return false;
 		}
+		
+		boolean noText = text == null && anOtherLabel.text == null;
+		boolean sameText = text != null && anOtherLabel.text != null && (text.equals(anOtherLabel.text) || stringService.score(text, anOtherLabel.text) > 0.9);
+		
+		return ((sameText || noText) && isInside(anOtherLabel));	
 	}
 }

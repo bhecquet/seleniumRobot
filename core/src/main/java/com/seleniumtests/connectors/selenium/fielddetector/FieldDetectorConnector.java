@@ -1,6 +1,9 @@
 package com.seleniumtests.connectors.selenium.fielddetector;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
@@ -113,15 +116,25 @@ public class FieldDetectorConnector {
 				.field("resize", resizeFactor)
 				.field("image", imageFile)
 				.asJson();
+		
+		JSONObject bodyObject = fieldDefinition.getBody().getObject();
 		if (fieldDefinition.getStatus() != 200) {
 			try {
-				throw new ScenarioException("Field detector returned error: " + fieldDefinition.getBody().getObject().get("error"));
+				throw new ScenarioException("Field detector returned error: " + bodyObject.get("error"));
 			} catch (NullPointerException e) {
 				throw new ScenarioException("Field detector returned error");
 			}
 		}
 		
-		return fieldDefinition.getBody().getObject().getJSONObject(imageFile.getName());
+		
+		List<String> imageNames = new ArrayList<>(Arrays.asList(JSONObject.getNames(bodyObject)));
+		imageNames.remove("error");
+		
+		if (imageNames.isEmpty()) {
+			throw new ScenarioException("Field detector did not return any information: " + bodyObject.get("error"));
+		}
+		
+		return bodyObject.getJSONObject(imageNames.get(0));
 		
 	}
 }

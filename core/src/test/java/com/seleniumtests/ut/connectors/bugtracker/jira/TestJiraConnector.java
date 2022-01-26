@@ -40,6 +40,7 @@ import com.atlassian.jira.rest.client.api.SearchRestClient;
 import com.atlassian.jira.rest.client.api.UserRestClient;
 import com.atlassian.jira.rest.client.api.domain.BasicComponent;
 import com.atlassian.jira.rest.client.api.domain.BasicIssue;
+import com.atlassian.jira.rest.client.api.domain.BasicProject;
 import com.atlassian.jira.rest.client.api.domain.CimFieldInfo;
 import com.atlassian.jira.rest.client.api.domain.Comment;
 import com.atlassian.jira.rest.client.api.domain.CustomFieldOption;
@@ -94,6 +95,9 @@ public class TestJiraConnector extends MockitoTest {
 	
 	@Mock
 	private Promise<Project> promiseProject;
+	
+	@Mock
+	private Promise<Iterable<BasicProject>> promiseAllProjects;
 	
 	@Mock
 	private Project project;
@@ -183,6 +187,9 @@ public class TestJiraConnector extends MockitoTest {
 	private CimFieldInfo fieldInfo2 = new CimFieldInfo("23", false, "environment", stringSchema, new HashSet<>(), Arrays.asList(), null);
 	private CimFieldInfo fieldInfo3 = new CimFieldInfo("33", false, "step", optionSchema, new HashSet<>(), Arrays.asList(optionStep1, optionStep2), null);
 	
+	private BasicProject project1 = new BasicProject(new URI("http://foo/bar/pr"), "PROJECT-1", 1L, "Project 1");
+	private BasicProject project2 = new BasicProject(new URI("http://foo/bar/pr"), "PROJECT-2", 2L, "Project 2");
+	
 	private User user;
 	
 	private ScreenShot screenshot;
@@ -261,6 +268,9 @@ public class TestJiraConnector extends MockitoTest {
 		when(project.getVersions()).thenReturn(Arrays.asList(version1, version2));
 		when(project.getKey()).thenReturn(PROJECT_KEY);
 		
+		when(projectRestClient.getAllProjects()).thenReturn(promiseAllProjects);
+		when(promiseAllProjects.claim()).thenReturn(Arrays.asList(project1, project2));
+		
 		when(restClient.getMetadataClient()).thenReturn(metadataRestClient);
 		when(metadataRestClient.getPriorities()).thenReturn(promisePriorities);
 		when(promisePriorities.claim()).thenReturn(Arrays.asList(priority1, priority2));
@@ -337,7 +347,7 @@ public class TestJiraConnector extends MockitoTest {
 	}
 	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class)
 	public void testUnkownProject() {
-		when(promiseProject.claim()).thenThrow(RestClientException.class);
+		when(promiseProject.claim()).thenThrow(RestClientException.class).thenReturn(project);
 		new JiraConnector("http://foo/bar", "PRO", "user", "password", jiraOptions);	
 	}
 	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class)
@@ -686,6 +696,28 @@ public class TestJiraConnector extends MockitoTest {
 	public void testCloseIssueMultipleTransitions() {
 
 		when(promiseTransitions.claim()).thenReturn(Arrays.asList(transition3)).thenReturn(Arrays.asList(transition1, transition2));
+		jiraOptions.put("jira.closeTransition", "review/close");
+		
+		ArgumentCaptor<TransitionInput> transitionArgument = ArgumentCaptor.forClass(TransitionInput.class);
+		
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
+		jiraConnector.closeIssue("ISSUE-1", "closed");
+		
+		verify(issueRestClient, times(2)).transition(eq(issue1), transitionArgument.capture());
+		Assert.assertEquals(transitionArgument.getAllValues().get(0).getId(), 3); // transition to review state
+		Assert.assertEquals(transitionArgument.getAllValues().get(1).getId(), 1); // transition to closed state
+	}
+	
+	/**
+	 * issue #470: When closing issue with multiple transition, check the case where jira do not update the transitions of the issue immediately
+	 * We need to retry
+	 */
+	@Test(groups= {"ut"})
+	public void testCloseIssueMultipleTransitionsSlow() {
+		
+		when(promiseTransitions.claim()).thenReturn(Arrays.asList(transition3)) // initial state
+										.thenReturn(Arrays.asList(transition3)) // state not updated
+										.thenReturn(Arrays.asList(transition1, transition2)); // state updated
 		jiraOptions.put("jira.closeTransition", "review/close");
 		
 		ArgumentCaptor<TransitionInput> transitionArgument = ArgumentCaptor.forClass(TransitionInput.class);
