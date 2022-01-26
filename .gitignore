@@ -9,3 +9,6 @@ chromedriver.log
 velocity.log
 seleniumtestsframework.iml
 *.zip
+/core/core.iml
+/core-parent.iml
+/grid-extensions/grid-extensions.iml
