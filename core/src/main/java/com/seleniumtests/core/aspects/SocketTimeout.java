@@ -51,33 +51,34 @@ public class SocketTimeout {
 	 * @throws IllegalArgumentException
 	 * @throws IllegalAccessException
 	 */
-	@After("initialization(org.openqa.selenium.remote.HttpCommandExecutor.new (..))")
-	public void changeTimeout2(JoinPoint joinPoint) throws NoSuchFieldException, IllegalAccessException {
-
-		HttpCommandExecutor commandExecutor = (HttpCommandExecutor)joinPoint.getThis();
-		
-		Field remoteServerField = HttpCommandExecutor.class.getDeclaredField("remoteServer");
-		remoteServerField.setAccessible(true);
-		URL url = (URL) remoteServerField.get(commandExecutor);
-
-		HttpClient client;
-		if (SeleniumTestsContextManager.isMobileTest()) {
-			client = NetworkUtility.createClient(url, Duration.ofMinutes(6), Duration.ofMinutes(6));
-		} else {
-			client = NetworkUtility.createClient(url, Duration.ofMinutes(2), Duration.ofMinutes(2));
-		}
-		
-		Field clientField = HttpCommandExecutor.class.getDeclaredField("client");
-		clientField.setAccessible(true);
-		clientField.set(commandExecutor, client);
-		
-		logger.info("Socket timeout for driver communication updated");
-		
-		SocketTimeout.socketTimeoutUpdated = true;
-	}
+//	@After("initialization(org.openqa.selenium.remote.HttpCommandExecutor.new (..))")
+//	public void changeTimeout2(JoinPoint joinPoint) throws NoSuchFieldException, IllegalAccessException {
+//
+//		HttpCommandExecutor commandExecutor = (HttpCommandExecutor)joinPoint.getThis();
+//		
+//		Field remoteServerField = HttpCommandExecutor.class.getDeclaredField("remoteServer");
+//		remoteServerField.setAccessible(true);
+//		URL url = (URL) remoteServerField.get(commandExecutor);
+//
+//		HttpClient client;
+//		if (SeleniumTestsContextManager.isMobileTest()) {
+//			client = NetworkUtility.createClient(url, Duration.ofMinutes(6), Duration.ofMinutes(6));
+//		} else {
+//			client = NetworkUtility.createClient(url, Duration.ofMinutes(2), Duration.ofMinutes(2));
+//		}
+//		
+//		Field clientField = HttpCommandExecutor.class.getDeclaredField("client");
+//		clientField.setAccessible(true);
+//		clientField.set(commandExecutor, client);
+//		
+//		logger.info("Socket timeout for driver communication updated");
+//		
+//		SocketTimeout.socketTimeoutUpdated = true;
+//	}
 
 	public static boolean isSocketTimeoutUpdated() {
-		return socketTimeoutUpdated;
+		return true;
+//		return socketTimeoutUpdated;
 	}
 	
 }

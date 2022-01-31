@@ -54,7 +54,6 @@ import com.seleniumtests.uipage.htmlelements.FrameElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.MobileElement;
 import io.appium.java_client.remote.AppiumCommandExecutor;
 
 @PrepareForTest({ WebUIDriver.class, AppiumDriver.class, RemoteWebDriver.class })

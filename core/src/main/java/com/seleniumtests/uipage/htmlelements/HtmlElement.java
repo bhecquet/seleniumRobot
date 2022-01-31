@@ -77,7 +77,6 @@ import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
-import io.appium.java_client.MobileElement;
 import io.appium.java_client.MultiTouchAction;
 import io.appium.java_client.PerformsTouchActions;
 import io.appium.java_client.TouchAction;
@@ -704,7 +703,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         // wait for element to be really visible. should be done only for actions on element
         if (waitForVisibility && makeVisible) {
         	try {
-        		new WebDriverWait(driver, 1).until(ExpectedConditions.visibilityOf(element));
+        		new WebDriverWait(driver, Duration.ofSeconds(1)).until(ExpectedConditions.visibilityOf(element));
         	} catch (TimeoutException e) {
         		logger.error(String.format("Element %s has never been made visible", toString()));
         	}
@@ -1391,7 +1390,10 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public Point getCenter() {
     	try {
     		checkForMobile();
-    		return ((MobileElement)getUnderlyingElement(element)).getCenter();
+            Point upperLeft = element.getLocation();
+            Dimension dimension = element.getSize();
+            Point center = new Point(upperLeft.x + dimension.width / 2, upperLeft.y + dimension.height / 2);
+    		return center;
     	} catch (ScenarioException e) {
     		Rectangle rectangle = element.getRect();
     		return new Point(rectangle.x + rectangle.width / 2, rectangle.y + rectangle.height / 2);
@@ -1401,13 +1403,14 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     @ReplayOnError
     public void pinch() {
     	PerformsTouchActions performTouchActions = checkForMobile();
-    	MobileElement mobElement = (MobileElement) getUnderlyingElement(element);
+    	WebElement mobElement = getUnderlyingElement(element);
     	
     	// code taken from appium
 		MultiTouchAction multiTouch = new MultiTouchAction(performTouchActions);
 		
 		Point upperLeft = mobElement.getLocation();
-		Point center = mobElement.getCenter();
+        Dimension dimension = mobElement.getSize();
+        Point center = new Point(upperLeft.x + dimension.width / 2, upperLeft.y + dimension.height / 2);
 		int yOffset = center.getY() - upperLeft.getY();
 		
 		TouchAction<?> action0 = createTouchAction().press(ElementOption.element(mobElement, center.getX(), center.getY() - yOffset))
@@ -1430,7 +1433,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      */
     @ReplayOnError
     public void swipe(int xOffset, int yOffset, int xMove, int yMove) {
-    	MobileElement mobElement = (MobileElement) getUnderlyingElement(element);
+    	WebElement mobElement = getUnderlyingElement(element);
         
         createTouchAction().press(ElementOption.element(mobElement, xOffset, yOffset))
 			.waitAction()
@@ -1446,7 +1449,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     @ReplayOnError
     public void tap(int fingers, int duration) {
     	PerformsTouchActions performTouchActions = checkForMobile();
-    	MobileElement mobElement = (MobileElement) getUnderlyingElement(element);
+    	WebElement mobElement = getUnderlyingElement(element);
     
     	// code from appium
     	MultiTouchAction multiTouch = new MultiTouchAction(performTouchActions);
@@ -1462,12 +1465,13 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     @ReplayOnError
     public void zoom() {
     	PerformsTouchActions performTouchActions = checkForMobile();
-    	MobileElement mobElement = (MobileElement) getUnderlyingElement(element);
+        WebElement mobElement = getUnderlyingElement(element);
     	
     	MultiTouchAction multiTouch = new MultiTouchAction(performTouchActions);
 
         Point upperLeft = mobElement.getLocation();
-        Point center = mobElement.getCenter();
+        Dimension dimension = mobElement.getSize();
+        Point center = new Point(upperLeft.x + dimension.width / 2, upperLeft.y + dimension.height / 2);
         int yOffset = center.getY() - upperLeft.getY();
 
         TouchAction<?> action0 = createTouchAction().press(PointOption.point(center.getX(), center.getY()))

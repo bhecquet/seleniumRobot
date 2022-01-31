@@ -7,23 +7,23 @@ import java.net.URL;
 import java.time.Duration;
 
 import org.openqa.selenium.remote.http.HttpClient;
-import org.openqa.selenium.remote.internal.OkHttpClient;
+//import org.openqa.selenium.remote.internal.OkHttpClient;
 
 import com.google.common.base.Strings;
 
-import okhttp3.ConnectionPool;
-import okhttp3.Credentials;
-import okhttp3.Request;
-import okhttp3.Response;
+//import okhttp3.ConnectionPool;
+//import okhttp3.Credentials;
+//import okhttp3.Request;
+//import okhttp3.Response;
 
 public class NetworkUtility {
 
 
-	private static final ConnectionPool pool = new ConnectionPool();
+//	private static final ConnectionPool pool = new ConnectionPool();
 	private static Proxy proxy = null;
 	
 	public static HttpClient createClient(URL url, Duration readTimeout, Duration connectionTimeout) {
-        okhttp3.OkHttpClient.Builder client = new okhttp3.OkHttpClient.Builder()
+        /*okhttp3.OkHttpClient.Builder client = new okhttp3.OkHttpClient.Builder()
             .connectionPool(pool)
             .followRedirects(true)
             .followSslRedirects(true)
@@ -56,8 +56,8 @@ public class NetworkUtility {
           return response.code() == 408
                  ? response.newBuilder().code(500).message("Server-Side Timeout").build()
                  : response;
-        });
-
-        return new OkHttpClient(client.build(), url);
+        });*/
+return null;
+//        return new OkHttpClient(client.build(), url);
       }	
 }

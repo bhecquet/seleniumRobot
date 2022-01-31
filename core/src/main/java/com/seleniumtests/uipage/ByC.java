@@ -28,7 +28,6 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.FindsByXPath;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ScenarioException;
@@ -392,7 +391,7 @@ public class ByC extends By {
 			if (partial && !label.endsWith("*")) {
 				label += "*";
 			}
-			return ((FindsByXPath) context).findElementsByXPath(String.format(".//%s%s/following::%s", labelTagName, buildSelectorForText(label), tagName));
+			return context.findElements(By.xpath(String.format(".//%s%s/following::%s", labelTagName, buildSelectorForText(label), tagName)));
 		}
 
 		@Override
@@ -400,7 +399,7 @@ public class ByC extends By {
 			if (partial && !label.endsWith("*")) {
 				label += "*";
 			}
-			return ((FindsByXPath) context).findElementByXPath(String.format(".//%s%s/following::%s", labelTagName, buildSelectorForText(label), tagName));
+			return context.findElement(By.xpath(String.format(".//%s%s/following::%s", labelTagName, buildSelectorForText(label), tagName)));
 		}
 
 		@Override
@@ -442,7 +441,7 @@ public class ByC extends By {
 			if (partial && !label.endsWith("*")) {
 				label += "*";
 			}
-			return ((FindsByXPath) context).findElementsByXPath(String.format(".//%s%s/preceding::%s", labelTagName, buildSelectorForText(label), tagName));
+			return context.findElements(By.xpath(String.format(".//%s%s/preceding::%s", labelTagName, buildSelectorForText(label), tagName)));
 		}
 		
 		@Override
@@ -451,7 +450,7 @@ public class ByC extends By {
 			if (partial && !label.endsWith("*")) {
 				label += "*";
 			}
-			elements = ((FindsByXPath) context).findElementsByXPath(String.format(".//%s%s/preceding::%s", labelTagName, buildSelectorForText(label), tagName));
+			elements = context.findElements(By.xpath(String.format(".//%s%s/preceding::%s", labelTagName, buildSelectorForText(label), tagName)));
 			List<WebElement> elementsReverse = elements.subList(0, elements.size());
 			Collections.reverse(elementsReverse);
 			return elementsReverse.get(0);
@@ -511,12 +510,12 @@ public class ByC extends By {
 
 		@Override
 		public List<WebElement> findElements(SearchContext context) {
-			return ((FindsByXPath) context).findElementsByXPath(String.format(".//*%s", buildSelector()));
+			return context.findElements(By.xpath(String.format(".//*%s", buildSelector())));
 		}
 
 		@Override
 		public WebElement findElement(SearchContext context) {
-			return ((FindsByXPath) context).findElementByXPath(String.format(".//*%s", buildSelector()));
+			return context.findElement(By.xpath(String.format(".//*%s", buildSelector())));
 		}
 
 		@Override
@@ -557,7 +556,7 @@ public class ByC extends By {
 			if (partial && !text.endsWith("*")) {
 				text += "*";
 			}
-			return ((FindsByXPath) context).findElementsByXPath(String.format(".//%s%s", tagName, buildSelectorForText(text)));
+			return context.findElements(By.xpath(String.format(".//%s%s", tagName, buildSelectorForText(text))));
 		}
 
 		@Override
@@ -565,7 +564,7 @@ public class ByC extends By {
 			if (partial && !text.endsWith("*")) {
 				text += "*";
 			}
-			return ((FindsByXPath) context).findElementByXPath(String.format(".//%s%s", tagName, buildSelectorForText(text)));
+			return context.findElement(By.xpath(String.format(".//%s%s", tagName, buildSelectorForText(text))));
 		}
 		
 
@@ -861,12 +860,12 @@ public class ByC extends By {
 
 	    @Override
 	    public List<WebElement> findElements(SearchContext context) {
-	      return ((FindsByXPath) context).findElementsByXPath(".//" + tagName);
+	      return context.findElements(By.xpath(".//" + tagName));
 	    }
 
 	    @Override
 	    public WebElement findElement(SearchContext context) {
-	      return ((FindsByXPath) context).findElementByXPath(".//" + tagName);
+	      return context.findElement(By.xpath(".//" + tagName));
 	    }
 
 	    @Override
@@ -892,12 +891,12 @@ public class ByC extends By {
 
 	    @Override
 	    public List<WebElement> findElements(SearchContext context) {
-	      return ((FindsByXPath) context).findElementsByXPath(".//*[" + containingWord("class", className) + "]");
+	      return context.findElements(By.xpath(".//*[" + containingWord("class", className) + "]"));
 	    }
 
 	    @Override
 	    public WebElement findElement(SearchContext context) {
-	      return ((FindsByXPath) context).findElementByXPath(".//*[" + containingWord("class", className) + "]");
+	      return context.findElement(By.xpath(".//*[" + containingWord("class", className) + "]"));
 	    }
 
 	    /**
