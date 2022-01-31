@@ -58,6 +58,7 @@ import org.zeroturnaround.zip.ZipUtil;
 
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
+import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -876,6 +877,77 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 		// check "increaseMaxRetry" cannot be called outside test method
 		Assert.assertTrue(logs.contains("SeleniumRobotTestListener: RetryAnalyzer is null, 'increaseMaxRetry' can be called only inside test methods"));
+	}
+	
+
+	/**
+	 * Check that when snapshot server is used for comparison, if comparison fails, test is retried
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testSnapshotComparisonKoChangeTestResultAndRetried() throws Exception {
+		try {
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, "changeTestResult");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
+			
+			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false}");		
+			
+			// say that snapshot comparison if failed when checking individual snapshots
+			createServerMock("PUT", SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL, 200, "{'id': '16', 'computed': true, 'computingError': '', 'diffPixelPercentage': 1.0, 'tooManyDiffs': true}");
+			
+			SeleniumTestsContextManager.removeThreadContext();
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+
+			// check test has been retried
+			String logs = readSeleniumRobotLogFile();
+			Assert.assertTrue(logs.contains("[RETRYING] class com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions FAILED, Retrying 1 time"));
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+		}
+	}
+	
+	/**
+	 * Check that when snapshot server is used for comparison, if comparison fails, test is not retried as we are in "displayOnly"
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testSnapshotComparisonKoChangeTestResultNotRetried() throws Exception {
+		try {
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, "displayOnly");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
+			
+			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false}");		
+			
+			// say that snapshot comparison if failed when checking individual snapshots
+			createServerMock("PUT", SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL, 200, "{'id': '16', 'computed': true, 'computingError': '', 'diffPixelPercentage': 1.0, 'tooManyDiffs': true}");
+			
+			SeleniumTestsContextManager.removeThreadContext();
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+			
+			// check test has NOT been retried
+			String logs = readSeleniumRobotLogFile();
+			Assert.assertFalse(logs.contains("[RETRYING] class com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions FAILED, Retrying 1 time"));
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+		}
 	}
 
 }

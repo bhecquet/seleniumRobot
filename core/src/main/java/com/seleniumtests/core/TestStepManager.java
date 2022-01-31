@@ -234,4 +234,12 @@ public class TestStepManager {
 	public void setVideoStartDate(Date videoStartDate) {
 		this.videoStartDate = videoStartDate;
 	}
+
+	/**
+	 * For tests only
+	 * @param testSteps
+	 */
+	public void setTestSteps(List<TestStep> testSteps) {
+		this.testSteps = testSteps;
+	}
 }

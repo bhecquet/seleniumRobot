@@ -138,6 +138,8 @@ public abstract class CommonReporter implements IReporter {
 	 * @param title			title of the exception
 	 * @param contentBuffer	
 	 * @param format		format to use to encode ('html', 'csv', 'xml', 'json')
+	 * @deprecated use {@link ExceptionUtility.generateTheStackTrace()}
+	 * 
 	 */
 	@Deprecated
 	public static void generateTheStackTrace(final Throwable exception, final String title, final StringBuilder contentBuffer, String format) {

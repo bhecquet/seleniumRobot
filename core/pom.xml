@@ -41,7 +41,7 @@
 		<dependency>
 		  <groupId>com.epam.reportportal</groupId>
 		  <artifactId>logger-java-log4j</artifactId>
-		  <version>5.0.3</version>
+		  <version>5.1.4</version>
 		</dependency>
 		
 		<dependency>
@@ -595,9 +595,9 @@
                 </executions>
             </plugin>
             <plugin>
-				<groupId>org.codehaus.mojo</groupId>
+				<groupId>com.nickwongdev</groupId>
 				<artifactId>aspectj-maven-plugin</artifactId>
-				<version>1.14.0</version>
+				<version>1.12.1</version>
 				<dependencies>
 					<dependency>
 						<groupId>org.aspectj</groupId>
@@ -606,8 +606,8 @@
 					</dependency>
 				</dependencies>
 				<configuration>
-					<complianceLevel>8</complianceLevel>
-					<source>8</source>
+					<complianceLevel>1.8</complianceLevel>
+					<source>1.8</source>
 					<showWeaveInfo>false</showWeaveInfo>
 					<Xlint>unmatchedSuperTypeInCall=ignore</Xlint>
 					<weaveDependencies>

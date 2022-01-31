@@ -31,6 +31,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarFile;
@@ -112,7 +113,10 @@ public class FileUtility {
         } else {
         	classFile = new File(storeLocation + File.pathSeparator + clz.getCanonicalName().replace(".", "/") + ".class");
         }
-        if (!classFile.delete()) {
+        
+        try {
+        	Files.delete(classFile.toPath());
+        } catch (IOException e) {
         	logger.warn("Cannot delete class file");
         }
     }

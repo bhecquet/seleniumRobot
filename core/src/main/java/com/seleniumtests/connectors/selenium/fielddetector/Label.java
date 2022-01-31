@@ -2,7 +2,13 @@ package com.seleniumtests.connectors.selenium.fielddetector;
 
 import java.awt.Rectangle;
 
+import com.seleniumtests.util.StringUtility;
+
 import kong.unirest.json.JSONObject;
+import net.ricecode.similarity.JaroWinklerStrategy;
+import net.ricecode.similarity.SimilarityStrategy;
+import net.ricecode.similarity.StringSimilarityService;
+import net.ricecode.similarity.StringSimilarityServiceImpl;
 
 public class Label {
 
@@ -13,6 +19,9 @@ public class Label {
 	private int right;
 	private int width;
 	private int height;
+	
+	private SimilarityStrategy strategy = new JaroWinklerStrategy();
+	private StringSimilarityService stringService = new StringSimilarityServiceImpl(strategy);
 	
 	public Label() {}
 	
@@ -80,13 +89,17 @@ public class Label {
 	 * @return
 	 */
 	public boolean isInside(Field field) {
+		return isInside(field.getLabel());
+	}
+	
+	public boolean isInside(Label label) {
 		int centerX = (right + left) / 2;
 		int centerY = (top + bottom) / 2;
 		
-		return centerX > field.getLabel().left 
-				&& centerX < field.getLabel().right
-				&& centerY > field.getLabel().top
-				&& centerY < field.getLabel().bottom;
+		return centerX > label.left 
+				&& centerX < label.right
+				&& centerY > label.top
+				&& centerY < label.bottom;
 	}
 	
 	/**
@@ -165,5 +178,23 @@ public class Label {
 		top += yOffset;
 		right = left + width;
 		bottom = top + height;
+	}
+	
+	/**
+	 * Check if 'anOtherLabel' matches this label
+	 * - text matches
+	 * - position matches
+	 * @param anOtherLabel
+	 * @return
+	 */
+	public boolean match(Label anOtherLabel) {
+		if (anOtherLabel == null) {
+			return false;
+		}
+		
+		boolean noText = text == null && anOtherLabel.text == null;
+		boolean sameText = text != null && anOtherLabel.text != null && (text.equals(anOtherLabel.text) || stringService.score(text, anOtherLabel.text) > 0.9);
+		
+		return ((sameText || noText) && isInside(anOtherLabel));	
 	}
 }

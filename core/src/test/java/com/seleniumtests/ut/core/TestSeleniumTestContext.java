@@ -586,6 +586,20 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	
 	@Test(groups="ut context")
+	public void testRandmoInAttachment(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setRandomInAttachmentNames(false);
+		Assert.assertFalse(SeleniumTestsContextManager.getThreadContext().getRandomInAttachments());
+	}
+	// by default, devMode is true if tests are launched from IDE
+	@Test(groups="ut context")
+	public void testRandmoInAttachmentNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setRandomInAttachmentNames(null);
+		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getRandomInAttachments());
+	}
+	
+	@Test(groups="ut context")
 	public void testDebugCore(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		try {
 			initThreadContext(testNGCtx);
@@ -1361,6 +1375,19 @@ public class TestSeleniumTestContext extends GenericTest {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setManualTestSteps(null);
 		Assert.assertFalse(SeleniumTestsContextManager.getThreadContext().isManualTestSteps());
+	}
+	
+	@Test(groups="ut context")
+	public void testFindErrorCause(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setFindErrorCause(true);
+		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().isFindErrorCause());
+	}
+	@Test(groups="ut context")
+	public void testFindErrorCauseNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setFindErrorCause(null);
+		Assert.assertFalse(SeleniumTestsContextManager.getThreadContext().isFindErrorCause());
 	}
 	
 	@Test(groups="ut context")

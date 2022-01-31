@@ -32,20 +32,19 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.apache.log4j.Logger;
 
 import com.seleniumtests.core.SeleniumTestsContext;
-import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class StringUtility {
-	
+
 	private static final Logger logger = SeleniumRobotLogger.getLogger(StringUtility.class);
 	public static Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\$\\{(.*?)\\}");
 
 	private StringUtility() {
 		// As a utility class, it is not meant to be instantiated.
 	}
-	
+
     public static String constructMethodSignature(final Method method, final Object[] parameters) {
         return method.getDeclaringClass().getCanonicalName() + "." + method.getName() + "("
                 + constructParameterString(parameters) + ")";
@@ -107,7 +106,7 @@ public class StringUtility {
 
         return builder.toString();
     }
-	
+
 	/**
 	 * @param ch
 	 * @return true if the given character is a letter
@@ -123,9 +122,9 @@ public class StringUtility {
 
 
 	}
-	
+
 	/**
-	 * Replace chars that cannot be used for file names 
+	 * Replace chars that cannot be used for file names
 	 * @return
 	 */
 	public static String replaceOddCharsFromFileName(String inString) {
@@ -139,15 +138,14 @@ public class StringUtility {
 				.replaceAll("[<>]", "-")
 				.replace("\\", "_");
 	}
-	
+
 	/**
 	 * Do interpolation like groovy language, using context variables
-	 * ex: provided the 'url' variable is present in test configuration with value 'http://my.site', 
+	 * ex: provided the 'url' variable is present in test configuration with value 'http://my.site',
 	 *     'connect to ${url}' => 'connect to http://my.site
 	 * If testContext is set to mask password, then, they will be replaced by '****'
-	 * 
+	 *
 	 * @param initialString		the string to interpolate
-	 * @param context			context where we will find values
 	 * @return
 	 */
 	public static String interpolateString(String initialString, SeleniumTestsContext testContext) {
@@ -157,38 +155,36 @@ public class StringUtility {
     	}
 		return interpolateString(initialString, testContext, testContext.getMaskedPassword());
 	}
-	
+
 	/**
 	 * Do interpolation like groovy language, using context variables
-	 * ex: provided the 'url' variable is present in test configuration with value 'http://my.site', 
+	 * ex: provided the 'url' variable is present in test configuration with value 'http://my.site',
 	 *     'connect to ${url}' => 'connect to http://my.site
-	 * 
+	 *
 	 * @param initialString		the string to interpolate
-	 * @param context			context where we will find values
-	 * @param maskPasswords		if true, password will be replaced by '****'
 	 * @return
 	 */
 	public static String interpolateString(String initialString, SeleniumTestsContext testContext, Boolean maskPassword) {
 		if (initialString == null) {
 			return null;
 		}
-		
+
 		String interpolatedString  = initialString;
-    	
+
     	if (testContext == null || testContext.getConfiguration() == null) {
     		return initialString;
     	}
     	Map<String, TestVariable> variables = testContext.getConfiguration();
     	List<String> unknownKeys = new ArrayList<>();
-    	
+
     	for (int i = 0; i < 10; i++) {
 	    	Matcher matcher = PLACEHOLDER_PATTERN.matcher(interpolatedString);
 	    	boolean processed = false;
-	    	
+
 	    	while (matcher.find()) {
 	    		processed = true;
 	    		String key = matcher.group(1);
-	    		
+
 	    		if (Boolean.TRUE.equals(maskPassword) && (key.toLowerCase().contains("password") || key.toLowerCase().contains("pwd") || key.toLowerCase().contains("passwd"))) {
 	    			interpolatedString = interpolatedString.replace(String.format("${%s}",  key), "****");
 	    		} else if (variables.containsKey(key)) {
@@ -196,14 +192,14 @@ public class StringUtility {
 	    		} else if (!unknownKeys.contains(key)){
 	    			unknownKeys.add(key);
 	    			logger.warn(String.format("Error while interpolating '%s', key '%s' not found in configuration", interpolatedString, key));
-	    		}	
+	    		}
 	    	}
-	    	
+
 	    	if (!processed) {
 	    		break;
 	    	}
     	}
-    	
+
     	return interpolatedString;
 	}
 
@@ -215,6 +211,9 @@ public class StringUtility {
 	 */
 	public static String encodeString(String message, String format) {
 		String newMessage;
+
+		if (format == null) { throw new CustomSeleniumTestsException("only escaping of 'xml', 'html', 'csv', 'json' is allowed"); }
+
 		switch (format) {
 		case "xml":
 			newMessage = StringEscapeUtils.escapeXml11(message);
@@ -240,6 +239,6 @@ public class StringUtility {
 		}
 		return newMessage;
 	}
-	
-	
+
+
 }

@@ -21,8 +21,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections.ListUtils;
+import org.apache.commons.lang.NotImplementedException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
@@ -31,12 +33,19 @@ import org.openqa.selenium.WebElement;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.WebUIDriver;
 
 public class ByC extends By {
 	
 
-	private static final String ERROR_CANNOT_FIND_ELEMENT_WITH_SUCH_CRITERIA = "Cannot find element with such criteria ";
+    public String getEffectiveXPath() {
+        throw new NotImplementedException("XPath not implemented");
+    }
+
+    private static final String ERROR_CANNOT_FIND_ELEMENT_WITH_SUCH_CRITERIA = "Cannot find element with such criteria ";
 
 	@Override
 	public List<WebElement> findElements(SearchContext context) {
@@ -191,7 +200,7 @@ public class ByC extends By {
 	 * 'text^' => text value starts with the provided value
 	 * 'text$' => text value ends with the provided value
 	 * 'text' => text value equals the provided value
-	 * @param label
+	 * @param textToSearch
 	 * @param tagName
 	 * @return
 	 */
@@ -386,21 +395,23 @@ public class ByC extends By {
 			this.labelTagName = labelTagName == null ? "label": labelTagName;
 		}
 
-		@Override
-		public List<WebElement> findElements(SearchContext context) {
-			if (partial && !label.endsWith("*")) {
-				label += "*";
-			}
-			return context.findElements(By.xpath(String.format(".//%s%s/following::%s", labelTagName, buildSelectorForText(label), tagName)));
-		}
+        @Override
+        public String getEffectiveXPath() {
+            if (partial && !label.endsWith("*")) {
+                label += "*";
+            }
+            return String.format(".//%s%s/following::%s", labelTagName, buildSelectorForText(label), tagName);
+        }
 
-		@Override
-		public WebElement findElement(SearchContext context) {
-			if (partial && !label.endsWith("*")) {
-				label += "*";
-			}
-			return context.findElement(By.xpath(String.format(".//%s%s/following::%s", labelTagName, buildSelectorForText(label), tagName)));
-		}
+        @Override
+        public List<WebElement> findElements(SearchContext context) {
+            return  context.findElements(By.xpath(getEffectiveXPath()));
+        }
+
+        @Override
+        public WebElement findElement(SearchContext context) {
+            return context.findElement(By.xpath(getEffectiveXPath()));
+        }
 
 		@Override
 		public String toString() {
@@ -437,20 +448,22 @@ public class ByC extends By {
 		}
 		
 		@Override
-		public List<WebElement> findElements(SearchContext context) {
+		public String getEffectiveXPath() {
 			if (partial && !label.endsWith("*")) {
 				label += "*";
 			}
-			return context.findElements(By.xpath(String.format(".//%s%s/preceding::%s", labelTagName, buildSelectorForText(label), tagName)));
+			return String.format(".//%s%s/preceding::%s", labelTagName, buildSelectorForText(label), tagName);
 		}
-		
+
+		@Override
+		public List<WebElement> findElements(SearchContext context) {
+			return context.findElements(By.xpath(getEffectiveXPath()));
+		}
+
 		@Override
 		public WebElement findElement(SearchContext context) {
 			List<WebElement> elements;
-			if (partial && !label.endsWith("*")) {
-				label += "*";
-			}
-			elements = context.findElements(By.xpath(String.format(".//%s%s/preceding::%s", labelTagName, buildSelectorForText(label), tagName)));
+			elements = context.findElements(By.xpath(getEffectiveXPath()));
 			List<WebElement> elementsReverse = elements.subList(0, elements.size());
 			Collections.reverse(elementsReverse);
 			return elementsReverse.get(0);
@@ -482,6 +495,11 @@ public class ByC extends By {
 			this.attributeName = attributeName;
 			this.attributeValue = attributeValue;
 		}
+
+		@Override
+		public String getEffectiveXPath() {
+			return String.format(".//*%s", buildSelector());
+		}
 		
 		/**
 		 *Build a xpath selector so that we understand the CSS syntax: https://www.w3schools.com/cssref/css_selectors.asp
@@ -508,15 +526,15 @@ public class ByC extends By {
 			}
 		}
 
-		@Override
-		public List<WebElement> findElements(SearchContext context) {
-			return context.findElements(By.xpath(String.format(".//*%s", buildSelector())));
-		}
+        @Override
+        public List<WebElement> findElements(SearchContext context) {
+            return context.findElements(By.xpath(getEffectiveXPath()));
+        }
 
-		@Override
-		public WebElement findElement(SearchContext context) {
-			return context.findElement(By.xpath(String.format(".//*%s", buildSelector())));
-		}
+        @Override
+        public WebElement findElement(SearchContext context) {
+            return context.findElement(By.xpath(getEffectiveXPath()));
+        }
 
 		@Override
 		public String toString() {
@@ -551,22 +569,24 @@ public class ByC extends By {
 			this.partial = partial;
 		}
 
-		@Override
-		public List<WebElement> findElements(SearchContext context) {
+        @Override
+        public String getEffectiveXPath() {
 			if (partial && !text.endsWith("*")) {
 				text += "*";
 			}
-			return context.findElements(By.xpath(String.format(".//%s%s", tagName, buildSelectorForText(text))));
-		}
+            return String.format(".//%s%s", tagName, buildSelectorForText(text));
+        }
 
-		@Override
-		public WebElement findElement(SearchContext context) {
-			if (partial && !text.endsWith("*")) {
-				text += "*";
-			}
-			return context.findElement(By.xpath(String.format(".//%s%s", tagName, buildSelectorForText(text))));
-		}
-		
+        @Override
+        public List<WebElement> findElements(SearchContext context) {
+            return context.findElements(By.xpath(getEffectiveXPath()));
+        }
+
+        @Override
+        public WebElement findElement(SearchContext context) {
+            return context.findElement(By.xpath(getEffectiveXPath()));
+        }
+
 
 		@Override
 		public String toString() {
@@ -858,15 +878,19 @@ public class ByC extends By {
 	      this.tagName = tagName;
 	    }
 
-	    @Override
-	    public List<WebElement> findElements(SearchContext context) {
-	      return context.findElements(By.xpath(".//" + tagName));
-	    }
+        public String getEffectiveXPath() {
+            return ".//" + tagName;
+        }
 
-	    @Override
-	    public WebElement findElement(SearchContext context) {
-	      return context.findElement(By.xpath(".//" + tagName));
-	    }
+        @Override
+        public List<WebElement> findElements(SearchContext context) {
+            return context.findElements(By.xpath(getEffectiveXPath()));
+        }
+
+        @Override
+        public WebElement findElement(SearchContext context) {
+            return context.findElement(By.xpath(getEffectiveXPath()));
+        }
 
 	    @Override
 	    public String toString() {
@@ -889,15 +913,19 @@ public class ByC extends By {
 	      this.className = className;
 	    }
 
-	    @Override
-	    public List<WebElement> findElements(SearchContext context) {
-	      return context.findElements(By.xpath(".//*[" + containingWord("class", className) + "]"));
-	    }
+        public String getEffectiveXPath() {
+            return (".//*[" + containingWord("class", className) + "]");
+        }
 
-	    @Override
-	    public WebElement findElement(SearchContext context) {
-	      return context.findElement(By.xpath(".//*[" + containingWord("class", className) + "]"));
-	    }
+        @Override
+        public List<WebElement> findElements(SearchContext context) {
+            return context.findElements(By.xpath(getEffectiveXPath()));
+        }
+
+        @Override
+        public WebElement findElement(SearchContext context) {
+            return context.findElement(By.xpath(getEffectiveXPath()));
+        }
 
 	    /**
 	     * Generate a partial XPath expression that matches an element whose specified attribute

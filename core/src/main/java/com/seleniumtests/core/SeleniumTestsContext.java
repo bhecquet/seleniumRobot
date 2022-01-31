@@ -126,6 +126,7 @@ public class SeleniumTestsContext {
     public static final String ADVANCED_ELEMENT_SEARCH = "advancedElementSearch";	// 'false' (default), 'full', 'dom'. if 'dom', store and possibly use found element information to adapt to changes in DOM, using only DOM information. If element is not found, it will try to use other element information to find it
     																				// if 'full', search will also be done using element picture, if available
     
+    public static final String FIND_ERROR_CAUSE = "findErrorCause";				// if 'true', try to find why the test failed
 
     public static final String IMAGE_FIELD_DETECTOR_SERVER_URL = "imageFieldDetectorServerUrl";		// URL of the server that can find fields in an image
     
@@ -224,17 +225,18 @@ public class SeleniumTestsContext {
     public static final String PLATFORM = "platform";							// platform on which test should execute. Ex: Windows 7, Android, iOS, Linux, OS X 10.10. 	
     public static final String CLOUD_API_KEY = "cloudApiKey";					// clé d'accès (dépend des services)
 
-    public static final String TEST_NAME = "testName";
-    public static final String RELATIVE_OUTPUT_DIR = "relativeOutputDir";
-    
     // Neoload specific properties
     public static final String NEOLOAD_USER_PATH = "neoloadUserPath";			// name of the neoload "user path" that will be created in Design mode
     
     public static final String REPORTPORTAL_ACTIVE = "reportPortalActive";		// whether report portal is activated
     
-    // internal storage
+    // internal use
     public static final String TEST_VARIABLES = "testVariables"; 				// configuration (aka variables, get via 'param()' method) used for the current test. It is not updated via XML file
-    																		
+    public static final String TEST_NAME = "testName";
+    public static final String RELATIVE_OUTPUT_DIR = "relativeOutputDir";
+    public static final String RANDOM_IN_ATTACHMENT_NAME = "randomInAttachmentName"; // by default, snapshots are renamed with a random part so that if several steps have the same name, their snapshot do not overwrite.
+    																				// this option disables the behaviour FOR TEST PURPOSE
+    
     // default values
     protected static final List<ReportInfo> DEFAULT_CUSTOM_TEST_REPORTS = Arrays.asList(new ReportInfo("PERF::xml::reporter/templates/report.perf.vm"));
     protected static final List<ReportInfo> DEFAULT_CUSTOM_SUMMARY_REPORTS = Arrays.asList(new ReportInfo("results::json::reporter/templates/report.summary.json.vm"));
@@ -261,6 +263,7 @@ public class SeleniumTestsContext {
 	public static final boolean DEFAULT_MANUAL_TEST_STEPS = false;
 	public static final boolean DEFAULT_HEADLESS_BROWSER = false;
 	public static final boolean DEFAULT_MASK_PASSWORD = true;
+	public static final boolean DEFAULT_FIND_ERROR_CAUSE = false;
 	public static final String DEFAULT_RUN_MODE = "LOCAL";
 	public static final boolean DEFAULT_OVERRIDE_SELENIUM_NATIVE_ACTION = false;
 	public static final boolean DEFAULT_SELENIUMROBOTSERVER_RECORD_RESULTS = false;
@@ -290,6 +293,7 @@ public class SeleniumTestsContext {
 	public static final String DEFAULT_BUGTRACKER_TYPE = null;
 	public static final String DEFAULT_STARTED_BY = null;
 	public static final boolean DEFAULT_REPORTPORTAL_ACTIVE = false;
+	public static final boolean DEFAULT_RANDOM_IN_ATTACHMENT_NAME = true;
 	public static final ElementInfo.Mode DEFAULT_ADVANCED_ELEMENT_SEARCH = ElementInfo.Mode.FALSE;
 	public static final String DEFAULT_IMAGE_FIELD_DETECTOR_SERVER_URL = null;
 	public static final boolean DEFAULT_EDGE_IE_MODE = false;
@@ -388,6 +392,8 @@ public class SeleniumTestsContext {
         setSeleniumRobotServerCompareSnapshotBehaviour(getValueForTest(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, System.getProperty(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR)));
         setSeleniumRobotServerRecordResults(getBoolValueForTest(SELENIUMROBOTSERVER_RECORD_RESULTS, System.getProperty(SELENIUMROBOTSERVER_RECORD_RESULTS)));
         setSeleniumRobotServerVariableOlderThan(getIntValueForTest(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN, System.getProperty(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN)));
+        
+        setFindErrorCause(getBoolValueForTest(FIND_ERROR_CAUSE, System.getProperty(FIND_ERROR_CAUSE)));
         
         setTmsType(getValueForTest(TMS_TYPE, System.getProperty(TMS_TYPE)));
         setTmsUrl(getValueForTest(TMS_URL, System.getProperty(TMS_URL)));
@@ -501,6 +507,8 @@ public class SeleniumTestsContext {
         setViewPortHeight(getIntValueForTest(VIEWPORT_HEIGHT, System.getProperty(VIEWPORT_HEIGHT)));
         
         setNeoloadUserPath(getValueForTest(NEOLOAD_USER_PATH, System.getProperty(NEOLOAD_USER_PATH)));
+        
+        setRandomInAttachmentNames(getBoolValueForTest(RANDOM_IN_ATTACHMENT_NAME, System.getProperty(RANDOM_IN_ATTACHMENT_NAME)));
         
         //setReportPortalActive(getBoolValueForTest(REPORTPORTAL_ACTIVE, System.getProperty(REPORTPORTAL_ACTIVE)));
         
@@ -1041,7 +1049,7 @@ public class SeleniumTestsContext {
 		
 		if (getImageFieldDetectorServerUrl() != null) {
 			
-			return new FieldDetectorConnector(getImageFieldDetectorServerUrl());
+			return FieldDetectorConnector.getInstance(getImageFieldDetectorServerUrl());
 		} else {
 			return null;
 		}
@@ -1442,6 +1450,10 @@ public class SeleniumTestsContext {
 		return (Boolean) getAttribute(MASK_PASSWORD);
 	}
 	
+	public Boolean getRandomInAttachments() {
+		return (Boolean) getAttribute(RANDOM_IN_ATTACHMENT_NAME);
+	}
+	
 	public ITestResult getTestNGResult() {
 		return testNGResult;
 	}
@@ -1623,6 +1635,10 @@ public class SeleniumTestsContext {
     
     public boolean isManualTestSteps() {
     	return (Boolean) getAttribute(MANUAL_TEST_STEPS);
+    }
+
+    public boolean isFindErrorCause() {
+    	return (Boolean) getAttribute(FIND_ERROR_CAUSE);
     }
     
 	public Map<String, String> getDeviceList() {
@@ -1927,6 +1943,14 @@ public class SeleniumTestsContext {
     	}
     }
     
+    public void setFindErrorCause(Boolean active) {
+    	if (active != null) {
+    		setAttribute(FIND_ERROR_CAUSE, active);
+    	} else {
+    		setAttribute(FIND_ERROR_CAUSE, DEFAULT_FIND_ERROR_CAUSE);
+    	}
+    }
+    
 
     public void setReportPortalActive(Boolean active) {
     	if (active != null) {
@@ -2011,9 +2035,9 @@ public class SeleniumTestsContext {
     	}
     }
     
-    public void setSeleniumRobotServerRecordResults(Boolean record) {
-    	if (record != null) {
-    		setAttribute(SELENIUMROBOTSERVER_RECORD_RESULTS, record);
+    public void setSeleniumRobotServerRecordResults(Boolean recordResult) {
+    	if (recordResult != null) {
+    		setAttribute(SELENIUMROBOTSERVER_RECORD_RESULTS, recordResult);
     	} else {
     		setAttribute(SELENIUMROBOTSERVER_RECORD_RESULTS, DEFAULT_SELENIUMROBOTSERVER_RECORD_RESULTS);
     	}
@@ -2023,9 +2047,9 @@ public class SeleniumTestsContext {
 		this.variableAlreadyRequestedFromServer = variableAlreadyRequestedFromServer;
 	}
 
-	public void setOverrideSeleniumNativeAction(Boolean record) {
-    	if (record != null) {
-    		setAttribute(OVERRIDE_SELENIUM_NATIVE_ACTION, record);
+	public void setOverrideSeleniumNativeAction(Boolean override) {
+    	if (override != null) {
+    		setAttribute(OVERRIDE_SELENIUM_NATIVE_ACTION, override);
     	} else {
     		setAttribute(OVERRIDE_SELENIUM_NATIVE_ACTION, DEFAULT_OVERRIDE_SELENIUM_NATIVE_ACTION);
     	}
@@ -2151,6 +2175,14 @@ public class SeleniumTestsContext {
     		setAttribute(MASK_PASSWORD, maskPassword);
     	} else {
     		setAttribute(MASK_PASSWORD, DEFAULT_MASK_PASSWORD);
+    	}
+    }
+    
+    public void setRandomInAttachmentNames(Boolean random) {
+    	if (random != null) {
+    		setAttribute(RANDOM_IN_ATTACHMENT_NAME, random);
+    	} else {
+    		setAttribute(RANDOM_IN_ATTACHMENT_NAME, DEFAULT_RANDOM_IN_ATTACHMENT_NAME);
     	}
     }
     

@@ -31,11 +31,16 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.mockito.stubbing.OngoingStubbing;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -64,6 +69,7 @@ import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnecto
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.WebUIDriverFactory;
+import com.seleniumtests.ut.exceptions.TestConfigurationException;
 
 import kong.unirest.Config;
 import kong.unirest.GetRequest;
@@ -177,53 +183,122 @@ public class ConnectorsTest extends MockitoTest {
 		return createServerMock(serverUrl, requestType, apiPath, statusCode, (Object)replyData, responseType);
 	}
 	
-	private HttpRequest createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, Object replyData, String responseType) throws UnirestException {
+	protected HttpRequest createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, Object replyData, String responseType) throws UnirestException {
+		return createServerMock(serverUrl, requestType, apiPath, statusCode, Arrays.asList(replyData), responseType);
+	}
+	protected HttpRequest createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, final List<Object> replyData, String responseType) throws UnirestException {
+		
+		if (replyData.isEmpty()) {
+			throw new TestConfigurationException("No replyData specified");
+		}
 		
 		@SuppressWarnings("unchecked")
 		HttpResponse<String> response = mock(HttpResponse.class);
 		HttpResponse<JsonNode> jsonResponse = mock(HttpResponse.class);
 		HttpResponse<File> streamResponse = mock(HttpResponse.class);
-		HttpResponse<byte[]> bytestremResponse = mock(HttpResponse.class);
+		HttpResponse<byte[]> bytestreamResponse = mock(HttpResponse.class);
 		HttpRequest request = mock(HttpRequest.class);
 		JsonNode json = mock(JsonNode.class);
-		MultipartBody requestMultipartBody = mock(MultipartBody.class);
 		HttpRequestWithBody postRequest = spy(HttpRequestWithBody.class);
-		RequestBodyEntity requestBodyEntity = mock(RequestBodyEntity.class);
 
 		PagedList<JsonNode> pageList = new PagedList<>(); // for asPaged method
 
 		when(request.getUrl()).thenReturn(serverUrl);
-		if (replyData instanceof String) {
+		if (replyData.get(0) instanceof String) {
 			when(response.getStatus()).thenReturn(statusCode);
-			when(response.getBody()).thenReturn((String)replyData);
+			//when(response.getBody()).thenReturn(replyData.toArray(new String[] {}));
+
+			when(response.getBody()).then(new Answer<String>() {
+			    private int count = -1;
+
+			    public String answer(InvocationOnMock invocation) {
+
+			        count++;
+			    	if (count >= replyData.size() - 1) {
+			    		return (String)replyData.get(replyData.size() - 1);
+			    	} else {
+			    		return (String)replyData.get(count);
+			    	}
+			    }
+			});
 			when(response.getStatusText()).thenReturn("TEXT");
 			
 			when(jsonResponse.getStatus()).thenReturn(statusCode);
 			when(jsonResponse.getBody()).thenReturn(json);
 			when(jsonResponse.getStatusText()).thenReturn("TEXT");
 			try {
-				if (((String) replyData).isEmpty()) {
-					replyData = "{}";
+				// check data is compatible with JSON
+				for (Object d: replyData) {
+					if (((String)d).isEmpty()) {
+						d = "{}";
+					}
+					new JSONObject((String)d);
 				}
-				JSONObject jsonReply = new JSONObject((String)replyData);
-				when(json.getObject()).thenReturn(jsonReply);
+				
+				
+//				JSONObject jsonReply = new JSONObject((String)replyData);
+//				when(json.getObject()).thenReturn(jsonReply);
+				
+				when(json.getObject()).then(new Answer<JSONObject>() {
+				    private int count = -1;
+
+				    public JSONObject answer(InvocationOnMock invocation) {
+
+				        count++;
+				        String reply;
+				    	if (count >= replyData.size() - 1) {
+				    		reply = (String)replyData.get(replyData.size() - 1);
+				    	} else {
+				    		reply = (String)replyData.get(count);
+				    	}
+				    	if (reply.isEmpty()) {
+							reply = "{}";
+						}
+				    	return new JSONObject(reply);
+				    }
+				});
 				
 				pageList = new PagedList<>();
 				pageList.add(jsonResponse);
 				
 			} catch (JSONException e) {}
-		} else if (replyData instanceof File) {
+
+			
+		} else if (replyData.get(0) instanceof File) {
 			when(streamResponse.getStatus()).thenReturn(statusCode);
 			when(streamResponse.getStatusText()).thenReturn("TEXT");
-			when(streamResponse.getBody()).thenReturn((File)replyData);
+			when(streamResponse.getBody()).then(new Answer<File>() {
+			    private int count = -1;
+
+			    public File answer(InvocationOnMock invocation) {
+
+			        count++;
+			    	if (count >= replyData.size() - 1) {
+			    		return (File)replyData.get(replyData.size() - 1);
+			    	} else {
+			    		return (File)replyData.get(count);
+			    	}
+			    }
+			});
+
+			//when(bytestreamResponse.getBody()).thenReturn(FileUtils.readFileToByteArray((File)replyData));
+			when(bytestreamResponse.getBody()).then(new Answer<byte[]>() {
+			    private int count = -1;
+			    
+			    public byte[] answer(InvocationOnMock invocation) throws IOException {
+			    	
+			        count++;
+			    	if (count >= replyData.size() - 1) {
+			    		return (byte[])FileUtils.readFileToByteArray((File)replyData.get(replyData.size() - 1));
+			    	} else {
+			    		return (byte[])FileUtils.readFileToByteArray((File)replyData.get(count));
+			    	}
+			    }
+			});
 			
-			try {
-				when(bytestremResponse.getBody()).thenReturn(FileUtils.readFileToByteArray((File)replyData));
-				when(bytestremResponse.getStatus()).thenReturn(statusCode);
-				when(bytestremResponse.getStatusText()).thenReturn("BYTES");
-			} catch (IOException e) {
-				logger.error("Cannot read file to bytes, this may be a problem for test");
-			}
+			when(bytestreamResponse.getStatus()).thenReturn(statusCode);
+			when(bytestreamResponse.getStatusText()).thenReturn("BYTES");
+
 		}
 		
 		
@@ -233,13 +308,14 @@ public class ConnectorsTest extends MockitoTest {
 				GetRequest getRequest = mock(GetRequest.class); 
 				
 				when(Unirest.get(serverUrl + apiPath)).thenReturn(getRequest);
+				when(getRequest.socketTimeout(anyInt())).thenReturn(getRequest);
 				when(unirestInstance.get(serverUrl + apiPath)).thenReturn(getRequest);
 				
 				when(getRequest.header(anyString(), anyString())).thenReturn(getRequest);
 				when(getRequest.asString()).thenReturn(response);
 				when(getRequest.asJson()).thenReturn(jsonResponse);
 				when(getRequest.asFile(anyString())).thenReturn(streamResponse);
-				when(getRequest.asBytes()).thenReturn(bytestremResponse);
+				when(getRequest.asBytes()).thenReturn(bytestreamResponse);
 				when(getRequest.queryString(anyString(), anyString())).thenReturn(getRequest);
 				when(getRequest.queryString(anyString(), anyInt())).thenReturn(getRequest);
 				when(getRequest.queryString(anyString(), anyBoolean())).thenReturn(getRequest);
@@ -252,42 +328,61 @@ public class ConnectorsTest extends MockitoTest {
 			case "POST":
 				when(Unirest.post(serverUrl + apiPath)).thenReturn(postRequest);
 				when(unirestInstance.post(serverUrl + apiPath)).thenReturn(postRequest);
+				return preparePostRequest(serverUrl, responseType, postRequest, response, jsonResponse);
 			case "PATCH":
 				when(Unirest.patch(serverUrl + apiPath)).thenReturn(postRequest);
 				when(unirestInstance.patch(serverUrl + apiPath)).thenReturn(postRequest);
-				when(postRequest.field(anyString(), anyString())).thenReturn(requestMultipartBody);
-				when(postRequest.field(anyString(), anyInt())).thenReturn(requestMultipartBody);
-				when(postRequest.field(anyString(), anyLong())).thenReturn(requestMultipartBody);
-				when(postRequest.field(anyString(), anyDouble())).thenReturn(requestMultipartBody);
-				when(postRequest.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
-				when(postRequest.basicAuth(anyString(), anyString())).thenReturn(postRequest);
-				when(postRequest.headerReplace(anyString(), anyString())).thenReturn(postRequest);
-				when(postRequest.queryString(anyString(), anyString())).thenReturn(postRequest);
-				when(postRequest.queryString(anyString(), anyInt())).thenReturn(postRequest);
-				when(postRequest.queryString(anyString(), anyBoolean())).thenReturn(postRequest);
-				when(postRequest.queryString(anyString(), any(SessionId.class))).thenReturn(postRequest);
-				when(postRequest.header(anyString(), anyString())).thenReturn(postRequest);
-				when(requestMultipartBody.field(anyString(), anyString())).thenReturn(requestMultipartBody);
-				when(requestMultipartBody.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
-				when(requestMultipartBody.asString()).thenReturn(response);
-				doReturn(response).when(postRequest).asString();
-				when(postRequest.getUrl()).thenReturn(serverUrl);
-				when(postRequest.body(any(JSONObject.class))).thenReturn(requestBodyEntity);
-				when(postRequest.asJson()).thenReturn(jsonResponse);
-				when(requestBodyEntity.asJson()).thenReturn(jsonResponse);
-				when(requestMultipartBody.getUrl()).thenReturn(serverUrl);
-				when(requestMultipartBody.asJson()).thenReturn(jsonResponse);
+				return preparePostRequest(serverUrl, responseType, postRequest, response, jsonResponse);
+			case "PUT":
+				when(Unirest.put(serverUrl + apiPath)).thenReturn(postRequest);
+				when(unirestInstance.put(serverUrl + apiPath)).thenReturn(postRequest);
+				return preparePostRequest(serverUrl, responseType, postRequest, response, jsonResponse);
 				
-				if ("request".equals(responseType)) {
-					return postRequest;
-				} else if ("body".equals(responseType)) {
-					return requestMultipartBody;
-				} else if ("requestBodyEntity".equals(responseType)) {
-					return requestBodyEntity;
-				}
 
 		}
 		return null;	
+	}
+	
+	private HttpRequest preparePostRequest(String serverUrl, String responseType, HttpRequestWithBody postRequest, HttpResponse<String> response, HttpResponse<JsonNode> jsonResponse) {
+
+		RequestBodyEntity requestBodyEntity = mock(RequestBodyEntity.class);
+		MultipartBody requestMultipartBody = mock(MultipartBody.class);
+
+		when(postRequest.socketTimeout(anyInt())).thenReturn(postRequest);
+		when(postRequest.field(anyString(), anyString())).thenReturn(requestMultipartBody);
+		when(postRequest.field(anyString(), anyInt())).thenReturn(requestMultipartBody);
+		when(postRequest.field(anyString(), anyLong())).thenReturn(requestMultipartBody);
+		when(postRequest.field(anyString(), anyDouble())).thenReturn(requestMultipartBody);
+		when(postRequest.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
+		when(postRequest.basicAuth(anyString(), anyString())).thenReturn(postRequest);
+		when(postRequest.headerReplace(anyString(), anyString())).thenReturn(postRequest);
+		when(postRequest.queryString(anyString(), anyString())).thenReturn(postRequest);
+		when(postRequest.queryString(anyString(), anyInt())).thenReturn(postRequest);
+		when(postRequest.queryString(anyString(), anyBoolean())).thenReturn(postRequest);
+		when(postRequest.queryString(anyString(), any(SessionId.class))).thenReturn(postRequest);
+		when(postRequest.header(anyString(), anyString())).thenReturn(postRequest);
+		when(requestMultipartBody.field(anyString(), anyString())).thenReturn(requestMultipartBody);
+		when(requestMultipartBody.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
+		when(requestMultipartBody.asString()).thenReturn(response);
+		doReturn(response).when(postRequest).asString();
+		when(postRequest.getUrl()).thenReturn(serverUrl);
+		when(postRequest.body(any(JSONObject.class))).thenReturn(requestBodyEntity);
+		when(postRequest.body(any(byte[].class))).thenReturn(requestBodyEntity);
+		when(postRequest.asJson()).thenReturn(jsonResponse);
+		when(requestBodyEntity.asJson()).thenReturn(jsonResponse);
+		when(requestBodyEntity.asString()).thenReturn(response);
+		when(requestMultipartBody.getUrl()).thenReturn(serverUrl);
+		when(requestMultipartBody.asJson()).thenReturn(jsonResponse);
+		
+		if ("request".equals(responseType)) {
+			return postRequest;
+		} else if ("body".equals(responseType)) {
+			return requestMultipartBody;
+		} else if ("requestBodyEntity".equals(responseType)) {
+			return requestBodyEntity;
+		} else {
+			return null;
+		}
 	}
 
 	protected OngoingStubbing<JsonNode> createJsonServerMock(String requestType, String apiPath, int statusCode, String ... replyData) throws UnirestException {
@@ -438,7 +533,8 @@ public class ConnectorsTest extends MockitoTest {
 		createServerMock("POST", SeleniumRobotSnapshotServerConnector.VERSION_API_URL, 200, "{'id': '11'}");	
 		createServerMock("POST", SeleniumRobotSnapshotServerConnector.TESTCASE_API_URL, 200, "{'id': '12'}");
 		createServerMock("POST", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL, 200, "{'id': '15'}");
-		createServerMock("POST", SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL, 200, "{'id': '16'}");
+		createServerMock("POST", SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL, 200, "{'id': '16', 'computed': true, 'computingError': '', 'diffPixelPercentage': 0.0, 'tooManyDiffs': false}");
+		createServerMock("PUT", SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL, 200, "{'id': '16', 'computed': true, 'computingError': '', 'diffPixelPercentage': 0.0, 'tooManyDiffs': false}");
 		createServerMock("POST", SeleniumRobotSnapshotServerConnector.EXCLUDE_API_URL, 200, "{'id': '18'}");
 		createServerMock("POST", SeleniumRobotSnapshotServerConnector.STEPRESULT_API_URL, 200, "{'id': '17'}");
 		createServerMock("POST", SeleniumRobotSnapshotServerConnector.SESSION_API_URL, 200, "{'id': '13'}");	
@@ -452,6 +548,7 @@ public class ConnectorsTest extends MockitoTest {
 		createServerMock("GET", SeleniumRobotServerConnector.NAMED_VERSION_API_URL, 200, "{'id': 11}");	
 		
 		createServerMock("POST", SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL, 200, "{'result': 'OK'}"); // upload reference image for step
+		createServerMock("GET", SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL + "17/", 200, Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "images", "googleSearch.png").toFile()); // get reference image
 		
 		SeleniumRobotSnapshotServerConnector connector = new SeleniumRobotSnapshotServerConnector(true, SERVER_URL);
 		
@@ -459,6 +556,7 @@ public class ConnectorsTest extends MockitoTest {
 		connector.setVersionId(null);
 		return connector;
 	}
+	
 	
 	/**
 	 * simulate an alive variable sever responding to all requests

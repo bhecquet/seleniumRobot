@@ -1230,7 +1230,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     		try {
     			executeScript("arguments[0].blur();", element);
     		} catch (Exception e) {	
-    			logger.error(e);
+    			logger.error("Error doing 'blur'", e);
     		}
     	}
     }

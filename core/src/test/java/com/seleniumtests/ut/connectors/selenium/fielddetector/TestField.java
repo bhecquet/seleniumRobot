@@ -98,4 +98,33 @@ public class TestField extends GenericTest {
 		
 		Assert.assertEquals(field.getInnerFieldRectangle(), new Rectangle(76, 205, 278, 19));
 	}
+	
+
+	@Test(groups= {"ut"})
+	public void testMatches() {
+		Field f1 = new Field(0, 100, 0, 20, "foobar", "field");
+		Field f2 = new Field(0, 99, 0, 20, "fooba", "field");
+		Assert.assertTrue(f1.match(f2));
+	}
+	
+	@Test(groups= {"ut"})
+	public void testNoMatchePosition() {
+		Field f1 = new Field(0, 100, 0, 20, "foobar", "field");
+		Field f2 = new Field(100, 199, 0, 20, "fooba", "field");
+		Assert.assertFalse(f1.match(f2));
+	}
+	
+	@Test(groups= {"ut"})
+	public void testNoMatcheClass() {
+		Field f1 = new Field(0, 100, 0, 20, "foobar", "radio");
+		Field f2 = new Field(0, 99, 0, 20, "fooba", "field");
+		Assert.assertFalse(f1.match(f2));
+	}
+	
+	@Test(groups= {"ut"})
+	public void testNoMatcheNullClass() {
+		Field f1 = new Field(0, 100, 0, 20, "foobar", null);
+		Field f2 = new Field(0, 99, 0, 20, "fooba", null);
+		Assert.assertFalse(f1.match(f2));
+	}
 }

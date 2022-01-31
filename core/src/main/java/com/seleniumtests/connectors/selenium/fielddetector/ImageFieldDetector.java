@@ -25,16 +25,45 @@ public class ImageFieldDetector {
 	private double resizeFactor;
 	private FieldDetectorConnector fieldDetectorInstance;
 	private JSONObject detectionJsonData;
+	private FieldType fieldTypeToDetect;
+	
+	public enum FieldType {
+		ALL_FORM_FIELDS,			// all fields: radio, text fields, buttons, ...
+		ERROR_MESSAGES_AND_FIELDS;	// error messages and fields in error
+	}
 	
 	public ImageFieldDetector(File image) {
 		this(image, 1);
 	}
 	public ImageFieldDetector(File image, double resizeFactor) {
+		this(image, resizeFactor, FieldType.ALL_FORM_FIELDS);
+	}
+	
+	/**
+	 * Initialize the image field detector
+	 * Depending on fieldTypeToDetect, it will use either a yolo model or an other
+	 * @param image					the image to detect fields in
+	 * @param resizeFactor			resizing of input image. With a factor > 1, detection will be better but longer
+	 * @param fieldTypeToDetect		ALL_FORM_FIELDS: all fields: radio, text fields, buttons, ...
+	 * 								ERROR_MESSAGE_AND_FIELDS: error messages and fields in error
+	 */
+	public ImageFieldDetector(File image, double resizeFactor, FieldType fieldTypeToDetect) {
 		this.image = image;
 		this.resizeFactor = resizeFactor;
+		this.fieldTypeToDetect = fieldTypeToDetect;
 		fieldDetectorInstance = SeleniumTestsContextManager.getThreadContext().getFieldDetectorInstance();
 		if (fieldDetectorInstance == null) {
 			throw new ConfigurationException("Image Field detector has not been properly configured");
+		}
+	}
+	
+	private void callDetector() {
+		if (detectionJsonData == null) {
+			if (fieldTypeToDetect == FieldType.ALL_FORM_FIELDS) {
+				detectionJsonData = fieldDetectorInstance.detect(image, resizeFactor);
+			} else if (fieldTypeToDetect == FieldType.ERROR_MESSAGES_AND_FIELDS) {
+				detectionJsonData = fieldDetectorInstance.detectError(image, resizeFactor);
+			}
 		}
 	}
 	
@@ -44,14 +73,11 @@ public class ImageFieldDetector {
 	 * @return
 	 */
 	public List<Field> detectFields() {
-		if (detectionJsonData == null) {
-			detectionJsonData = fieldDetectorInstance.detect(image, resizeFactor);
-		}
+		callDetector();
 		
 		List<Field> fields = new ArrayList<>();
 		try {
 			List<JSONObject> jsonFields = detectionJsonData.getJSONArray("fields").toList();
-			
 			
 			for (JSONObject jsonNode: jsonFields) {
 				fields.add(Field.fromJson(jsonNode));
@@ -69,9 +95,7 @@ public class ImageFieldDetector {
 	 * @return
 	 */
 	public List<Label> detectLabels() {
-		if (detectionJsonData == null) {
-			detectionJsonData = fieldDetectorInstance.detect(image, resizeFactor);
-		}
+		callDetector();
 
 		List<Label> labels = new ArrayList<>();
 		

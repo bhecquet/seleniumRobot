@@ -47,6 +47,8 @@ import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnecto
 import com.seleniumtests.connectors.tms.reportportal.ReportPortalService;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.testanalysis.ErrorCause;
+import com.seleniumtests.core.testanalysis.ErrorCauseFinder;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.ScenarioException;
@@ -128,6 +130,11 @@ public class ReporterControler implements IReporter {
 			} catch (Exception e) {
 				logger.error("Error generating JUnit report", e);
 			}
+
+			// find error causes once tests are finished
+			if (suiteFinished && SeleniumTestsContextManager.getGlobalContext().isFindErrorCause()) {
+				findErrorCauses(resultSet);
+			}
 			
 			
 			for (Class<?> reporterClass: SeleniumTestsContextManager.getGlobalContext().getReporterPluginClasses()) {
@@ -147,8 +154,25 @@ public class ReporterControler implements IReporter {
 					logger.error("Error generating report", e);
 				}
 			}
+			
 
 		}
+	}
+	
+	private void findErrorCauses(Map<ITestContext, Set<ITestResult>> resultSet) {
+		for (Set<ITestResult> rs: resultSet.values()) {
+			for (ITestResult testResult: rs) {
+				
+				// When SeleniumRobotTestRecorded has been run, results are stored on seleniumRobot server and it's then possible 
+				// to compare reference snapshot with current failed step (if any)
+				if (!testResult.isSuccess() && TestNGResultUtils.isSeleniumServerReportCreated(testResult) && testResult.getThrowable() != null && !(testResult.getThrowable() instanceof AssertionError)) {
+					List<ErrorCause> errorCauses = new ErrorCauseFinder(testResult).findErrorCause();
+					TestNGResultUtils.setErrorCauses(testResult, errorCauses);
+				}
+			}
+		}
+		
+		
 	}
 	
 	/**

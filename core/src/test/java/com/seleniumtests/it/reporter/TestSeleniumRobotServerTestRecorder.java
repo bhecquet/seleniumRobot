@@ -20,6 +20,7 @@ package com.seleniumtests.it.reporter;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
@@ -33,6 +34,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
 import org.mockito.Mock;
@@ -46,13 +48,16 @@ import org.testng.xml.XmlSuite.ParallelMode;
 
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
+import com.seleniumtests.connectors.selenium.fielddetector.FieldDetectorConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.reporters.CommonReporter;
 import com.seleniumtests.reporter.reporters.SeleniumRobotServerTestRecorder;
 
-@PrepareForTest({SeleniumRobotSnapshotServerConnector.class, CommonReporter.class, SeleniumRobotVariableServerConnector.class, SeleniumTestsContext.class})
+import kong.unirest.json.JSONObject;
+
+@PrepareForTest({SeleniumRobotSnapshotServerConnector.class, CommonReporter.class, SeleniumRobotVariableServerConnector.class, SeleniumTestsContext.class, FieldDetectorConnector.class})
 public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	
 	private SeleniumRobotServerTestRecorder reporter;
@@ -62,6 +67,9 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	
 	@Mock
 	SeleniumRobotVariableServerConnector variableServer;
+	
+	@Mock
+	FieldDetectorConnector fieldDetectorConnector;
 	
 	/**
 	 * In this test, everything is fine with seleniumrobot server
@@ -261,6 +269,10 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 		}
 	}
 	
+	/**
+	 * Check reference snapshot is retrieved when step fails
+	 * @throws Exception
+	 */
 	@Test(groups={"it"})
 	public void testReportContainsStepReferenceForFailedStep() throws Exception {
 		
@@ -270,16 +282,16 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			System.setProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL, "http://localhost:1234");
 
 			initMocks();
+			
 			when(serverConnector.createTestStep("_writeSomethingOnNonExistentElement ", 0)).thenReturn(120);
 			doReturn(123).when(serverConnector).recordStepResult(eq(false), anyString(), anyLong(), anyInt(), anyInt(), eq(120));
-//			when(serverConnector.recordStepResult(eq(false), anyString(), anyInt(), anyInt(), anyInt(), eq(120))).thenReturn(123);
-			
+
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShortKo"});
 
 			verify(serverConnector).createTestStep("_writeSomethingOnNonExistentElement ", 0);
-			verify(serverConnector).getReferenceSnapshot(123); // check id of failed "stepResult" is used and we try to get the reference image for this failed step
 			verify(serverConnector, times(2)).createStepReferenceSnapshot(any(Snapshot.class), eq(0)); // reference recording for other steps
 			verify(serverConnector, never()).createStepReferenceSnapshot(any(Snapshot.class), eq(123)); // no reference recording for failed step
 			
@@ -289,11 +301,12 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL);
 		}
 	}
 	
 	/**
-	 * If SELENIUMROBOTSERVER_COMPARE_SNAPSHOT is true but SELENIUMROBOTSERVER_RECORD_RESULTS, references should not be recorded
+	 * If SELENIUMROBOTSERVER_COMPARE_SNAPSHOT is true but not SELENIUMROBOTSERVER_RECORD_RESULTS, references should not be recorded
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})
@@ -306,17 +319,16 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "false");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			System.setProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL, "http://localhost:1234");
 			
 
 			initMocks();
 			when(serverConnector.createTestStep("_writeSomethingOnNonExistentElement ", 0)).thenReturn(120);
 			doReturn(123).when(serverConnector).recordStepResult(eq(false), anyString(), anyLong(), anyInt(), anyInt(), eq(120));
-//			when(serverConnector.recordStepResult(eq(false), anyString(), anyInt(), anyInt(), anyInt(), eq(120))).thenReturn(123);
-			
+
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShortKo"});
 			
 			verify(serverConnector).createTestStep("_writeSomethingOnNonExistentElement ", 0);
-			verify(serverConnector, never()).getReferenceSnapshot(123); // check id of failed "stepResult" is used and we try to get the reference image for this failed step
 			verify(serverConnector, never()).createStepReferenceSnapshot(any(Snapshot.class), eq(0)); // no reference recording at all
 			verify(serverConnector, never()).createStepReferenceSnapshot(any(Snapshot.class), eq(123)); // no reference recording for failed step
 			
@@ -327,6 +339,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL);
 		}
 	}
 	
@@ -344,6 +357,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			System.setProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL, "http://localhost:1234");
 			
 			
 			initMocks();
@@ -366,6 +380,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL);
 		}
 	}
 
@@ -382,6 +397,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			System.setProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL, "http://localhost:1234");
 			
 			
 			initMocks();
@@ -404,6 +420,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL);
 		}
 	}
 
@@ -425,6 +442,12 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 
 		PowerMockito.mockStatic(SeleniumRobotSnapshotServerConnector.class);
 		PowerMockito.doReturn(serverConnector).when(SeleniumRobotSnapshotServerConnector.class, "getInstance");
+		when(serverConnector.getReferenceSnapshot(anyInt())).thenReturn(File.createTempFile("img", ".png"));
+		
+		PowerMockito.mockStatic(FieldDetectorConnector.class);
+		PowerMockito.doReturn(fieldDetectorConnector).when(FieldDetectorConnector.class, "getInstance", anyString());
+		when(fieldDetectorConnector.detect(any(File.class), anyDouble())).thenReturn(new JSONObject("{'fields': [], 'labels': []}"));
+		when(fieldDetectorConnector.detectError(any(File.class), anyDouble())).thenReturn(new JSONObject("{'fields': [], 'labels': []}"));
 
 		doReturn(serverConnector).when(reporter).getServerConnector();
 		when(serverConnector.getActive()).thenReturn(true);

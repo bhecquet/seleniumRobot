@@ -24,6 +24,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.xml.bind.JAXBException;
+
 import org.apache.commons.io.FileUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -137,7 +139,7 @@ public class HpAlmConnector extends TestManager {
 		}
 	}
 	
-	public void updateRunStatus() throws Exception {
+	public void updateRunStatus() throws JAXBException {
 
 		// création du XML de modification
 		HashMap<String, String> fields = new HashMap<>();

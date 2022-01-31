@@ -25,6 +25,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -50,6 +51,7 @@ import org.testng.ITestResult;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.testanalysis.ErrorCause;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.reporter.logger.GenericFile;
@@ -66,7 +68,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
  */
 public class SeleniumTestsReporter2 extends CommonReporter implements IReporter {
 
-	private static final String RESOURCES_FOLDER = "resources";
+	public static final String RESOURCES_FOLDER = "resources";
 	private static final String STATUS = "status";
 	private static final String HEADER = "header";
 	private static final String APPLICATION = "application";
@@ -262,7 +264,21 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		
 		context.put("testName", testName);
 		context.put("description", StringUtility.encodeString(TestNGResultUtils.getTestDescription(testResult), "html"));
-		context.put("testInfos", relocateTestInfos(testResult, TestNGResultUtils.getTestInfoEncoded(testResult, "html")));
+		
+
+		// error causes
+		Map<String, String> testInfos = TestNGResultUtils.getTestInfoEncoded(testResult, "html");
+		if (!TestNGResultUtils.getErrorCauses(testResult).isEmpty()) {
+			
+			String causes = String.join("<br/>", TestNGResultUtils.getErrorCauses(testResult)
+					.stream()
+					.map(e -> String.format("<li>%s</li>", e))
+					.collect(Collectors.toList()));
+			testInfos.put("Possible error causes", String.format("<ul>%s</ul>", causes));
+		}
+		
+		
+		context.put("testInfos", relocateTestInfos(testResult, testInfos));
 		
 		// Application information
 		fillContextWithTestParams(context, testResult);      
@@ -293,8 +309,8 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			}
 			stepInfo.add(encodedTestStep.getDuration() / (double)1000);
 			stepInfo.add(encodedTestStep);	
-			stepInfo.add(encodedTestStep.getErrorCause());	
-			stepInfo.add(encodedTestStep.getErrorCauseDetails());	
+			stepInfo.add(encodedTestStep.getRootCause());	
+			stepInfo.add(encodedTestStep.getRootCauseDetails());	
 			
 			// do not display video timestamp if video is not taken, or removed
 			if (encodedTestStep.getVideoTimeStamp() > 0 && videoInReport) {
@@ -353,7 +369,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 	 * @return
 	 */
 	private Map<String, String> relocateTestInfos(ITestResult testResult, Map<String, String> testInfos) {
-		Map<String, String> relocatedTestInfos = new LinkedHashMap<String, String>();
+		Map<String, String> relocatedTestInfos = new LinkedHashMap<>();
 		for (Entry<String, String> testInfo: testInfos.entrySet()) {
 			if (testInfo.getValue().contains(String.format("<a href=\"%s/", TestNGResultUtils.getUniqueTestName(testResult)))) {
 				relocatedTestInfos.put(testInfo.getKey(), testInfo.getValue().replace(TestNGResultUtils.getUniqueTestName(testResult) + "/", ""));

@@ -52,7 +52,7 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
 	}
 	
 	/**
-	 * Select the right browser info, depending on type, version and binary
+	 * In local mode, select the right browser info, depending on type, version and binary
 	 * If several version are available, the highest is selected. This means that if betaVersion option is selected, we will get the beta browser.
 	 * 
 	 * @param browserType		the browser to select (chrome, firefox, ...)
@@ -65,17 +65,26 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
 
     	// automatic list from OS + binary added as launch option (see SeleniumTestsContext.updateInstalledBrowsers())
     	List<BrowserInfo> browserInfos = OSUtility.getInstalledBrowsersWithVersion(webDriverConfig.getBetaBrowser()).get(browserType);
-    	
-    	if (version != null) { 
+
+		if (version != null) {
     		selectedBrowserInfo = BrowserInfo.getInfoFromVersion(version, browserInfos);
     	} else if (binPath != null) {
     		selectedBrowserInfo = BrowserInfo.getInfoFromBinary(binPath, browserInfos);
     		logger.info("Using user defined browser binary from: " + selectedBrowserInfo.getPath());
-    	} else {
-    		selectedBrowserInfo = BrowserInfo.getHighestDriverVersion(browserInfos);
-    	}
-    	
-    	// in case of legacy firefox driverFileName is null
+    	} else  {
+			for (BrowserInfo browser : browserInfos) {
+				if (webDriverConfig.getBetaBrowser().equals(browser.getBeta())) {
+					selectedBrowserInfo = browser;
+				}
+			}
+		}
+		
+		if (selectedBrowserInfo == null ) {
+			throw new ConfigurationException(String.format("Browser %s %s is not available",
+					webDriverConfig.getBrowserType(), webDriverConfig.getBetaBrowser() ? "beta" : ""));
+		}
+
+		// in case of legacy firefox driverFileName is null
     	String newDriverPath = new DriverExtractor().extractDriver(selectedBrowserInfo.getDriverFileName());
     	if (driverPath != null) {
     		newDriverPath = driverPath;
@@ -112,6 +121,7 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
             if (!webDriverConfig.getNodeTags().isEmpty()) {
             	options.setCapability(SeleniumRobotCapabilityType.NODE_TAGS, webDriverConfig.getNodeTags());
             }
+            options.setCapability(SeleniumRobotCapabilityType.BETA_BROWSER, webDriverConfig.getBetaBrowser());
             updateGridOptionsWithSelectedBrowserInfo(options);
         }
 

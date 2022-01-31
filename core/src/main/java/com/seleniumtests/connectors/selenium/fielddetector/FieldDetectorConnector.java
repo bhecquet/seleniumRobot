@@ -2,6 +2,7 @@ package com.seleniumtests.connectors.selenium.fielddetector;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.seleniumtests.customexception.ConfigurationException;
@@ -22,15 +23,33 @@ import kong.unirest.json.JSONObject;
 public class FieldDetectorConnector {
 
 	private String url;
-	private static final String STATUS_URL = "/status";
-	private static final String DETECT_URL = "/detect";
+	public static final String STATUS_URL = "/status";
+	public static final String DETECT_URL = "/detect";
+	public static final String DETECT_ERROR_URL = "/detectError";
+	private static FieldDetectorConnector fieldDetectorConnector;
+	
+	
+	/**
+	 * For test only
+	 * @param fieldDetectorConnector
+	 */
+	public static void resetFieldDetectorConnector() {
+		FieldDetectorConnector.fieldDetectorConnector = null;
+	}
+
+	public static FieldDetectorConnector getInstance(String url) {
+		if (fieldDetectorConnector == null) {
+			fieldDetectorConnector = new FieldDetectorConnector(url);
+		} 
+		return fieldDetectorConnector;
+	}
 	
 	/**
 	 * 
 	 * @param url	URL of the service
 	 */
-	public FieldDetectorConnector(String url) {
-		this.url = url + DETECT_URL;
+	private FieldDetectorConnector(String url) {
+		this.url = url;
 		
 		try {
 			HttpResponse<String> response = Unirest.get(url + STATUS_URL).asString();
@@ -42,10 +61,50 @@ public class FieldDetectorConnector {
 		}
 	}
 	
+	/**
+	 * Detect fields and labels
+	 * @param imageFile
+	 * @return
+	 */
 	public JSONObject detect(File imageFile) {
 		return detect(imageFile, 1);
 	}
+	
+	/**
+	 * Detect fields and labels
+	 * @param imageFile
+	 * @return
+	 */
 	public JSONObject detect(File imageFile, double resizeFactor) {
+		return detect(imageFile, resizeFactor, DETECT_URL);
+	}
+
+	/**
+	 * Detect error message and fieids in error
+	 * @param imageFile
+	 * @return
+	 */
+	public JSONObject detectError(File imageFile) {
+		return detectError(imageFile, 1);
+	}
+	
+	/**
+	 * Detect error message and fieids in error
+	 * @param imageFile
+	 * @return
+	 */
+	public JSONObject detectError(File imageFile, double resizeFactor) {
+		return detect(imageFile, resizeFactor, DETECT_ERROR_URL);
+	}
+	
+	/**
+	 * Send image to image field detector and retrieve the box and text
+	 * @param imageFile
+	 * @param resizeFactor
+	 * @param urlPath
+	 * @return
+	 */
+	private JSONObject detect(File imageFile, double resizeFactor, String urlPath) {
 		if (imageFile == null) {
 			throw new ScenarioException("Image file is null");
 		}
@@ -53,19 +112,32 @@ public class FieldDetectorConnector {
 			throw new ScenarioException(String.format("Image file %s not found", imageFile.getAbsolutePath()));
 		}
 		
-		HttpResponse<JsonNode> fieldDefinition = Unirest.post(url)
+		HttpResponse<JsonNode> fieldDefinition = Unirest.post(url + urlPath)
 				.field("resize", resizeFactor)
 				.field("image", imageFile)
 				.asJson();
+		
+		JSONObject bodyObject = fieldDefinition.getBody().getObject();
 		if (fieldDefinition.getStatus() != 200) {
 			try {
-				throw new ScenarioException("Field detector returned error: " + fieldDefinition.getBody().getObject().get("error"));
+				throw new ScenarioException("Field detector returned error: " + bodyObject.get("error"));
 			} catch (NullPointerException e) {
 				throw new ScenarioException("Field detector returned error");
 			}
 		}
 		
-		return fieldDefinition.getBody().getObject().getJSONObject(imageFile.getName());
+		
+		List<String> imageNames = new ArrayList<>(Arrays.asList(JSONObject.getNames(bodyObject)));
+		imageNames.remove("error");
+		
+		if (imageNames.isEmpty()) {
+			throw new ScenarioException("Field detector did not return any information: " + bodyObject.get("error"));
+		}
+		
+		return bodyObject.getJSONObject(imageNames.get(0));
 		
 	}
 }
+
+
+
