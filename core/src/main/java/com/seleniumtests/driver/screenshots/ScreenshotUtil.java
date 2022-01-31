@@ -458,12 +458,12 @@ public class ScreenshotUtil {
             
             // android does not support screenshot from webview context, switch temporarly to native_app context to take screenshot
             if (uiDriver != null && uiDriver.getConfig().getBrowserType() == BrowserType.BROWSER) {
-            	((AndroidDriver<WebElement>)((CustomEventFiringWebDriver)driver).getWebDriver()).context("NATIVE_APP");
+            	((AndroidDriver)((CustomEventFiringWebDriver)driver).getWebDriver()).context("NATIVE_APP");
             }
 
             String screenshotB64 = screenShot.getScreenshotAs(OutputType.BASE64);
             if (uiDriver != null && uiDriver.getConfig().getBrowserType() == BrowserType.BROWSER) {
-            	((AndroidDriver<WebElement>)((CustomEventFiringWebDriver)driver).getWebDriver()).context("WEBVIEW");
+            	((AndroidDriver)((CustomEventFiringWebDriver)driver).getWebDriver()).context("WEBVIEW");
             }
             
             BufferedImage capturedImage = ImageProcessor.loadFromB64String(screenshotB64);

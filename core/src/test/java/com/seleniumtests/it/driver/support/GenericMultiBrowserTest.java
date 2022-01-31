@@ -47,6 +47,7 @@ import org.testng.annotations.BeforeMethod;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.MockitoTest;
+import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.TestType;
@@ -78,6 +79,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	protected DriverScrollingTestPage scrollingTestPage;
 	protected DriverTestPageSalesforceLightning lightningPage;
 	protected ITestContext testNGCtx;
+	private SeleniumGridConnector seleniumGridConnector;
 	private String testPageName;
 	protected String testPageUrl;
 	
@@ -142,14 +144,24 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 
 //		SeleniumTestsContextManager.getThreadContext().setDebug("gui"); // for testing issue #294
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
+//		SeleniumTestsContextManager.getThreadContext().setBetaBrowser(true);
 		SeleniumTestsContextManager.getThreadContext().setBrowser(browserType.getBrowserType());
 		SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(false);
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(15);
+		
+//		// edge IE mode
+//		SeleniumTestsContextManager.getThreadContext().setEdgeIeMode(true);
+//		SeleniumTestsContextManager.getThreadContext().setDebug("driver");
 
-		// grid support
-//		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://127.0.0.1:4444/wd/hub");
+//		// grid support
+//		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://10.200.42.9:4444/wd/hub");
 //		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
+//		
+//		// restore the grid connector as it's not in context for this test
+//		if (driver != null && !SeleniumTestsContextManager.getThreadContext().getWebDriverGrid().isEmpty()) {
+//			SeleniumTestsContextManager.getThreadContext().setSeleniumGridConnector(seleniumGridConnector);
+//		}
 	}
 	
 	
@@ -213,6 +225,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 			throw e;
 		}
 		driver = WebUIDriver.getWebDriver(true);
+		seleniumGridConnector = SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector();
 	}
 	
 

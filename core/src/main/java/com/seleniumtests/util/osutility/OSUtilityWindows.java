@@ -270,7 +270,6 @@ public class OSUtilityWindows extends OSUtility {
 		Map<BrowserType, List<BrowserInfo>> browserList = new EnumMap<>(BrowserType.class);
 		
 		browserList.put(BrowserType.HTMLUNIT, Arrays.asList(new BrowserInfo(BrowserType.HTMLUNIT, BrowserInfo.LATEST_VERSION, null)));
-		browserList.put(BrowserType.PHANTOMJS, Arrays.asList(new BrowserInfo(BrowserType.PHANTOMJS, BrowserInfo.LATEST_VERSION, null)));
 		
 		// look for Firefox
 		try {

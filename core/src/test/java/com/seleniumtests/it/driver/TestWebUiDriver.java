@@ -35,12 +35,9 @@ import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.mockito.Mock;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.*;
 import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.Timeouts;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -93,10 +90,10 @@ public class TestWebUiDriver extends ReporterTest {
 	private InstrumentsWrapper instrumentsWrapper;
 	
 	@Mock
-	private AndroidDriver<?> androidDriver;
+	private AndroidDriver androidDriver;
 	
 	@Mock
-	private IOSDriver<?> iosDriver;
+	private IOSDriver iosDriver;
 	
 	@Mock
 	private Options driverOptions;
@@ -117,7 +114,7 @@ public class TestWebUiDriver extends ReporterTest {
 		
 		whenNew(AndroidDriver.class).withAnyArguments().thenReturn(androidDriver);
 		when(androidDriver.manage()).thenReturn(driverOptions);
-		when(androidDriver.getCapabilities()).thenReturn(DesiredCapabilities.chrome());
+		when(androidDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
 		when(driverOptions.timeouts()).thenReturn(timeouts);
 		
 		SeleniumTestsContextManager.getThreadContext().setRunMode("local");
@@ -156,7 +153,7 @@ public class TestWebUiDriver extends ReporterTest {
 		
 		whenNew(AndroidDriver.class).withAnyArguments().thenReturn(androidDriver);
 		when(androidDriver.manage()).thenReturn(driverOptions);
-		when(androidDriver.getCapabilities()).thenReturn(DesiredCapabilities.chrome());
+		when(androidDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
 		when(driverOptions.timeouts()).thenReturn(timeouts);
 		
 		SeleniumTestsContextManager.getThreadContext().setRunMode("local");
@@ -191,7 +188,7 @@ public class TestWebUiDriver extends ReporterTest {
 		
 		whenNew(IOSDriver.class).withAnyArguments().thenReturn(iosDriver);
 		when(iosDriver.manage()).thenReturn(driverOptions);
-		when(iosDriver.getCapabilities()).thenReturn(DesiredCapabilities.chrome());
+		when(iosDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
 		when(driverOptions.timeouts()).thenReturn(timeouts);
 		
 		SeleniumTestsContextManager.getThreadContext().setRunMode("local");
@@ -231,7 +228,7 @@ public class TestWebUiDriver extends ReporterTest {
 			
 			whenNew(AndroidDriver.class).withAnyArguments().thenReturn(androidDriver);
 			when(androidDriver.manage()).thenReturn(driverOptions);
-			when(androidDriver.getCapabilities()).thenReturn(DesiredCapabilities.chrome());
+			when(androidDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
 			when(driverOptions.timeouts()).thenReturn(timeouts);
 			
 			SeleniumTestsContextManager.getThreadContext().setRunMode("local");

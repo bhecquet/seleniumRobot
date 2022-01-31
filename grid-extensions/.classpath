@@ -10,12 +10,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry including="**/browserfactory/mobile/**|**/browserfactory/BrowserInfo.java|**/browserfactory/SeleniumRobotCapabilityType.java|**/util/osutility/**|**/util/FileUtility.java|**/util/NetworkUtility.java|**/driver/CustomEventFiringWebDriver.java" kind="src" output="target/classes" path="Dev/seleniumRobot/seleniumRobot-core/core/src/main/java">
-		<attributes>
-			<attribute name="optional" value="true"/>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/java">
 		<attributes>
 			<attribute name="optional" value="true"/>

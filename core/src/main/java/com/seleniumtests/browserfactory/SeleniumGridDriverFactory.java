@@ -77,8 +77,6 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 		        	return new HtmlUnitCapabilitiesFactory(webDriverConfig);
 		        case SAFARI :
 		        	return new SafariCapabilitiesFactory(webDriverConfig);
-		        case PHANTOMJS :
-		        	return new PhantomJSCapabilitiesFactory(webDriverConfig);
 		        case EDGE :
 		        	return new EdgeCapabilitiesFactory(webDriverConfig);
 		        default :
@@ -182,8 +180,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
      * In case we do not find any node after 30 mins, we fail and increment a fail counter
      * This fail counter is reset every time we find a node
      * If this counter reaches 3, then we don't even try to get a driver
-     * 
-     * @param url
+     *
      * @param capability
      * @return
      */

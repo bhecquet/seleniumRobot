@@ -1,29 +1,5 @@
 package com.seleniumtests.connectors.extools;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.input.BOMInputStream;
-import org.apache.commons.lang3.StringUtils;
-import org.jdom2.DataConversionException;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
-import org.testng.Reporter;
-import org.xml.sax.InputSource;
-
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
@@ -34,6 +10,24 @@ import com.seleniumtests.reporter.logger.TestMessage;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.logging.ScenarioLogger;
+import org.apache.commons.io.FileUtils;
+import org.jdom2.DataConversionException;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
+import org.testng.Reporter;
+import org.xml.sax.InputSource;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Connector for executing UFT tests either locally or remotely on selenium grid
@@ -59,7 +53,6 @@ public class Uft {
 	Map<String, String> parameters;
 	
 	/**
-	 * @param vbsPath		path to the vbs file (locally, or on the remote machine)
 	 * @param scriptPath	path to the script, either local or from ALM. If test is from ALM, prefix it with '[QualityCenter]'. e.g: '[QualityCenter]Subject\TOOLS\TestsFoo\foo'
 	 * @param parameters	parameters to pass to the script
 	 */
@@ -144,7 +137,7 @@ public class Uft {
 	/**
 	 * Analyze Result.xml content
 	 * @param output		the Result.xml content as a string
-	 * @param duration		duration of the execution
+	 * @param testStep		the test step to analyze
 	 * @return
 	 */
 	public TestStep analyseOutput(String output, TestStep testStep) {

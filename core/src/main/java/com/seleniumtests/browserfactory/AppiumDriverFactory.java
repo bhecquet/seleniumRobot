@@ -76,10 +76,10 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
 	        if(ANDROID_PLATORM.equalsIgnoreCase(webDriverConfig.getPlatform())) {
 	        	extractAndroidDriver(capabilities);
 
-	            return new AndroidDriver<WebElement>(new URL(appiumLauncher.getAppiumServerUrl()), capabilities);
+	            return new AndroidDriver(new URL(appiumLauncher.getAppiumServerUrl()), capabilities);
 	            
 	        } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){
-	            return new IOSDriver<WebElement>(new URL(appiumLauncher.getAppiumServerUrl()), capabilities);
+	            return new IOSDriver(new URL(appiumLauncher.getAppiumServerUrl()), capabilities);
 	            
 	        } else {
 	        	throw new ConfigurationException(String.format("Platform %s is unknown for Appium tests", webDriverConfig.getPlatform()));

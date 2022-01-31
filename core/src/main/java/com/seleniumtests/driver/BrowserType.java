@@ -26,7 +26,6 @@ public enum BrowserType {
     OPERA("*opera"),
     SAFARI("*safari"),
     BROWSER("*browser"), // default Android browser
-    PHANTOMJS("*phantomjs"),
     NONE("*none")
     ;
 
@@ -53,8 +52,6 @@ public enum BrowserType {
             return BrowserType.SAFARI;
         } else if (browserType.toLowerCase().contains("browser") || browserType.toLowerCase().contains("android")) {
         	return BrowserType.BROWSER;
-        } else if (browserType.toLowerCase().contains("phantomjs")) {
-            return BrowserType.PHANTOMJS;
         } else if (browserType.toLowerCase().contains("none")) {
         	return BrowserType.NONE;
         } 
@@ -79,8 +76,6 @@ public enum BrowserType {
     		return org.openqa.selenium.remote.BrowserType.IE;
     	} else if (browserType == BrowserType.HTMLUNIT) {
     		return org.openqa.selenium.remote.BrowserType.HTMLUNIT;
-    	} else if (browserType == BrowserType.PHANTOMJS) {
-    		return org.openqa.selenium.remote.BrowserType.PHANTOMJS;
     	} else if (browserType == BrowserType.BROWSER) {
     		return org.openqa.selenium.remote.BrowserType.ANDROID;
     	} else {
@@ -101,8 +96,6 @@ public enum BrowserType {
     		return BrowserType.INTERNET_EXPLORER;
     	} else if (org.openqa.selenium.remote.BrowserType.HTMLUNIT.equals(browserType)) {
     		return BrowserType.HTMLUNIT;
-    	} else if (org.openqa.selenium.remote.BrowserType.PHANTOMJS.equals(browserType)) {
-    		return BrowserType.PHANTOMJS;
     	} else if (org.openqa.selenium.remote.BrowserType.ANDROID.equals(browserType)) {
     		return BrowserType.BROWSER;
     	} else {

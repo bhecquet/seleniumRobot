@@ -32,6 +32,7 @@ import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.edge.EdgeDriverService;
+import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -39,7 +40,6 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.microsoft.edge.seleniumtools.EdgeOptions;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.browserfactory.EdgeCapabilitiesFactory;
