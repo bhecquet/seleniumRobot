@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
-import org.openqa.selenium.WebDriverException;
 
 import com.seleniumtests.util.ExceptionUtility;
 import com.seleniumtests.util.StringUtility;

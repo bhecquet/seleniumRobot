@@ -65,6 +65,7 @@ public class TestStep extends TestAction {
 	private ITestResult testResult;
 	private RootCause errorCause;
 	private String errorCauseDetails;
+	private Integer stepResultId;  // the stepResult if it has been recorded on seleniumRobot-server
 	private boolean disableBugtracker;
 	
 	public enum StepStatus {
@@ -394,7 +395,16 @@ public class TestStep extends TestAction {
 	}
 	
 
+	/**
+	 * @deprecated use 'getRootCause' instead
+	 * @return
+	 */
+	@Deprecated
 	public RootCause getErrorCause() {
+		return getRootCause();
+	}
+
+	public RootCause getRootCause() {
 		if (getStepStatus() == StepStatus.SUCCESS) {
 			return null;
 		}
@@ -402,19 +412,29 @@ public class TestStep extends TestAction {
 			return errorCause;
 		} 
 		for (TestAction action: stepActions) {
-			if ((action instanceof TestStep && ((TestStep) action).getErrorCause() != null)) {
-				return ((TestStep) action).getErrorCause();
+			if ((action instanceof TestStep && ((TestStep) action).getRootCause() != null)) {
+				return ((TestStep) action).getRootCause();
 			}
 		}
 		
 		return errorCause;
 	}
 	
+
+	/**
+	 * @deprecated use getRootCauseDetails instead
+	 * @return
+	 */
+	@Deprecated
+	public String getErrorCauseDetails() {
+		return getRootCauseDetails();
+	}
+	
 	/**
 	 * Returns the error cause detail of the step or any sub step
 	 * @return
 	 */
-	public String getErrorCauseDetails() {
+	public String getRootCauseDetails() {
 		if (getStepStatus() == StepStatus.SUCCESS) {
 			return null;
 		}
@@ -422,8 +442,8 @@ public class TestStep extends TestAction {
 			return errorCauseDetails;
 		} 
 		for (TestAction action: stepActions) {
-			if ((action instanceof TestStep && ((TestStep) action).getErrorCause() != null)) {
-				return ((TestStep) action).getErrorCauseDetails();
+			if ((action instanceof TestStep && ((TestStep) action).getRootCause() != null)) {
+				return ((TestStep) action).getRootCauseDetails();
 			}
 		}
 		return errorCauseDetails;
@@ -491,6 +511,12 @@ public class TestStep extends TestAction {
 	}
 	public void setVideoTimeStamp(long videoTimeStamp) {
 		this.videoTimeStamp = videoTimeStamp;
+	}
+	public Integer getStepResultId() {
+		return stepResultId;
+	}
+	public void setStepResultId(Integer stepResultId) {
+		this.stepResultId = stepResultId;
 	}
 	
 }

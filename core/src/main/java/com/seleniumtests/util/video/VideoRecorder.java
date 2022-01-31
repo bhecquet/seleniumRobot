@@ -40,6 +40,7 @@ import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.WindowConstants;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -110,7 +111,7 @@ public class VideoRecorder {
 		
 		window = new JFrame("SeleniumRobot"); 
 		window.setAlwaysOnTop (true);
-		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		window.setUndecorated(true); 
 		try {
 			window.setOpacity(0.7f);

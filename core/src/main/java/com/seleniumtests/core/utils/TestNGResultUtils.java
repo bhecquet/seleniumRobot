@@ -19,23 +19,36 @@ package com.seleniumtests.core.utils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
+import org.testng.Reporter;
 import org.testng.annotations.CustomAttribute;
 import org.testng.internal.BaseTestMethod;
 import org.testng.internal.TestResult;
 
+import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
+import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector.SnapshotComparisonResult;
 import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.core.runner.CucumberScenarioWrapper;
+import com.seleniumtests.core.testanalysis.ErrorCause;
+import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.customexception.SeleniumRobotServerException;
+import com.seleniumtests.driver.screenshots.SnapshotComparisonBehaviour;
 import com.seleniumtests.reporter.info.Info;
-import com.seleniumtests.reporter.info.StringInfo;
+import com.seleniumtests.reporter.logger.Snapshot;
+import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.reporter.reporters.CommonReporter;
+import com.seleniumtests.util.ExceptionUtility;
 import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -57,7 +70,10 @@ public class TestNGResultUtils {
 	private static final String CUSTOM_REPORT = "customReport";			// true if the custom result has already been generated
 	private static final String METHOD_NAME = "methodName";				// name of the test method (or the cucumber scenario)
 	private static final String SNAPSHOT_COMPARISON_RESULT = "snapshotComparisonResult";	// the result of snapshot comparison, when enabled
-	private static final String DESCRIPTION = "description";	// description of the test method, if any
+	private static final String DESCRIPTION = "description";			// description of the test method, if any
+	private static final String ERROR_CAUSES = "errorCauses"; 			// list of causes of the test error
+	private static final String ERROR_CAUSE_IN_LAST_STEP = "errorCauseInLastStep"; // true when we have searched for error cause in the last step
+	private static final String ERROR_CAUSE_IN_REFERENCE = "errorCauseInReference"; // true when we have searched for error cause by comparing reference picture of the failed step
 
 	private TestNGResultUtils() {
 		// nothing to do
@@ -237,12 +253,7 @@ public class TestNGResultUtils {
     
     // did we already recorded this result to the server
     public static boolean isSeleniumServerReportCreated(ITestResult testNGResult) {
-    	Boolean alreadyRecorded = (Boolean) testNGResult.getAttribute(SELENIUM_SERVER_REPORT);
-    	if (alreadyRecorded == null) {
-    		return false;
-    	} else {
-    		return alreadyRecorded;
-    	}
+    	return isReportCreated(testNGResult, SELENIUM_SERVER_REPORT);
     }
     
     public static void setSeleniumServerReportCreated(ITestResult testNGResult, Boolean recordedToServer) {
@@ -255,12 +266,7 @@ public class TestNGResultUtils {
      * @return true if the result has already been recorded to test manager
      */
     public static boolean isTestManagerReportCreated(ITestResult testNGResult) {
-    	Boolean alreadyCreated = (Boolean) testNGResult.getAttribute(TEST_MANAGER_REPORT);
-    	if (alreadyCreated == null) {
-    		return false;
-    	} else {
-    		return alreadyCreated;
-    	}
+    	return isReportCreated(testNGResult, TEST_MANAGER_REPORT);
     }
    
     public static void setTestManagereportCreated(ITestResult testNGResult, Boolean recordedToServer) {
@@ -268,12 +274,7 @@ public class TestNGResultUtils {
     }
     
     public static boolean isBugtrackerReportCreated(ITestResult testNGResult) {
-    	Boolean alreadyCreated = (Boolean) testNGResult.getAttribute(BUGTRACKER_REPORT);
-    	if (alreadyCreated == null) {
-    		return false;
-    	} else {
-    		return alreadyCreated;
-    	}
+    	return isReportCreated(testNGResult, BUGTRACKER_REPORT);
     }
 
     public static void setBugtrackerReportCreated(ITestResult testNGResult, Boolean recordedToServer) {
@@ -286,12 +287,7 @@ public class TestNGResultUtils {
      * @return true if the HTML result has already been created for this result
      */
     public static boolean isHtmlReportCreated(ITestResult testNGResult) {
-    	Boolean alreadyCreated = (Boolean) testNGResult.getAttribute(HTML_REPORT);
-    	if (alreadyCreated == null) {
-    		return false;
-    	} else {
-    		return alreadyCreated;
-    	}
+    	return isReportCreated(testNGResult, HTML_REPORT);
     }
     
     public static void setHtmlReportCreated(ITestResult testNGResult, Boolean recordedToServer) {
@@ -304,16 +300,20 @@ public class TestNGResultUtils {
      * @return true if the Custom result has already been created for this result
      */
     public static boolean isCustomReportCreated(ITestResult testNGResult) {
-    	Boolean alreadyCreated = (Boolean) testNGResult.getAttribute(CUSTOM_REPORT);
+    	return isReportCreated(testNGResult, CUSTOM_REPORT);
+    }
+    
+    public static void setCustomReportCreated(ITestResult testNGResult, Boolean recordedToServer) {
+    	testNGResult.setAttribute(CUSTOM_REPORT, recordedToServer);
+    }
+    
+    private static boolean isReportCreated(ITestResult testNGResult, String attributeName) {
+    	Boolean alreadyCreated = (Boolean) testNGResult.getAttribute(attributeName);
     	if (alreadyCreated == null) {
     		return false;
     	} else {
     		return alreadyCreated;
     	}
-    }
-    
-    public static void setCustomReportCreated(ITestResult testNGResult, Boolean recordedToServer) {
-    	testNGResult.setAttribute(CUSTOM_REPORT, recordedToServer);
     }
 
     /**
@@ -399,5 +399,139 @@ public class TestNGResultUtils {
     		getSeleniumRobotTestContext(testNGResult).getConfiguration().put(key, new TestVariable(key, parameter.toString()));
     	}
     	testNGResult.setAttribute(DESCRIPTION, StringUtility.interpolateString(testNGResult.getMethod().getDescription(), getSeleniumRobotTestContext(testNGResult)));
+    }
+    
+
+    /**
+     * Change the test result when snapshot comparison fails
+     * @param testResult
+     */
+	public static void changeTestResultWithSnapshotComparison(final ITestResult testResult) {
+		
+		if (testResult.getStatus() == ITestResult.FAILURE  // test is already failed
+				|| !Boolean.TRUE.equals(SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerActive())
+				|| SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshotBehaviour() == SnapshotComparisonBehaviour.DISPLAY_ONLY // as the comparison result is only displayed, do not retry
+				|| SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshotBehaviour() == SnapshotComparisonBehaviour.ADD_TEST_RESULT // complicated to set the test failed, and then success again
+				|| !SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshot()) {
+			return;
+		}
+		
+		SeleniumRobotSnapshotServerConnector serverConnector = SeleniumRobotSnapshotServerConnector.getInstance();
+		
+		List<TestStep> testSteps = getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
+		if (testSteps == null) {
+			return;
+		}
+		
+		for (TestStep testStep: testSteps) {
+			for (Snapshot snapshot: new ArrayList<>(testStep.getSnapshots())) {
+				if (snapshot.getCheckSnapshot().recordSnapshotOnServerForComparison()) {
+					if (snapshot.getName() == null || snapshot.getName().isEmpty()) {
+						logger.warn("Snapshot hasn't any name, it won't be sent to server");
+						continue;
+					} 
+					
+					try {
+						SnapshotComparisonResult comparisonResult = serverConnector.checkSnapshotHasNoDifferences(snapshot, CommonReporter.getTestCaseName(testResult), testStep.getName());
+						if (comparisonResult == SnapshotComparisonResult.KO) {
+							testResult.setStatus(ITestResult.FAILURE);
+							testResult.setThrowable(new ScenarioException("Snapshot comparison failed"));
+							
+							// move test from passedTests to failedTests if test is not already in failed tests
+							if (testResult.getTestContext().getPassedTests().getAllMethods().contains(testResult.getMethod())) {
+								testResult.getTestContext().getPassedTests().removeResult(testResult);
+								testResult.getTestContext().getFailedTests().addResult(testResult, testResult.getMethod());
+							}
+							return;
+						}
+					} catch (SeleniumRobotServerException e) {
+						logger.error("Could not create snapshot on server", e);
+					}
+				}
+			}
+		}
+		
+
+
+	}	
+	
+
+	/**
+	 * In case test result is SUCCESS but some softAssertions were raised, change test result to 
+	 * FAILED
+	 * 
+	 * @param result
+	 */
+	public static void changeTestResultWithSoftAssertion(ITestResult result) {
+		List<Throwable> verificationFailures = SeleniumTestsContextManager.getThreadContext().getVerificationFailures(Reporter.getCurrentTestResult());
+
+		int size = verificationFailures.size();
+		if (size == 0 || result.getStatus() == ITestResult.FAILURE) {
+			return;
+		}
+
+		result.setStatus(ITestResult.FAILURE);
+
+		if (size == 1) {
+			result.setThrowable(verificationFailures.get(0));
+		} else {
+			
+			StringBuilder stackString = new StringBuilder("!!! Many Test Failures (").append(size).append(")\n\n");
+			
+			for (int i = 0; i < size - 1; i++) {
+				ExceptionUtility.generateTheStackTrace(verificationFailures.get(i), String.format("%n.%nFailure %d of %d%n", i + 1, size), stackString, "text");
+			}
+			
+			Throwable last = verificationFailures.get(size - 1);
+			stackString.append(String.format("%n.%nFailure %d of %d%n", size, size));
+			stackString.append(last.toString());
+
+			// set merged throwable
+			Throwable merged = new AssertionError(stackString.toString());
+			merged.setStackTrace(last.getStackTrace());
+
+			result.setThrowable(merged);
+		}
+
+		// move test from passedTests to failedTests if test is not already in failed tests
+		if (result.getTestContext().getPassedTests().getAllMethods().contains(result.getMethod())) {
+			result.getTestContext().getPassedTests().removeResult(result);
+			result.getTestContext().getFailedTests().addResult(result, result.getMethod());
+		}
+	}	
+	
+
+    @SuppressWarnings("unchecked")
+	public static List<ErrorCause> getErrorCauses(ITestResult testNGResult) {
+    	if (testNGResult.getAttribute(ERROR_CAUSES) == null) {
+    		return new ArrayList<>();
+    	} else {
+    		return (List<ErrorCause>) testNGResult.getAttribute(ERROR_CAUSES);
+    	}
+    }
+    
+    /**
+     * Store the list of detected error causes
+     * @param testNGResult
+     * @param errorCauses
+     */
+    public static void setErrorCauses(ITestResult testNGResult, List<ErrorCause> errorCauses) {
+    	testNGResult.setAttribute(ERROR_CAUSES, errorCauses);
+    }
+    
+    public static boolean isErrorCauseSearchedInLastStep(ITestResult testNGResult) {
+    	return isReportCreated(testNGResult, ERROR_CAUSE_IN_LAST_STEP);
+    }
+    
+    public static void setErrorCauseSearchedInLastStep(ITestResult testNGResult, Boolean errorCauseInLastStep) {
+    	testNGResult.setAttribute(ERROR_CAUSE_IN_LAST_STEP, errorCauseInLastStep);
+    }
+    
+    public static boolean isErrorCauseSearchedInReferencePicture(ITestResult testNGResult) {
+    	return isReportCreated(testNGResult, ERROR_CAUSE_IN_REFERENCE);
+    }
+    
+    public static void setErrorCauseSearchedInReferencePicture(ITestResult testNGResult, Boolean errorCauseInReferencePicture) {
+    	testNGResult.setAttribute(ERROR_CAUSE_IN_REFERENCE, errorCauseInReferencePicture);
     }
 }

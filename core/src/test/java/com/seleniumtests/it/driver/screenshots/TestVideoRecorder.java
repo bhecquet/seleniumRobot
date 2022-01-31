@@ -104,7 +104,7 @@ public class TestVideoRecorder extends ReporterTest {
 		try {
 			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
 			
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest2"}, ParallelMode.METHODS, new String[] {"testDriver"});
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriver"});
 			
 			// read 'testDriver' report. This contains calls to HtmlElement actions
 			String detailedReportContent1 = readTestMethodResultFile("testDriver");
@@ -112,7 +112,7 @@ public class TestVideoRecorder extends ReporterTest {
 			Assert.assertTrue(detailedReportContent1.contains("Video capture: <a href='videoCapture.avi'>file</a>"));
 			
 			// check shortcut to video is present in detailed report
-			Assert.assertTrue(detailedReportContent1.matches(".*<th>Last State</th><td><a href=\"screenshots/testDriver_6-1_Test_end--\\w+.png\"><i class=\"fas fa-file-image\" aria-hidden=\"true\"></i></a><a href=\"videoCapture.avi\"><i class=\"fas fa-video\" aria-hidden=\"true\"></i></a></td>.*"));
+			Assert.assertTrue(detailedReportContent1.matches(".*<th>Last State</th><td><a href=\"screenshots/testDriver_8-1_Test_end--\\w+.png\"><i class=\"fas fa-file-image\" aria-hidden=\"true\"></i></a><a href=\"videoCapture.avi\"><i class=\"fas fa-video\" aria-hidden=\"true\"></i></a></td>.*"));
 			
 			// check steps have the timestamp on video capture
 			Assert.assertTrue(detailedReportContent1.contains("<span><i class=\"fas fa-file-video\"></i>"));

@@ -41,12 +41,13 @@ public class Snapshot extends TestAction {
 	
 	private ScreenShot screenshot;
 	private SnapshotCheckType checkSnapshot; // whether this snapshot will be sent to Snapshot server to check if it conforms to baseline
+	private boolean displayInReport = true;
 
 	public static final String SNAPSHOT_PATTERN = "Application Snapshot";
 	public static final String OUTPUT_PATTERN = "Output '%s' browser: ";
 
-	public Snapshot(final ScreenShot screenshot, String driverName, SnapshotCheckType checkSnapshot) {
-		super(driverName, false, new ArrayList<>());
+	public Snapshot(final ScreenShot screenshot, String snaphotName, SnapshotCheckType checkSnapshot) {
+		super(snaphotName, false, new ArrayList<>());
 		this.screenshot = screenshot;
 		this.checkSnapshot = checkSnapshot;
 		durationToExclude = screenshot.getDuration();
@@ -145,8 +146,14 @@ public class Snapshot extends TestAction {
 		// build file name with <base name>-<part of UUID>.html
 		// this way, even when test is repeated multiple times, snapshots will have different names 
 		// (usefull for comments in bugtrackers where reference to new file should be different from previous ones)
-		String newName = String.format("%s-%s", newBaseName.substring(0, Math.min(50, newBaseName.length())), 
+		String newName;
+		if (Boolean.TRUE.equals(SeleniumTestsContextManager.getThreadContext().getRandomInAttachments())) {
+			newName = String.format("%s-%s", newBaseName.substring(0, Math.min(50, newBaseName.length())), 
 																oldFileName.substring(oldFileName.length() - 10));
+		} else {
+			newName = String.format("%s.%s", newBaseName.substring(0, Math.min(50, newBaseName.length())), 
+					FilenameUtils.getExtension(oldFileName));
+		}
 
 		screenshot.setImagePath(folderName + newName);
 		
@@ -174,8 +181,14 @@ public class Snapshot extends TestAction {
 		// build file name with <base name>-<part of UUID>.html
 		// this way, even when test is repeated multiple times, snapshots will have different names 
 		// (usefull for comments in bugtrackers where reference to new file should be different from previous ones)
-		String newName = String.format("%s-%s", newBaseName.substring(0, Math.min(50, newBaseName.length())), 
+		String newName;
+		if (Boolean.TRUE.equals(SeleniumTestsContextManager.getThreadContext().getRandomInAttachments())) {
+			newName = String.format("%s-%s", newBaseName.substring(0, Math.min(50, newBaseName.length())), 
 																oldFileName.substring(oldFileName.length() - 10));
+		} else {
+			newName = String.format("%s.%s", newBaseName.substring(0, Math.min(50, newBaseName.length())), 
+					FilenameUtils.getExtension(oldFileName));
+		}
 
 		
 		// if file cannot be moved, go back to old name
@@ -189,17 +202,17 @@ public class Snapshot extends TestAction {
 			}
 			
 			FileUtils.copyFile(oldFile, new File(screenshot.getFullHtmlPath()));
-			
-
-			try {
-				Files.delete(Paths.get(new File(oldFullPath).getCanonicalPath()));
-			} catch (IOException e) {
-				// do not consider it as an error if old file cannot be deleted
-				logger.warn(String.format("Could not delete %s", oldFullPath));
-			}	
 		} catch (IOException e) {
 			screenshot.setHtmlSourcePath(oldPath);
 		}
+
+		try {
+			Files.delete(Paths.get(new File(oldFullPath).getCanonicalPath()));
+		} catch (IOException e) {
+			// do not consider it as an error if old file cannot be deleted
+			logger.warn(String.format("Could not delete %s", oldFullPath));
+		}	
+		
 	}
     
 	public ScreenShot getScreenshot() {
@@ -228,6 +241,14 @@ public class Snapshot extends TestAction {
 
 	public void setCheckSnapshot(SnapshotCheckType checkSnapshot) {
 		this.checkSnapshot = checkSnapshot;
+	}
+
+	public boolean isDisplayInReport() {
+		return displayInReport;
+	}
+
+	public void setDisplayInReport(boolean displayInReport) {
+		this.displayInReport = displayInReport;
 	}
 
 }

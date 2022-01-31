@@ -1,5 +1,9 @@
 package com.seleniumtests.reporter.info;
 
+import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.util.logging.Sys;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +13,8 @@ import java.util.List;
  *
  */
 public class MultipleInfo extends Info {
+
+
 
 	private List<Info> infos;
 	
@@ -25,11 +31,18 @@ public class MultipleInfo extends Info {
 	public String encode(String format) {
 		StringBuilder out = new StringBuilder();
 		for (Info info: infos) {
-			out.append(info.encode(format));
+			try {
+				out.append(info.encode(format));
+			} catch (NullPointerException message) {
+				logger.error("format cannot be null");
+				return "";
+			}
 		}
 		return out.toString();
 	}
-	
-	
+
+	public List<Info> getInfos() {
+		return infos;
+	}
 
 }

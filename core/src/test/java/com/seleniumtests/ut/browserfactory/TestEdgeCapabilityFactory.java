@@ -44,6 +44,7 @@ import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.browserfactory.EdgeCapabilitiesFactory;
 import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
@@ -80,8 +81,70 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 
 		when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.NONE));
 		when(config.getPageLoadStrategy()).thenReturn(PageLoadStrategy.NORMAL);
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		when(config.getBrowserType()).thenReturn(BrowserType.EDGE);
 		
 		when(osUtility.getProgramExtension()).thenReturn(".exe");
+	}
+	
+	/**
+	 * If beta is not requested, get the non beta version even if both are present
+	 */
+	@Test(groups= {"ut"})
+	public void testNonBetaVersionBrowserChoosen() {
+		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
+		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, "96.0", "", false, false), 
+				new BrowserInfo(BrowserType.EDGE, "97.0", "", false, true)));
+		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
+		
+		EdgeCapabilitiesFactory capaFactory = new EdgeCapabilitiesFactory(config);
+		capaFactory.createCapabilities();
+		Assert.assertFalse(capaFactory.getSelectedBrowserInfo().getBeta());
+		Assert.assertEquals(capaFactory.getSelectedBrowserInfo().getVersion(), "96.0");
+	}
+	
+	/**
+	 * If beta is not requested, and non beta browser not installed, return null
+	 */
+	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Browser EDGE  is not available")
+	public void testNonBetaVersionBrowserAbsent() {
+		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
+		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, "97.0", "", false, true)));
+		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
+		
+		EdgeCapabilitiesFactory capaFactory = new EdgeCapabilitiesFactory(config);
+		capaFactory.createCapabilities();
+	}
+	
+	/**
+	 * If beta is requested, get the beta version even if both are present
+	 */
+	@Test(groups= {"ut"})
+	public void testBetaVersionBrowserChoosen() {
+		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
+		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, "96.0", "", false, false), 
+				new BrowserInfo(BrowserType.EDGE, "97.0", "", false, true)));
+		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(true)).thenReturn(browserInfos);
+		when(config.getBetaBrowser()).thenReturn(true);
+		
+		EdgeCapabilitiesFactory capaFactory = new EdgeCapabilitiesFactory(config);
+		capaFactory.createCapabilities();
+		Assert.assertTrue(capaFactory.getSelectedBrowserInfo().getBeta());
+		Assert.assertEquals(capaFactory.getSelectedBrowserInfo().getVersion(), "97.0");
+	}
+
+	/**
+	 * If beta is not requested, and non beta browser not installed, return null
+	 */
+	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Browser EDGE beta is not available")
+	public void testBetaVersionBrowserAbsent() {
+		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
+		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, "96.0", "", false, false)));
+		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(true)).thenReturn(browserInfos);
+		when(config.getBetaBrowser()).thenReturn(true);
+		
+		EdgeCapabilitiesFactory capaFactory = new EdgeCapabilitiesFactory(config);
+		capaFactory.createCapabilities();
 	}
 	
 	/**
@@ -163,6 +226,8 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithVersion() {
+		
+		when(config.getMode()).thenReturn(DriverMode.GRID);
 		
 		when(config.isEnableJavascript()).thenReturn(true);
 		when(config.getProxy()).thenReturn(proxyConfig);

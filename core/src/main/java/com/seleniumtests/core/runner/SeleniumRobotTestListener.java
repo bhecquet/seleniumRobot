@@ -17,37 +17,6 @@
  */
 package com.seleniumtests.core.runner;
 
-import java.io.File;
-import java.lang.reflect.Method;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
-
-import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.apache.log4j.Logger;
-import org.openqa.selenium.WebDriverException;
-import org.testng.IConfigurationListener;
-import org.testng.IExecutionListener;
-import org.testng.IInvokedMethod;
-import org.testng.IInvokedMethodListener;
-import org.testng.ISuite;
-import org.testng.ISuiteListener;
-import org.testng.ISuiteResult;
-import org.testng.ITestContext;
-import org.testng.ITestListener;
-import org.testng.ITestNGMethod;
-import org.testng.ITestResult;
-import org.testng.Reporter;
-import org.testng.internal.ConfigurationMethod;
-import org.testng.internal.annotations.DisabledRetryAnalyzer;
-
 import com.epam.reportportal.testng.BaseTestNGListener;
 import com.google.common.collect.Iterables;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
@@ -74,8 +43,19 @@ import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.video.VideoRecorder;
-
 import kong.unirest.Unirest;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.log4j.Logger;
+import org.openqa.selenium.WebDriverException;
+import org.testng.*;
+import org.testng.internal.ConfigurationMethod;
+import org.testng.internal.annotations.DisabledRetryAnalyzer;
+
+import java.io.File;
+import java.lang.reflect.Method;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class SeleniumRobotTestListener extends BaseTestNGListener implements ITestListener, IInvokedMethodListener, ISuiteListener, IExecutionListener, IConfigurationListener {
 	
@@ -516,8 +496,7 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 		logThrowableToTestEndStep(testResult);
 		WebUIDriver.logFinalDriversState(testResult);
 		tearDownStep.updateDuration();
-		TestStepManager.logTestStep(tearDownStep);
-		
+		TestStepManager.logTestStep(tearDownStep);		
 	}
 	
 	private void logThrowableToTestEndStep(ITestResult testResult) {
@@ -546,50 +525,8 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 		}
 	}
 	
+	
 
-	/**
-	 * In case test result is SUCCESS but some softAssertions were raised, change test result to 
-	 * FAILED
-	 * 
-	 * @param result
-	 */
-	public void changeTestResult(final ITestResult result) {
-		List<Throwable> verificationFailures = SeleniumTestsContextManager.getThreadContext().getVerificationFailures(Reporter.getCurrentTestResult());
-
-		int size = verificationFailures.size();
-		if (size == 0 || result.getStatus() == ITestResult.FAILURE) {
-			return;
-		}
-
-		result.setStatus(ITestResult.FAILURE);
-
-		if (size == 1) {
-			result.setThrowable(verificationFailures.get(0));
-		} else {
-			
-			StringBuilder stackString = new StringBuilder("!!! Many Test Failures (").append(size).append(")\n\n");
-			
-			for (int i = 0; i < size - 1; i++) {
-				ExceptionUtility.generateTheStackTrace(verificationFailures.get(i), String.format("%n.%nFailure %d of %d%n", i + 1, size), stackString, "text");
-			}
-			
-			Throwable last = verificationFailures.get(size - 1);
-			stackString.append(String.format("%n.%nFailure %d of %d%n", size, size));
-			stackString.append(last.toString());
-
-			// set merged throwable
-			Throwable merged = new AssertionError(stackString.toString());
-			merged.setStackTrace(last.getStackTrace());
-
-			result.setThrowable(merged);
-		}
-
-		// move test from passedTests to failedTests if test is not already in failed tests
-		if (result.getTestContext().getPassedTests().getAllMethods().contains(result.getMethod())) {
-			result.getTestContext().getPassedTests().removeResult(result);
-			result.getTestContext().getFailedTests().addResult(result, result.getMethod());
-		}
-	}	
 
 	/**
 	 * put in thread context the test / class / method context that may have already be defined in other \@BeforeXXX method
@@ -653,7 +590,8 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 
 		// Handle Soft CustomAssertion
 		if (method.isTestMethod()) {
-			changeTestResult(testResult);
+			TestNGResultUtils.changeTestResultWithSoftAssertion(testResult);
+			TestNGResultUtils.changeTestResultWithSnapshotComparison(testResult);
 		}
 		
 		// store context in test result

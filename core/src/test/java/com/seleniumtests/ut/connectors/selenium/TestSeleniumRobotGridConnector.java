@@ -50,6 +50,8 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.google.common.net.HttpHeaders;
+import com.google.common.net.MediaType;
 import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
@@ -597,7 +599,8 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		// no error encountered
 		verify(req).queryString("action", "uploadFile");
 		verify(req).queryString("name", "foo");
-		verify(req).field("content", "ABCDE");
+		verify(req).header(HttpHeaders.CONTENT_TYPE, MediaType.OCTET_STREAM.toString());
+		verify(req).body(new byte[] {(byte) 0x00, (byte) 0x10, (byte) 0x83});
 		verify(gridLogger, never()).warn(anyString());
 		verify(gridLogger, never()).error(anyString());
 	}
@@ -629,7 +632,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	@Test(groups={"ut"})
 	public void testUploadFileNoConnection() throws UnsupportedOperationException, IOException {
 		
-		HttpRequest<HttpRequest> req = createServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "", "body");
+		HttpRequest<HttpRequest> req = createServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "", "requestBodyEntity");
 		when(req.asString()).thenThrow(new UnirestException("connection error"));
 
 		connector.uploadFileToBrowser("foo", "ABCDE");		

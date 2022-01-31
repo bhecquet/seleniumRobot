@@ -29,6 +29,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.http.HttpHost;
@@ -59,6 +61,7 @@ import kong.unirest.json.JSONObject;
 
 public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 
+	private static final String ONLY_MAIN_SCREEN = "onlyMainScreen";
 	private static final String Y_FIELD = "y";
 	private static final String X_FIELD = "x";
 	private static final String NAME_FIELD = "name";
@@ -209,7 +212,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		}
 		
 		String responseBody = null;
-		logger.info(String.format("Mouse coordinates"));
+		logger.info("Mouse coordinates");
 		try {
 			// we get a string with x,y
 			HttpResponse<String> response = Unirest.get(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
@@ -260,7 +263,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 				.queryString(ACTION_FIELD, "leftClic")
 				.queryString(X_FIELD, x)
 				.queryString(Y_FIELD, y)
-				.queryString("onlyMainScreen", onlyMainScreen)
+				.queryString(ONLY_MAIN_SCREEN, onlyMainScreen)
 				.asString();
 			if (response.getStatus() != 200) {
 				logger.error(String.format("Left click error: %s", response.getBody()));
@@ -299,7 +302,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			.queryString(ACTION_FIELD, "doubleClick")
 			.queryString(X_FIELD, x)
 			.queryString(Y_FIELD, y)
-			.queryString("onlyMainScreen", onlyMainScreen)
+			.queryString(ONLY_MAIN_SCREEN, onlyMainScreen)
 			.asString();
 			if (response.getStatus() != 200) {
 				logger.error(String.format("Double click error: %s", response.getBody()));
@@ -337,7 +340,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 				.queryString(ACTION_FIELD, "rightClic")
 				.queryString(X_FIELD, x)
 				.queryString(Y_FIELD, y)
-				.queryString("onlyMainScreen", onlyMainScreen)
+				.queryString(ONLY_MAIN_SCREEN, onlyMainScreen)
 				.asString();
 			if (response.getStatus() != 200) {
 				logger.error(String.format("Right click error: %s", response.getBody()));
@@ -366,7 +369,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		try {
 			HttpResponse<String> response =  Unirest.get(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString(ACTION_FIELD, "screenshot")
-				.queryString("onlyMainScreen", onlyMainScreen)
+				.queryString(ONLY_MAIN_SCREEN, onlyMainScreen)
 				.asString();
 			
 			if (response.getStatus() != 200) {
@@ -391,13 +394,19 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		if (nodeUrl == null) {
 			throw new ScenarioException("You cannot upload file to browser before driver has been created and corresponding node instanciated");
 		}
+		
+		
 
 		logger.info("uploading file to browser: " + fileName);
 		try {
+			byte[] byteArray = base64Content.getBytes();
+			byte[] decodeBuffer = Base64.decodeBase64(byteArray);
+		
 			HttpResponse<String> response = Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+				.header(HttpHeaders.CONTENT_TYPE, MediaType.OCTET_STREAM.toString())
 				.queryString(ACTION_FIELD, "uploadFile")
 				.queryString(NAME_FIELD, fileName)
-				.field("content", base64Content)
+				.body(decodeBuffer)
 				.asString();
 			
 			if (response.getStatus() != 200) {
@@ -405,7 +414,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			}
 		} catch (UnirestException e) {
 			logger.warn(String.format("Cannot upload file: %s", e.getMessage()));
-		}
+		} 
 	}
 	
 	/**

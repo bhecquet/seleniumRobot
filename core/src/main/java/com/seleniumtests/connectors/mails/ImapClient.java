@@ -177,8 +177,23 @@ public class ImapClient extends EmailClientImpl {
 			
 		}
 		
-		List<Email> filteredEmails = new ArrayList<>();
 		lastMessageIndex = messages.length;
+		List<Email> filteredEmails = filterMessages(preFilteredMessages);
+		
+
+		folder.close(false);
+		
+		return filteredEmails;
+	}
+
+	/**
+	 * @param preFilteredMessages
+	 * @return
+	 * @throws MessagingException
+	 * @throws IOException
+	 */
+	private List<Email> filterMessages(List<Message> preFilteredMessages) throws MessagingException, IOException {
+		List<Email> filteredEmails = new ArrayList<>();
 
 		for (Message message: preFilteredMessages) {
 
@@ -228,10 +243,6 @@ public class ImapClient extends EmailClientImpl {
 			// create a new email
 			filteredEmails.add(new Email(message.getSubject(), messageContent, "", message.getReceivedDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(), attachments));
 		}
-		
-
-		folder.close(false);
-		
 		return filteredEmails;
 	}
 	

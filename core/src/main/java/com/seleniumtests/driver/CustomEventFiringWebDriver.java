@@ -99,6 +99,8 @@ import net.lightbody.bmp.BrowserMobProxy;
  */
 public class CustomEventFiringWebDriver extends EventFiringWebDriver implements HasCapabilities {
 	
+	private static final String OTHER_BROWSER = "other";
+	private static final String SAFARI_BROWSER = "safari";
 	private static final Logger logger = SeleniumRobotLogger.getLogger(CustomEventFiringWebDriver.class);
     private FileDetector fileDetector = new UselessFileDetector();
     private static final int MAX_DIMENSION = 100000;
@@ -888,12 +890,12 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	public void scrollToElement(WebElement element, int yOffset) {
 		if (isWebTest) {
 			try {
-				WebElement parentScrollableElement = (WebElement) ((JavascriptExecutor) driver).executeScript(JS_SCROLL_PARENT, element, (driver instanceof SafariDriver) ? "safari": "other");
+				WebElement parentScrollableElement = (WebElement) ((JavascriptExecutor) driver).executeScript(JS_SCROLL_PARENT, element, (driver instanceof SafariDriver) ? SAFARI_BROWSER: OTHER_BROWSER);
 				Long topHeaderSize = (Long) ((JavascriptExecutor) driver).executeScript(JS_GET_TOP_HEADER);
 
 				// try a second method (the first one is quicker but does not work when element is inside a document fragment, slot or shadow DOM
 				if ((parentScrollableElement == null || "html".equalsIgnoreCase(parentScrollableElement.getTagName())) && !(driver instanceof InternetExplorerDriver)) {
-					parentScrollableElement = (WebElement) ((JavascriptExecutor) driver).executeScript(JS_SCROLL_PARENT2, element, (driver instanceof SafariDriver) ? "safari": "other");
+					parentScrollableElement = (WebElement) ((JavascriptExecutor) driver).executeScript(JS_SCROLL_PARENT2, element, (driver instanceof SafariDriver) ? SAFARI_BROWSER: OTHER_BROWSER);
 				}
 				
 				if (parentScrollableElement != null) {
@@ -923,7 +925,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 									"if((arguments[0].scrollHeight - arguments[0].scrollTop - arguments[0].clientHeight) > 0) {" +
 									"   var rootElement = arguments[1] === \"safari\" ? document.body: document.documentElement;" +
 									"   rootElement.scrollTop -= " + scrollOffset + ";" +
-									"}", parentScrollableElement, (driver instanceof SafariDriver) ? "safari": "other");
+									"}", parentScrollableElement, (driver instanceof SafariDriver) ? SAFARI_BROWSER: OTHER_BROWSER);
 						}
 						
 						WaitHelper.waitForMilliSeconds(500); // wait a bit so that scrolling is complete

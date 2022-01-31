@@ -47,6 +47,7 @@ import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.browserfactory.IECapabilitiesFactory;
 import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
@@ -186,6 +187,9 @@ public class TestIECapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultIECapabilities() {
 		
+
+		Mockito.when(config.getInitialUrl()).thenReturn("http://mysite"); // check we start on "about:blank"
+		
 		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "internet explorer");
@@ -234,5 +238,83 @@ public class TestIECapabilityFactory extends MockitoTest {
 		
 		Assert.assertNull(System.getProperty(InternetExplorerDriverService.IE_DRIVER_EXE_PROPERTY));
 	}
+
+	/**
+	 * Edge IE mode in local
+	 * Check ie.edgepath and ie.edgechromium capabilities are set
+	 */
+	@Test(groups={"ut"})
+	public void testCreateDefaultEdgeIEModeCapabilities() {
+		
+		Mockito.when(config.getIeMode()).thenReturn(true);
+		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		Mockito.when(config.getInitialUrl()).thenReturn("http://mysite");
+		
+		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
+		browserInfos.put(BrowserType.INTERNET_EXPLORER, Arrays.asList(new BrowserInfo(BrowserType.INTERNET_EXPLORER, "11", "", false)));
+		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, "97.0", "", false)));
+		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
+		
+		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
+		
+		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "internet explorer");
+		Assert.assertTrue((Boolean)capa.getCapability(InternetExplorerDriver.IGNORE_ZOOM_SETTING));
+		Assert.assertTrue((Boolean)capa.getCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS));
+		Assert.assertTrue((Boolean)capa.getCapability(InternetExplorerDriver.IE_ENSURE_CLEAN_SESSION));
+		Assert.assertEquals((String)capa.getCapability(InternetExplorerDriver.INITIAL_BROWSER_URL), "http://mysite");
+
+		Assert.assertTrue((Boolean)capa.getCapability("ie.edgechromium"));
+		Assert.assertEquals((String)capa.getCapability("ie.edgepath"), "");
+
+		Assert.assertEquals(((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get("ie.edgepath"), "");
+		Assert.assertTrue((boolean) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get("ie.edgechromium"));
+	}
 	
+	/**
+	 * Edge IE mode in grid
+	 * Check ie.edgepath and ie.edgechromium capabilities are not set
+	 */
+	@Test(groups={"ut"})
+	public void testCreateDefaultEdgeIEModeCapabilitiesGrid() {
+		
+		Mockito.when(config.getIeMode()).thenReturn(true);
+		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
+		Mockito.when(config.getInitialUrl()).thenReturn("http://mysite");
+		
+		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
+		browserInfos.put(BrowserType.INTERNET_EXPLORER, Arrays.asList(new BrowserInfo(BrowserType.INTERNET_EXPLORER, "11", "", false)));
+		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, "97.0", "", false)));
+		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
+		
+		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
+		
+		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "internet explorer");
+		Assert.assertTrue((Boolean)capa.getCapability(InternetExplorerDriver.IGNORE_ZOOM_SETTING));
+		Assert.assertTrue((Boolean)capa.getCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS));
+		Assert.assertTrue((Boolean)capa.getCapability(InternetExplorerDriver.IE_ENSURE_CLEAN_SESSION));
+		Assert.assertEquals((String)capa.getCapability(InternetExplorerDriver.INITIAL_BROWSER_URL), "http://mysite");
+		
+		Assert.assertNull((Boolean)capa.getCapability("ie.edgechromium"));
+		Assert.assertNull((String)capa.getCapability("ie.edgepath"), "");
+		
+		Assert.assertNull(((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get("ie.edgepath"));
+		Assert.assertNull(((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get("ie.edgechromium"));
+	}
+	
+	/**
+	 * If Edge is not available, throw an error when Edge in IE mode is requested
+	 */
+	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class)
+	public void testCreateDefaultEdgeIEModeCapabilitiesGridEdgeNotAvailable() {
+		
+		Mockito.when(config.getIeMode()).thenReturn(true);
+		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		Mockito.when(config.getInitialUrl()).thenReturn("http://mysite");
+		
+		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
+		
+	}
+	
+	// Edge not available
+
 }

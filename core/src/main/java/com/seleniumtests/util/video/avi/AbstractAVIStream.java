@@ -1596,7 +1596,8 @@ public abstract class AbstractAVIStream {
 
     protected class MidiTrack extends Track {
 
-        private final int sampleChunkFourCC;
+        private static final String NOT_SUPPORTED_YET_ERROR = "Not supported yet.";
+		private final int sampleChunkFourCC;
 
         public MidiTrack(int trackIndex, int fourCC) {
             super(trackIndex, AVIMediaType.MIDI, fourCC);
@@ -1606,12 +1607,12 @@ public abstract class AbstractAVIStream {
 
         @Override
         public long getSTRFChunkSize() {
-            throw new UnsupportedOperationException("Not supported yet.");
+            throw new UnsupportedOperationException(NOT_SUPPORTED_YET_ERROR);
         }
 
         @Override
         public int getSampleChunkFourCC(boolean isSync) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            throw new UnsupportedOperationException(NOT_SUPPORTED_YET_ERROR);
         }
     }
 

@@ -64,6 +64,10 @@ public class ScreenShot {
         this.isException = isException;
     }
 
+    /**
+     * @deprecated not used anymore
+     * @return
+     */
     @Deprecated
     public String getSuiteName() {
         return suiteName;

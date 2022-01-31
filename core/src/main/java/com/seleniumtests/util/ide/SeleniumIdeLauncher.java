@@ -27,6 +27,7 @@ import net.openhft.compiler.CompilerUtils;
 public class SeleniumIdeLauncher {
 	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumIdeLauncher.class);
+	private static Random random = new Random();
 	
 	@Parameter(names = "-scripts", variableArity = true, description= "List of selenium .java files to execute within seleniumRobot. These files are exported from Selenium IDE")
 	public List<String> scripts = new ArrayList<>();
@@ -90,10 +91,10 @@ public class SeleniumIdeLauncher {
 		}
 		
 		Thread.currentThread().setContextClassLoader(loader);
-		executeTest(1, classes.toArray(new String[] {}), ParallelMode.NONE, new String[] {});
+		executeTest(1, classes.toArray(new String[] {}), new String[] {});
 	}
 	
-	private TestNG executeTest(int threadCount, String[] testClasses, XmlSuite.ParallelMode parallelMode, String[] methods) {
+	private TestNG executeTest(int threadCount, String[] testClasses, String[] methods) {
 
 		XmlSuite suite = new XmlSuite();
 		suite.setName("TmpSuite");
@@ -114,7 +115,7 @@ public class SeleniumIdeLauncher {
 		
 		for (String testClass: testClasses) {
 			XmlTest test = new XmlTest(suite);
-			test.setName(String.format("%s_%d", testClass.substring(testClass.lastIndexOf(".") + 1), new Random().nextInt()));
+			test.setName(String.format("%s_%d", testClass.substring(testClass.lastIndexOf(".") + 1), random.nextInt()));
 			List<XmlClass> classes = new ArrayList<>();
 			XmlClass xmlClass = new XmlClass(testClass);
 			if (methods.length > 0) {

@@ -360,4 +360,63 @@ public class TestLabel extends GenericTest {
 		Assert.assertFalse(label.isFieldAbove(field));
 		Assert.assertFalse(label.isFieldBelow(field));
 	}
+	
+	@Test(groups= {"ut"})
+	public void testMatches() {
+		Label l1 = new Label(0, 100, 0, 20, "foobar");
+		Label l2 = new Label(0, 99, 0, 20, "fooba");
+		Assert.assertTrue(l1.match(l2));
+	}
+	
+	@Test(groups= {"ut"})
+	public void testMatchesNull() {
+		Label l1 = new Label(0, 100, 0, 20, "foobar");
+		Assert.assertFalse(l1.match(null));
+	}
+	
+	@Test(groups= {"ut"})
+	public void testMatchesNullText() {
+		Label l1 = new Label(0, 100, 0, 20, null);
+		Label l2 = new Label(0, 99, 0, 20, "fooba");
+		Assert.assertFalse(l1.match(l2));
+	}
+	
+	@Test(groups= {"ut"})
+	public void testMatchesNullText2() {
+		Label l1 = new Label(0, 100, 0, 20, "foobar");
+		Label l2 = new Label(0, 99, 0, 20, null);
+		Assert.assertFalse(l1.match(l2));
+	}
+	
+	/**
+	 * If both texts are null, only rely on position
+	 */
+	@Test(groups= {"ut"})
+	public void testMatchesNullText3() {
+		Label l1 = new Label(0, 100, 0, 20, null);
+		Label l2 = new Label(0, 99, 0, 20, null);
+		Assert.assertTrue(l1.match(l2));
+	}
+	
+	@Test(groups= {"ut"})
+	public void testMatchesEmptyText() {
+		Label l1 = new Label(0, 100, 0, 20, "");
+		Label l2 = new Label(0, 99, 0, 20, "");
+		Assert.assertTrue(l1.match(l2));
+	}
+	
+	@Test(groups= {"ut"})
+	public void testNoMatchByText() {
+		Label l1 = new Label(0, 100, 0, 20, "foobar");
+		Label l2 = new Label(0, 99, 0, 20, "barfoo");
+		Assert.assertFalse(l1.match(l2));
+	}
+	
+	@Test(groups= {"ut"})
+	public void testNoMatchByPosition() {
+		Label l1 = new Label(0, 100, 0, 20, "foobar");
+		Label l2 = new Label(55, 150, 0, 20, "fooba");
+		Assert.assertFalse(l1.match(l2));
+	}
+
 }

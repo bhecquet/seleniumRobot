@@ -18,6 +18,9 @@ import com.google.common.base.Strings;
 
 public class NetworkUtility {
 
+	private NetworkUtility() {
+		// nothing to do
+	}
 
 //	private static final ConnectionPool pool = new ConnectionPool();
 	private static Proxy proxy = null;
@@ -35,7 +38,7 @@ public class NetworkUtility {
         if (!Strings.isNullOrEmpty(info)) {
           String[] parts = info.split(":", 2);
           String user = parts[0];
-          String pass = parts.length > 1 ? parts[1] : null;
+          String pass = parts.length > 1 ? parts[1] : "";
 
           String credentials = Credentials.basic(user, pass);
 
