@@ -26,7 +26,9 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.nio.charset.Charset;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
@@ -36,7 +38,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
-import org.apache.tools.ant.filters.StringInputStream;
 import org.mockito.Mock;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.remote.CapabilityType;
@@ -110,7 +111,7 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 		((DesiredCapabilities)capabilities).setCapability(CapabilityType.BROWSER_VERSION, "50.0");
 		
 		// prepare response
-		InputStream is = new StringInputStream("{'proxyId':'proxy//node:0'}");
+		InputStream is = IOUtils.toInputStream("{'proxyId':'proxy//node:0'}", Charset.forName("UTF-8"));
 		when(entity.getContent()).thenReturn(is);
 		
 		SeleniumGridConnector connector = spy(new SeleniumGridConnector(SERVER_URL));
@@ -149,7 +150,7 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 		((DesiredCapabilities)capabilities).setCapability(CapabilityType.BROWSER_VERSION, "50.0");
 		
 		// prepare response
-		InputStream is = new StringInputStream("{'proxyId':'proxy//node:0'}");
+		InputStream is = IOUtils.toInputStream("{'proxyId':'proxy//node:0'}", Charset.forName("UTF-8"));
 		when(entity.getContent()).thenReturn(is);
 		
 		SeleniumGridConnector connector = spy(new SeleniumGridConnector(SERVER_URL));

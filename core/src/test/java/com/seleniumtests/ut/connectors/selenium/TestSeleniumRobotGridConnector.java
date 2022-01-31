@@ -19,7 +19,6 @@ package com.seleniumtests.ut.connectors.selenium;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -30,8 +29,10 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.StatusLine;
@@ -40,7 +41,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
-import org.apache.tools.ant.filters.StringInputStream;
 import org.mockito.Mock;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.SessionId;
@@ -112,7 +112,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		capabilities.setCapability(MobileCapabilityType.APP, appFile.getAbsolutePath());
 		
 		// prepare response
-		InputStream is = new StringInputStream("file:app/zip");
+		InputStream is = IOUtils.toInputStream("file:app/zip", Charset.forName("UTF-8"));
 		when(statusLine.getStatusCode()).thenReturn(200);
 		when(entity.getContent()).thenReturn(is);
 		
@@ -129,7 +129,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		capabilities.setCapability(MobileCapabilityType.APP, appFile.getAbsolutePath());
 		
 		// prepare response
-		InputStream is = new StringInputStream("file:app/zip");
+		InputStream is = IOUtils.toInputStream("file:app/zip", Charset.forName("UTF-8"));
 		when(statusLine.getStatusCode()).thenReturn(500);
 		when(entity.getContent()).thenReturn(is);
 		
