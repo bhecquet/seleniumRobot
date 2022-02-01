@@ -865,13 +865,15 @@
 		      	</configuration>
 		   	</plugin>
         </plugins>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+			</testResource>
+		</testResources>
 		<resources>
 			<resource>
 		    	<directory>src/main/resources</directory>
 		    </resource>
-			<resource>
-				<directory>src/test/resources</directory>
-			</resource>
 		</resources>
 	</build>
 </project>
