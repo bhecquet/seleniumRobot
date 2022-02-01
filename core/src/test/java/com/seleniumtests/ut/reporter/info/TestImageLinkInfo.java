@@ -4,7 +4,8 @@ import com.seleniumtests.GenericTest;
 import com.seleniumtests.reporter.info.HyperlinkInfo;
 import com.seleniumtests.reporter.info.ImageLinkInfo;
 import com.seleniumtests.reporter.info.StringInfo;
-import org.junit.Assert;
+
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class TestImageLinkInfo extends GenericTest {
