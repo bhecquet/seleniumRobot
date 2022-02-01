@@ -381,7 +381,8 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.9.0</version>
+				<version>3.5.1</version>
+<!--				<version>3.9.0</version>-->
 				<configuration>
 					<encoding>utf-8</encoding>
 					<source>8</source>
@@ -608,6 +609,7 @@
 				<configuration>
 					<complianceLevel>1.8</complianceLevel>
 					<source>1.8</source>
+					<target>1.8</target>
 					<showWeaveInfo>false</showWeaveInfo>
 					<Xlint>unmatchedSuperTypeInCall=ignore</Xlint>
 					<weaveDependencies>
