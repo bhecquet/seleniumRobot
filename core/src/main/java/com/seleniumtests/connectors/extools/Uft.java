@@ -56,6 +56,7 @@ public class Uft {
 	private String almProject;
 	private String scriptPath;
 	private String scriptName;
+	private boolean killUftOnStartup = true;
 	Map<String, String> parameters;
 	
 	/**
@@ -94,7 +95,11 @@ public class Uft {
 	 * @return	the generated test step
 	 */
 	public TestStep executeScript(int timeout) {
+		return executeScript(timeout, true);
+	}
+	public TestStep executeScript(int timeout, boolean killUftOnStartup) {
 		
+		this.killUftOnStartup = killUftOnStartup;
 		TestStep testStep = new TestStep(String.format("UFT: %s", scriptName), Reporter.getCurrentTestResult(), new ArrayList<>(), false);
 		
 		Date startDate = new Date();
@@ -136,6 +141,10 @@ public class Uft {
 			args.add("/password:" + almPassword);
 			args.add("/domain:" + almDomain);
 			args.add("/project:" + almProject);
+		}
+		
+		if (killUftOnStartup) {
+			args.add("/clean");
 		}
 		
 		return args;
@@ -246,5 +255,13 @@ public class Uft {
 			testStep.addMessage(new TestMessage("Could not read UFT report: " + e.getMessage(), MessageType.ERROR));
 		}
 		
+	}
+
+	public void setKillUftOnStartup(boolean killUftOnStartup) {
+		this.killUftOnStartup = killUftOnStartup;
+	}
+
+	public boolean isKillUftOnStartup() {
+		return killUftOnStartup;
 	}
 }

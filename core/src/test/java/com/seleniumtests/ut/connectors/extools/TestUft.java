@@ -83,6 +83,7 @@ public class TestUft extends MockitoTest {
 	@Test(groups = { "ut" })
 	public void testPrepareArgumentsWithLocalTest() {
 		Uft uft = new Uft("D:\\Subject\\Tools\\Tests\\test1", new HashMap<>());
+		uft.setKillUftOnStartup(false);
 		List<String> args = uft.prepareArguments();
 
 		Assert.assertEquals(args.size(), 2);
@@ -98,6 +99,7 @@ public class TestUft extends MockitoTest {
 	public void testPrepareArgumentsWithAlmTest() {
 		Uft uft = new Uft("http://almserver/qcbin", "usr", "pwd", "dom", "proj",
 				"[QualityCenter]Subject\\Tools\\Tests\\test1", new HashMap<>());
+		uft.setKillUftOnStartup(false);
 		List<String> args = uft.prepareArguments();
 
 		Assert.assertEquals(args.size(), 7);
@@ -119,6 +121,29 @@ public class TestUft extends MockitoTest {
 				"[QualityCenter]Subject\\Tools\\Tests\\test1", params);
 		List<String> args = uft.prepareArguments();
 
+		Assert.assertEquals(args.size(), 9);
+		Assert.assertTrue(args.get(0).startsWith(System.getProperty("java.io.tmpdir")));
+		Assert.assertTrue(args.get(0).endsWith("uft.vbs"));
+		Assert.assertTrue(args.get(1).equals("[QualityCenter]Subject\\Tools\\Tests\\test1"));
+		Assert.assertTrue(args.get(2).equals("\"User=toto\""));
+		Assert.assertTrue(args.get(3).equals("/server:http://almserver/qcbin"));
+		Assert.assertTrue(args.get(4).equals("/user:usr"));
+		Assert.assertTrue(args.get(5).equals("/password:pwd"));
+		Assert.assertTrue(args.get(6).equals("/domain:dom"));
+		Assert.assertTrue(args.get(7).equals("/project:proj"));
+		Assert.assertTrue(args.get(8).equals("/clean"));
+		Assert.assertTrue(uft.isKillUftOnStartup());
+	}
+	
+	@Test(groups = { "ut" })
+	public void testPrepareArgumentsWithAlmTestAndParamAndClean() {
+		Map<String, String> params = new HashMap<>();
+		params.put("User", "toto");
+		Uft uft = new Uft("http://almserver/qcbin", "usr", "pwd", "dom", "proj",
+				"[QualityCenter]Subject\\Tools\\Tests\\test1", params);
+		uft.setKillUftOnStartup(false);
+		List<String> args = uft.prepareArguments();
+		
 		Assert.assertEquals(args.size(), 8);
 		Assert.assertTrue(args.get(0).startsWith(System.getProperty("java.io.tmpdir")));
 		Assert.assertTrue(args.get(0).endsWith("uft.vbs"));
@@ -141,6 +166,7 @@ public class TestUft extends MockitoTest {
 		when(connector.uploadFileToNode(anyString(), eq(true))).thenReturn("D:\\file");
 		
 		Uft uft = new Uft("D:\\Subject\\Tools\\Tests\\test1", new HashMap<>());
+		uft.setKillUftOnStartup(false);
 		List<String> args = uft.prepareArguments();
 
 		Assert.assertEquals(args.size(), 2);
