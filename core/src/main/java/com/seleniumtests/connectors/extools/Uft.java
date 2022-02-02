@@ -3,19 +3,14 @@ package com.seleniumtests.connectors.extools;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.input.BOMInputStream;
-import org.apache.commons.lang3.StringUtils;
 import org.jdom2.DataConversionException;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -250,7 +245,7 @@ public class Uft {
 				}
 			}
 		
-		} catch (JDOMException | IOException e) {
+		} catch (JDOMException | IOException | StringIndexOutOfBoundsException e) {
 			logger.error("Could not read UFT report: " + e.getMessage());
 			testStep.addMessage(new TestMessage("Could not read UFT report: " + e.getMessage(), MessageType.ERROR));
 		}
