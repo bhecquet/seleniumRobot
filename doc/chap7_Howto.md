@@ -711,4 +711,11 @@ args.put("User", "toto");
 executeUftScript("D:\\UFT\\Tests\\Tools\\Tests\\test1", args, 60);
 ```
 
-If you execute your tests wit seleniumRobot grid, the only thing to worry about is to start the web browser before executing UFT test (it will reserve a node). Else, no node will be available and it will fail.
+By default, starting UFT script will first close all uft.exe instances on the target computer. If you want to avoid that, call instead
+
+```
+executeUftScript("http://alm-server.company.com/qcbin", "user", "password", "domain", "project", "[QualityCenter]Subject\\Tools\\Tests\\test1", args, 60, false);
+```
+
+If you execute your tests wit seleniumRobot grid, the only thing to worry about is to start the web browser before executing UFT test (it will reserve a node). Else, no node will be available and it will fail. Moreover, you will need to allow "cscript.exe" to be executed from grid: 
+Add `-extProgramWhiteList cscript.exe` to the grid node options
