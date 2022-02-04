@@ -16,6 +16,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
+import org.jsoup.Jsoup;
 import org.testng.Reporter;
 import org.xml.sax.InputSource;
 
@@ -207,7 +208,11 @@ public class Uft {
 	private void readStep(TestStep parentStep, Element stepElement) {
 		List<Element> stepList = stepElement.getChildren("Step");
 		
-		String stepDescription = String.format("%s: %s", stepElement.getChildText("Obj"),  stepElement.getChildText("Details"));
+		org.jsoup.nodes.Document htmlDoc = Jsoup.parseBodyFragment(stepElement.getChildText("Details"));
+		String details = htmlDoc.text();
+
+		String stepDescription = String.format("%s: %s", stepElement.getChildText("Obj"),  details);
+		
 		
 		if (stepList.isEmpty()) {
 			TestAction action = new TestAction(stepDescription, false, new ArrayList<>());
@@ -226,9 +231,19 @@ public class Uft {
 		
 		Document document;
 		SAXBuilder builder = new SAXBuilder();
+		
 
 		try {
-			document = builder.build(new InputSource(new StringReader(xmlString.substring(xmlString.indexOf("<"))))); // we skip BOM by searching the first "<" character
+			String xml = xmlString.substring(xmlString.indexOf("<"));
+			String xml10pattern = "[^"
+			        + "\u0009\r\n"
+			        + "\u0020-\uD7FF"
+			        + "\uE000-\uFFFD"
+			        + "\ud800\udc00-\udbff\udfff"
+			        + "]";
+			xml = xml.replaceAll(xml10pattern, "");
+			
+			document = builder.build(new InputSource(new StringReader(xml))); // we skip BOM by searching the first "<" character
 			Element docElement = document.getRootElement().getChild("Doc");
 			Element summary = docElement.getChild("Summary");
 			if (summary!= null && summary.getAttribute("failed").getIntValue() != 0) {

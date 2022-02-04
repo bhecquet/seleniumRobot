@@ -72,7 +72,7 @@ public class TestUft extends MockitoTest {
 		// check the whiile content
 		Assert.assertEquals(testStep.toString(), "Step UFT: test1\n" + "  - Step test1\n"
 				+ "    - navigteur: La transaction \"navigteur\" a démarré.\n"
-				+ "    - Step S'identifier [Jenkins]: <table><tr><td><span style=\"text-align : left; font-size : 12px; \">Local Browser</span></td></tr></table>\n"
+				+ "    - Step S'identifier [Jenkins]: Local Browser\n"
 				+ "      - Step S'identifier [Jenkins]: Page\n" + "        - Utilisateur.Set: \"toto\"\n"
 				+ "        - Mot de passe.SetSecure: \"6075ac75a88a13a533eb7f5db06e\"\n"
 				+ "        - S'identifier.Click:\n" + "      - S'identifier [Jenkins].Close:\n"
@@ -247,6 +247,29 @@ public class TestUft extends MockitoTest {
 		Assert.assertEquals(argsArgument.getAllValues().get(1), "[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
 		Assert.assertEquals(argsArgument.getAllValues().get(2), "\"User=toto\"");
 		Assert.assertEquals(argsArgument.getAllValues().get(3), "/clean");
+		
+	}
+	
+	/**
+	 * Check the case where UFT produces an invalid file
+	 * @throws Exception
+	 */
+	@Test(groups = { "ut" })
+	public void testExecuteWithReport2() throws Exception {
+		String report = GenericTest.readResourceToString("tu/uftResult.txt");
+		PowerMockito.when(TestTasks.class, "executeCommand", eq("cscript.exe"), anyInt(), nullable(Charset.class), any()).thenReturn(report);
+		
+		Map<String, String> args = new HashMap<>();
+		args.put("User", "toto");
+		Uft uft = new Uft("[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1", args);
+		TestStep step = uft.executeScript();
+		
+		// check a step is returned
+		Assert.assertNotNull(step);
+		Assert.assertEquals(step.getName(), "UFT: test1");
+		Assert.assertTrue(step.toString().contains("Step Selection_Commune: Impossible d'identifier"));
+		Assert.assertFalse(step.toString().contains("<table>")); // check no HTML code is returned
+		
 		
 	}
 	
