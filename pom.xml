@@ -75,7 +75,7 @@
 		<!-- /!\ Also change version in SeleniumTestContextManager.java -->
 		<selenium.version>4.1.2</selenium.version>
 		<appium.version>8.0.0-beta2</appium.version>
-		<aspectj.version>1.9.7</aspectj.version>
+		<aspectj.version>1.9.1</aspectj.version>
 		<htmlunitdriver.version>3.57.0</htmlunitdriver.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -128,6 +128,10 @@
 				    <exclusion>
 				      <artifactId>commons-logging</artifactId>
 				      <groupId>commons-logging</groupId>
+				    </exclusion>
+					<exclusion>
+				      <artifactId>org.aspectj</artifactId>
+				      <groupId>aspectjweaver</groupId>
 				    </exclusion>
 				</exclusions>
 			</dependency>
