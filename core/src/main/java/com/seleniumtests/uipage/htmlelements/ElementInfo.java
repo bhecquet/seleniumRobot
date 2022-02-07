@@ -3,6 +3,7 @@ package com.seleniumtests.uipage.htmlelements;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -262,7 +263,7 @@ public class ElementInfo {
 			outputFile = buildElementInfoPath(htmlElement);
 		}
 		path = outputFile.getAbsolutePath();
-		FileUtils.writeStringToFile(outputFile, gson.toJson(this));
+		FileUtils.writeStringToFile(outputFile, gson.toJson(this), StandardCharsets.UTF_8);
 		return outputFile;
 	}
 	
@@ -270,7 +271,7 @@ public class ElementInfo {
 		
 		Gson gson = new Gson();
 		try {
-			ElementInfo info = gson.fromJson(FileUtils.readFileToString(elementInfoFile), ElementInfo.class);
+			ElementInfo info = gson.fromJson(FileUtils.readFileToString(elementInfoFile, StandardCharsets.UTF_8), ElementInfo.class);
 			
 			if (info == null) {
 				return null;

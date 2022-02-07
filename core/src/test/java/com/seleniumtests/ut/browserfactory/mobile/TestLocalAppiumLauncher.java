@@ -22,6 +22,7 @@ import static org.mockito.ArgumentMatchers.contains;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -55,7 +56,7 @@ public class TestLocalAppiumLauncher extends MockitoTest {
 		PowerMockito.mockStatic(FileUtils.class);
 		PowerMockito.mockStatic(System.class);
 		when(System.getenv("APPIUM_HOME")).thenReturn("/opt/appium/");
-		when(FileUtils.readFileToString(new File("/opt/appium/node_modules/appium/package.json")))
+		when(FileUtils.readFileToString(new File("/opt/appium/node_modules/appium/package.json"), StandardCharsets.UTF_8))
 					  .thenReturn("{\"name\":\"appium\",\"version\":\"1.4.13\"}");
 		
 	}
@@ -98,7 +99,7 @@ public class TestLocalAppiumLauncher extends MockitoTest {
 		PowerMockito.mockStatic(System.class);
 		PowerMockito.mockStatic(OSCommand.class);
 		when(System.getenv("APPIUM_HOME")).thenReturn("/opt/appium/");
-		when(FileUtils.readFileToString(new File("/opt/appium/node_modules/appium/package.json")))
+		when(FileUtils.readFileToString(new File("/opt/appium/node_modules/appium/package.json"), StandardCharsets.UTF_8))
 					  .thenReturn("{\"name\":\"application\"}");
 		new LocalAppiumLauncher();
 	}

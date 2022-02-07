@@ -1,6 +1,7 @@
 package com.seleniumtests.it.reporter;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,7 @@ public class CustomReportPlugin extends CommonReporter {
 	@Override
 	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String outputDirectory) {
 		try {
-			FileUtils.writeStringToFile(Paths.get(outputDirectory, "customReport.txt").toFile(), "foo");
+			FileUtils.writeStringToFile(Paths.get(outputDirectory, "customReport.txt").toFile(), "foo", StandardCharsets.UTF_8);
 		} catch (IOException e) {
 		}
 	}

@@ -20,6 +20,7 @@ package com.seleniumtests.it.reporter;
 import static org.mockito.Mockito.spy;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
@@ -77,7 +78,7 @@ public class TestJsonReporter extends ReporterTest {
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass", "com.seleniumtests.it.stubclasses.StubTestClass2"});
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
 		
-		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
+		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile(), StandardCharsets.UTF_8));
 		
 		// Check content of result file
 		Assert.assertEquals(jsonResult.getInt("pass"), 15);

@@ -18,6 +18,7 @@
 package com.seleniumtests.it.reporter;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
@@ -46,7 +47,7 @@ public class TestCustomReporter extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 				
 			// check content of the file. It should contains all fields with a value
-			String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "SUP-result.json").toFile());
+			String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "SUP-result.json").toFile(), StandardCharsets.UTF_8);
 			
 			JSONObject json = new JSONObject(detailedReportContent);
 			
@@ -86,11 +87,11 @@ public class TestCustomReporter extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 				
 			// check content of the file. It should contain error
-			String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testInError", "SUP-result.xml").toFile());
+			String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testInError", "SUP-result.xml").toFile(), StandardCharsets.UTF_8);
 			detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 			Assert.assertTrue(detailedReportContent.contains("<errors><error>				class java.lang.AssertionError: error								at com.seleniumtests"));
 			
-			String detailedReportContent2 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "SUP-result.xml").toFile());
+			String detailedReportContent2 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "SUP-result.xml").toFile(), StandardCharsets.UTF_8);
 			detailedReportContent2 = detailedReportContent2.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 			Assert.assertTrue(detailedReportContent2.contains("<errors></errors>"));
 			
@@ -116,7 +117,7 @@ public class TestCustomReporter extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 			
 			// check content of the file. It should contains all fields with a value
-			String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "summaryResult.json"));
+			String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "summaryResult.json"), StandardCharsets.UTF_8);
 			
 			JSONObject json = new JSONObject(detailedReportContent);
 			
@@ -139,7 +140,7 @@ public class TestCustomReporter extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
 			
 			// check content of the file. It should contains all fields with a value
-			String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "summaryResult.json"));
+			String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "summaryResult.json"), StandardCharsets.UTF_8);
 			
 			JSONObject json = new JSONObject(detailedReportContent);
 			
@@ -189,7 +190,7 @@ public class TestCustomReporter extends ReporterTest {
 			
 			executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"});
 			
-			String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "SUP-result.xml").toFile());
+			String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "SUP-result.xml").toFile(), StandardCharsets.UTF_8);
 			
 			// check step 1 has been encoded
 			Assert.assertTrue(detailedReportContent.contains("<name>step 1 &lt;&gt;&quot;&apos;&amp;/</name>"));
@@ -206,7 +207,7 @@ public class TestCustomReporter extends ReporterTest {
 			
 			executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"});
 			
-			String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "SUP-result.json").toFile());
+			String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "SUP-result.json").toFile(), StandardCharsets.UTF_8);
 			
 			// check step 1 has been encoded
 			Assert.assertTrue(detailedReportContent.contains("Step step 1 <>\\\\\"'&\\\\/\\\\n  - click button  <>\\\\\"'&\\\\n  - a message <>\\\\\"'&"));

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
@@ -75,7 +76,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 				.asString()
 				.getBody();
 		
-		Assert.assertEquals(fileContent, FileUtils.readFileToString(app));
+		Assert.assertEquals(fileContent, FileUtils.readFileToString(app, StandardCharsets.UTF_8));
 	}
 	
 //	@Test(groups={"it"})

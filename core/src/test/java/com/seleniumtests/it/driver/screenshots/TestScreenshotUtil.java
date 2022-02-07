@@ -20,6 +20,7 @@ package com.seleniumtests.it.driver.screenshots;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -100,11 +101,11 @@ public class TestScreenshotUtil extends ReporterTest {
 		Assert.assertEquals(htmlFiles.length, 2);
 		
 		// check that html files reflect the real window code
-		String mainWindowCode = FileUtils.readFileToString(htmlFiles[0]);
+		String mainWindowCode = FileUtils.readFileToString(htmlFiles[0], StandardCharsets.UTF_8);
 		Assert.assertTrue(mainWindowCode.contains("<h3>Test clicking an element</h3>"));
 		Assert.assertFalse(mainWindowCode.contains("<a href=\"http://www.google.fr\" id=\"linkIFrame\" target=\"_blank\">My link in IFrame</a>"));
 		
-		String secondWindowCode = FileUtils.readFileToString(htmlFiles[1]);
+		String secondWindowCode = FileUtils.readFileToString(htmlFiles[1], StandardCharsets.UTF_8);
 		Assert.assertFalse(secondWindowCode.contains("<h3>Test clicking an element</h3>"));
 		Assert.assertTrue(secondWindowCode.contains("<a href=\"http://www.google.fr\" id=\"linkIFrame\" target=\"_blank\">My link in IFrame</a>"));
 		
