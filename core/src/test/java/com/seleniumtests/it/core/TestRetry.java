@@ -18,6 +18,7 @@
 package com.seleniumtests.it.core;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.util.StringUtils;
@@ -165,7 +166,7 @@ public class TestRetry extends ReporterTest {
 		
 		executeSubCucumberTests("error_scenario", 1);
 		
-		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
+		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"), StandardCharsets.UTF_8);
 		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='error_scenario/TestReport\\.html'.*?>error_scenario</a>.*"));
 		Assert.assertFalse(mainReportContent.matches(".*<a href\\='error_scenario/TestReport\\.html'.*?>error_scenario-1</a>.*")); // check all executions are put in the same test

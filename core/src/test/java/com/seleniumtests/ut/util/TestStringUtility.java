@@ -17,14 +17,13 @@
  */
 package com.seleniumtests.ut.util;
 
-import com.seleniumtests.customexception.CustomSeleniumTestsException;
-import com.seleniumtests.customexception.DatasetException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestVariable;
+import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.util.StringUtility;
 
 public class TestStringUtility extends GenericTest {

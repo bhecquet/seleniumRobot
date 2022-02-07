@@ -28,6 +28,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -89,7 +90,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions"}, "core_3,core_4", "");
 		
-		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
+		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"), StandardCharsets.UTF_8);
 		Assert.assertTrue(mainReportContent.contains(">core_3</a>"));
 		Assert.assertTrue(mainReportContent.contains(">core_4</a>"));
 		Assert.assertTrue(mainReportContent.contains(">testAndSubActions</a>"));
@@ -439,7 +440,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		Assert.assertFalse(logs.contains("start test"));
 		
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
-		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
+		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile(), StandardCharsets.UTF_8));
 		
 		// All tests should be skipped because configuration method is skipped
 		Assert.assertEquals(jsonResult.getInt("skip"), 2);
@@ -471,7 +472,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
-		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
+		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile(), StandardCharsets.UTF_8));
 		
 		// All tests should be skipped because configuration method is skipped
 		Assert.assertEquals(jsonResult.getInt("skip"), 2);
@@ -504,7 +505,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 		
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
-		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
+		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile(), StandardCharsets.UTF_8));
 		
 		// All tests should be skipped because configuration method is skipped
 		Assert.assertEquals(jsonResult.getInt("skip"), 2);
@@ -539,7 +540,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 		
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
-		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
+		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile(), StandardCharsets.UTF_8));
 		
 		// All tests should not be skipped
 		Assert.assertEquals(jsonResult.getInt("skip"), 0);
@@ -576,7 +577,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		Assert.assertTrue(logs.contains("test 2"));
 		
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
-		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
+		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile(), StandardCharsets.UTF_8));
 		
 		// All tests should be skipped because configuration method is skipped
 		Assert.assertEquals(jsonResult.getInt("pass"), 2);
@@ -612,7 +613,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		Assert.assertTrue(logs.contains("end method"));
 		
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
-		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
+		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile(), StandardCharsets.UTF_8));
 		
 		// All tests should be skipped because configuration method is skipped
 		Assert.assertEquals(jsonResult.getInt("pass"), 2);
@@ -649,7 +650,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 		
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
-		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
+		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile(), StandardCharsets.UTF_8));
 		
 		// All tests should be skipped because configuration method is skipped
 		Assert.assertEquals(jsonResult.getInt("pass"), 2);
@@ -687,7 +688,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 		
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
-		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
+		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile(), StandardCharsets.UTF_8));
 		
 		// All tests should be skipped because configuration method is skipped
 		Assert.assertEquals(jsonResult.getInt("pass"), 2);

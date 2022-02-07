@@ -20,6 +20,7 @@ package com.seleniumtests.it.driver;
 import java.awt.AWTException;
 import java.io.File;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -469,7 +470,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	public void testWebDriverWaitWithLowTimeout() {
 		long start = new Date().getTime();
 		try {
-			new WebDriverWait(driver, 2).until(ExpectedConditions.visibilityOf(new HtmlElement("", By.id("someNonExistentId"))));
+			new WebDriverWait(driver, Duration.ofSeconds(2)).until(ExpectedConditions.visibilityOf(new HtmlElement("", By.id("someNonExistentId"))));
 		} catch (TimeoutException e) {}
 		
 		// we cannot check precise timing as it depends on the hardware, but we should never wait more that 10 secs (the default timeout for searching element is 30 secs)
