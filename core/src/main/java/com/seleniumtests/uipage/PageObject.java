@@ -1135,10 +1135,10 @@ public class PageObject extends BasePage implements IPage {
     	return selectNewWindow(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout() * 1000);
     }
     
-    private boolean hasAlreadySwitchedWindow() {
+    private boolean hasAlreadySwitchedWindow(String currentWindowHandle) {
     	// handles obtained before the click
     	Set<String> knownHandles  = getCurrentHandles();
-    	return !knownHandles.contains(driver.getWindowHandle());
+    	return !knownHandles.contains(currentWindowHandle);
     	
     }
     
@@ -1155,14 +1155,7 @@ public class PageObject extends BasePage implements IPage {
     	if (SeleniumTestsContextManager.getThreadContext().getTestType().family() == TestType.APP) {
             throw new ScenarioException("Application are not compatible with Windows");
         }
-    	
-    	// in case switch has already been done (HtmlUnit case)
-    	if (hasAlreadySwitchedWindow()) {
-
-     		internalLogger.info("Driver already switched to new window");
-    		return (String) getCurrentHandles().toArray()[0];
-    	}
-    	        
+    	     
         // Keep the name of the current window handle before switching
         // sometimes, our action made window disappear
  		String mainWindowHandle;
@@ -1171,6 +1164,14 @@ public class PageObject extends BasePage implements IPage {
  		} catch (Exception e) {
  			mainWindowHandle = "";
  		}
+
+    	// in case switch has already been done (HtmlUnit case)
+    	if (hasAlreadySwitchedWindow(mainWindowHandle)) {
+
+     		internalLogger.info("Driver already switched to new window");
+    		return (String) getCurrentHandles().toArray()[0];
+    	}
+ 		
  		internalLogger.debug("Current handle: " + mainWindowHandle);
 
  		// wait for window to be displayed

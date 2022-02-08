@@ -905,6 +905,46 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 
         return element.getAttribute(name);
     }
+	
+	@Override
+	@ReplayOnError
+	public String getDomAttribute(String name) {
+		findElement(false, false);
+		
+		return element.getDomAttribute(name);
+	}
+	
+	@Override
+	@ReplayOnError
+	public String getDomProperty(String name) {
+		findElement(false, false);
+		
+		return element.getDomProperty(name);
+	}
+	
+	@Override
+	@ReplayOnError
+	public String getAriaRole() {
+		findElement(false, false);
+		
+		return element.getAriaRole();
+	}
+	
+	@Override
+	@ReplayOnError
+	public String getAccessibleName() {
+		findElement(false, false);
+		
+		return element.getAccessibleName();
+	}
+	
+	@Override
+	@ReplayOnError
+	public SearchContext getShadowRoot() {
+		findElement(false, false);
+		
+		return element.getShadowRoot();
+	}
 
     /**
      * Returns the BY locator stored in the HtmlElement.
