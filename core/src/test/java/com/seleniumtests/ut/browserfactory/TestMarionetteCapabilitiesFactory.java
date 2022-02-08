@@ -31,6 +31,7 @@ import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.GeckoDriverService;
 import org.openqa.selenium.remote.CapabilityType;
@@ -91,7 +92,7 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		Assert.assertTrue(capa.is(CapabilityType.TAKES_SCREENSHOT));
 		Assert.assertTrue(capa.is(CapabilityType.ACCEPT_SSL_CERTS));
 		Assert.assertFalse(capa.is(SeleniumRobotCapabilityType.NODE_TAGS));
-		Assert.assertEquals(capa.getVersion(), "");
+		Assert.assertEquals(capa.getBrowserVersion(), "");
 		Assert.assertEquals(capa.getCapability(CapabilityType.PROXY), proxyConfig);
 	}
 
@@ -136,7 +137,7 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(capa.getPlatform(), Platform.WINDOWS);
+		Assert.assertEquals(capa.getPlatformName(), Platform.WINDOWS);
 		
 	}
 	
@@ -161,7 +162,7 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(capa.getVersion(), "60.0");
+		Assert.assertEquals(capa.getBrowserVersion(), "60.0");
 		
 	}
 	
@@ -175,9 +176,9 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "firefox");
-		Assert.assertEquals(capa.getCapability(FirefoxDriver.MARIONETTE), true);
+		Assert.assertEquals(capa.getCapability(FirefoxDriver.Capability.MARIONETTE), true);
 		
-		FirefoxProfile profile = (FirefoxProfile)capa.getCapability(FirefoxDriver.PROFILE);
+		FirefoxProfile profile = (FirefoxProfile)capa.getCapability(FirefoxDriver.Capability.PROFILE);
 		
 		// check profile
 		Assert.assertTrue(profile.getBooleanPreference("webdriver_accept_untrusted_certs", false));
@@ -198,7 +199,7 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
-		FirefoxProfile profile = (FirefoxProfile)capa.getCapability(FirefoxDriver.PROFILE);
+		FirefoxProfile profile = (FirefoxProfile)capa.getCapability(FirefoxDriver.Capability.PROFILE);
 		
 		// check profile
 		Assert.assertEquals(profile.getStringPreference("general.useragent.override", ""), "FIREFOX 55");
@@ -218,7 +219,7 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(capa.getCapability(FirefoxDriver.BINARY), "/opt/firefox/bin/firefox");
+		Assert.assertEquals(((Map<?,?>)(((FirefoxOptions)capa).asMap().get(FirefoxOptions.FIREFOX_OPTIONS))).get("binary") , "/opt/firefox/bin/firefox");
 	}
 	
 	@Test(groups={"ut"})
@@ -226,7 +227,7 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 
-		Assert.assertEquals(capa.getCapability(FirefoxDriver.BINARY), "/usr/bin/firefox");
+		Assert.assertEquals(((Map<?,?>)(((FirefoxOptions)capa).asMap().get(FirefoxOptions.FIREFOX_OPTIONS))).get("binary") , "/usr/bin/firefox");
 	}
 	
 	@Test(groups={"ut"})
@@ -237,7 +238,7 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
-		FirefoxProfile profile = (FirefoxProfile)capa.getCapability(FirefoxDriver.PROFILE);
+		FirefoxProfile profile = (FirefoxProfile)capa.getCapability(FirefoxDriver.Capability.PROFILE);
 		
 		// check profile
 		Assert.assertEquals(profile.getStringPreference("network.automatic-ntlm-auth.trusted-uris", ""), "uri://uri.ntlm");
@@ -251,7 +252,7 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
-		FirefoxProfile profile = (FirefoxProfile)capa.getCapability(FirefoxDriver.PROFILE);
+		FirefoxProfile profile = (FirefoxProfile)capa.getCapability(FirefoxDriver.Capability.PROFILE);
 		
 		// check profile
 		Assert.assertEquals(profile.getStringPreference("browser.download.dir", ""), "/home/download");
@@ -271,7 +272,7 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
-		FirefoxProfile profile = (FirefoxProfile)capa.getCapability(FirefoxDriver.PROFILE);
+		FirefoxProfile profile = (FirefoxProfile)capa.getCapability(FirefoxDriver.Capability.PROFILE);
 		
 		// check profile
 		Assert.assertEquals(profile.getStringPreference("browser.download.dir", ""), "");

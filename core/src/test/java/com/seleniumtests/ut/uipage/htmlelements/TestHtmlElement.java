@@ -83,6 +83,7 @@ import com.seleniumtests.uipage.htmlelements.FrameElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.remote.AppiumCommandExecutor;
 
 /**
@@ -102,7 +103,7 @@ public class TestHtmlElement extends MockitoTest {
 	private AppiumDriver mobileDriver;
 
 	@Mock
-	private WebElement mobileElement;
+	private RemoteWebElement mobileElement;
 	@Mock
 	private RemoteWebElement element;
 	@Mock
@@ -195,7 +196,9 @@ public class TestHtmlElement extends MockitoTest {
 		when(subElement2.getLocation()).thenReturn(new Point(5, 5));
 
 		when(mobileElement.getLocation()).thenReturn(new Point(1, 1));
+		when(mobileElement.getSize()).thenReturn(new Dimension(8, 8));
 		when(mobileElement.isDisplayed()).thenReturn(true);
+		when(mobileElement.getId()).thenReturn("1234");
 
 		// init for mobile tests
 		AppiumCommandExecutor ce = Mockito.mock(AppiumCommandExecutor.class);
@@ -211,7 +214,7 @@ public class TestHtmlElement extends MockitoTest {
 
 		// newSession, getSession, getSession, findElement
 
-		mobileDriver = Mockito.spy(new AppiumDriver(ce, new DesiredCapabilities()));
+		mobileDriver = Mockito.spy(new AndroidDriver(ce, new DesiredCapabilities()));
 
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");

@@ -1135,10 +1135,18 @@ public class PageObject extends BasePage implements IPage {
     	return selectNewWindow(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout() * 1000);
     }
     
+    private boolean hasAlreadySwitchedWindow() {
+    	// handles obtained before the click
+    	Set<String> knownHandles  = getCurrentHandles();
+    	return !knownHandles.contains(driver.getWindowHandle());
+    	
+    }
+    
     /**
      * Selects the first unknown window. To use immediately after an action creates a new window or tab
      * Each time we do a click, but just before it (selenium click, JS click or action click), we record the list of windows.
      * I a new window or tab is displayed, we select it.
+     * This also check if the switch has already been done (it's the case for HtmlUnit 3.57 where it switchs automatically
      * @param waitMs	wait for N milliseconds before raising error
      * @return
      */
@@ -1147,6 +1155,13 @@ public class PageObject extends BasePage implements IPage {
     	if (SeleniumTestsContextManager.getThreadContext().getTestType().family() == TestType.APP) {
             throw new ScenarioException("Application are not compatible with Windows");
         }
+    	
+    	// in case switch has already been done (HtmlUnit case)
+    	if (hasAlreadySwitchedWindow()) {
+
+     		internalLogger.info("Driver already switched to new window");
+    		return (String) getCurrentHandles().toArray()[0];
+    	}
     	        
         // Keep the name of the current window handle before switching
         // sometimes, our action made window disappear
