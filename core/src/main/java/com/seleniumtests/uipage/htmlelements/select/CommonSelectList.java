@@ -32,7 +32,7 @@ public abstract class CommonSelectList implements ISelectList {
     }
 
 	public boolean isMultipleWithoutFind() {
-		String value = getParentElement().getAttribute("multiple");
+		String value = getParentElement().getDomAttribute("multiple");
         return value != null && !"false".equals(value);
 	}
 
