@@ -168,7 +168,7 @@ public class TestLinuxOsUtility extends MockitoTest {
 		when(OSCommand.executeCommandAndWait("which google-chrome")).thenReturn("/usr/bin/which: no google-chrome in (/usr/local/sbin)");
 
 		Map<BrowserType, List<BrowserInfo>> browsers = new OSUtilityUnix().discoverInstalledBrowsersWithVersion();
-		Assert.assertEquals(browsers.size(), 2);
+		Assert.assertEquals(browsers.size(), 1); // only HTMLUNIT
 		Assert.assertFalse(browsers.containsKey(BrowserType.FIREFOX));
 	}
 

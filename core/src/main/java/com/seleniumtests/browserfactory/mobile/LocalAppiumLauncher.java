@@ -19,6 +19,7 @@ package com.seleniumtests.browserfactory.mobile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -103,7 +104,7 @@ public class LocalAppiumLauncher implements AppiumLauncher {
 	private void checkAppiumVersion() {
 		try {
 			File packageFile = Paths.get(appiumHome, "node_modules", "appium", "package.json").toFile();
-			String appiumConfig = FileUtils.readFileToString(packageFile);
+			String appiumConfig = FileUtils.readFileToString(packageFile, StandardCharsets.UTF_8);
 			JSONObject packages = new JSONObject(appiumConfig);
 			if (!"appium".equals(packages.getString("name"))) {
 				throw new ConfigurationException(String.format("package.json file found in %s is not for appium, check path", packageFile.getAbsolutePath()));

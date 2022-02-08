@@ -71,7 +71,9 @@ public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
         	options.setCapability(InternetExplorerDriver.INITIAL_BROWSER_URL, "about:blank");
         }
 		
-        options.setPageLoadStrategy(webDriverConfig.getPageLoadStrategy());
+        if (webDriverConfig.getPageLoadStrategy() != null) {
+        	options.setPageLoadStrategy(webDriverConfig.getPageLoadStrategy());
+        }
 
         return options;
 	}
