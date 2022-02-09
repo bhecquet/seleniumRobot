@@ -22,6 +22,8 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
@@ -31,7 +33,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.google.common.io.Files;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.extools.SoapUi;
 import com.seleniumtests.customexception.ConfigurationException;
@@ -51,9 +52,9 @@ public class TestSoapUi extends MockitoTest {
 	
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testNoSoapUiInstall() throws IOException {
-		File tmp = Files.createTempDir();
+		File tmp = Files.createTempDirectory("tmp").toFile();
 		File runner = Paths.get(tmp.getAbsolutePath(), "ban", "testrunner.bat").toFile();
-		FileUtils.write(runner, "rem");
+		FileUtils.write(runner, "rem", StandardCharsets.UTF_8);
 		
 		PowerMockito.mockStatic(System.class);
 		when(System.getenv("SOAPUI_HOME")).thenReturn(tmp.getAbsolutePath());
@@ -62,9 +63,9 @@ public class TestSoapUi extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testSoapUiInstallOk() throws IOException {
-		File tmp = Files.createTempDir();
+		File tmp = Files.createTempDirectory("tmp").toFile();
 		File runner = Paths.get(tmp.getAbsolutePath(), "bin", "testrunner.bat").toFile();
-		FileUtils.write(runner, "rem");
+		FileUtils.write(runner, "rem", StandardCharsets.UTF_8);
 		
 		PowerMockito.mockStatic(System.class);
 		when(System.getenv("SOAPUI_HOME")).thenReturn(tmp.getAbsolutePath());
@@ -73,9 +74,9 @@ public class TestSoapUi extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testRunWithString() throws IOException {
-		File tmp = Files.createTempDir();
+		File tmp = Files.createTempDirectory("tmp").toFile();
 		File runner = Paths.get(tmp.getAbsolutePath(), "bin", "testrunner.bat").toFile();
-		FileUtils.write(runner, "rem");
+		FileUtils.write(runner, "rem", StandardCharsets.UTF_8);
 		
 		PowerMockito.mockStatic(System.class);
 		PowerMockito.mockStatic(OSCommand.class);
@@ -87,16 +88,16 @@ public class TestSoapUi extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testRunWithProjectFile() throws IOException {
-		File tmp = Files.createTempDir();
+		File tmp = Files.createTempDirectory("tmp").toFile();
 		File runner;
 		if (OSUtility.getCurrentPlatorm() == Platform.WINDOWS) {
 			runner = Paths.get(tmp.getAbsolutePath(), "bin", "testrunner.bat").toFile();
 		} else {
 			runner = Paths.get(tmp.getAbsolutePath(), "bin", "testrunner.sh").toFile();
 		}
-		FileUtils.write(runner, "rem");
+		FileUtils.write(runner, "rem", StandardCharsets.UTF_8);
 		File project = Paths.get(tmp.getAbsolutePath(), "project.xml").toFile();
-		FileUtils.write(project, "<xml></xml>");
+		FileUtils.write(project, "<xml></xml>", StandardCharsets.UTF_8);
 		
 		PowerMockito.mockStatic(System.class);
 		PowerMockito.mockStatic(OSCommand.class);

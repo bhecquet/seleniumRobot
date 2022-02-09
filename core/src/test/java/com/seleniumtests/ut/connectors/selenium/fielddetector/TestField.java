@@ -7,7 +7,6 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.connectors.selenium.fielddetector.Field;
-import com.seleniumtests.connectors.selenium.fielddetector.Label;
 
 import kong.unirest.json.JSONObject;
 

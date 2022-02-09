@@ -29,7 +29,6 @@ import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
@@ -42,7 +41,6 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
-import com.seleniumtests.browserfactory.ChromeCapabilitiesFactory;
 import com.seleniumtests.browserfactory.FirefoxCapabilitiesFactory;
 import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.core.SeleniumTestsContext;

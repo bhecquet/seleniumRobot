@@ -31,7 +31,6 @@ import org.openqa.selenium.interactions.ClickAction;
 import org.openqa.selenium.interactions.CompositeAction;
 import org.openqa.selenium.interactions.Interaction;
 import org.openqa.selenium.interactions.Sequence;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
 
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
@@ -42,7 +41,7 @@ public class CompositeActions {
 	
 	/**
 	 * Slows down any action performed through CompositeActions by 200 ms
-	 * It requires to use {@link EventFiringWebDriver} because we intercept the "perform()" method of any {@link org.openqa.selenium.interactions.Action}
+	 * It requires to use {@link CustomEventFiringWebDriver} because we intercept the "perform()" method of any {@link org.openqa.selenium.interactions.Action}
 	 * Eclipse project also need to have its Aspect build path configured with selenium-api artifact
 	 * @param joinPoint
 	 */

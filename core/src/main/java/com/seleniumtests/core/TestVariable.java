@@ -22,7 +22,6 @@ import java.time.format.DateTimeFormatter;
 
 import org.apache.log4j.Logger;
 
-import com.seleniumtests.core.runner.SeleniumRobotTestListener;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;

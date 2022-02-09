@@ -10,9 +10,6 @@ import com.seleniumtests.uipage.htmlelements.ButtonElement;
 
 public class ImageDetectorPage extends PageObject {
 	
-
-	private String openedPageUrl;
-	
 	private static final ButtonElement errorButton = new ButtonElement("error button", By.id("errorButton"));
 	
     public ImageDetectorPage() throws Exception {
@@ -21,7 +18,6 @@ public class ImageDetectorPage extends PageObject {
 
     public ImageDetectorPage(String url) throws Exception {
     	super(errorButton, url);
-    	openedPageUrl = url;
     }
 	
 

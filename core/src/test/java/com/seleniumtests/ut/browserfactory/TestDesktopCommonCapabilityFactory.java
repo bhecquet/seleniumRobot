@@ -17,8 +17,8 @@
  */
 package com.seleniumtests.ut.browserfactory;
 
-import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;

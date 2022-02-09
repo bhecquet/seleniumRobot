@@ -25,7 +25,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -51,7 +50,6 @@ import org.testng.ITestResult;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.testanalysis.ErrorCause;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.reporter.logger.GenericFile;

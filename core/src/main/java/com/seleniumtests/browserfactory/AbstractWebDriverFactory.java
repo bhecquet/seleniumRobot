@@ -18,7 +18,6 @@
 package com.seleniumtests.browserfactory;
 
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.MutableCapabilities;

@@ -31,7 +31,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarFile;
@@ -245,7 +244,6 @@ public class FileUtility {
                     	 final OutputStream out = new FileOutputStream(entryDestination)) {
                     
 	                    IOUtils.copy(in, out);
-	                    IOUtils.closeQuietly(in);
                     }
                 }
             }

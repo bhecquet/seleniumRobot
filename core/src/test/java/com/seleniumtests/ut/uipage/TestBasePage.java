@@ -17,12 +17,12 @@
  */
 package com.seleniumtests.ut.uipage;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.remote.RemoteWebElement;

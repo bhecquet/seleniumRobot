@@ -17,8 +17,8 @@
  */
 package com.seleniumtests.it.reporter;
 
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import java.io.File;
 import java.nio.file.Paths;

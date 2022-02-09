@@ -19,7 +19,6 @@ package com.seleniumtests.it.stubclasses;
 
 import java.lang.reflect.Method;
 
-import org.openqa.selenium.WebDriverException;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;

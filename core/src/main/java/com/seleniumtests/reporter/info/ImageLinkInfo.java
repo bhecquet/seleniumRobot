@@ -1,9 +1,5 @@
 package com.seleniumtests.reporter.info;
 
-import com.seleniumtests.browserfactory.ICapabilitiesFactory;
-import com.seleniumtests.util.logging.SeleniumRobotLogger;
-import org.apache.log4j.Logger;
-
 public class ImageLinkInfo extends HyperlinkInfo {
 
 	public ImageLinkInfo(String link) {

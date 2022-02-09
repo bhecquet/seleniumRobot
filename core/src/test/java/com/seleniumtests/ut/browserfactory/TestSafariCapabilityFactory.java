@@ -17,7 +17,6 @@
  */
 package com.seleniumtests.ut.browserfactory;
 
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -40,7 +39,6 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
-import com.seleniumtests.browserfactory.ChromeCapabilitiesFactory;
 import com.seleniumtests.browserfactory.SafariCapabilitiesFactory;
 import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.driver.BrowserType;

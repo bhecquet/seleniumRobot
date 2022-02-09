@@ -55,7 +55,6 @@ import com.seleniumtests.core.config.ConfigReader;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
-import com.seleniumtests.driver.DriverExceptionListener;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;

@@ -23,7 +23,6 @@ import java.net.URL;
 
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.CapabilityType;
 
 import com.seleniumtests.browserfactory.mobile.AppiumLauncher;

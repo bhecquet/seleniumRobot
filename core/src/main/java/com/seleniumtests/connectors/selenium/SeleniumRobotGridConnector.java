@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.http.HttpHost;

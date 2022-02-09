@@ -1,5 +1,7 @@
 package com.seleniumtests.ut.uipage;
 
+import java.time.Duration;
+
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -34,23 +36,23 @@ public class TestExpectedConditionsC extends GenericTest {
 	
 	@Test(groups={"ut"})
 	public void testPresenceOfPresentElement() {
-		WebElement element = new WebDriverWait(page.getDriver(), 2).until(ExpectedConditionsC.presenceOfElementLocated(DriverTestPage.textElement));
+		WebElement element = new WebDriverWait(page.getDriver(), Duration.ofSeconds(2)).until(ExpectedConditionsC.presenceOfElementLocated(DriverTestPage.textElement));
 		Assert.assertEquals(element.getTagName(), "input");
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions = TimeoutException.class)
 	public void testPresenceOfNotPresentElement() {
-		new WebDriverWait(page.getDriver(), 2).until(ExpectedConditionsC.presenceOfElementLocated(DriverTestPage.textElementNotPresent));
+		new WebDriverWait(page.getDriver(), Duration.ofSeconds(2)).until(ExpectedConditionsC.presenceOfElementLocated(DriverTestPage.textElementNotPresent));
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions = TimeoutException.class)
 	public void testAbsenceOfPresentElement() {
-		new WebDriverWait(page.getDriver(), 2).until(ExpectedConditionsC.absenceOfElementLocated(DriverTestPage.textElement));
+		new WebDriverWait(page.getDriver(), Duration.ofSeconds(2)).until(ExpectedConditionsC.absenceOfElementLocated(DriverTestPage.textElement));
 	}
 	
 	@Test(groups={"ut"})
 	public void testAbsenceOfNotPresentElement() {
-		Boolean elementAbsent = new WebDriverWait(page.getDriver(), 2).until(ExpectedConditionsC.absenceOfElementLocated(DriverTestPage.textElementNotPresent));
+		Boolean elementAbsent = new WebDriverWait(page.getDriver(), Duration.ofSeconds(2)).until(ExpectedConditionsC.absenceOfElementLocated(DriverTestPage.textElementNotPresent));
 		Assert.assertTrue(elementAbsent);
 
 	}

@@ -22,8 +22,6 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.seleniumtests.customexception.ConfigurationException;
-
 /**
  * Stub class for correction of issue #389: check that is Method parameter is missing, error is raised
  * @author s047432

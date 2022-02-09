@@ -10,7 +10,6 @@ import org.testng.annotations.Test;
 import com.seleniumtests.GenericDriverTest;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.uipage.htmlelements.UiLibraryRegistry;
 

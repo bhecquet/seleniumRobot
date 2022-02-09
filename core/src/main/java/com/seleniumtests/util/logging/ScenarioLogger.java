@@ -14,7 +14,6 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.reporter.info.Info;
-import com.seleniumtests.reporter.info.StringInfo;
 import com.seleniumtests.reporter.logger.GenericFile;
 import com.seleniumtests.reporter.logger.HarCapture;
 import com.seleniumtests.reporter.logger.Snapshot;

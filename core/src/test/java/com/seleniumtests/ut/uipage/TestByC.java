@@ -1,23 +1,22 @@
 package com.seleniumtests.ut.uipage;
 
-import com.seleniumtests.GenericTest;
-import com.seleniumtests.MockitoTest;
-import com.seleniumtests.uipage.ByC;
-import com.seleniumtests.uipage.htmlelements.HtmlElement;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.testng.AssertJUnit.assertEquals;
+
+import java.util.Arrays;
+
 import org.mockito.Mock;
 import org.openqa.selenium.By;
-import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.util.Arrays;
-import java.util.List;
-
-import static org.mockito.Mockito.*;
-import static org.testng.AssertJUnit.assertEquals;
+import com.seleniumtests.MockitoTest;
+import com.seleniumtests.uipage.ByC;
 
 public class TestByC extends MockitoTest {
 

@@ -1,5 +1,6 @@
 package com.seleniumtests.uipage.htmlelements.select;
 
+import java.time.Duration;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -49,7 +50,7 @@ public abstract class CommonSelectList implements ISelectList {
 	 */
 	protected void handleAlert() {
 		try {
-			new WebDriverWait(driver, 0).until(ExpectedConditions.alertIsPresent());
+			new WebDriverWait(driver, Duration.ofSeconds(0)).until(ExpectedConditions.alertIsPresent());
 			driver.switchTo().alert().dismiss();
 		} catch (TimeoutException e) {
 			// no problem if no alert is there

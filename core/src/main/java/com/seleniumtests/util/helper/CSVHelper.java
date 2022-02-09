@@ -32,14 +32,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.DatasetException;
-import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class CSVHelper {
-    private static Logger logger = SeleniumRobotLogger.getLogger(CSVHelper.class);
 
     public static final String DOUBLE_QUOTE = "\"";
     public static final String DELIM_CHAR = ",";

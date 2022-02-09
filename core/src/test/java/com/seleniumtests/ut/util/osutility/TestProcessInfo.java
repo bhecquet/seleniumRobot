@@ -1,19 +1,13 @@
 package com.seleniumtests.ut.util.osutility;
 
-import com.seleniumtests.GenericTest;
-import com.seleniumtests.MockitoTest;
-import com.seleniumtests.browserfactory.BrowserInfo;
-import com.seleniumtests.util.osutility.OSCommand;
-import com.seleniumtests.util.osutility.OSUtilityWindows;
-import com.seleniumtests.util.osutility.ProcessInfo;
-import com.sun.jna.platform.win32.Advapi32Util;
-import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotEquals;
+
 import org.testng.annotations.Test;
 
-import java.nio.file.Paths;
-
-import static org.testng.Assert.*;
+import com.seleniumtests.GenericTest;
+import com.seleniumtests.util.osutility.ProcessInfo;
 
 public class TestProcessInfo extends GenericTest {
 

@@ -1,9 +1,5 @@
 package com.seleniumtests.reporter.info;
 
-import com.seleniumtests.customexception.ConfigurationException;
-import com.seleniumtests.util.logging.Sys;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 

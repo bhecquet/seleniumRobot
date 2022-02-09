@@ -26,11 +26,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
-import org.testng.ITestContext;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.ConnectorsTest;
