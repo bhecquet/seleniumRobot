@@ -176,8 +176,8 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 			return;
 		}
 		
-//		localAddress = Inet4Address.getLocalHost().getHostAddress();
-		localAddress = Inet4Address.getByName("localhost").getHostAddress();
+		localAddress = Inet4Address.getLocalHost().getHostAddress();
+//		localAddress = Inet4Address.getByName("localhost").getHostAddress();
         server = new WebServer(localAddress, getPageMapping());
         server.expose();
         logger.info(String.format("exposing server on http://%s:%d", localAddress, server.getServerHost().getPort()));

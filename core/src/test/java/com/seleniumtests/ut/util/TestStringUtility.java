@@ -17,6 +17,8 @@
  */
 package com.seleniumtests.ut.util;
 
+import java.net.MalformedURLException;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -29,7 +31,7 @@ import com.seleniumtests.util.StringUtility;
 public class TestStringUtility extends GenericTest {
 
 	@Test(groups={"ut"})
-	public void testOddCharWithNull() {
+	public void testOddCharWithNull() throws MalformedURLException {
 		Assert.assertEquals(StringUtility.replaceOddCharsFromFileName(null), "null");
 	}
 	

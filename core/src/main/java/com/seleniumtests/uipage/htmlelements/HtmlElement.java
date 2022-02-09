@@ -23,6 +23,8 @@ import java.lang.reflect.Method;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -417,21 +419,13 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	// click on element before sending keys through keyboard
     	element.click();
         executeScript("arguments[0].focus();", element);
-        
-        DriverConfig driverConfig = WebUIDriver.getWebUIDriver(false).getConfig();
-        
-        // handlitee org.openqa.selenium.UnsupportedCommandException: sendKeysToActiveElement which are not available for firefox and IE
-        if ((driverConfig.getBrowserType() == BrowserType.FIREFOX && FirefoxDriverFactory.isMarionetteMode())
-        		|| driverConfig.getBrowserType() == BrowserType.INTERNET_EXPLORER
-        		|| driverConfig.getBrowserType() == BrowserType.EDGE
-	        	|| (driverConfig.getBrowserType() == BrowserType.CHROME 
-	        			&& driverConfig.getMajorBrowserVersion() >= 75)) {
-        	logger.warn("using specific Marionette method");
-        	executeScript(String.format("arguments[0].value='%s';", keysToSend[0].toString()), element);
+
+        if (keysToSend.length == 0) {
+        	executeScript("arguments[0].value='';", element);
         } else {
-			// use keyboard to type
-			((CustomEventFiringWebDriver)driver).getKeyboard().sendKeys(keysToSend);
+        	executeScript(String.format("arguments[0].value='%s';", keysToSend[0].toString()), element);
         }
+
     }
 
     @ReplayOnError
@@ -854,7 +848,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 				
 			// wait for element to be displayed
 			try {
-				new WebDriverWait(driver, 1).until(ExpectedConditions.visibilityOf(element));
+				new WebDriverWait(driver, Duration.ofSeconds(1)).until(ExpectedConditions.visibilityOf(element));
 			} catch (ElementNotVisibleException e) {
 				scenarioLogger.info(String.format("element %s not visible", element));
 			} catch (Exception e) {
@@ -1553,15 +1547,15 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     
 	public void setImplicitWaitTimeout(final double timeout) {
         try {
-            driver.manage().timeouts().implicitlyWait((int)timeout, TimeUnit.SECONDS);
+            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds((int)timeout));
         } catch (Exception ex) {
         	logger.error(ex);
         }
     }
 	
-	public void setImplicitWaitTimeout(int timeout, TimeUnit unit) {
+	public void setImplicitWaitTimeout(int timeout, TemporalUnit unit) {
 		try {
-			driver.manage().timeouts().implicitlyWait(timeout, unit);
+			driver.manage().timeouts().implicitlyWait(Duration.of((long)timeout, unit));
 		} catch (Exception ex) {
 			logger.error(ex);
 		}
@@ -1580,14 +1574,14 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	driver = updateDriver();
     	
     	try {
-    		setImplicitWaitTimeout(510, TimeUnit.MILLISECONDS);
+    		setImplicitWaitTimeout(510, ChronoUnit.MILLIS);
     	
 	    	Clock clock = Clock.systemUTC();
 	    	Instant end = clock.instant().plusSeconds(Math.max(1, timeout));
 	    	
 	    	while (end.isAfter(clock.instant())) {
 	    		try {
-		    		WebElement elt = new WebDriverWait(driver, 0).ignoring(ConfigurationException.class, ScenarioException.class).until(ExpectedConditionsC.presenceOfElementLocated(this));
+		    		WebElement elt = new WebDriverWait(driver, Duration.ofMillis(0)).ignoring(ConfigurationException.class, ScenarioException.class).until(ExpectedConditionsC.presenceOfElementLocated(this));
 		            outlineElement(elt);
 		    		return;
 	    		} catch (TimeoutException e) {
@@ -1603,13 +1597,13 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public void waitFor(int timeout, ExpectedCondition<?> condition) {
     	
     	try {
-    		setImplicitWaitTimeout(510, TimeUnit.MILLISECONDS);
+    		setImplicitWaitTimeout(510, ChronoUnit.MILLIS);
 	    	Clock clock = Clock.systemUTC();
 	    	Instant end = clock.instant().plusSeconds(Math.max(1, timeout));
 	    	
 	    	while (end.isAfter(clock.instant())) {
 	    		try {
-	    			new WebDriverWait(driver, timeout).ignoring(ConfigurationException.class, ScenarioException.class).until(condition);
+	    			new WebDriverWait(driver, Duration.ofSeconds(timeout)).ignoring(ConfigurationException.class, ScenarioException.class).until(condition);
 		    		return;
 	    		} catch (TimeoutException e) {
 	    			// nothing to do

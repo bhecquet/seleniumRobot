@@ -28,6 +28,7 @@ import org.openqa.selenium.Proxy;
 import org.openqa.selenium.Proxy.ProxyType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
+import org.openqa.selenium.support.events.WebDriverListener;
 
 import com.google.gson.JsonObject;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
@@ -57,24 +58,44 @@ public class DriverConfig {
     	this.browserType = testContext.getBrowser();
     }
 
-    public List<WebDriverEventListener> getWebDriverListeners() {
+    public List<WebDriverEventListener> getWebDriverEventListeners() {
     	List<String> listeners = testContext.getWebDriverListener();
         
-        ArrayList<WebDriverEventListener> listenerList = new ArrayList<>();
+        ArrayList<WebDriverEventListener> oldlistenerList = new ArrayList<>();
         for (String listenerName : listeners) {
 
             WebDriverEventListener listener = null;
             try {
                 if (!"".equals(listenerName)) {
                     listener = (WebDriverEventListener) (Class.forName(listenerName)).newInstance();
-                    listenerList.add(listener);
+                    oldlistenerList.add(listener);
                 }
             } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
                 logger.error(e);
             }
         }
         
-        return listenerList;
+        return oldlistenerList;
+    }
+    
+    public List<WebDriverListener> getWebDriverListeners() {
+    	List<String> listeners = testContext.getWebDriverListener();
+    	
+    	ArrayList<WebDriverListener> listenerList = new ArrayList<>();
+    	for (String listenerName : listeners) {
+    		
+    		WebDriverListener listener = null;
+    		try {
+    			if (!listenerName.isEmpty()) {
+    				listener = (WebDriverListener) (Class.forName(listenerName)).newInstance();
+    				listenerList.add(listener);
+    			}
+    		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+    			logger.error(e);
+    		}
+    	}
+    	
+    	return listenerList;
     }
 
     public BrowserType getBrowserType() {

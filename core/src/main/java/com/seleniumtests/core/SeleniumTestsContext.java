@@ -37,6 +37,7 @@ import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy.ProxyType;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.events.WebDriverEventListener;
+import org.openqa.selenium.support.events.WebDriverListener;
 import org.testng.IReporter;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -2488,8 +2489,10 @@ public class SeleniumTestsContext {
     
     public void setWebDriverListener(String listener) {
     	List<String> listeners = new ArrayList<>();
-		listeners.add(DriverExceptionListener.class.getName());
     	if (listener != null && !listener.isEmpty()) {
+    		
+    		boolean oldListeners = false;
+    		boolean wdListeners = false;
 
     		for (String listenerClassName: listener.split(",")) {
 	    		// check we can access the class
@@ -2497,13 +2500,26 @@ public class SeleniumTestsContext {
 	    			Class<WebDriverEventListener> listenerClass = (Class<WebDriverEventListener>) Class.forName(listenerClassName);
 	    			if (!WebDriverEventListener.class.isAssignableFrom(listenerClass)) {
 	    				throw new ConfigurationException(String.format("Class %s must implement WebDriverEventListener class", listenerClassName));
+	    			} else {
+	    				logger.warn("WebDriverEventListener interface is deprecated, you should consider to upgrade to WebDriverListener interface");
+	    				oldListeners = true;
 	    			}
 	    			
+	    			if (!WebDriverListener.class.isAssignableFrom(listenerClass)) {
+	    				throw new ConfigurationException(String.format("Class %s must implement WebDriverListener class", listenerClassName));
+	    			} else {
+	    				wdListeners = true;
+	    			}
+
 	        		listeners.add(listenerClassName);
 	    		} catch (ExceptionInInitializerError | ClassNotFoundException e) {
 	    			throw new ConfigurationException(String.format("Class %s cannot be loaded", listenerClassName), e);
 	    		}
     		}
+    		
+    		if (oldListeners && wdListeners) {
+				throw new ConfigurationException("Don't mix 'WebDriverEventListener' and 'WebDriverListener' implementations");
+			}
     	}
     		
 		setAttribute(WEB_DRIVER_LISTENER, listeners);
