@@ -108,21 +108,6 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	
 	/**
-	 * If parameter is defined in test and as JVM parameter (user defined), the user defined parameter must be used
-	 */
-	@Test(groups={"ut context"})
-	public void testUserDefinedParam(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		try {
-			System.setProperty("dpTagsInclude", "anOtherTag");
-			initThreadContext(testNGCtx);
-			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
-			Assert.assertEquals(seleniumTestsCtx.getDPTagsInclude(), "anOtherTag");
-		} finally {
-			System.clearProperty("dpTagsInclude");
-		}
-	}
-	
-	/**
 	 * If parameter is defined in env.ini and as JVM parameter (user defined), the user defined parameter must be used
 	 */
 	@Test(groups={"ut context"})
