@@ -49,6 +49,8 @@ import com.seleniumtests.reporter.reporters.JUnitReporter;
 import com.seleniumtests.reporter.reporters.ReportInfo;
 import com.seleniumtests.reporter.reporters.TestManagerReporter;
 import com.seleniumtests.uipage.htmlelements.ElementInfo;
+import com.seleniumtests.ut.driver.WebDriverEventListener1;
+import com.seleniumtests.ut.driver.WebDriverEventListener2;
 import com.seleniumtests.ut.driver.WebDriverListener1;
 import com.seleniumtests.ut.driver.WebDriverListener2;
 import com.seleniumtests.util.logging.DebugMode;
@@ -1425,13 +1427,32 @@ public class TestSeleniumTestContext extends GenericTest {
 	
 
 	@Test(groups="ut context")
+	public void testWebDriverEventListener(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setWebDriverListener("com.seleniumtests.ut.driver.WebDriverEventListener1,com.seleniumtests.ut.driver.WebDriverEventListener2");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebDriverListener().size(), 2); 
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebDriverListener().get(0), WebDriverEventListener1.class.getName());
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebDriverListener().get(1), WebDriverEventListener2.class.getName());
+	}
+	
+	@Test(groups="ut context")
 	public void testWebDriverListener(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setWebDriverListener("com.seleniumtests.ut.driver.WebDriverListener1,com.seleniumtests.ut.driver.WebDriverListener2");
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebDriverListener().size(), 3); // 3 classes, the first is the internal class
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebDriverListener().get(0), DriverExceptionListener.class.getName());
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebDriverListener().get(1), WebDriverListener1.class.getName());
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebDriverListener().get(2), WebDriverListener2.class.getName());
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebDriverListener().size(), 2); 
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebDriverListener().get(1), WebDriverListener2.class.getName());
+	}
+	
+	/**
+	 * We cannot mix the 2 listeners
+	 * @param testNGCtx
+	 * @param xmlTest
+	 */
+	@Test(groups="ut context", expectedExceptions = ConfigurationException.class)
+	public void testMixWebDriverListener(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setWebDriverListener("com.seleniumtests.ut.driver.WebDriverEventListener1,com.seleniumtests.ut.driver.WebDriverListener2");
+		
 	}
 	
 	/**
@@ -1443,6 +1464,11 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testBadWebDriverListenerClass(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setWebDriverListener("com.seleniumtests.core.Filter");
+	}
+	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
+	public void testUnknownWebDriverListenerClass(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setWebDriverListener("com.seleniumtests.core.Foo");
 	}
 	@Test(groups="ut context")
 	public void testNullWebDriverListener(final ITestContext testNGCtx, final XmlTest xmlTest) {

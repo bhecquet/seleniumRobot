@@ -462,6 +462,10 @@ public class ScreenshotUtil {
             }
 
             String screenshotB64 = screenShot.getScreenshotAs(OutputType.BASE64);
+            if (screenshotB64 == null) {
+            	logger.warn("capture cannot be done");
+            	return null;
+            }
             if (uiDriver != null && uiDriver.getConfig().getBrowserType() == BrowserType.BROWSER) {
             	((AndroidDriver)((CustomEventFiringWebDriver)driver).getWebDriver()).context("WEBVIEW");
             }

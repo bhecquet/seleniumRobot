@@ -76,6 +76,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.UselessFileDetector;
 import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.support.events.EventFiringDecorator;
+import org.openqa.selenium.support.events.WebDriverListener;
 
 import com.neotys.selenium.proxies.NLWebDriver;
 import com.seleniumtests.browserfactory.BrowserInfo;
@@ -111,7 +112,8 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     private static final int MAX_DIMENSION = 100000;
     private Set<String> currentHandles;
     private final List<Long> driverPids;
-	private final WebDriver driver;
+	private WebDriver driver;
+	private final WebDriver originalDriver;
 	private final NLWebDriver neoloadDriver;
 	private final boolean isWebTest;
 	private final DriverMode driverMode;
@@ -542,11 +544,16 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     }
 
     public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, Boolean isWebTest, DriverMode localDriver, BrowserMobProxy mobProxy, SeleniumGridConnector gridConnector) {
-    	this(driver, driverPids, browserInfo, isWebTest, localDriver, mobProxy, gridConnector, null);
+    	this(driver, driverPids, browserInfo, isWebTest, localDriver, mobProxy, gridConnector, null, new ArrayList<>());
     }
-	public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, Boolean isWebTest, DriverMode localDriver, BrowserMobProxy mobProxy, SeleniumGridConnector gridConnector, Integer attachExistingDriverPort) {
+	public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, Boolean isWebTest, DriverMode localDriver, BrowserMobProxy mobProxy, SeleniumGridConnector gridConnector, Integer attachExistingDriverPort, List<WebDriverListener> wdListeners) {
 
+		this.originalDriver = driver; // store the original driver in case decorated one cannot be used (getSessionId)
 		this.driver = new EventFiringDecorator(new DriverExceptionListener()).decorate(driver);
+
+        for (WebDriverListener wdListener: wdListeners) {
+        	this.driver = new EventFiringDecorator(wdListener).decorate(this.driver);
+        }
 		
         this.driverPids = driverPids == null ? new ArrayList<>(): driverPids;
 		this.browserInfo = browserInfo;
@@ -709,7 +716,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     
     public String getSessionId() {
     	try {
-    		return ((RemoteWebDriver)driver).getSessionId().toString();
+    		return ((RemoteWebDriver)originalDriver).getSessionId().toString();
     	} catch (ClassCastException e) {
     		return UUID.randomUUID().toString();
     	} catch (NullPointerException e) {
@@ -1527,7 +1534,12 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 
 	@Override
 	public <X> X getScreenshotAs(OutputType<X> target) throws WebDriverException {
-		return ((TakesScreenshot)driver).getScreenshotAs(target);
+		try {
+			return ((TakesScreenshot)driver).getScreenshotAs(target);
+		} catch (ClassCastException e) {
+			// HTMLUNIT does not support taking screenshots, so casting is impossible
+			return null;
+		}
 	}
 
 	@Override

@@ -70,7 +70,7 @@ public class DriverConfig {
                     listener = (WebDriverEventListener) (Class.forName(listenerName)).newInstance();
                     oldlistenerList.add(listener);
                 }
-            } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+            } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | ClassCastException e) {
                 logger.error(e);
             }
         }
@@ -90,7 +90,7 @@ public class DriverConfig {
     				listener = (WebDriverListener) (Class.forName(listenerName)).newInstance();
     				listenerList.add(listener);
     			}
-    		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+    		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | ClassCastException e) {
     			logger.error(e);
     		}
     	}

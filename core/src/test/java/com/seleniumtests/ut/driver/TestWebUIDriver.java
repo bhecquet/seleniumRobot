@@ -26,6 +26,7 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
@@ -212,6 +213,22 @@ public class TestWebUIDriver extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
+	public void testDriverCreationWithListener() {
+
+		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
+		SeleniumTestsContextManager.getThreadContext().setWebDriverListener("com.seleniumtests.ut.driver.WebDriverListener1");
+		WebDriverListener1.setCalled(false);
+		
+		WebDriver driver = WebUIDriver.getWebDriver(true);
+		driver.manage().window().getSize();
+		
+		// check 'afterGetSize()' has been called
+		Assert.assertTrue(WebDriverListener1.isCalled());
+		
+
+	}
+	
+	@Test(groups={"ut"})
 	public void testConstructor() {
 		WebUIDriver uiDriver = WebUIDriverFactory.getInstance("foo");
 		Assert.assertEquals(WebUIDriver.getUxDriverSession().get().size(), 1);
@@ -314,7 +331,7 @@ public class TestWebUIDriver extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
 		WebDriver driver1 = WebUIDriver.getWebDriver(true, null, "main", null);
 		
-		Assert.assertTrue(((CustomEventFiringWebDriver)driver1).getWebDriver() instanceof HtmlUnitDriver);
+		Assert.assertEquals( ((CustomEventFiringWebDriver)driver1).getCapabilities().getBrowserName(), "htmlunit");
 	}
 	
 	/**

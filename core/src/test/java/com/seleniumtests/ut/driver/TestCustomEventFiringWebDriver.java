@@ -129,7 +129,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		
 		// add DriverExceptionListener to reproduce driver behavior
 		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, browserInfo, true, DriverMode.LOCAL, null, null));
-		attachedEventDriver = spy(new CustomEventFiringWebDriver(driver, null, browserInfo, true, DriverMode.LOCAL, null, null, 12345));
+		attachedEventDriver = spy(new CustomEventFiringWebDriver(driver, null, browserInfo, true, DriverMode.LOCAL, null, null, 12345, new ArrayList<>()));
 		when(driver.manage()).thenReturn(options);
 		when(driver.getCapabilities()).thenReturn(capabilities);
 		when(driver.switchTo()).thenReturn(target);
