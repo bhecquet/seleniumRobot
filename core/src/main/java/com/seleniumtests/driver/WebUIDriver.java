@@ -33,8 +33,10 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.logging.LogEntry;
+import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
+import org.openqa.selenium.support.events.WebDriverListener;
 import org.testng.ITestResult;
 
 import com.neotys.selenium.proxies.NLWebDriver;
@@ -604,7 +606,7 @@ public class WebUIDriver {
     		driver = NLWebDriverFactory.newNLWebDriver(driver, config.getNeoloadUserPath());
     	}
     	
-    	EventFiringWebDriver listeningDriver = new CustomEventFiringWebDriver(driver, 
+    	WebDriver listeningDriver = new CustomEventFiringWebDriver(driver, 
     																			driverPids, 
     																			browserInfo, 
     																			SeleniumTestsContextManager.isWebTest(), 
@@ -613,12 +615,17 @@ public class WebUIDriver {
     																			SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(),
     																			config.getAttachExistingDriverPort());
     	
-        List<WebDriverEventListener> listeners = config.getWebDriverListeners();
+        List<WebDriverEventListener> listeners = config.getWebDriverEventListeners();
         if (listeners != null && !listeners.isEmpty()) {
             for (int i = 0; i < config.getWebDriverListeners().size(); i++) {
-            	listeningDriver = listeningDriver.register(listeners.get(i));
+            	listeningDriver = ((EventFiringWebDriver) listeningDriver).register(listeners.get(i));
             }
         }
+        List<WebDriverListener> wdListeners = config.getWebDriverListeners();
+        for (WebDriverListener wdListener: config.getWebDriverListeners()) {
+        	listeningDriver = new EventFiringDecorator(wdListener).decorate(listeningDriver);
+        }
+        
 
         return listeningDriver;
     }

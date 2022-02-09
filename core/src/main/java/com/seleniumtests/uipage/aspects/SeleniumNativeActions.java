@@ -275,6 +275,5 @@ public class SeleniumNativeActions {
 	
 	
 	
-	// TODO: handle findElementBy... (from RemoteWebDriver) => should be useless as SeleniuRobot only expose a WebDriverInstance
 	// TODO: check behavior with WebDriverWait & CompositeActions
 }
