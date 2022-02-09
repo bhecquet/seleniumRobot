@@ -45,7 +45,8 @@ public class TestNoOverrideSeleniumNativeSearch extends TestOverrideSeleniumNati
 	
 	@Test(groups={"ut"})
 	public void testFindElementOverride() {
-		Assert.assertTrue(testPage.getElement().getClass().getName().contains("EventFiringWebElement"));
+		// net.bytebuddy.renamed.java.lang.Object$ByteBuddy is the type of elements when driver is decorated
+		Assert.assertTrue(testPage.getElement().getClass().getName().contains("net.bytebuddy.renamed.java.lang.Object$ByteBuddy"));
 	}
 	
 

@@ -2497,18 +2497,15 @@ public class SeleniumTestsContext {
     		for (String listenerClassName: listener.split(",")) {
 	    		// check we can access the class
 	    		try {
-	    			Class<WebDriverEventListener> listenerClass = (Class<WebDriverEventListener>) Class.forName(listenerClassName);
-	    			if (!WebDriverEventListener.class.isAssignableFrom(listenerClass)) {
-	    				throw new ConfigurationException(String.format("Class %s must implement WebDriverEventListener class", listenerClassName));
-	    			} else {
+
+	    			if (WebDriverEventListener.class.isAssignableFrom(Class.forName(listenerClassName))) {
 	    				logger.warn("WebDriverEventListener interface is deprecated, you should consider to upgrade to WebDriverListener interface");
 	    				oldListeners = true;
-	    			}
-	    			
-	    			if (!WebDriverListener.class.isAssignableFrom(listenerClass)) {
-	    				throw new ConfigurationException(String.format("Class %s must implement WebDriverListener class", listenerClassName));
-	    			} else {
+	    			} else if (WebDriverListener.class.isAssignableFrom(Class.forName(listenerClassName))) {
 	    				wdListeners = true;
+	    			} else {
+	    				throw new ConfigurationException(String.format("Class %s must implement WebDriverEventListener or WebDriverListener class", listenerClassName));
+	    				
 	    			}
 
 	        		listeners.add(listenerClassName);

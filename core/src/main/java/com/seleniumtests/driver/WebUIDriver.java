@@ -607,24 +607,20 @@ public class WebUIDriver {
     	}
     	
     	WebDriver listeningDriver = new CustomEventFiringWebDriver(driver, 
-    																			driverPids, 
-    																			browserInfo, 
-    																			SeleniumTestsContextManager.isWebTest(), 
-    																			SeleniumTestsContextManager.getThreadContext().getRunMode(),
-    																			config.getBrowserMobProxy(),
-    																			SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(),
-    																			config.getAttachExistingDriverPort());
+																	driverPids, 
+																	browserInfo, 
+																	SeleniumTestsContextManager.isWebTest(), 
+																	SeleniumTestsContextManager.getThreadContext().getRunMode(),
+																	config.getBrowserMobProxy(),
+																	SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(),
+																	config.getAttachExistingDriverPort(), 
+																	config.getWebDriverListeners());
     	
-        List<WebDriverEventListener> listeners = config.getWebDriverEventListeners();
-        if (listeners != null && !listeners.isEmpty()) {
-            for (int i = 0; i < config.getWebDriverListeners().size(); i++) {
-            	listeningDriver = ((EventFiringWebDriver) listeningDriver).register(listeners.get(i));
-            }
+
+    	for (WebDriverEventListener listener: config.getWebDriverEventListeners()) {
+        	listeningDriver = ((EventFiringWebDriver) listeningDriver).register(listener);
         }
-        List<WebDriverListener> wdListeners = config.getWebDriverListeners();
-        for (WebDriverListener wdListener: config.getWebDriverListeners()) {
-        	listeningDriver = new EventFiringDecorator(wdListener).decorate(listeningDriver);
-        }
+        
         
 
         return listeningDriver;
@@ -663,7 +659,7 @@ public class WebUIDriver {
     	}
     	Capabilities caps = ((CustomEventFiringWebDriver) driver).getCapabilities();
         String browserName = caps.getBrowserName();
-        String browserVersion = caps.getVersion(); 
+        String browserVersion = caps.getBrowserVersion(); 
         
         Integer majorVersion;
         try {

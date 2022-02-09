@@ -87,6 +87,9 @@ public class TestOverrideSeleniumNativeSearch extends MockitoTest {
 		}
 	}
 	
+	/**
+	 * Check element is overriden (and HtmlElement is returned instead of a Selenium WebElement)
+	 */
 	@Test(groups={"ut"})
 	public void testFindElementOverride() {
 		Assert.assertTrue(testPage.getElement() instanceof HtmlElement);
