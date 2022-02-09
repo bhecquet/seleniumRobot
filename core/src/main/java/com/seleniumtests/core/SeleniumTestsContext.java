@@ -178,9 +178,6 @@ public class SeleniumTestsContext {
     public static final String CAPTURE_NETWORK = "captureNetwork";
     public static final String VIDEO_CAPTURE = "captureVideo";
 
-    public static final String DP_TAGS_INCLUDE = "dpTagsInclude";				// 
-    public static final String DP_TAGS_EXCLUDE = "dpTagsExclude";				// Utilisé pour la lecture de fichiers CSV/XLS des DataProvider TODO: a étudier comment cela fonctionne
-
     public static final String SOFT_ASSERT_ENABLED = "softAssertEnabled";		// le test ne s'arrête pas lorsqu'une assertion est rencontrée
     public static final String TEST_RETRY_COUNT = "testRetryCount";				// number of times the test can be retried
     
@@ -463,8 +460,6 @@ public class SeleniumTestsContext {
         setCaptureNetwork(getBoolValueForTest(CAPTURE_NETWORK, System.getProperty(CAPTURE_NETWORK)));
         setVideoCapture(getValueForTest(VIDEO_CAPTURE, System.getProperty(VIDEO_CAPTURE)));
 
-        setDpTagsInclude(getValueForTest(DP_TAGS_INCLUDE, System.getProperty(DP_TAGS_INCLUDE)));
-        setDpTagsExclude(getValueForTest(DP_TAGS_EXCLUDE, System.getProperty(DP_TAGS_EXCLUDE)));
         setReporterPluginClasses(getValueForTest(REPORTER_PLUGIN_CLASSES, System.getProperty(REPORTER_PLUGIN_CLASSES)));
 
         setSoftAssertEnabled(getBoolValueForTest(SOFT_ASSERT_ENABLED, System.getProperty(SOFT_ASSERT_ENABLED)));
@@ -1215,14 +1210,6 @@ public class SeleniumTestsContext {
     
     public Boolean getBetaBrowser() {
     	return (Boolean) getAttribute(BETA_BROWSER);
-    }
-
-    public String getDPTagsExclude() {
-        return (String) getAttribute(DP_TAGS_EXCLUDE);
-    }
-
-    public String getDPTagsInclude() {
-        return (String) getAttribute(DP_TAGS_INCLUDE);
     }
     
     public String getTmsType() {
@@ -2448,14 +2435,6 @@ public class SeleniumTestsContext {
     	}
     }
 
-    public void setDpTagsInclude(String tags) {
-    	setAttribute(DP_TAGS_INCLUDE, tags);
-    }
-    
-    public void setDpTagsExclude(String tags) {
-    	setAttribute(DP_TAGS_EXCLUDE, tags);
-    }
-    
     public void setReporterPluginClasses(String classNames) {
     	if (classNames != null) {
     		List<Class<IReporter>> reporterClasses = new ArrayList<>();
