@@ -33,10 +33,8 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.logging.LogEntry;
-import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
-import org.openqa.selenium.support.events.WebDriverListener;
 import org.testng.ITestResult;
 
 import com.neotys.selenium.proxies.NLWebDriver;

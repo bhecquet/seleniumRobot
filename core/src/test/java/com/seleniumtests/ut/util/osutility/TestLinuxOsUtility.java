@@ -18,8 +18,6 @@
 package com.seleniumtests.ut.util.osutility;
 
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.ArgumentMatchers.anyString;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -28,12 +26,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.openqa.selenium.Platform;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 

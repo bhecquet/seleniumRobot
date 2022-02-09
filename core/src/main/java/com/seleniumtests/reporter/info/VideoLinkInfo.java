@@ -1,9 +1,5 @@
 package com.seleniumtests.reporter.info;
 
-import com.seleniumtests.browserfactory.ICapabilitiesFactory;
-import com.seleniumtests.util.logging.SeleniumRobotLogger;
-import org.apache.log4j.Logger;
-
 public class VideoLinkInfo extends HyperlinkInfo {
 
 	public VideoLinkInfo(String link) {

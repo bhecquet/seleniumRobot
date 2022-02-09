@@ -31,11 +31,9 @@ import kong.unirest.json.JSONObject;
 @PrepareForTest({Unirest.class})
 public class TestIteration extends ConnectorsTest {
 	
-	private Project project;
-	
 	@BeforeMethod(groups={"ut"})
 	public void init() {
-		project = new Project("http://localhost:8080/api/rest/latest/projects/1", 1, "project");
+		new Project("http://localhost:8080/api/rest/latest/projects/1", 1, "project");
 		Campaign.configureEntity("user", "pwd", SERVER_URL + "/");
 	}
 	

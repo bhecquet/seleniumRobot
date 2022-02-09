@@ -113,21 +113,6 @@ public class ScreenshotUtil {
     		
     	}
     	
-    	/**
-    	 * Copy the current image to an other one, changing underlying image
-    	 * @return
-    	 */
-    	public NamedBufferedImage copy(BufferedImage image) {
-    		NamedBufferedImage img = new NamedBufferedImage(image, this.prefix);
-    		img.prefix = prefix;
-    		img.image = image;
-    		img.url = url;
-    		img.title = title;
-    		img.pageSource = pageSource;
-    		
-    		return img;
-    	}
-    	
 
         /**
          * Add information (url, source, title) to the captured image

@@ -17,10 +17,7 @@
  */
 package com.seleniumtests.it.core;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
-import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
@@ -33,15 +30,12 @@ import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
-import com.seleniumtests.util.osutility.ProcessInfo;
 
 public class TestDebug extends GenericTest {
 
 	private static final Logger logger = SeleniumRobotLogger.getLogger(TestDebug.class);
 	
 	private OSUtility osUtil;
-	
-	private static WebDriver driver;
 	
 	@BeforeClass(groups={"it"})
 	public void initContext(final ITestContext testNGCtx) throws Exception {
@@ -72,7 +66,7 @@ public class TestDebug extends GenericTest {
 	 */
 	private void launchPageTest(){
 		try {
-			driver = WebUIDriver.getWebDriver(true);
+			WebUIDriver.getWebDriver(true);
 			new DriverTestPage(true);
 			DriverTestPage.selectList.selectByText("option2");
 			

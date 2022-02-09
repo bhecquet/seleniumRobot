@@ -2,8 +2,6 @@ package com.seleniumtests.connectors.selenium.fielddetector;
 
 import java.awt.Rectangle;
 
-import com.seleniumtests.util.StringUtility;
-
 import kong.unirest.json.JSONObject;
 import net.ricecode.similarity.JaroWinklerStrategy;
 import net.ricecode.similarity.SimilarityStrategy;

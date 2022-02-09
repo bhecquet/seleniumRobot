@@ -1,8 +1,5 @@
 package com.seleniumtests.it.core.testanalysis;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.util.Arrays;
 
 import org.testng.Assert;
@@ -10,16 +7,10 @@ import org.testng.ITestContext;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
-import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.connectors.selenium.fielddetector.FieldDetectorConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.it.reporter.ReporterTest;
 import com.seleniumtests.util.video.VideoCaptureMode;
-
-import kong.unirest.HttpRequest;
-import kong.unirest.HttpRequestWithBody;
-import kong.unirest.HttpResponse;
-import kong.unirest.JsonNode;
 
 public class TestErrorCauseFInder extends ReporterTest {
 	

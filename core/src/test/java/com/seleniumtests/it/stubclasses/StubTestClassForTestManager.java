@@ -20,9 +20,7 @@ package com.seleniumtests.it.stubclasses;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
-import org.openqa.selenium.WebDriverException;
 import org.testng.Assert;
-import org.testng.SkipException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.CustomAttribute;
 import org.testng.annotations.DataProvider;

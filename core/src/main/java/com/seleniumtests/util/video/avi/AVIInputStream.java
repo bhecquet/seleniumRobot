@@ -10,26 +10,43 @@
  */
 package com.seleniumtests.util.video.avi;
 
-import org.monte.media.AbortException;
-import org.monte.media.Format;
-import org.monte.media.ParseException;
-import org.monte.media.io.ByteArrayImageInputStream;
-import org.monte.media.math.Rational;
-import org.monte.media.riff.RIFFChunk;
-import org.monte.media.riff.RIFFParser;
-import org.monte.media.riff.RIFFVisitor;
+import static org.monte.media.AudioFormatKeys.ByteOrderKey;
+import static org.monte.media.AudioFormatKeys.ChannelsKey;
+import static org.monte.media.AudioFormatKeys.FrameSizeKey;
+import static org.monte.media.AudioFormatKeys.SampleRateKey;
+import static org.monte.media.AudioFormatKeys.SampleSizeInBitsKey;
+import static org.monte.media.AudioFormatKeys.SignedKey;
+import static org.monte.media.FormatKeys.EncodingKey;
+import static org.monte.media.FormatKeys.FrameRateKey;
+import static org.monte.media.FormatKeys.MIME_AVI;
+import static org.monte.media.FormatKeys.MediaTypeKey;
+import static org.monte.media.FormatKeys.MimeTypeKey;
+import static org.monte.media.VideoFormatKeys.DataClassKey;
+import static org.monte.media.VideoFormatKeys.DepthKey;
+import static org.monte.media.VideoFormatKeys.FixedFrameRateKey;
+import static org.monte.media.VideoFormatKeys.HeightKey;
+import static org.monte.media.VideoFormatKeys.PixelAspectRatioKey;
+import static org.monte.media.VideoFormatKeys.WidthKey;
+
 import java.awt.Dimension;
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import javax.imageio.stream.FileImageInputStream;
 import javax.imageio.stream.ImageInputStream;
-import static org.monte.media.AudioFormatKeys.*;
-import static org.monte.media.VideoFormatKeys.*;
+
+import org.monte.media.AbortException;
+import org.monte.media.Format;
+import org.monte.media.FormatKeys.MediaType;
+import org.monte.media.ParseException;
+import org.monte.media.io.ByteArrayImageInputStream;
+import org.monte.media.math.Rational;
+import org.monte.media.riff.RIFFChunk;
+import org.monte.media.riff.RIFFParser;
+import org.monte.media.riff.RIFFVisitor;
 
 /**
  * Provides low-level support for reading encoded audio and video samples from

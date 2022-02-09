@@ -18,7 +18,6 @@
 package com.seleniumtests.ut.browserfactory;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;

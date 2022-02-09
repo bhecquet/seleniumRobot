@@ -15,13 +15,9 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.connectors.selenium.fielddetector.Field;
-import com.seleniumtests.connectors.selenium.fielddetector.FieldDetectorConnector;
 import com.seleniumtests.connectors.selenium.fielddetector.ImageFieldDetector;
 import com.seleniumtests.core.SeleniumTestsContext;
-import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
-
-import kong.unirest.json.JSONObject;
 
 public class TestFieldDetectorConnector extends GenericTest {
 

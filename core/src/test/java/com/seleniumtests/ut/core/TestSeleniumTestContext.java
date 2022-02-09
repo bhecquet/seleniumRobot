@@ -40,7 +40,6 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
-import com.seleniumtests.driver.DriverExceptionListener;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.screenshots.SnapshotComparisonBehaviour;
@@ -51,7 +50,6 @@ import com.seleniumtests.reporter.reporters.TestManagerReporter;
 import com.seleniumtests.uipage.htmlelements.ElementInfo;
 import com.seleniumtests.ut.driver.WebDriverEventListener1;
 import com.seleniumtests.ut.driver.WebDriverEventListener2;
-import com.seleniumtests.ut.driver.WebDriverListener1;
 import com.seleniumtests.ut.driver.WebDriverListener2;
 import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.video.VideoCaptureMode;
@@ -1459,7 +1457,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testNullWebDriverListener(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setReporterPluginClasses(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebDriverListener().size(), 1); // the default listener
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebDriverListener().size(), 0); 
 	}
 	
 	@Test(groups="ut context")

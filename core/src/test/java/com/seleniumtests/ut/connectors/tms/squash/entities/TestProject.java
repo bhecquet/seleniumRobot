@@ -26,8 +26,6 @@ import kong.unirest.json.JSONObject;
 @PrepareForTest({Unirest.class})
 public class TestProject extends ConnectorsTest {
 	
-	private Project project;
-	
 	@BeforeMethod(groups={"ut"})
 	public void init() {
 		Campaign.configureEntity("user", "pwd", SERVER_URL + "/");

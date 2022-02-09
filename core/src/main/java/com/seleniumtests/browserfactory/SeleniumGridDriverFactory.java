@@ -44,6 +44,8 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.util.helper.WaitHelper;
 
+import io.appium.java_client.remote.MobileCapabilityType;
+
 public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
 	
 	private List<SeleniumGridConnector> gridConnectors;
@@ -106,9 +108,9 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     	DesiredCapabilities capabilities = new DesiredCapabilities();
     	
     	if (SeleniumTestsContextManager.isMobileTest()) {
-    		capabilities.setCapability(CapabilityType.VERSION, webDriverConfig.getMobilePlatformVersion());
+    		capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, webDriverConfig.getMobilePlatformVersion());
     	} else {
-    		capabilities.setCapability(CapabilityType.PLATFORM, webDriverConfig.getPlatform().toLowerCase());
+    		capabilities.setCapability(CapabilityType.PLATFORM_NAME, webDriverConfig.getPlatform().toLowerCase());
     		if (webDriverConfig.getBrowserVersion() != null && capabilities.getCapability(CapabilityType.BROWSER_VERSION) == null) {
     			capabilities.setCapability(CapabilityType.BROWSER_VERSION, webDriverConfig.getBrowserVersion());
     		}

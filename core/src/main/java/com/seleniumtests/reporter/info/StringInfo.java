@@ -2,7 +2,6 @@ package com.seleniumtests.reporter.info;
 
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.util.StringUtility;
-import com.seleniumtests.util.logging.Sys;
 
 public class StringInfo extends Info {
 

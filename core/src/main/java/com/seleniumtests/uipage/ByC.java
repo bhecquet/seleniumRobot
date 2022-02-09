@@ -21,7 +21,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.NotImplementedException;
@@ -33,9 +32,6 @@ import org.openqa.selenium.WebElement;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ScenarioException;
-import com.seleniumtests.driver.BrowserType;
-import com.seleniumtests.driver.CustomEventFiringWebDriver;
-import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.WebUIDriver;
 
 public class ByC extends By {

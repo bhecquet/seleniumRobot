@@ -18,7 +18,6 @@
 package com.seleniumtests.reporter.logger;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.json.JSONObject;
 
