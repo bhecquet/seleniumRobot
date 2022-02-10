@@ -460,11 +460,13 @@ public class TestWebUIDriver extends MockitoTest {
 		
 		SeleniumTestsContextManager.getThreadContext().setCaptureNetwork(true);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		WebUIDriver uiDriver = WebUIDriverFactory.getInstance("foo");
-		uiDriver.setDriver(eventDriver1);
-
+		WebDriver driver = spy(WebUIDriver.getWebDriver(true));
+		WebUIDriver uiDriver = WebUIDriver.getWebUIDriver(false);
+		uiDriver.setDriver(driver); // force the mocked driver
+		Assert.assertNotNull(uiDriver.getDriver());
+		
 		WebUIDriver.cleanUp();
-		verify(eventDriver1).quit();
+		verify(driver).quit();
 		Assert.assertNull(uiDriver.getDriver());	
 	}
 	
@@ -491,13 +493,17 @@ public class TestWebUIDriver extends MockitoTest {
 		
 		SeleniumTestsContextManager.getThreadContext().setCaptureNetwork(true);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		WebUIDriver uiDriver = WebUIDriverFactory.getInstance("foo");
-		uiDriver.setDriver(eventDriver1);
-		doThrow(new WebDriverException("error")).when(eventDriver1).quit();
+		WebDriver driver = spy(WebUIDriver.getWebDriver(true));
+		WebUIDriver uiDriver = WebUIDriver.getWebUIDriver(false);
+		uiDriver.setDriver(driver); // force the mocked driver
+		Assert.assertNotNull(uiDriver.getDriver());
+
+		doThrow(new WebDriverException("error")).when(driver).quit();
 		
 		WebUIDriver.cleanUp();
-		verify(eventDriver1).quit();
+		verify(driver).quit();
 		Assert.assertNull(uiDriver.getDriver());	
+		
 	}
 	
 	/**
