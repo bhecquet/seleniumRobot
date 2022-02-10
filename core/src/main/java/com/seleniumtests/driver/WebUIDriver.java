@@ -27,6 +27,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
@@ -332,6 +339,21 @@ public class WebUIDriver {
 			config.setBrowserMobProxy(null);
 		}
     }
+    
+    class DriverAliveTask implements Callable<String> {
+    	
+    	private WebDriver drv;
+    	
+    	public DriverAliveTask(WebDriver drv) {
+			this.drv = drv;
+		}
+    	
+        @Override
+        public String call() throws Exception {
+            drv.manage().getCookies();
+            return "OK";
+        }
+    }
     	
     /**
      * Cleans the driver created by this class: 
@@ -344,22 +366,33 @@ public class WebUIDriver {
 
     	if (driver != null) {
     		
-    		// write logs
-    		try {
-        		for (String logType: driver.manage().logs().getAvailableLogTypes()) {
-					retrieveLogs(logType);
-        		}
-            } catch (Exception e) {
-            	// ignore error when driver is down
-            }
+    		ExecutorService executor = Executors.newSingleThreadExecutor();
+            Future<String> future = executor.submit(new DriverAliveTask(driver));
+            try {
+				future.get(3, TimeUnit.SECONDS);
+				
+				// write logs
+	    		try {
+	        		for (String logType: driver.manage().logs().getAvailableLogTypes()) {
+						retrieveLogs(logType);
+	        		}
+	            } catch (Exception e) {
+	            	// ignore error when driver is down
+	            }
+	    		
+	    		
+	    		try {
+	    			scenarioLogger.log("quiting webdriver " + Thread.currentThread().getId());
+		            driver.quit();
+	        	} catch (Exception ex) {
+	        		scenarioLogger.error("Exception encountered when quiting driver:" + ex.getMessage());
+	        	}
+			} catch (InterruptedException | ExecutionException | TimeoutException e1) {
+				future.cancel(true);
+				logger.warn("driver not available");
+			}
     		
     		
-    		try {
-    			scenarioLogger.log("quiting webdriver " + Thread.currentThread().getId());
-	            driver.quit();
-        	} catch (Exception ex) {
-        		scenarioLogger.error("Exception encountered when quiting driver:" + ex.getMessage());
-        	}
     		driver = null;
         }
 		
