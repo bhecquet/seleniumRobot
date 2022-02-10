@@ -893,7 +893,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
 			
-			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			configureMockedSnapshotServerConnection();
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false}");		
 			
 			// say that snapshot comparison if failed when checking individual snapshots
@@ -928,7 +928,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
 			
-			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			configureMockedSnapshotServerConnection();
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false}");		
 			
 			// say that snapshot comparison if failed when checking individual snapshots

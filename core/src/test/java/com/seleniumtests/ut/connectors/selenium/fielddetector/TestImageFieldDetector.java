@@ -350,8 +350,8 @@ public class TestImageFieldDetector extends MockitoTest {
 		
 		SeleniumTestsContextManager.getThreadContext().setFieldDetectorInstance(fieldDetectorConnector);
 		ImageFieldDetector detector = new ImageFieldDetector(image);
-		List<Field> fields = detector.detectFields();
-		List<Label> labels = detector.detectLabels();
+		detector.detectFields();
+		detector.detectLabels();
 		
 		// detector is called only once
 		verify(fieldDetectorConnector).detect(image, 1);

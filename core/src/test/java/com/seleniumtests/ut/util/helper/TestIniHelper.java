@@ -46,6 +46,6 @@ public class TestIniHelper extends GenericTest {
     public void testBadFile() throws IOException {
         Map<String, Map<String, String>> hashMapToComplete = new HashMap<>();
         File envIni = new File("tu/meduse.mer");
-        Map<String, Map<String, String>> hashMapComplete = IniHelper.readIniFile(envIni, hashMapToComplete);
+        IniHelper.readIniFile(envIni, hashMapToComplete);
     }
 }

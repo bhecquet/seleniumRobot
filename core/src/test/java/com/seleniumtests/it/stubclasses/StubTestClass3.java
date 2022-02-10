@@ -134,7 +134,7 @@ public class StubTestClass3 extends StubParentClass {
 	public void testWithAssertInSubStep() throws IOException {
 		
 		
-		CalcPage page = new CalcPage()
+		new CalcPage()
 				.add(1, 1)
 				.assertWithSubStep()
 				.add(2)

@@ -299,7 +299,7 @@ public class TestPerformanceReporter extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
 			
-			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			configureMockedSnapshotServerConnection();
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false}");		
 			
 			SeleniumTestsContextManager.removeThreadContext();
@@ -332,7 +332,7 @@ public class TestPerformanceReporter extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
 			
-			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			configureMockedSnapshotServerConnection();
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': null, 'computingError': 'error'}");		
 			
 			SeleniumTestsContextManager.removeThreadContext();

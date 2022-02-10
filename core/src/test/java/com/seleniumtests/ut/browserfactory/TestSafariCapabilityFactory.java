@@ -96,7 +96,7 @@ public class TestSafariCapabilityFactory extends MockitoTest {
 		Assert.assertTrue(capa.is(CapabilityType.TAKES_SCREENSHOT));
 		Assert.assertTrue(capa.is(CapabilityType.ACCEPT_SSL_CERTS));
 		Assert.assertFalse(capa.is(SeleniumRobotCapabilityType.NODE_TAGS));
-		Assert.assertEquals(capa.getVersion(), "");
+		Assert.assertEquals(capa.getBrowserVersion(), "");
 		Assert.assertEquals(capa.getCapability(CapabilityType.PROXY), proxyConfig);
 	}
 
@@ -141,7 +141,7 @@ public class TestSafariCapabilityFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new SafariCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(capa.getPlatform(), Platform.MAC);
+		Assert.assertEquals(capa.getPlatformName(), Platform.MAC);
 		
 	}
 	
@@ -166,7 +166,7 @@ public class TestSafariCapabilityFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new SafariCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(capa.getVersion(), "10.0");
+		Assert.assertEquals(capa.getBrowserVersion(), "10.0");
 		
 	}
 	

@@ -133,7 +133,7 @@ public class TestProject extends ConnectorsTest {
 	
 	@Test(groups={"ut"})
 	public void testGetCampaignsInProject() {
-		GetRequest getRequest = (GetRequest) createServerMock("GET", "/projects/44/campaigns", 200, "{" + 
+		createServerMock("GET", "/projects/44/campaigns", 200, "{" + 
 				"  \"_embedded\" : {" + 
 				"    \"campaigns\" : [ {" + 
 				"      \"_type\" : \"campaign\"," + 
@@ -206,7 +206,7 @@ public class TestProject extends ConnectorsTest {
 		when(getRequest.asPaged(any(), (Function<HttpResponse<JsonNode>, String>) any(Function.class))).thenThrow(UnirestException.class);
 		
 		Project project = new Project("http://localhost:4321/projects/44", 44, "project");
-		List<Campaign> campaigns = project.getCampaigns();
+		project.getCampaigns();
 		
 	}
 }

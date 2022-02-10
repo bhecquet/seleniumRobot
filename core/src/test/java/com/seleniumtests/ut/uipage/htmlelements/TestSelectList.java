@@ -67,7 +67,6 @@ public class TestSelectList extends MockitoTest {
 	
 
 	private CustomEventFiringWebDriver eventDriver;
-	private PageObject page;
 
 	@BeforeMethod(groups={"ut"})
 	private void init() throws IOException {
@@ -125,14 +124,13 @@ public class TestSelectList extends MockitoTest {
 	public void testFindElementWrongType() throws IOException {
 		when(element.getTagName()).thenReturn("something");
 		SelectList select = new SelectList("", By.id("select"));
-		List<WebElement> options = select.getOptions();
-		Assert.assertTrue(select.getSelectImplementation() instanceof StubSelect);
+		select.getOptions();
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions = WebDriverException.class)
 	public void testGetOptionsNotPresent() throws IOException {
 		when(driver.findElement(By.id("select"))).thenThrow(new NoSuchElementException("not found"));
-		List<WebElement> options = new SelectList("", By.id("select")).getOptions();
+		new SelectList("", By.id("select")).getOptions();
 	}
 
 	@Test(groups={"ut"})

@@ -165,7 +165,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 	        
 	        // create a BrowserInfo based on information get from grid hub
 	        selectedBrowserInfo = new BrowserInfo(BrowserType.getBrowserTypeFromSeleniumBrowserType(((RemoteWebDriver)driver).getCapabilities().getBrowserName()), 
-		        									((RemoteWebDriver)driver).getCapabilities().getVersion());
+		        									((RemoteWebDriver)driver).getCapabilities().getBrowserVersion());
 	
 	        return driver;
         }

@@ -364,11 +364,9 @@ public class AVIInputStream extends AbstractAVIStream {
             };
             
             // Parse all RIFF structures in the file
-            int count = 0;
             while (true) {
                 long offset = p.parse(in, v);
                 p.setStreamOffset(offset);
-                count++;
             }
         } catch (EOFException ex) {
             //ex.printStackTrace();
