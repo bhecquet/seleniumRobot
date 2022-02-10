@@ -20,6 +20,7 @@ package com.seleniumtests.util.logging;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -200,7 +201,7 @@ public class SeleniumRobotLogger {
 		// read the file from appender directly
 		List<String> logLines;
 		try {
-			logLines = FileUtils.readLines(new File(((FileAppender)fileLoggerAppender).getFile())); 
+			logLines = FileUtils.readLines(new File(((FileAppender)fileLoggerAppender).getFile()), StandardCharsets.UTF_8); 
 		} catch (IOException e) {
 			getLogger(SeleniumRobotLogger.class).error("cannot read log file", e);
 			return;

@@ -19,6 +19,7 @@ package com.seleniumtests.ut.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,8 +40,8 @@ public class TestFileUtility extends GenericTest {
 		File f2 = File.createTempFile("data2", ".txt");
 		f1.deleteOnExit();
 		f2.deleteOnExit();
-		FileUtils.writeStringToFile(f1, "some data");
-		FileUtils.writeStringToFile(f2, "other data");
+		FileUtils.writeStringToFile(f1, "some data", StandardCharsets.UTF_8);
+		FileUtils.writeStringToFile(f2, "other data", StandardCharsets.UTF_8);
 		List<File> fileList = new ArrayList<>();
 		fileList.add(f1);
 		fileList.add(f2);
@@ -56,7 +57,7 @@ public class TestFileUtility extends GenericTest {
 			Assert.assertTrue(outFile1.exists());
 			Assert.assertTrue(outFile2.exists());
 			
-			Assert.assertEquals(FileUtils.readFileToString(outFile1), "some data");
+			Assert.assertEquals(FileUtils.readFileToString(outFile1, StandardCharsets.UTF_8), "some data");
 		} finally {
 			
 			try {

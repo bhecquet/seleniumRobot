@@ -57,7 +57,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 		}
 
 		connector.setNodeUrl("http://localhost:5555");
-		gridLogger = spy(connector.getLogger());
+		gridLogger = spy(SeleniumRobotGridConnector.getLogger());
 	}
 	
 

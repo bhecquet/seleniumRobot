@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -697,7 +698,7 @@ public class SeleniumTestsContextManager {
 	 */
     public static String readApplicationVersion(String resourceName, boolean fullVersion) {
     	try {
-			String version = IOUtils.toString(SeleniumTestsContextManager.class.getClassLoader().getResourceAsStream(resourceName));
+			String version = IOUtils.toString(SeleniumTestsContextManager.class.getClassLoader().getResourceAsStream(resourceName), StandardCharsets.UTF_8);
 			if (version.isEmpty()) {
 				return "0.0";
 			}

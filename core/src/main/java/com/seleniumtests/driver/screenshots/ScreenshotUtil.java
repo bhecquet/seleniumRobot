@@ -20,6 +20,7 @@ package com.seleniumtests.driver.screenshots;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -713,7 +714,7 @@ public class ScreenshotUtil {
         screenShot.setTitle(namedImage.title);
         
         try {
-            FileUtils.writeStringToFile(Paths.get(outputDirectory, HTML_DIR, filename + ".html").toFile(), namedImage.pageSource);
+            FileUtils.writeStringToFile(Paths.get(outputDirectory, HTML_DIR, filename + ".html").toFile(), namedImage.pageSource, StandardCharsets.UTF_8);
             screenShot.setHtmlSourcePath(String.format("%s/%s.html", HTML_DIR, filename));
         } catch (IOException e) {
             logger.warn("Ex", e);
