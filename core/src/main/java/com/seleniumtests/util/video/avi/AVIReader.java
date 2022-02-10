@@ -202,7 +202,7 @@ public class AVIReader extends AVIInputStream implements MovieReader {
     private void createCodec(Track tr) {
         Format fmt = tr.format;
         Codec codec = createCodec(fmt);
-        String enc = fmt.get(EncodingKey);
+        fmt.get(EncodingKey);
         if (codec == null) {
             throw new UnsupportedOperationException(String.format("Track %s no codec found for format %s", tr, fmt));
         } else {

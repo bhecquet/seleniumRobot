@@ -300,7 +300,7 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
         try {
             String node = nodeUrl.split("//")[1].split(":")[0];
             String browserName = driver.getCapabilities().getBrowserName();
-            String version = driver.getCapabilities().getVersion();
+            String version = driver.getCapabilities().getBrowserVersion();
             
             // setting sessionId ensures that this connector is the active one
             // issue #242: check if sessionId has already been set by a previous driver in this test session

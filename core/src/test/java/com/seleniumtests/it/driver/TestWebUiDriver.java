@@ -479,7 +479,7 @@ public class TestWebUiDriver extends ReporterTest {
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 
 		// creates the driver
-		WebDriver driver1 = WebUIDriver.getWebDriver(true, BrowserType.CHROME, "main", 12345);
+		WebUIDriver.getWebDriver(true, BrowserType.CHROME, "main", 12345);
 	}
 	
 	/**

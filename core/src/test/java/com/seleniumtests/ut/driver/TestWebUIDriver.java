@@ -228,7 +228,7 @@ public class TestWebUIDriver extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testConstructor() {
-		WebUIDriver uiDriver = WebUIDriverFactory.getInstance("foo");
+		WebUIDriverFactory.getInstance("foo");
 		Assert.assertEquals(WebUIDriver.getUxDriverSession().get().size(), 1);
 		Assert.assertEquals(WebUIDriver.getCurrentWebUiDriverName(), "foo");
 	}
@@ -238,8 +238,8 @@ public class TestWebUIDriver extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testMultipleConstructor() {
-		WebUIDriver uiDriver = WebUIDriverFactory.getInstance("foo");
-		WebUIDriver uiDriver2 = WebUIDriverFactory.getInstance("bar");
+		WebUIDriverFactory.getInstance("foo");
+		WebUIDriverFactory.getInstance("bar");
 		Assert.assertEquals(WebUIDriver.getUxDriverSession().get().size(), 2);
 
 		Assert.assertEquals(WebUIDriver.getCurrentWebUiDriverName(), "bar");
@@ -294,7 +294,7 @@ public class TestWebUIDriver extends MockitoTest {
 		WebUIDriver uiDriver1 = spy(WebUIDriver.getWebUIDriver(true, "main")); // create it so that we can control it via mock
 		WebUIDriver.getUxDriverSession().get().put("main", uiDriver1);
 		doReturn(drv1).when(uiDriver1).createWebDriver();
-		WebDriver driver1 = WebUIDriver.getWebDriver(true, BrowserType.HTMLUNIT, "main", null);
+		WebUIDriver.getWebDriver(true, BrowserType.HTMLUNIT, "main", null);
 
 		// set connector to simulate the driver creation on grid
 		SeleniumTestsContextManager.getThreadContext().setSeleniumGridConnector(gridConnector);
@@ -303,7 +303,7 @@ public class TestWebUIDriver extends MockitoTest {
 		WebUIDriver uiDriver2 = spy(WebUIDriver.getWebUIDriver(true, "other"));
 		WebUIDriver.getUxDriverSession().get().put("other", uiDriver2);
 		doReturn(drv2).when(uiDriver2).createWebDriver();
-		WebDriver driver2 = WebUIDriver.getWebDriver(true, BrowserType.HTMLUNIT, "other", null);
+		WebUIDriver.getWebDriver(true, BrowserType.HTMLUNIT, "other", null);
 		Assert.assertNull(uiDriver1.getConfig().getRunOnSameNode());
 		Assert.assertNotNull(uiDriver2.getConfig().getRunOnSameNode());
 
@@ -377,7 +377,7 @@ public class TestWebUIDriver extends MockitoTest {
 	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
 	public void testCreationWithoutName() {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		WebDriver driver1 = WebUIDriver.getWebDriver(true, BrowserType.HTMLUNIT, null, null);	
+		WebUIDriver.getWebDriver(true, BrowserType.HTMLUNIT, null, null);	
 	}
 	
 	@Test(groups={"ut"})
@@ -629,7 +629,7 @@ public class TestWebUIDriver extends MockitoTest {
 	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
 	public void testDriverSwitchingWhenClosed() {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		WebDriver driver1 = WebUIDriver.getWebDriver(true, BrowserType.HTMLUNIT, "main", null);
+		WebUIDriver.getWebDriver(true, BrowserType.HTMLUNIT, "main", null);
 		WebDriver driver2 = WebUIDriver.getWebDriver(true, BrowserType.CHROME, "other", null);
 		
 		driver2.quit();
@@ -649,7 +649,7 @@ public class TestWebUIDriver extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testGetCurrentWebUiDriver() {
-		WebUIDriver uiDriver1 = WebUIDriver.getWebUIDriver(true, "foo");
+		WebUIDriver.getWebUIDriver(true, "foo");
 		WebUIDriver uiDriver2 = WebUIDriver.getWebUIDriver(true, "bar");
 		Assert.assertEquals(WebUIDriver.getUxDriverSession().get().size(), 2);
 
@@ -670,7 +670,7 @@ public class TestWebUIDriver extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testGetNoWebUiDriver2() {
-		WebUIDriver uiDriver = WebUIDriver.getWebUIDriver(true, "bar");
+		WebUIDriver.getWebUIDriver(true, "bar");
 		Assert.assertNull(WebUIDriver.getWebUIDriver(false, "foo"));
 	}
 	

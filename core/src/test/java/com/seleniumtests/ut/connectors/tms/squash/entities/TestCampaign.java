@@ -223,7 +223,7 @@ public class TestCampaign extends ConnectorsTest {
 				7, 
 				"campaign"
 				);
-		List<Iteration> iterations = campaign.getIterations();
+		campaign.getIterations();
 	}
 	
 	/**

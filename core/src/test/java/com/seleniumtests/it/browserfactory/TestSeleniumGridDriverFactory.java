@@ -148,7 +148,7 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 			SeleniumGridDriverFactory.setRetryTimeout(1);
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, SERVER_URL + "/wd/hub");
-			WebUIDriver uiDriver = createMockedWebDriver();
+			createMockedWebDriver();
 			
 			// grid is there but we cannot get any matching node
 			createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, "Console");
@@ -181,7 +181,7 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 			SeleniumGridDriverFactory.setRetryTimeout(1);
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, SERVER_URL + "/wd/hub");
-			WebUIDriver uiDriver = createMockedWebDriver();
+			createMockedWebDriver();
 			
 			// grid is there but we cannot get any matching node
 			createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, "Console");
@@ -221,7 +221,7 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 			SeleniumGridDriverFactory.setRetryTimeout(1);
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, SERVER_URL + "/wd/hub");
-			WebUIDriver uiDriver = createMockedWebDriver();
+			createMockedWebDriver();
 			
 			// grid is there
 			createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, "Console");

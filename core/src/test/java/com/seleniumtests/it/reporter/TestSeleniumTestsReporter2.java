@@ -94,7 +94,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
 			
-			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			configureMockedSnapshotServerConnection();
 			createServerMock("POST", SeleniumRobotSnapshotServerConnector.SESSION_API_URL, 500, "Internal Server Error", "body");	
 			
 			SeleniumTestsContextManager.removeThreadContext();
@@ -137,7 +137,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
 			
-			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			configureMockedSnapshotServerConnection();
 			
 			SeleniumTestsContextManager.removeThreadContext();
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
@@ -183,7 +183,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
 			
-			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			configureMockedSnapshotServerConnection();
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': null, 'computingError': []}");		
 			
 			
@@ -233,7 +233,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
 			
-			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			configureMockedSnapshotServerConnection();
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false, 'computingError': []}");		
 			
 			SeleniumTestsContextManager.removeThreadContext();
@@ -282,7 +282,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
 			
-			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			configureMockedSnapshotServerConnection();
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false}");		
 			
 			SeleniumTestsContextManager.removeThreadContext();
@@ -332,7 +332,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
 			
-			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			configureMockedSnapshotServerConnection();
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false}");		
 			
 			SeleniumTestsContextManager.removeThreadContext();
@@ -378,7 +378,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
 			
-			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			configureMockedSnapshotServerConnection();
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': null, 'computingError': ['error computing']}");		
 			
 			SeleniumTestsContextManager.removeThreadContext();
@@ -429,7 +429,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
 			
-			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			configureMockedSnapshotServerConnection();
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': null, 'computingError': ['error computing']}");		
 			
 			SeleniumTestsContextManager.removeThreadContext();
@@ -481,7 +481,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
 			
-			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			configureMockedSnapshotServerConnection();
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': null, 'computingError': ['error computing']}");		
 			
 			SeleniumTestsContextManager.removeThreadContext();
@@ -1114,7 +1114,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.BROWSER);
 		}
 		
-		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
+		new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
 		String detailedReportContent1 = readTestMethodResultFile("test1Listener5");
 		
 		// check all files are displayed
@@ -1518,7 +1518,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
 			
-			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			configureMockedSnapshotServerConnection();
 			
 			// simulate the case where a reference exists
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL + "17/", 200, createImageFromResource("tu/ffLogo1.png"));	
@@ -1573,7 +1573,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
 			
-			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			configureMockedSnapshotServerConnection();
 			
 			// simulate the case where a reference exists
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL + "17/", 200, createImageFromResource("tu/ffLogo1.png"));	
@@ -1616,7 +1616,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
 			
-			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			configureMockedSnapshotServerConnection();
 			
 			// simulate the case where a reference exists
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL + "17/", 404, createImageFromResource("tu/ffLogo1.png"));	
@@ -1668,7 +1668,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "false");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
 			
-			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			configureMockedSnapshotServerConnection();
 			
 			// simulate the case where a reference exists
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL + "17/", 200, createImageFromResource("tu/ffLogo1.png"));	
@@ -1723,7 +1723,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
 			
-			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			configureMockedSnapshotServerConnection();
 			
 			// simulate the case where a reference exists
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL + "17/", 200, createImageFromResource("tu/ffLogo1.png"));	

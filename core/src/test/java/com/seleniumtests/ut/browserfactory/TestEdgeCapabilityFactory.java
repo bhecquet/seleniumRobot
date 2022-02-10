@@ -163,7 +163,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		Assert.assertTrue(capa.is(CapabilityType.TAKES_SCREENSHOT));
 		Assert.assertTrue(capa.is(CapabilityType.ACCEPT_SSL_CERTS));
 		Assert.assertFalse(capa.is(SeleniumRobotCapabilityType.NODE_TAGS));
-		Assert.assertEquals(capa.getVersion(), "");
+		Assert.assertEquals(capa.getBrowserVersion(), "");
 		Assert.assertEquals(capa.getCapability(CapabilityType.PROXY), proxyConfig);
 	}
 
@@ -208,7 +208,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(capa.getPlatform(), Platform.WINDOWS);
+		Assert.assertEquals(capa.getPlatformName(), Platform.WINDOWS);
 		
 	}
 	
@@ -235,7 +235,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(capa.getVersion(), "10240");
+		Assert.assertEquals(capa.getBrowserVersion(), "10240");
 		
 	}
 	
