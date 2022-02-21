@@ -76,6 +76,36 @@ public class TestCustomEventFiringWebDriver2 extends GenericMultiBrowserTest {
 	}
 	
 	/**
+	 * issue #481: check that when header or footer has a height > 50% of viewport height, it's not considered as a header anymore
+	 * @throws IOException
+	 */
+	@Test(groups={"it"})
+	public void testFixedBigHeaderFooterDimensionsFullHeight() throws IOException {
+		driver.manage().window().setSize(new Dimension(500, 700));
+		testPage.veryBigHeaderButton.click();
+		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getTopFixedHeaderSize(), (Long)0L);
+	}
+	
+	@Test(groups={"it"})
+	public void testFixedBigHeaderFooterDimensionsFullHeight2() throws IOException {
+		driver.manage().window().setSize(new Dimension(500, 700));
+		testPage.veryBigFooterButton.click();
+		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getBottomFixedFooterSize(), (Long)0L);
+	}
+	
+	/**
+	 * issue #481: check that when header or footer has a height < 50% of viewport height, it's considered as a header / footer
+	 * @throws IOException
+	 */
+	@Test(groups={"it"})
+	public void testFixedBigHeaderFooterDimensionsPartialHeight() throws IOException {
+		testPage.veryBigHeaderButton.click();
+		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getTopFixedHeaderSize(), (Long)300L);
+		testPage.veryBigFooterButton.click();
+		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getBottomFixedFooterSize(), (Long)300L);
+	}
+	
+	/**
 	 * issue #443
 	 * @throws IOException
 	 */

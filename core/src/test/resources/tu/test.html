@@ -44,9 +44,11 @@
 	<div style="background:#FFFF00;height:6px;width:100%;position:fixed;top:0px;left:0px;"></div>
 	<div style="background:#FF0000;height:1px;width:100%;position:fixed;top:6px;left:0px;"></div>
 	<div id="bighead" style="background:blue;height:40px;width:400px;position:fixed;top:0px;left:0px;display:none;"></div>
+	<div id="verybighead" style="background:blue;height:300px;width:100%;position:fixed;top:0px;left:0px;display:none;"></div>
 	<h3>Test clicking a moving element</h3>
 	<button id="button">Start Animation</button>
 	<button id="displayBigHeader" name="displayBigHeader" onclick="javascript:displayBigHeader();">header</button>
+	<button id="displayVeryBigHeader" name="displayVeryBigHeader" onclick="javascript:displayVeryBigHeader();">very big header</button>
 	<div style="background:#98bf21;height:20px;width:10px;position:absolute;" onclick="javascript:alert('coucou');" id="carre"></div>
 
 	<h3>Test clicking an element</h3>
@@ -227,9 +229,11 @@
 	
 	<h3>Test click bottom element</h3>
 	<button id="displayBigFooter" name="displayBigFooter" onclick="javascript:displayBigFooter();">footer</button>
+	<button id="displayVeryBigFooter" name="displayVeryBigFooter" onclick="javascript:displayVeryBigFooter();">very big footer</button>
 	<div style="background:orange;height:20px;width:20px;display: inline-block;" onclick="javascript:addText('text2', 'coucou bottom');" id="carreBottom"></div>
 	<div style="height:50px;width:20px;display: block;"></div>
 	<div id="bigfoot" style="background:blue;height:50px;width:500px;position:fixed;bottom:0px;left:0px;display:none;"></div>
+	<div id="verybigfoot" style="background:blue;height:300px;width:100%;position:fixed;bottom:0px;left:0px;display:none;"></div>
 	
 <script src="jquery.min.js">
 </script>
@@ -255,6 +259,14 @@ function displayBigFooter() {
 
 function displayBigHeader() {
 	$('#bighead').css("display", "block");
+}
+
+function displayVeryBigFooter() {
+	$('#verybigfoot').css("display", "block");
+}
+
+function displayVeryBigHeader() {
+	$('#verybighead').css("display", "block");
 }
 
 function resetState() {

@@ -123,6 +123,9 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 	 * Test page contains fixed header (yellow) and footer (orange) of 5 pixels height. Detect how many
 	 * pixels of these colors are present in picture
 	 * Also count red/green pixels which is a line not to remove when cropping
+	 * 
+	 * /!\ DESKTOP PIXEL ASPECT RATIO MUST BE SET TO 100% so that count is done correctly 
+	 * 
 	 * @param picture
 	 * @return
 	 * @throws IOException 
