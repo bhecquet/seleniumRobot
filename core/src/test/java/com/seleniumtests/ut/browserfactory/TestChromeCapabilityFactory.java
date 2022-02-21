@@ -240,11 +240,12 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testCreateDefaultChromeCapabilities() {
-		
+
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
-		
+
 		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process]");
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "chrome");
+		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("prefs").toString(), "{profile.exit_type=Normal}");
 	}
 	
 	@Test(groups={"ut"})
