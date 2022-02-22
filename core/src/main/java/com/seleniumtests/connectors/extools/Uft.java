@@ -1,5 +1,25 @@
 package com.seleniumtests.connectors.extools;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.io.FileUtils;
+import org.jdom2.DataConversionException;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
+import org.jsoup.Jsoup;
+import org.testng.Reporter;
+import org.xml.sax.InputSource;
+
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
@@ -10,24 +30,6 @@ import com.seleniumtests.reporter.logger.TestMessage;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.logging.ScenarioLogger;
-import org.apache.commons.io.FileUtils;
-import org.jdom2.DataConversionException;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
-import org.testng.Reporter;
-import org.xml.sax.InputSource;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Connector for executing UFT tests either locally or remotely on selenium grid
@@ -50,9 +52,11 @@ public class Uft {
 	private String almProject;
 	private String scriptPath;
 	private String scriptName;
+	private boolean killUftOnStartup = true;
 	Map<String, String> parameters;
 	
 	/**
+	 * @param vbsPath		path to the vbs file (locally, or on the remote machine)
 	 * @param scriptPath	path to the script, either local or from ALM. If test is from ALM, prefix it with '[QualityCenter]'. e.g: '[QualityCenter]Subject\TOOLS\TestsFoo\foo'
 	 * @param parameters	parameters to pass to the script
 	 */
@@ -87,7 +91,11 @@ public class Uft {
 	 * @return	the generated test step
 	 */
 	public TestStep executeScript(int timeout) {
+		return executeScript(timeout, true);
+	}
+	public TestStep executeScript(int timeout, boolean killUftOnStartup) {
 		
+		this.killUftOnStartup = killUftOnStartup;
 		TestStep testStep = new TestStep(String.format("UFT: %s", scriptName), Reporter.getCurrentTestResult(), new ArrayList<>(), false);
 		
 		Date startDate = new Date();
@@ -131,13 +139,17 @@ public class Uft {
 			args.add("/project:" + almProject);
 		}
 		
+		if (killUftOnStartup) {
+			args.add("/clean");
+		}
+		
 		return args;
 	}
 	
 	/**
 	 * Analyze Result.xml content
 	 * @param output		the Result.xml content as a string
-	 * @param testStep		the test step to analyze
+	 * @param duration		duration of the execution
 	 * @return
 	 */
 	public TestStep analyseOutput(String output, TestStep testStep) {
@@ -196,7 +208,11 @@ public class Uft {
 	private void readStep(TestStep parentStep, Element stepElement) {
 		List<Element> stepList = stepElement.getChildren("Step");
 		
-		String stepDescription = String.format("%s: %s", stepElement.getChildText("Obj"),  stepElement.getChildText("Details"));
+		org.jsoup.nodes.Document htmlDoc = Jsoup.parseBodyFragment(stepElement.getChildText("Details"));
+		String details = htmlDoc.text();
+
+		String stepDescription = String.format("%s: %s", stepElement.getChildText("Obj"),  details);
+		
 		
 		if (stepList.isEmpty()) {
 			TestAction action = new TestAction(stepDescription, false, new ArrayList<>());
@@ -215,9 +231,19 @@ public class Uft {
 		
 		Document document;
 		SAXBuilder builder = new SAXBuilder();
+		
 
 		try {
-			document = builder.build(new InputSource(new StringReader(xmlString.substring(xmlString.indexOf("<"))))); // we skip BOM by searching the first "<" character
+			String xml = xmlString.substring(xmlString.indexOf("<"));
+			String xml10pattern = "[^"
+			        + "\u0009\r\n"
+			        + "\u0020-\uD7FF"
+			        + "\uE000-\uFFFD"
+			        + "\ud800\udc00-\udbff\udfff"
+			        + "]";
+			xml = xml.replaceAll(xml10pattern, "");
+			
+			document = builder.build(new InputSource(new StringReader(xml))); // we skip BOM by searching the first "<" character
 			Element docElement = document.getRootElement().getChild("Doc");
 			Element summary = docElement.getChild("Summary");
 			if (summary!= null && summary.getAttribute("failed").getIntValue() != 0) {
@@ -234,10 +260,18 @@ public class Uft {
 				}
 			}
 		
-		} catch (JDOMException | IOException e) {
+		} catch (JDOMException | IOException | StringIndexOutOfBoundsException e) {
 			logger.error("Could not read UFT report: " + e.getMessage());
 			testStep.addMessage(new TestMessage("Could not read UFT report: " + e.getMessage(), MessageType.ERROR));
 		}
 		
+	}
+
+	public void setKillUftOnStartup(boolean killUftOnStartup) {
+		this.killUftOnStartup = killUftOnStartup;
+	}
+
+	public boolean isKillUftOnStartup() {
+		return killUftOnStartup;
 	}
 }

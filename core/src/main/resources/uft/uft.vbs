@@ -11,7 +11,8 @@
 ' In the following, we start test1 with parameter 'User' that takes value 'foo'
 ' ex: cscript.exe uft.vbs [QualityCenter]Subject\xxx\xxx\test1 User=foo /server:http://<host>:<port>/qcbin /user:myuser /password:mypassword /domain:mydomain /project:myproject
 ' 
-' An optional parameter /output:<result_folder> can be given to set the folder where result will be written (defaults to D:\uft\output)
+' An optional parameter '/output:<result_folder>' can be given to set the folder where result will be written (defaults to D:\uft\output)
+' An optional parameter '/clean' can be given so that UFT is killed before being restarted
 ' --------------------------------------------
 
 
@@ -45,7 +46,9 @@ On Error Resume Next
 DeleteOutput(resultFolder)
 
 ' Kill existing UFT processes
-KillAll("uft.exe")
+If Wscript.Arguments.Named.Exists("clean") Then
+    KillAll("uft.exe")
+End If
 
 '---------------------------------------------------------------------------------'
 

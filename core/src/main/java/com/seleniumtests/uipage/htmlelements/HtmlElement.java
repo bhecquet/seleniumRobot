@@ -54,6 +54,7 @@ import org.openqa.selenium.interactions.Coordinates;
 import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.RemoteWebElement;
+import org.openqa.selenium.support.decorators.Decorated;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -1404,18 +1405,12 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * Get the unerlying element and return it
      */
     private WebElement getUnderlyingElement(WebElement element) {
-    	
-    	if (element.getClass().getName().contains("EventFiringWebElement")) {
-    		try {
-				Method getWrappedElementMethod = element.getClass().getDeclaredMethod("getWrappedElement");
-				getWrappedElementMethod.setAccessible(true);
-				return (WebElement) getWrappedElementMethod.invoke(element);
-			} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				throw new DriverExceptions("cannot get wrapped Element", e);
-			}
-    	} else {
+    	try {
+    		return (RemoteWebElement)((Decorated<WebElement>)element).getOriginal();
+    	} catch (ClassCastException e) {
     		return element;
     	}
+    	
     	
     }
     

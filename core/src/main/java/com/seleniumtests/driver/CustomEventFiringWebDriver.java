@@ -449,6 +449,8 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     private static final String JS_GET_TOP_HEADER = 
     		"function getViewportWidth() {" + JS_GET_VIEWPORT_SIZE_WIDTH + "}" +
     		"" +
+    		"function getViewportHeight() {" + JS_GET_VIEWPORT_SIZE_HEIGHT + "}" +
+    		"" +
     		JS_GET_ELEMENT_STYLE +
     		"" + 
     		JS_IS_ELEMENT_VISIBLE + 
@@ -466,10 +468,12 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     		"" + 
     		"var topPixel = 0;" + 
     		"var viewportWidth = getViewportWidth();" +
+    		"var viewportHeight = getViewportHeight();" +
     		"" + 
     		"if (headers && headers.length > 0) {" + 
+    		// only keep headers which are wide enough, not too high and visible
     		"  headers = headers.filter(function(e) {" + 
-    		"    return getComputedStyle(e)[\"position\"] === \"fixed\" && isVisible(e) && e.clientWidth > viewportWidth / 2;" + 
+    		"    return getComputedStyle(e)[\"position\"] === \"fixed\" && isVisible(e) && e.clientWidth > viewportWidth / 2 && e.clientHeight < viewportHeight / 2;" + 
     		"  });" + 
     		"  headers = headers.sort(function(a, b) {" + 
     		"    if (a == null || a.offsetTop == null) return 1;" + 
@@ -492,6 +496,8 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     private static final String JS_GET_BOTTOM_FOOTER = 
     		"function getViewportWidth() {" + JS_GET_VIEWPORT_SIZE_WIDTH + "}" +
     		"" +
+    		"function getViewportHeight() {" + JS_GET_VIEWPORT_SIZE_HEIGHT + "}" +
+    		"" +
     		JS_GET_ELEMENT_STYLE +
     		"" + 
     		JS_IS_ELEMENT_VISIBLE +
@@ -510,10 +516,12 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     		"" + 
     		"var bottomPixel = document.documentElement.clientHeight;" + // count from bottom
     		"var viewportWidth = getViewportWidth();" +
+    		"var viewportHeight = getViewportHeight();" +
     		"" + 
     		"if (footers && footers.length > 0) {" + 
+    		// only keep footers which are wide enough, not too high and visible
     		"  footers = footers.filter(function(e) {" + 
-    		"    return getComputedStyle(e)[\"position\"] === \"fixed\" && isVisible(e) && e.clientWidth > viewportWidth / 2;" + 
+    		"    return getComputedStyle(e)[\"position\"] === \"fixed\" && isVisible(e) && e.clientWidth > viewportWidth / 2 && e.clientHeight < viewportHeight / 2;" + 
     		"  });" + 
     		"  footers = footers.sort(function(a, b) {" + 
     		"    if (a == null || a.offsetBottom == null) return -1;" + 

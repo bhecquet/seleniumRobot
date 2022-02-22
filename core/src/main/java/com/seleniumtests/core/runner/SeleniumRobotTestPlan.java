@@ -276,10 +276,25 @@ public class SeleniumRobotTestPlan {
      * @param timeout		timeout in seconds. Max time the script will run
      */
     public void executeUftScript(String almServer, String almUser, String almPassword, String almDomain, String almProject, String scriptPath, Map<String, String> args, int timeout) {
+    	executeUftScript(almServer, almUser, almPassword, almDomain, almProject, scriptPath, args, timeout, true);
+    }
+    /**
+     * Execute a UFT script locally or remotely via a VBS script called through csscript.exe
+     * @param almServer		ALM server address
+     * @param almUser		
+     * @param almPassword
+     * @param almDomain
+     * @param almProject
+     * @param scriptPath	path to ALM script. e.g: '[QualityCenter]Subject\TOOLS\TestsFoo\foo'
+     * @param args			parameters to give to UFT script
+     * @param timeout		timeout in seconds. Max time the script will run
+     * @param killUftOnStartup	if true, UFT will be killed before starting the UFT test
+     */
+    public void executeUftScript(String almServer, String almUser, String almPassword, String almDomain, String almProject, String scriptPath, Map<String, String> args, int timeout, boolean killUftOnStartup) {
     	TestTasks.terminateCurrentStep();
     	
 		Uft uft = new Uft(almServer, almUser, almPassword, almDomain, almProject, scriptPath, args);
-		TestStep uftStep = uft.executeScript(timeout);
+		TestStep uftStep = uft.executeScript(timeout, killUftOnStartup);
 		TestStepManager.setCurrentRootTestStep(uftStep);
 		TestStepManager.logTestStep(TestStepManager.getCurrentRootTestStep());
     }
