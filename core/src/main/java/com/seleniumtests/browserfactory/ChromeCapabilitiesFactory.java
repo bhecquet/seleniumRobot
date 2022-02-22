@@ -18,7 +18,9 @@
 package com.seleniumtests.browserfactory;
 
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.openqa.selenium.MutableCapabilities;
@@ -131,6 +133,11 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
         		.map(BrowserExtension::getExtensionPath)
         		.collect(Collectors.toList()));
         }
+        
+        // issue #480: disable "restore pages" popup
+        Map<String, Object> prefs = new HashMap<>();
+        prefs.put("profile.exit_type", "Normal");
+        options.setExperimentalOption("prefs", prefs);
         
         if (webDriverConfig.getAttachExistingDriverPort() != null) {
         	options.setExperimentalOption("debuggerAddress", "127.0.0.1:" + webDriverConfig.getAttachExistingDriverPort());

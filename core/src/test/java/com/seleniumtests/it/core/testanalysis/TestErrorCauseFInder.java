@@ -297,7 +297,7 @@ public class TestErrorCauseFInder extends ReporterTest {
 			
 			ReporterTest.executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.NONE,  new String[] {"testImageDetectionAssertionError"});
 			
-			// check the error cause is displayed at the top of the report
+			// check the error cause is not displayed at the top of the report
 			String output = readTestMethodResultFile("testImageDetectionAssertionError");
 			Assert.assertFalse(output.contains("<th>Possible error causes</th>"));
 			
