@@ -252,7 +252,7 @@ public class DriverConfig {
 		} else if (proxyConfig.getType() == ProxyType.MANUAL) {
 			proxy.setHttpProxy(proxyConfig.getAddressAndPort());
 			proxy.setSslProxy(proxyConfig.getAddressAndPort());
-			proxy.setFtpProxy(proxyConfig.getAddressAndPort());
+			//proxy.setFtpProxy(proxyConfig.getAddressAndPort());
 			
 			if (proxyConfig.getLogin() != null && proxyConfig.getPassword() != null) {
 				proxy.setSocksUsername(proxyConfig.getLogin());
