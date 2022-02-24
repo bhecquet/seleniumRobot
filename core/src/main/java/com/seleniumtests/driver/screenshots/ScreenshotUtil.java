@@ -615,6 +615,11 @@ public class ScreenshotUtil {
     	int maxLoops = (((contentDimension.height - topPixelsToCrop - bottomPixelsToCrop) / 
     			(viewDimensions.height - topPixelsToCrop - bottomPixelsToCrop)) + 1) * ((contentDimension.width / viewDimensions.width) + 1) + 3;
     	
+    	// if a modal is displayed, do not capture more than the viewport
+    	if (((CustomEventFiringWebDriver)driver).isModalDisplayed()) {
+    		maxLoops = 1;
+    	}
+    	
     	int loops = 0;
     	int currentImageHeight = 0;
   
