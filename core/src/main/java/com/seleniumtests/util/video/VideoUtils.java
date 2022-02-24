@@ -64,7 +64,7 @@ public class VideoUtils {
             
     		Map<Long, TestStep> samples = new HashMap<>();
     		for (TestStep testStep: testSteps) {
-    			if (!testStep.getName().equals(TestStepManager.LAST_STEP_NAME)) {
+    			if (!testStep.isTestEndStep()) {
     				// timestamp outside of video, do not try to extract as we would get the last picture
     				if (testStep.getVideoTimeStamp() / 1000 * in.getTimeScale(trackId) > in.getChunkCount(0)) {
     					continue;
