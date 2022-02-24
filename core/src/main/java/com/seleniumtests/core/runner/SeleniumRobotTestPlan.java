@@ -42,6 +42,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.core.utils.TestNGResultUtils;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.info.Info;
 import com.seleniumtests.reporter.info.MultipleInfo;
@@ -298,6 +299,11 @@ public class SeleniumRobotTestPlan {
 		TestStep uftStep = uft.executeScript(timeout, killUftOnStartup);
 		TestStepManager.setCurrentRootTestStep(uftStep);
 		TestStepManager.logTestStep(TestStepManager.getCurrentRootTestStep());
+		
+		if (Boolean.TRUE.equals(uftStep.getFailed())) {
+			throw new ScenarioException(String.format("UFT execution failed on script %s", scriptPath));
+			
+		}
     }
     
     /**
