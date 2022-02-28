@@ -1059,4 +1059,16 @@ public class TestTestStep extends GenericTest {
 		Assert.assertNull(step.getRootCause());
 		Assert.assertNull(step.getRootCauseDetails());
 	}
+	
+	@Test(groups = { "ut" })
+	public void testIsTestEndStep() {
+		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+		Assert.assertFalse(step.isTestEndStep());
+	}
+	
+	@Test(groups = { "ut" })
+	public void testIsTestEndStep2() {
+		TestStep step = new TestStep("Test end", null, new ArrayList<>(), true);
+		Assert.assertTrue(step.isTestEndStep());
+	}
 }

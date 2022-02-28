@@ -30,6 +30,7 @@ import org.json.JSONObject;
 import org.testng.ITestResult;
 
 import com.seleniumtests.core.Step.RootCause;
+import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.util.ExceptionUtility;
 
 /**
@@ -103,6 +104,10 @@ public class TestStep extends TestAction {
 		consolidatedDuration -= getDurationToExclude();
 
 		return Math.max(0, consolidatedDuration);
+	}
+	
+	public boolean isTestEndStep() {
+		return TestStepManager.LAST_STEP_NAME.equals(name);
 	}
 	
 	public void setStartDate() {
