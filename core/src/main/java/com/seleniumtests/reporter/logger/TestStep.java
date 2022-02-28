@@ -19,7 +19,6 @@ package com.seleniumtests.reporter.logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,12 +27,10 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.openqa.selenium.WebDriverException;
 import org.testng.ITestResult;
 
 import com.seleniumtests.core.Step.RootCause;
 import com.seleniumtests.core.TestStepManager;
-import com.seleniumtests.reporter.reporters.CommonReporter;
 import com.seleniumtests.util.ExceptionUtility;
 
 /**

@@ -217,9 +217,6 @@ public class TestWindowsOsUtility extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testFirefoxServerWindowsInstallation() throws IOException {
 
-		Path profilePath = Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "ffprofile");
-		Stream<Path> profiles = Files.list(Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "ffprofile"));
-		
 		PowerMockito.mockStatic(OSCommand.class);
 		PowerMockito.mockStatic(Advapi32Util.class);
 		PowerMockito.mockStatic(Paths.class);
@@ -253,9 +250,6 @@ public class TestWindowsOsUtility extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testSeveralFirefoxInstallations() throws IOException {
 
-		Path profilePath = Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "ffprofile");
-		Stream<Path> profiles = Files.list(Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "ffprofile"));
-		
 		PowerMockito.mockStatic(OSCommand.class);
 		PowerMockito.mockStatic(Advapi32Util.class);
 		PowerMockito.mockStatic(Paths.class);
@@ -292,10 +286,6 @@ public class TestWindowsOsUtility extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testSeveralFirefoxInstallationsMissingBrowser() throws IOException {
-		
-
-		Path profilePath = Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "ffprofile");
-		Stream<Path> profiles = Files.list(Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "ffprofile"));
 		
 		PowerMockito.mockStatic(OSCommand.class);
 		PowerMockito.mockStatic(Advapi32Util.class);

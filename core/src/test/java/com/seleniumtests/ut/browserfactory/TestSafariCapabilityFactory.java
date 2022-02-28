@@ -17,7 +17,6 @@
  */
 package com.seleniumtests.ut.browserfactory;
 
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -40,7 +39,6 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
-import com.seleniumtests.browserfactory.ChromeCapabilitiesFactory;
 import com.seleniumtests.browserfactory.SafariCapabilitiesFactory;
 import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.driver.BrowserType;
@@ -98,7 +96,7 @@ public class TestSafariCapabilityFactory extends MockitoTest {
 		Assert.assertTrue(capa.is(CapabilityType.TAKES_SCREENSHOT));
 		Assert.assertTrue(capa.is(CapabilityType.ACCEPT_SSL_CERTS));
 		Assert.assertFalse(capa.is(SeleniumRobotCapabilityType.NODE_TAGS));
-		Assert.assertEquals(capa.getVersion(), "");
+		Assert.assertEquals(capa.getBrowserVersion(), "");
 		Assert.assertEquals(capa.getCapability(CapabilityType.PROXY), proxyConfig);
 	}
 
@@ -143,7 +141,7 @@ public class TestSafariCapabilityFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new SafariCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(capa.getPlatform(), Platform.MAC);
+		Assert.assertEquals(capa.getPlatformName(), Platform.MAC);
 		
 	}
 	
@@ -168,7 +166,7 @@ public class TestSafariCapabilityFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new SafariCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(capa.getVersion(), "10.0");
+		Assert.assertEquals(capa.getBrowserVersion(), "10.0");
 		
 	}
 	

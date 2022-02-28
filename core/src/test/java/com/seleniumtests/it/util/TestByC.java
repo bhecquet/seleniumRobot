@@ -17,10 +17,10 @@
  */
 package com.seleniumtests.it.util;
 
-import java.util.List;
-
 import static com.seleniumtests.uipage.ByC.android;
 import static com.seleniumtests.uipage.ByC.ios;
+
+import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;

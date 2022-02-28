@@ -20,6 +20,7 @@ package com.seleniumtests.driver.screenshots;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -111,21 +112,6 @@ public class ScreenshotUtil {
     		this.title = null;
     		this.pageSource = null;
     		
-    	}
-    	
-    	/**
-    	 * Copy the current image to an other one, changing underlying image
-    	 * @return
-    	 */
-    	public NamedBufferedImage copy(BufferedImage image) {
-    		NamedBufferedImage img = new NamedBufferedImage(image, this.prefix);
-    		img.prefix = prefix;
-    		img.image = image;
-    		img.url = url;
-    		img.title = title;
-    		img.pageSource = pageSource;
-    		
-    		return img;
     	}
     	
 
@@ -458,12 +444,16 @@ public class ScreenshotUtil {
             
             // android does not support screenshot from webview context, switch temporarly to native_app context to take screenshot
             if (uiDriver != null && uiDriver.getConfig().getBrowserType() == BrowserType.BROWSER) {
-            	((AndroidDriver<WebElement>)((CustomEventFiringWebDriver)driver).getWebDriver()).context("NATIVE_APP");
+            	((AndroidDriver)((CustomEventFiringWebDriver)driver).getWebDriver()).context("NATIVE_APP");
             }
 
             String screenshotB64 = screenShot.getScreenshotAs(OutputType.BASE64);
+            if (screenshotB64 == null) {
+            	logger.warn("capture cannot be done");
+            	return null;
+            }
             if (uiDriver != null && uiDriver.getConfig().getBrowserType() == BrowserType.BROWSER) {
-            	((AndroidDriver<WebElement>)((CustomEventFiringWebDriver)driver).getWebDriver()).context("WEBVIEW");
+            	((AndroidDriver)((CustomEventFiringWebDriver)driver).getWebDriver()).context("WEBVIEW");
             }
             
             BufferedImage capturedImage = ImageProcessor.loadFromB64String(screenshotB64);
@@ -729,7 +719,7 @@ public class ScreenshotUtil {
         screenShot.setTitle(namedImage.title);
         
         try {
-            FileUtils.writeStringToFile(Paths.get(outputDirectory, HTML_DIR, filename + ".html").toFile(), namedImage.pageSource);
+            FileUtils.writeStringToFile(Paths.get(outputDirectory, HTML_DIR, filename + ".html").toFile(), namedImage.pageSource, StandardCharsets.UTF_8);
             screenShot.setHtmlSourcePath(String.format("%s/%s.html", HTML_DIR, filename));
         } catch (IOException e) {
             logger.warn("Ex", e);

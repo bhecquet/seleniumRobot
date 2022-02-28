@@ -17,115 +17,43 @@
  */
 package com.seleniumtests.driver;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.openqa.selenium.By;
 import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.NoSuchWindowException;
-import org.openqa.selenium.OutputType;
 import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.MoveTargetOutOfBoundsException;
-import org.openqa.selenium.support.events.WebDriverEventListener;
+import org.openqa.selenium.support.events.WebDriverListener;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.WebSessionEndedException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
-public class DriverExceptionListener implements WebDriverEventListener {
+public class DriverExceptionListener implements WebDriverListener {
 	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(DriverExceptionListener.class);
-	
-	@Override
-    public void afterChangeValueOf(final WebElement element, final WebDriver driver, CharSequence[] arg2) {
-    	// do nothing
-    }
-	
-	@Override
-    public void afterClickOn(final WebElement arg0, final WebDriver driver) {
-		// do nothing
-	}
 
-	@Override
-    public void afterFindBy(final By arg0, final WebElement arg1, final WebDriver arg2) {
-		// do nothing
-	}
-
-	@Override
-    public void afterNavigateBack(final WebDriver arg0) {
-		// do nothing
-	}
-
-	@Override
-    public void afterNavigateForward(final WebDriver arg0) {
-		// do nothing
-	}
-
-	@Override
-    public void afterNavigateTo(final String arg0, final WebDriver arg1) {
-		// do nothing
-	}
 
     @Override
-    public void afterScript(final String arg0, final WebDriver arg1) {
-    	// do nothing
-    }
-
-	@Override
-	public void beforeChangeValueOf(WebElement arg0, WebDriver arg1, CharSequence[] arg2) {
-		// do nothing
-		
-	}
-
-    @Override
-    public void beforeClickOn(final WebElement arg0, final WebDriver driver) {
+    public void beforeClick(WebElement arg0) {
     	if (SeleniumTestsContextManager.isWebTest()) {
     		((CustomEventFiringWebDriver)WebUIDriver.getWebDriver(false)).updateWindowsHandles();
     	}
     }
 
+ 
     @Override
-    public void beforeFindBy(final By arg0, final WebElement arg1, final WebDriver arg2) {
-    	// do nothing
-    }
-
-    @Override
-    public void beforeNavigateBack(final WebDriver arg0) {
-    	// do nothing
-    }
-
-    @Override
-    public void beforeNavigateForward(final WebDriver arg0) {
-    	// do nothing
-    }
-
-    @Override
-    public void beforeNavigateTo(final String arg0, final WebDriver arg1) {
-    	// do nothing
-    }
-
-    @Override
-    public void beforeScript(final String arg0, final WebDriver arg1) {
-    	// do nothing
-    }
-    
-    @Override
-    public void afterNavigateRefresh(WebDriver arg0) {
-    	// do nothing
-    }
-
-    @Override
-	public void beforeNavigateRefresh(WebDriver arg0) {
-    	// do nothing
-    }
-
-    @Override
-    public void onException(final Throwable ex, final WebDriver arg1) {
+    public void onError(Object target, Method method, Object[] args, InvocationTargetException e) {
+    	
+    	Throwable ex = e.getCause();
     	
         if (ex.getMessage() == null
         		|| ex.getMessage().contains("Element must be user-editable in order to clear it")
@@ -144,9 +72,9 @@ public class DriverExceptionListener implements WebDriverEventListener {
 
             // customexception
             for (int i = 0; i < ex.getStackTrace().length; i++) {
-                String method = ex.getStackTrace()[i].getMethodName();
-                if (method.contains("getTitle") || method.contains("getWindowHandle") || method.contains("click")
-                        || method.contains("getPageSource")) {
+                String methodInEx = ex.getStackTrace()[i].getMethodName();
+                if (methodInEx.contains("getTitle") || methodInEx.contains("getWindowHandle") || methodInEx.contains("click")
+                        || methodInEx.contains("getPageSource")) {
                     return;
                 }
             }
@@ -156,7 +84,8 @@ public class DriverExceptionListener implements WebDriverEventListener {
         } else if (ex.getMessage().contains("Error communicating with the remote browser. It may have died.")) {
 
             // Session has lost connection, remove it then ignore quit() method.
-            if (WebUIDriver.getWebUIDriver(false).getConfig().getMode() == DriverMode.GRID) {
+        	WebUIDriver drv = WebUIDriver.getWebUIDriver(false);
+            if (drv == null || drv.getConfig().getMode() == DriverMode.GRID) {
                 WebUIDriver.setWebDriver(null);
                 throw new WebSessionEndedException(ex);
             }
@@ -170,12 +99,12 @@ public class DriverExceptionListener implements WebDriverEventListener {
 	        		try {
 	        			driver.switchTo().window(handles.get(handles.size() - 1));
 	        			logger.info("Current window has been closed, switching to previous window to avoid problems in future commands");
-	        		} catch (IndexOutOfBoundsException | NoSuchWindowException e) {
+	        		} catch (IndexOutOfBoundsException | NoSuchWindowException e1) {
 	        			driver.switchTo().window(handles.get(0));
 	        			logger.info("Current window has been closed, switching to first window to avoid problems in future commands");
 	            	}
 	        	} 
-        	} catch (Exception e) {
+        	} catch (Exception e1) {
         		// ignore, do not raise exception during handling it
         	}
 
@@ -210,60 +139,4 @@ public class DriverExceptionListener implements WebDriverEventListener {
 
     }
 
-	@Override
-	public void afterAlertAccept(WebDriver arg0) {
-		// do nothing
-	}
-
-	@Override
-	public void afterAlertDismiss(WebDriver arg0) {
-		// do nothing
-	}
-
-
-	@Override
-	public void beforeAlertAccept(WebDriver arg0) {
-		// do nothing
-	}
-
-	@Override
-	public void beforeAlertDismiss(WebDriver arg0) {
-		// do nothing
-	}
-
-	@Override
-	public <X> void afterGetScreenshotAs(OutputType<X> arg0, X arg1) {
-		// do nothing
-		
-	}
-
-	@Override
-	public void afterGetText(WebElement arg0, WebDriver arg1, String arg2) {
-		// do nothing
-		
-	}
-
-	@Override
-	public void afterSwitchToWindow(String arg0, WebDriver arg1) {
-		// do nothing
-		
-	}
-
-	@Override
-	public <X> void beforeGetScreenshotAs(OutputType<X> arg0) {
-		// do nothing
-		
-	}
-
-	@Override
-	public void beforeGetText(WebElement arg0, WebDriver arg1) {
-		// do nothing
-		
-	}
-
-	@Override
-	public void beforeSwitchToWindow(String arg0, WebDriver arg1) {
-		// do nothing
-		
-	}	
 }

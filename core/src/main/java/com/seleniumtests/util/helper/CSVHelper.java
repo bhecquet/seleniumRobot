@@ -23,7 +23,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
@@ -33,15 +32,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
-import com.seleniumtests.core.Filter;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.DatasetException;
-import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class CSVHelper {
-    private static Logger logger = SeleniumRobotLogger.getLogger(CSVHelper.class);
 
     public static final String DOUBLE_QUOTE = "\"";
     public static final String DELIM_CHAR = ",";
@@ -61,9 +55,8 @@ public class CSVHelper {
      *
      * @throws  Exception
      */
-    public static Iterator<Object[]> getDataFromCSVFile(final Class<?> clazz, final String filename,
-            final Filter filter, final boolean readHeaders, final boolean supportDPFilter) {
-        return getDataFromCSVFile(clazz, filename, filter, readHeaders, null, supportDPFilter);
+    public static Iterator<Object[]> getDataFromCSVFile(final Class<?> clazz, final String filename, final boolean readHeaders) {
+        return getDataFromCSVFile(clazz, filename, readHeaders, null);
     }
 
     /**
@@ -79,10 +72,9 @@ public class CSVHelper {
      * @param supportDPFilter
      * @return
      */
-    public static Iterator<Object[]> getDataFromCSVFile(final Class<?> clazz, final String filename, Filter filter,
-            final boolean readHeaders, final String delimiter, final boolean supportDPFilter) {
+    public static Iterator<Object[]> getDataFromCSVFile(final Class<?> clazz, final String filename,
+            final boolean readHeaders, final String delimiter) {
 
-    	Filter newFilter = filter;
         try (InputStream is = (clazz != null) ?  clazz.getResourceAsStream(filename) : new FileInputStream(filename) ){
             
 
@@ -115,19 +107,6 @@ public class CSVHelper {
                 throw new CustomSeleniumTestsException("Blank TestTitle found on Row(s) " + sbBlank.toString() + ".");
             }
 
-            // Support include tags and exclude tags
-            if (supportDPFilter) {
-                Filter dpFilter = SpreadSheetHelper.getDPFilter();
-
-                if (dpFilter != null) {
-                    if (newFilter == null) {
-                    	newFilter = dpFilter;
-                    } else {
-                    	newFilter = Filter.and(newFilter, dpFilter);
-                    }
-                }
-            }
-
             // The first row is the header data
             for (int i = 1; i < csvData.length; i++) {
 
@@ -150,19 +129,6 @@ public class CSVHelper {
                     }
                 }
 
-                // To support include tags and exclude tags
-                if (supportDPFilter) {
-                    SpreadSheetHelper.formatDPTags(rowDataMap);
-                }
-
-                if (newFilter == null || newFilter.match(rowDataMap)) {
-                    sheetData.add(rowData.toArray(new Object[rowData.size()]));
-                }
-            }
-
-            if ((!readHeaders && sheetData.isEmpty()) || (readHeaders && sheetData.size() <= 1)) {
-                logger.warn("No matching data found on csv file: " + filename + " with filter criteria: "
-                        + newFilter.toString());
             }
 
             return sheetData.iterator();

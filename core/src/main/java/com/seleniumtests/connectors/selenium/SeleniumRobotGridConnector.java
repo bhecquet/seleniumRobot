@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -30,7 +31,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.http.HttpHost;
@@ -111,7 +111,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		        	throw new SeleniumGridException("could not upload application file: " + response.getStatusLine().getReasonPhrase());
 		        } else {
 		        	// set path to the mobile application as an URL on the grid hub
-		        	((DesiredCapabilities)caps).setCapability(MobileCapabilityType.APP, IOUtils.toString(response.getEntity().getContent()) + "/" + appFiles.get(0).getName());
+		        	((DesiredCapabilities)caps).setCapability(MobileCapabilityType.APP, IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8) + "/" + appFiles.get(0).getName());
 		        }
 		        
 			} catch (IOException | URISyntaxException e) {

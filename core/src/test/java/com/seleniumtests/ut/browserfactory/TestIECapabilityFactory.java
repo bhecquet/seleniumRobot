@@ -110,7 +110,7 @@ public class TestIECapabilityFactory extends MockitoTest {
 		Assert.assertTrue(capa.is(CapabilityType.TAKES_SCREENSHOT));
 		Assert.assertTrue(capa.is(CapabilityType.ACCEPT_SSL_CERTS));
 		Assert.assertFalse(capa.is(SeleniumRobotCapabilityType.NODE_TAGS));
-		Assert.assertEquals(capa.getVersion(), "");
+		Assert.assertEquals(capa.getBrowserVersion(), "");
 		Assert.assertEquals(capa.getCapability(CapabilityType.PROXY), proxyConfig);
 	}
 
@@ -155,7 +155,7 @@ public class TestIECapabilityFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(capa.getPlatform(), Platform.WINDOWS);
+		Assert.assertEquals(capa.getPlatformName(), Platform.WINDOWS);
 		
 	}
 	
@@ -180,7 +180,7 @@ public class TestIECapabilityFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(capa.getVersion(), "10.0");
+		Assert.assertEquals(capa.getBrowserVersion(), "10.0");
 		
 	}
 	
@@ -243,6 +243,7 @@ public class TestIECapabilityFactory extends MockitoTest {
 	 * Edge IE mode in local
 	 * Check ie.edgepath and ie.edgechromium capabilities are set
 	 */
+	@SuppressWarnings("unchecked")
 	@Test(groups={"ut"})
 	public void testCreateDefaultEdgeIEModeCapabilities() {
 		
@@ -274,6 +275,7 @@ public class TestIECapabilityFactory extends MockitoTest {
 	 * Edge IE mode in grid
 	 * Check ie.edgepath and ie.edgechromium capabilities are not set
 	 */
+	@SuppressWarnings("unchecked")
 	@Test(groups={"ut"})
 	public void testCreateDefaultEdgeIEModeCapabilitiesGrid() {
 		
@@ -311,7 +313,7 @@ public class TestIECapabilityFactory extends MockitoTest {
 		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		Mockito.when(config.getInitialUrl()).thenReturn("http://mysite");
 		
-		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
+		new IECapabilitiesFactory(config).createCapabilities();
 		
 	}
 	

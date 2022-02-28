@@ -23,10 +23,11 @@ import java.lang.reflect.Method;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -53,6 +54,7 @@ import org.openqa.selenium.interactions.Coordinates;
 import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.RemoteWebElement;
+import org.openqa.selenium.support.decorators.Decorated;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -77,7 +79,6 @@ import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
-import io.appium.java_client.MobileElement;
 import io.appium.java_client.MultiTouchAction;
 import io.appium.java_client.PerformsTouchActions;
 import io.appium.java_client.TouchAction;
@@ -418,21 +419,13 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	// click on element before sending keys through keyboard
     	element.click();
         executeScript("arguments[0].focus();", element);
-        
-        DriverConfig driverConfig = WebUIDriver.getWebUIDriver(false).getConfig();
-        
-        // handlitee org.openqa.selenium.UnsupportedCommandException: sendKeysToActiveElement which are not available for firefox and IE
-        if ((driverConfig.getBrowserType() == BrowserType.FIREFOX && FirefoxDriverFactory.isMarionetteMode())
-        		|| driverConfig.getBrowserType() == BrowserType.INTERNET_EXPLORER
-        		|| driverConfig.getBrowserType() == BrowserType.EDGE
-	        	|| (driverConfig.getBrowserType() == BrowserType.CHROME 
-	        			&& driverConfig.getMajorBrowserVersion() >= 75)) {
-        	logger.warn("using specific Marionette method");
-        	executeScript(String.format("arguments[0].value='%s';", keysToSend[0].toString()), element);
+
+        if (keysToSend.length == 0) {
+        	executeScript("arguments[0].value='';", element);
         } else {
-			// use keyboard to type
-			((CustomEventFiringWebDriver)driver).getKeyboard().sendKeys(keysToSend);
+        	executeScript(String.format("arguments[0].value='%s';", keysToSend[0].toString()), element);
         }
+
     }
 
     @ReplayOnError
@@ -704,7 +697,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         // wait for element to be really visible. should be done only for actions on element
         if (waitForVisibility && makeVisible) {
         	try {
-        		new WebDriverWait(driver, 1).until(ExpectedConditions.visibilityOf(element));
+        		new WebDriverWait(driver, Duration.ofSeconds(1)).until(ExpectedConditions.visibilityOf(element));
         	} catch (TimeoutException e) {
         		logger.error(String.format("Element %s has never been made visible", toString()));
         	}
@@ -855,7 +848,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 				
 			// wait for element to be displayed
 			try {
-				new WebDriverWait(driver, 1).until(ExpectedConditions.visibilityOf(element));
+				new WebDriverWait(driver, Duration.ofSeconds(1)).until(ExpectedConditions.visibilityOf(element));
 			} catch (ElementNotVisibleException e) {
 				scenarioLogger.info(String.format("element %s not visible", element));
 			} catch (Exception e) {
@@ -906,6 +899,46 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 
         return element.getAttribute(name);
     }
+	
+	@Override
+	@ReplayOnError
+	public String getDomAttribute(String name) {
+		findElement(false, false);
+		
+		return element.getDomAttribute(name);
+	}
+	
+	@Override
+	@ReplayOnError
+	public String getDomProperty(String name) {
+		findElement(false, false);
+		
+		return element.getDomProperty(name);
+	}
+	
+	@Override
+	@ReplayOnError
+	public String getAriaRole() {
+		findElement(false, false);
+		
+		return element.getAriaRole();
+	}
+	
+	@Override
+	@ReplayOnError
+	public String getAccessibleName() {
+		findElement(false, false);
+		
+		return element.getAccessibleName();
+	}
+	
+	@Override
+	@ReplayOnError
+	public SearchContext getShadowRoot() {
+		findElement(false, false);
+		
+		return element.getShadowRoot();
+	}
 
     /**
      * Returns the BY locator stored in the HtmlElement.
@@ -1372,18 +1405,12 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * Get the unerlying element and return it
      */
     private WebElement getUnderlyingElement(WebElement element) {
-    	
-    	if (element.getClass().getName().contains("EventFiringWebElement")) {
-    		try {
-				Method getWrappedElementMethod = element.getClass().getDeclaredMethod("getWrappedElement");
-				getWrappedElementMethod.setAccessible(true);
-				return (WebElement) getWrappedElementMethod.invoke(element);
-			} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				throw new DriverExceptions("cannot get wrapped Element", e);
-			}
-    	} else {
+    	try {
+    		return (RemoteWebElement)((Decorated<WebElement>)element).getOriginal();
+    	} catch (ClassCastException e) {
     		return element;
     	}
+    	
     	
     }
     
@@ -1391,7 +1418,10 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public Point getCenter() {
     	try {
     		checkForMobile();
-    		return ((MobileElement)getUnderlyingElement(element)).getCenter();
+            Point upperLeft = element.getLocation();
+            Dimension dimension = element.getSize();
+            Point center = new Point(upperLeft.x + dimension.width / 2, upperLeft.y + dimension.height / 2);
+    		return center;
     	} catch (ScenarioException e) {
     		Rectangle rectangle = element.getRect();
     		return new Point(rectangle.x + rectangle.width / 2, rectangle.y + rectangle.height / 2);
@@ -1401,13 +1431,14 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     @ReplayOnError
     public void pinch() {
     	PerformsTouchActions performTouchActions = checkForMobile();
-    	MobileElement mobElement = (MobileElement) getUnderlyingElement(element);
+    	WebElement mobElement = getUnderlyingElement(element);
     	
     	// code taken from appium
 		MultiTouchAction multiTouch = new MultiTouchAction(performTouchActions);
 		
 		Point upperLeft = mobElement.getLocation();
-		Point center = mobElement.getCenter();
+        Dimension dimension = mobElement.getSize();
+        Point center = new Point(upperLeft.x + dimension.width / 2, upperLeft.y + dimension.height / 2);
 		int yOffset = center.getY() - upperLeft.getY();
 		
 		TouchAction<?> action0 = createTouchAction().press(ElementOption.element(mobElement, center.getX(), center.getY() - yOffset))
@@ -1430,7 +1461,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      */
     @ReplayOnError
     public void swipe(int xOffset, int yOffset, int xMove, int yMove) {
-    	MobileElement mobElement = (MobileElement) getUnderlyingElement(element);
+    	WebElement mobElement = getUnderlyingElement(element);
         
         createTouchAction().press(ElementOption.element(mobElement, xOffset, yOffset))
 			.waitAction()
@@ -1446,7 +1477,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     @ReplayOnError
     public void tap(int fingers, int duration) {
     	PerformsTouchActions performTouchActions = checkForMobile();
-    	MobileElement mobElement = (MobileElement) getUnderlyingElement(element);
+    	WebElement mobElement = getUnderlyingElement(element);
     
     	// code from appium
     	MultiTouchAction multiTouch = new MultiTouchAction(performTouchActions);
@@ -1462,12 +1493,13 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     @ReplayOnError
     public void zoom() {
     	PerformsTouchActions performTouchActions = checkForMobile();
-    	MobileElement mobElement = (MobileElement) getUnderlyingElement(element);
+        WebElement mobElement = getUnderlyingElement(element);
     	
     	MultiTouchAction multiTouch = new MultiTouchAction(performTouchActions);
 
         Point upperLeft = mobElement.getLocation();
-        Point center = mobElement.getCenter();
+        Dimension dimension = mobElement.getSize();
+        Point center = new Point(upperLeft.x + dimension.width / 2, upperLeft.y + dimension.height / 2);
         int yOffset = center.getY() - upperLeft.getY();
 
         TouchAction<?> action0 = createTouchAction().press(PointOption.point(center.getX(), center.getY()))
@@ -1509,15 +1541,15 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     
 	public void setImplicitWaitTimeout(final double timeout) {
         try {
-            driver.manage().timeouts().implicitlyWait((int)timeout, TimeUnit.SECONDS);
+            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds((int)timeout));
         } catch (Exception ex) {
         	logger.error(ex);
         }
     }
 	
-	public void setImplicitWaitTimeout(int timeout, TimeUnit unit) {
+	public void setImplicitWaitTimeout(int timeout, TemporalUnit unit) {
 		try {
-			driver.manage().timeouts().implicitlyWait(timeout, unit);
+			driver.manage().timeouts().implicitlyWait(Duration.of((long)timeout, unit));
 		} catch (Exception ex) {
 			logger.error(ex);
 		}
@@ -1536,14 +1568,14 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	driver = updateDriver();
     	
     	try {
-    		setImplicitWaitTimeout(510, TimeUnit.MILLISECONDS);
+    		setImplicitWaitTimeout(510, ChronoUnit.MILLIS);
     	
 	    	Clock clock = Clock.systemUTC();
 	    	Instant end = clock.instant().plusSeconds(Math.max(1, timeout));
 	    	
 	    	while (end.isAfter(clock.instant())) {
 	    		try {
-		    		WebElement elt = new WebDriverWait(driver, 0).ignoring(ConfigurationException.class, ScenarioException.class).until(ExpectedConditionsC.presenceOfElementLocated(this));
+		    		WebElement elt = new WebDriverWait(driver, Duration.ofMillis(0)).ignoring(ConfigurationException.class, ScenarioException.class).until(ExpectedConditionsC.presenceOfElementLocated(this));
 		            outlineElement(elt);
 		    		return;
 	    		} catch (TimeoutException e) {
@@ -1559,13 +1591,13 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public void waitFor(int timeout, ExpectedCondition<?> condition) {
     	
     	try {
-    		setImplicitWaitTimeout(510, TimeUnit.MILLISECONDS);
+    		setImplicitWaitTimeout(510, ChronoUnit.MILLIS);
 	    	Clock clock = Clock.systemUTC();
 	    	Instant end = clock.instant().plusSeconds(Math.max(1, timeout));
 	    	
 	    	while (end.isAfter(clock.instant())) {
 	    		try {
-	    			new WebDriverWait(driver, timeout).ignoring(ConfigurationException.class, ScenarioException.class).until(condition);
+	    			new WebDriverWait(driver, Duration.ofSeconds(timeout)).ignoring(ConfigurationException.class, ScenarioException.class).until(condition);
 		    		return;
 	    		} catch (TimeoutException e) {
 	    			// nothing to do

@@ -4,7 +4,7 @@
 	<parent>
 	    <groupId>com.infotel.seleniumRobot</groupId>
 	    <artifactId>core-parent</artifactId>
-	    <version>4.21.4-SNAPSHOT</version>
+	    <version>5.0.0-SNAPSHOT</version>
 	</parent>
 
   	<artifactId>core</artifactId>
@@ -61,6 +61,10 @@
 			      <artifactId>commons-logging</artifactId>
 			      <groupId>commons-logging</groupId>
 			    </exclusion>
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -131,10 +135,6 @@
 			<artifactId>seleniumRobot-mac-driver</artifactId>
 		</dependency>
 		<dependency>
-	        <groupId>com.microsoft.edge</groupId>
-	        <artifactId>msedge-selenium-tools-java</artifactId>
-	    </dependency>
-		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
@@ -171,6 +171,7 @@
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
 			<version>7.3.0</version>
+			<!-- Cannot upgrade to 7.5: https://github.com/powermock/powermock/issues/1118 -->
 		</dependency>
 		<dependency>
 			<groupId>com.google.inject</groupId>
@@ -186,12 +187,12 @@
 			      <artifactId>commons-logging</artifactId>
 			      <groupId>commons-logging</groupId>
 			    </exclusion>
+				<!-- Java > 8 -->
+<!--				<exclusion>-->
+<!--					<groupId>xml-apis</groupId>-->
+<!--					<artifactId>xml-apis</artifactId>-->
+<!--				</exclusion>-->
 		    </exclusions>
-		</dependency>
-		<dependency>
-			<groupId>com.opera</groupId>
-			<artifactId>operadriver</artifactId>
-			<version>1.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.velocity</groupId>
@@ -244,6 +245,11 @@
         <dependency>
         	<groupId>org.aspectj</groupId>
         	<artifactId>aspectjrt</artifactId>
+        	<version>${aspectj.version}</version>
+        </dependency>
+        <dependency>
+        	<groupId>org.aspectj</groupId>
+        	<artifactId>aspectjweaver</artifactId>
         	<version>${aspectj.version}</version>
         </dependency>
         <dependency>
@@ -300,7 +306,7 @@
             <version>${jacoco.version}</version>
             <classifier>runtime</classifier>
 		</dependency>
-    </dependencies>
+	</dependencies>
 
 	<build>
 		<finalName>seleniumRobot</finalName>
@@ -351,7 +357,7 @@
 	              </dependency>
 				</dependencies>
 		        <configuration>
-		        	<skip>false</skip>
+		        	<skip>true</skip>
         			<ignoredDifferencesFile>${project.build.directory}/classes/clirr-differences.xml</ignoredDifferencesFile>
         			<includes>
         				<include>com/seleniumtests/connectors/db/**</include>
@@ -383,11 +389,14 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.5.1</version>
+<!--				<version>3.9.0</version>-->
 				<configuration>
 					<encoding>utf-8</encoding>
-					<source>1.8</source>
-					<target>1.8</target>
-					
+					<source>8</source>
+					<target>8</target>
+					<!-- https://stackoverflow.com/questions/26817884/netbeans-and-bad-service-configuration-file-or-exception-thrown-while-construct-->
+<!--					<compilerArgument>-proc:none</compilerArgument>-->
+
 				</configuration>
 				
 			</plugin>
@@ -458,7 +467,7 @@
                         <jacoco-agent.destfile>${project.build.directory}/coverage-reports/jacoco-it.exec</jacoco-agent.destfile>
                         <mavenExecution>true</mavenExecution>
 					</systemPropertyVariables>
-					<argLine>-Ddebug=${seleniumRobot.debug} -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"</argLine>
+					<argLine>${argLine} -Ddebug=${seleniumRobot.debug} -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"</argLine>
 				<!-- /comment -->
 				<!-- uncomment for online instrumentation -->
 					<!-- <argLine>${failsafeArgLine} -Ddebug=${seleniumRobot.debug} -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"</argLine> -->
@@ -607,6 +616,7 @@
 				<configuration>
 					<complianceLevel>1.8</complianceLevel>
 					<source>1.8</source>
+					<target>1.8</target>
 					<showWeaveInfo>false</showWeaveInfo>
 					<Xlint>unmatchedSuperTypeInCall=ignore</Xlint>
 					<weaveDependencies>
@@ -861,13 +871,15 @@
 		      	</configuration>
 		   	</plugin>
         </plugins>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+			</testResource>
+		</testResources>
 		<resources>
 			<resource>
 		    	<directory>src/main/resources</directory>
 		    </resource>
-			<resource>
-				<directory>src/test/resources</directory>
-			</resource>
 		</resources>
 	</build>
 </project>

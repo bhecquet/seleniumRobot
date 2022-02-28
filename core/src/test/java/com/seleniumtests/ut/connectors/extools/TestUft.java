@@ -220,7 +220,7 @@ public class TestUft extends MockitoTest {
 		when(connector.uploadFileToNode(anyString(), eq(true))).thenReturn("D:\\file\\uft.vbs");
 		
 		Uft uft = new Uft("D:\\Subject\\Tools\\Tests\\test1", new HashMap<>());
-		List<String> args = uft.prepareArguments();
+		uft.prepareArguments();
 	}
 	
 	@Test(groups = { "ut" })

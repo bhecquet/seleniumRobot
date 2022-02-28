@@ -1,8 +1,5 @@
 package com.seleniumtests.it.core.testanalysis;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.util.Arrays;
 
 import org.testng.Assert;
@@ -10,16 +7,10 @@ import org.testng.ITestContext;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
-import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.connectors.selenium.fielddetector.FieldDetectorConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.it.reporter.ReporterTest;
 import com.seleniumtests.util.video.VideoCaptureMode;
-
-import kong.unirest.HttpRequest;
-import kong.unirest.HttpRequestWithBody;
-import kong.unirest.HttpResponse;
-import kong.unirest.JsonNode;
 
 public class TestErrorCauseFInder extends ReporterTest {
 	
@@ -306,7 +297,7 @@ public class TestErrorCauseFInder extends ReporterTest {
 			
 			ReporterTest.executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.NONE,  new String[] {"testImageDetectionAssertionError"});
 			
-			// check the error cause is displayed at the top of the report
+			// check the error cause is not displayed at the top of the report
 			String output = readTestMethodResultFile("testImageDetectionAssertionError");
 			Assert.assertFalse(output.contains("<th>Possible error causes</th>"));
 			

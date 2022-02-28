@@ -16,11 +16,11 @@ import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WebDriver.Navigation;
 import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebDriver.Timeouts;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -37,7 +37,6 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.SnapshotTarget;
-import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.htmlelements.select.NativeSelect;
 import com.seleniumtests.uipage.htmlelements.select.NgSelect;
 import com.seleniumtests.ut.core.runner.cucumber.PageForActions;
@@ -85,7 +84,6 @@ public class TestSelectList2 extends MockitoTest {
 	private Alert alert;
 
 	private CustomEventFiringWebDriver eventDriver;
-	private PageObject page;
 
 	@BeforeMethod(groups = { "ut" })
 	private void init() throws IOException {

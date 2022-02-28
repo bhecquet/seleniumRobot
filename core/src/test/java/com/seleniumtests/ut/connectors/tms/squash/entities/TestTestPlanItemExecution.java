@@ -10,7 +10,6 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.connectors.tms.squash.entities.Campaign;
-import com.seleniumtests.connectors.tms.squash.entities.Project;
 import com.seleniumtests.connectors.tms.squash.entities.TestPlanItemExecution;
 import com.seleniumtests.connectors.tms.squash.entities.TestPlanItemExecution.ExecutionStatus;
 import com.seleniumtests.customexception.ScenarioException;
@@ -23,9 +22,7 @@ import kong.unirest.json.JSONObject;
 
 @PrepareForTest({Unirest.class})
 public class TestTestPlanItemExecution extends ConnectorsTest {
-	
-	private Project project;
-	
+
 	@BeforeMethod(groups={"ut"})
 	public void init() {
 		Campaign.configureEntity("user", "pwd", SERVER_URL + "/");

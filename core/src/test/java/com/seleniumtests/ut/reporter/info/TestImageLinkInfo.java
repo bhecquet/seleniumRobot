@@ -1,11 +1,10 @@
 package com.seleniumtests.ut.reporter.info;
 
-import com.seleniumtests.GenericTest;
-import com.seleniumtests.reporter.info.HyperlinkInfo;
-import com.seleniumtests.reporter.info.ImageLinkInfo;
-import com.seleniumtests.reporter.info.StringInfo;
-import org.junit.Assert;
+import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import com.seleniumtests.GenericTest;
+import com.seleniumtests.reporter.info.ImageLinkInfo;
 
 public class TestImageLinkInfo extends GenericTest {
 

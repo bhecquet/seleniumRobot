@@ -94,13 +94,13 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
 	
 	@Override
 	protected void updateOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
-		options.setCapability(FirefoxDriver.MARIONETTE, !BrowserInfo.useLegacyFirefoxVersion(selectedBrowserInfo.getVersion()));
+		options.setCapability(FirefoxDriver.Capability.MARIONETTE, !BrowserInfo.useLegacyFirefoxVersion(selectedBrowserInfo.getVersion()));
 		
 		((FirefoxOptions)options).setBinary(selectedBrowserInfo.getPath());
 		
         FirefoxProfile profile = getFirefoxProfile();
         configProfile(profile, webDriverConfig);
-        options.setCapability(FirefoxDriver.PROFILE, profile);
+        options.setCapability(FirefoxDriver.Capability.PROFILE, profile);
         
         // extensions
         List<BrowserExtension> extensions = BrowserExtension.getExtensions(webDriverConfig.getTestContext().getConfiguration());
@@ -199,7 +199,7 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
         } 		
 		
         configProfile(profile, webDriverConfig);
-        options.setCapability(FirefoxDriver.PROFILE, profile);
+        options.setCapability(FirefoxDriver.Capability.PROFILE, profile);
 		
 	}
 

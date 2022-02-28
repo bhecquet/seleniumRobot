@@ -33,9 +33,7 @@ import org.mockito.Mock;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
-import org.openqa.selenium.interactions.Keyboard;
-import org.openqa.selenium.interactions.Mouse;
-import org.openqa.selenium.interactions.internal.Coordinates;
+import org.openqa.selenium.interactions.Coordinates;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
@@ -85,11 +83,6 @@ public class TestPictureElement extends MockitoTest {
 	
 	@Mock
 	BrowserInfo browserInfo;
-	
-	@Mock
-	Mouse mouse;
-	@Mock
-	Keyboard keyboard;
 
 	@InjectMocks
 	PictureElement pictureElement = new PictureElement();
@@ -110,8 +103,6 @@ public class TestPictureElement extends MockitoTest {
 		when(uiDriver.getDriver()).thenReturn(driver);
 		when(uiDriver.getConfig()).thenReturn(driverConfig);
 		when(driverConfig.getBrowserType()).thenReturn(BrowserType.FIREFOX);
-		when(driver.getMouse()).thenReturn(mouse);
-		when(driver.getKeyboard()).thenReturn(keyboard);
 		when(driver.getBrowserInfo()).thenReturn(browserInfo);
 		when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
 		when(screenshotUtil.capture(SnapshotTarget.PAGE, File.class, true)).thenReturn(new File(""));

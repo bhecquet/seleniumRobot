@@ -85,7 +85,7 @@ public class TestExceptionUtility extends GenericTest {
 				+ "\n"
 				+ "at com.seleniumtests.ut.util.TestExceptionUtility.testGenerateStackTraceWithCause\\(TestExceptionUtility.java:\\d+\\)\n"
 				+ "at java.util.ArrayList.forEach\\(.*?\\)class org.openqa.selenium.WebDriverException: Caused by foo<br/>\n"
-				+ "Build info: version: 'unknown', revision: 'unknown', time: 'unknown'<br/>\n"
+				+ "Build info: version: '.*?', revision: '.*?'<br/>\n"
 				+ "System info: host: '.*?', ip: '.*?', os.name: '.*?', os.arch: '.*?', os.version: '.*?', java.version: '.*?'<br/>\n"
 				+ "Driver info: driver.version: unknown\n"
 				+ "\n"

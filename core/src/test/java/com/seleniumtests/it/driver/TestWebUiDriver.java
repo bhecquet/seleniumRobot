@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,7 @@ import org.json.JSONObject;
 import org.mockito.Mock;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.Timeouts;
@@ -93,10 +95,10 @@ public class TestWebUiDriver extends ReporterTest {
 	private InstrumentsWrapper instrumentsWrapper;
 	
 	@Mock
-	private AndroidDriver<?> androidDriver;
+	private AndroidDriver androidDriver;
 	
 	@Mock
-	private IOSDriver<?> iosDriver;
+	private IOSDriver iosDriver;
 	
 	@Mock
 	private Options driverOptions;
@@ -117,7 +119,7 @@ public class TestWebUiDriver extends ReporterTest {
 		
 		whenNew(AndroidDriver.class).withAnyArguments().thenReturn(androidDriver);
 		when(androidDriver.manage()).thenReturn(driverOptions);
-		when(androidDriver.getCapabilities()).thenReturn(DesiredCapabilities.chrome());
+		when(androidDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
 		when(driverOptions.timeouts()).thenReturn(timeouts);
 		
 		SeleniumTestsContextManager.getThreadContext().setRunMode("local");
@@ -156,7 +158,7 @@ public class TestWebUiDriver extends ReporterTest {
 		
 		whenNew(AndroidDriver.class).withAnyArguments().thenReturn(androidDriver);
 		when(androidDriver.manage()).thenReturn(driverOptions);
-		when(androidDriver.getCapabilities()).thenReturn(DesiredCapabilities.chrome());
+		when(androidDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
 		when(driverOptions.timeouts()).thenReturn(timeouts);
 		
 		SeleniumTestsContextManager.getThreadContext().setRunMode("local");
@@ -191,7 +193,7 @@ public class TestWebUiDriver extends ReporterTest {
 		
 		whenNew(IOSDriver.class).withAnyArguments().thenReturn(iosDriver);
 		when(iosDriver.manage()).thenReturn(driverOptions);
-		when(iosDriver.getCapabilities()).thenReturn(DesiredCapabilities.chrome());
+		when(iosDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
 		when(driverOptions.timeouts()).thenReturn(timeouts);
 		
 		SeleniumTestsContextManager.getThreadContext().setRunMode("local");
@@ -231,7 +233,7 @@ public class TestWebUiDriver extends ReporterTest {
 			
 			whenNew(AndroidDriver.class).withAnyArguments().thenReturn(androidDriver);
 			when(androidDriver.manage()).thenReturn(driverOptions);
-			when(androidDriver.getCapabilities()).thenReturn(DesiredCapabilities.chrome());
+			when(androidDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
 			when(driverOptions.timeouts()).thenReturn(timeouts);
 			
 			SeleniumTestsContextManager.getThreadContext().setRunMode("local");
@@ -272,7 +274,7 @@ public class TestWebUiDriver extends ReporterTest {
 			
 			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "main-networkCapture.har").toFile().exists());
 			
-			JSONObject json = new JSONObject(FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "main-networkCapture.har").toFile()));
+			JSONObject json = new JSONObject(FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "main-networkCapture.har").toFile(), StandardCharsets.UTF_8));
 			JSONArray pages = json.getJSONObject("log").getJSONArray("pages");
 			
 			// 7 steps in HTML 
@@ -329,7 +331,7 @@ public class TestWebUiDriver extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverManualSteps"});
 			
 			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverManualSteps", "main-networkCapture.har").toFile().exists());
-			JSONObject json = new JSONObject(FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverManualSteps", "main-networkCapture.har").toFile()));
+			JSONObject json = new JSONObject(FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverManualSteps", "main-networkCapture.har").toFile(), StandardCharsets.UTF_8));
 			JSONArray pages = json.getJSONObject("log").getJSONArray("pages");
 			Assert.assertEquals(pages.length(), 2);
 			Assert.assertEquals(pages.getJSONObject(0).getString("id").trim(), "testDriverManualSteps");
@@ -477,7 +479,7 @@ public class TestWebUiDriver extends ReporterTest {
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 
 		// creates the driver
-		WebDriver driver1 = WebUIDriver.getWebDriver(true, BrowserType.CHROME, "main", 12345);
+		WebUIDriver.getWebDriver(true, BrowserType.CHROME, "main", 12345);
 	}
 	
 	/**

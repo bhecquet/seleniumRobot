@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -298,7 +299,7 @@ public class TestElementInfo extends MockitoTest {
 		
 		// write data to file we will then read
 		File elementInfoPath = ElementInfo.buildElementInfoPath(htmlElement);
-		FileUtils.write(elementInfoPath, JSON_INFO_FOO);
+		FileUtils.write(elementInfoPath, JSON_INFO_FOO, StandardCharsets.UTF_8);
 		
 		ElementInfo elInfo = spy(ElementInfo.getInstance(htmlElement));
 		
@@ -335,7 +336,7 @@ public class TestElementInfo extends MockitoTest {
 		
 		// write data to file we will then read
 		File elementInfoPath = ElementInfo.buildElementInfoPath(htmlElement);
-		FileUtils.write(elementInfoPath, JSON_INFO_FOO);
+		FileUtils.write(elementInfoPath, JSON_INFO_FOO, StandardCharsets.UTF_8);
 		
 		// change HtmlElement locator
 		when(htmlElement.getBy()).thenReturn(By.name("bar"));
@@ -359,7 +360,7 @@ public class TestElementInfo extends MockitoTest {
 		
 		// write data to file we will then read
 		File elementInfoPath = ElementInfo.buildElementInfoPath(htmlElement);
-		FileUtils.write(elementInfoPath, JSON_INFO_FOO);
+		FileUtils.write(elementInfoPath, JSON_INFO_FOO, StandardCharsets.UTF_8);
 		
 		ElementInfo elInfo = spy(ElementInfo.getInstance(htmlElement));
 		
@@ -390,7 +391,7 @@ public class TestElementInfo extends MockitoTest {
 		
 		// write data to file we will then read
 		File elementInfoPath = ElementInfo.buildElementInfoPath(htmlElement);
-		FileUtils.write(elementInfoPath, JSON_INFO_FOO);
+		FileUtils.write(elementInfoPath, JSON_INFO_FOO, StandardCharsets.UTF_8);
 		
 		ElementInfo elInfo = spy(ElementInfo.getInstance(htmlElement));
 		Assert.assertEquals(elInfo.getTotalSearch(), 1);
@@ -421,7 +422,7 @@ public class TestElementInfo extends MockitoTest {
 		
 		// write data to file we will then read
 		File elementInfoPath = ElementInfo.buildElementInfoPath(htmlElement);
-		FileUtils.write(elementInfoPath, JSON_INFO_FOO);
+		FileUtils.write(elementInfoPath, JSON_INFO_FOO, StandardCharsets.UTF_8);
 		
 		ElementInfo elInfo = spy(ElementInfo.getInstance(htmlElement));
 		Assert.assertEquals(elInfo.getTotalSearch(), 1);
@@ -447,7 +448,7 @@ public class TestElementInfo extends MockitoTest {
 		
 		// write data to file we will then read
 		File elementInfoPath = ElementInfo.buildElementInfoPath(htmlElement);
-		FileUtils.write(elementInfoPath, JSON_INFO_FOO);
+		FileUtils.write(elementInfoPath, JSON_INFO_FOO, StandardCharsets.UTF_8);
 		
 		ElementInfo elInfo = spy(ElementInfo.getInstance(htmlElement));
 		Assert.assertEquals(elInfo.getTotalSearch(), 1);
@@ -477,14 +478,14 @@ public class TestElementInfo extends MockitoTest {
 		
 		// get an elementInfo from file, as it is complete (no mocks)
 		File einfoFile = File.createTempFile("elementInfo", ".json");
-		FileUtils.write(einfoFile, JSON_INFO);
+		FileUtils.write(einfoFile, JSON_INFO, StandardCharsets.UTF_8);
 		einfoFile.deleteOnExit();
 		ElementInfo elementInfo = ElementInfo.readFromJsonFile(einfoFile);
 		
 		File out = elementInfo.exportToJsonFile(false, htmlElement);
 		out.deleteOnExit();
 		Assert.assertTrue(out.exists());
-		String content = FileUtils.readFileToString(out);
+		String content = FileUtils.readFileToString(out, StandardCharsets.UTF_8);
 		Assert.assertTrue(content.contains("\"id\":\"com.seleniumtests.it.driver.support.pages.DriverTestPage/button_after_scroll\""));
 		Assert.assertTrue(content.contains("mylabel.json")); // path updated
 	}
@@ -496,7 +497,7 @@ public class TestElementInfo extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testReadFromJson() throws IOException {
 		File einfoFile = File.createTempFile("elementInfo", ".json");
-		FileUtils.write(einfoFile, JSON_INFO);
+		FileUtils.write(einfoFile, JSON_INFO, StandardCharsets.UTF_8);
 		einfoFile.deleteOnExit();
 		ElementInfo elementInfo = ElementInfo.readFromJsonFile(einfoFile);
 		Assert.assertEquals(elementInfo.getName(), "button after scroll");

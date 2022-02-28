@@ -85,7 +85,7 @@ public class SeleniumIdeLauncher {
 		// now compile tests which use page classes
 		for (Entry<String, String> entry: classCodes.entrySet()) {
 			if (!entry.getKey().endsWith("Page")) {
-				Class aClass = CompilerUtils.CACHED_COMPILER.loadFromJava(loader, entry.getKey(), entry.getValue());
+				Class<?> aClass = CompilerUtils.CACHED_COMPILER.loadFromJava(loader, entry.getKey(), entry.getValue());
 				classes.add(aClass.getCanonicalName());
 			}
 		}

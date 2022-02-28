@@ -29,12 +29,12 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import com.google.gson.Gson;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector.SnapshotComparisonResult;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.core.runner.CucumberScenarioWrapper;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.screenshots.ScreenShot;
@@ -489,7 +489,7 @@ public class TestTestNGResultUtil extends MockitoTest {
 		
 
 		SeleniumTestsContext context = SeleniumTestsContextManager.getThreadContext();
-		context.getTestStepManager().logTestStep(step1);
+		TestStepManager.logTestStep(step1);
 		
 		when(testResult.getStatus()).thenReturn(ITestResult.SUCCESS);
 		when(testResult.getAttribute("testContext")).thenReturn(context);

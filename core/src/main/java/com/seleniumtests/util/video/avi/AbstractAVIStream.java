@@ -10,22 +10,22 @@
  */
 package com.seleniumtests.util.video.avi;
 
-import org.monte.media.riff.RIFFChunk;
-import java.util.Map;
-import org.monte.media.Buffer;
-import org.monte.media.Codec;
-import org.monte.media.Format;
-import org.monte.media.io.SubImageOutputStream;
+import static org.monte.media.FormatKeys.EncodingKey;
+import static org.monte.media.VideoFormatKeys.ENCODING_AVI_DIB;
+
 import java.awt.Dimension;
 import java.awt.image.IndexColorModel;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
+
 import javax.imageio.stream.ImageOutputStream;
-import static org.monte.media.VideoFormatKeys.*;
+
+import org.monte.media.Buffer;
+import org.monte.media.Codec;
+import org.monte.media.Format;
+import org.monte.media.riff.RIFFChunk;
 
 /**
  * This is the base class for low-level AVI stream IO.

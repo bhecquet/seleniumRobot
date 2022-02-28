@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.Inet4Address;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -338,27 +339,27 @@ public class ReporterTest extends ConnectorsTest {
 	 * @throws IOException 
 	 */
 	public static String readTestMethodResultFile(String testName) throws IOException {
-		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), testName, "TestReport.html").toFile());
+		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), testName, "TestReport.html").toFile(), StandardCharsets.UTF_8);
 		return detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 	}
 	
 	public static String readTestMethodPerfFile(String testName) throws IOException {
-		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), testName, "PERF-result.xml").toFile());
+		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), testName, "PERF-result.xml").toFile(), StandardCharsets.UTF_8);
 		return detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 	}
 	
 	public static String readJUnitFile(String suiteName) throws IOException {
-		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "junitreports", String.format("TEST-%s.xml", suiteName)).toFile());
+		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "junitreports", String.format("TEST-%s.xml", suiteName)).toFile(), StandardCharsets.UTF_8);
 		return detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 	}
 	
 	public static String readSummaryFile() throws IOException {
-		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "SeleniumTestReport.html").toFile());
+		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "SeleniumTestReport.html").toFile(), StandardCharsets.UTF_8);
 		return detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 	}
 	
 	public static String readSeleniumRobotLogFile() throws IOException {
-		String logContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "seleniumRobot.log").toFile());
+		String logContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "seleniumRobot.log").toFile(), StandardCharsets.UTF_8);
 		return logContent.replace("\n", "").replace("\r",  "");
 	}
 }

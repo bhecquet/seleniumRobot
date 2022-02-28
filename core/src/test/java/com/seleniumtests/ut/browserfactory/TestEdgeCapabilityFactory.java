@@ -32,6 +32,7 @@ import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.edge.EdgeDriverService;
+import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -39,7 +40,6 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.microsoft.edge.seleniumtools.EdgeOptions;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.browserfactory.EdgeCapabilitiesFactory;
@@ -163,7 +163,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		Assert.assertTrue(capa.is(CapabilityType.TAKES_SCREENSHOT));
 		Assert.assertTrue(capa.is(CapabilityType.ACCEPT_SSL_CERTS));
 		Assert.assertFalse(capa.is(SeleniumRobotCapabilityType.NODE_TAGS));
-		Assert.assertEquals(capa.getVersion(), "");
+		Assert.assertEquals(capa.getBrowserVersion(), "");
 		Assert.assertEquals(capa.getCapability(CapabilityType.PROXY), proxyConfig);
 	}
 
@@ -208,7 +208,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(capa.getPlatform(), Platform.WINDOWS);
+		Assert.assertEquals(capa.getPlatformName(), Platform.WINDOWS);
 		
 	}
 	
@@ -235,7 +235,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(capa.getVersion(), "10240");
+		Assert.assertEquals(capa.getBrowserVersion(), "10240");
 		
 	}
 	

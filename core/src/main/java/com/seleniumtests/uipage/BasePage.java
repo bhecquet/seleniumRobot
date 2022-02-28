@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.uipage;
 
+import java.time.Duration;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -50,7 +51,7 @@ public abstract class BasePage {
 	protected static final Logger internalLogger = SeleniumRobotLogger.getLogger(BasePage.class);
     
     public Alert getAlert() {
-    	new WebDriverWait(driver, 2).until(ExpectedConditions.alertIsPresent());
+    	new WebDriverWait(driver, Duration.ofSeconds(2)).until(ExpectedConditions.alertIsPresent());
         return driver.switchTo().alert();
     }
 
@@ -116,7 +117,7 @@ public abstract class BasePage {
      */
     public void waitForCondition(final ExpectedCondition<WebElement> condition) {
     	
-    	WebDriverWait wait = new WebDriverWait(driver, explictWaitTimeout);
+    	WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(explictWaitTimeout));
     	wait.until(condition);
     }
 

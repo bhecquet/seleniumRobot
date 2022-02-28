@@ -19,6 +19,7 @@ package com.seleniumtests.connectors.extools;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
@@ -78,7 +79,7 @@ public class SoapUi {
 		try {
 			tmpFile = File.createTempFile("project-" + projectName, ".xml");
 			tmpFile.deleteOnExit();
-			FileUtils.writeStringToFile(tmpFile, projectString);
+			FileUtils.writeStringToFile(tmpFile, projectString, StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			throw new ScenarioException("Cannot write project file", e);
 		}

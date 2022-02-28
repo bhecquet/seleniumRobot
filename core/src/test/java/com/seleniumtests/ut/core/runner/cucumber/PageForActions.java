@@ -1,6 +1,5 @@
 package com.seleniumtests.ut.core.runner.cucumber;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.mockito.Mockito;

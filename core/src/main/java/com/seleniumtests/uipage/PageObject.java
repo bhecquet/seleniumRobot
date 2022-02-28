@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -1133,10 +1134,18 @@ public class PageObject extends BasePage implements IPage {
     	return selectNewWindow(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout() * 1000);
     }
     
+    private boolean hasAlreadySwitchedWindow(String currentWindowHandle) {
+    	// handles obtained before the click
+    	Set<String> knownHandles  = getCurrentHandles();
+    	return !knownHandles.contains(currentWindowHandle);
+    	
+    }
+    
     /**
      * Selects the first unknown window. To use immediately after an action creates a new window or tab
      * Each time we do a click, but just before it (selenium click, JS click or action click), we record the list of windows.
      * I a new window or tab is displayed, we select it.
+     * This also check if the switch has already been done (it's the case for HtmlUnit 3.57 where it switchs automatically
      * @param waitMs	wait for N milliseconds before raising error
      * @return
      */
@@ -1145,7 +1154,7 @@ public class PageObject extends BasePage implements IPage {
     	if (SeleniumTestsContextManager.getThreadContext().getTestType().family() == TestType.APP) {
             throw new ScenarioException("Application are not compatible with Windows");
         }
-    	        
+    	     
         // Keep the name of the current window handle before switching
         // sometimes, our action made window disappear
  		String mainWindowHandle;
@@ -1154,6 +1163,14 @@ public class PageObject extends BasePage implements IPage {
  		} catch (Exception e) {
  			mainWindowHandle = "";
  		}
+
+    	// in case switch has already been done (HtmlUnit case)
+    	if (hasAlreadySwitchedWindow(mainWindowHandle)) {
+
+     		internalLogger.info("Driver already switched to new window");
+    		return (String) getCurrentHandles().toArray()[0];
+    	}
+ 		
  		internalLogger.debug("Current handle: " + mainWindowHandle);
 
  		// wait for window to be displayed
@@ -1224,9 +1241,9 @@ public class PageObject extends BasePage implements IPage {
     		
     		
     		if (pageLoadStrategy == PageLoadStrategy.NORMAL) {
-    			new WebDriverWait(driver, 5).until(ExpectedConditions.jsReturnsValue("if (document.readyState === \"complete\") { return \"ok\"; }"));
+    			new WebDriverWait(driver, Duration.ofSeconds(5)).until(ExpectedConditions.jsReturnsValue("if (document.readyState === \"complete\") { return \"ok\"; }"));
     		} else if (pageLoadStrategy == PageLoadStrategy.EAGER) {
-    			new WebDriverWait(driver, 5).until(ExpectedConditions.jsReturnsValue("if (document.readyState === \"interactive\") { return \"ok\"; }"));
+    			new WebDriverWait(driver, Duration.ofSeconds(5)).until(ExpectedConditions.jsReturnsValue("if (document.readyState === \"interactive\") { return \"ok\"; }"));
     		}
     	} catch (TimeoutException e) {
     		// nothing
