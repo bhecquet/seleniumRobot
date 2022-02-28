@@ -73,14 +73,13 @@ public class TestPerformanceReporter extends ReporterTest {
 		// check content of summary report file
 		String jmeterReport = readTestMethodPerfFile("testWithException");
 		
-		Assert.assertTrue(jmeterReport.contains("<testsuite errors=\"0\" failures=\"1\" hostname=\"\" name=\"testWithException\" tests=\"6\" time=\""));
+		Assert.assertTrue(jmeterReport.contains("hostname=\"\" name=\"testWithException\" tests=\"6\" time=\""));
 		Assert.assertTrue(jmeterReport.contains("browser=\"NONE\""));
 		Assert.assertTrue(jmeterReport.contains("appVersion=\"" + SeleniumTestsContextManager.getApplicationVersion()));
 		Assert.assertTrue(jmeterReport.contains("coreVersion=\"" + SeleniumTestsContextManager.getCoreVersion()));
 		Assert.assertTrue(jmeterReport.contains("retries=\"2\"")); 
 		Assert.assertTrue(jmeterReport.contains("mobileApp=\"\""));
 		Assert.assertTrue(jmeterReport.contains("device=\"\"")); 
-		Assert.assertTrue(jmeterReport.contains("failedStep=\"Test end\"")); 
 		Assert.assertTrue(jmeterReport.contains("platform=\"" + OSUtility.getCurrentPlatorm().toString()));
 		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"Step 4: step 1\" time=\""));
 		
@@ -105,7 +104,7 @@ public class TestPerformanceReporter extends ReporterTest {
 
 		// issue #418: now it's Test end which is the failed step because in this case execption is raised directly in test scenario
 		Assert.assertTrue(jmeterReport.contains("retries=\"2\"")); 
-		Assert.assertTrue(jmeterReport.contains("failedStep=\"Test end\"")); 
+		Assert.assertTrue(jmeterReport.contains("failedStep=\"\"")); // failed step is not logged as there are no step logged
 	}
 	
 	/**
