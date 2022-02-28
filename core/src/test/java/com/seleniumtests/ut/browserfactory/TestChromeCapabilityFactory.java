@@ -77,6 +77,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.NONE));
 		when(config.getPageLoadStrategy()).thenReturn(PageLoadStrategy.NORMAL);
 		when(config.getBrowserType()).thenReturn(BrowserType.CHROME);
+		when(config.getAttachExistingDriverPort()).thenReturn(null);
 	}
 	
 
@@ -246,6 +247,22 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process]");
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "chrome");
 		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("prefs").toString(), "{profile.exit_type=Normal}");
+		Assert.assertNull(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("debuggerAddress")); // no debuger address set as we do not attach an existing browser
+	}
+	
+	/**
+	 * Check we set debugger address
+	 */
+	@Test(groups={"ut"})
+	public void testCreateDefaultChromeCapabilitiesAttach() {
+		
+		when(config.getAttachExistingDriverPort()).thenReturn(10);
+		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
+		
+		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process]");
+		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "chrome");
+		Assert.assertNull(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("prefs")); // no preference set when attaching to existing browser
+		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("debuggerAddress"), "127.0.0.1:10");
 	}
 	
 	@Test(groups={"ut"})

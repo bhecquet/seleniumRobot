@@ -445,6 +445,41 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     		"  return false;" + 
     		"}";
     
+    // return true if a modal is present: a 'visible' div whose size is the same as the viewport
+    private static final String JS_GET_MODAL = 
+    		"function getViewportWidth() {" + JS_GET_VIEWPORT_SIZE_WIDTH + "}" +
+    		"" +
+    		"function getViewportHeight() {" + JS_GET_VIEWPORT_SIZE_HEIGHT + "}" +
+    		"" +
+    		JS_GET_ELEMENT_STYLE +
+    		"" + 
+    		JS_IS_ELEMENT_VISIBLE + 
+
+    		"var modals;" + 
+    		"var nodes = document.querySelectorAll(\"div\");" + 
+    		"if (nodes && nodes.length > 0) {" + 
+    		"  var length = nodes.length;" + 
+    		"  modals = new Array();" + 
+    		"  for (var i = 0; i < length; i++) {" + 
+    		"    modals.push(nodes[i]);" + 
+    		"  }" + 
+    		"}" + 
+    		"" + 
+    		"var viewportWidth = getViewportWidth();" +
+    		"var viewportHeight = getViewportHeight();" +
+    		"" + 
+    		"if (modals && modals.length > 0) {" + 
+    		// only keep modals which are wide enough and visible
+    		"  modals = modals.filter(function(e) {" + 
+    		"    return getComputedStyle(e)[\"position\"] === \"fixed\" && isVisible(e) && e.clientWidth >= viewportWidth && e.clientHeight >= viewportHeight;" + 
+    		"  });" + 
+    		"  if (modals.length > 0) {" + 
+    		"    return true;" + 
+    		"  }" + 
+    		"}" + 
+    		"" + 
+    		"return false;";
+    
     // returns the top pixel from which fixed positioned headers are not present
     private static final String JS_GET_TOP_HEADER = 
     		"function getViewportWidth() {" + JS_GET_VIEWPORT_SIZE_WIDTH + "}" +
@@ -900,6 +935,18 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 			return (Long) ((JavascriptExecutor) driver).executeScript(JS_GET_BOTTOM_FOOTER);
 		} else { 
 			return 0L;
+		}
+	}
+	
+	/**
+	 * Check if a modal is displayed
+	 * @return
+	 */
+	public boolean isModalDisplayed() {
+		if (isWebTest) {
+			return (Boolean) ((JavascriptExecutor) driver).executeScript(JS_GET_MODAL);
+		} else { 
+			return false;
 		}
 	}
 	
