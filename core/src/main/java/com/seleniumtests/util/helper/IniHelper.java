@@ -32,8 +32,6 @@ import org.ini4j.Profile.Section;
 
 import com.seleniumtests.customexception.ConfigurationException;
 
-import javax.print.attribute.standard.NumberUp;
-
 public class IniHelper {
 
 	private IniHelper() {

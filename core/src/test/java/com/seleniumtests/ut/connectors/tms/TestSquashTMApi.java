@@ -77,7 +77,7 @@ public class TestSquashTMApi extends ConnectorsTest {
 	public void testServerInError() {
 		createServerMock("GET", "/api/rest/latest/projects", 500, "{}");
 		PowerMockito.when(Project.getAll()).thenReturn(Arrays.asList(project1, project2));
-		SquashTMApi api = new SquashTMApi("http://localhost:4321", "user", "password", "project1");
+		new SquashTMApi("http://localhost:4321", "user", "password", "project1");
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class)
@@ -86,7 +86,7 @@ public class TestSquashTMApi extends ConnectorsTest {
 		when(getRequest.asJson()).thenThrow(UnirestException.class);
 		
 		PowerMockito.when(Project.getAll()).thenReturn(Arrays.asList(project1, project2));
-		SquashTMApi api = new SquashTMApi("http://localhost:4321", "user", "password", "project1");
+		new SquashTMApi("http://localhost:4321", "user", "password", "project1");
 	}
 	
 	@Test(groups={"ut"})
@@ -262,7 +262,7 @@ public class TestSquashTMApi extends ConnectorsTest {
 		TestCase.get(3);
 		doReturn(testPlanItem1).when(iteration1).addTestCase(any(TestCase.class));
 		
-		IterationTestPlanItem itpi = api.addTestCaseInIteration(iteration1, 3);
+		api.addTestCaseInIteration(iteration1, 3);
 
 		
 	}

@@ -44,6 +44,8 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.util.helper.WaitHelper;
 
+import io.appium.java_client.remote.MobileCapabilityType;
+
 public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
 	
 	private List<SeleniumGridConnector> gridConnectors;
@@ -77,8 +79,6 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 		        	return new HtmlUnitCapabilitiesFactory(webDriverConfig);
 		        case SAFARI :
 		        	return new SafariCapabilitiesFactory(webDriverConfig);
-		        case PHANTOMJS :
-		        	return new PhantomJSCapabilitiesFactory(webDriverConfig);
 		        case EDGE :
 		        	return new EdgeCapabilitiesFactory(webDriverConfig);
 		        default :
@@ -108,9 +108,9 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     	DesiredCapabilities capabilities = new DesiredCapabilities();
     	
     	if (SeleniumTestsContextManager.isMobileTest()) {
-    		capabilities.setCapability(CapabilityType.VERSION, webDriverConfig.getMobilePlatformVersion());
+    		capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, webDriverConfig.getMobilePlatformVersion());
     	} else {
-    		capabilities.setCapability(CapabilityType.PLATFORM, webDriverConfig.getPlatform().toLowerCase());
+    		capabilities.setCapability(CapabilityType.PLATFORM_NAME, webDriverConfig.getPlatform().toLowerCase());
     		if (webDriverConfig.getBrowserVersion() != null && capabilities.getCapability(CapabilityType.BROWSER_VERSION) == null) {
     			capabilities.setCapability(CapabilityType.BROWSER_VERSION, webDriverConfig.getBrowserVersion());
     		}
@@ -165,7 +165,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 	        
 	        // create a BrowserInfo based on information get from grid hub
 	        selectedBrowserInfo = new BrowserInfo(BrowserType.getBrowserTypeFromSeleniumBrowserType(((RemoteWebDriver)driver).getCapabilities().getBrowserName()), 
-		        									((RemoteWebDriver)driver).getCapabilities().getVersion());
+		        									((RemoteWebDriver)driver).getCapabilities().getBrowserVersion());
 	
 	        return driver;
         }
@@ -182,8 +182,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
      * In case we do not find any node after 30 mins, we fail and increment a fail counter
      * This fail counter is reset every time we find a node
      * If this counter reaches 3, then we don't even try to get a driver
-     * 
-     * @param url
+     *
      * @param capability
      * @return
      */

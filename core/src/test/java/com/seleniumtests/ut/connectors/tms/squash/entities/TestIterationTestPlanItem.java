@@ -25,12 +25,10 @@ import kong.unirest.json.JSONObject;
 
 @PrepareForTest({Unirest.class})
 public class TestIterationTestPlanItem extends ConnectorsTest {
-	
-	private Project project;
-	
+
 	@BeforeMethod(groups={"ut"})
 	public void init() {
-		project = new Project("http://localhost:8080/api/rest/latest/projects/1", 1, "project");
+		new Project("http://localhost:8080/api/rest/latest/projects/1", 1, "project");
 		Campaign.configureEntity("user", "pwd", SERVER_URL + "/");
 	}
 	
@@ -48,7 +46,7 @@ public class TestIterationTestPlanItem extends ConnectorsTest {
 	
 	@Test(groups={"ut"})
 	public void testCreateExecution() {
-		HttpRequestWithBody postRequest = (HttpRequestWithBody) createServerMock("POST", "/iteration-test-plan-items/1/executions", 200, "{" + 
+		createServerMock("POST", "/iteration-test-plan-items/1/executions", 200, "{" + 
 				"  \"_type\" : \"iteration\"," + 
 				"  \"id\" : 22," + 
 				"  \"name\" : \"new iteration\"," + 
@@ -119,7 +117,7 @@ public class TestIterationTestPlanItem extends ConnectorsTest {
 		TestCase testCase = new TestCase(3, "http://localhost:8080/api/rest/latest/test-cases/3");
 		IterationTestPlanItem itpi = new IterationTestPlanItem("http://localhost:8080/api/rest/latest/iteration-test-plan-items/1", 1, testCase);
 		
-		TestPlanItemExecution execution = itpi.createExecution();
+		itpi.createExecution();
 	}
 	
 	@Test(groups={"ut"})

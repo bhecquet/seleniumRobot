@@ -165,7 +165,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	public void testServerActiveAliveAndSecured() throws UnirestException {
 		configureMockedVariableServerConnection();
 		when(responseAliveString.getStatus()).thenReturn(401);
-		SeleniumRobotVariableServerConnector connector = new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
 	}
 	
 	/**
@@ -175,14 +175,14 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	@Test(groups= {"ut"})
 	public void testServerActiveAliveAndSecuredWithToken() throws UnirestException {
 		configureMockedVariableServerConnection();
-		SeleniumRobotVariableServerConnector connector = new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", "123");
+		new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", "123");
 		verify(getAliveRequest).header("Authorization", "Token 123");
 	}
 	
 	@Test(groups= {"ut"})
 	public void testServerActiveAliveAndSecuredWithoutToken() throws UnirestException {
 		configureMockedVariableServerConnection();
-		SeleniumRobotVariableServerConnector connector = new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		 new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
 		verify(getAliveRequest, never()).header("Authorization", "Token 123");
 	}
 
@@ -240,7 +240,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	public void testFetchVariableWithNetworkError() throws UnirestException {
 		
 		configureMockedVariableServerConnection();
-		HttpRequest<HttpRequest> req =  createServerMock(SERVER_URL, "GET", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, "{}");
+		HttpRequest<?> req =  createServerMock(SERVER_URL, "GET", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, "{}");
 		when(req.asString()).thenThrow(UnirestException.class);
 		
 		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
@@ -279,7 +279,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	public void testVariableUpdateExistingVariableWithNetworkError() throws UnirestException {
 		
 		configureMockedVariableServerConnection();
-		HttpRequest<HttpRequest> req =  createServerMock(SERVER_URL, "PATCH", String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 12), 200, "{}");
+		HttpRequest<?> req =  createServerMock(SERVER_URL, "PATCH", String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 12), 200, "{}");
 		when(req.asString()).thenThrow(UnirestException.class);
 		
 		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);

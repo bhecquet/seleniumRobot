@@ -18,9 +18,9 @@
 package com.seleniumtests.browserfactory;
 
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
 
-import com.microsoft.edge.seleniumtools.EdgeDriver;
-import com.microsoft.edge.seleniumtools.EdgeOptions;
 import com.seleniumtests.driver.DriverConfig;
 
 public class EdgeDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {

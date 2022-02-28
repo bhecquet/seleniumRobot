@@ -33,8 +33,8 @@ import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
@@ -65,7 +65,7 @@ public class SauceLabsDriverFactory extends AbstractWebDriverFactory implements 
 	        capabilities.setCapability("app-activity", webDriverConfig.getAppActivity());
 	        capabilities.setCapability("app-wait-activity", webDriverConfig.getAppWaitActivity());
     	} else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())) {
-    		capabilities = DesiredCapabilities.iphone();
+    		capabilities = new DesiredCapabilities("iPhone", "", Platform.MAC);
     	}
         capabilities.setCapability("app", "sauce-storage:" + new File(webDriverConfig.getApp()).getName()); //  saucelabs waits for app capability a special file: sauce-storage:<filename>
         return capabilities;
@@ -74,7 +74,6 @@ public class SauceLabsDriverFactory extends AbstractWebDriverFactory implements 
     /**
      * Upload application to saucelabs server
      * @param targetAppPath
-     * @param serverURL
      * @return
      * @throws IOException
      * @throws AuthenticationException 
@@ -136,10 +135,10 @@ public class SauceLabsDriverFactory extends AbstractWebDriverFactory implements 
 
     	try {
 	        if(ANDROID_PLATFORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
-	            return new AndroidDriver<WebElement>(new URL(webDriverConfig.getHubUrl().get(0)), capabilities);
+	            return new AndroidDriver(new URL(webDriverConfig.getHubUrl().get(0)), capabilities);
 	            
 	        } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){
-	        	return new IOSDriver<WebElement>(new URL(webDriverConfig.getHubUrl().get(0)), capabilities);
+	        	return new IOSDriver(new URL(webDriverConfig.getHubUrl().get(0)), capabilities);
 	            
 	        } else {
 	        	return new RemoteWebDriver(new URL(webDriverConfig.getHubUrl().get(0)), capabilities);

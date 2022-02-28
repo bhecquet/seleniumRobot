@@ -25,7 +25,6 @@ import org.testng.xml.XmlTest;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
-import com.seleniumtests.reporter.logger.TestLogging;
 
 /**
  * Test class to product a BeforeXXX configuration error and look for logs in report

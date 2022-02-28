@@ -19,7 +19,6 @@ package com.seleniumtests.it.driver;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
@@ -33,15 +32,13 @@ import com.seleniumtests.it.driver.support.pages.DriverTestPageShadowDom;
 
 public class TestShadowDom extends GenericTest {
 	
-	private static WebDriver driver;
-
 
 	@BeforeClass(groups={"it"})
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
 		initThreadContext(testNGCtx);
 		setBrowser();
 		new DriverTestPageShadowDom(true);
-		driver = WebUIDriver.getWebDriver(true);
+		WebUIDriver.getWebDriver(true);
 	}
 	
 	@BeforeMethod(groups={"it"})

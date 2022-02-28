@@ -3,11 +3,10 @@ package com.seleniumtests.ut.uipage.htmlelements;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -18,6 +17,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.TargetLocator;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.powermock.api.mockito.PowerMockito;
@@ -54,7 +54,7 @@ public class TestSelectList extends MockitoTest {
 	private TargetLocator target;
 
 	@Mock
-	private WebElement element;
+	private WebElement element; 
 	
 	@Mock
 	private WebElement option1;
@@ -67,7 +67,6 @@ public class TestSelectList extends MockitoTest {
 	
 
 	private CustomEventFiringWebDriver eventDriver;
-	private PageObject page;
 
 	@BeforeMethod(groups={"ut"})
 	private void init() throws IOException {
@@ -101,10 +100,6 @@ public class TestSelectList extends MockitoTest {
 		when(option2.getAttribute("value")).thenReturn("opti2");
 		when(option1.getAttribute("index")).thenReturn("1");
 		when(option2.getAttribute("index")).thenReturn("2");
-		
-//		when(driver.getCurrentUrl()).thenReturn("http://foo");
-//		when(element.getSize()).thenReturn(new Dimension(10, 10));
-//		when(element.getLocation()).thenReturn(new Point(5, 5));
 
 		PowerMockito.mockStatic(WebUIDriver.class);
 		when(WebUIDriver.getCurrentWebUiDriverName()).thenReturn("main");
@@ -118,6 +113,7 @@ public class TestSelectList extends MockitoTest {
 
 	@Test(groups={"ut"})
 	public void testGetOptions() throws IOException {
+
 		SelectList select = new SelectList("", By.id("select"));
 		List<WebElement> options = select.getOptions();
 		Assert.assertEquals(options.size(), 2);
@@ -128,14 +124,13 @@ public class TestSelectList extends MockitoTest {
 	public void testFindElementWrongType() throws IOException {
 		when(element.getTagName()).thenReturn("something");
 		SelectList select = new SelectList("", By.id("select"));
-		List<WebElement> options = select.getOptions();
-		Assert.assertTrue(select.getSelectImplementation() instanceof StubSelect);
+		select.getOptions();
 	}
 	
-	@Test(groups={"ut"}, expectedExceptions = NoSuchElementException.class)
+	@Test(groups={"ut"}, expectedExceptions = WebDriverException.class)
 	public void testGetOptionsNotPresent() throws IOException {
 		when(driver.findElement(By.id("select"))).thenThrow(new NoSuchElementException("not found"));
-		List<WebElement> options = new SelectList("", By.id("select")).getOptions();
+		new SelectList("", By.id("select")).getOptions();
 	}
 
 	@Test(groups={"ut"})
@@ -244,7 +239,7 @@ public class TestSelectList extends MockitoTest {
 	public void testIsMultipleNotMultiple() throws IOException {
 		when(option1.isSelected()).thenReturn(true);
 		when(option2.isSelected()).thenReturn(false);
-		when(element.getAttribute("multiple")).thenReturn("false");
+		when(element.getDomAttribute("multiple")).thenReturn("false");
 		
 		SelectList select = new SelectList("", By.id("select"));
 		Assert.assertFalse(select.isMultiple());
@@ -254,7 +249,7 @@ public class TestSelectList extends MockitoTest {
 	public void testIsMultipleMultiple() throws IOException {
 		when(option1.isSelected()).thenReturn(true);
 		when(option2.isSelected()).thenReturn(false);
-		when(element.getAttribute("multiple")).thenReturn("true");
+		when(element.getDomAttribute("multiple")).thenReturn("true");
 		
 		SelectList select = new SelectList("", By.id("select"));
 		Assert.assertTrue(select.isMultiple());
@@ -265,7 +260,7 @@ public class TestSelectList extends MockitoTest {
 	public void testDeselectAll() throws IOException {
 		when(option1.isSelected()).thenReturn(true);
 		when(option2.isSelected()).thenReturn(false);
-		when(element.getAttribute("multiple")).thenReturn("true");
+		when(element.getDomAttribute("multiple")).thenReturn("true");
 		
 		SelectList select = new SelectList("", By.id("select"));
 		select.deselectAll();
@@ -277,7 +272,7 @@ public class TestSelectList extends MockitoTest {
 	public void testDeselectAllNotMultiple() throws IOException {
 		when(option1.isSelected()).thenReturn(true);
 		when(option2.isSelected()).thenReturn(false);
-		when(element.getAttribute("multiple")).thenReturn("false");
+		when(element.getDomAttribute("multiple")).thenReturn("false");
 		
 		SelectList select = new SelectList("", By.id("select"));
 		select.deselectAll();
@@ -287,7 +282,7 @@ public class TestSelectList extends MockitoTest {
 	public void testDeselectByIndex() throws IOException {
 		when(option1.isSelected()).thenReturn(false);
 		when(option2.isSelected()).thenReturn(true);
-		when(element.getAttribute("multiple")).thenReturn("true");
+		when(element.getDomAttribute("multiple")).thenReturn("true");
 		
 		SelectList select = new SelectList("", By.id("select"));
 		select.deselectByIndex(2);
@@ -299,7 +294,7 @@ public class TestSelectList extends MockitoTest {
 	public void testDeselectByText() throws IOException {
 		when(option1.isSelected()).thenReturn(false);
 		when(option2.isSelected()).thenReturn(true);
-		when(element.getAttribute("multiple")).thenReturn("true");
+		when(element.getDomAttribute("multiple")).thenReturn("true");
 		
 		SelectList select = new SelectList("", By.id("select"));
 		select.deselectByText("opt2");
@@ -311,7 +306,7 @@ public class TestSelectList extends MockitoTest {
 	public void testDeselectByTextNotSelected() throws IOException {
 		when(option1.isSelected()).thenReturn(false);
 		when(option2.isSelected()).thenReturn(true);
-		when(element.getAttribute("multiple")).thenReturn("true");
+		when(element.getDomAttribute("multiple")).thenReturn("true");
 		
 		SelectList select = new SelectList("", By.id("select"));
 		select.deselectByText("opt1");
@@ -323,7 +318,7 @@ public class TestSelectList extends MockitoTest {
 	public void testDeselectByValue() throws IOException {
 		when(option1.isSelected()).thenReturn(false);
 		when(option2.isSelected()).thenReturn(true);
-		when(element.getAttribute("multiple")).thenReturn("true");
+		when(element.getDomAttribute("multiple")).thenReturn("true");
 		
 		SelectList select = new SelectList("", By.id("select"));
 		select.deselectByValue("opti2");
@@ -335,7 +330,7 @@ public class TestSelectList extends MockitoTest {
 	public void testSelectByIndex() throws IOException {
 		when(option1.isSelected()).thenReturn(false);
 		when(option2.isSelected()).thenReturn(true);
-		when(element.getAttribute("multiple")).thenReturn("true");
+		when(element.getDomAttribute("multiple")).thenReturn("true");
 		
 		SelectList select = new SelectList("", By.id("select"));
 		select.selectByIndex(1);
@@ -347,7 +342,7 @@ public class TestSelectList extends MockitoTest {
 	public void testSelectByIndexes() throws IOException {
 		when(option1.isSelected()).thenReturn(false);
 		when(option2.isSelected()).thenReturn(true);
-		when(element.getAttribute("multiple")).thenReturn("true");
+		when(element.getDomAttribute("multiple")).thenReturn("true");
 		
 		SelectList select = new SelectList("", By.id("select"));
 		select.selectByIndex(1, 2);
@@ -359,7 +354,7 @@ public class TestSelectList extends MockitoTest {
 	public void testSelectByText() throws IOException {
 		when(option1.isSelected()).thenReturn(false);
 		when(option2.isSelected()).thenReturn(true);
-		when(element.getAttribute("multiple")).thenReturn("true");
+		when(element.getDomAttribute("multiple")).thenReturn("true");
 		
 		SelectList select = new SelectList("", By.id("select"));
 		select.selectByText("opt1");
@@ -371,7 +366,7 @@ public class TestSelectList extends MockitoTest {
 	public void testSelectByTexts() throws IOException {
 		when(option1.isSelected()).thenReturn(false);
 		when(option2.isSelected()).thenReturn(false);
-		when(element.getAttribute("multiple")).thenReturn("true");
+		when(element.getDomAttribute("multiple")).thenReturn("true");
 		
 		SelectList select = new SelectList("", By.id("select"));
 		select.selectByText("opt1", "opt2");
@@ -402,7 +397,7 @@ public class TestSelectList extends MockitoTest {
 	public void testSelectByCorrespondingTexts() throws IOException {
 		when(option1.isSelected()).thenReturn(false);
 		when(option2.isSelected()).thenReturn(false);
-		when(element.getAttribute("multiple")).thenReturn("true");
+		when(element.getDomAttribute("multiple")).thenReturn("true");
 		
 		SelectList select = new SelectList("", By.id("select"));
 		select.selectByCorrespondingText("PT1", "PT2");
@@ -414,7 +409,7 @@ public class TestSelectList extends MockitoTest {
 	public void testDeselectByCorrespondingText() throws IOException {
 		when(option1.isSelected()).thenReturn(true);
 		when(option2.isSelected()).thenReturn(true);
-		when(element.getAttribute("multiple")).thenReturn("true");
+		when(element.getDomAttribute("multiple")).thenReturn("true");
 		
 		SelectList select = new SelectList("", By.id("select"));
 		select.deselectByCorrespondingText("Pt2");
@@ -426,7 +421,7 @@ public class TestSelectList extends MockitoTest {
 	public void testDeselectByCorrespondingTextNotMultiple() throws IOException {
 		when(option1.isSelected()).thenReturn(false);
 		when(option2.isSelected()).thenReturn(true);
-		when(element.getAttribute("multiple")).thenReturn("false");
+		when(element.getDomAttribute("multiple")).thenReturn("false");
 		
 		SelectList select = new SelectList("", By.id("select"));
 		select.deselectByCorrespondingText("Pt2");
@@ -447,7 +442,7 @@ public class TestSelectList extends MockitoTest {
 	public void testSelectByValues() throws IOException {
 		when(option1.isSelected()).thenReturn(false);
 		when(option2.isSelected()).thenReturn(false);
-		when(element.getAttribute("multiple")).thenReturn("true");
+		when(element.getDomAttribute("multiple")).thenReturn("true");
 		
 		SelectList select = new SelectList("", By.id("select"));
 		select.selectByValue("opti1", "opti2");

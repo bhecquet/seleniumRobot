@@ -1,17 +1,18 @@
 package com.seleniumtests.ut.util.helper;
 
-import com.seleniumtests.GenericTest;
-import com.seleniumtests.customexception.ConfigurationException;
-import com.seleniumtests.customexception.CustomSeleniumTestsException;
-import com.seleniumtests.util.helper.IniHelper;
-import org.testng.annotations.Test;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.testng.Assert.*;
+import org.testng.annotations.Test;
+
+import com.seleniumtests.GenericTest;
+import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.util.helper.IniHelper;
 
 public class TestIniHelper extends GenericTest {
 
@@ -45,6 +46,6 @@ public class TestIniHelper extends GenericTest {
     public void testBadFile() throws IOException {
         Map<String, Map<String, String>> hashMapToComplete = new HashMap<>();
         File envIni = new File("tu/meduse.mer");
-        Map<String, Map<String, String>> hashMapComplete = IniHelper.readIniFile(envIni, hashMapToComplete);
+        IniHelper.readIniFile(envIni, hashMapToComplete);
     }
 }

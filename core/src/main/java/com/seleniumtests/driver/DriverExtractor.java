@@ -19,6 +19,7 @@ package com.seleniumtests.driver;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -66,7 +67,7 @@ public class DriverExtractor {
 	 */
 	private String getDriverVersion(String driverName) {
 		try {
-			return FileUtils.readFileToString(Paths.get(getDriverPath().toFile().getAbsolutePath(), getDriverVersionFileName(driverName)).toFile());
+			return FileUtils.readFileToString(Paths.get(getDriverPath().toFile().getAbsolutePath(), getDriverVersionFileName(driverName)).toFile(), StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			return null;
 		}
@@ -102,7 +103,7 @@ public class DriverExtractor {
 		
 		// write version file
 		try {
-			FileUtils.writeStringToFile(Paths.get(getDriverPath().toFile().getAbsolutePath(), getDriverVersionFileName(driverName)).toFile(), driverArtifactVersion);
+			FileUtils.writeStringToFile(Paths.get(getDriverPath().toFile().getAbsolutePath(), getDriverVersionFileName(driverName)).toFile(), driverArtifactVersion, StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			logger.error("driver version not written", e);
 		}

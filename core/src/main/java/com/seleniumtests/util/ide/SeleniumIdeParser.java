@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
@@ -16,7 +15,6 @@ import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.seleniumtests.core.SeleniumTestsContext;
-import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class SeleniumIdeParser {

@@ -37,6 +37,7 @@ import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy.ProxyType;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.events.WebDriverEventListener;
+import org.openqa.selenium.support.events.WebDriverListener;
 import org.testng.IReporter;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -54,7 +55,6 @@ import com.seleniumtests.core.config.ConfigReader;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
-import com.seleniumtests.driver.DriverExceptionListener;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
@@ -176,9 +176,6 @@ public class SeleniumTestsContext {
     public static final String CAPTURE_SNAPSHOT = "captureSnapshot";
     public static final String CAPTURE_NETWORK = "captureNetwork";
     public static final String VIDEO_CAPTURE = "captureVideo";
-
-    public static final String DP_TAGS_INCLUDE = "dpTagsInclude";				// 
-    public static final String DP_TAGS_EXCLUDE = "dpTagsExclude";				// Utilisé pour la lecture de fichiers CSV/XLS des DataProvider TODO: a étudier comment cela fonctionne
 
     public static final String SOFT_ASSERT_ENABLED = "softAssertEnabled";		// le test ne s'arrête pas lorsqu'une assertion est rencontrée
     public static final String TEST_RETRY_COUNT = "testRetryCount";				// number of times the test can be retried
@@ -462,8 +459,6 @@ public class SeleniumTestsContext {
         setCaptureNetwork(getBoolValueForTest(CAPTURE_NETWORK, System.getProperty(CAPTURE_NETWORK)));
         setVideoCapture(getValueForTest(VIDEO_CAPTURE, System.getProperty(VIDEO_CAPTURE)));
 
-        setDpTagsInclude(getValueForTest(DP_TAGS_INCLUDE, System.getProperty(DP_TAGS_INCLUDE)));
-        setDpTagsExclude(getValueForTest(DP_TAGS_EXCLUDE, System.getProperty(DP_TAGS_EXCLUDE)));
         setReporterPluginClasses(getValueForTest(REPORTER_PLUGIN_CLASSES, System.getProperty(REPORTER_PLUGIN_CLASSES)));
 
         setSoftAssertEnabled(getBoolValueForTest(SOFT_ASSERT_ENABLED, System.getProperty(SOFT_ASSERT_ENABLED)));
@@ -1214,14 +1209,6 @@ public class SeleniumTestsContext {
     
     public Boolean getBetaBrowser() {
     	return (Boolean) getAttribute(BETA_BROWSER);
-    }
-
-    public String getDPTagsExclude() {
-        return (String) getAttribute(DP_TAGS_EXCLUDE);
-    }
-
-    public String getDPTagsInclude() {
-        return (String) getAttribute(DP_TAGS_INCLUDE);
     }
     
     public String getTmsType() {
@@ -2447,14 +2434,6 @@ public class SeleniumTestsContext {
     	}
     }
 
-    public void setDpTagsInclude(String tags) {
-    	setAttribute(DP_TAGS_INCLUDE, tags);
-    }
-    
-    public void setDpTagsExclude(String tags) {
-    	setAttribute(DP_TAGS_EXCLUDE, tags);
-    }
-    
     public void setReporterPluginClasses(String classNames) {
     	if (classNames != null) {
     		List<Class<IReporter>> reporterClasses = new ArrayList<>();
@@ -2488,22 +2467,34 @@ public class SeleniumTestsContext {
     
     public void setWebDriverListener(String listener) {
     	List<String> listeners = new ArrayList<>();
-		listeners.add(DriverExceptionListener.class.getName());
     	if (listener != null && !listener.isEmpty()) {
+    		
+    		boolean oldListeners = false;
+    		boolean wdListeners = false;
 
     		for (String listenerClassName: listener.split(",")) {
 	    		// check we can access the class
 	    		try {
-	    			Class<WebDriverEventListener> listenerClass = (Class<WebDriverEventListener>) Class.forName(listenerClassName);
-	    			if (!WebDriverEventListener.class.isAssignableFrom(listenerClass)) {
-	    				throw new ConfigurationException(String.format("Class %s must implement WebDriverEventListener class", listenerClassName));
+
+	    			if (WebDriverEventListener.class.isAssignableFrom(Class.forName(listenerClassName))) {
+	    				logger.warn("WebDriverEventListener interface is deprecated, you should consider to upgrade to WebDriverListener interface");
+	    				oldListeners = true;
+	    			} else if (WebDriverListener.class.isAssignableFrom(Class.forName(listenerClassName))) {
+	    				wdListeners = true;
+	    			} else {
+	    				throw new ConfigurationException(String.format("Class %s must implement WebDriverEventListener or WebDriverListener class", listenerClassName));
+	    				
 	    			}
-	    			
+
 	        		listeners.add(listenerClassName);
 	    		} catch (ExceptionInInitializerError | ClassNotFoundException e) {
 	    			throw new ConfigurationException(String.format("Class %s cannot be loaded", listenerClassName), e);
 	    		}
     		}
+    		
+    		if (oldListeners && wdListeners) {
+				throw new ConfigurationException("Don't mix 'WebDriverEventListener' and 'WebDriverListener' implementations");
+			}
     	}
     		
 		setAttribute(WEB_DRIVER_LISTENER, listeners);

@@ -5,7 +5,7 @@
 
 	<groupId>com.infotel.seleniumRobot</groupId>
 	<artifactId>core-parent</artifactId>
-	<version>4.21.4-SNAPSHOT</version>
+	<version>5.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>selenium robot</name>
@@ -73,10 +73,10 @@
 
 		<!-- /!\ when changing selenium version, do not forget to change selenium-api version in project file (for aspectj build path) -->
 		<!-- /!\ Also change version in SeleniumTestContextManager.java -->
-		<selenium.version>3.141.59</selenium.version>
-		<appium.version>7.0.0</appium.version>
+		<selenium.version>4.1.2</selenium.version>
+		<appium.version>8.0.0-beta2</appium.version>
 		<aspectj.version>1.9.1</aspectj.version>
-		<htmlunitdriver.version>2.46.0</htmlunitdriver.version>
+		<htmlunitdriver.version>3.57.0</htmlunitdriver.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
@@ -128,6 +128,10 @@
 				    <exclusion>
 				      <artifactId>commons-logging</artifactId>
 				      <groupId>commons-logging</groupId>
+				    </exclusion>
+					<exclusion>
+				      <artifactId>org.aspectj</artifactId>
+				      <groupId>aspectjweaver</groupId>
 				    </exclusion>
 				</exclusions>
 			</dependency>
@@ -202,11 +206,6 @@
 				<artifactId>selenium-java</artifactId>
 				<version>${selenium.version}</version>
 			</dependency>
-			<dependency>
-		        <groupId>com.microsoft.edge</groupId>
-		        <artifactId>msedge-selenium-tools-java</artifactId>
-		        <version>3.141.0</version>
-		    </dependency>
 		    <dependency>
 		      <groupId>net.java.dev.jna</groupId>
 		      <artifactId>jna-platform</artifactId>
@@ -221,6 +220,12 @@
 		        <groupId>net.lightbody.bmp</groupId>
 		        <artifactId>browsermob-core</artifactId>
 		        <version>2.1.5</version>
+		        <exclusions>
+		          <exclusion>
+		            <groupId>com.google.guava</groupId>
+		            <artifactId>guava</artifactId>
+		          </exclusion>
+		        </exclusions>
     		</dependency>
     		<dependency>
 				<groupId>org.apache.commons</groupId>

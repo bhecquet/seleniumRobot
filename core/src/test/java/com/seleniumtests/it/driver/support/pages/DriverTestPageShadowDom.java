@@ -6,15 +6,12 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.uipage.ByC;
 import com.seleniumtests.uipage.PageObject;
-import com.seleniumtests.uipage.htmlelements.ButtonElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.uipage.htmlelements.TextFieldElement;
 
 public class DriverTestPageShadowDom extends PageObject {
 	
 
-	private String openedPageUrl;
-	
 	public static final TextFieldElement inputFail1 = new TextFieldElement("", By.id("fail1"));
 	public static final HtmlElement divPass1Direct = new HtmlElement("", By.id("pass1Shadow"));
 	public static final HtmlElement divPass1Shadow = new HtmlElement("", ByC.shadow(By.id("shadow2"))).findElement(By.id("pass1Shadow"));
@@ -30,7 +27,6 @@ public class DriverTestPageShadowDom extends PageObject {
 
     public DriverTestPageShadowDom(boolean openPageURL, String url) throws Exception {
     	super(inputFail1, openPageURL ? url : null);
-    	openedPageUrl = url;
     }
 	
 

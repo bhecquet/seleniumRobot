@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.it.driver.support.pages;
 
+import java.time.Duration;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -90,15 +91,15 @@ public class DriverTestPageNativeActions extends PageObject {
     }
     
     public void switchToFrameWithExpectedConditionsById() {
-    	new WebDriverWait(driver, 5).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(By.id("myIFrame")));
+    	new WebDriverWait(driver, Duration.ofSeconds(5)).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(By.id("myIFrame")));
     }
     
     public void switchToFrameWithExpectedConditionsByName() {
-    	new WebDriverWait(driver, 5).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("myIFrame"));
+    	new WebDriverWait(driver, Duration.ofSeconds(5)).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("myIFrame"));
     }
     
     public void switchToFrameWithExpectedConditionsByIndex() {
-    	new WebDriverWait(driver, 5).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(0));
+    	new WebDriverWait(driver, Duration.ofSeconds(5)).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(0));
     }
     
     public void switchToFirstFrameByNameOrId() {

@@ -17,7 +17,6 @@ import org.testng.annotations.Test;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.browserfactory.BrowserExtension;
 import com.seleniumtests.core.TestVariable;
-import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.support.server.WebServer;
 
 public class TestBrowserExtension extends GenericTest {

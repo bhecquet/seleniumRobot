@@ -349,7 +349,7 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 			
 			// connect to grid
 			PowerMockito.whenNew(RemoteWebDriver.class).withAnyArguments().thenReturn(driver);
-			WebDriver newDriver = new SeleniumGridDriverFactory(config).createWebDriver();
+			new SeleniumGridDriverFactory(config).createWebDriver();
 
 		} finally {
 			SeleniumGridDriverFactory.setRetryTimeout(SeleniumGridDriverFactory.DEFAULT_RETRY_TIMEOUT);

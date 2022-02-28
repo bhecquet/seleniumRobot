@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.ArrayUtils;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -146,16 +145,16 @@ public class ConnectorsTest extends MockitoTest {
 	 * Method for creating server reply mock
 	 * @throws UnirestException 
 	 */
-	protected HttpRequest createServerMock(String requestType, String apiPath, int statusCode, String replyData) throws UnirestException {
+	protected HttpRequest<?> createServerMock(String requestType, String apiPath, int statusCode, String replyData) throws UnirestException {
 		return createServerMock(requestType, apiPath, statusCode, replyData, "request");
 	}
-	protected HttpRequest createServerMock(String requestType, String apiPath, int statusCode, File replyData) throws UnirestException {
+	protected HttpRequest<?> createServerMock(String requestType, String apiPath, int statusCode, File replyData) throws UnirestException {
 		return createServerMock(requestType, apiPath, statusCode, replyData, "request");
 	}
-	protected HttpRequest createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, String replyData) throws UnirestException {
+	protected HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, String replyData) throws UnirestException {
 		return createServerMock(serverUrl, requestType, apiPath, statusCode, replyData, "request");
 	}
-	protected HttpRequest createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, File replyData) throws UnirestException {
+	protected HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, File replyData) throws UnirestException {
 		return createServerMock(serverUrl, requestType, apiPath, statusCode, replyData, "request");
 	}
 	
@@ -169,24 +168,24 @@ public class ConnectorsTest extends MockitoTest {
 	 * @return
 	 * @throws UnirestException
 	 */
-	protected HttpRequest createServerMock(String requestType, String apiPath, int statusCode, File replyData, String responseType) throws UnirestException {
+	protected HttpRequest<?> createServerMock(String requestType, String apiPath, int statusCode, File replyData, String responseType) throws UnirestException {
 		return createServerMock(SERVER_URL, requestType, apiPath, statusCode, (Object)replyData, responseType);
 	}
-	protected HttpRequest createServerMock(String requestType, String apiPath, int statusCode, String replyData, String responseType) throws UnirestException {
+	protected HttpRequest<?> createServerMock(String requestType, String apiPath, int statusCode, String replyData, String responseType) throws UnirestException {
 		return createServerMock(SERVER_URL, requestType, apiPath, statusCode, (Object)replyData, responseType);
 	}
 	
-	protected HttpRequest createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, File replyData, String responseType) throws UnirestException {
+	protected HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, File replyData, String responseType) throws UnirestException {
 		return createServerMock(serverUrl, requestType, apiPath, statusCode, (Object)replyData, responseType);
 	}
-	protected HttpRequest createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, String replyData, String responseType) throws UnirestException {
+	protected HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, String replyData, String responseType) throws UnirestException {
 		return createServerMock(serverUrl, requestType, apiPath, statusCode, (Object)replyData, responseType);
 	}
 	
-	protected HttpRequest createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, Object replyData, String responseType) throws UnirestException {
+	protected HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, Object replyData, String responseType) throws UnirestException {
 		return createServerMock(serverUrl, requestType, apiPath, statusCode, Arrays.asList(replyData), responseType);
 	}
-	protected HttpRequest createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, final List<Object> replyData, String responseType) throws UnirestException {
+	protected HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, final List<Object> replyData, String responseType) throws UnirestException {
 		
 		if (replyData.isEmpty()) {
 			throw new TestConfigurationException("No replyData specified");
@@ -197,7 +196,7 @@ public class ConnectorsTest extends MockitoTest {
 		HttpResponse<JsonNode> jsonResponse = mock(HttpResponse.class);
 		HttpResponse<File> streamResponse = mock(HttpResponse.class);
 		HttpResponse<byte[]> bytestreamResponse = mock(HttpResponse.class);
-		HttpRequest request = mock(HttpRequest.class);
+		HttpRequest<?> request = mock(HttpRequest.class);
 		JsonNode json = mock(JsonNode.class);
 		HttpRequestWithBody postRequest = spy(HttpRequestWithBody.class);
 
@@ -343,7 +342,7 @@ public class ConnectorsTest extends MockitoTest {
 		return null;	
 	}
 	
-	private HttpRequest preparePostRequest(String serverUrl, String responseType, HttpRequestWithBody postRequest, HttpResponse<String> response, HttpResponse<JsonNode> jsonResponse) {
+	private HttpRequest<?> preparePostRequest(String serverUrl, String responseType, HttpRequestWithBody postRequest, HttpResponse<String> response, HttpResponse<JsonNode> jsonResponse) {
 
 		RequestBodyEntity requestBodyEntity = mock(RequestBodyEntity.class);
 		MultipartBody requestMultipartBody = mock(MultipartBody.class);
@@ -389,7 +388,7 @@ public class ConnectorsTest extends MockitoTest {
 		
 		@SuppressWarnings("unchecked")
 		HttpResponse<JsonNode> jsonResponse = mock(HttpResponse.class);
-		HttpRequest request = mock(HttpRequest.class);
+		HttpRequest<?> request = mock(HttpRequest.class);
 		MultipartBody requestMultipartBody = mock(MultipartBody.class);
 		HttpRequestWithBody postRequest = mock(HttpRequestWithBody.class);
 		

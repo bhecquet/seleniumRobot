@@ -38,7 +38,7 @@ public class TestFieldDetectorConnector extends ConnectorsTest {
 
 	@Test(groups = { "ut" }, expectedExceptions = ConfigurationException.class)
 	public void testIsAbsent() {
-		HttpRequest<HttpRequest> req = createServerMock("GET", "/status", 500, "KO", "body");
+		HttpRequest<?> req = createServerMock("GET", "/status", 500, "KO", "body");
 		when(req.asString()).thenThrow(UnirestException.class);
 
 		FieldDetectorConnector.getInstance("http://localhost:4321");

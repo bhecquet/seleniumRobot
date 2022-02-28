@@ -48,8 +48,10 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
 import org.mockito.Mock;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.TargetLocator;
@@ -57,7 +59,6 @@ import org.openqa.selenium.WebDriver.Window;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
@@ -69,7 +70,6 @@ import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
-import com.seleniumtests.driver.DriverExceptionListener;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.Keyboard;
 import com.seleniumtests.util.osutility.OSUtility;
@@ -116,8 +116,8 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Mock
 	private PointerInfo pointerInfo;
 	
-	private EventFiringWebDriver eventDriver;
-	private EventFiringWebDriver attachedEventDriver;
+	private CustomEventFiringWebDriver eventDriver;
+	private CustomEventFiringWebDriver attachedEventDriver;
 
 	@BeforeMethod(groups={"ut"})
 	private void init() throws Exception {
@@ -126,9 +126,8 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		PowerMockito.spy(CustomEventFiringWebDriver.class);
 		
 		// add DriverExceptionListener to reproduce driver behavior
-		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, browserInfo, true, DriverMode.LOCAL, null, null).register(new DriverExceptionListener()));
-		attachedEventDriver = spy(new CustomEventFiringWebDriver(driver, null, browserInfo, true, DriverMode.LOCAL, null, null, 12345).register(new DriverExceptionListener()));
-		
+		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, browserInfo, true, DriverMode.LOCAL, null, null));
+		attachedEventDriver = spy(new CustomEventFiringWebDriver(driver, null, browserInfo, true, DriverMode.LOCAL, null, null, 12345, new ArrayList<>()));
 		when(driver.manage()).thenReturn(options);
 		when(driver.getCapabilities()).thenReturn(capabilities);
 		when(driver.switchTo()).thenReturn(target);
@@ -153,7 +152,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	
 	@Test(groups = {"ut"})
 	public void testGetSessionId() {
-		Assert.assertEquals(((CustomEventFiringWebDriver)eventDriver).getSessionId(), "1234");
+		Assert.assertEquals(eventDriver.getSessionId(), "1234");
 	}
 	
 	/**
@@ -163,12 +162,84 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Test(groups = {"ut"})
 	public void testGetSessionIdWithIncopmatibleDriver() {
 		when(driver.getSessionId()).thenThrow(ClassCastException.class);
-		Assert.assertNotEquals(((CustomEventFiringWebDriver)eventDriver).getSessionId(), "1234");
+		Assert.assertNotEquals(eventDriver.getSessionId(), "1234");
 	}
 	
 	@Test(groups = {"ut"})
 	public void testGetPageSource() {
-		Assert.assertEquals(((CustomEventFiringWebDriver)eventDriver).getPageSource(), "<html></html>");
+		Assert.assertEquals(eventDriver.getPageSource(), "<html></html>");
+	}
+	
+	/**
+	 * Check command is forwarded to underlying driver
+	 */
+	@Test(groups = {"ut"})
+	public void testFindElement() {
+		eventDriver.findElement(By.id("el"));
+		verify(driver).findElement(By.id("el"));
+	}
+	
+	/**
+	 * Check command is forwarded to underlying driver
+	 */
+	@Test(groups = {"ut"})
+	public void testFindElements() {
+		eventDriver.findElements(By.id("el"));
+		verify(driver).findElements(By.id("el"));
+	}
+	
+	/**
+	 * Check command is forwarded to underlying driver
+	 */
+	@Test(groups = {"ut"})
+	public void testGet() {
+		eventDriver.get("http://foo");
+		verify(driver).get("http://foo");
+	}
+	
+	/**
+	 * Check command is forwarded to underlying driver
+	 */
+	@Test(groups = {"ut"})
+	public void testSwitchTo() {
+		eventDriver.switchTo();
+		verify(driver).switchTo();
+	}
+	
+	/**
+	 * Check command is forwarded to underlying driver
+	 */
+	@Test(groups = {"ut"})
+	public void testManage() {
+		eventDriver.manage();
+		verify(driver).manage();
+	}
+	
+	/**
+	 * Check command is forwarded to underlying driver
+	 */
+	@Test(groups = {"ut"})
+	public void testGetScreenshotAs() {
+		eventDriver.getScreenshotAs(OutputType.BASE64);
+		verify(driver).getScreenshotAs(OutputType.BASE64);
+	}
+	
+	/**
+	 * Check command is forwarded to underlying driver
+	 */
+	@Test(groups = {"ut"})
+	public void testExecuteScript() {
+		eventDriver.executeScript("my script");
+		verify(driver).executeScript("my script");
+	}
+	
+	/**
+	 * Check command is forwarded to underlying driver
+	 */
+	@Test(groups = {"ut"})
+	public void testAsyncExecuteScript() {
+		eventDriver.executeAsyncScript("my script");
+		verify(driver).executeAsyncScript("my script");
 	}
 	
 	/**
@@ -177,7 +248,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Test(groups = {"ut"})
 	public void testGetPageSourceWithIncopmatibleDriver() {
 		doThrow(new WebDriverException("some error")).when(driver).getPageSource();
-		Assert.assertNull(((CustomEventFiringWebDriver)eventDriver).getPageSource());
+		Assert.assertNull(eventDriver.getPageSource());
 	}
 	
 	/**
@@ -185,7 +256,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testNullJavascriptReplyForContentDimension() {
-		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getContentDimension();
+		Dimension dim = eventDriver.getContentDimension();
 		
 		// check we get the window dimension
 		Assert.assertEquals(dim.height, 100);
@@ -198,7 +269,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Test(groups = {"ut"})
 	public void testContentDimension() {
 		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(120L, 80L));
-		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getContentDimension();
+		Dimension dim = eventDriver.getContentDimension();
 		
 		// no need to switch to default content if size is correctly returned
 		verify(driver, never()).switchTo();
@@ -214,7 +285,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Test(groups = {"ut"})
 	public void testContentDimensionWithZoomFactor() {
 		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(120.5, 80.67));
-		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getContentDimension();
+		Dimension dim = eventDriver.getContentDimension();
 		
 		// check we get the window dimension
 		Assert.assertEquals(dim.height, 80);
@@ -229,7 +300,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Test(groups = {"ut"})
 	public void testContentDimensionNotGet() {
 		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(100, 0)).thenReturn(Arrays.asList(120, 80));
-		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getContentDimension();
+		Dimension dim = eventDriver.getContentDimension();
 		
 		verify(driver).switchTo();
 		
@@ -240,7 +311,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Test(groups = {"ut"})
 	public void testContentDimensionNotGet2() {
 		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(0, 100)).thenReturn(Arrays.asList(120, 80));
-		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getContentDimension();
+		Dimension dim = eventDriver.getContentDimension();
 		
 		verify(driver).switchTo();
 		
@@ -254,9 +325,9 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testContentDimensionNonWebTest() {
-		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, null, false, DriverMode.LOCAL, null, null).register(new DriverExceptionListener()));
+		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, null, false, DriverMode.LOCAL, null, null));
 		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(120L, 80L));
-		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getContentDimension();
+		Dimension dim = eventDriver.getContentDimension();
 		
 		// check we get the window dimension
 		Assert.assertEquals(dim.height, 100);
@@ -268,7 +339,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testNullJavascriptReplyForContentDimensionWithoutScrollbar() {
-		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getViewPortDimensionWithoutScrollbar();
+		Dimension dim = eventDriver.getViewPortDimensionWithoutScrollbar();
 		
 		// check we get the window dimension
 		Assert.assertEquals(dim.height, 100);
@@ -281,7 +352,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Test(groups = {"ut"})
 	public void testViewPortDimensionWithoutScrollbar() {
 		when(driver.executeScript(anyString())).thenReturn(120L).thenReturn(80L);
-		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getViewPortDimensionWithoutScrollbar();
+		Dimension dim = eventDriver.getViewPortDimensionWithoutScrollbar();
 		
 		// no need to switch to default content if size is correctly returned
 		verify(driver, never()).switchTo();
@@ -297,7 +368,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Test(groups = {"ut"})
 	public void testViewPortDimensionWithoutScrollbarNotGet() {
 		when(driver.executeScript(anyString())).thenReturn(100000L).thenReturn(120L).thenReturn(80L); // retry when getting width
-		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getViewPortDimensionWithoutScrollbar();
+		Dimension dim = eventDriver.getViewPortDimensionWithoutScrollbar();
 		
 		verify(driver).switchTo();
 		
@@ -308,7 +379,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Test(groups = {"ut"})
 	public void testViewPortDimensionWithoutScrollbarNotGet2() {
 		when(driver.executeScript(anyString())).thenReturn(120L).thenReturn(100000L).thenReturn(80L); // retry when getting height
-		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getViewPortDimensionWithoutScrollbar();
+		Dimension dim = eventDriver.getViewPortDimensionWithoutScrollbar();
 		
 		verify(driver).switchTo();
 		
@@ -324,7 +395,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Test(groups = {"ut"})
 	public void testViewPortDimensionWithoutScrollbarNotReturned() {
 		when(driver.executeScript(anyString())).thenReturn(100000L);
-		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getViewPortDimensionWithoutScrollbar();
+		Dimension dim = eventDriver.getViewPortDimensionWithoutScrollbar();
 		
 		// check we get the window dimension
 		Assert.assertEquals(dim.height, 10000);
@@ -337,7 +408,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Test(groups = {"ut"})
 	public void testViewPortDimensionWithoutScrollbarWithZoomFactor() {
 		when(driver.executeScript(anyString())).thenReturn(120.5).thenReturn(80.67);
-		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getViewPortDimensionWithoutScrollbar();
+		Dimension dim = eventDriver.getViewPortDimensionWithoutScrollbar();
 		
 		// check we get the window dimension
 		Assert.assertEquals(dim.height, 80);
@@ -349,9 +420,9 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testContentDimensionWithoutScrollbarNonWebTest() {
-		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, null, false, DriverMode.LOCAL, null, null).register(new DriverExceptionListener()));
+		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, null, false, DriverMode.LOCAL, null, null));
 		when(driver.executeScript(anyString())).thenReturn(120L).thenReturn(80L);
-		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getViewPortDimensionWithoutScrollbar();
+		Dimension dim = eventDriver.getViewPortDimensionWithoutScrollbar();
 		
 		// check we get the window dimension
 		Assert.assertEquals(dim.height, 100);
@@ -363,7 +434,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testNullJavascriptReplyForScrollPosition() {
-		Point point = ((CustomEventFiringWebDriver)eventDriver).getScrollPosition();
+		Point point = eventDriver.getScrollPosition();
 		
 		// check we get the default position: (0,0)
 		Assert.assertEquals(point.x, 0);
@@ -376,7 +447,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Test(groups = {"ut"})
 	public void testScrollPosition() {
 		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(120L, 80L));
-		Point point = ((CustomEventFiringWebDriver)eventDriver).getScrollPosition();
+		Point point = eventDriver.getScrollPosition();
 		
 		// check we get the scroll position
 		Assert.assertEquals(point.x, 120);
@@ -389,7 +460,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Test(groups = {"ut"})
 	public void testScrollPositionWithZoomFactor() {
 		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(120.5, 80.67));
-		Point point = ((CustomEventFiringWebDriver)eventDriver).getScrollPosition();
+		Point point = eventDriver.getScrollPosition();
 		
 		// check we get the window dimension
 		Assert.assertEquals(point.x, 120);
@@ -401,9 +472,9 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"}, expectedExceptions=WebDriverException.class)
 	public void testScrollPositionNonWebTest() {
-		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, null, false, DriverMode.LOCAL, null, null).register(new DriverExceptionListener()));
+		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, null, false, DriverMode.LOCAL, null, null));
 		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(120L, 80L));
-		((CustomEventFiringWebDriver)eventDriver).getScrollPosition();
+		eventDriver.getScrollPosition();
 
 	}
 	
@@ -414,7 +485,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testQuit() {
 		when(browserInfo.getAllBrowserSubprocessPids(new ArrayList<>())).thenReturn(Arrays.asList(1000L));
 		
-		((CustomEventFiringWebDriver)eventDriver).quit();
+		eventDriver.quit();
 		verify(osUtility).killProcess("1000", true);
 	}
 	
@@ -440,7 +511,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		doThrow(new WebDriverException("some error")).when(driver).quit();
 		
 		try {
-			((CustomEventFiringWebDriver)eventDriver).quit();
+			eventDriver.quit();
 		} catch (WebDriverException e) {}
 		verify(osUtility).killProcess("1000", true);
 	}
@@ -941,13 +1012,13 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Test(groups = {"ut"})
 	public void testGetCurrentHandlesUpdated() throws IOException {
 		when(driver.getWindowHandles()).thenReturn(new TreeSet<>(Arrays.asList("12345", "67890")));
-		Assert.assertEquals(((CustomEventFiringWebDriver)eventDriver).getCurrentHandles(), new TreeSet<>(Arrays.asList("12345", "67890")));
+		Assert.assertEquals(eventDriver.getCurrentHandles(), new TreeSet<>(Arrays.asList("12345", "67890")));
 		verify((CustomEventFiringWebDriver)eventDriver, times(1)).updateWindowsHandles();
 	}
 	@Test(groups = {"ut"})
 	public void testGetCurrentHandlesNotUpdated() throws IOException {
-		((CustomEventFiringWebDriver)eventDriver).setCurrentHandles(new TreeSet<>(Arrays.asList("12345", "67890")));
-		Assert.assertEquals(((CustomEventFiringWebDriver)eventDriver).getCurrentHandles(), new TreeSet<>(Arrays.asList("12345", "67890")));
+		eventDriver.setCurrentHandles(new TreeSet<>(Arrays.asList("12345", "67890")));
+		Assert.assertEquals(eventDriver.getCurrentHandles(), new TreeSet<>(Arrays.asList("12345", "67890")));
 		verify((CustomEventFiringWebDriver)eventDriver, never()).updateWindowsHandles();
 	}
 	

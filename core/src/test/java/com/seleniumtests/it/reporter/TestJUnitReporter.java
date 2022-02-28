@@ -18,6 +18,7 @@
 package com.seleniumtests.it.reporter;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -91,7 +92,7 @@ public class TestJUnitReporter extends ReporterTest {
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
 		
 		
-		String result = FileUtils.readFileToString(Paths.get(outDir, "junitreports", String.format("TEST-%s.xml", testList.get(0))).toFile());
+		String result = FileUtils.readFileToString(Paths.get(outDir, "junitreports", String.format("TEST-%s.xml", testList.get(0))).toFile(), StandardCharsets.UTF_8);
 		Assert.assertTrue(result.contains("<failure type=\"java.lang.AssertionError\" message=\"error\">"));
 		Assert.assertTrue(result.contains("<error type=\"com.seleniumtests.customexception.DriverExceptions\" message=\"some exception\">")); // errors
 		Assert.assertTrue(result.contains("[main] SeleniumRobotTestListener: Finish method testSkipped")); // some logs
@@ -122,7 +123,7 @@ public class TestJUnitReporter extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
 			
-			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			configureMockedSnapshotServerConnection();
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false}");		
 			
 			SeleniumTestsContextManager.removeThreadContext();
@@ -130,7 +131,7 @@ public class TestJUnitReporter extends ReporterTest {
 			
 			// check there are 2 results. first one is the selenium test (OK) and second one is the snapshot comparison (KO)
 			String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
-			String result = FileUtils.readFileToString(Paths.get(outDir, "junitreports", String.format("TEST-%s.xml", testList.get(0))).toFile());
+			String result = FileUtils.readFileToString(Paths.get(outDir, "junitreports", String.format("TEST-%s.xml", testList.get(0))).toFile(), StandardCharsets.UTF_8);
 			Assert.assertTrue(result.contains("tests=\"2\""));
 			Assert.assertTrue(result.contains("errors=\"1\""));
 			Assert.assertTrue(result.contains("<error type=\"com.seleniumtests.customexception.ScenarioException\" message=\"Snapshot comparison failed\">"));
@@ -154,7 +155,7 @@ public class TestJUnitReporter extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
 			
-			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			configureMockedSnapshotServerConnection();
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': null, 'computingError': ['error1']}");		
 			
 			SeleniumTestsContextManager.removeThreadContext();
@@ -192,7 +193,7 @@ public class TestJUnitReporter extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
 			
-			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			configureMockedSnapshotServerConnection();
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false}");		
 			
 			SeleniumTestsContextManager.removeThreadContext();
@@ -200,7 +201,7 @@ public class TestJUnitReporter extends ReporterTest {
 			
 			// check there are 2 results. first one is the selenium test (OK) and second one is the snapshot comparison (KO)
 			String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
-			String result = FileUtils.readFileToString(Paths.get(outDir, "junitreports", String.format("TEST-%s.xml", testList.get(0))).toFile());
+			String result = FileUtils.readFileToString(Paths.get(outDir, "junitreports", String.format("TEST-%s.xml", testList.get(0))).toFile(), StandardCharsets.UTF_8);
 			Assert.assertTrue(result.contains("tests=\"1\""));
 			Assert.assertTrue(result.contains("errors=\"1\""));
 			Assert.assertTrue(result.contains("<error type=\"com.seleniumtests.customexception.ScenarioException\" message=\"Snapshot comparison failed\">"));
@@ -228,7 +229,7 @@ public class TestJUnitReporter extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
 			
-			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			configureMockedSnapshotServerConnection();
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': null, 'computingError': ['error1']}");		
 			
 			SeleniumTestsContextManager.removeThreadContext();
@@ -236,7 +237,7 @@ public class TestJUnitReporter extends ReporterTest {
 			
 			// check there is 1 results
 			String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
-			String result = FileUtils.readFileToString(Paths.get(outDir, "junitreports", String.format("TEST-%s.xml", testList.get(0))).toFile());
+			String result = FileUtils.readFileToString(Paths.get(outDir, "junitreports", String.format("TEST-%s.xml", testList.get(0))).toFile(), StandardCharsets.UTF_8);
 			Assert.assertTrue(result.contains("tests=\"1\""));
 			Assert.assertTrue(result.contains("errors=\"0\"")); // as comparison is skipped, test result is not changed
 			Assert.assertFalse(result.contains("<error type=\"com.seleniumtests.customexception.ScenarioException\" message=\"Snapshot comparison failed\">"));

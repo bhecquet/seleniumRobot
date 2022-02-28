@@ -17,7 +17,10 @@
  */
 package com.seleniumtests.browserfactory;
 
+import static org.openqa.selenium.remote.Browser.HTMLUNIT;
+
 import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.seleniumtests.driver.BrowserType;
@@ -31,7 +34,7 @@ public class HtmlUnitCapabilitiesFactory extends IDesktopCapabilityFactory {
 
 	@Override
 	protected MutableCapabilities getDriverOptions() {
-		return DesiredCapabilities.htmlUnit();
+		return new DesiredCapabilities(HTMLUNIT.browserName(), "", Platform.ANY);
 	}
 
 	@Override

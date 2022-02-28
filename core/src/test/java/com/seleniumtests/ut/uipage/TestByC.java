@@ -1,24 +1,22 @@
 package com.seleniumtests.ut.uipage;
 
-import com.seleniumtests.GenericTest;
-import com.seleniumtests.MockitoTest;
-import com.seleniumtests.uipage.ByC;
-import com.seleniumtests.uipage.htmlelements.HtmlElement;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.testng.AssertJUnit.assertEquals;
+
+import java.util.Arrays;
+
 import org.mockito.Mock;
 import org.openqa.selenium.By;
-import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.FindsByXPath;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.util.Arrays;
-import java.util.List;
-
-import static org.mockito.Mockito.*;
-import static org.testng.AssertJUnit.assertEquals;
+import com.seleniumtests.MockitoTest;
+import com.seleniumtests.uipage.ByC;
 
 public class TestByC extends MockitoTest {
 
@@ -128,87 +126,87 @@ public class TestByC extends MockitoTest {
     public void testFindElementByAttribute() {
         ByC.ByAttribute byAttribute = spy(new ByC.ByAttribute("name", "value"));
         byAttribute.findElement(driver);
-        verify((FindsByXPath)driver).findElementByXPath(".//*[@name='value']");
+        verify(driver).findElement(By.xpath(".//*[@name='value']"));
     }
 
     @Test
     public void testFindElementsByAttribute() {
         ByC.ByAttribute byAttribute = spy(new ByC.ByAttribute("meduse", "douce"));
         byAttribute.findElements(driver);
-        verify((FindsByXPath)driver).findElementsByXPath(".//*[@meduse='douce']");
+        verify(driver).findElements(By.xpath(".//*[@meduse='douce']"));
     }
 
     @Test
     public void testFindElementByLabelBackward() {
         ByC.ByLabelBackward byLabelBackward = spy(new ByC.ByLabelBackward("Physalia", "div", true,"label"));
-        when(((FindsByXPath)driver).findElementsByXPath(anyString())).thenReturn( Arrays.asList(element1, element2));
+        when(driver.findElements(any(By.class))).thenReturn( Arrays.asList(element1, element2));
         WebElement el = byLabelBackward.findElement(driver);
         Assert.assertEquals(el, element2);
-        verify((FindsByXPath)driver).findElementsByXPath(".//label[contains(text(),'Physalia')]/preceding::div");
+        verify(driver).findElements(By.xpath(".//label[contains(text(),'Physalia')]/preceding::div"));
     }
 
     @Test
     public void testFindElementsByLabelBackward() {
         ByC.ByLabelBackward byLabelBackward = spy(new ByC.ByLabelBackward("badaboum", "table", true,"label"));
         byLabelBackward.findElements(driver);
-        verify((FindsByXPath)driver).findElementsByXPath(".//label[contains(text(),'badaboum')]/preceding::table");
+        verify(driver).findElements(By.xpath(".//label[contains(text(),'badaboum')]/preceding::table"));
     }
 
     @Test
     public void testFindElementByLabelForward() {
         ByC.ByLabelForward byLabelForward = spy(new ByC.ByLabelForward("Chrysaora", "frame", true,"label"));
-        when(((FindsByXPath)driver).findElementsByXPath(anyString())).thenReturn( Arrays.asList(element1, element2));
+        when(driver.findElements(any())).thenReturn( Arrays.asList(element1, element2));
         byLabelForward.findElement(driver);
-        verify((FindsByXPath)driver).findElementByXPath(".//label[contains(text(),'Chrysaora')]/following::frame");
+        verify(driver).findElement(By.xpath(".//label[contains(text(),'Chrysaora')]/following::frame"));
     }
 
     @Test
     public void testFindElementsByLabelForward() {
         ByC.ByLabelBackward byLabelForward = spy(new ByC.ByLabelBackward("Cotylorhiza", "td", true,"label"));
         byLabelForward.findElements(driver);
-        verify((FindsByXPath)driver).findElementsByXPath(".//label[contains(text(),'Cotylorhiza')]/preceding::td");
+        verify(driver).findElements(By.xpath(".//label[contains(text(),'Cotylorhiza')]/preceding::td"));
     }
 
     @Test
     public void testFindElementByText() {
         ByC.ByText byText = spy(new ByC.ByText("Pelagia", "li",true));
         byText.findElement(driver);
-        verify((FindsByXPath)driver).findElementByXPath(".//li[contains(text(),'Pelagia')]");
+        verify(driver).findElement(By.xpath(".//li[contains(text(),'Pelagia')]"));
     }
 
     @Test
     public void testFindElementsByText() {
         ByC.ByText byText = spy(new ByC.ByText("Aequorea","ol",true));
         byText.findElements(driver);
-        verify((FindsByXPath)driver).findElementsByXPath(".//ol[contains(text(),'Aequorea')]");
+        verify(driver).findElements(By.xpath(".//ol[contains(text(),'Aequorea')]"));
     }
 
     @Test
     public void testFindElementByXClassName() {
         ByC.ByXClassName byXClassName = spy(new ByC.ByXClassName("Carybdea"));
         byXClassName.findElement(driver);
-        verify((FindsByXPath)driver).findElementByXPath(".//*[contains(concat(' ',normalize-space(@class),' '),' Carybdea ')]");
+        verify(driver).findElement(By.xpath(".//*[contains(concat(' ',normalize-space(@class),' '),' Carybdea ')]"));
     }
 
     @Test
     public void testFindElementsByXClassName() {
         ByC.ByXClassName byXClassName = spy(new ByC.ByXClassName("Rhizostoma"));
         byXClassName.findElements(driver);
-        verify((FindsByXPath)driver).findElementsByXPath(".//*[contains(concat(' ',normalize-space(@class),' '),' Rhizostoma ')]");
+        verify(driver).findElements(By.xpath(".//*[contains(concat(' ',normalize-space(@class),' '),' Rhizostoma ')]"));
     }
 
     @Test
     public void testFindElementByXTagName() {
         ByC.ByXTagName byXTagName = spy(new ByC.ByXTagName("Velella"));
         byXTagName.findElement(driver);
-        verify((FindsByXPath)driver).findElementByXPath(".//Velella");
+        verify(driver).findElement(By.xpath(".//Velella"));
     }
 
     @Test
     public void testFindElementsByXTagName() {
         ByC.ByXTagName byXTagName = spy(new ByC.ByXTagName("Turritopsis"));
         byXTagName.findElements(driver);
-        verify((FindsByXPath)driver).findElementsByXPath(".//Turritopsis");
+        verify(driver).findElements(By.xpath(".//Turritopsis"));
     }
 
 }

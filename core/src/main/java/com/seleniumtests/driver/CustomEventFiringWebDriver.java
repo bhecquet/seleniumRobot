@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -51,6 +52,7 @@ import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Alert;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.HasCapabilities;
@@ -59,24 +61,28 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.NoSuchWindowException;
+import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.interactions.Interactive;
+import org.openqa.selenium.interactions.Sequence;
 import org.openqa.selenium.remote.FileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.UselessFileDetector;
 import org.openqa.selenium.safari.SafariDriver;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.openqa.selenium.support.events.EventFiringDecorator;
+import org.openqa.selenium.support.events.WebDriverListener;
 
 import com.neotys.selenium.proxies.NLWebDriver;
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.core.StatisticsStorage;
 import com.seleniumtests.core.StatisticsStorage.DriverUsage;
-import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.customexception.WebSessionEndedException;
 import com.seleniumtests.util.helper.WaitHelper;
@@ -97,7 +103,7 @@ import net.lightbody.bmp.BrowserMobProxy;
  * When action do not need a real driver, static methods are provided
  * It also handles the grid mode, masking it to requester.
  */
-public class CustomEventFiringWebDriver extends EventFiringWebDriver implements HasCapabilities {
+public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, JavascriptExecutor, TakesScreenshot, Interactive {
 	
 	private static final String OTHER_BROWSER = "other";
 	private static final String SAFARI_BROWSER = "safari";
@@ -106,7 +112,8 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     private static final int MAX_DIMENSION = 100000;
     private Set<String> currentHandles;
     private final List<Long> driverPids;
-	private final WebDriver driver;
+	private WebDriver driver;
+	private final WebDriver originalDriver;
 	private final NLWebDriver neoloadDriver;
 	private final boolean isWebTest;
 	private final DriverMode driverMode;
@@ -580,12 +587,18 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     }
 
     public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, Boolean isWebTest, DriverMode localDriver, BrowserMobProxy mobProxy, SeleniumGridConnector gridConnector) {
-    	this(driver, driverPids, browserInfo, isWebTest, localDriver, mobProxy, gridConnector, null);
+    	this(driver, driverPids, browserInfo, isWebTest, localDriver, mobProxy, gridConnector, null, new ArrayList<>());
     }
-	public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, Boolean isWebTest, DriverMode localDriver, BrowserMobProxy mobProxy, SeleniumGridConnector gridConnector, Integer attachExistingDriverPort) {
-        super(driver);
+	public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, Boolean isWebTest, DriverMode localDriver, BrowserMobProxy mobProxy, SeleniumGridConnector gridConnector, Integer attachExistingDriverPort, List<WebDriverListener> wdListeners) {
+
+		this.originalDriver = driver; // store the original driver in case decorated one cannot be used (getSessionId)
+		this.driver = new EventFiringDecorator(new DriverExceptionListener()).decorate(driver);
+
+        for (WebDriverListener wdListener: wdListeners) {
+        	this.driver = new EventFiringDecorator(wdListener).decorate(this.driver);
+        }
+		
         this.driverPids = driverPids == null ? new ArrayList<>(): driverPids;
-		this.driver = driver;
 		this.browserInfo = browserInfo;
 		this.isWebTest = isWebTest;
 		this.driverMode = localDriver;
@@ -636,11 +649,11 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     	// issue #169: workaround for ios / IE tests where getWindowHandles sometimes fails with: class org.openqa.selenium.WebDriverException: Returned value cannot be converted to List<String>: true
     	for (int i = 0; i < 10; i++) {
 			try  {
-				return super.getWindowHandles();
+				return driver.getWindowHandles();
 			} catch (UnhandledAlertException e) {
 	    		logger.info("getWindowHandles: Handling alert");
 	    		handleAlert();
-	    		return super.getWindowHandles();
+	    		return driver.getWindowHandles();
 			} catch (WebSessionEndedException e) {
 				logger.warn("session already terminated");
 				return new TreeSet<>();
@@ -649,7 +662,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 				WaitHelper.waitForSeconds(2);
 			}
 		}
-    	return super.getWindowHandles();
+    	return driver.getWindowHandles();
     	
     }
     
@@ -670,33 +683,33 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     	}
     	
     	try {
-    		return super.getWindowHandle();
+    		return driver.getWindowHandle();
     	} catch (UnhandledAlertException e) {
     		logger.info("getWindowHandle: Handling alert");
     		handleAlert();
-    		return super.getWindowHandle();
+    		return driver.getWindowHandle();
     	}
     }
     
     @Override
     public void close() {
     	try {
-    		super.close();
+    		driver.close();
     	} catch (UnhandledAlertException e) {
     		logger.info("close: Handling alert");
     		handleAlert();
-    		super.close();
+    		driver.close();
     	}
     }
     
     @Override
     public String getCurrentUrl() {
     	try {
-	    	return super.getCurrentUrl();
+	    	return driver.getCurrentUrl();
 	    } catch (UnhandledAlertException e) {
     		logger.info("getCurrentUrl: Handling alert");
 			handleAlert();
-			return super.getCurrentUrl();
+			return driver.getCurrentUrl();
 		} catch (NoSuchWindowException e) {
 			return "";
 		}
@@ -705,11 +718,11 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     @Override
     public String getTitle() {
     	try {
-    		return super.getTitle();
+    		return driver.getTitle();
     	} catch (UnhandledAlertException e) {
     		logger.info("getTitle: Handling alert");
 			handleAlert();
-			return super.getTitle();
+			return driver.getTitle();
     	} catch (NoSuchWindowException e) {
 			return "";
     	}
@@ -746,7 +759,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     
     public String getSessionId() {
     	try {
-    		return ((RemoteWebDriver)driver).getSessionId().toString();
+    		return ((RemoteWebDriver)originalDriver).getSessionId().toString();
     	} catch (ClassCastException e) {
     		return UUID.randomUUID().toString();
     	} catch (NullPointerException e) {
@@ -760,11 +773,11 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     @Override
     public String getPageSource() {
     	try {
-    		return super.getPageSource();
+    		return driver.getPageSource();
     	} catch (UnhandledAlertException e) {
     		logger.info("getPageSource: Handling alert");
 			handleAlert();
-			return super.getPageSource();
+			return driver.getPageSource();
     	} catch (WebDriverException e) {
     		logger.info("page source not get: " + e.getMessage());
     		return null;
@@ -782,12 +795,12 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     	if (isWebTest) {
     		try {
     			
-	    		Number width = (Number)((JavascriptExecutor)driver).executeScript(JS_GET_VIEWPORT_SIZE_WIDTH);
+	    		Number width = (Number)executeScript(JS_GET_VIEWPORT_SIZE_WIDTH);
 	    		
 	    		// issue #238: check we get a non max size
 	    		if (width.intValue() == MAX_DIMENSION) {
 	    			driver.switchTo().defaultContent();
-	    			width = (Number)((JavascriptExecutor)driver).executeScript(JS_GET_VIEWPORT_SIZE_WIDTH);
+	    			width = (Number)executeScript(JS_GET_VIEWPORT_SIZE_WIDTH);
 	    		}
 	    		return width.intValue();
 	    		
@@ -803,12 +816,12 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 		if (isWebTest) {
 			try {
 				
-				Number height = (Number)((JavascriptExecutor)driver).executeScript(JS_GET_VIEWPORT_SIZE_HEIGHT);
+				Number height = (Number)executeScript(JS_GET_VIEWPORT_SIZE_HEIGHT);
 				
 				// issue #238: check we get a non max size
 				if (height.intValue() == MAX_DIMENSION) {
 					driver.switchTo().defaultContent();
-					height = (Number)((JavascriptExecutor)driver).executeScript(JS_GET_VIEWPORT_SIZE_HEIGHT);
+					height = (Number)executeScript(JS_GET_VIEWPORT_SIZE_HEIGHT);
 				}
 				return height.intValue();
 				
@@ -847,12 +860,12 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     public Dimension getContentDimension() {
     	if (isWebTest) {
     		try {
-				List<Number> dims = (List<Number>)((JavascriptExecutor)driver).executeScript(JS_GET_CONTENT_ENTIRE_SIZE);
+				List<Number> dims = (List<Number>)executeScript(JS_GET_CONTENT_ENTIRE_SIZE);
 		    	
 		    	// issue #238: check we get a non zero size
 		    	if (dims.get(0).intValue() == 0 || dims.get(1).intValue() == 0) {
 		    		driver.switchTo().defaultContent();
-		    		dims = (List<Number>)((JavascriptExecutor)driver).executeScript(JS_GET_CONTENT_ENTIRE_SIZE);
+		    		dims = (List<Number>)executeScript(JS_GET_CONTENT_ENTIRE_SIZE);
 		    	}
 		    	
 		    	return new Dimension(dims.get(0).intValue(), dims.get(1).intValue());
@@ -1501,28 +1514,6 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	 * 
 	 * @deprecated: should be removed (kept here for compatibility with old robots)
 	 */
-	@Deprecated
-	@Override
-	public Object executeScript(String script, Object... args) {
-		
-		// to we know this command ?
-		if (driverMode == DriverMode.LOCAL && NON_JS_UPLOAD_FILE_THROUGH_POPUP.equals(script)) {
-			if (args.length != 2) {
-				throw new DriverExceptions("Upload feature through executeScript needs 2 string arguments (file name, base64 content)");
-			}
-			try {
-				uploadFile((String)args[0], (String)args[1], driverMode, gridConnector);
-				return null; 
-			} catch (IOException e) {
-				return null;
-			}
-			
-		} else if (driverMode == DriverMode.LOCAL && NON_JS_CAPTURE_DESKTOP.equals(script)) {
-			return captureDesktopToBase64String(driverMode, gridConnector);
-		} else {
-			return super.executeScript(script, args);
-		}
-	}
 	
 	public static void displayStepOnScreen(String textToWrite, DriverMode driverMode, SeleniumGridConnector gridConnector, VideoRecorder recorder) {
 		if (driverMode == DriverMode.LOCAL) {
@@ -1564,5 +1555,67 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 
 	public MutableCapabilities getInternalCapabilities() {
 		return internalCapabilities;
+	}
+
+	@Override
+	public void get(String url) {
+		driver.get(url);
+	}
+
+	@Override
+	public List<WebElement> findElements(By by) {
+		return driver.findElements(by);
+	}
+
+	@Override
+	public WebElement findElement(By by) {
+		return driver.findElement(by);
+	}
+
+	@Override
+	public TargetLocator switchTo() {
+		return driver.switchTo();
+	}
+
+	@Override
+	public Navigation navigate() {
+		return driver.navigate();
+	}
+
+	@Override
+	public Options manage() {
+		return driver.manage();
+	}
+
+	@Override
+	public <X> X getScreenshotAs(OutputType<X> target) throws WebDriverException {
+		try {
+			return ((TakesScreenshot)driver).getScreenshotAs(target);
+		} catch (ClassCastException e) {
+			// HTMLUNIT does not support taking screenshots, so casting is impossible
+			return null;
+		}
+	}
+
+	@Override
+	public Object executeScript(String script, Object... args) {
+		return ((JavascriptExecutor)driver).executeScript(script, args);
+	}
+
+	@Override
+	public Object executeAsyncScript(String script, Object... args) {
+		return ((JavascriptExecutor)driver).executeAsyncScript(script, args);
+	}
+
+	@Override
+	public void perform(Collection<Sequence> actions) {
+		((Interactive)driver).perform(actions);
+		
+	}
+
+	@Override
+	public void resetInputState() {
+		((Interactive)driver).resetInputState();
+		
 	}
 }

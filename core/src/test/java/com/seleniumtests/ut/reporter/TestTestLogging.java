@@ -19,6 +19,7 @@ package com.seleniumtests.ut.reporter;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -105,7 +106,7 @@ public class TestTestLogging extends GenericTest {
 			
 			ScreenShot screenshot = new ScreenShot();
 			String htmlSourcePath = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.HTML_DIR, "capture.html").toString();
-			FileUtils.write(new File(htmlSourcePath), "<html>");
+			FileUtils.write(new File(htmlSourcePath), "<html>", StandardCharsets.UTF_8);
 			screenshot.setHtmlSourcePath(String.format("../%s/%s/%s.html", "testRelocateScreenshotHtmlOnly", ScreenshotUtil.HTML_DIR, "capture")); // copied from ScreeshotUtils class
 			
 			logger.logScreenshot(screenshot);
@@ -138,7 +139,7 @@ public class TestTestLogging extends GenericTest {
 			
 			ScreenShot screenshot = new ScreenShot();
 			String imgSourcePath = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR, "capture.png").toString();
-			FileUtils.write(new File(imgSourcePath), "<img>");
+			FileUtils.write(new File(imgSourcePath), "<img>", StandardCharsets.UTF_8);
 			screenshot.setImagePath(String.format("%s/%s.png", ScreenshotUtil.SCREENSHOT_DIR, "capture")); // copied from ScreeshotUtils class
 			
 			logger.logScreenshot(screenshot);
@@ -167,7 +168,7 @@ public class TestTestLogging extends GenericTest {
 			
 			ScreenShot screenshot = new ScreenShot();
 			String imgSourcePath = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR, "capture.png").toString();
-			FileUtils.write(new File(imgSourcePath), "<img>");
+			FileUtils.write(new File(imgSourcePath), "<img>", StandardCharsets.UTF_8);
 			screenshot.setImagePath(String.format("%s/%s.png", ScreenshotUtil.SCREENSHOT_DIR, "capture")); // copied from ScreeshotUtils class
 			
 			logger.logScreenshot(screenshot);

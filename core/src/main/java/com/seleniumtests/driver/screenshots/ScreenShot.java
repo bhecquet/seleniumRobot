@@ -20,6 +20,7 @@ package com.seleniumtests.driver.screenshots;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FileExistsException;
@@ -120,7 +121,7 @@ public class ScreenShot {
     public String getHtmlSource() {
     	if (htmlSourcePath != null) {
     		try {
-				return FileUtils.readFileToString(new File(getFullHtmlPath()));
+				return FileUtils.readFileToString(new File(getFullHtmlPath()), StandardCharsets.UTF_8);
 			} catch (IOException e) {
 				logger.error("cannot read source file", e);
 				return "";

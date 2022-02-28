@@ -17,9 +17,9 @@
  */
 package com.seleniumtests.it.driver.support.pages;
 
+import java.time.Duration;
 import java.util.List;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindAll;
 import org.openqa.selenium.support.FindBy;
@@ -32,7 +32,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.uipage.PageObject;
-import com.seleniumtests.uipage.htmlelements.TextFieldElement;
 
 public class DriverTestPageObjectFatory extends PageObject {
 	
@@ -124,15 +123,15 @@ public class DriverTestPageObjectFatory extends PageObject {
     }
     
     public void switchToFrameWithExpectedConditionsById() {
-    	new WebDriverWait(driver, 5).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(frame1));
+    	new WebDriverWait(driver, Duration.ofSeconds(5)).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(frame1));
     }
     
     public void switchToFrameWithExpectedConditionsByName() {
-    	new WebDriverWait(driver, 5).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("myIFrame"));
+    	new WebDriverWait(driver, Duration.ofSeconds(5)).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("myIFrame"));
     }
     
     public void switchToFrameWithExpectedConditionsByIndex() {
-    	new WebDriverWait(driver, 5).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(0));
+    	new WebDriverWait(driver, Duration.ofSeconds(5)).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(0));
     }
     
     public void switchToFirstFrameByNameOrId() {

@@ -1,10 +1,7 @@
 package com.seleniumtests.reporter.info;
 
-import com.seleniumtests.browserfactory.ICapabilitiesFactory;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.util.StringUtility;
-import com.seleniumtests.util.logging.SeleniumRobotLogger;
-import org.apache.log4j.Logger;
 
 public class HyperlinkInfo extends Info {
 

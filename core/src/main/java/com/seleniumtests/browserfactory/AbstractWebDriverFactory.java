@@ -17,7 +17,7 @@
  */
 package com.seleniumtests.browserfactory;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.MutableCapabilities;
@@ -77,7 +77,7 @@ public abstract class AbstractWebDriverFactory {
 
     protected void setPageLoadTimeout(final long timeout) {
         try {
-            driver.manage().timeouts().pageLoadTimeout(timeout, TimeUnit.SECONDS);
+            driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(timeout));
         } catch (WebDriverException e) {
             // chromedriver does not support pageLoadTimeout
         }
@@ -98,7 +98,7 @@ public abstract class AbstractWebDriverFactory {
 
     public void setImplicitWaitTimeout(final double timeout) {
         try {
-            driver.manage().timeouts().implicitlyWait((int)timeout, TimeUnit.SECONDS);
+            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds((int)timeout));
         } catch (Exception ex) {
         	logger.error(ex);
         }
