@@ -114,7 +114,7 @@ In this case, this user passed value will overwrite test or suite parameters
 | seleniumRobotServerToken	|			| Token to use when connecting to seleniumRobot server API (by default with server >= 2.0) |
 | outputDirectory 			| <exec folder>	| folder where HTML report will be written. By default, it's 'test-output' subfolder. If you want to write test in an other directory, use `test-output/myResult` to write them relative to SeleniumRobot root. An absolute path may also be specified. This will allow to execute several tests in parallel without overwritting existing results. If you want to set the current date and time in output directory folder name, see §7.18 | 
 
-
+**In case eof Linux Chromium**: set chromeBinaryPath to '/snap/chromium/current/usr/lib/chromium-brower/chrome'
 
 #### Proxy settings ####
 
@@ -167,7 +167,7 @@ Settings for customizing the default seleniumRobot driver features. By default, 
 | firefoxBinaryPath 		| 			| Path to firefox binary if a specific one should be used (for example when using portable versions. Else, the default firefox installation is choosen | 
 | geckoDriverPath 			| 			| Path to a different installation of geckodriver executable | 
 | chromeDriverPath 			| 			| Path to a different installation of chromedriver executable | 
-| chromeBinaryPath 			| 			| Path to chrome binary if using a portable installation (not detected by system | 
+| chromeBinaryPath 			| 			| Path to chrome binary if using a portable installation (not detected by system). In case of Linux box, with chrome installed with snap package, set the path to '/snap/chromium/current/usr/lib/chromium-brower/chrome' | 
 | ieDriverPath 				| 			| Path to a different ieDriverServer executable | 
 | edgeDriverPath			| 			| Path to a different edge driver executable |
 | userAgent 				| 			| Allow defining a specific user-agent in chrome and firefox only | 
