@@ -1,42 +1,42 @@
 <differences>
 
 
-	
 	<difference>
-		<className>**/uipage/htmlelements/GenericPictureElement</className>
-		<differenceType>7009</differenceType>
-		<method>GenericPictureElement()</method>
-		<justification>abstract class</justification>
+		<className>**/connectors/extools/Uft</className>
+		<differenceType>7005</differenceType>
+		<method>com.seleniumtests.reporter.logger.TestStep executeScript(int, boolean)</method>
+		<justification>splitting</justification>
+		<to>com.seleniumtests.reporter.logger.TestStep executeScript(int, java.util.Map)</to>
 	</difference>
 	<difference>
-		<className>**/uipage/htmlelements/GenericPictureElement</className>
-		<differenceType>7009</differenceType>
-		<method>GenericPictureElement(java.lang.String, java.io.File, double, boolean)</method>
-		<justification>abstract class</justification>
+		<className>**/connectors/extools/Uft</className>
+		<differenceType>7002</differenceType>
+		<method>com.seleniumtests.reporter.logger.TestStep executeScript()</method>
+		<justification>useless</justification>
 	</difference>
 	<difference>
-		<className>**/uipage/htmlelements/select/AngularSelect</className>
-		<differenceType>7009</differenceType>
-		<method>AngularSelect(org.openqa.selenium.WebElement, com.seleniumtests.uipage.htmlelements.FrameElement)</method>
-		<justification>abstract class</justification>
-	</difference>
-	<difference>
-		<className>**/uipage/htmlelements/select/AngularSelect</className>
-		<differenceType>7009</differenceType>
-		<method>AngularSelect(org.openqa.selenium.WebElement, com.seleniumtests.uipage.htmlelements.FrameElement, boolean)</method>
-		<justification>abstract class</justification>
-	</difference>
-	<difference>
-		<className>**/uipage/htmlelements/select/CommonSelectList</className>
-		<differenceType>7009</differenceType>
-		<method>CommonSelectList(org.openqa.selenium.WebElement, com.seleniumtests.uipage.htmlelements.FrameElement)</method>
-		<justification>abstract class</justification>
+		<className>**/connectors/extools/Uft</className>
+		<differenceType>7002</differenceType>
+		<method>com.seleniumtests.reporter.logger.TestStep executeScript(int)</method>
+		<justification>useless</justification>
 	</difference>
 	<difference>
 		<className>**/connectors/extools/Uft</className>
 		<differenceType>7004</differenceType>
-		<method>Uft(java.lang.String, java.lang.String, java.util.Map)</method>
-		<justification>not used before</justification>
+		<method>java.util.List prepareArguments()</method>
+		<justification>useless</justification>
+	</difference>
+	<difference>
+		<className>**/connectors/extools/Uft</className>
+		<differenceType>7004</differenceType>
+		<method>Uft(java.lang.String, java.util.Map)</method>
+		<justification>useless</justification>
+	</difference>
+	<difference>
+		<className>**/connectors/extools/Uft</className>
+		<differenceType>7004</differenceType>
+		<method>Uft(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.Map)</method>
+		<justification>useless</justification>
 	</difference>
 
 </differences>
