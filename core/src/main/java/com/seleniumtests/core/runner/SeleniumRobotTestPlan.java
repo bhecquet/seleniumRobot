@@ -256,30 +256,7 @@ public class SeleniumRobotTestPlan {
     public String executeCommand(String program, String ... args) {
     	return TestTasks.executeCommand(program, args);
     }
-    
-    /**
-     * 
-	 * @param scriptPath	path to the local script
-	 * @param parameters	parameters to pass to the script
-	 */
-    public void executeUftScript(String scriptPath, Map<String, String> args, int timeout) {
-    	executeUftScript(null, null, null, null, null, scriptPath, args, timeout);
-    } 
-    
-    /**
-     * Execute a UFT script locally or remotely via a VBS script called through csscript.exe
-     * @param almServer		ALM server address
-     * @param almUser		
-     * @param almPassword
-     * @param almDomain
-     * @param almProject
-     * @param scriptPath	path to ALM script. e.g: '[QualityCenter]Subject\TOOLS\TestsFoo\foo'
-     * @param args			parameters to give to UFT script
-     * @param timeout		timeout in seconds. Max time the script will run
-     */
-    public void executeUftScript(String almServer, String almUser, String almPassword, String almDomain, String almProject, String scriptPath, Map<String, String> args, int timeout) {
-    	executeUftScript(almServer, almUser, almPassword, almDomain, almProject, scriptPath, args, timeout, true);
-    }
+
     /**
      * Execute a UFT script locally or remotely via a VBS script called through csscript.exe
      * @param almServer		ALM server address
@@ -292,18 +269,35 @@ public class SeleniumRobotTestPlan {
      * @param timeout		timeout in seconds. Max time the script will run
      * @param killUftOnStartup	if true, UFT will be killed before starting the UFT test
      */
-    public void executeUftScript(String almServer, String almUser, String almPassword, String almDomain, String almProject, String scriptPath, Map<String, String> args, int timeout, boolean killUftOnStartup) {
+    public void executeUftScript(Uft uft, int timeout, Map<String, String> args) {
     	TestTasks.terminateCurrentStep();
     	
-		Uft uft = new Uft(almServer, almUser, almPassword, almDomain, almProject, scriptPath, args);
-		TestStep uftStep = uft.executeScript(timeout, killUftOnStartup);
+		TestStep uftStep = uft.executeScript(timeout, args);
 		TestStepManager.setCurrentRootTestStep(uftStep);
 		TestStepManager.logTestStep(TestStepManager.getCurrentRootTestStep());
 		
 		if (Boolean.TRUE.equals(uftStep.getFailed())) {
-			throw new ScenarioException(String.format("UFT execution failed on script %s", scriptPath));
+			throw new ScenarioException(String.format("UFT execution failed on script %s", uft.getScriptPath()));
 			
 		}
+    }
+    /**
+     * Load a UFT script locally or remotely via a VBS script called through csscript.exe
+     * @param almServer		ALM server address
+     * @param almUser		
+     * @param almPassword
+     * @param almDomain
+     * @param almProject
+     * @param args			parameters to give to UFT script
+     * @param scriptPath	path to ALM script. e.g: '[QualityCenter]Subject\TOOLS\TestsFoo\foo'
+     * @param killUftOnStartup	if true, UFT will be killed before starting the UFT test
+     */
+    public Uft loadUftScript(String almServer, String almUser, String almPassword, String almDomain, String almProject, String scriptPath, boolean killUftOnStartup) {
+
+    	Uft uft = new Uft(almServer, almUser, almPassword, almDomain, almProject, scriptPath);
+    	uft.loadScript(killUftOnStartup);
+    	
+    	return uft;
     }
     
     /**

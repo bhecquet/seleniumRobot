@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +24,7 @@ import org.xml.sax.InputSource;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.reporter.logger.TestAction;
@@ -53,23 +55,22 @@ public class Uft {
 	private String scriptPath;
 	private String scriptName;
 	private boolean killUftOnStartup = true;
-	Map<String, String> parameters;
+	private boolean loaded = false;
+	Map<String, String> parameters = new HashMap<>();;
 	
 	/**
 	 * @param vbsPath		path to the vbs file (locally, or on the remote machine)
 	 * @param scriptPath	path to the script, either local or from ALM. If test is from ALM, prefix it with '[QualityCenter]'. e.g: '[QualityCenter]Subject\TOOLS\TestsFoo\foo'
 	 * @param parameters	parameters to pass to the script
 	 */
-	public Uft(String scriptPath, Map<String, String> parameters) {
+	public Uft(String scriptPath) {
 		this.scriptPath = scriptPath;
 		this.scriptName = new File(scriptPath).getName();
-		this.parameters = parameters;
 	}
 	
-	public Uft(String almServer, String almUser, String almPassword, String almDomain, String almProject, String scriptPath, Map<String, String> parameters) {
+	public Uft(String almServer, String almUser, String almPassword, String almDomain, String almProject, String scriptPath) {
 		this.scriptPath = scriptPath;
 		this.scriptName = new File(scriptPath).getName();
-		this.parameters = parameters;
 		this.almServer = almServer;
 		this.almUser = almUser;
 		this.almPassword = almPassword;
@@ -77,12 +78,24 @@ public class Uft {
 		this.almProject = almProject;
 	}
 	
-	/**
-	 * Executes an UFT script with 2 mins of timeout
-	 * @return	the generated test step
-	 */
-	public TestStep executeScript() {
-		return executeScript(120);
+	public String getScriptPath() {
+		return scriptPath;
+	}
+
+	public Map<String, String> getParameters() {
+		return parameters;
+	}
+
+	public void setParameters(Map<String, String> parameters) {
+		this.parameters = parameters;
+	}
+
+	public void loadScript(boolean killUftOnStartup) {
+
+		this.killUftOnStartup = killUftOnStartup;
+		List<String> args = prepareArguments(true, false);
+		TestTasks.executeCommand("cscript.exe", 60, null, args.toArray(new String[] {}));
+		loaded = true;
 	}
 	
 	/**
@@ -90,22 +103,32 @@ public class Uft {
 	 * @param timeout 	timeout in seconds for UFT execution
 	 * @return	the generated test step
 	 */
-	public TestStep executeScript(int timeout) {
-		return executeScript(timeout, true);
-	}
-	public TestStep executeScript(int timeout, boolean killUftOnStartup) {
+	public TestStep executeScript(int timeout, Map<String, String> parameters) {
 		
-		this.killUftOnStartup = killUftOnStartup;
+		if (!loaded) {
+			throw new IllegalStateException("Test script has not been loaded. Call 'loadScript' before");
+		}
+		this.parameters = parameters;
+
 		TestStep testStep = new TestStep(String.format("UFT: %s", scriptName), Reporter.getCurrentTestResult(), new ArrayList<>(), false);
 		
 		Date startDate = new Date();
-		String output = TestTasks.executeCommand("cscript.exe", timeout, null, prepareArguments().toArray(new String[] {}));
+		String output = TestTasks.executeCommand("cscript.exe", timeout, null, prepareArguments(false, true).toArray(new String[] {}));
 		
 		testStep.setDuration(new Date().getTime() - startDate.getTime());
+		
+		// when execution ends, UFT is stopped
+		loaded = false; 
 		return analyseOutput(output, testStep);
 	}
 	
-	public List<String> prepareArguments() {
+	/**
+	 * Prepare list of arguments 
+	 * @param load		if true, add '/load'
+	 * @param execute	if true, add '/execute'
+	 * @return
+	 */
+	public List<String> prepareArguments(boolean load, boolean execute) {
 		// copy uft.vbs to disk
 		String vbsPath;
 		try {
@@ -129,20 +152,26 @@ public class Uft {
 		List<String> args = new ArrayList<>();
 		args.add(vbsPath);
 		args.add(scriptPath);
-		parameters.forEach((key, value) -> args.add(String.format("\"%s=%s\"", key, value)));
 		
-		if (almServer != null && almUser != null && almPassword != null && almDomain != null && almProject != null) {
-			args.add("/server:" + almServer);
-			args.add("/user:" + almUser);
-			args.add("/password:" + almPassword);
-			args.add("/domain:" + almDomain);
-			args.add("/project:" + almProject);
+		if (execute) {
+			parameters.forEach((key, value) -> args.add(String.format("\"%s=%s\"", key, value)));
 		}
 		
-		if (killUftOnStartup) {
-			args.add("/clean");
+		if (load) {
+			if (almServer != null && almUser != null && almPassword != null && almDomain != null && almProject != null) {
+				args.add("/server:" + almServer);
+				args.add("/user:" + almUser);
+				args.add("/password:" + almPassword);
+				args.add("/domain:" + almDomain);
+				args.add("/project:" + almProject);
+			} else if (almServer != null || almUser != null || almPassword != null || almDomain != null || almProject != null) {
+				throw new ConfigurationException("All valuers pour ALM connection must be provided: server, user, password, domain and project");
+			}
+			
+			if (killUftOnStartup) {
+				args.add("/clean");
+			}
 		}
-		
 		return args;
 	}
 	
