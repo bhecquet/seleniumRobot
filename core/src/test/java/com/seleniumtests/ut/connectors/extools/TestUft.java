@@ -6,9 +6,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -32,6 +30,7 @@ import com.seleniumtests.connectors.extools.Uft;
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.reporter.logger.TestMessage;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
@@ -57,7 +56,7 @@ public class TestUft extends MockitoTest {
 	@Test(groups = { "ut" })
 	public void testReadReport() throws IOException {
 		String report = GenericTest.readResourceToString("tu/uftReport.xml");
-		Uft uft = new Uft("[QualityCenter]Subject\\Tools\\Tests\\test1", new HashMap<>());
+		Uft uft = new Uft("[QualityCenter]Subject\\Tools\\Tests\\test1");
 		TestStep testStep = new TestStep("UFT: test1", Reporter.getCurrentTestResult(), new ArrayList<String>(), false);
 
 		uft.readXmlResult(report, testStep);
@@ -87,7 +86,7 @@ public class TestUft extends MockitoTest {
 	@Test(groups = { "ut" })
 	public void testReadBadReport() throws IOException {
 		String report = GenericTest.readResourceToString("tu/wrongUftReport.xml");
-		Uft uft = new Uft("[QualityCenter]Subject\\Tools\\Tests\\test1", new HashMap<>());
+		Uft uft = new Uft("[QualityCenter]Subject\\Tools\\Tests\\test1");
 
 		TestStep testStep = new TestStep("UFT: test1", Reporter.getCurrentTestResult(), new ArrayList<String>(), false);
 
@@ -104,7 +103,7 @@ public class TestUft extends MockitoTest {
 	@Test(groups = { "ut" })
 	public void testReadNoReport() throws IOException {
 		String report = "some bad report";
-		Uft uft = new Uft("[QualityCenter]Subject\\Tools\\Tests\\test1", new HashMap<>());
+		Uft uft = new Uft("[QualityCenter]Subject\\Tools\\Tests\\test1");
 		
 		TestStep testStep = new TestStep("UFT: test1", Reporter.getCurrentTestResult(), new ArrayList<String>(), false);
 		
@@ -118,9 +117,9 @@ public class TestUft extends MockitoTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testPrepareArgumentsWithLocalTest() {
-		Uft uft = new Uft("D:\\Subject\\Tools\\Tests\\test1", new HashMap<>());
+		Uft uft = new Uft("D:\\Subject\\Tools\\Tests\\test1");
 		uft.setKillUftOnStartup(false);
-		List<String> args = uft.prepareArguments();
+		List<String> args = uft.prepareArguments(true, true);
 
 		Assert.assertEquals(args.size(), 2);
 		Assert.assertTrue(args.get(0).startsWith(System.getProperty("java.io.tmpdir")));
@@ -134,9 +133,9 @@ public class TestUft extends MockitoTest {
 	@Test(groups = { "ut" })
 	public void testPrepareArgumentsWithAlmTest() {
 		Uft uft = new Uft("http://almserver/qcbin", "usr", "pwd", "dom", "proj",
-				"[QualityCenter]Subject\\Tools\\Tests\\test1", new HashMap<>());
+				"[QualityCenter]Subject\\Tools\\Tests\\test1");
 		uft.setKillUftOnStartup(false);
-		List<String> args = uft.prepareArguments();
+		List<String> args = uft.prepareArguments(true, true);
 
 		Assert.assertEquals(args.size(), 7);
 		Assert.assertTrue(args.get(0).startsWith(System.getProperty("java.io.tmpdir")));
@@ -148,14 +147,105 @@ public class TestUft extends MockitoTest {
 		Assert.assertTrue(args.get(5).equals("/domain:dom"));
 		Assert.assertTrue(args.get(6).equals("/project:proj"));
 	}
+	
+	/**
+	 * Check we add ALM parameters if they are set on loading
+	 */
+	@Test(groups = { "ut" })
+	public void testPrepareLoadArgumentsWithAlmTest() {
+		Uft uft = new Uft("http://almserver/qcbin", "usr", "pwd", "dom", "proj",
+				"[QualityCenter]Subject\\Tools\\Tests\\test1");
+		uft.setKillUftOnStartup(false);
+		List<String> args = uft.prepareArguments(true, false);
+		
+		Assert.assertEquals(args.size(), 7);
+		Assert.assertTrue(args.get(0).startsWith(System.getProperty("java.io.tmpdir")));
+		Assert.assertTrue(args.get(0).endsWith("uft.vbs"));
+		Assert.assertTrue(args.get(1).equals("[QualityCenter]Subject\\Tools\\Tests\\test1"));
+		Assert.assertTrue(args.get(2).equals("/server:http://almserver/qcbin"));
+		Assert.assertTrue(args.get(3).equals("/user:usr"));
+		Assert.assertTrue(args.get(4).equals("/password:pwd"));
+		Assert.assertTrue(args.get(5).equals("/domain:dom"));
+		Assert.assertTrue(args.get(6).equals("/project:proj"));
+	}
+	
+	/**
+	 * If some ALM values are missing, throw a configuration exception
+	 */
+	@Test(groups = { "ut" }, expectedExceptions = ConfigurationException.class)
+	public void testPrepareLoadArgumentsWithAlmTestMissingServerValues() {
+		Uft uft = new Uft(null, "usr", "pwd", "dom", "proj",
+				"[QualityCenter]Subject\\Tools\\Tests\\test1");
+		uft.setKillUftOnStartup(false);
+		uft.prepareArguments(true, false);
+	}
+	@Test(groups = { "ut" }, expectedExceptions = ConfigurationException.class)
+	public void testPrepareLoadArgumentsWithAlmTestMissingUserValues() {
+		Uft uft = new Uft("http://almserver/qcbin", null, "pwd", "dom", "proj",
+				"[QualityCenter]Subject\\Tools\\Tests\\test1");
+		uft.setKillUftOnStartup(false);
+		uft.prepareArguments(true, false);
+	}
+	@Test(groups = { "ut" }, expectedExceptions = ConfigurationException.class)
+	public void testPrepareLoadArgumentsWithAlmTestMissingPasswordValues() {
+		Uft uft = new Uft("http://almserver/qcbin", "usr", null, "dom", "proj",
+				"[QualityCenter]Subject\\Tools\\Tests\\test1");
+		uft.setKillUftOnStartup(false);
+		uft.prepareArguments(true, false);
+	}
+	@Test(groups = { "ut" }, expectedExceptions = ConfigurationException.class)
+	public void testPrepareLoadArgumentsWithAlmTestMissingDomainValues() {
+		Uft uft = new Uft("http://almserver/qcbin", "usr", "pwd", null, "proj",
+				"[QualityCenter]Subject\\Tools\\Tests\\test1");
+		uft.setKillUftOnStartup(false);
+		uft.prepareArguments(true, false);
+	}
+	@Test(groups = { "ut" }, expectedExceptions = ConfigurationException.class)
+	public void testPrepareLoadArgumentsWithAlmTestMissingProjectValues() {
+		Uft uft = new Uft("http://almserver/qcbin", "usr", "pwd", "dom", null,
+				"[QualityCenter]Subject\\Tools\\Tests\\test1");
+		uft.setKillUftOnStartup(false);
+		uft.prepareArguments(true, false);
+	}
+	
+	@Test(groups = { "ut" })
+	public void testPrepareLoadArgumentsWithKillOnStartup() {
+		Uft uft = new Uft("D:\\Subject\\Tools\\Tests\\test1");
+		uft.setKillUftOnStartup(true);
+		List<String> args = uft.prepareArguments(true, false);
+
+		Assert.assertEquals(args.size(), 3);
+		Assert.assertTrue(args.get(0).startsWith(System.getProperty("java.io.tmpdir")));
+		Assert.assertTrue(args.get(0).endsWith("uft.vbs"));
+		Assert.assertTrue(args.get(1).equals("D:\\Subject\\Tools\\Tests\\test1"));
+		Assert.assertTrue(args.get(2).equals("/clean"));
+	}
+	
+	/**
+	 * Check we do not add ALM parameters if they are set on execution
+	 */
+	@Test(groups = { "ut" })
+	public void testPrepareExecutionArgumentsWithAlmTest() {
+		Uft uft = new Uft("http://almserver/qcbin", "usr", "pwd", "dom", "proj",
+				"[QualityCenter]Subject\\Tools\\Tests\\test1");
+		uft.setKillUftOnStartup(false);
+		List<String> args = uft.prepareArguments(true, false);
+		
+		Assert.assertEquals(args.size(), 7);
+		Assert.assertTrue(args.get(0).startsWith(System.getProperty("java.io.tmpdir")));
+		Assert.assertTrue(args.get(0).endsWith("uft.vbs"));
+		Assert.assertTrue(args.get(1).equals("[QualityCenter]Subject\\Tools\\Tests\\test1"));
+	}
 
 	@Test(groups = { "ut" })
 	public void testPrepareArgumentsWithAlmTestAndParam() {
 		Map<String, String> params = new HashMap<>();
 		params.put("User", "toto");
 		Uft uft = new Uft("http://almserver/qcbin", "usr", "pwd", "dom", "proj",
-				"[QualityCenter]Subject\\Tools\\Tests\\test1", params);
-		List<String> args = uft.prepareArguments();
+				"[QualityCenter]Subject\\Tools\\Tests\\test1");
+		
+		uft.setParameters(params);
+		List<String> args = uft.prepareArguments(true, true);
 
 		Assert.assertEquals(args.size(), 9);
 		Assert.assertTrue(args.get(0).startsWith(System.getProperty("java.io.tmpdir")));
@@ -176,9 +266,10 @@ public class TestUft extends MockitoTest {
 		Map<String, String> params = new HashMap<>();
 		params.put("User", "toto");
 		Uft uft = new Uft("http://almserver/qcbin", "usr", "pwd", "dom", "proj",
-				"[QualityCenter]Subject\\Tools\\Tests\\test1", params);
+				"[QualityCenter]Subject\\Tools\\Tests\\test1");
 		uft.setKillUftOnStartup(false);
-		List<String> args = uft.prepareArguments();
+		uft.setParameters(params);
+		List<String> args = uft.prepareArguments(true, true);
 		
 		Assert.assertEquals(args.size(), 8);
 		Assert.assertTrue(args.get(0).startsWith(System.getProperty("java.io.tmpdir")));
@@ -201,9 +292,9 @@ public class TestUft extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
 		when(connector.uploadFileToNode(anyString(), eq(true))).thenReturn("D:\\file");
 		
-		Uft uft = new Uft("D:\\Subject\\Tools\\Tests\\test1", new HashMap<>());
+		Uft uft = new Uft("D:\\Subject\\Tools\\Tests\\test1");
 		uft.setKillUftOnStartup(false);
-		List<String> args = uft.prepareArguments();
+		List<String> args = uft.prepareArguments(true, true);
 
 		Assert.assertEquals(args.size(), 2);
 		Assert.assertTrue(args.get(0).equals("D:\\file\\uft.vbs"));
@@ -214,13 +305,69 @@ public class TestUft extends MockitoTest {
 	 * Test when grid is not present 
 	 */
 	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
-	public void testPrepareArgumentsForGridNoThere() {
+	public void testPrepareArgumentsForGridNotThere() {
 		SeleniumTestsContextManager.getThreadContext().setSeleniumGridConnector(null);
 		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
 		when(connector.uploadFileToNode(anyString(), eq(true))).thenReturn("D:\\file\\uft.vbs");
 		
-		Uft uft = new Uft("D:\\Subject\\Tools\\Tests\\test1", new HashMap<>());
-		List<String> args = uft.prepareArguments();
+		Uft uft = new Uft("D:\\Subject\\Tools\\Tests\\test1");
+		List<String> args = uft.prepareArguments(true, true);
+	}
+	
+
+	@Test(groups = { "ut" })
+	public void testLoad() throws Exception {
+		String report = GenericTest.readResourceToString("tu/uftReport.xml");
+		report = "some comments\n_____OUTPUT_____\n" + report + "\n_____ENDOUTPUT_____\nsome other comments";
+		PowerMockito.when(TestTasks.class, "executeCommand", eq("cscript.exe"), anyInt(), nullable(Charset.class), any()).thenReturn(report);
+		
+		Map<String, String> args = new HashMap<>();
+		args.put("User", "toto");
+		Uft uft = new Uft("[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
+		uft.setParameters(args);
+		uft.loadScript(false);
+	
+		ArgumentCaptor<String[]> argsArgument = ArgumentCaptor.forClass(String[].class);
+		
+		PowerMockito.verifyStatic(TestTasks.class);
+		TestTasks.executeCommand(eq("cscript.exe"), eq(60), isNull(), argsArgument.capture());
+		
+		// test parameters are not copied
+		Assert.assertEquals(argsArgument.getAllValues().size(), 2);
+		Assert.assertEquals(argsArgument.getAllValues().get(1), "[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
+	}
+	
+	/**
+	 * Check we cannot execute a test if it's not loaded
+	 * @throws Exception
+	 */
+	@Test(groups = { "ut" }, expectedExceptions = IllegalStateException.class, expectedExceptionsMessageRegExp = "Test script has not been loaded. Call 'loadScript' before")
+	public void testExecuteNoLoad() throws Exception {
+		String report = GenericTest.readResourceToString("tu/uftReport.xml");
+		report = "some comments\n_____OUTPUT_____\n" + report + "\n_____ENDOUTPUT_____\nsome other comments";
+		PowerMockito.when(TestTasks.class, "executeCommand", eq("cscript.exe"), anyInt(), nullable(Charset.class), any()).thenReturn(report);
+
+		Uft uft = new Uft("[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
+
+		uft.executeScript(5, new HashMap<>());		
+	}
+	
+	/**
+	 * Check we cannot execute the same test twice if loading has not been done before the second execution
+	 * @throws Exception
+	 */
+	@Test(groups = { "ut" }, expectedExceptions = IllegalStateException.class, expectedExceptionsMessageRegExp = "Test script has not been loaded. Call 'loadScript' before")
+	public void testExecuteNoLoadBeforeSecondExecution() throws Exception {
+		String report = GenericTest.readResourceToString("tu/uftReport.xml");
+		report = "some comments\n_____OUTPUT_____\n" + report + "\n_____ENDOUTPUT_____\nsome other comments";
+		PowerMockito.when(TestTasks.class, "executeCommand", eq("cscript.exe"), anyInt(), nullable(Charset.class), any()).thenReturn(report);
+
+		Uft uft = new Uft("[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
+		uft.loadScript(false);
+		uft.executeScript(5, new HashMap<>());	
+		
+		// try a second execution, it's not possible
+		uft.executeScript(5, new HashMap<>());		
 	}
 	
 	@Test(groups = { "ut" })
@@ -231,8 +378,9 @@ public class TestUft extends MockitoTest {
 		
 		Map<String, String> args = new HashMap<>();
 		args.put("User", "toto");
-		Uft uft = new Uft("[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1", args);
-		TestStep step = uft.executeScript();
+		Uft uft = new Uft("[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
+		uft.loadScript(false);
+		TestStep step = uft.executeScript(120, args);
 		
 		// check a step is returned
 		Assert.assertNotNull(step);
@@ -242,11 +390,10 @@ public class TestUft extends MockitoTest {
 		
 		PowerMockito.verifyStatic(TestTasks.class);
 		TestTasks.executeCommand(eq("cscript.exe"), eq(120), isNull(), argsArgument.capture());
-		Assert.assertEquals(argsArgument.getAllValues().size(), 4);
+		Assert.assertEquals(argsArgument.getAllValues().size(), 3);
 
 		Assert.assertEquals(argsArgument.getAllValues().get(1), "[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
 		Assert.assertEquals(argsArgument.getAllValues().get(2), "\"User=toto\"");
-		Assert.assertEquals(argsArgument.getAllValues().get(3), "/clean");
 		
 	}
 	
@@ -261,8 +408,9 @@ public class TestUft extends MockitoTest {
 		
 		Map<String, String> args = new HashMap<>();
 		args.put("User", "toto");
-		Uft uft = new Uft("[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1", args);
-		TestStep step = uft.executeScript();
+		Uft uft = new Uft("[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
+		uft.loadScript(false);
+		TestStep step = uft.executeScript(120, new HashMap<>());
 		
 		// check a step is returned
 		Assert.assertNotNull(step);
@@ -270,32 +418,6 @@ public class TestUft extends MockitoTest {
 		Assert.assertTrue(step.toString().contains("Step Selection_Commune: Impossible d'identifier"));
 		Assert.assertFalse(step.toString().contains("<table>")); // check no HTML code is returned
 		
-		
-	}
-	
-	@Test(groups = { "ut" })
-	public void testExecuteNoClean() throws Exception {
-		String report = GenericTest.readResourceToString("tu/uftReport.xml");
-		report = "some comments\n_____OUTPUT_____\n" + report + "\n_____ENDOUTPUT_____\nsome other comments";
-		PowerMockito.when(TestTasks.class, "executeCommand", eq("cscript.exe"), anyInt(), nullable(Charset.class), any()).thenReturn(report);
-		
-		Map<String, String> args = new HashMap<>();
-		args.put("User", "toto");
-		Uft uft = new Uft("[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1", args);
-		TestStep step = uft.executeScript(120, false);
-		
-		// check a step is returned
-		Assert.assertNotNull(step);
-		Assert.assertEquals(step.getName(), "UFT: test1");
-		
-		ArgumentCaptor<String[]> argsArgument = ArgumentCaptor.forClass(String[].class);
-		
-		PowerMockito.verifyStatic(TestTasks.class);
-		TestTasks.executeCommand(eq("cscript.exe"), eq(120), isNull(), argsArgument.capture());
-		Assert.assertEquals(argsArgument.getAllValues().size(), 3);
-		
-		Assert.assertEquals(argsArgument.getAllValues().get(1), "[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
-		Assert.assertEquals(argsArgument.getAllValues().get(2), "\"User=toto\"");
 		
 	}
 	
@@ -313,8 +435,9 @@ public class TestUft extends MockitoTest {
 		
 		Map<String, String> args = new HashMap<>();
 		args.put("User", "toto");
-		Uft uft = new Uft("[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1", args);
-		TestStep step = uft.executeScript();
+		Uft uft = new Uft("[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
+		uft.loadScript(false);
+		TestStep step = uft.executeScript(5, new HashMap<>());
 		
 		// check a step is returned
 		Assert.assertNotNull(step);
@@ -329,8 +452,9 @@ public class TestUft extends MockitoTest {
 		
 		Map<String, String> args = new HashMap<>();
 		args.put("User", "toto");
-		Uft uft = new Uft("[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1", args);
-		TestStep step = uft.executeScript();
+		Uft uft = new Uft("[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
+		uft.loadScript(false);
+		TestStep step = uft.executeScript(5, args);
 		
 		// check a step is returned
 		Assert.assertNotNull(step);
