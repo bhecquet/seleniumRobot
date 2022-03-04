@@ -71,6 +71,7 @@ import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.uipage.ByC;
 import com.seleniumtests.uipage.ExpectedConditionsC;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.ReplayOnError;
@@ -135,6 +136,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     
     protected WebDriver driver;
     protected WebElement element = null;
+    protected SearchContext searchContext = null; // if searchContext is a WebElement, then, element and searchContext will be the same. Used to store ShadowRoot which are not WebElements
     protected String label = null;
     protected HtmlElement parent = null;
     protected FrameElement frameElement = null;
@@ -679,39 +681,48 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         		
         	}
         	
-        	element = findSeleniumElement(parent.element, elementInfo);
+        	searchContext = findSeleniumElement(parent.searchContext, elementInfo);
 
         } else {
-        	element = findSeleniumElement(driver, elementInfo);
+        	searchContext = findSeleniumElement(driver, elementInfo);
         }
         
-        
-        if (makeVisible) { 
-        	makeWebElementVisible(element);
+        try {
+        	element = (WebElement)searchContext;
         	
-        	if (scrollToElementBeforeAction) {
-        		((CustomEventFiringWebDriver)driver).scrollToElement(element, OPTIMAL_SCROLLING);
-        	}
+        	if (makeVisible) { 
+            	makeWebElementVisible(element);
+            	
+            	if (scrollToElementBeforeAction) {
+            		((CustomEventFiringWebDriver)driver).scrollToElement(element, OPTIMAL_SCROLLING);
+            	}
+            }
+            
+            // wait for element to be really visible. should be done only for actions on element
+            if (waitForVisibility && makeVisible) {
+            	try {
+            		new WebDriverWait(driver, Duration.ofSeconds(1)).until(ExpectedConditions.visibilityOf(element));
+            	} catch (TimeoutException e) {
+            		logger.error(String.format("Element %s has never been made visible", toString()));
+            	}
+            }
+            
+            // If we are here, element has been found, update elementInformation
+            if (elementInfo != null) {
+            	try {
+    	        	elementInfo.updateInfo(this);
+    	        	elementInfo.exportToJsonFile(false, this);
+            	} catch (Exception e) {
+            		logger.warn("Error storing element information: " + e.getMessage());
+            	}
+            }
+        	
+        } catch (ClassCastException e) {
+        	// in case it's a ShadowRoot (not a WebElement, do not try to make it visible
         }
         
-        // wait for element to be really visible. should be done only for actions on element
-        if (waitForVisibility && makeVisible) {
-        	try {
-        		new WebDriverWait(driver, Duration.ofSeconds(1)).until(ExpectedConditions.visibilityOf(element));
-        	} catch (TimeoutException e) {
-        		logger.error(String.format("Element %s has never been made visible", toString()));
-        	}
-        }
         
-        // If we are here, element has been found, update elementInformation
-        if (elementInfo != null) {
-        	try {
-	        	elementInfo.updateInfo(this);
-	        	elementInfo.exportToJsonFile(false, this);
-        	} catch (Exception e) {
-        		logger.warn("Error storing element information: " + e.getMessage());
-        	}
-        }
+        
     }
     
     /**
@@ -722,17 +733,26 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * @param elementInfo
      * @return
      */
-    private WebElement findSeleniumElement(SearchContext context, ElementInfo elementInfo) {
+    private SearchContext findSeleniumElement(SearchContext context, ElementInfo elementInfo) {
     	
     	enterFrame();
     	
-		WebElement seleniumElement;
+    	SearchContext seleniumElement;
     	try {
-	    	if (elementIndex == null) {
-	    		seleniumElement = context.findElement(by);
-	    	} else {
-	    		seleniumElement = getElementByIndex(context.findElements(by));
-	    	}
+//    		if (by instanceof ByC.Shadow) {
+//    			context.findElements(by);
+//    			if (elementIndex == null) {
+//		    		seleniumElement = ((ByC.Shadow) by).getSearchContexts().get(0);
+//		    	} else {
+//		    		seleniumElement = getElementByIndex(((ByC.Shadow) by).getSearchContexts());
+//		    	}
+//    		} else {
+    			if (elementIndex == null) {
+		    		seleniumElement = context.findElement(by);
+		    	} else {
+		    		seleniumElement = getElementByIndex(context.findElements(by));
+		    	}
+//    		}
 	    	return seleniumElement;
     	} catch (WebDriverException e) {
     		
@@ -746,26 +766,26 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * returns an element depending on configured index
      * @param allElements
      */
-    private WebElement getElementByIndex(List<WebElement> allElements) {
+    private <T extends SearchContext> T getElementByIndex(List<T> allElements) {
     	if (elementIndex != null && elementIndex.equals(FIRST_VISIBLE)) {
-			for (WebElement el: allElements) {
-				if (el.isDisplayed()) {
-					return el;
+			for (T el: allElements) {
+				if (el instanceof WebElement &&  ((WebElement)el).isDisplayed()) {
+					return (T)el;
 				}
 			}
 			throw new NoSuchElementException("no visible element has been found for " + by.toString());
     	} else if (elementIndex != null && elementIndex < 0) {
     		return allElements.get(allElements.size() + elementIndex);
-		} else {
-			if (elementIndex == null) {
-				elementIndex = 0;
-			}
-			try {
-				return allElements.get(elementIndex);
-			} catch (IndexOutOfBoundsException e) {
-				throw new NoSuchElementException(String.format("No element found for locator %s with index %d", by.toString(), elementIndex));
-			}
-		}
+    	} else {
+    		if (elementIndex == null) {
+    			elementIndex = 0;
+    		}
+    		try {
+    			return (T)allElements.get(elementIndex);
+    		} catch (IndexOutOfBoundsException e) {
+    			throw new NoSuchElementException(String.format("No element found for locator %s with index %d", by.toString(), elementIndex));
+    		}
+    	}
     }
     
     /**
