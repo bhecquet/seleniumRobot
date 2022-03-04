@@ -29,6 +29,7 @@ import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageShadowDom;
+import com.seleniumtests.uipage.ByC;
 
 public class TestShadowDom extends GenericTest {
 	
@@ -59,7 +60,7 @@ public class TestShadowDom extends GenericTest {
 		DriverTestPageShadowDom.divPass1Direct.getText();
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups={"it"}) 
 	public void testAccessShadowElement() {
 		Assert.assertEquals(DriverTestPageShadowDom.divPass1Shadow.getText(), "This is a div with an ID of pass1Shadow");
 	}
@@ -80,7 +81,7 @@ public class TestShadowDom extends GenericTest {
 	 */
 	@Test(groups={"it"})
 	public void testAccessMultipleSameSubShadowElement() {
-		Assert.assertEquals(DriverTestPageShadowDom.divMultipleShadowElements.findElement(By.tagName("div")).getText(), "This is a DIV with the ID of pass71Shadow");
+		Assert.assertEquals(DriverTestPageShadowDom.divMultipleShadowElements.findElement(ByC.xTagName("div")).getText(), "This is a DIV with the ID of pass71Shadow");
 	}
 	
 	/**

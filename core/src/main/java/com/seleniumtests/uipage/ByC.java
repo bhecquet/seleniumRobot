@@ -18,6 +18,8 @@
 package com.seleniumtests.uipage;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,10 +29,15 @@ import org.apache.commons.lang.NotImplementedException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.NoSuchShadowRootException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WrapsDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.RemoteWebElement;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.WebUIDriver;
 
@@ -660,7 +667,7 @@ public class ByC extends By {
 		
 		
 		/**
-		 * If multiple "By" are pro
+		 * If multiple "By" are provided
 		 */
 		@Override
 		public List<WebElement> findElements(SearchContext context) {
@@ -677,10 +684,23 @@ public class ByC extends By {
 					hosts = elements.get(0).findElements(by);
 					elements = new ArrayList<>(); // reset list because we don't care parent elements
 				}
-				JavascriptExecutor js = (JavascriptExecutor)WebUIDriver.getWebDriver(false);
-				
+
 				for (WebElement host: hosts) {
-					elements.add((WebElement)(js.executeScript("return arguments[0].shadowRoot", host)));
+					SearchContext root = host.getShadowRoot();
+					try {
+						// https://github.com/SeleniumHQ/selenium/issues/10127 => invalid locator raised when using ShadowRoot directly
+						// so we build a remoteWebElement which works
+						Method getIdMethod = root.getClass().getMethod("getId");
+						getIdMethod.setAccessible(true);
+						String id = (String) getIdMethod.invoke(root);
+						RemoteWebElement shadowRootElement = new RemoteWebElement();
+						shadowRootElement.setParent((RemoteWebDriver) ((WrapsDriver)root).getWrappedDriver());
+                        shadowRootElement.setId(id);
+                        elements.add(shadowRootElement);
+						
+					} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+						throw new CustomSeleniumTestsException("A change in Selenium occured, ByC.Shadow fails");
+					} 
 				}	
 				
 				// stop if no element is found
@@ -712,6 +732,7 @@ public class ByC extends By {
 			
 			return String.join("/", biesString);
 		}
+
 	}
 	
 	/**
