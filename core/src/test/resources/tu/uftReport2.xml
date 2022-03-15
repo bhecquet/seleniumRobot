@@ -1,0 +1,294 @@
+<?xml version="1.0"?>
+<!DOCTYPE Report
+            [
+            <!ELEMENT Report (General ,(Doc|BPT)) >
+        <!ATTLIST Report ver CDATA #REQUIRED tmZone CDATA #REQUIRED>
+            <!ELEMENT General ( DocLocation ) >
+                <!ATTLIST General productName CDATA #REQUIRED productVer CDATA #REQUIRED os CDATA #REQUIRED host CDATA #REQUIRED qcserver CDATA #IMPLIED qcproject CDATA #IMPLIED SolManSolutionId CDATA #IMPLIED SolManProjectId CDATA #IMPLIED SolManTestPlanId CDATA #IMPLIED SolManTestPackageId CDATA #IMPLIED SolManUserInfoData CDATA #IMPLIED  >
+                    <!ELEMENT BPT (DName,Res,DVer?,TSet?,TInst?,NodeArgs,AdditionalInfo*,Doc*) >
+                        <!ATTLIST BPT rID ID #REQUIRED >
+                            <!ELEMENT Doc (DName,ConfName?,Res,DVer?,TSet?,TInst?,RunType?,DT?,AdditionalInfo*,Step*,DIter*,Step*,Action*,Doc*,Summary?,TestMaintenanceSummary*,NodeArgs?) >
+                                <!ATTLIST Doc rID ID #REQUIRED type (Test|BC|BPTWrapperTest|Flow|Group|Action) "Test"
+                                            productName CDATA #REQUIRED BCIter CDATA #IMPLIED >
+                                    <!ELEMENT RunType ( #PCDATA )>
+                                        <!ATTLIST RunType fmStep (False|True) "False"
+                                                    batch (False|True) "False"
+                                                    upDesc (False|True) "False"
+                                                    upChk (False|True) "False"
+                                                    upAS (False|True) "False">
+                                            <!ELEMENT DName ( #PCDATA ) >
+                                                <!ELEMENT ConfName ( #PCDATA ) >
+                                                    <!ELEMENT Res ( #PCDATA ) >
+                                                        <!ELEMENT AdditionalInfo (AdditionalDataName,AdditionalDataValue ) >
+                                                            <!ELEMENT AdditionalDataName ( #PCDATA ) >
+                                                                <!ELEMENT AdditionalDataValue ( #PCDATA ) >
+                                                                    <!ELEMENT DVer ( #PCDATA ) >
+                                                                        <!ELEMENT TSet ( #PCDATA ) >
+                                                                            <!ELEMENT TInst ( #PCDATA ) >
+                                                                                <!ELEMENT DIter (Step*,Action+,Summary?,NodeArgs)>
+                                                                                    <!ATTLIST DIter rID ID #REQUIRED iterID CDATA #REQUIRED>
+                                                                                        <!ELEMENT DocLocation ( #PCDATA )>
+                                                                                            <!ELEMENT Action (AName,AIter*,(Step|HtmlStep|Action)*, Summary,ActionMaintenanceSummary*, NodeArgs ) >
+                                                                                                <!ATTLIST Action rID ID #REQUIRED>
+                                                                                                    <!ELEMENT AIter ((Step|HtmlStep|Action)*,DataMapping?, Summary?,NodeArgs) >
+                                                                                                        <!ATTLIST AIter rID ID #REQUIRED iterID CDATA #REQUIRED isCountable (False|True) "False" >
+                                                                                                            <!ELEMENT AName ( #PCDATA ) >
+                                                                                                                <!ELEMENT TestMaintenanceSummary (ActionMaintenanceSummary*) >
+                                                                                                                    <!ATTLIST TestMaintenanceSummary ObjectsAdded CDATA #REQUIRED ObjectsUpdated CDATA #REQUIRED StepsUpdated CDATA #REQUIRED StepsComments CDATA #REQUIRED>
+                                                                                                                        <!ELEMENT ActionMaintenanceSummary (ObjectChange* ) >
+                                                                                                                            <!ATTLIST ActionMaintenanceSummary Action CDATA #REQUIRED Objects CDATA #REQUIRED Updated CDATA #REQUIRED LinesTotal CDATA #REQUIRED Added CDATA #REQUIRED LinesUpdated CDATA #REQUIRED>
+                                                                                                                                <!ELEMENT ObjectChange  (Hierarchy, PropertyChangeList* ) >
+                                                                                                                                    <!ATTLIST ObjectChange Operation CDATA #IMPLIED OriginalRepository CDATA #IMPLIED>
+                                                                                                                                        <!ELEMENT PropertyChangeList (PropertyDef*) >
+                                                                                                                                            <!ELEMENT PropertyDef (OriginalValue, NewValue) >
+                                                                                                                                                <!ATTLIST PropertyDef PropName CDATA #REQUIRED OriginRegularExpression (True|False) "False"
+                                                                                                                                                            NewRegularExpression (True|False) "False"
+                                                                                                                                                            AddedProperty (True|False) "False" >
+                                                                                                                                                    <!ELEMENT OriginalValue ( #PCDATA )>
+                                                                                                                                                        <!ELEMENT NewValue ( #PCDATA )>
+                                                                                                                                                            <!ELEMENT Hierarchy  (ObjectName, Hierarchy*) >
+                                                                                                                                                                <!ATTLIST Hierarchy MicClass CDATA #REQUIRED>
+                                                                                                                                                                    <!ELEMENT ObjectName  ( #PCDATA ) >
+                                                                                                                                                                        <!ELEMENT Step (Obj,Details,Time,TimeTick* ,(Step|HtmlStep|Doc)*, DataMapping?, NodeArgs) >
+                                                                                                                                                                            <!ATTLIST Step rID ID #REQUIRED retval CDATA #IMPLIED>
+                                                                                                                                                                                <!ELEMENT HtmlStep (HTML,TimeTick*,(Step|HtmlStep|Doc)*,NodeArgs) >
+                                                                                                                                                                                    <!ATTLIST HtmlStep rID ID #REQUIRED >
+                                                                                                                                                                                        <!ELEMENT Obj ( #PCDATA ) >
+                                                                                                                                                                                            <!ATTLIST Obj plainTxt (False|True) "True">
+                                                                                                                                                                                                <!ELEMENT Details ( #PCDATA ) >
+                                                                                                                                                                                                    <!ATTLIST Details plainTxt (False|True) "True">
+                                                                                                                                                                                                        <!ELEMENT Time ( #PCDATA ) >
+                                                                                                                                                                                                            <!ELEMENT HTML ( #PCDATA ) >
+                                                                                                                                                                                                                <!ELEMENT Disp ( #PCDATA ) >
+                                                                                                                                                                                                                    <!ELEMENT TimeTick ( #PCDATA ) >
+                                                                                                                                                                                                                        <!ELEMENT DataMapping ( DataMappedItem* )>
+                                                                                                                                                                                                                            <!ELEMENT DataMappedItem EMPTY >
+                                                                                                                                                                                                                                <!ATTLIST DataMappedItem dsName CDATA #REQUIRED >
+                                                                                                                                                                                                                                    <!ATTLIST DataMappedItem rowId CDATA #REQUIRED >
+                                                                                                                                                                                                                                        <!ELEMENT NodeArgs (Disp,TopPane?,BtmPane?,ExtendedInfo? )>
+                                                                                                                                                                                                                                            <!ATTLIST NodeArgs eType CDATA #REQUIRED icon CDATA #REQUIRED nRep CDATA #REQUIRED UserNote CDATA #IMPLIED filter (False|True) "True">
+                                                                                                                                                                                                                                                <!ATTLIST NodeArgs status (Passed|Failed|Done|Warning|Information) "Done">
+                                                                                                                                                                                                                                                    <!ATTLIST NodeArgs iconSel CDATA #IMPLIED nType CDATA #IMPLIED MovieMarker CDATA "">
+                                                                                                                                                                                                                                                        <!ATTLIST NodeArgs Source CDATA #IMPLIED SourceLine CDATA #IMPLIED StepFlowItemKey CDATA #IMPLIED >
+                                                                                                                                                                                                                                                            <!ELEMENT TopPane (Path)>
+                                                                                                                                                                                                                                                                <!ELEMENT BtmPane ( (Path|WR)?,ASHilite?)>
+                                                                                                                                                                                                                                                                    <!ATTLIST BtmPane vType CDATA "HTML">
+                                                                                                                                                                                                                                                                        <!ELEMENT Path ( #PCDATA ) >
+                                                                                                                                                                                                                                                                            <!ELEMENT ASHilite ( #PCDATA ) >
+                                                                                                                                                                                                                                                                                <!ELEMENT WR ( #PCDATA ) >
+                                                                                                                                                                                                                                                                                    <!ELEMENT ExtendedInfo ( StepData ) >
+                                                                                                                                                                                                                                                                                        <!ATTLIST ExtendedInfo StepType CDATA #REQUIRED>
+                                                                                                                                                                                                                                                                                            <!ELEMENT DT (NodeArgs) >
+                                                                                                                                                                                                                                                                                                <!ATTLIST DT rID ID #REQUIRED>
+                                                                                                                                                                                                                                                                                                    <!ELEMENT Summary (Param*)>
+                                                                                                                                                                                                                                                                                                        <!ATTLIST Summary sTime CDATA #IMPLIED eTime CDATA #IMPLIED passed CDATA #IMPLIED failed CDATA #IMPLIED warnings CDATA #IMPLIED retval CDATA #IMPLIED stopped (False|True) "False" >
+                                                                                                                                                                                                                                                                                                            <!ELEMENT Param (ParamName,ParamVal)+ >
+                                                                                                                                                                                                                                                                                                                <!ATTLIST Param paramInOut (In|Out) "In">
+                                                                                                                                                                                                                                                                                                                    <!ELEMENT ParamName ( #PCDATA ) >
+                                                                                                                                                                                                                                                                                                                        <!ELEMENT ParamVal ( #PCDATA ) >
+                                                                                                                                                                                                                                                                                                                            ]
+                                                                                                                                                                                                                                                                                                                            >
+<Report ver="2.0"
+    tmZone="Paris, Madrid">
+<General productName="Micro Focus Unified Functional Testing"
+        productVer="15.0.1"
+        os=""
+        host="PP20061968"
+        qcserver="http://z6i7222v.itsoc.itmma.fr:8080/qcbin"
+        qcproject="VNR.VALIDATION_2012">
+    <DocLocation><![CDATA[[ALM] Subject\QTP Tests\SalesForce\MRH_M_SC02_CAS01_Devis_SF]]></DocLocation>
+</General>
+<Doc rID="T1"
+    productName="Micro Focus Unified Functional Testing"  >
+    <DName><![CDATA[MRH_M_SC02_CAS01_Devis_SF]]></DName>
+    <Res><![CDATA[TempResults]]></Res>
+    <DT rID="T2">
+        <NodeArgs eType="Table"
+                    icon="2"
+                    nRep="5"
+                    filter="False" >
+            <Disp><![CDATA[Run-Time Data Table]]></Disp>
+            <BtmPane vType="Table" >
+                <Path><![CDATA[Default.xlsx]]></Path>
+            </BtmPane>
+        </NodeArgs>
+    </DT>
+    <DIter rID="T3"
+            iterID="1" >
+        <Action rID="T4">
+            <AName><![CDATA[MRH_M_SC02_CAS01_Devis_SF]]></AName>
+            <Action rID="T5">
+                <AName><![CDATA[Initialisations [Initialisations] [2]]]></AName>
+                <Step rID="T6">
+                    <Obj plainTxt="False" ><![CDATA[SystemUtil]]></Obj>
+                    <Details plainTxt="False" ><![CDATA[SystemUtil]]></Details>
+                    <Time><![CDATA[15/03/2022 - 09:16:23]]></Time>
+                    <TimeTick>1647332183</TimeTick>
+                    <Step rID="T7">
+                        <Obj plainTxt="False" ><![CDATA[Run "cmd",1]]></Obj>
+                        <Details plainTxt="False" ><![CDATA[Run "cmd",1]]></Details>
+                        <Time><![CDATA[15/03/2022 - 09:16:23]]></Time>
+                        <TimeTick>1647332183</TimeTick>
+                        <NodeArgs eType="Replay"
+                                    icon="6"
+                                    nRep="13"
+                                    status="Passed"
+                                    Source="Initialisations [Initialisations] [2]"
+                                    SourceLine="31" >
+                            <Disp><![CDATA[Run "cmd",1]]></Disp>
+                        </NodeArgs>
+                    </Step>
+                    <NodeArgs eType="Replay"
+                                icon="6"
+                                nRep="12"
+                                status="Passed"
+                                Source="Initialisations [Initialisations] [2]"
+                                SourceLine="31" >
+                        <Disp><![CDATA[SystemUtil]]></Disp>
+                    </NodeArgs>
+                </Step>
+                <Step rID="T8">
+                    <Obj plainTxt="False" ><![CDATA[P9]]></Obj>
+                    <Details plainTxt="False" ><![CDATA[<table><tr><td><span style="text-align : left; font-size : 12px; ">Local Browser</span></td></tr></table>]]></Details>
+                    <Time><![CDATA[15/03/2022 - 09:16:25]]></Time>
+                    <TimeTick>1647332185</TimeTick>
+                    <Step rID="T9">
+                        <Obj plainTxt="False" ><![CDATA[P9.Exist]]></Obj>
+                        <Details plainTxt="False" ><![CDATA["Object does not exist"]]></Details>
+                        <Time><![CDATA[15/03/2022 - 09:16:25]]></Time>
+                        <TimeTick>1647332185</TimeTick>
+                        <NodeArgs eType="Replay"
+                                    icon="7"
+                                    nRep="18"
+                                    Source="Initialisations [Initialisations] [2]"
+                                    SourceLine="34" >
+                            <Disp><![CDATA[P9.Exist]]></Disp>
+                        </NodeArgs>
+                    </Step>
+                    <NodeArgs eType="Context"
+                                icon="7"
+                                nRep="17"
+                                Source="Initialisations [Initialisations] [2]"
+                                SourceLine="34" >
+                        <Disp><![CDATA[P9]]></Disp>
+                    </NodeArgs>
+                </Step>
+                <Action rID="T10">
+                    <AName><![CDATA[Vidage_Cache [vidage_cache]]]></AName>
+                    <Summary sTime="15/03/2022 - 09:16:25"
+                            eTime="15/03/2022 - 09:16:34"
+                            passed="0"
+                            failed="0"
+                            warnings="0" />
+                    <NodeArgs eType="StartAction"
+                                icon="5"
+                                nRep="19" >
+                        <Disp><![CDATA[Récapitulatif Vidage_Cache [vidage_cache]]]></Disp>
+                    </NodeArgs>
+                </Action>
+                <Step rID="T11">
+                    <Obj><![CDATA[1]]></Obj>
+                    <Details><![CDATA[Le robot utilisé est : PP20061968]]></Details>
+                    <Time><![CDATA[15/03/2022 - 09:16:49]]></Time>
+                    <TimeTick>1647332209</TimeTick>
+                    <NodeArgs eType="User"
+                                icon="8"
+                                nRep="21"
+                                status="Passed" >
+                        <Disp><![CDATA[1]]></Disp>
+                    </NodeArgs>
+                </Step>
+                <Step rID="T12">
+                    <Obj><![CDATA[2]]></Obj>
+                    <Details><![CDATA[Traitement_erreur : PAS D'ENVIRONNEMENT DE TRAVAIL SELECTIONNÉ]]></Details>
+                    <Time><![CDATA[15/03/2022 - 09:16:49]]></Time>
+                    <TimeTick>1647332209</TimeTick>
+                    <NodeArgs eType="User"
+                                icon="8"
+                                nRep="22"
+                                status="Failed" >
+                        <Disp><![CDATA[2]]></Disp>
+                    </NodeArgs>
+                </Step>
+                <Step rID="T13">
+                    <Obj plainTxt="False" ><![CDATA[Erreur d’exécution]]></Obj>
+                    <Details plainTxt="False" ><![CDATA[Le fichier spécifié est introuvable.<BR/><BR/>Fichier de fonction : [ALM\Resources] Resources\Subject\QTP Actions\TECH_lib<BR/>Ligne (2036) : &quot;    InvokeApplication ( &quot;F:\_LOGICIELS\7-Zip\7z.exe a D:\logs\logs_sa.zip D:\logs\SA\logs D:\logs\SA\traces\&quot; &amp; login)&quot;.]]></Details>
+                    <Time><![CDATA[15/03/2022 - 09:16:53]]></Time>
+                    <TimeTick>1647332213</TimeTick>
+                    <NodeArgs eType="Replay"
+                                icon="9"
+                                nRep="23"
+                                status="Failed"
+                                Source="[QC-RESOURCE];;Resources\Subject\QTP Actions;;\TECH_lib"
+                                SourceLine="2035" >
+                        <Disp><![CDATA[Erreur d’exécution]]></Disp>
+                    </NodeArgs>
+                </Step>
+                <Step rID="T14">
+                    <Obj plainTxt="False" ><![CDATA[Arrêter l’exécution]]></Obj>
+                    <Details plainTxt="False" ><![CDATA[Exécution arrêtée par l’utilisateur.]]></Details>
+                    <Time><![CDATA[15/03/2022 - 09:16:54]]></Time>
+                    <TimeTick>1647332214</TimeTick>
+                    <NodeArgs eType="General"
+                                icon="10"
+                                nRep="24"
+                                status="Information" >
+                        <Disp><![CDATA[Arrêter l’exécution]]></Disp>
+                    </NodeArgs>
+                </Step>
+                <Summary sTime="15/03/2022 - 09:16:20"
+                        eTime="15/03/2022 - 09:16:54"
+                        passed="2"
+                        failed="2"
+                        warnings="0" />
+                <NodeArgs eType="StartAction"
+                            icon="5"
+                            nRep="9"
+                            status="Failed" >
+                    <Disp><![CDATA[Récapitulatif Initialisations [Initialisations] [2]]]></Disp>
+                </NodeArgs>
+            </Action>
+            <Step rID="T15">
+                <Obj plainTxt="False" ><![CDATA[Arrêter l’exécution]]></Obj>
+                <Details plainTxt="False" ><![CDATA[Exécution arrêtée par l’utilisateur.]]></Details>
+                <Time><![CDATA[15/03/2022 - 09:16:54]]></Time>
+                <TimeTick>1647332214</TimeTick>
+                <NodeArgs eType="General"
+                            icon="10"
+                            nRep="26"
+                            status="Information" >
+                    <Disp><![CDATA[Arrêter l’exécution]]></Disp>
+                </NodeArgs>
+            </Step>
+            <Summary sTime="15/03/2022 - 09:16:19"
+                    eTime="15/03/2022 - 09:16:54"
+                    passed="0"
+                    failed="0"
+                    warnings="0" />
+            <NodeArgs eType="StartAction"
+                        icon="4"
+                        nRep="8"
+                        status="Failed" >
+                <Disp><![CDATA[Récapitulatif MRH_M_SC02_CAS01_Devis_SF]]></Disp>
+            </NodeArgs>
+        </Action>
+        <NodeArgs eType="StartIteration"
+                    icon="3"
+                    nRep="7"
+                    status="Failed" >
+            <Disp><![CDATA[Itération MRH_M_SC02_CAS01_Devis_SF 1 (ligne 1)]]></Disp>
+        </NodeArgs>
+    </DIter>
+    <Summary sTime="15/03/2022 - 09:16:14"
+            eTime="15/03/2022 - 09:16:54"
+            passed="2"
+            failed="2"
+            warnings="0" />
+    <NodeArgs eType="StartTest"
+                icon="1"
+                nRep="4"
+                status="Failed" >
+        <Disp><![CDATA[Récapitulatif Test MRH_M_SC02_CAS01_Devis_SF]]></Disp>
+    </NodeArgs>
+</Doc>
+</Report>
