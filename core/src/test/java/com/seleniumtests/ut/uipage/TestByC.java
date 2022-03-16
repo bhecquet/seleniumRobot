@@ -469,6 +469,7 @@ public class TestByC extends MockitoTest {
         ByC.And byAnd = new ByC.And(id, name);
         List<WebElement> elements = byAnd.findElements(driver);
         assertEquals(elements.size(), 1);
+        assertTrue(elements.contains(id));
     }
 
     @Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)
@@ -495,20 +496,19 @@ public class TestByC extends MockitoTest {
     public void testFindElementsByOr() {
         ByC.Or byOr = new ByC.Or(id, name);
         List<WebElement> elements = byOr.findElements(driver);
-        assertFalse(elements.isEmpty());
+        assertEquals(elements.size(), 1);
+        assertTrue(elements.contains(element1));
     }
 
     @Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)
     public void testFindElementsByOrIdNull() {
         ByC.Or byOr = new ByC.Or(null, name);
         List<WebElement> elements = byOr.findElements(driver);
-        assertFalse(elements.isEmpty());
     }
 
     @Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)
     public void testFindElementsByOrNameNull() {
         ByC.Or byOr = new ByC.Or(id, null);
         List<WebElement> elements = byOr.findElements(driver);
-        assertFalse(elements.isEmpty());
     }
 }
