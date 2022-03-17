@@ -247,6 +247,15 @@ public class TestDriver extends GenericMultiBrowserTest {
 			DriverTestPage.resetButton.click();
 		}
 	}
+	
+	public void testClickWithMouse() {
+		try {
+			DriverTestPage.checkElement.clickMouse();
+			Assert.assertTrue(DriverTestPage.checkElement.isSelected());
+		} finally {
+			DriverTestPage.resetButton.click();
+		}
+	}
    
 	
 	public void testSendKeys() {
@@ -262,6 +271,15 @@ public class TestDriver extends GenericMultiBrowserTest {
 	public void testSendKeysJs() {
 		try {
 			DriverTestPage.textElement.simulateSendKeys("youpi@[]é");
+			Assert.assertEquals(DriverTestPage.textElement.getValue(), "youpi@[]é");
+		} finally {
+			driver.findElement(By.id("button2")).click();
+		}
+	}
+	
+	public void testSendKeysKeyboard() {
+		try {
+			DriverTestPage.textElement.sendKeysKeyboard("youpi@[]é");
 			Assert.assertEquals(DriverTestPage.textElement.getValue(), "youpi@[]é");
 		} finally {
 			driver.findElement(By.id("button2")).click();

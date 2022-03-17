@@ -17,6 +17,9 @@
  */
 package com.seleniumtests.uipage.htmlelements;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -24,11 +27,14 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
@@ -53,6 +59,7 @@ import org.openqa.selenium.interactions.Coordinates;
 import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.RemoteWebElement;
+import org.openqa.selenium.remote.ScreenshotException;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -69,10 +76,14 @@ import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.driver.screenshots.ScreenshotUtil;
+import com.seleniumtests.driver.screenshots.SnapshotTarget;
 import com.seleniumtests.uipage.ExpectedConditionsC;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.ReplayOnError;
 import com.seleniumtests.util.helper.WaitHelper;
+import com.seleniumtests.util.imaging.ImageDetector;
+import com.seleniumtests.util.imaging.ImageProcessor;
 import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -322,6 +333,64 @@ public class HtmlElement extends Element implements WebElement, Locatable {
             logger.error(e);
         }
     }
+    
+    @ReplayOnError
+    public void clickMouse() {
+
+        Rectangle viewportPosition = detectViewPortPosition();
+    	
+    	// always scroll to element so that we can click on it with mouse
+    	setScrollToElementBeforeAction(true);
+    	findElement(true);
+
+        outlineElement(element);
+        
+        
+        Rectangle elementRect = getRect();
+        Point scrollPosition = ((CustomEventFiringWebDriver)driver).getScrollPosition();
+        
+        CustomEventFiringWebDriver.leftClicOnDesktopAt(
+        		true,
+        		elementRect.x + elementRect.width / 2 + viewportPosition.x - scrollPosition.x, 
+        		elementRect.y + elementRect.height / 2 + viewportPosition.y - scrollPosition.y, 
+        		SeleniumTestsContextManager.getThreadContext().getRunMode(), 
+        		SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector());
+        
+    }
+    
+
+	private File getDesktopScreenshotFile() {
+		ScreenshotUtil screenshotUtil = new ScreenshotUtil(); // update driver
+		return screenshotUtil.capture(SnapshotTarget.MAIN_SCREEN, File.class, true);		
+	}
+	private File getViewportScreenshotFile() {
+		ScreenshotUtil screenshotUtil = new ScreenshotUtil(); // update driver
+		return screenshotUtil.capture(SnapshotTarget.VIEWPORT, File.class, true);		
+	}
+	
+    private Rectangle detectViewPortPosition() {
+		BufferedImage image;
+		try {
+			image = ImageProcessor.loadFromFile(getViewportScreenshotFile());
+		
+			BufferedImage croppedImage = ImageProcessor.cropImage(image, 0, 0, image.getWidth(), 150);
+			File cropScreenshotFile = File.createTempFile("img", ".png");
+			ImageIO.write(croppedImage, "png", cropScreenshotFile);
+			
+			File desktopScreenshotFile = getDesktopScreenshotFile();
+			if (desktopScreenshotFile == null) {
+				throw new ScreenshotException("Desktop screenshot does not exist");
+			}
+			
+			ImageDetector imageDetector = new ImageDetector(desktopScreenshotFile, cropScreenshotFile, 0.2);
+			imageDetector.detectExactZoneWithoutScale();
+			org.openqa.selenium.Rectangle detectedRectangle = imageDetector.getDetectedRectangle();
+			return new Rectangle(detectedRectangle.x, detectedRectangle.y, detectedRectangle.height, detectedRectangle.width);
+			
+		} catch (IOException e) {
+			throw new ScreenshotException("Error getting position of viewport: " + e.getMessage());
+		}
+	}
     
     /**
      * Click element in native way by Actions.
@@ -1246,6 +1315,21 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public void sendKeysAction(CharSequence... keysToSend) {
     	findElement(true);
     	new Actions(driver).sendKeys(element, keysToSend).build().perform();
+    }
+    
+    /**
+     * Send keys using real keyboard
+     * @param keysToSend
+     */
+    public void sendKeysKeyboard(CharSequence... keysToSend) {	
+    	clickMouse();
+    	for (CharSequence keys: keysToSend) {
+    		CustomEventFiringWebDriver.writeToDesktop(
+    				keys.toString(),
+            		SeleniumTestsContextManager.getThreadContext().getRunMode(), 
+            		SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector());
+    	}
+        
     }
 
     /**

@@ -82,6 +82,11 @@ public class TestScrollingSafari extends TestAutoScrolling {
 	public void testAutoScrollToDivBottom() {
 		super.testAutoScrollToDivBottom();
 	}
+
+	@Test(groups={"it"})
+	public void testScrollToDivBottomClickMouse() {
+		super.testScrollToDivBottomClickMouse();
+	}
 	
 	@Test(groups={"it", "ut"})
 	public void testAutoScrollToBottom() {

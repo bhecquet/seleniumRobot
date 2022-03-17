@@ -101,6 +101,11 @@ public class TestDriverInternetExplorer extends TestDriver {
 	public void testClickActionCheckbox() {
 		super.testClickActionCheckbox();
 	}
+
+	@Test(groups={"it"})
+	public void testClickWithMouse() {
+		super.testClickWithMouse();
+	}
    
 	@Test(groups= {"ie"})
 	public void testSendKeys() {
@@ -110,6 +115,11 @@ public class TestDriverInternetExplorer extends TestDriver {
 	@Test(groups= {"ie"})
 	public void testSendKeysJs() {
 		super.testSendKeysJs();
+	}
+
+	@Test(groups={"it"})
+	public void testSendKeysKeyboard() {
+		super.testSendKeysKeyboard();
 	}
 
 	@Test(groups= {"ie"})

@@ -100,6 +100,11 @@ public class TestDriverChrome extends TestDriver {
 	public void testClickActionCheckbox() {
 		super.testClickActionCheckbox();
 	}
+	
+	@Test(groups={"it"})
+	public void testClickWithMouse() {
+		super.testClickWithMouse();
+	}
    
 	@Test(groups={"it", "ut"})
 	public void testSendKeys() {
@@ -109,6 +114,11 @@ public class TestDriverChrome extends TestDriver {
 	@Test(groups={"it", "ut"})
 	public void testSendKeysJs() {
 		super.testSendKeysJs();
+	}
+	
+	@Test(groups={"it"})
+	public void testSendKeysKeyboard() {
+		super.testSendKeysKeyboard();
 	}
 
 	@Test(groups={"it", "ut"})

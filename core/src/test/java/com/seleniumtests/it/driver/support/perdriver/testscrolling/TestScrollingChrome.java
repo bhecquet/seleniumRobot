@@ -48,6 +48,11 @@ public class TestScrollingChrome extends TestAutoScrolling {
 		super.testScrollToDivBottom();
 	}
 	
+	@Test(groups={"it"})
+	public void testScrollToDivBottomClickMouse() {
+		super.testScrollToDivBottomClickMouse();
+	}
+	
 	@Test(groups={"it", "ut"})
 	public void testScrollToDivBottomWithCompositeAction() {
 		super.testScrollToDivBottomWithCompositeAction();
