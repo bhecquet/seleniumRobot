@@ -469,7 +469,7 @@ public class TestByC extends MockitoTest {
         ByC.And byAnd = new ByC.And(id, name);
         List<WebElement> elements = byAnd.findElements(driver);
         assertEquals(elements.size(), 1);
-        assertTrue(elements.contains(id));
+        assertTrue(elements.contains(element1));
     }
 
     @Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)
