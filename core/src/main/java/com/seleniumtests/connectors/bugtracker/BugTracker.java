@@ -162,12 +162,12 @@ public abstract class BugTracker {
 			
 			// "Test end" step should never be considered as failed, because it reflects the overall test result
 			if (Boolean.TRUE.equals(testStep.getFailed()) 
-					&& !testStep.getName().startsWith(TestStepManager.LAST_STEP_NAME) 
+					&& !testStep.isTestEndStep() 
 					&& !testStep.isDisableBugtracker() // if the step has the flag disabling bugtracker, do not count it as failed step
 					) {
 				failedSteps.add(testStep);
 			}
-			if (testStep.getName().startsWith(TestStepManager.LAST_STEP_NAME)) {
+			if (testStep.isTestEndStep()) {
 				lastTestStep = testStep;		
 				break;
 			}

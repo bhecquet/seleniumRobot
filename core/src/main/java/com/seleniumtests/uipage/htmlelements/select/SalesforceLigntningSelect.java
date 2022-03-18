@@ -21,8 +21,8 @@ public class SalesforceLigntningSelect extends AngularSelect implements ISelectL
 		super(parentElement, frameElement);
 		
 
-		locatorClickToOpen = ByC.xTagName("input");
-		locatorClickToclose = By.className("ng-arrow-wrapper");
+		locatorClickToOpen = ByC.xTagName("button");
+		locatorClickToclose = ByC.xTagName("button");
 		locatorParentOfDropdown = By.tagName("ng-dropdown-panel"); // is present in DOM only when options are displayed
 		locatorOption = ByC.xTagName("lightning-base-combobox-item");
 		locatorCheckboxInOption = null;
@@ -52,13 +52,13 @@ public class SalesforceLigntningSelect extends AngularSelect implements ISelectL
 	}
 
 	/**
-	 * Close the combobox
+	 * Close the combobox in case it's a multi-select
 	 */
 	@Override
 	public void finalizeAction() {
 		handleAlert();
-		if ("true".equalsIgnoreCase(parentElement.findElement(ByC.attribute("role", "combobox")).getAttribute("aria-expanded"))) {
-			parentElement.findElement(ByC.xTagName("input")).click();
+		if ("true".equalsIgnoreCase(parentElement.findElement(ByC.attribute("aria-haspopup", "listbox")).getAttribute("aria-expanded"))) {
+			parentElement.findElement(locatorClickToclose).click();
 		}
 	}
 
