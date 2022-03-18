@@ -360,8 +360,8 @@ public class TestWebUiDriver extends ReporterTest {
 		Assert.assertEquals(WebUIDriver.getWebDriver(false), driver2);
 		
 		// created browser is of the requested type
-		Assert.assertTrue(((CustomEventFiringWebDriver)driver1).getWebDriver() instanceof ChromeDriver);
-		Assert.assertTrue(((CustomEventFiringWebDriver)driver2).getWebDriver() instanceof FirefoxDriver);
+		Assert.assertEquals(((CustomEventFiringWebDriver)driver1).getCapabilities().getBrowserName(), "chrome");
+		Assert.assertEquals(((CustomEventFiringWebDriver)driver2).getCapabilities().getBrowserName(), "firefox");
 	}
 	
 	@Test(groups={"it"}, enabled=false)

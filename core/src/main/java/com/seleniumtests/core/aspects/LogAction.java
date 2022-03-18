@@ -306,7 +306,7 @@ public class LogAction {
 			targetName = "Select";
 		} else if (targetName.contains("->")) {
 			try {
-				targetName = "Element located by" + targetName.split("->")[1].replace("]", "");
+				targetName = "Element located by" + targetName.split("->")[1].replace("]", "").replace("}", "");
 			} catch (IndexOutOfBoundsException e) {
 				// we should never go here
 			}
