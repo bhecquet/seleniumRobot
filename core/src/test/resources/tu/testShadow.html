@@ -26,7 +26,7 @@
 			var s7 = document.getElementById("shadow7").attachShadow({mode: "open"});
 			s7.innerHTML='<div id="pass7Shadow">This is a div with an ID of pass7Shadow</div><div id="shadow71" name="doubleSubShadow"></div>';
 			var s71=s7.getElementById("shadow71").attachShadow({mode: "open"});
-			s71.innerHTML='<div id="pass71Shadow">This is a DIV with the ID of pass71Shadow</div>';
+			s71.innerHTML='<div id="pass71Shadow" name="pass71ShadowName" class="foo">This is a DIV with the ID <a>of pass71Shadow</a></div>';
 			
 			var s8 = document.getElementById("shadow8").attachShadow({mode: "open"});
 			s8.innerHTML='<div id="pass8Shadow">This is a div with an ID of pass8Shadow</div><div id="shadow81" name="doubleSubShadow"></div>';

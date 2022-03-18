@@ -74,6 +74,7 @@ import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.logger.TestStep.StepStatus;
+import com.seleniumtests.uipage.ByC;
 import com.seleniumtests.uipage.htmlelements.FrameElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
@@ -671,6 +672,99 @@ public class TestHtmlElement extends MockitoTest {
 		Assert.assertFalse(exceptionRaised);
 		Assert.assertTrue(LocalDateTime.now().minusSeconds(3).isBefore(start));
 	}
+	
+	/**
+	 * Check selector is not replaced if we are not a child of shadow root
+	 */
+	@Test(groups = { "ut" })
+	public void testReplaceSelector() {
+		HtmlElement present = new HtmlElement("element", By.xpath("present"));
+		present.replaceSelector();
+		Assert.assertEquals(present.getBy(), By.xpath("present"));
+	}
+	
+	/**
+	 * Check xpath selector is not valid if we are a child of shadow root
+	 */
+	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
+	public void testReplaceSelectorWithShadowRootAndXpath() {
+		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(By.xpath("//div"));
+		present.replaceSelector();
+	}
+	@Test(groups = { "ut" })
+	public void testReplaceSelectorWithShadowRootAndTagName() {
+		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(By.tagName("div"));
+		present.replaceSelector();
+		Assert.assertEquals(present.getBy(), By.cssSelector("div"));
+	}
+	@Test(groups = { "ut" })
+	public void testReplaceSelectorWithShadowRootAndName() {
+		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(By.name("foo"));
+		present.replaceSelector();
+		Assert.assertEquals(present.getBy(), By.cssSelector("[name=foo]"));
+	}
+	@Test(groups = { "ut" })
+	public void testReplaceSelectorWithShadowRootAndId() {
+		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(By.id("foo"));
+		present.replaceSelector();
+		Assert.assertEquals(present.getBy(), By.id("foo"));
+	}
+	@Test(groups = { "ut" })
+	public void testReplaceSelectorWithShadowRootAndLinkText() {
+		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(By.linkText("foo"));
+		present.replaceSelector();
+		Assert.assertEquals(present.getBy(), By.linkText("foo"));
+	}
+	@Test(groups = { "ut" })
+	public void testReplaceSelectorWithShadowRootAndXId() {
+		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(ByC.xId("foo"));
+		present.replaceSelector();
+		Assert.assertEquals(present.getBy(), ByC.attribute("id", "foo"));
+	}
+	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
+	public void testReplaceSelectorWithShadowRootAndXClassName() {
+		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(ByC.xClassName("foo"));
+		present.replaceSelector();
+	}
+	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
+	public void testReplaceSelectorWithShadowRootAndXTagName() {
+		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(ByC.xTagName("foo"));
+		present.replaceSelector();
+	}
+	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
+	public void testReplaceSelectorWithShadowRootAndXLinkText() {
+		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(ByC.xLinkText("foo"));
+		present.replaceSelector();
+	}
+	@Test(groups = { "ut" })
+	public void testReplaceSelectorWithShadowRootAndXName() {
+		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(ByC.xName("foo"));
+		present.replaceSelector();
+		Assert.assertEquals(present.getBy(), ByC.attribute("name", "foo"));
+	}
+	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
+	public void testReplaceSelectorWithShadowRootAndText() {
+		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(ByC.text("foo", "div"));
+		present.replaceSelector();
+	}
+	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
+	public void testReplaceSelectorWithShadowRootAndLabelForward() {
+		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(ByC.labelForward("foo", "div"));
+		present.replaceSelector();
+	}
+	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
+	public void testReplaceSelectorWithShadowRootAndLabelBackward() {
+		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(ByC.labelBackward("foo", "div"));
+		present.replaceSelector();
+	}
+	@Test(groups = { "ut" })
+	public void testReplaceSelectorWithShadowRootAndAttribute() {
+		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(ByC.attribute("foo", "bar"));
+		present.replaceSelector();
+		Assert.assertEquals(present.getBy(), ByC.attribute("foo", "bar"));
+		Assert.assertTrue(((ByC.ByAttribute)present.getBy()).isUseCssSelector()); // check we use the Css Selector instead of XPath
+	}
+	
 	
 	
 	
