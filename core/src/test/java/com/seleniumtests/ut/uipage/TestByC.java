@@ -128,6 +128,14 @@ public class TestByC extends MockitoTest {
         byAttribute.findElement(driver);
         verify(driver).findElement(By.xpath(".//*[@name='value']"));
     }
+    
+    @Test
+    public void testFindElementByAttributeWithCssSelector() {
+        ByC.ByAttribute byAttribute = spy(new ByC.ByAttribute("name", "value"));
+        byAttribute.setUseCssSelector(true);
+        byAttribute.findElement(driver);
+        verify(driver).findElement(By.cssSelector("[name=value]"));
+    }
 
     @Test
     public void testFindElementsByAttribute() {
@@ -136,6 +144,14 @@ public class TestByC extends MockitoTest {
         verify(driver).findElements(By.xpath(".//*[@meduse='douce']"));
     }
 
+    @Test
+    public void testFindElementsByAttributeWithCssSelector() {
+        ByC.ByAttribute byAttribute = spy(new ByC.ByAttribute("name", "value"));
+        byAttribute.setUseCssSelector(true);
+        byAttribute.findElements(driver);
+        verify(driver).findElements(By.cssSelector("[name=value]"));
+    }
+    
     @Test
     public void testFindElementByLabelBackward() {
         ByC.ByLabelBackward byLabelBackward = spy(new ByC.ByLabelBackward("Physalia", "div", true,"label"));

@@ -18,8 +18,6 @@
 package com.seleniumtests.uipage.htmlelements;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -64,7 +62,6 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.testretry.TestRetryAnalyzer;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
-import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
@@ -682,6 +679,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         	}
         	
         	searchContext = findSeleniumElement(parent.searchContext, elementInfo);
+        	
 
         } else {
         	searchContext = findSeleniumElement(driver, elementInfo);
@@ -739,20 +737,13 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	
     	SearchContext seleniumElement;
     	try {
-//    		if (by instanceof ByC.Shadow) {
-//    			context.findElements(by);
-//    			if (elementIndex == null) {
-//		    		seleniumElement = ((ByC.Shadow) by).getSearchContexts().get(0);
-//		    	} else {
-//		    		seleniumElement = getElementByIndex(((ByC.Shadow) by).getSearchContexts());
-//		    	}
-//    		} else {
-    			if (elementIndex == null) {
-		    		seleniumElement = context.findElement(by);
-		    	} else {
-		    		seleniumElement = getElementByIndex(context.findElements(by));
-		    	}
-//    		}
+    		replaceSelector();
+    		
+			if (elementIndex == null) {
+	    		seleniumElement = context.findElement(by);
+	    	} else {
+	    		seleniumElement = getElementByIndex(context.findElements(by));
+	    	}
 	    	return seleniumElement;
     	} catch (WebDriverException e) {
     		
@@ -760,6 +751,25 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     		// this code is here to prepare advanced element search
     		throw e;
     	}
+    }
+    
+    /**
+     * Some selectors are not allowed as direct children of a Shadow root (tagName, xPath, name)
+     * For xPath, we can't do anything as it's impossible to convert any xPath to its cssSelector equivalent
+     * For name and tagName, we provide the equivalent cssSelector
+     */
+    public void replaceSelector() {
+    	if (parent != null && parent.by instanceof ByC.Shadow) {
+    		if (by instanceof By.ByXPath || by instanceof ByC.ByForcedXPath || (by instanceof ByC && !(by instanceof ByC.ByHasCssSelector))) {
+    			throw new ScenarioException(String.format("%s is not supported as a direct child of a shadow DOM as it uses XPath. Try to add an intermediate selector (e.g: By.tagName) before", by.getClass()));
+    		} else if (by instanceof By.ByTagName) {
+    			by = By.cssSelector(by.toString().split(":")[1].trim());
+    		} else if (by instanceof By.ByName) {
+    			by = By.cssSelector(String.format("[name=%s]", by.toString().split(":")[1].trim()));
+    		} else if (by instanceof ByC.ByHasCssSelector) {
+    			((ByC.ByHasCssSelector)by).setUseCssSelector(true);
+    		}
+    	} 
     }
         
     /**

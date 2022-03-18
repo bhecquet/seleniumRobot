@@ -50,6 +50,36 @@ public class ByC extends By {
 
     private static final String ERROR_CANNOT_FIND_ELEMENT_WITH_SUCH_CRITERIA = "Cannot find element with such criteria ";
 
+	/**
+	 * All classes that inherit this class force the use of xpath to search elements.
+	 * Helps to do salesforce tests when pseudo shadow DOM is used
+	 * @author S047432
+	 *
+	 */
+	public abstract static class ByForcedXPath extends By implements Serializable {
+
+		private static final long serialVersionUID = 4699295846976948351L;
+		
+	}
+	
+	public abstract static class ByHasCssSelector extends ByC implements Serializable {
+
+		private static final long serialVersionUID = 4699295846976949851L;
+		
+		protected boolean useCssSelector;
+
+		public boolean isUseCssSelector() {
+			return useCssSelector;
+		}
+
+		public void setUseCssSelector(boolean useCssSelector) {
+			this.useCssSelector = useCssSelector;
+		}
+		
+		public abstract String getEffectiveCssSelector();
+		
+	}
+    
 	@Override
 	public List<WebElement> findElements(SearchContext context) {
 		return new ArrayList<>();
@@ -479,7 +509,7 @@ public class ByC extends By {
 	}
 	
 
-	public static class ByAttribute extends ByC implements Serializable {
+	public static class ByAttribute extends ByHasCssSelector implements Serializable {
 
 		private static final long serialVersionUID = 5341968046120372161L;
 
@@ -528,15 +558,28 @@ public class ByC extends By {
 				return String.format("[@%s=%s]", attributeName, escapedAttributeValue);
 			}
 		}
+		
+		@Override
+		public String getEffectiveCssSelector() {	
+			return String.format("[%s=%s]", attributeName, attributeValue);
+		}
 
         @Override
         public List<WebElement> findElements(SearchContext context) {
-            return context.findElements(By.xpath(getEffectiveXPath()));
+        	if (useCssSelector) {
+        		return context.findElements(By.cssSelector(getEffectiveCssSelector()));
+        	} else {
+        		return context.findElements(By.xpath(getEffectiveXPath()));
+        	}
         }
 
         @Override
         public WebElement findElement(SearchContext context) {
-            return context.findElement(By.xpath(getEffectiveXPath()));
+        	if (useCssSelector) {
+        		return context.findElement(By.cssSelector(getEffectiveCssSelector()));
+        	} else {
+        		return context.findElement(By.xpath(getEffectiveXPath()));
+        	}
         }
 
 		@Override
@@ -880,8 +923,10 @@ public class ByC extends By {
 			return by;
 		}
 	}
+	
 
-	public static class ByXTagName extends By implements Serializable {
+
+	public static class ByXTagName extends ByForcedXPath implements Serializable {
 
 	    private static final long serialVersionUID = 4699295846984948351L;
 
@@ -915,7 +960,7 @@ public class ByC extends By {
 	    }
 	  }
 
-	  public static class ByXClassName extends By implements Serializable {
+	  public static class ByXClassName extends ByForcedXPath implements Serializable {
 
 	    private static final long serialVersionUID = -8737882849130394673L;
 

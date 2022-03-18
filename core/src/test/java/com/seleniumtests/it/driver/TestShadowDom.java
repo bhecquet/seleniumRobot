@@ -27,6 +27,7 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageShadowDom;
 import com.seleniumtests.uipage.ByC;
@@ -78,10 +79,84 @@ public class TestShadowDom extends GenericTest {
 	
 	/**
 	 * Shadow elements are located through the same locators, check that the first one is used
+	 * Also check that By.tagName is supported as a direct child of shadow root
 	 */
 	@Test(groups={"it"})
 	public void testAccessMultipleSameSubShadowElement() {
-		Assert.assertEquals(DriverTestPageShadowDom.divMultipleShadowElements.findElement(ByC.xTagName("div")).getText(), "This is a DIV with the ID of pass71Shadow");
+		Assert.assertEquals(DriverTestPageShadowDom.divMultipleShadowElements.findElement(By.tagName("div")).getText(), "This is a DIV with the ID of pass71Shadow");
+	}
+
+	/**
+	 * Check that By.id is supported as a direct child of shadow root
+	 */
+	@Test(groups={"it"})
+	public void testAccessMultipleSameSubShadowElementById() {
+		Assert.assertEquals(DriverTestPageShadowDom.divMultipleShadowElements.findElement(By.id("pass71Shadow")).getText(), "This is a DIV with the ID of pass71Shadow");
+	}
+	
+	/**
+	 * Check that By.className is supported as a direct child of shadow root
+	 */
+	@Test(groups={"it"})
+	public void testAccessMultipleSameSubShadowElementByClassName() {
+		Assert.assertEquals(DriverTestPageShadowDom.divMultipleShadowElements.findElement(By.className("foo")).getText(), "This is a DIV with the ID of pass71Shadow");
+	}
+	
+	/**
+	 * Check that By.cssSelector is supported as a direct child of shadow root
+	 */
+	@Test(groups={"it"})
+	public void testAccessMultipleSameSubShadowElementByCssSelector() {
+		Assert.assertEquals(DriverTestPageShadowDom.divMultipleShadowElements.findElement(By.cssSelector("div")).getText(), "This is a DIV with the ID of pass71Shadow");
+	}
+	
+	/**
+	 * Check that By.name is supported as a direct child of shadow root
+	 */
+	@Test(groups={"it"})
+	public void testAccessMultipleSameSubShadowElementByName() {
+		Assert.assertEquals(DriverTestPageShadowDom.divMultipleShadowElements.findElement(By.name("pass71ShadowName")).getText(), "This is a DIV with the ID of pass71Shadow");
+	}
+	
+	/**
+	 * Check that By.linkText is supported as a direct child of shadow root
+	 */
+	@Test(groups={"it"})
+	public void testAccessMultipleSameSubShadowElementByLinkText() {
+		Assert.assertEquals(DriverTestPageShadowDom.divMultipleShadowElements.findElement(By.linkText("of pass71Shadow")).getText(), "of pass71Shadow");
+	}
+	
+	/**
+	 * Check that By.xpath is not supported as a direct child of shadow root
+	 */
+	@Test(groups={"it"}, expectedExceptions = ScenarioException.class, expectedExceptionsMessageRegExp = ".*ByXPath is not supported as a direct child of a shadow DOM as it uses XPath.*")
+	public void testAccessMultipleSameSubShadowElementByXPath() {
+		DriverTestPageShadowDom.divMultipleShadowElements.findElement(By.xpath("//div")).getText();
+	}
+	
+	/**
+	 * Check that xpath is still supported if it's not a direct child of shadow root
+	 */
+	@Test(groups={"it"})
+	public void testAccessMultipleSameSubShadowElementByXPath2() {
+		Assert.assertEquals(DriverTestPageShadowDom.divMultipleShadowElements.findElement(By.tagName("div")).findElement(By.xpath("//a")).getText(), "of pass71Shadow");
+	}
+	
+	/**
+	 * Check search ByC.attribute with internally uses xpath is converted to a Css selector
+	 */
+	@Test(groups={"it"})
+	public void testAccessMultipleSameSubShadowElementByCAttribute() {
+		Assert.assertEquals(DriverTestPageShadowDom.divMultipleShadowElements.findElement(ByC.attribute("id", "pass71Shadow")).getText(), "This is a DIV with the ID of pass71Shadow");
+	}
+	
+	
+	/**
+	 * Check search ByC.text fails as it uses XPath internally
+	 */
+	@Test(groups={"it"}, expectedExceptions = ScenarioException.class, expectedExceptionsMessageRegExp = ".*ByText is not supported as a direct child of a shadow DOM as it uses XPath.*")
+	public void testAccessMultipleSameSubShadowElementByCText() {
+		DriverTestPageShadowDom.divMultipleShadowElements.findElement(ByC.text("This is a DIV with the ID", "div")).getText();
 	}
 	
 	/**
