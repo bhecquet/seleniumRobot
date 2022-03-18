@@ -90,7 +90,7 @@ public class TestIECapabilityFactory extends MockitoTest {
 		when(osUtility.getProgramExtension()).thenReturn(".exe");
 		
 		when(config.getTestContext()).thenReturn(context);
-		Mockito.when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.NONE));
+		when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.NONE));
 		
 	}
 	
@@ -100,9 +100,9 @@ public class TestIECapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilities() {
 		
-		Mockito.when(config.isEnableJavascript()).thenReturn(true);
-		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
-		Mockito.when(config.getNodeTags()).thenReturn(new ArrayList<>());
+		when(config.isEnableJavascript()).thenReturn(true);
+		when(config.getProxy()).thenReturn(proxyConfig);
+		when(config.getNodeTags()).thenReturn(new ArrayList<>());
 		
 		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
 		
@@ -113,6 +113,36 @@ public class TestIECapabilityFactory extends MockitoTest {
 		Assert.assertEquals(capa.getBrowserVersion(), "");
 		Assert.assertEquals(capa.getCapability(CapabilityType.PROXY), proxyConfig);
 	}
+	
+	@Test(groups={"ut"})
+	public void testCreateCapabilitiesAttachExistingBrowser() {
+		
+		when(config.isEnableJavascript()).thenReturn(true);
+		when(config.getProxy()).thenReturn(proxyConfig);
+		when(config.getNodeTags()).thenReturn(new ArrayList<>());
+		when(config.getAttachExistingDriverPort()).thenReturn(0);
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		
+		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
+		
+		Assert.assertTrue(capa.is("attachExistingBrowser"));
+
+	}
+	
+	@Test(groups={"ut"})
+	public void testCreateCapabilitiesAttachExistingBrowserGrid() {
+		
+		when(config.isEnableJavascript()).thenReturn(true);
+		when(config.getProxy()).thenReturn(proxyConfig);
+		when(config.getNodeTags()).thenReturn(new ArrayList<>());
+		when(config.getAttachExistingDriverPort()).thenReturn(0);
+		when(config.getMode()).thenReturn(DriverMode.GRID);
+		
+		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
+		
+		Assert.assertTrue(capa.is("attachExistingBrowser"));
+		
+	}
 
 	/**
 	 * Check default behaviour when node tags are defined in grid mode
@@ -121,10 +151,10 @@ public class TestIECapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithNodeTagsInGridMode() {
 		
-		Mockito.when(config.isEnableJavascript()).thenReturn(true);
-		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
-		Mockito.when(config.getNodeTags()).thenReturn(Arrays.asList("foo", "bar"));
-		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
+		when(config.isEnableJavascript()).thenReturn(true);
+		when(config.getProxy()).thenReturn(proxyConfig);
+		when(config.getNodeTags()).thenReturn(Arrays.asList("foo", "bar"));
+		when(config.getMode()).thenReturn(DriverMode.GRID);
 		
 		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
 		
@@ -138,8 +168,8 @@ public class TestIECapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithNodeTagsInLocalMode() {
 		
-		Mockito.when(config.getNodeTags()).thenReturn(Arrays.asList("foo", "bar"));
-		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		when(config.getNodeTags()).thenReturn(Arrays.asList("foo", "bar"));
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		
 		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
 		
@@ -149,9 +179,9 @@ public class TestIECapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithPlatform() {
 		
-		Mockito.when(config.isEnableJavascript()).thenReturn(true);
-		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
-		Mockito.when(config.getWebPlatform()).thenReturn(Platform.WINDOWS);
+		when(config.isEnableJavascript()).thenReturn(true);
+		when(config.getProxy()).thenReturn(proxyConfig);
+		when(config.getWebPlatform()).thenReturn(Platform.WINDOWS);
 		
 		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
 		
@@ -162,8 +192,8 @@ public class TestIECapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithJavascriptDisabled() {
 		
-		Mockito.when(config.isEnableJavascript()).thenReturn(false);
-		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
+		when(config.isEnableJavascript()).thenReturn(false);
+		when(config.getProxy()).thenReturn(proxyConfig);
 		
 		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
 		
@@ -174,9 +204,9 @@ public class TestIECapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithVersion() {
 		
-		Mockito.when(config.isEnableJavascript()).thenReturn(true);
-		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
-		Mockito.when(config.getBrowserVersion()).thenReturn("10.0");
+		when(config.isEnableJavascript()).thenReturn(true);
+		when(config.getProxy()).thenReturn(proxyConfig);
+		when(config.getBrowserVersion()).thenReturn("10.0");
 		
 		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
 		
@@ -188,7 +218,7 @@ public class TestIECapabilityFactory extends MockitoTest {
 	public void testCreateDefaultIECapabilities() {
 		
 
-		Mockito.when(config.getInitialUrl()).thenReturn("http://mysite"); // check we start on "about:blank"
+		when(config.getInitialUrl()).thenReturn("http://mysite"); // check we start on "about:blank"
 		
 		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
 		
@@ -204,7 +234,7 @@ public class TestIECapabilityFactory extends MockitoTest {
 		try {
 			PowerMockito.mockStatic(Advapi32Util.class);
 			PowerMockito.when(Advapi32Util.registryGetValue(any(HKEY.class), anyString(), anyString())).thenReturn("1");
-			Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
+			when(config.getMode()).thenReturn(DriverMode.LOCAL);
 			
 			new IECapabilitiesFactory(config).createCapabilities();
 			
@@ -219,8 +249,8 @@ public class TestIECapabilityFactory extends MockitoTest {
 		try {
 			PowerMockito.mockStatic(Advapi32Util.class);
 			PowerMockito.when(Advapi32Util.registryGetValue(any(HKEY.class), anyString(), anyString())).thenReturn("1");
-			Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
-			Mockito.when(config.getIeDriverPath()).thenReturn("/opt/ie/driver/ie");
+			when(config.getMode()).thenReturn(DriverMode.LOCAL);
+			when(config.getIeDriverPath()).thenReturn("/opt/ie/driver/ie");
 			
 			new IECapabilitiesFactory(config).createCapabilities();
 			
@@ -232,7 +262,7 @@ public class TestIECapabilityFactory extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testCreateIECapabilitiesStandardDriverPathGrid() {
-		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
+		when(config.getMode()).thenReturn(DriverMode.GRID);
 		
 		new IECapabilitiesFactory(config).createCapabilities();
 		
@@ -247,9 +277,9 @@ public class TestIECapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultEdgeIEModeCapabilities() {
 		
-		Mockito.when(config.getIeMode()).thenReturn(true);
-		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
-		Mockito.when(config.getInitialUrl()).thenReturn("http://mysite");
+		when(config.getIeMode()).thenReturn(true);
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		when(config.getInitialUrl()).thenReturn("http://mysite");
 		
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
 		browserInfos.put(BrowserType.INTERNET_EXPLORER, Arrays.asList(new BrowserInfo(BrowserType.INTERNET_EXPLORER, "11", "", false)));
@@ -279,9 +309,9 @@ public class TestIECapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultEdgeIEModeCapabilitiesGrid() {
 		
-		Mockito.when(config.getIeMode()).thenReturn(true);
-		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
-		Mockito.when(config.getInitialUrl()).thenReturn("http://mysite");
+		when(config.getIeMode()).thenReturn(true);
+		when(config.getMode()).thenReturn(DriverMode.GRID);
+		when(config.getInitialUrl()).thenReturn("http://mysite");
 		
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
 		browserInfos.put(BrowserType.INTERNET_EXPLORER, Arrays.asList(new BrowserInfo(BrowserType.INTERNET_EXPLORER, "11", "", false)));
@@ -309,9 +339,9 @@ public class TestIECapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class)
 	public void testCreateDefaultEdgeIEModeCapabilitiesGridEdgeNotAvailable() {
 		
-		Mockito.when(config.getIeMode()).thenReturn(true);
-		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
-		Mockito.when(config.getInitialUrl()).thenReturn("http://mysite");
+		when(config.getIeMode()).thenReturn(true);
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		when(config.getInitialUrl()).thenReturn("http://mysite");
 		
 		new IECapabilitiesFactory(config).createCapabilities();
 		
