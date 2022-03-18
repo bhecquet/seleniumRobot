@@ -120,7 +120,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			if (testSteps != null) {
 				for (TestStep step: testSteps) {
 					testDuration += step.getDuration();
-					if (Boolean.TRUE.equals(step.getFailed())) {
+					if (Boolean.TRUE.equals(step.getFailed()) && !step.isTestEndStep()) {
 						failedStep = step.getName();
 						errors++;
 					}
