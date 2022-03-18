@@ -42,12 +42,12 @@ public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
 
 	@Override
 	protected MutableCapabilities getDriverOptions() {
-		InternetExplorerOptions options = new InternetExplorerOptions();
+		InternetExplorerOptions options = new InternetExplorerOptions()
+				.introduceFlakinessByIgnoringSecurityDomains()
+				.destructivelyEnsureCleanSession()
+				.ignoreZoomSettings();
 		
-		
-		options.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS,true);
-        options.setCapability(InternetExplorerDriver.IE_ENSURE_CLEAN_SESSION, true);
-        options.setCapability(InternetExplorerDriver.IGNORE_ZOOM_SETTING, true);
+
         
 //        options.setCapability(InternetExplorerDriver.REQUIRE_WINDOW_FOCUS, true);
 //        options.setCapability(InternetExplorerDriver.NATIVE_EVENTS, true);
@@ -56,19 +56,12 @@ public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
         	options.setCapability(InternetExplorerDriver.LOG_LEVEL, "TRACE");
         }
         
-        if (webDriverConfig.getAttachExistingDriverPort() != null) {
-        	
-        	// when attaching to an existing Internet Explorer, give the option to driver which will then not create a new Internet Explorer
-	        options.setCapability("attachExistingBrowser", true);
-			((Map<String, Object>) options.getCapability(SE_IE_OPTIONS)).put("attachExistingBrowser", true);
-        }
-        
         if (Boolean.TRUE.equals(webDriverConfig.getIeMode())) {
         	configureEdgeIeMode(options);
         	
         } else {
         	// initial URL is not set for Edge in IE mode, as about:blank is not a real URL and this prevent driver from finding the IE window
-        	options.setCapability(InternetExplorerDriver.INITIAL_BROWSER_URL, "about:blank");
+        	options.withInitialBrowserUrl("about:blank");
         }
 		
         if (webDriverConfig.getPageLoadStrategy() != null) {
@@ -89,15 +82,14 @@ public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
 			}
 			
 			// put in both location as Selenium3 does not handle edge chromium properly
-			((Map<String, Object>) options.getCapability(SE_IE_OPTIONS)).put("ie.edgechromium", true);
-		    options.setCapability("ie.edgechromium", true); 
-			((Map<String, Object>) options.getCapability(SE_IE_OPTIONS)).put("ie.edgepath", edgeBrowserInfos.get(0).getPath());
-		    options.setCapability("ie.edgepath", edgeBrowserInfos.get(0).getPath());
+			options.attachToEdgeChrome()
+				.withEdgeExecutablePath(edgeBrowserInfos.get(0).getPath());
+
 		} else {
 			options.setCapability(SeleniumRobotCapabilityType.EDGE_IE_MODE, true);
 		}
 
-	    options.setCapability(InternetExplorerDriver.INITIAL_BROWSER_URL, webDriverConfig.getInitialUrl());
+	    options.withInitialBrowserUrl(webDriverConfig.getInitialUrl());
 	}
 
 	@Override
@@ -119,15 +111,24 @@ public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
 	protected String getBrowserBinaryPath() {
 		return null;
 	}
+	
+	private void configureAttachExistingBrowser(MutableCapabilities options) {
+
+        if (webDriverConfig.getAttachExistingDriverPort() != null) {
+        	
+        	// when attaching to an existing Internet Explorer, give the option to driver which will then not create a new Internet Explorer
+	        options.setCapability("attachExistingBrowser", true);
+			((Map<String, Object>) options.getCapability(SE_IE_OPTIONS)).put("attachExistingBrowser", true);
+        }
+	}
 
 	@Override
 	protected void updateOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
-		// nothing to do
+		configureAttachExistingBrowser(options); // moved here because InternetExplorerOptions.merge removed the option (it's unknown from Selenium)
 	}
 
 	@Override
 	protected void updateGridOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
-		// TODO Auto-generated method stub
-		
+		configureAttachExistingBrowser(options); // moved here because InternetExplorerOptions.merge removed the option (it's unknown from Selenium)
 	}
 }

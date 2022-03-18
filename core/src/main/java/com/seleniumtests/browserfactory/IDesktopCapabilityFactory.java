@@ -20,6 +20,7 @@ package com.seleniumtests.browserfactory;
 import java.io.File;
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.Map;
 
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Proxy;
