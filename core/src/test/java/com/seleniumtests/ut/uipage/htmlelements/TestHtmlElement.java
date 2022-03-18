@@ -22,6 +22,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
@@ -474,60 +475,60 @@ public class TestHtmlElement extends MockitoTest {
 		finalCheck(true);
 	}
 
-//	@Test(groups = { "ut" })
-//	public void testPinch() throws Exception {
-//		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
-//		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
-//		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
-//		doNothing().when(el).findElement(anyBoolean(), anyBoolean());
-//		el.setElement(mobileElement);
-//		el.pinch();
-//		PowerMockito.verifyPrivate(el, atLeastOnce()).invoke("checkForMobile");
-//	}
-//
-//	@Test(groups = { "ut" })
-//	public void testGetCenter() throws Exception {
-//		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
-//		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
-//		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
-//		doNothing().when(el).findElement(anyBoolean(), anyBoolean());
-//		el.setElement(mobileElement);
-//		el.getCenter();
-//		PowerMockito.verifyPrivate(el, atLeastOnce()).invoke("checkForMobile");
-//	}
-//
-//	@Test(groups = { "ut" })
-//	public void testSwipe1() throws Exception {
-//		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
-//		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
-//		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
-//		doNothing().when(el).findElement(anyBoolean(), anyBoolean());
-//		el.setElement(mobileElement);
-//		el.swipe(0, 0, 0, 10);
-//		PowerMockito.verifyPrivate(el, atLeastOnce()).invoke("checkForMobile");
-//	}
-//
-//	@Test(groups = { "ut" })
-//	public void testTap() throws Exception {
-//		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
-//		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
-//		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
-//		doNothing().when(el).findElement(anyBoolean(), anyBoolean());
-//		el.setElement(mobileElement);
-//		el.tap(2, 2);
-//		PowerMockito.verifyPrivate(el, atLeastOnce()).invoke("checkForMobile");
-//	}
-//
-//	@Test(groups = { "ut" })
-//	public void testZoom() throws Exception {
-//		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
-//		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
-//		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
-//		doNothing().when(el).findElement(anyBoolean(), anyBoolean());
-//		el.setElement(mobileElement);
-//		el.zoom();
-//		PowerMockito.verifyPrivate(el, atLeastOnce()).invoke("checkForMobile");
-//	}
+	@Test(groups = { "ut" })
+	public void testPinch() throws Exception {
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
+		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
+		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
+		doNothing().when(el).findElement(anyBoolean(), anyBoolean());
+		el.setElement(mobileElement);
+		el.pinch();
+		PowerMockito.verifyPrivate(el, atLeastOnce()).invoke("checkForMobile");
+	}
+
+	@Test(groups = { "ut" })
+	public void testGetCenter() throws Exception {
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
+		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
+		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
+		doNothing().when(el).findElement(anyBoolean(), anyBoolean());
+		el.setElement(mobileElement);
+		el.getCenter();
+		PowerMockito.verifyPrivate(el, atLeastOnce()).invoke("checkForMobile");
+	}
+
+	@Test(groups = { "ut" })
+	public void testSwipe1() throws Exception {
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
+		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
+		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
+		doNothing().when(el).findElement(anyBoolean(), anyBoolean());
+		el.setElement(mobileElement);
+		el.swipe(0, 0, 0, 10);
+		PowerMockito.verifyPrivate(el, atLeastOnce()).invoke("checkForMobile");
+	}
+
+	@Test(groups = { "ut" })
+	public void testTap() throws Exception {
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
+		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
+		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
+		doNothing().when(el).findElement(anyBoolean(), anyBoolean());
+		el.setElement(mobileElement);
+		el.tap(2, 2);
+		PowerMockito.verifyPrivate(el, atLeastOnce()).invoke("checkForMobile");
+	}
+
+	@Test(groups = { "ut" })
+	public void testZoom() throws Exception {
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
+		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
+		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
+		doNothing().when(el).findElement(anyBoolean(), anyBoolean());
+		el.setElement(mobileElement);
+		el.zoom();
+		PowerMockito.verifyPrivate(el, atLeastOnce()).invoke("checkForMobile");
+	}
 
 	@Test(groups = { "ut" })
 	public void testElementNotFoundDefaultTimeout() throws Exception {
