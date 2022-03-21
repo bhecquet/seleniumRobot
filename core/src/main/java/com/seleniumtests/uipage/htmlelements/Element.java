@@ -17,6 +17,9 @@
  */
 package com.seleniumtests.uipage.htmlelements;
 
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.decorators.Decorated;
+
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
@@ -75,8 +78,8 @@ public abstract class Element {
     	if (!SeleniumTestsContextManager.isMobileTest()) {
     		throw new ScenarioException("action is available only for mobile platforms");
     	}
-    	if (!(driver.getWebDriver() instanceof AppiumDriver)) {
-    		throw new ScenarioException("action is available only for mobile platforms");
+    	if (!(((Decorated<WebDriver>)driver.getWebDriver()).getOriginal() instanceof AppiumDriver)) {
+    		throw new ScenarioException("action is available only for appium drivers");
     	}
     	findElement(true);
     	
