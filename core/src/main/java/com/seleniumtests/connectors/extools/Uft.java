@@ -154,6 +154,7 @@ public class Uft {
 		args.add(scriptPath);
 		
 		if (execute) {
+			args.add("/execute");
 			parameters.forEach((key, value) -> args.add(String.format("\"%s=%s\"", key, value)));
 		}
 		
@@ -167,6 +168,8 @@ public class Uft {
 			} else if (almServer != null || almUser != null || almPassword != null || almDomain != null || almProject != null) {
 				throw new ConfigurationException("All valuers pour ALM connection must be provided: server, user, password, domain and project");
 			}
+			
+			args.add("/load");
 			
 			if (killUftOnStartup) {
 				args.add("/clean");
