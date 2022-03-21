@@ -121,10 +121,11 @@ public class TestUft extends MockitoTest {
 		uft.setKillUftOnStartup(false);
 		List<String> args = uft.prepareArguments(true, true);
 
-		Assert.assertEquals(args.size(), 2);
+		Assert.assertEquals(args.size(), 4);
 		Assert.assertTrue(args.get(0).startsWith(System.getProperty("java.io.tmpdir")));
 		Assert.assertTrue(args.get(0).endsWith("uft.vbs"));
 		Assert.assertTrue(args.get(1).equals("D:\\Subject\\Tools\\Tests\\test1"));
+		Assert.assertTrue(args.get(2).equals("/execute"));
 	}
 
 	/**
@@ -137,15 +138,17 @@ public class TestUft extends MockitoTest {
 		uft.setKillUftOnStartup(false);
 		List<String> args = uft.prepareArguments(true, true);
 
-		Assert.assertEquals(args.size(), 7);
+		Assert.assertEquals(args.size(), 9);
 		Assert.assertTrue(args.get(0).startsWith(System.getProperty("java.io.tmpdir")));
 		Assert.assertTrue(args.get(0).endsWith("uft.vbs"));
 		Assert.assertTrue(args.get(1).equals("[QualityCenter]Subject\\Tools\\Tests\\test1"));
-		Assert.assertTrue(args.get(2).equals("/server:http://almserver/qcbin"));
-		Assert.assertTrue(args.get(3).equals("/user:usr"));
-		Assert.assertTrue(args.get(4).equals("/password:pwd"));
-		Assert.assertTrue(args.get(5).equals("/domain:dom"));
-		Assert.assertTrue(args.get(6).equals("/project:proj"));
+		Assert.assertTrue(args.get(2).equals("/execute"));
+		Assert.assertTrue(args.get(3).equals("/server:http://almserver/qcbin"));
+		Assert.assertTrue(args.get(4).equals("/user:usr"));
+		Assert.assertTrue(args.get(5).equals("/password:pwd"));
+		Assert.assertTrue(args.get(6).equals("/domain:dom"));
+		Assert.assertTrue(args.get(7).equals("/project:proj"));
+		Assert.assertTrue(args.get(8).equals("/load"));;
 	}
 	
 	/**
@@ -158,7 +161,7 @@ public class TestUft extends MockitoTest {
 		uft.setKillUftOnStartup(false);
 		List<String> args = uft.prepareArguments(true, false);
 		
-		Assert.assertEquals(args.size(), 7);
+		Assert.assertEquals(args.size(), 8);
 		Assert.assertTrue(args.get(0).startsWith(System.getProperty("java.io.tmpdir")));
 		Assert.assertTrue(args.get(0).endsWith("uft.vbs"));
 		Assert.assertTrue(args.get(1).equals("[QualityCenter]Subject\\Tools\\Tests\\test1"));
@@ -167,6 +170,7 @@ public class TestUft extends MockitoTest {
 		Assert.assertTrue(args.get(4).equals("/password:pwd"));
 		Assert.assertTrue(args.get(5).equals("/domain:dom"));
 		Assert.assertTrue(args.get(6).equals("/project:proj"));
+		Assert.assertTrue(args.get(7).equals("/load"));
 	}
 	
 	/**
@@ -214,11 +218,12 @@ public class TestUft extends MockitoTest {
 		uft.setKillUftOnStartup(true);
 		List<String> args = uft.prepareArguments(true, false);
 
-		Assert.assertEquals(args.size(), 3);
+		Assert.assertEquals(args.size(), 4);
 		Assert.assertTrue(args.get(0).startsWith(System.getProperty("java.io.tmpdir")));
 		Assert.assertTrue(args.get(0).endsWith("uft.vbs"));
 		Assert.assertTrue(args.get(1).equals("D:\\Subject\\Tools\\Tests\\test1"));
-		Assert.assertTrue(args.get(2).equals("/clean"));
+		Assert.assertTrue(args.get(2).equals("/load"));
+		Assert.assertTrue(args.get(3).equals("/clean"));
 	}
 	
 	/**
@@ -231,10 +236,11 @@ public class TestUft extends MockitoTest {
 		uft.setKillUftOnStartup(false);
 		List<String> args = uft.prepareArguments(true, false);
 		
-		Assert.assertEquals(args.size(), 7);
+		Assert.assertEquals(args.size(), 8);
 		Assert.assertTrue(args.get(0).startsWith(System.getProperty("java.io.tmpdir")));
 		Assert.assertTrue(args.get(0).endsWith("uft.vbs"));
 		Assert.assertTrue(args.get(1).equals("[QualityCenter]Subject\\Tools\\Tests\\test1"));
+		Assert.assertTrue(args.get(2).equals("/server:http://almserver/qcbin"));
 	}
 
 	@Test(groups = { "ut" })
@@ -247,17 +253,19 @@ public class TestUft extends MockitoTest {
 		uft.setParameters(params);
 		List<String> args = uft.prepareArguments(true, true);
 
-		Assert.assertEquals(args.size(), 9);
+		Assert.assertEquals(args.size(), 11);
 		Assert.assertTrue(args.get(0).startsWith(System.getProperty("java.io.tmpdir")));
 		Assert.assertTrue(args.get(0).endsWith("uft.vbs"));
 		Assert.assertTrue(args.get(1).equals("[QualityCenter]Subject\\Tools\\Tests\\test1"));
-		Assert.assertTrue(args.get(2).equals("\"User=toto\""));
-		Assert.assertTrue(args.get(3).equals("/server:http://almserver/qcbin"));
-		Assert.assertTrue(args.get(4).equals("/user:usr"));
-		Assert.assertTrue(args.get(5).equals("/password:pwd"));
-		Assert.assertTrue(args.get(6).equals("/domain:dom"));
-		Assert.assertTrue(args.get(7).equals("/project:proj"));
-		Assert.assertTrue(args.get(8).equals("/clean"));
+		Assert.assertTrue(args.get(2).equals("/execute"));
+		Assert.assertTrue(args.get(3).equals("\"User=toto\""));
+		Assert.assertTrue(args.get(4).equals("/server:http://almserver/qcbin"));
+		Assert.assertTrue(args.get(5).equals("/user:usr"));
+		Assert.assertTrue(args.get(6).equals("/password:pwd"));
+		Assert.assertTrue(args.get(7).equals("/domain:dom"));
+		Assert.assertTrue(args.get(8).equals("/project:proj"));
+		Assert.assertTrue(args.get(9).equals("/load"));
+		Assert.assertTrue(args.get(10).equals("/clean"));
 		Assert.assertTrue(uft.isKillUftOnStartup());
 	}
 	
@@ -271,16 +279,18 @@ public class TestUft extends MockitoTest {
 		uft.setParameters(params);
 		List<String> args = uft.prepareArguments(true, true);
 		
-		Assert.assertEquals(args.size(), 8);
+		Assert.assertEquals(args.size(), 10);
 		Assert.assertTrue(args.get(0).startsWith(System.getProperty("java.io.tmpdir")));
 		Assert.assertTrue(args.get(0).endsWith("uft.vbs"));
 		Assert.assertTrue(args.get(1).equals("[QualityCenter]Subject\\Tools\\Tests\\test1"));
-		Assert.assertTrue(args.get(2).equals("\"User=toto\""));
-		Assert.assertTrue(args.get(3).equals("/server:http://almserver/qcbin"));
-		Assert.assertTrue(args.get(4).equals("/user:usr"));
-		Assert.assertTrue(args.get(5).equals("/password:pwd"));
-		Assert.assertTrue(args.get(6).equals("/domain:dom"));
-		Assert.assertTrue(args.get(7).equals("/project:proj"));
+		Assert.assertTrue(args.get(2).equals("/execute"));
+		Assert.assertTrue(args.get(3).equals("\"User=toto\""));
+		Assert.assertTrue(args.get(4).equals("/server:http://almserver/qcbin"));
+		Assert.assertTrue(args.get(5).equals("/user:usr"));
+		Assert.assertTrue(args.get(6).equals("/password:pwd"));
+		Assert.assertTrue(args.get(7).equals("/domain:dom"));
+		Assert.assertTrue(args.get(8).equals("/project:proj"));
+		Assert.assertTrue(args.get(9).equals("/load"));
 	}
 	
 	/**
@@ -296,9 +306,11 @@ public class TestUft extends MockitoTest {
 		uft.setKillUftOnStartup(false);
 		List<String> args = uft.prepareArguments(true, true);
 
-		Assert.assertEquals(args.size(), 2);
+		Assert.assertEquals(args.size(), 4);
 		Assert.assertTrue(args.get(0).equals("D:\\file\\uft.vbs"));
 		Assert.assertTrue(args.get(1).equals("D:\\Subject\\Tools\\Tests\\test1"));
+		Assert.assertTrue(args.get(2).equals("/execute"));
+		Assert.assertTrue(args.get(3).equals("/load"));
 	}
 	
 	/**
@@ -333,8 +345,9 @@ public class TestUft extends MockitoTest {
 		TestTasks.executeCommand(eq("cscript.exe"), eq(60), isNull(), argsArgument.capture());
 		
 		// test parameters are not copied
-		Assert.assertEquals(argsArgument.getAllValues().size(), 2);
+		Assert.assertEquals(argsArgument.getAllValues().size(), 3);
 		Assert.assertEquals(argsArgument.getAllValues().get(1), "[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
+		Assert.assertEquals(argsArgument.getAllValues().get(2), "/load");
 	}
 	
 	/**
@@ -390,10 +403,11 @@ public class TestUft extends MockitoTest {
 		
 		PowerMockito.verifyStatic(TestTasks.class);
 		TestTasks.executeCommand(eq("cscript.exe"), eq(120), isNull(), argsArgument.capture());
-		Assert.assertEquals(argsArgument.getAllValues().size(), 3);
+		Assert.assertEquals(argsArgument.getAllValues().size(), 4);
 
 		Assert.assertEquals(argsArgument.getAllValues().get(1), "[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
-		Assert.assertEquals(argsArgument.getAllValues().get(2), "\"User=toto\"");
+		Assert.assertEquals(argsArgument.getAllValues().get(2), "/execute");
+		Assert.assertEquals(argsArgument.getAllValues().get(3), "\"User=toto\"");
 		
 	}
 	
