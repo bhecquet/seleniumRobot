@@ -1207,6 +1207,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     		waitForPresent(timeout);
     		return isDisplayed();
     	} catch (TimeoutException e) {
+    		scenarioLogger.warn(String.format("Element %s is not present", getBy()));
     		return false;
     	}
     }
