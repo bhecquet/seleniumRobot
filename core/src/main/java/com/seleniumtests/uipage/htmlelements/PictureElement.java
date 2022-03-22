@@ -117,6 +117,16 @@ public class PictureElement extends GenericPictureElement {
 		// scrolling will display, on top of window, the top of the element
 		intoElement.scrollToElement(0);
 		WaitHelper.waitForMilliSeconds(500);
+		
+		WebUIDriver uiDriver = isDriverCreated();
+		double pixelAspectRatio = ((CustomEventFiringWebDriver)uiDriver.getDriver()).getDeviceAspectRatio();
+		
+		// take into account the aspect ratio
+		detectedObjectRectangle.x = (int)(detectedObjectRectangle.x / pixelAspectRatio);
+		detectedObjectRectangle.y = (int)(detectedObjectRectangle.y / pixelAspectRatio);
+		detectedObjectRectangle.width = (int)(detectedObjectRectangle.width / pixelAspectRatio);
+		detectedObjectRectangle.height = (int)(detectedObjectRectangle.height / pixelAspectRatio);
+		pictureSizeRatio = pictureSizeRatio / pixelAspectRatio;
 	}
 
 	
@@ -212,7 +222,8 @@ public class PictureElement extends GenericPictureElement {
 					|| (uiDriver.getConfig().getBrowserType() == BrowserType.CHROME 
 						&& uiDriver.getConfig().getMajorBrowserVersion() >= 75)) {
 				// issue #180: internet explorer moves to center of element in viewport
-				Dimension viewportDim = ((CustomEventFiringWebDriver)uiDriver.getDriver()).getViewPortDimensionWithoutScrollbar();
+				// do not take into accoung pixel aspect ratio, because selenium element coordinates are calculated with zooming (element will always have the same size even if zooming is different)
+				Dimension viewportDim = ((CustomEventFiringWebDriver)uiDriver.getDriver()).getViewPortDimensionWithoutScrollbar(false);
 				coordX -= Math.min(element.getSize().width, viewportDim.width) / 2;
 				coordY -= Math.min(element.getSize().height, viewportDim.height) / 2;
 			}
