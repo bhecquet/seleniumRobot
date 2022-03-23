@@ -58,12 +58,14 @@ If Wscript.Arguments.Named.Exists("clean") Then
 End If
 
 '---------------------------------------------------------------------------------'
+' https://admhelp.microfocus.com/uft/en/all/AutomationObjectModel/Content/QuickTest~RunOptions~RunMode~Configure%20a%20Test%20to%20Run%20in%20Fast%20Mode_E.html 
+
 
 Test_path = Wscript.Arguments(0)
 'Test_path = "[QualityCenter]Subject\xxx\yyyy\test1" for ALM tests
 Set qtApp = CreateObject("QuickTest.Application") ' Create the Application object
 qtApp.Launch ' Start UFT
-qtApp.Visible = True ' Make the QuickTest application visible
+qtApp.Visible = False ' Make the QuickTest application not visible
 
 '' Set QuickTest run options
 qtApp.Options.Run.RunMode = "Normal"
@@ -95,7 +97,8 @@ If Wscript.Arguments.Named.Exists("load") Then
         
     End If
 
-    qtApp.Open Test_path, False 
+    ' Open test script in read only
+    qtApp.Open Test_path, True  
 End If
     
 ' Execute the test. It assumes a test is loaded
