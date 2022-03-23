@@ -18,6 +18,7 @@ import org.testng.annotations.Test;
 
 import javax.validation.constraints.Null;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -39,6 +40,9 @@ public class TestByC extends MockitoTest {
 
     @Mock
     private By.ByName name;
+    
+    @Mock
+    private By.ByName noElementsFound;
 
     @Mock
     private WebElement elements;
@@ -48,6 +52,7 @@ public class TestByC extends MockitoTest {
     public void init() throws Exception {
         when(id.findElements(driver)).thenReturn(Arrays.asList(element1));
         when(name.findElements(driver)).thenReturn(Arrays.asList(element1, element2));
+        when(noElementsFound.findElements(driver)).thenReturn(new ArrayList<>());
     }
 
     /**
@@ -469,7 +474,7 @@ public class TestByC extends MockitoTest {
         ByC.And byAnd = new ByC.And(id, name);
         List<WebElement> elements = byAnd.findElements(driver);
         assertEquals(elements.size(), 1);
-        assertTrue(elements.contains(id));
+        assertTrue(elements.contains(element1));
     }
 
     @Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)
@@ -492,12 +497,23 @@ public class TestByC extends MockitoTest {
         Assert.assertEquals(elements, element1);
     }
 
+    /**
+     * Check we find elements of the first locator which returns elements
+     */
     @Test(groups = {"ut"})
     public void testFindElementsByOr() {
         ByC.Or byOr = new ByC.Or(id, name);
         List<WebElement> elements = byOr.findElements(driver);
         assertEquals(elements.size(), 1);
         assertTrue(elements.contains(element1));
+    }
+    @Test(groups = {"ut"})
+    public void testFindElementsByOr2() {
+    	ByC.Or byOr = new ByC.Or(noElementsFound, name);
+    	List<WebElement> elements = byOr.findElements(driver);
+    	assertEquals(elements.size(), 2);
+    	assertTrue(elements.contains(element1));
+    	assertTrue(elements.contains(element2));
     }
 
     @Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)
