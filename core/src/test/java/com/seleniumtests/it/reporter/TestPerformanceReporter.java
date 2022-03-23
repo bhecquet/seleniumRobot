@@ -73,14 +73,13 @@ public class TestPerformanceReporter extends ReporterTest {
 		// check content of summary report file
 		String jmeterReport = readTestMethodPerfFile("testWithException");
 		
-		Assert.assertTrue(jmeterReport.contains("<testsuite errors=\"0\" failures=\"1\" hostname=\"\" name=\"testWithException\" tests=\"6\" time=\""));
+		Assert.assertTrue(jmeterReport.contains("hostname=\"\" name=\"testWithException\" tests=\"6\" time=\""));
 		Assert.assertTrue(jmeterReport.contains("browser=\"NONE\""));
 		Assert.assertTrue(jmeterReport.contains("appVersion=\"" + SeleniumTestsContextManager.getApplicationVersion()));
 		Assert.assertTrue(jmeterReport.contains("coreVersion=\"" + SeleniumTestsContextManager.getCoreVersion()));
 		Assert.assertTrue(jmeterReport.contains("retries=\"2\"")); 
 		Assert.assertTrue(jmeterReport.contains("mobileApp=\"\""));
 		Assert.assertTrue(jmeterReport.contains("device=\"\"")); 
-		Assert.assertTrue(jmeterReport.contains("failedStep=\"Test end\"")); 
 		Assert.assertTrue(jmeterReport.contains("platform=\"" + OSUtility.getCurrentPlatorm().toString()));
 		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"Step 4: step 1\" time=\""));
 		
@@ -105,7 +104,7 @@ public class TestPerformanceReporter extends ReporterTest {
 
 		// issue #418: now it's Test end which is the failed step because in this case execption is raised directly in test scenario
 		Assert.assertTrue(jmeterReport.contains("retries=\"2\"")); 
-		Assert.assertTrue(jmeterReport.contains("failedStep=\"Test end\"")); 
+		Assert.assertTrue(jmeterReport.contains("failedStep=\"\"")); // failed step is not logged as there are no step logged
 	}
 	
 	/**
@@ -138,14 +137,18 @@ public class TestPerformanceReporter extends ReporterTest {
 	@Test(groups={"it"})
 	public void testErrorWithException(ITestContext testContext) throws Exception {
 
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testWithException"});
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testFailedWithException"});
 		
 		// check content of summary report file
-		String jmeterReport = readTestMethodPerfFile("testWithException");
+		String jmeterReport = readTestMethodPerfFile("testFailedWithException");
 		
-		Assert.assertTrue(jmeterReport.contains("<error message=\"class com.seleniumtests.customexception.DriverExceptions: some exception\" type=\"\">"));
-		Assert.assertTrue(jmeterReport.contains("<![CDATA[class com.seleniumtests.customexception.DriverExceptions: some exception"));
-		Assert.assertTrue(jmeterReport.contains("at com.seleniumtests.it.stubclasses.StubTestClass.testWithException(StubTestClass.java"));
+		Assert.assertTrue(jmeterReport.contains("<error message=\"class com.seleniumtests.customexception.DriverExceptions: fail\""));
+		Assert.assertTrue(jmeterReport.contains("<![CDATA[class com.seleniumtests.customexception.DriverExceptions: fail"));
+		Assert.assertTrue(jmeterReport.contains("at com.seleniumtests.it.core.aspects.CalcPage.failAction_aroundBody"));
+
+		// check the step marked as failed is the last failed step (not 'Test end')
+		Assert.assertTrue(jmeterReport.contains("failedStep=\"failAction \"")); 
+		Assert.assertTrue(jmeterReport.contains("failures=\"1\"")); // only one error
 	}	
 
 	/**

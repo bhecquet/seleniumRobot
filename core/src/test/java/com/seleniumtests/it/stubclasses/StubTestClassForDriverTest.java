@@ -234,7 +234,7 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	public void testImageDetectionAssertionError() throws Exception {
 		
 		new ImageDetectorPage()
-		._clickErrorButtonInError();
+		._clickErrorButton();
 		Assert.assertTrue(false);
 	}
 	

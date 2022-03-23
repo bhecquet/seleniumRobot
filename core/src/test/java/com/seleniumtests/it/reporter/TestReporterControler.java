@@ -272,7 +272,7 @@ public class TestReporterControler extends ReporterTest {
 			PowerMockito.whenNew(ErrorCauseFinder.class).withAnyArguments().thenReturn(errorCauseFinder);
 			configureMockedSnapshotServerConnection();
 			
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverNativeActions"});
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverWithFailure"});
 			
 			// we search only once for each test result, at the end of test suite
 			verify(errorCauseFinder).findErrorCause();
@@ -365,7 +365,7 @@ public class TestReporterControler extends ReporterTest {
 			PowerMockito.whenNew(ErrorCauseFinder.class).withAnyArguments().thenReturn(errorCauseFinder);
 			configureMockedSnapshotServerConnection();
 			
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverNativeActions"});
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverWithFailure"});
 			
 			// we search only once for each test result, at the end of test suite
 			verify(errorCauseFinder, never()).findErrorCause();
@@ -398,7 +398,7 @@ public class TestReporterControler extends ReporterTest {
 			PowerMockito.whenNew(ErrorCauseFinder.class).withAnyArguments().thenReturn(errorCauseFinder);
 			configureMockedSnapshotServerConnection();
 			
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverNativeActions"});
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverWithFailure"});
 			
 			// we search only once for each test result, at the end of test suite
 			verify(errorCauseFinder, never()).findErrorCause();

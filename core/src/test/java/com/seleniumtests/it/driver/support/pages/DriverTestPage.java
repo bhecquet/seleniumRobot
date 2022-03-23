@@ -94,6 +94,8 @@ public class DriverTestPage extends PageObject {
 	public static final HtmlElement greenBox = new HtmlElement("button to scroll into view", By.id("greenBox"));
 	public static final ButtonElement bigFooterButton = new ButtonElement("Display Big footer", By.id("displayBigFooter"));
 	public static final ButtonElement bigHeaderButton = new ButtonElement("Display Big header", By.id("displayBigHeader"));
+	public static final ButtonElement veryBigFooterButton = new ButtonElement("Display Very Big footer", By.id("displayVeryBigFooter"));
+	public static final ButtonElement veryBigHeaderButton = new ButtonElement("Display Very Big header", By.id("displayVeryBigHeader"));
 	
 	// Elements inside others
 	public static final HtmlElement parentDiv = new HtmlElement("", By.id("parentDiv"));

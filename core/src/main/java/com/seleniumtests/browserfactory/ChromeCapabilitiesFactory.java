@@ -18,7 +18,9 @@
 package com.seleniumtests.browserfactory;
 
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.openqa.selenium.MutableCapabilities;
@@ -132,8 +134,15 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
         		.collect(Collectors.toList()));
         }
         
+       
         if (webDriverConfig.getAttachExistingDriverPort() != null) {
         	options.setExperimentalOption("debuggerAddress", "127.0.0.1:" + webDriverConfig.getAttachExistingDriverPort());
+        } else {
+        	 // issue #480: disable "restore pages" popup, but not when we attach an existing browser as it crashes driver (from invalid argument: cannot parse capability: goog:chromeOptions, from invalid argument: unrecognized chrome option: prefs)
+            Map<String, Object> prefs = new HashMap<>();
+            prefs.put("profile.exit_type", "Normal");
+            options.setExperimentalOption("prefs", prefs);
+            
         }
         
         
