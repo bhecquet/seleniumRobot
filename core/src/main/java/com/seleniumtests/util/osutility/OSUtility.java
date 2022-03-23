@@ -244,7 +244,8 @@ public abstract class OSUtility {
     	}
     	return webBrowserRunningList;
     }
-    
+
+
 	/******************************************
 	 ************* KILL process ***************
 	 ******************************************/
@@ -272,18 +273,21 @@ public abstract class OSUtility {
      * @return
      */
 	public abstract String getProgramExtension();
-	
+
+
 	/**
 	 * Returns the charset for the console
 	 * @return
 	 */
 	public abstract Charset getConsoleCharset();
-	
+
+
 	/**
 	 * Returns the process that listens for the given port, or null if none is found
 	 * @param port
 	 */
 	public abstract Integer getProcessIdByListeningPort(int port);
+
 
     /**
      * Ask system to terminate all the known web browser processes.
@@ -298,7 +302,8 @@ public abstract class OSUtility {
     		killProcess(processInfo.getPid(), force);
     	}
     }
-    
+
+
     /**
      * Ask system to terminate all the drivers processes
      * @param force
@@ -328,7 +333,8 @@ public abstract class OSUtility {
     	
     	return consoleCharset;
     }
-    
+
+
     /**
      * Returns the full version of chrome browser
      * String is like "Google Chrome X.Y.Z.T"
@@ -337,13 +343,14 @@ public abstract class OSUtility {
      */
     public static String getChromeVersion(String chromePath) {
     	OSUtility osUtility = OSUtilityFactory.getInstance();
-    	if (isWindows()) {
+    	if (osUtility instanceof OSUtilityWindows) {
     		return "Google Chrome " + ((OSUtilityWindows)osUtility).getChromeVersionFromFolder(chromePath);
     	} else {
     		return OSCommand.executeCommandAndWait(new String[] {chromePath, "--version"});
     	}
     }
-    
+
+
     /**
      * Returns the full version for firefox browser
      * @param firefoxPath
@@ -363,7 +370,8 @@ public abstract class OSUtility {
     	}
     	return browsers;
     }
-    
+
+
     /**
      * Returns the list of browsers for each type. For selenium robot local, this will help selecting the right binary
      * For grid, we will be able to provide each installed browser to the runner
@@ -374,7 +382,8 @@ public abstract class OSUtility {
     public Map<BrowserType, List<BrowserInfo>> discoverInstalledBrowsersWithVersion() {
     	return discoverInstalledBrowsersWithVersion(false);
     }
-    
+
+
     /**
      * example: Mozilla Firefox 52.0
      * @param versionString
@@ -389,7 +398,8 @@ public abstract class OSUtility {
 			return "";
 		}
     }
-    
+
+
     /**
      * example: Google Chrome 57.0.2987.110
      * @param versionString
@@ -404,7 +414,8 @@ public abstract class OSUtility {
     		return "";
     	}
     }
-    
+
+
     /**
      * Returns the version <major>.<minor> either with chrome or chromium
      * @param versionString
@@ -417,7 +428,8 @@ public abstract class OSUtility {
     		return extractChromeVersion(versionString);
     	}
     }
-    
+
+
     /**
      * example: Chromium 56.0.2924.76 Built on Ubuntu , running on Ubuntu 16.04 
      * @param versionString
@@ -441,7 +453,8 @@ public abstract class OSUtility {
     public static String extractIEVersion(String versionString) {
     	return versionString.split("\\.")[0];
     }
-    
+
+
     /**
      * example: 10240.th1.160802-1852
      * @param versionString
@@ -457,14 +470,24 @@ public abstract class OSUtility {
     	}
     }
 
-    /**
+
+	/**
+	 * Clear list of browsers to return it null
+	 * @return
+	 */
+	public static void resetInstalledBrowsersWithVersion() {
+		installedBrowsersWithVersion = null;
+	}
+
+	/**
      * Returns a map of browser, by type. It won't search for Beta browsers
      * @return
      */
     public static Map<BrowserType, List<BrowserInfo>> getInstalledBrowsersWithVersion() {
     	return getInstalledBrowsersWithVersion(false);
     }
-    
+
+
     /**
      * Returns a map of browser, by type
      * @param discoverBetaBrowsers		if true, also beta browsers will be searched (for now, chrome only)
@@ -476,7 +499,8 @@ public abstract class OSUtility {
 		}
 		return installedBrowsersWithVersion;
 	}
-	
+
+
 	/**
 	 * search browsers
 	 */
@@ -487,5 +511,4 @@ public abstract class OSUtility {
 	public static void refreshBrowserList(boolean discoverBetaBrowsers) {
 		installedBrowsersWithVersion = OSUtilityFactory.getInstance().discoverInstalledBrowsersWithVersion(discoverBetaBrowsers);
 	}
-    
 }
