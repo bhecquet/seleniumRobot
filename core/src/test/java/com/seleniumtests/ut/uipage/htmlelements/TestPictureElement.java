@@ -113,6 +113,7 @@ public class TestPictureElement extends MockitoTest {
 		when(driver.getMouse()).thenReturn(mouse);
 		when(driver.getKeyboard()).thenReturn(keyboard);
 		when(driver.getBrowserInfo()).thenReturn(browserInfo);
+		when(((CustomEventFiringWebDriver)driver).getDeviceAspectRatio()).thenReturn(1.0);
 		when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
 		when(screenshotUtil.capture(SnapshotTarget.PAGE, File.class, true)).thenReturn(new File(""));
 		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
@@ -126,6 +127,36 @@ public class TestPictureElement extends MockitoTest {
 		
 		picElement.click();
 		verify(picElement).moveAndClick(intoElement, -65, -60);
+		
+	}
+	@Test(groups={"ut"})
+	public void testClickOtherPixelRatio() {
+		PictureElement picElement = spy(pictureElement);
+		picElement.setObjectPictureFile(new File(""));
+		
+		PowerMockito.mockStatic(WebUIDriver.class);
+		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
+		when(WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(uiDriver);
+		when(uiDriver.getDriver()).thenReturn(driver);
+		when(uiDriver.getConfig()).thenReturn(driverConfig);
+		when(driverConfig.getBrowserType()).thenReturn(BrowserType.FIREFOX);
+		when(driver.getMouse()).thenReturn(mouse);
+		when(driver.getKeyboard()).thenReturn(keyboard);
+		when(driver.getBrowserInfo()).thenReturn(browserInfo);
+		when(((CustomEventFiringWebDriver)driver).getDeviceAspectRatio()).thenReturn(1.5);
+		when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
+		when(screenshotUtil.capture(SnapshotTarget.PAGE, File.class, true)).thenReturn(new File(""));
+		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
+		when(imageDetector.getSizeRatio()).thenReturn(1.5);
+		when(coordinates.inViewPort()).thenReturn(new Point(100, 120));
+		when(coordinates.onPage()).thenReturn(new Point(100, 120));
+		when(intoElement.getCoordinates()).thenReturn(coordinates);
+		when(intoElement.getSize()).thenReturn(new Dimension(200, 200));
+		
+		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
+		
+		picElement.click();
+		verify(picElement).moveAndClick(intoElement, -78, -81); // as pixel ratio changed, real rectangle is different
 	}
 	
 	
@@ -160,6 +191,12 @@ public class TestPictureElement extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testPictureVisible() throws AWTException {
 		PictureElement picElement = spy(pictureElement);
+
+		PowerMockito.mockStatic(WebUIDriver.class);
+		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
+		when(WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(uiDriver);
+		when(uiDriver.getDriver()).thenReturn(driver);
+		when(((CustomEventFiringWebDriver)driver).getDeviceAspectRatio()).thenReturn(1.0);
 		picElement.setObjectPictureFile(new File(""));
 		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
 		when(screenshotUtil.capture(SnapshotTarget.PAGE, File.class, true)).thenReturn(new File(""));

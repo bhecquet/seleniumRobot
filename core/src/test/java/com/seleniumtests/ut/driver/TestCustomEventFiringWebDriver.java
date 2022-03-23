@@ -21,6 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -197,7 +198,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testContentDimension() {
-		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(120L, 80L));
+		when(driver.executeScript(anyString(), eq(true))).thenReturn(Arrays.asList(120L, 80L));
 		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getContentDimension();
 		
 		// no need to switch to default content if size is correctly returned
@@ -213,7 +214,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testContentDimensionWithZoomFactor() {
-		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(120.5, 80.67));
+		when(driver.executeScript(anyString(), eq(true))).thenReturn(Arrays.asList(120.5, 80.67));
 		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getContentDimension();
 		
 		// check we get the window dimension
@@ -228,7 +229,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testContentDimensionNotGet() {
-		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(100, 0)).thenReturn(Arrays.asList(120, 80));
+		when(driver.executeScript(anyString(), eq(true))).thenReturn(Arrays.asList(100, 0)).thenReturn(Arrays.asList(120, 80));
 		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getContentDimension();
 		
 		verify(driver).switchTo();
@@ -239,7 +240,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	}
 	@Test(groups = {"ut"})
 	public void testContentDimensionNotGet2() {
-		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(0, 100)).thenReturn(Arrays.asList(120, 80));
+		when(driver.executeScript(anyString(), eq(true))).thenReturn(Arrays.asList(0, 100)).thenReturn(Arrays.asList(120, 80));
 		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getContentDimension();
 		
 		verify(driver).switchTo();
@@ -280,7 +281,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testViewPortDimensionWithoutScrollbar() {
-		when(driver.executeScript(anyString())).thenReturn(120L).thenReturn(80L);
+		when(driver.executeScript(anyString(), eq(true))).thenReturn(120L).thenReturn(80L);
 		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getViewPortDimensionWithoutScrollbar();
 		
 		// no need to switch to default content if size is correctly returned
@@ -296,7 +297,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testViewPortDimensionWithoutScrollbarNotGet() {
-		when(driver.executeScript(anyString())).thenReturn(100000L).thenReturn(120L).thenReturn(80L); // retry when getting width
+		when(driver.executeScript(anyString(), eq(true))).thenReturn(100000L).thenReturn(120L).thenReturn(80L); // retry when getting width
 		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getViewPortDimensionWithoutScrollbar();
 		
 		verify(driver).switchTo();
@@ -307,7 +308,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	}
 	@Test(groups = {"ut"})
 	public void testViewPortDimensionWithoutScrollbarNotGet2() {
-		when(driver.executeScript(anyString())).thenReturn(120L).thenReturn(100000L).thenReturn(80L); // retry when getting height
+		when(driver.executeScript(anyString(), eq(true))).thenReturn(120L).thenReturn(100000L).thenReturn(80L); // retry when getting height
 		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getViewPortDimensionWithoutScrollbar();
 		
 		verify(driver).switchTo();
@@ -323,7 +324,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testViewPortDimensionWithoutScrollbarNotReturned() {
-		when(driver.executeScript(anyString())).thenReturn(100000L);
+		when(driver.executeScript(anyString(), eq(true))).thenReturn(100000L);
 		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getViewPortDimensionWithoutScrollbar();
 		
 		// check we get the window dimension
@@ -336,7 +337,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testViewPortDimensionWithoutScrollbarWithZoomFactor() {
-		when(driver.executeScript(anyString())).thenReturn(120.5).thenReturn(80.67);
+		when(driver.executeScript(anyString(), eq(true))).thenReturn(120.5).thenReturn(80.67);
 		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getViewPortDimensionWithoutScrollbar();
 		
 		// check we get the window dimension
@@ -350,7 +351,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Test(groups = {"ut"})
 	public void testContentDimensionWithoutScrollbarNonWebTest() {
 		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, null, false, DriverMode.LOCAL, null, null).register(new DriverExceptionListener()));
-		when(driver.executeScript(anyString())).thenReturn(120L).thenReturn(80L);
+		when(driver.executeScript(anyString(), eq(true))).thenReturn(120L).thenReturn(80L);
 		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getViewPortDimensionWithoutScrollbar();
 		
 		// check we get the window dimension
