@@ -696,9 +696,10 @@ In this case UFT (Universal Functional Testing) may be used to automate the whol
 For a test stored on ALM
 
 ```
-Map<String, String> args = new HashMap<>();
-args.put("User", "toto");
-executeUftScript("http://alm-server.company.com/qcbin", "user", "password", "domain", "project", "[QualityCenter]Subject\\Tools\\Tests\\test1", args, 60);
+	Uft uft = loadUftScript("http://alm-server.company.com/qcbin", "user", "password", "domain", "project", "[QualityCenter]Subject\\Tools\\Tests\\test1", true);
+	Map<String, String> args = new HashMap<>();
+	args.put("User", "toto");
+	executeUftScript(uft, 60, args);
 ```
 You set a timeout to wait for UFT to complete its process. As it may be very slow, add overhead
 
@@ -706,15 +707,16 @@ You set a timeout to wait for UFT to complete its process. As it may be very slo
 For a test stored locally on computer executing the test
 
 ```
-Map<String, String> args = new HashMap<>();
-args.put("User", "toto");
-executeUftScript("D:\\UFT\\Tests\\Tools\\Tests\\test1", args, 60);
+	Uft uft = loadUftScript("http://alm-server.company.com/qcbin", "user", "password", "domain", "project", "D:\\UFT\\Tests\\Tools\\Tests\\test1", true);
+	Map<String, String> args = new HashMap<>();
+	args.put("User", "toto");
+	executeUftScript(uft, 60, args);
 ```
 
 By default, starting UFT script will first close all uft.exe instances on the target computer. If you want to avoid that, call instead
 
 ```
-executeUftScript("http://alm-server.company.com/qcbin", "user", "password", "domain", "project", "[QualityCenter]Subject\\Tools\\Tests\\test1", args, 60, false);
+Uft uft = loadUftScript("http://alm-server.company.com/qcbin", "user", "password", "domain", "project", "D:\\UFT\\Tests\\Tools\\Tests\\test1", false);
 ```
 
 If you execute your tests wit seleniumRobot grid, the only thing to worry about is to start the web browser before executing UFT test (it will reserve a node). Else, no node will be available and it will fail. Moreover, you will need to allow "cscript.exe" to be executed from grid: 
