@@ -803,7 +803,8 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
      */
     public double getDeviceAspectRatio() {
     	if (isWebTest) {
-    		return (double) ((JavascriptExecutor)driver).executeScript(JS_PIXEL_RATIO + " return pixelRatio;", true);
+    		Number devicePixelRatio = (Number) ((JavascriptExecutor)driver).executeScript(JS_PIXEL_RATIO + " return pixelRatio;", true);
+    		return devicePixelRatio.doubleValue();
     	} else {
     		return 1;
     	}
