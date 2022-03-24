@@ -33,7 +33,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.MoveTargetOutOfBoundsException;
 import org.openqa.selenium.support.events.WebDriverListener;
 
-import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.WebSessionEndedException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -41,11 +40,18 @@ public class DriverExceptionListener implements WebDriverListener {
 	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(DriverExceptionListener.class);
 
+	private final boolean isWebTest;
+	private final CustomEventFiringWebDriver driver;
+	
+	public DriverExceptionListener(CustomEventFiringWebDriver driver) {
+		this.isWebTest = driver.isWebTest();
+		this.driver = driver;
+	}
 
     @Override
     public void beforeClick(WebElement arg0) {
-    	if (SeleniumTestsContextManager.isWebTest()) {
-    		((CustomEventFiringWebDriver)WebUIDriver.getWebDriver(false)).updateWindowsHandles();
+    	if (isWebTest) {
+    		driver.updateWindowsHandles();
     	}
     }
 
@@ -84,15 +90,11 @@ public class DriverExceptionListener implements WebDriverListener {
         } else if (ex.getMessage().contains("Error communicating with the remote browser. It may have died.")) {
 
             // Session has lost connection, remove it then ignore quit() method.
-        	WebUIDriver drv = WebUIDriver.getWebUIDriver(false);
-            if (drv == null || drv.getConfig().getMode() == DriverMode.GRID) {
-                WebUIDriver.setWebDriver(null);
-                throw new WebSessionEndedException(ex);
-            }
+        	driver.setDriverExited();
+            throw new WebSessionEndedException(ex);
 
         } else if (ex instanceof NoSuchWindowException) {
         	try {
-	        	WebDriver driver = WebUIDriver.getWebDriver(false);
 	        	List<String> handles = new ArrayList<>(driver.getWindowHandles());
 	        	
 	        	if (!handles.isEmpty()) {
@@ -125,7 +127,8 @@ public class DriverExceptionListener implements WebDriverListener {
                     || message.contains("java.net.ConnectException: Failed to connect")
                     || message.contains("java.net.ConnectException: Connection refused")
                     ) {
-                WebUIDriver.setWebDriver(null); // can't quit anymore, save time.
+            	
+            	driver.setDriverExited();
 
                 // since the session was
                 // terminated.
