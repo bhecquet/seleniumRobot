@@ -304,6 +304,10 @@ public class WebUIDriver {
      * Logs current state of the browser
      */
     private void logFinalDriverState(ITestResult testResult) {
+    	if (((CustomEventFiringWebDriver)driver).isDriverExited()) {
+    		driver = null;
+    	}
+    	
     	if (driver != null) {
 			try {
 				
@@ -363,9 +367,12 @@ public class WebUIDriver {
      * dereference driver in this WebUIDriver
      */
     private void clean() {
+    	
+    	if (((CustomEventFiringWebDriver)driver).isDriverExited()) {
+    		driver = null;
+    	}
 
     	if (driver != null) {
-    		
     		ExecutorService executor = Executors.newSingleThreadExecutor();
             Future<String> future = executor.submit(new DriverAliveTask(driver));
             try {
@@ -391,8 +398,7 @@ public class WebUIDriver {
 				future.cancel(true);
 				logger.warn("driver not available");
 			}
-    		
-    		
+
     		driver = null;
         }
 		

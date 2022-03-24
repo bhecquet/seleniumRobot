@@ -10,6 +10,10 @@
 		<to>setImplicitWaitTimeout(int, java.util.concurrent.TimeUnit)</to>
 		<from>setImplicitWaitTimeout(int, java.util.concurrent.TimeUnit )</from>
 	</difference>
-	
+	<difference>
+        <className>**/customexception/DriverExceptions</className>
+        <differenceType>8001</differenceType>
+        <justification>update</justification>
+    </difference>
 
 </differences>

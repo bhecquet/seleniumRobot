@@ -116,10 +116,11 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	private final WebDriver originalDriver;
 	private final NLWebDriver neoloadDriver;
 	private final boolean isWebTest;
+	private boolean driverExited = false;
 	private final DriverMode driverMode;
 	private final BrowserInfo browserInfo;
 	private final BrowserMobProxy mobProxy;
-	private final SeleniumGridConnector gridConnector;
+	private SeleniumGridConnector gridConnector;
 	private final Integer attachExistingDriverPort;
 	private MutableCapabilities internalCapabilities = new MutableCapabilities();
 	
@@ -592,7 +593,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, Boolean isWebTest, DriverMode localDriver, BrowserMobProxy mobProxy, SeleniumGridConnector gridConnector, Integer attachExistingDriverPort, List<WebDriverListener> wdListeners) {
 
 		this.originalDriver = driver; // store the original driver in case decorated one cannot be used (getSessionId)
-		this.driver = new EventFiringDecorator(new DriverExceptionListener()).decorate(driver);
+		this.driver = new EventFiringDecorator(new DriverExceptionListener(this)).decorate(driver);
 
         for (WebDriverListener wdListener: wdListeners) {
         	this.driver = new EventFiringDecorator(wdListener).decorate(this.driver);
@@ -740,6 +741,10 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
      */
     public WebDriver getWebDriver() {
         return driver;
+    }
+    
+    public void setDriverExited() {
+    	driverExited = true;
     }
     
     /**
@@ -1104,6 +1109,10 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 					pidsToKill.add(browserProcess.longValue());
 				}
 			}
+		}
+		
+		if (driverExited) {
+			return;
 		}
 		
 		Capabilities caps;
@@ -1617,5 +1626,13 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	public void resetInputState() {
 		((Interactive)driver).resetInputState();
 		
+	}
+
+	public boolean isWebTest() {
+		return isWebTest;
+	}
+
+	public boolean isDriverExited() {
+		return driverExited;
 	}
 }
