@@ -137,6 +137,8 @@ public class TestHtmlElement extends MockitoTest {
 
 	@BeforeMethod(groups = { "ut" })
 	private void init() throws WebDriverException, IOException {
+		
+		
 		// mimic sub elements of the HtmlElement
 		List<WebElement> subElList = new ArrayList<WebElement>();
 		subElList.add(subElement1);
@@ -230,7 +232,7 @@ public class TestHtmlElement extends MockitoTest {
 		finalCheck(true);
 
 		// check handled are updated on click
-		verify((CustomEventFiringWebDriver) eventDriver).updateWindowsHandles();
+		verify( driver).getWindowHandles();
 	}
 
 	@Test(groups = { "ut" })

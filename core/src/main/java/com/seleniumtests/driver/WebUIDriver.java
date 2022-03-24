@@ -304,7 +304,7 @@ public class WebUIDriver {
      * Logs current state of the browser
      */
     private void logFinalDriverState(ITestResult testResult) {
-    	if (((CustomEventFiringWebDriver)driver).isDriverExited()) {
+    	if (driver != null && ((CustomEventFiringWebDriver)driver).isDriverExited()) {
     		driver = null;
     	}
     	
@@ -368,7 +368,7 @@ public class WebUIDriver {
      */
     private void clean() {
     	
-    	if (((CustomEventFiringWebDriver)driver).isDriverExited()) {
+    	if (driver != null && ((CustomEventFiringWebDriver)driver).isDriverExited()) {
     		driver = null;
     	}
 

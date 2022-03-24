@@ -592,21 +592,20 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     }
 	public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, Boolean isWebTest, DriverMode localDriver, BrowserMobProxy mobProxy, SeleniumGridConnector gridConnector, Integer attachExistingDriverPort, List<WebDriverListener> wdListeners) {
 
-		this.originalDriver = driver; // store the original driver in case decorated one cannot be used (getSessionId)
-		this.driver = new EventFiringDecorator(new DriverExceptionListener(this)).decorate(driver);
-
-        for (WebDriverListener wdListener: wdListeners) {
-        	this.driver = new EventFiringDecorator(wdListener).decorate(this.driver);
-        }
-		
-        this.driverPids = driverPids == null ? new ArrayList<>(): driverPids;
+		this.driverPids = driverPids == null ? new ArrayList<>(): driverPids;
 		this.browserInfo = browserInfo;
 		this.isWebTest = isWebTest;
 		this.driverMode = localDriver;
 		this.mobProxy = mobProxy;
 		this.gridConnector = gridConnector;
 		this.attachExistingDriverPort = attachExistingDriverPort;
-		
+		this.originalDriver = driver; // store the original driver in case decorated one cannot be used (getSessionId)
+		this.driver = new EventFiringDecorator(new DriverExceptionListener(this)).decorate(driver);
+
+        for (WebDriverListener wdListener: wdListeners) {
+        	this.driver = new EventFiringDecorator(wdListener).decorate(this.driver);
+        }
+	
 		// NEOLOAD //
 		if (driver instanceof NLWebDriver) {
 			neoloadDriver = (NLWebDriver)driver;
