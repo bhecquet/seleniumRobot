@@ -8,6 +8,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
@@ -467,6 +468,25 @@ public class TestWebUIDriver extends MockitoTest {
 		
 		WebUIDriver.cleanUp();
 		verify(driver).quit();
+		Assert.assertNull(uiDriver.getDriver());	
+	}
+	
+	/**
+	 * If driver has crashed, "driverEXited" is set to true, check no error is raised
+	 */
+	@Test(groups={"ut"})
+	public void testCleanUpDriverExited() {
+		
+		SeleniumTestsContextManager.getThreadContext().setCaptureNetwork(true);
+		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
+		WebDriver driver = spy(WebUIDriver.getWebDriver(true));
+		WebUIDriver uiDriver = WebUIDriver.getWebUIDriver(false);
+		uiDriver.setDriver(driver); // force the mocked driver
+		((CustomEventFiringWebDriver)driver).setDriverExited();
+		Assert.assertNotNull(uiDriver.getDriver());
+		
+		WebUIDriver.cleanUp();
+		verify(driver, never()).quit();
 		Assert.assertNull(uiDriver.getDriver());	
 	}
 	
