@@ -224,9 +224,7 @@ public class SeleniumTestsContext {
 
     // Neoload specific properties
     public static final String NEOLOAD_USER_PATH = "neoloadUserPath";			// name of the neoload "user path" that will be created in Design mode
-    
-    public static final String REPORTPORTAL_ACTIVE = "reportPortalActive";		// whether report portal is activated
-    
+
     // internal use
     public static final String TEST_VARIABLES = "testVariables"; 				// configuration (aka variables, get via 'param()' method) used for the current test. It is not updated via XML file
     public static final String TEST_NAME = "testName";
@@ -1298,32 +1296,6 @@ public class SeleniumTestsContext {
         return (String) getAttribute(IE_DRIVER_PATH);
     }
     
-    public static boolean getReportPortalActive() {
-    	if (System.getProperty(REPORTPORTAL_ACTIVE) != null && "true".equals(System.getProperty(REPORTPORTAL_ACTIVE))) {
-    		
-    		// check also report portal options (can be obtained here: https://github.com/reportportal/client-java)
-    		if (System.getProperty("rp.endpoint") == null) {
-    			logger.error("ReportPortal endpoint not configured (-Drp.endpoint=<rp url>). It is disabled");
-    			return false;
-    		}
-    		if (System.getProperty("rp.api.key") == null) {
-    			logger.error("ReportPortal API key not configured (-Drp.api.key=<key>). It is disabled");
-    			return false;
-    		}
-    		if (System.getProperty("rp.launch") == null) {
-    			logger.error("ReportPortal endpoint not configured (-Drp.launch=<launch name>). It is disabled");
-    			return false;
-    		}
-    		if (System.getProperty("rp.project") == null) {
-    			logger.error("ReportPortal endpoint not configured (-Drp.project=<project name>). It is disabled");
-    			return false;
-    		}
-    		
-    		return true;
-    	}
-    	return false;
-    }
-    
     public String getImageFieldDetectorServerUrl() {
     	return (String) getAttribute(IMAGE_FIELD_DETECTOR_SERVER_URL);
     }
@@ -1936,16 +1908,6 @@ public class SeleniumTestsContext {
     	} else {
     		setAttribute(FIND_ERROR_CAUSE, DEFAULT_FIND_ERROR_CAUSE);
     	}
-    }
-    
-
-    public void setReportPortalActive(Boolean active) {
-    	if (active != null) {
-    		setAttribute(REPORTPORTAL_ACTIVE, active);
-    	} else {
-    		setAttribute(REPORTPORTAL_ACTIVE, DEFAULT_REPORTPORTAL_ACTIVE);
-    	}
-    	
     }
     
     public void setImageFieldDetectorServerUrl(String url) {

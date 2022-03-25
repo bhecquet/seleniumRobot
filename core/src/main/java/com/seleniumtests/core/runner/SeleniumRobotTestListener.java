@@ -83,7 +83,6 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 	private static ScenarioLogger scenarioLogger = ScenarioLogger.getScenarioLogger(SeleniumRobotTestListener.class);
 	
 	private static List<ISuite> suiteList = Collections.synchronizedList(new ArrayList<>());
-	private static ReportPortalService reportPortalService = null;
 	private Date start;
 	
 	private static SeleniumRobotTestListener currentListener;
@@ -94,20 +93,8 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 	
 
 	public SeleniumRobotTestListener() {
-		super(initializeReportPortalListener());
+		super();
 		setCurrentListener(this);
-	}
-	
-	private static ReportPortalService initializeReportPortalListener() {
-		try {
-			if (SeleniumTestsContext.getReportPortalActive()) {
-				reportPortalService = new ReportPortalService();
-				return reportPortalService;
-			} 
-		} catch (Exception e) {
-			logger.error("Report portal has not been initialized: " + e.getMessage());
-		}
-		return null;
 	}
 	
 	/**
@@ -117,23 +104,11 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 	public void onTestFullyFinished(ITestResult testResult) {
 
 		generateTempReport(testResult);
-		
-		if (reportPortalService != null) {
-			if (testResult.getStatus() == ITestResult.SUCCESS) {
-				super.onTestSuccess(testResult);
-			} else if (testResult.getStatus() == ITestResult.FAILURE) {
-				super.onTestFailure(testResult);
-			} else if (testResult.getStatus() == ITestResult.SKIP) {
-				super.onTestSkipped(testResult);
-			}
-		}
+
 	}
 
 	@Override
 	public void onTestStart(ITestResult result) {
-		if (reportPortalService != null) {
-			super.onTestStart(result);
-		}
 	}
 
 	@Override
@@ -662,13 +637,9 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 		// nothing to do for now
 	}
 
-
-	// this action temporary doesn't supported by report portal
 	@Override
 	public void onTestFailedButWithinSuccessPercentage(ITestResult result) {
-		if (reportPortalService != null) {
-			super.onTestFailedButWithinSuccessPercentage(result);
-		}
+	
 	}
 
 
