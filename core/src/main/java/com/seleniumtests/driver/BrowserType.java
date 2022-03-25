@@ -17,6 +17,8 @@
  */
 package com.seleniumtests.driver;
 
+import org.openqa.selenium.remote.Browser;
+
 public enum BrowserType {
     FIREFOX("*firefox"),
     INTERNET_EXPLORER("*iexplore"),
@@ -50,8 +52,6 @@ public enum BrowserType {
             return BrowserType.HTMLUNIT;
         }  else if (browserType.toLowerCase().contains("safari")) {
             return BrowserType.SAFARI;
-        } else if (browserType.toLowerCase().contains("browser") || browserType.toLowerCase().contains("android")) {
-        	return BrowserType.BROWSER;
         } else if (browserType.toLowerCase().contains("none")) {
         	return BrowserType.NONE;
         } 
@@ -65,39 +65,35 @@ public enum BrowserType {
     
     public static String getSeleniumBrowserType(BrowserType browserType) {
     	if (browserType == BrowserType.FIREFOX) {
-    		return org.openqa.selenium.remote.BrowserType.FIREFOX;
+    		return Browser.FIREFOX.browserName();
     	} else if (browserType == BrowserType.CHROME) {
-    		return org.openqa.selenium.remote.BrowserType.CHROME;
+    		return Browser.CHROME.browserName();
     	} else if (browserType == BrowserType.EDGE) {
-    		return org.openqa.selenium.remote.BrowserType.EDGE;
+    		return Browser.EDGE.browserName();
     	} else if (browserType == BrowserType.SAFARI) {
-    		return org.openqa.selenium.remote.BrowserType.SAFARI;
+    		return Browser.SAFARI.browserName();
     	} else if (browserType == BrowserType.INTERNET_EXPLORER) {
-    		return org.openqa.selenium.remote.BrowserType.IE;
+    		return Browser.IE.browserName();
     	} else if (browserType == BrowserType.HTMLUNIT) {
-    		return org.openqa.selenium.remote.BrowserType.HTMLUNIT;
-    	} else if (browserType == BrowserType.BROWSER) {
-    		return org.openqa.selenium.remote.BrowserType.ANDROID;
+    		return Browser.HTMLUNIT.browserName();
     	} else {
     		return null;
     	}
     }
     
     public static BrowserType getBrowserTypeFromSeleniumBrowserType(String browserType) {
-    	if (org.openqa.selenium.remote.BrowserType.FIREFOX.equals(browserType)) {
+    	if (Browser.FIREFOX.browserName().equals(browserType)) {
     		return BrowserType.FIREFOX;
-    	} else if (org.openqa.selenium.remote.BrowserType.CHROME.equals(browserType)) {
+    	} else if (Browser.CHROME.browserName().equals(browserType)) {
     		return BrowserType.CHROME;
-    	} else if (org.openqa.selenium.remote.BrowserType.EDGE.equals(browserType)) {
+    	} else if (Browser.EDGE.browserName().equals(browserType)) {
     		return BrowserType.EDGE;
-    	} else if (org.openqa.selenium.remote.BrowserType.SAFARI.equals(browserType)) {
+    	} else if (Browser.SAFARI.browserName().equals(browserType)) {
     		return BrowserType.SAFARI;
-    	} else if (org.openqa.selenium.remote.BrowserType.IE.equals(browserType)) {
+    	} else if (Browser.IE.browserName().equals(browserType)) {
     		return BrowserType.INTERNET_EXPLORER;
-    	} else if (org.openqa.selenium.remote.BrowserType.HTMLUNIT.equals(browserType)) {
+    	} else if (Browser.HTMLUNIT.browserName().equals(browserType)) {
     		return BrowserType.HTMLUNIT;
-    	} else if (org.openqa.selenium.remote.BrowserType.ANDROID.equals(browserType)) {
-    		return BrowserType.BROWSER;
     	} else {
     		return BrowserType.NONE;
     	}
