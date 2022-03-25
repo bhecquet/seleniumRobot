@@ -116,7 +116,7 @@ public class ScenarioLogger {
     }
     public void logTestInfo(String key, Info value, ITestResult testResult) {
     	TestNGResultUtils.setTestInfo(testResult, key, value);
-    	logger.info("Storing into test result {0}: {1}", key, value.getInfo() );
+    	logger.info(String.format("Storing into test result %s: %s", key, value.getInfo()));
     }
 
     /**

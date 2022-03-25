@@ -2,6 +2,7 @@ package com.seleniumtests.util.logging;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
@@ -18,6 +19,8 @@ public abstract class LoggingOutputStream extends OutputStream {
      * Default number of bytes in the buffer.
      */
     private static final int DEFAULT_BUFFER_LENGTH = 2048;
+    
+    private String loggerPattern = "\\d+:\\d+:\\d+,\\d+\\s+\\[.*?\\] ";
 
     /**
      * Indicates stream state.
@@ -112,6 +115,10 @@ public abstract class LoggingOutputStream extends OutputStream {
         System.arraycopy(buf, 0, bytes, 0, count);
         String str = new String(bytes);
         str = str.replaceAll("\\r\\n$", "").replaceAll("\\n$", "");
+        try {
+        	str = str.split(loggerPattern)[1];
+        } catch (IndexOutOfBoundsException e) {}
+
         if (!str.isEmpty()) {
         	log(str);
         }
