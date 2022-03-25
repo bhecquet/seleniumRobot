@@ -17,7 +17,7 @@
  */
 package com.seleniumtests;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;

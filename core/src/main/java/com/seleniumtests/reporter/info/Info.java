@@ -1,7 +1,7 @@
 package com.seleniumtests.reporter.info;
 
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 public abstract class Info {
 

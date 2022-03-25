@@ -3,7 +3,8 @@ package com.seleniumtests.util.logging;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
@@ -25,15 +26,18 @@ import com.seleniumtests.uipage.PageObject;
 
 import net.lightbody.bmp.core.har.Har;
 
-public class ScenarioLogger extends Logger {
-
-	protected ScenarioLogger(String name) {
-		super(name);
+public class ScenarioLogger {
+	
+	private Logger logger;
+	
+	private ScenarioLogger(Logger logger) {
+		this.logger = logger;
 	}
 
 	public static ScenarioLogger getScenarioLogger(final Class<?> cls) {
 		SeleniumRobotLogger.getLogger(cls);
-		return (ScenarioLogger) Logger.getLogger("." + cls.getName(), new ScenarioLoggerFactory());
+		Logger logger = LogManager.getLogger("." + cls.getName());
+		return new ScenarioLogger(logger);
 	}
 	
 	private String cleanMessage(Object message) {
@@ -43,11 +47,10 @@ public class ScenarioLogger extends Logger {
 			return message.toString();
 		}
 	}
-	
-	@Override
+
 	public void info(Object message) {
         logMessage(cleanMessage(message), MessageType.INFO);
-        super.info(message);
+        logger.info(message);
     }
     
     /**
@@ -63,10 +66,9 @@ public class ScenarioLogger extends Logger {
      *
      * @param  message
      */
-    @Override
     public void warn(Object message) {
     	logMessage("Warning: " + cleanMessage(message), MessageType.WARNING);
-    	super.warn(message);
+    	logger.warn(message);
     }
     
     /**
@@ -74,10 +76,9 @@ public class ScenarioLogger extends Logger {
      *
      * @param  message
      */
-    @Override
     public void error(Object message) { 
         logMessage(cleanMessage(message), MessageType.ERROR);
-        super.error(message);
+        logger.error(message);
     } 
 
     /**
@@ -87,7 +88,7 @@ public class ScenarioLogger extends Logger {
      */
     public void log(final String message) {
         logMessage(message, MessageType.LOG);
-        super.info(message);
+        logger.info(message);
     }
 
     /**
@@ -115,7 +116,7 @@ public class ScenarioLogger extends Logger {
     }
     public void logTestInfo(String key, Info value, ITestResult testResult) {
     	TestNGResultUtils.setTestInfo(testResult, key, value);
-    	super.info(String.format("Storing into test result %s: %s", key, value.getInfo() ));
+    	logger.info("Storing into test result {0}: {1}", key, value.getInfo() );
     }
 
     /**
@@ -146,9 +147,9 @@ public class ScenarioLogger extends Logger {
     		try {
     			runningStep.addNetworkCapture(new HarCapture(har, name));
 			} catch (IOException e) {
-				super.error("cannot create network capture file: " + e.getMessage(), e);
+				logger.error("cannot create network capture file: " + e.getMessage(), e);
 			} catch (NullPointerException e) {
-				super.error("HAR capture is null");
+				logger.error("HAR capture is null");
 			}
     	}
     	
@@ -242,7 +243,7 @@ public class ScenarioLogger extends Logger {
 	    					SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getTestSteps().size(),
 	    					screenshotName);
 	    		} catch (NullPointerException e) {
-	    			super.error("screenshot is null");
+	    			logger.error("screenshot is null");
 	    		}
 	    	}
     	} catch (IndexOutOfBoundsException e) {

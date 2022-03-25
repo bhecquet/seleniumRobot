@@ -25,7 +25,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.remote.ScreenshotException;
 
