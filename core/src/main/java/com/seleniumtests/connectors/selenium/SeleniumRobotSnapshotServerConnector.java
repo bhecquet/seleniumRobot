@@ -19,6 +19,8 @@ package com.seleniumtests.connectors.selenium;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.Rectangle;
 import org.testng.ITestResult;
 
@@ -41,7 +44,6 @@ import kong.unirest.MultipartBody;
 import kong.unirest.UnirestException;
 import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
-import rp.com.google.common.io.Files;
 
 public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerConnector {
 	
@@ -238,7 +240,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			
 			
 			if (response.getStatus() == 200) {
-				Files.write(response.getBody(), tmpFile);
+				Files.write(tmpFile.toPath(), response.getBody());
 				return tmpFile;
 			} else {
 				logger.warn("No reference found");

@@ -330,7 +330,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		Unirest.config().reset();
 		Unirest.config().followRedirects(true);
 
-	
+	}
 
 	/**
 	 * Do we archive test results
