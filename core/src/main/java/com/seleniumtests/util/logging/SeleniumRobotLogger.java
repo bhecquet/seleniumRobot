@@ -40,10 +40,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.Filter;
-import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.FileAppender;
-import org.apache.logging.log4j.core.config.AppenderRef;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.apache.logging.log4j.core.config.builder.api.AppenderComponentBuilder;
@@ -122,8 +120,8 @@ public class SeleniumRobotLogger {
 			if (System.getProperty(MAVEN_EXECUTION) == null || System.getProperty(MAVEN_EXECUTION).equals("false")) {
 				System.out.println("streams redirected to logger");
 		        // redirect standard output and error to logger so that all logs are written to log file
-		        System.setErr(new PrintStream(new Sys.Error(LogManager.getLogger(cls)), true));
-		        System.setOut(new PrintStream(new Sys.Out(LogManager.getLogger(cls)), true));
+		        System.setErr(new PrintStream(new Sys.Error(LogManager.getRootLogger()), true));
+		        System.setOut(new PrintStream(new Sys.Out(LogManager.getRootLogger()), true));
 			}
 	
 	        rootIsConfigured = true;
