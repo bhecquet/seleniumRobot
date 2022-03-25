@@ -33,7 +33,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.testng.IReporter;
 import org.testng.ISuite;
 import org.testng.ISuiteResult;
@@ -44,7 +44,6 @@ import org.testng.TestRunner;
 import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
-import com.seleniumtests.connectors.tms.reportportal.ReportPortalService;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.testanalysis.ErrorCause;
@@ -71,18 +70,11 @@ public class ReporterControler implements IReporter {
 	private static final Object reporterLock = new Object();
 	private static final Logger logger = SeleniumRobotLogger.getLogger(ReporterControler.class);
 	private JUnitReporter junitReporter;
-	private ReportPortalReporter reportPortalReporter;
 
 	public ReporterControler() {
-		this(null);
-	}
-	
-	public ReporterControler(ReportPortalService reportPortalService) {
 		junitReporter = new JUnitReporter();
-		if (reportPortalService != null) {
-			reportPortalReporter = new ReportPortalReporter(reportPortalService);
-		}
 	}
+
 	
 	@Override
 	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String outputDirectory) {
@@ -114,11 +106,6 @@ public class ReporterControler implements IReporter {
 			// change / add test result according to snapshot comparison results
 			if (suiteFinished) {
 				changeTestResultsWithSnapshotComparison(suites);
-			}
-			
-			// test steps to Report Portal
-			if (reportPortalReporter != null && currentTestResult != null) {
-				reportPortalReporter.generateReport(currentTestResult);
 			}
 
 			try {
