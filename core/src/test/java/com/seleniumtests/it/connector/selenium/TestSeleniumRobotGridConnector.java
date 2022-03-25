@@ -14,7 +14,7 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.SessionId;
 import org.testng.Assert;

@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 

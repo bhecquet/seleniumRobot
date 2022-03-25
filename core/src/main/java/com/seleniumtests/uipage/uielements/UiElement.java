@@ -33,7 +33,7 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.remote.ScreenshotException;
 

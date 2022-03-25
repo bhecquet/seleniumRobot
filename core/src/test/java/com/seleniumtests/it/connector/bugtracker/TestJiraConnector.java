@@ -58,12 +58,15 @@ public class TestJiraConnector extends GenericTest {
 		jiraOptions.put("jira.openStates", "Open,To Do");
 		jiraOptions.put("jira.closeTransition", "Prêt/Démarrer/Livrer/A valider/Validation effectuée/Clore");
 		jiraOptions.put("jira.issueType", "Bogue");
-		jiraOptions.put("priority", "Important");
+		jiraOptions.put("priority", "Important (P3)");
 		
-		JiraConnector jiraConnector = new JiraConnector(System.getProperty("server"), "FFC", System.getProperty("user"), System.getProperty("password"), jiraOptions);
+		jiraOptions.put("jira.field.Ano-Affecte la version", "VERS.MAJ.22.06");
+		jiraOptions.put("jira.field.Libellé tâche ITBM", "-");
+		
+		JiraConnector jiraConnector = new JiraConnector(System.getProperty("server"), "JGEPV", System.getProperty("user"), System.getProperty("password"), jiraOptions);
 		jiraConnector.createIssue(null, null, "core", "testJira", "testng  http://confluence.covea.priv/display/portailSM/Selenium+-+Descriptions+des+scenarios", Arrays.asList(step1, step2, stepEnd), jiraOptions);
 //		jiraConnector.issueAlreadyExists(new JiraBean(null, "[Selenium][core][DEV][testng] test myTest KO", "", "Bogue"));
 //		jiraConnector.updateIssue("FFC-573", "commentaire", Arrays.asList(screenshot));
-		jiraConnector.closeIssue("FFC-837", "Terminé");
+//		jiraConnector.closeIssue("FFC-837", "Terminé");
 	}
 }

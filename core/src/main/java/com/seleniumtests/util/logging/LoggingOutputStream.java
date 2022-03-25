@@ -3,8 +3,9 @@ package com.seleniumtests.util.logging;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
+
 
 /**
  * Code from https://sysgears.com/articles/how-to-redirect-stdout-and-stderr-writing-to-a-log4j-appender/

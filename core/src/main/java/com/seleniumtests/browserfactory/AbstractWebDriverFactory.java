@@ -19,7 +19,7 @@ package com.seleniumtests.browserfactory;
 
 import java.time.Duration;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;

@@ -34,7 +34,7 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.codec.binary.Base64OutputStream;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.testng.ITestContext;

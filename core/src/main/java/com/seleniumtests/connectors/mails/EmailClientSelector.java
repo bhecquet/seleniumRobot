@@ -18,7 +18,7 @@
 package com.seleniumtests.connectors.mails;
 
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import com.seleniumtests.connectors.mails.EmailServer.EmailServerTypes;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;

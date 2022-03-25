@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.TestVariable;

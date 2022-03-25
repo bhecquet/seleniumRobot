@@ -17,7 +17,7 @@
  */
 package com.seleniumtests.connectors.tms;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.ITestResult;

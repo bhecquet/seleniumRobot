@@ -17,7 +17,7 @@
  */
 package com.seleniumtests.it.stubclasses;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.WebDriverException;
 
 import com.seleniumtests.util.helper.WaitHelper;

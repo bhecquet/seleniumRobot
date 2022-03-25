@@ -35,12 +35,20 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Appender;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.appender.FileAppender;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.core.config.builder.api.AppenderComponentBuilder;
+import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilder;
+import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilderFactory;
+import org.apache.logging.log4j.core.config.builder.api.LayoutComponentBuilder;
+import org.apache.logging.log4j.core.config.builder.api.RootLoggerComponentBuilder;
+import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
+import org.apache.logging.log4j.core.layout.PatternLayout;
 
 import com.seleniumtests.util.helper.WaitHelper;
 
@@ -65,39 +73,47 @@ public class SeleniumRobotLogger {
 		// As a utility class, it is not meant to be instantiated.
 	}
 	
+	private static void configureLogger() {
+		ConfigurationBuilder<BuiltConfiguration> builder = ConfigurationBuilderFactory.newConfigurationBuilder();
+		AppenderComponentBuilder console = builder.newAppender("stdout", "Console"); 
+		builder.add(console);
+		
+		LayoutComponentBuilder layout = builder.newLayout("PatternLayout");
+		layout.addAttribute("pattern", LOG_PATTERN);
+		console.add(layout);
+		
+		RootLoggerComponentBuilder rootLogger;
+		// use System property instead of SeleniumTestsContext class as SeleniumrobotLogger class is used for grid extension package and 
+        // we do not want to depend on "SeleniumTestsContext" class here
+		if (System.getProperty(INTERNAL_DEBUG) != null && System.getProperty(INTERNAL_DEBUG).contains("core")) {
+			rootLogger = builder.newRootLogger(Level.DEBUG);
+        } else {
+        	rootLogger = builder.newRootLogger(Level.INFO);
+        }
+		rootLogger.add(builder.newAppenderRef("stdout"));
+
+		builder.add(rootLogger);
+		
+		Configurator.initialize(builder.build());
+	}
+	
 	public static Logger getLogger(final Class<?> cls) {
 		
 		
-	    
 	    if (!rootIsConfigured) {
-	    	Logger.getRootLogger().removeAllAppenders();
-	        BasicConfigurator.configure();
-	        Logger rootLogger = Logger.getRootLogger();
+	    	configureLogger();
 
-	        Appender appender = (Appender) rootLogger.getAllAppenders().nextElement();
-	        appender.setLayout(new PatternLayout(SeleniumRobotLogger.LOG_PATTERN));
-	        
-			
 			if (System.getProperty(MAVEN_EXECUTION) == null || System.getProperty(MAVEN_EXECUTION).equals("false")) {
 				System.out.println("streams redirected to logger");
 		        // redirect standard output and error to logger so that all logs are written to log file
-		        System.setErr(new PrintStream(new Sys.Error(rootLogger), true));
-		        System.setOut(new PrintStream(new Sys.Out(rootLogger), true));
+		        System.setErr(new PrintStream(new Sys.Error(LogManager.getLogger(cls)), true));
+		        System.setOut(new PrintStream(new Sys.Out(LogManager.getLogger(cls)), true));
 			}
 	
 	        rootIsConfigured = true;
 	    }
-	    
-        // use System property instead of SeleniumTestsContext class as SeleniumrobotLogger class is used for grid extension package and 
-        // we do not want to depend on "SeleniumTestsContext" class here
-	    Logger rootLogger = Logger.getRootLogger();
-        if (System.getProperty(INTERNAL_DEBUG) != null && System.getProperty(INTERNAL_DEBUG).contains("core")) {
-        	rootLogger.setLevel(Level.DEBUG);
-        } else {
-        	rootLogger.setLevel(Level.INFO);
-        }
-	
-	    return Logger.getLogger(cls);
+
+	    return LogManager.getLogger(cls);
 	}
 
 
@@ -118,11 +134,9 @@ public class SeleniumRobotLogger {
 	public static void updateLogger(String outputDir, String defaultOutputDir, String logFileName, boolean doCleanResults) {
 		outputDirectory = outputDir;
 		defaultOutputDirectory = defaultOutputDir;
-		Appender fileLoggerAppender = Logger.getRootLogger().getAppender(FILE_APPENDER_NAME);
+		Appender fileLoggerAppender = ((LoggerContext)LogManager.getContext()).getConfiguration().getAppender(FILE_APPENDER_NAME);
 		if (fileLoggerAppender == null) {
-			Logger rootLogger = Logger.getRootLogger();
-			FileAppender fileAppender = new FileAppender();
-			
+
 			// clean output dir
 			if (doCleanResults) {
 				cleanResults();
@@ -133,24 +147,27 @@ public class SeleniumRobotLogger {
 					if (!new File(outputDir).exists()) {
 						new File(outputDir).mkdirs();
 					}
-			        
-			        
-			        fileAppender.setName(FILE_APPENDER_NAME);
-			        fileAppender.setFile(outputDir + "/" + logFileName);
-			        fileAppender.setLayout(new PatternLayout(LOG_PATTERN));
+					
+					PatternLayout.Builder layoutBuilder = PatternLayout.newBuilder();
+					layoutBuilder.withPattern(LOG_PATTERN);
+					
+					FileAppender.Builder<?> fileAppenderBuilder = FileAppender.newBuilder()
+							.withFileName(outputDir + "/" + logFileName);
+					fileAppenderBuilder.setLayout(layoutBuilder.build());
+					fileAppenderBuilder.setName(FILE_APPENDER_NAME);
+
 
 			        if (System.getProperty(INTERNAL_DEBUG) != null && System.getProperty(INTERNAL_DEBUG).contains("core")) {
-			        	fileAppender.setThreshold(Level.DEBUG);
+			        	((LoggerContext)LogManager.getContext()).getConfiguration().getRootLogger().addAppender(fileAppenderBuilder.build(), Level.DEBUG, null);
 			        } else {
-			        	fileAppender.setThreshold(Level.INFO);
+			        	((LoggerContext)LogManager.getContext()).getConfiguration().getRootLogger().addAppender(fileAppenderBuilder.build(), Level.INFO, null);
 			        }
 			        
-			        fileAppender.activateOptions();
 			        break;
 				} catch (Exception e) {
 				}
 			}
-	        rootLogger.addAppender(fileAppender);
+
 		}
 	}
 	
@@ -193,7 +210,8 @@ public class SeleniumRobotLogger {
 	 * @throws IOException 
 	 */
 	public static synchronized void parseLogFile() {
-		Appender fileLoggerAppender = Logger.getRootLogger().getAppender(FILE_APPENDER_NAME);
+		
+		Appender fileLoggerAppender = ((LoggerContext)LogManager.getContext()).getConfiguration().getAppender(FILE_APPENDER_NAME);
 		if (fileLoggerAppender == null) {
 			return;
 		} 
@@ -201,7 +219,7 @@ public class SeleniumRobotLogger {
 		// read the file from appender directly
 		List<String> logLines;
 		try {
-			logLines = FileUtils.readLines(new File(((FileAppender)fileLoggerAppender).getFile()), StandardCharsets.UTF_8); 
+			logLines = FileUtils.readLines(new File(((FileAppender)fileLoggerAppender).getFileName()), StandardCharsets.UTF_8); 
 		} catch (IOException e) {
 			getLogger(SeleniumRobotLogger.class).error("cannot read log file", e);
 			return;
@@ -245,13 +263,14 @@ public class SeleniumRobotLogger {
 		SeleniumRobotLogger.testLogs.clear();
 		
 		// clear log file
-		Appender fileAppender = Logger.getRootLogger().getAppender(FILE_APPENDER_NAME);
-		if (fileAppender != null) {
-			fileAppender.close();
+		Appender fileLoggerAppender = ((LoggerContext)LogManager.getContext()).getConfiguration().getAppender(FILE_APPENDER_NAME);
+		if (fileLoggerAppender != null) {
+			fileLoggerAppender.stop();
 			
 			// wait for handler to be closed
 			WaitHelper.waitForMilliSeconds(200);
-			Logger.getRootLogger().removeAppender(FILE_APPENDER_NAME);
+			((LoggerContext)LogManager.getContext()).getConfiguration().getRootLogger().removeAppender(FILE_APPENDER_NAME);
+			((LoggerContext)LogManager.getContext()).updateLoggers();
 		}
 		Path logFilePath = Paths.get(outputDirectory, SeleniumRobotLogger.LOG_FILE_NAME).toAbsolutePath();
 		if (logFilePath.toFile().exists()) {

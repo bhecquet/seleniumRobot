@@ -20,7 +20,7 @@ package com.seleniumtests.core;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.StringUtility;

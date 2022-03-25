@@ -3,7 +3,7 @@ package com.seleniumtests.uipage.htmlelements.select;
 import java.time.Duration;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;

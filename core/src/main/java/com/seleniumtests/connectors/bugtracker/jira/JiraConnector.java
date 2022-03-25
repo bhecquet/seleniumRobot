@@ -12,7 +12,7 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import com.atlassian.jira.rest.client.api.IssueRestClient;
 import com.atlassian.jira.rest.client.api.JiraRestClient;
@@ -47,12 +47,13 @@ import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.helper.WaitHelper;
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class JiraConnector extends BugTracker {
 
 
     private static final String ITEM = "    - %s";
-	private static Logger logger = Logger.getLogger(JiraConnector.class);
+	private static Logger logger = SeleniumRobotLogger.getLogger(JiraConnector.class);
     private String projectKey;
     private String browseUrl;
     private Map<String, BasicComponent> components;

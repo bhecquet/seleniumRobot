@@ -43,7 +43,7 @@ import javax.imageio.ImageIO;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.zeroturnaround.zip.ZipUtil;
 
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
