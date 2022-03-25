@@ -48,10 +48,8 @@ import org.testng.Reporter;
 import org.testng.internal.ConfigurationMethod;
 import org.testng.internal.annotations.DisabledRetryAnalyzer;
 
-import com.epam.reportportal.testng.BaseTestNGListener;
 import com.google.common.collect.Iterables;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
-import com.seleniumtests.connectors.tms.reportportal.ReportPortalService;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestStepManager;
@@ -77,7 +75,7 @@ import com.seleniumtests.util.video.VideoRecorder;
 
 import kong.unirest.Unirest;
 
-public class SeleniumRobotTestListener extends BaseTestNGListener implements ITestListener, IInvokedMethodListener, ISuiteListener, IExecutionListener, IConfigurationListener {
+public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodListener, ISuiteListener, IExecutionListener, IConfigurationListener {
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotTestListener.class);
 	private static ScenarioLogger scenarioLogger = ScenarioLogger.getScenarioLogger(SeleniumRobotTestListener.class);
@@ -159,7 +157,7 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 				testContext = SeleniumTestsContextManager.getThreadContext().getTestNGContext();
 			}
 			
-			new ReporterControler(reportPortalService).generateReport(
+			new ReporterControler().generateReport(
 					Arrays.asList(testContext.getCurrentXmlTest().getSuite()), 
 					Arrays.asList(testContext.getSuite()), 
 					SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(),
@@ -194,10 +192,7 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
         
         // global context of the test
         SeleniumTestsContextManager.initGlobalContext(context);	
-        
-        if (reportPortalService != null) {
-			super.onStart(context);
-		}
+
 	}
 
 	/**
@@ -243,10 +238,7 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 				context.getPassedTests().removeResult(result);
 			}
 		}
-		
-		if (reportPortalService != null) {
-			super.onFinish(context);
-		}
+
 	}
 
 	@Override
@@ -319,9 +311,6 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
     									SeleniumTestsContextManager.getApplicationFullVersion()));
     	logger.info(String.format("Core version: %s (%s)", SeleniumTestsContextManager.getCoreVersion(), SeleniumTestsContextManager.getCoreFullVersion()));
 
-    	if (reportPortalService != null) {
-			super.onStart(suite);
-		}
 	}
 
 	@Override
@@ -332,10 +321,7 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 			logger.warn("No test executed");
 		}	
 		suiteList.add(suite);
-		
-		if (reportPortalService != null) {
-			super.onFinish(suite);
-		}
+
 	}
 	
 	@Override
@@ -343,11 +329,7 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 		setSuiteList( Collections.synchronizedList(new ArrayList<>()));
 		Unirest.config().reset();
 		Unirest.config().followRedirects(true);
-		
-		if (reportPortalService != null) {
-			super.onExecutionStart();
-		}
-	}
+
 	
 
 	/**
@@ -409,10 +391,7 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
         		logger.error(String.format("Archiving KO [%s] => %s", e.getMessage(), SeleniumTestsContextManager.getGlobalContext().getArchiveToFile()));
         	}
 		}
-        
-        if (reportPortalService != null) {
-			super.onExecutionFinish();
-		}
+
 	}
 	
 	/**
