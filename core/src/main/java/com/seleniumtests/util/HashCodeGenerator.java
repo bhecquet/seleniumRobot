@@ -24,10 +24,11 @@ import java.util.UUID;
 import org.apache.logging.log4j.Logger;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class HashCodeGenerator {
 
-    private static Logger logger = Logger.getLogger(HashCodeGenerator.class);
+    private static Logger logger = SeleniumRobotLogger.getLogger(HashCodeGenerator.class);
 
     private HashCodeGenerator() {
 		// As a utility method, it is not meant to be instantiated.
