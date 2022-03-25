@@ -17,10 +17,7 @@
  */
 package com.seleniumtests.ut.util.logging;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +25,6 @@ import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -58,9 +54,7 @@ public class TestSeleniumRobotLogger extends MockitoTest {
 			logger.info("some info");
 			logger.debug("some debug");
 			logger.info(SeleniumRobotLogger.END_TEST_PATTERN + "testLogInDevMode");
-			
-			verify(logger, times(4)).callAppenders(any(LoggingEvent.class));
-			
+
 			// check log file content
 			SeleniumRobotLogger.parseLogFile();
 			String logs = SeleniumRobotLogger.getTestLogs().get("testLogInDevMode");
@@ -90,14 +84,37 @@ public class TestSeleniumRobotLogger extends MockitoTest {
 			logger.info("some info");
 			logger.debug("some debug");
 			logger.info(SeleniumRobotLogger.END_TEST_PATTERN + "testLogInRunMode");
-			
-			verify(logger, times(3)).callAppenders(any(LoggingEvent.class));
-			
+
 			// check log file content
 			SeleniumRobotLogger.parseLogFile();
 			String logs = SeleniumRobotLogger.getTestLogs().get("testLogInRunMode");
 			Assert.assertTrue(logs.contains("some info"));
 			Assert.assertFalse(logs.contains("some debug"));
+			
+		} finally {
+			System.clearProperty(SeleniumRobotLogger.INTERNAL_DEBUG);
+			SeleniumRobotLogger.reset();
+		}
+	}
+	
+	@Test(groups= {"ut"})
+	public void testSystemOutRedirectedToLogger() throws IOException {
+		try {
+			SeleniumRobotLogger.reset();
+			System.setProperty(SeleniumRobotLogger.INTERNAL_DEBUG, "none");
+			SeleniumRobotLogger.updateLogger(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory());
+
+
+			logger.info(SeleniumRobotLogger.START_TEST_PATTERN + "testSystemOutRedirectedToLogger");
+			System.out.println("information");
+			System.err.println("error");
+			logger.info(SeleniumRobotLogger.END_TEST_PATTERN + "testSystemOutRedirectedToLogger");
+			
+			// check log file content
+			SeleniumRobotLogger.parseLogFile();
+			String logs = SeleniumRobotLogger.getTestLogs().get("testSystemOutRedirectedToLogger");
+			Assert.assertTrue(logs.contains("Sys$Out: information"));
+			Assert.assertTrue(logs.contains("Sys$Error: error"));
 			
 		} finally {
 			System.clearProperty(SeleniumRobotLogger.INTERNAL_DEBUG);

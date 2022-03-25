@@ -17,6 +17,7 @@
  */
 package com.seleniumtests;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
@@ -29,7 +30,7 @@ import com.seleniumtests.customexception.ConfigurationException;
 @Aspect
 public class LogUnitTest {
 	
-	private static final Logger logger = Logger.getRootLogger();
+	private static final Logger logger = LogManager.getRootLogger();
 
 	@Before("execution(@org.testng.annotations.Test public * com.seleniumtests..* (..))")
 	public void logTestStart(JoinPoint joinPoint)  { 

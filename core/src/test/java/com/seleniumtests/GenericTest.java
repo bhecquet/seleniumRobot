@@ -113,7 +113,7 @@ public class GenericTest {
 		try {
 			SeleniumRobotLogger.reset();
 		} catch (IOException e) {
-			logger.error("Cannot delete log file", e);
+			logger.error("Cannot delete log file" + e.getMessage());
 		}
 	}
 	
