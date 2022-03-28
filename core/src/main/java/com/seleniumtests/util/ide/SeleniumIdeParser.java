@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.apache.logging.log4j.Logger;
 
 import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParseResult;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.AnnotationExpr;
@@ -84,9 +85,9 @@ public class SeleniumIdeParser {
 		Map<String, String> classInfo = new HashMap<>();
 		
 		// parse the file
-        CompilationUnit cu = JavaParser.parse(javaFile);
+        ParseResult<CompilationUnit> cu = new JavaParser().parse(javaFile);
 
-        cu.accept(new TestMethodVisitor(), new StringBuilder[] {testCode, webPageCode});
+        cu.getResult().get().accept(new TestMethodVisitor(), new StringBuilder[] {testCode, webPageCode});
         
         webPageCode.append(FOOTER);
         testCode.append(FOOTER);

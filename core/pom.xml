@@ -36,7 +36,7 @@
 		<dependency>
 			<groupId>com.atlassian.jira</groupId>
 			<artifactId>jira-rest-java-client-app</artifactId>
-			<version>5.2.1</version>
+			<version>5.2.4</version>
 			<exclusions>
 				<exclusion>
           			<groupId>org.springframework</groupId>
@@ -71,10 +71,6 @@
             <groupId>org.apache.logging.log4j</groupId>
            <artifactId>log4j-core</artifactId>
         </dependency>
-  <!--       <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-        </dependency> -->
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
@@ -147,17 +143,17 @@
 		<dependency>
 			<groupId>com.hierynomus</groupId>
 			<artifactId>sshj</artifactId>
-			<version>0.21.1</version>
+			<version>0.32.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.mail</groupId>
 			<artifactId>javax.mail</artifactId>
-			<version>1.5.6</version>
+			<version>1.6.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>
-			<version>1.14.2</version>
+			<version>1.14.3</version>
 		</dependency>
 		<dependency>
 		  	<groupId>com.oracle.database.jdbc</groupId>
@@ -173,7 +169,13 @@
 		<dependency>
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>
-			<version>3.0</version>
+			<version>5.1.0</version>
+			<exclusions>
+			    <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
 		</dependency>
 		<dependency>
 		    <groupId>org.seleniumhq.selenium</groupId>
@@ -220,12 +222,12 @@
 		<dependency>
 		    <groupId>com.github.javaparser</groupId>
 		    <artifactId>javaparser-core</artifactId>
-		    <version>3.6.22</version>
+		    <version>3.24.0</version>
 		</dependency>
 		<dependency>
 		    <groupId>net.openhft</groupId>
 		    <artifactId>compiler</artifactId>
-		    <version>2.3.4</version>
+		    <version>2.21ea81</version>
 		</dependency>
         
         <!-- Specific Neoload -->
@@ -263,19 +265,13 @@
         <dependency>
 	        <groupId>org.sonarsource.java</groupId>
 	        <artifactId>sonar-jacoco-listeners</artifactId>
-	        <version>3.8</version>
+	        <version>5.14.0.18788</version>
 	        <scope>test</scope>
         </dependency>
         <dependency> 
 	      <groupId>org.mockito</groupId>
 	      <artifactId>mockito-core</artifactId>
-	      <version>3.2.4</version>
-	      <scope>test</scope>
-	    </dependency>
-	    <dependency>
-	      <groupId>net.bytebuddy</groupId>
-	      <artifactId>byte-buddy</artifactId>
-	      <version>1.10.6</version>
+	      <version>3.12.4</version>
 	      <scope>test</scope>
 	    </dependency>
 	   <dependency>
@@ -293,7 +289,7 @@
         <dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>jetty-repacked</artifactId>
-			<version>9.4.1.v20170120</version>
+			<version>9.4.12.v20180830.1</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- needed for offline instrumentation. Offline is used because tests using powermockito are not correctly analyzed due to https://github.com/powermock/powermock/issues/727 -->

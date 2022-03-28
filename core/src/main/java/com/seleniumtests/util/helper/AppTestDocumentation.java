@@ -38,6 +38,7 @@ import org.apache.commons.io.FileUtils;
 import org.testng.annotations.Test;
 
 import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParseResult;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
@@ -189,11 +190,11 @@ public class AppTestDocumentation {
 		FileInputStream in = new FileInputStream(path.toAbsolutePath().toString());
 
         // parse the file
-        CompilationUnit cu = JavaParser.parse(in);
+        ParseResult<CompilationUnit> cu = new JavaParser().parse(in);
 
         // prints the resulting compilation unit to default system output
-        cu.accept(new ClassVisitor(), "Tests");
-        cu.accept(new TestMethodVisitor(), null);
+        cu.getResult().get().accept(new ClassVisitor(), "Tests");
+        cu.getResult().get().accept(new TestMethodVisitor(), null);
 	}
 	
 	private static void explorePages(File srcDir) throws IOException {
@@ -218,11 +219,11 @@ public class AppTestDocumentation {
 		FileInputStream in = new FileInputStream(path.toAbsolutePath().toString());
 
         // parse the file
-        CompilationUnit cu = JavaParser.parse(in);
+        ParseResult<CompilationUnit> cu = new JavaParser().parse(in);
 
         // prints the resulting compilation unit to default system output
-        cu.accept(new ClassVisitor(), "Pages");
-        cu.accept(new WebPageMethodVisitor(), null);
+        cu.getResult().get().accept(new ClassVisitor(), "Pages");
+        cu.getResult().get().accept(new WebPageMethodVisitor(), null);
 	}
 	
 	private static class TestMethodVisitor extends VoidVisitorAdapter<Void> {
@@ -289,7 +290,7 @@ public class AppTestDocumentation {
 		public void visit(MethodDeclaration n, Void arg) {
 			
 			// only display public methods
-			if (!n.getModifiers().contains(Modifier.PUBLIC)) {
+			if (!n.getModifiers().contains(Modifier.publicModifier())) {
 				return;
 			}		
 			
