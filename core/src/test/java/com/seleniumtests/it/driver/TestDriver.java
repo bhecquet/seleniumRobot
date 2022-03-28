@@ -24,6 +24,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.openqa.selenium.Alert;
@@ -35,6 +36,12 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.devtools.DevTools;
+import org.openqa.selenium.devtools.HasDevTools;
+import org.openqa.selenium.devtools.v97.page.Page;
+import org.openqa.selenium.devtools.v97.page.Page.CaptureScreenshotFormat;
+import org.openqa.selenium.devtools.v97.page.Page.CaptureSnapshotFormat;
+import org.openqa.selenium.devtools.v97.page.model.Viewport;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -95,6 +102,12 @@ public class TestDriver extends GenericMultiBrowserTest {
 	
 	public void testAlertDisplay() {
 		try {
+			((HasDevTools)driver).getDevTools().send(Page.captureScreenshot(Optional.of(CaptureScreenshotFormat.PNG), 
+					Optional.of(70), 
+					Optional.of(new Viewport(0, 0, 1000, 1000, 1)),
+					Optional.of(false),
+					Optional.of(true)
+					));
 			DriverTestPage.greenSquare.click();
 			driver.switchTo().alert().accept();
 		} finally {

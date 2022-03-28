@@ -69,7 +69,7 @@
 	</repositories>
 
 	<properties>
-		<jacoco.version>0.8.2</jacoco.version>
+		<jacoco.version>0.8.7</jacoco.version>
 
 		<!-- /!\ when changing selenium version, do not forget to change selenium-api version in project file (for aspectj build path) -->
 		<!-- /!\ Also change version in SeleniumTestContextManager.java -->
@@ -77,7 +77,7 @@
 		<appium.version>8.0.0</appium.version>
 		<log4j.version>2.17.2</log4j.version>
 		<aspectj.version>1.9.1</aspectj.version>
-		<htmlunitdriver.version>3.57.0</htmlunitdriver.version>
+		<htmlunitdriver.version>3.60.0</htmlunitdriver.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
@@ -113,7 +113,7 @@
 			<dependency>
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
-				<version>2.7</version>
+				<version>2.11.0</version>
 			</dependency>
 			<dependency>
 				<groupId>io.appium</groupId>
@@ -164,7 +164,7 @@
 			<dependency> <!-- version retrieved by powermock, but also needed by neotys -->
 				<groupId>org.javassist</groupId>
 				<artifactId>javassist</artifactId>
-				<version>3.27.0-GA</version>
+				<version>3.28.0-GA</version>
 			</dependency>
 			<dependency>
 				<groupId>com.infotel.seleniumRobot</groupId>
@@ -184,7 +184,7 @@
 			<dependency>
 			    <groupId>com.konghq</groupId>
 			    <artifactId>unirest-java</artifactId>
-			    <version>3.7.04</version>
+			    <version>3.13.7</version>
 			    <exclusions>
 				    <exclusion>
 				      <artifactId>commons-logging</artifactId>
@@ -200,12 +200,12 @@
 			<dependency>
 				<groupId>com.vdurmont</groupId>
 				<artifactId>semver4j</artifactId>
-				<version>2.2.0</version>
+				<version>3.1.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.json</groupId>
 				<artifactId>json</artifactId>
-				<version>20160810</version>
+				<version>20220320</version>
 			</dependency>
 			<dependency>
 				<groupId>com.github.stephenc.monte</groupId>
@@ -220,12 +220,12 @@
 		    <dependency>
 		      <groupId>net.java.dev.jna</groupId>
 		      <artifactId>jna-platform</artifactId>
-		      <version>4.1.0</version>
+		      <version>5.10.0</version>
 		    </dependency>
 		    <dependency>
 			    <groupId>org.zeroturnaround</groupId>
 			    <artifactId>zt-zip</artifactId>
-			    <version>1.13</version>
+			    <version>1.15</version>
 			</dependency>
 			<dependency>
 		        <groupId>net.lightbody.bmp</groupId>
@@ -241,7 +241,7 @@
     		<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
-				<version>3.5</version>
+				<version>3.12.0</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

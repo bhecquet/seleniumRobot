@@ -41,6 +41,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -68,6 +69,8 @@ import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.devtools.DevTools;
+import org.openqa.selenium.devtools.HasDevTools;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Interactive;
 import org.openqa.selenium.interactions.Sequence;
@@ -103,7 +106,7 @@ import net.lightbody.bmp.BrowserMobProxy;
  * When action do not need a real driver, static methods are provided
  * It also handles the grid mode, masking it to requester.
  */
-public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, JavascriptExecutor, TakesScreenshot, Interactive {
+public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, JavascriptExecutor, TakesScreenshot, Interactive, HasDevTools {
 	
 	private static final String OTHER_BROWSER = "other";
 	private static final String SAFARI_BROWSER = "safari";
@@ -1633,5 +1636,10 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 
 	public boolean isDriverExited() {
 		return driverExited;
+	}
+
+	@Override
+	public Optional<DevTools> maybeGetDevTools() {
+		return ((HasDevTools)driver).maybeGetDevTools();
 	}
 }
