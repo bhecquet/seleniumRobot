@@ -148,7 +148,7 @@ public class SeleniumRobotLogger {
 	public static void updateLogger(String outputDir, String defaultOutputDir, String logFileName, boolean doCleanResults) {
 		outputDirectory = outputDir;
 		defaultOutputDirectory = defaultOutputDir;
-		Appender fileLoggerAppender = ((LoggerContext)LogManager.getContext(false)).getConfiguration().getAppender(FILE_APPENDER_NAME);
+		Appender fileLoggerAppender = isFileAppenderPresent();
 		if (fileLoggerAppender == null) {
 
 			// clean output dir
@@ -176,21 +176,15 @@ public class SeleniumRobotLogger {
 					
 					Appender fileAppender = fileAppenderBuilder.build();
 					fileAppender.start();
-					
-					config.addAppender(fileAppender);
-					
-//					AppenderRef ref = AppenderRef.createAppenderRef("File", null, null);
-//			        AppenderRef[] refs = new AppenderRef[] {ref};
+
 			        ctx.getRootLogger().addAppender(fileAppender);
 
-			        ctx.updateLoggers();
-
-
 			        if (System.getProperty(INTERNAL_DEBUG) != null && System.getProperty(INTERNAL_DEBUG).contains("core")) {
-			        	((LoggerContext)LogManager.getContext(false)).getConfiguration().getRootLogger().setLevel(Level.DEBUG);
+			        	config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME).setLevel(Level.DEBUG);
 			        } else {
-			        	((LoggerContext)LogManager.getContext(false)).getConfiguration().getRootLogger().setLevel(Level.INFO);
+			        	config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME).setLevel(Level.INFO);
 			        }
+			        ctx.updateLoggers();
 			        
 			        break;
 				} catch (Exception e) {
@@ -239,8 +233,8 @@ public class SeleniumRobotLogger {
 	 * @throws IOException 
 	 */
 	public static synchronized void parseLogFile() {
-		
-		Appender fileLoggerAppender = ((LoggerContext)LogManager.getContext(false)).getConfiguration().getAppender(FILE_APPENDER_NAME);
+
+		Appender fileLoggerAppender = isFileAppenderPresent();
 		if (fileLoggerAppender == null) {
 			return;
 		} 
@@ -292,7 +286,7 @@ public class SeleniumRobotLogger {
 		SeleniumRobotLogger.testLogs.clear();
 		
 		// clear log file
-		Appender fileLoggerAppender = ((LoggerContext)LogManager.getContext(false)).getConfiguration().getAppender(FILE_APPENDER_NAME);
+		Appender fileLoggerAppender = isFileAppenderPresent();
 		if (fileLoggerAppender != null) {
 			fileLoggerAppender.stop();
 			
@@ -300,11 +294,16 @@ public class SeleniumRobotLogger {
 			WaitHelper.waitForMilliSeconds(200);
 			((LoggerContext)LogManager.getContext(false)).getConfiguration().getRootLogger().removeAppender(FILE_APPENDER_NAME);
 			((LoggerContext)LogManager.getContext(false)).updateLoggers();
+
 		}
 		Path logFilePath = Paths.get(outputDirectory, SeleniumRobotLogger.LOG_FILE_NAME).toAbsolutePath();
 		if (logFilePath.toFile().exists()) {
 			Files.delete(logFilePath);
 		}
+	}
+	
+	private static  Appender isFileAppenderPresent() {
+		return ((LoggerContext)LogManager.getContext(false)).getConfiguration().getRootLogger().getAppenders().get(FILE_APPENDER_NAME);
 	}
 
 
