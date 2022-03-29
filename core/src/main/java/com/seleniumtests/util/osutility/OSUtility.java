@@ -337,11 +337,11 @@ public abstract class OSUtility {
      */
     public static String getChromeVersion(String chromePath) {
     	OSUtility osUtility = OSUtilityFactory.getInstance();
-    	if (isWindows()) {
-    		return "Google Chrome " + ((OSUtilityWindows)osUtility).getChromeVersionFromFolder(chromePath);
-    	} else {
-    		return OSCommand.executeCommandAndWait(new String[] {chromePath, "--version"});
-    	}
+		if (osUtility instanceof OSUtilityWindows) {
+			return "Google Chrome " + ((OSUtilityWindows)osUtility).getChromeVersionFromFolder(chromePath);
+		} else {
+			return OSCommand.executeCommandAndWait(new String[] {chromePath, "--version"});
+		}
     }
     
     /**
@@ -363,6 +363,14 @@ public abstract class OSUtility {
     	}
     	return browsers;
     }
+
+	/**
+	 * Clear list of browsers to return it null
+	 * @return
+	 */
+	public static void resetInstalledBrowsersWithVersion() {
+		installedBrowsersWithVersion = null;
+	}
     
     /**
      * Returns the list of browsers for each type. For selenium robot local, this will help selecting the right binary
