@@ -1810,17 +1810,6 @@ public class TestSeleniumTestContext extends GenericTest {
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestType(), TestType.APPIUM_WEB_ANDROID);
 	}
 	
-	@Test(groups="ut context")
-	public void testTestTypeAndroidWebBrowser(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		initThreadContext(testNGCtx);
-
-		SeleniumTestsContextManager.getThreadContext().setApp(null); // to override parameter from exampleConfigGenericParams
-		SeleniumTestsContextManager.getThreadContext().setAppActivity(null); // to override parameter from exampleConfigGenericParams
-		SeleniumTestsContextManager.getThreadContext().setPlatform("Android 10.0");
-		SeleniumTestsContextManager.getThreadContext().setBrowser("browser");
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestType(), TestType.APPIUM_WEB_ANDROID);
-	}
-	
 	/**
 	 * APK path is given so that it can be installed
 	 * @param testNGCtx

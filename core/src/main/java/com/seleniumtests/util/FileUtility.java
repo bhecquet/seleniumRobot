@@ -288,7 +288,7 @@ public class FileUtility {
 			File tempZip = File.createTempFile(destZipFile.getName(), ".zip");
 			tempZip.deleteOnExit();
 			ZipUtil.pack(rootDir.toFile(), tempZip);
-			FileUtils.copyFile(tempZip, destZipFile);
+			copyFile(tempZip, destZipFile);
 		} catch (IOException e) {
 			logger.error("cannot create zip file", e);
 		}
@@ -299,5 +299,20 @@ public class FileUtility {
 			logger.error("cannot delete temp directory file", e);
 		}
     	
+    }
+    
+    /**
+     * Copy file ignoring when srcFile and destFile are identical
+     * @param srcFile
+     * @param destFile
+     * @throws IOException
+     */
+    public static void copyFile(final File srcFile, final File destFile) throws IOException {
+    	
+    	try {
+    		FileUtils.copyFile(srcFile, destFile);
+    	} catch (IllegalArgumentException e) {
+    		// nothing to do in case srcFile and destFile are identical
+    	}
     }
 }

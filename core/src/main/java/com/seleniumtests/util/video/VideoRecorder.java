@@ -42,7 +42,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.WindowConstants;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
 import org.monte.media.Format;
 import org.monte.media.FormatKeys.MediaType;
@@ -51,6 +50,7 @@ import org.monte.screenrecorder.ScreenRecorder;
 import org.monte.screenrecorder.ScreenRecorder.State;
 
 import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 
@@ -159,7 +159,7 @@ public class VideoRecorder {
 			if (!createdFiles.isEmpty()) {
 				File lastFile = createdFiles.get(createdFiles.size() - 1);
 				File videoFile = Paths.get(folderPath.getAbsolutePath(), fileName).toFile();
-				FileUtils.copyFile(lastFile, videoFile);
+				FileUtility.copyFile(lastFile, videoFile);
 				
 				// remove temp files
 				for (File f: createdFiles) {
