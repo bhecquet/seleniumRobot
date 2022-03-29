@@ -45,6 +45,7 @@ import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestMessage;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.ScenarioLogger;
 
@@ -86,8 +87,8 @@ public class StubTestClass extends StubParentClass {
 		ScreenShot screenshot = new ScreenShot();
 		screenshot.setImagePath("screenshot/" + tmpImg.getName());
 		screenshot.setHtmlSourcePath("htmls/" + tmpHtml.getName());
-		FileUtils.copyFile(tmpImg, new File(screenshot.getFullImagePath()));
-		FileUtils.copyFile(tmpHtml, new File(screenshot.getFullHtmlPath()));
+		FileUtility.copyFile(tmpImg, new File(screenshot.getFullImagePath()));
+		FileUtility.copyFile(tmpHtml, new File(screenshot.getFullHtmlPath()));
 		step1.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);
 		
 		ScreenShot screenshot2 = new ScreenShot();

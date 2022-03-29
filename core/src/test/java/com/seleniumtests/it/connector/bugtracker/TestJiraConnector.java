@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -18,6 +17,7 @@ import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.util.FileUtility;
 
 public class TestJiraConnector extends GenericTest {
 
@@ -34,8 +34,8 @@ public class TestJiraConnector extends GenericTest {
 		screenshot = new ScreenShot();
 		screenshot.setImagePath("screenshot/" + tmpImg.getName());
 		screenshot.setHtmlSourcePath("htmls/" + tmpHtml.getName());
-		FileUtils.copyFile(tmpImg, new File(screenshot.getFullImagePath()));
-		FileUtils.copyFile(tmpHtml, new File(screenshot.getFullHtmlPath()));
+		FileUtility.copyFile(tmpImg, new File(screenshot.getFullImagePath()));
+		FileUtility.copyFile(tmpHtml, new File(screenshot.getFullHtmlPath()));
 		
 		step1 = new TestStep("step 1", null, new ArrayList<>(), false);
 		step1.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);

@@ -5,12 +5,12 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.ide.SeleniumIdeParser;
 
 public class TestSeleniumIdeParser extends GenericTest {
@@ -67,7 +67,7 @@ public class TestSeleniumIdeParser extends GenericTest {
 			
 			File tmpSuiteFile = createFileFromResource("ti/ide/MysuiteTest.java");
 			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MysuiteTest.java").toFile();
-			FileUtils.copyFile(tmpSuiteFile, suiteFile);
+			FileUtility.copyFile(tmpSuiteFile, suiteFile);
 			
 			Map<String, String> classInfo = new SeleniumIdeParser(suiteFile.getAbsolutePath()).parseSeleniumIdeFile();
 	
@@ -131,7 +131,7 @@ public class TestSeleniumIdeParser extends GenericTest {
 			
 			File tmpSuiteFile = createFileFromResource("ti/ide/MysuiteTest.java");
 			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MysuiteTest.java").toFile();
-			FileUtils.copyFile(tmpSuiteFile, suiteFile);
+			FileUtility.copyFile(tmpSuiteFile, suiteFile);
 			
 			Map<String, String> classInfo = new SeleniumIdeParser(suiteFile.getAbsolutePath()).parseSeleniumIdeFile();
 			

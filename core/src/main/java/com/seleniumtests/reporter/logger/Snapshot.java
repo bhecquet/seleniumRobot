@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 
@@ -201,7 +200,8 @@ public class Snapshot extends TestAction {
 				screenshot.setHtmlSourcePath(folderName + newName);
 			}
 			
-			FileUtils.copyFile(oldFile, new File(screenshot.getFullHtmlPath()));
+			
+			FileUtility.copyFile(oldFile, new File(screenshot.getFullHtmlPath()));
 		} catch (IOException e) {
 			screenshot.setHtmlSourcePath(oldPath);
 		}

@@ -21,6 +21,7 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.it.driver.support.server.WebServer;
 import com.seleniumtests.it.reporter.ReporterTest;
+import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.ide.SeleniumIdeLauncher;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -78,7 +79,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 
 			File tmpSuiteFile = GenericTest.createFileFromResource("ti/ide/MainPageTest.java");
 			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTest.java").toFile();
-			FileUtils.copyFile(tmpSuiteFile, suiteFile);
+			FileUtility.copyFile(tmpSuiteFile, suiteFile);
 			
 			new SeleniumIdeLauncher().executeScripts(Arrays.asList(suiteFile.getAbsolutePath()));
 			
@@ -130,7 +131,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			// use a different file from the previous test to avoid problems with compiler cache
 			File tmpSuiteFile = GenericTest.createFileFromResource("ti/ide/MainPageTest2.java");
 			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTest2.java").toFile();
-			FileUtils.copyFile(tmpSuiteFile, suiteFile);
+			FileUtility.copyFile(tmpSuiteFile, suiteFile);
 			
 			new SeleniumIdeLauncher().executeScripts(Arrays.asList(suiteFile.getAbsolutePath()));
 			
