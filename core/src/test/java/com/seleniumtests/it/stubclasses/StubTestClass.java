@@ -306,6 +306,11 @@ public class StubTestClass extends StubParentClass {
 	public void testStandardDataProviderSemicolonWithHeader(String col1, String col2) {
 		logger.info(String.format("%s,%s", col1, col2));
 	}
+
+	@Test(groups="stub", dataProvider = "dataset")
+	public void testStandardXlsxDataProvider(String col1, String col2) {
+		logger.info(String.format("%s,%s", col1, col2));
+	}
 	
 	@Test(groups="stub", dataProvider = "dataset")
 	public void testStandardDataProviderNoFile(String col1, String col2) {
