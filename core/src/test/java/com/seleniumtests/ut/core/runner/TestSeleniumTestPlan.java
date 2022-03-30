@@ -31,6 +31,17 @@ public class TestSeleniumTestPlan extends ReporterTest {
 	}
 	
 	@Test(groups={"ut"})
+	public void testWithStandardXlsxDataProvider() throws Exception {
+		
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testStandardXlsxDataProvider"});
+		String logs = readSeleniumRobotLogFile();
+		
+		// first line / header has not been skipped => 2 tests
+		Assert.assertTrue(logs.contains("r1c1x,r1c2x"));
+		Assert.assertTrue(logs.contains("r2c1x,r2c2x"));
+	}
+	
+	@Test(groups={"ut"})
 	public void testWithStandardDataProviderSemicolon() throws Exception {
 		
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testStandardDataProviderSemicolon"});

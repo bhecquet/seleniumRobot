@@ -78,7 +78,7 @@ public  class SeleniumTestPlan extends SeleniumRobotTestPlan {
     private Object[][] reformatData(List<Map<String, String>> data) {
     	List<String[]> formattedData = new ArrayList<>();
     	for (Map<String, String> dataLine: data) {
-    		formattedData.add((String[]) data.toArray());
+    		formattedData.add((String[]) dataLine.values().toArray(new String[] {}));
     	}
     	String[][] result = new String[formattedData.size()][];
     	return formattedData.toArray(result);
