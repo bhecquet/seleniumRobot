@@ -124,7 +124,7 @@ public class EWSClient extends EmailClientImpl {
                 return f.getId();
             }
         }
-        throw new ConfigurationException("fodler " + folderName + " does not exist for this account");
+        throw new ConfigurationException("folder " + folderName + " does not exist for this account");
 	}
 	
 	/**
