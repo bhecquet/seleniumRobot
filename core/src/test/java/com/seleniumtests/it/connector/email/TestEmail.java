@@ -38,7 +38,7 @@ public class TestEmail {
 		EmailClient client = EmailClientSelector.routeEmail(server, "<email_of_mailbox_to_consult>", "<user_to_connect_to_mailbox>", "<password>");
 		client.getLastEmails();
 	}
-	
+
 	@Test(groups={"it"}, enabled=false)
 	public void testSendMail() throws Exception {
 		EmailServer server = new EmailServer("<mail_server_urs>", EmailServerTypes.EXCHANGE_EWS, "<domain_for_user>");
