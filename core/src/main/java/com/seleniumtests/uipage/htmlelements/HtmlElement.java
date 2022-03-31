@@ -733,7 +733,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 		if (!javascript.contains("arguments[0]")) {
 			throw new ScenarioException("JS script MUST contain 'arguments[0]' as reference");
 		}
-		return ((JavascriptExecutor) driver).executeScript(javascript, element, args);
+		return ((JavascriptExecutor) getDriver()).executeScript(javascript, element, args);
 	}
 
 	/**
@@ -942,7 +942,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 			try {
 
 				if (localElement.getLocation().x < 0) {
-					Long viewportHeight = (Long) ((JavascriptExecutor) driver)
+					Long viewportHeight = (Long) ((JavascriptExecutor) getDriver())
 							.executeScript("return document.documentElement.clientHeight");
 					Integer heightPosition = localElement.getLocation().y > viewportHeight
 							? localElement.getLocation().y - viewportHeight.intValue()
@@ -1093,7 +1093,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	public String getEval(String script) {
 		findElement(false, false);
 
-		return (String) ((JavascriptExecutor) driver).executeScript(script, getRealElementNoSearch());
+		return (String) ((JavascriptExecutor) getDriver()).executeScript(script, getRealElementNoSearch());
 	}
 
 	/**
@@ -1770,7 +1770,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	@Override
 	public <X> X getScreenshotAs(OutputType<X> target) {
 		findElement();
-		if (((HasCapabilities) driver).getCapabilities().getCapability(CapabilityType.TAKES_SCREENSHOT) != null) {
+		if (((HasCapabilities) getDriver()).getCapabilities().getCapability(CapabilityType.TAKES_SCREENSHOT) != null) {
 			return getRealElementNoSearch().getScreenshotAs(target);
 		} else {
 			return null;
