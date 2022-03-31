@@ -38,5 +38,33 @@
 		<method>Uft(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.Map)</method>
 		<justification>useless</justification>
 	</difference>
+	<difference>
+        <className>**/uipage/htmlelements/HtmlElement</className>
+        <differenceType>6004</differenceType>
+        <field>element</field>
+        <from>org.openqa.selenium.WebElement</from>
+        <to>java.lang.ThreadLocal</to>
+        <justification>thread-safety</justification>
+    </difference>
+	<difference>
+        <className>**/uipage/htmlelements/HtmlElement</className>
+        <differenceType>6004</differenceType>
+        <field>driver</field>
+        <from>org.openqa.selenium.WebDriver</from>
+        <to>java.lang.ThreadLocal</to>
+        <justification>thread-safety</justification>
+    </difference>
+    <difference>
+        <className>**/uipage/htmlelements/HtmlElement</className>
+        <differenceType>6010</differenceType>
+        <field>element</field>
+        <justification>force to use accessors</justification>
+    </difference>
+    <difference>
+        <className>**/uipage/htmlelements/HtmlElement</className>
+        <differenceType>6010</differenceType>
+        <field>driver</field>
+        <justification>force to use accessors</justification>
+    </difference>
 
 </differences>
