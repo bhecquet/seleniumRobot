@@ -16,7 +16,7 @@ public class TestSeleniumTestPlan extends ReporterTest {
 		String result = readTestMethodResultFile("testStandardDataProviderNoFile");
 		
 		// first line / header has been skipped
-		Assert.assertTrue(result.matches(".*com\\.seleniumtests\\.customexception\\.ConfigurationException\\: Dataset file.*testStandardDataProviderNoFile.csv does not exist.*"));
+		Assert.assertTrue(result.matches(".*com\\.seleniumtests\\.customexception\\.ConfigurationException\\: Dataset file.*testStandardDataProviderNoFile.csv or .*testStandardDataProviderNoFile.xlsx does not exist.*"));
 	}
 
 	@Test(groups={"ut"})
