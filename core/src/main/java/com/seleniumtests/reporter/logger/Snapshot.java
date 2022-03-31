@@ -202,7 +202,7 @@ public class Snapshot extends TestAction {
 			}
 			
 			FileUtils.copyFile(oldFile, new File(screenshot.getFullHtmlPath()));
-		} catch (IOException e) {
+		} catch (IOException |IllegalArgumentException e) {
 			screenshot.setHtmlSourcePath(oldPath);
 		}
 
