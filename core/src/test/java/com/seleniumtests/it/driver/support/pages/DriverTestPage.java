@@ -186,6 +186,14 @@ public class DriverTestPage extends PageObject {
     	textElement.sendKeys("a text");
     	return this;
     }
+    public DriverTestPage _writeSomething(String text) {
+    	textElement.sendKeys(text);
+    	return this;
+    }
+    
+    public String _getTextElementContent() {
+    	return textElement.getValue();
+    }
     
     public DriverTestPage _writeSomethingOnNonExistentElement() {
     	textElementNotPresent.sendKeys("a text");
