@@ -82,14 +82,14 @@ public class DatePickerElement extends HtmlElement {
      */
     private void clearField() {
     	
-    	if (element == null) {
+    	if (getRealElementNoSearch() == null) {
     		throw new ScenarioException("Element should not be null");
     	}
     	
 //    	BrowserType browser = WebUIDriver.getWebUIDriver(false).getConfig().getBrowserType();
 //    	if (browser == BrowserType.INTERNET_EXPLORER) {
-	    	new Actions(driver)
-	    		.doubleClick(element)
+	    	new Actions(getDriver())
+	    		.doubleClick(getRealElementNoSearch())
 		    	.sendKeys(Keys.DELETE, Keys.DELETE, Keys.DELETE, Keys.DELETE, Keys.DELETE, Keys.DELETE, Keys.DELETE, Keys.DELETE, Keys.DELETE, Keys.DELETE)
 		    	.sendKeys(Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE)
 		    	.perform();
@@ -110,8 +110,8 @@ public class DatePickerElement extends HtmlElement {
         if (clear) {
         	clearField();
         } 
-        element.click();
-        element.sendKeys(keysToSend);
+        getRealElementNoSearch().click();
+        getRealElementNoSearch().sendKeys(keysToSend);
         
         if (blurAfter) {
         	blur(); 

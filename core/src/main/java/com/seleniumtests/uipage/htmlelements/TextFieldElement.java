@@ -63,8 +63,8 @@ public class TextFieldElement extends HtmlElement {
     @ReplayOnError
     public void clear() {
         findElement();
-        if (!"file".equalsIgnoreCase(element.getAttribute("type"))) {
-            element.clear();
+        if (!"file".equalsIgnoreCase(getRealElementNoSearch().getAttribute("type"))) {
+        	getRealElementNoSearch().clear();
         }
     }
     
@@ -83,10 +83,10 @@ public class TextFieldElement extends HtmlElement {
         findElement(true);
         
         if (clear) {
-        	element.clear();
+        	getRealElementNoSearch().clear();
         } 
-        element.click();
-        element.sendKeys(keysToSend);
+        getRealElementNoSearch().click();
+        getRealElementNoSearch().sendKeys(keysToSend);
         
         if (blurAfter) {
         	blur(); 
