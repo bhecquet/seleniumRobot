@@ -67,6 +67,7 @@ public class TestLinuxOsUtility extends MockitoTest {
 	@BeforeClass(groups = {"ut"})
 	public void isWindows() throws Exception {
 		PowerMockito.mockStatic(OSUtility.class);
+		when(OSUtility.getCharset()).thenCallRealMethod();
 		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.LINUX);
 		PowerMockito.doCallRealMethod().when(OSUtility.class, "refreshBrowserList", false);
 		PowerMockito.doCallRealMethod().when(OSUtility.class, "resetInstalledBrowsersWithVersion");
