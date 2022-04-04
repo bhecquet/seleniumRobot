@@ -206,12 +206,12 @@
 		<dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-testng</artifactId>
-            <version>7.0.0</version>
+            <version>4.8.1</version>
         </dependency>
         <dependency>
             <groupId>io.cucumber</groupId>
 		    <artifactId>cucumber-java</artifactId>
-		    <version>7.0.0</version>
+		    <version>4.8.1</version>
         </dependency>
         <dependency>
 			<groupId>org.openpnp</groupId>

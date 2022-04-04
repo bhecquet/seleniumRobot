@@ -184,11 +184,7 @@ public class LogAction {
 	 * @return
 	 * @throws Throwable
 	 */
-	@Pointcut("(execution(@cucumber.api.java.en.When public * * (..)) "
-				+ "|| execution(@cucumber.api.java.en.Given public * * (..))"
-				+ "|| execution(@cucumber.api.java.fr.Soit public * * (..))"
-				+ "|| execution(@cucumber.api.java.fr.Lorsque public * * (..)) "
-				+ "|| execution(@io.cucumber.java.en.When public * * (..)) "
+	@Pointcut("(execution(execution(@io.cucumber.java.en.When public * * (..)) "
 				+ "|| execution(@io.cucumber.java.en.Given public * * (..))"
 				+ "|| execution(@io.cucumber.java.fr.Soit public * * (..))"
 				+ "|| execution(@io.cucumber.java.fr.Lorsque public * * (..))) "
@@ -406,9 +402,7 @@ public class LogAction {
 		
 		
 		for (Annotation annotation: method.getAnnotations()) {
-			if ((annotation.annotationType().getCanonicalName().contains("cucumber.api.java.en") 
-				|| annotation.annotationType().getCanonicalName().contains("cucumber.api.java.fr")
-				|| annotation.annotationType().getCanonicalName().contains("io.cucumber.java.en") 
+			if ((annotation.annotationType().getCanonicalName().contains("io.cucumber.java.en") 
 				|| annotation.annotationType().getCanonicalName().contains("io.cucumber.java.fr")) 
 				&& SeleniumRobotTestPlan.isCucumberTest()) {
 				stepName = getAnnotationValue(annotation) + " " + argumentString;
