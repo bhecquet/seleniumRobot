@@ -184,7 +184,7 @@ public class LogAction {
 	 * @return
 	 * @throws Throwable
 	 */
-	@Pointcut("(execution(execution(@io.cucumber.java.en.When public * * (..)) "
+	@Pointcut("(execution(@io.cucumber.java.en.When public * * (..)) "
 				+ "|| execution(@io.cucumber.java.en.Given public * * (..))"
 				+ "|| execution(@io.cucumber.java.fr.Soit public * * (..))"
 				+ "|| execution(@io.cucumber.java.fr.Lorsque public * * (..))) "
