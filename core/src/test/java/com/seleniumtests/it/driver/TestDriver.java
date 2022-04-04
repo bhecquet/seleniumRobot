@@ -18,7 +18,9 @@
 package com.seleniumtests.it.driver;
 
 import java.awt.AWTException;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -37,10 +39,9 @@ import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.devtools.DevTools;
-import org.openqa.selenium.devtools.HasDevTools;
 import org.openqa.selenium.devtools.v97.page.Page;
 import org.openqa.selenium.devtools.v97.page.Page.CaptureScreenshotFormat;
-import org.openqa.selenium.devtools.v97.page.Page.CaptureSnapshotFormat;
+import org.openqa.selenium.devtools.v97.page.Page.GetLayoutMetricsResponse;
 import org.openqa.selenium.devtools.v97.page.model.Viewport;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -57,7 +58,9 @@ import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 import com.seleniumtests.it.driver.support.pages.DriverSubTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
+import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.helper.WaitHelper;
+import com.seleniumtests.util.imaging.ImageProcessor;
 
 public class TestDriver extends GenericMultiBrowserTest {
 
@@ -102,12 +105,6 @@ public class TestDriver extends GenericMultiBrowserTest {
 	
 	public void testAlertDisplay() {
 		try {
-			((HasDevTools)driver).getDevTools().send(Page.captureScreenshot(Optional.of(CaptureScreenshotFormat.PNG), 
-					Optional.of(70), 
-					Optional.of(new Viewport(0, 0, 1000, 1000, 1)),
-					Optional.of(false),
-					Optional.of(true)
-					));
 			DriverTestPage.greenSquare.click();
 			driver.switchTo().alert().accept();
 		} finally {
