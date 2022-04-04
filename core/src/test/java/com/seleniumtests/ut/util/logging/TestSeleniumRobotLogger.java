@@ -97,7 +97,12 @@ public class TestSeleniumRobotLogger extends MockitoTest {
 		}
 	}
 	
-	@Test(groups= {"ut"})
+	/**
+	 * This test is not activated for maven as maven UT disable redirect to System.out and System.err
+	 * If it was not the case, the same log would be written dozen of times
+	 * @throws IOException
+	 */
+	@Test(groups= {"non-ut"})
 	public void testSystemOutRedirectedToLogger() throws IOException {
 		try {
 			SeleniumRobotLogger.reset();
