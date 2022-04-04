@@ -27,6 +27,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
@@ -40,6 +41,11 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.devtools.DevTools;
+import org.openqa.selenium.devtools.v97.page.Page;
+import org.openqa.selenium.devtools.v97.page.Page.CaptureScreenshotFormat;
+import org.openqa.selenium.devtools.v97.page.Page.GetLayoutMetricsResponse;
+import org.openqa.selenium.devtools.v97.page.model.Viewport;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ScenarioException;
@@ -55,6 +61,30 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import io.appium.java_client.android.AndroidDriver;
 
 public class ScreenshotUtil {
+	
+	/**
+	 * 
+	 DevTools devTools = ((CustomEventFiringWebDriver)driver).maybeGetDevTools().get();
+	devTools.createSessionIfThereIsNotOne();
+	GetLayoutMetricsResponse metrics = devTools.send(Page.getLayoutMetrics());
+	String outB64 = devTools.send(Page.captureScreenshot(Optional.of(CaptureScreenshotFormat.PNG), 
+			Optional.of(70), 
+			Optional.of(new Viewport(0, 0, metrics.getCssContentSize().getWidth(), metrics.getCssContentSize().getHeight(), 1)),
+			Optional.of(true),
+			Optional.of(true)
+			));
+	
+	try {
+		BufferedImage capturedImage = ImageProcessor.loadFromB64String(outB64);
+		File img =  File.createTempFile("img", ".png");
+		FileUtility.writeImage(img.getAbsolutePath(), capturedImage);
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	 */
+	
+	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(ScreenshotUtil.class);
 
     private String outputDirectory;
@@ -64,14 +94,7 @@ public class ScreenshotUtil {
     public static final String SCREENSHOT_DIR = "screenshots";
     public static final String HTML_DIR = "htmls";
     
-    /**
-     * @deprecated  use {@link SnapshotTarget} instead
-     * @author worm
-     *
-     */
-    @Deprecated
-    public enum Target {SCREEN, PAGE}
-	
+
 	public ScreenshotUtil() {
 		uiDriver = WebUIDriver.getWebUIDriver(false);
 		driver = uiDriver.getDriver();
@@ -189,15 +212,6 @@ public class ScreenshotUtil {
         }
     }
     
-
-    private SnapshotTarget targetToSnapshotTarget(Target target) {
-    	if (target == Target.PAGE) {
-    		return SnapshotTarget.PAGE;
-    	} else {
-    		return SnapshotTarget.SCREEN;
-    	}
-    }
-    
     /**
      * Capture a picture only if SeleniumTestsContext.getCaptureSnapshot() allows it
      * @param target		which picture to take, screen or page.
@@ -211,18 +225,6 @@ public class ScreenshotUtil {
     public <T extends Object> T capture(SnapshotTarget target, Class<T> exportClass, int scrollDelay) {
     	return capture(target, exportClass, false, scrollDelay);
     } 
-    
-    /**
-     * @deprecated use method with SnapshotTarget signature instead
-     * @param <T>
-     * @param target
-     * @param exportClass
-     * @return
-     */
-    @Deprecated
-    public <T extends Object> T capture(Target target, Class<T> exportClass) {
-    	return capture(targetToSnapshotTarget(target), exportClass);
-    }
     
     /**
      * Capture a picture
@@ -251,19 +253,7 @@ public class ScreenshotUtil {
 			return null;
 		}
     }
-    
-    /**
-     * @deprecated use method with SnapshotTarget signature instead
-     * @param <T>
-     * @param target
-     * @param exportClass
-     * @param force
-     * @return
-     */
-    @Deprecated
-    public <T extends Object> T capture(Target target, Class<T> exportClass, boolean force) {
-    	return capture(targetToSnapshotTarget(target), exportClass, force);
-    }
+
     
     private void removeAlert() {
     	try {
@@ -272,14 +262,6 @@ public class ScreenshotUtil {
     	} catch (Exception e) {
     		// nothing to do
     	}
-    }
-    
-    /**
-     * @deprecated use method with SnapshotTarget signature instead
-     */
-    @Deprecated
-    public <T extends Object> List<T> capture(Target target, Class<T> exportClass, boolean allWindows, boolean force) {
-    	return capture(targetToSnapshotTarget(target), exportClass, allWindows, force);
     }
     
     /**

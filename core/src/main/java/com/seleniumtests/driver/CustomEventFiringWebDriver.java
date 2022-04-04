@@ -17,6 +17,8 @@
  */
 package com.seleniumtests.driver;
 
+import static org.testng.Assert.assertThrows;
+
 import java.awt.AWTError;
 import java.awt.AWTException;
 import java.awt.GraphicsDevice;
@@ -1640,6 +1642,10 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 
 	@Override
 	public Optional<DevTools> maybeGetDevTools() {
-		return ((HasDevTools)driver).maybeGetDevTools();
+		try {
+			return ((HasDevTools)driver).maybeGetDevTools();
+		} catch (ClassCastException e) {
+			throw new ScenarioException("Cannot use DevTools with this driver");
+		}
 	}
 }
