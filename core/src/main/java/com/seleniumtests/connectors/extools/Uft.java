@@ -30,6 +30,7 @@ import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestMessage;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
+import com.seleniumtests.reporter.logger.TestStep.StepStatus;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.logging.ScenarioLogger;
 
@@ -56,19 +57,17 @@ public class Uft {
 	private String scriptName;
 	private boolean killUftOnStartup = true;
 	private boolean loaded = false;
-	Map<String, String> parameters = new HashMap<>();;
+	Map<String, String> parameters = new HashMap<>();
 	
 	/**
-	 * @param vbsPath		path to the vbs file (locally, or on the remote machine)
 	 * @param scriptPath	path to the script, either local or from ALM. If test is from ALM, prefix it with '[QualityCenter]'. e.g: '[QualityCenter]Subject\TOOLS\TestsFoo\foo'
-	 * @param parameters	parameters to pass to the script
 	 */
-	public Uft(String scriptPath) {
+	public Uft(String scriptPath) throws DataConversionException {
 		this.scriptPath = scriptPath;
 		this.scriptName = new File(scriptPath).getName();
 	}
 	
-	public Uft(String almServer, String almUser, String almPassword, String almDomain, String almProject, String scriptPath) {
+	public Uft(String almServer, String almUser, String almPassword, String almDomain, String almProject, String scriptPath) throws DataConversionException {
 		this.scriptPath = scriptPath;
 		this.scriptName = new File(scriptPath).getName();
 		this.almServer = almServer;
@@ -103,23 +102,15 @@ public class Uft {
 	 * @param timeout 	timeout in seconds for UFT execution
 	 * @return	the generated test step
 	 */
-	public TestStep executeScript(int timeout, Map<String, String> parameters) {
-		
-		if (!loaded) {
-			throw new IllegalStateException("Test script has not been loaded. Call 'loadScript' before");
-		}
-		this.parameters = parameters;
+	public TestStep executeScript(int timeout) {
 
 		TestStep testStep = new TestStep(String.format("UFT: %s", scriptName), Reporter.getCurrentTestResult(), new ArrayList<>(), false);
-		
+
 		Date startDate = new Date();
-		String output = TestTasks.executeCommand("cscript.exe", timeout, null, prepareArguments(false, true).toArray(new String[] {}));
-		
+		String output = TestTasks.executeCommand("cscript.exe", timeout, null, prepareArguments(true, true).toArray(new String[]{}));
+
 		testStep.setDuration(new Date().getTime() - startDate.getTime());
-		
-		// when execution ends, UFT is stopped
-		loaded = false; 
-		return analyseOutput(output, testStep);
+		return (TestStep) analyseOutput(output);
 	}
 	
 	/**
@@ -181,122 +172,109 @@ public class Uft {
 	/**
 	 * Analyze Result.xml content
 	 * @param output		the Result.xml content as a string
-	 * @param duration		duration of the execution
 	 * @return
 	 */
-	public TestStep analyseOutput(String output, TestStep testStep) {
+	public List<TestStep> analyseOutput(String output) {
 		StringBuilder uftOutput = new StringBuilder();
-		
+		List<TestStep> stepList = new ArrayList<>();
+
 		boolean logging = false;
-		for (String line: output.split("\n")) {
+		for (String line : output.split("\n")) {
 			line = line.trim();
-			
+
 			if (line.contains(START_LOGS)) {
 				logging = true;
 				continue;
 			} else if (line.contains(END_LOGS)) {
 				logging = false;
 			}
-			
+
 			if (logging) {
 				uftOutput.append(line);
 			}
 		}
-		
-		readXmlResult(uftOutput.toString(), testStep);
-		
-		return testStep;
+
+		readXmlResult(uftOutput.toString());
+
+		return stepList;
 	}
 	
 	/**
 	 * Read an action element
-	 * @param parentStep
 	 * @param actionElement
 	 * @throws DataConversionException
 	 */
-	private void readAction(TestStep parentStep, Element actionElement) throws DataConversionException {
-		TestStep actionStep = new TestStep(actionElement.getChildText("AName"), Reporter.getCurrentTestResult(), new ArrayList<>(), false);
-		parentStep.addStep(actionStep);
+	private TestStep readAction(Element actionElement) throws DataConversionException {
+		TestStep actionStep = new TestStep(actionElement.getChildText("AName").trim(), Reporter.getCurrentTestResult(), new ArrayList<>(), false);
 		Element summary = actionElement.getChild("Summary");
-		if (summary!= null && summary.getAttribute("failed").getIntValue() != 0) {
+		if (summary != null && summary.getAttribute("failed").getIntValue() != 0) {
 			actionStep.setFailed(true);
 		}
-		
-		for (Element element: actionElement.getChildren()) {
+
+		for (Element element : actionElement.getChildren()) {
 			if ("Action".equals(element.getName())) {
-				readAction(actionStep, element);
+				TestStep readStep = readAction(element);
+				actionStep.addStep(readStep);
 			} else if ("Step".equals(element.getName())) {
-				readStep(actionStep, element);
+				TestAction readAction = readStep(element);
+				actionStep.addAction(readAction);
 			}
 		}
-		
+		return actionStep;
 	}
-	
+
 	/**
 	 * Read a step element
-	 * @param parentStep
+	 * //     * @param parentStep
 	 * @param stepElement
 	 */
-	private void readStep(TestStep parentStep, Element stepElement) {
+	private TestAction readStep(Element stepElement) {
+		TestAction stepAction;
 		List<Element> stepList = stepElement.getChildren("Step");
 		
 		org.jsoup.nodes.Document htmlDoc = Jsoup.parseBodyFragment(stepElement.getChildText("Details"));
 		String details = htmlDoc.text();
 
-		String stepDescription = String.format("%s: %s", stepElement.getChildText("Obj"),  details);
-		
+		String stepDescription = String.format("%s: %s", stepElement.getChildText("Obj"), details).trim();
 		
 		if (stepList.isEmpty()) {
-			TestAction action = new TestAction(stepDescription, false, new ArrayList<>());
-			parentStep.addAction(action);
+			stepAction = new TestAction(stepDescription, false, new ArrayList<>());
 		} else {
-			TestStep stepStep = new TestStep(stepDescription, Reporter.getCurrentTestResult(), new ArrayList<>(), false);
-			parentStep.addStep(stepStep);
-			for (Element subStepElement: stepElement.getChildren("Step")) {
-				readStep(stepStep, subStepElement);
+			stepAction = new TestStep(stepDescription, Reporter.getCurrentTestResult(), new ArrayList<>(), false);
+			for (Element subStepElement : stepElement.getChildren("Step")) {
+				TestAction readAction = readStep(subStepElement);
+				((TestStep) stepAction).addAction(readAction);
 			}
 		}
-		
+		return stepAction;
 	}
-	
-	public void readXmlResult(String xmlString, TestStep testStep) {
-		
+
+	public List<TestStep> readXmlResult(String xmlString) {
 		Document document;
 		SAXBuilder builder = new SAXBuilder();
-		
+
+		List<TestStep> listStep = new ArrayList<>();
 
 		try {
-			String xml = xmlString.substring(xmlString.indexOf("<"));
-			String xml10pattern = "[^"
-			        + "\u0009\r\n"
-			        + "\u0020-\uD7FF"
-			        + "\uE000-\uFFFD"
-			        + "\ud800\udc00-\udbff\udfff"
-			        + "]";
-			xml = xml.replaceAll(xml10pattern, "");
-			
-			document = builder.build(new InputSource(new StringReader(xml))); // we skip BOM by searching the first "<" character
+			document = builder.build(new InputSource(new StringReader(xmlString.substring(xmlString.indexOf("<"))))); // we skip BOM by searching the first "<" character
 			Element docElement = document.getRootElement().getChild("Doc");
-			Element summary = docElement.getChild("Summary");
-			if (summary!= null && summary.getAttribute("failed").getIntValue() != 0) {
-				testStep.setFailed(true);
-			}
 			
-			Element iteration = docElement.getChild("DIter");
-			
-			for (Element element: iteration.getChildren()) {
-				if ("Action".equals(element.getName())) {
-					readAction(testStep, element);
-				} else if ("Step".equals(element.getName())) {
-					readStep(testStep, element);
+			// First Action is test Name so we take the children
+			Element iteration = docElement.getChild("DIter").getChild("Action");
+
+				for (Element element : iteration.getChildren()) {
+					if ("Action".equals(element.getName())) {
+						TestStep readStep = readAction(element);
+						listStep.add(readStep);
+					} else if ("Step".equals(element.getName())) {
+						readStep(element);
+					}
 				}
+			} catch (JDOMException | IOException e) {
+				logger.error("Could not read UFT report: " + e.getMessage());
 			}
-		
-		} catch (JDOMException | IOException | StringIndexOutOfBoundsException e) {
-			logger.error("Could not read UFT report: " + e.getMessage());
-			testStep.addMessage(new TestMessage("Could not read UFT report: " + e.getMessage(), MessageType.ERROR));
-		}
-		
+
+		return listStep;
 	}
 
 	public void setKillUftOnStartup(boolean killUftOnStartup) {

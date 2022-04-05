@@ -58,10 +58,10 @@ public class TestSeleniumRobotTestPlan extends MockitoTest {
 		
 		TestStep step = new TestStep("step", null, new ArrayList<String>(), false);
 		
-		when(uft.executeScript(5, params)).thenReturn(step);
+		when(uft.executeScript(5)).thenReturn(step);
 		
 		new SeleniumRobotTestPlan().executeUftScript(uft, 5, params);
-		verify(uft).executeScript(5, params);
+		verify(uft).executeScript(5);
 		
 		// check test step is recorded
 		PowerMockito.verifyStatic(TestStepManager.class, times(2)); // 1 call before the step, 1 call after
@@ -80,7 +80,7 @@ public class TestSeleniumRobotTestPlan extends MockitoTest {
 		TestStep step = new TestStep("step", null, new ArrayList<String>(), false);
 		step.setFailed(true);
 		
-		when(uft.executeScript(5, params)).thenReturn(step);
+		when(uft.executeScript(5)).thenReturn(step);
 		
 		new SeleniumRobotTestPlan().executeUftScript(uft, 5, params);
 	}
