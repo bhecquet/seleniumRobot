@@ -93,14 +93,14 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 	@Test(groups= {"ut"})
 	public void testNonBetaVersionBrowserChoosen() {
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, "96.0", "", false, false), 
-				new BrowserInfo(BrowserType.EDGE, "97.0", "", false, true)));
+		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, "99.0", "", false, false), 
+				new BrowserInfo(BrowserType.EDGE, "100.0", "", false, true)));
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
 		
 		EdgeCapabilitiesFactory capaFactory = new EdgeCapabilitiesFactory(config);
 		capaFactory.createCapabilities();
 		Assert.assertFalse(capaFactory.getSelectedBrowserInfo().getBeta());
-		Assert.assertEquals(capaFactory.getSelectedBrowserInfo().getVersion(), "96.0");
+		Assert.assertEquals(capaFactory.getSelectedBrowserInfo().getVersion(), "99.0");
 	}
 	
 	/**
@@ -109,7 +109,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Browser EDGE  is not available")
 	public void testNonBetaVersionBrowserAbsent() {
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, "97.0", "", false, true)));
+		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, "100.0", "", false, true)));
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
 		
 		EdgeCapabilitiesFactory capaFactory = new EdgeCapabilitiesFactory(config);
@@ -122,7 +122,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 	@Test(groups= {"ut"})
 	public void testBetaVersionBrowserChoosen() {
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, "96.0", "", false, false), 
+		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, "99.0", "", false, false), 
 				new BrowserInfo(BrowserType.EDGE, "97.0", "", false, true)));
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(true)).thenReturn(browserInfos);
 		when(config.getBetaBrowser()).thenReturn(true);
@@ -139,7 +139,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Browser EDGE beta is not available")
 	public void testBetaVersionBrowserAbsent() {
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, "96.0", "", false, false)));
+		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, "99.0", "", false, false)));
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(true)).thenReturn(browserInfos);
 		when(config.getBetaBrowser()).thenReturn(true);
 		
@@ -293,8 +293,8 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 
 		// SeleniumTestsContext class adds a browserInfo when binary path is set
 		Map<BrowserType, List<BrowserInfo>> updatedBrowserInfos = new HashMap<>();
-		updatedBrowserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, "92.0", "", false), 
-																	new BrowserInfo(BrowserType.EDGE, "93.0", "/opt/edge/bin/edge", false)));
+		updatedBrowserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, "99.0", "", false), 
+																	new BrowserInfo(BrowserType.EDGE, "100.0", "/opt/edge/bin/edge", false)));
 
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(updatedBrowserInfos);
 		
