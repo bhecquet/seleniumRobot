@@ -17,12 +17,22 @@
  */
 package com.seleniumtests.core.runner;
 
-import java.net.URISyntaxException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import com.seleniumtests.core.runner.cucumber.CustomCucumberPropertiesProvider;
+
+import io.cucumber.testng.CucumberPropertiesProvider;
+import io.cucumber.testng.FeatureWrapper;
+import io.cucumber.testng.PickleWrapper;
+import io.cucumber.testng.TestNGCucumberRunner;
 
 /**
  * This class initializes context, sets up and tears down and clean up drivers An STF test should extend this class.
@@ -30,39 +40,45 @@ import org.testng.annotations.Test;
 
 public class CucumberTestPlan extends SeleniumRobotTestPlan {
 	
-	private CustomTestNGCucumberRunner testNGCucumberRunner;
+
+    private TestNGCucumberRunner testNGCucumberRunner;
 
     @BeforeClass(alwaysRun = true)
-    public void setUpClass() throws URISyntaxException {
-        testNGCucumberRunner = new CustomTestNGCucumberRunner(this.getClass());
+    public void setUpClass(ITestContext context) {
+        CucumberPropertiesProvider properties = new CustomCucumberPropertiesProvider(context.getCurrentXmlTest());
+        testNGCucumberRunner = new TestNGCucumberRunner(this.getClass(), properties);
 		setCucumberTest(true);
     }
 
     @Test(groups = "cucumber", description = "Runs Cucumber Scenarios", dataProvider = "scenarios")
-    public void runScenario(CucumberScenarioWrapper pickleWrapper) {
-        testNGCucumberRunner.runScenario(pickleWrapper.getPickleEvent());
+    public void runScenario(CucumberScenarioWrapper scenarioWrapper) {
+        testNGCucumberRunner.runScenario(scenarioWrapper.getPickle());
     }
 
-    /**
-     * Returns two dimensional array of PickleEventWrapper scenarios
-     * with their associated CucumberFeatureWrapper feature.
-     *
-     * @return a two dimensional array of scenarios features.
-     */
-    @DataProvider(name = "scenarios")
-    public Object[][] scenarios() {
-        if (testNGCucumberRunner == null) {
+    @DataProvider
+    public Object[][] scenarios() throws IOException {
+    	if (testNGCucumberRunner == null) {
             return new Object[0][0];
         }
-        return testNGCucumberRunner.provideScenarios();
+    	Object[][] scenariosTmp = testNGCucumberRunner.provideScenarios();
+    	
+    	List<Object[]> scenarios = new ArrayList<>();
+    	for (Object[] paramsForTest: scenariosTmp) {
+    		scenarios.add(new Object[] {new CucumberScenarioWrapper((PickleWrapper)paramsForTest[0], (FeatureWrapper)paramsForTest[1])});
+    	}
+    	Object[][] result = new Object[scenariosTmp.length][];
+    	return scenarios.toArray(result);
+    	
     }
 
     @AfterClass(alwaysRun = true)
     public void tearDownClass() {
-        if (testNGCucumberRunner == null) {
+    	if (testNGCucumberRunner == null) {
             return;
         }
         testNGCucumberRunner.finish();
     }
+
+
 	
 }
