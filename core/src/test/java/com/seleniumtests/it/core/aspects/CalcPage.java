@@ -29,7 +29,7 @@ import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
-import cucumber.api.java.en.When;
+import io.cucumber.java.en.When;
 
 public class CalcPage extends PageObject {
 	

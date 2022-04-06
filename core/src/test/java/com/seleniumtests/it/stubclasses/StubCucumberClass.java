@@ -35,18 +35,9 @@ public class StubCucumberClass {
 		WaitHelper.waitForSeconds(1);
 	}
 	
-	@cucumber.api.java.en.When("write (\\w+)")
-	public void writeText(String text) {
-		logger.info("write " + text);
-		WaitHelper.waitForSeconds(1);
-	}
-	
 	@When("write_error2 (\\w+)")
 	public void writeTextWithError2(String text) {
 		throw new WebDriverException("no element found");
 	}
-	@cucumber.api.java.en.When("write_error (\\w+)")
-	public void writeTextWithError(String text) {
-		throw new WebDriverException("no element found");
-	}
+
 }

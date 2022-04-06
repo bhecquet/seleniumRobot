@@ -19,157 +19,149 @@ package com.seleniumtests.ut.core.runner;
 
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.mockito.Mock;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.api.mockito.PowerMockito;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.runner.CucumberScenarioWrapper;
 
-import gherkin.ast.Examples;
-import gherkin.ast.Location;
-import gherkin.ast.ScenarioDefinition;
-import gherkin.ast.ScenarioOutline;
-import gherkin.ast.TableCell;
-import gherkin.ast.TableRow;
-import gherkin.events.PickleEvent;
-import gherkin.pickles.Pickle;
-import gherkin.pickles.PickleLocation;
+import io.cucumber.testng.FeatureWrapper;
+import io.cucumber.testng.Pickle;
+import io.cucumber.testng.PickleWrapper;
 
+@PrepareForTest({Pickle.class})
 public class TestCucumberScenarioWrapper extends MockitoTest {
 	
 	@Mock
-	ScenarioDefinition cucumberScenario;
+	PickleWrapper pickleWrapper;
 	
 	@Mock
-	ScenarioDefinition cucumberScenario2;
+	PickleWrapper pickleWrapper2;
 	
 	@Mock
-	ScenarioOutline cucumberScenarioWithExample;
-	
-	Pickle pickle = new Pickle("short", "en", new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
-	PickleEvent pickleEvent = new PickleEvent("uri", pickle);
-	
-	Pickle pickleLong = new Pickle("a very long scenario outline name with some special characters like @ and |. But we should not strip it, only display a message saying its much too long.", "en", new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
-	PickleEvent pickleEventLong = new PickleEvent("uri", pickleLong);
-	
-	Pickle pickleLong2 = new Pickle("a very long scenario outline name with some special characters like @ and |. But we should not strip it, only display a message saying its much too long.2", "en", new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
-	PickleEvent pickleEventLong2 = new PickleEvent("uri", pickleLong2);
+	FeatureWrapper featureWrapper;
+
+	@Mock
+	Pickle pickle;
 	
 	@Mock
-	Examples examples1;
-	
-	@Mock
-	TableRow row1;
-	
-	@Mock
-	TableRow row2;
-	
-//	@Mock
-//	TagStatement gherkinModel2;
+	Pickle pickle2;
+
 	
 	@BeforeMethod(groups={"ut"})
-	public void init() {
-//		when(cucumberScenario.getGherkinModel()).thenReturn(gherkinModel);
-//		when(cucumberScenario2.getGherkinModel()).thenReturn(gherkinModel2);
-//		when(cucumberScenario.getVisualName()).thenReturn("| foo | bar |");
+	public void init() throws URISyntaxException {
+
+		when(pickleWrapper.getPickle()).thenReturn(pickle);
+		when(pickleWrapper2.getPickle()).thenReturn(pickle2);
 		
-		
-		when(cucumberScenarioWithExample.getExamples()).thenReturn(Arrays.asList(examples1));
-		when(examples1.getTableBody()).thenReturn(Arrays.asList(row1, row2));
-		when(row1.getLocation()).thenReturn(new Location(5, 5));
-		when(row2.getLocation()).thenReturn(new Location(6, 5));
-		when(row1.getCells()).thenReturn(Arrays.asList(new TableCell(new Location(5, 7), "foo"), new TableCell(new Location(5, 12), "foo2")));
-		when(row2.getCells()).thenReturn(Arrays.asList(new TableCell(new Location(6, 7), "bar"), new TableCell(new Location(6, 12), "bar2")));
-		
+		when(pickle.getUri()).thenReturn(new URI("file:///" + Paths.get(SeleniumTestsContextManager.getFeaturePath(), "Core.feature").toString().replace("\\", "/")));
+		when(pickle2.getUri()).thenReturn(new URI("file:///" + Paths.get(SeleniumTestsContextManager.getFeaturePath(), "Core.feature").toString().replace("\\", "/")));
+
 	}
 
 	@Test(groups={"ut"})
-	public void testScenarioToStringNoStripShort(ITestContext testNGCtx) {
-		when(cucumberScenario.getName()).thenReturn("short");
+	public void testScenarioToStringNoStripShort(ITestContext testNGCtx) throws IOException {
+		when(pickle.getName()).thenReturn("core_3");
+		when(pickle.getScenarioLine()).thenReturn(33);
+		when(pickle.getLine()).thenReturn(33);
 		
-		Assert.assertEquals(new CucumberScenarioWrapper(pickleEvent, cucumberScenario).toString(-1), "short");
+		Assert.assertEquals(new CucumberScenarioWrapper(pickleWrapper, featureWrapper).toString(-1), "core_3");
 	}
 	
 	@Test(groups={"ut"})
-	public void testScenarioToStringStripShort(ITestContext testNGCtx) {
-		when(cucumberScenario.getName()).thenReturn("short");
+	public void testScenarioToStringStripShort(ITestContext testNGCtx) throws IOException {
+		when(pickle.getName()).thenReturn("core_3");
+		when(pickle.getScenarioLine()).thenReturn(33);
+		when(pickle.getLine()).thenReturn(33);
 		
-		Assert.assertEquals(new CucumberScenarioWrapper(pickleEvent, cucumberScenario).toString(10), "short");
+		Assert.assertEquals(new CucumberScenarioWrapper(pickleWrapper, featureWrapper).toString(10), "core_3");
 	}
 	
 	@Test(groups={"ut"})
-	public void testScenarioToStringNoStripLong(ITestContext testNGCtx) {
-		when(cucumberScenario.getName()).thenReturn("a very long scenario outline name with some special characters like @ and |. But we should not strip it, only display a message saying its much too long.");
+	public void testScenarioToStringNoStripLong(ITestContext testNGCtx) throws IOException {
+		when(pickle.getName()).thenReturn("a very long scenario outline name with some special characters like @ and |. But we should not strip it, only display a message saying its much too long.");
+		when(pickle.getScenarioLine()).thenReturn(33);
+		when(pickle.getLine()).thenReturn(33);
 		
-		Assert.assertEquals(new CucumberScenarioWrapper(pickleEventLong, cucumberScenario).toString(-1), "a very long scenario outline name with some special characters like @ and |. But we should not strip it, only display a message saying its much too long.");
+		Assert.assertEquals(new CucumberScenarioWrapper(pickleWrapper, featureWrapper).toString(-1), "a very long scenario outline name with some special characters like @ and |. But we should not strip it, only display a message saying its much too long.");
 	}
 	
 	@Test(groups={"ut"})
-	public void testScenarioToStringStripLong(ITestContext testNGCtx) {
-		when(cucumberScenario.getName()).thenReturn("a very long scenario outline name with some special characters like @ and |. But we should not strip it, only display a message saying its much too long.");
+	public void testScenarioToStringStripLong(ITestContext testNGCtx) throws IOException {
+		when(pickle.getName()).thenReturn("a very long scenario outline name with some special characters like @ and |. But we should not strip it, only display a message saying its much too long.");
+		when(pickle.getScenarioLine()).thenReturn(33);
+		when(pickle.getLine()).thenReturn(33);
 		
-		Assert.assertEquals(new CucumberScenarioWrapper(pickleEventLong, cucumberScenario).toString(150), "a very long scenario outline name with some special characters like @ and |. But we should not strip it, only display a message saying its much too lo");
+		Assert.assertEquals(new CucumberScenarioWrapper(pickleWrapper, featureWrapper).toString(150), "a very long scenario outline name with some special characters like @ and |. But we should not strip it, only display a message saying its much too lo");
 	}
 	
 	@Test(groups={"ut"})
-	public void testScenarioToStringStripDefaultLong(ITestContext testNGCtx) {
-		when(cucumberScenario.getName()).thenReturn("a very long scenario outline name with some special characters like @ and |. But we should not strip it, only display a message saying its much too long.");
+	public void testScenarioToStringStripDefaultLong(ITestContext testNGCtx) throws IOException {
+		when(pickle.getName()).thenReturn("a very long scenario outline name with some special characters like @ and |. But we should not strip it, only display a message saying its much too long.");
+		when(pickle.getScenarioLine()).thenReturn(33);
+		when(pickle.getLine()).thenReturn(33);
 		
-		Assert.assertEquals(new CucumberScenarioWrapper(pickleEventLong, cucumberScenario).toString(), "a very long scenario outline name with some special characters like @ and |. But we should not ");
+		Assert.assertEquals(new CucumberScenarioWrapper(pickleWrapper, featureWrapper).toString(), "a very long scenario outline name with some special characters like @ and |. But we should not ");
 	}
 	
 	/**
 	 * With placeholder on scenario outline, we use the pickle name as placeholders have been replaced
 	 * @param testNGCtx
+	 * @throws IOException 
 	 */
 	@Test(groups={"ut"})
-	public void testScenarioToStringShortPlaceholder(ITestContext testNGCtx) {
-		when(cucumberScenarioWithExample.getName()).thenReturn("short <foo>");
-		Pickle pickle2 = new Pickle("short foobar", "en", 
-				new ArrayList<>(), 
-				new ArrayList<>(), 
-				Arrays.asList(new PickleLocation(2, 2), // location for scenario outline
-				new PickleLocation(6, 5)));
-		PickleEvent pickleEvent2 = new PickleEvent("uri", pickle2);
+	public void testScenarioToStringShortPlaceholder(ITestContext testNGCtx) throws IOException {
+		when(pickle.getName()).thenReturn("core_ tata");
+		when(pickle.getScenarioLine()).thenReturn(4);
+		when(pickle.getLine()).thenReturn(10);
 		
-		Assert.assertEquals(new CucumberScenarioWrapper(pickleEvent2, cucumberScenarioWithExample).toString(150), "short foobar");
+		Assert.assertEquals(new CucumberScenarioWrapper(pickleWrapper, featureWrapper).toString(150), "core_ tata");
 	}
 
 	/**
 	 * Without placeholder on scenario outline, we use the scenario outline description plus example value
 	 * @param testNGCtx
+	 * @throws IOException 
 	 */
 	@Test(groups={"ut"})
-	public void testScenarioToStringShortNoPlaceholder(ITestContext testNGCtx) {
-		when(cucumberScenarioWithExample.getName()).thenReturn("short");
+	public void testScenarioToStringShortNoPlaceholder(ITestContext testNGCtx) throws IOException {
+		when(pickle.getName()).thenReturn("core_unique_name");
+		when(pickle.getScenarioLine()).thenReturn(14);
+		when(pickle.getLine()).thenReturn(20);
 		
-		Pickle pickle2 = new Pickle("short", "en", 
-				new ArrayList<>(), 
-				new ArrayList<>(), 
-				Arrays.asList(new PickleLocation(2, 2), // location for scenario outline
-						new PickleLocation(6, 5))); // location for example
-		PickleEvent pickleEvent2 = new PickleEvent("uri", pickle2);
-		
-		Assert.assertEquals(new CucumberScenarioWrapper(pickleEvent2, cucumberScenarioWithExample).toString(-1), "short-| bar | bar2 |");
+		Assert.assertEquals(new CucumberScenarioWrapper(pickleWrapper, featureWrapper).toString(-1), "core_unique_name-| tata |");
 	}
 	
 
 	/**
 	 * Check the unstripped version is used to compare 2 cucumberscenariowrappers
 	 * @param testNGCtx
+	 * @throws IOException 
 	 */
 	@Test(groups={"ut"})
-	public void testScenarioEqualLong(ITestContext testNGCtx) {
-		when(cucumberScenario.getName()).thenReturn("a very long scenario outline name with some special characters like @ and |. But we should not strip it, only display a message saying its much too long.");
-		when(cucumberScenario2.getName()).thenReturn("a very long scenario outline name with some special characters like @ and |. But we should not strip it, only display a message saying its much too long.2");
+	public void testScenarioEqualLong(ITestContext testNGCtx) throws IOException {
+		when(pickle.getName()).thenReturn("a very long scenario outline name with some special characters like @ and |. But we should not strip it, only display a message saying its much too long.");
+		when(pickle.getScenarioLine()).thenReturn(14);
+		when(pickle.getLine()).thenReturn(20);
+		when(pickle2.getName()).thenReturn("a very long scenario outline name with some special characters like @ and |. But we should not strip it, only display a message saying its much too long.2");
+		when(pickle2.getScenarioLine()).thenReturn(14);
+		when(pickle2.getLine()).thenReturn(20);
 		
-		Assert.assertNotEquals(new CucumberScenarioWrapper(pickleEventLong, cucumberScenario), new CucumberScenarioWrapper(pickleEventLong2,  cucumberScenario2));
+		Assert.assertNotEquals(new CucumberScenarioWrapper(pickleWrapper, featureWrapper), 
+								new CucumberScenarioWrapper(pickleWrapper2,  featureWrapper));
 	}
 	
 }

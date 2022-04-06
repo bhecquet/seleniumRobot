@@ -17,23 +17,25 @@
  */
 package com.seleniumtests.core.runner;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 
+import com.google.common.io.Files;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
-import gherkin.ast.Examples;
-import gherkin.ast.ScenarioDefinition;
-import gherkin.ast.ScenarioOutline;
-import gherkin.ast.TableCell;
-import gherkin.ast.TableRow;
-import gherkin.events.PickleEvent;
-import gherkin.pickles.PickleLocation;
+import io.cucumber.messages.types.TableCell;
+import io.cucumber.messages.types.TableRow;
 import io.cucumber.testng.AbstractTestNGCucumberTests;
-import io.cucumber.testng.PickleEventWrapper;
+import io.cucumber.testng.FeatureWrapper;
+import io.cucumber.testng.Pickle;
+import io.cucumber.testng.PickleWrapper;
 
 /**
  * The only purpose of this class is to provide custom {@linkplain #toString()},
@@ -41,41 +43,33 @@ import io.cucumber.testng.PickleEventWrapper;
  *
  * @see AbstractTestNGCucumberTests#feature(cucumber.api.testng.CucumberFeatureWrapper)
  */
-public class CucumberScenarioWrapper implements PickleEventWrapper {
+public class CucumberScenarioWrapper {
 
 
 	private static final Logger logger = SeleniumRobotLogger.getLogger(CucumberScenarioWrapper.class);
 
-    private final PickleEvent pickleEvent;
-    private final ScenarioDefinition scenario;
+    private final PickleWrapper pickleWrapper;
+    private final FeatureWrapper cucumberFeature;
     private String exampleValues;
     private String scenarioOutlineName = null;
 
-    public CucumberScenarioWrapper(PickleEvent pickleEvent, ScenarioDefinition scenario) {
-        this.pickleEvent = pickleEvent;
-        this.scenario = scenario;
+    public CucumberScenarioWrapper(PickleWrapper pickleWrapper, FeatureWrapper cucumberFeature) throws IOException {
+        this.pickleWrapper = pickleWrapper;
+        this.cucumberFeature = cucumberFeature;
         
-        if (scenario instanceof ScenarioOutline) {
-        	scenarioOutlineName = scenario.getName();
-        	exampleValues = getExampleValue();
-        }
-    }
-    
-    private String getExampleValue() {
-    	for (Examples example: ((ScenarioOutline)scenario).getExamples()) {
-    		for (TableRow row: example.getTableBody()) {
-	    		for (PickleLocation pLocation: pickleEvent.pickle.getLocations()) {
-	    			if (row.getLocation().getColumn() == pLocation.getColumn() && row.getLocation().getLine() == pLocation.getLine()) {
-	    				return formatExampleRow(row);
-	    			}
-	    		}
-    		}
-    	}
-    	return "||";
-    }
-    
-    private String formatExampleRow(TableRow row) {
-    	return "| " + StringUtils.join(row.getCells().stream().map(TableCell::getValue).collect(Collectors.toList()), " | ") + " |";
+        int scenarioLineNumber = pickleWrapper.getPickle().getScenarioLine() - 1;
+        File featureFile = new File(pickleWrapper.getPickle().getUri());
+
+    	List<String> featureLines = Files.readLines(featureFile, StandardCharsets.UTF_8);
+		String scenarioLine = featureLines.get(scenarioLineNumber);
+		
+		if (scenarioLine.contains("Scenario Outline")) {
+	        int exampleLineNumber = pickleWrapper.getPickle().getLine() - 1;
+			exampleValues = featureLines.get(exampleLineNumber).replaceAll("\\s{2,99}", " ").trim();
+			scenarioOutlineName = scenarioLine;
+		}
+	
+
     }
 
     @Override
@@ -88,13 +82,13 @@ public class CucumberScenarioWrapper implements PickleEventWrapper {
     	String name;
     	
     	// in case of examples (Scenario Outline), search if scenario description contains placeholders. 
-    	// If true, only resturns description, else, return description and visualName (which contains data) so that all execution can be distinguished in report
+    	// If true, only return description, else, return description and visualName (which contains data) so that all execution can be distinguished in report
 
     	if (scenarioOutlineName != null && !Pattern.compile("<[^>]*+>").matcher(scenarioOutlineName).find()) { 
-    		name = pickleEvent.pickle.getName() + "-" + exampleValues;
+    		name = pickleWrapper.getPickle().getName() + "-" + exampleValues;
     		
     	} else {
-    		name = pickleEvent.pickle.getName();
+    		name = pickleWrapper.getPickle().getName();
     	}
     	
     	if (strip > 50 && name.length() > strip) {
@@ -131,9 +125,9 @@ public class CucumberScenarioWrapper implements PickleEventWrapper {
     public int hashCode() {
         return this.toString().hashCode();
     }
-	@Override
-	public PickleEvent getPickleEvent() {
-		return pickleEvent;
-	}
+
+    public Pickle getPickle() {
+    	return pickleWrapper.getPickle();
+    }
 
 }

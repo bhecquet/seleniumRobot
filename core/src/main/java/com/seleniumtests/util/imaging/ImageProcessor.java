@@ -27,7 +27,7 @@ import java.io.OutputStream;
 
 import javax.imageio.ImageIO;
 
-import gherkin.deps.net.iharder.Base64;
+import org.apache.commons.codec.binary.Base64OutputStream;
 
 public class ImageProcessor {
 
@@ -58,7 +58,7 @@ public class ImageProcessor {
 	
 	public static String toBase64(BufferedImage img) throws IOException {   
 	    ByteArrayOutputStream os = new ByteArrayOutputStream();
-        OutputStream b64 = new Base64.OutputStream(os);
+        OutputStream b64 = new Base64OutputStream(os);
         ImageIO.write(img, "png", b64);
         return os.toString("UTF-8"); 
 	}
