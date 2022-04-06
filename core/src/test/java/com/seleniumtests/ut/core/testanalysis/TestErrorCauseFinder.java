@@ -415,12 +415,34 @@ public class TestErrorCauseFinder extends MockitoTest {
 		// comparison successful
 		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep2).thenReturn(stepReferenceComparatorStep2);
 		when(stepReferenceComparatorStep2.compare()).thenReturn(50);
+		when(stepReferenceComparatorStep2.getMissingFields()).thenReturn(Arrays.asList(new Field(0, 100, 0, 20, "", "field")));
 		
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
 		
 		Assert.assertEquals(causes.size(), 1);
 		Assert.assertEquals(causes.get(0).getType(), ErrorType.APPLICATION_CHANGED);
-		Assert.assertNull(causes.get(0).getDescription());
+		Assert.assertEquals(causes.get(0).getDescription(), "1 fields are missing: \n"
+				+ "field[text=]: java.awt.Rectangle[x=0,y=0,width=100,height=20]\n");
+		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
+	}
+	@Test(groups= {"ut"})
+	public void testCompareStepInErrorWithReferenceMediumMatch2() throws Exception {
+		
+		ITestResult testResult = Reporter.getCurrentTestResult();
+		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
+		
+		// comparison successful
+		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep2).thenReturn(stepReferenceComparatorStep2);
+		when(stepReferenceComparatorStep2.compare()).thenReturn(50);
+		when(stepReferenceComparatorStep2.getMissingLabels()).thenReturn(Arrays.asList(new Label(0, 100, 20, 50, "some label")));
+		
+		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
+		
+		Assert.assertEquals(causes.size(), 1);
+		Assert.assertEquals(causes.get(0).getType(), ErrorType.APPLICATION_CHANGED);
+		Assert.assertEquals(causes.get(0).getDescription(), "1 Labels are missing: \n"
+				+ "some label\n");
 		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
 	}
 
