@@ -116,7 +116,9 @@ public class ErrorCauseFinder {
 					
 					// perform a match between the picture of this step and the reference stored on server
 					// We look at presence, position and text of each field
-					int matching = compareReferenceToStepSnapshot(stepSnapshotFile, referenceSnapshot);
+					List<Label> missingLabels = new ArrayList<>();
+					List<Field> missingFields = new ArrayList<>();
+					int matching = compareReferenceToStepSnapshot(stepSnapshotFile, referenceSnapshot, missingLabels, missingFields);
 					
 					// bad matching: the reference does not match at all the current step, we will check with other reference steps
 					if (matching < 50) {
@@ -125,7 +127,7 @@ public class ErrorCauseFinder {
 					// middle matching: we may be on the right web page but the page has changed (some fields appeared or disappeared)
 					// or the text changed slightly. This could mean application changed
 					} else if (matching < 90) {
-						causes.add(new ErrorCause(ErrorType.APPLICATION_CHANGED, null, testStep));
+						causes.add(new ErrorCause(ErrorType.APPLICATION_CHANGED, formatApplicationChangedDescription(missingLabels, missingFields), testStep));
 					}
 					
 					// else, very good matching: we are on the same web page, error does not come from there
@@ -145,6 +147,24 @@ public class ErrorCauseFinder {
 		TestNGResultUtils.setErrorCauseSearchedInReferencePicture(testResult, true);
 		
 		return causes;
+	}
+	
+	private String formatApplicationChangedDescription(List<Label> missingLabels, List<Field> missingFields) {
+		StringBuilder description = new StringBuilder();
+		if (!missingLabels.isEmpty()) {
+			description.append(String.format("%d Labels are missing: \n", missingLabels.size()));
+			for (Label label: missingLabels) {
+				description.append(label.getText() + "\n");
+			}
+		}
+		if (!missingFields.isEmpty()) {
+			description.append(String.format("%d fields are missing: \n", missingFields.size()));
+			for (Field field: missingFields) {
+				description.append(field.toString() + "\n");
+			}
+		}
+		
+		return description.toString();
 	}
 	
 	/**
@@ -191,7 +211,16 @@ public class ErrorCauseFinder {
 	 * @return an integer representing the matching (0: no matching, 100 very good matching) 
 	 */
 	private int compareReferenceToStepSnapshot(File stepSnapshot, File referenceSnapshot) {
-		return new StepReferenceComparator(stepSnapshot, referenceSnapshot).compare();
+		return compareReferenceToStepSnapshot(stepSnapshot, referenceSnapshot, new ArrayList<>(), new ArrayList<>());
+	}
+	private int compareReferenceToStepSnapshot(File stepSnapshot, File referenceSnapshot, List<Label> missingLabels, List<Field> missingFields) {
+		StepReferenceComparator stepReferenceComparator = new StepReferenceComparator(stepSnapshot, referenceSnapshot);
+		int matching = stepReferenceComparator.compare();
+		
+		missingLabels.addAll(stepReferenceComparator.getMissingLabels());
+		missingFields.addAll(stepReferenceComparator.getMissingFields());
+		
+		return matching;
 	}
 	
 	/**
