@@ -72,6 +72,8 @@ public class ErrorCauseFinder {
 		causes.addAll(findErrorInLastStepSnapshots());
 		causes.addAll(compareStepInErrorWithReference());
 		
+		logger.info(String.format("Found %d causes of error", causes.size()));
+		
 		return causes;
 	}
 	
@@ -81,6 +83,7 @@ public class ErrorCauseFinder {
 	 * @return
 	 */
 	public List<ErrorCause> compareStepInErrorWithReference() {
+		logger.info("Searching causes: comparing with references");
 		List<ErrorCause> causes = new ArrayList<>();
 		
 		// do not seearch again
@@ -196,6 +199,8 @@ public class ErrorCauseFinder {
 	 * @return
 	 */
 	public List<ErrorCause> findErrorInLastStepSnapshots() {
+		
+		logger.info("Searching causes: find errors in last snapshot");
 		
 		List<ErrorCause> causes = new ArrayList<>();
 		

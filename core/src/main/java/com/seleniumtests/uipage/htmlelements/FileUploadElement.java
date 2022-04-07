@@ -70,6 +70,6 @@ public class FileUploadElement extends HtmlElement {
     @ReplayOnError
     public void sendKeys(final boolean clear, final boolean blurAfter, CharSequence... keysToSend) {
         findElement(true);
-        element.sendKeys(keysToSend);
+        getRealElementNoSearch().sendKeys(keysToSend);
     }
 }
