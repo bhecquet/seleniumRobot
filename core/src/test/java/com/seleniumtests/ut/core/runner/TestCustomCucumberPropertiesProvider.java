@@ -18,6 +18,7 @@
 package com.seleniumtests.ut.core.runner;
 
 import java.net.URISyntaxException;
+import java.util.HashMap;
 
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -136,15 +137,19 @@ public class TestCustomCucumberPropertiesProvider extends GenericTest {
 	@Test(groups={"ut"})
 	public void testScenarioOutlineMatchingWithCucumberOptions(ITestContext testNGCtx) throws URISyntaxException {
 
-		testNGCtx.getCurrentXmlTest().addParameter("cucumber.filter.name", "core_ .*");
-		
-		initThreadContext(testNGCtx);
-		CucumberPropertiesProvider properties = new CustomCucumberPropertiesProvider(testNGCtx.getCurrentXmlTest());
-	    TestNGCucumberRunner runner = new TestNGCucumberRunner(this.getClass(), properties);
-		Object[][] scenarios = runner.provideScenarios();
-		Assert.assertEquals(scenarios.length, 2);
-		Assert.assertEquals(((PickleWrapper)scenarios[0][0]).getPickle().getName(), "core_ tata");
-		Assert.assertEquals(((PickleWrapper)scenarios[1][0]).getPickle().getName(), "core_ titi");
+		try {
+			testNGCtx.getCurrentXmlTest().addParameter("cucumber.filter.name", "core_ .*");
+			
+			initThreadContext(testNGCtx);
+			CucumberPropertiesProvider properties = new CustomCucumberPropertiesProvider(testNGCtx.getCurrentXmlTest());
+		    TestNGCucumberRunner runner = new TestNGCucumberRunner(this.getClass(), properties);
+			Object[][] scenarios = runner.provideScenarios();
+			Assert.assertEquals(scenarios.length, 2);
+			Assert.assertEquals(((PickleWrapper)scenarios[0][0]).getPickle().getName(), "core_ tata");
+			Assert.assertEquals(((PickleWrapper)scenarios[1][0]).getPickle().getName(), "core_ titi");
+		} finally {
+			testNGCtx.getCurrentXmlTest().setParameters(new HashMap<>());
+		}
 	}
 	
 	/**
