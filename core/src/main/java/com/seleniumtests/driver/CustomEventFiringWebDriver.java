@@ -17,8 +17,6 @@
  */
 package com.seleniumtests.driver;
 
-import static org.testng.Assert.assertThrows;
-
 import java.awt.AWTError;
 import java.awt.AWTException;
 import java.awt.GraphicsDevice;
