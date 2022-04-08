@@ -152,13 +152,13 @@ public class ErrorCauseFinder {
 	private String formatApplicationChangedDescription(List<Label> missingLabels, List<Field> missingFields) {
 		StringBuilder description = new StringBuilder();
 		if (!missingLabels.isEmpty()) {
-			description.append(String.format("%d Labels are missing: \n", missingLabels.size()));
+			description.append(String.format("%d Label(s) missing: \n", missingLabels.size()));
 			for (Label label: missingLabels) {
 				description.append(label.getText() + "\n");
 			}
 		}
 		if (!missingFields.isEmpty()) {
-			description.append(String.format("%d fields are missing: \n", missingFields.size()));
+			description.append(String.format("%d field(s) missing: \n", missingFields.size()));
 			for (Field field: missingFields) {
 				description.append(field.toString() + "\n");
 			}

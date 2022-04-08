@@ -421,7 +421,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 		
 		Assert.assertEquals(causes.size(), 1);
 		Assert.assertEquals(causes.get(0).getType(), ErrorType.APPLICATION_CHANGED);
-		Assert.assertEquals(causes.get(0).getDescription(), "1 fields are missing: \n"
+		Assert.assertEquals(causes.get(0).getDescription(), "1 field(s) missing: \n"
 				+ "field[text=]: java.awt.Rectangle[x=0,y=0,width=100,height=20]\n");
 		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
 	}
@@ -441,7 +441,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 		
 		Assert.assertEquals(causes.size(), 1);
 		Assert.assertEquals(causes.get(0).getType(), ErrorType.APPLICATION_CHANGED);
-		Assert.assertEquals(causes.get(0).getDescription(), "1 Labels are missing: \n"
+		Assert.assertEquals(causes.get(0).getDescription(), "1 Label(s) missing: \n"
 				+ "some label\n");
 		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
 	}
