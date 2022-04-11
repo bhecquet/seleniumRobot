@@ -47,7 +47,7 @@ public class CalcPage extends PageObject {
 		return this;
 	}
 	
-	@When("add '(\\d+)' to '(\\d+)'")
+	@When("^add '(\\d+)' to '(\\d+)'$")
 	public CalcPage addC(Integer a, Integer b) {
 		result = a + b;
 		return this;

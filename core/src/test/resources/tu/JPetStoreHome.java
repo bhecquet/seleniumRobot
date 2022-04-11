@@ -47,7 +47,7 @@ public class JPetStoreHome extends HeaderAndFooter {
 	 * @return
 	 * @throws Exception
 	 */
-	@When("Cliquer sur le lien 'FISH'")
+	@When("^Cliquer sur le lien 'FISH'$")
 	public FishList goToFish() throws Exception {
 		fishMenu.click();
 		return new FishList();

@@ -31,6 +31,7 @@ public class CustomCucumberPropertiesProvider implements CucumberPropertiesProvi
 			glue += ",classpath:com/seleniumtests/core/runner/cucumber";
         }
 		
+		parameters.put(Constants.PLUGIN_PUBLISH_QUIET_PROPERTY_NAME, "true");
 		parameters.put(Constants.GLUE_PROPERTY_NAME, glue);
 		parameters.put(Constants.ANSI_COLORS_DISABLED_PROPERTY_NAME, "true"); // force monpochrome
 		
