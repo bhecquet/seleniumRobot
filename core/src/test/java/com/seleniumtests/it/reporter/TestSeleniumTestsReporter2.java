@@ -2052,25 +2052,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testCucumberStart() throws Exception {
-		
-		executeSubCucumberTests("core_3", 1);
-
-		String mainReportContent = readSummaryFile();
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='core_3/TestReport\\.html'.*?>core_3</a>.*"));
-		
-		String detailedReportContent = readTestMethodResultFile("core_3");
-		
-		// Check each step is recorded in file: 2 test steps + test end + logs
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> write (\\w+) with args: (tutu, )"));
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Test is OK</div>"));
-	}
-	
-	/**
-	 * Same as above, but for new cucumber annotations
-	 * @throws Exception
-	 */
-	@Test(groups={"it"})
 	public void testCucumberStart2() throws Exception {
 		
 		executeSubCucumberTests("core_7", 1);
@@ -2081,7 +2062,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent = readTestMethodResultFile("core_7");
 		
 		// Check each step is recorded in file: 2 test steps + test end + logs
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> write2 (\\w+) with args: (tutu, )"));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> ^write2 (\\w+)$ with args: (tutu, )"));
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Test is OK</div>"));
 	}
 	
@@ -2269,10 +2250,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			// test all error log is displayed in execution logs
 			Assert.assertTrue(detailedReportContent.contains("[main] ScenarioLogger: Searched element [TextFieldElement Text, by={By.id: text___}] from page 'com.seleniumtests.it.driver.support.pages.DriverTestPage' could not be found</div>"));
 			Assert.assertTrue(detailedReportContent.contains("<div>at com.seleniumtests.it.driver.support.pages.DriverTestPage._writeSomethingOnNonExistentElementWithCatch"));
-			Assert.assertTrue(detailedReportContent.contains("<div>For documentation on this error, please visit: https://www.seleniumhq.org/exceptions/no_such_element.html</div>")); // checks that line not showing thread name are in logs
+			Assert.assertTrue(detailedReportContent.contains("<div>For documentation on this error, please visit: https://selenium.dev/exceptions/#no_such_element</div>")); // checks that line not showing thread name are in logs
 			
 			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-warning\">Warning: Searched element [TextFieldElement Text, by={By.id: text___}] from page 'com.seleniumtests.it.driver.support.pages.DriverTestPage' could not be found<br/>" + 
-					"For documentation on this error, please visit: https://www.seleniumhq.org/exceptions/no_such_element.html<br/>")); // warning displayed in step
+					"For documentation on this error, please visit: https://selenium.dev/exceptions/#no_such_element<br/>")); // warning displayed in step
 		} finally {
 			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
 		}

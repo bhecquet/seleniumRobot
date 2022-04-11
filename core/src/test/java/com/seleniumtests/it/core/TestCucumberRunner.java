@@ -111,13 +111,13 @@ public class TestCucumberRunner extends GenericMultiBrowserTest {
 			
 			// check steps
 			String testReport = ReporterTest.readTestMethodResultFile("scenario2");
-			Assert.assertTrue(testReport.contains("</button><span class=\"step-title\"> ^Open page '(.+)' with args: ({{ url }}"));
-			Assert.assertTrue(testReport.contains("</button><span class=\"step-title\"> ^Write into '([\\w.]+?)' with (.*) with args: (DriverTestPage.textElement, hello, )"));
-			Assert.assertTrue(testReport.contains("</button><span class=\"step-title\"> ^Click on '([\\w.]+?)' with args: (link, )"));
-			Assert.assertTrue(testReport.contains("</button><span class=\"step-title\"> ^Switch to new window"));
+			Assert.assertTrue(testReport.contains("</button><span class=\"step-title\"> ^Open page '(.+)'$ with args: ({{ url }}"));
+			Assert.assertTrue(testReport.contains("</button><span class=\"step-title\"> ^Write into '([\\w.]+?)' with (.*)$ with args: (DriverTestPage.textElement, hello, )"));
+			Assert.assertTrue(testReport.contains("</button><span class=\"step-title\"> ^Click on '([\\w.]+?)'$ with args: (link, )"));
+			Assert.assertTrue(testReport.contains("</button><span class=\"step-title\"> ^Switch to new window$"));
 			
 			// test password is masked
-			Assert.assertTrue(testReport.contains("</button><span class=\"step-title\"> ^Write password into '([\\w.]+?)' with (.*) with args: (DriverSubTestPage.textElement, ******, )"));
+			Assert.assertTrue(testReport.contains("</button><span class=\"step-title\"> ^Write password into '([\\w.]+?)' with (.*)$ with args: (DriverSubTestPage.textElement, ******, )"));
 			
 			
 			
