@@ -17,6 +17,8 @@
  */
 package com.seleniumtests.ut.connectors.selenium;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -42,6 +44,8 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
@@ -339,6 +343,28 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		
 		Assert.assertEquals(variable.getValue(), "value");
 	}
+	
+//	@Test(groups= {"ut"})
+//	public void testVariableWithoutPrefix() throws UnirestException {
+		
+//		configureMockedVariableServerConnection();
+//		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+//		TestVariable existingVariable = new TestVariable(10, "foo", "value", false, TestVariable.TEST_VARIABLE_PREFIX + "foo");
+//		TestVariable variable = connector.upsertVariable(existingVariable, true);
+//		
+//		when(variableServer.upsertVariable(any(TestVariable.class), anyBoolean())).thenReturn(existingVariable);
+//		
+//		TestTasks.createOrUpdateParam("foo", "value");
+//		TestTasks.createOrUpdateParam("foo", "value");
+//		TestTasks.createOrUpdateParam("foo", "value");
+//		
+//		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("foo"), existingVariable);
+//		
+//		PowerMockito.verifyStatic(Unirest.class);
+//		Unirest.post(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL));
+//		
+//		Assert.assertEquals(variable.getValue(), "value");
+//	}
 	
 	@Test(groups= {"ut"})
 	public void testVariableCreateNewVariable() throws UnirestException {

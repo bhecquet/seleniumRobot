@@ -263,13 +263,15 @@ public class SeleniumRobotTestPlan {
     public void executeUftScript(Uft uft, int timeout, Map<String, String> args) {
     	TestTasks.terminateCurrentStep();
     	
-		TestStep uftStep = uft.executeScript(timeout);
-		TestStepManager.setCurrentRootTestStep(uftStep);
-		TestStepManager.logTestStep(TestStepManager.getCurrentRootTestStep());
-		
-		if (Boolean.TRUE.equals(uftStep.getFailed())) {
-			throw new ScenarioException(String.format("UFT execution failed on script %s", uft.getScriptPath()));
+		List<TestStep> uftSteps = uft.executeScript(timeout, args);
+		for (TestStep uftStep: uftSteps) {
+			TestStepManager.setCurrentRootTestStep(uftStep);
+			TestStepManager.logTestStep(TestStepManager.getCurrentRootTestStep());
 			
+			if (Boolean.TRUE.equals(uftStep.getFailed())) {
+				throw new ScenarioException(String.format("UFT execution failed on script %s", uft.getScriptPath()));
+				
+			}
 		}
     }
     /**
@@ -282,7 +284,7 @@ public class SeleniumRobotTestPlan {
      * @param scriptPath	path to ALM script. e.g: '[QualityCenter]Subject\TOOLS\TestsFoo\foo'
      * @param killUftOnStartup	if true, UFT will be killed before starting the UFT test
      */
-    public Uft loadUftScript(String almServer, String almUser, String almPassword, String almDomain, String almProject, String scriptPath, boolean killUftOnStartup) throws DataConversionException {
+    public Uft loadUftScript(String almServer, String almUser, String almPassword, String almDomain, String almProject, String scriptPath, boolean killUftOnStartup) {
 
     	Uft uft = new Uft(almServer, almUser, almPassword, almDomain, almProject, scriptPath);
     	uft.loadScript(killUftOnStartup);

@@ -33,10 +33,9 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
-import com.seleniumtests.reporter.logger.TestMessage;
-import com.seleniumtests.reporter.logger.TestMessage.MessageType;
 import com.seleniumtests.reporter.logger.TestStep.StepStatus;
 import com.seleniumtests.reporter.logger.TestStep;
+
 
 @PrepareForTest({Uft.class, TestTasks.class})
 public class TestUft extends MockitoTest {
@@ -60,8 +59,8 @@ public class TestUft extends MockitoTest {
 		// check all content has been read
 		Assert.assertEquals(stepList.size(), 2);
 		
-		Assert.assertEquals(stepList.get(0).getName(), "DebutTest [DebutTest]");
-		Assert.assertEquals(stepList.get(1).getName(), "Choixproduit [Choixproduit]");
+		Assert.assertEquals(stepList.get(0).getName(), "UFT: DebutTest [DebutTest]");
+		Assert.assertEquals(stepList.get(1).getName(), "UFT: Choixproduit [Choixproduit]");
 
 
 		// check the while content
@@ -69,24 +68,25 @@ public class TestUft extends MockitoTest {
 		Assert.assertEquals(stepList.get(1).getStepStatus(), StepStatus.SUCCESS);
 		Assert.assertTrue(stepList.get(1).toString().contains("Permet de sélectionner le produit à traiter dans l'arbre produit")); 
 	}
-	
+
 	/**
 	 * Check report file is correctly read
 	 * 
-	 * @throws IOException, DataConversionException
+	 * @throws IOException
 	 */
-	@Test(groups = { "ut" }) 
-	public void testReadReport() throws IOException, DataConversionException {
+	@Test(groups = { "ut" })
+	public void testReadReport() throws IOException {
 		String report = GenericTest.readResourceToString("tu/uftReport.xml");
 		Uft uft = new Uft("[QualityCenter]Subject\\Tools\\Tests\\test1");
-
 		List<TestStep> stepList = uft.readXmlResult(report);
-
+		
+		// check all content has been read
+		Assert.assertEquals(stepList.get(0).getName(), "UFT: IP_Config_Poste_W10 [IP_Config_Poste_W10]");
 		// check all content has been read
 		Assert.assertEquals(stepList.size(), 1);
  
 		// check the while content 
-		Assert.assertEquals(stepList.get(0).toString(), "Step IP_Config_Poste_W10 [IP_Config_Poste_W10]");
+		Assert.assertEquals(stepList.get(0).toString(), "Step UFT: IP_Config_Poste_W10 [IP_Config_Poste_W10]");
 	}
 
 	/**
@@ -94,13 +94,12 @@ public class TestUft extends MockitoTest {
 	 * but without content
 	 */
 	@Test(groups = { "ut" })
-	public void testReadBadReport() throws IOException, DataConversionException {
+	public void testReadBadReport() throws IOException {
 		String report = GenericTest.readResourceToString("tu/wrongUftReport.xml");
 		Uft uft = new Uft("[QualityCenter]Subject\\Tools\\Tests\\test1");
 
-		List<TestStep> stepList = uft.readXmlResult(report);
-
-		Assert.assertEquals(stepList.size(), 0);
+		List<TestStep> testSteps = uft.readXmlResult(report);
+		Assert.assertEquals(testSteps.size(), 1);
 	}
 	
 	/**
@@ -109,22 +108,19 @@ public class TestUft extends MockitoTest {
 	 * @throws IOException
 	 */
 	@Test(groups = { "ut" })
-	public void testReadNoReport() throws IOException, DataConversionException {
+	public void testReadNoReport() throws IOException {
 		String report = "some bad report";
 		Uft uft = new Uft("[QualityCenter]Subject\\Tools\\Tests\\test1");
 		
-		TestStep testStep = new TestStep("UFT: test1", Reporter.getCurrentTestResult(), new ArrayList<String>(), false);
-		
-		uft.readXmlResult(report);
-		Assert.assertEquals(testStep.getStepActions().size(), 1);
-		Assert.assertEquals(((TestMessage) testStep.getStepActions().get(0)).getMessageType(), MessageType.ERROR);
+		List<TestStep> testSteps = uft.readXmlResult(report);
+		Assert.assertEquals(testSteps.size(), 1);
 	}
 
 	/**
 	 * Check uft.vbs file is copied to temp folder test is stored locally
 	 */
 	@Test(groups = { "ut" })
-	public void testPrepareArgumentsWithLocalTest() throws DataConversionException {
+	public void testPrepareArgumentsWithLocalTest() {
 		Uft uft = new Uft("D:\\Subject\\Tools\\Tests\\test1");
 		uft.setKillUftOnStartup(false);
 		List<String> args = uft.prepareArguments(true, true);
@@ -140,7 +136,7 @@ public class TestUft extends MockitoTest {
 	 * Check we add ALM parameters if they are set
 	 */
 	@Test(groups = { "ut" })
-	public void testPrepareArgumentsWithAlmTest() throws DataConversionException {
+	public void testPrepareArgumentsWithAlmTest() {
 		Uft uft = new Uft("http://almserver/qcbin", "usr", "pwd", "dom", "proj",
 				"[QualityCenter]Subject\\Tools\\Tests\\test1");
 		uft.setKillUftOnStartup(false);
@@ -163,7 +159,7 @@ public class TestUft extends MockitoTest {
 	 * Check we add ALM parameters if they are set on loading
 	 */
 	@Test(groups = { "ut" })
-	public void testPrepareLoadArgumentsWithAlmTest() throws DataConversionException {
+	public void testPrepareLoadArgumentsWithAlmTest() {
 		Uft uft = new Uft("http://almserver/qcbin", "usr", "pwd", "dom", "proj",
 				"[QualityCenter]Subject\\Tools\\Tests\\test1");
 		uft.setKillUftOnStartup(false);
@@ -185,35 +181,35 @@ public class TestUft extends MockitoTest {
 	 * If some ALM values are missing, throw a configuration exception
 	 */
 	@Test(groups = { "ut" }, expectedExceptions = ConfigurationException.class)
-	public void testPrepareLoadArgumentsWithAlmTestMissingServerValues() throws DataConversionException {
+	public void testPrepareLoadArgumentsWithAlmTestMissingServerValues() {
 		Uft uft = new Uft(null, "usr", "pwd", "dom", "proj",
 				"[QualityCenter]Subject\\Tools\\Tests\\test1");
 		uft.setKillUftOnStartup(false);
 		uft.prepareArguments(true, false);
 	}
 	@Test(groups = { "ut" }, expectedExceptions = ConfigurationException.class)
-	public void testPrepareLoadArgumentsWithAlmTestMissingUserValues() throws DataConversionException {
+	public void testPrepareLoadArgumentsWithAlmTestMissingUserValues() {
 		Uft uft = new Uft("http://almserver/qcbin", null, "pwd", "dom", "proj",
 				"[QualityCenter]Subject\\Tools\\Tests\\test1");
 		uft.setKillUftOnStartup(false);
 		uft.prepareArguments(true, false);
 	}
 	@Test(groups = { "ut" }, expectedExceptions = ConfigurationException.class)
-	public void testPrepareLoadArgumentsWithAlmTestMissingPasswordValues() throws DataConversionException {
+	public void testPrepareLoadArgumentsWithAlmTestMissingPasswordValues() {
 		Uft uft = new Uft("http://almserver/qcbin", "usr", null, "dom", "proj",
 				"[QualityCenter]Subject\\Tools\\Tests\\test1");
 		uft.setKillUftOnStartup(false);
 		uft.prepareArguments(true, false);
 	}
 	@Test(groups = { "ut" }, expectedExceptions = ConfigurationException.class)
-	public void testPrepareLoadArgumentsWithAlmTestMissingDomainValues() throws DataConversionException {
+	public void testPrepareLoadArgumentsWithAlmTestMissingDomainValues() {
 		Uft uft = new Uft("http://almserver/qcbin", "usr", "pwd", null, "proj",
 				"[QualityCenter]Subject\\Tools\\Tests\\test1");
 		uft.setKillUftOnStartup(false);
 		uft.prepareArguments(true, false);
 	}
 	@Test(groups = { "ut" }, expectedExceptions = ConfigurationException.class)
-	public void testPrepareLoadArgumentsWithAlmTestMissingProjectValues() throws DataConversionException {
+	public void testPrepareLoadArgumentsWithAlmTestMissingProjectValues() {
 		Uft uft = new Uft("http://almserver/qcbin", "usr", "pwd", "dom", null,
 				"[QualityCenter]Subject\\Tools\\Tests\\test1");
 		uft.setKillUftOnStartup(false);
@@ -221,7 +217,7 @@ public class TestUft extends MockitoTest {
 	}
 	
 	@Test(groups = { "ut" })
-	public void testPrepareLoadArgumentsWithKillOnStartup() throws DataConversionException {
+	public void testPrepareLoadArgumentsWithKillOnStartup() {
 		Uft uft = new Uft("D:\\Subject\\Tools\\Tests\\test1");
 		uft.setKillUftOnStartup(true);
 		List<String> args = uft.prepareArguments(true, false);
@@ -238,7 +234,7 @@ public class TestUft extends MockitoTest {
 	 * Check we do not add ALM parameters if they are set on execution
 	 */
 	@Test(groups = { "ut" })
-	public void testPrepareExecutionArgumentsWithAlmTest() throws DataConversionException {
+	public void testPrepareExecutionArgumentsWithAlmTest() {
 		Uft uft = new Uft("http://almserver/qcbin", "usr", "pwd", "dom", "proj",
 				"[QualityCenter]Subject\\Tools\\Tests\\test1");
 		uft.setKillUftOnStartup(false);
@@ -250,9 +246,9 @@ public class TestUft extends MockitoTest {
 		Assert.assertTrue(args.get(1).equals("[QualityCenter]Subject\\Tools\\Tests\\test1"));
 		Assert.assertTrue(args.get(2).equals("/server:http://almserver/qcbin"));
 	}
-
+	
 	@Test(groups = { "ut" })
-	public void testPrepareArgumentsWithAlmTestAndParam() throws DataConversionException {
+	public void testPrepareArgumentsWithAlmTestAndParam() {
 		Map<String, String> params = new HashMap<>();
 		params.put("User", "toto");
 		Uft uft = new Uft("http://almserver/qcbin", "usr", "pwd", "dom", "proj",
@@ -278,7 +274,7 @@ public class TestUft extends MockitoTest {
 	}
 	
 	@Test(groups = { "ut" })
-	public void testPrepareArgumentsWithAlmTestAndParamAndClean() throws DataConversionException {
+	public void testPrepareArgumentsWithAlmTestAndParamAndClean() {
 		Map<String, String> params = new HashMap<>();
 		params.put("User", "toto");
 		Uft uft = new Uft("http://almserver/qcbin", "usr", "pwd", "dom", "proj",
@@ -305,7 +301,7 @@ public class TestUft extends MockitoTest {
 	 * Check that in grid mode, we load the file to grid node
 	 */
 	@Test(groups = { "ut" })
-	public void testPrepareArgumentsForGrid() throws DataConversionException {
+	public void testPrepareArgumentsForGrid() {
 		SeleniumTestsContextManager.getThreadContext().setSeleniumGridConnector(connector);
 		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
 		when(connector.uploadFileToNode(anyString(), eq(true))).thenReturn("D:\\file");
@@ -325,7 +321,7 @@ public class TestUft extends MockitoTest {
 	 * Test when grid is not present 
 	 */
 	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
-	public void testPrepareArgumentsForGridNotThere() throws DataConversionException {
+	public void testPrepareArgumentsForGridNotThere() {
 		SeleniumTestsContextManager.getThreadContext().setSeleniumGridConnector(null);
 		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
 		when(connector.uploadFileToNode(anyString(), eq(true))).thenReturn("D:\\file\\uft.vbs");
@@ -334,7 +330,6 @@ public class TestUft extends MockitoTest {
 		List<String> args = uft.prepareArguments(true, true);
 	}
 	
-
 	@Test(groups = { "ut" })
 	public void testLoad() throws Exception {
 		String report = GenericTest.readResourceToString("tu/uftReport.xml");
@@ -370,7 +365,7 @@ public class TestUft extends MockitoTest {
 
 		Uft uft = new Uft("[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
 
-		uft.executeScript(5);
+		uft.executeScript(5, new HashMap<>());		
 	}
 	
 	/**
@@ -385,10 +380,10 @@ public class TestUft extends MockitoTest {
 
 		Uft uft = new Uft("[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
 		uft.loadScript(false);
-		uft.executeScript(5);
+		uft.executeScript(5, new HashMap<>());	
 		
 		// try a second execution, it's not possible
-		uft.executeScript(5);
+		uft.executeScript(5, new HashMap<>());		
 	}
 	
 	@Test(groups = { "ut" })
@@ -401,11 +396,10 @@ public class TestUft extends MockitoTest {
 		args.put("User", "toto");
 		Uft uft = new Uft("[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
 		uft.loadScript(false);
-		TestStep step = uft.executeScript(120);
+		List<TestStep> testSteps = uft.executeScript(120, args);
 		
 		// check a step is returned
-		Assert.assertNotNull(step);
-		Assert.assertEquals(step.getName(), "UFT: test1");
+		Assert.assertNotNull(testSteps);
 		
 		ArgumentCaptor<String[]> argsArgument = ArgumentCaptor.forClass(String[].class);
 		
@@ -432,14 +426,13 @@ public class TestUft extends MockitoTest {
 		args.put("User", "toto");
 		Uft uft = new Uft("[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
 		uft.loadScript(false);
-		TestStep step = uft.executeScript(120);
+		List<TestStep> testSteps = uft.executeScript(120, new HashMap<>());
 		
 		// check a step is returned
-		Assert.assertNotNull(step);
-		Assert.assertEquals(step.getName(), "UFT: test1");
-		Assert.assertTrue(step.toString().contains("Step Selection_Commune: Impossible d'identifier"));
-		Assert.assertFalse(step.toString().contains("<table>")); // check no HTML code is returned
-
+		Assert.assertNotNull(testSteps);
+		Assert.assertEquals(testSteps.get(0).getName(), "UFT: test1");
+		Assert.assertFalse(testSteps.toString().contains("<table>")); // check no HTML code is returned
+		
 	}
 	
 	/**
@@ -458,16 +451,15 @@ public class TestUft extends MockitoTest {
 		args.put("User", "toto");
 		Uft uft = new Uft("[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
 		uft.loadScript(false);
-		TestStep step = uft.executeScript(5);
+		List<TestStep> testSteps = uft.executeScript(5, new HashMap<>());
 		
 		// check a step is returned
-		Assert.assertNotNull(step);
-		Assert.assertEquals(step.getName(), "UFT: test1");
+		Assert.assertNotNull(testSteps);
+		Assert.assertEquals(testSteps.get(0).getName(), "UFT: IP_Config_Poste_W10 [IP_Config_Poste_W10]");
 	}
 	
 	@Test(groups = { "ut" })
 	public void testExecuteNothingReturned() throws Exception {
-		
 		String report = "";
 		PowerMockito.when(TestTasks.class, "executeCommand", eq("cscript.exe"), anyInt(), nullable(Charset.class), any()).thenReturn(report);
 		
@@ -475,14 +467,11 @@ public class TestUft extends MockitoTest {
 		args.put("User", "toto");
 		Uft uft = new Uft("[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
 		uft.loadScript(false);
-		TestStep step = uft.executeScript(5);
+		List<TestStep> testSteps = uft.executeScript(5, args);
 		
 		// check a step is returned
-		Assert.assertNotNull(step);
-		Assert.assertEquals(step.getName(), "UFT: test1");
+		Assert.assertFalse(testSteps.isEmpty());
+		Assert.assertEquals(testSteps.get(0).getName(), "UFT: test1");
 	}
-
-
-
 
 }
