@@ -245,8 +245,7 @@ public class Uft {
 	 * @param stepElement
 	 */
 	private TestAction readStep(Element stepElement) {
-		//String stepDescription = String.format("%s: %s", stepElement.getChildText("Obj"), stepElement.getChildText("Details").trim());
-
+	    
 		TestAction stepAction;
 		List<Element> stepList = stepElement.getChildren("Step");
 		
@@ -286,7 +285,6 @@ public class Uft {
             document = builder.build(new InputSource(new StringReader(xml))); // we skip BOM by searching the first "<" character
             Element docElement = document.getRootElement().getChild("Doc");
             Element summary = docElement.getChild("Summary");
-            if (summary != null && summary.getAttribute("failed").getIntValue() != 0) { }
             Element elementToIterate = docElement.getChild("DIter");
             Element iterationChild = elementToIterate.getChild("Action");
             
