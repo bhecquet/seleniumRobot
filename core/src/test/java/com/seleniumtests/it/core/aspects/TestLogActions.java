@@ -292,13 +292,13 @@ public class TestLogActions extends GenericTest {
 		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
-		Assert.assertEquals(steps.get(1).getName(), "add '(\\d+)' to '(\\d+)' with args: (1, 1, )");
+		Assert.assertEquals(steps.get(1).getName(), "^add '(\\d+)' to '(\\d+)'$ with args: (1, 1, )");
 		Assert.assertFalse(steps.get(0).getFailed());
 		Assert.assertFalse(steps.get(1).getFailed());
 		Assert.assertEquals(steps.get(0).getStepActions().size(), 1);
 		Assert.assertEquals(steps.get(0).getStepActions().get(0).getName(), "Opening page CalcPage");
 		Assert.assertEquals(steps.get(1).getStepActions().size(), 1);
-		Assert.assertEquals(steps.get(1).getStepActions().get(0).getName(), "add '(\\d+)' to '(\\d+)' with args: (1, 1, )");
+		Assert.assertEquals(steps.get(1).getStepActions().get(0).getName(), "^add '(\\d+)' to '(\\d+)'$ with args: (1, 1, )");
 
 	}
 	
