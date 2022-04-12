@@ -115,8 +115,8 @@ public class TestUft extends MockitoTest {
 		Uft uft = new Uft("[QualityCenter]Subject\\Tools\\Tests\\test1");
 
 		List<TestStep> testSteps = uft.readXmlResult(report);
+		
 		Assert.assertEquals(testSteps.size(), 1);
-
 		Assert.assertEquals(((TestMessage) testSteps.get(0).getStepActions().get(0)).getMessageType(), MessageType.ERROR);
 	}
 	
@@ -131,7 +131,10 @@ public class TestUft extends MockitoTest {
 		Uft uft = new Uft("[QualityCenter]Subject\\Tools\\Tests\\test1");
 		
 		List<TestStep> testSteps = uft.readXmlResult(report);
+		
 		Assert.assertEquals(testSteps.size(), 1);
+		Assert.assertEquals(((TestMessage) testSteps.get(0).getStepActions().get(0)).getMessageType(), MessageType.ERROR);
+
 	}
 
 	/**

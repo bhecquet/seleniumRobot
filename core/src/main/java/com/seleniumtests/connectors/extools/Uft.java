@@ -303,8 +303,9 @@ public class Uft {
                 }
             }
         } catch (IndexOutOfBoundsException e) {
-            logger.error("Could not have XML report" + e.getMessage());
+            logger.error("Probleme with XML " + e.getMessage());
             TestStep readStep = new TestStep("UFT: " + scriptName, Reporter.getCurrentTestResult(), new ArrayList<>(), false);
+            readStep.addMessage(new TestMessage("Could not read UFT report: " + e.getMessage(), MessageType.ERROR));
             listStep.add(readStep);
 	} catch (JDOMException | IOException e) {
             logger.error("Could not read UFT report: " + e.getMessage());
