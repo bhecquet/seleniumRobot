@@ -41,8 +41,8 @@ import com.seleniumtests.util.logging.ScenarioLogger;
  *
  */
 public class Uft {
-	
-	private static final ScenarioLogger logger = ScenarioLogger.getScenarioLogger(Uft.class); 
+
+	private static final ScenarioLogger logger = ScenarioLogger.getScenarioLogger(Uft.class);
 	private static final String START_LOGS = "_____OUTPUT_____";
 	private static final String END_LOGS = "_____ENDOUTPUT_____";
 	private static final String SCRIPT_NAME = "uft.vbs";
@@ -57,17 +57,19 @@ public class Uft {
 	private boolean killUftOnStartup = true;
 	private boolean loaded = false;
 	Map<String, String> parameters = new HashMap<>();;
-	
+
 	/**
-	 * @param vbsPath		path to the vbs file (locally, or on the remote machine)
-	 * @param scriptPath	path to the script, either local or from ALM. If test is from ALM, prefix it with '[QualityCenter]'. e.g: '[QualityCenter]Subject\TOOLS\TestsFoo\foo'
-	 * @param parameters	parameters to pass to the script
+	 * @param vbsPath    path to the vbs file (locally, or on the remote machine)
+	 * @param scriptPath path to the script, either local or from ALM. If test is
+	 *                   from ALM, prefix it with '[QualityCenter]'. e.g:
+	 *                   '[QualityCenter]Subject\TOOLS\TestsFoo\foo'
+	 * @param parameters parameters to pass to the script
 	 */
 	public Uft(String scriptPath) {
 		this.scriptPath = scriptPath;
 		this.scriptName = new File(scriptPath).getName();
 	}
-	
+
 	public Uft(String almServer, String almUser, String almPassword, String almDomain, String almProject, String scriptPath) {
 		this.scriptPath = scriptPath;
 		this.scriptName = new File(scriptPath).getName();
@@ -77,7 +79,7 @@ public class Uft {
 		this.almDomain = almDomain;
 		this.almProject = almProject;
 	}
-	
+
 	public String getScriptPath() {
 		return scriptPath;
 	}
@@ -91,41 +93,37 @@ public class Uft {
 	}
 
 	public void loadScript(boolean killUftOnStartup) {
-
 		this.killUftOnStartup = killUftOnStartup;
 		List<String> args = prepareArguments(true, false);
 		TestTasks.executeCommand("cscript.exe", 60, null, args.toArray(new String[] {}));
 		loaded = true;
 	}
-	
+
 	/**
 	 * Executes an UFT script with timeout
-	 * @param timeout 	timeout in seconds for UFT execution
-	 * @return	the generated test step
+	 * 
+	 * @param timeout timeout in seconds for UFT execution
+	 * @return the generated test step
 	 */
-	public TestStep executeScript(int timeout, Map<String, String> parameters) {
-		
+	public List<TestStep> executeScript(int timeout, Map<String, String> parameters) {
 		if (!loaded) {
 			throw new IllegalStateException("Test script has not been loaded. Call 'loadScript' before");
 		}
 		this.parameters = parameters;
 
-		TestStep testStep = new TestStep(String.format("UFT: %s", scriptName), Reporter.getCurrentTestResult(), new ArrayList<>(), false);
-		
 		Date startDate = new Date();
 		String output = TestTasks.executeCommand("cscript.exe", timeout, null, prepareArguments(false, true).toArray(new String[] {}));
-		
-		testStep.setDuration(new Date().getTime() - startDate.getTime());
-		
+
 		// when execution ends, UFT is stopped
-		loaded = false; 
-		return analyseOutput(output, testStep);
+		loaded = false;
+		return analyseOutput(output);
 	}
-	
+
 	/**
-	 * Prepare list of arguments 
-	 * @param load		if true, add '/load'
-	 * @param execute	if true, add '/execute'
+	 * Prepare list of arguments
+	 * 
+	 * @param load    if true, add '/load'
+	 * @param execute if true, add '/execute'
 	 * @return
 	 */
 	public List<String> prepareArguments(boolean load, boolean execute) {
@@ -134,30 +132,31 @@ public class Uft {
 		try {
 			File tempFile = Files.createTempDirectory("uft").resolve(SCRIPT_NAME).toFile();
 			tempFile.deleteOnExit();
-			FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream("uft/" + SCRIPT_NAME), tempFile);
+			FileUtils.copyInputStreamToFile(
+					Thread.currentThread().getContextClassLoader().getResourceAsStream("uft/" + SCRIPT_NAME), tempFile);
 			vbsPath = tempFile.getAbsolutePath();
 		} catch (IOException e) {
 			throw new ScenarioException("Error sending UFT script to grid node: " + e.getMessage());
 		}
-		
+
 		if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.GRID) {
 			SeleniumGridConnector gridConnector = SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector();
-    		if (gridConnector != null) {
-    			vbsPath = Paths.get(gridConnector.uploadFileToNode(vbsPath, true), SCRIPT_NAME).toString();
-    		} else {
-    			throw new ScenarioException("No grid connector present, executing UFT script needs a browser to be initialized");
-    		}
-		} 
-		
+			if (gridConnector != null) {
+				vbsPath = Paths.get(gridConnector.uploadFileToNode(vbsPath, true), SCRIPT_NAME).toString();
+			} else {
+				throw new ScenarioException("No grid connector present, executing UFT script needs a browser to be initialized");
+			}
+		}
+
 		List<String> args = new ArrayList<>();
 		args.add(vbsPath);
 		args.add(scriptPath);
-		
+
 		if (execute) {
 			args.add("/execute");
 			parameters.forEach((key, value) -> args.add(String.format("\"%s=%s\"", key, value)));
 		}
-		
+
 		if (load) {
 			if (almServer != null && almUser != null && almPassword != null && almDomain != null && almProject != null) {
 				args.add("/server:" + almServer);
@@ -166,138 +165,155 @@ public class Uft {
 				args.add("/domain:" + almDomain);
 				args.add("/project:" + almProject);
 			} else if (almServer != null || almUser != null || almPassword != null || almDomain != null || almProject != null) {
-				throw new ConfigurationException("All valuers pour ALM connection must be provided: server, user, password, domain and project");
+				throw new ConfigurationException(
+						"All valuers pour ALM connection must be provided: server, user, password, domain and project");
 			}
-			
+
 			args.add("/load");
-			
+
 			if (killUftOnStartup) {
 				args.add("/clean");
 			}
 		}
 		return args;
 	}
-	
+
 	/**
 	 * Analyze Result.xml content
-	 * @param output		the Result.xml content as a string
-	 * @param duration		duration of the execution
+	 *
+	 * @param output the Result.xml content as a string // * @param duration
+	 *               duration of the execution
 	 * @return
 	 */
-	public TestStep analyseOutput(String output, TestStep testStep) {
+	public List<TestStep> analyseOutput(String output) {
 		StringBuilder uftOutput = new StringBuilder();
-		
+		List<TestStep> stepList = new ArrayList<>();
+
 		boolean logging = false;
-		for (String line: output.split("\n")) {
+		for (String line : output.split("\n")) {
 			line = line.trim();
-			
+
 			if (line.contains(START_LOGS)) {
 				logging = true;
 				continue;
 			} else if (line.contains(END_LOGS)) {
 				logging = false;
 			}
-			
+
 			if (logging) {
 				uftOutput.append(line);
 			}
 		}
-		
-		readXmlResult(uftOutput.toString(), testStep);
-		
-		return testStep;
+
+		stepList = readXmlResult(uftOutput.toString());
+
+		return stepList;
 	}
-	
+
 	/**
 	 * Read an action element
-	 * @param parentStep
+	 * <p>
+	 * // * @param parentStep
+	 *
 	 * @param actionElement
 	 * @throws DataConversionException
 	 */
-	private void readAction(TestStep parentStep, Element actionElement) throws DataConversionException {
-		TestStep actionStep = new TestStep(actionElement.getChildText("AName"), Reporter.getCurrentTestResult(), new ArrayList<>(), false);
-		parentStep.addStep(actionStep);
+	private TestStep readAction(Element actionElement) throws DataConversionException {
+		TestStep actionStep = new TestStep("UFT: " + actionElement.getChildText("AName").trim(), Reporter.getCurrentTestResult(), new ArrayList<>(), false);
 		Element summary = actionElement.getChild("Summary");
-		if (summary!= null && summary.getAttribute("failed").getIntValue() != 0) {
+		if (summary != null && summary.getAttribute("failed").getIntValue() != 0) {
 			actionStep.setFailed(true);
 		}
-		
-		for (Element element: actionElement.getChildren()) {
+
+		for (Element element : actionElement.getChildren()) {
 			if ("Action".equals(element.getName())) {
-				readAction(actionStep, element);
+				TestStep readStep = readAction(element);
+				actionStep.addStep(readStep);
 			} else if ("Step".equals(element.getName())) {
-				readStep(actionStep, element);
+				TestAction readAction = readStep(element);
+				actionStep.addAction(readAction);
 			}
 		}
-		
+		return actionStep;
 	}
-	
+
 	/**
 	 * Read a step element
-	 * @param parentStep
+	 * <p>
+	 * // * @param parentStep
+	 *
 	 * @param stepElement
 	 */
-	private void readStep(TestStep parentStep, Element stepElement) {
+	private TestAction readStep(Element stepElement) {
+	    
+		TestAction stepAction;
 		List<Element> stepList = stepElement.getChildren("Step");
 		
 		org.jsoup.nodes.Document htmlDoc = Jsoup.parseBodyFragment(stepElement.getChildText("Details"));
 		String details = htmlDoc.text();
+		
+		String stepDescription = String.format("%s: %s", stepElement.getChildText("Obj"),  details).trim();
 
-		String stepDescription = String.format("%s: %s", stepElement.getChildText("Obj"),  details);
-		
-		
 		if (stepList.isEmpty()) {
-			TestAction action = new TestAction(stepDescription, false, new ArrayList<>());
-			parentStep.addAction(action);
+			stepAction = new TestAction(stepDescription, false, new ArrayList<>());
 		} else {
-			TestStep stepStep = new TestStep(stepDescription, Reporter.getCurrentTestResult(), new ArrayList<>(), false);
-			parentStep.addStep(stepStep);
-			for (Element subStepElement: stepElement.getChildren("Step")) {
-				readStep(stepStep, subStepElement);
+			stepAction = new TestStep(stepDescription, Reporter.getCurrentTestResult(), new ArrayList<>(), false);
+			for (Element subStepElement : stepElement.getChildren("Step")) {
+				TestAction readAction = readStep(subStepElement);
+				((TestStep) stepAction).addAction(readAction);
 			}
 		}
-		
+		return stepAction;
 	}
-	
-	public void readXmlResult(String xmlString, TestStep testStep) {
-		
-		Document document;
-		SAXBuilder builder = new SAXBuilder();
-		
 
-		try {
-			String xml = xmlString.substring(xmlString.indexOf("<"));
-			String xml10pattern = "[^"
-			        + "\u0009\r\n"
-			        + "\u0020-\uD7FF"
-			        + "\uE000-\uFFFD"
-			        + "\ud800\udc00-\udbff\udfff"
-			        + "]";
-			xml = xml.replaceAll(xml10pattern, "");
-			
-			document = builder.build(new InputSource(new StringReader(xml))); // we skip BOM by searching the first "<" character
-			Element docElement = document.getRootElement().getChild("Doc");
-			Element summary = docElement.getChild("Summary");
-			if (summary!= null && summary.getAttribute("failed").getIntValue() != 0) {
-				testStep.setFailed(true);
+	public List<TestStep> readXmlResult(String xmlString) {
+        Document document;
+        SAXBuilder builder = new SAXBuilder();
+
+        List<TestStep> listStep = new ArrayList<>();
+
+        try {
+            String xml = xmlString.substring(xmlString.indexOf("<"));
+		String xml10pattern = "[^"
+		        + "\u0009\r\n"
+		        + "\u0020-\uD7FF"
+		        + "\uE000-\uFFFD"
+		        + "\ud800\udc00-\udbff\udfff"
+		        + "]";
+		xml = xml.replaceAll(xml10pattern, "");
+		
+            document = builder.build(new InputSource(new StringReader(xml))); // we skip BOM by searching the first "<" character
+            Element docElement = document.getRootElement().getChild("Doc");
+            Element summary = docElement.getChild("Summary");
+            Element elementToIterate = docElement.getChild("DIter");
+            Element iterationChild = elementToIterate.getChild("Action");
+            
+			if (!iterationChild.getChildren("Action").isEmpty()) {
+				  elementToIterate = iterationChild;
 			}
 			
-			Element iteration = docElement.getChild("DIter");
-			
-			for (Element element: iteration.getChildren()) {
-				if ("Action".equals(element.getName())) {
-					readAction(testStep, element);
-				} else if ("Step".equals(element.getName())) {
-					readStep(testStep, element);
-				}
-			}
-		
-		} catch (JDOMException | IOException | StringIndexOutOfBoundsException e) {
-			logger.error("Could not read UFT report: " + e.getMessage());
-			testStep.addMessage(new TestMessage("Could not read UFT report: " + e.getMessage(), MessageType.ERROR));
-		}
-		
-	}
+			for (Element element : elementToIterate.getChildren()) {
+                if ("Action".equals(element.getName())) {
+                    TestStep readStep = readAction(element);
+                    listStep.add(readStep);
+                } else if ("Step".equals(element.getName())) {
+                    readStep(element);
+                }
+            }
+        } catch (IndexOutOfBoundsException e) {
+            logger.error("Probleme with XML " + e.getMessage());
+            TestStep readStep = new TestStep("UFT: " + scriptName, Reporter.getCurrentTestResult(), new ArrayList<>(), false);
+            readStep.addMessage(new TestMessage("Could not read UFT report: " + e.getMessage(), MessageType.ERROR));
+            listStep.add(readStep);
+	} catch (JDOMException | IOException e) {
+            logger.error("Could not read UFT report: " + e.getMessage());
+            TestStep readStep = new TestStep("UFT: " + scriptName, Reporter.getCurrentTestResult(), new ArrayList<>(), false);
+            readStep.addMessage(new TestMessage("Could not read UFT report: " + e.getMessage(), MessageType.ERROR));
+            listStep.add(readStep);
+        }
+
+        return listStep;
+    }
 
 	public void setKillUftOnStartup(boolean killUftOnStartup) {
 		this.killUftOnStartup = killUftOnStartup;

@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
+import org.jdom2.DataConversionException;
 import org.openqa.selenium.WebDriver;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
@@ -191,8 +192,7 @@ public class SeleniumRobotTestPlan {
      * env.ini file 
      * Moreover, created custom variable is specific to tuple (application, version, test environment)
      * @param key					name of the param
-     * @param newValue				value of the parameter (or new value if we update it)
-     * @param specificToVersion		if true, this param will be stored on server with a reference to the application version. This will have no effect if changing a 
+     * @param specificToVersion		if true, this param will be stored on server with a reference to the application version. This will have no effect if changing a
      * 								current variable.
      */
     public void createOrUpdateParam(String key, String value, boolean specificToVersion) {
@@ -203,8 +203,7 @@ public class SeleniumRobotTestPlan {
      * Method for creating or updating a variable. If variables are get from seleniumRobot server, this method will update the value on the server
      * Moreover, created custom variable is specific to tuple (application, version, test environment)
      * @param key					name of the param
-     * @param newValue				value of the parameter (or new value if we update it)
-     * @param specificToVersion		if true, this param will be stored on server with a reference to the application version. This will have no effect if changing a 
+     * @param specificToVersion		if true, this param will be stored on server with a reference to the application version. This will have no effect if changing a
      * 								current variable.
      * @param timeToLive			if > 0, this variable will be destroyed after some days (defined by variable). A positive value is mandatory if reservable is set to true 
      * 								because multiple variable can be created
@@ -242,7 +241,6 @@ public class SeleniumRobotTestPlan {
     /**
      * Add step to current test
      * @param stepName
-     * @param passwordsToMask	array of strings that must be replaced by '*****' in reports
      */
     public void addStep(String stepName, String ... passwordToMask) {
     	TestTasks.addStep(stepName, passwordToMask);
@@ -259,26 +257,21 @@ public class SeleniumRobotTestPlan {
 
     /**
      * Execute a UFT script locally or remotely via a VBS script called through csscript.exe
-     * @param almServer		ALM server address
-     * @param almUser		
-     * @param almPassword
-     * @param almDomain
-     * @param almProject
-     * @param scriptPath	path to ALM script. e.g: '[QualityCenter]Subject\TOOLS\TestsFoo\foo'
      * @param args			parameters to give to UFT script
      * @param timeout		timeout in seconds. Max time the script will run
-     * @param killUftOnStartup	if true, UFT will be killed before starting the UFT test
      */
     public void executeUftScript(Uft uft, int timeout, Map<String, String> args) {
     	TestTasks.terminateCurrentStep();
     	
-		TestStep uftStep = uft.executeScript(timeout, args);
-		TestStepManager.setCurrentRootTestStep(uftStep);
-		TestStepManager.logTestStep(TestStepManager.getCurrentRootTestStep());
-		
-		if (Boolean.TRUE.equals(uftStep.getFailed())) {
-			throw new ScenarioException(String.format("UFT execution failed on script %s", uft.getScriptPath()));
+		List<TestStep> uftSteps = uft.executeScript(timeout, args);
+		for (TestStep uftStep: uftSteps) {
+			TestStepManager.setCurrentRootTestStep(uftStep);
+			TestStepManager.logTestStep(TestStepManager.getCurrentRootTestStep());
 			
+			if (Boolean.TRUE.equals(uftStep.getFailed())) {
+				throw new ScenarioException(String.format("UFT execution failed on script %s", uft.getScriptPath()));
+				
+			}
 		}
     }
     /**
@@ -288,7 +281,6 @@ public class SeleniumRobotTestPlan {
      * @param almPassword
      * @param almDomain
      * @param almProject
-     * @param args			parameters to give to UFT script
      * @param scriptPath	path to ALM script. e.g: '[QualityCenter]Subject\TOOLS\TestsFoo\foo'
      * @param killUftOnStartup	if true, UFT will be killed before starting the UFT test
      */
