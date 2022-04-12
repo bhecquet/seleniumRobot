@@ -150,8 +150,8 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(15);
 		
-//		// edge IE mode
-//		SeleniumTestsContextManager.getThreadContext().setEdgeIeMode(true);
+		// edge IE mode forced
+		SeleniumTestsContextManager.getThreadContext().setEdgeIeMode(true);
 //		SeleniumTestsContextManager.getThreadContext().setDebug("driver");
 
 //		// grid support

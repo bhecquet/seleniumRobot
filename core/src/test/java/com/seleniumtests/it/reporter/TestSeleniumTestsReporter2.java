@@ -2117,6 +2117,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	/**
 	 * Check all steps are present in detailed report file. For cucumber, check that method name is the Scenario name, not the "feature" generic method
 	 * Test OK
+	 * Check if it's possible to have '??' is scenario name
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})
@@ -2130,7 +2131,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent = readTestMethodResultFile("my_beautiful_scenario_.._ok_..-");
 		
 		// Check each step is recorded in file: 2 test steps + test end + logs
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> write (\\w+) with args: (tatu, )"));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> ^write (\\w+)$ with args: (tatu, )"));
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Test is OK</div>"));
 		
 		

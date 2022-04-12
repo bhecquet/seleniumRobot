@@ -43,6 +43,9 @@ public class CustomCucumberPropertiesProvider implements CucumberPropertiesProvi
 		if (!SeleniumTestsContextManager.getThreadContext().getCucumberTests().isEmpty()) {
 			parameters.put(Constants.FILTER_NAME_PROPERTY_NAME, StringUtils.join(SeleniumTestsContextManager.getThreadContext().getCucumberTests(), "|"));
 		}
+		// Handle special regex character '?'
+		parameters.put(Constants.FILTER_NAME_PROPERTY_NAME, parameters.get(Constants.FILTER_NAME_PROPERTY_NAME).replace("?", "\\?"));
+		
 		parameters.put(Constants.FEATURES_PROPERTY_NAME, SeleniumTestsContextManager.getFeaturePath());
 	}
 	

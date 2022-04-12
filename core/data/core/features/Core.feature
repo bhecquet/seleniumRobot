@@ -40,8 +40,7 @@ Feature: Core
 	@new2
 	Scenario: core_4
 		When write tuta
-		
-	@EXCLUDE_FROM_SQUASH_TA
+
 	@new4
 	Scenario: core_5
 		When write tatu
@@ -54,6 +53,5 @@ Feature: Core
 	Scenario: error_scenario
 		When write_error error 
 		
-	@EXCLUDE_FROM_SQUASH_TA
 	Scenario: my beautiful scenario ?? ok ??
 		When write tatu
