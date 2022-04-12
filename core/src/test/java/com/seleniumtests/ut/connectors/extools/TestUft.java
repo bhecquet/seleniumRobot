@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jdom2.DataConversionException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
@@ -32,9 +33,11 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.reporter.logger.TestStep.StepStatus;
 import com.seleniumtests.reporter.logger.TestMessage;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
 import com.seleniumtests.reporter.logger.TestStep;
+
 
 @PrepareForTest({Uft.class, TestTasks.class})
 public class TestUft extends MockitoTest {
@@ -48,6 +51,40 @@ public class TestUft extends MockitoTest {
 		PowerMockito.mockStatic(TestTasks.class);
 	}
 
+	@Test(groups = { "ut" })
+	public void testReadReportListActions() throws IOException, DataConversionException {
+		String report = GenericTest.readResourceToString("tu/Results.xml");
+		Uft uft = new Uft("[QualityCenter]Subject\\Tools\\Tests\\test1");
+
+		List<TestStep> stepList = uft.readXmlResult(report);
+
+		// check all content has been read
+		Assert.assertEquals(stepList.size(), 2);
+		
+		Assert.assertEquals(stepList.get(0).getName(), "UFT: DebutTest [DebutTest]");
+		Assert.assertEquals(stepList.get(1).getName(), "UFT: Choixproduit [Choixproduit]");
+
+
+		// check the while content
+		Assert.assertEquals(stepList.get(0).getStepStatus(), StepStatus.FAILED);
+		Assert.assertEquals(stepList.get(1).getStepStatus(), StepStatus.SUCCESS);
+		Assert.assertEquals(stepList.get(1).toString(), "Step UFT: Choixproduit [Choixproduit]\n"
+			+ "  - Choix du produit\n"
+			+ "						: Permet de sélectionner le produit à traiter dans l'arbre produit\n"
+			+ "  - Step P9\n"
+			+ "						: Local Browser\n"
+			+ "    - Step P9 - Agence\n"
+			+ "							: Page\n"
+			+ "      - Step Onglets\n"
+			+ "								: Frame\n"
+			+ "        - Particulier.Exist\n"
+			+ "									: \"Object does not exist\"\n"
+			+ "      - Step Menu\n"
+			+ "								: Frame\n"
+			+ "        - Assurance.Click\n"
+			+ "									:"); 
+	}
+
 	/**
 	 * Check report file is correctly read
 	 * 
@@ -57,26 +94,15 @@ public class TestUft extends MockitoTest {
 	public void testReadReport() throws IOException {
 		String report = GenericTest.readResourceToString("tu/uftReport.xml");
 		Uft uft = new Uft("[QualityCenter]Subject\\Tools\\Tests\\test1");
-		TestStep testStep = new TestStep("UFT: test1", Reporter.getCurrentTestResult(), new ArrayList<String>(), false);
-
-		uft.readXmlResult(report, testStep);
-
+		List<TestStep> stepList = uft.readXmlResult(report);
+		
 		// check all content has been read
-		Assert.assertEquals((boolean) testStep.getFailed(), false);
-		Assert.assertEquals(testStep.getStepActions().size(), 1);
-
-		TestStep subStep = (TestStep) testStep.getStepActions().get(0);
-		Assert.assertEquals(subStep.getName(), "test1");
-
-		// check the whiile content
-		Assert.assertEquals(testStep.toString(), "Step UFT: test1\n" + "  - Step test1\n"
-				+ "    - navigteur: La transaction \"navigteur\" a démarré.\n"
-				+ "    - Step S'identifier [Jenkins]: Local Browser\n"
-				+ "      - Step S'identifier [Jenkins]: Page\n" + "        - Utilisateur.Set: \"toto\"\n"
-				+ "        - Mot de passe.SetSecure: \"6075ac75a88a13a533eb7f5db06e\"\n"
-				+ "        - S'identifier.Click:\n" + "      - S'identifier [Jenkins].Close:\n"
-				+ "    - Step IP_Config_Poste_W10 [IP_Config_Poste_W10]\n"
-				+ "    - navigteur: La transaction \"navigteur\" s’est terminée avec l’état \"Réussite\" (Durée totale : 17,7658 s Temps inutilisé : 0,0888 s).");
+		Assert.assertEquals(stepList.get(0).getName(), "UFT: IP_Config_Poste_W10 [IP_Config_Poste_W10]");
+		// check all content has been read
+		Assert.assertEquals(stepList.size(), 1);
+ 
+		// check the while content 
+		Assert.assertEquals(stepList.get(0).toString(), "Step UFT: IP_Config_Poste_W10 [IP_Config_Poste_W10]");
 	}
 
 	/**
@@ -88,11 +114,10 @@ public class TestUft extends MockitoTest {
 		String report = GenericTest.readResourceToString("tu/wrongUftReport.xml");
 		Uft uft = new Uft("[QualityCenter]Subject\\Tools\\Tests\\test1");
 
-		TestStep testStep = new TestStep("UFT: test1", Reporter.getCurrentTestResult(), new ArrayList<String>(), false);
-
-		uft.readXmlResult(report, testStep);
-		Assert.assertEquals(testStep.getStepActions().size(), 1);
-		Assert.assertEquals(((TestMessage) testStep.getStepActions().get(0)).getMessageType(), MessageType.ERROR);
+		List<TestStep> testSteps = uft.readXmlResult(report);
+		
+		Assert.assertEquals(testSteps.get(0).getStepActions().size(), 1);
+		Assert.assertEquals(((TestMessage) testSteps.get(0).getStepActions().get(0)).getMessageType(), MessageType.ERROR);
 	}
 	
 	/**
@@ -105,11 +130,11 @@ public class TestUft extends MockitoTest {
 		String report = "some bad report";
 		Uft uft = new Uft("[QualityCenter]Subject\\Tools\\Tests\\test1");
 		
-		TestStep testStep = new TestStep("UFT: test1", Reporter.getCurrentTestResult(), new ArrayList<String>(), false);
+		List<TestStep> testSteps = uft.readXmlResult(report);
 		
-		uft.readXmlResult(report, testStep);
-		Assert.assertEquals(testStep.getStepActions().size(), 1);
-		Assert.assertEquals(((TestMessage) testStep.getStepActions().get(0)).getMessageType(), MessageType.ERROR);
+		Assert.assertEquals(testSteps.get(0).getStepActions().size(), 1);
+		Assert.assertEquals(((TestMessage) testSteps.get(0).getStepActions().get(0)).getMessageType(), MessageType.ERROR);
+
 	}
 
 	/**
@@ -242,7 +267,7 @@ public class TestUft extends MockitoTest {
 		Assert.assertTrue(args.get(1).equals("[QualityCenter]Subject\\Tools\\Tests\\test1"));
 		Assert.assertTrue(args.get(2).equals("/server:http://almserver/qcbin"));
 	}
-
+	
 	@Test(groups = { "ut" })
 	public void testPrepareArgumentsWithAlmTestAndParam() {
 		Map<String, String> params = new HashMap<>();
@@ -326,7 +351,6 @@ public class TestUft extends MockitoTest {
 		List<String> args = uft.prepareArguments(true, true);
 	}
 	
-
 	@Test(groups = { "ut" })
 	public void testLoad() throws Exception {
 		String report = GenericTest.readResourceToString("tu/uftReport.xml");
@@ -393,11 +417,10 @@ public class TestUft extends MockitoTest {
 		args.put("User", "toto");
 		Uft uft = new Uft("[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
 		uft.loadScript(false);
-		TestStep step = uft.executeScript(120, args);
+		List<TestStep> testSteps = uft.executeScript(120, args);
 		
 		// check a step is returned
-		Assert.assertNotNull(step);
-		Assert.assertEquals(step.getName(), "UFT: test1");
+		Assert.assertNotNull(testSteps);
 		
 		ArgumentCaptor<String[]> argsArgument = ArgumentCaptor.forClass(String[].class);
 		
@@ -424,14 +447,12 @@ public class TestUft extends MockitoTest {
 		args.put("User", "toto");
 		Uft uft = new Uft("[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
 		uft.loadScript(false);
-		TestStep step = uft.executeScript(120, new HashMap<>());
+		List<TestStep> testSteps = uft.executeScript(120, new HashMap<>());
 		
 		// check a step is returned
-		Assert.assertNotNull(step);
-		Assert.assertEquals(step.getName(), "UFT: test1");
-		Assert.assertTrue(step.toString().contains("Step Selection_Commune: Impossible d'identifier"));
-		Assert.assertFalse(step.toString().contains("<table>")); // check no HTML code is returned
-		
+		Assert.assertNotNull(testSteps);
+		Assert.assertEquals(testSteps.get(0).getName(), "UFT: Risques [Risques]");
+		Assert.assertFalse(testSteps.toString().contains("<table>")); // check no HTML code is returned
 		
 	}
 	
@@ -451,16 +472,15 @@ public class TestUft extends MockitoTest {
 		args.put("User", "toto");
 		Uft uft = new Uft("[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
 		uft.loadScript(false);
-		TestStep step = uft.executeScript(5, new HashMap<>());
+		List<TestStep> testSteps = uft.executeScript(5, new HashMap<>());
 		
 		// check a step is returned
-		Assert.assertNotNull(step);
-		Assert.assertEquals(step.getName(), "UFT: test1");
+		Assert.assertNotNull(testSteps);
+		Assert.assertEquals(testSteps.get(0).getName(), "UFT: IP_Config_Poste_W10 [IP_Config_Poste_W10]");
 	}
 	
 	@Test(groups = { "ut" })
 	public void testExecuteNothingReturned() throws Exception {
-		
 		String report = "";
 		PowerMockito.when(TestTasks.class, "executeCommand", eq("cscript.exe"), anyInt(), nullable(Charset.class), any()).thenReturn(report);
 		
@@ -468,14 +488,11 @@ public class TestUft extends MockitoTest {
 		args.put("User", "toto");
 		Uft uft = new Uft("[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
 		uft.loadScript(false);
-		TestStep step = uft.executeScript(5, args);
+		List<TestStep> testSteps = uft.executeScript(5, args);
 		
 		// check a step is returned
-		Assert.assertNotNull(step);
-		Assert.assertEquals(step.getName(), "UFT: test1");
+		Assert.assertFalse(testSteps.isEmpty());
+		Assert.assertEquals(testSteps.get(0).getName(), "UFT: test1");
 	}
-
-
-
 
 }
