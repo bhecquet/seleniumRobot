@@ -70,8 +70,7 @@ public class Uft {
 		this.scriptName = new File(scriptPath).getName();
 	}
 
-	public Uft(String almServer, String almUser, String almPassword, String almDomain, String almProject,
-			String scriptPath) {
+	public Uft(String almServer, String almUser, String almPassword, String almDomain, String almProject, String scriptPath) {
 		this.scriptPath = scriptPath;
 		this.scriptName = new File(scriptPath).getName();
 		this.almServer = almServer;
@@ -94,7 +93,6 @@ public class Uft {
 	}
 
 	public void loadScript(boolean killUftOnStartup) {
-
 		this.killUftOnStartup = killUftOnStartup;
 		List<String> args = prepareArguments(true, false);
 		TestTasks.executeCommand("cscript.exe", 60, null, args.toArray(new String[] {}));
@@ -108,15 +106,13 @@ public class Uft {
 	 * @return the generated test step
 	 */
 	public List<TestStep> executeScript(int timeout, Map<String, String> parameters) {
-
 		if (!loaded) {
 			throw new IllegalStateException("Test script has not been loaded. Call 'loadScript' before");
 		}
 		this.parameters = parameters;
 
 		Date startDate = new Date();
-		String output = TestTasks.executeCommand("cscript.exe", timeout, null,
-				prepareArguments(false, true).toArray(new String[] {}));
+		String output = TestTasks.executeCommand("cscript.exe", timeout, null, prepareArguments(false, true).toArray(new String[] {}));
 
 		// when execution ends, UFT is stopped
 		loaded = false;
@@ -144,13 +140,11 @@ public class Uft {
 		}
 
 		if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.GRID) {
-			SeleniumGridConnector gridConnector = SeleniumTestsContextManager.getThreadContext()
-					.getSeleniumGridConnector();
+			SeleniumGridConnector gridConnector = SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector();
 			if (gridConnector != null) {
 				vbsPath = Paths.get(gridConnector.uploadFileToNode(vbsPath, true), SCRIPT_NAME).toString();
 			} else {
-				throw new ScenarioException(
-						"No grid connector present, executing UFT script needs a browser to be initialized");
+				throw new ScenarioException("No grid connector present, executing UFT script needs a browser to be initialized");
 			}
 		}
 
@@ -164,15 +158,13 @@ public class Uft {
 		}
 
 		if (load) {
-			if (almServer != null && almUser != null && almPassword != null && almDomain != null
-					&& almProject != null) {
+			if (almServer != null && almUser != null && almPassword != null && almDomain != null && almProject != null) {
 				args.add("/server:" + almServer);
 				args.add("/user:" + almUser);
 				args.add("/password:" + almPassword);
 				args.add("/domain:" + almDomain);
 				args.add("/project:" + almProject);
-			} else if (almServer != null || almUser != null || almPassword != null || almDomain != null
-					|| almProject != null) {
+			} else if (almServer != null || almUser != null || almPassword != null || almDomain != null || almProject != null) {
 				throw new ConfigurationException(
 						"All valuers pour ALM connection must be provided: server, user, password, domain and project");
 			}
@@ -227,8 +219,7 @@ public class Uft {
 	 * @throws DataConversionException
 	 */
 	private TestStep readAction(Element actionElement) throws DataConversionException {
-		TestStep actionStep = new TestStep("UFT: " + actionElement.getChildText("AName").trim(), Reporter.getCurrentTestResult(),
-				new ArrayList<>(), false);
+		TestStep actionStep = new TestStep("UFT: " + actionElement.getChildText("AName").trim(), Reporter.getCurrentTestResult(), new ArrayList<>(), false);
 		Element summary = actionElement.getChild("Summary");
 		if (summary != null && summary.getAttribute("failed").getIntValue() != 0) {
 			actionStep.setFailed(true);
@@ -254,11 +245,15 @@ public class Uft {
 	 * @param stepElement
 	 */
 	private TestAction readStep(Element stepElement) {
-		String stepDescription = String.format("%s: %s", stepElement.getChildText("Obj"),
-				stepElement.getChildText("Details").trim());
+		//String stepDescription = String.format("%s: %s", stepElement.getChildText("Obj"), stepElement.getChildText("Details").trim());
 
 		TestAction stepAction;
 		List<Element> stepList = stepElement.getChildren("Step");
+		
+		org.jsoup.nodes.Document htmlDoc = Jsoup.parseBodyFragment(stepElement.getChildText("Details"));
+		String details = htmlDoc.text();
+		
+		String stepDescription = String.format("%s: %s", stepElement.getChildText("Obj"),  details).trim();
 
 		if (stepList.isEmpty()) {
 			stepAction = new TestAction(stepDescription, false, new ArrayList<>());
@@ -279,7 +274,16 @@ public class Uft {
         List<TestStep> listStep = new ArrayList<>();
 
         try {
-			document = builder.build(new InputSource(new StringReader(xmlString.substring(xmlString.indexOf("<"))))); // we skip BOM by searching the first "<" character
+            String xml = xmlString.substring(xmlString.indexOf("<"));
+		String xml10pattern = "[^"
+		        + "\u0009\r\n"
+		        + "\u0020-\uD7FF"
+		        + "\uE000-\uFFFD"
+		        + "\ud800\udc00-\udbff\udfff"
+		        + "]";
+		xml = xml.replaceAll(xml10pattern, "");
+		
+            document = builder.build(new InputSource(new StringReader(xml))); // we skip BOM by searching the first "<" character
             Element docElement = document.getRootElement().getChild("Doc");
             Element summary = docElement.getChild("Summary");
             if (summary != null && summary.getAttribute("failed").getIntValue() != 0) { }
@@ -301,11 +305,12 @@ public class Uft {
         } catch (IndexOutOfBoundsException e) {
             logger.error("Could not have XML report" + e.getMessage());
             TestStep readStep = new TestStep("UFT: " + scriptName, Reporter.getCurrentTestResult(), new ArrayList<>(), false);
-			listStep.add(readStep);
-		} catch (JDOMException | IOException e) {
+            listStep.add(readStep);
+	} catch (JDOMException | IOException e) {
             logger.error("Could not read UFT report: " + e.getMessage());
             TestStep readStep = new TestStep("UFT: " + scriptName, Reporter.getCurrentTestResult(), new ArrayList<>(), false);
-			listStep.add(readStep);
+            readStep.addMessage(new TestMessage("Could not read UFT report: " + e.getMessage(), MessageType.ERROR));
+            listStep.add(readStep);
         }
 
         return listStep;

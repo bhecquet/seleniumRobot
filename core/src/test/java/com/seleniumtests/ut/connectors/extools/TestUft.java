@@ -34,6 +34,8 @@ import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.reporter.logger.TestStep.StepStatus;
+import com.seleniumtests.reporter.logger.TestMessage;
+import com.seleniumtests.reporter.logger.TestMessage.MessageType;
 import com.seleniumtests.reporter.logger.TestStep;
 
 
@@ -66,7 +68,21 @@ public class TestUft extends MockitoTest {
 		// check the while content
 		Assert.assertEquals(stepList.get(0).getStepStatus(), StepStatus.FAILED);
 		Assert.assertEquals(stepList.get(1).getStepStatus(), StepStatus.SUCCESS);
-		Assert.assertTrue(stepList.get(1).toString().contains("Permet de sélectionner le produit à traiter dans l'arbre produit")); 
+		Assert.assertEquals(stepList.get(1).toString(), "Step UFT: Choixproduit [Choixproduit]\n"
+			+ "  - Choix du produit\n"
+			+ "						: Permet de sélectionner le produit à traiter dans l'arbre produit\n"
+			+ "  - Step P9\n"
+			+ "						: Local Browser\n"
+			+ "    - Step P9 - Agence\n"
+			+ "							: Page\n"
+			+ "      - Step Onglets\n"
+			+ "								: Frame\n"
+			+ "        - Particulier.Exist\n"
+			+ "									: \"Object does not exist\"\n"
+			+ "      - Step Menu\n"
+			+ "								: Frame\n"
+			+ "        - Assurance.Click\n"
+			+ "									:"); 
 	}
 
 	/**
@@ -100,6 +116,8 @@ public class TestUft extends MockitoTest {
 
 		List<TestStep> testSteps = uft.readXmlResult(report);
 		Assert.assertEquals(testSteps.size(), 1);
+
+		Assert.assertEquals(((TestMessage) testSteps.get(0).getStepActions().get(0)).getMessageType(), MessageType.ERROR);
 	}
 	
 	/**
@@ -430,7 +448,7 @@ public class TestUft extends MockitoTest {
 		
 		// check a step is returned
 		Assert.assertNotNull(testSteps);
-		Assert.assertEquals(testSteps.get(0).getName(), "UFT: test1");
+		Assert.assertEquals(testSteps.get(0).getName(), "UFT: Risques [Risques]");
 		Assert.assertFalse(testSteps.toString().contains("<table>")); // check no HTML code is returned
 		
 	}
