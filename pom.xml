@@ -197,11 +197,6 @@
 				  </exclusions>
 			</dependency>
 			<dependency>
-			    <groupId>com.mashape.unirest</groupId> <!--  Kept for dependencies -->
-			    <artifactId>unirest-java</artifactId>
-			    <version>1.4.9</version>
-			</dependency>
-			<dependency>
 				<groupId>com.vdurmont</groupId>
 				<artifactId>semver4j</artifactId>
 				<version>3.1.0</version>
