@@ -35,6 +35,39 @@
 	<difference>
 		<className>**/connectors/extools/Uft</className>
 		<differenceType>7004</differenceType>
+		<method>void readXmlResult(java.lang.String, com.seleniumtests.reporter.logger.TestStep)</method>
+		<justification>need to provide one step for UFT step</justification>
+	</difference>
+	<difference>
+		<className>**/connectors/extools/Uft</className>
+		<differenceType>7004</differenceType>
+		<method>com.seleniumtests.reporter.logger.TestStep analyseOutput(java.lang.String, com.seleniumtests.reporter.logger.TestStep)</method>
+		<justification>need to provide one step for UFT step</justification>
+	</difference>
+	<difference>
+		<className>**/connectors/extools/Uft</className>
+		<differenceType>7006</differenceType>
+		<method>void readXmlResult(java.lang.String, com.seleniumtests.reporter.logger.TestStep)</method>
+		<to>java.util.List</to>
+		<justification>need to provide one step for UFT step</justification>
+	</difference>
+	<difference>
+		<className>**/connectors/extools/Uft</className>
+		<differenceType>7006</differenceType>
+		<method>com.seleniumtests.reporter.logger.TestStep executeScript(int, java.util.Map)</method>
+		<to>java.util.List</to>
+		<justification>need to provide one step for UFT step</justification>
+	</difference>
+	<difference>
+		<className>**/connectors/extools/Uft</className>
+		<differenceType>7006</differenceType>
+		<method>com.seleniumtests.reporter.logger.TestStep analyseOutput(java.lang.String, com.seleniumtests.reporter.logger.TestStep)</method>
+		<to>java.util.List</to>
+		<justification>need to provide one step for UFT step</justification>
+	</difference>
+	<difference>
+		<className>**/connectors/extools/Uft</className>
+		<differenceType>7004</differenceType>
 		<method>Uft(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.Map)</method>
 		<justification>useless</justification>
 	</difference>
