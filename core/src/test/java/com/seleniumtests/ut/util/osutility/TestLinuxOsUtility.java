@@ -18,8 +18,7 @@
 package com.seleniumtests.ut.util.osutility;
 
 import static com.seleniumtests.core.SeleniumTestsContext.CHROME_BINARY_PATH;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -29,21 +28,18 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
-import com.seleniumtests.core.SeleniumTestsContext;
-import com.seleniumtests.core.SeleniumTestsContextManager;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.openqa.selenium.Platform;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.Reporter;
-import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.OSUtility;
@@ -69,11 +65,12 @@ public class TestLinuxOsUtility extends MockitoTest {
 
     @BeforeClass(groups = {"ut"})
     public void isWindows() throws Exception {
-        PowerMockito.mockStatic(OSUtility.class);
-        when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.LINUX);
-        PowerMockito.doCallRealMethod().when(OSUtility.class, "refreshBrowserList", false);
-        PowerMockito.doCallRealMethod().when(OSUtility.class, "resetInstalledBrowsersWithVersion");
-        when(OSUtility.getInstalledBrowsersWithVersion(false)).thenCallRealMethod();
+    	PowerMockito.mockStatic(OSUtility.class);
+		when(OSUtility.getCharset()).thenCallRealMethod();
+		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.LINUX);
+		PowerMockito.doCallRealMethod().when(OSUtility.class, "refreshBrowserList", false);
+		PowerMockito.doCallRealMethod().when(OSUtility.class, "resetInstalledBrowsersWithVersion");
+		when(OSUtility.getInstalledBrowsersWithVersion(false)).thenCallRealMethod();
     }
 
     @Test(groups = {"ut"})
@@ -215,30 +212,33 @@ public class TestLinuxOsUtility extends MockitoTest {
     }
 
     @Test(groups = {"ut"})
-    public void testChromeSpecialBinaryInstallation() {
-        PowerMockito.mockStatic(OSCommand.class);
-        PowerMockito.mockStatic(Paths.class);
+	public void testChromeSpecialBinaryInstallation() {
+		PowerMockito.mockStatic(OSCommand.class);
+		PowerMockito.mockStatic(Paths.class);
 
-        when(Paths.get("/usr/local/bin/google-chrome")).thenReturn(path);
-        when(path.toFile()).thenReturn(browserFile);
-        when(browserFile.exists()).thenReturn(true);
+		when(Paths.get("/usr/local/bin/google-chrome")).thenReturn(path);
+		when(Paths.get("/usr/local/bin/google-chrome-binary")).thenReturn(path);
+		when(path.toFile()).thenReturn(browserFile);
+		when(browserFile.exists()).thenReturn(true);
 
-        when(OSUtility.getChromeVersion(anyString())).thenReturn("Google Chrome 57.0.2987.110");
-        when(OSUtility.extractChromeOrChromiumVersion(anyString())).thenReturn("57.0");
+		when(OSUtility.getChromeVersion("/usr/local/bin/google-chrome")).thenReturn("Google Chrome 57.0.2987.110");
+		when(OSUtility.getChromeVersion("/usr/local/bin/google-chrome-binary")).thenReturn("Google Chrome 66.6.6666.666");
 
-        when(OSCommand.executeCommandAndWait("which google-chrome")).thenReturn("/usr/local/bin/google-chrome");
-        when(OSCommand.executeCommandAndWait(new String[]{"/usr/local/bin/google-chrome", "--version"})).thenReturn("Google Chrome 57.0.2987.110");
+		when(OSCommand.executeCommandAndWait("which google-chrome")).thenReturn("/usr/local/bin/google-chrome");
+		when(OSCommand.executeCommandAndWait(new String[]{"/usr/local/bin/google-chrome", "--version"})).thenReturn("Google Chrome 57.0.2987.110");
 
-        when(OSCommand.executeCommandAndWait("which firefox")).thenReturn("/usr/bin/which: no firefox in (/usr/local/sbin)");
-        when(OSCommand.executeCommandAndWait("which iceweasel")).thenReturn("/usr/bin/which: no iceweasel in (/usr/local/sbin)");
-        when(OSCommand.executeCommandAndWait("which chromium-browser")).thenReturn("/usr/bin/which: no chromium-browser in (/usr/local/sbin)");
+		when(OSCommand.executeCommandAndWait("which firefox")).thenReturn("/usr/bin/which: no firefox in (/usr/local/sbin)");
+		when(OSCommand.executeCommandAndWait("which iceweasel")).thenReturn("/usr/bin/which: no iceweasel in (/usr/local/sbin)");
+		when(OSCommand.executeCommandAndWait("which chromium-browser")).thenReturn("/usr/bin/which: no chromium-browser in (/usr/local/sbin)");
 
-        SeleniumTestsContextManager.getThreadContext().setAttribute(CHROME_BINARY_PATH, "/usr/local/bin/google-chrome");
+		SeleniumTestsContextManager.getThreadContext().setAttribute(CHROME_BINARY_PATH, "/usr/local/bin/google-chrome-binary");
 
-        OSUtility.resetInstalledBrowsersWithVersion();
-        SeleniumTestsContextManager.getThreadContext().configureContext(Reporter.getCurrentTestResult());
-        Map<BrowserType, List<BrowserInfo>> browsers = new OSUtilityUnix().getInstalledBrowsersWithVersion();
+		OSUtility.resetInstalledBrowsersWithVersion();
+		SeleniumTestsContextManager.getThreadContext().configureContext(Reporter.getCurrentTestResult());
+		Map<BrowserType, List<BrowserInfo>> browsersBinary = new OSUtilityUnix().getInstalledBrowsersWithVersion(false);
 
-        assertEquals(browsers.size(), 3);
-    }
+		assertEquals(browsersBinary.size(), 3);
+		assertEquals(browsersBinary.get(BrowserType.CHROME).size(), 2);
+		browsersBinary.get(BrowserType.CHROME).get(0).getVersion();
+	}
 }
