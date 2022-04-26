@@ -130,10 +130,9 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     		+ "   arguments[0].fireEvent('ondblclick');"
     		+ "}";
     
-    
-    protected WebDriver driver;
-    protected WebElement element = null;
-    protected SearchContext searchContext = null; // if searchContext is a WebElement, then, element and searchContext will be the same. Used to store ShadowRoot which are not WebElements
+	private ThreadLocal<WebDriver> driver = new ThreadLocal<>();
+	private ThreadLocal<WebElement> element = new ThreadLocal<>();
+    protected ThreadLocal<SearchContext> searchContext = new ThreadLocal<>(); // if searchContext is a WebElement, then, element and searchContext will be the same. Used to store ShadowRoot which are not WebElements
     protected String label = null;
     protected HtmlElement parent = null;
     protected FrameElement frameElement = null;
@@ -289,8 +288,8 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public void click() {
         findElement(true);
         
-        outlineElement(element);
-        element.click();   
+		outlineElement(getRealElementNoSearch());
+		getRealElementNoSearch().click();
     }
     
     /**
@@ -300,9 +299,9 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public void clickAction() {
     	findElement(true);
 
-        outlineElement(element);
+		outlineElement(getRealElementNoSearch());
     	try {
-            new Actions(driver).click(element).perform();
+			new Actions(getDriver()).click(getRealElementNoSearch()).perform();
         } catch (InvalidElementStateException e) {
             logger.error(e);
         }
@@ -315,14 +314,71 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public void doubleClickAction() {
     	findElement(true);
 
-        outlineElement(element);
+		outlineElement(getRealElementNoSearch());
     	try {
-            new Actions(driver).doubleClick(element).perform();
+			new Actions(getDriver()).doubleClick(getRealElementNoSearch()).perform();
         } catch (InvalidElementStateException e) {
             logger.error(e);
         }
     }
     
+	@ReplayOnError
+	public void clickMouse() {
+
+		Rectangle viewportPosition = detectViewPortPosition();
+
+		// always scroll to element so that we can click on it with mouse
+		setScrollToElementBeforeAction(true);
+		findElement(true);
+
+		outlineElement(getRealElementNoSearch());
+
+		Rectangle elementRect = getRect();
+		Point scrollPosition = ((CustomEventFiringWebDriver) getDriver()).getScrollPosition();
+
+		CustomEventFiringWebDriver.leftClicOnDesktopAt(true,
+				elementRect.x + elementRect.width / 2 + viewportPosition.x - scrollPosition.x,
+				elementRect.y + elementRect.height / 2 + viewportPosition.y - scrollPosition.y,
+				SeleniumTestsContextManager.getThreadContext().getRunMode(),
+				SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector());
+
+	}
+
+	private File getDesktopScreenshotFile() {
+		ScreenshotUtil screenshotUtil = new ScreenshotUtil(); // update driver
+		return screenshotUtil.capture(SnapshotTarget.MAIN_SCREEN, File.class, true);
+	}
+
+	private File getViewportScreenshotFile() {
+		ScreenshotUtil screenshotUtil = new ScreenshotUtil(); // update driver
+		return screenshotUtil.capture(SnapshotTarget.VIEWPORT, File.class, true);
+	}
+
+	private Rectangle detectViewPortPosition() {
+		BufferedImage image;
+		try {
+			image = ImageProcessor.loadFromFile(getViewportScreenshotFile());
+
+			BufferedImage croppedImage = ImageProcessor.cropImage(image, 0, 0, image.getWidth(), 150);
+			File cropScreenshotFile = File.createTempFile("img", ".png");
+			ImageIO.write(croppedImage, "png", cropScreenshotFile);
+
+			File desktopScreenshotFile = getDesktopScreenshotFile();
+			if (desktopScreenshotFile == null) {
+				throw new ScreenshotException("Desktop screenshot does not exist");
+			}
+
+			ImageDetector imageDetector = new ImageDetector(desktopScreenshotFile, cropScreenshotFile, 0.2);
+			imageDetector.detectExactZoneWithoutScale();
+			org.openqa.selenium.Rectangle detectedRectangle = imageDetector.getDetectedRectangle();
+			return new Rectangle(detectedRectangle.x, detectedRectangle.y, detectedRectangle.height,
+					detectedRectangle.width);
+
+		} catch (IOException e) {
+			throw new ScreenshotException("Error getting position of viewport: " + e.getMessage());
+		}
+	}
+
     /**
      * Click element in native way by Actions.
      *
@@ -336,15 +392,14 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     @ReplayOnError
     public void clickAt(int xOffset, int yOffset) {
     	findElement();
-		((CustomEventFiringWebDriver)driver).scrollToElement(element, yOffset);
+		((CustomEventFiringWebDriver) getDriver()).scrollToElement(getRealElementNoSearch(), yOffset);
 
-        outlineElement(element);
+		outlineElement(getRealElementNoSearch());
         try {
-            new Actions(driver).moveToElement(element, xOffset, yOffset).click()
-                .perform();
+			new Actions(getDriver()).moveToElement(getRealElementNoSearch(), xOffset, yOffset).click().perform();
         } catch (InvalidElementStateException e) {
             logger.error(e);
-            element.click();
+			getRealElementNoSearch().click();
         }
     }
 
@@ -358,7 +413,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	}
     	
         findElement(true);
-        outlineElement(element);
+		outlineElement(getRealElementNoSearch());
         DriverConfig driverConfig = WebUIDriver.getWebUIDriver(false).getConfig();
 
         String mouseOverScript;
@@ -371,7 +426,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
             	mouseOverScript = "if(document.createEvent){var evObj = document.createEvent('MouseEvents');evObj.initEvent('mouseover', true, false); arguments[0].dispatchEvent(evObj);} else if(document.createEventObject) { arguments[0].fireEvent('onmouseover');}";
             }
         
-        executeScript(mouseOverScript, element);
+		executeScript(mouseOverScript, getRealElementNoSearch());
         WaitHelper.waitForSeconds(2);
         
         String clickScript = "";
@@ -385,14 +440,14 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         	clickScript = "if(document.createEvent){var evObj = document.createEvent('MouseEvents');evObj.initEvent('click', true, false); arguments[0].dispatchEvent(evObj);} else if(document.createEventObject) { arguments[0].fireEvent('onclick');}";
         }
 
-        executeScript(clickScript, element);
+		executeScript(clickScript, getRealElementNoSearch());
         WaitHelper.waitForSeconds(2);
     }
     
     @ReplayOnError
     public void simulateDoubleClick() {
         findElement(true);
-        outlineElement(element);
+		outlineElement(getRealElementNoSearch());
         
         DriverConfig driverConfig = WebUIDriver.getWebUIDriver(false).getConfig();
         
@@ -407,7 +462,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
             	doubleClickScript = JS_CLICK_DOUBLE;
             }
         
-        executeScript(doubleClickScript, element);
+		executeScript(doubleClickScript, getRealElementNoSearch());
 
     }
     
@@ -416,13 +471,13 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	findElement(true);
     		
     	// click on element before sending keys through keyboard
-    	element.click();
-        executeScript("arguments[0].focus();", element);
+		getRealElementNoSearch().click();
+		executeScript("arguments[0].focus();", getRealElementNoSearch());
 
         if (keysToSend.length == 0) {
-        	executeScript("arguments[0].value='';", element);
+        	executeScript("arguments[0].value='';", getRealElementNoSearch());
         } else {
-        	executeScript(String.format("arguments[0].value='%s';", keysToSend[0].toString()), element);
+        	executeScript(String.format("arguments[0].value='%s';", keysToSend[0].toString()), getRealElementNoSearch());
         }
 
     }
@@ -433,7 +488,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         executeScript(
             "function simulate(f,c,d,e){var b,a=null;for(b in eventMatchers)if(eventMatchers[b].test(c)){a=b;break}if(!a)return!1;document.createEvent?(b=document.createEvent(a),a==\"HTMLEvents\"?b.initEvent(c,!0,!0):b.initMouseEvent(c,!0,!0,document.defaultView,0,d,e,d,e,!1,!1,!1,!1,0,null),f.dispatchEvent(b)):(a=document.createEventObject(),a.detail=0,a.screenX=d,a.screenY=e,a.clientX=d,a.clientY=e,a.ctrlKey=!1,a.altKey=!1,a.shiftKey=!1,a.metaKey=!1,a.button=1,f.fireEvent(\"on\"+c,a));return!0} var eventMatchers={HTMLEvents:/^(?:load|unload|abort|errorLogger|select|change|submit|reset|focus|blur|resize|scroll)$/,MouseEvents:/^(?:click|dblclick|mouse(?:down|up|over|move|out))$/}; " +
             "simulate(arguments[0],\"mousemove\",arguments[1],arguments[2]);",
-            element,
+            getRealElementNoSearch(),
             x, 
             y);
 
@@ -462,7 +517,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	
     	// find the root element
     	findElement(false, false);
-    	List<WebElement> elements = element.findElements(by);
+		List<WebElement> elements = getRealElementNoSearch().findElements(by);
     	
     	// throw exception so that behavior is the same as with 'findElements()' call which retries search
     	if (elements.isEmpty()) {
@@ -483,7 +538,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	// find the root element
     	findElement(false, false);
     	List<WebElement> htmlElements = new ArrayList<>();
-    	List<WebElement> elements = element.findElements(childBy);
+		List<WebElement> elements = getRealElementNoSearch().findElements(childBy);
     	
     	// throw exception so that behavior is the same as with 'findElements()' call which retries search
     	if (elements.isEmpty()) {
@@ -592,7 +647,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public void changeCssAttribute(String cssProperty, String cssPropertyValue) {
     	findElement(false, false);
     	
-		changeCssAttribute(element, cssProperty, cssPropertyValue);
+		changeCssAttribute(getRealElementNoSearch(), cssProperty, cssPropertyValue);
 	}
     
     /**
@@ -604,7 +659,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public Object executeScript(String javascript, Object... args) {
     	findElement(false, false);
     	
-    	return executeScript(javascript, element, args); 
+		return executeScript(javascript, getRealElementNoSearch(), args);
     }
     
 
@@ -628,7 +683,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	if (!javascript.contains("arguments[0]")) {
     		throw new ScenarioException("JS script MUST contain 'arguments[0]' as reference");
     	}
-    	return ((JavascriptExecutor) driver).executeScript(javascript, element, args); 
+		return ((JavascriptExecutor) getDriver()).executeScript(javascript, element, args);
     }
     
 
@@ -657,7 +712,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	}
     	
     	// if a parent is defined, search for it before getting the sub element
-    	driver = updateDriver();
+		setDriver(updateDriver());
         if (parent != null) {
         	parent.findElement(false, false);
         	
@@ -678,28 +733,28 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         		
         	}
         	
-        	searchContext = findSeleniumElement(parent.searchContext, elementInfo);
+        	searchContext.set(findSeleniumElement(parent.searchContext.get(), elementInfo));
         	
 
         } else {
-        	searchContext = findSeleniumElement(driver, elementInfo);
+        	searchContext.set(findSeleniumElement(getDriver(), elementInfo));
         }
         
         try {
-        	element = (WebElement)searchContext;
+        	setElement((WebElement)searchContext.get());
         	
         	if (makeVisible) { 
-            	makeWebElementVisible(element);
+            	makeWebElementVisible(getRealElementNoSearch());
             	
             	if (scrollToElementBeforeAction) {
-            		((CustomEventFiringWebDriver)driver).scrollToElement(element, OPTIMAL_SCROLLING);
+            		((CustomEventFiringWebDriver)getDriver()).scrollToElement(getRealElementNoSearch(), OPTIMAL_SCROLLING);
             	}
             }
             
             // wait for element to be really visible. should be done only for actions on element
             if (waitForVisibility && makeVisible) {
             	try {
-            		new WebDriverWait(driver, Duration.ofSeconds(1)).until(ExpectedConditions.visibilityOf(element));
+            		new WebDriverWait(getDriver(), Duration.ofSeconds(1)).until(ExpectedConditions.visibilityOf(getRealElementNoSearch()));
             	} catch (TimeoutException e) {
             		logger.error(String.format("Element %s has never been made visible", toString()));
             	}
@@ -816,12 +871,12 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 			Integer idx = frameEl.getElementIndex() == null ? 0: frameEl.getElementIndex();
 			WebElement frameWebElement;
 			try {
-				frameWebElement = driver.findElements(frameEl.getBy()).get(idx);
+				frameWebElement = getDriver().findElements(frameEl.getBy()).get(idx);
 			} catch (IndexOutOfBoundsException e) {
 				throw new NoSuchFrameException(String.format("Frame %s with index %d has not been found", frameEl, idx));
 			}
-			((CustomEventFiringWebDriver)driver).scrollToElement(frameWebElement, -20);		
-			driver.switchTo().frame(frameWebElement);
+			((CustomEventFiringWebDriver) getDriver()).scrollToElement(frameWebElement, -20);
+			getDriver().switchTo().frame(frameWebElement);
 		}
     }
     
@@ -834,53 +889,57 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * outlines the element before acting on it
      * Element must have been searched before
      */
-    protected void outlineElement(WebElement element) {
-    	if (element == null || !SeleniumTestsContextManager.isWebTest() || !SeleniumTestsContextManager.getThreadContext().getDebug().contains(DebugMode.GUI)) {
+	protected void outlineElement(WebElement localElement) {
+		if (localElement == null || !SeleniumTestsContextManager.isWebTest()
+				|| !SeleniumTestsContextManager.getThreadContext().getDebug().contains(DebugMode.GUI)) {
     		return;
     	}
     	
-    	changeCssAttribute(element, "outline", "2px solid red");
+		changeCssAttribute(localElement, "outline", "2px solid red");
     	WaitHelper.waitForMilliSeconds(250);
-    	changeCssAttribute(element, "outline", "");
+		changeCssAttribute(localElement, "outline", "");
     }
     
     /**
 	 * Make element visible. Sometimes useful when real elements are backed by an image element
 	 */
-	protected void makeWebElementVisible(WebElement element) {
+	protected void makeWebElementVisible(WebElement localElement) {
 		if (SeleniumTestsContextManager.isWebTest()) {
-			if (element.isDisplayed()) {
+			if (localElement.isDisplayed()) {
 				return;
 			}
 			try {
 				
-				if (element.getLocation().x < 0) {
-					Long viewportHeight = (Long)((JavascriptExecutor) driver).executeScript("return document.documentElement.clientHeight");
-					Integer heightPosition = element.getLocation().y > viewportHeight ? element.getLocation().y - viewportHeight.intValue(): element.getLocation().y;
-					changeCssAttribute(element, "left", "20px");
-					changeCssAttribute(element, "top", heightPosition + "px"); 
-					changeCssAttribute(element, "position", "inherit");
+				if (localElement.getLocation().x < 0) {
+					Long viewportHeight = (Long) ((JavascriptExecutor) getDriver())
+							.executeScript("return document.documentElement.clientHeight");
+					Integer heightPosition = localElement.getLocation().y > viewportHeight
+							? localElement.getLocation().y - viewportHeight.intValue()
+							: localElement.getLocation().y;
+					changeCssAttribute(localElement, "left", "20px");
+					changeCssAttribute(localElement, "top", heightPosition + "px");
+					changeCssAttribute(localElement, "position", "inherit");
 				}
-				if (Boolean.TRUE.equals(executeScript("return getComputedStyle(arguments[0]).display === 'none'", element))) {
-					changeCssAttribute(element, "display", "block");
+				if (Boolean.TRUE.equals(executeScript("return getComputedStyle(arguments[0]).display === 'none'", localElement))) {
+					changeCssAttribute(localElement, "display", "block");
 				}
-				if (Boolean.TRUE.equals(executeScript("return getComputedStyle(arguments[0]).visibility !== 'visible'", element))) {
-					changeCssAttribute(element, "visibility", "visible");
+				if (Boolean.TRUE.equals(executeScript("return getComputedStyle(arguments[0]).visibility !== 'visible'", localElement))) {
+					changeCssAttribute(localElement, "visibility", "visible");
 				}
-				if (Boolean.TRUE.equals(executeScript("return getComputedStyle(arguments[0]).opacity === '0'", element))) {
-					changeCssAttribute(element, "opacity", "1");
+				if (Boolean.TRUE.equals(executeScript("return getComputedStyle(arguments[0]).opacity === '0'", localElement))) {
+					changeCssAttribute(localElement, "opacity", "1");
 				}
 
-				changeCssAttribute(element, "zIndex", "100000");
+				changeCssAttribute(localElement, "zIndex", "100000");
 			} catch (Exception e) {
 				return;
 			}
 				
 			// wait for element to be displayed
 			try {
-				new WebDriverWait(driver, Duration.ofSeconds(1)).until(ExpectedConditions.visibilityOf(element));
+				new WebDriverWait(getDriver(), Duration.ofSeconds(1)).until(ExpectedConditions.visibilityOf(localElement));
 			} catch (ElementNotVisibleException e) {
-				scenarioLogger.info(String.format("element %s not visible", element));
+				scenarioLogger.info(String.format("element %s not visible", localElement));
 			} catch (Exception e) {
 				logger.warn("Could not make element visible", e);
 			}
@@ -894,7 +953,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	 */	
 	public void scrollToElement(int yOffset) {
 		findElement();
-		((CustomEventFiringWebDriver)driver).scrollToElement(element, yOffset);		
+		((CustomEventFiringWebDriver) getDriver()).scrollToElement(getRealElementNoSearch(), yOffset);
 	}
 
     /**
@@ -910,9 +969,9 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 
         // issue #167: if we have a parent, search elements inside it
         if (parent != null) {
-        	return parent.element.findElements(by);
+			return parent.getRealElementNoSearch().findElements(by);
         } else {
-        	return driver.findElements(by);
+			return getDriver().findElements(by);
         }
     }
 
@@ -927,7 +986,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public String getAttribute(String name) {
         findElement(false, false);
 
-        return element.getAttribute(name);
+		return getRealElementNoSearch().getAttribute(name);
     }
 	
 	@Override
@@ -991,37 +1050,38 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public String getCssValue(String propertyName) {
         findElement(false, false);
 
-        return element.getCssValue(propertyName);
+		return getRealElementNoSearch().getCssValue(propertyName);
     }
 
     /**
      * Get underlying WebDriver.
      */
     protected WebDriver updateDriver() {
-    	driver = WebUIDriver.getWebDriver(false);
-    	if (driver == null) {
+		setDriver(WebUIDriver.getWebDriver(false));
+		if (getDriver() == null) {
     		throw new ScenarioException("Driver has not already been created");
     	}
-    	return driver;
+		return getDriver();
     }
     
     public WebDriver getDriver() {
-    	return driver;
+		return driver.get();
     }
 
     public void setDriver(WebDriver driver) {
-		this.driver = driver;
+		this.driver.set(driver);
 	}
 
 	/**
      * Returns the underlying WebDriver WebElement.
+	 * Search is always done
      *
      * @return
      */
     @ReplayOnError
     public WebElement getElement() {
     	findElement(true);
-        return element;
+		return getRealElementNoSearch();
     }
 
     /**
@@ -1037,7 +1097,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public String getEval(String script) {
         findElement(false, false);
         
-        return (String) ((JavascriptExecutor) driver).executeScript(script, element);
+		return (String) ((JavascriptExecutor) getDriver()).executeScript(script, getRealElementNoSearch());
     }
 
     /**
@@ -1049,7 +1109,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public int getHeight() {
         findElement(false, false);
 
-        return element.getSize().getHeight();
+		return getRealElementNoSearch().getSize().getHeight();
     }
 
     /**
@@ -1071,7 +1131,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public Point getLocation() {
         findElement(false, false);
 
-        return element.getLocation();
+		return getRealElementNoSearch().getLocation();
     }
     
 
@@ -1079,7 +1139,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	@ReplayOnError
 	public Rectangle getRect() {
 		findElement(false, false);
-		return new Rectangle(element.getLocation(), element.getSize());
+		return new Rectangle(getRealElementNoSearch().getLocation(), getRealElementNoSearch().getSize());
 	}
 
     /**
@@ -1092,7 +1152,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public Dimension getSize() {
         findElement(false, false);
 
-        return element.getSize();
+		return getRealElementNoSearch().getSize();
     }
 
     /**
@@ -1105,7 +1165,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public String getTagName() {
         findElement(false, false);
 
-        return element.getTagName();
+		return getRealElementNoSearch().getTagName();
     }
 
     /**
@@ -1118,7 +1178,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public String getText() {
         findElement(false, false);
 
-        return element.getText();
+		return getRealElementNoSearch().getText();
     }
 
     /**
@@ -1130,7 +1190,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public String getValue() {
         findElement(false, false);
 
-        return element.getAttribute("value");
+		return getRealElementNoSearch().getAttribute("value");
     }
 
     /**
@@ -1142,7 +1202,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public int getWidth() {
         findElement(false, false);
 
-        return element.getSize().getWidth();
+		return getRealElementNoSearch().getSize().getWidth();
     }
 
     /**
@@ -1166,8 +1226,8 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     @ReplayOnError
     public boolean isDisplayedRetry() {
     	findElement(false, false);
-        outlineElement(element);
-        return element.isDisplayed();
+		outlineElement(getRealElementNoSearch());
+		return getRealElementNoSearch().isDisplayed();
     }
 
     /**
@@ -1201,6 +1261,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     		waitForPresent(timeout);
     		return isDisplayed();
     	} catch (TimeoutException e) {
+			scenarioLogger.warn(String.format("Element %s is not present", getBy()));
     		return false;
     	}
     }
@@ -1219,7 +1280,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public boolean isEnabled() {
         findElement(false, false);
 
-        return element.isEnabled();
+		return getRealElementNoSearch().isEnabled();
     }
 
     /**
@@ -1232,7 +1293,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public boolean isSelected() {
         findElement(false, false);
 
-        return element.isSelected();
+		return getRealElementNoSearch().isSelected();
     }
 
     /**
@@ -1272,9 +1333,8 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public void simulateMouseOver() {
         findElement(true); // search element first because we want it to be visible
 
-        String mouseOverScript =
-            "if(document.createEvent){var evObj = document.createEvent('MouseEvents');evObj.initEvent('mouseover', true, false); arguments[0].dispatchEvent(evObj);} else if(document.createEventObject) { arguments[0].fireEvent('onmouseover');}";
-        executeScript(mouseOverScript, element);
+		String mouseOverScript = "if(document.createEvent){var evObj = document.createEvent('MouseEvents');evObj.initEvent('mouseover', true, false); arguments[0].dispatchEvent(evObj);} else if(document.createEventObject) { arguments[0].fireEvent('onmouseover');}";
+		executeScript(mouseOverScript, getRealElementNoSearch());
     }
     
     @Override
@@ -1290,9 +1350,9 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     }
     
     protected void blur() {
-    	if (SeleniumTestsContextManager.isWebTest() && "input".equalsIgnoreCase(element.getTagName())) {
+		if (SeleniumTestsContextManager.isWebTest() && "input".equalsIgnoreCase(getRealElementNoSearch().getTagName())) {
     		try {
-    			executeScript("arguments[0].blur();", element);
+				executeScript("arguments[0].blur();", getRealElementNoSearch());
     		} catch (Exception e) {	
     			logger.error("Error doing 'blur'", e);
     		}
@@ -1308,7 +1368,22 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     @ReplayOnError
     public void sendKeysAction(CharSequence... keysToSend) {
     	findElement(true);
-    	new Actions(driver).sendKeys(element, keysToSend).build().perform();
+		new Actions(getDriver()).sendKeys(getRealElementNoSearch(), keysToSend).build().perform();
+	}
+
+	/**
+	 * Send keys using real keyboard
+	 * 
+	 * @param keysToSend
+	 */
+	public void sendKeysKeyboard(CharSequence... keysToSend) {
+		clickMouse();
+		for (CharSequence keys : keysToSend) {
+			CustomEventFiringWebDriver.writeToDesktop(keys.toString(),
+					SeleniumTestsContextManager.getThreadContext().getRunMode(),
+					SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector());
+		}
+
     }
 
     /**
@@ -1323,9 +1398,9 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         findElement(true);
         
         if (clear) {
-        	element.clear();
+			getRealElementNoSearch().clear();
         } 
-        element.sendKeys(keysToSend);
+		getRealElementNoSearch().sendKeys(keysToSend);
         
         if (blurAfter) {
         	blur();
@@ -1336,7 +1411,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     @ReplayOnError
     public void clear() {
     	findElement(true);
-    	element.clear();
+		getRealElementNoSearch().clear();
     }
 
     /**
@@ -1358,9 +1433,9 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 		findElement(false, false);
 		String attributeValue;
 		if ("text".equals(attributeName)) {
-			attributeValue = element.getText();
+			attributeValue = getRealElementNoSearch().getText();
 		} else {
-			attributeValue = element.getAttribute(attributeName);
+			attributeValue = getRealElementNoSearch().getAttribute(attributeName);
 		}
 
 		Matcher matcher = pattern.matcher(attributeValue);
@@ -1434,11 +1509,11 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * findElement returns a EventFiringWebElement which is not compatible with MobileElement
      * Get the unerlying element and return it
      */
-    private WebElement getUnderlyingElement(WebElement element) {
+	private WebElement getUnderlyingElement(WebElement localElement) {
     	try {
-    		return (RemoteWebElement)((Decorated<WebElement>)element).getOriginal();
+    		return (RemoteWebElement)((Decorated<WebElement>)localElement).getOriginal();
     	} catch (ClassCastException e) {
-    		return element;
+    		return localElement;
     	}
     	
     	
@@ -1448,12 +1523,12 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public Point getCenter() {
     	try {
     		checkForMobile();
-            Point upperLeft = element.getLocation();
-            Dimension dimension = element.getSize();
+            Point upperLeft = getRealElementNoSearch().getLocation();
+            Dimension dimension = getRealElementNoSearch().getSize();
             Point center = new Point(upperLeft.x + dimension.width / 2, upperLeft.y + dimension.height / 2);
     		return center;
     	} catch (ScenarioException e) {
-    		Rectangle rectangle = element.getRect();
+			Rectangle rectangle = getRealElementNoSearch().getRect();
     		return new Point(rectangle.x + rectangle.width / 2, rectangle.y + rectangle.height / 2);
     	}	
     }
@@ -1461,7 +1536,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     @ReplayOnError
     public void pinch() {
     	PerformsTouchActions performTouchActions = checkForMobile();
-    	WebElement mobElement = getUnderlyingElement(element);
+    	WebElement mobElement = getUnderlyingElement(getRealElementNoSearch());
     	
     	// code taken from appium
 		MultiTouchAction multiTouch = new MultiTouchAction(performTouchActions);
@@ -1491,7 +1566,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      */
     @ReplayOnError
     public void swipe(int xOffset, int yOffset, int xMove, int yMove) {
-    	WebElement mobElement = getUnderlyingElement(element);
+    	WebElement mobElement = getUnderlyingElement(getRealElementNoSearch());
         
         createTouchAction().press(ElementOption.element(mobElement, xOffset, yOffset))
 			.waitAction()
@@ -1507,7 +1582,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     @ReplayOnError
     public void tap(int fingers, int duration) {
     	PerformsTouchActions performTouchActions = checkForMobile();
-    	WebElement mobElement = getUnderlyingElement(element);
+    	WebElement mobElement = getUnderlyingElement(getRealElementNoSearch());
     
     	// code from appium
     	MultiTouchAction multiTouch = new MultiTouchAction(performTouchActions);
@@ -1523,7 +1598,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     @ReplayOnError
     public void zoom() {
     	PerformsTouchActions performTouchActions = checkForMobile();
-        WebElement mobElement = getUnderlyingElement(element);
+        WebElement mobElement = getUnderlyingElement(getRealElementNoSearch());
     	
     	MultiTouchAction multiTouch = new MultiTouchAction(performTouchActions);
 
@@ -1571,7 +1646,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     
 	public void setImplicitWaitTimeout(final double timeout) {
         try {
-            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds((int)timeout));
+        	getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds((int)timeout));
         } catch (Exception ex) {
         	logger.error(ex);
         }
@@ -1579,7 +1654,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	
 	public void setImplicitWaitTimeout(int timeout, TemporalUnit unit) {
 		try {
-			driver.manage().timeouts().implicitlyWait(Duration.of((long)timeout, unit));
+			getDriver().manage().timeouts().implicitlyWait(Duration.of((long)timeout, unit));
 		} catch (Exception ex) {
 			logger.error(ex);
 		}
@@ -1595,7 +1670,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public void waitForPresent(int timeout) {
     	
     	// refresh driver
-    	driver = updateDriver();
+		setDriver(updateDriver());
     	
     	try {
     		setImplicitWaitTimeout(510, ChronoUnit.MILLIS);
@@ -1605,7 +1680,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	    	
 	    	while (end.isAfter(clock.instant())) {
 	    		try {
-		    		WebElement elt = new WebDriverWait(driver, Duration.ofMillis(0)).ignoring(ConfigurationException.class, ScenarioException.class).until(ExpectedConditionsC.presenceOfElementLocated(this));
+		    		WebElement elt = new WebDriverWait(getDriver(), Duration.ofMillis(0)).ignoring(ConfigurationException.class, ScenarioException.class).until(ExpectedConditionsC.presenceOfElementLocated(this));
 		            outlineElement(elt);
 		    		return;
 	    		} catch (TimeoutException e) {
@@ -1627,7 +1702,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	    	
 	    	while (end.isAfter(clock.instant())) {
 	    		try {
-	    			new WebDriverWait(driver, Duration.ofSeconds(timeout)).ignoring(ConfigurationException.class, ScenarioException.class).until(condition);
+	    			new WebDriverWait(getDriver(), Duration.ofSeconds(timeout)).ignoring(ConfigurationException.class, ScenarioException.class).until(condition);
 		    		return;
 	    		} catch (TimeoutException e) {
 	    			// nothing to do
@@ -1675,8 +1750,8 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	@Override
 	public <X> X getScreenshotAs(OutputType<X> target) {
 		findElement();
-		if (((HasCapabilities) driver).getCapabilities().getCapability(CapabilityType.TAKES_SCREENSHOT) != null) {
-			return element.getScreenshotAs(target);
+		if (((HasCapabilities) getDriver()).getCapabilities().getCapability(CapabilityType.TAKES_SCREENSHOT) != null) {
+			return getRealElementNoSearch().getScreenshotAs(target);
 		} else {
 			return null;
 		}
@@ -1686,19 +1761,19 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	@ReplayOnError
 	public void submit() {
 		findElement(true);
-		element.submit();
+		getRealElementNoSearch().submit();
 	}
 
 	@Override
 	@ReplayOnError
 	public Coordinates getCoordinates() {
 		findElement(false, false);
-		return ((Locatable)element).getCoordinates();
+		return ((Locatable) getRealElementNoSearch()).getCoordinates();
 	}
 	
 	public Map<String, Object> toJson() {
 		findElement();
-		return ((RemoteWebElement)getUnderlyingElement(element)).toJson();
+		return ((RemoteWebElement) getUnderlyingElement(getRealElementNoSearch())).toJson();
 	}
 	
 	public HtmlElement getParent() {
@@ -1718,7 +1793,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	 * @param element
 	 */
 	public void setElement(WebElement element) {
-		this.element = element;
+		this.element.set(element);
 	}
 
 	public Integer getElementIndex() {
@@ -1726,15 +1801,24 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	}
 	
 	/**
-	 * Returns the real web element. 
-	 * issue #313: Search the element if it has not been searched before
+	 * Directly returns the real element even if it has not been searched
+	 * @return
+	 */
+	protected WebElement getRealElementNoSearch() {
+		return element.get();
+	}
+
+	/**
+	 * Returns the real web element. issue #313: Search the element if it has not
+	 * been searched before
+	 * 
 	 * @return
 	 */
 	public WebElement getRealElement() {
-		if (element == null) {
+		if (getRealElementNoSearch() == null) {
 			findElement();
 		}
-		return element;
+		return getRealElementNoSearch();
 	}
 
 	/**

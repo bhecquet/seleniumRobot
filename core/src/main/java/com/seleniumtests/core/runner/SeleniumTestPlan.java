@@ -21,12 +21,16 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.helper.CSVHelper;
+import com.seleniumtests.util.helper.ExcelHelper;
 
 /**
  * This class initializes context, sets up and tears down and clean up drivers An STF test should extend this class.
@@ -41,11 +45,16 @@ public  class SeleniumTestPlan extends SeleniumRobotTestPlan {
 	
 
 	private File getDatasetFile(Method testMethod) {
-		File datasetFile = Paths.get(robotConfig().getApplicationDataPath(), "dataset", robotConfig().getTestEnv(), testMethod.getName() + ".csv").toFile();
-    	if (!datasetFile.exists()) {
-    		throw new ConfigurationException(String.format("Dataset file %s does not exist", datasetFile));
-    	}
-    	return datasetFile;
+		File csvDatasetFile = Paths.get(robotConfig().getApplicationDataPath(), "dataset", robotConfig().getTestEnv(), testMethod.getName() + ".csv").toFile();
+		File xlsxDatasetFile = Paths.get(robotConfig().getApplicationDataPath(), "dataset", robotConfig().getTestEnv(), testMethod.getName() + ".xlsx").toFile();
+    	
+		if (csvDatasetFile.exists()) {
+			return csvDatasetFile;
+		} else if (xlsxDatasetFile.exists()) {
+			return xlsxDatasetFile;
+		} else {
+			throw new ConfigurationException(String.format("Dataset file %s or %s does not exist", csvDatasetFile, xlsxDatasetFile));
+		}
 	}
 	
 	/**
@@ -57,7 +66,22 @@ public  class SeleniumTestPlan extends SeleniumRobotTestPlan {
 	 */
     @DataProvider(name = "dataset")
     public Object[][] dataset(Method testMethod) throws IOException {	
-        return CSVHelper.read(getDatasetFile(testMethod), ",");
+    	File dataset = getDatasetFile(testMethod);
+    	if (dataset.getName().toLowerCase().endsWith("csv")) {
+    		return CSVHelper.read(dataset, ",");
+    	} else {
+    		List<Map<String, String>> data = new ExcelHelper(dataset).readSheet(0, false);
+    		return reformatData(data);
+    	}
+    }
+    
+    private Object[][] reformatData(List<Map<String, String>> data) {
+    	List<String[]> formattedData = new ArrayList<>();
+    	for (Map<String, String> dataLine: data) {
+    		formattedData.add((String[]) dataLine.values().toArray(new String[] {}));
+    	}
+    	String[][] result = new String[formattedData.size()][];
+    	return formattedData.toArray(result);
     }
     
     /**
@@ -69,7 +93,13 @@ public  class SeleniumTestPlan extends SeleniumRobotTestPlan {
 	 */
     @DataProvider(name = "datasetWithHeader")
     public Object[][] datasetWithHeader(Method testMethod) throws IOException {
-    	return CSVHelper.readWithHeader(getDatasetFile(testMethod), ",");
+    	File dataset = getDatasetFile(testMethod);
+    	if (dataset.getName().toLowerCase().endsWith("csv")) {
+    		return CSVHelper.readWithHeader(getDatasetFile(testMethod), ",");
+    	} else {
+    		List<Map<String, String>> data = new ExcelHelper(dataset).readSheet(0, true);
+    		return reformatData(data);
+    	}
     }
     
     @DataProvider(name = "datasetSemicolon")

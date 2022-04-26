@@ -658,6 +658,13 @@ public class ByC extends By {
 			if (bies.length == 0) {
 				throw new ScenarioException("At least on locator must be provided for And");
 			}
+
+            for (By by : bies) {
+                if (by == null) {
+                    throw new IllegalArgumentException("Cannot find elements with a null element");
+                }
+            }
+
 			this.bies = bies;
 		}
 		
@@ -797,6 +804,13 @@ public class ByC extends By {
 			if (bies.length == 0) {
 				throw new ScenarioException("At least on locator must be provided");
 			}
+
+            for (By by : bies) {
+                if (by == null) {
+                    throw new IllegalArgumentException("Cannot find elements with a null element");
+                }
+            }
+
 			this.bies = bies;
 		}
 		

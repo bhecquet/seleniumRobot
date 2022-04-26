@@ -1,6 +1,7 @@
 package com.seleniumtests.util.imaging;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.seleniumtests.connectors.selenium.fielddetector.Field;
@@ -17,6 +18,8 @@ public class StepReferenceComparator {
 
 	private File stepSnapshot;
 	private File referenceSnapshot;
+	private List<Label> missingLabels = new ArrayList<>();
+	private List<Field> missingFields = new ArrayList<>();
 	
 	public StepReferenceComparator(File stepSnapshot, File referenceSnapshot) {
 		this.stepSnapshot = stepSnapshot;
@@ -40,12 +43,16 @@ public class StepReferenceComparator {
 		
 		int totalLabels = 0;
 		int matchedLabels = 0;
+		
+		missingLabels = new ArrayList<>(referenceSnapshotLabels);
+		missingFields = new ArrayList<>(referenceSnapshotFields);
 
 		for (Label referenceSnapshotLabel: referenceSnapshotLabels) {
 
 			totalLabels++;
 			for (Label stepSnapshotLabel: stepSnapshotLabels) {
 				if (stepSnapshotLabel.match(referenceSnapshotLabel)) {
+					missingLabels.remove(referenceSnapshotLabel);
 					matchedLabels++;
 					break;
 				}
@@ -60,6 +67,7 @@ public class StepReferenceComparator {
 			totalFields++;
 			for (Field stepSnapshotField: stepSnapshotFields) {
 				if (stepSnapshotField.match(referenceSnapshotField)) {
+					missingFields.remove(referenceSnapshotField);
 					matchedFields++;
 					break;
 				}
@@ -71,5 +79,13 @@ public class StepReferenceComparator {
 		}
 		
 		return 100 * (matchedFields + matchedLabels) / (totalFields + totalLabels);
+	}
+
+	public List<Label> getMissingLabels() {
+		return missingLabels;
+	}
+
+	public List<Field> getMissingFields() {
+		return missingFields;
 	}
 }

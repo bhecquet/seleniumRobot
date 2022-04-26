@@ -184,6 +184,8 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 	private void recordSteps(SeleniumRobotSnapshotServerConnector serverConnector, Integer sessionId, Integer testCaseInSessionId, List<TestStep> testSteps, ITestResult testResult) {
 		for (TestStep testStep: testSteps) {
 			
+			logger.info(String.format("Recording step %s on server", testStep.getName()));
+			
 			// record test step
 			Integer testStepId = serverConnector.createTestStep(testStep.getName(), testCaseInSessionId);
 			String stepLogs = testStep.toJson().toString();
@@ -205,6 +207,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 						for (Rectangle excludeZone: snapshot.getCheckSnapshot().getExcludeElementsRect()) {
 							serverConnector.createExcludeZones(excludeZone, snapshotId);
 						}
+						logger.info("Check snapshot created");
 					} catch (SeleniumRobotServerException e) {
 						logger.error("Could not create snapshot on server", e);
 					}
@@ -214,6 +217,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 					if (Boolean.FALSE.equals(testStep.getFailed())) {
 						try {
 							serverConnector.createStepReferenceSnapshot(snapshot, stepResultId);
+							logger.info("Step OK: reference created");
 						} catch (SeleniumRobotServerException e) {
 							logger.error("Could not create reference snapshot on server", e);
 						}
@@ -228,6 +232,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 							File referenceSnapshot = serverConnector.getReferenceSnapshot(stepResultId);
 							
 							if (referenceSnapshot != null) {
+								logger.info("Step KO: reference snapshot got from server");
 								Path newPath = Paths.get(TestNGResultUtils.getSeleniumRobotTestContext(testResult).getScreenshotOutputDirectory(), referenceSnapshot.getName()).toAbsolutePath(); 
 								FileUtils.moveFile(referenceSnapshot, newPath.toFile());
 								testStep.addSnapshot(new Snapshot(new ScreenShot(newPath.getParent().getParent().relativize(newPath).toString()), "Valid-reference", SnapshotCheckType.FALSE), 0, null);

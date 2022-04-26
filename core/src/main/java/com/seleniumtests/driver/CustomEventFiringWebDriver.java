@@ -127,8 +127,27 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	private final Integer attachExistingDriverPort;
 	private MutableCapabilities internalCapabilities = new MutableCapabilities();
 	
-	private static final String JS_PIXEL_RATIO = "var pixelRatio;" +
-			"try{pixelRatio = devicePixelRatio} catch(err){pixelRatio=1}";
+	/*
+	 * returns pixel aspect ratio of web site, it depends on OS and browser zoom
+	 * We can force to use PAR=1 by calling driver.executeScript("Some JS", false)
+	 * Cases which need the real PAR:
+	 * - Snapshot capture
+	 * - operations on ScreenZon
+	 * - more generally, every operation where we interact with screen
+	 * Cases which need PAR=1
+	 * - operations on PictureElement
+	 * - more generally, every operation where we interact with selenium elements which do not take PAR into account
+	 */
+	private static final String JS_PIXEL_RATIO = "var pixelRatio;"
+			+ "try{"
+			+ "    if (arguments.length==0 || arguments[0]) {"				
+			+ "        pixelRatio = devicePixelRatio"
+			+ "    } else {"
+			+ "        pixelRatio = 1"
+			+ "    }"
+			+ "} catch(err){"
+			+ "    pixelRatio=1"
+			+ "}";
     
     private static final String JS_GET_VIEWPORT_SIZE_WIDTH = String.format(
     		JS_PIXEL_RATIO
@@ -798,16 +817,37 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		return currentHandles;
 	}
     
+    /**
+     * Return the device aspect ratio
+     * @return
+     */
+    public double getDeviceAspectRatio() {
+    	if (isWebTest) {
+    		Number devicePixelRatio = (Number) ((JavascriptExecutor)driver).executeScript(JS_PIXEL_RATIO + " return pixelRatio;", true);
+    		return devicePixelRatio.doubleValue();
+    	} else {
+    		return 1;
+    	}
+    }
+    
 	public int getViewPortWidthWithoutScrollbar() {
+    	return getViewPortWidthWithoutScrollbar(true);
+    }
+    /**
+	 * Get viewport width, do not take scrollbar into account
+	 * @param usePixelAspectRatio	if true, take zoom level into account to compute size
+	 * @return
+	 */
+	public int getViewPortWidthWithoutScrollbar(boolean usePixelAspectRatio) {
     	if (isWebTest) {
     		try {
     			
-	    		Number width = (Number)executeScript(JS_GET_VIEWPORT_SIZE_WIDTH);
+	    		Number width = (Number)executeScript(JS_GET_VIEWPORT_SIZE_WIDTH, usePixelAspectRatio);
 	    		
 	    		// issue #238: check we get a non max size
 	    		if (width.intValue() == MAX_DIMENSION) {
 	    			driver.switchTo().defaultContent();
-	    			width = (Number)executeScript(JS_GET_VIEWPORT_SIZE_WIDTH);
+	    			width = (Number)executeScript(JS_GET_VIEWPORT_SIZE_WIDTH, usePixelAspectRatio);
 	    		}
 	    		return width.intValue();
 	    		
@@ -819,16 +859,29 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     	}
     }
 	
+	/**
+	 * Get viewport size, do not take scrollbar into account
+	 * @return
+	 */
 	public int getViewPortHeighthWithoutScrollbar() {
+		return getViewPortHeighthWithoutScrollbar(true);
+	}
+	
+	/**
+	 * Get viewport size, do not take scrollbar into account
+	 * @param usePixelAspectRatio	if true, take zoom level into account to compute size
+	 * @return
+	 */
+	public int getViewPortHeighthWithoutScrollbar(boolean usePixelAspectRatio) {
 		if (isWebTest) {
 			try {
 				
-				Number height = (Number)executeScript(JS_GET_VIEWPORT_SIZE_HEIGHT);
+				Number height = (Number)executeScript(JS_GET_VIEWPORT_SIZE_HEIGHT, usePixelAspectRatio);
 				
 				// issue #238: check we get a non max size
 				if (height.intValue() == MAX_DIMENSION) {
 					driver.switchTo().defaultContent();
-					height = (Number)executeScript(JS_GET_VIEWPORT_SIZE_HEIGHT);
+					height = (Number)executeScript(JS_GET_VIEWPORT_SIZE_HEIGHT, usePixelAspectRatio);
 				}
 				return height.intValue();
 				
@@ -847,9 +900,18 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
      */
     @SuppressWarnings("unchecked")
 	public Dimension getViewPortDimensionWithoutScrollbar() {
-    	Dimension foundDimension = new Dimension(getViewPortWidthWithoutScrollbar(), getViewPortHeighthWithoutScrollbar());
+    	return getViewPortDimensionWithoutScrollbar(true);
+    }
+    
+    /**
+     * get dimensions of the visible part of the page
+     * 
+     * @return
+     */
+	public Dimension getViewPortDimensionWithoutScrollbar(boolean usePixelAspectRatio) {
+    	Dimension foundDimension = new Dimension(getViewPortWidthWithoutScrollbar(usePixelAspectRatio), getViewPortHeighthWithoutScrollbar(usePixelAspectRatio));
 		
-		// issue #233: prevent too big size at it may be used to process images and Buffe
+		// issue #233: prevent too big size at it may be used to process images and Buffer
 		if (foundDimension.width * foundDimension.height * 8L > Integer.MAX_VALUE) {
 			return new Dimension(2000, 10000);
 		} else {
@@ -857,6 +919,10 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		}
     }
     
+	
+	public Dimension getContentDimension() {
+		return getContentDimension(true);
+	}
     /**
      * Get the whole webpage dimension
      * TODO: handle mobile app case
@@ -864,15 +930,15 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
      */
 
 	@SuppressWarnings("unchecked")
-    public Dimension getContentDimension() {
+    public Dimension getContentDimension(boolean usePixelAspectRatio) {
     	if (isWebTest) {
     		try {
-				List<Number> dims = (List<Number>)executeScript(JS_GET_CONTENT_ENTIRE_SIZE);
+				List<Number> dims = (List<Number>)executeScript(JS_GET_CONTENT_ENTIRE_SIZE, usePixelAspectRatio);
 		    	
 		    	// issue #238: check we get a non zero size
 		    	if (dims.get(0).intValue() == 0 || dims.get(1).intValue() == 0) {
 		    		driver.switchTo().defaultContent();
-		    		dims = (List<Number>)executeScript(JS_GET_CONTENT_ENTIRE_SIZE);
+		    		dims = (List<Number>)executeScript(JS_GET_CONTENT_ENTIRE_SIZE, usePixelAspectRatio);
 		    	}
 		    	
 		    	return new Dimension(dims.get(0).intValue(), dims.get(1).intValue());
@@ -925,8 +991,11 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	 * @return
 	 */
 	public Long getTopFixedHeaderSize() {
+		return getTopFixedHeaderSize(true);
+	}
+	public Long getTopFixedHeaderSize(boolean usePixelAspectRatio) {
 		if (isWebTest) {
-			return (Long) ((JavascriptExecutor) driver).executeScript(JS_GET_TOP_HEADER);
+			return (Long) ((JavascriptExecutor) driver).executeScript(JS_GET_TOP_HEADER, usePixelAspectRatio);
 		} else { 
 			return 0L;
 		}
@@ -938,8 +1007,11 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	 * @return
 	 */
 	public Long getBottomFixedFooterSize() {
+		return getBottomFixedFooterSize(true);
+	}
+	public Long getBottomFixedFooterSize(boolean usePixelAspectRatio) {
 		if (isWebTest) {
-			return (Long) ((JavascriptExecutor) driver).executeScript(JS_GET_BOTTOM_FOOTER);
+			return (Long) ((JavascriptExecutor) driver).executeScript(JS_GET_BOTTOM_FOOTER, usePixelAspectRatio);
 		} else { 
 			return 0L;
 		}
@@ -1519,12 +1591,6 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 			throw new ScenarioException("driver supports stopVideoCapture only in local and grid mode");
 		}
 	}
-	
-	/**
-	 * Intercept specific scripts to do some non selenium actions
-	 * 
-	 * @deprecated: should be removed (kept here for compatibility with old robots)
-	 */
 	
 	public static void displayStepOnScreen(String textToWrite, DriverMode driverMode, SeleniumGridConnector gridConnector, VideoRecorder recorder) {
 		if (driverMode == DriverMode.LOCAL) {

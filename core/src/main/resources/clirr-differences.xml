@@ -1,19 +1,103 @@
 <differences>
 
 
-	
 	<difference>
-		<className>**/uipage/htmlelements/HtmlElement</className>
+		<className>**/connectors/extools/Uft</className>
 		<differenceType>7005</differenceType>
-		<method>setImplicitWaitTimeout(int, java.util.concurrent.TimeUnit )</method>
-		<justification>update</justification>
-		<to>setImplicitWaitTimeout(int, java.util.concurrent.TimeUnit)</to>
-		<from>setImplicitWaitTimeout(int, java.util.concurrent.TimeUnit )</from>
+		<method>com.seleniumtests.reporter.logger.TestStep executeScript(int, boolean)</method>
+		<justification>splitting</justification>
+		<to>com.seleniumtests.reporter.logger.TestStep executeScript(int, java.util.Map)</to>
 	</difference>
 	<difference>
-        <className>**/customexception/DriverExceptions</className>
-        <differenceType>8001</differenceType>
-        <justification>update</justification>
+		<className>**/connectors/extools/Uft</className>
+		<differenceType>7002</differenceType>
+		<method>com.seleniumtests.reporter.logger.TestStep executeScript()</method>
+		<justification>useless</justification>
+	</difference>
+	<difference>
+		<className>**/connectors/extools/Uft</className>
+		<differenceType>7002</differenceType>
+		<method>com.seleniumtests.reporter.logger.TestStep executeScript(int)</method>
+		<justification>useless</justification>
+	</difference>
+	<difference>
+		<className>**/connectors/extools/Uft</className>
+		<differenceType>7004</differenceType>
+		<method>java.util.List prepareArguments()</method>
+		<justification>useless</justification>
+	</difference>
+	<difference>
+		<className>**/connectors/extools/Uft</className>
+		<differenceType>7004</differenceType>
+		<method>Uft(java.lang.String, java.util.Map)</method>
+		<justification>useless</justification>
+	</difference>
+	<difference>
+		<className>**/connectors/extools/Uft</className>
+		<differenceType>7004</differenceType>
+		<method>void readXmlResult(java.lang.String, com.seleniumtests.reporter.logger.TestStep)</method>
+		<justification>need to provide one step for UFT step</justification>
+	</difference>
+	<difference>
+		<className>**/connectors/extools/Uft</className>
+		<differenceType>7004</differenceType>
+		<method>com.seleniumtests.reporter.logger.TestStep analyseOutput(java.lang.String, com.seleniumtests.reporter.logger.TestStep)</method>
+		<justification>need to provide one step for UFT step</justification>
+	</difference>
+	<difference>
+		<className>**/connectors/extools/Uft</className>
+		<differenceType>7006</differenceType>
+		<method>void readXmlResult(java.lang.String, com.seleniumtests.reporter.logger.TestStep)</method>
+		<to>java.util.List</to>
+		<justification>need to provide one step for UFT step</justification>
+	</difference>
+	<difference>
+		<className>**/connectors/extools/Uft</className>
+		<differenceType>7006</differenceType>
+		<method>com.seleniumtests.reporter.logger.TestStep executeScript(int, java.util.Map)</method>
+		<to>java.util.List</to>
+		<justification>need to provide one step for UFT step</justification>
+	</difference>
+	<difference>
+		<className>**/connectors/extools/Uft</className>
+		<differenceType>7006</differenceType>
+		<method>com.seleniumtests.reporter.logger.TestStep analyseOutput(java.lang.String, com.seleniumtests.reporter.logger.TestStep)</method>
+		<to>java.util.List</to>
+		<justification>need to provide one step for UFT step</justification>
+	</difference>
+	<difference>
+		<className>**/connectors/extools/Uft</className>
+		<differenceType>7004</differenceType>
+		<method>Uft(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.Map)</method>
+		<justification>useless</justification>
+	</difference>
+	<difference>
+        <className>**/uipage/htmlelements/HtmlElement</className>
+        <differenceType>6004</differenceType>
+        <field>element</field>
+        <from>org.openqa.selenium.WebElement</from>
+        <to>java.lang.ThreadLocal</to>
+        <justification>thread-safety</justification>
+    </difference>
+	<difference>
+        <className>**/uipage/htmlelements/HtmlElement</className>
+        <differenceType>6004</differenceType>
+        <field>driver</field>
+        <from>org.openqa.selenium.WebDriver</from>
+        <to>java.lang.ThreadLocal</to>
+        <justification>thread-safety</justification>
+    </difference>
+    <difference>
+        <className>**/uipage/htmlelements/HtmlElement</className>
+        <differenceType>6010</differenceType>
+        <field>element</field>
+        <justification>force to use accessors</justification>
+    </difference>
+    <difference>
+        <className>**/uipage/htmlelements/HtmlElement</className>
+        <differenceType>6010</differenceType>
+        <field>driver</field>
+        <justification>force to use accessors</justification>
     </difference>
 
 </differences>

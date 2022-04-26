@@ -64,6 +64,7 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.reporter.ReporterTest;
+import com.seleniumtests.it.stubclasses.StubTestClassForDriverParallelTest;
 
 @PrepareForTest({SeleniumRobotVariableServerConnector.class, SeleniumGridConnectorFactory.class, SeleniumTestsContext.class, WebUIDriver.class})
 public class TestSeleniumRobotTestListener extends ReporterTest {
@@ -96,6 +97,22 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 		// all 3 methods are OK
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "info=\"ok\""), 3);
+	}
+	
+	/**
+	 * Test the case where several browsers access the same HtmlElement at the same time (as HtmlElements are almost always declared static)
+	 * Be sure each search in a thread adress the driver of this thread
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testMultiThreadTests2(ITestContext testContext) throws Exception {
+		
+		executeSubTest(StubTestClassForDriverParallelTest.maxThreads, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverParallelTest"}, ParallelMode.METHODS, new String[] {});
+		String logs = readSeleniumRobotLogFile();
+		
+		Assert.assertEquals(StringUtils.countMatches(logs, "Test is OK"), 4);
+		
 	}
 	
 	/**

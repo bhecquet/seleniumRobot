@@ -16,7 +16,7 @@ public class TestSeleniumTestPlan extends ReporterTest {
 		String result = readTestMethodResultFile("testStandardDataProviderNoFile");
 		
 		// first line / header has been skipped
-		Assert.assertTrue(result.matches(".*com\\.seleniumtests\\.customexception\\.ConfigurationException\\: Dataset file.*testStandardDataProviderNoFile.csv does not exist.*"));
+		Assert.assertTrue(result.matches(".*com\\.seleniumtests\\.customexception\\.ConfigurationException\\: Dataset file.*testStandardDataProviderNoFile.csv or .*testStandardDataProviderNoFile.xlsx does not exist.*"));
 	}
 
 	@Test(groups={"ut"})
@@ -28,6 +28,17 @@ public class TestSeleniumTestPlan extends ReporterTest {
 		// first line / header has not been skipped => 2 tests
 		Assert.assertTrue(logs.contains("r1c1,r1c2"));
 		Assert.assertTrue(logs.contains("r2c1,r2c2"));
+	}
+	
+	@Test(groups={"ut"})
+	public void testWithStandardXlsxDataProvider() throws Exception {
+		
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testStandardXlsxDataProvider"});
+		String logs = readSeleniumRobotLogFile();
+		
+		// first line / header has not been skipped => 2 tests
+		Assert.assertTrue(logs.contains("r1c1x,r1c2x"));
+		Assert.assertTrue(logs.contains("r2c1x,r2c2x"));
 	}
 	
 	@Test(groups={"ut"})

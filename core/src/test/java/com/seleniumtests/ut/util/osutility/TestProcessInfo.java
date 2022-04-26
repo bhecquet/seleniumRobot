@@ -91,10 +91,4 @@ public class TestProcessInfo extends GenericTest {
         info.setTitle("C:/");
         assertNotEquals(pi, info);
     }
-
-    @Test(groups = {"ut"})
-    public void testObjectNullEquals() {
-        ProcessInfo pi = new ProcessInfo();;
-        assertFalse(pi.equals(null));
-    }
 }
