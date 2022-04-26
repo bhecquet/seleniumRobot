@@ -64,6 +64,15 @@ public class TestAutoScrolling extends GenericMultiBrowserTest {
 		DriverScrollingTestPage.buttonScrollBottom.click();
 		Assert.assertEquals(DriverScrollingTestPage.textElement.getValue(), "scroll bottom");
 	}
+	
+	/**
+	 * Scroll into bottom of div. Check that footer do not hide the button
+	 * Click with mouse
+	 */
+	public void testScrollToDivBottomClickMouse() {
+		DriverScrollingTestPage.buttonScrollBottom.clickMouse();
+		Assert.assertEquals(DriverScrollingTestPage.textElement.getValue(), "scroll bottom");
+	}
 
 	/**
 	 * Scroll into bottom of div. Check that composite action is done

@@ -254,7 +254,7 @@ public class TestErrorCauseFInder extends ReporterTest {
 			
 			// check the error cause is displayed at the top of the report
 			String output = readTestMethodResultFile("testImageDetection");
-			Assert.assertTrue(output.contains("<th>Possible error causes</th><td><ul><li>The application has been modified on step '_clickErrorButtonInError '</li></ul></td>"));
+			Assert.assertTrue(output.contains("<th>Possible error causes</th><td><ul><li>The application has been modified: 1 field(s) missing: field_with_label[text=Name]: java.awt.Rectangle[x=191,y=284,width=114,height=36] on step '_clickErrorButtonInError '</li></ul></td>"));
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL);

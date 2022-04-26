@@ -69,10 +69,10 @@ public class RadioButtonElement extends HtmlElement {
         findElement();
 
         // handle angular-material case
-        if ("mat-radio-button".equals(element.getTagName())) {
-        	return element.getAttribute("class").contains("mat-radio-checked");
+        if ("mat-radio-button".equals(getRealElementNoSearch().getTagName())) {
+        	return getRealElementNoSearch().getAttribute("class").contains("mat-radio-checked");
         } else {
-        	return element.isSelected();
+        	return getRealElementNoSearch().isSelected();
         }
     }
 }

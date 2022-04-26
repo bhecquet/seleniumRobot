@@ -38,6 +38,7 @@ public class OSUtilityUnix extends OSUtility {
 
 	/**
      * Ask console for every running process.
+     *
      * @return list of output command lines
      */
 	@Override
@@ -77,6 +78,7 @@ public class OSUtilityUnix extends OSUtility {
     
     /**
      * Terminate process from command line terminal.
+     * @param process
      * @param force to kill the process
      * @return
      * @throws IOException
@@ -131,19 +133,27 @@ public class OSUtilityUnix extends OSUtility {
 		
 		if (!firefoxLocation.isEmpty() && !firefoxLocation.contains(WHICH_ERROR)) {
 			String version = getFirefoxVersion("firefox");
-			browserList.put(BrowserType.FIREFOX, Arrays.asList(new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), firefoxLocation)));
+            List<BrowserInfo> arrayFirefox = new ArrayList<>();
+            arrayFirefox.add(new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), firefoxLocation));
+            browserList.put(BrowserType.FIREFOX, arrayFirefox);
 			
 		} else if (!iceweaselLocation.isEmpty() && !iceweaselLocation.contains(WHICH_ERROR)) {
 			String version = getFirefoxVersion("iceweasel");
-			browserList.put(BrowserType.FIREFOX, Arrays.asList(new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), iceweaselLocation)));
+            List<BrowserInfo> arrayIceWeasel = new ArrayList<>();
+            arrayIceWeasel.add(new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), iceweaselLocation));
+            browserList.put(BrowserType.FIREFOX, arrayIceWeasel);
 		}
 		if (!chromiumLocation.isEmpty() && !chromiumLocation.contains(WHICH_ERROR)) {
 			String version = getChromeVersion("chromium-browser");
-			browserList.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, extractChromiumVersion(version), chromiumLocation)));
+            List<BrowserInfo> arrayChromium = new ArrayList<>();
+            arrayChromium.add(new BrowserInfo(BrowserType.CHROME, extractChromiumVersion(version), chromiumLocation));
+            browserList.put(BrowserType.CHROME, arrayChromium);
 			
 		} else if (!chromeLocation.isEmpty() && !chromeLocation.contains(WHICH_ERROR)) {
 			String version = getChromeVersion("google-chrome");
-			browserList.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, extractChromeVersion(version), chromeLocation)));
+            List<BrowserInfo> arrayChrome = new ArrayList<>();
+            arrayChrome.add(new BrowserInfo(BrowserType.CHROME, extractChromeVersion(version), chromeLocation));
+            browserList.put(BrowserType.CHROME, arrayChrome);
 		} 
 		
 		return browserList;

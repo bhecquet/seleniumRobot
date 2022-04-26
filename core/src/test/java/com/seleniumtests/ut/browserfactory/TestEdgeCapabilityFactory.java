@@ -123,14 +123,14 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 	public void testBetaVersionBrowserChoosen() {
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
 		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, "99.0", "", false, false), 
-				new BrowserInfo(BrowserType.EDGE, "97.0", "", false, true)));
+				new BrowserInfo(BrowserType.EDGE, "100.0", "", false, true)));
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(true)).thenReturn(browserInfos);
 		when(config.getBetaBrowser()).thenReturn(true);
 		
 		EdgeCapabilitiesFactory capaFactory = new EdgeCapabilitiesFactory(config);
 		capaFactory.createCapabilities();
 		Assert.assertTrue(capaFactory.getSelectedBrowserInfo().getBeta());
-		Assert.assertEquals(capaFactory.getSelectedBrowserInfo().getVersion(), "97.0");
+		Assert.assertEquals(capaFactory.getSelectedBrowserInfo().getVersion(), "100.0");
 	}
 
 	/**

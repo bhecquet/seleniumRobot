@@ -181,10 +181,10 @@ public class SelectList extends HtmlElement {
         implementationList = orderImplementations(getPreferedUiLibraries());
         for (Class<? extends ISelectList> selectClass: implementationList) {
         	try {
-				ISelectList selectInstance = selectClass.getConstructor(WebElement.class, FrameElement.class).newInstance(element, frameElement);
+				ISelectList selectInstance = selectClass.getConstructor(WebElement.class, FrameElement.class).newInstance(getRealElementNoSearch(), frameElement);
 				if (selectInstance.isApplicable()) {
 					selectImplementation = selectInstance;
-					selectInstance.setDriver(driver);
+					selectInstance.setDriver(getDriver());
 					break;
 				}
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
@@ -194,7 +194,7 @@ public class SelectList extends HtmlElement {
         }
         
         if (selectImplementation instanceof StubSelect) {
-        	throw new ScenarioException("Cannot find type of select " + element.getTagName());
+        	throw new ScenarioException("Cannot find type of select " + getRealElementNoSearch().getTagName());
         }
         
         options = selectImplementation.getOptions();

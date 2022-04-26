@@ -287,7 +287,7 @@ public class UiElement {
 			ImageDetector imageDetector = new ImageDetector(desktopScreenshotFile, cropScreenshotFile, 0.2);
 			imageDetector.detectExactZoneWithoutScale();
 			org.openqa.selenium.Rectangle detectedRectangle = imageDetector.getDetectedRectangle();
-			return new Rectangle(detectedRectangle.x, detectedRectangle.y, detectedRectangle.width, detectedRectangle.height);
+			return new Rectangle(detectedRectangle.x, detectedRectangle.y, detectedRectangle.height, detectedRectangle.width);
 			
 		} catch (IOException e) {
 			throw new ScreenshotException("Error getting position of viewport: " + e.getMessage());

@@ -77,10 +77,10 @@ public class CheckBoxElement extends HtmlElement {
         findElement();
 
         // handle angular-material case
-        if ("mat-checkbox".equals(element.getTagName())) {
-        	return element.getAttribute("class").contains("mat-checkbox-checked");
+        if ("mat-checkbox".equals(getRealElementNoSearch().getTagName())) {
+        	return getRealElementNoSearch().getAttribute("class").contains("mat-checkbox-checked");
         } else {
-        	return element.isSelected();
+        	return getRealElementNoSearch().isSelected();
         }
     }
 }

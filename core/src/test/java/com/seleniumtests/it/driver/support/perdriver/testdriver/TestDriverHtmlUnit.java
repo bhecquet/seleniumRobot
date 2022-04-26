@@ -66,6 +66,16 @@ public class TestDriverHtmlUnit extends TestDriver {
 	public void testUploadFileWithRobotKeyboard() {
 		// skip as htmlunit does not support it
 	}
+
+	@Test(groups={"it"})
+	public void testSendKeysKeyboard() {
+		// skip => not supported
+	}
+
+	@Test(groups={"it"})
+	public void testClickWithMouse() {
+		// skip => not supported
+	}
 	
 	@Test(groups={"it"})
 	public void testAlertDisplay() {

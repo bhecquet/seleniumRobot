@@ -150,11 +150,16 @@ public class ReporterControler implements IReporter {
 		for (Set<ITestResult> rs: resultSet.values()) {
 			for (ITestResult testResult: rs) {
 				
+				
 				// When SeleniumRobotTestRecorded has been run, results are stored on seleniumRobot server and it's then possible 
 				// to compare reference snapshot with current failed step (if any)
 				if (!testResult.isSuccess() && TestNGResultUtils.isSeleniumServerReportCreated(testResult) && testResult.getThrowable() != null && !(testResult.getThrowable() instanceof AssertionError)) {
+
+					logger.info("Search error cause for " + TestNGResultUtils.getTestName(testResult));
 					List<ErrorCause> errorCauses = new ErrorCauseFinder(testResult).findErrorCause();
 					TestNGResultUtils.setErrorCauses(testResult, errorCauses);
+				} else {
+					logger.info("Do not search error cause (requirements not satisfied) for " + TestNGResultUtils.getTestName(testResult));
 				}
 			}
 		}

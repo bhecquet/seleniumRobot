@@ -1,6 +1,6 @@
 Orignal work: Copyright 2015 www.seleniumtests.com
 Modified work: Copyright 2016 www.infotel.com
-				Copyright 2017-2021 B.Hecquet
+				Copyright 2017-2022 B.Hecquet
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

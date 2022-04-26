@@ -565,6 +565,7 @@ public class ScreenshotUtil {
     	Dimension viewDimensions = ((CustomEventFiringWebDriver)driver).getViewPortDimensionWithoutScrollbar();
     	Integer topPixelsToCrop = SeleniumTestsContextManager.getThreadContext().getSnapshotTopCropping();
     	Integer bottomPixelsToCrop = SeleniumTestsContextManager.getThreadContext().getSnapshotBottomCropping();
+    	double devicePixelRatio = ((CustomEventFiringWebDriver)driver).getDeviceAspectRatio();
 
     	
     	// issue #34: prevent getting image from HTMLUnit driver
@@ -615,7 +616,7 @@ public class ScreenshotUtil {
 			scrollY = currentImageHeight - cropTop;
 			
 			try {
-				((CustomEventFiringWebDriver)driver).scrollTo(scrollX, scrollY);
+				((CustomEventFiringWebDriver)driver).scrollTo((int)(scrollX / devicePixelRatio), (int)(scrollY / devicePixelRatio));
 			} catch (JavascriptException e) {
 				// ignore javascript errors
 			}

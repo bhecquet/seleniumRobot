@@ -47,6 +47,11 @@ public class TestScrollingInternetExplorer extends TestAutoScrolling {
 	public void testScrollToDivBottom() {
 		super.testScrollToDivBottom();
 	}
+
+	@Test(groups={"it"})
+	public void testScrollToDivBottomClickMouse() {
+		super.testScrollToDivBottomClickMouse();
+	}
 	
 	@Test(groups= {"ie"})
 	public void testScrollToDivBottomWithCompositeAction() {
