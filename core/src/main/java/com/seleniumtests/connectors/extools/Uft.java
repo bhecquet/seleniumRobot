@@ -111,7 +111,6 @@ public class Uft {
 		}
 		this.parameters = parameters;
 
-		Date startDate = new Date();
 		String output = TestTasks.executeCommand("cscript.exe", timeout, null, prepareArguments(false, true).toArray(new String[] {}));
 
 		// when execution ends, UFT is stopped
@@ -301,19 +300,20 @@ public class Uft {
                 }
             }
         } catch (IndexOutOfBoundsException e) {
-            logger.error("Probleme with XML " + e.getMessage());
-            TestStep readStep = new TestStep("UFT: " + scriptName, Reporter.getCurrentTestResult(), new ArrayList<>(), false);
-            readStep.addMessage(new TestMessage("Could not read UFT report: " + e.getMessage(), MessageType.ERROR));
-            listStep.add(readStep);
+            addStepWithoutXml(listStep, "Invalid XML data: ", e);
 	} catch (JDOMException | IOException e) {
-            logger.error("Could not read UFT report: " + e.getMessage());
-            TestStep readStep = new TestStep("UFT: " + scriptName, Reporter.getCurrentTestResult(), new ArrayList<>(), false);
-            readStep.addMessage(new TestMessage("Could not read UFT report: " + e.getMessage(), MessageType.ERROR));
-            listStep.add(readStep);
+            addStepWithoutXml(listStep, "Could not read UFT report: ", e);
         }
 
         return listStep;
     }
+
+	private void addStepWithoutXml(List<TestStep> listStep, String messageException, Exception e) {
+	    logger.error(messageException + e.getMessage());
+	    TestStep readStep = new TestStep("UFT: " + scriptName, Reporter.getCurrentTestResult(), new ArrayList<>(), false);
+            readStep.addMessage(new TestMessage(messageException + e.getMessage(), MessageType.ERROR));
+            listStep.add(readStep);
+	}
 
 	public void setKillUftOnStartup(boolean killUftOnStartup) {
 		this.killUftOnStartup = killUftOnStartup;
