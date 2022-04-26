@@ -300,10 +300,8 @@ public class Uft {
                 }
             }
         } catch (IndexOutOfBoundsException e) {
-            logger.error("Invalide XML data: " + e.getMessage());
-            addStepWithoutXml(listStep, "Problem with XML file: ", e);
+            addStepWithoutXml(listStep, "Invalid XML data: ", e);
 	} catch (JDOMException | IOException e) {
-            logger.error("Could not read UFT report: " + e.getMessage());
             addStepWithoutXml(listStep, "Could not read UFT report: ", e);
         }
 
@@ -311,6 +309,7 @@ public class Uft {
     }
 
 	private void addStepWithoutXml(List<TestStep> listStep, String messageException, Exception e) {
+	    logger.error(messageException + e.getMessage());
 	    TestStep readStep = new TestStep("UFT: " + scriptName, Reporter.getCurrentTestResult(), new ArrayList<>(), false);
             readStep.addMessage(new TestMessage(messageException + e.getMessage(), MessageType.ERROR));
             listStep.add(readStep);
