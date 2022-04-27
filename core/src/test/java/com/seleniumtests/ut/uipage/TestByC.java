@@ -4,15 +4,19 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.testng.Assert.assertTrue;
 import static org.testng.AssertJUnit.assertEquals;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.mockito.Mock;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
@@ -179,9 +183,9 @@ public class TestByC extends MockitoTest {
     // ByText
     @Test(groups = {"ut"})
     public void testXPathByTextQuote() {
-        ByC.ByText byText = new ByC.ByText("'", "'", true);
+        ByC.ByText byText = new ByC.ByText("'text", "label", true);
         String stringPath = byText.getEffectiveXPath();
-        assertEquals(stringPath, ".//'[text() = co)]");
+        assertEquals(stringPath, ".//label[contains(text(),concat('',\"'\",'text'))]");
     }
 
     @Test(groups = {"ut"})
@@ -195,7 +199,7 @@ public class TestByC extends MockitoTest {
     public void testXPathByTextPartialTrue() {
         ByC.ByText byText = new ByC.ByText("scyphozoa", "td", true);
         String stringPath = byText.getEffectiveXPath();
-        assertEquals(stringPath, ".//td[text() = 'scyphozoa']");
+        assertEquals(stringPath, ".//td[contains(text(),'scyphozoa')]");
     }
 
     @Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)
@@ -242,7 +246,7 @@ public class TestByC extends MockitoTest {
     @Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)
     public void testXPathByXTagNameNull() {
         ByC.ByXTagName byXTagName = new ByC.ByXTagName(null);
-        String stringPath = byXTagName.getEffectiveXPath();
+        byXTagName.getEffectiveXPath();
     }
 
     /**
@@ -269,14 +273,14 @@ public class TestByC extends MockitoTest {
     public void testFindElementsByAttribute() {
         ByC.ByAttribute byAttribute = spy(new ByC.ByAttribute("jellyfish", "sweety"));
         byAttribute.findElements(driver);
-        verify(driver).findElement(By.xpath".//*[@jellyfish='sweety']"));
+        verify(driver).findElements(By.xpath(".//*[@jellyfish='sweety']"));
     }
 
     @Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)
     public void testFindElementsByAttributeNameNull() {
         ByC.ByAttribute byAttribute = spy(new ByC.ByAttribute(null, "douce"));
         byAttribute.findElements(driver);
-        verify(driver).findElement(By.xpath".//*[@meduse='douce']"));
+        verify(driver).findElement(By.xpath(".//*[@meduse='douce']"));
     }
 
     @Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)
@@ -321,33 +325,32 @@ public class TestByC extends MockitoTest {
     @Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)
     public void testFindElementByLabelBackwardLabelNull() {
         ByC.ByLabelBackward byLabelBackward = spy(new ByC.ByLabelBackward(null, "div", true, "label"));
-        when(driver).findElementsByXPath(anyString())).thenReturn(Arrays.asList(element1, element2));
+        when((driver).findElements(any(By.class))).thenReturn(Arrays.asList(element1, element2));
         WebElement el = byLabelBackward.findElement(driver);
     }
 
     @Test(groups = {"ut"})
     public void testFindElementByLabelBackwarTagNameNull() {
         ByC.ByLabelBackward byLabelBackward = spy(new ByC.ByLabelBackward("badaboum", null, true, "label"));
-        when(((FindsByXPath) driver).findElementsByXPath(anyString())).thenReturn(Arrays.asList(element1, element2));
+        when((driver).findElements(any(By.class))).thenReturn(Arrays.asList(element1, element2));
         WebElement el = byLabelBackward.findElement(driver);
         Assert.assertEquals(el, element2);
-        verify((FindsByXPath) driver).findElementsByXPath(".//label[contains(text(),'badaboum')]/preceding::input");
+        verify(driver).findElements(By.xpath(".//label[contains(text(),'badaboum')]/preceding::input"));
     }
 
     @Test(groups = {"ut"})
     public void testFindElementByLabelBackwarLabelTagNameNull() {
         ByC.ByLabelBackward byLabelBackward = spy(new ByC.ByLabelBackward("badaboum", "div", true, null));
-        when(((FindsByXPath) driver).findElementsByXPath(anyString())).thenReturn(Arrays.asList(element1, element2));
+        when((driver).findElements(any(By.class))).thenReturn(Arrays.asList(element1, element2));
         WebElement el = byLabelBackward.findElement(driver);
         Assert.assertEquals(el, element2);
-        verify((FindsByXPath) driver).findElementsByXPath(".//label[contains(text(),'badaboum')]/preceding::div");
+        verify(driver).findElements(By.xpath(".//label[contains(text(),'badaboum')]/preceding::div"));
     }
 
     // ByLabelForward
     @Test(groups = {"ut"})
     public void testFindElementByLabelForward() {
         ByC.ByLabelForward byLabelForward = spy(new ByC.ByLabelForward("Chrysaora", "frame", true,"label"));
-        when(driver.findElements(any())).thenReturn( Arrays.asList(element1, element2));
         byLabelForward.findElement(driver);
         verify(driver).findElement(By.xpath(".//label[contains(text(),'Chrysaora')]/following::frame"));
     }
@@ -362,32 +365,28 @@ public class TestByC extends MockitoTest {
     @Test(groups = {"ut"})
     public void testFindElementByLabelForwardPartialFalse() {
         ByC.ByLabelForward byLabelForward = spy(new ByC.ByLabelForward("Chrysaora", "frame", false, "label"));
-        when(((FindsByXPath) driver).findElementsByXPath(anyString())).thenReturn(Arrays.asList(element1, element2));
         byLabelForward.findElement(driver);
-        verify((FindsByXPath) driver).findElementByXPath(".//label[text() = 'Chrysaora']/following::frame");
+        verify(driver).findElement(By.xpath(".//label[text() = 'Chrysaora']/following::frame"));
     }
 
     @Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)
     public void testFindElementByLabelForwardLabelNull() {
         ByC.ByLabelForward byLabelForward = spy(new ByC.ByLabelForward(null, "frame", true, "label"));
-        when(((FindsByXPath) driver).findElementsByXPath(anyString())).thenReturn(Arrays.asList(element1, element2));
         byLabelForward.findElement(driver);
     }
 
     @Test(groups = {"ut"})
     public void testFindElementByLabelForwardTagNameNull() {
         ByC.ByLabelForward byLabelForward = spy(new ByC.ByLabelForward("Chrysaora", null, true, "label"));
-        when(((FindsByXPath) driver).findElementsByXPath(anyString())).thenReturn(Arrays.asList(element1, element2));
         byLabelForward.findElement(driver);
-        verify((FindsByXPath) driver).findElementByXPath(".//label[contains(text(),'Chrysaora')]/following::input");
+        verify(driver).findElement(By.xpath(".//label[contains(text(),'Chrysaora')]/following::input"));
     }
 
     @Test(groups = {"ut"})
     public void testFindElementByLabelForwardLabelTagNameNull() {
         ByC.ByLabelForward byLabelForward = spy(new ByC.ByLabelForward("Chrysaora", "frame", true, null));
-        when(((FindsByXPath) driver).findElementsByXPath(anyString())).thenReturn(Arrays.asList(element1, element2));
         byLabelForward.findElement(driver);
-        verify((FindsByXPath) driver).findElementByXPath(".//label[contains(text(),'Chrysaora')]/following::frame");
+        verify(driver).findElement(By.xpath(".//label[contains(text(),'Chrysaora')]/following::frame"));
     }
 
     // ByText
@@ -457,8 +456,7 @@ public class TestByC extends MockitoTest {
     public void testFindElementsByXTagName() {
         ByC.ByXTagName byXTagName = spy(new ByC.ByXTagName("p"));
         byXTagName.findElements(driver);
-        verify(driver).findElements(By.xpath(".//Turritopsis"));
-        verify((FindsByXPath) driver).findElementsByXPath(".//p");
+        verify(driver).findElements(By.xpath(".//p"));
     }
 
     @Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)
