@@ -17,6 +17,9 @@
  */
 package com.seleniumtests.uipage.htmlelements;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.time.Clock;
 import java.time.Duration;
@@ -28,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.imageio.ImageIO;
 
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
@@ -52,6 +57,7 @@ import org.openqa.selenium.interactions.Coordinates;
 import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.RemoteWebElement;
+import org.openqa.selenium.remote.ScreenshotException;
 import org.openqa.selenium.support.decorators.Decorated;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -68,11 +74,15 @@ import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.driver.screenshots.ScreenshotUtil;
+import com.seleniumtests.driver.screenshots.SnapshotTarget;
 import com.seleniumtests.uipage.ByC;
 import com.seleniumtests.uipage.ExpectedConditionsC;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.ReplayOnError;
 import com.seleniumtests.util.helper.WaitHelper;
+import com.seleniumtests.util.imaging.ImageDetector;
+import com.seleniumtests.util.imaging.ImageProcessor;
 import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -994,7 +1004,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	public String getDomAttribute(String name) {
 		findElement(false, false);
 		
-		return element.getDomAttribute(name);
+		return getRealElementNoSearch().getDomAttribute(name);
 	}
 	
 	@Override
@@ -1002,7 +1012,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	public String getDomProperty(String name) {
 		findElement(false, false);
 		
-		return element.getDomProperty(name);
+		return getRealElementNoSearch().getDomProperty(name);
 	}
 	
 	@Override
@@ -1010,7 +1020,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	public String getAriaRole() {
 		findElement(false, false);
 		
-		return element.getAriaRole();
+		return getRealElementNoSearch().getAriaRole();
 	}
 	
 	@Override
@@ -1018,7 +1028,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	public String getAccessibleName() {
 		findElement(false, false);
 		
-		return element.getAccessibleName();
+		return getRealElementNoSearch().getAccessibleName();
 	}
 	
 	@Override
@@ -1026,7 +1036,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	public SearchContext getShadowRoot() {
 		findElement(false, false);
 		
-		return element.getShadowRoot();
+		return getRealElementNoSearch().getShadowRoot();
 	}
 
     /**

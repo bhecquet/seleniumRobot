@@ -18,6 +18,7 @@
 package com.seleniumtests.ut.util.osutility;
 
 import static org.mockito.Mockito.when;
+import static org.testng.Assert.assertEquals;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -30,11 +31,14 @@ import org.openqa.selenium.Platform;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
+import org.testng.Reporter;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
+import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.OSUtility;
@@ -235,13 +239,13 @@ public class TestLinuxOsUtility extends MockitoTest {
 		when(OSCommand.executeCommandAndWait("which iceweasel")).thenReturn("/usr/bin/which: no iceweasel in (/usr/local/sbin)");
 		when(OSCommand.executeCommandAndWait("which chromium-browser")).thenReturn("/usr/bin/which: no chromium-browser in (/usr/local/sbin)");
 
-		SeleniumTestsContextManager.getThreadContext().setAttribute(CHROME_BINARY_PATH, "/usr/local/bin/google-chrome-binary");
+		SeleniumTestsContextManager.getThreadContext().setAttribute(SeleniumTestsContext.CHROME_BINARY_PATH, "/usr/local/bin/google-chrome-binary");
 
 		OSUtility.resetInstalledBrowsersWithVersion();
 		SeleniumTestsContextManager.getThreadContext().configureContext(Reporter.getCurrentTestResult());
-		Map<BrowserType, List<BrowserInfo>> browsersBinary = new OSUtilityUnix().getInstalledBrowsersWithVersion(false);
+		Map<BrowserType, List<BrowserInfo>> browsersBinary = OSUtilityUnix.getInstalledBrowsersWithVersion(false);
 
-		assertEquals(browsersBinary.size(), 3);
+		assertEquals(browsersBinary.size(), 2); // chrome & htmlunit
 		assertEquals(browsersBinary.get(BrowserType.CHROME).size(), 2);
 		browsersBinary.get(BrowserType.CHROME).get(0).getVersion();
 	}

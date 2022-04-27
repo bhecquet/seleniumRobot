@@ -200,14 +200,8 @@ public class Snapshot extends TestAction {
 				screenshot.setHtmlSourcePath(folderName + newName);
 			}
 			
-<<<<<<< HEAD
-			
 			FileUtility.copyFile(oldFile, new File(screenshot.getFullHtmlPath()));
 		} catch (IOException e) {
-=======
-			FileUtils.copyFile(oldFile, new File(screenshot.getFullHtmlPath()));
-		} catch (IOException |IllegalArgumentException e) {
->>>>>>> refs/remotes/origin/master
 			screenshot.setHtmlSourcePath(oldPath);
 		}
 

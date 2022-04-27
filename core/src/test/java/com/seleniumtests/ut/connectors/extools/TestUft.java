@@ -6,13 +6,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +20,6 @@ import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
-import org.testng.Reporter;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -33,10 +29,12 @@ import com.seleniumtests.connectors.extools.Uft;
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.reporter.logger.TestMessage;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.reporter.logger.TestStep.StepStatus;
 
 @PrepareForTest({Uft.class, TestTasks.class})
 public class TestUft extends MockitoTest {
@@ -207,6 +205,7 @@ public class TestUft extends MockitoTest {
 		uft.setKillUftOnStartup(false);
 		uft.prepareArguments(true, false);
 	}
+	
 	@Test(groups = { "ut" }, expectedExceptions = ConfigurationException.class)
 	public void testPrepareLoadArgumentsWithAlmTestMissingUserValues() {
 		Uft uft = new Uft("http://almserver/qcbin", null, "pwd", "dom", "proj",
@@ -214,6 +213,7 @@ public class TestUft extends MockitoTest {
 		uft.setKillUftOnStartup(false);
 		uft.prepareArguments(true, false);
 	}
+	
 	@Test(groups = { "ut" }, expectedExceptions = ConfigurationException.class)
 	public void testPrepareLoadArgumentsWithAlmTestMissingPasswordValues() {
 		Uft uft = new Uft("http://almserver/qcbin", "usr", null, "dom", "proj",

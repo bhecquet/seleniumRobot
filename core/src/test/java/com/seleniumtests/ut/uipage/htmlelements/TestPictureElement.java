@@ -131,8 +131,6 @@ public class TestPictureElement extends MockitoTest {
 		when(uiDriver.getDriver()).thenReturn(driver);
 		when(uiDriver.getConfig()).thenReturn(driverConfig);
 		when(driverConfig.getBrowserType()).thenReturn(BrowserType.FIREFOX);
-		when(driver.getMouse()).thenReturn(mouse);
-		when(driver.getKeyboard()).thenReturn(keyboard);
 		when(driver.getBrowserInfo()).thenReturn(browserInfo);
 		when(((CustomEventFiringWebDriver)driver).getDeviceAspectRatio()).thenReturn(1.5);
 		when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
