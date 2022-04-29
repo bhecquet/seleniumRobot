@@ -721,3 +721,22 @@ Uft uft = loadUftScript("http://alm-server.company.com/qcbin", "user", "password
 
 If you execute your tests wit seleniumRobot grid, the only thing to worry about is to start the web browser before executing UFT test (it will reserve a node). Else, no node will be available and it will fail. Moreover, you will need to allow "cscript.exe" to be executed from grid: 
 Add `-extProgramWhiteList cscript.exe` to the grid node options
+
+### 26 Read XLSX file ###
+
+To read a single xlsx sheet
+You get a list of row values
+For each row, you get a map: columnName=cellValue
+
+```
+    File dataset = new File("myFile.xlsx");
+    List<Map<String, String>> data = new ExcelHelper(dataset).readSheet(0, true);
+```
+
+To read all sheets at once
+In this case, you obtain a map (one key for each sheet) whose values is a list of row values
+
+```
+    File dataset = new File("myFile.xlsx");
+    Map<String, List<Map<String, String>>> data = new ExcelHelper(dataset).read(true);
+```

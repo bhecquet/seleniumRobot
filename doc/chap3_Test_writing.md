@@ -858,7 +858,7 @@ It you use ExpectedConditions that takes a locator (e.g: `ExpectedConditions.vis
 
 Data provider is a standard TestNG [https://testng.org/doc/documentation-main.html#parameters-dataproviders](https://testng.org/doc/documentation-main.html#parameters-dataproviders) feature that allows executing the same test with several dataset.
 
-SeleniumRobot provides standard Dataprovider for common use cases which will search CSV file depending on test method name in `<root>/data/<app>/dataset/<environment>/<testMethodName>.csv`
+SeleniumRobot provides standard Dataprovider for common use cases which will search CSV / XLSX file depending on test method name in `<root>/data/<app>/dataset/<environment>/<testMethodName>.csv`
 
 ```java
 	@Test(groups="stub", dataProvider = "dataset")
@@ -870,8 +870,8 @@ Assuming the DEV environment, file will be searched in `<root>/data/<app>/datase
 
 4 dataproviders are defined
 
-- 'dataset' => CSV file with "," as separator and no header
-- 'datasetWithHeader' => CSV file with "," as separator and with header
+- 'dataset' => CSV file with "," as separator / XLSX file and no header
+- 'datasetWithHeader' => CSV file with "," as separator / XLSX file and with header
 - 'datasetSemicolon' => CSV file with ";" as separator and no header
 - 'datasetSemicolonWithHeader' => CSV file with ";" as separator and with header
 
