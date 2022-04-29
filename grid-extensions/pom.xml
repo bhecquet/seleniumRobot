@@ -253,6 +253,7 @@
 	              </dependency>
 				</dependencies>
 		        <configuration>
+		          <skip>true</skip>
         			<ignoredDifferencesFile>../core/src/main/resources/clirr-differences.xml</ignoredDifferencesFile>
         			<includes>
         				<include>com/seleniumtests/connectors/db/**</include>
