@@ -44,6 +44,7 @@
     - [Step name](#step-name)
 - [24 Activate Dark Mode (chrome only)](#24-activate-dark-mode-chrome-only)
 - [25 Execute UFT test](#25-execute-uft-test)
+- [26 Read XLSX file](#26-read-xlsx-file)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
