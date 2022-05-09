@@ -17,14 +17,21 @@
  */
 package com.seleniumtests.ut.util.imaging;
 
+import java.awt.Color;
+import java.awt.Rectangle;
+import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+import javax.imageio.ImageIO;
+
+import org.apache.commons.io.FileUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
+import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.imaging.ImageProcessor;
 
 public class TestImageProcessor extends GenericTest {
@@ -45,6 +52,42 @@ public class TestImageProcessor extends GenericTest {
 		BufferedImage croppedFfLogoOkBuf = ImageProcessor.loadFromFile(croppedFfLogoOk);
 		
 		Assert.assertEquals(ImageProcessor.toBase64(croppedFfLogoOkBuf), ImageProcessor.toBase64(croppedFfLogo));
+	}
+	
+	@Test(groups={"ut"})
+	public void testDrawRectangles() throws IOException {
+		File tmpFile = File.createTempFile("image", ".png");
+		tmpFile.deleteOnExit();
+		File ffLogo = createFileFromResource("tu/ffLogo1.png");
+		FileUtils.copyFile(ffLogo, tmpFile);
+		ImageProcessor.drawRectangles(tmpFile, Color.RED, new Rectangle(10, 20, 100, 15));
+		
+		BufferedImage image = ImageIO.read(tmpFile);
+		
+		// check rectangle has been drawn with 2 pixels width
+		Assert.assertEquals(new Color(image.getRGB(10, 20)), Color.RED);
+		Assert.assertEquals(new Color(image.getRGB(11, 20)), Color.RED);
+		Assert.assertEquals(new Color(image.getRGB(11, 21)), Color.RED);
+		Assert.assertNotEquals(new Color(image.getRGB(12, 22)), Color.RED);
+		Assert.assertEquals(new Color(image.getRGB(110, 35)), Color.RED);
+		Assert.assertNotEquals(new Color(image.getRGB(111, 36)), Color.RED);
+	}
+	@Test(groups={"ut"})
+	public void testDrawLines() throws IOException {
+		File tmpFile = File.createTempFile("image", ".png");
+		tmpFile.deleteOnExit();
+		File ffLogo = createFileFromResource("tu/ffLogo1.png");
+		FileUtils.copyFile(ffLogo, tmpFile);
+		ImageProcessor.drawLines(tmpFile, Color.RED, new Line2D.Double(10, 20, 100, 20));
+		
+		BufferedImage image = ImageIO.read(tmpFile);
+		
+		// check line has been drawn with 2 pixels width
+		Assert.assertEquals(new Color(image.getRGB(10, 20)), Color.RED);
+		Assert.assertEquals(new Color(image.getRGB(10, 21)), Color.RED);
+		Assert.assertNotEquals(new Color(image.getRGB(10, 22)), Color.RED);
+		Assert.assertEquals(new Color(image.getRGB(100, 20)), Color.RED);
+		Assert.assertNotEquals(new Color(image.getRGB(101, 20)), Color.RED);
 	}
 	
 	@Test(groups={"ut"})

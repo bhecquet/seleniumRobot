@@ -17,6 +17,11 @@
  */
 package com.seleniumtests.util.imaging;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -26,6 +31,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.imageio.ImageIO;
+
+import com.seleniumtests.util.FileUtility;
 
 import gherkin.deps.net.iharder.Base64;
 
@@ -61,6 +68,30 @@ public class ImageProcessor {
         OutputStream b64 = new Base64.OutputStream(os);
         ImageIO.write(img, "png", b64);
         return os.toString("UTF-8"); 
+	}
+	
+	public static void drawRectangles(File file, Color color, Rectangle ... rectangles) throws IOException {
+		BufferedImage bi = loadFromFile(file);
+		Graphics graph = bi.getGraphics();
+		graph.setColor(color);
+		for (Rectangle rect: rectangles) {
+			graph.drawRect(rect.x, rect.y, rect.width, rect.height);
+			graph.drawRect(rect.x+1, rect.y+1, rect.width - 2,rect.height - 2);
+		}
+		FileUtility.writeImage(file.getAbsolutePath(), bi);
+		
+	}
+	
+	public static void drawLines(File file, Color color, Line2D.Double ... lines) throws IOException {
+		BufferedImage bi = loadFromFile(file);
+		Graphics2D graph = (Graphics2D)bi.getGraphics();
+		graph.setColor(color);
+		for (Line2D line: lines) {
+			graph.draw(line);
+			graph.draw(new Line2D.Double(line.getX1(), line.getY1() + 1, line.getX2(), line.getY2() + 1));
+		}
+		FileUtility.writeImage(file.getAbsolutePath(), bi);
+		
 	}
 	
 	/**
