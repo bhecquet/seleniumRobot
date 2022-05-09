@@ -4,10 +4,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
 
+import java.awt.Color;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
 import org.mockito.Mock;
@@ -19,6 +23,7 @@ import org.testng.Reporter;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.connectors.selenium.fielddetector.Field;
@@ -71,6 +76,8 @@ public class TestErrorCauseFinder extends MockitoTest {
 		step1.setStepResultId(0);
 		step1.setPosition(0);
 		
+		File image = GenericTest.createFileFromResource("tu/images/driverTestPage.png");
+		
 		
 		imgStep1Ref = File.createTempFile("img", ".png");
 		imgStep1 = File.createTempFile("img", ".png");
@@ -122,7 +129,9 @@ public class TestErrorCauseFinder extends MockitoTest {
 		PowerMockito.when(SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(serverConnector);
 		
 		referenceImgStep1 = File.createTempFile("img", ".png"); // reference image for step 1
+		FileUtils.copyFile(image, referenceImgStep1);
 		referenceImgStep2 = File.createTempFile("img", ".png"); // reference image for step 2
+		FileUtils.copyFile(image, referenceImgStep2);
 		when(serverConnector.getReferenceSnapshot(0)).thenReturn(referenceImgStep1);
 		when(serverConnector.getReferenceSnapshot(1)).thenReturn(referenceImgStep2);
 		
@@ -424,6 +433,13 @@ public class TestErrorCauseFinder extends MockitoTest {
 		Assert.assertEquals(causes.get(0).getDescription(), "1 field(s) missing: \n"
 				+ "field[text=]: java.awt.Rectangle[x=0,y=0,width=100,height=20]\n");
 		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
+		
+		// check rectangle has been drawn around the missing field
+		BufferedImage image = ImageIO.read(referenceImgStep2);
+		Assert.assertEquals(new Color(image.getRGB(0, 20)), Color.RED);
+		Assert.assertEquals(new Color(image.getRGB(0, 0)), Color.RED);
+		Assert.assertEquals(new Color(image.getRGB(100, 20)), Color.RED);
+		Assert.assertEquals(new Color(image.getRGB(100, 0)), Color.RED);
 	}
 	@Test(groups= {"ut"})
 	public void testCompareStepInErrorWithReferenceMediumMatch2() throws Exception {
@@ -444,6 +460,13 @@ public class TestErrorCauseFinder extends MockitoTest {
 		Assert.assertEquals(causes.get(0).getDescription(), "1 Label(s) missing: \n"
 				+ "some label\n");
 		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
+		
+		// check line has been drawn below the missing label
+		BufferedImage image = ImageIO.read(referenceImgStep2);
+		Assert.assertEquals(new Color(image.getRGB(0, 50)), Color.RED);
+		Assert.assertNotEquals(new Color(image.getRGB(0, 20)), Color.RED);
+		Assert.assertEquals(new Color(image.getRGB(100, 50)), Color.RED);
+		Assert.assertNotEquals(new Color(image.getRGB(100, 20)), Color.RED);
 	}
 
 	/**
