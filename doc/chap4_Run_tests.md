@@ -709,13 +709,13 @@ If you do not want to generate these files, add `usedefaultlistener false` to yo
 From version 4.10, it is possible to execute Selenium IDE tests.
 - Create your test / suite with selenium IDE
 - Export it with JUnit / Java as a .java file
-- Run the following command
+- Run the following command: **don't forget to specify the browser parameter, else you will get a NullPointerException**
 
-`java -cp seleniumRobot.jar -D<option1>=<value1> -D<option2>=<value2> -javaagent:aspectjweaver.jar com.seleniumtests.util.ide.SeleniumIdeLauncher -scripts test1.java,test2.java`
+`java -cp seleniumRobot.jar -D<option1>=<value1> -D<option2>=<value2> -Dbrowser=<browser> -javaagent:aspectjweaver.jar com.seleniumtests.util.ide.SeleniumIdeLauncher -scripts test1.java,test2.java`
 
 or, for local
 
-`java -cp seleniumRobot.jar;lib/drivers/* -D<option1>=<value1> -D<option2>=<value2> -javaagent:aspectjweaver.jar com.seleniumtests.util.ide.SeleniumIdeLauncher -scripts test1.java,test2.java`
+`java -cp seleniumRobot.jar;lib/drivers/* -D<option1>=<value1> -D<option2>=<value2> -Dbrowser=<browser> -javaagent:aspectjweaver.jar com.seleniumtests.util.ide.SeleniumIdeLauncher -scripts test1.java,test2.java`
 
 **/!\ AS we compile on the fly, a java JDK MUST be used, else you will get: java.lang.AssertionError: java.lang.ClassNotFoundException: com.sun.tools.javac.api.JavacTool**
 
