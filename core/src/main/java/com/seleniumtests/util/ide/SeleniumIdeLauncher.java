@@ -3,6 +3,7 @@ package com.seleniumtests.util.ide;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -45,10 +46,22 @@ public class SeleniumIdeLauncher {
 	}
 
 	public void executeScripts() throws ClassNotFoundException {
+		
 		executeScripts(scripts);
 	}
 	
+	/**
+	 * Check if mandatory options are set
+	 */
+	private void checkPrerequisites() {
+		if (System.getProperty(SeleniumTestsContext.BROWSER) == null) {
+			logger.error("'-Dbrowser=<browser>' option is mandatory" );
+			System.exit(1);
+		}
+	}
+	
 	public void executeScripts(List<String> scriptFiles) throws ClassNotFoundException {
+		checkPrerequisites();
 		Map<String, String> classCodes = generateTestClasses(scriptFiles);
 		executeGeneratedClasses(classCodes);
 	}
@@ -58,7 +71,7 @@ public class SeleniumIdeLauncher {
 	 * We take all the methods (without \@After and \@Before) and copy them in a new file
 	 */
 	public Map<String, String> generateTestClasses(List<String> scriptFiles) {
-		Map<String, String> classCodes = new HashMap<>();
+		Map<String, String> classCodes = new LinkedHashMap<>();
 		
 		for (String scriptFile: scriptFiles) {
 			try {
