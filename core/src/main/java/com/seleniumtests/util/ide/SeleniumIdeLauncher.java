@@ -21,6 +21,7 @@ import org.testng.xml.XmlTest;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 import net.openhft.compiler.CompilerUtils;
@@ -42,6 +43,7 @@ public class SeleniumIdeLauncher {
             .build()
             .parse(args);
 
+        
         main.executeScripts();
 	}
 
@@ -55,8 +57,7 @@ public class SeleniumIdeLauncher {
 	 */
 	private void checkPrerequisites() {
 		if (System.getProperty(SeleniumTestsContext.BROWSER) == null) {
-			logger.error("'-Dbrowser=<browser>' option is mandatory" );
-			System.exit(1);
+			throw new ConfigurationException("'-Dbrowser=<browser>' option is mandatory");
 		}
 	}
 	
