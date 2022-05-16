@@ -1174,7 +1174,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 		
 		// close windows before quitting (this is the only way to close chrome attached browser when it's not started by selenium)
 		try {
-			List<String> handles = new ArrayList<>(((CustomEventFiringWebDriver)driver).getWebDriver().getWindowHandles());
+			List<String> handles = new ArrayList<>(driver.getWindowHandles());
 	        Collections.reverse(handles);
 
 	        for (String handle: handles) {
