@@ -110,6 +110,7 @@ public class SeleniumTestsContext {
     public static final String CHROME_USER_PROFILE_PATH = "chromeUserProfilePath";	// chrome user profile
     public static final String EDGE_USER_PROFILE_PATH = "edgeUserProfilePath";	// edge user profile
     public static final String CHROME_OPTIONS = "chromeOptions";				// options to give to chrome at startup
+    public static final String EDGE_OPTIONS = "edgeOptions";					// options to give to edge at startup
     public static final String FIREFOX_BINARY_PATH = "firefoxBinaryPath";		// chemin vers le binaire firefox (firefox portable ou pour utiliser une version spécifique
     public static final String CHROME_DRIVER_PATH = "chromeDriverPath";			// chemin vers chromeDriver si on souhaite utiliser une version différente
     public static final String GECKO_DRIVER_PATH = "geckoDriverPath";			// chemin vers chromeDriver si on souhaite utiliser une version différente
@@ -1429,6 +1430,10 @@ public class SeleniumTestsContext {
     public String getChromeOptions() {
     	return (String) getAttribute(CHROME_OPTIONS);
     }
+    
+    public String getEdgeOptions() {
+    	return (String) getAttribute(EDGE_OPTIONS);
+    }
 
     public String getOutputDirectory() {
         return (String) getAttribute(OUTPUT_DIRECTORY);
@@ -2252,6 +2257,10 @@ public class SeleniumTestsContext {
    
     public void setChromeOptions(String options) {
     	setAttribute(CHROME_OPTIONS, options);
+    }
+    
+    public void setEdgeOptions(String options) {
+    	setAttribute(EDGE_OPTIONS, options);
     }
     
     public void setChromeUserProfilePath(String path) {
