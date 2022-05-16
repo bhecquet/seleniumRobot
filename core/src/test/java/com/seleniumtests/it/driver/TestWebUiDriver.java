@@ -539,6 +539,49 @@ public class TestWebUiDriver extends ReporterTest {
 		WebUIDriver.getWebDriver(true, BrowserType.INTERNET_EXPLORER, "main", 0);
 	}
 	
+
+	@Test(groups={"it"})
+	public void testAttachExternalEdgeBrowser() {
+		if (!SystemUtils.IS_OS_WINDOWS) {
+			throw new SkipException("This test can only be done on Windows");
+		}
+
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
+		
+		Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
+		String path = browsers.get(BrowserType.EDGE).get(0).getPath();
+		int port = GenericDriverTest.findFreePort();
+		
+		// create chrome browser with the right option
+		new BrowserLauncher(BrowserType.EDGE, port, path, 0, null).run();
+			
+		// creates the driver
+		WebDriver driver1 = WebUIDriver.getWebDriver(true, BrowserType.EDGE, "main", port);
+		driver1.get("edge://settings/");
+		Assert.assertTrue(new TextFieldElement("search", By.id("search_input")).isElementPresent(3));
+	}
+	
+	@Test(groups={"it"})
+	public void testAttachExternalEdgeIEBrowser() throws Exception {
+
+		if (!SystemUtils.IS_OS_WINDOWS) {
+			throw new SkipException("This test can only be done on Windows");
+		}
+		exposeWebServer();
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
+		SeleniumTestsContextManager.getThreadContext().setBrowser("iexplore");
+		SeleniumTestsContextManager.getThreadContext().setEdgeUserProfilePath("default");
+		SeleniumTestsContextManager.getThreadContext().setEdgeIeMode(true);
+
+		// creates the first driver so that an internet explorer process is created the right way
+		new BrowserLauncher(BrowserType.INTERNET_EXPLORER, 0, null, 0, serverUrl).run();
+		
+		// attach a second driver to the previous browser
+		WebDriver driverAttached = WebUIDriver.getWebDriver(true, BrowserType.INTERNET_EXPLORER, "second", 0);
+		Assert.assertEquals(driverAttached.getCurrentUrl(), serverUrl); // check we are connected to the first started browser
+		driverAttached.get("about:blank"); // check we can control the browser
+	}
+	
 	@AfterMethod(groups={"it"}, alwaysRun = true)
 	public void closeBrowser() {
 		try {
@@ -568,7 +611,7 @@ public class TestWebUiDriver extends ReporterTest {
 			
 			WaitHelper.waitForSeconds(delay);
 
-			if (BrowserType.CHROME == browserType) {
+			if (BrowserType.CHROME == browserType || BrowserType.EDGE == browserType) {
 				// create chrome browser with the right option
 				OSCommand.executeCommand(new String[] {path, "--remote-debugging-port=" + port, "about:blank"});
 			} else if (BrowserType.INTERNET_EXPLORER == browserType) {

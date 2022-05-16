@@ -105,6 +105,10 @@ public class DriverConfig {
     	return testContext.getChromeOptions();
     }
     
+    public String getEdgeOptions() {
+    	return testContext.getEdgeOptions();
+    }
+    
     public Boolean getBetaBrowser() {
     	return testContext.getBetaBrowser();
     }
