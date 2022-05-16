@@ -31,6 +31,10 @@ import io.appium.java_client.remote.MobileCapabilityType;
 
 public abstract class IMobileCapabilityFactory extends ICapabilitiesFactory {
 
+
+	protected static final String ANDROID_PLATFORM = "android";
+	protected static final String IOS_PLATFORM = "ios";
+	
 	protected IMobileCapabilityFactory(DriverConfig webDriverConfig) {
 		super(webDriverConfig);
 	}

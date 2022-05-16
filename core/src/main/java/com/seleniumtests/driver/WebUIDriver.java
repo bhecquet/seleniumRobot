@@ -48,6 +48,7 @@ import com.seleniumtests.browserfactory.FirefoxDriverFactory;
 import com.seleniumtests.browserfactory.HtmlUnitDriverFactory;
 import com.seleniumtests.browserfactory.IEDriverFactory;
 import com.seleniumtests.browserfactory.IWebDriverFactory;
+import com.seleniumtests.browserfactory.PerfectoDriverFactory;
 import com.seleniumtests.browserfactory.SafariDriverFactory;
 import com.seleniumtests.browserfactory.SauceLabsDriverFactory;
 import com.seleniumtests.browserfactory.SeleniumGridDriverFactory;
@@ -204,7 +205,9 @@ public class WebUIDriver {
         	return new SauceLabsDriverFactory(this.config);
         } else if (config.getMode() == DriverMode.BROWSERSTACK) {
         	return new BrowserStackDriverFactory(this.config);
-        
+        } else if (config.getMode() == DriverMode.PERFECTO) {
+        	return new PerfectoDriverFactory(this.config);
+               
         	
         // local mode
         } else {
