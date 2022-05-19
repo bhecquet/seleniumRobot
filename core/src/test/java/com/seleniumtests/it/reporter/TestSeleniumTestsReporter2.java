@@ -789,6 +789,41 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 	
 	/**
+	 * Check behaviour when Assert is used in test scenario (not in webpage)
+	 * Assertion in scenario should be attached, when there is no step after (final checks) should be displayed in a specific step
+	 * Test end will also be in red
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testDetailedReportWithSoftAssertAtScenarioEnd() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "true");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testWithAssertOnTestEnd"});
+			
+			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
+			
+			// check content of summary report file
+			String detailedReportContent = readTestMethodResultFile("testWithAssertOnTestEnd");
+			
+			// check last step shows the assertion					
+			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box failed\">.*?<i class\\=\"fas fa-plus\"></i>"
+					+ "</button><span class=\"step-title\"> Test end - \\d+\\.\\d+ secs\\s*</span></div><div class\\=\"box-body\"><ul><div class\\=\"message-log\">Test is KO with error: class java.lang.AssertionError: Error in result expected \\[1\\] but found \\[2\\].*"));
+			
+
+			// that assertion raised in test scenario is attached to previous step
+			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box failed\"><div class\\=\"box-header with-border\">"
+					+ "<button type\\=\"button\" class\\=\"btn btn-box-tool\" data-widget\\=\"collapse\"><i class\\=\"fas fa-plus\"></i></button><span class=\"step-title\"> getResult  - \\d+\\.\\d+ secs\\s*</span></div><div class\\=\"box-body\">"
+					+ "<ul><div class\\=\"message-error\">!!!FAILURE ALERT!!! - Assertion Failure: Error in result expected \\[1\\] but found \\[2\\]</div>.*"));
+			
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);
+		}
+	}
+	
+	/**
 	 * Check that when an assert is raised in sub step, the root step is marked as failed
 	 * @throws Exception
 	 */
