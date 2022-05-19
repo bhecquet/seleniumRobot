@@ -26,6 +26,7 @@ import org.openqa.selenium.WebDriverException;
 
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
+import com.seleniumtests.driver.TestType;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public abstract class AbstractWebDriverFactory {
@@ -67,7 +68,7 @@ public abstract class AbstractWebDriverFactory {
         driver = createNativeDriver();
 
         setImplicitWaitTimeout(webDriverConfig.getImplicitWaitTimeout());
-        if (webDriverConfig.getPageLoadTimeout() >= 0) {
+        if (webDriverConfig.getPageLoadTimeout() >= 0 && webDriverConfig.getTestType().family() == TestType.WEB) {
             setPageLoadTimeout(webDriverConfig.getPageLoadTimeout());
         }
 
