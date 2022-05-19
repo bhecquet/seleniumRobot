@@ -130,6 +130,19 @@ public class StubTestClass3 extends StubParentClass {
 		page.add(3);
 	}
 	
+	/**
+	 * Check an assertion raised directly inside scenario, after all steps is correctly displayed in report
+	 * @throws IOException
+	 */
+	@Test(groups="stub")
+	public void testWithAssertOnTestEnd() throws IOException {
+		
+		
+		CalcPage page = new CalcPage()
+				.add(1, 1);
+		Assert.assertEquals(page.getResult(), 1, "Error in result");
+	}
+	
 	@Test(groups="stub")
 	public void testWithAssertInSubStep() throws IOException {
 		
