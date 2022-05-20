@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
@@ -25,14 +24,13 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.DriverConfig;
 
 import io.appium.java_client.remote.MobileCapabilityType;
 
-public class PerfectoCapabilitiesFactory extends ICapabilitiesFactory {
+public class PerfectoCapabilitiesFactory extends ICloudCapabilityFactory {
 
 	private static final Pattern CLOUD_NAME_PATTERN = Pattern.compile("https://(\\w+).perfectomobile.com/nexperience.*");
 	
@@ -50,27 +48,33 @@ public class PerfectoCapabilitiesFactory extends ICapabilitiesFactory {
 		capabilities.setCapability("securityToken", webDriverConfig.getCloudApiKey());
 
 		
-		if(IMobileCapabilityFactory.ANDROID_PLATFORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
+		if(ANDROID_PLATFORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
         	Capabilities androidCaps = new AndroidCapabilitiesFactory(webDriverConfig).createCapabilities();
         	capabilities.merge(androidCaps);
             
-        } else if (IMobileCapabilityFactory.IOS_PLATFORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
+        } else if (IOS_PLATFORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
         	Capabilities iosCaps = new IOsCapabilitiesFactory(webDriverConfig).createCapabilities();
         	capabilities.merge(iosCaps);
         } 
 		
 		// we need to upload something
 		if (capabilities.getCapability(MobileCapabilityType.APP) != null) {
+			boolean uploadApp = isUploadApp(capabilities);
+			
 			String appName = new File((String) capabilities.getCapability(MobileCapabilityType.APP)).getName();
-			String repositoryKey = String.format("PRIVATE:%s/Native/android/%s", SeleniumTestsContextManager.getApplicationName(), appName);
+			String repositoryKey = String.format("PUBLIC:%s", appName);
 			
 			String cloudName = extractCloudName();
-			try {
-				uploadFile(cloudName, webDriverConfig.getCloudApiKey(), (String)capabilities.getCapability(MobileCapabilityType.APP), repositoryKey);
-				capabilities.setCapability(MobileCapabilityType.APP, repositoryKey);
-			} catch (URISyntaxException | IOException e) {
-				throw new ScenarioException("Could not upload file", e);
+			
+			if (uploadApp) {
+				try {
+					uploadFile(cloudName, webDriverConfig.getCloudApiKey(), (String)capabilities.getCapability(MobileCapabilityType.APP), repositoryKey);
+					
+				} catch (URISyntaxException | IOException e) {
+					throw new ScenarioException("Could not upload file", e);
+				}
 			}
+			capabilities.setCapability(MobileCapabilityType.APP, repositoryKey);
 		}
 
 		return capabilities;

@@ -27,10 +27,10 @@ public class PerfectoDriverFactory extends AbstractWebDriverFactory implements I
     	
 
     	try {
-	        if(IMobileCapabilityFactory.ANDROID_PLATFORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
+	        if(ICloudCapabilityFactory.ANDROID_PLATFORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
 	            return new AndroidDriver<WebElement>(new URL(webDriverConfig.getHubUrl().get(0)), driverOptions);
 	            
-	        } else if (IMobileCapabilityFactory.IOS_PLATFORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
+	        } else if (ICloudCapabilityFactory.IOS_PLATFORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
 	        	return new IOSDriver<WebElement>(new URL(webDriverConfig.getHubUrl().get(0)), driverOptions);
 	            
 	        } else {
