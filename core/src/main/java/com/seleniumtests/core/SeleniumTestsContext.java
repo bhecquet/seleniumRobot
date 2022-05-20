@@ -32,6 +32,8 @@ import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy.ProxyType;
@@ -120,6 +122,7 @@ public class SeleniumTestsContext {
     public static final String USER_AGENT = "userAgent";						// user agent utilisé pour les tests. Permet d'écraser le user-agent par défaut du navigateur, sur firefox et chrome uniquement
     public static final String BETA_BROWSER = "betaBrowser";					// enable usage of beta browsers	
     public static final String EDGE_IE_MODE  = "edgeIeMode";					// if true, Edge is started in IE mode
+    public static final String CAPABILITIES  = "capabilities";					// The capability to add to driver. `-Dcapabilities=<key1>=<value1>,<key2>=<value2>`
     
     public static final String VIEWPORT_WIDTH = "viewPortWidth";					// width of viewport	
     public static final String VIEWPORT_HEIGHT = "viewPortHeight";					// height of viewport
@@ -443,7 +446,8 @@ public class SeleniumTestsContext {
         setJavascriptEnabled(getBoolValueForTest(ENABLE_JAVASCRIPT, System.getProperty(ENABLE_JAVASCRIPT)));
         setNtlmAuthTrustedUris(getValueForTest(NTLM_AUTH_TRUSTED_URIS, System.getProperty(NTLM_AUTH_TRUSTED_URIS)));
         setBrowserDownloadDir(getValueForTest(BROWSER_DOWNLOAD_DIR, System.getProperty(BROWSER_DOWNLOAD_DIR)));
-   
+        setCapabilities(getValueForTest(CAPABILITIES, System.getProperty(CAPABILITIES)));
+        
         setOverrideSeleniumNativeAction(getBoolValueForTest(OVERRIDE_SELENIUM_NATIVE_ACTION, System.getProperty(OVERRIDE_SELENIUM_NATIVE_ACTION)));
 
         setAdvancedElementSearch(getValueForTest(ADVANCED_ELEMENT_SEARCH, System.getProperty(ADVANCED_ELEMENT_SEARCH)));
@@ -1151,6 +1155,10 @@ public class SeleniumTestsContext {
         } else {
             return this.getOutputDirectory() + "\\downloads\\";
         }
+    }
+    
+    public Capabilities getCapabilities() {
+    	return (Capabilities) getAttribute(CAPABILITIES);
     }
     
     public Integer getSnapshotScrollDelay() {
@@ -2359,6 +2367,22 @@ public class SeleniumTestsContext {
     
     public void setBrowserDownloadDir(String downloadDir) {
     	setAttribute(BROWSER_DOWNLOAD_DIR, downloadDir);
+    }
+    
+    public void setCapabilities(String capabilities) {
+
+		MutableCapabilities caps = new MutableCapabilities();
+    	if (capabilities != null) {
+    		for (String cap: capabilities.split(",")) {
+    			String[] keyValue = cap.split("=", 2);
+    			if (keyValue.length != 2) {
+    				throw new ConfigurationException("format of capability is '<key>=<value>'");
+    			}
+    			caps.setCapability(keyValue[0], keyValue[1]);
+    		}
+    		
+    	} 
+    	setAttribute(CAPABILITIES, caps);
     }
     
     public void setFullReset(Boolean enabled) {
