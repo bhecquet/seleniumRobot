@@ -17,27 +17,124 @@
  */
 package com.seleniumtests.browserfactory;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.http.auth.AuthenticationException;
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.DriverConfig;
 
-public class SauceLabsCapabilitiesFactory extends ICapabilitiesFactory {
+import io.appium.java_client.remote.MobileCapabilityType;
+import kong.unirest.Unirest;
+import kong.unirest.UnirestException;
+import kong.unirest.UnirestInstance;
+
+public class SauceLabsCapabilitiesFactory extends ICloudCapabilityFactory {
+
+	private static final Pattern REG_USER_PASSWORD = Pattern.compile("https://([^:/]++):([^:@]++)@ondemand.(.*?).saucelabs.com:443/wd/hub");
+	private static final String SAUCE_UPLOAD_URL = "https://api.%s.saucelabs.com/v1/storage/upload";
 	
     public SauceLabsCapabilitiesFactory(DriverConfig webDriverConfig) {
 		super(webDriverConfig);
 	}
 
+    /**
+     * https://docs.saucelabs.com/dev/test-configuration-options/
+     */
 	@Override
     public DesiredCapabilities createCapabilities() {
 
         final DesiredCapabilities capabilities = new DesiredCapabilities();
 
-        capabilities.setCapability("browserName", webDriverConfig.getBrowserType());
-        capabilities.setCapability("platform", webDriverConfig.getPlatform());
-        capabilities.setCapability("version", webDriverConfig.getVersion());
-        capabilities.setCapability("name", SeleniumTestsContextManager.getThreadContext().getTestMethodSignature());
+        
+        MutableCapabilities sauceOptions = new MutableCapabilities();
+        capabilities.setCapability("sauce:options", sauceOptions);
+		
+		if(ANDROID_PLATFORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
+	        
+        	Capabilities androidCaps = new AndroidCapabilitiesFactory(webDriverConfig).createCapabilities();
+        	capabilities.merge(androidCaps);
+            
+        } else if (IOS_PLATFORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
+        	Capabilities iosCaps = new IOsCapabilitiesFactory(webDriverConfig).createCapabilities();
+        	capabilities.merge(iosCaps);
+        	
+        	
+        } else {
+        	capabilities.setCapability("browserName", webDriverConfig.getBrowserType());
+            capabilities.setCapability("platform", webDriverConfig.getPlatform());
+            capabilities.setCapability("version", webDriverConfig.getVersion());
+            capabilities.setCapability("name", SeleniumTestsContextManager.getThreadContext().getTestMethodSignature());
 
+        }
+		
+		// we need to upload something
+		if (capabilities.getCapability(MobileCapabilityType.APP) != null) {
+			boolean uploadApp = isUploadApp(capabilities);
+			
+			if (uploadApp) {
+				uploadFile((String)capabilities.getCapability(MobileCapabilityType.APP));
+			}
+			capabilities.setCapability("app", "storage:filename=" + new File((String) capabilities.getCapability(MobileCapabilityType.APP)).getName()); //  saucelabs waits for app capability a special file: sauce-storage:<filename>
+
+		}
+        
         return capabilities;
     }
+	
+
+    /**
+     * Upload application to saucelabs server
+     * @param targetAppPath
+     * @param serverURL
+     * @return
+     * @throws IOException
+     * @throws AuthenticationException 
+     */
+    private void uploadFile(String application) {
+
+    	// extract user name and password from getWebDriverGrid
+    	Matcher matcher = REG_USER_PASSWORD.matcher(SeleniumTestsContextManager.getThreadContext().getWebDriverGrid().get(0));
+    	String user;
+    	String password;
+    	String datacenter;
+    	if (matcher.matches()) {
+    		user = matcher.group(1);
+    		password = matcher.group(2);
+    		datacenter = matcher.group(3);
+    	} else {
+    		throw new ConfigurationException("webDriverGrid variable does not have the right format for connecting to sauceLabs: \"https://<user>:<token>@ondemand.<datacenter>.saucelabs.com:443/wd/hub\"");
+    	}
+    	
+    	try (UnirestInstance unirest = Unirest.spawnInstance();){
+    		
+    		String proxyHost = System.getProperty("https.proxyHost");
+    		String proxyPort = System.getProperty("https.proxyPort");
+    		if (proxyHost != null && proxyPort != null) {
+    			unirest.config().proxy(proxyHost, Integer.valueOf(proxyPort));
+    		}
+    		unirest.post(String.format(SAUCE_UPLOAD_URL, datacenter))
+    					.basicAuth(user, password)
+    					.field("payload", new File(application))
+    					.field("name", new File(application).getName())
+    					.asString()
+    					.ifFailure(response -> {
+    						throw new ConfigurationException(String.format("Application file upload failed: %s", response.getStatusText()));
+    						})
+    					.ifSuccess(response -> {
+    						logger.info("Application successfuly uploaded to Saucelabs");
+    					});
+
+		} catch (UnirestException e) {
+			throw new ConfigurationException("Application file upload failed: " + e.getMessage());
+		}
+    }
+
 }
