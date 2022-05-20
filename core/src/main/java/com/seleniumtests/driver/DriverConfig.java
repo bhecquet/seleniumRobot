@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
@@ -88,6 +89,10 @@ public class DriverConfig {
 	public String getBrowserDownloadDir() {
         return testContext.getBrowserDownloadDir();
     }
+	
+	public Capabilities getCapabilites() {
+		return testContext.getCapabilities();
+	}
 	
 	public String getInitialUrl() {
 		return testContext.getInitialUrl();

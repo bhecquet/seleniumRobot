@@ -44,6 +44,9 @@ public abstract class AbstractWebDriverFactory {
         capsFactory = getCapabilitiesFactory();
         driverOptions = capsFactory.createCapabilities();
         
+        // add user defined capabilities
+        driverOptions.merge(webDriverConfig.getCapabilites());
+        
         if (capsFactory instanceof IDesktopCapabilityFactory) {
         	selectedBrowserInfo = ((IDesktopCapabilityFactory)capsFactory).getSelectedBrowserInfo();
         } else {
@@ -112,4 +115,8 @@ public abstract class AbstractWebDriverFactory {
     public void setWebDriverConfig(final DriverConfig cfg) {
         this.webDriverConfig = cfg;
     }
+
+	public MutableCapabilities getDriverOptions() {
+		return driverOptions;
+	}
 }
