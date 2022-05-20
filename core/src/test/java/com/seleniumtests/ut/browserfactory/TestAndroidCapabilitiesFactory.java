@@ -58,7 +58,7 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		MutableCapabilities capa = capaFactory.createCapabilities();
 		
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), BrowserType.CHROME.toString().toLowerCase());
-		Assert.assertEquals(capa.getCapability(MobileCapabilityType.AUTOMATION_NAME), "UiAutomator2");
+		Assert.assertEquals(capa.getCapability(MobileCapabilityType.AUTOMATION_NAME), "Appium");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_NAME), "android");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_VERSION), "8.0");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.DEVICE_NAME), "Samsung Galasy S8");
@@ -158,7 +158,7 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), BrowserType.BROWSER.toString().toLowerCase());
 		Assert.assertNull(capa.getCapability(ChromeOptions.CAPABILITY));
-		Assert.assertEquals(capa.getCapability(MobileCapabilityType.AUTOMATION_NAME), "UiAutomator2");
+		Assert.assertEquals(capa.getCapability(MobileCapabilityType.AUTOMATION_NAME), "Appium");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_NAME), "android");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_VERSION), "8.0");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.DEVICE_NAME), "Samsung Galasy S8");
@@ -186,7 +186,7 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "");
 		Assert.assertEquals(capa.getCapability("app"), "com.covea.mobileapp");
-		Assert.assertEquals(capa.getCapability(MobileCapabilityType.AUTOMATION_NAME), "UiAutomator2");
+		Assert.assertEquals(capa.getCapability(MobileCapabilityType.AUTOMATION_NAME), "Appium");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_NAME), "android");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_VERSION), "8.0");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.DEVICE_NAME), "Samsung Galasy S8");
