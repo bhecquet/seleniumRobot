@@ -40,7 +40,7 @@ public class AndroidCapabilitiesFactory extends IMobileCapabilityFactory {
 		} else if (webDriverConfig.getMobilePlatformVersion() != null && Integer.parseInt(webDriverConfig.getMobilePlatformVersion().split("\\.")[0]) < 6) {
     		return "UiAutomator1";
     	} else if (webDriverConfig.getAutomationName() == null) {
-    		return "UiAutomator2";
+    		return "Appium";
     	} else {
     		return webDriverConfig.getAutomationName();
     	}
