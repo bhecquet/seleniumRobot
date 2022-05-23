@@ -1249,6 +1249,18 @@ By default, your test will only contain 1 running step, which is the full scenar
 
 ![](images/selenium_ide_step.png)
 
+#### Call Java code ####
+
+for scenarios that needs access to Desktop (for authentication for example), Selenium IDE cannot run the whole Scenario
+So it's possible to write a comment ("echo")
+
+```
+CALL:new com.company.AuthenticationPage()._accessAuthentication(${user}).toString());
+```
+
+On execution with SeleniumRobot, the "CALL" command will be replaced by the content which will be called
+It's mandatory to specify the package of the class, as we do not add the imports.
+
 ### 12 Write mobile tests ###
 
 SeleniumRobot supports appium (see chap4_Run_tests, §3 to configure execution) out of the box. Be default, seleniumRobot will start the appium server itself for running the test locally, and stop it at the end of the test.
