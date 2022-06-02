@@ -393,10 +393,6 @@ public class DriverConfig {
         return testContext.getVersion();
     }
 
-	public String getCloudApiKey() {
-		return testContext.getCloudApiKey();
-	}
-	
 	public VideoCaptureMode getVideoCapture() {
 		return testContext.getVideoCapture();
 	}

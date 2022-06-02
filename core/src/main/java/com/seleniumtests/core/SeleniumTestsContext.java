@@ -227,7 +227,6 @@ public class SeleniumTestsContext {
     // Cloud specific properties
     public static final String VERSION = "version";								// browser version
     public static final String PLATFORM = "platform";							// platform on which test should execute. Ex: Windows 7, Android, iOS, Linux, OS X 10.10. 	
-    public static final String CLOUD_API_KEY = "cloudApiKey";					// clé d'accès (dépend des services)
 
     // Neoload specific properties
     public static final String NEOLOAD_USER_PATH = "neoloadUserPath";			// name of the neoload "user path" that will be created in Design mode
@@ -499,7 +498,6 @@ public class SeleniumTestsContext {
 
         setVersion(getValueForTest(VERSION, System.getProperty(VERSION)));
         setPlatform(getValueForTest(PLATFORM, System.getProperty(PLATFORM)));
-        setCloudApiKey(getValueForTest(CLOUD_API_KEY, System.getProperty(CLOUD_API_KEY)));
         
         setCustomTestReports(getValueForTest(CUSTOM_TEST_REPORTS, System.getProperty(CUSTOM_TEST_REPORTS)));
         setCustomSummaryReports(getValueForTest(CUSTOM_SUMMARY_REPORTS, System.getProperty(CUSTOM_SUMMARY_REPORTS)));
@@ -1722,10 +1720,6 @@ public class SeleniumTestsContext {
     public String getPlatform() {
         return (String) getAttribute(PLATFORM);
     }
-    
-    public String getCloudApiKey() {
-    	return (String) getAttribute(CLOUD_API_KEY);
-    }
 
     public String getRelativeOutputDir() {
     	return (String) getAttribute(RELATIVE_OUTPUT_DIR);
@@ -2704,10 +2698,6 @@ public class SeleniumTestsContext {
     			setAttribute(PLATFORM, Platform.ANY.toString());
     		}
     	}
-    }
-    
-    public void setCloudApiKey(String key) {
-    	setAttribute(CLOUD_API_KEY, key);
     }
     
     public void setTestType(final TestType testType) {
