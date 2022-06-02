@@ -1,8 +1,5 @@
 package com.seleniumtests.it.core.testanalysis;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.util.Arrays;
 
 import org.testng.Assert;
@@ -10,16 +7,10 @@ import org.testng.ITestContext;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
-import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.connectors.selenium.fielddetector.FieldDetectorConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.it.reporter.ReporterTest;
 import com.seleniumtests.util.video.VideoCaptureMode;
-
-import kong.unirest.HttpRequest;
-import kong.unirest.HttpRequestWithBody;
-import kong.unirest.HttpResponse;
-import kong.unirest.JsonNode;
 
 public class TestErrorCauseFInder extends ReporterTest {
 	
@@ -221,6 +212,39 @@ public class TestErrorCauseFInder extends ReporterTest {
 			createServerMock("POST", FieldDetectorConnector.DETECT_URL, 200, String.format(DETECT_FIELD_REPLY, "testImageDetection_4-1__clickErrorButtonInError_-.jpg"));
 			
 			ReporterTest.executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.NONE,  new String[] {"testImageDetection"});
+			
+			// check the error cause is displayed at the top of the report
+			String output = readTestMethodResultFile("testImageDetection");
+			Assert.assertTrue(output.contains("<th>Possible error causes</th><td><ul><li>Field in error: At least one field in error on step '_clickErrorButtonInError '</li></ul></td>"));
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL);
+			System.clearProperty(SeleniumTestsContext.FIND_ERROR_CAUSE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+			System.clearProperty(SeleniumTestsContext.RANDOM_IN_ATTACHMENT_NAME);
+			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
+		}
+	}
+	@Test(groups={"it"})
+	public void testErrorInLastStepMultithread(ITestContext testContext) throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL, SERVER_URL);
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.FIND_ERROR_CAUSE, "true");
+			System.setProperty(SeleniumTestsContext.RANDOM_IN_ATTACHMENT_NAME, "false");
+			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, VideoCaptureMode.ON_ERROR.toString());
+			
+			configureMockedSnapshotServerConnection();
+			createServerMock("GET", FieldDetectorConnector.STATUS_URL, 200, "OK");		
+			createServerMock("POST", FieldDetectorConnector.DETECT_ERROR_URL, 200, String.format(DETECT_ERROR_REPLY, "testImageDetection_5-1_Test_end-.png"));		
+			createServerMock("POST", FieldDetectorConnector.DETECT_URL, 200, String.format(DETECT_FIELD_REPLY, "testImageDetection_4-1__clickErrorButtonInError_-.jpg"));
+		
+			ReporterTest.executeSubTest(3, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS,  new String[] {"testImageDetection"});
 			
 			// check the error cause is displayed at the top of the report
 			String output = readTestMethodResultFile("testImageDetection");
