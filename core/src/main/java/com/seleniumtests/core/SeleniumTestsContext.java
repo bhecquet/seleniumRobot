@@ -96,6 +96,7 @@ public class SeleniumTestsContext {
     public static final String EXPLICIT_WAIT_TIME_OUT = "explicitWaitTimeOut";	// attente explicite du navigateur
     public static final String HEADLESS_BROWSER = "headless";
     public static final String REPLAY_TIME_OUT = "replayTimeOut";				// time during which an action is replayed. By default 30 secs
+    public static final String ACTION_DELAY = "actionDelay";					// time in milliseconds between 2 actions (e.g: 2 clicks). It allows to slow down or speed up tests
     public static final String PAGE_LOAD_TIME_OUT = "pageLoadTimeout";			// temps d'attente de chargement d'une page
     public static final String PAGE_LOAD_STRATEGY = "pageLoadStrategy";			// page load strategy as defined in selenium spec. Will be applied to driver
     public static final String WEB_DRIVER_GRID = "webDriverGrid";				// adresse du serveur seleniumGrid
@@ -302,6 +303,7 @@ public class SeleniumTestsContext {
 	public static final boolean DEFAULT_EDGE_IE_MODE = false;
     
     public static final int DEFAULT_REPLAY_TIME_OUT = 30;
+    public static final int DEFAULT_ACTION_DELAY = 200;
     
 	
 
@@ -495,6 +497,8 @@ public class SeleniumTestsContext {
         setAppActivity(getValueForTest(APP_ACTIVITY, System.getProperty(APP_ACTIVITY)));
         setAppWaitActivity(getValueForTest(APP_WAIT_ACTIVITY, System.getProperty(APP_WAIT_ACTIVITY)));
         setNewCommandTimeout(getIntValueForTest(NEW_COMMAND_TIMEOUT, System.getProperty(NEW_COMMAND_TIMEOUT)));
+        
+        setActionDelay(getIntValueForTest(ACTION_DELAY, System.getProperty(ACTION_DELAY)));
 
         setVersion(getValueForTest(VERSION, System.getProperty(VERSION)));
         setPlatform(getValueForTest(PLATFORM, System.getProperty(PLATFORM)));
@@ -1712,6 +1716,10 @@ public class SeleniumTestsContext {
     public int getNewCommandTimeout() {
         return (Integer) getAttribute(NEW_COMMAND_TIMEOUT);
     }
+    
+    public int getActionDelay() {
+    	return (Integer) getAttribute(ACTION_DELAY);
+    }
 
     public String getVersion() {
         return (String) getAttribute(VERSION);
@@ -2637,6 +2645,14 @@ public class SeleniumTestsContext {
     		setAttribute(NEW_COMMAND_TIMEOUT, timeout);
     	} else {
     		setAttribute(NEW_COMMAND_TIMEOUT, DEFAULT_NEW_COMMAND_TIMEOUT);
+    	}
+    }
+    
+    public void setActionDelay(Integer delay) {
+    	if (delay != null) {
+    		setAttribute(ACTION_DELAY, delay);
+    	} else {
+    		setAttribute(ACTION_DELAY, DEFAULT_ACTION_DELAY);
     	}
     }
     

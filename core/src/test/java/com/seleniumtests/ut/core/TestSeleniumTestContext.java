@@ -1322,6 +1322,19 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	
 	@Test(groups="ut context")
+	public void testActionDelay(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setActionDelay(15);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getActionDelay(), 15);
+	}
+	@Test(groups="ut context")
+	public void testActionDelayNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setActionDelay(null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getActionDelay(), SeleniumTestsContext.DEFAULT_ACTION_DELAY);
+	}
+	
+	@Test(groups="ut context")
 	public void testOutputDirectoryAbsolutePath(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setOutputDirectory("/home/user/test-output", testNGCtx, false);
