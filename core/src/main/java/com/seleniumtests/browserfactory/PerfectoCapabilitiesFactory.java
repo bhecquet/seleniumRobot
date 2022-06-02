@@ -32,7 +32,7 @@ import io.appium.java_client.remote.MobileCapabilityType;
 
 public class PerfectoCapabilitiesFactory extends ICloudCapabilityFactory {
 
-	private static final Pattern CLOUD_NAME_PATTERN = Pattern.compile("https://(\\w+).perfectomobile.com/nexperience.*");
+	private static final Pattern CLOUD_NAME_PATTERN = Pattern.compile("https://([^:@]++)@(\\w+).perfectomobile.com/nexperience.*");
 	
 	protected PerfectoCapabilitiesFactory(DriverConfig webDriverConfig) {
 		super(webDriverConfig);
@@ -41,11 +41,12 @@ public class PerfectoCapabilitiesFactory extends ICloudCapabilityFactory {
 	@Override
 	public MutableCapabilities createCapabilities() {
 		
-
+		String apiKey = extractApiKey();
+		
 		DesiredCapabilities  capabilities = new DesiredCapabilities ();
 		capabilities.setCapability("enableAppiumBehavior", true);
 		capabilities.setCapability("autoLaunch", true);
-		capabilities.setCapability("securityToken", webDriverConfig.getCloudApiKey());
+		capabilities.setCapability("securityToken", apiKey);
 
 		
 		if(ANDROID_PLATFORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
@@ -68,7 +69,7 @@ public class PerfectoCapabilitiesFactory extends ICloudCapabilityFactory {
 			
 			if (uploadApp) {
 				try {
-					uploadFile(cloudName, webDriverConfig.getCloudApiKey(), (String)capabilities.getCapability(MobileCapabilityType.APP), repositoryKey);
+					uploadFile(cloudName, apiKey, (String)capabilities.getCapability(MobileCapabilityType.APP), repositoryKey);
 					
 				} catch (URISyntaxException | IOException e) {
 					throw new ScenarioException("Could not upload file", e);
@@ -80,16 +81,30 @@ public class PerfectoCapabilitiesFactory extends ICloudCapabilityFactory {
 		return capabilities;
 	}
 	
+	private String extractApiKey() {
+		List<String> hubUrls = webDriverConfig.getHubUrl();
+		if (hubUrls.isEmpty() || !hubUrls.get(0).contains(".perfectomobile.com/nexperience/perfectomobile/wd/hub")) {
+			throw new ConfigurationException("Perfecto usage needs configuring 'webDriverGrid' parameter with the format 'https://<apikey>@<cloudName>.perfectomobile.com/nexperience/perfectomobile/wd/hub'");
+		}
+		String hubUrl = hubUrls.get(0);
+		
+		Matcher apiKeyMatcher = CLOUD_NAME_PATTERN.matcher(hubUrl);
+		if (apiKeyMatcher.matches()) {
+			return apiKeyMatcher.group(1);
+		} else {
+			throw new ConfigurationException("Api key no provided");
+		}
+	}
 	private String extractCloudName() {
 		List<String> hubUrls = webDriverConfig.getHubUrl();
 		if (hubUrls.isEmpty() || !hubUrls.get(0).contains(".perfectomobile.com/nexperience/perfectomobile/wd/hub")) {
-			throw new ConfigurationException("Perfecto usage needs configuring 'webDriverGrid' parameter with the format 'https://<cloudName>.perfectomobile.com/nexperience/perfectomobile/wd/hub'");
+			throw new ConfigurationException("Perfecto usage needs configuring 'webDriverGrid' parameter with the format 'https://<apikey>@<cloudName>.perfectomobile.com/nexperience/perfectomobile/wd/hub'");
 		}
 		String hubUrl = hubUrls.get(0);
 		
 		Matcher cloudNameMatcher = CLOUD_NAME_PATTERN.matcher(hubUrl);
 		if (cloudNameMatcher.matches()) {
-			return cloudNameMatcher.group(1);
+			return cloudNameMatcher.group(2);
 		}
 		return "";
 	}
