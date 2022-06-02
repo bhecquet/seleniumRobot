@@ -142,6 +142,7 @@ Settings for changing the test behavior
 | loadIni					|			| comma separated list of path to ini formatted files to load. Their values will overwrite those from env.ini file if the same key is present. Path is relative to data/<app>/config path |
 | overrideSeleniumNativeAction      | false | intercept driver.findElement and driver.frame operations so that seleniumRobot element operations can be use (replay, error handling, ...) even when using standard selenium code. Only findElement(By) and findElements(By) are supported, not findElementByxxx(String). Logging is also better |
 | webDriverListener 		| 			| additional driver listener class. See chapter §7.21 for implementation details |
+| actionDelay               | 200       | delay in millisecondes between 2 actions. It allows to speed up or slow down a test |
 
 
 Cucumber options
