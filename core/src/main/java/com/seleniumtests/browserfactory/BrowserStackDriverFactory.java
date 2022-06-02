@@ -22,6 +22,7 @@ import java.net.URL;
 
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
@@ -31,6 +32,9 @@ import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.TestType;
+
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
 
 /**
  * Class for launching test on browserstack
@@ -45,39 +49,21 @@ public class BrowserStackDriverFactory extends AbstractWebDriverFactory implemen
     public BrowserStackDriverFactory(final DriverConfig cfg) {
         super(cfg);
     }
-
-
-    /**
-     * Add / update capabilities to be compatible with browserstack requirements
-     * @return
-     */
-    private DesiredCapabilities createCapabilities(){
-    	
-		DesiredCapabilities capabilities = new DesiredCapabilities();
-		
-		if (SeleniumTestsContextManager.isMobileTest()) {
-			capabilities.setCapability("browserName", webDriverConfig.getBrowserType() == BrowserType.SAFARI ? "iPhone": "android"); 
-			capabilities.setCapability("device", webDriverConfig.getDeviceName()); // pour deviceName
-			capabilities.setCapability("realMobile", "true");
-			capabilities.setCapability("os_version", webDriverConfig.getMobilePlatformVersion());
-			capabilities.setCapability("os", webDriverConfig.getPlatform());
-		} 
-           
-		capabilities.setCapability("name", SeleniumTestsContextManager.getThreadContext().getTestMethodSignature());
-        capabilities.setCapability("project", SeleniumTestsContextManager.getApplicationName());
-        capabilities.setCapability("browserstack.selenium_version", SeleniumTestsContextManager.SELENIUM_VERSION);
-
-    	return capabilities;
-    }
-    
-    @Override
+	
+	@Override
     protected WebDriver createNativeDriver() {
-    	
-    	MutableCapabilities capabilities = createCapabilities();
-    	capabilities.merge(driverOptions);
 
     	try {
-	        return new RemoteWebDriver(new URL(webDriverConfig.getHubUrl().get(0)), capabilities);
+	        if(ICloudCapabilityFactory.ANDROID_PLATFORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
+	            return new AndroidDriver<WebElement>(new URL(webDriverConfig.getHubUrl().get(0)), driverOptions);
+	            
+	        } else if (ICloudCapabilityFactory.IOS_PLATFORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
+	        	return new IOSDriver<WebElement>(new URL(webDriverConfig.getHubUrl().get(0)), driverOptions);
+	            
+	        } else {
+	        	return new RemoteWebDriver(new URL(webDriverConfig.getHubUrl().get(0)), driverOptions);
+	        }
+	
     	} catch (MalformedURLException e) {
     		throw new DriverExceptions("Error creating driver: " + e.getMessage());
     	}
@@ -85,19 +71,7 @@ public class BrowserStackDriverFactory extends AbstractWebDriverFactory implemen
 
 	@Override
 	protected ICapabilitiesFactory getCapabilitiesFactory() {
-		if (webDriverConfig.getTestType().family().equals(TestType.APP)) {
-			throw new ConfigurationException("Mobile app testing is not supported on browserstack");
-		}
-		
-		if("android".equalsIgnoreCase(webDriverConfig.getPlatform())){
-        	return new AndroidCapabilitiesFactory(webDriverConfig);
-            
-        } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){
-        	return new IOsCapabilitiesFactory(webDriverConfig);
-            
-        } else {
-        	return new BrowserStackCapabilitiesFactory(webDriverConfig);
-        }
+        return new BrowserStackCapabilitiesFactory(webDriverConfig);
 	}
 
 }
