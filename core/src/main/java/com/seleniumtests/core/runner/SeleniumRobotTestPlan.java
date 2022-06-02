@@ -34,7 +34,9 @@ import org.jdom2.DataConversionException;
 import org.openqa.selenium.WebDriver;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Listeners;
 
 import com.seleniumtests.connectors.extools.Uft;
@@ -77,6 +79,12 @@ public class SeleniumRobotTestPlan {
 			return false;
 		}
 		return isCucumberT;
+	}
+	
+	@BeforeSuite(alwaysRun=true)
+	public void doBeforeSuite() {
+		// do nothing but be in the same state as most of the integration tests which call a Beforesuite method
+		// this lead to the creation of a thread context for the main thread
 	}
 	
 	/**
