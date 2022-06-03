@@ -136,7 +136,7 @@ public class PictureElement extends GenericPictureElement {
 	 * In case the size ratio between searched picture and found picture is not 1, then, offset is
 	 * the source offset so that it's compatible with any screen size and resolution
 	 */
-	@ReplayOnError(replayDelayMs=1000)
+	@ReplayOnError(replayDelayMs=1000, waitAfterAction = true)
 	public void clickAt(int xOffset, int yOffset) {
 		findElement();
 
@@ -147,7 +147,7 @@ public class PictureElement extends GenericPictureElement {
 		moveAndClick(intoElement, relativeX + (int)(xOffset * pictureSizeRatio), relativeY + (int)(yOffset * pictureSizeRatio));
 	}
 	
-	@ReplayOnError(replayDelayMs=1000)
+	@ReplayOnError(replayDelayMs=1000, waitAfterAction = true)
 	public void doubleClickAt(int xOffset, int yOffset) {
 		findElement();
 		
@@ -158,7 +158,7 @@ public class PictureElement extends GenericPictureElement {
 		moveAndDoubleClick(intoElement, relativeX + (int)(xOffset * pictureSizeRatio), relativeY + (int)(yOffset * pictureSizeRatio));
 	}
 	
-	@ReplayOnError(replayDelayMs=1000)
+	@ReplayOnError(replayDelayMs=1000, waitAfterAction = true)
     public void swipe(int xMove, int yMove) {
 		findElement();
 
@@ -172,7 +172,7 @@ public class PictureElement extends GenericPictureElement {
 			.perform();
 	}
 	
-	@ReplayOnError(replayDelayMs=1000)
+	@ReplayOnError(replayDelayMs=1000, waitAfterAction = true)
     public void tap() {
 		findElement();
 

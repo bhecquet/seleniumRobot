@@ -317,6 +317,42 @@ public class TestDriver extends GenericMultiBrowserTest {
 	}
 	
 	/**
+	 * Check setting the delay for click action is correctly handled
+	 */
+	public void testActionDelay() {
+		SeleniumTestsContextManager.getThreadContext().setActionDelay(5000);
+		long start = new Date().getTime();
+		DriverTestPage.redSquare.click();
+		DriverTestPage.resetButton.click();
+		DriverTestPage.resetButton.click();
+		long delay = new Date().getTime() - start;
+		Assert.assertTrue(delay > 14000); // 3 commands with wait
+	}
+	/**
+	 * If no delay is specified, we go as quick as possible
+	 */
+	public void testActionNoDelay() {
+		SeleniumTestsContextManager.getThreadContext().setActionDelay(0);
+		long start = new Date().getTime();
+		DriverTestPage.redSquare.click();
+		DriverTestPage.resetButton.click();
+		DriverTestPage.resetButton.click();
+		long delay = new Date().getTime() - start;
+		Assert.assertTrue(delay < 1500); // 3 commands without wait
+	}
+	/**
+	 * Some actions (we do not test all) do not define a wait
+	 */
+	public void testActionNoDelay2() {
+		SeleniumTestsContextManager.getThreadContext().setActionDelay(5000);
+		long start = new Date().getTime();
+		DriverTestPage.redSquare.getCoordinates();
+		DriverTestPage.resetButton.getCenter();
+		long delay = new Date().getTime() - start;
+		Assert.assertTrue(delay < 1000); // 3 commands without wait
+	}
+	
+	/**
 	 * Tests finding sub-elements of an HTMLElement
 	 */
 	
