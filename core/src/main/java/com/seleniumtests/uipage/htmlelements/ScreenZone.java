@@ -92,7 +92,7 @@ public class ScreenZone extends GenericPictureElement {
 	 * In case the size ratio between searched picture and found picture is not 1, then, offset is
 	 * the source offset so that it's compatible with any screen size and resolution
 	 */
-	@ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
 	public void clickAt(int xOffset, int yOffset) {
 		findElement();
 
@@ -102,7 +102,7 @@ public class ScreenZone extends GenericPictureElement {
 		moveAndLeftClick(relativeX + (int)(xOffset * pictureSizeRatio), relativeY + (int)(yOffset * pictureSizeRatio));
 	}
 	
-	@ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
 	public void doubleClickAt(int xOffset, int yOffset) {
 		findElement();
 		
@@ -112,7 +112,7 @@ public class ScreenZone extends GenericPictureElement {
 		moveAndDoubleClick(relativeX + (int)(xOffset * pictureSizeRatio), relativeY + (int)(yOffset * pictureSizeRatio));
 	}
 	
-	@ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
 	public void rightClickAt(int xOffset, int yOffset) {
 		findElement();
 		

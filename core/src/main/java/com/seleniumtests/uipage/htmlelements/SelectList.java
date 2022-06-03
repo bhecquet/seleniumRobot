@@ -324,7 +324,7 @@ public class SelectList extends HtmlElement {
     /**
      * De-selects all options in a multi-select list element.
      */
-    @ReplayOnError
+    @ReplayOnError(waitAfterAction = true)
     public void deselectAll() {
     	
     	List<WebElement> allSelectedOptions = getAllTheSelectedOptions();
@@ -338,7 +338,7 @@ public class SelectList extends HtmlElement {
         }
     }
 
-    @ReplayOnError
+    @ReplayOnError(waitAfterAction = true)
     public void deselectByIndex(final Integer index) {
     	
     	
@@ -354,7 +354,7 @@ public class SelectList extends HtmlElement {
     	}
     }
 
-    @ReplayOnError
+    @ReplayOnError(waitAfterAction = true)
     public void deselectByText(final String text) {
     
     	try {
@@ -371,7 +371,7 @@ public class SelectList extends HtmlElement {
     	}
     }
 
-    @ReplayOnError
+    @ReplayOnError(waitAfterAction = true)
     public void deselectByValue(final String value) {
 
     	try {
@@ -388,7 +388,7 @@ public class SelectList extends HtmlElement {
     	}
     }
 
-    @ReplayOnError
+    @ReplayOnError(waitAfterAction = true)
     public void selectByIndex(final Integer index) {
     	try {
 	        findElement();
@@ -399,7 +399,7 @@ public class SelectList extends HtmlElement {
     	}
     }
 
-    @ReplayOnError
+    @ReplayOnError(waitAfterAction = true)
     public void selectByIndex(int ... indexs) {
     	 try {
  	    	findElement();
@@ -418,7 +418,7 @@ public class SelectList extends HtmlElement {
      *
      * @param  text
      */
-    @ReplayOnError
+    @ReplayOnError(waitAfterAction = true)
     public void selectByText(final String text) {
     	try {
 	    	findElement();
@@ -429,7 +429,7 @@ public class SelectList extends HtmlElement {
     	}
     }
 
-    @ReplayOnError
+    @ReplayOnError(waitAfterAction = true)
     public void selectByText(String ... texts) {
     	try {
 	        findElement();
@@ -449,7 +449,7 @@ public class SelectList extends HtmlElement {
      *
      * @param  text
      */
-    @ReplayOnError
+    @ReplayOnError(waitAfterAction = true)
     public void selectByCorrespondingText(String text) {
     	try {
 	    	findElement();
@@ -465,7 +465,7 @@ public class SelectList extends HtmlElement {
      * 
      * @param text
      */
-    @ReplayOnError
+    @ReplayOnError(waitAfterAction = true)
     public void selectByCorrespondingText(String ... text) {
     	try {
 	    	findElement();
@@ -494,7 +494,7 @@ public class SelectList extends HtmlElement {
     	}
     }
     
-    @ReplayOnError
+    @ReplayOnError(waitAfterAction = true)
     public void deselectByCorrespondingText(final String text) {
     	
     	try {
@@ -524,7 +524,7 @@ public class SelectList extends HtmlElement {
     	}
     }
 
-    @ReplayOnError
+    @ReplayOnError(waitAfterAction = true)
     public void selectByValue(final String value) {
     	try {
 	    	findElement();
@@ -535,7 +535,7 @@ public class SelectList extends HtmlElement {
     	}
     }
 
-    @ReplayOnError
+    @ReplayOnError(waitAfterAction = true)
     public void selectByValue(final String ... values) {
     	try {
 	        findElement();

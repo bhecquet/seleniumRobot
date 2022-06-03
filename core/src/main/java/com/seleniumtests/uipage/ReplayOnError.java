@@ -46,4 +46,5 @@ import java.lang.annotation.Target;
 public @interface ReplayOnError {
 	public int replayDelayMs() default 300;
 	public int replayTimes() default -1;
+	public boolean waitAfterAction() default false; // do we wait after the action is performed
 }

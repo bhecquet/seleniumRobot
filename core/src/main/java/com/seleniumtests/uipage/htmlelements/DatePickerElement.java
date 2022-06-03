@@ -103,7 +103,7 @@ public class DatePickerElement extends HtmlElement {
     }
     
     @Override
-    @ReplayOnError
+    @ReplayOnError(waitAfterAction = true)
     public void sendKeys(final boolean clear, final boolean blurAfter, CharSequence... keysToSend) {
         findElement(true);
         

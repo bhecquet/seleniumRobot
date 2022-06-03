@@ -27,7 +27,6 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -298,7 +297,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	/**
 	 * Native click
 	 */
-	@ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
 	public void click() {
 		findElement(true);
 
@@ -309,7 +308,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	/**
 	 * Click with CompositeActions
 	 */
-	@ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
 	public void clickAction() {
 		findElement(true);
 
@@ -324,7 +323,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	/**
 	 * Double Click with CompositeActions
 	 */
-	@ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
 	public void doubleClickAction() {
 		findElement(true);
 
@@ -336,7 +335,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 		}
 	}
 
-	@ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
 	public void clickMouse() {
 
 		Rectangle viewportPosition = detectViewPortPosition();
@@ -404,7 +403,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	 *
 	 * @param value
 	 */
-	@ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
 	public void clickAt(int xOffset, int yOffset) {
 		findElement();
 		((CustomEventFiringWebDriver) getDriver()).scrollToElement(getRealElementNoSearch(), yOffset);
@@ -421,7 +420,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	/**
 	 * Click with javascript
 	 */
-	@ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
 	public void simulateClick() {
 		if (SeleniumTestsContextManager.isWebTest()) {
 			((CustomEventFiringWebDriver) updateDriver()).updateWindowsHandles();
@@ -459,7 +458,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 		WaitHelper.waitForSeconds(2);
 	}
 
-	@ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
 	public void simulateDoubleClick() {
 		findElement(true);
 		outlineElement(getRealElementNoSearch());
@@ -481,7 +480,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 
 	}
 
-	@ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
 	public void simulateSendKeys(CharSequence... keysToSend) {
 		findElement(true);
 
@@ -506,7 +505,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 		}
 	}
 
-	@ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
 	public void simulateMoveToElement(int x, int y) {
 		findElement(true);
 		executeScript(
@@ -1332,7 +1331,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	 * Forces a mouseOver event on the WebElement using simulate by JavaScript way
 	 * for some dynamic menu.
 	 */
-	@ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
 	public void simulateMouseOver() {
 		findElement(true); // search element first because we want it to be visible
 
@@ -1368,7 +1367,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	 * 
 	 * @param keysToSend
 	 */
-	@ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
 	public void sendKeysAction(CharSequence... keysToSend) {
 		findElement(true);
 		new Actions(getDriver()).sendKeys(getRealElementNoSearch(), keysToSend).build().perform();
@@ -1396,7 +1395,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	 * @param blurAfter  if true, do blur() after sendKeys has been done
 	 * @param keysToSend write this text
 	 */
-	@ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
 	public void sendKeys(boolean clear, boolean blurAfter, CharSequence... keysToSend) {
 		findElement(true);
 
@@ -1540,12 +1539,12 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 			checkForMobile();
 			return ((MobileElement) getUnderlyingElement(getRealElementNoSearch())).getCenter();
 		} catch (ScenarioException e) {
-			Rectangle rectangle = getRealElementNoSearch().getRect();
+			Rectangle rectangle = getRect();
 			return new Point(rectangle.x + rectangle.width / 2, rectangle.y + rectangle.height / 2);
 		}
 	}
 
-	@ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
 	public void pinch() {
 		PerformsTouchActions performTouchActions = checkForMobile();
 		MobileElement mobElement = (MobileElement) getUnderlyingElement(getRealElementNoSearch());
@@ -1576,7 +1575,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	 * @param xMove   Movement amplitude on x axis
 	 * @param yMove   Movement amplitude on y axis
 	 */
-	@ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
 	public void swipe(int xOffset, int yOffset, int xMove, int yMove) {
 		MobileElement mobElement = (MobileElement) getUnderlyingElement(getRealElementNoSearch());
 
@@ -1590,7 +1589,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	 * @param fingers  number of fingers to tap with
 	 * @param duration duration in ms to wait before releasing
 	 */
-	@ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
 	public void tap(int fingers, int duration) {
 		PerformsTouchActions performTouchActions = checkForMobile();
 		MobileElement mobElement = (MobileElement) getUnderlyingElement(getRealElementNoSearch());
@@ -1607,7 +1606,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 		multiTouch.perform();
 	}
 
-	@ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
 	public void zoom() {
 		PerformsTouchActions performTouchActions = checkForMobile();
 		MobileElement mobElement = (MobileElement) getUnderlyingElement(getRealElementNoSearch());
@@ -1778,7 +1777,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	}
 
 	@Override
-	@ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
 	public void submit() {
 		findElement(true);
 		getRealElementNoSearch().submit();
