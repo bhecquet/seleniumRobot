@@ -87,6 +87,8 @@ public class SeleniumIdeParser {
 	
 	/**
 	 * Do some pre-computing to help execution
+	 * - transform "CALL:" operation to java call
+	 * - in the CALL line, replace escaped quotes by quote itself
 	 */
 	private void prepareJavaFile(File javaFile) {
 		Pattern pattern = Pattern.compile(".*System.out.println\\(\"CALL:(.*)\"\\);$");
@@ -97,7 +99,7 @@ public class SeleniumIdeParser {
 				line = line.replace("\r", "");
 				Matcher matcher = pattern.matcher(line);
 				if (matcher.matches()) {
-					newContent.append(matcher.group(1) + "\n");
+					newContent.append(matcher.group(1).replace("\\\"", "\"") + "\n");
 				} else {
 					newContent.append(line + "\n");
 				}
