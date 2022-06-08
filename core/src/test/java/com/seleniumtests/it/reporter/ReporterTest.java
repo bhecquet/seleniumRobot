@@ -151,6 +151,7 @@ public class ReporterTest extends ConnectorsTest {
 		
 		TestNG tng = new TestNG(false);
 		tng.setXmlSuites(suites);
+		tng.setUseDefaultListeners(false);
 		tng.setOutputDirectory(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
 		tng.run(); 
 		
@@ -213,6 +214,7 @@ public class ReporterTest extends ConnectorsTest {
 		
 		TestNG tng = new TestNG(false);
 		tng.setXmlSuites(suites);
+		tng.setUseDefaultListeners(false);
 		tng.setOutputDirectory(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
 		tng.run(); 
 		
@@ -283,6 +285,7 @@ public class ReporterTest extends ConnectorsTest {
 		
 		TestNG tng = new TestNG(false);
 		tng.setXmlSuites(suites);
+		tng.setUseDefaultListeners(false);
 		tng.setOutputDirectory(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
 		tng.run(); 
 		
@@ -324,6 +327,7 @@ public class ReporterTest extends ConnectorsTest {
 		
 		TestNG tng = new TestNG(false);
 		tng.setXmlSuites(suites);
+		tng.setUseDefaultListeners(false);
 		tng.setOutputDirectory(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
 		tng.run(); 
 		

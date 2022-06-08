@@ -27,14 +27,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
-import org.jdom2.DataConversionException;
 import org.openqa.selenium.WebDriver;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Listeners;
@@ -56,6 +53,7 @@ import com.seleniumtests.util.video.VideoCaptureMode;
 import com.seleniumtests.util.video.VideoUtils;
 
 @Listeners({com.seleniumtests.reporter.reporters.ReporterControler.class,
+	org.testng.reporters.FailedReporter.class,
 	com.seleniumtests.core.runner.SeleniumRobotTestListener.class//,
 	//ReportPortalTestListener.class
 	})

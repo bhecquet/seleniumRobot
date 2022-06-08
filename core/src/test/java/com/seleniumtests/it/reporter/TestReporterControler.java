@@ -45,6 +45,20 @@ public class TestReporterControler extends ReporterTest {
 	private ErrorCauseFinder errorCauseFinder;
 	
 	/**
+	 * Check testng-failed.xml file is present in test-output directory
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testTestNGFailedFilePresent() throws Exception {
+		
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverWithFailure"});
+		
+		// check files are there
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testng-failed.xml").toFile().isFile());
+		
+	}
+	
+	/**
 	 * Check that files created by robot but not integrated to tests are deleted
 	 * 
 	 * @throws Exception
