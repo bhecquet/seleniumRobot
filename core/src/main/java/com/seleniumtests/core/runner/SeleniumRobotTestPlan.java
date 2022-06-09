@@ -53,7 +53,6 @@ import com.seleniumtests.util.video.VideoCaptureMode;
 import com.seleniumtests.util.video.VideoUtils;
 
 @Listeners({com.seleniumtests.reporter.reporters.ReporterControler.class,
-	org.testng.reporters.FailedReporter.class,
 	com.seleniumtests.core.runner.SeleniumRobotTestListener.class//,
 	//ReportPortalTestListener.class
 	})
