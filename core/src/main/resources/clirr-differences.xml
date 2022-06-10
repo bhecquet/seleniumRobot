@@ -1,3 +1,4 @@
+<!--  https://www.mojohaus.org/clirr-maven-plugin/examples/ignored-differences.html -->
 <differences>
 
 
@@ -98,6 +99,22 @@
         <differenceType>6010</differenceType>
         <field>driver</field>
         <justification>force to use accessors</justification>
+    </difference>
+    <difference>
+        <className>**/uipage/htmlelements/GenericPictureElement</className>
+        <differenceType>6004</differenceType>
+        <field>detectedObjectRectangle</field>
+        <from>org.openqa.selenium.Rectangle</from>
+        <to>java.util.Map</to>
+        <justification>#510</justification>
+    </difference>
+    <difference>
+        <className>**/uipage/htmlelements/GenericPictureElement</className>
+        <differenceType>6004</differenceType>
+        <field>pictureSizeRatio</field>
+        <from>org.openqa.selenium.Rectangle</from>
+        <to>java.util.Map</to>
+        <justification>#510</justification>
     </difference>
 
 </differences>
