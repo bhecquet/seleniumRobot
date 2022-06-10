@@ -97,6 +97,7 @@ public class TestPictureElement extends MockitoTest {
 	@BeforeMethod(groups={"ut"})
 	public void init() {
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
+		pictureElement.clearMemory();
 	}
 	
 	@Test(groups={"ut"})
@@ -127,6 +128,43 @@ public class TestPictureElement extends MockitoTest {
 		
 		picElement.click();
 		verify(picElement).moveAndClick(intoElement, -65, -60);
+		
+	}
+	
+	/**
+	 * Check search is done only once even if we click twice
+	 */
+	@Test(groups={"ut"})
+	public void testClickTwice() {
+		PictureElement picElement = spy(pictureElement);
+		picElement.setObjectPictureFile(new File(""));
+		
+		PowerMockito.mockStatic(WebUIDriver.class);
+		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
+		when(WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(uiDriver);
+		when(uiDriver.getDriver()).thenReturn(driver);
+		when(uiDriver.getConfig()).thenReturn(driverConfig);
+		when(driverConfig.getBrowserType()).thenReturn(BrowserType.FIREFOX);
+		when(driver.getMouse()).thenReturn(mouse);
+		when(driver.getKeyboard()).thenReturn(keyboard);
+		when(driver.getBrowserInfo()).thenReturn(browserInfo);
+		when(((CustomEventFiringWebDriver)driver).getDeviceAspectRatio()).thenReturn(1.0);
+		when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
+		when(screenshotUtil.capture(SnapshotTarget.PAGE, File.class, true)).thenReturn(new File(""));
+		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
+		when(imageDetector.getSizeRatio()).thenReturn(1.0);
+		when(coordinates.inViewPort()).thenReturn(new Point(100, 120));
+		when(coordinates.onPage()).thenReturn(new Point(100, 120));
+		when(intoElement.getCoordinates()).thenReturn(coordinates);
+		when(intoElement.getSize()).thenReturn(new Dimension(200, 200));
+		
+		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
+		
+		picElement.click();
+		picElement.click();
+		verify(imageDetector).getDetectedRectangle();			// image search only done once
+		verify(picElement, times(2)).findElement(); // search called 2 times
+		verify(picElement, times(2)).moveAndClick(intoElement, -65, -60);
 		
 	}
 	@Test(groups={"ut"})

@@ -112,7 +112,7 @@
         <className>**/uipage/htmlelements/GenericPictureElement</className>
         <differenceType>6004</differenceType>
         <field>pictureSizeRatio</field>
-        <from>org.openqa.selenium.Rectangle</from>
+        <from>double</from>
         <to>java.util.Map</to>
         <justification>#510</justification>
     </difference>
