@@ -124,6 +124,15 @@ public abstract class GenericPictureElement extends Element {
 	}
 	
 	/**
+	 * Clirr stored searches
+	 * For test
+	 */
+	public void clearMemory() {
+		detectedObjectRectangle.clear();
+		pictureSizeRatio.clear();
+	}
+	
+	/**
 	 * Search the picture in the screenshot taken by Robot or WebDriver
 	 * Robot is used in Desktop mode
 	 * WebDriver is used in mobile, because Robot is not available for mobile platforms

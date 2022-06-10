@@ -37,15 +37,18 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.SnapshotTarget;
@@ -70,6 +73,10 @@ public class TestScreenZone extends MockitoTest {
 	@InjectMocks
 	ScreenZone screenZone = new ScreenZone();
 	
+	@BeforeMethod(groups={"ut"})
+	public void init() {
+		screenZone.clearMemory();
+	}
 
 	@Test(groups={"ut"})
 	public void testClick() {
@@ -90,6 +97,33 @@ public class TestScreenZone extends MockitoTest {
 		
 		picElement.click();
 		verify(picElement).moveAndLeftClick(35, 60);
+	}
+	
+	/**
+	 * Check search is done only once even if we click twice
+	 */
+	@Test(groups={"ut"})
+	public void testClickTwice() {
+		ScreenZone picElement = spy(screenZone);
+		picElement.setObjectPictureFile(new File(""));
+		
+		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
+		PowerMockito.mockStatic(WebUIDriver.class);
+		
+		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
+		when(driver.getBrowserInfo()).thenReturn(browserInfo);
+		when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
+		
+		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
+		when(screenshotUtil.capture(SnapshotTarget.SCREEN, File.class, true)).thenReturn(new File(""));
+		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
+		when(imageDetector.getSizeRatio()).thenReturn(1.0);
+		
+		picElement.click();
+		picElement.click();
+		verify(imageDetector).getDetectedRectangle();
+		verify(picElement, times(2)).findElement();
+		verify(picElement, times(2)).moveAndLeftClick(35, 60);
 	}
 	
 	/**
