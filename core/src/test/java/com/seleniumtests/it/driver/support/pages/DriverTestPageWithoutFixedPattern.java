@@ -64,17 +64,21 @@ public class DriverTestPageWithoutFixedPattern extends PageObject {
 	
 	private String openedPageUrl;
 	
-	public DriverTestPageWithoutFixedPattern() throws Exception {
+	public DriverTestPageWithoutFixedPattern()  {
         super(textElement);
     }
     
-    public DriverTestPageWithoutFixedPattern(boolean openPageURL) throws Exception {
+    public DriverTestPageWithoutFixedPattern(boolean openPageURL) {
         super(textElement, openPageURL ? getPageUrl() : null);
     }
 
-    public DriverTestPageWithoutFixedPattern(boolean openPageURL, String url) throws Exception {
+    public DriverTestPageWithoutFixedPattern(boolean openPageURL, String url) {
     	super(textElement, openPageURL ? url : null);
     	openedPageUrl = url;
+    }
+    
+    public void clickGooglePicture() {
+    	googlePicture.click();
     }
     
     //for TestInterceptPage (the loader page of By has to be a PageObject)

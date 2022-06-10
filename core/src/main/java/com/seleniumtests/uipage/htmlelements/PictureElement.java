@@ -23,6 +23,7 @@ import java.time.Duration;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
@@ -112,21 +113,31 @@ public class PictureElement extends GenericPictureElement {
 		return screenshotUtil.capture(SnapshotTarget.PAGE, File.class, true);		
 	}
 	
+	/**
+	 * Take device aspect ratio / zoom into account when storing found rectangle so that click can be done at the right place
+	 */
+	@Override
+	public void setDetectedObjectRectangleAndAspectRatio(Rectangle detectedRectangle, double sizeRatio) {
+
+		WebUIDriver uiDriver = isDriverCreated();
+		double pixelAspectRatio = ((CustomEventFiringWebDriver)uiDriver.getDriver()).getDeviceAspectRatio();
+		
+		// take into account the aspect ratio
+		detectedRectangle.x = (int)(detectedRectangle.x / pixelAspectRatio);
+		detectedRectangle.y = (int)(detectedRectangle.y / pixelAspectRatio);
+		detectedRectangle.width = (int)(detectedRectangle.width / pixelAspectRatio);
+		detectedRectangle.height = (int)(detectedRectangle.height / pixelAspectRatio);
+		sizeRatio = sizeRatio / pixelAspectRatio;
+		
+		super.setDetectedObjectRectangleAndAspectRatio(detectedRectangle, sizeRatio);
+	}
+	
 	protected void doAfterPictureSearch() {
 		// scroll to element where our picture is so that we will be able to act on it
 		// scrolling will display, on top of window, the top of the element
 		intoElement.scrollToElement(0);
 		WaitHelper.waitForMilliSeconds(500);
 		
-		WebUIDriver uiDriver = isDriverCreated();
-		double pixelAspectRatio = ((CustomEventFiringWebDriver)uiDriver.getDriver()).getDeviceAspectRatio();
-		
-		// take into account the aspect ratio
-		detectedObjectRectangle.x = (int)(detectedObjectRectangle.x / pixelAspectRatio);
-		detectedObjectRectangle.y = (int)(detectedObjectRectangle.y / pixelAspectRatio);
-		detectedObjectRectangle.width = (int)(detectedObjectRectangle.width / pixelAspectRatio);
-		detectedObjectRectangle.height = (int)(detectedObjectRectangle.height / pixelAspectRatio);
-		pictureSizeRatio = pictureSizeRatio / pixelAspectRatio;
 	}
 
 	
@@ -141,10 +152,10 @@ public class PictureElement extends GenericPictureElement {
 		findElement();
 
 		Point intoElementPos = intoElement.getCoordinates().onPage();
-		int relativeX = detectedObjectRectangle.x + detectedObjectRectangle.width / 2 - intoElementPos.x;
-		int relativeY = detectedObjectRectangle.y + detectedObjectRectangle.height / 2 - intoElementPos.y;
+		int relativeX = getDetectedObjectRectangle().x + getDetectedObjectRectangle().width / 2 - intoElementPos.x;
+		int relativeY = getDetectedObjectRectangle().y + getDetectedObjectRectangle().height / 2 - intoElementPos.y;
 
-		moveAndClick(intoElement, relativeX + (int)(xOffset * pictureSizeRatio), relativeY + (int)(yOffset * pictureSizeRatio));
+		moveAndClick(intoElement, relativeX + (int)(xOffset * getPictureSizeRatio()), relativeY + (int)(yOffset * getPictureSizeRatio()));
 	}
 	
 	@ReplayOnError(replayDelayMs=1000, waitAfterAction = true)
@@ -152,18 +163,18 @@ public class PictureElement extends GenericPictureElement {
 		findElement();
 		
 		Point intoElementPos = intoElement.getCoordinates().onPage();
-		int relativeX = detectedObjectRectangle.x + detectedObjectRectangle.width / 2 - intoElementPos.x;
-		int relativeY = detectedObjectRectangle.y + detectedObjectRectangle.height / 2 - intoElementPos.y;
+		int relativeX = getDetectedObjectRectangle().x + getDetectedObjectRectangle().width / 2 - intoElementPos.x;
+		int relativeY = getDetectedObjectRectangle().y + getDetectedObjectRectangle().height / 2 - intoElementPos.y;
 		
-		moveAndDoubleClick(intoElement, relativeX + (int)(xOffset * pictureSizeRatio), relativeY + (int)(yOffset * pictureSizeRatio));
+		moveAndDoubleClick(intoElement, relativeX + (int)(xOffset * getPictureSizeRatio()), relativeY + (int)(yOffset * getPictureSizeRatio()));
 	}
 	
 	@ReplayOnError(replayDelayMs=1000, waitAfterAction = true)
     public void swipe(int xMove, int yMove) {
 		findElement();
 
-		int xInit = detectedObjectRectangle.x + detectedObjectRectangle.width / 2;
-		int yInit = detectedObjectRectangle.y + detectedObjectRectangle.height / 2;
+		int xInit = getDetectedObjectRectangle().x + getDetectedObjectRectangle().width / 2;
+		int yInit = getDetectedObjectRectangle().y + getDetectedObjectRectangle().height / 2;
 		
 		createTouchAction().press(PointOption.point(xInit, yInit))
 			.waitAction(WaitOptions.waitOptions(Duration.ofMillis(500)))
@@ -177,7 +188,7 @@ public class PictureElement extends GenericPictureElement {
 		findElement();
 
 		createTouchAction()
-			.moveTo(PointOption.point(detectedObjectRectangle.x + detectedObjectRectangle.width / 2, detectedObjectRectangle.y + detectedObjectRectangle.height / 2))
+			.moveTo(PointOption.point(getDetectedObjectRectangle().x + getDetectedObjectRectangle().width / 2, getDetectedObjectRectangle().y + getDetectedObjectRectangle().height / 2))
 			.tap(TapOptions.tapOptions().withTapsCount(1)).perform();
 	}
 	
