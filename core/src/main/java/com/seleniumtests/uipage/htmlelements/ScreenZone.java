@@ -96,30 +96,30 @@ public class ScreenZone extends GenericPictureElement {
 	public void clickAt(int xOffset, int yOffset) {
 		findElement();
 
-		int relativeX = detectedObjectRectangle.x + detectedObjectRectangle.width / 2;
-		int relativeY = detectedObjectRectangle.y + detectedObjectRectangle.height / 2;
+		int relativeX = getDetectedObjectRectangle().x + getDetectedObjectRectangle().width / 2;
+		int relativeY = getDetectedObjectRectangle().y + getDetectedObjectRectangle().height / 2;
 
-		moveAndLeftClick(relativeX + (int)(xOffset * pictureSizeRatio), relativeY + (int)(yOffset * pictureSizeRatio));
+		moveAndLeftClick(relativeX + (int)(xOffset * getPictureSizeRatio()), relativeY + (int)(yOffset * getPictureSizeRatio()));
 	}
 	
 	@ReplayOnError(waitAfterAction = true)
 	public void doubleClickAt(int xOffset, int yOffset) {
 		findElement();
 		
-		int relativeX = detectedObjectRectangle.x + detectedObjectRectangle.width / 2;
-		int relativeY = detectedObjectRectangle.y + detectedObjectRectangle.height / 2;
+		int relativeX = getDetectedObjectRectangle().x + getDetectedObjectRectangle().width / 2;
+		int relativeY = getDetectedObjectRectangle().y + getDetectedObjectRectangle().height / 2;
 		
-		moveAndDoubleClick(relativeX + (int)(xOffset * pictureSizeRatio), relativeY + (int)(yOffset * pictureSizeRatio));
+		moveAndDoubleClick(relativeX + (int)(xOffset * getPictureSizeRatio()), relativeY + (int)(yOffset * getPictureSizeRatio()));
 	}
 	
 	@ReplayOnError(waitAfterAction = true)
 	public void rightClickAt(int xOffset, int yOffset) {
 		findElement();
 		
-		int relativeX = detectedObjectRectangle.x + detectedObjectRectangle.width / 2;
-		int relativeY = detectedObjectRectangle.y + detectedObjectRectangle.height / 2;
+		int relativeX = getDetectedObjectRectangle().x + getDetectedObjectRectangle().width / 2;
+		int relativeY = getDetectedObjectRectangle().y + getDetectedObjectRectangle().height / 2;
 		
-		moveAndRightClick(relativeX + (int)(xOffset * pictureSizeRatio), relativeY + (int)(yOffset * pictureSizeRatio));
+		moveAndRightClick(relativeX + (int)(xOffset * getPictureSizeRatio()), relativeY + (int)(yOffset * getPictureSizeRatio()));
 	}
 	
     public void swipe(int xMove, int yMove) {

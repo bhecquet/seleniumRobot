@@ -27,6 +27,7 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.Navigation;
 import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.TargetLocator;
@@ -55,6 +56,8 @@ import com.seleniumtests.driver.screenshots.SnapshotTarget;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.ut.core.runner.cucumber.PageForActions;
+import com.seleniumtests.util.helper.WaitHelper;
+import com.seleniumtests.util.osutility.OSCommand;
 
 @PrepareForTest({ WebUIDriver.class })
 public class TestPageObject2 extends MockitoTest {
@@ -1235,5 +1238,62 @@ public class TestPageObject2 extends MockitoTest {
 	public void testUiLibraryWithoutPage() {
 		Assert.assertTrue(PageForActions.getUiLibraries(PageForActions.class.getCanonicalName()).isEmpty());
 	}
+	
+	@Test(groups = { "ut" })
+	public void testCallingPageSetToPictureElement() {
+		PageForActions p1 = new PageForActions();
+		Assert.assertNotNull(p1.getPicture().getCallingPage());
+		Assert.assertNotNull(p1.getScreenZone().getCallingPage());
+		Assert.assertNull(p1.getTextField().getCallingPage());
+	}
+	
+	@Test(groups = { "ut" })
+	public void testCallingPageDifferentPages() {
+		PageForActions p1 = new PageForActions();
+		PageObject p1e = p1.getPicture().getCallingPage();
+		PageForActions p2 = new PageForActions();
+		PageObject p2e = p1.getPicture().getCallingPage();
+		
+		// check that a single page of same type is kept for eache thread
+		Assert.assertEquals(p1.getPicture().getCallingPage(), p2.getPicture().getCallingPage());
+		
+		// check that callingPage evolves when a new instance of the same page is created
+		Assert.assertNotEquals(p1e,  p2e);
+	}
+	
+	/**
+	 * Check that each thread records a different instance of page
+	 */
+	@Test(groups = { "ut" })
+	public void testCallingPageSetForEachThread() {
+		PageLauncher p1 = new PageLauncher();
+		p1.start();
+		PageLauncher p2 = new PageLauncher();
+		p2.start();
+		while (p1.otherPage == null || p1.otherPage == null) {
+			WaitHelper.waitForMilliSeconds(200);
+		}
+		
+		// check that for each thread, a different page is recorded
+		Assert.assertNotEquals(p1.getPictureElementPage(), p2.getPictureElementPage());
+	}
 
+	private class PageLauncher extends Thread {
+		
+		public PageForActions otherPage;
+		public PageObject callingPage;
+		
+		public void run() {
+			SeleniumTestsContextManager.setThreadContext(SeleniumTestsContextManager.getGlobalContext());
+			SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
+			otherPage = new PageForActions();
+			callingPage = otherPage.getPicture().getCallingPage();
+		}
+		
+		public PageObject getPictureElementPage() {
+			return callingPage;
+		}
+	}
+	
+	
 }

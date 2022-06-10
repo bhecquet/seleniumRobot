@@ -17,6 +17,8 @@
  */
 package com.seleniumtests.it.driver;
 
+import java.util.Calendar;
+
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
@@ -71,6 +73,57 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 		Assert.assertEquals(DriverTestPageWithoutFixedPattern.logoText.getValue(), "ff logo");
 	}
 	
+	/**
+	 * Check that if the same Picture element is used in a single instance of the same page, then, search will be done only once
+	 */
+	public void testMultipleActionsOnPicture() {
+		try {
+			Calendar start = Calendar.getInstance();
+			testPageWithoutPattern.clickGooglePicture();
+			long totalTime1 = Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis();
+			reset();
+
+			// second click should not search for the element again as we are in the same page
+			start = Calendar.getInstance();
+			testPageWithoutPattern.clickGooglePicture();
+			long totalTime2 = Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis();
+			logger.info(String.format("Time first click: %d ms - time second click: %d ms", totalTime1, totalTime2));
+			
+			// check second action is much shorter than first one
+			Assert.assertTrue(totalTime2 * 3 < totalTime1);
+
+		} catch (ImageSearchException e) {
+			throw new SkipException("Image not found, we may be on screenless slave", e);
+		}
+		WaitHelper.waitForMilliSeconds(500); // in case of browser slowness
+		Assert.assertEquals(DriverTestPageWithoutFixedPattern.textElement.getValue(), "image");
+	}
+	
+	/**
+	 * Check that if the same Picture element is used in 2 instances of the same page, then, search will be done twice
+	 */
+	public void testMultipleActionsOnPictureWithAnotherPage() {
+		try {
+			Calendar start = Calendar.getInstance();
+			testPageWithoutPattern.clickGooglePicture();
+			long totalTime1 = Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis();
+			reset();
+			
+			// second click should not search for the element again as we are in the same page
+			start = Calendar.getInstance();
+			new DriverTestPageWithoutFixedPattern().clickGooglePicture();
+			long totalTime2 = Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis();
+			logger.info(String.format("Time first click: %d ms - time second click: %d ms", totalTime1, totalTime2));
+			
+			// check second action is much shorter than first one
+			Assert.assertTrue(totalTime2 * 1.0 / totalTime1 < 1.5);
+			
+		} catch (ImageSearchException e) {
+			throw new SkipException("Image not found, we may be on screenless slave", e);
+		}
+		WaitHelper.waitForMilliSeconds(500); // in case of browser slowness
+		Assert.assertEquals(DriverTestPageWithoutFixedPattern.textElement.getValue(), "image");
+	}
 	
 	public void testDoubleClickOnPicture() {
 		try {

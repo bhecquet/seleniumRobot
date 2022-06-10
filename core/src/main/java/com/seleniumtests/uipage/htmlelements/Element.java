@@ -22,6 +22,7 @@ import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.uipage.PageObject;
 
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.PerformsTouchActions;
@@ -36,6 +37,8 @@ public abstract class Element {
 
 
 	protected Integer replayTimeout = 30;
+	
+	protected ThreadLocal<PageObject> callingPage = new ThreadLocal<>();
 	
 	protected abstract void findElement(boolean waitForVisibility);
 	
@@ -96,5 +99,13 @@ public abstract class Element {
 
 	public void setReplayTimeout(int replayTimeout) {
 		this.replayTimeout = replayTimeout;
+	}
+
+	public void setCallingPage(PageObject page) {
+		callingPage.set(page);
+	}
+	
+	public PageObject getCallingPage() {
+		return callingPage.get();
 	}
 }
