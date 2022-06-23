@@ -1112,9 +1112,9 @@ The business configuration are read in the following order (the last overwrites 
 
 - suite parameter (from TestNG XML file)
 - test parameter (from TestNG XML file)
-- system property (user defined value by -D<key>=<value> on command line)
 - parameter defined in env.ini
 - parameter defined in seleniumrobot server (if used)
+- system property (user defined value by -D<key>=<value> on command line)
 
 #### Using placeholders in variable value (>= 4.20.0)
 
