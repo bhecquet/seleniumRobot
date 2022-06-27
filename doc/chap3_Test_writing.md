@@ -70,6 +70,7 @@
 - [10 Use external dependencies](#10-use-external-dependencies)
 - [11 Customize Selenium IDE tests](#11-customize-selenium-ide-tests)
   - [Add steps](#add-steps)
+  - [Call Java code](#call-java-code)
 - [12 Write mobile tests](#12-write-mobile-tests)
 - [13 Implement custom SelectList](#13-implement-custom-selectlist)
 - [14 Using custom UI libraries](#14-using-custom-ui-libraries)
@@ -858,7 +859,7 @@ It you use ExpectedConditions that takes a locator (e.g: `ExpectedConditions.vis
 
 Data provider is a standard TestNG [https://testng.org/doc/documentation-main.html#parameters-dataproviders](https://testng.org/doc/documentation-main.html#parameters-dataproviders) feature that allows executing the same test with several dataset.
 
-SeleniumRobot provides standard Dataprovider for common use cases which will search CSV file depending on test method name in `<root>/data/<app>/dataset/<environment>/<testMethodName>.csv`
+SeleniumRobot provides standard Dataprovider for common use cases which will search CSV / XLSX file depending on test method name in `<root>/data/<app>/dataset/<environment>/<testMethodName>.csv`
 
 ```java
 	@Test(groups="stub", dataProvider = "dataset")
@@ -870,8 +871,8 @@ Assuming the DEV environment, file will be searched in `<root>/data/<app>/datase
 
 4 dataproviders are defined
 
-- 'dataset' => CSV file with "," as separator and no header
-- 'datasetWithHeader' => CSV file with "," as separator and with header
+- 'dataset' => CSV file with "," as separator / XLSX file and no header
+- 'datasetWithHeader' => CSV file with "," as separator / XLSX file and with header
 - 'datasetSemicolon' => CSV file with ";" as separator and no header
 - 'datasetSemicolonWithHeader' => CSV file with ";" as separator and with header
 
@@ -1248,6 +1249,18 @@ SeleniumRobot supports all features of Selenium IDE scenarios, it only does mini
 By default, your test will only contain 1 running step, which is the full scenario step. If you want more steps, you can use manual steps feature and add a step of type "echo" with target: `STEP:<step name>` 
 
 ![](images/selenium_ide_step.png)
+
+#### Call Java code ####
+
+for scenarios that needs access to Desktop (for authentication for example), Selenium IDE cannot run the whole Scenario
+So it's possible to write a comment ("echo")
+
+```
+CALL:new com.company.AuthenticationPage()._accessAuthentication(${user}).toString());
+```
+
+On execution with SeleniumRobot, the "CALL" command will be replaced by the content which will be called
+It's mandatory to specify the package of the class, as we do not add the imports.
 
 ### 12 Write mobile tests ###
 

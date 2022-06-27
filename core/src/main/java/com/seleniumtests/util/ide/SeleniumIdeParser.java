@@ -2,10 +2,16 @@ package com.seleniumtests.util.ide;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
 
 import com.github.javaparser.JavaParser;
@@ -81,7 +87,36 @@ public class SeleniumIdeParser {
 		webPageCode = new StringBuilder(String.format(PAGE_OBJECT_HEADER, className, className));
 	}
 	
+	/**
+	 * Do some pre-computing to help execution
+	 * - transform "CALL:" operation to java call
+	 * - in the CALL line, replace escaped quotes by quote itself
+	 */
+	private void prepareJavaFile(File javaFile) {
+		Pattern pattern = Pattern.compile(".*System.out.println\\(\"CALL:(.*)\"\\);$");
+		try {
+			StringBuilder newContent = new StringBuilder();
+			String content = FileUtils.readFileToString(javaFile, StandardCharsets.UTF_8);
+			for (String line: content.split("\n")) {
+				line = line.replace("\r", "");
+				Matcher matcher = pattern.matcher(line);
+				if (matcher.matches()) {
+					newContent.append(matcher.group(1).replace("\\\"", "\"") + "\n");
+				} else {
+					newContent.append(line + "\n");
+				}
+			}
+			
+			FileUtils.writeStringToFile(javaFile, newContent.toString(), StandardCharsets.UTF_8);
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public Map<String, String> parseSeleniumIdeFile() throws FileNotFoundException {
+		prepareJavaFile(javaFile);
 		Map<String, String> classInfo = new HashMap<>();
 		
 		// parse the file

@@ -95,7 +95,7 @@ public class SeleniumGridConnectorFactory {
 					if (response.getStatus() == 200) {
 						
 						// try to connect to a SeleniumRobot grid specific servlet. If it replies, we are on a seleniumRobot grid
-						HttpResponse<String> responseGuiServlet = Unirest.get(String.format("http://%s:%s%s", hubUrl.getHost(), hubUrl.getPort(), SeleniumRobotGridConnector.GUI_SERVLET)).asString();
+						HttpResponse<String> responseGuiServlet = Unirest.get(String.format("http://%s:%s%s", hubUrl.getHost(), hubUrl.getPort() + 10, SeleniumRobotGridConnector.GUI_SERVLET)).asString();
 						if (responseGuiServlet.getStatus() == 200) {
 							seleniumGridConnectors.add(new SeleniumRobotGridConnector(hubUrl.toString()));
 		        		} else {

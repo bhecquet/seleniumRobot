@@ -51,7 +51,7 @@ public class ImageFieldDetector {
 		this.image = image;
 		this.resizeFactor = resizeFactor;
 		this.fieldTypeToDetect = fieldTypeToDetect;
-		fieldDetectorInstance = SeleniumTestsContextManager.getThreadContext().getFieldDetectorInstance();
+		fieldDetectorInstance = SeleniumTestsContextManager.getGlobalContext().getFieldDetectorInstance();
 		if (fieldDetectorInstance == null) {
 			throw new ConfigurationException("Image Field detector has not been properly configured");
 		}

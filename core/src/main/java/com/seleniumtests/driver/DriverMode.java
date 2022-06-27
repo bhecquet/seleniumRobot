@@ -21,7 +21,8 @@ public enum DriverMode {
     LOCAL ("local"),
     GRID ("grid"),
     BROWSERSTACK ("browserstack"),
-    SAUCELABS ("saucelabs");
+    SAUCELABS ("saucelabs"),
+	PERFECTO ("perfecto");
 	
 	String[] dMode;
 	

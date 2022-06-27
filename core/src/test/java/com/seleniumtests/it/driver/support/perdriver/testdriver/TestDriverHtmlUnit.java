@@ -180,6 +180,21 @@ public class TestDriverHtmlUnit extends TestDriver {
 	public void testFindHtmlElementsByWithSimilarElements() {
 		super.testFindHtmlElementsByWithSimilarElements();
 	}
+	
+	@Test(groups={"it"})
+	public void testActionDelay() {
+		super.testActionDelay();
+	}
+	
+	@Test(groups={"it"})
+	public void testActionNoDelay() {
+		super.testActionNoDelay();
+	}
+	
+	@Test(groups={"it"})
+	public void testActionNoDelay2() {
+		super.testActionNoDelay2();
+	}
 
 	@Test(groups={"it"})
 	public void testFindSubElement() {

@@ -58,7 +58,7 @@ public  class SeleniumTestPlan extends SeleniumRobotTestPlan {
 	}
 	
 	/**
-	 * This data provider can be used to read data from a CSV file (NO HEADER) in /data/<app>/dataset/<environment>/<testmethodname>.csv folder
+	 * This data provider can be used to read data from a CSV/XLSX file (NO HEADER) in /data/<app>/dataset/<environment>/<testmethodname>.csv folder
 	 * CSV file MUST use ',' as separator. For (semicolon) ';', use datasetSemicolon
 	 * @param testMethod
 	 * @return
@@ -85,7 +85,7 @@ public  class SeleniumTestPlan extends SeleniumRobotTestPlan {
     }
     
     /**
-	 * This data provider can be used to read data from a CSV file (WITH HEADER) in /data/<app>/dataset/<environment>/<testmethodname>.csv folder
+	 * This data provider can be used to read data from a CSV/XLSX file (WITH HEADER) in /data/<app>/dataset/<environment>/<testmethodname>.csv folder
 	 * CSV file MUST use ',' as separator. For (semicolon) ';', use datasetSemicolonWithHeader
 	 * @param testMethod
 	 * @return
@@ -102,11 +102,26 @@ public  class SeleniumTestPlan extends SeleniumRobotTestPlan {
     	}
     }
     
+    /**
+	 * This data provider can be used to read data from a CSV file (NO HEADER) in /data/<app>/dataset/<environment>/<testmethodname>.csv folder
+	 * CSV file MUST use ';' as separator. For (comma) ',', use 'dataset'
+	 * @param testMethod
+	 * @return
+	 * @throws IOException
+	 */
     @DataProvider(name = "datasetSemicolon")
     public Object[][] datasetSemicolon(Method testMethod) throws IOException {	
     	return CSVHelper.read(getDatasetFile(testMethod), ";");
     }
     
+    
+    /**
+	 * This data provider can be used to read data from a CSV file (WITH HEADER) in /data/<app>/dataset/<environment>/<testmethodname>.csv folder
+	 * CSV file MUST use ';' as separator. For (comma) ',', use 'datasetWithHeader'
+	 * @param testMethod
+	 * @return
+	 * @throws IOException
+	 */
     @DataProvider(name = "datasetSemicolonWithHeader")
     public Object[][] datasetSemicolonWithHeader(Method testMethod) throws IOException {
     	return CSVHelper.readWithHeader(getDatasetFile(testMethod), ";");

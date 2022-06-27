@@ -75,6 +75,10 @@ public class ReplayAction {
 	private static Clock systemClock = Clock.systemUTC();
 	private static final ScenarioLogger scenarioLogger = ScenarioLogger.getScenarioLogger(ReplayAction.class);
 	
+	private Integer getActionDelay() {
+		return SeleniumTestsContextManager.getThreadContext().getActionDelay();
+	}
+	
 	/**
 	 * Replay all HtmlElement actions annotated by ReplayOnError.
 	 * Classes which are not subclass of HtmlElement won't go there 
@@ -126,7 +130,11 @@ public class ReplayAction {
 		    	
 		    	try {
 		    		reply = joinPoint.proceed(joinPoint.getArgs());
-		    		WaitHelper.waitForMilliSeconds(200);
+		    		
+		    		// wait will be done only if action annotation request it
+		    		if (replay.waitAfterAction()) {
+		    			WaitHelper.waitForMilliSeconds(getActionDelay());
+		    		}
 		    		break;
 		    	} catch (UnhandledAlertException e) {
 		    		throw e;

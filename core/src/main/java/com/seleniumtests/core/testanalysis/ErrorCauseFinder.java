@@ -1,5 +1,8 @@
 package com.seleniumtests.core.testanalysis;
 
+import java.awt.Color;
+import java.awt.Rectangle;
+import java.awt.geom.Line2D;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,6 +23,7 @@ import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.util.imaging.ImageProcessor;
 import com.seleniumtests.util.imaging.StepReferenceComparator;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -127,6 +131,15 @@ public class ErrorCauseFinder {
 					// middle matching: we may be on the right web page but the page has changed (some fields appeared or disappeared)
 					// or the text changed slightly. This could mean application changed
 					} else if (matching < 90) {
+						
+						// draw missing labels and fields
+						for (Label missingLabel: missingLabels) {
+							Rectangle rect = missingLabel.getRectangle();
+							Line2D.Double line = new Line2D.Double(rect.x, rect.y + rect.height, rect.x + rect.width, rect.y + rect.height);
+							ImageProcessor.drawLines(referenceSnapshot, Color.RED, line);
+						}
+						ImageProcessor.drawRectangles(referenceSnapshot, Color.RED, missingFields.stream().map(Field::getRectangle).collect(Collectors.toList()).toArray(new Rectangle[] {}));
+						
 						causes.add(new ErrorCause(ErrorType.APPLICATION_CHANGED, formatApplicationChangedDescription(missingLabels, missingFields), testStep));
 					}
 					

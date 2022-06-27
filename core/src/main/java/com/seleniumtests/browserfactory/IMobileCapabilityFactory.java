@@ -30,7 +30,7 @@ import com.seleniumtests.driver.DriverMode;
 import io.appium.java_client.remote.MobileCapabilityType;
 
 public abstract class IMobileCapabilityFactory extends ICapabilitiesFactory {
-
+	
 	protected IMobileCapabilityFactory(DriverConfig webDriverConfig) {
 		super(webDriverConfig);
 	}

@@ -33,6 +33,8 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -650,7 +652,7 @@ public class TestHtmlElement extends MockitoTest {
 		}
 		verify(driver.switchTo(), never()).frame(any(WebElement.class));
 		Assert.assertTrue(exceptionRaised);
-		Assert.assertTrue(LocalDateTime.now().minusSeconds(1).isAfter(start));
+		Assert.assertTrue(LocalDateTime.now().minus(900, ChronoUnit.MILLIS).isAfter(start));
 	}
 	
 	/**

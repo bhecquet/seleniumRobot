@@ -145,6 +145,9 @@ public class ConnectorsTest extends MockitoTest {
 	 * Method for creating server reply mock
 	 * @throws UnirestException 
 	 */
+	protected HttpRequest<?> createGridServletServerMock(String requestType, String apiPath, int statusCode, String replyData) throws UnirestException {
+		return createServerMock(GRID_SERVLET_URL, requestType, apiPath, statusCode, replyData, "request");
+	}
 	protected HttpRequest<?> createServerMock(String requestType, String apiPath, int statusCode, String replyData) throws UnirestException {
 		return createServerMock(requestType, apiPath, statusCode, replyData, "request");
 	}
@@ -468,43 +471,70 @@ public class ConnectorsTest extends MockitoTest {
 		
 		WebUIDriver uiDriver = createMockedWebDriver();
 		
-		createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, "Console");
+		createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, "UI");
 		createServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "ABC");
 		createServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "ABC");
 		createServerMock("GET", SeleniumRobotGridConnector.GUI_SERVLET, 200, "Gui");
-		createServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200, "{\"http://localhost:4321\": {" + 
-				"    \"busy\": false," + 
-				"    \"lastSessionStart\": \"never\"," + 
-				"    \"version\": \"4.6.0\"," + 
-				"    \"usedTestSlots\": 0,\n" + 
-				"    \"testSlots\": 1," + 
-				"    \"status\": \"ACTIVE\"" + 
-				"  }," + 
-				"  \"hub\": {" + 
-				"    \"version\": \"4.6.1\"," + 
-				"    \"status\": \"ACTIVE\"" + 
-				"  }," + 
-				"  \"success\": true" + 
-				"}");
-
-		
-		
-		createJsonServerMock("GET", SeleniumRobotGridConnector.API_TEST_SESSSION, 200, 
+		createJsonServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200,
 				// session not found
-				"{" + 
-				"  \"msg\": \"Cannot find test slot running session 7ef50edc-ce51-40dd-98b6-0a369bff38b in the registry.\"," + 
-				"  \"success\": false" + 
-				"}", 
+				"{"
+				+ "  \"value\": {"
+				+ "    \"ready\": false,"
+				+ "    \"message\": \"Selenium Grid ready.\","
+				+ "    \"nodes\": ["
+				+ "    ]"
+				+ "  }"
+				+ "}"
+				,
 				// session found
-				"{" + 
-				"  \"inactivityTime\": 409," + 
-				"  \"internalKey\": \"fef800fc-941d-4f76-9590-711da6443e00\"," + 
-				"  \"msg\": \"slot found !\"," + 
-				"  \"proxyId\": \"http://localhost:4321\"," + 
-				"  \"session\": \"7ef50edc-ce51-40dd-98b6-0a369bff38b1\"," + 
-				"  \"success\": true" + 
-				"}");
-		
+				"{"
+				+ "  \"value\": {"
+				+ "    \"ready\": true,"
+				+ "    \"message\": \"Selenium Grid ready.\","
+				+ "    \"nodes\": ["
+				+ "      {"
+				+ "        \"id\": \"9f05db23-5533-48c2-8637-0822f8a41d78\","
+				+ "        \"uri\": \"http:\\u002f\\u002f127.0.0.1:5555\","
+				+ "        \"maxSessions\": 3,"
+				+ "        \"osInfo\": {"
+				+ "          \"arch\": \"amd64\","
+				+ "          \"name\": \"Windows 10\","
+				+ "          \"version\": \"10.0\""
+				+ "        },"
+				+ "        \"heartbeatPeriod\": 60000,"
+				+ "        \"availability\": \"UP\","
+				+ "        \"version\": \"4.2.2 (revision 683ccb65d6)\","
+				+ "        \"slots\": ["
+				+ "          {"
+				+ "            \"id\": {"
+				+ "              \"hostId\": \"9f05db23-5533-48c2-8637-0822f8a41d78\","
+				+ "              \"id\": \"6fd05336-ded3-4602-a1b8-03d94b3f56fa\""
+				+ "            },"
+				+ "            \"lastStarted\": \"1970-01-01T00:00:00Z\","
+				+ "            \"session\": null,"
+				+ "            \"stereotype\": {"
+				+ "              \"beta\": true,"
+				+ "              \"browserName\": \"MicrosoftEdge\","
+				+ "              \"browserVersion\": \"103.0\","
+				+ "              \"edge_binary\": \"C:\\u002fProgram Files (x86)\\u002fMicrosoft\\u002fEdge Beta\\u002fApplication\\u002fmsedge.exe\","
+				+ "              \"max-sessions\": 5,"
+				+ "              \"nodeTags\": ["
+				+ "                \"toto\""
+				+ "              ],"
+				+ "              \"platform\": \"Windows 10\","
+				+ "              \"platformName\": \"Windows 10\","
+				+ "              \"restrictToTags\": false,"
+				+ "              \"se:webDriverExecutable\": \"D:\\u002fDev\\u002fseleniumRobot\\u002fseleniumRobot-grid\\u002fdrivers\\u002fedgedriver_103.0_edge-103-104.exe\","
+				+ "              \"webdriver-executable\": \"D:\\u002fDev\\u002fseleniumRobot\\u002fseleniumRobot-grid\\u002fdrivers\\u002fedgedriver_103.0_edge-103-104.exe\","
+				+ "              \"webdriver.edge.driver\": \"D:\\u002fDev\\u002fseleniumRobot\\u002fseleniumRobot-grid\\u002fdrivers\\u002fedgedriver_103.0_edge-103-104.exe\""
+				+ "            }"
+				+ "          },"
+				+ "        ]"
+				+ "      }"
+				+ "    ]"
+				+ "  }"
+				+ "}");
+
 		return uiDriver;
 	}
 	
