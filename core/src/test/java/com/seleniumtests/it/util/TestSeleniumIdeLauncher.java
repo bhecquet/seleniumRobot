@@ -19,6 +19,7 @@ import org.testng.annotations.Test;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.it.driver.support.server.WebServer;
 import com.seleniumtests.it.reporter.ReporterTest;
 import com.seleniumtests.util.FileUtility;
@@ -155,6 +156,34 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.BROWSER);
+			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
+			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);
+			
+			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
+		}
+	}
+	
+	/**
+	 * Check an error is raised if browser is not specified
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
+	@Test(groups={"it"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "'-Dbrowser=<browser>' option is mandatory")
+	public void testSeleniumExecutionWithoutBrowser() throws IOException, ClassNotFoundException {
+		try {
+			CompilerUtils.addClassPath("target/test-classes");
+			System.setProperty(SeleniumTestsContext.MANUAL_TEST_STEPS, "true");
+			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "false");
+			
+			// use a different file from the previous test to avoid problems with compiler cache
+			File tmpSuiteFile = GenericTest.createFileFromResource("ti/ide/MainPageTest2.java");
+			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTest2.java").toFile();
+			FileUtils.copyFile(tmpSuiteFile, suiteFile);
+			
+			new SeleniumIdeLauncher().executeScripts(Arrays.asList(suiteFile.getAbsolutePath()));
+
+			
+		} finally {
 			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
 			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);
 			

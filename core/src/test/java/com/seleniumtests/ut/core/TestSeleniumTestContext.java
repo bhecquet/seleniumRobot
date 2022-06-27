@@ -1307,6 +1307,19 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	
 	@Test(groups="ut context")
+	public void testActionDelay(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setActionDelay(15);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getActionDelay(), 15);
+	}
+	@Test(groups="ut context")
+	public void testActionDelayNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setActionDelay(null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getActionDelay(), SeleniumTestsContext.DEFAULT_ACTION_DELAY);
+	}
+	
+	@Test(groups="ut context")
 	public void testOutputDirectoryAbsolutePath(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setOutputDirectory("/home/user/test-output", testNGCtx, false);
@@ -1348,6 +1361,34 @@ public class TestSeleniumTestContext extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().setHeadlessBrowser(null);
 		Assert.assertFalse(SeleniumTestsContextManager.getThreadContext().isHeadlessBrowser());
 	}
+	
+	@Test(groups="ut context")
+	public void testCapabilities(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setCapabilities("app=foo.apk");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getCapabilities().asMap().size(), 1);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getCapabilities().getCapability("app"), "foo.apk");
+	}
+	@Test(groups="ut context")
+	public void testMultipleCapabilities(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setCapabilities("app=foo.apk,foo=bar");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getCapabilities().asMap().size(), 2);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getCapabilities().getCapability("app"), "foo.apk");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getCapabilities().getCapability("foo"), "bar");
+	}
+	@Test(groups="ut context", expectedExceptions = ConfigurationException.class)
+	public void testWrongCapabilitiesFormat(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setCapabilities("app=foo.apk,foobar");
+	}
+	@Test(groups="ut context")
+	public void testCapabilitiesNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setCapabilities(null);
+		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getCapabilities().asMap().isEmpty());
+	}
+
 	
 	@Test(groups="ut context")
 	public void testManualSteps(final ITestContext testNGCtx, final XmlTest xmlTest) {

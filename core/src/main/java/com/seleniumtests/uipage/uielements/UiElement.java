@@ -323,7 +323,7 @@ public class UiElement {
 	}
 	
 	
-	@ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
 	public void clickAt(int xOffset, int yOffset) {
 		Point relativePoint = findElementPosition(xOffset, yOffset);
 		
@@ -360,7 +360,7 @@ public class UiElement {
 		doubleClickAt(0, 0);
 	}
 	
-	@ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
 	public void doubleClickAt(int xOffset, int yOffset) {
 		Point relativePoint = findElementPosition(xOffset, yOffset);
 		
@@ -373,7 +373,7 @@ public class UiElement {
 		rightClickAt(0, 0);
 	}
 	
-	@ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
 	public void rightClickAt(int xOffset, int yOffset) {
 		Point relativePoint = findElementPosition(xOffset, yOffset);
 		

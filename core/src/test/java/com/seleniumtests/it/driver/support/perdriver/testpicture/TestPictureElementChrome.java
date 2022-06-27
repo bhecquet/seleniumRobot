@@ -33,6 +33,16 @@ public class TestPictureElementChrome extends TestPictureElement {
 	public void testClickOnPicture() {
 		super.testClickOnPicture();
 	}
+	
+	@Test(groups={"it"})
+	public void testMultipleActionsOnPicture() {
+		super.testMultipleActionsOnPicture();
+	}
+	
+	@Test(groups={"it"})
+	public void testMultipleActionsOnPictureWithAnotherPage() {
+		super.testMultipleActionsOnPictureWithAnotherPage();
+	}
 
 	@Test(groups={"it"})
 	public void testDoubleClickOnPicture() {

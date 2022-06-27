@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -140,6 +141,112 @@ public class TestSeleniumIdeParser extends GenericTest {
 			
 			Assert.assertEquals(classInfo.get("com.infotel.selenium.ide.MysuiteTest"), testClassCode);
 			Assert.assertEquals(classInfo.get("com.infotel.selenium.ide.MysuiteTestPage"), pageClassCode);
+		} finally {
+			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
+		}
+	}
+	
+	/**
+	 * Test it's possible to call java code from Selenium IDE test, using an echo command 
+	 * System.out.println("CALL:new covea.selenium.commons.webpage.AuthentificationSbcPage()._accederAuthentification(vars.get("foo").toString());");
+	 * @throws IOException
+	 */
+	@Test(groups={"it"})
+	public void testCodeGenerationJavaCall() throws IOException {
+		
+		String testClassCode = "package com.infotel.selenium.ide;\n"
+				+ "\n"
+				+ "import java.io.IOException;\n"
+				+ "import com.seleniumtests.core.runner.SeleniumTestPlan;\n"
+				+ "import org.testng.annotations.Test;\n"
+				+ "\n"
+				+ "public class MainPageExternalCall extends SeleniumTestPlan {\n"
+				+ "\n"
+				+ "    @Test\n"
+				+ "    public void mainPage() throws IOException {\n"
+				+ "        new MainPageExternalCallPage().mainPage();\n"
+				+ "    }\n"
+				+ "\n"
+				+ "}";
+		
+		String pageClassCode = String.format(SeleniumIdeParser.PAGE_OBJECT_HEADER, "MainPageExternalCall", "MainPageExternalCall") + 
+				"public void mainPage(){\n"
+				+ "    driver.get(\"https://docs.python.org/3/library/operator.html\");\n"
+				+ "    driver.manage().window().setSize(new Dimension(1150, 825));\n"
+				+ "    vars.put(\"user\", \"myUser\");\n"
+				+ "    driver.findElement(By.linkText(\"Lib/operator.py\")).click();\n"
+				+ "    new com.company.AuthenticationPage()._accessAuthentication(vars.get(\"user\").toString());\n"
+				+ "}\n" 
+				+ "\n" 
+				+ "\n" 
+				+ "}";
+		
+		try {
+			System.setProperty(SeleniumTestsContext.MANUAL_TEST_STEPS, "false");
+			
+			File tmpSuiteFile = createFileFromResource("ti/ide/MainPageExternalCall.java");
+			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageExternalCall.java").toFile();
+			FileUtils.copyFile(tmpSuiteFile, suiteFile);
+			
+			Map<String, String> classInfo = new SeleniumIdeParser(suiteFile.getAbsolutePath()).parseSeleniumIdeFile();
+	
+			Assert.assertTrue(classInfo.containsKey("com.infotel.selenium.ide.MainPageExternalCall"));
+			Assert.assertTrue(classInfo.containsKey("com.infotel.selenium.ide.MainPageExternalCallPage"));
+			
+			Assert.assertEquals(classInfo.get("com.infotel.selenium.ide.MainPageExternalCall"), testClassCode);
+			Assert.assertEquals(classInfo.get("com.infotel.selenium.ide.MainPageExternalCallPage"), pageClassCode);
+		} finally {
+			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
+		}
+	}
+	
+	/**
+	 * Test it's possible to call java code from Selenium IDE test, using an echo command 
+	 * Here, call parameters has escaped quotes
+	 * System.out.println("CALL:new covea.selenium.commons.webpage.AuthentificationSbcPage()._accederAuthentification(\"foo\");");
+	 * @throws IOException
+	 */
+	@Test(groups={"it"})
+	public void testCodeGenerationJavaCall2() throws IOException {
+		
+		String testClassCode = "package com.infotel.selenium.ide;\n"
+				+ "\n"
+				+ "import java.io.IOException;\n"
+				+ "import com.seleniumtests.core.runner.SeleniumTestPlan;\n"
+				+ "import org.testng.annotations.Test;\n"
+				+ "\n"
+				+ "public class MainPageExternalCall2 extends SeleniumTestPlan {\n"
+				+ "\n"
+				+ "    @Test\n"
+				+ "    public void mainPage() throws IOException {\n"
+				+ "        new MainPageExternalCall2Page().mainPage();\n"
+				+ "    }\n"
+				+ "\n"
+				+ "}";
+		
+		String pageClassCode = String.format(SeleniumIdeParser.PAGE_OBJECT_HEADER, "MainPageExternalCall2", "MainPageExternalCall2") + 
+				"public void mainPage(){\n"
+				+ "    driver.get(\"https://docs.python.org/3/library/operator.html\");\n"
+				+ "    driver.manage().window().setSize(new Dimension(1150, 825));\n"
+				+ "    vars.put(\"user\", \"myUser\");\n"
+				+ "    driver.findElement(By.linkText(\"Lib/operator.py\")).click();\n"
+				+ "    new com.company.AuthenticationPage()._accessAuthentication(\"user\");\n"
+				+ "}\n" 
+				+ "\n" 
+				+ "\n" 
+				+ "}";
+		
+		try {
+			System.setProperty(SeleniumTestsContext.MANUAL_TEST_STEPS, "false");
+			
+			File tmpSuiteFile = createFileFromResource("ti/ide/MainPageExternalCall2.java");
+			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageExternalCall2.java").toFile();
+			FileUtils.copyFile(tmpSuiteFile, suiteFile);
+			
+			Map<String, String> classInfo = new SeleniumIdeParser(suiteFile.getAbsolutePath()).parseSeleniumIdeFile();
+			
+			Assert.assertEquals(classInfo.get("com.infotel.selenium.ide.MainPageExternalCall2"), testClassCode);
+			Assert.assertEquals(classInfo.get("com.infotel.selenium.ide.MainPageExternalCall2Page"), pageClassCode);
 		} finally {
 			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
 		}

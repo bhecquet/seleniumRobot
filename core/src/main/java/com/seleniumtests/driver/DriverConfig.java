@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
@@ -110,6 +111,10 @@ public class DriverConfig {
         return testContext.getBrowserDownloadDir();
     }
 	
+	public Capabilities getCapabilites() {
+		return testContext.getCapabilities();
+	}
+	
 	public String getInitialUrl() {
 		return testContext.getInitialUrl();
 	}
@@ -124,6 +129,10 @@ public class DriverConfig {
     
     public String getChromeOptions() {
     	return testContext.getChromeOptions();
+    }
+    
+    public String getEdgeOptions() {
+    	return testContext.getEdgeOptions();
     }
     
     public Boolean getBetaBrowser() {
@@ -405,10 +414,6 @@ public class DriverConfig {
         return testContext.getVersion();
     }
 
-	public String getCloudApiKey() {
-		return testContext.getCloudApiKey();
-	}
-	
 	public VideoCaptureMode getVideoCapture() {
 		return testContext.getVideoCapture();
 	}

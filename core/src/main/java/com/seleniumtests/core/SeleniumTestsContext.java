@@ -32,6 +32,8 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy.ProxyType;
@@ -94,6 +96,7 @@ public class SeleniumTestsContext {
     public static final String EXPLICIT_WAIT_TIME_OUT = "explicitWaitTimeOut";	// attente explicite du navigateur
     public static final String HEADLESS_BROWSER = "headless";
     public static final String REPLAY_TIME_OUT = "replayTimeOut";				// time during which an action is replayed. By default 30 secs
+    public static final String ACTION_DELAY = "actionDelay";					// time in milliseconds between 2 actions (e.g: 2 clicks). It allows to slow down or speed up tests
     public static final String PAGE_LOAD_TIME_OUT = "pageLoadTimeout";			// temps d'attente de chargement d'une page
     public static final String PAGE_LOAD_STRATEGY = "pageLoadStrategy";			// page load strategy as defined in selenium spec. Will be applied to driver
     public static final String WEB_DRIVER_GRID = "webDriverGrid";				// adresse du serveur seleniumGrid
@@ -110,6 +113,7 @@ public class SeleniumTestsContext {
     public static final String CHROME_USER_PROFILE_PATH = "chromeUserProfilePath";	// chrome user profile
     public static final String EDGE_USER_PROFILE_PATH = "edgeUserProfilePath";	// edge user profile
     public static final String CHROME_OPTIONS = "chromeOptions";				// options to give to chrome at startup
+    public static final String EDGE_OPTIONS = "edgeOptions";					// options to give to edge at startup
     public static final String FIREFOX_BINARY_PATH = "firefoxBinaryPath";		// chemin vers le binaire firefox (firefox portable ou pour utiliser une version spécifique
     public static final String CHROME_DRIVER_PATH = "chromeDriverPath";			// chemin vers chromeDriver si on souhaite utiliser une version différente
     public static final String GECKO_DRIVER_PATH = "geckoDriverPath";			// chemin vers chromeDriver si on souhaite utiliser une version différente
@@ -119,6 +123,7 @@ public class SeleniumTestsContext {
     public static final String USER_AGENT = "userAgent";						// user agent utilisé pour les tests. Permet d'écraser le user-agent par défaut du navigateur, sur firefox et chrome uniquement
     public static final String BETA_BROWSER = "betaBrowser";					// enable usage of beta browsers	
     public static final String EDGE_IE_MODE  = "edgeIeMode";					// if true, Edge is started in IE mode
+    public static final String CAPABILITIES  = "capabilities";					// The capability to add to driver. `-Dcapabilities=<key1>=<value1>,<key2>=<value2>`
     
     public static final String VIEWPORT_WIDTH = "viewPortWidth";					// width of viewport	
     public static final String VIEWPORT_HEIGHT = "viewPortHeight";					// height of viewport
@@ -220,7 +225,6 @@ public class SeleniumTestsContext {
     // Cloud specific properties
     public static final String VERSION = "version";								// browser version
     public static final String PLATFORM = "platform";							// platform on which test should execute. Ex: Windows 7, Android, iOS, Linux, OS X 10.10. 	
-    public static final String CLOUD_API_KEY = "cloudApiKey";					// clé d'accès (dépend des services)
 
     // Neoload specific properties
     public static final String NEOLOAD_USER_PATH = "neoloadUserPath";			// name of the neoload "user path" that will be created in Design mode
@@ -294,6 +298,7 @@ public class SeleniumTestsContext {
 	public static final boolean DEFAULT_EDGE_IE_MODE = false;
     
     public static final int DEFAULT_REPLAY_TIME_OUT = 30;
+    public static final int DEFAULT_ACTION_DELAY = 200;
     
 	
 
@@ -437,7 +442,8 @@ public class SeleniumTestsContext {
         setJavascriptEnabled(getBoolValueForTest(ENABLE_JAVASCRIPT, System.getProperty(ENABLE_JAVASCRIPT)));
         setNtlmAuthTrustedUris(getValueForTest(NTLM_AUTH_TRUSTED_URIS, System.getProperty(NTLM_AUTH_TRUSTED_URIS)));
         setBrowserDownloadDir(getValueForTest(BROWSER_DOWNLOAD_DIR, System.getProperty(BROWSER_DOWNLOAD_DIR)));
-   
+        setCapabilities(getValueForTest(CAPABILITIES, System.getProperty(CAPABILITIES)));
+        
         setOverrideSeleniumNativeAction(getBoolValueForTest(OVERRIDE_SELENIUM_NATIVE_ACTION, System.getProperty(OVERRIDE_SELENIUM_NATIVE_ACTION)));
 
         setAdvancedElementSearch(getValueForTest(ADVANCED_ELEMENT_SEARCH, System.getProperty(ADVANCED_ELEMENT_SEARCH)));
@@ -484,10 +490,11 @@ public class SeleniumTestsContext {
         setAppActivity(getValueForTest(APP_ACTIVITY, System.getProperty(APP_ACTIVITY)));
         setAppWaitActivity(getValueForTest(APP_WAIT_ACTIVITY, System.getProperty(APP_WAIT_ACTIVITY)));
         setNewCommandTimeout(getIntValueForTest(NEW_COMMAND_TIMEOUT, System.getProperty(NEW_COMMAND_TIMEOUT)));
+        
+        setActionDelay(getIntValueForTest(ACTION_DELAY, System.getProperty(ACTION_DELAY)));
 
         setVersion(getValueForTest(VERSION, System.getProperty(VERSION)));
         setPlatform(getValueForTest(PLATFORM, System.getProperty(PLATFORM)));
-        setCloudApiKey(getValueForTest(CLOUD_API_KEY, System.getProperty(CLOUD_API_KEY)));
         
         setCustomTestReports(getValueForTest(CUSTOM_TEST_REPORTS, System.getProperty(CUSTOM_TEST_REPORTS)));
         setCustomSummaryReports(getValueForTest(CUSTOM_SUMMARY_REPORTS, System.getProperty(CUSTOM_SUMMARY_REPORTS)));
@@ -1145,6 +1152,10 @@ public class SeleniumTestsContext {
         }
     }
     
+    public Capabilities getCapabilities() {
+    	return (Capabilities) getAttribute(CAPABILITIES);
+    }
+    
     public Integer getSnapshotScrollDelay() {
     	return (Integer) getAttribute(SNAPSHOT_SCROLL_DELAY);
     }
@@ -1387,6 +1398,10 @@ public class SeleniumTestsContext {
     
     public String getChromeOptions() {
     	return (String) getAttribute(CHROME_OPTIONS);
+    }
+    
+    public String getEdgeOptions() {
+    	return (String) getAttribute(EDGE_OPTIONS);
     }
 
     public String getOutputDirectory() {
@@ -1660,6 +1675,10 @@ public class SeleniumTestsContext {
     public int getNewCommandTimeout() {
         return (Integer) getAttribute(NEW_COMMAND_TIMEOUT);
     }
+    
+    public int getActionDelay() {
+    	return (Integer) getAttribute(ACTION_DELAY);
+    }
 
     public String getVersion() {
         return (String) getAttribute(VERSION);
@@ -1667,10 +1686,6 @@ public class SeleniumTestsContext {
 
     public String getPlatform() {
         return (String) getAttribute(PLATFORM);
-    }
-    
-    public String getCloudApiKey() {
-    	return (String) getAttribute(CLOUD_API_KEY);
     }
 
     public String getRelativeOutputDir() {
@@ -2203,6 +2218,10 @@ public class SeleniumTestsContext {
     	setAttribute(CHROME_OPTIONS, options);
     }
     
+    public void setEdgeOptions(String options) {
+    	setAttribute(EDGE_OPTIONS, options);
+    }
+    
     public void setChromeUserProfilePath(String path) {
     	if (path != null && getBrowser() == BrowserType.CHROME) {
     		if ((new File(path).exists() && getRunMode() == DriverMode.LOCAL) || getRunMode() != DriverMode.LOCAL || BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(path)) {
@@ -2299,6 +2318,22 @@ public class SeleniumTestsContext {
     
     public void setBrowserDownloadDir(String downloadDir) {
     	setAttribute(BROWSER_DOWNLOAD_DIR, downloadDir);
+    }
+    
+    public void setCapabilities(String capabilities) {
+
+		MutableCapabilities caps = new MutableCapabilities();
+    	if (capabilities != null) {
+    		for (String cap: capabilities.split(",")) {
+    			String[] keyValue = cap.split("=", 2);
+    			if (keyValue.length != 2) {
+    				throw new ConfigurationException("format of capability is '<key>=<value>'");
+    			}
+    			caps.setCapability(keyValue[0], keyValue[1]);
+    		}
+    		
+    	} 
+    	setAttribute(CAPABILITIES, caps);
     }
     
     public void setFullReset(Boolean enabled) {
@@ -2566,6 +2601,14 @@ public class SeleniumTestsContext {
     	}
     }
     
+    public void setActionDelay(Integer delay) {
+    	if (delay != null) {
+    		setAttribute(ACTION_DELAY, delay);
+    	} else {
+    		setAttribute(ACTION_DELAY, DEFAULT_ACTION_DELAY);
+    	}
+    }
+    
     public void setOutputDirectory(String outputDir, ITestContext context, boolean configureTestNg) {
     	setDefaultOutputDirectory(context);
     	if (outputDir == null) {
@@ -2624,10 +2667,6 @@ public class SeleniumTestsContext {
     			setAttribute(PLATFORM, Platform.ANY.toString());
     		}
     	}
-    }
-    
-    public void setCloudApiKey(String key) {
-    	setAttribute(CLOUD_API_KEY, key);
     }
     
     public void setTestType(final TestType testType) {

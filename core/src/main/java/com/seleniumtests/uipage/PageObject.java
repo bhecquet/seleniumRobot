@@ -443,13 +443,25 @@ public class PageObject extends BasePage implements IPage {
         assertCurrentPage(false, pageIdentifierElement);
 
         Calendar end = Calendar.getInstance();
-        start.setTime(new Date());
 
         long startTime = start.getTimeInMillis();
         long endTime = end.getTimeInMillis();
-        if ((endTime - startTime) / 1000 > 0) {
-            logger.log("Open web page in :" + (endTime - startTime) / 1000 + "seconds");
-        } 
+        logger.log("Open web page in :" + (endTime - startTime) / 1000.0 + " seconds");
+        
+        setPageOnElements();
+    }
+    
+    private void setPageOnElements() {
+
+        for (Field field: getClass().getFields()) {
+        	if (GenericPictureElement.class.isAssignableFrom(field.getType())) {
+        		try {
+					((GenericPictureElement)field.get(this)).setCallingPage(this);
+				} catch (IllegalArgumentException | IllegalAccessException e) {
+					throw new CustomSeleniumTestsException("Problem occured while setting element on page");
+				} 
+        	}
+        }
     }
     
     /**

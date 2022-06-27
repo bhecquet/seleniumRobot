@@ -54,6 +54,7 @@ public class MockitoTest  extends PowerMockTestCase {
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(MockitoTest.class);
 
 	protected static final String SERVER_URL = "http://localhost:4321";
+	protected static final String GRID_SERVLET_URL = "http://localhost:4331"; // grid servlet are listening on port of router (or node) + 10
 	private static Map<Method, Boolean> beforeMethodDone = Collections.synchronizedMap(new HashMap<>());
 
 	@BeforeMethod(groups={"ut", "it", "ie"})  

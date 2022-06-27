@@ -41,6 +41,7 @@ import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.SuiteRunner;
 import org.testng.TestRunner;
+import org.testng.reporters.FailedReporter;
 import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
@@ -70,6 +71,7 @@ public class ReporterControler implements IReporter {
 	private static final Object reporterLock = new Object();
 	private static final Logger logger = SeleniumRobotLogger.getLogger(ReporterControler.class);
 	private JUnitReporter junitReporter;
+	private FailedReporter failedReporter;
 
 	public ReporterControler() {
 		junitReporter = new JUnitReporter();
@@ -111,6 +113,7 @@ public class ReporterControler implements IReporter {
 			try {
 				if (suiteFinished) {
 					junitReporter.generateReport(xmlSuites, suites, SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
+					failedReporter.generateReport(xmlSuites, suites, SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
 				} else {
 					junitReporter.generateReport(resultSet, SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), true);
 				}

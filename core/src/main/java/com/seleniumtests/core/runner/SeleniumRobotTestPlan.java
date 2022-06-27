@@ -32,6 +32,7 @@ import org.openqa.selenium.WebDriver;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Listeners;
 
 import com.seleniumtests.connectors.extools.Uft;
@@ -74,6 +75,12 @@ public class SeleniumRobotTestPlan {
 			return false;
 		}
 		return isCucumberT;
+	}
+	
+	@BeforeSuite(alwaysRun=true)
+	public void doBeforeSuite() {
+		// do nothing but be in the same state as most of the integration tests which call a Beforesuite method
+		// this lead to the creation of a thread context for the main thread
 	}
 	
 	/**
@@ -189,7 +196,6 @@ public class SeleniumRobotTestPlan {
      * env.ini file 
      * Moreover, created custom variable is specific to tuple (application, version, test environment)
      * @param key					name of the param
-     * @param newValue				value of the parameter (or new value if we update it)
      * @param specificToVersion		if true, this param will be stored on server with a reference to the application version. This will have no effect if changing a 
      * 								current variable.
      */
@@ -201,7 +207,6 @@ public class SeleniumRobotTestPlan {
      * Method for creating or updating a variable. If variables are get from seleniumRobot server, this method will update the value on the server
      * Moreover, created custom variable is specific to tuple (application, version, test environment)
      * @param key					name of the param
-     * @param newValue				value of the parameter (or new value if we update it)
      * @param specificToVersion		if true, this param will be stored on server with a reference to the application version. This will have no effect if changing a 
      * 								current variable.
      * @param timeToLive			if > 0, this variable will be destroyed after some days (defined by variable). A positive value is mandatory if reservable is set to true 

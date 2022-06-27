@@ -18,6 +18,8 @@
 package com.seleniumtests.browserfactory;
 
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.edge.EdgeDriverService;
@@ -40,12 +42,44 @@ public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
 	protected MutableCapabilities getDriverOptions() {
         
         EdgeOptions options = new EdgeOptions();
-        options.setPageLoadStrategy(webDriverConfig.getPageLoadStrategy());
         
+        if (webDriverConfig.getUserAgentOverride() != null) {
+            options.addArguments("--user-agent=" + webDriverConfig.getUserAgentOverride());
+        }
+        options.addArguments("--disable-translate");
+        options.addArguments("--disable-web-security");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-site-isolation-trials");
+        options.addArguments("--disable-features=IsolateOrigins,site-per-process");
+        
+        if (webDriverConfig.getEdgeOptions() != null) {
+        	for (String option: webDriverConfig.getEdgeOptions().split(" ")) {
+        		options.addArguments(option);
+        	}
+        }
+        
+        if (webDriverConfig.isHeadlessBrowser()) {
+        	logger.info("setting edge in headless mode");
+	        options.addArguments("--headless");
+	        options.addArguments("--window-size=1280,1024");
+	        options.addArguments("--disable-gpu");
+        }
 
         if (webDriverConfig.getMode() == DriverMode.LOCAL) {
         	setLogging();
         }
+        
+        if (webDriverConfig.getAttachExistingDriverPort() != null) {
+        	options.setExperimentalOption("debuggerAddress", "127.0.0.1:" + webDriverConfig.getAttachExistingDriverPort());
+        } else {
+        	 // issue #480: disable "restore pages" popup, but not when we attach an existing browser as it crashes driver (from invalid argument: cannot parse capability: goog:chromeOptions, from invalid argument: unrecognized chrome option: prefs)
+            Map<String, Object> prefs = new HashMap<>();
+            prefs.put("profile.exit_type", "Normal");
+            options.setExperimentalOption("prefs", prefs);
+            
+        }
+
+        options.setPageLoadStrategy(webDriverConfig.getPageLoadStrategy());
         
 		return options;
 	}

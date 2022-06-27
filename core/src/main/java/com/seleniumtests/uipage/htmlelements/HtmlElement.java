@@ -294,7 +294,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     /**
      * Native click
      */
-    @ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
     public void click() {
         findElement(true);
         
@@ -305,7 +305,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     /**
      * Click with CompositeActions
      */
-    @ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
     public void clickAction() {
     	findElement(true);
 
@@ -320,7 +320,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     /**
      * Double Click with CompositeActions
      */
-    @ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
     public void doubleClickAction() {
     	findElement(true);
 
@@ -332,7 +332,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         }
     }
     
-	@ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
 	public void clickMouse() {
 
 		Rectangle viewportPosition = detectViewPortPosition();
@@ -393,13 +393,14 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * Click element in native way by Actions.
      *
      * <p/>
+	 * 
      * <pre class="code">
-       clickAt(1, 1);
+	 * clickAt(1, 1);
      * </pre>
      *
      * @param  value
      */
-    @ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
     public void clickAt(int xOffset, int yOffset) {
     	findElement();
 		((CustomEventFiringWebDriver) getDriver()).scrollToElement(getRealElementNoSearch(), yOffset);
@@ -416,7 +417,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     /**
      * Click with javascript
      */
-    @ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
     public void simulateClick() {
     	if (SeleniumTestsContextManager.isWebTest()) {
     		((CustomEventFiringWebDriver)updateDriver()).updateWindowsHandles();
@@ -454,7 +455,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         WaitHelper.waitForSeconds(2);
     }
     
-    @ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
     public void simulateDoubleClick() {
         findElement(true);
 		outlineElement(getRealElementNoSearch());
@@ -476,7 +477,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 
     }
     
-    @ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
     public void simulateSendKeys(CharSequence... keysToSend) {
     	findElement(true);
     		
@@ -492,7 +493,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 
     }
 
-    @ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
     public void simulateMoveToElement(int x, int y) {
         findElement(true);
         executeScript(
@@ -539,6 +540,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 
     /**
      * Find elements inside this element
+	 * 
      * @param childBy
      * @return	List of HtmlElement's based on real WebElement
      */
@@ -564,6 +566,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     
     /**
      * Find an element inside an other one
+	 * 
      * @param by
      * @return
      */
@@ -650,7 +653,9 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     
 
     /**
-     * Change CSS attribute of the element by setting if via javascript: arguments[0].style.<attribute>=<value>
+	 * Change CSS attribute of the element by setting if via javascript:
+	 * arguments[0].style.<attribute>=<value>
+	 * 
      * @param cssProperty
      * @param cssPropertyValue
      */
@@ -662,7 +667,9 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     
     /**
      * Execute arbitrary script on this element. Renaming of getEval
-     * @param script	the script to execute. It MUST contain 'arguments[0]' and may return something
+	 * 
+	 * @param script the script to execute. It MUST contain 'arguments[0]' and may
+	 *               return something
      * @return 		arbitrary value. You must cast it
      */
     @ReplayOnError
@@ -675,9 +682,12 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 
     /**
      * Execute arbitrary script on the provided element
+	 * 
      * @param element	the WebElement on which we call the script
-     * @param script	the script to execute. It MUST contain 'arguments[0]' and may return something
-     * @param args		optional arguments to pass to the script. They should ba accessed using 'arguments[1]' ...
+	 * @param script  the script to execute. It MUST contain 'arguments[0]' and may
+	 *                return something
+	 * @param args    optional arguments to pass to the script. They should ba
+	 *                accessed using 'arguments[1]' ...
      * @return 		arbitrary value. You must cast it
      */
     protected Object executeScript(String javascript, WebElement element, Object... args) {
@@ -702,12 +712,16 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * element problem. This method is invoked before all the basic operations like click, sendKeys, getText, etc. Use
      * waitForPresent to use Explicit Waits to deal with special element which needs long time to present.
      * @param waitForVisibility		wait for element to be visible
-     * @param makeVisible			whether we try to make the element visible. Should be true except when trying to know if element is displayed
+	 * @param makeVisible       whether we try to make the element visible. Should
+	 *                          be true except when trying to know if element is
+	 *                          displayed
      */
     public void findElement(boolean waitForVisibility, boolean makeVisible) {
-        // TODO: https://discuss.appium.io/t/how-can-i-scroll-to-an-element-in-appium-im-using-android-native-app/10618/14
+		// TODO:
+		// https://discuss.appium.io/t/how-can-i-scroll-to-an-element-in-appium-im-using-android-native-app/10618/14
     	// String DESTINATION_ELEMENT_TEXT= "KUBO";
-    	//((AndroidDriver) driver).findElementByAndroidUIAutomator("new UiScrollable(new UiSelector())
+		// ((AndroidDriver) driver).findElementByAndroidUIAutomator("new
+		// UiScrollable(new UiSelector())
     	//		.scrollIntoView(new UiSelector().text(DESTINATION_ELEMENT_TEXT))");
         
     	ElementInfo elementInfo = null;
@@ -726,7 +740,8 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         if (parent != null) {
         	parent.findElement(false, false);
         	
-        	// issue #166: add a dot in front of xpath expression if we search the element inside a parent
+			// issue #166: add a dot in front of xpath expression if we search the element
+			// inside a parent
         	if (by instanceof ByXPath) {
         		try {
 					Field xpathExpressionField = ByXPath.class.getDeclaredField("xpathExpression");
@@ -761,7 +776,8 @@ public class HtmlElement extends Element implements WebElement, Locatable {
             	}
             }
             
-            // wait for element to be really visible. should be done only for actions on element
+		// wait for element to be really visible. should be done only for actions on
+		// element
             if (waitForVisibility && makeVisible) {
             	try {
             		new WebDriverWait(getDriver(), Duration.ofSeconds(1)).until(ExpectedConditions.visibilityOf(getRealElementNoSearch()));
@@ -839,6 +855,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         
     /**
      * returns an element depending on configured index
+	 * 
      * @param allElements
      */
     private <T extends SearchContext> T getElementByIndex(List<T> allElements) {
@@ -959,6 +976,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	
 	/**
 	 * Move to element
+	 * 
 	 * @param element
 	 */	
 	public void scrollToElement(int yOffset) {
@@ -986,7 +1004,8 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     }
 
     /**
-     * Gets an attribute (using standard key-value pair) from the underlying attribute.
+	 * Gets an attribute (using standard key-value pair) from the underlying
+	 * attribute.
      *
      * @param   name
      *
@@ -1216,7 +1235,8 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     }
 
     /**
-     * Indicates whether or not the web element is currently displayed in the browser.
+	 * Indicates whether or not the web element is currently displayed in the
+	 * browser.
      *
      * @return
      */
@@ -1244,7 +1264,8 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * Searches for the element using the BY locator, and indicates whether or not it exists in the page. This can be
      * used to look for hidden objects, whereas isDisplayed() only looks for things that are visible to the user
      * 
-     * Note that when requested element has "HtmlElement.FIRST_VISIBLE" index, isElementPresent acts as isElementPresentAndDisplayed
+	 * Note that when requested element has "HtmlElement.FIRST_VISIBLE" index,
+	 * isElementPresent acts as isElementPresentAndDisplayed
      * 
      * @param timeout 	timeout in seconds
      * @return
@@ -1263,6 +1284,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     
     /**
      * Search for an element to be present AND displayed
+	 * 
      * @param timeout	timeout in seconds
      * @return false if the element is not present or present but not displayed
      */
@@ -1307,7 +1329,8 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     }
 
     /**
-     * Whether or not the indicated text is contained in the element's getText() attribute.
+	 * Whether or not the indicated text is contained in the element's getText()
+	 * attribute.
      *
      * @param   text
      *
@@ -1319,8 +1342,8 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     }
     
     /**
-     * @deprecated (due to selenium Mouse deprecation)
-     * Forces a mouseDown event on the WebElement.
+	 * @deprecated (due to selenium Mouse deprecation) Forces a mouseDown event on
+	 *             the WebElement.
      */
     @Deprecated
     public void mouseDown() {
@@ -1328,8 +1351,8 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     }
 
     /**
-     * @deprecated (due to selenium Mouse deprecation)
-     * Forces a mouseOver event on the WebElement.
+	 * @deprecated (due to selenium Mouse deprecation) Forces a mouseOver event on
+	 *             the WebElement.
      */
     @Deprecated
     public void mouseOver() {
@@ -1337,9 +1360,10 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     }
 
     /**
-     * Forces a mouseOver event on the WebElement using simulate by JavaScript way for some dynamic menu.
+	 * Forces a mouseOver event on the WebElement using simulate by JavaScript way
+	 * for some dynamic menu.
      */
-    @ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
     public void simulateMouseOver() {
         findElement(true); // search element first because we want it to be visible
 
@@ -1370,12 +1394,12 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     }
     
     /**
-     * Send keys through composite actions
-     * /!\ does not clear text before and no blur after
+	 * Send keys through composite actions /!\ does not clear text before and no
+	 * blur after
      * 
      * @param keysToSend
      */
-    @ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
     public void sendKeysAction(CharSequence... keysToSend) {
     	findElement(true);
 		new Actions(getDriver()).sendKeys(getRealElementNoSearch(), keysToSend).build().perform();
@@ -1403,7 +1427,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * @param	blurAfter	if true, do blur() after sendKeys has been done
      * @param   keysToSend	write this text
      */
-    @ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
     public void sendKeys(boolean clear, boolean blurAfter, CharSequence... keysToSend) {
         findElement(true);
         
@@ -1458,7 +1482,9 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     
     /**
 	 * Returns URL present in one of the element attributes
-	 * @param attributeName		attribute name in which we should look at. Give "text" to search in value
+	 * 
+	 * @param attributeName attribute name in which we should look at. Give "text"
+	 *                      to search in value
 	 * @return 					the found link
 	 */
 	public String findLink(String attributeName) {
@@ -1574,7 +1600,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * @param xMove		Movement amplitude on x axis
      * @param yMove		Movement amplitude on y axis
      */
-    @ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
     public void swipe(int xOffset, int yOffset, int xMove, int yMove) {
     	WebElement mobElement = getUnderlyingElement(getRealElementNoSearch());
         
@@ -1589,7 +1615,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * @param fingers	number of fingers to tap with
      * @param duration	duration in ms to wait before releasing
      */
-    @ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
     public void tap(int fingers, int duration) {
     	PerformsTouchActions performTouchActions = checkForMobile();
     	WebElement mobElement = getUnderlyingElement(getRealElementNoSearch());
@@ -1605,7 +1631,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         multiTouch.perform();
     }
     
-    @ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
     public void zoom() {
     	PerformsTouchActions performTouchActions = checkForMobile();
         WebElement mobElement = getUnderlyingElement(getRealElementNoSearch());
@@ -1747,6 +1773,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	
 	/**
 	 * Sometimes, the frame defined for the element may change
+	 * 
 	 * @param frameElement
 	 * @return
 	 */
@@ -1768,7 +1795,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	}
 
 	@Override
-	@ReplayOnError
+	@ReplayOnError(waitAfterAction = true)
 	public void submit() {
 		findElement(true);
 		getRealElementNoSearch().submit();
@@ -1800,6 +1827,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 
 	/**
 	 * USE ONLY for testing
+	 * 
 	 * @param element
 	 */
 	public void setElement(WebElement element) {
@@ -1833,6 +1861,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 
 	/**
 	 * Change the search index of the element (its order in element list)
+	 * 
 	 * @param elementIndex
 	 */
 	public void setElementIndex(Integer elementIndex) {

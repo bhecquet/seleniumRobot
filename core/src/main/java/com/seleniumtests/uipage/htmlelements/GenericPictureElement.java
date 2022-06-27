@@ -23,6 +23,8 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
@@ -32,6 +34,7 @@ import org.openqa.selenium.remote.ScreenshotException;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
+import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.imaging.ImageDetector;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -46,8 +49,8 @@ public abstract class GenericPictureElement extends Element {
 	
 	protected File objectPictureFile;
 	protected String resourcePath;
-	protected Rectangle detectedObjectRectangle;
-	protected double pictureSizeRatio;
+	protected Map<PageObject, Rectangle> detectedObjectRectangle = new HashMap<>();
+	protected Map<PageObject, Double> pictureSizeRatio = new HashMap<>();
 	protected ImageDetector detector;
 	protected boolean searchOnDesktop;
 	protected long actionDuration;
@@ -78,6 +81,29 @@ public abstract class GenericPictureElement extends Element {
 			detector.setDetectionThreshold(detectionThreshold);
 			setObjectPictureFile(pictureFile);
 		}
+		
+	}
+	
+	
+	/**
+	 * 
+	 * @param label
+	 * @param pictureFile			picture to search for in snapshot or on desktop
+	 * @param intoElement			HtmlElement inside of which our picture is. It allows scrolling to the zone where 
+	 * 								picture is searched before doing capture
+	 * @param detectionThreshold	sensitivity of search between 0 and 1. Be default, 0.1. More sensitivity means search can be less accurate, detect unwanted zones
+	 * @param searchOnDesktop		By default, false: search in driver snapshot. If true, we take a desktop screenshot, allowing searching into other elements that browser
+	 */
+	protected GenericPictureElement(String label, File pictureFile, double detectionThreshold, boolean searchOnDesktop, String groupName) {		
+		
+		this.searchOnDesktop = searchOnDesktop;
+		this.label = label;
+		
+		if (pictureFile != null) {
+			detector = new ImageDetector();
+			detector.setDetectionThreshold(detectionThreshold);
+			setObjectPictureFile(pictureFile);
+		}
 	
 	}
 	
@@ -98,6 +124,15 @@ public abstract class GenericPictureElement extends Element {
 	}
 	
 	/**
+	 * Clirr stored searches
+	 * For test
+	 */
+	public void clearMemory() {
+		detectedObjectRectangle.clear();
+		pictureSizeRatio.clear();
+	}
+	
+	/**
 	 * Search the picture in the screenshot taken by Robot or WebDriver
 	 * Robot is used in Desktop mode
 	 * WebDriver is used in mobile, because Robot is not available for mobile platforms
@@ -105,6 +140,11 @@ public abstract class GenericPictureElement extends Element {
 	 */
 	public void findElement() {
 		
+		// we already searched the picture for this page instance, reuse data
+		if (getDetectedObjectRectangle() != null) {
+			logger.info(String.format("Picture %s already searched", objectPictureFile));
+			return;
+		}
 
 		LocalDateTime start = LocalDateTime.now();
 	
@@ -118,16 +158,21 @@ public abstract class GenericPictureElement extends Element {
 		if (detector != null) {
 			detector.setSceneImage(screenshotFile);
 			detector.detectExactZoneWithScale();
-			detectedObjectRectangle = detector.getDetectedRectangle();
-			pictureSizeRatio = detector.getSizeRatio();
+			setDetectedObjectRectangleAndAspectRatio(detector.getDetectedRectangle(), detector.getSizeRatio());
+
 		} else {
-			detectedObjectRectangle = new Rectangle(0, 0, 0, 0);
-			pictureSizeRatio = 1.0;
+			setDetectedObjectRectangleAndAspectRatio(new Rectangle(0, 0, 0, 0), 1.0);
 		}
 		actionDuration = Duration.between(start, LocalDateTime.now()).toMillis();
 		
 		doAfterPictureSearch();
 	}
+	
+	public void setDetectedObjectRectangleAndAspectRatio(Rectangle detectedRectangle, double sizeRatio) {
+		detectedObjectRectangle.put(callingPage.get(), detectedRectangle);
+		pictureSizeRatio.put(callingPage.get(), sizeRatio);
+	}
+
 	
 	/**
 	 * Get File containing the screeenshot, either on desktop or on browser
@@ -231,7 +276,11 @@ public abstract class GenericPictureElement extends Element {
 	}
 
 	public Rectangle getDetectedObjectRectangle() {
-		return detectedObjectRectangle;
+		return detectedObjectRectangle.get(callingPage.get());
+	}
+	
+	public Double getPictureSizeRatio() {
+		return pictureSizeRatio.get(callingPage.get());
 	}
 
 	public long getActionDuration() {
@@ -241,4 +290,5 @@ public abstract class GenericPictureElement extends Element {
 	public void setActionDuration(long actionDuration) {
 		this.actionDuration = actionDuration;
 	}
+
 }

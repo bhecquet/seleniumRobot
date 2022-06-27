@@ -30,7 +30,8 @@
     - [Application test on iOS](#application-test-on-ios)
   - [4 Test with SauceLabs](#4-test-with-saucelabs)
   - [5 Test with BrowserStack](#5-test-with-browserstack)
-  - [6 Test with SeleniumGrid](#6-test-with-seleniumgrid)
+  - [6 Test with Perfecto](#6-test-with-perfecto)
+  - [7 Test with SeleniumGrid](#7-test-with-seleniumgrid)
     - [Configure SeleniumRobot](#configure-seleniumrobot)
     - [Configure Grid hub](#configure-grid-hub)
     - [Configure Grid node](#configure-grid-node)
@@ -41,7 +42,7 @@
     - [Jenkins way](#jenkins-way)
       - [Matrix Job](#matrix-job)
       - [Selenium Capability Axis](#selenium-capability-axis)
-  - [7 The test results](#7-the-test-results)
+  - [8 The test results](#8-the-test-results)
     - [HTML result](#html-result)
     - [JUnit XML global result](#junit-xml-global-result)
     - [JUnit XML per test result](#junit-xml-per-test-result)
@@ -50,7 +51,7 @@
       - [Custom Test report](#custom-test-report)
       - [Custom Summary report](#custom-summary-report)
     - [Default TestNG reports](#default-testng-reports)
-  - [8 Execute Selenium IDE Tests](#8-execute-selenium-ide-tests)
+  - [9 Execute Selenium IDE Tests](#9-execute-selenium-ide-tests)
 - [Troubleshooting](#troubleshooting)
   - [Cyclic dependency when executing TestNG Test](#cyclic-dependency-when-executing-testng-test)
 
@@ -118,6 +119,8 @@ In this case, this user passed value will overwrite test or suite parameters
 
 #### Proxy settings ####
 
+The proxy settings below apply to the browser used to test your application
+
 | Param name       			| Default 	| Description  |
 | -------------------------	| ------- 	| ------------ |
 | proxyType 				| AUTO		| Proxy type. Valid values are `AUTODETECT`, `MANUAL`, `DIRECT`, `PAC`, `SYSTEM` | 
@@ -139,6 +142,7 @@ Settings for changing the test behavior
 | loadIni					|			| comma separated list of path to ini formatted files to load. Their values will overwrite those from env.ini file if the same key is present. Path is relative to data/<app>/config path |
 | overrideSeleniumNativeAction      | false | intercept driver.findElement and driver.frame operations so that seleniumRobot element operations can be use (replay, error handling, ...) even when using standard selenium code. Only findElement(By) and findElements(By) are supported, not findElementByxxx(String). Logging is also better |
 | webDriverListener 		| 			| additional driver listener class. See chapter §7.21 for implementation details |
+| actionDelay               | 200       | delay in millisecondes between 2 actions. It allows to speed up or slow down a test |
 
 
 Cucumber options
@@ -178,6 +182,7 @@ Settings for customizing the default seleniumRobot driver features. By default, 
 | extensionX.path			|			| Path (absolute file path or HTTP URL) to the extension (.xpi or .crx). Replace X with extension number. E.g: `extension0.path=http://localhost:8000/myExt.crx`. See §7.17 |
 | extensionX.options		|			| options to pass to extension (only for firefox). Options must have the format: <key1>=<value1>;<key2>=<value2> |
 | chromeOptions				|			| allow to set any options to chrome executable. For example: to put chrome in "Dark mode", you will write: `-DchromeOptions="--force-dark-mode --enable-features=WebUIDarkMode"`. Other chrome options can be found here: https://peter.sh/experiments/chromium-command-line-switches/ |
+| edgeOptions				|			| see 'chromeOptions' |
 
 
 
@@ -389,7 +394,7 @@ You the MUST use options:
 - `DwebDriverGrid=http://<user>:<key>@hub-cloud.browserstack.com/wd/hub` => see browserstack documentation
 - `platform=<platform>` => Use browserstack [capabilities generator](https://www.browserstack.com/automate/capabilities) to see which platforms are available. Platform to set here is the concatenation of `os` and `os_version` for desktop. E.g: "Windows 10"
 
-If you run behind a proxy, also use the JVM options: `-Dhttp.proxyHost=<host> -Dhttp.proxyPort=<port> -Dhttp.nonProxyHosts=<nonProxy> -Dhttps.proxyHost=<host> -Dhttps.proxyPort=<port>`
+If you run behind a proxy, also use the JVM options: `-Dhttps.proxyHost=<host> -Dhttps.proxyPort=<port> -Dhttps.nonProxyHosts=<nonProxy>`
 
 ### 3 Test with Appium locally ###
 
@@ -453,6 +458,13 @@ Define test as follows (minimal needed options)
 
 ### 4 Test with SauceLabs ###
 
+You the MUST use options:
+- `runMode=saucelabs` to enable SauceLabs
+- `DwebDriverGrid=http://<user>:<key>@ondemand.eu-central-1.saucelabs.com:443/wd/hub` => see saucelabs documentation
+- `platform=<platform>` 
+- `deviceName=<name>` => name of the device to use.
+- `app=<application file>` => the application to test. By default, application is uploaded. If you want to avoid this step (application has already been uploaded), add 'NO_UPLOAD:' prefix to application path
+
 Define test as follows
 
 ```xml
@@ -483,10 +495,23 @@ You the MUST use options:
 - `DwebDriverGrid=http://<user>:<key>@hub-cloud.browserstack.com/wd/hub` => see browserstack documentation
 - `platform=<platform>` => Use browserstack [capabilities generator](https://www.browserstack.com/automate/capabilities) to see which platforms are available. Platform to set here "Android X.Y" or "iOS X"
 - `deviceName=<name>` => name of the device to use. Use browserstack [capabilities generator](https://www.browserstack.com/automate/capabilities) to get the list
+- `app=<application file>` => the application to test. By default, application is uploaded. If you want to avoid this step (application has already been uploaded), add 'NO_UPLOAD:' prefix to application path
 
 If you run behind a proxy, also use the JVM options: `-Dhttp.proxyHost=<host> -Dhttp.proxyPort=<port> -Dhttp.nonProxyHosts=<nonProxy> -Dhttps.proxyHost=<host> -Dhttps.proxyPort=<port>`
+
+### 6 Test with Perfecto ####
+
+Perfecto is seen as a selenium grid.
+You the MUST use options:
+- `runMode=perfecto` to enable browserstack
+- `DwebDriverGrid=https://<apiKey>@<cloudname>.perfectomobile.com/nexperience/perfectomobile/wd/hub` => see perfecto documentation
+- `platform=<platform>` 
+- `deviceName=<name>` => name of the device to use. 
+- `app=<application file>` => the application to test. By default, application is uploaded. If you want to avoid this step (application has already been uploaded), add 'NO_UPLOAD:' prefix to application path
+
+If you run behind a proxy, also use the JVM options: `-Dhttps.nonProxyHosts=<nonProxy> -Dhttps.proxyHost=<host> -Dhttps.proxyPort=<port>`
  
-### 6 Test with SeleniumGrid ###
+### 7 Test with SeleniumGrid ###
 
 SeleniumGrid allows to address multiple selenium nodes from one central point
 ![](/images/seleniumGrid.png) 
@@ -635,7 +660,7 @@ Finally, configure a shell / batch script to use the created variable "%BROWSER%
 
 Jenkins offers Selenium Capability Axis to create a matrix configured through Selenium Grid
 
-### 7 The test results ###
+### 8 The test results ###
 
 SeleniumRobot generates several test results after run
 Results are written in the directory pointed by the option `-DoutputDirectory=<dir>` or by default in the `test-output` directory
@@ -704,18 +729,18 @@ they are located in the folder pointed by `-d` option, by default `test-ouput` w
 
 If you do not want to generate these files, add `usedefaultlistener false` to your TestNG options
 
-### 8 Execute Selenium IDE Tests ###
+### 9 Execute Selenium IDE Tests ###
 
 From version 4.10, it is possible to execute Selenium IDE tests.
 - Create your test / suite with selenium IDE
 - Export it with JUnit / Java as a .java file
-- Run the following command
+- Run the following command: **don't forget to specify the browser parameter, else you will get a NullPointerException**
 
-`java -cp seleniumRobot.jar -D<option1>=<value1> -D<option2>=<value2> -javaagent:aspectjweaver.jar com.seleniumtests.util.ide.SeleniumIdeLauncher -scripts test1.java,test2.java`
+`java -cp seleniumRobot.jar -D<option1>=<value1> -D<option2>=<value2> -Dbrowser=<browser> -javaagent:aspectjweaver.jar com.seleniumtests.util.ide.SeleniumIdeLauncher -scripts test1.java,test2.java`
 
 or, for local
 
-`java -cp seleniumRobot.jar;lib/drivers/* -D<option1>=<value1> -D<option2>=<value2> -javaagent:aspectjweaver.jar com.seleniumtests.util.ide.SeleniumIdeLauncher -scripts test1.java,test2.java`
+`java -cp seleniumRobot.jar;lib/drivers/* -D<option1>=<value1> -D<option2>=<value2> -Dbrowser=<browser> -javaagent:aspectjweaver.jar com.seleniumtests.util.ide.SeleniumIdeLauncher -scripts test1.java,test2.java`
 
 **/!\ AS we compile on the fly, a java JDK MUST be used, else you will get: java.lang.AssertionError: java.lang.ClassNotFoundException: com.sun.tools.javac.api.JavacTool**
 
