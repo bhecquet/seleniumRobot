@@ -75,6 +75,7 @@ public class ReporterControler implements IReporter {
 
 	public ReporterControler() {
 		junitReporter = new JUnitReporter();
+		failedReporter = new FailedReporter();
 	}
 
 	

@@ -74,7 +74,6 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	private static final String ACTION_FIELD = "action";
 	public static final String NODE_TASK_SERVLET = "/extra/NodeTaskServlet";
 	public static final String FILE_SERVLET = "/extra/FileServlet";
-	public static final String STATUS_SERVLET = "/status";
 	public static final String GUI_SERVLET = "/grid/admin/GuiServlet"; 
 	
 	private String nodeServletUrl;
@@ -684,39 +683,6 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			} catch (Exception e) {
 				logger.warn("Error deleting previous video file, there may be a problem getting the new one: " + e.getMessage());
 			}
-		}
-	}
-	
-	/**
-	 * @return 	true: if grid hub is active and and there is at least 1 node
-	 * 			false: if no node is present
-	 * 
-	 */
-	@Override
-	public boolean isGridActive() {
-		boolean gridActive = super.isGridActive();
-		if (!gridActive) {
-			return false;
-		}
-		
-		HttpResponse<JsonNode> response;
-		try {
-			response = Unirest.get(String.format("http://%s:%s%s", hubUrl.getHost(), hubUrl.getPort(), STATUS_SERVLET)).asJson();
-			if (response.getStatus() != 200) {
-	    		logger.warn("Error connecting to the grid hub at " + hubUrl);
-	    		return false;
-	    	} 
-		} catch (UnirestException e) {
-			logger.warn("Cannot connect to the grid hub at " + hubUrl);
-			return false;
-		}
-		
-		try {
-			JSONObject hubStatus = response.getBody().getObject();
-			
-			return hubStatus.getJSONObject("value").getBoolean("ready");	
-		} catch (JSONException | NullPointerException e) {
-			return false;
 		}
 	}
 
