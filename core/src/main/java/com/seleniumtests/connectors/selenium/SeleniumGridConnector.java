@@ -36,6 +36,7 @@ import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 import kong.unirest.HttpResponse;
+import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
 import kong.unirest.json.JSONArray;
@@ -234,21 +235,26 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	 * @return true if grid is active. Raises an exception if it's not there anymore
 	 */
 	public boolean isGridActive() {
-		HttpResponse<String> response;
+		
+		HttpResponse<JsonNode> response;
 		try {
-			response = Unirest.get(String.format("http://%s:%s%s", hubUrl.getHost(), hubUrl.getPort(), SeleniumGridConnector.CONSOLE_SERVLET)).asString();
-			
+			response = Unirest.get(String.format("http://%s:%s%s", hubUrl.getHost(), hubUrl.getPort(), STATUS_SERVLET)).asJson();
 			if (response.getStatus() != 200) {
 	    		logger.warn("Error connecting to the grid hub at " + hubUrl);
 	    		return false;
-	    	} else {
-	    		return true;
-	    	}
+	    	} 
 		} catch (UnirestException e) {
 			logger.warn("Cannot connect to the grid hub at " + hubUrl);
 			return false;
 		}
 		
+		try {
+			JSONObject hubStatus = response.getBody().getObject();
+			
+			return hubStatus.getJSONObject("value").getBoolean("ready");	
+		} catch (JSONException | NullPointerException e) {
+			return false;
+		}		
 	}
 	
 	/**

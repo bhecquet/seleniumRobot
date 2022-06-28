@@ -57,60 +57,14 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 			WebUIDriver uiDriver = createMockedWebDriver();
 			
 			createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, "Console");
-			createServerMock("GET", SeleniumRobotGridConnector.GUI_SERVLET, 200, "Gui");
+			createGridServletServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "ABC");
+			createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "ABC");
+			createGridServletServerMock("GET", SeleniumRobotGridConnector.GUI_SERVLET, 200, "Gui");
 
 			createJsonServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200,
 
 					// session found
-					"{"
-					+ "  \"value\": {"
-					+ "    \"ready\": true,"
-					+ "    \"message\": \"Selenium Grid ready.\","
-					+ "    \"nodes\": ["
-					+ "      {"
-					+ "        \"id\": \"9f05db23-5533-48c2-8637-0822f8a41d78\","
-					+ "        \"uri\": \"http:\\u002f\\u002f127.0.0.1:5555\","
-					+ "        \"maxSessions\": 3,"
-					+ "        \"osInfo\": {"
-					+ "          \"arch\": \"amd64\","
-					+ "          \"name\": \"Windows 10\","
-					+ "          \"version\": \"10.0\""
-					+ "        },"
-					+ "        \"heartbeatPeriod\": 60000,"
-					+ "        \"availability\": \"UP\","
-					+ "        \"version\": \"4.2.2 (revision 683ccb65d6)\","
-					+ "        \"slots\": ["
-					+ "          {"
-					+ "            \"id\": {"
-					+ "              \"hostId\": \"9f05db23-5533-48c2-8637-0822f8a41d78\","
-					+ "              \"id\": \"6fd05336-ded3-4602-a1b8-03d94b3f56fa\""
-					+ "            },"
-					+ "            \"lastStarted\": \"1970-01-01T00:00:00Z\","
-					+ "            \"session\": {"
-					+ "				 \"sessionId\": \"abcdef\""
-					+ "            },"
-					+ "            \"stereotype\": {"
-					+ "              \"beta\": true,"
-					+ "              \"browserName\": \"MicrosoftEdge\","
-					+ "              \"browserVersion\": \"103.0\","
-					+ "              \"edge_binary\": \"C:\\u002fProgram Files (x86)\\u002fMicrosoft\\u002fEdge Beta\\u002fApplication\\u002fmsedge.exe\","
-					+ "              \"max-sessions\": 5,"
-					+ "              \"nodeTags\": ["
-					+ "                \"toto\""
-					+ "              ],"
-					+ "              \"platform\": \"Windows 10\","
-					+ "              \"platformName\": \"Windows 10\","
-					+ "              \"restrictToTags\": false,"
-					+ "              \"se:webDriverExecutable\": \"D:\\u002fDev\\u002fseleniumRobot\\u002fseleniumRobot-grid\\u002fdrivers\\u002fedgedriver_103.0_edge-103-104.exe\","
-					+ "              \"webdriver-executable\": \"D:\\u002fDev\\u002fseleniumRobot\\u002fseleniumRobot-grid\\u002fdrivers\\u002fedgedriver_103.0_edge-103-104.exe\","
-					+ "              \"webdriver.edge.driver\": \"D:\\u002fDev\\u002fseleniumRobot\\u002fseleniumRobot-grid\\u002fdrivers\\u002fedgedriver_103.0_edge-103-104.exe\""
-					+ "            }"
-					+ "          },"
-					+ "        ]"
-					+ "      }"
-					+ "    ]"
-					+ "  }"
-					+ "}");
+					GRID_STATUS_WITH_SESSION);
 		
 			ReporterTest.executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
 
@@ -119,6 +73,7 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 			
 			String logs = ReporterTest.readSeleniumRobotLogFile();
 			Assert.assertEquals(StringUtils.countMatches(logs, "Start creating *chrome driver"), 1);
+			Assert.assertTrue(logs.contains("Test is OK"));
 			
 			
 		} finally {
@@ -146,58 +101,14 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 			WebUIDriver uiDriver = createMockedWebDriver();
 			
 			createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, "Console");
-			createServerMock("GET", SeleniumRobotGridConnector.GUI_SERVLET, 200, "Gui");
+			createGridServletServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "ABC");
+			createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "ABC");
+			createGridServletServerMock("GET", SeleniumRobotGridConnector.GUI_SERVLET, 200, "Gui");
 
 			createJsonServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200,
 
-					// session found
-					"{"
-					+ "  \"value\": {"
-					+ "    \"ready\": true,"
-					+ "    \"message\": \"Selenium Grid ready.\","
-					+ "    \"nodes\": ["
-					+ "      {"
-					+ "        \"id\": \"9f05db23-5533-48c2-8637-0822f8a41d78\","
-					+ "        \"uri\": \"http:\\u002f\\u002f127.0.0.1:5555\","
-					+ "        \"maxSessions\": 3,"
-					+ "        \"osInfo\": {"
-					+ "          \"arch\": \"amd64\","
-					+ "          \"name\": \"Windows 10\","
-					+ "          \"version\": \"10.0\""
-					+ "        },"
-					+ "        \"heartbeatPeriod\": 60000,"
-					+ "        \"availability\": \"UP\","
-					+ "        \"version\": \"4.2.2 (revision 683ccb65d6)\","
-					+ "        \"slots\": ["
-					+ "          {"
-					+ "            \"id\": {"
-					+ "              \"hostId\": \"9f05db23-5533-48c2-8637-0822f8a41d78\","
-					+ "              \"id\": \"6fd05336-ded3-4602-a1b8-03d94b3f56fa\""
-					+ "            },"
-					+ "            \"lastStarted\": \"1970-01-01T00:00:00Z\","
-					+ "            \"session\": null,"
-					+ "            \"stereotype\": {"
-					+ "              \"beta\": true,"
-					+ "              \"browserName\": \"MicrosoftEdge\","
-					+ "              \"browserVersion\": \"103.0\","
-					+ "              \"edge_binary\": \"C:\\u002fProgram Files (x86)\\u002fMicrosoft\\u002fEdge Beta\\u002fApplication\\u002fmsedge.exe\","
-					+ "              \"max-sessions\": 5,"
-					+ "              \"nodeTags\": ["
-					+ "                \"toto\""
-					+ "              ],"
-					+ "              \"platform\": \"Windows 10\","
-					+ "              \"platformName\": \"Windows 10\","
-					+ "              \"restrictToTags\": false,"
-					+ "              \"se:webDriverExecutable\": \"D:\\u002fDev\\u002fseleniumRobot\\u002fseleniumRobot-grid\\u002fdrivers\\u002fedgedriver_103.0_edge-103-104.exe\","
-					+ "              \"webdriver-executable\": \"D:\\u002fDev\\u002fseleniumRobot\\u002fseleniumRobot-grid\\u002fdrivers\\u002fedgedriver_103.0_edge-103-104.exe\","
-					+ "              \"webdriver.edge.driver\": \"D:\\u002fDev\\u002fseleniumRobot\\u002fseleniumRobot-grid\\u002fdrivers\\u002fedgedriver_103.0_edge-103-104.exe\""
-					+ "            }"
-					+ "          },"
-					+ "        ]"
-					+ "      }"
-					+ "    ]"
-					+ "  }"
-					+ "}");
+					// session not found
+					GRID_STATUS_NO_SESSION);
 		
 			ReporterTest.executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
 
@@ -237,7 +148,7 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 
 			String logs = ReporterTest.readSeleniumRobotLogFile();
 			Assert.assertEquals(StringUtils.countMatches(logs, "Start creating *chrome driver"), 1); // driver is really created once, but, from WebUIDriver point of view, there was only one call
-			Assert.assertTrue(logs.contains("Cannot find test slot running session 7ef50edc-ce51-40dd-98b6-0a369bff38b")); // check error on first creation is displayed
+			Assert.assertTrue(logs.contains("Could not start a new session. Could not get session information from grid")); // check error on first creation is displayed
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.RUN_MODE);
@@ -261,7 +172,9 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 			
 			// grid is there but we cannot get any matching node
 			createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, "Console");
-			createServerMock("GET", SeleniumRobotGridConnector.GUI_SERVLET, 200, "Gui");
+			createGridServletServerMock("GET", SeleniumRobotGridConnector.GUI_SERVLET, 200, "Gui");
+			createGridServletServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "ABC");
+			createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "ABC");
 			createServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 500, "{}");
 			
 			ReporterTest.executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
@@ -294,7 +207,9 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 			
 			// grid is there but we cannot get any matching node
 			createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, "Console");
-			createServerMock("GET", SeleniumRobotGridConnector.GUI_SERVLET, 200, "Gui");
+			createGridServletServerMock("GET", SeleniumRobotGridConnector.GUI_SERVLET, 200, "Gui");
+			createGridServletServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "ABC");
+			createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "ABC");
 			createServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 500, "{}");
 			
 			ReporterTest.executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.NONE, new String[] {"testDriverShort", "testDriverShort2", "testDriverShort3", "testDriverShort4"});
@@ -334,8 +249,8 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 			
 			// grid is there
 			createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, "Console");
-			createServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "ABC");
-			createServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "ABC");
+			createGridServletServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "ABC");
+			createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "ABC");
 			createGridServletServerMock("GET", SeleniumRobotGridConnector.GUI_SERVLET, 200, "Gui");
 			createJsonServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200, 
 					// node is not there 2 times
@@ -357,55 +272,7 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 					+ "}"
 					,
 					// session found
-					"{"
-					+ "  \"value\": {"
-					+ "    \"ready\": true,"
-					+ "    \"message\": \"Selenium Grid ready.\","
-					+ "    \"nodes\": ["
-					+ "      {"
-					+ "        \"id\": \"9f05db23-5533-48c2-8637-0822f8a41d78\","
-					+ "        \"uri\": \"http:\\u002f\\u002f127.0.0.1:5555\","
-					+ "        \"maxSessions\": 3,"
-					+ "        \"osInfo\": {"
-					+ "          \"arch\": \"amd64\","
-					+ "          \"name\": \"Windows 10\","
-					+ "          \"version\": \"10.0\""
-					+ "        },"
-					+ "        \"heartbeatPeriod\": 60000,"
-					+ "        \"availability\": \"UP\","
-					+ "        \"version\": \"4.2.2 (revision 683ccb65d6)\","
-					+ "        \"slots\": ["
-					+ "          {"
-					+ "            \"id\": {"
-					+ "              \"hostId\": \"9f05db23-5533-48c2-8637-0822f8a41d78\","
-					+ "              \"id\": \"6fd05336-ded3-4602-a1b8-03d94b3f56fa\""
-					+ "            },"
-					+ "            \"lastStarted\": \"1970-01-01T00:00:00Z\","
-					+ "            \"session\": {"
-					+ "				 \"sessionId\": \"abcdef\""
-					+ "            },"
-					+ "            \"stereotype\": {"
-					+ "              \"beta\": true,"
-					+ "              \"browserName\": \"MicrosoftEdge\","
-					+ "              \"browserVersion\": \"103.0\","
-					+ "              \"edge_binary\": \"C:\\u002fProgram Files (x86)\\u002fMicrosoft\\u002fEdge Beta\\u002fApplication\\u002fmsedge.exe\","
-					+ "              \"max-sessions\": 5,"
-					+ "              \"nodeTags\": ["
-					+ "                \"toto\""
-					+ "              ],"
-					+ "              \"platform\": \"Windows 10\","
-					+ "              \"platformName\": \"Windows 10\","
-					+ "              \"restrictToTags\": false,"
-					+ "              \"se:webDriverExecutable\": \"D:\\u002fDev\\u002fseleniumRobot\\u002fseleniumRobot-grid\\u002fdrivers\\u002fedgedriver_103.0_edge-103-104.exe\","
-					+ "              \"webdriver-executable\": \"D:\\u002fDev\\u002fseleniumRobot\\u002fseleniumRobot-grid\\u002fdrivers\\u002fedgedriver_103.0_edge-103-104.exe\","
-					+ "              \"webdriver.edge.driver\": \"D:\\u002fDev\\u002fseleniumRobot\\u002fseleniumRobot-grid\\u002fdrivers\\u002fedgedriver_103.0_edge-103-104.exe\""
-					+ "            }"
-					+ "          },"
-					+ "        ]"
-					+ "      }"
-					+ "    ]"
-					+ "  }"
-					+ "}");
+					GRID_STATUS_WITH_SESSION);
 
 			
 			
