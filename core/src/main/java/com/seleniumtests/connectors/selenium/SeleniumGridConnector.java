@@ -56,13 +56,17 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	protected static Logger logger = SeleniumRobotLogger.getLogger(SeleniumGridConnector.class);
 	
 	public SeleniumGridConnector(String url) {
+		setHubUrl(url);
+	}
+	
+	protected void setHubUrl(String hubUrl) {
 		try {
-			hubUrl = new URL(url);
+			this.hubUrl = new URL(hubUrl);
 		} catch (MalformedURLException e1) {
-			throw new ConfigurationException(String.format("Hub url '%s' is invalid: %s", url, e1.getMessage()));
+			throw new ConfigurationException(String.format("Hub url '%s' is invalid: %s", hubUrl, e1.getMessage()));
 		}
-		hubHost = hubUrl.getHost();
-        hubPort = hubUrl.getPort();
+		hubHost = this.hubUrl.getHost();
+        hubPort = this.hubUrl.getPort();
 	}
 	
 	/**
