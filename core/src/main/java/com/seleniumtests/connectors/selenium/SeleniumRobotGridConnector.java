@@ -42,7 +42,6 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.json.JSONException;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -57,11 +56,9 @@ import com.seleniumtests.util.FileUtility;
 import io.appium.java_client.remote.MobileCapabilityType;
 import kong.unirest.HttpRequestWithBody;
 import kong.unirest.HttpResponse;
-import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
 import kong.unirest.UnirestInstance;
-import kong.unirest.json.JSONObject;
 
 public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 
@@ -77,23 +74,18 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	public static final String GUI_SERVLET = "/grid/admin/GuiServlet"; 
 	
 	private String nodeServletUrl;
+	private URL hubServletUrl;
 	
 	public SeleniumRobotGridConnector(String url) {
 		super(url);
 		
 	}
 	
+	
 	@Override
 	public void getSessionInformationFromGrid(RemoteWebDriver driver, long driverCreationDuration) {
 		super.getSessionInformationFromGrid(driver, driverCreationDuration);
-		
-		int nodePort;
-		try {
-			nodePort = new URL(nodeUrl).getPort();
-		} catch (MalformedURLException e) {
-			throw new ConfigurationException("Node URL is invalid: " + nodeUrl);
-		}
-		nodeServletUrl = nodeUrl.replace(Integer.toString(nodePort), Integer.toString(nodePort + 10));
+		setNodeUrl(nodeUrl);
 	}
 	
 	/**
@@ -115,9 +107,9 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 				appFiles.add(new File(appPath));
 				File zipFile = FileUtility.createZipArchiveFromFiles(appFiles);
 				
-				HttpHost serverHost = new HttpHost(hubUrl.getHost(), hubUrl.getPort());
+				HttpHost serverHost = new HttpHost(hubServletUrl.getHost(), hubServletUrl.getPort());
 				URIBuilder builder = new URIBuilder();
-	        	builder.setPath("/grid/admin/FileServlet/");
+	        	builder.setPath("/grid/admin/FileServlet");
 	        	builder.addParameter(OUTPUT_FIELD, "app");
 	        	HttpPost httpPost = new HttpPost(builder.build());
 		        httpPost.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.OCTET_STREAM.toString());
@@ -197,7 +189,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			appFiles.add(new File(filePath));
 			File zipFile = FileUtility.createZipArchiveFromFiles(appFiles);
 
-			HttpHost serverHost = new HttpHost(hubUrl.getHost(), hubUrl.getPort());
+			HttpHost serverHost = new HttpHost(hubServletUrl.getHost(), hubServletUrl.getPort());
 			URIBuilder builder = new URIBuilder();
         	builder.setPath("/grid/admin/FileServlet/");
         	builder.addParameter(OUTPUT_FIELD, "app");
@@ -683,6 +675,29 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			} catch (Exception e) {
 				logger.warn("Error deleting previous video file, there may be a problem getting the new one: " + e.getMessage());
 			}
+		}
+	}
+
+	@Override
+	public void setNodeUrl(String nodeUrl) {
+		super.setNodeUrl(nodeUrl);
+		int nodePort;
+		try {
+			nodePort = new URL(nodeUrl).getPort();
+		} catch (MalformedURLException e) {
+			throw new ConfigurationException("Node URL is invalid: " + nodeUrl);
+		}
+		nodeServletUrl = nodeUrl.replace(Integer.toString(nodePort), Integer.toString(nodePort + 10));
+	}
+
+	@Override
+	protected void setHubUrl(String hubUrl) {
+		super.setHubUrl(hubUrl);
+		
+		try {
+			hubServletUrl = new URL(hubUrl.replace(Integer.toString(hubPort), Integer.toString(hubPort + 10)));
+		} catch (MalformedURLException e) {
+			throw new ConfigurationException("Hub URL is invalid: " + nodeUrl);
 		}
 	}
 

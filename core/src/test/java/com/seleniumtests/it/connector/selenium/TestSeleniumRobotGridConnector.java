@@ -5,6 +5,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
+import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
@@ -46,17 +47,20 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	private SeleniumGridConnector connector;
 	private Logger gridLogger;
 	
+	// TODO: démarrer un navigateur
+	// TODO: uploadFileToBrowser
+	
 	@BeforeMethod(groups={"it"})
 	public void initConnector(ITestContext ctx) {
 		initThreadContext(ctx);
 
-		connector = new SeleniumRobotGridConnector("http://localhost:4444/wd/hub");
+		connector = new SeleniumRobotGridConnector("http://127.0.0.1:4444/wd/hub");
 		
 		if (!connector.isGridActive()) {
 			throw new SkipException("no seleniumrobot grid available");
 		}
 
-		connector.setNodeUrl("http://localhost:5555");
+		connector.setNodeUrl("http://127.0.0.1:5555");
 		gridLogger = spy(SeleniumRobotGridConnector.getLogger());
 	}
 	
@@ -71,8 +75,44 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 		connector.uploadMobileApp(caps);
 		String url = (String) caps.getCapability(MobileCapabilityType.APP);
 		
-		String fileContent = Unirest.get("http://localhost:4444/grid/admin/FileServlet/")
+		String fileContent = Unirest.get("http://localhost:4454/grid/admin/FileServlet")
 				.queryString("file", url)
+				.asString()
+				.getBody();
+		
+		Assert.assertEquals(fileContent, FileUtils.readFileToString(app, StandardCharsets.UTF_8));
+	}
+	
+	@Test(groups={"it"})
+	public void testUploadFileToNode() throws ClientProtocolException, IOException, UnirestException {
+		
+		File app = GenericTest.createFileFromResource("clirr-differences.xml");
+		
+		DesiredCapabilities caps = new DesiredCapabilities();
+		caps.setCapability(MobileCapabilityType.APP, app.getAbsolutePath());
+		String filePath = connector.uploadFileToNode(app.getAbsolutePath(), true);
+		Assert.assertEquals(filePath, "");
+		
+		String fileContent = Unirest.get("http://localhost:5565/extra/FileServlet")
+				.queryString("file", "clirr-differences.xml")
+				.asString()
+				.getBody();
+		
+		Assert.assertEquals(fileContent, FileUtils.readFileToString(app, StandardCharsets.UTF_8));
+	}
+	
+	@Test(groups={"it"})
+	public void testUploadFileToNode2() throws ClientProtocolException, IOException, UnirestException {
+		
+		File app = GenericTest.createFileFromResource("clirr-differences.xml");
+		
+		DesiredCapabilities caps = new DesiredCapabilities();
+		caps.setCapability(MobileCapabilityType.APP, app.getAbsolutePath());
+		String filePath = connector.uploadFileToNode(app.getAbsolutePath(), false);
+		Assert.assertEquals(filePath, "");
+		
+		String fileContent = Unirest.get("http://localhost:5565/extra/FileServlet/")
+				.queryString("file", "clirr-differences.xml")
 				.asString()
 				.getBody();
 		
@@ -89,7 +129,8 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 
 	@Test(groups={"it"})
 	public void testGetMouseCoordinates() throws ClientProtocolException, IOException {
-		connector.getMouseCoordinates();
+		Point coords = connector.getMouseCoordinates();
+		Assert.assertNotEquals(coords, new Point(0, 0));
 		
 		// no error encountered
 		verify(gridLogger, never()).warn(anyString());
@@ -98,6 +139,14 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	@Test(groups={"it"})
 	public void testLeftClick() throws ClientProtocolException, IOException {
 		connector.leftClic(100, 100);
+		
+		// no error encountered
+		verify(gridLogger, never()).warn(anyString());
+		verify(gridLogger, never()).error(anyString());
+	}
+	@Test(groups={"it"})
+	public void testLeftClickMainScreen() throws ClientProtocolException, IOException {
+		connector.leftClic(true, 100, 100);
 		
 		// no error encountered
 		verify(gridLogger, never()).warn(anyString());
@@ -114,8 +163,27 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	}
 	
 	@Test(groups={"it"})
+	public void testDoubleClickMainScreen() throws ClientProtocolException, IOException {
+		connector.doubleClick(true, 100, 100);
+		
+		// no error encountered
+		verify(gridLogger, never()).warn(anyString());
+		verify(gridLogger, never()).error(anyString());
+	}
+	
+	@Test(groups={"it"})
 	public void testRightClick() throws ClientProtocolException, IOException {
 		connector.rightClic(100, 100);
+		
+		// no error encountered
+		verify(gridLogger, never()).warn(anyString());
+		verify(gridLogger, never()).error(anyString());
+	}
+	
+	
+	@Test(groups={"it"})
+	public void testRightClickMainScreen() throws ClientProtocolException, IOException {
+		connector.rightClic(true, 100, 100);
 		
 		// no error encountered
 		verify(gridLogger, never()).warn(anyString());
@@ -131,12 +199,31 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 		File image = new File("d:\\tmp\\out.png");
 		Assert.assertTrue(image.exists());
 		Assert.assertTrue(image.length() > 100);
+	}
+	
+	@Test(groups={"it"})
+	public void testDesktopScreenshotMainScreen() throws ClientProtocolException, IOException {
 		
+		new File("d:\\tmp\\out.png").delete();
+		FileUtility.writeImage("d:\\tmp\\out.png", ImageProcessor.loadFromB64String(connector.captureDesktopToBuffer(true)));
+		
+		File image = new File("d:\\tmp\\out.png");
+		Assert.assertTrue(image.exists());
+		Assert.assertTrue(image.length() > 100);	
 	}
 
 	@Test(groups={"it"})
 	public void testSendKeys() throws ClientProtocolException, IOException {
 		connector.sendKeysWithKeyboard(Arrays.asList(KeyEvent.VK_F1));
+		
+		// no error encountered
+		verify(gridLogger, never()).warn(anyString());
+		verify(gridLogger, never()).error(anyString());
+	}
+	
+	@Test(groups={"it"})
+	public void testdisplayRunningStep() throws ClientProtocolException, IOException {
+		connector.displayRunningStep("coucou");
 		
 		// no error encountered
 		verify(gridLogger, never()).warn(anyString());
