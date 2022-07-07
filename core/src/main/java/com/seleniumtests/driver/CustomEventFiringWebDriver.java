@@ -1427,8 +1427,8 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 				} else {
 					moveMouse(robot, x, y);
 				}
-				robot.mousePress(InputEvent.BUTTON2_DOWN_MASK);
-				robot.mouseRelease(InputEvent.BUTTON2_DOWN_MASK);
+				robot.mousePress(InputEvent.BUTTON3_DOWN_MASK);
+				robot.mouseRelease(InputEvent.BUTTON3_DOWN_MASK);
 			} catch (AWTException e) {
 				throw new ScenarioException("rightClicOnDesktopAt: problem using Robot: " + e.getMessage());
 			}
