@@ -38,7 +38,7 @@ import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.By.ByXPath;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.ElementNotVisibleException;
+import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.JavascriptExecutor;
@@ -965,7 +965,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 			// wait for element to be displayed
 			try {
 				new WebDriverWait(getDriver(), Duration.ofSeconds(1)).until(ExpectedConditions.visibilityOf(localElement));
-			} catch (ElementNotVisibleException e) {
+			} catch (ElementNotInteractableException e) {
 				scenarioLogger.info(String.format("element %s not visible", localElement));
 			} catch (Exception e) {
 				logger.warn("Could not make element visible", e);

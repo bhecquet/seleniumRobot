@@ -58,15 +58,12 @@ public class TestDesktopCommonCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilities() {
 		
-		when(config.isEnableJavascript()).thenReturn(true);
 		when(config.getProxy()).thenReturn(proxyConfig);
 		when(config.getNodeTags()).thenReturn(new ArrayList<>());
 		
 		MutableCapabilities capa = new HtmlUnitCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertTrue(capa.is(CapabilityType.SUPPORTS_JAVASCRIPT));
-		Assert.assertTrue(capa.is(CapabilityType.TAKES_SCREENSHOT));
-		Assert.assertTrue(capa.is(CapabilityType.ACCEPT_SSL_CERTS));
+		Assert.assertTrue(capa.is(CapabilityType.ACCEPT_INSECURE_CERTS));
 		Assert.assertFalse(capa.is(SeleniumRobotCapabilityType.NODE_TAGS));
 		Assert.assertEquals(capa.getBrowserVersion(), "");
 		Assert.assertEquals(capa.getCapability(CapabilityType.PROXY), proxyConfig);
@@ -79,7 +76,6 @@ public class TestDesktopCommonCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithNodeTagsInGridMode() {
 		
-		when(config.isEnableJavascript()).thenReturn(true);
 		when(config.getProxy()).thenReturn(proxyConfig);
 		when(config.getNodeTags()).thenReturn(Arrays.asList("foo", "bar"));
 		when(config.getMode()).thenReturn(DriverMode.GRID);
@@ -96,7 +92,6 @@ public class TestDesktopCommonCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithBetaInGridMode() {
 		
-		when(config.isEnableJavascript()).thenReturn(true);
 		when(config.getProxy()).thenReturn(proxyConfig);
 		when(config.getNodeTags()).thenReturn(Arrays.asList("foo", "bar"));
 		when(config.getMode()).thenReturn(DriverMode.GRID);
@@ -125,7 +120,6 @@ public class TestDesktopCommonCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithPlatform() {
 		
-		when(config.isEnableJavascript()).thenReturn(true);
 		when(config.getProxy()).thenReturn(proxyConfig);
 		when(config.getWebPlatform()).thenReturn(Platform.WINDOWS);
 		
@@ -134,19 +128,6 @@ public class TestDesktopCommonCapabilityFactory extends MockitoTest {
 		Assert.assertEquals(capa.getPlatformName(), Platform.WINDOWS);
 		
 	}
-	
-	@Test(groups={"ut"})
-	public void testCreateDefaultCapabilitiesWithJavascriptDisabled() {
-		
-		when(config.isEnableJavascript()).thenReturn(false);
-		when(config.getProxy()).thenReturn(proxyConfig);
-		
-		MutableCapabilities capa = new HtmlUnitCapabilitiesFactory(config).createCapabilities();
-		
-		Assert.assertFalse(capa.is(CapabilityType.SUPPORTS_JAVASCRIPT));
-		
-	}
-
 	
 	/**
 	 * Check that with neoload in design mode, proxy is set

@@ -10,8 +10,10 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.client.ClientProtocolException;
@@ -46,10 +48,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 
 	private SeleniumGridConnector connector;
 	private Logger gridLogger;
-	
-	// TODO: démarrer un navigateur
-	// TODO: uploadFileToBrowser
-	
+
 	@BeforeMethod(groups={"it"})
 	public void initConnector(ITestContext ctx) {
 		initThreadContext(ctx);
@@ -223,7 +222,10 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	
 	@Test(groups={"it"})
 	public void testdisplayRunningStep() throws ClientProtocolException, IOException {
+		connector.startVideoCapture();
 		connector.displayRunningStep("coucou");
+		WaitHelper.waitForMilliSeconds(5000);
+		connector.stopVideoCapture("d:\\tmp\\out.avi");
 		
 		// no error encountered
 		verify(gridLogger, never()).warn(anyString());
@@ -261,8 +263,9 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 
 	@Test(groups={"it"})
 	public void testGetProcessList() throws ClientProtocolException, IOException {
+		
 		List<Integer> processes = connector.getProcessList("conhost");
-
+		
 		Assert.assertTrue(processes.size() > 0);
 	}
 	

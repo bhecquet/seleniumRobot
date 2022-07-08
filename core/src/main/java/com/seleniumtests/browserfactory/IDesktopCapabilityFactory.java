@@ -25,6 +25,7 @@ import java.util.Map;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.Proxy.ProxyType;
+import org.openqa.selenium.remote.AbstractDriverOptions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
@@ -107,8 +108,8 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
 	}
 
     public MutableCapabilities createCapabilities() {
-    	MutableCapabilities options = getDriverOptions();
-        options = options.merge(updateDefaultCapabilities());
+    	AbstractDriverOptions<AbstractDriverOptions> options = (AbstractDriverOptions<AbstractDriverOptions>) getDriverOptions();
+        updateDefaultCapabilities(options);
 
         if (webDriverConfig.getMode() == DriverMode.LOCAL) {
 			prepareBinaryAndDriver(getBrowserType(),
@@ -148,31 +149,27 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
     
     protected abstract void updateGridOptionsWithSelectedBrowserInfo(MutableCapabilities options);
  
-    private MutableCapabilities updateDefaultCapabilities() {
+    private MutableCapabilities updateDefaultCapabilities(AbstractDriverOptions options) {
 
-    	DesiredCapabilities capability = new DesiredCapabilities();
-    	
-        capability.setJavascriptEnabled(webDriverConfig.isEnableJavascript());
-        capability.setCapability(CapabilityType.TAKES_SCREENSHOT, true);
-        capability.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
-        
         // ACCEPT_INSECURE_CERTS is not permitted for IE
         if (webDriverConfig.getBrowserType() != BrowserType.INTERNET_EXPLORER) {
-        	capability.setCapability(CapabilityType.ACCEPT_INSECURE_CERTS, webDriverConfig.isSetAcceptUntrustedCertificates());
+        	options.setAcceptInsecureCerts(webDriverConfig.isSetAcceptUntrustedCertificates());
         } else {
-        	capability.setCapability(CapabilityType.ACCEPT_INSECURE_CERTS, false);
+        	options.setAcceptInsecureCerts(false);
         }
 
         if (webDriverConfig.getBrowserVersion() != null) {
-            capability.setCapability(CapabilityType.BROWSER_VERSION, webDriverConfig.getBrowserVersion());
+        	options.setBrowserVersion(webDriverConfig.getBrowserVersion());
         }
 
         if (webDriverConfig.getWebPlatform() != null) {
-            capability.setPlatform(webDriverConfig.getWebPlatform());
-            capability.setCapability(CapabilityType.PLATFORM_NAME, webDriverConfig.getWebPlatform());
+        	options.setPlatformName(webDriverConfig.getWebPlatform().toString());
         }
 
-        configureProxyCap(capability);
+        configureProxyCap(options);
+        
+        MutableCapabilities capOptions = options;
+
         
     	// NEOLOAD //
         if (webDriverConfig.isNeoloadActive()) {
@@ -180,7 +177,8 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
         		logger.warn("Enabling Neoload Design mode automatically configures a manual proxy through neoload instance, other proxy settings are overriden and network capture won't be possible");
         	}
         	try {
-        		capability = NLWebDriverFactory.addProxyCapabilitiesIfNecessary(capability);
+        		DesiredCapabilities capability = NLWebDriverFactory.addProxyCapabilitiesIfNecessary(new DesiredCapabilities());
+        		capOptions = capOptions.merge(capability);
         	} catch (ExceptionInInitializerError e) {
         		throw new ConfigurationException("Error while contacting Neoload Design API", e);
         	} catch (RuntimeException e) {
@@ -188,7 +186,7 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
         	}
         }
 
-        return capability;
+        return capOptions;
     }  
     
     /**
@@ -196,7 +194,7 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
      * If network capture is enabled, start browsermob proxy and set it into browser
      * @param capability
      */
-    private void configureProxyCap(MutableCapabilities capability) {
+    private void configureProxyCap(AbstractDriverOptions<AbstractDriverOptions> capability) {
     	Proxy proxy = webDriverConfig.getProxy();
 
         if (webDriverConfig.getCaptureNetwork()) {
@@ -219,10 +217,10 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
 			mobProxy.start(0);
 		    Proxy seleniumProxy = ClientUtil.createSeleniumProxy(mobProxy);
 	    
-		    capability.setCapability(CapabilityType.PROXY, seleniumProxy);
+		    capability.setProxy(seleniumProxy);
 		    webDriverConfig.setBrowserMobProxy(mobProxy);
         } else {
-            capability.setCapability(CapabilityType.PROXY, proxy);
+            capability.setProxy(proxy);
         }
     }
 }

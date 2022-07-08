@@ -155,15 +155,12 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilities() {
 		
-		when(config.isEnableJavascript()).thenReturn(true);
 		when(config.getProxy()).thenReturn(proxyConfig);
 		when(config.getNodeTags()).thenReturn(new ArrayList<>());
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
-		
-		Assert.assertTrue(capa.is(CapabilityType.SUPPORTS_JAVASCRIPT));
-		Assert.assertTrue(capa.is(CapabilityType.TAKES_SCREENSHOT));
-		Assert.assertTrue(capa.is(CapabilityType.ACCEPT_SSL_CERTS));
+
+		Assert.assertTrue(capa.is(CapabilityType.ACCEPT_INSECURE_CERTS));
 		Assert.assertFalse(capa.is(SeleniumRobotCapabilityType.NODE_TAGS));
 		Assert.assertEquals(capa.getBrowserVersion(), "");
 		Assert.assertEquals(capa.getCapability(CapabilityType.PROXY), proxyConfig);
@@ -176,7 +173,6 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithNodeTagsInGridMode() {
 		
-		when(config.isEnableJavascript()).thenReturn(true);
 		when(config.getProxy()).thenReturn(proxyConfig);
 		when(config.getNodeTags()).thenReturn(Arrays.asList("foo", "bar"));
 		when(config.getMode()).thenReturn(DriverMode.GRID);
@@ -204,7 +200,6 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithPlatform() {
 		
-		when(config.isEnableJavascript()).thenReturn(true);
 		when(config.getProxy()).thenReturn(proxyConfig);
 		when(config.getWebPlatform()).thenReturn(Platform.WINDOWS);
 		
@@ -213,23 +208,11 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		Assert.assertEquals(capa.getPlatformName(), Platform.WINDOWS);
 		
 	}
-	
-	@Test(groups={"ut"})
-	public void testCreateDefaultCapabilitiesWithJavascriptDisabled() {
-		
-		when(config.isEnableJavascript()).thenReturn(false);
-		when(config.getProxy()).thenReturn(proxyConfig);
-		
-		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
-		
-		Assert.assertFalse(capa.is(CapabilityType.SUPPORTS_JAVASCRIPT));
-		
-	}
+
 	
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithVersion() {
 		
-		when(config.isEnableJavascript()).thenReturn(true);
 		when(config.getProxy()).thenReturn(proxyConfig);
 		when(config.getBrowserVersion()).thenReturn("60.0");
 		
@@ -384,14 +367,11 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultMobileCapabilities() {
 		
-		when(config.isEnableJavascript()).thenReturn(true);
 		when(config.getProxy()).thenReturn(proxyConfig);
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createMobileCapabilities(config);
-		
-		Assert.assertNull(capa.getCapability(CapabilityType.SUPPORTS_JAVASCRIPT));
-		Assert.assertNull(capa.getCapability(CapabilityType.TAKES_SCREENSHOT));
-		Assert.assertNull(capa.getCapability(CapabilityType.ACCEPT_SSL_CERTS));
+
+		Assert.assertNull(capa.getCapability(CapabilityType.ACCEPT_INSECURE_CERTS));
 		Assert.assertEquals(((Map<?,?>)capa.getCapability(ChromeOptions.CAPABILITY)).get("args").toString(), "[--disable-translate, --disable-web-security, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process]");
 	}
 	

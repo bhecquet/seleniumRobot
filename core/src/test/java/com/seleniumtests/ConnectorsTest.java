@@ -248,6 +248,12 @@ public class ConnectorsTest extends MockitoTest {
 	protected HttpRequest<?> createGridServletServerMock(String requestType, String apiPath, int statusCode, String replyData) throws UnirestException {
 		return createServerMock(GRID_SERVLET_URL, requestType, apiPath, statusCode, replyData, "request");
 	}
+	protected HttpRequest<?> createGridServletServerMock(String requestType, String apiPath, int statusCode, File replyData) throws UnirestException {
+		return createServerMock(GRID_SERVLET_URL, requestType, apiPath, statusCode, replyData, "request");
+	}
+	protected HttpRequest<?> createGridServletServerMock(String requestType, String apiPath, int statusCode, String replyData, String responseType) throws UnirestException {
+		return createServerMock(GRID_SERVLET_URL, requestType, apiPath, statusCode, replyData, responseType);
+	}
 	protected HttpRequest<?> createServerMock(String requestType, String apiPath, int statusCode, String replyData) throws UnirestException {
 		return createServerMock(requestType, apiPath, statusCode, replyData, "request");
 	}
@@ -363,7 +369,7 @@ public class ConnectorsTest extends MockitoTest {
 				pageList = new PagedList<>();
 				pageList.add(jsonResponse);
 				
-			} catch (JSONException e) {}
+			} catch (JSONException | NullPointerException e) {}
 
 			
 		} else if (replyData.get(0) instanceof File) {

@@ -47,8 +47,10 @@ import org.testng.annotations.BeforeMethod;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.MockitoTest;
+import com.seleniumtests.browserfactory.SeleniumGridDriverFactory;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.SeleniumGridNodeNotAvailable;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
@@ -82,6 +84,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	private SeleniumGridConnector seleniumGridConnector;
 	private String testPageName;
 	protected String testPageUrl;
+	private boolean targetSeleniumGrid = false;
 	
 	protected List<BrowserType> installedBrowsers = OSUtilityFactory.getInstance().getInstalledBrowsers();
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(GenericMultiBrowserTest.class);
@@ -94,8 +97,13 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	}
 
 	public GenericMultiBrowserTest(BrowserType browserType, String testPageName) throws Exception {
+		this(browserType, testPageName, false);
+	}
+	
+	public GenericMultiBrowserTest(BrowserType browserType, String testPageName, boolean targetSeleniumGrid) throws Exception {
 		this.browserType = browserType; 
 		this.testPageName = testPageName;
+		this.targetSeleniumGrid = targetSeleniumGrid;
 	}
 	
 	/**
@@ -115,14 +123,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 		mapping.put("/tu/googleSearch.png", "/googleSearch.png");
 		mapping.put("/tu/images/bouton_enregistrer.png", "/images/bouton_enregistrer.png");
 		mapping.put("/tu/jquery.min.js", "/jquery.min.js");
-		
-//		// angular app
-//		mapping.put("/tu/angularApp/index.html", "/angularApp/index.html");
-//		mapping.put("/tu/angularApp/inline.bundle.js", "/angularApp/inline.bundle.js");
-//		mapping.put("/tu/angularApp/main.bundle.js", "/angularApp/main.bundle.js");
-//		mapping.put("/tu/angularApp/polyfills.bundle.js", "/angularApp/polyfills.bundle.js");
-//		mapping.put("/tu/angularApp/styles.bundle.css", "/angularApp/styles.bundle.css");
-//		
+
 		// angular app v9
 		mapping.put("/tu/angularAppv9/index.html", "/angularApp/index.html");
 		mapping.put("/tu/angularAppv9/runtime-es2015.js", "/angularApp/runtime-es2015.js");
@@ -154,14 +155,17 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setEdgeIeMode(true);
 //		SeleniumTestsContextManager.getThreadContext().setDebug("driver");
 
-//		// grid support
-//		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://10.200.42.9:4444/wd/hub");
-//		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
-//		
-//		// restore the grid connector as it's not in context for this test
-//		if (driver != null && !SeleniumTestsContextManager.getThreadContext().getWebDriverGrid().isEmpty()) {
-//			SeleniumTestsContextManager.getThreadContext().setSeleniumGridConnector(seleniumGridConnector);
-//		}
+		// grid support
+		if (targetSeleniumGrid) {
+			SeleniumGridDriverFactory.setRetryTimeout(1);
+			SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://localhost:4444/wd/hub");
+			SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
+
+			// restore the grid connector as it's not in context for this test
+			if (driver != null && !SeleniumTestsContextManager.getThreadContext().getWebDriverGrid().isEmpty()) {
+				SeleniumTestsContextManager.getThreadContext().setSeleniumGridConnector(seleniumGridConnector);
+			}
+		}
 	}
 	
 	
@@ -219,6 +223,8 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 					lightningPage = new DriverTestPageSalesforceLightning();
 					break;
 			}
+		} catch (SeleniumGridNodeNotAvailable e) {
+			throw new SkipException("No grid available, tests won't be run");
 		} catch (Exception e) {
 			logger.error("Error opening page");
 			logger.error(WebUIDriver.getWebDriver(true).getPageSource());

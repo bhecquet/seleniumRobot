@@ -354,10 +354,6 @@ public class DriverConfig {
         return testContext.getWebSessionTimeout();
     }
 
-    public boolean isEnableJavascript() {
-        return testContext.getJavascriptEnabled();
-    }
-
     public boolean isSetAcceptUntrustedCertificates() {
         return testContext.getAcceptUntrustedCertificates();
     }

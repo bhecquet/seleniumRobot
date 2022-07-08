@@ -561,8 +561,11 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			
 			HttpRequestWithBody req = unirest.post(String.format("%s%s", nodeServletUrl, NODE_TASK_SERVLET))
 				.queryString(ACTION_FIELD, "command")
-				.queryString(NAME_FIELD, program)
-				.queryString(SESSION_FIELD, getSessionId().toString());
+				.queryString(NAME_FIELD, program);
+			
+			if (getSessionId() != null) {
+				req = req.queryString(SESSION_FIELD, getSessionId().toString());
+			}
 			
 			int i = 0;
 			for (String arg: args) {
@@ -605,8 +608,11 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			} else {
 				List<String> pidListStr = Arrays.asList(
 					response.getBody()
+					.trim()
 					.split(","));
-				return pidListStr.stream().map(Integer::valueOf).collect(Collectors.toList());
+				return pidListStr.stream()
+						.filter(p -> !p.isEmpty())
+						.map(Integer::parseInt).collect(Collectors.toList());
 			}
 		} catch (UnirestException e) {
 			logger.warn(String.format("Could not get process list of %s: %s", processName, e.getMessage()));
@@ -677,6 +683,14 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			}
 		}
 	}
+	
+	/**
+	 * For TESTING only
+	 */
+	public void setNullNodeUrl() {
+		super.setNodeUrl(null);
+	}
+	
 
 	@Override
 	public void setNodeUrl(String nodeUrl) {

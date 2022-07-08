@@ -20,15 +20,11 @@ package com.seleniumtests.uipage.aspects;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.openqa.selenium.interactions.Action;
-import org.openqa.selenium.interactions.ClickAction;
-import org.openqa.selenium.interactions.CompositeAction;
 import org.openqa.selenium.interactions.Interaction;
 import org.openqa.selenium.interactions.Sequence;
 
@@ -48,42 +44,6 @@ public class CompositeActions {
 	@After("call(public * org.openqa.selenium.interactions.Action+.perform (..))")
     public void slowDown(JoinPoint joinPoint) {
 		WaitHelper.waitForMilliSeconds(200);
-	}
-	
-	/**
-	 * Update window handles when a click is requested in a composite Action (to get the same behavior between native clicks
-	 * and clicks in CompositeAction
-	 * Capture is done on all Action sub-classes, else it would never be done
-	 * 
-	 * TO KEEP until ClickAction and other equivalents are there in selenium code
-	 * 
-	 * @param joinPoint
-	 * @throws SecurityException 
-	 * @throws NoSuchFieldException 
-	 * @throws IllegalAccessException 
-	 * @throws IllegalArgumentException 
-	 */
-	@Before("call(public void org.openqa.selenium.interactions.Action+.perform ())")
-	public void updateHandles(JoinPoint joinPoint) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-		if (!(joinPoint.getTarget() instanceof CompositeAction)) {
-			return;
-		}
-		CompositeAction compositeAction = (CompositeAction)joinPoint.getTarget();
-		Field actionListField = CompositeAction.class.getDeclaredField("actionsList");
-		actionListField.setAccessible(true);
-		@SuppressWarnings("unchecked")
-		List<Action> actionsList = (List<Action>)actionListField.get(compositeAction);
-		
-		boolean clickRequested = false;
-		for (Action action: actionsList) {
-			if (action instanceof ClickAction) {
-				clickRequested = true;
-			}
-		}
-		
-		if (clickRequested) {
-			((CustomEventFiringWebDriver)WebUIDriver.getWebDriver(false)).updateWindowsHandles();
-		}
 	}
 	
 	/**

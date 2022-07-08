@@ -86,15 +86,12 @@ public class TestSafariCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilities() {
 		
-		Mockito.when(config.isEnableJavascript()).thenReturn(true);
 		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
 		Mockito.when(config.getNodeTags()).thenReturn(new ArrayList<>());
 		
 		MutableCapabilities capa = new SafariCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertTrue(capa.is(CapabilityType.SUPPORTS_JAVASCRIPT));
-		Assert.assertTrue(capa.is(CapabilityType.TAKES_SCREENSHOT));
-		Assert.assertTrue(capa.is(CapabilityType.ACCEPT_SSL_CERTS));
+		Assert.assertTrue(capa.is(CapabilityType.ACCEPT_INSECURE_CERTS));
 		Assert.assertFalse(capa.is(SeleniumRobotCapabilityType.NODE_TAGS));
 		Assert.assertEquals(capa.getBrowserVersion(), "");
 		Assert.assertEquals(capa.getCapability(CapabilityType.PROXY), proxyConfig);
@@ -107,7 +104,6 @@ public class TestSafariCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithNodeTagsInGridMode() {
 		
-		Mockito.when(config.isEnableJavascript()).thenReturn(true);
 		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
 		Mockito.when(config.getNodeTags()).thenReturn(Arrays.asList("foo", "bar"));
 		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
@@ -135,7 +131,6 @@ public class TestSafariCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithPlatform() {
 		
-		Mockito.when(config.isEnableJavascript()).thenReturn(true);
 		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
 		Mockito.when(config.getWebPlatform()).thenReturn(Platform.MAC);
 		
@@ -146,21 +141,8 @@ public class TestSafariCapabilityFactory extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testCreateDefaultCapabilitiesWithJavascriptDisabled() {
-		
-		Mockito.when(config.isEnableJavascript()).thenReturn(false);
-		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
-		
-		MutableCapabilities capa = new SafariCapabilitiesFactory(config).createCapabilities();
-		
-		Assert.assertFalse(capa.is(CapabilityType.SUPPORTS_JAVASCRIPT));
-		
-	}
-	
-	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithVersion() {
 		
-		Mockito.when(config.isEnableJavascript()).thenReturn(true);
 		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
 		Mockito.when(config.getBrowserVersion()).thenReturn("10.0");
 		
