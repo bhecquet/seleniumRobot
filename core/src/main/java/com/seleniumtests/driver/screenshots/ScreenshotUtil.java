@@ -42,10 +42,10 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.devtools.DevTools;
-import org.openqa.selenium.devtools.v103.page.Page;
-import org.openqa.selenium.devtools.v103.page.Page.CaptureScreenshotFormat;
-import org.openqa.selenium.devtools.v103.page.Page.GetLayoutMetricsResponse;
-import org.openqa.selenium.devtools.v103.page.model.Viewport;
+import org.openqa.selenium.devtools.v102.page.Page;
+import org.openqa.selenium.devtools.v102.page.Page.CaptureScreenshotFormat;
+import org.openqa.selenium.devtools.v102.page.Page.GetLayoutMetricsResponse;
+import org.openqa.selenium.devtools.v102.page.model.Viewport;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ScenarioException;

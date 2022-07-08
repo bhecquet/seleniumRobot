@@ -147,7 +147,6 @@ public class SeleniumTestsContext {
     
     public static final String SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER = "setAssumeUntrustedCertificateIssuer"; // Firefox uniquement pour qu'il ne prenne pas en compte les certificats invalides 
     public static final String SET_ACCEPT_UNTRUSTED_CERTIFICATES = "setAcceptUntrustedCertificates"; // Firefox uniquement pour qu'il ne prenne pas en compte les certificats invalides
-    public static final String ENABLE_JAVASCRIPT = "enableJavascript";			// activation du javascrit dans le navigateur.
     public static final String NTLM_AUTH_TRUSTED_URIS = "ntlmAuthTrustedUris";	// Firefox uniquement
     public static final String BROWSER_DOWNLOAD_DIR = "browserDownloadDir";		// répertoire où seront enregistrés les fichiers
 
@@ -439,7 +438,6 @@ public class SeleniumTestsContext {
         setBetaBrowser(getBoolValueForTest(BETA_BROWSER, System.getProperty(BETA_BROWSER)));
         setAssumeUntrustedCertificateIssuer(getBoolValueForTest(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER, System.getProperty(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER)));
         setAcceptUntrustedCertificates(getBoolValueForTest(SET_ACCEPT_UNTRUSTED_CERTIFICATES, System.getProperty(SET_ACCEPT_UNTRUSTED_CERTIFICATES)));
-        setJavascriptEnabled(getBoolValueForTest(ENABLE_JAVASCRIPT, System.getProperty(ENABLE_JAVASCRIPT)));
         setNtlmAuthTrustedUris(getValueForTest(NTLM_AUTH_TRUSTED_URIS, System.getProperty(NTLM_AUTH_TRUSTED_URIS)));
         setBrowserDownloadDir(getValueForTest(BROWSER_DOWNLOAD_DIR, System.getProperty(BROWSER_DOWNLOAD_DIR)));
         setCapabilities(getValueForTest(CAPABILITIES, System.getProperty(CAPABILITIES)));
@@ -1374,10 +1372,6 @@ public class SeleniumTestsContext {
 	public Boolean getAssumeUntrustedCertificateIssuer() {
         return (Boolean) getAttribute(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER);
     }
-	
-	public Boolean getJavascriptEnabled() {
-		return (Boolean) getAttribute(ENABLE_JAVASCRIPT);
-	}
 
 	public Boolean getAcceptUntrustedCertificates() {
         return (Boolean) getAttribute(SET_ACCEPT_UNTRUSTED_CERTIFICATES);
@@ -2303,15 +2297,7 @@ public class SeleniumTestsContext {
     		setAttribute(SET_ACCEPT_UNTRUSTED_CERTIFICATES, DEFAULT_SET_ACCEPT_UNTRUSTED_CERTIFICATES);
     	}
     }
-    
-    public void setJavascriptEnabled(Boolean enabled) {
-    	if (enabled != null) {
-    		setAttribute(ENABLE_JAVASCRIPT, enabled);
-    	} else {
-    		setAttribute(ENABLE_JAVASCRIPT, DEFAULT_ENABLE_JAVASCRIPT);
-    	}
-    }
-   
+
     public void setNtlmAuthTrustedUris(String uris) {
     	setAttribute(NTLM_AUTH_TRUSTED_URIS, uris);
     }

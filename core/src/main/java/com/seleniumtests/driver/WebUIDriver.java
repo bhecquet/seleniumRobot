@@ -751,11 +751,7 @@ public class WebUIDriver {
     public boolean isSetAssumeUntrustedCertificateIssuer() {
         return config.isSetAssumeUntrustedCertificateIssuer();
     }
-
-    public boolean isEnableJavascript() {
-        return config.isEnableJavascript();
-    }
-
+    
 	public DriverConfig getConfig() {
 		return config;
 	}

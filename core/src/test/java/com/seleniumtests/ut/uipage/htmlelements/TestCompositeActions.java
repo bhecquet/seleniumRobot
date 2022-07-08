@@ -32,7 +32,6 @@ import org.mockito.Mockito;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Coordinates;
-import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.powermock.api.mockito.PowerMockito;
@@ -57,9 +56,6 @@ public class TestCompositeActions extends MockitoTest {
 	private RemoteWebElement element;
 	
 	@Mock
-	private Mouse mouse;
-	
-	@Mock
 	private Coordinates coordinates;
 	
 	@Mock
@@ -79,7 +75,6 @@ public class TestCompositeActions extends MockitoTest {
 		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
 		when(eventDriver.getBrowserInfo()).thenReturn(browserInfo);
 		when(browserInfo.getBrowser()).thenReturn(BrowserType.CHROME);
-		when(driver.getMouse()).thenReturn(mouse);
 		Mockito.doCallRealMethod().when(driver).perform(ArgumentMatchers.anyCollection());
 		
 	}

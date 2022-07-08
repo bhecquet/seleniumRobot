@@ -793,19 +793,6 @@ public class TestSeleniumTestContext extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().setAcceptUntrustedCertificates(null);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAcceptUntrustedCertificates(), (Boolean)SeleniumTestsContext.DEFAULT_SET_ACCEPT_UNTRUSTED_CERTIFICATES);
 	}
-	
-	@Test(groups="ut context")
-	public void testJavascriptEnabled(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setJavascriptEnabled(false);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getJavascriptEnabled(), (Boolean)false);
-	}
-	@Test(groups="ut context")
-	public void testJavascriptEnabledNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setJavascriptEnabled(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getJavascriptEnabled(), (Boolean)SeleniumTestsContext.DEFAULT_ENABLE_JAVASCRIPT);
-	}
 
 	
 	@Test(groups="ut context")
