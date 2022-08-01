@@ -192,7 +192,7 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
         	if (!BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getChromeProfilePath()) && (webDriverConfig.getChromeProfilePath().contains("/") || webDriverConfig.getChromeProfilePath().contains("\\"))) {
         		((ChromeOptions)options).addArguments(USER_DATA_DIR_OPTION + webDriverConfig.getChromeProfilePath()); // e.g: C:\\Users\\MyUser\\AppData\\Local\\Google\\Chrome\\User Data
         	} else if (BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getChromeProfilePath())) {
-        		options.setCapability("chromeProfile", BrowserInfo.DEFAULT_BROWSER_PRODFILE);
+        		options.setCapability(SeleniumRobotCapabilityType.CHROME_PROFILE, BrowserInfo.DEFAULT_BROWSER_PRODFILE);
         	} else {
         		logger.warn(String.format("Chrome profile %s could not be set", webDriverConfig.getChromeProfilePath()));
         	}

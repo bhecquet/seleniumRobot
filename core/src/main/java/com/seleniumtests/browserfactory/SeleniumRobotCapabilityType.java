@@ -23,26 +23,36 @@ public interface SeleniumRobotCapabilityType {
 	 * parameter to force a test to execute on a specific node or set of nodes
 	 * value must be a list of strings
 	 */
-	String NODE_TAGS = "nodeTags"; 
+	String NODE_TAGS = "sr:nodeTags"; 
 	
 	
 	/**
 	 * parameter to route browser creation on a specific node on grid even if maxSession is reached
 	 */
-	String ATTACH_SESSION_ON_NODE = "attachSessionOnNode"; 
+	String ATTACH_SESSION_ON_NODE = "sr:attachSessionOnNode"; 
 	
 	/**
 	 * name of the running test
 	 */
-	String TEST_NAME = "testName";
+	String TEST_NAME = "sr:testName";
 	
 	/**
 	 * Capability giving information on the beta status of the browser
 	 */
-	String BETA_BROWSER = "beta";
+	String BETA_BROWSER = "sr:beta";
 	
 	/**
 	 * Whether Edge should be started in IE mode
 	 */
-	String EDGE_IE_MODE = "ieMode";
+	String EDGE_IE_MODE = "sr:ieMode";
+	
+	/**
+	 * Path to the chrome profile (or "default" to use the default user profile)
+	 */
+	String CHROME_PROFILE = "sr:chromeProfile";
+	
+	/**
+	 * Path to the edge profile (or "default" to use the default user profile)
+	 */
+	String EDGE_PROFILE = "sr:edgeProfile";
 }

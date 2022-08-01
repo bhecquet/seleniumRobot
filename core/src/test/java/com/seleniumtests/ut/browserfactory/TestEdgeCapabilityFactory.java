@@ -354,7 +354,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
 		
 		// check 'edgeProfile' is set to 'default'
-		Assert.assertEquals(capa.getCapability("edgeProfile"), BrowserInfo.DEFAULT_BROWSER_PRODFILE);
+		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.EDGE_PROFILE), BrowserInfo.DEFAULT_BROWSER_PRODFILE);
 	}
 	
 	@Test(groups={"ut"})
@@ -366,7 +366,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
 		
 		// check option is added with user profile
-		Assert.assertNull(capa.getCapability("edgeProfile"));
+		Assert.assertNull(capa.getCapability(SeleniumRobotCapabilityType.EDGE_PROFILE));
 		Assert.assertTrue(((Map<String, List<String>>)(((EdgeOptions)capa).asMap().get(EdgeOptions.CAPABILITY))).get("args").contains("--user-data-dir=/home/user/profile"));
 	}
 	
@@ -378,7 +378,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
 		
 		// check 'edgeProfile' is not set as not requested, and no option added
-		Assert.assertNull(capa.getCapability("edgeProfile"));
+		Assert.assertNull(capa.getCapability(SeleniumRobotCapabilityType.EDGE_PROFILE));
 		Assert.assertFalse(((Map<String, List<String>>)(((EdgeOptions)capa).asMap().get(EdgeOptions.CAPABILITY))).get("args").toString().contains("--user-data-dir=/home/user/profile"));
 	}
 	
@@ -391,7 +391,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
 
 		// check 'edgeProfile' is not set as it's wrong profile path, and no option added
-		Assert.assertNull(capa.getCapability("edgeProfile"));
+		Assert.assertNull(capa.getCapability(SeleniumRobotCapabilityType.EDGE_PROFILE));
 		Assert.assertFalse(((Map<String, List<String>>)(((EdgeOptions)capa).asMap().get(EdgeOptions.CAPABILITY))).get("args").toString().contains("--user-data-dir=/home/user/profile"));
 	}
 
