@@ -140,7 +140,7 @@ public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
         	if (!BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getEdgeProfilePath()) && (webDriverConfig.getEdgeProfilePath().contains("/") || webDriverConfig.getEdgeProfilePath().contains("\\"))) {
         		((EdgeOptions)options).addArguments(USER_DATA_DIR_OPTION + webDriverConfig.getEdgeProfilePath()); // e.g: C:\\Users\\MyUser\\AppData\\Local\\Microsoft\\Edge\\User Data
         	} else if (BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getEdgeProfilePath())) {
-        		options.setCapability("edgeProfile", BrowserInfo.DEFAULT_BROWSER_PRODFILE);
+        		options.setCapability(SeleniumRobotCapabilityType.EDGE_PROFILE, BrowserInfo.DEFAULT_BROWSER_PRODFILE);
         	} else {
         		logger.warn(String.format("Edge profile %s could not be set", webDriverConfig.getEdgeProfilePath()));
         	}

@@ -394,7 +394,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
 		// check 'chromeProfile' is set to 'default'
-		Assert.assertEquals(capa.getCapability("chromeProfile"), BrowserInfo.DEFAULT_BROWSER_PRODFILE);
+		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.CHROME_PROFILE), BrowserInfo.DEFAULT_BROWSER_PRODFILE);
 	}
 	
 	@Test(groups={"ut"})
@@ -406,7 +406,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
 		// check option is added with user profile
-		Assert.assertNull(capa.getCapability("chromeProfile"));
+		Assert.assertNull(capa.getCapability(SeleniumRobotCapabilityType.CHROME_PROFILE));
 		Assert.assertTrue(((Map<String, List<String>>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").contains("--user-data-dir=/home/user/profile"));
 	}
 	
@@ -418,7 +418,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
 		// check 'chromeProfile' is not set as not requested, and no option added
-		Assert.assertNull(capa.getCapability("chromeProfile"));
+		Assert.assertNull(capa.getCapability(SeleniumRobotCapabilityType.CHROME_PROFILE));
 		Assert.assertFalse(((Map<String, List<String>>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--user-data-dir=/home/user/profile"));
 	}
 	
@@ -431,7 +431,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 
 		// check 'chromeProfile' is not set as it's wrong profile path, and no option added
-		Assert.assertNull(capa.getCapability("chromeProfile"));
+		Assert.assertNull(capa.getCapability(SeleniumRobotCapabilityType.CHROME_PROFILE));
 		Assert.assertFalse(((Map<String, List<String>>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--user-data-dir=/home/user/profile"));
 	}
 	
