@@ -639,6 +639,20 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	
 	@Test(groups="ut context")
+	public void testBrowserIE(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setBrowser("iexplore");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getBrowser(), BrowserType.INTERNET_EXPLORER);
+		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getEdgeIeMode());
+	}
+	@Test(groups="ut context")
+	public void testBrowserIEMode(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setBrowser("iexploreEdge");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getBrowser(), BrowserType.INTERNET_EXPLORER);
+		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getEdgeIeMode());
+	}
+	@Test(groups="ut context")
 	public void testBrowser(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
