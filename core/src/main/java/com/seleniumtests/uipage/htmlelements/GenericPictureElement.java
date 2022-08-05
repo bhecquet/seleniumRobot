@@ -124,7 +124,7 @@ public abstract class GenericPictureElement extends Element {
 	}
 	
 	/**
-	 * Clirr stored searches
+	 * Clear stored searches
 	 * For test
 	 */
 	public void clearMemory() {
