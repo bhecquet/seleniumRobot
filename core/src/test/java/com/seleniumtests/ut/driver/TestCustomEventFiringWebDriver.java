@@ -680,8 +680,8 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testRightClickOnDesktop() {
 		CustomEventFiringWebDriver.rightClicOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
 		
-		verify(robot).mousePress(InputEvent.BUTTON2_DOWN_MASK);
-		verify(robot).mouseRelease(InputEvent.BUTTON2_DOWN_MASK);
+		verify(robot).mousePress(InputEvent.BUTTON3_DOWN_MASK);
+		verify(robot).mouseRelease(InputEvent.BUTTON3_DOWN_MASK);
 		verify(robot).mouseMove(0, 0);
 		verify(gridConnector, never()).rightClic(anyBoolean(), anyInt(), anyInt());
 	}
@@ -690,8 +690,8 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testRightClickOnDesktopMainScreen() {
 		CustomEventFiringWebDriver.rightClicOnDesktopAt(true, 0, 0, DriverMode.LOCAL, gridConnector);
 		
-		verify(robot).mousePress(InputEvent.BUTTON2_DOWN_MASK);
-		verify(robot).mouseRelease(InputEvent.BUTTON2_DOWN_MASK);
+		verify(robot).mousePress(InputEvent.BUTTON3_DOWN_MASK);
+		verify(robot).mouseRelease(InputEvent.BUTTON3_DOWN_MASK);
 		verify(robot).mouseMove(0, 0);
 		verify(gridConnector, never()).rightClic(anyBoolean(), anyInt(), anyInt());
 	}

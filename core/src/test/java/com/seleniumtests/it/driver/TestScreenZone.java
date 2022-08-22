@@ -35,6 +35,7 @@ import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageWithoutFixedPattern;
 import com.seleniumtests.uipage.htmlelements.ScreenZone;
+import com.seleniumtests.util.helper.WaitHelper;
 
 public class TestScreenZone extends GenericMultiBrowserTest {
 	
@@ -52,6 +53,9 @@ public class TestScreenZone extends GenericMultiBrowserTest {
 			DriverTestPageWithoutFixedPattern.logoText.clear();
 			DriverTestPageWithoutFixedPattern.textElement.clear();
 			((CustomEventFiringWebDriver)driver).scrollTop();
+			
+			DriverTestPageWithoutFixedPattern.googleForDesktop.moveAndLeftClick(0, 200);
+			WaitHelper.waitForSeconds(2); // slow down tests because, with search picture cache introduced by #510, 2 successive clicks may be interpreted by a double click
 		}
 	}
 	
