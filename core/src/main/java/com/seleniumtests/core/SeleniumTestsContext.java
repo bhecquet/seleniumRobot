@@ -2178,6 +2178,7 @@ public class SeleniumTestsContext {
 
     public void setBrowser(String browser) {
     	String newBrowser = browser == null ? DEFAULT_BROWSER: browser;
+    	
     	setAttribute(BROWSER, BrowserType.getBrowserType(newBrowser));
     	
     	// when reconfiguring browser, mostly from integration tests, change test type accordingly
@@ -2185,7 +2186,8 @@ public class SeleniumTestsContext {
         	configureTestType();
     	}
 
-    	setEdgeIeMode("iexploreEdge".equals(browser));
+    	// force Edge in IE mode if IE is requested
+    	setEdgeIeMode("iexploreEdge".equals(newBrowser) || "iexplore".equals(newBrowser));
 
     }
     

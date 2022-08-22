@@ -78,6 +78,7 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 	 */
 	public void testMultipleActionsOnPicture() {
 		try {
+			DriverTestPageWithoutFixedPattern.googlePicture.clearMemory(); // reset memory for object to detect
 			Calendar start = Calendar.getInstance();
 			testPageWithoutPattern.clickGooglePicture();
 			long totalTime1 = Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis();
@@ -104,6 +105,7 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 	 */
 	public void testMultipleActionsOnPictureWithAnotherPage() {
 		try {
+			DriverTestPageWithoutFixedPattern.googlePicture.clearMemory(); // reset memory for object to detect
 			Calendar start = Calendar.getInstance();
 			testPageWithoutPattern.clickGooglePicture();
 			long totalTime1 = Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis();
