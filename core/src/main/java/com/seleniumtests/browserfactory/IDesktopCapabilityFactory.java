@@ -17,16 +17,18 @@
  */
 package com.seleniumtests.browserfactory;
 
+import static org.openqa.selenium.remote.CapabilityType.PLATFORM_NAME;
+import static org.openqa.selenium.remote.CapabilityType.PROXY;
+
 import java.io.File;
 import java.net.InetSocketAddress;
 import java.util.List;
-import java.util.Map;
 
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.Proxy.ProxyType;
+import org.openqa.selenium.internal.Require;
 import org.openqa.selenium.remote.AbstractDriverOptions;
-import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.neotys.selenium.proxies.NLWebDriverFactory;
@@ -108,8 +110,8 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
 	}
 
     public MutableCapabilities createCapabilities() {
-    	AbstractDriverOptions<AbstractDriverOptions> options = (AbstractDriverOptions<AbstractDriverOptions>) getDriverOptions();
-        updateDefaultCapabilities(options);
+    	MutableCapabilities options = getDriverOptions();
+    	options = updateDefaultCapabilities(options);
 
         if (webDriverConfig.getMode() == DriverMode.LOCAL) {
 			prepareBinaryAndDriver(getBrowserType(),
@@ -149,22 +151,27 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
     
     protected abstract void updateGridOptionsWithSelectedBrowserInfo(MutableCapabilities options);
  
-    private MutableCapabilities updateDefaultCapabilities(AbstractDriverOptions options) {
+    private MutableCapabilities updateDefaultCapabilities(MutableCapabilities options) {
 
-        // ACCEPT_INSECURE_CERTS is not permitted for IE
-        if (webDriverConfig.getBrowserType() != BrowserType.INTERNET_EXPLORER) {
-        	options.setAcceptInsecureCerts(webDriverConfig.isSetAcceptUntrustedCertificates());
-        } else {
-        	options.setAcceptInsecureCerts(false);
-        }
-
-        if (webDriverConfig.getBrowserVersion() != null) {
-        	options.setBrowserVersion(webDriverConfig.getBrowserVersion());
-        }
-
-        if (webDriverConfig.getWebPlatform() != null) {
-        	options.setPlatformName(webDriverConfig.getWebPlatform().toString());
-        }
+        // HTMLUnit does not provide AbstractDriverOptions
+    	if (webDriverConfig.getBrowserType() == BrowserType.HTMLUNIT) {
+    		options.setCapability(PLATFORM_NAME, webDriverConfig.getWebPlatform().toString());
+    	} else {
+    		// ACCEPT_INSECURE_CERTS is not permitted for IE
+	        if (webDriverConfig.getBrowserType() != BrowserType.INTERNET_EXPLORER) {
+	        	((AbstractDriverOptions<?>)options).setAcceptInsecureCerts(webDriverConfig.isSetAcceptUntrustedCertificates());
+	        } else {
+	        	((AbstractDriverOptions<?>)options).setAcceptInsecureCerts(false);
+	        }
+	
+	        if (webDriverConfig.getBrowserVersion() != null) {
+	        	((AbstractDriverOptions<?>)options).setBrowserVersion(webDriverConfig.getBrowserVersion());
+	        }
+	
+	        if (webDriverConfig.getWebPlatform() != null) {
+	        	((AbstractDriverOptions<?>)options).setPlatformName(webDriverConfig.getWebPlatform().toString());
+	        }
+    	}
 
         configureProxyCap(options);
         
@@ -194,7 +201,7 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
      * If network capture is enabled, start browsermob proxy and set it into browser
      * @param capability
      */
-    private void configureProxyCap(AbstractDriverOptions<AbstractDriverOptions> capability) {
+    private void configureProxyCap(MutableCapabilities capability) {
     	Proxy proxy = webDriverConfig.getProxy();
 
         if (webDriverConfig.getCaptureNetwork()) {
@@ -217,10 +224,10 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
 			mobProxy.start(0);
 		    Proxy seleniumProxy = ClientUtil.createSeleniumProxy(mobProxy);
 	    
-		    capability.setProxy(seleniumProxy);
+        	capability.setCapability(PROXY, Require.nonNull("Proxy", seleniumProxy));
 		    webDriverConfig.setBrowserMobProxy(mobProxy);
-        } else {
-            capability.setProxy(proxy);
+        } else if (proxy != null) {
+        	capability.setCapability(PROXY, Require.nonNull("Proxy", proxy));
         }
     }
 }
