@@ -32,6 +32,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.neotys.selenium.proxies.NLWebDriverFactory;
@@ -39,6 +40,7 @@ import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.HtmlUnitCapabilitiesFactory;
 import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.osutility.OSUtility;
@@ -51,6 +53,13 @@ public class TestDesktopCommonCapabilityFactory extends MockitoTest {
 	
 	@Mock
 	private Proxy proxyConfig;
+	
+	@BeforeMethod(groups= {"ut"})
+	public void init() {
+
+		when(config.getBrowserType()).thenReturn(BrowserType.HTMLUNIT);
+		when(config.isSetAcceptUntrustedCertificates()).thenReturn(true);
+	}
 	
 	/**
 	 * Check default behaviour

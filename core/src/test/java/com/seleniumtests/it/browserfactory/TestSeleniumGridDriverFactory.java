@@ -64,7 +64,7 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 			createJsonServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200,
 
 					// session found
-					GRID_STATUS_WITH_SESSION);
+					String.format(GRID_STATUS_WITH_SESSION, "abcdef"));
 		
 			ReporterTest.executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
 
@@ -272,7 +272,7 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 					+ "}"
 					,
 					// session found
-					GRID_STATUS_WITH_SESSION);
+					String.format(GRID_STATUS_WITH_SESSION, "abcdef"));
 
 			
 			

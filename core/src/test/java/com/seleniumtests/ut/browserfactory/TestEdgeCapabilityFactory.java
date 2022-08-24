@@ -83,6 +83,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		when(config.getPageLoadStrategy()).thenReturn(PageLoadStrategy.NORMAL);
 		when(config.getBrowserType()).thenReturn(BrowserType.EDGE);
 		when(config.getAttachExistingDriverPort()).thenReturn(null);
+		when(config.isSetAcceptUntrustedCertificates()).thenReturn(true);
 	}
 		
 	

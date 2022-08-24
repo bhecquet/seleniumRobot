@@ -17,6 +17,8 @@
  */
 package com.seleniumtests.ut.browserfactory;
 
+import static org.mockito.Mockito.when;
+
 import org.mockito.Mock;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.CapabilityType;
@@ -26,6 +28,7 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.HtmlUnitCapabilitiesFactory;
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.util.osutility.OSUtility;
 
@@ -38,6 +41,8 @@ public class TestHtmlUnitCapabilityFactory extends MockitoTest {
 
 	@Test(groups={"ut"})
 	public void testCreateDefaultHtmlUnitCapabilities() {
+
+		when(config.getBrowserType()).thenReturn(BrowserType.HTMLUNIT);
 		
 		MutableCapabilities capa = new HtmlUnitCapabilitiesFactory(config).createCapabilities();
 		

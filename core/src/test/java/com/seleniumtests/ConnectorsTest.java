@@ -134,6 +134,7 @@ public class ConnectorsTest extends MockitoTest {
 	protected HttpRequestWithBody updateVariableRequest;
 	protected HttpRequestWithBody updateVariableRequest2;
 	
+	// to call with "String.format(GRID_STATUS_WITH_SESSION, sessionId)"
 	protected static final String GRID_STATUS_WITH_SESSION = "{"
 			+ "  \"value\": {"
 			+ "    \"ready\": true,"
@@ -159,7 +160,7 @@ public class ConnectorsTest extends MockitoTest {
 			+ "            },"
 			+ "            \"lastStarted\": \"1970-01-01T00:00:00Z\","
 			+ "            \"session\": {"
-			+ "				 \"sessionId\": \"abcdef\","
+			+ "				 \"sessionId\": \"%s\","
 			+ "				 \"uri\": \"http:\\u002f\\u002flocalhost:4321\""
 			+ "            },"
 			+ "            \"stereotype\": {"
@@ -178,7 +179,7 @@ public class ConnectorsTest extends MockitoTest {
 			+ "              \"webdriver-executable\": \"D:\\u002fDev\\u002fseleniumRobot\\u002fseleniumRobot-grid\\u002fdrivers\\u002fedgedriver_103.0_edge-103-104.exe\","
 			+ "              \"webdriver.edge.driver\": \"D:\\u002fDev\\u002fseleniumRobot\\u002fseleniumRobot-grid\\u002fdrivers\\u002fedgedriver_103.0_edge-103-104.exe\""
 			+ "            }"
-			+ "          },"
+			+ "          }"
 			+ "        ]"
 			+ "      }"
 			+ "    ]"
@@ -586,7 +587,7 @@ public class ConnectorsTest extends MockitoTest {
 				GRID_STATUS_NO_SESSION, // called when we get grid status
 				GRID_STATUS_NO_SESSION,
 				// session found (id provided)
-				GRID_STATUS_WITH_SESSION);
+				String.format(GRID_STATUS_WITH_SESSION, "abcdef"));
 
 		return uiDriver;
 	}

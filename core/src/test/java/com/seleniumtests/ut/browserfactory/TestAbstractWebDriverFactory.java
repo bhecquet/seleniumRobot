@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import org.mockito.Mock;
 import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.powermock.api.mockito.PowerMockito;
 import org.testng.Assert;
@@ -15,6 +16,7 @@ import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.HtmlUnitDriverFactory;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.TestType;
 
@@ -38,6 +40,8 @@ public class TestAbstractWebDriverFactory extends MockitoTest {
 		
 		when(config.getNodeTags()).thenReturn(new ArrayList<>());
 		when(config.getCapabilites()).thenReturn(caps);
+		when(config.getBrowserType()).thenReturn(BrowserType.HTMLUNIT);
+		when(config.getWebPlatform()).thenReturn(Platform.WINDOWS);
 		
 		SeleniumTestsContextManager.setThreadContext(context);
 		when(context.getTestType()).thenReturn(TestType.WEB);
