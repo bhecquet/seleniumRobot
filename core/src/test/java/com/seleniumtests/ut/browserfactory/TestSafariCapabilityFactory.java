@@ -76,7 +76,10 @@ public class TestSafariCapabilityFactory extends MockitoTest {
 		PowerMockito.when(OSUtilityFactory.getInstance()).thenReturn(osUtility);
 		
 		when(osUtility.getProgramExtension()).thenReturn(".exe");
-		Mockito.when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.NONE));
+		when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.NONE));
+
+		when(config.getBrowserType()).thenReturn(BrowserType.SAFARI);
+		when(config.isSetAcceptUntrustedCertificates()).thenReturn(true);
 		
 	}
 	

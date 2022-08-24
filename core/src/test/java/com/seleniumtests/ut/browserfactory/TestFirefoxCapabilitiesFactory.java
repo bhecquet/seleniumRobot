@@ -17,6 +17,9 @@
  */
 package com.seleniumtests.ut.browserfactory;
 
+import static org.mockito.Mockito.when;
+
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -71,9 +74,10 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 		browserInfos.put(BrowserType.FIREFOX, Arrays.asList(new BrowserInfo(BrowserType.FIREFOX, "47.0", "/usr/bin/firefox", false)));
 		PowerMockito.mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
-		Mockito.when(config.getTestContext()).thenReturn(context);
-		Mockito.when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.NONE));
-		Mockito.when(config.getPageLoadStrategy()).thenReturn(PageLoadStrategy.NORMAL);
+		when(config.getTestContext()).thenReturn(context);
+		when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.NONE));
+		when(config.getPageLoadStrategy()).thenReturn(PageLoadStrategy.NORMAL);
+		when(config.isSetAcceptUntrustedCertificates()).thenReturn(true);
 	}
 	
 	/**
@@ -82,8 +86,8 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilities() {
 		
-		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
-		Mockito.when(config.getNodeTags()).thenReturn(new ArrayList<>());
+		when(config.getProxy()).thenReturn(proxyConfig);
+		when(config.getNodeTags()).thenReturn(new ArrayList<>());
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
@@ -101,9 +105,9 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithNodeTagsInGridMode() {
 		
-		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
-		Mockito.when(config.getNodeTags()).thenReturn(Arrays.asList("foo", "bar"));
-		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
+		when(config.getProxy()).thenReturn(proxyConfig);
+		when(config.getNodeTags()).thenReturn(Arrays.asList("foo", "bar"));
+		when(config.getMode()).thenReturn(DriverMode.GRID);
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
@@ -117,8 +121,8 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithNodeTagsInLocalMode() {
 		
-		Mockito.when(config.getNodeTags()).thenReturn(Arrays.asList("foo", "bar"));
-		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		when(config.getNodeTags()).thenReturn(Arrays.asList("foo", "bar"));
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
@@ -128,8 +132,8 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithPlatform() {
 		
-		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
-		Mockito.when(config.getWebPlatform()).thenReturn(Platform.WINDOWS);
+		when(config.getProxy()).thenReturn(proxyConfig);
+		when(config.getWebPlatform()).thenReturn(Platform.WINDOWS);
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
@@ -140,7 +144,7 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithHeadless() {
 		
-		Mockito.when(config.isHeadlessBrowser()).thenReturn(true);
+		when(config.isHeadlessBrowser()).thenReturn(true);
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
@@ -151,8 +155,8 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithVersion() {
 		
-		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
-		Mockito.when(config.getBrowserVersion()).thenReturn("60.0");
+		when(config.getProxy()).thenReturn(proxyConfig);
+		when(config.getBrowserVersion()).thenReturn("60.0");
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
@@ -161,11 +165,11 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testCreateDefaultFirefoxCapabilities() {
+	public void testCreateDefaultFirefoxCapabilities() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 
-		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
-		Mockito.when(config.isSetAcceptUntrustedCertificates()).thenReturn(true);
-		Mockito.when(config.isSetAssumeUntrustedCertificateIssuer()).thenReturn(true);
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		when(config.isSetAcceptUntrustedCertificates()).thenReturn(true);
+		when(config.isSetAssumeUntrustedCertificateIssuer()).thenReturn(true);
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
@@ -175,8 +179,13 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 		FirefoxProfile profile = (FirefoxProfile)capa.getCapability(FirefoxDriver.Capability.PROFILE);
 		
 		// check profile
-		Assert.assertTrue(profile.getBooleanPreference("webdriver_accept_untrusted_certs", false));
-		Assert.assertTrue(profile.getBooleanPreference("webdriver_assume_untrusted_issuer", false));
+		Field fieldAcceptUntrustedCerts = FirefoxProfile.class.getDeclaredField("acceptUntrustedCerts");
+		fieldAcceptUntrustedCerts.setAccessible(true);
+		Assert.assertTrue((boolean) fieldAcceptUntrustedCerts.get(profile));
+		Field fieldUntrustedCertIssuer = FirefoxProfile.class.getDeclaredField("untrustedCertIssuer");
+		fieldUntrustedCertIssuer.setAccessible(true);
+		Assert.assertTrue((boolean) fieldUntrustedCertIssuer.get(profile));
+		
 		Assert.assertEquals(profile.getStringPreference("capability.policy.default.Window.QueryInterface", ""), FirefoxCapabilitiesFactory.ALL_ACCESS);
 		Assert.assertEquals(profile.getStringPreference("capability.policy.default.Window.frameElement.get", ""), FirefoxCapabilitiesFactory.ALL_ACCESS);
 		Assert.assertEquals(profile.getStringPreference("capability.policy.default.HTMLDocument.compatMode.get", ""), FirefoxCapabilitiesFactory.ALL_ACCESS);
@@ -188,8 +197,8 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateFirefoxCapabilitiesOverrideUserAgent() {
 		
-		Mockito.when(config.getUserAgentOverride()).thenReturn("FIREFOX 55");
-		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		when(config.getUserAgentOverride()).thenReturn("FIREFOX 55");
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
@@ -201,8 +210,8 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testCreateFirefoxCapabilitiesOverrideBinPath() {
-		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
-		Mockito.when(config.getFirefoxBinPath()).thenReturn("/opt/firefox/bin/firefox");
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		when(config.getFirefoxBinPath()).thenReturn("/opt/firefox/bin/firefox");
 		
 		// SeleniumTestsContext class adds a browserInfo when binary path is set
 		Map<BrowserType, List<BrowserInfo>> updatedBrowserInfos = new HashMap<>();
@@ -218,7 +227,7 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testCreateFirefoxCapabilitiesStandardBinPath() {
-		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 
 		Assert.assertEquals(((Map<?,?>)(((FirefoxOptions)capa).asMap().get(FirefoxOptions.FIREFOX_OPTIONS))).get("binary"), "/usr/bin/firefox");
@@ -227,8 +236,8 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateFirefoxCapabilitiesOverrideNtlmAuth() {
 		
-		Mockito.when(config.getNtlmAuthTrustedUris()).thenReturn("uri://uri.ntlm");
-		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		when(config.getNtlmAuthTrustedUris()).thenReturn("uri://uri.ntlm");
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
@@ -241,8 +250,8 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateFirefoxCapabilitiesOverrideDownloadDir() {
 		
-		Mockito.when(config.getBrowserDownloadDir()).thenReturn("/home/download");
-		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		when(config.getBrowserDownloadDir()).thenReturn("/home/download");
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
@@ -261,8 +270,8 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateFirefoxCapabilitiesNoOverrideDownloadDirRemote() {
 		
-		Mockito.when(config.getBrowserDownloadDir()).thenReturn("/home/download");
-		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
+		when(config.getBrowserDownloadDir()).thenReturn("/home/download");
+		when(config.getMode()).thenReturn(DriverMode.GRID);
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
@@ -277,8 +286,8 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateFirefoxCapabilitiesWithDefaultProfile() {
 		
-		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
-		Mockito.when(config.getFirefoxProfilePath()).thenReturn(BrowserInfo.DEFAULT_BROWSER_PRODFILE);
+		when(config.getMode()).thenReturn(DriverMode.GRID);
+		when(config.getFirefoxProfilePath()).thenReturn(BrowserInfo.DEFAULT_BROWSER_PRODFILE);
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
@@ -289,8 +298,8 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateFirefoxCapabilitiesWithUserProfile() {
 		
-		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
-		Mockito.when(config.getFirefoxProfilePath()).thenReturn("/home/user/profile");
+		when(config.getMode()).thenReturn(DriverMode.GRID);
+		when(config.getFirefoxProfilePath()).thenReturn("/home/user/profile");
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
@@ -301,7 +310,7 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateFirefoxCapabilitiesWithoutDefaultProfile() {
 		
-		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
+		when(config.getMode()).thenReturn(DriverMode.GRID);
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
@@ -312,8 +321,8 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateFirefoxCapabilitiesWrongProfile() {
 		
-		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
-		Mockito.when(config.getFirefoxProfilePath()).thenReturn("foo");
+		when(config.getMode()).thenReturn(DriverMode.GRID);
+		when(config.getFirefoxProfilePath()).thenReturn("foo");
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		

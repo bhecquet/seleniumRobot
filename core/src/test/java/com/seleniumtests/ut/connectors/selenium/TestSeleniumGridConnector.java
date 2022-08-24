@@ -52,6 +52,7 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
+import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -96,23 +97,19 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 		when(response.getStatusLine()).thenReturn(statusLine);
 		when(client.execute((HttpHost)any(HttpHost.class), any(HttpRequest.class))).thenReturn(response);
 		when(driver.getCapabilities()).thenReturn(capabilities); 
-		when(driver.getSessionId()).thenReturn(new SessionId("0"));
+		when(driver.getSessionId()).thenReturn(new SessionId("abcdef"));
 		when(driver2.getCapabilities()).thenReturn(capabilities); 
-		when(driver2.getSessionId()).thenReturn(new SessionId("1"));
+		when(driver2.getSessionId()).thenReturn(new SessionId("ghijkl"));
 	}
 	
 	@Test(groups={"ut"})
 	public void testGetSessionInformationFromGrid() throws UnsupportedOperationException, IOException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, UnirestException {
 		
-		createServerMock("GET", "/grid/api/testsession/", 200, "{'proxyId': 'http://localhost:43210'}");	
+
+		createJsonServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200, String.format(GRID_STATUS_WITH_SESSION, "abcdef"));
 		
-		// prepare app file
 		((DesiredCapabilities)capabilities).setCapability(CapabilityType.BROWSER_NAME, "firefox");
 		((DesiredCapabilities)capabilities).setCapability(CapabilityType.BROWSER_VERSION, "50.0");
-		
-		// prepare response
-		InputStream is = IOUtils.toInputStream("{'proxyId':'proxy//node:0'}", Charset.forName("UTF-8"));
-		when(entity.getContent()).thenReturn(is);
 		
 		SeleniumGridConnector connector = spy(new SeleniumGridConnector(SERVER_URL));
 		
@@ -123,11 +120,11 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 		
 		connector.getSessionInformationFromGrid(driver);
 		
-		verify(logger).info("Brower firefox (50.0) created in 0.0 secs on node localhost [http://localhost:4321] with session 0");
+		verify(logger).info("Brower firefox (50.0) created in 0.0 secs on node localhost [http://localhost:4321] with session abcdef");
 		
 		// check sessionId is set when test is started
 		verify(connector).setSessionId(any(SessionId.class));
-		Assert.assertEquals(connector.getNodeUrl(), "http://localhost:43210");
+		Assert.assertEquals(connector.getNodeUrl(), "http://localhost:4321");
 	}
 	
 	/**
@@ -143,15 +140,10 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 	@Test(groups={"ut"})
 	public void testGetSessionInformationFromGridWithSecondDriver() throws UnsupportedOperationException, IOException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, UnirestException {
 		
-		createServerMock("GET", "/grid/api/testsession/", 200, "{'proxyId': 'http://localhost:43210'}");	
+		createJsonServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200, String.format(GRID_STATUS_WITH_SESSION, "abcdef"), String.format(GRID_STATUS_WITH_SESSION, "ghijkl"));
 		
-		// prepare app file
 		((DesiredCapabilities)capabilities).setCapability(CapabilityType.BROWSER_NAME, "firefox");
 		((DesiredCapabilities)capabilities).setCapability(CapabilityType.BROWSER_VERSION, "50.0");
-		
-		// prepare response
-		InputStream is = IOUtils.toInputStream("{'proxyId':'proxy//node:0'}", Charset.forName("UTF-8"));
-		when(entity.getContent()).thenReturn(is);
 		
 		SeleniumGridConnector connector = spy(new SeleniumGridConnector(SERVER_URL));
 
@@ -161,7 +153,8 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 		
 		// issue #242: check sessionId is set only once when first driver is created
 		verify(connector).setSessionId(any(SessionId.class));
-		Assert.assertEquals(connector.getNodeUrl(), "http://localhost:43210");
+		Assert.assertEquals(connector.getSessionId().toString(), "abcdef");
+		Assert.assertEquals(connector.getNodeUrl(), "http://localhost:4321");
 	}
 	
 	/**
@@ -183,8 +176,8 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 	public void testIsGridActiveWithGridNotPresent() throws ClientProtocolException, IOException, UnirestException {
 		
 		SeleniumGridConnector connector = new SeleniumGridConnector(SERVER_URL);
-		when(Unirest.get(SERVER_URL + SeleniumGridConnector.CONSOLE_SERVLET)).thenReturn(getRequest);
-		when(getRequest.asString()).thenThrow(UnirestException.class);
+		when(Unirest.get(SERVER_URL + SeleniumGridConnector.STATUS_SERVLET)).thenReturn(getRequest);
+		when(getRequest.asJson()).thenThrow(UnirestException.class);
 		
 		Assert.assertFalse(connector.isGridActive());
 	}
@@ -193,7 +186,7 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 	public void testIsGridActiveWithGridPresent() throws ClientProtocolException, IOException, UnirestException {
 		
 		SeleniumGridConnector connector = new SeleniumGridConnector(SERVER_URL);
-		createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, "some text");	
+		createServerMock("GET", SeleniumGridConnector.STATUS_SERVLET, 200, "{\"value\": {\"ready\": true}}");	
 		
 		Assert.assertTrue(connector.isGridActive());
 	}
@@ -202,7 +195,7 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 	public void testIsGridActiveWithGridInError() throws ClientProtocolException, IOException, UnirestException {
 		
 		SeleniumGridConnector connector = new SeleniumGridConnector(SERVER_URL);
-		createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 500, "some text");	
+		createServerMock("GET", SeleniumGridConnector.STATUS_SERVLET, 500, "some text");	
 		
 		Assert.assertFalse(connector.isGridActive());
 	}

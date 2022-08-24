@@ -21,6 +21,7 @@ import java.io.File;
 import java.util.Arrays;
 
 import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.testng.Assert;
@@ -59,7 +60,7 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), BrowserType.CHROME.toString().toLowerCase());
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.AUTOMATION_NAME), "Appium");
-		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_NAME), "android");
+		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_NAME), Platform.ANDROID);
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_VERSION), "8.0");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.DEVICE_NAME), "Samsung Galasy S8");
 		Assert.assertFalse(capa.is(SeleniumRobotCapabilityType.NODE_TAGS));
@@ -145,7 +146,7 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultAndroidBrowserCapabilities() {
 		SeleniumTestsContext context = new SeleniumTestsContext(SeleniumTestsContextManager.getThreadContext());
-		context.setBrowser(BrowserType.BROWSER.toString());
+		context.setBrowser(BrowserType.CHROME.toString());
 		context.setMobilePlatformVersion("8.0");
 		context.setPlatform("android");
 		context.setDeviceName("Samsung Galasy S8");
@@ -157,10 +158,9 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
 		MutableCapabilities capa = capaFactory.createCapabilities();
 		
-		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), BrowserType.BROWSER.toString().toLowerCase());
-		Assert.assertNull(capa.getCapability(ChromeOptions.CAPABILITY));
+		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), BrowserType.CHROME.toString().toLowerCase());
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.AUTOMATION_NAME), "Appium");
-		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_NAME), "android");
+		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_NAME), Platform.ANDROID);
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_VERSION), "8.0");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.DEVICE_NAME), "Samsung Galasy S8");
 		Assert.assertEquals(capa.getCapability(AndroidMobileCapabilityType.APP_PACKAGE), "com.infotel.mobile"); // from exampleConfigGenericParams.xml when tu.xml is executed, else, null
@@ -188,7 +188,7 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "");
 		Assert.assertEquals(capa.getCapability("app"), "com.covea.mobileapp");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.AUTOMATION_NAME), "Appium");
-		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_NAME), "android");
+		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_NAME), Platform.ANDROID);
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_VERSION), "8.0");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.DEVICE_NAME), "Samsung Galasy S8");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.FULL_RESET), true);

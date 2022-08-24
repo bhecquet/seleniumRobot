@@ -26,6 +26,7 @@ import java.util.List;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -226,7 +227,7 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		deviceSelector.setIosReady(false);
 		
 		MutableCapabilities updatedCaps = deviceSelector.updateCapabilitiesWithSelectedDevice(requestedCaps, DriverMode.LOCAL);
-		Assert.assertEquals(updatedCaps.getCapability(MobileCapabilityType.PLATFORM_NAME), "android");
+		Assert.assertEquals(updatedCaps.getCapability(MobileCapabilityType.PLATFORM_NAME), Platform.ANDROID);
 		Assert.assertEquals(updatedCaps.getCapability(MobileCapabilityType.DEVICE_NAME), "1234");
 		Assert.assertEquals(updatedCaps.getCapability(MobileCapabilityType.PLATFORM_VERSION), "5.0");
 		Assert.assertNull(updatedCaps.getCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE));		

@@ -1213,7 +1213,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		
 		SeleniumGridConnector connector = new SeleniumRobotGridConnector(SERVER_URL);
 		createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, "some text");	
-		createServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200, GRID_STATUS_WITH_SESSION);	
+		createServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200, String.format(GRID_STATUS_WITH_SESSION, "abcdef"));	
 		
 		Assert.assertTrue(connector.isGridActive());
 	}

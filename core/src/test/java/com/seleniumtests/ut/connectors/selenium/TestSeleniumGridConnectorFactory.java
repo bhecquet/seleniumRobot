@@ -103,8 +103,8 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 	@Test(groups={"ut"})
 	public void testWithSeleniumRobotGrid() throws UnsupportedOperationException, IOException, UnirestException {
 		
-		createServerMock("GET", SeleniumRobotGridConnector.GUI_SERVLET, 200, guiServletContent);		
-		createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, consoleServletContent);		
+		createGridServletServerMock("GET", SeleniumRobotGridConnector.GUI_SERVLET, 200, guiServletContent);	
+		createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, consoleServletContent);			
 		
 		Assert.assertTrue(SeleniumGridConnectorFactory.getInstances(Arrays.asList(SERVER_URL + "/wd/hub")).get(0) instanceof SeleniumRobotGridConnector);
 	}
@@ -119,13 +119,13 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 	@Test(groups={"ut"})
 	public void testWithSeveralSeleniumRobotGrid() throws UnsupportedOperationException, IOException, UnirestException {
 		
-		createServerMock("GET", SeleniumRobotGridConnector.GUI_SERVLET, 200, guiServletContent);		
+		createGridServletServerMock("GET", SeleniumRobotGridConnector.GUI_SERVLET, 200, guiServletContent);		
 		createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, consoleServletContent);	
 
-		createServerMock("GET", "5" + SeleniumRobotGridConnector.GUI_SERVLET, 404, "default monitoring page");
-		createServerMock("GET", "5" + SeleniumGridConnector.CONSOLE_SERVLET, 200, consoleServletContent);		
+		createServerMock("http://localhost:4431", "GET", SeleniumRobotGridConnector.GUI_SERVLET, 404, "default monitoring page", "request");
+		createServerMock("http://localhost:4421", "GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, consoleServletContent);		
 		
-		List<SeleniumGridConnector> gridConnectors = SeleniumGridConnectorFactory.getInstances(Arrays.asList(SERVER_URL + "/wd/hub", SERVER_URL + "5/wd/hub"));
+		List<SeleniumGridConnector> gridConnectors = SeleniumGridConnectorFactory.getInstances(Arrays.asList(SERVER_URL + "/wd/hub", "http://localhost:4421/wd/hub"));
 		
 		Assert.assertEquals(gridConnectors.size(), 2);
 		Assert.assertTrue(gridConnectors.get(0) instanceof SeleniumRobotGridConnector);
@@ -142,11 +142,11 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 	public void testWithSeveralSeleniumGridNotAllThere() throws UnsupportedOperationException, IOException, UnirestException {
 				
 		// only the second grid replies
-		createServerMock("GET", "5" + SeleniumRobotGridConnector.GUI_SERVLET, 404, "default monitoring page");
-		createServerMock("GET", "5" + SeleniumGridConnector.CONSOLE_SERVLET, 200, consoleServletContent);		
+		createServerMock("http://localhost:4431", "GET", SeleniumRobotGridConnector.GUI_SERVLET, 404, "default monitoring page", "request");
+		createServerMock("http://localhost:4421", "GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, consoleServletContent);		
 		
 		// 2 grid URL given
-		List<SeleniumGridConnector> gridConnectors = SeleniumGridConnectorFactory.getInstances(Arrays.asList(SERVER_URL + "/wd/hub", SERVER_URL + "5/wd/hub"));
+		List<SeleniumGridConnector> gridConnectors = SeleniumGridConnectorFactory.getInstances(Arrays.asList(SERVER_URL + "/wd/hub", "http://localhost:4421/wd/hub"));
 		
 		Assert.assertEquals(gridConnectors.size(), 1);
 		Assert.assertTrue(gridConnectors.get(0) instanceof SeleniumGridConnector);
@@ -161,7 +161,7 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 	@Test(groups={"ut"})
 	public void testWithSeleniumGrid() throws UnsupportedOperationException, IOException, UnirestException {
 		
-		createServerMock("GET", SeleniumRobotGridConnector.GUI_SERVLET, 404, "default monitoring page");
+		createGridServletServerMock("GET", SeleniumRobotGridConnector.GUI_SERVLET, 404, "default monitoring page");
 		createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, consoleServletContent);			
 		
 		Assert.assertTrue(SeleniumGridConnectorFactory.getInstances(Arrays.asList(SERVER_URL + "/wd/hub")).get(0) instanceof SeleniumGridConnector);

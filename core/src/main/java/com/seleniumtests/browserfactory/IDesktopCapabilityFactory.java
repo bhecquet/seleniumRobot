@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.browserfactory;
 
+import static org.openqa.selenium.remote.CapabilityType.ACCEPT_INSECURE_CERTS;
 import static org.openqa.selenium.remote.CapabilityType.PLATFORM_NAME;
 import static org.openqa.selenium.remote.CapabilityType.PROXY;
 
@@ -155,7 +156,11 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
 
         // HTMLUnit does not provide AbstractDriverOptions
     	if (webDriverConfig.getBrowserType() == BrowserType.HTMLUNIT) {
-    		options.setCapability(PLATFORM_NAME, webDriverConfig.getWebPlatform().toString());
+    		if (webDriverConfig.getWebPlatform() != null) {
+    			options.setCapability(PLATFORM_NAME, webDriverConfig.getWebPlatform().toString());
+    		}
+    		options.setCapability(ACCEPT_INSECURE_CERTS, webDriverConfig.isSetAcceptUntrustedCertificates());
+    		
     	} else {
     		// ACCEPT_INSECURE_CERTS is not permitted for IE
 	        if (webDriverConfig.getBrowserType() != BrowserType.INTERNET_EXPLORER) {
