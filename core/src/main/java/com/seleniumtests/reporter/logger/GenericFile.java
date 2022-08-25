@@ -46,7 +46,7 @@ public class GenericFile extends TestAction {
 	 * @param move			if true, move the file to log folder
 	 * @throws IOException
 	 */
-	private GenericFile(File file, String description, boolean move) throws IOException {
+	public GenericFile(File file, String description, boolean move) throws IOException {
 		super(description, false, new ArrayList<>());
 		
 		if (file == null || !file.exists()) {
