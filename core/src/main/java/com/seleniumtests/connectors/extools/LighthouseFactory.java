@@ -1,0 +1,56 @@
+package com.seleniumtests.connectors.extools;
+
+
+import java.nio.file.Paths;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.chromium.HasCdp;
+
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import com.seleniumtests.driver.DriverMode;
+import com.seleniumtests.driver.WebUIDriver;
+
+public class LighthouseFactory {
+
+	private static final Pattern DEBUG_PORT_PATTERN = Pattern.compile(".*localhost:(\\d+).*");
+	
+	public static Lighthouse getInstance() {
+		WebDriver driver = WebUIDriver.getWebDriver(false);
+		
+		if (!(((CustomEventFiringWebDriver) driver).getOriginalDriver() instanceof HasCdp)) {
+			throw new ConfigurationException("Lighthouse can only be used on chromium browsers");
+		}
+		
+		// compute output directory
+		String outputDir;
+		if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.LOCAL) {
+			outputDir = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "lighthouseOut").toString();
+		} else if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.GRID) {
+			outputDir = "";
+		} else {
+			throw new ConfigurationException("Lighthouse can only be run on local or on premise SeleniumRobot grid");
+		}
+		
+		// create output directory
+		Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "lighthouse").toFile().mkdirs();
+		
+		// check for remote debugging port
+		Capabilities caps = ((CustomEventFiringWebDriver) driver).getCapabilities();
+		
+		String cdpOption = (String) caps.getCapability("se:cdp");
+		
+		Matcher portMatcher = DEBUG_PORT_PATTERN.matcher(cdpOption);
+		if (portMatcher.matches()) {
+			return new Lighthouse(Integer.parseInt(portMatcher.group(1)), outputDir);
+		} else {
+			throw new ConfigurationException("Lighthouse cannot be used with the browser, --remote-debugging-port option is not set");
+		}
+	}
+}
