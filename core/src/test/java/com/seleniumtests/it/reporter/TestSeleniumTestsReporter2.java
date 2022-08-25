@@ -2469,4 +2469,23 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertFalse(detailedReportContent.contains("<div class=\"step-info\"><i class=\"fas fa-info-circle\"></i>"));
 		
 	}
+	
+	@Test(groups={"it"})
+	public void testReportWithLighthouseExecution() throws Exception {
+
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverWithLighthouse"});
+
+		String detailedReportContent = readTestMethodResultFile("testDriverWithLighthouse");
+		
+		// check lighthouse report is included
+		Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"message-snapshot\">Lighthouse JSON http://\\d+.\\d+.\\d+.\\d+:\\d+/test.html: <a href\\='http.\\d+.\\d+.\\d+.\\d+.\\d+test.html-\\w+.json'>file</a></div>.*"));
+		Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"message-snapshot\">Lighthouse HTML http://\\d+.\\d+.\\d+.\\d+:\\d+/test.html: <a href\\='http.\\d+.\\d+.\\d+.\\d+.\\d+test.html-\\w+.html'>file</a></div>.*"));
+		
+		// check accessibility is displayed
+		Assert.assertTrue(detailedReportContent.contains("<tr><th width=\"15%\">Key</th><th width=\"60%\">Message</th><th width=\"25%\">Value</th></tr><tr><td>accessibility</td><td>accessibility</td><td>60.0</td></tr>"));
+		
+		// check lighthouse error is included
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Lighthouse did not execute correctly</div>"));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-snapshot\">Lighthouse logs some.bad.url: <a href='some.bad.url"));
+	}
 }

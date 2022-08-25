@@ -23,6 +23,7 @@ public class TestLigthouse extends GenericMultiBrowserTest {
 		lighthouseInstance.execute(testPageUrl, new ArrayList<>());
 		Assert.assertNotNull(lighthouseInstance.getHtmlReport());
 		Assert.assertNotNull(lighthouseInstance.getJsonReport());
+		Assert.assertNull(lighthouseInstance.getLogs());
 		Assert.assertTrue(lighthouseInstance.getScore(Category.ACCESSIBILITY) > 30);
 	}
 	
@@ -32,6 +33,7 @@ public class TestLigthouse extends GenericMultiBrowserTest {
 		lighthouseInstance.execute("badUrl", new ArrayList<>());
 		Assert.assertNull(lighthouseInstance.getHtmlReport());
 		Assert.assertNull(lighthouseInstance.getJsonReport());
+		Assert.assertNotNull(lighthouseInstance.getLogs());
 		Assert.assertTrue(lighthouseInstance.getScore(Category.ACCESSIBILITY) < 0.1);
 	}
 

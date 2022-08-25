@@ -111,7 +111,7 @@ public class Lighthouse {
 					jsonReport = jsonFile;
 				}
 				
-				logger.logFile(jsonReport, "Lighthouse JSON " + url);
+				logger.logFile(jsonReport, "Lighthouse JSON " + url, false);
 				
 				File htmlFile = new File(outputPath + ".report.html");
 				htmlReport = Paths.get(jsonFile.getParentFile().getAbsolutePath(), LIGHTHOUSE_FOLDER, baseName + ".html").toFile();
@@ -120,7 +120,7 @@ public class Lighthouse {
 				} catch (IOException e) {
 					htmlReport = htmlFile;
 				}
-				logger.logFile(htmlReport, "Lighthouse HTML " + url);
+				logger.logFile(htmlReport, "Lighthouse HTML " + url, false);
 				
 			} else if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.GRID) {
 				
@@ -133,7 +133,7 @@ public class Lighthouse {
 	 * @param category
 	 * @return
 	 */
-	public double getScore(Category category) {
+	public Double getScore(Category category) {
 		if (jsonReport == null) {
 			logger.error(String.format("Cannot get %s score, lighthouse has not been run or is in error", category));
 			return 0.0;

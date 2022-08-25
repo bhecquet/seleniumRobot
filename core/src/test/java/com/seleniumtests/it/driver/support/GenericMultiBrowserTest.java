@@ -47,6 +47,7 @@ import org.testng.annotations.BeforeMethod;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.MockitoTest;
+import com.seleniumtests.WebTestPageServer;
 import com.seleniumtests.browserfactory.SeleniumGridDriverFactory;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -69,8 +70,9 @@ import com.seleniumtests.util.osutility.OSUtilityFactory;
 public abstract class GenericMultiBrowserTest extends MockitoTest {
 	
 	protected BrowserType browserType;
-	protected WebServer server;
-	protected String localAddress;
+	
+	private WebTestPageServer server;
+	private String localAddress;
 	protected WebDriver driver;
 	protected DriverTestPage testPage;
 	protected DriverTestPageNativeActions testPageNativeActions;
@@ -104,37 +106,6 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 		this.browserType = browserType; 
 		this.testPageName = testPageName;
 		this.targetSeleniumGrid = targetSeleniumGrid;
-	}
-	
-	/**
-	 * Method for returning mapping of files stored in resources, with path on server
-	 * @return
-	 */
-	protected Map<String, String> getPageMapping() {
-		Map<String, String> mapping = new HashMap<>();
-		mapping.put("/tu/test.html", "/test.html");
-		mapping.put("/tu/testScrolling.html", "/testScrolling.html");
-		mapping.put("/tu/testWithoutFixedPattern.html", "/testWithoutFixedPattern.html");
-		mapping.put("/tu/testIFrame.html", "/testIFrame.html");
-		mapping.put("/tu/testAngularIFrame.html", "/testAngularIFrame.html");
-		mapping.put("/tu/testIFrame2.html", "/testIFrame2.html");
-		mapping.put("/tu/ffLogo1.png", "/ffLogo1.png");
-		mapping.put("/tu/ffLogo2.png", "/ffLogo2.png");
-		mapping.put("/tu/googleSearch.png", "/googleSearch.png");
-		mapping.put("/tu/images/bouton_enregistrer.png", "/images/bouton_enregistrer.png");
-		mapping.put("/tu/jquery.min.js", "/jquery.min.js");
-
-		// angular app v9
-		mapping.put("/tu/angularAppv9/index.html", "/angularApp/index.html");
-		mapping.put("/tu/angularAppv9/runtime-es2015.js", "/angularApp/runtime-es2015.js");
-		mapping.put("/tu/angularAppv9/runtime-es5.js", "/angularApp/runtime-es5.js");
-		mapping.put("/tu/angularAppv9/main-es5.js", "/angularApp/main-es5.js");
-		mapping.put("/tu/angularAppv9/main-es2015.js", "/angularApp/main-es2015.js");
-		mapping.put("/tu/angularAppv9/polyfills-es2015.js", "/angularApp/polyfills-es2015.js");
-		mapping.put("/tu/angularAppv9/polyfills-es5.js", "/angularApp/polyfills-es5.js");
-		mapping.put("/tu/angularAppv9/styles.css", "/angularApp/styles.css");
-		
-		return mapping;
 	}
 	
 	@BeforeMethod(groups={"ut", "it", "upload", "ie"})  
@@ -180,12 +151,10 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 			return;
 		}
 		
-		localAddress = Inet4Address.getLocalHost().getHostAddress();
-//		localAddress = Inet4Address.getByName("localhost").getHostAddress();
-        server = new WebServer(localAddress, getPageMapping());
-        server.expose();
-        logger.info(String.format("exposing server on http://%s:%d", localAddress, server.getServerHost().getPort()));
-
+		server = new WebTestPageServer();
+		server.exposeTestPage();
+		localAddress = server.getLocalAddress();
+		
 		initThreadContext(testNGCtx);
 		initBeforeMethod();
 		
@@ -238,8 +207,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	@AfterClass(groups={"it", "ut", "upload", "ie"}, alwaysRun=true)
 	public void stop() throws Exception {
 		if (server != null) {
-			logger.info("stopping web server");
-			server.stop();
+			server.stopServer();
 		}
 		if (WebUIDriver.getWebDriver(false) != null) {
 			logger.info("closing driver after all tests");
