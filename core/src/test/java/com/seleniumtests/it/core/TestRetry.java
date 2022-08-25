@@ -21,7 +21,7 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.FileUtils;
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
@@ -64,7 +64,7 @@ public class TestRetry extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.contains("step 1"));
 		Assert.assertTrue(detailedReportContent.contains("<li>played 3 times")); // only the last step is retained
 		Assert.assertFalse(detailedReportContent.contains("<li>played 2 times")); // only the last step is retained
-		Assert.assertEquals(StringUtils.countOccurrencesOf(detailedReportContent, "step 1"), 1); 
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "step 1"), 1); 
 		
 	}
 	
@@ -92,7 +92,7 @@ public class TestRetry extends ReporterTest {
 			Assert.assertTrue(detailedReportContent.contains("step 1"));
 			Assert.assertTrue(detailedReportContent.contains("<li>played 2 times")); // only the last step is retained
 			Assert.assertFalse(detailedReportContent.contains("<li>played 1 times")); // only the last step is retained
-			Assert.assertEquals(StringUtils.countOccurrencesOf(detailedReportContent, "step 1"), 1); 
+			Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "step 1"), 1); 
 		} finally {
 			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
 		}
@@ -116,7 +116,7 @@ public class TestRetry extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.contains("step 1"));
 		Assert.assertTrue(detailedReportContent.contains("<li>played 3 times")); // only the last step is retained
 		Assert.assertFalse(detailedReportContent.contains("<li>played 2 times")); // only the last step is retained
-		Assert.assertEquals(StringUtils.countOccurrencesOf(detailedReportContent, "step 1"), 1); 
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "step 1"), 1); 
 		
 	}
 	
@@ -137,7 +137,7 @@ public class TestRetry extends ReporterTest {
 		// check that in case of retry, steps are not logged twice
 		Assert.assertTrue(detailedReportContent.contains("step 1"));
 		Assert.assertTrue(detailedReportContent.contains("<li>played 5 times")); // only the last step is retained
-		Assert.assertEquals(StringUtils.countOccurrencesOf(detailedReportContent, "step 1"), 1); 	
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "step 1"), 1); 	
 	}
 	
 	/**
@@ -158,7 +158,7 @@ public class TestRetry extends ReporterTest {
 		// check that in case of retry, steps are not logged twice
 		Assert.assertTrue(detailedReportContent.contains("step 1"));
 		Assert.assertTrue(detailedReportContent.contains("<li>played 5 times")); // only the last step is retained
-		Assert.assertEquals(StringUtils.countOccurrencesOf(detailedReportContent, "step 1"), 1); 	
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "step 1"), 1); 	
 	}
 	
 	@Test(groups={"it"})
@@ -178,8 +178,8 @@ public class TestRetry extends ReporterTest {
 
 		// check that in case of retry, steps are not logged twice and step name is the cucumber step name (defined by annotation
 		Assert.assertTrue(detailedReportContent.contains("write_error"));
-		Assert.assertEquals(StringUtils.countOccurrencesOf(detailedReportContent, "Start method error_scenario"), 3); 
-		Assert.assertEquals(StringUtils.countOccurrencesOf(detailedReportContent, "Finish method error_scenario"), 3); 
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "Start method error_scenario"), 3); 
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "Finish method error_scenario"), 3); 
 		
 	}
 }
