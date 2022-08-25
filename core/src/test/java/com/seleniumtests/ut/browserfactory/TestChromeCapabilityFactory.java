@@ -228,7 +228,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 
-		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process]");
+		Assert.assertTrue(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process"));
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "chrome");
 		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("prefs").toString(), "{profile.exit_type=Normal}");
 		Assert.assertNull(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("debuggerAddress")); // no debuger address set as we do not attach an existing browser
@@ -243,7 +243,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		when(config.getAttachExistingDriverPort()).thenReturn(10);
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process]");
+		Assert.assertTrue(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process"));
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "chrome");
 		Assert.assertNull(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("prefs")); // no preference set when attaching to existing browser
 		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("debuggerAddress"), "127.0.0.1:10");
@@ -256,7 +256,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--user-agent=CHROME 55, --disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process]");
+		Assert.assertTrue(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--user-agent=CHROME 55"));
 	}
 	
 	@Test(groups={"ut"})
@@ -266,7 +266,8 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process, --headless, --window-size=1280,1024, --disable-gpu]");
+		// check headless is configured
+		Assert.assertTrue(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--headless, --window-size=1280,1024, --disable-gpu"));
 	}
 
 	@Test(groups={"ut"})
@@ -277,7 +278,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process, --user-data-dir=/home/foo/chrome]");
+		Assert.assertTrue(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--user-data-dir=/home/foo/chrome"));
 	}
 	
 	@Test(groups={"ut"})
@@ -289,8 +290,14 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
 		// a user data dir is configured
-		Assert.assertNotEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process, --user-data-dir=/home/foo/chrome]");
-		Assert.assertTrue(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().startsWith("[--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process, --user-data-dir="));
+		Assert.assertFalse(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--user-data-dir=/home/foo/chrome"));
+		String chromeArgs = ((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString();
+		Assert.assertTrue(chromeArgs.contains("--disable-translate"));
+		Assert.assertTrue(chromeArgs.contains("--disable-web-security"));
+		Assert.assertTrue(chromeArgs.contains("--no-sandbox"));
+		Assert.assertTrue(chromeArgs.contains("--disable-site-isolation-trials"));
+		Assert.assertTrue(chromeArgs.contains("--disable-features=IsolateOrigins,site-per-process"));
+		Assert.assertTrue(chromeArgs.contains("--user-data-dir="));
 	}
 	
 	@Test(groups={"ut"})
@@ -301,8 +308,8 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
-		// a user data dir is configured
-		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process]");
+
+		Assert.assertFalse(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--user-data-dir"));
 	}
 	
 	/**
@@ -443,7 +450,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createMobileCapabilities(config);
 		
-		Assert.assertEquals(((Map<?,?>)(capa.asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--disable-translate, --disable-web-security, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process, --key1=value1, --key2=value2]");
+		Assert.assertTrue(((Map<?,?>)(capa.asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--key1=value1, --key2=value2"));
 	}
 	@Test(groups={"ut"})
 	public void testCreateChromeCapabilitiesWithOptions() {
@@ -452,7 +459,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process, --key1=value1, --key2=value2]");
+		Assert.assertTrue(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--key1=value1, --key2=value2"));
 	}
 	
 	@Test(groups={"ut"})
