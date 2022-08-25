@@ -1712,4 +1712,8 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 			throw new ScenarioException("Cannot use DevTools with this driver");
 		}
 	}
+
+	public WebDriver getOriginalDriver() {
+		return originalDriver;
+	}
 }
