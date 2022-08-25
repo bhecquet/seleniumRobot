@@ -122,7 +122,7 @@ public class TestTasks {
      * Execute a command
      * If test is run locally, you can execute any command, limit is the rights given to the user
      * If test is run through seleniumRobot grid, only commands allowed by grid will be allowed
-     * @param program	program to execute
+     * @param program	program to execute. If program is to be searched in system path, then, program should be "OSCommand.USE_PATH" + "myprogram", and first arg will be the program name
      * @param charset	the charset used to read program output
      * @param timeout	timeout in seconds. After this duration, program will be terminated
      * @param args		arguments to give to program

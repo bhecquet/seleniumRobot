@@ -18,15 +18,17 @@
 package com.seleniumtests.util.osutility;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.Logger;
 
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 /**
@@ -35,6 +37,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 public class OSCommand {
 	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(OSCommand.class);
+	public static final String USE_PATH = "_USE_PATH_";	
 	
 	private OSCommand() {
 		// class with static methods
@@ -72,14 +75,34 @@ public class OSCommand {
     
     /**
      * Execute a command in command line terminal and wait at most 'timeout' seconds
-     * @param cmd
+     * @param cmd		An array containing the program to execute and its arguments
+     * 					e.g: ["cmd.exe", "foo"]
+     * 					If first item is "_USE_PATH_", then, on Windows, we will start cmd.exe first. This is because ProcessBuilder does not look for programs into the path
      * @param timeout 	number of seconds to wait for end of execution. A negative value means it will wait 30 secs
      * @return 
      */
    	public static String executeCommandAndWait(final String[] cmd, int timeout, Charset charset) {
         
+   		List<String> newCmd = new ArrayList<>(Arrays.asList(cmd));
+   		
+   		if (newCmd.get(0).startsWith(USE_PATH)) {
+   			newCmd.set(0, newCmd.get(0).replace(USE_PATH, ""));
+   			
+   	    	if (OSUtility.isWindows()) {
+   	    		String out = executeCommandAndWait(new String[] {"where", newCmd.get(0)});
+   	    		try {
+   	    			String path = out.split("\n")[out.split("\n").length - 1].trim();
+   	    			newCmd.set(0, path);
+   	    		} catch (IndexOutOfBoundsException e) {
+   	    			throw new ScenarioException(String.format("Program %s is not in the path", newCmd.get(0)));
+   	    		}
+
+   	    	}
+   		}
+   		
         try {
-        	Process proc = Runtime.getRuntime().exec(cmd);
+        	ProcessBuilder pb = new ProcessBuilder(newCmd);
+        	Process proc = pb.start();
 			return waitProcessTermination(proc, timeout, charset);
 			
         } catch (IOException e) {
@@ -139,15 +162,14 @@ public class OSCommand {
     	if (charset == null) {
     		charset = OSUtility.getCharset();
     	}
-    	
-    	StringBuilder output = new StringBuilder();
-    	StringBuilder error = new StringBuilder();
-    	InputStream is = proc.getInputStream();
-    	InputStream es = proc.getErrorStream();
-        
+
     	Clock clock = Clock.systemUTC();
 		Instant end = clock.instant().plusSeconds(timeout > 0 ? timeout: 30);
     	
+		StreamGobbler errorGobbler = new StreamGobbler(proc.getErrorStream(), charset);
+		StreamGobbler outputGobbler  = new StreamGobbler(proc.getInputStream(), charset);
+		errorGobbler.start();
+        outputGobbler.start();
         
         boolean read = false;
         boolean terminated = false;
@@ -158,19 +180,14 @@ public class OSCommand {
         	}
         	
         	read = true;
-        	int isAvailable = is.available();
-        	if (isAvailable > 0) {
-        		byte[] b = new byte[isAvailable];
-        		IOUtils.read(is, b);
-        		output.append(new String(b, charset));
-        	}
-        	if (es.available() > 0) {
-        		byte[] b = new byte[isAvailable];
-        		IOUtils.read(es, b);
-        		error.append(new String(b, charset));
-        	}
+        	
         	Thread.sleep(100);
         }
+        errorGobbler.halt();
+        outputGobbler.halt();
+        
+        StringBuilder error = errorGobbler.getOutput();
+        StringBuilder output = outputGobbler.getOutput();
         
         return output.toString() + '\n' + error.toString();
     }
