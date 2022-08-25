@@ -101,6 +101,10 @@ public class ScenarioLogger {
 
 
     	TestStep runningStep = TestStepManager.getParentTestStep();
+    	if (runningStep == null) {
+    		runningStep = TestStepManager.getCurrentOrPreviousStep();
+    	}
+    	
     	if (runningStep != null) {
     		runningStep.addValue(new TestValue(id, message, value));
     	}
@@ -143,6 +147,9 @@ public class ScenarioLogger {
     	
 
     	TestStep runningStep = TestStepManager.getParentTestStep();
+    	if (runningStep == null) {
+    		runningStep = TestStepManager.getCurrentOrPreviousStep();
+    	}
     	if (runningStep != null) {
     		try {
     			runningStep.addNetworkCapture(new HarCapture(har, name));
@@ -155,12 +162,31 @@ public class ScenarioLogger {
     	
     }
     
+
+    /**
+     * Log the given file to HTML result, file will be moved to test-output root folder
+     * @param file			file to log
+     * @param description	a comment for the file
+     */
     public void logFile(File file, String description) {
+    	logFile(file, description, true);
+    }
+    
+    /**
+     * Log the given file to HTML result
+     * @param file			file to log
+     * @param description	a comment for the file
+     * @param move			if true, the file will be moved to log folder. Useful when the input file is outside the selenium result tree
+     */
+    public void logFile(File file, String description, boolean move) {
 
     	try {
 	    	TestStep runningStep = TestStepManager.getParentTestStep();
+	    	if (runningStep == null) {
+	    		runningStep = TestStepManager.getCurrentOrPreviousStep();
+	    	}
 	    	if (runningStep != null) {
-	    		runningStep.addFile(new GenericFile(file, description));
+	    		runningStep.addFile(new GenericFile(file, description, move));
 	    	}
     	} catch (IndexOutOfBoundsException e) {
     		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
