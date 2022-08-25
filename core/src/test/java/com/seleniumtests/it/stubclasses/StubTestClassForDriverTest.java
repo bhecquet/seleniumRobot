@@ -18,12 +18,17 @@
 package com.seleniumtests.it.stubclasses;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.WebTestPageServer;
+import com.seleniumtests.connectors.extools.Lighthouse;
+import com.seleniumtests.connectors.extools.Lighthouse.Category;
+import com.seleniumtests.connectors.extools.LighthouseFactory;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
@@ -132,6 +137,30 @@ public class StubTestClassForDriverTest extends StubParentClass {
 		page._reset();
 		Assert.assertTrue(false);
 		page._writeSomething();
+	}
+
+	@Test(groups="stub")
+	public void testDriverWithLighthouse() throws Exception {
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
+		
+		WebTestPageServer server = new WebTestPageServer();
+		try {
+			
+			server.exposeTestPage();
+			String localAddress = server.getLocalAddress();
+			DriverTestPage page = new DriverTestPage(true, String.format("http://%s:%d/test.html", localAddress, server.getServerHost().getPort()));
+
+			Lighthouse lighthouseInstance = LighthouseFactory.getInstance();
+			lighthouseInstance.execute(page.getUrl(), new ArrayList<>());
+			logger.logTestValue("accessibility", "accessibility", lighthouseInstance.getScore(Category.ACCESSIBILITY).toString());
+			
+			page._reset();
+			lighthouseInstance.execute("some.bad.url", new ArrayList<>());
+	
+			page._writeSomething();
+		} finally {
+			server.stopServer();
+		}
 	}
 	
 	@Test(groups="stub")
