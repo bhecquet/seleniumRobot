@@ -18,6 +18,7 @@
 package com.seleniumtests.ut.connectors.selenium;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -30,9 +31,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -651,6 +655,85 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		connector.setNullNodeUrl();
 		connector.uploadFileToBrowser("foo", "ABCDE");		
 	}
+	
+
+	/**
+	 * Test download file
+	 * @throws UnsupportedOperationException
+	 * @throws IOException
+	 * @throws UnirestException
+	 */
+	@Test(groups={"ut"})
+	public void testDownloadFile() throws UnsupportedOperationException, IOException {
+		
+		File f = File.createTempFile("foo",  ".bar");
+		FileUtils.write(f, "ABCD", StandardCharsets.UTF_8);
+		GetRequest req = (GetRequest) createGridServletServerMock("GET", SeleniumRobotGridConnector.FILE_SERVLET, 200, f);	
+		
+		File file = connector.downloadFileFromNode("upload/foo");
+		
+		Assert.assertEquals(FileUtils.readFileToString(file, StandardCharsets.UTF_8), "ABCD");
+		
+		// no error encountered
+		verify(req).queryString("file", "file:upload/foo");
+		verify(req).asFile(anyString(), eq(StandardCopyOption.REPLACE_EXISTING));
+		verify(gridLogger, never()).warn(anyString());
+		verify(gridLogger, never()).error(anyString());
+	}
+	
+	/**
+	 * Test download file when requested path is not in upload folder
+	 * @throws UnsupportedOperationException
+	 * @throws IOException
+	 */
+	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class, expectedExceptionsMessageRegExp = "File path foo is invalid, only path in 'upload' folder are allowed")
+	public void testDownloadFileWrongPath() throws UnsupportedOperationException, IOException {
+		
+		File f = File.createTempFile("foo",  ".bar");
+		FileUtils.write(f, "ABCD", StandardCharsets.UTF_8);
+		GetRequest req = (GetRequest) createGridServletServerMock("GET", SeleniumRobotGridConnector.FILE_SERVLET, 200, f);	
+		
+		connector.downloadFileFromNode("foo");
+	}
+	
+	/**
+	 * Test download file with status code different from 200
+	 * @throws UnsupportedOperationException
+	 * @throws IOException
+	 * @throws UnirestException
+	 */
+	@Test(groups={"ut"}, expectedExceptions = SeleniumGridException.class, expectedExceptionsMessageRegExp = "Error downloading file upload/foo: .*")
+	public void testDownloadFileError500() throws UnsupportedOperationException, IOException {
+		
+		createGridServletServerMock("GET", SeleniumRobotGridConnector.FILE_SERVLET, 500, File.createTempFile("foo",  ".bar"));	
+
+		connector.downloadFileFromNode("upload/foo");
+	}
+	
+	/**
+	 * Test download file when connection error occurs
+	 * @throws UnsupportedOperationException
+	 * @throws IOException
+	 * @throws UnirestException
+	 */
+	@Test(groups={"ut"}, expectedExceptions = SeleniumGridException.class, expectedExceptionsMessageRegExp = "Cannot download file: upload/foo")
+	public void testDownloadFileNoConnection() throws UnsupportedOperationException, IOException {
+		
+		HttpRequest<?> req = createGridServletServerMock("GET", SeleniumRobotGridConnector.FILE_SERVLET, 500, File.createTempFile("foo",  ".bar"), "requestBodyEntity");
+		when(req.asFile(anyString(), any(StandardCopyOption.class))).thenThrow(new UnirestException("connection error"));
+
+		connector.downloadFileFromNode("upload/foo");
+	}
+
+	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class, expectedExceptionsMessageRegExp = "You cannot download file before driver has been created and corresponding node instanciated")
+	public void testDownloadFileWithoutNodeUrl() throws UnsupportedOperationException, IOException {
+		
+		createGridServletServerMock("GET", SeleniumRobotGridConnector.FILE_SERVLET, 200, File.createTempFile("foo",  ".bar"));	
+
+		connector.setNullNodeUrl();
+		connector.downloadFileFromNode("upload/foo");
+	}
+
 	
 	/**
 	 * Test send keys with keyboard

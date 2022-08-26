@@ -25,14 +25,18 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.http.HttpHost;
@@ -54,6 +58,7 @@ import com.seleniumtests.customexception.SeleniumGridException;
 import com.seleniumtests.util.FileUtility;
 
 import io.appium.java_client.remote.MobileCapabilityType;
+import kong.unirest.GetRequest;
 import kong.unirest.HttpRequestWithBody;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
@@ -68,6 +73,8 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	private static final String NAME_FIELD = "name";
 	private static final String SESSION_FIELD = "session";
 	private static final String OUTPUT_FIELD = "output";
+	private static final String FILE_FIELD = "file";
+	private static final String UPLOAD_FOLDER = "upload";
 	private static final String ACTION_FIELD = "action";
 	public static final String NODE_TASK_SERVLET = "/extra/NodeTaskServlet";
 	public static final String FILE_SERVLET = "/extra/FileServlet";
@@ -156,7 +163,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 
 		logger.info("uploading file to node: " + zipFile.getName());
 		try {
-			HttpRequestWithBody req = Unirest.post(String.format("%s%s", nodeUrl, FILE_SERVLET))
+			HttpRequestWithBody req = Unirest.post(String.format("%s%s", nodeServletUrl, FILE_SERVLET))
 					.header(HttpHeaders.CONTENT_TYPE, MediaType.OCTET_STREAM.toString())
 					.queryString(OUTPUT_FIELD, "file");
 			if (returnLocalFile) {
@@ -173,6 +180,37 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			}
 		} catch (UnirestException e) {
 			throw new SeleniumGridException(String.format("Cannot upload file: %s", e.getMessage()));
+		}
+
+	}
+	
+	@Override
+	public File downloadFileFromNode(String filePath) {
+		
+		if (nodeUrl == null) {
+			throw new ScenarioException("You cannot download file before driver has been created and corresponding node instanciated");
+		}
+		
+		if (!filePath.startsWith(UPLOAD_FOLDER)) {
+			throw new ScenarioException(String.format("File path %s is invalid, only path in 'upload' folder are allowed", filePath));
+		}
+		
+		Path targetFile = Paths.get(FileUtils.getTempDirectoryPath(), new File(filePath).getName());
+		
+		logger.info("downloading file from node: {}", filePath);
+		try {
+			HttpResponse<File> response = Unirest.get(String.format("%s%s", nodeServletUrl, FILE_SERVLET))
+					.queryString(FILE_FIELD, "file:" + filePath)
+					.asFile(targetFile.toString(), StandardCopyOption.REPLACE_EXISTING)
+					;
+
+			if (response.getStatus() != 200) {
+				throw new SeleniumGridException(String.format("Error downloading file %s: %s", filePath, response.getBody()));
+			} else {
+				return response.getBody();
+			}
+		} catch (UnirestException e) {
+			throw new SeleniumGridException(String.format("Cannot download file: %s", filePath, e.getMessage()));
 		}
 
 	}

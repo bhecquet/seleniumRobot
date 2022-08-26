@@ -90,7 +90,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 		DesiredCapabilities caps = new DesiredCapabilities();
 		caps.setCapability(MobileCapabilityType.APP, app.getAbsolutePath());
 		String filePath = connector.uploadFileToNode(app.getAbsolutePath(), true);
-		Assert.assertEquals(filePath, "");
+		Assert.assertTrue(filePath.contains("upload/file"));
 		
 		String fileContent = Unirest.get("http://localhost:5565/extra/FileServlet")
 				.queryString("file", "clirr-differences.xml")
@@ -98,6 +98,20 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 				.getBody();
 		
 		Assert.assertEquals(fileContent, FileUtils.readFileToString(app, StandardCharsets.UTF_8));
+	}
+	
+
+	@Test(groups={"it"})
+	public void testDownloadFileFromNode() throws ClientProtocolException, IOException, UnirestException {
+		
+		File app = GenericTest.createFileFromResource("clirr-differences.xml");
+		
+		DesiredCapabilities caps = new DesiredCapabilities();
+		caps.setCapability(MobileCapabilityType.APP, app.getAbsolutePath());
+		String filePath = connector.uploadFileToNode(app.getAbsolutePath(), true);
+		File downloaded = connector.downloadFileFromNode("upload" + filePath.split("upload")[1] + "/" + app.getName());
+		
+		Assert.assertEquals(FileUtils.readFileToString(downloaded, StandardCharsets.UTF_8), FileUtils.readFileToString(app, StandardCharsets.UTF_8));
 	}
 	
 	@Test(groups={"it"})
