@@ -26,10 +26,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.Inet4Address;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -63,7 +60,6 @@ import com.seleniumtests.it.driver.support.pages.DriverTestPageNativeActions;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageObjectFatory;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageSalesforceLightning;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageWithoutFixedPattern;
-import com.seleniumtests.it.driver.support.server.WebServer;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 
