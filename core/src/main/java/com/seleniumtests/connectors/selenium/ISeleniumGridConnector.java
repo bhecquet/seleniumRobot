@@ -23,6 +23,11 @@ public interface ISeleniumGridConnector {
 	public String uploadFileToNode(String filePath, boolean returnLocalFile);
 	
 	/**
+	 * Download a file given file path
+	 * @param filePath
+	 */
+	public File downloadFileFromNode(String filePath);
+	/**
 	 * Kill process
 	 * @param processName
 	 */

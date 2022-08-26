@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
@@ -255,6 +256,9 @@ public class ConnectorsTest extends MockitoTest {
 	protected HttpRequest<?> createGridServletServerMock(String requestType, String apiPath, int statusCode, String replyData, String responseType) throws UnirestException {
 		return createServerMock(GRID_SERVLET_URL, requestType, apiPath, statusCode, replyData, responseType);
 	}
+	protected HttpRequest<?> createGridServletServerMock(String requestType, String apiPath, int statusCode, File replyData, String responseType) throws UnirestException {
+		return createServerMock(GRID_SERVLET_URL, requestType, apiPath, statusCode, replyData, responseType);
+	}
 	protected HttpRequest<?> createServerMock(String requestType, String apiPath, int statusCode, String replyData) throws UnirestException {
 		return createServerMock(requestType, apiPath, statusCode, replyData, "request");
 	}
@@ -424,6 +428,7 @@ public class ConnectorsTest extends MockitoTest {
 				when(getRequest.asString()).thenReturn(response);
 				when(getRequest.asJson()).thenReturn(jsonResponse);
 				when(getRequest.asFile(anyString())).thenReturn(streamResponse);
+				when(getRequest.asFile(anyString(), any(StandardCopyOption.class))).thenReturn(streamResponse);
 				when(getRequest.asBytes()).thenReturn(bytestreamResponse);
 				when(getRequest.queryString(anyString(), anyString())).thenReturn(getRequest);
 				when(getRequest.queryString(anyString(), anyInt())).thenReturn(getRequest);

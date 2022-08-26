@@ -95,6 +95,15 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	}
 	
 	/**
+	 * Download a file given file path
+	 * @param filePath
+	 */
+	public File downloadFileFromNode(String filePath) {
+		logger.warn("file download is only available with seleniumRobot grid");
+		return null;
+	}
+	
+	/**
 	 * Kill process
 	 * @param processName
 	 */
