@@ -1355,7 +1355,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-info\">Some Info message</div>"));
 			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Some Error message</div>"));
 			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Some log message</div>"));
-			Assert.assertTrue(detailedReportContent.contains("<table class=\"table table-bordered table-condensed\"><tr><th width=\"15%\">Key</th><th width=\"60%\">Message</th><th width=\"25%\">Value</th></tr><tr><td>key</td><td>we found a value of</td><td>10</td></tr></table>"));
+			Assert.assertTrue(detailedReportContent.contains("<table class=\"table table-bordered table-sm\"><tr><th width=\"15%\">Key</th><th width=\"60%\">Message</th><th width=\"25%\">Value</th></tr><tr><td>key</td><td>we found a value of</td><td>10</td></tr></table>"));
 			Assert.assertTrue(detailedReportContent.contains("<li>send keyboard action</li>"));
 		} finally {
 			System.clearProperty("customTestReports");
@@ -2064,7 +2064,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent = readTestMethodResultFile("testInError");
 		
 		// Check error is present is Last test step
-		Assert.assertTrue(detailedReportContent.contains("<table class=\"table table-bordered table-condensed\"><tr><th width=\"15%\">Key</th><th width=\"60%\">Message</th><th width=\"25%\">Value</th></tr><tr><td>key</td><td>we found a value of</td><td>10</td></tr></table>"));
+		Assert.assertTrue(detailedReportContent.contains("<table class=\"table table-bordered table-sm\"><tr><th width=\"15%\">Key</th><th width=\"60%\">Message</th><th width=\"25%\">Value</th></tr><tr><td>key</td><td>we found a value of</td><td>10</td></tr></table>"));
 	}
 	
 	@Test(groups={"it"})
