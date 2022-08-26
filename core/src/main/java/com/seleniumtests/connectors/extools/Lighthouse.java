@@ -3,6 +3,7 @@ package com.seleniumtests.connectors.extools;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.google.common.io.Files;
+import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.customexception.ScenarioException;
@@ -37,6 +39,7 @@ public class Lighthouse {
 
 	private int port;
 	private String outputPath;
+	private Path storagePath;
 	private boolean available = false;
 	private File jsonReport;
 	private File htmlReport;
@@ -58,10 +61,16 @@ public class Lighthouse {
 		}
 	}
 
+	/**
+	 * 
+	 * @param port			port on which lighthouse will connect
+	 * @param outputPath	base name of files lighthouse will produce. We will get 2 files: <outputPath>.report.html and <outputPath>.report.json
+	 */
 	public Lighthouse(int port, String outputPath) {
 		this.available = isInstalled();
 		this.port = port;
 		this.outputPath = outputPath;
+		this.storagePath = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), LIGHTHOUSE_FOLDER) ;
 	}
 	
 	private boolean isInstalled() {
@@ -89,9 +98,9 @@ public class Lighthouse {
 		
 		String out = TestTasks.executeCommand(OSCommand.USE_PATH + "lighthouse", 90, null, args.toArray(new String[] {}));
 		
-		logs = Paths.get(new File(outputPath).getParentFile().getAbsolutePath(), LIGHTHOUSE_FOLDER, baseName + ".log").toFile();
 		if (!out.contains("json output written to")) {
 			logger.error("Lighthouse did not execute correctly");
+			logs = storagePath.resolve(baseName + ".log").toFile();
 			try {
 				FileUtils.write(logs, out, StandardCharsets.UTF_8);
 				logger.logFile(logs, "Lighthouse logs " + url);
@@ -99,32 +108,35 @@ public class Lighthouse {
 				logger.error("Lighthouse logs could not be written: " + e.getMessage());
 			}
 		} else {
-		
-			// get result
-			if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.LOCAL) {
-				
-				File jsonFile = new File(outputPath + ".report.json");
-				jsonReport = Paths.get(jsonFile.getParentFile().getAbsolutePath(), LIGHTHOUSE_FOLDER, baseName + ".json").toFile();
-				try {
-					Files.move(jsonFile, jsonReport);
-				} catch (IOException e) {
-					jsonReport = jsonFile;
-				}
-				
-				logger.logFile(jsonReport, "Lighthouse JSON " + url, false);
-				
-				File htmlFile = new File(outputPath + ".report.html");
-				htmlReport = Paths.get(jsonFile.getParentFile().getAbsolutePath(), LIGHTHOUSE_FOLDER, baseName + ".html").toFile();
-				try {
-					Files.move(htmlFile, htmlReport);
-				} catch (IOException e) {
-					htmlReport = htmlFile;
-				}
-				logger.logFile(htmlReport, "Lighthouse HTML " + url, false);
-				
-			} else if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.GRID) {
-				
+			
+			File jsonFile = new File(outputPath + ".report.json");
+			File htmlFile = new File(outputPath + ".report.html");
+			
+			// With grid, download file first
+			if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.GRID) {
+				SeleniumGridConnector gridConnector = SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector();
+				jsonFile = gridConnector.downloadFileFromNode(outputPath + ".report.json");
+				htmlFile = gridConnector.downloadFileFromNode(outputPath + ".report.html");
 			}
+		
+			// get result	
+			jsonReport = storagePath.resolve(baseName + ".json").toFile();
+			try {
+				Files.move(jsonFile, jsonReport);
+			} catch (IOException e) {
+				jsonReport = jsonFile;
+			}
+			
+			logger.logFile(jsonReport, "Lighthouse JSON " + url, false);
+			
+			
+			htmlReport = storagePath.resolve(baseName + ".html").toFile();
+			try {
+				Files.move(htmlFile, htmlReport);
+			} catch (IOException e) {
+				htmlReport = htmlFile;
+			}
+			logger.logFile(htmlReport, "Lighthouse HTML " + url, false);
 		}
 	}
 	

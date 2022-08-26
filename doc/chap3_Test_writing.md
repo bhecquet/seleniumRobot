@@ -943,6 +943,12 @@ executeCommand(<my_program>, <arg1>, <arg2>)
 
 When using this in grid mode, you must declare the program name in the white list of grid node: `-extProgramWhiteList my_program`
 
+If the program you execute is in the path, you do not need to give the full path to executable. But, you have to write
+
+```
+executeCommand(OSCommand.USE_PATH" + <my_program>, <arg1>, <arg2>)
+```
+
 ### 4 Write a cucumber test ###
 Cucumber styled tests rely on a `.feature` file where each test step is defined. Look at [https://cucumber.io/docs/gherkin/reference/](https://cucumber.io/docs/gherkin/reference/) for more information about writing a feature file.
 
