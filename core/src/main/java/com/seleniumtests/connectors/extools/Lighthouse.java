@@ -3,6 +3,7 @@ package com.seleniumtests.connectors.extools;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -15,7 +16,6 @@ import org.apache.commons.io.FileUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.google.common.io.Files;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
@@ -40,7 +40,7 @@ public class Lighthouse {
 	private int port;
 	private String outputPath;
 	private Path storagePath;
-	private boolean available = false;
+	private Boolean available = null;
 	private File jsonReport;
 	private File htmlReport;
 	private File logs;
@@ -67,10 +67,16 @@ public class Lighthouse {
 	 * @param outputPath	base name of files lighthouse will produce. We will get 2 files: <outputPath>.report.html and <outputPath>.report.json
 	 */
 	public Lighthouse(int port, String outputPath) {
-		this.available = isInstalled();
 		this.port = port;
 		this.outputPath = outputPath;
 		this.storagePath = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), LIGHTHOUSE_FOLDER) ;
+	}
+	
+	public boolean isAvailable() {
+		if (available == null) {
+			available = isInstalled();
+		}
+		return available;
 	}
 	
 	private boolean isInstalled() {
@@ -79,12 +85,12 @@ public class Lighthouse {
 	}
 	
 	public void execute(String url, List<String> options) {
-		
+
 		jsonReport = null;
 		htmlReport = null;
 		logs = null;
 		
-		if (!available) {
+		if (!isAvailable()) {
 			throw new ScenarioException("Lighthouse not available");
 		}
 		
@@ -121,8 +127,10 @@ public class Lighthouse {
 		
 			// get result	
 			jsonReport = storagePath.resolve(baseName + ".json").toFile();
+			
 			try {
-				Files.move(jsonFile, jsonReport);
+				FileUtils.createParentDirectories(jsonReport);
+				Files.move(jsonFile.toPath(), jsonReport.toPath());
 			} catch (IOException e) {
 				jsonReport = jsonFile;
 			}
@@ -132,7 +140,8 @@ public class Lighthouse {
 			
 			htmlReport = storagePath.resolve(baseName + ".html").toFile();
 			try {
-				Files.move(htmlFile, htmlReport);
+				FileUtils.createParentDirectories(htmlReport);
+				Files.move(htmlFile.toPath(), htmlReport.toPath());
 			} catch (IOException e) {
 				htmlReport = htmlFile;
 			}
@@ -170,5 +179,13 @@ public class Lighthouse {
 
 	public File getLogs() {
 		return logs;
+	}
+
+	public int getPort() {
+		return port;
+	}
+
+	public String getOutputPath() {
+		return outputPath;
 	}
 }

@@ -65,7 +65,7 @@ public class LighthouseFactory {
 		if (portMatcher.matches()) {
 			return new Lighthouse(Integer.parseInt(portMatcher.group(1)), outputDir);
 		} else {
-			throw new ConfigurationException("Lighthouse cannot be used with the browser, --remote-debugging-port option is not set");
+			throw new ConfigurationException("Lighthouse cannot be used with the browser, Chrome dev tools not present");
 		}
 	}
 }
