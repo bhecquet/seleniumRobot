@@ -193,10 +193,11 @@ public class OSUtilityWindows extends OSUtility {
 	 * @return
 	 */
 	public String getEdgeVersionFromFolder(String edgePath) {
-		if (!new File(edgePath).exists()) {
+		File parentFolder = Paths.get(edgePath).toFile();
+		if (!parentFolder.exists()) {
 			throw new ConfigurationException("Edge version could not be get from folder, edge path does not exist");
 		}
-		for (File file: new File(edgePath.replace(MSEDGE_EXE, "")).listFiles()) {
+		for (File file: parentFolder.listFiles()) {
 			if (file.isDirectory() && file.getName().matches("^\\d++.*")) {
 				return file.getName();
 			}
@@ -260,6 +261,14 @@ public class OSUtilityWindows extends OSUtility {
 			}
 		}
 		return firefoxInstallations;
+	}
+	
+	private String getEdgeChromiumPath() {
+		try {
+			return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "InstallLocation");
+		} catch (Win32Exception e) {
+			return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\App Paths\\msedge.exe", "Path");
+		}
 	}
 
 	@Override
@@ -330,7 +339,7 @@ public class OSUtilityWindows extends OSUtility {
 		// look for edge chromium
 		try {
 			browserList.put(BrowserType.EDGE, new ArrayList<>());
-			String edgePath = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "InstallLocation");
+			String edgePath = getEdgeChromiumPath();
 			String version = getWindowsEdgeVersion(edgePath);
 			
 			if (version != null && !version.isEmpty()) {
