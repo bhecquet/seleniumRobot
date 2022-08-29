@@ -407,7 +407,7 @@
 			            <phase>generate-sources</phase>
 			            <configuration>
 			                <target>
-			                    <echo file="${project.basedir}/target/classes/${project.artifactId}-version.txt">${project.version}</echo>
+			                    <echo file="${project.basedir}/target/classes/core-version.txt">${project.version}</echo>
 			                </target>
 			            </configuration>
 			            <goals>
