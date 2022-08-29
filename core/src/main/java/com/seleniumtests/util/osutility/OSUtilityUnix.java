@@ -208,7 +208,7 @@ public class OSUtilityUnix extends OSUtility {
 	@Override
 	public Charset getConsoleCharset() {
 		try {
-			return Charset.forName(OSCommand.executeCommandAndWait("locale charmap", -1, StandardCharsets.UTF_8).trim());
+			return Charset.forName(OSCommand.executeCommandAndWait(new String[] {"locale", "charmap"}, -1, StandardCharsets.UTF_8).trim());
 		} catch (Exception e) {
 			return Charset.defaultCharset();
 		}

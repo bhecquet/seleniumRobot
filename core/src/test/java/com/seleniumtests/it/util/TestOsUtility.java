@@ -286,27 +286,6 @@ public class TestOsUtility extends GenericTest {
 		}
 	}
 	
-	/**
-	 * Check that command is stopped before end
-	 */
-	@Test(groups={"it"})
-	public void testExecuteCommandAndWait() {
-		if (OSUtility.isWindows()) {
-			String out = OSCommand.executeCommandAndWait("ping localhost -n 10", 5, null);
-			Assert.assertEquals(out.split("\n").length, 7);
-		}
-	}
-	
-	/**
-	 * Check that command is stopped after end
-	 */
-	@Test(groups={"it"})
-	public void testExecuteCommandAndWaitEnd() {
-		if (OSUtility.isWindows()) {
-			String out = OSCommand.executeCommandAndWait("ping localhost -n 4", 10, null);
-			Assert.assertEquals(out.split("\n").length, 11); // we went to the end of the program, so more result lines are added
-		}
-	}
 
 	@Test(groups={"it"})
 	public void testKillProcess() {

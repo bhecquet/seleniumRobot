@@ -24,11 +24,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.nio.charset.Charset;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
@@ -53,7 +50,6 @@ import org.testng.annotations.Test;
 import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
-import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 import kong.unirest.GetRequest;
@@ -61,7 +57,7 @@ import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
 
 
-@PrepareForTest({HttpClients.class, TestLogging.class, Unirest.class})
+@PrepareForTest({HttpClients.class, Unirest.class})
 public class TestSeleniumGridConnector extends ConnectorsTest {
 
 	@Mock
@@ -90,7 +86,6 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 	@BeforeMethod(groups={"ut"})
 	private void init() throws ClientProtocolException, IOException {
 		PowerMockito.mockStatic(HttpClients.class);
-		PowerMockito.mockStatic(TestLogging.class);
 		
 		when(HttpClients.createDefault()).thenReturn(client);
 		when(response.getEntity()).thenReturn(entity);
