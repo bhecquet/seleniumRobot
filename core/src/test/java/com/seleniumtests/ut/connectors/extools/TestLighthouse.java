@@ -111,6 +111,7 @@ public class TestLighthouse extends MockitoTest {
 		Assert.assertNotNull(lighthouse.getJsonReport());
 		Assert.assertTrue(lighthouse.getJsonReport().canRead());
 		Assert.assertEquals(FileUtils.readFileToString(lighthouse.getJsonReport(), StandardCharsets.UTF_8), "{}");
+		logger.info("chemin fichier: " + lighthouse.getJsonReport().toString());
 		Assert.assertTrue(lighthouse.getJsonReport().toString().replace(File.separator, "/").contains("test-output/testLighthouseExecute/lighthouse/http.myurl.com"));
 		Assert.assertNotNull(lighthouse.getHtmlReport());
 		Assert.assertTrue(lighthouse.getHtmlReport().canRead());
