@@ -1,9 +1,7 @@
 package com.seleniumtests.util.osutility;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
 import org.apache.commons.io.IOUtils;
@@ -32,7 +30,7 @@ class StreamGobbler extends Thread {
         try 
         {
 
-            while (started) {
+            while (started && is != null) {
 	            int isAvailable = is.available();
 	        	if (isAvailable > 0) {
 	        		byte[] b = new byte[isAvailable];

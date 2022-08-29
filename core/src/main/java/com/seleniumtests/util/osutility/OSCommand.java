@@ -39,28 +39,122 @@ public class OSCommand {
 	private static final Logger logger = SeleniumRobotLogger.getLogger(OSCommand.class);
 	public static final String USE_PATH = "_USE_PATH_";	
 	
-	private OSCommand() {
-		// class with static methods
+	private List<String> cmdList;
+	private String cmdString;
+	private int timeout;
+	private Charset charset;
+	private ProcessBuilder pb;
+	private Runtime runtime;
+	
+	public OSCommand(List<String> cmdList) {
+		this(cmdList, -1, null);
+	}
+	
+	public OSCommand(List<String> cmdList, int timeout, Charset charset) {
+		this(cmdList, timeout, charset, new ProcessBuilder());
+	}
+	
+	public OSCommand(List<String> cmdList, int timeout, Charset charset, ProcessBuilder pb) {
+		
+		this.timeout = timeout;
+		this.charset = charset;
+		this.pb = pb;
+		this.cmdList = cmdList;
+	}
+	
+	/**
+	 * Execute a process, giving the full command as a String (useful when command uses pipe, for example)
+	 * @param cmdString
+	 * @param timeout
+	 * @param charset
+	 * @param pb
+	 */
+	public OSCommand(String cmdString, int timeout, Charset charset) {
+		this(cmdString, timeout, charset, Runtime.getRuntime());
+	}
+	public OSCommand(String cmdString, int timeout, Charset charset, Runtime runtime) {
+		
+		this.timeout = timeout;
+		this.charset = charset;
+		this.cmdString = cmdString;
+		this.runtime = runtime;
+	}
+	
+	/**
+	 * Search a program in windows path
+	 * Throw an exception if it cannot be found
+	 * @param command
+	 * @return
+	 */
+	public String searchInWindowsPath(String command) {
+		String out = new OSCommand(Arrays.asList("where", command), timeout, charset, pb).execute(); 
+		try {
+			return out.split("\n")[out.split("\n").length - 1].trim();
+			
+		} catch (IndexOutOfBoundsException e) {
+			throw new ScenarioException(String.format("Program %s is not in the path", command));
+		}
+	}
+
+	/**
+	 * Update command list
+	 * @param cmd
+	 * @return
+	 */
+	private List<String> updateCommand(List<String> cmd) {
+		List<String> newCmd = new ArrayList<>(cmd);
+		
+		if (newCmd.get(0).startsWith(USE_PATH)) {
+			newCmd.set(0, newCmd.get(0).replace(USE_PATH, ""));
+			
+			if (OSUtility.isWindows()) {
+				String path = searchInWindowsPath(newCmd.get(0));
+				newCmd.set(0, path);
+			}
+		}
+		return newCmd;
+	}
+	
+	/**
+	 * Execute the process and wait for termination
+	 * @return
+	 */
+	public String execute() {
+		Process proc = executeNoWait();
+		return waitProcessTermination(proc, timeout, charset);
+	}
+	
+	
+	/**
+	 * Executes the command and returns the process
+	 * @return
+	 */
+	public Process executeNoWait() {
+		if (cmdList != null) {
+			cmdList = updateCommand(cmdList);
+			pb.command(cmdList);
+			
+			try {
+				return pb.start();
+			} catch (IOException e) {
+				throw new CustomSeleniumTestsException("cannot start process: " + cmdList.get(0), e);
+			}
+		} else {
+			try {
+				return runtime.exec(cmdString);
+			} catch (IOException e) {
+				throw new CustomSeleniumTestsException("cannot execute command: " + cmdString, e);
+			}
+		}
+		
 	}
 	
 	public static Process executeCommand(final String cmd) {
-		Process proc;
-        try {
-			proc = Runtime.getRuntime().exec(cmd);
-			return proc;
-        } catch (IOException e1) {
-        	throw new CustomSeleniumTestsException("cannot start process: " + cmd, e1);
-        }
+		return new OSCommand(cmd, -1, null).executeNoWait();
 	}
 	
 	public static Process executeCommand(final String[] cmd) {
-		Process proc;
-		try {
-			proc = Runtime.getRuntime().exec(cmd);
-			return proc;
-		} catch (IOException e1) {
-			throw new CustomSeleniumTestsException("cannot start process: " + cmd, e1);
-		}
+		return new OSCommand(Arrays.asList(cmd), -1, null).executeNoWait();		
 	}
 	
 	/**
@@ -82,34 +176,7 @@ public class OSCommand {
      * @return 
      */
    	public static String executeCommandAndWait(final String[] cmd, int timeout, Charset charset) {
-        
-   		List<String> newCmd = new ArrayList<>(Arrays.asList(cmd));
-   		
-   		if (newCmd.get(0).startsWith(USE_PATH)) {
-   			newCmd.set(0, newCmd.get(0).replace(USE_PATH, ""));
-   			
-   	    	if (OSUtility.isWindows()) {
-   	    		String out = executeCommandAndWait(new String[] {"where", newCmd.get(0)});
-   	    		try {
-   	    			String path = out.split("\n")[out.split("\n").length - 1].trim();
-   	    			newCmd.set(0, path);
-   	    		} catch (IndexOutOfBoundsException e) {
-   	    			throw new ScenarioException(String.format("Program %s is not in the path", newCmd.get(0)));
-   	    		}
-
-   	    	}
-   		}
-   		
-        try {
-        	ProcessBuilder pb = new ProcessBuilder(newCmd);
-        	Process proc = pb.start();
-			return waitProcessTermination(proc, timeout, charset);
-			
-        } catch (IOException e) {
-        	logger.error(e);
-        } 
-        
-        return "";
+        return new OSCommand(Arrays.asList(cmd), timeout, charset).execute();
     }
     
     /**
@@ -130,19 +197,10 @@ public class OSCommand {
      * @return 
      */
     public static String executeCommandAndWait(final String cmd, int timeout, Charset charset) {
-
-        try {
-			Process proc = Runtime.getRuntime().exec(cmd);
-			return waitProcessTermination(proc, timeout, charset);
-			
-        } catch (IOException e1) {
-        	logger.error(e1);
-        } 
-        
-        return "";
+    	return new OSCommand(cmd, timeout, charset).execute();
     }
     
-    private static String waitProcessTermination(Process proc, int timeout, Charset charset) {
+    public String waitProcessTermination(Process proc, int timeout, Charset charset) {
 
     	try {
 
