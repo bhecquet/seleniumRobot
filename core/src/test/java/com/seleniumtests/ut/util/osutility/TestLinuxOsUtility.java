@@ -17,12 +17,15 @@
  */
 package com.seleniumtests.ut.util.osutility;
 
+import static org.mockito.ArgumentMatchers.anyString;
+
 import static org.mockito.Mockito.when;
 import static org.testng.Assert.assertEquals;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -64,11 +67,17 @@ public class TestLinuxOsUtility extends MockitoTest {
 	@BeforeClass(groups = {"ut"})
     public void isWindows() throws Exception {
     	PowerMockito.mockStatic(OSUtility.class);
+    	
 		when(OSUtility.getCharset()).thenCallRealMethod();
 		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.LINUX);
 		PowerMockito.doCallRealMethod().when(OSUtility.class, "refreshBrowserList", false);
 		PowerMockito.doCallRealMethod().when(OSUtility.class, "resetInstalledBrowsersWithVersion");
-		when(OSUtility.getInstalledBrowsersWithVersion(false)).thenCallRealMethod();
+		when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(new HashMap<>());
+		
+		PowerMockito.when(OSUtility.isWindows()).thenReturn(false);
+		PowerMockito.when(OSUtility.isMac()).thenReturn(false);
+		PowerMockito.when(OSUtility.extractChromeVersion(anyString())).thenCallRealMethod();
+		PowerMockito.when(OSUtility.extractChromeOrChromiumVersion(anyString())).thenCallRealMethod();
     }
 	
 	
@@ -207,6 +216,7 @@ public class TestLinuxOsUtility extends MockitoTest {
 		when(path.toFile()).thenReturn(browserFile);
 		when(browserFile.exists()).thenReturn(true);
 		
+		when(OSUtility.getChromeVersion("google-chrome")).thenReturn("Google Chrome 103.0.2987.110");
 		when(OSCommand.executeCommandAndWait("which google-chrome")).thenReturn("/usr/local/bin/google-chrome");
 		when(OSCommand.executeCommandAndWait(new String[] {"google-chrome", "--version"})).thenReturn("Google Chrome 57.0.2987.110");
 		
@@ -242,10 +252,11 @@ public class TestLinuxOsUtility extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setAttribute(SeleniumTestsContext.CHROME_BINARY_PATH, "/usr/local/bin/google-chrome-binary");
 
 		OSUtility.resetInstalledBrowsersWithVersion();
+		when(OSUtility.getInstalledBrowsersWithVersion(false)).thenCallRealMethod(); // we want the real behaviour so that configureContext does its job
 		SeleniumTestsContextManager.getThreadContext().configureContext(Reporter.getCurrentTestResult());
-		Map<BrowserType, List<BrowserInfo>> browsersBinary = OSUtilityUnix.getInstalledBrowsersWithVersion(false);
+		Map<BrowserType, List<BrowserInfo>> browsersBinary = new OSUtilityUnix().getInstalledBrowsersWithVersion(false);
 
-		assertEquals(browsersBinary.size(), 2); // chrome & htmlunit
+		assertEquals(browsersBinary.size(), 2); // chrome
 		assertEquals(browsersBinary.get(BrowserType.CHROME).size(), 2);
 		browsersBinary.get(BrowserType.CHROME).get(0).getVersion();
 	}

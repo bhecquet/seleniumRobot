@@ -531,12 +531,16 @@ public class SeleniumTestsContext {
     	
     	if (getFirefoxBinPath() != null) {
     		String version = OSUtility.getFirefoxVersion(getFirefoxBinPath());
-    		installedBrowsers.get(BrowserType.FIREFOX).add(new BrowserInfo(BrowserType.FIREFOX, OSUtility.extractFirefoxVersion(version), getFirefoxBinPath()));
+    		List<BrowserInfo> infos = installedBrowsers.getOrDefault(BrowserType.FIREFOX, new ArrayList<>());
+    		infos.add(new BrowserInfo(BrowserType.FIREFOX, OSUtility.extractFirefoxVersion(version), getFirefoxBinPath()));
+    		installedBrowsers.put(BrowserType.FIREFOX, infos);
     	}
     	
     	if (getChromeBinPath() != null) {
     		String version = OSUtility.getChromeVersion(getChromeBinPath());
-    		installedBrowsers.get(BrowserType.CHROME).add(new BrowserInfo(BrowserType.CHROME, OSUtility.extractChromeOrChromiumVersion(version), getChromeBinPath()));
+    		List<BrowserInfo> infos = installedBrowsers.getOrDefault(BrowserType.CHROME, new ArrayList<>());
+    		infos.add(new BrowserInfo(BrowserType.CHROME, OSUtility.extractChromeOrChromiumVersion(version), getChromeBinPath()));
+    		installedBrowsers.put(BrowserType.CHROME, infos);
     	}
     }
     
