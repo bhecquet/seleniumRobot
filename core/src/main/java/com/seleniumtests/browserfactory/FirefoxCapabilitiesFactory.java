@@ -100,7 +100,7 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
 		
         FirefoxProfile profile = getFirefoxProfile();
         configProfile(profile, webDriverConfig);
-        options.setCapability(FirefoxDriver.Capability.PROFILE, profile);
+        ((FirefoxOptions)options).setProfile(profile);
         
         // extensions
         List<BrowserExtension> extensions = BrowserExtension.getExtensions(webDriverConfig.getTestContext().getConfiguration());
@@ -192,7 +192,7 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
 		FirefoxProfile profile = new FirefoxProfile();
 		if (webDriverConfig.getFirefoxProfilePath() != null) {
         	if (BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getFirefoxProfilePath()) || webDriverConfig.getFirefoxProfilePath().contains("/") || webDriverConfig.getFirefoxProfilePath().contains("\\")) {
-        		options.setCapability("firefoxProfile", webDriverConfig.getFirefoxProfilePath());
+        		options.setCapability(SeleniumRobotCapabilityType.FIREFOX_PROFILE, webDriverConfig.getFirefoxProfilePath());
         	} else {
         		logger.warn(String.format("Firefox profile %s could not be set", webDriverConfig.getFirefoxProfilePath()));
         	}

@@ -55,4 +55,9 @@ public interface SeleniumRobotCapabilityType {
 	 * Path to the edge profile (or "default" to use the default user profile)
 	 */
 	String EDGE_PROFILE = "sr:edgeProfile";
+	
+	/**
+	 * Path to the edge profile (or "default" to use the default user profile)
+	 */
+	String FIREFOX_PROFILE = "sr:firefoxProfile";
 }
