@@ -20,6 +20,7 @@ package com.seleniumtests.ut.browserfactory;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -153,7 +154,7 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testCreateDefaultMarionetteCapabilities() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	public void testCreateDefaultMarionetteCapabilities() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, IOException {
 
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		when(config.isSetAcceptUntrustedCertificates()).thenReturn(true);
@@ -164,7 +165,9 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "firefox");
 		Assert.assertEquals(capa.getCapability(FirefoxDriver.Capability.MARIONETTE), true);
 		
-		FirefoxProfile profile = (FirefoxProfile)capa.getCapability(FirefoxDriver.Capability.PROFILE);
+		FirefoxProfile profile = FirefoxProfile.fromJson((String) ((Map<String, Object>) capa
+				.getCapability(FirefoxOptions.FIREFOX_OPTIONS))
+				.get("profile"));
 		
 		// check profile
 		Field fieldAcceptUntrustedCerts = FirefoxProfile.class.getDeclaredField("acceptUntrustedCerts");
@@ -183,14 +186,16 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testCreateMarionetteCapabilitiesOverrideUserAgent() {
+	public void testCreateMarionetteCapabilitiesOverrideUserAgent() throws IOException {
 		
 		when(config.getUserAgentOverride()).thenReturn("FIREFOX 55");
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
-		FirefoxProfile profile = (FirefoxProfile)capa.getCapability(FirefoxDriver.Capability.PROFILE);
+		FirefoxProfile profile = FirefoxProfile.fromJson((String) ((Map<String, Object>) capa
+				.getCapability(FirefoxOptions.FIREFOX_OPTIONS))
+				.get("profile"));
 		
 		// check profile
 		Assert.assertEquals(profile.getStringPreference("general.useragent.override", ""), "FIREFOX 55");
@@ -222,28 +227,32 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testCreateMarionetteCapabilitiesOverrideNtlmAuth() {
+	public void testCreateMarionetteCapabilitiesOverrideNtlmAuth() throws IOException {
 		
 		when(config.getNtlmAuthTrustedUris()).thenReturn("uri://uri.ntlm");
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
-		FirefoxProfile profile = (FirefoxProfile)capa.getCapability(FirefoxDriver.Capability.PROFILE);
+		FirefoxProfile profile = FirefoxProfile.fromJson((String) ((Map<String, Object>) capa
+				.getCapability(FirefoxOptions.FIREFOX_OPTIONS))
+				.get("profile"));
 		
 		// check profile
 		Assert.assertEquals(profile.getStringPreference("network.automatic-ntlm-auth.trusted-uris", ""), "uri://uri.ntlm");
 	}
 	
 	@Test(groups={"ut"})
-	public void testCreateMarionetteCapabilitiesOverrideDownloadDir() {
+	public void testCreateMarionetteCapabilitiesOverrideDownloadDir() throws IOException {
 		
 		when(config.getBrowserDownloadDir()).thenReturn("/home/download");
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
-		FirefoxProfile profile = (FirefoxProfile)capa.getCapability(FirefoxDriver.Capability.PROFILE);
+		FirefoxProfile profile = FirefoxProfile.fromJson((String) ((Map<String, Object>) capa
+				.getCapability(FirefoxOptions.FIREFOX_OPTIONS))
+				.get("profile"));
 		
 		// check profile
 		Assert.assertEquals(profile.getStringPreference("browser.download.dir", ""), "/home/download");
@@ -254,16 +263,19 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 	
 	/**
 	 * issue #365: Check DownloadDir is not set in remote
+	 * @throws IOException 
 	 */
 	@Test(groups={"ut"})
-	public void testCreateMarionetteCapabilitiesNoOverrideDownloadDirRemote() {
+	public void testCreateMarionetteCapabilitiesNoOverrideDownloadDirRemote() throws IOException {
 		
 		when(config.getBrowserDownloadDir()).thenReturn("/home/download");
 		when(config.getMode()).thenReturn(DriverMode.GRID);
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
-		FirefoxProfile profile = (FirefoxProfile)capa.getCapability(FirefoxDriver.Capability.PROFILE);
+		FirefoxProfile profile = FirefoxProfile.fromJson((String) ((Map<String, Object>) capa
+				.getCapability(FirefoxOptions.FIREFOX_OPTIONS))
+				.get("profile"));
 		
 		// check profile
 		Assert.assertEquals(profile.getStringPreference("browser.download.dir", ""), "");
@@ -319,7 +331,7 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
 		// check 'firefoxProfile' is set to 'default'
-		Assert.assertEquals(capa.getCapability("firefoxProfile"), BrowserInfo.DEFAULT_BROWSER_PRODFILE);
+		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.FIREFOX_PROFILE), BrowserInfo.DEFAULT_BROWSER_PRODFILE);
 	}
 	
 	@Test(groups={"ut"})
@@ -331,7 +343,7 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
 		// check 'firefoxProfile' is set to user profile
-		Assert.assertEquals(capa.getCapability("firefoxProfile"), "/home/user/profile");
+		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.FIREFOX_PROFILE), "/home/user/profile");
 	}
 	
 	@Test(groups={"ut"})
@@ -342,7 +354,7 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
 		// check 'firefoxProfile' is no set when not requested
-		Assert.assertNull(capa.getCapability("firefoxProfile"));
+		Assert.assertNull(capa.getCapability(SeleniumRobotCapabilityType.FIREFOX_PROFILE));
 	}
 	
 	@Test(groups={"ut"})
@@ -354,7 +366,7 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
 		// check 'firefoxProfile' is not set if name is not valid
-		Assert.assertNull(capa.getCapability("firefoxProfile"));
+		Assert.assertNull(capa.getCapability(SeleniumRobotCapabilityType.FIREFOX_PROFILE));
 	}
 	
 }
