@@ -28,7 +28,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -90,7 +90,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions"}, "core_3,core_4", "");
 		
-		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
+		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"), StandardCharsets.UTF_8);
 		Assert.assertTrue(mainReportContent.contains(">core_3</a>"));
 		Assert.assertTrue(mainReportContent.contains(">core_4</a>"));
 		Assert.assertTrue(mainReportContent.contains(">testAndSubActions</a>"));
@@ -135,7 +135,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testFailedWithException"});
 			
 			// check get variables has been called once for each retry
-			verify(variableServer, times(3)).getVariables(0);
+			verify(variableServer, times(3)).getVariables(0, -1);
 			verify(variableServer, times(3)).unreserveVariables(anyList());
 			
 		} finally {
@@ -230,7 +230,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testFailedWithException"});
 			
 			// check get variables has been called once for each retry
-			verify(variableServer).getVariables(0);
+			verify(variableServer).getVariables(0, -1);
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
@@ -456,7 +456,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		Assert.assertFalse(logs.contains("start test"));
 		
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
-		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
+		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile(), StandardCharsets.UTF_8));
 		
 		// All tests should be skipped because configuration method is skipped
 		Assert.assertEquals(jsonResult.getInt("skip"), 2);
@@ -488,7 +488,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
-		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
+		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile(), StandardCharsets.UTF_8));
 		
 		// All tests should be skipped because configuration method is skipped
 		Assert.assertEquals(jsonResult.getInt("skip"), 2);
@@ -521,7 +521,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 		
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
-		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
+		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile(), StandardCharsets.UTF_8));
 		
 		// All tests should be skipped because configuration method is skipped
 		Assert.assertEquals(jsonResult.getInt("skip"), 2);
@@ -556,7 +556,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 		
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
-		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
+		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile(), StandardCharsets.UTF_8));
 		
 		// All tests should not be skipped
 		Assert.assertEquals(jsonResult.getInt("skip"), 0);
@@ -593,7 +593,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		Assert.assertTrue(logs.contains("test 2"));
 		
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
-		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
+		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile(), StandardCharsets.UTF_8));
 		
 		// All tests should be skipped because configuration method is skipped
 		Assert.assertEquals(jsonResult.getInt("pass"), 2);
@@ -629,7 +629,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		Assert.assertTrue(logs.contains("end method"));
 		
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
-		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
+		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile(), StandardCharsets.UTF_8));
 		
 		// All tests should be skipped because configuration method is skipped
 		Assert.assertEquals(jsonResult.getInt("pass"), 2);
@@ -666,7 +666,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 		
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
-		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
+		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile(), StandardCharsets.UTF_8));
 		
 		// All tests should be skipped because configuration method is skipped
 		Assert.assertEquals(jsonResult.getInt("pass"), 2);
@@ -704,7 +704,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 		
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
-		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
+		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile(), StandardCharsets.UTF_8));
 		
 		// All tests should be skipped because configuration method is skipped
 		Assert.assertEquals(jsonResult.getInt("pass"), 2);
@@ -910,7 +910,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
 			
-			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			configureMockedSnapshotServerConnection();
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false}");		
 			
 			// say that snapshot comparison if failed when checking individual snapshots
@@ -945,7 +945,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
 			
-			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			configureMockedSnapshotServerConnection();
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false}");		
 			
 			// say that snapshot comparison if failed when checking individual snapshots

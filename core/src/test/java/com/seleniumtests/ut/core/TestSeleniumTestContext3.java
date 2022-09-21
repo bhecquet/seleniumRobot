@@ -18,11 +18,10 @@
 package com.seleniumtests.ut.core;
 
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -32,7 +31,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.JSONObject;
 import org.mockito.Mock;
 import org.openqa.selenium.remote.SessionId;
 import org.powermock.api.mockito.PowerMockito;
@@ -346,7 +344,7 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 					.withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null))
 					.thenReturn(variableServer);
 			when(variableServer.isAlive()).thenReturn(true);
-			when(variableServer.getVariables(0)).thenReturn(variables);
+			when(variableServer.getVariables(0, -1)).thenReturn(variables);
 			System.setProperty("key1", "userValue");
 
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
@@ -383,7 +381,7 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 					.withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null))
 					.thenReturn(variableServer);
 			when(variableServer.isAlive()).thenReturn(true);
-			when(variableServer.getVariables(0)).thenReturn(variables);
+			when(variableServer.getVariables(0, -1)).thenReturn(variables);
 
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
 			initThreadContext(testNGCtx, "myTest", testResult);
@@ -395,6 +393,44 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 		} finally {
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+		}
+	}
+	
+	/**
+	 * Check we use the parameter "seleniumRobotServerVariablesReservation" provided by user
+	 * @param testNGCtx
+	 * @param xmlTest
+	 * @throws Exception
+	 */
+	@Test(groups = { "ut" })
+	public void testVariablesFromVariableServerWithReservationDuration(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+		
+		Map<String, TestVariable> variables = new HashMap<>();
+		variables.put("key1", new TestVariable("key1", "val1"));
+		
+		try {
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_VARIABLES_RESERVATION, "300");
+			
+			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class)
+			.withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null))
+			.thenReturn(variableServer);
+			when(variableServer.isAlive()).thenReturn(true);
+			when(variableServer.getVariables(0, 300)).thenReturn(variables);
+			
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			initThreadContext(testNGCtx, "myTest", testResult);
+			
+			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
+			seleniumTestsCtx.configureContext(testResult);
+			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key1").getValue(), "val1");
+			verify(variableServer).getVariables(0, 300);
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_VARIABLES_RESERVATION);
 		}
 	}
 
@@ -420,7 +456,7 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 					.withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null))
 					.thenReturn(variableServer);
 			when(variableServer.isAlive()).thenReturn(true);
-			when(variableServer.getVariables(0)).thenReturn(variables);
+			when(variableServer.getVariables(0, -1)).thenReturn(variables);
 
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
 			initThreadContext(testNGCtx, "myTest", testResult);
@@ -431,7 +467,7 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 			seleniumTestsCtx.setTestConfiguration();
 			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key").getValue(), "val1");
 
-			verify(variableServer).getVariables(0);
+			verify(variableServer).getVariables(0, -1);
 
 		} finally {
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
@@ -462,7 +498,7 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 					.withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null))
 					.thenReturn(variableServer);
 			when(variableServer.isAlive()).thenReturn(true);
-			when(variableServer.getVariables(0)).thenReturn(variables);
+			when(variableServer.getVariables(0, -1)).thenReturn(variables);
 
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
 			initThreadContext(testNGCtx, "myTest", testResult);
@@ -477,7 +513,7 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 			Assert.assertEquals(seleniumTestsCtx2.getConfiguration().get("key").getValue(), "val1");
 
 			// only one call, done by first context init, further retrieving is forbidden
-			verify(variableServer).getVariables(0);
+			verify(variableServer).getVariables(0, -1);
 
 		} finally {
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
@@ -549,7 +585,7 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 					.withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null))
 					.thenReturn(variableServer);
 			when(variableServer.isAlive()).thenReturn(true);
-			when(variableServer.getVariables(0)).thenReturn(variables);
+			when(variableServer.getVariables(0, -1)).thenReturn(variables);
 
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
 			initThreadContext(testNGCtx, "myTest", testResult);
@@ -566,7 +602,7 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 
 			// 2 calls, one for each context because we allow variable retrieving when
 			// copying
-			verify(variableServer, times(2)).getVariables(0);
+			verify(variableServer, times(2)).getVariables(0, -1);
 
 		} finally {
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);

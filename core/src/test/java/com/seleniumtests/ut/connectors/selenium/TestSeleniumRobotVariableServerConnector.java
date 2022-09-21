@@ -17,8 +17,7 @@
  */
 package com.seleniumtests.ut.connectors.selenium;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -44,8 +43,6 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
-import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
@@ -214,14 +211,71 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
 	}
 	
+	/**
+	 * Check default behaviour with query parameters
+	 * 
+	 * @throws UnirestException
+	 */
 	@Test(groups= {"ut"})
-	public void testFetchVariable() throws UnirestException {
+	public void testGetVariables() throws UnirestException {
 		
 		configureMockedVariableServerConnection();
 		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
 		Map<String, TestVariable> variables = connector.getVariables();
 		Assert.assertEquals(variables.get("key1").getValue(), "value1");
 		Assert.assertEquals(variables.get("key2").getValue(), "value2");
+		
+		verify(variablesRequest).queryString("reserve", true);
+		verify(variablesRequest).queryString("version", 4);
+		verify(variablesRequest).queryString("environment", 2);
+		verify(variablesRequest).queryString("test", 3);
+		verify(variablesRequest).queryString("olderThan", 0);
+		verify(variablesRequest).queryString("format", "json");
+		verify(variablesRequest, never()).queryString(eq("reservationDuration"), anyInt());
+		verify(variablesRequest, never()).queryString(eq("name"), anyString());
+		verify(variablesRequest, never()).queryString(eq("value"), anyString());
+	}
+	
+	/**
+	 * Check reservation delay is sent to server in seconds (whereas we provide it in minutes)
+	 * @throws UnirestException
+	 */
+	@Test(groups= {"ut"})
+	public void testGetVariablesWithReservationDelay() throws UnirestException {
+		
+		configureMockedVariableServerConnection();
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		Map<String, TestVariable> variables = connector.getVariables(0, 30);
+		Assert.assertEquals(variables.get("key1").getValue(), "value1");
+		Assert.assertEquals(variables.get("key2").getValue(), "value2");
+		
+		verify(variablesRequest).queryString("reservationDuration", 1800);
+	}
+	
+	@Test(groups= {"ut"})
+	public void testGetVariablesByName() throws UnirestException {
+		
+		configureMockedVariableServerConnection();
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		Map<String, TestVariable> variables = connector.getVariables("foo", null);
+		Assert.assertEquals(variables.get("key1").getValue(), "value1");
+		Assert.assertEquals(variables.get("key2").getValue(), "value2");
+
+		verify(variablesRequest).queryString("name", "foo");
+		verify(variablesRequest, never()).queryString(eq("value"), anyString());
+	}
+	
+	@Test(groups= {"ut"})
+	public void testGetVariablesByValue() throws UnirestException {
+		
+		configureMockedVariableServerConnection();
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		Map<String, TestVariable> variables = connector.getVariables(null, "bar");
+		Assert.assertEquals(variables.get("key1").getValue(), "value1");
+		Assert.assertEquals(variables.get("key2").getValue(), "value2");
+		
+		verify(variablesRequest, never()).queryString(eq("name"), anyString());
+		verify(variablesRequest).queryString("value", "bar");
 	}
 	
 	/**
@@ -229,7 +283,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"}, expectedExceptions = SeleniumRobotServerException.class)
-	public void testFetchVariableFailed() throws UnirestException {
+	public void testGetVariablesFailed() throws UnirestException {
 
 		configureMockedVariableServerConnection();
 		createServerMock(SERVER_URL, "GET", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 404, "{}");
@@ -241,7 +295,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	}
 	
 	@Test(groups= {"ut"}, expectedExceptions = SeleniumRobotServerException.class)
-	public void testFetchVariableWithNetworkError() throws UnirestException {
+	public void testGetVariablesWithNetworkError() throws UnirestException {
 		
 		configureMockedVariableServerConnection();
 		HttpRequest<HttpRequest> req =  createServerMock(SERVER_URL, "GET", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, "{}");
