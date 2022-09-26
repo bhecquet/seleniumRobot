@@ -21,27 +21,31 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.testng.annotations.Test;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.Node.TreeTraversal;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.comments.Comment;
@@ -51,11 +55,12 @@ import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.util.StringUtility;
 
 /**
  * Class for creating test documentation, which can be imported into confluence through API
  * It generates a template.confluence file which contains the formatted javadoc for each Test method and step
- * @author s047432
+ * https://support.atlassian.com/confluence-cloud/docs/insert-confluence-wiki-markup/
  *
  */
 public class AppTestDocumentation {
@@ -94,26 +99,14 @@ public class AppTestDocumentation {
 			rootFolder = rootFolders.get(0);
 		}
 		
-		javadoc.append("\n{toc}\n\n");
-		javadoc.append("${project.summary}\n");
-		javadoc.append("h1. Tests\n");
-		try (Stream<Path> files = Files.walk(rootFolder)) {
-			List<Path> testsFolders = files
-		        .filter(Files::isDirectory)
-		        .filter(p -> p.getFileName().toString().equals("tests"))
-		        .collect(Collectors.toList());
-			
-			for (Path testsFolder: testsFolders) {
-				exploreTests(testsFolder.toFile());
-			}
-			
-			
-		} catch (IndexOutOfBoundsException e) {
-			throw new ConfigurationException("no 'tests' sub-package found");
-		}
+		javadoc.append("<h1>\n"
+				+ "<ac:structured-macro ac:macro-id=\"723cab2f-15e1-4b30-a536-80defee1b817\" ac:name=\"toc\" ac:schema-version=\"1\"/>"
+				+ "</h1>");
 		
-		javadoc.append("----");
-		javadoc.append("h1. Pages\n");
+		javadoc.append("${project.summary}\n");
+		
+		StringBuilder pagesDoc = new StringBuilder();
+		pagesDoc.append("<h1>Pages</h1>\n");
 		try (Stream<Path> files = Files.walk(rootFolder)) {
 			List<Path> pagesFolders = files
 					.filter(Files::isDirectory)
@@ -121,24 +114,48 @@ public class AppTestDocumentation {
 					.collect(Collectors.toList());
 			
 			for (Path pagesFolder: pagesFolders) {
-				explorePages(pagesFolder.toFile());
+				explorePages(pagesFolder.toFile(), pagesDoc);
 			}
 
 		} catch (IndexOutOfBoundsException e) {
 			throw new ConfigurationException("no 'webpage' sub-package found");
 		}
+		
+		StringBuilder testDoc = new StringBuilder();
+		testDoc.append("<h1>Scénarios de test</h1>\n");
+		testDoc.append("<table>\n"
+				+ "   <tr>\n"
+				+ "       <th>Classe</th>\n" 
+				+ "       <th>Test</th>\n"
+				+ "       <th>Description</th>\n"
+				+ "       <th>Details</th>\n"
+				+ "   </tr>\n");
+		try (Stream<Path> files = Files.walk(rootFolder)) {
+			List<Path> testsFolders = files
+		        .filter(Files::isDirectory)
+		        .filter(p -> p.getFileName().toString().equals("tests"))
+		        .collect(Collectors.toList());
+			
+			for (Path testsFolder: testsFolders) {
+				exploreTests(testsFolder.toFile(), testDoc);
+			}
+			
+			
+		} catch (IndexOutOfBoundsException e) {
+			throw new ConfigurationException("no 'tests' sub-package found");
+		}
+		testDoc.append("</table>\n");
+		
+		
+		javadoc.append(testDoc);
 
+		javadoc.append("<hr/>");
 		javadoc.append("${project.scmManager}\n\n");		
 		
 		// store usage data
-		javadoc.append("h1. Statistics\n");
-		javadoc.append(String.format("Number of tests: %d\n", tests.size()));
 		System.out.println(String.format("Number of tests: %d", tests.size()));
-		javadoc.append(String.format("Searched elements: %d\n", searchedElements));
 		System.out.println(String.format("Searched elements: %d", searchedElements));
-		javadoc.append(String.format("Test steps: %d\n", steps.size()));
 		System.out.println(String.format("Test steps: %d", steps.size()));
-		javadoc.append(String.format("Mean elements/steps: %.1f\n", searchedElements * 1.0 / steps.size()));
 		System.out.println(String.format("Mean elements/steps: %.1f\n", searchedElements * 1.0 / steps.size()));
 		
 		int usedSteps = 0;
@@ -151,8 +168,32 @@ public class AppTestDocumentation {
 				}
 			}
 		}
-		javadoc.append(String.format("Steps reuse percentage: %.1f\n", usedSteps * 1.0 / stepReuse.size()));
 		System.out.println(String.format("Steps reuse percentage: %.2f", usedSteps * 1.0 / stepReuse.size()));
+		
+		javadoc.append("<h1>Statistics</h1>\n");
+		javadoc.append("<table>\n"
+				+ "   <tr>\n"
+				+ "       <td>Nombre de tests</td>\n" 
+				+ String.format("       <td>%d</td>\n", tests.size()) 
+				+ "   </tr>\n"
+				+ "   <tr>\n"
+				+ "       <td>Elements recherchés</td>\n" 
+				+ String.format("       <td>%d</td>\n", searchedElements) 
+				+ "   </tr>\n"
+				+ "   <tr>\n"
+				+ "       <td>Nombre de steps</td>\n" 
+				+ String.format("       <td>%d</td>\n", steps.size()) 
+				+ "   </tr>\n"
+				+ "   <tr>\n"
+				+ "       <td>Moyenne elements/steps</td>\n" 
+				+ String.format("       <td>%.1f</td>\n", searchedElements * 1.0 / steps.size()) 
+				+ "   </tr>\n"
+				+ "   <tr>\n"
+				+ "       <td>Taux de réutilisation des steps</td>\n" 
+				+ String.format("       <td>%.1f</td>\n", usedSteps * 1.0 / stepReuse.size()) 
+				+ "   </tr>\n"
+				+ "</table>"
+				);
 		
 		/*for (String step :steps) {
 			if (!stepReuse.containsKey(step)) {
@@ -163,17 +204,19 @@ public class AppTestDocumentation {
 		
 
 		FileUtils.write(Paths.get(args[0], "src/site/confluence/template.confluence").toFile(), javadoc, StandardCharsets.UTF_8);
+		FileUtils.write(Paths.get(args[0], "src/site/confluence/template.html").toFile(), javadoc, StandardCharsets.UTF_8);
 		
 		
 	}
 	
-	private static void exploreTests(File srcDir) throws IOException {
+	private static StringBuilder exploreTests(File srcDir, StringBuilder testDoc) throws IOException {
+
 		try (Stream<Path> files = Files.walk(Paths.get(srcDir.getAbsolutePath()))){
 		files.filter(Files::isRegularFile)
 	        .filter(p -> p.getFileName().toString().endsWith(".java"))
 	        .forEach(t -> {
 				try {
-					parseTest(t);
+					parseTest(t, testDoc);
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -181,29 +224,46 @@ public class AppTestDocumentation {
 			});
 		}
 		
+		return testDoc;
 		
 	}
 	
-	private static void parseTest(Path path) throws FileNotFoundException {
-		javadoc.append(String.format("\nh2. Tests: %s\n", path.getFileName().toString()));
-		
+	private static void parseTest(Path path, StringBuilder testDoc) throws FileNotFoundException {
 		FileInputStream in = new FileInputStream(path.toAbsolutePath().toString());
 
         // parse the file
         CompilationUnit cu = JavaParser.parse(in);
 
         // prints the resulting compilation unit to default system output
-        cu.accept(new ClassVisitor(), "Tests");
-        cu.accept(new TestMethodVisitor(), null);
+        ClassVisitor classVisitor = new ClassVisitor();
+		cu.accept(classVisitor, "Tests");
+        TestMethodVisitor methodVisitor = new TestMethodVisitor();
+        cu.accept(methodVisitor, null);
+        
+        int i = 0;
+        for (Entry<String, String> testEntry: methodVisitor.getMethodInfos().entrySet()) {
+        	testDoc.append("<tr>\n");
+        	if (i == 0) {
+        		testDoc.append(String.format("    <td rowspan=\"%d\">%s</td>\n", methodVisitor.methodInfos.size(), classVisitor.getClassName()));
+        	}
+        	testDoc.append(String.format("    <td>%s</td>\n", testEntry.getKey().toString().split("\\.")[1])
+        			+ String.format("    <td>%s</td>\n", testEntry.getValue().trim())
+        	);
+        	testDoc.append(String.format("    <td>%s</td>\n", String.join(", ", methodVisitor.getStepsInScenario().get(testEntry.getKey()))));
+        	testDoc.append("</tr>\n");
+        	i += 1;
+        }
+        
+        stepsUsedInTests.putAll(methodVisitor.getStepsInScenario());
 	}
 	
-	private static void explorePages(File srcDir) throws IOException {
+	private static void explorePages(File srcDir, StringBuilder pagesDoc) throws IOException {
 		try (Stream<Path> files = Files.walk(Paths.get(srcDir.getAbsolutePath()))) {
 			files.filter(Files::isRegularFile)
 	        .filter(p -> p.getFileName().toString().endsWith(".java"))
 	        .forEach(t -> {
 				try {
-					parseWebPage(t);
+					parseWebPage(t, pagesDoc);
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -213,8 +273,8 @@ public class AppTestDocumentation {
 	}
 	
 
-	private static void parseWebPage(Path path) throws FileNotFoundException {
-		javadoc.append(String.format("\nh2. Page: %s\n", path.getFileName().toString()));
+	private static void parseWebPage(Path path, StringBuilder pagesDoc) throws FileNotFoundException {
+		pagesDoc.append(String.format("\n<h2>Page: %s</h2>\n", path.getFileName().toString()));
 		
 		FileInputStream in = new FileInputStream(path.toAbsolutePath().toString());
 
@@ -223,10 +283,31 @@ public class AppTestDocumentation {
 
         // prints the resulting compilation unit to default system output
         cu.accept(new ClassVisitor(), "Pages");
-        cu.accept(new WebPageMethodVisitor(), null);
+        WebPageMethodVisitor methodVisitor = new WebPageMethodVisitor();
+		cu.accept(methodVisitor, null);
+		
+		for (Entry<String, String> pageEntry: methodVisitor.getMethodInfo().entrySet()) {
+			pagesDoc.append(String.format("\n<h4>Operation: %s</h4>\n", pageEntry.getKey()));
+			pagesDoc.append(pageEntry.getValue());
+		}
 	}
 	
 	private static class TestMethodVisitor extends VoidVisitorAdapter<Void> {
+		
+		private Map<String, String> methodInfos =  new HashMap<>();
+		private Map<String, List<String>> stepsInScenario = new HashMap<>();
+		
+		private List<MethodCallExpr> findAllMethodCalls(Node instruction) {
+			final List<MethodCallExpr> found = new ArrayList<>();
+			instruction.walk(TreeTraversal.BREADTHFIRST, node -> {
+	            if (MethodCallExpr.class.isAssignableFrom(node.getClass())) {
+	                found.add(MethodCallExpr.class.cast(node));
+	            }
+	        });
+	
+			Collections.reverse(found);
+			return found;
+		}
 		
 		@Override
 	    public void visit(MethodDeclaration n, Void arg) {
@@ -242,18 +323,15 @@ public class AppTestDocumentation {
 		    		
 		    		methodId = ((ClassOrInterfaceDeclaration)(optParentNode.get())).getNameAsString() + "." + n.getNameAsString();
 		  
-		    		stepsUsedInTests.put(methodId, new ArrayList<>());
+		    		stepsInScenario.put(methodId, new ArrayList<>());
 		    		
 		    		for (Node instruction: body.getChildNodes()) {
 		    			
-		    			for (MethodCallExpr methodCall: instruction.findAll(MethodCallExpr.class)) {
+		    			for (MethodCallExpr methodCall: findAllMethodCalls(instruction)) {
 		    				String methodName = methodCall.getNameAsString();
-		    				if (methodName.endsWith("param") 
-		    						|| methodName.equals("contains") 
-		    						|| methodName.startsWith("assert")) {
-		    					continue;
+		    				if (steps.contains(methodName)) {
+		    					stepsInScenario.get(methodId).add(methodName);
 		    				}
-		    				stepsUsedInTests.get(methodId).add(methodName);
 		    			}
 		    		}
 		    		
@@ -274,17 +352,27 @@ public class AppTestDocumentation {
 	    	
 	    	tests.add(methodId);
 
-	    	javadoc.append(String.format("\nh4. Test: %s\n", n.getNameAsString()));
-    		
+    		String methodDoc = "";
 	    	Optional<Comment> optComment = n.getComment();
 	    	if (optComment.isPresent()) {
     			Comment comment = optComment.get();
-				javadoc.append(formatJavadoc(comment.getContent()));
+    			methodDoc = formatJavadoc(comment.getContent());
     		} 
+	    	methodInfos.put(methodId, methodDoc);
 	    }
+
+		public Map<String, String> getMethodInfos() {
+			return methodInfos;
+		}
+
+		public Map<String, List<String>> getStepsInScenario() {
+			return stepsInScenario;
+		}
 	}
 	
 	private static class WebPageMethodVisitor extends VoidVisitorAdapter<Void> {
+		
+		private Map<String, String> methodInfo = new HashMap<>();
 		
 		@Override
 		public void visit(MethodDeclaration n, Void arg) {
@@ -296,26 +384,35 @@ public class AppTestDocumentation {
 			
 			steps.add(n.getNameAsString());
 
-			javadoc.append(String.format("\nh4. Operation: %s\n", n.getNameAsString()));
-			
+			String methodJavaDoc = "";
 			Optional<Comment> optComment = n.getComment();
 	    	if (optComment.isPresent()) {
 				Comment comment = optComment.get();
-				javadoc.append(formatJavadoc(comment.getContent()));
-			} 
+				methodJavaDoc = formatJavadoc(comment.getContent());
+			}
+	    	
+	    	methodInfo.put(n.getNameAsString(), methodJavaDoc);
+		}
+
+		public Map<String, String> getMethodInfo() {
+			return methodInfo;
 		}
 	}
 	
 	private static class ClassVisitor extends VoidVisitorAdapter<String> {
 		
+		private String classDoc;
+		private String className;
+		
 		@Override
 		public void visit(ClassOrInterfaceDeclaration n, String objectType) {
 			Optional<Comment> optComment = n.getComment();
+			className = n.getNameAsString();
 			if (optComment.isPresent()) {
 				Comment comment = optComment.get();
-				javadoc.append(String.format("{panel}%s{panel}\n", formatJavadoc(comment.getContent())));
+				classDoc = String.format("%s", formatJavadoc(comment.getContent()));
 			} else {
-				javadoc.append(String.format("{panel}%s de la classe %s{panel}\n", objectType, n.getNameAsString()));
+				classDoc = String.format("%s de la classe %s", objectType, n.getNameAsString());
 			}
 			
 			if ("Pages".equals(objectType)) {
@@ -330,6 +427,14 @@ public class AppTestDocumentation {
 			}
 			
 		}
+
+		public String getClassDoc() {
+			return classDoc;
+		}
+
+		public String getClassName() {
+			return className;
+		}
 	}
 	
 	/**
@@ -343,8 +448,12 @@ public class AppTestDocumentation {
 			if (line.startsWith("*")) {
 				line = line.substring(1).trim();
 			} 
+			
 			if (line.startsWith("@")) {
-				line = String.format("{{%s}}", line); 
+				line = String.format("<pre>%s</pre>", StringUtility.encodeString(line, "html")); 
+			}
+			if (line.contains("@throws")) {
+				continue;
 			}
 			out.append(line + "\n");
 		}
