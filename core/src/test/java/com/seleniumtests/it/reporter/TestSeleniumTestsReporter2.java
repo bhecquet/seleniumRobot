@@ -1439,6 +1439,33 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 	}
 	
+	/**
+	 * Test the case where "testName" is specified on Test annotation
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportWithCustomTestName() throws Exception {
+		
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testOkWithTestName", "testOkWithTestNameAndDataProvider"});
+		
+
+		// check visual name is used in summary (string interpolation with dataprovider, and raw test name)
+		String mainReportContent = readSummaryFile();
+		Assert.assertTrue(mainReportContent.contains("<a href='testOkWithTestName/TestReport.html' info=\"ok\" data-toggle=\"tooltip\" title=\"no description available\">A test which is &lt;OK&gt; &eacute;&amp;</a>"));
+		Assert.assertTrue(mainReportContent.contains("<a href='testOkWithTestNameAndDataProvider/TestReport.html' info=\"ok\" data-toggle=\"tooltip\" title=\"no description available\">A test which is OK (data2, data3)</a>"));
+		
+		// detailed reports should also display the custom test name
+		String detailedReportContent = readTestMethodResultFile("testOkWithTestName");
+		Assert.assertTrue(detailedReportContent.contains("<h4> Test Details - A test which is &lt;OK&gt; &eacute;&amp;</h4>"));
+
+		String detailedReportContent2 = readTestMethodResultFile("testOkWithTestNameAndDataProvider");
+		Assert.assertTrue(detailedReportContent2.contains("<h4> Test Details - A test which is OK (data2, data3) with params: (data2,data3)</h4>"));
+		String detailedReportContent3 = readTestMethodResultFile("testOkWithTestNameAndDataProvider-1");
+		Assert.assertTrue(detailedReportContent3.contains("<h4> Test Details - A test which is OK (data4, data5) with params: (data4,data5)</h4>"));
+		
+		
+	}
+	
 	@Test(groups={"it"})
 	public void testReportContainsCustomScreenshot() throws Exception {
 		

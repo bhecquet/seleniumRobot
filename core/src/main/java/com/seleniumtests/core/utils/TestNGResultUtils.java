@@ -31,6 +31,7 @@ import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.annotations.CustomAttribute;
+import org.testng.annotations.Test;
 import org.testng.internal.BaseTestMethod;
 import org.testng.internal.TestResult;
 
@@ -57,6 +58,7 @@ public class TestNGResultUtils {
 	protected static Logger logger = SeleniumRobotLogger.getLogger(TestNGResultUtils.class);
 
 	private static final String UNIQUE_METHOD_NAME = "uniqueMethodName"; // unique name of the test (in case several tests have the same name)
+	private static final String VISUAL_TEST_NAME = "visualTestName"; 	// Name that will be displayed in reports for user (HTML and JUnit report)
 	private static final String TEST_CONTEXT = "testContext";
 	private static final String LINKED_TEST_METHOD = "linkedTestMethod"; // the test method associated to this configuration method. Obviously, this is null for all test methods 
 	private static final String RETRY = "retry";						// index of the retry
@@ -148,6 +150,35 @@ public class TestNGResultUtils {
     			return testNGResult.getMethod().getMethodName();
     		}
     	}
+	}
+	
+	/**
+	 * Returns a "visual" name for this test.
+	 * In case "testName" is not specified for @Test annotation, then, we return the "unique test name"
+	 * If "testName" is specified, then, we return it, possibly, interpolating string
+	 * @param testNGResult
+	 * @return
+	 */
+	public static String getVisualTestName(ITestResult testNGResult) {
+		if (testNGResult == null) {
+			return null;
+		}
+		
+		Test testAnnotation = testNGResult.getMethod().getConstructorOrMethod().getMethod().getAnnotation(Test.class);
+		String testName = getUniqueTestName(testNGResult);
+		if (testAnnotation != null && !testAnnotation.testName().isEmpty()) {
+			int i = 0;
+	    	for (Object parameter: testNGResult.getParameters()) {
+	    		String key = String.format("arg%d", i++);
+	    		getSeleniumRobotTestContext(testNGResult).getConfiguration().put(key, new TestVariable(key, parameter.toString()));
+	    	}
+	    	testName = StringUtility.interpolateString(testAnnotation.testName(), getSeleniumRobotTestContext(testNGResult));
+		} 
+		
+		// store it for usage in reports (velocity access the attribute directly)
+		testNGResult.setAttribute(VISUAL_TEST_NAME, testName);
+
+		return testName;
 	}
 	
     /**
@@ -384,23 +415,21 @@ public class TestNGResultUtils {
     	
     }
     
-    public static String getTestDescription(ITestResult testNGResult) {
-    	return (String) testNGResult.getAttribute(DESCRIPTION);
-    }
-    
     /**
-     * Set description interpolating variables
+     * Returns the test description, interpolating variable
      * @param testNGResult
+     * @return
      */
-    public static void setTestDescription(ITestResult testNGResult) { 
+    public static String getTestDescription(ITestResult testNGResult) {
     	int i = 0;
     	for (Object parameter: testNGResult.getParameters()) {
     		String key = String.format("arg%d", i++);
     		getSeleniumRobotTestContext(testNGResult).getConfiguration().put(key, new TestVariable(key, parameter.toString()));
     	}
-    	testNGResult.setAttribute(DESCRIPTION, StringUtility.interpolateString(testNGResult.getMethod().getDescription(), getSeleniumRobotTestContext(testNGResult)));
+    	String description = StringUtility.interpolateString(testNGResult.getMethod().getDescription(), getSeleniumRobotTestContext(testNGResult));
+    	testNGResult.setAttribute(DESCRIPTION, description); // store it so that it's used in reports
+    	return description;
     }
-    
 
     /**
      * Change the test result when snapshot comparison fails

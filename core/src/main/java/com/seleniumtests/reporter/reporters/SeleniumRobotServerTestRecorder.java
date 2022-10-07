@@ -157,7 +157,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 				
 				// record test case
 				Integer testCaseId = serverConnector.createTestCase(testName);
-				Integer testCaseInSessionId = serverConnector.createTestCaseInSession(sessionId, testCaseId, getTestName(testResult));
+				Integer testCaseInSessionId = serverConnector.createTestCaseInSession(sessionId, testCaseId, getVisualTestName(testResult));
 				serverConnector.addLogsToTestCaseInSession(testCaseInSessionId, generateExecutionLogs(testResult).toString());
 				
 				List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();

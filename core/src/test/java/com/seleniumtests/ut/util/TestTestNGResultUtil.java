@@ -29,12 +29,12 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import com.google.gson.Gson;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector.SnapshotComparisonResult;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.core.runner.CucumberScenarioWrapper;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.screenshots.ScreenShot;
@@ -406,13 +406,76 @@ public class TestTestNGResultUtil extends MockitoTest {
 		Assert.assertNull(TestNGResultUtils.getTestCaseId(tr));
 	}
 	
+	/**
+	 * Test setting description with a method parameter
+	 * @param db
+	 */
 	@Parameters("db")
 	@Test(groups={"ut"}, description = "my DB ${arg0}")
 	public void testDescription(@Optional("mysql")String db) {
 		ITestResult tr = Reporter.getCurrentTestResult();
 		TestNGResultUtils.setSeleniumRobotTestContext(tr, SeleniumTestsContextManager.getThreadContext());
-		TestNGResultUtils.setTestDescription(tr);
 		Assert.assertEquals(TestNGResultUtils.getTestDescription(tr), "my DB mysql");
+	}
+	
+	/**
+	 * Only test method name is available => we take unique test name
+	 */
+	@Test(groups={"ut"})
+	public void testVisualTestName() {
+		
+		ITestResult tr = Reporter.getCurrentTestResult();
+		TestNGResultUtils.setSeleniumRobotTestContext(tr, SeleniumTestsContextManager.getThreadContext());
+		TestNGResultUtils.setUniqueTestName(tr, "testVisualTestName-1");
+		Assert.assertEquals(TestNGResultUtils.getVisualTestName(tr), "testVisualTestName-1");
+	}
+	@Test(groups={"ut"})
+	public void testVisualTestNameNull() {
+		
+		ITestResult tr = Reporter.getCurrentTestResult();
+		TestNGResultUtils.setSeleniumRobotTestContext(tr, SeleniumTestsContextManager.getThreadContext());
+		TestNGResultUtils.setUniqueTestName(tr, "testVisualTestName-1");
+		Assert.assertNull(TestNGResultUtils.getVisualTestName(null));
+	}
+	
+	/**
+	 * Test name is defined in annotation, return it
+	 */
+	@Test(groups={"ut"}, testName = "My Test")
+	public void testVisualTestNameWithTestName() {
+		
+		ITestResult tr = Reporter.getCurrentTestResult();
+		TestNGResultUtils.setSeleniumRobotTestContext(tr, SeleniumTestsContextManager.getThreadContext());
+		TestNGResultUtils.setUniqueTestName(tr, "testVisualTestName-1");
+		Assert.assertEquals(TestNGResultUtils.getVisualTestName(tr), "My Test");
+	}
+	
+	/**
+	 * Allow placeholder in test name, referring to variable
+	 */
+	@Test(groups={"ut"}, testName = "My Test ${key}")
+	public void testVisualTestNameWithTestNameAndParameters() {
+		
+		ITestResult tr = Reporter.getCurrentTestResult();
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("key", new TestVariable("key", "value"));
+		TestNGResultUtils.setSeleniumRobotTestContext(tr, SeleniumTestsContextManager.getThreadContext());
+		TestNGResultUtils.setUniqueTestName(tr, "testVisualTestName-1");
+		Assert.assertEquals(TestNGResultUtils.getVisualTestName(tr), "My Test value");
+	}
+	
+	/**
+	 * Allow placeholder in test name, referring to method parameter
+	 * @param db
+	 */
+	@Parameters("db")
+	@Test(groups={"ut"}, testName = "My Test ${arg0}")
+	public void testVisualTestNameWithTestNameAndParameters2(@Optional("mysql")String db) {
+		
+		ITestResult tr = Reporter.getCurrentTestResult();
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("key", new TestVariable("key", "value"));
+		TestNGResultUtils.setSeleniumRobotTestContext(tr, SeleniumTestsContextManager.getThreadContext());
+		TestNGResultUtils.setUniqueTestName(tr, "testVisualTestName-1");
+		Assert.assertEquals(TestNGResultUtils.getVisualTestName(tr), "My Test mysql");
 	}
 	
 	/**

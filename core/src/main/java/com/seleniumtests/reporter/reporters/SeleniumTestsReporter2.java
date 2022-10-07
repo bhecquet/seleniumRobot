@@ -205,7 +205,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			// do not recreate this report anymore
 			TestNGResultUtils.setHtmlReportCreated(testResult, true);
 		} catch (Exception e) {
-			logger.error("Error writing test report: " + getTestName(testResult), e);
+			logger.error("Error writing test report: " + getVisualTestName(testResult), e);
 		}  
 	}
 	
@@ -244,7 +244,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		
 		// test header
 		Object[] testParameters = testResult.getParameters();
-		StringBuilder testName = new StringBuilder(getTestName(testResult));
+		StringBuilder testName = new StringBuilder(getVisualTestName(testResult));
 		
 		// issue #163: add test parameter to test name
 		if (testParameters.length > 0) {
@@ -262,7 +262,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			testName.append(")");
 		}
 		
-		context.put("testName", testName);
+		context.put("testName", StringUtility.encodeString(testName.toString(), "html"));
 		context.put("description", StringUtility.encodeString(TestNGResultUtils.getTestDescription(testResult), "html"));
 		
 
@@ -392,6 +392,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		// build result list for each TestNG test
 		Map<ITestContext, List<ITestResult>> methodResultsMap = new LinkedHashMap<>();
 		Map<ITestResult, Map<String, String>> testInfosMap = new HashMap<>();
+		Map<ITestResult, String> testNameMap = new HashMap<>();
 		Map<ITestResult, List<TestStep>> allSteps = new HashMap<>();
 		Set<String> allInfoKeys = new HashSet<>();
 		
@@ -420,6 +421,8 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 				testInfosMap.put(result, testInfos);
 				allInfoKeys.addAll(testInfos.keySet());
 				
+				// add visual test name
+				testNameMap.put(result, StringUtility.encodeString(TestNGResultUtils.getVisualTestName(result), "html"));
 			}
 			
 			methodResultsMap.put(entry.getKey(), methodResults);
@@ -444,7 +447,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 				context.put("steps", allSteps);
 				context.put("infos", testInfosMap);
 				context.put("infoKeys", allSortedInfoKeys);
-
+				context.put("testNames", testNameMap);
 				
 			}
 			StringWriter writer = new StringWriter();
