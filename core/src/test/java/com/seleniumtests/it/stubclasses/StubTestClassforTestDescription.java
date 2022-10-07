@@ -48,6 +48,15 @@ public class StubTestClassforTestDescription extends StubParentClass {
 
 	}
 	
+	@Test(groups="stub", description = "This test is always <OK> & \"green\"")
+	public void testWithDescriptionAndSpecialCharacters() throws IOException {
+		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
+		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
+		step1.addAction(new TestAction("sendKeys to text field", true, new ArrayList<>()));
+		TestStepManager.logTestStep(step1);
+		
+	}
+	
 	@Test(groups="stub", description="a test with param ${url}\nand line breaks")
 	public void testWithLineBreaksInDescription() throws IOException {
 		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), true);

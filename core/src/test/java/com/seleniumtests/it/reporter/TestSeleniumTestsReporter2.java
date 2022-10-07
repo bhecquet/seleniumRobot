@@ -2460,6 +2460,28 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 	
 	/**
+	 * Test special characters are correctly handled in description
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testDescriptionWithSpecialCharacters(ITestContext testContext) throws Exception {
+		
+		try {
+			System.setProperty("url", "http://mysite.com");
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassforTestDescription"}, ParallelMode.METHODS, new String[] {"testWithDescriptionAndSpecialCharacters"});
+			
+			String summaryReport = readSummaryFile();
+			Assert.assertTrue(summaryReport.contains("info=\"ok\" data-toggle=\"tooltip\" title=\"This test is always &lt;OK&gt; &amp; &quot;green&quot;\""));
+			
+			String detailedReportContent = readTestMethodResultFile("testWithDescriptionAndSpecialCharacters");
+			Assert.assertTrue(detailedReportContent.contains("<th width=\"200px\">Description</th><td>This test is always &lt;OK&gt; &amp; &quot;green&quot;</td>"));
+		} finally {
+			System.clearProperty("url");
+		}	
+	}
+	
+	/**
 	 * Check error cause is displayed in report
 	 * @throws Exception
 	 */

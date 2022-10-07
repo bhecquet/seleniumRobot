@@ -393,6 +393,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		Map<ITestContext, List<ITestResult>> methodResultsMap = new LinkedHashMap<>();
 		Map<ITestResult, Map<String, String>> testInfosMap = new HashMap<>();
 		Map<ITestResult, String> testNameMap = new HashMap<>();
+		Map<ITestResult, String> descriptionMap = new HashMap<>();
 		Map<ITestResult, List<TestStep>> allSteps = new HashMap<>();
 		Set<String> allInfoKeys = new HashSet<>();
 		
@@ -421,8 +422,9 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 				testInfosMap.put(result, testInfos);
 				allInfoKeys.addAll(testInfos.keySet());
 				
-				// add visual test name
+				// add visual test name and description
 				testNameMap.put(result, StringUtility.encodeString(TestNGResultUtils.getVisualTestName(result), "html"));
+				descriptionMap.put(result, StringUtility.encodeString(TestNGResultUtils.getTestDescription(result), "html"));
 			}
 			
 			methodResultsMap.put(entry.getKey(), methodResults);
@@ -448,6 +450,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 				context.put("infos", testInfosMap);
 				context.put("infoKeys", allSortedInfoKeys);
 				context.put("testNames", testNameMap);
+				context.put("descriptions", descriptionMap);
 				
 			}
 			StringWriter writer = new StringWriter();

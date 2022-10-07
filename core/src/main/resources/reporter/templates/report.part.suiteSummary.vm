@@ -65,6 +65,7 @@
 				                		#foreach ($testResult in $testContext.value)
 				                			#set ($testIdx = $testIdx + 1)
 				                			#set ($testName = $testNames.get($testResult))
+				                			#set ($description = $descriptions.get($testResult))
 				                			#**
 				                			Compute step state for each test
 				                			*#
@@ -85,10 +86,8 @@
 				                			#set ($totalPassed = $totalPassed + $passedSteps)
 				                			#set ($totalFailed = $totalFailed + $failedSteps)
 				                			#set ($totalSteps = $totalSteps + $totalTestSteps)
-				                			#if ($testResult.getAttribute("description").isEmpty())
+				                			#if ($description.isEmpty())
 				                				#set ($description = "no description available")
-				                			#else
-				                				#set ($description = $testResult.getAttribute("description"))
 				                			#end
 				                			
 				                			#if ("$!testResult.getAttribute('snapshotComparisonResult')" == "")
