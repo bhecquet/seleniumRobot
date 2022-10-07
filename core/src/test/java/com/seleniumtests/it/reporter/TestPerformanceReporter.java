@@ -20,6 +20,7 @@ package com.seleniumtests.it.reporter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -89,6 +90,19 @@ public class TestPerformanceReporter extends ReporterTest {
 		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"Step 6: Post test step: reset\" time="));
 	}
 	
+	@Test(groups={"it"})
+	public void testReportWithCustomTestNames(ITestContext testContext) throws Exception {
+		
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testOkWithTestName", "testOkWithTestNameAndDataProvider"});
+		
+		// check content of summary report file
+		String jmeterReport = readTestMethodPerfFile("testOkWithTestName");
+		Assert.assertTrue(jmeterReport.contains("hostname=\"\" name=\"A test which is &lt;OK&gt; é&amp;\" tests=\"6\" time=\""));
+		String jmeterReport1 = readTestMethodPerfFile("testOkWithTestNameAndDataProvider");
+		Assert.assertTrue(jmeterReport1.contains("hostname=\"\" name=\"A test which is OK (data2, data3)\" tests=\"5\" time=\""));
+
+	}
+	
 	/**
 	 * Check number of retries is correctly logged
 	 * @param testContext
@@ -118,7 +132,7 @@ public class TestPerformanceReporter extends ReporterTest {
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testOkWithOneStepFailed"});
 		
 		// check content of summary report file
-		String jmeterReport = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testOkWithOneStepFailed", "PERF-result.xml").toFile());
+		String jmeterReport = readTestMethodPerfFile("testOkWithOneStepFailed");
 		
 		Assert.assertTrue(jmeterReport.contains("<testsuite errors=\"0\" failures=\"0\" hostname=\"\" name=\"testOkWithOneStepFailed\" tests=\"6\""));
 		Assert.assertTrue(jmeterReport.contains("name=\"Step 1: Pre test step: setCount\""));
