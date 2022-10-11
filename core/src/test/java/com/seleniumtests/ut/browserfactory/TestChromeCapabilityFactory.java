@@ -130,7 +130,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		ChromeCapabilitiesFactory capaFactory = new ChromeCapabilitiesFactory(config);
 		capaFactory.createCapabilities();
 		Assert.assertTrue(capaFactory.getSelectedBrowserInfo().getBeta());
-		Assert.assertEquals(capaFactory.getSelectedBrowserInfo().getVersion(), "97.0");
+		Assert.assertEquals(capaFactory.getSelectedBrowserInfo().getVersion(), "105.0");
 	}
 
 	/**
