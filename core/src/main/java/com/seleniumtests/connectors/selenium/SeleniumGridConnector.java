@@ -31,7 +31,7 @@ import org.openqa.selenium.SessionNotCreatedException;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
 
-import com.seleniumtests.core.StatisticsStorage.DriverUsage;
+import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -343,9 +343,9 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
             
             // store some information about driver creation
             MutableCapabilities caps = (MutableCapabilities)driver.getCapabilities();
-            caps.setCapability(DriverUsage.GRID_HUB, hubUrl);
-            caps.setCapability(DriverUsage.SESSION_ID, sessionId);
-            caps.setCapability(DriverUsage.GRID_NODE, node);
+            caps.setCapability(SeleniumRobotCapabilityType.GRID_HUB, hubUrl);
+            caps.setCapability(SeleniumRobotCapabilityType.SESSION_ID, sessionId);
+            caps.setCapability(SeleniumRobotCapabilityType.GRID_NODE, node);
             
             logger.info(String.format("Brower %s (%s) created in %.1f secs on node %s [%s] with session %s", browserName, version, driverCreationDuration / 1000.0, node, hubUrl, sessionId).replace(",", "."));
             

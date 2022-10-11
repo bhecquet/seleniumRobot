@@ -83,6 +83,7 @@ import org.openqa.selenium.support.events.WebDriverListener;
 
 import com.neotys.selenium.proxies.NLWebDriver;
 import com.seleniumtests.browserfactory.BrowserInfo;
+import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.core.StatisticsStorage;
 import com.seleniumtests.core.StatisticsStorage.DriverUsage;
@@ -1212,22 +1213,22 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		
 		Long duration = 0L;
 		try {
-			duration = new Date().getTime() - (Long)internalCapabilities.getCapability(DriverUsage.START_TIME);
+			duration = new Date().getTime() - (Long)internalCapabilities.getCapability(SeleniumRobotCapabilityType.START_TIME);
 		} catch (Exception e) {
 			// catch error
 		}
-		String gridHub = caps.getCapability(DriverUsage.GRID_HUB) != null ? caps.getCapability(DriverUsage.GRID_HUB).toString(): null;
-		String sessionId = caps.getCapability(DriverUsage.SESSION_ID) != null ? caps.getCapability(DriverUsage.SESSION_ID).toString(): null;
+		String gridHub = caps.getCapability(SeleniumRobotCapabilityType.GRID_HUB) != null ? caps.getCapability(SeleniumRobotCapabilityType.GRID_HUB).toString(): null;
+		String sessionId = caps.getCapability(SeleniumRobotCapabilityType.SESSION_ID) != null ? caps.getCapability(SeleniumRobotCapabilityType.SESSION_ID).toString(): null;
 		
 		// store driver stats
 		DriverUsage usage = new DriverUsage(gridHub, 
-				(String) caps.getCapability(DriverUsage.GRID_NODE), 
-				(Long) internalCapabilities.getCapability(DriverUsage.START_TIME), 
+				(String) caps.getCapability(SeleniumRobotCapabilityType.GRID_NODE), 
+				(Long) internalCapabilities.getCapability(SeleniumRobotCapabilityType.START_TIME), 
 				duration, 
 				sessionId, 
 				caps.getBrowserName(), 
-				(Long) internalCapabilities.getCapability(DriverUsage.STARTUP_DURATION), 
-				(String) internalCapabilities.getCapability(DriverUsage.TEST_NAME));
+				(Long) internalCapabilities.getCapability(SeleniumRobotCapabilityType.STARTUP_DURATION), 
+				(String) internalCapabilities.getCapability(SeleniumRobotCapabilityType.TEST_NAME));
 		StatisticsStorage.addDriverUsage(usage);
 		
 		try {

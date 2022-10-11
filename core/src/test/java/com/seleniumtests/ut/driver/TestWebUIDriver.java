@@ -6,9 +6,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
@@ -38,6 +38,7 @@ import com.seleniumtests.GenericTest;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.browserfactory.SeleniumGridDriverFactory;
+import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -107,8 +108,8 @@ public class TestWebUIDriver extends MockitoTest {
 		Assert.assertNull(((CustomEventFiringWebDriver)driver).getNeoloadDriver());
 		
 		Capabilities caps = ((CustomEventFiringWebDriver)driver).getInternalCapabilities();
-		Assert.assertNotNull(caps.getCapability(DriverUsage.START_TIME));
-		Assert.assertNotNull(caps.getCapability(DriverUsage.STARTUP_DURATION));
+		Assert.assertNotNull(caps.getCapability(SeleniumRobotCapabilityType.START_TIME));
+		Assert.assertNotNull(caps.getCapability(SeleniumRobotCapabilityType.STARTUP_DURATION));
 	}
 	
 	/**

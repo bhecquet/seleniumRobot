@@ -59,8 +59,8 @@ import com.seleniumtests.browserfactory.PerfectoDriverFactory;
 import com.seleniumtests.browserfactory.SafariDriverFactory;
 import com.seleniumtests.browserfactory.SauceLabsDriverFactory;
 import com.seleniumtests.browserfactory.SeleniumGridDriverFactory;
+import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.StatisticsStorage.DriverUsage;
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.core.testretry.TestRetryAnalyzer;
 import com.seleniumtests.core.utils.TestNGResultUtils;
@@ -167,14 +167,14 @@ public class WebUIDriver {
             
             if (driver != null) {
     			MutableCapabilities caps = ((CustomEventFiringWebDriver)driver).getInternalCapabilities();
-    			caps.setCapability(DriverUsage.STARTUP_DURATION, duration);
-                caps.setCapability(DriverUsage.START_TIME, start);
+    			caps.setCapability(SeleniumRobotCapabilityType.STARTUP_DURATION, duration);
+                caps.setCapability(SeleniumRobotCapabilityType.START_TIME, start);
 
                 // testName is added here, once driver has been created, even if this capability has already been added in IDestkopCapabilitiesFactory. Reason is that 
                 // capability from IDestkopCapabilitiesFactory is not available when we request capabilities from driver.
                 if (config.getTestContext() != null && config.getTestContext().getTestNGResult() != null) {
 	                String testName = TestNGResultUtils.getTestName(config.getTestContext().getTestNGResult());
-	                caps.setCapability(DriverUsage.TEST_NAME, testName);
+	                caps.setCapability(SeleniumRobotCapabilityType.TEST_NAME, testName);
                 }
 			}
     	

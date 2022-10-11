@@ -60,4 +60,15 @@ public interface SeleniumRobotCapabilityType {
 	 * Path to the edge profile (or "default" to use the default user profile)
 	 */
 	String FIREFOX_PROFILE = "sr:firefoxProfile";
+	
+	/**
+	 * Informations for driver usage
+	 */
+	String GRID_HUB = "sr:gridHub";
+	String GRID_NODE = "sr:gridNode";
+	String START_TIME = "sr:startTime";
+	String DURATION = "sr:duration";
+	String SESSION_ID = "sr:sessionId";
+	String BROWSER = "sr:browser";
+	String STARTUP_DURATION = "sr:startupDuration";
 }

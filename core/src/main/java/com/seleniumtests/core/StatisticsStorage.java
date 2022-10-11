@@ -14,14 +14,7 @@ public class StatisticsStorage {
 	
 	public static class DriverUsage {
 		
-		public static final String GRID_HUB = "gridHub";
-		public static final String GRID_NODE = "gridNode";
-		public static final String START_TIME = "startTime";
-		public static final String DURATION = "duration";
-		public static final String SESSION_ID = "sessionId";
-		public static final String BROWSER = "browser";
-		public static final String STARTUP_DURATION = "startupDuration";
-		public static final String TEST_NAME = "testName";
+		
 		
 		String gridHub;
 		String gridNode;
