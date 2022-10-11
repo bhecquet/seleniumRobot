@@ -123,7 +123,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
 		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "104.0", "", false, false), 
-				new BrowserInfo(BrowserType.CHROME, "97.0", "", false, true)));
+				new BrowserInfo(BrowserType.CHROME, "105.0", "", false, true)));
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(true)).thenReturn(browserInfos);
 		when(config.getBetaBrowser()).thenReturn(true);
 
