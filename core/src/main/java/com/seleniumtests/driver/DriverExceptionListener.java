@@ -25,6 +25,7 @@ import java.util.List;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.InvalidElementStateException;
+import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.UnsupportedCommandException;
@@ -64,6 +65,7 @@ public class DriverExceptionListener implements WebDriverListener {
         if (ex.getMessage() == null
         		|| ex.getMessage().contains("Element must be user-editable in order to clear it")
         		|| ex.getMessage().contains("Element is not clickable at point")
+        		|| ex instanceof NoAlertPresentException
         		|| ex instanceof UnsupportedCommandException
         		|| ex.getMessage().contains(" read-only")
         		|| ex.getMessage().contains("not implemented")
