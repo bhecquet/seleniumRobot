@@ -5,7 +5,7 @@
 
 	<groupId>com.infotel.seleniumRobot</groupId>
 	<artifactId>core-parent</artifactId>
-	<version>4.22.6-SNAPSHOT</version>
+	<version>4.23.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>selenium robot</name>
