@@ -111,7 +111,7 @@ public class TestJUnitReporter extends ReporterTest {
 	 */
 	@Test(groups={"it"})
 	public void testReportContentCustomTestName(ITestContext testContext) throws Exception {
-		
+
 		List<String> testList = executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testOkWithTestName", "testOkWithTestNameAndDataProvider"});
 		
 		String result = readJUnitFile(testList.get(0));
