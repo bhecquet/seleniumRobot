@@ -76,7 +76,7 @@
 		<selenium.version>3.141.59</selenium.version>
 		<appium.version>7.0.0</appium.version>
 		<aspectj.version>1.9.1</aspectj.version>
-		<htmlunitdriver.version>2.46.0</htmlunitdriver.version>
+		<htmlunitdriver.version>2.65.0</htmlunitdriver.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
