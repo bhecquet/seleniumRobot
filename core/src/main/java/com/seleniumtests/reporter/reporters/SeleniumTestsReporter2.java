@@ -263,6 +263,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		}
 		
 		context.put("testName", StringUtility.encodeString(testName.toString(), "html"));
+		// by default, encodeString replaces line breaks with <br/> which is not suitable for description
 		context.put("description", StringUtility.encodeString(TestNGResultUtils.getTestDescription(testResult), "html"));
 		
 
@@ -424,7 +425,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 				
 				// add visual test name and description
 				testNameMap.put(result, StringUtility.encodeString(TestNGResultUtils.getVisualTestName(result), "html"));
-				descriptionMap.put(result, StringUtility.encodeString(TestNGResultUtils.getTestDescription(result), "html"));
+				descriptionMap.put(result, StringUtility.encodeString(TestNGResultUtils.getTestDescription(result), "html").replace("<br/>", ""));
 			}
 			
 			methodResultsMap.put(entry.getKey(), methodResults);

@@ -2450,7 +2450,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassforTestDescription"}, ParallelMode.METHODS, new String[] {"testWithLineBreaksInDescription"});
 			
 			String summaryReport = readSummaryFile();
-			Assert.assertTrue(summaryReport.contains("info=\"ko\" data-toggle=\"tooltip\" title=\"a test with param http://mysite.comand line breaks\""));
+			Assert.assertTrue(summaryReport.contains("info=\"ko\" data-toggle=\"tooltip\" title=\"a test with param http://mysite.comand line breaks\"")); // line break is removed by 'summaryReport' call
 			
 			String detailedReportContent = readTestMethodResultFile("testWithLineBreaksInDescription");
 			Assert.assertTrue(detailedReportContent.contains("<th width=\"200px\">Description</th><td>a test with param http://mysite.com<br/>and line breaks</td>"));
