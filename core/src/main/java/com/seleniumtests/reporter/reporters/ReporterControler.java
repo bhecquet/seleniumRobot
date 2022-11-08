@@ -168,7 +168,7 @@ public class ReporterControler implements IReporter {
 			for (ITestResult testResult: rs) {
 				
 				
-				// When SeleniumRobotTestRecorded has been run, results are stored on seleniumRobot server and it's then possible 
+				// When SeleniumRobotTestRecorder has been run, results are stored on seleniumRobot server and it's then possible 
 				// to compare reference snapshot with current failed step (if any)
 				if (!testResult.isSuccess() && TestNGResultUtils.isSeleniumServerReportCreated(testResult) && testResult.getThrowable() != null && !(testResult.getThrowable() instanceof AssertionError)) {
 
