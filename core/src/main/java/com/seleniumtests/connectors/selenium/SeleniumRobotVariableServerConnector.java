@@ -106,6 +106,21 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	 * @param name							name of the variables to retrieve. If given, only one variable will be get because server only returns one variable for each name
 	 * @param value							value of the variables to retrieve
 	 * @param reserve						if true, reserve the reservable variables, else, only return searched variables
+	 * @return
+	 */
+	public Map<String, TestVariable> getVariables(Integer variablesOlderThanDays, String name, String value, boolean reserve) {
+		return getVariables(variablesOlderThanDays, name, value, reserve, -1);
+	}
+	
+	/**
+	 * Retrieve all variables from the server
+	 * Display a warning when a custom variable prefix "custom.test.variable." overwrites or is overwritten by a regular one
+	 * 
+	 * 
+	 * @param variablesOlderThanDays 		number of days since this variable should be created before it can be returned. This only applies to variables which have a time to live (a.k.a: where destroyAfterDays parameter is > 0) 
+	 * @param name							name of the variables to retrieve. If given, only one variable will be get because server only returns one variable for each name
+	 * @param value							value of the variables to retrieve
+	 * @param reserve						if true, reserve the reservable variables, else, only return searched variables
 	 * @param variablesReservationDuration	Number of seconds a reservable variable will be reserved
 	 * @return
 	 */
