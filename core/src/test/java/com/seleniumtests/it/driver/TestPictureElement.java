@@ -111,14 +111,41 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 			long totalTime1 = Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis();
 			reset();
 			
-			// second click should not search for the element again as we are in the same page
+			// second click should  search for the elementas we are not in the same page
 			start = Calendar.getInstance();
 			new DriverTestPageWithoutFixedPattern().clickGooglePicture();
 			long totalTime2 = Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis();
 			logger.info(String.format("Time first click: %d ms - time second click: %d ms", totalTime1, totalTime2));
 			
-			// check second action is much shorter than first one
-			Assert.assertTrue(totalTime2 * 1.0 / totalTime1 < 1.5);
+			// check second action last almost the same as the first one
+			Assert.assertTrue(Math.max(totalTime1, totalTime2)  * 1.0 / Math.min(totalTime1, totalTime2) < 1.5);
+			
+		} catch (ImageSearchException e) {
+			throw new SkipException("Image not found, we may be on screenless slave", e);
+		}
+		WaitHelper.waitForMilliSeconds(500); // in case of browser slowness
+		Assert.assertEquals(DriverTestPageWithoutFixedPattern.textElement.getValue(), "image");
+	}
+	
+	/**
+	 * Check that if the same Picture element is used in 2 instances of the same page and PictureElement is declared private, then, search will be done twice
+	 */
+	public void testMultipleActionsOnPictureWithAnotherPagePrivateField() {
+		try {
+			DriverTestPageWithoutFixedPattern.googlePicture.clearMemory(); // reset memory for object to detect
+			Calendar start = Calendar.getInstance();
+			testPageWithoutPattern.clickGooglePrivatePicture();
+			long totalTime1 = Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis();
+			reset();
+			
+			// second click should  search for the elementas we are not in the same page
+			start = Calendar.getInstance();
+			new DriverTestPageWithoutFixedPattern().clickGooglePrivatePicture();
+			long totalTime2 = Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis();
+			logger.info(String.format("Time first click: %d ms - time second click: %d ms", totalTime1, totalTime2));
+			
+			// check second action last almost the same as the first one
+			Assert.assertTrue(Math.max(totalTime1, totalTime2)  * 1.0 / Math.min(totalTime1, totalTime2) < 1.5);
 			
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
