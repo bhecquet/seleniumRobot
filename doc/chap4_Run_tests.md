@@ -221,6 +221,7 @@ Params for mobile testing
 | app 						| 			| Path to the application file (local or remote) | 
 | deviceName 				| 			| Name of the device to use for mobile tests. It's the Human readable name (e.g: Nexus 6 as given by `adb -s <id_device> shell getprop`, line [ro.product.model] property on Android or `instruments -s devices`), not it's id. SeleniumRobot will replace this name with id when communicating with Appium | 
 | fullReset 				| true		| enable full reset capability for appium tests | 
+| appiumServerUrl			|			| Appium server already started, that will be used to execute the test. It's useful to debug tests locally |
 | appPackage 				| 			| Package name of application (android only) | 
 | appActivity 				| 			| Activity started by mobile application (Android) | 
 | appWaitActivity 			| 			| In some cases, the first started activity is not the main app activity | 
