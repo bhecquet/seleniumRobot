@@ -47,6 +47,7 @@ import com.seleniumtests.MockitoTest;
 import com.seleniumtests.WebTestPageServer;
 import com.seleniumtests.browserfactory.SeleniumGridDriverFactory;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
+import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.SeleniumGridNodeNotAvailable;
 import com.seleniumtests.driver.BrowserType;
@@ -131,6 +132,11 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 			// restore the grid connector as it's not in context for this test
 			if (driver != null && !SeleniumTestsContextManager.getThreadContext().getWebDriverGrid().isEmpty()) {
 				SeleniumTestsContextManager.getThreadContext().setSeleniumGridConnector(seleniumGridConnector);
+			}
+			
+			// Skip test when local grid is not present
+			if (!new SeleniumRobotGridConnector("http://127.0.0.1:4444/wd/hub").isGridActive()) {
+				throw new SkipException("no local seleniumrobot grid available");
 			}
 		}
 	}

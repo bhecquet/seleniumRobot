@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.chromium.HasCdp;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.remote.Browser;
 
