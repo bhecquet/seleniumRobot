@@ -69,7 +69,7 @@ public abstract class GenericPictureElement extends Element {
 	 * @param intoElement			HtmlElement inside of which our picture is. It allows scrolling to the zone where 
 	 * 								picture is searched before doing capture
 	 * @param detectionThreshold	sensitivity of search between 0 and 1. Be default, 0.1. More sensitivity means search can be less accurate, detect unwanted zones
-	 * @param searchOnDesktop		By default, false: search in driver snapshot. If true, we take a desktop screenshot, allowing searching into other elements that browser
+	 * @param searchOnDesktop		By default, false: search in driver snapshot. If true, we take a desktop screenshot, allowing searching into other elements than browser
 	 */
 	protected GenericPictureElement(String label, File pictureFile, double detectionThreshold, boolean searchOnDesktop) {		
 		

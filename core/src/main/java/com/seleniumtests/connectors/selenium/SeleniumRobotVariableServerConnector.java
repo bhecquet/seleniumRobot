@@ -72,7 +72,7 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	}
 	
 	public Map<String, TestVariable> getVariables() {
-		return getVariables(0);
+		return getVariables(0, -1);
 	}
 	
 
@@ -83,7 +83,7 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	 * @return			the map of found variables
 	 */
 	public Map<String, TestVariable> getVariables(String name, String value) {
-		return getVariables(0, name, value, true);
+		return getVariables(0, name, value, true, -1);
 	}
 
 	/**
@@ -93,8 +93,8 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	 * @param variablesOlderThanDays number of days since this variable should be created before it can be returned. This only applies to variables which have a time to live (a.k.a: where destroyAfterDays parameter is > 0) 
 	 * @return
 	 */
-	public Map<String, TestVariable> getVariables(Integer variablesOlderThanDays) {
-		return getVariables(variablesOlderThanDays, null, null, true);
+	public Map<String, TestVariable> getVariables(Integer variablesOlderThanDays, int variablesReservationDuration) {
+		return getVariables(variablesOlderThanDays, null, null, true, variablesReservationDuration);
 	}
 	
 	/**
@@ -102,13 +102,29 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	 * Display a warning when a custom variable prefix "custom.test.variable." overwrites or is overwritten by a regular one
 	 * 
 	 * 
-	 * @param variablesOlderThanDays 	number of days since this variable should be created before it can be returned. This only applies to variables which have a time to live (a.k.a: where destroyAfterDays parameter is > 0) 
-	 * @param name						name of the variables to retrieve. If given, only one variable will be get because server only returns one variable for each name
-	 * @param value						value of the variables to retrieve
-	 * @param reserve					if true, reserve the reservable variables, else, only return searched variables
+	 * @param variablesOlderThanDays 		number of days since this variable should be created before it can be returned. This only applies to variables which have a time to live (a.k.a: where destroyAfterDays parameter is > 0) 
+	 * @param name							name of the variables to retrieve. If given, only one variable will be get because server only returns one variable for each name
+	 * @param value							value of the variables to retrieve
+	 * @param reserve						if true, reserve the reservable variables, else, only return searched variables
 	 * @return
 	 */
 	public Map<String, TestVariable> getVariables(Integer variablesOlderThanDays, String name, String value, boolean reserve) {
+		return getVariables(variablesOlderThanDays, name, value, reserve, -1);
+	}
+	
+	/**
+	 * Retrieve all variables from the server
+	 * Display a warning when a custom variable prefix "custom.test.variable." overwrites or is overwritten by a regular one
+	 * 
+	 * 
+	 * @param variablesOlderThanDays 		number of days since this variable should be created before it can be returned. This only applies to variables which have a time to live (a.k.a: where destroyAfterDays parameter is > 0) 
+	 * @param name							name of the variables to retrieve. If given, only one variable will be get because server only returns one variable for each name
+	 * @param value							value of the variables to retrieve
+	 * @param reserve						if true, reserve the reservable variables, else, only return searched variables
+	 * @param variablesReservationDuration	Number of seconds a reservable variable will be reserved
+	 * @return
+	 */
+	public Map<String, TestVariable> getVariables(Integer variablesOlderThanDays, String name, String value, boolean reserve, int variablesReservationDuration) {
 		if (!active) {
 			throw new SeleniumRobotServerException("Server is not active");
 		}
@@ -124,6 +140,9 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 					.queryString("reserve", reserve)
 					.queryString("format", "json");
 			
+			if (variablesReservationDuration > 0) {
+				request = request.queryString("reservationDuration", variablesReservationDuration * 60);
+			}
 			if (name != null) {
 				request = request.queryString(FIELD_NAME, name);
 			}

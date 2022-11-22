@@ -261,6 +261,24 @@ public class StubTestClass extends StubParentClass {
 		}
 	}
 	
+	
+	@Test(groups="stub", testName="A test which is <OK> é&")
+	public void testOkWithTestName() throws IOException {
+		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
+		step1.addAction(new TestAction("sendKeys to text field", false, new ArrayList<>()));
+		TestStepManager.logTestStep(step1);
+	}
+	
+	@DataProvider(name = "data2")
+	 public Object[][] data2() {
+		return new String[][] {new String[] {"data2", "data3"}, new String[] {"data4", "data5"}};
+   }
+	
+	@Test(groups="stub", testName="A test which is OK (${arg0}, ${arg1})", dataProvider = "data2")
+	public void testOkWithTestNameAndDataProvider(String col1, String col2) throws IOException {
+		logger.info(String.format("%s,%s", col1, col2));
+	}
 
 	@Test(groups="stub")
 	public void testOk() throws IOException {

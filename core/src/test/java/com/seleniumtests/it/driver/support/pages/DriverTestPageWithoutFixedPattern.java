@@ -48,6 +48,7 @@ public class DriverTestPageWithoutFixedPattern extends PageObject {
 	public static final PictureElement picture = new PictureElement("picture", "tu/images/logo_text_field.png", table);
 	public static final PictureElement pictureNotPresent = new PictureElement("picture", "tu/images/vosAlertes.png", table);
 	public static final PictureElement googlePicture = new PictureElement("picture", "tu/googleSearch.png", null);
+	private static final PictureElement googlePrivatePicture = new PictureElement("picture", "tu/googleSearch.png", null);
 	public static final PictureElement googlePictureWithFile = new PictureElement("picture", Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "images", "googleSearch.png").toFile(), null);
 	public static final ScreenZone googleForDesktop = new ScreenZone("picture", "tu/googleSearch.png");
 	public static final ScreenZone googleForDesktopWithFile = new ScreenZone("picture", Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "images", "googleSearch.png").toFile());
@@ -67,6 +68,10 @@ public class DriverTestPageWithoutFixedPattern extends PageObject {
 	public DriverTestPageWithoutFixedPattern()  {
         super(textElement);
     }
+	
+	public DriverTestPageWithoutFixedPattern(String url, BrowserType browserType, String driverName) {
+		super(textElement, url, browserType, driverName, null);
+	}
     
     public DriverTestPageWithoutFixedPattern(boolean openPageURL) {
         super(textElement, openPageURL ? getPageUrl() : null);
@@ -79,6 +84,10 @@ public class DriverTestPageWithoutFixedPattern extends PageObject {
     
     public void clickGooglePicture() {
     	googlePicture.click();
+    }
+    
+    public void clickGooglePrivatePicture() {
+    	googlePrivatePicture.click();
     }
     
     //for TestInterceptPage (the loader page of By has to be a PageObject)

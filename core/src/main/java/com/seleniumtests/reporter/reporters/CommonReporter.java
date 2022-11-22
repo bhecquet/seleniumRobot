@@ -163,7 +163,7 @@ public abstract class CommonReporter implements IReporter {
 	}
 	
 	/**
-	 * Returns the visible test name 
+	 * Returns the unique test name 
 	 * It's based on unique name meaning that if same test has been executed several times through dataprovider, name is suffixed by "-1, -2, ...". 
 	 * It depends also if test has been skipped or not
 	 * skipped tests has never been executed and so attribute (set in TestListener) has not been applied
@@ -177,6 +177,31 @@ public abstract class CommonReporter implements IReporter {
 		
 		if (TestNGResultUtils.getUniqueTestName(testResult) != null) {
 			return TestNGResultUtils.getUniqueTestName(testResult);
+		}
+		
+		// when test is skipped, UNIQUE_METHOD_NAME may have not been generated
+		if (testResult.getStatus() == ITestResult.SKIP) {
+			return testResult.getName();
+		} else {
+			return "N-A";
+		}
+	}
+	
+	/**
+	 * Returns the visual test name. This name should be used only when presenting test name to a human (HTML / JUnit report), not used for technical communication
+	 * It's based on visual name meaning that if same test has been executed several times through dataprovider, name is suffixed by "-1, -2, ...". 
+	 * It depends also if test has been skipped or not
+	 * skipped tests has never been executed and so attribute (set in TestListener) has not been applied
+	 * @param testResult
+	 * @return
+	 */
+	public static String getVisualTestName(ITestResult testResult) {
+		if (testResult == null) {
+			return "N-A";
+		}
+		
+		if (TestNGResultUtils.getVisualTestName(testResult) != null) {
+			return TestNGResultUtils.getVisualTestName(testResult);
 		}
 		
 		// when test is skipped, UNIQUE_METHOD_NAME may have not been generated

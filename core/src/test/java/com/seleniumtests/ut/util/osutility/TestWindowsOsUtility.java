@@ -70,6 +70,12 @@ public class TestWindowsOsUtility extends MockitoTest {
 	private Path path4;
 	
 	@Mock
+	private File versionFolder;
+	
+	@Mock
+	private File exeFile;
+	
+	@Mock
 	private File browserFile2;
 	
 	@BeforeClass(groups={"ut"})
@@ -527,6 +533,46 @@ public class TestWindowsOsUtility extends MockitoTest {
 		Assert.assertEquals(browsers.get(BrowserType.EDGE).size(), 1);
 		Assert.assertEquals(browsers.get(BrowserType.EDGE).get(0).getPath(), "C:\\Program Files (x86)\\Microsoft_\\Edge\\Application\\msedge.exe");
 		Assert.assertEquals(browsers.get(BrowserType.EDGE).get(0).getVersion(), "92.0");
+	}
+	
+	/**
+	 * Search Edge chromium in HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe
+	 * In this case, version will be found in folder structure
+	 */
+	@Test(groups={"ut"})
+	public void testEdgeChromiumStandardWindowsInstallation2() {
+		PowerMockito.mockStatic(OSCommand.class);
+		PowerMockito.mockStatic(Advapi32Util.class);
+		PowerMockito.mockStatic(Paths.class);
+		
+		// mock search of browser version in folder structure
+		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application")).thenReturn(path);
+		when(path.toFile()).thenReturn(browserFile);
+		when(browserFile.exists()).thenReturn(true);
+		when(browserFile.listFiles()).thenReturn(new File[] {exeFile, versionFolder}); // list of files in C:\Program Files (x86)\Microsoft\Edge\Application
+		when(versionFolder.isDirectory()).thenReturn(true);
+		when(versionFolder.getName()).thenReturn("104.0.1293.70");
+		when(exeFile.isDirectory()).thenReturn(false);
+		when(exeFile.getName()).thenReturn("msedge.exe");
+		
+		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application\\msedge.exe")).thenReturn(path);
+		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application", "msedge.exe")).thenReturn(path2);
+		when(path2.toString()).thenReturn("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application\\msedge.exe");
+		
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "")).thenThrow(Win32Exception.class);
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeBHTML\\shell\\open\\command", "")).thenThrow(Win32Exception.class); // chrome beta not installed
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenThrow(Win32Exception.class);
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "InstallLocation")).thenThrow(Win32Exception.class);
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\App Paths\\msedge.exe", "Path")).thenReturn("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application");
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "Version")).thenThrow(Win32Exception.class);
+		when(OSCommand.executeCommandAndWait(new String[] {"REG", "QUERY", "HKCR",  "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("");
+		
+		OSUtility.refreshBrowserList();
+		Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
+		Assert.assertTrue(browsers.keySet().contains(BrowserType.EDGE));
+		Assert.assertEquals(browsers.get(BrowserType.EDGE).size(), 1);
+		Assert.assertEquals(browsers.get(BrowserType.EDGE).get(0).getPath(), "C:\\Program Files (x86)\\Microsoft_\\Edge\\Application\\msedge.exe");
+		Assert.assertEquals(browsers.get(BrowserType.EDGE).get(0).getVersion(), "104.0");
 	}
 	
 	/**

@@ -160,7 +160,7 @@ public class JUnitReporter extends CommonReporter {
 
 		Properties p2 = new Properties();
 		p2.setProperty(XMLConstants.ATTR_CLASSNAME, className);
-		p2.setProperty(XMLConstants.ATTR_NAME, getTestName(tr));
+		p2.setProperty(XMLConstants.ATTR_NAME, getVisualTestName(tr));
 		int status = tr.getStatus();
 		if (status == ITestResult.SKIP || status == ITestResult.SUCCESS_PERCENTAGE_FAILURE) {
 			testTag.childTag = XMLConstants.SKIPPED;

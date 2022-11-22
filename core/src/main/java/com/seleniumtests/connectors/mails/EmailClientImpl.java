@@ -244,7 +244,7 @@ public abstract class EmailClientImpl implements EmailClient {
 				break;
 			}
 			
-			// non found retry with last received emails
+			// not found retry with last received emails
 			emailList.addAll(getEmails(subject));			
 			WaitHelper.waitForSeconds(10);
 		}

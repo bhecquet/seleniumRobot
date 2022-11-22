@@ -54,24 +54,32 @@ public class TestErrorCauseFinder extends MockitoTest {
 	SeleniumRobotSnapshotServerConnector serverConnector;
 	
 	@Mock
+	StepReferenceComparator stepReferenceComparatorStep3;
+	
+	@Mock
 	StepReferenceComparator stepReferenceComparatorStep2;
 	
 	@Mock
 	StepReferenceComparator stepReferenceComparatorStep1;
 	
 	private TestStep step1;
+	private TestStep step2;
 	private TestStep stepFailed;
 	private TestStep lastStep;
 	
 	private File imgStep1Ref;
 	private File imgStep1;
 	private File imgStep2Ref;
+	private File imgStep3Ref;
 	private File imgLastStep;
 	private File referenceImgStep1;
 	private File referenceImgStep2;
+	private File referenceImgStep3;
 	
 	@BeforeMethod(alwaysRun = true)
 	public void init() throws Exception {
+		
+		// create first step
 		step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), false);
 		step1.setStepResultId(0);
 		step1.setPosition(0);
@@ -96,23 +104,42 @@ public class TestErrorCauseFinder extends MockitoTest {
 		FileUtils.copyFile(imgStep1, new File(screenshot.getFullImagePath()));
 		FileUtils.copyFile(tmpHtml, new File(screenshot.getFullHtmlPath()));
 		step1.addSnapshot(new Snapshot(screenshot2, null, SnapshotCheckType.FALSE), 1, null);
-		
-		stepFailed = new TestStep("step 2", Reporter.getCurrentTestResult(), new ArrayList<>(), false);
-		stepFailed.setStepResultId(1);
-		stepFailed.setFailed(true);
-		stepFailed.setPosition(1);
-		
+
+		// create an second step
+		step2 = new TestStep("step 2", Reporter.getCurrentTestResult(), new ArrayList<>(), false);
+		step2.setStepResultId(1);
+		step2.setPosition(1);
+	
 		imgStep2Ref = File.createTempFile("img", ".png");
 		
+		ScreenShot screenshotStep3 = new ScreenShot();
+		screenshotStep3.setImagePath("screenshot/" + imgStep2Ref.getName());
+		screenshotStep3.setHtmlSourcePath("htmls/" + tmpHtml.getName());
+		FileUtils.copyFile(imgStep2Ref, new File(screenshotStep3.getFullImagePath()));
+		FileUtils.copyFile(tmpHtml, new File(screenshotStep3.getFullHtmlPath()));
+		step2.addSnapshot(new Snapshot(screenshot, null, SnapshotCheckType.REFERENCE_ONLY), 1, null);
+		
+		
+		// create third step, which will fail
+		stepFailed = new TestStep("step 3", Reporter.getCurrentTestResult(), new ArrayList<>(), false);
+		stepFailed.setStepResultId(2);
+		stepFailed.setFailed(true);
+		stepFailed.setPosition(2);
+		
+		imgStep3Ref = File.createTempFile("img", ".png");
+		
 		ScreenShot screenshot3 = new ScreenShot();
-		screenshot3.setImagePath("screenshot/" + imgStep2Ref.getName());
+		screenshot3.setImagePath("screenshot/" + imgStep3Ref.getName());
 		screenshot3.setHtmlSourcePath("htmls/" + tmpHtml.getName());
-		FileUtils.copyFile(imgStep2Ref, new File(screenshot3.getFullImagePath()));
+		FileUtils.copyFile(imgStep3Ref, new File(screenshot3.getFullImagePath()));
 		FileUtils.copyFile(tmpHtml, new File(screenshot3.getFullHtmlPath()));
 		stepFailed.addSnapshot(new Snapshot(screenshot3, null, SnapshotCheckType.REFERENCE_ONLY), 1, null);
 		
+
+
+		// create 'Test end' step
 		lastStep = new TestStep(TestStepManager.LAST_STEP_NAME, Reporter.getCurrentTestResult(), new ArrayList<>(), false);
-		lastStep.setPosition(2);
+		lastStep.setPosition(3);
 		
 		imgLastStep = File.createTempFile("img", ".png");
 		File tmpHtml2 = File.createTempFile("html", ".html");
@@ -132,8 +159,11 @@ public class TestErrorCauseFinder extends MockitoTest {
 		FileUtils.copyFile(image, referenceImgStep1);
 		referenceImgStep2 = File.createTempFile("img", ".png"); // reference image for step 2
 		FileUtils.copyFile(image, referenceImgStep2);
+		referenceImgStep3 = File.createTempFile("img", ".png"); // reference image for step 2
+		FileUtils.copyFile(image, referenceImgStep3);
 		when(serverConnector.getReferenceSnapshot(0)).thenReturn(referenceImgStep1);
 		when(serverConnector.getReferenceSnapshot(1)).thenReturn(referenceImgStep2);
+		when(serverConnector.getReferenceSnapshot(2)).thenReturn(referenceImgStep3);
 		
 	}
 	
@@ -377,7 +407,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
 		
 		// comparison successful
-		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep2).thenReturn(stepReferenceComparatorStep2);
+		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep3).thenReturn(stepReferenceComparatorStep3);
 		when(stepReferenceComparatorStep2.compare()).thenReturn(90);
 		
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
@@ -397,7 +427,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
 		
 		// comparison successful
-		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep2).thenReturn(stepReferenceComparatorStep2);
+		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep3).thenReturn(stepReferenceComparatorStep3);
 		when(stepReferenceComparatorStep2.compare()).thenReturn(90);
 		
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
@@ -422,9 +452,9 @@ public class TestErrorCauseFinder extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
 		
 		// comparison successful
-		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep2).thenReturn(stepReferenceComparatorStep2);
-		when(stepReferenceComparatorStep2.compare()).thenReturn(50);
-		when(stepReferenceComparatorStep2.getMissingFields()).thenReturn(Arrays.asList(new Field(0, 100, 0, 20, "", "field")));
+		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep3).thenReturn(stepReferenceComparatorStep3);
+		when(stepReferenceComparatorStep3.compare()).thenReturn(50);
+		when(stepReferenceComparatorStep3.getMissingFields()).thenReturn(Arrays.asList(new Field(0, 100, 0, 20, "", "field")));
 		
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
 		
@@ -435,7 +465,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
 		
 		// check rectangle has been drawn around the missing field
-		BufferedImage image = ImageIO.read(referenceImgStep2);
+		BufferedImage image = ImageIO.read(referenceImgStep3);
 		Assert.assertEquals(new Color(image.getRGB(0, 20)), Color.RED);
 		Assert.assertEquals(new Color(image.getRGB(0, 0)), Color.RED);
 		Assert.assertEquals(new Color(image.getRGB(100, 20)), Color.RED);
@@ -449,9 +479,9 @@ public class TestErrorCauseFinder extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
 		
 		// comparison successful
-		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep2).thenReturn(stepReferenceComparatorStep2);
-		when(stepReferenceComparatorStep2.compare()).thenReturn(50);
-		when(stepReferenceComparatorStep2.getMissingLabels()).thenReturn(Arrays.asList(new Label(0, 100, 20, 50, "some label")));
+		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep3).thenReturn(stepReferenceComparatorStep3);
+		when(stepReferenceComparatorStep3.compare()).thenReturn(50);
+		when(stepReferenceComparatorStep3.getMissingLabels()).thenReturn(Arrays.asList(new Label(0, 100, 20, 50, "some label")));
 		
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
 		
@@ -462,7 +492,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
 		
 		// check line has been drawn below the missing label
-		BufferedImage image = ImageIO.read(referenceImgStep2);
+		BufferedImage image = ImageIO.read(referenceImgStep3);
 		Assert.assertEquals(new Color(image.getRGB(0, 50)), Color.RED);
 		Assert.assertNotEquals(new Color(image.getRGB(0, 20)), Color.RED);
 		Assert.assertEquals(new Color(image.getRGB(100, 50)), Color.RED);
@@ -483,9 +513,9 @@ public class TestErrorCauseFinder extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
 		
 		// comparison successful
-		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep2).thenReturn(stepReferenceComparatorStep2);
+		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep3).thenReturn(stepReferenceComparatorStep3);
 		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep1).thenReturn(stepReferenceComparatorStep1);
-		when(stepReferenceComparatorStep2.compare()).thenReturn(49); // bad comparison with step2 reference
+		when(stepReferenceComparatorStep3.compare()).thenReturn(49); // bad comparison with step2 reference
 		when(stepReferenceComparatorStep1.compare()).thenReturn(81); // good comparison with step1 reference
 		
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
@@ -494,6 +524,34 @@ public class TestErrorCauseFinder extends MockitoTest {
 		Assert.assertEquals(causes.get(0).getType(), ErrorType.SELENIUM_ERROR);
 		Assert.assertEquals(causes.get(0).getDescription(), "Wrong page found, we are on the page of step 'step 1'");
 		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
+	}
+	
+	/**
+	 * #525: Test that step order is not modified when we compare with previous steps
+	 * @throws Exception
+	 */
+	@Test(groups= {"ut"})
+	public void testCompareStepInErrorWithReferenceBadMatchPreviousStep2() throws Exception {
+		
+		ITestResult testResult = Reporter.getCurrentTestResult();
+		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, step2, stepFailed, lastStep));
+		
+		// comparison successful
+		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep3).thenReturn(stepReferenceComparatorStep3);
+		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep2).thenReturn(stepReferenceComparatorStep2);
+		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep1).thenReturn(stepReferenceComparatorStep1);
+		when(stepReferenceComparatorStep3.compare()).thenReturn(49); // bad comparison with step3 reference
+		when(stepReferenceComparatorStep3.compare()).thenReturn(49); // bad comparison with step2 reference
+		when(stepReferenceComparatorStep1.compare()).thenReturn(81); // good comparison with step1 reference
+		
+		new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
+		
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
+		Assert.assertEquals(steps.get(0), step1);
+		Assert.assertEquals(steps.get(1), step2);
+		Assert.assertEquals(steps.get(2), stepFailed);
+		Assert.assertEquals(steps.get(3), lastStep);
 	}
 	
 	/**
@@ -510,9 +568,9 @@ public class TestErrorCauseFinder extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
 		
 		// comparison successful
-		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep2).thenReturn(stepReferenceComparatorStep2);
+		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep3).thenReturn(stepReferenceComparatorStep3);
 		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep1).thenReturn(stepReferenceComparatorStep1);
-		when(stepReferenceComparatorStep2.compare()).thenReturn(49); // bad comparison with step2 reference
+		when(stepReferenceComparatorStep3.compare()).thenReturn(49); // bad comparison with step2 reference
 		when(stepReferenceComparatorStep1.compare()).thenReturn(80); // good comparison with step1 reference
 		
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
@@ -536,8 +594,8 @@ public class TestErrorCauseFinder extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(stepFailed, lastStep));
 		
 		// comparison successful
-		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep2).thenReturn(stepReferenceComparatorStep2);
-		when(stepReferenceComparatorStep2.compare()).thenReturn(49); // bad comparison with step2 reference
+		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep3).thenReturn(stepReferenceComparatorStep3);
+		when(stepReferenceComparatorStep3.compare()).thenReturn(49); // bad comparison with step3 reference
 		
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
 		
@@ -561,9 +619,9 @@ public class TestErrorCauseFinder extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
 		
 		// comparison successful
-		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep2).thenReturn(stepReferenceComparatorStep2);
+		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep3).thenReturn(stepReferenceComparatorStep3);
 		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep1).thenReturn(stepReferenceComparatorStep1);
-		when(stepReferenceComparatorStep2.compare()).thenReturn(49); // bad comparison with step2 reference
+		when(stepReferenceComparatorStep3.compare()).thenReturn(49); // bad comparison with step3 reference
 		
 		// error occurs when getting reference on step 1
 		when(serverConnector.getReferenceSnapshot(0)).thenReturn(null);
@@ -589,9 +647,9 @@ public class TestErrorCauseFinder extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
 		
 		// comparison successful
-		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep2).thenReturn(stepReferenceComparatorStep2);
+		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep3).thenReturn(stepReferenceComparatorStep3);
 		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep1).thenReturn(stepReferenceComparatorStep1);
-		when(stepReferenceComparatorStep2.compare()).thenReturn(49); // bad comparison with step2 reference
+		when(stepReferenceComparatorStep3.compare()).thenReturn(49); // bad comparison with step3 reference
 		
 		// exception occurs when getting reference on step 1
 		when(serverConnector.getReferenceSnapshot(0)).thenThrow(new ConfigurationException(""));
@@ -635,7 +693,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
 		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
 		
-		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep2);
+		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep3);
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
 		
 		// no comparison done
@@ -656,7 +714,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
 		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, lastStep));
 		
-		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep2);
+		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep3);
 		
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
 
@@ -682,7 +740,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
 		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
 		
-		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep2);
+		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep3);
 		
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
 		
@@ -707,7 +765,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
 		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
 		
-		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep2);
+		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep3);
 		
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
 		
@@ -733,9 +791,9 @@ public class TestErrorCauseFinder extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
 		
 		// comparison successful
-		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep2).thenReturn(stepReferenceComparatorStep2);
+		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep3).thenReturn(stepReferenceComparatorStep3);
 		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep1).thenReturn(stepReferenceComparatorStep1);
-		when(stepReferenceComparatorStep2.compare()).thenReturn(49); // bad comparison with step2 reference
+		when(stepReferenceComparatorStep3.compare()).thenReturn(49); // bad comparison with step3 reference
 		when(stepReferenceComparatorStep1.compare()).thenReturn(81); // good comparison with step1 reference
 		
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
@@ -758,7 +816,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
 		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
 		
-		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep2);
+		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep3);
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
 		
 		// no comparison done
@@ -781,8 +839,8 @@ public class TestErrorCauseFinder extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
 		
 		// no reference exists for stepFailed on server
-		when(serverConnector.getReferenceSnapshot(1)).thenReturn(null);
-		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep2);
+		when(serverConnector.getReferenceSnapshot(2)).thenReturn(null);
+		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep3);
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
 		
 		// no comparison done
@@ -804,8 +862,8 @@ public class TestErrorCauseFinder extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
 		
 		// no reference exists for stepFailed on server
-		when(serverConnector.getReferenceSnapshot(1)).thenThrow(new SeleniumRobotServerException("error"));
-		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep2);
+		when(serverConnector.getReferenceSnapshot(2)).thenThrow(new SeleniumRobotServerException("error"));
+		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep3);
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
 		
 		// no comparison done
@@ -827,8 +885,8 @@ public class TestErrorCauseFinder extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
 		
 		// comparison successful
-		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep2).thenReturn(stepReferenceComparatorStep2);
-		when(stepReferenceComparatorStep2.compare()).thenThrow(new ConfigurationException("error on init"));
+		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(new File(stepFailed.getSnapshots().get(0).getScreenshot().getFullImagePath()), referenceImgStep3).thenReturn(stepReferenceComparatorStep3);
+		when(stepReferenceComparatorStep3.compare()).thenThrow(new ConfigurationException("error on init"));
 		
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference();
 		

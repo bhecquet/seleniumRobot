@@ -77,6 +77,7 @@ public class DriverTestPage extends PageObject {
 	public static final Table table = new Table("table", By.id("table"));
 	public static final Table emptyTable = new Table("table", By.id("emptyTable"));
 	public static final PictureElement picture = new PictureElement("picture", "tu/images/logo_text_field.png", table);
+	private static final PictureElement privatePicture = new PictureElement("picture", "tu/images/logo_text_field.png", table);
 	public static final PictureElement pictureNotPresent = new PictureElement("picture", "tu/images/vosAlertes.png", table);
 	public static final TextFieldElement logoText = new TextFieldElement("logoText", By.id("logoText"));
 	public static final FileUploadElement upload = new FileUploadElement("upload", By.id("upload"));
@@ -266,6 +267,11 @@ public class DriverTestPage extends PageObject {
     public DriverTestPage _clickPicture() {
 		picture.clickAt(0, -30);
 		return this;
+    }
+    
+    public DriverTestPage _clickPrivatePicture() {
+    	privatePicture.clickAt(0, -30);
+    	return this;
     }
     
     public DriverTestPage _switchAngularWindow() {

@@ -530,7 +530,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			throw new ScenarioException("You cannot write text before driver has been created and corresponding node instanciated");
 		}
 		
-		logger.info("writing text: " + text);
+		logger.info("writing text: " + text.substring(0, Math.min(2, text.length())) + "****");
 		try {
 			HttpResponse<String> response = Unirest.post(String.format("%s%s", nodeServletUrl, NODE_TASK_SERVLET))
 				.queryString(ACTION_FIELD, "writeText")

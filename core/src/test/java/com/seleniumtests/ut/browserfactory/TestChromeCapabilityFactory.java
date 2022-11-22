@@ -91,12 +91,14 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
 		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "104.0", "", false, false), 
 																		new BrowserInfo(BrowserType.CHROME, "105.0", "", false, true)));
+
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
 		
 		ChromeCapabilitiesFactory capaFactory = new ChromeCapabilitiesFactory(config);
 		capaFactory.createCapabilities();
 		Assert.assertFalse(capaFactory.getSelectedBrowserInfo().getBeta());
 		Assert.assertEquals(capaFactory.getSelectedBrowserInfo().getVersion(), "104.0");
+
 	}
 	
 	/**
@@ -124,6 +126,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
 		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "104.0", "", false, false), 
 				new BrowserInfo(BrowserType.CHROME, "105.0", "", false, true)));
+
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(true)).thenReturn(browserInfos);
 		when(config.getBetaBrowser()).thenReturn(true);
 

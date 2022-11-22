@@ -163,7 +163,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			context.put("newline", "\n");
 			context.put("failures", errors);
 			context.put("hostname", testResult.getHost() == null ? "": testResult.getHost());
-			context.put("suiteName", TestNGResultUtils.getUniqueTestName(testResult));
+			context.put("suiteName", StringUtility.encodeString(TestNGResultUtils.getVisualTestName(testResult), reportFormat.toLowerCase()));
 			context.put("className", testResult.getTestClass().getName());
 			context.put("tests", newTestSteps == null ? 0: newTestSteps.size());
 			context.put("duration", testDuration / 1000.0);

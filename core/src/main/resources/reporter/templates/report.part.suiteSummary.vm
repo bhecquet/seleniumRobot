@@ -64,6 +64,8 @@
 				                	#foreach ($testContext in $tests.entrySet())
 				                		#foreach ($testResult in $testContext.value)
 				                			#set ($testIdx = $testIdx + 1)
+				                			#set ($testName = $testNames.get($testResult))
+				                			#set ($description = $descriptions.get($testResult))
 				                			#**
 				                			Compute step state for each test
 				                			*#
@@ -84,10 +86,8 @@
 				                			#set ($totalPassed = $totalPassed + $passedSteps)
 				                			#set ($totalFailed = $totalFailed + $failedSteps)
 				                			#set ($totalSteps = $totalSteps + $totalTestSteps)
-				                			#if ($testResult.getAttribute("description").isEmpty())
+				                			#if ($description.isEmpty())
 				                				#set ($description = "no description available")
-				                			#else
-				                				#set ($description = $testResult.getAttribute("description"))
 				                			#end
 				                			
 				                			#if ("$!testResult.getAttribute('snapshotComparisonResult')" == "")
@@ -103,15 +103,15 @@
 				                			#if ($testResult.getStatus() == 1)
 				                				<tr class="testSuccess">
 				                				<td>$testContext.key.getName()</td>
-				                				<td class="alignleft">$circle<a href='$testResult.getAttribute("methodResultFileName")' info="ok" data-toggle="tooltip" title="$description">$testResult.getAttribute("uniqueMethodName")</a></td>
+				                				<td class="alignleft">$circle<a href='$testResult.getAttribute("methodResultFileName")' info="ok" data-toggle="tooltip" title="$description">$testName</a></td>
 				                			#elseif ($testResult.getStatus() == 2)
 				                				<tr class="testFailed">
 				                				<td>$testContext.key.getName()</td>
-				                				<td class="alignleft">$circle<a href='$testResult.getAttribute("methodResultFileName")' info="ko" data-toggle="tooltip" title="$description">$testResult.getAttribute("uniqueMethodName")</a></td>
+				                				<td class="alignleft">$circle<a href='$testResult.getAttribute("methodResultFileName")' info="ko" data-toggle="tooltip" title="$description">$testName</a></td>
 				                			#else 
 				                				<tr class="testSkipped">
 				                				<td>$testContext.key.getName()</td>
-				                				<td class="alignleft">$circle<a href='$testResult.getAttribute("methodResultFileName")' info="skipped" data-toggle="tooltip" title="$description">$testResult.getAttribute("uniqueMethodName")</a></td>
+				                				<td class="alignleft">$circle<a href='$testResult.getAttribute("methodResultFileName")' info="skipped" data-toggle="tooltip" title="$description">$testName</a></td>
 				                			#end 
 	
 											<!--

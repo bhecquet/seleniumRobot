@@ -203,7 +203,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			// do not recreate this report anymore
 			TestNGResultUtils.setHtmlReportCreated(testResult, true);
 		} catch (Exception e) {
-			logger.error("Error writing test report: " + getTestName(testResult), e);
+			logger.error("Error writing test report: " + getVisualTestName(testResult), e);
 		}  
 	}
 	
@@ -242,7 +242,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		
 		// test header
 		Object[] testParameters = testResult.getParameters();
-		StringBuilder testName = new StringBuilder(getTestName(testResult));
+		StringBuilder testName = new StringBuilder(getVisualTestName(testResult));
 		
 		// issue #163: add test parameter to test name
 		if (testParameters.length > 0) {
@@ -260,7 +260,8 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			testName.append(")");
 		}
 		
-		context.put("testName", testName);
+		context.put("testName", StringUtility.encodeString(testName.toString(), "html"));
+		// by default, encodeString replaces line breaks with <br/> which is not suitable for description
 		context.put("description", StringUtility.encodeString(TestNGResultUtils.getTestDescription(testResult), "html"));
 		
 
@@ -390,6 +391,8 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		// build result list for each TestNG test
 		Map<ITestContext, List<ITestResult>> methodResultsMap = new LinkedHashMap<>();
 		Map<ITestResult, Map<String, String>> testInfosMap = new HashMap<>();
+		Map<ITestResult, String> testNameMap = new HashMap<>();
+		Map<ITestResult, String> descriptionMap = new HashMap<>();
 		Map<ITestResult, List<TestStep>> allSteps = new HashMap<>();
 		Set<String> allInfoKeys = new HashSet<>();
 		
@@ -418,6 +421,9 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 				testInfosMap.put(result, testInfos);
 				allInfoKeys.addAll(testInfos.keySet());
 				
+				// add visual test name and description
+				testNameMap.put(result, StringUtility.encodeString(TestNGResultUtils.getVisualTestName(result), "html"));
+				descriptionMap.put(result, StringUtility.encodeString(TestNGResultUtils.getTestDescription(result), "html").replace("<br/>", ""));
 			}
 			
 			methodResultsMap.put(entry.getKey(), methodResults);
@@ -442,7 +448,8 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 				context.put("steps", allSteps);
 				context.put("infos", testInfosMap);
 				context.put("infoKeys", allSortedInfoKeys);
-
+				context.put("testNames", testNameMap);
+				context.put("descriptions", descriptionMap);
 				
 			}
 			StringWriter writer = new StringWriter();

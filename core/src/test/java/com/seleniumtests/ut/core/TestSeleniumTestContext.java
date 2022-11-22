@@ -947,6 +947,19 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	
 	@Test(groups="ut context")
+	public void testSeleniumRobotVariableReservationDuration(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerVariableReservationDuration(300);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerVariableReservationDuration(), (Integer)300);
+	}
+	@Test(groups="ut context")
+	public void testSeleniumRobotVariableReservationDurationNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerVariableReservationDuration(null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerVariableReservationDuration(), (Integer)SeleniumTestsContext.DEFAULT_SELENIUMROBOTSERVER_VARIABLES_RESERVATION);
+	}
+	
+	@Test(groups="ut context")
 	public void testCompareSnapshotBehaviour(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerCompareSnapshotBehaviour("addTestResult");

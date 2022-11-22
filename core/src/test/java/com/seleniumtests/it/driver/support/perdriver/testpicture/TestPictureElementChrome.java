@@ -43,6 +43,14 @@ public class TestPictureElementChrome extends TestPictureElement {
 	public void testMultipleActionsOnPictureWithAnotherPage() {
 		super.testMultipleActionsOnPictureWithAnotherPage();
 	}
+	
+	/**
+	 * issue #529: test done only with chrome as it does not depend on browser
+	 */
+	@Test(groups={"it"})
+	public void testMultipleActionsOnPictureWithAnotherPagePrivateField() {
+		super.testMultipleActionsOnPictureWithAnotherPagePrivateField();
+	}
 
 	@Test(groups={"it"})
 	public void testDoubleClickOnPicture() {

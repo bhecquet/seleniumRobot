@@ -22,7 +22,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
@@ -89,10 +88,9 @@ public class TestJUnitReporter extends ReporterTest {
 	public void testReportContent(ITestContext testContext) throws Exception {
 
 		List<String> testList = executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException", "testSkipped"});
-		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
 		
 		
-		String result = FileUtils.readFileToString(Paths.get(outDir, "junitreports", String.format("TEST-%s.xml", testList.get(0))).toFile(), StandardCharsets.UTF_8);
+		String result = readJUnitFile(testList.get(0));
 		Assert.assertTrue(result.contains("<failure type=\"java.lang.AssertionError\" message=\"error\">"));
 		Assert.assertTrue(result.contains("<error type=\"com.seleniumtests.customexception.DriverExceptions\" message=\"some exception\">")); // errors
 		Assert.assertTrue(result.contains("[main] SeleniumRobotTestListener: Finish method testSkipped")); // some logs
@@ -106,6 +104,22 @@ public class TestJUnitReporter extends ReporterTest {
 		Assert.assertFalse(result.contains("<testcase name=\"testWithExceptionAndMaxRetryIncreased\""));
 		Assert.assertFalse(result.contains("<testcase name=\"testWithExceptionAndMaxRetryIncreasedWithLimit\""));
 	
+	}
+	
+	/**
+	 * Check custom names are set in JUnit report
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportContentCustomTestName(ITestContext testContext) throws Exception {
+
+		List<String> testList = executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testOkWithTestName", "testOkWithTestNameAndDataProvider"});
+
+		String result = readJUnitFile(testList.get(0));
+		Assert.assertTrue(result.contains("<testcase name=\"A test which is &lt;OK&gt; é&amp;\""));
+		Assert.assertTrue(result.contains("<testcase name=\"A test which is OK (data2, data3)\""));
+		
 	}
 	
 
@@ -130,8 +144,8 @@ public class TestJUnitReporter extends ReporterTest {
 			List<String> testList = executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
 			
 			// check there are 2 results. first one is the selenium test (OK) and second one is the snapshot comparison (KO)
-			String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
-			String result = FileUtils.readFileToString(Paths.get(outDir, "junitreports", String.format("TEST-%s.xml", testList.get(0))).toFile(), StandardCharsets.UTF_8);
+			String result = readJUnitFile(testList.get(0));
+			
 			Assert.assertTrue(result.contains("tests=\"2\""));
 			Assert.assertTrue(result.contains("errors=\"1\""));
 			Assert.assertTrue(result.contains("<error type=\"com.seleniumtests.customexception.ScenarioException\" message=\"Snapshot comparison failed\">"));
@@ -200,8 +214,7 @@ public class TestJUnitReporter extends ReporterTest {
 			List<String> testList = executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
 			
 			// check there are 2 results. first one is the selenium test (OK) and second one is the snapshot comparison (KO)
-			String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
-			String result = FileUtils.readFileToString(Paths.get(outDir, "junitreports", String.format("TEST-%s.xml", testList.get(0))).toFile(), StandardCharsets.UTF_8);
+			String result = readJUnitFile(testList.get(0));
 			Assert.assertTrue(result.contains("tests=\"1\""));
 			Assert.assertTrue(result.contains("errors=\"1\""));
 			Assert.assertTrue(result.contains("<error type=\"com.seleniumtests.customexception.ScenarioException\" message=\"Snapshot comparison failed\">"));
@@ -236,8 +249,7 @@ public class TestJUnitReporter extends ReporterTest {
 			List<String> testList = executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
 			
 			// check there is 1 results
-			String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
-			String result = FileUtils.readFileToString(Paths.get(outDir, "junitreports", String.format("TEST-%s.xml", testList.get(0))).toFile(), StandardCharsets.UTF_8);
+			String result = readJUnitFile(testList.get(0));
 			Assert.assertTrue(result.contains("tests=\"1\""));
 			Assert.assertTrue(result.contains("errors=\"0\"")); // as comparison is skipped, test result is not changed
 			Assert.assertFalse(result.contains("<error type=\"com.seleniumtests.customexception.ScenarioException\" message=\"Snapshot comparison failed\">"));

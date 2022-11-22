@@ -192,7 +192,8 @@ public class ErrorCauseFinder {
 		
 
 		// read the list in reverse order to find the best matching reference
-		List<TestStep> testStepsSubList = testStepManager.getTestSteps().subList(0, testStep.getPosition());
+		// #525: copy list so that original step list is not modified
+		List<TestStep> testStepsSubList = new ArrayList<>(testStepManager.getTestSteps().subList(0, testStep.getPosition()));
 		Collections.reverse(testStepsSubList);
 		for (TestStep testStep2: testStepsSubList) {
 			if (testStep2.getStepResultId() != null) {

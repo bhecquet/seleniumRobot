@@ -143,6 +143,7 @@ public class SeleniumTestsContext {
     public static final String SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL = "seleniumRobotServerSnapshotsTtl";			// Time to live of the test session on seleniumRobot server
     public static final String SELENIUMROBOTSERVER_RECORD_RESULTS = "seleniumRobotServerRecordResults";				// whether we should record test results to server. This option only operates when SeleniumRobot server is connected
     public static final String SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN = "seleniumRobotServerVariablesOlderThan";	// whether we should get from server variables which were created at least X days ago
+    public static final String SELENIUMROBOTSERVER_VARIABLES_RESERVATION = "seleniumRobotServerVariablesReservation"; // duration of reservation of variable in minutes. By default, variable server reserves variable for 15 mins
     public static final String SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR = "snapshotComparisonResult";
     
     public static final String SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER = "setAssumeUntrustedCertificateIssuer"; // Firefox uniquement pour qu'il ne prenne pas en compte les certificats invalides 
@@ -267,6 +268,7 @@ public class SeleniumTestsContext {
 	public static final boolean DEFAULT_SELENIUMROBOTSERVER_RECORD_RESULTS = false;
 	public static final boolean DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT = false;
 	public static final int DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL = 30;
+	public static final int DEFAULT_SELENIUMROBOTSERVER_VARIABLES_RESERVATION = -1;
 	public static final SnapshotComparisonBehaviour DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR = SnapshotComparisonBehaviour.DISPLAY_ONLY;
 	public static final boolean DEFAULT_SELENIUMROBOTSERVER_ACTIVE = false;
 	public static final String DEFAULT_SELENIUMROBOTSERVER_TOKEN = null;
@@ -387,6 +389,7 @@ public class SeleniumTestsContext {
         setSeleniumRobotServerActive(getBoolValueForTest(SELENIUMROBOTSERVER_ACTIVE, System.getProperty(SELENIUMROBOTSERVER_ACTIVE)));
         setSeleniumRobotServerToken(getValueForTest(SELENIUMROBOTSERVER_TOKEN, System.getProperty(SELENIUMROBOTSERVER_TOKEN)));
         setSeleniumRobotServerCompareSnapshot(getBoolValueForTest(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, System.getProperty(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT)));
+        setSeleniumRobotServerVariableReservationDuration(getIntValueForTest(SELENIUMROBOTSERVER_VARIABLES_RESERVATION, System.getProperty(SELENIUMROBOTSERVER_VARIABLES_RESERVATION)));
         setSeleniumRobotServerCompareSnapshotTtl(getIntValueForTest(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL, System.getProperty(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL)));
         setSeleniumRobotServerCompareSnapshotBehaviour(getValueForTest(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, System.getProperty(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR)));
         setSeleniumRobotServerRecordResults(getBoolValueForTest(SELENIUMROBOTSERVER_RECORD_RESULTS, System.getProperty(SELENIUMROBOTSERVER_RECORD_RESULTS)));
@@ -992,7 +995,7 @@ public class SeleniumTestsContext {
     		
     		// get variable from server if they have never been get
     		if (variableAlreadyRequestedFromServer == null) {
-				variableAlreadyRequestedFromServer = variableServer.getVariables(getSeleniumRobotServerVariableOlderThan());
+				variableAlreadyRequestedFromServer = variableServer.getVariables(getSeleniumRobotServerVariableOlderThan(), getSeleniumRobotServerVariableReservationDuration());
     		}
     		getConfiguration().putAll(variableAlreadyRequestedFromServer);
 
@@ -1339,6 +1342,10 @@ public class SeleniumTestsContext {
     
     public Integer getSeleniumRobotServerCompareSnapshotTtl() {
     	return (Integer) getAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL);
+    }
+    
+    public Integer getSeleniumRobotServerVariableReservationDuration() {
+    	return (Integer) getAttribute(SELENIUMROBOTSERVER_VARIABLES_RESERVATION);
     }
     
     public boolean getSeleniumRobotServerRecordResults() {
@@ -1994,6 +2001,14 @@ public class SeleniumTestsContext {
     		setAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL, timeToLive);
     	} else {
     		setAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL, DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL);
+    	}
+    }
+    
+    public void setSeleniumRobotServerVariableReservationDuration(Integer reservationDuration) {
+    	if (reservationDuration != null) {
+    		setAttribute(SELENIUMROBOTSERVER_VARIABLES_RESERVATION, reservationDuration);
+    	} else {
+    		setAttribute(SELENIUMROBOTSERVER_VARIABLES_RESERVATION, DEFAULT_SELENIUMROBOTSERVER_VARIABLES_RESERVATION);
     	}
     }
     

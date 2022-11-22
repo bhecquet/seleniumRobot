@@ -3,8 +3,13 @@
 
 	<parent>
 	    <groupId>com.infotel.seleniumRobot</groupId>
+<<<<<<< HEAD
 	    <artifactId>core-parent-selenium4</artifactId>
 	    <version>5.0.4-SNAPSHOT</version>
+=======
+	    <artifactId>core-parent</artifactId>
+	    <version>4.23.5-SNAPSHOT</version>
+>>>>>>> refs/remotes/origin/master
 	</parent>
 
   	<artifactId>grid-extensions-selenium4</artifactId>

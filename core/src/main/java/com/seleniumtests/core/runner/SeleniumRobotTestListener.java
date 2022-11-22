@@ -571,9 +571,6 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		// store context in test result
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
 
-		// store test description
-		TestNGResultUtils.setTestDescription(testResult);
-		
 		// capture snap shot at the end of the test
 		logLastStep(testResult);
 		

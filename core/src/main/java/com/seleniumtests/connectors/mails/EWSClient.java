@@ -196,7 +196,7 @@ public class EWSClient extends EmailClientImpl {
 		} else {
 			SearchFilter.SearchFilterCollection filter = new SearchFilter.SearchFilterCollection();
 			filter.add(new SearchFilter.IsGreaterThan(ItemSchema.DateTimeReceived, Date.from(firstMessageTime.plusHours(timeOffset).atZone(ZoneId.systemDefault()).toInstant())));
-			preFilteredItems = service.findItems(folderId, filter, new ItemView(lastMessageIndex)).getItems();
+			preFilteredItems = service.findItems(folderId, filter, new ItemView(Math.max(1, lastMessageIndex))).getItems();
 		}
 			
 		for (Item item: preFilteredItems) {

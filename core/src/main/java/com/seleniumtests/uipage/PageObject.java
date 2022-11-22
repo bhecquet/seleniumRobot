@@ -451,12 +451,19 @@ public class PageObject extends BasePage implements IPage {
         setPageOnElements();
     }
     
+    /**
+     * asssociates the calling page instance ('this') to each GenericPictureElement instance of the page, so that it can create a sort of cache based on calling page 
+     */
     private void setPageOnElements() {
 
-        for (Field field: getClass().getFields()) {
+    	for (Field field: getClass().getDeclaredFields()) {
+        
         	if (GenericPictureElement.class.isAssignableFrom(field.getType())) {
         		try {
+        			boolean accessible = field.isAccessible();
+        			field.setAccessible(true);
 					((GenericPictureElement)field.get(this)).setCallingPage(this);
+					field.setAccessible(accessible);
 				} catch (IllegalArgumentException | IllegalAccessException e) {
 					throw new CustomSeleniumTestsException("Problem occured while setting element on page");
 				} 

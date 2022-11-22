@@ -135,7 +135,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testFailedWithException"});
 			
 			// check get variables has been called once for each retry
-			verify(variableServer, times(3)).getVariables(0);
+			verify(variableServer, times(3)).getVariables(0, -1);
 			verify(variableServer, times(3)).unreserveVariables(anyList());
 			
 		} finally {
@@ -230,7 +230,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testFailedWithException"});
 			
 			// check get variables has been called once for each retry
-			verify(variableServer).getVariables(0);
+			verify(variableServer).getVariables(0, -1);
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
