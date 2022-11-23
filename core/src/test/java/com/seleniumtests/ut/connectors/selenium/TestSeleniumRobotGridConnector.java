@@ -825,7 +825,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	@Test(groups={"ut"})
 	public void testWriteShortText() throws UnsupportedOperationException, IOException {
 		
-		HttpRequestWithBody req = (HttpRequestWithBody) createServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
+		HttpRequestWithBody req = (HttpRequestWithBody) createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
 		
 		connector.writeText("f");	
 		
