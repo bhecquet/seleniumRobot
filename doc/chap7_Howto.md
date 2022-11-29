@@ -741,3 +741,16 @@ In this case, you obtain a map (one key for each sheet) whose values is a list o
     File dataset = new File("myFile.xlsx");
     Map<String, List<Map<String, String>>> data = new ExcelHelper(dataset).read(true);
 ```
+
+### 27 Perform accessibility testing (WCAG) using Axe-core ###
+
+Accessibility testing can be done using the axe-core library
+Use WcagChecker class to analyze the current page.
+If you do not provide elements (in the example below, myElement1, myElement2), the whole page will be analyzed
+
+```
+Results results = WcagChecker.analyze(driver, myElement1, myElement2);
+```
+
+If you do nothing else, the text report will be available in HTML report and number of violations will be provided as warning
+But, you can also to some asserts on results object

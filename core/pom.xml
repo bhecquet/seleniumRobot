@@ -37,13 +37,27 @@
 		  <groupId>com.epam.reportportal</groupId>
 		  <artifactId>agent-java-testng</artifactId>
 		  <version>5.0.8</version>
+		  <exclusions>
+              <exclusion>
+                  <groupId>com.fasterxml.jackson.core</groupId>
+                  <artifactId>jackson-annotations</artifactId>
+              </exclusion>
+              <exclusion>
+                 <groupId>com.fasterxml.jackson.core</groupId>
+                  <artifactId>jackson-core</artifactId>
+              </exclusion>
+          </exclusions>
 		</dependency>
 		<dependency>
 		  <groupId>com.epam.reportportal</groupId>
 		  <artifactId>logger-java-log4j</artifactId>
 		  <version>5.1.4</version>
 		</dependency>
-		
+		<dependency>
+		  <groupId>com.deque.html.axe-core</groupId>
+		  <artifactId>selenium</artifactId>
+		  <version>4.5.1</version>
+		</dependency>
 		<dependency>
 			<groupId>com.atlassian.jira</groupId>
 			<artifactId>jira-rest-java-client-app</artifactId>

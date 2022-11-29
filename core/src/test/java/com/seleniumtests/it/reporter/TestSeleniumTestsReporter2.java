@@ -18,6 +18,7 @@
 package com.seleniumtests.it.reporter;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.nio.file.Paths;
 
 import org.apache.commons.lang3.StringUtils;
@@ -1975,6 +1976,20 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		} finally {
 			System.clearProperty(SeleniumTestsContext.CAPTURE_NETWORK);
 		}
+		
+	}
+	
+	@Test(groups={"it"})
+	public void testReportContainsWcagResults() throws Exception {
+
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverWithWcag"});
+		
+		// read 'testDriver' report. This contains calls to HtmlElement actions
+		String detailedReportContent1 = readTestMethodResultFile("testDriverWithWcag");
+		
+		Assert.assertTrue(detailedReportContent1.matches(".*<div class\\=\"message-warning\">Warning: \\d+ violations found, see attached file</div>.*"));
+		Assert.assertTrue(detailedReportContent1.contains("WCAG report: <a href='wcag/file"));
+		Assert.assertEquals(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverWithWcag", "wcag").toFile().listFiles().length, 1);
 		
 	}
 	

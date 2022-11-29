@@ -156,11 +156,24 @@ public class ScenarioLogger extends Logger {
     }
     
     public void logFile(File file, String description) {
+    	logFile(file, description, true);
+    }
+    
+    /**
+     * Log file to HTML result and record it to outputFolder
+     * @param file			the file to log
+     * @param description	a description for the file
+     * @param move			if true, file will be moved from it's original place to the outputDirectory of the current test
+     */
+    public void logFile(File file, String description, boolean move) {
 
     	try {
 	    	TestStep runningStep = TestStepManager.getParentTestStep();
+	    	if (runningStep == null) {
+	    		runningStep = TestStepManager.getCurrentOrPreviousStep();
+	    	}
 	    	if (runningStep != null) {
-	    		runningStep.addFile(new GenericFile(file, description));
+	    		runningStep.addFile(new GenericFile(file, description, move));
 	    	}
     	} catch (IndexOutOfBoundsException e) {
     		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
