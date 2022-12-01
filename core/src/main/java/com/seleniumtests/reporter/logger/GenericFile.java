@@ -33,7 +33,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 public class GenericFile extends TestAction {
 
 	private File file;
-	private String relativeFilePath;
+	private String relativeFilePath; // path relative to the root of test output directory
 	
 
 	public GenericFile(File file, String description) throws IOException {
@@ -62,8 +62,10 @@ public class GenericFile extends TestAction {
 			move = true;
 		}
 		
+		// move the file to the root of test specific output directory
 		if (move) {
 			File loggedFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), file.getName()).toFile();
+			relativeFilePath = file.getName(); // correct relavtive path, as we moved the file
 			
 			try {
 				Files.move(file.toPath(), loggedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -136,5 +138,9 @@ public class GenericFile extends TestAction {
 
 	public File getFile() {
 		return file;
+	}
+
+	public String getRelativeFilePath() {
+		return relativeFilePath;
 	}
 }
