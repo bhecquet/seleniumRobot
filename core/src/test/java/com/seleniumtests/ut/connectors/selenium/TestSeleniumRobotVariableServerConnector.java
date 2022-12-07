@@ -321,6 +321,36 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		
 		Assert.assertEquals(variable.getValue(), "value");
 	}
+
+	@Test(groups= {"ut"})
+	public void testUpsertVariableWithoutPrefix() throws Exception {
+		configureMockedVariableServerConnection();
+		System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+		System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
+
+		SeleniumTestsContext selenium = SeleniumTestsContextManager.getThreadContext();
+
+		TestVariable existingVariable = new TestVariable(12, "foo", "value", false, "foo");
+
+		Map<String, TestVariable> configuration = SeleniumTestsContextManager.getThreadContext().getConfiguration();
+		configuration.put("foo", existingVariable);
+
+		SeleniumRobotVariableServerConnector  variableServer = new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		selenium.setVariableServer(variableServer);
+
+		createServerMock(SERVER_URL, "POST", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, "{'id': 13, 'name': 'custom.test.variable.foo', 'value': 'value', 'reservable': false}");
+		createServerMock(SERVER_URL, "PATCH", String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 13), 200, "{'id': 13, 'name': 'custom.test.variable.foo', 'value': 'value', 'reservable': false}");
+
+		//PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withArguments(eq(true), eq("http://localhost:4321"), anyString(), eq(null)).thenReturn(variableServer);
+
+		TestTasks.createOrUpdateParam("foo", "value");
+		TestTasks.createOrUpdateParam("foo", "value");
+
+		PowerMockito.verifyStatic(Unirest.class);
+		Unirest.post(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL));
+		Unirest.patch(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL));
+
+	}
 	
 	@Test(groups= {"ut"}, expectedExceptions = SeleniumRobotServerException.class)
 	public void testVariableUpdateExistingVariableWithServerError() throws UnirestException {
