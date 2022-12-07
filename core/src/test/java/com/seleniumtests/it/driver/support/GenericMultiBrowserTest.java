@@ -114,6 +114,12 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 		mapping.put("/tu/images/bouton_enregistrer.png", "/images/bouton_enregistrer.png");
 		mapping.put("/tu/jquery.min.js", "/jquery.min.js");
 		
+		// Site remasterisé
+		mapping.put("/tu/pagesApp/test.html", "/test.html");
+		mapping.put("/tu/pagesApp/testCharging.html", "/testCharging.html");
+		mapping.put("/tu/pagesApp/testMissingElement.html", "/testMissingElement.html");
+
+		
 //		// angular app
 //		mapping.put("/tu/angularApp/index.html", "/angularApp/index.html");
 //		mapping.put("/tu/angularApp/inline.bundle.js", "/angularApp/inline.bundle.js");
@@ -276,4 +282,5 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 		    logger.error(os.toString("UTF-8"));
 		}
 	}
+	
 }
