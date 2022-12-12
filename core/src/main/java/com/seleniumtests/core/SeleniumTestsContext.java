@@ -1762,6 +1762,10 @@ public class SeleniumTestsContext {
     public SeleniumRobotVariableServerConnector getVariableServer() {
 		return variableServer;
 	}
+
+    public void setVariableServer(SeleniumRobotVariableServerConnector variableServer) {
+        this.variableServer = variableServer;
+    }
     
     public List<SeleniumGridConnector> getSeleniumGridConnectors() {
     	if (seleniumGridConnectors == null) {
