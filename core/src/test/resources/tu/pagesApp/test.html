@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Testaklik</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+
+<style type="text/css">
+
+.bg-light {
+	background-color: transparent !important;
+	margin-bottom: 1rem;
+}
+
+.container-shadow {
+	box-shadow: 0px 0px 25px -8px #003973;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	align-items: center;
+	border-radius: 2%;
+}
+		
+.first-btn {
+	background-image: linear-gradient(to right, #003973 0%, #E5E5BE 51%, #003973 100%);
+	text-align: center;
+	transition: 0.5s;
+	background-size: 200% auto;
+	color: white;
+	box-shadow: 0 0 20px #eee;
+	border-radius: 10px;
+	display: block;
+	border: none;
+	width: 100%;
+	height: 2.5rem;
+}
+.first-btn:hover {
+	background-position: right center;
+	color: #fff;
+	text-decoration: none;
+}
+  
+#form-first {
+	border: none;
+	box-shadow: 0px 0px 20px 6px rgb(0 0 0 / 10%);
+	border-radius: 15px;
+	width: 100%;
+	height: 3rem;
+}
+  
+.form-check-input:checked {
+	background-color: #003973;
+	border-color: #003973;
+}
+  
+input[type=range].form-range::-webkit-slider-thumb {
+	background: #003973;
+}
+         
+.position {
+    position: absolute;
+    height: 100%;
+    right: 18.5rem;
+    top: 5rem;
+}
+
+.alert-success {
+	height: 48.5rem;
+	text-align: end;
+	padding-top: 80px;
+	width: 10rem;
+}
+
+.btn-group {
+    width: 100%;
+    height: 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.btn-icon {
+	border-color: #003973;
+}
+.btn-icon:hover {
+	background-color: rgb(0,57,115,0.5);
+	border-color: #003973;
+}
+.icon {
+	color: #003973;
+}
+
+.css-tooltip{
+  position: relative;
+  
+}
+.css-tooltip:hover:after{
+    content: attr(data-tooltip);
+    background: #003973;
+    padding: 3px;
+    border-radius: 3px;
+    display: inline-block;
+    position: absolute;
+    transform: translate(-50%,-100%);
+    margin: 0 auto;
+    color: #FFF;
+    min-width: 150px;
+    bottom: -65px;
+    left: 50%;
+    text-align: center;
+}
+.css-tooltip:hover:before {
+	left: 50%;
+	border: solid transparent;
+	content: " ";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;
+	border-color: rgba(0, 0, 0, 0);
+	border-top-color: #003973;
+	border-width: 5px;
+	margin-left: -5px;
+	transform: rotate(180deg);
+	bottom: -5px;
+}         
+</style>
+</head>
+ 
+<body>
+	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+	  <div class="container-fluid">
+	    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+		      <ul class="navbar-nav me-auto mb-2 mb-lg-0 w-100 justify-content-evenly">
+		      	<div class="col-2">
+			        <a class="btn btn-primary first-btn" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample">
+					  OffCanvas
+					</a>
+				</div>
+				<div class="col-2">
+			        <button type="button" class="btn css-tooltip first-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" data-tooltip="Well done!">
+					  Tooltip
+					</button>
+				</div>
+		     </ul>
+	      	<div class="col-1">
+		      <form class="d-flex">
+				<button type="button" class="btn first-btn" id="liveAlertBtn">Alert</button>
+		      </form>
+		      </div>
+	    </div>
+	  </div>
+	</nav>
+	<div class="container mt-2 p-2 container-shadow" id="id-height" style="height:50rem">
+			<div class="position">
+				<div id="liveAlertPlaceholder"></div>
+				<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+				  <div class="offcanvas-header">
+				    <h5 class="offcanvas-title" id="offcanvasExampleLabel">Jellyfish's thinks</h5>
+				    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+				  </div>
+				  <div class="offcanvas-body">
+				    <div>
+						Si je devais résumer ma vie aujourd'hui avec vous je dirais que c'est d'abord des rencontres. 
+						Des gens qui m'ont tendu la main peut-être à un moment où je ne pouvais pas, où j'étais seul chez moi. 
+						Et c'est assez curieux de se dire que les hasards, les rencontres, forgent une destinée (...) 
+						Et je dis merci à la vie, je chante la vie, je danse la vie. Je ne suis qu'amour.
+				    </div>
+				    <div class="dropdown mt-3">
+				      <button class="btn btn-secondary dropdown-toggle first-btn" type="button" data-bs-toggle="dropdown">
+				        Dropdown
+				      </button>
+				      <ul class="dropdown-menu">
+				        <li><a class="dropdown-item" href="#">Monologue</a></li>
+				        <li><a class="dropdown-item" href="#">Mythique</a></li>
+				        <li><a class="dropdown-item" href="#">D'Otis</a></li>
+				   		<li><a class="dropdown-item" href="#">SCribe</a></li>
+				      </ul>
+				    </div>
+				  </div>
+				</div>
+			</div>
+			<form action="" method="post" class="w-100">
+				<div class="row justify-content-center align-items-center w-100 m-0">
+					<div class="col-6">
+					  <input type="email" class="form-control" id="floatingInput" placeholder="gaulois4ever@cesarpu.fr">
+					</div>				    
+			    	<div class="col-2">
+		        		<button class="first-btn" type="button">Button</button>
+		        	</div>
+		        </div>
+			</form>
+			<div class="row justify-content-center align-items-center w-100">
+				<div class="col-8">
+					<div class="input-group">
+					  <span class="input-group-text">Lastname & Firstname</span>
+					  <input type="text" aria-label="First name" class="form-control">
+					  <input type="text" aria-label="Last name" class="form-control">
+					</div>
+				</div>
+			</div>
+			<div class="row justify-content-center align-items-center w-100">
+			<div class="col-8">
+					<select class="form-select" aria-label="Default select example">
+					  <option selected>What's on the menu ?</option>
+					  <option value="1">Nothing</option>
+					  <option value="2">Still nothing</option>
+					  <option value="3">A pretty jellyfish</option>
+					</select>
+				</div>
+			</div>
+			<div class="row justify-content-center align-items-center w-100">
+				<div class="col-8">
+					<select class="form-select" size="3" aria-label="size 3 select example">
+					  <option selected>Numérobis ! Prépare ton sarcophage !</option>
+					  <option value="1">Il est bizarre, ce sol...</option>
+					  <option value="2">Il est où, le magneau ?</option>
+					  <option value="3">Souquez les artimuses !</option>
+					</select>
+				</div>
+			</div>
+			<div class="row justify-content-center align-items-center w-100">
+				<div class="col-8">
+					<div class="form-check">
+					  <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+					  <label class="form-check-label" for="flexCheckDefault">
+					    Checkbox
+					  </label>
+					</div>
+					<div class="form-check">
+					  <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+					  <label class="form-check-label" for="flexRadioDefault1">
+					    Radio
+					  </label>
+					</div>
+				</div>
+			</div>
+			<div class="row justify-content-center align-items-center w-100">
+				<div class="col-8">
+					<label for="customRange1" class="form-label">Range</label>
+					<input type="range" class="form-range" id="customRange1">
+				</div>
+			</div>
+			<div class="row justify-content-center align-items-center w-100">
+				<div class="col-8">
+					<div class="accordion accordion-flush" id="accordionFlushExample">
+					  <div class="accordion-item">
+					    <h2 class="accordion-header" id="flush-headingOne">
+					      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+					        Accordion (first of the name)
+					      </button>
+					    </h2>
+					    <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+					      <div class="accordion-body">I have no idea what is going here</div>
+					  </div>
+					  <div class="accordion-item">
+					    <h2 class="accordion-header" id="flush-headingTwo">
+					      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
+					        Accordion (the second)
+					      </button>
+					    </h2>
+					    <div id="flush-collapseTwo" class="accordion-collapse collapse" aria-labelledby="flush-headingTwo" data-bs-parent="#accordionFlushExample">
+					      <div class="accordion-body">Please mind the gap between the plane and the platform</div>
+					  </div>
+					  <div class="accordion-item">
+					    <h2 class="accordion-header" id="flush-headingThree">
+					      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseThree" aria-expanded="false" aria-controls="flush-collapseThree">
+					        Accordion (third, the worst !)
+					      </button>
+					    </h2>
+					    <div id="flush-collapseThree" class="accordion-collapse collapse" aria-labelledby="flush-headingThree" data-bs-parent="#accordionFlushExample">
+					      <div class="accordion-body">No, the worst was the second</div>
+					    </div>
+					  </div>
+					</div>
+				</div>
+			</div>
+			<div class="row justify-content-center align-items-center w-100 mt-2">
+				<div class="btn-toolbar col-10 justify-content-center" role="toolbar" aria-label="...">
+				    <div class="btn-group" role="group" aria-label="...">
+				        <button type="button" class="btn btn-outline-secondary btn-icon btn-group"><i class="fa-solid fa-skull-crossbones icon"></i></button>
+				        <button type="button" class="btn btn-outline-secondary btn-icon btn-group"><i class="fa-solid fa-skull icon"></i></button>
+				        <button type="button" class="btn btn-outline-secondary btn-icon btn-group"><i class="fa-solid fa-person-falling-burst icon"></i></button>
+				        <button type="button" class="btn btn-outline-secondary btn-icon btn-group"><i class="fa-solid fa-face-dizzy icon"></i></button>
+				        <button type="button" class="btn btn-outline-secondary btn-icon btn-group"><i class="fa-solid fa-meteor icon"></i></button>
+				        <button type="button" class="btn btn-outline-secondary btn-icon btn-group"><i class="fa-solid fa-poo icon"></i></button>
+				    </div>
+				</div>
+			</div>
+		</div>
+
+	<script src="https://kit.fontawesome.com/327b2435a4.js" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+	<script>
+	
+	function getHeight() {
+		var height = document.documentElement.clientHeight;
+		var el = document.getElementById("id-height");
+		
+		el.style.height = height + 200;
+		console.log("Hauteur récupérée : " + height + "px !");
+	}
+	
+	function addEvent(element, type, listener){
+	  if(element.addEventListener){
+	    element.addEventListener(type, listener, false);
+	  }else if(element.attachEvent){
+	    element.attachEvent("on"+type, listener);
+	  }
+	 }
+	  
+	  addEvent(window, "load", getHeight);
+	  addEvent(window, "resize", getHeight);
+	  
+	  
+	  
+	  
+	  const alertPlaceholder = document.getElementById('liveAlertPlaceholder')
+
+		const alert = (message, type) => {
+		  const wrapper = document.createElement('div')
+		  wrapper.innerHTML = [
+		    `<div class="alert alert-${type} alert-dismissible" role="alert">`,
+		    `   <div>${message}</div>`,
+		    '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+		    '</div>'
+		  ].join('')
+		
+		  alertPlaceholder.append(wrapper)
+		}
+		
+		const alertTrigger = document.getElementById('liveAlertBtn')
+		if (alertTrigger) {
+		  alertTrigger.addEventListener('click', () => {
+		    alert('Qu est-c qu on a fait des tuyaux? Des lances et d la grande échelle Qu est-c qu on a fait des tuyaux? Pas d panique il nous les faut', 'success')
+		  })
+		}
+	</script> 
+	</body>
+</html>
