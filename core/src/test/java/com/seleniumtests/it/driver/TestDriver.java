@@ -276,7 +276,35 @@ public class TestDriver extends GenericMultiBrowserTest {
 			driver.findElement(By.id("button2")).click();
 		}
 	}
-	
+
+	public void testSendKeysAction() {
+		try {
+			DriverTestPage.textElement.sendKeysAction("youpi@[]é");
+			Assert.assertEquals(DriverTestPage.textElement.getValue(), "youpi@[]é");
+		} finally {
+			driver.findElement(By.id("button2")).click();
+		}
+	}
+
+	public void testSendKeysActionWithPause() {
+		try {
+			long startTime = System.nanoTime();
+			DriverTestPage.textElement.sendKeysAction(500, "youpi@[]", " meduse");
+			long endTime = System.nanoTime();
+
+			long nanoDuration = endTime - startTime;
+			//double secondDuration = (double) nanoDuration / 1_000_000_000;
+			long secondDuration = TimeUnit.SECONDS.convert(nanoDuration, TimeUnit.NANOSECONDS);
+
+			Assert.assertEquals(DriverTestPage.textElement.getValue(), "youpi@[] meduse");
+
+			Assert.assertTrue(secondDuration < 10);
+			Assert.assertTrue(secondDuration > 7);
+		} finally {
+			driver.findElement(By.id("button2")).click();
+		}
+	}
+
 	public void testSendKeysKeyboard() {
 		try {
 			DriverTestPage.textElement.sendKeysKeyboard("youpi@[]é");
