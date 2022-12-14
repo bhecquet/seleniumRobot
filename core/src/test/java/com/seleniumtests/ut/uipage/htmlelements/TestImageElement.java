@@ -55,7 +55,7 @@ public class TestImageElement extends MockitoTest {
 		Mockito.when(driver.findElement(By.id("img"))).thenReturn(element);
 		Mockito.when(driver.switchTo()).thenReturn(locator);
 		Mockito.when(element.getSize()).thenReturn(new Dimension(10,10));
-		Mockito.when(element.getAttribute("src")).thenReturn("http://nowhere.com/jpg");
+		Mockito.when(element.getDomAttribute("src")).thenReturn("http://nowhere.com/jpg");
 		
 		ImageElement el = Mockito.spy(new ImageElement("image", By.id("img")));
 	

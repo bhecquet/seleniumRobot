@@ -672,7 +672,7 @@ public class TestPageObject2 extends MockitoTest {
 	@Test(groups = { "ut" })
 	public void testWaitForValueViaValueAttribute() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
-		when(element.getAttribute("value")).thenReturn("foo");
+		when(element.getDomProperty("value")).thenReturn("foo");
 		page.waitForValue("textField", "foo");
 	}
 
@@ -687,7 +687,7 @@ public class TestPageObject2 extends MockitoTest {
 	public void testWaitForWrongValue() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		when(element.getText()).thenReturn("bar");
-		when(element.getAttribute("value")).thenReturn("bar2");
+		when(element.getDomProperty("value")).thenReturn("bar2");
 		page.waitForValue("textField", "foo");
 	}
 
@@ -850,7 +850,7 @@ public class TestPageObject2 extends MockitoTest {
 	public void testAssertForValueViaValueAttribute() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		when(element.getText()).thenReturn("");
-		when(element.getAttribute("value")).thenReturn("foo");
+		when(element.getDomProperty("value")).thenReturn("foo");
 		page.assertForValue("textField", "foo");
 	}
 
@@ -858,7 +858,7 @@ public class TestPageObject2 extends MockitoTest {
 	public void testAssertForValueViaValueAttributeNotPresent() {
 		when(driver.findElement(By.id("text"))).thenThrow(new NoSuchElementException("not found"));
 		when(element.getText()).thenReturn("");
-		when(element.getAttribute("value")).thenReturn("foo");
+		when(element.getDomProperty("value")).thenReturn("foo");
 		page.assertForValue("textField", "foo");
 	}
 
@@ -866,7 +866,7 @@ public class TestPageObject2 extends MockitoTest {
 	public void testAssertForValueViaText() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		when(element.getText()).thenReturn("foo");
-		when(element.getAttribute("value")).thenReturn("");
+		when(element.getDomProperty("value")).thenReturn("");
 		page.assertForValue("textField", "foo");
 	}
 
@@ -874,7 +874,7 @@ public class TestPageObject2 extends MockitoTest {
 	public void testAssertForWrongValue() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		when(element.getText()).thenReturn("bar");
-		when(element.getAttribute("value")).thenReturn("bar2");
+		when(element.getDomProperty("value")).thenReturn("bar2");
 		page.assertForValue("textField", "foo");
 	}
 
@@ -886,21 +886,21 @@ public class TestPageObject2 extends MockitoTest {
 	@Test(groups = { "ut" })
 	public void testAssertForEmptyValueViaValueAttribute() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
-		when(element.getAttribute("value")).thenReturn("");
+		when(element.getDomProperty("value")).thenReturn("");
 		page.assertForEmptyValue("textField");
 	}
 
 	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
 	public void testAssertForEmptyValueViaValueAttributeNotPresent() {
 		when(driver.findElement(By.id("text"))).thenThrow(new NoSuchElementException("not found"));
-		when(element.getAttribute("value")).thenReturn("");
+		when(element.getDomProperty("value")).thenReturn("");
 		page.assertForEmptyValue("textField");
 	}
 
 	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
 	public void testAssertForEmptyValueViaValueAttributeNotEmpty() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
-		when(element.getAttribute("value")).thenReturn("foo");
+		when(element.getDomProperty("value")).thenReturn("foo");
 		page.assertForEmptyValue("textField");
 	}
 
@@ -912,21 +912,21 @@ public class TestPageObject2 extends MockitoTest {
 	@Test(groups = { "ut" })
 	public void testAssertForNonEmptyValueViaValueAttribute() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
-		when(element.getAttribute("value")).thenReturn("bar");
+		when(element.getDomProperty("value")).thenReturn("bar");
 		page.assertForNonEmptyValue("textField");
 	}
 
 	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
 	public void testAssertForNonEmptyValueViaValueAttributeNotPresent() {
 		when(driver.findElement(By.id("text"))).thenThrow(new NoSuchElementException("not found"));
-		when(element.getAttribute("value")).thenReturn("bar");
+		when(element.getDomProperty("value")).thenReturn("bar");
 		page.assertForNonEmptyValue("textField");
 	}
 
 	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
 	public void testAssertForNonEmptyValueViaValueAttributeNotEmpty() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
-		when(element.getAttribute("value")).thenReturn("");
+		when(element.getDomProperty("value")).thenReturn("");
 		page.assertForNonEmptyValue("textField");
 	}
 
@@ -939,7 +939,7 @@ public class TestPageObject2 extends MockitoTest {
 	public void testAssertForMatchingValueViaValueAttribute() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		when(element.getText()).thenReturn("");
-		when(element.getAttribute("value")).thenReturn("barfoobar");
+		when(element.getDomProperty("value")).thenReturn("barfoobar");
 		page.assertForMatchingValue("textField", "foo");
 	}
 
@@ -947,7 +947,7 @@ public class TestPageObject2 extends MockitoTest {
 	public void testAssertForMatchingValueViaValueAttributeNotPresent() {
 		when(driver.findElement(By.id("text"))).thenThrow(new NoSuchElementException("not found"));
 		when(element.getText()).thenReturn("");
-		when(element.getAttribute("value")).thenReturn("barfoobar");
+		when(element.getDomProperty("value")).thenReturn("barfoobar");
 		page.assertForMatchingValue("textField", "foo");
 	}
 
@@ -955,7 +955,7 @@ public class TestPageObject2 extends MockitoTest {
 	public void testAssertForMatchingValueViaText() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		when(element.getText()).thenReturn("barfoobar");
-		when(element.getAttribute("value")).thenReturn("");
+		when(element.getDomProperty("value")).thenReturn("");
 		page.assertForMatchingValue("textField", "foo");
 	}
 
@@ -963,7 +963,7 @@ public class TestPageObject2 extends MockitoTest {
 	public void testAssertForWrongMatchingValue() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		when(element.getText()).thenReturn("bar");
-		when(element.getAttribute("value")).thenReturn("bar2");
+		when(element.getDomProperty("value")).thenReturn("bar2");
 		page.assertForMatchingValue("textField", "foo");
 	}
 

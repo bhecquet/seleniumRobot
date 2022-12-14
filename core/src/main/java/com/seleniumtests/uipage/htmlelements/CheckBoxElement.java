@@ -78,7 +78,7 @@ public class CheckBoxElement extends HtmlElement {
 
         // handle angular-material case
         if ("mat-checkbox".equals(getRealElementNoSearch().getTagName())) {
-        	return getRealElementNoSearch().getAttribute("class").contains("mat-checkbox-checked");
+        	return getRealElementNoSearch().getDomAttribute("class").contains("mat-checkbox-checked");
         } else {
         	return getRealElementNoSearch().isSelected();
         }

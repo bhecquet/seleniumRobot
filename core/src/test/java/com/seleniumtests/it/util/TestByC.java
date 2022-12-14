@@ -287,7 +287,7 @@ public class TestByC extends GenericTest {
 	 */
 	@Test(groups={"it"})
 	public void testFindElementRelativeByAttribute() {
-		Assert.assertEquals(new HtmlElement("", By.id("parentDiv")).findRadioButtonElement(ByC.attribute("name", "radioClick")).getAttribute("id"), "radioClickParent");
+		Assert.assertEquals(new HtmlElement("", By.id("parentDiv")).findRadioButtonElement(ByC.attribute("name", "radioClick")).getDomAttribute("id"), "radioClickParent");
 	}
 	@Test(groups={"it"})
 	public void testFindElementsRelativeByAttribute() {
@@ -299,23 +299,23 @@ public class TestByC extends GenericTest {
 	 */
 	@Test(groups={"it"})
 	public void testFindElementRelativeByPartialLabel() {
-		Assert.assertEquals(new HtmlElement("", By.id("parent")).findElement(ByC.partialLabelForward("findElement", "div")).getAttribute("id"), "child1");
+		Assert.assertEquals(new HtmlElement("", By.id("parent")).findElement(ByC.partialLabelForward("findElement", "div")).getDomAttribute("id"), "child1");
 	}
 	@Test(groups={"it"})
 	public void testFindElementsRelativeByPartialLabel() {
 		List<WebElement> elements = new HtmlElement("", By.id("parent")).findElement(ByC.partialLabelForward("findElement", "div")).findElements();
 		Assert.assertTrue(elements.size() >= 3);
-		Assert.assertEquals(elements.get(0).getAttribute("id"), "child1");
+		Assert.assertEquals(elements.get(0).getDomAttribute("id"), "child1");
 	}
 	@Test(groups={"it"})
 	public void testFindElementRelativeByLabel() {
-		Assert.assertEquals(new HtmlElement("", By.id("parent")).findElement(ByC.labelForward("findElement", "div")).getAttribute("id"), "child1");
+		Assert.assertEquals(new HtmlElement("", By.id("parent")).findElement(ByC.labelForward("findElement", "div")).getDomAttribute("id"), "child1");
 	}
 	@Test(groups={"it"})
 	public void testFindElementsRelativeByLabel() {
 		List<WebElement> elements = new HtmlElement("", By.id("parent")).findElement(ByC.labelForward("findElement", "div")).findElements();
 		Assert.assertTrue(elements.size() >= 3);
-		Assert.assertEquals(elements.get(0).getAttribute("id"), "child1");
+		Assert.assertEquals(elements.get(0).getDomAttribute("id"), "child1");
 	}
 	
 	/**
@@ -323,23 +323,23 @@ public class TestByC extends GenericTest {
 	 */
 	@Test(groups={"it"})
 	public void testFindElementRelativeByPartialText() {
-		Assert.assertEquals(new HtmlElement("", By.id("parent")).findElement(ByC.partialText("first chi", "div")).getAttribute("id"), "child1");
+		Assert.assertEquals(new HtmlElement("", By.id("parent")).findElement(ByC.partialText("first chi", "div")).getDomAttribute("id"), "child1");
 	}
 	@Test(groups={"it"})
 	public void testFindElementsRelativeByPartialText() {
 		List<WebElement> elements = new HtmlElement("", By.id("parent")).findElement(ByC.partialText("first chi", "div")).findElements();
 		Assert.assertEquals(elements.size(), 1);
-		Assert.assertEquals(elements.get(0).getAttribute("id"), "child1");
+		Assert.assertEquals(elements.get(0).getDomAttribute("id"), "child1");
 	}
 	@Test(groups={"it"})
 	public void testFindElementRelativeByText() {
-		Assert.assertEquals(new HtmlElement("", By.id("parent")).findElement(ByC.text("first child", "div")).getAttribute("id"), "child1");
+		Assert.assertEquals(new HtmlElement("", By.id("parent")).findElement(ByC.text("first child", "div")).getDomAttribute("id"), "child1");
 	}
 	@Test(groups={"it"})
 	public void testFindElementsRelativeByText() {
 		List<WebElement> elements = new HtmlElement("", By.id("parent")).findElement(ByC.text("first child", "div")).findElements();
 		Assert.assertEquals(elements.size(), 1);Assert.assertEquals(elements.size(), 1);
-		Assert.assertEquals(elements.get(0).getAttribute("id"), "child1");
+		Assert.assertEquals(elements.get(0).getDomAttribute("id"), "child1");
 	}
 
 	@Test(groups={"it"})
@@ -350,7 +350,7 @@ public class TestByC extends GenericTest {
 	public void testFindElementBySeveralCriteria() { 
 		TextFieldElement el = new TextFieldElement("", ByC.and(By.tagName("input"), By.name("textField")));
 		Assert.assertEquals(el.getTagName(), "input");
-		Assert.assertEquals(el.getAttribute("name"), "textField");
+		Assert.assertEquals(el.getDomAttribute("name"), "textField");
 	}
 	
 	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
@@ -381,7 +381,7 @@ public class TestByC extends GenericTest {
 	}
 	@Test(groups={"it"})
 	public void testFindElementRelativeById() {
-		Assert.assertEquals(new HtmlElement("", By.id("parentDiv")).findElement(ByC.xId("textSelectedTextParent")).getAttribute("name"), "textSelectedText");
+		Assert.assertEquals(new HtmlElement("", By.id("parentDiv")).findElement(ByC.xId("textSelectedTextParent")).getDomAttribute("name"), "textSelectedText");
 	}
 	@Test(groups={"it"})
 	public void testFindElementsRelativeById() {
@@ -398,7 +398,7 @@ public class TestByC extends GenericTest {
 	}
 	@Test(groups={"it"})
 	public void testFindElementRelativeByName() {
-		Assert.assertEquals(new HtmlElement("", By.id("parentDiv")).findElement(ByC.xName("radioClick")).getAttribute("id"), "radioClickParent");
+		Assert.assertEquals(new HtmlElement("", By.id("parentDiv")).findElement(ByC.xName("radioClick")).getDomAttribute("id"), "radioClickParent");
 	}
 	@Test(groups={"it"})
 	public void testFindElementsRelativeByName() {
@@ -415,7 +415,7 @@ public class TestByC extends GenericTest {
 	}
 	@Test(groups={"it"})
 	public void testFindElementRelativeByLinkText() {
-		Assert.assertEquals(new HtmlElement("", By.id("parentDiv")).findElement(ByC.xLinkText("My link Parent")).getAttribute("id"), "linkParent");
+		Assert.assertEquals(new HtmlElement("", By.id("parentDiv")).findElement(ByC.xLinkText("My link Parent")).getDomAttribute("id"), "linkParent");
 	}
 	@Test(groups={"it"})
 	public void testFindElementsRelativeByLinkText() {
@@ -432,7 +432,7 @@ public class TestByC extends GenericTest {
 	}
 	@Test(groups={"it"})
 	public void testFindElementRelativeByPartialLinkText() {
-		Assert.assertEquals(new HtmlElement("", By.id("parentDiv")).findElement(ByC.xPartialLinkText("My link")).getAttribute("id"), "linkParent");
+		Assert.assertEquals(new HtmlElement("", By.id("parentDiv")).findElement(ByC.xPartialLinkText("My link")).getDomAttribute("id"), "linkParent");
 	}
 	@Test(groups={"it"})
 	public void testFindElementsRelativeByPartialLinkText() {
@@ -449,7 +449,7 @@ public class TestByC extends GenericTest {
 	}
 	@Test(groups={"it"})
 	public void testFindElementRelativeByTagName() {
-		Assert.assertEquals(new HtmlElement("", By.id("parentDiv")).findElement(ByC.xTagName("button")).getAttribute("name"), "resetButton");
+		Assert.assertEquals(new HtmlElement("", By.id("parentDiv")).findElement(ByC.xTagName("button")).getDomAttribute("name"), "resetButton");
 	}
 	@Test(groups={"it"})
 	public void testFindElementsRelativeByTagName() {

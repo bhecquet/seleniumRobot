@@ -49,12 +49,12 @@ public class TestFrame extends GenericMultiBrowserTest {
 	
 	
 	public void testFrameRadio() {
-		Assert.assertEquals(DriverTestPage.radioElementIFrame.getAttribute("name"), "radio");
+		Assert.assertEquals(DriverTestPage.radioElementIFrame.getDomAttribute("name"), "radio");
 	}
 	
 	
 	public void testFrameCheckbox() {
-		Assert.assertEquals(DriverTestPage.checkElementIFrame.getAttribute("type"), "checkbox");
+		Assert.assertEquals(DriverTestPage.checkElementIFrame.getDomAttribute("type"), "checkbox");
 	}
 	
 	

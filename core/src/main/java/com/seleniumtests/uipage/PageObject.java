@@ -942,7 +942,7 @@ public class PageObject extends BasePage implements IPage {
     }
 
     public String getCanonicalURL() {
-        return new LinkElement("Canonical URL", By.cssSelector("link[rel=canonical]")).getAttribute("href");
+        return new LinkElement("Canonical URL", By.cssSelector("link[rel=canonical]")).getDomAttribute("href");
     }
 
     /**
@@ -1645,7 +1645,7 @@ public class PageObject extends BasePage implements IPage {
 		if (element instanceof HtmlElement) {
 			((HtmlElement) element).waitFor(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout(), 
 					ExpectedConditions.or(
-							ExpectedConditions.attributeToBe((HtmlElement)element, "value", value),
+							ExpectedConditions.domPropertyToBe((HtmlElement)element, "value", value),
 							ExpectedConditions.textToBePresentInElement((HtmlElement)element, value)
 							));
 		} else {

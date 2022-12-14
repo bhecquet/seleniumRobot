@@ -48,6 +48,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.TargetLocator;
@@ -110,6 +111,9 @@ public class TestHtmlElement extends MockitoTest {
 	private RemoteWebElement subElement2;
 	@Mock
 	private RemoteWebElement frameElement;
+	
+	@Mock
+	private SearchContext searchContext;
 
 	@Mock
 	private TargetLocator locator;
@@ -174,11 +178,16 @@ public class TestHtmlElement extends MockitoTest {
 		when(element.findElement(By.name("subEl"))).thenReturn(subElement1);
 		when(element.findElements(By.name("subEl"))).thenReturn(subElList);
 		when(element.getAttribute(anyString())).thenReturn("attribute");
+		when(element.getDomAttribute(anyString())).thenReturn("attribute");
+		when(element.getDomProperty(anyString())).thenReturn("property");
 		when(element.getSize()).thenReturn(new Dimension(10, 10));
 		when(element.getLocation()).thenReturn(new Point(5, 5));
 		when(frame.getLocation()).thenReturn(new Point(5, 5));
 		when(element.getTagName()).thenReturn("h1");
 		when(element.getText()).thenReturn("text");
+		when(element.getAriaRole()).thenReturn("role");
+		when(element.getShadowRoot()).thenReturn(searchContext);
+		when(element.getAccessibleName()).thenReturn("name");
 		when(element.isDisplayed()).thenReturn(true);
 		when(element.isEnabled()).thenReturn(true);
 
@@ -465,6 +474,36 @@ public class TestHtmlElement extends MockitoTest {
 	@Test(groups = { "ut" })
 	public void testFindPatternInAttrNoMatch() throws Exception {
 		Assert.assertEquals(el.findPattern(Pattern.compile("\\w(\\d+)\\w"), "attr"), "");
+		finalCheck(true);
+	}
+	
+	/**
+	 * Check selenium method is called
+	 * @throws Exception
+	 */
+	@Test(groups = { "ut" })
+	public void testGetDomAttribute() throws Exception {
+		Assert.assertEquals(el.getDomAttribute("someAttribute"), "attribute");
+		finalCheck(true);
+	}
+	@Test(groups = { "ut" })
+	public void testGetDomProperty() throws Exception {
+		Assert.assertEquals(el.getDomProperty("someAttribute"), "property");
+		finalCheck(true);
+	}
+	@Test(groups = { "ut" })
+	public void testGetAriaRole() throws Exception {
+		Assert.assertEquals(el.getAriaRole(), "role");
+		finalCheck(true);
+	}
+	@Test(groups = { "ut" })
+	public void testGetAccessibilityName() throws Exception {
+		Assert.assertEquals(el.getAccessibleName(), "name");
+		finalCheck(true);
+	}
+	@Test(groups = { "ut" })
+	public void testGetShadowRoot() throws Exception {
+		Assert.assertEquals(el.getShadowRoot(), searchContext);
 		finalCheck(true);
 	}
 

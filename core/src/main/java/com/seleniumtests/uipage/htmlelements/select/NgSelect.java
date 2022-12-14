@@ -38,7 +38,7 @@ public class NgSelect extends AngularSelect implements ISelectList {
 	
 	@Override
 	public boolean isMultipleWithoutFind() {
-        return parentElement.getAttribute("class").contains("ng-select-multiple");
+        return parentElement.getDomAttribute("class").contains("ng-select-multiple");
     }
 
 }

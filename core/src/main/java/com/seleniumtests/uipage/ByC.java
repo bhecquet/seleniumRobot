@@ -710,7 +710,7 @@ public class ByC extends By {
 		
 		public Shadow(By ... bies) {
 			if (bies.length == 0) {
-				throw new ScenarioException("At least on locator must be provided for shadow ");
+				throw new ScenarioException("At least one locator must be provided for shadow ");
 			}
 			this.bies = bies;
 		}

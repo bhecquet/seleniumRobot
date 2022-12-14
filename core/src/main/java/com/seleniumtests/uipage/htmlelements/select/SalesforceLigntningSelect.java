@@ -57,14 +57,14 @@ public class SalesforceLigntningSelect extends AngularSelect implements ISelectL
 	@Override
 	public void finalizeAction() {
 		handleAlert();
-		if ("true".equalsIgnoreCase(parentElement.findElement(ByC.attribute("aria-haspopup", "listbox")).getAttribute("aria-expanded"))) {
+		if ("true".equalsIgnoreCase(parentElement.findElement(ByC.attribute("aria-haspopup", "listbox")).getDomAttribute("aria-expanded"))) {
 			parentElement.findElement(locatorClickToclose).click();
 		}
 	}
 
 	@Override
 	public String getOptionValue(WebElement option) {
-		return option.getAttribute("id");
+		return option.getDomAttribute("data-value");
 	}
 	
 	/**
@@ -83,7 +83,7 @@ public class SalesforceLigntningSelect extends AngularSelect implements ISelectL
 	 */
 	@Override
 	public String getOptionText(WebElement option) {
-		return option.findElements(ByC.xTagName("span")).get(1).findElement(ByC.xTagName("span")).getAttribute("title");
+		return option.findElements(ByC.xTagName("span")).get(1).findElement(ByC.xTagName("span")).getDomAttribute("title");
 	}
 	
 	@Override

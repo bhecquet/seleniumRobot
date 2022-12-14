@@ -34,7 +34,7 @@ public class TestNewWindow  extends GenericMultiBrowserTest {
 	}
 	
 	public TestNewWindow() throws Exception {
-		super(BrowserType.CHROME, "DriverTestPage");  
+		super(BrowserType.CHROME, "DriverTestPage", true);  
 	}
 	
 	/**
@@ -50,7 +50,7 @@ public class TestNewWindow  extends GenericMultiBrowserTest {
 		
 			// go to new opened window
 			mainHandle = testPage.selectNewWindow();
-			Assert.assertEquals(driver.findElement(By.id("textInIFrameWithValue")).getAttribute("value"), "a value");
+			Assert.assertEquals(driver.findElement(By.id("textInIFrameWithValue")).getDomProperty("value"), "a value");
 		} finally {
 			// go back to main window
 			if (driver.getWindowHandles().size() > 1) {

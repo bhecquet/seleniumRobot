@@ -1219,7 +1219,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public String getValue() {
         findElement(false, false);
 
-		return getRealElementNoSearch().getAttribute("value");
+		return getRealElementNoSearch().getDomProperty("value");
     }
 
     /**

@@ -47,7 +47,7 @@ public class NativeSelect extends CommonSelectList implements ISelectList {
 
 	@Override
 	public String getOptionValue(WebElement option) {
-		return option.getAttribute("value");
+		return option.getDomAttribute("value");
 	}
 
 	@Override

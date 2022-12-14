@@ -58,6 +58,6 @@ public class LinkElement extends HtmlElement {
     }
 
     public String getUrl() {
-        return super.getAttribute("href");
+        return super.getDomAttribute("href");
     }
 }

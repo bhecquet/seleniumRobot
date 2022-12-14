@@ -96,8 +96,8 @@ public class TestSelectList extends MockitoTest {
 
 		when(option1.getText()).thenReturn("opt1");
 		when(option2.getText()).thenReturn("opt2");
-		when(option1.getAttribute("value")).thenReturn("opti1");
-		when(option2.getAttribute("value")).thenReturn("opti2");
+		when(option1.getDomAttribute("value")).thenReturn("opti1");
+		when(option2.getDomAttribute("value")).thenReturn("opti2");
 		when(option1.getAttribute("index")).thenReturn("1");
 		when(option2.getAttribute("index")).thenReturn("2");
 

@@ -63,7 +63,7 @@ public class TextFieldElement extends HtmlElement {
     @ReplayOnError
     public void clear() {
         findElement();
-        if (!"file".equalsIgnoreCase(getRealElementNoSearch().getAttribute("type"))) {
+        if (!"file".equalsIgnoreCase(getRealElementNoSearch().getDomAttribute("type"))) {
         	getRealElementNoSearch().clear();
         }
     }

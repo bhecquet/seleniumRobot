@@ -582,7 +582,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 //		try {
 //			driver.executeScript("window.scrollTo(0, 0);");
 //			driver.findImageElement(new File(Thread.currentThread().getContextClassLoader().getResource("googleSearch.png").getFile())).click();
-//			Assert.assertEquals("image", driver.findElement(By.id("text2")).getAttribute("value"));
+//			Assert.assertEquals("image", driver.findElement(By.id("text2")).getDomProperty("value"));
 //		} finally {
 //			driver.findElement(By.id("button2")).click();
 //		}
@@ -612,7 +612,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		WaitHelper.waitForSeconds(10); // sometimes, upload popup needs time to display
 		testPage.uploadFile(path);
 		
-		Assert.assertEquals(DriverTestPage.uploadedFile.getAttribute("value"), "envSpecific.ini");
+		Assert.assertEquals(DriverTestPage.uploadedFile.getDomProperty("value"), "envSpecific.ini");
 	}
 	
 	/**
@@ -629,7 +629,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		WaitHelper.waitForSeconds(10); // sometimes, upload popup needs time to display
 		CustomEventFiringWebDriver.uploadFileUsingKeyboardTyping(new File(path));
 		WaitHelper.waitForSeconds(1);
-		Assert.assertEquals(DriverTestPage.uploadedFile.getAttribute("value"), "envSpecific2.ini");
+		Assert.assertEquals(DriverTestPage.uploadedFile.getDomProperty("value"), "envSpecific2.ini");
 	}
 	
 	/**
@@ -642,7 +642,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		String path = SeleniumTestsContextManager.getConfigPath() + File.separator + "config.ini";
 		DriverTestPage.upload.sendKeys(path);
 		
-		Assert.assertEquals(DriverTestPage.uploadedFile.getAttribute("value"), "config.ini");
+		Assert.assertEquals(DriverTestPage.uploadedFile.getDomProperty("value"), "config.ini");
 	}
 	
 	/**

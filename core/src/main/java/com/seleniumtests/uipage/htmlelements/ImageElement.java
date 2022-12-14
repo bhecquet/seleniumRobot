@@ -58,6 +58,6 @@ public class ImageElement extends HtmlElement {
     }
 
     public String getUrl() {
-        return super.getAttribute("src");
+        return super.getDomAttribute("src");
     }
 }

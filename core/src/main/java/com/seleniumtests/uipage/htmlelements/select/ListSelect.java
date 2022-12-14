@@ -47,7 +47,7 @@ public class ListSelect extends CommonSelectList implements ISelectList {
 
 	@Override
 	public String getOptionValue(WebElement option) {
-		return option.getAttribute("id");
+		return option.getDomAttribute("id");
 	}
 
 	@Override

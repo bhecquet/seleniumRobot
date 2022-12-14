@@ -202,7 +202,7 @@ public class ScreenshotUtil {
         		title = prefix == null ? title: prefix + title;
         		
         		try {
-        			pageSource = element.getAttribute("outerHTML");
+        			pageSource = element.getDomProperty("outerHTML");
         		} catch (Exception e) {
         			pageSource = "";
         		}

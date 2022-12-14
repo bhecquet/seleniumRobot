@@ -66,7 +66,6 @@ public class TestShadowDom extends GenericTest {
 		Assert.assertEquals(DriverTestPageShadowDom.divPass1Shadow.getText(), "This is a div with an ID of pass1Shadow");
 	}
 	
-	
 	@Test(groups={"it"})
 	public void testAccessSubShadowElement() {
 		Assert.assertEquals(DriverTestPageShadowDom.divPass1Shadow.getText(), "This is a div with an ID of pass1Shadow");

@@ -99,7 +99,7 @@ public class TestOverrideSeleniumNativeSearch extends MockitoTest {
 	public void testSendKeys() {
 		try {
 			testPage.sendKeys();
-			Assert.assertEquals(realDriver.findElement(By.id("text2")).getAttribute("value"), "some text");
+			Assert.assertEquals(realDriver.findElement(By.id("text2")).getDomProperty("value"), "some text");
 		} finally {
 			testPage.reset();
 		}
@@ -135,7 +135,7 @@ public class TestOverrideSeleniumNativeSearch extends MockitoTest {
 	public void testSingleFrame() {
 		testPage.switchToFirstFrameByElement();
 		WebElement el = testPage.getElementInsideFrame();
-		Assert.assertEquals(el.getAttribute("value"), "a value");
+		Assert.assertEquals(el.getDomProperty("value"), "a value");
 	}
 	
 	/**
@@ -145,7 +145,7 @@ public class TestOverrideSeleniumNativeSearch extends MockitoTest {
 	public void testSingleFrameByIndex() {
 		testPage.switchToFirstFrameByIndex();
 		WebElement el = testPage.getElementInsideFrame();
-		Assert.assertEquals(el.getAttribute("value"), "a value");
+		Assert.assertEquals(el.getDomProperty("value"), "a value");
 	}
 	
 	/**
@@ -155,7 +155,7 @@ public class TestOverrideSeleniumNativeSearch extends MockitoTest {
 	public void testSingleFrameByNameOrId() {
 		testPage.switchToFirstFrameByNameOrId();
 		WebElement el = testPage.getElementInsideFrame();
-		Assert.assertEquals(el.getAttribute("value"), "a value");
+		Assert.assertEquals(el.getDomProperty("value"), "a value");
 	}
 	
 	/**
@@ -166,7 +166,7 @@ public class TestOverrideSeleniumNativeSearch extends MockitoTest {
 		testPage.switchToFirstFrameByElement();
 		testPage.switchToSecondFrameByElement();
 		WebElement el = testPage.getElementInsideFrameOfFrame();
-		Assert.assertEquals(el.getAttribute("value"), "an other value in iframe");
+		Assert.assertEquals(el.getDomProperty("value"), "an other value in iframe");
 	}
 	
 
@@ -177,7 +177,7 @@ public class TestOverrideSeleniumNativeSearch extends MockitoTest {
 	public void testExpectedConditionsForSwitchingFrame() {
 		testPage.switchToFrameWithExpectedConditionsById();
 		WebElement el = testPage.getElementInsideFrame();
-		Assert.assertEquals(el.getAttribute("value"), "a value");
+		Assert.assertEquals(el.getDomProperty("value"), "a value");
 	}
 	
 	/**
@@ -187,7 +187,7 @@ public class TestOverrideSeleniumNativeSearch extends MockitoTest {
 	public void testExpectedConditionsForSwitchingFrameByName() {
 		testPage.switchToFrameWithExpectedConditionsByName();
 		WebElement el = testPage.getElementInsideFrame();
-		Assert.assertEquals(el.getAttribute("value"), "a value");
+		Assert.assertEquals(el.getDomProperty("value"), "a value");
 	}
 	
 	/**
@@ -197,7 +197,7 @@ public class TestOverrideSeleniumNativeSearch extends MockitoTest {
 	public void testExpectedConditionsForSwitchingFrameIndex() {
 		testPage.switchToFrameWithExpectedConditionsByIndex();
 		WebElement el = testPage.getElementInsideFrame();
-		Assert.assertEquals(el.getAttribute("value"), "a value");
+		Assert.assertEquals(el.getDomProperty("value"), "a value");
 	}
 	
 	/**
@@ -209,7 +209,7 @@ public class TestOverrideSeleniumNativeSearch extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setOverrideSeleniumNativeAction(false);
 		testPage.switchToFrameWithExpectedConditionsById();
 		WebElement el = testPage.getElementInsideFrame();
-		Assert.assertEquals(el.getAttribute("value"), "a value");
+		Assert.assertEquals(el.getDomProperty("value"), "a value");
 	}
 	
 	/**
@@ -220,9 +220,9 @@ public class TestOverrideSeleniumNativeSearch extends MockitoTest {
 
 		testPage.switchToFirstFrameByIndex();
 		WebElement el = testPage.getElementInsideFrame();
-		Assert.assertEquals(el.getAttribute("value"), "a value");
+		Assert.assertEquals(el.getDomProperty("value"), "a value");
 		WebElement el2 = testPage.getElementInsideFrame();
-		Assert.assertEquals(el2.getAttribute("value"), "a value");
+		Assert.assertEquals(el2.getDomProperty("value"), "a value");
 	}
 	
 	/**
@@ -232,12 +232,12 @@ public class TestOverrideSeleniumNativeSearch extends MockitoTest {
 	public void testDefaultContent() {
 		testPage.switchToFirstFrameByIndex();
 		WebElement el = testPage.getElementInsideFrame();
-		Assert.assertEquals(el.getAttribute("value"), "a value");
+		Assert.assertEquals(el.getDomProperty("value"), "a value");
 		testPage.switchDefaultContent();
 		
 		try {
 			testPage.sendKeys();
-			Assert.assertEquals(realDriver.findElement(By.id("text2")).getAttribute("value"), "some text");
+			Assert.assertEquals(realDriver.findElement(By.id("text2")).getDomProperty("value"), "some text");
 		} finally {
 			testPage.reset();
 		}
@@ -251,10 +251,10 @@ public class TestOverrideSeleniumNativeSearch extends MockitoTest {
 		testPage.switchToFirstFrameByElement();
 		testPage.switchToSecondFrameByElement();
 		WebElement el = testPage.getElementInsideFrameOfFrame();
-		Assert.assertEquals(el.getAttribute("value"), "an other value in iframe");
+		Assert.assertEquals(el.getDomProperty("value"), "an other value in iframe");
 		testPage.switchParentFrame();
 		WebElement el1 = testPage.getElementInsideFrame();
-		Assert.assertEquals(el1.getAttribute("value"), "a value");
+		Assert.assertEquals(el1.getDomProperty("value"), "a value");
 	}
 	
 	@Test(groups={"ut"})
