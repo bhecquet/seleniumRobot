@@ -50,7 +50,7 @@ public abstract class IMobileCapabilityFactory extends ICapabilitiesFactory {
     	DesiredCapabilities capabilities = new DesiredCapabilities();
     	capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.AUTOMATION_NAME, getAutomationName());
     
-    	if (app != null && !"".equals(app.trim())) {
+    	if (app != null && !app.trim().isEmpty()) {
 	    	capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.FULL_RESET, webDriverConfig.isFullReset());
     	}
     	
@@ -62,7 +62,7 @@ public abstract class IMobileCapabilityFactory extends ICapabilitiesFactory {
     	capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.NEW_COMMAND_TIMEOUT, webDriverConfig.getNewCommandTimeout());
     	
     	// in case app has not been specified for cloud provider
-        if ((capabilities.getCapability(MobileCapabilityType.APP) == null || capabilities.getCapability(MobileCapabilityType.APP) == null) && app != null && !app.isEmpty()) {
+        if (capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP) == null && app != null && !app.isEmpty()) {
         	
         	// in case of local file, give absolute path to file. For remote files (e.g: http://myapp.apk), it will be transmitted as is
         	if (new File(app).isFile()) {

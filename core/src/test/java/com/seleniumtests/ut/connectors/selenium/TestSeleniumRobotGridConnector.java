@@ -58,6 +58,7 @@ import org.testng.annotations.Test;
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
 import com.seleniumtests.ConnectorsTest;
+import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
 import com.seleniumtests.customexception.ScenarioException;
@@ -116,7 +117,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		// prepare app file
 		File appFile = File.createTempFile("app", ".apk");
 		appFile.deleteOnExit();
-		capabilities.setCapability(MobileCapabilityType.APP, appFile.getAbsolutePath());
+		capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP, appFile.getAbsolutePath());
 		
 		// prepare response
 		InputStream is = IOUtils.toInputStream("file:app/zip", Charset.forName("UTF-8"));
@@ -133,7 +134,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		// prepare app file
 		File appFile = File.createTempFile("app", ".apk");
 		appFile.deleteOnExit();
-		capabilities.setCapability(MobileCapabilityType.APP, appFile.getAbsolutePath());
+		capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP, appFile.getAbsolutePath());
 		
 		// prepare response
 		InputStream is = IOUtils.toInputStream("file:app/zip", Charset.forName("UTF-8"));
@@ -153,12 +154,12 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	public void testDontSendAppWhenHttp() throws ClientProtocolException, IOException {
 		
 		// prepare app key
-		capabilities.setCapability(MobileCapabilityType.APP, "http://server:port/data/application.apk");
+		capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP, "http://server:port/data/application.apk");
 		
 		connector.uploadMobileApp(capabilities);
 		
 		verify(client, never()).execute((HttpHost)any(), any());
-		Assert.assertEquals(capabilities.getCapability(MobileCapabilityType.APP), "http://server:port/data/application.apk");
+		Assert.assertEquals(capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP), "http://server:port/data/application.apk");
 	}
 	
 	/**
@@ -173,7 +174,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		connector.uploadMobileApp(new DesiredCapabilities());
 		
 		verify(client, never()).execute((HttpHost)any(), any());
-		Assert.assertEquals(capabilities.getCapability(MobileCapabilityType.APP), null);
+		Assert.assertEquals(capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP), null);
 	}
 	
 	/**
