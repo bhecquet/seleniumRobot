@@ -44,15 +44,12 @@ import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.internal.ConfigurationMethod;
 import org.testng.xml.XmlSuite;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.TestType;
-import com.seleniumtests.util.TestConfigurationParser;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 /**
@@ -124,8 +121,7 @@ public class SeleniumTestsContextManager {
         }
     	
     	ITestContext testNGCtx = new DefaultTestNGContext(suiteContext);
-    	ITestContext newTestNGCtx = getContextFromConfigFile(testNGCtx);
-        globalContext = new SeleniumTestsContext(newTestNGCtx);
+        globalContext = new SeleniumTestsContext(testNGCtx);
     }
     
     public static void initGlobalContext(ITestContext testNGCtx) {
@@ -135,8 +131,7 @@ public class SeleniumTestsContextManager {
         	generateApplicationPath(testNGCtx.getCurrentXmlTest().getSuite());
         }
     	
-    	ITestContext newTestNGCtx = getContextFromConfigFile(testNGCtx);
-        globalContext = new SeleniumTestsContext(newTestNGCtx);
+        globalContext = new SeleniumTestsContext(testNGCtx);
     }
     
     private static String getKeyForMethod(ITestContext testNGCtx, String className, String methodName) {
@@ -242,7 +237,7 @@ public class SeleniumTestsContextManager {
     				testContext.get(testNGCtx.getName());
     				
     	} else {
-    		return new SeleniumTestsContext(getContextFromConfigFile(testNGCtx));
+    		return new SeleniumTestsContext(testNGCtx);
     	}
     }
     
@@ -425,109 +420,6 @@ public class SeleniumTestsContextManager {
 		return methodContext;
 	}
 
-	/**
-     * Get parameters from configuration file.
-     * @param iTestContext
-     * @param configParser
-     * @return Map with parameters from the given file.
-     */
-    private static Map<String, String> getParametersFromConfigFile(final ITestContext iTestContext, 
-    																TestConfigurationParser configParser) {
-        Map<String, String> parameters;
-        
-        // get parameters
-        if (iTestContext.getCurrentXmlTest() != null) {
-        	parameters = iTestContext.getCurrentXmlTest().getSuite().getParameters();
-        } else {
-        	parameters = iTestContext.getSuite().getXmlSuite().getParameters();
-        }
-        // insert parameters
-        for (Node node: configParser.getParameterNodes()) {
-            parameters.put(node.getAttributes().getNamedItem("name").getNodeValue(),
-            		       node.getAttributes().getNamedItem("value").getNodeValue());
-        }
-        return parameters;
-    }
-    
-    /**
-     * 
-     * @param iTestContext
-     * @return run mode corresponding to the given test context
-     */
-    private static String setRunMode(final ITestContext iTestContext){
-    	String runMode;
-		if (System.getProperty(SeleniumTestsContext.RUN_MODE) != null) {
-			runMode = System.getProperty(SeleniumTestsContext.RUN_MODE);
-		} else if (iTestContext.getSuite().getParameter(SeleniumTestsContext.RUN_MODE) != null) {
-			runMode = iTestContext.getSuite().getParameter(SeleniumTestsContext.RUN_MODE);
-		} else {
-			runMode = "LOCAL";
-		}
-		return runMode;
-    }
-    
-    /**
-     * Get service parameters from configuration file.
-     * Only the parameters corresponding to the defined runMode.
-     * @param parameters
-     * @param runMode
-     * @param iTestContext
-     * @param configParser
-     * @return Map with service parameters from the given file.
-     */
-    private static Map<String, String> getServiceParameters(Map<String, String> parameters, String runMode, TestConfigurationParser configParser) {
-    	
-    	for (Node node: configParser.getServiceNodes()) {
-    		
-        	if (node.getAttributes().getNamedItem("name").getNodeValue().equalsIgnoreCase(runMode)) {
-        		
-        		NodeList nList = node.getChildNodes();
-        		for (int i = 0; i < nList.getLength(); i++ ) {
-        			Node paramNode = nList.item(i);
-        			if ("parameter".equals(paramNode.getNodeName())) {
-            			parameters.put(paramNode.getAttributes().getNamedItem("name").getNodeValue(),
-            						   paramNode.getAttributes().getNamedItem("value").getNodeValue());
-        			}
-        		}
-        	}
-        }
-    	return parameters;
-    }
-    
-    /**
-     * Set the parameters for the test with parameters from XML configuration file.
-     * @param   iTestContext
-     * @return  iTestContext set with parameters from external config file
-     */
-    public static ITestContext getContextFromConfigFile(final ITestContext iTestContext) {
-        if (iTestContext != null
-        	&& iTestContext.getSuite().getParameter(SeleniumTestsContext.TEST_CONFIGURATION) != null) {
-            	
-            	File suiteFile = new File(iTestContext.getSuite().getXmlSuite().getFileName());
-                String configFile = suiteFile.getPath().replace(suiteFile.getName(), "") + iTestContext.getSuite().getParameter(SeleniumTestsContext.TEST_CONFIGURATION);
-                
-                TestConfigurationParser configParser = new TestConfigurationParser(configFile);
-            	
-                Map<String, String> parameters = getParametersFromConfigFile(iTestContext, configParser);
-                
-                // get configuration for services.
-	            String runMode = setRunMode(iTestContext);
-	            getServiceParameters(parameters, runMode, configParser);
-                
-                // 
-                parameters.put(SeleniumTestsContext.DEVICE_LIST, configParser.getDeviceNodesAsJson());
-    
-                if (iTestContext.getCurrentXmlTest() != null) {
-                	// iTestContext is a test context provided by TestNG
-                	iTestContext.getCurrentXmlTest().getSuite().setParameters(parameters);
-                } else {
-                	// iTestContext is a DefaultTestNGContext
-                	iTestContext.getSuite().getXmlSuite().setParameters(parameters);
-                }
-        }
-
-        return iTestContext;
-    }
 
     public static void initThreadContext() {
         initThreadContext(globalContext.getTestNGContext(), null);
@@ -535,8 +427,7 @@ public class SeleniumTestsContextManager {
 
     public static void initThreadContext(ITestContext testNGCtx, ITestResult testResult) {
 
-    	ITestContext newTestNGCtx = getContextFromConfigFile(testNGCtx);
-    	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(newTestNGCtx);
+    	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(testNGCtx);
         
         threadLocalContext.set(seleniumTestsCtx);
         
@@ -629,8 +520,7 @@ public class SeleniumTestsContextManager {
     		return TestNGResultUtils.getSeleniumRobotTestContext(testResult);
     	} else {
     		logger.error("Result did not contain thread context, initializing a new one");
-    		ITestContext newTestNGCtx = getContextFromConfigFile(testNGCtx);
-        	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(newTestNGCtx);
+        	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(testNGCtx);
             seleniumTestsCtx.configureContext(testResult);
 
             TestNGResultUtils.setSeleniumRobotTestContext(testResult, seleniumTestsCtx);
