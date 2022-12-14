@@ -19,6 +19,9 @@ package com.seleniumtests.browserfactory;
 
 public interface SeleniumRobotCapabilityType {
 
+
+	String APPIUM_PREFIX = "appium:";
+	
 	/**
 	 * parameter to force a test to execute on a specific node or set of nodes
 	 * value must be a list of strings

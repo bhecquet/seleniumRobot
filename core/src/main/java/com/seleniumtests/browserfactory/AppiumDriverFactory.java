@@ -55,7 +55,7 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
 			String driverPath;
 			try {
 				driverPath = FileUtility.decodePath(new DriverExtractor().extractDriver(chromeDriverFile));
-				capabilities.setCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, driverPath);
+				capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, driverPath);
 			} catch (UnsupportedEncodingException e) {
 				logger.error("cannot get driver path", e);
 			}
@@ -103,10 +103,10 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
 				}
 				
 				if (capabilities.getCapability(CapabilityType.PLATFORM_NAME).toString().equalsIgnoreCase(ANDROID_PLATORM)) {
-					capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, webDriverConfig.getDeviceId());
+					capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.DEVICE_NAME, webDriverConfig.getDeviceId());
 				} else { // iOS
-					capabilities.setCapability(IOSMobileCapabilityType.XCODE_CONFIG_FILE, (String)null); // remove this capability as it may not be accurate
-					capabilities.setCapability(MobileCapabilityType.UDID, webDriverConfig.getDeviceId());
+					capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + IOSMobileCapabilityType.XCODE_CONFIG_FILE, (String)null); // remove this capability as it may not be accurate
+					capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.UDID, webDriverConfig.getDeviceId());
 				}
 			} else {
 				throw e;

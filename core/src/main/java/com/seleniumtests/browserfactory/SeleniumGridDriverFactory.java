@@ -108,7 +108,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     	DesiredCapabilities capabilities = new DesiredCapabilities();
     	
     	if (SeleniumTestsContextManager.isMobileTest()) {
-    		capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, webDriverConfig.getMobilePlatformVersion());
+    		capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.PLATFORM_VERSION, webDriverConfig.getMobilePlatformVersion());
     	} else {
     		capabilities.setCapability(CapabilityType.PLATFORM_NAME, webDriverConfig.getPlatform().toLowerCase());
     		if (webDriverConfig.getBrowserVersion() != null && capabilities.getCapability(CapabilityType.BROWSER_VERSION) == null) {

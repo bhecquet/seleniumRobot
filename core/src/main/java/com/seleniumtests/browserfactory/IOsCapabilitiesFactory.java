@@ -22,6 +22,7 @@ import org.openqa.selenium.MutableCapabilities;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
 
+import io.appium.java_client.ios.options.XCUITestOptions;
 import io.appium.java_client.remote.IOSMobileCapabilityType;
 
 public class IOsCapabilitiesFactory extends IMobileCapabilityFactory {
@@ -41,11 +42,10 @@ public class IOsCapabilitiesFactory extends IMobileCapabilityFactory {
 
 	@Override
 	protected MutableCapabilities getSystemSpecificCapabilities() {
-		
 		MutableCapabilities capabilities = new MutableCapabilities();
 
     	if (webDriverConfig.getMode() == DriverMode.LOCAL) {
-    		capabilities.setCapability(IOSMobileCapabilityType.XCODE_CONFIG_FILE, System.getenv("APPIUM_HOME") + "/node_modules/appium/node_modules/appium-xcuitest-driver/WebDriverAgent/xcodeConfigFile.xcconfig");
+    		capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + IOSMobileCapabilityType.XCODE_CONFIG_FILE, System.getenv("APPIUM_HOME") + "/node_modules/appium/node_modules/appium-xcuitest-driver/WebDriverAgent/xcodeConfigFile.xcconfig");
     	}
     	
     	return capabilities;

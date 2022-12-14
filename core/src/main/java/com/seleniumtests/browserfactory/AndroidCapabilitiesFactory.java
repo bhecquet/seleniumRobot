@@ -22,6 +22,7 @@ import org.openqa.selenium.MutableCapabilities;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 
+import io.appium.java_client.android.options.UiAutomator2Options;
 import io.appium.java_client.remote.AndroidMobileCapabilityType;
 
 /**
@@ -48,18 +49,17 @@ public class AndroidCapabilitiesFactory extends IMobileCapabilityFactory {
 
 	@Override
 	protected MutableCapabilities getSystemSpecificCapabilities() {
-		
 		MutableCapabilities capabilities = new MutableCapabilities();
 		  
     	// automatically hide keyboard
 //    	capabilities.setCapability(AndroidMobileCapabilityType.RESET_KEYBOARD, true);
 //    	capabilities.setCapability(AndroidMobileCapabilityType.UNICODE_KEYBOARD, true);
 
-        capabilities.setCapability(AndroidMobileCapabilityType.APP_PACKAGE, webDriverConfig.getAppPackage());
-        capabilities.setCapability(AndroidMobileCapabilityType.APP_ACTIVITY, webDriverConfig.getAppActivity());
+        capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + AndroidMobileCapabilityType.APP_PACKAGE, webDriverConfig.getAppPackage());
+        capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + AndroidMobileCapabilityType.APP_ACTIVITY, webDriverConfig.getAppActivity());
         
         if (webDriverConfig.getAppWaitActivity() != null) {
-        	capabilities.setCapability(AndroidMobileCapabilityType.APP_WAIT_ACTIVITY, webDriverConfig.getAppWaitActivity());
+        	capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + AndroidMobileCapabilityType.APP_WAIT_ACTIVITY, webDriverConfig.getAppWaitActivity());
         }
         
         return capabilities;

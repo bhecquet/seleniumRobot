@@ -23,6 +23,7 @@ import java.util.List;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.CapabilityType;
 
+import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverMode;
@@ -91,9 +92,9 @@ public class MobileDeviceSelector {
 	 */
 	public MobileDevice getRelevantMobileDevice(MutableCapabilities capabilities) {
 		isInitialized();
-		Object deviceName = capabilities.getCapability(MobileCapabilityType.DEVICE_NAME);
+		Object deviceName = capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.DEVICE_NAME);
 		Object platformName = capabilities.getCapability(CapabilityType.PLATFORM_NAME);
-		Object platformVersion = capabilities.getCapability(MobileCapabilityType.PLATFORM_VERSION);
+		Object platformVersion = capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.PLATFORM_VERSION);
 		
 		if (deviceName == null
 				&& platformName == null
@@ -140,7 +141,8 @@ public class MobileDeviceSelector {
 		MobileDevice selectedDevice = getRelevantMobileDevice(capabilities);
 		
 		if ("android".equals(selectedDevice.getPlatform())) {
-			capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, selectedDevice.getId());
+			capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.DEVICE_NAME, selectedDevice.getName());
+			capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.UDID, selectedDevice.getId());
 			
 			// set the right chromedriver executable according to android browser / chromeversion
 			// it's only the file name, not it's path
@@ -153,17 +155,17 @@ public class MobileDeviceSelector {
 	        	}
 				if (chromeDriverFile != null) {
 					// driver extraction will be done later. For example in AppiumDriverFactory
-					capabilities.setCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, chromeDriverFile);
+					capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, chromeDriverFile);
 				}
 			}
 			
 		} else if ("ios".equalsIgnoreCase(selectedDevice.getPlatform())) {
-			capabilities.setCapability(MobileCapabilityType.UDID, selectedDevice.getId());
-			capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, selectedDevice.getName());
-			capabilities.setCapability(IOSMobileCapabilityType.XCODE_CONFIG_FILE, System.getenv("APPIUM_HOME") + "/node_modules/appium/node_modules/appium-xcuitest-driver/WebDriverAgent/xcodeConfigFile.xcconfig");
+			capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.UDID, selectedDevice.getId());
+			capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.DEVICE_NAME, selectedDevice.getName());
+			capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + IOSMobileCapabilityType.XCODE_CONFIG_FILE, System.getenv("APPIUM_HOME") + "/node_modules/appium/node_modules/appium-xcuitest-driver/WebDriverAgent/xcodeConfigFile.xcconfig");
 		}
 		capabilities.setCapability(CapabilityType.PLATFORM_NAME, selectedDevice.getPlatform());
-		capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, selectedDevice.getVersion());
+		capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.PLATFORM_VERSION, selectedDevice.getVersion());
 		
 		return capabilities;
 	}
