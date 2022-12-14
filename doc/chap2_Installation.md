@@ -212,7 +212,7 @@ As of June 2017, it asks for (simulator and real device):
 - install xcode
 - install xcode-select
 - install homebrew (see homebrew website)
-- `brew install carthage`
+[https://github.com/appium/appium-xcuitest-driver#desired-capabilities] (https://github.com/appium/appium-xcuitest-driver#desired-capabilities)
 
 Check installation with appium-doctor:
 - `npm install appium-doctor`
