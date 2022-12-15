@@ -37,46 +37,6 @@ import com.seleniumtests.util.PackageUtility;
  */
 public class TestSeleniumTestContextManager extends GenericTest {
 
-	/**
-	 * Test reading of extended configuration (referenced by testConfig parameter in suite file)
-	 * @param iTestContext
-	 */
-	@Test(groups={"ut"})
-	public void readExtendedConfiguration(ITestContext iTestContext) {
-		iTestContext = SeleniumTestsContextManager.getContextFromConfigFile(iTestContext);
-		
-		Assert.assertEquals(iTestContext.getCurrentXmlTest().getSuite().getParameter(SeleniumTestsContext.DEVICE_LIST), "{\"Samsung Galaxy Nexus SPH-L700 4.3\":\"Android 4.3\",\"Android Emulator\":\"Android 5.1\"}");
-		Assert.assertEquals(iTestContext.getCurrentXmlTest().getSuite().getParameter(SeleniumTestsContext.WEB_DRIVER_GRID), "http://localhost:4723/wd/hub");
-		Assert.assertEquals(iTestContext.getCurrentXmlTest().getSuite().getParameter(SeleniumTestsContext.APP_PACKAGE), "com.infotel.mobile");
-	}
-	
-	/**
-	 * A value defined in suite and in extended configuration will be get from extended configuration
-	 * @param iTestContext
-	 */
-	@Test(groups={"ut"})
-	public void extendedConfigurationOverridesSuiteValue(ITestContext iTestContext) {
-		iTestContext = SeleniumTestsContextManager.getContextFromConfigFile(iTestContext);
-		
-		Assert.assertEquals(iTestContext.getCurrentXmlTest().getSuite().getParameter(SeleniumTestsContext.BROWSER), "chrome");
-	}
-	
-	/**
-	 * By default, runMode is LOCAL, we check it's possible to define runMode from command line and it's taken into account when reading
-	 * testConfig file
-	 * @param iTestContext
-	 */
-	@Test(groups={"ut"})
-	public void runModeDefinedAsProperty(ITestContext iTestContext) {
-		try {
-			System.setProperty("runMode", "saucelabs");
-			iTestContext = SeleniumTestsContextManager.getContextFromConfigFile(iTestContext);
-			
-			Assert.assertEquals(iTestContext.getCurrentXmlTest().getSuite().getParameter(SeleniumTestsContext.WEB_DRIVER_GRID), "http://xxx:aaaaa-26d7-44fa-bbbb-b2c75cdccafd@ondemand.saucelabs.com:80/wd/hub");
-		} finally {
-			System.clearProperty("runMode");
-		}
-	}
 	
 	@Test(groups={"ut"})
 	public void extendedConfigurationIsWrittentIntoCurrentTest(ITestContext iTestContext) {
