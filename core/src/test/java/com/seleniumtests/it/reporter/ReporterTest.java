@@ -338,7 +338,7 @@ public class ReporterTest extends ConnectorsTest {
 	/**
 	 * Reads the TestReport.html file for the given test name
 	 * line breaks are removed
-	 * @param testName
+	 * @param object
 	 * @return
 	 * @throws IOException 
 	 */
