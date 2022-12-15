@@ -35,6 +35,7 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
+import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.browserfactory.mobile.AdbWrapper;
 import com.seleniumtests.browserfactory.mobile.InstrumentsWrapper;
 import com.seleniumtests.browserfactory.mobile.MobileDevice;
@@ -199,7 +200,7 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		// requested caps
 		DesiredCapabilities requestedCaps = new DesiredCapabilities();
 		requestedCaps.setCapability(MobileCapabilityType.PLATFORM_NAME, "android");
-		requestedCaps.setCapability(MobileCapabilityType.PLATFORM_VERSION, "6.0");
+		requestedCaps.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.PLATFORM_VERSION, "6.0");
 		
 		deviceSelector.setAndroidReady(true);
 		deviceSelector.setIosReady(false);
@@ -221,16 +222,17 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
 		
 		DesiredCapabilities requestedCaps = new DesiredCapabilities();
-		requestedCaps.setCapability(MobileCapabilityType.DEVICE_NAME, "Nexus 5");
+		requestedCaps.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.DEVICE_NAME, "Nexus 5");
 		
 		deviceSelector.setAndroidReady(true);
 		deviceSelector.setIosReady(false);
 		
 		MutableCapabilities updatedCaps = deviceSelector.updateCapabilitiesWithSelectedDevice(requestedCaps, DriverMode.LOCAL);
 		Assert.assertEquals(updatedCaps.getCapability(MobileCapabilityType.PLATFORM_NAME), Platform.ANDROID);
-		Assert.assertEquals(updatedCaps.getCapability(MobileCapabilityType.DEVICE_NAME), "1234");
-		Assert.assertEquals(updatedCaps.getCapability(MobileCapabilityType.PLATFORM_VERSION), "5.0");
-		Assert.assertNull(updatedCaps.getCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE));		
+		Assert.assertEquals(updatedCaps.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.DEVICE_NAME), "nexus 5");
+		Assert.assertEquals(updatedCaps.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.UDID), "1234");
+		Assert.assertEquals(updatedCaps.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.PLATFORM_VERSION), "5.0");
+		Assert.assertNull(updatedCaps.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE));		
 	}
 	
 	/**
@@ -246,14 +248,14 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
 		
 		DesiredCapabilities requestedCaps = new DesiredCapabilities();
-		requestedCaps.setCapability(MobileCapabilityType.DEVICE_NAME, "Nexus 5");
+		requestedCaps.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.DEVICE_NAME, "Nexus 5");
 		requestedCaps.setCapability(MobileCapabilityType.BROWSER_NAME, "chrome");
 		
 		deviceSelector.setAndroidReady(true);
 		deviceSelector.setIosReady(false);
 		
 		MutableCapabilities updatedCaps = deviceSelector.updateCapabilitiesWithSelectedDevice(requestedCaps, DriverMode.LOCAL);
-		Assert.assertEquals(updatedCaps.getCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE), "chromedriver.exe");
+		Assert.assertEquals(updatedCaps.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE), "chromedriver.exe");
 		
 	}
 	
@@ -270,14 +272,14 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
 		
 		DesiredCapabilities requestedCaps = new DesiredCapabilities();
-		requestedCaps.setCapability(MobileCapabilityType.DEVICE_NAME, "Nexus 5");
+		requestedCaps.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.DEVICE_NAME, "Nexus 5");
 		requestedCaps.setCapability(MobileCapabilityType.BROWSER_NAME, "browser");
 		
 		deviceSelector.setAndroidReady(true);
 		deviceSelector.setIosReady(false);
 		
 		MutableCapabilities updatedCaps = deviceSelector.updateCapabilitiesWithSelectedDevice(requestedCaps, DriverMode.SAUCELABS);
-		Assert.assertNull(updatedCaps.getCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE));
+		Assert.assertNull(updatedCaps.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE));
 		
 	}
 }
