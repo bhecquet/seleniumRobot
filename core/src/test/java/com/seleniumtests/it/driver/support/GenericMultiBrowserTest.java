@@ -108,6 +108,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 		mapping.put("/tu/testIFrame.html", "/testIFrame.html");
 		mapping.put("/tu/testAngularIFrame.html", "/testAngularIFrame.html");
 		mapping.put("/tu/testIFrame2.html", "/testIFrame2.html");
+		mapping.put("/tu/testIFrame3.html", "/testIFrame3.html");
 		mapping.put("/tu/ffLogo1.png", "/ffLogo1.png");
 		mapping.put("/tu/ffLogo2.png", "/ffLogo2.png");
 		mapping.put("/tu/googleSearch.png", "/googleSearch.png");
@@ -115,7 +116,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 		mapping.put("/tu/jquery.min.js", "/jquery.min.js");
 		
 		// Site remasterisé
-		mapping.put("/tu/pagesApp/test.html", "/test.html");
+		mapping.put("/tu/pagesApp/test.html", "/testIA.html");
 		mapping.put("/tu/pagesApp/testCharging.html", "/testCharging.html");
 		mapping.put("/tu/pagesApp/testMissingElement.html", "/testMissingElement.html");
 

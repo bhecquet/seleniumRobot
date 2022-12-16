@@ -107,4 +107,20 @@ public class TestShadowDom extends GenericTest {
 		DriverTestPageShadowDom.textInScroll.sendKeys("hello!");
 		Assert.assertEquals(DriverTestPageShadowDom.textInScroll.getValue(), "hello!");
 	}
+	
+	/**
+	 * Shadow element is in a frame
+	 */
+	@Test(groups={"it"})
+	public void testAccessShadowElementInFrame() {
+		Assert.assertEquals(DriverTestPageShadowDom.divPassInFrameAndShadow.getText(), "This is a div with an ID of pass1InFrameShadow");
+	}
+	
+	/**
+	 * Frame is in a shadow element
+	 */
+	@Test(groups={"it"})
+	public void testAccessFrameInShadowElement() {
+		Assert.assertEquals(DriverTestPageShadowDom.divPassInShadowAndFrame.getText(), "This is a DIV with the id of pass1");
+	}
 }

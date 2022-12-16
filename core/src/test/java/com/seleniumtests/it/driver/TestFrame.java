@@ -19,7 +19,6 @@ package com.seleniumtests.it.driver;
 
 import org.openqa.selenium.By;
 import org.testng.Assert;
-import org.testng.annotations.Test;
 
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
@@ -104,6 +103,13 @@ public class TestFrame extends GenericMultiBrowserTest {
 		Assert.assertEquals(DriverTestPage.tableIFrame.findElements(By.tagName("tr")).size(), 2);
 	}
 	
+	
+	/**
+	 * Check it's possible to define a frame as a sub-element of an other one (e.g: a div)
+	 */
+	public void testFrameOtherElement() {
+		Assert.assertEquals(DriverTestPage.textElementInIFrameInDiv.getValue(), "an other value in an other iframe");
+	}
 	
 	public void testFrameInFrameText() {
 		Assert.assertEquals(DriverTestPage.textElementSubIFrame.getValue(), "an other value in iframe");

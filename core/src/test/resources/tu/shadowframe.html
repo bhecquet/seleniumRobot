@@ -6,7 +6,7 @@
 	<script>
 		function setup(){
 			//Test
-			document.getElementById("shadow2").attachShadow({mode: "open"}).innerHTML='<div id="pass1">This is a div with an ID of pass1</div>';
+			document.getElementById("shadow2Frame").attachShadow({mode: "open"}).innerHTML='<div id="pass1InFrameShadow">This is a div with an ID of pass1InFrameShadow</div>';
 		}
 	</script>
 </head>
@@ -19,7 +19,7 @@
 	<div id="pass1">This is a DIV with the id of pass1</div>
 	
 	<p>Shadow DOM:</p>	
-	<div id="shadow2"></div>
+	<div id="shadow2Frame"></div>
 
 </body>
 </html>

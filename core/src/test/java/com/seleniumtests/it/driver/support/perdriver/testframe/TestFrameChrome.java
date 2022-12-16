@@ -94,6 +94,11 @@ public class TestFrameChrome extends TestFrame {
 	}
 	
 	@Test(groups={"it"})
+	public void testFrameOtherElement() {
+		super.testFrameOtherElement();
+	}
+	
+	@Test(groups={"it"})
 	public void testBackToMainFrame() {
 		super.testBackToMainFrame();
 	}	
