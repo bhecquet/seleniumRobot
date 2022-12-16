@@ -2,12 +2,11 @@
 <suite name="Unit test suite" parallel="false" verbose="1" thread-count="1" configfailurepolicy="continue" group-by-instances="true">
    
 	<parameter name="implicitWaitTimeOut" value="2"></parameter>
-	<parameter name="browser" value="opera" />
+	<parameter name="browser" value="chrome" />
 	<parameter name="app" value="https://www.test.google.fr" />
 	<parameter name="aParam" value="value1" />
 	<parameter name="anOtherParam" value="value2" />
 	<parameter name="variable1" value="value4" />
-    <parameter name="testConfig" value="exampleConfigGenericParams.xml" />
 	<parameter name="debug" value="none" />
 
     <test name="UnitTests" parallel="false">

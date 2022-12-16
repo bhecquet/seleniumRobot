@@ -17,31 +17,12 @@
  */
 package com.seleniumtests.ut.core;
 
-import org.testng.Assert;
-import org.testng.ITestContext;
 import org.testng.annotations.Test;
 
-import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 
 public class TestSeleniumTestContextManagerWithoutInit {
-	
-	/**
-	 * Check that global context gets parameters from XML file
-	 * @param testContext
-	 */
-	@Test(groups= {"ut context"}) 
-	public void testGlobalContextGetsParametersFromXmlFile(ITestContext testContext) {
-		try {
-			SeleniumTestsContextManager.initGlobalContext(testContext.getSuite()); 
-			SeleniumTestsContext context = SeleniumTestsContextManager.getGlobalContext();
-			context.setSoftAssertEnabled(false); 
-			Assert.assertEquals(context.getApp(), "myMobileApp.apk");
-		} finally {
-			SeleniumTestsContextManager.setGlobalContext(null);
-		}
-	}
 	
 	@Test(groups= {"ut context"}, expectedExceptions=ConfigurationException.class)
 	public void testGlobalContextMustBeInit() {

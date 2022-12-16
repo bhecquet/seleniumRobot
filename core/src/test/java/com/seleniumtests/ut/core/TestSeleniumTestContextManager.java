@@ -26,29 +26,11 @@ import org.testng.xml.XmlSuite;
 import org.testng.xml.XmlSuite.ParallelMode;
 
 import com.seleniumtests.GenericTest;
-import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.util.PackageUtility;
 
-/**
- * The first 4 tests will fail when executed directly because they use the tu.xml specific configurations
- * @author behe
- *
- */
 public class TestSeleniumTestContextManager extends GenericTest {
 
-	
-	@Test(groups={"ut"})
-	public void extendedConfigurationIsWrittentIntoCurrentTest(ITestContext iTestContext) {
-		try {
-			System.setProperty(SeleniumTestsContext.DEVICE_NAME, "Samsung Galaxy Nexus SPH-L700 4.3");
-			initThreadContext(iTestContext);
-			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getPlatform(), "Android");
-			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getMobilePlatformVersion(), "4.3");
-		} finally {
-			System.clearProperty(SeleniumTestsContext.DEVICE_NAME);
-		}
-	}
 	
 	/**
 	 * Check that version is shorten: 3.0.0 => 3.0
