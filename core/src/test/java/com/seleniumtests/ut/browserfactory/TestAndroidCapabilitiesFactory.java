@@ -160,8 +160,6 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_NAME), Platform.ANDROID);
 		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.PLATFORM_VERSION), "8.0");
 		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.DEVICE_NAME), "Samsung Galasy S8");
-		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + AndroidMobileCapabilityType.APP_PACKAGE), "com.infotel.mobile"); // from exampleConfigGenericParams.xml when tu.xml is executed, else, null
-		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + AndroidMobileCapabilityType.APP_ACTIVITY), "com.infotel.mobile.StartActivity"); // from exampleConfigGenericParams.xml when tu.xml is executed, else, null
 		Assert.assertNull(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.FULL_RESET));
 	}
 	

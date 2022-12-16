@@ -76,13 +76,13 @@ public class SauceLabsCapabilitiesFactory extends ICloudCapabilityFactory {
         }
 		
 		// we need to upload something
-		if (capabilities.getCapability(MobileCapabilityType.APP) != null) {
+		if (capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP) != null) {
 			boolean uploadApp = isUploadApp(capabilities);
 			
 			if (uploadApp) {
-				uploadFile((String)capabilities.getCapability(MobileCapabilityType.APP));
+				uploadFile((String)capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP));
 			}
-			capabilities.setCapability("app", "storage:filename=" + new File((String) capabilities.getCapability(MobileCapabilityType.APP)).getName()); //  saucelabs waits for app capability a special file: sauce-storage:<filename>
+			capabilities.setCapability("app", "storage:filename=" + new File((String) capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP)).getName()); //  saucelabs waits for app capability a special file: sauce-storage:<filename>
 
 		}
         

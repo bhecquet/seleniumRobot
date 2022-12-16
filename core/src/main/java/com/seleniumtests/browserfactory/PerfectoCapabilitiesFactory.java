@@ -59,23 +59,23 @@ public class PerfectoCapabilitiesFactory extends ICloudCapabilityFactory {
         } 
 		
 		// we need to upload something
-		if (capabilities.getCapability(MobileCapabilityType.APP) != null) {
+		if (capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP) != null) {
 			boolean uploadApp = isUploadApp(capabilities);
 			
-			String appName = new File((String) capabilities.getCapability(MobileCapabilityType.APP)).getName();
+			String appName = new File((String) capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP)).getName();
 			String repositoryKey = String.format("PUBLIC:%s", appName);
 			
 			String cloudName = extractCloudName();
 			
 			if (uploadApp) {
 				try {
-					uploadFile(cloudName, apiKey, (String)capabilities.getCapability(MobileCapabilityType.APP), repositoryKey);
+					uploadFile(cloudName, apiKey, (String)capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP), repositoryKey);
 					
 				} catch (URISyntaxException | IOException e) {
 					throw new ScenarioException("Could not upload file", e);
 				}
 			}
-			capabilities.setCapability(MobileCapabilityType.APP, repositoryKey);
+			capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP, repositoryKey);
 		}
 
 		return capabilities;

@@ -24,9 +24,9 @@ public abstract class ICloudCapabilityFactory extends ICapabilitiesFactory {
 	 * @return
 	 */
 	protected boolean isUploadApp(MutableCapabilities capabilities) {
-		boolean uploadApp = !((String) capabilities.getCapability(MobileCapabilityType.APP)).startsWith(NO_APP_UPLOAD);
+		boolean uploadApp = !((String) capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP)).startsWith(NO_APP_UPLOAD);
 		if (!uploadApp) {
-			capabilities.setCapability(MobileCapabilityType.APP, ((String) capabilities.getCapability(MobileCapabilityType.APP)).replace(NO_APP_UPLOAD, ""));
+			capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP, ((String) capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP)).replace(NO_APP_UPLOAD, ""));
 		}
 		
 		return uploadApp;

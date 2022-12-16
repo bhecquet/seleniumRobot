@@ -125,7 +125,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		when(entity.getContent()).thenReturn(is);
 		
 		connector.uploadMobileApp(capabilities);
-		Assert.assertEquals(capabilities.getCapability(MobileCapabilityType.APP), "file:app/zip/" + appFile.getName());
+		Assert.assertEquals(capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP), "file:app/zip/" + appFile.getName());
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions = SeleniumGridException.class)

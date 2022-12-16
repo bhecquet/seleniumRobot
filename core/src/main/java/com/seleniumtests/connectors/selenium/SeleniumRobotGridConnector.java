@@ -52,6 +52,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
+import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.customexception.SeleniumGridException;
@@ -103,7 +104,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	@Override
 	public void uploadMobileApp(Capabilities caps) {
 		
-		String appPath = (String)caps.getCapability(MobileCapabilityType.APP);
+		String appPath = (String)caps.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP);
 		
 		// check whether app is given and app path is a local file
 		if (appPath != null && new File(appPath).isFile()) {
@@ -129,7 +130,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		        	throw new SeleniumGridException("could not upload application file: " + response.getStatusLine().getReasonPhrase());
 		        } else {
 		        	// set path to the mobile application as an URL on the grid hub
-		        	((DesiredCapabilities)caps).setCapability(MobileCapabilityType.APP, IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8) + "/" + appFiles.get(0).getName());
+		        	((DesiredCapabilities)caps).setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP, IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8) + "/" + appFiles.get(0).getName());
 		        }
 		        
 			} catch (IOException | URISyntaxException e) {

@@ -10,10 +10,8 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.client.ClientProtocolException;
@@ -28,6 +26,7 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.MockitoTest;
+import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
 import com.seleniumtests.util.FileUtility;
@@ -70,9 +69,9 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 		File app = GenericTest.createFileFromResource("clirr-differences.xml");
 		
 		DesiredCapabilities caps = new DesiredCapabilities();
-		caps.setCapability(MobileCapabilityType.APP, app.getAbsolutePath());
+		caps.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP, app.getAbsolutePath());
 		connector.uploadMobileApp(caps);
-		String url = (String) caps.getCapability(MobileCapabilityType.APP);
+		String url = (String) caps.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP);
 		
 		String fileContent = Unirest.get("http://localhost:4454/grid/admin/FileServlet")
 				.queryString("file", url)
@@ -88,7 +87,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 		File app = GenericTest.createFileFromResource("clirr-differences.xml");
 		
 		DesiredCapabilities caps = new DesiredCapabilities();
-		caps.setCapability(MobileCapabilityType.APP, app.getAbsolutePath());
+		caps.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP, app.getAbsolutePath());
 		String filePath = connector.uploadFileToNode(app.getAbsolutePath(), true);
 		Assert.assertTrue(filePath.contains("upload/file"));
 		
@@ -107,7 +106,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 		File app = GenericTest.createFileFromResource("clirr-differences.xml");
 		
 		DesiredCapabilities caps = new DesiredCapabilities();
-		caps.setCapability(MobileCapabilityType.APP, app.getAbsolutePath());
+		caps.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP, app.getAbsolutePath());
 		String filePath = connector.uploadFileToNode(app.getAbsolutePath(), true);
 		File downloaded = connector.downloadFileFromNode("upload" + filePath.split("upload")[1] + "/" + app.getName());
 		
@@ -120,7 +119,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 		File app = GenericTest.createFileFromResource("clirr-differences.xml");
 		
 		DesiredCapabilities caps = new DesiredCapabilities();
-		caps.setCapability(MobileCapabilityType.APP, app.getAbsolutePath());
+		caps.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP, app.getAbsolutePath());
 		String filePath = connector.uploadFileToNode(app.getAbsolutePath(), false);
 		Assert.assertEquals(filePath, "");
 		

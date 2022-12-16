@@ -63,7 +63,7 @@ public class BrowserStackCapabilitiesFactory extends ICloudCapabilityFactory {
 	        	Capabilities androidCaps = new AndroidCapabilitiesFactory(webDriverConfig).createCapabilities();
 	        	capabilities.merge(androidCaps);
 
-	        	capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, "UIAutomator2");
+	        	capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.AUTOMATION_NAME, "UIAutomator2");
 	            
 	        } else if (IOS_PLATFORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
 	        	Capabilities iosCaps = new IOsCapabilitiesFactory(webDriverConfig).createCapabilities();
@@ -100,8 +100,8 @@ public class BrowserStackCapabilitiesFactory extends ICloudCapabilityFactory {
         capabilities.setCapability("project", SeleniumTestsContextManager.getApplicationName());
         
         // we need to upload something
- 		if (capabilities.getCapability(MobileCapabilityType.APP) != null) {
- 			String appUrl = uploadFile((String)capabilities.getCapability(MobileCapabilityType.APP));
+ 		if (capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP) != null) {
+ 			String appUrl = uploadFile((String)capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP));
  			capabilities.setCapability("app", appUrl);
 
  		}

@@ -1211,15 +1211,16 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     }
 
     /**
-     * Returns the 'value' attribute of the underlying WebElement.
+     * Returns the 'value' attribute of the underlying WebElement or '' if no value present
      *
      * @return
      */
     @ReplayOnError
     public String getValue() {
         findElement(false, false);
+        String value = getRealElementNoSearch().getDomProperty("value");
 
-		return getRealElementNoSearch().getDomProperty("value");
+		return value == null ? "": value;
     }
 
     /**

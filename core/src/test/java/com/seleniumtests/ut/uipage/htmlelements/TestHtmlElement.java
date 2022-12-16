@@ -351,7 +351,7 @@ public class TestHtmlElement extends MockitoTest {
 
 	@Test(groups = { "ut" })
 	public void testValue() throws Exception {
-		Assert.assertEquals(el.getValue(), "attribute");
+		Assert.assertEquals(el.getValue(), "property");
 		finalCheck(true);
 	}
 
