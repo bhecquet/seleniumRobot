@@ -43,6 +43,9 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
+import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
