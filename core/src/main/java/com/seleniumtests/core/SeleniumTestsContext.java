@@ -109,7 +109,6 @@ public class SeleniumTestsContext {
     public static final String BROWSER = "browser";								// navigateur utilisé. Sur Android, le navigateur par défaut est "Browser"
     public static final String BROWSER_VERSION = "browserVersion";				// version de navigateur utilisé
     public static final String FIREFOX_USER_PROFILE_PATH = "firefoxUserProfilePath";	// firefox user profile
-    public static final String OPERA_USER_PROFILE_PATH = "operaUserProfilePath";	// profile utilisateur opéra
     public static final String CHROME_USER_PROFILE_PATH = "chromeUserProfilePath";	// chrome user profile
     public static final String EDGE_USER_PROFILE_PATH = "edgeUserProfilePath";	// edge user profile
     public static final String CHROME_OPTIONS = "chromeOptions";				// options to give to chrome at startup
@@ -427,7 +426,6 @@ public class SeleniumTestsContext {
         setHeadlessBrowser(getBoolValueForTest(HEADLESS_BROWSER, System.getProperty(HEADLESS_BROWSER)));
         setBrowserVersion(getValueForTest(BROWSER_VERSION, System.getProperty(BROWSER_VERSION)));
         setFirefoxUserProfilePath(getValueForTest(FIREFOX_USER_PROFILE_PATH, System.getProperty(FIREFOX_USER_PROFILE_PATH)));
-        setOperaUserProfilePath(getValueForTest(OPERA_USER_PROFILE_PATH, System.getProperty(OPERA_USER_PROFILE_PATH)));
         setChromeUserProfilePath(getValueForTest(CHROME_USER_PROFILE_PATH, System.getProperty(CHROME_USER_PROFILE_PATH)));
         setEdgeUserProfilePath(getValueForTest(EDGE_USER_PROFILE_PATH, System.getProperty(EDGE_USER_PROFILE_PATH)));
         setChromeOptions(getValueForTest(CHROME_OPTIONS, System.getProperty(CHROME_OPTIONS)));
@@ -1387,11 +1385,6 @@ public class SeleniumTestsContext {
 	public Boolean getAcceptUntrustedCertificates() {
         return (Boolean) getAttribute(SET_ACCEPT_UNTRUSTED_CERTIFICATES);
     }
-
-
-    public String getOperaUserProfilePath() {
-        return (String) getAttribute(OPERA_USER_PROFILE_PATH);
-    }
     
     public String getChromeUserProfilePath() {
     	return (String) getAttribute(CHROME_USER_PROFILE_PATH);
@@ -2223,10 +2216,6 @@ public class SeleniumTestsContext {
     		}
     	}
    
-    }
-    
-    public void setOperaUserProfilePath(String path) {
-    	setAttribute(OPERA_USER_PROFILE_PATH, path);
     }
    
     public void setChromeOptions(String options) {

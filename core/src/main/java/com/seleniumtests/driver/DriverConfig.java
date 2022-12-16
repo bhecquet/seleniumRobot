@@ -211,19 +211,6 @@ public class DriverConfig {
         return testContext.getNtlmAuthTrustedUris();
     }
 
-    public String getOperaProfilePath() {
-        if (testContext.getOperaUserProfilePath() == null && getClass().getResource("/profiles/operaProfile") != null) {
-
-            try {
-                return getClass().getResource("/profiles/operaProfile").toURI().getPath();
-            } catch (URISyntaxException e) {
-            	throw new DriverExceptions(e.getMessage());
-            }
-        }
-
-        return testContext.getOperaUserProfilePath();
-    }
-
     public String getOutputDirectory() {
         return testContext.getOutputDirectory();
     }

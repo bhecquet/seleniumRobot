@@ -25,7 +25,6 @@ public enum BrowserType {
     EDGE("*edge"),
     CHROME("*chrome"),
     HTMLUNIT("*htmlunit"),
-    OPERA("*opera"),
     SAFARI("*safari"),
     BROWSER("*browser"), // default Android browser
     NONE("*none")
@@ -46,8 +45,6 @@ public enum BrowserType {
         	return BrowserType.EDGE;
         } else if (browserType.toLowerCase().contains("chrome")) {
             return BrowserType.CHROME;
-        } else if (browserType.toLowerCase().contains("opera")) {
-        	return BrowserType.OPERA;
         } else if (browserType.toLowerCase().contains("htmlunit")) {
             return BrowserType.HTMLUNIT;
         }  else if (browserType.toLowerCase().contains("safari")) {
