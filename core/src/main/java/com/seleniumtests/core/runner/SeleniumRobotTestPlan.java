@@ -108,7 +108,11 @@ public class SeleniumRobotTestPlan {
 		File videoFile = WebUIDriver.stopVideoCapture();
 		
 		if (videoFile != null) {
-			VideoUtils.extractReferenceForSteps(videoFile, TestStepManager.getInstance().getTestSteps(), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
+			try {
+				VideoUtils.extractReferenceForSteps(videoFile, TestStepManager.getInstance().getTestSteps(), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
+			} catch (Exception e) {
+				logger.error("Error extracting step reference, continue anyway", e);
+			}
 
 	        if (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.TRUE
 	        		|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_SUCCESS && testResult.isSuccess())
