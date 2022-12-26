@@ -49,7 +49,9 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.expr.AnnotationExpr;
+import com.github.javaparser.ast.expr.MemberValuePair;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.expr.NormalAnnotationExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
@@ -129,6 +131,7 @@ public class AppTestDocumentation {
 				+ "       <th>Test</th>\n"
 				+ "       <th>Description</th>\n"
 				+ "       <th>Details</th>\n"
+				+ "       <th>Attributes</th>\n"
 				+ "   </tr>\n");
 		try (Stream<Path> files = Files.walk(rootFolder)) {
 			List<Path> testsFolders = files
@@ -249,6 +252,10 @@ public class AppTestDocumentation {
         			+ String.format("    <td>%s</td>\n", testEntry.getValue().trim())
         	);
         	testDoc.append(String.format("    <td>%s</td>\n", String.join(", ", methodVisitor.getStepsInScenario().get(testEntry.getKey()))));
+        	
+        	Map<String, String> methodAttributes = methodVisitor.getTestAttributes().get(testEntry.getKey());
+        	
+        	testDoc.append(String.format("    <td>%s</td>\n", methodAttributes.toString()));
         	testDoc.append("</tr>\n");
         	i += 1;
         }
@@ -291,9 +298,68 @@ public class AppTestDocumentation {
 		}
 	}
 	
+
+	private static class TestAttributeVisitor extends VoidVisitorAdapter<Void> {
+		
+		Map<String, String> attributes = new HashMap<>();
+		
+		@Override
+	    public void visit(NormalAnnotationExpr n, Void arg) {
+
+			for (MemberValuePair pair: n.getPairs()) {
+				if ("attributes".equals(pair.getNameAsString())) {
+					TestCustomAttributeVisitor taVisitor = new TestCustomAttributeVisitor();
+					pair.accept(taVisitor, null);
+					
+					attributes = taVisitor.getAttribute();
+				}
+			}
+		}
+
+		public Map<String, String> getAttributes() {
+			return attributes;
+		}
+		
+	}
+	
+	/**
+	 * Class for reading CustomAttributes
+	 * Returning all the attributes as a map
+	 *
+	 */
+	private static class TestCustomAttributeVisitor extends VoidVisitorAdapter<Void> {
+		
+		Map<String, String> attribute = new HashMap<>();
+
+		@Override
+	    public void visit(NormalAnnotationExpr n, Void arg) {
+
+			String name = null;
+			String value = null;
+			for (MemberValuePair pair: n.getPairs()) {
+				if ("name".equals(pair.getNameAsString())) {
+					name = pair.getValue().toString();
+				} else if ("values".equals(pair.getNameAsString())) {
+					value = pair.getValue().toString();
+				}
+			}
+			
+			if (name != null && value != null) {
+				attribute.put(name, value);
+			}
+		}
+
+		public Map<String, String> getAttribute() {
+			return attribute;
+		}
+		
+	}
+
+	
 	private static class TestMethodVisitor extends VoidVisitorAdapter<Void> {
 		
 		private Map<String, String> methodInfos =  new HashMap<>();
+		private Map<String, Map<String, String>> testAttributes =  new HashMap<>();
 		private Map<String, List<String>> stepsInScenario = new HashMap<>();
 		
 		private List<MethodCallExpr> findAllMethodCalls(Node instruction) {
@@ -349,6 +415,11 @@ public class AppTestDocumentation {
 	    		return;
 	    	}
 	    	
+	    	// search for attributes
+	    	TestAttributeVisitor taVisitor = new TestAttributeVisitor();
+    		n.accept(taVisitor, null);
+    		testAttributes.put(methodId, taVisitor.getAttributes());
+	    	
 	    	tests.add(methodId);
 
     		String methodDoc = "";
@@ -367,6 +438,10 @@ public class AppTestDocumentation {
 		public Map<String, List<String>> getStepsInScenario() {
 			return stepsInScenario;
 	    }
+
+		public Map<String, Map<String, String>> getTestAttributes() {
+			return testAttributes;
+		}
 	}
 	
 	private static class WebPageMethodVisitor extends VoidVisitorAdapter<Void> {
