@@ -436,7 +436,7 @@ Define test as follows (minimal needed options)
 
 
 `deviceName` reflects the local device used to automate the test
-`app` is the path of the application file. It can be an URL. If access to URL is restricted, use the pattern "http://<user>:<password>@<host>:<port>/path"
+`app` is the path of the application file. It can be an URL. If access to URL is restricted, use the pattern "http://\<user\>:\<password\>@\<host\>:\<port\>/path"
 `appPackage` and `appActivity` can be found in APK manifest file
 
 #### Application test on iOS ####
