@@ -89,14 +89,14 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "103.0", "", false, false), 
-				new BrowserInfo(BrowserType.CHROME, "104.0", "", false, true)));
+		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "108.0", "", false, false), 
+				new BrowserInfo(BrowserType.CHROME, "109.0", "", false, true)));
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
 		
 		ChromeCapabilitiesFactory capaFactory = new ChromeCapabilitiesFactory(config);
 		capaFactory.createCapabilities();
 		Assert.assertFalse(capaFactory.getSelectedBrowserInfo().getBeta());
-		Assert.assertEquals(capaFactory.getSelectedBrowserInfo().getVersion(), "103.0");
+		Assert.assertEquals(capaFactory.getSelectedBrowserInfo().getVersion(), "108.0");
 	}
 	
 	/**
@@ -107,7 +107,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "104.0", "", false, true)));
+		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "109.0", "", false, true)));
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
 
 		ChromeCapabilitiesFactory capaFactory = new ChromeCapabilitiesFactory(config);
@@ -122,15 +122,15 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "103.0", "", false, false), 
-				new BrowserInfo(BrowserType.CHROME, "104.0", "", false, true)));
+		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "108.0", "", false, false), 
+				new BrowserInfo(BrowserType.CHROME, "109.0", "", false, true)));
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(true)).thenReturn(browserInfos);
 		when(config.getBetaBrowser()).thenReturn(true);
 
 		ChromeCapabilitiesFactory capaFactory = new ChromeCapabilitiesFactory(config);
 		capaFactory.createCapabilities();
 		Assert.assertTrue(capaFactory.getSelectedBrowserInfo().getBeta());
-		Assert.assertEquals(capaFactory.getSelectedBrowserInfo().getVersion(), "104.0");
+		Assert.assertEquals(capaFactory.getSelectedBrowserInfo().getVersion(), "109.0");
 	}
 
 	/**
@@ -141,7 +141,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "103.0", "", false, false)));
+		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "108.0", "", false, false)));
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(true)).thenReturn(browserInfos);
 		when(config.getBetaBrowser()).thenReturn(true);
 
@@ -332,8 +332,8 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 
 		// SeleniumTestsContext class adds a browserInfo when binary path is set
 		Map<BrowserType, List<BrowserInfo>> updatedBrowserInfos = new HashMap<>();
-		updatedBrowserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "102.0", "", false), 
-																	new BrowserInfo(BrowserType.CHROME, "103.0", "/opt/chrome/bin/chrome", false)));
+		updatedBrowserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "108.0", "", false), 
+																	new BrowserInfo(BrowserType.CHROME, "109.0", "/opt/chrome/bin/chrome", false)));
 
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(updatedBrowserInfos);
 		
