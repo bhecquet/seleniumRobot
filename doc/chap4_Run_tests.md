@@ -218,7 +218,7 @@ Params for mobile testing
 
 | Param name       			| Default 	| Description  |
 | -------------------------	| ------- 	| ------------ |
-| app 						| 			| Path to the application file (local or remote) | 
+| app 						| 			| Path to the application file (local or remote). For local, if application is for example in 'data/<artifact>/myApp.apk', then give this path | 
 | deviceName 				| 			| Name of the device to use for mobile tests. It's the Human readable name (e.g: Nexus 6 as given by `adb -s <id_device> shell getprop`, line [ro.product.model] property on Android or `instruments -s devices`), not it's id. SeleniumRobot will replace this name with id when communicating with Appium | 
 | fullReset 				| true		| enable full reset capability for appium tests | 
 | appiumServerUrl			|			| Appium server already started, that will be used to execute the test. It's useful to debug tests locally |
@@ -436,7 +436,7 @@ Define test as follows (minimal needed options)
 
 
 `deviceName` reflects the local device used to automate the test
-`app` is the path of the application file. It can be an URL. If access to URL is restricted, use the pattern "http://\<user\>:\<password\>@\<host\>:\<port\>/path"
+`app` is the path of the application file. It can be an URL. If access to URL is restricted, use the pattern "http://\<user\>:\<password\>@\<host\>:\<port\>/path". If local, give a relative path to the root of test application. e.g: 'data/mytests/myapp.apk'
 `appPackage` and `appActivity` can be found in APK manifest file
 
 #### Application test on iOS ####
