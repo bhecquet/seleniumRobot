@@ -70,6 +70,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.devtools.DevTools;
+import org.openqa.selenium.devtools.DevToolsException;
 import org.openqa.selenium.devtools.HasDevTools;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Interactive;
@@ -1710,7 +1711,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		try {
 			return ((HasDevTools)driver).maybeGetDevTools();
 		} catch (ClassCastException e) {
-			throw new ScenarioException("Cannot use DevTools with this driver");
+			throw new DevToolsException("Cannot use DevTools with this driver");
 		}
 	}
 

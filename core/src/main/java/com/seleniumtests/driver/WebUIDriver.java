@@ -314,8 +314,11 @@ public class WebUIDriver {
     	if (driver != null) {
 			try {
 				
-				// issue #414: capture the whole screen
-				driver.switchTo().defaultContent();
+				// #539: mobile tests do not support switch to default content
+				if (SeleniumTestsContextManager.isWebTest()) {
+					// issue #414: capture the whole screen
+					driver.switchTo().defaultContent();
+				}
 				
 				// force screenshotUtil to use the driver of this WebUiDriver, not the currently selected one
 				for (ScreenShot screenshot: new ScreenshotUtil(driver).capture(SnapshotTarget.PAGE, ScreenShot.class, true, true)) {
@@ -357,7 +360,7 @@ public class WebUIDriver {
     	
         @Override
         public String call() throws Exception {
-            drv.manage().getCookies();
+        	drv.manage().timeouts().getImplicitWaitTimeout();
             return "OK";
         }
     }
@@ -466,7 +469,7 @@ public class WebUIDriver {
     public static WebDriver getNativeWebDriver() {
     	CustomEventFiringWebDriver eventFiringWebDriver = (CustomEventFiringWebDriver) getWebDriver(true);
     	if (eventFiringWebDriver != null) {
-    		return eventFiringWebDriver.getWebDriver();
+    		return eventFiringWebDriver.getOriginalDriver();
     	} else {
     		return null;
     	}

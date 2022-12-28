@@ -42,12 +42,16 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.devtools.DevTools;
+import org.openqa.selenium.devtools.DevToolsException;
+import org.openqa.selenium.devtools.HasDevTools;
 import org.openqa.selenium.devtools.v102.page.Page;
 import org.openqa.selenium.devtools.v102.page.Page.CaptureScreenshotFormat;
 import org.openqa.selenium.devtools.v102.page.Page.GetLayoutMetricsResponse;
 import org.openqa.selenium.devtools.v102.page.model.Viewport;
 
+import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
@@ -61,29 +65,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import io.appium.java_client.android.AndroidDriver;
 
 public class ScreenshotUtil {
-	
-	/**
-	 * 
-	 DevTools devTools = ((CustomEventFiringWebDriver)driver).maybeGetDevTools().get();
-	devTools.createSessionIfThereIsNotOne();
-	GetLayoutMetricsResponse metrics = devTools.send(Page.getLayoutMetrics());
-	String outB64 = devTools.send(Page.captureScreenshot(Optional.of(CaptureScreenshotFormat.PNG), 
-			Optional.of(70), 
-			Optional.of(new Viewport(0, 0, metrics.getCssContentSize().getWidth(), metrics.getCssContentSize().getHeight(), 1)),
-			Optional.of(true),
-			Optional.of(true)
-			));
-	
-	try {
-		BufferedImage capturedImage = ImageProcessor.loadFromB64String(outB64);
-		File img =  File.createTempFile("img", ".png");
-		FileUtility.writeImage(img.getAbsolutePath(), capturedImage);
-	} catch (IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-	 */
-	
+
 	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(ScreenshotUtil.class);
 
@@ -423,19 +405,11 @@ public class ScreenshotUtil {
 //                ((AndroidDriver<WebElement>)((CustomEventFiringWebDriver)driver).getWebDriver()).getContextHandles();
 //                ((AndroidDriver<WebElement>)((CustomEventFiringWebDriver)driver).getWebDriver()).context("CHROMIUM");
          // TEST_MOBILE
-            
-            // android does not support screenshot from webview context, switch temporarly to native_app context to take screenshot
-            if (uiDriver != null && uiDriver.getConfig().getBrowserType() == BrowserType.BROWSER) {
-            	((AndroidDriver)((CustomEventFiringWebDriver)driver).getWebDriver()).context("NATIVE_APP");
-            }
 
             String screenshotB64 = screenShot.getScreenshotAs(OutputType.BASE64);
             if (screenshotB64 == null) {
             	logger.warn("capture cannot be done");
             	return null;
-            }
-            if (uiDriver != null && uiDriver.getConfig().getBrowserType() == BrowserType.BROWSER) {
-            	((AndroidDriver)((CustomEventFiringWebDriver)driver).getWebDriver()).context("WEBVIEW");
             }
             
             BufferedImage capturedImage = ImageProcessor.loadFromB64String(screenshotB64);
@@ -555,11 +529,39 @@ public class ScreenshotUtil {
     }
     
     /**
+     * Capture web page using the Chrome DevTools Protocol
+     * @return
+     * @throws IOException 
+     */
+    public BufferedImage captureWebPageUsingCDP() throws IOException {
+    	if (!(((CustomEventFiringWebDriver)driver).getOriginalDriver() instanceof HasDevTools)) {
+    		throw new DevToolsException("CDP not implemented for " + driver.getClass().toString());
+    	}
+
+    	DevTools devTools = ((HasDevTools) driver).getDevTools();
+
+		devTools.createSessionIfThereIsNotOne();
+		GetLayoutMetricsResponse layout = devTools.send(Page.getLayoutMetrics());
+		String b64Image = devTools.send(Page.captureScreenshot(Optional.of(CaptureScreenshotFormat.PNG), Optional.of(100), Optional.of(new Viewport(0, 0, layout.getCssContentSize().getWidth(), layout.getCssContentSize().getHeight(), 1)), Optional.of(true), Optional.of(true)));
+		return ImageProcessor.loadFromB64String(b64Image);
+    }
+    
+    /**
      * Captures a web page. If the browser natively returns the whole page, nothing more is done. Else (only webview is returned), we scroll down the page to get more of the page  
      * @param scrollDelay	time in ms to wait between scrolling and snapshot. 
      * @return
      */
     private BufferedImage captureWebPage(int scrollDelay) {
+    	
+    	if (((CustomEventFiringWebDriver)driver).getOriginalDriver() instanceof HasDevTools) {
+    		try {
+    			return captureWebPageUsingCDP();
+    		} catch (IOException e) {
+    			logger.warn("Error getting screenshot with CDP, using standard method: " + e.getMessage());
+    		} catch (DevToolsException e) {
+    			// ignore and use the standard method
+    		}
+    	}
 
     	Dimension contentDimension = ((CustomEventFiringWebDriver)driver).getContentDimension();
     	Dimension viewDimensions = ((CustomEventFiringWebDriver)driver).getViewPortDimensionWithoutScrollbar();
