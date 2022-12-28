@@ -30,10 +30,13 @@ import org.aspectj.lang.annotation.Aspect;
 @Aspect
 public class InterceptBy {
 
-	 @Around("call(* org.openqa.selenium.By..* (..) )")
+	 @Around("call(* org.openqa.selenium.By.id (..) )")
 	public Object changeArg(ProceedingJoinPoint joinPoint) throws Throwable {
-		// deactivate aspect but do not remove it as it breaks existing test applications (they need to be recompiled
-		return joinPoint.proceed(joinPoint.getArgs());
+		 Object[] args = joinPoint.getArgs();
+		 
+		 
+		// deactivate aspect but do not remove it as it breaks existing test applications (they need to be recompiled)
+		return joinPoint.proceed(args);
 
 	}
 	

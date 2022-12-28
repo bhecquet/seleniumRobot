@@ -82,6 +82,7 @@ import com.seleniumtests.uipage.ByC;
 import com.seleniumtests.uipage.htmlelements.FrameElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
+import io.appium.java_client.AppiumBy;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.remote.AppiumCommandExecutor;
 
@@ -216,6 +217,7 @@ public class TestHtmlElement extends MockitoTest {
 		// newSession, getSession, getSession, findElement
 
 		mobileDriver = Mockito.spy(new AndroidDriver(ce, new DesiredCapabilities()));
+		doReturn("my.package").when(mobileDriver).getCurrentPackage();
 
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
@@ -809,7 +811,94 @@ public class TestHtmlElement extends MockitoTest {
 		Assert.assertTrue(((ByC.ByAttribute)present.getBy()).isUseCssSelector()); // check we use the Css Selector instead of XPath
 	}
 	
+	/**
+	 * #540: add automatically package name for id selector on android
+	 */
+	@Test(groups = { "ut" })
+	public void testReplaceSelectorAndroidId() {
+		
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_ANDROID);
+		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
+		
+		HtmlElement present = new HtmlElement("element", By.id("present"));
+		present.setDriver(new CustomEventFiringWebDriver(mobileDriver)); // mimic the findElement call were we update driver before doing anything
+		present.replaceSelector();
+		Assert.assertEquals(present.getBy(), By.id("my.package:id/present"));
+	}
 	
+	/**
+	 * #540: do not add automatically package name for id selector on chrome android
+	 */
+	@Test(groups = { "ut" })
+	public void testReplaceSelectorAndroidWebId() {
+		
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
+		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
+		
+		HtmlElement present = new HtmlElement("element", By.id("present"));
+		present.setDriver(new CustomEventFiringWebDriver(mobileDriver)); // mimic the findElement call were we update driver before doing anything
+		present.replaceSelector();
+		Assert.assertEquals(present.getBy(), By.id("present"));
+	}
+	
+	/**
+	 * #540: do not add automatically package name for id selector on iOS
+	 */
+	@Test(groups = { "ut" })
+	public void testReplaceSelectorIOsId() {
+		
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_ANDROID);
+		SeleniumTestsContextManager.getThreadContext().setPlatform("ios");
+		
+		HtmlElement present = new HtmlElement("element", By.id("present"));
+		present.setDriver(new CustomEventFiringWebDriver(mobileDriver)); // mimic the findElement call were we update driver before doing anything
+		present.replaceSelector();
+		Assert.assertEquals(present.getBy(), By.id("present"));
+	}
+	
+	/**
+	 * #540: add automatically package name for AppiumBy.id selector on android
+	 */
+	@Test(groups = { "ut" })
+	public void testReplaceSelectorAndroidAppiumId() {
+		
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_ANDROID);
+		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
+		
+		HtmlElement present = new HtmlElement("element", AppiumBy.id("present"));
+		present.setDriver(new CustomEventFiringWebDriver(mobileDriver)); // mimic the findElement call were we update driver before doing anything
+		present.replaceSelector();
+		Assert.assertEquals(present.getBy(), By.id("my.package:id/present"));
+	}
+	/**
+	 * #540: add automatically package name for AppiumBy.id selector on android
+	 */
+	@Test(groups = { "ut" })
+	public void testReplaceSelectorAndroidAppiumAccessibilityId() {
+		
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_ANDROID);
+		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
+		
+		HtmlElement present = new HtmlElement("element", AppiumBy.accessibilityId("present"));
+		present.setDriver(new CustomEventFiringWebDriver(mobileDriver)); // mimic the findElement call were we update driver before doing anything
+		present.replaceSelector();
+		Assert.assertEquals(present.getBy(), By.id("my.package:id/present"));
+	}
+	
+	/**
+	 * #540: If andoird package is already specified, do not add it
+	 */
+	@Test(groups = { "ut" })
+	public void testReplaceSelectorAndroidIdPackageGiven() {
+		
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_ANDROID);
+		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
+		
+		HtmlElement present = new HtmlElement("element", By.id("a.package:id/present"));
+		present.setDriver(new CustomEventFiringWebDriver(mobileDriver)); // mimic the findElement call were we update driver before doing anything
+		present.replaceSelector();
+		Assert.assertEquals(present.getBy(), By.id("a.package:id/present"));
+	}
 	
 	
 	

@@ -87,9 +87,11 @@ import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
+import io.appium.java_client.AppiumBy;
 import io.appium.java_client.MultiTouchAction;
 import io.appium.java_client.PerformsTouchActions;
 import io.appium.java_client.TouchAction;
+import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.touch.WaitOptions;
 import io.appium.java_client.touch.offset.ElementOption;
 import io.appium.java_client.touch.offset.PointOption;
@@ -851,6 +853,18 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     			((ByC.ByHasCssSelector)by).setUseCssSelector(true);
     		}
     	} 
+    	
+    	// add package name before the id
+		 if (SeleniumTestsContextManager.isMobileAppTest() 
+				 && "android".equalsIgnoreCase(SeleniumTestsContextManager.getThreadContext().getPlatform())
+				 && (by instanceof By.ById || by instanceof AppiumBy.ById || by instanceof AppiumBy.ByAccessibilityId)
+				 && !by.toString().split(":", 2)[1].contains(":")) {
+			 WebDriver drv = ((CustomEventFiringWebDriver)getDriver()).getOriginalDriver();
+			 String packageName = ((AndroidDriver)drv).getCurrentPackage();
+			 by = By.id(packageName + ":id/" + by.toString().split(":", 2)[1].trim());
+		 }
+
+    			 
     }
         
     /**
