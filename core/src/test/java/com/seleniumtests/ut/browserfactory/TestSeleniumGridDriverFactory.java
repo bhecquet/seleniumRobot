@@ -4,6 +4,8 @@ package com.seleniumtests.ut.browserfactory;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
 
 import java.net.URL;
 import java.util.Arrays;
@@ -41,6 +43,9 @@ import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.util.logging.DebugMode;
 
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
+
 @PrepareForTest({SeleniumGridDriverFactory.class})
 public class TestSeleniumGridDriverFactory extends MockitoTest {
 
@@ -64,6 +69,12 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 	
 	@Mock
 	private RemoteWebDriver driver2;
+	
+	@Mock
+	private AndroidDriver androidDriver;
+	
+	@Mock
+	private IOSDriver iosDriver;
 	
 	@Mock
 	private Options options;
@@ -91,6 +102,12 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 		when(driver2.manage()).thenReturn(options);
 		when(driver2.getCapabilities()).thenReturn(caps);
 		when(options.timeouts()).thenReturn(timeouts);
+
+		when(androidDriver.manage()).thenReturn(options);
+		when(androidDriver.getCapabilities()).thenReturn(caps);
+		
+		when(iosDriver.manage()).thenReturn(options);
+		when(iosDriver.getCapabilities()).thenReturn(caps);
 		
 		when(gridConnector1.getHubUrl()).thenReturn(new URL("http://localhost:1111/wd/hub"));
 		when(gridConnector2.getHubUrl()).thenReturn(new URL("http://localhost:2222/wd/hub"));
@@ -124,6 +141,53 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 		Assert.assertEquals(driverFactory.getSelectedBrowserInfo().getBrowser(), BrowserType.HTMLUNIT);
 		Assert.assertEquals(driverFactory.getSelectedBrowserInfo().getVersion(), "70.0.1.2.3");
 	}
+	
+	@Test(groups={"ut"})
+	public void testMobileDriverCreation() throws Exception {
+		
+		SeleniumTestsContextManager.setThreadContext(context);
+		when(config.getPlatform()).thenReturn("android");
+		when(config.getApp()).thenReturn("myApp.apk");
+		when(context.getTestType()).thenReturn(TestType.APPIUM_APP_ANDROID);
+		
+		when(gridConnector1.isGridActive()).thenReturn(true);
+		when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1));
+		
+		// connect to grid
+		PowerMockito.whenNew(AndroidDriver.class).withAnyArguments().thenReturn(androidDriver);
+		SeleniumGridDriverFactory driverFactory = new SeleniumGridDriverFactory(config);
+		WebDriver newDriver = driverFactory.createWebDriver();
+
+		// verify app is uploaded
+		verify(gridConnector1).uploadMobileApp(any());
+		
+		// verify driver is an android driver
+		Assert.assertTrue(newDriver instanceof AndroidDriver);
+	}
+	
+	@Test(groups={"ut"})
+	public void testIosMobileDriverCreation() throws Exception {
+		
+		SeleniumTestsContextManager.setThreadContext(context);
+		when(config.getPlatform()).thenReturn("ios");
+		when(config.getApp()).thenReturn("myApp.ipa");
+		when(context.getTestType()).thenReturn(TestType.APPIUM_APP_IOS);
+		
+		when(gridConnector1.isGridActive()).thenReturn(true);
+		when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1));
+		
+		// connect to grid
+		PowerMockito.whenNew(IOSDriver.class).withAnyArguments().thenReturn(iosDriver);
+		SeleniumGridDriverFactory driverFactory = new SeleniumGridDriverFactory(config);
+		WebDriver newDriver = driverFactory.createWebDriver();
+		
+		// verify app is uploaded
+		verify(gridConnector1).uploadMobileApp(any());
+		
+		// verify driver is an android driver
+		Assert.assertTrue(newDriver instanceof IOSDriver);
+	}
+
 	
 	/**
 	 * If grid is not active, driver is not created and exception is raised

@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.browserfactory;
 
+import java.net.URL;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.SessionNotCreatedException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.LocalFileDetector;
@@ -44,6 +46,8 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.util.helper.WaitHelper;
 
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.remote.MobileCapabilityType;
 
 public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
@@ -173,6 +177,22 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
         throw new SessionNotCreatedException("Session not created on any grid hub, after 3 tries");
     }
     
+    private WebDriver getDriverInstance(URL hubUrl, MutableCapabilities capabilities) {
+		if (SeleniumTestsContextManager.isDesktopWebTest()) {
+		        return new RemoteWebDriver(hubUrl, capabilities);
+		} else if (SeleniumTestsContextManager.isMobileTest()) {
+			if("android".equalsIgnoreCase(webDriverConfig.getPlatform())) {
+        		return new AndroidDriver(hubUrl, capabilities);
+	        } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){
+	        	return new IOSDriver(hubUrl, capabilities);
+	        } else {
+	        	throw new ConfigurationException(String.format("Platform %s is unknown for mobile tests", webDriverConfig.getPlatform()));
+	        }
+		} else {
+			throw new ConfigurationException("Wrong test format detected. Should be either mobile or desktop");
+		}
+	}
+    
     /**
      * Connect to grid using RemoteWebDriver
      * As we may have several grid available, takes the first one where driver is created
@@ -183,10 +203,10 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
      * This fail counter is reset every time we find a node
      * If this counter reaches 3, then we don't even try to get a driver
      *
-     * @param capability
+     * @param capabilities
      * @return
      */
-    private WebDriver getDriver(MutableCapabilities capability){
+    private WebDriver getDriver(MutableCapabilities capabilities){
     	driver = null;
     	
     	Clock clock = Clock.systemUTC();
@@ -219,7 +239,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 				}
 				
 				try {
-					driver = new RemoteWebDriver(gridConnector.getHubUrl(), capability);
+					driver = getDriverInstance(gridConnector.getHubUrl(), capabilities);
 					activeGridConnector = gridConnector;
 					break;
 				} catch (WebDriverException e) {
