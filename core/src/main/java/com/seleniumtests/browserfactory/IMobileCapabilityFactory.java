@@ -76,7 +76,7 @@ public abstract class IMobileCapabilityFactory extends ICapabilitiesFactory {
         	capabilities.setCapability(CapabilityType.BROWSER_NAME, webDriverConfig.getBrowserType().toString().toLowerCase());
         	capabilities.merge(getBrowserSpecificCapabilities());
         } else {
-        	capabilities.setCapability(CapabilityType.BROWSER_NAME, "");
+        	capabilities.setCapability(CapabilityType.BROWSER_NAME, (String)null);
         }
         
         // add node tags

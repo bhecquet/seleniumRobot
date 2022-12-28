@@ -180,7 +180,7 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
 		MutableCapabilities capa = capaFactory.createCapabilities();
 		
-		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "");
+		Assert.assertNull(capa.getCapability(CapabilityType.BROWSER_NAME));
 		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP), "com.covea.mobileapp");
 		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.AUTOMATION_NAME), "Appium");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_NAME), Platform.ANDROID);
@@ -208,7 +208,7 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
 		MutableCapabilities capa = capaFactory.createCapabilities();
 		
-		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "");
+		Assert.assertNull(capa.getCapability(CapabilityType.BROWSER_NAME));
 		logger.info("app path: " + capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP));
 		Assert.assertTrue(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP).toString().contains("/data/core/app.apk"));
 	}
@@ -231,7 +231,7 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
 		MutableCapabilities capa = capaFactory.createCapabilities();
 		
-		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "");
+		Assert.assertNull(capa.getCapability(CapabilityType.BROWSER_NAME));
 		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP), path.replace("\\", "/"));
 	}
 	
