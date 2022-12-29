@@ -186,7 +186,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTest2.java").toFile();
 			FileUtils.copyFile(tmpSuiteFile, suiteFile);
 			
-			new SeleniumIdeLauncher().executeScripts();
+			new SeleniumIdeLauncher().executeScripts(Arrays.asList(suiteFile.getAbsolutePath()));
 
 			
 		} finally {
