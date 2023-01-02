@@ -88,6 +88,7 @@ public class TestSelectList extends MockitoTest {
 		// standard select
 		when(driver.findElement(By.id("select"))).thenReturn(element);
 		when(element.getTagName()).thenReturn("select");
+		when(element.isEnabled()).thenReturn(true);
 		when(element.isDisplayed()).thenReturn(true);
 		when(element.findElements(By.tagName("option"))).thenReturn(Arrays.asList(option1, option2));
 		
@@ -99,7 +100,9 @@ public class TestSelectList extends MockitoTest {
 		
 
 		when(option1.getText()).thenReturn("opt1");
+		when(option1.isEnabled()).thenReturn(true);
 		when(option2.getText()).thenReturn("opt2");
+		when(option2.isEnabled()).thenReturn(true);
 		when(option1.getDomAttribute("value")).thenReturn("opti1");
 		when(option2.getDomAttribute("value")).thenReturn("opti2");
 		when(option1.getAttribute("index")).thenReturn("1");

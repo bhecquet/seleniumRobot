@@ -22,8 +22,8 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -34,7 +34,6 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -48,6 +47,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver.Options;
@@ -188,6 +188,7 @@ public class TestHtmlElement extends MockitoTest {
 		when(frame.getLocation()).thenReturn(new Point(5, 5));
 		when(element.getTagName()).thenReturn("h1");
 		when(element.getText()).thenReturn("text");
+		when(element.getRect()).thenReturn(new Rectangle(10, 10, 100, 200));
 		when(element.getAriaRole()).thenReturn("role");
 		when(element.getShadowRoot()).thenReturn(searchContext);
 		when(element.getAccessibleName()).thenReturn("name");
@@ -513,13 +514,10 @@ public class TestHtmlElement extends MockitoTest {
 
 	@Test(groups = { "ut" })
 	public void testGetCenter() throws Exception {
-		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
-		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
-		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
-		doNothing().when(el).findElement(anyBoolean(), anyBoolean());
-		el.setElement(mobileElement);
-		el.getCenter();
-		PowerMockito.verifyPrivate(el, atLeastOnce()).invoke("checkForMobile");
+
+		Point center = el.getCenter();
+		Assert.assertEquals(center.getX(), 110);
+		Assert.assertEquals(center.getY(), 60);
 	}
 
 	@Test(groups = { "ut" })

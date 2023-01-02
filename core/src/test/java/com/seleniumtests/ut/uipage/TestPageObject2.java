@@ -461,9 +461,11 @@ public class TestPageObject2 extends MockitoTest {
 		when(driver.findElement(By.id("select"))).thenReturn(element);
 		when(element.getTagName()).thenReturn("select");
 		when(element.isDisplayed()).thenReturn(true);
+		when(element.isEnabled()).thenReturn(true);
 		when(element.findElements(By.tagName("option"))).thenReturn(Arrays.asList(option1));
 		when(element.findElements(By.xpath(".//option[normalize-space(.) = \"foo\"]")))
 				.thenReturn(Arrays.asList(option1));
+		when(option1.isEnabled()).thenReturn(true);
 		page.selectOption("select", "foo");
 		verify(option1).click();
 	}

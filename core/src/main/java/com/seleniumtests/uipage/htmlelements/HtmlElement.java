@@ -1569,22 +1569,12 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	} catch (ClassCastException e) {
     		return localElement;
     	}
-    	
-    	
     }
     
     @ReplayOnError
     public Point getCenter() {
-    	try {
-    		checkForMobile();
-            Point upperLeft = getRealElementNoSearch().getLocation();
-            Dimension dimension = getRealElementNoSearch().getSize();
-            Point center = new Point(upperLeft.x + dimension.width / 2, upperLeft.y + dimension.height / 2);
-    		return center;
-    	} catch (ScenarioException e) {
-			Rectangle rectangle = getRealElementNoSearch().getRect();
-    		return new Point(rectangle.x + rectangle.width / 2, rectangle.y + rectangle.height / 2);
-    	}	
+		Rectangle rectangle = getRealElement().getRect();
+		return new Point(rectangle.x + rectangle.width / 2, rectangle.y + rectangle.height / 2);
     }
 
     /**
