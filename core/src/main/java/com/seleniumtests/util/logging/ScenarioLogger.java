@@ -80,6 +80,10 @@ public class ScenarioLogger {
         logMessage(cleanMessage(message), MessageType.ERROR);
         logger.error(message);
     } 
+    public void error(Object message, Exception e) { 
+    	logMessage(cleanMessage(message), MessageType.ERROR);
+    	logger.error(message, e);
+    } 
 
     /**
      * Write log message to logger and current test step
