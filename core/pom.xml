@@ -91,6 +91,10 @@
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-java</artifactId>
 		</dependency>
+		<dependency>
+          <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>selenium-devtools-v104</artifactId>
+        </dependency>
 	    <dependency>
 	      <groupId>net.java.dev.jna</groupId>
 	      <artifactId>jna-platform</artifactId>
