@@ -43,6 +43,9 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
+import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
@@ -320,6 +323,39 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		Unirest.patch(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL));
 		
 		Assert.assertEquals(variable.getValue(), "value");
+	}
+
+	@Test(groups= {"ut"})
+	public void testUpsertVariableWithoutPrefix() throws Exception {
+		try {
+			configureMockedVariableServerConnection();
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
+	
+			SeleniumTestsContext selenium = SeleniumTestsContextManager.getThreadContext();
+	
+			TestVariable existingVariable = new TestVariable(12, "foo", "value", false, "foo");
+	
+			Map<String, TestVariable> configuration = SeleniumTestsContextManager.getThreadContext().getConfiguration();
+			configuration.put("foo", existingVariable);
+	
+			SeleniumRobotVariableServerConnector  variableServer = new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+			selenium.setVariableServer(variableServer);
+	
+			createServerMock(SERVER_URL, "POST", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, "{'id': 13, 'name': 'custom.test.variable.foo', 'value': 'value', 'reservable': false}");
+			createServerMock(SERVER_URL, "PATCH", String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 13), 200, "{'id': 13, 'name': 'custom.test.variable.foo', 'value': 'value', 'reservable': false}");
+	
+			TestTasks.createOrUpdateParam("foo", "value");
+			TestTasks.createOrUpdateParam("foo", "value");
+	
+			PowerMockito.verifyStatic(Unirest.class);
+			Unirest.post(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL));
+			Unirest.patch(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL));
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+		}
+
 	}
 	
 	@Test(groups= {"ut"}, expectedExceptions = SeleniumRobotServerException.class)

@@ -35,23 +35,17 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="var" path="M2_REPO/org/seleniumhq/selenium/selenium-remote-driver/4.1.2/selenium-remote-driver-4.1.2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/seleniumhq/selenium/selenium-api/4.1.2/selenium-api-4.1.2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/seleniumhq/selenium/selenium-support/4.1.2/selenium-support-4.1.2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/seleniumhq/selenium/selenium-api/4.3.0/selenium-api-4.3.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/seleniumhq/selenium/selenium-remote-driver/4.3.0/selenium-remote-driver-4.3.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/seleniumhq/selenium/selenium-support/4.3.0/selenium-support-4.3.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/seleniumhq/selenium/selenium-api/4.2.2/selenium-api-4.2.2.jar">
+	<classpathentry kind="var" path="M2_REPO/org/seleniumhq/selenium/selenium-api/4.7.2/selenium-api-4.7.2.jar">
 		<attributes>
 			<attribute name="org.eclipse.ajdt.inpath" value="org.eclipse.ajdt.inpath"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="var" path="M2_REPO/org/seleniumhq/selenium/selenium-remote-driver/4.2.2/selenium-remote-driver-4.2.2.jar">
+	<classpathentry kind="var" path="M2_REPO/org/seleniumhq/selenium/selenium-remote-driver/4.7.2/selenium-remote-driver-4.7.2.jar">
 		<attributes>
 			<attribute name="org.eclipse.ajdt.inpath" value="org.eclipse.ajdt.inpath"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="var" path="M2_REPO/org/seleniumhq/selenium/selenium-support/4.2.2/selenium-support-4.2.2.jar">
+	<classpathentry kind="var" path="M2_REPO/org/seleniumhq/selenium/selenium-support/4.7.2/selenium-support-4.7.2.jar">
 		<attributes>
 			<attribute name="org.eclipse.ajdt.inpath" value="org.eclipse.ajdt.inpath"/>
 		</attributes>

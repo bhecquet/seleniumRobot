@@ -171,7 +171,7 @@ public class ScenarioLogger {
     public void logFile(File file, String description) {
     	logFile(file, description, true);
     }
-    
+     
     /**
      * Log the given file to HTML result
      * @param file			file to log

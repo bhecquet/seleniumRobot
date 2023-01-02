@@ -905,8 +905,17 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 		for (FrameElement frameEl: frameTree) {
 			Integer idx = frameEl.getElementIndex() == null ? 0: frameEl.getElementIndex();
 			WebElement frameWebElement;
+			
+			SearchContext searchContext;
+			if (frameEl.parent != null) {
+				frameEl.parent.findElement(false, false);
+				searchContext = frameEl.parent.getRealElementNoSearch();
+			} else {
+				searchContext = getDriver();
+			}
+			
 			try {
-				frameWebElement = getDriver().findElements(frameEl.getBy()).get(idx);
+				frameWebElement = searchContext.findElements(frameEl.getBy()).get(idx);
 			} catch (IndexOutOfBoundsException e) {
 				throw new NoSuchFrameException(String.format("Frame %s with index %d has not been found", frameEl, idx));
 			}

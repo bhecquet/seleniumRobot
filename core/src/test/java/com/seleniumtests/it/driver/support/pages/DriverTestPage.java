@@ -151,6 +151,11 @@ public class DriverTestPage extends PageObject {
 	
 	public static final TextFieldElement textElementSubIFrame = new TextFieldElement("Text", By.id("textInIFrameWithValue2"), subIframe);
 	
+	// frame in div
+	public static final HtmlElement divWithFrame = new HtmlElement("", By.id("divForFrame"));
+	public static final FrameElement frameInDiv = new FrameElement("IFrame", By.tagName("iframe"), divWithFrame);
+	public static final TextFieldElement textElementInIFrameInDiv = new TextFieldElement("Text", By.id("textInIFrameWithValue3"), frameInDiv);
+	
 	// Elements for Angular IFrame
 	public static final FrameElement angularIFrame = new FrameElement("IFrame angular", By.id("angularIFrame"));
 	public static final SelectList angularSelectListIFrame = new SelectList("list", By.id("angularSelect"), angularIFrame);

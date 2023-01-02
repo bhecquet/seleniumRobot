@@ -7,7 +7,6 @@ import java.util.Map;
 import org.apache.http.HttpHost;
 import org.apache.logging.log4j.Logger;
 
-import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 import com.seleniumtests.it.driver.support.server.WebServer;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -40,6 +39,12 @@ public class WebTestPageServer {
 		mapping.put("/tu/images/bouton_enregistrer.png", "/images/bouton_enregistrer.png");
 		mapping.put("/tu/jquery.min.js", "/jquery.min.js");
 
+		// web pages for IA tests
+		mapping.put("/tu/pagesApp/test.html", "/testIA.html");
+		mapping.put("/tu/pagesApp/testCharging.html", "/testCharging.html");
+		mapping.put("/tu/pagesApp/testMissingElement.html", "/testMissingElement.html");
+
+		
 		// angular app v9
 		mapping.put("/tu/angularAppv9/index.html", "/angularApp/index.html");
 		mapping.put("/tu/angularAppv9/runtime-es2015.js", "/angularApp/runtime-es2015.js");

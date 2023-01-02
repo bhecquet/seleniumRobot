@@ -29,6 +29,7 @@ import com.seleniumtests.WebTestPageServer;
 import com.seleniumtests.connectors.extools.Lighthouse;
 import com.seleniumtests.connectors.extools.Lighthouse.Category;
 import com.seleniumtests.connectors.extools.LighthouseFactory;
+import com.seleniumtests.connectors.extools.WcagChecker;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
@@ -66,6 +67,15 @@ public class StubTestClassForDriverTest extends StubParentClass {
 			._reset()
 			._sendKeysComposite()
 			._clickPicture();
+	}
+	
+	@Test(groups="stub")
+	public void testDriverWithWcag() throws Exception {
+		
+		DriverTestPage page = new DriverTestPage(true)
+		._writeSomething();
+		
+		WcagChecker.analyze(page.getDriver());
 	}
 	
 	/**

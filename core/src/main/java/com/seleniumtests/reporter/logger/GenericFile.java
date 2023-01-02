@@ -33,6 +33,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 public class GenericFile extends TestAction {
 
 	private File file;
+	private String relativeFilePath; // path relative to the root of test output directory
 	
 
 	public GenericFile(File file, String description) throws IOException {
@@ -53,8 +54,18 @@ public class GenericFile extends TestAction {
 			throw new FileNotFoundException("GenericFile needs a file");
 		}
 		
+		// in case file is not in output directory, move it
+		try {
+			relativeFilePath = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()).relativize(file.toPath()).toString().replace("\\", "/");
+		} catch (IllegalArgumentException e) {
+			relativeFilePath = file.getName();
+			move = true;
+		}
+		
+		// move the file to the root of test specific output directory
 		if (move) {
 			File loggedFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), file.getName()).toFile();
+			relativeFilePath = file.getName(); // correct relavtive path, as we moved the file
 			
 			try {
 				Files.move(file.toPath(), loggedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -70,8 +81,12 @@ public class GenericFile extends TestAction {
 
 	}
 	
-	public String buildLog() {
-		return String.format("%s: <a href='%s'>file</a>", name, file.getName());
+	/**
+	 * Build a string that can be used in HTML logs
+	 * @return
+	 */
+	public String buildLog() {		
+		return String.format("%s: <a href='%s'>file</a>", name, relativeFilePath);
     }
 	
 
@@ -110,7 +125,11 @@ public class GenericFile extends TestAction {
 	@Override
 	public GenericFile encode(String format) {
 		try {
-			return new GenericFile(file, encodeString(name, format), false);
+			GenericFile genericFile = new GenericFile(file, encodeString(name, format), false);
+			genericFile.relativeFilePath = this.relativeFilePath; // restore the path, as this method is called at the end of test suite, where thread context output directory point to the 
+																	// root output directory. RelativePath would be lost
+																	// we do not move file, so relativePath remains the same
+			return genericFile;
 		} catch (IOException e) {
 			logger.error("Cannot encode file: " + e.getMessage());
 			return this;
@@ -119,5 +138,9 @@ public class GenericFile extends TestAction {
 
 	public File getFile() {
 		return file;
+	}
+
+	public String getRelativeFilePath() {
+		return relativeFilePath;
 	}
 }

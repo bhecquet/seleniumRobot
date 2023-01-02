@@ -34,6 +34,11 @@
 
 	<dependencies>
 		<dependency>
+		  <groupId>com.deque.html.axe-core</groupId>
+		  <artifactId>selenium</artifactId>
+		  <version>4.5.1</version>
+		</dependency>
+		<dependency>
 			<groupId>com.atlassian.jira</groupId>
 			<artifactId>jira-rest-java-client-app</artifactId>
 			<version>5.2.4</version>

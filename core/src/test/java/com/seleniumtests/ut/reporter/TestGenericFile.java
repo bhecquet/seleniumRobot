@@ -27,6 +27,65 @@ public class TestGenericFile extends GenericTest {
 		new GenericFile(null, "description");
 	}
 	
+
+	/**
+	 * In case file is not in the output directory, move it even if it's not requested
+	 * @throws IOException
+	 */
+	@Test(groups={"ut"})
+	public void testFileMovedIfNotInOutputDirectory() throws IOException {
+		File videoFile = File.createTempFile("video", ".avi");
+		videoFile.deleteOnExit();
+		GenericFile genericFile = new GenericFile(videoFile, "description", false);
+		Assert.assertEquals(genericFile.getFile(), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), videoFile.getName()).toFile());
+		Assert.assertEquals(genericFile.getRelativeFilePath(), videoFile.getName());
+	}
+	
+	/**
+	 * In case file is already in the test output directory 'test-output/mytest' for example, do not move it if not requested
+	 * @throws IOException
+	 */
+	@Test(groups={"ut"})
+	public void testFileNotMovedIfInOutputDirectory() throws IOException {
+		File videoFile = File.createTempFile("video", ".avi");
+		File newVideoFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "video", videoFile.getName()).toFile();
+		FileUtils.copyFile(videoFile, newVideoFile);
+		GenericFile genericFile = new GenericFile(newVideoFile, "description", false);
+		Assert.assertEquals(genericFile.getFile(), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "video", videoFile.getName()).toFile());
+		Assert.assertEquals(genericFile.getRelativeFilePath(), "video/" + videoFile.getName());
+	}
+	
+	/**
+	 * Path is already relative to the output directory (in a sub-directory)
+	 * Check relativePath is corrected when file is moved
+	 * @throws IOException
+	 */
+	@Test(groups={"ut"})
+	public void testFileMovedIfRequested() throws IOException {
+		File videoFile = File.createTempFile("video", ".avi");
+		File newVideoFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "video", videoFile.getName()).toFile();
+		FileUtils.copyFile(videoFile, newVideoFile);
+		GenericFile genericFile = new GenericFile(newVideoFile, "description", true);
+		Assert.assertEquals(genericFile.getFile(), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), videoFile.getName()).toFile());
+		Assert.assertEquals(genericFile.getRelativeFilePath(), videoFile.getName());
+	}
+	
+	@Test(groups={"ut"})
+	public void testBuildLogWithRelativePath() throws IOException {
+		File videoFile = File.createTempFile("video", ".avi");
+		File newVideoFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "video", videoFile.getName()).toFile();
+		FileUtils.copyFile(videoFile, newVideoFile);
+		GenericFile genericFile = new GenericFile(newVideoFile, "description", false);
+		Assert.assertEquals(genericFile.buildLog(), String.format("description: <a href='video/%s'>file</a>", videoFile.getName()));
+	}
+	
+	@Test(groups={"ut"})
+	public void testBuildLog() throws IOException {
+		File videoFile = File.createTempFile("video", ".avi");
+		videoFile.deleteOnExit();
+		GenericFile genericFile = new GenericFile(videoFile, "description", false);
+		Assert.assertEquals(genericFile.buildLog(), String.format("description: <a href='%s'>file</a>", videoFile.getName()));
+	}
 	
 	@Test(groups={"ut"})
 	public void testFileMovedOnCreation() throws IOException {
@@ -34,6 +93,7 @@ public class TestGenericFile extends GenericTest {
 		videoFile.deleteOnExit();
 		GenericFile genericFile = new GenericFile(videoFile, "description");
 		Assert.assertEquals(genericFile.getFile(), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), videoFile.getName()).toFile());
+		Assert.assertEquals(genericFile.getRelativeFilePath(), videoFile.getName());
 	}
 	
 	@Test(groups={"ut"})

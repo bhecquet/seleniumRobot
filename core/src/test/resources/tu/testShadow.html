@@ -34,9 +34,11 @@
 			s81.innerHTML='<div id="pass81Shadow">This is a DIV with the ID of pass81Shadow</div>';
 			
 			//Test7
-			var o=document.getElementById("shadow9").attachShadow({mode: "open"});o.innerHTML='<div id="sam">This is a DIV with the ID of sam</div><div id="shadow10"></div>';
+			var o=document.getElementById("shadow9").attachShadow({mode: "open"});
+			o.innerHTML='<div id="sam">This is a DIV with the ID of sam</div><div id="shadow10"></div>';
 			var p=o.getElementById("shadow10").attachShadow({mode: "open"});
 			p.innerHTML='<div id="sam">This is a DIV with the ID of sam - Fail</div><div id="sam">This is a DIV with the ID of sam - Fail</div>';
+
 
 			//Test8
 			customElements.define('component-element',
@@ -52,7 +54,9 @@
 			// Test 10
 			var o=document.getElementById("shadow11").attachShadow({mode: "open"});o.innerHTML='<div class="box2" style="height: 200px;"></div><input type="text" id="textInScroll" value="" />'
 
-			
+			// Test 11
+		    var p=document.getElementById("shadow12").attachShadow({mode: "open"});
+            p.innerHTML='<div id="anId"><iframe id="frame11" src="shadowframe.html" width="400px" height="400px"></iframe></div>';
 		}
 	</script>
 	<style type="text/css">
@@ -156,7 +160,7 @@
 <h2>Test 9</h2>
 
 	<p>This is a shadowDOM located inside an iFrame:</p>
-	<iframe src="shadowframe.html" width="400px" height="400px"></iframe>
+	<iframe id="frame9" src="shadowframe.html" width="400px" height="400px"></iframe>
 
 <h2>Test 10</h2>
 	<p>Scrollable element inside shadow DOM</p>
@@ -164,7 +168,13 @@
 		<div id="shadow11">
 			
 		</div>
-	</div
+	</div>
+
+<h2>Test 11</h2>
+
+    <p>This is iFrame inside shadow DOM</p>
+    <div id="shadow12"></div>
+
 
 
 
