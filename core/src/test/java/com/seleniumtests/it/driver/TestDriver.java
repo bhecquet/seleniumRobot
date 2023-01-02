@@ -294,7 +294,6 @@ public class TestDriver extends GenericMultiBrowserTest {
 			long endTime = System.nanoTime();
 
 			long nanoDuration = endTime - startTime;
-			//double secondDuration = (double) nanoDuration / 1_000_000_000;
 			long secondDuration = TimeUnit.SECONDS.convert(nanoDuration, TimeUnit.NANOSECONDS);
 
 			Assert.assertEquals(DriverTestPage.textElement.getValue(), "youpi@[] meduse");
