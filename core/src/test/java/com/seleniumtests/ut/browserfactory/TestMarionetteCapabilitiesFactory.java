@@ -163,7 +163,6 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "firefox");
-		Assert.assertEquals(capa.getCapability(FirefoxDriver.Capability.MARIONETTE), true);
 		
 		FirefoxProfile profile = FirefoxProfile.fromJson((String) ((Map<String, Object>) capa
 				.getCapability(FirefoxOptions.FIREFOX_OPTIONS))
