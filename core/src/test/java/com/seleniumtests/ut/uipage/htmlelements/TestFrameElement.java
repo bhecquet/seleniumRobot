@@ -37,6 +37,8 @@ import org.openqa.selenium.NoSuchFrameException;
 import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.powermock.api.mockito.PowerMockito;
@@ -98,6 +100,7 @@ public class TestFrameElement extends MockitoTest {
 	@BeforeMethod(groups={"ut"})
 	private void init() {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
+		when(driver.getCapabilities()).thenReturn(new FirefoxOptions()); // add capabilities to allow augmenting driver
 		
 		eventDriver = spy(new CustomEventFiringWebDriver(driver));
 		PowerMockito.mockStatic(WebUIDriver.class);

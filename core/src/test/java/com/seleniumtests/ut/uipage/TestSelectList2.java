@@ -20,6 +20,7 @@ import org.openqa.selenium.WebDriver.Navigation;
 import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebDriver.Timeouts;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.powermock.api.mockito.PowerMockito;
@@ -95,6 +96,8 @@ public class TestSelectList2 extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setImplicitWaitTimeout(1);
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(2);
 
+		// add capabilities to allow augmenting driver
+		when(driver.getCapabilities()).thenReturn(new FirefoxOptions()); 
 		eventDriver = spy(new CustomEventFiringWebDriver(driver));
 
 		when(eventDriver.switchTo()).thenReturn(target);

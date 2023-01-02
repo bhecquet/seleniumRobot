@@ -26,13 +26,16 @@ import org.mockito.invocation.InvocationOnMock;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.neotys.selenium.proxies.NLWebDriver;
+import com.neotys.selenium.proxies.NLRemoteWebDriver;
 import com.neotys.selenium.proxies.NLWebDriverFactory;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.MockitoTest;
@@ -70,13 +73,13 @@ import net.lightbody.bmp.BrowserMobProxy;
 public class TestWebUIDriver extends MockitoTest {
 	
 	@Mock
-	private NLWebDriver neoloadDriver;
+	private NLRemoteWebDriver neoloadDriver;
 	
 	@Mock
-	private WebDriver drv1;
+	private RemoteWebDriver drv1;
 	
 	@Mock
-	private WebDriver drv2;
+	private RemoteWebDriver drv2;
 	
 	@Mock
 	private VideoRecorder videoRecorder;
@@ -96,6 +99,15 @@ public class TestWebUIDriver extends MockitoTest {
 	@Mock
 	private SeleniumGridDriverFactory gridDriverFactory;
 
+
+	@BeforeMethod(groups={"ut"})
+	private void init() throws Exception {
+		// add capabilities to allow augmenting driver
+		when(drv1.getCapabilities()).thenReturn(new DesiredCapabilities()); 
+		when(drv2.getCapabilities()).thenReturn(new DesiredCapabilities()); 
+		when(neoloadDriver.getCapabilities()).thenReturn(new DesiredCapabilities()); 
+	}
+	
 	/**
 	 * When driver is created, no Neoload driver is instanciated if neoload parameters are not set
 	 */

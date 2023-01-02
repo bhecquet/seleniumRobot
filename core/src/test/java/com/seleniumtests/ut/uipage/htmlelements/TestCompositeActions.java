@@ -30,6 +30,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Coordinates;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -68,6 +69,7 @@ public class TestCompositeActions extends MockitoTest {
 	private void init() throws Exception {
 		
 		driver = PowerMockito.mock(RemoteWebDriver.class);
+		when(driver.getCapabilities()).thenReturn(new ChromeOptions()); // add capabilities to allow augmenting driver
 		
 		eventDriver = spy(new CustomEventFiringWebDriver(driver));
 		

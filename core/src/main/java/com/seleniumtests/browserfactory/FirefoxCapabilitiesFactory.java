@@ -192,13 +192,14 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
 		if (webDriverConfig.getFirefoxProfilePath() != null) {
         	if (BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getFirefoxProfilePath()) || webDriverConfig.getFirefoxProfilePath().contains("/") || webDriverConfig.getFirefoxProfilePath().contains("\\")) {
         		options.setCapability(SeleniumRobotCapabilityType.FIREFOX_PROFILE, webDriverConfig.getFirefoxProfilePath());
+        		return;
         	} else {
         		logger.warn(String.format("Firefox profile %s could not be set", webDriverConfig.getFirefoxProfilePath()));
         	}
         } 		
 		
         configProfile(profile, webDriverConfig);
-        options.setCapability(FirefoxDriver.SystemProperty.BROWSER_PROFILE, profile);
+        ((FirefoxOptions)options).setProfile(profile);
 		
 	}
 

@@ -88,13 +88,7 @@ import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 import io.appium.java_client.AppiumBy;
-import io.appium.java_client.MultiTouchAction;
-import io.appium.java_client.PerformsTouchActions;
-import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.touch.WaitOptions;
-import io.appium.java_client.touch.offset.ElementOption;
-import io.appium.java_client.touch.offset.PointOption;
 
 
 /**
@@ -1583,90 +1577,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     		return new Point(rectangle.x + rectangle.width / 2, rectangle.y + rectangle.height / 2);
     	}	
     }
-    
-    @ReplayOnError
-    public void pinch() {
-    	PerformsTouchActions performTouchActions = checkForMobile();
-    	WebElement mobElement = getUnderlyingElement(getRealElementNoSearch());
-    	
-    	// code taken from appium
-		MultiTouchAction multiTouch = new MultiTouchAction(performTouchActions);
-		
-		Point upperLeft = mobElement.getLocation();
-        Dimension dimension = mobElement.getSize();
-        Point center = new Point(upperLeft.x + dimension.width / 2, upperLeft.y + dimension.height / 2);
-		int yOffset = center.getY() - upperLeft.getY();
-		
-		TouchAction<?> action0 = createTouchAction().press(ElementOption.element(mobElement, center.getX(), center.getY() - yOffset))
-																	.moveTo(ElementOption.element(mobElement))
-																	.release();
-		TouchAction<?> action1 = createTouchAction().press(ElementOption.element(mobElement, center.getX(), center.getY() + yOffset))
-																	.moveTo(ElementOption.element(mobElement))
-																	.release();
-		
-		multiTouch.add(action0).add(action1).perform();
 
-    }
-    
-    /**
-     * Convenience method for swiping on the given element to the given direction
-     * @param xOffset	X offset from the top-left corner of the element
-     * @param yOffset	Y offset from the top-left corner of the element
-     * @param xMove		Movement amplitude on x axis
-     * @param yMove		Movement amplitude on y axis
-     */
-	@ReplayOnError(waitAfterAction = true)
-    public void swipe(int xOffset, int yOffset, int xMove, int yMove) {
-    	WebElement mobElement = getUnderlyingElement(getRealElementNoSearch());
-        
-        createTouchAction().press(ElementOption.element(mobElement, xOffset, yOffset))
-			.waitAction()
-			.moveTo(ElementOption.element(mobElement, xMove, yMove))
-			.release().perform();
-    }
-    
-    /**
-     * Tap with X fingers on screen
-     * @param fingers	number of fingers to tap with
-     * @param duration	duration in ms to wait before releasing
-     */
-	@ReplayOnError(waitAfterAction = true)
-    public void tap(int fingers, int duration) {
-    	PerformsTouchActions performTouchActions = checkForMobile();
-    	WebElement mobElement = getUnderlyingElement(getRealElementNoSearch());
-    
-    	// code from appium
-    	MultiTouchAction multiTouch = new MultiTouchAction(performTouchActions);
-
-        for (int i = 0; i < fingers; i++) {
-            TouchAction<?> tap = createTouchAction();
-            multiTouch.add(tap.press(ElementOption.element(mobElement)).waitAction(WaitOptions.waitOptions(Duration.ofMillis(duration))).release());
-        }
-
-        multiTouch.perform();
-    }
-    
-	@ReplayOnError(waitAfterAction = true)
-    public void zoom() {
-    	PerformsTouchActions performTouchActions = checkForMobile();
-        WebElement mobElement = getUnderlyingElement(getRealElementNoSearch());
-    	
-    	MultiTouchAction multiTouch = new MultiTouchAction(performTouchActions);
-
-        Point upperLeft = mobElement.getLocation();
-        Dimension dimension = mobElement.getSize();
-        Point center = new Point(upperLeft.x + dimension.width / 2, upperLeft.y + dimension.height / 2);
-        int yOffset = center.getY() - upperLeft.getY();
-
-        TouchAction<?> action0 = createTouchAction().press(PointOption.point(center.getX(), center.getY()))
-                												.moveTo(ElementOption.element(mobElement, center.getX(), center.getY() - yOffset))
-                												.release();
-        TouchAction<?> action1 = createTouchAction().press(PointOption.point(center.getX(), center.getY()))
-                												.moveTo(ElementOption.element(mobElement, center.getX(), center.getY() + yOffset))
-                												.release();
-        multiTouch.add(action0).add(action1).perform();
-    }
-    
     /**
      * Wait element to present using Explicit Waits with default EXPLICIT_WAIT_TIME_OUT = 15 seconds.
      */

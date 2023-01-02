@@ -202,10 +202,11 @@ public class TestIECapabilityFactory extends MockitoTest {
 		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "internet explorer");
-		Assert.assertTrue((Boolean)capa.getCapability(InternetExplorerDriver.IGNORE_ZOOM_SETTING));
-		Assert.assertTrue((Boolean)capa.getCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS));
-		Assert.assertTrue((Boolean)capa.getCapability(InternetExplorerDriver.IE_ENSURE_CLEAN_SESSION));
-		Assert.assertEquals((String)capa.getCapability(InternetExplorerDriver.INITIAL_BROWSER_URL), "about:blank");
+		
+		Assert.assertTrue((boolean) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get(InternetExplorerDriver.IGNORE_ZOOM_SETTING));
+		Assert.assertTrue((boolean) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS));
+		Assert.assertTrue((boolean) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get(InternetExplorerDriver.IE_ENSURE_CLEAN_SESSION));
+		Assert.assertEquals((String) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get(InternetExplorerDriver.INITIAL_BROWSER_URL), "about:blank");
 	}
 	
 	@Test(groups={"ut"})
@@ -268,16 +269,13 @@ public class TestIECapabilityFactory extends MockitoTest {
 		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "internet explorer");
-		Assert.assertTrue((Boolean)capa.getCapability(InternetExplorerDriver.IGNORE_ZOOM_SETTING));
-		Assert.assertTrue((Boolean)capa.getCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS));
-		Assert.assertTrue((Boolean)capa.getCapability(InternetExplorerDriver.IE_ENSURE_CLEAN_SESSION));
-		Assert.assertEquals((String)capa.getCapability(InternetExplorerDriver.INITIAL_BROWSER_URL), "http://mysite");
-
-		Assert.assertTrue((Boolean)capa.getCapability("ie.edgechromium"));
-		Assert.assertEquals((String)capa.getCapability("ie.edgepath"), "");
 
 		Assert.assertEquals(((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get("ie.edgepath"), "");
 		Assert.assertTrue((boolean) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get("ie.edgechromium"));
+		Assert.assertTrue((boolean) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get(InternetExplorerDriver.IGNORE_ZOOM_SETTING));
+		Assert.assertTrue((boolean) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS));
+		Assert.assertTrue((boolean) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get(InternetExplorerDriver.IE_ENSURE_CLEAN_SESSION));
+		Assert.assertEquals((String) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get(InternetExplorerDriver.INITIAL_BROWSER_URL), "http://mysite");
 	}
 	
 	/**
@@ -300,16 +298,13 @@ public class TestIECapabilityFactory extends MockitoTest {
 		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "internet explorer");
-		Assert.assertTrue((Boolean)capa.getCapability(InternetExplorerDriver.IGNORE_ZOOM_SETTING));
-		Assert.assertTrue((Boolean)capa.getCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS));
-		Assert.assertTrue((Boolean)capa.getCapability(InternetExplorerDriver.IE_ENSURE_CLEAN_SESSION));
-		Assert.assertEquals((String)capa.getCapability(InternetExplorerDriver.INITIAL_BROWSER_URL), "http://mysite");
-		
-		Assert.assertNull((Boolean)capa.getCapability("ie.edgechromium"));
-		Assert.assertNull((String)capa.getCapability("ie.edgepath"), "");
-		
+
 		Assert.assertNull(((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get("ie.edgepath"));
 		Assert.assertNull(((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get("ie.edgechromium"));
+		Assert.assertTrue((boolean) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get(InternetExplorerDriver.IGNORE_ZOOM_SETTING));
+		Assert.assertTrue((boolean) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS));
+		Assert.assertTrue((boolean) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get(InternetExplorerDriver.IE_ENSURE_CLEAN_SESSION));
+		Assert.assertEquals((String) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get(InternetExplorerDriver.INITIAL_BROWSER_URL), "http://mysite");
 	}
 	
 	/**
