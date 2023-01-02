@@ -29,6 +29,7 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.devtools.DevToolsException;
 import org.testng.Assert;
 import org.testng.ISuite;
 import org.testng.ISuiteResult;
@@ -46,12 +47,62 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.SnapshotTarget;
+import com.seleniumtests.it.driver.support.pages.DriverTestPageShadowDom;
 import com.seleniumtests.it.reporter.ReporterTest;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestStep;
 
 public class TestScreenshotUtil extends ReporterTest {
 
+	@Test(groups={"it"})
+	public void testChromeScreenshotUsingCDP() throws Exception {
+
+		setBrowser("chrome");
+		new DriverTestPageShadowDom(true);
+		WebDriver driver = WebUIDriver.getWebDriver(true);
+		try {
+			BufferedImage image = new ScreenshotUtil(driver).captureWebPageUsingCDP(driver.getWindowHandle());
+			Assert.assertTrue(image.getHeight() > 3200);
+			Assert.assertTrue(image.getWidth() > 1000);
+		} finally {
+			driver.close();
+		}
+	}
+	
+	@Test(groups={"it"})
+	public void testEdgeScreenshotUsingCDP() throws Exception {
+		
+		setBrowser("edge");
+		new DriverTestPageShadowDom(true);
+		WebDriver driver = WebUIDriver.getWebDriver(true);
+		try {
+			BufferedImage image = new ScreenshotUtil(driver).captureWebPageUsingCDP(driver.getWindowHandle());
+			Assert.assertTrue(image.getHeight() > 3200);
+			Assert.assertTrue(image.getWidth() > 1000);
+		} finally {
+			driver.close();
+		}
+	}
+	@Test(groups={"it"}, expectedExceptions = DevToolsException.class)
+	public void testFirefoxScreenshotUsingCDP() throws Exception {
+		
+		setBrowser("firefox");
+		new DriverTestPageShadowDom(true);
+		WebDriver driver = WebUIDriver.getWebDriver(true);
+		try {
+			BufferedImage image = new ScreenshotUtil(driver).captureWebPageUsingCDP(driver.getWindowHandle());
+			Assert.assertTrue(image.getHeight() > 3200);
+			Assert.assertTrue(image.getWidth() > 1000);
+		} finally {
+			driver.close();
+		}
+	}
+	
+
+	public void setBrowser(String browserName) {
+		SeleniumTestsContextManager.getThreadContext().setBrowser(browserName);
+	}
+	
 	/**
 	 * check that duration of screenshots is logged into TestStep
 	 * @param testContext
@@ -164,7 +215,6 @@ public class TestScreenshotUtil extends ReporterTest {
 	
 	/**
 	 * issue #435: Test that when a modal is present on a relatively long web page (twice the height of the modal), screenshot is done
-	 * ('maxLoops' should never be <= 0)
 	 */
 	@Test(groups={"it"})
 	public void testCaptureWhenModalPresent() throws Exception {
@@ -181,7 +231,7 @@ public class TestScreenshotUtil extends ReporterTest {
 						Assert.assertNotNull(step.getSnapshots().get(0).getScreenshot().getFullImagePath());
 						
 						BufferedImage image = ImageIO.read(new File(step.getSnapshots().get(0).getScreenshot().getFullImagePath()));
-						Assert.assertTrue(image.getHeight() < 2000); // check we have a picture which is smaller than the real page height (should be the screen size)
+						Assert.assertTrue(image.getHeight() > 2000); // check we have a full picture of the page. As Chrome uses CDP for capturing, the whole page is taken
 						return;
 					}	
 				}

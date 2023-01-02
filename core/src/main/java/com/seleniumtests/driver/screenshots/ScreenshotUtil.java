@@ -44,14 +44,13 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.devtools.DevTools;
 import org.openqa.selenium.devtools.DevToolsException;
 import org.openqa.selenium.devtools.HasDevTools;
-import org.openqa.selenium.devtools.v102.page.Page;
-import org.openqa.selenium.devtools.v102.page.Page.CaptureScreenshotFormat;
-import org.openqa.selenium.devtools.v102.page.Page.GetLayoutMetricsResponse;
-import org.openqa.selenium.devtools.v102.page.model.Viewport;
+import org.openqa.selenium.devtools.v108.page.Page;
+import org.openqa.selenium.devtools.v108.page.Page.CaptureScreenshotFormat;
+import org.openqa.selenium.devtools.v108.page.Page.GetLayoutMetricsResponse;
+import org.openqa.selenium.devtools.v108.page.model.Viewport;
+import org.openqa.selenium.firefox.FirefoxDriver;
 
-import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
@@ -62,15 +61,13 @@ import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.imaging.ImageProcessor;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
-import io.appium.java_client.android.AndroidDriver;
-
 public class ScreenshotUtil {
 
 	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(ScreenshotUtil.class);
 
     private String outputDirectory;
-    private WebDriver driver;
+    private CustomEventFiringWebDriver driver;
     private WebUIDriver uiDriver;
     private String filename;
     public static final String SCREENSHOT_DIR = "screenshots";
@@ -79,7 +76,7 @@ public class ScreenshotUtil {
 
 	public ScreenshotUtil() {
 		uiDriver = WebUIDriver.getWebUIDriver(false);
-		driver = uiDriver.getDriver();
+		driver = (CustomEventFiringWebDriver)uiDriver.getDriver();
     	if (driver == null) {
     		throw new ScenarioException("Driver has not already been created");
     	}
@@ -89,7 +86,7 @@ public class ScreenshotUtil {
 
     public ScreenshotUtil(final WebDriver driver) {
         outputDirectory = getOutputDirectory();
-        this.driver = driver;
+        this.driver = (CustomEventFiringWebDriver)driver;
     }
 
     private static String getOutputDirectory() {
@@ -283,7 +280,7 @@ public class ScreenshotUtil {
     	// back to page top
     	try {
     		if (target.isPageTarget()) {
-    			((CustomEventFiringWebDriver)driver).scrollTop();
+    			driver.scrollTop();
     		}
     	} catch (WebDriverException e) {
     		// ignore errors here.
@@ -350,7 +347,7 @@ public class ScreenshotUtil {
     	// capture web without scrolling on the main window
     	} else if (target.isViewportTarget() && SeleniumTestsContextManager.isWebTest()) {
     		removeAlert();
-    		target.setSnapshotRectangle(new Rectangle(((CustomEventFiringWebDriver)driver).getScrollPosition(), ((CustomEventFiringWebDriver)driver).getViewPortDimensionWithoutScrollbar()));
+    		target.setSnapshotRectangle(new Rectangle(driver.getScrollPosition(), driver.getViewPortDimensionWithoutScrollbar()));
     		capturedImages.add(new NamedBufferedImage(capturePage(0, 0), "")); // allow removing of scrollbar (a negative value would not remove it)
     		
     	// capture web with scrolling on the main window
@@ -402,8 +399,8 @@ public class ScreenshotUtil {
             TakesScreenshot screenShot = (TakesScreenshot) driver;
             
          // TEST_MOBILE
-//                ((AndroidDriver<WebElement>)((CustomEventFiringWebDriver)driver).getWebDriver()).getContextHandles();
-//                ((AndroidDriver<WebElement>)((CustomEventFiringWebDriver)driver).getWebDriver()).context("CHROMIUM");
+//                ((AndroidDriver<WebElement>)driver.getWebDriver()).getContextHandles();
+//                ((AndroidDriver<WebElement>)driver.getWebDriver()).context("CHROMIUM");
          // TEST_MOBILE
 
             String screenshotB64 = screenShot.getScreenshotAs(OutputType.BASE64);
@@ -419,12 +416,12 @@ public class ScreenshotUtil {
             	
 
                 // in case driver already capture the whole content, do not crop anything as cropping is used to remove static headers when scrolling
-                Dimension contentDimension = ((CustomEventFiringWebDriver)driver).getContentDimension();
+                Dimension contentDimension = driver.getContentDimension();
                 if (capturedImage.getWidth() == contentDimension.width && capturedImage.getHeight() == contentDimension.height) {
                 	return capturedImage;
                 }
             	
-	            Dimension dimensions = ((CustomEventFiringWebDriver)driver).getViewPortDimensionWithoutScrollbar();
+	            Dimension dimensions = driver.getViewPortDimensionWithoutScrollbar();
 	            capturedImage = ImageProcessor.cropImage(capturedImage, 0, cropTop, dimensions.getWidth(), dimensions.getHeight() - cropTop - cropBottom);
             }
             
@@ -501,7 +498,7 @@ public class ScreenshotUtil {
 	        		}
 	        		driver.switchTo().window(windowHandle);
 	        		windowWithSeleniumfocus = windowHandle;
-	        		images.add(new NamedBufferedImage(captureWebPage(scrollDelay), "").addMetaDataToImage());
+	        		images.add(new NamedBufferedImage(captureWebPage(scrollDelay, windowHandle), "").addMetaDataToImage());
 	        	}
 	        }
 	        
@@ -514,7 +511,7 @@ public class ScreenshotUtil {
         		}
         		
         		// capture current window
-        		images.add(new NamedBufferedImage(captureWebPage(scrollDelay), "Current Window: ").addMetaDataToImage());
+        		images.add(new NamedBufferedImage(captureWebPage(scrollDelay, currentWindowHandle), "Current Window: ").addMetaDataToImage());
         		
         	} catch (Exception e) {
         		try {
@@ -529,33 +526,41 @@ public class ScreenshotUtil {
     }
     
     /**
+     * TODO: may be should we move this code to a specific class
      * Capture web page using the Chrome DevTools Protocol
      * @return
      * @throws IOException 
      */
-    public BufferedImage captureWebPageUsingCDP() throws IOException {
-    	if (!(((CustomEventFiringWebDriver)driver).getOriginalDriver() instanceof HasDevTools)) {
+    public BufferedImage captureWebPageUsingCDP(String windowHandle) throws IOException {
+    	if (!(driver.getWebDriver() instanceof HasDevTools)
+    			|| (driver.getOriginalDriver() instanceof FirefoxDriver) // Firefox does not seem to handle CDP correctly ("Unable to establish websocket connection")
+    			) {
     		throw new DevToolsException("CDP not implemented for " + driver.getClass().toString());
     	}
-
-    	DevTools devTools = ((HasDevTools) driver).getDevTools();
-
-		devTools.createSessionIfThereIsNotOne();
-		GetLayoutMetricsResponse layout = devTools.send(Page.getLayoutMetrics());
-		String b64Image = devTools.send(Page.captureScreenshot(Optional.of(CaptureScreenshotFormat.PNG), Optional.of(100), Optional.of(new Viewport(0, 0, layout.getCssContentSize().getWidth(), layout.getCssContentSize().getHeight(), 1)), Optional.of(true), Optional.of(true)));
-		return ImageProcessor.loadFromB64String(b64Image);
+    	
+    	DevTools devTools = ((HasDevTools) driver.getWebDriver()).getDevTools();
+    	
+		devTools.createSession(windowHandle);
+		try {
+			GetLayoutMetricsResponse layout = devTools.send(Page.getLayoutMetrics());
+			String b64Image = devTools.send(Page.captureScreenshot(Optional.of(CaptureScreenshotFormat.PNG), Optional.of(100), Optional.of(new Viewport(0, 0, layout.getCssContentSize().getWidth(), layout.getCssContentSize().getHeight(), 1)), Optional.of(true), Optional.of(true)));
+			return ImageProcessor.loadFromB64String(b64Image);
+		} finally {
+			devTools.disconnectSession();
+		}
     }
     
     /**
      * Captures a web page. If the browser natively returns the whole page, nothing more is done. Else (only webview is returned), we scroll down the page to get more of the page  
      * @param scrollDelay	time in ms to wait between scrolling and snapshot. 
+     * @param windowHandle	the window handle of the page to capture
      * @return
      */
-    private BufferedImage captureWebPage(int scrollDelay) {
+    private BufferedImage captureWebPage(int scrollDelay, String windowHandle) {
     	
-    	if (((CustomEventFiringWebDriver)driver).getOriginalDriver() instanceof HasDevTools) {
+    	if (driver.getWebDriver() instanceof HasDevTools && scrollDelay == 0) {
     		try {
-    			return captureWebPageUsingCDP();
+    			return captureWebPageUsingCDP(windowHandle);
     		} catch (IOException e) {
     			logger.warn("Error getting screenshot with CDP, using standard method: " + e.getMessage());
     		} catch (DevToolsException e) {
@@ -563,11 +568,11 @@ public class ScreenshotUtil {
     		}
     	}
 
-    	Dimension contentDimension = ((CustomEventFiringWebDriver)driver).getContentDimension();
-    	Dimension viewDimensions = ((CustomEventFiringWebDriver)driver).getViewPortDimensionWithoutScrollbar();
+    	Dimension contentDimension = driver.getContentDimension();
+    	Dimension viewDimensions = driver.getViewPortDimensionWithoutScrollbar();
     	Integer topPixelsToCrop = SeleniumTestsContextManager.getThreadContext().getSnapshotTopCropping();
     	Integer bottomPixelsToCrop = SeleniumTestsContextManager.getThreadContext().getSnapshotBottomCropping();
-    	double devicePixelRatio = ((CustomEventFiringWebDriver)driver).getDeviceAspectRatio();
+    	double devicePixelRatio = driver.getDeviceAspectRatio();
 
     	
     	// issue #34: prevent getting image from HTMLUnit driver
@@ -577,10 +582,10 @@ public class ScreenshotUtil {
     	
     	// if cropping is automatic, get fixed header size to configure cropping
     	if (topPixelsToCrop == null) {
-    		topPixelsToCrop = ((CustomEventFiringWebDriver)driver).getTopFixedHeaderSize().intValue();
+    		topPixelsToCrop = driver.getTopFixedHeaderSize().intValue();
     	}
     	if (bottomPixelsToCrop == null) {
-    		bottomPixelsToCrop = ((CustomEventFiringWebDriver)driver).getBottomFixedFooterSize().intValue();
+    		bottomPixelsToCrop = driver.getBottomFixedFooterSize().intValue();
     	}
     	
     	int scrollY = 0;
@@ -591,7 +596,7 @@ public class ScreenshotUtil {
     			(viewDimensions.height - topPixelsToCrop - bottomPixelsToCrop)) + 1) * ((contentDimension.width / viewDimensions.width) + 1) + 3;
     	
     	// if a modal is displayed, do not capture more than the viewport
-    	if (((CustomEventFiringWebDriver)driver).isModalDisplayed()) {
+    	if (driver.isModalDisplayed()) {
     		maxLoops = 1;
     	}
     	
@@ -602,7 +607,7 @@ public class ScreenshotUtil {
     	maxLoops = Math.max(1, maxLoops);
     	
     	try {
-    		((CustomEventFiringWebDriver)driver).scrollTop();
+    		driver.scrollTop();
     	} catch (JavascriptException e) {
     		maxLoops = 1;
 		}
@@ -618,7 +623,7 @@ public class ScreenshotUtil {
 			scrollY = currentImageHeight - cropTop;
 			
 			try {
-				((CustomEventFiringWebDriver)driver).scrollTo((int)(scrollX / devicePixelRatio), (int)(scrollY / devicePixelRatio));
+				driver.scrollTo((int)(scrollX / devicePixelRatio), (int)(scrollY / devicePixelRatio));
 			} catch (JavascriptException e) {
 				// ignore javascript errors
 			}

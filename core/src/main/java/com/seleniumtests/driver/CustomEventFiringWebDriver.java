@@ -75,6 +75,7 @@ import org.openqa.selenium.devtools.HasDevTools;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Interactive;
 import org.openqa.selenium.interactions.Sequence;
+import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.FileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.UselessFileDetector;
@@ -108,7 +109,7 @@ import net.lightbody.bmp.BrowserMobProxy;
  * When action do not need a real driver, static methods are provided
  * It also handles the grid mode, masking it to requester.
  */
-public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, JavascriptExecutor, TakesScreenshot, Interactive, HasDevTools {
+public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, JavascriptExecutor, TakesScreenshot, Interactive {
 	
 	private static final String OTHER_BROWSER = "other";
 	private static final String SAFARI_BROWSER = "safari";
@@ -624,7 +625,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		this.gridConnector = gridConnector;
 		this.attachExistingDriverPort = attachExistingDriverPort;
 		this.originalDriver = driver; // store the original driver in case decorated one cannot be used (getSessionId)
-		this.driver = new EventFiringDecorator(new DriverExceptionListener(this)).decorate(driver);
+		this.driver = new Augmenter().augment(new EventFiringDecorator(new DriverExceptionListener(this)).decorate(driver));
 
         for (WebDriverListener wdListener: wdListeners) {
         	this.driver = new EventFiringDecorator(wdListener).decorate(this.driver);
@@ -1704,15 +1705,6 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 
 	public boolean isDriverExited() {
 		return driverExited;
-	}
-
-	@Override
-	public Optional<DevTools> maybeGetDevTools() {
-		try {
-			return ((HasDevTools)driver).maybeGetDevTools();
-		} catch (ClassCastException e) {
-			throw new DevToolsException("Cannot use DevTools with this driver");
-		}
 	}
 
 	public WebDriver getOriginalDriver() {

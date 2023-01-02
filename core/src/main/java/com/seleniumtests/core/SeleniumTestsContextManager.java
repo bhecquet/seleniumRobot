@@ -75,7 +75,7 @@ public class SeleniumTestsContextManager {
 
 	public static final String DATA_FOLDER_NAME = "data";
 	public static final String CACHE_FOLDER_NAME = "cache";
-	public static final String SELENIUM_VERSION = "4.3.0";
+	public static final String SELENIUM_VERSION = "4.7.2";
 
     // global level context
     private static SeleniumTestsContext globalContext;
