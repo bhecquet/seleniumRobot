@@ -107,15 +107,16 @@ public class OSUtilityWindows extends OSUtility {
 
     	if (force) {
     		try {
-    			OSCommand.executeCommandAndWait(String.format("wmic process where \"processid='%s'\" delete", pid));
+    			OSCommand.executeCommand(String.format("wmic process where \"processid='%s'\" delete", pid));
+    			return "Done";
     		} catch (Exception e) {
     			// use an other mean if wmic fails
     		}
-    		return OSCommand.executeCommandAndWait("taskkill /F /PID " + pid);
+    		OSCommand.executeCommand("taskkill /F /PID " + pid);
     	} else {
-    		return OSCommand.executeCommandAndWait("taskkill /PID " + pid);
+    		OSCommand.executeCommand("taskkill /PID " + pid);
     	}
-    	
+    	return "Done";
     }
     
     /**
@@ -127,14 +128,16 @@ public class OSUtilityWindows extends OSUtility {
 	public String killProcessByName(String programName, boolean force) {
 		if (force) {
 			try {
-    			OSCommand.executeCommandAndWait(String.format("wmic process where \"name='%s'\" delete", programName + getProgramExtension()));
+    			OSCommand.executeCommand(String.format("wmic process where \"name='%s'\" delete", programName + getProgramExtension()));
+    			return "Done";
     		} catch (Exception e) {
     			// use an other mean if wmic fails
     		}
-			return OSCommand.executeCommandAndWait("taskkill /F /IM " + programName + getProgramExtension());
+			OSCommand.executeCommand("taskkill /F /IM " + programName + getProgramExtension());
     	} else {
-    		return OSCommand.executeCommandAndWait("taskkill /IM " + programName + getProgramExtension());
+    		OSCommand.executeCommand("taskkill /IM " + programName + getProgramExtension());
     	}
+		return "Done";
 	}
 
 	@Override

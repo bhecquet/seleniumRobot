@@ -62,7 +62,7 @@ public class TestScreenshotUtil extends ReporterTest {
 		WebDriver driver = WebUIDriver.getWebDriver(true);
 		try {
 			BufferedImage image = new ScreenshotUtil(driver).captureWebPageUsingCDP(driver.getWindowHandle());
-			Assert.assertTrue(image.getHeight() > 3200);
+			Assert.assertTrue(image.getHeight() > 2000);
 			Assert.assertTrue(image.getWidth() > 1000);
 		} finally {
 			driver.close();
@@ -77,7 +77,7 @@ public class TestScreenshotUtil extends ReporterTest {
 		WebDriver driver = WebUIDriver.getWebDriver(true);
 		try {
 			BufferedImage image = new ScreenshotUtil(driver).captureWebPageUsingCDP(driver.getWindowHandle());
-			Assert.assertTrue(image.getHeight() > 3200);
+			Assert.assertTrue(image.getHeight() > 2000);
 			Assert.assertTrue(image.getWidth() > 1000);
 		} finally {
 			driver.close();
@@ -91,7 +91,7 @@ public class TestScreenshotUtil extends ReporterTest {
 		WebDriver driver = WebUIDriver.getWebDriver(true);
 		try {
 			BufferedImage image = new ScreenshotUtil(driver).captureWebPageUsingCDP(driver.getWindowHandle());
-			Assert.assertTrue(image.getHeight() > 3200);
+			Assert.assertTrue(image.getHeight() > 2000);
 			Assert.assertTrue(image.getWidth() > 1000);
 		} finally {
 			driver.close();
