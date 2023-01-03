@@ -751,14 +751,14 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${project.build.directory}/data/${project.artifactId}</outputDirectory>
+							<outputDirectory>${project.build.directory}/data/core</outputDirectory>
 							<resources>
 							
 								<resource>
 									<directory>src/main/resources/data/core</directory>
 								</resource>
 								<resource>
-									<directory>${project.basedir}/data/${project.artifactId}</directory>
+									<directory>${project.basedir}/data/core</directory>
 								</resource>
 							</resources>
 						</configuration>            
