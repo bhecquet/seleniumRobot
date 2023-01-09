@@ -33,6 +33,7 @@ public class WebTestPageServer {
 		mapping.put("/tu/testIFrame.html", "/testIFrame.html");
 		mapping.put("/tu/testAngularIFrame.html", "/testAngularIFrame.html");
 		mapping.put("/tu/testIFrame2.html", "/testIFrame2.html");
+		mapping.put("/tu/testIFrame3.html", "/testIFrame3.html");
 		mapping.put("/tu/ffLogo1.png", "/ffLogo1.png");
 		mapping.put("/tu/ffLogo2.png", "/ffLogo2.png");
 		mapping.put("/tu/googleSearch.png", "/googleSearch.png");

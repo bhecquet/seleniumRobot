@@ -34,7 +34,11 @@ public class IEDriverFactory extends AbstractWebDriverFactory implements IWebDri
     @Override
     protected WebDriver createNativeDriver() {
     	InternetExplorerOptions options = (InternetExplorerOptions)driverOptions;
+    	
+    	// remove selenium robot capabilities, as they prevent IE from starting
     	options.setCapability(SeleniumRobotCapabilityType.TEST_NAME, (String)null);
+    	options.setCapability(SeleniumRobotCapabilityType.BETA_BROWSER, (String)null);
+    	options.setCapability(SeleniumRobotCapabilityType.EDGE_IE_MODE, (String)null);
         return new InternetExplorerDriver(options);
     }
 

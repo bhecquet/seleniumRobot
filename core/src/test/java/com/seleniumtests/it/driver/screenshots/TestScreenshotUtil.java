@@ -52,6 +52,11 @@ import com.seleniumtests.it.reporter.ReporterTest;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestStep;
 
+/**
+ * Other tests can be found in "TestBrowserSnapshot"
+ * @author S047432
+ *
+ */
 public class TestScreenshotUtil extends ReporterTest {
 
 	@Test(groups={"it"})

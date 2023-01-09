@@ -574,6 +574,7 @@ public class TestWebUiDriver extends ReporterTest {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("iexplore");
 		SeleniumTestsContextManager.getThreadContext().setEdgeUserProfilePath("default");
 		SeleniumTestsContextManager.getThreadContext().setEdgeIeMode(true);
+		SeleniumTestsContextManager.getThreadContext().setInitialUrl(serverUrl);
 
 		// creates the first driver so that an internet explorer process is created the right way
 		new BrowserLauncher(BrowserType.INTERNET_EXPLORER, 0, null, 0, serverUrl).run();

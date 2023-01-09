@@ -222,6 +222,20 @@
 			  <groupId>org.seleniumhq.selenium</groupId>
 			  <artifactId>selenium-devtools-v104</artifactId>
 			  <version>4.5.3</version>
+			  <exclusions>
+	            <exclusion>
+	                <groupId>org.seleniumhq.selenium</groupId>
+	                <artifactId>selenium-api</artifactId>
+	            </exclusion>
+	            <exclusion>
+	                <groupId>org.seleniumhq.selenium</groupId>
+	                <artifactId>selenium-remote-driver</artifactId>
+	            </exclusion>
+	            <exclusion>
+	                <groupId>org.seleniumhq.selenium</groupId>
+	                <artifactId>selenium-json</artifactId>
+	            </exclusion>
+	          </exclusions>
 			</dependency>
 		    <dependency>
 		      <groupId>net.java.dev.jna</groupId>

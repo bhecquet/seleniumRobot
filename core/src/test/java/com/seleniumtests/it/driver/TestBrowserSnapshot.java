@@ -376,8 +376,7 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 	
 	/**
 	 * Check we can rebuild the whole page from partial captures
-	 * This is useful for chrome as snapshot is only taken from visible display
-	 * For firefox, nothing to do
+	 * This is not the default mode for chrome, but test it anyway
 	 * @throws IOException
 	 */
 	@Test(groups={"it"})
@@ -389,13 +388,14 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 		FileUtility.writeImage(topFilePath, new ScreenshotUtil(driver).capturePage(0, 0));
 		
 		// get full picture
-		File image = new ScreenshotUtil(driver).capture(SnapshotTarget.PAGE, File.class);
+		String fullCapture = generateCaptureFilePath();
+		FileUtility.writeImage(fullCapture, new ScreenshotUtil(driver).captureWebPage(1, driver.getWindowHandle()));
 		
 		String bottomFilePath = generateCaptureFilePath();
 		FileUtility.writeImage(bottomFilePath, new ScreenshotUtil(driver).capturePage(0, 0));
 
 		// exception thrown if nothing found
-		ImageDetector detectorTop = new ImageDetector(image, new File(topFilePath), 0.001);
+		ImageDetector detectorTop = new ImageDetector(new File(fullCapture), new File(topFilePath), 0.001);
 		detectorTop.detectExactZoneWithScale();
 	}
 	

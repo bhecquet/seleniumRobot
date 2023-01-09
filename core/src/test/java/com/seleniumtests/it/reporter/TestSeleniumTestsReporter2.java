@@ -2542,8 +2542,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent = readTestMethodResultFile("testDriverWithLighthouse");
 		
 		// check lighthouse report is included
-		Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"message-snapshot\">Lighthouse JSON http://\\d+.\\d+.\\d+.\\d+:\\d+/test.html: <a href\\='http.\\d+.\\d+.\\d+.\\d+.\\d+test.html-\\w+.json'>file</a></div>.*"));
-		Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"message-snapshot\">Lighthouse HTML http://\\d+.\\d+.\\d+.\\d+:\\d+/test.html: <a href\\='http.\\d+.\\d+.\\d+.\\d+.\\d+test.html-\\w+.html'>file</a></div>.*"));
+		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-snapshot\">Lighthouse JSON http://\\d+.\\d+.\\d+.\\d+:\\d+/test.html: <a href='lighthouse/http.\\d+.\\d+.\\d+.\\d+.\\d+test.html-\\w+.json'>file</a></div>.*"));
+		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-snapshot\">Lighthouse HTML http://\\d+.\\d+.\\d+.\\d+:\\d+/test.html: <a href='lighthouse/http.\\d+.\\d+.\\d+.\\d+.\\d+test.html-\\w+.html'>file</a></div>.*"));
 		
 		// check accessibility is displayed
 		Assert.assertTrue(detailedReportContent.contains("<tr><th width=\"15%\">Key</th><th width=\"60%\">Message</th><th width=\"25%\">Value</th></tr><tr><td>accessibility</td><td>accessibility</td><td>60.0</td></tr>"));

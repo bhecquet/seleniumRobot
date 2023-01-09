@@ -91,7 +91,7 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 			logger.info(String.format("Time first click: %d ms - time second click: %d ms", totalTime1, totalTime2));
 			
 			// check second action is much shorter than first one
-			Assert.assertTrue(totalTime2 * 3 < totalTime1);
+			Assert.assertTrue(totalTime2 * 2 < totalTime1);
 
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);

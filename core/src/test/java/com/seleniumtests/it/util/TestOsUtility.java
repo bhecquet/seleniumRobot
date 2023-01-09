@@ -143,6 +143,7 @@ public class TestOsUtility extends GenericTest {
 		if (OSUtility.isWindows()) {
 			osUtil.killAllWebBrowserProcess(true);
 			SeleniumTestsContextManager.getThreadContext().setBrowser("iexplore");
+			SeleniumTestsContextManager.getThreadContext().setInitialUrl("http://foo.bar");
 			WebUIDriver.getWebDriver(true);
 			Assert.assertTrue(osUtil.isWebBrowserRunning(true));
 		}
@@ -201,6 +202,7 @@ public class TestOsUtility extends GenericTest {
 		if (OSUtility.isWindows()) {
 			osUtil.killAllWebBrowserProcess(true);
 			SeleniumTestsContextManager.getThreadContext().setBrowser("iexplore");
+			SeleniumTestsContextManager.getThreadContext().setInitialUrl("http://foo.bar");
 			WebUIDriver.getWebDriver(true);
 			List<ProcessInfo> pis = osUtil.whichWebBrowserRunning();
 			for (ProcessInfo pi: pis) {
@@ -300,14 +302,18 @@ public class TestOsUtility extends GenericTest {
 				pi = osUtil.getRunningProcess("Calculator"); // Windows 10
 			}
 			if (pi == null) {
+				pi = osUtil.getRunningProcess("CalculatorApp"); // Windows 10
+			}
+			if (pi == null) {
 				pi = osUtil.getRunningProcess("win32calc"); // Windows 2016
 			}
 			if (pi == null) {
-				throw new ConfigurationException("Cannot find process 'calc', 'win32calc' or 'calculator'");
+				throw new ConfigurationException("Cannot find process 'calc', 'win32calc', 'CalculatorApp' or 'calculator'");
 			}
 			osUtil.killProcess(pi.getPid(), true);
 			Assert.assertNull(osUtil.getRunningProcess("calc"));
 			Assert.assertNull(osUtil.getRunningProcess("calculator"));
+			Assert.assertNull(osUtil.getRunningProcess("CalculatorApp"));
 			Assert.assertNull(osUtil.getRunningProcess("Calculator"));
 			Assert.assertNull(osUtil.getRunningProcess("win32calc"));
 		}

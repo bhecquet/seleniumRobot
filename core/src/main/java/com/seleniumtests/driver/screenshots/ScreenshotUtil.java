@@ -551,12 +551,15 @@ public class ScreenshotUtil {
     }
     
     /**
-     * Captures a web page. If the browser natively returns the whole page, nothing more is done. Else (only webview is returned), we scroll down the page to get more of the page  
+     * Captures a web page. If the browser natively returns the whole page, nothing more is done. Else (only webview is returned), we scroll down the page to get more of the page
+     * On chromium browsers, CDP will be used if possible
+     * If you do not want to use CDP, then, set a scrollDelay to a positive value
+     *   
      * @param scrollDelay	time in ms to wait between scrolling and snapshot. 
      * @param windowHandle	the window handle of the page to capture
      * @return
      */
-    private BufferedImage captureWebPage(int scrollDelay, String windowHandle) {
+    public BufferedImage captureWebPage(int scrollDelay, String windowHandle) {
     	
     	if (driver.getWebDriver() instanceof HasDevTools && scrollDelay == 0) {
     		try {
