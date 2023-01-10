@@ -305,13 +305,6 @@ Jira needs more parameters
 | snapshotBottomCropping	| null			| same as snapshotTopCropping for bottom cropping |
 | snapshotScrollDelay		| 0			| time in ms between the browser scrolling (when it's needed) and effective capture. A higher value means we have chance all picture have been loaded (with progressive loading) but capture take more time. This is only valid when captures are done for image comparison. See [https://github.com/bhecquet/seleniumRobot/blob/master/doc/chap7_Howto.md#23-compare-snapshots](https://github.com/bhecquet/seleniumRobot/blob/master/doc/chap7_Howto.md#23-compare-snapshots) |
 
-#### Deprecated ####
-
-| Param name       			| Default 	| Description  |
-| -------------------------	| ------- 	| ------------ |
-| testMethodSignature 		|  			| define a specific method signature for hashcodes |
-| pluginConfigPath 			|  			| plugins to add |
-
 #### Minimal Configuration ####
 
 See §3.3 - 'TestNG file' for the minimal TestNG XML file to use to start a test
@@ -519,7 +512,7 @@ SeleniumGrid allows to address multiple selenium nodes from one central point
 ![](/images/seleniumGrid.png) 
 In this mode, SeleniumRobot addresses the Hub and then, the hub dispatches browser creation on available nodes, for mobile or desktop tests.
 
-For better features, prefer using seleniumRobot-grid which is based on standard grid
+Use seleniumRobot-grid which is based on standard grid
 
 #### Configure SeleniumRobot ####
 
@@ -536,90 +529,23 @@ Test must be configured like the example below (or use `-DrunMode=grid -DwebDriv
     </test>
 ```
 
-#### Configure Grid hub ####
-
-**/!\ Useless with SeleniumRobot grid !!**
-
-Hub configuration from command line or JSON is provided here: 
-[https://github.com/SeleniumHQ/selenium/wiki/Grid2](https://github.com/SeleniumHQ/selenium/wiki/Grid2)
-
-Hub configuration should use a browserTimeout of 60 seconds
-
-#### Configure Grid node ####
-
-**/!\ Useless with SeleniumRobot grid !!**
-
-Node configuration from command line or JSON is provided here: 
-[https://github.com/SeleniumHQ/selenium/wiki/Grid2](https://github.com/SeleniumHQ/selenium/wiki/Grid2)
-
-You should use JSON configuration for nodes, to make it simpler to start
+Seleniumrobot Grid accepts all options of Selenium Grid [https://www.selenium.dev/documentation/grid/configuration/cli_options/] (https://www.selenium.dev/documentation/grid/configuration/cli_options/) plus options specific to SeleniumRobot
 
 ##### Desktop node #####
 
-To add a browser / browser version, add following code (change info if necessary)
-
-```json
-	{
-      "browserName": "firefox",
-      "maxInstances": 5,
-      "seleniumProtocol": "WebDriver",
-	  "version": "last",
-	  "firefox_binary": "C:/Program Files (x86)/Mozilla Firefox/firefox.exe"
-    },
-```
-
-`version` may be any text string as soon as SeleniumRobot asks for it with the `browserVersion` parameter
-`firefox_binary` is only necessary if you need to specify a version different from the default one
-
-To configure IEDriverServer and ChromeDriver executables, add the following to JSON `configuration` dictionnary
-
-	"Dwebdriver.chrome.driver=<path_to_driver>/chromedriver.exe": "",
-    "Dwebdriver.ie.driver=<path_to_driver>/IEDriverServer.exe": ""
-
-or as command line switches
-
-Node configuration should use a timeout of 45 seconds
+To add a browser / browser version that is not detected automatically, follow [https://www.selenium.dev/documentation/grid/configuration/cli_options/#node] (https://www.selenium.dev/documentation/grid/configuration/cli_options/#node)
 
 ##### Appium nodes #####
 
 To use mobile tests and SeleniumGrid, we use appium directly.<br/>
-Create a node.json configuration file for this node. (In the example below, We have 1 mobile device in Android 6.0 version, supporting either chrome or default android browser)
+Start your android emulators (iOS simulators will be started when needed) and plug your physical devices
+Start the seleniumrobot grid node
 
-```json
-		{
-	  	"capabilities":
-	      [
-	        {
-				"browserName": "browser",
-				"deviceName": "192.168.228.101:5555",
-				 "version":"6.0",
-				 "maxInstances": 1,
-				 "platform":"android"
-	        },
-			{
-				"browserName": "chrome",
-				"deviceName": "192.168.228.101:5555",
-				 "version":"6.0",
-				 "maxInstances": 1,
-				 "platform":"android"
-	        }
-	      ],
-	  "configuration":
-	  {
-	    "proxy": "org.openqa.grid.selenium.proxy.DefaultRemoteProxy",
-	    "maxSession": 1,
-	    "register": true,
-	    "registerCycle": 5000,
-	    "hubPort": 4444,
-	    "hubHost": "172.22.2.2"
-	  }
-	}
+```
+java -cp seleniumRobot-grid.jar com.infotel.seleniumrobot.grid.GridStarter node --grid-url http://localhost:4444 --host 127.0.0.1 --port 5555 --max-sessions 1 --devMode true --restrictToTags false --proxyConfig auto
 ```
 
-From command line, use
-`appium --nodeconfig /path/to/nodeconfig.json`
-
-From GUI, node config file can be specified in appium options
+Devices should be automatically detected
 
 ### 6 Running tests in parallel ###
 When testing among several browsers or devices is requested, it's easier to run these tests in parallel
