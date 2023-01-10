@@ -760,12 +760,24 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     }
 
     /**
-     * Returns the Selenium driver
+     * Returns the decorated and augmented Selenium driver.
+     * This means that if you use a Chrome browser, {@code getWebDriver() instanceof ChromeDriver} will return false.
+     * You will have to use {@code getOriginalDriver() instanceof ChromeDriver}
+     * However, {@code getWebDriver() instanceof HasCdp} will return true because driver is augmented at creation with all implemented interfaces
      * @return
      */
     public WebDriver getWebDriver() {
         return driver;
     }
+
+	/**
+	 * Method returning the real created driver, before it has been decorated and augmented
+	 * This allows to write {@code getOriginalDriver() instanceof ChromeDriver} which returns true for a chrome browser
+	 * @return
+	 */
+	public WebDriver getOriginalDriver() {
+		return originalDriver;
+	}
     
     public void setDriverExited() {
     	driverExited = true;
@@ -1707,7 +1719,4 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		return driverExited;
 	}
 
-	public WebDriver getOriginalDriver() {
-		return originalDriver;
-	}
 }

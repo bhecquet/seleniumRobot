@@ -182,8 +182,8 @@ public class TestAutoScrolling extends GenericMultiBrowserTest {
 	
 	public void testAutoScrollToMenu() {
 		// test is known not to work with IE because menu disappears immediately after the first 'moveToElement'
-		// this bheavior is pure Selenium
-		if (((CustomEventFiringWebDriver)driver).getWebDriver() instanceof InternetExplorerDriver) {
+		// this behavior is pure Selenium
+		if (((CustomEventFiringWebDriver)driver).getOriginalDriver() instanceof InternetExplorerDriver) {
 			return;
 		}
 		try {

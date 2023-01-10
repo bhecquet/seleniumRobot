@@ -112,7 +112,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		DriverTestPage.greenSquare.click();
 		DriverTestPage.redSquare.click();
 		
-		if (((CustomEventFiringWebDriver)driver).getWebDriver() instanceof FirefoxDriver && FirefoxDriverFactory.isMarionetteMode()) {
+		if (((CustomEventFiringWebDriver)driver).getOriginalDriver() instanceof FirefoxDriver && FirefoxDriverFactory.isMarionetteMode()) {
 			throw new UnhandledAlertException("fake exception as firefox / marionette does not raise any exception");
 		}
 	}
