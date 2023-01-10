@@ -41,7 +41,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -69,9 +68,6 @@ import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.devtools.DevTools;
-import org.openqa.selenium.devtools.DevToolsException;
-import org.openqa.selenium.devtools.HasDevTools;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Interactive;
 import org.openqa.selenium.interactions.Sequence;
@@ -625,11 +621,16 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		this.gridConnector = gridConnector;
 		this.attachExistingDriverPort = attachExistingDriverPort;
 		this.originalDriver = driver; // store the original driver in case decorated one cannot be used (getSessionId)
-		this.driver = new Augmenter().augment(new EventFiringDecorator(new DriverExceptionListener(this)).decorate(driver));
-
+		this.driver = new EventFiringDecorator(new DriverExceptionListener(this)).decorate(driver);
+		
         for (WebDriverListener wdListener: wdListeners) {
         	this.driver = new EventFiringDecorator(wdListener).decorate(this.driver);
         }
+
+		// Augmenter is only supported for web test because augmenting driver namely tries to create a CDP connection with a browser
+		if (isWebTest()) {
+			this.driver = new Augmenter().augment(this.driver);
+		}
 	
 		// NEOLOAD //
 		if (driver instanceof NLWebDriver) {
