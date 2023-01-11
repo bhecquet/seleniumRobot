@@ -30,6 +30,20 @@ import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public abstract class BugTracker {
+	
+	// options that can be provided as CLI parameters
+	public static final String BUGTRACKER_TYPE = "bugtrackerType";
+	public static final String BUGTRACKER_URL = "bugtrackerUrl";
+	public static final String BUGTRACKER_PROJECT = "bugtrackerProject";
+	public static final String BUGTRACKER_USER = "bugtrackerUser";
+	public static final String BUGTRACKER_PASSWORD = "bugtrackerPassword";
+	
+	// variables that may be specific to each test
+	public static final String BUGTRACKER_ISSUE_PRIORITY = "bugtracker.priority";
+	public static final String BUGTRACKER_ISSUE_ASSIGNEE = "bugtracker.assignee";
+	public static final String BUGTRACKER_ISSUE_REPORTER = "bugtracker.reporter";
+	
+	public static final String BUGTRACKER_PREFIX = "bugtracker.";
 
 	public static final String STEP_KO_PATTERN = "Step %d: ";
 	protected static Logger logger = SeleniumRobotLogger.getLogger(BugTracker.class);
@@ -199,8 +213,8 @@ public abstract class BugTracker {
 			zipFile = createDetailedResultReport(testName);
 		}
 
-		String assignee = issueOptions.get("assignee");
-		String reporter = issueOptions.get("reporter");
+		String assignee = issueOptions.get(BUGTRACKER_ISSUE_ASSIGNEE);
+		String reporter = issueOptions.get(BUGTRACKER_ISSUE_REPORTER);
 		
 		
 		return createIssueBean(summary, fullDescription.toString(), 

@@ -74,9 +74,9 @@ public class TestBugTrackerReporter extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.BUGTRACKER_PROJECT, "Project");
 			System.setProperty(SeleniumTestsContext.BUGTRACKER_USER, "jira");
 			System.setProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD, "jira");
-			System.setProperty("bugtracker.reporter", "me");
-			System.setProperty("bugtracker.assignee", "you");
-			System.setProperty("bugtracker.jira.field.application", "app");
+			System.setProperty(BugTracker.BUGTRACKER_ISSUE_REPORTER, "me");
+			System.setProperty(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE, "you");
+			System.setProperty(JiraConnector.BUGTRACKER_JIRA_FIELD + "application", "app");
 
 			ArgumentCaptor<List<TestStep>> testStepsArgument = ArgumentCaptor.forClass(List.class);
 			ArgumentCaptor<Map<String, String>> issueOptionsArgument = ArgumentCaptor.forClass(Map.class);
@@ -87,9 +87,9 @@ public class TestBugTrackerReporter extends ReporterTest {
 			Assert.assertEquals(testStepsArgument.getValue().size(), 5);
 			
 			Assert.assertEquals(issueOptionsArgument.getValue().size(), 3);
-			Assert.assertEquals(issueOptionsArgument.getValue().get("reporter"), "me");
-			Assert.assertEquals(issueOptionsArgument.getValue().get("assignee"), "you2"); // check we get the updated value, set directly in test method
-			Assert.assertEquals(issueOptionsArgument.getValue().get("jira.field.application"), "app");
+			Assert.assertEquals(issueOptionsArgument.getValue().get(BugTracker.BUGTRACKER_ISSUE_REPORTER), "me");
+			Assert.assertEquals(issueOptionsArgument.getValue().get(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE), "you2"); // check we get the updated value, set directly in test method
+			Assert.assertEquals(issueOptionsArgument.getValue().get(JiraConnector.BUGTRACKER_JIRA_FIELD + "application"), "app");
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_TYPE);
@@ -97,9 +97,9 @@ public class TestBugTrackerReporter extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_URL);
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
-			System.clearProperty("bugtracker.reporter");
-			System.clearProperty("bugtracker.assignee");
-			System.clearProperty("bugtracker.jira.field.application");
+			System.clearProperty(BugTracker.BUGTRACKER_ISSUE_REPORTER);
+			System.clearProperty(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE);
+			System.clearProperty(JiraConnector.BUGTRACKER_JIRA_FIELD + "application");
 		}
 	}
 	
@@ -117,9 +117,9 @@ public class TestBugTrackerReporter extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.BUGTRACKER_USER, "jira");
 			System.setProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD, "jira");
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
-			System.setProperty("bugtracker.reporter", "me");
-			System.setProperty("bugtracker.assignee", "you");
-			System.setProperty("bugtracker.jira.field.application", "app");
+			System.setProperty(BugTracker.BUGTRACKER_ISSUE_REPORTER, "me");
+			System.setProperty(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE, "you");
+			System.setProperty(JiraConnector.BUGTRACKER_JIRA_FIELD + "application", "app");
 			
 			ArgumentCaptor<Map<String, String>> issueOptionsArgument = ArgumentCaptor.forClass(Map.class);
 			ArgumentCaptor<Map<String, String>> issueOptionsArgument2 = ArgumentCaptor.forClass(Map.class);
@@ -129,18 +129,18 @@ public class TestBugTrackerReporter extends ReporterTest {
 			verify(jiraConnector).createIssue(eq("core"), eq("DEV"), anyString(), eq("testInErrorDataProvider"), contains("Test 'testInErrorDataProvider' failed"), any(), issueOptionsArgument.capture());
 			
 			Assert.assertEquals(issueOptionsArgument.getValue().size(), 3);
-			Assert.assertEquals(issueOptionsArgument.getValue().get("reporter"), "me");
-			Assert.assertEquals(issueOptionsArgument.getValue().get("assignee"), "you2data1"); // check we get the updated value, set directly in test method
-			Assert.assertEquals(issueOptionsArgument.getValue().get("jira.field.application"), "app");
+			Assert.assertEquals(issueOptionsArgument.getValue().get(BugTracker.BUGTRACKER_ISSUE_REPORTER), "me");
+			Assert.assertEquals(issueOptionsArgument.getValue().get(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE), "you2data1"); // check we get the updated value, set directly in test method
+			Assert.assertEquals(issueOptionsArgument.getValue().get(JiraConnector.BUGTRACKER_JIRA_FIELD + "application"), "app");
 			
 
 			// check we have only one result recording for each test method
 			verify(jiraConnector).createIssue(eq("core"), eq("DEV"), anyString(), eq("testInErrorDataProvider-1"), contains("Test 'testInErrorDataProvider-1' failed"), any(), issueOptionsArgument2.capture());
 			
 			Assert.assertEquals(issueOptionsArgument2.getValue().size(), 3);
-			Assert.assertEquals(issueOptionsArgument2.getValue().get("reporter"), "me");
-			Assert.assertEquals(issueOptionsArgument2.getValue().get("assignee"), "you2data2"); // check we get the updated value, set directly in test method
-			Assert.assertEquals(issueOptionsArgument2.getValue().get("jira.field.application"), "app");
+			Assert.assertEquals(issueOptionsArgument2.getValue().get(BugTracker.BUGTRACKER_ISSUE_REPORTER), "me");
+			Assert.assertEquals(issueOptionsArgument2.getValue().get(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE), "you2data2"); // check we get the updated value, set directly in test method
+			Assert.assertEquals(issueOptionsArgument2.getValue().get(JiraConnector.BUGTRACKER_JIRA_FIELD + "application"), "app");
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_TYPE);
@@ -149,9 +149,9 @@ public class TestBugTrackerReporter extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
 			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
-			System.clearProperty("bugtracker.reporter");
-			System.clearProperty("bugtracker.assignee");
-			System.clearProperty("bugtracker.jira.field.application");
+			System.clearProperty(BugTracker.BUGTRACKER_ISSUE_REPORTER);
+			System.clearProperty(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE);
+			System.clearProperty(JiraConnector.BUGTRACKER_JIRA_FIELD + "application");
 		}
 	}
 	
@@ -169,9 +169,9 @@ public class TestBugTrackerReporter extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.BUGTRACKER_PROJECT, "Project");
 			System.setProperty(SeleniumTestsContext.BUGTRACKER_USER, "fake");
 			System.setProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD, "fake");
-			System.setProperty("bugtracker.reporter", "me");
-			System.setProperty("bugtracker.assignee", "you");
-			System.setProperty("bugtracker.jira.field.application", "app");
+			System.setProperty(BugTracker.BUGTRACKER_ISSUE_REPORTER, "me");
+			System.setProperty(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE, "you");
+			System.setProperty(JiraConnector.BUGTRACKER_JIRA_FIELD + "application", "app");
 			
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'");
 			String creationDate = ZonedDateTime.now().format(formatter);
@@ -192,9 +192,9 @@ public class TestBugTrackerReporter extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_URL);
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
-			System.clearProperty("bugtracker.reporter");
-			System.clearProperty("bugtracker.assignee");
-			System.clearProperty("bugtracker.jira.field.application");
+			System.clearProperty(BugTracker.BUGTRACKER_ISSUE_REPORTER);
+			System.clearProperty(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE);
+			System.clearProperty(JiraConnector.BUGTRACKER_JIRA_FIELD + "application");
 		}
 	}
 	
@@ -209,9 +209,9 @@ public class TestBugTrackerReporter extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.BUGTRACKER_PROJECT, "Project");
 			System.setProperty(SeleniumTestsContext.BUGTRACKER_USER, "fake");
 			System.setProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD, "fake");
-			System.setProperty("bugtracker.reporter", "me");
-			System.setProperty("bugtracker.assignee", "you");
-			System.setProperty("bugtracker.jira.field.application", "app");
+			System.setProperty(BugTracker.BUGTRACKER_ISSUE_REPORTER, "me");
+			System.setProperty(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE, "you");
+			System.setProperty(JiraConnector.BUGTRACKER_JIRA_FIELD + "application", "app");
 			
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testInError", "testSkipped"});
 			
@@ -233,9 +233,9 @@ public class TestBugTrackerReporter extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_URL);
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
-			System.clearProperty("bugtracker.reporter");
-			System.clearProperty("bugtracker.assignee");
-			System.clearProperty("bugtracker.jira.field.application");
+			System.clearProperty(BugTracker.BUGTRACKER_ISSUE_REPORTER);
+			System.clearProperty(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE);
+			System.clearProperty(JiraConnector.BUGTRACKER_JIRA_FIELD + "application");
 		}
 	}
 	
@@ -252,9 +252,9 @@ public class TestBugTrackerReporter extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.BUGTRACKER_PROJECT, "Project");
 			System.setProperty(SeleniumTestsContext.BUGTRACKER_USER, "jira");
 			System.setProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD, "jira");
-			System.setProperty("bugtracker.reporter", "me");
-			System.setProperty("bugtracker.assignee", "you");
-			System.setProperty("bugtracker.jira.field.application", "app");
+			System.setProperty(BugTracker.BUGTRACKER_ISSUE_REPORTER, "me");
+			System.setProperty(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE, "you");
+			System.setProperty(JiraConnector.BUGTRACKER_JIRA_FIELD + "application", "app");
 			
 			JiraBean jiraBean = new JiraBean("JIRA-1234", "summary", "description", "Bug", "P1");
 			jiraBean.setAccessUrl("http://jira.server.com/browse/JIRA-1234");
@@ -280,9 +280,9 @@ public class TestBugTrackerReporter extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_URL);
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
-			System.clearProperty("bugtracker.reporter");
-			System.clearProperty("bugtracker.assignee");
-			System.clearProperty("bugtracker.jira.field.application");
+			System.clearProperty(BugTracker.BUGTRACKER_ISSUE_REPORTER);
+			System.clearProperty(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE);
+			System.clearProperty(JiraConnector.BUGTRACKER_JIRA_FIELD + "application");
 		}
 	}
 	
@@ -299,9 +299,9 @@ public class TestBugTrackerReporter extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.BUGTRACKER_PROJECT, "Project");
 			System.setProperty(SeleniumTestsContext.BUGTRACKER_USER, "jira");
 			System.setProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD, "jira");
-			System.setProperty("bugtracker.reporter", "me");
-			System.setProperty("bugtracker.assignee", "you");
-			System.setProperty("bugtracker.jira.field.application", "app");
+			System.setProperty(BugTracker.BUGTRACKER_ISSUE_REPORTER, "me");
+			System.setProperty(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE, "you");
+			System.setProperty(JiraConnector.BUGTRACKER_JIRA_FIELD + "application", "app");
 			
 			JiraBean jiraBean = new JiraBean("JIRA-1234", "summary", "description", "Bug", "P1");
 			jiraBean.setDate("2021-01-06T15:18+01:00");
@@ -326,9 +326,9 @@ public class TestBugTrackerReporter extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_URL);
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
-			System.clearProperty("bugtracker.reporter");
-			System.clearProperty("bugtracker.assignee");
-			System.clearProperty("bugtracker.jira.field.application");
+			System.clearProperty(BugTracker.BUGTRACKER_ISSUE_REPORTER);
+			System.clearProperty(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE);
+			System.clearProperty(JiraConnector.BUGTRACKER_JIRA_FIELD + "application");
 		}
 	}
 	

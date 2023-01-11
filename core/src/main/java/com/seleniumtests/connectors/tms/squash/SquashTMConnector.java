@@ -12,6 +12,9 @@ import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 
 public class SquashTMConnector extends TestManager {
+	
+	public static final String SQUASH_ITERATION = "tms.squash.iteration";
+	public static final String SQUASH_CAMPAIGN = "tms.squash.campaign";
 
 	private String user;
 	private String password;

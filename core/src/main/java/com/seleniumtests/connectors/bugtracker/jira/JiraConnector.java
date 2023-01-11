@@ -51,6 +51,11 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class JiraConnector extends BugTracker {
 
+	public static final String BUGTRACKER_JIRA_ISSUE_TYPE = "bugtracker.jira.issueType"; // type of issue that will be created
+	public static final String BUGTRACKER_JIRA_OPEN_STATES = "bugtracker.jira.openStates"; // List of states an issue can be when it's open. It allows to search for an previously opened issue
+	public static final String BUGTRACKER_JIRA_CLOSE_TRANSITION = "bugtracker.jira.closeTransition"; // Comma separated list of transitions from an open issue to a closed issue. e.g: "Done"
+	public static final String BUGTRACKER_JIRA_FIELD = "bugtracker.jira.field."; // prefix to any custom field that has to be added to an issue
+	public static final String BUGTRACKER_JIRA_COMPONENTS = "bugtracker.jira.components"; // Component this issue should be associated with
 
     private static final String ITEM = "    - %s";
 	private static Logger logger = SeleniumRobotLogger.getLogger(JiraConnector.class);
@@ -120,15 +125,15 @@ public class JiraConnector extends BugTracker {
         this(server, projectKey, user, password);
         
         // check jira options
-		closeTransition = jiraOptions.get("jira.closeTransition");
+		closeTransition = jiraOptions.get(BUGTRACKER_JIRA_CLOSE_TRANSITION);
 		
-		if (jiraOptions.get("jira.openStates") == null) {
-			throw new ConfigurationException("'bugtracker.jira.openStates' MUST be set. It's the state of an issue when it has juste been create. Used to search for open issues");
+		if (jiraOptions.get(BUGTRACKER_JIRA_OPEN_STATES) == null) {
+			throw new ConfigurationException(String.format("'%s' MUST be set. It's the state of an issue when it has juste been create. Used to search for open issues", BUGTRACKER_JIRA_OPEN_STATES));
 		} else {
-			openStates = Arrays.asList(jiraOptions.get("jira.openStates").split(",")).stream().map(String::trim).collect(Collectors.toList());
+			openStates = Arrays.asList(jiraOptions.get(BUGTRACKER_JIRA_OPEN_STATES).split(",")).stream().map(String::trim).collect(Collectors.toList());
 		}
 		if (closeTransition == null) {
-			throw new ConfigurationException("'bugtracker.jira.closeTransition' MUST be set. It's the name of the transition that will close an issue");
+			throw new ConfigurationException(String.format("'%s' MUST be set. It's the name of the transition that will close an issue", BUGTRACKER_JIRA_CLOSE_TRANSITION));
 		}
 
         logger.info(String.format("Connecting to Jira API [%s], on project [%s] with user [%s]", server, projectKey, user));
@@ -244,18 +249,18 @@ public class JiraConnector extends BugTracker {
 			File zipFile,
 			Map<String, String> issueOptions) {
 		
-		String priority = issueOptions.get("priority");
-		String issueType = issueOptions.get("jira.issueType");
+		String priority = issueOptions.get(BUGTRACKER_ISSUE_PRIORITY);
+		String issueType = issueOptions.get(BUGTRACKER_JIRA_ISSUE_TYPE);
 		Map<String, String> customFieldsValues = new HashMap<>();
 		for (Entry<String, String> variable: issueOptions.entrySet()) {
-			if (variable.getKey().startsWith("jira.field.")) {
-				customFieldsValues.put(variable.getKey().replace("jira.field.", ""), variable.getValue());
+			if (variable.getKey().startsWith(BUGTRACKER_JIRA_FIELD)) {
+				customFieldsValues.put(variable.getKey().replace(BUGTRACKER_JIRA_FIELD, ""), variable.getValue());
 			}
 		}
 
 		List<String> comps = new ArrayList<>();
-		if (issueOptions.get("jira.components") != null) {
-			comps = Arrays.asList(issueOptions.get("jira.components").split(","));
+		if (issueOptions.get(BUGTRACKER_JIRA_COMPONENTS) != null) {
+			comps = Arrays.asList(issueOptions.get(BUGTRACKER_JIRA_COMPONENTS).split(","));
 		}
 		
 		

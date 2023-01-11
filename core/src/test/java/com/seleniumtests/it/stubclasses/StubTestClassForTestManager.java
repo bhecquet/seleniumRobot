@@ -26,6 +26,7 @@ import org.testng.annotations.CustomAttribute;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.connectors.bugtracker.BugTracker;
 import com.seleniumtests.util.helper.WaitHelper;
 
 public class StubTestClassForTestManager extends StubParentClass {
@@ -43,9 +44,20 @@ public class StubTestClassForTestManager extends StubParentClass {
 	
 	@Test(groups="stub", attributes = {@CustomAttribute(name = "testId", values = "13")})
 	public void testInError() throws IOException {
-		createOrUpdateLocalParam("bugtracker.assignee", "you2"); // change value for bugtracker assignee so that we check it's updated
+		createOrUpdateLocalParam(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE, "you2"); // change value for bugtracker assignee so that we check it's updated
 		new StubTestPage()
 			.failStep();
+	}
+	
+	/**
+	 * Test when testId is set in test body instead of in attributes
+	 * @throws IOException
+	 */
+	@Test(groups="stub")
+	public void testInErrorWithTestIdSetInsiteTest() throws IOException {
+		createOrUpdateLocalParam(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE, "you2"); // change value for bugtracker assignee so that we check it's updated
+		new StubTestPage()
+		.failStep();
 	}
 	
 	@Test(groups="stub", attributes = {@CustomAttribute(name = "testId", values = "14")})
@@ -67,7 +79,7 @@ public class StubTestClassForTestManager extends StubParentClass {
 
 	@Test(groups="stub", dataProvider = "data", attributes = {@CustomAttribute(name = "testId", values = "16")})
 	public void testInErrorDataProvider(String name) throws IOException {
-		createOrUpdateLocalParam("bugtracker.assignee", "you2" + name); // change value for bugtracker assignee so that w check it's updated
+		createOrUpdateLocalParam(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE, "you2" + name); // change value for bugtracker assignee so that w check it's updated
 		new StubTestPage()
 		.failStep();
 	}

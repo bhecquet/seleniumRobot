@@ -171,11 +171,11 @@ public class SeleniumTestsContext {
     public static final String TMS_PROJECT = TestManager.TMS_PROJECT;						// The project to which this test application is linked in Test manager    
     public static final String TMS_TYPE = TestManager.TMS_TYPE;							// Type of the Test Manager ('squash' or 'hp')
     
-	public static final String BUGTRACKER_TYPE = "bugtrackerType";
-	public static final String BUGTRACKER_URL = "bugtrackerUrl";
-	public static final String BUGTRACKER_PROJECT = "bugtrackerProject";
-	public static final String BUGTRACKER_USER = "bugtrackerUser";
-	public static final String BUGTRACKER_PASSWORD = "bugtrackerPassword";
+	public static final String BUGTRACKER_TYPE = BugTracker.BUGTRACKER_TYPE;
+	public static final String BUGTRACKER_URL = BugTracker.BUGTRACKER_URL;
+	public static final String BUGTRACKER_PROJECT = BugTracker.BUGTRACKER_PROJECT;
+	public static final String BUGTRACKER_USER = BugTracker.BUGTRACKER_USER;
+	public static final String BUGTRACKER_PASSWORD = BugTracker.BUGTRACKER_PASSWORD;
     
     public static final String CAPTURE_SNAPSHOT = "captureSnapshot";
     public static final String CAPTURE_NETWORK = "captureNetwork";
@@ -1034,8 +1034,8 @@ public class SeleniumTestsContext {
 			// any options specific to this bugtracker may be given in the form 'bugtracker.xxx'
 			Map<String, String> bugtrackerOptions = new HashMap<>();
 			for (TestVariable variable: getConfiguration().values()) {
-				if (variable.getName().startsWith("bugtracker.")) {
-					bugtrackerOptions.put(variable.getName().replace("bugtracker.", ""), variable.getValue());
+				if (variable.getName().startsWith(BugTracker.BUGTRACKER_PREFIX)) {
+					bugtrackerOptions.put(variable.getName(), variable.getValue());
 				}
 			}
 			

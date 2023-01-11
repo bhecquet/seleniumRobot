@@ -51,8 +51,8 @@ public class BugTrackerReporter extends CommonReporter implements IReporter {
 				// get all bugtracker options
 				Map<String, String> issueOptions = new HashMap<>();
 				for (TestVariable variable: testContext.getConfiguration().values()) {
-					if (variable.getName().startsWith("bugtracker.")) {
-						issueOptions.put(variable.getName().replace("bugtracker.", ""), variable.getValue());
+					if (variable.getName().startsWith(BugTracker.BUGTRACKER_PREFIX)) {
+						issueOptions.put(variable.getName(), variable.getValue());
 					}
 				}
 				
