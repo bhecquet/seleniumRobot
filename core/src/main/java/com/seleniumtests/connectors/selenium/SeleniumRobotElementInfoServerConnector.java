@@ -49,9 +49,9 @@ public class SeleniumRobotElementInfoServerConnector extends SeleniumRobotServer
 	public static SeleniumRobotElementInfoServerConnector getInstance() {
 		if (infoServerConnector == null) {
 			infoServerConnector = new SeleniumRobotElementInfoServerConnector(
-					SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerActive(),
-					SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerUrl(),
-					SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerToken()
+					SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerActive(),
+					SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerUrl(),
+					SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerToken()
 					);
 		} 
 		return infoServerConnector;

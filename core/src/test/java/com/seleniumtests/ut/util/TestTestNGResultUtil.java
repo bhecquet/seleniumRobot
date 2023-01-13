@@ -91,7 +91,7 @@ public class TestTestNGResultUtil extends MockitoTest {
 		when(testContext.getName()).thenReturn("myTest");
 		
 		PowerMockito.mockStatic(SeleniumRobotSnapshotServerConnector.class);
-		SeleniumTestsContextManager.getGlobalContext().setSeleniumRobotServerUrl(SERVER_URL);
+		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerUrl(SERVER_URL);
 	}
 	
 	@Test(groups={"ut"})
@@ -564,9 +564,9 @@ public class TestTestNGResultUtil extends MockitoTest {
 		when(passedTests.getAllMethods()).thenReturn(methods);
 		
 		// be sure we will do comparison
-		SeleniumTestsContextManager.getGlobalContext().setSeleniumRobotServerCompareSnapshotBehaviour("changeTestResult");
-		SeleniumTestsContextManager.getGlobalContext().setSeleniumRobotServerActive(true);
-		SeleniumTestsContextManager.getGlobalContext().setSeleniumRobotServerCompareSnapshot(true);
+		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerCompareSnapshotBehaviour("changeTestResult");
+		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerActive(true);
+		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerCompareSnapshot(true);
 		
 		
 		PowerMockito.when(SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(snapshotServerConnector);
@@ -580,9 +580,9 @@ public class TestTestNGResultUtil extends MockitoTest {
 	public void testChangeTestResultWithSnapshotComparisonAlreadyFailed() {
 		when(testResult.getStatus()).thenReturn(ITestResult.FAILURE);
 		
-		SeleniumTestsContextManager.getGlobalContext().setSeleniumRobotServerCompareSnapshotBehaviour("changeTestResult");
-		SeleniumTestsContextManager.getGlobalContext().setSeleniumRobotServerActive(true);
-		SeleniumTestsContextManager.getGlobalContext().setSeleniumRobotServerCompareSnapshot(true);
+		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerCompareSnapshotBehaviour("changeTestResult");
+		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerActive(true);
+		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerCompareSnapshot(true);
 		
 		
 		PowerMockito.when(SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(snapshotServerConnector);
@@ -595,9 +595,9 @@ public class TestTestNGResultUtil extends MockitoTest {
 	public void testChangeTestResultWithSnapshotComparisonNoComparisonRequested() {
 		when(testResult.getStatus()).thenReturn(ITestResult.SUCCESS);
 		
-		SeleniumTestsContextManager.getGlobalContext().setSeleniumRobotServerCompareSnapshotBehaviour("changeTestResult");
-		SeleniumTestsContextManager.getGlobalContext().setSeleniumRobotServerActive(true);
-		SeleniumTestsContextManager.getGlobalContext().setSeleniumRobotServerCompareSnapshot(false);
+		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerCompareSnapshotBehaviour("changeTestResult");
+		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerActive(true);
+		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerCompareSnapshot(false);
 		
 		
 		PowerMockito.when(SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(snapshotServerConnector);
@@ -613,9 +613,9 @@ public class TestTestNGResultUtil extends MockitoTest {
 	public void testChangeTestResultWithSnapshotComparisonServerInactive() {
 		when(testResult.getStatus()).thenReturn(ITestResult.SUCCESS);
 		
-		SeleniumTestsContextManager.getGlobalContext().setSeleniumRobotServerCompareSnapshotBehaviour("changeTestResult");
-		SeleniumTestsContextManager.getGlobalContext().setSeleniumRobotServerActive(false);
-		SeleniumTestsContextManager.getGlobalContext().setSeleniumRobotServerCompareSnapshot(true);
+		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerCompareSnapshotBehaviour("changeTestResult");
+		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerActive(false);
+		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerCompareSnapshot(true);
 		
 		
 		PowerMockito.when(SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(snapshotServerConnector);
@@ -631,9 +631,9 @@ public class TestTestNGResultUtil extends MockitoTest {
 	public void testChangeTestResultWithSnapshotComparisonBehaviourAddResult() {
 		when(testResult.getStatus()).thenReturn(ITestResult.SUCCESS);
 		
-		SeleniumTestsContextManager.getGlobalContext().setSeleniumRobotServerCompareSnapshotBehaviour("addTestResult");
-		SeleniumTestsContextManager.getGlobalContext().setSeleniumRobotServerActive(true);
-		SeleniumTestsContextManager.getGlobalContext().setSeleniumRobotServerCompareSnapshot(true);
+		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerCompareSnapshotBehaviour("addTestResult");
+		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerActive(true);
+		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerCompareSnapshot(true);
 		
 		
 		PowerMockito.when(SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(snapshotServerConnector);
@@ -649,9 +649,9 @@ public class TestTestNGResultUtil extends MockitoTest {
 	public void testChangeTestResultWithSnapshotComparisonBehaviourDisplayOnly() {
 		when(testResult.getStatus()).thenReturn(ITestResult.SUCCESS);
 		
-		SeleniumTestsContextManager.getGlobalContext().setSeleniumRobotServerCompareSnapshotBehaviour("displayOnly");
-		SeleniumTestsContextManager.getGlobalContext().setSeleniumRobotServerActive(true);
-		SeleniumTestsContextManager.getGlobalContext().setSeleniumRobotServerCompareSnapshot(true);
+		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerCompareSnapshotBehaviour("displayOnly");
+		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerActive(true);
+		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerCompareSnapshot(true);
 		
 		
 		PowerMockito.when(SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(snapshotServerConnector);

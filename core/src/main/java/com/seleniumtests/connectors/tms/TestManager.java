@@ -39,6 +39,9 @@ public abstract class TestManager {
 	public static final String TMS_PROJECT = "tmsProject";
 	public static final String TMS_DOMAIN = "tmsDomain";
 	
+    // variable that may be defined dynamically
+    public static final String TMS_TEST_ID = "tms.testId";					// name of the variable that identifies the id of the test in TMS
+	
 	protected boolean initialized;
 	
 	protected TestManager() {

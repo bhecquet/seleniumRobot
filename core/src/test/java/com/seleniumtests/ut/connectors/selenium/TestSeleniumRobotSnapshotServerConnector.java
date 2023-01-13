@@ -91,8 +91,8 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		when(getAliveRequest.asString()).thenThrow(UnirestException.class);
 		when(unirestInstance.get(SERVER_URL + "/snapshot/")).thenReturn(getAliveRequest);
 		
-		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerUrl(SERVER_URL);
-		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerActive(true);
+		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerUrl(SERVER_URL);
+		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerActive(true);
 		return new SeleniumRobotSnapshotServerConnector(true, SERVER_URL);
 	}
 	

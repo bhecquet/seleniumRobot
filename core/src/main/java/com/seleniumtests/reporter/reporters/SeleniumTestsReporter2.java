@@ -230,9 +230,9 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 
 		context.put("staticPathPrefix", "../");
 		
-		boolean displaySnapshots = testContext.getSeleniumRobotServerCompareSnapshot() && TestNGResultUtils.getSnapshotTestCaseInSessionId(testResult) != null && TestNGResultUtils.getSnapshotComparisonResult(testResult) != null;
+		boolean displaySnapshots = testContext.seleniumServer().getSeleniumRobotServerCompareSnapshot() && TestNGResultUtils.getSnapshotTestCaseInSessionId(testResult) != null && TestNGResultUtils.getSnapshotComparisonResult(testResult) != null;
 		context.put("snapshots", displaySnapshots);
-		context.put("snapshotServer", testContext.getSeleniumRobotServerUrl());
+		context.put("snapshotServer", testContext.seleniumServer().getSeleniumRobotServerUrl());
 		context.put("snapshotComparisonResult", TestNGResultUtils.getSnapshotComparisonResult(testResult));
 		context.put("snapshotSessionId", TestNGResultUtils.getSnapshotTestCaseInSessionId(testResult));
 		

@@ -87,9 +87,9 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 		}
 		
 		// issue #81: use global context because these parameters are known from there (thread context is too narrow)
-		if (!Boolean.TRUE.equals(SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerActive())
-				|| !SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerRecordResults() 
-				&& !SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshot()) {
+		if (!Boolean.TRUE.equals(SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerActive())
+				|| !SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerRecordResults() 
+				&& !SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshot()) {
 			return;
 		}
 		
@@ -196,7 +196,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			// sends all snapshots that are flagged as comparable
 			for (Snapshot snapshot: new ArrayList<>(testStep.getSnapshots())) {
 				
-				if (snapshot.getCheckSnapshot().recordSnapshotOnServerForComparison() && SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshot()) {
+				if (snapshot.getCheckSnapshot().recordSnapshotOnServerForComparison() && SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshot()) {
 					if (snapshot.getName() == null || snapshot.getName().isEmpty()) {
 						logger.warn("Snapshot hasn't any name, it won't be sent to server");
 						continue;
@@ -213,7 +213,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 					}
 					
 				// record reference image on server if step is successful
-				} else if (snapshot.getCheckSnapshot().recordSnapshotOnServerForReference() && SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerRecordResults()) {
+				} else if (snapshot.getCheckSnapshot().recordSnapshotOnServerForReference() && SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerRecordResults()) {
 					if (Boolean.FALSE.equals(testStep.getFailed())) {
 						try {
 							serverConnector.createStepReferenceSnapshot(snapshot, stepResultId);

@@ -612,8 +612,8 @@ public class ConnectorsTest extends MockitoTest {
 		when(Unirest.get(SERVER_URL + "/snapshot/")).thenReturn(getAliveRequest);
 		when(unirestInstance.get(SERVER_URL + "/snapshot/")).thenReturn(getAliveRequest);
 		
-		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerUrl(SERVER_URL);
-		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerActive(true);
+		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerUrl(SERVER_URL);
+		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerActive(true);
 		
 		// set default reply from server. To override this behaviour, redefine some steps in test after connector creation
 		createServerMock("POST", SeleniumRobotSnapshotServerConnector.APPLICATION_API_URL, 200, "{'id': '9'}");	
@@ -652,8 +652,8 @@ public class ConnectorsTest extends MockitoTest {
 	 */
 	protected void configureMockedVariableServerConnection() throws UnirestException {
 
-		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerUrl(SERVER_URL);
-		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerActive(true);
+		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerUrl(SERVER_URL);
+		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerActive(true);
 		
 		configureMockedVariableServerConnection(SERVER_URL);
 	}

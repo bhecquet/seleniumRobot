@@ -325,4 +325,5 @@ public class SeleniumRobotTestPlan {
     public void addTestInfo(String key, Info value) {
     	((ScenarioLogger)logger).logTestInfo(key, value);
     }
+
 }

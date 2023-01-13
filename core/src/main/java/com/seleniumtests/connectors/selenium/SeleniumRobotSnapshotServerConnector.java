@@ -19,7 +19,6 @@ package com.seleniumtests.connectors.selenium;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -28,7 +27,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.Rectangle;
 import org.testng.ITestResult;
 
@@ -78,9 +76,9 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	public static SeleniumRobotSnapshotServerConnector getInstance() {
 		if (snapshotConnector == null) {
 			snapshotConnector = new SeleniumRobotSnapshotServerConnector(
-					SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerActive(),
-					SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerUrl(),
-					SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerToken()
+					SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerActive(),
+					SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerUrl(),
+					SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerToken()
 					);
 		} 
 		return snapshotConnector;
@@ -138,8 +136,8 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field("environment", SeleniumTestsContextManager.getGlobalContext().getTestEnv())
 					.field("version", versionId.toString())
 					.field(FIELD_NAME, strippedSessionName)
-					.field("compareSnapshot", String.valueOf(SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshot()))
-					.field("ttl", String.format("%d days", SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshotTtl()))); // format is 'x days' as this is the way Django expect a duration in days
+					.field("compareSnapshot", String.valueOf(SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshot()))
+					.field("ttl", String.format("%d days", SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshotTtl()))); // format is 'x days' as this is the way Django expect a duration in days
 			return sessionJson.getInt("id");
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 			throw new SeleniumRobotServerException("cannot create session", e);

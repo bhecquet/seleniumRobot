@@ -44,6 +44,7 @@ import com.seleniumtests.connectors.bugtracker.BugTracker;
 import com.seleniumtests.connectors.bugtracker.jira.JiraBean;
 import com.seleniumtests.connectors.bugtracker.jira.JiraConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.core.contexts.BugTrackerContext;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.reporter.logger.TestStep;
 
@@ -69,11 +70,11 @@ public class TestBugTrackerReporter extends ReporterTest {
 	@Test(groups={"it"})
 	public void testIssueIsRecorded() throws Exception {
 		try {
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_TYPE, "jira");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_URL, "http://localhost:1234");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_PROJECT, "Project");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_USER, "jira");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD, "jira");
+			System.setProperty(BugTrackerContext.BUGTRACKER_TYPE, "jira");
+			System.setProperty(BugTrackerContext.BUGTRACKER_URL, "http://localhost:1234");
+			System.setProperty(BugTrackerContext.BUGTRACKER_PROJECT, "Project");
+			System.setProperty(BugTrackerContext.BUGTRACKER_USER, "jira");
+			System.setProperty(BugTrackerContext.BUGTRACKER_PASSWORD, "jira");
 			System.setProperty(BugTracker.BUGTRACKER_ISSUE_REPORTER, "me");
 			System.setProperty(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE, "you");
 			System.setProperty(JiraConnector.BUGTRACKER_JIRA_FIELD + "application", "app");
@@ -92,11 +93,11 @@ public class TestBugTrackerReporter extends ReporterTest {
 			Assert.assertEquals(issueOptionsArgument.getValue().get(JiraConnector.BUGTRACKER_JIRA_FIELD + "application"), "app");
 			
 		} finally {
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_TYPE);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PROJECT);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_URL);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_TYPE);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_PROJECT);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_URL);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_USER);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_PASSWORD);
 			System.clearProperty(BugTracker.BUGTRACKER_ISSUE_REPORTER);
 			System.clearProperty(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE);
 			System.clearProperty(JiraConnector.BUGTRACKER_JIRA_FIELD + "application");
@@ -111,11 +112,11 @@ public class TestBugTrackerReporter extends ReporterTest {
 	@Test(groups={"it"})
 	public void testIssueIsRecordedWithDataProvider() throws Exception {
 		try {
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_TYPE, "jira");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_URL, "http://localhost:1234");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_PROJECT, "Project");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_USER, "jira");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD, "jira");
+			System.setProperty(BugTrackerContext.BUGTRACKER_TYPE, "jira");
+			System.setProperty(BugTrackerContext.BUGTRACKER_URL, "http://localhost:1234");
+			System.setProperty(BugTrackerContext.BUGTRACKER_PROJECT, "Project");
+			System.setProperty(BugTrackerContext.BUGTRACKER_USER, "jira");
+			System.setProperty(BugTrackerContext.BUGTRACKER_PASSWORD, "jira");
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
 			System.setProperty(BugTracker.BUGTRACKER_ISSUE_REPORTER, "me");
 			System.setProperty(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE, "you");
@@ -143,11 +144,11 @@ public class TestBugTrackerReporter extends ReporterTest {
 			Assert.assertEquals(issueOptionsArgument2.getValue().get(JiraConnector.BUGTRACKER_JIRA_FIELD + "application"), "app");
 			
 		} finally {
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_TYPE);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PROJECT);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_URL);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_TYPE);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_PROJECT);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_URL);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_USER);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_PASSWORD);
 			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
 			System.clearProperty(BugTracker.BUGTRACKER_ISSUE_REPORTER);
 			System.clearProperty(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE);
@@ -164,11 +165,11 @@ public class TestBugTrackerReporter extends ReporterTest {
 	@Test(groups={"it"})
 	public void testIssueIsRecordedInReportsFakeBugtracker() throws Exception {
 		try {
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_TYPE, "fake");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_URL, "http://localhost:1234");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_PROJECT, "Project");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_USER, "fake");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD, "fake");
+			System.setProperty(BugTrackerContext.BUGTRACKER_TYPE, "fake");
+			System.setProperty(BugTrackerContext.BUGTRACKER_URL, "http://localhost:1234");
+			System.setProperty(BugTrackerContext.BUGTRACKER_PROJECT, "Project");
+			System.setProperty(BugTrackerContext.BUGTRACKER_USER, "fake");
+			System.setProperty(BugTrackerContext.BUGTRACKER_PASSWORD, "fake");
 			System.setProperty(BugTracker.BUGTRACKER_ISSUE_REPORTER, "me");
 			System.setProperty(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE, "you");
 			System.setProperty(JiraConnector.BUGTRACKER_JIRA_FIELD + "application", "app");
@@ -187,11 +188,11 @@ public class TestBugTrackerReporter extends ReporterTest {
 			Assert.assertTrue(detailedReportContent.contains(String.format("<th>Issue date</th><td>%s", creationDate)));
 			
 		} finally {
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_TYPE);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PROJECT);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_URL);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_TYPE);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_PROJECT);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_URL);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_USER);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_PASSWORD);
 			System.clearProperty(BugTracker.BUGTRACKER_ISSUE_REPORTER);
 			System.clearProperty(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE);
 			System.clearProperty(JiraConnector.BUGTRACKER_JIRA_FIELD + "application");
@@ -204,11 +205,11 @@ public class TestBugTrackerReporter extends ReporterTest {
 	@Test(groups={"it"})
 	public void testIssueRecordedOnceAllRetriesDoneAfterTestMethod() throws Exception {
 		try {
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_TYPE, "fake");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_URL, "http://localhost:1234");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_PROJECT, "Project");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_USER, "fake");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD, "fake");
+			System.setProperty(BugTrackerContext.BUGTRACKER_TYPE, "fake");
+			System.setProperty(BugTrackerContext.BUGTRACKER_URL, "http://localhost:1234");
+			System.setProperty(BugTrackerContext.BUGTRACKER_PROJECT, "Project");
+			System.setProperty(BugTrackerContext.BUGTRACKER_USER, "fake");
+			System.setProperty(BugTrackerContext.BUGTRACKER_PASSWORD, "fake");
 			System.setProperty(BugTracker.BUGTRACKER_ISSUE_REPORTER, "me");
 			System.setProperty(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE, "you");
 			System.setProperty(JiraConnector.BUGTRACKER_JIRA_FIELD + "application", "app");
@@ -228,11 +229,11 @@ public class TestBugTrackerReporter extends ReporterTest {
 			Assert.assertEquals(StringUtils.countMatches(logs, "Issue 1234 created"), 1);
 			
 		} finally {
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_TYPE);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PROJECT);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_URL);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_TYPE);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_PROJECT);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_URL);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_USER);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_PASSWORD);
 			System.clearProperty(BugTracker.BUGTRACKER_ISSUE_REPORTER);
 			System.clearProperty(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE);
 			System.clearProperty(JiraConnector.BUGTRACKER_JIRA_FIELD + "application");
@@ -247,11 +248,11 @@ public class TestBugTrackerReporter extends ReporterTest {
 	@Test(groups={"it"})
 	public void testIssueIsRecordedInReports() throws Exception {
 		try {
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_TYPE, "jira");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_URL, "http://localhost:1234");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_PROJECT, "Project");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_USER, "jira");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD, "jira");
+			System.setProperty(BugTrackerContext.BUGTRACKER_TYPE, "jira");
+			System.setProperty(BugTrackerContext.BUGTRACKER_URL, "http://localhost:1234");
+			System.setProperty(BugTrackerContext.BUGTRACKER_PROJECT, "Project");
+			System.setProperty(BugTrackerContext.BUGTRACKER_USER, "jira");
+			System.setProperty(BugTrackerContext.BUGTRACKER_PASSWORD, "jira");
 			System.setProperty(BugTracker.BUGTRACKER_ISSUE_REPORTER, "me");
 			System.setProperty(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE, "you");
 			System.setProperty(JiraConnector.BUGTRACKER_JIRA_FIELD + "application", "app");
@@ -275,11 +276,11 @@ public class TestBugTrackerReporter extends ReporterTest {
 			Assert.assertTrue(detailedReportContent.contains(String.format("<th>Issue date</th><td>%s</td>", jiraBean.getCreationDate())));
 			
 		} finally {
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_TYPE);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PROJECT);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_URL);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_TYPE);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_PROJECT);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_URL);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_USER);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_PASSWORD);
 			System.clearProperty(BugTracker.BUGTRACKER_ISSUE_REPORTER);
 			System.clearProperty(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE);
 			System.clearProperty(JiraConnector.BUGTRACKER_JIRA_FIELD + "application");
@@ -294,11 +295,11 @@ public class TestBugTrackerReporter extends ReporterTest {
 	@Test(groups={"it"})
 	public void testIssueIsRecordedInReportsNoURL() throws Exception {
 		try {
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_TYPE, "jira");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_URL, "http://localhost:1234");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_PROJECT, "Project");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_USER, "jira");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD, "jira");
+			System.setProperty(BugTrackerContext.BUGTRACKER_TYPE, "jira");
+			System.setProperty(BugTrackerContext.BUGTRACKER_URL, "http://localhost:1234");
+			System.setProperty(BugTrackerContext.BUGTRACKER_PROJECT, "Project");
+			System.setProperty(BugTrackerContext.BUGTRACKER_USER, "jira");
+			System.setProperty(BugTrackerContext.BUGTRACKER_PASSWORD, "jira");
 			System.setProperty(BugTracker.BUGTRACKER_ISSUE_REPORTER, "me");
 			System.setProperty(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE, "you");
 			System.setProperty(JiraConnector.BUGTRACKER_JIRA_FIELD + "application", "app");
@@ -321,11 +322,11 @@ public class TestBugTrackerReporter extends ReporterTest {
 			Assert.assertTrue(detailedReportContent.contains(String.format("<th>Issue date</th><td>%s</td>", jiraBean.getCreationDate())));
 			
 		} finally {
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_TYPE);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PROJECT);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_URL);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_TYPE);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_PROJECT);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_URL);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_USER);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_PASSWORD);
 			System.clearProperty(BugTracker.BUGTRACKER_ISSUE_REPORTER);
 			System.clearProperty(BugTracker.BUGTRACKER_ISSUE_ASSIGNEE);
 			System.clearProperty(JiraConnector.BUGTRACKER_JIRA_FIELD + "application");
@@ -339,11 +340,11 @@ public class TestBugTrackerReporter extends ReporterTest {
 	@Test(groups={"it"})
 	public void testNoIssueIsRecordedWithTestSuccess() throws Exception {
 		try {
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_TYPE, "jira");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_URL, "http://localhost:1234");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_PROJECT, "Project");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_USER, "jira");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD, "jira");
+			System.setProperty(BugTrackerContext.BUGTRACKER_TYPE, "jira");
+			System.setProperty(BugTrackerContext.BUGTRACKER_URL, "http://localhost:1234");
+			System.setProperty(BugTrackerContext.BUGTRACKER_PROJECT, "Project");
+			System.setProperty(BugTrackerContext.BUGTRACKER_USER, "jira");
+			System.setProperty(BugTrackerContext.BUGTRACKER_PASSWORD, "jira");
 
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
 			
@@ -352,11 +353,11 @@ public class TestBugTrackerReporter extends ReporterTest {
 			verify(jiraConnector).closeIssue(eq("core"), eq("DEV"), anyString(), eq("testAndSubActions"));
 			
 		} finally {
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_TYPE);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PROJECT);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_URL);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_TYPE);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_PROJECT);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_URL);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_USER);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_PASSWORD);
 		}
 	}
 	
@@ -367,11 +368,11 @@ public class TestBugTrackerReporter extends ReporterTest {
 	@Test(groups={"it"})
 	public void testNoIssueIsRecordedWithTestSkipped() throws Exception {
 		try {
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_TYPE, "jira");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_URL, "http://localhost:1234");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_PROJECT, "Project");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_USER, "jira");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD, "jira");
+			System.setProperty(BugTrackerContext.BUGTRACKER_TYPE, "jira");
+			System.setProperty(BugTrackerContext.BUGTRACKER_URL, "http://localhost:1234");
+			System.setProperty(BugTrackerContext.BUGTRACKER_PROJECT, "Project");
+			System.setProperty(BugTrackerContext.BUGTRACKER_USER, "jira");
+			System.setProperty(BugTrackerContext.BUGTRACKER_PASSWORD, "jira");
 			
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testSkipped"});
 			
@@ -380,11 +381,11 @@ public class TestBugTrackerReporter extends ReporterTest {
 			
 			
 		} finally {
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_TYPE);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PROJECT);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_URL);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_TYPE);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_PROJECT);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_URL);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_USER);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_PASSWORD);
 		}
 	}
 	
@@ -395,11 +396,11 @@ public class TestBugTrackerReporter extends ReporterTest {
 	@Test(groups={"it"})
 	public void testNoIssueIsRecordeWithoutBugTracker() throws Exception {
 		try {
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_TYPE, "foo");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_URL, "http://localhost:1234");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_PROJECT, "Project");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_USER, "jira");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD, "jira");
+			System.setProperty(BugTrackerContext.BUGTRACKER_TYPE, "foo");
+			System.setProperty(BugTrackerContext.BUGTRACKER_URL, "http://localhost:1234");
+			System.setProperty(BugTrackerContext.BUGTRACKER_PROJECT, "Project");
+			System.setProperty(BugTrackerContext.BUGTRACKER_USER, "jira");
+			System.setProperty(BugTrackerContext.BUGTRACKER_PASSWORD, "jira");
 			
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testInError"});
 			
@@ -408,21 +409,21 @@ public class TestBugTrackerReporter extends ReporterTest {
 			
 			
 		} finally {
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_TYPE);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PROJECT);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_URL);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_TYPE);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_PROJECT);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_URL);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_USER);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_PASSWORD);
 		}
 	}
 	
 	@Test(groups={"it"})
 	public void testIssueNotRecordedMissingProject() throws Exception {
 		try {
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_TYPE, "jira");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_URL, "http://localhost:1234");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_USER, "jira");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD, "jira");
+			System.setProperty(BugTrackerContext.BUGTRACKER_TYPE, "jira");
+			System.setProperty(BugTrackerContext.BUGTRACKER_URL, "http://localhost:1234");
+			System.setProperty(BugTrackerContext.BUGTRACKER_USER, "jira");
+			System.setProperty(BugTrackerContext.BUGTRACKER_PASSWORD, "jira");
 
 			PowerMockito.whenNew(JiraConnector.class).withAnyArguments().thenThrow(new ConfigurationException(""));
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testInError"});
@@ -430,10 +431,10 @@ public class TestBugTrackerReporter extends ReporterTest {
 			verify(jiraConnector, never()).createIssue(any(), any(), any(), any(), any(), any(), any());
 			
 		} finally {
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_TYPE);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_URL);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_TYPE);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_URL);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_USER);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_PASSWORD);
 		}
 	}	
 	
@@ -444,11 +445,11 @@ public class TestBugTrackerReporter extends ReporterTest {
 	@Test(groups={"it"})
 	public void testIssueDescriptionIsInterpolated() throws Exception {
 		try {
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_TYPE, "jira");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_URL, "http://localhost:1234");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_PROJECT, "Project");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_USER, "jira");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD, "jira");
+			System.setProperty(BugTrackerContext.BUGTRACKER_TYPE, "jira");
+			System.setProperty(BugTrackerContext.BUGTRACKER_URL, "http://localhost:1234");
+			System.setProperty(BugTrackerContext.BUGTRACKER_PROJECT, "Project");
+			System.setProperty(BugTrackerContext.BUGTRACKER_USER, "jira");
+			System.setProperty(BugTrackerContext.BUGTRACKER_PASSWORD, "jira");
 
 			System.setProperty("url", "http://mysite.com");
 
@@ -464,11 +465,11 @@ public class TestBugTrackerReporter extends ReporterTest {
 
 			
 		} finally {
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_TYPE);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PROJECT);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_URL);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_TYPE);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_PROJECT);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_URL);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_USER);
+			System.clearProperty(BugTrackerContext.BUGTRACKER_PASSWORD);
 			System.clearProperty("url");
 		}
 	}

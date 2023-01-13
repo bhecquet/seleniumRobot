@@ -178,8 +178,8 @@ public class ReporterControler implements IReporter {
 	 */
 	private void changeTestResultsWithSnapshotComparison(List<ISuite> suites) {
 		
-		if (!(SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerActive()
-				&& SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshot())) {
+		if (!(SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerActive()
+				&& SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshot())) {
 			return;
 		}
 		
@@ -249,11 +249,11 @@ public class ReporterControler implements IReporter {
 	 */
 	private void changeTestResultWithSnapshotComparison(ISuiteResult suiteResult, ITestResult testResult, int snapshotComparisonResult) {
 		// based on snapshot comparison flag, change test result only if comparison is KO
-		if (SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshotBehaviour() == SnapshotComparisonBehaviour.CHANGE_TEST_RESULT && snapshotComparisonResult == ITestResult.FAILURE ) {
+		if (SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshotBehaviour() == SnapshotComparisonBehaviour.CHANGE_TEST_RESULT && snapshotComparisonResult == ITestResult.FAILURE ) {
 			testResult.setStatus(ITestResult.FAILURE);
 			testResult.setThrowable(new ScenarioException("Snapshot comparison failed"));
 			
-		} else if (SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshotBehaviour() == SnapshotComparisonBehaviour.ADD_TEST_RESULT) {
+		} else if (SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshotBehaviour() == SnapshotComparisonBehaviour.ADD_TEST_RESULT) {
 			
 			ITestResult newTestResult;
 			try {

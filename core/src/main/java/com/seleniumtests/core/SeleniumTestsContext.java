@@ -54,6 +54,9 @@ import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnecto
 import com.seleniumtests.connectors.selenium.fielddetector.FieldDetectorConnector;
 import com.seleniumtests.connectors.tms.TestManager;
 import com.seleniumtests.core.config.ConfigReader;
+import com.seleniumtests.core.contexts.BugTrackerContext;
+import com.seleniumtests.core.contexts.SeleniumRobotServerContext;
+import com.seleniumtests.core.contexts.TestManagerContext;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
@@ -133,18 +136,7 @@ public class SeleniumTestsContext {
     public static final String FIND_ERROR_CAUSE = "findErrorCause";				// if 'true', try to find why the test failed
 
     public static final String IMAGE_FIELD_DETECTOR_SERVER_URL = "imageFieldDetectorServerUrl";		// URL of the server that can find fields in an image
-    
-    // selenium robot server parameters
-    public static final String SELENIUMROBOTSERVER_URL = "seleniumRobotServerUrl";
-    public static final String SELENIUMROBOTSERVER_ACTIVE = "seleniumRobotServerActive";
-    public static final String SELENIUMROBOTSERVER_TOKEN = "seleniumRobotServerToken";
-    public static final String SELENIUMROBOTSERVER_COMPARE_SNAPSHOT = "seleniumRobotServerCompareSnapshots";			// whether we should use the snapshots created by robot to compare them to a previous execution. This option only operates when SeleniumRobot server is connected
-    public static final String SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL = "seleniumRobotServerSnapshotsTtl";			// Time to live of the test session on seleniumRobot server
-    public static final String SELENIUMROBOTSERVER_RECORD_RESULTS = "seleniumRobotServerRecordResults";				// whether we should record test results to server. This option only operates when SeleniumRobot server is connected
-    public static final String SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN = "seleniumRobotServerVariablesOlderThan";	// whether we should get from server variables which were created at least X days ago
-    public static final String SELENIUMROBOTSERVER_VARIABLES_RESERVATION = "seleniumRobotServerVariablesReservation"; // duration of reservation of variable in minutes. By default, variable server reserves variable for 15 mins
-    public static final String SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR = "snapshotComparisonResult";
-    
+
     public static final String SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER = "setAssumeUntrustedCertificateIssuer"; // Firefox uniquement pour qu'il ne prenne pas en compte les certificats invalides 
     public static final String SET_ACCEPT_UNTRUSTED_CERTIFICATES = "setAcceptUntrustedCertificates"; // Firefox uniquement pour qu'il ne prenne pas en compte les certificats invalides
     public static final String NTLM_AUTH_TRUSTED_URIS = "ntlmAuthTrustedUris";	// Firefox uniquement
@@ -164,18 +156,6 @@ public class SeleniumTestsContext {
     public static final String WEB_PROXY_PAC = "proxyPac";						// adresse de configuration automatique du proxy
 
     public static final String TEST_ENTITY = "testEntity";						// Jamais utilisé
-
-    public static final String TMS_URL = TestManager.TMS_SERVER_URL;								// URL of the test manager  (e.g: Squash TM http://<squash_host>:<squash_port>)
-    public static final String TMS_USER = TestManager.TMS_USER;							// User which will access Test manager
-    public static final String TMS_PASSWORD = TestManager.TMS_PASSWORD;					// password of the user which will access Test Manager
-    public static final String TMS_PROJECT = TestManager.TMS_PROJECT;						// The project to which this test application is linked in Test manager    
-    public static final String TMS_TYPE = TestManager.TMS_TYPE;							// Type of the Test Manager ('squash' or 'hp')
-    
-	public static final String BUGTRACKER_TYPE = BugTracker.BUGTRACKER_TYPE;
-	public static final String BUGTRACKER_URL = BugTracker.BUGTRACKER_URL;
-	public static final String BUGTRACKER_PROJECT = BugTracker.BUGTRACKER_PROJECT;
-	public static final String BUGTRACKER_USER = BugTracker.BUGTRACKER_USER;
-	public static final String BUGTRACKER_PASSWORD = BugTracker.BUGTRACKER_PASSWORD;
     
     public static final String CAPTURE_SNAPSHOT = "captureSnapshot";
     public static final String CAPTURE_NETWORK = "captureNetwork";
@@ -264,21 +244,12 @@ public class SeleniumTestsContext {
 	public static final boolean DEFAULT_FIND_ERROR_CAUSE = false;
 	public static final String DEFAULT_RUN_MODE = "LOCAL";
 	public static final boolean DEFAULT_OVERRIDE_SELENIUM_NATIVE_ACTION = false;
-	public static final boolean DEFAULT_SELENIUMROBOTSERVER_RECORD_RESULTS = false;
-	public static final boolean DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT = false;
-	public static final int DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL = 30;
-	public static final int DEFAULT_SELENIUMROBOTSERVER_VARIABLES_RESERVATION = -1;
-	public static final SnapshotComparisonBehaviour DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR = SnapshotComparisonBehaviour.DISPLAY_ONLY;
-	public static final boolean DEFAULT_SELENIUMROBOTSERVER_ACTIVE = false;
-	public static final String DEFAULT_SELENIUMROBOTSERVER_TOKEN = null;
-	public static final int DEFAULT_SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN = 0;
 	public static final int DEFAULT_PAGE_LOAD_TIME_OUT = 90;
 	public static final PageLoadStrategy DEFAULT_PAGE_LOAD_STRATEGY = PageLoadStrategy.NORMAL;
 	public static final int DEFAULT_EXPLICIT_WAIT_TIME_OUT = 15;
 	public static final int DEFAULT_IMPLICIT_WAIT_TIME_OUT = 5;
 	public static final int DEFAULT_WEB_SESSION_TIMEOUT = 90000;
 	public static final int DEFAULT_TEST_RETRY_COUNT = 2;
-	public static final String DEFAULT_SELENIUMROBOTSERVER_URL = null;
 	public static final ProxyType DEFAULT_WEB_PROXY_TYPE = ProxyType.AUTODETECT;
 	public static final boolean DEFAULT_OPTIMIZE_REPORTS = false;
 	public static final ArchiveMode DEFAULT_ARCHIVE= ArchiveMode.NEVER;
@@ -286,10 +257,6 @@ public class SeleniumTestsContext {
 	public static final String DEFAULT_NODE_TAGS = "";
 	public static final String DEFAULT_DEBUG = "none";
 	public static final String DEFAULT_AUTOMATION_NAME = "Appium";
-	public static final String DEFAULT_TMS_URL = null;
-	public static final String DEFAULT_TMS_TYPE = null;
-	public static final String DEFAULT_BUGTRACKER_URL = null;
-	public static final String DEFAULT_BUGTRACKER_TYPE = null;
 	public static final String DEFAULT_STARTED_BY = null;
 	public static final boolean DEFAULT_REPORTPORTAL_ACTIVE = false;
 	public static final boolean DEFAULT_RANDOM_IN_ATTACHMENT_NAME = true;
@@ -315,7 +282,10 @@ public class SeleniumTestsContext {
     private SeleniumGridConnector seleniumGridConnector;
     private List<SeleniumGridConnector> seleniumGridConnectors;
     private TestManager testManagerInstance;
+    private TestManagerContext testManagerContext;
     private BugTracker	bugtrackerInstance;
+    private BugTrackerContext bugtrackerContext;
+    private SeleniumRobotServerContext seleniumRobotServerContext;
     private FieldDetectorConnector	fieldDetectorInstance;
     private TestStepManager testStepManager; // handles logging of test steps in this context
     private boolean driverCreationBlocked = false;		// if true, inside this thread, driver creation will be forbidden
@@ -331,6 +301,7 @@ public class SeleniumTestsContext {
     	testManagerInstance = null;
     	bugtrackerInstance = null;
     	fieldDetectorInstance = null;
+    	testManagerContext = null;
     	testStepManager = new TestStepManager();
     }
     
@@ -377,36 +348,24 @@ public class SeleniumTestsContext {
         testNGContext = context;
 
     	testStepManager = new TestStepManager();
+    	
+    	testManagerContext = new TestManagerContext(this);
+    	bugtrackerContext = new BugTrackerContext(this);
+    	seleniumRobotServerContext = new SeleniumRobotServerContext(this);
+    	
         buildContextFromConfig();
     }
     
     private void buildContextFromConfig() {
     	setConfiguration(new HashMap<>());
     	
+    	testManagerContext.init();
+    	bugtrackerContext.init();
+    	seleniumRobotServerContext.init();
+    	
     	setImageFieldDetectorServerUrl(getValueForTest(IMAGE_FIELD_DETECTOR_SERVER_URL, System.getProperty(IMAGE_FIELD_DETECTOR_SERVER_URL)));
-        setSeleniumRobotServerUrl(getValueForTest(SELENIUMROBOTSERVER_URL, System.getProperty(SELENIUMROBOTSERVER_URL)));
-        setSeleniumRobotServerActive(getBoolValueForTest(SELENIUMROBOTSERVER_ACTIVE, System.getProperty(SELENIUMROBOTSERVER_ACTIVE)));
-        setSeleniumRobotServerToken(getValueForTest(SELENIUMROBOTSERVER_TOKEN, System.getProperty(SELENIUMROBOTSERVER_TOKEN)));
-        setSeleniumRobotServerCompareSnapshot(getBoolValueForTest(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, System.getProperty(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT)));
-        setSeleniumRobotServerVariableReservationDuration(getIntValueForTest(SELENIUMROBOTSERVER_VARIABLES_RESERVATION, System.getProperty(SELENIUMROBOTSERVER_VARIABLES_RESERVATION)));
-        setSeleniumRobotServerCompareSnapshotTtl(getIntValueForTest(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL, System.getProperty(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL)));
-        setSeleniumRobotServerCompareSnapshotBehaviour(getValueForTest(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, System.getProperty(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR)));
-        setSeleniumRobotServerRecordResults(getBoolValueForTest(SELENIUMROBOTSERVER_RECORD_RESULTS, System.getProperty(SELENIUMROBOTSERVER_RECORD_RESULTS)));
-        setSeleniumRobotServerVariableOlderThan(getIntValueForTest(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN, System.getProperty(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN)));
-        
+           
         setFindErrorCause(getBoolValueForTest(FIND_ERROR_CAUSE, System.getProperty(FIND_ERROR_CAUSE)));
-        
-        setTmsType(getValueForTest(TMS_TYPE, System.getProperty(TMS_TYPE)));
-        setTmsUrl(getValueForTest(TMS_URL, System.getProperty(TMS_URL)));
-        setTmsUser(getValueForTest(TMS_USER, System.getProperty(TMS_USER)));
-        setTmsPassword(getValueForTest(TMS_PASSWORD, System.getProperty(TMS_PASSWORD)));
-        setTmsProject(getValueForTest(TMS_PROJECT, System.getProperty(TMS_PROJECT)));
-        
-        setBugtrackerType(getValueForTest(BUGTRACKER_TYPE, System.getProperty(BUGTRACKER_TYPE)));
-        setBugtrackerUrl(getValueForTest(BUGTRACKER_URL, System.getProperty(BUGTRACKER_URL)));
-        setBugtrackerUser(getValueForTest(BUGTRACKER_USER, System.getProperty(BUGTRACKER_USER)));
-        setBugtrackerPassword(getValueForTest(BUGTRACKER_PASSWORD, System.getProperty(BUGTRACKER_PASSWORD)));
-        setBugtrackerProject(getValueForTest(BUGTRACKER_PROJECT, System.getProperty(BUGTRACKER_PROJECT)));
         
         setWebDriverGrid(getValueForTest(WEB_DRIVER_GRID, System.getProperty(WEB_DRIVER_GRID)));
         setRunMode(getValueForTest(RUN_MODE, System.getProperty(RUN_MODE)));   
@@ -631,38 +590,6 @@ public class SeleniumTestsContext {
     	}
     }
     
-    // TODO: this call should be moved into postInit method as SeleniumRobotVariableServerConnector calls SeleniumTestsContextManager.getThreadContext() which may not be initialized
-    private SeleniumRobotVariableServerConnector connectSeleniumRobotServer() {
-    	
-    	if (testNGResult == null) {
-    		return null;
-    	}
-    	
-    	// in case we find the url of variable server and it's marked as active, use it
-		if (getSeleniumRobotServerActive() != null && getSeleniumRobotServerActive() && getSeleniumRobotServerUrl() != null) {
-			if (System.getProperty(SeleniumRobotLogger.MAVEN_EXECUTION) == null || System.getProperty(SeleniumRobotLogger.MAVEN_EXECUTION).equals("false")) {
-				logger.info(String.format("%s key found, and set to true, trying to get variable from variable server %s [%s]", 
-							SELENIUMROBOTSERVER_ACTIVE, 
-							getSeleniumRobotServerUrl(),
-							SELENIUMROBOTSERVER_URL));
-			}
-			SeleniumRobotVariableServerConnector vServer = new SeleniumRobotVariableServerConnector(getSeleniumRobotServerActive(), getSeleniumRobotServerUrl(), TestNGResultUtils.getTestName(testNGResult).replaceAll("^before-", ""), getSeleniumRobotServerToken());
-			
-			if (!vServer.isAlive()) {
-				throw new ConfigurationException(String.format("Variable server %s could not be contacted", getSeleniumRobotServerUrl()));
-			}
-			
-			return vServer;
-			
-		} else {
-			if (System.getProperty(SeleniumRobotLogger.MAVEN_EXECUTION) == null || System.getProperty(SeleniumRobotLogger.MAVEN_EXECUTION).equals("false")) {
-				logger.info(String.format("%s key not found or set to false, or url key %s has not been set", SELENIUMROBOTSERVER_ACTIVE, SELENIUMROBOTSERVER_URL));
-			}
-			return null;
-		}
-		
-    }
-    
     /**
      * returns the selenium grid connector if mode requests it
      * @return
@@ -774,7 +701,7 @@ public class SeleniumTestsContext {
      * @param  sysPropertyValue
      * @param  defaultValue
      */
-    private String getValueForTest(final String attributeName, final String sysPropertyValue) {
+    public String getValueForTest(final String attributeName, final String sysPropertyValue) {
     	String value = null;
         if (testNGContext != null) {
         	
@@ -806,7 +733,7 @@ public class SeleniumTestsContext {
      * @param sysPropertyValue
      * @return
      */
-    private Integer getIntValueForTest(final String attributeName, final String sysPropertyValue) {
+    public Integer getIntValueForTest(final String attributeName, final String sysPropertyValue) {
     	String value = getValueForTest(attributeName, sysPropertyValue);
     	try {
     		return value == null ? null: Integer.parseInt(value);
@@ -821,18 +748,9 @@ public class SeleniumTestsContext {
      * @param sysPropertyValue
      * @return
      */
-    private Boolean getBoolValueForTest(final String attributeName, final String sysPropertyValue) {
+    public Boolean getBoolValueForTest(final String attributeName, final String sysPropertyValue) {
     	String value = getValueForTest(attributeName, sysPropertyValue);
     	return value == null ? null: Boolean.parseBoolean(value);
-    }
-   
-    /**
-     * Connect all servers (grid, seleniumRobot server) to this context
-     */
-    private void createVariableServerConnectors() {
-
-        // create seleniumRobot server instance
-        variableServer = connectSeleniumRobotServer();
     }
     
     private void createContextConnectors() {
@@ -842,9 +760,9 @@ public class SeleniumTestsContext {
     	getSeleniumGridConnectors();
     	
     	// create Test Manager connector
-    	testManagerInstance = initTestManager();
+    	testManagerInstance = testManagerContext.createTestManagerConnector();
     	
-    	bugtrackerInstance = initBugtracker();
+    	bugtrackerInstance = bugtrackerContext.createBugtracker();
     	
     }
     
@@ -918,8 +836,9 @@ public class SeleniumTestsContext {
         
         // update ouput directory
         createTestSpecificOutputDirectory(testNGResult);
-
-        createVariableServerConnectors();
+        
+        // create seleniumRobot server instance
+        variableServer = seleniumRobotServerContext.createSeleniumRobotServer(testNGResult);
     	
         // read and set test configuration from env.ini file and from seleniumRobot server
     	setTestConfiguration();
@@ -993,7 +912,7 @@ public class SeleniumTestsContext {
     		
     		// get variable from server if they have never been get
     		if (variableAlreadyRequestedFromServer == null) {
-				variableAlreadyRequestedFromServer = variableServer.getVariables(getSeleniumRobotServerVariableOlderThan(), getSeleniumRobotServerVariableReservationDuration());
+				variableAlreadyRequestedFromServer = variableServer.getVariables(seleniumRobotServerContext.getSeleniumRobotServerVariableOlderThan(), seleniumRobotServerContext.getSeleniumRobotServerVariableReservationDuration());
     		}
     		getConfiguration().putAll(variableAlreadyRequestedFromServer);
 
@@ -1001,48 +920,6 @@ public class SeleniumTestsContext {
 			getConfiguration().putAll(getUserDefinedVariablesFromCommandLine());
     	}
     }
-	
-	public TestManager initTestManager() {
-		if (getTmsType() != null && getTmsUrl() != null) {
-			
-			// build configuration
-			JSONObject jsonConfig = new JSONObject();
-			jsonConfig.put(TMS_TYPE, getTmsType());
-			jsonConfig.put(TMS_URL, getTmsUrl());
-			jsonConfig.put(TMS_USER, getTmsUser());
-			jsonConfig.put(TMS_PASSWORD, getTmsPassword());
-			jsonConfig.put(TMS_PROJECT, getTmsProject());
-			
-			// add non standard configurations
-			for (String key: getConfiguration().keySet()) {
-				if (key.startsWith("tms")) {
-					jsonConfig.put(key, getConfiguration().get(key).getValue());
-				}
-			}
-			
-			TestManager tms = TestManager.getInstance(jsonConfig);
-			
-			tms.init(jsonConfig);
-			return tms;
-		}
-		return null;
-	}
-	
-	public BugTracker initBugtracker() {
-		if (getBugtrackerType() != null && getBugtrackerUrl() != null) {
-			
-			// any options specific to this bugtracker may be given in the form 'bugtracker.xxx'
-			Map<String, String> bugtrackerOptions = new HashMap<>();
-			for (TestVariable variable: getConfiguration().values()) {
-				if (variable.getName().startsWith(BugTracker.BUGTRACKER_PREFIX)) {
-					bugtrackerOptions.put(variable.getName(), variable.getValue());
-				}
-			}
-			
-			return BugTracker.getInstance(getBugtrackerType(), getBugtrackerUrl(), getBugtrackerProject(), getBugtrackerUser(), getBugtrackerPassword(), bugtrackerOptions);
-		}
-		return null;
-	}
 	
 	/**
 	 * initialize the image field detector
@@ -1223,46 +1100,6 @@ public class SeleniumTestsContext {
     	return (Boolean) getAttribute(BETA_BROWSER);
     }
     
-    public String getTmsType() {
-    	return (String) getAttribute(TMS_TYPE);
-    }
-    
-    public String getTmsUrl() {
-    	return (String) getAttribute(TMS_URL);
-    }
-    
-    public String getTmsUser() {
-    	return (String) getAttribute(TMS_USER);
-    }
-    
-    public String getTmsPassword() {
-    	return (String) getAttribute(TMS_PASSWORD);
-    }
-    
-    public String getTmsProject() {
-    	return (String) getAttribute(TMS_PROJECT);
-    }
-    
-    public String getBugtrackerType() {
-    	return (String) getAttribute(BUGTRACKER_TYPE);
-    }
-    
-    public String getBugtrackerUrl() {
-    	return (String) getAttribute(BUGTRACKER_URL, true);
-    }
-    
-    public String getBugtrackerUser() {
-    	return (String) getAttribute(BUGTRACKER_USER, true);
-    }
-    
-    public String getBugtrackerPassword() {
-    	return (String) getAttribute(BUGTRACKER_PASSWORD, true);
-    }
-    
-    public String getBugtrackerProject() {
-    	return (String) getAttribute(BUGTRACKER_PROJECT, true);
-    }
-    
     @SuppressWarnings("unchecked")
 	public List<Class<?>> getReporterPluginClasses() {
     	List<Class<?>> userDefinedClasses = new ArrayList<>();
@@ -1313,43 +1150,7 @@ public class SeleniumTestsContext {
     public String getImageFieldDetectorServerUrl() {
     	return (String) getAttribute(IMAGE_FIELD_DETECTOR_SERVER_URL);
     }
-    
-    public String getSeleniumRobotServerUrl() {
-    	return (String) getAttribute(SELENIUMROBOTSERVER_URL);
-    }
-    
-    public Boolean getSeleniumRobotServerActive() {
-    	return (Boolean) getAttribute(SELENIUMROBOTSERVER_ACTIVE);
-    }
-    
-    public String getSeleniumRobotServerToken() {
-    	return (String) getAttribute(SELENIUMROBOTSERVER_TOKEN);
-    }
-    
-    public boolean getSeleniumRobotServerCompareSnapshot() {
-    	return (Boolean) getAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
-    }
-    
-    public SnapshotComparisonBehaviour getSeleniumRobotServerCompareSnapshotBehaviour() {
-    	return (SnapshotComparisonBehaviour) getAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR);
-    }
-    
-    public Integer getSeleniumRobotServerVariableOlderThan() {
-    	return (Integer) getAttribute(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN);
-    }
-    
-    public Integer getSeleniumRobotServerCompareSnapshotTtl() {
-    	return (Integer) getAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL);
-    }
-    
-    public Integer getSeleniumRobotServerVariableReservationDuration() {
-    	return (Integer) getAttribute(SELENIUMROBOTSERVER_VARIABLES_RESERVATION);
-    }
-    
-    public boolean getSeleniumRobotServerRecordResults() {
-    	return (Boolean) getAttribute(SELENIUMROBOTSERVER_RECORD_RESULTS);
-    }
-    
+ 
     public boolean getOverrideSeleniumNativeAction() {
     	return (Boolean) getAttribute(OVERRIDE_SELENIUM_NATIVE_ACTION);
     }
@@ -1935,88 +1736,6 @@ public class SeleniumTestsContext {
     	}
     }
     
-    public void setSeleniumRobotServerUrl(String url) {
-    	if (url != null) {
-    		setAttribute(SELENIUMROBOTSERVER_URL, url);
-    	} else if (System.getenv(SELENIUMROBOTSERVER_URL) != null) {
-    		setAttribute(SELENIUMROBOTSERVER_URL, System.getenv(SELENIUMROBOTSERVER_URL));
-    	} else {
-    		setAttribute(SELENIUMROBOTSERVER_URL, DEFAULT_SELENIUMROBOTSERVER_URL);
-    	}
-    }
-    
-    public void setSeleniumRobotServerActive(Boolean active) {
-    	if (active != null) {
-    		setAttribute(SELENIUMROBOTSERVER_ACTIVE, active);
-    	} else {
-    		setAttribute(SELENIUMROBOTSERVER_ACTIVE, DEFAULT_SELENIUMROBOTSERVER_ACTIVE);
-    	}
-    	
-    	if (getSeleniumRobotServerUrl() == null && getSeleniumRobotServerActive()) {
-    		throw new ConfigurationException("SeleniumRobot server is requested but URL is not found, either in parameters, command line or through environment variable");
-    	}
-    }
-    
-    public void setSeleniumRobotServerToken(String token) {
-    	if (token != null) {
-    		setAttribute(SELENIUMROBOTSERVER_TOKEN, token);
-    	} else {
-    		setAttribute(SELENIUMROBOTSERVER_TOKEN, DEFAULT_SELENIUMROBOTSERVER_TOKEN);
-    	}
-    }
-    
-    public void setSeleniumRobotServerCompareSnapshot(Boolean capture) {
-    	if (capture != null) {
-    		setAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, capture);
-    	} else {
-    		setAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
-    	}
-    }
-    
-    public void setSeleniumRobotServerCompareSnapshotBehaviour(String compareSnapshotBehaviour) {
-    	if (compareSnapshotBehaviour != null) {
-    		setAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, SnapshotComparisonBehaviour.fromString(compareSnapshotBehaviour));
-    	} else {
-    		setAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR);
-    	}
-    }
-    
-    public void setSeleniumRobotServerVariableOlderThan(Integer olderThan) {
-    	if (olderThan != null) {
-    		setAttribute(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN, olderThan);
-    	} else {
-    		setAttribute(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN, DEFAULT_SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN);
-    	}
-    }
-    
-    /**
-     * set time to live for snapshot comparison session
-     * @param timeToLive
-     */
-    public void setSeleniumRobotServerCompareSnapshotTtl(Integer timeToLive) {
-    	if (timeToLive != null) {
-    		setAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL, timeToLive);
-    	} else {
-    		setAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL, DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL);
-    	}
-    }
-    
-    public void setSeleniumRobotServerVariableReservationDuration(Integer reservationDuration) {
-    	if (reservationDuration != null) {
-    		setAttribute(SELENIUMROBOTSERVER_VARIABLES_RESERVATION, reservationDuration);
-    	} else {
-    		setAttribute(SELENIUMROBOTSERVER_VARIABLES_RESERVATION, DEFAULT_SELENIUMROBOTSERVER_VARIABLES_RESERVATION);
-    	}
-    }
-    
-    public void setSeleniumRobotServerRecordResults(Boolean recordResult) {
-    	if (recordResult != null) {
-    		setAttribute(SELENIUMROBOTSERVER_RECORD_RESULTS, recordResult);
-    	} else {
-    		setAttribute(SELENIUMROBOTSERVER_RECORD_RESULTS, DEFAULT_SELENIUMROBOTSERVER_RECORD_RESULTS);
-    	}
-    }
-    
     public void setVariableAlreadyRequestedFromServer(Map<String, TestVariable> variableAlreadyRequestedFromServer) {
 		this.variableAlreadyRequestedFromServer = variableAlreadyRequestedFromServer;
 	}
@@ -2065,62 +1784,6 @@ public class SeleniumTestsContext {
     	} else {
     		setAttribute(INITIAL_URL, DEFAULT_INITIAL_URL);
     	}
-    }
-    
-    public void setTmsUrl(String url) {
-    	if (url != null) {
-    		setAttribute(TMS_URL, url);
-    	} else {
-    		setAttribute(TMS_URL, DEFAULT_TMS_URL);
-    	}
-    }
-    
-    public void setTmsType(String type) {
-    	if (type != null) {
-    		setAttribute(TMS_TYPE, type);
-    	} else {
-    		setAttribute(TMS_TYPE, DEFAULT_TMS_TYPE);
-    	}
-    }
-    
-    public void setTmsUser(String user){
-    	setAttribute(TMS_USER, user);
-    }
-    
-    public void setTmsPassword(String password){
-    	setAttribute(TMS_PASSWORD, password);
-    }
-    
-    public void setTmsProject(String project){
-    	setAttribute(TMS_PROJECT, project);
-    }
-    
-    public void setBugtrackerUrl(String url) {
-    	if (url != null) {
-    		setAttribute(BUGTRACKER_URL, url);
-    	} else {
-    		setAttribute(BUGTRACKER_URL, DEFAULT_BUGTRACKER_URL);
-    	}
-    }
-    
-    public void setBugtrackerType(String type) {
-    	if (type != null) {
-    		setAttribute(BUGTRACKER_TYPE, type);
-    	} else {
-    		setAttribute(BUGTRACKER_TYPE, DEFAULT_BUGTRACKER_TYPE);
-    	}
-    }
-    
-    public void setBugtrackerUser(String user){
-    	setAttribute(BUGTRACKER_USER, user);
-    }
-    
-    public void setBugtrackerPassword(String password){
-    	setAttribute(BUGTRACKER_PASSWORD, password);
-    }
-    
-    public void setBugtrackerProject(String project){
-    	setAttribute(BUGTRACKER_PROJECT, project);
     }
     
     public void setFieldDetectorInstance(FieldDetectorConnector fieldDetectorInstance) {
@@ -2710,4 +2373,25 @@ public class SeleniumTestsContext {
 	public void setSeleniumGridConnectors(List<SeleniumGridConnector> seleniumGridConnectors) {
 		this.seleniumGridConnectors = seleniumGridConnectors;
 	}
+	
+	/**
+	 * Access method to allow, from test, to write e.g: 'robotConfig().testManager().setTestId(1)'
+	 * @return
+	 */
+	public TestManagerContext testManager() {
+		return testManagerContext;
+	}
+	
+	/**
+	 * Access method to allow, from test, to write e.g: 'robotConfig().bugtracker().setAssignee("foo")'
+	 * @return
+	 */
+	public BugTrackerContext bugtracker() {
+		return bugtrackerContext;
+	}
+	
+	public SeleniumRobotServerContext seleniumServer() {
+		return seleniumRobotServerContext;
+	}
+
 }

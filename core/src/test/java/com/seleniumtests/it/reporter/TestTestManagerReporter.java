@@ -46,6 +46,7 @@ import com.seleniumtests.connectors.tms.squash.entities.Project;
 import com.seleniumtests.connectors.tms.squash.entities.TestCase;
 import com.seleniumtests.connectors.tms.squash.entities.TestPlanItemExecution.ExecutionStatus;
 import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.core.contexts.TestManagerContext;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.reporter.reporters.CommonReporter;
 
@@ -84,11 +85,11 @@ public class TestTestManagerReporter extends ReporterTest {
 	@Test(groups={"it"})
 	public void testResultIsRecorded() throws Exception {
 		try {
-			System.setProperty(SeleniumTestsContext.TMS_TYPE, "squash");
-			System.setProperty(SeleniumTestsContext.TMS_URL, "http://localhost:1234");
-			System.setProperty(SeleniumTestsContext.TMS_PROJECT, "Project");
-			System.setProperty(SeleniumTestsContext.TMS_USER, "squash");
-			System.setProperty(SeleniumTestsContext.TMS_PASSWORD, "squash");
+			System.setProperty(TestManagerContext.TMS_TYPE, "squash");
+			System.setProperty(TestManagerContext.TMS_URL, "http://localhost:1234");
+			System.setProperty(TestManagerContext.TMS_PROJECT, "Project");
+			System.setProperty(TestManagerContext.TMS_USER, "squash");
+			System.setProperty(TestManagerContext.TMS_PASSWORD, "squash");
 			
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testWithAssert", "testInError", "testSkipped"});
 			
@@ -98,22 +99,22 @@ public class TestTestManagerReporter extends ReporterTest {
 			verify(api).setExecutionResult(iterationTestPlanItem, ExecutionStatus.BLOCKED);
 			
 		} finally {
-			System.clearProperty(SeleniumTestsContext.TMS_TYPE);
-			System.clearProperty(SeleniumTestsContext.TMS_PROJECT);
-			System.clearProperty(SeleniumTestsContext.TMS_URL);
-			System.clearProperty(SeleniumTestsContext.TMS_USER);
-			System.clearProperty(SeleniumTestsContext.TMS_PASSWORD);
+			System.clearProperty(TestManagerContext.TMS_TYPE);
+			System.clearProperty(TestManagerContext.TMS_PROJECT);
+			System.clearProperty(TestManagerContext.TMS_URL);
+			System.clearProperty(TestManagerContext.TMS_USER);
+			System.clearProperty(TestManagerContext.TMS_PASSWORD);
 		}
 	}
 	
 	@Test(groups={"it"})
 	public void testResultIsNotRecordedServerUnavailable() throws Exception {
 		try {
-			System.setProperty(SeleniumTestsContext.TMS_TYPE, "squash");
-			System.setProperty(SeleniumTestsContext.TMS_URL, "http://localhost:1234");
-			System.setProperty(SeleniumTestsContext.TMS_PROJECT, "Project");
-			System.setProperty(SeleniumTestsContext.TMS_USER, "squash");
-			System.setProperty(SeleniumTestsContext.TMS_PASSWORD, "squash");
+			System.setProperty(TestManagerContext.TMS_TYPE, "squash");
+			System.setProperty(TestManagerContext.TMS_URL, "http://localhost:1234");
+			System.setProperty(TestManagerContext.TMS_PROJECT, "Project");
+			System.setProperty(TestManagerContext.TMS_USER, "squash");
+			System.setProperty(TestManagerContext.TMS_PASSWORD, "squash");
 			doThrow(new ConfigurationException("Cannot contact Squash TM server API")).when(squash).getApi();
 			
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
@@ -122,21 +123,21 @@ public class TestTestManagerReporter extends ReporterTest {
 			verify(api, never()).setExecutionResult(eq(iterationTestPlanItem), any());
 			
 		} finally {
-			System.clearProperty(SeleniumTestsContext.TMS_TYPE);
-			System.clearProperty(SeleniumTestsContext.TMS_PROJECT);
-			System.clearProperty(SeleniumTestsContext.TMS_URL);
-			System.clearProperty(SeleniumTestsContext.TMS_USER);
-			System.clearProperty(SeleniumTestsContext.TMS_PASSWORD);
+			System.clearProperty(TestManagerContext.TMS_TYPE);
+			System.clearProperty(TestManagerContext.TMS_PROJECT);
+			System.clearProperty(TestManagerContext.TMS_URL);
+			System.clearProperty(TestManagerContext.TMS_USER);
+			System.clearProperty(TestManagerContext.TMS_PASSWORD);
 		}
 	}
 	
 	@Test(groups={"it"})
 	public void testResultIsNotRecordedServerNotConfigured() throws Exception {
 		try {
-			System.setProperty(SeleniumTestsContext.TMS_URL, "http://localhost:1234");
-			System.setProperty(SeleniumTestsContext.TMS_PROJECT, "Project");
-			System.setProperty(SeleniumTestsContext.TMS_USER, "squash");
-			System.setProperty(SeleniumTestsContext.TMS_PASSWORD, "squash");
+			System.setProperty(TestManagerContext.TMS_URL, "http://localhost:1234");
+			System.setProperty(TestManagerContext.TMS_PROJECT, "Project");
+			System.setProperty(TestManagerContext.TMS_USER, "squash");
+			System.setProperty(TestManagerContext.TMS_PASSWORD, "squash");
 			
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
 			
@@ -144,22 +145,22 @@ public class TestTestManagerReporter extends ReporterTest {
 			verify(squash, never()).getApi();
 			
 		} finally {
-			System.clearProperty(SeleniumTestsContext.TMS_TYPE);
-			System.clearProperty(SeleniumTestsContext.TMS_PROJECT);
-			System.clearProperty(SeleniumTestsContext.TMS_URL);
-			System.clearProperty(SeleniumTestsContext.TMS_USER);
-			System.clearProperty(SeleniumTestsContext.TMS_PASSWORD);
+			System.clearProperty(TestManagerContext.TMS_TYPE);
+			System.clearProperty(TestManagerContext.TMS_PROJECT);
+			System.clearProperty(TestManagerContext.TMS_URL);
+			System.clearProperty(TestManagerContext.TMS_USER);
+			System.clearProperty(TestManagerContext.TMS_PASSWORD);
 		}
 	}
 	
 	@Test(groups={"it"})
 	public void testResultIsNotRecordedWrongTestId() throws Exception {
 		try {
-			System.setProperty(SeleniumTestsContext.TMS_TYPE, "squash");
-			System.setProperty(SeleniumTestsContext.TMS_URL, "http://localhost:1234");
-			System.setProperty(SeleniumTestsContext.TMS_PROJECT, "Project");
-			System.setProperty(SeleniumTestsContext.TMS_USER, "squash");
-			System.setProperty(SeleniumTestsContext.TMS_PASSWORD, "squash");
+			System.setProperty(TestManagerContext.TMS_TYPE, "squash");
+			System.setProperty(TestManagerContext.TMS_URL, "http://localhost:1234");
+			System.setProperty(TestManagerContext.TMS_PROJECT, "Project");
+			System.setProperty(TestManagerContext.TMS_USER, "squash");
+			System.setProperty(TestManagerContext.TMS_PASSWORD, "squash");
 			
 			doThrow(new ConfigurationException("Wrong Test ID")).when(api).addTestCaseInIteration(eq(iteration), anyInt());
 			
@@ -169,11 +170,11 @@ public class TestTestManagerReporter extends ReporterTest {
 			verify(api, never()).setExecutionResult(eq(iterationTestPlanItem), any());
 			
 		} finally {
-			System.clearProperty(SeleniumTestsContext.TMS_TYPE);
-			System.clearProperty(SeleniumTestsContext.TMS_PROJECT);
-			System.clearProperty(SeleniumTestsContext.TMS_URL);
-			System.clearProperty(SeleniumTestsContext.TMS_USER);
-			System.clearProperty(SeleniumTestsContext.TMS_PASSWORD);
+			System.clearProperty(TestManagerContext.TMS_TYPE);
+			System.clearProperty(TestManagerContext.TMS_PROJECT);
+			System.clearProperty(TestManagerContext.TMS_URL);
+			System.clearProperty(TestManagerContext.TMS_USER);
+			System.clearProperty(TestManagerContext.TMS_PASSWORD);
 		}
 	}
 	

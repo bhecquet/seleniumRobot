@@ -45,7 +45,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		initThreadContext(ctx);
 		
 		// pass the token via  -DseleniumRobotServerToken=xxxxxx
-		connector = new SeleniumRobotSnapshotServerConnector(true, "http://localhost:8002", SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerToken());
+		connector = new SeleniumRobotSnapshotServerConnector(true, "http://localhost:8002", SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerToken());
 		if (!connector.getActive()) {
 			throw new SkipException("no seleniumrobot server available");
 		}

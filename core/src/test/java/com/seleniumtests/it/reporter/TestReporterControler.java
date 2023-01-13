@@ -34,6 +34,7 @@ import org.testng.xml.XmlSuite.ParallelMode;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.contexts.SeleniumRobotServerContext;
 import com.seleniumtests.core.testanalysis.ErrorCauseFinder;
 import com.seleniumtests.reporter.reporters.ReporterControler;
 
@@ -279,9 +280,9 @@ public class TestReporterControler extends ReporterTest {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.FIND_ERROR_CAUSE, "true");
-			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
-			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
-			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			
 			PowerMockito.whenNew(ErrorCauseFinder.class).withAnyArguments().thenReturn(errorCauseFinder);
 			configureMockedSnapshotServerConnection();
@@ -293,9 +294,9 @@ public class TestReporterControler extends ReporterTest {
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.FIND_ERROR_CAUSE);
-			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
-			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
-			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
 		}
 		
 	}
@@ -309,9 +310,9 @@ public class TestReporterControler extends ReporterTest {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.FIND_ERROR_CAUSE, "true");
-			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
-			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
-			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			
 			PowerMockito.whenNew(ErrorCauseFinder.class).withAnyArguments().thenReturn(errorCauseFinder);
 			configureMockedSnapshotServerConnection();
@@ -323,9 +324,9 @@ public class TestReporterControler extends ReporterTest {
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.FIND_ERROR_CAUSE);
-			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
-			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
-			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
 		}
 		
 	}
@@ -339,9 +340,9 @@ public class TestReporterControler extends ReporterTest {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.FIND_ERROR_CAUSE, "true");
-			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
-			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
-			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			
 			PowerMockito.whenNew(ErrorCauseFinder.class).withAnyArguments().thenReturn(errorCauseFinder);
 			configureMockedSnapshotServerConnection();
@@ -353,9 +354,9 @@ public class TestReporterControler extends ReporterTest {
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.FIND_ERROR_CAUSE);
-			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
-			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
-			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
 		}
 		
 	}
@@ -372,9 +373,9 @@ public class TestReporterControler extends ReporterTest {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.FIND_ERROR_CAUSE, "false");
-			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
-			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
-			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			
 			PowerMockito.whenNew(ErrorCauseFinder.class).withAnyArguments().thenReturn(errorCauseFinder);
 			configureMockedSnapshotServerConnection();
@@ -386,9 +387,9 @@ public class TestReporterControler extends ReporterTest {
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.FIND_ERROR_CAUSE);
-			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
-			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
-			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
 		}
 		
 	}
@@ -405,9 +406,9 @@ public class TestReporterControler extends ReporterTest {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.FIND_ERROR_CAUSE, "false");
-			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
-			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
-			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "false");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "false");
 			
 			PowerMockito.whenNew(ErrorCauseFinder.class).withAnyArguments().thenReturn(errorCauseFinder);
 			configureMockedSnapshotServerConnection();
@@ -419,9 +420,9 @@ public class TestReporterControler extends ReporterTest {
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.FIND_ERROR_CAUSE);
-			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
-			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
-			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
 		}
 		
 	}

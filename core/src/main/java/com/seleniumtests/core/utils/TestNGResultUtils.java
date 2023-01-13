@@ -438,10 +438,10 @@ public class TestNGResultUtils {
 	public static void changeTestResultWithSnapshotComparison(final ITestResult testResult) {
 		
 		if (testResult.getStatus() == ITestResult.FAILURE  // test is already failed
-				|| !Boolean.TRUE.equals(SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerActive())
-				|| SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshotBehaviour() == SnapshotComparisonBehaviour.DISPLAY_ONLY // as the comparison result is only displayed, do not retry
-				|| SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshotBehaviour() == SnapshotComparisonBehaviour.ADD_TEST_RESULT // complicated to set the test failed, and then success again
-				|| !SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshot()) {
+				|| !Boolean.TRUE.equals(SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerActive())
+				|| SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshotBehaviour() == SnapshotComparisonBehaviour.DISPLAY_ONLY // as the comparison result is only displayed, do not retry
+				|| SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshotBehaviour() == SnapshotComparisonBehaviour.ADD_TEST_RESULT // complicated to set the test failed, and then success again
+				|| !SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshot()) {
 			return;
 		}
 		
