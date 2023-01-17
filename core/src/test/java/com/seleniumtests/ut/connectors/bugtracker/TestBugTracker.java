@@ -91,8 +91,8 @@ public class TestBugTracker extends MockitoTest {
 		stepEnd.addSnapshot(new Snapshot(screenshot, "end2", SnapshotCheckType.FULL), 1, null);
 		stepEnd.setPosition(2);
 		
-		issueOptions.put("reporter", "you");
-		issueOptions.put("assignee", "me");
+		issueOptions.put("bugtracker.reporter", "you");
+		issueOptions.put("bugtracker.assignee", "me");
 		
 		BugTracker.resetBugTrackerInstances();
 		
