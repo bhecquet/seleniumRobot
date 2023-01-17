@@ -439,8 +439,6 @@ public class TestHtmlElement extends MockitoTest {
 		finalCheck(true);
 	}
 
-	// issue #498
-	// sendKeysAction("text", Keys.ESCV, "other text");
 	@Test(groups = { "ut" })
 	public void testSendKeysWithPause() throws Exception {
 		el.sendKeysAction(10, "toto", "titi", "meduse");
