@@ -95,12 +95,12 @@ public class TestTestManagerContext extends ConnectorsTest {
 		SeleniumTestsContextManager.getThreadContext().testManager().setTestId(1);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get(TestManager.TMS_TEST_ID).getValue(), "1");
 	}
-	@Test(groups="ut context", expectedExceptions = UnsupportedOperationException.class)
+	@Test(groups="ut", expectedExceptions = UnsupportedOperationException.class)
 	public void testTmsSquashCampaignNullTms(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().testManager().setCampaignName("campaign");
 	}
-	@Test(groups="ut context")
+	@Test(groups="ut")
 	public void testTmsSquashCampaign(final ITestContext testNGCtx, final XmlTest xmlTest) throws NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 		try {
 			System.setProperty(TestManagerContext.TMS_TYPE, "squash");
@@ -128,12 +128,12 @@ public class TestTestManagerContext extends ConnectorsTest {
 			System.clearProperty(TestManagerContext.TMS_PROJECT);
 		}		
 	}
-	@Test(groups="ut context", expectedExceptions = UnsupportedOperationException.class)
+	@Test(groups="ut", expectedExceptions = UnsupportedOperationException.class)
 	public void testTmsSquashIterationNullTms(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().testManager().setIterationName("iteration");
 	}
-	@Test(groups="ut context")
+	@Test(groups="ut")
 	public void testTmsSquashIteration(final ITestContext testNGCtx, final XmlTest xmlTest) throws NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 		try {
 			System.setProperty(TestManagerContext.TMS_TYPE, "squash");
