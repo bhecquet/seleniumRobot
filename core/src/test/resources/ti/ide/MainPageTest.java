@@ -56,6 +56,7 @@ public class MainPageTest {
     driver.findElement(By.id("selectIFrame")).click();
     driver.findElement(By.cssSelector("option")).click();
   }
+  
   @Test
   public void mainPage() {
     vars.put("toto", "coucou");
