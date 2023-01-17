@@ -95,13 +95,30 @@ public class SquashTMConnector extends TestManager {
 		
 		try {
 			SquashTMApi sapi = getApi();
-			Integer testId = TestNGResultUtils.getTestCaseId(testResult);
+			Integer testId = getTestCaseId(testResult);
 			if (testId == null) {
 				return;
 			}
 	
-			Campaign campaign = sapi.createCampaign("Selenium " + testResult.getTestContext().getName(), "");
-			Iteration iteration = sapi.createIteration(campaign, TestNGResultUtils.getSeleniumRobotTestContext(testResult).getApplicationVersion());
+			// campaign
+			String campaignName;
+			if (TestNGResultUtils.getSeleniumRobotTestContext(testResult).testManager().getCampaignName() != null) {
+				campaignName = TestNGResultUtils.getSeleniumRobotTestContext(testResult).testManager().getCampaignName();
+			} else {
+				campaignName = "Selenium " + testResult.getTestContext().getName();
+			}
+			
+			Campaign campaign = sapi.createCampaign(campaignName, "");
+			
+			// iteration
+			String iterationName;
+			if (TestNGResultUtils.getSeleniumRobotTestContext(testResult).testManager().getIterationName() != null) {
+				iterationName = TestNGResultUtils.getSeleniumRobotTestContext(testResult).testManager().getIterationName();
+			} else {
+				iterationName = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getApplicationVersion();
+			}
+			
+			Iteration iteration = sapi.createIteration(campaign, iterationName);
 			
 			IterationTestPlanItem tpi = sapi.addTestCaseInIteration(iteration, testId);
 			

@@ -21,9 +21,12 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.ITestResult;
+import org.testng.annotations.CustomAttribute;
 
 import com.seleniumtests.connectors.tms.hpalm.HpAlmConnector;
 import com.seleniumtests.connectors.tms.squash.SquashTMConnector;
+import com.seleniumtests.core.TestVariable;
+import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -61,6 +64,33 @@ public abstract class TestManager {
 	public abstract void init(JSONObject connectParams);
 
 	public abstract void logout();
+	
+	 
+    /**
+     * Returns the ID of the test case for this test result or null if it's not defined
+     * It assumes that test method has been annotated with 'testId' custom attribute {@code @Test(attributes = {@CustomAttribute(name = "testId", values = "12")})} 
+     */
+    public Integer getTestCaseId(ITestResult testNGResult) {
+    	
+    	TestVariable testCaseIdVariable = TestNGResultUtils.getSeleniumRobotTestContext(testNGResult) != null ? TestNGResultUtils.getSeleniumRobotTestContext(testNGResult).getConfiguration().get(TMS_TEST_ID): null;
+    	
+    	// priority given to variables
+    	if (testCaseIdVariable != null) {
+    		return Integer.parseInt(testCaseIdVariable.getValue());
+    	}
+    	
+    	for (CustomAttribute customAttribute: testNGResult.getMethod().getAttributes()) {
+    		if ("testId".equals(customAttribute.name()) && customAttribute.values().length > 0) {
+    			try {
+    				return Integer.parseInt(customAttribute.values()[0]);
+    			} catch (NumberFormatException e) {
+    				logger.error(String.format("Could not parse %s as int for getting testId of test method %s", customAttribute.values()[0], testNGResult.getMethod().getMethodName()));
+    			}
+    		}
+    	}
+    	return null;
+    	
+    }
 	
 	public static TestManager getInstance(JSONObject configString) {
 

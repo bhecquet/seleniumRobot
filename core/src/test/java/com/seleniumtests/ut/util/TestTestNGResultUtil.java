@@ -389,24 +389,6 @@ public class TestTestNGResultUtil extends MockitoTest {
 		Assert.assertEquals(TestNGResultUtils.getTestInfo(tr).size(), 0);
 	}
 	
-	@Test(groups={"ut"}, attributes = {@CustomAttribute(name = "testId", values = "12")})
-	public void testTestCaseId() {
-		ITestResult tr = Reporter.getCurrentTestResult();
-		Assert.assertEquals(TestNGResultUtils.getTestCaseId(tr), (Integer)12);
-	}
-	
-	@Test(groups={"ut"}, attributes = {@CustomAttribute(name = "testId", values = "foo")})
-	public void testTestCaseIdWrongFormat() {
-		ITestResult tr = Reporter.getCurrentTestResult();
-		Assert.assertNull(TestNGResultUtils.getTestCaseId(tr));
-	}
-	
-	@Test(groups={"ut"})
-	public void testTestCaseIdNotDefined() {
-		ITestResult tr = Reporter.getCurrentTestResult();
-		Assert.assertNull(TestNGResultUtils.getTestCaseId(tr));
-	}
-	
 	/**
 	 * Test setting description with a method parameter
 	 * @param db

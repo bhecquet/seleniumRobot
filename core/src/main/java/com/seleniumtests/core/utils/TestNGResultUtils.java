@@ -398,24 +398,6 @@ public class TestNGResultUtils {
     }
     
     /**
-     * Returns the ID of the test case for this test result or null if it's not defined
-     * It assumes that test method has been annotated with 'testId' custom attribute {@code @Test(attributes = {@CustomAttribute(name = "testId", values = "12")})} 
-     */
-    public static Integer getTestCaseId(ITestResult testNGResult) {
-    	for (CustomAttribute customAttribute: testNGResult.getMethod().getAttributes()) {
-    		if ("testId".equals(customAttribute.name()) && customAttribute.values().length > 0) {
-    			try {
-    				return Integer.parseInt(customAttribute.values()[0]);
-    			} catch (NumberFormatException e) {
-    				logger.error(String.format("Could not parse %s as int for getting testId of test method %s", customAttribute.values()[0], testNGResult.getMethod().getMethodName()));
-    			}
-    		}
-    	}
-    	return null;
-    	
-    }
-    
-    /**
      * Returns the test description, interpolating variable
      * @param testNGResult
      * @return

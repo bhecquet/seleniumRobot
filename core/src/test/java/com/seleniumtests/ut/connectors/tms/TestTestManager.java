@@ -19,12 +19,17 @@ package com.seleniumtests.ut.connectors.tms;
 
 import org.json.JSONObject;
 import org.testng.Assert;
+import org.testng.ITestResult;
+import org.testng.Reporter;
+import org.testng.annotations.CustomAttribute;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.connectors.tms.TestManager;
 import com.seleniumtests.connectors.tms.hpalm.HpAlmConnector;
 import com.seleniumtests.connectors.tms.squash.SquashTMConnector;
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 
 
@@ -54,5 +59,43 @@ public class TestTestManager extends GenericTest {
 	public void testTmsSelectionNoType() {
 		String config = "{'tmsType': '3'}";
 		TestManager.getInstance(new JSONObject(config));
+	}
+	
+	
+	/**
+	 * #545: test the case where test id is set inside test, not as annotation parameter
+	 */
+	@Test(groups={"ut"})
+	public void testTestCaseIdFromContext() {
+		ITestResult tr = Reporter.getCurrentTestResult();
+		SeleniumTestsContextManager.getThreadContext().testManager().setTestId(23);
+		TestNGResultUtils.setSeleniumRobotTestContext(tr, SeleniumTestsContextManager.getThreadContext());
+		String config = "{'tmsType': 'squash'}";
+		TestManager manager = TestManager.getInstance(new JSONObject(config));
+		Assert.assertEquals(manager.getTestCaseId(tr), (Integer)23);
+	}
+	
+	@Test(groups={"ut"}, attributes = {@CustomAttribute(name = "testId", values = "12")})
+	public void testTestCaseId() {
+		ITestResult tr = Reporter.getCurrentTestResult();
+		String config = "{'tmsType': 'squash'}";
+		TestManager manager = TestManager.getInstance(new JSONObject(config));
+		Assert.assertEquals(manager.getTestCaseId(tr), (Integer)12);
+	}
+	
+	@Test(groups={"ut"}, attributes = {@CustomAttribute(name = "testId", values = "foo")})
+	public void testTestCaseIdWrongFormat() {
+		ITestResult tr = Reporter.getCurrentTestResult();
+		String config = "{'tmsType': 'squash'}";
+		TestManager manager = TestManager.getInstance(new JSONObject(config));
+		Assert.assertNull(manager.getTestCaseId(tr));
+	}
+	
+	@Test(groups={"ut"})
+	public void testTestCaseIdNotDefined() {
+		ITestResult tr = Reporter.getCurrentTestResult();
+		String config = "{'tmsType': 'squash'}";
+		TestManager manager = TestManager.getInstance(new JSONObject(config));
+		Assert.assertNull(manager.getTestCaseId(tr));
 	}
 }

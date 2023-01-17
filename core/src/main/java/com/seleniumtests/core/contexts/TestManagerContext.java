@@ -52,11 +52,27 @@ public class TestManagerContext {
 		}
 	}
 	
+	public String getCampaignName() {
+		try {
+			return context.getConfiguration().get(SquashTMConnector.SQUASH_CAMPAIGN).getValue();
+		} catch (NullPointerException e) {
+			return null;
+		}
+	}
+	
 	public void setIterationName(String name) {
 		if (context.getTestManagerInstance() instanceof SquashTMConnector) {
 			context.getConfiguration().put(SquashTMConnector.SQUASH_ITERATION, new TestVariable(SquashTMConnector.SQUASH_ITERATION, name));
 		} else {
 			throw new UnsupportedOperationException("Setting campaign name is only possible when Test manager is of type 'squash' ");
+		}
+	}
+	
+	public String getIterationName() {
+		try {
+			return context.getConfiguration().get(SquashTMConnector.SQUASH_ITERATION).getValue();
+		} catch (NullPointerException e) {
+			return null;
 		}
 	}
 	

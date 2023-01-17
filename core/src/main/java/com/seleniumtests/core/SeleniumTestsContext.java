@@ -2375,6 +2375,13 @@ public class SeleniumTestsContext {
 	}
 	
 	/**
+     * To be used by unit tests exclusively
+     */
+	public void setTestManagerInstance(TestManager testManagerInstance) {
+		this.testManagerInstance = testManagerInstance;
+	}
+	
+	/**
 	 * Access method to allow, from test, to write e.g: 'robotConfig().testManager().setTestId(1)'
 	 * @return
 	 */
