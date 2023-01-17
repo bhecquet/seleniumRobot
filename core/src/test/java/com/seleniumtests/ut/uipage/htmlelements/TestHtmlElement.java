@@ -440,6 +440,12 @@ public class TestHtmlElement extends MockitoTest {
 	}
 
 	@Test(groups = { "ut" })
+	public void testSendKeysWithPause() throws Exception {
+		el.sendKeysAction(10, "toto", "titi", "meduse");
+		finalCheck(true);
+	}
+
+	@Test(groups = { "ut" })
 	public void testSendKeysWithException() throws Exception {
 		when(element.getAttribute("type")).thenThrow(WebDriverException.class);
 		el.sendKeys("someText");

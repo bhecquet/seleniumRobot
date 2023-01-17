@@ -23,6 +23,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.openqa.selenium.Alert;
@@ -276,7 +277,34 @@ public class TestDriver extends GenericMultiBrowserTest {
 			driver.findElement(By.id("button2")).click();
 		}
 	}
-	
+
+	public void testSendKeysAction() {
+		try {
+			DriverTestPage.textElement.sendKeysAction("youpi@[]é");
+			Assert.assertEquals(DriverTestPage.textElement.getValue(), "youpi@[]é");
+		} finally {
+			driver.findElement(By.id("button2")).click();
+		}
+	}
+
+	public void testSendKeysActionWithPause() {
+		try {
+			long startTime = System.nanoTime();
+			DriverTestPage.textElement.sendKeysAction(500, "youpi@[]", " meduse");
+			long endTime = System.nanoTime();
+
+			long nanoDuration = endTime - startTime;
+			long secondDuration = TimeUnit.SECONDS.convert(nanoDuration, TimeUnit.NANOSECONDS);
+
+			Assert.assertEquals(DriverTestPage.textElement.getValue(), "youpi@[] meduse");
+
+			Assert.assertTrue(secondDuration < 10);
+			Assert.assertTrue(secondDuration > 7);
+		} finally {
+			driver.findElement(By.id("button2")).click();
+		}
+	}
+
 	public void testSendKeysKeyboard() {
 		try {
 			DriverTestPage.textElement.sendKeysKeyboard("youpi@[]é");
