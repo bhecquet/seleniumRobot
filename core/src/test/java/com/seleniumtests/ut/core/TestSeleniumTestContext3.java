@@ -61,7 +61,7 @@ import com.seleniumtests.driver.WebUIDriver;
  * @author behe
  *
  */
-@PrepareForTest({ SeleniumRobotVariableServerConnector.class, SeleniumGridConnectorFactory.class,
+@PrepareForTest({ SeleniumRobotVariableServerConnector.class, SeleniumRobotServerContext.class, SeleniumGridConnectorFactory.class,
 		SeleniumTestsContext.class, TestManager.class })
 public class TestSeleniumTestContext3 extends ConnectorsTest {
 
@@ -79,111 +79,6 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 //	@Mock
 //	private ITestNGMethod testMethod;
 
-	/**
-	 * Check we create a variable server if all connection params are present
-	 * 
-	 * @param testNGCtx
-	 * @param xmlTest
-	 * @throws Exception
-	 */
-	@Test(groups = "ut")
-	public void testVariableServerConnection(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
-		try {
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
-
-			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class)
-					.withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null))
-					.thenReturn(variableServer);
-			when(variableServer.isAlive()).thenReturn(true);
-
-			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
-			initThreadContext(testNGCtx, "myTest", testResult);
-
-			// check upsert has been called
-			verify(variableServer).isAlive();
-
-			Assert.assertNotNull(SeleniumTestsContextManager.getThreadContext().getVariableServer());
-
-		} finally {
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
-		}
-	}
-
-	/**
-	 * Check we create a no variable server if all it's not active
-	 * 
-	 * @param testNGCtx
-	 * @param xmlTest
-	 * @throws Exception
-	 */
-	@Test(groups = "ut")
-	public void testNoVariableServerIfNotRequested(final ITestContext testNGCtx, final XmlTest xmlTest)
-			throws Exception {
-		try {
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "false");
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
-
-			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
-			initThreadContext(testNGCtx, "myTest", testResult);
-
-			Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getVariableServer());
-
-		} finally {
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
-		}
-	}
-
-	/**
-	 * Check we create a no variable server if no URL
-	 * 
-	 * @param testNGCtx
-	 * @param xmlTest
-	 * @throws Exception
-	 */
-	@Test(groups = "ut", expectedExceptions = ConfigurationException.class)
-	public void testNoVariableServerIfNoURL(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
-		try {
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
-
-			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
-			initThreadContext(testNGCtx, "myTest", testResult);
-
-		} finally {
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
-		}
-	}
-
-	/**
-	 * Check we create a no variable server if not active
-	 * 
-	 * @param testNGCtx
-	 * @param xmlTest
-	 * @throws Exception
-	 */
-	@Test(groups = "ut", expectedExceptions = ConfigurationException.class)
-	public void testNoVariableServerIfNotAlive(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
-		try {
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
-
-			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class)
-					.withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null))
-					.thenReturn(variableServer);
-			when(variableServer.isAlive()).thenReturn(false);
-
-			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
-			initThreadContext(testNGCtx, "myTest", testResult);
-
-			// check upsert has been called
-			verify(variableServer).isAlive();
-		} finally {
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
-		}
-	}
 
 	/**
 	 * Test that a grid connection is created when all parameters are correct

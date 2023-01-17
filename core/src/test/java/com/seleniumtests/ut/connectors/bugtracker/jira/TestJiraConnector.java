@@ -316,18 +316,18 @@ public class TestJiraConnector extends MockitoTest {
 		detailedResult = File.createTempFile("detailed", ".zip");
 		detailedResult.deleteOnExit();
 		
-		jiraOptions.put("jira.openStates", "Open,To Do");
-		jiraOptions.put("jira.closeTransition", "close");
+		jiraOptions.put("bugtracker.jira.openStates", "Open,To Do");
+		jiraOptions.put("bugtracker.jira.closeTransition", "close");
 	}
 
 	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class)
 	public void testMissingCloseTransition() {
-		jiraOptions.remove("jira.closeTransition");
+		jiraOptions.remove("bugtracker.jira.closeTransition");
 		new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);	
 	}
 	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class)
 	public void testMissingOpenStates() {
-		jiraOptions.remove("jira.openStates");
+		jiraOptions.remove("bugtracker.jira.openStates");
 		new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);	
 	}
 	@Test(groups= {"ut"})
@@ -696,7 +696,7 @@ public class TestJiraConnector extends MockitoTest {
 	public void testCloseIssueMultipleTransitions() {
 
 		when(promiseTransitions.claim()).thenReturn(Arrays.asList(transition3)).thenReturn(Arrays.asList(transition1, transition2));
-		jiraOptions.put("jira.closeTransition", "review/close");
+		jiraOptions.put("bugtracker.jira.closeTransition", "review/close");
 		
 		ArgumentCaptor<TransitionInput> transitionArgument = ArgumentCaptor.forClass(TransitionInput.class);
 		
@@ -718,7 +718,7 @@ public class TestJiraConnector extends MockitoTest {
 		when(promiseTransitions.claim()).thenReturn(Arrays.asList(transition3)) // initial state
 										.thenReturn(Arrays.asList(transition3)) // state not updated
 										.thenReturn(Arrays.asList(transition1, transition2)); // state updated
-		jiraOptions.put("jira.closeTransition", "review/close");
+		jiraOptions.put("bugtracker.jira.closeTransition", "review/close");
 		
 		ArgumentCaptor<TransitionInput> transitionArgument = ArgumentCaptor.forClass(TransitionInput.class);
 		
@@ -733,7 +733,7 @@ public class TestJiraConnector extends MockitoTest {
 	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "'bugtracker.jira.closeTransition' values \\[closed\\] are unknown for this issue, allowed transitions are \\[reopen, close\\]")
 	public void testCloseIssueInvalidTransition() {
 
-		jiraOptions.put("jira.closeTransition", "closed");
+		jiraOptions.put("bugtracker.jira.closeTransition", "closed");
 		ArgumentCaptor<TransitionInput> transitionArgument = ArgumentCaptor.forClass(TransitionInput.class);
 		
 		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
@@ -746,7 +746,7 @@ public class TestJiraConnector extends MockitoTest {
 	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "'bugtracker.jira.closeTransition': value \\[closeQuickly\\] is invalid for this issue in its current state, allowed transitions are \\[reopen, close\\]")
 	public void testCloseIssueInvalidTransitionInSecondPosition() {
 		when(promiseTransitions.claim()).thenReturn(Arrays.asList(transition3)).thenReturn(Arrays.asList(transition1, transition2));
-		jiraOptions.put("jira.closeTransition", "review/closeQuickly");
+		jiraOptions.put("bugtracker.jira.closeTransition", "review/closeQuickly");
 		
 		ArgumentCaptor<TransitionInput> transitionArgument = ArgumentCaptor.forClass(TransitionInput.class);
 		
@@ -800,12 +800,12 @@ public class TestJiraConnector extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateJiraBean() throws Exception {
 		
-		jiraOptions.put("priority", "P1");
-		jiraOptions.put("assignee", "me");
-		jiraOptions.put("reporter", "you");
-		jiraOptions.put("jira.issueType", "Bug");
-		jiraOptions.put("jira.components", "comp1,comp2");
-		jiraOptions.put("jira.field.foo", "bar");
+		jiraOptions.put("bugtracker.priority", "P1");
+		jiraOptions.put("bugtracker.assignee", "me");
+		jiraOptions.put("bugtracker.reporter", "you");
+		jiraOptions.put("bugtracker.jira.issueType", "Bug");
+		jiraOptions.put("bugtracker.jira.components", "comp1,comp2");
+		jiraOptions.put("bugtracker.jira.field.foo", "bar");
 		
 		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
 	
@@ -858,12 +858,12 @@ public class TestJiraConnector extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateJiraBeanWithOrigin() throws Exception {
 		
-		jiraOptions.put("priority", "P1");
-		jiraOptions.put("assignee", "me");
-		jiraOptions.put("reporter", "you");
-		jiraOptions.put("jira.issueType", "Bug");
-		jiraOptions.put("jira.components", "comp1,comp2");
-		jiraOptions.put("jira.field.foo", "bar");
+		jiraOptions.put("bugtracker.priority", "P1");
+		jiraOptions.put("bugtracker.assignee", "me");
+		jiraOptions.put("bugtracker.reporter", "you");
+		jiraOptions.put("bugtracker.jira.issueType", "Bug");
+		jiraOptions.put("bugtracker.jira.components", "comp1,comp2");
+		jiraOptions.put("bugtracker.jira.field.foo", "bar");
 		SeleniumTestsContextManager.getThreadContext().setStartedBy("http://foo/bar/job/1");
 		
 		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
@@ -912,12 +912,12 @@ public class TestJiraConnector extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateJiraBeanWithErrorCauseAndDetails() throws Exception {
 		
-		jiraOptions.put("priority", "P1");
-		jiraOptions.put("assignee", "me");
-		jiraOptions.put("reporter", "you");
-		jiraOptions.put("jira.issueType", "Bug");
-		jiraOptions.put("jira.components", "comp1,comp2");
-		jiraOptions.put("jira.field.foo", "bar");
+		jiraOptions.put("bugtracker.priority", "P1");
+		jiraOptions.put("bugtracker.assignee", "me");
+		jiraOptions.put("bugtracker.reporter", "you");
+		jiraOptions.put("bugtracker.jira.issueType", "Bug");
+		jiraOptions.put("bugtracker.jira.components", "comp1,comp2");
+		jiraOptions.put("bugtracker.jira.field.foo", "bar");
 		SeleniumTestsContextManager.getThreadContext().setStartedBy("http://foo/bar/job/1");
 		
 		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
@@ -954,12 +954,12 @@ public class TestJiraConnector extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateJiraBeanWithErrorCauseNoDetails() throws Exception {
 		
-		jiraOptions.put("priority", "P1");
-		jiraOptions.put("assignee", "me");
-		jiraOptions.put("reporter", "you");
-		jiraOptions.put("jira.issueType", "Bug");
-		jiraOptions.put("jira.components", "comp1,comp2");
-		jiraOptions.put("jira.field.foo", "bar");
+		jiraOptions.put("bugtracker.priority", "P1");
+		jiraOptions.put("bugtracker.assignee", "me");
+		jiraOptions.put("bugtracker.reporter", "you");
+		jiraOptions.put("bugtracker.jira.issueType", "Bug");
+		jiraOptions.put("bugtracker.jira.components", "comp1,comp2");
+		jiraOptions.put("bugtracker.jira.field.foo", "bar");
 		SeleniumTestsContextManager.getThreadContext().setStartedBy("http://foo/bar/job/1");
 		
 		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
@@ -996,12 +996,12 @@ public class TestJiraConnector extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateJiraBeanNoFailedSteps() throws Exception {
 		
-		jiraOptions.put("priority", "P1");
-		jiraOptions.put("assignee", "me");
-		jiraOptions.put("reporter", "you");
-		jiraOptions.put("jira.issueType", "Bug");
-		jiraOptions.put("jira.components", "comp1,comp2");
-		jiraOptions.put("jira.field.foo", "bar");
+		jiraOptions.put("bugtracker.priority", "P1");
+		jiraOptions.put("bugtracker.assignee", "me");
+		jiraOptions.put("bugtracker.reporter", "you");
+		jiraOptions.put("bugtracker.jira.issueType", "Bug");
+		jiraOptions.put("bugtracker.jira.components", "comp1,comp2");
+		jiraOptions.put("bugtracker.jira.field.foo", "bar");
 		
 		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
 	
@@ -1016,12 +1016,12 @@ public class TestJiraConnector extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateJiraBeanNoFinalStep() throws Exception {
 		
-		jiraOptions.put("priority", "P1");
-		jiraOptions.put("assignee", "me");
-		jiraOptions.put("reporter", "you");
-		jiraOptions.put("jira.issueType", "Bug");
-		jiraOptions.put("jira.components", "comp1,comp2");
-		jiraOptions.put("jira.field.foo", "bar");
+		jiraOptions.put("bugtracker.priority", "P1");
+		jiraOptions.put("bugtracker.assignee", "me");
+		jiraOptions.put("bugtracker.reporter", "you");
+		jiraOptions.put("bugtracker.jira.issueType", "Bug");
+		jiraOptions.put("bugtracker.jira.components", "comp1,comp2");
+		jiraOptions.put("bugtracker.jira.field.foo", "bar");
 		
 		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
 		

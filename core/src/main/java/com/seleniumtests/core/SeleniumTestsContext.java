@@ -342,6 +342,13 @@ public class SeleniumTestsContext {
     	verificationFailuresMap = new HashMap<>(toCopy.verificationFailuresMap);
     	testStepManager = new TestStepManager(toCopy.testStepManager);
     	
+    	initSubContexts();
+    }
+    
+    private void initSubContexts() {
+    	testManagerContext = new TestManagerContext(this);
+    	bugtrackerContext = new BugTrackerContext(this);
+    	seleniumRobotServerContext = new SeleniumRobotServerContext(this);
     }
     
     public SeleniumTestsContext(final ITestContext context) {
@@ -349,9 +356,7 @@ public class SeleniumTestsContext {
 
     	testStepManager = new TestStepManager();
     	
-    	testManagerContext = new TestManagerContext(this);
-    	bugtrackerContext = new BugTrackerContext(this);
-    	seleniumRobotServerContext = new SeleniumRobotServerContext(this);
+    	initSubContexts();
     	
         buildContextFromConfig();
     }

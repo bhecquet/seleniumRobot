@@ -65,7 +65,7 @@ import com.seleniumtests.util.osutility.OSUtilityWindows;
 
 import net.lightbody.bmp.BrowserMobProxy;
 
-@PrepareForTest({SeleniumRobotVariableServerConnector.class, OSCommand.class, SeleniumTestsContext.class, OSUtilityFactory.class, SeleniumGridConnectorFactory.class, WebUIDriver.class})
+@PrepareForTest({SeleniumRobotVariableServerConnector.class, OSCommand.class, SeleniumTestsContext.class, SeleniumRobotServerContext.class, OSUtilityFactory.class, SeleniumGridConnectorFactory.class, WebUIDriver.class})
 public class TestTestTasks extends MockitoTest {
 
 	@Mock

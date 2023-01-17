@@ -15,10 +15,11 @@ import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.connectors.tms.TestManager;
 import com.seleniumtests.connectors.tms.squash.SquashTMConnector;
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.contexts.TestManagerContext;
 
-@PrepareForTest({ TestManager.class })
+@PrepareForTest({ TestManager.class, SeleniumTestsContext.class })
 public class TestTestManagerContext extends ConnectorsTest {
 
 

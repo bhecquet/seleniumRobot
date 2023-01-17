@@ -55,13 +55,13 @@ public class TestJiraConnector extends GenericTest {
 	public void testJira() {
 
 		Map<String, String> jiraOptions = new HashMap<>();
-		jiraOptions.put("jira.openStates", "Open,To Do");
-		jiraOptions.put("jira.closeTransition", "Prêt/Démarrer/Livrer/A valider/Validation effectuée/Clore");
-		jiraOptions.put("jira.issueType", "Bogue");
-		jiraOptions.put("priority", "Important (P3)");
+		jiraOptions.put("bugtracker.jira.openStates", "Open,To Do");
+		jiraOptions.put("bugtracker.jira.closeTransition", "Prêt/Démarrer/Livrer/A valider/Validation effectuée/Clore");
+		jiraOptions.put("bugtracker.jira.issueType", "Bogue");
+		jiraOptions.put("bugtracker.priority", "Important (P3)");
 		
-		jiraOptions.put("jira.field.Ano-Affecte la version", "VERS.MAJ.22.06");
-		jiraOptions.put("jira.field.Libellé tâche ITBM", "-");
+		jiraOptions.put("bugtracker.jira.field.Ano-Affecte la version", "VERS.MAJ.22.06");
+		jiraOptions.put("bugtracker.jira.field.Libellé tâche ITBM", "-");
 		
 		JiraConnector jiraConnector = new JiraConnector(System.getProperty("server"), "JGEPV", System.getProperty("user"), System.getProperty("password"), jiraOptions);
 		jiraConnector.createIssue(null, null, "core", "testJira", "testng  http://confluence.covea.priv/display/portailSM/Selenium+-+Descriptions+des+scenarios", Arrays.asList(step1, step2, stepEnd), jiraOptions);
