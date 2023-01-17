@@ -10,7 +10,6 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +20,6 @@ import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
-import org.testng.Reporter;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -53,36 +51,26 @@ public class TestUft extends MockitoTest {
 
 	@Test(groups = { "ut" })
 	public void testReadReportListActions() throws IOException, DataConversionException {
-		String report = GenericTest.readResourceToString("tu/Results.xml");
+		String report = GenericTest.readResourceToString("tu/uftReport2023.xml");
 		Uft uft = new Uft("[QualityCenter]Subject\\Tools\\Tests\\test1");
 
 		List<TestStep> stepList = uft.readXmlResult(report);
 
 		// check all content has been read
-		Assert.assertEquals(stepList.size(), 2);
+		Assert.assertEquals(stepList.size(), 3);
 		
 		Assert.assertEquals(stepList.get(0).getName(), "UFT: DebutTest [DebutTest]");
-		Assert.assertEquals(stepList.get(1).getName(), "UFT: Choixproduit [Choixproduit]");
+		Assert.assertEquals(stepList.get(1).getName(), "UFT: FinTest [FinTest]");
 
 
 		// check the while content
-		Assert.assertEquals(stepList.get(0).getStepStatus(), StepStatus.FAILED);
-		Assert.assertEquals(stepList.get(1).getStepStatus(), StepStatus.SUCCESS);
-		Assert.assertEquals(stepList.get(1).toString(), "Step UFT: Choixproduit [Choixproduit]\n"
-			+ "  - Choix du produit\n"
-			+ "						: Permet de sélectionner le produit à traiter dans l'arbre produit\n"
-			+ "  - Step P9\n"
-			+ "						: Local Browser\n"
-			+ "    - Step P9 - Agence\n"
-			+ "							: Page\n"
-			+ "      - Step Onglets\n"
-			+ "								: Frame\n"
-			+ "        - Particulier.Exist\n"
-			+ "									: \"Object does not exist\"\n"
-			+ "      - Step Menu\n"
-			+ "								: Frame\n"
-			+ "        - Assurance.Click\n"
-			+ "									:"); 
+		Assert.assertEquals(stepList.get(0).getStepStatus(), StepStatus.SUCCESS);
+		Assert.assertEquals(stepList.get(1).getStepStatus(), StepStatus.FAILED);
+		Assert.assertEquals(stepList.get(1).toString(), "Step UFT: FinTest [FinTest]\n" +
+				"  - Step UFT: Opérations de fin de test\n" +
+				"  - Step UFT: 63\n" +
+				"  - Item of type <CYCL_FOLD>, with Id <-2> does not exist.: Item of type <CYCL_FOLD>, with Id <-2> does not exist. Line (39): \"TargetCycleName = CurrentTestSet.TestSetFolder.TargetCycle.Name\".\n" +
+				"  - Stop Run: Run stopped by user.");
 	}
 
 	/**
@@ -92,17 +80,13 @@ public class TestUft extends MockitoTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testReadReport() throws IOException {
-		String report = GenericTest.readResourceToString("tu/uftReport.xml");
+		String report = GenericTest.readResourceToString("tu/uftReport2023.xml");
 		Uft uft = new Uft("[QualityCenter]Subject\\Tools\\Tests\\test1");
 		List<TestStep> stepList = uft.readXmlResult(report);
 		
 		// check all content has been read
-		Assert.assertEquals(stepList.get(0).getName(), "UFT: IP_Config_Poste_W10 [IP_Config_Poste_W10]");
-		// check all content has been read
-		Assert.assertEquals(stepList.size(), 1);
- 
-		// check the while content 
-		Assert.assertEquals(stepList.get(0).toString(), "Step UFT: IP_Config_Poste_W10 [IP_Config_Poste_W10]");
+		Assert.assertEquals(stepList.size(), 3);
+		Assert.assertEquals(((TestStep) stepList.get(0).getStepActions().get(1)).getStepActions().get(0).toString(),  "Step UFT: Lancer P9");
 	}
 
 	/**
@@ -111,7 +95,7 @@ public class TestUft extends MockitoTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testReadBadReport() throws IOException {
-		String report = GenericTest.readResourceToString("tu/wrongUftReport.xml");
+		String report = GenericTest.readResourceToString("tu/wrongUftReport2023.xml");
 		Uft uft = new Uft("[QualityCenter]Subject\\Tools\\Tests\\test1");
 
 		List<TestStep> testSteps = uft.readXmlResult(report);
@@ -353,7 +337,7 @@ public class TestUft extends MockitoTest {
 	
 	@Test(groups = { "ut" })
 	public void testLoad() throws Exception {
-		String report = GenericTest.readResourceToString("tu/uftReport.xml");
+		String report = GenericTest.readResourceToString("tu/uftReport2023.xml");
 		report = "some comments\n_____OUTPUT_____\n" + report + "\n_____ENDOUTPUT_____\nsome other comments";
 		PowerMockito.when(TestTasks.class, "executeCommand", eq("cscript.exe"), anyInt(), nullable(Charset.class), any()).thenReturn(report);
 		
@@ -380,7 +364,7 @@ public class TestUft extends MockitoTest {
 	 */
 	@Test(groups = { "ut" }, expectedExceptions = IllegalStateException.class, expectedExceptionsMessageRegExp = "Test script has not been loaded. Call 'loadScript' before")
 	public void testExecuteNoLoad() throws Exception {
-		String report = GenericTest.readResourceToString("tu/uftReport.xml");
+		String report = GenericTest.readResourceToString("tu/uftReport2023.xml");
 		report = "some comments\n_____OUTPUT_____\n" + report + "\n_____ENDOUTPUT_____\nsome other comments";
 		PowerMockito.when(TestTasks.class, "executeCommand", eq("cscript.exe"), anyInt(), nullable(Charset.class), any()).thenReturn(report);
 
@@ -395,7 +379,7 @@ public class TestUft extends MockitoTest {
 	 */
 	@Test(groups = { "ut" }, expectedExceptions = IllegalStateException.class, expectedExceptionsMessageRegExp = "Test script has not been loaded. Call 'loadScript' before")
 	public void testExecuteNoLoadBeforeSecondExecution() throws Exception {
-		String report = GenericTest.readResourceToString("tu/uftReport.xml");
+		String report = GenericTest.readResourceToString("tu/uftReport2023.xml");
 		report = "some comments\n_____OUTPUT_____\n" + report + "\n_____ENDOUTPUT_____\nsome other comments";
 		PowerMockito.when(TestTasks.class, "executeCommand", eq("cscript.exe"), anyInt(), nullable(Charset.class), any()).thenReturn(report);
 
@@ -409,7 +393,7 @@ public class TestUft extends MockitoTest {
 	
 	@Test(groups = { "ut" })
 	public void testExecute() throws Exception {
-		String report = GenericTest.readResourceToString("tu/uftReport.xml");
+		String report = GenericTest.readResourceToString("tu/uftReport2023.xml");
 		report = "some comments\n_____OUTPUT_____\n" + report + "\n_____ENDOUTPUT_____\nsome other comments";
 		PowerMockito.when(TestTasks.class, "executeCommand", eq("cscript.exe"), anyInt(), nullable(Charset.class), any()).thenReturn(report);
 		
@@ -440,7 +424,7 @@ public class TestUft extends MockitoTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testExecuteWithReport2() throws Exception {
-		String report = GenericTest.readResourceToString("tu/uftResult.txt");
+		String report = GenericTest.readResourceToString("tu/uftResult2023.txt");
 		PowerMockito.when(TestTasks.class, "executeCommand", eq("cscript.exe"), anyInt(), nullable(Charset.class), any()).thenReturn(report);
 		
 		Map<String, String> args = new HashMap<>();
@@ -451,7 +435,7 @@ public class TestUft extends MockitoTest {
 		
 		// check a step is returned
 		Assert.assertNotNull(testSteps);
-		Assert.assertEquals(testSteps.get(0).getName(), "UFT: Risques [Risques]");
+		Assert.assertEquals(testSteps.get(0).getName(), "UFT: test1");
 		Assert.assertFalse(testSteps.toString().contains("<table>")); // check no HTML code is returned
 		
 	}
@@ -463,7 +447,7 @@ public class TestUft extends MockitoTest {
 	@Test(groups = { "ut" })
 	public void testExecuteWithBom() throws Exception {
 		
-		String report = GenericTest.readResourceToString("tu/uftReport.xml");
+		String report = GenericTest.readResourceToString("tu/uftReport2023.xml");
 		report = "some comments\n_____OUTPUT_____B\n" + report + "\n_____ENDOUTPUT_____\nsome other comments";
 		PowerMockito.when(TestTasks.class, "executeCommand", eq("cscript.exe"), anyInt(), nullable(Charset.class), any()).thenReturn(report);
 		
@@ -476,7 +460,7 @@ public class TestUft extends MockitoTest {
 		
 		// check a step is returned
 		Assert.assertNotNull(testSteps);
-		Assert.assertEquals(testSteps.get(0).getName(), "UFT: IP_Config_Poste_W10 [IP_Config_Poste_W10]");
+		Assert.assertEquals(testSteps.get(0).getName(), "UFT: DebutTest [DebutTest]");
 	}
 	
 	@Test(groups = { "ut" })
