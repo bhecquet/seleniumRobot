@@ -45,11 +45,7 @@ To use this server,
 
 Test manager are softwares that help managing test campaigns, requirements and tests results. For selenium test, the aim is to execute selenium test instead of manual tests and record results
 
-### 1 Squash TM/TA ###
-
-Squash TA capabilities has been removed from SeleniumRobot. To record your test results in Squash TM, see §3
-
-### 2 Jenkins ###
+### 1 Jenkins ###
 
 To execute SeleniumRobot using Jenkins, create a free-style job.
 
@@ -78,7 +74,7 @@ SeleniumRobot uses external fonts and javascript so Jenkins must be configured t
 
 e.g: `"default-src 'self' fonts.googleapis.com cdnjs.cloudflare.com fonts.gstatic.com 'unsafe-inline' 'unsafe-eval'"`
 
-### 3 Squash TM through API ###
+### 2 Squash TM through API ###
 
 As of Squash TM 1.21, API is complete enough to allow to create campaigns, iteration, test results directly from it. So it's possible to execute a test from Jenkins and have the results directly sent to Squash TM
 
@@ -97,9 +93,13 @@ Use parameters:
 By default, test result won't be sent to Squash TM even if it's properly configured.
 For this link to be active, we MUST give seleniumRobot the 'id' of the test in Squash
 
-Test id can be found when clicking on any test, and hovering mouse on test title in the right pane => a link is displayed at the bottom left of the screen, giving the id of the test.
+Test id can be found when clicking on any test, the url is of type: 'https://<host>/squash/test-case-workspace/test-case/499831/content'. Test id is '499831'
 
 When you have this id, configure your java test
+
+##### Configure through annotation #####
+
+In most case, Test id can be configured as a parameter of @Test annotation
 
 ```java
 @Test(attributes = {@CustomAttribute(name = "testId", values = "12")})
@@ -108,6 +108,40 @@ public void testMyFeature() {
 }
 ```
 
+##### Configure through context #####
+
+In case of DataProvider, this is not possible to use the annotation, as testId would be the same for all datasets.
+So, to provide a test id for each dataset, configure this way
+
+```
+@Test(groups={"ut"})
+    public void testTestCaseIdFromContext() {
+        robotConfig().testManager().setTestId(23);
+        ...
+        
+    }
+```
+
+This is equivalent of setting a variable `tms.testId`
+
+#### Configure campaign name and iteration ####
+
+By default, a campaign "Selenium <context name>" and an iteration "<application version>" are used to record test results in squash
+You can override this beheviour by specifying it in variables or in test directly
+
+```
+@Test(groups={"ut"})
+    public void testTestCaseIdFromContext() {
+        robotConfig().testManager().setCampaignName("my campaign");
+        robotConfig().testManager().setCampaignName("my iteration");
+        ...
+        
+    }
+```
+
+It's also possible to set it via variables:
+`tms.squash.iteration`
+`tms.squash.campaign`
   
 ### 4 HP ALM ###
  
