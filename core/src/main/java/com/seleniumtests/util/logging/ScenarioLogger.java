@@ -282,7 +282,7 @@ public class ScenarioLogger extends Logger {
 		if (throwable != null) {
 			StackTraceElement[] s1 = throwable.getStackTrace();
 			
-			StringBuilder string = new StringBuilder(throwable.getMessage());
+			StringBuilder string = new StringBuilder(throwable.getMessage() == null ? "null": throwable.getMessage());
 			for (int x = 0; x < s1.length; x++) {
 				try {
 					if (PageObject.class.isAssignableFrom(Class.forName(s1[x].getClassName()))) {
