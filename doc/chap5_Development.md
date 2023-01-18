@@ -8,8 +8,10 @@
 - [3 Test](#3-test)
 - [4 Deploy](#4-deploy)
 - [5 Release code](#5-release-code)
-- [5 Aspect handling](#5-aspect-handling)
-  - [aspect and dynamic compilation](#aspect-and-dynamic-compilation)
+- [6 Development considerations](#6-development-considerations)
+  - [Aspect handling](#aspect-handling)
+    - [aspect and dynamic compilation](#aspect-and-dynamic-compilation)
+  - [Test context](#test-context)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
