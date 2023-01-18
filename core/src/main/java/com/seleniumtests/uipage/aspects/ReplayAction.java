@@ -284,11 +284,17 @@ public class ReplayAction {
 	
 	/**
 	 * Replays the composite action in case any error occurs
+	 * This replay will only be done if composite action is directly done by test script. Every call from HtmlElement or its derivatives won't be replayed, as, in this case
+	 * replay is already performed through {@code @ReplayOnError} annotation
 	 * @param joinPoint
 	 */
 	@Around("execution(public void org.openqa.selenium.interactions.Actions.BuiltAction.perform ())")
 	public Object replayCompositeAction(ProceedingJoinPoint joinPoint) throws Throwable {
-		return replay(joinPoint, null);
+		if (isFromHtmlElement(Thread.currentThread().getStackTrace())) {
+			return joinPoint.proceed(joinPoint.getArgs());
+		} else {
+			return replay(joinPoint, null);
+		}
 	}
 	
 	/**
@@ -368,6 +374,26 @@ public class ReplayAction {
 		}
 		return false;
 
+	}
+	
+	/**
+	 * Returns true if the call to element is made inside a subclass of HtmlElement
+	 * @param stack
+	 * @return
+	 */
+	private boolean isFromHtmlElement(StackTraceElement[] stack) {
+		
+		for(int i=0; i < stack.length; i++) {
+			
+			// when using aspects, class name may contain a "$", remove everything after that symbol
+			String stackClass = stack[i].getClassName().split("\\$")[0];
+			if (stackClass.startsWith("com.seleniumtests.uipage.htmlelements")) {
+				return true;
+			}
+			
+		}
+		return false;
+		
 	}
 	
     

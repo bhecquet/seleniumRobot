@@ -1375,6 +1375,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	 * @param keysToSend
 	 * @throws InterruptedException
 	 */
+	@ReplayOnError(waitAfterAction = true)
 	public void sendKeysAction(long duration, CharSequence... keysToSend) {
 		findElement(true);
 		Actions send = new Actions(getDriver()).moveToElement(getRealElementNoSearch()).click();
