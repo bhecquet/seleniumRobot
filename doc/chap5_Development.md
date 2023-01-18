@@ -72,7 +72,9 @@ When a SNAPSHOT version is ready to be released, use
 
 Check installation requirements to perform a release
 
-### 5 Aspect handling ###
+### 6 Development considerations ###
+
+#### Aspect handling ####
 
 SeleniumRobot uses AspectJ extensively to avoid writing too many times the same code. Aspects allow
 - logging called methods
@@ -84,7 +86,7 @@ This is directly handled by maven during build (and by your favourite IDE with a
 
 for debugging aspects inside eclipse, go to 'Window' -> 'Preferences' -> 'AspectJ compiler' and tick 'no inline'
 
-#### aspect and dynamic compilation ####
+##### aspect and dynamic compilation #####
 
 For Selenium IDE execution feature, the generated code had to be compiled and woven with seleniumRobot aspects so that no feature are lost. For this to work, 
 - java program MUST be launched with `-javaagent:/path/to/aspectjweaver.jar`
@@ -111,3 +113,11 @@ doc:
 - https://stackoverflow.com/questions/10733247/aspectj-weaving-with-custom-classloader-at-runtime
 - https://stackoverflow.com/questions/16777015/can-weavingurlclassloader-only-weave-aspects-of-local-jars
 - https://www.baeldung.com/aspectj
+
+#### Test context ####
+
+SeleniumRobot uses a context for each test method, storing information about the parameters of the test, dataset etc ...
+Everything is done inside "SeleniumTestContext" and classes from core/context package
+The rules are the following:
+- if a parameter is a launch option (i.e: browser, proxy, ...), so, common to all tests, it's stored in `contextDataMap` and documentation references this launch option
+- if a parameter is different from test to test (bugtracker reporter, testId, url, ...), it's called a variable and can be provided through env.ini, seleniumRobot variable server or command line. It will be accessible through `getConfiguration` method
