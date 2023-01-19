@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
+import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.util.ExceptionUtility;
 import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -59,7 +60,7 @@ public class TestAction {
 		this.name = name;
 		this.failed = failed;
 		this.pwdToReplace = pwdToReplace.stream()
-					.filter(s -> s.length() > 5)
+					.filter(s -> s.length() > TestStepManager.MIN_PASSWORD_LENGTH)
 					.collect(Collectors.toList());
 	}
 

@@ -40,6 +40,7 @@ import org.testng.Reporter;
 import org.testng.annotations.AfterMethod;
 
 import com.neotys.selenium.proxies.NLWebDriver;
+import com.seleniumtests.core.Mask;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.Step;
 import com.seleniumtests.core.Step.RootCause;
@@ -338,9 +339,12 @@ public class LogAction {
 				} catch (ClassCastException | IndexOutOfBoundsException e) {
 					argName = "_";
 				}
-				
+
 				// store the value of the argument containing a password
-				if (arg != null && (argName.toLowerCase().contains("password") || argName.toLowerCase().contains("pwd") || argName.toLowerCase().contains("passwd"))) {
+				if (arg != null && (argName.toLowerCase().contains("password") 
+						|| argName.toLowerCase().contains("pwd") 
+						|| argName.toLowerCase().contains("passwd")
+						|| ((MethodSignature)joinPoint.getSignature()).getMethod().getParameters()[paramIdx].getAnnotationsByType(Mask.class).length > 0)) {
 					if (arg instanceof CharSequence[]) {
 						for (Object obj: (CharSequence[])arg) {
 							stringToReplace.add(obj.toString());

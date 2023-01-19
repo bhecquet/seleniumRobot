@@ -2,6 +2,8 @@ package com.seleniumtests.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -12,16 +14,19 @@ import com.seleniumtests.reporter.logger.TestStep;
 
 public class TestStepManager {
 	
+	public static final int MIN_PASSWORD_LENGTH = 5;
 	public static final String LAST_STEP_NAME = "Test end";
 	public static final String LAST_STATE_NAME = "Last State";
 	List<TestStep> testSteps;  // list of root steps
 	TestStep runningStep;
 	TestStep rootStep;
 	Date videoStartDate;
+	private List<String> pwdToReplace;
 	
 	public TestStepManager() {
 		runningStep = null;
 		rootStep = null;
+		pwdToReplace = new ArrayList<>();
 		testSteps = new CopyOnWriteArrayList<>();
 	}
 	
@@ -37,6 +42,7 @@ public class TestStepManager {
 		runningStep = managerToCopy.runningStep;
 		rootStep = managerToCopy.rootStep;
 		videoStartDate = managerToCopy.videoStartDate;
+		pwdToReplace = managerToCopy.pwdToReplace;
 	}
 	
 	/**
@@ -71,6 +77,16 @@ public class TestStepManager {
 		runningStep = testStep;
 		if (testStep != null) {
 			testStep.setPosition(testSteps.size());
+		}
+	}
+	
+	/**
+	 * Add a password to the list of strings to obfuscate
+	 * @param password
+	 */
+	public void addPasswordToReplace(String password) {
+		if (password.length() > MIN_PASSWORD_LENGTH) {
+			pwdToReplace.add(password);
 		}
 	}
 	
@@ -110,6 +126,7 @@ public class TestStepManager {
     		// notify each TestStepManager about the new test step (useful for AfterClass / AfterTest configuration methods)
     		for (SeleniumTestsContext testContext: SeleniumTestsContextManager.getContextForCurrentTestState()) {
     			TestStepManager stepManager = testContext.getTestStepManager();
+    			testStep.getPwdToReplace().addAll(stepManager.pwdToReplace);
     	    	stepManager.getTestSteps().add(testStep);
     	    	stepManager.setRootTestStep(null);
     	    	stepManager.setRunningTestStep(null);
@@ -241,5 +258,9 @@ public class TestStepManager {
 	 */
 	public void setTestSteps(List<TestStep> testSteps) {
 		this.testSteps = testSteps;
+	}
+
+	public List<String> getPwdToReplace() {
+		return pwdToReplace;
 	}
 }
