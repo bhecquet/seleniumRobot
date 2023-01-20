@@ -71,6 +71,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
+import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.customexception.ScenarioException;
@@ -181,6 +182,8 @@ public class TestHtmlElement extends MockitoTest {
 		when(uiDriver.getConfig()).thenReturn(driverConfig);
 		when(driverConfig.getBrowserType()).thenReturn(BrowserType.HTMLUNIT);
 		when(driverConfig.getMajorBrowserVersion()).thenReturn(1);
+		
+		when(((CustomEventFiringWebDriver)eventDriver).getBrowserInfo()).thenReturn(new BrowserInfo(BrowserType.HTMLUNIT, "999.9"));
 
 		when(element.findElement(By.name("subEl"))).thenReturn(subElement1);
 		when(element.findElements(By.name("subEl"))).thenReturn(subElList);
