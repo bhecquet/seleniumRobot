@@ -289,17 +289,18 @@ public class ReplayAction {
 	
 	/**
 	 * Replays the composite action in case any error occurs
-	 * This replay will only be done if composite action is directly done by test script. Every call from HtmlElement or its derivatives won't be replayed, as, in this case
-	 * replay is already performed through {@code @ReplayOnError} annotation
+	 * When the composite action is played inside an HtmlElement, and the calling method is annotated with {@code @ReplayOnError}, we have 2 replays
+	 * 
+	 *  method replay => ReplayOnError annotation
+	 *  	composite action replay
+	 *  
+	 *  This does not seem to be a problem because if 'composite action replay' takes to much time, then 'method replay' will not effectively replay
+	 *  
 	 * @param joinPoint
 	 */
 	@Around("execution(public void org.openqa.selenium.interactions.Actions.BuiltAction.perform ())")
 	public Object replayCompositeAction(ProceedingJoinPoint joinPoint) throws Throwable {
-		if (isFromHtmlElement(Thread.currentThread().getStackTrace())) {
-			return joinPoint.proceed(joinPoint.getArgs());
-		} else {
-			return replay(joinPoint, null);
-		}
+		return replay(joinPoint, null);
 	}
 	
 	/**
