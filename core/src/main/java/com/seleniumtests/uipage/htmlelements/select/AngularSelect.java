@@ -1,8 +1,11 @@
 package com.seleniumtests.uipage.htmlelements.select;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
@@ -188,7 +191,7 @@ public abstract class AngularSelect extends CommonSelectList {
 			WebElement option = options.get(index);
 	        setDeselected(option);
 		} catch (IndexOutOfBoundsException e) {
-			throw new NoSuchElementException("Cannot locate element with index: " + index);
+			throw new NoSuchElementException("Cannot find option with index: " + index);
 		}
 
 	}
@@ -196,15 +199,20 @@ public abstract class AngularSelect extends CommonSelectList {
 	@Override
 	public void deselectByText(String text) {
 		boolean matched = false;
+		List<String> knownOptions = new ArrayList<>();
+		
 		for (WebElement option : options) {
-			if (getOptionText(option).equals(text)) {
+			String optionText = getOptionText(option);
+			knownOptions.add(optionText);
+			
+			if (optionText.equals(text)) {
             	setDeselected(option);
             	matched = true;
                 break;
             }
         }
 		if (!matched) {
-	      throw new NoSuchElementException("Cannot locate element with text: " + text);
+			throw new NoSuchElementException(String.format("Cannot find option with text: %s. Known options are: %s", text, StringUtils.join(knownOptions, ";")));
 	    }
 
 	}
@@ -212,15 +220,20 @@ public abstract class AngularSelect extends CommonSelectList {
 	@Override
 	public void deselectByValue(String value) {
 		boolean matched = false;
+		List<String> knownOptions = new ArrayList<>();
+		
 		for (WebElement option : options) {
-            if (getOptionValue(option).equals(value)) {
+			String optionValue = getOptionValue(option);
+			knownOptions.add(optionValue);
+			
+            if (optionValue.equals(value)) {
             	setDeselected(option);
             	matched = true;
                 break;
             }
         }
 		if (!matched) {
-	      throw new NoSuchElementException("Cannot locate element with value: " + value);
+			throw new NoSuchElementException(String.format("Cannot find option with value: %s. Known options are: %s", value, StringUtils.join(knownOptions, ";")));
 	    }
 
 	}
@@ -232,7 +245,7 @@ public abstract class AngularSelect extends CommonSelectList {
 			WebElement option = options.get(index);
 			setSelected(option);
 		} catch (IndexOutOfBoundsException e) {
-			throw new NoSuchElementException("Cannot locate option with index: " + index);
+			throw new NoSuchElementException("Cannot find option with index: " + index);
 		}
 	}
 
@@ -240,9 +253,13 @@ public abstract class AngularSelect extends CommonSelectList {
 	@Override
 	public void selectByText(String text) {
 		boolean matched = false;
+		List<String> knownOptions = new ArrayList<>();
+		
 		for (WebElement option : options) {
 
-            if (getOptionText(option).equals(text)) {
+			String optionText = getOptionText(option);
+			knownOptions.add(optionText);
+            if (optionText.equals(text)) {
                 setSelected(option);
                 matched = true;
                 break;
@@ -250,7 +267,7 @@ public abstract class AngularSelect extends CommonSelectList {
         }
 		
 		if (!matched) {
-	      throw new NoSuchElementException("Cannot locate element with text: " + text);
+	      throw new NoSuchElementException(String.format("Cannot find option with text: %s. Known options are: %s", text, StringUtils.join(knownOptions, ";")));
 	    }
 
 	}
@@ -259,15 +276,20 @@ public abstract class AngularSelect extends CommonSelectList {
 	@Override
 	public void selectByValue(String value) {
 		boolean matched = false;
+		List<String> knownOptions = new ArrayList<>();
+		
 		for (WebElement option : options) {
-            if (getOptionValue(option).equals(value)) {
+			String optionValue = getOptionValue(option);
+			knownOptions.add(optionValue);
+			
+            if (optionValue.equals(value)) {
                 setSelected(option);
                 matched =true;
                 break;
             }
         }
 		if (!matched) {
-			throw new NoSuchElementException("Cannot locate option with value: " + value);
+			throw new NoSuchElementException(String.format("Cannot find option with value: %s. Known options are: %s", value, StringUtils.join(knownOptions, ";")));
 	    }
 
 	}

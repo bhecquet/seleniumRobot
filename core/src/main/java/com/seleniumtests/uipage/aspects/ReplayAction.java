@@ -58,6 +58,7 @@ import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.uipage.ReplayOnError;
 import com.seleniumtests.uipage.htmlelements.GenericPictureElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
+import com.seleniumtests.uipage.htmlelements.SelectList;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.ScenarioLogger;
 
@@ -167,7 +168,11 @@ public class ReplayAction {
 		    			WaitHelper.waitForMilliSeconds(replay.replayDelayMs());
 					} else {
 						if (e instanceof NoSuchElementException) {
-							throw new NoSuchElementException(String.format("Searched element [%s] from page '%s' could not be found", element, element.getOrigin()));
+							if (element instanceof SelectList && e.getMessage().contains("option")) {
+								throw new NoSuchElementException(String.format("'%s' from page '%s': %s", element, element.getOrigin(), e.getMessage()));
+							} else {
+								throw new NoSuchElementException(String.format("Searched element [%s] from page '%s' could not be found", element, element.getOrigin()));
+							}
 						} else if (e instanceof UnreachableBrowserException) {
 							throw new WebDriverException("Browser did not reply, it may have frozen");
 						}
