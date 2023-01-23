@@ -481,7 +481,7 @@ public class SelectList extends HtmlElement {
     	double score = 0;
     	WebElement optionToSelect = null;
     	for (WebElement option : options) {
-    		String source = option.getText().trim();
+    		String source = selectImplementation.getOptionText(option).trim();
     		if (service.score(source, text) > score) {
     			score = service.score(source, text);
     			optionToSelect = option;

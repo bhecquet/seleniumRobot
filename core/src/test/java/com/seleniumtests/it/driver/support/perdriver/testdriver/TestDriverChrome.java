@@ -50,7 +50,17 @@ public class TestDriverChrome extends TestDriver {
 	public void testSendKeysElementNotFound() {
 		super.testSendKeysElementNotFound(); 
 	}
-   
+
+	@Test(groups = {"it", "ut"})
+	public void testSendKeysAction() {
+		super.testSendKeysAction();
+	}
+
+	@Test(groups = {"it", "ut"})
+	public void testSendKeysActionPause() {
+		super.testSendKeysActionWithPause();
+	}
+
 	@Test(groups={"it", "ut"})
 	public void testClickRadio() {
 		super.testClickRadio();

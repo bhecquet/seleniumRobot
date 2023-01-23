@@ -402,6 +402,18 @@ public class TestTestNGResultUtil extends MockitoTest {
 	}
 	
 	/**
+	 * Test setting description with a "null" method parameter
+	 * @param db
+	 */
+	@Parameters("db")
+	@Test(groups={"ut"}, description = "my DB ${arg0}")
+	public void testDescriptionNullParameter(@Optional()String db) {
+		ITestResult tr = Reporter.getCurrentTestResult();
+		TestNGResultUtils.setSeleniumRobotTestContext(tr, SeleniumTestsContextManager.getThreadContext());
+		Assert.assertEquals(TestNGResultUtils.getTestDescription(tr), "my DB null");
+	}
+	
+	/**
 	 * Only test method name is available => we take unique test name
 	 */
 	@Test(groups={"ut"})

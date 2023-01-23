@@ -58,6 +58,7 @@ import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.uipage.ReplayOnError;
 import com.seleniumtests.uipage.htmlelements.GenericPictureElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
+import com.seleniumtests.uipage.htmlelements.SelectList;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.ScenarioLogger;
 
@@ -167,7 +168,11 @@ public class ReplayAction {
 		    			WaitHelper.waitForMilliSeconds(replay.replayDelayMs());
 					} else {
 						if (e instanceof NoSuchElementException) {
-							throw new NoSuchElementException(String.format("Searched element [%s] from page '%s' could not be found", element, element.getOrigin()));
+							if (element instanceof SelectList && e.getMessage().contains("option")) {
+								throw new NoSuchElementException(String.format("'%s' from page '%s': %s", element, element.getOrigin(), e.getMessage()));
+							} else {
+								throw new NoSuchElementException(String.format("Searched element [%s] from page '%s' could not be found", element, element.getOrigin()));
+							}
 						} else if (e instanceof UnreachableBrowserException) {
 							throw new WebDriverException("Browser did not reply, it may have frozen");
 						}
@@ -284,6 +289,13 @@ public class ReplayAction {
 	
 	/**
 	 * Replays the composite action in case any error occurs
+	 * When the composite action is played inside an HtmlElement, and the calling method is annotated with {@code @ReplayOnError}, we have 2 replays
+	 * 
+	 *  method replay => ReplayOnError annotation
+	 *  	composite action replay
+	 *  
+	 *  This does not seem to be a problem because if 'composite action replay' takes to much time, then 'method replay' will not effectively replay
+	 *  
 	 * @param joinPoint
 	 */
 	@Around("execution(public void org.openqa.selenium.interactions.Actions.BuiltAction.perform ())")
@@ -368,6 +380,26 @@ public class ReplayAction {
 		}
 		return false;
 
+	}
+	
+	/**
+	 * Returns true if the call to element is made inside a subclass of HtmlElement
+	 * @param stack
+	 * @return
+	 */
+	private boolean isFromHtmlElement(StackTraceElement[] stack) {
+		
+		for(int i=0; i < stack.length; i++) {
+			
+			// when using aspects, class name may contain a "$", remove everything after that symbol
+			String stackClass = stack[i].getClassName().split("\\$")[0];
+			if (stackClass.startsWith("com.seleniumtests.uipage.htmlelements")) {
+				return true;
+			}
+			
+		}
+		return false;
+		
 	}
 	
     

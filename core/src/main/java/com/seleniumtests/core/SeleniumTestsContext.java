@@ -2278,13 +2278,15 @@ public class SeleniumTestsContext {
     }
     
     public void setOutputDirectory(String outputDir, ITestContext context, boolean configureTestNg) {
-    	setDefaultOutputDirectory(context);
+    	
     	if (outputDir == null) {
+    		setAttribute(DEFAULT_OUTPUT_DIRECTORY, new File(context.getOutputDirectory()).getParent());
     		setAttribute(OUTPUT_DIRECTORY, new File(context.getOutputDirectory()).getParent());
     	} else {
     		if (context instanceof TestRunner && configureTestNg) {
     			((TestRunner)context).setOutputDirectory(outputDir);
     		}
+    		setAttribute(DEFAULT_OUTPUT_DIRECTORY, new File(outputDir).getAbsolutePath().replace(File.separator, "/"));
     		setAttribute(OUTPUT_DIRECTORY, new File(outputDir).getAbsolutePath().replace(File.separator, "/"));
     		try {
     			new File((String)getAttribute(OUTPUT_DIRECTORY)).mkdirs();
@@ -2292,10 +2294,6 @@ public class SeleniumTestsContext {
     			logger.error(String.format("Error creating output directory %s", (String)getAttribute(OUTPUT_DIRECTORY)));
     		}
     	}
-    }
-    
-    public void setDefaultOutputDirectory(ITestContext context) {
-    	setAttribute(DEFAULT_OUTPUT_DIRECTORY, new File(context.getOutputDirectory()).getParent());
     }
     
     public void setOptimizeReports(Boolean optimize) {

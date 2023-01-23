@@ -111,6 +111,16 @@ public class TestDriverFirefox extends TestDriver {
 		super.testSendKeysJs();
 	}
 
+	@Test(groups = {"it", "ut"})
+	public void testSendKeysAction() {
+		super.testSendKeysAction();
+	}
+
+	@Test(groups = {"it", "ut"})
+	public void testSendKeysActionPause() {
+		super.testSendKeysActionWithPause();
+	}
+
 	@Test(groups={"it"})
 	public void testSendKeysKeyboard() {
 		super.testSendKeysKeyboard();

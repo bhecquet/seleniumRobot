@@ -1093,6 +1093,17 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	
 	@Test(groups="ut context")
+	public void testDefaultOutputDirectory(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		String out = SeleniumTestsContextManager.getRootPath();
+		((TestRunner)testNGCtx).setOutputDirectory(out);
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setOutputDirectory(out, testNGCtx, true);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory().replace("\\", "/") + "/", out);
+	}
+
+
+	
+	@Test(groups="ut context")
 	public void testHeadlessMode(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setHeadlessBrowser(true);

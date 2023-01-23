@@ -406,7 +406,7 @@ public class TestNGResultUtils {
     	int i = 0;
     	for (Object parameter: testNGResult.getParameters()) {
     		String key = String.format("arg%d", i++);
-    		getSeleniumRobotTestContext(testNGResult).getConfiguration().put(key, new TestVariable(key, parameter.toString()));
+    		getSeleniumRobotTestContext(testNGResult).getConfiguration().put(key, new TestVariable(key, parameter == null ? "null" : parameter.toString()));
     	}
     	String description = StringUtility.interpolateString(testNGResult.getMethod().getDescription(), getSeleniumRobotTestContext(testNGResult));
     	testNGResult.setAttribute(DESCRIPTION, description); // store it so that it's used in reports

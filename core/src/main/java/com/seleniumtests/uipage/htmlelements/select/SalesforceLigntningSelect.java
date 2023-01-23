@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
 import com.seleniumtests.uipage.ByC;
@@ -83,7 +84,12 @@ public class SalesforceLigntningSelect extends AngularSelect implements ISelectL
 	 */
 	@Override
 	public String getOptionText(WebElement option) {
-		return option.findElements(ByC.xTagName("span")).get(1).findElement(ByC.xTagName("span")).getDomAttribute("title");
+		try {
+			return option.findElements(ByC.xTagName("span")).get(1).findElement(ByC.xTagName("span")).getAttribute("title");
+		} catch (NoSuchElementException e) {
+			// sometimes, the span sub-element is not present, so the above line fails. Fall back to getText() method
+			return option.getText();
+		}
 	}
 	
 	@Override

@@ -33,11 +33,13 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.core.Mask;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
+import com.seleniumtests.it.core.aspects.CalcPage;
 import com.seleniumtests.reporter.info.HyperlinkInfo;
 import com.seleniumtests.reporter.info.StringInfo;
 import com.seleniumtests.reporter.logger.Snapshot;
@@ -273,11 +275,26 @@ public class StubTestClass extends StubParentClass {
 	@DataProvider(name = "data2")
 	 public Object[][] data2() {
 		return new String[][] {new String[] {"data2", "data3"}, new String[] {"data4", "data5"}};
-   }
+	}
+	@DataProvider(name = "data3")
+	public Object[][] data3() {
+		return new Integer[][] {new Integer[] {12, 123456}, 
+			new Integer[] {13, 12345},
+		new Integer[] {14, null}
+		};
+	}
 	
 	@Test(groups="stub", testName="A test which is OK (${arg0}, ${arg1})", dataProvider = "data2")
 	public void testOkWithTestNameAndDataProvider(String col1, String col2) throws IOException {
 		logger.info(String.format("%s,%s", col1, col2));
+	}
+	
+	@Test(groups="stub", dataProvider = "data3")
+	public void testOkWithPasswordDataProvider(Integer col1, @Mask Integer sensibleData) throws IOException {
+		logger.info(String.format("%d,%d", col1, sensibleData == null ? -1: sensibleData));
+		
+		new CalcPage()
+			.add(1, sensibleData);
 	}
 
 	@Test(groups="stub")

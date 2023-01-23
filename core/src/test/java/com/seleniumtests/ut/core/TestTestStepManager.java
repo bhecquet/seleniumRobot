@@ -7,12 +7,31 @@ import org.testng.Reporter;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.helper.WaitHelper;
 
 public class TestTestStepManager extends GenericTest {
 
+
+	@Test(groups= {"ut"})
+	public void testLogStep() {
+		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
+		TestStepManager.logTestStep(step1);
+		
+		Assert.assertNull(TestStepManager.getCurrentRootTestStep());
+		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getTestStepManager().getRunningTestStep());
+	}
+	
+	@Test(groups= {"ut"})
+	public void testLogStepWithPassword() {
+		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().addPasswordToReplace("foobar");
+		TestStepManager.logTestStep(step1);
+	
+		Assert.assertEquals(step1.getPwdToReplace().get(0), "foobar");
+	}
 	
 	@Test(groups= {"ut"})
 	public void testCurrentRootTestStepWithoutVideoTimeStamp() {

@@ -420,6 +420,30 @@ public class TestLogActions extends GenericTest {
 	
 	
 	/**
+	 * Check password replacement when {@code @Mask} annotation is used on parameter
+	 * @throws IOException
+	 */
+	@Test(groups={"it"})
+	public void testPasswordMasking() throws IOException {
+		new CalcPage()
+			.addAndMask(1, 234567);
+		
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
+		Assert.assertEquals(steps.size(), 2);
+		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
+		Assert.assertEquals(steps.get(1).getName(), String.format("addAndMask with args: (1, ******, )"));
+	}
+	
+	/**
+	 * If password is null do not replace
+	 * @throws IOException
+	 */
+	@Test(groups={"it"})
+	public void testPasswordReplacementNull() throws IOException {
+		testPassword(true, null, "null");
+	}
+	
+	/**
 	 * Check password replacement done when requested by start option
 	 * @throws IOException
 	 */

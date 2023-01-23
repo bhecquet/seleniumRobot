@@ -48,6 +48,7 @@ import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 
+import com.seleniumtests.core.Mask;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.utils.TestNGResultUtils;
@@ -246,12 +247,19 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		
 		// issue #163: add test parameter to test name
 		if (testParameters.length > 0) {
+			
 			testName.append(" with params: (");
 			
 			int i = 0;
 			
 			for (Object param: testParameters) {
-				testName.append(param.toString());
+				
+				// method parameters that should be masked are stored inside TestStepManager
+				if (param != null && testContext.getTestStepManager().getPwdToReplace().contains(param.toString())) {
+					testName.append("******");
+				} else {				
+					testName.append(param == null ? "null": param.toString());
+				}
 				if (i < testParameters.length - 1) {
 					testName.append(",");
 				}

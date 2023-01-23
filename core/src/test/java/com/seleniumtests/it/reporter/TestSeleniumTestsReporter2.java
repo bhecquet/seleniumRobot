@@ -1463,8 +1463,29 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent2.contains("<h4> Test Details - A test which is OK (data2, data3) with params: (data2,data3)</h4>"));
 		String detailedReportContent3 = readTestMethodResultFile("testOkWithTestNameAndDataProvider-1");
 		Assert.assertTrue(detailedReportContent3.contains("<h4> Test Details - A test which is OK (data4, data5) with params: (data4,data5)</h4>"));
+	}
+	
+	/**
+	 * Test parameter masking for test method and test step
+	 * Only test method parameter is set as "to mask", but check all steps using the parameter will mask it
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportParametersFromDataProvider() throws Exception {
 		
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testOkWithPasswordDataProvider"});
 		
+		// Check password is masked
+		String detailedReportContent = readTestMethodResultFile("testOkWithPasswordDataProvider");
+		Assert.assertTrue(detailedReportContent.contains("<h4> Test Details - testOkWithPasswordDataProvider with params: (12,******)</h4>"));
+		Assert.assertTrue(detailedReportContent.contains("class=\"step-title\"> add with args: (1, ******, )"));
+		String detailedReportContent2 = readTestMethodResultFile("testOkWithPasswordDataProvider-1");
+		Assert.assertTrue(detailedReportContent2.contains("<h4> Test Details - testOkWithPasswordDataProvider-1 with params: (13,12345)</h4>"));
+		Assert.assertTrue(detailedReportContent2.contains("class=\"step-title\"> add with args: (1, 12345, )"));
+
+		// test with "null" parameter
+		String detailedReportContent3 = readTestMethodResultFile("testOkWithPasswordDataProvider-2");
+		Assert.assertTrue(detailedReportContent3.contains("<h4> Test Details - testOkWithPasswordDataProvider-2 with params: (14,null)</h4>"));
 	}
 	
 	@Test(groups={"it"})

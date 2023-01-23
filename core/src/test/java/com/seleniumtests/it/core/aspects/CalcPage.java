@@ -22,6 +22,7 @@ import java.io.IOException;
 import org.openqa.selenium.By;
 import org.testng.Assert;
 
+import com.seleniumtests.core.Mask;
 import com.seleniumtests.core.Step;
 import com.seleniumtests.core.Step.RootCause;
 import com.seleniumtests.core.StepName;
@@ -42,6 +43,12 @@ public class CalcPage extends PageObject {
 	}
 	
 	public CalcPage add(int a, int b) {
+		result = a + b;
+		doNothing();
+		return this;
+	}
+	
+	public CalcPage addAndMask(int a, @Mask int b) {
 		result = a + b;
 		doNothing();
 		return this;

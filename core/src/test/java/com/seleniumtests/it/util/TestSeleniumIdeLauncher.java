@@ -1,5 +1,8 @@
 package com.seleniumtests.it.util;
 
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.Inet4Address;
@@ -10,12 +13,15 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.Appender;
+import org.mockito.ArgumentMatchers;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.lang.reflect.Field;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -228,6 +234,49 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 		} finally {
 			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		}
+	}
+	
+	/**
+	 * 
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 * @throws NoSuchFieldException 
+	 * @throws IllegalAccessException 
+	 * @throws IllegalArgumentException 
+	 */
+	@Test(groups={"it"})
+	public void testParseIssue() throws IOException, ClassNotFoundException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+		try {		    
+		    SeleniumIdeLauncher seleniumIde = new SeleniumIdeLauncher();
+		    
+		    Logger logger = spy(SeleniumRobotLogger.getLogger(SeleniumIdeLauncher.class));
+		    Field loggerField = SeleniumIdeLauncher.class.getDeclaredField("logger");
+		    loggerField.setAccessible(true);
+		    loggerField.set(seleniumIde, logger);
+		    
 		
+			CompilerUtils.addClassPath("target/test-classes");
+			System.setProperty(SeleniumTestsContext.BROWSER, "chrome");
+			System.setProperty(SeleniumTestsContext.MANUAL_TEST_STEPS, "true");
+			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "false");
+
+			// use a different file from the previous test to avoid problems with compiler cache
+			File tmpSuiteFile = GenericTest.createFileFromResource("ti/ide/MainPageTestError.java");
+			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTestError.java").toFile();
+			FileUtils.copyFile(tmpSuiteFile, suiteFile);
+			
+			seleniumIde.executeScripts(Arrays.asList(suiteFile.getAbsolutePath()));
+			
+			verify(logger).error(ArgumentMatchers.contains("invalid code, one element is missing : "));
+			verify(logger).error(ArgumentMatchers.contains("Parse error."));
+
+
+			} finally {
+			System.clearProperty(SeleniumTestsContext.BROWSER);
+			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
+			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);
+			
+			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
+		}
 	}
 }
