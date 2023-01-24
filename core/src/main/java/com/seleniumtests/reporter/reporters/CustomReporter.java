@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.seleniumtests.driver.DriverMode;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -159,6 +160,11 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			SeleniumTestsContext seleniumTestsContext = TestNGResultUtils.getSeleniumRobotTestContext(testResult);
 	
 			// if adding some information, don't forget to add them to velocity model for integration tests
+			if (seleniumTestsContext.getRunMode().equals(DriverMode.GRID)) {
+				context.put("gridnode", seleniumTestsContext.getSeleniumGridConnector().getNodeHost());
+			} else {
+				context.put("gridnode", seleniumTestsContext.getRunMode());
+			}
 			context.put("errors", 0);
 			context.put("newline", "\n");
 			context.put("failures", errors);

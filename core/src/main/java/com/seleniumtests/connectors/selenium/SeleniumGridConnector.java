@@ -48,6 +48,7 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	protected int hubPort;
 	protected SessionId sessionId;
 	protected String nodeUrl;
+	protected String nodeHost;
 	
 	public static final String CONSOLE_SERVLET = "/grid/console/";
 	public static final String API_TEST_SESSSION = "/grid/api/testsession/";
@@ -301,7 +302,8 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
             String node = nodeUrl.split("//")[1].split(":")[0];
             String browserName = driver.getCapabilities().getBrowserName();
             String version = driver.getCapabilities().getVersion();
-            
+            //get node host name
+			nodeHost = node.split("\\.")[0];
             // setting sessionId ensures that this connector is the active one
             // issue #242: check if sessionId has already been set by a previous driver in this test session
             // 				if so, keep the previous sessionId so that recordings are correctly handled
@@ -340,6 +342,10 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 
 	public void setNodeUrl(String nodeUrl) {
 		this.nodeUrl = nodeUrl;
+	}
+
+	public String getNodeHost() {
+		return nodeHost;
 	}
 
 	public static Logger getLogger() {
