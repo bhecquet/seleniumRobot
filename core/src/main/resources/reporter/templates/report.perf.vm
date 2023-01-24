@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite errors="$errors" failures="$failures" hostname="$hostname" name="$suiteName" tests="$tests" time="$duration" timestamp="$time" browser="$browser" appVersion="$version" coreVersion="$coreVersion" retries="$retries" mobileApp="$mobileApp" device="$device" platform="$platform" failedStep="$failedStep" >
+<testsuite gridnode="$gridnode" errors="$errors" failures="$failures" hostname="$hostname" name="$suiteName" tests="$tests" time="$duration" timestamp="$time" browser="$browser" appVersion="$version" coreVersion="$coreVersion" retries="$retries" mobileApp="$mobileApp" device="$device" platform="$platform" failedStep="$failedStep" >
 	
 	<infos>
 		#foreach ($testInfo in $testInfos.entrySet())
