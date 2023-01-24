@@ -489,7 +489,7 @@ public class ConnectorsTest extends MockitoTest {
 
 		
 		
-		createJsonServerMock("GET", SeleniumRobotGridConnector.API_TEST_SESSSION, 200,
+		createJsonServerMock("GET", SeleniumRobotGridConnector.API_TEST_SESSSION, 200, 
 				// session not found
 				"{" + 
 				"  \"msg\": \"Cannot find test slot running session 7ef50edc-ce51-40dd-98b6-0a369bff38b in the registry.\"," + 
