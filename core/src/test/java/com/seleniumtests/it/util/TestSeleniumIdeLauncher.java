@@ -265,13 +265,18 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTestError.java").toFile();
 			FileUtils.copyFile(tmpSuiteFile, suiteFile);
 			
-			seleniumIde.executeScripts(Arrays.asList(suiteFile.getAbsolutePath()));
+			try {
+				seleniumIde.executeScripts(Arrays.asList(suiteFile.getAbsolutePath()));
+				Assert.fail("ClassNotFoundException expected");
+			} catch (ClassNotFoundException e) {
+				
+			}
 			
 			verify(logger).error(ArgumentMatchers.contains("invalid code, one element is missing : "));
-			verify(logger).error(ArgumentMatchers.contains("Parse error."));
+			verify(logger).error(ArgumentMatchers.contains("com.infotel.selenium.ide.MainPageTestErrorPage"));
 
 
-			} finally {
+		} finally {
 			System.clearProperty(SeleniumTestsContext.BROWSER);
 			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
 			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);

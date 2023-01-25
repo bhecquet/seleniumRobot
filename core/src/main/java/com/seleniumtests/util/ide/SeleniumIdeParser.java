@@ -126,12 +126,13 @@ public class SeleniumIdeParser {
         
         webPageCode.append(FOOTER);
         testCode.append(FOOTER);
+        String testCodeStr = testCode.toString().replace("new WebPage().", String.format("new %sPage().", className));
         
-        classInfo.put("com.infotel.selenium.ide." + className, testCode.toString().replace("new WebPage().", String.format("new %sPage().", className)));
+        classInfo.put("com.infotel.selenium.ide." + className, testCodeStr);
         classInfo.put("com.infotel.selenium.ide." + className + "Page", webPageCode.toString());
         
         logger.info(String.format("generated class %s", className));
-        logger.info("\n" + testCode.toString());
+        logger.info("\n" + testCodeStr);
         logger.info("------------------------------------------");
         logger.info(String.format("generated class %sPage", className));
         logger.info("\n" + webPageCode.toString());

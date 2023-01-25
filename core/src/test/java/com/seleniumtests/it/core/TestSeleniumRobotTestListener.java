@@ -67,7 +67,7 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.reporter.ReporterTest;
 import com.seleniumtests.it.stubclasses.StubTestClassForDriverParallelTest;
 
-@PrepareForTest({SeleniumRobotVariableServerConnector.class, SeleniumGridConnectorFactory.class, SeleniumTestsContext.class, WebUIDriver.class})
+@PrepareForTest({SeleniumRobotVariableServerConnector.class, SeleniumGridConnectorFactory.class, SeleniumRobotServerContext.class, SeleniumTestsContext.class, WebUIDriver.class})
 public class TestSeleniumRobotTestListener extends ReporterTest {
 
 	private static final String DRIVER_BLOCKED_MSG = "Driver creation forbidden before @BeforeMethod and after @AfterMethod execution";

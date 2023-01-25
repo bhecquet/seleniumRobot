@@ -58,7 +58,7 @@ import com.seleniumtests.reporter.reporters.SeleniumRobotServerTestRecorder;
 
 import kong.unirest.json.JSONObject;
 
-@PrepareForTest({SeleniumRobotSnapshotServerConnector.class, CommonReporter.class, SeleniumRobotVariableServerConnector.class, SeleniumTestsContext.class, FieldDetectorConnector.class})
+@PrepareForTest({SeleniumRobotSnapshotServerConnector.class, CommonReporter.class, SeleniumRobotVariableServerConnector.class, SeleniumRobotServerContext.class, SeleniumTestsContext.class, FieldDetectorConnector.class})
 public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	
 	private SeleniumRobotServerTestRecorder reporter;

@@ -64,14 +64,15 @@ public class SeleniumIdeLauncher {
 	
 	public void executeScripts(List<String> scriptFiles) throws ClassNotFoundException {
         try {
-		checkPrerequisites();
-		Map<String, String> classCodes = generateTestClasses(scriptFiles);
-		executeGeneratedClasses(classCodes);
-        } catch (ParseProblemException e) {
+			checkPrerequisites();
+			Map<String, String> classCodes = generateTestClasses(scriptFiles);
+			executeGeneratedClasses(classCodes);
+        } catch (ParseProblemException | ClassNotFoundException e) {
 	        String parse = e.getMessage().split("Problem")[0];
                 logger.error("--------------------------------------------------------------------------------------------------------------------------------------------------------");
                 logger.error("invalid code, one element is missing : " + parse);
                 logger.error("--------------------------------------------------------------------------------------------------------------------------------------------------------");
+            throw e;
         }
 	}
 	
