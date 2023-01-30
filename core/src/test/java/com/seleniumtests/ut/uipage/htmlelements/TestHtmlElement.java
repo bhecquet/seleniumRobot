@@ -66,10 +66,12 @@ import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
+import org.testng.Reporter;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
+import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.customexception.ScenarioException;
@@ -180,6 +182,8 @@ public class TestHtmlElement extends MockitoTest {
 		when(uiDriver.getConfig()).thenReturn(driverConfig);
 		when(driverConfig.getBrowserType()).thenReturn(BrowserType.HTMLUNIT);
 		when(driverConfig.getMajorBrowserVersion()).thenReturn(1);
+		
+		when(((CustomEventFiringWebDriver)eventDriver).getBrowserInfo()).thenReturn(new BrowserInfo(BrowserType.HTMLUNIT, "999.9"));
 
 		when(element.findElement(By.name("subEl"))).thenReturn(subElement1);
 		when(element.findElements(By.name("subEl"))).thenReturn(subElList);
@@ -365,6 +369,27 @@ public class TestHtmlElement extends MockitoTest {
 		PowerMockito.verifyPrivate(el, atLeast(2)).invoke("updateDriver");
 
 		verify(el, times(1)).isDisplayedRetry();
+	}
+	
+	/**
+	 * #548: check that if a NullPointerException is raised during replay, this does not affect the logging
+	 * @throws Exception
+	 */
+	@Test(groups = { "ut" })
+	public void testReplayActionWithNPE() throws Exception {
+		TestStep step = new TestStep("step", Reporter.getCurrentTestResult(), new ArrayList<>(), false);
+		
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setRootTestStep(step);// add a step so that we can reproduce the NPE bug in "ReplayAction" class
+		when(element.isDisplayed()).thenThrow(new NullPointerException());
+		try {
+			el.isDisplayedRetry();
+		} catch (NullPointerException e) {
+			// ignore the error, as it's expected
+		}
+		
+		Assert.assertEquals(step.getStepActions().size(), 2);
+		Assert.assertEquals(step.getStepActions().get(1).getName(), "Warning: null"); // check message is logged
 	}
 
 	/**

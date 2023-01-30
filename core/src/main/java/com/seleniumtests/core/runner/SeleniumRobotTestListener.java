@@ -21,6 +21,7 @@ import com.epam.reportportal.testng.BaseTestNGListener;
 import com.google.common.collect.Iterables;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import com.seleniumtests.connectors.tms.reportportal.ReportPortalService;
+import com.seleniumtests.core.Mask;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestStepManager;
@@ -570,6 +571,15 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
     	// unique method name is the test name plus an index in case DataProvider is used
     	TestNGResultUtils.setUniqueTestName(testResult, SeleniumTestsContextManager.getThreadContext().getRelativeOutputDir());
 		logger.info(SeleniumRobotLogger.START_TEST_PATTERN + TestNGResultUtils.getUniqueTestName(testResult));
+		
+		// search method parameters that should be masked
+		Object[] testParameters = testResult.getParameters();
+		for (int i = 0; i < testParameters.length; i++) {
+			if (testResult.getMethod().getConstructorOrMethod().getMethod().getParameters()[i].getAnnotationsByType(Mask.class).length > 0
+					&& testResult.getParameters()[i] != null) {
+				SeleniumTestsContextManager.getThreadContext().getTestStepManager().addPasswordToReplace(testResult.getParameters()[i].toString());
+			}
+		}
 	}
 	
 

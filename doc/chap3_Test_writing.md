@@ -727,6 +727,17 @@ because method `_setPassword` signature is `public DriverTestPage _setPassword(S
 	addStep("my step name", myValueForPassword1, myValueForPassword2)
 ```
 
+**WARN: ** When the password is given to test method using @DataProvider, the above won't work due to java limitation during compilation. To hide pasword, use the @Mask annotation
+
+```
+@Test
+public void methodWithPassword(Integer col1, @Mask Integer sensibleData) throws IOException {
+        logger.info(String.format("%d,%d", col1, sensibleData == null ? -1: sensibleData));
+    }
+```
+
+The `@Mask` annotation will also work on test steps, in case you do not want to name your variable 'password' / 'pwd' / ...
+
 #### TestNG file ####
 For tests extending SeleniumTestPlan, the testNg XML looks like (minimal requirements):
 

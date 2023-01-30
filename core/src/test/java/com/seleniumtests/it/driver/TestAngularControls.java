@@ -50,6 +50,10 @@ public class TestAngularControls extends GenericMultiBrowserTest {
    
 
 	
+	public void testSelectNotFound() {
+		DriverSubAngularTestPage.selectListNotFound.selectByText("Option 1");
+	}
+	
 	public void testSelectByText() {
 		DriverSubAngularTestPage.selectList.selectByText("Option 1");
 		Assert.assertEquals(DriverSubAngularTestPage.selectList.getSelectedText(), "Option 1");

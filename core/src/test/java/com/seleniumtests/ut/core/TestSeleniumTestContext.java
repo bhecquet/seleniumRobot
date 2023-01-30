@@ -1026,7 +1026,6 @@ public class TestSeleniumTestContext extends GenericTest {
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerRecordResults(), SeleniumTestsContext.DEFAULT_SELENIUMROBOTSERVER_RECORD_RESULTS);
 	}
 
-
 	@Test(groups="ut context")
 	public void testSoftAssertEnabled(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
@@ -1390,6 +1389,17 @@ public class TestSeleniumTestContext extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().setOutputDirectory(null, testNGCtx, false);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "/home/other/test-output".replace("/", File.separator));
 	}
+
+	@Test(groups="ut context")
+	public void testDefaultOutputDirectory(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		String out = SeleniumTestsContextManager.getRootPath();
+		((TestRunner)testNGCtx).setOutputDirectory(out);
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setOutputDirectory(out, testNGCtx, true);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory().replace("\\", "/") + "/", out);
+	}
+
+
 	
 	@Test(groups="ut context")
 	public void testHeadlessMode(final ITestContext testNGCtx, final XmlTest xmlTest) {
