@@ -222,6 +222,7 @@ Params for mobile testing
 | deviceName 				| 			| Name of the device to use for mobile tests. It's the Human readable name (e.g: Nexus 6 as given by `adb -s <id_device> shell getprop`, line [ro.product.model] property on Android or `instruments -s devices`), not it's id. SeleniumRobot will replace this name with id when communicating with Appium | 
 | fullReset 				| true		| enable full reset capability for appium tests | 
 | appiumServerUrl			|			| Appium server already started, that will be used to execute the test. It's useful to debug tests locally |
+| appiumCaps                |           | Set of capabilities that will be added and sent to appium. These are the capabilities that are not already handled by the framework. See: http://appium.io/docs/en/writing-running-appium/caps/. Format is "key1=value1;key2=value2" |
 | appPackage 				| 			| Package name of application (android only) | 
 | appActivity 				| 			| Activity started by mobile application (Android) | 
 | appWaitActivity 			| 			| In some cases, the first started activity is not the main app activity | 
@@ -411,6 +412,8 @@ Also check that there is only one version of ADB on computer. Otherwise, there m
 
 When using seleniumRobot-grid, these environment variables will be set on grid node
 For cloud test, these variables are not needed
+
+If you want to set some appium capabilities, use 'appiumCaps' parameter when the needed capabilities are not provided by framework
 
 #### Application test on android ####
 
