@@ -3,9 +3,13 @@ package com.seleniumtests.it.util;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -144,6 +148,67 @@ public class TestSeleniumIdeParser extends GenericTest {
 		} finally {
 			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
 		}
+	}
+	
+	/**
+	 * Check that WebDriverWait time unit is replaced
+	 * @throws IOException
+	 */
+	@Test(groups={"it"})
+	public void testCodeGenerationWebDriverWait() throws IOException {
+		
+		String testClassCode = "package com.infotel.selenium.ide;\n" + 
+				"\n" + 
+				"import java.io.IOException;\n" + 
+				"import com.seleniumtests.core.runner.SeleniumTestPlan;\n" + 
+				"import org.testng.annotations.Test;\n" + 
+				"\n" + 
+				"public class MysuiteTestWait extends SeleniumTestPlan {\n" + 
+				"\n" + 
+				"    @Test\n" + 
+				"    public void jcommander() throws IOException {\n" + 
+				"        new MysuiteTestWaitPage().jcommander();\n" + 
+				"    }\n" + 
+				"\n" + 
+				"}";
+		
+		String pageClassCode = String.format(SeleniumIdeParser.PAGE_OBJECT_HEADER, "MysuiteTestWait", "MysuiteTestWait") + 
+				"public void seleniumhq(){\n" + 
+				"    driver.get(\"https://www.seleniumhq.org/\");\n" + 
+				"    driver.manage().window().setSize(new Dimension(1000, 683));\n" + 
+				"    driver.findElement(By.linkText(\"Blog\")).click();\n" + 
+				"}\n" + 
+				"\n" + 
+				"\n" + 
+				"public void jcommander(){\n" + 
+				"    vars.put(\"toto\", \"coucou\");\n" + 
+			    "    logger.info(vars.get(\"foo\"));\n" +
+				"    driver.get(\"http://www.jcommander.org//\");\n" + 
+				"    driver.manage().window().setSize(new Dimension(768, 683));\n" + 
+				"    driver.findElement(By.linkText(\"2.1. Boolean\")).click();\n" + 
+				"    {\n" +
+				"        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));\n" +
+				"        wait.until(ExpectedConditions.presenceOfElementLocated(By.id(\"bla\")));\n" +
+				"    }\n" +
+				"    driver.findElement(By.linkText(\"21. Parameter delegates\")).click();\n" + 
+				"    assertThat(driver.findElement(By.linkText(\"2.1. Boolean\")).getText(), is(\"2.1. Boolean\"));\n" +
+				"    seleniumhq();\n" + 
+				"}\n" + 
+				"\n" + 
+				"\n" + 
+				"}";
+		
+			File tmpSuiteFile = createFileFromResource("ti/ide/MysuiteTestWait.java");
+			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MysuiteTestWait.java").toFile();
+			FileUtility.copyFile(tmpSuiteFile, suiteFile);
+			
+			Map<String, String> classInfo = new SeleniumIdeParser(suiteFile.getAbsolutePath()).parseSeleniumIdeFile();
+			
+			Assert.assertTrue(classInfo.containsKey("com.infotel.selenium.ide.MysuiteTestWait"));
+			Assert.assertTrue(classInfo.containsKey("com.infotel.selenium.ide.MysuiteTestWaitPage"));
+			
+			Assert.assertEquals(classInfo.get("com.infotel.selenium.ide.MysuiteTestWait"), testClassCode);
+			Assert.assertEquals(classInfo.get("com.infotel.selenium.ide.MysuiteTestWaitPage"), pageClassCode);
 	}
 	
 	/**

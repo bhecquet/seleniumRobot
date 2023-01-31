@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
@@ -54,6 +55,7 @@ public class SeleniumIdeParser {
 			"import org.openqa.selenium.Keys;\n" + 
 			"import com.seleniumtests.core.TestVariable;\n" +
 			"import java.util.Map.Entry;\n" +
+			"import java.time.Duration;\n" +
 			"import java.util.*;\n" +  
 			"\n" + 
 			"public class %sPage extends PageObject {\n" + 
@@ -93,15 +95,19 @@ public class SeleniumIdeParser {
 	 * - in the CALL line, replace escaped quotes by quote itself
 	 */
 	private void prepareJavaFile(File javaFile) {
-		Pattern pattern = Pattern.compile(".*System.out.println\\(\"CALL:(.*)\"\\);$");
+		Pattern patternCall = Pattern.compile(".*System.out.println\\(\"CALL:(.*)\"\\);$");
+		Pattern patternWait = Pattern.compile(".*new WebDriverWait\\(driver, (\\d+)\\);$");
 		try {
 			StringBuilder newContent = new StringBuilder();
 			String content = FileUtils.readFileToString(javaFile, StandardCharsets.UTF_8);
 			for (String line: content.split("\n")) {
 				line = line.replace("\r", "");
-				Matcher matcher = pattern.matcher(line);
-				if (matcher.matches()) {
-					newContent.append(matcher.group(1).replace("\\\"", "\"") + "\n");
+				Matcher matcherCall = patternCall.matcher(line);
+				Matcher matcherWait = patternWait.matcher(line);
+				if (matcherCall.matches()) {
+					newContent.append(matcherCall.group(1).replace("\\\"", "\"") + "\n");
+				} else if (matcherWait.matches()) {
+					newContent.append(String.format("WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(%s));\n", matcherWait.group(1)));
 				} else {
 					newContent.append(line + "\n");
 				}
@@ -110,7 +116,6 @@ public class SeleniumIdeParser {
 			FileUtils.writeStringToFile(javaFile, newContent.toString(), StandardCharsets.UTF_8);
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
