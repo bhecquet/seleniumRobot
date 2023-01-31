@@ -317,13 +317,13 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
 		MutableCapabilities capa = capaFactory.createCapabilities();
 		
-		Assert.assertEquals(capa.getCapability("key1"), "value1");
-		Assert.assertEquals(capa.getCapability("key2"), "value2");
+		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + "key1"), "value1");
+		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + "key2"), "value2");
 
 	}
 	
 	/**
-	 * Check that when user sets a capability with 'appiumCaps' option which overrides an other option, user option is prioritary
+	 * Check that when user sets a capability with 'appiumCaps' option which do not override an other option
 	 */
 	@Test(groups={"ut"})
 	public void testCreateCapabilitiesWithUserDefinedOverride() {
@@ -341,7 +341,7 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
 		MutableCapabilities capa = capaFactory.createCapabilities();
 		
-		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "firefox");
+		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + CapabilityType.BROWSER_NAME), "firefox");
 		
 	}
 }
