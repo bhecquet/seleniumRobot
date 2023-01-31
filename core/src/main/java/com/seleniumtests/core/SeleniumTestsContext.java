@@ -47,6 +47,7 @@ import org.testng.TestRunner;
 import org.testng.internal.TestResult;
 
 import com.seleniumtests.browserfactory.BrowserInfo;
+import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.connectors.bugtracker.BugTracker;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
@@ -2248,7 +2249,8 @@ public class SeleniumTestsContext {
 	    		Map<String, String> capsMap = Arrays.asList(appiumCapabilites.split(";"))
 	    			.stream()
 	    			.map(kv -> kv.split("="))
-	    			.collect(Collectors.toMap(a -> a[0], a -> a[1]));
+	    			.collect(Collectors.toMap(a -> a[0].startsWith(SeleniumRobotCapabilityType.APPIUM_PREFIX) ? a[0]: SeleniumRobotCapabilityType.APPIUM_PREFIX + a[0],
+	    					a -> a[1]));
 	    		setAttribute(APPIUM_CAPS, new MutableCapabilities(capsMap));
     		} catch (IndexOutOfBoundsException e) {
     			throw new ConfigurationException("Format for appium capabilities must be 'key1=value1;key2=value2'");

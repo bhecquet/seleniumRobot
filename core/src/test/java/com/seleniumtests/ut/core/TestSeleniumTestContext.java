@@ -36,6 +36,7 @@ import org.testng.xml.XmlTest;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
+import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestVariable;
@@ -1026,11 +1027,11 @@ public class TestSeleniumTestContext extends GenericTest {
 	@Test(groups="ut context")
 	public void testAppiumCapabilities(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setAppiumCapabilities("cap1=val1;cap2=val2");
+		SeleniumTestsContextManager.getThreadContext().setAppiumCapabilities("cap1=val1;appium:cap2=val2");
 		Capabilities caps = SeleniumTestsContextManager.getThreadContext().getAppiumCapabilities();
 		Assert.assertEquals(caps.asMap().size(), 2);
-		Assert.assertEquals(caps.getCapability("cap1"), "val1");
-		Assert.assertEquals(caps.getCapability("cap2"), "val2");
+		Assert.assertEquals(caps.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + "cap1"), "val1");
+		Assert.assertEquals(caps.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + "cap2"), "val2");
 	}
 	@Test(groups="ut context", expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Format for appium capabilities must be 'key1=value1;key2=value2'")
 	public void testAppiumCapabilitiesWrongFormat(final ITestContext testNGCtx, final XmlTest xmlTest) {
