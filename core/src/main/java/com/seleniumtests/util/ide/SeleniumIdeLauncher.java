@@ -34,6 +34,9 @@ public class SeleniumIdeLauncher {
 	
 	@Parameter(names = "-scripts", variableArity = true, description= "List of selenium .java files to execute within seleniumRobot. These files are exported from Selenium IDE")
 	public List<String> scripts = new ArrayList<>();
+	
+	@Parameter(names = "-threadcount", description = "The default number of threads to use when running tests in parallel.")
+	public int threadCount = 1;
 
 	public static void main(String ... args) throws ClassNotFoundException {
 		
@@ -50,7 +53,7 @@ public class SeleniumIdeLauncher {
 
 	public void executeScripts() throws ClassNotFoundException {
 		
-		executeScripts(scripts);
+		executeScripts(scripts, threadCount);
 	}
 	
 	/**
@@ -62,11 +65,11 @@ public class SeleniumIdeLauncher {
 		}
 	}
 	
-	public void executeScripts(List<String> scriptFiles) throws ClassNotFoundException {
+	public void executeScripts(List<String> scriptFiles, int numberOfThreads) throws ClassNotFoundException {
         try {
 			checkPrerequisites();
 			Map<String, String> classCodes = generateTestClasses(scriptFiles);
-			executeGeneratedClasses(classCodes);
+			executeGeneratedClasses(classCodes, numberOfThreads);
         } catch (ParseProblemException | ClassNotFoundException e) {
 	        String parse = e.getMessage().split("Problem")[0];
                 logger.error("--------------------------------------------------------------------------------------------------------------------------------------------------------");
@@ -93,7 +96,7 @@ public class SeleniumIdeLauncher {
 		return classCodes;
 	}
 	
-	public void executeGeneratedClasses(Map<String, String> classCodes) throws ClassNotFoundException {
+	public void executeGeneratedClasses(Map<String, String> classCodes, int numberOfThreads) throws ClassNotFoundException {
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 
 		
@@ -114,7 +117,7 @@ public class SeleniumIdeLauncher {
 		}
 		
 		Thread.currentThread().setContextClassLoader(loader);
-		executeTest(1, classes.toArray(new String[] {}), new String[] {});
+		executeTest(numberOfThreads, classes.toArray(new String[] {}), new String[] {});
 	}
 	
 	private TestNG executeTest(int threadCount, String[] testClasses, String[] methods) {
@@ -133,7 +136,7 @@ public class SeleniumIdeLauncher {
 		
 		if (threadCount > 1) {
 			suite.setThreadCount(threadCount);
-			suite.setParallel(XmlSuite.ParallelMode.METHODS);
+			suite.setParallel(XmlSuite.ParallelMode.TESTS);
 		}
 		
 		for (String testClass: testClasses) {

@@ -687,6 +687,9 @@ Benefits to execute Selenium IDE tests this way are:
 For specifics about Selenium IDE writing, see §3.14
 - If you've added manual steps (as described in §3.14), add the option `-DmanualTestSteps=true`
 
+If you want to execute multiple script at the same time, use the `-threadCount` parameter
+e.g: `java -cp seleniumRobot.jar -D<option1>=<value1> -D<option2>=<value2> -Dbrowser=<browser> -javaagent:aspectjweaver.jar com.seleniumtests.util.ide.SeleniumIdeLauncher -scripts test1.java,test2.java -threadCount 2`
+
 ## Troubleshooting ##
 
 ### Cyclic dependency when executing TestNG Test ###

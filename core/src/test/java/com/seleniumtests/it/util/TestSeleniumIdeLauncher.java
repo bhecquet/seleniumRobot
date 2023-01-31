@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.Appender;
 import org.mockito.ArgumentMatchers;
@@ -88,7 +89,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTest.java").toFile();
 			FileUtility.copyFile(tmpSuiteFile, suiteFile);
 			
-			new SeleniumIdeLauncher().executeScripts(Arrays.asList(suiteFile.getAbsolutePath()));
+			new SeleniumIdeLauncher().executeScripts(Arrays.asList(suiteFile.getAbsolutePath()), 1);
 			
 			String mainReportContent = ReporterTest.readSummaryFile();
 			
@@ -122,6 +123,53 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 		}
 	}
 	
+	@Test(groups={"it"})
+	public void testSeleniumExecutionParallel() throws IOException, ClassNotFoundException {
+		try {
+			CompilerUtils.addClassPath("target/test-classes");
+			System.setProperty(SeleniumTestsContext.BROWSER, "chrome");
+			System.setProperty(SeleniumTestsContext.MANUAL_TEST_STEPS, "false");
+			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "false");
+			System.setProperty("foo", "Hello Selenium IDE");
+			
+			
+			File tmpSuiteFile = GenericTest.createFileFromResource("ti/ide/MainPageTest.java");
+			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTest.java").toFile();
+			File tmpSuiteFile2 = GenericTest.createFileFromResource("ti/ide/MainPageTest2.java");
+			File suiteFile2 = Paths.get(tmpSuiteFile2.getParentFile().getAbsolutePath(), "MainPageTest2.java").toFile();
+			FileUtility.copyFile(tmpSuiteFile, suiteFile);
+			FileUtility.copyFile(tmpSuiteFile2, suiteFile2);
+			
+			new SeleniumIdeLauncher().executeScripts(Arrays.asList(suiteFile.getAbsolutePath(), suiteFile2.getAbsolutePath()), 2);
+			
+			String mainReportContent = ReporterTest.readSummaryFile();
+			
+			// check that test are seen and OK
+			Assert.assertTrue(mainReportContent.matches(".*<a href='mainPage/TestReport.html' info=\"ok\" .*?>mainPage</a>.*"));
+			Assert.assertTrue(mainReportContent.matches(".*<a href='mainPage-1/TestReport.html' info=\"ok\" .*?>mainPage-1</a>.*"));
+			
+			// check tests has been run in parallel
+			String logs = ReporterTest.readSeleniumRobotLogFile();
+			Assert.assertEquals(StringUtils.countMatches(logs, "Start creating *chrome driver"), 2);
+			Assert.assertTrue(logs.contains("[TestNG-tests-1]")); // first thread
+			Assert.assertTrue(logs.contains("[TestNG-tests-2]")); // second thread
+			
+			// check that driver creation is done before the end of each test, meaning they have been executed almost at the same time
+			Assert.assertTrue(logs.indexOf("[TestNG-tests-2] WebUIDriver: Start creating *chrome driver") < logs.indexOf("[TestNG-tests-1] ScenarioLogger: Test is OK"));
+			Assert.assertTrue(logs.indexOf("[TestNG-tests-1] WebUIDriver: Start creating *chrome driver") < logs.indexOf("[TestNG-tests-2] ScenarioLogger: Test is OK"));
+			
+			
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.BROWSER);
+			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
+			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);
+			System.clearProperty("foo");
+			
+			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
+		}
+	}
+	
 	/**
 	 * Check that manual steps are displayed in report
 	 * @throws IOException
@@ -140,7 +188,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTest2.java").toFile();
 			FileUtility.copyFile(tmpSuiteFile, suiteFile);
 			
-			new SeleniumIdeLauncher().executeScripts(Arrays.asList(suiteFile.getAbsolutePath()));
+			new SeleniumIdeLauncher().executeScripts(Arrays.asList(suiteFile.getAbsolutePath()), 1);
 			
 			String mainReportContent = ReporterTest.readSummaryFile();
 			
@@ -186,7 +234,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTest2.java").toFile();
 			FileUtils.copyFile(tmpSuiteFile, suiteFile);
 			
-			new SeleniumIdeLauncher().executeScripts(Arrays.asList(suiteFile.getAbsolutePath()));
+			new SeleniumIdeLauncher().executeScripts(Arrays.asList(suiteFile.getAbsolutePath()), 1);
 
 			
 		} finally {
@@ -221,7 +269,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			Map<String, String> clss = new HashMap<String, String>();
 			clss.put("covea.selenium.commons.tests.Default", cls);
 			
-			new SeleniumIdeLauncher().executeGeneratedClasses(clss);
+			new SeleniumIdeLauncher().executeGeneratedClasses(clss, 1);
 			
 			String mainReportContent = ReporterTest.readSummaryFile();
 			
@@ -266,7 +314,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			FileUtils.copyFile(tmpSuiteFile, suiteFile);
 			
 			try {
-				seleniumIde.executeScripts(Arrays.asList(suiteFile.getAbsolutePath()));
+				seleniumIde.executeScripts(Arrays.asList(suiteFile.getAbsolutePath()), 1);
 				Assert.fail("ClassNotFoundException expected");
 			} catch (ClassNotFoundException e) {
 				
