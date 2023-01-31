@@ -301,4 +301,51 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.AUTOMATION_NAME), "UiAutomator1");
 	}
+	
+	/**
+	 * Check that when user sets a capability with 'appiumCaps' option, it's forwarded to appium
+	 */
+	@Test(groups={"ut"})
+	public void testCreateCapabilitiesWithUserDefined() {
+		SeleniumTestsContext context = new SeleniumTestsContext(SeleniumTestsContextManager.getThreadContext());
+		context.setBrowser(BrowserType.CHROME.toString());
+		context.setMobilePlatformVersion("8.0");
+		context.setPlatform("android");
+		context.setDeviceName("Samsung Galasy S8");
+		context.setApp("");
+		context.setAppiumCapabilities("key1=value1;key2=value2");
+		
+		DriverConfig config = new DriverConfig(context);
+		
+		
+		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
+		MutableCapabilities capa = capaFactory.createCapabilities();
+		
+		Assert.assertEquals(capa.getCapability("key1"), "value1");
+		Assert.assertEquals(capa.getCapability("key2"), "value2");
+
+	}
+	
+	/**
+	 * Check that when user sets a capability with 'appiumCaps' option which overrides an other option, user option is prioritary
+	 */
+	@Test(groups={"ut"})
+	public void testCreateCapabilitiesWithUserDefinedOverride() {
+		SeleniumTestsContext context = new SeleniumTestsContext(SeleniumTestsContextManager.getThreadContext());
+		context.setBrowser(BrowserType.CHROME.toString());
+		context.setMobilePlatformVersion("8.0");
+		context.setPlatform("android");
+		context.setDeviceName("Samsung Galasy S8");
+		context.setApp("");
+		context.setAppiumCapabilities("browserName=firefox;key2=value2");
+		
+		DriverConfig config = new DriverConfig(context);
+		
+		
+		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
+		MutableCapabilities capa = capaFactory.createCapabilities();
+		
+		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "firefox");
+		
+	}
 }

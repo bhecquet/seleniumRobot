@@ -220,6 +220,8 @@ public class SeleniumTestsContext {
     public static final String FULL_RESET = "fullReset";						// whether we should do a full reset (default is true)
     public static final String AUTOMATION_NAME = "automationName";				// Default is "Appium". The automationName to use. See http://appium.io/docs/en/writing-running-appium/caps/index.html
     public static final String APPIUM_SERVER_URL = "appiumServerUrl";			// URL of an already started appium server. I set, this appium server will be used instead of starting a new one
+    public static final String APPIUM_CAPS = "appiumCaps";						// Set of capabilities that will be added and sent to appium. These are the capabilities that are not already handled by the framework. See: http://appium.io/docs/en/writing-running-appium/caps/
+    																			// Format is "key1=value1;key2=value2"
     
     public static final String APP_PACKAGE = "appPackage";						// package de l'application
     public static final String APP_ACTIVITY = "appActivity";					// activité à démarrer (Android)
@@ -480,6 +482,7 @@ public class SeleniumTestsContext {
 
         setWebDriverListener(getValueForTest(WEB_DRIVER_LISTENER, System.getProperty(WEB_DRIVER_LISTENER)));
 
+        setAppiumCapabilities(getValueForTest(APPIUM_CAPS, System.getProperty(APPIUM_CAPS)));
         setAppiumServerUrl(getValueForTest(APPIUM_SERVER_URL, System.getProperty(APPIUM_SERVER_URL)));
         setDeviceName(getValueForTest(DEVICE_NAME, System.getProperty(DEVICE_NAME)));
         setDeviceId(getValueForTest(DEVICE_ID, System.getProperty(DEVICE_ID)));
@@ -1711,6 +1714,10 @@ public class SeleniumTestsContext {
     public String getAppiumServerUrl() {
     	return (String) getAttribute(APPIUM_SERVER_URL);
     }
+    
+    public Capabilities getAppiumCapabilities() {
+    	return (Capabilities) getAttribute(APPIUM_CAPS);
+    }
 
     public String getAppActivity() {
         return (String) getAttribute(APP_ACTIVITY);
@@ -2634,6 +2641,25 @@ public class SeleniumTestsContext {
     		setAttribute(APPIUM_SERVER_URL, appiumServerUrl);
     	} else {
     		throw new ConfigurationException("appiumServerUrl must be 'http://<host>:<port>/wd/hub/");
+    	}
+    }
+    
+    public void setAppiumCapabilities(String appiumCapabilites) {
+    	if (appiumCapabilites != null) {
+    		try {
+	    		Map<String, String> capsMap = Arrays.asList(appiumCapabilites.split(";"))
+	    			.stream()
+	    			.map(kv -> kv.split("="))
+	    			.collect(Collectors.toMap(a -> a[0], a -> a[1]));
+	    		setAttribute(APPIUM_CAPS, new MutableCapabilities(capsMap));
+    		} catch (IndexOutOfBoundsException e) {
+    			throw new ConfigurationException("Format for appium capabilities must be 'key1=value1;key2=value2'");
+    		} catch (IllegalStateException e) {
+    			throw new ConfigurationException("Appium capabilities keys must be unique");
+    		}
+    		
+    	} else {
+    		setAttribute(APPIUM_CAPS, new MutableCapabilities());
     	}
     }
 

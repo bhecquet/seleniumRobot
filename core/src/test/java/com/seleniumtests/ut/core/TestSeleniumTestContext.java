@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Proxy.ProxyType;
 import org.testng.Assert;
@@ -39,6 +40,7 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverExceptionListener;
 import com.seleniumtests.driver.DriverMode;
@@ -1172,6 +1174,36 @@ public class TestSeleniumTestContext extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().setAppiumServerUrl(null);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAppiumServerUrl(), null);
 	}
+	
+	@Test(groups="ut context")
+	public void testAppiumCapabilities(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setAppiumCapabilities("cap1=val1;cap2=val2");
+		Capabilities caps = SeleniumTestsContextManager.getThreadContext().getAppiumCapabilities();
+		Assert.assertEquals(caps.asMap().size(), 2);
+		Assert.assertEquals(caps.getCapability("cap1"), "val1");
+		Assert.assertEquals(caps.getCapability("cap2"), "val2");
+	}
+	@Test(groups="ut context", expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Format for appium capabilities must be 'key1=value1;key2=value2'")
+	public void testAppiumCapabilitiesWrongFormat(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setAppiumCapabilities("foobar");
+		SeleniumTestsContextManager.getThreadContext().getAppiumCapabilities();
+	}
+	@Test(groups="ut context", expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Appium capabilities keys must be unique")
+	public void testAppiumCapabilitiesDuplicateKey(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setAppiumCapabilities("cap1=val1;cap1=val2");
+		SeleniumTestsContextManager.getThreadContext().getAppiumCapabilities();
+	}
+	@Test(groups="ut context")
+	public void testAppiumCapabilitiesNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setAppiumCapabilities(null);
+		Capabilities caps = SeleniumTestsContextManager.getThreadContext().getAppiumCapabilities();
+		Assert.assertEquals(caps.asMap().size(), 0);
+	}
+
 
 	@Test(groups="ut context")
 	public void testFullReset(final ITestContext testNGCtx, final XmlTest xmlTest) {
