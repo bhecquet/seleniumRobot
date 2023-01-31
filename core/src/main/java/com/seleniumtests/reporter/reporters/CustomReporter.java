@@ -180,7 +180,6 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			context.put("browser", seleniumTestsContext.getBrowser());	
 			context.put("mobileApp", StringUtility.encodeString(seleniumTestsContext.getApp(), reportFormat.toLowerCase()));	
 			context.put("device", StringUtility.encodeString(seleniumTestsContext.getDeviceName() == null ? "": seleniumTestsContext.getDeviceName(), reportFormat.toLowerCase()));
-			
 			if (seleniumTestsContext.getTestType().isMobile()) {
 				context.put("platform", seleniumTestsContext.getPlatform() + " " + seleniumTestsContext.getMobilePlatformVersion());
 			} else {

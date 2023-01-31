@@ -22,10 +22,20 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
 
+import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
+import com.seleniumtests.core.utils.TestNGResultUtils;
+import com.seleniumtests.driver.DriverConfig;
+import com.seleniumtests.driver.DriverMode;
+import com.seleniumtests.util.logging.Sys;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.openqa.selenium.Proxy;
+import org.openqa.selenium.remote.SessionId;
 import org.testng.Assert;
 import org.testng.ITestContext;
+import org.testng.ITestResult;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
@@ -34,6 +44,9 @@ import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnecto
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.util.osutility.OSUtility;
+
+import static org.mockito.Mockito.doReturn;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
  * Test that default reporting contains an XML file per test (CustomReporter.java) with default test reports defined in SeleniumTestsContext.DEFAULT_CUSTOM_TEST_REPORTS
@@ -45,22 +58,50 @@ public class TestPerformanceReporter extends ReporterTest {
 	@BeforeMethod(groups={"it"})
 	private void deleteGeneratedFiles() throws IOException {
 		FileUtils.deleteQuietly(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()));
-		
-		
 	}
 	
 	@Test(groups={"it"})
 	public void testReportGeneration(ITestContext testContext) throws Exception {
-		
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 
 		// check all files are generated with the right name
 		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "PERF-result.xml").toFile().exists());
 		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testInError", "PERF-result.xml").toFile().exists());
 		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithException", "PERF-result.xml").toFile().exists());
-
 	}
-	
+
+
+	/**
+	 * Check if param gridnode is ok in xml report
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportGenerationGrid(ITestContext testContext) throws Exception {
+		System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
+		System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4321/wd/hub");
+
+		createGridHubMockWithNodeOK();
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
+		String jmeterReport = readTestMethodPerfFile("testDriverShort");
+
+		// check file is generated with gridnode param
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverShort", "PERF-result.xml").toFile().exists());
+		Assert.assertTrue(jmeterReport.contains("gridnode=\"localhost\""));
+	}
+
+	@Test(groups={"it"})
+	public void testReportGenerationLocal(ITestContext testContext) throws Exception {
+		System.setProperty(SeleniumTestsContext.RUN_MODE, "local");
+
+		createGridHubMockWithNodeOK();
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
+		String jmeterReport = readTestMethodPerfFile("testDriverShort");
+
+		// check file is generated with gridnode param
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverShort", "PERF-result.xml").toFile().exists());
+		Assert.assertTrue(jmeterReport.contains("gridnode=\"LOCAL\""));
+	}
+
 	/**
 	 * Check all steps of test case are available
 	 * @param testContext

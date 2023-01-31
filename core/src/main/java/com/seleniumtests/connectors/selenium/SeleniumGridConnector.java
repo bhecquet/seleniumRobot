@@ -66,7 +66,7 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	
 	/**
 	 * Do nothing as we are not a SeleniumRobotGrid
-	 * @param driver
+	 * @param caps
 	 */
 	public void uploadMobileApp(Capabilities caps) {
 		logger.warn("application upload is only available with seleniumRobot grid");
@@ -119,7 +119,8 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 
 	/**
 	 * Upload a file to a browser uplpoad window
-	 * @param filePath
+	 * @param fileName
+	 * @param base64Content
 	 */
 	public void uploadFileToBrowser(String fileName, String base64Content) {
 		logger.warn("file upload to browser is only available with seleniumRobot grid");
@@ -138,7 +139,7 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	 * Left clic on desktop at x,y
 	 * @param x		x coordinate
 	 * @param y		y coordinate
-	 * @param onlyMainScreen	if true, click coordinates are on the main screen
+	 * if true, click coordinates are on the main screen
 	 */
 	public void leftClic(int x, int y) {
 		logger.warn("left clic is only available with seleniumRobot grid");
@@ -209,7 +210,7 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	
 	/**
 	 * Send keys to desktop
-	 * @param keys
+	 * @param keyCodes
 	 */
 	public void sendKeysWithKeyboard(List<Integer> keyCodes) {
 		logger.warn("send keys is only available with seleniumRobot grid");
@@ -253,7 +254,7 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	
 	/**
 	 * Display running step
-	 * @param text
+	 * @param stepName
 	 */
 	public void displayRunningStep(String stepName) {
 		logger.warn("displayRunningStep is only available with seleniumRobot grid");
