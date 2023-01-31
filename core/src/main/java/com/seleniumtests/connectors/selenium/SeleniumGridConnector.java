@@ -50,6 +50,7 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	protected int hubPort;
 	protected SessionId sessionId;
 	protected String nodeUrl;
+	protected String nodeHost;
 	
 	public static final String CONSOLE_SERVLET = "/ui/";
 	public static final String STATUS_SERVLET = "/status";

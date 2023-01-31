@@ -22,31 +22,19 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 
-import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
-import com.seleniumtests.core.utils.TestNGResultUtils;
-import com.seleniumtests.driver.DriverConfig;
-import com.seleniumtests.driver.DriverMode;
-import com.seleniumtests.util.logging.Sys;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.openqa.selenium.Proxy;
-import org.openqa.selenium.remote.SessionId;
 import org.testng.Assert;
 import org.testng.ITestContext;
-import org.testng.ITestResult;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.contexts.SeleniumRobotServerContext;
 import com.seleniumtests.util.osutility.OSUtility;
-
-import static org.mockito.Mockito.doReturn;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
  * Test that default reporting contains an XML file per test (CustomReporter.java) with default test reports defined in SeleniumTestsContext.DEFAULT_CUSTOM_TEST_REPORTS
