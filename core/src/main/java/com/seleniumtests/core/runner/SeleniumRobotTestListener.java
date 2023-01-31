@@ -93,7 +93,7 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 	
 	/**
 	 * Method to be called when the test has been terminated and all AfterMethod methods has been called
-	 * @param result
+	 * @param testResult
 	 */
 	public void onTestFullyFinished(ITestResult testResult) {
 
@@ -282,7 +282,7 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 	
 	/**
 	 * Do after configuration or method call
-	 * issue #150: intercept any exception so that \@AfterMethod gets called even if this method fails (see {@link Invoker.class.invokeMethod()}) 
+	 * issue #150: intercept any exception so that \@AfterMethod gets called even if this method fails (see {@linkInvoker.class.invokeMethod()})
 	 */
 	@Override
 	public void afterInvocation(IInvokedMethod method, ITestResult testResult, ITestContext context) {
@@ -591,7 +591,6 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 	 * - record test method context
 	 * @param method
 	 * @param testResult
-	 * @param contexte pas
 	 */
 	private void executeAfterTestMethod(IInvokedMethod method, ITestResult testResult) {
 		logger.info(SeleniumRobotLogger.END_TEST_PATTERN + TestNGResultUtils.getUniqueTestName(testResult));

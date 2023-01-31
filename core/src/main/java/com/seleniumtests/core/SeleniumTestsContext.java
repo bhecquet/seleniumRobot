@@ -779,10 +779,8 @@ public class SeleniumTestsContext {
     /**
      * Get (in order of importance) user value (if exist), test value (if exist), suite value (if exist) or null
      *
-     * @param  context
      * @param  attributeName
      * @param  sysPropertyValue
-     * @param  defaultValue
      */
     private String getValueForTest(final String attributeName, final String sysPropertyValue) {
     	String value = null;
@@ -1851,7 +1849,7 @@ public class SeleniumTestsContext {
 
     /**
      * 
-     * @param timeout  timeout of driver session in seconds
+     * @param timeoutInSecs  timeout of driver session in seconds
      */
     public void setWebSessionTimeout(Integer timeoutInSecs) {
     	if (timeoutInSecs != null) {
