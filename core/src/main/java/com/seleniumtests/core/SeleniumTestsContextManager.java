@@ -109,6 +109,10 @@ public class SeleniumTestsContextManager {
         return globalContext;
     }
 
+    public static boolean hasThreadContext() {
+    	return threadLocalContext.get() != null;
+    	
+    }
     public static SeleniumTestsContext getThreadContext() {
         if (threadLocalContext.get() == null) {
         	throw new ConfigurationException("SeleniumTestsContextManager.getThreadContext() MUST be called after SeleniumTestsContextManager.initThreadContext()");
