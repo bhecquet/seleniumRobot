@@ -87,6 +87,9 @@ public abstract class IMobileCapabilityFactory extends ICapabilitiesFactory {
         // add OS specific capabilities
         capabilities.merge(getSystemSpecificCapabilities());
         
+        // add user configurations
+        capabilities.merge(webDriverConfig.getAppiumCapabilities());
+        
         
         return capabilities;
     }

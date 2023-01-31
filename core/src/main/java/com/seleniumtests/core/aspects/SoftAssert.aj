@@ -51,7 +51,8 @@ public class SoftAssert {
 		
 		try {
 			
-			if (SeleniumTestsContextManager.getThreadContext().isSoftAssertEnabled()) {
+			if (SeleniumTestsContextManager.hasThreadContext() && 
+					SeleniumTestsContextManager.getThreadContext().isSoftAssertEnabled()) {
 				SeleniumTestsContextManager.getThreadContext().addVerificationFailures(Reporter.getCurrentTestResult(), e);
 				logger.error("!!!FAILURE ALERT!!! - Assertion Failure: " + e.getMessage());
 				TestTasks.capturePageSnapshot();

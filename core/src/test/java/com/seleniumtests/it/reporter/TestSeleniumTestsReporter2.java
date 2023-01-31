@@ -566,6 +566,36 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(mainReportContent.contains("<td class=\"info\">"));
 		Assert.assertTrue(mainReportContent.contains("<th> Last State </th>"));
 	}
+
+	/**
+	 * Check if param "Gridnode" is ok
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testGridnodeExist() throws Exception {
+		System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
+		System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4321/wd/hub");
+
+		createGridHubMockWithNodeOK();
+
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
+
+		// check content of summary report file
+		String mainReportContent = readTestMethodResultFile("testDriverShort");
+
+		Assert.assertTrue(mainReportContent.contains("<th>Grid node</th>" +
+				"<td>localhost</td>"));
+	}
+	@Test(groups={"it"})
+	public void testGridnodeExistForLocal() throws Exception {
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
+
+		// check content of summary report file
+		String mainReportContent = readTestMethodResultFile("testDriverShort");
+
+		Assert.assertTrue(mainReportContent.contains("<th>Grid node</th>" +
+				"<td>LOCAL</td>"));
+	}
 	
 	/**
 	 * Check generic steps are logged

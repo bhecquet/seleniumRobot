@@ -80,6 +80,8 @@ public class TestJUnitReporter extends ReporterTest {
 		for (String testName: testList) {
 			Assert.assertTrue(Paths.get(outDir, "junitreports", String.format("TEST-%s.xml", testName)).toFile().exists());
 		}
+		String result = readJUnitFile(testList.get(0));
+		Assert.assertTrue(result.matches(".*timestamp=\"\\d+\".*")); // check timestamp is in ms
 
 	}
 	

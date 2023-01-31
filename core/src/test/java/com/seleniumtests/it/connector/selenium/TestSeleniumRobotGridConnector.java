@@ -61,7 +61,6 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 		connector.setNodeUrl("http://127.0.0.1:5555");
 		gridLogger = spy(SeleniumRobotGridConnector.getLogger());
 	}
-	
 
 	@Test(groups={"it"})
 	public void testUploadMobileApp() throws ClientProtocolException, IOException, UnirestException {

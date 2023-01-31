@@ -153,7 +153,12 @@
 											<td>$application</td>
 										</tr>
 									#end
-								
+									#if ($gridnode)
+										<tr>
+											<th>Grid node</th>
+											<td>$gridnode</td>
+										</tr>
+									#end
 									#if ($testInfos)
 										#foreach ($testInfo in $testInfos.entrySet())
 											<tr>

@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import com.seleniumtests.driver.DriverMode;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.lang.StringUtils;
@@ -173,15 +174,12 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			}
 		}
 	}
-	
+
 	/**
 	 * Generate HTML report for a single test
 	 * @param testResult
 	 * @param resourcesFromCdn		if true (optimizeReport), resources are linked from CDN
 	 */
-	public void generateSingleTestReport(ITestResult testResult) {
-		generateSingleTestReport(testResult, false);
-	}
 	public void generateSingleTestReport(ITestResult testResult, boolean resourcesFromCdn) {
 
 		// issue #81: recreate test context from this context (due to multithreading, this context may be null if parallel testing is done)
@@ -207,7 +205,11 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			logger.error("Error writing test report: " + getVisualTestName(testResult), e);
 		}  
 	}
-	
+	public void generateSingleTestReport(ITestResult testResult) {
+		generateSingleTestReport(testResult, false);
+	}
+
+
 	private boolean isVideoInReport(ITestResult testResult) {
 
 		boolean videoInReport = false;
@@ -271,7 +273,6 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		context.put("testName", StringUtility.encodeString(testName.toString(), "html"));
 		// by default, encodeString replaces line breaks with <br/> which is not suitable for description
 		context.put("description", StringUtility.encodeString(TestNGResultUtils.getTestDescription(testResult), "html"));
-		
 
 		// error causes
 		Map<String, String> testInfos = TestNGResultUtils.getTestInfoEncoded(testResult, "html");
@@ -389,9 +390,8 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 
 	/**
 	 * Generate summary report for all test methods
-	 * @param suites
-	 * @param suiteName
-	 * @param map
+	 * @param resultSet
+	 * @param resourcesFromCdn
 	 * @return	map containing test results
 	 */
 	public Map<ITestContext, List<ITestResult>> generateSuiteSummaryReport(Map<ITestContext, Set<ITestResult>> resultSet, boolean resourcesFromCdn) {
@@ -516,6 +516,13 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			String app = selTestContext.getApp();
 			String appPackage = selTestContext.getAppPackage();
 			TestType testType = selTestContext.getTestType();
+
+
+			if (selTestContext.getRunMode().equals(DriverMode.GRID)) {
+				velocityContext.put("gridnode", selTestContext.getSeleniumGridConnector().getNodeHost());
+			} else {
+				velocityContext.put("gridnode", selTestContext.getRunMode());
+			}
 
 			if (browser != null) {
 				browser = browser.replace("*", "");

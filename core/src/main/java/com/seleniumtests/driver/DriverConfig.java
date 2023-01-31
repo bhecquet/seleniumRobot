@@ -122,6 +122,10 @@ public class DriverConfig {
     public String getBrowserVersion() {
         return testContext.getWebBrowserVersion();
     }
+    
+    public Capabilities getAppiumCapabilities() {
+    	return testContext.getAppiumCapabilities();
+    }
 
     public String getChromeBinPath() {
         return testContext.getChromeBinPath();
