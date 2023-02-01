@@ -19,23 +19,13 @@ package com.seleniumtests.it.reporter;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.util.List;
 
-import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
-import com.seleniumtests.core.utils.TestNGResultUtils;
-import com.seleniumtests.driver.DriverConfig;
-import com.seleniumtests.driver.DriverMode;
-import com.seleniumtests.util.logging.Sys;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.openqa.selenium.Proxy;
-import org.openqa.selenium.remote.SessionId;
 import org.testng.Assert;
 import org.testng.ITestContext;
-import org.testng.ITestResult;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
@@ -44,9 +34,6 @@ import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnecto
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.util.osutility.OSUtility;
-
-import static org.mockito.Mockito.doReturn;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
  * Test that default reporting contains an XML file per test (CustomReporter.java) with default test reports defined in SeleniumTestsContext.DEFAULT_CUSTOM_TEST_REPORTS
@@ -227,10 +214,10 @@ public class TestPerformanceReporter extends ReporterTest {
 			System.setProperty("customTestReports", "PERF::xml::reporter/templates/report.perf.vm,PERF2::json::ti/report.test.vm");
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
 			
-			String jmeterReport1 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "PERF-result.xml").toFile());
-			String jmeterReport2 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "PERF2-result.json").toFile());
+			String jmeterReport1 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "PERF-result.xml").toFile(), StandardCharsets.UTF_8);
+			String jmeterReport2 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "PERF2-result.json").toFile(), StandardCharsets.UTF_8);
 			
-			Assert.assertTrue(jmeterReport1.contains("<testsuite errors=\"0\" failures=\"0\" hostname=\"\" name=\"testAndSubActions\" tests=\"7\" time=\"15"));
+			Assert.assertTrue(jmeterReport1.contains("<testsuite gridnode=\"LOCAL\" errors=\"0\" failures=\"0\" hostname=\"\" name=\"testAndSubActions\" tests=\"7\" time=\"15"));
 			Assert.assertTrue(jmeterReport2.contains("\"suiteName\": \"testAndSubActions\""));
 		} finally {
 			System.clearProperty("customTestReports");
