@@ -573,18 +573,23 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 */
 	@Test(groups={"it"})
 	public void testGridnodeExist() throws Exception {
-		System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
-		System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4321/wd/hub");
-
-		createGridHubMockWithNodeOK();
-
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
-
-		// check content of summary report file
-		String mainReportContent = readTestMethodResultFile("testDriverShort");
-
-		Assert.assertTrue(mainReportContent.contains("<th>Grid node</th>" +
-				"<td>localhost</td>"));
+		try {
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
+			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4321/wd/hub");
+	
+			createGridHubMockWithNodeOK();
+	
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
+	
+			// check content of summary report file
+			String mainReportContent = readTestMethodResultFile("testDriverShort");
+	
+			Assert.assertTrue(mainReportContent.contains("<th>Grid node</th>" +
+					"<td>localhost</td>"));
+		} finally {
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
+		}
 	}
 	@Test(groups={"it"})
 	public void testGridnodeExistForLocal() throws Exception {
