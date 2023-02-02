@@ -172,7 +172,7 @@ public class TestPerformanceReporter extends ReporterTest {
 		// check content of summary report file
 		String jmeterReport = readTestMethodPerfFile("testOkWithOneStepFailed");
 		
-		Assert.assertTrue(jmeterReport.contains("<testsuite errors=\"0\" failures=\"0\" hostname=\"\" name=\"testOkWithOneStepFailed\" tests=\"6\""));
+		Assert.assertTrue(jmeterReport.contains("<testsuite gridnode=\"LOCAL\" errors=\"0\" failures=\"0\" hostname=\"\" name=\"testOkWithOneStepFailed\" tests=\"6\""));
 		Assert.assertTrue(jmeterReport.contains("name=\"Step 1: Pre test step: setCount\""));
 		Assert.assertTrue(jmeterReport.contains("name=\"Step 2: Pre test step: slow\""));
 		Assert.assertTrue(jmeterReport.contains("name=\"Step 3: Pre test step: set\""));
