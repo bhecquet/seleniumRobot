@@ -36,10 +36,15 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openqa.selenium.Rectangle;
+import org.openqa.selenium.WebElement;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
@@ -107,7 +112,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("A test which is <OK> é&")); // a test with custom name
 			verify(serverConnector, times(4)).createTestStep(eq("step 1"), anyInt());
 			verify(serverConnector).createTestStep(eq("step 2"), anyInt());
-			verify(serverConnector).createSnapshot(any(Snapshot.class), anyInt(), anyInt(), anyInt()); // two snapshots but only once is sent because the other has no name
+			verify(serverConnector).createSnapshot(any(Snapshot.class), anyInt(), anyInt(), anyInt(), eq(new ArrayList<>())); // two snapshots but only once is sent because the other has no name
 			verify(serverConnector, never()).createExcludeZones(any(Rectangle.class), anyInt());
 			
 			String logs = readSeleniumRobotLogFile();
@@ -135,6 +140,8 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			
+			ArgumentCaptor<List<Rectangle>> listArgument = ArgumentCaptor.forClass(List.class);
 
 			initMocks();
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverCustomSnapshot"});
@@ -148,8 +155,11 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector).addLogsToTestCaseInSession(anyInt(), anyString());
 			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testDriverCustomSnapshot")); 
 			verify(serverConnector).createTestStep(eq("_captureSnapshot with args: (my snapshot, )"), anyInt());
-			verify(serverConnector).createSnapshot(any(Snapshot.class), anyInt(), anyInt(), anyInt()); // 1 custom snapshot taken with name
-			verify(serverConnector).createExcludeZones(any(Rectangle.class), anyInt()); // one exclude zone created with that snapshot
+			verify(serverConnector).createSnapshot(any(Snapshot.class), anyInt(), anyInt(), anyInt(), listArgument.capture()); // 1 custom snapshot taken with name
+			
+			// check exclude zones have been sent
+			Assert.assertEquals(listArgument.getValue().size(), 1);
+			Assert.assertEquals(listArgument.getValue().get(0), new Rectangle(71, 162, 21, 170));
 			
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
@@ -184,7 +194,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector).addLogsToTestCaseInSession(anyInt(), anyString());
 			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testDriverCustomSnapshot")); 
 			verify(serverConnector).createTestStep(eq("_captureSnapshot with args: (my snapshot, )"), anyInt());
-			verify(serverConnector, never()).createSnapshot(any(Snapshot.class), anyInt(), anyInt(), anyInt()); // 1 custom snapshot taken with name
+			verify(serverConnector, never()).createSnapshot(any(Snapshot.class), anyInt(), anyInt(), anyInt(), eq(new ArrayList<>())); // 1 custom snapshot taken with name
 			verify(serverConnector, never()).createExcludeZones(any(Rectangle.class), anyInt()); // one exclude zone created with that snapshot
 			
 		} finally {

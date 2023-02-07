@@ -20,9 +20,11 @@ package com.seleniumtests.it.connector.selenium;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.Rectangle;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.SkipException;
@@ -31,6 +33,7 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
+import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector.SnapshotComparisonResult;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
@@ -137,9 +140,34 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		ScreenShot screenshot = new ScreenShot();
 		screenshot.setImagePath(image.getName());
 		Snapshot snapshot = new Snapshot(screenshot, "img", SnapshotCheckType.TRUE);
-		Integer snapshotId = connector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId);
+		Integer snapshotId = connector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId, Arrays.asList(new Rectangle(10, 11, 120, 230), 
+				new Rectangle(100, 110, 220, 130)));
 		
 		Assert.assertNotNull(snapshotId);
+	}
+	
+	
+	/**
+	 * create a snapshot
+	 * @throws IOException 
+	 */
+	@Test(groups={"it"})
+	public void testCheckSnapshotHasNoDifferences() throws IOException {
+
+		Integer sessionId = connector.createSession("Session1");
+		Integer testCaseId = connector.createTestCase("Test 2");
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 2");
+		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
+		Integer stepResultId = connector.recordStepResult(true, "logs", 1, sessionId, testCaseInSessionId, testStepId);
+		File image = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "img.png").toFile();
+		image.deleteOnExit();
+		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/images/ffLogoConcat.png"), image);
+		ScreenShot screenshot = new ScreenShot();
+		screenshot.setImagePath(image.getName());
+		Snapshot snapshot = new Snapshot(screenshot, "img", SnapshotCheckType.TRUE);
+		SnapshotComparisonResult comparisonResult = connector.checkSnapshotHasNoDifferences(snapshot, "Test 2", "Step 1");
+		
+		Assert.assertEquals(comparisonResult, SnapshotComparisonResult.OK);
 	}
 	
 	/**

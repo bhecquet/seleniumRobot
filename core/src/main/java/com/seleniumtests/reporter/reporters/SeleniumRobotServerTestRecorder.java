@@ -203,10 +203,8 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 					} 
 					
 					try {
-						Integer snapshotId = serverConnector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId);
-						for (Rectangle excludeZone: snapshot.getCheckSnapshot().getExcludeElementsRect()) {
-							serverConnector.createExcludeZones(excludeZone, snapshotId);
-						}
+						serverConnector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId, snapshot.getCheckSnapshot().getExcludeElementsRect());
+
 						logger.info("Check snapshot created");
 					} catch (SeleniumRobotServerException e) {
 						logger.error("Could not create snapshot on server", e);

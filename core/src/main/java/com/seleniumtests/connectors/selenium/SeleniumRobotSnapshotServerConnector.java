@@ -40,11 +40,13 @@ import com.seleniumtests.util.helper.WaitHelper;
 import kong.unirest.HttpResponse;
 import kong.unirest.MultipartBody;
 import kong.unirest.UnirestException;
+import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
 
 public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerConnector {
 	
+	public static final String FIELD_EXCLUDE_ZONES = "excludeZones";
 	private static final String FIELD_IMAGE = "image";
 	private static final String FIELD_IS_OK_WITH_SNAPSHOTS = "isOkWithSnapshots";
 	private static final String FIELD_COMPUTING_ERROR = "computingError";
@@ -319,7 +321,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			String strippedTestName = getTestName(testName);
 			String strippedStepName = getTestStepName(stepName);
 			
-			JSONObject snapshotJson = getJSonResponse(buildPutRequest(url + SNAPSHOT_API_URL)
+			MultipartBody request = buildPutRequest(url + SNAPSHOT_API_URL)
 					.socketTimeout(5000)
 					.field(FIELD_IMAGE, pictureFile)
 					.field(FIELD_NAME, snapshotName)
@@ -329,8 +331,19 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field("environmentId", environmentId.toString())
 					.field("browser", browser.getBrowserType())
 					.field("testCaseName", strippedTestName)
-					.field("stepName", strippedStepName)
-					);
+					.field("stepName", strippedStepName);
+			
+			if (snapshot.getCheckSnapshot() != null && !snapshot.getCheckSnapshot().getExcludeElementsRect().isEmpty()) {
+				JSONArray excludeZonesJson = new JSONArray(snapshot
+						.getCheckSnapshot()
+						.getExcludeElementsRect()
+						.stream()
+						.map(r -> new JSONObject(r))
+						.collect(Collectors.toList()));
+				request = request.field(FIELD_EXCLUDE_ZONES, excludeZonesJson.toString());
+			}
+			
+			JSONObject snapshotJson = getJSonResponse(request);
 			
 			if (snapshotJson != null) {
 				String computingError = snapshotJson.getString(FIELD_COMPUTING_ERROR);
@@ -362,7 +375,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	/**
 	 * Create snapshot on server that will be used to show differences between 2 versions of the application
 	 */
-	public Integer createSnapshot(Snapshot snapshot, Integer sessionId, Integer testCaseInSessionId, Integer stepResultId) {
+	public Integer createSnapshot(Snapshot snapshot, Integer sessionId, Integer testCaseInSessionId, Integer stepResultId, List<Rectangle> excludeZones) {
 		if (!active) {
 			return null;
 		}
@@ -382,14 +395,22 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		try {
 			File pictureFile = new File(snapshot.getScreenshot().getFullImagePath());
 			
-			JSONObject snapshotJson = getJSonResponse(buildPostRequest(url + SNAPSHOT_API_URL)
+			MultipartBody request = buildPostRequest(url + SNAPSHOT_API_URL)
 					.field("stepResult", stepResultId)
 					.field("sessionId", sessionUUID)
 					.field(FIELD_TEST_CASE, testCaseInSessionId.toString())
 					.field(FIELD_IMAGE, pictureFile)
 					.field(FIELD_NAME, snapshotName)
 					.field("compare", snapshot.getCheckSnapshot().getName())
-					.field("diffTolerance", String.valueOf(snapshot.getCheckSnapshot().getErrorThreshold()))
+					.field("diffTolerance", String.valueOf(snapshot.getCheckSnapshot().getErrorThreshold()));
+			
+			if (excludeZones != null && !excludeZones.isEmpty()) {
+			
+				JSONArray excludeZonesJson = new JSONArray(excludeZones.stream().map(r -> new JSONObject(r)).collect(Collectors.toList()));
+				request = request.field(FIELD_EXCLUDE_ZONES, excludeZonesJson.toString());
+			}
+			
+			JSONObject snapshotJson = getJSonResponse(request
 					);
 			return snapshotJson.getInt("id");
 			
