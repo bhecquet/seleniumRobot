@@ -415,6 +415,8 @@ public class TestNGResultUtils {
 
     /**
      * Change the test result when snapshot comparison fails
+     * These comparison are done for every test execution (every retry). At this point, snapshot are not recorded on server. This will be recorded in SeleniumRobotServerTestRecorder
+     * only with the last test execution.
      * @param testResult
      */
 	public static void changeTestResultWithSnapshotComparison(final ITestResult testResult) {

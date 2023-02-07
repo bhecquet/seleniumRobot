@@ -29,9 +29,9 @@ public class SnapshotCheckType {
 	
 	public enum Control {
 		NONE,
-		FULL,
-		LAYOUT,
-		NONE_REFERENCE // no comparison done, it's a reference picture when step fails so that we can show to user what should have been the application if step succeed
+		FULL,			// pixel comparison
+		LAYOUT,			// do not compare colors (not implemented), just shapes
+		NONE_REFERENCE 	// no comparison done, it's a reference picture when step fails so that we can show to user what should have been the application if step succeed
 	}
 	
 	// snapshot will be compared to baseline if requested by option seleniumRobotServerCompareSnapshots
@@ -39,7 +39,7 @@ public class SnapshotCheckType {
 	
 	public static final SnapshotCheckType FULL = new SnapshotCheckType(Control.FULL);
 	
-	public static final SnapshotCheckType LAYOUT = new SnapshotCheckType(Control.LAYOUT);
+	public static final SnapshotCheckType LAYOUT = new SnapshotCheckType(Control.LAYOUT); // not really used
 	
 	// snapshot will not be compared
 	public static final SnapshotCheckType FALSE = new SnapshotCheckType(Control.NONE);
