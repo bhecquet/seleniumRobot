@@ -6,6 +6,8 @@ import java.nio.charset.Charset;
 
 import org.apache.commons.io.IOUtils;
 
+import com.seleniumtests.util.helper.WaitHelper;
+
 class StreamGobbler extends Thread {
     InputStream is;
     Charset charset;
@@ -37,6 +39,7 @@ class StreamGobbler extends Thread {
 	        		IOUtils.read(is, b);
 	        		output.append(new String(b, charset));
 	        	}
+	        	WaitHelper.waitForMilliSeconds(2);
             }
 
         } catch (IOException ioe) {

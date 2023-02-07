@@ -229,25 +229,32 @@ public class OSCommand {
 		errorGobbler.start();
         outputGobbler.start();
         
-        boolean read = false;
-        boolean terminated = false;
-        while (end.isAfter(clock.instant()) && (!read || !terminated)) {
-        	// be sure we read all logs produced by process, event after termination
-        	if (!proc.isAlive()) {
-        		terminated = true;
-        	}
-        	
-        	read = true;
-        	
-        	Thread.sleep(100);
+        try {
+	        boolean read = false;
+	        boolean terminated = false;
+	        while (end.isAfter(clock.instant()) && (!read || !terminated)) {
+	        	// be sure we read all logs produced by process, event after termination
+	        	if (!proc.isAlive()) {
+	        		terminated = true;
+	        	}
+	        	
+	        	read = true;
+	        	
+	        	Thread.sleep(100);
+	        }
+	        errorGobbler.halt();
+	        outputGobbler.halt();
+	        
+	        StringBuilder error = errorGobbler.getOutput();
+	        StringBuilder output = outputGobbler.getOutput();
+	        
+	        return output.toString() + '\n' + error.toString();
+        } catch (Exception e) {
+        	// in case something gets wrong, stop the threads
+	        errorGobbler.halt();
+	        outputGobbler.halt();
+	        throw e;
         }
-        errorGobbler.halt();
-        outputGobbler.halt();
-        
-        StringBuilder error = errorGobbler.getOutput();
-        StringBuilder output = outputGobbler.getOutput();
-        
-        return output.toString() + '\n' + error.toString();
     }
 
 }
