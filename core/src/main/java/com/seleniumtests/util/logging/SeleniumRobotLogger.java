@@ -76,7 +76,8 @@ public class SeleniumRobotLogger {
 	}
 	
 	private static void configureLogger() {
-		ConfigurationBuilder<BuiltConfiguration> builder = ConfigurationBuilderFactory.newConfigurationBuilder();
+		ConfigurationBuilder<BuiltConfiguration> builder = ConfigurationBuilderFactory.newConfigurationBuilder()
+				.setPackages("com.seleniumtests.util.logging"); // to be able to load custom filters
 		AppenderComponentBuilder consoleAppenderBuilder  = builder.newAppender("stdout", "CONSOLE"); 
 		
 		LayoutComponentBuilder layout = builder
@@ -87,6 +88,7 @@ public class SeleniumRobotLogger {
 		consoleAppenderBuilder.add(builder
 				.newFilter("MarkerFilter", Filter.Result.DENY, Filter.Result.NEUTRAL)
 			    .addAttribute("marker", "FLOW"));
+
 		
 		builder.add(consoleAppenderBuilder);
 		
@@ -99,6 +101,7 @@ public class SeleniumRobotLogger {
         	rootLogger = builder.newRootLogger(Level.INFO);
         }
 		rootLogger.add(builder.newAppenderRef("stdout"));
+		rootLogger.add(builder.newFilter("RepeatFilter", Filter.Result.ACCEPT, Filter.Result.DENY));
 
 		builder.add(rootLogger);
 //		Uncomment to debug configuration

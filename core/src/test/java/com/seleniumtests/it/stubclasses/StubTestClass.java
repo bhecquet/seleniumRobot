@@ -352,4 +352,26 @@ public class StubTestClass extends StubParentClass {
 	public void testStandardDataProviderNoFile(String col1, String col2) {
 		logger.info(String.format("%s,%s", col1, col2));
 	}
+	
+	@Test(groups="stub")
+	public void testLogSameInfoMultipleTimes() {
+		for (int i=0; i < 20; i++) {
+			logger.info("something interesting");
+		}
+		for (int i=0; i < 2; i++) {
+			logger.info("something else interesting");
+		}
+		
+	}
+	
+	@Test(groups="stub")
+	public void testLogSameInfoMultipleTimes2() {
+		for (int i=0; i < 15; i++) {
+			logger.info("something interesting");
+		}
+		for (int i=0; i < 3; i++) {
+			logger.info("something else interesting");
+		}
+		
+	}
 }
