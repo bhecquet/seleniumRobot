@@ -159,7 +159,8 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 			// check exclude zones have been sent
 			Assert.assertEquals(listArgument.getValue().size(), 1);
-			Assert.assertEquals(listArgument.getValue().get(0), new Rectangle(71, 162, 21, 170));
+			Assert.assertTrue(listArgument.getValue().get(0).getWidth() > 150); // don't be precise as it may depend on screen / computer
+			Assert.assertTrue(listArgument.getValue().get(0).getHeight() > 15);
 			
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
