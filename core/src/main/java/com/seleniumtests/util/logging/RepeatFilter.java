@@ -10,8 +10,12 @@ import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 import org.apache.logging.log4j.core.filter.AbstractFilter;
 import org.apache.logging.log4j.message.Message;
 
+import com.seleniumtests.driver.DriverExceptionListener;
+
 @Plugin(name = "RepeatFilter", category = "Core", elementType = "filter", printObject = true)
 public final class RepeatFilter extends AbstractFilter {
+	
+	private Logger logger = null;
  
     private final Level level;
     private ThreadLocal<String> lastLog = new ThreadLocal<>();
@@ -37,6 +41,11 @@ public final class RepeatFilter extends AbstractFilter {
  
     private Result filter(String message) {
     	
+    	// delay logger creation so that we do not have recursive call on init
+    	if (logger == null) {
+        	logger = SeleniumRobotLogger.getLogger(DriverExceptionListener.class);
+    	}
+    	
     	boolean discard = false;
     	if (lastLog.get() != null) {
     		
@@ -51,7 +60,7 @@ public final class RepeatFilter extends AbstractFilter {
     			Integer repeatTime = lastLogRepeat.get();
     			lastLogRepeat.set(0);
     			if (repeatTime != null && repeatTime > 1) {
-    				System.out.println(String.format("... repeated %d times ...", repeatTime));
+    				logger.info("... repeated {} times ...", repeatTime);
     			}
     			lastLogRepeat.set(1);
     		}
