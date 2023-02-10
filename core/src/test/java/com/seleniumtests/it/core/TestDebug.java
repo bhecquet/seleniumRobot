@@ -79,9 +79,7 @@ public class TestDebug extends GenericTest {
 		} catch (Exception e) {
 			logger.error(e);
 		} finally {
-			if (WebUIDriver.getWebDriver(false) != null) {
-				WebUIDriver.cleanUp();
-			}
+			WebUIDriver.cleanUp();
 		}
 	}
 	
