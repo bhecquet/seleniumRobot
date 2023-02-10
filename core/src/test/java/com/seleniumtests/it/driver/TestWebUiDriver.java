@@ -315,6 +315,25 @@ public class TestWebUiDriver extends ReporterTest {
 		}
 	}
 	
+
+	@Test(groups={"it"})
+	public void testLocalLaunchWithMultipleThreads() throws Exception {
+		
+		ReporterTest.executeSubTest(2, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverManualSteps", "testDriver"});
+		
+		String logs = readSeleniumRobotLogFile();
+		
+		// check drivers are created one after the other
+		int firstDriverCreation = logs.indexOf("driver creation took"); // written when driver is created
+		int firstDriverInit = logs.indexOf("Socket timeout for driver communication updated");
+		int secondDriverCreation = logs.lastIndexOf("driver creation took");
+		int secondDriverInit = logs.lastIndexOf("Socket timeout for driver communication updated"); // written before creating driver
+		
+		Assert.assertTrue(secondDriverInit > firstDriverCreation);
+		Assert.assertTrue(secondDriverInit > firstDriverInit);
+		Assert.assertTrue(secondDriverCreation > firstDriverCreation);
+	}
+	
 	/**
 	 * Check that HAR capture file is present in result with manual steps
 	 * 

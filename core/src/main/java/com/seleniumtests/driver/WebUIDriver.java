@@ -118,7 +118,10 @@ public class WebUIDriver {
         
         logger.info("driver mode: "+ config.getMode());
 
-        synchronized (createDriverLock) {
+        // synchronizing is only useful in local mode, as we need to get the PID of browser and driver
+        // in grid mode, PID list will be empty
+        // Moreover, keeping synchronization in grid mode will block driver of all tests
+        synchronized (config.getMode() == DriverMode.LOCAL ? createDriverLock: new Object()) {
         	
     		// get browser info used to start this driver. It will be used then for managing pids
         	BrowserInfo browserInfo = webDriverBuilder.getSelectedBrowserInfo();

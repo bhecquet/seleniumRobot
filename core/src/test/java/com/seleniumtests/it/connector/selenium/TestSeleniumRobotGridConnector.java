@@ -8,12 +8,15 @@ import static org.mockito.Mockito.verify;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.SessionId;
 import org.testng.Assert;
@@ -21,11 +24,15 @@ import org.testng.ITestContext;
 import org.testng.SkipException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import org.testng.xml.XmlSuite.ParallelMode;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
+import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.it.reporter.ReporterTest;
 import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.imaging.ImageProcessor;
@@ -57,6 +64,33 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 
 		connector.setNodeUrl("http://localhost:5555");
 		gridLogger = spy(connector.getLogger());
+	}
+	
+	@Test(groups={"it"})
+	public void testGridLaunchWithMultipleThreads() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
+			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/wd/hub");
+			
+			ReporterTest.executeSubTest(2, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverManualSteps", "testDriver"});
+			
+			String logs = ReporterTest.readSeleniumRobotLogFile();
+			
+			// check drivers are created in parallel
+			int firstDriverCreation = logs.indexOf("driver creation took"); // written when driver is created
+			int firstDriverInit = logs.indexOf("Socket timeout for driver communication updated");
+			int secondDriverCreation = logs.lastIndexOf("driver creation took");
+			int secondDriverInit = logs.lastIndexOf("Socket timeout for driver communication updated"); // written before creating driver
+			
+			Assert.assertTrue(secondDriverInit < firstDriverCreation);
+			Assert.assertTrue(secondDriverInit > firstDriverInit);
+			Assert.assertTrue(secondDriverCreation > firstDriverCreation);
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
+		}
 	}
 
 	@Test(groups={"it"})
