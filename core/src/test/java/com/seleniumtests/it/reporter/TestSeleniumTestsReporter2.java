@@ -592,6 +592,26 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		}
 	}
 	@Test(groups={"it"})
+	public void testGridnodeNotPresentForSkippedTest() throws Exception {
+		try {
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
+			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4321/wd/hub");
+			
+			createGridHubMockWithNodeOK();
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShortKo", "testDriverShortSkipped"});
+			
+			// check content of summary report file
+			String mainReportContent = readTestMethodResultFile("testDriverShortSkipped");
+			
+			// grid node information not present when test is skipped
+			Assert.assertFalse(mainReportContent.contains("<th>Grid node</th>"));
+		} finally {
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
+		}
+	}
+	@Test(groups={"it"})
 	public void testGridnodeExistForLocal() throws Exception {
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
 

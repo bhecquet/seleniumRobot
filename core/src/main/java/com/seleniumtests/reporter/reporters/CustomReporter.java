@@ -161,7 +161,9 @@ public class CustomReporter extends CommonReporter implements IReporter {
 	
 			// if adding some information, don't forget to add them to velocity model for integration tests
 			if (seleniumTestsContext.getRunMode().equals(DriverMode.GRID)) {
-				context.put("gridnode", seleniumTestsContext.getSeleniumGridConnector().getNodeHost());
+				// in case test is skipped, connector is null
+				context.put("gridnode", seleniumTestsContext.getSeleniumGridConnector() != null ? seleniumTestsContext.getSeleniumGridConnector().getNodeHost(): "N/A");
+
 			} else {
 				context.put("gridnode", seleniumTestsContext.getRunMode());
 			}
