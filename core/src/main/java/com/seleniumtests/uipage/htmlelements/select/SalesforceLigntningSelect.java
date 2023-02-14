@@ -86,9 +86,9 @@ public class SalesforceLigntningSelect extends AngularSelect implements ISelectL
 	public String getOptionText(WebElement option) {
 		try {
 			try {
-				return option.findElements(ByC.xTagName("span")).get(2).findElement(ByC.xTagName("span")).getAttribute("title");
-			} catch (NoSuchElementException e) {
 				return option.findElements(ByC.xTagName("span")).get(1).findElement(ByC.xTagName("span")).getAttribute("title");
+			} catch (NoSuchElementException e) {
+				return option.findElements(ByC.xTagName("span")).get(2).findElement(ByC.xTagName("span")).getAttribute("title");
 			}
 		} catch (NoSuchElementException e) {
 			// sometimes, the span sub-element is not present, so the above line fails. Fall back to getText() method
