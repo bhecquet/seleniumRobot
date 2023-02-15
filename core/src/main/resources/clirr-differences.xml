@@ -3,118 +3,22 @@
 
 
 	<difference>
-		<className>**/connectors/extools/Uft</className>
-		<differenceType>7005</differenceType>
-		<method>com.seleniumtests.reporter.logger.TestStep executeScript(int, boolean)</method>
-		<justification>splitting</justification>
-		<to>com.seleniumtests.reporter.logger.TestStep executeScript(int, java.util.Map)</to>
-	</difference>
-	<difference>
-		<className>**/connectors/extools/Uft</className>
-		<differenceType>7002</differenceType>
-		<method>com.seleniumtests.reporter.logger.TestStep executeScript()</method>
-		<justification>useless</justification>
-	</difference>
-	<difference>
-		<className>**/connectors/extools/Uft</className>
-		<differenceType>7002</differenceType>
-		<method>com.seleniumtests.reporter.logger.TestStep executeScript(int)</method>
-		<justification>useless</justification>
-	</difference>
-	<difference>
-		<className>**/connectors/extools/Uft</className>
-		<differenceType>7004</differenceType>
-		<method>java.util.List prepareArguments()</method>
-		<justification>useless</justification>
-	</difference>
-	<difference>
-		<className>**/connectors/extools/Uft</className>
-		<differenceType>7004</differenceType>
-		<method>Uft(java.lang.String, java.util.Map)</method>
-		<justification>useless</justification>
-	</difference>
-	<difference>
-		<className>**/connectors/extools/Uft</className>
-		<differenceType>7004</differenceType>
-		<method>void readXmlResult(java.lang.String, com.seleniumtests.reporter.logger.TestStep)</method>
-		<justification>need to provide one step for UFT step</justification>
-	</difference>
-	<difference>
-		<className>**/connectors/extools/Uft</className>
-		<differenceType>7004</differenceType>
-		<method>com.seleniumtests.reporter.logger.TestStep analyseOutput(java.lang.String, com.seleniumtests.reporter.logger.TestStep)</method>
-		<justification>need to provide one step for UFT step</justification>
-	</difference>
-	<difference>
-		<className>**/connectors/extools/Uft</className>
-		<differenceType>7006</differenceType>
-		<method>void readXmlResult(java.lang.String, com.seleniumtests.reporter.logger.TestStep)</method>
-		<to>java.util.List</to>
-		<justification>need to provide one step for UFT step</justification>
-	</difference>
-	<difference>
-		<className>**/connectors/extools/Uft</className>
-		<differenceType>7006</differenceType>
-		<method>com.seleniumtests.reporter.logger.TestStep executeScript(int, java.util.Map)</method>
-		<to>java.util.List</to>
-		<justification>need to provide one step for UFT step</justification>
-	</difference>
-	<difference>
-		<className>**/connectors/extools/Uft</className>
-		<differenceType>7006</differenceType>
-		<method>com.seleniumtests.reporter.logger.TestStep analyseOutput(java.lang.String, com.seleniumtests.reporter.logger.TestStep)</method>
-		<to>java.util.List</to>
-		<justification>need to provide one step for UFT step</justification>
-	</difference>
-	<difference>
-		<className>**/connectors/extools/Uft</className>
-		<differenceType>7004</differenceType>
-		<method>Uft(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.Map)</method>
-		<justification>useless</justification>
-	</difference>
-	<difference>
-        <className>**/uipage/htmlelements/HtmlElement</className>
+        <className>**/uipage/htmlelements/SelectList</className>
         <differenceType>6004</differenceType>
-        <field>element</field>
-        <from>org.openqa.selenium.WebElement</from>
-        <to>java.lang.ThreadLocal</to>
-        <justification>thread-safety</justification>
-    </difference>
-	<difference>
-        <className>**/uipage/htmlelements/HtmlElement</className>
-        <differenceType>6004</differenceType>
-        <field>driver</field>
-        <from>org.openqa.selenium.WebDriver</from>
+        <field>multiple</field>
+        <from>boolean</from>
         <to>java.lang.ThreadLocal</to>
         <justification>thread-safety</justification>
     </difference>
     <difference>
-        <className>**/uipage/htmlelements/HtmlElement</className>
-        <differenceType>6010</differenceType>
-        <field>element</field>
-        <justification>force to use accessors</justification>
-    </difference>
-    <difference>
-        <className>**/uipage/htmlelements/HtmlElement</className>
-        <differenceType>6010</differenceType>
-        <field>driver</field>
-        <justification>force to use accessors</justification>
-    </difference>
-    <difference>
-        <className>**/uipage/htmlelements/GenericPictureElement</className>
+        <className>**/uipage/htmlelements/SelectList</className>
         <differenceType>6004</differenceType>
-        <field>detectedObjectRectangle</field>
-        <from>org.openqa.selenium.Rectangle</from>
-        <to>java.util.Map</to>
-        <justification>#510</justification>
+        <field>options</field>
+        <from>java.util.List</from>
+        <to>java.lang.ThreadLocal</to>
+        <justification>thread-safety</justification>
     </difference>
-    <difference>
-        <className>**/uipage/htmlelements/GenericPictureElement</className>
-        <differenceType>6004</differenceType>
-        <field>pictureSizeRatio</field>
-        <from>double</from>
-        <to>java.util.Map</to>
-        <justification>#510</justification>
-    </difference>
+    
+    
 
 </differences>
