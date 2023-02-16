@@ -519,7 +519,9 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 
 
 			if (selTestContext.getRunMode().equals(DriverMode.GRID)) {
-				velocityContext.put("gridnode", selTestContext.getSeleniumGridConnector().getNodeHost());
+				if (selTestContext.getSeleniumGridConnector() != null) { // in case test is skipped, connector is null
+					velocityContext.put("gridnode", selTestContext.getSeleniumGridConnector().getNodeHost());
+				}
 			} else {
 				velocityContext.put("gridnode", selTestContext.getRunMode());
 			}

@@ -40,7 +40,6 @@ import com.seleniumtests.uipage.htmlelements.select.ISelectList;
 import com.seleniumtests.uipage.htmlelements.select.StubSelect;
 
 import net.ricecode.similarity.JaroWinklerStrategy;
-import net.ricecode.similarity.SimilarityStrategy;
 import net.ricecode.similarity.StringSimilarityService;
 import net.ricecode.similarity.StringSimilarityServiceImpl;
 
@@ -82,12 +81,11 @@ public class SelectList extends HtmlElement {
 	}
 
     private static final String ERROR_MULTI_SELECT = "You may only deselect all options of a multi-select";
-	protected List<WebElement> options = null;
-	private SimilarityStrategy strategy = new JaroWinklerStrategy();
-	private StringSimilarityService service = new StringSimilarityServiceImpl(strategy);
-	private ISelectList selectImplementation;
+	protected ThreadLocal<List<WebElement>> options = new ThreadLocal<>();
+	private StringSimilarityService service = new StringSimilarityServiceImpl(new JaroWinklerStrategy());
+	private ThreadLocal<ISelectList> selectImplementation = new ThreadLocal<>();
 	private List<Class<? extends ISelectList>> implementationList;
-	protected boolean multiple;
+	protected ThreadLocal<Boolean> multiple = new ThreadLocal<>();
 
 	/**
 	 * Creates a SelectList element which represents either
@@ -172,7 +170,7 @@ public class SelectList extends HtmlElement {
     protected void findElement() {
 
     	// set a default type so that use of selectImplementation can be done
-    	selectImplementation = new StubSelect();
+    	setSelectImplementation(new StubSelect());
     	
         super.findElement(true);
         
@@ -183,7 +181,7 @@ public class SelectList extends HtmlElement {
         	try {
 				ISelectList selectInstance = selectClass.getConstructor(WebElement.class, FrameElement.class).newInstance(getRealElementNoSearch(), frameElement);
 				if (selectInstance.isApplicable()) {
-					selectImplementation = selectInstance;
+					setSelectImplementation(selectInstance);
 					selectInstance.setDriver(getDriver());
 					break;
 				}
@@ -193,12 +191,13 @@ public class SelectList extends HtmlElement {
 			}
         }
         
-        if (selectImplementation instanceof StubSelect) {
+        if (getSelectImplementation() instanceof StubSelect) {
         	throw new ScenarioException("Cannot find type of select " + getRealElementNoSearch().getTagName());
         }
         
-        options = selectImplementation.getOptions();
-        multiple = selectImplementation.isMultipleWithoutFind();
+        setOptions(getSelectImplementation().getOptions());
+        setMultipleSelect(getSelectImplementation().isMultipleWithoutFind());
+
     }
 
     /**
@@ -209,15 +208,23 @@ public class SelectList extends HtmlElement {
     protected Select getNewSelectElement(final WebElement element) {
         return new Select(element);
     }
+    
+    protected void setOptions(List<WebElement> selectOptions) {
+    	options.set(selectOptions);
+    }
+    
+    protected List<WebElement> getOptionsNoSearch() {
+    	return options.get();
+    }
 
 
     @ReplayOnError
     public List<WebElement> getOptions() {
     	try {
 	        findElement();
-	        return options;
+	        return getOptionsNoSearch();
     	} finally {
-    		selectImplementation.finalizeAction();
+    		getSelectImplementation().finalizeAction();
     	}
     }
     
@@ -251,10 +258,10 @@ public class SelectList extends HtmlElement {
 
     	try {
 	    	findElement();
-			return selectImplementation.getAllSelectedOptions(); 
+			return getSelectImplementation().getAllSelectedOptions(); 
 			
     	} finally {
-    		selectImplementation.finalizeAction();
+    		getSelectImplementation().finalizeAction();
     	}
 	}
 
@@ -276,7 +283,7 @@ public class SelectList extends HtmlElement {
     	List<String> textList = new ArrayList<>();
     	
         for (WebElement option : allSelectedOptions) {
-        	textList.add(selectImplementation.getOptionText(option));
+        	textList.add(getSelectImplementation().getOptionText(option));
         }
 
         String[] texts = new String[textList.size()];
@@ -287,7 +294,7 @@ public class SelectList extends HtmlElement {
     public String getSelectedValue() {
     	WebElement firstSelectedOption = getTheFirstSelectedOption();
     	if (firstSelectedOption != null) {
-    		return selectImplementation.getOptionValue(firstSelectedOption);
+    		return getSelectImplementation().getOptionValue(firstSelectedOption);
     	} else {
     		return "";
     	}
@@ -299,7 +306,7 @@ public class SelectList extends HtmlElement {
     	List<String> valueList = new ArrayList<>();
     	
         for (WebElement option : allSelectedOptions) {
-        	valueList.add(selectImplementation.getOptionValue(option));
+        	valueList.add(getSelectImplementation().getOptionValue(option));
         }
 
         String[] texts = new String[valueList.size()];
@@ -311,14 +318,18 @@ public class SelectList extends HtmlElement {
     	try {
 	        findElement();
 	
-	        return selectImplementation.isMultipleWithoutFind();
+	        return getSelectImplementation().isMultipleWithoutFind();
     	} finally {
-    		selectImplementation.finalizeAction();
+    		getSelectImplementation().finalizeAction();
     	}
     }
     
     protected boolean isMultipleSelect() {
-    	return multiple;
+    	return multiple.get();
+    }
+    
+    protected void setMultipleSelect(boolean multipleSelect) {
+    	multiple.set(multipleSelect);
     }
     
     /**
@@ -334,7 +345,7 @@ public class SelectList extends HtmlElement {
         }
     	
         for (WebElement option : allSelectedOptions) {
-        	selectImplementation.setDeselected(option);
+        	getSelectImplementation().setDeselected(option);
         }
     }
 
@@ -348,9 +359,9 @@ public class SelectList extends HtmlElement {
 	    	if (!isMultipleSelect()) {
 	            throw new UnsupportedOperationException("You may only deselect options of a multi-select");
 	        }
-	    	selectImplementation.deselectByIndex(index);
+	    	getSelectImplementation().deselectByIndex(index);
     	} finally {
-    		selectImplementation.finalizeAction();
+    		getSelectImplementation().finalizeAction();
     	}
     }
 
@@ -364,10 +375,10 @@ public class SelectList extends HtmlElement {
 	            throw new UnsupportedOperationException(ERROR_MULTI_SELECT);
 	        }
 	    	
-	    	selectImplementation.deselectByText(text);
+	    	getSelectImplementation().deselectByText(text);
 			
     	} finally {
-    		selectImplementation.finalizeAction();
+    		getSelectImplementation().finalizeAction();
     	}
     }
 
@@ -381,10 +392,10 @@ public class SelectList extends HtmlElement {
 	            throw new UnsupportedOperationException(ERROR_MULTI_SELECT);
 	        }
 	    	
-	    	selectImplementation.deselectByValue(value);
+	    	getSelectImplementation().deselectByValue(value);
 			
     	} finally {
-    		selectImplementation.finalizeAction();
+    		getSelectImplementation().finalizeAction();
     	}
     }
 
@@ -393,9 +404,9 @@ public class SelectList extends HtmlElement {
     	try {
 	        findElement();
 	        
-	        selectImplementation.selectByIndex(index);
+	        getSelectImplementation().selectByIndex(index);
     	} finally {
-    		selectImplementation.finalizeAction();
+    		getSelectImplementation().finalizeAction();
     	}
     }
 
@@ -405,10 +416,10 @@ public class SelectList extends HtmlElement {
  	    	findElement();
  	    	
  	    	for (int i = 0; i < indexs.length; i++) {
- 	    		selectImplementation.selectByIndex(indexs[i]);
+ 	    		getSelectImplementation().selectByIndex(indexs[i]);
  	    	}
      	} finally {
-     		selectImplementation.finalizeAction();
+     		getSelectImplementation().finalizeAction();
      	}
     }
 
@@ -423,9 +434,9 @@ public class SelectList extends HtmlElement {
     	try {
 	    	findElement();
 	        
-	    	selectImplementation.selectByText(text);
+	    	getSelectImplementation().selectByText(text);
     	} finally {
-    		selectImplementation.finalizeAction();
+    		getSelectImplementation().finalizeAction();
     	}
     }
 
@@ -435,11 +446,11 @@ public class SelectList extends HtmlElement {
 	        findElement();
 	        
 	        for (int i = 0; i < texts.length; i++) {
-	        	selectImplementation.selectByText(texts[i]);
+	        	getSelectImplementation().selectByText(texts[i]);
 	        }
 	       
     	} finally {
-    		selectImplementation.finalizeAction();
+    		getSelectImplementation().finalizeAction();
     	}
     }
    
@@ -455,7 +466,7 @@ public class SelectList extends HtmlElement {
 	    	findElement();
 	    	selectCorrespondingText(text);
     	} finally {
-    		selectImplementation.finalizeAction();
+    		getSelectImplementation().finalizeAction();
     	}
     }
     
@@ -473,22 +484,22 @@ public class SelectList extends HtmlElement {
 	    		selectCorrespondingText(text[i]);
 	    	}
     	} finally {
-    		selectImplementation.finalizeAction();
+    		getSelectImplementation().finalizeAction();
     	}
     }
     
     private void selectCorrespondingText(final String text) {
     	double score = 0;
     	WebElement optionToSelect = null;
-    	for (WebElement option : options) {
-    		String source = selectImplementation.getOptionText(option).trim();
+    	for (WebElement option : getOptionsNoSearch()) {
+    		String source = getSelectImplementation().getOptionText(option).trim();
     		if (service.score(source, text) > score) {
     			score = service.score(source, text);
     			optionToSelect = option;
     		}
     	}
     	if (optionToSelect != null) {
-    		selectImplementation.setSelected(optionToSelect);
+    		getSelectImplementation().setSelected(optionToSelect);
     	} else {
     		throw new NoSuchElementException("Cannot locate option with corresponding text " + text);
     	}
@@ -506,7 +517,7 @@ public class SelectList extends HtmlElement {
 
 	    	double score = 0;
 	    	WebElement optionToSelect = null;
-	    	for (WebElement option : options) {
+	    	for (WebElement option : getOptionsNoSearch()) {
 	    		String source = option.getText().trim();
 	    		if (service.score(source, text) > score) {
 	    			score = service.score(source, text);
@@ -514,13 +525,13 @@ public class SelectList extends HtmlElement {
 	    		}
 	    	}
 	    	if (optionToSelect != null) {
-	    		selectImplementation.setDeselected(optionToSelect);
+	    		getSelectImplementation().setDeselected(optionToSelect);
 	    	} else {
 	    		throw new NoSuchElementException("Cannot locate option with corresponding text " + text);
 	    	}
     		
     	} finally {
-    		selectImplementation.finalizeAction();
+    		getSelectImplementation().finalizeAction();
     	}
     }
 
@@ -529,9 +540,9 @@ public class SelectList extends HtmlElement {
     	try {
 	    	findElement();
 	        
-	    	selectImplementation.selectByValue(value);
+	    	getSelectImplementation().selectByValue(value);
     	} finally {
-    		selectImplementation.finalizeAction();
+    		getSelectImplementation().finalizeAction();
     	}
     }
 
@@ -540,15 +551,19 @@ public class SelectList extends HtmlElement {
     	try {
 	        findElement();
 	        for (int i = 0; i < values.length; i++) {
-	        	selectImplementation.selectByValue(values[i]);
+	        	getSelectImplementation().selectByValue(values[i]);
 	        }
     	} finally {
-    		selectImplementation.finalizeAction();
+    		getSelectImplementation().finalizeAction();
     	}
     }
 
 	public ISelectList getSelectImplementation() {
-		return selectImplementation;
+		return selectImplementation.get();
+	}
+
+	public void setSelectImplementation(ISelectList selectImplementation) {
+		this.selectImplementation.set(selectImplementation);
 	}
 
 	public List<Class<? extends ISelectList>> getImplementationList() {

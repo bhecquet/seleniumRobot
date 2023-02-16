@@ -138,6 +138,11 @@ public class StubTestClassForDriverTest extends StubParentClass {
 		new DriverTestPage(true)
 			._writeSomethingOnNonExistentElement();
 	}
+
+	@Test(groups="stub", dependsOnMethods = "testDriverShortKo")
+	public void testDriverShortSkipped() throws Exception {
+		new DriverTestPage(true);
+	}
 	
 	@Test(groups="stub")
 	public void testDriverWithAssert() throws Exception {

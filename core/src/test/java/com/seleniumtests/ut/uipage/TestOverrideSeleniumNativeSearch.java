@@ -63,9 +63,7 @@ public class TestOverrideSeleniumNativeSearch extends MockitoTest {
 	
 	@AfterClass(groups={"ut"}, alwaysRun=true)
 	public void destroyDriver() {
-		if (WebUIDriver.getWebDriver(false) != null) {
-			WebUIDriver.cleanUp();
-		}
+		WebUIDriver.cleanUp();
 
 		GenericTest.resetTestNGREsultAndLogger();
 	}

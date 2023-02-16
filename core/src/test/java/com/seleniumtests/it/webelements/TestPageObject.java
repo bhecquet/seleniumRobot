@@ -60,9 +60,7 @@ public class TestPageObject extends GenericTest {
 	
 	@AfterMethod(groups= {"it", "pageobject"}, alwaysRun=true)
 	public void destroyDriver() {
-		if (WebUIDriver.getWebDriver(false) != null) {
-			WebUIDriver.cleanUp();
-		}
+		WebUIDriver.cleanUp();
 
 		GenericTest.resetTestNGREsultAndLogger();
 	}

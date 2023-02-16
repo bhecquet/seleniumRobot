@@ -52,9 +52,7 @@ public class TestOsUtility extends GenericTest {
 	
 	@AfterMethod(groups={"it"}, alwaysRun=true)
 	public void destroyDriver() {
-		if (WebUIDriver.getWebDriver(false) != null) {
-			WebUIDriver.cleanUp();
-		}
+		WebUIDriver.cleanUp();
 	}
 	
 	@Test(groups={"it"})
