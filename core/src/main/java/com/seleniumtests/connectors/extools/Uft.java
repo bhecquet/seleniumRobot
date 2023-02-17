@@ -2,32 +2,25 @@ package com.seleniumtests.connectors.extools;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.seleniumtests.util.logging.Sys;
 import org.apache.commons.io.FileUtils;
-import org.jdom2.*;
-import org.jdom2.input.SAXBuilder;
-import org.jsoup.Jsoup;
 import org.testng.Reporter;
-import org.xml.sax.InputSource;
 
+import com.seleniumtests.connectors.extools.uftreports.UftReportFactory;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.DriverMode;
-import com.seleniumtests.reporter.logger.TestAction;
-import com.seleniumtests.reporter.logger.TestMessage;
-import com.seleniumtests.reporter.logger.TestMessage.MessageType;
+import com.seleniumtests.reporter.logger.GenericFile;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.logging.ScenarioLogger;
 
@@ -90,7 +83,7 @@ public class Uft {
     public void loadScript(boolean killUftOnStartup) {
         this.killUftOnStartup = killUftOnStartup;
         List<String> args = prepareArguments(true, false);
-        TestTasks.executeCommand("cscript.exe", 60, null, args.toArray(new String[]{}));
+        String out = TestTasks.executeCommand("cscript.exe", 60, null, args.toArray(new String[]{}));
         loaded = true;
     }
 
@@ -199,132 +192,22 @@ public class Uft {
             }
         }
 
-        stepList = readXmlResult(uftOutput.toString());
+        stepList.addAll(UftReportFactory.getInstance(uftOutput.toString(), scriptName).readXmlResult());
+        try {
+        	if (stepList.isEmpty()) {
+        		stepList.add(new TestStep("UFT: " + scriptName, Reporter.getCurrentTestResult(), new ArrayList<>(), false));
+        	}
+        	File reportFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), String.format("uftReport-%d.txt", (int)(Math.random() * 100))).toFile();
+			FileUtils.write(reportFile, output, StandardCharsets.UTF_8);
+			stepList.get(0).addFile(new GenericFile(reportFile, "Uft report"));
+			
+		} catch (IOException e) {
+			logger.error("could not write UFT output file: " + e.getMessage());
+		}
 
         return stepList;
     }
 
-    /**
-     * Read an action element
-     * <p>
-     * // * @param parentStep
-     *
-     * @param actionElement
-     * @throws DataConversionException
-     */
-    private TestStep readAction(Element actionElement) throws DataConversionException {
-        Element data = actionElement.getChild("Data");
-        // data null au second passage parce que pas de balise data après
-        TestStep actionStep = new TestStep("UFT: " + data.getChild("Name").getValue().trim(), Reporter.getCurrentTestResult(), new ArrayList<>(), false);
-
-        if (data != null && data.getChild("Result").getValue().contains("Failed")) {
-            actionStep.setFailed(true);
-        }
-
-        for (Element element : actionElement.getChildren()) {
-                if ("Data".equals(element.getName())) { }
-                else if (element.getAttributeValue("type").equals("Action")) {
-                    TestStep readStep = readAction(element);
-                    actionStep.addStep(readStep);
-                } else if (element.getAttributeValue("type").equals("Step")) {
-                    TestAction readAction = readStep(element);
-                    actionStep.addAction(readAction);
-                } else if (element.getAttributeValue("type").equals("Context")) {
-                    TestStep readStep = readAction(element);
-                    actionStep.addStep(readStep);
-                } else if (element.getAttributeValue("type").equals("User")) {
-                    TestStep readStep = readAction(element);
-                    actionStep.addStep(readStep);
-                }
-        }
-        return actionStep;
-    }
-
-    /**
-     * Read a step element
-     * <p>
-     * // * @param parentStep
-     *
-     * @param stepElement
-     */
-    private TestAction readStep(Element stepElement) {
-        String stepDescription = "";
-
-        TestAction stepAction;
-        List<Element> stepList = stepElement.getChildren("ReportNode");
-
-        if (stepElement.getChild("Data").getChild("Description") != null) {
-            if (!stepElement.getChild("Data").getChild("Description").getContent().isEmpty()) {
-                org.jsoup.nodes.Document htmlDoc = Jsoup.parseBodyFragment(stepElement.getChild("Data").getChildText("Description"));
-                String details = htmlDoc.text();
-                stepDescription = String.format("%s: %s", stepElement.getChild("Data").getChildText("Name"), details).trim();
-            }
-        } else {
-            stepDescription = String.format(stepElement.getChild("Data").getChildText("Name")).trim();
-        }
-
-        if (stepList.isEmpty()) {
-            stepAction = new TestAction(stepDescription, false, new ArrayList<>());
-        } else {
-            stepAction = new TestStep(stepDescription, Reporter.getCurrentTestResult(), new ArrayList<>(), false);
-            for (Element subStepElement : stepElement.getChildren("ReportNode")) {
-                TestAction readAction = readStep(subStepElement);
-                ((TestStep) stepAction).addAction(readAction);
-            }
-        }
-        return stepAction;
-    }
-
-    public List<TestStep> readXmlResult(String xmlString) {
-        Document document;
-        SAXBuilder builder = new SAXBuilder();
-
-        List<TestStep> listStep = new ArrayList<>();
-
-        try {
-            String xml = xmlString.substring(xmlString.indexOf("<"));
-            String xml10pattern = "[^"
-                    + "\u0009\r\n"
-                    + "\u0020-\uD7FF"
-                    + "\uE000-\uFFFD"
-                    + "\ud800\udc00-\udbff\udfff"
-                    + "]";
-            xml = xml.replaceAll(xml10pattern, "");
-
-            document = builder.build(new InputSource(new StringReader(xml))); // we skip BOM by searching the first "<" character
-            Element docElement = document.getRootElement().getChild("ReportNode");
-            Element elementToIterate = docElement.getChild("ReportNode");
-            Element iterationChild = elementToIterate.getChild("ReportNode");
-            Element data = docElement.getChild("Data");
-
-            if (!iterationChild.getChildren("ReportNode").isEmpty()) {
-                elementToIterate = iterationChild;
-            }
-
-            for (Element element : elementToIterate.getChildren()) {
-                if ("ReportNode".equals(element.getName())) {
-                    TestStep readStep = readAction(element);
-                    listStep.add(readStep);
-                }
-//                else if ("Data".equals(element.getName())) {
-//                    readStep(element);
-//                }
-            }
-        } catch (IndexOutOfBoundsException e) {
-            addStepWithoutXml(listStep, "Invalid XML data: ", e);
-        } catch (JDOMException | IOException e) {
-            addStepWithoutXml(listStep, "Could not read UFT report: ", e);
-        }
-
-        return listStep;
-    }
-
-    private void addStepWithoutXml(List<TestStep> listStep, String messageException, Exception e) {
-        logger.error(messageException + e.getMessage());
-        TestStep readStep = new TestStep("UFT: " + scriptName, Reporter.getCurrentTestResult(), new ArrayList<>(), false);
-        readStep.addMessage(new TestMessage(messageException + e.getMessage(), MessageType.ERROR));
-        listStep.add(readStep);
-    }
 
     public void setKillUftOnStartup(boolean killUftOnStartup) {
         this.killUftOnStartup = killUftOnStartup;

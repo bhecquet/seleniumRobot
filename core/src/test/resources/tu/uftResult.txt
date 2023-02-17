@@ -633,6 +633,6 @@ _____OUTPUT_____
 <Disp><![CDATA[Arrêter l'exécution]]></Disp>
 </NodeArgs>
 </Step>
-</Report>
+
 _____ENDOUTPUT_____
 
