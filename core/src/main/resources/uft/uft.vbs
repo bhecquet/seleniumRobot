@@ -65,8 +65,8 @@ Test_path = Wscript.Arguments(0)
 'Test_path = "[QualityCenter]Subject\xxx\yyyy\test1" for ALM tests
 Set qtApp = CreateObject("QuickTest.Application") ' Create the Application object
 qtApp.Launch ' Start UFT
-' qtApp.Visible = False ' Make the QuickTest application not visible
-qtApp.Visible = True ' Make the QuickTest application visible
+qtApp.Visible = False ' Make the QuickTest application not visible
+' qtApp.Visible = True ' Make the QuickTest application visible
 
 '' Set QuickTest run options
 qtApp.Options.Run.RunMode = "Normal"
