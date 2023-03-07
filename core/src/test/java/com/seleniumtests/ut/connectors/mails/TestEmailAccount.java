@@ -70,6 +70,7 @@ public class TestEmailAccount extends MockitoTest {
 
         when(emailClientMock.checkMessagePresenceInLastMessagesByBody(anyString(), any(String[].class), any(Email.class), anyInt())).thenCallRealMethod();
         when(emailClientMock.checkMessagePresenceInLastMessagesByBody(anyString(), anyList(), any(Email.class), anyInt())).thenCallRealMethod();
+        when(emailClientMock.checkMessagePresenceInLastMessagesByBody(anyString(), any(String[].class), any(Email.class))).thenCallRealMethod();
         when(emailClientMock.getEmailsByContent(anyString())).thenCallRealMethod();
 
         when(emailClientMock.getLastEmails(nullable(String.class))).thenCallRealMethod();
@@ -150,19 +151,7 @@ public class TestEmailAccount extends MockitoTest {
     }
 
     @Test(groups = {"ut"})
-    public void testCheckEmailPresenceByBodyWithOneWord() throws IOException, MessagingException {
-        EmailAccount account = new EmailAccount("email@free.fr", "email@free.fr", "aaa", server);
-        List<Email> emails = new ArrayList<>();
-        emails.add(new Email("Jellyfish", "stinging", "oursindemer@company.com", LocalDateTime.now(), Arrays.asList(new String[]{"medusa.png"})));
-        EmailClientSelector.routeEmail(server, emailAddress, login, password);
-        when(emailClientMock.getEmails(nullable(String.class), eq(1), nullable(LocalDateTime.class))).thenReturn(emails);
-        Email emailFound = account.checkEmailPresenceByBody("stinging", new String[]{"medusa.png"}, 5);
-
-        Assert.assertEquals(emailFound.getContent(), "stinging");
-    }
-
-    @Test(groups = {"ut"})
-    public void testCheckEmailPresenceByBodyWithManyWords() throws IOException, MessagingException {
+    public void testCheckEmailPresenceByBodyWithManyWords() throws Exception {
         EmailAccount account = new EmailAccount("email@free.fr", "email@free.fr", "aaa", server);
         List<Email> emails = new ArrayList<>();
         emails.add(new Email("Jellyfish", "Lorem ipsum dolor sit amet,", "oursindemer@company.com", LocalDateTime.now(), Arrays.asList(new String[]{"medusa.png"})));
@@ -174,15 +163,25 @@ public class TestEmailAccount extends MockitoTest {
     }
 
     @Test(groups = {"ut"}, expectedExceptions = ScenarioException.class)
-    public void testCheckEmailPresenceByBodyWithoutSearchString() throws IOException, MessagingException {
+    public void testCheckEmailPresenceByBodyWithoutSearchString() throws Exception {
         EmailAccount account = new EmailAccount("email@free.fr", "email@free.fr", "aaa", server);
         List<Email> emails = new ArrayList<>();
         emails.add(new Email("Jellyfish", "Lorem ipsum dolor sit amet,", "oursindemer@company.com", LocalDateTime.now(), Arrays.asList(new String[]{"medusa.png"})));
-        emails.add(new Email("Shark", "Lorem ipsum sit amet,", "oursindemer@company.com", LocalDateTime.now(), Arrays.asList(new String[]{"medusa.png"})));
-        emails.add(new Email("Whale", "ipsum dolor sit amet,", "oursindemer@company.com", LocalDateTime.now(), Arrays.asList(new String[]{"medusa.png"})));
         EmailClientSelector.routeEmail(server, emailAddress, login, password);
         when(emailClientMock.getEmails(nullable(String.class), eq(1), nullable(LocalDateTime.class))).thenReturn(emails);
 
         account.checkEmailPresenceByBody("", new String[]{"medusa.png"}, 5);
+    }
+
+    @Test(groups = {"ut"}, expectedExceptions = ScenarioException.class)
+    public void testCheckEmailPresenceByBodyNullContent() throws Exception {
+        EmailAccount account = new EmailAccount("email@free.fr", "email@free.fr", "aaa", server);
+        EmailClientSelector.routeEmail(server, emailAddress, login, password);
+
+        doThrow(new ScenarioException("content can't be null"))
+                .when(emailClientMock)
+                .checkMessagePresenceInLastMessagesByBody(nullable(String.class), any(String[].class), any(Email.class), anyInt());
+
+        account.checkEmailPresenceByBody(null, new String[]{"medusa.png"}, 5);
     }
 }

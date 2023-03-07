@@ -72,9 +72,9 @@ public class TestEmailClient extends MockitoTest {
 		when(emailClientMock.checkMessagePresenceInLastMessages(anyString(), any(String[].class), any(Email.class), anyInt())).thenCallRealMethod();
 		when(emailClientMock.checkMessagePresenceInLastMessages(anyString(), anyList(), any(Email.class), anyInt())).thenCallRealMethod();
 
-		when(emailClientMock.checkMessagePresenceInLastMessagesByBody(anyString(), any(String[].class), any(Email.class), anyInt())).thenCallRealMethod();
-		when(emailClientMock.checkMessagePresenceInLastMessagesByBody(anyString(), anyList(), any(Email.class), anyInt())).thenCallRealMethod();
-		when(emailClientMock.checkMessagePresenceInLastMessagesByBody(anyString(), any(String[].class), any(Email.class))).thenCallRealMethod();
+		when(emailClientMock.checkMessagePresenceInLastMessagesByBody(nullable(String.class), any(String[].class), any(Email.class), anyInt())).thenCallRealMethod();
+		when(emailClientMock.checkMessagePresenceInLastMessagesByBody(nullable(String.class), anyList(), any(Email.class), anyInt())).thenCallRealMethod();
+		when(emailClientMock.checkMessagePresenceInLastMessagesByBody(nullable(String.class), any(String[].class), any(Email.class))).thenCallRealMethod();
 
 		when(emailClientMock.getLastEmails(nullable(String.class))).thenCallRealMethod();
 		when(emailClientMock.getLastEmails()).thenCallRealMethod();
@@ -311,6 +311,18 @@ public class TestEmailClient extends MockitoTest {
 		emailClient.checkMessagePresenceInLastMessagesByBody("text within good content", new String[] {"contract-\\d+\\.pdf", "infos.txt"}, email);
 
 		Assert.assertEquals(email.getContent(), "text within good content");
+	}
+
+	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class)
+	public void testCheckMessagePresenceInLastMessagesByBodyWithNullContent() throws Exception {
+		when(emailClientMock.getEmailsByContent(nullable(String.class))).thenCallRealMethod();
+
+		EmailServer server = new EmailServer(serverUrl, EmailServerTypes.EXCHANGE, "");
+		EmailClient emailClient = EmailClientSelector.routeEmail(server, emailAddress, login, password);
+		emailClient.setLastMessageIndex(emailClient.getLastMessageIndex() - 1);
+
+		Email email = new Email();
+		emailClientMock.checkMessagePresenceInLastMessagesByBody(null, new String[] {"contract-\\d+\\.pdf", "infos.txt"}, email);
 	}
 	
 	/**

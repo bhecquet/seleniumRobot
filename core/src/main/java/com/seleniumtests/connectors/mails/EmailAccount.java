@@ -169,7 +169,7 @@ public class EmailAccount {
      * @param attachments      list of attachments in email
      * @param timeoutInSeconds time to wait for expected message
      */
-    public Email checkEmailPresenceByBody(String content, String[] attachments, int timeoutInSeconds) {
+    public Email checkEmailPresenceByBody(String content, String[] attachments, int timeoutInSeconds) throws Exception {
 
         // is client configured
         getEmailClient();
@@ -187,9 +187,7 @@ public class EmailAccount {
                     Assert.assertTrue(missingAttachments.isEmpty(), "Email with " + content + " content found but attachments are missing: " + missingAttachments);
                 }
             } catch (ScenarioException e) {
-                throw new ScenarioException(e.getMessage());
-            } catch (Exception e) {
-                logger.error("Could not get messages", e);
+                throw e;
             }
         } else {
             throw new ConfigurationException("Mail server client has not been configured");
