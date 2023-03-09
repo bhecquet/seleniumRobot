@@ -357,9 +357,11 @@ public class StubTestClass extends StubParentClass {
 	public void testLogSameInfoMultipleTimes() {
 		for (int i=0; i < 20; i++) {
 			logger.info("something interesting");
+			WaitHelper.waitForMilliSeconds(50);
 		}
 		for (int i=0; i < 2; i++) {
 			logger.info("something else interesting");
+			WaitHelper.waitForMilliSeconds(100);
 		}
 		
 	}
@@ -368,9 +370,11 @@ public class StubTestClass extends StubParentClass {
 	public void testLogSameInfoMultipleTimes2() {
 		for (int i=0; i < 15; i++) {
 			logger.info("something interesting");
+			WaitHelper.waitForMilliSeconds(50);
 		}
 		for (int i=0; i < 3; i++) {
 			logger.info("something else interesting");
+			WaitHelper.waitForMilliSeconds(100);
 		}
 		
 	}

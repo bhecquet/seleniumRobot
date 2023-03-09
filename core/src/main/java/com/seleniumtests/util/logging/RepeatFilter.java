@@ -1,5 +1,8 @@
 package com.seleniumtests.util.logging;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -20,6 +23,7 @@ public final class RepeatFilter extends AbstractFilter {
     private final Level level;
     private ThreadLocal<String> lastLog = new ThreadLocal<>();
     private ThreadLocal<Integer> lastLogRepeat = new ThreadLocal<>();
+    private ThreadLocal<LocalDateTime> lastLogTime = new ThreadLocal<>();
  
     private RepeatFilter(Level level, Result onMatch, Result onMismatch) {
         super(onMatch, onMismatch);
@@ -55,12 +59,13 @@ public final class RepeatFilter extends AbstractFilter {
     				lastLogRepeat.set(1);
     			}
     			lastLogRepeat.set(lastLogRepeat.get() + 1);
+    			lastLogTime.set(LocalDateTime.now());
     			discard = true;
     		} else {
     			Integer repeatTime = lastLogRepeat.get();
     			lastLogRepeat.set(0);
     			if (repeatTime != null && repeatTime > 1) {
-    				logger.info("... repeated {} times ...", repeatTime);
+    				logger.info("... repeated {} times until {} ...", repeatTime, lastLogTime.get().format(DateTimeFormatter.ISO_LOCAL_TIME));
     			}
     			lastLogRepeat.set(1);
     		}
