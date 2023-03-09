@@ -103,7 +103,7 @@ public class ReporterControler implements IReporter {
 			} catch (Exception e) {
 				logger.warn(String.format("Problem creating output directory %s: %s", SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), e.getMessage()));
 			}
-			cleanAttachments(resultSet);
+			cleanAttachments(currentTestResult);
 			
 			// are we at the end of all suites (suite.getResults() has the same size as the returned result map)
 			boolean suiteFinished = true;
@@ -314,7 +314,7 @@ public class ReporterControler implements IReporter {
 			// If at least one test (not a test method, but a TestNG test) is finished, suite contains its results
 			for (String suiteString: suite.getResults().keySet()) {
 				ISuiteResult suiteResult = suite.getResults().get(suiteString);
-				
+
 				Set<ITestResult> resultSet = new HashSet<>(); 
 				resultSet.addAll(suiteResult.getTestContext().getFailedTests().getAllResults());
 				resultSet.addAll(suiteResult.getTestContext().getPassedTests().getAllResults());
@@ -324,10 +324,11 @@ public class ReporterControler implements IReporter {
 			
 			// complete the suite result with remaining, currently running tests
 			for (TestRunner testContext: testContexts) {
+
 				if (allResultSet.containsKey(testContext)) {
 					continue;
 				}
-				
+
 				Set<ITestResult> resultSet = removeUnecessaryResults(testContext, currentTestResult);
 
 				allResultSet.put(testContext, resultSet);
@@ -421,40 +422,36 @@ public class ReporterControler implements IReporter {
 	}
 	
 	/**
-	 * Delete all files in html and screenshot folders that are not directly references by any test step
+	 * Delete all files in html and screenshot folders that are not directly references by test steps in current result
 	 * @param suites
 	 */
-	private void cleanAttachments(Map<ITestContext, Set<ITestResult>> resultSet) {
+	private void cleanAttachments(ITestResult currentResult) {
+
+		if (currentResult == null) {
+			return;
+		}
 		
 		List<File> usedFiles = new ArrayList<>();
 		List<File> allFiles = new ArrayList<>();
 		
-		Set<ITestResult> allResultsSet = new HashSet<>();
-		for (Set<ITestResult> rs: resultSet.values()) {
-			allResultsSet.addAll(rs);
+		// without context, nothing can be done
+		SeleniumTestsContext testContext = TestNGResultUtils.getSeleniumRobotTestContext(currentResult);
+		if (testContext == null) {
+			return;
 		}
 		
-		for (ITestResult testResult: allResultsSet) {
-			
-			// without context, nothing can be done
-			SeleniumTestsContext testContext = TestNGResultUtils.getSeleniumRobotTestContext(testResult);
-			if (testContext == null) {
-				continue;
+		// get files referenced by the steps
+		for (TestStep testStep: testContext.getTestStepManager().getTestSteps()) {
+			try {
+				testStep.moveAttachments(testContext.getOutputDirectory());
+			} catch (IOException e) {
+				logger.error("Cannot move attachment " + e.getMessage());
 			}
+			usedFiles.addAll(testStep.getAllAttachments());
 			
-			// get files referenced by the steps
-			for (TestStep testStep: testContext.getTestStepManager().getTestSteps()) {
-				try {
-					testStep.moveAttachments(testContext.getOutputDirectory());
-				} catch (IOException e) {
-					logger.error("Cannot move attachment " + e.getMessage());
-				}
-				usedFiles.addAll(testStep.getAllAttachments());
-				
-			}
-			
-			allFiles.addAll(listAttachments(testContext));
-		}		
+		}
+
+		allFiles.addAll(listAttachments(testContext));
 		
 		for (File file: allFiles) {
 			if (!usedFiles.contains(file)) {

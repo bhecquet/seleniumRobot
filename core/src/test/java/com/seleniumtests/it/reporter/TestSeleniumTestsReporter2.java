@@ -18,8 +18,12 @@
 package com.seleniumtests.it.reporter;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.testng.Assert;
@@ -30,6 +34,7 @@ import org.testng.xml.XmlSuite.ParallelMode;
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.it.stubclasses.StubTestClass;
 
 public class TestSeleniumTestsReporter2 extends ReporterTest {
@@ -60,6 +65,57 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(StringUtils.indexOf(logs, "testInError/PERF-result.xml") < StringUtils.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
 		Assert.assertTrue(StringUtils.indexOf(logs, "testAndSubActions/PERF-result.xml") < StringUtils.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
 		Assert.assertTrue(StringUtils.indexOf(logs, "testWithException/PERF-result.xml") < StringUtils.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
+	}
+	
+	/**
+	 * #569: check that when parallel execution is performed with retried tests, all screenshots are displayed in report
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testMultithreadReportWithDriver() throws Exception {
+
+		try {
+			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
+			System.setProperty(SeleniumTestsContext.REPLAY_TIME_OUT, "5");
+			
+			executeSubTest(2, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverFailed", "testDriverLongFailed"});
+			
+			// check all images are present
+			Pattern pattern = Pattern.compile("src=\"screenshots/(.*?.png)\"");
+			
+			
+			String detailedReportContent = readTestMethodResultFile("testDriverFailed");
+			List<String> screenshotsInReport = findAllMAtchs(pattern, detailedReportContent);
+			List<File> screenshotsInDir = Arrays.asList(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverFailed", ScreenshotUtil.SCREENSHOT_DIR).toFile().listFiles());
+			
+			Assert.assertEquals(screenshotsInDir.size(), screenshotsInReport.size());
+			for (File screenshot: screenshotsInDir) {
+				Assert.assertTrue(screenshotsInReport.contains(screenshot.getName()));
+			}
+			
+			String detailedReportContent2 = readTestMethodResultFile("testDriverLongFailed");
+			screenshotsInReport = findAllMAtchs(pattern, detailedReportContent2);
+			screenshotsInDir = Arrays.asList(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverLongFailed", ScreenshotUtil.SCREENSHOT_DIR).toFile().listFiles());
+			
+			Assert.assertEquals(screenshotsInDir.size(), screenshotsInReport.size());
+			for (File screenshot: screenshotsInDir) {
+				Assert.assertTrue(screenshotsInReport.contains(screenshot.getName()));
+			}
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
+			System.clearProperty(SeleniumTestsContext.REPLAY_TIME_OUT);
+		}
+	}
+	
+	private List<String> findAllMAtchs(Pattern pattern, String detailedReportContent) {
+		List<String> matches = new ArrayList<String>();
+		Matcher matcher = pattern.matcher(detailedReportContent);
+		while (matcher.find())
+		{
+		  matches.add(matcher.group(1));
+		}
+		return matches;
 	}
 	
 	/**
