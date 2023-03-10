@@ -135,7 +135,7 @@ You can override this beheviour by specifying it in variables or in test directl
 @Test(groups={"ut"})
     public void testTestCaseIdFromContext() {
         robotConfig().testManager().setCampaignName("my campaign");
-        robotConfig().testManager().setCampaignName("my iteration");
+        robotConfig().testManager().setIterationName("my iteration");
         ...
         
     }
