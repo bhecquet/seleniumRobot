@@ -64,7 +64,7 @@ public class SquashTMConnector extends TestManager {
 
 		if (serverUrlVar == null || projectVar == null || userVar == null || passwordVar == null) {
 			throw new ConfigurationException(String.format("SquashTM access not correctly configured. Environment configuration must contain variables"
-					+ "%s, %s, %s, %s", TMS_SERVER_URL, TMS_PASSWORD, TMS_USER, TMS_PROJECT));
+					+ " %s, %s, %s, %s", TMS_SERVER_URL, TMS_PASSWORD, TMS_USER, TMS_PROJECT));
 		}
 		
 		serverUrl = serverUrlVar;
