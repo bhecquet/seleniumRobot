@@ -11,6 +11,8 @@ import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import kong.unirest.PagedList;
 import kong.unirest.Unirest;
+import kong.unirest.json.JSONArray;
+import kong.unirest.json.JSONElement;
 import kong.unirest.json.JSONObject;
 
 public class Entity {
@@ -68,11 +70,26 @@ public class Entity {
 	}
 	
 	protected static HttpRequestWithBody buildPostRequest(String url) {
-		return Unirest.post(url).basicAuth(user, password).headerReplace(HEADER_CONTENT_TYPE, MIMETYPE_APPLICATION_JSON);
+		return Unirest.post(updateUrl(url)).basicAuth(user, password).headerReplace(HEADER_CONTENT_TYPE, MIMETYPE_APPLICATION_JSON);
 	}
 	
 	protected static HttpRequestWithBody buildPatchRequest(String url) {
-		return Unirest.patch(url).basicAuth(user, password).headerReplace(HEADER_CONTENT_TYPE, MIMETYPE_APPLICATION_JSON);
+		return Unirest.patch(updateUrl(url)).basicAuth(user, password).headerReplace(HEADER_CONTENT_TYPE, MIMETYPE_APPLICATION_JSON);
+	}
+	
+	/**
+	 * As POST and PATCH requests won't follow redirect (HTTP RFC 2616), and if squash is behind a reverse proxy which does the HTTPS end point, all URLs that squash will 
+	 * reply will be in HTTP
+	 * So, replace http by https if root url is in https
+	 * @param url
+	 * @return
+	 */
+	private static String updateUrl(String url) {
+		if (Entity.apiRootUrl.startsWith("https://")) {
+			return url.replace("http://", "https://");
+		} else {
+			return url;
+		}
 	}
 	
 	/**
@@ -112,7 +129,37 @@ public class Entity {
 		return finalJson;
 	}
 	
+	/**
+	 * get JSONObject in reply to the request
+	 * if reply code is 204 or if body is empty, object is empty
+	 * @param request
+	 * @return
+	 */
 	protected static JSONObject getJSonResponse(HttpRequest<?> request) {
+		JsonNode responseBody =  getJSonNodeResponse(request);
+		if (responseBody == null) {
+			return new JSONObject();
+		} else {
+			return responseBody.getObject();
+		}
+	}
+	
+	/**
+	 * get JSONArray in reply to the request
+	 * if reply code is 204 or if body is empty, array is empty
+	 * @param request
+	 * @return
+	 */
+	protected static JSONArray getArrayJSonResponse(HttpRequest<?> request) {
+		JsonNode responseBody =  getJSonNodeResponse(request);
+		if (responseBody == null) {
+			return new JSONArray();
+		} else {
+			return responseBody.getArray();
+		}
+	}
+	
+	private static JsonNode getJSonNodeResponse(HttpRequest<?> request) {
 
 		HttpResponse<JsonNode> response = request.asJson();
 		
@@ -125,13 +172,9 @@ public class Entity {
 		}
 		
 		if (response.getStatus() == 204) {
-			return new JSONObject();
+			return null;
 		}
-		
-		if (response.getBody() == null) {
-			return new JSONObject();
-		}
-		
-		return response.getBody().getObject();
+
+		return response.getBody();
 	}
 }

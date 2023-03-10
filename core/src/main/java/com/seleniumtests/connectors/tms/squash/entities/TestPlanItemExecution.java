@@ -44,7 +44,7 @@ public class TestPlanItemExecution extends Entity {
 		body.put("_type", "execution");
 		body.put("execution_status", result.toString());
 		try {
-			getJSonResponse(buildPatchRequest(url).body(body));
+			getJSonResponse(buildPatchRequest(String.format("%s?fields=execution_status", url)).body(body));
 		} catch (UnirestException e) {
 			throw new ScenarioException(String.format("Cannot set result for execution %d", id));
 		}

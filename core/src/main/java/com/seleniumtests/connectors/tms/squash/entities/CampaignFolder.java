@@ -6,12 +6,14 @@ import java.util.List;
 import com.seleniumtests.customexception.ScenarioException;
 
 import kong.unirest.UnirestException;
+import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
 
 public class CampaignFolder extends Entity {
 
 	public static final String CAMPAIGN_FOLDER_URL = "campaign-folders";
+	public static final String CAMPAIGN_FOLDER_TREE_URL = CAMPAIGN_FOLDER_URL + "/" + "tree/%s";
 	
 	private Project project;
 	private Entity parent;
@@ -22,6 +24,10 @@ public class CampaignFolder extends Entity {
 		this.parent = parent;
 	}
 	
+	/**
+	 * Get all campaign folders (should not be used on large instances
+	 * @return
+	 */
 	public static List<CampaignFolder> getAll() {
 		try {
 			JSONObject json = getPagedJSonResponse(buildGetRequest(apiRootUrl + CAMPAIGN_FOLDER_URL));
@@ -36,6 +42,36 @@ public class CampaignFolder extends Entity {
 		} catch (UnirestException e) {
 			throw new ScenarioException("Cannot get all campaign folders", e);
 		}
+	}
+	
+	/**
+	 * Get all campaign folders for this project
+	 * @return
+	 */
+	public static List<CampaignFolder> getAll(Project project) {
+		try {
+			JSONArray json = getArrayJSonResponse(buildGetRequest(apiRootUrl + String.format(CAMPAIGN_FOLDER_TREE_URL, project.getId())));
+			
+			List<CampaignFolder> campaignFolders = new ArrayList<>();
+			if (!json.isEmpty()) {
+				// we request for only one project, so take the first element
+				for (JSONObject folderJson: (List<JSONObject>)json.getJSONObject(0).getJSONArray("folders").toList()) {
+					campaignFolders.add(CampaignFolder.get(folderJson.getInt("id")));
+				}
+			}
+	
+			return campaignFolders;
+		} catch (UnirestException e) {
+			throw new ScenarioException("Cannot get all campaign folders", e);
+		}
+	}
+	
+	public static CampaignFolder get(int id) {
+		try {
+			return fromJson(getJSonResponse(buildGetRequest(apiRootUrl + String.format("%s/%d", CAMPAIGN_FOLDER_URL, id))));
+		} catch (UnirestException e) {
+			throw new ScenarioException(String.format("campaign %d does not exist", id));
+		}	
 	}
 
 	public JSONObject asJson() {
