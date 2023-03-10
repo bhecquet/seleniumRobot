@@ -255,6 +255,8 @@ Params for mobile testing
 | tmsType					| null		| Type of the Test Manager ('squash' or 'hp')  |
 | tmsProject				| null		| The project to which this test application is linked in Test manager   |
 
+In case of Squash TM test manager, it's possible to set `tms.squash.iteration` and `tms.squash.campaign` to configure campaign and iteration where results will be recorded
+
 ##### Bugtrackers #####
 
 Below are the common parameters to all parameters. When using Jira, look below for the mandatory jira parameters
