@@ -82,6 +82,7 @@ import kong.unirest.RequestBodyEntity;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
 import kong.unirest.UnirestInstance;
+import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
 
@@ -231,7 +232,11 @@ public class ConnectorsTest extends MockitoTest {
 					if (((String)d).isEmpty()) {
 						d = "{}";
 					}
-					new JSONObject((String)d);
+					try {
+						new JSONObject((String)d);
+					} catch (JSONException e) {
+						new JSONArray((String)d);
+					}
 				}
 				
 				
@@ -254,6 +259,25 @@ public class ConnectorsTest extends MockitoTest {
 							reply = "{}";
 						}
 				    	return new JSONObject(reply);
+				    }
+				});
+				
+				when(json.getArray()).then(new Answer<JSONArray>() {
+				    private int count = -1;
+
+				    public JSONArray answer(InvocationOnMock invocation) {
+
+				        count++;
+				        String reply;
+				    	if (count >= replyData.size() - 1) {
+				    		reply = (String)replyData.get(replyData.size() - 1);
+				    	} else {
+				    		reply = (String)replyData.get(count);
+				    	}
+				    	if (reply.isEmpty()) {
+							reply = "{}";
+						}
+				    	return new JSONArray(reply);
 				    }
 				});
 				

@@ -14,6 +14,7 @@ import org.testng.annotations.Test;
 import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.connectors.tms.squash.entities.Campaign;
 import com.seleniumtests.connectors.tms.squash.entities.Project;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 
 import kong.unirest.GetRequest;
@@ -91,6 +92,52 @@ public class TestProject extends ConnectorsTest {
 		when(getRequest.asPaged(any(), (Function<HttpResponse<JsonNode>, String>) any(Function.class))).thenThrow(UnirestException.class);
 		
 		Project.getAll();
+	}
+	
+	@Test(groups={"ut"})
+	public void testGet() {
+		createServerMock("GET", "/projects?projectName=sample project", 200, 
+				"{"
+				+ "  \"_type\" : \"project\","
+				+ "  \"id\" : 367,"
+				+ "  \"description\" : \"<p>This project is the main sample project</p>\","
+				+ "  \"label\" : \"Main Sample Project\","
+				+ "  \"name\" : \"sample project\","
+				+ "  \"active\" : true,"
+				+ "  \"attachments\" : [ ],"
+				+ "  \"_links\" : {"
+				+ "    \"self\" : {"
+				+ "      \"href\" : \"http://localhost:8080/api/rest/latest/projects/367\""
+				+ "    },"
+				+ "    \"requirements\" : {"
+				+ "      \"href\" : \"http://localhost:8080/api/rest/latest/projects/367/requirements-library/content\""
+				+ "    },"
+				+ "    \"test-cases\" : {"
+				+ "      \"href\" : \"http://localhost:8080/api/rest/latest/projects/367/test-cases-library/content\""
+				+ "    },"
+				+ "    \"campaigns\" : {"
+				+ "      \"href\" : \"http://localhost:8080/api/rest/latest/projects/367/campaigns-library/content\""
+				+ "    },"
+				+ "    \"permissions\" : {"
+				+ "      \"href\" : \"http://localhost:8080/api/rest/latest/projects/367/permissions\""
+				+ "    },"
+				+ "    \"attachments\" : {"
+				+ "      \"href\" : \"http://localhost:8080/api/rest/latest/projects/attachments\""
+				+ "    }"
+				+ "  }"
+				+ "}");
+		Project project = Project.get("sample project");
+		Assert.assertEquals(project.getName(), "sample project");
+		Assert.assertEquals(project.getId(), 367);
+		Assert.assertEquals(project.getUrl(), "http://localhost:8080/api/rest/latest/projects/367");
+	}
+
+	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class)
+	public void testGetWithError() {
+		GetRequest getRequest = (GetRequest) createServerMock("GET", "/projects?projectName=sample project", 200, "{}", "requestBodyEntity");
+		when(getRequest.asJson()).thenThrow(UnirestException.class);
+		
+		Project.get("sample project");
 	}
 	
 
