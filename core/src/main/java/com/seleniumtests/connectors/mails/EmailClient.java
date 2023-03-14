@@ -26,8 +26,7 @@ import com.seleniumtests.connectors.mails.EmailClientImpl.SearchMode;
 
 
 public interface EmailClient {
-	
-	
+
 	public List<Email> getLastEmails(String folderName) throws Exception;
 	public List<Email> getLastEmails() throws Exception;
 	public List<Email> getEmails(int firstMessageIndex) throws Exception;
@@ -35,6 +34,7 @@ public interface EmailClient {
 	public List<Email> getEmails(LocalDateTime firstMessageTime) throws Exception;
 	public List<Email> getEmails(String folderName, LocalDateTime firstMessageTime) throws Exception;
 	public List<Email> getEmails(String folderName, int firstMessageIndex, LocalDateTime firstMessageTime) throws Exception;
+	List<Email> getEmailsByContent(String content) throws Exception;
 	public void disconnect() throws MessagingException;
 	public void setLastMessageIndex() throws Exception;
 	public void setLastMessageIndex(int messageIndex);
@@ -46,6 +46,11 @@ public interface EmailClient {
 	public List<String> checkMessagePresenceInLastMessages(String subject, List<String> attachmentNames, Email email, int timeoutInSeconds) throws Exception;
 	public List<String> checkMessagePresenceInLastMessages(String subject, String[] attachmentNames, Email email, int timeoutInSeconds) throws Exception;
 	public Email getEmail(String subject, List<String> attachmentNames) throws Exception;
+
+	public List<String> checkMessagePresenceInLastMessagesByBody(String content, String[] attachmentNames, Email email) throws Exception;
+	List<String> checkMessagePresenceInLastMessagesByBody(String content, List<String> attachmentNames, Email emailOut, int timeoutInSeconds) throws Exception;
+	List<String> checkMessagePresenceInLastMessagesByBody(String content, String[] attachmentNames, Email emailOut, int timeoutInSeconds) throws Exception;
+
 	public Email getEmail(String subject, String[] attachmentNames) throws Exception;
 	public SearchMode getSearchMode();
 	public void setSearchMode(SearchMode searchMode);

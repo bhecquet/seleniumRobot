@@ -133,7 +133,7 @@ public class ImapClient extends EmailClientImpl {
 	 * 
 	 * @param folderName		folder to read
 	 * @param firstMessageTime	date from which we should get messages
-	 * @param firstMessageIndex index of the firste message to find
+	 * @param firstMessageIndex index of the first message to find
 	 * @throws MessagingException
 	 * @throws IOException
 	 */
