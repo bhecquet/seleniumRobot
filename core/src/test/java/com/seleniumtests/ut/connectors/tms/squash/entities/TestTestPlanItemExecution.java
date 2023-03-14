@@ -62,7 +62,7 @@ public class TestTestPlanItemExecution extends ConnectorsTest {
 	
 	@Test(groups={"ut"})
 	public void testSetResult() {
-		HttpRequestWithBody patchRequest = (HttpRequestWithBody) createServerMock("PATCH", "/executions/83", 200, "{" + 
+		HttpRequestWithBody patchRequest = (HttpRequestWithBody) createServerMock("PATCH", "/executions/83?fields=execution_status", 200, "{" + 
 				"  \"_type\" : \"execution\"," + 
 				"  \"id\" : 83," + 
 				"  \"execution_status\" : \"SUCCESS\"," + 
@@ -113,7 +113,7 @@ public class TestTestPlanItemExecution extends ConnectorsTest {
 	
 	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class)
 	public void testSetResultWithError() {
-		RequestBodyEntity patchRequest = (RequestBodyEntity) createServerMock("PATCH", "/executions/83", 200, "{}", "requestBodyEntity");
+		RequestBodyEntity patchRequest = (RequestBodyEntity) createServerMock("PATCH", "/executions/83?fields=execution_status", 200, "{}", "requestBodyEntity");
 		when(patchRequest.asJson()).thenThrow(UnirestException.class);
 		
 		TestPlanItemExecution execution = new TestPlanItemExecution("http://localhost:4321/executions/83", 83, "execution");
