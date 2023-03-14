@@ -30,6 +30,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.seleniumtests.customexception.ScenarioException;
+import io.cucumber.java.an.E;
+import io.cucumber.java.bs.A;
 import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -68,6 +71,11 @@ public class TestEmailClient extends MockitoTest {
 		when(emailClientMock.checkMessagePresenceInLastMessages(anyString(), anyList(), any(Email.class))).thenCallRealMethod();
 		when(emailClientMock.checkMessagePresenceInLastMessages(anyString(), any(String[].class), any(Email.class), anyInt())).thenCallRealMethod();
 		when(emailClientMock.checkMessagePresenceInLastMessages(anyString(), anyList(), any(Email.class), anyInt())).thenCallRealMethod();
+
+		when(emailClientMock.checkMessagePresenceInLastMessagesByBody(nullable(String.class), any(String[].class), any(Email.class), anyInt())).thenCallRealMethod();
+		when(emailClientMock.checkMessagePresenceInLastMessagesByBody(nullable(String.class), anyList(), any(Email.class), anyInt())).thenCallRealMethod();
+		when(emailClientMock.checkMessagePresenceInLastMessagesByBody(nullable(String.class), any(String[].class), any(Email.class))).thenCallRealMethod();
+
 		when(emailClientMock.getLastEmails(nullable(String.class))).thenCallRealMethod();
 		when(emailClientMock.getLastEmails()).thenCallRealMethod();
 		when(emailClientMock.getEmails(anyString())).thenCallRealMethod();
@@ -163,7 +171,87 @@ public class TestEmailClient extends MockitoTest {
 		
 		Assert.assertNull(emailClient.getEmail("subject.*", new String[] {"contract-\\d+\\.pdf", "infos.txt"}));
 	}
-	
+
+	/**
+	 * Check if email(s) found with it/them one word content
+	 */
+	@Test(groups = {"ut"})
+	public void testGetEmailByContentOneWord() throws Exception {
+		List<Email> emails = new ArrayList<>();
+		emails.add(new Email("subject", "text", "someone@company.com", LocalDateTime.now(), Arrays.asList(new String[] {"infos.pdf", "contract-123.txt"})));
+		emails.add(new Email("subject2", "text", "someone@company.com", LocalDateTime.now(), Arrays.asList(new String[] {"contract-123.pdf"})));
+
+		when(emailClientMock.getEmailsByContent(nullable(String.class))).thenCallRealMethod();
+		when(emailClientMock.getLastEmails()).thenReturn(emails);
+
+		EmailServer server = new EmailServer(serverUrl, EmailServerTypes.EXCHANGE, "");
+		EmailClient emailClient = EmailClientSelector.routeEmail(server, emailAddress, login, password);
+		emailClient.setLastMessageIndex(emailClient.getLastMessageIndex() - 1);
+
+		Assert.assertEquals(emailClient.getEmailsByContent("text").size(), emails.size());
+	}
+
+	/**
+	 * Check if email(s) found with it/them part of content
+	 */
+	@Test(groups = {"ut"})
+	public void testGetEmailByContent() throws Exception {
+		List<Email> emails = new ArrayList<>();
+		emails.add(new Email("Jellyfish", "jellyfish let themselves be carried by the current", "someone@company.com", LocalDateTime.now(), Arrays.asList(new String[] {"infos.pdf"})));
+		emails.add(new Email("Shark", "sharks eat things", "someone@company.com", LocalDateTime.now(), Arrays.asList(new String[] {"ocean.pdf"})));
+		emails.add(new Email("Dolphin", "dolphins are mean", "someone@company.com", LocalDateTime.now(), Arrays.asList(new String[] {"infos.pdf", "ocean.txt"})));
+		emails.add(new Email("Whale", "whales are peacefull", "someone@company.com", LocalDateTime.now(), Arrays.asList(new String[] {"deep.pdf", "whali.png"})));
+
+		when(emailClientMock.getEmailsByContent(nullable(String.class))).thenCallRealMethod();
+		when(emailClientMock.getLastEmails()).thenReturn(emails);
+
+		EmailServer server = new EmailServer(serverUrl, EmailServerTypes.EXCHANGE, "");
+		EmailClient emailClient = EmailClientSelector.routeEmail(server, emailAddress, login, password);
+		emailClient.setLastMessageIndex(emailClient.getLastMessageIndex() - 1);
+
+		List<Email> listToCheck = emailClient.getEmailsByContent("are");
+
+		Assert.assertEquals(listToCheck.size(), 2);
+		Assert.assertEquals(listToCheck.get(0).getSubject(), "Dolphin");
+	}
+
+	/**
+	 * Check if getEmailsByContent get a ScenarioException if content is null
+	 */
+	@Test(groups = {"ut"}, expectedExceptions = ScenarioException.class)
+	public void testGetEmailByContentNull() throws Exception {
+		List<Email> emails = new ArrayList<>();
+		emails.add(new Email("Jellyfish", "jellyfish let themselves be carried by the current", "someone@company.com", LocalDateTime.now(), Arrays.asList(new String[] {"infos.pdf"})));
+		emails.add(new Email("Whale", "whales are peacefull", "someone@company.com", LocalDateTime.now(), Arrays.asList(new String[] {"deep.pdf", "whali.png"})));
+
+		when(emailClientMock.getEmailsByContent(nullable(String.class))).thenCallRealMethod();
+		when(emailClientMock.getLastEmails()).thenReturn(emails);
+
+		EmailServer server = new EmailServer(serverUrl, EmailServerTypes.EXCHANGE, "");
+		EmailClient emailClient = EmailClientSelector.routeEmail(server, emailAddress, login, password);
+		emailClient.setLastMessageIndex(emailClient.getLastMessageIndex() - 1);
+
+		emailClient.getEmailsByContent(null);
+	}
+
+	/**
+	 * Check if getEmailsByContent get a IllegalArgumentException if content is less than 3 characters
+	 */
+	@Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)
+	public void testGetEmailByContentEmpty() throws Exception {
+		List<Email> emails = new ArrayList<>();
+		emails.add(new Email("Jellyfish", "jellyfish let themselves be carried by the current", "someone@company.com", LocalDateTime.now(), Arrays.asList(new String[] {"infos.pdf"})));
+		emails.add(new Email("Whale", "whales are peacefull", "someone@company.com", LocalDateTime.now(), Arrays.asList(new String[] {"deep.pdf", "whali.png"})));
+
+		when(emailClientMock.getEmailsByContent(nullable(String.class))).thenCallRealMethod();
+		when(emailClientMock.getLastEmails()).thenReturn(emails);
+
+		EmailServer server = new EmailServer(serverUrl, EmailServerTypes.EXCHANGE, "");
+		EmailClient emailClient = EmailClientSelector.routeEmail(server, emailAddress, login, password);
+		emailClient.setLastMessageIndex(emailClient.getLastMessageIndex() - 1);
+
+		emailClient.getEmailsByContent("");
+	}
 
 	/**
 	 * Check email is get when all attachments match. Test retry is available
@@ -192,7 +280,6 @@ public class TestEmailClient extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testCheckMessagePresenceInLastMessages() throws Exception {
-		
 		List<Email> emails = new ArrayList<>();
 		emails.add(new Email("subject", "text", "someone@company.com", LocalDateTime.now(), Arrays.asList(new String[] {"infos.pdf", "contract-123.txt"})));
 		emails.add(new Email("subject2", "text", "someone@company.com", LocalDateTime.now(), Arrays.asList(new String[] {"contract-123.pdf", "infos.txt"})));
@@ -207,9 +294,39 @@ public class TestEmailClient extends MockitoTest {
 		Assert.assertEquals(emailClient.checkMessagePresenceInLastMessages("subject.*", new String[] {"contract-\\d+\\.pdf", "infos.txt"}, email).size(), 0);
 		Assert.assertEquals(email.getSubject(), "subject2");
 	}
+
+	@Test(groups={"ut"})
+	public void testCheckMessagePresenceInLastMessagesByBody() throws Exception {
+		List<Email> emails = new ArrayList<>();
+		emails.add(new Email("subject", "text without good content", "someone@company.com", LocalDateTime.now(), Arrays.asList("infos.pdf", "contract-123.txt")));
+		emails.add(new Email("subject2", "text within good content", "someone@company.com", LocalDateTime.now(), Arrays.asList("contract-123.pdf", "infos.txt")));
+
+		when(emailClientMock.getEmailsByContent(nullable(String.class))).thenReturn(emails);
+
+		EmailServer server = new EmailServer(serverUrl, EmailServerTypes.EXCHANGE, "");
+		EmailClient emailClient = EmailClientSelector.routeEmail(server, emailAddress, login, password);
+		emailClient.setLastMessageIndex(emailClient.getLastMessageIndex() - 1);
+
+		Email email = new Email();
+		emailClient.checkMessagePresenceInLastMessagesByBody("text within good content", new String[] {"contract-\\d+\\.pdf", "infos.txt"}, email);
+
+		Assert.assertEquals(email.getContent(), "text within good content");
+	}
+
+	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class)
+	public void testCheckMessagePresenceInLastMessagesByBodyWithNullContent() throws Exception {
+		when(emailClientMock.getEmailsByContent(nullable(String.class))).thenCallRealMethod();
+
+		EmailServer server = new EmailServer(serverUrl, EmailServerTypes.EXCHANGE, "");
+		EmailClient emailClient = EmailClientSelector.routeEmail(server, emailAddress, login, password);
+		emailClient.setLastMessageIndex(emailClient.getLastMessageIndex() - 1);
+
+		Email email = new Email();
+		emailClientMock.checkMessagePresenceInLastMessagesByBody(null, new String[] {"contract-\\d+\\.pdf", "infos.txt"}, email);
+	}
 	
 	/**
-	 * Check we an email is found, but some attachments are missing
+	 * Check we have an email is found, but some attachments are missing
 	 * @throws Exception
 	 */
 	@Test(groups={"ut"})
