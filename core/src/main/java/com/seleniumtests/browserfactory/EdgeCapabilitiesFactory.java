@@ -47,13 +47,13 @@ public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
             options.addArguments("--user-agent=" + webDriverConfig.getUserAgentOverride());
         }
         
-        options.addArguments("--remote-allow-origins=*"); // workaround for https://github.com/SeleniumHQ/selenium/issues/11750 on chrome >= 111 
         options.addArguments("--disable-translate");
         options.addArguments("--disable-web-security");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-site-isolation-trials");
         options.addArguments("--disable-features=IsolateOrigins,site-per-process");
-        
+        options.addArguments("--remote-allow-origins=*"); // workaround for https://github.com/SeleniumHQ/selenium/issues/11750 on chrome >= 111 
+                
         if (webDriverConfig.getEdgeOptions() != null) {
         	for (String option: webDriverConfig.getEdgeOptions().split(" ")) {
         		options.addArguments(option);
