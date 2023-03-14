@@ -60,6 +60,22 @@ public class TestManagerContext {
 		}
 	}
 	
+	public void setCampaignFolderPath(String name) {
+		if (context.getTestManagerInstance() instanceof SquashTMConnector) {
+			context.getConfiguration().put(SquashTMConnector.SQUASH_CAMPAIGN_FOLDER, new TestVariable(SquashTMConnector.SQUASH_CAMPAIGN_FOLDER, name));
+		} else {
+			throw new UnsupportedOperationException("Setting campaign folder path is only possible when Test manager is of type 'squash' ");
+		}
+	}
+	
+	public String getCampaignFolderPath() {
+		try {
+			return context.getConfiguration().get(SquashTMConnector.SQUASH_CAMPAIGN_FOLDER).getValue();
+		} catch (NullPointerException e) {
+			return "";
+		}
+	}
+	
 	public void setIterationName(String name) {
 		if (context.getTestManagerInstance() instanceof SquashTMConnector) {
 			context.getConfiguration().put(SquashTMConnector.SQUASH_ITERATION, new TestVariable(SquashTMConnector.SQUASH_ITERATION, name));

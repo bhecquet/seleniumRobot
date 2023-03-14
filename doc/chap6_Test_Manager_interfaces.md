@@ -126,7 +126,7 @@ So, to provide a test id for each dataset, configure this way
 
 This is equivalent of setting a variable `tms.testId`
 
-#### Configure campaign name and iteration ####
+#### Configure campaign name, campaign folder and iteration ####
 
 By default, a campaign "Selenium <context name>" and an iteration "<application version>" are used to record test results in squash
 You can override this beheviour by specifying it in variables or in test directly
@@ -136,6 +136,7 @@ You can override this beheviour by specifying it in variables or in test directl
     public void testTestCaseIdFromContext() {
         robotConfig().testManager().setCampaignName("my campaign");
         robotConfig().testManager().setIterationName("my iteration");
+        robotConfig().testManager().setCampaignFolderPath("folder1/folder2");
         ...
         
     }
@@ -144,6 +145,8 @@ You can override this beheviour by specifying it in variables or in test directl
 It's also possible to set it via variables:
 `tms.squash.iteration`
 `tms.squash.campaign`
+`tms.squash.campaign.folder`
+
   
 ### 4 HP ALM ###
  

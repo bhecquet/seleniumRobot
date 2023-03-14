@@ -15,6 +15,7 @@ public class SquashTMConnector extends TestManager {
 	
 	public static final String SQUASH_ITERATION = "tms.squash.iteration";
 	public static final String SQUASH_CAMPAIGN = "tms.squash.campaign";
+	public static final String SQUASH_CAMPAIGN_FOLDER = "tms.squash.campaign.folder";
 
 	private String user;
 	private String password;
@@ -108,7 +109,9 @@ public class SquashTMConnector extends TestManager {
 				campaignName = "Selenium " + testResult.getTestContext().getName();
 			}
 			
-			Campaign campaign = sapi.createCampaign(campaignName, "");
+			
+			
+			Campaign campaign = sapi.createCampaign(campaignName, TestNGResultUtils.getSeleniumRobotTestContext(testResult).testManager().getCampaignFolderPath());
 			
 			// iteration
 			String iterationName;

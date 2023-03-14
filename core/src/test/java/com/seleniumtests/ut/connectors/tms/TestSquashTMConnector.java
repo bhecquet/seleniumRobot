@@ -512,4 +512,43 @@ public class TestSquashTMConnector extends MockitoTest {
 		verify(api).addTestCaseInIteration(iteration, 23);
 		verify(api).setExecutionResult(iterationTestPlanItem, ExecutionStatus.SUCCESS);
 	}
+	/**
+	 * With a custom iteration name, check it's created if it does not exist
+	 * @param testContext
+	 */
+	@Test(groups={"ut"})
+	public void testRecordResultTestInSuccessCustomCampaignFolder(ITestContext testContext) {
+		
+		JSONObject connect = new JSONObject();
+		connect.put(SquashTMConnector.TMS_SERVER_URL, "http://myServer");
+		connect.put(SquashTMConnector.TMS_PROJECT, "project");
+		connect.put(SquashTMConnector.TMS_USER, "user");
+		connect.put(SquashTMConnector.TMS_PASSWORD, "password");
+		
+		SquashTMConnector squash = spy(new SquashTMConnector());
+		squash.init(connect);
+		doReturn(api).when(squash).getApi();
+		
+		
+		// customize test result so that it has attributes
+		when(testResult.getMethod()).thenReturn(testMethod);
+		when(testResult.isSuccess()).thenReturn(true);
+		when(testResult.getName()).thenReturn("MyTest");
+		when(testResult.getTestContext()).thenReturn(testContext);
+		when(testResult.getParameters()).thenReturn(new Object[] {});
+		when(testResult.getAttribute("testContext")).thenReturn(SeleniumTestsContextManager.getThreadContext());
+		SeleniumTestsContextManager.getThreadContext().testManager().setTestId(23);
+		SeleniumTestsContextManager.getThreadContext().setTestManagerInstance(squash);
+		SeleniumTestsContextManager.getThreadContext().testManager().setCampaignFolderPath("folder1/folder2");
+		when(api.createCampaign(anyString(), anyString())).thenReturn(campaign);
+		when(api.createIteration(any(Campaign.class), anyString())).thenReturn(iteration);
+		when(api.addTestCaseInIteration(iteration, 23)).thenReturn(iterationTestPlanItem);
+		
+		squash.recordResult(testResult);
+		
+		// check we call all necessary API methods to record the result
+		verify(api).createCampaign("Selenium " + testContext.getName(), "folder1/folder2");
+		verify(api).addTestCaseInIteration(iteration, 23);
+		verify(api).setExecutionResult(iterationTestPlanItem, ExecutionStatus.SUCCESS);
+	}
 }

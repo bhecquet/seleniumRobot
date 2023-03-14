@@ -118,8 +118,139 @@ public class TestTestManagerContext extends ConnectorsTest {
 
 			initThreadContext(testNGCtx, "myTest", testResult);
 			SeleniumTestsContextManager.getThreadContext().testManager().setCampaignName("campaign");
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().testManager().getCampaignName(), "campaign");
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get(SquashTMConnector.SQUASH_CAMPAIGN).getValue(), "campaign");
 
+		} finally {
+			System.clearProperty(TestManagerContext.TMS_TYPE);
+			System.clearProperty(TestManagerContext.TMS_URL);
+			System.clearProperty(TestManagerContext.TMS_USER);
+			System.clearProperty(TestManagerContext.TMS_PASSWORD);
+			System.clearProperty(TestManagerContext.TMS_PROJECT);
+		}		
+	}
+	/**
+	 * Test via user parameter
+	 */
+	@Test(groups="ut")
+	public void testTmsSquashCampaign2(final ITestContext testNGCtx, final XmlTest xmlTest) throws NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+		try {
+			System.setProperty(TestManagerContext.TMS_TYPE, "squash");
+			System.setProperty(TestManagerContext.TMS_URL, "http://localhost:1234");
+			System.setProperty(TestManagerContext.TMS_USER, "user");
+			System.setProperty(TestManagerContext.TMS_PASSWORD, "password");
+			System.setProperty(TestManagerContext.TMS_PROJECT, "project");
+			System.setProperty(SquashTMConnector.SQUASH_CAMPAIGN, "campaign2");
+			
+			PowerMockito.mockStatic(TestManager.class);
+			
+			
+			PowerMockito.when(TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
+			
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			
+			initThreadContext(testNGCtx, "myTest", testResult);
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().testManager().getCampaignName(), "campaign2");
+			
+		} finally {
+			System.clearProperty(TestManagerContext.TMS_TYPE);
+			System.clearProperty(TestManagerContext.TMS_URL);
+			System.clearProperty(TestManagerContext.TMS_USER);
+			System.clearProperty(TestManagerContext.TMS_PASSWORD);
+			System.clearProperty(TestManagerContext.TMS_PROJECT);
+			System.clearProperty(SquashTMConnector.SQUASH_CAMPAIGN);
+		}		
+	}
+	@Test(groups="ut", expectedExceptions = UnsupportedOperationException.class)
+	public void testTmsSquashCampaignFolderNullTms(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().testManager().setCampaignFolderPath("campaign");
+	}
+	/**
+	 * Test via method call
+	 */
+	@Test(groups="ut")
+	public void testTmsSquashCampaignFolderPath(final ITestContext testNGCtx, final XmlTest xmlTest) throws NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+		try {
+			System.setProperty(TestManagerContext.TMS_TYPE, "squash");
+			System.setProperty(TestManagerContext.TMS_URL, "http://localhost:1234");
+			System.setProperty(TestManagerContext.TMS_USER, "user");
+			System.setProperty(TestManagerContext.TMS_PASSWORD, "password");
+			System.setProperty(TestManagerContext.TMS_PROJECT, "project");
+			
+			PowerMockito.mockStatic(TestManager.class);
+			
+			
+			PowerMockito.when(TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
+			
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			
+			initThreadContext(testNGCtx, "myTest", testResult);
+			SeleniumTestsContextManager.getThreadContext().testManager().setCampaignFolderPath("folder1/folder2");
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().testManager().getCampaignFolderPath(), "folder1/folder2");
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get(SquashTMConnector.SQUASH_CAMPAIGN_FOLDER).getValue(), "folder1/folder2");
+			
+		} finally {
+			System.clearProperty(TestManagerContext.TMS_TYPE);
+			System.clearProperty(TestManagerContext.TMS_URL);
+			System.clearProperty(TestManagerContext.TMS_USER);
+			System.clearProperty(TestManagerContext.TMS_PASSWORD);
+			System.clearProperty(TestManagerContext.TMS_PROJECT);
+		}		
+	}
+	
+	/**
+	 * Test via user parameter
+	 */
+	@Test(groups="ut")
+	public void testTmsSquashCampaignFolderPath2(final ITestContext testNGCtx, final XmlTest xmlTest) throws NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+		try {
+			System.setProperty(TestManagerContext.TMS_TYPE, "squash");
+			System.setProperty(TestManagerContext.TMS_URL, "http://localhost:1234");
+			System.setProperty(TestManagerContext.TMS_USER, "user");
+			System.setProperty(TestManagerContext.TMS_PASSWORD, "password");
+			System.setProperty(TestManagerContext.TMS_PROJECT, "project");
+			System.setProperty(SquashTMConnector.SQUASH_CAMPAIGN_FOLDER, "folder1");
+			
+			PowerMockito.mockStatic(TestManager.class);
+			
+			
+			PowerMockito.when(TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
+			
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			
+			initThreadContext(testNGCtx, "myTest", testResult);
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().testManager().getCampaignFolderPath(), "folder1");
+			
+		} finally {
+			System.clearProperty(TestManagerContext.TMS_TYPE);
+			System.clearProperty(TestManagerContext.TMS_URL);
+			System.clearProperty(TestManagerContext.TMS_USER);
+			System.clearProperty(TestManagerContext.TMS_PASSWORD);
+			System.clearProperty(TestManagerContext.TMS_PROJECT);
+			System.clearProperty(SquashTMConnector.SQUASH_CAMPAIGN_FOLDER);
+		}		
+	}
+	@Test(groups="ut")
+	public void testTmsSquashCampaignFolderPathNull(final ITestContext testNGCtx, final XmlTest xmlTest) throws NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+		try {
+			System.setProperty(TestManagerContext.TMS_TYPE, "squash");
+			System.setProperty(TestManagerContext.TMS_URL, "http://localhost:1234");
+			System.setProperty(TestManagerContext.TMS_USER, "user");
+			System.setProperty(TestManagerContext.TMS_PASSWORD, "password");
+			System.setProperty(TestManagerContext.TMS_PROJECT, "project");
+			
+			PowerMockito.mockStatic(TestManager.class);
+			
+			
+			PowerMockito.when(TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
+			
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			
+			initThreadContext(testNGCtx, "myTest", testResult);
+
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().testManager().getCampaignFolderPath(), "");
+			
 		} finally {
 			System.clearProperty(TestManagerContext.TMS_TYPE);
 			System.clearProperty(TestManagerContext.TMS_URL);
@@ -159,6 +290,35 @@ public class TestTestManagerContext extends ConnectorsTest {
 			System.clearProperty(TestManagerContext.TMS_USER);
 			System.clearProperty(TestManagerContext.TMS_PASSWORD);
 			System.clearProperty(TestManagerContext.TMS_PROJECT);
+		}		
+	}
+	@Test(groups="ut")
+	public void testTmsSquashIteration2(final ITestContext testNGCtx, final XmlTest xmlTest) throws NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+		try {
+			System.setProperty(TestManagerContext.TMS_TYPE, "squash");
+			System.setProperty(TestManagerContext.TMS_URL, "http://localhost:1234");
+			System.setProperty(TestManagerContext.TMS_USER, "user");
+			System.setProperty(TestManagerContext.TMS_PASSWORD, "password");
+			System.setProperty(TestManagerContext.TMS_PROJECT, "project");
+			System.setProperty(SquashTMConnector.SQUASH_ITERATION, "iteration2");
+			
+			PowerMockito.mockStatic(TestManager.class);
+			
+			
+			PowerMockito.when(TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
+			
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			
+			initThreadContext(testNGCtx, "myTest", testResult);
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get(SquashTMConnector.SQUASH_ITERATION).getValue(), "iteration2");
+			
+		} finally {
+			System.clearProperty(TestManagerContext.TMS_TYPE);
+			System.clearProperty(TestManagerContext.TMS_URL);
+			System.clearProperty(TestManagerContext.TMS_USER);
+			System.clearProperty(TestManagerContext.TMS_PASSWORD);
+			System.clearProperty(TestManagerContext.TMS_PROJECT);
+			System.clearProperty(SquashTMConnector.SQUASH_ITERATION);
 		}		
 	}
 	
