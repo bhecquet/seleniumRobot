@@ -332,11 +332,10 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
     	
         	
         try {
-            String node = nodeUrl.split("//")[1].split(":")[0];
+        	nodeHost = nodeUrl.split("//")[1].split(":")[0];
             String browserName = driver.getCapabilities().getBrowserName();
             String version = driver.getCapabilities().getBrowserVersion();
-            //get node host name
-			nodeHost = node.split("\\.")[0];
+
             // setting sessionId ensures that this connector is the active one
             // issue #242: check if sessionId has already been set by a previous driver in this test session
             // 				if so, keep the previous sessionId so that recordings are correctly handled
@@ -348,9 +347,9 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
             MutableCapabilities caps = (MutableCapabilities)driver.getCapabilities();
             caps.setCapability(SeleniumRobotCapabilityType.GRID_HUB, hubUrl);
             caps.setCapability(SeleniumRobotCapabilityType.SESSION_ID, sessionId);
-            caps.setCapability(SeleniumRobotCapabilityType.GRID_NODE, node);
+            caps.setCapability(SeleniumRobotCapabilityType.GRID_NODE, nodeHost);
             
-            logger.info(String.format("Brower %s (%s) created in %.1f secs on node %s [%s] with session %s", browserName, version, driverCreationDuration / 1000.0, node, hubUrl, sessionId).replace(",", "."));
+            logger.info(String.format("Brower %s (%s) created in %.1f secs on node %s [%s] with session %s", browserName, version, driverCreationDuration / 1000.0, nodeHost, hubUrl, sessionId).replace(",", "."));
             
         } catch (Exception ex) {
         	throw new SessionNotCreatedException(ex.getMessage());

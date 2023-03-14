@@ -36,7 +36,7 @@ public class SquashTMApi {
 		Entity.configureEntity(user, password, this.url);
 		testConnection();
 		
-		currentProject = getProject(projectName);
+		currentProject = Project.get(projectName);
 	}
 	
 	/**
@@ -58,15 +58,6 @@ public class SquashTMApi {
 		
 	}
 
-	public Project getProject(String projectName) {
-		for (Project project: Project.getAll()) {
-			if (project.getName().equals(projectName)) {
-				return project;
-			}
-		}
-		throw new ConfigurationException(String.format("Cannot find project %s on SquashTM. Maybe user %s has not rights to see it", projectName, user));
-	}
-
 	/**
 	 * Creates a campaign if it does not exist
 	 * @param project		project in which this campaign will be created
@@ -79,7 +70,7 @@ public class SquashTMApi {
 			folder = "";
 		}
 		
-		List<CampaignFolder> campaignFolders = CampaignFolder.getAll();
+		List<CampaignFolder> campaignFolders = CampaignFolder.getAll(currentProject);
 		
 		// create folder where campaign will be located
 		CampaignFolder parentFolder = null;

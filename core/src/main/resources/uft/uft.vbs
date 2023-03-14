@@ -66,6 +66,7 @@ Test_path = Wscript.Arguments(0)
 Set qtApp = CreateObject("QuickTest.Application") ' Create the Application object
 qtApp.Launch ' Start UFT
 qtApp.Visible = False ' Make the QuickTest application not visible
+' qtApp.Visible = True ' Make the QuickTest application visible
 
 '' Set QuickTest run options
 qtApp.Options.Run.RunMode = "Normal"
@@ -75,6 +76,8 @@ qtApp.Options.Run.ViewResults = False
 
 ' Open the test in read-only mode
 If Wscript.Arguments.Named.Exists("load") Then
+
+    WScript.Echo "Loading test: " + Test_path
 
     'connection to ALM
     If qtApp.TDConnection.IsConnected Then
@@ -106,6 +109,8 @@ If Wscript.Arguments.Named.Exists("execute") Then
     Set pDefColl = qtApp.Test.ParameterDefinitions
     Set rtParams = pDefColl.GetParameters()
     Dim keyValue
+    
+    WScript.Echo "Executing test"
     
     For Each strArg in Wscript.Arguments
     	keyValue = Split(strArg, "=")

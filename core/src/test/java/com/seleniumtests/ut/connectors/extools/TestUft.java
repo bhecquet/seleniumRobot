@@ -8,13 +8,11 @@ import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jdom2.DataConversionException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
@@ -46,78 +44,6 @@ public class TestUft extends MockitoTest {
 	@BeforeMethod(groups= {"ut"})
 	public void init() {
 		PowerMockito.mockStatic(TestTasks.class);
-	}
-
-	@Test(groups = { "ut" })
-	public void testReadReportListActions() throws IOException, DataConversionException {
-		String report = GenericTest.readResourceToString("tu/uftReport2023.xml");
-		Uft uft = new Uft("[QualityCenter]Subject\\Tools\\Tests\\test1");
-
-		List<TestStep> stepList = uft.readXmlResult(report);
-
-		// check all content has been read
-		Assert.assertEquals(stepList.size(), 3);
-		
-		Assert.assertEquals(stepList.get(0).getName(), "UFT: DebutTest [DebutTest]");
-		Assert.assertEquals(stepList.get(1).getName(), "UFT: FinTest [FinTest]");
-
-
-		// check the while content
-		Assert.assertEquals(stepList.get(0).getStepStatus(), StepStatus.SUCCESS);
-		Assert.assertEquals(stepList.get(1).getStepStatus(), StepStatus.FAILED);
-		Assert.assertEquals(stepList.get(1).toString(), "Step UFT: FinTest [FinTest]\n" +
-				"  - Step UFT: Opérations de fin de test\n" +
-				"  - Step UFT: 63\n" +
-				"  - Item of type <CYCL_FOLD>, with Id <-2> does not exist.: Item of type <CYCL_FOLD>, with Id <-2> does not exist. Line (39): \"TargetCycleName = CurrentTestSet.TestSetFolder.TargetCycle.Name\".\n" +
-				"  - Stop Run: Run stopped by user.");
-	}
-
-	/**
-	 * Check report file is correctly read
-	 * 
-	 * @throws IOException
-	 */
-	@Test(groups = { "ut" })
-	public void testReadReport() throws IOException {
-		String report = GenericTest.readResourceToString("tu/uftReport2023.xml");
-		Uft uft = new Uft("[QualityCenter]Subject\\Tools\\Tests\\test1");
-		List<TestStep> stepList = uft.readXmlResult(report);
-		
-		// check all content has been read
-		Assert.assertEquals(stepList.size(), 3);
-		Assert.assertEquals(((TestStep) stepList.get(0).getStepActions().get(1)).getStepActions().get(0).toString(),  "Step UFT: Lancer P9");
-	}
-
-	/**
-	 * Check that with wrong formatted report, the main test step is still present
-	 * but without content
-	 */
-	@Test(groups = { "ut" })
-	public void testReadBadReport() throws IOException {
-		String report = GenericTest.readResourceToString("tu/wrongUftReport2023.xml");
-		Uft uft = new Uft("[QualityCenter]Subject\\Tools\\Tests\\test1");
-
-		List<TestStep> testSteps = uft.readXmlResult(report);
-		
-		Assert.assertEquals(testSteps.get(0).getStepActions().size(), 1);
-		Assert.assertEquals(((TestMessage) testSteps.get(0).getStepActions().get(0)).getMessageType(), MessageType.ERROR);
-	}
-	
-	/**
-	 * Test when no report is available
-	 * the main test step is still present
-	 * @throws IOException
-	 */
-	@Test(groups = { "ut" })
-	public void testReadNoReport() throws IOException {
-		String report = "some bad report";
-		Uft uft = new Uft("[QualityCenter]Subject\\Tools\\Tests\\test1");
-		
-		List<TestStep> testSteps = uft.readXmlResult(report);
-		
-		Assert.assertEquals(testSteps.get(0).getStepActions().size(), 1);
-		Assert.assertEquals(((TestMessage) testSteps.get(0).getStepActions().get(0)).getMessageType(), MessageType.ERROR);
-
 	}
 
 	/**
@@ -406,6 +332,40 @@ public class TestUft extends MockitoTest {
 		
 		// check a step is returned
 		Assert.assertNotNull(testSteps);
+		Assert.assertEquals(testSteps.size(), 3);
+		Assert.assertEquals(testSteps.get(0).getFiles().size(), 1);
+		Assert.assertEquals(testSteps.get(0).getFiles().get(0).getName(), "Uft report");
+		
+		ArgumentCaptor<String[]> argsArgument = ArgumentCaptor.forClass(String[].class);
+		
+		PowerMockito.verifyStatic(TestTasks.class);
+		TestTasks.executeCommand(eq("cscript.exe"), eq(120), isNull(), argsArgument.capture());
+		Assert.assertEquals(argsArgument.getAllValues().size(), 4);
+
+		Assert.assertEquals(argsArgument.getAllValues().get(1), "[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
+		Assert.assertEquals(argsArgument.getAllValues().get(2), "/execute");
+		Assert.assertEquals(argsArgument.getAllValues().get(3), "\"User=toto\"");
+		
+	}
+	
+	/**
+	 * Test execution with an other file format
+	 * @throws Exception
+	 */
+	@Test(groups = { "ut" })
+	public void testExecute2() throws Exception {
+		String report = GenericTest.readResourceToString("tu/uftReport.xml");
+		report = "some comments\n_____OUTPUT_____\n" + report + "\n_____ENDOUTPUT_____\nsome other comments";
+		PowerMockito.when(TestTasks.class, "executeCommand", eq("cscript.exe"), anyInt(), nullable(Charset.class), any()).thenReturn(report);
+		
+		Map<String, String> args = new HashMap<>();
+		args.put("User", "toto");
+		Uft uft = new Uft("[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
+		uft.loadScript(false);
+		List<TestStep> testSteps = uft.executeScript(120, args);
+		
+		// check a step is returned
+		Assert.assertNotNull(testSteps);
 		
 		ArgumentCaptor<String[]> argsArgument = ArgumentCaptor.forClass(String[].class);
 		
@@ -425,7 +385,7 @@ public class TestUft extends MockitoTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testExecuteWithReport2() throws Exception {
-		String report = GenericTest.readResourceToString("tu/uftResult2023.txt");
+		String report = GenericTest.readResourceToString("tu/uftResult.txt");
 		PowerMockito.when(TestTasks.class, "executeCommand", eq("cscript.exe"), anyInt(), nullable(Charset.class), any()).thenReturn(report);
 		
 		Map<String, String> args = new HashMap<>();

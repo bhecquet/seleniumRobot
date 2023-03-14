@@ -52,6 +52,8 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
         if (webDriverConfig.getUserAgentOverride() != null) {
             options.addArguments("--user-agent=" + webDriverConfig.getUserAgentOverride());
         }
+        
+        options.addArguments("--remote-allow-origins=*"); // workaround for https://github.com/SeleniumHQ/selenium/issues/11750 on chrome >= 111 
         options.addArguments("--disable-translate");
         options.addArguments("--disable-web-security");
         options.addArguments("--disable-site-isolation-trials");
@@ -108,6 +110,8 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-site-isolation-trials");
         options.addArguments("--disable-features=IsolateOrigins,site-per-process");
+        options.addArguments("--remote-allow-origins=*"); // workaround for https://github.com/SeleniumHQ/selenium/issues/11750 on chrome >= 111 
+        
         
         if (webDriverConfig.getChromeOptions() != null) {
         	for (String option: webDriverConfig.getChromeOptions().split(" ")) {

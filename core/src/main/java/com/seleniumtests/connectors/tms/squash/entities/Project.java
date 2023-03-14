@@ -3,6 +3,7 @@ package com.seleniumtests.connectors.tms.squash.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 
 import kong.unirest.UnirestException;
@@ -18,6 +19,14 @@ public class Project extends Entity {
 		super(url, id, name);
 	}
 
+	public static Project get(String projectName) {
+		try {
+			return fromJson(getJSonResponse(buildGetRequest(apiRootUrl + String.format("%s?projectName=%s", PROJECTS_URL, projectName))));
+		} catch (UnirestException e) {
+			throw new ConfigurationException(String.format("Projet %s does not exist or can't be accessed", projectName));
+		}
+	}
+	
 	/**
 	 * Returns the list of projects accessible to this user
 	 * @return

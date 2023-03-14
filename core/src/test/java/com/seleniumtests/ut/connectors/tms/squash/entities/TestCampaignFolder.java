@@ -37,60 +37,60 @@ public class TestCampaignFolder extends ConnectorsTest {
 	
 	@Test(groups={"ut"})
 	public void testGetAll() {
-		createServerMock("GET", "/campaign-folders", 200, "{\r\n" + 
-				"  \"_embedded\" : {\r\n" + 
-				"    \"campaign-folders\" : [ {\r\n" + 
-				"      \"_type\" : \"campaign-folder\",\r\n" + 
-				"      \"id\" : 100,\r\n" + 
-				"      \"name\" : \"qualification\",\r\n" + 
-				"      \"_links\" : {\r\n" + 
-				"        \"self\" : {\r\n" + 
-				"          \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders/100\"\r\n" + 
-				"        }\r\n" + 
-				"      }\r\n" + 
-				"    }, {\r\n" + 
-				"      \"_type\" : \"campaign-folder\",\r\n" + 
-				"      \"id\" : 101,\r\n" + 
-				"      \"name\" : \"CP-18.01\",\r\n" + 
-				"      \"_links\" : {\r\n" + 
-				"        \"self\" : {\r\n" + 
-				"          \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders/101\"\r\n" + 
-				"        }\r\n" + 
-				"      }\r\n" + 
-				"    }, {\r\n" + 
-				"      \"_type\" : \"campaign-folder\",\r\n" + 
-				"      \"id\" : 102,\r\n" + 
-				"      \"name\" : \"DX-U17\",\r\n" + 
-				"      \"_links\" : {\r\n" + 
-				"        \"self\" : {\r\n" + 
-				"          \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders/102\"\r\n" + 
-				"        }\r\n" + 
-				"      }\r\n" + 
-				"    } ]\r\n" + 
-				"  },\r\n" + 
-				"  \"_links\" : {\r\n" + 
-				"    \"first\" : {\r\n" + 
-				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders?page=0&size=3\"\r\n" + 
-				"    },\r\n" + 
-				"    \"prev\" : {\r\n" + 
-				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders?page=0&size=3\"\r\n" + 
-				"    },\r\n" + 
-				"    \"self\" : {\r\n" + 
-				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders?page=1&size=3\"\r\n" + 
-				"    },\r\n" + 
-				"    \"next\" : {\r\n" + 
-				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders?page=2&size=3\"\r\n" + 
-				"    },\r\n" + 
-				"    \"last\" : {\r\n" + 
-				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders?page=3&size=3\"\r\n" + 
-				"    }\r\n" + 
-				"  },\r\n" + 
-				"  \"page\" : {\r\n" + 
-				"    \"size\" : 3,\r\n" + 
-				"    \"totalElements\" : 10,\r\n" + 
-				"    \"totalPages\" : 4,\r\n" + 
-				"    \"number\" : 1\r\n" + 
-				"  }\r\n" + 
+		createServerMock("GET", "/campaign-folders", 200, "{" + 
+				"  \"_embedded\" : {" + 
+				"    \"campaign-folders\" : [ {" + 
+				"      \"_type\" : \"campaign-folder\"," + 
+				"      \"id\" : 100," + 
+				"      \"name\" : \"qualification\"," + 
+				"      \"_links\" : {" + 
+				"        \"self\" : {" + 
+				"          \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders/100\"" + 
+				"        }" + 
+				"      }" + 
+				"    }, {" + 
+				"      \"_type\" : \"campaign-folder\"," + 
+				"      \"id\" : 101," + 
+				"      \"name\" : \"CP-18.01\"," + 
+				"      \"_links\" : {" + 
+				"        \"self\" : {" + 
+				"          \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders/101\"" + 
+				"        }" + 
+				"      }" + 
+				"    }, {" + 
+				"      \"_type\" : \"campaign-folder\"," + 
+				"      \"id\" : 102," + 
+				"      \"name\" : \"DX-U17\"," + 
+				"      \"_links\" : {" + 
+				"        \"self\" : {" + 
+				"          \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders/102\"" + 
+				"        }" + 
+				"      }" + 
+				"    } ]" + 
+				"  }," + 
+				"  \"_links\" : {" + 
+				"    \"first\" : {" + 
+				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders?page=0&size=3\"" + 
+				"    }," + 
+				"    \"prev\" : {" + 
+				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders?page=0&size=3\"" + 
+				"    }," + 
+				"    \"self\" : {" + 
+				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders?page=1&size=3\"" + 
+				"    }," + 
+				"    \"next\" : {" + 
+				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders?page=2&size=3\"" + 
+				"    }," + 
+				"    \"last\" : {" + 
+				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders?page=3&size=3\"" + 
+				"    }" + 
+				"  }," + 
+				"  \"page\" : {" + 
+				"    \"size\" : 3," + 
+				"    \"totalElements\" : 10," + 
+				"    \"totalPages\" : 4," + 
+				"    \"number\" : 1" + 
+				"  }" + 
 				"}");
 		List<CampaignFolder> campaignFolders = CampaignFolder.getAll();
 		Assert.assertEquals(campaignFolders.size(), 3);
@@ -113,32 +113,198 @@ public class TestCampaignFolder extends ConnectorsTest {
 
 	@Test(groups={"ut"})
 	public void testGetAllNoFolder() {
-		createServerMock("GET", "/campaign-folders", 200, "{\r\n" + 
-				"  \"_links\" : {\r\n" + 
-				"    \"first\" : {\r\n" + 
-				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders?page=0&size=3\"\r\n" + 
-				"    },\r\n" + 
-				"    \"prev\" : {\r\n" + 
-				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders?page=0&size=3\"\r\n" + 
-				"    },\r\n" + 
-				"    \"self\" : {\r\n" + 
-				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders?page=1&size=3\"\r\n" + 
-				"    },\r\n" + 
-				"    \"next\" : {\r\n" + 
-				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders?page=2&size=3\"\r\n" + 
-				"    },\r\n" + 
-				"    \"last\" : {\r\n" + 
-				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders?page=3&size=3\"\r\n" + 
-				"    }\r\n" + 
-				"  },\r\n" + 
-				"  \"page\" : {\r\n" + 
-				"    \"size\" : 3,\r\n" + 
-				"    \"totalElements\" : 10,\r\n" + 
-				"    \"totalPages\" : 4,\r\n" + 
-				"    \"number\" : 1\r\n" + 
-				"  }\r\n" + 
+		createServerMock("GET", "/campaign-folders", 200, "{" + 
+				"  \"_links\" : {" + 
+				"    \"first\" : {" + 
+				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders?page=0&size=3\"" + 
+				"    }," + 
+				"    \"prev\" : {" + 
+				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders?page=0&size=3\"" + 
+				"    }," + 
+				"    \"self\" : {" + 
+				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders?page=1&size=3\"" + 
+				"    }," + 
+				"    \"next\" : {" + 
+				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders?page=2&size=3\"" + 
+				"    }," + 
+				"    \"last\" : {" + 
+				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders?page=3&size=3\"" + 
+				"    }" + 
+				"  }," + 
+				"  \"page\" : {" + 
+				"    \"size\" : 3," + 
+				"    \"totalElements\" : 10," + 
+				"    \"totalPages\" : 4," + 
+				"    \"number\" : 1" + 
+				"  }" + 
 				"}");
 		List<CampaignFolder> campaignFolders = CampaignFolder.getAll();
+		Assert.assertEquals(campaignFolders.size(), 0);
+	}
+	
+
+	@Test(groups={"ut"})
+	public void testGetAllByProject() {
+		
+		createServerMock("GET", "/campaign-folders/tree/14", 200, "[ {"
+				+ "  \"_type\" : \"project\","
+				+ "  \"id\" : 10,"
+				+ "  \"name\" : \"project-1\","
+				+ "  \"folders\" : [ {"
+				+ "    \"_type\" : \"campaign-folder\","
+				+ "    \"id\" : 100,"
+				+ "    \"name\" : \"folder1\","
+				+ "    \"url\" : \"http://localhost:8080/api/rest/latest/campaign-folders/100\","
+				+ "    \"children\" : [ ]"
+				+ "  }, {"
+				+ "    \"_type\" : \"campaign-folder\","
+				+ "    \"id\" : 101,"
+				+ "    \"name\" : \"folder2\","
+				+ "    \"url\" : \"http://localhost:8080/api/rest/latest/campaign-folders/101\","
+				+ "    \"children\" : [ ]"
+				+ "  } ]"
+				+ "}]");
+		
+		createServerMock("GET", "/campaign-folders/100", 200, "{"
+				+ "  \"_type\" : \"campaign-folder\","
+				+ "  \"id\" : 100,"
+				+ "  \"name\" : \"folder1\","
+				+ "  \"project\" : {"
+				+ "    \"_type\" : \"project\","
+				+ "    \"id\" : 14,"
+				+ "    \"name\" : \"Mangrove\","
+				+ "    \"_links\" : {"
+				+ "      \"self\" : {"
+				+ "        \"href\" : \"http://localhost:8080/api/rest/latest/projects/14\""
+				+ "      }"
+				+ "    }"
+				+ "  },"
+				+ "  \"path\" : \"/Mangrove/old\","
+				+ "  \"parent\" : {"
+				+ "    \"_type\" : \"project\","
+				+ "    \"id\" : 14,"
+				+ "    \"name\" : \"Mangrove\","
+				+ "    \"_links\" : {"
+				+ "      \"self\" : {"
+				+ "        \"href\" : \"http://localhost:8080/api/rest/latest/projects/14\""
+				+ "      }"
+				+ "    }"
+				+ "  },"
+				+ "  \"created_by\" : \"User-1\","
+				+ "  \"created_on\" : \"2011-09-30T10:00:00.000+00:00\","
+				+ "  \"last_modified_by\" : \"admin\","
+				+ "  \"last_modified_on\" : \"2017-06-16T10:00:00.000+00:00\","
+				+ "  \"description\" : \"<p>where all the old campaigns go</p>\","
+				+ "  \"custom_fields\" : [ {"
+				+ "    \"code\" : \"CF_TXT\","
+				+ "    \"label\" : \"test level\","
+				+ "    \"value\" : \"mandatory\""
+				+ "  }, {"
+				+ "    \"code\" : \"CF_TAGS\","
+				+ "    \"label\" : \"see also\","
+				+ "    \"value\" : [ \"walking\", \"bipedal\" ]"
+				+ "  } ],"
+				+ "  \"attachments\" : [ ],"
+				+ "  \"_links\" : {"
+				+ "    \"self\" : {"
+				+ "      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders/100\""
+				+ "    },"
+				+ "    \"project\" : {"
+				+ "      \"href\" : \"http://localhost:8080/api/rest/latest/projects/14\""
+				+ "    },"
+				+ "    \"content\" : {"
+				+ "      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders/100/content\""
+				+ "    },"
+				+ "    \"attachments\" : {"
+				+ "      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders/100/attachments\""
+				+ "    }"
+				+ "  }"
+				+ "}");
+		createServerMock("GET", "/campaign-folders/101", 200, "{"
+				+ "  \"_type\" : \"campaign-folder\","
+				+ "  \"id\" : 101,"
+				+ "  \"name\" : \"folder2\","
+				+ "  \"project\" : {"
+				+ "    \"_type\" : \"project\","
+				+ "    \"id\" : 14,"
+				+ "    \"name\" : \"Mangrove\","
+				+ "    \"_links\" : {"
+				+ "      \"self\" : {"
+				+ "        \"href\" : \"http://localhost:8080/api/rest/latest/projects/14\""
+				+ "      }"
+				+ "    }"
+				+ "  },"
+				+ "  \"path\" : \"/Mangrove/old\","
+				+ "  \"parent\" : {"
+				+ "    \"_type\" : \"project\","
+				+ "    \"id\" : 14,"
+				+ "    \"name\" : \"Mangrove\","
+				+ "    \"_links\" : {"
+				+ "      \"self\" : {"
+				+ "        \"href\" : \"http://localhost:8080/api/rest/latest/projects/14\""
+				+ "      }"
+				+ "    }"
+				+ "  },"
+				+ "  \"created_by\" : \"User-1\","
+				+ "  \"created_on\" : \"2011-09-30T10:00:00.000+00:00\","
+				+ "  \"last_modified_by\" : \"admin\","
+				+ "  \"last_modified_on\" : \"2017-06-16T10:00:00.000+00:00\","
+				+ "  \"description\" : \"<p>where all the old campaigns go</p>\","
+				+ "  \"custom_fields\" : [ {"
+				+ "    \"code\" : \"CF_TXT\","
+				+ "    \"label\" : \"test level\","
+				+ "    \"value\" : \"mandatory\""
+				+ "  }, {"
+				+ "    \"code\" : \"CF_TAGS\","
+				+ "    \"label\" : \"see also\","
+				+ "    \"value\" : [ \"walking\", \"bipedal\" ]"
+				+ "  } ],"
+				+ "  \"attachments\" : [ ],"
+				+ "  \"_links\" : {"
+				+ "    \"self\" : {"
+				+ "      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders/101\""
+				+ "    },"
+				+ "    \"project\" : {"
+				+ "      \"href\" : \"http://localhost:8080/api/rest/latest/projects/14\""
+				+ "    },"
+				+ "    \"content\" : {"
+				+ "      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders/101/content\""
+				+ "    },"
+				+ "    \"attachments\" : {"
+				+ "      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders/101/attachments\""
+				+ "    }"
+				+ "  }"
+				+ "}");
+	
+		
+		List<CampaignFolder> campaignFolders = CampaignFolder.getAll(project);
+		Assert.assertEquals(campaignFolders.size(), 2);
+		Assert.assertEquals(campaignFolders.get(0).getName(), "folder1");
+		Assert.assertEquals(campaignFolders.get(0).getId(), 100);
+		Assert.assertEquals(campaignFolders.get(0).getUrl(), "http://localhost:8080/api/rest/latest/campaign-folders/100");
+	}
+	
+
+	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class)
+	public void testGetAllByProjectWithError() {
+		GetRequest getRequest = (GetRequest) createServerMock("GET", "/campaign-folders/tree/14", 200, "{}", "requestBodyEntity");
+		when(getRequest.asJson()).thenThrow(UnirestException.class);
+		
+		CampaignFolder.getAll(project);
+	}
+	
+	@Test(groups={"ut"})
+	public void testGetAllByProjectNoFolder() {
+		
+		createServerMock("GET", "/campaign-folders/tree/14", 200, "[ {"
+				+ "  \"_type\" : \"project\","
+				+ "  \"id\" : 10,"
+				+ "  \"name\" : \"project-1\","
+				+ "  \"folders\" : []"
+				+ "}]");
+		
+		
+		List<CampaignFolder> campaignFolders = CampaignFolder.getAll(project);
 		Assert.assertEquals(campaignFolders.size(), 0);
 	}
 	
@@ -184,14 +350,14 @@ public class TestCampaignFolder extends ConnectorsTest {
 		json.put("_links", new JSONObject("{\"self\" : {" + 
 				"          \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folder/1\"" + 
 				"        }}"));
-		json.put("project", new JSONObject("{\r\n" + 
-				"    \"_type\" : \"project\",\r\n" + 
-				"    \"id\" : 10,\r\n" + 
-				"    \"name\" : \"Mangrove\",\r\n" + 
-				"    \"_links\" : {\r\n" + 
-				"      \"self\" : {\r\n" + 
-				"        \"href\" : \"http://localhost:8080/api/rest/latest/project/10\"\r\n" + 
-				"      }\r\n" + 
+		json.put("project", new JSONObject("{" + 
+				"    \"_type\" : \"project\"," + 
+				"    \"id\" : 10," + 
+				"    \"name\" : \"Mangrove\"," + 
+				"    \"_links\" : {" + 
+				"      \"self\" : {" + 
+				"        \"href\" : \"http://localhost:8080/api/rest/latest/project/10\"" + 
+				"      }" + 
 				"    }}"));
 		
 		CampaignFolder campaignFolder = CampaignFolder.fromJson(json);
@@ -212,14 +378,14 @@ public class TestCampaignFolder extends ConnectorsTest {
 		json.put("_links", new JSONObject("{\"self\" : {" + 
 				"          \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folder/1\"" + 
 				"        }}"));
-		json.put("parent", new JSONObject("{\r\n" + 
-				"    \"_type\" : \"campaign-folder\",\r\n" + 
-				"    \"id\" : 10,\r\n" + 
-				"    \"name\" : \"Mangrove\",\r\n" + 
-				"    \"_links\" : {\r\n" + 
-				"      \"self\" : {\r\n" + 
-				"        \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folder/10\"\r\n" + 
-				"      }\r\n" + 
+		json.put("parent", new JSONObject("{" + 
+				"    \"_type\" : \"campaign-folder\"," + 
+				"    \"id\" : 10," + 
+				"    \"name\" : \"Mangrove\"," + 
+				"    \"_links\" : {" + 
+				"      \"self\" : {" + 
+				"        \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folder/10\"" + 
+				"      }" + 
 				"    }}"));
 		
 		CampaignFolder campaignFolder = CampaignFolder.fromJson(json);
@@ -240,14 +406,14 @@ public class TestCampaignFolder extends ConnectorsTest {
 		json.put("_links", new JSONObject("{\"self\" : {" + 
 				"          \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folder/1\"" + 
 				"        }}"));
-		json.put("parent", new JSONObject("{\r\n" + 
-				"    \"_type\" : \"project\",\r\n" + 
-				"    \"id\" : 10,\r\n" + 
-				"    \"name\" : \"Mangrove\",\r\n" + 
-				"    \"_links\" : {\r\n" + 
-				"      \"self\" : {\r\n" + 
-				"        \"href\" : \"http://localhost:8080/api/rest/latest/project/10\"\r\n" + 
-				"      }\r\n" + 
+		json.put("parent", new JSONObject("{" + 
+				"    \"_type\" : \"project\"," + 
+				"    \"id\" : 10," + 
+				"    \"name\" : \"Mangrove\"," + 
+				"    \"_links\" : {" + 
+				"      \"self\" : {" + 
+				"        \"href\" : \"http://localhost:8080/api/rest/latest/project/10\"" + 
+				"      }" + 
 				"    }}"));
 		
 		CampaignFolder campaignFolder = CampaignFolder.fromJson(json);
@@ -274,60 +440,60 @@ public class TestCampaignFolder extends ConnectorsTest {
 	
 	@Test(groups={"ut"})
 	public void testCreateCampaignFolderNoParent() {
-		HttpRequestWithBody postRequest = (HttpRequestWithBody) createServerMock("POST", "/campaign-folders", 200, "{\r\n" + 
-				"  \"_type\" : \"campaign-folder\",\r\n" + 
-				"  \"id\" : 33,\r\n" + 
-				"  \"name\" : \"Campaign folder 1\",\r\n" + 
-				"  \"project\" : {\r\n" + 
-				"    \"_type\" : \"project\",\r\n" + 
-				"    \"id\" : 14,\r\n" + 
-				"    \"name\" : \"Test Project 1\",\r\n" + 
-				"    \"_links\" : {\r\n" + 
-				"      \"self\" : {\r\n" + 
-				"        \"href\" : \"http://localhost:8080/api/rest/latest/projects/14\"\r\n" + 
-				"      }\r\n" + 
-				"    }\r\n" + 
-				"  },\r\n" + 
-				"  \"path\" : \"/Test Project 1/Campaign folder 1\",\r\n" + 
-				"  \"parent\" : {\r\n" + 
-				"    \"_type\" : \"project\",\r\n" + 
-				"    \"id\" : 14,\r\n" + 
-				"    \"name\" : \"Test Project 1\",\r\n" + 
-				"    \"_links\" : {\r\n" + 
-				"      \"self\" : {\r\n" + 
-				"        \"href\" : \"http://localhost:8080/api/rest/latest/projects/14\"\r\n" + 
-				"      }\r\n" + 
-				"    }\r\n" + 
-				"  },\r\n" + 
-				"  \"created_by\" : \"admin\",\r\n" + 
-				"  \"created_on\" : \"2017-06-15T10:00:00.000+0000\",\r\n" + 
-				"  \"last_modified_by\" : \"admin\",\r\n" + 
-				"  \"last_modified_on\" : \"2017-06-15T10:00:00.000+0000\",\r\n" + 
-				"  \"description\" : null,\r\n" + 
-				"  \"custom_fields\" : [ {\r\n" + 
-				"    \"code\" : \"cuf1\",\r\n" + 
-				"    \"label\" : \"Lib Cuf1\",\r\n" + 
-				"    \"value\" : \"Cuf1 Value\"\r\n" + 
-				"  }, {\r\n" + 
-				"    \"code\" : \"cuf2\",\r\n" + 
-				"    \"label\" : \"Lib Cuf2\",\r\n" + 
-				"    \"value\" : \"true\"\r\n" + 
-				"  } ],\r\n" + 
-				"  \"attachments\" : [ ],\r\n" + 
-				"  \"_links\" : {\r\n" + 
-				"    \"self\" : {\r\n" + 
-				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders/33\"\r\n" + 
-				"    },\r\n" + 
-				"    \"project\" : {\r\n" + 
-				"      \"href\" : \"http://localhost:8080/api/rest/latest/projects/14\"\r\n" + 
-				"    },\r\n" + 
-				"    \"content\" : {\r\n" + 
-				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders/33/content\"\r\n" + 
-				"    },\r\n" + 
-				"    \"attachments\" : {\r\n" + 
-				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders/33/attachments\"\r\n" + 
-				"    }\r\n" + 
-				"  }\r\n" + 
+		HttpRequestWithBody postRequest = (HttpRequestWithBody) createServerMock("POST", "/campaign-folders", 200, "{" + 
+				"  \"_type\" : \"campaign-folder\"," + 
+				"  \"id\" : 33," + 
+				"  \"name\" : \"Campaign folder 1\"," + 
+				"  \"project\" : {" + 
+				"    \"_type\" : \"project\"," + 
+				"    \"id\" : 14," + 
+				"    \"name\" : \"Test Project 1\"," + 
+				"    \"_links\" : {" + 
+				"      \"self\" : {" + 
+				"        \"href\" : \"http://localhost:8080/api/rest/latest/projects/14\"" + 
+				"      }" + 
+				"    }" + 
+				"  }," + 
+				"  \"path\" : \"/Test Project 1/Campaign folder 1\"," + 
+				"  \"parent\" : {" + 
+				"    \"_type\" : \"project\"," + 
+				"    \"id\" : 14," + 
+				"    \"name\" : \"Test Project 1\"," + 
+				"    \"_links\" : {" + 
+				"      \"self\" : {" + 
+				"        \"href\" : \"http://localhost:8080/api/rest/latest/projects/14\"" + 
+				"      }" + 
+				"    }" + 
+				"  }," + 
+				"  \"created_by\" : \"admin\"," + 
+				"  \"created_on\" : \"2017-06-15T10:00:00.000+0000\"," + 
+				"  \"last_modified_by\" : \"admin\"," + 
+				"  \"last_modified_on\" : \"2017-06-15T10:00:00.000+0000\"," + 
+				"  \"description\" : null," + 
+				"  \"custom_fields\" : [ {" + 
+				"    \"code\" : \"cuf1\"," + 
+				"    \"label\" : \"Lib Cuf1\"," + 
+				"    \"value\" : \"Cuf1 Value\"" + 
+				"  }, {" + 
+				"    \"code\" : \"cuf2\"," + 
+				"    \"label\" : \"Lib Cuf2\"," + 
+				"    \"value\" : \"true\"" + 
+				"  } ]," + 
+				"  \"attachments\" : [ ]," + 
+				"  \"_links\" : {" + 
+				"    \"self\" : {" + 
+				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders/33\"" + 
+				"    }," + 
+				"    \"project\" : {" + 
+				"      \"href\" : \"http://localhost:8080/api/rest/latest/projects/14\"" + 
+				"    }," + 
+				"    \"content\" : {" + 
+				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders/33/content\"" + 
+				"    }," + 
+				"    \"attachments\" : {" + 
+				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders/33/attachments\"" + 
+				"    }" + 
+				"  }" + 
 				"}", "request");
 		CampaignFolder campaignFolder = CampaignFolder.create(project, null, "Campaign folder 1");
 		verify(postRequest).body(new JSONObject(" {\"_type\":\"campaign-folder\",\"name\":\"Campaign folder 1\",\"parent\":{\"_type\":\"project\",\"id\":14,\"name\":\"Test Project 1\"}}"));
@@ -338,60 +504,60 @@ public class TestCampaignFolder extends ConnectorsTest {
 	
 	@Test(groups={"ut"})
 	public void testCreateCampaignFolderWithParent() {
-		HttpRequestWithBody postRequest = (HttpRequestWithBody) createServerMock("POST", "/campaign-folders", 200, "{\r\n" + 
-				"  \"_type\" : \"campaign-folder\",\r\n" + 
-				"  \"id\" : 33,\r\n" + 
-				"  \"name\" : \"Campaign folder 1\",\r\n" + 
-				"  \"project\" : {\r\n" + 
-				"    \"_type\" : \"project\",\r\n" + 
-				"    \"id\" : 14,\r\n" + 
-				"    \"name\" : \"Test Project 1\",\r\n" + 
-				"    \"_links\" : {\r\n" + 
-				"      \"self\" : {\r\n" + 
-				"        \"href\" : \"http://localhost:8080/api/rest/latest/projects/14\"\r\n" + 
-				"      }\r\n" + 
-				"    }\r\n" + 
-				"  },\r\n" + 
-				"  \"path\" : \"/Test Project 1/Campaign folder 1\",\r\n" + 
-				"  \"parent\" : {\r\n" + 
-				"    \"_type\" : \"campaign-folder\",\r\n" + 
-				"    \"id\" : 10,\r\n" + 
-				"    \"name\" : \"Campaign folder parent\",\r\n" + 
-				"    \"_links\" : {\r\n" + 
-				"      \"self\" : {\r\n" + 
-				"        \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders/10\"\r\n" + 
-				"      }\r\n" + 
-				"    }\r\n" + 
-				"  },\r\n" + 
-				"  \"created_by\" : \"admin\",\r\n" + 
-				"  \"created_on\" : \"2017-06-15T10:00:00.000+0000\",\r\n" + 
-				"  \"last_modified_by\" : \"admin\",\r\n" + 
-				"  \"last_modified_on\" : \"2017-06-15T10:00:00.000+0000\",\r\n" + 
-				"  \"description\" : null,\r\n" + 
-				"  \"custom_fields\" : [ {\r\n" + 
-				"    \"code\" : \"cuf1\",\r\n" + 
-				"    \"label\" : \"Lib Cuf1\",\r\n" + 
-				"    \"value\" : \"Cuf1 Value\"\r\n" + 
-				"  }, {\r\n" + 
-				"    \"code\" : \"cuf2\",\r\n" + 
-				"    \"label\" : \"Lib Cuf2\",\r\n" + 
-				"    \"value\" : \"true\"\r\n" + 
-				"  } ],\r\n" + 
-				"  \"attachments\" : [ ],\r\n" + 
-				"  \"_links\" : {\r\n" + 
-				"    \"self\" : {\r\n" + 
-				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders/33\"\r\n" + 
-				"    },\r\n" + 
-				"    \"project\" : {\r\n" + 
-				"      \"href\" : \"http://localhost:8080/api/rest/latest/projects/14\"\r\n" + 
-				"    },\r\n" + 
-				"    \"content\" : {\r\n" + 
-				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders/33/content\"\r\n" + 
-				"    },\r\n" + 
-				"    \"attachments\" : {\r\n" + 
-				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders/33/attachments\"\r\n" + 
-				"    }\r\n" + 
-				"  }\r\n" + 
+		HttpRequestWithBody postRequest = (HttpRequestWithBody) createServerMock("POST", "/campaign-folders", 200, "{" + 
+				"  \"_type\" : \"campaign-folder\"," + 
+				"  \"id\" : 33," + 
+				"  \"name\" : \"Campaign folder 1\"," + 
+				"  \"project\" : {" + 
+				"    \"_type\" : \"project\"," + 
+				"    \"id\" : 14," + 
+				"    \"name\" : \"Test Project 1\"," + 
+				"    \"_links\" : {" + 
+				"      \"self\" : {" + 
+				"        \"href\" : \"http://localhost:8080/api/rest/latest/projects/14\"" + 
+				"      }" + 
+				"    }" + 
+				"  }," + 
+				"  \"path\" : \"/Test Project 1/Campaign folder 1\"," + 
+				"  \"parent\" : {" + 
+				"    \"_type\" : \"campaign-folder\"," + 
+				"    \"id\" : 10," + 
+				"    \"name\" : \"Campaign folder parent\"," + 
+				"    \"_links\" : {" + 
+				"      \"self\" : {" + 
+				"        \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders/10\"" + 
+				"      }" + 
+				"    }" + 
+				"  }," + 
+				"  \"created_by\" : \"admin\"," + 
+				"  \"created_on\" : \"2017-06-15T10:00:00.000+0000\"," + 
+				"  \"last_modified_by\" : \"admin\"," + 
+				"  \"last_modified_on\" : \"2017-06-15T10:00:00.000+0000\"," + 
+				"  \"description\" : null," + 
+				"  \"custom_fields\" : [ {" + 
+				"    \"code\" : \"cuf1\"," + 
+				"    \"label\" : \"Lib Cuf1\"," + 
+				"    \"value\" : \"Cuf1 Value\"" + 
+				"  }, {" + 
+				"    \"code\" : \"cuf2\"," + 
+				"    \"label\" : \"Lib Cuf2\"," + 
+				"    \"value\" : \"true\"" + 
+				"  } ]," + 
+				"  \"attachments\" : [ ]," + 
+				"  \"_links\" : {" + 
+				"    \"self\" : {" + 
+				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders/33\"" + 
+				"    }," + 
+				"    \"project\" : {" + 
+				"      \"href\" : \"http://localhost:8080/api/rest/latest/projects/14\"" + 
+				"    }," + 
+				"    \"content\" : {" + 
+				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders/33/content\"" + 
+				"    }," + 
+				"    \"attachments\" : {" + 
+				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folders/33/attachments\"" + 
+				"    }" + 
+				"  }" + 
 				"}", "request");
 		CampaignFolder campaignFolderParent = new CampaignFolder("http://localhost:8080/api/rest/latest/campaign-folders/10", 10, "Campaign folder parent", project, null);
 		CampaignFolder campaignFolder = CampaignFolder.create(project, campaignFolderParent, "Campaign folder 1");

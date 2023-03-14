@@ -38,6 +38,7 @@ import com.seleniumtests.it.driver.support.pages.DriverModalTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageNativeActions;
 import com.seleniumtests.it.driver.support.pages.ImageDetectorPage;
+import com.seleniumtests.util.helper.WaitHelper;
 
 public class StubTestClassForDriverTest extends StubParentClass {
 	
@@ -67,6 +68,25 @@ public class StubTestClassForDriverTest extends StubParentClass {
 			._reset()
 			._sendKeysComposite()
 			._clickPicture();
+	}
+	
+	@Test(groups="stub")
+	public void testDriverLongFailed() throws Exception {
+		
+		DriverTestPage page = new DriverTestPage(true)
+		._writeSomething()
+		._reset();
+		WaitHelper.waitForSeconds(15);
+		page._sendKeysComposite()
+		._writeSomethingOnNonExistentElement();
+	}
+	
+	@Test(groups="stub")
+	public void testDriverFailed() throws Exception {
+		
+		DriverTestPage page = new DriverTestPage(true)
+				._sendKeysComposite()
+		._writeSomethingOnNonExistentElement();
 	}
 	
 	@Test(groups="stub")

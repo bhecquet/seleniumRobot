@@ -19,6 +19,11 @@ package com.seleniumtests.it.reporter;
 
 import java.io.File;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.testng.Assert;
@@ -30,6 +35,7 @@ import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnecto
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.contexts.SeleniumRobotServerContext;
+import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.it.stubclasses.StubTestClass;
 
 public class TestSeleniumTestsReporter2 extends ReporterTest {
