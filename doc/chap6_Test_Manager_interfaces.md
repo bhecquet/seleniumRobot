@@ -10,7 +10,7 @@
     - [Configure Test to be linked with Squash TM](#configure-test-to-be-linked-with-squash-tm)
       - [Configure through annotation](#configure-through-annotation)
       - [Configure through context](#configure-through-context)
-    - [Configure campaign name and iteration](#configure-campaign-name-and-iteration)
+    - [Configure campaign name, campaign folder and iteration](#configure-campaign-name-campaign-folder-and-iteration)
   - [4 HP ALM](#4-hp-alm)
     - [Configure environment to access HP ALM](#configure-environment-to-access-hp-alm)
     - [Configure test runner computer](#configure-test-runner-computer)
