@@ -646,4 +646,9 @@ public class BrowserInfo {
 	public String getDefaultProfilePath() {
 		return defaultProfilePath;
 	}
+	
+	@Override
+	public String toString() {
+		return String.format("%s v%s [%s]", browser.name(), version, path);
+	}
 }

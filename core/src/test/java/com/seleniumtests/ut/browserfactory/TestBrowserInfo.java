@@ -64,6 +64,12 @@ public class TestBrowserInfo extends MockitoTest {
 		Assert.assertEquals(bi.getVersion(), "0.0");
 	}
 	
+	@Test(groups= {"ut"})
+	public void testToString() {
+		BrowserInfo bi = new BrowserInfo(BrowserType.CHROME, "58", "/usr/bin/chrome", false);
+		Assert.assertEquals(bi.toString(), "CHROME v58 [/usr/bin/chrome]");
+	}
+	
 	/**
 	 * Test that if a non existent path is provided, error is raised
 	 */
