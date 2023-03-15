@@ -431,7 +431,7 @@ public abstract class EmailClientImpl implements EmailClient {
 
         if (content == null) {
             throw new ScenarioException("content can't be null");
-        } if (content.length() < 2) {
+        } else if (content.length() < 2) {
             throw new ScenarioException("content must contains at least three characters");
         }
 

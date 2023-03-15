@@ -30,9 +30,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.seleniumtests.customexception.ScenarioException;
-import io.cucumber.java.an.E;
-import io.cucumber.java.bs.A;
 import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -47,6 +44,7 @@ import com.seleniumtests.connectors.mails.EmailClientSelector;
 import com.seleniumtests.connectors.mails.EmailServer;
 import com.seleniumtests.connectors.mails.EmailServer.EmailServerTypes;
 import com.seleniumtests.connectors.mails.ImapClient;
+import com.seleniumtests.customexception.ScenarioException;
 
 @PrepareForTest({EmailClientSelector.class})
 public class TestEmailClient extends MockitoTest {
@@ -237,7 +235,7 @@ public class TestEmailClient extends MockitoTest {
 	/**
 	 * Check if getEmailsByContent get a IllegalArgumentException if content is less than 3 characters
 	 */
-	@Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)
+	@Test(groups = {"ut"}, expectedExceptions = ScenarioException.class)
 	public void testGetEmailByContentEmpty() throws Exception {
 		List<Email> emails = new ArrayList<>();
 		emails.add(new Email("Jellyfish", "jellyfish let themselves be carried by the current", "someone@company.com", LocalDateTime.now(), Arrays.asList(new String[] {"infos.pdf"})));
