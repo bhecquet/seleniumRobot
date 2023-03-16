@@ -129,7 +129,7 @@ public class TestPageObject extends GenericTest {
 			int port = GenericDriverTest.findFreePort();
 			
 			// create chrome browser with the right option
-			OSCommand.executeCommand(new String[] {path, "--remote-debugging-port=" + port, "about:blank"});
+			OSCommand.executeCommand(new String[] {path, "--remote-allow-origins=*",  "--remote-debugging-port=" + port, "about:blank"});
 			
 			DriverTestPage secondPage = new DriverTestPage(BrowserType.CHROME, port);
 			Assert.assertNotNull(secondPage.getCurrentHandles());

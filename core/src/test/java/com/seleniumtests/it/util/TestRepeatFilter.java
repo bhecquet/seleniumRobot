@@ -25,7 +25,7 @@ public class TestRepeatFilter extends ReporterTest {
 		Assert.assertEquals(StringUtils.countMatches(logs, "... repeated 2 times until"), logs.contains("seleniumRobotServerActive key not found or set to false") ? 2: 1); 
 							// "seleniumRobotServerActive key not found or set to false, or url key seleniumRobotServerUrl has not been set" => not written when executed by maven 
 							// AND "something else interesting"
-		Assert.assertEquals(StringUtils.countMatches(logs, "... repeated"), 3);
+		Assert.assertEquals(StringUtils.countMatches(logs, "... repeated"), logs.contains("seleniumRobotServerActive key not found or set to false") ? 3: 2);
 		
 	}
 	
@@ -48,7 +48,7 @@ public class TestRepeatFilter extends ReporterTest {
 		Assert.assertEquals(StringUtils.countMatches(logs, "... repeated 3 times"), 1);
 		Assert.assertEquals(StringUtils.countMatches(logs, "... repeated 2 times"), logs.contains("seleniumRobotServerActive key not found or set to false") ? 3: 1); // "seleniumRobotServerActive key not found or set to false, or url key seleniumRobotServerUrl has not been set" 
 																														// AND "something else interesting"
-		Assert.assertEquals(StringUtils.countMatches(logs, "... repeated"), 6);
+		Assert.assertEquals(StringUtils.countMatches(logs, "... repeated"), logs.contains("seleniumRobotServerActive key not found or set to false") ? 6: 4);
 		
 	}
 }
