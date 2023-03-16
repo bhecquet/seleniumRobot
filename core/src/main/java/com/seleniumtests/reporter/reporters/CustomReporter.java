@@ -146,8 +146,13 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			
 			// issue #228: if test is OK, set number of errors to 0 even if one step is failed
 			// because test result published by this report must conform to other results
-			if (testResult.getStatus() == ITestResult.SUCCESS) {
+			else if (testResult.getStatus() == ITestResult.SUCCESS) {
 				errors = 0;
+			}
+			
+			// #573: if test is KO, be sure errors is > 0
+			else if (testResult.getStatus() == ITestResult.FAILURE && errors < 1) {
+				errors = 1;
 			}
 			
 			List<String> stack = null;
