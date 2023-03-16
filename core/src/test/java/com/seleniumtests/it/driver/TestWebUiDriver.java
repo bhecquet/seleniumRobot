@@ -327,9 +327,9 @@ public class TestWebUiDriver extends ReporterTest {
 		
 		// check drivers are created one after the other
 		int firstDriverCreation = logs.indexOf("driver creation took"); // written when driver is created
-		int firstDriverInit = logs.indexOf("Socket timeout for driver communication updated");
+		int firstDriverInit = logs.indexOf("driver mode:"); // written before creating driver
 		int secondDriverCreation = logs.lastIndexOf("driver creation took");
-		int secondDriverInit = logs.lastIndexOf("Socket timeout for driver communication updated"); // written before creating driver
+		int secondDriverInit = logs.lastIndexOf("driver mode:"); 
 		
 		Assert.assertTrue(secondDriverInit > firstDriverCreation);
 		Assert.assertTrue(secondDriverInit > firstDriverInit);
