@@ -165,6 +165,7 @@ public class TestPerformanceReporter extends ReporterTest {
 	
 	/**
 	 * Check number of retries is correctly logged
+	 * This test is failed in "test" part, not in steps. Check it's correctly logged as failed
 	 * @param testContext
 	 * @throws Exception
 	 */
@@ -178,6 +179,7 @@ public class TestPerformanceReporter extends ReporterTest {
 
 		// issue #418: now it's Test end which is the failed step because in this case execption is raised directly in test scenario
 		Assert.assertTrue(jmeterReport.contains("retries=\"2\"")); 
+		Assert.assertTrue(jmeterReport.contains("failures=\"1\"")); // be sure an error is reported 
 		Assert.assertTrue(jmeterReport.contains("failedStep=\"\"")); // failed step is not logged as there are no step logged
 	}
 	
