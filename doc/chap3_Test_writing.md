@@ -889,7 +889,7 @@ Assuming the DEV environment, file will be searched in `<root>/data/<app>/datase
 
 **WARNING** In case your last cell is empty (a line that ends with ',' or ';'), add a "space" so that cell is taken into account
 
-#### Use placeholders in test description ####
+#### Use placeholders in test description and test name ####
 
 With TestNG, it's possible to declare a test description inside the @Test annotation
 
@@ -930,6 +930,26 @@ Finally, when using dataprovider, method parameters can also be used as placehol
 	public void testStandardDataProvider(String col1, String col2) {
 		logger.info(String.format("%s,%s", col1, col2));
 	}
+```
+
+The same logic applies to testName
+
+```
+    @Test(groups="stub", testName="A test which is OK (${arg0}, ${arg1})", dataProvider = "data2")
+    public void myTest(String col1, String col2) throws IOException {
+        ...
+    }
+```
+
+or
+
+```java
+    @Test(groups="stub", testName="on ${client} account ${account}")
+    public void test() {
+        createOrUpdateLocalParam("account", "123456")
+        createOrUpdateParam("client", "Bob")
+        logger.info("hello");
+    }
 ```
 
 #### Execute or kill a process ####
