@@ -103,7 +103,6 @@ public class ReporterControler implements IReporter {
 			} catch (Exception e) {
 				logger.warn(String.format("Problem creating output directory %s: %s", SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), e.getMessage()));
 			}
-			cleanAttachments(currentTestResult);
 			
 			// are we at the end of all suites (suite.getResults() has the same size as the returned result map)
 			boolean suiteFinished = true;
@@ -158,7 +157,8 @@ public class ReporterControler implements IReporter {
 					logger.error("Error generating report", e);
 				}
 			}
-			
+
+			cleanAttachments(currentTestResult);
 
 		}
 	}
