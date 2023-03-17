@@ -43,7 +43,7 @@
     - [Use Generic steps with user defined steps](#use-generic-steps-with-user-defined-steps)
   - [Use WebDriverWait](#use-webdriverwait)
   - [Use Dataprovider](#use-dataprovider)
-  - [Use placeholders in test description](#use-placeholders-in-test-description)
+  - [Use placeholders in test description and test name](#use-placeholders-in-test-description-and-test-name)
   - [Execute or kill a process](#execute-or-kill-a-process)
     - [Kill an existing process](#kill-an-existing-process)
     - [Start a process / execute a command](#start-a-process--execute-a-command)
