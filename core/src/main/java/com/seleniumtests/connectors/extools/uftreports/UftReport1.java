@@ -17,6 +17,11 @@ import org.xml.sax.InputSource;
 import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestStep;
 
+/**
+ * Class for analyzing HTML report XML file (run_results.xml) file
+ * @author S047432
+ *
+ */
 public class UftReport1 extends IUftReport {
 	
 	public UftReport1(String xmlReport, String scriptName) {
@@ -74,7 +79,7 @@ public class UftReport1 extends IUftReport {
      */
     private TestStep readAction(Element actionElement) throws DataConversionException {
         Element data = actionElement.getChild("Data");
-        // data null au second passage parce que pas de balise data après
+        
         TestStep actionStep = new TestStep("UFT: " + data.getChild("Name").getValue().trim(), Reporter.getCurrentTestResult(), new ArrayList<>(), false);
 
         if (data != null && data.getChild("Result").getValue().contains("Failed")) {

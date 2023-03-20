@@ -17,6 +17,10 @@ import org.xml.sax.InputSource;
 import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestStep;
 
+/**
+ * Class for analyzing "Result viewer" XML report
+ *
+ */
 public class UftReport2 extends IUftReport {
 	
 	public UftReport2(String xmlReport, String scriptName) {
