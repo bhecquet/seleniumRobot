@@ -677,7 +677,7 @@ public class ByC extends By {
 
 
         /**
-         * If multiple "By" are pro
+         * If multiple "By" are provided
          */
         @Override
         public List<WebElement> findElements(SearchContext context) {
