@@ -1,0 +1,122 @@
+{
+  "devices" : {
+    "com.apple.CoreSimulator.SimRuntime.tvOS-13-4" : [
+
+    ],
+    "com.apple.CoreSimulator.SimRuntime.watchOS-6-2" : [
+
+    ],
+    "com.apple.CoreSimulator.SimRuntime.iOS-16-2" : [
+      {
+        "dataPath" : "\/Users\/zsselenium\/Library\/Developer\/CoreSimulator\/Devices\/638E5405-8CA0-4C39-9F21-C48FB284A41C\/data",
+        "dataPathSize" : 13316096,
+        "logPath" : "\/Users\/zsselenium\/Library\/Logs\/CoreSimulator\/638E5405-8CA0-4C39-9F21-C48FB284A41C",
+        "udid" : "638E5405-8CA0-4C39-9F21-C48FB284A41C",
+        "isAvailable" : true,
+        "deviceTypeIdentifier" : "com.apple.CoreSimulator.SimDeviceType.iPhone-SE-3rd-generation",
+        "state" : "Shutdown",
+        "name" : "iPhone SE (3rd generation)"
+      },
+      {
+        "lastBootedAt" : "2023-03-23T07:22:55Z",
+        "dataPath" : "\/Users\/zsselenium\/Library\/Developer\/CoreSimulator\/Devices\/F588AFB8-5DF5-475C-B01C-28707D0CBD19\/data",
+        "dataPathSize" : 312999936,
+        "logPath" : "\/Users\/zsselenium\/Library\/Logs\/CoreSimulator\/F588AFB8-5DF5-475C-B01C-28707D0CBD19",
+        "udid" : "F588AFB8-5DF5-475C-B01C-28707D0CBD19",
+        "isAvailable" : true,
+        "logPathSize" : 45056,
+        "deviceTypeIdentifier" : "com.apple.CoreSimulator.SimDeviceType.iPhone-14",
+        "state" : "Shutdown",
+        "name" : "iPhone 14"
+      },
+      {
+        "dataPath" : "\/Users\/zsselenium\/Library\/Developer\/CoreSimulator\/Devices\/80B41580-4F70-47C5-853F-E8D06CC42E03\/data",
+        "dataPathSize" : 13316096,
+        "logPath" : "\/Users\/zsselenium\/Library\/Logs\/CoreSimulator\/80B41580-4F70-47C5-853F-E8D06CC42E03",
+        "udid" : "80B41580-4F70-47C5-853F-E8D06CC42E03",
+        "isAvailable" : true,
+        "deviceTypeIdentifier" : "com.apple.CoreSimulator.SimDeviceType.iPhone-14-Plus",
+        "state" : "Shutdown",
+        "name" : "iPhone 14 Plus"
+      },
+      {
+        "lastBootedAt" : "2023-03-21T10:17:44Z",
+        "dataPath" : "\/Users\/zsselenium\/Library\/Developer\/CoreSimulator\/Devices\/DC8C3B0D-D51F-412A-8542-7F277125C981\/data",
+        "dataPathSize" : 582049792,
+        "logPath" : "\/Users\/zsselenium\/Library\/Logs\/CoreSimulator\/DC8C3B0D-D51F-412A-8542-7F277125C981",
+        "udid" : "DC8C3B0D-D51F-412A-8542-7F277125C981",
+        "isAvailable" : true,
+        "logPathSize" : 90112,
+        "deviceTypeIdentifier" : "com.apple.CoreSimulator.SimDeviceType.iPhone-14-Pro",
+        "state" : "Booted",
+        "name" : "iPhone 14 Pro"
+      },
+      {
+        "dataPath" : "\/Users\/zsselenium\/Library\/Developer\/CoreSimulator\/Devices\/B5C8D5D7-091F-45EB-B2E2-9CA7135AD634\/data",
+        "dataPathSize" : 13316096,
+        "logPath" : "\/Users\/zsselenium\/Library\/Logs\/CoreSimulator\/B5C8D5D7-091F-45EB-B2E2-9CA7135AD634",
+        "udid" : "B5C8D5D7-091F-45EB-B2E2-9CA7135AD634",
+        "isAvailable" : true,
+        "deviceTypeIdentifier" : "com.apple.CoreSimulator.SimDeviceType.iPhone-14-Pro-Max",
+        "state" : "Shutdown",
+        "name" : "iPhone 14 Pro Max"
+      },
+      {
+        "dataPath" : "\/Users\/zsselenium\/Library\/Developer\/CoreSimulator\/Devices\/460A5C6C-092B-4975-892C-6F4C8232DBC7\/data",
+        "dataPathSize" : 13316096,
+        "logPath" : "\/Users\/zsselenium\/Library\/Logs\/CoreSimulator\/460A5C6C-092B-4975-892C-6F4C8232DBC7",
+        "udid" : "460A5C6C-092B-4975-892C-6F4C8232DBC7",
+        "isAvailable" : true,
+        "deviceTypeIdentifier" : "com.apple.CoreSimulator.SimDeviceType.iPad-Air-5th-generation",
+        "state" : "Shutdown",
+        "name" : "iPad Air (5th generation)"
+      },
+      {
+        "dataPath" : "\/Users\/zsselenium\/Library\/Developer\/CoreSimulator\/Devices\/A6F2D89C-13B8-4F5E-BD53-0DA139D2AE34\/data",
+        "dataPathSize" : 13316096,
+        "logPath" : "\/Users\/zsselenium\/Library\/Logs\/CoreSimulator\/A6F2D89C-13B8-4F5E-BD53-0DA139D2AE34",
+        "udid" : "A6F2D89C-13B8-4F5E-BD53-0DA139D2AE34",
+        "isAvailable" : true,
+        "deviceTypeIdentifier" : "com.apple.CoreSimulator.SimDeviceType.iPad-10th-generation",
+        "state" : "Shutdown",
+        "name" : "iPad (10th generation)"
+      },
+      {
+        "dataPath" : "\/Users\/zsselenium\/Library\/Developer\/CoreSimulator\/Devices\/459FE03D-A888-4CD5-9F8B-A7095BC60AD6\/data",
+        "dataPathSize" : 13316096,
+        "logPath" : "\/Users\/zsselenium\/Library\/Logs\/CoreSimulator\/459FE03D-A888-4CD5-9F8B-A7095BC60AD6",
+        "udid" : "459FE03D-A888-4CD5-9F8B-A7095BC60AD6",
+        "isAvailable" : true,
+        "deviceTypeIdentifier" : "com.apple.CoreSimulator.SimDeviceType.iPad-mini-6th-generation",
+        "state" : "Shutdown",
+        "name" : "iPad mini (6th generation)"
+      },
+      {
+        "dataPath" : "\/Users\/zsselenium\/Library\/Developer\/CoreSimulator\/Devices\/9760D90D-B890-4226-802D-5A2AC32405A0\/data",
+        "dataPathSize" : 13316096,
+        "logPath" : "\/Users\/zsselenium\/Library\/Logs\/CoreSimulator\/9760D90D-B890-4226-802D-5A2AC32405A0",
+        "udid" : "9760D90D-B890-4226-802D-5A2AC32405A0",
+        "isAvailable" : true,
+        "deviceTypeIdentifier" : "com.apple.CoreSimulator.SimDeviceType.iPad-Pro-11-inch-4th-generation-8GB",
+        "state" : "Shutdown",
+        "name" : "iPad Pro (11-inch) (4th generation)"
+      },
+      {
+        "dataPath" : "\/Users\/zsselenium\/Library\/Developer\/CoreSimulator\/Devices\/2BB14244-84FA-4B08-BEA4-AA1C27C96B46\/data",
+        "dataPathSize" : 13316096,
+        "logPath" : "\/Users\/zsselenium\/Library\/Logs\/CoreSimulator\/2BB14244-84FA-4B08-BEA4-AA1C27C96B46",
+        "udid" : "2BB14244-84FA-4B08-BEA4-AA1C27C96B46",
+        "isAvailable" : true,
+        "deviceTypeIdentifier" : "com.apple.CoreSimulator.SimDeviceType.iPad-Pro-12-9-inch-6th-generation-8GB",
+        "state" : "Shutdown",
+        "name" : "iPad Pro (12.9-inch) (6th generation)"
+      }
+    ],
+    "com.apple.CoreSimulator.SimRuntime.iOS-13-6" : [
+
+    ],
+    "com.apple.CoreSimulator.SimRuntime.iOS-16-1" : [
+
+    ]
+  }
+}

@@ -216,7 +216,7 @@ Params for mobile testing
 | Param name       			| Default 	| Description  |
 | -------------------------	| ------- 	| ------------ |
 | app 						| 			| Path to the application file (local or remote). For local, if application is for example in 'data/<artifact>/myApp.apk', then give this path | 
-| deviceName 				| 			| Name of the device to use for mobile tests. It's the Human readable name (e.g: Nexus 6 as given by `adb -s <id_device> shell getprop`, line [ro.product.model] property on Android or `instruments -s devices`), not it's id. SeleniumRobot will replace this name with id when communicating with Appium | 
+| deviceName 				| 			| Name of the device to use for mobile tests. It's the Human readable name (e.g: Nexus 6 as given by `adb -s <id_device> shell getprop`, line [ro.product.model] property on Android or `xcrun simctl list --json devices available`), not it's id. SeleniumRobot will replace this name with id when communicating with Appium | 
 | fullReset 				| true		| enable full reset capability for appium tests | 
 | appiumServerUrl			|			| Appium server already started, that will be used to execute the test. It's useful to debug tests locally |
 | appiumCaps                |           | Set of capabilities that will be added and sent to appium. These are the capabilities that are not already handled by the framework. See: http://appium.io/docs/en/writing-running-appium/caps/. Format is "key1=value1;key2=value2" |
