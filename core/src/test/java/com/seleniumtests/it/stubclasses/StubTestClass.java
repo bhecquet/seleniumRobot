@@ -367,6 +367,15 @@ public class StubTestClass extends StubParentClass {
 	}
 	
 	@Test(groups="stub")
+	public void testLogSameInfoMultipleTimesLong() {
+		for (int i=0; i < 15; i++) {
+			logger.info("something interesting");
+			WaitHelper.waitForSeconds(5);
+		}
+		
+	}
+	
+	@Test(groups="stub")
 	public void testLogSameInfoMultipleTimes2() {
 		for (int i=0; i < 15; i++) {
 			logger.info("something interesting");

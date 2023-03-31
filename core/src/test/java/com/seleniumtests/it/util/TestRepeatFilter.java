@@ -30,6 +30,25 @@ public class TestRepeatFilter extends ReporterTest {
 	}
 	
 	/**
+	 * Test the case where repeat lasts more that 60 secs, message should be displayed at least once every 60 secs
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testRepeatFilteredLong() throws Exception {
+		
+		SeleniumTestsContextManager.removeThreadContext();
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testLogSameInfoMultipleTimesLong"});
+		
+		// no bullet as no snapshot comparison is done
+		String logs = readSeleniumRobotLogFile();
+		Assert.assertEquals(StringUtils.countMatches(logs, "something interesting"), 2); // 1 time for each period of 60 secs, and test lasts 75 secs
+		Assert.assertEquals(StringUtils.countMatches(logs, "... repeated 12 times until"), 1); // first 60 secs
+		Assert.assertTrue(logs.matches(".*12 times until \\d+:\\d+:\\d+\\.\\d+ ...*")); // check end time of repeat is present
+		Assert.assertEquals(StringUtils.countMatches(logs, "... repeated 3 times until"), 1);  // last 15 secs
+		
+	}
+	
+	/**
 	 * Check that with several threads, each repeat filter works independently
 	 * @throws Exception
 	 */

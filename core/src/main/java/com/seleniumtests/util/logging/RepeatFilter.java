@@ -24,6 +24,7 @@ public final class RepeatFilter extends AbstractFilter {
     private ThreadLocal<String> lastLog = new ThreadLocal<>();
     private ThreadLocal<Integer> lastLogRepeat = new ThreadLocal<>();
     private ThreadLocal<LocalDateTime> lastLogTime = new ThreadLocal<>();
+    private ThreadLocal<LocalDateTime> firstLogTime = new ThreadLocal<>();
  
     private RepeatFilter(Level level, Result onMatch, Result onMismatch) {
         super(onMatch, onMismatch);
@@ -54,23 +55,31 @@ public final class RepeatFilter extends AbstractFilter {
     	if (lastLog.get() != null) {
     		
     		// same message than previous, increment repeat
-    		if (lastLog.get().equals(message)) {
+    		// when we do not have different message during more than 60 secs, print it anyway
+    		if (lastLog.get().equals(message) 
+    				&& firstLogTime.get() != null 
+    				&& firstLogTime.get().plusSeconds(60).isAfter(LocalDateTime.now())) {
     			if (lastLogRepeat.get() == null) {
     				lastLogRepeat.set(1);
+    				
     			}
     			lastLogRepeat.set(lastLogRepeat.get() + 1);
     			lastLogTime.set(LocalDateTime.now());
     			discard = true;
+    			
+    		// message different from previous. If message has been repeated, display it
     		} else {
     			Integer repeatTime = lastLogRepeat.get();
     			lastLogRepeat.set(0);
     			if (repeatTime != null && repeatTime > 1) {
     				logger.info("... repeated {} times until {} ...", repeatTime, lastLogTime.get().format(DateTimeFormatter.ISO_LOCAL_TIME));
     			}
-    			lastLogRepeat.set(1);
+    			lastLogRepeat.remove();
+    			firstLogTime.set(LocalDateTime.now()); // record the time of the first occurence of the message
     		}
     	} else {
-    		lastLogRepeat.set(1);
+    		lastLogRepeat.remove();
+    		firstLogTime.set(LocalDateTime.now());
     	}
     	
     	lastLog.set(message);

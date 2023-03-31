@@ -120,6 +120,7 @@
 						<include>**/util/FileUtility.java</include>
 						<include>**/util/NetworkUtility.java</include>
 						<include>**/driver/CustomEventFiringWebDriver.java</include>
+						<include>**/util/logging/RepeatFilter.java</include>
 					</includes>
 				</configuration>
 			</plugin>
