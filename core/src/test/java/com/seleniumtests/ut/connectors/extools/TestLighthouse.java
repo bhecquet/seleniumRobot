@@ -1,9 +1,6 @@
 package com.seleniumtests.ut.connectors.extools;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -59,8 +56,8 @@ public class TestLighthouse extends MockitoTest {
 	 */
 	@Test(groups="ut")
 	public void testLighthouseInstalled() {
-		
-		
+
+
 		Lighthouse lighthouse = new Lighthouse(1234, "/home/selenium/out");
 		Assert.assertTrue(lighthouse.isAvailable());
 	}
@@ -68,10 +65,11 @@ public class TestLighthouse extends MockitoTest {
 	@Test(groups="ut")
 	public void testLighthouseNotInstalled() {
 		
-		PowerMockito.when(TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(5), isNull(), eq("--help"))).thenReturn("Unknown program");
+		PowerMockito.when(TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(5), isNull(), eq("--help"))).thenCallRealMethod();
 		
 		Lighthouse lighthouse = new Lighthouse(1234, "/home/selenium/out");
-		Assert.assertFalse(lighthouse.isAvailable());
+		boolean available = lighthouse.isAvailable();
+		Assert.assertFalse(available);
 	}
 	
 	private File createFilesForExecution() throws IOException {
