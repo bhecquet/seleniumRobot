@@ -65,6 +65,11 @@ public interface SeleniumRobotCapabilityType {
 	String FIREFOX_PROFILE = "sr:firefoxProfile";
 	
 	/**
+	 * Any string representing who started the test
+	 */
+	String STARTED_BY = "sr:startedBy";
+	
+	/**
 	 * Informations for driver usage
 	 */
 	String GRID_HUB = "sr:gridHub";

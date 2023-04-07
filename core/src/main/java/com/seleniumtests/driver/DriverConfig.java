@@ -115,6 +115,10 @@ public class DriverConfig {
 		return testContext.getCapabilities();
 	}
 	
+	public String getStartedBy() {
+		return testContext.getStartedBy();
+	}
+	
 	public String getInitialUrl() {
 		return testContext.getInitialUrl();
 	}

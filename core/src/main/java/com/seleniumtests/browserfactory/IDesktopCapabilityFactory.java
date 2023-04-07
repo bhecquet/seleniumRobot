@@ -133,6 +133,7 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
         if (webDriverConfig.getTestContext() != null && webDriverConfig.getTestContext().getTestNGResult() != null) {
         	String testName = TestNGResultUtils.getTestName(webDriverConfig.getTestContext().getTestNGResult());
             options.setCapability(SeleniumRobotCapabilityType.TEST_NAME, testName);
+            options.setCapability(SeleniumRobotCapabilityType.STARTED_BY, webDriverConfig.getStartedBy());
         }
      
         return options;

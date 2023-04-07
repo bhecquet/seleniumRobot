@@ -23,6 +23,7 @@ import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
@@ -69,6 +70,12 @@ public abstract class IMobileCapabilityFactory extends ICapabilitiesFactory {
         		app = new File(app).getAbsolutePath();
         	}
         	capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP, app.replace("\\", "/"));
+        }
+        
+        if (webDriverConfig.getTestContext() != null && webDriverConfig.getTestContext().getTestNGResult() != null) {
+        	String testName = TestNGResultUtils.getTestName(webDriverConfig.getTestContext().getTestNGResult());
+        	capabilities.setCapability(SeleniumRobotCapabilityType.TEST_NAME, testName);
+        	capabilities.setCapability(SeleniumRobotCapabilityType.STARTED_BY, webDriverConfig.getStartedBy());
         }
     	
     	// do not configure application and browser as they are mutualy exclusive

@@ -47,15 +47,6 @@ public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
 				.destructivelyEnsureCleanSession()
 				.ignoreZoomSettings();
 		
-
-        
-//        options.setCapability(InternetExplorerDriver.REQUIRE_WINDOW_FOCUS, true);
-//        options.setCapability(InternetExplorerDriver.NATIVE_EVENTS, true);
-        
-        if (webDriverConfig.getDebug().contains(DebugMode.DRIVER)) {
-        	options.setCapability(InternetExplorerDriver.LOG_LEVEL, "TRACE");
-        }
-        
         if (Boolean.TRUE.equals(webDriverConfig.getIeMode())) {
         	configureEdgeIeMode(options);
         	
