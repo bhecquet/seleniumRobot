@@ -44,10 +44,10 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.devtools.DevTools;
 import org.openqa.selenium.devtools.DevToolsException;
 import org.openqa.selenium.devtools.HasDevTools;
-import org.openqa.selenium.devtools.v108.page.Page;
-import org.openqa.selenium.devtools.v108.page.Page.CaptureScreenshotFormat;
-import org.openqa.selenium.devtools.v108.page.Page.GetLayoutMetricsResponse;
-import org.openqa.selenium.devtools.v108.page.model.Viewport;
+import org.openqa.selenium.devtools.v109.page.Page;
+import org.openqa.selenium.devtools.v109.page.Page.CaptureScreenshotFormat;
+import org.openqa.selenium.devtools.v109.page.Page.GetLayoutMetricsResponse;
+import org.openqa.selenium.devtools.v109.page.model.Viewport;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -543,7 +543,7 @@ public class ScreenshotUtil {
 		devTools.createSession(windowHandle);
 		try {
 			GetLayoutMetricsResponse layout = devTools.send(Page.getLayoutMetrics());
-			String b64Image = devTools.send(Page.captureScreenshot(Optional.of(CaptureScreenshotFormat.PNG), Optional.of(100), Optional.of(new Viewport(0, 0, layout.getCssContentSize().getWidth(), layout.getCssContentSize().getHeight(), 1)), Optional.of(true), Optional.of(true)));
+			String b64Image = devTools.send(Page.captureScreenshot(Optional.of(CaptureScreenshotFormat.PNG), Optional.of(100), Optional.of(new Viewport(0, 0, layout.getCssContentSize().getWidth(), layout.getCssContentSize().getHeight(), 1)), Optional.of(true), Optional.of(true), Optional.of(true)));
 			return ImageProcessor.loadFromB64String(b64Image);
 		} finally {
 			devTools.disconnectSession();
