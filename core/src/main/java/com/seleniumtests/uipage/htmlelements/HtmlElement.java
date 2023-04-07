@@ -52,6 +52,7 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Coordinates;
 import org.openqa.selenium.interactions.Locatable;
@@ -1235,7 +1236,13 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     @ReplayOnError
     public String getValue() {
         findElement(false, false);
-        String value = getRealElementNoSearch().getDomProperty("value");
+        String value;
+        // https://github.com/SeleniumHQ/htmlunit-driver/issues/128
+        if (((CustomEventFiringWebDriver)getDriver()).getOriginalDriver() instanceof HtmlUnitDriver) {
+        	value = getRealElementNoSearch().getAttribute("value");
+        } else {
+        	value = getRealElementNoSearch().getDomProperty("value");
+        }
 
 		return value == null ? "": value;
     }
