@@ -1,17 +1,20 @@
 package com.seleniumtests.ut.connectors.extools;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 
+import com.seleniumtests.customexception.CustomSeleniumTestsException;
+import com.seleniumtests.util.osutility.OSCommand;
 import org.apache.commons.io.FileUtils;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
@@ -64,9 +67,9 @@ public class TestLighthouse extends MockitoTest {
 	
 	@Test(groups="ut")
 	public void testLighthouseNotInstalled() {
-		
-		PowerMockito.when(TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(5), isNull(), eq("--help"))).thenCallRealMethod();
-		
+		PowerMockito.when(TestTasks.executeCommand(eq(OSCommand.USE_PATH + "lighthouse"), eq(5), isNull(), eq("--help")))
+				.thenThrow(new ScenarioException("Lighthouse not found"));
+
 		Lighthouse lighthouse = new Lighthouse(1234, "/home/selenium/out");
 		boolean available = lighthouse.isAvailable();
 		Assert.assertFalse(available);

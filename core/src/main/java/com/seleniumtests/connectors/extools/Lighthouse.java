@@ -77,10 +77,11 @@ public class Lighthouse {
         String out;
         try {
             out = TestTasks.executeCommand(OSCommand.USE_PATH + "lighthouse", 5, null, "--help");
-        } catch (CustomSeleniumTestsException e) {
+            return out.contains("--port");
+        } catch (ScenarioException e) {
+            e.getMessage();
             return false;
         }
-        return out.contains("--port");
     }
 
     public void execute(String url, List<String> options) {
