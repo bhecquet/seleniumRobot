@@ -45,6 +45,8 @@ public class TestDriverExtractor extends MockitoTest {
 	private DriverExtractor extractor;
 	private Path driverPath;
 	
+	private static final String DRIVER_VERSION = "chromedriver_111.0_chrome-111-112";
+	
 	@BeforeClass(groups={"ut"})
 	public void initContext(final ITestContext testNGCtx) throws Exception {
 		initThreadContext(testNGCtx);
@@ -71,14 +73,14 @@ public class TestDriverExtractor extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testDriverExtraction() throws IOException {
 		
-		extractor.extractDriver("chromedriver_111.0_chrome-111-112");
+		extractor.extractDriver(DRIVER_VERSION);
 		
 		if (OSUtility.isWindows()) {
-			Assert.assertTrue(Paths.get(driverPath.toString(), "chromedriver_111.0_chrome-111-112.exe").toFile().exists());
+			Assert.assertTrue(Paths.get(driverPath.toString(), DRIVER_VERSION + ".exe").toFile().exists());
 		} else {
-			Assert.assertTrue(Paths.get(driverPath.toString(), "chromedriver_111.0_chrome-111-112").toFile().exists());
+			Assert.assertTrue(Paths.get(driverPath.toString(), DRIVER_VERSION).toFile().exists());
 		}
-		Assert.assertTrue(Paths.get(driverPath.toString(), "version_chromedriver_111.0_chrome-111-112.txt").toFile().exists());
+		Assert.assertTrue(Paths.get(driverPath.toString(), String.format("version_%s.txt", DRIVER_VERSION)).toFile().exists());
 	}
 	
 	/**
@@ -88,13 +90,13 @@ public class TestDriverExtractor extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testDriverNotExtractedAlreadyExists() throws IOException {
 
-		extractor.extractDriver("chromedriver_111.0_chrome-111-112");
+		extractor.extractDriver(DRIVER_VERSION);
 		
 		DriverExtractor driverExtractor = spy(new DriverExtractor(rootPath));
-		driverExtractor.extractDriver("chromedriver_111.0_chrome-111-112");
+		driverExtractor.extractDriver(DRIVER_VERSION);
 		
 		// check driver has not been copied as it already exists in the right version
-		verify(driverExtractor, never()).copyDriver("chromedriver_111.0_chrome-111-112");
+		verify(driverExtractor, never()).copyDriver(DRIVER_VERSION);
 	}
 	
 	/**
@@ -113,16 +115,16 @@ public class TestDriverExtractor extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testDriverNotExtractedAlreadyExistsNoVersion() throws IOException {
 
-		extractor.extractDriver("chromedriver_111.0_chrome-111-112");
+		extractor.extractDriver(DRIVER_VERSION);
 		
 		// remove version to force copy
-		Paths.get(driverPath.toString(), "version_chromedriver_111.0_chrome-111-112.txt").toFile().delete();
+		Paths.get(driverPath.toString(), String.format("version_%s.txt", DRIVER_VERSION)).toFile().delete();
 		
 		DriverExtractor driverExtractor = spy(new DriverExtractor(rootPath));
-		driverExtractor.extractDriver("chromedriver_103.0_chrome-103-104");
+		driverExtractor.extractDriver(DRIVER_VERSION);
 		
 		// check driver has been copied as it already exists but no version has been specified
-		verify(driverExtractor).copyDriver("chromedriver_103.0_chrome-103-104");
+		verify(driverExtractor).copyDriver(DRIVER_VERSION);
 		
 	}
 }
