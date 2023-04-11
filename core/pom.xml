@@ -195,7 +195,7 @@
 		</dependency>
 		<dependency>
 		    <groupId>org.seleniumhq.selenium</groupId>
-		    <artifactId>htmlunit3-driver</artifactId>
+		    <artifactId>htmlunit-driver</artifactId>
 		    <version>${htmlunitdriver.version}</version>
 		    <exclusions>
 		    	<exclusion>

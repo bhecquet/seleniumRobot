@@ -79,7 +79,7 @@
 		<appium.version>8.3.0</appium.version>
 		<log4j.version>2.19.0</log4j.version>
 		<aspectj.version>1.9.1</aspectj.version>
-		<htmlunitdriver.version>4.8.1</htmlunitdriver.version>
+		<htmlunitdriver.version>4.8.1.1</htmlunitdriver.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
