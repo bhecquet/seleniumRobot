@@ -71,14 +71,14 @@ public class TestDriverExtractor extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testDriverExtraction() throws IOException {
 		
-		extractor.extractDriver("chromedriver_103.0_chrome-103-104");
+		extractor.extractDriver("chromedriver_111.0_chrome-111-112");
 		
 		if (OSUtility.isWindows()) {
-			Assert.assertTrue(Paths.get(driverPath.toString(), "chromedriver_103.0_chrome-103-104.exe").toFile().exists());
+			Assert.assertTrue(Paths.get(driverPath.toString(), "chromedriver_111.0_chrome-111-112.exe").toFile().exists());
 		} else {
-			Assert.assertTrue(Paths.get(driverPath.toString(), "chromedriver_103.0_chrome-103-104").toFile().exists());
+			Assert.assertTrue(Paths.get(driverPath.toString(), "chromedriver_111.0_chrome-111-112").toFile().exists());
 		}
-		Assert.assertTrue(Paths.get(driverPath.toString(), "version_chromedriver_103.0_chrome-103-104.txt").toFile().exists());
+		Assert.assertTrue(Paths.get(driverPath.toString(), "version_chromedriver_111.0_chrome-111-112.txt").toFile().exists());
 	}
 	
 	/**
@@ -88,13 +88,13 @@ public class TestDriverExtractor extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testDriverNotExtractedAlreadyExists() throws IOException {
 
-		extractor.extractDriver("chromedriver_103.0_chrome-103-104");
+		extractor.extractDriver("chromedriver_111.0_chrome-111-112");
 		
 		DriverExtractor driverExtractor = spy(new DriverExtractor(rootPath));
-		driverExtractor.extractDriver("chromedriver_103.0_chrome-103-104");
+		driverExtractor.extractDriver("chromedriver_111.0_chrome-111-112");
 		
 		// check driver has not been copied as it already exists in the right version
-		verify(driverExtractor, never()).copyDriver("chromedriver_103.0_chrome-103-104");
+		verify(driverExtractor, never()).copyDriver("chromedriver_111.0_chrome-111-112");
 	}
 	
 	/**
@@ -113,10 +113,10 @@ public class TestDriverExtractor extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testDriverNotExtractedAlreadyExistsNoVersion() throws IOException {
 
-		extractor.extractDriver("chromedriver_103.0_chrome-103-104");
+		extractor.extractDriver("chromedriver_111.0_chrome-111-112");
 		
 		// remove version to force copy
-		Paths.get(driverPath.toString(), "version_chromedriver_103.0_chrome-103-104.txt").toFile().delete();
+		Paths.get(driverPath.toString(), "version_chromedriver_111.0_chrome-111-112.txt").toFile().delete();
 		
 		DriverExtractor driverExtractor = spy(new DriverExtractor(rootPath));
 		driverExtractor.extractDriver("chromedriver_103.0_chrome-103-104");
