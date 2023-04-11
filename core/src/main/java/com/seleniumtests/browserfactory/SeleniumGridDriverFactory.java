@@ -222,7 +222,12 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 			throw new SkipException("Skipping as the 3 previous tests could not get any matching node. Check your test configuration and grid setup");
 		}
     	
+		int i = 0;
 		while (end.isAfter(clock.instant())) {
+
+			logger.debug("getting driver #{}", i);
+			capabilities.setCapability("sr:try", i);
+			i += 1;
 			
 			for (SeleniumGridConnector gridConnector: gridConnectors) {
 			
