@@ -67,12 +67,23 @@ public class TestLighthouse extends MockitoTest {
 	
 	@Test(groups="ut")
 	public void testLighthouseNotInstalled() {
+
+		PowerMockito.when(TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(5), isNull(), eq("--help"))).thenReturn("Unknown program");
+
+		Lighthouse lighthouse = new Lighthouse(1234, "/home/selenium/out");
+		Assert.assertFalse(lighthouse.isAvailable());
+	}
+
+
+	@Test(groups="ut")
+	public void testLighthouseNotFound() {
 		PowerMockito.when(TestTasks.executeCommand(eq(OSCommand.USE_PATH + "lighthouse"), eq(5), isNull(), eq("--help")))
 				.thenThrow(new ScenarioException("Lighthouse not found"));
 
 		Lighthouse lighthouse = new Lighthouse(1234, "/home/selenium/out");
 		boolean available = lighthouse.isAvailable();
 		Assert.assertFalse(available);
+
 	}
 	
 	private File createFilesForExecution() throws IOException {

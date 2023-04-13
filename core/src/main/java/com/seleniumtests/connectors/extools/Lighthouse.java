@@ -79,7 +79,6 @@ public class Lighthouse {
             out = TestTasks.executeCommand(OSCommand.USE_PATH + "lighthouse", 5, null, "--help");
             return out.contains("--port");
         } catch (ScenarioException e) {
-            e.getMessage();
             return false;
         }
     }
