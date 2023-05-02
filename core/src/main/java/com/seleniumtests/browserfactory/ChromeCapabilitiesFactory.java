@@ -21,11 +21,14 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.seleniumtests.driver.BrowserType;
@@ -129,6 +132,18 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
         if (webDriverConfig.getMode() == DriverMode.LOCAL) {
         	setLogging();
         }
+        
+        /*// performance logging
+        Map<String, Object> perfLogPrefs = new HashMap<>();
+        //perfLogPrefs.put("traceCategories", "browser,devtools.timeline,devtools");
+        perfLogPrefs.put("enableNetwork", true);
+        perfLogPrefs.put("enablePage", false);
+        options.setExperimentalOption("perfLoggingPrefs", perfLogPrefs);
+
+        // For Enabling performance Logs for WebPageTest
+        LoggingPreferences logPrefs = new LoggingPreferences();
+        logPrefs.enable(LogType.PERFORMANCE, Level.ALL);
+        options.setCapability("goog:loggingPrefs", logPrefs);*/
         
         // extensions
         List<BrowserExtension> extensions = BrowserExtension.getExtensions(webDriverConfig.getTestContext().getConfiguration());
