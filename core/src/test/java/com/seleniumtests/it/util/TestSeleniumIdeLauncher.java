@@ -5,6 +5,7 @@ import static org.mockito.Mockito.verify;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.Inet4Address;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -13,7 +14,6 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.apache.logging.log4j.core.Appender;
 import org.mockito.ArgumentMatchers;
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -21,11 +21,11 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.lang.reflect.Field;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.it.driver.support.server.WebServer;
 import com.seleniumtests.it.reporter.ReporterTest;
 import com.seleniumtests.util.ide.SeleniumIdeLauncher;
@@ -265,13 +265,18 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTestError.java").toFile();
 			FileUtils.copyFile(tmpSuiteFile, suiteFile);
 			
-			seleniumIde.executeScripts(Arrays.asList(suiteFile.getAbsolutePath()));
+			try {
+				seleniumIde.executeScripts(Arrays.asList(suiteFile.getAbsolutePath()));
+				Assert.assertFalse(true, "Exception should have been raised");
+			} catch (ScenarioException e) {
+				
+			}
 			
 			verify(logger).error(ArgumentMatchers.contains("invalid code, one element is missing : "));
 			verify(logger).error(ArgumentMatchers.contains("Parse error."));
 
 
-			} finally {
+		} finally {
 			System.clearProperty(SeleniumTestsContext.BROWSER);
 			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
 			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);

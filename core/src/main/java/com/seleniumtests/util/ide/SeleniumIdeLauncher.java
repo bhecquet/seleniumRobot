@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.apache.velocity.exception.ParseErrorException;
 import org.testng.TestNG;
 import org.testng.xml.XmlClass;
 import org.testng.xml.XmlInclude;
@@ -23,6 +24,7 @@ import com.beust.jcommander.Parameter;
 import com.github.javaparser.ParseProblemException;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 import net.openhft.compiler.CompilerUtils;
@@ -68,9 +70,10 @@ public class SeleniumIdeLauncher {
             executeGeneratedClasses(classCodes);
         } catch (ParseProblemException e) {
 	        String parse = e.getMessage().split("Problem")[0];
-                logger.error("--------------------------------------------------------------------------------------------------------------------------------------------------------");
-                logger.error("invalid code, one element is missing : " + parse);
-                logger.error("--------------------------------------------------------------------------------------------------------------------------------------------------------");
+            logger.error("--------------------------------------------------------------------------------------------------------------------------------------------------------");
+            logger.error("invalid code, one element is missing : " + parse);
+            logger.error("--------------------------------------------------------------------------------------------------------------------------------------------------------");
+            throw new ScenarioException("invalid java code");
         }
     }
 
