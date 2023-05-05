@@ -1742,6 +1742,9 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 
 	public void waitFor(int timeout, ExpectedCondition<?> condition) {
 
+		// refresh driver
+		setDriver(updateDriver());
+		
 		try {
 			setImplicitWaitTimeout(510, TimeUnit.MILLISECONDS);
 			Clock clock = Clock.systemUTC();
@@ -1749,7 +1752,8 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 
 			while (end.isAfter(clock.instant())) {
 				try {
-					new WebDriverWait(getDriver(), timeout).ignoring(ConfigurationException.class, ScenarioException.class)
+					new WebDriverWait(getDriver(), timeout)
+							.ignoring(ConfigurationException.class, ScenarioException.class)
 							.until(condition);
 					return;
 				} catch (TimeoutException e) {

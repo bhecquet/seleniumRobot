@@ -706,7 +706,61 @@ public class TestHtmlElement extends MockitoTest {
 		Assert.assertFalse(exceptionRaised);
 		Assert.assertTrue(LocalDateTime.now().minusSeconds(3).isBefore(start));
 	}
+
+	@Test(groups = { "ut" })
+	public void testWaitForVisibilityFound() throws Exception {
+		HtmlElement present = new HtmlElement("element", By.id("present"));
+		when(driver.findElement(By.id("present"))).thenReturn(el);
+		LocalDateTime start = LocalDateTime.now();
+		
+		boolean exceptionRaised = false;
+		try {
+			present.waitForVisibility(5);
+		} catch (TimeoutException e) {
+			exceptionRaised = true;
+		}
+		Assert.assertFalse(exceptionRaised);
+		Assert.assertTrue(LocalDateTime.now().minusSeconds(5).isBefore(start));
+	}
 	
+
+	@Test(groups = { "ut" })
+	public void testWaitForVisibilityNotFound() throws Exception {
+		HtmlElement elNotPresent = new HtmlElement("element", By.id("notPresent"));
+		when(driver.findElement(By.id("notPresent"))).thenThrow(new NoSuchElementException("Unable to locate element with ID: 'notPresent'"));
+		LocalDateTime start = LocalDateTime.now();
+		
+		boolean exceptionRaised = false;
+		try {
+			elNotPresent.waitForVisibility(5);
+		} catch (TimeoutException e) {
+			exceptionRaised = true;
+		}
+		Assert.assertTrue(exceptionRaised);
+		Assert.assertTrue(LocalDateTime.now().minusSeconds(5).isAfter(start));
+	}
+	
+
+	/**
+	 * Check that element is visible with frame
+	 * @throws Exception
+	 */
+	@Test(groups = { "ut" })
+	public void testWaitForVisibilityFoundWithFrame() throws Exception {
+		HtmlElement present = new HtmlElement("element", By.id("present"), frame);
+		when(driver.findElement(By.id("present"))).thenReturn(el);
+		LocalDateTime start = LocalDateTime.now();
+		
+		boolean exceptionRaised = false;
+		try {
+			present.waitForVisibility(5);
+		} catch (TimeoutException e) {
+			exceptionRaised = true;
+		}
+		verify(driver.switchTo()).frame(any(WebElement.class));
+		Assert.assertFalse(exceptionRaised);
+		Assert.assertTrue(LocalDateTime.now().minusSeconds(5).isBefore(start));
+	}
 	
 	
 	
