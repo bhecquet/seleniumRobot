@@ -39,6 +39,9 @@ import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.reporter.logger.Snapshot;
 
+import kong.unirest.json.JSONArray;
+import kong.unirest.json.JSONObject;
+
 public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 
 	SeleniumRobotSnapshotServerConnector connector;
@@ -122,6 +125,30 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		Assert.assertEquals(testSteps.get(0), testStepId.toString());
 	}
 	
+	@Test(groups={"it"})
+	public Integer testCreateStepReferenceSnapshot() throws IOException {
+		Integer sessionId = connector.createSession("Session1");
+		Integer testCaseId = connector.createTestCase("Test 2");
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 2");
+		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
+		Integer stepResultId = connector.recordStepResult(true, "logs", 1, sessionId, testCaseInSessionId, testStepId);
+		
+		File image = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "img.png").toFile();
+		image.deleteOnExit();
+		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/images/ffLogoConcat.png"), image);
+		ScreenShot screenshot = new ScreenShot();
+		screenshot.setImagePath(image.getName());
+		Snapshot snapshot = new Snapshot(screenshot, "img", SnapshotCheckType.TRUE);
+		
+		connector.createStepReferenceSnapshot(snapshot, stepResultId);
+		
+		File referenceImage = connector.getReferenceSnapshot(stepResultId);
+		Assert.assertNotNull(referenceImage);
+		Assert.assertEquals(FileUtils.sizeOf(referenceImage), 5892);
+		
+		return stepResultId;
+	}
+	
 	/**
 	 * create a snapshot
 	 * @throws IOException 
@@ -175,7 +202,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	 * @throws IOException 
 	 */
 	@Test(groups={"it"})
-	public void testRecordTestResult() throws IOException {
+	public void testRecordStepResult() throws IOException {
 		Integer sessionId = connector.createSession("Session1");
 		Integer testCaseId = connector.createTestCase("Test 2");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 2");
@@ -184,6 +211,50 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		
 		Assert.assertNotNull(stepResultId);
 	}
+	
+	@Test(groups={"it"})
+	public void testDetectErrorInPicture() throws IOException {
+		
+		File image = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "img.png").toFile();
+		image.deleteOnExit();
+		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/imageFieldDetection/login-page-error.jpg"), image);
+		ScreenShot screenshot = new ScreenShot();
+		screenshot.setImagePath(image.getName());
+		Snapshot snapshot = new Snapshot(screenshot, "img", SnapshotCheckType.FALSE);
+		JSONObject detectionData = connector.detectErrorInPicture(snapshot);
+		JSONArray errors = detectionData.getJSONArray("fields");
+		
+		Assert.assertEquals(errors.length(), 1);
+		Assert.assertEquals(errors.getJSONObject(0).getString("text"), "Votre email/mot de passe est incorrect");
+	}
+	
+	@Test(groups={"it"})
+	public void testDetectFieldsInPicture() throws IOException {
+		
+		File image = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "img.png").toFile();
+		image.deleteOnExit();
+		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/imageFieldDetection/browserCapture.png"), image);
+		ScreenShot screenshot = new ScreenShot();
+		screenshot.setImagePath(image.getName());
+		Snapshot snapshot = new Snapshot(screenshot, "img", SnapshotCheckType.FALSE);
+		JSONObject detectionData = connector.detectFieldsInPicture(snapshot);
+		JSONArray fields = detectionData.getJSONArray("fields");
+		
+		Assert.assertEquals(fields.length(), 50);
+		Assert.assertEquals(fields.getJSONObject(0).getString("text"), "Test delay");
+	}
+	
+	@Test(groups={"it"})
+	public void testGetStepReferenceDetectFieldInformation() throws IOException {
+		Integer stepResultId = testCreateStepReferenceSnapshot();
+		JSONObject detectionData = connector.getStepReferenceDetectFieldInformation(stepResultId, "afcc45");
+		
+		// no field found because the used picture does not contain any
+		// we only check no error occurs calling the service
+		Assert.assertNull(detectionData.get("error"));
+		
+	}
+	
 	
 	
 }

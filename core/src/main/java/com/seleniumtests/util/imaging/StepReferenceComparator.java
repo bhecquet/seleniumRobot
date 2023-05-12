@@ -1,29 +1,29 @@
 package com.seleniumtests.util.imaging;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.seleniumtests.connectors.selenium.fielddetector.Field;
-import com.seleniumtests.connectors.selenium.fielddetector.ImageFieldDetector;
 import com.seleniumtests.connectors.selenium.fielddetector.Label;
-import com.seleniumtests.connectors.selenium.fielddetector.ImageFieldDetector.FieldType;
 
 /**
- * A class that helps comparing 2 pictures that may be reference for a test step
- * @author S047432
+ * A class that helps comparing fields and labeld extracted from 2 pictures
  *
  */
 public class StepReferenceComparator {
 
-	private File stepSnapshot;
-	private File referenceSnapshot;
+	private List<Field> stepSnapshotFields;
+	private List<Label> stepSnapshotLabels;
+	private List<Field> referenceSnapshotFields;
+	private List<Label> referenceSnapshotLabels;
 	private List<Label> missingLabels = new ArrayList<>();
 	private List<Field> missingFields = new ArrayList<>();
 	
-	public StepReferenceComparator(File stepSnapshot, File referenceSnapshot) {
-		this.stepSnapshot = stepSnapshot;
-		this.referenceSnapshot = referenceSnapshot;
+	public StepReferenceComparator(List<Field> stepSnapshotFields, List<Label> stepSnapshotLabels, List<Field> referenceSnapshotFields, List<Label> referenceSnapshotLabels) {
+		this.stepSnapshotFields = stepSnapshotFields;
+		this.stepSnapshotLabels = stepSnapshotLabels;
+		this.referenceSnapshotFields = referenceSnapshotFields;
+		this.referenceSnapshotLabels = referenceSnapshotLabels;
 	}
 	
 	/**
@@ -32,14 +32,6 @@ public class StepReferenceComparator {
 	 * @return the ratio (100 means best matching, 0 no matching)
 	 */
 	public int compare() {
-
-		ImageFieldDetector stepSnapshotImageFieldDetector = new ImageFieldDetector(stepSnapshot, 1, FieldType.ALL_FORM_FIELDS);
-		List<Field> stepSnapshotFields = stepSnapshotImageFieldDetector.detectFields();
-		List<Label> stepSnapshotLabels = stepSnapshotImageFieldDetector.detectLabels();
-		
-		ImageFieldDetector referenceSnapshotImageFieldDetector = new ImageFieldDetector(referenceSnapshot, 1, FieldType.ALL_FORM_FIELDS);
-		List<Field> referenceSnapshotFields = referenceSnapshotImageFieldDetector.detectFields();
-		List<Label> referenceSnapshotLabels = referenceSnapshotImageFieldDetector.detectLabels();
 		
 		int totalLabels = 0;
 		int matchedLabels = 0;

@@ -17,12 +17,12 @@
  */
 package com.seleniumtests.ut.connectors.selenium;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,6 +58,8 @@ import kong.unirest.HttpRequestWithBody;
 import kong.unirest.MultipartBody;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
+import kong.unirest.json.JSONArray;
+import kong.unirest.json.JSONObject;
 
 @PrepareForTest({Unirest.class})
 public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
@@ -1053,7 +1055,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	
 	
 	@Test(groups= {"ut"})
-	public void testCreateStepReferenceSnapshot() throws UnirestException {
+	public Integer testCreateStepReferenceSnapshot() throws UnirestException {
 		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
 		
 		Integer sessionId = connector.createSession("Session1");
@@ -1065,6 +1067,8 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		
 		// check prerequisites has been created
 		Assert.assertEquals((int)sessionId, 13);
+		
+		return stepResultId;
 	}
 	
 	/**
@@ -1207,6 +1211,141 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL));
 		
 	}
+	
+
+	@Test(groups={"it"})
+	public void testDetectFieldsInPicture() throws IOException {
+		
+		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
+		JSONObject detectionData = connector.detectFieldsInPicture(snapshot);
+		JSONArray fields = detectionData.getJSONArray("fields");
+		
+		Assert.assertEquals(fields.length(), 2);
+		Assert.assertEquals(fields.getJSONObject(0).getString("class_name"), "field_with_label");
+		Assert.assertEquals(detectionData.getString("fileName"), "img.png");
+	}
+	
+	/**
+	 * Detection fails (e.g: feautre not activated on server, timeout, ...)
+	 * @throws IOException
+	 */
+	@Test(groups={"it"})
+	public void testDetectFieldsInPictureServerInactive() throws IOException {
+		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
+
+		connector.detectFieldsInPicture(snapshot);
+		PowerMockito.verifyStatic(Unirest.class, never());
+		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.DETECT_API_URL));
+	}
+	
+	/**
+	 * Detection fails (e.g: feautre not activated on server, timeout, ...)
+	 * @throws IOException
+	 */
+	@Test(groups={"it"}, expectedExceptions = SeleniumRobotServerException.class, expectedExceptionsMessageRegExp = "field detection failed")
+	public void testDetectFieldsInPictureInError() throws IOException {
+		
+		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
+		createServerMock("POST", SeleniumRobotSnapshotServerConnector.DETECT_API_URL, 500, "{'error': 'Field detector disabled'}", "body");	
+		
+		connector.detectFieldsInPicture(snapshot);
+	}
+	@Test(groups={"it"}, expectedExceptions = SeleniumRobotServerException.class)
+	public void testDetectFieldsInPictureInError2() throws IOException {
+
+		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
+		HttpRequest<?> req = createServerMock("POST", SeleniumRobotSnapshotServerConnector.DETECT_API_URL, 500, "{'id': '9'}", "body");	
+		when(req.asString()).thenThrow(UnirestException.class);
+		
+		connector.detectFieldsInPicture(snapshot);
+	}
+	
+	/**
+	 * Provided image does not exist
+	 * @throws IOException
+	 */
+	@Test(groups={"it"}, expectedExceptions = SeleniumRobotServerException.class, expectedExceptionsMessageRegExp = "Provided snapshot does not exist")
+	public void testDetectFieldsInPictureInvalidPicture() throws IOException {
+		
+		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
+		connector.detectFieldsInPicture(null);
+	}
+	@Test(groups={"it"}, expectedExceptions = SeleniumRobotServerException.class, expectedExceptionsMessageRegExp = "Provided snapshot does not exist")
+	public void testDetectFieldsInPictureInvalidPicture2() throws IOException {
+		
+		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
+		when(snapshot.getScreenshot()).thenReturn(null);
+		connector.detectFieldsInPicture(snapshot);
+	}
+	@Test(groups={"it"}, expectedExceptions = SeleniumRobotServerException.class, expectedExceptionsMessageRegExp = "Provided snapshot does not exist")
+	public void testDetectFieldsInPictureInvalidPicture3() throws IOException {
+		
+		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
+		when(screenshot.getFullImagePath()).thenReturn(null);
+		connector.detectFieldsInPicture(snapshot);
+	}
+	
+	
+
+	@Test(groups={"it"})
+	public void testDetectErrorInPicture() throws IOException {
+		// same as testDetectFieldInPicture()
+	}
+	
+	@Test(groups={"it"})
+	public void testGetStepReferenceDetectFieldInformation() throws IOException {
+		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
+
+		JSONObject detectionData = connector.getStepReferenceDetectFieldInformation(1, "afcc45");
+		JSONArray fields = detectionData.getJSONArray("fields");
+		
+		Assert.assertEquals(fields.length(), 2);
+		Assert.assertEquals(fields.getJSONObject(0).getString("class_name"), "field_with_label");
+		
+		Assert.assertEquals(detectionData.getString("fileName"), "img.png");
+	}
+	
+	@Test(groups={"it"}, expectedExceptions = SeleniumRobotServerException.class, expectedExceptionsMessageRegExp = "Cannot get field detector information for reference snapshot")
+	public void testGetStepReferenceDetectFieldInformationInError() throws IOException {
+		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
+		createServerMock("GET", SeleniumRobotSnapshotServerConnector.DETECT_API_URL, 404, "no field detection information", "body");
+		
+		connector.getStepReferenceDetectFieldInformation(1, "afcc45");
+	}
+	
+	@Test(groups={"it"}, expectedExceptions = SeleniumRobotServerException.class, expectedExceptionsMessageRegExp = "Cannot get field detector information for reference snapshot")
+	public void testGetStepReferenceDetectFieldInformationInError2() throws IOException {
+		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
+		HttpRequest<?> req = createServerMock("GET", SeleniumRobotSnapshotServerConnector.DETECT_API_URL, 200, "no field detection information", "body");
+		when(req.asString()).thenThrow(UnirestException.class);
+		
+		connector.getStepReferenceDetectFieldInformation(1, "afcc45");
+	}
+	
+	@Test(groups={"it"}, expectedExceptions = ConfigurationException.class)
+	public void testGetStepReferenceDetectFieldInformationNullVersion() throws IOException {
+		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
+		
+		connector.getStepReferenceDetectFieldInformation(1, null);
+	}
+	@Test(groups={"it"}, expectedExceptions = ConfigurationException.class)
+	public void testGetStepReferenceDetectFieldInformationNullStepResult() throws IOException {
+		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
+
+		connector.getStepReferenceDetectFieldInformation(null, "afcc45");
+	}
+	
+	@Test(groups={"it"})
+	public void testGetStepReferenceDetectFieldInformationInactive() throws IOException {
+		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
+		
+		connector.getStepReferenceDetectFieldInformation(1, "afcc45");
+		
+		PowerMockito.verifyStatic(Unirest.class, never());
+		Unirest.get(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.DETECT_API_URL));
+	}
+	
+	
 	
 	
 

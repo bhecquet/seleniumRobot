@@ -61,6 +61,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	public static final String EXCLUDE_API_URL = "/snapshot/api/exclude/";
 	public static final String SNAPSHOT_API_URL = "/snapshot/upload/image";
 	public static final String STEP_REFERENCE_API_URL = "/snapshot/stepReference/";
+	public static final String DETECT_API_URL = "/snapshot/detect/";
 	private String sessionUUID;
 	private static SeleniumRobotSnapshotServerConnector snapshotConnector;
 
@@ -610,6 +611,149 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			}
 		} else {
 			return ITestResult.SKIP;
+		}
+	}
+	
+	private JSONObject detectInPicture(Snapshot snapshot, String task) {
+		
+		if (!active) {
+			return null;
+		}
+
+		if (snapshot == null || snapshot.getScreenshot() == null || snapshot.getScreenshot().getFullImagePath() == null) {
+			throw new SeleniumRobotServerException("Provided snapshot does not exist");
+		}
+		
+		try {
+			File pictureFile = new File(snapshot.getScreenshot().getFullImagePath());
+			
+			return getJSonResponse(buildPostRequest(url + DETECT_API_URL)
+					.field("task", task)
+					.field(FIELD_IMAGE, pictureFile)
+					
+					);
+			
+			
+		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
+			throw new SeleniumRobotServerException(String.format("%s detection failed", task), e);
+		}
+	}
+	
+	/**
+	 * Method that sends a picture to seleniumRobot server "/detect" endpoint
+	 * Server will try to detect error messages in the provided picture and return a JSON of this type
+	 "<image_name>": {
+        "fields": [
+            {
+                "class_id": 2,
+                "top": 216,
+                "bottom": 239,
+                "left": 277,
+                "right": 342,
+                "class_name": "error_field",
+                "text": null,
+                "related_field": null,
+                "with_label": false,
+                "width": 65,
+                "height": 23
+            },
+        [...]
+        ],
+        "labels": [
+            {
+                "top": 3,
+                "left": 16,
+                "width": 72,
+                "height": 16,
+                "text": "Join Us",
+                "right": 88,
+                "bottom": 19
+            },
+        [...]
+        ]
+    },
+    "error": null,
+    "version": "afcc45"
+}
+	 * @param snapshot
+	 * @return
+	 */
+	public JSONObject detectErrorInPicture(Snapshot snapshot) {
+		return detectInPicture(snapshot, "error");
+	}
+	
+	/**
+	 * Method that sends a picture to seleniumRobot server "/detect" endpoint
+	 * Server will try to detect fields in the provided picture and return a JSON of this type
+	 "<image_name>": {
+        "fields": [
+            {
+                "class_id": 2,
+                "top": 216,
+                "bottom": 239,
+                "left": 277,
+                "right": 342,
+                "class_name": "button",
+                "text": null,
+                "related_field": null,
+                "with_label": false,
+                "width": 65,
+                "height": 23
+            },
+        [...]
+        ],
+        "labels": [
+            {
+                "top": 3,
+                "left": 16,
+                "width": 72,
+                "height": 16,
+                "text": "Join Us",
+                "right": 88,
+                "bottom": 19
+            },
+        [...]
+        ]
+    },
+    "error": null,
+    "version": "afcc45"
+}
+	 * @param snapshot
+	 * @return
+	 */
+	public JSONObject detectFieldsInPicture(Snapshot snapshot) {
+		return detectInPicture(snapshot, "field");
+	}
+	
+	/**
+	 * Returns the detected information of a step reference, if it exists
+	 * @param stepResultId		the step result id
+	 * @param computeVersion	the "image-field-detector" version used to compute field information
+	 * 							It's used to check that the information returned by the reference has been computed with the same version of the model
+	 * @return
+	 */
+	public JSONObject getStepReferenceDetectFieldInformation(Integer stepResultId, String computeVersion) {
+		
+		if (!active) {
+			return null;
+		}
+		
+		if (computeVersion == null) {
+			throw new ConfigurationException("computeVersion is mandatory: version of the model to use to compute fields");
+		}
+
+		checkStepResult(stepResultId);
+		
+		try {
+			
+			return getJSonResponse(buildGetRequest(url + DETECT_API_URL)
+					.queryString("stepResultId", stepResultId)
+					.queryString("version", computeVersion)
+					.queryString("output", "json")
+					);
+			
+		} catch (UnirestException | SeleniumRobotServerException e) {
+			throw new SeleniumRobotServerException("Cannot get field detector information for reference snapshot", e);
 		}
 	}
 

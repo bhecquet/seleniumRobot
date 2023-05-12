@@ -27,6 +27,9 @@ import com.seleniumtests.util.imaging.ImageProcessor;
 import com.seleniumtests.util.imaging.StepReferenceComparator;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
+import kong.unirest.json.JSONException;
+import kong.unirest.json.JSONObject;
+
 /**
  * Class that may help the tester to know what if the cause of test failure
  * - we were not on the right page when performing the last step
@@ -73,8 +76,8 @@ public class ErrorCauseFinder {
 		
 		List<ErrorCause> causes = new ArrayList<>();
 		
-		causes.addAll(findErrorInLastStepSnapshots());
-		causes.addAll(compareStepInErrorWithReference());
+		String version = findErrorInLastStepSnapshots(causes);
+		causes.addAll(compareStepInErrorWithReference(version));
 		
 		logger.info(String.format("Found %d causes of error", causes.size()));
 		
@@ -84,9 +87,11 @@ public class ErrorCauseFinder {
 	/**
 	 * Compare the failed step with it's reference that can be found on seleniumRobot server
 	 * If reference cannot be found, skip this step
+	 * 
+	 * @param	version of the model used to compute fields / errors
 	 * @return
 	 */
-	public List<ErrorCause> compareStepInErrorWithReference() {
+	public List<ErrorCause> compareStepInErrorWithReference(String version) {
 		logger.info("Searching causes: comparing with references");
 		List<ErrorCause> causes = new ArrayList<>();
 		
@@ -107,26 +112,25 @@ public class ErrorCauseFinder {
 			if (Boolean.TRUE.equals(testStep.getFailed()) && !(testStep.getActionException() instanceof AssertionError) && stepResultId != null) {
 				
 				try {
+					// only keep snapshot that will serve as reference
 					Snapshot stepSnapshot = testStep.getSnapshots()
 						.stream()
 						.filter(s -> s.getCheckSnapshot().recordSnapshotOnServerForReference())
 						.collect(Collectors.toList()).get(0);
-					File stepSnapshotFile = new File(stepSnapshot.getScreenshot().getFullImagePath());
-					
 					File referenceSnapshot = SeleniumRobotSnapshotServerConnector.getInstance().getReferenceSnapshot(stepResultId);
-					if (referenceSnapshot == null) {
-						continue;
-					}
-					
+
+					JSONObject stepSnapshotDetectionData = SeleniumRobotSnapshotServerConnector.getInstance().detectFieldsInPicture(stepSnapshot);
+					JSONObject referenceSnapshotDetectionData = SeleniumRobotSnapshotServerConnector.getInstance().getStepReferenceDetectFieldInformation(stepResultId, version);
+
 					// perform a match between the picture of this step and the reference stored on server
 					// We look at presence, position and text of each field
 					List<Label> missingLabels = new ArrayList<>();
 					List<Field> missingFields = new ArrayList<>();
-					int matching = compareReferenceToStepSnapshot(stepSnapshotFile, referenceSnapshot, missingLabels, missingFields);
+					int matching = compareReferenceToStepSnapshot(stepSnapshotDetectionData, referenceSnapshotDetectionData, missingLabels, missingFields);
 					
 					// bad matching: the reference does not match at all the current step, we will check with other reference steps
 					if (matching < 50) {
-						searchMatchingInPreviousStep(testStepManager, testStep, stepSnapshotFile, causes);
+						searchMatchingInPreviousStep(testStepManager, testStep, stepSnapshotDetectionData, causes, version);
 						
 					// middle matching: we may be on the right web page but the page has changed (some fields appeared or disappeared)
 					// or the text changed slightly. This could mean application changed
@@ -142,6 +146,8 @@ public class ErrorCauseFinder {
 						
 						causes.add(new ErrorCause(ErrorType.APPLICATION_CHANGED, formatApplicationChangedDescription(missingLabels, missingFields), testStep));
 					}
+					
+					// TODO: faire quelque chose de "referenceSnapshot"
 					
 					// else, very good matching: we are on the same web page, error does not come from there
 					
@@ -188,7 +194,7 @@ public class ErrorCauseFinder {
 	 * @param stepSnapshotFile		the snapshot taken at the beginning of the step (which will be compared to references
 	 * @param errorCauses			the list of error causes
 	 */
-	private void searchMatchingInPreviousStep(TestStepManager testStepManager, TestStep testStep, File stepSnapshotFile, List<ErrorCause> errorCauses) {
+	private void searchMatchingInPreviousStep(TestStepManager testStepManager, TestStep testStep, JSONObject stepSnapshotDetectionData, List<ErrorCause> errorCauses, String version) {
 		
 
 		// read the list in reverse order to find the best matching reference
@@ -198,12 +204,9 @@ public class ErrorCauseFinder {
 		for (TestStep testStep2: testStepsSubList) {
 			if (testStep2.getStepResultId() != null) {
 				try {
-					File referenceSnapshot = SeleniumRobotSnapshotServerConnector.getInstance().getReferenceSnapshot(testStep2.getStepResultId());
+					JSONObject referenceSnapshotDetectionData = SeleniumRobotSnapshotServerConnector.getInstance().getStepReferenceDetectFieldInformation(testStep2.getStepResultId(), version);
 				
-					if (referenceSnapshot == null) {
-						continue;
-					}
-					int matching = compareReferenceToStepSnapshot(stepSnapshotFile, referenceSnapshot);
+					int matching = compareReferenceToStepSnapshot(stepSnapshotDetectionData, referenceSnapshotDetectionData);
 					
 					if (matching > 80) {
 						errorCauses.add(new ErrorCause(ErrorType.SELENIUM_ERROR, String.format("Wrong page found, we are on the page of step '%s'", testStep2.getName()), testStep));
@@ -220,15 +223,21 @@ public class ErrorCauseFinder {
 	
 	/**
 	 * Compare the reference snapshot for this step to the version of the current test
-	 * @param stepSnapshot
-	 * @param referenceSnapshot
+	 * @param stepSnapshotDetectionData			Detection data get from seleniumRobot server for step snapshot
+	 * @param referenceSnapshotDetectionData    Detection data get from seleniumRobot server for reference snapshot
 	 * @return an integer representing the matching (0: no matching, 100 very good matching) 
 	 */
-	private int compareReferenceToStepSnapshot(File stepSnapshot, File referenceSnapshot) {
-		return compareReferenceToStepSnapshot(stepSnapshot, referenceSnapshot, new ArrayList<>(), new ArrayList<>());
+	private int compareReferenceToStepSnapshot(JSONObject stepSnapshotDetectionData, JSONObject referenceSnapshotDetectionData) {
+		return compareReferenceToStepSnapshot(stepSnapshotDetectionData, referenceSnapshotDetectionData, new ArrayList<>(), new ArrayList<>());
 	}
-	private int compareReferenceToStepSnapshot(File stepSnapshot, File referenceSnapshot, List<Label> missingLabels, List<Field> missingFields) {
-		StepReferenceComparator stepReferenceComparator = new StepReferenceComparator(stepSnapshot, referenceSnapshot);
+	private int compareReferenceToStepSnapshot(JSONObject stepSnapshotDetectionData, JSONObject referenceSnapshotDetectionData, List<Label> missingLabels, List<Field> missingFields) {
+		
+		List<Field> stepSnapshotFields = getFieldsFromDetectionData(stepSnapshotDetectionData);
+		List<Label> stepSnapshotLabels = getLabelsFromDetectionData(stepSnapshotDetectionData);
+		List<Field> referenceSnapshotFields = getFieldsFromDetectionData(referenceSnapshotDetectionData);
+		List<Label> referenceSnapshotLabels = getLabelsFromDetectionData(referenceSnapshotDetectionData);
+		
+		StepReferenceComparator stepReferenceComparator = new StepReferenceComparator(stepSnapshotFields, stepSnapshotLabels, referenceSnapshotFields, referenceSnapshotLabels);
 		int matching = stepReferenceComparator.compare();
 		
 		missingLabels.addAll(stepReferenceComparator.getMissingLabels());
@@ -239,17 +248,16 @@ public class ErrorCauseFinder {
 	
 	/**
 	 * Search in snapshots of the last step if there are any displayed errors (error messages or fields in error)
-	 * @return
+	 * @return	the detection model version
 	 */
-	public List<ErrorCause> findErrorInLastStepSnapshots() {
+	public String findErrorInLastStepSnapshots(List<ErrorCause> causes) {
 		
 		logger.info("Searching causes: find errors in last snapshot");
 		
-		List<ErrorCause> causes = new ArrayList<>();
-		
 		// do not seearch again
 		if (TestNGResultUtils.isErrorCauseSearchedInLastStep(testResult)) {
-			return causes; 
+			logger.warn("Field detector model version will be empty string");
+			return ""; 
 		}
 		
 
@@ -261,13 +269,17 @@ public class ErrorCauseFinder {
 			}
 		}
 		
+		String version = "";
+		
 		if (lastTestStep != null) {
 			for (Snapshot snapshot: lastTestStep.getSnapshots()) {
 				try {
-					ImageFieldDetector imageFieldDetector = new ImageFieldDetector(new File(snapshot.getScreenshot().getFullImagePath()), 1, FieldType.ERROR_MESSAGES_AND_FIELDS);
-					List<Field> fields = imageFieldDetector.detectFields();
-					List<Label> labels = imageFieldDetector.detectLabels();
-					
+					JSONObject detectionData = SeleniumRobotSnapshotServerConnector.getInstance().detectErrorInPicture(snapshot);
+
+					List<Field> fields = getFieldsFromDetectionData(detectionData);
+					List<Label> labels = getLabelsFromDetectionData(detectionData);
+					version = detectionData.getString("version");
+
 					// are some text considered as error messages (mainly in red on page)
 					parseFields(causes, fields, labels, lastFailedStep);
 
@@ -276,16 +288,84 @@ public class ErrorCauseFinder {
 					
 				} catch (Exception e) {
 					logger.error("Error searching for errors in last snapshots: " + e.getMessage());
-					break;
 				}
 
 			}
 			TestNGResultUtils.setErrorCauseSearchedInLastStep(testResult, true);
 		}
 		
-		return causes;
+		return version;
 	}
+	
+	/**
+	 * From a JSONObject get from seleniumServer, returns the list of fields
+	 * 
+	 * {
+	"fields": [
+		{
+			"class_id": 4,
+			"top": 142,
+			"bottom": 166,
+			"left": 174,
+			"right": 210,
+			"class_name": "field_with_label",
+			"text": null,
+			"related_field": {
+				"class_id": 0,
+				"top": 142,
+				"bottom": 165,
+				"left": 175,
+				"right": 211,
+				"class_name": "field",
+				"text": null,
+				"related_field": null,
+				"with_label": false,
+				"width": 36,
+				"height": 23
+			},
+			"with_label": true,
+			"width": 36,
+			"height": 24
+		},
 
+	],
+	"labels": [
+		{
+			"top": 3,
+			"left": 16,
+			"width": 72,
+			"height": 16,
+			"text": "Join Us",
+			"right": 88,
+			"bottom": 19
+		},
+
+	]
+	"error": null,
+	"version": "afcc45"
+}
+	 * 
+	 * @param detectionData
+	 * @return
+	 */
+	private List<Field> getFieldsFromDetectionData(JSONObject detectionData) {
+		return ((List<JSONObject>)detectionData
+				.getJSONArray("fields")
+				.toList())
+				.stream()
+				.map(jsonField -> Field.fromJson(jsonField))
+				.collect(Collectors.toList());
+	}
+	private List<Label> getLabelsFromDetectionData(JSONObject detectionData) {
+		return ((List<JSONObject>)detectionData
+				.getJSONArray("labels")
+				.toList())
+				.stream()
+				.map(jsonField -> Label.fromJson(jsonField))
+				.collect(Collectors.toList());
+	}
+	
+	
 	/**
 	 * @param causes
 	 * @param labels
