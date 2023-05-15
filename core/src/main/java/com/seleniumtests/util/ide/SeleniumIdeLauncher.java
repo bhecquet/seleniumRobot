@@ -23,6 +23,7 @@ import com.beust.jcommander.Parameter;
 import com.github.javaparser.ParseProblemException;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 import net.openhft.compiler.CompilerUtils;
@@ -75,7 +76,7 @@ public class SeleniumIdeLauncher {
                 logger.error("--------------------------------------------------------------------------------------------------------------------------------------------------------");
                 logger.error("invalid code, one element is missing : " + parse);
                 logger.error("--------------------------------------------------------------------------------------------------------------------------------------------------------");
-            throw e;
+            throw new ScenarioException("invalid java code");
         }
 	}
 	

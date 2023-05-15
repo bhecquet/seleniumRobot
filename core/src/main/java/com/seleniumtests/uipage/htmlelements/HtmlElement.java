@@ -1644,10 +1644,13 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	}
     
     /**
-     * Wait element to present using Explicit Waits with timeout in seconds. This method is used for special element
-     * which needs long time to present.
-     * This method is replayed because it may fail if frame is not present at start. The replay is not done if TimeOutException raises (see ReplayAction class)
-     * @param timeout	timeout in seconds. Set a minimal value of 1 sec to avoid not searching for element
+	 * Wait element to present using Explicit Waits with timeout in seconds. This
+	 * method is used for special element which needs long time to present. This
+	 * method is replayed because it may fail if frame is not present at start. The
+	 * replay is not done if TimeOutException raises (see ReplayAction class)
+	 * 
+	 * @param timeout timeout in seconds. Set a minimal value of 1 sec to avoid not
+	 *                searching for element
      */
     @ReplayOnError
     public void waitForPresent(int timeout) {
@@ -1678,6 +1681,9 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     
     public void waitFor(int timeout, ExpectedCondition<?> condition) {
     	
+		// refresh driver
+		setDriver(updateDriver());
+		
     	try {
     		setImplicitWaitTimeout(510, ChronoUnit.MILLIS);
 	    	Clock clock = Clock.systemUTC();
@@ -1685,7 +1691,9 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	    	
 	    	while (end.isAfter(clock.instant())) {
 	    		try {
-	    			new WebDriverWait(getDriver(), Duration.ofSeconds(timeout)).ignoring(ConfigurationException.class, ScenarioException.class).until(condition);
+	    			new WebDriverWait(getDriver(), Duration.ofSeconds(timeout))
+							.ignoring(ConfigurationException.class, ScenarioException.class)
+							.until(condition);
 		    		return;
 	    		} catch (TimeoutException e) {
 	    			// nothing to do

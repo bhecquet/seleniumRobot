@@ -46,6 +46,7 @@
 - [25 Execute UFT test](#25-execute-uft-test)
 - [26 Read XLSX file](#26-read-xlsx-file)
 - [27 Perform accessibility testing (WCAG) using Axe-core](#27-perform-accessibility-testing-wcag-using-axe-core)
+- [28 Generate One-time password](#28-generate-one-time-password)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -755,3 +756,14 @@ Results results = WcagChecker.analyze(driver, myElement1, myElement2);
 
 If you do nothing else, the text report will be available in HTML report and number of violations will be provided as warning
 But, you can also to some asserts on results object
+
+### 28 Generate One-time password ###
+
+For tests that need two factor authentication (like google authenticator), you can use
+
+```
+String code = Totp.generateCode("<your secret key>");
+```
+
+Secret key can be get as text from your login screen
+For now, only 6 character length code are provided

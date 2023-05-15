@@ -27,6 +27,7 @@ import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.it.driver.support.server.WebServer;
 import com.seleniumtests.it.reporter.ReporterTest;
 import com.seleniumtests.util.FileUtility;
@@ -314,14 +315,14 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			FileUtils.copyFile(tmpSuiteFile, suiteFile);
 			
 			try {
-				seleniumIde.executeScripts(Arrays.asList(suiteFile.getAbsolutePath()), 1);
-				Assert.fail("ClassNotFoundException expected");
-			} catch (ClassNotFoundException e) {
+				seleniumIde.executeScripts(Arrays.asList(suiteFile.getAbsolutePath()));
+				Assert.assertFalse(true, "Exception should have been raised");
+			} catch (ScenarioException e) {
 				
 			}
 			
 			verify(logger).error(ArgumentMatchers.contains("invalid code, one element is missing : "));
-			verify(logger).error(ArgumentMatchers.contains("com.infotel.selenium.ide.MainPageTestErrorPage"));
+			verify(logger).error(ArgumentMatchers.contains("Parse error."));
 
 
 		} finally {

@@ -71,8 +71,7 @@ qtApp.Visible = False ' Make the QuickTest application not visible
 '' Set QuickTest run options
 qtApp.Options.Run.RunMode = "Normal"
 qtApp.Options.Run.ViewResults = False
-
-
+qtApp.Options.Run.ReportFormat = "RRV"
 
 ' Open the test in read-only mode
 If Wscript.Arguments.Named.Exists("load") Then
