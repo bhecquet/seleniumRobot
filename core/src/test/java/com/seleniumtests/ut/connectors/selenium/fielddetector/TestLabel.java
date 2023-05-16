@@ -418,5 +418,48 @@ public class TestLabel extends GenericTest {
 		Label l2 = new Label(55, 150, 0, 20, "fooba");
 		Assert.assertFalse(l1.match(l2));
 	}
+	
+
+	@Test(groups= {"ut"})
+	public void testEquals() {
+		Label f1 = new Label(0, 100, 0, 20, "foobar");
+		Label f2 = new Label(0, 100, 0, 20, "foobar");
+		Assert.assertEquals(f1, f2);
+	}
+	
+	@Test(groups= {"ut"})
+	public void testEqualsDifferentText() {
+		Label f1 = new Label(0, 100, 0, 20, "foobar");
+		Label f2 = new Label(0, 100, 0, 20, "foobr");
+		Assert.assertNotEquals(f1, f2);
+	}
+	
+	@Test(groups= {"ut"})
+	public void testEqualsDifferentPosition() {
+		Label f1 = new Label(1, 100, 0, 20, "foobar");
+		Label f2 = new Label(0, 100, 0, 20, "foobar");
+		Assert.assertNotEquals(f1, f2);
+	}
+	
+	@Test(groups= {"ut"})
+	public void testEqualsDifferentPosition2() {
+		Label f1 = new Label(0, 101, 0, 20, "foobar");
+		Label f2 = new Label(0, 100, 0, 20, "foobar");
+		Assert.assertNotEquals(f1, f2);
+	}
+	
+	@Test(groups= {"ut"})
+	public void testEqualsDifferentPosition3() {
+		Label f1 = new Label(0, 100, 1, 20, "foobar");
+		Label f2 = new Label(0, 100, 0, 20, "foobar");
+		Assert.assertNotEquals(f1, f2);
+	}
+	
+	@Test(groups= {"ut"})
+	public void testEqualsDifferentPosition4() {
+		Label f1 = new Label(0, 100, 0, 21, "foobar");
+		Label f2 = new Label(0, 100, 0, 20, "foobar");
+		Assert.assertNotEquals(f1, f2);
+	}
 
 }

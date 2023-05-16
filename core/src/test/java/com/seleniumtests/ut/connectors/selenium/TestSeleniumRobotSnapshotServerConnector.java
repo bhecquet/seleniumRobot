@@ -1268,7 +1268,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	public void testDetectFieldsInPictureInvalidPicture() throws IOException {
 		
 		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
-		connector.detectFieldsInPicture(null);
+		connector.detectFieldsInPicture((Snapshot)null);
 	}
 	@Test(groups={"it"}, expectedExceptions = SeleniumRobotServerException.class, expectedExceptionsMessageRegExp = "Provided snapshot does not exist")
 	public void testDetectFieldsInPictureInvalidPicture2() throws IOException {

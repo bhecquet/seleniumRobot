@@ -14,8 +14,6 @@ import org.testng.ITestResult;
 
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.connectors.selenium.fielddetector.Field;
-import com.seleniumtests.connectors.selenium.fielddetector.ImageFieldDetector;
-import com.seleniumtests.connectors.selenium.fielddetector.ImageFieldDetector.FieldType;
 import com.seleniumtests.connectors.selenium.fielddetector.Label;
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.core.utils.TestNGResultUtils;
@@ -27,7 +25,6 @@ import com.seleniumtests.util.imaging.ImageProcessor;
 import com.seleniumtests.util.imaging.StepReferenceComparator;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
-import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
 
 /**
@@ -118,7 +115,10 @@ public class ErrorCauseFinder {
 						.filter(s -> s.getCheckSnapshot().recordSnapshotOnServerForReference())
 						.collect(Collectors.toList()).get(0);
 					File referenceSnapshot = SeleniumRobotSnapshotServerConnector.getInstance().getReferenceSnapshot(stepResultId);
-
+					if (referenceSnapshot == null) {
+						continue;
+					}
+					
 					JSONObject stepSnapshotDetectionData = SeleniumRobotSnapshotServerConnector.getInstance().detectFieldsInPicture(stepSnapshot);
 					JSONObject referenceSnapshotDetectionData = SeleniumRobotSnapshotServerConnector.getInstance().getStepReferenceDetectFieldInformation(stepResultId, version);
 
@@ -146,9 +146,7 @@ public class ErrorCauseFinder {
 						
 						causes.add(new ErrorCause(ErrorType.APPLICATION_CHANGED, formatApplicationChangedDescription(missingLabels, missingFields), testStep));
 					}
-					
-					// TODO: faire quelque chose de "referenceSnapshot"
-					
+
 					// else, very good matching: we are on the same web page, error does not come from there
 					
 					
@@ -232,10 +230,10 @@ public class ErrorCauseFinder {
 	}
 	private int compareReferenceToStepSnapshot(JSONObject stepSnapshotDetectionData, JSONObject referenceSnapshotDetectionData, List<Label> missingLabels, List<Field> missingFields) {
 		
-		List<Field> stepSnapshotFields = getFieldsFromDetectionData(stepSnapshotDetectionData);
-		List<Label> stepSnapshotLabels = getLabelsFromDetectionData(stepSnapshotDetectionData);
-		List<Field> referenceSnapshotFields = getFieldsFromDetectionData(referenceSnapshotDetectionData);
-		List<Label> referenceSnapshotLabels = getLabelsFromDetectionData(referenceSnapshotDetectionData);
+		List<Field> stepSnapshotFields = Field.fromDetectionData(stepSnapshotDetectionData);
+		List<Label> stepSnapshotLabels = Label.fromDetectionData(stepSnapshotDetectionData);
+		List<Field> referenceSnapshotFields = Field.fromDetectionData(referenceSnapshotDetectionData);
+		List<Label> referenceSnapshotLabels = Label.fromDetectionData(referenceSnapshotDetectionData);
 		
 		StepReferenceComparator stepReferenceComparator = new StepReferenceComparator(stepSnapshotFields, stepSnapshotLabels, referenceSnapshotFields, referenceSnapshotLabels);
 		int matching = stepReferenceComparator.compare();
@@ -276,8 +274,8 @@ public class ErrorCauseFinder {
 				try {
 					JSONObject detectionData = SeleniumRobotSnapshotServerConnector.getInstance().detectErrorInPicture(snapshot);
 
-					List<Field> fields = getFieldsFromDetectionData(detectionData);
-					List<Label> labels = getLabelsFromDetectionData(detectionData);
+					List<Field> fields = Field.fromDetectionData(detectionData);
+					List<Label> labels = Label.fromDetectionData(detectionData);
 					version = detectionData.getString("version");
 
 					// are some text considered as error messages (mainly in red on page)
@@ -295,76 +293,7 @@ public class ErrorCauseFinder {
 		}
 		
 		return version;
-	}
-	
-	/**
-	 * From a JSONObject get from seleniumServer, returns the list of fields
-	 * 
-	 * {
-	"fields": [
-		{
-			"class_id": 4,
-			"top": 142,
-			"bottom": 166,
-			"left": 174,
-			"right": 210,
-			"class_name": "field_with_label",
-			"text": null,
-			"related_field": {
-				"class_id": 0,
-				"top": 142,
-				"bottom": 165,
-				"left": 175,
-				"right": 211,
-				"class_name": "field",
-				"text": null,
-				"related_field": null,
-				"with_label": false,
-				"width": 36,
-				"height": 23
-			},
-			"with_label": true,
-			"width": 36,
-			"height": 24
-		},
-
-	],
-	"labels": [
-		{
-			"top": 3,
-			"left": 16,
-			"width": 72,
-			"height": 16,
-			"text": "Join Us",
-			"right": 88,
-			"bottom": 19
-		},
-
-	]
-	"error": null,
-	"version": "afcc45"
-}
-	 * 
-	 * @param detectionData
-	 * @return
-	 */
-	private List<Field> getFieldsFromDetectionData(JSONObject detectionData) {
-		return ((List<JSONObject>)detectionData
-				.getJSONArray("fields")
-				.toList())
-				.stream()
-				.map(jsonField -> Field.fromJson(jsonField))
-				.collect(Collectors.toList());
-	}
-	private List<Label> getLabelsFromDetectionData(JSONObject detectionData) {
-		return ((List<JSONObject>)detectionData
-				.getJSONArray("labels")
-				.toList())
-				.stream()
-				.map(jsonField -> Label.fromJson(jsonField))
-				.collect(Collectors.toList());
-	}
-	
+	}	
 	
 	/**
 	 * @param causes

@@ -37,8 +37,8 @@ import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.remote.ScreenshotException;
 
+import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.connectors.selenium.fielddetector.Field;
-import com.seleniumtests.connectors.selenium.fielddetector.ImageFieldDetector;
 import com.seleniumtests.connectors.selenium.fielddetector.Label;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
@@ -46,6 +46,7 @@ import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.SnapshotTarget;
 import com.seleniumtests.uipage.PageObject;
@@ -54,6 +55,8 @@ import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.imaging.ImageDetector;
 import com.seleniumtests.util.imaging.ImageProcessor;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
+
+import kong.unirest.json.JSONObject;
 
 /**
  * Element which is found inside driver snapshot
@@ -131,11 +134,7 @@ public class UiElement {
 	public ScreenshotUtil getScreenshotUtil() {
 		return new ScreenshotUtil();
 	}
-	
-	public ImageFieldDetector getImageFieldDetector(File screenshotFile) {
-		return new ImageFieldDetector(screenshotFile);
-	}
-	
+
 	/**
 	 * Check search criteria has the required information
 	 */
@@ -159,7 +158,7 @@ public class UiElement {
 		
 		// search fields if we do not have one for this page
 		if (!fieldsPerPage.containsKey(origin)) {
-			File screenshotFile = getScreenshotFile();
+			ScreenShot screenshotFile = getScreenshotFile();
 			if (screenshotFile == null) {
 				throw new ScreenshotException("Screenshot does not exist");
 			}
@@ -167,17 +166,17 @@ public class UiElement {
 			// TODO: handle other cases than browser
 			// try to find viewport position so that we can match a position on browser capture with the same position on screen
 			// we assume that browser is started on main screen in a multi-screen environment
-			Rectangle viewportPosition = detectViewPortPosition(screenshotFile);
+			Rectangle viewportPosition = detectViewPortPosition(new File(screenshotFile.getFullImagePath()));
 			offsetPerPage.put(origin, new Point(viewportPosition.x, viewportPosition.y));
 			
-			ImageFieldDetector detector = getImageFieldDetector(screenshotFile);
-			List<Field> fields = detector.detectFields();
+			JSONObject snapshotDetectionData = SeleniumRobotSnapshotServerConnector.getInstance().detectFieldsInPicture(screenshotFile);
+			List<Field> fields = Field.fromDetectionData(snapshotDetectionData);
 			for (Field field: fields) {
 				field.changePosition(viewportPosition.x, viewportPosition.y);
 			}
 			fieldsPerPage.put(origin, fields);
 			
-			List<Label> labels = detector.detectLabels();
+			List<Label> labels = Label.fromDetectionData(snapshotDetectionData);
 			for (Label lbl: labels) {
 				lbl.changePosition(viewportPosition.x, viewportPosition.y);
 			}
@@ -279,12 +278,12 @@ public class UiElement {
 			File cropScreenshotFile = File.createTempFile("img", ".png");
 			ImageIO.write(croppedImage, "png", cropScreenshotFile);
 			
-			File desktopScreenshotFile = getDesktopScreenshotFile();
+			ScreenShot desktopScreenshotFile = getDesktopScreenshotFile();
 			if (desktopScreenshotFile == null) {
 				throw new ScreenshotException("Desktop screenshot does not exist");
 			}
 			
-			ImageDetector imageDetector = new ImageDetector(desktopScreenshotFile, cropScreenshotFile, 0.2);
+			ImageDetector imageDetector = new ImageDetector(new File(desktopScreenshotFile.getFullImagePath()), cropScreenshotFile, 0.2);
 			imageDetector.detectExactZoneWithoutScale();
 			org.openqa.selenium.Rectangle detectedRectangle = imageDetector.getDetectedRectangle();
 			return new Rectangle(detectedRectangle.x, detectedRectangle.y, detectedRectangle.height, detectedRectangle.width);
@@ -294,16 +293,16 @@ public class UiElement {
 		}
 	}
 
-	public File getScreenshotFile() {
+	public ScreenShot getScreenshotFile() {
 		screenshotUtil = getScreenshotUtil(); // update driver
 		
-		return screenshotUtil.capture(SnapshotTarget.PAGE, File.class, true);		
+		return screenshotUtil.capture(SnapshotTarget.PAGE, ScreenShot.class, true);		
 	}
 	
-	public File getDesktopScreenshotFile() {
+	public ScreenShot getDesktopScreenshotFile() {
 		screenshotUtil = getScreenshotUtil(); // update driver
 		
-		return screenshotUtil.capture(SnapshotTarget.MAIN_SCREEN, File.class, true);		
+		return screenshotUtil.capture(SnapshotTarget.MAIN_SCREEN, ScreenShot.class, true);		
 	}
 
 	public CustomEventFiringWebDriver getDriver() {

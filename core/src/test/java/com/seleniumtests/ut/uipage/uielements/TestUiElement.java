@@ -27,7 +27,6 @@ import org.testng.annotations.Test;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.connectors.selenium.fielddetector.Field;
-import com.seleniumtests.connectors.selenium.fielddetector.ImageFieldDetector;
 import com.seleniumtests.connectors.selenium.fielddetector.Label;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
@@ -48,10 +47,7 @@ public class TestUiElement extends MockitoTest {
 	
 	@Mock
 	private ScreenshotUtil screenshotUtil;
-	
-	@Mock
-	private ImageFieldDetector imageFieldDetector;
-	
+
 	@Mock
 	private CustomEventFiringWebDriver driver;
 	

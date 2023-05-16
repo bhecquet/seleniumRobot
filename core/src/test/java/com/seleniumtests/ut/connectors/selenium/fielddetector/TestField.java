@@ -126,4 +126,59 @@ public class TestField extends GenericTest {
 		Field f2 = new Field(0, 99, 0, 20, "fooba", null);
 		Assert.assertFalse(f1.match(f2));
 	}
+	
+	@Test(groups= {"ut"})
+	public void testEquals() {
+		Field f1 = new Field(0, 100, 0, 20, "foobar", "field");
+		Field f2 = new Field(0, 100, 0, 20, "foobar", "field");
+		Assert.assertEquals(f1, f2);
+	}
+	
+	@Test(groups= {"ut"})
+	public void testEqualsDifferentText() {
+		Field f1 = new Field(0, 100, 0, 20, "foobar", "field");
+		Field f2 = new Field(0, 100, 0, 20, "foobr", "field");
+		Assert.assertNotEquals(f1, f2);
+	}
+	
+	@Test(groups= {"ut"})
+	public void testEqualsDifferentClass() {
+		Field f1 = new Field(0, 100, 0, 20, "foobar", "button");
+		Field f2 = new Field(0, 100, 0, 20, "foobar", "field");
+		Assert.assertNotEquals(f1, f2);
+	}
+	
+	@Test(groups= {"ut"})
+	public void testEqualsDifferentPosition() {
+		Field f1 = new Field(1, 100, 0, 20, "foobar", "field");
+		Field f2 = new Field(0, 100, 0, 20, "foobar", "field");
+		Assert.assertNotEquals(f1, f2);
+	}
+	
+	@Test(groups= {"ut"})
+	public void testEqualsDifferentPosition2() {
+		Field f1 = new Field(0, 101, 0, 20, "foobar", "field");
+		Field f2 = new Field(0, 100, 0, 20, "foobar", "field");
+		Assert.assertNotEquals(f1, f2);
+	}
+	
+	@Test(groups= {"ut"})
+	public void testEqualsDifferentPosition3() {
+		Field f1 = new Field(0, 100, 1, 20, "foobar", "field");
+		Field f2 = new Field(0, 100, 0, 20, "foobar", "field");
+		Assert.assertNotEquals(f1, f2);
+	}
+	
+	@Test(groups= {"ut"})
+	public void testEqualsDifferentPosition4() {
+		Field f1 = new Field(0, 100, 0, 21, "foobar", "field");
+		Field f2 = new Field(0, 100, 0, 20, "foobar", "field");
+		Assert.assertNotEquals(f1, f2);
+	}
+	
+	@Test(groups= {"ut"})
+	public void testHashCodeNullClassName() {
+		Field f1 = new Field(0, 100, 0, 20, "foobar", null);
+		f1.hashCode(); // only test there is no problem with null
+	}
 }

@@ -52,7 +52,6 @@ import com.seleniumtests.connectors.bugtracker.BugTracker;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
-import com.seleniumtests.connectors.selenium.fielddetector.FieldDetectorConnector;
 import com.seleniumtests.connectors.tms.TestManager;
 import com.seleniumtests.core.config.ConfigReader;
 import com.seleniumtests.core.contexts.BugTrackerContext;
@@ -135,8 +134,6 @@ public class SeleniumTestsContext {
     																				// if 'full', search will also be done using element picture, if available
     
     public static final String FIND_ERROR_CAUSE = "findErrorCause";				// if 'true', try to find why the test failed
-
-    public static final String IMAGE_FIELD_DETECTOR_SERVER_URL = "imageFieldDetectorServerUrl";		// URL of the server that can find fields in an image
 
     public static final String SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER = "setAssumeUntrustedCertificateIssuer"; // Firefox uniquement pour qu'il ne prenne pas en compte les certificats invalides 
     public static final String SET_ACCEPT_UNTRUSTED_CERTIFICATES = "setAcceptUntrustedCertificates"; // Firefox uniquement pour qu'il ne prenne pas en compte les certificats invalides
@@ -264,7 +261,6 @@ public class SeleniumTestsContext {
 	public static final boolean DEFAULT_REPORTPORTAL_ACTIVE = false;
 	public static final boolean DEFAULT_RANDOM_IN_ATTACHMENT_NAME = true;
 	public static final ElementInfo.Mode DEFAULT_ADVANCED_ELEMENT_SEARCH = ElementInfo.Mode.FALSE;
-	public static final String DEFAULT_IMAGE_FIELD_DETECTOR_SERVER_URL = null;
 	public static final boolean DEFAULT_EDGE_IE_MODE = false;
     
     public static final int DEFAULT_REPLAY_TIME_OUT = 30;
@@ -289,7 +285,6 @@ public class SeleniumTestsContext {
     private BugTracker	bugtrackerInstance;
     private BugTrackerContext bugtrackerContext;
     private SeleniumRobotServerContext seleniumRobotServerContext;
-    private FieldDetectorConnector	fieldDetectorInstance;
     private TestStepManager testStepManager; // handles logging of test steps in this context
     private boolean driverCreationBlocked = false;		// if true, inside this thread, driver creation will be forbidden
     
@@ -303,7 +298,6 @@ public class SeleniumTestsContext {
     	seleniumGridConnectors = new ArrayList<>();
     	testManagerInstance = null;
     	bugtrackerInstance = null;
-    	fieldDetectorInstance = null;
     	testManagerContext = null;
     	testStepManager = new TestStepManager();
     }
@@ -337,7 +331,6 @@ public class SeleniumTestsContext {
     	if (!allowRequestsToDependencies) {
     		testManagerInstance = toCopy.testManagerInstance;
     		bugtrackerInstance = toCopy.bugtrackerInstance;
-    		fieldDetectorInstance = toCopy.fieldDetectorInstance;
     	}
     	
     	testNGResult = toCopy.testNGResult;
@@ -370,9 +363,7 @@ public class SeleniumTestsContext {
     	testManagerContext.init();
     	bugtrackerContext.init();
     	seleniumRobotServerContext.init();
-    	
-    	setImageFieldDetectorServerUrl(getValueForTest(IMAGE_FIELD_DETECTOR_SERVER_URL, System.getProperty(IMAGE_FIELD_DETECTOR_SERVER_URL)));
-           
+    	   
         setFindErrorCause(getBoolValueForTest(FIND_ERROR_CAUSE, System.getProperty(FIND_ERROR_CAUSE)));
         
         setWebDriverGrid(getValueForTest(WEB_DRIVER_GRID, System.getProperty(WEB_DRIVER_GRID)));
@@ -927,21 +918,7 @@ public class SeleniumTestsContext {
 			getConfiguration().putAll(getUserDefinedVariablesFromCommandLine());
     	}
     }
-	
-	/**
-	 * initialize the image field detector
-	 * @return
-	 */
-	public FieldDetectorConnector initFieldDetectorConnector() {
-		
-		if (getImageFieldDetectorServerUrl() != null) {
-			
-			return FieldDetectorConnector.getInstance(getImageFieldDetectorServerUrl());
-		} else {
-			return null;
-		}
-		
-	}
+
 	
 	// ------------------------- accessors ------------------------------------------------------
 	
@@ -1152,10 +1129,6 @@ public class SeleniumTestsContext {
 
     public String getIEDriverPath() {
         return (String) getAttribute(IE_DRIVER_PATH);
-    }
-    
-    public String getImageFieldDetectorServerUrl() {
-    	return (String) getAttribute(IMAGE_FIELD_DETECTOR_SERVER_URL);
     }
  
     public boolean getOverrideSeleniumNativeAction() {
@@ -1560,15 +1533,7 @@ public class SeleniumTestsContext {
     public BugTracker getBugTrackerInstance() {
     	return bugtrackerInstance;
     }
-    
-    public FieldDetectorConnector getFieldDetectorInstance() {
-    	if (fieldDetectorInstance == null) {
-        	fieldDetectorInstance = initFieldDetectorConnector();
-    	}
-    	return fieldDetectorInstance;
-    }
-    
-
+  
 	public Map<String, Object> getContextDataMap() {
 		return contextDataMap;
 	}
@@ -1738,15 +1703,7 @@ public class SeleniumTestsContext {
     		setAttribute(FIND_ERROR_CAUSE, DEFAULT_FIND_ERROR_CAUSE);
     	}
     }
-    
-    public void setImageFieldDetectorServerUrl(String url) {
-    	if (url != null) {
-    		setAttribute(IMAGE_FIELD_DETECTOR_SERVER_URL, url);
-    	} else {
-    		setAttribute(IMAGE_FIELD_DETECTOR_SERVER_URL, DEFAULT_IMAGE_FIELD_DETECTOR_SERVER_URL);
-    	}
-    }
-    
+  
     public void setVariableAlreadyRequestedFromServer(Map<String, TestVariable> variableAlreadyRequestedFromServer) {
 		this.variableAlreadyRequestedFromServer = variableAlreadyRequestedFromServer;
 	}
@@ -1796,11 +1753,7 @@ public class SeleniumTestsContext {
     		setAttribute(INITIAL_URL, DEFAULT_INITIAL_URL);
     	}
     }
-    
-    public void setFieldDetectorInstance(FieldDetectorConnector fieldDetectorInstance) {
-    	this.fieldDetectorInstance = fieldDetectorInstance;
-    }
-    
+  
     public void setRunMode(String runMode) {
     	String newRunMode = runMode == null ? DEFAULT_RUN_MODE: runMode;
         setAttribute(RUN_MODE, DriverMode.fromString(newRunMode));

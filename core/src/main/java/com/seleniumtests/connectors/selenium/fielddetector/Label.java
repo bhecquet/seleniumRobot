@@ -1,6 +1,10 @@
 package com.seleniumtests.connectors.selenium.fielddetector;
 
 import java.awt.Rectangle;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import com.seleniumtests.core.testanalysis.ErrorCause;
 
 import kong.unirest.json.JSONObject;
 import net.ricecode.similarity.JaroWinklerStrategy;
@@ -80,6 +84,66 @@ public class Label {
 		label.text = json.optString("text", null);
 		
 		return label;
+	}
+	
+	/**
+	 * From a JSONObject get from seleniumServer, returns the list of Labels
+	 * 
+	 * {
+	"fields": [
+		{
+			"class_id": 4,
+			"top": 142,
+			"bottom": 166,
+			"left": 174,
+			"right": 210,
+			"class_name": "field_with_label",
+			"text": null,
+			"related_field": {
+				"class_id": 0,
+				"top": 142,
+				"bottom": 165,
+				"left": 175,
+				"right": 211,
+				"class_name": "field",
+				"text": null,
+				"related_field": null,
+				"with_label": false,
+				"width": 36,
+				"height": 23
+			},
+			"with_label": true,
+			"width": 36,
+			"height": 24
+		},
+
+	],
+	"labels": [
+		{
+			"top": 3,
+			"left": 16,
+			"width": 72,
+			"height": 16,
+			"text": "Join Us",
+			"right": 88,
+			"bottom": 19
+		},
+
+	]
+	"error": null,
+	"version": "afcc45"
+}
+	 * 
+	 * @param detectionData
+	 * @return
+	 */
+	public static List<Label> fromDetectionData(JSONObject detectionData) {
+		return ((List<JSONObject>)detectionData
+				.getJSONArray("labels")
+				.toList())
+				.stream()
+				.map(Label::fromJson)
+				.collect(Collectors.toList());
 	}
 	
 	/**
@@ -194,5 +258,32 @@ public class Label {
 		boolean sameText = text != null && anOtherLabel.text != null && (text.equals(anOtherLabel.text) || stringService.score(text, anOtherLabel.text) > 0.9);
 		
 		return ((sameText || noText) && isInside(anOtherLabel));	
+	}
+	
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+
+		if (obj instanceof Label && this == obj) {
+			return true;
+		}
+
+		Label label = (Label)obj;
+
+		return this.getRectangle().equals(label.getRectangle())
+				&& ((this.text == null && label.text == null) || this.text.equals(label.text));
+			 
+	}
+	
+	@Override
+	public int hashCode() {
+		if (text != null) {
+			return getRectangle().hashCode() + text.hashCode();
+		} else {
+			return getRectangle().hashCode();
+		}
 	}
 }

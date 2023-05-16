@@ -34,6 +34,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.util.helper.WaitHelper;
 
@@ -615,17 +616,23 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	}
 	
 	private JSONObject detectInPicture(Snapshot snapshot, String task) {
+		if (snapshot == null) {
+			throw new SeleniumRobotServerException("Provided snapshot does not exist");
+		}
+		return detectInPicture(snapshot.getScreenshot(), task);
+	}
+	private JSONObject detectInPicture(ScreenShot screenShot, String task) {
 		
 		if (!active) {
 			return null;
 		}
 
-		if (snapshot == null || snapshot.getScreenshot() == null || snapshot.getScreenshot().getFullImagePath() == null) {
-			throw new SeleniumRobotServerException("Provided snapshot does not exist");
+		if (screenShot == null || screenShot.getFullImagePath() == null) {
+			throw new SeleniumRobotServerException("Provided screenshot does not exist");
 		}
 		
 		try {
-			File pictureFile = new File(snapshot.getScreenshot().getFullImagePath());
+			File pictureFile = new File(screenShot.getFullImagePath());
 			
 			return getJSonResponse(buildPostRequest(url + DETECT_API_URL)
 					.field("task", task)
@@ -642,7 +649,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	/**
 	 * Method that sends a picture to seleniumRobot server "/detect" endpoint
 	 * Server will try to detect error messages in the provided picture and return a JSON of this type
-	 "<image_name>": {
+	 "{
         "fields": [
             {
                 "class_id": 2,
@@ -671,7 +678,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
             },
         [...]
         ]
-    },
+
     "error": null,
     "version": "afcc45"
 }
@@ -681,12 +688,15 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	public JSONObject detectErrorInPicture(Snapshot snapshot) {
 		return detectInPicture(snapshot, "error");
 	}
+	public JSONObject detectErrorInPicture(ScreenShot screenshot) {
+		return detectInPicture(screenshot, "error");
+	}
 	
 	/**
 	 * Method that sends a picture to seleniumRobot server "/detect" endpoint
 	 * Server will try to detect fields in the provided picture and return a JSON of this type
-	 "<image_name>": {
-        "fields": [
+	 "{
+      "fields": [
             {
                 "class_id": 2,
                 "top": 216,
@@ -702,7 +712,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
             },
         [...]
         ],
-        "labels": [
+    "labels": [
             {
                 "top": 3,
                 "left": 16,
@@ -714,7 +724,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
             },
         [...]
         ]
-    },
+
     "error": null,
     "version": "afcc45"
 }
@@ -723,6 +733,9 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	 */
 	public JSONObject detectFieldsInPicture(Snapshot snapshot) {
 		return detectInPicture(snapshot, "field");
+	}
+	public JSONObject detectFieldsInPicture(ScreenShot screenshot) {
+		return detectInPicture(screenshot, "field");
 	}
 	
 	/**

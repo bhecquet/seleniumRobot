@@ -37,14 +37,12 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openqa.selenium.Rectangle;
-import org.openqa.selenium.WebElement;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
@@ -53,7 +51,6 @@ import org.testng.xml.XmlSuite.ParallelMode;
 
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
-import com.seleniumtests.connectors.selenium.fielddetector.FieldDetectorConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.contexts.SeleniumRobotServerContext;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
@@ -63,7 +60,7 @@ import com.seleniumtests.reporter.reporters.SeleniumRobotServerTestRecorder;
 
 import kong.unirest.json.JSONObject;
 
-@PrepareForTest({SeleniumRobotSnapshotServerConnector.class, CommonReporter.class, SeleniumRobotVariableServerConnector.class, SeleniumRobotServerContext.class, SeleniumTestsContext.class, FieldDetectorConnector.class})
+@PrepareForTest({SeleniumRobotSnapshotServerConnector.class, CommonReporter.class, SeleniumRobotVariableServerConnector.class, SeleniumRobotServerContext.class, SeleniumTestsContext.class})
 public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	
 	private SeleniumRobotServerTestRecorder reporter;
@@ -73,9 +70,6 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	
 	@Mock
 	SeleniumRobotVariableServerConnector variableServer;
-	
-	@Mock
-	FieldDetectorConnector fieldDetectorConnector;
 	
 	/**
 	 * In this test, everything is fine with seleniumrobot server
@@ -295,7 +289,6 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
-			System.setProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL, "http://localhost:1234");
 
 			initMocks();
 			
@@ -314,7 +307,6 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
-			System.clearProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL);
 		}
 	}
 	
@@ -332,7 +324,6 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "false");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
-			System.setProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL, "http://localhost:1234");
 			
 
 			initMocks();
@@ -352,7 +343,6 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
-			System.clearProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL);
 		}
 	}
 	
@@ -370,7 +360,6 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
-			System.setProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL, "http://localhost:1234");
 			
 			
 			initMocks();
@@ -393,7 +382,6 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
-			System.clearProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL);
 		}
 	}
 
@@ -410,7 +398,6 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
-			System.setProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL, "http://localhost:1234");
 			
 			
 			initMocks();
@@ -433,7 +420,6 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
-			System.clearProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL);
 		}
 	}
 

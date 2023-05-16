@@ -315,7 +315,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			FileUtils.copyFile(tmpSuiteFile, suiteFile);
 			
 			try {
-				seleniumIde.executeScripts(Arrays.asList(suiteFile.getAbsolutePath()));
+				seleniumIde.executeScripts(Arrays.asList(suiteFile.getAbsolutePath()), 1);
 				Assert.assertFalse(true, "Exception should have been raised");
 			} catch (ScenarioException e) {
 				
