@@ -21,6 +21,7 @@ public abstract class CommonSelectList implements ISelectList {
 	protected List<WebElement> options;
 
 	protected static final String ATTR_ARIA_SELECTED = "aria-selected";
+	protected static final String ATTR_ARIA_CHECKED = "aria-checked";
 
 	protected CommonSelectList(WebElement parentElement, FrameElement frameElement) {
 		this.parentElement = parentElement;
