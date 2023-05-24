@@ -16,9 +16,9 @@ public class SnapshotTarget {
 	public static final SnapshotTarget VIEWPORT = new SnapshotTarget(Target.VIEWPORT);
 	
 	public enum Target {
-		SCREEN, 
-		MAIN_SCREEN, 
-		PAGE, 
+		SCREEN,   		// all the physical screens
+		MAIN_SCREEN, 	// only the main physical screen
+		PAGE, 			// the web page
 		ELEMENT,
 		VIEWPORT
 	}

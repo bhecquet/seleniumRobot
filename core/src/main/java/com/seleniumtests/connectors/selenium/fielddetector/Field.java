@@ -32,6 +32,20 @@ public class Field {
 		return relatedField;
 	}
 	
+	public JSONObject toJson() {
+		JSONObject json = label.toJson();
+		json.put("class_name", className);
+		json.put("with_label", className.endsWith("with_label"));
+		if (relatedField != null) {
+			json.put("related_field", relatedField.toJson());
+		} else {
+			json.put("related_field", (String)null);
+		}
+		
+
+		return json;
+	}
+	
 	public static Field fromJson(JSONObject json) {
 		Field field = new Field();
 		field.label = Label.fromJson(json);
@@ -88,7 +102,8 @@ public class Field {
 
 	]
 	"error": null,
-	"version": "afcc45"
+	"version": "afcc45",
+	"fileName": "foo.png"
 }
 	 * 
 	 * @param detectionData
@@ -135,7 +150,7 @@ public class Field {
 	}
 	
 	/**
-	 * 2 fields match if the are of the same class and their positions match
+	 * 2 fields match if they are of the same class and their positions match
 	 * @param anOtherField
 	 * @return
 	 */

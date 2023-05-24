@@ -7,12 +7,25 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.connectors.selenium.fielddetector.Field;
+import com.seleniumtests.connectors.selenium.fielddetector.Label;
 
 import kong.unirest.json.JSONObject;
 
 
 public class TestField extends GenericTest {
 
+
+	@Test(groups= {"ut"})
+	public void testToJson() {
+		Field field = new Field(0, 1, 2, 3, "foo", "field");
+		Assert.assertEquals(field.toJson(), new JSONObject("{\"text\":\"foo\",\"top\":2,\"bottom\":3,\"left\":0,\"right\":1,\"width\":1,\"height\":1,\"class_name\":\"field\",\"with_label\":false,\"related_field\":null}"));
+	}
+	@Test(groups= {"ut"})
+	public void testToJsonRelatedField() {
+		Field field = new Field(10, 11, 12, 13, "foo", "field");
+		Field field2 = new Field(0, 1, 2, 3, "foo", "field", field);
+		Assert.assertEquals(field2.toJson(), new JSONObject("{\"text\":\"foo\",\"top\":2,\"bottom\":3,\"left\":0,\"right\":1,\"width\":1,\"height\":1,\"class_name\":\"field\",\"with_label\":false,\"related_field\":{\"text\":\"foo\",\"top\":12,\"bottom\":13,\"left\":10,\"right\":11,\"width\":1,\"height\":1,\"class_name\":\"field\",\"with_label\":false,\"related_field\":null}}"));
+	}
 	
 	@Test(groups= {"ut"})
 	public void testChangePosition() {

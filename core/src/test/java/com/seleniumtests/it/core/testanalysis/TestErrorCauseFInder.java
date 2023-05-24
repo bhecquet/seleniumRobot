@@ -7,7 +7,7 @@ import org.testng.ITestContext;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
-import com.seleniumtests.connectors.selenium.fielddetector.FieldDetectorConnector;
+import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.contexts.SeleniumRobotServerContext;
 import com.seleniumtests.it.reporter.ReporterTest;
@@ -17,8 +17,9 @@ public class TestErrorCauseFInder extends ReporterTest {
 	
 	private static final String DETECT_FIELD_REPLY = "{" // add it to a formatting with picture name
 			+ "	\"error\": null,"
-			+ "	\"%s\": {"
-			+ "		\"fields\": [{"
+			+ " \"fileName\": \"%s\","
+			+ " \"version\": \"aaa\","
+			+ "	\"fields\": [{"
 			+ "			\"bottom\": 220,"
 			+ "			\"class_id\": 4,"
 			+ "			\"class_name\": \"field_with_label\","
@@ -56,7 +57,7 @@ public class TestErrorCauseFInder extends ReporterTest {
 			+ "			\"width\": 100,"
 			+ "			\"with_label\": false"
 			+ "		}],"
-			+ "		\"labels\": [{"
+			+ "	\"labels\": [{"
 			+ "			\"bottom\": 20,"
 			+ "			\"height\": 15,"
 			+ "			\"left\": 159,"
@@ -74,18 +75,18 @@ public class TestErrorCauseFInder extends ReporterTest {
 			+ "			\"top\": 254,"
 			+ "			\"width\": 60"
 			+ "		}]"
-			+ "	}"
 			+ "}";
 	
 	private static final String DETECT_FIELD_REPLY2 = "{" // add it to a formatting with picture name
 			+ "	\"error\": null,"
-			+ "	\"%s\": {"
-			+ "		\"fields\": [{"
-			+ "			\"bottom\": 320,"
+			+ " \"fileName\": \"%s\","
+			+ " \"version\": \"aaa\","
+			+ "	\"fields\": [{"
+			+ "			\"bottom\": 220,"
 			+ "			\"class_id\": 4,"
 			+ "			\"class_name\": \"field_with_label\","
 			+ "			\"height\": 36,"
-			+ "			\"left\": 191,"
+			+ "			\"left\": 491,"
 			+ "			\"related_field\": {"
 			+ "				\"bottom\": 228,"
 			+ "				\"class_id\": 0,"
@@ -99,13 +100,13 @@ public class TestErrorCauseFInder extends ReporterTest {
 			+ "				\"width\": 147,"
 			+ "				\"with_label\": false"
 			+ "			},"
-			+ "			\"right\": 305,"
-			+ "			\"text\": \"Name\","
-			+ "			\"top\": 284,"
+			+ "			\"right\": 705,"
+			+ "			\"text\": \"Date de naissance\","
+			+ "			\"top\": 184,"
 			+ "			\"width\": 114,"
 			+ "			\"with_label\": true"
 			+ "		}],"
-			+ "		\"labels\": [{"
+			+ "	\"labels\": [{"
 			+ "			\"bottom\": 20,"
 			+ "			\"height\": 15,"
 			+ "			\"left\": 159,"
@@ -123,13 +124,13 @@ public class TestErrorCauseFInder extends ReporterTest {
 			+ "			\"top\": 254,"
 			+ "			\"width\": 60"
 			+ "		}]"
-			+ "	}"
 			+ "}";
 	
 	private static final String DETECT_ERROR_REPLY = "{" 
 			+ "	\"error\": null,"
-			+ "	\"%s\": {"
-			+ "		\"fields\": ["
+			+ " \"fileName\": \"%s\","
+			+ " \"version\": \"aaa\","
+			+ " \"fields\": ["
 			+ "		{"
 			+ "			\"bottom\": 204,"
 			+ "			\"class_id\": 0,"
@@ -143,7 +144,7 @@ public class TestErrorCauseFInder extends ReporterTest {
 			+ "			\"width\": 100,"
 			+ "			\"with_label\": false"
 			+ "		}],"
-			+ "		\"labels\": [{"
+			+ "	\"labels\": [{"
 			+ "			\"bottom\": 20,"
 			+ "			\"height\": 15,"
 			+ "			\"left\": 159,"
@@ -161,14 +162,14 @@ public class TestErrorCauseFInder extends ReporterTest {
 			+ "			\"top\": 254,"
 			+ "			\"width\": 60"
 			+ "		}]"
-			+ "	}"
 			+ "}";
 	
 	private static final String DETECT_NO_ERROR_REPLY = "{" 
 			+ "	\"error\": null,"
-			+ "	\"%s\": {"
-			+ "		\"fields\": [],"
-			+ "		\"labels\": [{"
+			+ " \"fileName\": \"%s\","
+			+ " \"version\": \"aaa\","
+			+ "	\"fields\": [],"
+			+ "	\"labels\": [{"
 			+ "			\"bottom\": 20,"
 			+ "			\"height\": 15,"
 			+ "			\"left\": 159,"
@@ -186,7 +187,6 @@ public class TestErrorCauseFInder extends ReporterTest {
 			+ "			\"top\": 254,"
 			+ "			\"width\": 60"
 			+ "		}]"
-			+ "	}"
 			+ "}";
 	
 	
@@ -199,7 +199,6 @@ public class TestErrorCauseFInder extends ReporterTest {
 	public void testErrorInLastStep(ITestContext testContext) throws Exception {
 		
 		try {
-			System.setProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL, SERVER_URL);
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
@@ -207,11 +206,19 @@ public class TestErrorCauseFInder extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.RANDOM_IN_ATTACHMENT_NAME, "false");
 			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, VideoCaptureMode.ON_ERROR.toString());
 			
-			configureMockedSnapshotServerConnection();
-			createServerMock("GET", FieldDetectorConnector.STATUS_URL, 200, "OK");		
-			createServerMock("POST", FieldDetectorConnector.DETECT_ERROR_URL, 200, String.format(DETECT_ERROR_REPLY, "testImageDetection_5-1_Test_end-.png"));		
-			createServerMock("POST", FieldDetectorConnector.DETECT_URL, 200, String.format(DETECT_FIELD_REPLY, "testImageDetection_4-1__clickErrorButtonInError_-.jpg"));
-			
+			configureMockedSnapshotServerConnection();	
+			createServerMock(SERVER_URL,
+					"POST", 
+					SeleniumRobotSnapshotServerConnector.DETECT_API_URL, 
+					200, 
+					Arrays.asList(
+							String.format(DETECT_ERROR_REPLY, "testImageDetection_5-1_Test_end-.png"),
+							String.format(DETECT_FIELD_REPLY, "testImageDetection_4-1__clickErrorButtonInError_-.jpg")
+							),
+					"request"
+					); // detect field
+			createServerMock("GET", SeleniumRobotSnapshotServerConnector.DETECT_API_URL, 200, String.format(DETECT_FIELD_REPLY, "testImageDetection_4-1__clickErrorButtonInError_-.jpg")); // get fields detected for reference
+		
 			ReporterTest.executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.NONE,  new String[] {"testImageDetection"});
 			
 			// check the error cause is displayed at the top of the report
@@ -219,40 +226,6 @@ public class TestErrorCauseFInder extends ReporterTest {
 			Assert.assertTrue(output.contains("<th>Possible error causes</th><td><ul><li>Field in error: At least one field in error on step '_clickErrorButtonInError '</li></ul></td>"));
 			
 		} finally {
-			System.clearProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL);
-			System.clearProperty(SeleniumTestsContext.FIND_ERROR_CAUSE);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
-			System.clearProperty(SeleniumTestsContext.RANDOM_IN_ATTACHMENT_NAME);
-			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
-		}
-	}
-	@Test(groups={"it"})
-	public void testErrorInLastStepMultithread(ITestContext testContext) throws Exception {
-		
-		try {
-			System.setProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL, SERVER_URL);
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
-			System.setProperty(SeleniumTestsContext.FIND_ERROR_CAUSE, "true");
-			System.setProperty(SeleniumTestsContext.RANDOM_IN_ATTACHMENT_NAME, "false");
-			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, VideoCaptureMode.ON_ERROR.toString());
-			
-			configureMockedSnapshotServerConnection();
-			createServerMock("GET", FieldDetectorConnector.STATUS_URL, 200, "OK");		
-			createServerMock("POST", FieldDetectorConnector.DETECT_ERROR_URL, 200, String.format(DETECT_ERROR_REPLY, "testImageDetection_5-1_Test_end-.png"));		
-			createServerMock("POST", FieldDetectorConnector.DETECT_URL, 200, String.format(DETECT_FIELD_REPLY, "testImageDetection_4-1__clickErrorButtonInError_-.jpg"));
-		
-			ReporterTest.executeSubTest(3, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS,  new String[] {"testImageDetection"});
-			
-			// check the error cause is displayed at the top of the report
-			String output = readTestMethodResultFile("testImageDetection");
-			Assert.assertTrue(output.contains("<th>Possible error causes</th><td><ul><li>Field in error: At least one field in error on step '_clickErrorButtonInError '</li></ul></td>"));
-			
-		} finally {
-			System.clearProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL);
 			System.clearProperty(SeleniumTestsContext.FIND_ERROR_CAUSE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
@@ -262,11 +235,16 @@ public class TestErrorCauseFInder extends ReporterTest {
 		}
 	}
 	
+	/**
+	 * Test  when there is an error in last step, check we display the analysis in report
+	 * Test is executed with multiple threads
+	 * @param testContext
+	 * @throws Exception
+	 */
 	@Test(groups={"it"})
-	public void testErrorWithDiffFromReference(ITestContext testContext) throws Exception {
+	public void testErrorInLastStepMultithread(ITestContext testContext) throws Exception {
 		
 		try {
-			System.setProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL, SERVER_URL);
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
@@ -275,23 +253,161 @@ public class TestErrorCauseFInder extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, VideoCaptureMode.ON_ERROR.toString());
 			
 			configureMockedSnapshotServerConnection();
-			createServerMock("GET", FieldDetectorConnector.STATUS_URL, 200, "OK");		
-			createServerMock("POST", FieldDetectorConnector.DETECT_ERROR_URL, 200, String.format(DETECT_NO_ERROR_REPLY, "testImageDetectionNoError_5-1_Test_end-.png"));		
 			createServerMock(SERVER_URL,
 					"POST", 
-					FieldDetectorConnector.DETECT_URL,
+					SeleniumRobotSnapshotServerConnector.DETECT_API_URL, 
 					200, 
-					Arrays.asList(String.format(DETECT_FIELD_REPLY, "testImageDetectionNoError_4-1__clickErrorButton_-.jpg"), String.format(DETECT_FIELD_REPLY2, "testImageDetectionNoError_4-1__clickErrorButton_-.jpg")),
-					"request");	
+					Arrays.asList(
+							String.format(DETECT_ERROR_REPLY, "testImageDetection_5-1_Test_end-.png"),
+							String.format(DETECT_FIELD_REPLY, "testImageDetection_4-1__clickErrorButtonInError_-.jpg")
+							),
+					"request"
+					); // detect field
+			createServerMock("GET", SeleniumRobotSnapshotServerConnector.DETECT_API_URL, 200, String.format(DETECT_FIELD_REPLY, "testImageDetection_4-1__clickErrorButtonInError_-.jpg")); // get fields detected for reference
+		
+			ReporterTest.executeSubTest(3, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS,  new String[] {"testImageDetection"});
+			
+			// check the error cause is displayed at the top of the report
+			String output = readTestMethodResultFile("testImageDetection");
+			Assert.assertTrue(output.contains("<th>Possible error causes</th><td><ul><li>Field in error: At least one field in error on step '_clickErrorButtonInError '</li></ul></td>"));
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.FIND_ERROR_CAUSE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+			System.clearProperty(SeleniumTestsContext.RANDOM_IN_ATTACHMENT_NAME);
+			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
+		}
+	}
+	
+	/**
+	 * Check case where a field is missing in step, compared to reference snapshot
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testErrorWithDiffFromReference(ITestContext testContext) throws Exception {
+		
+		try {
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.FIND_ERROR_CAUSE, "true");
+			System.setProperty(SeleniumTestsContext.RANDOM_IN_ATTACHMENT_NAME, "false");
+			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, VideoCaptureMode.ON_ERROR.toString());
+			
+			configureMockedSnapshotServerConnection();
+			createServerMock(SERVER_URL,
+					"POST", 
+					SeleniumRobotSnapshotServerConnector.DETECT_API_URL, 
+					200, 
+					Arrays.asList(
+							String.format(DETECT_NO_ERROR_REPLY, "testImageDetection_5-1_Test_end-.png"),
+							String.format(DETECT_FIELD_REPLY2, "testImageDetectionNoError_4-1__clickErrorButton_-.jpg")
+							),
+					"request"
+					); // detect field
+			createServerMock("GET", SeleniumRobotSnapshotServerConnector.DETECT_API_URL, 200, String.format(DETECT_FIELD_REPLY, "testImageDetection_4-1__clickErrorButtonInError_-.jpg")); // get fields detected for reference
+		
+			ReporterTest.executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.NONE,  new String[] {"testImageDetection"});
+			
+			// check the error cause is displayed at the top of the report
+			String output = readTestMethodResultFile("testImageDetection");
+			Assert.assertTrue(output.contains("<th>Possible error causes</th><td><ul><li>The application has been modified: 1 field(s) missing: field[text=null]: java.awt.Rectangle[x=611,y=183,width=100,height=21] on step '_clickErrorButtonInError '</li></ul></td>"));
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.FIND_ERROR_CAUSE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+			System.clearProperty(SeleniumTestsContext.RANDOM_IN_ATTACHMENT_NAME);
+			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
+		}
+		
+	}
+	/**
+	 * No error can be found by error cause finder
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testNoErrorCauseFound(ITestContext testContext) throws Exception {
+		
+		try {
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.FIND_ERROR_CAUSE, "true");
+			System.setProperty(SeleniumTestsContext.RANDOM_IN_ATTACHMENT_NAME, "false");
+			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, VideoCaptureMode.ON_ERROR.toString());
+			
+			configureMockedSnapshotServerConnection();
+			createServerMock(SERVER_URL,
+					"POST", 
+					SeleniumRobotSnapshotServerConnector.DETECT_API_URL, 
+					200, 
+					Arrays.asList(
+							String.format(DETECT_NO_ERROR_REPLY, "testImageDetection_5-1_Test_end-.png"),
+							String.format(DETECT_FIELD_REPLY, "testImageDetectionNoError_4-1__clickErrorButton_-.jpg")
+							),
+					"request"
+					); // detect field
+			createServerMock("GET", SeleniumRobotSnapshotServerConnector.DETECT_API_URL, 200, String.format(DETECT_FIELD_REPLY, "testImageDetection_4-1__clickErrorButtonInError_-.jpg")); // get fields detected for reference
 			
 			ReporterTest.executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.NONE,  new String[] {"testImageDetection"});
 			
 			// check the error cause is displayed at the top of the report
 			String output = readTestMethodResultFile("testImageDetection");
-			Assert.assertTrue(output.contains("<th>Possible error causes</th><td><ul><li>The application has been modified: 1 field(s) missing: field_with_label[text=Name]: java.awt.Rectangle[x=191,y=284,width=114,height=36] on step '_clickErrorButtonInError '</li></ul></td>"));
+			Assert.assertFalse(output.contains("<th>Possible error causes</th>"));
 			
 		} finally {
-			System.clearProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL);
+			System.clearProperty(SeleniumTestsContext.FIND_ERROR_CAUSE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+			System.clearProperty(SeleniumTestsContext.RANDOM_IN_ATTACHMENT_NAME);
+			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
+		}
+		
+	}
+	
+	/**
+	 * Check case where a field is missing in step, compared to reference snapshot but we do not want error causes to be computed
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testErrorWithDiffFromReferenceNotRequested(ITestContext testContext) throws Exception {
+		
+		try {
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.FIND_ERROR_CAUSE, "false");
+			System.setProperty(SeleniumTestsContext.RANDOM_IN_ATTACHMENT_NAME, "false");
+			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, VideoCaptureMode.ON_ERROR.toString());
+			
+			configureMockedSnapshotServerConnection();
+			createServerMock(SERVER_URL,
+					"POST", 
+					SeleniumRobotSnapshotServerConnector.DETECT_API_URL, 
+					200, 
+					Arrays.asList(
+							String.format(DETECT_NO_ERROR_REPLY, "testImageDetection_5-1_Test_end-.png"),
+							String.format(DETECT_FIELD_REPLY2, "testImageDetectionNoError_4-1__clickErrorButton_-.jpg")
+							),
+					"request"
+					); // detect field
+			createServerMock("GET", SeleniumRobotSnapshotServerConnector.DETECT_API_URL, 200, String.format(DETECT_FIELD_REPLY, "testImageDetection_4-1__clickErrorButtonInError_-.jpg")); // get fields detected for reference
+			
+			ReporterTest.executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.NONE,  new String[] {"testImageDetection"});
+			
+			// check the error cause is displayed at the top of the report
+			String output = readTestMethodResultFile("testImageDetection");
+			Assert.assertFalse(output.contains("<th>Possible error causes</th>"));
+			
+		} finally {
 			System.clearProperty(SeleniumTestsContext.FIND_ERROR_CAUSE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
@@ -311,7 +427,6 @@ public class TestErrorCauseFInder extends ReporterTest {
 	public void testErrorWithAssertion(ITestContext testContext) throws Exception {
 		
 		try {
-			System.setProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL, SERVER_URL);
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
@@ -320,14 +435,17 @@ public class TestErrorCauseFInder extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, VideoCaptureMode.ON_ERROR.toString());
 			
 			configureMockedSnapshotServerConnection();
-			createServerMock("GET", FieldDetectorConnector.STATUS_URL, 200, "OK");		
-			createServerMock("POST", FieldDetectorConnector.DETECT_ERROR_URL, 200, String.format(DETECT_NO_ERROR_REPLY, "testImageDetectionNoError_5-1_Test_end-.png"));		
 			createServerMock(SERVER_URL,
 					"POST", 
-					FieldDetectorConnector.DETECT_URL,
+					SeleniumRobotSnapshotServerConnector.DETECT_API_URL, 
 					200, 
-					Arrays.asList(String.format(DETECT_FIELD_REPLY, "testImageDetectionNoError_4-1__clickErrorButton_-.jpg"), String.format(DETECT_FIELD_REPLY2, "testImageDetectionNoError_4-1__clickErrorButton_-.jpg")),
-					"request");	
+					Arrays.asList(
+							String.format(DETECT_NO_ERROR_REPLY, "testImageDetection_5-1_Test_end-.png"),
+							String.format(DETECT_FIELD_REPLY2, "testImageDetectionNoError_4-1__clickErrorButton_-.jpg")
+							),
+					"request"
+					); // detect field
+			createServerMock("GET", SeleniumRobotSnapshotServerConnector.DETECT_API_URL, 200, String.format(DETECT_FIELD_REPLY, "testImageDetection_4-1__clickErrorButtonInError_-.jpg")); // get fields detected for reference
 			
 			ReporterTest.executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.NONE,  new String[] {"testImageDetectionAssertionError"});
 			
@@ -336,7 +454,6 @@ public class TestErrorCauseFInder extends ReporterTest {
 			Assert.assertFalse(output.contains("<th>Possible error causes</th>"));
 			
 		} finally {
-			System.clearProperty(SeleniumTestsContext.IMAGE_FIELD_DETECTOR_SERVER_URL);
 			System.clearProperty(SeleniumTestsContext.FIND_ERROR_CAUSE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
@@ -347,8 +464,7 @@ public class TestErrorCauseFInder extends ReporterTest {
 		
 	}
 	
-	// test quand on ne demande pas à trouver les causes d'erreurs
-	// teste quand il n'y a pas de cause
+
 	// Prendre en compte RootCause et RootCauseDetails du testStep: on l'ajoute à la description de "ErrorCause"
 
 

@@ -71,6 +71,12 @@ public class Label {
 		return new Rectangle(left, top, width, height);
 	}
 
+	public JSONObject toJson() {
+		JSONObject json = new JSONObject(this);
+		json.remove("strategy");
+		json.remove("stringService");
+		return json;
+	}
 	
 	public static Label fromJson(JSONObject json) {
 		Label label = new Label();

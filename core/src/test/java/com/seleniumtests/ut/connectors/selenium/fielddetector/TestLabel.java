@@ -32,6 +32,12 @@ public class TestLabel extends GenericTest {
 		Assert.assertEquals(label.getText(), "My link Parent");
 	}
 	
+	@Test(groups= {"ut"})
+	public void testToJson() {
+		Label label = new Label(0, 1, 2, 3, "foo");
+		Assert.assertEquals(label.toJson(), new JSONObject("{\"text\":\"foo\",\"top\":2,\"bottom\":3,\"left\":0,\"right\":1,\"width\":1,\"height\":1}"));
+	}
+	
 	/**
 	 * Test case where text key is not present
 	 */

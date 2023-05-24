@@ -1,6 +1,5 @@
 package com.seleniumtests.ut.uipage.uielements;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -12,9 +11,12 @@ import static org.mockito.Mockito.when;
 import java.awt.Rectangle;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.apache.commons.io.FileUtils;
 import org.mockito.Mock;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.remote.ScreenshotException;
@@ -26,20 +28,26 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
+import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.connectors.selenium.fielddetector.Field;
 import com.seleniumtests.connectors.selenium.fielddetector.Label;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.SnapshotTarget;
 import com.seleniumtests.uipage.uielements.ByUI;
 import com.seleniumtests.uipage.uielements.ElementType;
 import com.seleniumtests.uipage.uielements.UiElement;
 
-@PrepareForTest({CustomEventFiringWebDriver.class, WebUIDriver.class})
+import kong.unirest.json.JSONArray;
+import kong.unirest.json.JSONObject;
+
+@PrepareForTest({CustomEventFiringWebDriver.class, WebUIDriver.class, SeleniumRobotSnapshotServerConnector.class})
 public class TestUiElement extends MockitoTest {
 	
 	public TestUiElement() throws IOException {
@@ -50,6 +58,9 @@ public class TestUiElement extends MockitoTest {
 
 	@Mock
 	private CustomEventFiringWebDriver driver;
+	
+	@Mock
+	private SeleniumRobotSnapshotServerConnector serverConnector;
 	
 	@Mock
 	private BrowserInfo browserInfo;
@@ -69,12 +80,12 @@ public class TestUiElement extends MockitoTest {
 	private Label label2;
 	private Label labelInside;
 	
-	private File screenCapture = createImageFromResource("tu/imageFieldDetection/screenCapture.png");
-	private File browserCapture = createImageFromResource("tu/imageFieldDetection/browserCapture.png");
+	private ScreenShot screenCapture;
+	private ScreenShot browserCapture;
 
 	
 	@BeforeMethod(groups= {"ut"})
-	public void init() {
+	public void init() throws IOException {
 		UiElement.resetPageInformation();
 		
 		/*
@@ -110,18 +121,35 @@ public class TestUiElement extends MockitoTest {
 		
 		PowerMockito.when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
 		when(driver.getBrowserInfo()).thenReturn(new BrowserInfo(BrowserType.CHROME, "83.0"));
+		
+		File screenCaptureFile = createImageFromResource("tu/imageFieldDetection/screenCapture.png");
+		File browserCaptureFile = createImageFromResource("tu/imageFieldDetection/browserCapture.png");
+		FileUtils.moveFile(screenCaptureFile, Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), screenCaptureFile.getName()).toFile());
+		FileUtils.moveFile(browserCaptureFile, Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), browserCaptureFile.getName()).toFile());
+		
+		screenCapture = new ScreenShot(screenCaptureFile.getName());
+		browserCapture = new ScreenShot(browserCaptureFile.getName());
+
 	}
 	
 	private void initDetector(UiElement element, List<Field> fields, List<Label> labels) {
 		// mock part of viewport detection
 		doReturn(screenshotUtil).when(element).getScreenshotUtil();
-		when(screenshotUtil.capture(SnapshotTarget.PAGE, File.class, true)).thenReturn(browserCapture);
-		when(screenshotUtil.capture(SnapshotTarget.MAIN_SCREEN, File.class, true)).thenReturn(screenCapture);
+		when(screenshotUtil.capture(SnapshotTarget.PAGE, ScreenShot.class, true)).thenReturn(browserCapture);
+		when(screenshotUtil.capture(SnapshotTarget.MAIN_SCREEN, ScreenShot.class, true)).thenReturn(screenCapture);
 		
-		// mock image field detector
-		doReturn(imageFieldDetector).when(element).getImageFieldDetector(any(File.class));
-		when(imageFieldDetector.detectFields()).thenReturn(fields);
-		when(imageFieldDetector.detectLabels()).thenReturn(labels);
+		PowerMockito.mockStatic(SeleniumRobotSnapshotServerConnector.class);
+		PowerMockito.when(SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(serverConnector);
+		
+		// build detect response from fields and labels
+		JSONObject detectResult = new JSONObject();
+		detectResult.put("version", "aaa");
+		detectResult.put("error", (String)null);
+		detectResult.put("fileName", "foo.png");
+		detectResult.put("fields", new JSONArray(fields.stream().map(Field::toJson).collect(Collectors.toList())));
+		detectResult.put("labels", new JSONArray(labels.stream().map(Label::toJson).collect(Collectors.toList())));
+		when(serverConnector.detectFieldsInPicture(browserCapture)).thenReturn(detectResult);
+
 	}
 	
 	@Test(groups= {"ut"})
@@ -168,8 +196,7 @@ public class TestUiElement extends MockitoTest {
 		element.findElement();
 		element.findElement();
 		
-		verify(imageFieldDetector).detectFields();
-		verify(imageFieldDetector).detectLabels();
+		verify(serverConnector).detectFieldsInPicture(browserCapture);
 	}
 	
 	/**
@@ -187,8 +214,7 @@ public class TestUiElement extends MockitoTest {
 		element.findElement();
 		element.findElement();
 		
-		verify(imageFieldDetector, times(2)).detectFields();
-		verify(imageFieldDetector, times(2)).detectLabels();
+		verify(serverConnector, times(2)).detectFieldsInPicture(browserCapture);
 	}
 	
 	/**
@@ -321,14 +347,21 @@ public class TestUiElement extends MockitoTest {
 		
 		// mock part of viewport detection
 		doReturn(screenshotUtil).when(element).getScreenshotUtil();
-		when(screenshotUtil.capture(SnapshotTarget.PAGE, File.class, true)).thenReturn(null);
-		when(screenshotUtil.capture(SnapshotTarget.MAIN_SCREEN, File.class, true)).thenReturn(screenCapture);
+		when(screenshotUtil.capture(SnapshotTarget.PAGE, ScreenShot.class, true)).thenReturn(null);
+		when(screenshotUtil.capture(SnapshotTarget.MAIN_SCREEN, ScreenShot.class, true)).thenReturn(screenCapture);
 		
-		// mock image field detector
-		doReturn(imageFieldDetector).when(element).getImageFieldDetector(any(File.class));
-		when(imageFieldDetector.detectFields()).thenReturn(Arrays.asList(field1, fieldWithLabel, field2));
-		when(imageFieldDetector.detectLabels()).thenReturn(Arrays.asList(label1Right, label2));
+		PowerMockito.mockStatic(SeleniumRobotSnapshotServerConnector.class);
+		PowerMockito.when(SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(serverConnector);
 		
+		// build detect response from fields and labels
+		JSONObject detectResult = new JSONObject();
+		detectResult.put("version", "aaa");
+		detectResult.put("error", (String)null);
+		detectResult.put("fileName", "foo.png");
+		detectResult.put("fields", new JSONArray(Arrays.asList(field1, fieldWithLabel, field2).stream().map(Field::toJson).collect(Collectors.toList())));
+		detectResult.put("labels", new JSONArray(Arrays.asList(label1Right, label2).stream().map(Label::toJson).collect(Collectors.toList())));
+		when(serverConnector.detectFieldsInPicture(browserCapture)).thenReturn(detectResult);
+
 		element.findElement();
 		
 	}

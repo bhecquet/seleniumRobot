@@ -1,38 +1,19 @@
 package com.seleniumtests.ut.util.imaging;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyDouble;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
-
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.seleniumtests.MockitoTest;
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.connectors.selenium.fielddetector.Field;
-import com.seleniumtests.connectors.selenium.fielddetector.ImageFieldDetector;
-import com.seleniumtests.connectors.selenium.fielddetector.ImageFieldDetector.FieldType;
 import com.seleniumtests.connectors.selenium.fielddetector.Label;
 import com.seleniumtests.util.imaging.StepReferenceComparator;
 
-@PrepareForTest({ImageFieldDetector.class, StepReferenceComparator.class})
-public class TestStepReferenceComparator extends MockitoTest {
+public class TestStepReferenceComparator extends GenericTest {
 
-	
-	@Mock
-	ImageFieldDetector stepImageFieldDetector;
-	
-	@Mock
-	ImageFieldDetector refImageFieldDetector;
-	
+
 	/**
 	 * List of fields are the same, comparison is successful (no labels)
 	 * @throws Exception
@@ -47,16 +28,11 @@ public class TestStepReferenceComparator extends MockitoTest {
 		List<Field> referenceFields = new ArrayList<>();
 		referenceFields.add(new Field(0, 100, 0, 20, "", "field"));
 		referenceFields.add(new Field(5, 105, 100, 120, "", "field"));
-		
-		PowerMockito.whenNew(ImageFieldDetector.class).withAnyArguments().thenReturn(stepImageFieldDetector, refImageFieldDetector);
-		when(stepImageFieldDetector.detectFields()).thenReturn(stepFields);
-		when(refImageFieldDetector.detectFields()).thenReturn(referenceFields);
-		
-		StepReferenceComparator comparator = new StepReferenceComparator(File.createTempFile("img", ".png"), File.createTempFile("img", ".png"));
+
+		StepReferenceComparator comparator = new StepReferenceComparator(stepFields, new ArrayList<>(), referenceFields, new ArrayList<>());
 		int matching = comparator.compare();
 		
 		Assert.assertEquals(matching, 100);
-		PowerMockito.verifyNew(ImageFieldDetector.class, times(2)).withArguments(any(File.class), anyDouble(), eq(FieldType.ALL_FORM_FIELDS));
 		
 	}
 	
@@ -70,12 +46,8 @@ public class TestStepReferenceComparator extends MockitoTest {
 		List<Label> referenceLabels = new ArrayList<>();
 		referenceLabels.add(new Label(0, 100, 0, 20, "a text"));
 		referenceLabels.add(new Label(5, 105, 100, 120, "other text"));
-		
-		PowerMockito.whenNew(ImageFieldDetector.class).withAnyArguments().thenReturn(stepImageFieldDetector, refImageFieldDetector);
-		when(stepImageFieldDetector.detectLabels()).thenReturn(stepLabels);
-		when(refImageFieldDetector.detectLabels()).thenReturn(referenceLabels);
-		
-		StepReferenceComparator comparator = new StepReferenceComparator(File.createTempFile("img", ".png"), File.createTempFile("img", ".png"));
+
+		StepReferenceComparator comparator = new StepReferenceComparator(new ArrayList<>(), stepLabels, new ArrayList<>(), referenceLabels);
 		
 		Assert.assertEquals(comparator.compare(), 100);
 	}
@@ -98,14 +70,8 @@ public class TestStepReferenceComparator extends MockitoTest {
 		List<Field> referenceFields = new ArrayList<>();
 		referenceFields.add(new Field(0, 100, 0, 20, "", "field"));
 		referenceFields.add(new Field(5, 105, 100, 120, "", "field"));
-		
-		PowerMockito.whenNew(ImageFieldDetector.class).withAnyArguments().thenReturn(stepImageFieldDetector, refImageFieldDetector);
-		when(stepImageFieldDetector.detectLabels()).thenReturn(stepLabels);
-		when(refImageFieldDetector.detectLabels()).thenReturn(referenceLabels);
-		when(stepImageFieldDetector.detectFields()).thenReturn(stepFields);
-		when(refImageFieldDetector.detectFields()).thenReturn(referenceFields);
-		
-		StepReferenceComparator comparator = new StepReferenceComparator(File.createTempFile("img", ".png"), File.createTempFile("img", ".png"));
+
+		StepReferenceComparator comparator = new StepReferenceComparator(stepFields, stepLabels, referenceFields, referenceLabels);
 		
 		Assert.assertEquals(comparator.compare(), 50);
 	}
@@ -113,9 +79,7 @@ public class TestStepReferenceComparator extends MockitoTest {
 	@Test(groups= {"ut"})
 	public void testCompareNoFieldNoLabel() throws Exception {
 		
-		PowerMockito.whenNew(ImageFieldDetector.class).withAnyArguments().thenReturn(stepImageFieldDetector, refImageFieldDetector);
-
-		StepReferenceComparator comparator = new StepReferenceComparator(File.createTempFile("img", ".png"), File.createTempFile("img", ".png"));
+		StepReferenceComparator comparator = new StepReferenceComparator(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
 		
 		Assert.assertEquals(comparator.compare(), 100);
 	}
