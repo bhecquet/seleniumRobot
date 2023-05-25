@@ -19,7 +19,6 @@ package com.seleniumtests.it.reporter;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -54,6 +53,7 @@ import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnecto
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.contexts.SeleniumRobotServerContext;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
+import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.reporters.CommonReporter;
 import com.seleniumtests.reporter.reporters.SeleniumRobotServerTestRecorder;
@@ -114,6 +114,38 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 			// check that screenshot information are removed from logs (the pattern "Output: ...")
 			verify(serverConnector).recordStepResult(eq(true), contains("step 1.3: open page"), eq(1230L), anyInt(), anyInt(), anyInt());
+		} finally {
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+		}
+	}
+	
+	/**
+	 * When selenium server is not active, do not try to send information to it
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportGenerationServerInactive() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "false");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			
+			initMocks();
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException", "testSkipped", "testOkWithTestName"});
+			
+			// check server has NOT been called for all aspects of test (app, version, ...)
+			verify(serverConnector, never()).createSession(anyString());
+			verify(serverConnector, never()).createTestCase(anyString());
+			verify(serverConnector, never()).addLogsToTestCaseInSession(anyInt(), anyString());
+			verify(serverConnector, never()).createTestCaseInSession(anyInt(), anyInt(), anyString()); 
+			verify(serverConnector, never()).createTestStep(anyString(), anyInt());
+			verify(serverConnector, never()).createSnapshot(any(Snapshot.class), anyInt(), anyInt(), anyInt(), eq(new ArrayList<>())); // two snapshots but only once is sent because the other has no name
+			
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
@@ -347,7 +379,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	}
 	
 	/**
-	 * We will check that at all calls to server will be done even if an error occurs when calling 'createStepReferenceSnapshot' on the first time
+	 * We will check that all calls to server will be done even if an error occurs when calling 'createStepReferenceSnapshot' on the first time
 	 * Further call should continue
 	 * @throws Exception
 	 */
@@ -443,10 +475,8 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 		PowerMockito.doReturn(serverConnector).when(SeleniumRobotSnapshotServerConnector.class, "getInstance");
 		when(serverConnector.getReferenceSnapshot(anyInt())).thenReturn(File.createTempFile("img", ".png"));
 		
-		PowerMockito.mockStatic(FieldDetectorConnector.class);
-		PowerMockito.doReturn(fieldDetectorConnector).when(FieldDetectorConnector.class, "getInstance", anyString());
-		when(fieldDetectorConnector.detect(any(File.class), anyDouble())).thenReturn(new JSONObject("{'fields': [], 'labels': []}"));
-		when(fieldDetectorConnector.detectError(any(File.class), anyDouble())).thenReturn(new JSONObject("{'fields': [], 'labels': []}"));
+		when(serverConnector.detectFieldsInPicture(any(ScreenShot.class))).thenReturn(new JSONObject("{'fields': [], 'labels': [], 'version': 'aaa', 'error': null}"));
+		when(serverConnector.detectErrorInPicture(any(ScreenShot.class))).thenReturn(new JSONObject("{'fields': [], 'labels': [], 'version': 'aaa', 'error': null}"));
 
 		doReturn(serverConnector).when(reporter).getServerConnector();
 		when(serverConnector.getActive()).thenReturn(true);

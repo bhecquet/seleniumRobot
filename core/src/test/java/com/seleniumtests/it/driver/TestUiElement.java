@@ -24,31 +24,38 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.seleniumtests.connectors.selenium.fielddetector.FieldDetectorConnector;
+import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageWithoutFixedPattern;
 import com.seleniumtests.util.helper.WaitHelper;
 
+/**
+ * Test class that aims at testing UiElement in real context
+ * SeleniumServer must be started on port 8002 and at least an "image-field-detector" worker is available
+ * @author S047432
+ *
+ */
 public class TestUiElement extends GenericMultiBrowserTest {
 	
+	
+	private SeleniumRobotSnapshotServerConnector connector;
 
 	public TestUiElement() throws Exception {
 		super(BrowserType.CHROME, "DriverTestPageWithoutFixedPattern");
 	}
 	
 	@BeforeMethod(groups={"it"}, alwaysRun = true)
-	public void testConnector() {
-
-		SeleniumTestsContextManager.getThreadContext().setImageFieldDetectorServerUrl("http://localhost:5000");
-		try {
-			FieldDetectorConnector.getInstance(SeleniumTestsContextManager.getThreadContext().getImageFieldDetectorServerUrl());
-		} catch (ConfigurationException e) {
-			throw new SkipException("Field detector is not available at address 'http://localhost:5000', skipping");
+	public void initConnector() {
+		
+		// pass the token via  -DseleniumRobotServerToken=xxxxxx
+		connector = new SeleniumRobotSnapshotServerConnector(true, "http://localhost:8002", SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerToken());
+		if (!connector.getActive()) {
+			throw new SkipException("no seleniumrobot server available");
 		}
+
 	}
 	
 	@AfterMethod(groups={"it"}, alwaysRun=true)
