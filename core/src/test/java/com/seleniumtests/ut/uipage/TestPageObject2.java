@@ -1276,7 +1276,7 @@ public class TestPageObject2 extends MockitoTest {
 		p1.start();
 		PageLauncher p2 = new PageLauncher();
 		p2.start();
-		while (p1.otherPage == null || p1.otherPage == null) {
+		while (p1.otherPage == null || p2.otherPage == null) {
 			WaitHelper.waitForMilliSeconds(200);
 		}
 		
