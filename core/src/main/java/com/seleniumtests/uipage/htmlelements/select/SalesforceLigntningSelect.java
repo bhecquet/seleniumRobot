@@ -98,7 +98,7 @@ public class SalesforceLigntningSelect extends AngularSelect implements ISelectL
 	
 	@Override
 	public boolean isSelected(WebElement option) {
-		String selectedAttribute = option.getAttribute(ATTR_ARIA_SELECTED).toLowerCase();
+		String selectedAttribute = option.getAttribute(ATTR_ARIA_CHECKED).toLowerCase();
 		return selectedAttribute != null && selectedAttribute.contains("true");
 			
 	}
