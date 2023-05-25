@@ -80,7 +80,7 @@ public class Lighthouse {
 	private boolean isInstalled() {
 		List<String> args = new ArrayList<>();
 		args.add("--help");
-		String out = executeLighthouseIndex(args);
+		String out = executeLighthouse(args);
 		return out.contains("--port");
 	}
 
@@ -102,7 +102,7 @@ public class Lighthouse {
 			throw new ScenarioException("Lighthouse not available");
 		}
 
-		String out = executeLighthouseIndex(args);
+		String out = executeLighthouse(args);
 
 		if (!out.contains("json output written to")) {
 			logger.error("Lighthouse did not execute correctly");
