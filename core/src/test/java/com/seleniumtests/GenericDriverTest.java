@@ -27,7 +27,9 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.video.VideoCaptureMode;
 
 /**
@@ -36,6 +38,7 @@ import com.seleniumtests.util.video.VideoCaptureMode;
  *
  */
 public class GenericDriverTest {
+	protected static final ScenarioLogger logger = ScenarioLogger.getScenarioLogger(SeleniumRobotTestPlan.class);
 	
 	public WebDriver driver = null;
 

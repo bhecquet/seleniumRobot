@@ -99,7 +99,6 @@ public class SeleniumIdeLauncher {
 	
 	public void executeGeneratedClasses(Map<String, String> classCodes, int numberOfThreads) throws ClassNotFoundException {
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
-
 		
 		// load web page classes
 		List<String> classes = new ArrayList<>();

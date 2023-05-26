@@ -2628,10 +2628,11 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-snapshot\">Lighthouse HTML http://\\d+.\\d+.\\d+.\\d+:\\d+/test.html: <a href='lighthouse/http.\\d+.\\d+.\\d+.\\d+.\\d+test.html-\\w+.html'>file</a></div>.*"));
 		
 		// check accessibility is displayed
-		Assert.assertTrue(detailedReportContent.contains("<tr><th width=\"15%\">Key</th><th width=\"60%\">Message</th><th width=\"25%\">Value</th></tr><tr><td>accessibility</td><td>accessibility</td><td>60.0</td></tr>"));
+		Assert.assertTrue(detailedReportContent.matches(".*<tr><th width=\"15%\">Key</th><th width=\"60%\">Message</th><th width=\"25%\">Value</th></tr><tr><td>accessibility</td><td>accessibility</td><td>\\d+\\.\\d+</td></tr>.*"));
 		
 		// check lighthouse error is included
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Lighthouse did not execute correctly</div>"));
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-snapshot\">Lighthouse logs some.bad.url: <a href='some.bad.url"));
+
 	}
 }

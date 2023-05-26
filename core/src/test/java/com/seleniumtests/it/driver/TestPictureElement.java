@@ -138,7 +138,7 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 			long totalTime1 = Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis();
 			reset();
 			
-			// second click should  search for the elementas we are not in the same page
+			// second click should  search for the element as we are not in the same page
 			start = Calendar.getInstance();
 			new DriverTestPageWithoutFixedPattern().clickGooglePrivatePicture();
 			long totalTime2 = Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis();

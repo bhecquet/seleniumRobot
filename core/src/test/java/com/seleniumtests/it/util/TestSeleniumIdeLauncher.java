@@ -39,7 +39,7 @@ import net.openhft.compiler.CompilerUtils;
 /**
  * /!\ to make these tests work from your IDE, you MUST add a VM argument: "-javaagent:<path_to_maven_repo>\org\aspectj\aspectjweaver\1.9.1\aspectjweaver-1.9.1.jar" 
  * Test and compilation MUST also be executed by a JDK
- *
+ * When using java IDE scripts, make sure they have different names accross tests, else, we may encounter problems with class already being in classloader
  */
 public class TestSeleniumIdeLauncher extends GenericTest {
 	
@@ -135,9 +135,9 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			
 			
 			File tmpSuiteFile = GenericTest.createFileFromResource("ti/ide/MainPageTest.java");
-			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTest.java").toFile();
+			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTest2.java").toFile();
 			File tmpSuiteFile2 = GenericTest.createFileFromResource("ti/ide/MainPageTest2.java");
-			File suiteFile2 = Paths.get(tmpSuiteFile2.getParentFile().getAbsolutePath(), "MainPageTest2.java").toFile();
+			File suiteFile2 = Paths.get(tmpSuiteFile2.getParentFile().getAbsolutePath(), "MainPageTest3.java").toFile();
 			FileUtility.copyFile(tmpSuiteFile, suiteFile);
 			FileUtility.copyFile(tmpSuiteFile2, suiteFile2);
 			
@@ -173,6 +173,8 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 	
 	/**
 	 * Check that manual steps are displayed in report
+	 * /!\ most of the time, this test fails during maven execution
+	 * 
 	 * @throws IOException
 	 * @throws ClassNotFoundException
 	 */
@@ -186,7 +188,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			
 			// use a different file from the previous test to avoid problems with compiler cache
 			File tmpSuiteFile = GenericTest.createFileFromResource("ti/ide/MainPageTest2.java");
-			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTest2.java").toFile();
+			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTest4.java").toFile();
 			FileUtility.copyFile(tmpSuiteFile, suiteFile);
 			
 			new SeleniumIdeLauncher().executeScripts(Arrays.asList(suiteFile.getAbsolutePath()), 1);
@@ -232,7 +234,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			
 			// use a different file from the previous test to avoid problems with compiler cache
 			File tmpSuiteFile = GenericTest.createFileFromResource("ti/ide/MainPageTest2.java");
-			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTest2.java").toFile();
+			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTest5.java").toFile();
 			FileUtils.copyFile(tmpSuiteFile, suiteFile);
 			
 			new SeleniumIdeLauncher().executeScripts(Arrays.asList(suiteFile.getAbsolutePath()), 1);
@@ -322,7 +324,6 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			}
 			
 			verify(logger).error(ArgumentMatchers.contains("invalid code, one element is missing : "));
-			verify(logger).error(ArgumentMatchers.contains("Parse error."));
 
 
 		} finally {

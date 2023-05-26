@@ -635,7 +635,7 @@ public class TestWebUiDriver extends ReporterTest {
 
 			if (BrowserType.CHROME == browserType || BrowserType.EDGE == browserType) {
 				// create chrome browser with the right option
-				OSCommand.executeCommand(new String[] {path, "--remote-debugging-port=" + port, "about:blank"});
+				OSCommand.executeCommand(new String[] {path, "--remote-debugging-port=" + port, "--remote-allow-origins=*", "about:blank"});
 			} else if (BrowserType.INTERNET_EXPLORER == browserType) {
 				WebDriver driver = WebUIDriver.getWebDriver(true, BrowserType.INTERNET_EXPLORER, "main", null);
 				if (startupUrl != null) {
