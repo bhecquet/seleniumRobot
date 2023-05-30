@@ -204,7 +204,7 @@ public class AppTestDocumentation {
 		
 
 		FileUtils.write(Paths.get(args[0], "src/site/confluence/template.confluence").toFile(), javadoc, StandardCharsets.UTF_8);
-		FileUtils.write(Paths.get(args[0], "src/site/confluence/template.html").toFile(), javadoc, StandardCharsets.UTF_8);
+		FileUtils.write(Paths.get(args[0], "src/site/confluence/template.xhtml").toFile(), javadoc, StandardCharsets.UTF_8);
 		
 		
 	}
