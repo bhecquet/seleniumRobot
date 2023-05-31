@@ -80,22 +80,7 @@ public class SquashTMApi {
 				continue;
 			}
 			
-			boolean folderExists = false;
-			for (CampaignFolder existingFolder: campaignFolders) {
-				if (existingFolder.getName().equals(folderName) 
-						&& (existingFolder.getProject() == null || existingFolder.getProject() != null && existingFolder.getProject().getId() == currentProject.getId())
-						&& (existingFolder.getParent() == null 
-							|| parentFolder == null && existingFolder.getParent() != null && existingFolder.getParent() instanceof Project
-							|| (parentFolder != null && existingFolder.getParent() != null && existingFolder.getParent() instanceof CampaignFolder && existingFolder.getParent().getId() == parentFolder.getId()))) {
-					folderExists = true;
-					parentFolder = existingFolder;
-					break;
-				}
-			}
-			
-			if (!folderExists) {
-				parentFolder = CampaignFolder.create(currentProject, parentFolder, folderName);
-			}
+			parentFolder = createCampaignFolders(campaignFolders, folderName, parentFolder);
 		}
 
 		// do not create campaign if it exists
@@ -120,6 +105,34 @@ public class SquashTMApi {
 			}
 		}
 		return Iteration.create(campaign, iterationName);
+	}
+	
+	/**
+	 * Creates folders to store a campaign
+	 * @param campaignFolders
+	 * @param folderName
+	 * @param parentFolder
+	 * @return
+	 */
+	private CampaignFolder createCampaignFolders(List<CampaignFolder> campaignFolders, String folderName, CampaignFolder parentFolder) {
+		boolean folderExists = false;
+		for (CampaignFolder existingFolder: campaignFolders) {
+			if (existingFolder.getName().equals(folderName) 
+					&& (existingFolder.getProject() == null || existingFolder.getProject() != null && existingFolder.getProject().getId() == currentProject.getId())
+					&& (existingFolder.getParent() == null 
+						|| parentFolder == null && existingFolder.getParent() != null && existingFolder.getParent() instanceof Project
+						|| (parentFolder != null && existingFolder.getParent() != null && existingFolder.getParent() instanceof CampaignFolder && existingFolder.getParent().getId() == parentFolder.getId()))) {
+				folderExists = true;
+				parentFolder = existingFolder;
+				break;
+			}
+		}
+		
+		if (!folderExists) {
+			parentFolder = CampaignFolder.create(currentProject, parentFolder, folderName);
+		}
+		
+		return parentFolder;
 	}
 	
 	/**

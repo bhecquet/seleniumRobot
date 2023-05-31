@@ -24,6 +24,11 @@ import com.seleniumtests.reporter.logger.TestStep;
  */
 public class UftReport1 extends IUftReport {
 	
+	private static final String ATTRIBUTE_TYPE = "type";
+	private static final String TAG_DATA = "Data";
+	private static final String TAG_DESCRIPTION = "Description";
+	private static final String TAG_REPORT_NODE = "ReportNode";
+
 	public UftReport1(String xmlReport, String scriptName) {
 		super(xmlReport, scriptName);
 	}
@@ -45,16 +50,16 @@ public class UftReport1 extends IUftReport {
             xml = xml.replaceAll(xml10pattern, "");
 
             document = builder.build(new InputSource(new StringReader(xml))); // we skip BOM by searching the first "<" character
-            Element docElement = document.getRootElement().getChild("ReportNode");
-            Element elementToIterate = docElement.getChild("ReportNode");
-            Element iterationChild = elementToIterate.getChild("ReportNode");
+            Element docElement = document.getRootElement().getChild(TAG_REPORT_NODE);
+            Element elementToIterate = docElement.getChild(TAG_REPORT_NODE);
+            Element iterationChild = elementToIterate.getChild(TAG_REPORT_NODE);
 
-            if (!iterationChild.getChildren("ReportNode").isEmpty()) {
+            if (!iterationChild.getChildren(TAG_REPORT_NODE).isEmpty()) {
                 elementToIterate = iterationChild;
             }
 
             for (Element element : elementToIterate.getChildren()) {
-                if ("ReportNode".equals(element.getName())) {
+                if (TAG_REPORT_NODE.equals(element.getName())) {
                     TestStep readStep = readAction(element);
                     listStep.add(readStep);
                 }
@@ -78,7 +83,7 @@ public class UftReport1 extends IUftReport {
      * @throws DataConversionException
      */
     private TestStep readAction(Element actionElement) throws DataConversionException {
-        Element data = actionElement.getChild("Data");
+        Element data = actionElement.getChild(TAG_DATA);
         
         TestStep actionStep = new TestStep("UFT: " + data.getChild("Name").getValue().trim(), Reporter.getCurrentTestResult(), new ArrayList<>(), false);
 
@@ -87,13 +92,13 @@ public class UftReport1 extends IUftReport {
         }
 
         for (Element element : actionElement.getChildren()) {
-                if ("Data".equals(element.getName())) { }
-                else if (element.getAttributeValue("type").equals("Action")
-                		|| element.getAttributeValue("type").equals("Context")
-                		|| element.getAttributeValue("type").equals("User")) {
+                if (TAG_DATA.equals(element.getName())) { }
+                else if (element.getAttributeValue(ATTRIBUTE_TYPE).equals("Action")
+                		|| element.getAttributeValue(ATTRIBUTE_TYPE).equals("Context")
+                		|| element.getAttributeValue(ATTRIBUTE_TYPE).equals("User")) {
                     TestStep readStep = readAction(element);
                     actionStep.addStep(readStep);
-                } else if (element.getAttributeValue("type").equals("Step")) {
+                } else if (element.getAttributeValue(ATTRIBUTE_TYPE).equals("Step")) {
                     TestAction readAction = readStep(element);
                     actionStep.addAction(readAction);
                 } 
@@ -112,23 +117,23 @@ public class UftReport1 extends IUftReport {
         String stepDescription = "";
 
         TestAction stepAction;
-        List<Element> stepList = stepElement.getChildren("ReportNode");
+        List<Element> stepList = stepElement.getChildren(TAG_REPORT_NODE);
 
-        if (stepElement.getChild("Data").getChild("Description") != null) {
-            if (!stepElement.getChild("Data").getChild("Description").getContent().isEmpty()) {
-                org.jsoup.nodes.Document htmlDoc = Jsoup.parseBodyFragment(stepElement.getChild("Data").getChildText("Description"));
+        if (stepElement.getChild(TAG_DATA).getChild(TAG_DESCRIPTION) != null) {
+            if (!stepElement.getChild(TAG_DATA).getChild(TAG_DESCRIPTION).getContent().isEmpty()) {
+                org.jsoup.nodes.Document htmlDoc = Jsoup.parseBodyFragment(stepElement.getChild(TAG_DATA).getChildText(TAG_DESCRIPTION));
                 String details = htmlDoc.text();
-                stepDescription = String.format("%s: %s", stepElement.getChild("Data").getChildText("Name"), details).trim();
+                stepDescription = String.format("%s: %s", stepElement.getChild(TAG_DATA).getChildText("Name"), details).trim();
             }
         } else {
-            stepDescription = String.format(stepElement.getChild("Data").getChildText("Name")).trim();
+            stepDescription = String.format(stepElement.getChild(TAG_DATA).getChildText("Name")).trim();
         }
 
         if (stepList.isEmpty()) {
             stepAction = new TestAction(stepDescription, false, new ArrayList<>());
         } else {
             stepAction = new TestStep(stepDescription, Reporter.getCurrentTestResult(), new ArrayList<>(), false);
-            for (Element subStepElement : stepElement.getChildren("ReportNode")) {
+            for (Element subStepElement : stepElement.getChildren(TAG_REPORT_NODE)) {
                 TestAction readAction = readStep(subStepElement);
                 ((TestStep) stepAction).addAction(readAction);
             }

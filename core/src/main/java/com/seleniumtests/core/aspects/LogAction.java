@@ -341,22 +341,7 @@ public class LogAction {
 				}
 
 				// store the value of the argument containing a password
-				if (arg != null && (argName.toLowerCase().contains("password") 
-						|| argName.toLowerCase().contains("pwd") 
-						|| argName.toLowerCase().contains("passwd")
-						|| ((MethodSignature)joinPoint.getSignature()).getMethod().getParameters()[paramIdx].getAnnotationsByType(Mask.class).length > 0)) {
-					if (arg instanceof CharSequence[]) {
-						for (Object obj: (CharSequence[])arg) {
-							stringToReplace.add(obj.toString());
-						}
-					} else if (arg instanceof List) {
-						for (Object obj: (List<?>)arg) {
-							stringToReplace.add(obj.toString());
-						}
-					} else {
-						stringToReplace.add(arg.toString());
-					}
-				} 
+				addPasswordsToReplacements(joinPoint, stringToReplace, paramIdx, arg, argName); 
 				
 				StringBuilder argValue = new StringBuilder();
 				// add arguments to the name of the method
@@ -369,7 +354,6 @@ public class LogAction {
 				} else {
 					argValue.append((arg == null ? "null": arg.toString()));
 				}
-//				argString.append(String.format("%s=%s, ", argName, argValue.toString()));
 				argString.append(String.format("%s, ", argValue.toString()));
 				argValues.put(argName, argValue.toString());
 				paramIdx++;
@@ -377,6 +361,33 @@ public class LogAction {
 			argString.append(")");
 		}
 		return argString.toString();
+	}
+
+	/**
+	 * @param joinPoint
+	 * @param stringToReplace
+	 * @param paramIdx
+	 * @param arg
+	 * @param argName
+	 */
+	private static void addPasswordsToReplacements(JoinPoint joinPoint, List<String> stringToReplace, int paramIdx,
+			Object arg, String argName) {
+		if (arg != null && (argName.toLowerCase().contains("password") 
+				|| argName.toLowerCase().contains("pwd") 
+				|| argName.toLowerCase().contains("passwd")
+				|| ((MethodSignature)joinPoint.getSignature()).getMethod().getParameters()[paramIdx].getAnnotationsByType(Mask.class).length > 0)) {
+			if (arg instanceof CharSequence[]) {
+				for (Object obj: (CharSequence[])arg) {
+					stringToReplace.add(obj.toString());
+				}
+			} else if (arg instanceof List) {
+				for (Object obj: (List<?>)arg) {
+					stringToReplace.add(obj.toString());
+				}
+			} else {
+				stringToReplace.add(arg.toString());
+			}
+		}
 	}
 	
 	/**

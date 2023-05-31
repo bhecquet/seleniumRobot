@@ -88,26 +88,7 @@ public class SeleniumGridConnectorFactory {
 					seleniumGridConnectors.add(new BrowserStackGridConnector(hubUrl.toString()));
 					break;
 				}
-				
-				// connect to console page to see if grid replies
-				try {
-					HttpResponse<String> response = Unirest.get(String.format("http://%s:%s%s", hubUrl.getHost(), hubUrl.getPort(), SeleniumGridConnector.CONSOLE_SERVLET)).asString();
-					if (response.getStatus() == 200) {
-						
-						// try to connect to a SeleniumRobot grid specific servlet. If it replies, we are on a seleniumRobot grid
-						HttpResponse<String> responseGuiServlet = Unirest.get(String.format("http://%s:%s%s", hubUrl.getHost(), hubUrl.getPort(), SeleniumRobotGridConnector.GUI_SERVLET)).asString();
-						if (responseGuiServlet.getStatus() == 200) {
-							seleniumGridConnectors.add(new SeleniumRobotGridConnector(hubUrl.toString()));
-		        		} else {
-		        			seleniumGridConnectors.add(new SeleniumGridConnector(hubUrl.toString()));
-		        		}
-		        	} else {
-		        		logger.error("Cannot connect to the grid hub at " + hubUrl.toString());
-		        	}
-				} catch (Exception ex) {
-					WaitHelper.waitForMilliSeconds(500);
-					currentException = ex;
-				}
+				currentException = connectHub(currentException, seleniumGridConnectors, hubUrl);
 			}
 			
 			// if at least one hub replies, continue
@@ -117,6 +98,36 @@ public class SeleniumGridConnectorFactory {
 		}
 
     	throw new ConfigurationException("Cannot connect to the grid hubs at " + urls, currentException);
+	}
+
+	/**
+	 * @param currentException
+	 * @param seleniumGridConnectors
+	 * @param hubUrl
+	 * @return
+	 */
+	private static Exception connectHub(Exception currentException, List<SeleniumGridConnector> seleniumGridConnectors,
+			URL hubUrl) {
+		// connect to console page to see if grid replies
+		try {
+			HttpResponse<String> response = Unirest.get(String.format("http://%s:%s%s", hubUrl.getHost(), hubUrl.getPort(), SeleniumGridConnector.CONSOLE_SERVLET)).asString();
+			if (response.getStatus() == 200) {
+				
+				// try to connect to a SeleniumRobot grid specific servlet. If it replies, we are on a seleniumRobot grid
+				HttpResponse<String> responseGuiServlet = Unirest.get(String.format("http://%s:%s%s", hubUrl.getHost(), hubUrl.getPort(), SeleniumRobotGridConnector.GUI_SERVLET)).asString();
+				if (responseGuiServlet.getStatus() == 200) {
+					seleniumGridConnectors.add(new SeleniumRobotGridConnector(hubUrl.toString()));
+				} else {
+					seleniumGridConnectors.add(new SeleniumGridConnector(hubUrl.toString()));
+				}
+			} else {
+				logger.error("Cannot connect to the grid hub at " + hubUrl.toString());
+			}
+		} catch (Exception ex) {
+			WaitHelper.waitForMilliSeconds(500);
+			currentException = ex;
+		}
+		return currentException;
 	}
 
 	public static int getRetryTimeout() {
