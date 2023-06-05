@@ -25,7 +25,12 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.seleniumtests.connectors.extools.Lighthouse;
+import com.seleniumtests.core.TestTasks;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.math3.analysis.function.Power;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.Test;
@@ -37,6 +42,8 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.contexts.SeleniumRobotServerContext;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.it.stubclasses.StubTestClass;
+
+import static org.mockito.ArgumentMatchers.*;
 
 public class TestSeleniumTestsReporter2 extends ReporterTest {
 
@@ -2618,6 +2625,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	
 	@Test(groups={"it"})
 	public void testReportWithLighthouseExecution() throws Exception {
+		Lighthouse lighthouse = PowerMockito.mock(Lighthouse.class);
+		PowerMockito.when(lighthouse.isAvailable()).thenReturn(true);
 
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverWithLighthouse"});
 
