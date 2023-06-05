@@ -86,7 +86,7 @@ public class TestLighthouse extends MockitoTest {
 
 	@Test(groups = "ut")
 	public void testCheckLighthouseHomeIsntOnPath() throws IOException {
-		when(System.getenv("LIGHTHOUSE_HOME")).thenReturn("C:/test/lighthouse/");
+		when(System.getenv("LIGHTHOUSE_HOME")).thenReturn("/test/lighthouse/");
 
 		Lighthouse lighthouse = new Lighthouse(1234, "/home/selenium/out");
 		Assert.assertFalse(lighthouse.isLighthouseInPath());
@@ -100,7 +100,7 @@ public class TestLighthouse extends MockitoTest {
 
 	@Test(groups = "ut")
 	public void testExecuteLighthouseIndexWithPath() throws IOException {
-		PowerMockito.when(TestTasks.executeCommand(eq(OSCommand.USE_PATH + "lighthouse"), eq(90), isNull(), any()))
+		PowerMockito.when(TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(90), isNull(), any()))
 				.thenReturn("mocked output with path");
 
 		Lighthouse lighthouse = new Lighthouse(1234, "/home/selenium/out");
@@ -112,9 +112,9 @@ public class TestLighthouse extends MockitoTest {
 	@Test(groups = "ut")
 	public void testExecuteLighthouseIndexWithoutPath() throws IOException {
 		PowerMockito.mockStatic(System.class);
-		when(System.getenv("LIGHTHOUSE_HOME")).thenReturn("C:/test/lighthouse/");
+		when(System.getenv("LIGHTHOUSE_HOME")).thenReturn("/test/lighthouse/");
 
-		PowerMockito.when(TestTasks.executeCommand(eq(OSCommand.USE_PATH + "node"), eq(90), isNull(), eq("C:/test/lighthouse/index.js")))
+		PowerMockito.when(TestTasks.executeCommand(eq("_USE_PATH_node"), eq(90), isNull(), eq("/test/lighthouse/index.js")))
 				.thenReturn("mocked output without path");
 
 		Lighthouse lighthouse = new Lighthouse(1234, "/home/selenium/out");
