@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Platform;
+import org.openqa.selenium.Proxy;
 
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.customexception.ConfigurationException;
@@ -511,4 +512,10 @@ public abstract class OSUtility {
 	public static void refreshBrowserList(boolean discoverBetaBrowsers) {
 		installedBrowsersWithVersion = OSUtilityFactory.getInstance().discoverInstalledBrowsersWithVersion(discoverBetaBrowsers);
 	}
+	
+	/**
+	 * Sets the proxy at system level
+	 * @param proxy
+	 */
+	public abstract void setSystemProxy(Proxy proxy);
 }

@@ -36,6 +36,7 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Platform;
+import org.openqa.selenium.Proxy;
 import org.openqa.selenium.Proxy.ProxyType;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.events.WebDriverEventListener;
@@ -980,6 +981,36 @@ public class SeleniumTestsContext {
     	if (getCaptureNetwork() && getWebProxyType() != ProxyType.DIRECT && getWebProxyType() != ProxyType.MANUAL) {
     		throw new ConfigurationException("Browsermob proxy (captureNetwork option) is only compatible with DIRECT and MANUAL");
     	}
+    }
+    
+    public Proxy getProxy() {
+
+    	Proxy proxy = new Proxy();
+    	ProxyType proxyType = getWebProxyType();
+    	String addressAndPort = String.format("%s:%s", getWebProxyAddress(), getWebProxyPort());
+    	
+    	proxy.setProxyType(proxyType);
+    	
+		if (proxyType == ProxyType.PAC) {
+			proxy.setProxyAutoconfigUrl(getWebProxyPac());
+			
+		// manual proxy configuration
+		} else if (proxyType == ProxyType.MANUAL) {
+			proxy.setHttpProxy(addressAndPort);
+			proxy.setSslProxy(addressAndPort);
+			//proxy.setFtpProxy(addressAndPort);
+			
+			if (getWebProxyLogin() != null && getWebProxyPassword() != null) {
+				proxy.setSocksUsername(getWebProxyLogin());
+				proxy.setSocksPassword(getWebProxyPassword());
+			}
+			
+			if (getWebProxyExclude() != null) {
+				proxy.setNoProxy(getWebProxyExclude().replace(";", ","));
+			}
+		} 	
+		
+		return proxy;
     }
     
     /**
