@@ -67,7 +67,6 @@ public class OSCommand {
 	 * @param cmdString
 	 * @param timeout
 	 * @param charset
-	 * @param pb
 	 */
 	public OSCommand(String cmdString, int timeout, Charset charset) {
 		this(cmdString, timeout, charset, Runtime.getRuntime());
@@ -159,8 +158,7 @@ public class OSCommand {
 	
 	/**
      * Execute a command in command line terminal
-     * @param cmd
-     * @param wait for the end of the command execution
+     * @param cmd for the end of the command execution
      * @return 
      */
     public static String executeCommandAndWait(final String[] cmd) {
@@ -181,8 +179,7 @@ public class OSCommand {
     
     /**
      * Execute a command in command line terminal
-     * @param cmd
-     * @param wait for the end of the command execution
+     * @param cmd for the end of the command execution
      * @return 
      */
    	public static String executeCommandAndWait(final String cmd) {
