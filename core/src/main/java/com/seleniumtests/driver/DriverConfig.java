@@ -31,10 +31,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 import org.openqa.selenium.support.events.WebDriverListener;
 
-import com.google.gson.JsonObject;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
-import com.seleniumtests.core.proxy.ProxyConfig;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -234,74 +232,9 @@ public class DriverConfig {
     public Platform getWebPlatform() {
         return Platform.fromString(testContext.getPlatform());
     }
-    
-    public JsonObject getJsonProxy() {
-    	ProxyConfig proxyConfig = getProxyConfig();
-    	
-    	JsonObject json = new JsonObject();
-		json.addProperty("proxyType", proxyConfig.getType().toString());
-		
-		if (proxyConfig.getType() == ProxyType.PAC) {
-			json.addProperty("proxyAutoconfigUrl", proxyConfig.getPac());
-			
-		// manual proxy configuration
-		} else if (proxyConfig.getType() == ProxyType.MANUAL) {
-			json.addProperty("httpProxy", proxyConfig.getAddress());
-			json.addProperty("httpProxyPort", proxyConfig.getPort());
-			json.addProperty("sslProxy", proxyConfig.getAddress());
-			json.addProperty("sslProxyPort", proxyConfig.getPort());
-			
-			if (proxyConfig.getLogin() != null && proxyConfig.getPassword() != null) {
-				json.addProperty("socksUsername", proxyConfig.getLogin());
-				json.addProperty("socksPassword", proxyConfig.getPassword());
-			}
-			
-			if (proxyConfig.getExclude() != null) {
-				json.addProperty("noProxy", proxyConfig.getExclude().replace(";", ","));
-			}
-		}
-		
-		return json;
-    }
 
     public Proxy getProxy() {
-    	ProxyConfig proxyConfig = getProxyConfig();
-    	
-    	Proxy proxy = new Proxy();
-    	proxy.setProxyType(proxyConfig.getType());
-    	
-		if (proxyConfig.getType() == ProxyType.PAC) {
-			proxy.setProxyAutoconfigUrl(proxyConfig.getPac());
-			
-		// manual proxy configuration
-		} else if (proxyConfig.getType() == ProxyType.MANUAL) {
-			proxy.setHttpProxy(proxyConfig.getAddressAndPort());
-			proxy.setSslProxy(proxyConfig.getAddressAndPort());
-			//proxy.setFtpProxy(proxyConfig.getAddressAndPort());
-			
-			if (proxyConfig.getLogin() != null && proxyConfig.getPassword() != null) {
-				proxy.setSocksUsername(proxyConfig.getLogin());
-				proxy.setSocksPassword(proxyConfig.getPassword());
-			}
-			
-			if (proxyConfig.getExclude() != null) {
-				proxy.setNoProxy(proxyConfig.getExclude().replace(";", ","));
-			}
-		} 	
-		
-		return proxy;
-    }
-
-    public ProxyConfig getProxyConfig() {
-    	ProxyConfig proxyConfig = new ProxyConfig();
-        proxyConfig.setType(testContext.getWebProxyType());
-        proxyConfig.setAddress(testContext.getWebProxyAddress());
-        proxyConfig.setPort(testContext.getWebProxyPort());
-        proxyConfig.setLogin(testContext.getWebProxyLogin());
-        proxyConfig.setPassword(testContext.getWebProxyPassword());
-        proxyConfig.setExclude(testContext.getWebProxyExclude());
-        proxyConfig.setPac(testContext.getWebProxyPac());
-        return proxyConfig;
+    	return testContext.getProxy();
     }
     
     public ProxyType getWebProxyType() {

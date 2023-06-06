@@ -23,6 +23,9 @@ import com.seleniumtests.reporter.logger.TestStep;
  */
 public class UftReport2 extends IUftReport {
 	
+	private static final String TAG_STEP = "Step";
+	private static final String TAG_ACTION = "Action";
+
 	public UftReport2(String xmlReport, String scriptName) {
 		super(xmlReport, scriptName);
 	}
@@ -46,17 +49,17 @@ public class UftReport2 extends IUftReport {
             document = builder.build(new InputSource(new StringReader(xml))); // we skip BOM by searching the first "<" character
             Element docElement = document.getRootElement().getChild("Doc");
             Element elementToIterate = docElement.getChild("DIter");
-            Element iterationChild = elementToIterate.getChild("Action");
+            Element iterationChild = elementToIterate.getChild(TAG_ACTION);
             
-			if (!iterationChild.getChildren("Action").isEmpty()) {
+			if (!iterationChild.getChildren(TAG_ACTION).isEmpty()) {
 				  elementToIterate = iterationChild;
 			}
 			
 			for (Element element : elementToIterate.getChildren()) {
-                if ("Action".equals(element.getName())) {
+                if (TAG_ACTION.equals(element.getName())) {
                     TestStep readStep = readAction(element);
                     listStep.add(readStep);
-                } else if ("Step".equals(element.getName())) {
+                } else if (TAG_STEP.equals(element.getName())) {
                     readStep(element);
                 }
             }
@@ -85,10 +88,10 @@ public class UftReport2 extends IUftReport {
 		}
 
 		for (Element element : actionElement.getChildren()) {
-			if ("Action".equals(element.getName())) {
+			if (TAG_ACTION.equals(element.getName())) {
 				TestStep readStep = readAction(element);
 				actionStep.addStep(readStep);
-			} else if ("Step".equals(element.getName())) {
+			} else if (TAG_STEP.equals(element.getName())) {
 				TestAction readAction = readStep(element);
 				actionStep.addAction(readAction);
 			}
@@ -106,7 +109,7 @@ public class UftReport2 extends IUftReport {
 	private TestAction readStep(Element stepElement) {
 	    
 		TestAction stepAction;
-		List<Element> stepList = stepElement.getChildren("Step");
+		List<Element> stepList = stepElement.getChildren(TAG_STEP);
 		
 		org.jsoup.nodes.Document htmlDoc = Jsoup.parseBodyFragment(stepElement.getChildText("Details"));
 		String details = htmlDoc.text();
@@ -117,7 +120,7 @@ public class UftReport2 extends IUftReport {
 			stepAction = new TestAction(stepDescription, false, new ArrayList<>());
 		} else {
 			stepAction = new TestStep(stepDescription, Reporter.getCurrentTestResult(), new ArrayList<>(), false);
-			for (Element subStepElement : stepElement.getChildren("Step")) {
+			for (Element subStepElement : stepElement.getChildren(TAG_STEP)) {
 				TestAction readAction = readStep(subStepElement);
 				((TestStep) stepAction).addAction(readAction);
 			}

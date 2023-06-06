@@ -192,51 +192,11 @@ public class UiElement {
 	private void findElementByPosition() {
 
 		// search the fields with label
-		Label labelRightOf = null;
-		Label labelLeftOf = null;
-		Label labelAbove = null;
-		Label labelBelow = null;
-		Label labelText = null;
-		if (by.getRightOf() != null) {
-			for (Label lbl: labelsPerPage.get(origin)) {
-				if (by.getRightOf().matcher(lbl.getText().trim()).matches()) {
-					labelRightOf = lbl;
-					break;
-				}
-			}
-		}
-		if (by.getLeftOf() != null) {
-			for (Label lbl: labelsPerPage.get(origin)) {
-				if (by.getLeftOf().matcher(lbl.getText().trim()).matches()) {
-					labelLeftOf = lbl;
-					break;
-				}
-			}
-		}
-		if (by.getAbove() != null) {
-			for (Label lbl: labelsPerPage.get(origin)) {
-				if (by.getAbove().matcher(lbl.getText().trim()).matches()) {
-					labelAbove = lbl;
-					break;
-				}
-			}
-		}
-		if (by.getBelow() != null) {
-			for (Label lbl: labelsPerPage.get(origin)) {
-				if (by.getBelow().matcher(lbl.getText().trim()).matches()) {
-					labelBelow = lbl;
-					break;
-				}
-			}
-		}
-		if (by.getText() != null) {
-			for (Label lbl: labelsPerPage.get(origin)) {
-				if (by.getText().matcher(lbl.getText().trim()).matches()) {
-					labelText = lbl;
-					break;
-				}
-			}
-		}
+		Label labelRightOf = getLabelRightOf();
+		Label labelLeftOf = getLabelLeftOf();
+		Label labelAbove = getLabelAbove();
+		Label labelBelow = getLabelBelow();
+		Label labelText = getLabelText();
 		
 		if (labelLeftOf == null && labelRightOf == null && labelText == null && labelAbove == null && labelBelow == null) {
 			throw new ConfigurationException(String.format("No label could be found matching search criteria [%s]", by));
@@ -259,6 +219,81 @@ public class UiElement {
 		
 		}
 		throw new ConfigurationException(String.format("No field could be found matching search criteria [%s]", by));
+	}
+
+	/**
+	 * @param labelText
+	 * @return
+	 */
+	private Label getLabelText() {
+		if (by.getText() != null) {
+			for (Label lbl: labelsPerPage.get(origin)) {
+				if (by.getText().matcher(lbl.getText().trim()).matches()) {
+					return lbl;
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @param labelBelow
+	 * @return
+	 */
+	private Label getLabelBelow() {
+		if (by.getBelow() != null) {
+			for (Label lbl: labelsPerPage.get(origin)) {
+				if (by.getBelow().matcher(lbl.getText().trim()).matches()) {
+					return lbl;
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @param labelAbove
+	 * @return
+	 */
+	private Label getLabelAbove() {
+		if (by.getAbove() != null) {
+			for (Label lbl: labelsPerPage.get(origin)) {
+				if (by.getAbove().matcher(lbl.getText().trim()).matches()) {
+					return lbl;
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @param labelLeftOf
+	 * @return
+	 */
+	private Label getLabelLeftOf() {
+		if (by.getLeftOf() != null) {
+			for (Label lbl: labelsPerPage.get(origin)) {
+				if (by.getLeftOf().matcher(lbl.getText().trim()).matches()) {
+					return lbl;
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @param labelRightOf
+	 * @return
+	 */
+	private Label getLabelRightOf() {
+		if (by.getRightOf() != null) {
+			for (Label lbl: labelsPerPage.get(origin)) {
+				if (by.getRightOf().matcher(lbl.getText().trim()).matches()) {
+					return lbl;
+				}
+			}
+		}
+		return null;
 	}
 	
 	/**

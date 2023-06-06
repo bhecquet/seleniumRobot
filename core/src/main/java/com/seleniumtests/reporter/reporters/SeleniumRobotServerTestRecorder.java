@@ -202,47 +202,71 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 						continue;
 					} 
 					
-					try {
-						serverConnector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId, snapshot.getCheckSnapshot().getExcludeElementsRect());
-
-						logger.info("Check snapshot created");
-					} catch (SeleniumRobotServerException e) {
-						logger.error("Could not create snapshot on server", e);
-					}
+					recordSnapshot(serverConnector, sessionId, testCaseInSessionId, stepResultId, snapshot);
 					
 				// record reference image on server if step is successful
 				} else if (snapshot.getCheckSnapshot().recordSnapshotOnServerForReference() && SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerRecordResults()) {
-					if (Boolean.FALSE.equals(testStep.getFailed())) {
-						try {
-							serverConnector.createStepReferenceSnapshot(snapshot, stepResultId);
-							logger.info("Step OK: reference created");
-						} catch (SeleniumRobotServerException e) {
-							logger.error("Could not create reference snapshot on server", e);
-						}
-						
-						// remove this snapshot, extracted from video as it won't be used anymore
-						testStep.getSnapshots().remove(snapshot);
-
-					} else {
-						try {
-							// move snapshot to "screenshots" directory as "video" directory will be removed at the end of the test
-							snapshot.relocate(TestNGResultUtils.getSeleniumRobotTestContext(testResult).getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR + "/" + snapshot.getScreenshot().getImageName());
-							File referenceSnapshot = serverConnector.getReferenceSnapshot(stepResultId);
-							
-							if (referenceSnapshot != null) {
-								logger.info("Step KO: reference snapshot got from server");
-								Path newPath = Paths.get(TestNGResultUtils.getSeleniumRobotTestContext(testResult).getScreenshotOutputDirectory(), referenceSnapshot.getName()).toAbsolutePath(); 
-								FileUtils.moveFile(referenceSnapshot, newPath.toFile());
-								testStep.addSnapshot(new Snapshot(new ScreenShot(newPath.getParent().getParent().relativize(newPath).toString()), "Valid-reference", SnapshotCheckType.FALSE), 0, null);
-								snapshot.setDisplayInReport(true); // change flag so that it's displayed in report (by default reference image extracted from video are not displayed)
-							}
-						} catch (SeleniumRobotServerException e) {
-							logger.error("Could not get reference snapshot from server", e);
-						} catch (IOException e) {
-							logger.error("Could not copy reference snapshot", e);
-						}
-					}
+					recordReference(serverConnector, testResult, testStep, stepResultId, snapshot);
 				}
+			}
+		}
+	}
+
+	/**
+	 * record a snpashot on server, for snapshot comparison
+	 * @param serverConnector
+	 * @param sessionId
+	 * @param testCaseInSessionId
+	 * @param stepResultId
+	 * @param snapshot
+	 */
+	private void recordSnapshot(SeleniumRobotSnapshotServerConnector serverConnector, Integer sessionId,
+			Integer testCaseInSessionId, Integer stepResultId, Snapshot snapshot) {
+		try {
+			serverConnector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId, snapshot.getCheckSnapshot().getExcludeElementsRect());
+			logger.info("Check snapshot created");
+		} catch (SeleniumRobotServerException e) {
+			logger.error("Could not create snapshot on server", e);
+		}		
+	}
+	/**
+	 * record a step reference snapshot, when step is OK
+	 * @param serverConnector
+	 * @param testResult
+	 * @param testStep
+	 * @param stepResultId
+	 * @param snapshot
+	 */
+	private void recordReference(SeleniumRobotSnapshotServerConnector serverConnector, ITestResult testResult,
+			TestStep testStep, Integer stepResultId, Snapshot snapshot) {
+		if (Boolean.FALSE.equals(testStep.getFailed())) {
+			try {
+				serverConnector.createStepReferenceSnapshot(snapshot, stepResultId);
+				logger.info("Step OK: reference created");
+			} catch (SeleniumRobotServerException e) {
+				logger.error("Could not create reference snapshot on server", e);
+			}
+			
+			// remove this snapshot, extracted from video as it won't be used anymore
+			testStep.getSnapshots().remove(snapshot);
+
+		} else {
+			try {
+				// move snapshot to "screenshots" directory as "video" directory will be removed at the end of the test
+				snapshot.relocate(TestNGResultUtils.getSeleniumRobotTestContext(testResult).getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR + "/" + snapshot.getScreenshot().getImageName());
+				File referenceSnapshot = serverConnector.getReferenceSnapshot(stepResultId);
+				
+				if (referenceSnapshot != null) {
+					logger.info("Step KO: reference snapshot got from server");
+					Path newPath = Paths.get(TestNGResultUtils.getSeleniumRobotTestContext(testResult).getScreenshotOutputDirectory(), referenceSnapshot.getName()).toAbsolutePath(); 
+					FileUtils.moveFile(referenceSnapshot, newPath.toFile());
+					testStep.addSnapshot(new Snapshot(new ScreenShot(newPath.getParent().getParent().relativize(newPath).toString()), "Valid-reference", SnapshotCheckType.FALSE), 0, null);
+					snapshot.setDisplayInReport(true); // change flag so that it's displayed in report (by default reference image extracted from video are not displayed)
+				}
+			} catch (SeleniumRobotServerException e) {
+				logger.error("Could not get reference snapshot from server", e);
+			} catch (IOException e) {
+				logger.error("Could not copy reference snapshot", e);
 			}
 		}
 	}

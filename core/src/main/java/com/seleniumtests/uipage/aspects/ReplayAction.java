@@ -143,12 +143,8 @@ public class ReplayAction {
 		    		
 		    		// if click has been intercepted, it means element could not be interacted, so allow auto scrolling for further retries
 		    		// to avoid trying always the same method, we try without scrolling, then with scrolling, then without, ...
-		    		
-		    		if (element.isScrollToElementBeforeAction()) {
-		    			element.setScrollToElementBeforeAction(false);
-		    		} else {
-		    			element.setScrollToElementBeforeAction(true);
-		    		}
+		    		element.setScrollToElementBeforeAction(!element.isScrollToElementBeforeAction());
+
 		    	} catch (WebDriverException e) { 
 		    		// don't prevent TimeoutException to be thrown when coming from waitForPresent
 		    		// only check that cause is the not found element and not an other error (NoSucheSessionError for example)
@@ -164,20 +160,7 @@ public class ReplayAction {
 	    				throw e;
 		    		}
 	
-		    		if (end.minusMillis(replay.replayDelayMs() + 100L).isAfter(systemClock.instant())) {
-		    			WaitHelper.waitForMilliSeconds(replay.replayDelayMs());
-					} else {
-						if (e instanceof NoSuchElementException) {
-							if (element instanceof SelectList && e.getMessage().contains("option")) {
-								throw new NoSuchElementException(String.format("'%s' from page '%s': %s", element, element.getOrigin(), e.getMessage()));
-							} else {
-								throw new NoSuchElementException(String.format("Searched element [%s] from page '%s' could not be found", element, element.getOrigin()));
-							}
-						} else if (e instanceof UnreachableBrowserException) {
-							throw new WebDriverException("Browser did not reply, it may have frozen");
-						}
-						throw e;
-					}
+		    		handleWebDriverException(replay, element, end, e);
 		    	} 
 				
 	    	}
@@ -205,6 +188,30 @@ public class ReplayAction {
     		element.setScrollToElementBeforeAction(false);
 		}
    }
+
+	/**
+	 * @param replay
+	 * @param element
+	 * @param end
+	 * @param e
+	 */
+	private void handleWebDriverException(ReplayOnError replay, HtmlElement element, Instant end,
+			WebDriverException e) {
+		if (end.minusMillis(replay.replayDelayMs() + 100L).isAfter(systemClock.instant())) {
+			WaitHelper.waitForMilliSeconds(replay.replayDelayMs());
+		} else {
+			if (e instanceof NoSuchElementException) {
+				if (element instanceof SelectList && e.getMessage().contains("option")) {
+					throw new NoSuchElementException(String.format("'%s' from page '%s': %s", element, element.getOrigin(), e.getMessage()));
+				} else {
+					throw new NoSuchElementException(String.format("Searched element [%s] from page '%s' could not be found", element, element.getOrigin()));
+				}
+			} else if (e instanceof UnreachableBrowserException) {
+				throw new WebDriverException("Browser did not reply, it may have frozen");
+			}
+			throw e;
+		}
+	}
     
 	/**
 	 * Replay all actions annotated by ReplayOnError if the class is not a subclass of 

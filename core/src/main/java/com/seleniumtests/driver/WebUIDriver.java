@@ -225,24 +225,30 @@ public class WebUIDriver {
         	if (config.getTestType().isMobile()) {
         		return new AppiumDriverFactory(this.config);
         	} else {
-        		
-	            if (config.getBrowserType() == BrowserType.FIREFOX) {
-	                return new FirefoxDriverFactory(this.config);
-	            } else if (config.getBrowserType() == BrowserType.INTERNET_EXPLORER) {
-	                return new IEDriverFactory(this.config);
-	            } else if (config.getBrowserType() == BrowserType.EDGE) {
-	            	return new EdgeDriverFactory(this.config);
-	            } else if (config.getBrowserType() == BrowserType.CHROME) {
-	                return new ChromeDriverFactory(this.config);
-	            } else if (config.getBrowserType() == BrowserType.HTMLUNIT) {
-	                return new HtmlUnitDriverFactory(this.config);
-	            } else if (config.getBrowserType() == BrowserType.SAFARI) {
-	                return new SafariDriverFactory(this.config);
-	            } else {
-	                throw new DriverExceptions("Unsupported browser: " + config.getBrowserType().toString());
-	            }
+	            return getLocalWebDriverBuilderFactory();
         	}
         }
+	}
+
+	/**
+	 * @return
+	 */
+	private IWebDriverFactory getLocalWebDriverBuilderFactory() {
+		if (config.getBrowserType() == BrowserType.FIREFOX) {
+		    return new FirefoxDriverFactory(this.config);
+		} else if (config.getBrowserType() == BrowserType.INTERNET_EXPLORER) {
+		    return new IEDriverFactory(this.config);
+		} else if (config.getBrowserType() == BrowserType.EDGE) {
+			return new EdgeDriverFactory(this.config);
+		} else if (config.getBrowserType() == BrowserType.CHROME) {
+		    return new ChromeDriverFactory(this.config);
+		} else if (config.getBrowserType() == BrowserType.HTMLUNIT) {
+		    return new HtmlUnitDriverFactory(this.config);
+		} else if (config.getBrowserType() == BrowserType.SAFARI) {
+		    return new SafariDriverFactory(this.config);
+		} else {
+		    throw new DriverExceptions("Unsupported browser: " + config.getBrowserType().toString());
+		}
 	}
 
     /**

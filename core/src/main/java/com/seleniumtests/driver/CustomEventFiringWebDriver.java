@@ -1062,37 +1062,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 				}
 				
 				if (parentScrollableElement != null) {
-					String parentTagName = parentScrollableElement.getTagName();
-					
-					// When the scrollable element is the document itself (html or body), use the legacy behavior scrolling the window itself
-					if ("html".equalsIgnoreCase(parentTagName) || "body".equalsIgnoreCase(parentTagName)) {
-						if (yOffset == Integer.MAX_VALUE) {// equivalent to HtmlElement.OPTIMAL_SCROLLING but, for grid, we do not want dependency between the 2 classes
-							yOffset = (int) Math.min(-200, -topHeaderSize);
-						}
-						
-						scrollWindowToElement(element, yOffset);
-					
-					// When scrollable element is a "div" or anything else, use scrollIntoView because it's the easiest way to make the element visible
-					} else {
-						((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
-						
-						// check if scrollbar of parent is at bottom. In this case, going upside (yOffset < 0), could hide searched element.
-						// scrollIntoView is configured to position scrollbar to top position of the searched element.
-						// in case offset is > 0, this has no impact as scrollBottom will always be < 0
-						WaitHelper.waitForMilliSeconds(500); // wait a bit so that scrolling is complete
-						
-						// if top header is present, scroll up so that our element is not hidden behind it (scrollIntoView scrolls so that element is at the top of the view even if header masks it)
-						if (topHeaderSize > 0) {// equivalent to HtmlElement.OPTIMAL_SCROLLING but, for grid, we do not want dependency between the 2 classes
-							Integer scrollOffset = (int) (yOffset == Integer.MAX_VALUE ? topHeaderSize: topHeaderSize - yOffset);
-							((JavascriptExecutor) driver).executeScript(
-									"if((arguments[0].scrollHeight - arguments[0].scrollTop - arguments[0].clientHeight) > 0) {" +
-									"   var rootElement = arguments[1] === \"safari\" ? document.body: document.documentElement;" +
-									"   rootElement.scrollTop -= " + scrollOffset + ";" +
-									"}", parentScrollableElement, (driver instanceof SafariDriver) ? SAFARI_BROWSER: OTHER_BROWSER);
-						}
-						
-						WaitHelper.waitForMilliSeconds(500); // wait a bit so that scrolling is complete
-					}
+					scrollParent(element, yOffset, parentScrollableElement, topHeaderSize);
 				} else {
 					// go to default behavior
 					throw new JavascriptException("No parent found");
@@ -1110,6 +1080,49 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 				}
 			}
 		}
+	}
+
+	/**
+	 * Scroll parent of element, in case we have a scroll inside an other scroll
+	 * @param element
+	 * @param yOffset
+	 * @param parentScrollableElement
+	 * @param topHeaderSize
+	 * @return
+	 */
+	private int scrollParent(WebElement element, int yOffset, WebElement parentScrollableElement, Long topHeaderSize) {
+		String parentTagName = parentScrollableElement.getTagName();
+		
+		// When the scrollable element is the document itself (html or body), use the legacy behavior scrolling the window itself
+		if ("html".equalsIgnoreCase(parentTagName) || "body".equalsIgnoreCase(parentTagName)) {
+			if (yOffset == Integer.MAX_VALUE) {// equivalent to HtmlElement.OPTIMAL_SCROLLING but, for grid, we do not want dependency between the 2 classes
+				yOffset = (int) Math.min(-200, -topHeaderSize);
+			}
+			
+			scrollWindowToElement(element, yOffset);
+		
+		// When scrollable element is a "div" or anything else, use scrollIntoView because it's the easiest way to make the element visible
+		} else {
+			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
+			
+			// check if scrollbar of parent is at bottom. In this case, going upside (yOffset < 0), could hide searched element.
+			// scrollIntoView is configured to position scrollbar to top position of the searched element.
+			// in case offset is > 0, this has no impact as scrollBottom will always be < 0
+			WaitHelper.waitForMilliSeconds(500); // wait a bit so that scrolling is complete
+			
+			// if top header is present, scroll up so that our element is not hidden behind it (scrollIntoView scrolls so that element is at the top of the view even if header masks it)
+			if (topHeaderSize > 0) {// equivalent to HtmlElement.OPTIMAL_SCROLLING but, for grid, we do not want dependency between the 2 classes
+				Integer scrollOffset = (int) (yOffset == Integer.MAX_VALUE ? topHeaderSize: topHeaderSize - yOffset);
+				((JavascriptExecutor) driver).executeScript(
+						"if((arguments[0].scrollHeight - arguments[0].scrollTop - arguments[0].clientHeight) > 0) {" +
+						"   var rootElement = arguments[1] === \"safari\" ? document.body: document.documentElement;" +
+						"   rootElement.scrollTop -= " + scrollOffset + ";" +
+						"}", parentScrollableElement, (driver instanceof SafariDriver) ? SAFARI_BROWSER: OTHER_BROWSER);
+			}
+			
+			WaitHelper.waitForMilliSeconds(500); // wait a bit so that scrolling is complete
+		}
+		return yOffset;
 	}
 	
 	private void scrollWindowToElement(WebElement element, int yOffset) {

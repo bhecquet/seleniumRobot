@@ -48,6 +48,7 @@ import kong.unirest.json.JSONObject;
 public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerConnector {
 	
 	public static final String FIELD_EXCLUDE_ZONES = "excludeZones";
+	private static final String NAPSHOT_DOES_NOT_EXIST_ERROR = "Provided snapshot does not exist";
 	private static final String FIELD_IMAGE = "image";
 	private static final String FIELD_IS_OK_WITH_SNAPSHOTS = "isOkWithSnapshots";
 	private static final String FIELD_COMPUTING_ERROR = "computingError";
@@ -273,7 +274,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 
 		checkStepResult(stepResultId);
 		if (snapshot == null || snapshot.getScreenshot() == null || snapshot.getScreenshot().getFullImagePath() == null) {
-			throw new SeleniumRobotServerException("Provided snapshot does not exist");
+			throw new SeleniumRobotServerException(NAPSHOT_DOES_NOT_EXIST_ERROR);
 		}
 		
 		try {
@@ -311,7 +312,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			throw new ConfigurationException("stepName must not be null");
 		}
 		if (snapshot == null || snapshot.getScreenshot() == null || snapshot.getScreenshot().getFullImagePath() == null) {
-			throw new SeleniumRobotServerException("Provided snapshot does not exist");
+			throw new SeleniumRobotServerException(NAPSHOT_DOES_NOT_EXIST_ERROR);
 		}
 		
 		String snapshotName = snapshot.getName().length() > MAX_SNAPSHOT_NAME_LENGHT ? snapshot.getName().substring(0, MAX_SNAPSHOT_NAME_LENGHT): snapshot.getName(); 
@@ -389,7 +390,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		}
 		checkStepResult(stepResultId);
 		if (snapshot == null || snapshot.getScreenshot() == null || snapshot.getScreenshot().getFullImagePath() == null) {
-			throw new SeleniumRobotServerException("Provided snapshot does not exist");
+			throw new SeleniumRobotServerException(NAPSHOT_DOES_NOT_EXIST_ERROR);
 		}
 		
 		String snapshotName = snapshot.getName().length() > MAX_SNAPSHOT_NAME_LENGHT ? snapshot.getName().substring(0, MAX_SNAPSHOT_NAME_LENGHT): snapshot.getName(); 

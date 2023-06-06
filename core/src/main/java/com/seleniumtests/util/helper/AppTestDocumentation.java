@@ -103,9 +103,7 @@ public class AppTestDocumentation {
 		javadoc.append("<h1>\n"
 				+ "<ac:structured-macro ac:macro-id=\"723cab2f-15e1-4b30-a536-80defee1b817\" ac:name=\"toc\" ac:schema-version=\"1\"/>"
 				+ "</h1>");
-		
-		javadoc.append("${project.summary}\n");
-		
+	
 		StringBuilder pagesDoc = new StringBuilder();
 		pagesDoc.append("<h1>Pages</h1>\n");
 		try (Stream<Path> files = Files.walk(rootFolder)) {
@@ -151,8 +149,7 @@ public class AppTestDocumentation {
 		
 		javadoc.append(testDoc);
 
-		javadoc.append("<hr/>");
-		javadoc.append("${project.scmManager}\n\n");		
+		javadoc.append("<hr/>");		
 		
 		// store usage data
 		System.out.println(String.format("Number of tests: %d", tests.size()));

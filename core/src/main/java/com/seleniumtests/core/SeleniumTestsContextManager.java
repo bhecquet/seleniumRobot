@@ -489,25 +489,41 @@ public class SeleniumTestsContextManager {
 			matchingContexts.add(getThreadContext());
 		} else if (method.isAfterClassConfiguration()) {
 			synchronized (testResultContext) {
-				for (Entry<ITestResult, SeleniumTestsContext> entry: testResultContext.entrySet()) {
-					if (entry.getKey().getTestClass() != null && entry.getKey().getTestClass().getName().equals(testResult.getTestClass().getName())) {
-						matchingContexts.add(entry.getValue());
-					}
-				}
+				addAfterClassContext(matchingContexts, testResult);
 			}
 			
 		} else if (method.isAfterTestConfiguration()) {
 			synchronized (testResultContext) {
-				for (Entry<ITestResult, SeleniumTestsContext> entry: testResultContext.entrySet()) {
-					if (entry.getKey().getTestContext().equals(testResult.getTestContext())) {
-						matchingContexts.add(entry.getValue());
-					}
-				}
+				addAfterTestContext(matchingContexts, testResult);
 			}
 			
 		} 
     	return matchingContexts;
     }
+
+	/**
+	 * @param matchingContexts
+	 * @param testResult
+	 */
+	private static void addAfterTestContext(List<SeleniumTestsContext> matchingContexts, ITestResult testResult) {
+		for (Entry<ITestResult, SeleniumTestsContext> entry: testResultContext.entrySet()) {
+			if (entry.getKey().getTestContext().equals(testResult.getTestContext())) {
+				matchingContexts.add(entry.getValue());
+			}
+		}
+	}
+
+	/**
+	 * @param matchingContexts
+	 * @param testResult
+	 */
+	private static void addAfterClassContext(List<SeleniumTestsContext> matchingContexts, ITestResult testResult) {
+		for (Entry<ITestResult, SeleniumTestsContext> entry: testResultContext.entrySet()) {
+			if (entry.getKey().getTestClass() != null && entry.getKey().getTestClass().getName().equals(testResult.getTestClass().getName())) {
+				matchingContexts.add(entry.getValue());
+			}
+		}
+	}
     
     /**
      * get SR context stored in test result if it exists. Else, create a new one (happens when a test method has been skipped for example)

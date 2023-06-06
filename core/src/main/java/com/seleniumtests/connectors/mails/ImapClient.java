@@ -213,37 +213,51 @@ public class ImapClient extends EmailClientImpl {
 			if (contentType.toLowerCase().contains("text/html")) {
 				messageContent += StringEscapeUtils.unescapeHtml4(message.getContent().toString());
 			} else if (contentType.toLowerCase().contains("multipart/")) {
-				List<BodyPart> partList = getMessageParts((Multipart) message.getContent());
-
-				// store content in list
-				for (BodyPart part : partList) {
-
-					String partContentType = part.getContentType().toLowerCase();
-					if (partContentType.contains("text/html")) {
-						messageContent = messageContent.concat(StringEscapeUtils.unescapeHtml4(part.getContent().toString()));
-						
-					} else if (partContentType.contains("text/")
-						&& !partContentType.contains("vcard")) {
-						messageContent = messageContent.concat(part.getContent().toString());					
-						
-					} else if (partContentType.contains("image")
-							|| partContentType.contains("application/")
-							|| partContentType.contains("text/x-vcard")) {
-						if (part.getFileName() != null) {
-							attachments.add(part.getFileName());
-						} else {
-							attachments.add(part.getDescription());
-						}
-					} else {
-						logger.debug("type: " + part.getContentType());
-					}
-				}
+				messageContent = parseMultipartBody(message, messageContent, attachments);
 			}
 			
 			// create a new email
 			filteredEmails.add(new Email(message.getSubject(), messageContent, "", message.getReceivedDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(), attachments));
 		}
 		return filteredEmails;
+	}
+
+	/**
+	 * @param message
+	 * @param messageContent
+	 * @param attachments
+	 * @return
+	 * @throws IOException
+	 * @throws MessagingException
+	 */
+	private String parseMultipartBody(Message message, String messageContent, List<String> attachments)
+			throws IOException, MessagingException {
+		List<BodyPart> partList = getMessageParts((Multipart) message.getContent());
+
+		// store content in list
+		for (BodyPart part : partList) {
+
+			String partContentType = part.getContentType().toLowerCase();
+			if (partContentType.contains("text/html")) {
+				messageContent = messageContent.concat(StringEscapeUtils.unescapeHtml4(part.getContent().toString()));
+				
+			} else if (partContentType.contains("text/")
+				&& !partContentType.contains("vcard")) {
+				messageContent = messageContent.concat(part.getContent().toString());					
+				
+			} else if (partContentType.contains("image")
+					|| partContentType.contains("application/")
+					|| partContentType.contains("text/x-vcard")) {
+				if (part.getFileName() != null) {
+					attachments.add(part.getFileName());
+				} else {
+					attachments.add(part.getDescription());
+				}
+			} else {
+				logger.debug("type: " + part.getContentType());
+			}
+		}
+		return messageContent;
 	}
 	
 	/**

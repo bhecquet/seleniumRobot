@@ -243,34 +243,8 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		context.put("localResources", !resourcesFromCdn);
 		context.put(HEADER, testStatus);
 		
-		// test header
-		Object[] testParameters = testResult.getParameters();
-		StringBuilder testName = new StringBuilder(getVisualTestName(testResult));
+		fillContextWithTestName(testContext, testResult, context);
 		
-		// issue #163: add test parameter to test name
-		if (testParameters.length > 0) {
-			
-			testName.append(" with params: (");
-			
-			int i = 0;
-			
-			for (Object param: testParameters) {
-				
-				// method parameters that should be masked are stored inside TestStepManager
-				if (param != null && testContext.getTestStepManager().getPwdToReplace().contains(param.toString())) {
-					testName.append("******");
-				} else {				
-					testName.append(param == null ? "null": param.toString());
-				}
-				if (i < testParameters.length - 1) {
-					testName.append(",");
-				}
-				i++;
-			}
-			testName.append(")");
-		}
-		
-		context.put("testName", StringUtility.encodeString(testName.toString(), "html"));
 		// by default, encodeString replaces line breaks with <br/> which is not suitable for description
 		context.put("description", StringUtility.encodeString(TestNGResultUtils.getTestDescription(testResult), "html"));
 
@@ -292,43 +266,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		fillContextWithTestParams(context, testResult);      
 		
 		// test steps
-		List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
-		if (testSteps == null) {
-			testSteps = new ArrayList<>();
-		}
-		
-		boolean videoInReport = isVideoInReport(testResult);
-		List<List<Object>> steps = new ArrayList<>();
-		for (TestStep testStep: testSteps) {
-			
-			List<Object> stepInfo = new ArrayList<>();
-			TestStep encodedTestStep = testStep.encode("html");
-			
-			stepInfo.add(encodedTestStep.getName());
-			
-			// step status
-			StepStatus stepStatus = encodedTestStep.getStepStatus();
-			if (stepStatus == StepStatus.FAILED) {
-				stepInfo.add(FAILED_TEST);
-			} else if (stepStatus == StepStatus.WARNING) {
-				stepInfo.add(WARN_TEST);
-			} else {
-				stepInfo.add(PASSED_TEST);
-			}
-			stepInfo.add(encodedTestStep.getDuration() / (double)1000);
-			stepInfo.add(encodedTestStep);	
-			stepInfo.add(encodedTestStep.getRootCause());	
-			stepInfo.add(encodedTestStep.getRootCauseDetails());	
-			
-			// do not display video timestamp if video is not taken, or removed
-			if (encodedTestStep.getVideoTimeStamp() > 0 && videoInReport) {
-				stepInfo.add(encodedTestStep.getVideoTimeStamp() / (double)1000);
-			} else {
-				stepInfo.add(null);
-			}
-			steps.add(stepInfo);
-		}
-		context.put("steps", steps);
+		fillContextWithSteps(testResult, context);
 		
 		// logs
 		String logs = SeleniumRobotLogger.getTestLogs().get(getTestName(testResult));
@@ -370,6 +308,88 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		StringWriter writer = new StringWriter();
 		t.merge(context, writer);
 		generateReport(Paths.get(testContext.getOutputDirectory(), "TestReport.html").toFile(), writer.toString());
+	}
+
+	/**
+	 * @param testContext
+	 * @param testResult
+	 * @param context
+	 */
+	private void fillContextWithTestName(SeleniumTestsContext testContext, ITestResult testResult,
+			VelocityContext context) {
+		// test header
+		Object[] testParameters = testResult.getParameters();
+		StringBuilder testName = new StringBuilder(getVisualTestName(testResult));
+		
+		// issue #163: add test parameter to test name
+		if (testParameters.length > 0) {
+			
+			testName.append(" with params: (");
+			
+			int i = 0;
+			
+			for (Object param: testParameters) {
+				
+				// method parameters that should be masked are stored inside TestStepManager
+				if (param != null && testContext.getTestStepManager().getPwdToReplace().contains(param.toString())) {
+					testName.append("******");
+				} else {				
+					testName.append(param == null ? "null": param.toString());
+				}
+				if (i < testParameters.length - 1) {
+					testName.append(",");
+				}
+				i++;
+			}
+			testName.append(")");
+		}
+		
+		context.put("testName", StringUtility.encodeString(testName.toString(), "html"));
+	}
+
+	/**
+	 * @param testResult
+	 * @param context
+	 * @param testSteps
+	 */
+	private void fillContextWithSteps(ITestResult testResult, VelocityContext context) {
+		List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
+		if (testSteps == null) {
+			testSteps = new ArrayList<>();
+		}
+		
+		boolean videoInReport = isVideoInReport(testResult);
+		List<List<Object>> steps = new ArrayList<>();
+		for (TestStep testStep: testSteps) {
+			
+			List<Object> stepInfo = new ArrayList<>();
+			TestStep encodedTestStep = testStep.encode("html");
+			
+			stepInfo.add(encodedTestStep.getName());
+			
+			// step status
+			StepStatus stepStatus = encodedTestStep.getStepStatus();
+			if (stepStatus == StepStatus.FAILED) {
+				stepInfo.add(FAILED_TEST);
+			} else if (stepStatus == StepStatus.WARNING) {
+				stepInfo.add(WARN_TEST);
+			} else {
+				stepInfo.add(PASSED_TEST);
+			}
+			stepInfo.add(encodedTestStep.getDuration() / (double)1000);
+			stepInfo.add(encodedTestStep);	
+			stepInfo.add(encodedTestStep.getRootCause());	
+			stepInfo.add(encodedTestStep.getRootCauseDetails());	
+			
+			// do not display video timestamp if video is not taken, or removed
+			if (encodedTestStep.getVideoTimeStamp() > 0 && videoInReport) {
+				stepInfo.add(encodedTestStep.getVideoTimeStamp() / (double)1000);
+			} else {
+				stepInfo.add(null);
+			}
+			steps.add(stepInfo);
+		}
+		context.put("steps", steps);
 	}
 	
 	/**

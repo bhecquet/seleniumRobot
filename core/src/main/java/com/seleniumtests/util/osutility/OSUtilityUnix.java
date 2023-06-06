@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.openqa.selenium.Proxy;
+
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.driver.BrowserType;
 
@@ -214,4 +216,10 @@ public class OSUtilityUnix extends OSUtility {
 		}
 	}
 	
+	@Override
+	public void setSystemProxy(Proxy proxy) {
+		logger.warn("setSystemProxy is not available on unix systems");
+		
+	}
+
 }

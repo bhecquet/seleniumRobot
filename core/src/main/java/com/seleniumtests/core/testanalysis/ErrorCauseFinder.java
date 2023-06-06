@@ -139,7 +139,10 @@ public class ErrorCauseFinder {
 						// draw missing labels and fields
 						for (Label missingLabel: missingLabels) {
 							Rectangle rect = missingLabel.getRectangle();
-							Line2D.Double line = new Line2D.Double(rect.x, rect.y + rect.height, rect.x + rect.width, rect.y + rect.height);
+							Line2D.Double line = new Line2D.Double(rect.getX(), 
+									rect.getY() + rect.getHeight(), 
+									rect.getX() + rect.getWidth(), 
+									rect.getY() + rect.getHeight());
 							ImageProcessor.drawLines(referenceSnapshot, Color.RED, line);
 						}
 						ImageProcessor.drawRectangles(referenceSnapshot, Color.RED, missingFields.stream().map(Field::getRectangle).collect(Collectors.toList()).toArray(new Rectangle[] {}));

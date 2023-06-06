@@ -88,7 +88,26 @@ public class SeleniumGridConnectorFactory {
 					seleniumGridConnectors.add(new BrowserStackGridConnector(hubUrl.toString()));
 					break;
 				}
+				currentException = connectHub(currentException, seleniumGridConnectors, hubUrl);
+			}
+			
+			// if at least one hub replies, continue
+			if (!seleniumGridConnectors.isEmpty()) {
+				return seleniumGridConnectors;
+			}
+		}
 				
+    	throw new ConfigurationException("Cannot connect to the grid hubs at " + urls, currentException);
+	}
+
+	/**
+	 * @param currentException
+	 * @param seleniumGridConnectors
+	 * @param hubUrl
+	 * @return
+	 */
+	private static Exception connectHub(Exception currentException, List<SeleniumGridConnector> seleniumGridConnectors,
+			URL hubUrl) {
 				// connect to console page to see if grid replies
 				try {
 					HttpResponse<String> response = Unirest.get(String.format("http://%s:%s%s", hubUrl.getHost(), hubUrl.getPort(), SeleniumGridConnector.CONSOLE_SERVLET)).asString();
@@ -108,17 +127,9 @@ public class SeleniumGridConnectorFactory {
 					WaitHelper.waitForMilliSeconds(500);
 					currentException = ex;
 				}
+		return currentException;
 			}
 			
-			// if at least one hub replies, continue
-			if (!seleniumGridConnectors.isEmpty()) {
-				return seleniumGridConnectors;
-			}
-		}
-
-    	throw new ConfigurationException("Cannot connect to the grid hubs at " + urls, currentException);
-	}
-
 	public static int getRetryTimeout() {
 		return retryTimeout;
 	}

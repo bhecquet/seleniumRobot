@@ -56,7 +56,7 @@ public class ErrorCause {
 	
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null) {
+		if (obj == null || !(obj instanceof ErrorCause)) {
 			return false;
 		}
 
