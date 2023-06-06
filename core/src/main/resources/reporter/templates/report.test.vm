@@ -1,298 +1,361 @@
 #macro( stepActions $localStep $directCall)
+    #if (!$directCall)
+        #set ($localStepException = $localStep.getActionExceptionMessage())
+        #if ($localStep.getFailed() && $localStepException)
+        <li class="header-failed">$localStep.getName()<br/>$localStep.getActionExceptionMessage()</li>
+        #else
+        <li>
+            <div class="d-inline-flex align-items-center">
+                <span class="stepTimestamp mr-2"
+                      style="display: none ;font-family: 'Courier New', Courier, monospace;">$timestamp</span> $localStep.getName()
+            </div>
+        </li>
+        #end
+    #end
+<ul>
+    #foreach( $action in $localStep.getStepActions() )
+        #set ($timestamp = $action.getTimestamp())
+        #if (${action.class.name.equals("com.seleniumtests.reporter.logger.TestStep")})
+            #stepActions($action false)
+        #elseif (${action.class.name.equals("com.seleniumtests.reporter.logger.TestMessage")})
+            #set ($messageType = $action.getMessageType().toString().toLowerCase())
+            #set ($messageType = "message-" + $messageType)
+            <div style="display: flex; flex-direction: row; align-items: baseline" class="$messageType"><span
+                    class="stepTimestamp mr-2"
+                    style="display: none ;font-family: 'Courier New', Courier, monospace;">$timestamp</span> $action.getName()
+            </div>
+            #set ($messageType = "")
+        #elseif (${action.class.name.equals("com.seleniumtests.reporter.logger.TestValue")})
+            <table class="table table-bordered table-sm">
+                <tr>
+                    <th width="15%">Key</th>
+                    <th width="60%">Message</th>
+                    <th width="25%">Value</th>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="d-inline-flex align-items-baseline">
+                            <span class="stepTimestamp mr-2"
+                                  style="display: none ;font-family: 'Courier New', Courier, monospace;">$timestamp</span> $action.getName()
+                        </div>
+                    </td>
+                    <td>$action.getMessage()</td>
+                    <td>$action.getValue()</td>
+                </tr>
+            </table>
+        #else
+            #set ($actionException = $action.getActionExceptionMessage())
+            #if ($action.getFailed() && $actionException)
+                <li class="header-failed">
+                    <div class="d-inline-flex align-items-center">
+                        <span class="stepTimestamp mr-2"
+                              style="display: none ;font-family: 'Courier New', Courier, monospace;">$timestamp</span> $action.getName() $action.getActionExceptionMessage()
+                    </div>
+                </li>
+            #else
+                <li>
+                    <div class="d-inline-flex align-items-center">
+                        <span class="stepTimestamp mr-2"
+                              style="display: none ;font-family: 'Courier New', Courier, monospace;">$timestamp</span> $action.getName()
+                    </div>
+                </li>
+            #end
+        #end
+    #end
+    <div class="row">
+        #foreach( $snapshot in $localStep.getSnapshots() )
+            #set($snapshotLog = $snapshot.buildScreenshotLog())
+            #set($displaySnapshot = $snapshot.isDisplayInReport())
+            #if ($displaySnapshot)
+                <div class="message-snapshot col">$snapshotLog</div>
+            #end
+        #end
+    </div>
 
-	#if (!$directCall)
-		#set ($localStepException = $localStep.getActionExceptionMessage())
-		#if ($localStep.getFailed() && $localStepException)
-			<li class="header-failed">$localStep.getName()<br/>$localStep.getActionExceptionMessage()</li>
-		#else
-			<li>$localStep.getName()</li>
-		#end
-	#end
-	<ul>
-	#foreach( $action in $localStep.getStepActions() )
-		#if (${action.class.name.equals("com.seleniumtests.reporter.logger.TestStep")})
-			#stepActions($action false)
-		#elseif (${action.class.name.equals("com.seleniumtests.reporter.logger.TestMessage")})
-			#set ($messageType = $action.getMessageType().toString().toLowerCase())
-			#set ($messageType = "message-" + $messageType)
-			<div class="$messageType">$action.getName()</div>
-			#set ($messageType = "")
-		#elseif (${action.class.name.equals("com.seleniumtests.reporter.logger.TestValue")})
-			<table class="table table-bordered table-sm">
-				<tr>
-					<th width="15%">Key</th>
-					<th width="60%">Message</th>
-					<th width="25%">Value</th>
-				</tr>
-				<tr>
-					<td>$action.getName()</td>
-					<td>$action.getMessage()</td>
-					<td>$action.getValue()</td>
-				</tr>
-			</table>
-		#else
-			#set ($actionException = $action.getActionExceptionMessage())
-			#if ($action.getFailed() && $actionException)
-				<li class="header-failed">$action.getName()<br/>$action.getActionExceptionMessage()</li>
-			#else
-				<li>$action.getName()</li>
-			#end
-	    #end
-	#end
-	<div class="row">
-	#foreach( $snapshot in $localStep.getSnapshots() )
-		#set($snapshotLog = $snapshot.buildScreenshotLog())
-		#set($displaySnapshot = $snapshot.isDisplayInReport())
-		#if ($displaySnapshot)
-		  <div class="message-snapshot col">$snapshotLog</div>
-		 #end
-	#end
-	</div>
-	
-	#foreach( $file in $localStep.getFiles() )
-		#set($log = $file.buildLog())
-		<div class="message-snapshot">$log</div>
-	#end
-	#foreach( $har in $localStep.getHarCaptures() )
-		#set($harLog = $har.buildHarLog())
-		<div class="message-har">$harLog</div>
-	#end
-	</ul>
+    #foreach( $file in $localStep.getFiles() )
+        #set($log = $file.buildLog())
+        <div class="message-snapshot">$log</div>
+    #end
+    #foreach( $har in $localStep.getHarCaptures() )
+        #set($harLog = $har.buildHarLog())
+        <div class="message-har">$harLog</div>
+    #end
+</ul>
 #end
 
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-	<head>
-		<meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
 
-		<title>SeleniumRobot</title>
+    <title>SeleniumRobot</title>
 
-		#if ($localResources)
-			#parse("reporter/templates/html.head.local.vm")
-			<script src="resources/iframeResizer.min.js"></script>
-			
-		#else
-			#parse("reporter/templates/html.head.remote.vm")
-			<script src="https://cdn.jsdelivr.net/npm/iframe-resizer@4.2.10/js/iframeResizer.min.js"></script> 
-		#end
-			
-		<script src="resources/app.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="resources/seleniumRobot_solo.css">
+    #if ($localResources)
+        #parse("reporter/templates/html.head.local.vm")
+        <script src="resources/iframeResizer.min.js"></script>
+        <script src="https://kit.fontawesome.com/327b2435a4.js" crossorigin="anonymous"></script>
 
-	</head>
+    #else
+        #parse("reporter/templates/html.head.remote.vm")
+        <script src="https://cdn.jsdelivr.net/npm/iframe-resizer@4.2.10/js/iframeResizer.min.js"></script>
+    #end
 
-	<body>
-		#if ($header == "passed")
-			<div class="wrapper">
-				<header class='main-header header-success'>
-					<a href='https://github.com/bhecquet/seleniumRobot'>SeleniumRobot</a><br/>
-				</header>
-			</div>
-		#elseif ($header == "failed")
-			<div class="wrapper">
-				<header class='main-header header-failed'>
-					<a href='https://github.com/bhecquet/seleniumRobot'>SeleniumRobot</a><br/>
-				</header>
-			</div>
-		#else
-			<div class="wrapper">
-				<header class='main-header header-skipped'>
-					<a href='https://github.com/bhecquet/seleniumRobot'>SeleniumRobot</a><br/>
-				</header>
-			</div>
-		#end
+    <script src="resources/app.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="resources/seleniumRobot_solo.css">
+    <style>
+        @media screen and (max-width: 1280px) {
+            .fa-stopwatch-20 {
+                font-size: 30px !important;
+            }
 
-		<div id="tabs" #if ($snapshots)style="display: block;" #else style="display: none;" #end>
-			<ul class="nav nav-tabs" id="tab" role="tablist">
-				<li class="nav-item">
-					<a class="nav-link active" id="result-tab" data-toggle="tab" href="#results" role="tab" aria-controls="home" aria-selected="true">Results</a>
-			  	</li>
-			  	<li class="nav-item">
-					<a class="nav-link #if ($snapshotComparisonResult && $snapshotComparisonResult == 1) tab-success #elseif(($snapshotComparisonResult && $snapshotComparisonResult == 3)) tab-skipped #else tab-failed #end" id="snapshot-tab" data-toggle="tab" href="#snapshots" role="tab" aria-controls="profile" aria-selected="false">Snapshots</a>
-				</li>
-			</ul>
-		</div>
-		<div class="tab-content" id="myTabContent">
-		
-		     <!-- Modal for displaying pictures -->
-		    <div class="modal fade" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-xl">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                        </div>
-                        <div class="modal-body">
-                            <img src="" id="imagepreview" style="width: 80%;" >
-                        </div>
+            #timestampAction {
+                left: -1rem !important;
+            }
+        }
+    </style>
+</head>
+
+<div>
+    #if ($header == "passed")
+        <div class="wrapper">
+            <header class='main-header header-success'>
+                <a href='https://github.com/bhecquet/seleniumRobot'>SeleniumRobot</a><br/>
+            </header>
+        </div>
+    #elseif ($header == "failed")
+        <div class="wrapper">
+            <header class='main-header header-failed'>
+                <a href='https://github.com/bhecquet/seleniumRobot'>SeleniumRobot</a><br/>
+            </header>
+        </div>
+    #else
+        <div class="wrapper">
+            <header class='main-header header-skipped'>
+                <a href='https://github.com/bhecquet/seleniumRobot'>SeleniumRobot</a><br/>
+            </header>
+        </div>
+    #end
+
+    <div id="tabs" #if ($snapshots)style="display: block;" #else style="display: none;" #end>
+        <ul class="nav nav-tabs" id="tab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="result-tab" data-toggle="tab" href="#results" role="tab"
+                   aria-controls="home"
+                   aria-selected="true">Results</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link #if ($snapshotComparisonResult && $snapshotComparisonResult == 1) tab-success #elseif(($snapshotComparisonResult && $snapshotComparisonResult == 3)) tab-skipped #else tab-failed #end"
+                   id="snapshot-tab" data-toggle="tab" href="#snapshots" role="tab" aria-controls="profile"
+                   aria-selected="false">Snapshots</a>
+            </li>
+        </ul>
+    </div>
+    <div class="tab-content" id="myTabContent">
+
+        <!-- Modal for displaying pictures -->
+        <div class="modal fade" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span
+                                aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <img src="" id="imagepreview" style="width: 80%;">
                     </div>
                 </div>
             </div>
-		
-			<div class="tab-pane fade show active" id="results" role="tabpanel" aria-labelledby="result-tab">
+        </div>
 
-				<div class="container-fluid">
-					<section class="content">
-						<div class="row">
-							<div class="col-xl-12">
-								<h4> Test Details - $testName</h4>
-								<table class="table table-bordered table-sm">
-									#if ($description && !$description.isEmpty())
-										<tr>
-											<th width="200px">Description</th>
-											<td>$description</td>
-										</tr>
-									#end
-									#if ($applicationType && !$applicationType.isEmpty())
-										<tr>
-											<th>Application type</th>
-											<td>$applicationType</td>
-										</tr>
-										<tr>
-											<th>Application</th>
-											<td>$application</td>
-										</tr>
-									#end
-									#if ($gridnode)
-										<tr>
-											<th>Grid node</th>
-											<td>$gridnode</td>
-										</tr>
-									#end
-									#if ($testInfos)
-										#foreach ($testInfo in $testInfos.entrySet())
-											<tr>
-												<th>$testInfo.key</th>
-												<td>$testInfo.value</td>
-											</tr>
-										#end
-									#end
-								</table>
-						
-			<!-- All test steps -->
-								#foreach ($step in $steps)
-									#set ($stepName = $step.get(0))
-									#set ($stepStatus = $step.get(1))
-									#set ($stepDuration = $step.get(2))
-									#set ($stepObject = $step.get(3))
-									#set ($stepErrorCause = $step.get(4))
-									#set ($stepErrorCauseDetails = $step.get(5))
-									#set ($stepVideoTimeStamp = $step.get(6))
-									
-									#if ($stepStatus.toString().equals("passed"))
-										<div class="box collapsed-box success">
-									#elseif ($stepStatus.toString().equals("failed"))
-										<div class="box collapsed-box failed">
-									#elseif ($stepStatus.toString().equals("warning"))
-										<div class="box collapsed-box warning">
-									#else
-										<div class="box collapsed-box skipped">
-									#end
-										<div class="box-header with-border">
-											<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fas fa-plus"></i></button><span class="step-title"> $stepName - $stepDuration secs</span>
-											#if ($stepVideoTimeStamp)
-											     <span><i class="fas fa-file-video"></i>$stepVideoTimeStamp s</span>
-											#end
-										</div>
-										<div class="box-body">
-											#if ($stepErrorCause)
-												<div class="step-info">
-													<i class="fas fa-info-circle"></i><span>Possibly caused by $stepErrorCause: $stepErrorCauseDetails</span>
-												</div>
-											#end
-											#stepActions($stepObject true)
-											
-											#if($stepObject.getActionException())
-											<div class="message-error">
-												#set($exceptionMessage = $stepObject.getActionExceptionMessage())
+        <div class="tab-pane fade show active" id="results" role="tabpanel" aria-labelledby="result-tab">
+
+            <div class="container-fluid">
+                <section class="content">
+                    <div class="row">
+                        <div class="col-xl-12">
+                            <h4> Test Details - $testName</h4>
+                            <btn id="timestampAction" class="btn" style="position: fixed;left: 4rem;top: 10rem;"><i
+                                    class="fa-solid fa-stopwatch-20" style="font-size: 40px;"></i></btn>
+                            <table class="table table-bordered table-sm">
+                                #if ($description && !$description.isEmpty())
+                                    <tr>
+                                        <th width="200px">Description</th>
+                                        <td>$description</td>
+                                    </tr>
+                                #end
+                                #if ($applicationType && !$applicationType.isEmpty())
+                                    <tr>
+                                        <th>Application type</th>
+                                        <td>$applicationType</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Application</th>
+                                        <td>$application</td>
+                                    </tr>
+                                #end
+                                #if ($gridnode)
+                                    <tr>
+                                        <th>Grid node</th>
+                                        <td>$gridnode</td>
+                                    </tr>
+                                #end
+                                #if ($testInfos)
+                                    #foreach ($testInfo in $testInfos.entrySet())
+                                        <tr>
+                                            <th>$testInfo.key</th>
+                                            <td>$testInfo.value</td>
+                                        </tr>
+                                    #end
+                                #end
+                            </table>
+
+                            <!-- All test steps -->
+                            #foreach ($step in $steps)
+                                #set ($stepName = $step.get(0))
+                                #set ($stepStatus = $step.get(1))
+                                #set ($stepDuration = $step.get(2))
+                                #set ($stepObject = $step.get(3))
+                                #set ($stepErrorCause = $step.get(4))
+                                #set ($stepErrorCauseDetails = $step.get(5))
+                                #set ($stepVideoTimeStamp = $step.get(6))
+
+                                #if ($stepStatus.toString().equals("passed"))
+                                <div class="box collapsed-box success">
+                                #elseif ($stepStatus.toString().equals("failed"))
+                                <div class="box collapsed-box failed">
+                                #elseif ($stepStatus.toString().equals("warning"))
+                                <div class="box collapsed-box warning">
+                                #else
+                                <div class="box collapsed-box skipped">
+                                #end
+                                <div class="box-header with-border">
+                                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                                            class="fas fa-plus"></i></button>
+                                    <span class="step-title"> $stepName - $stepDuration secs</span>
+                                    #if ($stepVideoTimeStamp)
+                                        <span><i class="fas fa-file-video"></i>$stepVideoTimeStamp s</span>
+                                    #end
+                                </div>
+                                <div class="box-body">
+                                    #if ($stepErrorCause)
+                                        <div class="step-info">
+                                            <i class="fas fa-info-circle"></i><span>Possibly caused by $stepErrorCause: $stepErrorCauseDetails</span>
+                                        </div>
+                                    #end
+                                    #stepActions($stepObject true)
+
+                                    #if($stepObject.getActionException())
+                                        <div class="message-error">
+                                            #set($exceptionMessage = $stepObject.getActionExceptionMessage())
 												$exceptionMessage
-											</div>
-											#end
-										</div>
-									</div>
-								#end
-								
-			<!-- logs -->
-								#if ($status.toString().equals("passed"))
-									<div class="box collapsed-box success">
-								#elseif ($status.toString().equals("failed"))
-									<div class="box collapsed-box failed">
-								#else
-									<div class="box collapsed-box skipped">
-								#end
-									<div class="box-header with-border">
-										<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fas fa-plus"></i></button> Execution logs
-									</div>
-									<div class="box-body logs">
-										#if ($stacktrace)
-											<div class="message-error">
-											#set ($lineIdx = 0)
-											#foreach($line in $stacktrace)
-												#if ($lineIdx == 0)
-													<div>$line</div>
-												#else
-													<div class="stack-element">$line</div>
-												#end
-												#set ($lineIdx = $lineIdx + 1)
-											#end
-											</div>
-										#end
-										<br/>
-										#foreach($line in $logs)
-											<div>$line</div>
-										#end	
-									</div>
-								</div>
-								
-			<!-- previous execution logs -->
-								#if ($title)
-								<div class="box collapsed-box success">
-									<div class="box-header with-border">
-										<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fas fa-plus"></i></button> $title
-									</div>
-									<div class="box-body">
-										#foreach($line in $files)
-											<div><a href="$line">$line</a></div>
-										#end	
-									</div>
-								</div>
-								#end
-							</div>
-						</div>
-					</section>
-				</div>
-			</div>
-			#if ($snapshots)
-				<div class="tab-pane fade" id="snapshots" role="tabpanel" aria-labelledby="snapshot-tab">
-					<div class="container-fluid">
-						<section class="content">
-							<div class="row">
-								<div class="col-xl-12">
-									<iframe src="${snapshotServer}/snapshot/compare/stepList/${snapshotSessionId}/?header=true" id="snapshot-iframe" frameborder="0"></iframe>
-								</div>
-							</div>
-						</section>
-					</div>
-				</div>
-			#end
-		</div>
+                                        </div>
+                                    #end
+                                </div>
+                            </div>
+                            #end
 
-        <script>
-             // activate popover
-             $('[data-toggle="popover"]').popover();
-        </script>
-		
-		#if ($snapshots)
-			<script>
-			    
-			     
-				const frames = iFrameResize({ log: true, autoResize: false}, '#snapshot-iframe')
-				$('#snapshot-tab').on('shown.bs.tab', function (e) {
-					console.log("resizing iframe");
-					frames[0].iFrameResizer.resize();
-					frames[0].iFrameResizer.sendMessage("resize");
-				})
-			</script>	
-		#end
-	</body>
+                            <!-- logs -->
+                            #if ($status.toString().equals("passed"))
+                            <div class="box collapsed-box success">
+                            #elseif ($status.toString().equals("failed"))
+                            <div class="box collapsed-box failed">
+                            #else
+                            <div class="box collapsed-box skipped">
+                            #end
+                            <div class="box-header with-border">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                                        class="fas fa-plus"></i></button>
+                                Execution logs
+                            </div>
+                            <div class="box-body logs">
+                                #if ($stacktrace)
+                                    <div class="message-error">
+                                        #set ($lineIdx = 0)
+                                        #foreach($line in $stacktrace)
+                                            #if ($lineIdx == 0)
+                                                <div>$line</div>
+                                            #else
+                                                <div class="stack-element">$line</div>
+                                            #end
+                                            #set ($lineIdx = $lineIdx + 1)
+                                        #end
+                                    </div>
+                                #end
+                                <br/>
+                                #foreach($line in $logs)
+                                    <div>$line</div>
+                                #end
+                            </div>
+                        </div>
+
+                            <!-- previous execution logs -->
+                            #if ($title)
+                                <div class="box collapsed-box success">
+                                    <div class="box-header with-border">
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                                                class="fas fa-plus"></i></button> $title
+                                    </div>
+                                    <div class="box-body">
+                                        #foreach($line in $files)
+                                            <div><a href="$line">$line</a></div>
+                                        #end
+                                    </div>
+                                </div>
+                            #end
+                        </div>
+                        </div>
+                </section>
+            </div>
+        </div>
+        #if ($snapshots)
+            <div class="tab-pane fade" id="snapshots" role="tabpanel" aria-labelledby="snapshot-tab">
+                <div class="container-fluid">
+                    <section class="content">
+                        <div class="row">
+                            <div class="col-xl-12">
+                                <iframe src="${snapshotServer}/snapshot/compare/stepList/${snapshotSessionId}/?header=true"
+                                        id="snapshot-iframe" frameborder="0"></iframe>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        #end
+    </div>
+</div>
+
+<script>
+    // activate popover
+    $('[data-toggle="popover"]').popover();
+</script>
+<script>
+    var elements = document.getElementsByClassName("stepTimestamp");
+
+    function toggleTimestamps() {
+        for (var i = 0; i < elements.length; i++) {
+            var element = elements[i];
+            if (element.style.display === "none") {
+                element.style.display = "block";
+            } else {
+                element.style.display = "none";
+            }
+        }
+    }
+
+    document.getElementById("timestampAction").addEventListener("click", toggleTimestamps);
+</script>
+
+    #if ($snapshots)
+    <script>
+        const frames = iFrameResize({log: true, autoResize: false}, '#snapshot-iframe')
+        $('#snapshot-tab').on('shown.bs.tab', function (e) {
+            console.log("resizing iframe");
+            frames[0].iFrameResizer.resize();
+            frames[0].iFrameResizer.sendMessage("resize");
+        })
+    </script>
+    #end
+</body>
 </html>
