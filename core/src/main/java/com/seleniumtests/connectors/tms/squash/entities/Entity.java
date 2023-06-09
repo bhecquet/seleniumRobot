@@ -165,7 +165,7 @@ public class Entity {
 		
 		if (response.getStatus() >= 400) {
 			if (response.getBody() != null) {
-				throw new ScenarioException(String.format("request to %s failed: %s", request.getUrl(), response.getBody().toPrettyString()));	
+				throw new ScenarioException(String.format("request to %s failed[%d]: %s", request.getUrl(), response.getStatus(), response.getBody().toPrettyString()));	
 			} else {
 				throw new ScenarioException(String.format("request to %s failed", request.getUrl()));	
 			}

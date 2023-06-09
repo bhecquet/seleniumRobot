@@ -98,6 +98,7 @@ public class SquashTMConnector extends TestManager {
 			SquashTMApi sapi = getApi();
 			Integer testId = getTestCaseId(testResult);
 			if (testId == null) {
+				logger.warn("Results won't be recorded, no testId configured");
 				return;
 			}
 	
@@ -125,10 +126,15 @@ public class SquashTMConnector extends TestManager {
 			
 			IterationTestPlanItem tpi = sapi.addTestCaseInIteration(iteration, testId);
 			
+			
 			if (testResult.isSuccess()) {
 				sapi.setExecutionResult(tpi, ExecutionStatus.SUCCESS);
 			} else if (testResult.getStatus() == 2){ // failed
-				sapi.setExecutionResult(tpi, ExecutionStatus.FAILURE);
+				String comment = null;
+				if (testResult.getThrowable() != null) {
+					comment = testResult.getThrowable().getMessage();
+				}
+				sapi.setExecutionResult(tpi, ExecutionStatus.FAILURE, comment);
 			} else { // skipped or other reason
 				sapi.setExecutionResult(tpi, ExecutionStatus.BLOCKED);
 			}

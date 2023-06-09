@@ -167,8 +167,19 @@ public class SquashTMApi {
 	 * @param result		Execution status of the test
 	 */
 	public void setExecutionResult(IterationTestPlanItem testPlanItem, ExecutionStatus result) {
+		setExecutionResult(testPlanItem, result, null);
+	}
+	
+
+	/**
+	 * Add an execution result to the test case
+	 * @param testPlanItem	the IterationTestPlanItem which has been executed
+	 * @param result		Execution status of the test
+	 * @param comment		Comment to add to failed step
+	 */
+	public void setExecutionResult(IterationTestPlanItem testPlanItem, ExecutionStatus result, String comment) {
 		TestPlanItemExecution execution = testPlanItem.createExecution();
-		execution.setResult(result);
+		execution.setResult(result, comment);
 	}
 
 	public Project getCurrentProject() {
