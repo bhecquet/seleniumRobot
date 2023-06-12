@@ -49,6 +49,7 @@ import com.seleniumtests.reporter.info.MultipleInfo;
 import com.seleniumtests.reporter.info.VideoLinkInfo;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.logging.ScenarioLogger;
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.video.VideoCaptureMode;
 import com.seleniumtests.util.video.VideoUtils;
 
@@ -60,7 +61,7 @@ public class SeleniumRobotTestPlan {
 	
 	private static Map<Thread, Boolean> cucumberTest = Collections.synchronizedMap(new HashMap<>());
 	protected static final Logger logger = ScenarioLogger.getScenarioLogger(SeleniumRobotTestPlan.class);
-	
+	protected static final Logger internalLogger = SeleniumRobotLogger.getLogger(SeleniumRobotTestPlan.class);
 	public SeleniumRobotTestPlan() {
 		System.setProperty( "file.encoding", "UTF-8" );
 	}
@@ -106,20 +107,21 @@ public class SeleniumRobotTestPlan {
 		
 		// stop video capture and log file
 		File videoFile = WebUIDriver.stopVideoCapture();
-		
+		internalLogger.info("Video capture received");
 		if (videoFile != null) {
+			internalLogger.info("extracting references");
 			try {
 				VideoUtils.extractReferenceForSteps(videoFile, TestStepManager.getInstance().getTestSteps(), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
 			} catch (Exception e) {
 				logger.error("Error extracting step reference, continue anyway", e);
 			}
-
+			internalLogger.info("references extracted");
 	        if (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.TRUE
 	        		|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_SUCCESS && testResult.isSuccess())
 	        		|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_ERROR && !testResult.isSuccess())) {
-
+	        	internalLogger.info("storing video to log file");
 	        	((ScenarioLogger)logger).logFileToTestEnd(videoFile.getAbsoluteFile(), "Video capture");
-
+	        	internalLogger.info("add video to info");
 	        	Info lastStateInfo = TestNGResultUtils.getTestInfo(testResult).get(TestStepManager.LAST_STATE_NAME);
 	        	if (lastStateInfo != null) {
 	        		((MultipleInfo)lastStateInfo).addInfo(new VideoLinkInfo(TestNGResultUtils.getUniqueTestName(testResult) + "/videoCapture.avi"));
@@ -128,6 +130,7 @@ public class SeleniumRobotTestPlan {
 	        	logger.info("Video file copied to " + videoFile.getAbsolutePath());
 	        	
 			} else {
+				internalLogger.info("No need to keep video => delete video file");
 				try {
 					Files.delete(Paths.get(videoFile.getAbsolutePath()));
 				} catch (IOException e) {
@@ -135,10 +138,10 @@ public class SeleniumRobotTestPlan {
 				}
 			}
 		}
-
+		internalLogger.info("clean driver");
 		WebUIDriver.cleanUp();
 		SeleniumTestsContextManager.getThreadContext().setDriverCreationBlocked(true);
-		
+		internalLogger.info("on test fully finished");
 		SeleniumRobotTestListener.getCurrentListener().onTestFullyFinished(testResult);
 	}
 
