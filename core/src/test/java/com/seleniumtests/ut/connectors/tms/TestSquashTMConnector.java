@@ -19,6 +19,8 @@ package com.seleniumtests.ut.connectors.tms;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -29,6 +31,7 @@ import java.lang.annotation.Annotation;
 
 import org.json.JSONObject;
 import org.mockito.Mock;
+import org.openqa.selenium.WebDriverException;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
@@ -283,7 +286,63 @@ public class TestSquashTMConnector extends MockitoTest {
 		verify(api).createCampaign("Selenium " + testContext.getName(), "");
 		verify(api).createIteration(campaign, SeleniumTestsContextManager.getThreadContext().getApplicationVersion());
 		verify(api).addTestCaseInIteration(iteration, 1);
-		verify(api).setExecutionResult(iterationTestPlanItem, ExecutionStatus.FAILURE);
+		verify(api).setExecutionResult(iterationTestPlanItem, ExecutionStatus.FAILURE, null);
+	}
+	
+	/**
+	 * Same as above, adding a comment to result, from raised exception
+	 * @param testContext
+	 */
+	@Test(groups={"ut"})
+	public void testRecordResultTestInErrorWithComment(ITestContext testContext) {
+		
+		JSONObject connect = new JSONObject();
+		connect.put(SquashTMConnector.TMS_SERVER_URL, "http://myServer");
+		connect.put(SquashTMConnector.TMS_PROJECT, "project");
+		connect.put(SquashTMConnector.TMS_USER, "user");
+		connect.put(SquashTMConnector.TMS_PASSWORD, "password");
+		
+		SquashTMConnector squash = spy(new SquashTMConnector());
+		squash.init(connect);
+		doReturn(api).when(squash).getApi();
+		
+		CustomAttribute testIdAttr = new CustomAttribute() {
+			@Override
+			public Class<? extends Annotation> annotationType() {
+				return null;
+			}
+			
+			@Override
+			public String[] values() {
+				return new String[] {"1"};
+			}
+			
+			@Override
+			public String name() {
+				return "testId";
+			}
+		};
+		// customize test result so that it has attributes
+		when(testResult.getMethod()).thenReturn(testMethod);
+		when(testResult.isSuccess()).thenReturn(false);
+		when(testResult.getStatus()).thenReturn(2);
+		when(testResult.getName()).thenReturn("MyTest");
+		when(testResult.getTestContext()).thenReturn(testContext);
+		when(testResult.getParameters()).thenReturn(new Object[] {});
+		when(testResult.getAttribute("testContext")).thenReturn(SeleniumTestsContextManager.getThreadContext());
+		when(testResult.getThrowable()).thenReturn(new WebDriverException("error from driver"));
+		when(testMethod.getAttributes()).thenReturn(new CustomAttribute[] {testIdAttr});
+		when(api.createCampaign(anyString(), anyString())).thenReturn(campaign);
+		when(api.createIteration(any(Campaign.class), anyString())).thenReturn(iteration);
+		when(api.addTestCaseInIteration(iteration, 1)).thenReturn(iterationTestPlanItem);
+		
+		squash.recordResult(testResult);
+		
+		// check we call all necessary API methods to record the result
+		verify(api).createCampaign("Selenium " + testContext.getName(), "");
+		verify(api).createIteration(campaign, SeleniumTestsContextManager.getThreadContext().getApplicationVersion());
+		verify(api).addTestCaseInIteration(iteration, 1);
+		verify(api).setExecutionResult(eq(iterationTestPlanItem), eq(ExecutionStatus.FAILURE), contains("error from driver"));
 	}
 	
 	@Test(groups={"ut"})

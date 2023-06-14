@@ -1,14 +1,12 @@
 package com.seleniumtests.connectors.tms.squash.entities;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.seleniumtests.customexception.ScenarioException;
 
 import kong.unirest.UnirestException;
+import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
 
@@ -47,8 +45,11 @@ public class TestPlanItemExecution extends Entity {
 					json.getString(FIELD_NAME)
 					);
 			
-			for (JSONObject jsonStep: (List<JSONObject>)json.getJSONArray("execution_steps").toList()) {
-				testPlanItemExecution.steps.add(ExecutionStep.fromJson(jsonStep));
+			JSONArray steps = json.optJSONArray("execution_steps");
+			if (steps != null) {
+				for (JSONObject jsonStep: (List<JSONObject>)steps.toList()) {
+					testPlanItemExecution.steps.add(ExecutionStep.fromJson(jsonStep));
+				}
 			}
 			
 			return testPlanItemExecution;

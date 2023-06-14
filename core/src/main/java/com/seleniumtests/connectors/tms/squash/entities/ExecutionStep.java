@@ -28,6 +28,9 @@ public class ExecutionStep extends Entity {
 	}
 	
 	public void setStatus(ExecutionStatus status) {
+		if (status == null) {
+			return;
+		}
 		try {
 			getJSonResponse(buildPatchRequest(String.format("%s/execution-status/%s", url, status.toString())));
 		} catch (UnirestException e) {
