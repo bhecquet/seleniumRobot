@@ -639,6 +639,10 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			deleteExistingVideo(outputFile);
 				
 			HttpResponse<File> videoResponse = Unirest.get(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+					.downloadMonitor((b, fileName, bytesWritten, totalBytes) -> {
+						logger.info(String.format("File %s: %d/%d", fileName, bytesWritten, totalBytes));
+	                })
+					
 				.queryString(ACTION_FIELD, "stopVideoCapture")
 				.queryString(SESSION_FIELD, sessionId)
 				.asFile(outputFile);
