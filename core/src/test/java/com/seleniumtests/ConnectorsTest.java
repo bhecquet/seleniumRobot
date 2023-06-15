@@ -331,6 +331,7 @@ public class ConnectorsTest extends MockitoTest {
 				GetRequest getRequest = mock(GetRequest.class); 
 				
 				when(Unirest.get(serverUrl + apiPath)).thenReturn(getRequest);
+				when(getRequest.downloadMonitor(any())).thenReturn(getRequest);
 				when(getRequest.socketTimeout(anyInt())).thenReturn(getRequest);
 				when(unirestInstance.get(serverUrl + apiPath)).thenReturn(getRequest);
 				
