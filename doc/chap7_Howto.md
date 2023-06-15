@@ -767,3 +767,5 @@ String code = Totp.generateCode("<your secret key>");
 
 Secret key can be get as text from your login screen
 For now, only 6 character length code are provided
+
+Totp class also provides a "main" so that it's possible to generate a code, given the secret key, outside of selenium tests

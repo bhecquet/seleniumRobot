@@ -15,6 +15,16 @@ public class Totp {
 		// nothing to do
 	}
 	
+	/**
+	 * Main to generate a 6 digit code from key
+	 * Provide only 1 argument with the secret key
+	 * @param args
+	 * @throws InvalidKeyException
+	 */
+	public static void main(String[] args) throws InvalidKeyException {
+		System.out.println(Totp.generateCode(args[0]));
+	}
+	
 	private static final TimeBasedOneTimePasswordGenerator totp = new TimeBasedOneTimePasswordGenerator();
 	
 	/**
