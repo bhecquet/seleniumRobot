@@ -19,31 +19,21 @@ package com.seleniumtests.it.reporter;
 
 import java.io.File;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import com.seleniumtests.connectors.extools.Lighthouse;
-import com.seleniumtests.core.TestTasks;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.math3.analysis.function.Power;
-import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
+import com.seleniumtests.CaptureVideo;
+import com.seleniumtests.connectors.extools.Lighthouse;
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.contexts.SeleniumRobotServerContext;
-import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.it.stubclasses.StubTestClass;
-
-import static org.mockito.ArgumentMatchers.*;
 
 public class TestSeleniumTestsReporter2 extends ReporterTest {
 
@@ -584,6 +574,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check if param "Gridnode" is ok
 	 * @throws Exception
 	 */
+	@CaptureVideo
 	@Test(groups={"it"})
 	public void testGridnodeExist() throws Exception {
 		try {
@@ -604,6 +595,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
 		}
 	}
+	@CaptureVideo
 	@Test(groups={"it"})
 	public void testGridnodeNotPresentForSkippedTest() throws Exception {
 		try {
@@ -624,6 +616,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
 		}
 	}
+	
+	@CaptureVideo
 	@Test(groups={"it"})
 	public void testGridnodeExistForLocal() throws Exception {
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
@@ -774,6 +768,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * A snapshot is taken when soft assertion is enabled and assertion fails
 	 * @throws Exception
 	 */
+	
+	@CaptureVideo
 	@Test(groups={"it"})
 	public void testDetailedReportContainsCaptureOnSoftAssertionEnabled() throws Exception {
 
@@ -793,6 +789,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		}
 	}
 	
+	@CaptureVideo
 	@Test(groups={"it"})
 	public void testDetailedReportDoesNotContainCaptureOnSoftAssertionDisabled() throws Exception {
 		
@@ -1556,6 +1553,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent3.contains("<h4> Test Details - testOkWithPasswordDataProvider-2 with params: (14,null)</h4>"));
 	}
 	
+	@CaptureVideo
 	@Test(groups={"it"})
 	public void testReportContainsCustomScreenshot() throws Exception {
 		
@@ -1574,6 +1572,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check test information shows a link to last test step
 	 * @throws Exception
 	 */
+	@CaptureVideo
 	@Test(groups={"it"})
 	public void testReportContainsTestEndScreenshotQuicklink() throws Exception {
 		
@@ -1595,6 +1594,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * 
 	 * @throws Exception
 	 */
+	
+	@CaptureVideo
 	@Test(groups={"it"})
 	public void testReportContainsNoVideoCapture() throws Exception {
 		
@@ -1626,6 +1627,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * 
 	 * @throws Exception
 	 */
+	@CaptureVideo
 	@Test(groups={"it"})
 	public void testReportContainsVideoCapture() throws Exception {
 		
@@ -1659,6 +1661,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * 
 	 * @throws Exception
 	 */
+	@CaptureVideo
 	@Test(groups={"it"})
 	public void testReportContainsStepReferenceForFailedStep() throws Exception {
 		
@@ -1714,6 +1717,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		}
 	}
 	
+	@CaptureVideo
 	@Test(groups={"it"})
 	public void testReportDoeNotContainStepReferenceForFailedStepWhenVideoDisabled() throws Exception {
 		
@@ -1757,6 +1761,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check step state is not displayed when reference image does not exist on server
 	 * @throws Exception
 	 */
+	@CaptureVideo
 	@Test(groups={"it"})
 	public void testReportDoesNotContainStepImageWithoutReference() throws Exception {
 		
@@ -1810,6 +1815,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check reference is not get if server recording is disabled
 	 * @throws Exception
 	 */
+	@CaptureVideo
 	@Test(groups={"it"})
 	public void testReportDoesNotContainStepReferenceWhenRecordingDisabled() throws Exception {
 		
@@ -1864,6 +1870,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * In case test is OK, no reference image is displayed in report
 	 * @throws Exception
 	 */
+	@CaptureVideo
 	@Test(groups={"it"})
 	public void testReportDoesNotContainReferenceStep() throws Exception {
 		
@@ -1915,6 +1922,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * issue #406
 	 * @throws Exception
 	 */
+	@CaptureVideo
 	@Test(groups={"it"})
 	public void testReportContainsVideoCaptureOnRetry() throws Exception {
 		
@@ -1941,6 +1949,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * issue #406
 	 * @throws Exception
 	 */
+	@CaptureVideo
 	@Test(groups={"it"})
 	public void testReportContainsVideoCaptureStartedOnBeforeMethodOnRetry() throws Exception {
 		
@@ -1967,6 +1976,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * 
 	 * @throws Exception
 	 */
+	@CaptureVideo
 	@Test(groups={"it"})
 	public void testReportContainsOneVideoCaptureWithMultipleDrivers() throws Exception {
 		
@@ -1991,6 +2001,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * 
 	 * @throws Exception
 	 */
+	@CaptureVideo
 	@Test(groups={"it"})
 	public void testReportContainsHarCapture() throws Exception {
 		
@@ -2019,6 +2030,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * 
 	 * @throws Exception
 	 */
+	@CaptureVideo
 	@Test(groups={"it"})
 	public void testReportContainsHarCaptureMultipleBrowsers() throws Exception {
 		
@@ -2049,6 +2061,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * 
 	 * @throws Exception
 	 */
+	@CaptureVideo
 	@Test(groups={"it"})
 	public void testReportDoNotContainsHarCapture() throws Exception {
 		try {
@@ -2068,6 +2081,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 	}
 	
+	@CaptureVideo
 	@Test(groups={"it"})
 	public void testReportContainsWcagResults() throws Exception {
 
@@ -2091,6 +2105,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * 
 	 * @throws Exception
 	 */
+	@CaptureVideo
 	@Test(groups={"it"})
 	public void testReportContainsDriverActions() throws Exception {
 		
@@ -2405,6 +2420,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check that when an action fails, a warning is displayed in step and logs
 	 * This helps in the case the action error is catched
 	 */
+	@CaptureVideo
 	@Test(groups={"it"})
 	public void testLogActionErrorsAsWarning(ITestContext testContext) throws Exception {
 		
@@ -2430,6 +2446,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check call to 'isDisplayedRetry' when element is not present should create a failed step with warning, but no exception displayed
 	 * @throws Exception
 	 */
+	@CaptureVideo
 	@Test(groups={"it"})
 	public void testNoFailedStepForIsDisplayedRetry() throws Exception {
 		
@@ -2623,6 +2640,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 	}
 	
+	@CaptureVideo
 	@Test(groups={"it"})
 	public void testReportWithLighthouseExecution() throws Exception {
 		Lighthouse lighthouse = PowerMockito.mock(Lighthouse.class);

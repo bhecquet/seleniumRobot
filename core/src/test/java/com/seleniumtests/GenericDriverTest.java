@@ -25,6 +25,7 @@ import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Listeners;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
@@ -37,6 +38,7 @@ import com.seleniumtests.util.video.VideoCaptureMode;
  * @author s047432
  *
  */
+@Listeners({CaptureVideoListener.class})
 public class GenericDriverTest {
 	protected static final ScenarioLogger logger = ScenarioLogger.getScenarioLogger(SeleniumRobotTestPlan.class);
 	

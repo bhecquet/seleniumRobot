@@ -36,6 +36,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Listeners;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -49,6 +50,7 @@ import com.seleniumtests.util.video.VideoCaptureMode;
  */
 
 @PowerMockIgnore({"javax.net.ssl.*", "com.google.inject.*", "javax.imageio.*", "javax.swing.*"})
+@Listeners({CaptureVideoListener.class})
 public class MockitoTest  extends PowerMockTestCase {
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(MockitoTest.class);

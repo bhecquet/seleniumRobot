@@ -42,6 +42,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 
+import com.seleniumtests.CaptureVideo;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.WebTestPageServer;
@@ -64,6 +65,7 @@ import com.seleniumtests.it.driver.support.pages.DriverTestPageWithoutFixedPatte
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 
+@CaptureVideo
 public abstract class GenericMultiBrowserTest extends MockitoTest {
 	
 	protected BrowserType browserType;
