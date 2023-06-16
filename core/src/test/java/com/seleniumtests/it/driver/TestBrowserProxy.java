@@ -44,7 +44,7 @@ public class TestBrowserProxy extends GenericDriverTest {
 			System.setProperty(SeleniumTestsContext.BROWSER, BROWSER);
 			System.setProperty(SeleniumTestsContext.WEB_PROXY_TYPE, "autodetect");
 			initDriver(testNGCtx);
-			driver.get("http://www.google.fr");
+			driver.get("http://www.google.com");
 			Assert.assertTrue(driver.findElement(By.tagName("body")).getText().toLowerCase().contains("gmail"), "Google home page has not been loaded");
 		} finally {
 			System.clearProperty(SeleniumTestsContext.BROWSER);
@@ -64,7 +64,7 @@ public class TestBrowserProxy extends GenericDriverTest {
 			System.setProperty(SeleniumTestsContext.WEB_SESSION_TIME_OUT, "5");
 			System.setProperty(SeleniumTestsContext.WEB_PROXY_TYPE, "direct");
 			initDriver(testNGCtx);
-			driver.get("http://www.google.fr");
+			driver.get("http://www.google.com");
 		} finally {
 			System.clearProperty(SeleniumTestsContext.BROWSER);
 			System.clearProperty(SeleniumTestsContext.WEB_PROXY_TYPE);
