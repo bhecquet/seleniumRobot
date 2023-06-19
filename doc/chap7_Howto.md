@@ -769,3 +769,27 @@ Secret key can be get as text from your login screen
 For now, only 6 character length code are provided
 
 Totp class also provides a "main" so that it's possible to generate a code, given the secret key, outside of selenium tests
+
+### 29 Execute lighthouse on your webpage ###
+
+Lighthouse is one of the chrome components that provides information about performance, accessibility, SEO ... [https://github.com/GoogleChrome/lighthouse](https://github.com/GoogleChrome/lighthouse)
+
+To use it inside your tests, you first need to install lighthouse on the node on which browser will be started
+
+```
+npm install -g lighthouse
+```
+
+This should put a 'lighthouse' executable at the root of npm install path
+
+If not the case (lighthouse installed without the '-g' flag), set the LIGHTHOUSE_HOME environment variable which points to the `<npm_install_folder>\node_modules\lighthouse\cli`
+
+Then, in the test
+
+```
+    Lighthouse lighthouseInstance = LighthouseFactory.getInstance();
+    lighthouseInstance.execute(page.getUrl(), new ArrayList<>());
+    logger.logTestValue("accessibility", "accessibility", lighthouseInstance.getScore(Category.ACCESSIBILITY).toString()); 
+```
+
+You can also use some asserts to control scores
