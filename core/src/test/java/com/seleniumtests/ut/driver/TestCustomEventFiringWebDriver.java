@@ -514,7 +514,6 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testQuitInErrorLocal() {
-		PowerMockito.mockStatic(Unirest.class);
 		when(browserInfo.getAllBrowserSubprocessPids(new ArrayList<>())).thenReturn(Arrays.asList(1000L));
 		when(capabilities.getCapability(SeleniumRobotCapabilityType.GRID_NODE_URL)).thenReturn(null);
 		doThrow(new WebDriverException("some error")).when(driver).quit();
@@ -525,8 +524,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		verify(osUtility).killProcess("1000", true);
 		
 		// this test is "local", so no node is available, we won't try to stop session on grid node
-		PowerMockito.verifyStatic(Unirest.class, never());
-		Unirest.delete(anyString());
+		verify(gridConnector, never()).stopSession("1234");
 	}
 	
 	/**
