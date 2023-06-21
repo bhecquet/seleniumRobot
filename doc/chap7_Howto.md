@@ -47,6 +47,7 @@
 - [26 Read XLSX file](#26-read-xlsx-file)
 - [27 Perform accessibility testing (WCAG) using Axe-core](#27-perform-accessibility-testing-wcag-using-axe-core)
 - [28 Generate One-time password](#28-generate-one-time-password)
+- [29 Execute lighthouse on your webpage](#29-execute-lighthouse-on-your-webpage)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
