@@ -5,9 +5,8 @@
         <li class="header-failed">$localStep.getName()<br/>$localStep.getActionExceptionMessage()</li>
         #else
         <li>
-            <div class="d-inline-flex align-items-center">
-                <span class="stepTimestamp mr-2"
-                      style="display: none ;font-family: 'Courier New', Courier, monospace;">$timestamp</span> $localStep.getName()
+            <div class="message-conf">
+                <span class="stepTimestamp mr-2">$timestamp</span> $localStep.getName()
             </div>
         </li>
         #end
@@ -20,9 +19,8 @@
         #elseif (${action.class.name.equals("com.seleniumtests.reporter.logger.TestMessage")})
             #set ($messageType = $action.getMessageType().toString().toLowerCase())
             #set ($messageType = "message-" + $messageType)
-            <div style="display: flex; flex-direction: row; align-items: baseline" class="$messageType"><span
-                    class="stepTimestamp mr-2"
-                    style="display: none ;font-family: 'Courier New', Courier, monospace;">$timestamp</span> $action.getName()
+            <div class="$messageType message-conf"><span
+                    class="stepTimestamp mr-1">$timestamp</span> $action.getName()
             </div>
             #set ($messageType = "")
         #elseif (${action.class.name.equals("com.seleniumtests.reporter.logger.TestValue")})
@@ -34,9 +32,8 @@
                 </tr>
                 <tr>
                     <td>
-                        <div class="d-inline-flex align-items-baseline">
-                            <span class="stepTimestamp mr-2"
-                                  style="display: none ;font-family: 'Courier New', Courier, monospace;">$timestamp</span> $action.getName()
+                        <div class="message-conf">
+                            <span class="stepTimestamp mr-1">$timestamp</span> $action.getName()
                         </div>
                     </td>
                     <td>$action.getMessage()</td>
@@ -47,16 +44,14 @@
             #set ($actionException = $action.getActionExceptionMessage())
             #if ($action.getFailed() && $actionException)
                 <li class="header-failed">
-                    <div class="d-inline-flex align-items-center">
-                        <span class="stepTimestamp mr-2"
-                              style="display: none ;font-family: 'Courier New', Courier, monospace;">$timestamp</span> $action.getName() $action.getActionExceptionMessage()
+                    <div class="message-conf">
+                        <span class="stepTimestamp mr-1">$timestamp</span> $action.getName() $action.getActionExceptionMessage()
                     </div>
                 </li>
             #else
                 <li>
-                    <div class="d-inline-flex align-items-center">
-                        <span class="stepTimestamp mr-2"
-                              style="display: none ;font-family: 'Courier New', Courier, monospace;">$timestamp</span> $action.getName()
+                    <div class="message-conf">
+                        <span class="stepTimestamp mr-1">$timestamp</span> $action.getName()
                     </div>
                 </li>
             #end
@@ -103,17 +98,6 @@
 
     <script src="resources/app.min.js"></script>
     <link rel="stylesheet" type="text/css" href="resources/seleniumRobot_solo.css">
-    <style>
-        @media screen and (max-width: 1280px) {
-            .fa-stopwatch-20 {
-                font-size: 30px !important;
-            }
-
-            #timestampAction {
-                left: -1rem !important;
-            }
-        }
-    </style>
 </head>
 
 <div>
