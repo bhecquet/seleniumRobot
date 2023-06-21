@@ -348,12 +348,26 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
             caps.setCapability(SeleniumRobotCapabilityType.GRID_HUB, hubUrl);
             caps.setCapability(SeleniumRobotCapabilityType.SESSION_ID, sessionId);
             caps.setCapability(SeleniumRobotCapabilityType.GRID_NODE, nodeHost);
+            caps.setCapability(SeleniumRobotCapabilityType.GRID_NODE_URL, nodeUrl);
             
             logger.info(String.format("Brower %s (%s) created in %.1f secs on node %s [%s] with session %s", browserName, version, driverCreationDuration / 1000.0, nodeHost, hubUrl, sessionId).replace(",", "."));
             
         } catch (Exception ex) {
         	throw new SessionNotCreatedException(ex.getMessage());
         } 
+	}
+	
+	/**
+	 * Stop the session calling the node URL
+	 * /!\ this will not work if a secret has been defined 
+	 * @param sessionId
+	 */
+	public boolean stopSession(String sessionId) {
+		HttpResponse<String> response = Unirest.delete(String.format("%s/se/grid/node/session/%s", nodeUrl, sessionId))
+		.header("X-REGISTRATION-SECRET", "")
+		.asString();
+		
+		return response.getStatus() == 200;
 	}
 
 	public URL getHubUrl() {

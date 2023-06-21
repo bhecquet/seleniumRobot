@@ -194,4 +194,14 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 		
 		Assert.assertFalse(connector.isGridActive());
 	}
+	
+	@Test(groups={"ut"})
+	public void testStopSession() throws ClientProtocolException, IOException, UnirestException {
+		
+		SeleniumGridConnector connector = new SeleniumGridConnector(SERVER_URL);
+		connector.setNodeUrl("http://localhost:5555");
+		createServerMock("http://localhost:5555", "DELETE", "/se/grid/node/session/1234", 200, "some text");	
+		
+		Assert.assertTrue(connector.stopSession("1234"));
+	}
 }

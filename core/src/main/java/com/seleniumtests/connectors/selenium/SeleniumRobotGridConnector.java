@@ -86,9 +86,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	
 	public SeleniumRobotGridConnector(String url) {
 		super(url);
-		
 	}
-	
 	
 	@Override
 	public void getSessionInformationFromGrid(RemoteWebDriver driver, long driverCreationDuration) {

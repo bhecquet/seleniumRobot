@@ -69,6 +69,7 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
+import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
@@ -77,6 +78,9 @@ import com.seleniumtests.driver.Keyboard;
 import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.video.VideoRecorder;
+
+import kong.unirest.HttpRequestWithBody;
+import kong.unirest.Unirest;
 
 @PrepareForTest({OSUtilityFactory.class, CustomEventFiringWebDriver.class})
 public class TestCustomEventFiringWebDriver extends MockitoTest {
@@ -509,14 +513,40 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 * Check that even if error is raised when driver is quit, killing process is done
 	 */
 	@Test(groups = {"ut"})
-	public void testQuitInError() {
+	public void testQuitInErrorLocal() {
+		PowerMockito.mockStatic(Unirest.class);
 		when(browserInfo.getAllBrowserSubprocessPids(new ArrayList<>())).thenReturn(Arrays.asList(1000L));
+		when(capabilities.getCapability(SeleniumRobotCapabilityType.GRID_NODE_URL)).thenReturn(null);
 		doThrow(new WebDriverException("some error")).when(driver).quit();
 		
 		try {
 			eventDriver.quit();
 		} catch (WebDriverException e) {}
 		verify(osUtility).killProcess("1000", true);
+		
+		// this test is "local", so no node is available, we won't try to stop session on grid node
+		PowerMockito.verifyStatic(Unirest.class, never());
+		Unirest.delete(anyString());
+	}
+	
+	/**
+	 * Check that even if error is raised when driver is quit, session stop is done at node level
+	 */
+	@Test(groups = {"ut"})
+	public void testQuitInErrorOnGrid() {
+		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, browserInfo, true, DriverMode.LOCAL, null, gridConnector));
+		
+		when(browserInfo.getAllBrowserSubprocessPids(new ArrayList<>())).thenReturn(Arrays.asList(1000L));
+		when(capabilities.getCapability(SeleniumRobotCapabilityType.GRID_NODE_URL)).thenReturn("http://grid-node:5555");
+		doThrow(new WebDriverException("some error")).when(driver).quit();
+		
+		try {
+			eventDriver.quit();
+		} catch (WebDriverException e) {}
+		verify(osUtility).killProcess("1000", true);
+		
+		// this test is "local", so no node is available, we won't try to stop session on grid node
+		verify(gridConnector).stopSession("1234");
 	}
 	
 	/**

@@ -92,6 +92,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.video.VideoRecorder;
 
+import kong.unirest.Unirest;
 import net.lightbody.bmp.BrowserMobProxy;
 
 /**
@@ -1247,6 +1248,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		}
 		String gridHub = caps.getCapability(SeleniumRobotCapabilityType.GRID_HUB) != null ? caps.getCapability(SeleniumRobotCapabilityType.GRID_HUB).toString(): null;
 		String sessionId = caps.getCapability(SeleniumRobotCapabilityType.SESSION_ID) != null ? caps.getCapability(SeleniumRobotCapabilityType.SESSION_ID).toString(): null;
+		String driverSessionId = getSessionId();
 		
 		// store driver stats
 		DriverUsage usage = new DriverUsage(gridHub, 
@@ -1262,8 +1264,18 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		try {
 			driver.quit();
 		} catch (WebDriverException e) {
-			caps = new MutableCapabilities();
+			
 			logger.error("Error while quitting driver: " + e.getMessage());
+			
+			// in case stopping fails, kill the session on node directly
+			// It happens on an InternetExplorer where an unexpected modal, associated to a mechanism that prevents IE to be stopped, driver.close() and driver.quit()
+			// do not work as exepected
+			sessionId = driverSessionId != null ? driverSessionId: sessionId;
+			if (sessionId != null && gridConnector != null) {
+				logger.info(String.format("Try to stop session %s calling node", sessionId));
+				gridConnector.stopSession(sessionId);
+			}
+			caps = new MutableCapabilities();
 		} finally {
 			
 			// wait for browser processes to stop

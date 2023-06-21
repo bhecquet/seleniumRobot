@@ -74,6 +74,7 @@ public interface SeleniumRobotCapabilityType {
 	 */
 	String GRID_HUB = "sr:gridHub";
 	String GRID_NODE = "sr:gridNode";
+	String GRID_NODE_URL = "sr:gridNodeUrl";
 	String START_TIME = "sr:startTime";
 	String DURATION = "sr:duration";
 	String SESSION_ID = "sr:sessionId";

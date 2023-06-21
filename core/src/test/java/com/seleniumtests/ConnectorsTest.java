@@ -475,7 +475,10 @@ public class ConnectorsTest extends MockitoTest {
 				when(Unirest.put(serverUrl + apiPath)).thenReturn(postRequest);
 				when(unirestInstance.put(serverUrl + apiPath)).thenReturn(postRequest);
 				return preparePostRequest(serverUrl, responseType, postRequest, response, jsonResponse);
-				
+			case "DELETE":
+				when(Unirest.delete(serverUrl + apiPath)).thenReturn(postRequest);
+				when(unirestInstance.delete(serverUrl + apiPath)).thenReturn(postRequest);
+				return preparePostRequest(serverUrl, responseType, postRequest, response, jsonResponse);
 
 		}
 		return null;	
