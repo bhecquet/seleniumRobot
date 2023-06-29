@@ -18,6 +18,7 @@
 package com.seleniumtests.reporter.logger;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -28,6 +29,7 @@ import java.util.UUID;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.json.JSONObject;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.screenshots.ScreenShot;
@@ -39,16 +41,21 @@ import com.seleniumtests.util.StringUtility;
 public class Snapshot extends TestAction {
 	
 	private ScreenShot screenshot;
-	private SnapshotCheckType checkSnapshot; // whether this snapshot will be sent to Snapshot server to check if it conforms to baseline
+	private SnapshotCheckType snapshotCheckType; // whether this snapshot will be sent to Snapshot server to check if it conforms to baseline
 	private boolean displayInReport = true;
 
 	public static final String SNAPSHOT_PATTERN = "Application Snapshot";
 	public static final String OUTPUT_PATTERN = "Output '%s' browser: ";
 
-	public Snapshot(final ScreenShot screenshot, String snaphotName, SnapshotCheckType checkSnapshot) {
+	public Snapshot(final ScreenShot screenshot, String snaphotName, SnapshotCheckType snapshotCheckType) throws FileNotFoundException {
 		super(snaphotName, false, new ArrayList<>());
+		
+		if (screenshot == null) {
+			throw new FileNotFoundException("Snapshot needs a screenshot");
+		}
+		
 		this.screenshot = screenshot;
-		this.checkSnapshot = checkSnapshot;
+		this.snapshotCheckType = snapshotCheckType;
 		durationToExclude = screenshot.getDuration();
 	}
 	
@@ -123,6 +130,20 @@ public class Snapshot extends TestAction {
     	if (screenshot.getImagePath() != null) {
     		renameImageFile(newBaseName);
     	}
+    }
+    
+    @Override
+	public JSONObject toJson() {
+    	JSONObject snapshotJson = super.toJson();
+    	snapshotJson.put("snapshotCheckType", snapshotCheckType.getName());
+    	snapshotJson.put("image", String.format(FILE_PATTERN, screenshot.getFullImagePath().replace("\\", "/")));
+    	snapshotJson.put("html", String.format(FILE_PATTERN, screenshot.getFullHtmlPath().replace("\\", "/")));
+    	snapshotJson.put("name", screenshot.getImageName());
+    	snapshotJson.put("title", screenshot.getTitle());
+    	snapshotJson.put("url", screenshot.getLocation());
+    	snapshotJson.put("type", "snapshot");
+    	
+    	return snapshotJson;
     }
 
 	/**
@@ -230,16 +251,16 @@ public class Snapshot extends TestAction {
 		}
 	}
 	
-	public Snapshot encode() {
-		return new Snapshot(screenshot, name, checkSnapshot);
+	public Snapshot encode() throws FileNotFoundException {
+		return new Snapshot(screenshot, name, snapshotCheckType);
 	}
 	
 	public SnapshotCheckType getCheckSnapshot() {
-		return checkSnapshot;
+		return snapshotCheckType;
 	}
 
 	public void setCheckSnapshot(SnapshotCheckType checkSnapshot) {
-		this.checkSnapshot = checkSnapshot;
+		this.snapshotCheckType = checkSnapshot;
 	}
 
 	public boolean isDisplayInReport() {

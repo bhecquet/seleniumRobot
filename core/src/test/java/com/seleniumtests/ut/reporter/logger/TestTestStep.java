@@ -15,9 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.seleniumtests.ut.reporter;
+package com.seleniumtests.ut.reporter.logger;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -294,6 +295,59 @@ public class TestTestStep extends GenericTest {
 				"screenshots/N-A_0-11_step1--" + tmpImgFileSubStep2.getName().substring(tmpImgFileSubStep2.getName().length() - 10));
 		Assert.assertEquals(subStep.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(),
 				"htmls/N-A_0-11_step1--" + tmpHtmlFileSubStep2.getName().substring(tmpHtmlFileSubStep2.getName().length() - 10));
+
+		tmpImgFile.deleteOnExit();
+		tmpHtmlFile.deleteOnExit();
+		tmpImgFileSubStep.deleteOnExit();
+		tmpHtmlFileSubStep.deleteOnExit();
+	}
+
+	/**
+	 * Check we get snapshots from substeps, if requested
+	 * @throws IOException
+	 */
+	@Test(groups = { "ut" })
+	public void testGetSnapshotSubStep() throws IOException {
+		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+		ScreenShot screenshot = new ScreenShot();
+
+		File tmpImgFile = File.createTempFile("img", ".png");
+		File tmpImgFile2 = Paths.get(tmpImgFile.getParent(), "screenshots", tmpImgFile.getName()).toFile();
+		FileUtils.moveFile(tmpImgFile, tmpImgFile2);
+		File tmpHtmlFile = File.createTempFile("html", ".html");
+		File tmpHtmlFile2 = Paths.get(tmpHtmlFile.getParent(), "htmls", tmpHtmlFile.getName()).toFile();
+		FileUtils.moveFile(tmpHtmlFile, tmpHtmlFile2);
+
+		screenshot.setOutputDirectory(tmpImgFile.getParent());
+		screenshot.setLocation("http://mysite.com");
+		screenshot.setTitle("mysite");
+		screenshot.setImagePath("screenshots/" + tmpImgFile2.getName());
+		screenshot.setHtmlSourcePath("htmls/" + tmpHtmlFile2.getName());
+
+		step.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.TRUE), 0, null);
+
+		TestStep subStep = new TestStep("step1", null, new ArrayList<>(), true);
+		ScreenShot screenshotSubStep = new ScreenShot();
+		File tmpImgFileSubStep = File.createTempFile("img", ".png");
+		File tmpImgFileSubStep2 = Paths.get(tmpImgFileSubStep.getParent(), "screenshots", tmpImgFileSubStep.getName())
+				.toFile();
+		FileUtils.moveFile(tmpImgFileSubStep, tmpImgFileSubStep2);
+		File tmpHtmlFileSubStep = File.createTempFile("html", ".html");
+		File tmpHtmlFileSubStep2 = Paths.get(tmpHtmlFileSubStep.getParent(), "htmls", tmpHtmlFileSubStep.getName())
+				.toFile();
+		FileUtils.moveFile(tmpHtmlFileSubStep, tmpHtmlFileSubStep2);
+
+		screenshotSubStep.setOutputDirectory(tmpImgFileSubStep.getParent());
+		screenshotSubStep.setLocation("http://mysite.com");
+		screenshotSubStep.setTitle("mysite");
+		screenshotSubStep.setImagePath("screenshots/" + tmpImgFileSubStep2.getName());
+		screenshotSubStep.setHtmlSourcePath("htmls/" + tmpHtmlFileSubStep2.getName());
+
+		step.addStep(subStep);
+		subStep.addSnapshot(new Snapshot(screenshotSubStep, "main", SnapshotCheckType.TRUE), 0, null);
+
+		Assert.assertEquals(step.getSnapshots().size(), 1);
+		Assert.assertEquals(step.getSnapshots(true).size(), 2);
 
 		tmpImgFile.deleteOnExit();
 		tmpHtmlFile.deleteOnExit();
@@ -652,6 +706,10 @@ public class TestTestStep extends GenericTest {
 
 		GenericFile file = new GenericFile(File.createTempFile("video", ".avi"), "video file");
 		step.addFile(file);
+		
+		ScreenShot screenshot = new ScreenShot();
+		Snapshot snapshot = new Snapshot(screenshot, "main", SnapshotCheckType.FALSE);
+		step.addSnapshot(snapshot, 0, "foo");
 
 		TestStep subStep = new TestStep("subStep", null, new ArrayList<>(), true);
 		subStep.addMessage(new TestMessage("everything in subStep almost OK", MessageType.WARNING));
@@ -682,6 +740,8 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(stepJson.getJSONArray("files").getJSONObject(0).getString("type"), "file");
 		Assert.assertEquals(stepJson.getJSONArray("files").getJSONObject(0).getString("name"), "video file");
 		Assert.assertTrue(stepJson.getJSONArray("files").getJSONObject(0).getString("file").contains(".avi"));
+		
+		Assert.assertEquals(stepJson.getJSONArray("snapshots").getJSONObject(0).getString("type"), "snapshot");
 
 	}
 
@@ -914,7 +974,7 @@ public class TestTestStep extends GenericTest {
 	}
 
 	@Test(groups = { "ut" })
-	public void testDurationWithSnapshot() {
+	public void testDurationWithSnapshot() throws FileNotFoundException {
 		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
 		step.setDuration(5000L);
 		step.setDurationToExclude(500L);

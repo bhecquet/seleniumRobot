@@ -273,9 +273,12 @@ public class TestStep extends TestAction {
 	
 	@Override
 	public JSONObject toJson() {
-		JSONObject stepJSon = new JSONObject();
+		JSONObject stepJSon = super.toJson();
 		
 		stepJSon.put("name", encodeString(getName(), "json"));
+		stepJSon.put("duration", getDuration());
+		stepJSon.put("date", startDate);
+		stepJSon.put("videoTimeStamp", videoTimeStamp);
 		stepJSon.put("type", "step");
 		stepJSon.put("harCaptures", new JSONArray());
 		for (HarCapture harCapture: getHarCaptures()) {
@@ -292,6 +295,11 @@ public class TestStep extends TestAction {
 			stepJSon.getJSONArray("files").put(file.toJson());
 		}
 		
+		stepJSon.put("snapshots", new JSONArray());
+		for (Snapshot snapshot: getSnapshots()) {
+			stepJSon.getJSONArray("snapshots").put(snapshot.toJson());
+		}
+		
 		return stepJSon;
 	}
 
@@ -300,7 +308,18 @@ public class TestStep extends TestAction {
 	}
 
 	public List<Snapshot> getSnapshots() {
-		return snapshots;
+		return getSnapshots(false);
+	}
+	public List<Snapshot> getSnapshots(boolean fromSubSteps) {
+		List<Snapshot> snaps = new ArrayList<>(snapshots);
+
+		if (fromSubSteps) {
+			for (TestAction subStep : stepActions.stream().filter(a -> a instanceof TestStep).collect(Collectors.toList())) {
+				snaps.addAll(((TestStep) subStep).getSnapshots(fromSubSteps));
+			}
+		}
+
+		return snaps;
 	}
 
 	public ITestResult getTestResult() {
@@ -336,15 +355,16 @@ public class TestStep extends TestAction {
 				}
 			}
 		}
+
+		usedFiles.addAll(getFiles().stream().map(GenericFile::getFile).collect(Collectors.toList()));
+		usedFiles.addAll(getHarCaptures().stream().map(HarCapture::getFile).collect(Collectors.toList()));
 		
 		// add attachments declared in sub-steps
 		for (TestAction subStep: stepActions.stream().filter(a -> a instanceof TestStep).collect(Collectors.toList())) {
 			usedFiles.addAll(((TestStep)subStep).getAllAttachments(onlyPictureOfSnapshots));
+			usedFiles.addAll(((TestStep)subStep).getFiles().stream().map(GenericFile::getFile).collect(Collectors.toList()));
 		}
-		
-		usedFiles.addAll(getFiles().stream().map(GenericFile::getFile).collect(Collectors.toList()));
-		usedFiles.addAll(getHarCaptures().stream().map(HarCapture::getFile).collect(Collectors.toList()));
-		
+
 		return usedFiles;
 	}
 	

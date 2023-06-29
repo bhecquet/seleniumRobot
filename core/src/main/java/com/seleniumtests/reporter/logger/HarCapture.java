@@ -73,6 +73,7 @@ public class HarCapture extends TestAction {
 		
 		actionJson.put("type", "networkCapture");
 		actionJson.put("name", name);
+		actionJson.put("file", String.format(FILE_PATTERN, harFile.getAbsolutePath().replace("\\", "/")));
 		
 		return actionJson;
 	}

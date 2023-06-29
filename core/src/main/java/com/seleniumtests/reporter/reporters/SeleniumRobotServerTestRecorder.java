@@ -194,7 +194,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			testStep.setStepResultId(stepResultId);
 			
 			// sends all snapshots that are flagged as comparable
-			for (Snapshot snapshot: new ArrayList<>(testStep.getSnapshots())) {
+			for (Snapshot snapshot: new ArrayList<>(testStep.getSnapshots(true))) {
 				
 				if (snapshot.getCheckSnapshot().recordSnapshotOnServerForComparison() && SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshot()) {
 					if (snapshot.getName() == null || snapshot.getName().isEmpty()) {

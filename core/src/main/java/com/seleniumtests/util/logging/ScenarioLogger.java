@@ -1,6 +1,7 @@
 package com.seleniumtests.util.logging;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.logging.log4j.LogManager;
@@ -272,7 +273,7 @@ public class ScenarioLogger {
 	    			runningStep.addSnapshot(new Snapshot(screenshot, String.format("drv:%s%s", driverName, displayedScreenshotName), checkSnapshot), 
 	    					SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getTestSteps().size(),
 	    					screenshotName);
-	    		} catch (NullPointerException e) {
+	    		} catch (FileNotFoundException e) {
 	    			logger.error("screenshot is null");
 	    		}
 	    	}

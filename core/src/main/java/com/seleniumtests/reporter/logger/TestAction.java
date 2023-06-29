@@ -38,6 +38,7 @@ public class TestAction {
 	
 
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(TestAction.class);
+	protected static final String FILE_PATTERN = "<file:%s>";
 	
 	protected String name;
 	protected TestAction parent = null;
@@ -123,9 +124,10 @@ public class TestAction {
 		JSONObject actionJson = new JSONObject();
 		
 		actionJson.put("type", "action");
-		actionJson.put("name", encodeString(name, "json"));
+		actionJson.put("name", encodeString(getName(), "json"));
 		actionJson.put("exception", actionException == null ? null: actionException.toString());
 		actionJson.put("failed", failed);
+		actionJson.put("position", position);
 		
 		return actionJson;
 	}

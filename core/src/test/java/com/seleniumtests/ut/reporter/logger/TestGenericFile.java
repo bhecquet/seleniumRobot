@@ -1,4 +1,4 @@
-package com.seleniumtests.ut.reporter;
+package com.seleniumtests.ut.reporter.logger;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
+import org.json.JSONObject;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -221,5 +222,18 @@ public class TestGenericFile extends GenericTest {
 		
 		// check file has been replaced
 		Assert.assertEquals(FileUtils.readFileToString(dest, StandardCharsets.UTF_8), "foo");
+	}
+	
+	@Test(groups={"ut"})
+	public void testToJson() throws IOException {
+		File videoFile = File.createTempFile("video", ".avi");
+		videoFile.deleteOnExit();
+		FileUtils.write(videoFile, "bar", StandardCharsets.UTF_8);
+		GenericFile genericFile = new GenericFile(videoFile, "description");
+		
+		JSONObject json = genericFile.toJson();
+		Assert.assertEquals(json.getString("name"), "description");
+		Assert.assertEquals(json.getString("type"), "file");
+		Assert.assertEquals(json.getString("file"), "<file:" + genericFile.getFile().getAbsolutePath() + ">");
 	}
 }

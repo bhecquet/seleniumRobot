@@ -5,6 +5,7 @@ import static org.monte.media.FormatKeys.MediaTypeKey;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -85,9 +86,11 @@ public class VideoUtils {
                 if (samples.containsKey(i)) {
 	            	Path extractedPicture = videoOutputDirectory.resolve(String.format("video-%d.jpg", j));
 	                FileUtility.writeImage(extractedPicture.toString(), img);
-	                Snapshot snapshot = new Snapshot(new ScreenShot(outputDirectory.relativize(extractedPicture).toString()), "Step beginning state", SnapshotCheckType.REFERENCE_ONLY);
-	                snapshot.setDisplayInReport(false); // by default, reference snapshot won't be displayed in report. This flag will be set to "true" only if step fails and we have a reference picture from server
-					samples.get(i).addSnapshot(snapshot, j, null);
+	                try {
+		                Snapshot snapshot = new Snapshot(new ScreenShot(outputDirectory.relativize(extractedPicture).toString()), "Step beginning state", SnapshotCheckType.REFERENCE_ONLY);
+		                snapshot.setDisplayInReport(false); // by default, reference snapshot won't be displayed in report. This flag will be set to "true" only if step fails and we have a reference picture from server
+						samples.get(i).addSnapshot(snapshot, j, null);
+	                } catch (FileNotFoundException e) {}
 	                j++;
                 }
                 i++;

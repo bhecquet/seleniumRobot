@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.seleniumtests.reporter.logger.TestStep;
+import org.apache.commons.lang.NotImplementedException;
 import org.openqa.selenium.Rectangle;
 import org.testng.ITestResult;
 
@@ -61,6 +63,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	public static final String TESTSTEP_API_URL = "/snapshot/api/teststep/";
 	public static final String STEPRESULT_API_URL = "/snapshot/api/stepresult/";
 	public static final String EXCLUDE_API_URL = "/snapshot/api/exclude/";
+	public static final String FILE_API_URL = "/snapshot/api/file/";
 	public static final String SNAPSHOT_API_URL = "/snapshot/upload/image";
 	public static final String STEP_REFERENCE_API_URL = "/snapshot/stepReference/";
 	public static final String DETECT_API_URL = "/snapshot/detect/";
@@ -447,12 +450,79 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			throw new SeleniumRobotServerException("cannot create exclude zone", e);
 		}
 	}
+
+	/**
+	 * Upload file to selenium server
+	 * @param file			the file to upload. Its id should be referenced somewhere so that it can be used
+	 * @param stepResultId	id the the step result
+	 * @return				the id of the file
+	 */
+	public Integer uploadFile(File file, Integer stepResultId) {
+		if (!active) {
+			return null;
+		}
+		if (stepResultId == null) {
+			throw new ConfigurationException("stepResultId must be provided");
+		}
+		if (file == null) {
+			throw new ConfigurationException("file must be provided");
+		} else if (!file.exists()) {
+			throw new ConfigurationException(String.format("File %s does not exist", file.getAbsolutePath()));
+		}
+
+		try {
+			JSONObject fileJson = getJSonResponse(buildPostRequest(url + FILE_API_URL)
+					.field("file", file)
+			);
+			return fileJson.getInt("id");
+
+		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
+			throw new SeleniumRobotServerException("cannot upload file", e);
+		}
+	}
+
+	/**
+	 * Record step result
+	 * for each file present in step
+	 * @param testStep				the test step
+	 * @param sessionId				session id as recorded on server
+	 * @param testCaseInSessionId   test case in session id as recorded on server
+	 * @param testStepId			test step id as recorded on server
+	 * @return the stepResult id stored on server
+	 */
+	public Integer recordStepResult(TestStep testStep, Integer sessionId, Integer testCaseInSessionId, Integer testStepId) {
+		if (testStep == null) {
+			throw new ConfigurationException("A test step must be provided");
+		}
+
+		String jsonStep = testStep.toJson().toString();
+
+		Integer stepResultId = recordStepResult(!testStep.getFailed(), "", testStep.getDuration(), sessionId, testCaseInSessionId, testStepId);
+
+		// upload all files to server
+		for (File file: testStep.getAllAttachments(false)) {
+			try {
+				Integer fileId = uploadFile(file, stepResultId);
+
+				// replace the path, referenced with '<file:some_path>' by the id '<file:file_id>'
+				jsonStep = jsonStep.replace(file.getAbsolutePath().replace("\\", "/"), Integer.toString(fileId));
+			} catch (SeleniumRobotServerException | ConfigurationException e) {
+				logger.error(e);
+			}
+		}
+
+		updateStepResult(jsonStep, stepResultId);
+		return stepResultId;
+	}
 	
 	/**
 	 * Record step result
-	 * @param result	step result (true of false)
-	 * @param logs		step details
-	 * @param duration	step duration in milliseconds
+	 * @param result				step result (true of false)
+	 * @param logs					step details
+	 * @param duration				step duration in milliseconds
+	 * @param sessionId				session id as recorded on server
+	 * @param testCaseInSessionId   test case in session id as recorded on server
+	 * @param testStepId			test step id as recorded on server
 	 * @return the stepResult id stored on server
 	 */
 	public Integer recordStepResult(Boolean result, String logs, long duration, Integer sessionId, Integer testCaseInSessionId, Integer testStepId) {
@@ -478,7 +548,25 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					);
 			return resultJson.getInt("id");
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
-			throw new SeleniumRobotServerException("cannot create test snapshot", e);
+			throw new SeleniumRobotServerException("cannot create step result", e);
+		}
+	}
+
+	public Integer updateStepResult(String logs, Integer stepResultId) {
+		if (!active) {
+			return null;
+		}
+
+		if (stepResultId == null) {
+			throw new ConfigurationException("step result id must be defined");
+		}
+		try {
+			JSONObject resultJson = getJSonResponse(buildPatchRequest(url + STEPRESULT_API_URL + stepResultId + "/")
+					.field("stacktrace", logs)
+					);
+			return resultJson.getInt("id");
+		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
+			throw new SeleniumRobotServerException("cannot update step result", e);
 		}
 	}
 
