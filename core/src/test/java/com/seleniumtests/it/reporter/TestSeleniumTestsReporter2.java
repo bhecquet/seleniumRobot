@@ -1,14 +1,14 @@
 /**
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
- * 				Copyright 2017-2019 B.Hecquet
- *
+ * Copyright 2017-2019 B.Hecquet
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,20 +17,19 @@
  */
 package com.seleniumtests.it.reporter;
 
-import java.io.File;
-import java.nio.file.Paths;
-
+import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
+import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.contexts.SeleniumRobotServerContext;
+import com.seleniumtests.it.stubclasses.StubTestClass;
 import org.apache.commons.lang3.StringUtils;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
-import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
-import com.seleniumtests.core.SeleniumTestsContext;
-import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.contexts.SeleniumRobotServerContext;
-import com.seleniumtests.it.stubclasses.StubTestClass;
+import java.io.File;
+import java.nio.file.Paths;
 
 public class TestSeleniumTestsReporter2 extends ReporterTest {
 
@@ -38,11 +37,11 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check summary format in multithread
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testMultithreadReport() throws Exception {
 
 		SeleniumTestsContextManager.removeThreadContext();
-		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
+		executeSubTest(5, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions", "testInError", "testWithException"});
 
 		// check content of summary report file
 		String mainReportContent = readSummaryFile();
@@ -66,11 +65,11 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check that test report do not display tabs when no snapshot comparison is requested
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testNoSnapshotComparison() throws Exception {
 
 		SeleniumTestsContextManager.removeThreadContext();
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions"});
 
 		// no bullet as no snapshot comparison is done
 		String summaryReport = readSummaryFile();
@@ -86,7 +85,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * issue #351: Check that when snapshot server is used, but a problem occurs posting information, snapshot tab is not displayed
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testSnapshotComparisonErrorDuringTransfer() throws Exception {
 		try {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
@@ -99,7 +98,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			createServerMock("POST", SeleniumRobotSnapshotServerConnector.SESSION_API_URL, 500, "Internal Server Error", "body");
 
 			SeleniumTestsContextManager.removeThreadContext();
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions"});
 
 			// check result is ok and comparison result is shown through green bullet
 			String summaryReport = readSummaryFile();
@@ -129,7 +128,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Moreover, a green bullet should be visible on summary result when comparison is OK
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testSnapshotComparisonOkDisplayOnly() throws Exception {
 		try {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
@@ -141,7 +140,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			configureMockedSnapshotServerConnection();
 
 			SeleniumTestsContextManager.removeThreadContext();
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions"});
 
 			// check result is ok and comparison result is shown through green bullet
 			String summaryReport = readSummaryFile();
@@ -177,7 +176,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Test case where no snapshot has been sent to server, 'snapshot comparison' step should be green with message stating that no picture has been processed
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testSnapshotNoComparisonDisplayOnly() throws Exception {
 		try {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
@@ -191,7 +190,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 
 			SeleniumTestsContextManager.removeThreadContext();
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions"});
 
 			// check result is ok and comparison result is shown through blue bullet (no comparison to do)
 			String summaryReport = readSummaryFile();
@@ -206,11 +205,11 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\" style=\"display: block;\" >"));
 
 			// successful step has been added for comparison
-			Assert.assertTrue(detailedReportContent.matches("<div class=\"message-log message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> No comparison to do \\(no snapshots\\) </div>"));
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-log message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> No comparison to do \\(no snapshots\\) </div>.*"));
 			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box success\">.*?<i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> Snapshot comparison.*"));
 
 			// snapshot tab active / skipped
-			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link  tab-skipped \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
+			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link tab-skipped \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
 
 			// iframe present with the right test case id
 			Assert.assertTrue(detailedReportContent.contains("<iframe src=\"http://localhost:4321/snapshot/compare/stepList/15/?header=true\" id=\"snapshot-iframe\" frameborder=\"0\"></iframe>"));
@@ -229,7 +228,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Result remains OK as behaviour is "displayOnly"
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testSnapshotComparisonKoDisplayOnly() throws Exception {
 		try {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
@@ -242,7 +241,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false, 'computingError': []}");
 
 			SeleniumTestsContextManager.removeThreadContext();
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions"});
 
 			// check result is ok and comparison result is shown through red bullet (comparison KO)
 			String summaryReport = readSummaryFile();
@@ -279,7 +278,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Result is KO as behavior is 'changeTestResult'
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testSnapshotComparisonKoChangeTestResult() throws Exception {
 		try {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
@@ -292,7 +291,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false}");
 
 			SeleniumTestsContextManager.removeThreadContext();
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions"});
 
 			// check result is KO (due to option 'changeTestResult') and comparison result is shown through red bullet (comparison KO)
 			String summaryReport = readSummaryFile();
@@ -330,7 +329,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Both are the same but second test is there for integration with junit parser so that we can differentiate navigation result from GUI result.
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testSnapshotComparisonKoAddTestResult() throws Exception {
 		try {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
@@ -343,7 +342,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false}");
 
 			SeleniumTestsContextManager.removeThreadContext();
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions"});
 
 			// check there are 2 results. first one is the selenium test (OK) and second one is the snapshot comparison (KO)
 			String summaryReport = readSummaryFile();
@@ -377,7 +376,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		}
 	}
 
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testSnapshotComparisonSkipDisplayOnly() throws Exception {
 
 		try {
@@ -391,7 +390,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': null, 'computingError': ['error computing']}");
 
 			SeleniumTestsContextManager.removeThreadContext();
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions"});
 
 			// check result is ok and comparison result is shown through red bullet (comparison KO)
 			String summaryReport = readSummaryFile();
@@ -428,7 +427,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Result remains OK as behaviour is "displayOnly"
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testSnapshotComparisonSkipChangeTestResult() throws Exception {
 
 		try {
@@ -442,7 +441,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': null, 'computingError': ['error computing']}");
 
 			SeleniumTestsContextManager.removeThreadContext();
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions"});
 
 			// check result is OK (even with option 'changeTestResult' because comparison is skipped) and comparison result is shown through blue bullet (comparison Skipped)
 			String summaryReport = readSummaryFile();
@@ -481,7 +480,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Both are the same but second test is there for integration with junit parser so that we can differentiate navigation result from GUI result.
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testSnapshotComparisonSkipAddTestResult() throws Exception {
 		try {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
@@ -494,7 +493,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': null, 'computingError': ['error computing']}");
 
 			SeleniumTestsContextManager.removeThreadContext();
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions"});
 
 			// check there are 2 results. first one is the selenium test (OK) and second one is the snapshot comparison (KO)
 			String summaryReport = readSummaryFile();
@@ -530,10 +529,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check summary format in monothread
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testMonothreadReport() throws Exception {
 		SeleniumTestsContextManager.removeThreadContext();
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions", "testInError", "testWithException"});
 
 		// check content of summary report file
 		String mainReportContent = readSummaryFile();
@@ -561,10 +560,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check "Last State" is always there even if nothing needs to be displayed (should never happen as we should have at least the last screen capture
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testMonothreadReportTestOk() throws Exception {
 		SeleniumTestsContextManager.removeThreadContext();
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions"});
 
 		// check content of summary report file
 		String mainReportContent = readSummaryFile();
@@ -578,7 +577,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check if param "Gridnode" is ok
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testGridnodeExist() throws Exception {
 		try {
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
@@ -586,7 +585,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 			createGridHubMockWithNodeOK();
 
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverShort"});
 
 			// check content of summary report file
 			String mainReportContent = readTestMethodResultFile("testDriverShort");
@@ -599,7 +598,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		}
 	}
 
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testGridnodeNotPresentForSkippedTest() throws Exception {
 		try {
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
@@ -607,7 +606,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 			createGridHubMockWithNodeOK();
 
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShortKo", "testDriverShortSkipped"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverShortKo", "testDriverShortSkipped"});
 
 			// check content of summary report file
 			String mainReportContent = readTestMethodResultFile("testDriverShortSkipped");
@@ -620,9 +619,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		}
 	}
 
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testGridnodeExistForLocal() throws Exception {
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverShort"});
 
 		// check content of summary report file
 		String mainReportContent = readTestMethodResultFile("testDriverShort");
@@ -635,11 +634,11 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check generic steps are logged
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testGenericSteps() throws Exception {
 
 		SeleniumTestsContextManager.removeThreadContext();
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForGenericSteps"}, ParallelMode.METHODS, new String[] {"testDriver"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForGenericSteps"}, ParallelMode.METHODS, new String[]{"testDriver"});
 
 		// check content of summary report file
 		String mainReportContent = readSummaryFile();
@@ -659,11 +658,11 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check single test report format when tests have steps
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testMultithreadTestReport() throws Exception {
 
 		SeleniumTestsContextManager.removeThreadContext();
-		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.TESTS, new String[] {"testAndSubActions", "testInError", "testWithException"});
+		executeSubTest(5, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.TESTS, new String[]{"testAndSubActions", "testInError", "testWithException"});
 
 		// check content of summary report file
 		String mainReportContent = readSummaryFile();
@@ -701,9 +700,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check issue #143 where all \@AfterMethod calls are displayed in all test if its first parameter is not a method reference
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testTestReportContainsOnlyItsAfterMethodSteps() throws Exception {
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForIssue143"});
+		executeSubTest(new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForIssue143"});
 
 		String detailedReportContent1 = readTestMethodResultFile("testOk1");
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Post test step: reset2"), 1);
@@ -722,10 +721,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check issue #141 where \@AfterMethod calls are displayed as many times as test retries
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testRetriedTestReportContainsOnlyItsAfterMethod() throws Exception {
 		System.setProperty("testRetryCount", "1");
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForIssue141"});
+		executeSubTest(new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForIssue141"});
 
 		// check we only display the second call
 		String detailedReportContent1 = readTestMethodResultFile("testOk1");
@@ -738,10 +737,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * issue #251: check error message is displayed for any action that failed
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testDetailedReportWithOneStepFailed() throws Exception {
 
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testOkWithOneStepFailed"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[]{"testOkWithOneStepFailed"});
 
 		// check content of summary report file
 		String detailedReportContent = readTestMethodResultFile("testOkWithOneStepFailed");
@@ -753,9 +752,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * issue #251: check error message is displayed for any action that failed
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testDetailedReportWithOneSubStepFailed() throws Exception {
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testOkWithOneSubStepFailed"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[]{"testOkWithOneSubStepFailed"});
 
 		// check content of summary report file
 		String detailedReportContent = readTestMethodResultFile("testOkWithOneSubStepFailed");
@@ -772,13 +771,13 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * A snapshot is taken when soft assertion is enabled and assertion fails
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testDetailedReportContainsCaptureOnSoftAssertionEnabled() throws Exception {
 
 		try {
 			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "true");
 
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverWithAssert"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverWithAssert"});
 
 			String detailedReportContent = readTestMethodResultFile("testDriverWithAssert");
 			detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
@@ -793,13 +792,13 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		}
 	}
 
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testDetailedReportDoesNotContainCaptureOnSoftAssertionDisabled() throws Exception {
 
 		try {
 			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "false");
 
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverWithAssert"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverWithAssert"});
 
 			String detailedReportContent = readTestMethodResultFile("testDriverWithAssert");
 			detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
@@ -822,13 +821,13 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Test end will also be in red
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testDetailedReportWithSoftAssertInScenario() throws Exception {
 
 		try {
 			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "true");
 
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testWithAssertInTest"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[]{"testWithAssertInTest"});
 
 			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 
@@ -867,13 +866,13 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Test end will also be in red
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testDetailedReportWithSoftAssertAtScenarioEnd() throws Exception {
 
 		try {
 			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "true");
 
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testWithAssertOnTestEnd"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[]{"testWithAssertOnTestEnd"});
 
 			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 
@@ -902,13 +901,13 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check that when an assert is raised in sub step, the root step is marked as failed
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testDetailedReportWithSoftAssertInSubStep() throws Exception {
 
 		try {
 			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "true");
 
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testWithAssertInSubStep"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[]{"testWithAssertInSubStep"});
 
 			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 
@@ -934,13 +933,13 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Test stops on first assertion and step is failed
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testDetailedReportWithHardAssertInScenario() throws Exception {
 
 		try {
 			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "false");
 
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testWithAssertInTest"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[]{"testWithAssertInTest"});
 
 			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 
@@ -973,10 +972,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check summary format when tests have steps
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportSummaryContentWithSteps() throws Exception {
 
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException", "testOk"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions", "testInError", "testWithException", "testOk"});
 
 		// check content of summary report file
 		String mainReportContent = readSummaryFile();
@@ -1003,13 +1002,13 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * issue #148: Check that when test is retried and retry is OK, summary is correct
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testFailsOnlyOnceAndRetriedOk() throws Exception {
 
 		StubTestClass.failed = false;
 
 		// execute only the test that fails the first time it's executed
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testWithExceptionOnFirstExec"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testWithExceptionOnFirstExec"});
 
 		// check content of summary report file
 		String mainReportContent = readSummaryFile();
@@ -1028,12 +1027,12 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check resources referenced in header are get from CDN and resources files are not copied to ouput folder
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportWithResourcesFromCDN() throws Exception {
 
 		try {
 			System.setProperty(SeleniumTestsContext.OPTIMIZE_REPORTS, "true");
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions", "testInError", "testWithException"});
 		} finally {
 			System.clearProperty(SeleniumTestsContext.OPTIMIZE_REPORTS);
 		}
@@ -1059,12 +1058,12 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check resources referenced in header are get from local and resources files are  copied to ouput folder
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportWithResourcesFromLocal() throws Exception {
 
 		try {
 			System.setProperty(SeleniumTestsContext.OPTIMIZE_REPORTS, "false");
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions", "testInError", "testWithException"});
 		} finally {
 			System.clearProperty(SeleniumTestsContext.OPTIMIZE_REPORTS);
 		}
@@ -1082,14 +1081,14 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.contains("<script src=\"resources/iframeResizer.min.js\"></script>"));
 	}
 
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testKeepAllResults(ITestContext testContext) throws Exception {
 
 		try {
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
 			System.setProperty(SeleniumTestsContext.KEEP_ALL_RESULTS, "true");
 
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testWithException2"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions", "testWithException2"});
 
 
 			// issue #346: check all reports are generated
@@ -1110,14 +1109,14 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		}
 	}
 
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testKeepAllResultsNoParallel(ITestContext testContext) throws Exception {
 
 		try {
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
 			System.setProperty(SeleniumTestsContext.KEEP_ALL_RESULTS, "true");
 
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.NONE, new String[] {"testAndSubActions", "testWithException2"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.NONE, new String[]{"testAndSubActions", "testWithException2"});
 
 			String detailedReportContent = readTestMethodResultFile("testWithException2");
 
@@ -1139,14 +1138,14 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Previous execution results cannot be generated without retry / or test OK
 	 * Check the line in report is not present
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testKeepAllResultsWithoutRetry(ITestContext testContext) throws Exception {
 
 		try {
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
 			System.setProperty(SeleniumTestsContext.KEEP_ALL_RESULTS, "true");
 
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions"});
 
 			String detailedReportContent = readTestMethodResultFile("testAndSubActions");
 
@@ -1167,14 +1166,14 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	/**
 	 * Check that logs of a failed attempt are not kept in the result directory (KEEP_ALL_RESULTS=false)
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testDoNotKeepAllResults(ITestContext testContext) throws Exception {
 
 		try {
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
 			System.setProperty(SeleniumTestsContext.KEEP_ALL_RESULTS, "false");
 
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testWithException"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testWithException"});
 
 			String detailedReportContent = readTestMethodResultFile("testWithException");
 
@@ -1190,10 +1189,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	/**
 	 * Check if test description made available by TestNG annotation is displayed in summary and detailed report
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testTestDescription() throws Exception {
 
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions", "testInError", "testWithException"});
 
 		// check content of summary report file
 		String mainReportContent = readSummaryFile();
@@ -1218,13 +1217,13 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	/**
 	 * Check that with driver starting and operations in BeforeMethod method, screenshots are available in HTML report
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testAllScreenshotsArePresent() throws Exception {
 
 		try {
 			System.setProperty(SeleniumTestsContext.BROWSER, "chrome");
 			System.setProperty("startLocation", "beforeMethod");
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForListener5.test1Listener5"}, "", "stub1");
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForListener5.test1Listener5"}, "", "stub1");
 		} finally {
 			System.clearProperty(SeleniumTestsContext.BROWSER);
 		}
@@ -1245,10 +1244,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check that automatic steps create all steps in report
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testAutomaticSteps() throws Exception {
 
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"});
+		executeSubTest(new String[]{"com.seleniumtests.it.stubclasses.StubTestClass3"});
 
 		// check content of summary report file
 		String mainReportContent = readSummaryFile();
@@ -1299,10 +1298,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	}
 
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testAttachmentRenaming() throws Exception {
 
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions", "testInError", "testWithException"});
 
 		String detailedReportContent1 = readTestMethodResultFile("testAndSubActions");
 		Assert.assertTrue(detailedReportContent1.contains("src=\"screenshot/testAndSubActions_0-1_step_1--rtened.png\""));
@@ -1311,11 +1310,11 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "htmls", "testAndSubActions_0-1_step_1--tened.html").toFile().exists());
 	}
 
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testAttachmentRenamingWithOptimizeReports() throws Exception {
 		try {
 			System.setProperty("optimizeReports", "true");
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions", "testInError", "testWithException"});
 		} finally {
 			System.clearProperty("optimizeReports");
 		}
@@ -1336,10 +1335,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Also, error in step should be presented
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testManualSteps() throws Exception {
 
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassManualSteps"});
+		executeSubTest(new String[]{"com.seleniumtests.it.stubclasses.StubTestClassManualSteps"});
 
 		// check content of summary report file
 		String mainReportContent = readSummaryFile();
@@ -1385,30 +1384,30 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check that manual also mask password if user requests it (gives password to mask in report)
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testManualStepsPasswordMasking() throws Exception {
 
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassManualSteps"}, ParallelMode.METHODS, new String[] {"testOkPassword"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassManualSteps"}, ParallelMode.METHODS, new String[]{"testOkPassword"});
 
 		// check that without soft assertion, 'add' step is skipped
 		String detailedReportContent1 = readTestMethodResultFile("testOkPassword");
-
+		detailedReportContent1 = detailedReportContent1.replaceAll("\\s+", " ");
 		// if step specifies string to mask, hide it
-		Assert.assertFalse(detailedReportContent1.contains("<div class=\"message-info\">password is aPassPhrase</div>"));
-		Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-info\">password is ******</div>"));
+		Assert.assertFalse(detailedReportContent1.contains("<div class=\"message-info message-conf\"><span class=\"stepTimestamp mr-1\">17:14:43.505</span> password is aPassPhrase </div>"));
+		Assert.assertTrue(detailedReportContent1.matches(".*<div class=\"message-info message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> password is \\*\\*\\*\\*\\*\\* </div>.*"));
 
 		// if step does not specifies string to mask, it's displayed
-		Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-info\">password is anOtherPassPhrase</div>"));
+		Assert.assertTrue(detailedReportContent1.matches(".*<div class=\"message-info message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> password is anOtherPassPhrase </div>.*"));
 	}
 
 	/**
 	 * Check state and style of all tests
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportSummaryContentWithDependantTests() throws Exception {
 
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass2"});
+		executeSubTest(new String[]{"com.seleniumtests.it.stubclasses.StubTestClass2"});
 
 		// check content of summary report file
 		String mainReportContent = readSummaryFile();
@@ -1426,13 +1425,13 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check format of messages in detailed report
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportDetailsMessageStyles() throws Exception {
 
 		try {
 			System.setProperty("customTestReports", "PERF::xml::reporter/templates/report.perf.vm,SUP::xml::reporter/templates/report.supervision.vm");
 
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions", "testInError", "testWithException"});
 
 
 			// check style of messages
@@ -1455,23 +1454,24 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * test1 in com.seleniumtests.it.stubclasses.StubTestClass defines steps inside other steps
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportDetailsWithSubSteps() throws Exception {
 
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions", "testInError", "testWithException"});
 
 		// check content of summary report file
 		String detailedReportContent = readTestMethodResultFile("testAndSubActions");
+		detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
 
 		Assert.assertTrue(detailedReportContent.matches(
-				".*<ul>"													// root step
+				".*<ul>"                                                    // root step
 						+ "<li>click button</li>"
 						+ "<li>sendKeys to text field</li>"
-						+ "<li>step 1.3: open page</li>"					// sub-step
+						+ "<li>step 1.3: open page</li>"                    // sub-step
 						+ "<ul>"
-						+ "<li>click link</li>"							// action in sub step
-						+ "<div class\\=\"message-log\">a message</div>"	// message in sub step
-						+ "<li>sendKeys to password field</li>"			// action in sub step
+						+ "<li>click link</li>"                            // action in sub step
+						+ "<div class\\=\"message-log\">a message</div>"    // message in sub step
+						+ "<li>sendKeys to password field</li>"            // action in sub step
 						+ "<div class\\=\"row\"></div></ul><div class=\"row\">"
 						+ "<div class\\=\"message-snapshot col\"><div class\\=\"text-center\">.*src\\=\"screenshot/testAndSubActions_0-1_step_1--rtened\\.png\" style\\=\"width: 300px\">.*"
 		));
@@ -1482,10 +1482,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check logs are written in file
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportDetailsWithLogs() throws Exception {
 
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions", "testInError", "testWithException"});
 
 		// check content of detailed report file
 		String detailedReportContent = readTestMethodResultFile("testAndSubActions");
@@ -1500,10 +1500,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Test OK
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportDetailsSteps() throws Exception {
 
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions", "testInError", "testWithException"});
 
 		String detailedReportContent = readTestMethodResultFile("testAndSubActions");
 
@@ -1531,10 +1531,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Test the case where "testName" is specified on Test annotation
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportWithCustomTestName() throws Exception {
 
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testOkWithTestName", "testOkWithTestNameAndDataProvider"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testOkWithTestName", "testOkWithTestNameAndDataProvider"});
 
 
 		// check visual name is used in summary (string interpolation with dataprovider, and raw test name)
@@ -1557,10 +1557,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Only test method parameter is set as "to mask", but check all steps using the parameter will mask it
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportParametersFromDataProvider() throws Exception {
 
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testOkWithPasswordDataProvider"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testOkWithPasswordDataProvider"});
 
 		// Check password is masked
 		String detailedReportContent = readTestMethodResultFile("testOkWithPasswordDataProvider");
@@ -1575,10 +1575,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent3.contains("<h4> Test Details - testOkWithPasswordDataProvider-2 with params: (14,null)</h4>"));
 	}
 
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportContainsCustomScreenshot() throws Exception {
 
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverCustomSnapshot"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverCustomSnapshot"});
 
 		// read 'testDriver' report. This contains calls to HtmlElement actions
 		String detailedReportContent1 = readTestMethodResultFile("testDriverCustomSnapshot");
@@ -1593,10 +1593,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check test information shows a link to last test step
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportContainsTestEndScreenshotQuicklink() throws Exception {
 
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverCustomSnapshot"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverCustomSnapshot"});
 
 		// read 'testDriverCustomSnapshot' report. This contains calls to HtmlElement actions
 		String detailedReportContent1 = readTestMethodResultFile("testDriverCustomSnapshot");
@@ -1614,13 +1614,13 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 *
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportContainsNoVideoCapture() throws Exception {
 
 		try {
 			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "false");
 
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriver"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriver"});
 
 			// read 'testDriver' report. This contains calls to HtmlElement actions
 			String detailedReportContent1 = readTestMethodResultFile("testDriver");
@@ -1645,13 +1645,13 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 *
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportContainsVideoCapture() throws Exception {
 
 		try {
 			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
 
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriver"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriver"});
 
 			// read 'testDriver' report. This contains calls to HtmlElement actions
 			String detailedReportContent1 = readTestMethodResultFile("testDriver");
@@ -1678,7 +1678,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 *
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportContainsStepReferenceForFailedStep() throws Exception {
 
 		try {
@@ -1695,8 +1695,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL + "17/", 200, createImageFromResource("tu/ffLogo1.png"));
 
 
-
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShortKo"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverShortKo"});
 
 			// read 'testDriver' report. This contains calls to HtmlElement actions
 			String detailedReportContent1 = readTestMethodResultFile("testDriverShortKo");
@@ -1733,7 +1732,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		}
 	}
 
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportDoeNotContainStepReferenceForFailedStepWhenVideoDisabled() throws Exception {
 
 		try {
@@ -1750,8 +1749,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL + "17/", 200, createImageFromResource("tu/ffLogo1.png"));
 
 
-
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShortKo"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverShortKo"});
 
 			// read 'testDriver' report. This contains calls to HtmlElement actions
 			String detailedReportContent1 = readTestMethodResultFile("testDriverShortKo");
@@ -1776,7 +1774,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check step state is not displayed when reference image does not exist on server
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportDoesNotContainStepImageWithoutReference() throws Exception {
 
 		try {
@@ -1792,7 +1790,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			// simulate the case where a reference exists
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL + "17/", 404, createImageFromResource("tu/ffLogo1.png"));
 
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShortKo"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverShortKo"});
 
 			// read 'testDriver' report. This contains calls to HtmlElement actions
 			String detailedReportContent1 = readTestMethodResultFile("testDriverShortKo");
@@ -1829,7 +1827,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check reference is not get if server recording is disabled
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportDoesNotContainStepReferenceWhenRecordingDisabled() throws Exception {
 
 		try {
@@ -1845,8 +1843,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL + "17/", 200, createImageFromResource("tu/ffLogo1.png"));
 
 
-
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShortKo"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverShortKo"});
 
 			// read 'testDriver' report. This contains calls to HtmlElement actions
 			String detailedReportContent1 = readTestMethodResultFile("testDriverShortKo");
@@ -1883,7 +1880,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * In case test is OK, no reference image is displayed in report
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportDoesNotContainReferenceStep() throws Exception {
 
 		try {
@@ -1899,7 +1896,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			// simulate the case where a reference exists
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL + "17/", 200, createImageFromResource("tu/ffLogo1.png"));
 
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverShort"});
 
 			// read 'testDriver' report. This contains calls to HtmlElement actions
 			String detailedReportContent1 = readTestMethodResultFile("testDriverShort");
@@ -1934,14 +1931,14 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * issue #406
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportContainsVideoCaptureOnRetry() throws Exception {
 
 		try {
 			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
 
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShortKo"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverShortKo"});
 
 			// read 'testDriver' report. This contains calls to HtmlElement actions
 			String detailedReportContent1 = readTestMethodResultFile("testDriverShortKo");
@@ -1960,14 +1957,14 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * issue #406
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportContainsVideoCaptureStartedOnBeforeMethodOnRetry() throws Exception {
 
 		try {
 			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
 
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForVideoTest"}, ParallelMode.METHODS, new String[] {"testDriverShortKo"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForVideoTest"}, ParallelMode.METHODS, new String[]{"testDriverShortKo"});
 
 			// read 'testDriver' report. This contains calls to HtmlElement actions
 			String detailedReportContent1 = readTestMethodResultFile("testDriverShortKo");
@@ -1986,13 +1983,13 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 *
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportContainsOneVideoCaptureWithMultipleDrivers() throws Exception {
 
 		try {
 			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
 
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testMultipleDriver"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testMultipleDriver"});
 
 			// read 'testDriver' report. This contains calls to HtmlElement actions
 			String detailedReportContent1 = readTestMethodResultFile("testMultipleDriver");
@@ -2010,19 +2007,20 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 *
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportContainsHarCapture() throws Exception {
 
 		try {
 			System.setProperty(SeleniumTestsContext.CAPTURE_NETWORK, "true");
 			System.setProperty(SeleniumTestsContext.WEB_PROXY_TYPE, "direct");
 
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriver"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriver"});
 
 			// read 'testDriver' report. This contains calls to HtmlElement actions
 			String detailedReportContent1 = readTestMethodResultFile("testDriver");
+			detailedReportContent1 = detailedReportContent1.replaceAll("\\s+", " ");
 
-			Assert.assertTrue(detailedReportContent1.contains("<li>sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [a text,], )</li>"));
+			Assert.assertTrue(detailedReportContent1.matches(".*<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys on TextFieldElement Text, by=\\{By.id: text2} with args: \\(true, true, \\[a text,\\], \\) </div></li>.*"));
 			Assert.assertTrue(detailedReportContent1.contains("Network capture 'main' browser: <a href='main-networkCapture.har'>HAR file</a>"));
 			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "main-networkCapture.har").toFile().exists());
 
@@ -2038,19 +2036,20 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 *
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportContainsHarCaptureMultipleBrowsers() throws Exception {
 
 		try {
 			System.setProperty(SeleniumTestsContext.CAPTURE_NETWORK, "true");
 			System.setProperty(SeleniumTestsContext.WEB_PROXY_TYPE, "direct");
 
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testMultipleDriver"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testMultipleDriver"});
 
 			// read 'testDriver' report. This contains calls to HtmlElement actions
 			String detailedReportContent1 = readTestMethodResultFile("testMultipleDriver");
+			detailedReportContent1 = detailedReportContent1.replaceAll("\\s+", " ");
 
-			Assert.assertTrue(detailedReportContent1.contains("<li>sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [a text,], )</li>"));
+			Assert.assertTrue(detailedReportContent1.matches(".*<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys on TextFieldElement Text, by=\\{By.id: text2} with args: \\(true, true, \\[a text,\\], \\) </div></li>.*"));
 			Assert.assertTrue(detailedReportContent1.contains("Network capture 'main' browser: <a href='main-networkCapture.har'>HAR file</a>"));
 			Assert.assertTrue(detailedReportContent1.contains("Network capture 'second' browser: <a href='second-networkCapture.har'>HAR file</a>"));
 			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testMultipleDriver", "main-networkCapture.har").toFile().exists());
@@ -2068,17 +2067,18 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 *
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportDoNotContainsHarCapture() throws Exception {
 		try {
 			System.setProperty(SeleniumTestsContext.CAPTURE_NETWORK, "false");
 
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriver"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriver"});
 
 			// read 'testDriver' report. This contains calls to HtmlElement actions
 			String detailedReportContent1 = readTestMethodResultFile("testDriver");
+			detailedReportContent1 = detailedReportContent1.replaceAll("\\s+", " ");
 
-			Assert.assertTrue(detailedReportContent1.contains("<li>sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [a text,], )</li>"));
+			Assert.assertTrue(detailedReportContent1.matches(".*<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys on TextFieldElement Text, by=\\{By.id: text2} with args: \\(true, true, \\[a text,\\], \\) </div></li>.*"));
 			Assert.assertFalse(detailedReportContent1.contains("Network capture: <a href='networkCapture.har'>HAR file</a>"));
 			Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "networkCapture.har").toFile().exists());
 		} finally {
@@ -2086,15 +2086,16 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		}
 	}
 
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportContainsWcagResults() throws Exception {
 
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverWithWcag"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverWithWcag"});
 
 		// read 'testDriver' report. This contains calls to HtmlElement actions
 		String detailedReportContent1 = readTestMethodResultFile("testDriverWithWcag");
+		detailedReportContent1 = detailedReportContent1.replaceAll("\\s+", " ");
 
-		Assert.assertTrue(detailedReportContent1.matches(".*<div class\\=\"message-warning\">Warning: \\d+ violations found, see attached file</div>.*"));
+		Assert.assertTrue(detailedReportContent1.matches(".*<div class=\"message-warning message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Warning: \\d+ violations found, see attached file </div>.*"));
 		Assert.assertTrue(detailedReportContent1.contains("WCAG report: <a href='wcag/file"));
 		Assert.assertEquals(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverWithWcag", "wcag").toFile().listFiles().length, 1);
 
@@ -2109,16 +2110,17 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 *
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportContainsDriverActions() throws Exception {
 
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriver", "testDriverNativeActions", "testDriverNativeActionsWithoutOverride", "testDriverWithHtmlElementWithoutOverride"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriver", "testDriverNativeActions", "testDriverNativeActionsWithoutOverride", "testDriverWithHtmlElementWithoutOverride"});
 
 		// read 'testDriver' report. This contains calls to HtmlElement actions
 		String detailedReportContent1 = readTestMethodResultFile("testDriver");
+		detailedReportContent1 = detailedReportContent1.replaceAll("\\s+", " ");
 
-		Assert.assertTrue(detailedReportContent1.contains("<li>sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [a text,], )</li>"));
-		Assert.assertTrue(detailedReportContent1.contains("<li>click on ButtonElement Reset, by={By.id: button2} </li>"));
+		Assert.assertTrue(detailedReportContent1.matches(".*<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys on TextFieldElement Text, by=\\{By.id: text2} with args: \\(true, true, \\[a text,], \\) </div></li>.*"));
+		Assert.assertTrue(detailedReportContent1.matches(".*<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> click on ButtonElement Reset, by=\\{By.id: button2} </div></li>.*"));
 		Assert.assertTrue(detailedReportContent1.contains("<div class=\"text-center\">drv:main: Current Window: Test page</div>"));
 		Assert.assertTrue(detailedReportContent1.matches(".*<img id\\=\".*?\" src\\=\"screenshots/testDriver_3-1_openPage_with_args.*<div class\\=\"text-center\">drv:main: Current Window: Test page</div>.*"));
 
@@ -2128,36 +2130,39 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// read the 'testDriverNativeActions' test result to see if native actions are also logged (overrideSeleniumNativeAction is true)
 		String detailedReportContent2 = readTestMethodResultFile("testDriverNativeActions");
 		System.out.println(detailedReportContent2);
-		Assert.assertTrue(detailedReportContent2.contains("<li>sendKeys on HtmlElement , by={By.id: text2} with args: (true, true, [some text,], )</li>"));
-		Assert.assertTrue(detailedReportContent2.contains("<li>click on HtmlElement , by={By.id: button2} </li>"));
+
+		detailedReportContent2 = detailedReportContent2.replaceAll("\\s+", " ");
+
+		Assert.assertTrue(detailedReportContent2.matches(".*<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys on HtmlElement , by=\\{By.id: text2} with args: \\(true, true, \\[some text,], \\) </div></li>.*"));
+		Assert.assertTrue(detailedReportContent2.matches(".*<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> click on HtmlElement , by=\\{By.id: button2} </div></li>.*"));
 
 		// read the 'testDriverNativeActionsWithoutOverride' test result to see if native actions are not logged (overrideSeleniumNativeAction is false)
 		String detailedReportContent3 = readTestMethodResultFile("testDriverNativeActionsWithoutOverride");
+		detailedReportContent3 = detailedReportContent3.replaceAll("\\s+", " ");
 
 		// logging is not done via HtmlElement
 		Assert.assertFalse(detailedReportContent3.contains("<li>sendKeys on HtmlElement , by={By.id: text2} with args: (true, true, [some text,], )</li>"));
 		Assert.assertFalse(detailedReportContent3.contains("<li>click on HtmlElement , by={By.id: button2} </li>"));
 
 		// check that without override, native actions are logged
-		Assert.assertTrue(detailedReportContent3.contains("<ul><li>sendKeys on Element located by id: text2 with args: ([some text,], )</li>"));
-		Assert.assertTrue(detailedReportContent3.contains("<ul><li>click on Element located by id: button2 </li>"));
-		Assert.assertTrue(detailedReportContent3.contains("<ul><li>selectByVisibleText on Select with args: (option1, )</li>"));
+		Assert.assertTrue(detailedReportContent3.matches(".*<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys on Element located by id: text2 with args: \\(\\[some text,], \\) </div></li>.*"));
+		Assert.assertTrue(detailedReportContent3.matches(".*<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> click on Element located by id: button2 </div></li>.*"));
+		Assert.assertTrue(detailedReportContent3.matches(".*<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> selectByVisibleText on Select with args: \\(option1, \\) </div></li>.*"));
 
 		// check composite actions. We must have the moveToElement, click and sendKeys actions
-		Assert.assertTrue(detailedReportContent1.contains("<ul><li>moveToElement with args: (TextFieldElement Text, by={By.id: text2}, )</li><li>sendKeys with args: ([composite,], )</li><li>moveToElement with args: (ButtonElement Reset, by={By.id: button2}, )</li><li>click </li>"));
+		Assert.assertTrue(detailedReportContent1.matches(".*<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> moveToElement with args: \\(TextFieldElement Text, by=\\{By.id: text2}, \\) </div></li><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys with args: \\(\\[composite,\\], \\) </div></li><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> moveToElement with args: \\(ButtonElement Reset, by=\\{By.id: button2}, \\) </div></li><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> click </div></li>.*"));
 
 		// check PictureElement action is logged
-		Assert.assertTrue(detailedReportContent1.contains("<ul><li>clickAt on Picture picture from resource tu/images/logo_text_field.png with args: (0, -30, )</li>"));
+		Assert.assertTrue(detailedReportContent1.matches(".*<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> clickAt on Picture picture from resource tu/images/logo_text_field.png with args: \\(0, -30, \\) </div></li>.*"));
 
 		// check that when logging PictureElement action which uses composite actions, those are not logged
 		Assert.assertFalse(detailedReportContent1.contains("<ul><li>clickAt on Picture picture from resource tu/images/logo_text_field.png with args: (0, -30, )</li><li>moveToElement with args:"));
 
 		// no action is logged when step fails (findElement exception). Ok because logging is done on action, not search
 
-
 		// check that seleniumRobot actions are logged only once when overrideNativeAction is enabled (issue #88)
 		String detailedReportContent4 = readTestMethodResultFile("testDriverWithHtmlElementWithoutOverride");
-		Assert.assertEquals(StringUtils.countMatches(detailedReportContent4, "<li>click on ButtonElement Reset, by={By.id: button2} </li>"), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent4, "click on ButtonElement Reset, by={By.id: button2}"), 1);
 
 		// TODO: spliter ce test en plusieurs
 
@@ -2169,15 +2174,16 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * - in Test end step
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportDetailsWithErrors() throws Exception {
 
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions", "testInError", "testWithException"});
 
 		String detailedReportContent = readTestMethodResultFile("testInError");
+		detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
 
 		// Check error is present is Last test step
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"box-body\"><ul><div class=\"message-log\">Test is KO with error: class java.lang.AssertionError: error</div>"));
+		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-log message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Test is KO with error: class java.lang.AssertionError: error </div>.*"));
 		System.out.println(detailedReportContent);
 		// Check exception is logged and filtered
 		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error\"><div>class java.lang.AssertionError: error</div>"
@@ -2206,20 +2212,21 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check test values are displayed (call to logger.logTestValue()) shown as a table
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportDetailsWithTestValues() throws Exception {
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions", "testInError", "testWithException"});
 
 		String detailedReportContent = readTestMethodResultFile("testInError");
+		detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
 
 		// Check error is present is Last test step
-		Assert.assertTrue(detailedReportContent.contains("<table class=\"table table-bordered table-sm\"><tr><th width=\"15%\">Key</th><th width=\"60%\">Message</th><th width=\"25%\">Value</th></tr><tr><td>key</td><td>we found a value of</td><td>10</td></tr></table>"));
+		Assert.assertTrue(detailedReportContent.matches(".*<table class=\"table table-bordered table-sm\"><tr><th width=\"15%\">Key</th><th width=\"60%\">Message</th><th width=\"25%\">Value</th></tr><tr><td><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> key </div></td><td>we found a value of</td><td>10</td></tr></table>.*"));
 	}
 
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportDetailsContainsParentConfigurations() throws Exception {
 
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForListener1"});
+		executeSubTest(new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForListener1"});
 
 		String detailedReportContent = readTestMethodResultFile("test1Listener1");
 
@@ -2235,7 +2242,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Test OK
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testCucumberStart2() throws Exception {
 
 		executeSubCucumberTests("core_7", 1);
@@ -2244,17 +2251,18 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='core_7/TestReport\\.html'.*?>core_7</a>.*"));
 
 		String detailedReportContent = readTestMethodResultFile("core_7");
+		detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
 
 		// Check each step is recorded in file: 2 test steps + test end + logs
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> ^write2 (\\w+)$ with args: (tutu, )"));
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Test is OK</div>"));
+		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-log message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Test is OK </div>.*"));
 	}
 
 	/**
 	 * issue #362: check that with scenario outline, we have the 2 results
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testCucumberScenarioOutline() throws Exception {
 
 		executeSubCucumberTests("core_ .*", 1);
@@ -2269,7 +2277,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * issue #362: check that with scenario outline, we have the 2 results even if name is the same
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testCucumberScenarioOutlineUniqueName() throws Exception {
 
 		executeSubCucumberTests("core_unique_name", 1);
@@ -2286,7 +2294,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * issue #366: also check with an accent so that we can verify it's removed
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testCucumberScenarioOutlineUniqueLongName() throws Exception {
 
 		executeSubCucumberTests("a very long scenàrio outline name which should not have been created but is there but we should not strip it only display a message saying its much too long", 1);
@@ -2304,7 +2312,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check if it's possible to have '??' is scenario name
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testCucumberScenarioWithSpecialName() throws Exception {
 
 		executeSubCucumberTests("my beautiful scenario ?? ok ??", 1);
@@ -2313,11 +2321,11 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='my_beautiful_scenario_.._ok_..-/TestReport\\.html'.*?>my_beautiful_scenario_.._ok_..-</a>.*"));
 
 		String detailedReportContent = readTestMethodResultFile("my_beautiful_scenario_.._ok_..-");
+		detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
 
 		// Check each step is recorded in file: 2 test steps + test end + logs
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> ^write (\\w+)$ with args: (tatu, )"));
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Test is OK</div>"));
-
+		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-log message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Test is OK </div>.*"));
 
 	}
 
@@ -2326,7 +2334,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Test OK
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testCucumberMultiThread() throws Exception {
 
 		executeSubCucumberTests("core_3,core_4", 5);
@@ -2335,20 +2343,20 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='core_3/TestReport\\.html'.*?>core_3</a>.*"));
 	}
 
-
 	/**
 	 * Test that HTML report is correctly encoded
 	 * @param testContext
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testHtmlCharacterEscape(ITestContext testContext) throws Exception {
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"});
+		executeSubTest(new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"});
 
 		String detailedReportContent = readTestMethodResultFile("testWithException");
+		detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
 
 		// check step 1 has been encoded
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Test is KO with error: class com.seleniumtests.customexception.DriverExceptions: &amp; some exception &quot;with &quot; &lt;strong&gt;&lt;a href='http://someurl/link' style='background-color: red;'&gt;HTML to encode&lt;/a&gt;&lt;/strong&gt;"));
+		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-log message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Test is KO with error: class com.seleniumtests.customexception.DriverExceptions: &amp; some exception &quot;with &quot; &lt;strong&gt;&lt;a href='http://someurl/link' style='background-color: red;'&gt;HTML to encode&lt;/a&gt;&lt;/strong&gt;.*"));
 
 		// check logs are also encoded
 		Assert.assertTrue(detailedReportContent.contains("[main] ScenarioLogger: Test is KO with error: class com.seleniumtests.customexception.DriverExceptions: &amp; some exception &quot;with &quot; &lt;strong&gt;&lt;a href='http://someurl/link' style='background-color: red;'&gt;HTML to encode&lt;/a&gt;&lt;/strong&gt;"));
@@ -2368,9 +2376,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * @param testContext
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testHtmlCharacterEscapeMultipleExceptions(ITestContext testContext) throws Exception {
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"});
+		executeSubTest(new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"});
 
 		String detailedReportContent = readTestMethodResultFile("testWithChainedException");
 
@@ -2385,11 +2393,11 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check that information recorded during test, by calling 'SeleniumRobotTestPlan.addTestInfo(key, value)' are added to summary and test report
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testWithTestInfo() throws Exception {
 
 		SeleniumTestsContextManager.removeThreadContext();
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testWithInfo1", "testWithInfo2", "testAndSubActions"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testWithInfo1", "testWithInfo2", "testAndSubActions"});
 
 		// check content of summary report file
 		String mainReportContent = readSummaryFile();
@@ -2406,10 +2414,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * issue #99: Check summary with multiple suites executing the same test. Both test should be presented
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testMultiSuitesdReport() throws Exception {
 
-		executeMultiSuites(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, new String[] {"testAndSubActions"});
+		executeMultiSuites(new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, new String[]{"testAndSubActions"});
 
 		// check content of summary report file
 		String mainReportContent = readSummaryFile();
@@ -2423,22 +2431,21 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check that when an action fails, a warning is displayed in step and logs
 	 * This helps in the case the action error is catched
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testLogActionErrorsAsWarning(ITestContext testContext) throws Exception {
 
 		try {
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
 
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShortKoWithCatchException"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverShortKoWithCatchException"});
 			String detailedReportContent = readTestMethodResultFile("testDriverShortKoWithCatchException");
+			detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
 
 			// test all error log is displayed in execution logs
 			Assert.assertTrue(detailedReportContent.contains("[main] ScenarioLogger: Searched element [TextFieldElement Text, by={By.id: text___}] from page 'com.seleniumtests.it.driver.support.pages.DriverTestPage' could not be found</div>"));
 			Assert.assertTrue(detailedReportContent.contains("<div>at com.seleniumtests.it.driver.support.pages.DriverTestPage._writeSomethingOnNonExistentElementWithCatch"));
 			Assert.assertTrue(detailedReportContent.contains("<div>For documentation on this error, please visit: https://selenium.dev/exceptions/#no_such_element</div>")); // checks that line not showing thread name are in logs
-
-			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-warning\">Warning: Searched element [TextFieldElement Text, by={By.id: text___}] from page 'com.seleniumtests.it.driver.support.pages.DriverTestPage' could not be found<br/>" +
-					"For documentation on this error, please visit: https://selenium.dev/exceptions/#no_such_element<br/>")); // warning displayed in step
+			Assert.assertTrue(detailedReportContent.contains("Warning: Searched element [TextFieldElement Text, by={By.id: text___}] from page 'com.seleniumtests.it.driver.support.pages.DriverTestPage' could not be found<br/>" + "For documentation on this error, please visit: https://selenium.dev/exceptions/#no_such_element<br/>")); // warning displayed in step
 		} finally {
 			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
 		}
@@ -2454,11 +2461,13 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		try {
 			System.setProperty(SeleniumTestsContext.REPLAY_TIME_OUT, "3");
 
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverIsDisplayedRetry"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverIsDisplayedRetry"});
 
 			// read 'testDriver' report. This contains calls to HtmlElement actions
 			String detailedReportContent1 = readTestMethodResultFile("testDriverIsDisplayedRetry");
-			Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-warning\">Warning: Searched element [TextFieldElement Text, by={By.id: text___}] from page 'com.seleniumtests.it.driver.support.pages.DriverTestPage' could not be found")); // warning
+			detailedReportContent1 = detailedReportContent1.replaceAll("\\s+", " ");
+
+			Assert.assertTrue(detailedReportContent1.matches(".*<div class=\"message-warning message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Warning: Searched element \\[TextFieldElement Text, by=\\{By.id: text___}] from page 'com.seleniumtests.it.driver.support.pages.DriverTestPage' could not be foun.*")); // warning
 			Assert.assertFalse(detailedReportContent1.contains("<div class=\"message-error\">class org.openqa.selenium.NoSuchElementException: Searched element [TextFieldElement Text, by={By.id: text___}] from page 'com.seleniumtests.it.driver.support.pages.DriverTestPage' could not be found<br/>"));
 		} finally {
 			System.clearProperty(SeleniumTestsContext.REPLAY_TIME_OUT);
@@ -2466,10 +2475,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 
 
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testNoDescription(ITestContext testContext) throws Exception {
 
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassforTestDescription"}, ParallelMode.METHODS, new String[] {"testNoDescription"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassforTestDescription"}, ParallelMode.METHODS, new String[]{"testNoDescription"});
 
 		String summaryReport = readSummaryFile();
 		Assert.assertTrue(summaryReport.contains("info=\"ok\" data-toggle=\"tooltip\" title=\"no description available\""));
@@ -2483,12 +2492,12 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * @param testContext
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testDescriptionWithUserParam(ITestContext testContext) throws Exception {
 
 		try {
 			System.setProperty("url", "http://mysite.com");
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassforTestDescription"}, ParallelMode.METHODS, new String[] {"testWithDescription"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassforTestDescription"}, ParallelMode.METHODS, new String[]{"testWithDescription"});
 
 			String summaryReport = readSummaryFile();
 			Assert.assertTrue(summaryReport.contains("info=\"ok\" data-toggle=\"tooltip\" title=\"a test with param http://mysite.com\""));
@@ -2506,10 +2515,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * @param testContext
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testDescriptionWithParamCreatedInTest(ITestContext testContext) throws Exception {
 
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassforTestDescription"}, ParallelMode.METHODS, new String[] {"testWithParamCreatedInTest"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassforTestDescription"}, ParallelMode.METHODS, new String[]{"testWithParamCreatedInTest"});
 
 		String summaryReport = readSummaryFile();
 		Assert.assertTrue(summaryReport.contains("info=\"ok\" data-toggle=\"tooltip\" title=\"a test on Bob account account-12345\""));
@@ -2524,10 +2533,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * @param testContext
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testDescriptionWithDataProvider(ITestContext testContext) throws Exception {
 
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassforTestDescription"}, ParallelMode.METHODS, new String[] {"testDataProvider"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassforTestDescription"}, ParallelMode.METHODS, new String[]{"testDataProvider"});
 
 
 		String summaryReport = readSummaryFile();
@@ -2546,12 +2555,12 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * @param testContext
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testDescriptionWithLineBreak(ITestContext testContext) throws Exception {
 
 		try {
 			System.setProperty("url", "http://mysite.com");
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassforTestDescription"}, ParallelMode.METHODS, new String[] {"testWithLineBreaksInDescription"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassforTestDescription"}, ParallelMode.METHODS, new String[]{"testWithLineBreaksInDescription"});
 
 			String summaryReport = readSummaryFile();
 			Assert.assertTrue(summaryReport.contains("info=\"ko\" data-toggle=\"tooltip\" title=\"a test with param http://mysite.comand line breaks\"")); // line break is removed by 'summaryReport' call
@@ -2568,12 +2577,12 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * @param testContext
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testDescriptionWithSpecialCharacters(ITestContext testContext) throws Exception {
 
 		try {
 			System.setProperty("url", "http://mysite.com");
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassforTestDescription"}, ParallelMode.METHODS, new String[] {"testWithDescriptionAndSpecialCharacters"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassforTestDescription"}, ParallelMode.METHODS, new String[]{"testWithDescriptionAndSpecialCharacters"});
 
 			String summaryReport = readSummaryFile();
 			Assert.assertTrue(summaryReport.contains("info=\"ok\" data-toggle=\"tooltip\" title=\"This test is always &lt;OK&gt; &amp; &quot;green&quot;\""));
@@ -2589,37 +2598,38 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check error cause is displayed in report
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testStepAnnotationWithError() throws Exception {
 
 		SeleniumTestsContextManager.removeThreadContext();
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForStepsAnnotation"}, ParallelMode.METHODS, new String[] {"testCauseWithErrorAndDetails"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForStepsAnnotation"}, ParallelMode.METHODS, new String[]{"testCauseWithErrorAndDetails"});
 
 		String detailedReportContent = readTestMethodResultFile("testCauseWithErrorAndDetails");
+		detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
 
 		// Only failing step contains the information message
 		Assert.assertTrue(detailedReportContent.matches(".*<i class\\=\"fas fa-plus\"></i></button><span class=\"step-title\"> add - 0\\.\\d+ secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fas fa-info-circle\"></i><span>Possibly caused by REGRESSION: Check your scripts</span></div>.*"));
 		Assert.assertFalse(detailedReportContent.matches(".*<i class\\=\"fas fa-plus\"></i></button><span class=\"step-title\"> Test end - 0\\.\\d+ secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fas fa-info-circle\"></i><span>Possibly caused by REGRESSION: Check your scripts</span></div>.*"));
 	}
 
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testStepAnnotationWithErrorNoDetails() throws Exception {
 
 		SeleniumTestsContextManager.removeThreadContext();
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForStepsAnnotation"}, ParallelMode.METHODS, new String[] {"testCauseWithErrorNoDetails"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForStepsAnnotation"}, ParallelMode.METHODS, new String[]{"testCauseWithErrorNoDetails"});
 
 		String detailedReportContent = readTestMethodResultFile("testCauseWithErrorNoDetails");
+		detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
 
 		// Only failing step contains the information message
-		Assert.assertTrue(detailedReportContent.matches(".*<i class\\=\"fas fa-plus\"></i></button><span class=\"step-title\"> add - 0\\.\\d+ secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fas fa-info-circle\"></i><span>Possibly caused by REGRESSION: </span></div>.*"));
 		Assert.assertFalse(detailedReportContent.matches(".*<i class\\=\"fas fa-plus\"></i></button><span class=\"step-title\"> Test end - 0\\.\\d+ secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fas fa-info-circle\"></i><span>Possibly caused by REGRESSION: </span></div>.*"));
 	}
 
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testStepAnnotationNoErrors() throws Exception {
 
 		SeleniumTestsContextManager.removeThreadContext();
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForStepsAnnotation"}, ParallelMode.METHODS, new String[] {"testCauseNoError"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForStepsAnnotation"}, ParallelMode.METHODS, new String[]{"testCauseNoError"});
 
 		String detailedReportContent = readTestMethodResultFile("testCauseNoError");
 
@@ -2628,11 +2638,11 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	}
 
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testStepAnnotationNoErrorCause() throws Exception {
 
 		SeleniumTestsContextManager.removeThreadContext();
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForStepsAnnotation"}, ParallelMode.METHODS, new String[] {"testNoCauseAndError"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForStepsAnnotation"}, ParallelMode.METHODS, new String[]{"testNoCauseAndError"});
 
 		String detailedReportContent = readTestMethodResultFile("testNoCauseAndError");
 
@@ -2641,10 +2651,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	}
 
-	@Test(groups={"it"})
+	@Test(groups = {"it"})
 	public void testReportWithLighthouseExecution() throws Exception {
 
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverWithLighthouse"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverWithLighthouse"});
 
 		String detailedReportContent = readTestMethodResultFile("testDriverWithLighthouse");
 
