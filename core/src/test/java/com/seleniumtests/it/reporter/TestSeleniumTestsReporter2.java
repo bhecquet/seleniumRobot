@@ -728,8 +728,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 		// check we only display the second call
 		String detailedReportContent1 = readTestMethodResultFile("testOk1");
-		Assert.assertFalse(detailedReportContent1.contains("<div class=\"message-info\">after method 1</div>"));
-		Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-info\">after method 2</div>"));
+		detailedReportContent1 = detailedReportContent1.replaceAll("\\s+", " ");
+
+		Assert.assertFalse(detailedReportContent1.matches("<div class=\"message-info message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> after method 1 </div>"));
+		Assert.assertTrue(detailedReportContent1.matches(".*<div class=\"message-info message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> after method 2 </div>.*"));
 
 	}
 
@@ -758,12 +760,13 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 		// check content of summary report file
 		String detailedReportContent = readTestMethodResultFile("testOkWithOneSubStepFailed");
+		detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
 
 		// failed action is visible as failed
 		Assert.assertTrue(detailedReportContent.contains("<li class=\"header-failed\">failAction <br/>class com.seleniumtests.customexception.DriverExceptions: fail</li>"));
 
 		// parent action is OK, so it should not be marked as failed
-		Assert.assertTrue(detailedReportContent.contains("<li>addWithCatchedError with args: (1, )</li>"));
+		Assert.assertTrue(detailedReportContent.matches(".*<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-2\">\\d+:\\d+:\\d+.\\d+</span> addWithCatchedError with args: \\(1, \\) </div></li>.*"));
 
 	}
 
@@ -785,7 +788,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 
 			// check that with assertion error, snapshot is present
-			Assert.assertTrue(detailedReportContent.contains("!!!FAILURE ALERT!!! - Assertion Failure: expected [true] but found [false]</div><div class=\"row\"><div class=\"message-snapshot col\"><div class=\"text-center\"><a href=\"#\" onclick=\"$('#imagepreview').attr('src', $('#"));
+			Assert.assertTrue(detailedReportContent.contains("!!!FAILURE ALERT!!! - Assertion Failure: expected [true] but found [false] </div><div class=\"row\"><div class=\"message-snapshot col\"><div class=\"text-center\"><a href=\"#\" onclick=\"$('#imagepreview').attr('src', $('#"));
 
 		} finally {
 			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);
@@ -806,7 +809,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 
 			// check that with assertion error, snapshot is present
-			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Assertion Failure: expected [true] but found [false]</div>"));
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Assertion Failure: expected \\[true\\] but found \\[false\\] </div>.*"));
 			Assert.assertFalse(detailedReportContent.contains("<div class=\"message-error\">!!!FAILURE ALERT!!! - Assertion Failure: expected [true] but found [false]</div>"
 					+ "<div class=\"message-snapshot\">Output 'drv:main' browser: Current Window: Test page:"));
 
@@ -835,22 +838,22 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			String detailedReportContent = readTestMethodResultFile("testWithAssertInTest");
 			detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
 
-
 			// check step with assertion inside is failed
 			Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\">"
 					+ "<button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> assertAction"));
-			Assert.assertTrue(detailedReportContent.contains("</div><div class=\"box-body\"><ul><div class=\"message-error\">!!!FAILURE ALERT!!! - Assertion Failure: false error expected [true] but found [false]</div>"));
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> !!!FAILURE ALERT!!! - Assertion Failure: false error expected \\[true\\] but found \\[false\\] </div>.*"));
 
 			// that assertion raised in test scenario is attached to previous step
 			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box failed\"><div class\\=\"box-header with-border\">"
-					+ "<button type\\=\"button\" class\\=\"btn btn-box-tool\" data-widget\\=\"collapse\"><i class\\=\"fas fa-plus\"></i></button><span class=\"step-title\"> getResult  - \\d+\\.\\d+ secs\\s*</span></div><div class\\=\"box-body\">"
-					+ "<ul><div class\\=\"message-error\">!!!FAILURE ALERT!!! - Assertion Failure: Error in result expected \\[1\\] but found \\[2\\]</div>.*"));
+					+ "<button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> getResult - \\d+.\\d+ secs</span></div><div class=\"box-body\">"
+					+ "<ul><div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> !!!FAILURE ALERT!!! - Assertion Failure: Error in result expected \\[1\\] but found \\[2\\] </div>.*"));
 
 			// check last step shows the assertion
-			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box failed\">.*?<i class\\=\"fas fa-plus\"></i>"
-					+ "</button><span class=\"step-title\"> Test end - \\d+\\.\\d+ secs\\s*</span></div><div class\\=\"box-body\"><ul><div class\\=\"message-log\">Test is KO with error: class java.lang.AssertionError: !!! Many Test Failures \\(2\\)<br/>"
-					+ "<br/>class java.lang.AssertionError: <br/>\\.<br/>Failure 1 of 2.*Failure 2 of 2.*"
-					+ "<div class\\=\"message-error\">\\s+class java.lang.AssertionError: !!! Many Test Failures \\(2\\)<br/>.*"));
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fas fa-plus\"></i>"
+					+ "</button><span class=\"step-title\"> Test end - \\d+.\\d+ secs</span></div><div class=\"box-body\"><ul><div class=\"message-log message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Test is KO with error: class java.lang.AssertionError: !!! Many Test Failures \\(2\\)<br/>.*?"
+					+ "<br/><br/>class java.lang.AssertionError: <br/>\\.<br/>Failure 1 of 2.*Failure 2 of 2.*"));
+
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-log message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Test is KO with error: class java.lang.AssertionError: !!! Many Test Failures \\(2\\)<br/>.*"));
 
 			// check last step before test end is OK because no error occurs in it
 			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box success\">.*?<i class\\=\"fas fa-plus\"></i></button><span class=\"step-title\"> add with args: \\(3, \\).*"));
@@ -880,16 +883,15 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			String detailedReportContent = readTestMethodResultFile("testWithAssertOnTestEnd");
 			detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
 
-
 			// check last step shows the assertion
-			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box failed\">.*?<i class\\=\"fas fa-plus\"></i>"
-					+ "</button><span class=\"step-title\"> Test end - \\d+\\.\\d+ secs\\s*</span></div><div class\\=\"box-body\"><ul><div class\\=\"message-log\">Test is KO with error: class java.lang.AssertionError: Error in result expected \\[1\\] but found \\[2\\].*"));
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fas fa-plus\"></i>"
+					+ "</button><span class=\"step-title\"> Test end - \\d+.\\d+ secs</span></div><div class=\"box-body\"><ul><div class=\"message-log message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Test is KO with error: class java.lang.AssertionError: Error in result expected \\[1\\] but found \\[2\\] </div>.*"));
 
 
 			// that assertion raised in test scenario is attached to previous step
-			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box failed\"><div class\\=\"box-header with-border\">"
-					+ "<button type\\=\"button\" class\\=\"btn btn-box-tool\" data-widget\\=\"collapse\"><i class\\=\"fas fa-plus\"></i></button><span class=\"step-title\"> getResult  - \\d+\\.\\d+ secs\\s*</span></div><div class\\=\"box-body\">"
-					+ "<ul><div class\\=\"message-error\">!!!FAILURE ALERT!!! - Assertion Failure: Error in result expected \\[1\\] but found \\[2\\]</div>.*"));
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\">"
+					+ "<button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> getResult - \\d+.\\d+ secs</span></div><div class=\"box-body\">"
+					+ "<ul><div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> !!!FAILURE ALERT!!! - Assertion Failure: Error in result expected \\[1\\] but found \\[2\\] </div>.*"));
 
 
 		} finally {
@@ -917,11 +919,11 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 
 			// check that sub step failure (with assertion) caused the step to fail itself
-			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box failed\">.*?<i class\\=\"fas fa-plus\"></i>" // => step failed
-					+ "</button><span class=\"step-title\"> assertWithSubStep  - \\d+\\.\\d+ secs</span></div><div class\\=\"box-body\"><ul><li>doNothing </li>"
-					+ "<ul><li>doNothing on HtmlElement none, by=\\{By\\.id: none\\} </li><div class\\=\"row\"></div></ul>"
-					+ "<li>assertAction </li><ul>" // => sub step with error
-					+ "<div class\\=\"message-error\">!!!FAILURE ALERT!!! - Assertion Failure: false error expected \\[true\\] but found \\[false\\].*")); // error displayed
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fas fa-plus\"></i>" // => step failed
+					+ "</button><span class=\"step-title\"> assertWithSubStep - \\d+.\\d+ secs</span></div><div class=\"box-body\"><ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-2\">\\d+:\\d+:\\d+.\\d+</span> doNothing </div></li>"
+					+ "<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> doNothing on HtmlElement none, by=\\{By.id: none} </div></li><div class=\"row\"></div></ul>"
+					+ "<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-2\">\\d+:\\d+:\\d+.\\d+</span> assertAction </div></li><ul>" // => sub step with error
+					+ "<div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> !!!FAILURE ALERT!!! - Assertion Failure: false error expected \\[true\\] but found \\[false\\].*")); // error displayed
 
 		} finally {
 			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);
@@ -935,7 +937,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 */
 	@Test(groups = {"it"})
 	public void testDetailedReportWithHardAssertInScenario() throws Exception {
-
 		try {
 			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "false");
 
@@ -949,15 +950,15 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 
 			// check step with assertion inside is failed
-			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box failed\">.*?<i class\\=\"fas fa-plus\"></i>"
-					+ "</button><span class=\"step-title\"> getResult  - \\d+\\.\\d+ secs</span></div><div class\\=\"box-body\">.*?"
-					+ "<div class\\=\"message-error\">\\s*Assertion Failure: Error in result expected \\[1\\] but found \\[2\\].*"));
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fas fa-plus\"></i>"
+					+ "</button><span class=\"step-title\"> getResult - \\d+.\\d+ secs</span></div><div class=\"box-body\">.*?"
+					+ "<div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Assertion Failure: Error in result expected \\[1\\] but found \\[2\\].*"));
 
 			// Test end step also displays the error
-			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box failed\">.*?<i class\\=\"fas fa-plus\"></i>"
-					+ "</button><span class=\"step-title\"> Test end - \\d+\\.\\d+ secs</span></div><div class\\=\"box-body\"><ul><div class\\=\"message-log\">Test is KO with error: class java.lang.AssertionError: Error in result expected \\[1\\] but found \\[2\\]</div>"
-					+ "<div class\\=\"message-log\">\\[NOT RETRYING\\] due to failed Assertion</div>.*?"
-					+ "<div class\\=\"message-error\">\\s+class java.lang.AssertionError: Error in result expected \\[1\\] but found \\[2\\].*"
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fas fa-plus\"></i>"
+					+ "</button><span class=\"step-title\"> Test end - \\d+.\\d+ secs</span></div><div class=\"box-body\"><ul>.*?"
+					+ "<div class=\"message-log message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> \\[NOT RETRYING\\] due to failed Assertion </div>.*?"
+					+ "<div class=\"message-error\"> class java.lang.AssertionError: Error in result expected \\[1\\] but found \\[2\\].*"
 			));
 
 			// test is stopped after assertion raised in test. AssertAction which would be executed later is never reached
@@ -1263,7 +1264,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent2 = readTestMethodResultFile("testFailedWithSoftAssertDisabled");
 		detailedReportContent2 = detailedReportContent2.replaceAll("\\s+", " ");
 
-		Assert.assertTrue(detailedReportContent2.contains("</button><span class=\"sttep-itle\"> openPage with args: (null, )"));
+
+		Assert.assertTrue(detailedReportContent2.contains("</button><span class=\"step-title\"> openPage with args: (null, )"));
 		Assert.assertTrue(detailedReportContent2.contains("</button><span class=\"step-title\"> assertAction"));
 		Assert.assertFalse(detailedReportContent2.contains("</button><span class=\"step-title\"> add with args: (1, )"));
 		Assert.assertTrue(detailedReportContent2.contains("</button><span class=\"step-title\"> Test end"));
@@ -1291,7 +1293,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		detailedReportContent4 = detailedReportContent4.replaceAll("\\s+", " ");
 
 		Assert.assertTrue(detailedReportContent4.contains("</button><span class=\"step-title\"> openPage with args: (null, )"));
-		Assert.assertTrue(detailedReportContent4.contains("<div class=\"box-body\"><ul><li>Opening page CalcPage</li>"));
+		Assert.assertTrue(detailedReportContent4.matches(".*<div class=\"box-body\"><ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Opening page CalcPage </div></li>.*"));
 		Assert.assertFalse(detailedReportContent4.contains("</button><span class=\"step-title\"> failAction"));
 		Assert.assertTrue(detailedReportContent4.contains("</button><span class=\"step-title\"> add with args: (1, 1, )"));
 		Assert.assertTrue(detailedReportContent4.contains("</button><span class=\"step-title\"> Test end"));
@@ -1346,7 +1348,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testOk/TestReport\\.html'.*?>testOk</a>.*"));
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testWithAssert/TestReport\\.html'.*?>testWithAssert</a>.*"));
 
-
 		// check that without soft assertion, 'add' step is skipped
 		String detailedReportContent1 = readTestMethodResultFile("testOk");
 		Assert.assertTrue(detailedReportContent1.contains("</button><span class=\"step-title\"> Test start"));
@@ -1367,6 +1368,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 		// ----- check manual steps errors ------
 		String detailedReportContent2 = readTestMethodResultFile("testWithAssert");
+		detailedReportContent2 = detailedReportContent2.replaceAll("\\s+", " ");
 
 		// check execution logs are in error
 		Assert.assertTrue(detailedReportContent2.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button> Execution logs"));
@@ -1376,7 +1378,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent2.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> assert exception"));
 
 		// check exception is present in step
-		Assert.assertTrue(detailedReportContent2.contains("<div class=\"message-log\">Test is KO with error: class java.lang.AssertionError: false error expected [true] but found [false]</div>"));
+		Assert.assertTrue(detailedReportContent2.matches(".*<div class=\"message-log message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Test is KO with error: class java.lang.AssertionError: false error expected \\[true\\] but found \\[false\\] </div>.*"));
 
 	}
 
@@ -1427,23 +1429,22 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 */
 	@Test(groups = {"it"})
 	public void testReportDetailsMessageStyles() throws Exception {
-
 		try {
 			System.setProperty("customTestReports", "PERF::xml::reporter/templates/report.perf.vm,SUP::xml::reporter/templates/report.supervision.vm");
 
 			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions", "testInError", "testWithException"});
 
-
 			// check style of messages
 			String detailedReportContent = readTestMethodResultFile("testInError");
+			detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
 
-			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-info\">click ok</div>"));
-			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-warning\">Warning: Some warning message</div>"));
-			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-info\">Some Info message</div>"));
-			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Some Error message</div>"));
-			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Some log message</div>"));
-			Assert.assertTrue(detailedReportContent.contains("<table class=\"table table-bordered table-sm\"><tr><th width=\"15%\">Key</th><th width=\"60%\">Message</th><th width=\"25%\">Value</th></tr><tr><td>key</td><td>we found a value of</td><td>10</td></tr></table>"));
-			Assert.assertTrue(detailedReportContent.contains("<li>send keyboard action</li>"));
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-info message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> click ok </div>.*"));
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-warning message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Warning: Some warning message </div>.*"));
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-info message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Some Info message </div>.*"));
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Some Error message </div>.*"));
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-log message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Some log message </div>.*"));
+			Assert.assertTrue(detailedReportContent.matches(".*<table class=\"table table-bordered table-sm\"><tr><th width=\"15%\">Key</th><th width=\"60%\">Message</th><th width=\"25%\">Value</th></tr><tr><td><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> key </div></td><td>we found a value of</td><td>10</td></tr></table>.*"));
+			Assert.assertTrue(detailedReportContent.matches(".*<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> send keyboard action </div></li>.*"));
 		} finally {
 			System.clearProperty("customTestReports");
 		}
@@ -1462,18 +1463,18 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// check content of summary report file
 		String detailedReportContent = readTestMethodResultFile("testAndSubActions");
 		detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
-
+//\d+:\d+:\d+.\d+
 		Assert.assertTrue(detailedReportContent.matches(
-				".*<ul>"                                                    // root step
-						+ "<li>click button</li>"
-						+ "<li>sendKeys to text field</li>"
-						+ "<li>step 1.3: open page</li>"                    // sub-step
-						+ "<ul>"
-						+ "<li>click link</li>"                            // action in sub step
-						+ "<div class\\=\"message-log\">a message</div>"    // message in sub step
-						+ "<li>sendKeys to password field</li>"            // action in sub step
-						+ "<div class\\=\"row\"></div></ul><div class=\"row\">"
-						+ "<div class\\=\"message-snapshot col\"><div class\\=\"text-center\">.*src\\=\"screenshot/testAndSubActions_0-1_step_1--rtened\\.png\" style\\=\"width: 300px\">.*"
+				".*<ul>.*?"                                                    // root step
+						+ "click button.*?"
+						+ "sendKeys to text field.*?"
+						+ "step 1.3: open page.*?"// sub-step
+						+ "<ul>.*?"
+						+ "click link.*?"                            // action in sub step
+						+ "<div class=\"message-log message-conf\"><span class=\"stepTimestamp mr-1\">1\\d+:\\d+:\\d+.\\d+</span> a message </div>.*?"    // message in sub step
+						+ "sendKeys to password field.*?"            // action in sub step
+						+ "<div class=\"row\"></div></ul><div class=\"row\">.*?"
+						+ "<div class=\"message-snapshot col\"><div class=\"text-center\">.*src=\"screenshot/testAndSubActions_0-1_step_1--rtened\\.png\" style=\"width: 300px\">.*"
 		));
 
 	}
@@ -1506,6 +1507,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions", "testInError", "testWithException"});
 
 		String detailedReportContent = readTestMethodResultFile("testAndSubActions");
+		detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
 
 		// Check each step is recorded in file: 2 test steps + test end + logs
 
@@ -1514,10 +1516,11 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> step 2 - "));
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> Test end - "));
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button> Execution logs"));
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Test is OK</div>"));
+		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-log message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Test is OK </div>.*"));
 
 		// check failed steps are in red
 		String detailedReportContent2 = readTestMethodResultFile("testInError");
+		detailedReportContent2 = detailedReportContent2.replaceAll("\\s+", " ");
 
 		// Check each step is recorded in file: 2 test steps + test end + logs
 		Assert.assertTrue(detailedReportContent2.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> Test end"));
@@ -2657,17 +2660,53 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverWithLighthouse"});
 
 		String detailedReportContent = readTestMethodResultFile("testDriverWithLighthouse");
+		detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
 
 		// check lighthouse report is included
 		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-snapshot\">Lighthouse JSON http://\\d+.\\d+.\\d+.\\d+:\\d+/test.html: <a href='lighthouse/http.\\d+.\\d+.\\d+.\\d+.\\d+test.html-\\w+.json'>file</a></div>.*"));
 		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-snapshot\">Lighthouse HTML http://\\d+.\\d+.\\d+.\\d+:\\d+/test.html: <a href='lighthouse/http.\\d+.\\d+.\\d+.\\d+.\\d+test.html-\\w+.html'>file</a></div>.*"));
 
 		// check accessibility is displayed
-		Assert.assertTrue(detailedReportContent.contains("<tr><th width=\"15%\">Key</th><th width=\"60%\">Message</th><th width=\"25%\">Value</th></tr><tr><td>accessibility</td><td>accessibility</td><td>60.0</td></tr>"));
+		Assert.assertTrue(detailedReportContent.matches(".*<tr><th width=\"15%\">Key</th><th width=\"60%\">Message</th><th width=\"25%\">Value</th></tr><tr><td><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> accessibility </div></td><td>accessibility</td><td>.*"));
 
 		// check lighthouse error is included
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Lighthouse did not execute correctly</div>"));
+		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Lighthouse did not execute correctly </div>.*"));
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-snapshot\">Lighthouse logs some.bad.url: <a href='some.bad.url"));
 	}
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
