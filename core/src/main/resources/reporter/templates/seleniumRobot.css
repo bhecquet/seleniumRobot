@@ -7,7 +7,7 @@ body{
 	.container,.container-fluid {
 		width:85%
 	}
-} 
+}
 
 .main-header{
 	background-color: #000;
@@ -72,13 +72,13 @@ a.failedStepsTooltip {
 }
 
 a.errorTooltip {
-    color: #007bff;
+	color: #007bff;
 	cursor: pointer;
 }
 
 .fa-file-video, .fa-video, .fa-file-image, .fa-file-alt {
-    padding-right: 4px;
-    font-size: 20px;
+	padding-right: 4px;
+	font-size: 20px;
 }
 
 .testSuccess{

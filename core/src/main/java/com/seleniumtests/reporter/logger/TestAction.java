@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.reporter.logger;
 
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,6 +51,7 @@ public class TestAction {
 	protected List<String> pwdToReplace;
 	protected boolean maskPassword = true;
 	protected boolean encoded = false;		// true if we have encoded messages
+	private LocalTime timestamp;
 	
 	/**
 	 * 
@@ -63,6 +65,9 @@ public class TestAction {
 		this.pwdToReplace = pwdToReplace.stream()
 					.filter(s -> s.length() > TestStepManager.MIN_PASSWORD_LENGTH)
 					.collect(Collectors.toList());
+
+
+		timestamp = getTimestamp();
 	}
 
 	/**
@@ -77,6 +82,10 @@ public class TestAction {
 			}
 		}
 		return newName;
+	}
+
+	public LocalTime getTimestamp() {
+		return LocalTime.now();
 	}
 
 	public Boolean getFailed() {
