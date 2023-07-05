@@ -375,6 +375,102 @@
 					</execution>
 				</executions>
 		      </plugin>
+			<!-- Put Jacoco plugin before clirr plugin, as they are bound to the same phase 'verify' and clirr may recompile classes which annoys Jacoco -->
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco.version}</version>
+
+				<executions>
+					<!-- comment for online instrumentation -->
+					<execution>
+						<id>default-instrument</id>
+						<goals>
+							<goal>instrument</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>default-restore-instrumented-classes-it</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>restore-instrumented-classes</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<goals>
+							<goal>report</goal>
+						</goals>
+						<phase>verify</phase>
+						<configuration>
+							<excludes>
+								<exclude>org/openqa/**/*</exclude>
+							</excludes>
+							<dataFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</dataFile>
+							<outputDirectory>${project.build.directory}/jacoco-ut</outputDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<id>report-it</id>
+						<goals>
+							<goal>report-integration</goal>
+						</goals>
+						<phase>verify</phase>
+						<configuration>
+							<excludes>
+								<exclude>org/openqa/**/*</exclude>
+							</excludes>
+							<dataFile>${project.build.directory}/coverage-reports/jacoco-it.exec</dataFile>
+							<outputDirectory>${project.build.directory}/jacoco-it</outputDirectory>
+						</configuration>
+					</execution>
+					<!-- /comment -->
+					<!-- <execution>
+                        <id>default-prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                            <destFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</destFile>
+                            <propertyName>surefireArgLine</propertyName>
+
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>default-report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <dataFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</dataFile>
+                            <outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>pre-integration-test</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                            <destFile>${project.build.directory}/coverage-reports/jacoco-it.exec</destFile>
+                            <propertyName>failsafeArgLine</propertyName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>post-integration-test</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <dataFile>${project.build.directory}/coverage-reports/jacoco-it.exec</dataFile>
+                            <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
+                        </configuration>
+                    </execution> -->
+				</executions>
+			</plugin>
 			<plugin>
 		        <groupId>org.codehaus.mojo</groupId>
 		        <artifactId>clirr-maven-plugin</artifactId>
@@ -537,101 +633,6 @@
 					</execution>
 				</executions>
     		</plugin>
-			<plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${jacoco.version}</version>
-                                  
-                <executions>
-                <!-- comment for online instrumentation -->
-                	<execution>
-                        <id>default-instrument</id>
-                        <goals>
-                            <goal>instrument</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>default-restore-instrumented-classes-it</id>
- 						<phase>post-integration-test</phase>
-                        <goals>
-                            <goal>restore-instrumented-classes</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>report</id>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                        <phase>verify</phase>
-                        <configuration>
-                        	<excludes>
-                        		<exclude>org/openqa/**/*</exclude>
-                        	</excludes>
-                            <dataFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</dataFile>
-                            <outputDirectory>${project.build.directory}/jacoco-ut</outputDirectory>
-                        </configuration>
-					</execution>
-                    <execution>
-                        <id>report-it</id>
-                        <goals>
-                            <goal>report-integration</goal>
-                        </goals>
-                        <phase>verify</phase>
-                        <configuration>
-                        	<excludes>
-                        		<exclude>org/openqa/**/*</exclude>
-                        	</excludes>
-                            <dataFile>${project.build.directory}/coverage-reports/jacoco-it.exec</dataFile>
-                            <outputDirectory>${project.build.directory}/jacoco-it</outputDirectory>
-                        </configuration>
-					</execution>
-				<!-- /comment -->
-                    <!-- <execution>
-                        <id>default-prepare-agent</id>
-                        <goals>
-                        	<goal>prepare-agent</goal>
-                        </goals>
-                        <configuration>
-			                <destFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</destFile>
-			                <propertyName>surefireArgLine</propertyName>
-			                
-			            </configuration>
-                    </execution>
-                    <execution>
-                        <id>default-report</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                        	<goal>report</goal>
-                        </goals>
-                        <configuration>
-	                        <dataFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</dataFile>
-			                <outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
-		                </configuration>
-                    </execution>
-                    <execution>
-			            <id>pre-integration-test</id>
-			            <phase>pre-integration-test</phase>
-			            <goals>
-			                <goal>prepare-agent</goal>
-			            </goals>
-			            <configuration>
-			                <destFile>${project.build.directory}/coverage-reports/jacoco-it.exec</destFile>
-			                <propertyName>failsafeArgLine</propertyName>
-			            </configuration>
-			        </execution>
-			        <execution>
-			            <id>post-integration-test</id>
-			            <phase>post-integration-test</phase>
-			            <goals>
-			                <goal>report</goal>
-			            </goals>
-			            <configuration>
-			                <dataFile>${project.build.directory}/coverage-reports/jacoco-it.exec</dataFile>
-			                <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
-			            </configuration>
-			        </execution> -->
-                </executions>
-            </plugin>
             <plugin>
 				<groupId>com.nickwongdev</groupId>
 				<artifactId>aspectj-maven-plugin</artifactId>
