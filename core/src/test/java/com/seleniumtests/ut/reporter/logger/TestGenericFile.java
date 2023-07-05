@@ -234,6 +234,6 @@ public class TestGenericFile extends GenericTest {
 		JSONObject json = genericFile.toJson();
 		Assert.assertEquals(json.getString("name"), "description");
 		Assert.assertEquals(json.getString("type"), "file");
-		Assert.assertEquals(json.getString("file"), "<file:" + genericFile.getFile().getAbsolutePath() + ">");
+		Assert.assertEquals(json.getString("file"), "<file:" + genericFile.getFile().getAbsolutePath().replace("\\", "/") + ">");
 	}
 }

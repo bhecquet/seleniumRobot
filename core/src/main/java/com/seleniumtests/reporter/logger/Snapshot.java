@@ -136,8 +136,8 @@ public class Snapshot extends TestAction {
 	public JSONObject toJson() {
     	JSONObject snapshotJson = super.toJson();
     	snapshotJson.put("snapshotCheckType", snapshotCheckType.getName());
-    	snapshotJson.put("image", String.format(FILE_PATTERN, screenshot.getFullImagePath().replace("\\", "/")));
-    	snapshotJson.put("html", String.format(FILE_PATTERN, screenshot.getFullHtmlPath().replace("\\", "/")));
+    	snapshotJson.put("image", String.format(FILE_PATTERN, screenshot.getFullImagePath() != null ? screenshot.getFullImagePath().replace("\\", "/"): null));
+    	snapshotJson.put("html", String.format(FILE_PATTERN, screenshot.getFullHtmlPath()!= null ? screenshot.getFullHtmlPath().replace("\\", "/"): null));
     	snapshotJson.put("name", screenshot.getImageName());
     	snapshotJson.put("title", screenshot.getTitle());
     	snapshotJson.put("url", screenshot.getLocation());

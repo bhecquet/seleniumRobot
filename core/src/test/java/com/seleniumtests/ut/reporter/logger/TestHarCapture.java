@@ -85,6 +85,6 @@ public class TestHarCapture extends GenericTest {
 		Assert.assertEquals(json.getString("type"), "networkCapture");
 		Assert.assertEquals(json.getString("name"), "main");
 		File harFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "main-networkCapture.har").toFile();
-		Assert.assertEquals(json.getString("file"), "<file:" + harFile.getAbsolutePath() + ">");
+		Assert.assertEquals(json.getString("file"), "<file:" + harFile.getAbsolutePath().replace("\\", "/") + ">");
 	}
 }
