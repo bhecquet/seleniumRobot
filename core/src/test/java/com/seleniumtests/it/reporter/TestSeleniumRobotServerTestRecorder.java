@@ -32,12 +32,14 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.reset;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.seleniumtests.reporter.logger.TestStep;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -111,9 +113,8 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 			String logs = readSeleniumRobotLogFile();
 			Assert.assertTrue(logs.contains("Snapshot hasn't any name, it won't be sent to server")); // one snapshot has no name, error message is displayed
-			
-			// check that screenshot information are removed from logs (the pattern "Output: ...")
-			verify(serverConnector).recordStepResult(eq(true), contains("step 1.3: open page"), eq(1230L), anyInt(), anyInt(), anyInt());
+
+			verify(serverConnector, times(30)).recordStepResult(any(TestStep.class), anyInt(), anyInt(), anyInt()); // all steps are recorded
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
@@ -297,8 +298,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 			// check server has been called for session
 			verify(serverConnector).createSession(anyString()); // once per TestNG context (so 1 time here)
-			verify(serverConnector, times(3)).recordStepResult(anyBoolean(), anyString(), anyLong(), anyInt(), anyInt(), anyInt()); // once for each test execution + the final logging which is done only once as it fails
-																							// it shows that when result has not been recorded, it's retried
+			verify(serverConnector, times(13)).recordStepResult(any(TestStep.class), anyInt(), anyInt(), anyInt());
 			
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
@@ -395,8 +395,9 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 			
 			initMocks();
+			// check failed step is recorded
 			when(serverConnector.createTestStep("_writeSomethingOnNonExistentElement ", 0)).thenReturn(120);
-			doReturn(123).when(serverConnector).recordStepResult(eq(false), anyString(), anyLong(), anyInt(), anyInt(), eq(120));
+			doReturn(123).when(serverConnector).recordStepResult(any(TestStep.class), anyInt(), anyInt(), eq(120));
 			
 			
 			doThrow(SeleniumRobotServerException.class).doNothing().when(serverConnector).createStepReferenceSnapshot(any(Snapshot.class), anyInt());
@@ -434,7 +435,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 			initMocks();
 			when(serverConnector.createTestStep("_writeSomethingOnNonExistentElement ", 0)).thenReturn(120);
-			doReturn(123).when(serverConnector).recordStepResult(eq(false), anyString(), anyLong(), anyInt(), anyInt(), eq(120));
+			doReturn(123).when(serverConnector).recordStepResult(any(TestStep.class), anyInt(), anyInt(), eq(120));
 			
 			
 			doThrow(SeleniumRobotServerException.class).when(serverConnector).createStepReferenceSnapshot(any(Snapshot.class), anyInt());
@@ -472,6 +473,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 		PowerMockito.when(CommonReporter.getInstance(SeleniumRobotServerTestRecorder.class)).thenReturn(reporter);
 
 		PowerMockito.mockStatic(SeleniumRobotSnapshotServerConnector.class);
+		reset(serverConnector); // reset call count
 		PowerMockito.doReturn(serverConnector).when(SeleniumRobotSnapshotServerConnector.class, "getInstance");
 		when(serverConnector.getReferenceSnapshot(anyInt())).thenReturn(File.createTempFile("img", ".png"));
 		

@@ -190,7 +190,8 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			Integer testStepId = serverConnector.createTestStep(testStep.getName(), testCaseInSessionId);
 			String stepLogs = testStep.toJson().toString();
 			
-			Integer stepResultId = serverConnector.recordStepResult(!testStep.getFailed(), stepLogs, testStep.getDuration(), sessionId, testCaseInSessionId, testStepId);
+//			Integer stepResultId = serverConnector.recordStepResult(!testStep.getFailed(), stepLogs, testStep.getDuration(), sessionId, testCaseInSessionId, testStepId);
+			Integer stepResultId = serverConnector.recordStepResult(testStep, sessionId, testCaseInSessionId, testStepId);
 			testStep.setStepResultId(stepResultId);
 			
 			// sends all snapshots that are flagged as comparable

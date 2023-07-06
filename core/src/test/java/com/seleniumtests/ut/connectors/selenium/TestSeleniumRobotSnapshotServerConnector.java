@@ -923,6 +923,33 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	public void testCreateStepResultFromTestStepErrorUploading() throws IOException {
 		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
 
+		// fail on uploading file
+		HttpRequest<?> req = createServerMock("POST", SeleniumRobotSnapshotServerConnector.FILE_API_URL, 201, "{'id': '18'}", "body");
+		when(req.asString()).thenThrow(UnirestException.class);
+
+		Integer sessionId = connector.createSession("Session1");
+		Integer testCaseId = connector.createTestCase("Test 1");
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1");
+		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
+
+		TestStep testStep = new TestStep("Step 1", null, new ArrayList<>(), true);
+		GenericFile file = new GenericFile(File.createTempFile("video", ".avi"), "video file");
+		testStep.addFile(file);
+		testStep.addFile(file);
+
+		Integer stepResultId = connector.recordStepResult(testStep, sessionId, testCaseInSessionId, testStepId);
+
+		// check we record step, then update it and store all files
+		verify(connector).recordStepResult(true, "", 0, sessionId, testCaseInSessionId, testStepId);
+		verify(connector, times(2)).uploadFile(file.getFile(), 17);
+		String filePath = file.getFile().getAbsolutePath().replace("\\", "/");
+		verify(connector, never()).updateStepResult(testStep.toJson().toString().replace(filePath, // no file uploaded, image id does not replace file path
+				"18"), 17);
+	}
+	@Test(groups= {"ut"})
+	public void testCreateStepResultFromTestStepErrorUploading2() throws IOException {
+		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
+
 		Integer sessionId = connector.createSession("Session1");
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1");
