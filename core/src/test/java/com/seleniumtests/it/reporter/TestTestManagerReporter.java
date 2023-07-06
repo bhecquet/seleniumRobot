@@ -17,10 +17,7 @@
  */
 package com.seleniumtests.it.reporter;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -95,7 +92,8 @@ public class TestTestManagerReporter extends ReporterTest {
 			
 			// check we have only one result recording for each test method
 			verify(api).setExecutionResult(iterationTestPlanItem, ExecutionStatus.SUCCESS);
-			verify(api, times(2)).setExecutionResult(iterationTestPlanItem, ExecutionStatus.FAILURE); // for 'testInError' and 'testWithAssert'
+			verify(api).setExecutionResult(iterationTestPlanItem, ExecutionStatus.FAILURE, "error");
+			verify(api).setExecutionResult(eq(iterationTestPlanItem), eq(ExecutionStatus.FAILURE), contains("fail"));
 			verify(api).setExecutionResult(iterationTestPlanItem, ExecutionStatus.BLOCKED);
 			
 		} finally {

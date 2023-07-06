@@ -264,8 +264,8 @@ public class TestReporterControler extends ReporterTest {
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent3, "</i></button><span class=\"step-title\"> Post test step: reset -"), 1);
 		
 		// in case of test method error, it is retried so each Before/After method is also replayed. Check it's the last one we have
-		Assert.assertTrue(detailedReportContent3.contains("<div class=\"message-info\">before count: 2</div>"));
-		Assert.assertTrue(detailedReportContent3.contains("<div class=\"message-info\">after count: 3</div>"));
+		Assert.assertTrue(detailedReportContent3.matches(".*<div class=\"message-info message-conf\">.*?before count: 2</div>.*"));
+		Assert.assertTrue(detailedReportContent3.matches(".*<div class=\"message-info message-conf\">.*after count: 3</div>.*"));
 	}
 	
 	/**

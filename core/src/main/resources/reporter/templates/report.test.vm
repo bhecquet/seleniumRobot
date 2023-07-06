@@ -215,8 +215,7 @@
                                 <div class="box collapsed-box skipped">
                                 #end
                                 <div class="box-header with-border">
-                                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
-                                            class="fas fa-plus"></i></button>
+                                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fas fa-plus"></i></button>
                                     <span class="step-title"> $stepName - $stepDuration secs</span>
                                     #if ($stepVideoTimeStamp)
                                         <span><i class="fas fa-file-video"></i>$stepVideoTimeStamp s</span>

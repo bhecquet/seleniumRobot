@@ -307,6 +307,10 @@ public class TestStep extends TestAction {
 		return startDate;
 	}
 
+	public void removeSnapshot(Snapshot snapshotToRemove) {
+		snapshots.remove(snapshotToRemove);
+	}
+
 	public List<Snapshot> getSnapshots() {
 		return getSnapshots(false);
 	}

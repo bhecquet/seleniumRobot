@@ -62,8 +62,8 @@ public class TestRetry extends ReporterTest {
 		
 		// check that in case of retry, steps are not logged twice
 		Assert.assertTrue(detailedReportContent.contains("step 1"));
-		Assert.assertTrue(detailedReportContent.contains("<li>played 3 times")); // only the last step is retained
-		Assert.assertFalse(detailedReportContent.contains("<li>played 2 times")); // only the last step is retained
+		Assert.assertTrue(detailedReportContent.contains("played 3 times")); // only the last step is retained
+		Assert.assertFalse(detailedReportContent.contains("played 2 times")); // only the last step is retained
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "step 1"), 1); 
 		
 	}
@@ -90,8 +90,8 @@ public class TestRetry extends ReporterTest {
 			
 			// check that in case of retry, steps are not logged twice
 			Assert.assertTrue(detailedReportContent.contains("step 1"));
-			Assert.assertTrue(detailedReportContent.contains("<li>played 2 times")); // only the last step is retained
-			Assert.assertFalse(detailedReportContent.contains("<li>played 1 times")); // only the last step is retained
+			Assert.assertTrue(detailedReportContent.contains("played 2 times")); // only the last step is retained
+			Assert.assertFalse(detailedReportContent.contains("played 1 times")); // only the last step is retained
 			Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "step 1"), 1); 
 		} finally {
 			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
@@ -114,8 +114,8 @@ public class TestRetry extends ReporterTest {
 		
 		// check that in case of retry, steps are not logged twice
 		Assert.assertTrue(detailedReportContent.contains("step 1"));
-		Assert.assertTrue(detailedReportContent.contains("<li>played 3 times")); // only the last step is retained
-		Assert.assertFalse(detailedReportContent.contains("<li>played 2 times")); // only the last step is retained
+		Assert.assertTrue(detailedReportContent.contains("played 3 times")); // only the last step is retained
+		Assert.assertFalse(detailedReportContent.contains("played 2 times")); // only the last step is retained
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "step 1"), 1); 
 		
 	}
@@ -136,7 +136,7 @@ public class TestRetry extends ReporterTest {
 		
 		// check that in case of retry, steps are not logged twice
 		Assert.assertTrue(detailedReportContent.contains("step 1"));
-		Assert.assertTrue(detailedReportContent.contains("<li>played 5 times")); // only the last step is retained
+		Assert.assertTrue(detailedReportContent.contains("played 5 times")); // only the last step is retained
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "step 1"), 1); 	
 	}
 	
@@ -157,7 +157,7 @@ public class TestRetry extends ReporterTest {
 		
 		// check that in case of retry, steps are not logged twice
 		Assert.assertTrue(detailedReportContent.contains("step 1"));
-		Assert.assertTrue(detailedReportContent.contains("<li>played 5 times")); // only the last step is retained
+		Assert.assertTrue(detailedReportContent.contains("played 5 times")); // only the last step is retained
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "step 1"), 1); 	
 	}
 	

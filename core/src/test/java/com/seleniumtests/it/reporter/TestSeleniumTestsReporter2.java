@@ -1720,7 +1720,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Step beginning state</div>"), 1);
 
 			// check step beginning state is present with valid path
-			Assert.assertTrue(detailedReportContent1.contains("src=\"screenshots/testDriverShortKo_4-1__writeSomethingOnNonExistent-ideo-1.jpg\""));
+			Assert.assertTrue(detailedReportContent1.contains("src=\"screenshots/testDriverShortKo_4-1__writeSomethingOnNonExistent-ideo-2.jpg\""));
 
 			// check no picture extracted from video is kept
 			Assert.assertEquals(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverShortKo", "video").toFile().listFiles().length, 0);

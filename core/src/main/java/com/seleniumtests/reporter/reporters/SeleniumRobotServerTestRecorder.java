@@ -249,7 +249,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			}
 			
 			// remove this snapshot, extracted from video as it won't be used anymore
-			testStep.getSnapshots().remove(snapshot);
+			testStep.removeSnapshot(snapshot);
 
 		} else {
 			try {

@@ -105,9 +105,9 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			Assert.assertFalse(detailedReportContent1.contains("</button> new window link - ")); // manual step is not there
 			Assert.assertTrue(detailedReportContent1.contains("><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> mainPage  - ")); // auto step is there
 			Assert.assertTrue(detailedReportContent1.contains("<i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> openPage with args: (null, ) - "));
-			Assert.assertTrue(detailedReportContent1.contains("<li>click on HtmlElement , by={By.id: image} </li>")); // action
-			Assert.assertTrue(detailedReportContent1.contains("<li>frame </li>")); // auto sub-step
-			Assert.assertTrue(detailedReportContent1.contains("<li>click on HtmlElement , by={By.id: buttonIFrame} </li>"));
+			Assert.assertTrue(detailedReportContent1.contains("</span> click on HtmlElement , by={By.id: image}")); // action
+			Assert.assertTrue(detailedReportContent1.contains("</span> frame")); // auto sub-step
+			Assert.assertTrue(detailedReportContent1.contains("</span> click on HtmlElement , by={By.id: buttonIFrame}"));
 			
 			// test that user variable (set via command line in our test) is added to variabled available to script
 			Assert.assertTrue(detailedReportContent1.contains("Hello Selenium IDE"));
@@ -202,9 +202,9 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			String detailedReportContent1 = ReporterTest.readTestMethodResultFile("mainPage");
 			
 			// manual step is present with details
-			Assert.assertFalse(detailedReportContent1.contains("<li>click on HtmlElement , by={By.id: image} </li>")); // not there because created before the first step
+			Assert.assertFalse(detailedReportContent1.contains("click on HtmlElement , by={By.id: image}")); // not there because created before the first step
 			Assert.assertTrue(detailedReportContent1.contains("</button><span class=\"step-title\"> new window link - "));
-			Assert.assertTrue(detailedReportContent1.contains("li>click on HtmlElement , by={By.id: buttonIFrame} </li>"));
+			Assert.assertTrue(detailedReportContent1.contains("click on HtmlElement , by={By.id: buttonIFrame}"));
 			
 			// screenshot is present for the step (taken at the beginning of the step: see anchor)
 			Assert.assertTrue(detailedReportContent1.matches(".*<div class\\=\"message-snapshot col\"><div class\\=\"text-center\">.*"
