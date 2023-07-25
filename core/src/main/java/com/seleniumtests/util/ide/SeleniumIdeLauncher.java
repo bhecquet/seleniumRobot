@@ -50,6 +50,7 @@ public class SeleniumIdeLauncher {
 
         
         main.executeScripts();
+        System.exit(0);
 	}
 
 	public void executeScripts() throws ClassNotFoundException {
