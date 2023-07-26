@@ -2,7 +2,7 @@
     <!-- <weaver options="-showWeaveInfo -nowarn -warn:none -Xlint:ignore"/>-->
     <weaver options="-nowarn -warn:none -Xlint:ignore"/>
     <aspects>
-    	<!--<aspect name="com.seleniumtests.LogUnitTest"/> Not present in final jar file-->
+    	<aspect name="com.seleniumtests.core.aspects.LogUnitTest"/>
     	<aspect name="com.seleniumtests.core.aspects.SoftAssert"/>
     	<aspect name="com.seleniumtests.core.aspects.LogAction"/>
     	<aspect name="com.seleniumtests.uipage.aspects.InterceptBy"/>
