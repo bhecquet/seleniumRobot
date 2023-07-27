@@ -17,7 +17,11 @@
  */
 package com.seleniumtests.reporter.logger;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneOffset;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,7 +55,7 @@ public class TestAction {
 	protected List<String> pwdToReplace;
 	protected boolean maskPassword = true;
 	protected boolean encoded = false;		// true if we have encoded messages
-	private LocalTime timestamp;
+	private LocalDateTime timestamp;
 	
 	/**
 	 * 
@@ -67,7 +71,7 @@ public class TestAction {
 					.collect(Collectors.toList());
 
 
-		timestamp = getTimestamp();
+		timestamp = LocalDateTime.now();
 	}
 
 	/**
@@ -84,8 +88,8 @@ public class TestAction {
 		return newName;
 	}
 
-	public LocalTime getTimestamp() {
-		return LocalTime.now();
+	public LocalDateTime getTimestamp() {
+		return timestamp;
 	}
 
 	public Boolean getFailed() {
@@ -131,13 +135,14 @@ public class TestAction {
 	
 	public JSONObject toJson() {
 		JSONObject actionJson = new JSONObject();
-		
+
+		actionJson.put("timestamp", timestamp.toEpochSecond(ZoneOffset.UTC));
 		actionJson.put("type", "action");
 		actionJson.put("name", encodeString(getName(), "json"));
 		actionJson.put("exception", actionException == null ? null: actionException.toString());
 		actionJson.put("failed", failed);
 		actionJson.put("position", position);
-		
+
 		return actionJson;
 	}
 	
