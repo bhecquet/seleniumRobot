@@ -258,6 +258,13 @@ public class ByC extends By {
         return new And(bies);
     }
     
+    /**
+     * Searches for a <label> element with the specified label name and returns only the associated <input> element due to the connection between the label's for attribute and the input's id.
+     * Element label need to have an attribute "for".
+     * Use Case: {@code <label for="input_id">labelName</label><input id="input_id" value="" />}
+     * @param labelName The name of the label to search for.
+     * @return A By instance that can be used to locate the <input> element associated with the specified label.
+     */
     public static By label(String labelName) {
         return new ByLabel(labelName);
     }
