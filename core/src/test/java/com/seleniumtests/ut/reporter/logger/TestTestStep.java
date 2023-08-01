@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -708,6 +709,20 @@ public class TestTestStep extends GenericTest {
 		step.addFile(file);
 		
 		ScreenShot screenshot = new ScreenShot();
+
+		File tmpImgFile = File.createTempFile("img", ".png");
+		File tmpImgFile2 = Paths.get(tmpImgFile.getParent(), "screenshots", tmpImgFile.getName()).toFile();
+		FileUtils.moveFile(tmpImgFile, tmpImgFile2);
+		File tmpHtmlFile = File.createTempFile("html", ".html");
+		File tmpHtmlFile2 = Paths.get(tmpHtmlFile.getParent(), "htmls", tmpHtmlFile.getName()).toFile();
+		FileUtils.moveFile(tmpHtmlFile, tmpHtmlFile2);
+
+		screenshot.setOutputDirectory(tmpImgFile.getParent());
+		screenshot.setLocation("http://mysite.com");
+		screenshot.setTitle("mysite");
+		screenshot.setImagePath("screenshots/" + tmpImgFile2.getName());
+		screenshot.setHtmlSourcePath("htmls/" + tmpHtmlFile2.getName());
+
 		Snapshot snapshot = new Snapshot(screenshot, "main", SnapshotCheckType.FALSE);
 		step.addSnapshot(snapshot, 0, "foo");
 
@@ -720,7 +735,9 @@ public class TestTestStep extends GenericTest {
 
 		Assert.assertEquals(stepJson.getString("type"), "step");
 		Assert.assertEquals(stepJson.getString("name"), "step1");
+		Assert.assertEquals(stepJson.getLong("timestamp"), step.getTimestamp().toEpochSecond(ZoneOffset.UTC));
 		Assert.assertEquals(stepJson.getJSONArray("actions").length(), 3);
+		Assert.assertNotNull(stepJson.getLong("timestamp"));
 
 		// check actions order
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(0).getString("type"), "message");

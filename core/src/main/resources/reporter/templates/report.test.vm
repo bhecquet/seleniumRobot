@@ -13,7 +13,7 @@
     #end
 <ul>
     #foreach( $action in $localStep.getStepActions() )
-        #set ($timestamp = $action.getTimestamp())
+        #set ($timestamp = $action.getTimestamp().toLocalTime())
         #if (${action.class.name.equals("com.seleniumtests.reporter.logger.TestStep")})
             #stepActions($action false)
         #elseif (${action.class.name.equals("com.seleniumtests.reporter.logger.TestMessage")})

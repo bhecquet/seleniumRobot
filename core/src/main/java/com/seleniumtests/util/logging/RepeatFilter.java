@@ -1,24 +1,22 @@
 package com.seleniumtests.util.logging;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
 import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 import org.apache.logging.log4j.core.filter.AbstractFilter;
 import org.apache.logging.log4j.message.Message;
 
-import com.seleniumtests.driver.DriverExceptionListener;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Plugin(name = "RepeatFilter", category = "Core", elementType = "filter", printObject = true)
 public final class RepeatFilter extends AbstractFilter {
 	
-	private Logger logger = null;
+	private org.apache.logging.log4j.Logger logger = null;
  
     private final Level level;
     private ThreadLocal<String> lastLog = new ThreadLocal<>();
@@ -30,12 +28,14 @@ public final class RepeatFilter extends AbstractFilter {
         super(onMatch, onMismatch);
         this.level = level;
     }
- 
+
+    @Override
     public Result filter(Logger logger, Level level, Marker marker, String msg, Object[] params) {
         return filter(msg);
     }
- 
-    public Result filter(Logger logger, Level level, Marker marker, Message msg, Throwable t) {
+
+    @Override
+	public Result filter(Logger logger, Level level, Marker marker, Message msg, Throwable t) {
         return filter(msg.getFormattedMessage());
     }
  
@@ -48,7 +48,7 @@ public final class RepeatFilter extends AbstractFilter {
     	
     	// delay logger creation so that we do not have recursive call on init
     	if (logger == null) {
-        	logger = SeleniumRobotLogger.getLogger(DriverExceptionListener.class);
+        	logger = SeleniumRobotLogger.getLogger(RepeatFilter.class);
     	}
     	
     	boolean discard = false;
@@ -93,9 +93,9 @@ public final class RepeatFilter extends AbstractFilter {
  
     /**
      * Create a ThresholdFilter.
-     * @param loggerLevel The log Level.
-     * @param match The action to take on a match.
-     * @param mismatch The action to take on a mismatch.
+     * @param level The log Level.
+     * @param onMatch The action to take on a match.
+     * @param onMismatch The action to take on a mismatch.
      * @return The created ThresholdFilter.
      */
     @PluginFactory
