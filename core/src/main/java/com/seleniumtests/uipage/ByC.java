@@ -1,26 +1,21 @@
 /**
- * Orignal work: Copyright 2015 www.seleniumtests.com Modified work: Copyright 2016 www.infotel.com Copyright 2017-2019
- * B.Hecquet
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
+ * 				Copyright 2017-2019 B.Hecquet
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
- * the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * 	http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
- * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.seleniumtests.uipage;
-
-import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.customexception.CustomSeleniumTestsException;
-import com.seleniumtests.customexception.ScenarioException;
-import org.apache.commons.collections.ListUtils;
-import org.apache.commons.lang.NotImplementedException;
-import org.openqa.selenium.*;
-import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.remote.RemoteWebElement;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -28,6 +23,23 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import org.apache.commons.collections.ListUtils;
+import org.apache.commons.lang.NotImplementedException;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.NoSuchShadowRootException;
+import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WrapsDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.RemoteWebElement;
+
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.CustomSeleniumTestsException;
+import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.WebUIDriver;
 
 public class ByC extends By {
     
@@ -95,8 +107,8 @@ public class ByC extends By {
     /**
      *  Search first element for {@code tagName} after label referenced by partial name
      * Use case is {@code <h2>some label</h2><input type="text" value="" />}
-     * @param label            label to search
-     * @param tagName        tag name after this label. The element we really search
+     * @param label			label to search
+     * @param tagName		tag name after this label. The element we really search
      * @param labelTagName  if label is not in a {@code <label>} tag, define this tag name
      * @return
      */
@@ -127,8 +139,8 @@ public class ByC extends By {
     /**
      *  Search first element for {@code tagName} after label referenced by partial name
      * Use case is {@code <h2>some label</h2><input type="text" value="" />}
-     * @param label            label to search
-     * @param tagName        tag name after this label. The element we really search
+     * @param label			label to search
+     * @param tagName		tag name after this label. The element we really search
      * @param labelTagName  if label is not in a {@code <label>} tag, define this tag name
      * @return
      */
@@ -158,7 +170,6 @@ public class ByC extends By {
     public static ByC labelBackward(final String label, final String tagName) {
         return labelBackward(label, tagName, false, null);
     }
-    
     public static ByC labelBackward(final String label, final String tagName, final String labelTagName) {
         return labelBackward(label, tagName, false, labelTagName);
     }
@@ -186,8 +197,8 @@ public class ByC extends By {
     /**
      *  Search first element for {@code tagName} before label referenced by partial name
      * Use case is {@code <input type="text" value="" /><h2>some label</h2>}
-     * @param label            label to search
-     * @param tagName        tag name after this label. The element we really search
+     * @param label			label to search
+     * @param tagName		tag name after this label. The element we really search
      * @param labelTagName  if label is not in a {@code <label>} tag, define this tag name
      * @return
      */
@@ -229,7 +240,6 @@ public class ByC extends By {
     public static ByC partialText(final String textToSearch, final String tagName) {
         return text(textToSearch, tagName, true);
     }
-    
     public static ByC text(final String textToSearch, final String tagName) {
         return text(textToSearch, tagName, false);
     }
@@ -244,8 +254,12 @@ public class ByC extends By {
      * @param bies
      * @return
      */
-    public static ByC and(By... bies) {
+    public static ByC and(By ... bies) {
         return new And(bies);
+    }
+    
+    public static By label(String labelName) {
+        return new ByLabel(labelName);
     }
     
     /**
@@ -270,7 +284,7 @@ public class ByC extends By {
      * @param bies
      * @return
      */
-    public static ByC shadow(By... bies) {
+    public static ByC shadow(By ... bies) {
         return new Shadow(bies);
     }
     
@@ -279,10 +293,11 @@ public class ByC extends By {
      * It also checks if the locator is relevant to the tested platform (in case of mobile), which allow to write
      *
      * <code>ByC.or(android(By.tagName("input")), ios(By.xpath("")))</code>
+     
      * @author S047432
      *
      */
-    public static ByC or(By... bies) {
+    public static ByC or(By ... bies) {
         return new Or(bies);
     }
     
@@ -368,11 +383,6 @@ public class ByC extends By {
         return new ByXClassName(className);
     }
     
-    
-    public static By label(String labelName) {
-        return new ByLabel(labelName);
-    }
-    
     protected static String buildSelectorForText(String text) {
         String escapedText;
         if (text.endsWith("*") || text.endsWith("^") || text.endsWith("$")) {
@@ -405,10 +415,10 @@ public class ByC extends By {
         
         /**
          *
-         * @param label            Content of the label to search
-         * @param tagName        Tag name of the element following label, we want to get. Default is "input"
-         * @param partial        do we search for partial of full label name
-         * @param labelTagName    tag name of the label element. Default is "label"
+         * @param label			Content of the label to search
+         * @param tagName		Tag name of the element following label, we want to get. Default is "input"
+         * @param partial		do we search for partial of full label name
+         * @param labelTagName	tag name of the label element. Default is "label"
          */
         public ByLabelForward(String label, String tagName, boolean partial, String labelTagName) {
             
@@ -417,9 +427,9 @@ public class ByC extends By {
             }
             
             this.label = label;
-            this.tagName = tagName == null ? "input" : tagName;
+            this.tagName = tagName == null ? "input": tagName;
             this.partial = partial;
-            this.labelTagName = labelTagName == null ? "label" : labelTagName;
+            this.labelTagName = labelTagName == null ? "label": labelTagName;
         }
         
         @Override
@@ -432,7 +442,7 @@ public class ByC extends By {
         
         @Override
         public List<WebElement> findElements(SearchContext context) {
-            return context.findElements(By.xpath(getEffectiveXPath()));
+            return  context.findElements(By.xpath(getEffectiveXPath()));
         }
         
         @Override
@@ -457,10 +467,10 @@ public class ByC extends By {
         
         /**
          *
-         * @param label            Content of the label to search
-         * @param tagName        Tag name of the element following label, we want to get. Default is "input"
-         * @param partial        do we search for partial of full label name
-         * @param labelTagName    tag name of the label element. Default is "label"
+         * @param label			Content of the label to search
+         * @param tagName		Tag name of the element following label, we want to get. Default is "input"
+         * @param partial		do we search for partial of full label name
+         * @param labelTagName	tag name of the label element. Default is "label"
          */
         public ByLabelBackward(String label, String tagName, boolean partial, String labelTagName) {
             
@@ -469,9 +479,9 @@ public class ByC extends By {
             }
             
             this.label = label;
-            this.tagName = tagName == null ? "input" : tagName;
+            this.tagName = tagName == null ? "input": tagName;
             this.partial = partial;
-            this.labelTagName = labelTagName == null ? "label" : labelTagName;
+            this.labelTagName = labelTagName == null ? "label": labelTagName;
         }
         
         @Override
@@ -648,7 +658,7 @@ public class ByC extends By {
         private static final long serialVersionUID = 6341968046120372161L;
         private transient By[] bies;
         
-        public And(By... bies) {
+        public And(By ... bies) {
             if (bies.length == 0) {
                 throw new ScenarioException("At least on locator must be provided for And");
             }
@@ -687,7 +697,7 @@ public class ByC extends By {
         public String toString() {
             
             List<String> biesString = new ArrayList<>();
-            for (By by : bies) {
+            for (By by: bies) {
                 biesString.add(by.toString());
             }
             
@@ -702,7 +712,7 @@ public class ByC extends By {
         
         private transient By[] bies;
         
-        public Shadow(By... bies) {
+        public Shadow(By ... bies) {
             if (bies.length == 0) {
                 throw new ScenarioException("At least one locator must be provided for shadow ");
             }
@@ -719,7 +729,7 @@ public class ByC extends By {
             List<WebElement> elements = new ArrayList<>();
             
             
-            for (By by : bies) {
+            for (By by: bies) {
                 
                 List<WebElement> hosts;
                 if (elements.isEmpty()) { // first iteration
@@ -729,7 +739,7 @@ public class ByC extends By {
                     elements = new ArrayList<>(); // reset list because we don't care parent elements
                 }
                 
-                for (WebElement host : hosts) {
+                for (WebElement host: hosts) {
                     SearchContext root = host.getShadowRoot();
                     try {
                         // https://github.com/SeleniumHQ/selenium/issues/10127 => invalid locator raised when using ShadowRoot directly
@@ -738,7 +748,7 @@ public class ByC extends By {
                         getIdMethod.setAccessible(true);
                         String id = (String) getIdMethod.invoke(root);
                         RemoteWebElement shadowRootElement = new RemoteWebElement();
-                        shadowRootElement.setParent((RemoteWebDriver) ((WrapsDriver) root).getWrappedDriver());
+                        shadowRootElement.setParent((RemoteWebDriver) ((WrapsDriver)root).getWrappedDriver());
                         shadowRootElement.setId(id);
                         elements.add(shadowRootElement);
                         
@@ -770,7 +780,7 @@ public class ByC extends By {
         public String toString() {
             
             List<String> biesString = new ArrayList<>();
-            for (By by : bies) {
+            for (By by: bies) {
                 biesString.add(by.toString());
             }
             
@@ -784,6 +794,7 @@ public class ByC extends By {
      * It also checks if the locator is relevant to the tested platform (in case of mobile), which allow to write
      *
      * <code>ByC.or(android(By.tagName("input")), ios(By.xpath("")))</code>
+     
      * @author S047432
      *
      */
@@ -793,7 +804,7 @@ public class ByC extends By {
         
         private static final long serialVersionUID = 6341968046167372161L;
         
-        public Or(By... bies) {
+        public Or(By ... bies) {
             if (bies.length == 0) {
                 throw new ScenarioException("At least on locator must be provided");
             }
@@ -815,7 +826,7 @@ public class ByC extends By {
             List<WebElement> elements = new ArrayList<>();
             
             
-            for (By by : bies) {
+            for (By by: bies) {
                 // check this 'by' applies to the platform
                 if ((by instanceof Android && !platform.equalsIgnoreCase("android"))
                         || (by instanceof Ios && !platform.equalsIgnoreCase("ios"))
@@ -849,7 +860,7 @@ public class ByC extends By {
         public String toString() {
             
             List<String> biesString = new ArrayList<>();
-            for (By by : bies) {
+            for (By by: bies) {
                 biesString.add(by.toString());
             }
             
@@ -930,6 +941,7 @@ public class ByC extends By {
             return by;
         }
     }
+    
     
     
     public static class ByXTagName extends ByForcedXPath implements Serializable {
@@ -1020,7 +1032,7 @@ public class ByC extends By {
             return "'" + aString + "'";
         } else {
             StringBuilder newString = new StringBuilder("concat(");
-            for (String part : aString.split("'")) {
+            for (String part: aString.split("'")) {
                 newString.append("'" + part + "',\"'\",");
             }
             return newString.substring(0, newString.length() - 5) + ")";
@@ -1038,7 +1050,7 @@ public class ByC extends By {
         private String label;
         
         /**
-         * @param label         Value of the "for" attribute of the label to search.
+         * @param label Value of the "for" attribute of the label to search.
          */
         public ByLabel(String label) {
             if (label == null) {
@@ -1067,4 +1079,5 @@ public class ByC extends By {
             return String.format("By.label '%s' on element", label);
         }
     }
+    
 }
