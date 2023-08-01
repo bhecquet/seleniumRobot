@@ -1049,7 +1049,6 @@ public class ByC extends By {
 			this.label = label;
 		}
 
-		// //input[@id=string(//label[.='First Name']/@for)]
 		@Override
 		public String getEffectiveXPath() {
 			return String.format("//input[@id=string(//label[.='%s']/@for)]", label);
