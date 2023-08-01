@@ -145,6 +145,27 @@ public class TestIterationTestPlanItem extends ConnectorsTest {
 		Assert.assertEquals(iteration.getTestCase().getId(), 25);
 		Assert.assertEquals(iteration.getUrl(), "http://localhost:8080/api/rest/latest/iteration-test-plan-items/6");
 	}
+
+	/**
+	 * Sometimes, referenced test-case is null, handle this case
+	 */
+	@Test(groups={"ut"})
+	public void testFromJsonNullTestCase() {
+
+		JSONObject json = new JSONObject();
+		json.put("_type", "iteration-test-plan-item");
+		json.put("id", 6);
+		json.put("name", "foo");
+		json.put("_links", new JSONObject("{\"self\" : {" +
+				"          \"href\" : \"http://localhost:8080/api/rest/latest/iteration-test-plan-items/6\"" +
+				"        }}"));
+		json.put("referenced_test_case", (Object)null);
+
+		IterationTestPlanItem iteration = IterationTestPlanItem.fromJson(json);
+		Assert.assertEquals(iteration.getId(), 6);
+		Assert.assertNull(iteration.getTestCase());
+		Assert.assertEquals(iteration.getUrl(), "http://localhost:8080/api/rest/latest/iteration-test-plan-items/6");
+	}
 	
 	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class)
 	public void testFromJsonWrongFormat() {

@@ -40,10 +40,12 @@ public class IterationTestPlanItem extends Entity {
 	public static IterationTestPlanItem fromJson(JSONObject json) {
 
 		try {
+			JSONObject referencedTestCase = json.optJSONObject("referenced_test_case");
+
 			return new IterationTestPlanItem(
 					json.getJSONObject("_links").getJSONObject("self").getString("href"),
 					json.getInt(FIELD_ID), 
-					TestCase.fromJson(json.getJSONObject("referenced_test_case"))
+					referencedTestCase == null ? null: TestCase.fromJson(referencedTestCase)
 					);
 		} catch (JSONException e) {
 			throw new ScenarioException(String.format("Cannot create IterationTestPlanItem from JSON [%s] data: %s", json.toString(), e.getMessage()));
