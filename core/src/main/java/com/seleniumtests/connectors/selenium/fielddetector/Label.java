@@ -273,15 +273,17 @@ public class Label {
 			return false;
 		}
 
-		if (obj instanceof Label && this == obj) {
+		if (this == obj) {
 			return true;
 		}
 
-		Label label = (Label)obj;
-
-		return this.getRectangle().equals(label.getRectangle())
-				&& ((this.text == null && label.text == null) || this.text.equals(label.text));
-			 
+		if (obj instanceof Label ) {
+			Label label = (Label) obj;
+			return this.getRectangle().equals(label.getRectangle())
+					&& ((this.text == null && label.text == null) || this.text.equals(label.text));
+		} else {
+			return false;
+		}
 	}
 	
 	@Override

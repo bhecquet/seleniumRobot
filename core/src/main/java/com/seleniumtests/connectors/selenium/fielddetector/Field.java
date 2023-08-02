@@ -163,19 +163,22 @@ public class Field {
 
 	@Override
 	public boolean equals(Object obj) {
+
 		if (obj == null) {
 			return false;
 		}
 
-		if (obj instanceof Field && this == obj) {
+		if (this == obj) {
 			return true;
 		}
 
-		Field field = (Field)obj;
-
-		return this.getLabel().equals(field.getLabel())
-				&& this.className.equals(field.className);
-			 
+		if (obj instanceof Field) {
+			Field field = (Field) obj;
+			return this.getLabel().equals(field.getLabel())
+					&& this.className.equals(field.className);
+		} else {
+			return false;
+		}
 	}
 	
 	@Override
