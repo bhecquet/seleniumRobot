@@ -518,7 +518,14 @@ public class TestByC extends GenericTest {
 		Assert.assertEquals(new HtmlElement("or", ByC.or(ios(By.id("text2")), android(By.id("textField")))).getTagName(), "input");
 		
 	}
-	
-	
-	
+
+	@Test(groups={"it"})
+	public void testByLabelNameOk() {
+		Assert.assertEquals(new HtmlElement("", ByC.label("By id backward")).findElements().size(), 1);
+	}
+
+	@Test(groups={"it"}, expectedExceptions = IllegalArgumentException.class)
+	public void testByLabelNameLabelNull() {
+		new HtmlElement("", ByC.label(null));
+	}
 }

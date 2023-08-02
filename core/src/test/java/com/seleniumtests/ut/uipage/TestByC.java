@@ -535,4 +535,17 @@ public class TestByC extends MockitoTest {
         ByC.Or byOr = new ByC.Or(id, null);
         List<WebElement> elements = byOr.findElements(driver);
     }
+
+    @Test(groups = {"ut"})
+    public void testFindElementByLabelName() {
+        ByC.ByLabel byLabel = spy(new ByC.ByLabel("jellyfish"));
+        byLabel.findElement(driver);
+        verify(driver).findElement(By.xpath("//input[@id=string(//label[.='jellyfish']/@for)]"));
+    }
+
+    @Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)
+    public void testFindElementByLabelNameNull() {
+        ByC.ByLabel byLabel = spy(new ByC.ByLabel(null));
+        byLabel.findElement(driver);
+    }
 }
