@@ -1742,11 +1742,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	@Override
 	public <X> X getScreenshotAs(OutputType<X> target) {
 		findElement();
-		if (((HasCapabilities) getDriver()).getCapabilities().getCapability(CapabilityType.TAKES_SCREENSHOT) != null) {
-			return getRealElementNoSearch().getScreenshotAs(target);
-		} else {
-			return null;
-		}
+		return getRealElementNoSearch().getScreenshotAs(target);
 	}
 
 	@Override

@@ -44,10 +44,10 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.devtools.DevTools;
 import org.openqa.selenium.devtools.DevToolsException;
 import org.openqa.selenium.devtools.HasDevTools;
-import org.openqa.selenium.devtools.v109.page.Page;
-import org.openqa.selenium.devtools.v109.page.Page.CaptureScreenshotFormat;
-import org.openqa.selenium.devtools.v109.page.Page.GetLayoutMetricsResponse;
-import org.openqa.selenium.devtools.v109.page.model.Viewport;
+import org.openqa.selenium.devtools.v113.page.Page;
+import org.openqa.selenium.devtools.v113.page.Page.CaptureScreenshotFormat;
+import org.openqa.selenium.devtools.v113.page.Page.GetLayoutMetricsResponse;
+import org.openqa.selenium.devtools.v113.page.model.Viewport;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -120,7 +120,6 @@ public class ScreenshotUtil {
         /**
          * Add information (url, source, title) to the captured image
          * Beware that these information use the current driver so driver state must reflect the provided image
-         * @param bufferedImage
          */
         public NamedBufferedImage addMetaDataToImage() {
 
@@ -697,8 +696,7 @@ public class ScreenshotUtil {
     
     /**
      * Export buffered image to screenshot object, adding HTML source, title, ...
-     * @param image
-     * @param prefix
+     * @param namedImage
      * @param duration
      * @return
      */
