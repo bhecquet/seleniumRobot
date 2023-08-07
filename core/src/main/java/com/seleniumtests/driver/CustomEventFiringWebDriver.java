@@ -205,31 +205,53 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
             "var totalHeight = Math.max(maxDocElementHeight, maxBodyHeight); " +
             "return [totalWidth * pixelRatio, totalHeight * pixelRatio];";
     
+    /*
+    Get the first parent element which is scrollable
+    
+    TESTED WITH
+	- no scrollable element in parents
+	- scrollable element in parents
+     */
     // according to https://www.w3schools.com/jsref/prop_element_scrolltop.asp
     // root scrollable (overflow) element is 'document.body' for safari and 'document.documentElement' for other browsers
-    private static final String JS_SCROLL_PARENT = "function getScrollParent(element, includeHidden, browserName) {" + 
-    		"    var rootElement = browserName === \"safari\" ? document.body: document.documentElement;" +
-    		"    var style = getComputedStyle(element);" + 
-    		"    var excludeStaticParent = style.position === \"absolute\";" + 
-    		"    var overflowRegex = includeHidden ? /(auto|scroll|hidden)/ : /(auto|scroll)/;" + 
-    		"" + 
-    		"    if (style.position === \"fixed\") return rootElement;" + 
-    		"    for (var parent = element; (parent = parent.parentElement);) {" + 
-    		"        style = getComputedStyle(parent);" + 
-    		"        if (excludeStaticParent && style.position === \"static\") {" + 
-    		"            continue;" + 
-    		"        }" + 
-    		"        if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) return parent;" + 
-    		"    }" + 
-    		"" + 
-    		"    return rootElement;" + 
-    		"}" +
+    private static final String JS_SCROLL_PARENT = "function getScrollParent(element, includeHidden, browserName) {" +
+			"    var rootElement = browserName === \"safari\" ? document.body: document.documentElement;" +
+			"    var style = getComputedStyle(element);" +
+			"    var excludeStaticParent = style.position === \"absolute\";" +
+			"    var overflowRegex = includeHidden ? /(auto|scroll|hidden)/ : /(auto|scroll)/;" +
+			"" +
+			"    if (style.position === \"fixed\") return null;" +
+			"    for (var parent = element; (parent = getParentNode(parent));) {" +
+			"        style = getComputedStyle(parent);" +
+			"        if (excludeStaticParent && style.position === \"static\") {" +
+			"            continue;" +
+			"        }" +
+			"        if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) return parent;" +
+			"    }" +
+			"" +
+			"    return null;" +
+			"}" +
+			"" +
+			"function getParentNode(node) {" +
+			// le parent est le document
+			"    if (node.parentNode.nodeType === Node.DOCUMENT_NODE) {" +
+			"        return null;" +
+			"    " +
+			// cas standard
+			"    } else if (node.parentNode.nodeType === Node.ELEMENT_NODE) {" +
+			"        return node.parentNode;" +
+			"        " +
+			// cas d'un shadow DOM / documentFragment
+			"    } else if (node.parentNode.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {" +
+			"        return node.parentNode.host;" +
+			"    }" +
+			"}" +
     		"return getScrollParent(arguments[0], false, arguments[1]);";
     
 
     /*
 	an other methode for finding scolling parent, that computes full xpath and then search a matching parent
-    this method will work in case of shadowDom / document fragments / slots
+    this method may be very slow for big DOM
 	@param element			the element for which we want to get a scrollable parent
 	@param includeHidden	whether to include hidden scrollable parents in search
 	@param browserName		name of the browser
@@ -1058,9 +1080,9 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 				Long topHeaderSize = (Long) ((JavascriptExecutor) driver).executeScript(JS_GET_TOP_HEADER);
 
 				// try a second method (the first one is quicker but does not work when element is inside a document fragment, slot or shadow DOM
-				if ((parentScrollableElement == null || "html".equalsIgnoreCase(parentScrollableElement.getTagName())) && !(driver instanceof InternetExplorerDriver)) {
-					parentScrollableElement = (WebElement) ((JavascriptExecutor) driver).executeScript(JS_SCROLL_PARENT2, element, (driver instanceof SafariDriver) ? SAFARI_BROWSER: OTHER_BROWSER);
-				}
+//				if ((parentScrollableElement == null || "html".equalsIgnoreCase(parentScrollableElement.getTagName())) && !(driver instanceof InternetExplorerDriver)) {
+//					parentScrollableElement = (WebElement) ((JavascriptExecutor) driver).executeScript(JS_SCROLL_PARENT2, element, (driver instanceof SafariDriver) ? SAFARI_BROWSER: OTHER_BROWSER);
+//				}
 				
 				if (parentScrollableElement != null) {
 					scrollParent(element, yOffset, parentScrollableElement, topHeaderSize);
