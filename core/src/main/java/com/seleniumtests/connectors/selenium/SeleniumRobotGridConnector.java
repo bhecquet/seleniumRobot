@@ -79,7 +79,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	private static final String ACTION_FIELD = "action";
 	public static final String NODE_TASK_SERVLET = "/extra/NodeTaskServlet";
 	public static final String FILE_SERVLET = "/extra/FileServlet";
-	public static final String GUI_SERVLET = "/grid/admin/GuiServlet"; 
+	public static final String GUI_SERVLET = "/grid/admin/GuiServlet";
 	
 	private String nodeServletUrl;
 	private URL hubServletUrl;
@@ -693,6 +693,10 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			deleteExistingVideo(outputFile);
 				
 			HttpResponse<File> videoResponse = Unirest.get(String.format("%s%s", nodeServletUrl, NODE_TASK_SERVLET))
+					.downloadMonitor((b, fileName, bytesWritten, totalBytes) -> {
+						logger.info(String.format("File %s: %d/%d", fileName, bytesWritten, totalBytes));
+	                })
+					
 				.queryString(ACTION_FIELD, "stopVideoCapture")
 				.queryString(SESSION_FIELD, sessionId)
 				.asFile(outputFile);
