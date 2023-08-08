@@ -200,7 +200,7 @@
 		</dependency>
 		<dependency>
 		    <groupId>org.seleniumhq.selenium</groupId>
-		    <artifactId>htmlunit-driver</artifactId>
+		    <artifactId>htmlunit3-driver</artifactId>
 		    <version>${htmlunitdriver.version}</version>
 		    <exclusions>
 		    	<exclusion>
@@ -483,7 +483,7 @@
 	              </dependency>
 				</dependencies>
 		        <configuration>
-		        	<skip>true</skip>
+		        	<skip>false</skip>
         			<ignoredDifferencesFile>${project.build.directory}/classes/clirr-differences.xml</ignoredDifferencesFile>
         			<includes>
         				<include>com/seleniumtests/connectors/db/**</include>
