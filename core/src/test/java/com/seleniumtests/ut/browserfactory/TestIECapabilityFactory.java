@@ -120,8 +120,8 @@ public class TestIECapabilityFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertTrue(capa.is("attachExistingBrowser"));
-
+		Assert.assertTrue((Boolean) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get("ie.attachExistingBrowser"));
+		Assert.assertTrue((Boolean) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get("ie.ignoreprocessmatch"));
 	}
 	
 	@Test(groups={"ut"})
@@ -134,7 +134,8 @@ public class TestIECapabilityFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertTrue(capa.is("attachExistingBrowser"));
+		Assert.assertTrue((Boolean) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get("ie.attachExistingBrowser"));
+		Assert.assertTrue((Boolean) ((Map<String, Object>)capa.getCapability(IECapabilitiesFactory.SE_IE_OPTIONS)).get("ie.ignoreprocessmatch"));
 		
 	}
 

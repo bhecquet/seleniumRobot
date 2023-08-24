@@ -108,8 +108,9 @@ public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
         if (webDriverConfig.getAttachExistingDriverPort() != null) {
         	
         	// when attaching to an existing Internet Explorer, give the option to driver which will then not create a new Internet Explorer
-	        options.setCapability("ie.attachExistingBrowser", true);
 			((Map<String, Object>) options.getCapability(SE_IE_OPTIONS)).put("ie.attachExistingBrowser", true);
+			((Map<String, Object>) options.getCapability(SE_IE_OPTIONS)).put("ie.ignoreprocessmatch", true); // add this option (https://github.com/SeleniumHQ/selenium/pull/12246) because
+																											 // without it, driver searches a process ID of -1
         }
 	}
 
