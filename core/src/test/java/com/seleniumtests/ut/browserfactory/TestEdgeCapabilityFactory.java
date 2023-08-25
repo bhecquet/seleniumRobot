@@ -57,6 +57,8 @@ import com.seleniumtests.util.osutility.OSUtilityFactory;
 @PrepareForTest({OSUtility.class, OSUtilityFactory.class, EdgeCapabilitiesFactory.class})
 public class TestEdgeCapabilityFactory extends MockitoTest {
 	
+	public static final String VERSION = "116.0";
+	public static final String BETA_VERSION = "117.0";
 	Map<BrowserType, List<BrowserInfo>> browserInfos;
 
 	@Mock
@@ -90,14 +92,14 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, "109.0", "", false, false), 
-				new BrowserInfo(BrowserType.EDGE, "110.0", "", false, true)));
+		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, VERSION, "", false, false),
+				new BrowserInfo(BrowserType.EDGE, BETA_VERSION, "", false, true)));
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
 		
 		EdgeCapabilitiesFactory capaFactory = new EdgeCapabilitiesFactory(config);
 		capaFactory.createCapabilities();
 		Assert.assertFalse(capaFactory.getSelectedBrowserInfo().getBeta());
-		Assert.assertEquals(capaFactory.getSelectedBrowserInfo().getVersion(), "109.0");
+		Assert.assertEquals(capaFactory.getSelectedBrowserInfo().getVersion(), VERSION);
 	}
 	
 	/**
@@ -108,7 +110,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, "110.0", "", false, true)));
+		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, BETA_VERSION, "", false, true)));
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
 
 		EdgeCapabilitiesFactory capaFactory = new EdgeCapabilitiesFactory(config);
@@ -123,15 +125,15 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, "109.0", "", false, false), 
-				new BrowserInfo(BrowserType.EDGE, "110.0", "", false, true)));
+		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, VERSION, "", false, false),
+				new BrowserInfo(BrowserType.EDGE, BETA_VERSION, "", false, true)));
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(true)).thenReturn(browserInfos);
 		when(config.getBetaBrowser()).thenReturn(true);
 
 		EdgeCapabilitiesFactory capaFactory = new EdgeCapabilitiesFactory(config);
 		capaFactory.createCapabilities();
 		Assert.assertTrue(capaFactory.getSelectedBrowserInfo().getBeta());
-		Assert.assertEquals(capaFactory.getSelectedBrowserInfo().getVersion(), "110.0");
+		Assert.assertEquals(capaFactory.getSelectedBrowserInfo().getVersion(), BETA_VERSION);
 	}
 
 	/**
@@ -142,7 +144,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, "109.0", "", false, false)));
+		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, VERSION, "", false, false)));
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(true)).thenReturn(browserInfos);
 		when(config.getBetaBrowser()).thenReturn(true);
 
