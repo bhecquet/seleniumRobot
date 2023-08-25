@@ -308,7 +308,9 @@ public class TestOsUtility extends GenericTest {
 			if (pi == null) {
 				throw new ConfigurationException("Cannot find process 'calc', 'win32calc', 'CalculatorApp' or 'calculator'");
 			}
+			logger.info("PID to kill " + pi.getPid());
 			osUtil.killProcess(pi.getPid(), true);
+			WaitHelper.waitForSeconds(1);
 			Assert.assertNull(osUtil.getRunningProcess("calc"));
 			Assert.assertNull(osUtil.getRunningProcess("calculator"));
 			Assert.assertNull(osUtil.getRunningProcess("CalculatorApp"));

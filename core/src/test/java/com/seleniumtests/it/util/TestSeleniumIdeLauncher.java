@@ -99,18 +99,24 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			
 			// check that detailed result contains the "hello" written in test
 			String detailedReportContent1 = ReporterTest.readTestMethodResultFile("mainPage");
-			Assert.assertTrue(detailedReportContent1.contains("Start method mainPage"));
-			
-			// check we have automatic steps corresponding to the single test method "jcommander"
-			Assert.assertFalse(detailedReportContent1.contains("</button> new window link - ")); // manual step is not there
-			Assert.assertTrue(detailedReportContent1.contains("><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> mainPage  - ")); // auto step is there
-			Assert.assertTrue(detailedReportContent1.contains("<i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> openPage with args: (null, ) - "));
-			Assert.assertTrue(detailedReportContent1.contains("</span> click on HtmlElement , by={By.id: image}")); // action
-			Assert.assertTrue(detailedReportContent1.contains("</span> frame")); // auto sub-step
-			Assert.assertTrue(detailedReportContent1.contains("</span> click on HtmlElement , by={By.id: buttonIFrame}"));
-			
-			// test that user variable (set via command line in our test) is added to variabled available to script
-			Assert.assertTrue(detailedReportContent1.contains("Hello Selenium IDE"));
+			try {
+				Assert.assertTrue(detailedReportContent1.contains("Start method mainPage"));
+				
+				// check we have automatic steps corresponding to the single test method "jcommander"
+				Assert.assertFalse(detailedReportContent1.contains("</button> new window link - ")); // manual step is not there
+				Assert.assertTrue(detailedReportContent1.contains("><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> mainPage  - ")); // auto step is there
+				Assert.assertTrue(detailedReportContent1.contains("<i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> openPage with args: (null, ) - "));
+				Assert.assertTrue(detailedReportContent1.contains("</span> click on HtmlElement , by={By.id: image}")); // action
+				Assert.assertTrue(detailedReportContent1.contains("</span> frame")); // auto sub-step
+				Assert.assertTrue(detailedReportContent1.contains("</span> click on HtmlElement , by={By.id: buttonIFrame}"));
+				
+				// test that user variable (set via command line in our test) is added to variabled available to script
+				Assert.assertTrue(detailedReportContent1.contains("Hello Selenium IDE"));
+			} catch (AssertionError e) {
+				logger.error("------------------ Detailed report --------------");
+				logger.error(detailedReportContent1);
+				throw e;
+			}
 			
 			
 			

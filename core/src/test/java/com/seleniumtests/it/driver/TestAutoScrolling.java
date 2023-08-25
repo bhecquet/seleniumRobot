@@ -79,7 +79,9 @@ public class TestAutoScrolling extends GenericMultiBrowserTest {
 	 */
 	
 	public void testScrollToDivBottomWithCompositeAction() {
-		new Actions(driver).click(DriverScrollingTestPage.buttonScrollBottom).perform();
+		// force scrolling by an amout of 100 pixels as by default, 'click' places the button bottom at the bottom of the viewport
+		// there is no way to do the optimal scrolling, as all operations are done at driver level
+		new Actions(driver).scrollToElement(DriverScrollingTestPage.buttonScrollBottom).scrollByAmount(0, 100).click(DriverScrollingTestPage.buttonScrollBottom).perform();
 		Assert.assertEquals(DriverScrollingTestPage.textElement.getValue(), "scroll bottom");
 	}
 	

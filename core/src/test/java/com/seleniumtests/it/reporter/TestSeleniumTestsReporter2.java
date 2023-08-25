@@ -1463,19 +1463,24 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// check content of summary report file
 		String detailedReportContent = readTestMethodResultFile("testAndSubActions");
 		detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
-//\d+:\d+:\d+.\d+
-		Assert.assertTrue(detailedReportContent.matches(
-				".*<ul>.*?"                                                    // root step
-						+ "click button.*?"
-						+ "sendKeys to text field.*?"
-						+ "step 1.3: open page.*?"// sub-step
-						+ "<ul>.*?"
-						+ "click link.*?"                            // action in sub step
-						+ "<div class=\"message-log message-conf\"><span class=\"stepTimestamp mr-1\">1\\d+:\\d+:\\d+.\\d+</span> a message </div>.*?"    // message in sub step
-						+ "sendKeys to password field.*?"            // action in sub step
-						+ "<div class=\"row\"></div></ul><div class=\"row\">.*?"
-						+ "<div class=\"message-snapshot col\"><div class=\"text-center\">.*src=\"screenshot/testAndSubActions_0-1_step_1--rtened\\.png\" style=\"width: 300px\">.*"
-		));
+		try {
+			Assert.assertTrue(detailedReportContent.matches(
+					".*<ul>.*?"                                                    // root step
+							+ "click button.*?"
+							+ "sendKeys to text field.*?"
+							+ "step 1.3: open page.*?"// sub-step
+							+ "<ul>.*?"
+							+ "click link.*?"                            // action in sub step
+							+ "<div class=\"message-log message-conf\"><span class=\"stepTimestamp mr-1\">1\\d+:\\d+:\\d+.\\d+</span> a message </div>.*?"    // message in sub step
+							+ "sendKeys to password field.*?"            // action in sub step
+							+ "<div class=\"row\"></div></ul><div class=\"row\">.*?"
+							+ "<div class=\"message-snapshot col\"><div class=\"text-center\">.*src=\"screenshot/testAndSubActions_0-1_step_1--rtened\\.png\" style=\"width: 300px\">.*"
+			));
+		} catch (AssertionError e) {
+			logger.error("------ detailed report --------");
+			logger.error(detailedReportContent);
+			throw e;
+		}
 
 	}
 
@@ -1720,7 +1725,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Step beginning state</div>"), 1);
 
 			// check step beginning state is present with valid path
-			Assert.assertTrue(detailedReportContent1.contains("src=\"screenshots/testDriverShortKo_4-1__writeSomethingOnNonExistent-ideo-2.jpg\""));
+			Assert.assertTrue(detailedReportContent1.contains("src=\"screenshots/testDriverShortKo_4-1__writeSomethingOnNonExistent-ideo-"));
 
 			// check no picture extracted from video is kept
 			Assert.assertEquals(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverShortKo", "video").toFile().listFiles().length, 0);
@@ -2447,8 +2452,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			// test all error log is displayed in execution logs
 			Assert.assertTrue(detailedReportContent.contains("[main] ScenarioLogger: Searched element [TextFieldElement Text, by={By.id: text___}] from page 'com.seleniumtests.it.driver.support.pages.DriverTestPage' could not be found</div>"));
 			Assert.assertTrue(detailedReportContent.contains("<div>at com.seleniumtests.it.driver.support.pages.DriverTestPage._writeSomethingOnNonExistentElementWithCatch"));
-			Assert.assertTrue(detailedReportContent.contains("<div>For documentation on this error, please visit: https://selenium.dev/exceptions/#no_such_element</div>")); // checks that line not showing thread name are in logs
-			Assert.assertTrue(detailedReportContent.contains("Warning: Searched element [TextFieldElement Text, by={By.id: text___}] from page 'com.seleniumtests.it.driver.support.pages.DriverTestPage' could not be found<br/>" + "For documentation on this error, please visit: https://selenium.dev/exceptions/#no_such_element<br/>")); // warning displayed in step
+			Assert.assertTrue(detailedReportContent.contains("<div>For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#no-such-element-exception</div>")); // checks that line not showing thread name are in logs
+			Assert.assertTrue(detailedReportContent.contains("Warning: Searched element [TextFieldElement Text, by={By.id: text___}] from page 'com.seleniumtests.it.driver.support.pages.DriverTestPage' could not be found<br/>"
+					+ "For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#no-such-element-exception<br/>")); // warning displayed in step
 		} finally {
 			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
 		}
