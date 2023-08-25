@@ -67,12 +67,12 @@ public class TestDesktopDrivers extends GenericDriverTest {
 	@Test(groups={"it"})
 	public void testChromeBetaStartup(final ITestContext testNGCtx, final XmlTest xmlTest) {
 
-		// check Edge is available and Edge beta is installed
+		// check Chrome is available and Edge beta is installed
 		OSUtility.refreshBrowserList(true);
 		Assert.assertTrue(OSUtility.getInstalledBrowsersWithVersion(true).get(BrowserType.CHROME).size() > 1);
 		Assert.assertTrue(OSUtility.getInstalledBrowsersWithVersion(true).get(BrowserType.CHROME).get(1).getPath().contains("Beta"));
 
-		// initial list of edge processes in case some are running
+		// initial list of chrome processes in case some are running
 		List<String> executingEdge = OSUtilityFactory.getInstance().getRunningProcesses("chrome")
 					.stream()
 					.map(ProcessInfo::getPid)

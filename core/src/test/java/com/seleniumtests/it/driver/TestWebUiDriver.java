@@ -513,6 +513,10 @@ public class TestWebUiDriver extends ReporterTest {
 		}
 		exposeWebServer();
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
+		SeleniumTestsContextManager.getThreadContext().setBrowser("iexplore");
+		SeleniumTestsContextManager.getThreadContext().setEdgeUserProfilePath("default");
+		SeleniumTestsContextManager.getThreadContext().setEdgeIeMode(true);
+		SeleniumTestsContextManager.getThreadContext().setInitialUrl(serverUrl);
 
 		// creates the first driver so that an internet explorer process is created the right way
 		new BrowserLauncher(BrowserType.INTERNET_EXPLORER, 0, null, 0, serverUrl).run();
@@ -537,6 +541,10 @@ public class TestWebUiDriver extends ReporterTest {
 
 		exposeWebServer();
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
+		SeleniumTestsContextManager.getThreadContext().setBrowser("iexplore");
+		SeleniumTestsContextManager.getThreadContext().setEdgeUserProfilePath("default");
+		SeleniumTestsContextManager.getThreadContext().setEdgeIeMode(true);
+		SeleniumTestsContextManager.getThreadContext().setInitialUrl(serverUrl);
 		
 		logger.info("will start browser in 30 secs");
 		new BrowserLauncher(BrowserType.INTERNET_EXPLORER, 0, null, 30, serverUrl).run();

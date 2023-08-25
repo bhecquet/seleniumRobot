@@ -63,7 +63,7 @@ public class TestBrowserInfo extends GenericDriverTest {
 		browserInfo.getDriverFileName();
 		
 		Assert.assertTrue(browserInfo.isDriverFileSearched());
-		Assert.assertEquals(browserInfo.getDriverFileName(), "chromedriver_108.0_chrome-108-109");
+		Assert.assertEquals(browserInfo.getDriverFileName(), "chromedriver_116.0_chrome-116-117");
 		
 	}
 	
