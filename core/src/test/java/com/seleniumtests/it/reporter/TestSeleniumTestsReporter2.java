@@ -1471,7 +1471,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 							+ "step 1.3: open page.*?"// sub-step
 							+ "<ul>.*?"
 							+ "click link.*?"                            // action in sub step
-							+ "<div class=\"message-log message-conf\"><span class=\"stepTimestamp mr-1\">1\\d+:\\d+:\\d+.\\d+</span> a message </div>.*?"    // message in sub step
+							+ "<div class=\"message-log message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> a message </div>.*?"    // message in sub step
 							+ "sendKeys to password field.*?"            // action in sub step
 							+ "<div class=\"row\"></div></ul><div class=\"row\">.*?"
 							+ "<div class=\"message-snapshot col\"><div class=\"text-center\">.*src=\"screenshot/testAndSubActions_0-1_step_1--rtened\\.png\" style=\"width: 300px\">.*"
