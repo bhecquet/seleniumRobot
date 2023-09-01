@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import com.seleniumtests.core.TestStepManager;
+import com.seleniumtests.reporter.logger.TestStep;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
@@ -154,14 +156,14 @@ public class TestPageObject2 extends MockitoTest {
 
 	@Test(groups = { "ut" })
 	public void testCapturePageSnapshotNoArguments() throws IOException {
-
+		
+		TestStepManager.setCurrentRootTestStep(new TestStep("stub"));
 		page.setScreenshotUtil(screenshotUtil);
-		String htmlFilePath = page.getHtmlFilePath();
 		page.capturePageSnapshot();
 
 		// check capture has been done on the second call (a first capture is done at
 		// PageObject init)
-		Assert.assertFalse(page.getHtmlFilePath().equals(htmlFilePath));
+		Assert.assertEquals(TestStepManager.getCurrentOrPreviousStep().getSnapshots().size(), 1);
 	}
 
 	/**
@@ -171,14 +173,14 @@ public class TestPageObject2 extends MockitoTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testCapturePageSnapshotWithCheck() throws IOException {
-
+		
+		TestStepManager.setCurrentRootTestStep(new TestStep("stub"));
 		page.setScreenshotUtil(screenshotUtil);
-		String htmlFilePath = page.getHtmlFilePath();
 		page.capturePageSnapshot("img", SnapshotCheckType.TRUE);
 
 		// check capture has been done on the second call (a first capture is done at
 		// PageObject init)
-		Assert.assertFalse(page.getHtmlFilePath().equals(htmlFilePath));
+		Assert.assertEquals(TestStepManager.getCurrentOrPreviousStep().getSnapshots().size(), 1);
 		
 		// check scroll delay is not applied
 		verify(screenshotUtil).capture(SnapshotTarget.PAGE, ScreenShot.class, 0);
@@ -229,13 +231,13 @@ public class TestPageObject2 extends MockitoTest {
 	@Test(groups = { "ut" })
 	public void testCaptureViewportSnapshotNoArguments() throws IOException {
 		
+		TestStepManager.setCurrentRootTestStep(new TestStep("stub"));
 		page.setScreenshotUtil(screenshotUtil);
-		String htmlFilePath = page.getHtmlFilePath();
 		page.captureViewportSnapshot();
 		
 		// check capture has been done on the second call (a first capture is done at
 		// PageObject init)
-		Assert.assertFalse(page.getHtmlFilePath().equals(htmlFilePath));
+		Assert.assertEquals(TestStepManager.getCurrentOrPreviousStep().getSnapshots().size(), 1);
 	}
 	
 	/**
@@ -246,13 +248,13 @@ public class TestPageObject2 extends MockitoTest {
 	@Test(groups = { "ut" })
 	public void testCaptureViewportSnapshotWithCheck() throws IOException {
 		
+		TestStepManager.setCurrentRootTestStep(new TestStep("stub"));
 		page.setScreenshotUtil(screenshotUtil);
-		String htmlFilePath = page.getHtmlFilePath();
 		page.captureViewportSnapshot("img", SnapshotCheckType.TRUE);
 		
 		// check capture has been done on the second call (a first capture is done at
 		// PageObject init)
-		Assert.assertFalse(page.getHtmlFilePath().equals(htmlFilePath));
+		Assert.assertEquals(TestStepManager.getCurrentOrPreviousStep().getSnapshots().size(), 1);
 		
 		// check scroll delay is not applied
 		verify(screenshotUtil).capture(SnapshotTarget.VIEWPORT, ScreenShot.class);
@@ -275,13 +277,13 @@ public class TestPageObject2 extends MockitoTest {
 	@Test(groups = { "ut" })
 	public void testCaptureDesktopSnapshotNoArguments() throws IOException {
 		
+		TestStepManager.setCurrentRootTestStep(new TestStep("stub"));
 		page.setScreenshotUtil(screenshotUtil);
-		String imageFilePath = page.getImageFilePath();
 		page.captureDesktopSnapshot();
 		
 		// check capture has been done on the second call (a first capture is done at
 		// PageObject init)
-		Assert.assertFalse(page.getImageFilePath().equals(imageFilePath));
+		Assert.assertEquals(TestStepManager.getCurrentOrPreviousStep().getSnapshots().size(), 1);
 	}
 	
 	/**
@@ -292,13 +294,14 @@ public class TestPageObject2 extends MockitoTest {
 	@Test(groups = { "ut" })
 	public void testCaptureDesktopSnapshotWithCheck() throws IOException {
 		
+		TestStepManager.setCurrentRootTestStep(new TestStep("stub"));
+		TestStepManager.setCurrentRootTestStep(new TestStep("stub"));
 		page.setScreenshotUtil(screenshotUtil);
-		String imageFilePath = page.getImageFilePath();
 		page.captureDesktopSnapshot("img", SnapshotCheckType.TRUE);
 		
 		// check capture has been done on the second call (a first capture is done at
 		// PageObject init)
-		Assert.assertFalse(page.getImageFilePath().equals(imageFilePath));
+		Assert.assertEquals(TestStepManager.getCurrentOrPreviousStep().getSnapshots().size(), 1);
 		
 		// check scroll delay is not applied
 		verify(screenshotUtil).capture(SnapshotTarget.MAIN_SCREEN, ScreenShot.class);
@@ -313,6 +316,7 @@ public class TestPageObject2 extends MockitoTest {
 	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
 	public void testCaptureDesktopSnapshotWithCheckNoName() throws IOException {
 		
+		TestStepManager.setCurrentRootTestStep(new TestStep("stub"));
 		page.setScreenshotUtil(screenshotUtil);
 		page.captureDesktopSnapshot("", SnapshotCheckType.TRUE);
 		
@@ -325,14 +329,13 @@ public class TestPageObject2 extends MockitoTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testCaptureElementSnapshotWithCheck() throws IOException {
-
+		TestStepManager.setCurrentRootTestStep(new TestStep("stub"));
 		page.setScreenshotUtil(screenshotUtil);
-		String htmlFilePath = page.getHtmlFilePath();
 		page.captureElementSnapshot("img", new HtmlElement("", By.id("el")), SnapshotCheckType.TRUE);
 
 		// check capture has been done on the second call (a first capture is done at
 		// PageObject init)
-		Assert.assertFalse(page.getHtmlFilePath().equals(htmlFilePath));
+		Assert.assertEquals(TestStepManager.getCurrentOrPreviousStep().getSnapshots().size(), 1);
 		
 		// check scroll delay is 0 by default
 		verify(screenshotUtil).capture(any(SnapshotTarget.class), eq(ScreenShot.class), eq(0));
@@ -340,7 +343,7 @@ public class TestPageObject2 extends MockitoTest {
 	
 	@Test(groups = { "ut" })
 	public void testCaptureElementSnapshotWithCheckAndDelay() throws IOException {
-	
+		
 		SeleniumTestsContextManager.getThreadContext().setSnapshotScrollDelay(100);
 		
 		page.setScreenshotUtil(screenshotUtil);

@@ -33,39 +33,29 @@ import net.lightbody.bmp.core.har.Har;
 public class HarCapture extends TestAction {
 
 	private Har har;
-	private File harFile;
+	private FileContent harFile;
 	private static final String HAR_FILE_NAME = "networkCapture.har";
 	
-	public HarCapture(Har har, String name, File harFile) {
+	public HarCapture(Har har, String name, FileContent harFile) {
 
 		super(name, false, new ArrayList<>());
 		this.har = har;
 		this.harFile = harFile;
-		
 	}
+	
 	public HarCapture(Har har, String name) throws IOException {
 		super(name, false, new ArrayList<>());
 		this.har = har;
-		harFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), name + "-" + HAR_FILE_NAME).toFile();
+		harFile = new FileContent(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), name + "-" + HAR_FILE_NAME).toFile());
 		
-		har.writeTo(harFile);
+		har.writeTo(harFile.getFile());
 
-		logger.info("HAR capture file copied to " + harFile.getAbsolutePath());
+		logger.info("HAR capture file copied to " + harFile.getFile().getAbsolutePath());
 	}
 	
 	public String buildHarLog() {
 		return String.format("Network capture '%s' browser: <a href='%s-%s'>HAR file</a>", name, name, HAR_FILE_NAME);
     }
-	
-	public void relocate(String outputDirectory) throws IOException {
-		if (outputDirectory == null) {
-			return;
-		}
-		new File(outputDirectory).mkdirs();
-		Path newPath = Paths.get(outputDirectory, harFile.getName());
-		Files.move(Paths.get(harFile.toString()), newPath);
-		harFile = newPath.toFile();
-	}
 
 	@Override
 	public JSONObject toJson() {
@@ -73,7 +63,7 @@ public class HarCapture extends TestAction {
 		
 		actionJson.put("type", "networkCapture");
 		actionJson.put("name", name);
-		actionJson.put("file", String.format(FILE_PATTERN, harFile.getAbsolutePath().replace("\\", "/")));
+		actionJson.put("id", harFile.getId() == null ? JSONObject.NULL: harFile.getId());
 		
 		return actionJson;
 	}
@@ -83,10 +73,15 @@ public class HarCapture extends TestAction {
 	}
 	
 	public File getFile() {
+		return harFile.getFile();
+	}
+	
+	public FileContent getFileContent() {
 		return harFile;
 	}
 	
 	public HarCapture encode() {
 		return new HarCapture(har, name, harFile);
 	}
+
 }

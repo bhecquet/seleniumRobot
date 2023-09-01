@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import com.seleniumtests.reporter.logger.FileContent;
 import org.apache.logging.log4j.Logger;
 import org.testng.IReporter;
 import org.testng.ISuite;
@@ -433,7 +434,7 @@ public class ReporterControler implements IReporter {
 			} catch (IOException e) {
 				logger.error("Cannot move attachment " + e.getMessage());
 			}
-			usedFiles.addAll(testStep.getAllAttachments());
+			usedFiles.addAll(testStep.getAllAttachments().stream().map(FileContent::getFile).collect(Collectors.toList()));
 			
 		}
 		

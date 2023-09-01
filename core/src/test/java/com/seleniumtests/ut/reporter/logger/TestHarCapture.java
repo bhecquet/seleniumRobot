@@ -31,49 +31,7 @@ public class TestHarCapture extends GenericTest {
 		HarCapture capture = new HarCapture(har, "main");
 		Assert.assertEquals(capture.buildHarLog(), "Network capture 'main' browser: <a href='main-networkCapture.har'>HAR file</a>");
 	}
-	
 
-	@Test(groups={"ut"})
-	public void testRelocateHar() throws IOException {
-
-		try {
-			Har har = new Har(new HarLog());
-			har.getLog().addPage(new HarPage("title", "a title"));
-			HarCapture capture = new HarCapture(har, "main");
-			File initialFile = capture.getFile();
-
-			// relocate
-			capture.relocate(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved");
-			File movedFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved", "main-networkCapture.har").toFile();
-			
-			Assert.assertTrue(movedFile.exists());
-			Assert.assertFalse(initialFile.exists());
-			Assert.assertEquals(capture.getFile(), movedFile);
-		} finally {
-			FileUtils.deleteQuietly(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
-			FileUtils.deleteQuietly(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved"));
-		}
-	}
-	
-	/**
-	 * Test no error is raised is outputDirectory is null
-	 * @throws IOException
-	 */
-	@Test(groups={"ut"})
-	public void testRelocateHarNull() throws IOException {
-		
-		try {
-			Har har = new Har(new HarLog());
-			har.getLog().addPage(new HarPage("title", "a title"));
-			HarCapture capture = new HarCapture(har, "main");
-
-			// relocate
-			capture.relocate(null);
-			
-		} finally {
-			FileUtils.deleteQuietly(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
-		}
-	}
 	
 	@Test(groups={"ut"})
 	public void testToJson() throws IOException {
@@ -85,6 +43,20 @@ public class TestHarCapture extends GenericTest {
 		Assert.assertEquals(json.getString("type"), "networkCapture");
 		Assert.assertEquals(json.getString("name"), "main");
 		File harFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "main-networkCapture.har").toFile();
-		Assert.assertEquals(json.getString("file"), "<file:" + harFile.getAbsolutePath().replace("\\", "/") + ">");
+		Assert.assertTrue(json.isNull("id"));
+	}
+	
+	@Test(groups={"ut"})
+	public void testToJsonWithId() throws IOException {
+		Har har = new Har(new HarLog());
+		har.getLog().addPage(new HarPage("title", "a title"));
+		HarCapture capture = new HarCapture(har, "main");
+		capture.getFileContent().setId(2);
+		
+		JSONObject json = capture.toJson();
+		Assert.assertEquals(json.getString("type"), "networkCapture");
+		Assert.assertEquals(json.getString("name"), "main");
+		File harFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "main-networkCapture.har").toFile();
+		Assert.assertEquals(json.getInt("id"), 2);
 	}
 }

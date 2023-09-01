@@ -43,7 +43,6 @@ public class TestAction {
 	
 
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(TestAction.class);
-	protected static final String FILE_PATTERN = "<file:%s>";
 	
 	protected String name;
 	protected TestAction parent = null;

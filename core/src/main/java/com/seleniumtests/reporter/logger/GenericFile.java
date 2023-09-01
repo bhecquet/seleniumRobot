@@ -32,12 +32,17 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 
 public class GenericFile extends TestAction {
 
-	private File file;
+	private FileContent file;
 	private String relativeFilePath; // path relative to the root of test output directory
 	
 
 	public GenericFile(File file, String description) throws IOException {
 		this(file, description, true);
+	}
+	public GenericFile(FileContent file, String description, String relativeFilePath)  {
+		super(description, false, new ArrayList<>());
+		this.file = file;
+		this.relativeFilePath = relativeFilePath;
 	}
 	
 	/**
@@ -69,14 +74,14 @@ public class GenericFile extends TestAction {
 			
 			try {
 				Files.move(file.toPath(), loggedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-				this.file = loggedFile;
+				this.file = new FileContent(loggedFile);
 			} catch (Exception e) {
 				logger.error(String.format("Failed to move file %s to %s: %s", file.getAbsolutePath(), loggedFile.getAbsolutePath(), e.getMessage()));
-				this.file = file;
+				this.file = new FileContent(file);
 			}
 		
 		} else {
-			this.file = file;
+			this.file = new FileContent(file);
 		}
 
 	}
@@ -88,27 +93,7 @@ public class GenericFile extends TestAction {
 	public String buildLog() {		
 		return String.format("%s: <a href='%s'>file</a>", name, relativeFilePath);
     }
-	
 
-	/**
-	 * Change path of the file
-	 * @param outputDirectory
-	 * @throws IOException
-	 */
-	public void relocate(String outputDirectory) throws IOException {
-		if (outputDirectory == null) {
-			return;
-		}
-		new File(outputDirectory).mkdirs();
-		Path newPath = Paths.get(outputDirectory, file.getName());
-		
-		try {
-			Files.move(file.toPath(), newPath, StandardCopyOption.REPLACE_EXISTING);
-			file = newPath.toFile();
-		} catch (Exception e) {
-			logger.error(String.format("Failed to relocate file %s to %s: %s", file.getAbsolutePath(), newPath.toString(), e.getMessage()));
-		}
-	}
 	
 
 	@Override
@@ -117,26 +102,20 @@ public class GenericFile extends TestAction {
 		
 		actionJson.put("type", "file");
 		actionJson.put("name", name);
-		actionJson.put("file", String.format(FILE_PATTERN, file.getAbsolutePath().replace("\\", "/")));
+		actionJson.put("id", file.getId() == null ? JSONObject.NULL: file.getId());
 		
 		return actionJson;
 	}
 	
 	@Override
 	public GenericFile encode(String format) {
-		try {
-			GenericFile genericFile = new GenericFile(file, encodeString(name, format), false);
-			genericFile.relativeFilePath = this.relativeFilePath; // restore the path, as this method is called at the end of test suite, where thread context output directory point to the 
-																	// root output directory. RelativePath would be lost
-																	// we do not move file, so relativePath remains the same
-			return genericFile;
-		} catch (IOException e) {
-			logger.error("Cannot encode file: " + e.getMessage());
-			return this;
-		}
+		return new GenericFile(file, encodeString(name, format), relativeFilePath);
 	}
 
 	public File getFile() {
+		return file.getFile();
+	}
+	public FileContent getFileContent() {
 		return file;
 	}
 

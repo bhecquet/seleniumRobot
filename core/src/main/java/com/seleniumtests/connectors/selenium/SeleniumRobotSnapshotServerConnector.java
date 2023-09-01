@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.seleniumtests.driver.screenshots.SnapshotCheckType;
+import com.seleniumtests.reporter.logger.FileContent;
 import com.seleniumtests.reporter.logger.TestStep;
 import org.apache.commons.lang.NotImplementedException;
 import org.openqa.selenium.Rectangle;
@@ -473,6 +475,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		try {
 			JSONObject fileJson = getJSonResponse(buildPostRequest(url + FILE_API_URL)
 					.field("file", file)
+					.field("stepResult", String.valueOf(stepResultId))
 			);
 			return fileJson.getInt("id");
 
@@ -495,23 +498,9 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			throw new ConfigurationException("A test step must be provided");
 		}
 
-		String jsonStep = testStep.toJson().toString();
 
 		Integer stepResultId = recordStepResult(!testStep.getFailed(), "", testStep.getDuration(), sessionId, testCaseInSessionId, testStepId);
-
-		// upload all files to server
-		for (File file: testStep.getAllAttachments(false)) {
-			try {
-				Integer fileId = uploadFile(file, stepResultId);
-
-				// replace the path, referenced with '<file:some_path>' by the id '<file:file_id>'
-				jsonStep = jsonStep.replace(file.getAbsolutePath().replace("\\", "/"), Integer.toString(fileId));
-			} catch (SeleniumRobotServerException | ConfigurationException e) {
-				logger.error(e);
-			}
-		}
-
-		updateStepResult(jsonStep, stepResultId);
+		
 		return stepResultId;
 	}
 	

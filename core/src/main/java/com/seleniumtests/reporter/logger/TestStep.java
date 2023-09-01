@@ -20,10 +20,12 @@ package com.seleniumtests.reporter.logger;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -46,7 +48,7 @@ import com.seleniumtests.util.ExceptionUtility;
  *    +--- sub-action2
  * +--- action2
  * 
- * Each TestStep is then logged in {@link TestLogging TestLogging class} with ScenarioLogger.logTestStep() method
+ * Each TestStep is then logged
  * 
  * @author behe
  *
@@ -72,8 +74,16 @@ public class TestStep extends TestAction {
 		WARNING
 	}
 	
+	
 	/**
-	 * 
+	 * Step for test
+	 * @param name
+	 */
+	public TestStep(String name) {
+		this(name, null, new ArrayList<>(), true);
+	}
+	/**
+	 *
 	 * @param name			action name
 	 * @param testResult	associated TestNG result
 	 * @param pwdToReplace	list of string to replace when returning actions so that passwords are masked
@@ -334,39 +344,47 @@ public class TestStep extends TestAction {
 	 * Returns the list of files referenced by this test step and sub-steps
 	 * @return
 	 */
-	public List<File> getAllAttachments() {
+	public List<FileContent> getAllAttachments() {
 		return getAllAttachments(false);
 	}
-	public List<File> getAllAttachments(boolean onlyPictureOfSnapshots) {
-		List<File> usedFiles = new ArrayList<>();
+
+	/**
+	 * Returns the list of files referenced by this test step and sub-steps
+	 * @param onlyPictureOfSnapshots		If true, the HTML file linked to snapshot won't be returned
+	 * @param requestedSnapshotCheckTypes   If not empty, only returns Snapshot files whose SnapshotCheckType correspond to this value
+	 * @return
+	 */
+	public List<FileContent> getAllAttachments(boolean onlyPictureOfSnapshots, SnapshotCheckType ... requestedSnapshotCheckTypes) {
+		List<FileContent> usedFiles = new ArrayList<>();
 		for (Snapshot snapshot: snapshots) {
-			if (snapshot == null || snapshot.getScreenshot() == null ) {
+			if (snapshot == null || snapshot.getScreenshot() == null ||
+					(requestedSnapshotCheckTypes.length != 0 && !Arrays.asList(requestedSnapshotCheckTypes).contains(snapshot.getCheckSnapshot()))) {
 				continue;
 			}
 			
 			if (snapshot.getScreenshot().getFullHtmlPath() != null && !onlyPictureOfSnapshots) {
 				try {
-					usedFiles.add(new File(snapshot.getScreenshot().getFullHtmlPath()).getCanonicalFile());
+					usedFiles.add(new FileContent(new File(snapshot.getScreenshot().getFullHtmlPath()).getCanonicalFile()));
 				} catch (IOException e) {
 					// error while getting HtmlPath
 				}
 			}
 			if (snapshot.getScreenshot().getFullImagePath() != null) {
 				try {
-					usedFiles.add(new File(snapshot.getScreenshot().getFullImagePath()).getCanonicalFile());
+					usedFiles.add(new FileContent(new File(snapshot.getScreenshot().getFullImagePath()).getCanonicalFile()));
 				} catch (IOException e) {
 					// error getting image path
 				}
 			}
 		}
 
-		usedFiles.addAll(getFiles().stream().map(GenericFile::getFile).collect(Collectors.toList()));
-		usedFiles.addAll(getHarCaptures().stream().map(HarCapture::getFile).collect(Collectors.toList()));
+		usedFiles.addAll(getFiles().stream().map(GenericFile::getFileContent).collect(Collectors.toList()));
+		usedFiles.addAll(getHarCaptures().stream().map(HarCapture::getFileContent).collect(Collectors.toList()));
 		
 		// add attachments declared in sub-steps
 		for (TestAction subStep: stepActions.stream().filter(a -> a instanceof TestStep).collect(Collectors.toList())) {
-			usedFiles.addAll(((TestStep)subStep).getAllAttachments(onlyPictureOfSnapshots));
-			usedFiles.addAll(((TestStep)subStep).getFiles().stream().map(GenericFile::getFile).collect(Collectors.toList()));
+			usedFiles.addAll(((TestStep)subStep).getAllAttachments(onlyPictureOfSnapshots, requestedSnapshotCheckTypes));
+			usedFiles.addAll(((TestStep)subStep).getFiles().stream().map(GenericFile::getFileContent).collect(Collectors.toList()));
 		}
 
 		return usedFiles;
@@ -401,13 +419,13 @@ public class TestStep extends TestAction {
 	
 		for (HarCapture harCapture: harCaptures) {
 			if (harCapture.getFile().toString().contains(BEFORE_STEP_PREFIX)) {
-				harCapture.relocate(outputDirectory);
+				harCapture.getFileContent().relocate(outputDirectory);
 			}
 		}
 		
 		for (GenericFile genericFile: files) {
 			if (genericFile.getFile().toString().contains(BEFORE_STEP_PREFIX)) {
-				genericFile.relocate(outputDirectory);
+				genericFile.getFileContent().relocate(outputDirectory);
 			}
 		}
 	}

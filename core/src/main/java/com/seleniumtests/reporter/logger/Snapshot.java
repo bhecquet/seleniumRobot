@@ -62,8 +62,6 @@ public class Snapshot extends TestAction {
     /**
      * Log Screenshot method
      * Return: screenshot message with links
-     *
-     * @param  screenShot
      * 
      * @return String
      */
@@ -123,11 +121,11 @@ public class Snapshot extends TestAction {
     		newBaseName = StringUtility.replaceOddCharsFromFileName(userGivenName);
     	}
     	
-    	if (screenshot.getHtmlSourcePath() != null) {
+    	if (screenshot.getHtml() != null) {
     		renameHtmlSourceFile(newBaseName);
     						
     	}
-    	if (screenshot.getImagePath() != null) {
+    	if (screenshot.getImage() != null) {
     		renameImageFile(newBaseName);
     	}
     }
@@ -136,11 +134,12 @@ public class Snapshot extends TestAction {
 	public JSONObject toJson() {
     	JSONObject snapshotJson = super.toJson();
     	snapshotJson.put("snapshotCheckType", snapshotCheckType.getName());
-    	snapshotJson.put("image", String.format(FILE_PATTERN, screenshot.getFullImagePath() != null ? screenshot.getFullImagePath().replace("\\", "/"): null));
-    	snapshotJson.put("html", String.format(FILE_PATTERN, screenshot.getFullHtmlPath()!= null ? screenshot.getFullHtmlPath().replace("\\", "/"): null));
+    	snapshotJson.put("idImage", (screenshot.getImage() == null || screenshot.getImage().getId() == null) ? JSONObject.NULL: screenshot.getImage().getId());
+    	snapshotJson.put("idHtml", (screenshot.getHtml() == null || screenshot.getHtml().getId() == null) ? JSONObject.NULL: screenshot.getHtml().getId());;
     	snapshotJson.put("name", screenshot.getImageName());
     	snapshotJson.put("title", screenshot.getTitle());
     	snapshotJson.put("url", screenshot.getLocation());
+    	snapshotJson.put("displayInReport", displayInReport);
     	snapshotJson.put("type", "snapshot");
     	
     	return snapshotJson;
@@ -169,7 +168,7 @@ public class Snapshot extends TestAction {
 		String newName;
 		if (Boolean.TRUE.equals(SeleniumTestsContextManager.getThreadContext().getRandomInAttachments())) {
 			newName = String.format("%s-%s", newBaseName.substring(0, Math.min(50, newBaseName.length())), 
-																oldFileName.substring(oldFileName.length() - 10));
+																oldFileName.substring(Math.max(0, oldFileName.length() - 10)));
 		} else {
 			newName = String.format("%s.%s", newBaseName.substring(0, Math.min(50, newBaseName.length())), 
 					FilenameUtils.getExtension(oldFileName));
@@ -204,7 +203,7 @@ public class Snapshot extends TestAction {
 		String newName;
 		if (Boolean.TRUE.equals(SeleniumTestsContextManager.getThreadContext().getRandomInAttachments())) {
 			newName = String.format("%s-%s", newBaseName.substring(0, Math.min(50, newBaseName.length())), 
-																oldFileName.substring(oldFileName.length() - 10));
+																oldFileName.substring(Math.max(0, oldFileName.length() - 10)));
 		} else {
 			newName = String.format("%s.%s", newBaseName.substring(0, Math.min(50, newBaseName.length())), 
 					FilenameUtils.getExtension(oldFileName));

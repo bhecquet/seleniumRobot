@@ -142,89 +142,6 @@ public class TestGenericFile extends GenericTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testRelocate() throws IOException {
-		File videoFile = File.createTempFile("video", ".avi");
-		videoFile.deleteOnExit();
-		GenericFile genericFile = new GenericFile(videoFile, "description");
-		
-		File outputDir = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "dest").toFile();
-		File previousLocation = genericFile.getFile();
-		Assert.assertTrue(previousLocation.exists());
-		
-		genericFile.relocate(outputDir.getAbsolutePath());
-		
-		Assert.assertEquals(genericFile.getFile(), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "dest", videoFile.getName()).toFile());
-		Assert.assertTrue(genericFile.getFile().exists());
-	}
-	
-	/**
-	 * No error
-	 * @throws IOException
-	 */
-	@Test(groups={"ut"})
-	public void testRelocateNull() throws IOException {
-		File videoFile = File.createTempFile("video", ".avi");
-		videoFile.deleteOnExit();
-		GenericFile genericFile = new GenericFile(videoFile, "description");
-
-		genericFile.relocate(null);
-		
-	}
-	
-	/**
-	 * Check relocate can replace file on move
-	 * @throws IOException
-	 */
-	@Test(groups={"ut"})
-	public void testFileReplaceOnRelocate() throws IOException {
-		
-		File videoFile = File.createTempFile("video", ".avi");
-		videoFile.deleteOnExit();
-		FileUtils.write(videoFile, "bar", StandardCharsets.UTF_8);
-		GenericFile genericFile = new GenericFile(videoFile, "description");
-		
-		File outputDir = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "dest").toFile();
-		File dest = Paths.get(outputDir.getAbsolutePath(), videoFile.getName()).toFile();
-		FileUtils.write(dest, "foo", StandardCharsets.UTF_8);
-		File previousLocation = genericFile.getFile();
-		Assert.assertTrue(previousLocation.exists());
-		
-		genericFile.relocate(outputDir.getAbsolutePath());
-		
-		Assert.assertEquals(genericFile.getFile(), dest);
-		Assert.assertTrue(genericFile.getFile().exists());
-		
-		// check file has been replaced
-		Assert.assertEquals(FileUtils.readFileToString(dest, StandardCharsets.UTF_8), "bar");
-	}
-	
-	@Test(groups={"ut"})
-	public void testFileNotReplacedOnRelocate() throws IOException {
-		
-		File videoFile = File.createTempFile("video", ".avi");
-		videoFile.deleteOnExit();
-		FileUtils.write(videoFile, "bar", StandardCharsets.UTF_8);
-		GenericFile genericFile = new GenericFile(videoFile, "description");
-		
-		File outputDir = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "dest").toFile();
-		File dest = Paths.get(outputDir.getAbsolutePath(), videoFile.getName()).toFile();
-		FileUtils.write(dest, "foo", StandardCharsets.UTF_8);
-		File previousLocation = genericFile.getFile();
-		Assert.assertTrue(previousLocation.exists());
-		
-		try (InputStreamReader reader = new InputStreamReader(new FileInputStream(dest),  StandardCharsets.UTF_8);) {
-			genericFile.relocate(outputDir.getAbsolutePath());
-		}
-		
-		// file has not been moved
-		Assert.assertEquals(genericFile.getFile(), previousLocation);
-		Assert.assertTrue(genericFile.getFile().exists());
-		
-		// check file has been replaced
-		Assert.assertEquals(FileUtils.readFileToString(dest, StandardCharsets.UTF_8), "foo");
-	}
-	
-	@Test(groups={"ut"})
 	public void testToJson() throws IOException {
 		File videoFile = File.createTempFile("video", ".avi");
 		videoFile.deleteOnExit();
@@ -234,6 +151,20 @@ public class TestGenericFile extends GenericTest {
 		JSONObject json = genericFile.toJson();
 		Assert.assertEquals(json.getString("name"), "description");
 		Assert.assertEquals(json.getString("type"), "file");
-		Assert.assertEquals(json.getString("file"), "<file:" + genericFile.getFile().getAbsolutePath().replace("\\", "/") + ">");
+		Assert.assertTrue(json.isNull("id"));
+	}
+	
+	@Test(groups={"ut"})
+	public void testToJsonWithId() throws IOException {
+		File videoFile = File.createTempFile("video", ".avi");
+		videoFile.deleteOnExit();
+		FileUtils.write(videoFile, "bar", StandardCharsets.UTF_8);
+		GenericFile genericFile = new GenericFile(videoFile, "description");
+		genericFile.getFileContent().setId(1);
+		
+		JSONObject json = genericFile.toJson();
+		Assert.assertEquals(json.getString("name"), "description");
+		Assert.assertEquals(json.getString("type"), "file");
+		Assert.assertEquals(json.getInt("id"), 1);
 	}
 }

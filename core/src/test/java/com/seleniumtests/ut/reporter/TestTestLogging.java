@@ -194,53 +194,6 @@ public class TestTestLogging extends GenericTest {
 		Assert.assertFalse(TestStepManager.getParentTestStep().getHarCaptures().isEmpty());
 		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "main-networkCapture.har").toFile().exists());
 	}
-
-	@Test(groups={"ut"})
-	public void testRelocateHar() throws IOException {
-
-		try {
-			TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
-			Har har = new Har(new HarLog());
-			har.getLog().addPage(new HarPage("title", "a title"));
-			logger.logNetworkCapture(har, "main");
-			File initialFile = TestStepManager.getParentTestStep().getHarCaptures().get(0).getFile();
-			Assert.assertTrue(initialFile.exists()); // file exists before moving
-			
-			// relocate
-			TestStepManager.getParentTestStep().getHarCaptures().get(0).relocate(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved");
-			File movedFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved", "main-networkCapture.har").toFile();
-			
-			Assert.assertTrue(movedFile.exists());
-			Assert.assertFalse(initialFile.exists());
-			Assert.assertEquals(TestStepManager.getParentTestStep().getHarCaptures().get(0).getFile(), movedFile);
-		} finally {
-			FileUtils.deleteQuietly(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
-			FileUtils.deleteQuietly(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved"));
-		}
-	}
-	
-	/**
-	 * Test no error is raised is outputDirectory is null
-	 * @throws IOException
-	 */
-	@Test(groups={"ut"})
-	public void testRelocateHarNull() throws IOException {
-		
-		try {
-			TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
-			Har har = new Har(new HarLog());
-			har.getLog().addPage(new HarPage("title", "a title"));
-			logger.logNetworkCapture(har, "main");
-			File initialFile = TestStepManager.getParentTestStep().getHarCaptures().get(0).getFile();
-			Assert.assertTrue(initialFile.exists()); // file exists before moving
-			
-			// relocate
-			TestStepManager.getParentTestStep().getHarCaptures().get(0).relocate(null);
-			
-		} finally {
-			FileUtils.deleteQuietly(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
-		}
-	}
 	
 	// GenericFile
 	@Test(groups={"ut"})
@@ -278,54 +231,6 @@ public class TestTestLogging extends GenericTest {
 		FileUtils.copyFile(videoFile, Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), videoFile.getName()).toFile());
 		
 		logger.logFile(videoFile, "video");
-	}
-	
-	@Test(groups={"ut"})
-	public void testRelocateFile() throws IOException {
-		
-		try {
-			TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
-			File videoFile = File.createTempFile("video", ".avi");
-			videoFile.deleteOnExit();
-			logger.logFile(videoFile, "video");
-			File initialFile = TestStepManager.getParentTestStep().getFiles().get(0).getFile();
-			Assert.assertTrue(initialFile.exists()); // file exists before moving
-			
-			// relocate
-			TestStepManager.getParentTestStep().getFiles().get(0).relocate(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved");
-			File movedFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved", videoFile.getName()).toFile();
-			
-			Assert.assertTrue(movedFile.exists());
-			Assert.assertFalse(initialFile.exists());
-			Assert.assertEquals(TestStepManager.getParentTestStep().getFiles().get(0).getFile(), movedFile);
-		} finally {
-			FileUtils.deleteQuietly(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
-			FileUtils.deleteQuietly(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved"));
-			
-		}
-	}
-	
-	/**
-	 * Test no error is raised is outputDirectory is null
-	 * @throws IOException
-	 */
-	@Test(groups={"ut"})
-	public void testRelocateFileNull() throws IOException {
-		
-		try {
-			TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
-			File videoFile = File.createTempFile("video", ".avi");
-			videoFile.deleteOnExit();
-			logger.logFile(videoFile, "video");
-			File initialFile = TestStepManager.getParentTestStep().getFiles().get(0).getFile();
-			Assert.assertTrue(initialFile.exists()); // file exists before moving
-			
-			// relocate
-			TestStepManager.getParentTestStep().getFiles().get(0).relocate(null);
-		} finally {
-			FileUtils.deleteQuietly(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
-			
-		}
 	}
 	
 	@Test(groups={"ut"})

@@ -118,6 +118,28 @@ public class TestSnapshot extends GenericTest {
 	}
 	
 	@Test(groups={"ut"})
+	public void testToJsonWithId() throws FileNotFoundException {
+		
+		ScreenShot screenshot = new ScreenShot();
+		screenshot.setTitle("title");
+		screenshot.setLocation("http://location");
+		screenshot.setHtmlSourcePath("file.html");
+		screenshot.setImagePath("file.png");
+		Snapshot snapshotLogger = new Snapshot(screenshot, "main", SnapshotCheckType.TRUE);
+		snapshotLogger.getScreenshot().getHtml().setId(2);
+		snapshotLogger.getScreenshot().getImage().setId(3);
+		
+		JSONObject json = snapshotLogger.toJson();
+		
+		Assert.assertEquals(json.getString("type"), "snapshot");
+		Assert.assertEquals(json.getString("url"), "http://location");
+		Assert.assertEquals(json.getString("title"), "title");
+		Assert.assertEquals(json.getString("name"), "file.png");
+		Assert.assertEquals(json.getInt("idHtml"), 2);
+		Assert.assertEquals(json.getInt("idImage"), 3);
+		Assert.assertEquals(json.getString("snapshotCheckType"), "FULL");
+	}
+	@Test(groups={"ut"})
 	public void testToJson() throws FileNotFoundException {
 		
 		ScreenShot screenshot = new ScreenShot();
@@ -133,8 +155,8 @@ public class TestSnapshot extends GenericTest {
 		Assert.assertEquals(json.getString("url"), "http://location");
 		Assert.assertEquals(json.getString("title"), "title");
 		Assert.assertEquals(json.getString("name"), "file.png");
-		Assert.assertEquals(json.getString("html"), "<file:" + screenshot.getFullHtmlPath() + ">");
-		Assert.assertEquals(json.getString("image"), "<file:" + screenshot.getFullImagePath() + ">");
+		Assert.assertTrue(json.isNull("idHtml"));
+		Assert.assertTrue(json.isNull("idImage"));
 		Assert.assertEquals(json.getString("snapshotCheckType"), "FULL");
 	}
 }

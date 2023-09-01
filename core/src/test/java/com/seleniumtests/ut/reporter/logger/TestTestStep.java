@@ -20,12 +20,14 @@ package com.seleniumtests.ut.reporter.logger;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.seleniumtests.reporter.logger.*;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 import org.openqa.selenium.NoSuchElementException;
@@ -38,15 +40,8 @@ import com.seleniumtests.core.Step.RootCause;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
-import com.seleniumtests.reporter.logger.GenericFile;
-import com.seleniumtests.reporter.logger.HarCapture;
-import com.seleniumtests.reporter.logger.Snapshot;
-import com.seleniumtests.reporter.logger.TestAction;
-import com.seleniumtests.reporter.logger.TestMessage;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
-import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.logger.TestStep.StepStatus;
-import com.seleniumtests.reporter.logger.TestValue;
 
 import net.lightbody.bmp.core.har.Har;
 import net.lightbody.bmp.core.har.HarLog;
@@ -415,7 +410,7 @@ public class TestTestStep extends GenericTest {
 	 * @throws IOException
 	 */
 	@Test(groups = { "ut" })
-	public void testListAllAttachments() throws IOException {
+	public void testGetAllAttachments() throws IOException {
 		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
 
 		// create screenshot for main step
@@ -457,11 +452,121 @@ public class TestTestStep extends GenericTest {
 		step.addAction(new TestAction("action2", false, new ArrayList<>()));
 		step.addAction(subStep);
 
-		List<File> attachments = step.getAllAttachments();
+		List<FileContent> attachments = step.getAllAttachments();
 		Assert.assertEquals(attachments.size(), 3);
-		Assert.assertEquals(attachments.get(0).getName(), "N-A_0-1_step1--" + tmpHtmlFile2.getName().substring(tmpHtmlFile2.getName().length() - 10));
-		Assert.assertEquals(attachments.get(1).getName(), "N-A_0-1_step1--" + tmpImgFile2.getName().substring(tmpImgFile2.getName().length() - 10));
-		Assert.assertEquals(attachments.get(2).getName(), "N-A_0-1_subStep--" + tmpImgFile4.getName().substring(tmpImgFile4.getName().length() - 10));
+		Assert.assertEquals(attachments.get(0).getFile().getName(), "N-A_0-1_step1--" + tmpHtmlFile2.getName().substring(tmpHtmlFile2.getName().length() - 10));
+		Assert.assertEquals(attachments.get(1).getFile().getName(), "N-A_0-1_step1--" + tmpImgFile2.getName().substring(tmpImgFile2.getName().length() - 10));
+		Assert.assertEquals(attachments.get(2).getFile().getName(), "N-A_0-1_subStep--" + tmpImgFile4.getName().substring(tmpImgFile4.getName().length() - 10));
+	}
+
+	/**
+	 * Check we get all files from a step and its sub steps from a given SnapshotCheckType
+	 *
+	 * @throws IOException
+	 */
+	@Test(groups = { "ut" })
+	public void testGetAllAttachmentsFilterSnapshotCheckType() throws IOException {
+		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+
+		// create screenshot for main step
+		ScreenShot screenshot1 = new ScreenShot();
+
+		File tmpImgFile = File.createTempFile("img", ".png");
+		File tmpImgFile2 = Paths.get(tmpImgFile.getParent(), "screenshots", tmpImgFile.getName()).toFile();
+		FileUtils.moveFile(tmpImgFile, tmpImgFile2);
+		File tmpHtmlFile = File.createTempFile("html", ".html");
+		File tmpHtmlFile2 = Paths.get(tmpHtmlFile.getParent(), "htmls", tmpHtmlFile.getName()).toFile();
+		FileUtils.moveFile(tmpHtmlFile, tmpHtmlFile2);
+
+		tmpImgFile.deleteOnExit();
+		tmpHtmlFile.deleteOnExit();
+
+		screenshot1.setOutputDirectory(tmpImgFile.getParent());
+		screenshot1.setLocation("http://mysite.com");
+		screenshot1.setTitle("mysite");
+		screenshot1.setImagePath("screenshots/" + tmpImgFile2.getName());
+		screenshot1.setHtmlSourcePath("htmls/" + tmpHtmlFile2.getName());
+		step.addSnapshot(new Snapshot(screenshot1, "main", SnapshotCheckType.FALSE), 0, null);
+
+		TestStep subStep = new TestStep("subStep", null, new ArrayList<>(), true);
+
+		// create screenshot for sub step
+		ScreenShot screenshot2 = new ScreenShot();
+
+		File tmpImgFile3 = File.createTempFile("img", ".png");
+		File tmpImgFile4 = Paths.get(tmpImgFile3.getParent(), "screenshots", tmpImgFile3.getName()).toFile();
+		FileUtils.moveFile(tmpImgFile3, tmpImgFile4);
+
+		screenshot2.setOutputDirectory(tmpImgFile3.getParent());
+		screenshot2.setLocation("http://mysite.com");
+		screenshot2.setTitle("mysite");
+		screenshot2.setImagePath("screenshots/" + tmpImgFile4.getName());
+		subStep.addSnapshot(new Snapshot(screenshot2, "main", SnapshotCheckType.TRUE), 0, null);
+
+		subStep.addAction(new TestAction("action1", true, new ArrayList<>()));
+		step.addAction(new TestAction("action2", false, new ArrayList<>()));
+		step.addAction(subStep);
+
+		List<FileContent> attachments = step.getAllAttachments(false, SnapshotCheckType.FALSE);
+		// only the HTML and image from first added snapshot
+		Assert.assertEquals(attachments.size(), 2);
+		Assert.assertEquals(attachments.get(0).getFile().getName(), "N-A_0-1_step1--" + tmpHtmlFile2.getName().substring(tmpHtmlFile2.getName().length() - 10));
+		Assert.assertEquals(attachments.get(1).getFile().getName(), "N-A_0-1_step1--" + tmpImgFile2.getName().substring(tmpImgFile2.getName().length() - 10));
+	}
+	
+	/**
+	 * Check we get all files except HTML when we request it
+	 *
+	 * @throws IOException
+	 */
+	@Test(groups = { "ut" })
+	public void testGetAllAttachmentsFilterHtml() throws IOException {
+		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+
+		// create screenshot for main step
+		ScreenShot screenshot1 = new ScreenShot();
+
+		File tmpImgFile = File.createTempFile("img", ".png");
+		File tmpImgFile2 = Paths.get(tmpImgFile.getParent(), "screenshots", tmpImgFile.getName()).toFile();
+		FileUtils.moveFile(tmpImgFile, tmpImgFile2);
+		File tmpHtmlFile = File.createTempFile("html", ".html");
+		File tmpHtmlFile2 = Paths.get(tmpHtmlFile.getParent(), "htmls", tmpHtmlFile.getName()).toFile();
+		FileUtils.moveFile(tmpHtmlFile, tmpHtmlFile2);
+
+		tmpImgFile.deleteOnExit();
+		tmpHtmlFile.deleteOnExit();
+
+		screenshot1.setOutputDirectory(tmpImgFile.getParent());
+		screenshot1.setLocation("http://mysite.com");
+		screenshot1.setTitle("mysite");
+		screenshot1.setImagePath("screenshots/" + tmpImgFile2.getName());
+		screenshot1.setHtmlSourcePath("htmls/" + tmpHtmlFile2.getName());
+		step.addSnapshot(new Snapshot(screenshot1, "main", SnapshotCheckType.FALSE), 0, null);
+
+		TestStep subStep = new TestStep("subStep", null, new ArrayList<>(), true);
+
+		// create screenshot for sub step
+		ScreenShot screenshot2 = new ScreenShot();
+
+		File tmpImgFile3 = File.createTempFile("img", ".png");
+		File tmpImgFile4 = Paths.get(tmpImgFile3.getParent(), "screenshots", tmpImgFile3.getName()).toFile();
+		FileUtils.moveFile(tmpImgFile3, tmpImgFile4);
+
+		screenshot2.setOutputDirectory(tmpImgFile3.getParent());
+		screenshot2.setLocation("http://mysite.com");
+		screenshot2.setTitle("mysite");
+		screenshot2.setImagePath("screenshots/" + tmpImgFile4.getName());
+		subStep.addSnapshot(new Snapshot(screenshot2, "main", SnapshotCheckType.TRUE), 0, null);
+
+		subStep.addAction(new TestAction("action1", true, new ArrayList<>()));
+		step.addAction(new TestAction("action2", false, new ArrayList<>()));
+		step.addAction(subStep);
+
+		List<FileContent> attachments = step.getAllAttachments(true, null);
+		// only the HTML and image from first added snapshot
+		Assert.assertEquals(attachments.size(), 2);
+		Assert.assertEquals(attachments.get(0).getFile().getName(), "N-A_0-1_step1--" + tmpImgFile2.getName().substring(tmpImgFile2.getName().length() - 10));
+		Assert.assertEquals(attachments.get(1).getFile().getName(), "N-A_0-1_subStep--" + tmpImgFile4.getName().substring(tmpImgFile4.getName().length() - 10));
 	}
 
 	@Test(groups = { "ut" }, expectedExceptions = CustomSeleniumTestsException.class)
@@ -1148,4 +1253,62 @@ public class TestTestStep extends GenericTest {
 		TestStep step = new TestStep("Test end", null, new ArrayList<>(), true);
 		Assert.assertTrue(step.isTestEndStep());
 	}
+	
+	
+	/**
+	 * Check we move all attachments that are located in "before-xxx" folders
+	 *
+	 * @throws IOException
+	 */
+	@Test(groups = { "ut" })
+	public void testMoveAttachements() throws IOException {
+		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+		
+		// create screenshot for main step
+		ScreenShot screenshot1 = new ScreenShot();
+		
+		File tmpImgFile = File.createTempFile("img", ".png");
+		File tmpImgFile2 = Paths.get(tmpImgFile.getParent(), "screenshots", tmpImgFile.getName()).toFile();
+		FileUtils.moveFile(tmpImgFile, tmpImgFile2);
+		File tmpHtmlFile = File.createTempFile("html", ".html");
+		File tmpHtmlFile2 = Paths.get(tmpHtmlFile.getParent(), "htmls", tmpHtmlFile.getName()).toFile();
+		FileUtils.moveFile(tmpHtmlFile, tmpHtmlFile2);
+		
+		tmpImgFile.deleteOnExit();
+		tmpHtmlFile.deleteOnExit();
+		
+		screenshot1.setOutputDirectory(tmpImgFile.getParent());
+		screenshot1.setLocation("http://mysite.com");
+		screenshot1.setTitle("mysite");
+		screenshot1.setImagePath("screenshots/" + tmpImgFile2.getName());
+		screenshot1.setHtmlSourcePath("htmls/" + tmpHtmlFile2.getName());
+		step.addSnapshot(new Snapshot(screenshot1, "main", SnapshotCheckType.FALSE), 0, null);
+		
+		TestStep subStep = new TestStep("subStep", null, new ArrayList<>(), true);
+		
+		// create screenshot for sub step
+		ScreenShot screenshot2 = new ScreenShot();
+		
+		File tmpImgFile3 = File.createTempFile("img", ".png");
+		File tmpImgFile4 = Paths.get(tmpImgFile3.getParent(), "screenshots", tmpImgFile3.getName()).toFile();
+		FileUtils.moveFile(tmpImgFile3, tmpImgFile4);
+		
+		screenshot2.setOutputDirectory(tmpImgFile3.getParent());
+		screenshot2.setLocation("http://mysite.com");
+		screenshot2.setTitle("mysite");
+		screenshot2.setImagePath("screenshots/" + tmpImgFile4.getName());
+		subStep.addSnapshot(new Snapshot(screenshot2, "main", SnapshotCheckType.TRUE), 0, null);
+		
+		subStep.addAction(new TestAction("action1", true, new ArrayList<>()));
+		step.addAction(new TestAction("action2", false, new ArrayList<>()));
+		step.addAction(subStep);
+		
+		Path outputDir = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "dest");
+		step.moveAttachments(outputDir.toString());
+		Assert.assertEquals(outputDir.toFile().list().length, 3);
+		//Assert.assertEquals(attachments.get(0).getFile().getName(), "N-A_0-1_step1--" + tmpHtmlFile2.getName().substring(tmpHtmlFile2.getName().length() - 10));
+		//Assert.assertEquals(attachments.get(1).getFile().getName(), "N-A_0-1_step1--" + tmpImgFile2.getName().substring(tmpImgFile2.getName().length() - 10));
+		//Assert.assertEquals(attachments.get(2).getFile().getName(), "N-A_0-1_subStep--" + tmpImgFile4.getName().substring(tmpImgFile4.getName().length() - 10));
+	}
+	
 }

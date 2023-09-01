@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 
+import com.seleniumtests.reporter.logger.FileContent;
 import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
@@ -36,8 +37,8 @@ public class ScreenShot {
 	private static final Logger logger = SeleniumRobotLogger.getLogger(ScreenShot.class);
 
     private String location;
-    private String htmlSourcePath;
-    private String imagePath;
+    private FileContent image;
+    private FileContent html;
     private String title;
     private String suiteName;
     private long duration;
@@ -54,7 +55,10 @@ public class ScreenShot {
             outputDirectory = SeleniumTestsContextManager.getThreadContext().getOutputDirectory();
         }
     	
-    	this.imagePath = imagePath;
+    	if (imagePath != null) {
+            this.image = new FileContent(Paths.get(outputDirectory, imagePath).toFile());
+        }
+    
     	this.duration = 0;
     }
 
@@ -96,8 +100,8 @@ public class ScreenShot {
     }
     
     public String getImageName() {
-    	if (imagePath != null) {
-    		return new File(imagePath).getName();
+    	if (image != null) {
+    		return image.getFile().getName();
     	} else {
     		return "";
     	}
@@ -108,21 +112,21 @@ public class ScreenShot {
     }
 
     public void setHtmlSourcePath(String htmlSourcePath) {
-        this.htmlSourcePath = htmlSourcePath;
+        this.html = new FileContent(Paths.get(outputDirectory, htmlSourcePath).toFile());
     }
 
     public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
+        this.image = new FileContent(Paths.get(outputDirectory, imagePath).toFile());
     }
 
     public String getHtmlSourcePath() {
-        return htmlSourcePath;
+        return Paths.get(outputDirectory).relativize(Paths.get(html.getFile().getAbsolutePath())).toString();
     }
     
     public String getHtmlSource() {
-    	if (htmlSourcePath != null) {
+    	if (html != null) {
     		try {
-				return FileUtils.readFileToString(new File(getFullHtmlPath()), StandardCharsets.UTF_8);
+				return FileUtils.readFileToString(html.getFile(), StandardCharsets.UTF_8);
 			} catch (IOException e) {
 				logger.error("cannot read source file", e);
 				return "";
@@ -137,7 +141,7 @@ public class ScreenShot {
      * @return
      */
     public String getImagePath() {
-        return imagePath;
+        return Paths.get(outputDirectory).relativize(Paths.get(image.getFile().getAbsolutePath())).toString();
     }
 
     /**
@@ -153,16 +157,16 @@ public class ScreenShot {
     }
 
     public String getFullImagePath() {
-        if (imagePath != null) {
-            return Paths.get(outputDirectory, imagePath).toString().replace("\\", "/");
+        if (image != null) {
+            return image.getFile().getAbsolutePath().replace("\\", "/");
         } else {
             return null;
         }
     }
 
     public String getFullHtmlPath() {
-        if (htmlSourcePath != null) {
-        	return Paths.get(outputDirectory, htmlSourcePath).toString().replace("\\", "/");
+        if (html != null) {
+        	return html.getFile().getAbsolutePath().replace("\\", "/");
         } else {
             return null;
         }
@@ -188,68 +192,37 @@ public class ScreenShot {
 	 * @throws IOException
 	 */
 	public void relocate(String destOutputDirectory) throws IOException {
-		relocate(destOutputDirectory, imagePath, htmlSourcePath);
+		relocate(destOutputDirectory, getImagePath(), getHtmlSourcePath());
 	}
 	
 	/**
 	 * Move physically the image to 'destOutputDirectory'
 	 * @param destOutputDirectory		the output directory to copy to. It's a root directory where test results / image / html / video are stored
 	 * @param newImagePath				the new path of the image if it needs to be moved inside the output directory
-	 * @throws IOException				the new path of the html if it needs to be moved inside the output directory
+     * @param newHtmlPath               the new path of the html if it needs to be moved inside the output directory
+	 * @throws IOException
 	 */
 	public void relocate(String destOutputDirectory, String newImagePath, String newHtmlPath) throws IOException {
 
 		new File(destOutputDirectory).mkdirs();
 		
-		if (htmlSourcePath != null) {
-			
-			if (newHtmlPath != null && !newHtmlPath.equals(htmlSourcePath)) {
-				try {
-					FileUtils.moveFile(Paths.get(outputDirectory, htmlSourcePath).toFile(), Paths.get(outputDirectory, newHtmlPath).toFile());
-					htmlSourcePath = newHtmlPath.replace("\\", "/");
-				} catch (IOException e) {
-					logger.warn(String.format("File renaming to %s failed", newHtmlPath));
-				}
-			}
-			
-			File htmlSrc = Paths.get(outputDirectory, htmlSourcePath).toFile().getCanonicalFile();
-			File newHtmlSrc = new File(htmlSrc.getAbsolutePath().replace("\\",  "/").replace(outputDirectory, destOutputDirectory));
-			try {
-				FileUtils.moveFile(htmlSrc, newHtmlSrc);
-			} catch (FileExistsException e) {
-				// nothing to do, file is there
-			} catch (FileNotFoundException e) {
-				logger.warn(String.format("File %s cannot be moved, it does not exist", htmlSourcePath));
-				return;
-			}
-			htmlSourcePath = Paths.get(destOutputDirectory).relativize(Paths.get(newHtmlSrc.getAbsolutePath())).toString().replace("\\",  "/");
+		if (html != null) {
+		    html.relocate(destOutputDirectory, newHtmlPath);
 		}
 		
-		if (imagePath != null) { 
-			
-			if (newImagePath != null && !newImagePath.equals(imagePath)) {
-				try {
-					FileUtils.moveFile(Paths.get(outputDirectory, imagePath).toFile(), Paths.get(outputDirectory, newImagePath).toFile());
-					imagePath = newImagePath.replace("\\", "/");
-				} catch (IOException e) {
-					logger.warn(String.format("File renaming to %s failed", newImagePath));
-				}
-			}
-			
-			File imgSrc = Paths.get(outputDirectory, imagePath).toFile().getCanonicalFile();
-			File newImgSrc = new File(imgSrc.getAbsolutePath().replace("\\",  "/").replace(outputDirectory, destOutputDirectory));
-			try {
-				FileUtils.moveFile(imgSrc, newImgSrc);
-			} catch (FileExistsException e) {
-				// nothing to do, file is there
-			} catch (FileNotFoundException e) {
-				logger.warn(String.format("File %s cannot be moved, it does not exist", imagePath));
-				return;
-			}
-			imagePath = Paths.get(destOutputDirectory).relativize(Paths.get(newImgSrc.getAbsolutePath())).toString().replace("\\",  "/");
+		if (image != null) {
+			image.relocate(destOutputDirectory, newImagePath);
 		}
 		
 		outputDirectory = destOutputDirectory;
 		
 	}
+	
+	public FileContent getImage() {
+	    return image;
+    }
+    
+    public FileContent getHtml() {
+	    return html;
+    }
 }

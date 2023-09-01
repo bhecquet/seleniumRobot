@@ -96,8 +96,6 @@ public class PageObject extends BasePage implements IPage {
     private String url = null;
     private String suiteName = null;
     private String outputDirectory = null;
-    private String htmlFilePath = null;
-    private String imageFilePath = null;
     private boolean captureSnapshot = true;
     private static Map<String, List<String>> uiLibraries = Collections.synchronizedMap(new HashMap<>()); // the UI libraries used for searching elements. Allows to speed up search when several UI libs are declared (e.g for SelectList)
     private ScreenshotUtil screenshotUtil;
@@ -491,19 +489,12 @@ public class PageObject extends BasePage implements IPage {
     protected void setUrl(final String openUrl) {
         this.url = openUrl;
     }
-    
-    public String getHtmlFilePath() {
-        return htmlFilePath;
-    }
 
     @Override
     public String getHtmlSource() {
     	return driver.getPageSource();
     }
 
-    public String getImageFilePath() {
-        return imageFilePath;
-    }
 
     @Override
     public String getLocation() {
@@ -815,17 +806,10 @@ public class PageObject extends BasePage implements IPage {
     	}
     	
     	if (screenShot != null) { // may be null if user request not to take snapshots
-	    	if (screenShot.getHtmlSourcePath() != null) {
-	    		htmlFilePath = screenShot.getHtmlSourcePath().replace(suiteName, outputDirectory);
-	    	}
-	    	
-	    	if (screenShot.getImagePath() != null) {
-	    		imageFilePath = screenShot.getImagePath().replace(suiteName, outputDirectory);
-	    	}
+
 	    	if (snapshotName != null) {
 	    		screenShot.setTitle(snapshotName);
 	    	}
-	    	
 	    	
 	    	logger.logScreenshot(screenShot, snapshotName, checkSnapshot);
     	}

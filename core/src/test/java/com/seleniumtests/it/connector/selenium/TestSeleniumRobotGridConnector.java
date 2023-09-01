@@ -55,13 +55,13 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	public void initConnector(ITestContext ctx) {
 		initThreadContext(ctx);
 
-		connector = new SeleniumRobotGridConnector("http://127.0.0.1:4444/wd/hub");
+		connector = new SeleniumRobotGridConnector("http://selenium-grid-hub.covea.priv:4447/wd/hub");
 		
 		if (!connector.isGridActive()) {
 			throw new SkipException("no seleniumrobot grid available");
 		}
 
-		connector.setNodeUrl("http://127.0.0.1:5555");
+		connector.setNodeUrl("http://pf22029072.itsoc.itmma.fr:5545");
 		gridLogger = spy(SeleniumRobotGridConnector.getLogger());
 	}
 
@@ -317,7 +317,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 		connector.setSessionId(new SessionId("video"));
 		
 		connector.startVideoCapture();
-		WaitHelper.waitForMilliSeconds(500);
+		WaitHelper.waitForMilliSeconds(50000);
 		connector.stopVideoCapture("d:\\tmp\\out.avi");
 		
 	}

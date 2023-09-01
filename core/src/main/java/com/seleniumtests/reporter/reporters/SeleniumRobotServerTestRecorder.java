@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.seleniumtests.reporter.logger.FileContent;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 import org.openqa.selenium.Rectangle;
@@ -190,9 +191,11 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			Integer testStepId = serverConnector.createTestStep(testStep.getName(), testCaseInSessionId);
 			String stepLogs = testStep.toJson().toString();
 			
-//			Integer stepResultId = serverConnector.recordStepResult(!testStep.getFailed(), stepLogs, testStep.getDuration(), sessionId, testCaseInSessionId, testStepId);
 			Integer stepResultId = serverConnector.recordStepResult(testStep, sessionId, testCaseInSessionId, testStepId);
 			testStep.setStepResultId(stepResultId);
+
+			// record all attachments
+			recordAllAttachments(serverConnector, stepResultId, testStep);
 			
 			// sends all snapshots that are flagged as comparable
 			for (Snapshot snapshot: new ArrayList<>(testStep.getSnapshots(true))) {
@@ -209,6 +212,30 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 				} else if (snapshot.getCheckSnapshot().recordSnapshotOnServerForReference() && SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerRecordResults()) {
 					recordReference(serverConnector, testResult, testStep, stepResultId, snapshot);
 				}
+			}
+
+			// update logs on server
+			String jsonStep = testStep.toJson().toString();
+			serverConnector.updateStepResult(jsonStep, stepResultId);
+		}
+	}
+
+	/**
+	 * Records all attachments on server, except the reference pictures and pictures for comparison, as they are recorded by other means
+	 * @param serverConnector
+	 * @param stepResultId
+	 * @param testStep
+	 */
+	private void recordAllAttachments(SeleniumRobotSnapshotServerConnector serverConnector, Integer stepResultId, TestStep testStep) {
+
+		// upload all files to server
+		for (FileContent file: testStep.getAllAttachments(false, SnapshotCheckType.NONE, SnapshotCheckType.REFERENCE_ONLY)) {
+			try {
+				Integer fileId = serverConnector.uploadFile(file.getFile(), stepResultId);
+				file.setId(fileId);
+
+			} catch (SeleniumRobotServerException | ConfigurationException e) {
+				logger.error(e);
 			}
 		}
 	}
@@ -261,7 +288,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 					logger.info("Step KO: reference snapshot got from server");
 					Path newPath = Paths.get(TestNGResultUtils.getSeleniumRobotTestContext(testResult).getScreenshotOutputDirectory(), referenceSnapshot.getName()).toAbsolutePath(); 
 					FileUtils.moveFile(referenceSnapshot, newPath.toFile());
-					testStep.addSnapshot(new Snapshot(new ScreenShot(newPath.getParent().getParent().relativize(newPath).toString()), "Valid-reference", SnapshotCheckType.FALSE), 0, null);
+					testStep.addSnapshot(new Snapshot(new ScreenShot(newPath.getParent().getParent().relativize(newPath).toString()), "Valid-reference", SnapshotCheckType.NONE), 0, null);
 					snapshot.setDisplayInReport(true); // change flag so that it's displayed in report (by default reference image extracted from video are not displayed)
 				}
 			} catch (SeleniumRobotServerException e) {

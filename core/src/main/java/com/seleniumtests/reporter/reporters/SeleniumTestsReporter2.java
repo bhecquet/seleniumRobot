@@ -216,7 +216,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		TestStep lastTestStep = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getLastTestStep();
 		if (lastTestStep != null) {
 			for (GenericFile f: lastTestStep.getFiles()) {
-				if (f.getFile().getName().contains("video")) {
+				if (f.getName().contains("video")) {
 					videoInReport = true;
 				}
 			}

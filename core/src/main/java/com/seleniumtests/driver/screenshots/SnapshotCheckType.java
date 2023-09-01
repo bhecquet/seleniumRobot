@@ -43,6 +43,7 @@ public class SnapshotCheckType {
 	
 	// snapshot will not be compared
 	public static final SnapshotCheckType FALSE = new SnapshotCheckType(Control.NONE);
+	public static final SnapshotCheckType NONE = new SnapshotCheckType(Control.NONE);
 	
 	// snapshot will be used for reference, when test fails, no comparison should be done on these pictures
 	public static final SnapshotCheckType REFERENCE_ONLY = new SnapshotCheckType(Control.NONE_REFERENCE);
