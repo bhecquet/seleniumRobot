@@ -24,6 +24,18 @@
         <method>java.util.List readXmlResult(java.lang.String)</method>
         <justification>...</justification>
     </difference>
+    <difference>
+        <className>**/uipage/PageObject</className>
+        <differenceType>7002</differenceType>
+        <method>java.lang.String getHtmlFilePath()</method>
+        <justification>useless</justification>
+    </difference>
+    <difference>
+        <className>**/uipage/PageObject</className>
+        <differenceType>7002</differenceType>
+        <method>java.lang.String getImageFilePath()</method>
+        <justification>useless</justification>
+    </difference>
     
     
 
