@@ -35,12 +35,20 @@ public class FileContent {
     public void relocate(String outputDirectory) throws IOException {
         relocate(outputDirectory, file.getName());
     }
+    
+    /**
+     * Move the file to a new output directory, respecting its path
+     * @param outputDirectory
+     * @param newFilePath
+     * @throws IOException
+     */
     public void relocate(String outputDirectory, String newFilePath) throws IOException {
         if (outputDirectory == null || newFilePath == null) {
             return;
         }
-        new File(outputDirectory).mkdirs();
+        
         Path newPath = Paths.get(outputDirectory, newFilePath);
+        newPath.getParent().toFile().mkdirs();
         try {
             Files.move(file.toPath(), newPath, StandardCopyOption.REPLACE_EXISTING);
             file = newPath.toFile();

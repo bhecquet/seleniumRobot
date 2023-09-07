@@ -118,9 +118,18 @@ public class ScreenShot {
     public void setImagePath(String imagePath) {
         this.image = new FileContent(Paths.get(outputDirectory, imagePath).toFile());
     }
-
+    
+    /**
+     * Returns the relative path of HTML file (relative to outputDirectory)
+     * @return
+     */
     public String getHtmlSourcePath() {
-        return Paths.get(outputDirectory).relativize(Paths.get(html.getFile().getAbsolutePath())).toString();
+        if (html != null) {
+            return Paths.get(outputDirectory).relativize(Paths.get(html.getFile().getAbsolutePath())).toString().replace("\\", "/");
+        } else {
+            return null;
+        }
+        
     }
     
     public String getHtmlSource() {
@@ -141,7 +150,11 @@ public class ScreenShot {
      * @return
      */
     public String getImagePath() {
-        return Paths.get(outputDirectory).relativize(Paths.get(image.getFile().getAbsolutePath())).toString();
+        if (image != null) {
+            return Paths.get(outputDirectory).relativize(Paths.get(image.getFile().getAbsolutePath())).toString().replace("\\", "/");
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -204,8 +217,6 @@ public class ScreenShot {
 	 */
 	public void relocate(String destOutputDirectory, String newImagePath, String newHtmlPath) throws IOException {
 
-		new File(destOutputDirectory).mkdirs();
-		
 		if (html != null) {
 		    html.relocate(destOutputDirectory, newHtmlPath);
 		}

@@ -26,6 +26,16 @@ public class TestScreenshot extends GenericTest {
 	}
 	
 	@Test(groups= {"ut"})
+	public void testGetImagePath() {
+		Assert.assertEquals(new ScreenShot("foo.jpg").getImagePath(), "foo.jpg");
+	}
+	
+	@Test(groups= {"ut"})
+	public void testGetImagePathNull() {
+		Assert.assertNull(new ScreenShot(null).getImagePath());
+	}
+	
+	@Test(groups= {"ut"})
 	public void testGetFullHtmlPath() {
 		ScreenShot s = new ScreenShot("foo.jpg");
 		s.setHtmlSourcePath("foo.html");
@@ -35,6 +45,18 @@ public class TestScreenshot extends GenericTest {
 	@Test(groups= {"ut"})
 	public void testGetFullHtmlPathNull() {
 		Assert.assertNull(new ScreenShot(null).getFullHtmlPath());
+	}
+	
+	@Test(groups= {"ut"})
+	public void testHtmlSourcePath() {
+		ScreenShot s = new ScreenShot("foo.jpg");
+		s.setHtmlSourcePath("foo.html");
+		Assert.assertEquals(s.getHtmlSourcePath(), "foo.html");
+	}
+	
+	@Test(groups= {"ut"})
+	public void testHtmlSourcePathNull() {
+		Assert.assertNull(new ScreenShot(null).getHtmlSourcePath());
 	}
 	
 	@Test(groups= {"ut"})
