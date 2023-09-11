@@ -127,8 +127,10 @@ public class SeleniumIdeParser {
 		// parse the file
         ParseResult<CompilationUnit> cu = new JavaParser().parse(javaFile);
 
-        cu.getResult().get().accept(new TestMethodVisitor(), new StringBuilder[] {testCode, webPageCode});
-        
+        if (cu.isSuccessful()) {
+			cu.getResult().get().accept(new TestMethodVisitor(), new StringBuilder[]{testCode, webPageCode});
+		}
+
         webPageCode.append(FOOTER);
         testCode.append(FOOTER);
         String testCodeStr = testCode.toString().replace("new WebPage().", String.format("new %sPage().", className));
