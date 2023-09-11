@@ -22,6 +22,11 @@ public class Sys {
 		@Override
 		protected void log(String str) {
 			logger.log(level, str);
+			Logger testLogger = SeleniumRobotLogger.getLoggerForTest();
+			
+			if (testLogger != null) {
+				testLogger.log(level, str);
+			}
 		}
 	}
 	
@@ -33,6 +38,11 @@ public class Sys {
 		@Override
 		protected void log(String str) {
 			logger.log(level, str);
+			Logger testLogger = SeleniumRobotLogger.getLoggerForTest();
+			
+			if (testLogger != null) {
+				testLogger.log(level, str);
+			}
 		}
 	}
 }

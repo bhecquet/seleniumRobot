@@ -269,7 +269,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		fillContextWithSteps(testResult, context);
 		
 		// logs
-		String logs = SeleniumRobotLogger.getTestLogs().get(getTestName(testResult));
+		String logs = SeleniumRobotLogger.getTestLogs(getTestName(testResult));
 		if (logs == null) {
 			logs = "";
 		}

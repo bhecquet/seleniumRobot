@@ -17,6 +17,25 @@
  */
 package com.seleniumtests.util.logging;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.util.helper.WaitHelper;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.filefilter.TrueFileFilter;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.Filter;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.appender.FileAppender;
+import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.core.config.LoggerConfig;
+import org.apache.logging.log4j.core.config.builder.api.*;
+import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
+import org.apache.logging.log4j.core.layout.PatternLayout;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -29,30 +48,8 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.Appender;
-import org.apache.logging.log4j.core.Filter;
-import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.appender.FileAppender;
-import org.apache.logging.log4j.core.config.Configuration;
-import org.apache.logging.log4j.core.config.Configurator;
-import org.apache.logging.log4j.core.config.builder.api.AppenderComponentBuilder;
-import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilder;
-import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilderFactory;
-import org.apache.logging.log4j.core.config.builder.api.LayoutComponentBuilder;
-import org.apache.logging.log4j.core.config.builder.api.RootLoggerComponentBuilder;
-import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
-import org.apache.logging.log4j.core.layout.PatternLayout;
-
-import com.seleniumtests.util.helper.WaitHelper;
 
 public class SeleniumRobotLogger {
 	
@@ -60,7 +57,8 @@ public class SeleniumRobotLogger {
 
 	private static final String FILE_APPENDER_NAME = "FileLogger";
 	private static final Pattern LOG_FILE_PATTERN = Pattern.compile(".*?\\d \\[([^\\]]+)\\](.*)");
-	private static Map<String, String> testLogs = Collections.synchronizedMap(new HashMap<>());
+	private static Map<String, File> testLogs = Collections.synchronizedMap(new HashMap<>());
+	private static ThreadLocal<String> loggerNames = new ThreadLocal();
 	private static String outputDirectory;
 	private static String defaultOutputDirectory;
 	
@@ -73,6 +71,52 @@ public class SeleniumRobotLogger {
 	
 	private SeleniumRobotLogger() {
 		// As a utility class, it is not meant to be instantiated.
+	}
+	
+	public static void createLoggerForTest(String outputDir, String loggerName) {
+		
+		
+
+		LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+		Configuration config = ctx.getConfiguration();
+		Level level = (System.getProperty(INTERNAL_DEBUG) != null && System.getProperty(INTERNAL_DEBUG).contains("core")) ? Level.DEBUG: Level.INFO;
+		
+		if (loggerNames.get() != null) {
+			String previousName = loggerNames.get();
+			Appender appender = ((BuiltConfiguration) config).getLogger(previousName).getAppenders().get(FILE_APPENDER_NAME + "-" + previousName);
+			appender.stop();
+			((BuiltConfiguration) config).getLogger(previousName).removeAppender(FILE_APPENDER_NAME + "-" + previousName);
+		}
+		
+		LoggerConfig loggerConfig = new LoggerConfig(loggerName, level, false);
+		PatternLayout.Builder layoutBuilder = PatternLayout.newBuilder();
+		layoutBuilder.withPattern(LOG_PATTERN);
+		PatternLayout patternLayout = layoutBuilder.build();
+		
+		File logFile = new File(outputDir + "/execution.log");
+		FileAppender.Builder<?> fileAppenderBuilder = FileAppender.newBuilder()
+				.withFileName(logFile.getAbsolutePath());
+		fileAppenderBuilder.setLayout(patternLayout);
+		fileAppenderBuilder.setName(FILE_APPENDER_NAME + "-" + loggerName);
+		
+		Appender fileAppender = fileAppenderBuilder.build();
+		fileAppender.start();
+
+		loggerConfig.addAppender(fileAppender, level, null);
+		loggerConfig.addFilter(RepeatFilter.createFilter(Level.ERROR, true, Filter.Result.ACCEPT, Filter.Result.DENY));
+		
+		config.addLogger(loggerName, loggerConfig);
+		
+		ctx.updateLoggers();
+		loggerNames.set(loggerName);
+		testLogs.put(loggerName, logFile);
+	}
+	
+	public static Logger getLoggerForTest() {
+		if (loggerNames.get() == null) {
+			return null;
+		}
+		return LogManager.getLogger(loggerNames.get());
 	}
 	
 	private static void configureLogger() {
@@ -92,6 +136,8 @@ public class SeleniumRobotLogger {
 		
 		builder.add(consoleAppenderBuilder);
 		
+
+		
 		RootLoggerComponentBuilder rootLogger;
 		// use System property instead of SeleniumTestsContext class as SeleniumrobotLogger class is used for grid extension package and 
         // we do not want to depend on "SeleniumTestsContext" class here
@@ -103,6 +149,7 @@ public class SeleniumRobotLogger {
 		rootLogger.add(builder.newAppenderRef("stdout"));
 		rootLogger.add(builder.newFilter("RepeatFilter", Filter.Result.ACCEPT, Filter.Result.DENY));
 
+		
 		builder.add(rootLogger);
 //		Uncomment to debug configuration
 //		try {
@@ -112,6 +159,8 @@ public class SeleniumRobotLogger {
 //			e.printStackTrace();
 //		}
 		Configurator.reconfigure(builder.build());
+		
+		
 	}
 	
 	public static Logger getLogger(final Class<?> cls) {
@@ -130,7 +179,7 @@ public class SeleniumRobotLogger {
 	        rootIsConfigured = true;
 	    }
 
-	    return LogManager.getLogger(cls);
+	    return new LoggerWrapper(LogManager.getLogger(cls));
 	}
 
 
@@ -228,61 +277,27 @@ public class SeleniumRobotLogger {
 	    	}
 		}
 	}
-
-
+	
 	/**
-	 * Parses log file and store logs of each test in testLogs variable
-	 * @return
-	 * @throws IOException 
+	 * Remove all execution files as they are not needed anymore, data written to log files
 	 */
-	public static synchronized void parseLogFile() {
-
-		Appender fileLoggerAppender = isFileAppenderPresent();
-		if (fileLoggerAppender == null) {
-			return;
-		} 
+	public static void cleanTestLogs() {
 		
-		// read the file from appender directly
-		List<String> logLines;
-		try {
-			logLines = FileUtils.readLines(new File(((FileAppender)fileLoggerAppender).getFileName()), StandardCharsets.UTF_8); 
-		} catch (IOException e) {
-			getLogger(SeleniumRobotLogger.class).error("cannot read log file", e);
-			return;
-		}
-		
-		// clean before reading file. correction of issue #100
-		SeleniumRobotLogger.testLogs.clear();
-			
-		//store the name of the thread for each test
-		Map<String, String> testPerThread = new HashMap<>();
-		String previousThread = null; // will store the thread associated to the previously read line
-		
-		for (String line: logLines) {
-			Matcher matcher = SeleniumRobotLogger.LOG_FILE_PATTERN.matcher(line);
-			if (matcher.matches()) {
-				String thread = matcher.group(1);
-				String content = matcher.group(2);
-				previousThread = thread;
-				
-				if (content.contains(SeleniumRobotLogger.START_TEST_PATTERN)) {
-					String testName = content.split(SeleniumRobotLogger.START_TEST_PATTERN)[1].trim();
-					testPerThread.put(thread, testName);
-					 
-					// do not refresh content of logs in case test is retried
-					if (!SeleniumRobotLogger.testLogs.containsKey(testName)) {
-						SeleniumRobotLogger.testLogs.put(testName, "");
-					}
-				}
-				if (testPerThread.get(thread) != null) {
-					String testName = testPerThread.get(thread);
-					SeleniumRobotLogger.testLogs.put(testName, SeleniumRobotLogger.testLogs.get(testName).concat(line + "\n"));
-				}
-			} else if (previousThread != null && testPerThread.get(previousThread) != null) {
-				String testName = testPerThread.get(previousThread);
-				SeleniumRobotLogger.testLogs.put(testName, SeleniumRobotLogger.testLogs.get(testName).concat(line + "\n"));
+		// stop all file loggers
+		LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+		Configuration config = ctx.getConfiguration();
+		for (LoggerConfig loggerConfig: config.getLoggers().values()) {
+			for (Appender appender: loggerConfig.getAppenders().values()) {
+				appender.stop();
 			}
 		}
+
+		for (File file: FileUtils.listFiles(new File(SeleniumTestsContextManager.getGlobalContext().getDefaultOutputDirectory()),
+				FileFilterUtils.nameFileFilter("execution.log"),
+				TrueFileFilter.INSTANCE )) {
+			file.delete();
+		}
+		
 	}
 	
 	public static void reset() throws IOException {
@@ -308,10 +323,24 @@ public class SeleniumRobotLogger {
 	private static  Appender isFileAppenderPresent() {
 		return ((LoggerContext)LogManager.getContext(false)).getConfiguration().getRootLogger().getAppenders().get(FILE_APPENDER_NAME);
 	}
-
-
-	public static Map<String, String> getTestLogs() {
-		return testLogs;
+	
+	/**
+	 * Returns the file containing logs for requested test name (unique test name)
+	 * or else, null
+	 * @param testName
+	 * @return
+	 */
+	public static String getTestLogs(String testName) {
+		File logFile = testLogs.get(testName);
+		if (logFile == null) {
+			return "";
+		}
+		
+		try {
+			return FileUtils.readFileToString(logFile, StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			return "";
+		}
 	}
 
 

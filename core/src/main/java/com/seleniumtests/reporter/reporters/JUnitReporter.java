@@ -169,7 +169,7 @@ public class JUnitReporter extends CommonReporter {
 	}
 	
 	private static void handleLogs(TestTag testTag, ITestResult testResult) {
-		String logs = SeleniumRobotLogger.getTestLogs().get(getTestName(testResult));
+		String logs = SeleniumRobotLogger.getTestLogs(getTestName(testResult));
 		try {
 			testTag.logs = logs == null ? "Test skipped": StringUtility.encodeString(logs, "xml");
 		} catch (CustomSeleniumTestsException e) {

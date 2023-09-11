@@ -64,7 +64,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 	public JSONObject generateExecutionLogs(final ITestResult testResult) {
 		
 		JSONObject executionLogs = new JSONObject();
-		executionLogs.put("logs", SeleniumRobotLogger.getTestLogs().get(TestNGResultUtils.getUniqueTestName(testResult)));
+		executionLogs.put("logs", SeleniumRobotLogger.getTestLogs(TestNGResultUtils.getUniqueTestName(testResult)));
 		
 		// exception handling
 		StringBuilder stackString = new StringBuilder();
@@ -286,9 +286,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 				
 				if (referenceSnapshot != null) {
 					logger.info("Step KO: reference snapshot got from server");
-					Path newPath = Paths.get(TestNGResultUtils.getSeleniumRobotTestContext(testResult).getScreenshotOutputDirectory(), referenceSnapshot.getName()).toAbsolutePath(); 
-					FileUtils.moveFile(referenceSnapshot, newPath.toFile());
-					testStep.addSnapshot(new Snapshot(new ScreenShot(newPath.getParent().getParent().relativize(newPath).toString()), "Valid-reference", SnapshotCheckType.NONE), 0, null);
+					testStep.addSnapshot(new Snapshot(new ScreenShot(referenceSnapshot), "Valid-reference", SnapshotCheckType.NONE), 0, null);
 					snapshot.setDisplayInReport(true); // change flag so that it's displayed in report (by default reference image extracted from video are not displayed)
 				}
 			} catch (SeleniumRobotServerException e) {

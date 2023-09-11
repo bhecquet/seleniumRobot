@@ -53,7 +53,7 @@ public class TestPageObject extends GenericDriverTest {
 		new DriverTestPage(true);
 		
 		// 0 capture because capture snapshot is set to false
-		Assert.assertTrue(TestStepManager.getCurrentOrPreviousStep().getAllAttachments(true, null).isEmpty());
+		Assert.assertTrue(TestStepManager.getCurrentOrPreviousStep().getAllAttachments(true).isEmpty());
 
 	}
 	@Test(groups={"it"})
@@ -64,8 +64,8 @@ public class TestPageObject extends GenericDriverTest {
 		new DriverTestPage(true);
 		
 		// one capture, due to opening page
-		Assert.assertFalse(TestStepManager.getCurrentOrPreviousStep().getAllAttachments(true, null).isEmpty());
-		Assert.assertEquals(TestStepManager.getCurrentOrPreviousStep().getAllAttachments(true, null).size(), 1);
+		Assert.assertFalse(TestStepManager.getCurrentOrPreviousStep().getAllAttachments(true).isEmpty());
+		Assert.assertEquals(TestStepManager.getCurrentOrPreviousStep().getAllAttachments(true).size(), 1);
 		
 	}
 	

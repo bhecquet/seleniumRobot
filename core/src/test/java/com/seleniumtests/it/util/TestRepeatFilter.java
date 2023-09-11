@@ -46,6 +46,12 @@ public class TestRepeatFilter extends ReporterTest {
 		Assert.assertTrue(logs.matches(".*12 times until \\d+:\\d+:\\d+\\.\\d+ ...*")); // check end time of repeat is present
 		Assert.assertEquals(StringUtils.countMatches(logs, "... repeated 3 times until"), 1);  // last 15 secs
 		
+		// check same logs are in the HTML result file
+		String htmlLogs = readTestMethodResultFile("testLogSameInfoMultipleTimes");
+		Assert.assertEquals(StringUtils.countMatches(htmlLogs, "something interesting"), 2); // 1 time for each period of 60 secs, and test lasts 75 secs
+		Assert.assertEquals(StringUtils.countMatches(htmlLogs, "... repeated 12 times until"), 1); // first 60 secs
+		Assert.assertTrue(htmlLogs.matches(".*12 times until \\d+:\\d+:\\d+\\.\\d+ ...*")); // check end time of repeat is present
+		Assert.assertEquals(StringUtils.countMatches(htmlLogs, "... repeated 3 times until"), 1);  // last 15 secs
 	}
 	
 	/**
@@ -68,6 +74,14 @@ public class TestRepeatFilter extends ReporterTest {
 		Assert.assertEquals(StringUtils.countMatches(logs, "... repeated 2 times"), logs.contains("seleniumRobotServerActive key not found or set to false") ? 3: 1); // "seleniumRobotServerActive key not found or set to false, or url key seleniumRobotServerUrl has not been set" 
 																														// AND "something else interesting"
 		Assert.assertEquals(StringUtils.countMatches(logs, "... repeated"), logs.contains("seleniumRobotServerActive key not found or set to false") ? 6: 4);
+		
+		String htmlLogs2 = readTestMethodResultFile("testLogSameInfoMultipleTimes2");
+		Assert.assertEquals(StringUtils.countMatches(htmlLogs2, "... repeated 15 times"), 1);
+		Assert.assertEquals(StringUtils.countMatches(htmlLogs2, "... repeated 3 times"), 1);
+		
+		String htmlLogs = readTestMethodResultFile("testLogSameInfoMultipleTimes");
+		Assert.assertEquals(StringUtils.countMatches(htmlLogs, "... repeated 20 times"), 1);
+		Assert.assertEquals(StringUtils.countMatches(htmlLogs, "... repeated 2 times"), 1);
 		
 	}
 }

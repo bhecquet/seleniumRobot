@@ -83,13 +83,15 @@ public class ReporterControler implements IReporter {
 	@Override
 	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String outputDirectory) {
 		generateReport(xmlSuites, suites, outputDirectory, null);
+		
+		// remove test logs
+		SeleniumRobotLogger.cleanTestLogs();
 	}
 
 	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String outputDirectory, ITestResult currentTestResult) {
 		
 		synchronized (reporterLock) {
 
-			SeleniumRobotLogger.parseLogFile();
 			Map<ITestContext, Set<ITestResult>> resultSet = updateTestSteps(suites, currentTestResult);
 			try {
 				new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).mkdirs();

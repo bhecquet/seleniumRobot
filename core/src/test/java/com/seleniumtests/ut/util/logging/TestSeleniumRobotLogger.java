@@ -44,9 +44,11 @@ public class TestSeleniumRobotLogger extends MockitoTest {
 	@Test(groups= {"ut"})
 	public void testLogInDevMode() throws IOException {
 		try {
+			// simulate init of logger
 			SeleniumRobotLogger.reset();
 			System.setProperty(SeleniumRobotLogger.INTERNAL_DEBUG, "core");
 			SeleniumRobotLogger.updateLogger(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory());
+			SeleniumRobotLogger.createLoggerForTest(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "testLogInDevMode");
 			
 			Logger logger = spy(SeleniumRobotLogger.getLogger(TestSeleniumRobotLogger.class));
 			
@@ -56,8 +58,7 @@ public class TestSeleniumRobotLogger extends MockitoTest {
 			logger.info(SeleniumRobotLogger.END_TEST_PATTERN + "testLogInDevMode");
 
 			// check log file content
-			SeleniumRobotLogger.parseLogFile();
-			String logs = SeleniumRobotLogger.getTestLogs().get("testLogInDevMode");
+			String logs = SeleniumRobotLogger.getTestLogs("testLogInDevMode");
 			Assert.assertTrue(logs.contains("some info"));
 			Assert.assertTrue(logs.contains("some debug"));
 			
@@ -74,9 +75,12 @@ public class TestSeleniumRobotLogger extends MockitoTest {
 	@Test(groups= {"ut"})
 	public void testLogInRunMode() throws IOException {
 		try {
+			
+			// simulate init of logger
 			SeleniumRobotLogger.reset();
 			System.setProperty(SeleniumRobotLogger.INTERNAL_DEBUG, "none");
 			SeleniumRobotLogger.updateLogger(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory());
+			SeleniumRobotLogger.createLoggerForTest(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "testLogInRunMode");
 			
 			Logger logger = spy(SeleniumRobotLogger.getLogger(TestSeleniumRobotLogger.class));
 			
@@ -86,8 +90,7 @@ public class TestSeleniumRobotLogger extends MockitoTest {
 			logger.info(SeleniumRobotLogger.END_TEST_PATTERN + "testLogInRunMode");
 
 			// check log file content
-			SeleniumRobotLogger.parseLogFile();
-			String logs = SeleniumRobotLogger.getTestLogs().get("testLogInRunMode");
+			String logs = SeleniumRobotLogger.getTestLogs("testLogInRunMode");
 			Assert.assertTrue(logs.contains("some info"));
 			Assert.assertFalse(logs.contains("some debug"));
 			
@@ -105,10 +108,12 @@ public class TestSeleniumRobotLogger extends MockitoTest {
 	@Test(groups= {"non-ut"})
 	public void testSystemOutRedirectedToLogger() throws IOException {
 		try {
+			
+			// simulate init of logger
 			SeleniumRobotLogger.reset();
 			System.setProperty(SeleniumRobotLogger.INTERNAL_DEBUG, "none");
 			SeleniumRobotLogger.updateLogger(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory());
-
+			SeleniumRobotLogger.createLoggerForTest(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "testSystemOutRedirectedToLogger");
 
 			logger.info(SeleniumRobotLogger.START_TEST_PATTERN + "testSystemOutRedirectedToLogger");
 			System.out.println("information");
@@ -116,8 +121,7 @@ public class TestSeleniumRobotLogger extends MockitoTest {
 			logger.info(SeleniumRobotLogger.END_TEST_PATTERN + "testSystemOutRedirectedToLogger");
 			
 			// check log file content
-			SeleniumRobotLogger.parseLogFile();
-			String logs = SeleniumRobotLogger.getTestLogs().get("testSystemOutRedirectedToLogger");
+			String logs = SeleniumRobotLogger.getTestLogs("testSystemOutRedirectedToLogger");
 			Assert.assertTrue(logs.contains("Sys$Out: information"));
 			Assert.assertTrue(logs.contains("Sys$Error: error"));
 			

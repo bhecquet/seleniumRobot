@@ -36,8 +36,7 @@ public class ScenarioLogger {
 	}
 
 	public static ScenarioLogger getScenarioLogger(final Class<?> cls) {
-		SeleniumRobotLogger.getLogger(cls);
-		Logger logger = LogManager.getLogger("." + cls.getName());
+		Logger logger = SeleniumRobotLogger.getLogger(cls);
 		return new ScenarioLogger(logger);
 	}
 	

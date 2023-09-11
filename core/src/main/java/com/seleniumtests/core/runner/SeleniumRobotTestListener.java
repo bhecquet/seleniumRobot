@@ -105,9 +105,39 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		generateTempReport(testResult);
 
 	}
-
+	
+	/**
+	 * Executed just before the test starts
+	 * @param testResult
+	 */
 	@Override
-	public void onTestStart(ITestResult result) {
+	public void onTestStart(ITestResult testResult) {
+
+		TestNGResultUtils.setTestMethodName(testResult, TestNGResultUtils.getTestName(testResult));
+		TestNGResultUtils.setUniqueTestName(testResult, TestNGResultUtils.getTestName(testResult));// initialize it so that it's always set
+		ITestNGMethod method = testResult.getMethod();
+		
+		SeleniumTestsContextManager.insertThreadContext(method, testResult, testResult.getTestContext());
+		
+		if (method.getRetryAnalyzer(testResult) == null || method.getRetryAnalyzer(testResult) instanceof DisabledRetryAnalyzer) {
+			testResult.getMethod().setRetryAnalyzerClass(TestRetryAnalyzer.class);
+			((TestRetryAnalyzer)method.getRetryAnalyzer(testResult)).setMaxCount(SeleniumTestsContextManager.getThreadContext().getTestRetryCount());
+		}
+		
+		// unique method name is the test name plus an index in case DataProvider is used
+		TestNGResultUtils.setUniqueTestName(testResult, SeleniumTestsContextManager.getThreadContext().getRelativeOutputDir());
+		SeleniumRobotLogger.createLoggerForTest(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), TestNGResultUtils.getUniqueTestName(testResult));
+		
+		logger.info(SeleniumRobotLogger.START_TEST_PATTERN + TestNGResultUtils.getUniqueTestName(testResult));
+		
+		// search method parameters that should be masked
+		Object[] testParameters = testResult.getParameters();
+		for (int i = 0; i < testParameters.length; i++) {
+			if (testResult.getMethod().getConstructorOrMethod().getMethod().getParameters()[i].getAnnotationsByType(Mask.class).length > 0
+					&& testResult.getParameters()[i] != null) {
+				SeleniumTestsContextManager.getThreadContext().getTestStepManager().addPasswordToReplace(testResult.getParameters()[i].toString());
+			}
+		}
 	}
 
 	@Override
@@ -260,10 +290,6 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		// for each beforemethod, store the current context so that it can be edited by the configuration method
 		if (method.isConfigurationMethod()) {
 			configureThreadContextBeforeInvoke(method, testResult, context);
-		}
-
-		if (method.isTestMethod()) {
-			executeBeforeTestMethod(method, testResult, context);	
 		}
 	}
 	
@@ -526,36 +552,6 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	private void configureThreadContextAfterInvoke(IInvokedMethod method, ITestResult testResult, ITestContext context) {
 		SeleniumTestsContextManager.saveThreadContext(method, testResult, context);
 	}
-	
-	/**
-	 * Execute the actions before test method
-	 */
-	private void executeBeforeTestMethod(IInvokedMethod method, ITestResult testResult, ITestContext context) {
-		
-		TestNGResultUtils.setTestMethodName(testResult, TestNGResultUtils.getTestName(testResult));
-		TestNGResultUtils.setUniqueTestName(testResult, TestNGResultUtils.getTestName(testResult));// initialize it so that it's always set
-		
-		SeleniumTestsContextManager.insertThreadContext(method.getTestMethod(), testResult, context);
-
-    	if (method.getTestMethod().getRetryAnalyzer(testResult) == null || method.getTestMethod().getRetryAnalyzer(testResult) instanceof DisabledRetryAnalyzer) {
-    		testResult.getMethod().setRetryAnalyzerClass(TestRetryAnalyzer.class);
-    		((TestRetryAnalyzer)method.getTestMethod().getRetryAnalyzer(testResult)).setMaxCount(SeleniumTestsContextManager.getThreadContext().getTestRetryCount());
-		}	
-    	
-    	// unique method name is the test name plus an index in case DataProvider is used
-    	TestNGResultUtils.setUniqueTestName(testResult, SeleniumTestsContextManager.getThreadContext().getRelativeOutputDir());
-		logger.info(SeleniumRobotLogger.START_TEST_PATTERN + TestNGResultUtils.getUniqueTestName(testResult));
-		
-		// search method parameters that should be masked
-		Object[] testParameters = testResult.getParameters();
-		for (int i = 0; i < testParameters.length; i++) {
-			if (testResult.getMethod().getConstructorOrMethod().getMethod().getParameters()[i].getAnnotationsByType(Mask.class).length > 0
-					&& testResult.getParameters()[i] != null) {
-				SeleniumTestsContextManager.getThreadContext().getTestStepManager().addPasswordToReplace(testResult.getParameters()[i].toString());
-			}
-		}
-	}
-	
 
 	/**
 	 * Finalize test method execution

@@ -1,6 +1,7 @@
 package com.seleniumtests.util.logging;
 
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.Logger;
@@ -17,16 +18,19 @@ import java.time.format.DateTimeFormatter;
 public final class RepeatFilter extends AbstractFilter {
 	
 	private org.apache.logging.log4j.Logger logger = null;
+	private org.apache.logging.log4j.Logger testLogger = null;
  
     private final Level level;
+    private final boolean logTests;
     private ThreadLocal<String> lastLog = new ThreadLocal<>();
     private ThreadLocal<Integer> lastLogRepeat = new ThreadLocal<>();
     private ThreadLocal<LocalDateTime> lastLogTime = new ThreadLocal<>();
     private ThreadLocal<LocalDateTime> firstLogTime = new ThreadLocal<>();
  
-    private RepeatFilter(Level level, Result onMatch, Result onMismatch) {
+    private RepeatFilter(Level level, boolean logTests, Result onMatch, Result onMismatch) {
         super(onMatch, onMismatch);
         this.level = level;
+        this.logTests = logTests;
     }
 
     @Override
@@ -47,9 +51,12 @@ public final class RepeatFilter extends AbstractFilter {
     private Result filter(String message) {
     	
     	// delay logger creation so that we do not have recursive call on init
-    	if (logger == null) {
-        	logger = SeleniumRobotLogger.getLogger(RepeatFilter.class);
+    	if (logger == null && !logTests) {
+        	logger = LogManager.getRootLogger();
     	}
+    	else if (logTests) {
+    	    logger = SeleniumRobotLogger.getLoggerForTest();
+        }
     	
     	boolean discard = false;
     	if (lastLog.get() != null) {
@@ -72,7 +79,9 @@ public final class RepeatFilter extends AbstractFilter {
     			Integer repeatTime = lastLogRepeat.get();
     			lastLogRepeat.set(0);
     			if (repeatTime != null && repeatTime > 1) {
-    				logger.info("... repeated {} times until {} ...", repeatTime, lastLogTime.get().format(DateTimeFormatter.ISO_LOCAL_TIME));
+    			    if (logger != null) {
+    				    logger.info("... repeated {} times until {} ...", repeatTime, lastLogTime.get().format(DateTimeFormatter.ISO_LOCAL_TIME));
+                    }
     			}
     			lastLogRepeat.remove();
     			firstLogTime.set(LocalDateTime.now()); // record the time of the first occurence of the message
@@ -83,6 +92,7 @@ public final class RepeatFilter extends AbstractFilter {
     	}
     	
     	lastLog.set(message);
+    	
         return discard ? onMismatch: onMatch;
     }
  
@@ -102,6 +112,12 @@ public final class RepeatFilter extends AbstractFilter {
     public static RepeatFilter createFilter(@PluginAttribute(value = "level", defaultString = "ERROR") Level level,
                                                @PluginAttribute(value = "onMatch", defaultString = "NEUTRAL") Result onMatch,
                                                @PluginAttribute(value = "onMismatch", defaultString = "DENY") Result onMismatch) {
-        return new RepeatFilter(level, onMatch, onMismatch);
+        return new RepeatFilter(level, false, onMatch, onMismatch);
+    }
+    public static RepeatFilter createFilter(@PluginAttribute(value = "level", defaultString = "ERROR") Level level,
+                                               @PluginAttribute(value = "logTests", defaultString = "FALSE") boolean logTests,
+                                               @PluginAttribute(value = "onMatch", defaultString = "NEUTRAL") Result onMatch,
+                                               @PluginAttribute(value = "onMismatch", defaultString = "DENY") Result onMismatch) {
+        return new RepeatFilter(level, logTests, onMatch, onMismatch);
     }
 }
