@@ -60,11 +60,7 @@ public class TestBugTracker extends MockitoTest {
 		File tmpHtml = File.createTempFile("html", ".html");
 		tmpHtml.deleteOnExit();
 		
-		screenshot = new ScreenShot();
-		screenshot.setImagePath("screenshot/" + tmpImg.getName());
-		screenshot.setHtmlSourcePath("htmls/" + tmpHtml.getName());
-		FileUtils.copyFile(tmpImg, new File(screenshot.getFullImagePath()));
-		FileUtils.copyFile(tmpHtml, new File(screenshot.getFullHtmlPath()));
+		screenshot = new ScreenShot(tmpImg, tmpHtml);
 		
 		step1 = new TestStep("step 1", null, new ArrayList<>(), false);
 		step1.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);

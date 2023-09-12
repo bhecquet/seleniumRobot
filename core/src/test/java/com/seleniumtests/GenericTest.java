@@ -63,6 +63,12 @@ public class GenericTest {
 		SeleniumTestsContextManager.getThreadContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
 		SeleniumTestsContextManager.getGlobalContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
 		SeleniumTestsContext.resetOutputFolderNames();
+		
+		try {
+			FileUtils.deleteDirectory(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
+		} catch (IOException e) {
+		
+		}
 	}
 	
 	public void initThreadContext(final ITestContext testNGCtx) {
@@ -96,7 +102,7 @@ public class GenericTest {
 		
 		return tempFile;
 	}
-	
+
 
 	public static String readResourceToString(String resourceName) throws IOException {
 		return IOUtils.toString(Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName), StandardCharsets.UTF_8);

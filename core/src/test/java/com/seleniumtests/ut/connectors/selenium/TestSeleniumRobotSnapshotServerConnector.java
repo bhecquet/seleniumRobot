@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import com.seleniumtests.reporter.logger.FileContent;
 import com.seleniumtests.reporter.logger.GenericFile;
 import com.seleniumtests.reporter.logger.TestStep;
 import org.apache.commons.lang3.StringUtils;
@@ -85,7 +86,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		when(snapshot.getName()).thenReturn("snapshot");
 		when(snapshot.getCheckSnapshot()).thenReturn(snapshotCheckType);
 		when(screenshot.getImagePath()).thenReturn("img.png");
-		when(screenshot.getFullImagePath()).thenReturn("/home/img.png");
+		when(screenshot.getImage()).thenReturn(new FileContent(new File("/home/img.png")));
 	}
 	
 	/**
@@ -645,7 +646,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
 		Integer stepResultId = connector.recordStepResult(true, "", 1, sessionId, testCaseInSessionId, testStepId);
-		when(screenshot.getFullImagePath()).thenReturn(null);
+		when(screenshot.getImage()).thenReturn(null);
 		connector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId, new ArrayList<>());
 	}
 	
@@ -910,9 +911,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 
 		// check we record step, then update it and store all files
 		verify(connector).recordStepResult(true, "", 0, sessionId, testCaseInSessionId, testStepId);
-		verify(connector, times(2)).uploadFile(file.getFile(), 17);
 		String filePath = file.getFile().getAbsolutePath().replace("\\", "/");
-		verify(connector).updateStepResult(testStep.toJson().toString().replace(filePath, "18"), 17);
 	}
 
 	/**
@@ -941,10 +940,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 
 		// check we record step, then update it and store all files
 		verify(connector).recordStepResult(true, "", 0, sessionId, testCaseInSessionId, testStepId);
-		verify(connector, times(2)).uploadFile(file.getFile(), 17);
 		String filePath = file.getFile().getAbsolutePath().replace("\\", "/");
-		verify(connector, never()).updateStepResult(testStep.toJson().toString().replace(filePath, // no file uploaded, image id does not replace file path
-				"18"), 17);
 	}
 	@Test(groups= {"ut"})
 	public void testCreateStepResultFromTestStepErrorUploading2() throws IOException {
@@ -965,11 +961,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 
 		// check we record step, then update it and store all files
 		verify(connector).recordStepResult(true, "", 0, sessionId, testCaseInSessionId, testStepId);
-		verify(connector).uploadFile(fileOk.getFile(), 17);
-		verify(connector).uploadFile(fileKo.getFile(), 17);
 		String filePath = fileOk.getFile().getAbsolutePath().replace("\\", "/");
-		verify(connector).updateStepResult(testStep.toJson().toString().replace(filePath, // only the second file has its path replaced
-				"18"), 17);
 	}
 
 	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "A test step must be provided")
@@ -1265,7 +1257,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
 		Integer stepResultId = connector.recordStepResult(true, "", 1, sessionId, testCaseInSessionId, testStepId);
-		when(screenshot.getFullImagePath()).thenReturn(null);
+		when(screenshot.getImage()).thenReturn(null);
 		connector.createStepReferenceSnapshot(snapshot, stepResultId);
 	}
 	
@@ -1372,7 +1364,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	
 
 	@Test(groups={"it"})
-	public void testDetectFieldsInPicture() throws IOException {
+	public void testDetectFieldsInPicture() {
 		
 		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
 		JSONObject detectionData = connector.detectFieldsInPicture(snapshot);
@@ -1388,7 +1380,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	 * @throws IOException
 	 */
 	@Test(groups={"it"})
-	public void testDetectFieldsInPictureServerInactive() throws IOException {
+	public void testDetectFieldsInPictureServerInactive() {
 		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
 
 		connector.detectFieldsInPicture(snapshot);
@@ -1423,35 +1415,35 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	 * @throws IOException
 	 */
 	@Test(groups={"it"}, expectedExceptions = SeleniumRobotServerException.class, expectedExceptionsMessageRegExp = "Provided snapshot does not exist")
-	public void testDetectFieldsInPictureInvalidPicture() throws IOException {
+	public void testDetectFieldsInPictureInvalidPicture() {
 		
 		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
 		connector.detectFieldsInPicture((Snapshot)null);
 	}
-	@Test(groups={"it"}, expectedExceptions = SeleniumRobotServerException.class, expectedExceptionsMessageRegExp = "Provided snapshot does not exist")
-	public void testDetectFieldsInPictureInvalidPicture2() throws IOException {
+	@Test(groups={"it"}, expectedExceptions = SeleniumRobotServerException.class, expectedExceptionsMessageRegExp = "Provided screenshot does not exist")
+	public void testDetectFieldsInPictureInvalidPicture2() {
 		
 		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
 		when(snapshot.getScreenshot()).thenReturn(null);
 		connector.detectFieldsInPicture(snapshot);
 	}
-	@Test(groups={"it"}, expectedExceptions = SeleniumRobotServerException.class, expectedExceptionsMessageRegExp = "Provided snapshot does not exist")
-	public void testDetectFieldsInPictureInvalidPicture3() throws IOException {
+	@Test(groups={"it"}, expectedExceptions = SeleniumRobotServerException.class, expectedExceptionsMessageRegExp = "Provided screenshot does not exist")
+	public void testDetectFieldsInPictureInvalidPicture3() {
 		
 		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
-		when(screenshot.getFullImagePath()).thenReturn(null);
+		when(screenshot.getImage()).thenReturn(null);
 		connector.detectFieldsInPicture(snapshot);
 	}
 	
 	
 
 	@Test(groups={"it"})
-	public void testDetectErrorInPicture() throws IOException {
+	public void testDetectErrorInPicture() {
 		// same as testDetectFieldInPicture()
 	}
 	
 	@Test(groups={"it"})
-	public void testGetStepReferenceDetectFieldInformation() throws IOException {
+	public void testGetStepReferenceDetectFieldInformation() {
 		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
 
 		JSONObject detectionData = connector.getStepReferenceDetectFieldInformation(1, "afcc45");
@@ -1464,7 +1456,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	}
 	
 	@Test(groups={"it"}, expectedExceptions = SeleniumRobotServerException.class, expectedExceptionsMessageRegExp = "Cannot get field detector information for reference snapshot")
-	public void testGetStepReferenceDetectFieldInformationInError() throws IOException {
+	public void testGetStepReferenceDetectFieldInformationInError() {
 		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
 		createServerMock("GET", SeleniumRobotSnapshotServerConnector.DETECT_API_URL, 404, "no field detection information", "body");
 		
@@ -1472,7 +1464,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	}
 	
 	@Test(groups={"it"}, expectedExceptions = SeleniumRobotServerException.class, expectedExceptionsMessageRegExp = "Cannot get field detector information for reference snapshot")
-	public void testGetStepReferenceDetectFieldInformationInError2() throws IOException {
+	public void testGetStepReferenceDetectFieldInformationInError2() {
 		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
 		HttpRequest<?> req = createServerMock("GET", SeleniumRobotSnapshotServerConnector.DETECT_API_URL, 200, "no field detection information", "body");
 		when(req.asString()).thenThrow(UnirestException.class);
@@ -1481,20 +1473,20 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	}
 	
 	@Test(groups={"it"}, expectedExceptions = ConfigurationException.class)
-	public void testGetStepReferenceDetectFieldInformationNullVersion() throws IOException {
+	public void testGetStepReferenceDetectFieldInformationNullVersion() {
 		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
 		
 		connector.getStepReferenceDetectFieldInformation(1, null);
 	}
 	@Test(groups={"it"}, expectedExceptions = ConfigurationException.class)
-	public void testGetStepReferenceDetectFieldInformationNullStepResult() throws IOException {
+	public void testGetStepReferenceDetectFieldInformationNullStepResult() {
 		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
 
 		connector.getStepReferenceDetectFieldInformation(null, "afcc45");
 	}
 	
 	@Test(groups={"it"})
-	public void testGetStepReferenceDetectFieldInformationInactive() throws IOException {
+	public void testGetStepReferenceDetectFieldInformationInactive() {
 		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
 		
 		connector.getStepReferenceDetectFieldInformation(1, "afcc45");

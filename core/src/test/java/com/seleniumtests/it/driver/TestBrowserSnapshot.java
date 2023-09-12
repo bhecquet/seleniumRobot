@@ -226,7 +226,7 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 		
 		ScreenShot screenshot = screenshotUtil.capture(SnapshotTarget.PAGE, ScreenShot.class);
 		Assert.assertNotNull(screenshot.getHtmlSourcePath());
-		Assert.assertNotNull(screenshot.getFullImagePath());
+		Assert.assertNotNull(screenshot.getImage());
 	}
 	
 	/**
@@ -249,7 +249,7 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 		
 		ScreenShot screenshot = screenshotUtil.capture(SnapshotTarget.PAGE, ScreenShot.class);
 		Assert.assertNotNull(screenshot.getHtmlSourcePath());
-		Assert.assertNotNull(screenshot.getFullImagePath());
+		Assert.assertNotNull(screenshot.getImage());
 	}
 
 	/**
@@ -467,7 +467,7 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 		
 		Assert.assertEquals(screenshots.size(), 2);
 		Assert.assertEquals(currentWindowHandle, driver.getWindowHandle());
-		Assert.assertTrue(FileUtils.sizeOf(new File(((ScreenShot)screenshots.get(0)).getFullImagePath())) < FileUtils.sizeOf(new File(((ScreenShot)screenshots.get(1)).getFullImagePath())));
+		Assert.assertTrue(FileUtils.sizeOf(((ScreenShot)screenshots.get(0)).getImage().getFile()) < FileUtils.sizeOf(((ScreenShot)screenshots.get(1)).getImage().getFile()));
 	}
 	
 	/**

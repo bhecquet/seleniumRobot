@@ -17,13 +17,20 @@
  */
 package com.seleniumtests.driver.screenshots;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.reporter.logger.FileContent;
+import com.seleniumtests.util.FileUtility;
+import com.seleniumtests.util.HashCodeGenerator;
 import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
@@ -32,6 +39,10 @@ import org.json.JSONObject;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
+/**
+ * Represents a screenshot (image + HTML source code when applicable)
+ * Files are stored in the output directory of the test
+ */
 public class ScreenShot {
 	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(ScreenShot.class);
@@ -40,55 +51,101 @@ public class ScreenShot {
     private FileContent image;
     private FileContent html;
     private String title;
-    private String suiteName;
     private long duration;
-    private boolean isException;
     private String outputDirectory;
-
-    public ScreenShot() {
-        this(null);
-    }
     
-    public ScreenShot(String imagePath) {
-    	if (SeleniumTestsContextManager.getGlobalContext().getTestNGContext() != null) {
-            suiteName = SeleniumTestsContextManager.getGlobalContext().getTestNGContext().getSuite().getName();
-            outputDirectory = SeleniumTestsContextManager.getThreadContext().getOutputDirectory();
-        }
-    	
-    	if (imagePath != null) {
-            this.image = new FileContent(Paths.get(outputDirectory, imagePath).toFile());
-        }
-    
-    	this.duration = 0;
-    }
-
-    public boolean isException() {
-        return isException;
-    }
-
-    public void setException(final boolean isException) {
-        this.isException = isException;
-    }
-
     /**
-     * @deprecated not used anymore
-     * @return
+     * File will be copied in <output_directory>/screenshots/<file_name>
+     * @param imageBuffer
      */
-    @Deprecated
-    public String getSuiteName() {
-        return suiteName;
+    public ScreenShot(BufferedImage imageBuffer, String pageSource) {
+    
+        initializeOutputDirectory();
+        
+        String filename = HashCodeGenerator.getRandomHashCode("web");
+        if (imageBuffer != null) {
+            Path filePath = Paths.get(outputDirectory, ScreenshotUtil.SCREENSHOT_DIR, filename + ".png");
+            FileUtility.writeImage(filePath.toString(), imageBuffer);
+            this.image = new FileContent(filePath.toFile());
+        }
+
+        if (pageSource != null) {
+            try {
+                File htmlFile = Paths.get(outputDirectory, ScreenshotUtil.HTML_DIR, filename + ".html").toFile();
+                FileUtils.writeStringToFile(htmlFile, pageSource, StandardCharsets.UTF_8);
+                html = new FileContent(htmlFile);
+            } catch (IOException e) {
+                logger.warn("Ex", e);
+            }
+        }
+    }
+    
+    /**
+     * File will be copied in <output_directory>/screenshots/<file_name>
+     * @param imageFile
+     */
+    public ScreenShot(File imageFile) {
+        this(imageFile, null, ScreenshotUtil.SCREENSHOT_DIR);
+    }
+    public ScreenShot(File imageFile, File htmlFile) {
+        this(imageFile, htmlFile, ScreenshotUtil.SCREENSHOT_DIR);
+    }
+    
+    /**
+     * File will be copied in <output_directory>/<relative_path>/<file_name>
+     * @param imageFile
+     */
+    public ScreenShot(File imageFile, File htmlFile, String relativePath) {
+        
+        
+    
+        initializeOutputDirectory();
+    
+        // copy the input image file to <output_directory>/screenshots/<file_name>
+        if (imageFile != null && imageFile.exists()) {
+            Path filePath = Paths.get(outputDirectory, relativePath, imageFile.getName());
+            filePath.getParent().toFile().mkdirs();
+            try {
+                Files.move(imageFile.toPath(), filePath, StandardCopyOption.REPLACE_EXISTING);
+                this.image = new FileContent(filePath.toFile());
+            } catch (Exception e) {
+                throw new ScenarioException(String.format("Failed to move image file %s to %s: %s", imageFile.getAbsolutePath(), filePath.toFile().getAbsolutePath(), e.getMessage()));
+            }
+        }
+    
+        // copy the input HTML file to <output_directory>/htmls/<file_name>
+        if (htmlFile != null && htmlFile.exists()) {
+            Path htmlFilePath = Paths.get(outputDirectory, ScreenshotUtil.HTML_DIR, htmlFile.getName());
+            htmlFilePath.getParent().toFile().mkdirs();
+            try {
+                Files.move(htmlFile.toPath(), htmlFilePath, StandardCopyOption.REPLACE_EXISTING);
+                this.html = new FileContent(htmlFilePath.toFile());
+            } catch (Exception e) {
+                throw new ScenarioException(String.format("Failed to move html file %s to %s: %s", htmlFile.getAbsolutePath(), htmlFilePath.toFile().getAbsolutePath(), e.getMessage()));
+            }
+        }
+    
+        this.duration = 0;
+    }
+    
+    private void initializeOutputDirectory() {
+        if (SeleniumTestsContextManager.getGlobalContext().getTestNGContext() != null) {
+            outputDirectory = SeleniumTestsContextManager.getThreadContext().getOutputDirectory();
+        } else {
+            throw new ScenarioException("Cannot create a screenshot outside of a test");
+        }
     }
 
     public String getOutputDirectory() {
         return outputDirectory;
     }
-
-    public void setOutputDirectory(final String outputDirectory) {
+    
+    /**
+     * For test
+     * @param outputDirectory
+     */
+    public void setOutputDirectory(String outputDirectory) {
         this.outputDirectory = outputDirectory;
-    }
-
-    public void setSuiteName(final String suiteName) {
-        this.suiteName = suiteName;
     }
 
     /**
@@ -110,14 +167,6 @@ public class ScreenShot {
     public void setLocation(String location) {
         this.location = location;
     }
-
-    public void setHtmlSourcePath(String htmlSourcePath) {
-        this.html = new FileContent(Paths.get(outputDirectory, htmlSourcePath).toFile());
-    }
-
-    public void setImagePath(String imagePath) {
-        this.image = new FileContent(Paths.get(outputDirectory, imagePath).toFile());
-    }
     
     /**
      * Returns the relative path of HTML file (relative to outputDirectory)
@@ -130,19 +179,6 @@ public class ScreenShot {
             return null;
         }
         
-    }
-    
-    public String getHtmlSource() {
-    	if (html != null) {
-    		try {
-				return FileUtils.readFileToString(html.getFile(), StandardCharsets.UTF_8);
-			} catch (IOException e) {
-				logger.error("cannot read source file", e);
-				return "";
-			}
-    	} else {
-    		return "";
-    	}
     }
 
     /**
@@ -169,26 +205,10 @@ public class ScreenShot {
         this.title = title;
     }
 
-    public String getFullImagePath() {
-        if (image != null) {
-            return image.getFile().getAbsolutePath().replace("\\", "/");
-        } else {
-            return null;
-        }
-    }
-
-    public String getFullHtmlPath() {
-        if (html != null) {
-        	return html.getFile().getAbsolutePath().replace("\\", "/");
-        } else {
-            return null;
-        }
-    }
-
     @Override
     public String toString() {
-        return "!!!EXCEPTION:" + this.isException + "|APPLICATION URL:" + this.location + "|PAGE TITLE:" + this.title
-                + "|PAGE HTML SOURCE:" + this.getFullHtmlPath() + "|PAGE IMAGE:" + this.getFullImagePath();
+        return "|APPLICATION URL:" + this.location + "|PAGE TITLE:" + this.title
+                + "|PAGE HTML SOURCE:" + this.getHtmlSourcePath() + "|PAGE IMAGE:" + this.getImagePath();
     }
 
 	public long getDuration() {

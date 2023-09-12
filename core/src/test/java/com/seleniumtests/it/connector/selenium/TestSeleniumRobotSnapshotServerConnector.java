@@ -136,8 +136,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		File image = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "img.png").toFile();
 		image.deleteOnExit();
 		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/images/ffLogoConcat.png"), image);
-		ScreenShot screenshot = new ScreenShot();
-		screenshot.setImagePath(image.getName());
+		ScreenShot screenshot = new ScreenShot(image, null, "");
 		Snapshot snapshot = new Snapshot(screenshot, "img", SnapshotCheckType.TRUE);
 		
 		connector.createStepReferenceSnapshot(snapshot, stepResultId);
@@ -164,8 +163,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		File image = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "img.png").toFile();
 		image.deleteOnExit();
 		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/images/ffLogoConcat.png"), image);
-		ScreenShot screenshot = new ScreenShot();
-		screenshot.setImagePath(image.getName());
+		ScreenShot screenshot = new ScreenShot(image, null, "");
 		Snapshot snapshot = new Snapshot(screenshot, "img", SnapshotCheckType.TRUE);
 		Integer snapshotId = connector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId, Arrays.asList(new Rectangle(10, 11, 120, 230), 
 				new Rectangle(100, 110, 220, 130)));
@@ -189,8 +187,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		File image = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "img.png").toFile();
 		image.deleteOnExit();
 		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/images/ffLogoConcat.png"), image);
-		ScreenShot screenshot = new ScreenShot();
-		screenshot.setImagePath(image.getName());
+		ScreenShot screenshot = new ScreenShot(image, null, "");
 		Snapshot snapshot = new Snapshot(screenshot, "img", SnapshotCheckType.TRUE);
 		SnapshotComparisonResult comparisonResult = connector.checkSnapshotHasNoDifferences(snapshot, "Test 2", "Step 1");
 		
@@ -218,8 +215,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		File image = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "img.png").toFile();
 		image.deleteOnExit();
 		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/imageFieldDetection/login-page-error.jpg"), image);
-		ScreenShot screenshot = new ScreenShot();
-		screenshot.setImagePath(image.getName());
+		ScreenShot screenshot = new ScreenShot(image, null, "");
 		Snapshot snapshot = new Snapshot(screenshot, "img", SnapshotCheckType.FALSE);
 		JSONObject detectionData = connector.detectErrorInPicture(snapshot);
 		JSONArray errors = detectionData.getJSONArray("fields");
@@ -234,8 +230,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		File image = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "img.png").toFile();
 		image.deleteOnExit();
 		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/imageFieldDetection/browserCapture.png"), image);
-		ScreenShot screenshot = new ScreenShot();
-		screenshot.setImagePath(image.getName());
+		ScreenShot screenshot = new ScreenShot(image, null, "");
 		Snapshot snapshot = new Snapshot(screenshot, "img", SnapshotCheckType.FALSE);
 		JSONObject detectionData = connector.detectFieldsInPicture(snapshot);
 		JSONArray fields = detectionData.getJSONArray("fields");

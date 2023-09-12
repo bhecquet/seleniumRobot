@@ -127,8 +127,8 @@ public class TestUiElement extends MockitoTest {
 		FileUtils.moveFile(screenCaptureFile, Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), screenCaptureFile.getName()).toFile());
 		FileUtils.moveFile(browserCaptureFile, Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), browserCaptureFile.getName()).toFile());
 		
-		screenCapture = new ScreenShot(screenCaptureFile.getName());
-		browserCapture = new ScreenShot(browserCaptureFile.getName());
+		screenCapture = new ScreenShot(screenCaptureFile, null, "");
+		browserCapture = new ScreenShot(browserCaptureFile, null, "");
 
 	}
 	

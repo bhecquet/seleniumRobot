@@ -166,7 +166,7 @@ public class UiElement {
 			// TODO: handle other cases than browser
 			// try to find viewport position so that we can match a position on browser capture with the same position on screen
 			// we assume that browser is started on main screen in a multi-screen environment
-			Rectangle viewportPosition = detectViewPortPosition(new File(screenshotFile.getFullImagePath()));
+			Rectangle viewportPosition = detectViewPortPosition(screenshotFile.getImage().getFile());
 			offsetPerPage.put(origin, new Point(viewportPosition.x, viewportPosition.y));
 			
 			JSONObject snapshotDetectionData = SeleniumRobotSnapshotServerConnector.getInstance().detectFieldsInPicture(screenshotFile);
@@ -222,7 +222,6 @@ public class UiElement {
 	}
 
 	/**
-	 * @param labelText
 	 * @return
 	 */
 	private Label getLabelText() {
@@ -237,7 +236,6 @@ public class UiElement {
 	}
 
 	/**
-	 * @param labelBelow
 	 * @return
 	 */
 	private Label getLabelBelow() {
@@ -252,7 +250,6 @@ public class UiElement {
 	}
 
 	/**
-	 * @param labelAbove
 	 * @return
 	 */
 	private Label getLabelAbove() {
@@ -267,7 +264,6 @@ public class UiElement {
 	}
 
 	/**
-	 * @param labelLeftOf
 	 * @return
 	 */
 	private Label getLabelLeftOf() {
@@ -282,7 +278,6 @@ public class UiElement {
 	}
 
 	/**
-	 * @param labelRightOf
 	 * @return
 	 */
 	private Label getLabelRightOf() {
@@ -318,7 +313,7 @@ public class UiElement {
 				throw new ScreenshotException("Desktop screenshot does not exist");
 			}
 			
-			ImageDetector imageDetector = new ImageDetector(new File(desktopScreenshotFile.getFullImagePath()), cropScreenshotFile, 0.2);
+			ImageDetector imageDetector = new ImageDetector(desktopScreenshotFile.getImage().getFile(), cropScreenshotFile, 0.2);
 			imageDetector.detectExactZoneWithoutScale();
 			org.openqa.selenium.Rectangle detectedRectangle = imageDetector.getDetectedRectangle();
 			return new Rectangle(detectedRectangle.x, detectedRectangle.y, detectedRectangle.height, detectedRectangle.width);
@@ -418,13 +413,18 @@ public class UiElement {
 	
 	/**
 	 * Send text to desktop using keyboard at xOffset, yOffset. Before sending keys, we robot clicks on position to gain focus
-	 * @param xOffset	
-	 * @param yOffset
 	 * @param text		Text to write
 	 */
 	public void sendKeys(CharSequence text) {
 		sendKeys(0, 0, text);
 	}
+	
+	/**
+	 * Send text to desktop using keyboard at xOffset, yOffset. Before sending keys, we robot clicks on position to gain focus
+	 * @param xOffset
+	 * @param yOffset
+	 * @param text		Text to write
+	 */
 	public void sendKeys(int xOffset, int yOffset, final CharSequence text) {
 		clickAt(xOffset, yOffset);
 		

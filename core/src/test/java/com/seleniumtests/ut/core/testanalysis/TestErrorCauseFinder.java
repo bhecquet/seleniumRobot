@@ -167,20 +167,11 @@ public class TestErrorCauseFinder extends MockitoTest {
 		
 		imgStep1Ref = File.createTempFile("img", ".png");
 		imgStep1 = File.createTempFile("img", ".png");
-		File tmpHtml = File.createTempFile("html", ".html");
 		
-		ScreenShot screenshot = new ScreenShot();
-		screenshot.setImagePath("screenshot/" + imgStep1Ref.getName());
-		screenshot.setHtmlSourcePath("htmls/" + tmpHtml.getName());
-		FileUtils.copyFile(imgStep1Ref, new File(screenshot.getFullImagePath()));
-		FileUtils.copyFile(tmpHtml, new File(screenshot.getFullHtmlPath()));
+		ScreenShot screenshot = new ScreenShot(imgStep1Ref, File.createTempFile("html", ".html"));
 		step1.addSnapshot(new Snapshot(screenshot, null, SnapshotCheckType.REFERENCE_ONLY), 1, null);
 		
-		ScreenShot screenshot2 = new ScreenShot();
-		screenshot2.setImagePath("screenshot/" + imgStep1.getName());
-		screenshot2.setHtmlSourcePath("htmls/" + tmpHtml.getName());
-		FileUtils.copyFile(imgStep1, new File(screenshot.getFullImagePath()));
-		FileUtils.copyFile(tmpHtml, new File(screenshot.getFullHtmlPath()));
+		ScreenShot screenshot2 = new ScreenShot(imgStep1, File.createTempFile("html", ".html"));
 		step1.addSnapshot(new Snapshot(screenshot2, null, SnapshotCheckType.FALSE), 1, null);
 
 		// create an second step
@@ -190,13 +181,8 @@ public class TestErrorCauseFinder extends MockitoTest {
 	
 		imgStep2Ref = File.createTempFile("img", ".png");
 		
-		ScreenShot screenshotStep3 = new ScreenShot();
-		screenshotStep3.setImagePath("screenshot/" + imgStep2Ref.getName());
-		screenshotStep3.setHtmlSourcePath("htmls/" + tmpHtml.getName());
-		FileUtils.copyFile(imgStep2Ref, new File(screenshotStep3.getFullImagePath()));
-		FileUtils.copyFile(tmpHtml, new File(screenshotStep3.getFullHtmlPath()));
+		ScreenShot screenshotStep3 = new ScreenShot(imgStep2Ref, File.createTempFile("html", ".html"));
 		step2.addSnapshot(new Snapshot(screenshot, null, SnapshotCheckType.REFERENCE_ONLY), 1, null);
-		
 		
 		// create third step, which will fail
 		stepFailed = new TestStep("step 3", Reporter.getCurrentTestResult(), new ArrayList<>(), false);
@@ -206,27 +192,16 @@ public class TestErrorCauseFinder extends MockitoTest {
 		
 		imgStep3Ref = File.createTempFile("img", ".png");
 		
-		ScreenShot screenshot3 = new ScreenShot();
-		screenshot3.setImagePath("screenshot/" + imgStep3Ref.getName());
-		screenshot3.setHtmlSourcePath("htmls/" + tmpHtml.getName());
-		FileUtils.copyFile(imgStep3Ref, new File(screenshot3.getFullImagePath()));
-		FileUtils.copyFile(tmpHtml, new File(screenshot3.getFullHtmlPath()));
+		ScreenShot screenshot3 = new ScreenShot(imgStep3Ref, File.createTempFile("html", ".html"));
 		stepFailed.addSnapshot(new Snapshot(screenshot3, null, SnapshotCheckType.REFERENCE_ONLY), 1, null);
 		
-
-
 		// create 'Test end' step
 		lastStep = new TestStep(TestStepManager.LAST_STEP_NAME, Reporter.getCurrentTestResult(), new ArrayList<>(), false);
 		lastStep.setPosition(3);
 		
 		imgLastStep = File.createTempFile("img", ".png");
-		File tmpHtml2 = File.createTempFile("html", ".html");
 		
-		ScreenShot screenshot4 = new ScreenShot();
-		screenshot4.setImagePath("screenshot/" + imgStep1.getName());
-		screenshot4.setHtmlSourcePath("htmls/" + tmpHtml.getName());
-		FileUtils.copyFile(imgLastStep, new File(screenshot4.getFullImagePath()));
-		FileUtils.copyFile(tmpHtml2, new File(screenshot4.getFullHtmlPath()));
+		ScreenShot screenshot4 = new ScreenShot(imgStep1, File.createTempFile("html", ".html"));
 		lastStep.addSnapshot(new Snapshot(screenshot4, "main", SnapshotCheckType.FALSE), 1, null);
 		lastStep.setStepResultId(10);
 

@@ -216,11 +216,7 @@ public class TestJiraConnector extends MockitoTest {
 		File tmpHtml = File.createTempFile("html", "123456.html");
 		tmpHtml.deleteOnExit();
 		
-		screenshot = new ScreenShot();
-		screenshot.setImagePath("screenshot/" + tmpImg.getName());
-		screenshot.setHtmlSourcePath("htmls/" + tmpHtml.getName());
-		FileUtils.copyFile(tmpImg, new File(screenshot.getFullImagePath()));
-		FileUtils.copyFile(tmpHtml, new File(screenshot.getFullHtmlPath()));
+		screenshot = new ScreenShot(tmpImg, tmpHtml);
 		
 		step1 = new TestStep("step 1", null, new ArrayList<>(), false);
 		step1.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);
@@ -510,7 +506,7 @@ public class TestJiraConnector extends MockitoTest {
 		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
 		
 		// simulate screenshot file not present
-		new File(screenshot.getFullImagePath()).delete();
+		screenshot.getImage().getFile().delete();
 		
 		JiraBean jiraBean = new JiraBean(null, "issue 1", "issue 1 descr", "P1", "Bug", null, null, null, null, Arrays.asList(screenshot), null, new HashMap<>(), new ArrayList<>());
 		jiraConnector.createIssue(jiraBean);		

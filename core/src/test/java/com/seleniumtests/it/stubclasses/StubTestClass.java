@@ -86,18 +86,10 @@ public class StubTestClass extends StubParentClass {
 		File tmpImg = File.createTempFile("img", "_with_very_very_very_long_name_to_be_shortened.png");
 		File tmpHtml = File.createTempFile("html", "_with_very_very_very_long_name_to_be_shortened.html");
 		
-		ScreenShot screenshot = new ScreenShot();
-		screenshot.setImagePath("screenshot/" + tmpImg.getName());
-		screenshot.setHtmlSourcePath("htmls/" + tmpHtml.getName());
-		FileUtility.copyFile(tmpImg, new File(screenshot.getFullImagePath()));
-		FileUtility.copyFile(tmpHtml, new File(screenshot.getFullHtmlPath()));
+		ScreenShot screenshot = new ScreenShot(tmpImg, tmpHtml);
 		step1.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);
 		
-		ScreenShot screenshot2 = new ScreenShot();
-		screenshot2.setImagePath("screenshot/" + tmpImg.getName());
-		screenshot2.setHtmlSourcePath("htmls/" + tmpHtml.getName());
-		FileUtils.moveFile(tmpImg, new File(screenshot2.getFullImagePath()));
-		FileUtils.moveFile(tmpHtml, new File(screenshot2.getFullHtmlPath()));
+		ScreenShot screenshot2 = new ScreenShot(tmpImg, tmpHtml);
 		step1.addSnapshot(new Snapshot(screenshot2, null, SnapshotCheckType.FULL), 1, null);
 		
 		step1.setActionException(new WebDriverException("driver exception"));

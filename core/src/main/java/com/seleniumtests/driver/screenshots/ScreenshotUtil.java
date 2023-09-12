@@ -701,29 +701,13 @@ public class ScreenshotUtil {
      * @return
      */
     private ScreenShot exportToScreenshot(NamedBufferedImage namedImage, long duration) {
-    	ScreenShot screenShot = new ScreenShot();
-    	
-    	
-    	File screenshotFile = exportToFile(namedImage.image);
-    	
+    	ScreenShot screenShot = new ScreenShot(namedImage.image, namedImage.pageSource);
+
         screenShot.setLocation(namedImage.url);
         screenShot.setTitle(namedImage.title);
         
-        try {
-            FileUtils.writeStringToFile(Paths.get(outputDirectory, HTML_DIR, filename + ".html").toFile(), namedImage.pageSource, StandardCharsets.UTF_8);
-            screenShot.setHtmlSourcePath(String.format("%s/%s.html", HTML_DIR, filename));
-        } catch (IOException e) {
-            logger.warn("Ex", e);
-        }
-
     	// record duration of screenshot
     	screenShot.setDuration(duration);
-    	if (screenshotFile.exists()) {
-    		Path pathAbsolute = Paths.get(screenshotFile.getAbsolutePath());
-	        Path pathBase = Paths.get(outputDirectory);
-
-    		screenShot.setImagePath(pathBase.relativize(pathAbsolute).toString());
-    	}
 		return screenShot;
     }
  

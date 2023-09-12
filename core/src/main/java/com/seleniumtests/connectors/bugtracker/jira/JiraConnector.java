@@ -308,8 +308,8 @@ public class JiraConnector extends BugTracker {
     				.map(Snapshot::getScreenshot)
     				.collect(Collectors.toList());
     		for (ScreenShot screenshot: screenshots) {
-    			if (screenshot.getFullImagePath() != null && new File(screenshot.getFullImagePath()).exists()) {
-    				fullDescription.append(String.format("!%s|thumbnail!\n", new File(screenshot.getFullImagePath()).getName()));
+    			if (screenshot.getImage() != null && screenshot.getImage().getFile().exists()) {
+    				fullDescription.append(String.format("!%s|thumbnail!\n", screenshot.getImage().getName()));
     			}
     		}
     	}
@@ -415,8 +415,9 @@ public class JiraConnector extends BugTracker {
 		if (!jiraBean.getScreenShots().isEmpty()) {
         	File[] files = jiraBean.getScreenShots()
                     .stream()
-                    .peek(s -> logger.info("file -> " + s.getFullImagePath()))
-                    .map(s -> new File(s.getFullImagePath()))
+					.filter(s -> s.getImage() != null)
+					.peek(s -> logger.info("file -> " + s.getImageName()))
+                    .map(s -> s.getImage().getFile())
                     .filter(File::exists)
                     .collect(Collectors.toList())
                     .toArray(new File[] {});
@@ -613,7 +614,7 @@ public class JiraConnector extends BugTracker {
 		
         // add snapshots to comment
         for (ScreenShot screenshot: screenShots) {
-        	fullDescription.append(String.format("!%s|thumbnail!\n", new File(screenshot.getFullImagePath()).getName()));
+        	fullDescription.append(String.format("!%s|thumbnail!\n", screenshot.getImage().getName()));
         }
         
         return fullDescription;
@@ -648,8 +649,9 @@ public class JiraConnector extends BugTracker {
 	        if (!screenShots.isEmpty()) {
 	            issueClient.addAttachments(issue.getAttachmentsUri(), screenShots
 	                    .stream()
-	                    .peek(s -> logger.info("file ->" + s.getFullImagePath()))
-	                    .map(s -> new File(s.getFullImagePath()))
+						.filter(s -> s.getImage() != null)
+	                    .peek(s -> logger.info("file ->" + s.getImagePath()))
+	                    .map(s -> s.getImage().getFile())
 	                    .collect(Collectors.toList())
 	                    .toArray(new File[] {})
 	            );

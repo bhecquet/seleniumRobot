@@ -538,11 +538,7 @@ public class TestTestNGResultUtil extends MockitoTest {
 		File tmpImg = File.createTempFile("img", "_with_very_very_very_long_name_to_be_shortened.png");
 		File tmpHtml = File.createTempFile("html", "_with_very_very_very_long_name_to_be_shortened.html");
 		
-		ScreenShot screenshot = new ScreenShot();
-		screenshot.setImagePath("screenshot/" + tmpImg.getName());
-		screenshot.setHtmlSourcePath("htmls/" + tmpHtml.getName());
-		FileUtils.copyFile(tmpImg, new File(screenshot.getFullImagePath()));
-		FileUtils.copyFile(tmpHtml, new File(screenshot.getFullHtmlPath()));
+		ScreenShot screenshot = new ScreenShot(tmpImg, tmpHtml);
 		step1.addSnapshot(new Snapshot(screenshot, snapshotName, snapshotCheckType), 1, null);
 		
 

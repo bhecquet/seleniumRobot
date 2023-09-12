@@ -87,7 +87,7 @@ public class VideoUtils {
 	            	Path extractedPicture = videoOutputDirectory.resolve(String.format("video-%d.jpg", j));
 	                FileUtility.writeImage(extractedPicture.toString(), img);
 	                try {
-		                Snapshot snapshot = new Snapshot(new ScreenShot(outputDirectory.relativize(extractedPicture).toString()), "Step beginning state", SnapshotCheckType.REFERENCE_ONLY);
+		                Snapshot snapshot = new Snapshot(new ScreenShot(extractedPicture.toFile(), null, VIDEO_DIR), "Step beginning state", SnapshotCheckType.REFERENCE_ONLY);
 		                snapshot.setDisplayInReport(false); // by default, reference snapshot won't be displayed in report. This flag will be set to "true" only if step fails and we have a reference picture from server
 						samples.get(i).addSnapshot(snapshot, j, null);
 	                } catch (FileNotFoundException e) {}

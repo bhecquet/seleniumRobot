@@ -180,7 +180,7 @@ public class TestScreenshotUtil extends ReporterTest {
 	public void testDesktopScreenshots(ITestContext testContext) throws Exception {
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 		ScreenShot screenshot = new ScreenshotUtil(null).capture(SnapshotTarget.SCREEN, ScreenShot.class);
-		Assert.assertTrue(new File(screenshot.getFullImagePath()).exists());
+		Assert.assertTrue(screenshot.getImage().getFile().exists());
 		
 	}
 	
@@ -209,7 +209,7 @@ public class TestScreenshotUtil extends ReporterTest {
 			localDriver = WebUIDriver.getWebDriver(true);
 			ScreenShot screenshot = new ScreenshotUtil(localDriver).capture(SnapshotTarget.PAGE, ScreenShot.class, true);
 			Assert.assertNotNull(screenshot);
-			Assert.assertTrue(new File(screenshot.getFullImagePath()).exists());
+			Assert.assertTrue(screenshot.getImage().getFile().exists());
 		} finally {
 			if (localDriver != null) {
 				localDriver.close();
@@ -233,9 +233,9 @@ public class TestScreenshotUtil extends ReporterTest {
 				for (TestStep step: steps) {
 					if ("_captureSnapshot with args: (my snapshot, )".equals(step.getName())) {
 						Assert.assertEquals(step.getSnapshots().size(), 1);
-						Assert.assertNotNull(step.getSnapshots().get(0).getScreenshot().getFullImagePath());
+						Assert.assertNotNull(step.getSnapshots().get(0).getScreenshot().getImage());
 						
-						BufferedImage image = ImageIO.read(new File(step.getSnapshots().get(0).getScreenshot().getFullImagePath()));
+						BufferedImage image = ImageIO.read(step.getSnapshots().get(0).getScreenshot().getImage().getFile());
 						Assert.assertTrue(image.getHeight() > 2000); // check we have a full picture of the page. As Chrome uses CDP for capturing, the whole page is taken
 						return;
 					}	

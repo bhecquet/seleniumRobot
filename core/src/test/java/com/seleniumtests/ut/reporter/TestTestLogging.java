@@ -88,9 +88,9 @@ public class TestTestLogging extends GenericTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testLogScreenshotOk() {
+	public void testLogScreenshotOk() throws IOException {
 		TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
-		logger.logScreenshot(new ScreenShot());
+		logger.logScreenshot(new ScreenShot(File.createTempFile("img", ".png")));
 		Assert.assertEquals(TestStepManager.getParentTestStep().getSnapshots().size(), 1);
 	}
 	
@@ -104,13 +104,10 @@ public class TestTestLogging extends GenericTest {
 		try {
 			TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
 			
-			ScreenShot screenshot = new ScreenShot();
-			String htmlSourcePath = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.HTML_DIR, "capture.html").toString();
-			FileUtils.write(new File(htmlSourcePath), "<html>", StandardCharsets.UTF_8);
-			screenshot.setHtmlSourcePath(String.format("../%s/%s/%s.html", "testRelocateScreenshotHtmlOnly", ScreenshotUtil.HTML_DIR, "capture")); // copied from ScreeshotUtils class
-			
+			ScreenShot screenshot = new ScreenShot(null, "<html>");
+
 			logger.logScreenshot(screenshot);
-			File initialFile = new File(TestStepManager.getParentTestStep().getSnapshots().get(0).getScreenshot().getFullHtmlPath());
+			File initialFile = TestStepManager.getParentTestStep().getSnapshots().get(0).getScreenshot().getHtml().getFile();
 			Assert.assertTrue(initialFile.exists()); // file exists before moving
 			Assert.assertNull(TestStepManager.getParentTestStep().getSnapshots().get(0).getScreenshot().getImagePath());
 			
@@ -120,7 +117,7 @@ public class TestTestLogging extends GenericTest {
 	
 			Assert.assertTrue(movedFile.exists());
 			Assert.assertFalse(initialFile.exists());
-			Assert.assertEquals(new File(TestStepManager.getParentTestStep().getSnapshots().get(0).getScreenshot().getFullHtmlPath()), movedFile);
+			Assert.assertEquals(TestStepManager.getParentTestStep().getSnapshots().get(0).getScreenshot().getHtml().getFile(), movedFile);
 		} finally {
 			FileUtils.deleteQuietly(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
 			FileUtils.deleteQuietly(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved"));
@@ -137,15 +134,12 @@ public class TestTestLogging extends GenericTest {
 		try {
 			TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
 			
-			ScreenShot screenshot = new ScreenShot();
-			String imgSourcePath = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR, "capture.png").toString();
-			FileUtils.write(new File(imgSourcePath), "<img>", StandardCharsets.UTF_8);
-			screenshot.setImagePath(String.format("%s/%s.png", ScreenshotUtil.SCREENSHOT_DIR, "capture")); // copied from ScreeshotUtils class
+			ScreenShot screenshot = new ScreenShot(File.createTempFile("img", ".png"));
 			
 			logger.logScreenshot(screenshot);
-			File initialFile = new File(TestStepManager.getParentTestStep().getSnapshots().get(0).getScreenshot().getFullImagePath());
+			File initialFile = TestStepManager.getParentTestStep().getSnapshots().get(0).getScreenshot().getImage().getFile();
 			Assert.assertTrue(initialFile.exists()); // file exists before moving
-			Assert.assertEquals(TestStepManager.getParentTestStep().getSnapshots().get(0).getScreenshot().getHtmlSource(), "");
+			Assert.assertEquals(FileUtils.readFileToString(TestStepManager.getParentTestStep().getSnapshots().get(0).getScreenshot().getHtml().getFile(), StandardCharsets.UTF_8), "");
 			
 			// relocate
 			TestStepManager.getParentTestStep().getSnapshots().get(0).relocate(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved");
@@ -153,7 +147,7 @@ public class TestTestLogging extends GenericTest {
 
 			Assert.assertTrue(movedFile.exists());
 			Assert.assertFalse(initialFile.exists());
-			Assert.assertEquals(new File(TestStepManager.getParentTestStep().getSnapshots().get(0).getScreenshot().getFullImagePath()), movedFile);
+			Assert.assertEquals(TestStepManager.getParentTestStep().getSnapshots().get(0).getScreenshot().getImage().getFile(), movedFile);
 		} finally {
 			FileUtils.deleteQuietly(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
 			FileUtils.deleteQuietly(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved"));
@@ -166,15 +160,12 @@ public class TestTestLogging extends GenericTest {
 		try {
 			TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
 			
-			ScreenShot screenshot = new ScreenShot();
-			String imgSourcePath = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR, "capture.png").toString();
-			FileUtils.write(new File(imgSourcePath), "<img>", StandardCharsets.UTF_8);
-			screenshot.setImagePath(String.format("%s/%s.png", ScreenshotUtil.SCREENSHOT_DIR, "capture")); // copied from ScreeshotUtils class
-			
+			ScreenShot screenshot = new ScreenShot(File.createTempFile("img", ".png"));
+
 			logger.logScreenshot(screenshot);
-			File initialFile = new File(TestStepManager.getParentTestStep().getSnapshots().get(0).getScreenshot().getFullImagePath());
+			File initialFile = TestStepManager.getParentTestStep().getSnapshots().get(0).getScreenshot().getImage().getFile();
 			Assert.assertTrue(initialFile.exists()); // file exists before moving
-			Assert.assertEquals(TestStepManager.getParentTestStep().getSnapshots().get(0).getScreenshot().getHtmlSource(), "");
+			Assert.assertEquals(FileUtils.readFileToString(TestStepManager.getParentTestStep().getSnapshots().get(0).getScreenshot().getHtml().getFile(), StandardCharsets.UTF_8), "");
 			
 			// check no error is raised if we ask the files to be moved at the same place
 			TestStepManager.getParentTestStep().getSnapshots().get(0).relocate(SeleniumTestsContextManager.getThreadContext().getOutputDirectory());

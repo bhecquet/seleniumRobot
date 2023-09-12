@@ -20,15 +20,19 @@ package com.seleniumtests.ut.reporter.logger;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import com.seleniumtests.reporter.logger.*;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.json.JSONObject;
 import org.openqa.selenium.NoSuchElementException;
 import org.testng.Assert;
@@ -49,6 +53,7 @@ import net.lightbody.bmp.core.har.HarPage;
 
 public class TestTestStep extends GenericTest {
 
+	
 	/**
 	 * Checks getStepStatus correctly compute test step status if action is failed
 	 * Step is OK
@@ -125,16 +130,13 @@ public class TestTestStep extends GenericTest {
 	@Test(groups = { "ut" })
 	public void testSnapshotRenaming() throws IOException {
 		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
-		ScreenShot screenshot = new ScreenShot();
 
 		File tmpImgFile = File.createTempFile("img", ".png");
 		File tmpHtmlFile = File.createTempFile("html", ".html");
+		ScreenShot screenshot = new ScreenShot(tmpImgFile, tmpHtmlFile, "");
 
-		screenshot.setOutputDirectory(tmpImgFile.getParent());
 		screenshot.setLocation("http://mysite.com");
 		screenshot.setTitle("mysite");
-		screenshot.setImagePath(tmpImgFile.getName());
-		screenshot.setHtmlSourcePath(tmpHtmlFile.getName());
 
 		step.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.TRUE), 0, null);
 
@@ -155,16 +157,13 @@ public class TestTestStep extends GenericTest {
 	public void testSnapshotRenamingNoRandom() throws IOException {
 		SeleniumTestsContextManager.getThreadContext().setRandomInAttachmentNames(false);
 		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
-		ScreenShot screenshot = new ScreenShot();
 		
 		File tmpImgFile = File.createTempFile("img", ".png");
 		File tmpHtmlFile = File.createTempFile("html", ".html");
+		ScreenShot screenshot = new ScreenShot(tmpImgFile, tmpHtmlFile, "");
 		
-		screenshot.setOutputDirectory(tmpImgFile.getParent());
 		screenshot.setLocation("http://mysite.com");
 		screenshot.setTitle("mysite");
-		screenshot.setImagePath(tmpImgFile.getName());
-		screenshot.setHtmlSourcePath(tmpHtmlFile.getName());
 		
 		step.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.TRUE), 0, null);
 		
@@ -186,16 +185,13 @@ public class TestTestStep extends GenericTest {
 	@Test(groups = { "ut" })
 	public void testSnapshotRenamingWithCustomName() throws IOException {
 		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
-		ScreenShot screenshot = new ScreenShot();
 
 		File tmpImgFile = File.createTempFile("img", ".png");
 		File tmpHtmlFile = File.createTempFile("html", ".html");
+		ScreenShot screenshot = new ScreenShot(tmpImgFile, tmpHtmlFile, "");
 
-		screenshot.setOutputDirectory(tmpImgFile.getParent());
 		screenshot.setLocation("http://mysite.com");
 		screenshot.setTitle("mysite");
-		screenshot.setImagePath(tmpImgFile.getName());
-		screenshot.setHtmlSourcePath(tmpHtmlFile.getName());
 
 		step.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FALSE), 0, "my snapshot <name>");
 
@@ -211,27 +207,20 @@ public class TestTestStep extends GenericTest {
 	@Test(groups = { "ut" })
 	public void testSnapshotRenamingWithSubFolder() throws IOException {
 		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
-		ScreenShot screenshot = new ScreenShot();
 
 		File tmpImgFile = File.createTempFile("img", ".png");
-		File tmpImgFile2 = Paths.get(tmpImgFile.getParent(), "screenshots", tmpImgFile.getName()).toFile();
-		FileUtils.moveFile(tmpImgFile, tmpImgFile2);
 		File tmpHtmlFile = File.createTempFile("html", ".html");
-		File tmpHtmlFile2 = Paths.get(tmpHtmlFile.getParent(), "htmls", tmpHtmlFile.getName()).toFile();
-		FileUtils.moveFile(tmpHtmlFile, tmpHtmlFile2);
+		ScreenShot screenshot = new ScreenShot(tmpImgFile, tmpHtmlFile);
 
-		screenshot.setOutputDirectory(tmpImgFile.getParent());
 		screenshot.setLocation("http://mysite.com");
 		screenshot.setTitle("mysite");
-		screenshot.setImagePath("screenshots/" + tmpImgFile2.getName());
-		screenshot.setHtmlSourcePath("htmls/" + tmpHtmlFile2.getName());
 
 		step.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.TRUE), 0, null);
 
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(),
-				"screenshots/N-A_0-1_step1--" + tmpImgFile2.getName().substring(tmpImgFile2.getName().length() - 10));
+				"screenshots/N-A_0-1_step1--" + tmpImgFile.getName().substring(tmpImgFile.getName().length() - 10));
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(),
-				"htmls/N-A_0-1_step1--" + tmpHtmlFile2.getName().substring(tmpHtmlFile2.getName().length() - 10));
+				"htmls/N-A_0-1_step1--" + tmpHtmlFile.getName().substring(tmpHtmlFile.getName().length() - 10));
 
 		tmpImgFile.deleteOnExit();
 		tmpHtmlFile.deleteOnExit();
@@ -246,51 +235,35 @@ public class TestTestStep extends GenericTest {
 	@Test(groups = { "ut" })
 	public void testSnapshotInSubStep() throws IOException {
 		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
-		ScreenShot screenshot = new ScreenShot();
 
 		File tmpImgFile = File.createTempFile("img", ".png");
-		File tmpImgFile2 = Paths.get(tmpImgFile.getParent(), "screenshots", tmpImgFile.getName()).toFile();
-		FileUtils.moveFile(tmpImgFile, tmpImgFile2);
 		File tmpHtmlFile = File.createTempFile("html", ".html");
-		File tmpHtmlFile2 = Paths.get(tmpHtmlFile.getParent(), "htmls", tmpHtmlFile.getName()).toFile();
-		FileUtils.moveFile(tmpHtmlFile, tmpHtmlFile2);
+		ScreenShot screenshot = new ScreenShot(tmpImgFile, tmpHtmlFile);
 
-		screenshot.setOutputDirectory(tmpImgFile.getParent());
 		screenshot.setLocation("http://mysite.com");
 		screenshot.setTitle("mysite");
-		screenshot.setImagePath("screenshots/" + tmpImgFile2.getName());
-		screenshot.setHtmlSourcePath("htmls/" + tmpHtmlFile2.getName());
 
 		step.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.TRUE), 0, null);
 
 		TestStep subStep = new TestStep("step1", null, new ArrayList<>(), true);
-		ScreenShot screenshotSubStep = new ScreenShot();
 		File tmpImgFileSubStep = File.createTempFile("img", ".png");
-		File tmpImgFileSubStep2 = Paths.get(tmpImgFileSubStep.getParent(), "screenshots", tmpImgFileSubStep.getName())
-				.toFile();
-		FileUtils.moveFile(tmpImgFileSubStep, tmpImgFileSubStep2);
 		File tmpHtmlFileSubStep = File.createTempFile("html", ".html");
-		File tmpHtmlFileSubStep2 = Paths.get(tmpHtmlFileSubStep.getParent(), "htmls", tmpHtmlFileSubStep.getName())
-				.toFile();
-		FileUtils.moveFile(tmpHtmlFileSubStep, tmpHtmlFileSubStep2);
+		ScreenShot screenshotSubStep = new ScreenShot(tmpImgFileSubStep, tmpHtmlFileSubStep);
 
-		screenshotSubStep.setOutputDirectory(tmpImgFileSubStep.getParent());
 		screenshotSubStep.setLocation("http://mysite.com");
 		screenshotSubStep.setTitle("mysite");
-		screenshotSubStep.setImagePath("screenshots/" + tmpImgFileSubStep2.getName());
-		screenshotSubStep.setHtmlSourcePath("htmls/" + tmpHtmlFileSubStep2.getName());
 
 		step.addStep(subStep);
 		subStep.addSnapshot(new Snapshot(screenshotSubStep, "main", SnapshotCheckType.TRUE), 0, null);
 
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(),
-				"screenshots/N-A_0-1_step1--" + tmpImgFile2.getName().substring(tmpImgFile2.getName().length() - 10));
+				"screenshots/N-A_0-1_step1--" + tmpImgFile.getName().substring(tmpImgFile.getName().length() - 10));
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(),
-				"htmls/N-A_0-1_step1--" + tmpHtmlFile2.getName().substring(tmpHtmlFile2.getName().length() - 10));
+				"htmls/N-A_0-1_step1--" + tmpHtmlFile.getName().substring(tmpHtmlFile.getName().length() - 10));
 		Assert.assertEquals(subStep.getSnapshots().get(0).getScreenshot().getImagePath(),
-				"screenshots/N-A_0-11_step1--" + tmpImgFileSubStep2.getName().substring(tmpImgFileSubStep2.getName().length() - 10));
+				"screenshots/N-A_0-11_step1--" + tmpImgFileSubStep.getName().substring(tmpImgFileSubStep.getName().length() - 10));
 		Assert.assertEquals(subStep.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(),
-				"htmls/N-A_0-11_step1--" + tmpHtmlFileSubStep2.getName().substring(tmpHtmlFileSubStep2.getName().length() - 10));
+				"htmls/N-A_0-11_step1--" + tmpHtmlFileSubStep.getName().substring(tmpHtmlFileSubStep.getName().length() - 10));
 
 		tmpImgFile.deleteOnExit();
 		tmpHtmlFile.deleteOnExit();
@@ -305,39 +278,23 @@ public class TestTestStep extends GenericTest {
 	@Test(groups = { "ut" })
 	public void testGetSnapshotSubStep() throws IOException {
 		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
-		ScreenShot screenshot = new ScreenShot();
 
 		File tmpImgFile = File.createTempFile("img", ".png");
-		File tmpImgFile2 = Paths.get(tmpImgFile.getParent(), "screenshots", tmpImgFile.getName()).toFile();
-		FileUtils.moveFile(tmpImgFile, tmpImgFile2);
 		File tmpHtmlFile = File.createTempFile("html", ".html");
-		File tmpHtmlFile2 = Paths.get(tmpHtmlFile.getParent(), "htmls", tmpHtmlFile.getName()).toFile();
-		FileUtils.moveFile(tmpHtmlFile, tmpHtmlFile2);
+		ScreenShot screenshot = new ScreenShot(tmpImgFile, tmpHtmlFile);
 
-		screenshot.setOutputDirectory(tmpImgFile.getParent());
 		screenshot.setLocation("http://mysite.com");
 		screenshot.setTitle("mysite");
-		screenshot.setImagePath("screenshots/" + tmpImgFile2.getName());
-		screenshot.setHtmlSourcePath("htmls/" + tmpHtmlFile2.getName());
 
 		step.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.TRUE), 0, null);
 
 		TestStep subStep = new TestStep("step1", null, new ArrayList<>(), true);
-		ScreenShot screenshotSubStep = new ScreenShot();
 		File tmpImgFileSubStep = File.createTempFile("img", ".png");
-		File tmpImgFileSubStep2 = Paths.get(tmpImgFileSubStep.getParent(), "screenshots", tmpImgFileSubStep.getName())
-				.toFile();
-		FileUtils.moveFile(tmpImgFileSubStep, tmpImgFileSubStep2);
 		File tmpHtmlFileSubStep = File.createTempFile("html", ".html");
-		File tmpHtmlFileSubStep2 = Paths.get(tmpHtmlFileSubStep.getParent(), "htmls", tmpHtmlFileSubStep.getName())
-				.toFile();
-		FileUtils.moveFile(tmpHtmlFileSubStep, tmpHtmlFileSubStep2);
+		ScreenShot screenshotSubStep = new ScreenShot(tmpImgFileSubStep, tmpHtmlFileSubStep);
 
-		screenshotSubStep.setOutputDirectory(tmpImgFileSubStep.getParent());
 		screenshotSubStep.setLocation("http://mysite.com");
 		screenshotSubStep.setTitle("mysite");
-		screenshotSubStep.setImagePath("screenshots/" + tmpImgFileSubStep2.getName());
-		screenshotSubStep.setHtmlSourcePath("htmls/" + tmpHtmlFileSubStep2.getName());
 
 		step.addStep(subStep);
 		subStep.addSnapshot(new Snapshot(screenshotSubStep, "main", SnapshotCheckType.TRUE), 0, null);
@@ -354,49 +311,33 @@ public class TestTestStep extends GenericTest {
 	@Test(groups = { "ut" })
 	public void testMultipleSnapshotsInStep() throws IOException {
 		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
-		ScreenShot screenshot = new ScreenShot();
 
 		File tmpImgFile = File.createTempFile("img", ".png");
-		File tmpImgFile2 = Paths.get(tmpImgFile.getParent(), "screenshots", tmpImgFile.getName()).toFile();
-		FileUtils.moveFile(tmpImgFile, tmpImgFile2);
 		File tmpHtmlFile = File.createTempFile("html", ".html");
-		File tmpHtmlFile2 = Paths.get(tmpHtmlFile.getParent(), "htmls", tmpHtmlFile.getName()).toFile();
-		FileUtils.moveFile(tmpHtmlFile, tmpHtmlFile2);
+		ScreenShot screenshot = new ScreenShot(tmpImgFile, tmpHtmlFile);
 
-		screenshot.setOutputDirectory(tmpImgFile.getParent());
 		screenshot.setLocation("http://mysite.com");
 		screenshot.setTitle("mysite");
-		screenshot.setImagePath("screenshots/" + tmpImgFile2.getName());
-		screenshot.setHtmlSourcePath("htmls/" + tmpHtmlFile2.getName());
 
 		step.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.TRUE), 0, null);
 
-		ScreenShot screenshotSubStep = new ScreenShot();
 		File tmpImgFileSubStep = File.createTempFile("img", ".png");
-		File tmpImgFileSubStep2 = Paths.get(tmpImgFileSubStep.getParent(), "screenshots", tmpImgFileSubStep.getName())
-				.toFile();
-		FileUtils.moveFile(tmpImgFileSubStep, tmpImgFileSubStep2);
 		File tmpHtmlFileSubStep = File.createTempFile("html", ".html");
-		File tmpHtmlFileSubStep2 = Paths.get(tmpHtmlFileSubStep.getParent(), "htmls", tmpHtmlFileSubStep.getName())
-				.toFile();
-		FileUtils.moveFile(tmpHtmlFileSubStep, tmpHtmlFileSubStep2);
+		ScreenShot screenshotSubStep = new ScreenShot(tmpImgFileSubStep, tmpHtmlFileSubStep);
 
-		screenshotSubStep.setOutputDirectory(tmpImgFileSubStep.getParent());
 		screenshotSubStep.setLocation("http://mysite.com");
 		screenshotSubStep.setTitle("mysite");
-		screenshotSubStep.setImagePath("screenshots/" + tmpImgFileSubStep2.getName());
-		screenshotSubStep.setHtmlSourcePath("htmls/" + tmpHtmlFileSubStep2.getName());
 
 		step.addSnapshot(new Snapshot(screenshotSubStep, "main", SnapshotCheckType.TRUE), 0, null);
 
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(),
-				"screenshots/N-A_0-1_step1--" + tmpImgFile2.getName().substring(tmpImgFile2.getName().length() - 10));
+				"screenshots/N-A_0-1_step1--" + tmpImgFile.getName().substring(tmpImgFile.getName().length() - 10));
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(),
-				"htmls/N-A_0-1_step1--" + tmpHtmlFile2.getName().substring(tmpHtmlFile2.getName().length() - 10));
+				"htmls/N-A_0-1_step1--" + tmpHtmlFile.getName().substring(tmpHtmlFile.getName().length() - 10));
 		Assert.assertEquals(step.getSnapshots().get(1).getScreenshot().getImagePath(),
-				"screenshots/N-A_0-2_step1--" + tmpImgFileSubStep2.getName().substring(tmpImgFileSubStep2.getName().length() - 10));
+				"screenshots/N-A_0-2_step1--" + tmpImgFileSubStep.getName().substring(tmpImgFileSubStep.getName().length() - 10));
 		Assert.assertEquals(step.getSnapshots().get(1).getScreenshot().getHtmlSourcePath(),
-				"htmls/N-A_0-2_step1--" + tmpHtmlFileSubStep2.getName().substring(tmpHtmlFileSubStep2.getName().length() - 10));
+				"htmls/N-A_0-2_step1--" + tmpHtmlFileSubStep.getName().substring(tmpHtmlFileSubStep.getName().length() - 10));
 
 		tmpImgFile.deleteOnExit();
 		tmpHtmlFile.deleteOnExit();
@@ -414,38 +355,27 @@ public class TestTestStep extends GenericTest {
 		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
 
 		// create screenshot for main step
-		ScreenShot screenshot1 = new ScreenShot();
 
 		File tmpImgFile = File.createTempFile("img", ".png");
-		File tmpImgFile2 = Paths.get(tmpImgFile.getParent(), "screenshots", tmpImgFile.getName()).toFile();
-		FileUtils.moveFile(tmpImgFile, tmpImgFile2);
 		File tmpHtmlFile = File.createTempFile("html", ".html");
-		File tmpHtmlFile2 = Paths.get(tmpHtmlFile.getParent(), "htmls", tmpHtmlFile.getName()).toFile();
-		FileUtils.moveFile(tmpHtmlFile, tmpHtmlFile2);
+		ScreenShot screenshot1 = new ScreenShot(tmpImgFile, tmpHtmlFile);
 
 		tmpImgFile.deleteOnExit();
 		tmpHtmlFile.deleteOnExit();
 
-		screenshot1.setOutputDirectory(tmpImgFile.getParent());
 		screenshot1.setLocation("http://mysite.com");
 		screenshot1.setTitle("mysite");
-		screenshot1.setImagePath("screenshots/" + tmpImgFile2.getName());
-		screenshot1.setHtmlSourcePath("htmls/" + tmpHtmlFile2.getName());
 		step.addSnapshot(new Snapshot(screenshot1, "main", SnapshotCheckType.FALSE), 0, null);
 
 		TestStep subStep = new TestStep("subStep", null, new ArrayList<>(), true);
 
 		// create screenshot for sub step
-		ScreenShot screenshot2 = new ScreenShot();
 
 		File tmpImgFile3 = File.createTempFile("img", ".png");
-		File tmpImgFile4 = Paths.get(tmpImgFile3.getParent(), "screenshots", tmpImgFile3.getName()).toFile();
-		FileUtils.moveFile(tmpImgFile3, tmpImgFile4);
+		ScreenShot screenshot2 = new ScreenShot(tmpImgFile3);
 
-		screenshot2.setOutputDirectory(tmpImgFile3.getParent());
 		screenshot2.setLocation("http://mysite.com");
 		screenshot2.setTitle("mysite");
-		screenshot2.setImagePath("screenshots/" + tmpImgFile4.getName());
 		subStep.addSnapshot(new Snapshot(screenshot2, "main", SnapshotCheckType.TRUE), 0, null);
 
 		subStep.addAction(new TestAction("action1", true, new ArrayList<>()));
@@ -454,9 +384,9 @@ public class TestTestStep extends GenericTest {
 
 		List<FileContent> attachments = step.getAllAttachments();
 		Assert.assertEquals(attachments.size(), 3);
-		Assert.assertEquals(attachments.get(0).getFile().getName(), "N-A_0-1_step1--" + tmpHtmlFile2.getName().substring(tmpHtmlFile2.getName().length() - 10));
-		Assert.assertEquals(attachments.get(1).getFile().getName(), "N-A_0-1_step1--" + tmpImgFile2.getName().substring(tmpImgFile2.getName().length() - 10));
-		Assert.assertEquals(attachments.get(2).getFile().getName(), "N-A_0-1_subStep--" + tmpImgFile4.getName().substring(tmpImgFile4.getName().length() - 10));
+		Assert.assertEquals(attachments.get(0).getFile().getName(), "N-A_0-1_step1--" + tmpHtmlFile.getName().substring(tmpHtmlFile.getName().length() - 10));
+		Assert.assertEquals(attachments.get(1).getFile().getName(), "N-A_0-1_step1--" + tmpImgFile.getName().substring(tmpImgFile.getName().length() - 10));
+		Assert.assertEquals(attachments.get(2).getFile().getName(), "N-A_0-1_subStep--" + tmpImgFile3.getName().substring(tmpImgFile3.getName().length() - 10));
 	}
 
 	/**
@@ -469,38 +399,27 @@ public class TestTestStep extends GenericTest {
 		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
 
 		// create screenshot for main step
-		ScreenShot screenshot1 = new ScreenShot();
 
 		File tmpImgFile = File.createTempFile("img", ".png");
-		File tmpImgFile2 = Paths.get(tmpImgFile.getParent(), "screenshots", tmpImgFile.getName()).toFile();
-		FileUtils.moveFile(tmpImgFile, tmpImgFile2);
 		File tmpHtmlFile = File.createTempFile("html", ".html");
-		File tmpHtmlFile2 = Paths.get(tmpHtmlFile.getParent(), "htmls", tmpHtmlFile.getName()).toFile();
-		FileUtils.moveFile(tmpHtmlFile, tmpHtmlFile2);
+		ScreenShot screenshot1 = new ScreenShot(tmpImgFile, tmpHtmlFile);
 
 		tmpImgFile.deleteOnExit();
 		tmpHtmlFile.deleteOnExit();
 
-		screenshot1.setOutputDirectory(tmpImgFile.getParent());
 		screenshot1.setLocation("http://mysite.com");
 		screenshot1.setTitle("mysite");
-		screenshot1.setImagePath("screenshots/" + tmpImgFile2.getName());
-		screenshot1.setHtmlSourcePath("htmls/" + tmpHtmlFile2.getName());
 		step.addSnapshot(new Snapshot(screenshot1, "main", SnapshotCheckType.FALSE), 0, null);
 
 		TestStep subStep = new TestStep("subStep", null, new ArrayList<>(), true);
 
 		// create screenshot for sub step
-		ScreenShot screenshot2 = new ScreenShot();
 
 		File tmpImgFile3 = File.createTempFile("img", ".png");
-		File tmpImgFile4 = Paths.get(tmpImgFile3.getParent(), "screenshots", tmpImgFile3.getName()).toFile();
-		FileUtils.moveFile(tmpImgFile3, tmpImgFile4);
+		ScreenShot screenshot2 = new ScreenShot(tmpImgFile3);
 
-		screenshot2.setOutputDirectory(tmpImgFile3.getParent());
 		screenshot2.setLocation("http://mysite.com");
 		screenshot2.setTitle("mysite");
-		screenshot2.setImagePath("screenshots/" + tmpImgFile4.getName());
 		subStep.addSnapshot(new Snapshot(screenshot2, "main", SnapshotCheckType.TRUE), 0, null);
 
 		subStep.addAction(new TestAction("action1", true, new ArrayList<>()));
@@ -510,8 +429,8 @@ public class TestTestStep extends GenericTest {
 		List<FileContent> attachments = step.getAllAttachments(false, SnapshotCheckType.FALSE);
 		// only the HTML and image from first added snapshot
 		Assert.assertEquals(attachments.size(), 2);
-		Assert.assertEquals(attachments.get(0).getFile().getName(), "N-A_0-1_step1--" + tmpHtmlFile2.getName().substring(tmpHtmlFile2.getName().length() - 10));
-		Assert.assertEquals(attachments.get(1).getFile().getName(), "N-A_0-1_step1--" + tmpImgFile2.getName().substring(tmpImgFile2.getName().length() - 10));
+		Assert.assertEquals(attachments.get(0).getFile().getName(), "N-A_0-1_step1--" + tmpHtmlFile.getName().substring(tmpHtmlFile.getName().length() - 10));
+		Assert.assertEquals(attachments.get(1).getFile().getName(), "N-A_0-1_step1--" + tmpImgFile.getName().substring(tmpImgFile.getName().length() - 10));
 	}
 	
 	/**
@@ -524,49 +443,37 @@ public class TestTestStep extends GenericTest {
 		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
 
 		// create screenshot for main step
-		ScreenShot screenshot1 = new ScreenShot();
 
 		File tmpImgFile = File.createTempFile("img", ".png");
-		File tmpImgFile2 = Paths.get(tmpImgFile.getParent(), "screenshots", tmpImgFile.getName()).toFile();
-		FileUtils.moveFile(tmpImgFile, tmpImgFile2);
 		File tmpHtmlFile = File.createTempFile("html", ".html");
-		File tmpHtmlFile2 = Paths.get(tmpHtmlFile.getParent(), "htmls", tmpHtmlFile.getName()).toFile();
-		FileUtils.moveFile(tmpHtmlFile, tmpHtmlFile2);
+		ScreenShot screenshot1 = new ScreenShot(tmpImgFile, tmpHtmlFile);
 
 		tmpImgFile.deleteOnExit();
 		tmpHtmlFile.deleteOnExit();
 
-		screenshot1.setOutputDirectory(tmpImgFile.getParent());
 		screenshot1.setLocation("http://mysite.com");
 		screenshot1.setTitle("mysite");
-		screenshot1.setImagePath("screenshots/" + tmpImgFile2.getName());
-		screenshot1.setHtmlSourcePath("htmls/" + tmpHtmlFile2.getName());
 		step.addSnapshot(new Snapshot(screenshot1, "main", SnapshotCheckType.FALSE), 0, null);
 
 		TestStep subStep = new TestStep("subStep", null, new ArrayList<>(), true);
 
 		// create screenshot for sub step
-		ScreenShot screenshot2 = new ScreenShot();
-
 		File tmpImgFile3 = File.createTempFile("img", ".png");
-		File tmpImgFile4 = Paths.get(tmpImgFile3.getParent(), "screenshots", tmpImgFile3.getName()).toFile();
-		FileUtils.moveFile(tmpImgFile3, tmpImgFile4);
+		ScreenShot screenshot2 = new ScreenShot(tmpImgFile3);
 
-		screenshot2.setOutputDirectory(tmpImgFile3.getParent());
 		screenshot2.setLocation("http://mysite.com");
 		screenshot2.setTitle("mysite");
-		screenshot2.setImagePath("screenshots/" + tmpImgFile4.getName());
 		subStep.addSnapshot(new Snapshot(screenshot2, "main", SnapshotCheckType.TRUE), 0, null);
 
 		subStep.addAction(new TestAction("action1", true, new ArrayList<>()));
 		step.addAction(new TestAction("action2", false, new ArrayList<>()));
 		step.addAction(subStep);
 
-		List<FileContent> attachments = step.getAllAttachments(true, null);
+		List<FileContent> attachments = step.getAllAttachments(true);
 		// only the HTML and image from first added snapshot
 		Assert.assertEquals(attachments.size(), 2);
-		Assert.assertEquals(attachments.get(0).getFile().getName(), "N-A_0-1_step1--" + tmpImgFile2.getName().substring(tmpImgFile2.getName().length() - 10));
-		Assert.assertEquals(attachments.get(1).getFile().getName(), "N-A_0-1_subStep--" + tmpImgFile4.getName().substring(tmpImgFile4.getName().length() - 10));
+		Assert.assertEquals(attachments.get(0).getFile().getName(), "N-A_0-1_step1--" + tmpImgFile.getName().substring(tmpImgFile.getName().length() - 10));
+		Assert.assertEquals(attachments.get(1).getFile().getName(), "N-A_0-1_subStep--" + tmpImgFile3.getName().substring(tmpImgFile3.getName().length() - 10));
 	}
 
 	@Test(groups = { "ut" }, expectedExceptions = CustomSeleniumTestsException.class)
@@ -813,20 +720,13 @@ public class TestTestStep extends GenericTest {
 		GenericFile file = new GenericFile(File.createTempFile("video", ".avi"), "video file");
 		step.addFile(file);
 		
-		ScreenShot screenshot = new ScreenShot();
 
 		File tmpImgFile = File.createTempFile("img", ".png");
-		File tmpImgFile2 = Paths.get(tmpImgFile.getParent(), "screenshots", tmpImgFile.getName()).toFile();
-		FileUtils.moveFile(tmpImgFile, tmpImgFile2);
 		File tmpHtmlFile = File.createTempFile("html", ".html");
-		File tmpHtmlFile2 = Paths.get(tmpHtmlFile.getParent(), "htmls", tmpHtmlFile.getName()).toFile();
-		FileUtils.moveFile(tmpHtmlFile, tmpHtmlFile2);
+		ScreenShot screenshot = new ScreenShot(tmpImgFile, tmpHtmlFile);
 
-		screenshot.setOutputDirectory(tmpImgFile.getParent());
 		screenshot.setLocation("http://mysite.com");
 		screenshot.setTitle("mysite");
-		screenshot.setImagePath("screenshots/" + tmpImgFile2.getName());
-		screenshot.setHtmlSourcePath("htmls/" + tmpHtmlFile2.getName());
 
 		Snapshot snapshot = new Snapshot(screenshot, "main", SnapshotCheckType.FALSE);
 		step.addSnapshot(snapshot, 0, "foo");
@@ -1096,12 +996,12 @@ public class TestTestStep extends GenericTest {
 	}
 
 	@Test(groups = { "ut" })
-	public void testDurationWithSnapshot() throws FileNotFoundException {
+	public void testDurationWithSnapshot() throws IOException {
 		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
 		step.setDuration(5000L);
 		step.setDurationToExclude(500L);
 
-		ScreenShot screenshot = new ScreenShot();
+		ScreenShot screenshot = new ScreenShot(File.createTempFile("img", ".png"));
 		screenshot.setDuration(200);
 		Snapshot snapshot = new Snapshot(screenshot, "main", SnapshotCheckType.TRUE);
 		step.addSnapshot(snapshot, 0, "name");
@@ -1182,16 +1082,13 @@ public class TestTestStep extends GenericTest {
 		TestStep subStep = new TestStep("subStep1", null, new ArrayList<>(), true);
 		step.addStep(subStep);
 
-		ScreenShot screenshot = new ScreenShot();
 
 		File tmpImgFile = File.createTempFile("img", ".png");
 		File tmpHtmlFile = File.createTempFile("html", ".html");
+		ScreenShot screenshot = new ScreenShot(tmpImgFile, tmpHtmlFile);
 
-		screenshot.setOutputDirectory(tmpImgFile.getParent());
 		screenshot.setLocation("http://mysite.com");
 		screenshot.setTitle("mysite");
-		screenshot.setImagePath(tmpImgFile.getName());
-		screenshot.setHtmlSourcePath(tmpHtmlFile.getName());
 
 		Snapshot snapshot = new Snapshot(screenshot, "main", SnapshotCheckType.TRUE);
 		step.addSnapshot(snapshot, 0, null);
@@ -1262,41 +1159,43 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testMoveAttachements() throws IOException {
+		try {
+			FileUtils.deleteDirectory(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory().replace("testMoveAttachements", "before-testMoveAttachements")));
+		} catch (IOException e) {
+		}
+		
 		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
 		
 		// create screenshot for main step
-		ScreenShot screenshot1 = new ScreenShot();
-		
 		File tmpImgFile = File.createTempFile("img", ".png");
-		File tmpImgFile2 = Paths.get(tmpImgFile.getParent(), "screenshots", tmpImgFile.getName()).toFile();
-		FileUtils.moveFile(tmpImgFile, tmpImgFile2);
 		File tmpHtmlFile = File.createTempFile("html", ".html");
-		File tmpHtmlFile2 = Paths.get(tmpHtmlFile.getParent(), "htmls", tmpHtmlFile.getName()).toFile();
-		FileUtils.moveFile(tmpHtmlFile, tmpHtmlFile2);
+		ScreenShot screenshot1 = new ScreenShot(tmpImgFile, tmpHtmlFile);
+		
+		// move the capture to a "before-" folde to simulate the case where BeforeMethod executes a driver which takes screenshots
+		File imageInBeforeFolder = new File(screenshot1.getImage().getFile().getAbsolutePath().replace("testMoveAttachements", "before-testMoveAttachements"));
+		File htmlInBeforeFolder = new File(screenshot1.getHtml().getFile().getAbsolutePath().replace("testMoveAttachements", "before-testMoveAttachements"));
+		imageInBeforeFolder.getParentFile().mkdirs();
+		FileUtils.moveFile(screenshot1.getImage().getFile(), imageInBeforeFolder);
+		FileUtils.moveFile(screenshot1.getHtml().getFile(), htmlInBeforeFolder);
+		screenshot1.getImage().setFile(imageInBeforeFolder);
+		screenshot1.getHtml().setFile(htmlInBeforeFolder);
+		screenshot1.setOutputDirectory(imageInBeforeFolder.getParentFile().getParentFile().getAbsolutePath());
 		
 		tmpImgFile.deleteOnExit();
 		tmpHtmlFile.deleteOnExit();
 		
-		screenshot1.setOutputDirectory(tmpImgFile.getParent());
 		screenshot1.setLocation("http://mysite.com");
 		screenshot1.setTitle("mysite");
-		screenshot1.setImagePath("screenshots/" + tmpImgFile2.getName());
-		screenshot1.setHtmlSourcePath("htmls/" + tmpHtmlFile2.getName());
 		step.addSnapshot(new Snapshot(screenshot1, "main", SnapshotCheckType.FALSE), 0, null);
 		
 		TestStep subStep = new TestStep("subStep", null, new ArrayList<>(), true);
 		
 		// create screenshot for sub step
-		ScreenShot screenshot2 = new ScreenShot();
-		
 		File tmpImgFile3 = File.createTempFile("img", ".png");
-		File tmpImgFile4 = Paths.get(tmpImgFile3.getParent(), "screenshots", tmpImgFile3.getName()).toFile();
-		FileUtils.moveFile(tmpImgFile3, tmpImgFile4);
+		ScreenShot screenshot2 = new ScreenShot(tmpImgFile3);
 		
-		screenshot2.setOutputDirectory(tmpImgFile3.getParent());
 		screenshot2.setLocation("http://mysite.com");
 		screenshot2.setTitle("mysite");
-		screenshot2.setImagePath("screenshots/" + tmpImgFile4.getName());
 		subStep.addSnapshot(new Snapshot(screenshot2, "main", SnapshotCheckType.TRUE), 0, null);
 		
 		subStep.addAction(new TestAction("action1", true, new ArrayList<>()));
@@ -1305,10 +1204,8 @@ public class TestTestStep extends GenericTest {
 		
 		Path outputDir = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "dest");
 		step.moveAttachments(outputDir.toString());
-		Assert.assertEquals(outputDir.toFile().list().length, 3);
-		//Assert.assertEquals(attachments.get(0).getFile().getName(), "N-A_0-1_step1--" + tmpHtmlFile2.getName().substring(tmpHtmlFile2.getName().length() - 10));
-		//Assert.assertEquals(attachments.get(1).getFile().getName(), "N-A_0-1_step1--" + tmpImgFile2.getName().substring(tmpImgFile2.getName().length() - 10));
-		//Assert.assertEquals(attachments.get(2).getFile().getName(), "N-A_0-1_subStep--" + tmpImgFile4.getName().substring(tmpImgFile4.getName().length() - 10));
+		Collection<File> files = FileUtils.listFiles(outputDir.toFile(), TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
+		Assert.assertEquals(files.size(), 2); // only files in "before-" folder has been moved
 	}
 	
 }

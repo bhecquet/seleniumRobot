@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -362,19 +363,11 @@ public class TestStep extends TestAction {
 				continue;
 			}
 			
-			if (snapshot.getScreenshot().getFullHtmlPath() != null && !onlyPictureOfSnapshots) {
-				try {
-					usedFiles.add(new FileContent(new File(snapshot.getScreenshot().getFullHtmlPath()).getCanonicalFile()));
-				} catch (IOException e) {
-					// error while getting HtmlPath
-				}
+			if (snapshot.getScreenshot().getHtml() != null && !onlyPictureOfSnapshots) {
+				usedFiles.add(snapshot.getScreenshot().getHtml());
 			}
-			if (snapshot.getScreenshot().getFullImagePath() != null) {
-				try {
-					usedFiles.add(new FileContent(new File(snapshot.getScreenshot().getFullImagePath()).getCanonicalFile()));
-				} catch (IOException e) {
-					// error getting image path
-				}
+			if (snapshot.getScreenshot().getImage() != null) {
+				usedFiles.add(snapshot.getScreenshot().getImage());
 			}
 		}
 
@@ -396,20 +389,21 @@ public class TestStep extends TestAction {
 	 * @throws IOException 
 	 */
 	public void moveAttachments(String outputDirectory) throws IOException {
+		
+		// create the output directory if it does not exist
+		new File(outputDirectory).mkdirs();
 
 		for (Snapshot snapshot: snapshots) {
-			if (snapshot == null 
-					|| snapshot.getScreenshot() == null 
-					|| snapshot.getScreenshot().getFullHtmlPath() == null 
-					|| !snapshot.getScreenshot().getFullHtmlPath().contains(BEFORE_STEP_PREFIX) ) {
-				continue;
+			if (snapshot != null
+					&& snapshot.getScreenshot() != null
+					&& ((snapshot.getScreenshot().getHtml() != null && snapshot.getScreenshot().getHtml().getFile().getAbsolutePath().contains(BEFORE_STEP_PREFIX))
+					||  (snapshot.getScreenshot().getImage() != null && snapshot.getScreenshot().getImage().getFile().getAbsolutePath().contains(BEFORE_STEP_PREFIX)))) {
+				try {
+					snapshot.relocate(outputDirectory);
+				} catch (IOException e) {
+					logger.error("Cannot relocate snapshot: " + e.getMessage());
+				}
 			}
-			try {
-				snapshot.relocate(outputDirectory);
-			} catch (IOException e) {
-				logger.error("Cannot relocate snapshot: " + e.getMessage());
-			}
-			
 		}
 	
 		// move attachments in sub-steps

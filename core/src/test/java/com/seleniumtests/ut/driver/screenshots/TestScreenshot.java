@@ -1,11 +1,13 @@
 package com.seleniumtests.ut.driver.screenshots;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
@@ -13,45 +15,154 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 
+import javax.imageio.ImageIO;
+
 public class TestScreenshot extends GenericTest {
+	@BeforeMethod(groups= {"ut"})
+	public void init() {
+		try {
+			FileUtils.deleteDirectory(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Check files are copied at the right place
+	 * @throws IOException
+	 */
+	@Test(groups= {"ut"})
+	public void testScreenshot() throws IOException {
+		File tmpImgFile = File.createTempFile("img", ".png");
+		File tmpHtmlFile = File.createTempFile("html", ".html");
+		ScreenShot screenshot = new ScreenShot(tmpImgFile, tmpHtmlFile);
+		
+		Assert.assertTrue(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR, tmpImgFile.getName()).toFile().exists());
+		Assert.assertTrue(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.HTML_DIR, tmpHtmlFile.getName()).toFile().exists());
+		Assert.assertNotNull(screenshot.getImage());
+		Assert.assertNotNull(screenshot.getHtml());
+	}
+	
+	/**
+	 * If provided file is already at the right place, no error should be raised
+	 * @throws IOException
+	 */
+	@Test(groups= {"ut"})
+	public void testScreenshotFilePresent() throws IOException {
+		File tmpImgFile = File.createTempFile("img", ".png");
+		File newImgPath = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR, tmpImgFile.getName()).toFile();
+		FileUtils.moveFile(tmpImgFile, newImgPath);
+		File tmpHtmlFile = File.createTempFile("html", ".html");
+		File newHtmlPath = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.HTML_DIR, tmpHtmlFile.getName()).toFile();
+		FileUtils.moveFile(tmpHtmlFile, newHtmlPath);
+		
+		ScreenShot screenshot = new ScreenShot(newImgPath, newHtmlPath);
+		
+		Assert.assertTrue(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR, tmpImgFile.getName()).toFile().exists());
+		Assert.assertTrue(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.HTML_DIR, tmpHtmlFile.getName()).toFile().exists());
+		Assert.assertNotNull(screenshot.getImage());
+		Assert.assertNotNull(screenshot.getHtml());
+	}
+	
+	@Test(groups= {"ut"})
+	public void testScreenshotImageDoesNotExist() throws IOException {
+		File tmpImgFile = File.createTempFile("img", ".png");
+		tmpImgFile.delete();
+		File tmpHtmlFile = File.createTempFile("html", ".html");
+		ScreenShot screenshot = new ScreenShot(tmpImgFile, tmpHtmlFile);
+		
+		Assert.assertNull(screenshot.getImage());
+		Assert.assertTrue(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.HTML_DIR, tmpHtmlFile.getName()).toFile().exists());
+	}
+	
+	@Test(groups= {"ut"})
+	public void testScreenshotHtmlDoesNotExist() throws IOException {
+		File tmpImgFile = File.createTempFile("img", ".png");
+		File tmpHtmlFile = File.createTempFile("html", ".html");
+		tmpHtmlFile.delete();
+		ScreenShot screenshot = new ScreenShot(tmpImgFile, tmpHtmlFile);
+		
+		Assert.assertTrue(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR, tmpImgFile.getName()).toFile().exists());
+		Assert.assertNull(screenshot.getHtml());
+	}
+	
+	@Test(groups= {"ut"})
+	public void testScreenshotNoHtml() throws IOException {
+		File tmpImgFile = File.createTempFile("img", ".png");
+		ScreenShot screenshot = new ScreenShot(tmpImgFile, null);
+		
+		Assert.assertTrue(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR, tmpImgFile.getName()).toFile().exists());
+	}
+	
+	@Test(groups= {"ut"})
+	public void testScreenshotNoImage() throws IOException {
+		File tmpHtmlFile = File.createTempFile("html", ".html");
+		ScreenShot screenshot = new ScreenShot(null, tmpHtmlFile);
+		
+		Assert.assertNull(screenshot.getImage());
+		Assert.assertTrue(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.HTML_DIR, tmpHtmlFile.getName()).toFile().exists());
+	}
+	
+	@Test(groups= {"ut"})
+	public void testScreenshotWithRelativePath() throws IOException {
+		File tmpImgFile = File.createTempFile("img", ".png");
+		File tmpHtmlFile = File.createTempFile("html", ".html");
+		ScreenShot screenshot = new ScreenShot(tmpImgFile, tmpHtmlFile, "foo");
+		
+		Assert.assertTrue(Paths.get(screenshot.getOutputDirectory(), "foo", tmpImgFile.getName()).toFile().exists());
+		Assert.assertTrue(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.HTML_DIR, tmpHtmlFile.getName()).toFile().exists());
+	}
+	
+	@Test(groups= {"ut"})
+	public void testScreenshotBuffer() throws IOException {
+
+		BufferedImage img = ImageIO.read(Thread.currentThread().getContextClassLoader().getResourceAsStream("tu/ffLogo1.png"));
+		ScreenShot screenshot = new ScreenShot(img, "<html>");
+		
+		Assert.assertEquals(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR).toFile().listFiles().length, 1);
+		Assert.assertEquals(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.HTML_DIR).toFile().listFiles().length, 1);
+		Assert.assertNotNull(screenshot.getImage());
+		Assert.assertNotNull(screenshot.getHtml());
+	}
+	@Test(groups= {"ut"})
+	public void testScreenshotBufferNoImage() throws IOException {
+
+		ScreenShot screenshot = new ScreenShot(null, "<html>");
+		
+		Assert.assertNull(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR).toFile().listFiles()); // listFiles returns null if directory does not exist
+		Assert.assertEquals(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.HTML_DIR).toFile().listFiles().length, 1);
+		Assert.assertNull(screenshot.getImage());
+		Assert.assertNotNull(screenshot.getHtml());
+	}
+	@Test(groups= {"ut"})
+	public void testScreenshotBufferNoHtml() throws IOException {
+		
+		BufferedImage img = ImageIO.read(Thread.currentThread().getContextClassLoader().getResourceAsStream("tu/ffLogo1.png"));
+		ScreenShot screenshot = new ScreenShot(img, null);
+		
+		Assert.assertEquals(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR).toFile().listFiles().length, 1);
+		Assert.assertNull(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.HTML_DIR).toFile().listFiles()); // listFiles returns 'null' when directory does not exist
+		Assert.assertNotNull(screenshot.getImage());
+		Assert.assertNull(screenshot.getHtml());
+	}
+
 
 	@Test(groups= {"ut"})
-	public void testGetFullImagePath() {
-		Assert.assertEquals(new ScreenShot("foo.jpg").getFullImagePath(), SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "/foo.jpg");
+	public void testGetImagePath() throws IOException {
+		File tmpImgFile = File.createTempFile("img", ".png");
+		ScreenShot screenshot = new ScreenShot(tmpImgFile);
+		Assert.assertEquals(screenshot.getImagePath(), "screenshots/" + tmpImgFile.getName());
 	}
-	
 	@Test(groups= {"ut"})
-	public void testGetFullImagePathNull() {
-		Assert.assertNull(new ScreenShot(null).getFullImagePath());
-	}
-	
-	@Test(groups= {"ut"})
-	public void testGetImagePath() {
-		Assert.assertEquals(new ScreenShot("foo.jpg").getImagePath(), "foo.jpg");
+	public void testGetHtmlSourcePath() throws IOException {
+		File tmpHtmlFile = File.createTempFile("html", ".html");
+		ScreenShot screenshot = new ScreenShot(null, tmpHtmlFile);
+		Assert.assertEquals(screenshot.getHtmlSourcePath(), "htmls/" + tmpHtmlFile.getName());
 	}
 	
 	@Test(groups= {"ut"})
 	public void testGetImagePathNull() {
 		Assert.assertNull(new ScreenShot(null).getImagePath());
-	}
-	
-	@Test(groups= {"ut"})
-	public void testGetFullHtmlPath() {
-		ScreenShot s = new ScreenShot("foo.jpg");
-		s.setHtmlSourcePath("foo.html");
-		Assert.assertEquals(s.getFullHtmlPath(), SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "/foo.html");
-	}
-	
-	@Test(groups= {"ut"})
-	public void testGetFullHtmlPathNull() {
-		Assert.assertNull(new ScreenShot(null).getFullHtmlPath());
-	}
-	
-	@Test(groups= {"ut"})
-	public void testHtmlSourcePath() {
-		ScreenShot s = new ScreenShot("foo.jpg");
-		s.setHtmlSourcePath("foo.html");
-		Assert.assertEquals(s.getHtmlSourcePath(), "foo.html");
 	}
 	
 	@Test(groups= {"ut"})
@@ -64,12 +175,11 @@ public class TestScreenshot extends GenericTest {
 		FileUtils.deleteDirectory(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
 		FileUtils.deleteDirectory(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out").toFile());
 		
-		FileUtils.copyFile(createFileFromResource("tu/ffLogo1.png"), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR, "foo.jpg").toFile());
-		ScreenShot s = new ScreenShot(ScreenshotUtil.SCREENSHOT_DIR + "/foo.jpg");
+		ScreenShot s = new ScreenShot(createFileFromResource("tu/ffLogo1.png"));
+		String fileName = s.getImageName();
 		s.relocate(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out").toString());
-		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out", ScreenshotUtil.SCREENSHOT_DIR, "foo.jpg").toFile().exists());
-		Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR, "foo.jpg").toFile().exists());
-		Assert.assertEquals(s.getFullImagePath(), Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out", ScreenshotUtil.SCREENSHOT_DIR, "foo.jpg").toString().replace("\\", "/"));
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out", ScreenshotUtil.SCREENSHOT_DIR, fileName).toFile().exists());
+		Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR, fileName).toFile().exists());
 	}
 	
 	/**
@@ -80,8 +190,7 @@ public class TestScreenshot extends GenericTest {
 	public void testRelocateSameFolder() throws IOException {
 		FileUtils.deleteDirectory(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
 		
-		FileUtils.copyFile(createFileFromResource("tu/ffLogo1.png"), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "video", "foo.jpg").toFile());
-		ScreenShot s = new ScreenShot("video/foo.jpg");
+		ScreenShot s = new ScreenShot(createFileFromResource("tu/ffLogo1.png"), null, "video");
 		s.relocate(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), Paths.get(ScreenshotUtil.SCREENSHOT_DIR, "foo.jpg").toString(), null);
 		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR, "foo.jpg").toFile().exists());
 		Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "video", "foo.jpg").toFile().exists());
@@ -97,9 +206,9 @@ public class TestScreenshot extends GenericTest {
 		FileUtils.deleteDirectory(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
 		FileUtils.deleteDirectory(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out").toFile());
 		
-		FileUtils.copyFile(createFileFromResource("tu/ffLogo1.png"), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR, "foo.jpg").toFile());
-		FileUtils.copyFile(createFileFromResource("tu/ffLogo1.png"), Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out", ScreenshotUtil.SCREENSHOT_DIR, "foo.jpg").toFile());
-		ScreenShot s = new ScreenShot(ScreenshotUtil.SCREENSHOT_DIR + "/foo.jpg");
+		File imageFile = createFileFromResource("tu/ffLogo1.png");
+		FileUtils.copyFile(imageFile, Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out", ScreenshotUtil.SCREENSHOT_DIR, imageFile.getName()).toFile());
+		ScreenShot s = new ScreenShot(imageFile);
 		s.relocate(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out").toString());
 		
 	}
@@ -117,13 +226,18 @@ public class TestScreenshot extends GenericTest {
 		s.relocate(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out").toString());
 		
 	}
-
+	
+	/**
+	 * No error should be raised
+	 * @throws IOException
+	 */
 	@Test(groups= {"ut"})
 	public void testRelocateNonExistingFile() throws IOException {
 		FileUtils.deleteDirectory(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
 		FileUtils.deleteDirectory(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out").toFile());
 		
-		ScreenShot s = new ScreenShot(ScreenshotUtil.SCREENSHOT_DIR + "/foo.jpg");
+		ScreenShot s = new ScreenShot(createFileFromResource("tu/ffLogo1.png"));
+		s.getImage().getFile().delete();
 		s.relocate(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out").toString());
 	}
 	
@@ -132,25 +246,27 @@ public class TestScreenshot extends GenericTest {
 		FileUtils.deleteDirectory(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
 		FileUtils.deleteDirectory(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out").toFile());
 		
-		FileUtils.copyFile(createFileFromResource("tu/test.html"), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.HTML_DIR, "foo.html").toFile());
-		ScreenShot s = new ScreenShot();
-		s.setHtmlSourcePath(ScreenshotUtil.HTML_DIR + "/foo.html");
+		File htmlFile = createFileFromResource("tu/test.html");
+		ScreenShot s = new ScreenShot(null, htmlFile);
 		s.relocate(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out").toString());
-		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out", ScreenshotUtil.HTML_DIR, "foo.html").toFile().exists());
-		Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.HTML_DIR, "foo.html").toFile().exists());
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out", ScreenshotUtil.HTML_DIR, htmlFile.getName()).toFile().exists());
+		Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.HTML_DIR, htmlFile.getName()).toFile().exists());
 	}
 	
+	/**
+	 * No error should be raised when source and dest files are the same
+	 * @throws IOException
+	 */
 	@Test(groups= {"ut"})
 	public void testRelocateHtmlSameFolder() throws IOException {
 		FileUtils.deleteDirectory(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
 		
-		FileUtils.copyFile(createFileFromResource("tu/test.html"), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.HTML_DIR, "foo.html").toFile());
-		ScreenShot s = new ScreenShot();
-		s.setHtmlSourcePath(ScreenshotUtil.HTML_DIR + "/foo.html");
-		s.relocate(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), null, Paths.get(ScreenshotUtil.SCREENSHOT_DIR, "foo.html").toString());
-		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR, "foo.html").toFile().exists());
-		Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.HTML_DIR, "foo.html").toFile().exists());
-		Assert.assertEquals(s.getHtmlSourcePath(),  ScreenshotUtil.SCREENSHOT_DIR + "/foo.html");
+		File htmlFile = createFileFromResource("tu/test.html");
+		ScreenShot s = new ScreenShot(null, htmlFile);
+		s.relocate(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), null, Paths.get(ScreenshotUtil.SCREENSHOT_DIR, "test.html").toString());
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR, "test.html").toFile().exists());
+		Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.HTML_DIR, htmlFile.getName()).toFile().exists());
+		Assert.assertEquals(s.getHtmlSourcePath(),  ScreenshotUtil.SCREENSHOT_DIR + "/test.html");
 	}
 	
 	/**
@@ -161,13 +277,11 @@ public class TestScreenshot extends GenericTest {
 	public void testRelocateExistingHtmlFile() throws IOException {
 		FileUtils.deleteDirectory(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
 		FileUtils.deleteDirectory(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out").toFile());
-
-		FileUtils.copyFile(createFileFromResource("tu/test.html"), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.HTML_DIR, "foo.html").toFile());
-		FileUtils.copyFile(createFileFromResource("tu/test.html"), Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out", ScreenshotUtil.HTML_DIR, "foo.html").toFile());
-		ScreenShot s = new ScreenShot();
-		s.setHtmlSourcePath(ScreenshotUtil.HTML_DIR + "/foo.html");
-		s.relocate(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out").toString());
 		
+		File htmlFile = createFileFromResource("tu/test.html");
+		FileUtils.copyFile(htmlFile, Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out", ScreenshotUtil.HTML_DIR, htmlFile.getName()).toFile());
+		ScreenShot s = new ScreenShot(htmlFile);
+		s.relocate(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out").toString());
 	}
 	
 	/**
@@ -179,49 +293,16 @@ public class TestScreenshot extends GenericTest {
 		FileUtils.deleteDirectory(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
 		FileUtils.deleteDirectory(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out").toFile());
 		
-		ScreenShot s = new ScreenShot();
+		ScreenShot s = new ScreenShot(null, null, "");
 		s.relocate(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out").toString());
 		
 	}
 	
 	@Test(groups= {"ut"})
-	public void testRelocateNonExistingHtmlFile() throws IOException {
-		FileUtils.deleteDirectory(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
-		FileUtils.deleteDirectory(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out").toFile());
-		
-		ScreenShot s = new ScreenShot();
-		s.setHtmlSourcePath(ScreenshotUtil.HTML_DIR + "/foo.html");
-		s.relocate(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out").toString());
-	}
-	
-	@Test(groups= {"ut"})
-	public void testGetHtmlSource() throws IOException {
-		FileUtils.deleteDirectory(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
-		
-		FileUtils.copyFile(createFileFromResource("tu/test.html"), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.HTML_DIR, "foo.html").toFile());
-		ScreenShot s = new ScreenShot();
-		s.setHtmlSourcePath(ScreenshotUtil.HTML_DIR + "/foo.html");
-		Assert.assertTrue(s.getHtmlSource().contains("<html>"));
-	}
-	
-	@Test(groups= {"ut"})
-	public void testGetHtmlSourceNonExistentFile() throws IOException {
-		ScreenShot s = new ScreenShot();
-		s.setHtmlSourcePath(ScreenshotUtil.HTML_DIR + "/foo.html");
-		Assert.assertEquals(s.getHtmlSource(), "");
-	}
-	
-	@Test(groups= {"ut"})
-	public void testGetHtmlSourceNull() throws IOException {
-
-		ScreenShot s = new ScreenShot();
-		Assert.assertEquals(s.getHtmlSource(), "");
-	}
-	
-	@Test(groups= {"ut"})
-	public void testGetImageName() {
-		ScreenShot s = new ScreenShot("video/foo.jpg");
-		Assert.assertEquals(s.getImageName(), "foo.jpg");
+	public void testGetImageName() throws IOException {
+		File imageFile = createFileFromResource("tu/ffLogo1.png");
+		ScreenShot s = new ScreenShot(imageFile);
+		Assert.assertEquals(s.getImageName(), imageFile.getName());
 	}
 	
 	@Test(groups= {"ut"})

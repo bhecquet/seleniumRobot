@@ -231,7 +231,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	}
 	
 	/**
-	 * Get reference snapshot from server
+	 * Get reference snapshot from server, copy it to a temp file
 	 * This is useful when a step fails and we want to get the reference to allow comparison
 	 */
 	public File getReferenceSnapshot(Integer stepResultId) {
@@ -278,12 +278,12 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		}
 
 		checkStepResult(stepResultId);
-		if (snapshot == null || snapshot.getScreenshot() == null || snapshot.getScreenshot().getFullImagePath() == null) {
+		if (snapshot == null || snapshot.getScreenshot() == null || snapshot.getScreenshot().getImage() == null) {
 			throw new SeleniumRobotServerException(NAPSHOT_DOES_NOT_EXIST_ERROR);
 		}
 		
 		try {
-			File pictureFile = new File(snapshot.getScreenshot().getFullImagePath());
+			File pictureFile = snapshot.getScreenshot().getImage().getFile();
 			
 			getJSonResponse(buildPostRequest(url + STEP_REFERENCE_API_URL)
 					.field("stepResult", stepResultId)
@@ -316,14 +316,14 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		if (stepName == null) {
 			throw new ConfigurationException("stepName must not be null");
 		}
-		if (snapshot == null || snapshot.getScreenshot() == null || snapshot.getScreenshot().getFullImagePath() == null) {
+		if (snapshot == null || snapshot.getScreenshot() == null || snapshot.getScreenshot().getImage() == null) {
 			throw new SeleniumRobotServerException(NAPSHOT_DOES_NOT_EXIST_ERROR);
 		}
 		
 		String snapshotName = snapshot.getName().length() > MAX_SNAPSHOT_NAME_LENGHT ? snapshot.getName().substring(0, MAX_SNAPSHOT_NAME_LENGHT): snapshot.getName(); 
 		
 		try {
-			File pictureFile = new File(snapshot.getScreenshot().getFullImagePath());
+			File pictureFile = snapshot.getScreenshot().getImage().getFile();
 			BrowserType browser = SeleniumTestsContextManager.getGlobalContext().getBrowser();
 			browser = browser == null ? BrowserType.NONE : browser;
 			String strippedTestName = getTestName(testName);
@@ -394,14 +394,14 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			throw new ConfigurationException("TestCaseInSession must be previously recorded");
 		}
 		checkStepResult(stepResultId);
-		if (snapshot == null || snapshot.getScreenshot() == null || snapshot.getScreenshot().getFullImagePath() == null) {
+		if (snapshot == null || snapshot.getScreenshot() == null || snapshot.getScreenshot().getImage() == null) {
 			throw new SeleniumRobotServerException(NAPSHOT_DOES_NOT_EXIST_ERROR);
 		}
 		
 		String snapshotName = snapshot.getName().length() > MAX_SNAPSHOT_NAME_LENGHT ? snapshot.getName().substring(0, MAX_SNAPSHOT_NAME_LENGHT): snapshot.getName(); 
 		
 		try {
-			File pictureFile = new File(snapshot.getScreenshot().getFullImagePath());
+			File pictureFile = snapshot.getScreenshot().getImage().getFile();
 			
 			MultipartBody request = buildPostRequest(url + SNAPSHOT_API_URL)
 					.field("stepResult", stepResultId)
@@ -705,12 +705,12 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			return null;
 		}
 
-		if (screenShot == null || screenShot.getFullImagePath() == null) {
+		if (screenShot == null || screenShot.getImage() == null) {
 			throw new SeleniumRobotServerException("Provided screenshot does not exist");
 		}
 		
 		try {
-			File pictureFile = new File(screenShot.getFullImagePath());
+			File pictureFile = screenShot.getImage().getFile();
 			
 			return getJSonResponse(buildPostRequest(url + DETECT_API_URL)
 					.field("task", task)
