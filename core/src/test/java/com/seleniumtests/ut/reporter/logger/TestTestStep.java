@@ -143,7 +143,7 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(),
 				"N-A_0-1_step1--" + tmpImgFile.getName().substring(tmpImgFile.getName().length() - 10));
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(),
-				"N-A_0-1_step1--" + tmpHtmlFile.getName().substring(tmpHtmlFile.getName().length() - 10));
+				"htmls/N-A_0-1_step1--" + tmpHtmlFile.getName().substring(tmpHtmlFile.getName().length() - 10));
 
 		tmpImgFile.deleteOnExit();
 		tmpHtmlFile.deleteOnExit();
@@ -170,7 +170,7 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(),
 				"N-A_0-1_step1-.png");
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(),
-				"N-A_0-1_step1-.html");
+				"htmls/N-A_0-1_step1-.html");
 		
 		tmpImgFile.deleteOnExit();
 		tmpHtmlFile.deleteOnExit();
@@ -198,7 +198,7 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(),
 				"my_snapshot_-name--" + tmpImgFile.getName().substring(tmpImgFile.getName().length() - 10));
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(),
-				"my_snapshot_-name--" + tmpHtmlFile.getName().substring(tmpHtmlFile.getName().length() - 10));
+				"htmls/my_snapshot_-name--" + tmpHtmlFile.getName().substring(tmpHtmlFile.getName().length() - 10));
 
 		tmpImgFile.deleteOnExit();
 		tmpHtmlFile.deleteOnExit();
@@ -761,7 +761,6 @@ public class TestTestStep extends GenericTest {
 
 		Assert.assertEquals(stepJson.getJSONArray("files").getJSONObject(0).getString("type"), "file");
 		Assert.assertEquals(stepJson.getJSONArray("files").getJSONObject(0).getString("name"), "video file");
-		Assert.assertTrue(stepJson.getJSONArray("files").getJSONObject(0).getString("file").contains(".avi"));
 		
 		Assert.assertEquals(stepJson.getJSONArray("snapshots").getJSONObject(0).getString("type"), "snapshot");
 

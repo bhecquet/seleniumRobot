@@ -124,11 +124,13 @@ public class TestUiElement extends MockitoTest {
 		
 		File screenCaptureFile = createImageFromResource("tu/imageFieldDetection/screenCapture.png");
 		File browserCaptureFile = createImageFromResource("tu/imageFieldDetection/browserCapture.png");
-		FileUtils.moveFile(screenCaptureFile, Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), screenCaptureFile.getName()).toFile());
-		FileUtils.moveFile(browserCaptureFile, Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), browserCaptureFile.getName()).toFile());
+		File newScreenCaptureFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), screenCaptureFile.getName()).toFile();
+		FileUtils.moveFile(screenCaptureFile, newScreenCaptureFile);
+		File newBrowserCaptureFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), browserCaptureFile.getName()).toFile();
+		FileUtils.moveFile(browserCaptureFile, newBrowserCaptureFile);
 		
-		screenCapture = new ScreenShot(screenCaptureFile, null, "");
-		browserCapture = new ScreenShot(browserCaptureFile, null, "");
+		screenCapture = new ScreenShot(newScreenCaptureFile, null, "");
+		browserCapture = new ScreenShot(newBrowserCaptureFile, null, "");
 
 	}
 	
