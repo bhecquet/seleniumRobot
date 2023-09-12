@@ -73,6 +73,7 @@ public class GenericFile extends TestAction {
 			relativeFilePath = file.getName(); // correct relavtive path, as we moved the file
 			
 			try {
+				loggedFile.mkdirs();
 				Files.move(file.toPath(), loggedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 				this.file = new FileContent(loggedFile);
 			} catch (Exception e) {

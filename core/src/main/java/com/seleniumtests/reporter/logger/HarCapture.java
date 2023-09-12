@@ -46,7 +46,9 @@ public class HarCapture extends TestAction {
 	public HarCapture(Har har, String name) throws IOException {
 		super(name, false, new ArrayList<>());
 		this.har = har;
-		harFile = new FileContent(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), name + "-" + HAR_FILE_NAME).toFile());
+		File f = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), name + "-" + HAR_FILE_NAME).toFile();
+		f.getParentFile().mkdirs();
+		harFile = new FileContent(f);
 		
 		har.writeTo(harFile.getFile());
 

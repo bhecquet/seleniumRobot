@@ -113,7 +113,7 @@ public class TestTestLogging extends GenericTest {
 			
 			// relocate
 			TestStepManager.getParentTestStep().getSnapshots().get(0).relocate(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved");
-			File movedFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved", ScreenshotUtil.HTML_DIR, "N-A_0-1_step--pture.html").toFile();
+			File movedFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved", ScreenshotUtil.HTML_DIR, initialFile.getName()).toFile();
 	
 			Assert.assertTrue(movedFile.exists());
 			Assert.assertFalse(initialFile.exists());
@@ -139,11 +139,11 @@ public class TestTestLogging extends GenericTest {
 			logger.logScreenshot(screenshot);
 			File initialFile = TestStepManager.getParentTestStep().getSnapshots().get(0).getScreenshot().getImage().getFile();
 			Assert.assertTrue(initialFile.exists()); // file exists before moving
-			Assert.assertEquals(FileUtils.readFileToString(TestStepManager.getParentTestStep().getSnapshots().get(0).getScreenshot().getHtml().getFile(), StandardCharsets.UTF_8), "");
+			Assert.assertEquals(FileUtils.readFileToString(TestStepManager.getParentTestStep().getSnapshots().get(0).getScreenshot().getImage().getFile(), StandardCharsets.UTF_8), "");
 			
 			// relocate
 			TestStepManager.getParentTestStep().getSnapshots().get(0).relocate(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved");
-			File movedFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved", ScreenshotUtil.SCREENSHOT_DIR, "N-A_0-1_step--apture.png").toFile();
+			File movedFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved", ScreenshotUtil.SCREENSHOT_DIR, initialFile.getName()).toFile();
 
 			Assert.assertTrue(movedFile.exists());
 			Assert.assertFalse(initialFile.exists());
@@ -165,7 +165,7 @@ public class TestTestLogging extends GenericTest {
 			logger.logScreenshot(screenshot);
 			File initialFile = TestStepManager.getParentTestStep().getSnapshots().get(0).getScreenshot().getImage().getFile();
 			Assert.assertTrue(initialFile.exists()); // file exists before moving
-			Assert.assertEquals(FileUtils.readFileToString(TestStepManager.getParentTestStep().getSnapshots().get(0).getScreenshot().getHtml().getFile(), StandardCharsets.UTF_8), "");
+			Assert.assertEquals(FileUtils.readFileToString(TestStepManager.getParentTestStep().getSnapshots().get(0).getScreenshot().getImage().getFile(), StandardCharsets.UTF_8), "");
 			
 			// check no error is raised if we ask the files to be moved at the same place
 			TestStepManager.getParentTestStep().getSnapshots().get(0).relocate(SeleniumTestsContextManager.getThreadContext().getOutputDirectory());
