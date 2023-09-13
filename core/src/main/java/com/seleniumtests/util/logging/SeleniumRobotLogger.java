@@ -17,7 +17,6 @@
  */
 package com.seleniumtests.util.logging;
 
-import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.util.helper.WaitHelper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -74,8 +73,6 @@ public class SeleniumRobotLogger {
 	}
 	
 	public static void createLoggerForTest(String outputDir, String loggerName) {
-		
-		
 
 		LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
 		Configuration config = ctx.getConfiguration();
@@ -84,8 +81,10 @@ public class SeleniumRobotLogger {
 		if (loggerNames.get() != null) {
 			String previousName = loggerNames.get();
 			Appender appender = ((BuiltConfiguration) config).getLogger(previousName).getAppenders().get(FILE_APPENDER_NAME + "-" + previousName);
-			appender.stop();
-			((BuiltConfiguration) config).getLogger(previousName).removeAppender(FILE_APPENDER_NAME + "-" + previousName);
+			if (appender != null) {
+				appender.stop();
+				((BuiltConfiguration) config).getLogger(previousName).removeAppender(FILE_APPENDER_NAME + "-" + previousName);
+			}
 		}
 		
 		LoggerConfig loggerConfig = new LoggerConfig(loggerName, level, false);
@@ -292,7 +291,7 @@ public class SeleniumRobotLogger {
 			}
 		}
 
-		for (File file: FileUtils.listFiles(new File(SeleniumTestsContextManager.getGlobalContext().getDefaultOutputDirectory()),
+		for (File file: FileUtils.listFiles(new File(defaultOutputDirectory),
 				FileFilterUtils.nameFileFilter("execution.log"),
 				TrueFileFilter.INSTANCE )) {
 			file.delete();

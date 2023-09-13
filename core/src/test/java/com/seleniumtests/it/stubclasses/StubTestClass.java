@@ -85,11 +85,12 @@ public class StubTestClass extends StubParentClass {
 		
 		File tmpImg = File.createTempFile("img", "_with_very_very_very_long_name_to_be_shortened.png");
 		File tmpHtml = File.createTempFile("html", "_with_very_very_very_long_name_to_be_shortened.html");
-		
 		ScreenShot screenshot = new ScreenShot(tmpImg, tmpHtml);
 		step1.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);
 		
-		ScreenShot screenshot2 = new ScreenShot(tmpImg, tmpHtml);
+		File tmpImg2 = File.createTempFile("img", "_with_very_very_very_long_name_to_be_shortened.png");
+		File tmpHtml2 = File.createTempFile("html", "_with_very_very_very_long_name_to_be_shortened.html");
+		ScreenShot screenshot2 = new ScreenShot(tmpImg2, tmpHtml2);
 		step1.addSnapshot(new Snapshot(screenshot2, null, SnapshotCheckType.FULL), 1, null);
 		
 		step1.setActionException(new WebDriverException("driver exception"));
@@ -144,9 +145,16 @@ public class StubTestClass extends StubParentClass {
 	}
 	
 	@Test(groups="stub")
-	public void testWithException() {
+	public void testWithException() throws IOException {
 		count++;
 		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		
+		File tmpImg2 = File.createTempFile("img", "_with_very_very_very_long_name_to_be_shortened.png");
+		File tmpHtml2 = File.createTempFile("html", "_with_very_very_very_long_name_to_be_shortened.html");
+		ScreenShot screenshot2 = new ScreenShot(tmpImg2, tmpHtml2);
+		step1.addSnapshot(new Snapshot(screenshot2, null, SnapshotCheckType.NONE), 1, null);
+		
+		
 		step1.addAction(new TestAction(String.format("played %d times", count), false, new ArrayList<>()));
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		TestStepManager.logTestStep(step1);

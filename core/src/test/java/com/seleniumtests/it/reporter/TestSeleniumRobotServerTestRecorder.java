@@ -36,9 +36,11 @@ import static org.mockito.Mockito.reset;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.reporter.logger.TestStep;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -115,6 +117,15 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			Assert.assertTrue(logs.contains("Snapshot hasn't any name, it won't be sent to server")); // one snapshot has no name, error message is displayed
 
 			verify(serverConnector, times(30)).recordStepResult(any(TestStep.class), anyInt(), anyInt(), anyInt()); // all steps are recorded
+			// files are uploaded. Only 'testWithException' holds a Snapshot with snapshotCheckType.NONE and so, only its 2 files are uploaded
+			// other snapshots, which are used for image comparison / regression are uploaded through an other service 'createSnapshot'
+			verify(serverConnector).uploadFile(eq(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithException", "htmls", "testWithException_0-1_step_1--tened.html").toFile()), anyInt());
+			verify(serverConnector).uploadFile(eq(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithException", "screenshots", "testWithException_0-1_step_1--rtened.png").toFile()), anyInt());
+			// check image id and html id has been updated once files has been uploaded, for tests where snapshots has been uploaded
+			verify(serverConnector).updateStepResult(contains("\"snapshots\":[{\"idHtml\":0,\"displayInReport\":true,\"name\":\"testWithException_0-1_step_1--rtened.png\",\"idImage\":0,\"failed\":false,\"position\":0,\"type\":\"snapshot\",\"snapshotCheckType\":\"NONE\""), eq(0));
+			verify(serverConnector).updateStepResult(contains("\"snapshots\":[{\"idHtml\":null,\"displayInReport\":true,\"name\":\"testAndSubActions_0-1_step_1--rtened.png\""), eq(0));
+			
+			
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
