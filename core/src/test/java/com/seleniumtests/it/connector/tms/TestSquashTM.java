@@ -24,10 +24,10 @@ import com.seleniumtests.core.utils.TestNGResultUtils;
  */
 public class TestSquashTM extends GenericTest {
 	
-	private String server = "https://localhost/squash";
-	private String user = "user";
-	private String password = "pwd";
-	private String project = "myProject";
+	private String server = "***REMOVED***";
+	private String user = "s047432";
+	private String password = "***REMOVED***";
+	private String project = "99.Bac à sable";
 
 	@Test(groups="no-ti", enabled = true, attributes = {@CustomAttribute(name = "testId", values = "12")})
 	public void testCreateCampaign(ITestContext testContext) {
