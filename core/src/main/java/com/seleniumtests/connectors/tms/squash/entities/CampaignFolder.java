@@ -56,7 +56,7 @@ public class CampaignFolder extends Entity {
 			if (!json.isEmpty()) {
 				// we request for only one project, so take the first element
 				for (JSONObject folderJson: (List<JSONObject>)json.getJSONObject(0).getJSONArray("folders").toList()) {
-					campaignFolders.add(CampaignFolder.get(folderJson.getInt("id")));
+					campaignFolders.addAll(readCampaignFolderFromTree(folderJson));
 				}
 			}
 	
@@ -64,6 +64,18 @@ public class CampaignFolder extends Entity {
 		} catch (UnirestException e) {
 			throw new ScenarioException("Cannot get all campaign folders", e);
 		}
+	}
+	
+	private static List<CampaignFolder> readCampaignFolderFromTree(JSONObject folderJson) {
+		List<CampaignFolder> campaignFolders = new ArrayList<>();
+		CampaignFolder campaignFolder = CampaignFolder.get(folderJson.getInt("id"));
+		campaignFolders.add(campaignFolder);
+		
+		// add children
+		for (Object childJson: folderJson.getJSONArray("children")) {
+			campaignFolders.addAll(readCampaignFolderFromTree((JSONObject) childJson));
+		}
+		return campaignFolders;
 	}
 	
 	public static CampaignFolder get(int id) {
