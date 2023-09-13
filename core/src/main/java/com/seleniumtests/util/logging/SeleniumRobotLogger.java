@@ -72,11 +72,12 @@ public class SeleniumRobotLogger {
 		// As a utility class, it is not meant to be instantiated.
 	}
 	
-	public static void createLoggerForTest(String outputDir, String loggerName) {
-
+	/**
+	 * Removes the logger for specific test
+	 */
+	public static void removeLoggerForTest() {
 		LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
 		Configuration config = ctx.getConfiguration();
-		Level level = (System.getProperty(INTERNAL_DEBUG) != null && System.getProperty(INTERNAL_DEBUG).contains("core")) ? Level.DEBUG: Level.INFO;
 		
 		if (loggerNames.get() != null) {
 			String previousName = loggerNames.get();
@@ -85,7 +86,20 @@ public class SeleniumRobotLogger {
 				appender.stop();
 				((BuiltConfiguration) config).getLogger(previousName).removeAppender(FILE_APPENDER_NAME + "-" + previousName);
 			}
+			loggerNames.remove();
 		}
+	}
+	
+	/**
+	 * Creates a logger for a test method, so that all logs goes to a specific file
+	 * @param outputDir
+	 * @param loggerName
+	 */
+	public static void createLoggerForTest(String outputDir, String loggerName) {
+
+		LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+		Configuration config = ctx.getConfiguration();
+		Level level = (System.getProperty(INTERNAL_DEBUG) != null && System.getProperty(INTERNAL_DEBUG).contains("core")) ? Level.DEBUG: Level.INFO;
 		
 		LoggerConfig loggerConfig = new LoggerConfig(loggerName, level, false);
 		PatternLayout.Builder layoutBuilder = PatternLayout.newBuilder();
@@ -279,6 +293,7 @@ public class SeleniumRobotLogger {
 	
 	/**
 	 * Remove all execution files as they are not needed anymore, data written to log files
+	 * This method MUST be called once all tests has terminated, else, loggers will try to write to closed streams
 	 */
 	public static void cleanTestLogs() {
 		
@@ -286,6 +301,10 @@ public class SeleniumRobotLogger {
 		LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
 		Configuration config = ctx.getConfiguration();
 		for (LoggerConfig loggerConfig: config.getLoggers().values()) {
+			// do not stop root logger
+			if (loggerConfig.getParent() == null) {
+				continue;
+			}
 			for (Appender appender: loggerConfig.getAppenders().values()) {
 				appender.stop();
 			}
@@ -296,7 +315,6 @@ public class SeleniumRobotLogger {
 				TrueFileFilter.INSTANCE )) {
 			file.delete();
 		}
-		
 	}
 	
 	public static void reset() throws IOException {

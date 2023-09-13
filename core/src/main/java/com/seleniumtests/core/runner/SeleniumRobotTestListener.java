@@ -103,7 +103,8 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	public void onTestFullyFinished(ITestResult testResult) {
 
 		generateTempReport(testResult);
-
+		
+		SeleniumRobotLogger.removeLoggerForTest();
 	}
 	
 	/**
