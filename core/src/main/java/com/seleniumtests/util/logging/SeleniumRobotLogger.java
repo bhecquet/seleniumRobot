@@ -87,6 +87,9 @@ public class SeleniumRobotLogger {
 				((BuiltConfiguration) config).getLogger(previousName).removeAppender(FILE_APPENDER_NAME + "-" + previousName);
 			}
 			loggerNames.remove();
+			
+			// remove the logger so that a new one for the same name can be added (useful during integration tests)
+			config.removeLogger(previousName);
 		}
 	}
 	
