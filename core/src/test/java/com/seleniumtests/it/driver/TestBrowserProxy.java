@@ -45,7 +45,7 @@ public class TestBrowserProxy extends GenericDriverTest {
 			System.setProperty(SeleniumTestsContext.WEB_PROXY_TYPE, "autodetect");
 			initDriver(testNGCtx);
 			driver.get("http://www.google.com");
-			logger.info(driver.getPageSource());
+			logger.info(driver.findElement(By.tagName("body")).getText().toLowerCase());
 			Assert.assertTrue(driver.findElement(By.tagName("body")).getText().toLowerCase().contains("gmail"), "Google home page has not been loaded");
 		} finally {
 			System.clearProperty(SeleniumTestsContext.BROWSER);
