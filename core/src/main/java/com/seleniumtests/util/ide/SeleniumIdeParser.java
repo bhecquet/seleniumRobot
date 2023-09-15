@@ -97,6 +97,7 @@ public class SeleniumIdeParser {
 	private void prepareJavaFile(File javaFile) {
 		Pattern patternCall = Pattern.compile(".*System.out.println\\(\"CALL:(.*)\"\\);$");
 		Pattern patternWait = Pattern.compile(".*new WebDriverWait\\(driver, (\\d+)\\);$");
+		Pattern patternVariableQuote = Pattern.compile("(.*assert.*)\"(vars.get.*)\"\\);$"); // for files of type assertEquals(vars.get("dateAujourdhui").toString(), "vars.get("dateFin").toString()");
 		try {
 			StringBuilder newContent = new StringBuilder();
 			String content = FileUtils.readFileToString(javaFile, StandardCharsets.UTF_8);
@@ -104,10 +105,13 @@ public class SeleniumIdeParser {
 				line = line.replace("\r", "");
 				Matcher matcherCall = patternCall.matcher(line);
 				Matcher matcherWait = patternWait.matcher(line);
+				Matcher matcherQuote = patternVariableQuote.matcher(line);
 				if (matcherCall.matches()) {
 					newContent.append(matcherCall.group(1).replace("\\\"", "\"") + "\n");
 				} else if (matcherWait.matches()) {
 					newContent.append(String.format("WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(%s));\n", matcherWait.group(1)));
+				} else if (matcherQuote.matches()) {
+					newContent.append(String.format("%s%s);\n", matcherQuote.group(1), matcherQuote.group(2)));
 				} else {
 					newContent.append(line + "\n");
 				}

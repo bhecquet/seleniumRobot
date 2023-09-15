@@ -316,4 +316,64 @@ public class TestSeleniumIdeParser extends GenericTest {
 			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
 		}
 	}
+	
+	
+	/**
+	 * Selenium IDE may generate this code:
+	 * <code>
+	 *     vars.put("dateFin", driver.findElement(By.xpath("//td[8]/div/lds-datepicker/div/input")).getAttribute("value"));
+	 *     vars.put("dateAujourdhui", js.executeScript("return new Date().toLocaleDateString(\'fr-FR\');"));
+	 *     assertEquals(vars.get("dateAujourdhui").toString(), "vars.get("dateFin").toString()");
+	 * </code>
+	 * Check we unquote the last "vars.get"
+	 */
+	@Test(groups={"it"})
+	public void testCodeGenerationunquoteAssertVariables() throws IOException {
+		
+		String testClassCode = "package com.infotel.selenium.ide;\n"
+				+ "\n"
+				+ "import java.io.IOException;\n"
+				+ "import com.seleniumtests.core.runner.SeleniumTestPlan;\n"
+				+ "import org.testng.annotations.Test;\n"
+				+ "\n"
+				+ "public class MainPageVariableQuote extends SeleniumTestPlan {\n"
+				+ "\n"
+				+ "    @Test\n"
+				+ "    public void mainPage() throws IOException {\n"
+				+ "        new MainPageVariableQuotePage().mainPage();\n"
+				+ "    }\n"
+				+ "\n"
+				+ "}";
+		
+		String pageClassCode = String.format(SeleniumIdeParser.PAGE_OBJECT_HEADER, "MainPageVariableQuote", "MainPageVariableQuote") +
+				"public void mainPage(){\n"
+				+ "    driver.get(\"https://docs.python.org/3/library/operator.html\");\n"
+				+ "    driver.manage().window().setSize(new Dimension(1150, 825));\n"
+				+ "    vars.put(\"user\", \"myUser\");\n"
+				+ "    driver.findElement(By.linkText(\"Lib/operator.py\")).click();\n"
+				+ "    vars.put(\"dateFin\", driver.findElement(By.xpath(\"//td[8]/div/lds-datepicker/div/input\")).getAttribute(\"value\"));\n"
+				+ "    vars.put(\"dateAujourdhui\", js.executeScript(\"return new Date().toLocaleDateString(\\'fr-FR\\');\"));\n"
+				+ "    assertEquals(vars.get(\"dateAujourdhui\").toString(), vars.get(\"dateFin\").toString());\n"
+				+ "}\n"
+				+ "\n"
+				+ "\n"
+				+ "}";
+		
+		try {
+			System.setProperty(SeleniumTestsContext.MANUAL_TEST_STEPS, "false");
+			
+			File tmpSuiteFile = createFileFromResource("ti/ide/MainPageVariableQuote.java");
+			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageVariableQuote.java").toFile();
+			FileUtils.copyFile(tmpSuiteFile, suiteFile);
+			
+			Map<String, String> classInfo = new SeleniumIdeParser(suiteFile.getAbsolutePath()).parseSeleniumIdeFile();
+			
+			Assert.assertTrue(classInfo.containsKey("com.infotel.selenium.ide.MainPageVariableQuotePage"));
+			
+			Assert.assertEquals(classInfo.get("com.infotel.selenium.ide.MainPageVariableQuote"), testClassCode);
+			Assert.assertEquals(classInfo.get("com.infotel.selenium.ide.MainPageVariableQuotePage"), pageClassCode);
+		} finally {
+			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
+		}
+	}
 }
