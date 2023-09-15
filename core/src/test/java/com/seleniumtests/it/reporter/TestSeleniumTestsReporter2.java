@@ -1306,28 +1306,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions", "testInError", "testWithException"});
 
 		String detailedReportContent1 = readTestMethodResultFile("testAndSubActions");
-		Assert.assertTrue(detailedReportContent1.contains("src=\"screenshot/testAndSubActions_0-1_step_1--rtened.png\""));
+		Assert.assertTrue(detailedReportContent1.contains("src=\"screenshots/testAndSubActions_0-1_step_1--rtened.png\""));
 		Assert.assertTrue(detailedReportContent1.contains("<a href='htmls/testAndSubActions_0-1_step_1--tened.html' target=html>"));
 
 		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "htmls", "testAndSubActions_0-1_step_1--tened.html").toFile().exists());
-	}
-
-	@Test(groups = {"it"})
-	public void testAttachmentRenamingWithOptimizeReports() throws Exception {
-		try {
-			System.setProperty("optimizeReports", "true");
-			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions", "testInError", "testWithException"});
-		} finally {
-			System.clearProperty("optimizeReports");
-		}
-
-		String detailedReportContent1 = readTestMethodResultFile("testAndSubActions");
-		Assert.assertTrue(detailedReportContent1.contains("src=\"screenshot/testAndSubActions_0-1_step_1--rtened.png\""));
-		Assert.assertTrue(detailedReportContent1.contains(" | <a href='htmls/testAndSubActions_0-1_step_1--tened.html.zip' target=html>"));
-
-		// check file has been moved / compressed
-		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "htmls", "testAndSubActions_0-1_step_1--tened.html.zip").toFile().exists());
-		Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "htmls", "testAndSubActions_0-1_step_1--tened.html").toFile().exists());
 	}
 
 	/**
@@ -1474,7 +1456,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 							+ "<div class=\"message-log message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> a message </div>.*?"    // message in sub step
 							+ "sendKeys to password field.*?"            // action in sub step
 							+ "<div class=\"row\"></div></ul><div class=\"row\">.*?"
-							+ "<div class=\"message-snapshot col\"><div class=\"text-center\">.*src=\"screenshot/testAndSubActions_0-1_step_1--rtened\\.png\" style=\"width: 300px\">.*"
+							+ "<div class=\"message-snapshot col\"><div class=\"text-center\">.*src=\"screenshots/testAndSubActions_0-1_step_1--rtened\\.png\" style=\"width: 300px\">.*"
 			));
 		} catch (AssertionError e) {
 			logger.error("------ detailed report --------");
