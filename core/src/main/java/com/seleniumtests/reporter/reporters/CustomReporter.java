@@ -221,7 +221,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 
 	private void getTestLogs(VelocityContext context, String reportFormat, String logs) {
 		try {
-			context.put("logs", logs == null ? "Test skipped": StringUtility.encodeString(logs, reportFormat.toLowerCase()));
+			context.put("logs", logs == null || logs.isEmpty() ? "Test skipped": StringUtility.encodeString(logs, reportFormat.toLowerCase()));
 		} catch (CustomSeleniumTestsException e) {
 			context.put("logs", logs);
 		}

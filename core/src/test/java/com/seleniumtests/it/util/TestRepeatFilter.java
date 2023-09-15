@@ -48,7 +48,7 @@ public class TestRepeatFilter extends ReporterTest {
 		
 		// check same logs are in the HTML result file
 		String htmlLogs = readTestMethodResultFile("testLogSameInfoMultipleTimesLong");
-		Assert.assertEquals(StringUtils.countMatches(htmlLogs, "something interesting"), 2); // 1 time for each period of 60 secs, and test lasts 75 secs
+		Assert.assertEquals(StringUtils.countMatches(htmlLogs, "ScenarioLogger: something interesting"), 2); // 1 time for each period of 60 secs, and test lasts 75 secs
 		Assert.assertEquals(StringUtils.countMatches(htmlLogs, "... repeated 12 times until"), 1); // first 60 secs
 		Assert.assertTrue(htmlLogs.matches(".*12 times until \\d+:\\d+:\\d+\\.\\d+ ...*")); // check end time of repeat is present
 		Assert.assertEquals(StringUtils.countMatches(htmlLogs, "... repeated 3 times until"), 1);  // last 15 secs
