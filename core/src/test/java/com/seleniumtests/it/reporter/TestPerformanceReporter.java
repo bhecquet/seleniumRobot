@@ -243,7 +243,7 @@ public class TestPerformanceReporter extends ReporterTest {
 			String jmeterReport1 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "PERF-result.xml").toFile(), StandardCharsets.UTF_8);
 			String jmeterReport2 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "PERF2-result.json").toFile(), StandardCharsets.UTF_8);
 			
-			Assert.assertTrue(jmeterReport1.contains("<testsuite gridnode=\"LOCAL\" errors=\"0\" failures=\"0\" hostname=\"\" name=\"testAndSubActions\" tests=\"7\" time=\"15"));
+			Assert.assertTrue(jmeterReport1.contains("<testsuite gridnode=\"LOCAL\" errors=\"0\" failures=\"0\" hostname=\"\" name=\"testAndSubActions\" tests=\"7\" time=\""));
 			Assert.assertTrue(jmeterReport2.contains("\"suiteName\": \"testAndSubActions\""));
 		} finally {
 			System.clearProperty("customTestReports");

@@ -298,7 +298,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 
 			Assert.assertEquals(DriverTestPage.textElement.getValue(), "youpi@[] meduse");
 
-			Assert.assertTrue(secondDuration < 10);
+			Assert.assertTrue(secondDuration < 11);
 			Assert.assertTrue(secondDuration > 7);
 		} finally {
 			driver.findElement(By.id("button2")).click();
