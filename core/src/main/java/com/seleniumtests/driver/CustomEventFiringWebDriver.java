@@ -743,7 +743,10 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     @Override
     public void close() {
     	try {
-    		driver.close();
+			driver.close();
+		} catch (NullPointerException e) {
+			// NPE raised with IE when closing session
+			// nothing to do
     	} catch (UnhandledAlertException e) {
     		logger.info("close: Handling alert");
     		handleAlert();
@@ -1444,8 +1447,6 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	
 	/**
 	 * Get mouse coordinates
-	 * @param x
-	 * @param y
 	 */
 	public static java.awt.Point getMouseCoordinates(DriverMode driverMode, SeleniumGridConnector gridConnector) {
 		
@@ -1550,7 +1551,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	/**
 	 * send keys to desktop
 	 * This is useful for typing special keys like ENTER
-	 * @param keys	List of KeyEvent 
+	 * @param keyCodes	List of KeyEvent
 	 */
 	public static void sendKeysToDesktop(List<Integer> keyCodes, DriverMode driverMode, SeleniumGridConnector gridConnector) {
 		if (driverMode == DriverMode.LOCAL) {
