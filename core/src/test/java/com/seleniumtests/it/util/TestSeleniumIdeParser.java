@@ -44,7 +44,8 @@ public class TestSeleniumIdeParser extends GenericTest {
 				"\n" + 
 				"}";
 		
-		String pageClassCode = String.format(SeleniumIdeParser.PAGE_OBJECT_HEADER, "MysuiteTest", "MysuiteTest") + 
+		String pageClassCode = String.format(SeleniumIdeParser.PAGE_OBJECT_HEADER, "MysuiteTest", "MysuiteTest")
+				.replace("https://initialurl.com", "https://www.seleniumhq.org/") +
 				"public void seleniumhq(){\n" + 
 				"    driver.get(\"https://www.seleniumhq.org/\");\n" + 
 				"    driver.manage().window().setSize(new Dimension(1000, 683));\n" + 
@@ -108,7 +109,8 @@ public class TestSeleniumIdeParser extends GenericTest {
 				"\n" + 
 				"}";
 		
-		String pageClassCode = String.format(SeleniumIdeParser.PAGE_OBJECT_HEADER, "MysuiteTest", "MysuiteTest") + 
+		String pageClassCode = String.format(SeleniumIdeParser.PAGE_OBJECT_HEADER, "MysuiteTest", "MysuiteTest")
+				.replace("https://initialurl.com", "https://www.seleniumhq.org/") +
 				"public void seleniumhq(){\n" + 
 				"    driver.get(\"https://www.seleniumhq.org/\");\n" + 
 				"    driver.manage().window().setSize(new Dimension(1000, 683));\n" + 
@@ -172,7 +174,8 @@ public class TestSeleniumIdeParser extends GenericTest {
 				"\n" + 
 				"}";
 		
-		String pageClassCode = String.format(SeleniumIdeParser.PAGE_OBJECT_HEADER, "MysuiteTestWait", "MysuiteTestWait") + 
+		String pageClassCode = String.format(SeleniumIdeParser.PAGE_OBJECT_HEADER, "MysuiteTestWait", "MysuiteTestWait")
+				.replace("https://initialurl.com", "https://www.seleniumhq.org/") +
 				"public void seleniumhq(){\n" + 
 				"    driver.get(\"https://www.seleniumhq.org/\");\n" + 
 				"    driver.manage().window().setSize(new Dimension(1000, 683));\n" + 
@@ -234,7 +237,8 @@ public class TestSeleniumIdeParser extends GenericTest {
 				+ "\n"
 				+ "}";
 		
-		String pageClassCode = String.format(SeleniumIdeParser.PAGE_OBJECT_HEADER, "MainPageExternalCall", "MainPageExternalCall") + 
+		String pageClassCode = String.format(SeleniumIdeParser.PAGE_OBJECT_HEADER, "MainPageExternalCall", "MainPageExternalCall")
+				.replace("https://initialurl.com", "https://docs.python.org/3/library/operator.html") +
 				"public void mainPage(){\n"
 				+ "    driver.get(\"https://docs.python.org/3/library/operator.html\");\n"
 				+ "    driver.manage().window().setSize(new Dimension(1150, 825));\n"
@@ -289,7 +293,8 @@ public class TestSeleniumIdeParser extends GenericTest {
 				+ "\n"
 				+ "}";
 		
-		String pageClassCode = String.format(SeleniumIdeParser.PAGE_OBJECT_HEADER, "MainPageExternalCall2", "MainPageExternalCall2") + 
+		String pageClassCode = String.format(SeleniumIdeParser.PAGE_OBJECT_HEADER, "MainPageExternalCall2", "MainPageExternalCall2")
+				.replace("https://initialurl.com", "https://docs.python.org/3/library/operator.html") +
 				"public void mainPage(){\n"
 				+ "    driver.get(\"https://docs.python.org/3/library/operator.html\");\n"
 				+ "    driver.manage().window().setSize(new Dimension(1150, 825));\n"
@@ -345,7 +350,8 @@ public class TestSeleniumIdeParser extends GenericTest {
 				+ "\n"
 				+ "}";
 		
-		String pageClassCode = String.format(SeleniumIdeParser.PAGE_OBJECT_HEADER, "MainPageVariableQuote", "MainPageVariableQuote") +
+		String pageClassCode = String.format(SeleniumIdeParser.PAGE_OBJECT_HEADER, "MainPageVariableQuote", "MainPageVariableQuote")
+				.replace("https://initialurl.com", "https://docs.python.org/3/library/operator.html") +
 				"public void mainPage(){\n"
 				+ "    driver.get(\"https://docs.python.org/3/library/operator.html\");\n"
 				+ "    driver.manage().window().setSize(new Dimension(1150, 825));\n"

@@ -64,7 +64,7 @@ public class SeleniumIdeParser {
 			"    private JavascriptExecutor js;\n" + 	
 			"\n" + 	
 			"    public %sPage() throws IOException {\n" + 
-			"        super();\n" + 
+			"        super(null, \"https://initialurl.com\");\n" +
 			"        js = (JavascriptExecutor) driver;\n" + 
 			"        vars = new HashMap<String, Object>();\n" + 
 			"        for (Entry<String, TestVariable> entry: robotConfig().getConfiguration().entrySet()) {\n" + 
@@ -94,7 +94,11 @@ public class SeleniumIdeParser {
 	 * - transform "CALL:" operation to java call
 	 * - in the CALL line, replace escaped quotes by quote itself
 	 */
-	private void prepareJavaFile(File javaFile) {
+	private String prepareJavaFile(File javaFile) {
+		String initialUrl = "https://www.selenium.dev";
+		boolean initialUrlFound = false;
+		
+		Pattern patternUrl = Pattern.compile("^\\s+driver.get\\(\"(.*?)\"\\);$");
 		Pattern patternCall = Pattern.compile(".*System.out.println\\(\"CALL:(.*)\"\\);$");
 		Pattern patternWait = Pattern.compile(".*new WebDriverWait\\(driver, (\\d+)\\);$");
 		Pattern patternVariableQuote = Pattern.compile("(.*assert.*)\"(vars.get.*)\"\\);$"); // for files of type assertEquals(vars.get("dateAujourdhui").toString(), "vars.get("dateFin").toString()");
@@ -103,6 +107,7 @@ public class SeleniumIdeParser {
 			String content = FileUtils.readFileToString(javaFile, StandardCharsets.UTF_8);
 			for (String line: content.split("\n")) {
 				line = line.replace("\r", "");
+				Matcher matcherUrl = patternUrl.matcher(line);
 				Matcher matcherCall = patternCall.matcher(line);
 				Matcher matcherWait = patternWait.matcher(line);
 				Matcher matcherQuote = patternVariableQuote.matcher(line);
@@ -112,6 +117,10 @@ public class SeleniumIdeParser {
 					newContent.append(String.format("WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(%s));\n", matcherWait.group(1)));
 				} else if (matcherQuote.matches()) {
 					newContent.append(String.format("%s%s);\n", matcherQuote.group(1), matcherQuote.group(2)));
+				} else if (matcherUrl.matches() && !initialUrlFound) {
+					initialUrl = matcherUrl.group(1);
+					initialUrlFound = true;
+					newContent.append(line + "\n");
 				} else {
 					newContent.append(line + "\n");
 				}
@@ -122,10 +131,12 @@ public class SeleniumIdeParser {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		return initialUrl;
 	}
 	
 	public Map<String, String> parseSeleniumIdeFile() throws FileNotFoundException {
-		prepareJavaFile(javaFile);
+		String initialUrl = prepareJavaFile(javaFile);
 		Map<String, String> classInfo = new HashMap<>();
 		
 		// parse the file
@@ -135,16 +146,21 @@ public class SeleniumIdeParser {
         
         webPageCode.append(FOOTER);
         testCode.append(FOOTER);
-        String testCodeStr = testCode.toString().replace("new WebPage().", String.format("new %sPage().", className));
+        String testCodeStr = testCode
+				.toString()
+				.replace("new WebPage().", String.format("new %sPage().", className));
+        
+        String webPageCodeStr = webPageCode.toString()
+				.replace("https://initialurl.com", initialUrl);
         
         classInfo.put("com.infotel.selenium.ide." + className, testCodeStr);
-        classInfo.put("com.infotel.selenium.ide." + className + "Page", webPageCode.toString());
+        classInfo.put("com.infotel.selenium.ide." + className + "Page", webPageCodeStr);
         
         logger.info(String.format("generated class %s", className));
         logger.info("\n" + testCodeStr);
         logger.info("------------------------------------------");
         logger.info(String.format("generated class %sPage", className));
-        logger.info("\n" + webPageCode.toString());
+        logger.info("\n" + webPageCodeStr);
         
         return classInfo;
 	}
@@ -192,8 +208,7 @@ public class SeleniumIdeParser {
 		    		tCode.append("    }\n\n");
 		    	} 
     		}
-	    	
-	    	// TODO: steps
+
 	    }
 	}
 }
