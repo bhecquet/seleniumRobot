@@ -130,6 +130,51 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 		}
 	}
 	
+	/**
+	 * Test that with IE, test starts correctly (initial url is set)
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
+	@Test(groups={"it"})
+	public void testSeleniumExecutionInternetExplorer() throws IOException, ClassNotFoundException {
+		try {
+			CompilerUtils.addClassPath("target/test-classes");
+			System.setProperty(SeleniumTestsContext.BROWSER, "iexploreEdge");
+			System.setProperty(SeleniumTestsContext.MANUAL_TEST_STEPS, "false");
+			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "false");
+			System.setProperty("foo", "Hello Selenium IDE");
+			
+
+			File tmpSuiteFile = GenericTest.createFileFromResource("ti/ide/MainPageTest.java");
+			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTest.java").toFile();
+			FileUtility.copyFile(tmpSuiteFile, suiteFile);
+			
+			new SeleniumIdeLauncher().executeScripts(Arrays.asList(suiteFile.getAbsolutePath()), 1);
+			
+			String mainReportContent = ReporterTest.readSummaryFile();
+			
+			// check that test is seen and OK
+			Assert.assertTrue(mainReportContent.matches(".*<a href='mainPage/TestReport.html' info=\"ok\" .*?>mainPage</a>.*"));
+			
+			// check that detailed result contains the "hello" written in test
+			String detailedReportContent1 = ReporterTest.readTestMethodResultFile("mainPage");
+
+			Assert.assertTrue(detailedReportContent1.contains("Start method mainPage"));
+			Assert.assertTrue(detailedReportContent1.contains("Test is OK"));
+			Assert.assertTrue(detailedReportContent1.contains("Hello Selenium IDE"));
+
+			
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.BROWSER);
+			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
+			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);
+			System.clearProperty("foo");
+			
+			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
+		}
+	}
+	
 	@Test(groups={"it"})
 	public void testSeleniumExecutionParallel() throws IOException, ClassNotFoundException {
 		try {
