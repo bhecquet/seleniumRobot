@@ -49,15 +49,10 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
 import org.mockito.Mock;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.Point;
+import org.openqa.selenium.*;
 import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebDriver.Window;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
@@ -483,6 +478,31 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(120L, 80L));
 		eventDriver.getScrollPosition();
 
+	}
+	
+	@Test(groups = {"ut"})
+	public void testClose() {
+
+		eventDriver.close();
+		verify(driver).close();
+	}
+	
+	/**
+	 * With Internet Explorer, closing driver may lead to a NullPointerException
+	 * Check its intercepted
+	 */
+	@Test(groups = {"ut"})
+	public void testCloseWithNPE() {
+		doThrow(new NullPointerException("no handles")).when(driver).close();
+		eventDriver.close();
+	}
+	
+	@Test(groups = {"ut"})
+	public void testCloseWithAlerts() {
+		doThrow(new UnhandledAlertException("alert present")).doNothing().when(driver).close();
+		eventDriver.close();
+		verify(driver).switchTo();
+		verify(target).alert(); // check we switch to alert
 	}
 	
 	/**
