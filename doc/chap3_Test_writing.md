@@ -1299,6 +1299,12 @@ CALL:new com.company.AuthenticationPage()._accessAuthentication(${user}).toStrin
 On execution with SeleniumRobot, the "CALL" command will be replaced by the content which will be called
 It's mandatory to specify the package of the class, as we do not add the imports.
 
+#### Mask passwords ####
+
+SeleniumRobot offers a feature to mask your sensitive information in reports.
+To enable it, you just need to store your password / token inside a variable (command `store text`, and re-use this variable in the script with `${var}` notation
+The variable name **MUST** contain either 'pwd', 'password', or 'passwd'.
+
 ### 12 Write mobile tests ###
 
 SeleniumRobot supports appium (see chap4_Run_tests, §3 to configure execution) out of the box. Be default, seleniumRobot will start the appium server itself for running the test locally, and stop it at the end of the test.
