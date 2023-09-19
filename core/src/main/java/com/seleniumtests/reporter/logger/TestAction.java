@@ -66,6 +66,7 @@ public class TestAction {
 		this.name = name;
 		this.failed = failed;
 		this.pwdToReplace = pwdToReplace.stream()
+					.filter(s -> s != null)
 					.filter(s -> s.length() > TestStepManager.MIN_PASSWORD_LENGTH)
 					.collect(Collectors.toList());
 
