@@ -71,6 +71,7 @@
 - [11 Customize Selenium IDE tests](#11-customize-selenium-ide-tests)
   - [Add steps](#add-steps)
   - [Call Java code](#call-java-code)
+  - [Mask passwords](#mask-passwords)
 - [12 Write mobile tests](#12-write-mobile-tests)
 - [13 Implement custom SelectList](#13-implement-custom-selectlist)
 - [14 Using custom UI libraries](#14-using-custom-ui-libraries)
