@@ -63,6 +63,8 @@ public class TestMessage extends TestAction {
 		} else {
 			msg.encoded = true;
 		}
+		
+		msg.timestamp = timestamp;
 		msg.actionException = actionException;
 		if (actionException != null) {
 			msg.actionExceptionMessage = actionException.getClass().toString() + ": " + encodeString(actionException.getMessage(), format);

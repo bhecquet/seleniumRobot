@@ -54,7 +54,7 @@ public class TestAction {
 	protected List<String> pwdToReplace;
 	protected boolean maskPassword = true;
 	protected boolean encoded = false;		// true if we have encoded messages
-	private LocalDateTime timestamp;
+	protected LocalDateTime timestamp;
 	
 	/**
 	 * 
@@ -165,6 +165,7 @@ public class TestAction {
 		TestAction encodedAction = new TestAction(encodeString(name, format), failed, encodedPasswords);
 		encodedAction.actionException = actionException;
 		encodedAction.maskPassword = maskPassword;
+		encodedAction.timestamp = timestamp;
 		
 		if (format == null) {
 			encodedAction.encoded = encoded;
