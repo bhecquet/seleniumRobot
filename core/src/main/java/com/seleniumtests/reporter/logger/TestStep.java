@@ -156,6 +156,19 @@ public class TestStep extends TestAction {
 		duration = new Date().getTime() - startDate.getTime();
 		
 	}
+	
+	/**
+	 * Add a password to the list of passwords that should be masked / replaced
+	 * This password will also be added to the list of password for sub steps
+	 * Useful for Selenium IDE tests, where we specify a password in the middle of a step
+	 * Only substeps, action, messages created AFTER this call will have their new password masked
+	 * @param password		the password to add
+	 */
+	public void addPasswordToReplace(String password) {
+		if (password != null && password.length() > TestStepManager.MIN_PASSWORD_LENGTH) {
+			pwdToReplace.add(password);
+		}
+	}
 
 	public List<TestAction> getStepActions() {
 		return stepActions;

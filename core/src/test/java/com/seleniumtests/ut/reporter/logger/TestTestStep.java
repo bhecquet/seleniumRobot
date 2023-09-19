@@ -820,6 +820,17 @@ public class TestTestStep extends GenericTest {
 				"  - Step substep with args: (******)");
 	}
 	
+	/**
+	 * Check null is refused for passwork masking
+	 */
+	@Test(groups = { "ut" })
+	public void testPasswordMaskingNull() {
+		List<String> pwd = new ArrayList<>();
+		pwd.add(null);
+		TestStep step = new TestStep("step1 with args: (bar, passwd)", null, pwd, true);
+		Assert.assertTrue(step.getPwdToReplace().isEmpty());
+	}
+	
 	@Test(groups = { "ut" })
 	public void testPasswordMaskingHtmlEncodedMainStep() {
 		TestStep step = new TestStep("step1 with args: (bar, passwd)", null, Arrays.asList("passwd"), true);
@@ -961,6 +972,39 @@ public class TestTestStep extends GenericTest {
 		TestStep step = new TestStep("step1 with args: (bar, passwd)", null, toReplace, true);
 
 		Assert.assertEquals(step.getName(), "step1 with args: (bar, ******)");
+	}
+	
+	
+	/**
+	 * Check we can add a password to list of passwords to mask
+	 */
+	@Test(groups = { "ut" })
+	public void testPasswordMaskingAddPassword() {
+		TestStep step = new TestStep("step1 with args: (bar, passwd)", null, new ArrayList<>(), true);
+		TestAction action = new TestAction("action in step1 with args: (foo, passwd)", false, new ArrayList<>());
+		TestMessage message = new TestMessage("everything OK on passwd", MessageType.INFO);
+		TestStep substep = new TestStep("substep with args: (passwd)", null, new ArrayList<>(), true);
+		step.addAction(action);
+		step.addMessage(message);
+		step.addPasswordToReplace("passwd");
+		step.addStep(substep);
+		
+		// check password is not masked before 'addPasswordToReplace' has been called (only step name will still be replaced)
+		Assert.assertEquals(step.getName(), "step1 with args: (bar, ******)");
+		Assert.assertEquals(action.getName(), "action in step1 with args: (foo, passwd)");
+		Assert.assertEquals(message.getName(), "everything OK on passwd");
+		Assert.assertEquals(substep.getName(), "substep with args: (******)");
+
+	}
+	
+	@Test(groups = { "ut" })
+	public void testPasswordMaskingAddPasswordNull() {
+		TestStep step = new TestStep("step1 with args: (bar, passwd)", null, new ArrayList<>(), true);
+		step.addPasswordToReplace(null);
+		
+		// check 'null' is refused
+		Assert.assertTrue(step.getPwdToReplace().isEmpty());
+		Assert.assertEquals(step.getName(), "step1 with args: (bar, passwd)");
 	}
 
 	/**

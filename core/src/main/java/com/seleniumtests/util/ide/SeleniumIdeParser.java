@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.seleniumtests.core.TestStepManager;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -55,6 +56,7 @@ public class SeleniumIdeParser {
 			"import org.openqa.selenium.Keys;\n" + 
 			"import com.seleniumtests.core.TestVariable;\n" +
 			"import java.util.Map.Entry;\n" +
+			"import com.seleniumtests.util.ide.IdeHashMap;\n" +
 			"import java.time.Duration;\n" +
 			"import java.util.*;\n" +  
 			"\n" + 
@@ -66,7 +68,7 @@ public class SeleniumIdeParser {
 			"    public %sPage() throws IOException {\n" + 
 			"        super(null, \"https://initialurl.com\");\n" +
 			"        js = (JavascriptExecutor) driver;\n" + 
-			"        vars = new HashMap<String, Object>();\n" + 
+			"        vars = new IdeHashMap<String, Object>();\n" +
 			"        for (Entry<String, TestVariable> entry: robotConfig().getConfiguration().entrySet()) {\n" + 
 			"            vars.put(entry.getKey(), entry.getValue().getValue());\n" + 
 			"        }\n"	+
@@ -111,16 +113,25 @@ public class SeleniumIdeParser {
 				Matcher matcherCall = patternCall.matcher(line);
 				Matcher matcherWait = patternWait.matcher(line);
 				Matcher matcherQuote = patternVariableQuote.matcher(line);
+				
+				// allow calling seleniumRobot code from inside a Selenium IDE script, with the use of "CALL:" comment
 				if (matcherCall.matches()) {
 					newContent.append(matcherCall.group(1).replace("\\\"", "\"") + "\n");
+				
+				// replace WebDriverWait so that they are compatible with Selenium 4
 				} else if (matcherWait.matches()) {
 					newContent.append(String.format("WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(%s));\n", matcherWait.group(1)));
+				
+				// remove quotes around 'vars.get' when present in an assert
 				} else if (matcherQuote.matches()) {
 					newContent.append(String.format("%s%s);\n", matcherQuote.group(1), matcherQuote.group(2)));
+					
+				// get first URL (driver.get() call) to pass it the the driver on init
 				} else if (matcherUrl.matches() && !initialUrlFound) {
 					initialUrl = matcherUrl.group(1);
 					initialUrlFound = true;
 					newContent.append(line + "\n");
+
 				} else {
 					newContent.append(line + "\n");
 				}
