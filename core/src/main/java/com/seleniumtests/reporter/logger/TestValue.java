@@ -73,6 +73,8 @@ public class TestValue extends TestAction {
 		} else {
 			val.encoded = true;
 		}
+		
+		val.timestamp = timestamp;
 		return val;
 	}
 }

@@ -549,6 +549,7 @@ public class TestStep extends TestAction {
 		step.errorCause = errorCause;
 		step.errorCauseDetails = encodeString(errorCauseDetails, format);
 		step.disableBugtracker = disableBugtracker;
+		step.timestamp = timestamp;
 		
 		return step;
 	}
