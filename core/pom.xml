@@ -14,6 +14,9 @@
 	    <skipTests>false</skipTests>
 	    <skipITs>${skipTests}</skipITs>
 	    <skipUTs>${skipTests}</skipUTs>
+		<skipJar>false</skipJar>
+		<skipJavadoc>false</skipJavadoc>
+		<argLine></argLine> <!-- Can be used to pass JVM arguments to tests -->
 	    <testng.testnames>IExplorer,IntegrationTests,PageObject</testng.testnames>
 	    <testng.utTestnames>UnitTests,UnitTestsWithContext,UnitTestsWithContext2</testng.utTestnames>
 	    <seleniumRobot.debug>none</seleniumRobot.debug>
@@ -809,6 +812,7 @@
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.6</version>
 				<configuration>
+					<skip>${skipJar}</skip>
 					<finalName>seleniumRobot</finalName>
 					<archive>
 						<manifest>
@@ -840,6 +844,7 @@
 				<version>2.9.1</version>
 				<configuration>
 			      <source>8</source>
+					<skip>${skipJavadoc}</skip>
 			    </configuration> 
 				<executions>
 					<execution>

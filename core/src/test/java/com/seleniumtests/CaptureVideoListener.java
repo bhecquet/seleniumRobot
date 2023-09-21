@@ -19,7 +19,6 @@ public class CaptureVideoListener implements IInvokedMethodListener {
 	 public void beforeInvocation(IInvokedMethod method, ITestResult testResult) {
 		 
 		 if (method.isTestMethod()) {
-			 
 			 CaptureVideo captureVideoOnMethod = method.getTestMethod().getConstructorOrMethod().getMethod().getAnnotation(CaptureVideo.class);
 			 CaptureVideo captureVideoOnClass = method.getTestMethod().getConstructorOrMethod().getMethod().getDeclaringClass().getAnnotation(CaptureVideo.class);
 			 Class<?> clazz = method.getTestMethod().getConstructorOrMethod().getMethod().getDeclaringClass();
@@ -30,13 +29,16 @@ public class CaptureVideoListener implements IInvokedMethodListener {
 			 }
 			 
 			 
-			 if (captureVideoOnClass != null && captureVideoOnClass.enabled() || 
-					 captureVideoOnMethod != null && captureVideoOnMethod.enabled()) {
+			 if (captureVideoOnClass != null && captureVideoOnClass.enabled()
+					|| captureVideoOnClass2 != null && captureVideoOnClass2.enabled()
+					|| captureVideoOnMethod != null && captureVideoOnMethod.enabled()
+			 ) {
 				 VideoRecorder recorder = new VideoRecorder(new File("videos"), String.format("%s#%s.avi", 
 						 method.getTestMethod().getConstructorOrMethod().getMethod().getDeclaringClass().getName(),
 						 method.getTestMethod().getMethodName()));
-					recorder.start();
-					recorders.set(recorder);
+				 logger.info("Video recording started for test");
+				 recorder.start();
+				 recorders.set(recorder);
 			 }
 		 }
 	 }
