@@ -24,9 +24,9 @@ import com.seleniumtests.core.utils.TestNGResultUtils;
  */
 public class TestSquashTM extends GenericTest {
 	
-	private String server = "***REMOVED***";
-	private String user = "s047432";
-	private String password = "***REMOVED***";
+	private String server = "https://squash-tm/squash";
+	private String user = "yyy";
+	private String password = "xxx";
 	private String project = "99.Bac à sable";
 
 	@Test(groups="no-ti", enabled = true, attributes = {@CustomAttribute(name = "testId", values = "12")})
