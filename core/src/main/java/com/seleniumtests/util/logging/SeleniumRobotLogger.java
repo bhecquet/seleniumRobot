@@ -362,6 +362,15 @@ public class SeleniumRobotLogger {
 			return "";
 		}
 	}
+	
+	/**
+	 * Returns the log file (execution.log) for the given test name
+	 * @param testName
+	 * @return
+	 */
+	public static File getTestLogsFile(String testName) {
+		return testLogs.get(testName);
+	}
 
 
 

@@ -43,7 +43,6 @@ import kong.unirest.UnirestException;
 /**
  * All these tests need to be executed with a selenium robot grid started on localhost, port 4444
  * In a continuous delivery process, they won't be executed
- * @author S047432
  *
  */
 public class TestSeleniumRobotGridConnector extends MockitoTest {

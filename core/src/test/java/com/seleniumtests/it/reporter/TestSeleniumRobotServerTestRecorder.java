@@ -125,6 +125,10 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector).updateStepResult(contains("\"snapshots\":[{\"idHtml\":0,\"displayInReport\":true,\"name\":\"testWithException_0-1_step_1--rtened.png\",\"idImage\":0,\"failed\":false,\"position\":0,\"type\":\"snapshot\",\"snapshotCheckType\":\"NONE\""), eq(0));
 			verify(serverConnector).updateStepResult(contains("\"snapshots\":[{\"idHtml\":null,\"displayInReport\":true,\"name\":\"testAndSubActions_0-1_step_1--rtened.png\""), eq(0));
 			
+			// check logs has been uploaded (one upload for each test)
+			verify(serverConnector, times(5)).uploadLogs(any(File.class), eq(0));
+			verify(serverConnector).uploadLogs(eq(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithException", "execution.log").toFile()), eq(0));
+			verify(serverConnector).uploadLogs(eq(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "execution.log").toFile()), eq(0));
 			
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
