@@ -43,6 +43,10 @@ import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
 
+/***
+ * Class representing a connector to a grid node
+ * A single scenario will always execute on the same node even if multiple browsers are requested. They will always be created on that node
+ */
 public class SeleniumGridConnector implements ISeleniumGridConnector {
 
 	protected URL hubUrl;
@@ -328,9 +332,8 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
         	throw new SessionNotCreatedException(String.format("Could not get session information from grid: %s", e.getMessage()));
         }
         	
-    	nodeUrl = (String) object.get("uri");
-    	
-        	
+    	setNodeUrl((String)object.get("uri"));
+        
         try {
         	nodeHost = nodeUrl.split("//")[1].split(":")[0];
             String browserName = driver.getCapabilities().getBrowserName();
@@ -346,11 +349,11 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
             // store some information about driver creation
             MutableCapabilities caps = (MutableCapabilities)driver.getCapabilities();
             caps.setCapability(SeleniumRobotCapabilityType.GRID_HUB, hubUrl);
-            caps.setCapability(SeleniumRobotCapabilityType.SESSION_ID, sessionId);
+            caps.setCapability(SeleniumRobotCapabilityType.SESSION_ID, sessionId); // store the scenario session (sessionID of the first created browser to group browsers in logs
             caps.setCapability(SeleniumRobotCapabilityType.GRID_NODE, nodeHost);
             caps.setCapability(SeleniumRobotCapabilityType.GRID_NODE_URL, nodeUrl);
             
-            logger.info(String.format("Brower %s (%s) created in %.1f secs on node %s [%s] with session %s", browserName, version, driverCreationDuration / 1000.0, nodeHost, hubUrl, sessionId).replace(",", "."));
+            logger.info(String.format("Brower %s (%s) created in %.1f secs on node %s [%s] with session %s", browserName, version, driverCreationDuration / 1000.0, nodeHost, hubUrl, driver.getSessionId()).replace(",", "."));
             
         } catch (Exception ex) {
         	throw new SessionNotCreatedException(ex.getMessage());

@@ -1015,7 +1015,49 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	public void testUploadFileInactive() throws IOException {
 		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
 
-		Integer fileId = connector.uploadFile(new File(""), 17);
+		Integer fileId = connector.uploadFile(new File(""), 1);
+		Assert.assertNull(fileId);
+	}
+	
+	@Test(groups= {"ut"})
+	public void testUploadLogs() throws IOException {
+		File tmp = File.createTempFile("logs", ".txt");
+		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
+
+		Integer fileId = connector.uploadLogs(tmp, 15);
+		Assert.assertEquals(fileId, (Integer)19);
+	}
+
+	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "testCaseId must be provided")
+	public void testUploadLogsNoTestCaseId() throws IOException {
+		File tmp = File.createTempFile("logs", ".txt");
+		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
+
+		connector.uploadLogs(tmp, null);
+	}
+
+	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = ".*does not exist")
+	public void testUploadLogsWrongFile() throws IOException {
+		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
+
+		connector.uploadLogs(new File(""), 15);
+	}
+
+	@Test(groups= {"ut"}, expectedExceptions = SeleniumRobotServerException.class)
+	public void testUploadLogsInError() throws IOException {
+		File tmp = File.createTempFile("logs", ".txt");
+		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
+		HttpRequest<?> req = createServerMock("POST", SeleniumRobotSnapshotServerConnector.LOGS_API_URL, 201, "{'id': '19'}", "body");
+		when(req.asString()).thenThrow(UnirestException.class);
+
+		connector.uploadLogs(tmp, 15);
+	}
+
+	@Test(groups= {"ut"})
+	public void testUploadLogsInactive() throws IOException {
+		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
+
+		Integer fileId = connector.uploadLogs(new File(""), 15);
 		Assert.assertNull(fileId);
 	}
 

@@ -167,6 +167,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 				}
 				
 				recordSteps(serverConnector, sessionId, testCaseInSessionId, testSteps, testResult);
+				recordLogs(serverConnector, testCaseInSessionId, testResult);
 				
 				logger.info(String.format("Snapshots has been recorded with TestCaseSessionId: %d", testCaseInSessionId));
 				TestNGResultUtils.setSnapshotTestCaseInSessionId(testResult, testCaseInSessionId);
@@ -217,6 +218,19 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			// update logs on server
 			String jsonStep = testStep.toJson().toString();
 			serverConnector.updateStepResult(jsonStep, stepResultId);
+		}
+	}
+	
+	/**
+	 * Record logs to server
+	 * @param serverConnector
+	 * @param testCaseInSessionId
+	 */
+	private void recordLogs(SeleniumRobotSnapshotServerConnector serverConnector, Integer testCaseInSessionId, ITestResult testResult) {
+		try {
+			serverConnector.uploadLogs(SeleniumRobotLogger.getTestLogsFile(getTestName(testResult)), testCaseInSessionId);
+		} catch (SeleniumRobotServerException | ConfigurationException e) {
+			logger.error(e);
 		}
 	}
 

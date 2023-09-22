@@ -66,6 +66,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	public static final String STEPRESULT_API_URL = "/snapshot/api/stepresult/";
 	public static final String EXCLUDE_API_URL = "/snapshot/api/exclude/";
 	public static final String FILE_API_URL = "/snapshot/api/file/";
+	public static final String LOGS_API_URL = "/snapshot/api/logs/";
 	public static final String SNAPSHOT_API_URL = "/snapshot/upload/image";
 	public static final String STEP_REFERENCE_API_URL = "/snapshot/stepReference/";
 	public static final String DETECT_API_URL = "/snapshot/detect/";
@@ -456,7 +457,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	/**
 	 * Upload file to selenium server
 	 * @param file			the file to upload. Its id should be referenced somewhere so that it can be used
-	 * @param stepResultId	id the the step result
+	 * @param stepResultId	id of the step result
 	 * @return				the id of the file
 	 */
 	public Integer uploadFile(File file, Integer stepResultId) {
@@ -481,6 +482,36 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 			throw new SeleniumRobotServerException("cannot upload file", e);
+		}
+	}
+	/**
+	 * Upload execution logs for the test case
+	 * @param file			the file to upload. Its id should be referenced somewhere so that it can be used
+	 * @param testCaseId	id of the test case
+	 * @return				the id of the file
+	 */
+	public Integer uploadLogs(File file, Integer testCaseId) {
+		if (!active) {
+			return null;
+		}
+		if (testCaseId == null) {
+			throw new ConfigurationException("testCaseId must be provided");
+		}
+		if (file == null) {
+			throw new ConfigurationException("file must be provided");
+		} else if (!file.exists()) {
+			throw new ConfigurationException(String.format("File %s does not exist", file.getAbsolutePath()));
+		}
+
+		try {
+			JSONObject fileJson = getJSonResponse(buildPostRequest(url + LOGS_API_URL)
+					.field("file", file)
+					.field("testCase", String.valueOf(testCaseId))
+			);
+			return fileJson.getInt("id");
+
+		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
+			throw new SeleniumRobotServerException("cannot upload logs", e);
 		}
 	}
 
