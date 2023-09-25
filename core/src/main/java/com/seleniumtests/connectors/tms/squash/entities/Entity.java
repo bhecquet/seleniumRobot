@@ -102,7 +102,9 @@ public class Entity {
 		JSONObject finalJson = null;
 		
 		PagedList<JsonNode> result =  request
-				.queryString("size", 20).asPaged(
+				.queryString("size", 20)
+				.queryString("sort", "id") // we add sorting as paging produces odd results (not all data are provided)
+				.asPaged(
                         r -> ((HttpRequest) r).asJson(),
                         r -> {
 	                        	JSONObject links = ((HttpResponse<JsonNode>) r).getBody().getObject().getJSONObject("_links");
