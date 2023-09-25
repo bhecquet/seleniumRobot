@@ -141,6 +141,11 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 		((DesiredCapabilities)capabilities).setCapability(CapabilityType.BROWSER_VERSION, "50.0");
 		
 		SeleniumGridConnector connector = spy(new SeleniumGridConnector(SERVER_URL));
+		
+		Logger logger = spy(SeleniumRobotLogger.getLogger(SeleniumGridConnector.class));
+		Field loggerField = SeleniumGridConnector.class.getDeclaredField("logger");
+		loggerField.setAccessible(true);
+		loggerField.set(connector, logger);
 
 		// 2 drivers created inside the same test
 		connector.getSessionInformationFromGrid(driver);
@@ -150,6 +155,10 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 		verify(connector).setSessionId(any(SessionId.class));
 		Assert.assertEquals(connector.getSessionId().toString(), "abcdef");
 		Assert.assertEquals(connector.getNodeUrl(), "http://localhost:4321");
+		
+		// check that the driver session id is displayed in logs to help debugging
+		verify(logger).info("Brower firefox (50.0) created in 0.0 secs on node localhost [http://localhost:4321] with session abcdef");
+		verify(logger).info("Brower firefox (50.0) created in 0.0 secs on node localhost [http://localhost:4321] with session ghijkl");
 	}
 	
 	/**

@@ -81,17 +81,12 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	public static final String FILE_SERVLET = "/extra/FileServlet";
 	public static final String GUI_SERVLET = "/grid/admin/GuiServlet";
 	
+	
 	private String nodeServletUrl;
 	private URL hubServletUrl;
 	
 	public SeleniumRobotGridConnector(String url) {
 		super(url);
-	}
-	
-	@Override
-	public void getSessionInformationFromGrid(RemoteWebDriver driver, long driverCreationDuration) {
-		super.getSessionInformationFromGrid(driver, driverCreationDuration);
-		setNodeUrl(nodeUrl);
 	}
 	
 	/**
@@ -754,6 +749,10 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		} catch (MalformedURLException e) {
 			throw new ConfigurationException("Hub URL is invalid: " + nodeUrl);
 		}
+	}
+	
+	public String getNodeServletUrl() {
+		return nodeServletUrl;
 	}
 
 }

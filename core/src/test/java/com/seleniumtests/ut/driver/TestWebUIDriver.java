@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.seleniumtests.driver.*;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -49,11 +50,6 @@ import com.seleniumtests.core.StatisticsStorage;
 import com.seleniumtests.core.StatisticsStorage.DriverUsage;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
-import com.seleniumtests.driver.BrowserType;
-import com.seleniumtests.driver.CustomEventFiringWebDriver;
-import com.seleniumtests.driver.DriverMode;
-import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.driver.WebUIDriverFactory;
 import com.seleniumtests.it.stubclasses.StubTestPage;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.util.osutility.OSUtility;
@@ -68,7 +64,8 @@ import net.lightbody.bmp.BrowserMobProxy;
 				CustomEventFiringWebDriver.class, 
 				SeleniumGridConnectorFactory.class, 
 				SeleniumGridDriverFactory.class, 
-				WebUIDriver.class, 
+				WebUIDriver.class,
+				WebUIDriverFactory.class,
 				PageObject.class})
 public class TestWebUIDriver extends MockitoTest {
 	
@@ -320,6 +317,42 @@ public class TestWebUIDriver extends MockitoTest {
 		WebUIDriver.getWebDriver(true, BrowserType.HTMLUNIT, "other", null);
 		Assert.assertNull(uiDriver1.getConfig().getRunOnSameNode());
 		Assert.assertNotNull(uiDriver2.getConfig().getRunOnSameNode());
+		
+		// second driver is the active one
+		Assert.assertEquals(WebUIDriver.getCurrentWebUiDriverName(), "other");
+
+	}
+	
+	/**
+	 * Check the case where second driver fails to start, we should remove all it's references (name) from WebUiDriver
+	 * and switch back to previous driver
+	 */
+	@Test(groups={"ut"})
+	public void testNewDriverCreationInGridFails() throws Exception {
+		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
+		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://localhost:4444/wd/hub");
+		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
+		
+		WebUIDriver uiDriver1 = spy(new WebUIDriver("main"));
+		WebUIDriver uiDriver2 = spy(new WebUIDriver("other"));
+		
+		PowerMockito.whenNew(WebUIDriver.class).withArguments("main").thenReturn(uiDriver1);
+		PowerMockito.whenNew(WebUIDriver.class).withArguments("other").thenReturn(uiDriver2);
+		WebUIDriver.getUxDriverSession().remove();
+		
+		doReturn(drv1).when(uiDriver1).createWebDriver();
+		WebUIDriver.getWebDriver(true, BrowserType.HTMLUNIT, "main", null);
+
+		// set connector to simulate the driver creation on grid
+		SeleniumTestsContextManager.getThreadContext().setSeleniumGridConnector(gridConnector);
+		when(gridConnector.getNodeUrl()).thenReturn("http://localhost:5555/");
+		
+		doThrow(new WebDriverException("error")).when(uiDriver2).createWebDriver();
+		WebUIDriver.getWebDriver(true, BrowserType.HTMLUNIT, "other", null);
+		Assert.assertNull(uiDriver1.getConfig().getRunOnSameNode());
+		Assert.assertNotNull(uiDriver2.getConfig().getRunOnSameNode());
+		
+		Assert.assertEquals(WebUIDriver.getCurrentWebUiDriverName(), "main");
 
 	}
 	
