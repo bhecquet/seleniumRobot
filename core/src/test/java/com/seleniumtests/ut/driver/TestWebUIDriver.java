@@ -348,7 +348,9 @@ public class TestWebUIDriver extends MockitoTest {
 		when(gridConnector.getNodeUrl()).thenReturn("http://localhost:5555/");
 		
 		doThrow(new WebDriverException("error")).when(uiDriver2).createWebDriver();
-		WebUIDriver.getWebDriver(true, BrowserType.HTMLUNIT, "other", null);
+		try {
+			WebUIDriver.getWebDriver(true, BrowserType.HTMLUNIT, "other", null);
+		} catch (WebDriverException e) {}
 		Assert.assertNull(uiDriver1.getConfig().getRunOnSameNode());
 		Assert.assertNotNull(uiDriver2.getConfig().getRunOnSameNode());
 		

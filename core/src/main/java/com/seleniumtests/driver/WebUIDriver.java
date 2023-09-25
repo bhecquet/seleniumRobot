@@ -577,8 +577,11 @@ public class WebUIDriver {
 				} catch (Exception e) {
 	        		// in case driver fails to start, remove any reference to its name so that we cannot switch to it
 					setCurrentWebUiDriverName(previousDriverName);
-					uxDriverSession.get().remove(driverName);
+					if (driverName != DEFAULT_DRIVER_NAME) {
+						uxDriverSession.get().remove(driverName);
+					}
 					switchToDriver(previousDriverName);
+					throw e;
 				}
         	}
         } else {
