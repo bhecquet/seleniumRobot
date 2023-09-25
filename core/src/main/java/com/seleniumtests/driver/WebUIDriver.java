@@ -538,6 +538,7 @@ public class WebUIDriver {
     		throw new ScenarioException("A name must be given to the driver");
     	}
     	
+    	String previousDriverName = getCurrentWebUiDriverName();
     	boolean createDriver = false;
     	
     	// issue #304: should we try to create the driver
@@ -556,7 +557,7 @@ public class WebUIDriver {
     	
         if (createDriver) {
         	
-        	WebUIDriver uiDriver = getWebUIDriver(true, driverName);
+         	WebUIDriver uiDriver = getWebUIDriver(true, driverName);
         	if (uiDriver != null) {
 	        	uiDriver.config.setAttachExistingDriverPort(attachExistingDriverPort);
 	        	
@@ -568,10 +569,17 @@ public class WebUIDriver {
 	        	
 	        	// expect the new driver to run on same node as the previous ones
 	        	if (uxDriverSession.get() != null && uxDriverSession.get().size() > 1 && uiDriver.config.getSeleniumGridConnector() != null) {
-	        		uiDriver.config.setRunOnSameNode(SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector().getNodeUrl());
+	        		uiDriver.config.setRunOnSameNode(uiDriver.getConfig().getSeleniumGridConnector().getNodeUrl());
 	        	}
 	        	
-	        	uiDriver.createWebDriver();
+	        	try {
+					uiDriver.createWebDriver();
+				} catch (Exception e) {
+	        		// in case driver fails to start, remove any reference to its name so that we cannot switch to it
+					setCurrentWebUiDriverName(previousDriverName);
+					uxDriverSession.get().remove(driverName);
+					switchToDriver(previousDriverName);
+				}
         	}
         } else {
         	setCurrentWebUiDriverName(driverName);

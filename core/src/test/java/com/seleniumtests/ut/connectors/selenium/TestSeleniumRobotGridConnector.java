@@ -30,12 +30,14 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -47,7 +49,9 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.logging.log4j.Logger;
 import org.mockito.Mock;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -74,7 +78,60 @@ import kong.unirest.UnirestException;
 
 @PrepareForTest({HttpClients.class, Unirest.class})
 public class TestSeleniumRobotGridConnector extends ConnectorsTest {
-
+	
+	
+	private static final String GRID_STATUS_WITH_SESSION_OTHER_NODE = "{"
+			+ "  \"value\": {"
+			+ "    \"ready\": true,"
+			+ "    \"message\": \"Selenium Grid ready.\","
+			+ "    \"nodes\": ["
+			+ "      {"
+			+ "        \"id\": \"9f05db23-5533-48c2-8637-0822f8a41d78\","
+			+ "        \"uri\": \"http:\\u002f\\u002flocalhost2:5555\","
+			+ "        \"maxSessions\": 3,"
+			+ "        \"osInfo\": {"
+			+ "          \"arch\": \"amd64\","
+			+ "          \"name\": \"Windows 10\","
+			+ "          \"version\": \"10.0\""
+			+ "        },"
+			+ "        \"heartbeatPeriod\": 60000,"
+			+ "        \"availability\": \"UP\","
+			+ "        \"version\": \"4.2.2 (revision 683ccb65d6)\","
+			+ "        \"slots\": ["
+			+ "          {"
+			+ "            \"id\": {"
+			+ "              \"hostId\": \"9f05db23-5533-48c2-8637-0822f8a41d78\","
+			+ "              \"id\": \"6fd05336-ded3-4602-a1b8-03d94b3f56fa\""
+			+ "            },"
+			+ "            \"lastStarted\": \"1970-01-01T00:00:00Z\","
+			+ "            \"session\": {"
+			+ "				 \"sessionId\": \"%s\","
+			+ "				 \"uri\": \"http:\\u002f\\u002flocalhost2:4321\""
+			+ "            },"
+			+ "            \"stereotype\": {"
+			+ "              \"beta\": true,"
+			+ "              \"browserName\": \"MicrosoftEdge\","
+			+ "              \"browserVersion\": \"103.0\","
+			+ "              \"edge_binary\": \"C:\\u002fProgram Files (x86)\\u002fMicrosoft\\u002fEdge Beta\\u002fApplication\\u002fmsedge.exe\","
+			+ "              \"max-sessions\": 5,"
+			+ "              \"nodeTags\": ["
+			+ "                \"toto\""
+			+ "              ],"
+			+ "              \"platform\": \"Windows 10\","
+			+ "              \"platformName\": \"Windows 10\","
+			+ "              \"restrictToTags\": false,"
+			+ "              \"se:webDriverExecutable\": \"D:\\u002fDev\\u002fseleniumRobot\\u002fseleniumRobot-grid\\u002fdrivers\\u002fedgedriver_103.0_edge-103-104.exe\","
+			+ "              \"webdriver-executable\": \"D:\\u002fDev\\u002fseleniumRobot\\u002fseleniumRobot-grid\\u002fdrivers\\u002fedgedriver_103.0_edge-103-104.exe\","
+			+ "              \"webdriver.edge.driver\": \"D:\\u002fDev\\u002fseleniumRobot\\u002fseleniumRobot-grid\\u002fdrivers\\u002fedgedriver_103.0_edge-103-104.exe\""
+			+ "            }"
+			+ "          }"
+			+ "        ]"
+			+ "      }"
+			+ "    ]"
+			+ "  }"
+			+ "}";
+	
+	
 	@Mock
 	private CloseableHttpClient client; 
 	
@@ -83,6 +140,12 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	@Mock
 	private HttpEntity entity;
+	
+	@Mock
+	private RemoteWebDriver driver;
+	
+	@Mock
+	private RemoteWebDriver driver2;
 	
 	@Mock
 	private GetRequest getRequest;
@@ -102,6 +165,10 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		when(response.getEntity()).thenReturn(entity);
 		when(response.getStatusLine()).thenReturn(statusLine);
 		when(client.execute((HttpHost)any(), any())).thenReturn(response);
+		when(driver.getCapabilities()).thenReturn(capabilities);
+		when(driver.getSessionId()).thenReturn(new SessionId("abcdef"));
+		when(driver2.getCapabilities()).thenReturn(capabilities);
+		when(driver2.getSessionId()).thenReturn(new SessionId("ghijkl"));
 
 		connector = new SeleniumRobotGridConnector(SERVER_URL + "/wd/hub");
 		connector.setNodeUrl("http://localhost:4321");
@@ -1408,5 +1475,63 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		createServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 500, hubStatus);	
 		
 		Assert.assertFalse(connector.isGridActive());
+	}
+	
+	@Test(groups={"ut"})
+	public void testGetSessionInformationFromGrid() throws UnsupportedOperationException, IOException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, UnirestException {
+		
+		createJsonServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200, String.format(GRID_STATUS_WITH_SESSION, "abcdef"));
+		
+		((DesiredCapabilities)capabilities).setCapability(CapabilityType.BROWSER_NAME, "firefox");
+		((DesiredCapabilities)capabilities).setCapability(CapabilityType.BROWSER_VERSION, "50.0");
+		
+		SeleniumRobotGridConnector connector = spy(new SeleniumRobotGridConnector(SERVER_URL));
+		
+		Logger logger = spy(SeleniumRobotLogger.getLogger(SeleniumGridConnector.class));
+		Field loggerField = SeleniumGridConnector.class.getDeclaredField("logger");
+		loggerField.setAccessible(true);
+		loggerField.set(connector, logger);
+		
+		connector.getSessionInformationFromGrid(driver);
+		
+		verify(logger).info("Brower firefox (50.0) created in 0.0 secs on node localhost [http://localhost:4321] with session abcdef");
+		
+		// check sessionId is set when test is started
+		verify(connector).setSessionId(any(SessionId.class));
+		Assert.assertEquals(connector.getNodeServletUrl(), "http://localhost:4331");
+		verify(connector).setNodeUrl("http://localhost:4321");
+	}
+	
+	@Test(groups={"ut"})
+	public void testGetSessionInformationFromGridWithSecondDriver() throws UnsupportedOperationException, IOException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, UnirestException {
+		
+		createJsonServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200, String.format(GRID_STATUS_WITH_SESSION, "abcdef"), String.format(GRID_STATUS_WITH_SESSION_OTHER_NODE, "ghijkl"));
+		
+		((DesiredCapabilities)capabilities).setCapability(CapabilityType.BROWSER_NAME, "firefox");
+		((DesiredCapabilities)capabilities).setCapability(CapabilityType.BROWSER_VERSION, "50.0");
+		
+		SeleniumRobotGridConnector connector = spy(new SeleniumRobotGridConnector(SERVER_URL));
+		
+		Logger logger = spy(SeleniumRobotLogger.getLogger(SeleniumGridConnector.class));
+		Field loggerField = SeleniumGridConnector.class.getDeclaredField("logger");
+		loggerField.setAccessible(true);
+		loggerField.set(connector, logger);
+		
+		// 2 drivers created inside the same test
+		connector.getSessionInformationFromGrid(driver);
+		Assert.assertEquals(connector.getNodeServletUrl(), "http://localhost:4331");
+		connector.getSessionInformationFromGrid(driver2);
+		
+		// check that second driver opening on an other node (this should not happen) won't change the node servlet URL
+		Assert.assertEquals(connector.getNodeServletUrl(), "http://localhost:4331");
+		
+		// issue #242: check sessionId is set only once when first driver is created
+		verify(connector).setSessionId(any(SessionId.class));
+		Assert.assertEquals(connector.getSessionId().toString(), "abcdef");
+		Assert.assertEquals(connector.getNodeUrl(), "http://localhost:4321");
+		
+		// check that the driver session id is displayed in logs to help debugging
+		verify(logger).info("Brower firefox (50.0) created in 0.0 secs on node localhost [http://localhost:4321] with session abcdef");
+		verify(logger).info("Brower firefox (50.0) created in 0.0 secs on node localhost2 [http://localhost:4321] with session ghijkl");
 	}
 }

@@ -331,20 +331,23 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
         } catch (Exception e) {
         	throw new SessionNotCreatedException(String.format("Could not get session information from grid: %s", e.getMessage()));
         }
-        	
-    	setNodeUrl((String)object.get("uri"));
-        
+ 
         try {
-        	nodeHost = nodeUrl.split("//")[1].split(":")[0];
+			// setting sessionId ensures that this connector is the active one
+			// issue #242: check if sessionId has already been set by a previous driver in this test session
+			// 				if so, keep the previous sessionId so that video recordings are correctly handled
+			// issue #612: Also keep the previous nodeId as all driver of the same test should start on the same node
+			if (sessionId == null) {
+				setSessionId(driver.getSessionId());
+				setNodeUrl((String)object.get("uri"));
+				nodeHost = nodeUrl.split("//")[1].split(":")[0];
+			}
+   
+			String driverNodeHost = ((String)object.get("uri")).split("//")[1].split(":")[0];
+			
             String browserName = driver.getCapabilities().getBrowserName();
             String version = driver.getCapabilities().getBrowserVersion();
 
-            // setting sessionId ensures that this connector is the active one
-            // issue #242: check if sessionId has already been set by a previous driver in this test session
-            // 				if so, keep the previous sessionId so that recordings are correctly handled
-            if (sessionId == null) {
-            	setSessionId(driver.getSessionId());
-            }
             
             // store some information about driver creation
             MutableCapabilities caps = (MutableCapabilities)driver.getCapabilities();
@@ -353,7 +356,8 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
             caps.setCapability(SeleniumRobotCapabilityType.GRID_NODE, nodeHost);
             caps.setCapability(SeleniumRobotCapabilityType.GRID_NODE_URL, nodeUrl);
             
-            logger.info(String.format("Brower %s (%s) created in %.1f secs on node %s [%s] with session %s", browserName, version, driverCreationDuration / 1000.0, nodeHost, hubUrl, driver.getSessionId()).replace(",", "."));
+            // log will display the actual driver session ID and node URL so that it reflects the real driver creation (whereas nodeUrl and sessionId variables only store the first driver information for the test)
+            logger.info(String.format("Brower %s (%s) created in %.1f secs on node %s [%s] with session %s", browserName, version, driverCreationDuration / 1000.0, driverNodeHost, hubUrl, driver.getSessionId()).replace(",", "."));
             
         } catch (Exception ex) {
         	throw new SessionNotCreatedException(ex.getMessage());
