@@ -19,6 +19,7 @@ package com.seleniumtests.ut.uipage;
 
 import java.awt.AWTException;
 
+import com.seleniumtests.CaptureVideo;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.testng.annotations.Test;
@@ -26,6 +27,7 @@ import org.testng.annotations.Test;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.TestDriver;
 
+@CaptureVideo(enabled = false)
 public class TestHtmlElement extends TestDriver {
 
 	public TestHtmlElement() throws Exception {
