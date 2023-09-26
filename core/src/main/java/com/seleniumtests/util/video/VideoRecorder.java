@@ -58,6 +58,7 @@ public class VideoRecorder {
 	
 	private ScreenRecorder screenRecorder;
 	private String fileName;
+	private boolean displayStep;
 	private File folderPath;
 	private JLabel label;
 	private JFrame window;
@@ -77,7 +78,20 @@ public class VideoRecorder {
 	 * @param localRecording		if true, we will capture something locally. Else grid mode is used
 	 */
 	public VideoRecorder(File folderPath, String fileName, boolean localRecording) {
+		this(folderPath, fileName, localRecording, true);
+		
+	}
 	
+	/**
+	 * Init video recorder
+	 * @param folderPath		where to record video
+	 * @param fileName			file name
+	 * @param localRecording	do we record on local machine or remote
+	 * @param displaySteps		should we display test steps (true for selenium test, false for unit tests)
+	 */
+	public VideoRecorder(File folderPath, String fileName, boolean localRecording, boolean displaySteps) {
+	
+		this.displayStep = displaySteps;
 		
 		//Create a instance of ScreenRecorder with the required configurations
 		if (localRecording) {
@@ -107,6 +121,10 @@ public class VideoRecorder {
 	 * Display the JFrame
 	 */
 	private void startStepDisplay(GraphicsConfiguration gc) {
+		if (!displayStep) {
+			return;
+		}
+		
 		Rectangle screenBounds = gc.getBounds();
 		
 		window = new JFrame("SeleniumRobot"); 
@@ -153,7 +171,9 @@ public class VideoRecorder {
 		
 		if (screenRecorder.getState() == State.RECORDING) {
 			
-			window.dispose();
+			if (displayStep) {
+				window.dispose();
+			}
 			screenRecorder.stop();
 			List<File> createdFiles = screenRecorder.getCreatedMovieFiles();
 			if (!createdFiles.isEmpty()) {
@@ -180,7 +200,7 @@ public class VideoRecorder {
 	}
 	
 	public void displayRunningStep(String stepName) {	
-		if (label != null) {
+		if (label != null && displayStep) {
 			label.setText(stepName);
 		}
 	}

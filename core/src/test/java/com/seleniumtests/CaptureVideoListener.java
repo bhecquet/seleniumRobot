@@ -3,6 +3,7 @@ package com.seleniumtests;
 import java.io.File;
 import java.io.IOException;
 
+import junit.framework.TestResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.IInvokedMethod;
@@ -35,7 +36,9 @@ public class CaptureVideoListener implements IInvokedMethodListener {
 			 ) {
 				 VideoRecorder recorder = new VideoRecorder(new File("videos"), String.format("%s#%s.avi", 
 						 method.getTestMethod().getConstructorOrMethod().getMethod().getDeclaringClass().getName(),
-						 method.getTestMethod().getMethodName()));
+						 method.getTestMethod().getMethodName()),
+						 true,
+						 false);
 				 logger.info("Video recording started for test");
 				 recorder.start();
 				 recorders.set(recorder);
@@ -49,7 +52,7 @@ public class CaptureVideoListener implements IInvokedMethodListener {
 				File videoFile = recorders.get().stop();
 				
 				// delete video file if test is OK
-				if (videoFile != null && testResult.isSuccess()) {
+				if (videoFile != null && testResult.getStatus() != ITestResult.FAILURE) {
 					videoFile.delete();
 				} else if (videoFile != null) {
 					logger.info("Test failed => video file available at " + videoFile.getAbsolutePath());
