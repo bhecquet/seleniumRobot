@@ -175,6 +175,7 @@ public class VideoRecorder {
 				window.dispose();
 			}
 			screenRecorder.stop();
+			window = null;
 			List<File> createdFiles = screenRecorder.getCreatedMovieFiles();
 			if (!createdFiles.isEmpty()) {
 				File lastFile = createdFiles.get(createdFiles.size() - 1);
@@ -202,6 +203,17 @@ public class VideoRecorder {
 	public void displayRunningStep(String stepName) {	
 		if (label != null && displayStep) {
 			label.setText(stepName);
+		}
+	}
+	
+	public void disableStepDisplay() {
+		if (window != null) {
+			window.setVisible(false);
+		}
+	}
+	public void enableStepDisplay() {
+		if (window != null) {
+			window.setVisible(true);
 		}
 	}
 

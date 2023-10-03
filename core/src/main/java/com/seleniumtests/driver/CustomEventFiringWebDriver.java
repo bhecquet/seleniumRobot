@@ -17,16 +17,7 @@
  */
 package com.seleniumtests.driver;
 
-import java.awt.AWTError;
-import java.awt.AWTException;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.HeadlessException;
-import java.awt.MouseInfo;
-import java.awt.PointerInfo;
-import java.awt.Rectangle;
-import java.awt.Robot;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -1581,7 +1572,10 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	 * @return
 	 */
 	public static String captureDesktopToBase64String(DriverMode driverMode, SeleniumGridConnector gridConnector) {
-		return captureDesktopToBase64String(false, driverMode, gridConnector);
+		return captureDesktopToBase64String(false, driverMode, gridConnector, null);
+	}
+	public static String captureDesktopToBase64String(boolean onlyMainScreen, DriverMode driverMode, SeleniumGridConnector gridConnector) {
+		return captureDesktopToBase64String(onlyMainScreen, driverMode, gridConnector, null);
 	}
 	
 	/**
@@ -1589,15 +1583,25 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	 * @param onlyMainScreen	if true, only capture the default (or main) screen
 	 * @param driverMode
 	 * @param gridConnector
+	 * @param videoRecorder		the video recorder, so that we can disable/enable step display
 	 * @return
 	 */
-	public static String captureDesktopToBase64String(boolean onlyMainScreen, DriverMode driverMode, SeleniumGridConnector gridConnector) {
+	public static String captureDesktopToBase64String(boolean onlyMainScreen, DriverMode driverMode, SeleniumGridConnector gridConnector, VideoRecorder videoRecorder) {
 		if (driverMode == DriverMode.LOCAL) {
+			
+			if (videoRecorder != null) {
+				videoRecorder.disableStepDisplay();
+			}
+
 			BufferedImage bi;
 			if (onlyMainScreen) {
 				bi = captureMainDesktopScreenToBuffer();
 			} else {
 				bi = captureDesktopToBuffer();
+			}
+			
+			if (videoRecorder != null) {
+				videoRecorder.enableStepDisplay();
 			}
 			
 			ByteArrayOutputStream os = new ByteArrayOutputStream();

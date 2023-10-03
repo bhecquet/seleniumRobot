@@ -453,8 +453,10 @@ public class ScreenshotUtil {
 		}
 
 		// use driver because, we need remote desktop capture when using grid mode
-		String screenshotB64 =  CustomEventFiringWebDriver.captureDesktopToBase64String(onlyMainScreen, SeleniumTestsContextManager.getThreadContext().getRunMode(), 
-																							SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector());
+		String screenshotB64 =  CustomEventFiringWebDriver.captureDesktopToBase64String(onlyMainScreen,
+																					SeleniumTestsContextManager.getThreadContext().getRunMode(),
+																					SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(),
+																					WebUIDriver.getThreadVideoRecorder());
 		try {
 			return ImageProcessor.loadFromB64String(screenshotB64);
 		} catch (IOException e) {
