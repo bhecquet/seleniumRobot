@@ -1125,7 +1125,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		
 		verify(videoRecorder).start();
 		verify(gridConnector, never()).startVideoCapture();
-		Assert.assertNotNull(CustomEventFiringWebDriver.getThreadVideoRecorder());
+		Assert.assertFalse(CustomEventFiringWebDriver.getVideoRecorders().isEmpty());
 	}
 
 	/**
@@ -1161,7 +1161,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 
 		verify(videoRecorder, never()).start();
 		verify(gridConnector).startVideoCapture();
-		Assert.assertNull(CustomEventFiringWebDriver.getThreadVideoRecorder());
+		Assert.assertTrue(CustomEventFiringWebDriver.getVideoRecorders().isEmpty());
 	}
 	
 	/**
@@ -1184,14 +1184,14 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testStopVideoCaptureToDesktop2() throws IOException {
 		File videoFolder = File.createTempFile("video", ".avi").getParentFile();
 		CustomEventFiringWebDriver.startVideoCapture(DriverMode.LOCAL, gridConnector, videoFolder, "video.avi");
-		Assert.assertNotNull(CustomEventFiringWebDriver.getThreadVideoRecorder());
+		Assert.assertFalse(CustomEventFiringWebDriver.getVideoRecorders().isEmpty());
 		
 		CustomEventFiringWebDriver.stopVideoCapture(DriverMode.LOCAL, gridConnector, videoRecorder);
 		
 		verify(videoRecorder).stop();
 		verify(gridConnector, never()).stopVideoCapture(anyString());
 		
-		Assert.assertNull(CustomEventFiringWebDriver.getThreadVideoRecorder());
+		Assert.assertTrue(CustomEventFiringWebDriver.getVideoRecorders().isEmpty());
 	}
 	
 	/**
