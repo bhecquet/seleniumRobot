@@ -102,6 +102,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	private static final String OTHER_BROWSER = "other";
 	private static final String SAFARI_BROWSER = "safari";
 	private static final Logger logger = SeleniumRobotLogger.getLogger(CustomEventFiringWebDriver.class);
+	private static ThreadLocal<VideoRecorder> videoRecorder = new ThreadLocal<>();
     private FileDetector fileDetector = new UselessFileDetector();
     private static final int MAX_DIMENSION = 100000;
     private Set<String> currentHandles;
@@ -1418,6 +1419,11 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		
 		if (driverMode == DriverMode.LOCAL) {
 			try {
+				
+				if (videoRecorder.get() != null) {
+					videoRecorder.get().disableStepDisplay();
+				}
+				
 				Robot robot = new Robot();
 				if (onlyMainScreen) {
 					moveMouseMainScreen(robot, x, y);
@@ -1428,6 +1434,10 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 				robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
 			} catch (AWTException e) {
 				throw new ScenarioException("leftClicOnDesktopAt: problem using Robot: " + e.getMessage());
+			} finally {
+				if (videoRecorder.get() != null) {
+					videoRecorder.get().enableStepDisplay();
+				}
 			}
 		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
 			gridConnector.leftClic(onlyMainScreen, x, y);
@@ -1467,6 +1477,11 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		
 		if (driverMode == DriverMode.LOCAL) {
 			try {
+				
+				if (videoRecorder.get() != null) {
+					videoRecorder.get().disableStepDisplay();
+				}
+				
 				Robot robot = new Robot();
 				if (onlyMainScreen) {
 					moveMouseMainScreen(robot, x, y);
@@ -1480,6 +1495,11 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 				robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
 			} catch (AWTException e) {
 				throw new ScenarioException("doubleClickOnDesktopAt: problem using Robot: " + e.getMessage());
+			} finally {
+				
+				if (videoRecorder.get() != null) {
+					videoRecorder.get().enableStepDisplay();
+				}
 			}
 		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
 			gridConnector.doubleClick(onlyMainScreen, x, y);
@@ -1500,6 +1520,11 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		
 		if (driverMode == DriverMode.LOCAL) {
 			try {
+				
+				if (videoRecorder.get() != null) {
+					videoRecorder.get().disableStepDisplay();
+				}
+				
 				Robot robot = new Robot();
 				if (onlyMainScreen) {
 					moveMouseMainScreen(robot, x, y);
@@ -1510,6 +1535,11 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 				robot.mouseRelease(InputEvent.BUTTON3_DOWN_MASK);
 			} catch (AWTException e) {
 				throw new ScenarioException("rightClicOnDesktopAt: problem using Robot: " + e.getMessage());
+			} finally {
+				
+				if (videoRecorder.get() != null) {
+					videoRecorder.get().enableStepDisplay();
+				}
 			}
 		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
 			gridConnector.rightClic(onlyMainScreen, x, y);
@@ -1572,10 +1602,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	 * @return
 	 */
 	public static String captureDesktopToBase64String(DriverMode driverMode, SeleniumGridConnector gridConnector) {
-		return captureDesktopToBase64String(false, driverMode, gridConnector, null);
-	}
-	public static String captureDesktopToBase64String(boolean onlyMainScreen, DriverMode driverMode, SeleniumGridConnector gridConnector) {
-		return captureDesktopToBase64String(onlyMainScreen, driverMode, gridConnector, null);
+		return captureDesktopToBase64String(false, driverMode, gridConnector);
 	}
 	
 	/**
@@ -1583,35 +1610,38 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	 * @param onlyMainScreen	if true, only capture the default (or main) screen
 	 * @param driverMode
 	 * @param gridConnector
-	 * @param videoRecorder		the video recorder, so that we can disable/enable step display
 	 * @return
 	 */
-	public static String captureDesktopToBase64String(boolean onlyMainScreen, DriverMode driverMode, SeleniumGridConnector gridConnector, VideoRecorder videoRecorder) {
+	public static String captureDesktopToBase64String(boolean onlyMainScreen, DriverMode driverMode, SeleniumGridConnector gridConnector) {
 		if (driverMode == DriverMode.LOCAL) {
 			
-			if (videoRecorder != null) {
-				videoRecorder.disableStepDisplay();
+			try {
+				if (videoRecorder.get() != null) {
+					videoRecorder.get().disableStepDisplay();
+				}
+				
+				BufferedImage bi;
+				if (onlyMainScreen) {
+					bi = captureMainDesktopScreenToBuffer();
+				} else {
+					bi = captureDesktopToBuffer();
+				}
+				
+				ByteArrayOutputStream os = new ByteArrayOutputStream();
+				OutputStream b64 = new Base64OutputStream(os);
+				try {
+					ImageIO.write(bi, "png", b64);
+					return os.toString("UTF-8");
+				} catch (IOException e) {
+					return "";
+				}
+				
+			} finally {
+				if (videoRecorder.get() != null) {
+					videoRecorder.get().enableStepDisplay();
+				}
 			}
 
-			BufferedImage bi;
-			if (onlyMainScreen) {
-				bi = captureMainDesktopScreenToBuffer();
-			} else {
-				bi = captureDesktopToBuffer();
-			}
-			
-			if (videoRecorder != null) {
-				videoRecorder.enableStepDisplay();
-			}
-			
-			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			OutputStream b64 = new Base64OutputStream(os);
-			try {
-				ImageIO.write(bi, "png", b64);
-				return os.toString("UTF-8");
-			} catch (IOException e) {
-				return "";
-			}
 		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
 			return gridConnector.captureDesktopToBuffer();
 		} else {
@@ -1630,6 +1660,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 			try {
 				VideoRecorder recorder = new VideoRecorder(videoFolder, videoName);
 				recorder.start();
+				videoRecorder.set(recorder);
 				return recorder;
 			} catch (HeadlessException e) {
 				throw new ScenarioException("could not initialize video capture with headless robot: " + e.getMessage());
@@ -1651,6 +1682,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	 */
 	public static File stopVideoCapture(DriverMode driverMode, SeleniumGridConnector gridConnector, VideoRecorder recorder) throws IOException {
 		if (driverMode == DriverMode.LOCAL && recorder != null) {
+			videoRecorder.remove();
 			return recorder.stop();
 		} else if (driverMode == DriverMode.GRID && gridConnector != null && recorder != null) {
 			return gridConnector.stopVideoCapture(Paths.get(recorder.getFolderPath().getAbsolutePath(), recorder.getFileName()).toString());
@@ -1770,6 +1802,15 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 
 	public boolean isDriverExited() {
 		return driverExited;
+	}
+	
+	public static VideoRecorder getThreadVideoRecorder() {
+		return videoRecorder.get();
+	}
+	
+	// for tests
+	public static void resetVideoRecorder() {
+		videoRecorder.remove();
 	}
 
 }
