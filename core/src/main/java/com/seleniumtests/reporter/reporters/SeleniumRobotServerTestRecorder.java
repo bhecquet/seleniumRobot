@@ -194,9 +194,6 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			
 			Integer stepResultId = serverConnector.recordStepResult(testStep, sessionId, testCaseInSessionId, testStepId);
 			testStep.setStepResultId(stepResultId);
-
-			// record all attachments
-			recordAllAttachments(serverConnector, stepResultId, testStep);
 			
 			// sends all snapshots that are flagged as comparable
 			for (Snapshot snapshot: new ArrayList<>(testStep.getSnapshots(true))) {
@@ -214,6 +211,9 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 					recordReference(serverConnector, testResult, testStep, stepResultId, snapshot);
 				}
 			}
+			
+			// record all attachments (after references so that video files are not included if step is OK)
+			recordAllAttachments(serverConnector, stepResultId, testStep);
 
 			// update logs on server
 			String jsonStep = testStep.toJson().toString();
