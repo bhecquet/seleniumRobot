@@ -184,6 +184,45 @@ public class TestSquashTMConnector extends MockitoTest {
 	}
 
 	/**
+	 * Check result is not recorded when testId is not available
+	 * @param testContext
+	 */
+	@Test(groups={"ut"})
+	public void testRecordResultTestInSuccessNoId(ITestContext testContext) {
+
+		JSONObject connect = new JSONObject();
+		connect.put(SquashTMConnector.TMS_SERVER_URL, "http://myServer");
+		connect.put(SquashTMConnector.TMS_PROJECT, "project");
+		connect.put(SquashTMConnector.TMS_USER, "user");
+		connect.put(SquashTMConnector.TMS_PASSWORD, "password");
+
+		SquashTMConnector squash = spy(new SquashTMConnector());
+		squash.init(connect);
+		doReturn(api).when(squash).getApi();
+
+		// customize test result so that it has attributes
+		when(testResult.getMethod()).thenReturn(testMethod);
+		when(testMethod.getMethodName()).thenReturn("myTestMethod");
+		when(testMethod.getAttributes()).thenReturn(new CustomAttribute[] {});
+		when(testResult.isSuccess()).thenReturn(true);
+		when(testResult.getName()).thenReturn("MyTest");
+		when(testResult.getTestContext()).thenReturn(testContext);
+		when(testResult.getParameters()).thenReturn(new Object[] {});
+		when(testResult.getAttribute("testContext")).thenReturn(SeleniumTestsContextManager.getThreadContext());
+		when(api.createCampaign(anyString(), anyString())).thenReturn(campaign);
+		when(api.createIteration(any(Campaign.class), anyString())).thenReturn(iteration);
+		when(api.addTestCaseInIteration(iteration, 1)).thenReturn(iterationTestPlanItem);
+
+		squash.recordResult(testResult);
+
+		// check we call all necessary API methods to record the result
+		verify(api, never()).createCampaign("Selenium " + testContext.getName(), "");
+		verify(api, never()).createIteration(campaign, SeleniumTestsContextManager.getThreadContext().getApplicationVersion());
+		verify(api, never()).addTestCaseInIteration(iteration, 1);
+		verify(api, never()).setExecutionResult(iterationTestPlanItem, ExecutionStatus.SUCCESS);
+	}
+
+	/**
 	 * Check cache is used when 2 tests records on the same campaign
 	 * @param testContext
 	 */

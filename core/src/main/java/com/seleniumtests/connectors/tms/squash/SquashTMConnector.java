@@ -107,7 +107,7 @@ public class SquashTMConnector extends TestManager {
 			SquashTMApi sapi = getApi();
 			Integer testId = getTestCaseId(testResult);
 			if (testId == null) {
-				logger.warn("Results won't be recorded, no testId configured");
+				logger.warn("Results won't be recorded, no testId configured for " + TestNGResultUtils.getTestName(testResult));
 				return;
 			}
 	
