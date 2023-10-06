@@ -21,11 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.lang.annotation.Annotation;
 
@@ -61,6 +57,9 @@ public class TestSquashTMConnector extends MockitoTest {
 	
 	@Mock
 	private ITestResult testResult;
+
+	@Mock
+	private ITestResult testResult2;
 	
 	@Mock
 	private Campaign campaign;
@@ -183,7 +182,68 @@ public class TestSquashTMConnector extends MockitoTest {
 		verify(api).addTestCaseInIteration(iteration, 1);
 		verify(api).setExecutionResult(iterationTestPlanItem, ExecutionStatus.SUCCESS);
 	}
-	
+
+	/**
+	 * Check cache is used when 2 tests records on the same campaign
+	 * @param testContext
+	 */
+	@Test(groups={"ut"})
+	public void testRecordResultTestInSuccessOnSameCampaign(ITestContext testContext) {
+
+		JSONObject connect = new JSONObject();
+		connect.put(SquashTMConnector.TMS_SERVER_URL, "http://myServer");
+		connect.put(SquashTMConnector.TMS_PROJECT, "project");
+		connect.put(SquashTMConnector.TMS_USER, "user");
+		connect.put(SquashTMConnector.TMS_PASSWORD, "password");
+
+		SquashTMConnector squash = spy(new SquashTMConnector());
+		squash.init(connect);
+		doReturn(api).when(squash).getApi();
+
+		CustomAttribute testIdAttr = new CustomAttribute() {
+			@Override
+			public Class<? extends Annotation> annotationType() {
+				return null;
+			}
+
+			@Override
+			public String[] values() {
+				return new String[] {"1"};
+			}
+
+			@Override
+			public String name() {
+				return "testId";
+			}
+		};
+		// customize test result so that it has attributes
+		when(testResult.getMethod()).thenReturn(testMethod);
+		when(testResult.isSuccess()).thenReturn(true);
+		when(testResult.getName()).thenReturn("MyTest");
+		when(testResult.getTestContext()).thenReturn(testContext);
+		when(testResult.getParameters()).thenReturn(new Object[] {});
+		when(testResult.getAttribute("testContext")).thenReturn(SeleniumTestsContextManager.getThreadContext());
+		when(testResult2.getMethod()).thenReturn(testMethod);
+		when(testResult2.isSuccess()).thenReturn(true);
+		when(testResult2.getName()).thenReturn("MyTest");
+		when(testResult2.getTestContext()).thenReturn(testContext);
+		when(testResult2.getParameters()).thenReturn(new Object[] {});
+		when(testResult2.getAttribute("testContext")).thenReturn(SeleniumTestsContextManager.getThreadContext());
+		when(testMethod.getAttributes()).thenReturn(new CustomAttribute[] {testIdAttr});
+		when(api.createCampaign(anyString(), anyString())).thenReturn(campaign);
+		when(api.createIteration(any(Campaign.class), anyString())).thenReturn(iteration);
+		when(api.addTestCaseInIteration(iteration, 1)).thenReturn(iterationTestPlanItem);
+
+		squash.recordResult(testResult);
+		squash.recordResult(testResult2);
+
+		// check we call all necessary API methods to record the result
+		verify(api).createCampaign("Selenium " + testContext.getName(), "");
+		verify(api).createIteration(campaign, SeleniumTestsContextManager.getThreadContext().getApplicationVersion());
+		verify(api, times(2)).addTestCaseInIteration(iteration, 1);
+		verify(api, times(2)).setExecutionResult(iterationTestPlanItem, ExecutionStatus.SUCCESS);
+	}
+
 	/**
 	 * Check that if the testID is not valid, we raise an error
 	 * @param testContext

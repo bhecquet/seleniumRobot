@@ -11,6 +11,9 @@ import com.seleniumtests.connectors.tms.squash.entities.TestPlanItemExecution.Ex
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class SquashTMConnector extends TestManager {
 	
 	public static final String SQUASH_ITERATION = "tms.squash.iteration";
@@ -22,9 +25,15 @@ public class SquashTMConnector extends TestManager {
 	private String serverUrl;
 	private String project;
 	private SquashTMApi api;
-	
+
+	private Map<String, Campaign> campaignCache;
+	private Map<String, Iteration> iterationCache;
+
 	public SquashTMConnector() {
 		// to be called with init method
+
+		campaignCache = new HashMap<>();
+		iterationCache = new HashMap<>();
 	}
 	
 	public SquashTMConnector(String url, String user, String password, String project) {
@@ -109,10 +118,14 @@ public class SquashTMConnector extends TestManager {
 			} else {
 				campaignName = "Selenium " + testResult.getTestContext().getName();
 			}
-			
-			
-			
-			Campaign campaign = sapi.createCampaign(campaignName, TestNGResultUtils.getSeleniumRobotTestContext(testResult).testManager().getCampaignFolderPath());
+
+			Campaign campaign;
+			if (campaignCache.containsKey(campaignName) && campaignCache.get(campaignName) != null) {
+				campaign = campaignCache.get(campaignName);
+			} else {
+				campaign = sapi.createCampaign(campaignName, TestNGResultUtils.getSeleniumRobotTestContext(testResult).testManager().getCampaignFolderPath());
+				campaignCache.put(campaignName, campaign);
+			}
 			
 			// iteration
 			String iterationName;
@@ -121,8 +134,14 @@ public class SquashTMConnector extends TestManager {
 			} else {
 				iterationName = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getApplicationVersion();
 			}
-			
-			Iteration iteration = sapi.createIteration(campaign, iterationName);
+
+			Iteration iteration;
+			if (iterationCache.containsKey(iterationName) && iterationCache.get(iterationName) != null) {
+				iteration = iterationCache.get(iterationName);
+			} else {
+				iteration = sapi.createIteration(campaign, iterationName);
+				iterationCache.put(iterationName, iteration);
+			}
 			
 			IterationTestPlanItem tpi = sapi.addTestCaseInIteration(iteration, testId);
 			
