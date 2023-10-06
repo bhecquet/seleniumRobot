@@ -399,7 +399,6 @@ public class TestTestStep extends GenericTest {
 		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
 
 		// create screenshot for main step
-
 		File tmpImgFile = File.createTempFile("img", ".png");
 		File tmpHtmlFile = File.createTempFile("html", ".html");
 		ScreenShot screenshot1 = new ScreenShot(tmpImgFile, tmpHtmlFile);
@@ -409,12 +408,14 @@ public class TestTestStep extends GenericTest {
 
 		screenshot1.setLocation("http://mysite.com");
 		screenshot1.setTitle("mysite");
+		
+		// check that both FALSE & NONE are considered as the same control
 		step.addSnapshot(new Snapshot(screenshot1, "main", SnapshotCheckType.FALSE), 0, null);
+		step.addSnapshot(new Snapshot(screenshot1, "main", SnapshotCheckType.NONE), 0, null);
 
 		TestStep subStep = new TestStep("subStep", null, new ArrayList<>(), true);
 
 		// create screenshot for sub step
-
 		File tmpImgFile3 = File.createTempFile("img", ".png");
 		ScreenShot screenshot2 = new ScreenShot(tmpImgFile3);
 
@@ -427,10 +428,12 @@ public class TestTestStep extends GenericTest {
 		step.addAction(subStep);
 
 		List<FileContent> attachments = step.getAllAttachments(false, SnapshotCheckType.FALSE);
-		// only the HTML and image from first added snapshot
-		Assert.assertEquals(attachments.size(), 2);
-		Assert.assertEquals(attachments.get(0).getFile().getName(), "N-A_0-1_step1--" + tmpHtmlFile.getName().substring(tmpHtmlFile.getName().length() - 10));
-		Assert.assertEquals(attachments.get(1).getFile().getName(), "N-A_0-1_step1--" + tmpImgFile.getName().substring(tmpImgFile.getName().length() - 10));
+		// only the HTML and image from first and second added snapshot
+		Assert.assertEquals(attachments.size(), 4);
+		Assert.assertEquals(attachments.get(0).getFile().getName(), "N-A_0-2_step1--" + tmpHtmlFile.getName().substring(tmpHtmlFile.getName().length() - 10));
+		Assert.assertEquals(attachments.get(1).getFile().getName(), "N-A_0-2_step1--" + tmpImgFile.getName().substring(tmpImgFile.getName().length() - 10));
+		Assert.assertEquals(attachments.get(2).getFile().getName(), "N-A_0-2_step1--" + tmpHtmlFile.getName().substring(tmpHtmlFile.getName().length() - 10));
+		Assert.assertEquals(attachments.get(3).getFile().getName(), "N-A_0-2_step1--" + tmpImgFile.getName().substring(tmpImgFile.getName().length() - 10));
 	}
 	
 	/**

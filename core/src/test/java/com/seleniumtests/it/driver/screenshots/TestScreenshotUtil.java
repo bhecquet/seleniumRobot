@@ -27,7 +27,11 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import com.seleniumtests.customexception.ImageSearchException;
+import com.seleniumtests.util.imaging.ImageDetector;
+import com.seleniumtests.util.video.VideoCaptureMode;
 import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.devtools.DevToolsException;
 import org.testng.Assert;
@@ -73,6 +77,7 @@ public class TestScreenshotUtil extends ReporterTest {
 			driver.close();
 		}
 	}
+	
 	
 	@Test(groups={"it"})
 	public void testEdgeScreenshotUsingCDP() throws Exception {
@@ -181,6 +186,34 @@ public class TestScreenshotUtil extends ReporterTest {
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 		ScreenShot screenshot = new ScreenshotUtil(null).capture(SnapshotTarget.SCREEN, ScreenShot.class);
 		Assert.assertTrue(screenshot.getImage().getFile().exists());
+		
+	}
+	
+	/**
+	 * Check that step is hidden while we capture desktop
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"}, expectedExceptions = ImageSearchException.class)
+	public void testDesktopScreenshotsWithVideoRecorder(ITestContext testContext) throws Exception {
+		
+		SeleniumTestsContextManager.getThreadContext().setVideoCapture(VideoCaptureMode.TRUE.toString());
+		setBrowser("chrome");
+		new DriverTestPageShadowDom(true);
+		WebDriver driver = WebUIDriver.getWebDriver(true);
+		
+		try {
+			SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
+			ScreenShot screenshot = new ScreenshotUtil(null).capture(SnapshotTarget.SCREEN, ScreenShot.class);
+			Assert.assertTrue(screenshot.getImage().getFile().exists());
+			
+			ImageDetector detector = new ImageDetector(screenshot.getImage().getFile(), createImageFromResource("tu/images/step.png"), 0.20);
+			
+			detector.detectExactZoneWithScale();
+			
+		} finally {
+			driver.close();
+		}
 		
 	}
 	

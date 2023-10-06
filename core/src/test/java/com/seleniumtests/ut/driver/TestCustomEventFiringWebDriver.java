@@ -74,9 +74,6 @@ import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.video.VideoRecorder;
 
-import kong.unirest.HttpRequestWithBody;
-import kong.unirest.Unirest;
-
 @PrepareForTest({OSUtilityFactory.class, CustomEventFiringWebDriver.class})
 public class TestCustomEventFiringWebDriver extends MockitoTest {
 
@@ -149,7 +146,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		PowerMockito.mockStatic(MouseInfo.class);
 		PowerMockito.when(MouseInfo.getPointerInfo()).thenReturn(pointerInfo);
 		when(pointerInfo.getLocation()).thenReturn(new java.awt.Point(2, 3));
-		
+		CustomEventFiringWebDriver.resetVideoRecorder();
 	}
 	
 	@Test(groups = {"ut"})
@@ -606,12 +603,48 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testLeftClickOnDesktop() {
+		
 		CustomEventFiringWebDriver.leftClicOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
 		
 		verify(robot).mousePress(InputEvent.BUTTON1_DOWN_MASK);
 		verify(robot).mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
 		verify(robot).mouseMove(0, 0);
 		verify(gridConnector, never()).leftClic(anyBoolean(), anyInt(), anyInt());
+		
+		verify(videoRecorder, never()).disableStepDisplay();
+		verify(videoRecorder, never()).enableStepDisplay();
+	}
+
+	@Test(groups = {"ut"})
+	public void testLeftClickOnDesktopWithVideoCapture() throws IOException {
+		
+		File videoFolder = File.createTempFile("video", ".avi").getParentFile();
+		CustomEventFiringWebDriver.startVideoCapture(DriverMode.LOCAL, gridConnector, videoFolder, "video.avi");
+		
+		CustomEventFiringWebDriver.leftClicOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
+		
+		verify(robot).mousePress(InputEvent.BUTTON1_DOWN_MASK);
+		verify(robot).mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+		verify(robot).mouseMove(0, 0);
+		verify(gridConnector, never()).leftClic(anyBoolean(), anyInt(), anyInt());
+		
+		verify(videoRecorder).disableStepDisplay();
+		verify(videoRecorder).enableStepDisplay();
+	}
+	
+	@Test(groups = {"ut"})
+	public void testLeftClickOnDesktopWithVideoCaptureAndError() throws IOException {
+		
+		File videoFolder = File.createTempFile("video", ".avi").getParentFile();
+		CustomEventFiringWebDriver.startVideoCapture(DriverMode.LOCAL, gridConnector, videoFolder, "video.avi");
+		
+		doThrow(AWTError.class).when(robot).mousePress(InputEvent.BUTTON1_DOWN_MASK);
+		try {
+			CustomEventFiringWebDriver.leftClicOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
+		} catch (AWTError e) {}
+
+		verify(videoRecorder).disableStepDisplay();
+		verify(videoRecorder).enableStepDisplay();
 	}
 	
 	@Test(groups = {"ut"})
@@ -678,6 +711,41 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		verify(robot, times(2)).mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
 		verify(robot).mouseMove(0, 0);
 		verify(gridConnector, never()).doubleClick(anyBoolean(), anyInt(), anyInt());
+		
+		verify(videoRecorder, never()).disableStepDisplay();
+		verify(videoRecorder, never()).enableStepDisplay();
+	}
+
+	@Test(groups = {"ut"})
+	public void testDoubleClickOnDesktopWithVideoCapture() throws IOException {
+		
+		File videoFolder = File.createTempFile("video", ".avi").getParentFile();
+		CustomEventFiringWebDriver.startVideoCapture(DriverMode.LOCAL, gridConnector, videoFolder, "video.avi");
+		
+		CustomEventFiringWebDriver.doubleClickOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
+		
+		verify(robot, times(2)).mousePress(InputEvent.BUTTON1_DOWN_MASK);
+		verify(robot, times(2)).mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+		verify(robot).mouseMove(0, 0);
+		verify(gridConnector, never()).doubleClick(anyBoolean(), anyInt(), anyInt());
+		
+		verify(videoRecorder).disableStepDisplay();
+		verify(videoRecorder).enableStepDisplay();
+	}
+	
+	@Test(groups = {"ut"})
+	public void testDoubleClickOnDesktopWithVideoCaptureAndError() throws IOException {
+		
+		File videoFolder = File.createTempFile("video", ".avi").getParentFile();
+		CustomEventFiringWebDriver.startVideoCapture(DriverMode.LOCAL, gridConnector, videoFolder, "video.avi");
+		
+		doThrow(AWTError.class).when(robot).mousePress(InputEvent.BUTTON1_DOWN_MASK);
+		try {
+			CustomEventFiringWebDriver.doubleClickOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
+		} catch (AWTError e) {}
+		
+		verify(videoRecorder).disableStepDisplay();
+		verify(videoRecorder).enableStepDisplay();
 	}
 	
 	/**
@@ -734,6 +802,39 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		verify(robot).mouseRelease(InputEvent.BUTTON3_DOWN_MASK);
 		verify(robot).mouseMove(0, 0);
 		verify(gridConnector, never()).rightClic(anyBoolean(), anyInt(), anyInt());
+		
+		verify(videoRecorder, never()).disableStepDisplay();
+		verify(videoRecorder, never()).enableStepDisplay();
+	}
+
+	@Test(groups = {"ut"})
+	public void testRightClickOnDesktopWithVideoCapture() throws IOException {
+		File videoFolder = File.createTempFile("video", ".avi").getParentFile();
+		CustomEventFiringWebDriver.startVideoCapture(DriverMode.LOCAL, gridConnector, videoFolder, "video.avi");
+		
+		CustomEventFiringWebDriver.rightClicOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
+		
+		verify(robot).mousePress(InputEvent.BUTTON3_DOWN_MASK);
+		verify(robot).mouseRelease(InputEvent.BUTTON3_DOWN_MASK);
+		verify(robot).mouseMove(0, 0);
+		verify(gridConnector, never()).rightClic(anyBoolean(), anyInt(), anyInt());
+		
+		verify(videoRecorder).disableStepDisplay();
+		verify(videoRecorder).enableStepDisplay();
+	}
+	
+	@Test(groups = {"ut"})
+	public void testRightClickOnDesktopWithVideoCaptureAndError() throws IOException {
+		File videoFolder = File.createTempFile("video", ".avi").getParentFile();
+		CustomEventFiringWebDriver.startVideoCapture(DriverMode.LOCAL, gridConnector, videoFolder, "video.avi");
+		
+		doThrow(AWTError.class).when(robot).mousePress(InputEvent.BUTTON3_DOWN_MASK);
+		try {
+			CustomEventFiringWebDriver.rightClicOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
+		} catch (AWTError e) {}
+
+		verify(videoRecorder).disableStepDisplay();
+		verify(videoRecorder).enableStepDisplay();
 	}
 	
 	@Test(groups = {"ut"})
@@ -917,6 +1018,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testCaptureDesktop() throws IOException {
+		
 		File imageFile = File.createTempFile("image-", ".png");
 		imageFile.deleteOnExit();
 		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/images/ffLogoConcat.png"), imageFile);
@@ -927,6 +1029,56 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		String b64img = CustomEventFiringWebDriver.captureDesktopToBase64String(DriverMode.LOCAL, gridConnector);
 		Assert.assertTrue(b64img.startsWith("iVBORw0KGgoAAAANSUhEUgAAALoAAACMCAIAAABETyQWAACAAElEQVR42pT8ZVRbafs+fmeKx3B3"));
 		verify(gridConnector, never()).captureDesktopToBuffer();
+		
+		verify(videoRecorder, never()).disableStepDisplay();
+		verify(videoRecorder, never()).enableStepDisplay();
+	}
+	
+	/**
+	 * Check that step display is disabled / enabled when video capture has started
+	 * @throws IOException
+	 */
+	@Test(groups = {"ut"})
+	public void testCaptureDesktopWithVideoCapture() throws IOException {
+		File imageFile = File.createTempFile("image-", ".png");
+		imageFile.deleteOnExit();
+		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/images/ffLogoConcat.png"), imageFile);
+		BufferedImage bi = ImageIO.read(imageFile);
+
+		when(robot.createScreenCapture(any(Rectangle.class))).thenReturn(bi);
+		
+		File videoFolder = File.createTempFile("video", ".avi").getParentFile();
+		CustomEventFiringWebDriver.startVideoCapture(DriverMode.LOCAL, gridConnector, videoFolder, "video.avi");
+		
+		String b64img = CustomEventFiringWebDriver.captureDesktopToBase64String(DriverMode.LOCAL, gridConnector);
+		Assert.assertTrue(b64img.startsWith("iVBORw0KGgoAAAANSUhEUgAAALoAAACMCAIAAABETyQWAACAAElEQVR42pT8ZVRbafs+fmeKx3B3"));
+		verify(gridConnector, never()).captureDesktopToBuffer();
+		
+		verify(videoRecorder).disableStepDisplay();
+		verify(videoRecorder).enableStepDisplay();
+	}
+	
+	/**
+	 * Check that step display is disabled / enabled when video capture has started even if error occurs
+	 * @throws IOException
+	 */
+	@Test(groups = {"ut"})
+	public void testCaptureDesktopWithVideoCaptureAndError() throws IOException {
+		File imageFile = File.createTempFile("image-", ".png");
+		imageFile.deleteOnExit();
+		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/images/ffLogoConcat.png"), imageFile);
+		BufferedImage bi = ImageIO.read(imageFile);
+
+		when(robot.createScreenCapture(any(Rectangle.class))).thenThrow(ScenarioException.class);
+		
+		File videoFolder = File.createTempFile("video", ".avi").getParentFile();
+		CustomEventFiringWebDriver.startVideoCapture(DriverMode.LOCAL, gridConnector, videoFolder, "video.avi");
+		
+		try {
+			String b64img = CustomEventFiringWebDriver.captureDesktopToBase64String(DriverMode.LOCAL, gridConnector);
+		} catch (ScenarioException e) {}
+		verify(videoRecorder).disableStepDisplay();
+		verify(videoRecorder).enableStepDisplay();
 	}
 	
 	/**
@@ -973,6 +1125,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		
 		verify(videoRecorder).start();
 		verify(gridConnector, never()).startVideoCapture();
+		Assert.assertFalse(CustomEventFiringWebDriver.getVideoRecorders().isEmpty());
 	}
 
 	/**
@@ -1008,6 +1161,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 
 		verify(videoRecorder, never()).start();
 		verify(gridConnector).startVideoCapture();
+		Assert.assertTrue(CustomEventFiringWebDriver.getVideoRecorders().isEmpty());
 	}
 	
 	/**
@@ -1020,6 +1174,24 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		
 		verify(videoRecorder).stop();
 		verify(gridConnector, never()).stopVideoCapture(anyString());
+	}
+	
+	/**
+	 * stop video capture to desktop in local mode
+	 * @throws IOException
+	 */
+	@Test(groups = {"ut"})
+	public void testStopVideoCaptureToDesktop2() throws IOException {
+		File videoFolder = File.createTempFile("video", ".avi").getParentFile();
+		CustomEventFiringWebDriver.startVideoCapture(DriverMode.LOCAL, gridConnector, videoFolder, "video.avi");
+		Assert.assertFalse(CustomEventFiringWebDriver.getVideoRecorders().isEmpty());
+		
+		CustomEventFiringWebDriver.stopVideoCapture(DriverMode.LOCAL, gridConnector, videoRecorder);
+		
+		verify(videoRecorder).stop();
+		verify(gridConnector, never()).stopVideoCapture(anyString());
+		
+		Assert.assertTrue(CustomEventFiringWebDriver.getVideoRecorders().isEmpty());
 	}
 	
 	/**

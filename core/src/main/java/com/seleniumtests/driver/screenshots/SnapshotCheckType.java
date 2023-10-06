@@ -3,6 +3,7 @@ package com.seleniumtests.driver.screenshots;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.seleniumtests.connectors.selenium.fielddetector.Field;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriverException;
@@ -170,6 +171,26 @@ public class SnapshotCheckType {
 
 	public Control getControl() {
 		return control;
+	}
+	
+	
+	@Override
+	public boolean equals(Object obj) {
+		
+		if (obj == null) {
+			return false;
+		}
+		
+		if (this == obj) {
+			return true;
+		}
+		
+		if (obj instanceof SnapshotCheckType) {
+			SnapshotCheckType checkType = (SnapshotCheckType) obj;
+			return this.getControl() == checkType.getControl();
+		} else {
+			return false;
+		}
 	}
 		
 }

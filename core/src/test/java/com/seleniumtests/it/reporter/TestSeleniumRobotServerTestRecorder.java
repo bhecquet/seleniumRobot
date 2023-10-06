@@ -347,6 +347,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector).createTestStep("_writeSomethingOnNonExistentElement ", 0);
 			verify(serverConnector, times(2)).createStepReferenceSnapshot(any(Snapshot.class), eq(0)); // reference recording for other steps
 			verify(serverConnector, never()).createStepReferenceSnapshot(any(Snapshot.class), eq(123)); // no reference recording for failed step
+			verify(serverConnector).getReferenceSnapshot(anyInt()); // check we get reference snapshot for failed step
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
