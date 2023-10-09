@@ -739,6 +739,8 @@ public void methodWithPassword(Integer col1, @Mask Integer sensibleData) throws 
 
 The `@Mask` annotation will also work on test steps, in case you do not want to name your variable 'password' / 'pwd' / ...
 
+For Selenium IDE tests, see §11
+
 #### TestNG file ####
 For tests extending SeleniumTestPlan, the testNg XML looks like (minimal requirements):
 

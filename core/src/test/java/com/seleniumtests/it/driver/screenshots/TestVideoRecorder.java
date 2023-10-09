@@ -56,7 +56,7 @@ public class TestVideoRecorder extends ReporterTest {
 		Assert.assertEquals(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()).listFiles().length, 1);
 		
 		// check JFrame is reset
-		Assert.assertFalse(recorder.getWindow().isShowing());
+		Assert.assertNull(recorder.getWindow());
 	}
 	
 

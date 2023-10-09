@@ -68,7 +68,7 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
         }
         
         // handle https://bugzilla.mozilla.org/show_bug.cgi?id=1429338#c4 and https://github.com/mozilla/geckodriver/issues/789
-        options.setCapability("moz:useNonSpecCompliantPointerOrigin", true);
+        //options.setCapability("moz:useNonSpecCompliantPointerOrigin", true);
         return options;
 	}
 	
