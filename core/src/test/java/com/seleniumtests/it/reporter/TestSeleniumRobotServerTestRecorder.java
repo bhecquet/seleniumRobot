@@ -103,11 +103,11 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector).createTestCase("testWithException");
 			verify(serverConnector).createTestCase("testSkipped");
 			verify(serverConnector, times(5)).addLogsToTestCaseInSession(anyInt(), anyString());
-			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testAndSubActions")); 
-			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testInError")); 
-			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testWithException")); 
-			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testSkipped")); 
-			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("A test which is <OK> é&")); // a test with custom name
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testAndSubActions"), eq("SUCCESS"));
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testInError"), eq("FAILURE"));
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testWithException"), eq("FAILURE"));
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testSkipped"), eq("SKIP"));
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("A test which is <OK> é&"), eq("SUCCESS")); // a test with custom name
 			verify(serverConnector, times(4)).createTestStep(eq("step 1"), anyInt());
 			verify(serverConnector).createTestStep(eq("step 2"), anyInt());
 			verify(serverConnector).createSnapshot(any(Snapshot.class), anyInt(), anyInt(), anyInt(), eq(new ArrayList<>())); // two snapshots but only once is sent because the other has no name
@@ -122,8 +122,8 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector).uploadFile(eq(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithException", "htmls", "testWithException_0-1_step_1--tened.html").toFile()), anyInt());
 			verify(serverConnector).uploadFile(eq(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithException", "screenshots", "testWithException_0-1_step_1--rtened.png").toFile()), anyInt());
 			// check image id and html id has been updated once files has been uploaded, for tests where snapshots has been uploaded
-			verify(serverConnector).updateStepResult(contains("\"snapshots\":[{\"idHtml\":0,\"displayInReport\":true,\"name\":\"testWithException_0-1_step_1--rtened.png\",\"idImage\":0,\"failed\":false,\"position\":0,\"type\":\"snapshot\",\"snapshotCheckType\":\"NONE\""), eq(0));
-			verify(serverConnector).updateStepResult(contains("\"snapshots\":[{\"idHtml\":null,\"displayInReport\":true,\"name\":\"testAndSubActions_0-1_step_1--rtened.png\""), eq(0));
+			verify(serverConnector).updateStepResult(contains("\"snapshots\":[{\"idHtml\":0,\"displayInReport\":true,\"name\":\"a name\",\"idImage\":0,\"failed\":false,\"position\":0,\"type\":\"snapshot\",\"snapshotCheckType\":\"NONE\""), eq(0));
+			verify(serverConnector).updateStepResult(contains("\"snapshots\":[{\"idHtml\":null,\"displayInReport\":true,\"name\":\"main\""), eq(0));
 			
 			// check logs has been uploaded (one upload for each test)
 			verify(serverConnector, times(5)).uploadLogs(any(File.class), eq(0));
@@ -158,7 +158,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector, never()).createSession(anyString());
 			verify(serverConnector, never()).createTestCase(anyString());
 			verify(serverConnector, never()).addLogsToTestCaseInSession(anyInt(), anyString());
-			verify(serverConnector, never()).createTestCaseInSession(anyInt(), anyInt(), anyString()); 
+			verify(serverConnector, never()).createTestCaseInSession(anyInt(), anyInt(), anyString(), anyString());
 			verify(serverConnector, never()).createTestStep(anyString(), anyInt());
 			verify(serverConnector, never()).createSnapshot(any(Snapshot.class), anyInt(), anyInt(), anyInt(), eq(new ArrayList<>())); // two snapshots but only once is sent because the other has no name
 			
@@ -195,7 +195,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			// issue #331: check all test cases are created, call MUST be done only once to avoid result to be recorded several times
 			verify(serverConnector).createTestCase("testDriverCustomSnapshot");
 			verify(serverConnector).addLogsToTestCaseInSession(anyInt(), anyString());
-			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testDriverCustomSnapshot")); 
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testDriverCustomSnapshot"), eq("SUCCESS"));
 			verify(serverConnector).createTestStep(eq("_captureSnapshot with args: (my snapshot, )"), anyInt());
 			verify(serverConnector).createSnapshot(any(Snapshot.class), anyInt(), anyInt(), anyInt(), listArgument.capture()); // 1 custom snapshot taken with name
 			
@@ -235,7 +235,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			// issue #331: check all test cases are created, call MUST be done only once to avoid result to be recorded several times
 			verify(serverConnector).createTestCase("testDriverCustomSnapshot");
 			verify(serverConnector).addLogsToTestCaseInSession(anyInt(), anyString());
-			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testDriverCustomSnapshot")); 
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testDriverCustomSnapshot"), eq("SUCCESS"));
 			verify(serverConnector).createTestStep(eq("_captureSnapshot with args: (my snapshot, )"), anyInt());
 			verify(serverConnector, never()).createSnapshot(any(Snapshot.class), anyInt(), anyInt(), anyInt(), eq(new ArrayList<>())); // 1 custom snapshot taken with name
 			verify(serverConnector, never()).createExcludeZones(any(Rectangle.class), anyInt()); // one exclude zone created with that snapshot
@@ -281,7 +281,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 			// check all test cases are created, in both test classes
 			verify(serverConnector, never()).createTestCase(anyString());
-			verify(serverConnector, never()).createTestCaseInSession(anyInt(), anyInt(), anyString()); 
+			verify(serverConnector, never()).createTestCaseInSession(anyInt(), anyInt(), anyString(), anyString());
 			verify(serverConnector, never()).createTestStep(anyString(), anyInt());
 			
 		} finally {

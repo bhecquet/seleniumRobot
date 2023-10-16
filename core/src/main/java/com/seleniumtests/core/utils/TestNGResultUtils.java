@@ -547,4 +547,29 @@ public class TestNGResultUtils {
     public static void setErrorCauseSearchedInReferencePicture(ITestResult testNGResult, Boolean errorCauseInReferencePicture) {
     	testNGResult.setAttribute(ERROR_CAUSE_IN_REFERENCE, errorCauseInReferencePicture);
     }
+
+	/**
+	 * Returns the string representation of the status: SUCCESS, ERROR, SKIPPED, ...
+	 * @param testNGResult
+	 * @return
+	 */
+	public static String getTestStatusString(ITestResult testNGResult) {
+
+		switch (testNGResult.getStatus()) {
+			case -1:
+				return "CREATED";
+			case 1:
+				return "SUCCESS";
+			case 2:
+				return "FAILURE";
+			case 3:
+				return "SKIP";
+			case 4:
+				return "SUCCESS_PERCENTAGE_FAILURE";
+			case 16:
+				return "STARTED";
+			default:
+				return "UNKNOWN";
+		}
+	}
 }

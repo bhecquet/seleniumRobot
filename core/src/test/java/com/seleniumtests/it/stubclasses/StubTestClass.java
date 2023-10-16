@@ -152,7 +152,7 @@ public class StubTestClass extends StubParentClass {
 		File tmpImg2 = File.createTempFile("img", "_with_very_very_very_long_name_to_be_shortened.png");
 		File tmpHtml2 = File.createTempFile("html", "_with_very_very_very_long_name_to_be_shortened.html");
 		ScreenShot screenshot2 = new ScreenShot(tmpImg2, tmpHtml2);
-		step1.addSnapshot(new Snapshot(screenshot2, null, SnapshotCheckType.NONE), 1, null);
+		step1.addSnapshot(new Snapshot(screenshot2, "a name", SnapshotCheckType.NONE), 1, null);
 		
 		
 		step1.addAction(new TestAction(String.format("played %d times", count), false, new ArrayList<>()));

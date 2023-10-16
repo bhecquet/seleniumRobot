@@ -60,6 +60,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	private static final String FIELD_TEST_STEPS = "testSteps";
 	private static final String FIELD_SESSION = "session";
 	private static final String FIELD_TEST_CASE = "testCase";
+	private static final String FIELD_STATUS = "status";
 	public static final String SESSION_API_URL = "/snapshot/api/session/";
 	public static final String TESTCASEINSESSION_API_URL = "/snapshot/api/testcaseinsession/";
 	public static final String TESTSTEP_API_URL = "/snapshot/api/teststep/";
@@ -164,7 +165,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	 */
 	@Deprecated
 	public Integer createTestCaseInSession(Integer sessionId, Integer testCaseId) {
-		return createTestCaseInSession(sessionId, testCaseId, "");
+		return createTestCaseInSession(sessionId, testCaseId, "", "UNKNOWN");
 	}
 	
 	/**
@@ -174,7 +175,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	 * @param name			name of the test case in this session. This is to distinguish the test case (e.g: 'test1') and its full name (e.g: 'test1-1'), when executed with dataprovider
 	 * @return	the id of the created testCaseInSession
 	 */
-	public Integer createTestCaseInSession(Integer sessionId, Integer testCaseId, String name) {
+	public Integer createTestCaseInSession(Integer sessionId, Integer testCaseId, String name, String status) {
 		if (!active) {
 			return null;
 		}
@@ -191,6 +192,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			JSONObject testInSessionJson = getJSonResponse(buildPostRequest(url + TESTCASEINSESSION_API_URL)
 					.field(FIELD_TEST_CASE, testCaseId)
 					.field(FIELD_SESSION, sessionId.toString())
+					.field(FIELD_STATUS, status)
 					.field(FIELD_NAME, strippedName));
 			return testInSessionJson.getInt("id");
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {

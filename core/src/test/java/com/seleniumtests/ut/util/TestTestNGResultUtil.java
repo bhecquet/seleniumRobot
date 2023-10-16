@@ -695,6 +695,40 @@ public class TestTestNGResultUtil extends MockitoTest {
 		verify(passedTests).removeResult(testResult);
 		verify(failedTests).addResult(testResult, testNGMethod);
 	}
-	
-	
+
+	@Test(groups={"ut"})
+	public void testGetTestStatusStringCreated() {
+		when(testResult.getStatus()).thenReturn(-1);
+		Assert.assertEquals(TestNGResultUtils.getTestStatusString(testResult), "CREATED");
+	}
+	@Test(groups={"ut"})
+	public void testGetTestStatusStringSuccess() {
+		when(testResult.getStatus()).thenReturn(1);
+		Assert.assertEquals(TestNGResultUtils.getTestStatusString(testResult), "SUCCESS");
+	}
+	@Test(groups={"ut"})
+	public void testGetTestStatusStringFailure() {
+		when(testResult.getStatus()).thenReturn(2);
+		Assert.assertEquals(TestNGResultUtils.getTestStatusString(testResult), "FAILURE");
+	}
+	@Test(groups={"ut"})
+	public void testGetTestStatusStringSkip() {
+		when(testResult.getStatus()).thenReturn(3);
+		Assert.assertEquals(TestNGResultUtils.getTestStatusString(testResult), "SKIP");
+	}
+	@Test(groups={"ut"})
+	public void testGetTestStatusStringPercentageFailure() {
+		when(testResult.getStatus()).thenReturn(4);
+		Assert.assertEquals(TestNGResultUtils.getTestStatusString(testResult), "SUCCESS_PERCENTAGE_FAILURE");
+	}
+	@Test(groups={"ut"})
+	public void testGetTestStatusStringPercentageStarted() {
+		when(testResult.getStatus()).thenReturn(16);
+		Assert.assertEquals(TestNGResultUtils.getTestStatusString(testResult), "STARTED");
+	}
+	@Test(groups={"ut"})
+	public void testGetTestStatusStringPercentageUnknown() {
+		when(testResult.getStatus()).thenReturn(5);
+		Assert.assertEquals(TestNGResultUtils.getTestStatusString(testResult), "UNKNOWN");
+	}
 }
