@@ -394,7 +394,7 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	}
 
 	public void setNodeUrl(String nodeUrl) {
-		this.nodeUrl = nodeUrl.toLowerCase();
+		this.nodeUrl = nodeUrl == null ? nodeUrl: nodeUrl.toLowerCase();
 	}
 
 	public String getNodeHost() {
