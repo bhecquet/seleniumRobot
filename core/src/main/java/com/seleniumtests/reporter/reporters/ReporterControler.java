@@ -125,6 +125,7 @@ public class ReporterControler implements IReporter {
 			}
 
 			// find error causes once tests are finished
+			// TODO: to delete once ErrorCause is integrated into seleniumRobot server ?
 			if (suiteFinished && SeleniumTestsContextManager.getGlobalContext().isFindErrorCause()) {
 				findErrorCauses(resultSet);
 			}

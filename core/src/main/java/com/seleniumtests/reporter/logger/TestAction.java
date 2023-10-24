@@ -139,7 +139,8 @@ public class TestAction {
 		actionJson.put("timestamp", timestamp.toEpochSecond(ZoneOffset.UTC));
 		actionJson.put("type", "action");
 		actionJson.put("name", encodeString(getName(), "json"));
-		actionJson.put("exception", actionException == null ? null: actionException.toString());
+		actionJson.put("exception", actionException == null ? null: encodeString(actionException.getClass().toString(), "json"));
+		actionJson.put("exceptionMessage", actionException == null ? null: encodeString(ExceptionUtility.getExceptionMessage(actionException), "json"));
 		actionJson.put("failed", failed);
 		actionJson.put("position", position);
 

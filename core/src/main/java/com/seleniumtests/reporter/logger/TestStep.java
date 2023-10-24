@@ -304,6 +304,7 @@ public class TestStep extends TestAction {
 		stepJSon.put("date", startDate);
 		stepJSon.put("videoTimeStamp", videoTimeStamp);
 		stepJSon.put("type", "step");
+		stepJSon.put("status", getStepStatus().toString());
 		stepJSon.put("harCaptures", new JSONArray());
 		for (HarCapture harCapture: getHarCaptures()) {
 			stepJSon.getJSONArray("harCaptures").put(harCapture.toJson());

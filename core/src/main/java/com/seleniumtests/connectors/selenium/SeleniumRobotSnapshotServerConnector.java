@@ -149,6 +149,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field("version", versionId.toString())
 					.field(FIELD_NAME, strippedSessionName)
 					.field("compareSnapshot", String.valueOf(SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshot()))
+					.field("compareSnapshotBehaviour", SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshotBehaviour().toString())
 					.field("ttl", String.format("%d days", SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshotTtl()))); // format is 'x days' as this is the way Django expect a duration in days
 			return sessionJson.getInt("id");
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
