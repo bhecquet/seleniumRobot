@@ -35,6 +35,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.util.logging.DebugMode;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -462,7 +465,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	
 	/**
 	 * Send keys to desktop
-	 * @param keys		List of KeyEvent 
+	 * @param keyCodes		List of KeyEvent
 	 */
 	@Override
 	public void sendKeysWithKeyboard(List<Integer> keyCodes) {
@@ -491,7 +494,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	
 	/**
 	 * Display running step
-	 * @param text
+	 * @param stepName
 	 */
 	@Override
 	public void displayRunningStep(String stepName) {
@@ -687,11 +690,14 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			// delete file if it exists as '.asFile()' will not overwrite it
 			deleteExistingVideo(outputFile);
 				
-			HttpResponse<File> videoResponse = Unirest.get(String.format("%s%s", nodeServletUrl, NODE_TASK_SERVLET))
-					.downloadMonitor((b, fileName, bytesWritten, totalBytes) -> {
-						logger.info(String.format("File %s: %d/%d", fileName, bytesWritten, totalBytes));
-	                })
-					
+			GetRequest getRequest = Unirest.get(String.format("%s%s", nodeServletUrl, NODE_TASK_SERVLET));
+			if (SeleniumTestsContextManager.getThreadContext().getDebug().contains(DebugMode.NETWORK)) {
+				getRequest = getRequest
+						.downloadMonitor((b, fileName, bytesWritten, totalBytes) -> {
+							logger.info(String.format("File %s: %d/%d", fileName, bytesWritten, totalBytes));
+						});
+			}
+			HttpResponse<File> videoResponse = getRequest
 				.queryString(ACTION_FIELD, "stopVideoCapture")
 				.queryString(SESSION_FIELD, sessionId)
 				.asFile(outputFile);

@@ -17,21 +17,19 @@
  */
 package com.seleniumtests.driver;
 
-import java.awt.*;
-import java.awt.datatransfer.StringSelection;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.List;
-
-import javax.imageio.ImageIO;
-
+import com.neotys.selenium.proxies.NLWebDriver;
+import com.seleniumtests.browserfactory.BrowserInfo;
+import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
+import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
+import com.seleniumtests.core.StatisticsStorage;
+import com.seleniumtests.core.StatisticsStorage.DriverUsage;
+import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.customexception.WebSessionEndedException;
+import com.seleniumtests.util.helper.WaitHelper;
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
+import com.seleniumtests.util.osutility.OSUtilityFactory;
+import com.seleniumtests.util.video.VideoRecorder;
+import net.lightbody.bmp.BrowserMobProxy;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.commons.io.FileUtils;
@@ -50,10 +48,10 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.UnhandledAlertException;
+import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Interactive;
 import org.openqa.selenium.interactions.Sequence;
 import org.openqa.selenium.remote.Augmenter;
@@ -64,21 +62,35 @@ import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.openqa.selenium.support.events.WebDriverListener;
 
-import com.neotys.selenium.proxies.NLWebDriver;
-import com.seleniumtests.browserfactory.BrowserInfo;
-import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
-import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
-import com.seleniumtests.core.StatisticsStorage;
-import com.seleniumtests.core.StatisticsStorage.DriverUsage;
-import com.seleniumtests.customexception.ScenarioException;
-import com.seleniumtests.customexception.WebSessionEndedException;
-import com.seleniumtests.util.helper.WaitHelper;
-import com.seleniumtests.util.logging.SeleniumRobotLogger;
-import com.seleniumtests.util.osutility.OSUtilityFactory;
-import com.seleniumtests.util.video.VideoRecorder;
-
-import kong.unirest.Unirest;
-import net.lightbody.bmp.BrowserMobProxy;
+import javax.imageio.ImageIO;
+import java.awt.AWTError;
+import java.awt.AWTException;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.HeadlessException;
+import java.awt.MouseInfo;
+import java.awt.PointerInfo;
+import java.awt.Rectangle;
+import java.awt.Robot;
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.UUID;
 
 /**
  * This class acts as a proxy for everything related to selenium driver actions (mostly a bypass) or with the machine holding
@@ -495,10 +507,10 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     		"    modals.push(nodes[i]);" + 
     		"  }" + 
     		"}" + 
-    		"" + 
+
     		"var viewportWidth = getViewportWidth();" +
     		"var viewportHeight = getViewportHeight();" +
-    		"" + 
+
     		"if (modals && modals.length > 0) {" + 
     		// only keep modals which are wide enough and visible
     		"  modals = modals.filter(function(e) {" + 
@@ -507,20 +519,20 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     		"  if (modals.length > 0) {" + 
     		"    return true;" + 
     		"  }" + 
-    		"}" + 
-    		"" + 
+    		"}" +
+
     		"return false;";
     
     // returns the top pixel from which fixed positioned headers are not present
     private static final String JS_GET_TOP_HEADER = 
     		"function getViewportWidth() {" + JS_GET_VIEWPORT_SIZE_WIDTH + "}" +
-    		"" +
+
     		"function getViewportHeight() {" + JS_GET_VIEWPORT_SIZE_HEIGHT + "}" +
-    		"" +
+
     		JS_GET_ELEMENT_STYLE +
-    		"" + 
+
     		JS_IS_ELEMENT_VISIBLE + 
-    		"" + 
+
     		JS_PIXEL_RATIO +
     		"var headers;" + 
     		"var nodes = document.querySelectorAll(\"div,header,ul\");" + 
@@ -531,11 +543,11 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     		"    headers.push(nodes[i]);" + 
     		"  }" + 
     		"}" + 
-    		"" + 
+
     		"var topPixel = 0;" + 
     		"var viewportWidth = getViewportWidth();" +
     		"var viewportHeight = getViewportHeight();" +
-    		"" + 
+
     		"if (headers && headers.length > 0) {" + 
     		// only keep headers which are wide enough, not too high and visible
     		"  headers = headers.filter(function(e) {" + 
@@ -546,7 +558,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     		"    if (b == null || b.offsetTop == null) return -1;" + 
     		"    return a.offsetTop - b.offsetTop;" + 
     		"  });" + 
-    		"" + 
+
     		"  for (var i = 0; i < headers.length; i++) {" + 
     		"    var header = headers[i];" + 
     		"    if (header.offsetTop <= topPixel + 10) {" + 
@@ -556,20 +568,20 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     		"    }" + 
     		"  }" + 
     		"}" + 
-    		"" + 
+
     		"return Math.round(topPixel * pixelRatio);";
     
     private static final String JS_GET_BOTTOM_FOOTER = 
     		"function getViewportWidth() {" + JS_GET_VIEWPORT_SIZE_WIDTH + "}" +
-    		"" +
+
     		"function getViewportHeight() {" + JS_GET_VIEWPORT_SIZE_HEIGHT + "}" +
-    		"" +
+
     		JS_GET_ELEMENT_STYLE +
-    		"" + 
+
     		JS_IS_ELEMENT_VISIBLE +
-    		"" + 
+
     		JS_PIXEL_RATIO +
-    		"" + 
+
     		"var footers;" + 
     		"var nodes = document.querySelectorAll(\"div,footer,ul\");" + 
     		"if (nodes && nodes.length > 0) {" + 
@@ -579,11 +591,11 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     		"    footers.push(nodes[i]);" + 
     		"  }" + 
     		"}" + 
-    		"" + 
+
     		"var bottomPixel = document.documentElement.clientHeight;" + // count from bottom
     		"var viewportWidth = getViewportWidth();" +
     		"var viewportHeight = getViewportHeight();" +
-    		"" + 
+
     		"if (footers && footers.length > 0) {" + 
     		// only keep footers which are wide enough, not too high and visible
     		"  footers = footers.filter(function(e) {" + 
@@ -594,7 +606,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     		"    if (b == null || b.offsetBottom == null) return 1;" + 
     		"    return b.offsetBottom - a.offsetBottom;" + 
     		"  });" + 
-    		"" + 
+
     		"  for (var i = 0; i < footers.length; i++) {" + 
     		"    var footer = footers[i];" + 
     		"    if (footer.offsetTop + footer.scrollHeight >= bottomPixel - 10) {" + 
@@ -604,7 +616,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     		"    }" + 
     		"  }" + 
     		"}" + 
-    		"" + 
+
     		"return Math.round(document.documentElement.clientHeight * pixelRatio - bottomPixel * pixelRatio);";
     		
     
@@ -805,7 +817,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     		getSessionId();
     		getCapabilities();
     		return driver.getWindowHandles().isEmpty();
-    	} catch (NoSuchSessionException e) {
+    	} catch (NoSuchSessionException | UnsupportedCommandException e) {
     		return true;
     	}
     	

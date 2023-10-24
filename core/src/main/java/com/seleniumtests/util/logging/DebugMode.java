@@ -22,7 +22,7 @@ import java.util.List;
 
 public enum DebugMode {
 
-	NONE("none"), DRIVER("driver"), CORE("core"), GUI("gui");
+	NONE("none"), DRIVER("driver"), CORE("core"), GUI("gui"), NETWORK("network");
 
 	String[] dMode;
 

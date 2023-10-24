@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.logging.log4j.Logger;
@@ -44,23 +45,34 @@ import kong.unirest.UnirestException;
  * All these tests need to be executed with a selenium robot grid started on localhost, port 4444
  * In a continuous delivery process, they won't be executed
  *
+ * to use an other grid than predefined (hub: http://127.0.0.1:4444/wd/hub and node: http://127.0.0.1:5555), use java properties: -DhubUrl=<> -DnodeUrl=<>
+ *
  */
 public class TestSeleniumRobotGridConnector extends MockitoTest {
 
 	private SeleniumGridConnector connector;
 	private Logger gridLogger;
 
+	private String hubUrl;
+	private String nodeUrl;
+
 	@BeforeMethod(groups={"it"})
 	public void initConnector(ITestContext ctx) {
 		initThreadContext(ctx);
-
-		connector = new SeleniumRobotGridConnector("http://127.0.0.1:4444/wd/hub");
+		hubUrl = System.getProperty("hubUrl");
+		if (hubUrl == null) {
+			hubUrl = "http://127.0.0.1:4444/wd/hub";
+		}
+		connector = new SeleniumRobotGridConnector(hubUrl);
 		
 		if (!connector.isGridActive()) {
 			throw new SkipException("no seleniumrobot grid available");
 		}
-
-		connector.setNodeUrl("http://127.0.0.1:5555");
+		nodeUrl = System.getProperty("nodeUrl");
+		if (nodeUrl == null) {
+			nodeUrl = "http://127.0.0.1:5555";
+		}
+		connector.setNodeUrl(nodeUrl);
 		gridLogger = spy(SeleniumRobotGridConnector.getLogger());
 	}
 
@@ -69,7 +81,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
-			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/wd/hub");
+			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, hubUrl);
 			
 			ReporterTest.executeSubTest(2, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverManualSteps", "testDriver"});
 			
@@ -312,11 +324,11 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	
 	@Test(groups={"it"})
 	public void testVideoCapture() throws ClientProtocolException, IOException {
-		
+
 		connector.setSessionId(new SessionId("video"));
 		
 		connector.startVideoCapture();
-		WaitHelper.waitForMilliSeconds(50000);
+		WaitHelper.waitForMilliSeconds(5000);
 		connector.stopVideoCapture("d:\\tmp\\out.avi");
 		
 	}
