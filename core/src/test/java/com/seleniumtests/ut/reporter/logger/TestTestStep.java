@@ -35,6 +35,7 @@ import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.json.JSONObject;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriverException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -742,7 +743,9 @@ public class TestTestStep extends GenericTest {
 		JSONObject stepJson = step.toJson();
 
 		Assert.assertEquals(stepJson.getString("type"), "step");
+		Assert.assertTrue(stepJson.isNull("exception"));
 		Assert.assertEquals(stepJson.getString("name"), "step1");
+		Assert.assertEquals(stepJson.getString("status"), "SUCCESS");
 		Assert.assertEquals(stepJson.getLong("timestamp"), step.getTimestamp().toEpochSecond(ZoneOffset.UTC));
 		Assert.assertEquals(stepJson.getJSONArray("actions").length(), 3);
 		Assert.assertNotNull(stepJson.getLong("timestamp"));
@@ -766,6 +769,26 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(stepJson.getJSONArray("files").getJSONObject(0).getString("name"), "video file");
 		
 		Assert.assertEquals(stepJson.getJSONArray("snapshots").getJSONObject(0).getString("type"), "snapshot");
+
+	}
+	@Test(groups = { "ut" })
+	public void testToJsonWithException() throws IOException {
+		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+		step.setActionException(new WebDriverException("KO"));
+		step.addMessage(new TestMessage("OK", MessageType.INFO));
+		step.addAction(new TestAction("action2", true, new ArrayList<>()));
+
+		JSONObject stepJson = step.toJson();
+
+		Assert.assertEquals(stepJson.getString("type"), "step");
+		Assert.assertEquals(stepJson.getString("exception"), "class org.openqa.selenium.WebDriverException");
+		Assert.assertTrue(stepJson.getString("exceptionMessage").contains("class org.openqa.selenium.WebDriverException: KO"));
+		Assert.assertEquals(stepJson.getString("name"), "step1");
+		Assert.assertEquals(stepJson.getString("status"), "WARNING");
+		Assert.assertEquals(stepJson.getLong("timestamp"), step.getTimestamp().toEpochSecond(ZoneOffset.UTC));
+		Assert.assertEquals(stepJson.getJSONArray("actions").length(), 2);
+		Assert.assertNotNull(stepJson.getLong("timestamp"));
+
 
 	}
 
