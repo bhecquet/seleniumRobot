@@ -537,6 +537,7 @@ For debugging a test, you can:
 - use -Ddebug=core: when test is executing outside of dev environment, you will get a log file with all details about which methods are running. It's very verbose
 - use -Ddebug=driver: when something wrong happens with browser / driver (crashing, errors, ...), it will log driver and browser behaviour
 - use -Ddebug=gui: it will outline an element before clicking on it or when searching if it's displayed or present. As it slows down the test (250 ms for each outline), use it only for demo.
+- use -Ddebug=network: it will enable download monitor for video
 
 ### 21 Customize driver behaviour ###
 
