@@ -136,7 +136,7 @@ public class TestAction {
 	public JSONObject toJson() {
 		JSONObject actionJson = new JSONObject();
 
-		actionJson.put("timestamp", timestamp.toEpochSecond(ZoneOffset.UTC));
+		actionJson.put("timestamp", timestamp.atZone(ZoneOffset.UTC).toInstant().toEpochMilli());
 		actionJson.put("type", "action");
 		actionJson.put("name", encodeString(getName(), "json"));
 		actionJson.put("exception", actionException == null ? null: encodeString(actionException.getClass().toString(), "json"));

@@ -28,6 +28,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.reporter.logger.FileContent;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
@@ -122,7 +124,18 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 	public void recordTestSession(ITestContext testContext) {
 		SeleniumRobotSnapshotServerConnector serverConnector = getServerConnector();
 		if (TestNGContextUtils.getTestSessionCreated(testContext) == null) {
-			Integer sessionId = serverConnector.createSession(testContext.getName());
+
+			String browserOrApp;
+			if (SeleniumTestsContextManager.isAppTest()) {
+				String appPath = SeleniumTestsContextManager.getGlobalContext().getApp() == null ? "noApp": SeleniumTestsContextManager.getGlobalContext().getApp();
+				browserOrApp = "APP:" + new File(appPath).getName();
+			} else {
+				BrowserType browser = SeleniumTestsContextManager.getGlobalContext().getBrowser();
+				browser = browser == null ? BrowserType.NONE : browser;
+				browserOrApp = "BROWSER:" + browser;
+			}
+
+			Integer sessionId = serverConnector.createSession(testContext.getName(), browserOrApp);
 			TestNGContextUtils.setTestSessionCreated(testContext, sessionId);
 		}
 	}
@@ -158,7 +171,8 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 				
 				// record test case
 				Integer testCaseId = serverConnector.createTestCase(testName);
-				Integer testCaseInSessionId = serverConnector.createTestCaseInSession(sessionId, testCaseId, getVisualTestName(testResult), TestNGResultUtils.getTestStatusString(testResult));
+				String gridNode = getGridNode();
+				Integer testCaseInSessionId = serverConnector.createTestCaseInSession(sessionId, testCaseId, getVisualTestName(testResult), TestNGResultUtils.getTestStatusString(testResult), gridNode);
 				serverConnector.addLogsToTestCaseInSession(testCaseInSessionId, generateExecutionLogs(testResult).toString());
 				
 				List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
@@ -174,6 +188,14 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 				TestNGResultUtils.setSeleniumServerReportCreated(testResult, true);
 			}
 		}
+	}
+
+	private static String getGridNode() {
+		String gridNode = SeleniumTestsContextManager.getThreadContext().getRunMode().toString();
+		if (SeleniumTestsContextManager.getThreadContext().getRunMode().equals(DriverMode.GRID) && SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector() != null) { // in case test is skipped, connector is null
+			gridNode = SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector().getNodeHost();
+		}
+		return gridNode;
 	}
 
 	/**
@@ -195,7 +217,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			Integer stepResultId = serverConnector.recordStepResult(testStep, sessionId, testCaseInSessionId, testStepId);
 			testStep.setStepResultId(stepResultId);
 			
-			// sends all snapshots that are flagged as comparable
+			// sends all snapshots that are flagged as comparable, when user request them to be compared
 			for (Snapshot snapshot: new ArrayList<>(testStep.getSnapshots(true))) {
 				
 				if (snapshot.getCheckSnapshot().recordSnapshotOnServerForComparison() && SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshot()) {
@@ -242,8 +264,16 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 	 */
 	private void recordAllAttachments(SeleniumRobotSnapshotServerConnector serverConnector, Integer stepResultId, TestStep testStep) {
 
+		List<FileContent> attachments;
+		// in case snapshot comparison is not requested, we still want captured pictured to be displayed in report
+		if (SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshot()) {
+			attachments = testStep.getAllAttachments(false, SnapshotCheckType.NONE, SnapshotCheckType.REFERENCE_ONLY);
+		} else {
+			attachments = testStep.getAllAttachments(false, SnapshotCheckType.NONE, SnapshotCheckType.REFERENCE_ONLY, SnapshotCheckType.FULL);
+		}
+
 		// upload all files to server
-		for (FileContent file: testStep.getAllAttachments(false, SnapshotCheckType.NONE, SnapshotCheckType.REFERENCE_ONLY)) {
+		for (FileContent file: attachments) {
 			try {
 				Integer fileId = serverConnector.uploadFile(file.getFile(), stepResultId);
 				file.setId(fileId);

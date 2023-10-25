@@ -27,10 +27,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.seleniumtests.driver.screenshots.SnapshotCheckType;
-import com.seleniumtests.reporter.logger.FileContent;
 import com.seleniumtests.reporter.logger.TestStep;
-import org.apache.commons.lang.NotImplementedException;
 import org.openqa.selenium.Rectangle;
 import org.testng.ITestResult;
 
@@ -74,10 +71,11 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	private String sessionUUID;
 	private static SeleniumRobotSnapshotServerConnector snapshotConnector;
 
-	protected static final int MAX_TESTSESSION_NAME_LENGHT = 100;
-	protected static final int MAX_TESTCASEINSESSION_NAME_LENGHT = 100;
-	protected static final int MAX_SNAPSHOT_NAME_LENGHT = 100;
-	protected static final int MAX_TESTSTEP_NAME_LENGHT = 100;
+	protected static final int MAX_TESTSESSION_NAME_LENGTH = 100;
+	protected static final int MAX_BROWSER_NAME_LENGTH = 100;
+	protected static final int MAX_TESTCASEINSESSION_NAME_LENGTH = 100;
+	protected static final int MAX_SNAPSHOT_NAME_LENGTH = 100;
+	protected static final int MAX_TESTSTEP_NAME_LENGTH = 100;
 	
 	public enum SnapshotComparisonResult {
 		OK,
@@ -115,12 +113,21 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	public boolean isAlive() {
 		return isAlive("/snapshot/");
 	}
-	
+
+	public Integer createSession(String sessionName) {
+		BrowserType browser = SeleniumTestsContextManager.getGlobalContext().getBrowser();
+		browser = browser == null ? BrowserType.NONE : browser;
+
+		return createSession(sessionName, browser.toString());
+	}
+
 	/**
 	 * Create a test session
+	 * @param sessionName		name of the session
+	 * @param browserOrApp		name of the browser or application that is run
 	 * @return
 	 */
-	public Integer createSession(String sessionName) {
+	public Integer createSession(String sessionName, String browserOrApp) {
 		if (!active) {
 			return null;
 		}
@@ -134,17 +141,16 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			createVersion();
 		}
 		
-		String strippedSessionName = sessionName.length() > MAX_TESTSESSION_NAME_LENGHT ? sessionName.substring(0, MAX_TESTSESSION_NAME_LENGHT): sessionName;
-		
+		String strippedSessionName = sessionName.length() > MAX_TESTSESSION_NAME_LENGTH ? sessionName.substring(0, MAX_TESTSESSION_NAME_LENGTH): sessionName;
+		String strippedBrowserName = browserOrApp.length() > MAX_BROWSER_NAME_LENGTH ? browserOrApp.substring(0, MAX_BROWSER_NAME_LENGTH): browserOrApp;
+
 		try {
-			BrowserType browser = SeleniumTestsContextManager.getGlobalContext().getBrowser();
-			browser = browser == null ? BrowserType.NONE : browser;
 			sessionUUID = UUID.randomUUID().toString(); // for uniqueness of the session
 			
 			JSONObject sessionJson = getJSonResponse(buildPostRequest(url + SESSION_API_URL)
 					.field("sessionId", sessionUUID)
 					.field("date", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME))
-					.field("browser", browser.getBrowserType())
+					.field("browser", strippedBrowserName)
 					.field("environment", SeleniumTestsContextManager.getGlobalContext().getTestEnv())
 					.field("version", versionId.toString())
 					.field(FIELD_NAME, strippedSessionName)
@@ -166,7 +172,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	 */
 	@Deprecated
 	public Integer createTestCaseInSession(Integer sessionId, Integer testCaseId) {
-		return createTestCaseInSession(sessionId, testCaseId, "", "UNKNOWN");
+		return createTestCaseInSession(sessionId, testCaseId, "", "UNKNOWN", "LOCAL");
 	}
 	
 	/**
@@ -174,9 +180,11 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	 * @param sessionId		the sessionId which should have been created before
 	 * @param testCaseId	the test case Id to link to this session
 	 * @param name			name of the test case in this session. This is to distinguish the test case (e.g: 'test1') and its full name (e.g: 'test1-1'), when executed with dataprovider
+	 * @param status		status of the test, as reported by TestNG (SKIP, SUCCESS, FAILURE, ...)
+	 * @param gridNode		name of the grid node where test run
 	 * @return	the id of the created testCaseInSession
 	 */
-	public Integer createTestCaseInSession(Integer sessionId, Integer testCaseId, String name, String status) {
+	public Integer createTestCaseInSession(Integer sessionId, Integer testCaseId, String name, String status, String gridNode) {
 		if (!active) {
 			return null;
 		}
@@ -187,13 +195,14 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			throw new ConfigurationException("Test case must be previously defined");
 		}
 		
-		String strippedName = name.length() > MAX_TESTCASEINSESSION_NAME_LENGHT ? name.substring(0, MAX_TESTCASEINSESSION_NAME_LENGHT): name;
+		String strippedName = name.length() > MAX_TESTCASEINSESSION_NAME_LENGTH ? name.substring(0, MAX_TESTCASEINSESSION_NAME_LENGTH): name;
 		
 		try {
 			JSONObject testInSessionJson = getJSonResponse(buildPostRequest(url + TESTCASEINSESSION_API_URL)
 					.field(FIELD_TEST_CASE, testCaseId)
 					.field(FIELD_SESSION, sessionId.toString())
 					.field(FIELD_STATUS, status)
+					.field("gridNode", gridNode)
 					.field(FIELD_NAME, strippedName));
 			return testInSessionJson.getInt("id");
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
@@ -206,7 +215,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	 * @return
 	 */
 	private String getTestStepName(String testStepName) {
-		return testStepName.length() > MAX_TESTSTEP_NAME_LENGHT ? testStepName.substring(0, MAX_TESTSTEP_NAME_LENGHT): testStepName;
+		return testStepName.length() > MAX_TESTSTEP_NAME_LENGTH ? testStepName.substring(0, MAX_TESTSTEP_NAME_LENGTH): testStepName;
 	}
 	
 
@@ -324,7 +333,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			throw new SeleniumRobotServerException(NAPSHOT_DOES_NOT_EXIST_ERROR);
 		}
 		
-		String snapshotName = snapshot.getName().length() > MAX_SNAPSHOT_NAME_LENGHT ? snapshot.getName().substring(0, MAX_SNAPSHOT_NAME_LENGHT): snapshot.getName(); 
+		String snapshotName = snapshot.getName().length() > MAX_SNAPSHOT_NAME_LENGTH ? snapshot.getName().substring(0, MAX_SNAPSHOT_NAME_LENGTH): snapshot.getName();
 		
 		try {
 			File pictureFile = snapshot.getScreenshot().getImage().getFile();
@@ -402,7 +411,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			throw new SeleniumRobotServerException(NAPSHOT_DOES_NOT_EXIST_ERROR);
 		}
 		
-		String snapshotName = snapshot.getName().length() > MAX_SNAPSHOT_NAME_LENGHT ? snapshot.getName().substring(0, MAX_SNAPSHOT_NAME_LENGHT): snapshot.getName(); 
+		String snapshotName = snapshot.getName().length() > MAX_SNAPSHOT_NAME_LENGTH ? snapshot.getName().substring(0, MAX_SNAPSHOT_NAME_LENGTH): snapshot.getName();
 		
 		try {
 			File pictureFile = snapshot.getScreenshot().getImage().getFile();

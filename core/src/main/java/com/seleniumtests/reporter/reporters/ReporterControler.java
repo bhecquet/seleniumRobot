@@ -212,8 +212,8 @@ public class ReporterControler implements IReporter {
 					// update snapshot comparison result of the run test.
 					TestNGResultUtils.setSnapshotComparisonResult(testResult, snapshotComparisonResult);
 					
-					// create a step for snapshot comparison
-					createTestStepForComparisonResult(testResult, snapshotComparisonResult, errorMessage.toString());
+					// create a step for snapshot comparison => TODO: remove as handled by server
+					// createTestStepForComparisonResult(testResult, snapshotComparisonResult, errorMessage.toString());
 					
 					changeTestResultWithSnapshotComparison(suiteResult, testResult, snapshotComparisonResult);
 				}
