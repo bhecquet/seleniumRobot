@@ -746,7 +746,7 @@ public class TestTestStep extends GenericTest {
 		Assert.assertTrue(stepJson.isNull("exception"));
 		Assert.assertEquals(stepJson.getString("name"), "step1");
 		Assert.assertEquals(stepJson.getString("status"), "SUCCESS");
-		Assert.assertEquals(stepJson.getLong("timestamp"), step.getTimestamp().toEpochSecond(ZoneOffset.UTC));
+		Assert.assertEquals(stepJson.getLong("timestamp"), step.getTimestamp().toInstant(ZoneOffset.UTC).toEpochMilli());
 		Assert.assertEquals(stepJson.getJSONArray("actions").length(), 3);
 		Assert.assertNotNull(stepJson.getLong("timestamp"));
 
@@ -785,7 +785,7 @@ public class TestTestStep extends GenericTest {
 		Assert.assertTrue(stepJson.getString("exceptionMessage").contains("class org.openqa.selenium.WebDriverException: KO"));
 		Assert.assertEquals(stepJson.getString("name"), "step1");
 		Assert.assertEquals(stepJson.getString("status"), "WARNING");
-		Assert.assertEquals(stepJson.getLong("timestamp"), step.getTimestamp().toEpochSecond(ZoneOffset.UTC));
+		Assert.assertEquals(stepJson.getLong("timestamp"), step.getTimestamp().toInstant(ZoneOffset.UTC).toEpochMilli());
 		Assert.assertEquals(stepJson.getJSONArray("actions").length(), 2);
 		Assert.assertNotNull(stepJson.getLong("timestamp"));
 
