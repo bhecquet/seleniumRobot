@@ -108,7 +108,8 @@ public class SeleniumIdeParser {
 			StringBuilder newContent = new StringBuilder();
 			String content = FileUtils.readFileToString(javaFile, StandardCharsets.UTF_8);
 			for (String line: content.split("\n")) {
-				line = line.replace("\r", "");
+				line = line.replace("\r", "")
+						.replace("\\\\\\'", "'");
 				Matcher matcherUrl = patternUrl.matcher(line);
 				Matcher matcherCall = patternCall.matcher(line);
 				Matcher matcherWait = patternWait.matcher(line);

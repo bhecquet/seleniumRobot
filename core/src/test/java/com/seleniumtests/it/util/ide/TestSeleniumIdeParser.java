@@ -382,4 +382,55 @@ public class TestSeleniumIdeParser extends GenericTest {
 			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
 		}
 	}
+
+	@Test(groups={"it"})
+	public void testCodeGenerationUnescapeSingleQuote() throws IOException {
+
+		String testClassCode = "package com.infotel.selenium.ide;\n"
+				+ "\n"
+				+ "import java.io.IOException;\n"
+				+ "import com.seleniumtests.core.runner.SeleniumTestPlan;\n"
+				+ "import org.testng.annotations.Test;\n"
+				+ "\n"
+				+ "public class MainPageSimpleQuoteEscape extends SeleniumTestPlan {\n"
+				+ "\n"
+				+ "    @Test\n"
+				+ "    public void mainPage() throws IOException {\n"
+				+ "        new MainPageSimpleQuoteEscapePage().mainPage();\n"
+				+ "    }\n"
+				+ "\n"
+				+ "}";
+
+		String pageClassCode = String.format(SeleniumIdeParser.PAGE_OBJECT_HEADER, "MainPageSimpleQuoteEscape", "MainPageSimpleQuoteEscape")
+				.replace("https://initialurl.com", "https://docs.python.org/3/library/operator.html") +
+				"public void mainPage(){\n"
+				+ "    driver.get(\"https://docs.python.org/3/library/operator.html\");\n"
+				+ "    driver.manage().window().setSize(new Dimension(1150, 825));\n"
+				+ "    vars.put(\"user\", \"myUser\");\n"
+				+ "    driver.findElement(By.linkText(\"Lib/operator.py\")).click();\n"
+				+ "    vars.put(\"dateFin\", driver.findElement(By.xpath(\"//td[8]/div/lds-datepicker/div/input\")).getAttribute(\"value\"));\n"
+				+ "    vars.put(\"dateAujourdhui\", js.executeScript(\"return new Date().toLocaleDateString(\\'fr-FR\\');\"));\n"
+				+ "    assertThat(driver.findElement(By.xpath(\"//h2[@class=\\\"slds-text-heading_small\\\"]\")).getText(), is(\"Veuillez renseigner l'exhaustivitÃ© \"));\n"
+				+ "}\n"
+				+ "\n"
+				+ "\n"
+				+ "}";
+
+		try {
+			System.setProperty(SeleniumTestsContext.MANUAL_TEST_STEPS, "false");
+
+			File tmpSuiteFile = createFileFromResource("ti/ide/MainPageSimpleQuoteEscape.java");
+			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageSimpleQuoteEscape.java").toFile();
+			FileUtils.copyFile(tmpSuiteFile, suiteFile);
+
+			Map<String, String> classInfo = new SeleniumIdeParser(suiteFile.getAbsolutePath()).parseSeleniumIdeFile();
+
+			Assert.assertTrue(classInfo.containsKey("com.infotel.selenium.ide.MainPageSimpleQuoteEscape"));
+
+			Assert.assertEquals(classInfo.get("com.infotel.selenium.ide.MainPageSimpleQuoteEscape"), testClassCode);
+			Assert.assertEquals(classInfo.get("com.infotel.selenium.ide.MainPageSimpleQuoteEscapePage"), pageClassCode);
+		} finally {
+			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
+		}
+	}
 }
