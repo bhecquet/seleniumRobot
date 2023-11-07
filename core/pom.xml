@@ -30,7 +30,7 @@
 			</snapshots>
 			<id>atlassian</id>
 			<name>atlassian</name>
-			<url>https://packages.atlassian.com/repository/public</url>
+			<url>https://packages.atlassian.com/maven-public</url>
 	     	</repository>
 	</repositories>
 	
