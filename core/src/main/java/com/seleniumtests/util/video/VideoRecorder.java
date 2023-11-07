@@ -129,6 +129,8 @@ public class VideoRecorder {
 		
 		window = new JFrame("SeleniumRobot"); 
 		window.setAlwaysOnTop (true);
+		window.setFocusable(false);
+		window.setFocusableWindowState(false);
 		window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		window.setUndecorated(true); 
 		try {
