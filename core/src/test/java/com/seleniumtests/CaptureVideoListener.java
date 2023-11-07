@@ -3,6 +3,8 @@ package com.seleniumtests;
 import java.io.File;
 import java.io.IOException;
 
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import com.seleniumtests.driver.DriverMode;
 import junit.framework.TestResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,13 +36,13 @@ public class CaptureVideoListener implements IInvokedMethodListener {
 					|| captureVideoOnClass2 != null && captureVideoOnClass2.enabled()
 					|| captureVideoOnMethod != null && captureVideoOnMethod.enabled()
 			 ) {
-				 VideoRecorder recorder = new VideoRecorder(new File("videos"), String.format("%s#%s.avi", 
-						 method.getTestMethod().getConstructorOrMethod().getMethod().getDeclaringClass().getName(),
-						 method.getTestMethod().getMethodName()),
-						 true,
-						 false);
+				 VideoRecorder recorder = CustomEventFiringWebDriver.startVideoCapture(DriverMode.LOCAL,
+						 null,
+						 new File("videos"), String.format("%s#%s.avi", method.getTestMethod().getConstructorOrMethod().getMethod().getDeclaringClass().getName(),
+								 method.getTestMethod().getMethodName()));
+
 				 logger.info("Video recording started for test");
-				 recorder.start();
+
 				 recorders.set(recorder);
 			 }
 		 }
@@ -49,7 +51,7 @@ public class CaptureVideoListener implements IInvokedMethodListener {
 	 public void afterInvocation(IInvokedMethod method, ITestResult testResult) {
 	    if (method.isTestMethod() && recorders.get() != null) {
 	    	try {
-				File videoFile = recorders.get().stop();
+				File videoFile = CustomEventFiringWebDriver.stopVideoCapture(DriverMode.LOCAL, null, recorders.get());
 				
 				// delete video file if test is OK
 				if (videoFile != null && testResult.getStatus() != ITestResult.FAILURE) {
