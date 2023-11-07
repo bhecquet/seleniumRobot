@@ -153,11 +153,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			// tabs are shown
 			Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\" style=\"display: block;\" >"));
 
-			// successful step has been added for comparison
-			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-info message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Comparison successful </div>.*"));
-
-			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box success\">.*?<i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> Snapshot comparison.*"));
-
 			// snapshot tab not active
 			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link tab-success \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
 
@@ -203,10 +198,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 			// tabs are shown
 			Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\" style=\"display: block;\" >"));
-
-			// successful step has been added for comparison
-			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-log message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> No comparison to do \\(no snapshots\\) </div>.*"));
-			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box success\">.*?<i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> Snapshot comparison.*"));
 
 			// snapshot tab active / skipped
 			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link tab-skipped \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
@@ -254,10 +245,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			// tabs are shown
 			Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\" style=\"display: block;\" >"));
 
-			// failed step has been added for comparison
-			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Comparison failed: </div>.*"));
-			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> Snapshot comparison.*"));
-
 			// snapshot tab not active
 			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link tab-failed \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
 
@@ -303,10 +290,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 			// tabs are shown
 			Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\" style=\"display: block;\" >"));
-
-			// failed step has been added for comparison
-			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Comparison failed: </div>.*"));
-			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> Snapshot comparison.*"));
 
 			// snapshot tab not active
 			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link tab-failed \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
@@ -355,10 +338,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			// tabs are shown
 			Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\" style=\"display: block;\" >"));
 
-			// failed step has been added for comparison
-			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Comparison failed: </div>.*"));
-			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> Snapshot comparison.*"));
-
 			// snapshot tab not active
 			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link tab-failed \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
 
@@ -402,10 +381,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			// tabs are shown
 			Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\" style=\"display: block;\" >"));
 			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link tab-skipped \" id=\"snapshot-tab\"")); // tab is in blue as comparison skipped
-
-			// failed step has been added for comparison
-			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Comparison skipped: &quot;error computing&quot; </div>.*"));
-			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> Snapshot comparison.*"));
 
 			// snapshot tab not active
 			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link tab-skipped \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
@@ -455,10 +430,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\" style=\"display: block;\" >"));
 			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link tab-skipped \" id=\"snapshot-tab\"")); // tab is in blue as comparison skipped
 
-			// failed step has been added for comparison
-			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Comparison skipped: &quot;error computing&quot; </div>.*"));
-			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> Snapshot comparison.*"));
-
 			// snapshot tab not active
 			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link tab-skipped \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
 
@@ -505,10 +476,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 			// tabs are shown
 			Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\" style=\"display: block;\" >"));
-
-			// failed step has been added for comparison
-			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Comparison skipped: &quot;error computing&quot; </div>.*"));
-			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> Snapshot comparison.*"));
 
 			// snapshot tab not active
 			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link tab-skipped \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
