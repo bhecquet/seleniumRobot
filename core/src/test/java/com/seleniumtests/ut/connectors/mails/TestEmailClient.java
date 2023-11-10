@@ -31,8 +31,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -46,7 +46,7 @@ import com.seleniumtests.connectors.mails.EmailServer.EmailServerTypes;
 import com.seleniumtests.connectors.mails.ImapClient;
 import com.seleniumtests.customexception.ScenarioException;
 
-@PrepareForTest({EmailClientSelector.class})
+//@PrepareForTest({EmailClientSelector.class})
 public class TestEmailClient extends MockitoTest {
 	
 	private String serverUrl = "";
@@ -59,7 +59,7 @@ public class TestEmailClient extends MockitoTest {
 
 	@BeforeMethod(groups={"ut"})
 	public void init() throws Exception {
-		PowerMockito.mockStatic(EmailClientSelector.class);
+//		PowerMockito.mockStatic(EmailClientSelector.class);
 		when(EmailClientSelector.routeEmail(any(EmailServer.class), anyString(), anyString(), anyString())).thenReturn(emailClientMock);
 		when(emailClientMock.getEmail(anyString(), anyList())).thenCallRealMethod();
 		when(emailClientMock.getEmail(anyString(), any(String[].class))).thenCallRealMethod();

@@ -19,8 +19,8 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -39,7 +39,7 @@ import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.reporters.SeleniumTestsReporter2;
 
-@PrepareForTest({BugTracker.class})
+//@PrepareForTest({BugTracker.class})
 public class TestBugTracker extends MockitoTest {
 
 	@Mock
@@ -96,7 +96,7 @@ public class TestBugTracker extends MockitoTest {
 
 	@Test(groups={"ut"})
 	public void testJiraBugtracker() throws Exception {
-		PowerMockito.whenNew(JiraConnector.class).withAnyArguments().thenReturn(jiraConnector);
+//		PowerMockito.whenNew(JiraConnector.class).withAnyArguments().thenReturn(jiraConnector);
 		
 		BugTracker bugtracker = BugTracker.getInstance("jira", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
 		Assert.assertTrue(bugtracker instanceof JiraConnector);
@@ -105,7 +105,7 @@ public class TestBugTracker extends MockitoTest {
 	
 	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class)
 	public void testUnknownBugtracker() throws Exception {
-		PowerMockito.whenNew(JiraConnector.class).withAnyArguments().thenReturn(jiraConnector);
+//		PowerMockito.whenNew(JiraConnector.class).withAnyArguments().thenReturn(jiraConnector);
 		
 		BugTracker.getInstance("mantis", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
 	}
@@ -117,7 +117,7 @@ public class TestBugTracker extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateIssue() throws Exception {
 		FakeBugTracker fbt = spy(new FakeBugTracker());
-		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
+//		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
 		BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
 			
 		bugtracker.createIssue("selenium", "DEV", "ngName", "testCreateIssue", "some description", 
@@ -138,7 +138,7 @@ public class TestBugTracker extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testDoNotCreateIssue() throws Exception {
 		FakeBugTracker fbt = spy(new FakeBugTracker());
-		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
+//		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
 		BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
 		
 		bugtracker.createIssue("selenium", "DEV", "ngName", "testDoNotCreateIssue", "some description", 
@@ -182,7 +182,7 @@ public class TestBugTracker extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testUpdateIssue() throws Exception {
 		FakeBugTracker fbt = spy(new FakeBugTracker());
-		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
+//		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
 		when(fbt.issueAlreadyExists(any(IssueBean.class))).thenReturn(new IssueBean("ISSUE-1", "[Selenium][app][env][ng] test Test1 KO", "Test KO"));
 		BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
 			
@@ -204,7 +204,7 @@ public class TestBugTracker extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testDoNotUpdateIssue() throws Exception {
 		FakeBugTracker fbt = spy(new FakeBugTracker());
-		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
+//		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
 		when(fbt.issueAlreadyExists(any(IssueBean.class))).thenReturn(new IssueBean("ISSUE-1", "[Selenium][app][env][ng] test Test1 KO", String.format(BugTracker.STEP_KO_PATTERN, 1)));
 		BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
 	
@@ -230,7 +230,7 @@ public class TestBugTracker extends MockitoTest {
 		new SeleniumTestsReporter2().copyResources();
 		
 		FakeBugTracker fbt = spy(new FakeBugTracker());
-		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
+//		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
 		BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
 			
 		
@@ -272,7 +272,7 @@ public class TestBugTracker extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testDoNotCreateIssueBeanWithStepDisabled() throws Exception {
 		FakeBugTracker fbt = spy(new FakeBugTracker());
-		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
+//		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
 		BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
 			
 		
@@ -288,7 +288,7 @@ public class TestBugTracker extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateIssueBeanWithStepDisabled() throws Exception {
 		FakeBugTracker fbt = spy(new FakeBugTracker());
-		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
+//		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
 		BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
 		
 		
@@ -321,7 +321,7 @@ public class TestBugTracker extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateIssueBeanNoStep() throws Exception {
 		FakeBugTracker fbt = spy(new FakeBugTracker());
-		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
+//		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
 		BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
 		
 		IssueBean issueBean = bugtracker.createIssueBean("[Selenium][selenium][DEV][ngName] test myTest KO", "myTest", "some description", 
@@ -337,7 +337,7 @@ public class TestBugTracker extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateIssueBeanNoEndStep() throws Exception {
 		FakeBugTracker fbt = spy(new FakeBugTracker());
-		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
+//		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
 		BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
 		
 		IssueBean issueBean = bugtracker.createIssueBean("[Selenium][selenium][DEV][ngName] test myTest KO", "myTest", "some description", 

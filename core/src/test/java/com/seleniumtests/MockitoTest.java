@@ -28,8 +28,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.Logger;
 import org.mockito.MockitoAnnotations;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterClass;
@@ -49,9 +47,9 @@ import com.seleniumtests.util.video.VideoCaptureMode;
  *
  */
 
-@PowerMockIgnore({"javax.net.ssl.*", "com.google.inject.*", "javax.imageio.*", "javax.swing.*"})
+//@PowerMockIgnore({"javax.net.ssl.*", "com.google.inject.*", "javax.imageio.*", "javax.swing.*"})
 @Listeners({CaptureVideoListener.class})
-public class MockitoTest  extends PowerMockTestCase {
+public class MockitoTest /* extends PowerMockTestCase */ {
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(MockitoTest.class);
 
@@ -62,7 +60,7 @@ public class MockitoTest  extends PowerMockTestCase {
 	@BeforeMethod(groups={"ut", "it", "ie"})  
 	public void beforeMethod(final Method method, final ITestContext testNGCtx, final ITestResult testResult) throws Exception {
 		doBeforeMethod(method);
-		beforePowerMockTestMethod();
+		//beforePowerMockTestMethod();
 		beforeMethodDone.put(method, true);
 		initThreadContext(testNGCtx, null, testResult);
 		MockitoAnnotations.initMocks(this); 
@@ -90,13 +88,13 @@ public class MockitoTest  extends PowerMockTestCase {
 	
 	@BeforeClass(groups={"ut", "it", "ie"})  
 	public void beforeClass() throws Exception {
-		beforePowerMockTestClass();
+		//beforePowerMockTestClass();
 	}
 	
 	@AfterMethod(groups={"ut", "it", "ie"}, alwaysRun=true)
 	public void afterMethod(final Method method) throws Exception {
 		if (beforeMethodDone.getOrDefault(method, false) == true) {
-			afterPowerMockTestMethod();
+			//afterPowerMockTestMethod();
 		}
 
 		GenericTest.resetTestNGREsultAndLogger();
@@ -114,7 +112,7 @@ public class MockitoTest  extends PowerMockTestCase {
 	
 	@AfterClass(groups={"ut", "it", "ie"}, alwaysRun=true)
 	public void afterClass() throws Exception {
-		afterPowerMockTestClass();
+		//afterPowerMockTestClass();
 	}
 	
 	public void myTest() {

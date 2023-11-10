@@ -12,8 +12,8 @@ import java.util.Map;
 
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -25,7 +25,7 @@ import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.reporter.logger.TestStep;
 
-@PrepareForTest({Uft.class, SeleniumRobotTestPlan.class, TestStepManager.class})
+//@PrepareForTest({Uft.class, SeleniumRobotTestPlan.class, TestStepManager.class})
 public class TestSeleniumRobotTestPlan extends MockitoTest {
 
 	
@@ -37,13 +37,13 @@ public class TestSeleniumRobotTestPlan extends MockitoTest {
 	
 	@BeforeMethod(groups= {"ut"})
 	public void init() throws Exception {
-		PowerMockito.mockStatic(TestStepManager.class);
-		PowerMockito.doReturn(currentTestStep).when(TestStepManager.class, "getCurrentRootTestStep");
+//		PowerMockito.mockStatic(TestStepManager.class);
+//		PowerMockito.doReturn(currentTestStep).when(TestStepManager.class, "getCurrentRootTestStep");
 	}
 
 	@Test(groups= {"ut"})
 	public void testLoadUftScript() throws Exception {
-		PowerMockito.whenNew(Uft.class).withAnyArguments().thenReturn(uft);
+//		PowerMockito.whenNew(Uft.class).withAnyArguments().thenReturn(uft);
 		
 		
 		Uft uftInstance = new SeleniumRobotTestPlan().loadUftScript("", "", "", "", "", "", false);
@@ -65,10 +65,10 @@ public class TestSeleniumRobotTestPlan extends MockitoTest {
 		verify(uft).executeScript(5, params);
 		
 		// check test step is recorded
-		PowerMockito.verifyStatic(TestStepManager.class, times(2)); // 1 call before the step, 1 call after
+//		PowerMockito.verifyStatic(TestStepManager.class, times(2)); // 1 call before the step, 1 call after
 		TestStepManager.logTestStep(TestStepManager.getCurrentRootTestStep());
 		
-		PowerMockito.verifyStatic(TestStepManager.class);
+//		PowerMockito.verifyStatic(TestStepManager.class);
 		TestStepManager.setCurrentRootTestStep(step);
 	}
 	

@@ -34,8 +34,8 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.interactions.Coordinates;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
@@ -57,7 +57,7 @@ import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.uipage.htmlelements.PictureElement;
 import com.seleniumtests.util.imaging.ImageDetector;
 
-@PrepareForTest(WebUIDriver.class)
+//@PrepareForTest(WebUIDriver.class)
 public class TestPictureElement extends MockitoTest {
 	
 	@Mock
@@ -98,7 +98,7 @@ public class TestPictureElement extends MockitoTest {
 		PictureElement picElement = spy(pictureElement);
 		picElement.setObjectPictureFile(new File(""));
 
-		PowerMockito.mockStatic(WebUIDriver.class);
+//		PowerMockito.mockStatic(WebUIDriver.class);
 		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
 		when(WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(uiDriver);
 		when(uiDriver.getDriver()).thenReturn(driver);
@@ -130,7 +130,7 @@ public class TestPictureElement extends MockitoTest {
 		PictureElement picElement = spy(pictureElement);
 		picElement.setObjectPictureFile(new File(""));
 		
-		PowerMockito.mockStatic(WebUIDriver.class);
+//		PowerMockito.mockStatic(WebUIDriver.class);
 		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
 		when(WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(uiDriver);
 		when(uiDriver.getDriver()).thenReturn(driver);
@@ -161,7 +161,7 @@ public class TestPictureElement extends MockitoTest {
 		PictureElement picElement = spy(pictureElement);
 		picElement.setObjectPictureFile(new File(""));
 		
-		PowerMockito.mockStatic(WebUIDriver.class);
+//		PowerMockito.mockStatic(WebUIDriver.class);
 		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
 		when(WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(uiDriver);
 		when(uiDriver.getDriver()).thenReturn(driver);
@@ -217,7 +217,7 @@ public class TestPictureElement extends MockitoTest {
 	public void testPictureVisible() throws AWTException {
 		PictureElement picElement = spy(pictureElement);
 
-		PowerMockito.mockStatic(WebUIDriver.class);
+//		PowerMockito.mockStatic(WebUIDriver.class);
 		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
 		when(WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(uiDriver);
 		when(uiDriver.getDriver()).thenReturn(driver);

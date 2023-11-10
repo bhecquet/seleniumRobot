@@ -56,8 +56,8 @@ import org.openqa.selenium.WebDriver.Window;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -74,7 +74,7 @@ import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.video.VideoRecorder;
 
-@PrepareForTest({OSUtilityFactory.class, CustomEventFiringWebDriver.class})
+//@PrepareForTest({OSUtilityFactory.class, CustomEventFiringWebDriver.class})
 public class TestCustomEventFiringWebDriver extends MockitoTest {
 
 
@@ -121,12 +121,12 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	private void init() throws Exception {
 		
 
-		PowerMockito.spy(CustomEventFiringWebDriver.class);
+//		PowerMockito.spy(CustomEventFiringWebDriver.class);
 		when(driver.getCapabilities()).thenReturn(new DesiredCapabilities()); // add capabilities to allow augmenting driver
 		
 		// add DriverExceptionListener to reproduce driver behavior
-		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, browserInfo, true, DriverMode.LOCAL, null, null));
-		attachedEventDriver = spy(new CustomEventFiringWebDriver(driver, null, browserInfo, true, DriverMode.LOCAL, null, null, 12345, new ArrayList<>()));
+		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, browserInfo, true, DriverMode.LOCAL, null));
+		attachedEventDriver = spy(new CustomEventFiringWebDriver(driver, null, browserInfo, true, DriverMode.LOCAL, null, 12345, new ArrayList<>()));
 		when(driver.manage()).thenReturn(options);
 		when(driver.getCapabilities()).thenReturn(capabilities);
 		when(driver.switchTo()).thenReturn(target);
@@ -135,16 +135,16 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		when(options.window()).thenReturn(window);
 		when(window.getSize()).thenReturn(new Dimension(100, 100));
 		
-		PowerMockito.mockStatic(OSUtilityFactory.class);
+//		PowerMockito.mockStatic(OSUtilityFactory.class);
 		when(OSUtilityFactory.getInstance()).thenReturn(osUtility);
 		
-		PowerMockito.whenNew(Robot.class).withNoArguments().thenReturn(robot);
-		PowerMockito.whenNew(VideoRecorder.class).withAnyArguments().thenReturn(videoRecorder);
-		PowerMockito.whenNew(Keyboard.class).withNoArguments().thenReturn(keyboard);
-		PowerMockito.doReturn(new Rectangle(1900, 1000)).when(CustomEventFiringWebDriver.class, "getScreensRectangle");
+//		PowerMockito.whenNew(Robot.class).withNoArguments().thenReturn(robot);
+//		PowerMockito.whenNew(VideoRecorder.class).withAnyArguments().thenReturn(videoRecorder);
+//		PowerMockito.whenNew(Keyboard.class).withNoArguments().thenReturn(keyboard);
+//		PowerMockito.doReturn(new Rectangle(1900, 1000)).when(CustomEventFiringWebDriver.class, "getScreensRectangle");
 		
-		PowerMockito.mockStatic(MouseInfo.class);
-		PowerMockito.when(MouseInfo.getPointerInfo()).thenReturn(pointerInfo);
+//		PowerMockito.mockStatic(MouseInfo.class);
+//		PowerMockito.when(MouseInfo.getPointerInfo()).thenReturn(pointerInfo);
 		when(pointerInfo.getLocation()).thenReturn(new java.awt.Point(2, 3));
 		CustomEventFiringWebDriver.resetVideoRecorder();
 	}
@@ -324,7 +324,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testContentDimensionNonWebTest() {
-		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, null, false, DriverMode.LOCAL, null, null));
+		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, null, false, DriverMode.LOCAL, null));
 		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(120L, 80L));
 		Dimension dim = eventDriver.getContentDimension();
 		
@@ -419,7 +419,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testContentDimensionWithoutScrollbarNonWebTest() {
-		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, null, false, DriverMode.LOCAL, null, null));
+		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, null, false, DriverMode.LOCAL, null));
 		when(driver.executeScript(anyString(), eq(true))).thenReturn(120L).thenReturn(80L);
 		Dimension dim = eventDriver.getViewPortDimensionWithoutScrollbar();
 		
@@ -471,7 +471,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"}, expectedExceptions=WebDriverException.class)
 	public void testScrollPositionNonWebTest() {
-		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, null, false, DriverMode.LOCAL, null, null));
+		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, null, false, DriverMode.LOCAL, null));
 		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(120L, 80L));
 		eventDriver.getScrollPosition();
 
@@ -549,7 +549,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testQuitInErrorOnGrid() {
-		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, browserInfo, true, DriverMode.LOCAL, null, gridConnector));
+		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, browserInfo, true, DriverMode.LOCAL, gridConnector));
 		
 		when(browserInfo.getAllBrowserSubprocessPids(new ArrayList<>())).thenReturn(Arrays.asList(1000L));
 		when(capabilities.getCapability(SeleniumRobotCapabilityType.GRID_NODE_URL)).thenReturn("http://grid-node:5555");
@@ -581,7 +581,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
 	public void testMouseCoordinatesOnDesktopWithoutDesktop() throws Exception {
-		PowerMockito.when(MouseInfo.getPointerInfo()).thenThrow(HeadlessException.class);
+//		PowerMockito.when(MouseInfo.getPointerInfo()).thenThrow(HeadlessException.class);
 		
 		CustomEventFiringWebDriver.getMouseCoordinates(DriverMode.LOCAL, gridConnector);
 	}
@@ -663,7 +663,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
 	public void testLeftClickOnDesktopWithoutDesktop() throws Exception {
-		PowerMockito.whenNew(Robot.class).withNoArguments().thenThrow(AWTException.class);
+//		PowerMockito.whenNew(Robot.class).withNoArguments().thenThrow(AWTException.class);
 		
 		CustomEventFiringWebDriver.leftClicOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
 	}
@@ -754,7 +754,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
 	public void testDoubleClickOnDesktopWithoutDesktop() throws Exception {
-		PowerMockito.whenNew(Robot.class).withNoArguments().thenThrow(AWTException.class);
+//		PowerMockito.whenNew(Robot.class).withNoArguments().thenThrow(AWTException.class);
 		
 		CustomEventFiringWebDriver.doubleClickOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
 	}
@@ -853,7 +853,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
 	public void testRightClickOnDesktopWithoutDesktop() throws Exception {
-		PowerMockito.whenNew(Robot.class).withNoArguments().thenThrow(AWTException.class);
+//		PowerMockito.whenNew(Robot.class).withNoArguments().thenThrow(AWTException.class);
 		
 		CustomEventFiringWebDriver.rightClicOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
 	}
@@ -907,7 +907,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
 	public void testWriteToDesktopWithoutDesktop() throws Exception {
-		PowerMockito.whenNew(Keyboard.class).withNoArguments().thenThrow(AWTException.class);
+//		PowerMockito.whenNew(Keyboard.class).withNoArguments().thenThrow(AWTException.class);
 		
 		CustomEventFiringWebDriver.writeToDesktop("text", DriverMode.LOCAL, gridConnector);
 	}
@@ -984,7 +984,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
 	public void testSendKeysToDesktopWithoutDesktop() throws Exception {
-		PowerMockito.whenNew(Robot.class).withNoArguments().thenThrow(AWTException.class);
+//		PowerMockito.whenNew(Robot.class).withNoArguments().thenThrow(AWTException.class);
 		
 		CustomEventFiringWebDriver.sendKeysToDesktop(Arrays.asList(10, 20), DriverMode.LOCAL, gridConnector);
 	}
@@ -1135,7 +1135,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
 	public void testStartVideoCaptureToDesktopWithoutDesktop() throws Exception {
 		File videoFolder = File.createTempFile("video", ".avi").getParentFile();
-		PowerMockito.whenNew(VideoRecorder.class).withArguments(any(File.class), anyString()).thenThrow(HeadlessException.class);
+//		PowerMockito.whenNew(VideoRecorder.class).withArguments(any(File.class), anyString()).thenThrow(HeadlessException.class);
 
 		CustomEventFiringWebDriver.startVideoCapture(DriverMode.LOCAL, gridConnector, videoFolder, "video.avi");
 	}

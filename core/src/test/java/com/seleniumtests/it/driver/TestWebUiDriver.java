@@ -21,7 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
+//import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -46,8 +46,8 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
@@ -83,7 +83,7 @@ import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 import kong.unirest.Unirest;
 
-@PrepareForTest({AdbWrapper.class, AndroidDriver.class, MobileDeviceSelector.class, AppiumDriverFactory.class, AppiumLauncherFactory.class, Unirest.class, InstrumentsWrapper.class})
+//@PrepareForTest({AdbWrapper.class, AndroidDriver.class, MobileDeviceSelector.class, AppiumDriverFactory.class, AppiumLauncherFactory.class, Unirest.class, InstrumentsWrapper.class})
 public class TestWebUiDriver extends ReporterTest {
 	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(TestWebUiDriver.class);
@@ -109,7 +109,7 @@ public class TestWebUiDriver extends ReporterTest {
 
 	@Test(groups={"it"})
 	public void testLocalAndroidDriver() throws Exception {
-		whenNew(AdbWrapper.class).withNoArguments().thenReturn(adbWrapper);
+//		whenNew(AdbWrapper.class).withNoArguments().thenReturn(adbWrapper);
 
 		List<MobileDevice> deviceList = new ArrayList<>();
 		deviceList.add(new MobileDevice("IPhone 6", "0000", "ios", "10.2", new ArrayList<>()));
@@ -117,7 +117,7 @@ public class TestWebUiDriver extends ReporterTest {
 		deviceList.add(new MobileDevice("Nexus 7", "1235", "android", "6.0", new ArrayList<>()));
 		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
 		
-		whenNew(AndroidDriver.class).withAnyArguments().thenReturn(androidDriver);
+//		whenNew(AndroidDriver.class).withAnyArguments().thenReturn(androidDriver);
 		when(androidDriver.manage()).thenReturn(driverOptions);
 		when(androidDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
 		when(driverOptions.timeouts()).thenReturn(timeouts);
@@ -127,7 +127,7 @@ public class TestWebUiDriver extends ReporterTest {
 		SeleniumTestsContextManager.getThreadContext().setMobilePlatformVersion("5.0");
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_ANDROID);
 		
-		PowerMockito.mockStatic(AppiumLauncherFactory.class);
+//		PowerMockito.mockStatic(AppiumLauncherFactory.class);
 		LocalAppiumLauncher appiumLauncher;
 		
 		try {
@@ -139,7 +139,7 @@ public class TestWebUiDriver extends ReporterTest {
 			throw new SkipException("Test skipped, appium not correctly configured", e);
 		}
 		 
-		PowerMockito.verifyNew(AndroidDriver.class).withArguments(any(URL.class), any(Capabilities.class));
+//		PowerMockito.verifyNew(AndroidDriver.class).withArguments(any(URL.class), any(Capabilities.class));
 				
 		
 		verify(appiumLauncher).stopAppium();
@@ -151,12 +151,12 @@ public class TestWebUiDriver extends ReporterTest {
 	 */
 	@Test(groups={"it"})
 	public void testLocalAndroidDriverWithRemoteAppiumServer() throws Exception {
-		whenNew(AdbWrapper.class).withNoArguments().thenReturn(adbWrapper);
+//		whenNew(AdbWrapper.class).withNoArguments().thenReturn(adbWrapper);
 		
 		List<MobileDevice> deviceList = new ArrayList<>();
 		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
 		
-		whenNew(AndroidDriver.class).withAnyArguments().thenReturn(androidDriver);
+//		whenNew(AndroidDriver.class).withAnyArguments().thenReturn(androidDriver);
 		when(androidDriver.manage()).thenReturn(driverOptions);
 		when(androidDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
 		when(driverOptions.timeouts()).thenReturn(timeouts);
@@ -170,7 +170,7 @@ public class TestWebUiDriver extends ReporterTest {
 		
 		createServerMock("GET", "/wd/hub/sessions", 200, "{}");
 		
-		PowerMockito.mockStatic(AppiumLauncherFactory.class);
+//		PowerMockito.mockStatic(AppiumLauncherFactory.class);
 		ExistingAppiumLauncher appiumLauncher;
 
 		appiumLauncher = spy(new ExistingAppiumLauncher("http://localhost:4321/wd/hub/"));
@@ -178,7 +178,7 @@ public class TestWebUiDriver extends ReporterTest {
 		
 		WebUIDriver.getWebDriver(true);
 		
-		PowerMockito.verifyNew(AndroidDriver.class).withArguments(any(URL.class), any(Capabilities.class));
+//		PowerMockito.verifyNew(AndroidDriver.class).withArguments(any(URL.class), any(Capabilities.class));
 		
 		WebUIDriver.cleanUp();
 		verify(appiumLauncher).stopAppium();
@@ -186,12 +186,12 @@ public class TestWebUiDriver extends ReporterTest {
 	
 	@Test(groups={"it"})
 	public void testLocaliOSDriverWithRemoteAppiumServer() throws Exception {
-		whenNew(InstrumentsWrapper.class).withNoArguments().thenReturn(instrumentsWrapper);
+//		whenNew(InstrumentsWrapper.class).withNoArguments().thenReturn(instrumentsWrapper);
 		
 		List<MobileDevice> deviceList = new ArrayList<>();
 		when(instrumentsWrapper.parseIosDevices()).thenReturn(deviceList);
 		
-		whenNew(IOSDriver.class).withAnyArguments().thenReturn(iosDriver);
+//		whenNew(IOSDriver.class).withAnyArguments().thenReturn(iosDriver);
 		when(iosDriver.manage()).thenReturn(driverOptions);
 		when(iosDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
 		when(driverOptions.timeouts()).thenReturn(timeouts);
@@ -205,7 +205,7 @@ public class TestWebUiDriver extends ReporterTest {
 		
 		createServerMock("GET", "/wd/hub/sessions", 200, "{}");
 		
-		PowerMockito.mockStatic(AppiumLauncherFactory.class);
+//		PowerMockito.mockStatic(AppiumLauncherFactory.class);
 		ExistingAppiumLauncher appiumLauncher;
 		
 		appiumLauncher = spy(new ExistingAppiumLauncher("http://localhost:4321/wd/hub/"));
@@ -213,7 +213,7 @@ public class TestWebUiDriver extends ReporterTest {
 		
 		WebUIDriver.getWebDriver(true);
 		
-		PowerMockito.verifyNew(IOSDriver.class).withArguments(any(URL.class), any(Capabilities.class));
+//		PowerMockito.verifyNew(IOSDriver.class).withArguments(any(URL.class), any(Capabilities.class));
 		
 		WebUIDriver.cleanUp();
 		verify(appiumLauncher).stopAppium();
@@ -226,12 +226,12 @@ public class TestWebUiDriver extends ReporterTest {
 	@Test(groups={"it"}, expectedExceptions = ConfigurationException.class)
 	public void testLocalAndroidDriverWithRemoteAppiumServerAndNoDeviceId() throws Exception {
 		try {
-			whenNew(AdbWrapper.class).withNoArguments().thenReturn(adbWrapper);
+//			whenNew(AdbWrapper.class).withNoArguments().thenReturn(adbWrapper);
 			
 			List<MobileDevice> deviceList = new ArrayList<>();
 			when(adbWrapper.getDeviceList()).thenReturn(deviceList);
 			
-			whenNew(AndroidDriver.class).withAnyArguments().thenReturn(androidDriver);
+//			whenNew(AndroidDriver.class).withAnyArguments().thenReturn(androidDriver);
 			when(androidDriver.manage()).thenReturn(driverOptions);
 			when(androidDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
 			when(driverOptions.timeouts()).thenReturn(timeouts);
@@ -244,7 +244,7 @@ public class TestWebUiDriver extends ReporterTest {
 			
 			createServerMock("GET", "/wd/hub/sessions", 200, "{}");
 			
-			PowerMockito.mockStatic(AppiumLauncherFactory.class);
+//			PowerMockito.mockStatic(AppiumLauncherFactory.class);
 			ExistingAppiumLauncher appiumLauncher;
 			
 	

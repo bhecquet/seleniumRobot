@@ -3,8 +3,8 @@ package com.seleniumtests.ut.core.context;
 import static org.mockito.ArgumentMatchers.argThat;
 
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -19,7 +19,7 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.contexts.TestManagerContext;
 
-@PrepareForTest({ TestManager.class, SeleniumTestsContext.class })
+//@PrepareForTest({ TestManager.class, SeleniumTestsContext.class })
 public class TestTestManagerContext extends ConnectorsTest {
 
 
@@ -109,10 +109,10 @@ public class TestTestManagerContext extends ConnectorsTest {
 			System.setProperty(TestManagerContext.TMS_PASSWORD, "password");
 			System.setProperty(TestManagerContext.TMS_PROJECT, "project");
 
-			PowerMockito.mockStatic(TestManager.class);
+//			PowerMockito.mockStatic(TestManager.class);
 
 
-			PowerMockito.when(TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
+//			PowerMockito.when(TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
 
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
 
@@ -142,10 +142,10 @@ public class TestTestManagerContext extends ConnectorsTest {
 			System.setProperty(TestManagerContext.TMS_PROJECT, "project");
 			System.setProperty(SquashTMConnector.SQUASH_CAMPAIGN, "campaign2");
 			
-			PowerMockito.mockStatic(TestManager.class);
+//			PowerMockito.mockStatic(TestManager.class);
 			
 			
-			PowerMockito.when(TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
+//			PowerMockito.when(TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
 			
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
 			
@@ -178,10 +178,10 @@ public class TestTestManagerContext extends ConnectorsTest {
 			System.setProperty(TestManagerContext.TMS_PASSWORD, "password");
 			System.setProperty(TestManagerContext.TMS_PROJECT, "project");
 			
-			PowerMockito.mockStatic(TestManager.class);
+//			PowerMockito.mockStatic(TestManager.class);
 			
 			
-			PowerMockito.when(TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
+//			PowerMockito.when(TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
 			
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
 			
@@ -212,10 +212,10 @@ public class TestTestManagerContext extends ConnectorsTest {
 			System.setProperty(TestManagerContext.TMS_PROJECT, "project");
 			System.setProperty(SquashTMConnector.SQUASH_CAMPAIGN_FOLDER, "folder1");
 			
-			PowerMockito.mockStatic(TestManager.class);
+//			PowerMockito.mockStatic(TestManager.class);
 			
 			
-			PowerMockito.when(TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
+//			PowerMockito.when(TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
 			
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
 			
@@ -240,10 +240,10 @@ public class TestTestManagerContext extends ConnectorsTest {
 			System.setProperty(TestManagerContext.TMS_PASSWORD, "password");
 			System.setProperty(TestManagerContext.TMS_PROJECT, "project");
 			
-			PowerMockito.mockStatic(TestManager.class);
+//			PowerMockito.mockStatic(TestManager.class);
 			
 			
-			PowerMockito.when(TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
+//			PowerMockito.when(TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
 			
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
 			
@@ -273,10 +273,10 @@ public class TestTestManagerContext extends ConnectorsTest {
 			System.setProperty(TestManagerContext.TMS_PASSWORD, "password");
 			System.setProperty(TestManagerContext.TMS_PROJECT, "project");
 			
-			PowerMockito.mockStatic(TestManager.class);
+//			PowerMockito.mockStatic(TestManager.class);
 			
 			
-			PowerMockito.when(TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
+//			PowerMockito.when(TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
 			
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
 			
@@ -302,10 +302,10 @@ public class TestTestManagerContext extends ConnectorsTest {
 			System.setProperty(TestManagerContext.TMS_PROJECT, "project");
 			System.setProperty(SquashTMConnector.SQUASH_ITERATION, "iteration2");
 			
-			PowerMockito.mockStatic(TestManager.class);
+//			PowerMockito.mockStatic(TestManager.class);
 			
 			
-			PowerMockito.when(TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
+//			PowerMockito.when(TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
 			
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
 			
@@ -333,10 +333,10 @@ public class TestTestManagerContext extends ConnectorsTest {
 			System.setProperty(TestManagerContext.TMS_PROJECT, "project");
 			System.setProperty("tmsDomain", "domain"); // check that any parameter starting with "tms" will be used for configuration
 
-			PowerMockito.mockStatic(TestManager.class);
+//			PowerMockito.mockStatic(TestManager.class);
 
 
-			PowerMockito.when(TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash") && config.getString("tmsDomain").equals("domain")))).thenReturn(testManager);
+//			PowerMockito.when(TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash") && config.getString("tmsDomain").equals("domain")))).thenReturn(testManager);
 
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
 

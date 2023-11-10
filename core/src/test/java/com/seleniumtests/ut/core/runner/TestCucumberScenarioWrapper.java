@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeMethod;
@@ -42,7 +42,7 @@ import io.cucumber.testng.FeatureWrapper;
 import io.cucumber.testng.Pickle;
 import io.cucumber.testng.PickleWrapper;
 
-@PrepareForTest({Pickle.class})
+//@PrepareForTest({Pickle.class})
 public class TestCucumberScenarioWrapper extends MockitoTest {
 	
 	@Mock

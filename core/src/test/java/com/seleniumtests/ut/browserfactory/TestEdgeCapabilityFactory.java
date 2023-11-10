@@ -35,8 +35,8 @@ import org.openqa.selenium.Proxy;
 import org.openqa.selenium.edge.EdgeDriverService;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.remote.CapabilityType;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -55,7 +55,7 @@ import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.osutility.OSUtilityWindows;
 
-@PrepareForTest({OSUtility.class, OSUtilityFactory.class, EdgeCapabilitiesFactory.class})
+//@PrepareForTest({OSUtility.class, OSUtilityFactory.class, EdgeCapabilitiesFactory.class})
 public class TestEdgeCapabilityFactory extends MockitoTest {
 
 	private static final String BETA_VERSION = "118.0";
@@ -80,8 +80,8 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 	public void init() {
 		browserInfos = new HashMap<>();
 		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, "72.0", "", false)));
-		PowerMockito.mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
-		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion()).thenReturn(browserInfos);
+//		PowerMockito.mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
+//		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion()).thenReturn(browserInfos);
 		when(config.getTestContext()).thenReturn(context);
 		when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.NONE));
 		when(config.getPageLoadStrategy()).thenReturn(PageLoadStrategy.NORMAL);
@@ -101,7 +101,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
 		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, RELEASE_VERSION, "", false, false), 
 				new BrowserInfo(BrowserType.EDGE, BETA_VERSION, "", false, true)));
-		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
+//		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
 		
 		EdgeCapabilitiesFactory capaFactory = new EdgeCapabilitiesFactory(config);
 		capaFactory.createCapabilities();
@@ -118,7 +118,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
 		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, BETA_VERSION, "", false, true)));
-		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
+//		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
 		
 		EdgeCapabilitiesFactory capaFactory = new EdgeCapabilitiesFactory(config);
 		capaFactory.createCapabilities();
@@ -134,7 +134,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
 		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, RELEASE_VERSION, "", false, false), 
 				new BrowserInfo(BrowserType.EDGE, BETA_VERSION, "", false, true)));
-		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(true)).thenReturn(browserInfos);
+//		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(true)).thenReturn(browserInfos);
 		when(config.getBetaBrowser()).thenReturn(true);
 		
 		EdgeCapabilitiesFactory capaFactory = new EdgeCapabilitiesFactory(config);
@@ -152,7 +152,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
 		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, RELEASE_VERSION, "", false, false)));
-		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(true)).thenReturn(browserInfos);
+//		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(true)).thenReturn(browserInfos);
 		when(config.getBetaBrowser()).thenReturn(true);
 		
 		EdgeCapabilitiesFactory capaFactory = new EdgeCapabilitiesFactory(config);

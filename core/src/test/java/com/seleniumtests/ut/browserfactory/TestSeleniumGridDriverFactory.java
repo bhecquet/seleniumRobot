@@ -24,8 +24,8 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -46,7 +46,7 @@ import com.seleniumtests.util.logging.DebugMode;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 
-@PrepareForTest({SeleniumGridDriverFactory.class})
+//@PrepareForTest({SeleniumGridDriverFactory.class})
 public class TestSeleniumGridDriverFactory extends MockitoTest {
 
 	@Mock
@@ -127,7 +127,7 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 		when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1));
 		
 		// connect to grid
-		PowerMockito.whenNew(RemoteWebDriver.class).withAnyArguments().thenReturn(driver);
+//		PowerMockito.whenNew(RemoteWebDriver.class).withAnyArguments().thenReturn(driver);
 		SeleniumGridDriverFactory driverFactory = new SeleniumGridDriverFactory(config);
 		WebDriver newDriver = driverFactory.createWebDriver();
 		
@@ -154,7 +154,7 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 		when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1));
 		
 		// connect to grid
-		PowerMockito.whenNew(AndroidDriver.class).withAnyArguments().thenReturn(androidDriver);
+//		PowerMockito.whenNew(AndroidDriver.class).withAnyArguments().thenReturn(androidDriver);
 		SeleniumGridDriverFactory driverFactory = new SeleniumGridDriverFactory(config);
 		WebDriver newDriver = driverFactory.createWebDriver();
 
@@ -177,7 +177,7 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 		when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1));
 		
 		// connect to grid
-		PowerMockito.whenNew(IOSDriver.class).withAnyArguments().thenReturn(iosDriver);
+//		PowerMockito.whenNew(IOSDriver.class).withAnyArguments().thenReturn(iosDriver);
 		SeleniumGridDriverFactory driverFactory = new SeleniumGridDriverFactory(config);
 		WebDriver newDriver = driverFactory.createWebDriver();
 		
@@ -206,7 +206,7 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 			when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1));
 			
 			// connect to grid
-			PowerMockito.whenNew(RemoteWebDriver.class).withAnyArguments().thenReturn(driver);
+//			PowerMockito.whenNew(RemoteWebDriver.class).withAnyArguments().thenReturn(driver);
 			SeleniumGridDriverFactory driverFactory = new SeleniumGridDriverFactory(config);
 			driverFactory.createWebDriver();
 			
@@ -233,7 +233,7 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 			when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1));
 			
 			// connect to grid;
-			PowerMockito.whenNew(RemoteWebDriver.class).withParameterTypes(URL.class, Capabilities.class).withArguments(eq(new URL("http://localhost:1111/wd/hub")), any(DesiredCapabilities.class)).thenThrow(new WebDriverException(""));
+//			PowerMockito.whenNew(RemoteWebDriver.class).withParameterTypes(URL.class, Capabilities.class).withArguments(eq(new URL("http://localhost:1111/wd/hub")), any(DesiredCapabilities.class)).thenThrow(new WebDriverException(""));
 			new SeleniumGridDriverFactory(config).createWebDriver();
 			
 		} finally {
@@ -256,8 +256,8 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 		when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1, gridConnector2));
 		
 		// connect to grid. One driver for each connector so that it's easy to distinguish them
-		PowerMockito.whenNew(RemoteWebDriver.class).withParameterTypes(URL.class, Capabilities.class).withArguments(eq(new URL("http://localhost:1111/wd/hub")), any(DesiredCapabilities.class)).thenReturn(driver);
-		PowerMockito.whenNew(RemoteWebDriver.class).withParameterTypes(URL.class, Capabilities.class).withArguments(eq(new URL("http://localhost:2222/wd/hub")), any(DesiredCapabilities.class)).thenReturn(driver2);
+//		PowerMockito.whenNew(RemoteWebDriver.class).withParameterTypes(URL.class, Capabilities.class).withArguments(eq(new URL("http://localhost:1111/wd/hub")), any(DesiredCapabilities.class)).thenReturn(driver);
+//		PowerMockito.whenNew(RemoteWebDriver.class).withParameterTypes(URL.class, Capabilities.class).withArguments(eq(new URL("http://localhost:2222/wd/hub")), any(DesiredCapabilities.class)).thenReturn(driver2);
 		WebDriver newDriver = new SeleniumGridDriverFactory(config).createWebDriver();
 		Assert.assertNotNull(newDriver);
 	}
@@ -277,8 +277,8 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 		when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1, gridConnector2));
 		
 		// connect to grid. One driver for each connector so that it's easy to distinguish them
-		PowerMockito.whenNew(RemoteWebDriver.class).withParameterTypes(URL.class, Capabilities.class).withArguments(eq(new URL("http://localhost:1111/wd/hub")), any(DesiredCapabilities.class)).thenReturn(driver);
-		PowerMockito.whenNew(RemoteWebDriver.class).withParameterTypes(URL.class, Capabilities.class).withArguments(eq(new URL("http://localhost:2222/wd/hub")), any(DesiredCapabilities.class)).thenReturn(driver2);
+//		PowerMockito.whenNew(RemoteWebDriver.class).withParameterTypes(URL.class, Capabilities.class).withArguments(eq(new URL("http://localhost:1111/wd/hub")), any(DesiredCapabilities.class)).thenReturn(driver);
+//		PowerMockito.whenNew(RemoteWebDriver.class).withParameterTypes(URL.class, Capabilities.class).withArguments(eq(new URL("http://localhost:2222/wd/hub")), any(DesiredCapabilities.class)).thenReturn(driver2);
 		WebDriver newDriver = new SeleniumGridDriverFactory(config).createWebDriver();
 		Assert.assertNotNull(newDriver);
 		
@@ -303,8 +303,8 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 			when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1, gridConnector2));
 			
 			// first driver will create an exception
-			PowerMockito.whenNew(RemoteWebDriver.class).withParameterTypes(URL.class, Capabilities.class).withArguments(eq(new URL("http://localhost:1111/wd/hub")), any(DesiredCapabilities.class)).thenThrow(new WebDriverException(""));
-			PowerMockito.whenNew(RemoteWebDriver.class).withParameterTypes(URL.class, Capabilities.class).withArguments(eq(new URL("http://localhost:2222/wd/hub")), any(DesiredCapabilities.class)).thenReturn(driver2);
+//			PowerMockito.whenNew(RemoteWebDriver.class).withParameterTypes(URL.class, Capabilities.class).withArguments(eq(new URL("http://localhost:1111/wd/hub")), any(DesiredCapabilities.class)).thenThrow(new WebDriverException(""));
+//			PowerMockito.whenNew(RemoteWebDriver.class).withParameterTypes(URL.class, Capabilities.class).withArguments(eq(new URL("http://localhost:2222/wd/hub")), any(DesiredCapabilities.class)).thenReturn(driver2);
 			WebDriver newDriver = new SeleniumGridDriverFactory(config).createWebDriver();
 			Assert.assertNotNull(newDriver);
 			
@@ -334,7 +334,7 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 		when(config.getSeleniumGridConnector()).thenReturn(gridConnector1); // simulate a previously created driver
 		
 		// connect to grid
-		PowerMockito.whenNew(RemoteWebDriver.class).withAnyArguments().thenReturn(driver);
+//		PowerMockito.whenNew(RemoteWebDriver.class).withAnyArguments().thenReturn(driver);
 		SeleniumGridDriverFactory driverFactory = new SeleniumGridDriverFactory(config);
 		WebDriver newDriver = driverFactory.createWebDriver();
 		
@@ -361,7 +361,7 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 		when(config.getSeleniumGridConnector()).thenReturn(gridConnector1); // simulate a previously created driver
 		
 	
-		DesiredCapabilities caps = new SeleniumGridDriverFactory(config).createSpecificGridCapabilities(config);
+		MutableCapabilities caps = new SeleniumGridDriverFactory(config).createSpecificGridCapabilities(config);
 		Assert.assertEquals(caps.getCapability(SeleniumRobotCapabilityType.ATTACH_SESSION_ON_NODE), "http://localhost:5556/");
 	}
 	
@@ -383,8 +383,8 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 		when(config.getSeleniumGridConnector()).thenReturn(gridConnector2); // simulate a previously created driver
 
 		// connect to grid
-		PowerMockito.whenNew(RemoteWebDriver.class)
-						.withAnyArguments().thenReturn(driver);
+//		PowerMockito.whenNew(RemoteWebDriver.class)
+//						.withAnyArguments().thenReturn(driver);
 		SeleniumGridDriverFactory driverFactory = new SeleniumGridDriverFactory(config);
 		WebDriver newDriver = driverFactory.createWebDriver();
 		Assert.assertNotNull(newDriver);
@@ -412,7 +412,7 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 			when(config.getSeleniumGridConnector()).thenReturn(null);			// simulate the case where no previous driver was created
 			
 			// connect to grid
-			PowerMockito.whenNew(RemoteWebDriver.class).withAnyArguments().thenReturn(driver);
+//			PowerMockito.whenNew(RemoteWebDriver.class).withAnyArguments().thenReturn(driver);
 			new SeleniumGridDriverFactory(config).createWebDriver();
 
 		} finally {

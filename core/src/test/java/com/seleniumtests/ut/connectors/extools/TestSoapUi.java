@@ -28,8 +28,8 @@ import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.Platform;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -40,12 +40,12 @@ import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.OSUtility;
 
 
-@PrepareForTest({OSCommand.class, SoapUi.class})
+//@PrepareForTest({OSCommand.class, SoapUi.class})
 public class TestSoapUi extends MockitoTest {
 
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testNoSoapUiEnvVar() {
-		PowerMockito.mockStatic(System.class);
+//		PowerMockito.mockStatic(System.class);
 		when(System.getenv("SOAPUI_HOME")).thenReturn(null);
 		new SoapUi();	
 	}
@@ -56,7 +56,7 @@ public class TestSoapUi extends MockitoTest {
 		File runner = Paths.get(tmp.getAbsolutePath(), "ban", "testrunner.bat").toFile();
 		FileUtils.write(runner, "rem", StandardCharsets.UTF_8);
 		
-		PowerMockito.mockStatic(System.class);
+//		PowerMockito.mockStatic(System.class);
 		when(System.getenv("SOAPUI_HOME")).thenReturn(tmp.getAbsolutePath());
 		new SoapUi();	
 	}
@@ -67,7 +67,7 @@ public class TestSoapUi extends MockitoTest {
 		File runner = Paths.get(tmp.getAbsolutePath(), "bin", "testrunner.bat").toFile();
 		FileUtils.write(runner, "rem", StandardCharsets.UTF_8);
 		
-		PowerMockito.mockStatic(System.class);
+//		PowerMockito.mockStatic(System.class);
 		when(System.getenv("SOAPUI_HOME")).thenReturn(tmp.getAbsolutePath());
 		new SoapUi();	
 	}
@@ -78,8 +78,8 @@ public class TestSoapUi extends MockitoTest {
 		File runner = Paths.get(tmp.getAbsolutePath(), "bin", "testrunner.bat").toFile();
 		FileUtils.write(runner, "rem", StandardCharsets.UTF_8);
 		
-		PowerMockito.mockStatic(System.class);
-		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(System.class);
+//		PowerMockito.mockStatic(OSCommand.class);
 		when(System.getenv("SOAPUI_HOME")).thenReturn(tmp.getAbsolutePath());
 		SoapUi soapui = new SoapUi();	
 		when(OSCommand.executeCommandAndWait(any(String[].class))).thenReturn("ok");
@@ -99,8 +99,8 @@ public class TestSoapUi extends MockitoTest {
 		File project = Paths.get(tmp.getAbsolutePath(), "project.xml").toFile();
 		FileUtils.write(project, "<xml></xml>", StandardCharsets.UTF_8);
 		
-		PowerMockito.mockStatic(System.class);
-		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(System.class);
+//		PowerMockito.mockStatic(OSCommand.class);
 		when(System.getenv("SOAPUI_HOME")).thenReturn(tmp.getAbsolutePath());
 		SoapUi soapui = new SoapUi();	
 		when(OSCommand.executeCommandAndWait(new String[] {runner.getAbsolutePath(), project.getAbsolutePath()})).thenReturn("ok");

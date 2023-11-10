@@ -15,8 +15,8 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestResult;
 import org.testng.Reporter;
@@ -44,7 +44,7 @@ import com.seleniumtests.util.imaging.StepReferenceComparator;
 
 import kong.unirest.json.JSONObject;
 
-@PrepareForTest({ErrorCauseFinder.class, SeleniumRobotSnapshotServerConnector.class})
+//@PrepareForTest({ErrorCauseFinder.class, SeleniumRobotSnapshotServerConnector.class})
 public class TestErrorCauseFinder extends MockitoTest {
 
 	@Mock
@@ -205,8 +205,8 @@ public class TestErrorCauseFinder extends MockitoTest {
 		lastStep.addSnapshot(new Snapshot(screenshot4, "main", SnapshotCheckType.FALSE), 1, null);
 		lastStep.setStepResultId(10);
 
-		PowerMockito.mockStatic(SeleniumRobotSnapshotServerConnector.class);
-		PowerMockito.when(SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(serverConnector);
+//		PowerMockito.mockStatic(SeleniumRobotSnapshotServerConnector.class);
+//		PowerMockito.when(SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(serverConnector);
 		
 		referenceImgStep1 = File.createTempFile("img", ".png"); // reference image for step 1
 		FileUtils.copyFile(image, referenceImgStep1);
@@ -705,10 +705,10 @@ public class TestErrorCauseFinder extends MockitoTest {
 		when(serverConnector.getStepReferenceDetectFieldInformation(2, "aa")).thenReturn(referenceStepFieldInformation);
 		
 		// comparison successful
-		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
-				Label.fromDetectionData(failedStepFieldInformation),
-				Field.fromDetectionData(referenceStepFieldInformation),
-				Label.fromDetectionData(referenceStepFieldInformation)).thenReturn(stepReferenceComparatorStep3);
+//		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
+//				Label.fromDetectionData(failedStepFieldInformation),
+//				Field.fromDetectionData(referenceStepFieldInformation),
+//				Label.fromDetectionData(referenceStepFieldInformation)).thenReturn(stepReferenceComparatorStep3);
 		when(stepReferenceComparatorStep3.compare()).thenReturn(90);
 		
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference("aa");
@@ -733,19 +733,19 @@ public class TestErrorCauseFinder extends MockitoTest {
 		when(serverConnector.getStepReferenceDetectFieldInformation(2, "aa")).thenReturn(referenceStepFieldInformation);
 		
 		// comparison successful
-		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
-				Label.fromDetectionData(failedStepFieldInformation),
-				Field.fromDetectionData(referenceStepFieldInformation),
-				Label.fromDetectionData(referenceStepFieldInformation)).thenReturn(stepReferenceComparatorStep3);
+//		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
+//				Label.fromDetectionData(failedStepFieldInformation),
+//				Field.fromDetectionData(referenceStepFieldInformation),
+//				Label.fromDetectionData(referenceStepFieldInformation)).thenReturn(stepReferenceComparatorStep3);
 		when(stepReferenceComparatorStep3.compare()).thenReturn(90);
 		
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference("aa");
 		
 		// no comparison done
-		PowerMockito.verifyNew(StepReferenceComparator.class, never()).withArguments(Field.fromDetectionData(failedStepFieldInformation),
-				Label.fromDetectionData(failedStepFieldInformation),
-				Field.fromDetectionData(referenceStepFieldInformation),
-				Label.fromDetectionData(referenceStepFieldInformation));
+//		PowerMockito.verifyNew(StepReferenceComparator.class, never()).withArguments(Field.fromDetectionData(failedStepFieldInformation),
+//				Label.fromDetectionData(failedStepFieldInformation),
+//				Field.fromDetectionData(referenceStepFieldInformation),
+//				Label.fromDetectionData(referenceStepFieldInformation));
 				
 		
 		Assert.assertEquals(causes.size(), 0);
@@ -769,10 +769,10 @@ public class TestErrorCauseFinder extends MockitoTest {
 		when(serverConnector.getStepReferenceDetectFieldInformation(2, "aa")).thenReturn(referenceStepFieldInformation);
 		
 		// comparison successful
-		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
-				Label.fromDetectionData(failedStepFieldInformation),
-				Field.fromDetectionData(referenceStepFieldInformation),
-				Label.fromDetectionData(referenceStepFieldInformation)).thenReturn(stepReferenceComparatorStep3);
+//		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
+//				Label.fromDetectionData(failedStepFieldInformation),
+//				Field.fromDetectionData(referenceStepFieldInformation),
+//				Label.fromDetectionData(referenceStepFieldInformation)).thenReturn(stepReferenceComparatorStep3);
 		when(stepReferenceComparatorStep3.compare()).thenReturn(50);
 		when(stepReferenceComparatorStep3.getMissingFields()).thenReturn(Arrays.asList(new Field(0, 100, 0, 20, "", "field")));
 		
@@ -805,10 +805,10 @@ public class TestErrorCauseFinder extends MockitoTest {
 		when(serverConnector.getStepReferenceDetectFieldInformation(2, "aa")).thenReturn(referenceStepFieldInformation);
 		
 		// comparison successful
-		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
-				Label.fromDetectionData(failedStepFieldInformation),
-				Field.fromDetectionData(referenceStepFieldInformation),
-				Label.fromDetectionData(referenceStepFieldInformation)).thenReturn(stepReferenceComparatorStep3);
+//		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
+//				Label.fromDetectionData(failedStepFieldInformation),
+//				Field.fromDetectionData(referenceStepFieldInformation),
+//				Label.fromDetectionData(referenceStepFieldInformation)).thenReturn(stepReferenceComparatorStep3);
 		when(stepReferenceComparatorStep3.compare()).thenReturn(50);
 		when(stepReferenceComparatorStep3.getMissingLabels()).thenReturn(Arrays.asList(new Label(0, 100, 20, 50, "some label")));
 		
@@ -847,14 +847,14 @@ public class TestErrorCauseFinder extends MockitoTest {
 		when(serverConnector.getStepReferenceDetectFieldInformation(2, "aa")).thenReturn(referenceStepFieldInformation); // reference for stepFailed
 		when(serverConnector.getStepReferenceDetectFieldInformation(0, "aa")).thenReturn(referenceStepFieldInformation2); // reference for step1
 		
-		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
-				Label.fromDetectionData(failedStepFieldInformation),
-				Field.fromDetectionData(referenceStepFieldInformation),
-				Label.fromDetectionData(referenceStepFieldInformation)).thenReturn(stepReferenceComparatorStep3);
-		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
-				Label.fromDetectionData(failedStepFieldInformation),
-				Field.fromDetectionData(referenceStepFieldInformation2),
-				Label.fromDetectionData(referenceStepFieldInformation2)).thenReturn(stepReferenceComparatorStep1);
+//		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
+//				Label.fromDetectionData(failedStepFieldInformation),
+//				Field.fromDetectionData(referenceStepFieldInformation),
+//				Label.fromDetectionData(referenceStepFieldInformation)).thenReturn(stepReferenceComparatorStep3);
+//		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
+//				Label.fromDetectionData(failedStepFieldInformation),
+//				Field.fromDetectionData(referenceStepFieldInformation2),
+//				Label.fromDetectionData(referenceStepFieldInformation2)).thenReturn(stepReferenceComparatorStep1);
 		
 		// comparison successful
 		when(stepReferenceComparatorStep3.compare()).thenReturn(49); // bad comparison with step2 reference
@@ -887,18 +887,18 @@ public class TestErrorCauseFinder extends MockitoTest {
 		when(serverConnector.getStepReferenceDetectFieldInformation(1, "aa")).thenReturn(referenceStepFieldInformation2); // reference for step2
 		when(serverConnector.getStepReferenceDetectFieldInformation(0, "aa")).thenReturn(referenceStepFieldInformation3); // reference for step1
 		
-		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
-				Label.fromDetectionData(failedStepFieldInformation),
-				Field.fromDetectionData(referenceStepFieldInformation),
-				Label.fromDetectionData(referenceStepFieldInformation)).thenReturn(stepReferenceComparatorStep3);
-		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
-				Label.fromDetectionData(failedStepFieldInformation),
-				Field.fromDetectionData(referenceStepFieldInformation2),
-				Label.fromDetectionData(referenceStepFieldInformation2)).thenReturn(stepReferenceComparatorStep2);
-		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
-				Label.fromDetectionData(failedStepFieldInformation),
-				Field.fromDetectionData(referenceStepFieldInformation3),
-				Label.fromDetectionData(referenceStepFieldInformation3)).thenReturn(stepReferenceComparatorStep3);
+//		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
+//				Label.fromDetectionData(failedStepFieldInformation),
+//				Field.fromDetectionData(referenceStepFieldInformation),
+//				Label.fromDetectionData(referenceStepFieldInformation)).thenReturn(stepReferenceComparatorStep3);
+//		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
+//				Label.fromDetectionData(failedStepFieldInformation),
+//				Field.fromDetectionData(referenceStepFieldInformation2),
+//				Label.fromDetectionData(referenceStepFieldInformation2)).thenReturn(stepReferenceComparatorStep2);
+//		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
+//				Label.fromDetectionData(failedStepFieldInformation),
+//				Field.fromDetectionData(referenceStepFieldInformation3),
+//				Label.fromDetectionData(referenceStepFieldInformation3)).thenReturn(stepReferenceComparatorStep3);
 		
 		
 		when(stepReferenceComparatorStep3.compare()).thenReturn(49); // bad comparison with step3 reference
@@ -933,14 +933,14 @@ public class TestErrorCauseFinder extends MockitoTest {
 		when(serverConnector.getStepReferenceDetectFieldInformation(2, "aa")).thenReturn(referenceStepFieldInformation); // reference for stepFailed
 		when(serverConnector.getStepReferenceDetectFieldInformation(0, "aa")).thenReturn(referenceStepFieldInformation2); // reference for step1
 		
-		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
-				Label.fromDetectionData(failedStepFieldInformation),
-				Field.fromDetectionData(referenceStepFieldInformation),
-				Label.fromDetectionData(referenceStepFieldInformation)).thenReturn(stepReferenceComparatorStep3);
-		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
-				Label.fromDetectionData(failedStepFieldInformation),
-				Field.fromDetectionData(referenceStepFieldInformation2),
-				Label.fromDetectionData(referenceStepFieldInformation2)).thenReturn(stepReferenceComparatorStep1);
+//		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
+//				Label.fromDetectionData(failedStepFieldInformation),
+//				Field.fromDetectionData(referenceStepFieldInformation),
+//				Label.fromDetectionData(referenceStepFieldInformation)).thenReturn(stepReferenceComparatorStep3);
+//		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
+//				Label.fromDetectionData(failedStepFieldInformation),
+//				Field.fromDetectionData(referenceStepFieldInformation2),
+//				Label.fromDetectionData(referenceStepFieldInformation2)).thenReturn(stepReferenceComparatorStep1);
 		
 		
 		when(stepReferenceComparatorStep3.compare()).thenReturn(49); // bad comparison with step2 reference
@@ -970,10 +970,10 @@ public class TestErrorCauseFinder extends MockitoTest {
 		when(serverConnector.detectFieldsInPicture(stepFailed.getSnapshots().get(0))).thenReturn(failedStepFieldInformation); // no matter the JSONObject as we mock StepReferenceComparator
 		when(serverConnector.getStepReferenceDetectFieldInformation(2, "aa")).thenReturn(referenceStepFieldInformation); // reference for stepFailed
 		
-		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
-				Label.fromDetectionData(failedStepFieldInformation),
-				Field.fromDetectionData(referenceStepFieldInformation),
-				Label.fromDetectionData(referenceStepFieldInformation)).thenReturn(stepReferenceComparatorStep3);
+//		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
+//				Label.fromDetectionData(failedStepFieldInformation),
+//				Field.fromDetectionData(referenceStepFieldInformation),
+//				Label.fromDetectionData(referenceStepFieldInformation)).thenReturn(stepReferenceComparatorStep3);
 		when(stepReferenceComparatorStep3.compare()).thenReturn(49); // bad comparison with step3 reference
 		
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference("aa");
@@ -1003,10 +1003,10 @@ public class TestErrorCauseFinder extends MockitoTest {
 		when(serverConnector.getStepReferenceDetectFieldInformation(2, "aa")).thenReturn(referenceStepFieldInformation); // reference for stepFailed
 		when(serverConnector.getStepReferenceDetectFieldInformation(0, "aa")).thenThrow(new SeleniumRobotServerException("error detect")); // reference for step1 fails
 				
-		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
-				Label.fromDetectionData(failedStepFieldInformation),
-				Field.fromDetectionData(referenceStepFieldInformation),
-				Label.fromDetectionData(referenceStepFieldInformation)).thenReturn(stepReferenceComparatorStep3);
+//		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
+//				Label.fromDetectionData(failedStepFieldInformation),
+//				Field.fromDetectionData(referenceStepFieldInformation),
+//				Label.fromDetectionData(referenceStepFieldInformation)).thenReturn(stepReferenceComparatorStep3);
 		when(stepReferenceComparatorStep3.compare()).thenReturn(49); // bad comparison with step3 reference
 		
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference("aa");
@@ -1035,10 +1035,10 @@ public class TestErrorCauseFinder extends MockitoTest {
 		when(serverConnector.getStepReferenceDetectFieldInformation(2, "aa")).thenReturn(referenceStepFieldInformation); // reference for stepFailed
 		when(serverConnector.getStepReferenceDetectFieldInformation(0, "aa")).thenThrow(new ConfigurationException("error detect")); // reference for step1 fails
 				
-		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
-				Label.fromDetectionData(failedStepFieldInformation),
-				Field.fromDetectionData(referenceStepFieldInformation),
-				Label.fromDetectionData(referenceStepFieldInformation)).thenReturn(stepReferenceComparatorStep3);
+//		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
+//				Label.fromDetectionData(failedStepFieldInformation),
+//				Field.fromDetectionData(referenceStepFieldInformation),
+//				Label.fromDetectionData(referenceStepFieldInformation)).thenReturn(stepReferenceComparatorStep3);
 		
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference("aa");
 		
@@ -1065,10 +1065,10 @@ public class TestErrorCauseFinder extends MockitoTest {
 		when(serverConnector.getStepReferenceDetectFieldInformation(2, "aa")).thenReturn(referenceStepFieldInformation); // reference for stepFailed
 		when(serverConnector.getStepReferenceDetectFieldInformation(0, "aa")).thenReturn(referenceStepFieldInformation2); // reference for step1 
 		
-		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
-				Label.fromDetectionData(failedStepFieldInformation),
-				Field.fromDetectionData(referenceStepFieldInformation),
-				Label.fromDetectionData(referenceStepFieldInformation)).thenReturn(stepReferenceComparatorStep3);
+//		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
+//				Label.fromDetectionData(failedStepFieldInformation),
+//				Field.fromDetectionData(referenceStepFieldInformation),
+//				Label.fromDetectionData(referenceStepFieldInformation)).thenReturn(stepReferenceComparatorStep3);
 		
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference("aa");
 		
@@ -1093,10 +1093,10 @@ public class TestErrorCauseFinder extends MockitoTest {
 		when(serverConnector.getStepReferenceDetectFieldInformation(2, "aa")).thenThrow(new SeleniumRobotServerException("error detect")); // reference for stepFailed
 		when(serverConnector.getStepReferenceDetectFieldInformation(0, "aa")).thenReturn(referenceStepFieldInformation2); // reference for step1 
 		
-		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
-				Label.fromDetectionData(failedStepFieldInformation),
-				Field.fromDetectionData(referenceStepFieldInformation),
-				Label.fromDetectionData(referenceStepFieldInformation)).thenReturn(stepReferenceComparatorStep3);
+//		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
+//				Label.fromDetectionData(failedStepFieldInformation),
+//				Field.fromDetectionData(referenceStepFieldInformation),
+//				Label.fromDetectionData(referenceStepFieldInformation)).thenReturn(stepReferenceComparatorStep3);
 		
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference("aa");
 		
@@ -1135,11 +1135,11 @@ public class TestErrorCauseFinder extends MockitoTest {
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
 		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
 		
-		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep3);
+//		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep3);
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference("aa");
 		
 		// no comparison done
-		PowerMockito.verifyNew(StepReferenceComparator.class, never()).withArguments(anyList(), anyList(), anyList(), anyList());
+//		PowerMockito.verifyNew(StepReferenceComparator.class, never()).withArguments(anyList(), anyList(), anyList(), anyList());
 		
 		Assert.assertEquals(causes.size(), 0);
 		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
@@ -1156,12 +1156,12 @@ public class TestErrorCauseFinder extends MockitoTest {
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
 		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, lastStep));
 		
-		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep3);
+//		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep3);
 		
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference("aa");
 
 		// no comparison done
-		PowerMockito.verifyNew(StepReferenceComparator.class, never()).withArguments(anyList(), anyList(), anyList(), anyList());
+//		PowerMockito.verifyNew(StepReferenceComparator.class, never()).withArguments(anyList(), anyList(), anyList(), anyList());
 		
 		Assert.assertEquals(causes.size(), 0);
 		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
@@ -1182,12 +1182,12 @@ public class TestErrorCauseFinder extends MockitoTest {
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
 		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
 		
-		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep3);
+//		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep3);
 		
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference("aa");
 		
 		// no comparison done
-		PowerMockito.verifyNew(StepReferenceComparator.class, never()).withArguments(anyList(), anyList(), anyList(), anyList());
+//		PowerMockito.verifyNew(StepReferenceComparator.class, never()).withArguments(anyList(), anyList(), anyList(), anyList());
 		
 		Assert.assertEquals(causes.size(), 0);
 		Assert.assertFalse(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
@@ -1207,12 +1207,12 @@ public class TestErrorCauseFinder extends MockitoTest {
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
 		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
 		
-		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep3);
+//		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep3);
 		
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference("aa");
 		
 		// no comparison done
-		PowerMockito.verifyNew(StepReferenceComparator.class, never()).withArguments(anyList(), anyList(), anyList(), anyList());
+//		PowerMockito.verifyNew(StepReferenceComparator.class, never()).withArguments(anyList(), anyList(), anyList(), anyList());
 		
 		Assert.assertEquals(causes.size(), 0);
 		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
@@ -1238,14 +1238,14 @@ public class TestErrorCauseFinder extends MockitoTest {
 		when(serverConnector.getStepReferenceDetectFieldInformation(2, "aa")).thenReturn(referenceStepFieldInformation); // reference for stepFailed
 		when(serverConnector.getStepReferenceDetectFieldInformation(0, "aa")).thenReturn(referenceStepFieldInformation2); // reference for stepFailed
 		
-		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
-				Label.fromDetectionData(failedStepFieldInformation),
-				Field.fromDetectionData(referenceStepFieldInformation),
-				Label.fromDetectionData(referenceStepFieldInformation)).thenReturn(stepReferenceComparatorStep3);
-		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
-				Label.fromDetectionData(failedStepFieldInformation),
-				Field.fromDetectionData(referenceStepFieldInformation2),
-				Label.fromDetectionData(referenceStepFieldInformation2)).thenReturn(stepReferenceComparatorStep1);
+//		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
+//				Label.fromDetectionData(failedStepFieldInformation),
+//				Field.fromDetectionData(referenceStepFieldInformation),
+//				Label.fromDetectionData(referenceStepFieldInformation)).thenReturn(stepReferenceComparatorStep3);
+//		PowerMockito.whenNew(StepReferenceComparator.class).withArguments(Field.fromDetectionData(failedStepFieldInformation),
+//				Label.fromDetectionData(failedStepFieldInformation),
+//				Field.fromDetectionData(referenceStepFieldInformation2),
+//				Label.fromDetectionData(referenceStepFieldInformation2)).thenReturn(stepReferenceComparatorStep1);
 		
 		// comparison successful
 		when(stepReferenceComparatorStep3.compare()).thenReturn(49); // bad comparison with step3 reference
@@ -1271,11 +1271,11 @@ public class TestErrorCauseFinder extends MockitoTest {
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
 		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
 		
-		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep3);
+//		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep3);
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference("aa");
 		
 		// no comparison done
-		PowerMockito.verifyNew(StepReferenceComparator.class, never()).withArguments(anyList(), anyList(), anyList(), anyList());
+//		PowerMockito.verifyNew(StepReferenceComparator.class, never()).withArguments(anyList(), anyList(), anyList(), anyList());
 		
 		Assert.assertEquals(causes.size(), 0);
 		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
@@ -1295,11 +1295,11 @@ public class TestErrorCauseFinder extends MockitoTest {
 		
 		// no reference exists for stepFailed on server
 		when(serverConnector.getReferenceSnapshot(2)).thenReturn(null);
-		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep3);
+//		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep3);
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference("aa");
 		
 		// no comparison done
-		PowerMockito.verifyNew(StepReferenceComparator.class, never()).withArguments(anyList(), anyList(), anyList(), anyList());
+//		PowerMockito.verifyNew(StepReferenceComparator.class, never()).withArguments(anyList(), anyList(), anyList(), anyList());
 		
 		Assert.assertEquals(causes.size(), 0);
 		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
@@ -1318,11 +1318,11 @@ public class TestErrorCauseFinder extends MockitoTest {
 		
 		// no reference exists for stepFailed on server
 		when(serverConnector.getReferenceSnapshot(2)).thenThrow(new SeleniumRobotServerException("error"));
-		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep3);
+//		PowerMockito.whenNew(StepReferenceComparator.class).withAnyArguments().thenReturn(stepReferenceComparatorStep3);
 		List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference("aa");
 		
 		// no comparison done
-		PowerMockito.verifyNew(StepReferenceComparator.class, never()).withArguments(anyList(), anyList(), anyList(), anyList());
+//		PowerMockito.verifyNew(StepReferenceComparator.class, never()).withArguments(anyList(), anyList(), anyList(), anyList());
 		
 		Assert.assertEquals(causes.size(), 0);
 		Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));

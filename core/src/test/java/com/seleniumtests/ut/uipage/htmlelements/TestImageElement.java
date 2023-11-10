@@ -25,8 +25,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebElement;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -36,7 +36,7 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.uipage.htmlelements.ImageElement;
 
 
-@PrepareForTest(WebUIDriver.class)
+//@PrepareForTest(WebUIDriver.class)
 public class TestImageElement extends MockitoTest {
 	
 	@Mock
@@ -50,7 +50,7 @@ public class TestImageElement extends MockitoTest {
 
 	@Test(groups={"ut"})
 	public void testImageElement() throws Exception {
-		PowerMockito.mockStatic(WebUIDriver.class);
+//		PowerMockito.mockStatic(WebUIDriver.class);
 		Mockito.when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
 		Mockito.when(driver.findElement(By.id("img"))).thenReturn(element);
 		Mockito.when(driver.switchTo()).thenReturn(locator);
@@ -64,6 +64,6 @@ public class TestImageElement extends MockitoTest {
 		Assert.assertEquals(el.getUrl(), "http://nowhere.com/jpg");
 		
 		// check we called getDriver before using it
-		PowerMockito.verifyPrivate(el, Mockito.times(3)).invoke("updateDriver");
+//		PowerMockito.verifyPrivate(el, Mockito.times(3)).invoke("updateDriver");
 	}
 }

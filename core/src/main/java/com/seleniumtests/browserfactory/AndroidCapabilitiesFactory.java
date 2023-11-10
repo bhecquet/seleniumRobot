@@ -17,12 +17,11 @@
  */
 package com.seleniumtests.browserfactory;
 
+import io.appium.java_client.android.options.UiAutomator2Options;
 import org.openqa.selenium.MutableCapabilities;
 
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
-
-import io.appium.java_client.remote.AndroidMobileCapabilityType;
 
 /**
  * Sets Android capabilities.
@@ -35,11 +34,7 @@ public class AndroidCapabilitiesFactory extends IMobileCapabilityFactory {
 
 	@Override
 	protected String getAutomationName() {
-		if (webDriverConfig.getMobilePlatformVersion() != null && Integer.parseInt(webDriverConfig.getMobilePlatformVersion().split("\\.")[0]) < 4) {
-    		return "Selendroid";
-		} else if (webDriverConfig.getMobilePlatformVersion() != null && Integer.parseInt(webDriverConfig.getMobilePlatformVersion().split("\\.")[0]) < 6) {
-    		return "UiAutomator1";
-    	} else if (webDriverConfig.getAutomationName() == null) {
+		if (webDriverConfig.getAutomationName() == null) {
     		return "Appium";
     	} else {
     		return webDriverConfig.getAutomationName();
@@ -48,20 +43,21 @@ public class AndroidCapabilitiesFactory extends IMobileCapabilityFactory {
 
 	@Override
 	protected MutableCapabilities getSystemSpecificCapabilities() {
-		MutableCapabilities capabilities = new MutableCapabilities();
-		  
+
     	// automatically hide keyboard
 //    	capabilities.setCapability(AndroidMobileCapabilityType.RESET_KEYBOARD, true);
 //    	capabilities.setCapability(AndroidMobileCapabilityType.UNICODE_KEYBOARD, true);
 
-        capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + AndroidMobileCapabilityType.APP_PACKAGE, webDriverConfig.getAppPackage());
-        capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + AndroidMobileCapabilityType.APP_ACTIVITY, webDriverConfig.getAppActivity());
-        
+		UiAutomator2Options options = new UiAutomator2Options()
+				.setAppPackage(webDriverConfig.getAppPackage())
+				.setAppActivity(webDriverConfig.getAppActivity())
+				.setDeviceName(webDriverConfig.getDeviceName());
+
         if (webDriverConfig.getAppWaitActivity() != null) {
-        	capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + AndroidMobileCapabilityType.APP_WAIT_ACTIVITY, webDriverConfig.getAppWaitActivity());
+			options.setAppWaitActivity(webDriverConfig.getAppWaitActivity());
         }
         
-        return capabilities;
+        return options;
 	}
 
 	@Override

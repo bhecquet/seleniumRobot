@@ -23,8 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -36,7 +36,7 @@ import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.osutility.OSCommand;
 
-@PrepareForTest({ExternalTool.class, FileUtility.class, OSCommand.class})
+//@PrepareForTest({ExternalTool.class, FileUtility.class, OSCommand.class})
 public class TestExternalTool extends MockitoTest {
 	
 	@Mock
@@ -44,18 +44,18 @@ public class TestExternalTool extends MockitoTest {
 	
 	@BeforeMethod(groups={"ut"})
 	public void init() throws Exception {
-		PowerMockito.spy(ExternalTool.class);
-		PowerMockito.spy(FileUtility.class);
+//		PowerMockito.spy(ExternalTool.class);
+//		PowerMockito.spy(FileUtility.class);
 		
 		Map<String, String> env = new HashMap<>();
 		env.put("JAVA_HOME", "/usr/bin/java");
 		env.put("SELENIUM_TOOL_MyTool", "/opt/mytool/mytool");
 		env.put("SELENIUM_TOOL_MyOtherTool", "/opt/mytool/myothertool");
 		
-		PowerMockito.when(ExternalTool.readEnvVariables()).thenReturn(env);
+//		PowerMockito.when(ExternalTool.readEnvVariables()).thenReturn(env);
 		
-		PowerMockito.when(FileUtility.fileExists("/opt/mytool/mytool")).thenReturn(true);
-		PowerMockito.when(FileUtility.fileExists("/opt/mytool/myothertool")).thenReturn(false);
+//		PowerMockito.when(FileUtility.fileExists("/opt/mytool/mytool")).thenReturn(true);
+//		PowerMockito.when(FileUtility.fileExists("/opt/mytool/myothertool")).thenReturn(false);
 		
 	}
 	
@@ -92,8 +92,8 @@ public class TestExternalTool extends MockitoTest {
 
 	@Test(groups={"ut"})
 	public void testStartProgram() {
-		PowerMockito.mockStatic(OSCommand.class);
-		PowerMockito.when(OSCommand.executeCommand(new String[] {"/opt/mytool/mytool"})).thenReturn(process);
+//		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.when(OSCommand.executeCommand(new String[] {"/opt/mytool/mytool"})).thenReturn(process);
 		
 		ExternalTool tool = new ExternalTool("MyTool").start();
 		Assert.assertTrue(tool.isStarted());
@@ -101,8 +101,8 @@ public class TestExternalTool extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testStopProgram() {
-		PowerMockito.mockStatic(OSCommand.class);
-		PowerMockito.when(OSCommand.executeCommand(new String[] {"/opt/mytool/mytool"})).thenReturn(process);
+//		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.when(OSCommand.executeCommand(new String[] {"/opt/mytool/mytool"})).thenReturn(process);
 		
 		ExternalTool tool = new ExternalTool("MyTool").start().stop();
 		Assert.assertFalse(tool.isStarted());
@@ -116,8 +116,8 @@ public class TestExternalTool extends MockitoTest {
 	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
 	public void testStartStartedProgram() {
 
-		PowerMockito.mockStatic(OSCommand.class);
-		PowerMockito.when(OSCommand.executeCommand(new String[] {"/opt/mytool/mytool"})).thenReturn(process);
+//		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.when(OSCommand.executeCommand(new String[] {"/opt/mytool/mytool"})).thenReturn(process);
 		
 		new ExternalTool("MyTool").start().start();
 	}

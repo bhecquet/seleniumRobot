@@ -41,8 +41,8 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -70,7 +70,7 @@ import com.seleniumtests.uipage.htmlelements.TextFieldElement;
  * @author behe
  *
  */
-@PrepareForTest(WebUIDriver.class)
+//@PrepareForTest(WebUIDriver.class)
 public class TestFrameElement extends MockitoTest {
 	
 	@Mock
@@ -103,7 +103,7 @@ public class TestFrameElement extends MockitoTest {
 		when(driver.getCapabilities()).thenReturn(new FirefoxOptions()); // add capabilities to allow augmenting driver
 		
 		eventDriver = spy(new CustomEventFiringWebDriver(driver));
-		PowerMockito.mockStatic(WebUIDriver.class);
+//		PowerMockito.mockStatic(WebUIDriver.class);
 		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
 		when(driver.findElement(By.id("el"))).thenReturn(element);
 		when(element.findElement(By.id("link"))).thenReturn(link);

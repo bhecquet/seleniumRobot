@@ -7,7 +7,6 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.function.Function;
 
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -28,7 +27,6 @@ import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
 import kong.unirest.json.JSONObject;
 
-@PrepareForTest({Unirest.class})
 public class TestCampaign extends ConnectorsTest {
 	
 	private Project project;
@@ -41,50 +39,51 @@ public class TestCampaign extends ConnectorsTest {
 	
 	@Test(groups={"ut"})
 	public void testGetAll() {
-		createServerMock("GET", "/campaigns", 200, "{" + 
-				"  \"_embedded\" : {" + 
-				"    \"campaigns\" : [ {" + 
-				"      \"_type\" : \"campaign\"," + 
-				"      \"id\" : 41," + 
-				"      \"name\" : \"sample campaign 1\"," + 
-				"      \"reference\" : \"SAMP_CAMP_1\"," + 
-				"      \"_links\" : {" + 
-				"        \"self\" : {" + 
-				"          \"href\" : \"http://localhost:8080/api/rest/latest/campaigns/41\"" + 
-				"        }" + 
-				"      }" + 
-				"    }, {" + 
-				"      \"_type\" : \"campaign\"," + 
-				"      \"id\" : 46," + 
-				"      \"name\" : \"sample campaign 2\"," + 
-				"      \"reference\" : \"SAMP_CAMP_2\"," + 
-				"      \"_links\" : {" + 
-				"        \"self\" : {" + 
-				"          \"href\" : \"http://localhost:8080/api/rest/latest/campaigns/46\"" + 
-				"        }" + 
-				"      }" + 
-				"    } ]" + 
-				"  }," + 
-				"  \"_links\" : {" + 
-				"    \"first\" : {" + 
-				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaigns?page=0&size=2\"" + 
-				"    }," + 
-				"    \"prev\" : {" + 
-				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaigns?page=0&size=2\"" + 
-				"    }," + 
-				"    \"self\" : {" + 
-				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaigns?page=1&size=2\"" + 
-				"    }," + 
-				"    \"last\" : {" + 
-				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaigns?page=1&size=2\"" + 
-				"    }" + 
-				"  }," + 
-				"  \"page\" : {" + 
-				"    \"size\" : 2," + 
-				"    \"totalElements\" : 4," + 
-				"    \"totalPages\" : 2," + 
-				"    \"number\" : 1" + 
-				"  }" + 
+
+		createServerMock("GET", "/campaigns", 200, "{" +
+				"  \"_embedded\" : {" +
+				"    \"campaigns\" : [ {" +
+				"      \"_type\" : \"campaign\"," +
+				"      \"id\" : 41," +
+				"      \"name\" : \"sample campaign 1\"," +
+				"      \"reference\" : \"SAMP_CAMP_1\"," +
+				"      \"_links\" : {" +
+				"        \"self\" : {" +
+				"          \"href\" : \"http://localhost:8080/api/rest/latest/campaigns/41\"" +
+				"        }" +
+				"      }" +
+				"    }, {" +
+				"      \"_type\" : \"campaign\"," +
+				"      \"id\" : 46," +
+				"      \"name\" : \"sample campaign 2\"," +
+				"      \"reference\" : \"SAMP_CAMP_2\"," +
+				"      \"_links\" : {" +
+				"        \"self\" : {" +
+				"          \"href\" : \"http://localhost:8080/api/rest/latest/campaigns/46\"" +
+				"        }" +
+				"      }" +
+				"    } ]" +
+				"  }," +
+				"  \"_links\" : {" +
+				"    \"first\" : {" +
+				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaigns?page=0&size=2\"" +
+				"    }," +
+				"    \"prev\" : {" +
+				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaigns?page=0&size=2\"" +
+				"    }," +
+				"    \"self\" : {" +
+				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaigns?page=1&size=2\"" +
+				"    }," +
+				"    \"last\" : {" +
+				"      \"href\" : \"http://localhost:8080/api/rest/latest/campaigns?page=1&size=2\"" +
+				"    }" +
+				"  }," +
+				"  \"page\" : {" +
+				"    \"size\" : 2," +
+				"    \"totalElements\" : 4," +
+				"    \"totalPages\" : 2," +
+				"    \"number\" : 1" +
+				"  }" +
 				"}");
 		List<Campaign> campaigns = Campaign.getAll();
 		Assert.assertEquals(campaigns.size(), 2);

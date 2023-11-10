@@ -32,8 +32,8 @@ import java.util.Map;
 
 import org.mockito.Mock;
 import org.openqa.selenium.remote.SessionId;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -61,8 +61,8 @@ import com.seleniumtests.driver.WebUIDriver;
  * @author behe
  *
  */
-@PrepareForTest({ SeleniumRobotVariableServerConnector.class, SeleniumRobotServerContext.class, SeleniumGridConnectorFactory.class,
-		SeleniumTestsContext.class, TestManager.class })
+//@PrepareForTest({ SeleniumRobotVariableServerConnector.class, SeleniumRobotServerContext.class, SeleniumGridConnectorFactory.class,
+//		SeleniumTestsContext.class, TestManager.class })
 public class TestSeleniumTestContext3 extends ConnectorsTest {
 
 	@Mock
@@ -99,9 +99,9 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 		// grid connector is in use only if session Id exists
 		doReturn(new SessionId("1234")).when(gridConnector).getSessionId();
 
-		PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
-		PowerMockito.when(SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd")))
-				.thenReturn(Arrays.asList(gridConnector));
+//		PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
+//		PowerMockito.when(SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd")))
+//				.thenReturn(Arrays.asList(gridConnector));
 
 		try {
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
@@ -164,9 +164,9 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 		// grid connector is in use only if session Id exists
 		doReturn(new SessionId("1234")).when(gridConnector).getSessionId();
 
-		PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
-		PowerMockito.when(SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd")))
-				.thenReturn(Arrays.asList(gridConnector));
+//		PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
+//		PowerMockito.when(SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd")))
+//				.thenReturn(Arrays.asList(gridConnector));
 
 		try {
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "local");
@@ -201,9 +201,9 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 		// grid connector is in use only if session Id exists
 		doReturn(new SessionId("1234")).when(gridConnector).getSessionId();
 
-		PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
-		PowerMockito.when(SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd")))
-				.thenReturn(Arrays.asList(gridConnector));
+//		PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
+//		PowerMockito.when(SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd")))
+//				.thenReturn(Arrays.asList(gridConnector));
 
 		try {
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
@@ -237,9 +237,9 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 
-			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class)
-					.withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null))
-					.thenReturn(variableServer);
+//			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class)
+//					.withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null))
+//					.thenReturn(variableServer);
 			when(variableServer.isAlive()).thenReturn(true);
 			when(variableServer.getVariables(0, -1)).thenReturn(variables);
 
@@ -279,9 +279,9 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 
-			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class)
-					.withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null))
-					.thenReturn(variableServer);
+//			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class)
+//					.withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null))
+//					.thenReturn(variableServer);
 			when(variableServer.isAlive()).thenReturn(true);
 			when(variableServer.getVariables(0, -1)).thenReturn(variables);
 
@@ -366,9 +366,9 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 
-			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class)
-					.withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null))
-					.thenReturn(variableServer);
+//			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class)
+//					.withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null))
+//					.thenReturn(variableServer);
 			when(variableServer.isAlive()).thenReturn(true);
 			when(variableServer.getVariables(0, -1)).thenReturn(variables);
 

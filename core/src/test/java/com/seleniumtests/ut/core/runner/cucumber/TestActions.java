@@ -19,8 +19,8 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -37,7 +37,7 @@ import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
 import io.appium.java_client.AppiumDriver;
 
-@PrepareForTest({ WebUIDriver.class, AppiumDriver.class })
+//@PrepareForTest({ WebUIDriver.class, AppiumDriver.class })
 public class TestActions extends MockitoTest {
 
 
@@ -80,7 +80,7 @@ public class TestActions extends MockitoTest {
 		// add DriverExceptionListener to reproduce driver behavior
 		eventDriver = spy(new CustomEventFiringWebDriver(driver));
 
-		PowerMockito.mockStatic(WebUIDriver.class);
+//		PowerMockito.mockStatic(WebUIDriver.class);
 		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
 		when(WebUIDriver.getWebDriver(anyBoolean(), any(BrowserType.class), isNull(), isNull())).thenReturn(eventDriver);
 		when(WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(uiDriver);

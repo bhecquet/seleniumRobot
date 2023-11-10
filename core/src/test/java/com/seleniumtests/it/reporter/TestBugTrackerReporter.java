@@ -33,8 +33,8 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -48,7 +48,7 @@ import com.seleniumtests.core.contexts.BugTrackerContext;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.reporter.logger.TestStep;
 
-@PrepareForTest({BugTracker.class})
+//@PrepareForTest({BugTracker.class})
 public class TestBugTrackerReporter extends ReporterTest {
 
 	@Mock
@@ -57,7 +57,7 @@ public class TestBugTrackerReporter extends ReporterTest {
 	@BeforeMethod(groups={"it"})
 	public void initTestManager() throws Exception {
 
-		PowerMockito.whenNew(JiraConnector.class).withAnyArguments().thenReturn(jiraConnector);
+//		PowerMockito.whenNew(JiraConnector.class).withAnyArguments().thenReturn(jiraConnector);
 
 		BugTracker.resetBugTrackerInstances();
 		
@@ -425,7 +425,7 @@ public class TestBugTrackerReporter extends ReporterTest {
 			System.setProperty(BugTrackerContext.BUGTRACKER_USER, "jira");
 			System.setProperty(BugTrackerContext.BUGTRACKER_PASSWORD, "jira");
 
-			PowerMockito.whenNew(JiraConnector.class).withAnyArguments().thenThrow(new ConfigurationException(""));
+//			PowerMockito.whenNew(JiraConnector.class).withAnyArguments().thenThrow(new ConfigurationException(""));
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testInError"});
 			
 			verify(jiraConnector, never()).createIssue(any(), any(), any(), any(), any(), any(), any());

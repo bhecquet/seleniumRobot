@@ -29,8 +29,8 @@ import java.nio.file.Paths;
 import org.apache.commons.io.FileUtils;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -40,7 +40,7 @@ import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.util.osutility.OSCommand;
 
-@PrepareForTest({FileUtils.class, OSCommand.class, LocalAppiumLauncher.class, Paths.class})
+//@PrepareForTest({FileUtils.class, OSCommand.class, LocalAppiumLauncher.class, Paths.class})
 public class TestLocalAppiumLauncher extends MockitoTest {
 	
 	@Mock
@@ -53,8 +53,8 @@ public class TestLocalAppiumLauncher extends MockitoTest {
 	File nodeFile;
 
 	private void initValidAppiumInstallation() throws IOException {
-		PowerMockito.mockStatic(FileUtils.class);
-		PowerMockito.mockStatic(System.class);
+//		PowerMockito.mockStatic(FileUtils.class);
+//		PowerMockito.mockStatic(System.class);
 		when(System.getenv("APPIUM_HOME")).thenReturn("/opt/appium/");
 		when(FileUtils.readFileToString(new File("/opt/appium/node_modules/appium/package.json"), StandardCharsets.UTF_8))
 					  .thenReturn("{\"name\":\"appium\",\"version\":\"1.4.13\"}");
@@ -62,7 +62,7 @@ public class TestLocalAppiumLauncher extends MockitoTest {
 	}
 	
 	private void initValidNodeInstallation() {
-		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(OSCommand.class);
 		when(OSCommand.executeCommandAndWait("node -v")).thenReturn("v6.2.1");
 	}
 	
@@ -71,7 +71,7 @@ public class TestLocalAppiumLauncher extends MockitoTest {
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testAppiumNotFound() {
-		PowerMockito.mockStatic(System.class);
+//		PowerMockito.mockStatic(System.class);
 		when(System.getenv("APPIUM_HOME")).thenReturn(null);
 		new LocalAppiumLauncher();
 	}
@@ -95,9 +95,9 @@ public class TestLocalAppiumLauncher extends MockitoTest {
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testAppiumFoundInvalid() throws IOException {
-		PowerMockito.mockStatic(FileUtils.class);
-		PowerMockito.mockStatic(System.class);
-		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(FileUtils.class);
+//		PowerMockito.mockStatic(System.class);
+//		PowerMockito.mockStatic(OSCommand.class);
 		when(System.getenv("APPIUM_HOME")).thenReturn("/opt/appium/");
 		when(FileUtils.readFileToString(new File("/opt/appium/node_modules/appium/package.json"), StandardCharsets.UTF_8))
 					  .thenReturn("{\"name\":\"application\"}");
@@ -112,7 +112,7 @@ public class TestLocalAppiumLauncher extends MockitoTest {
 	public void testNodeFoundInSystemPath() throws IOException {
 		initValidAppiumInstallation();
 		
-		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(OSCommand.class);
 		when(OSCommand.executeCommandAndWait("node -v")).thenReturn("v6.2.1");
 		
 		LocalAppiumLauncher appium = new LocalAppiumLauncher();
@@ -127,7 +127,7 @@ public class TestLocalAppiumLauncher extends MockitoTest {
 	public void testNodeNotFoundInPath() throws IOException {
 		initValidAppiumInstallation();
 		
-		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(OSCommand.class);
 		when(OSCommand.executeCommandAndWait("node -v")).thenReturn("node command not found");
 		new LocalAppiumLauncher();
 	}
@@ -142,10 +142,10 @@ public class TestLocalAppiumLauncher extends MockitoTest {
 	public void testNodeFoundInAppiumPath() throws IOException {
 		initValidAppiumInstallation();
 
-		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(OSCommand.class);
 		when(OSCommand.executeCommandAndWait("/opt/appium/node -v")).thenReturn("v6.2.1");
 		
-		PowerMockito.mockStatic(Paths.class);
+//		PowerMockito.mockStatic(Paths.class);
 		
 		when(Paths.get("/opt/appium/", "node")).thenReturn(nodePath);
 		when(nodePath.toFile()).thenReturn(nodeFile);

@@ -19,7 +19,12 @@ package com.seleniumtests.browserfactory.mobile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import io.appium.java_client.android.options.UiAutomator2Options;
+import io.appium.java_client.ios.options.XCUITestOptions;
+import io.appium.java_client.remote.options.BaseOptions;
+import io.appium.java_client.remote.options.SupportsDeviceNameOption;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.CapabilityType;
 
@@ -27,10 +32,6 @@ import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverMode;
-
-import io.appium.java_client.remote.AndroidMobileCapabilityType;
-import io.appium.java_client.remote.IOSMobileCapabilityType;
-import io.appium.java_client.remote.MobileCapabilityType;
 
 public class MobileDeviceSelector {
 	
@@ -92,13 +93,13 @@ public class MobileDeviceSelector {
 	 */
 	public MobileDevice getRelevantMobileDevice(MutableCapabilities capabilities) {
 		isInitialized();
-		Object deviceName = capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.DEVICE_NAME);
+		Object deviceName = capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX +  SupportsDeviceNameOption.DEVICE_NAME_OPTION);
 		Object platformName = capabilities.getCapability(CapabilityType.PLATFORM_NAME);
-		Object platformVersion = capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.PLATFORM_VERSION);
+		Optional<String> platformVersion = ((BaseOptions)capabilities).getPlatformVersion();
 		
 		if (deviceName == null
 				&& platformName == null
-				&& platformVersion == null
+				&& (!platformVersion.isPresent() || platformVersion.get() == null)
 				) {
 			throw new ConfigurationException("at least one mobile capaiblity must be provided: DEVICE_NAME, PLATFORM_NAME, PLATFORM_VERSION");
 		}
@@ -141,8 +142,8 @@ public class MobileDeviceSelector {
 		MobileDevice selectedDevice = getRelevantMobileDevice(capabilities);
 		
 		if ("android".equals(selectedDevice.getPlatform())) {
-			capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.DEVICE_NAME, selectedDevice.getName());
-			capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.UDID, selectedDevice.getId());
+			((UiAutomator2Options)capabilities).setDeviceName(selectedDevice.getName())
+					.setUdid(selectedDevice.getId());
 			
 			// set the right chromedriver executable according to android browser / chromeversion
 			// it's only the file name, not it's path
@@ -155,17 +156,17 @@ public class MobileDeviceSelector {
 	        	}
 				if (chromeDriverFile != null) {
 					// driver extraction will be done later. For example in AppiumDriverFactory
-					capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, chromeDriverFile);
+					((UiAutomator2Options)capabilities).setChromedriverExecutable(chromeDriverFile);
 				}
 			}
 			
 		} else if ("ios".equalsIgnoreCase(selectedDevice.getPlatform())) {
-			capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.UDID, selectedDevice.getId());
-			capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.DEVICE_NAME, selectedDevice.getName());
-			capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + IOSMobileCapabilityType.XCODE_CONFIG_FILE, System.getenv("APPIUM_HOME") + "/node_modules/appium/node_modules/appium-xcuitest-driver/WebDriverAgent/xcodeConfigFile.xcconfig");
+			((XCUITestOptions)capabilities).setUdid(selectedDevice.getId())
+							.setDeviceName(selectedDevice.getName());
+//			capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + IOSMobileCapabilityType.XCODE_CONFIG_FILE, System.getenv("APPIUM_HOME") + "/node_modules/appium/node_modules/appium-xcuitest-driver/WebDriverAgent/xcodeConfigFile.xcconfig");
 		}
 		capabilities.setCapability(CapabilityType.PLATFORM_NAME, selectedDevice.getPlatform());
-		capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.PLATFORM_VERSION, selectedDevice.getVersion());
+		((BaseOptions)capabilities).setPlatformVersion(selectedDevice.getVersion());
 		
 		return capabilities;
 	}

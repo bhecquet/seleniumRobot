@@ -31,8 +31,8 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.SystemUtils;
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
@@ -51,7 +51,7 @@ import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.Win32Exception;
 import com.sun.jna.platform.win32.WinReg;
 
-@PrepareForTest({Advapi32Util.class, OSUtilityWindows.class, OSCommand.class, Paths.class, BrowserInfo.class})
+//@PrepareForTest({Advapi32Util.class, OSUtilityWindows.class, OSCommand.class, Paths.class, BrowserInfo.class})
 public class TestWindowsOsUtility extends MockitoTest {
 	
 	@Mock
@@ -104,7 +104,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testGetProcessPidByListenPort() {
 
-		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(OSCommand.class);
 		when(OSCommand.executeCommandAndWait("netstat -aon")).thenReturn("Proto  Adresse locale         Adresse distante       État\r\n"
 				+ "TCP    0.0.0.0:64360          0.0.0.0:0              LISTENING       39320\r\n" + 
 				"  TCP    0.0.0.0:64362          0.0.0.0:0              LISTENING       26660\r\n" + 
@@ -123,7 +123,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testGetProcessPidByListenPort2() {
 		
-		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(OSCommand.class);
 		when(OSCommand.executeCommandAndWait("netstat -aon")).thenReturn("Proto  Adresse locale         Adresse distante       État\r\n"
 				+ "TCP    0.0.0.0:64360          0.0.0.0:0              LISTENING       39320\r\n" + 
 				"  TCP    0.0.0.0:64362          0.0.0.0:0              LISTENING       26660\r\n" + 
@@ -141,7 +141,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testGetProcessPidByListenPort3() {
 		
-		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(OSCommand.class);
 		when(OSCommand.executeCommandAndWait("netstat -aon")).thenReturn("Proto  Adresse locale         Adresse distante       État\r\n"
 				+ "TCP    0.0.0.0:64360          0.0.0.0:0              LISTENING       39320\r\n" + 
 				"  TCP    0.0.0.0:64362          0.0.0.0:0              LISTENING       26660\r\n" + 
@@ -156,7 +156,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testGetProcessPidByListenPortNotFound() {
 		
-		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(OSCommand.class);
 		when(OSCommand.executeCommandAndWait("netstat -aon")).thenReturn("");
 
 		Assert.assertNull(OSUtilityFactory.getInstance().getProcessIdByListeningPort(51239));
@@ -165,7 +165,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testGetProcessList() {
 		
-		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(OSCommand.class);
 		when(OSCommand.executeCommandAndWait(contains("system32\\tasklist.exe /NH /SVC"))).thenReturn("eclipse.exe                   6480 N/A\r\n" + 
 				"javaw.exe                     7280 N/A\r\n" + 
 				"chromedriver_2.45_chrome-    11252 N/A\r\n"
@@ -190,10 +190,10 @@ public class TestWindowsOsUtility extends MockitoTest {
 		Path profilePath = Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "ffprofile");
 		Stream<Path> profiles = Files.list(Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "ffprofile"));
 		
-		PowerMockito.mockStatic(OSCommand.class);
-		PowerMockito.mockStatic(Advapi32Util.class);
-		PowerMockito.mockStatic(Paths.class);
-		PowerMockito.mockStatic(Files.class);
+//		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(Advapi32Util.class);
+//		PowerMockito.mockStatic(Paths.class);
+//		PowerMockito.mockStatic(Files.class);
 		
 		when(Paths.get("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe")).thenReturn(path);
 		when(Paths.get(contains("Profiles"))).thenReturn(profilePath);
@@ -223,10 +223,10 @@ public class TestWindowsOsUtility extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testFirefoxServerWindowsInstallation() throws IOException {
 
-		PowerMockito.mockStatic(OSCommand.class);
-		PowerMockito.mockStatic(Advapi32Util.class);
-		PowerMockito.mockStatic(Paths.class);
-		PowerMockito.mockStatic(Files.class);
+//		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(Advapi32Util.class);
+//		PowerMockito.mockStatic(Paths.class);
+//		PowerMockito.mockStatic(Files.class);
 		
 		when(Paths.get("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe")).thenReturn(path);
 		when(path.toFile()).thenReturn(browserFile);
@@ -256,10 +256,10 @@ public class TestWindowsOsUtility extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testSeveralFirefoxInstallations() throws IOException {
 
-		PowerMockito.mockStatic(OSCommand.class);
-		PowerMockito.mockStatic(Advapi32Util.class);
-		PowerMockito.mockStatic(Paths.class);
-		PowerMockito.mockStatic(Files.class);
+//		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(Advapi32Util.class);
+//		PowerMockito.mockStatic(Paths.class);
+//		PowerMockito.mockStatic(Files.class);
 		
 		when(Paths.get("C:\\Program Files (x86)\\Mozilla2 Firefox\\firefox.exe")).thenReturn(path);
 		when(Paths.get("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe")).thenReturn(path);
@@ -293,10 +293,10 @@ public class TestWindowsOsUtility extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testSeveralFirefoxInstallationsMissingBrowser() throws IOException {
 		
-		PowerMockito.mockStatic(OSCommand.class);
-		PowerMockito.mockStatic(Advapi32Util.class);
-		PowerMockito.mockStatic(Paths.class);
-		PowerMockito.mockStatic(Files.class);
+//		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(Advapi32Util.class);
+//		PowerMockito.mockStatic(Paths.class);
+//		PowerMockito.mockStatic(Files.class);
 		
 		when(Paths.get("C:\\Program Files (x86)\\Mozilla2 Firefox\\firefox.exe")).thenReturn(path2);
 		when(Paths.get("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe")).thenReturn(path);
@@ -330,9 +330,9 @@ public class TestWindowsOsUtility extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testChromeStandardWindowsInstallation() {
-		PowerMockito.mockStatic(OSCommand.class);
-		PowerMockito.mockStatic(Advapi32Util.class);
-		PowerMockito.mockStatic(Paths.class);
+//		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(Advapi32Util.class);
+//		PowerMockito.mockStatic(Paths.class);
 
 		when(Paths.get("C:\\Program Files (x86)\\Google_\\Chrome\\Application\\chrome.exe")).thenReturn(path);
 		when(path.toFile()).thenReturn(browserFile);
@@ -360,9 +360,9 @@ public class TestWindowsOsUtility extends MockitoTest {
 	 */
 	/*@Test(groups={"ut"})
 	public void testChromeStandardWindowsInstallationButNotInRegistry() {
-		PowerMockito.mockStatic(OSCommand.class);
-		PowerMockito.mockStatic(Advapi32Util.class);
-		PowerMockito.mockStatic(Paths.class, Mockito.CALLS_REAL_METHODS);
+//		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(Advapi32Util.class);
+//		PowerMockito.mockStatic(Paths.class, Mockito.CALLS_REAL_METHODS);
 		
 		when(Paths.get("C:\\Program Files (x86)\\Google_\\Chrome\\Application\\chrome.exe")).thenReturn(path);
 		when(path.toFile()).thenReturn(browserFile);
@@ -391,12 +391,12 @@ public class TestWindowsOsUtility extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testChromeBetaAndStandardWindowsInstallation() throws Exception {
-		PowerMockito.mockStatic(OSCommand.class);
-		PowerMockito.mockStatic(Advapi32Util.class);
-		PowerMockito.mockStatic(Paths.class);
+//		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(Advapi32Util.class);
+//		PowerMockito.mockStatic(Paths.class);
 		
-		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Google_\\Chrome\\Application\\chrome.exe")).thenReturn(path);
-		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Google_\\Chrome Beta\\Application\\chrome.exe")).thenReturn(path);
+//		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Google_\\Chrome\\Application\\chrome.exe")).thenReturn(path);
+//		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Google_\\Chrome Beta\\Application\\chrome.exe")).thenReturn(path);
 		when(path.toFile()).thenReturn(browserFile);
 		when(browserFile.exists()).thenReturn(true);
 		
@@ -422,9 +422,9 @@ public class TestWindowsOsUtility extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testChromeBetaNotDiscoveredStandardWindowsInstallation() {
-		PowerMockito.mockStatic(OSCommand.class);
-		PowerMockito.mockStatic(Advapi32Util.class);
-		PowerMockito.mockStatic(Paths.class);
+//		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(Advapi32Util.class);
+//		PowerMockito.mockStatic(Paths.class);
 		
 		when(Paths.get("C:\\Program Files (x86)\\Google_\\Chrome\\Application\\chrome.exe")).thenReturn(path);
 		when(Paths.get("C:\\Program Files (x86)\\Google_\\Chrome Beta\\Application\\chrome.exe")).thenReturn(path);
@@ -454,9 +454,9 @@ public class TestWindowsOsUtility extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testChromeNotReallyInstalled() {
-		PowerMockito.mockStatic(OSCommand.class);
-		PowerMockito.mockStatic(Advapi32Util.class);
-		PowerMockito.mockStatic(Paths.class);
+//		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(Advapi32Util.class);
+//		PowerMockito.mockStatic(Paths.class);
 		
 		when(Paths.get("C:\\Program Files (x86)\\Google_\\Chrome\\Application\\chrome.exe")).thenReturn(path);
 		when(path.toFile()).thenReturn(browserFile);
@@ -481,9 +481,9 @@ public class TestWindowsOsUtility extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testIEStandardWindowsInstallation() {
-		PowerMockito.mockStatic(OSCommand.class);
-		PowerMockito.mockStatic(Advapi32Util.class);
-		PowerMockito.mockStatic(Paths.class);
+//		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(Advapi32Util.class);
+//		PowerMockito.mockStatic(Paths.class);
 		
 		when(Paths.get("C:\\Program Files\\Internet_Explorer\\IEXPLORE.EXE")).thenReturn(path);
 		when(path.toFile()).thenReturn(browserFile);
@@ -509,12 +509,12 @@ public class TestWindowsOsUtility extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testEdgeChromiumStandardWindowsInstallation() {
-		PowerMockito.mockStatic(OSCommand.class);
-		PowerMockito.mockStatic(Advapi32Util.class);
-		PowerMockito.mockStatic(Paths.class);
+//		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(Advapi32Util.class);
+//		PowerMockito.mockStatic(Paths.class);
 		
-		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application\\msedge.exe")).thenReturn(path);
-		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application", "msedge.exe")).thenReturn(path2);
+//		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application\\msedge.exe")).thenReturn(path);
+//		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application", "msedge.exe")).thenReturn(path2);
 		when(path.toFile()).thenReturn(browserFile);
 		when(path.toFile()).thenReturn(browserFile);
 		when(path2.toString()).thenReturn("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application\\msedge.exe");
@@ -541,12 +541,12 @@ public class TestWindowsOsUtility extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testEdgeChromiumStandardWindowsInstallation2() {
-		PowerMockito.mockStatic(OSCommand.class);
-		PowerMockito.mockStatic(Advapi32Util.class);
-		PowerMockito.mockStatic(Paths.class);
+//		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(Advapi32Util.class);
+//		PowerMockito.mockStatic(Paths.class);
 		
 		// mock search of browser version in folder structure
-		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application")).thenReturn(path);
+//		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application")).thenReturn(path);
 		when(path.toFile()).thenReturn(browserFile);
 		when(browserFile.exists()).thenReturn(true);
 		when(browserFile.listFiles()).thenReturn(new File[] {exeFile, versionFolder}); // list of files in C:\Program Files (x86)\Microsoft\Edge\Application
@@ -555,8 +555,8 @@ public class TestWindowsOsUtility extends MockitoTest {
 		when(exeFile.isDirectory()).thenReturn(false);
 		when(exeFile.getName()).thenReturn("msedge.exe");
 		
-		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application\\msedge.exe")).thenReturn(path);
-		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application", "msedge.exe")).thenReturn(path2);
+//		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application\\msedge.exe")).thenReturn(path);
+//		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application", "msedge.exe")).thenReturn(path2);
 		when(path2.toString()).thenReturn("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application\\msedge.exe");
 		
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "")).thenThrow(Win32Exception.class);
@@ -580,14 +580,14 @@ public class TestWindowsOsUtility extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testEdgeChromiumBetaStandardWindowsInstallation() {
-		PowerMockito.mockStatic(OSCommand.class);
-		PowerMockito.mockStatic(Advapi32Util.class);
-		PowerMockito.mockStatic(Paths.class);
+//		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(Advapi32Util.class);
+//		PowerMockito.mockStatic(Paths.class);
 		
-		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application\\msedge.exe")).thenReturn(path);
-		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application", "msedge.exe")).thenReturn(path2);
-		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Microsoft_\\Edge Beta\\Application\\msedge.exe")).thenReturn(path3);
-		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Microsoft_\\Edge Beta\\Application", "msedge.exe")).thenReturn(path4);
+//		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application\\msedge.exe")).thenReturn(path);
+//		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application", "msedge.exe")).thenReturn(path2);
+//		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Microsoft_\\Edge Beta\\Application\\msedge.exe")).thenReturn(path3);
+//		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Microsoft_\\Edge Beta\\Application", "msedge.exe")).thenReturn(path4);
 		when(path.toFile()).thenReturn(browserFile);
 		when(path2.toFile()).thenReturn(browserFile);
 		when(path3.toFile()).thenReturn(browserFile);

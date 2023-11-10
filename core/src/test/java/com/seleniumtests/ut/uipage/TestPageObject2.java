@@ -39,8 +39,8 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.interactions.Interactive;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -63,7 +63,7 @@ import com.seleniumtests.ut.core.runner.cucumber.PageForActions;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.osutility.OSCommand;
 
-@PrepareForTest({ WebUIDriver.class })
+//@PrepareForTest({ WebUIDriver.class })
 public class TestPageObject2 extends MockitoTest {
 
 	@Mock
@@ -135,7 +135,7 @@ public class TestPageObject2 extends MockitoTest {
 		when(alert.getText()).thenReturn("alert text");
 		when(driver.switchTo()).thenReturn(targetLocator);
 
-		PowerMockito.mockStatic(WebUIDriver.class);
+//		PowerMockito.mockStatic(WebUIDriver.class);
 		when(WebUIDriver.getCurrentWebUiDriverName()).thenReturn("main");
 		when(WebUIDriver.getWebDriver(anyBoolean(), eq(BrowserType.FIREFOX), eq("main"), isNull()))
 				.thenReturn(eventDriver);

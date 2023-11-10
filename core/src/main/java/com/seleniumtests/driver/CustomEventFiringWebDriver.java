@@ -29,7 +29,7 @@ import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.video.VideoRecorder;
-import net.lightbody.bmp.BrowserMobProxy;
+//import net.lightbody.bmp.BrowserMobProxy;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.commons.io.FileUtils;
@@ -120,7 +120,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	private boolean driverExited = false;
 	private final DriverMode driverMode;
 	private final BrowserInfo browserInfo;
-	private final BrowserMobProxy mobProxy;
+//	private final BrowserMobProxy mobProxy;
 	private SeleniumGridConnector gridConnector;
 	private final Integer attachExistingDriverPort;
 	private MutableCapabilities internalCapabilities = new MutableCapabilities();
@@ -626,19 +626,19 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     		"var action = 'capture_desktop_snapshot_to_base64_string';return '';";
     
     public CustomEventFiringWebDriver(final WebDriver driver) {
-    	this(driver, null, null, true, DriverMode.LOCAL, null, null);
+    	this(driver, null, null, true, DriverMode.LOCAL, null);
     }
 
-    public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, Boolean isWebTest, DriverMode localDriver, BrowserMobProxy mobProxy, SeleniumGridConnector gridConnector) {
-    	this(driver, driverPids, browserInfo, isWebTest, localDriver, mobProxy, gridConnector, null, new ArrayList<>());
+    public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, Boolean isWebTest, DriverMode localDriver, SeleniumGridConnector gridConnector) {
+    	this(driver, driverPids, browserInfo, isWebTest, localDriver, gridConnector, null, new ArrayList<>());
     }
-	public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, Boolean isWebTest, DriverMode localDriver, BrowserMobProxy mobProxy, SeleniumGridConnector gridConnector, Integer attachExistingDriverPort, List<WebDriverListener> wdListeners) {
+	public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, Boolean isWebTest, DriverMode localDriver, SeleniumGridConnector gridConnector, Integer attachExistingDriverPort, List<WebDriverListener> wdListeners) {
 
 		this.driverPids = driverPids == null ? new ArrayList<>(): driverPids;
 		this.browserInfo = browserInfo;
 		this.isWebTest = isWebTest;
 		this.driverMode = localDriver;
-		this.mobProxy = mobProxy;
+//		this.mobProxy = mobProxy;
 		this.gridConnector = gridConnector;
 		this.attachExistingDriverPort = attachExistingDriverPort;
 		this.originalDriver = driver; // store the original driver in case decorated one cannot be used (getSessionId)
@@ -1710,9 +1710,9 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		}
     }
 
-	public BrowserMobProxy getMobProxy() {
-		return mobProxy;
-	}
+//	public BrowserMobProxy getMobProxy() {
+//		return mobProxy;
+//	}
 
 	// NEOLOAD //
 	public NLWebDriver getNeoloadDriver() {

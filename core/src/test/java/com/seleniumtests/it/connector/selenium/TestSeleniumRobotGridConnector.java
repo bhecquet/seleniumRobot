@@ -14,9 +14,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import io.appium.java_client.android.options.UiAutomator2Options;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.SessionId;
 import org.testng.Assert;
@@ -37,7 +39,6 @@ import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.imaging.ImageProcessor;
 
-import io.appium.java_client.remote.MobileCapabilityType;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
 
@@ -108,10 +109,10 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 		
 		File app = GenericTest.createFileFromResource("clirr-differences.xml");
 		
-		DesiredCapabilities caps = new DesiredCapabilities();
-		caps.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP, app.getAbsolutePath());
+		MutableCapabilities caps = new DesiredCapabilities();
+		((UiAutomator2Options)caps).setApp(app.getAbsolutePath());
 		connector.uploadMobileApp(caps);
-		String url = (String) caps.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP);
+		String url = ((UiAutomator2Options)caps).getApp().orElse(null);
 		
 		String fileContent = Unirest.get("http://localhost:4454/grid/admin/FileServlet")
 				.queryString("file", url)
@@ -126,8 +127,9 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 		
 		File app = GenericTest.createFileFromResource("clirr-differences.xml");
 		
-		DesiredCapabilities caps = new DesiredCapabilities();
-		caps.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP, app.getAbsolutePath());
+		MutableCapabilities caps = new DesiredCapabilities();
+
+		((UiAutomator2Options)caps).setApp(app.getAbsolutePath());
 		String filePath = connector.uploadFileToNode(app.getAbsolutePath(), true);
 		Assert.assertTrue(filePath.contains("upload/file"));
 		
@@ -145,8 +147,8 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 		
 		File app = GenericTest.createFileFromResource("clirr-differences.xml");
 		
-		DesiredCapabilities caps = new DesiredCapabilities();
-		caps.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP, app.getAbsolutePath());
+		MutableCapabilities caps = new DesiredCapabilities();
+		((UiAutomator2Options)caps).setApp(app.getAbsolutePath());
 		String filePath = connector.uploadFileToNode(app.getAbsolutePath(), true);
 		File downloaded = connector.downloadFileFromNode("upload" + filePath.split("upload")[1] + "/" + app.getName());
 		
@@ -158,8 +160,9 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 		
 		File app = GenericTest.createFileFromResource("clirr-differences.xml");
 		
-		DesiredCapabilities caps = new DesiredCapabilities();
-		caps.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP, app.getAbsolutePath());
+		MutableCapabilities caps = new DesiredCapabilities();
+
+		((UiAutomator2Options)caps).setApp(app.getAbsolutePath());
 		String filePath = connector.uploadFileToNode(app.getAbsolutePath(), false);
 		Assert.assertEquals(filePath, "");
 		

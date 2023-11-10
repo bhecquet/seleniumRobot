@@ -21,8 +21,8 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -44,7 +44,7 @@ import com.seleniumtests.uipage.htmlelements.select.StubSelect;
  * It will be tested with a mock of HTML select
  * @throws IOException
  */
-@PrepareForTest({WebUIDriver.class})
+//@PrepareForTest({WebUIDriver.class})
 public class TestSelectList extends MockitoTest {
 
 
@@ -108,7 +108,7 @@ public class TestSelectList extends MockitoTest {
 		when(option1.getAttribute("index")).thenReturn("1");
 		when(option2.getAttribute("index")).thenReturn("2");
 
-		PowerMockito.mockStatic(WebUIDriver.class);
+//		PowerMockito.mockStatic(WebUIDriver.class);
 		when(WebUIDriver.getCurrentWebUiDriverName()).thenReturn("main");
 		when(WebUIDriver.getWebDriver(anyBoolean(), eq(BrowserType.FIREFOX), eq("main"), isNull())).thenReturn(eventDriver);
 		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);

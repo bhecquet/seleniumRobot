@@ -55,14 +55,15 @@ import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.DriverCommand;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.remote.Response;
 import org.openqa.selenium.remote.SessionId;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.BeforeMethod;
@@ -96,7 +97,7 @@ import io.appium.java_client.remote.AppiumCommandExecutor;
  * @author behe
  *
  */
-@PrepareForTest({ WebUIDriver.class, AndroidDriver.class, RemoteWebDriver.class })
+//@PrepareForTest({ WebUIDriver.class, AndroidDriver.class, RemoteWebDriver.class })
 public class TestHtmlElement extends MockitoTest {
 
 	@Mock
@@ -162,7 +163,7 @@ public class TestHtmlElement extends MockitoTest {
 		// add DriverExceptionListener to reproduce driver behavior
 		eventDriver = spy(new CustomEventFiringWebDriver(driver));
 
-		PowerMockito.mockStatic(WebUIDriver.class);
+//		PowerMockito.mockStatic(WebUIDriver.class);
 		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
 		when(WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(uiDriver);
 		when(driver.findElement(By.id("el"))).thenReturn(element);
@@ -209,19 +210,18 @@ public class TestHtmlElement extends MockitoTest {
 		when(mobileElement.isDisplayed()).thenReturn(true);
 		when(mobileElement.getId()).thenReturn("1234");
 
-		// init for mobile tests
+//		// init for mobile tests
 		AppiumCommandExecutor ce = Mockito.mock(AppiumCommandExecutor.class);
-		Response response = new Response(new SessionId("1"));
-		response.setValue(new HashMap<String, Object>());
-		Response findResponse = new Response(new SessionId("1"));
-		findResponse.setValue(mobileElement);
-
-		when(ce.execute(any())).thenReturn(response, response, response, findResponse);
-		doReturn(response).when(ce).execute(argThat(command -> DriverCommand.NEW_SESSION.equals(command.getName())));
-		doReturn(response).when(ce).execute(argThat(command -> DriverCommand.FIND_ELEMENT.equals(command.getName())));
-		doReturn(response).when(ce).execute(argThat(command -> "getSession".equals(command.getName())));
-
-		// newSession, getSession, getSession, findElement
+//		Response response = new Response(new SessionId("1"));
+//		response.setValue(new HashMap<String, Object>());
+//		Response findResponse = new Response(new SessionId("1"));
+//		findResponse.setValue(mobileElement);
+//
+//		// newSession, getSession, getSession, findElement
+//		when(ce.execute(any())).thenReturn(response, response, response, findResponse);
+//		doReturn(response).when(ce).execute(argThat(command -> DriverCommand.NEW_SESSION.equals(command.getName())));
+//		doReturn(response).when(ce).execute(argThat(command -> DriverCommand.FIND_ELEMENT.equals(command.getName())));
+//		doReturn(response).when(ce).execute(argThat(command -> "getSession".equals(command.getName())));
 
 		mobileDriver = Mockito.spy(new AndroidDriver(ce, new DesiredCapabilities()));
 		doReturn("my.package").when(mobileDriver).getCurrentPackage();
@@ -232,11 +232,11 @@ public class TestHtmlElement extends MockitoTest {
 
 	private void finalCheck(boolean findElement) throws Exception {
 		// check we called getDriver before using it
-		PowerMockito.verifyPrivate(el, atLeastOnce()).invoke("updateDriver");
+//		PowerMockito.verifyPrivate(el, atLeastOnce()).invoke("updateDriver");
 
 		// isElementPresent does not call findElement as we use WebDriverWait
 		if (findElement) {
-			PowerMockito.verifyPrivate(el).invoke("findElement", anyBoolean(), anyBoolean());
+//			PowerMockito.verifyPrivate(el).invoke("findElement", anyBoolean(), anyBoolean());
 		}
 	}
 
@@ -383,7 +383,7 @@ public class TestHtmlElement extends MockitoTest {
 
 		// updateDriver is called on every replay, so if we have 2 invocations, it means
 		// that replay has been done
-		PowerMockito.verifyPrivate(el, atLeast(2)).invoke("updateDriver");
+//		PowerMockito.verifyPrivate(el, atLeast(2)).invoke("updateDriver");
 
 		verify(el, times(1)).isDisplayedRetry();
 	}

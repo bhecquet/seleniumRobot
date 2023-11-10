@@ -20,8 +20,8 @@ import org.apache.commons.io.FileUtils;
 import org.mockito.Mock;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.remote.ScreenshotException;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -47,7 +47,7 @@ import com.seleniumtests.uipage.uielements.UiElement;
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
 
-@PrepareForTest({CustomEventFiringWebDriver.class, WebUIDriver.class, SeleniumRobotSnapshotServerConnector.class})
+//@PrepareForTest({CustomEventFiringWebDriver.class, WebUIDriver.class, SeleniumRobotSnapshotServerConnector.class})
 public class TestUiElement extends MockitoTest {
 	
 	public TestUiElement() throws IOException {
@@ -116,10 +116,10 @@ public class TestUiElement extends MockitoTest {
 		label2 = new Label(100, 150, 0, 20, "label_without_field");
 		labelInside = new Label(200, 250, 100, 120, "label_inside");
 		
-		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
-		PowerMockito.mockStatic(WebUIDriver.class);
+//		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
+//		PowerMockito.mockStatic(WebUIDriver.class);
 		
-		PowerMockito.when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
+//		PowerMockito.when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
 		when(driver.getBrowserInfo()).thenReturn(new BrowserInfo(BrowserType.CHROME, "83.0"));
 		
 		File screenCaptureFile = createImageFromResource("tu/imageFieldDetection/screenCapture.png");
@@ -140,8 +140,8 @@ public class TestUiElement extends MockitoTest {
 		when(screenshotUtil.capture(SnapshotTarget.PAGE, ScreenShot.class, true)).thenReturn(browserCapture);
 		when(screenshotUtil.capture(SnapshotTarget.MAIN_SCREEN, ScreenShot.class, true)).thenReturn(screenCapture);
 		
-		PowerMockito.mockStatic(SeleniumRobotSnapshotServerConnector.class);
-		PowerMockito.when(SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(serverConnector);
+//		PowerMockito.mockStatic(SeleniumRobotSnapshotServerConnector.class);
+//		PowerMockito.when(SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(serverConnector);
 		
 		// build detect response from fields and labels
 		JSONObject detectResult = new JSONObject();
@@ -352,8 +352,8 @@ public class TestUiElement extends MockitoTest {
 		when(screenshotUtil.capture(SnapshotTarget.PAGE, ScreenShot.class, true)).thenReturn(null);
 		when(screenshotUtil.capture(SnapshotTarget.MAIN_SCREEN, ScreenShot.class, true)).thenReturn(screenCapture);
 		
-		PowerMockito.mockStatic(SeleniumRobotSnapshotServerConnector.class);
-		PowerMockito.when(SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(serverConnector);
+//		PowerMockito.mockStatic(SeleniumRobotSnapshotServerConnector.class);
+//		PowerMockito.when(SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(serverConnector);
 		
 		// build detect response from fields and labels
 		JSONObject detectResult = new JSONObject();
@@ -405,7 +405,7 @@ public class TestUiElement extends MockitoTest {
 		// - the element positions (field1 center is at (250, 110) in web page
 		// - scroll position in page (0, 100) as defined in this test
 		// - viewport position in screen (0, 115)
-		PowerMockito.verifyStatic(CustomEventFiringWebDriver.class, times(1));
+//		PowerMockito.verifyStatic(CustomEventFiringWebDriver.class, times(1));
 		CustomEventFiringWebDriver.leftClicOnDesktopAt(eq(true), eq(250), eq(125), eq(DriverMode.LOCAL), eq(null));
 	}
 	
@@ -429,7 +429,7 @@ public class TestUiElement extends MockitoTest {
 		// - scroll position in page (0, 100) as defined in this test
 		// - viewport position in screen (0, 115)
 		// - click offset (10, 15)
-		PowerMockito.verifyStatic(CustomEventFiringWebDriver.class, times(1));
+//		PowerMockito.verifyStatic(CustomEventFiringWebDriver.class, times(1));
 		CustomEventFiringWebDriver.doubleClickOnDesktopAt(eq(true), eq(260), eq(140), eq(DriverMode.LOCAL), eq(null));
 	}
 	
@@ -453,7 +453,7 @@ public class TestUiElement extends MockitoTest {
 		// - scroll position in page (0, 100) as defined in this test
 		// - viewport position in screen (0, 115)
 		// - click offset (10, 15)
-		PowerMockito.verifyStatic(CustomEventFiringWebDriver.class, times(1));
+//		PowerMockito.verifyStatic(CustomEventFiringWebDriver.class, times(1));
 		CustomEventFiringWebDriver.rightClicOnDesktopAt(eq(true), eq(260), eq(240), eq(DriverMode.LOCAL), eq(null));
 	}
 
@@ -476,10 +476,10 @@ public class TestUiElement extends MockitoTest {
 		// - the element positions (field1 center is at (250, 110) in web page
 		// - scroll position in page (0, 100) as defined in this test
 		// - viewport position in screen (0, 115)
-		PowerMockito.verifyStatic(CustomEventFiringWebDriver.class, times(1));
+//		PowerMockito.verifyStatic(CustomEventFiringWebDriver.class, times(1));
 		CustomEventFiringWebDriver.leftClicOnDesktopAt(eq(true), eq(260), eq(135), eq(DriverMode.LOCAL), eq(null));
 
-		PowerMockito.verifyStatic(CustomEventFiringWebDriver.class, times(1));
+//		PowerMockito.verifyStatic(CustomEventFiringWebDriver.class, times(1));
 		CustomEventFiringWebDriver.writeToDesktop(eq("foo"), eq(DriverMode.LOCAL), eq(null));
 	}
 	

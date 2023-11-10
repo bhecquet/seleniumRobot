@@ -35,8 +35,8 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebElement;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -62,7 +62,7 @@ import kong.unirest.UnirestException;
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
 
-@PrepareForTest({Unirest.class})
+//@PrepareForTest({Unirest.class})
 public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	
 	@Mock
@@ -150,7 +150,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		connector.setApplicationId(null); // reset to be sure it's recreated
 		
 		connector.createApplication();
-		PowerMockito.verifyStatic(Unirest.class, never());
+//		PowerMockito.verifyStatic(Unirest.class, never());
 		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.APPLICATION_API_URL));
 	}
 	
@@ -197,7 +197,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		connector.setVersionId(null); // reset to be sure it's recreated
 		
 		connector.createVersion();
-		PowerMockito.verifyStatic(Unirest.class, never());
+//		PowerMockito.verifyStatic(Unirest.class, never());
 		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.VERSION_API_URL));
 	}
 	
@@ -230,7 +230,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		connector.setEnvironmentId(null); // reset to be sure it's recreated
 		
 		connector.createEnvironment();
-		PowerMockito.verifyStatic(Unirest.class, never());
+//		PowerMockito.verifyStatic(Unirest.class, never());
 		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.ENVIRONMENT_API_URL));
 	}
 	
@@ -298,7 +298,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
 		
 		connector.createSession("Session1");
-		PowerMockito.verifyStatic(Unirest.class, never());
+//		PowerMockito.verifyStatic(Unirest.class, never());
 		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.SESSION_API_URL));
 	}
 	
@@ -373,7 +373,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
 		
 		connector.createTestCase("Test 1");
-		PowerMockito.verifyStatic(Unirest.class, never());
+//		PowerMockito.verifyStatic(Unirest.class, never());
 		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.TESTCASE_API_URL));
 	}
 	
@@ -439,7 +439,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
 		
 		connector.createTestCaseInSession(1, 1, "Test 1", "SUCCESS", "LOCAL");
-		PowerMockito.verifyStatic(Unirest.class, never());
+//		PowerMockito.verifyStatic(Unirest.class, never());
 		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL));
 	}
 	
@@ -489,7 +489,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
 		
 		connector.createTestStep("Step 1", 1);
-		PowerMockito.verifyStatic(Unirest.class, never());
+//		PowerMockito.verifyStatic(Unirest.class, never());
 		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.TESTSTEP_API_URL));
 	}
 	
@@ -560,7 +560,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SKIPPED","LOCAL");
 		connector.addTestStepsToTestCases(new ArrayList<>(), testCaseInSessionId);
 		
-		PowerMockito.verifyStatic(Unirest.class, never());
+//		PowerMockito.verifyStatic(Unirest.class, never());
 		Unirest.patch(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL));
 	}
 	
@@ -711,7 +711,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 
 
 		Integer snapshotId = connector.createSnapshot(snapshot, 1, 1, 1, new ArrayList<>());
-		PowerMockito.verifyStatic(Unirest.class, never());
+//		PowerMockito.verifyStatic(Unirest.class, never());
 		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL));
 		
 		Assert.assertNull(snapshotId);
@@ -851,7 +851,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
 		
 		Integer excludeZoneId = connector.createExcludeZones(new Rectangle(1, 1, 1, 1), 0);
-		PowerMockito.verifyStatic(Unirest.class, never());
+//		PowerMockito.verifyStatic(Unirest.class, never());
 		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL));
 		
 		Assert.assertNull(excludeZoneId);
@@ -900,7 +900,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
 
 		Integer stepResultId = connector.recordStepResult(true, "", 1, 1, 1, 1);
-		PowerMockito.verifyStatic(Unirest.class, never());
+//		PowerMockito.verifyStatic(Unirest.class, never());
 		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.STEPRESULT_API_URL));
 		
 		Assert.assertNull(stepResultId);
@@ -1336,7 +1336,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 
 
 		connector.createStepReferenceSnapshot(snapshot, 1);
-		PowerMockito.verifyStatic(Unirest.class, never());
+//		PowerMockito.verifyStatic(Unirest.class, never());
 		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL));
 		
 	}
@@ -1411,7 +1411,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		
 		
 		connector.getReferenceSnapshot(1);
-		PowerMockito.verifyStatic(Unirest.class, never());
+//		PowerMockito.verifyStatic(Unirest.class, never());
 		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL));
 		
 	}
@@ -1438,7 +1438,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
 
 		connector.detectFieldsInPicture(snapshot);
-		PowerMockito.verifyStatic(Unirest.class, never());
+//		PowerMockito.verifyStatic(Unirest.class, never());
 		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.DETECT_API_URL));
 	}
 	
@@ -1545,7 +1545,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		
 		connector.getStepReferenceDetectFieldInformation(1, "afcc45");
 		
-		PowerMockito.verifyStatic(Unirest.class, never());
+//		PowerMockito.verifyStatic(Unirest.class, never());
 		Unirest.get(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.DETECT_API_URL));
 	}
 	

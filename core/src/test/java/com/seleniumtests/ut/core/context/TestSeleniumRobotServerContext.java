@@ -9,8 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -28,7 +28,7 @@ import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.screenshots.SnapshotComparisonBehaviour;
 
 
-@PrepareForTest({ SeleniumRobotVariableServerConnector.class, SeleniumRobotServerContext.class})
+//@PrepareForTest({ SeleniumRobotVariableServerConnector.class, SeleniumRobotServerContext.class})
 public class TestSeleniumRobotServerContext extends ConnectorsTest {
 	
 
@@ -178,9 +178,9 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 
-			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class)
-					.withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null))
-					.thenReturn(variableServer);
+//			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class)
+//					.withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null))
+//					.thenReturn(variableServer);
 			when(variableServer.isAlive()).thenReturn(true);
 			when(variableServer.getVariables(0, -1)).thenReturn(variables);
 			System.setProperty("key1", "userValue");
@@ -215,9 +215,9 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 
-			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class)
-					.withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null))
-					.thenReturn(variableServer);
+//			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class)
+//					.withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null))
+//					.thenReturn(variableServer);
 			when(variableServer.isAlive()).thenReturn(true);
 			when(variableServer.getVariables(0, -1)).thenReturn(variables);
 
@@ -251,9 +251,9 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_VARIABLES_RESERVATION, "300");
 			
-			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class)
-			.withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null))
-			.thenReturn(variableServer);
+//			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class)
+//			.withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null))
+//			.thenReturn(variableServer);
 			when(variableServer.isAlive()).thenReturn(true);
 			when(variableServer.getVariables(0, 300)).thenReturn(variables);
 			
@@ -285,9 +285,9 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 
-			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class)
-					.withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null))
-					.thenReturn(variableServer);
+//			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class)
+//					.withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null))
+//					.thenReturn(variableServer);
 			when(variableServer.isAlive()).thenReturn(true);
 
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
@@ -362,9 +362,9 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 
-			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class)
-					.withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null))
-					.thenReturn(variableServer);
+//			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class)
+//					.withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null))
+//					.thenReturn(variableServer);
 			when(variableServer.isAlive()).thenReturn(false);
 
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());

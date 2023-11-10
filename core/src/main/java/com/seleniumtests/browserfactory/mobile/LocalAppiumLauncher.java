@@ -40,7 +40,7 @@ import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.osutility.ProcessInfo;
-import com.vdurmont.semver4j.Semver;
+import org.semver4j.Semver;
 
 public class LocalAppiumLauncher implements AppiumLauncher {
 

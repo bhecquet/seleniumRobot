@@ -27,8 +27,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
@@ -49,7 +49,7 @@ import com.seleniumtests.reporter.reporters.CommonReporter;
 
 import kong.unirest.Unirest;
 
-@PrepareForTest({SquashTMConnector.class, Project.class, CampaignFolder.class, Campaign.class, Iteration.class, Unirest.class, TestCase.class, CommonReporter.class, SeleniumTestsContext.class})
+//@PrepareForTest({SquashTMConnector.class, Project.class, CampaignFolder.class, Campaign.class, Iteration.class, Unirest.class, TestCase.class, CommonReporter.class, SeleniumTestsContext.class})
 public class TestTestManagerReporter extends ReporterTest {
 
 
@@ -71,7 +71,7 @@ public class TestTestManagerReporter extends ReporterTest {
 	public void initTestManager() throws Exception {
 
 		squash = spy(new SquashTMConnector());
-		PowerMockito.whenNew(SquashTMConnector.class).withNoArguments().thenReturn(squash);
+//		PowerMockito.whenNew(SquashTMConnector.class).withNoArguments().thenReturn(squash);
 		doReturn(api).when(squash).getApi();
 		when(api.createCampaign(anyString(), anyString())).thenReturn(campaign);
 		when(api.createIteration(any(Campaign.class), anyString())).thenReturn(iteration);

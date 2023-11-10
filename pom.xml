@@ -31,8 +31,6 @@
 	<scm>
 	   <connection>scm:git:https://github.com/bhecquet/seleniumRobot.git</connection>
         <developerConnection>scm:git:https://github.com/bhecquet/seleniumRobot.git</developerConnection>
-		<!-- <connection>scm:git:git@github.com:bhecquet/seleniumRobot.git</connection>
-		<developerConnection>scm:git:git@github.com:bhecquet/seleniumRobot.git</developerConnection> -->
 		<url>git@github.com:bhecquet/seleniumRobot.git</url>
 		<tag>HEAD</tag>
 	</scm>
@@ -71,15 +69,16 @@
 	</repositories>
 
 	<properties>
-		<jacoco.version>0.8.7</jacoco.version>
+		<jacoco.version>0.8.11</jacoco.version>
 
 		<!-- /!\ when changing selenium version, do not forget to change selenium-api version in project file (for aspectj build path) -->
 		<!-- /!\ Also change version in SeleniumTestContextManager.java -->
-		<selenium.version>4.11.0</selenium.version>
-		<appium.version>8.3.0</appium.version>
-		<log4j.version>2.19.0</log4j.version>
-		<aspectj.version>1.9.1</aspectj.version>
-		<htmlunitdriver.version>4.11.0</htmlunitdriver.version>
+		<selenium.version>4.15.0</selenium.version>
+		<appium.version>9.0.0</appium.version>
+		<log4j.version>2.21.1</log4j.version>
+		<unirest.version>4.0.12</unirest.version>
+		<aspectj.version>1.9.20.1</aspectj.version>
+		<htmlunitdriver.version>4.14.1</htmlunitdriver.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
@@ -155,7 +154,7 @@
 			<dependency>
 				<groupId>com.neotys.selenium</groupId>
 				<artifactId>neotys-selenium-proxy</artifactId>
-				<version>2.1.4</version>
+				<version>3.0.1</version>
 				<exclusions>
 					<exclusion>
 						<groupId>com.google.guava</groupId>
@@ -170,7 +169,7 @@
 			<dependency> <!-- version retrieved by powermock, but also needed by neotys -->
 				<groupId>org.javassist</groupId>
 				<artifactId>javassist</artifactId>
-				<version>3.28.0-GA</version>
+				<version>3.29.1-GA</version>
 			</dependency>
 			<dependency>
 				<groupId>com.infotel.seleniumRobot</groupId>
@@ -188,6 +187,17 @@
 				<version>[5.0.1,)</version>
 			</dependency>
 			<dependency>
+				<groupId>com.konghq</groupId>
+				<artifactId>unirest-core</artifactId>
+				<version>${unirest.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.konghq</groupId>
+				<artifactId>unirest-object-mappers-gson</artifactId>
+				<version>${unirest.version}</version>
+			</dependency>
+			<!-- TODO: remove previous Unirest -->
+			<dependency>
 			    <groupId>com.konghq</groupId>
 			    <artifactId>unirest-java</artifactId>
 			    <version>3.14.2</version>
@@ -199,14 +209,14 @@
 				  </exclusions>
 			</dependency>
 			<dependency>
-				<groupId>com.vdurmont</groupId>
+				<groupId>org.semver4j</groupId>
 				<artifactId>semver4j</artifactId>
-				<version>3.1.0</version>
+				<version>5.2.2</version>
 			</dependency>
 			<dependency>
 				<groupId>org.json</groupId>
 				<artifactId>json</artifactId>
-				<version>20220320</version>
+				<version>20231013</version>
 			</dependency>
 			<dependency>
 				<groupId>com.github.stephenc.monte</groupId>
@@ -218,58 +228,20 @@
 				<artifactId>selenium-java</artifactId>
 				<version>${selenium.version}</version>
 			</dependency>
-			<dependency>
-			  <groupId>org.seleniumhq.selenium</groupId>
-			  <artifactId>selenium-devtools-v104</artifactId>
-			  <version>4.5.3</version>
-			  <exclusions>
-	            <exclusion>
-	                <groupId>org.seleniumhq.selenium</groupId>
-	                <artifactId>selenium-api</artifactId>
-	            </exclusion>
-	            <exclusion>
-	                <groupId>org.seleniumhq.selenium</groupId>
-	                <artifactId>selenium-remote-driver</artifactId>
-	            </exclusion>
-	            <exclusion>
-	                <groupId>org.seleniumhq.selenium</groupId>
-	                <artifactId>selenium-json</artifactId>
-	            </exclusion>
-	          </exclusions>
-			</dependency>
 		    <dependency>
 		      <groupId>net.java.dev.jna</groupId>
 		      <artifactId>jna-platform</artifactId>
-		      <version>4.1.0</version>
+		      <version>5.13.0</version>
 		    </dependency>
 		    <dependency>
 			    <groupId>org.zeroturnaround</groupId>
 			    <artifactId>zt-zip</artifactId>
-			    <version>1.15</version>
+			    <version>1.16</version>
 			</dependency>
-			<dependency>
-		        <groupId>net.lightbody.bmp</groupId>
-		        <artifactId>browsermob-core</artifactId>
-		        <version>2.1.5</version>
-		        <exclusions>
-		          <exclusion>
-		            <groupId>com.google.guava</groupId>
-		            <artifactId>guava</artifactId>
-		          </exclusion>
-		          <exclusion>
-	                    <groupId>com.fasterxml.jackson.core</groupId>
-                        <artifactId>jackson-annotations</artifactId>
-	                </exclusion>
-	                <exclusion>
-	                   <groupId>com.fasterxml.jackson.core</groupId>
-                        <artifactId>jackson-core</artifactId>
-	                </exclusion>
-		        </exclusions>
-    		</dependency>
     		<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
-				<version>3.12.0</version>
+				<version>3.13.0</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

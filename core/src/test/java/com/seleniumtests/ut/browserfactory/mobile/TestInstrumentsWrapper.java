@@ -23,8 +23,8 @@ import java.io.IOException;
 import java.util.List;
 
 import org.openqa.selenium.Platform;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -37,21 +37,21 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.OSUtility;
 
-@PrepareForTest({OSCommand.class, InstrumentsWrapper.class, OSUtility.class})
+//@PrepareForTest({OSCommand.class, InstrumentsWrapper.class, OSUtility.class})
 public class TestInstrumentsWrapper extends MockitoTest {
 	
 
 	
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testInstrumentsNotFound() {
-		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(OSCommand.class);
 		when(OSCommand.executeCommandAndWait("instruments")).thenReturn("instruments: command not found");
 		new InstrumentsWrapper();
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testNotOnMac() {
-		PowerMockito.mockStatic(OSUtility.class);
+//		PowerMockito.mockStatic(OSUtility.class);
 		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
 		
 		new InstrumentsWrapper();
@@ -60,8 +60,8 @@ public class TestInstrumentsWrapper extends MockitoTest {
 
 	@Test(groups={"ut"})
 	public void testOnMac() {
-		PowerMockito.mockStatic(OSUtility.class);
-		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(OSUtility.class);
+//		PowerMockito.mockStatic(OSCommand.class);
 		when(OSCommand.executeCommandAndWait("xcrun")).thenReturn("Usage: xcrun [options] <tool name> ... arguments ...");
 		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
 		
@@ -71,8 +71,8 @@ public class TestInstrumentsWrapper extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testiOSDeviceRetrieving() throws IOException {
-		PowerMockito.mockStatic(OSCommand.class);
-		PowerMockito.mockStatic(OSUtility.class);
+//		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(OSUtility.class);
 		when(OSCommand.executeCommandAndWait("xcrun")).thenReturn("Usage: xcrun [options] <tool name> ... arguments ...");
 		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
 		

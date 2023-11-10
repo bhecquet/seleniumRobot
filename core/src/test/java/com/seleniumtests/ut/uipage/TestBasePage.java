@@ -26,8 +26,8 @@ import org.mockito.Mockito;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.remote.RemoteWebElement;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -38,7 +38,7 @@ import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.uipage.BasePage;
 
-@PrepareForTest(WebUIDriver.class)
+//@PrepareForTest(WebUIDriver.class)
 public class TestBasePage extends MockitoTest {
 	
 	@Mock
@@ -62,7 +62,7 @@ public class TestBasePage extends MockitoTest {
 	public void init() throws Exception{
 		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
 		
-		PowerMockito.mockStatic(WebUIDriver.class);
+//		PowerMockito.mockStatic(WebUIDriver.class);
 		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
 		when(WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(webUiDriver);
 		

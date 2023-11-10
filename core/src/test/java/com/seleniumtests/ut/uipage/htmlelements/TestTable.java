@@ -29,8 +29,8 @@ import org.mockito.Spy;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebElement;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -42,7 +42,7 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.uipage.htmlelements.Table;
 
 
-@PrepareForTest(WebUIDriver.class)
+//@PrepareForTest(WebUIDriver.class)
 public class TestTable extends MockitoTest {
 	
 	@Mock
@@ -69,7 +69,7 @@ public class TestTable extends MockitoTest {
 	
 	@BeforeMethod(groups={"ut"})
 	private void init() {
-		PowerMockito.mockStatic(WebUIDriver.class);
+//		PowerMockito.mockStatic(WebUIDriver.class);
 		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
 		when(driver.findElement(By.id("table"))).thenReturn(tableEl);
 		when(driver.switchTo()).thenReturn(locator);

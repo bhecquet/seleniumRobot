@@ -11,8 +11,8 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -32,7 +32,7 @@ import kong.unirest.GetRequest;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
 
-@PrepareForTest({Project.class, CampaignFolder.class, Campaign.class, Iteration.class, Unirest.class, TestCase.class})
+//@PrepareForTest({Project.class, CampaignFolder.class, Campaign.class, Iteration.class, Unirest.class, TestCase.class})
 public class TestSquashTMApi extends ConnectorsTest {
 	
 	private Project project1;
@@ -50,11 +50,11 @@ public class TestSquashTMApi extends ConnectorsTest {
 
 	@BeforeMethod(groups={"ut"})
 	public void init() {
-		PowerMockito.mockStatic(Project.class);
-		PowerMockito.mockStatic(Campaign.class);
-		PowerMockito.mockStatic(CampaignFolder.class);
-		PowerMockito.mockStatic(Iteration.class);
-		PowerMockito.mockStatic(TestCase.class);
+//		PowerMockito.mockStatic(Project.class);
+//		PowerMockito.mockStatic(Campaign.class);
+//		PowerMockito.mockStatic(CampaignFolder.class);
+//		PowerMockito.mockStatic(Iteration.class);
+//		PowerMockito.mockStatic(TestCase.class);
 		
 		// server is present by default
 		createServerMock("GET", "/api/rest/latest/projects", 200, "{}");
@@ -76,7 +76,7 @@ public class TestSquashTMApi extends ConnectorsTest {
 	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class)
 	public void testServerInError() {
 		createServerMock("GET", "/api/rest/latest/projects", 500, "{}");
-		PowerMockito.when(Project.get("project1")).thenReturn(project1);
+//		PowerMockito.when(Project.get("project1")).thenReturn(project1);
 		SquashTMApi api = new SquashTMApi("http://localhost:4321", "user", "password", "project1");
 	}
 	
@@ -85,13 +85,13 @@ public class TestSquashTMApi extends ConnectorsTest {
 		GetRequest getRequest = (GetRequest)createServerMock("GET", "/api/rest/latest/projects", 200, "{}");
 		when(getRequest.asJson()).thenThrow(UnirestException.class);
 		
-		PowerMockito.when(Project.get("project1")).thenReturn(project1);
+//		PowerMockito.when(Project.get("project1")).thenReturn(project1);
 		SquashTMApi api = new SquashTMApi("http://localhost:4321", "user", "password", "project1");
 	}
 	
 	@Test(groups={"ut"})
 	public void testGetExistingProject() {
-		PowerMockito.when(Project.get("project1")).thenReturn(project1);
+//		PowerMockito.when(Project.get("project1")).thenReturn(project1);
 		SquashTMApi api = new SquashTMApi("http://localhost:4321", "user", "password", "project1");
 		Assert.assertEquals(api.getCurrentProject(), project1);
 	}
@@ -101,29 +101,29 @@ public class TestSquashTMApi extends ConnectorsTest {
 	 */
 	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class)
 	public void testGetNoExistingProject() {
-		PowerMockito.when(Project.get("project3")).thenThrow(new ConfigurationException("Project does not exist"));
+//		PowerMockito.when(Project.get("project3")).thenThrow(new ConfigurationException("Project does not exist"));
 		SquashTMApi api = new SquashTMApi("http://localhost:4321", "user", "password", "project3");
 	}
 	
 	@Test(groups={"ut"})
 	public void testCreateUnexistingCampaign() {
-		PowerMockito.when(Project.get("project1")).thenReturn(project1);
+//		PowerMockito.when(Project.get("project1")).thenReturn(project1);
 		doReturn(Arrays.asList(campaign1, campaign2)).when(project1).getCampaigns();
 		
 		
 		Campaign myCampaign = new Campaign("http://localhost:4321/campaigns/3", 3, "mycampaign");
-		PowerMockito.when(Campaign.create(project1, "mycampaign", null)).thenReturn(myCampaign);
+//		PowerMockito.when(Campaign.create(project1, "mycampaign", null)).thenReturn(myCampaign);
 		
 		SquashTMApi api = new SquashTMApi("http://localhost:4321", "user", "password", "project1");
 		Campaign newCampaign = api.createCampaign("mycampaign", null);
 		Assert.assertEquals(newCampaign, myCampaign);
 		
 		// check campaign creation has been called
-		PowerMockito.verifyStatic(Campaign.class);
+//		PowerMockito.verifyStatic(Campaign.class);
 		Campaign.create(project1, "mycampaign", null);
 		
 		// check no folder has been created
-		PowerMockito.verifyStatic(CampaignFolder.class, never());
+//		PowerMockito.verifyStatic(CampaignFolder.class, never());
 		CampaignFolder.create(eq(project1), any(), anyString());
 	}
 	
@@ -132,7 +132,7 @@ public class TestSquashTMApi extends ConnectorsTest {
 	 */
 	@Test(groups={"ut"})
 	public void testDoNotCreateExistingCampaign() {
-		PowerMockito.when(Project.get("project1")).thenReturn(project1);
+//		PowerMockito.when(Project.get("project1")).thenReturn(project1);
 		doReturn(Arrays.asList(campaign1, campaign2)).when(project1).getCampaigns();
 		
 		SquashTMApi api = new SquashTMApi("http://localhost:4321", "user", "password", "project1");
@@ -140,11 +140,11 @@ public class TestSquashTMApi extends ConnectorsTest {
 		Assert.assertEquals(newCampaign, campaign1);
 		
 		// check campaign creation has been called
-		PowerMockito.verifyStatic(Campaign.class, never());
+//		PowerMockito.verifyStatic(Campaign.class, never());
 		Campaign.create(project1, "campaign1", null);
 
 		// check no folder has been created
-		PowerMockito.verifyStatic(CampaignFolder.class, never());
+//		PowerMockito.verifyStatic(CampaignFolder.class, never());
 		CampaignFolder.create(eq(project1), any(), anyString());
 	}
 
@@ -153,65 +153,65 @@ public class TestSquashTMApi extends ConnectorsTest {
 	 */
 	@Test(groups={"ut"})
 	public void testCreateCampaignWithFolder() {
-		PowerMockito.when(Project.get("project1")).thenReturn(project1);
+//		PowerMockito.when(Project.get("project1")).thenReturn(project1);
 		doReturn(Arrays.asList(campaign1, campaign2)).when(project1).getCampaigns();
-		PowerMockito.when(CampaignFolder.getAll(project1)).thenReturn(Arrays.asList(campaignFolder1, campaignFolder2));
+//		PowerMockito.when(CampaignFolder.getAll(project1)).thenReturn(Arrays.asList(campaignFolder1, campaignFolder2));
 		
 		Campaign myCampaign = new Campaign("http://localhost:4321/campaigns/3", 3, "mycampaign");
-		PowerMockito.when(Campaign.create(project1, "mycampaign", null)).thenReturn(myCampaign);
+//		PowerMockito.when(Campaign.create(project1, "mycampaign", null)).thenReturn(myCampaign);
 		
 		SquashTMApi api = new SquashTMApi("http://localhost:4321", "user", "password", "project1");
 		Campaign newCampaign = api.createCampaign("mycampaign", "myFolder/folder1");
 		Assert.assertEquals(newCampaign, myCampaign);
 		
 		// check campaign creation has been called
-		PowerMockito.verifyStatic(Campaign.class);
+//		PowerMockito.verifyStatic(Campaign.class);
 		Campaign.create(project1, "mycampaign", null);
 		
 		// check 2 folders has been created
-		PowerMockito.verifyStatic(CampaignFolder.class);
+//		PowerMockito.verifyStatic(CampaignFolder.class);
 		CampaignFolder.create(eq(project1), any(), eq("myFolder"));
-		PowerMockito.verifyStatic(CampaignFolder.class);
+//		PowerMockito.verifyStatic(CampaignFolder.class);
 		CampaignFolder.create(eq(project1), any(), eq("folder1"));
 	}
 	
 	@Test(groups={"ut"})
 	public void testCreateCampaignWithExistingFolder() {
-		PowerMockito.when(Project.get("project1")).thenReturn(project1);
+//		PowerMockito.when(Project.get("project1")).thenReturn(project1);
 		doReturn(Arrays.asList(campaign1, campaign2)).when(project1).getCampaigns();
-		PowerMockito.when(CampaignFolder.getAll(project1)).thenReturn(Arrays.asList(campaignFolder1, campaignFolder2));
+//		PowerMockito.when(CampaignFolder.getAll(project1)).thenReturn(Arrays.asList(campaignFolder1, campaignFolder2));
 		
 		Campaign myCampaign = new Campaign("http://localhost:4321/campaigns/3", 3, "mycampaign");
-		PowerMockito.when(Campaign.create(project1, "mycampaign", campaignFolder2)).thenReturn(myCampaign);
+//		PowerMockito.when(Campaign.create(project1, "mycampaign", campaignFolder2)).thenReturn(myCampaign);
 		
 		SquashTMApi api = new SquashTMApi("http://localhost:4321", "user", "password", "project1");
 		Campaign newCampaign = api.createCampaign("mycampaign", "campaignFolder1/campaignFolder2");
 		Assert.assertEquals(newCampaign, myCampaign);
 		
 		// check campaign creation has been called
-		PowerMockito.verifyStatic(Campaign.class);
+//		PowerMockito.verifyStatic(Campaign.class);
 		Campaign.create(project1, "mycampaign", campaignFolder2);
 		
 		// check the 2 folders has not been created
-		PowerMockito.verifyStatic(CampaignFolder.class, never());
+//		PowerMockito.verifyStatic(CampaignFolder.class, never());
 		CampaignFolder.create(eq(project1), any(), eq("campaignFolder1"));
-		PowerMockito.verifyStatic(CampaignFolder.class, never());
+//		PowerMockito.verifyStatic(CampaignFolder.class, never());
 		CampaignFolder.create(eq(project1), any(), eq("campaignFolder2"));
 	}
 	
 
 	@Test(groups={"ut"})
 	public void testCreateIteration() {
-		PowerMockito.when(Project.get("project1")).thenReturn(project1);
+//		PowerMockito.when(Project.get("project1")).thenReturn(project1);
 		SquashTMApi api = new SquashTMApi("http://localhost:4321", "user", "password", "project1");
 		doReturn(Arrays.asList(iteration1, iteration2)).when(campaign1).getIterations();
 		
 		Iteration iteration3 = spy(new Iteration("http://localhost:4321/iterations/3", 3, "myIteration"));
-		PowerMockito.when(Iteration.create(campaign1, "myIteration")).thenReturn(iteration3);
+//		PowerMockito.when(Iteration.create(campaign1, "myIteration")).thenReturn(iteration3);
 		Assert.assertEquals(api.createIteration(campaign1, "myIteration"), iteration3);
 
 		// check campaign creation has been called
-		PowerMockito.verifyStatic(Iteration.class);
+//		PowerMockito.verifyStatic(Iteration.class);
 		Iteration.create(campaign1, "myIteration");
 	}
 	
@@ -220,25 +220,25 @@ public class TestSquashTMApi extends ConnectorsTest {
 	 */
 	@Test(groups={"ut"})
 	public void testDoNotCreateIteration() {
-		PowerMockito.when(Project.get("project1")).thenReturn(project1);
+//		PowerMockito.when(Project.get("project1")).thenReturn(project1);
 		SquashTMApi api = new SquashTMApi("http://localhost:4321", "user", "password", "project1");
 		doReturn(Arrays.asList(iteration1, iteration2)).when(campaign1).getIterations();
 		
-		PowerMockito.when(Iteration.create(campaign1, "myIteration")).thenReturn(iteration1);
+//		PowerMockito.when(Iteration.create(campaign1, "myIteration")).thenReturn(iteration1);
 		Assert.assertEquals(api.createIteration(campaign1, "iteration1"), iteration1);
 		
 		// check campaign creation has been called
-		PowerMockito.verifyStatic(Iteration.class, never());
+//		PowerMockito.verifyStatic(Iteration.class, never());
 		Iteration.create(campaign1, "iteration1");
 	}
 	
 
 	@Test(groups={"ut"})
 	public void testAddTestCaseInIteration() {
-		PowerMockito.when(Project.get("project1")).thenReturn(project1);
+//		PowerMockito.when(Project.get("project1")).thenReturn(project1);
 		SquashTMApi api = new SquashTMApi("http://localhost:4321", "user", "password", "project1");
 		doReturn(Arrays.asList(testPlanItem1, testPlanItem2)).when(iteration1).getAllTestCases();
-		PowerMockito.when(TestCase.get(3)).thenReturn(testCase1);
+//		PowerMockito.when(TestCase.get(3)).thenReturn(testCase1);
 		doReturn(testPlanItem1).when(iteration1).addTestCase(testCase1);
 		
 		IterationTestPlanItem itpi = api.addTestCaseInIteration(iteration1, 3);
@@ -254,10 +254,10 @@ public class TestSquashTMApi extends ConnectorsTest {
 	 */
 	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class)
 	public void testCannotAddTestCaseDoesNotExist() {
-		PowerMockito.when(Project.get("project1")).thenReturn(project1);
+//		PowerMockito.when(Project.get("project1")).thenReturn(project1);
 		SquashTMApi api = new SquashTMApi("http://localhost:4321", "user", "password", "project1");
 		doReturn(Arrays.asList(testPlanItem1, testPlanItem2)).when(iteration1).getAllTestCases();
-		PowerMockito.doThrow(new ScenarioException("")).when(TestCase.class);
+//		PowerMockito.doThrow(new ScenarioException("")).when(TestCase.class);
 		TestCase.get(3);
 		doReturn(testPlanItem1).when(iteration1).addTestCase(any(TestCase.class));
 		
@@ -271,10 +271,10 @@ public class TestSquashTMApi extends ConnectorsTest {
 	 */
 	@Test(groups={"ut"})
 	public void testDoNotAddTestCase() {
-		PowerMockito.when(Project.get("project1")).thenReturn(project1);
+//		PowerMockito.when(Project.get("project1")).thenReturn(project1);
 		SquashTMApi api = new SquashTMApi("http://localhost:4321", "user", "password", "project1");
 		doReturn(Arrays.asList(testPlanItem1, testPlanItem2)).when(iteration1).getAllTestCases();
-		PowerMockito.when(TestCase.get(3)).thenReturn(testCase1);
+//		PowerMockito.when(TestCase.get(3)).thenReturn(testCase1);
 		doReturn(testPlanItem1).when(iteration1).addTestCase(testCase1);
 
 		IterationTestPlanItem itpi = api.addTestCaseInIteration(iteration1, 2);

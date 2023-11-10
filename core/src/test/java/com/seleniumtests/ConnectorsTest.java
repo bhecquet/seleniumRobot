@@ -23,10 +23,7 @@ import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,9 +36,14 @@ import java.util.function.Function;
 
 import org.apache.commons.io.FileUtils;
 import org.mockito.Mock;
+import org.mockito.MockedConstruction;
+import org.mockito.MockedStatic;
 import org.mockito.invocation.InvocationOnMock;
+import org.mockito.quality.Strictness;
 import org.mockito.stubbing.Answer;
 import org.mockito.stubbing.OngoingStubbing;
+import org.mockito.testng.MockitoSettings;
+import org.mockito.testng.MockitoTestNGListener;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Platform;
@@ -54,13 +56,11 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.remote.SessionId;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
-import com.seleniumtests.browserfactory.SeleniumGridDriverFactory;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotServerConnector;
@@ -86,8 +86,10 @@ import kong.unirest.UnirestInstance;
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
+import org.testng.annotations.Listeners;
 
-@PrepareForTest({Unirest.class, WebUIDriverFactory.class, SeleniumGridDriverFactory.class})
+@Listeners(MockitoTestNGListener.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class ConnectorsTest extends MockitoTest {
 	
 	@Mock
@@ -122,6 +124,11 @@ public class ConnectorsTest extends MockitoTest {
 	
 	@Mock
 	public UnirestInstance unirestInstance;
+
+	protected MockedStatic mocked;
+	protected MockedStatic mockedWebUiDriverFactory;
+	protected MockedConstruction mockedWebUiDriver;
+	protected MockedConstruction mockedRemoteWebDriver;
 	
 	protected GetRequest namedApplicationRequest;
 	protected GetRequest namedEnvironmentRequest;
@@ -239,9 +246,24 @@ public class ConnectorsTest extends MockitoTest {
 
 	@BeforeMethod(groups={"ut", "it"})  
 	public void initMocks(final Method method, final ITestContext testNGCtx, final ITestResult testResult) throws Exception {
-		PowerMockito.mockStatic(Unirest.class);
-		when(Unirest.spawnInstance()).thenReturn(unirestInstance);
-		when(Unirest.config()).thenReturn(unirestConfig);
+		mocked = mockStatic(Unirest.class);
+		mocked.when(() -> Unirest.spawnInstance()).thenReturn(unirestInstance);
+		mocked.when(() -> Unirest.config()).thenReturn(unirestConfig);
+	}
+
+	@AfterMethod(groups={"ut", "it"})
+	public void resetMocks() {
+		mocked.close(); // as we do not use try-with-resource
+
+		if (mockedWebUiDriver != null) {
+			mockedWebUiDriver.close();
+		}
+		if (mockedRemoteWebDriver != null) {
+			mockedRemoteWebDriver.close();
+		}
+		if (mockedWebUiDriverFactory != null) {
+			mockedWebUiDriverFactory.close();
+		}
 	}
 	
 	/**
@@ -301,11 +323,12 @@ public class ConnectorsTest extends MockitoTest {
 		return createServerMock(serverUrl, requestType, apiPath, statusCode, Arrays.asList(replyData), responseType);
 	}
 	protected HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, final List<Object> replyData, String responseType) throws UnirestException {
-		
+
+
 		if (replyData.isEmpty()) {
 			throw new TestConfigurationException("No replyData specified");
 		}
-		
+
 		@SuppressWarnings("unchecked")
 		HttpResponse<String> response = mock(HttpResponse.class);
 		HttpResponse<JsonNode> jsonResponse = mock(HttpResponse.class);
@@ -323,132 +346,132 @@ public class ConnectorsTest extends MockitoTest {
 			//when(response.getBody()).thenReturn(replyData.toArray(new String[] {}));
 
 			when(response.getBody()).then(new Answer<String>() {
-			    private int count = -1;
+				private int count = -1;
 
-			    public String answer(InvocationOnMock invocation) {
+				public String answer(InvocationOnMock invocation) {
 
-			        count++;
-			    	if (count >= replyData.size() - 1) {
-			    		return (String)replyData.get(replyData.size() - 1);
-			    	} else {
-			    		return (String)replyData.get(count);
-			    	}
-			    }
+					count++;
+					if (count >= replyData.size() - 1) {
+						return (String) replyData.get(replyData.size() - 1);
+					} else {
+						return (String) replyData.get(count);
+					}
+				}
 			});
 			when(response.getStatusText()).thenReturn("TEXT");
-			
+
 			when(jsonResponse.getStatus()).thenReturn(statusCode);
 			when(jsonResponse.getBody()).thenReturn(json);
 			when(jsonResponse.getStatusText()).thenReturn("TEXT");
 			try {
 				// check data is compatible with JSON
-				for (Object d: replyData) {
-					if (((String)d).isEmpty()) {
+				for (Object d : replyData) {
+					if (((String) d).isEmpty()) {
 						d = "{}";
 					}
 					try {
-						new JSONObject((String)d);
+						new JSONObject((String) d);
 					} catch (JSONException e) {
-						new JSONArray((String)d);
+						new JSONArray((String) d);
 					}
 				}
-				
-				
-//				JSONObject jsonReply = new JSONObject((String)replyData);
-//				when(json.getObject()).thenReturn(jsonReply);
-				
+
+
+				//				JSONObject jsonReply = new JSONObject((String)replyData);
+				//				when(json.getObject()).thenReturn(jsonReply);
+
 				when(json.getObject()).then(new Answer<JSONObject>() {
-				    private int count = -1;
+					private int count = -1;
 
-				    public JSONObject answer(InvocationOnMock invocation) {
+					public JSONObject answer(InvocationOnMock invocation) {
 
-				        count++;
-				        String reply;
-				    	if (count >= replyData.size() - 1) {
-				    		reply = (String)replyData.get(replyData.size() - 1);
-				    	} else {
-				    		reply = (String)replyData.get(count);
-				    	}
-				    	if (reply.isEmpty()) {
+						count++;
+						String reply;
+						if (count >= replyData.size() - 1) {
+							reply = (String) replyData.get(replyData.size() - 1);
+						} else {
+							reply = (String) replyData.get(count);
+						}
+						if (reply.isEmpty()) {
 							reply = "{}";
 						}
-				    	return new JSONObject(reply);
-				    }
+						return new JSONObject(reply);
+					}
 				});
-				
+
 				when(json.getArray()).then(new Answer<JSONArray>() {
-				    private int count = -1;
+					private int count = -1;
 
-				    public JSONArray answer(InvocationOnMock invocation) {
+					public JSONArray answer(InvocationOnMock invocation) {
 
-				        count++;
-				        String reply;
-				    	if (count >= replyData.size() - 1) {
-				    		reply = (String)replyData.get(replyData.size() - 1);
-				    	} else {
-				    		reply = (String)replyData.get(count);
-				    	}
-				    	if (reply.isEmpty()) {
+						count++;
+						String reply;
+						if (count >= replyData.size() - 1) {
+							reply = (String) replyData.get(replyData.size() - 1);
+						} else {
+							reply = (String) replyData.get(count);
+						}
+						if (reply.isEmpty()) {
 							reply = "{}";
 						}
-				    	return new JSONArray(reply);
-				    }
+						return new JSONArray(reply);
+					}
 				});
-				
+
 				pageList = new PagedList<>();
 				pageList.add(jsonResponse);
-				
-			} catch (JSONException | NullPointerException e) {}
 
-			
+			} catch (JSONException | NullPointerException e) {
+			}
+
+
 		} else if (replyData.get(0) instanceof File) {
 			when(streamResponse.getStatus()).thenReturn(statusCode);
 			when(streamResponse.getStatusText()).thenReturn("TEXT");
 			when(streamResponse.getBody()).then(new Answer<File>() {
-			    private int count = -1;
+				private int count = -1;
 
-			    public File answer(InvocationOnMock invocation) {
+				public File answer(InvocationOnMock invocation) {
 
-			        count++;
-			    	if (count >= replyData.size() - 1) {
-			    		return (File)replyData.get(replyData.size() - 1);
-			    	} else {
-			    		return (File)replyData.get(count);
-			    	}
-			    }
+					count++;
+					if (count >= replyData.size() - 1) {
+						return (File) replyData.get(replyData.size() - 1);
+					} else {
+						return (File) replyData.get(count);
+					}
+				}
 			});
 
 			//when(bytestreamResponse.getBody()).thenReturn(FileUtils.readFileToByteArray((File)replyData));
 			when(bytestreamResponse.getBody()).then(new Answer<byte[]>() {
-			    private int count = -1;
-			    
-			    public byte[] answer(InvocationOnMock invocation) throws IOException {
-			    	
-			        count++;
-			    	if (count >= replyData.size() - 1) {
-			    		return (byte[])FileUtils.readFileToByteArray((File)replyData.get(replyData.size() - 1));
-			    	} else {
-			    		return (byte[])FileUtils.readFileToByteArray((File)replyData.get(count));
-			    	}
-			    }
+				private int count = -1;
+
+				public byte[] answer(InvocationOnMock invocation) throws IOException {
+
+					count++;
+					if (count >= replyData.size() - 1) {
+						return (byte[]) FileUtils.readFileToByteArray((File) replyData.get(replyData.size() - 1));
+					} else {
+						return (byte[]) FileUtils.readFileToByteArray((File) replyData.get(count));
+					}
+				}
 			});
-			
+
 			when(bytestreamResponse.getStatus()).thenReturn(statusCode);
 			when(bytestreamResponse.getStatusText()).thenReturn("BYTES");
 
 		}
-		
-		
-		
-		switch(requestType) {
+
+
+		switch (requestType) {
 			case "GET":
-				GetRequest getRequest = mock(GetRequest.class); 
-				
-				when(Unirest.get(serverUrl + apiPath)).thenReturn(getRequest);
+				GetRequest getRequest = mock(GetRequest.class);
+
+				mocked.when(() -> Unirest.get(serverUrl + apiPath)).thenReturn(getRequest);
 				when(getRequest.downloadMonitor(any())).thenReturn(getRequest);
 				when(getRequest.socketTimeout(anyInt())).thenReturn(getRequest);
 				when(unirestInstance.get(serverUrl + apiPath)).thenReturn(getRequest);
-				
+
 				when(getRequest.header(anyString(), anyString())).thenReturn(getRequest);
 				when(getRequest.asString()).thenReturn(response);
 				when(getRequest.asJson()).thenReturn(jsonResponse);
@@ -465,24 +488,25 @@ public class ConnectorsTest extends MockitoTest {
 				when(getRequest.asPaged(any(), (Function<HttpResponse<JsonNode>, String>) any(Function.class))).thenReturn(pageList);
 				return getRequest;
 			case "POST":
-				when(Unirest.post(serverUrl + apiPath)).thenReturn(postRequest);
+				mocked.when(() -> Unirest.post(serverUrl + apiPath)).thenReturn(postRequest);
 				when(unirestInstance.post(serverUrl + apiPath)).thenReturn(postRequest);
 				return preparePostRequest(serverUrl, responseType, postRequest, response, jsonResponse);
 			case "PATCH":
-				when(Unirest.patch(serverUrl + apiPath)).thenReturn(postRequest);
+				mocked.when(() -> Unirest.patch(serverUrl + apiPath)).thenReturn(postRequest);
 				when(unirestInstance.patch(serverUrl + apiPath)).thenReturn(postRequest);
 				return preparePostRequest(serverUrl, responseType, postRequest, response, jsonResponse);
 			case "PUT":
-				when(Unirest.put(serverUrl + apiPath)).thenReturn(postRequest);
+				mocked.when(() -> Unirest.put(serverUrl + apiPath)).thenReturn(postRequest);
 				when(unirestInstance.put(serverUrl + apiPath)).thenReturn(postRequest);
 				return preparePostRequest(serverUrl, responseType, postRequest, response, jsonResponse);
 			case "DELETE":
-				when(Unirest.delete(serverUrl + apiPath)).thenReturn(postRequest);
+				mocked.when(() -> Unirest.delete(serverUrl + apiPath)).thenReturn(postRequest);
 				when(unirestInstance.delete(serverUrl + apiPath)).thenReturn(postRequest);
 				return preparePostRequest(serverUrl, responseType, postRequest, response, jsonResponse);
 
 		}
-		return null;	
+		return null;
+
 	}
 	
 	private HttpRequest<?> preparePostRequest(String serverUrl, String responseType, HttpRequestWithBody postRequest, HttpResponse<String> response, HttpResponse<JsonNode> jsonResponse) {
@@ -528,68 +552,64 @@ public class ConnectorsTest extends MockitoTest {
 	}
 
 	protected OngoingStubbing<JsonNode> createJsonServerMock(String requestType, String apiPath, int statusCode, String ... replyData) throws UnirestException {
-		
+
 		@SuppressWarnings("unchecked")
 		HttpResponse<JsonNode> jsonResponse = mock(HttpResponse.class);
 		HttpRequest<?> request = mock(HttpRequest.class);
 		MultipartBody requestMultipartBody = mock(MultipartBody.class);
 		HttpRequestWithBody postRequest = mock(HttpRequestWithBody.class);
-		
+
 		when(request.getUrl()).thenReturn(SERVER_URL);
 		when(jsonResponse.getStatus()).thenReturn(statusCode);
-		
+
 		OngoingStubbing<JsonNode> stub = when(jsonResponse.getBody()).thenReturn(new JsonNode(replyData[0]));
 
-		for (String reply: Arrays.asList(replyData).subList(1, replyData.length)) {
+		for (String reply : Arrays.asList(replyData).subList(1, replyData.length)) {
 			stub = stub.thenReturn(new JsonNode(reply));
 		}
 
-		
-		switch(requestType) {
-		case "GET":
-			GetRequest getRequest = mock(GetRequest.class); 
-			
-			when(Unirest.get(SERVER_URL + apiPath)).thenReturn(getRequest);
-			
-			when(getRequest.header(anyString(), anyString())).thenReturn(getRequest);
-			when(getRequest.asJson()).thenReturn(jsonResponse);
-			when(getRequest.queryString(anyString(), anyString())).thenReturn(getRequest);
-			when(getRequest.queryString(anyString(), anyInt())).thenReturn(getRequest);
-			when(getRequest.queryString(anyString(), anyBoolean())).thenReturn(getRequest);
-			return stub;
-		case "POST":
-			when(Unirest.post(SERVER_URL + apiPath)).thenReturn(postRequest);
-		case "PATCH":
-			when(Unirest.patch(SERVER_URL + apiPath)).thenReturn(postRequest);
-			when(postRequest.field(anyString(), anyString())).thenReturn(requestMultipartBody);
-			when(postRequest.field(anyString(), anyInt())).thenReturn(requestMultipartBody);
-			when(postRequest.field(anyString(), anyLong())).thenReturn(requestMultipartBody);
-			when(postRequest.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
-			when(postRequest.queryString(anyString(), anyString())).thenReturn(postRequest);
-			when(postRequest.queryString(anyString(), anyInt())).thenReturn(postRequest);
-			when(postRequest.queryString(anyString(), anyBoolean())).thenReturn(postRequest);
-			when(postRequest.header(anyString(), anyString())).thenReturn(postRequest);
-			when(requestMultipartBody.field(anyString(), anyString())).thenReturn(requestMultipartBody);
-			when(requestMultipartBody.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
-			return stub;
-			
+
+		switch (requestType) {
+			case "GET":
+				GetRequest getRequest = mock(GetRequest.class);
+
+				mocked.when(() -> Unirest.get(SERVER_URL + apiPath)).thenReturn(getRequest);
+
+				when(getRequest.header(anyString(), anyString())).thenReturn(getRequest);
+				when(getRequest.asJson()).thenReturn(jsonResponse);
+				when(getRequest.queryString(anyString(), anyString())).thenReturn(getRequest);
+				when(getRequest.queryString(anyString(), anyInt())).thenReturn(getRequest);
+				when(getRequest.queryString(anyString(), anyBoolean())).thenReturn(getRequest);
+				return stub;
+			case "POST":
+				mocked.when(() -> Unirest.post(SERVER_URL + apiPath)).thenReturn(postRequest);
+			case "PATCH":
+				mocked.when(() -> Unirest.patch(SERVER_URL + apiPath)).thenReturn(postRequest);
+				when(postRequest.field(anyString(), anyString())).thenReturn(requestMultipartBody);
+				when(postRequest.field(anyString(), anyInt())).thenReturn(requestMultipartBody);
+				when(postRequest.field(anyString(), anyLong())).thenReturn(requestMultipartBody);
+				when(postRequest.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
+				when(postRequest.queryString(anyString(), anyString())).thenReturn(postRequest);
+				when(postRequest.queryString(anyString(), anyInt())).thenReturn(postRequest);
+				when(postRequest.queryString(anyString(), anyBoolean())).thenReturn(postRequest);
+				when(postRequest.header(anyString(), anyString())).thenReturn(postRequest);
+				when(requestMultipartBody.field(anyString(), anyString())).thenReturn(requestMultipartBody);
+				when(requestMultipartBody.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
+				return stub;
+
 		}
+
 		return null;	
 	}
 	
 	protected WebUIDriver createMockedWebDriver() throws Exception {
 
 		WebUIDriver uiDriver = spy(new WebUIDriver("main"));
-		
-		PowerMockito.whenNew(WebUIDriver.class).withArguments(any()).thenReturn(uiDriver);
-		PowerMockito.whenNew(RemoteWebDriver.class).withAnyArguments().thenReturn(driver);
-		when(driver.manage()).thenReturn(options);
-		when(options.timeouts()).thenReturn(timeouts);
-		when(driver.getSessionId()).thenReturn(new SessionId("abcdef"));
-		when(driver.navigate()).thenReturn(navigation);
-		when(driver.switchTo()).thenReturn(targetLocator);
-		when(driver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "75.0", Platform.WINDOWS));
-		when(driver.findElement(By.id("text2"))).thenReturn(element);
+		mockedWebUiDriverFactory = mockStatic(WebUIDriverFactory.class);
+		mockedWebUiDriverFactory.when(() -> WebUIDriverFactory.getInstance("main")).thenReturn(uiDriver);
+
+		mockedWebUiDriver = mockConstruction(WebUIDriver.class);
+
 		when(element.getAttribute(anyString())).thenReturn("attribute");
 		when(element.getSize()).thenReturn(new Dimension(10, 10));
 		when(element.getLocation()).thenReturn(new Point(5, 5));
@@ -597,14 +617,27 @@ public class ConnectorsTest extends MockitoTest {
 		when(element.getText()).thenReturn("text");
 		when(element.isDisplayed()).thenReturn(true);
 		when(element.isEnabled()).thenReturn(true);
-		
+		when(options.timeouts()).thenReturn(timeouts);
+
+		mockedRemoteWebDriver = mockConstruction(RemoteWebDriver.class, (mock, context) -> {
+			when(mock.manage()).thenReturn(options);
+			when(mock.getSessionId()).thenReturn(new SessionId("abcdef"));
+			when(mock.navigate()).thenReturn(navigation);
+			when(mock.switchTo()).thenReturn(targetLocator);
+			when(mock.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "75.0", Platform.WINDOWS));
+			when(mock.findElement(By.id("text2"))).thenReturn(element);
+
+		});
+
+
 		return uiDriver;
+
+
 	}
 	
 	/**
 	 * Creates a mock for grid on http://localhost:4321
-	 * 
-	 * PowerMockito.mockStatic(Unirest.class); should be called first
+	 *
 	 * @throws Exception 
 	 */
 	protected WebUIDriver createGridHubMockWithNodeOK() throws Exception {

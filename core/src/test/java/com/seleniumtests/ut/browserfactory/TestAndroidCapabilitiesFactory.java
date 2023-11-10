@@ -20,6 +20,7 @@ package com.seleniumtests.ut.browserfactory;
 import java.io.File;
 import java.util.Arrays;
 
+import io.appium.java_client.android.options.UiAutomator2Options;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.remote.CapabilityType;
@@ -33,10 +34,6 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
-
-import io.appium.java_client.remote.AndroidMobileCapabilityType;
-import io.appium.java_client.remote.MobileCapabilityType;
-
 public class TestAndroidCapabilitiesFactory extends GenericTest {
 
 	/**
@@ -55,15 +52,15 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		
 		
 		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
-		MutableCapabilities capa = capaFactory.createCapabilities();
+		UiAutomator2Options capa = (UiAutomator2Options) capaFactory.createCapabilities();
 		
-		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), BrowserType.CHROME.toString().toLowerCase());
-		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.AUTOMATION_NAME), "Appium");
-		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_NAME), Platform.ANDROID);
-		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.PLATFORM_VERSION), "8.0");
-		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.DEVICE_NAME), "Samsung Galasy S8");
+		Assert.assertEquals(capa.getBrowserName(), BrowserType.CHROME.toString().toLowerCase());
+		Assert.assertEquals(capa.getAutomationName().orElse(null), "Appium");
+		Assert.assertEquals(capa.getPlatformName(), Platform.ANDROID);
+		Assert.assertEquals(capa.getPlatformVersion().orElse(null), "8.0");
+		Assert.assertEquals(capa.getDeviceName().orElse(null), "Samsung Galasy S8");
 		Assert.assertFalse(capa.is(SeleniumRobotCapabilityType.NODE_TAGS));
-		Assert.assertNull(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.FULL_RESET));
+		Assert.assertNull(capa.doesFullReset().orElse(false));
 	}
 	
 	/**
@@ -83,11 +80,11 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		
 		
 		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
-		MutableCapabilities capa = capaFactory.createCapabilities();
+		UiAutomator2Options capa = (UiAutomator2Options) capaFactory.createCapabilities();
 		
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), BrowserType.CHROME.toString().toLowerCase());
-		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.AUTOMATION_NAME), "UiAutomator1");
-		Assert.assertNull(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.FULL_RESET));
+		Assert.assertEquals(capa.getAutomationName(), "UiAutomator1");
+		Assert.assertNull(capa.doesFullReset().orElse(false));
 	}
 	
 	/**
@@ -153,14 +150,14 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		
 		
 		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
-		MutableCapabilities capa = capaFactory.createCapabilities();
+		UiAutomator2Options capa = (UiAutomator2Options) capaFactory.createCapabilities();
 		
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), BrowserType.CHROME.toString().toLowerCase());
-		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.AUTOMATION_NAME), "Appium");
-		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_NAME), Platform.ANDROID);
-		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.PLATFORM_VERSION), "8.0");
-		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.DEVICE_NAME), "Samsung Galasy S8");
-		Assert.assertNull(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.FULL_RESET));
+		Assert.assertEquals(capa.getAutomationName().orElse(null), "Appium");
+		Assert.assertEquals(capa.getPlatformName(), Platform.ANDROID);
+		Assert.assertEquals(capa.getPlatformVersion(), "8.0");
+		Assert.assertEquals(capa.getDeviceName().orElse(null), "Samsung Galasy S8");
+		Assert.assertNull(capa.doesFullReset().orElse(false));
 	}
 	
 	/**
@@ -178,17 +175,17 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		DriverConfig config = new DriverConfig(context);
 		
 		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
-		MutableCapabilities capa = capaFactory.createCapabilities();
+		UiAutomator2Options capa = (UiAutomator2Options) capaFactory.createCapabilities();
 		
 		Assert.assertNull(capa.getCapability(CapabilityType.BROWSER_NAME));
-		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP), "com.covea.mobileapp");
-		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.AUTOMATION_NAME), "Appium");
-		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_NAME), Platform.ANDROID);
-		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.PLATFORM_VERSION), "8.0");
-		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.DEVICE_NAME), "Samsung Galasy S8");
-		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.FULL_RESET), true);
-		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + AndroidMobileCapabilityType.APP_PACKAGE), "appPackage");
-		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + AndroidMobileCapabilityType.APP_ACTIVITY), "appActivity");
+		Assert.assertEquals(capa.getApp().orElse(null), "com.covea.mobileapp");
+		Assert.assertEquals(capa.getAutomationName().orElse(null), "Appium");
+		Assert.assertEquals(capa.getPlatformName(), Platform.ANDROID);
+		Assert.assertEquals(capa.getPlatformVersion(), "8.0");
+		Assert.assertEquals(capa.getDeviceName().orElse(null), "Samsung Galasy S8");
+		Assert.assertTrue(capa.doesFullReset().orElse(false));
+		Assert.assertEquals(capa.getAppPackage().orElse(null), "appPackage");
+		Assert.assertEquals(capa.getAppActivity().orElse(null), "appActivity");
 	}
 	
 	/**
@@ -206,11 +203,10 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		DriverConfig config = new DriverConfig(context);
 		
 		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
-		MutableCapabilities capa = capaFactory.createCapabilities();
+		UiAutomator2Options capa = (UiAutomator2Options) capaFactory.createCapabilities();
 		
 		Assert.assertNull(capa.getCapability(CapabilityType.BROWSER_NAME));
-		logger.info("app path: " + capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP));
-		Assert.assertTrue(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP).toString().contains("/data/core/app.apk"));
+		Assert.assertTrue(capa.getApp().orElse("").contains("/data/core/app.apk"));
 	}
 	
 	/**
@@ -229,10 +225,10 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		DriverConfig config = new DriverConfig(context);
 		
 		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
-		MutableCapabilities capa = capaFactory.createCapabilities();
+		UiAutomator2Options capa = (UiAutomator2Options) capaFactory.createCapabilities();
 		
 		Assert.assertNull(capa.getCapability(CapabilityType.BROWSER_NAME));
-		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP), path.replace("\\", "/"));
+		Assert.assertEquals(capa.getApp().orElse(""), path.replace("\\", "/"));
 	}
 	
 	/**
@@ -251,53 +247,11 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		DriverConfig config = new DriverConfig(context);
 		
 		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
-		MutableCapabilities capa = capaFactory.createCapabilities();
+		UiAutomator2Options capa = (UiAutomator2Options) capaFactory.createCapabilities();
 		
-		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.FULL_RESET), false);
+		Assert.assertEquals(capa.doesFullReset(), false);
 	}
-	
-	/**
-	 * Check automationName capability with android < 4
-	 */
-	@Test(groups={"ut"})
-	public void testCreateCapabilitiesWithApplicationOldAndroid() {
-		SeleniumTestsContext context = new SeleniumTestsContext(SeleniumTestsContextManager.getThreadContext());
-		context.setMobilePlatformVersion("2.3");
-		context.setPlatform("android");
-		context.setDeviceName("Samsung Galasy S1");
-		context.setAppPackage("appPackage");
-		context.setAppActivity("appActivity");
-		context.setFullReset(true);
-		context.setApp("com.covea.mobileapp");
-		DriverConfig config = new DriverConfig(context);
-		
-		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
-		MutableCapabilities capa = capaFactory.createCapabilities();
-		
-		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.AUTOMATION_NAME), "Selendroid");
-	}
-	
-	/**
-	 * Check automationName capability with android < 6
-	 */
-	@Test(groups={"ut"})
-	public void testCreateCapabilitiesWithApplicationOldAndroid2() {
-		SeleniumTestsContext context = new SeleniumTestsContext(SeleniumTestsContextManager.getThreadContext());
-		context.setMobilePlatformVersion("5.0");
-		context.setPlatform("android");
-		context.setDeviceName("Samsung Galasy S5");
-		context.setAppPackage("appPackage");
-		context.setAppActivity("appActivity");
-		context.setFullReset(true);
-		context.setApp("com.covea.mobileapp");
-		DriverConfig config = new DriverConfig(context);
-		
-		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
-		MutableCapabilities capa = capaFactory.createCapabilities();
-		
-		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.AUTOMATION_NAME), "UiAutomator1");
-	}
-	
+
 	/**
 	 * Check that when user sets a capability with 'appiumCaps' option, it's forwarded to appium
 	 */
@@ -315,7 +269,7 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		
 		
 		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
-		MutableCapabilities capa = capaFactory.createCapabilities();
+		UiAutomator2Options capa = (UiAutomator2Options) capaFactory.createCapabilities();
 		
 		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + "key1"), "value1");
 		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + "key2"), "value2");

@@ -46,8 +46,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openqa.selenium.Rectangle;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
@@ -64,7 +64,7 @@ import com.seleniumtests.reporter.reporters.SeleniumRobotServerTestRecorder;
 
 import kong.unirest.json.JSONObject;
 
-@PrepareForTest({SeleniumRobotSnapshotServerConnector.class, CommonReporter.class, SeleniumRobotVariableServerConnector.class, SeleniumRobotServerContext.class, SeleniumTestsContext.class})
+//@PrepareForTest({SeleniumRobotSnapshotServerConnector.class, CommonReporter.class, SeleniumRobotVariableServerConnector.class, SeleniumRobotServerContext.class, SeleniumTestsContext.class})
 public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	
 	private SeleniumRobotServerTestRecorder reporter;
@@ -274,15 +274,15 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 			
-			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null)).thenReturn(variableServer);
+//			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null)).thenReturn(variableServer);
 			when(variableServer.isAlive()).thenReturn(false);
 
 			reporter = spy(new SeleniumRobotServerTestRecorder());
-			PowerMockito.mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
-			PowerMockito.when(CommonReporter.getInstance(SeleniumRobotServerTestRecorder.class)).thenReturn(reporter);
-
-			PowerMockito.mockStatic(SeleniumRobotSnapshotServerConnector.class);
-			PowerMockito.doReturn(serverConnector).when(SeleniumRobotSnapshotServerConnector.class, "getInstance");
+//			PowerMockito.mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+//			PowerMockito.when(CommonReporter.getInstance(SeleniumRobotServerTestRecorder.class)).thenReturn(reporter);
+//
+//			PowerMockito.mockStatic(SeleniumRobotSnapshotServerConnector.class);
+//			PowerMockito.doReturn(serverConnector).when(SeleniumRobotSnapshotServerConnector.class, "getInstance");
 
 			doReturn(serverConnector).when(reporter).getServerConnector();
 			when(serverConnector.getActive()).thenReturn(false);
@@ -495,16 +495,16 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	 */
 	private void initMocks() throws Exception, InstantiationException, IllegalAccessException,
 			InvocationTargetException, NoSuchMethodException {
-		PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null)).thenReturn(variableServer);
+//		PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null)).thenReturn(variableServer);
 		when(variableServer.isAlive()).thenReturn(true);
 		
 		reporter = spy(new SeleniumRobotServerTestRecorder());
-		PowerMockito.mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
-		PowerMockito.when(CommonReporter.getInstance(SeleniumRobotServerTestRecorder.class)).thenReturn(reporter);
+//		PowerMockito.mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+//		PowerMockito.when(CommonReporter.getInstance(SeleniumRobotServerTestRecorder.class)).thenReturn(reporter);
 
-		PowerMockito.mockStatic(SeleniumRobotSnapshotServerConnector.class);
+//		PowerMockito.mockStatic(SeleniumRobotSnapshotServerConnector.class);
 		reset(serverConnector); // reset call count
-		PowerMockito.doReturn(serverConnector).when(SeleniumRobotSnapshotServerConnector.class, "getInstance");
+//		PowerMockito.doReturn(serverConnector).when(SeleniumRobotSnapshotServerConnector.class, "getInstance");
 		when(serverConnector.getReferenceSnapshot(anyInt())).thenReturn(File.createTempFile("img", ".png"));
 		
 		when(serverConnector.detectFieldsInPicture(any(ScreenShot.class))).thenReturn(new JSONObject("{'fields': [], 'labels': [], 'version': 'aaa', 'error': null}"));

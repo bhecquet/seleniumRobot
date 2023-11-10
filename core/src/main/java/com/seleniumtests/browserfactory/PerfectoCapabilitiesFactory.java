@@ -4,9 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import io.appium.java_client.remote.options.BaseOptions;
+import io.appium.java_client.remote.options.SupportsAppOption;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -28,8 +31,6 @@ import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.DriverConfig;
 
-import io.appium.java_client.remote.MobileCapabilityType;
-
 public class PerfectoCapabilitiesFactory extends ICloudCapabilityFactory {
 
 	private static final Pattern CLOUD_NAME_PATTERN = Pattern.compile("https://([^:@]++)@(\\w+).perfectomobile.com/nexperience.*");
@@ -43,7 +44,7 @@ public class PerfectoCapabilitiesFactory extends ICloudCapabilityFactory {
 		
 		String apiKey = extractApiKey();
 		
-		DesiredCapabilities  capabilities = new DesiredCapabilities ();
+		MutableCapabilities  capabilities = new DesiredCapabilities ();
 		capabilities.setCapability("enableAppiumBehavior", true);
 		capabilities.setCapability("autoLaunch", true);
 		capabilities.setCapability("securityToken", apiKey);
@@ -59,23 +60,24 @@ public class PerfectoCapabilitiesFactory extends ICloudCapabilityFactory {
         } 
 		
 		// we need to upload something
-		if (capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP) != null) {
+		Optional<String> applicationCapability = ((SupportsAppOption)capabilities).getApp();
+		if (applicationCapability.isPresent() && applicationCapability.get() != null) {
 			boolean uploadApp = isUploadApp(capabilities);
 			
-			String appName = new File((String) capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP)).getName();
+			String appName = new File((String) applicationCapability.get()).getName();
 			String repositoryKey = String.format("PUBLIC:%s", appName);
 			
 			String cloudName = extractCloudName();
 			
 			if (uploadApp) {
 				try {
-					uploadFile(cloudName, apiKey, (String)capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP), repositoryKey);
+					uploadFile(cloudName, apiKey, applicationCapability.get(), repositoryKey);
 					
 				} catch (URISyntaxException | IOException e) {
 					throw new ScenarioException("Could not upload file", e);
 				}
 			}
-			capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP, repositoryKey);
+			((SupportsAppOption)capabilities).setApp(repositoryKey);
 		}
 
 		return capabilities;

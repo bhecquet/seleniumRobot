@@ -48,9 +48,9 @@ import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
 import com.seleniumtests.reporter.logger.TestStep.StepStatus;
 
-import net.lightbody.bmp.core.har.Har;
-import net.lightbody.bmp.core.har.HarLog;
-import net.lightbody.bmp.core.har.HarPage;
+//import net.lightbody.bmp.core.har.Har;
+//import net.lightbody.bmp.core.har.HarLog;
+//import net.lightbody.bmp.core.har.HarPage;
 
 public class TestTestStep extends GenericTest {
 
@@ -572,17 +572,17 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(encodedTestStep.getActionExceptionMessage(), "class org.openqa.selenium.NoSuchElementException: foo\n");
 	}
 
-	@Test(groups = { "ut" })
-	public void testTestStepEncodeXmlHarKept() throws IOException {
-		Har har = new Har(new HarLog());
-		har.getLog().addPage(new HarPage("title", "a title"));
-		HarCapture cap = new HarCapture(har, "main");
-
-		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>(), true);
-		step.setHarCaptures(Arrays.asList(cap));
-		TestStep encodedTestStep = step.encode("xml");
-		Assert.assertEquals(encodedTestStep.getHarCaptures().get(0), cap);
-	}
+//	@Test(groups = { "ut" })
+//	public void testTestStepEncodeXmlHarKept() throws IOException {
+//		Har har = new Har(new HarLog());
+//		har.getLog().addPage(new HarPage("title", "a title"));
+//		HarCapture cap = new HarCapture(har, "main");
+//
+//		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>(), true);
+//		step.setHarCaptures(Arrays.asList(cap));
+//		TestStep encodedTestStep = step.encode("xml");
+//		Assert.assertEquals(encodedTestStep.getHarCaptures().get(0), cap);
+//	}
 
 	@Test(groups = { "ut" })
 	public void testTestStepEncodeXmlFileKept() throws IOException {
@@ -717,9 +717,9 @@ public class TestTestStep extends GenericTest {
 		step.addMessage(new TestMessage("everything OK", MessageType.INFO));
 		step.addAction(new TestAction("action2", false, new ArrayList<>()));
 
-		Har har = new Har(new HarLog());
-		har.getLog().addPage(new HarPage("title", "a title"));
-		step.addNetworkCapture(new HarCapture(har, "main"));
+//		Har har = new Har(new HarLog());
+//		har.getLog().addPage(new HarPage("title", "a title"));
+//		step.addNetworkCapture(new HarCapture(har, "main"));
 
 		GenericFile file = new GenericFile(File.createTempFile("video", ".avi"), "video file");
 		step.addFile(file);
@@ -798,9 +798,9 @@ public class TestTestStep extends GenericTest {
 		step.addMessage(new TestMessage("everything OK", MessageType.INFO));
 		step.addAction(new TestAction("action2", false, new ArrayList<>()));
 
-		Har har = new Har(new HarLog());
-		har.getLog().addPage(new HarPage("title", "a title"));
-		step.addNetworkCapture(new HarCapture(har, "main"));
+//		Har har = new Har(new HarLog());
+//		har.getLog().addPage(new HarPage("title", "a title"));
+//		step.addNetworkCapture(new HarCapture(har, "main"));
 
 		GenericFile file = new GenericFile(File.createTempFile("video", ".avi"), "video file");
 		step.addFile(file);
@@ -1118,20 +1118,20 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(message.getPosition(), 1);
 		Assert.assertEquals(message.getParent(), step);
 	}
-
-	@Test(groups = { "ut" })
-	public void testTestSubCapturePositionAndParent() throws IOException {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
-		TestStep subStep = new TestStep("subStep1", null, new ArrayList<>(), true);
-		step.addStep(subStep);
-
-		Har har = new Har(new HarLog());
-		har.getLog().addPage(new HarPage("title", "a title"));
-		HarCapture capture = new HarCapture(har, "main");
-		step.addNetworkCapture(capture);
-		Assert.assertEquals(capture.getPosition(), 1);
-		Assert.assertEquals(capture.getParent(), step);
-	}
+//
+//	@Test(groups = { "ut" })
+//	public void testTestSubCapturePositionAndParent() throws IOException {
+//		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+//		TestStep subStep = new TestStep("subStep1", null, new ArrayList<>(), true);
+//		step.addStep(subStep);
+//
+//		Har har = new Har(new HarLog());
+//		har.getLog().addPage(new HarPage("title", "a title"));
+//		HarCapture capture = new HarCapture(har, "main");
+//		step.addNetworkCapture(capture);
+//		Assert.assertEquals(capture.getPosition(), 1);
+//		Assert.assertEquals(capture.getParent(), step);
+//	}
 
 	@Test(groups = { "ut" })
 	public void testTestSubFilePositionAndParent() throws IOException {

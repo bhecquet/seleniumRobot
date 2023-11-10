@@ -18,7 +18,11 @@
 package com.seleniumtests.browserfactory;
 
 import java.io.File;
+import java.time.Duration;
+import java.util.Optional;
 
+import io.appium.java_client.remote.options.BaseOptions;
+import io.appium.java_client.remote.options.SupportsAppOption;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -27,8 +31,6 @@ import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
-
-import io.appium.java_client.remote.MobileCapabilityType;
 
 public abstract class IMobileCapabilityFactory extends ICapabilitiesFactory {
 	
@@ -48,57 +50,57 @@ public abstract class IMobileCapabilityFactory extends ICapabilitiesFactory {
 
     	String app = webDriverConfig.getApp().trim();
     	
-    	DesiredCapabilities capabilities = new DesiredCapabilities();
-    	capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.AUTOMATION_NAME, getAutomationName());
+    	BaseOptions options = new BaseOptions();
+    	options.setAutomationName(getAutomationName());
     
     	if (app != null && !app.trim().isEmpty()) {
-	    	capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.FULL_RESET, webDriverConfig.isFullReset());
+	    	options.setFullReset(webDriverConfig.isFullReset());
     	}
     	
-    	// Set up version and device name else appium server would pick the only available emulator/device
+    	// Set up version (device name is set on specific capability factories) else appium server would pick the only available emulator/device
         // Both of these are ignored for android for now
-    	capabilities.setCapability(CapabilityType.PLATFORM_NAME, webDriverConfig.getPlatform());
-    	capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.PLATFORM_VERSION, webDriverConfig.getMobilePlatformVersion());
-    	capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.DEVICE_NAME, webDriverConfig.getDeviceName());
-    	capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.NEW_COMMAND_TIMEOUT, webDriverConfig.getNewCommandTimeout());
+    	options.setPlatformName(webDriverConfig.getPlatform());
+    	options.setPlatformVersion(webDriverConfig.getMobilePlatformVersion());
+    	options.setNewCommandTimeout(Duration.ofSeconds(webDriverConfig.getNewCommandTimeout()));
     	
     	// in case app has not been specified for cloud provider
-        if (capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP) == null && app != null && !app.isEmpty()) {
+		Optional<String> applicationOption = ((SupportsAppOption)options).getApp();
+        if (applicationOption.isPresent() && applicationOption.get() == null && app != null && !app.isEmpty()) {
         	
         	// in case of local file, give absolute path to file. For remote files (e.g: http://myapp.apk), it will be transmitted as is
         	if (new File(app).isFile()) {
         		app = new File(app).getAbsolutePath();
         	}
-        	capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP, app.replace("\\", "/"));
+			((SupportsAppOption)options).setApp(app.replace("\\", "/"));
         }
         
         if (webDriverConfig.getTestContext() != null && webDriverConfig.getTestContext().getTestNGResult() != null) {
         	String testName = TestNGResultUtils.getTestName(webDriverConfig.getTestContext().getTestNGResult());
-        	capabilities.setCapability(SeleniumRobotCapabilityType.TEST_NAME, testName);
-        	capabilities.setCapability(SeleniumRobotCapabilityType.STARTED_BY, webDriverConfig.getStartedBy());
+        	options.setCapability(SeleniumRobotCapabilityType.TEST_NAME, testName);
+        	options.setCapability(SeleniumRobotCapabilityType.STARTED_BY, webDriverConfig.getStartedBy());
         }
     	
     	// do not configure application and browser as they are mutualy exclusive
         if (app == null || app.isEmpty() && webDriverConfig.getBrowserType() != BrowserType.NONE) {
-        	capabilities.setCapability(CapabilityType.BROWSER_NAME, webDriverConfig.getBrowserType().toString().toLowerCase());
-        	capabilities.merge(getBrowserSpecificCapabilities());
+        	options.setCapability(CapabilityType.BROWSER_NAME, webDriverConfig.getBrowserType().toString().toLowerCase());
+        	options.merge(getBrowserSpecificCapabilities());
         } else {
-        	capabilities.setCapability(CapabilityType.BROWSER_NAME, (String)null);
+        	options.setCapability(CapabilityType.BROWSER_NAME, (String)null);
         }
         
         // add node tags
         if (!webDriverConfig.getNodeTags().isEmpty() && webDriverConfig.getMode() == DriverMode.GRID) {
-        	capabilities.setCapability(SeleniumRobotCapabilityType.NODE_TAGS, webDriverConfig.getNodeTags());
+        	options.setCapability(SeleniumRobotCapabilityType.NODE_TAGS, webDriverConfig.getNodeTags());
         }
         
         // add OS specific capabilities
-        capabilities.merge(getSystemSpecificCapabilities());
+        options.merge(getSystemSpecificCapabilities());
         
         // add user configurations
-        capabilities.merge(webDriverConfig.getAppiumCapabilities());
+        options.merge(webDriverConfig.getAppiumCapabilities());
         
         
-        return capabilities;
+        return options;
     }
 
 }

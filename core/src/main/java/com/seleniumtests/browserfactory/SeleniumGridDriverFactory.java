@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import io.appium.java_client.remote.options.BaseOptions;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.SessionNotCreatedException;
 import org.openqa.selenium.WebDriver;
@@ -47,7 +48,6 @@ import com.seleniumtests.util.helper.WaitHelper;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
-import io.appium.java_client.remote.MobileCapabilityType;
 
 public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
 	
@@ -107,11 +107,11 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
      * OS version is only updated for mobile. It has no real sense on desktop
      * @return
      */
-    public DesiredCapabilities createSpecificGridCapabilities(DriverConfig webDriverConfig) {
-    	DesiredCapabilities capabilities = new DesiredCapabilities();
+    public MutableCapabilities createSpecificGridCapabilities(DriverConfig webDriverConfig) {
+    	MutableCapabilities capabilities = new MutableCapabilities();
     	
     	if (SeleniumTestsContextManager.isMobileTest()) {
-    		capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.PLATFORM_VERSION, webDriverConfig.getMobilePlatformVersion());
+			((BaseOptions)capabilities).setPlatformVersion(webDriverConfig.getMobilePlatformVersion());
     	} else {
     		capabilities.setCapability(CapabilityType.PLATFORM_NAME, webDriverConfig.getPlatform().toLowerCase());
     		if (webDriverConfig.getBrowserVersion() != null && capabilities.getCapability(CapabilityType.BROWSER_VERSION) == null) {

@@ -24,8 +24,8 @@ import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -77,7 +77,7 @@ import com.seleniumtests.reporter.logger.TestStep;
 
 import io.atlassian.util.concurrent.Promise;
 
-@PrepareForTest({JiraConnector.class})
+//@PrepareForTest({JiraConnector.class})
 public class TestJiraConnector extends MockitoTest {
 	
 	public TestJiraConnector() throws Exception {
@@ -253,7 +253,7 @@ public class TestJiraConnector extends MockitoTest {
 		stepEnd.setPosition(2);
 		
 		// mock all clients
-		PowerMockito.whenNew(AsynchronousJiraRestClientFactory.class).withNoArguments().thenReturn(restClientFactory);
+//		PowerMockito.whenNew(AsynchronousJiraRestClientFactory.class).withNoArguments().thenReturn(restClientFactory);
 		when(restClientFactory.createWithBasicHttpAuthentication(any(URI.class), eq("user"), eq("password"))).thenReturn(restClient);
 		
 		when(restClient.getProjectClient()).thenReturn(projectRestClient);

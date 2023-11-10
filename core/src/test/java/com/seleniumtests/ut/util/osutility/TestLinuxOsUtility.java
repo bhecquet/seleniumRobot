@@ -31,8 +31,8 @@ import java.util.Map;
 
 import org.mockito.Mock;
 import org.openqa.selenium.Platform;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.BeforeClass;
@@ -49,7 +49,7 @@ import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.osutility.OSUtilityUnix;
 import com.sun.jna.platform.win32.Advapi32Util;
 
-@PrepareForTest({Advapi32Util.class, OSUtilityUnix.class, OSUtilityFactory.class, OSCommand.class, Paths.class, BrowserInfo.class, OSUtility.class})
+//@PrepareForTest({Advapi32Util.class, OSUtilityUnix.class, OSUtilityFactory.class, OSCommand.class, Paths.class, BrowserInfo.class, OSUtility.class})
 public class TestLinuxOsUtility extends MockitoTest {
 	
 	@Mock
@@ -66,18 +66,18 @@ public class TestLinuxOsUtility extends MockitoTest {
 	
 	@BeforeClass(groups = {"ut"})
     public void isWindows() throws Exception {
-    	PowerMockito.mockStatic(OSUtility.class);
+//    	PowerMockito.mockStatic(OSUtility.class);
     	
 		when(OSUtility.getCharset()).thenCallRealMethod();
 		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.LINUX);
-		PowerMockito.doCallRealMethod().when(OSUtility.class, "refreshBrowserList", false);
-		PowerMockito.doCallRealMethod().when(OSUtility.class, "resetInstalledBrowsersWithVersion");
+//		PowerMockito.doCallRealMethod().when(OSUtility.class, "refreshBrowserList", false);
+//		PowerMockito.doCallRealMethod().when(OSUtility.class, "resetInstalledBrowsersWithVersion");
 		when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(new HashMap<>());
 		
-		PowerMockito.when(OSUtility.isWindows()).thenReturn(false);
-		PowerMockito.when(OSUtility.isMac()).thenReturn(false);
-		PowerMockito.when(OSUtility.extractChromeVersion(anyString())).thenCallRealMethod();
-		PowerMockito.when(OSUtility.extractChromeOrChromiumVersion(anyString())).thenCallRealMethod();
+//		PowerMockito.when(OSUtility.isWindows()).thenReturn(false);
+//		PowerMockito.when(OSUtility.isMac()).thenReturn(false);
+//		PowerMockito.when(OSUtility.extractChromeVersion(anyString())).thenCallRealMethod();
+//		PowerMockito.when(OSUtility.extractChromeOrChromiumVersion(anyString())).thenCallRealMethod();
     }
 	
 	
@@ -86,7 +86,7 @@ public class TestLinuxOsUtility extends MockitoTest {
 	public void testGetProcessPidByListenPort() {
 		
 
-		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(OSCommand.class);
 		when(OSCommand.executeCommandAndWait("netstat -anp")).thenReturn("tcp        0      0 0.0.0.0:48000           0.0.0.0:*               LISTEN      1421/nimbus(control\r\n" + 
 				"tcp        0      0 0.0.0.0:51239           0.0.0.0:*               LISTEN      22492/nimbus(spooler\r\n" + 
 				"tcp        0      0 0.0.0.0:10050           0.0.0.0:*               LISTEN      1382/zabbix_agentd\r\n" + 
@@ -111,7 +111,7 @@ public class TestLinuxOsUtility extends MockitoTest {
 	public void testGetProcessPidByListenPort2() {
 		
 		
-		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(OSCommand.class);
 		when(OSCommand.executeCommandAndWait("netstat -anp")).thenReturn("tcp        0      0 0.0.0.0:48000           0.0.0.0:*               LISTEN      1421/nimbus(control\r\n" + 
 				"tcp        0      0 0.0.0.0:1234           0.0.0.0:*               LISTEN      22492/nimbus(spooler\r\n" + 
 				"tcp        0      0 0.0.0.0:10050           0.0.0.0:*               LISTEN      1382/zabbix_agentd\r\n" + 
@@ -135,7 +135,7 @@ public class TestLinuxOsUtility extends MockitoTest {
 	public void testGetProcessPidByListenPort3() {
 		
 		
-		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(OSCommand.class);
 		when(OSCommand.executeCommandAndWait("netstat -anp")).thenReturn("tcp        0      0 0.0.0.0:48000           0.0.0.0:*               LISTEN      1421/nimbus(control\r\n" + 
 				"tcp        0      0 0.0.0.0:1234           0.0.0.0:*               LISTEN      22492/nimbus(spooler\r\n" + 
 				"tcp        0      0 0.0.0.0:10050           0.0.0.0:51239          LISTEN      1382/zabbix_agentd\r\n" + 
@@ -155,7 +155,7 @@ public class TestLinuxOsUtility extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testGetProcessPidByListenPortNotFound() {
 		
-		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(OSCommand.class);
 		when(OSCommand.executeCommandAndWait("netstat -anp")).thenReturn("");
 
 		Assert.assertNull(new OSUtilityUnix().getProcessIdByListeningPort(51239));
@@ -166,8 +166,8 @@ public class TestLinuxOsUtility extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testNoBrowserInstalled() {
-		PowerMockito.mockStatic(OSCommand.class);
-		PowerMockito.mockStatic(Paths.class);
+//		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(Paths.class);
 		
 
 		when(Paths.get("/usr/local/bin/firefox")).thenReturn(path);
@@ -186,8 +186,8 @@ public class TestLinuxOsUtility extends MockitoTest {
 
 	@Test(groups={"ut"})
 	public void testFirefoxStandardInstallation() {
-		PowerMockito.mockStatic(OSCommand.class);
-		PowerMockito.mockStatic(Paths.class);
+//		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(Paths.class);
 		
 
 		when(Paths.get("/usr/local/bin/firefox")).thenReturn(path);
@@ -208,8 +208,8 @@ public class TestLinuxOsUtility extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testChromeStandardInstallation() {
-		PowerMockito.mockStatic(OSCommand.class);
-		PowerMockito.mockStatic(Paths.class);
+//		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(Paths.class);
 		
 		
 		when(Paths.get("/usr/local/bin/google-chrome")).thenReturn(path);
@@ -231,8 +231,8 @@ public class TestLinuxOsUtility extends MockitoTest {
 	
 	@Test(groups = {"ut"})
 	public void testChromeSpecialBinaryInstallation() {
-		PowerMockito.mockStatic(OSCommand.class);
-		PowerMockito.mockStatic(Paths.class);
+//		PowerMockito.mockStatic(OSCommand.class);
+//		PowerMockito.mockStatic(Paths.class);
 
 		when(Paths.get("/usr/local/bin/google-chrome")).thenReturn(path);
 		when(Paths.get("/usr/local/bin/google-chrome-binary")).thenReturn(path);

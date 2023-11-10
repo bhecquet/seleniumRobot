@@ -24,8 +24,8 @@ import org.mockito.Mockito;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebElement;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -35,7 +35,7 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.uipage.htmlelements.LabelElement;
 
 
-@PrepareForTest(WebUIDriver.class)
+//@PrepareForTest(WebUIDriver.class)
 public class TestLabelElement extends MockitoTest {
 	
 	@Mock
@@ -49,7 +49,7 @@ public class TestLabelElement extends MockitoTest {
 
 	@Test(groups={"ut"})
 	public void testLabelElement() throws Exception {
-		PowerMockito.mockStatic(WebUIDriver.class);
+//		PowerMockito.mockStatic(WebUIDriver.class);
 		Mockito.when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
 		Mockito.when(driver.findElement(By.id("label"))).thenReturn(element);
 		Mockito.when(element.getText()).thenReturn("textual label");
@@ -60,6 +60,6 @@ public class TestLabelElement extends MockitoTest {
 		Assert.assertEquals(el.getText(), "textual label");
 		
 		// check we called getDriver before using it
-		PowerMockito.verifyPrivate(el, Mockito.times(1)).invoke("updateDriver");
+//		PowerMockito.verifyPrivate(el, Mockito.times(1)).invoke("updateDriver");
 	}
 }

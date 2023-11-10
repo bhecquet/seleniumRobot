@@ -19,9 +19,11 @@ package com.seleniumtests.browserfactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import io.appium.java_client.remote.options.SupportsAppOption;
 import org.apache.http.auth.AuthenticationException;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
@@ -31,7 +33,6 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.DriverConfig;
 
-import io.appium.java_client.remote.MobileCapabilityType;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
 import kong.unirest.UnirestInstance;
@@ -76,13 +77,15 @@ public class SauceLabsCapabilitiesFactory extends ICloudCapabilityFactory {
         }
 		
 		// we need to upload something
-		if (capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP) != null) {
+		Optional<String> applicationCapability = ((SupportsAppOption)capabilities).getApp();
+		if (applicationCapability.isPresent() && applicationCapability.get() != null) {
+
 			boolean uploadApp = isUploadApp(capabilities);
 			
 			if (uploadApp) {
-				uploadFile((String)capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP));
+				uploadFile(applicationCapability.get());
 			}
-			capabilities.setCapability("app", "storage:filename=" + new File((String) capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP)).getName()); //  saucelabs waits for app capability a special file: sauce-storage:<filename>
+			((SupportsAppOption)capabilities).setApp("storage:filename=" + new File(applicationCapability.get()).getName()); //  saucelabs waits for app capability a special file: sauce-storage:<filename>
 
 		}
         
@@ -92,8 +95,6 @@ public class SauceLabsCapabilitiesFactory extends ICloudCapabilityFactory {
 
     /**
      * Upload application to saucelabs server
-     * @param targetAppPath
-     * @param serverURL
      * @return
      * @throws IOException
      * @throws AuthenticationException 

@@ -32,8 +32,8 @@ import java.io.File;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.openqa.selenium.Rectangle;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
@@ -55,7 +55,7 @@ import com.seleniumtests.driver.screenshots.SnapshotTarget;
 import com.seleniumtests.uipage.htmlelements.ScreenZone;
 import com.seleniumtests.util.imaging.ImageDetector;
 
-@PrepareForTest({CustomEventFiringWebDriver.class, WebUIDriver.class})
+//@PrepareForTest({CustomEventFiringWebDriver.class, WebUIDriver.class})
 public class TestScreenZone extends MockitoTest {
 	
 	@Mock
@@ -83,8 +83,8 @@ public class TestScreenZone extends MockitoTest {
 		ScreenZone picElement = spy(screenZone);
 		picElement.setObjectPictureFile(new File(""));
 
-		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
-		PowerMockito.mockStatic(WebUIDriver.class);
+//		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
+//		PowerMockito.mockStatic(WebUIDriver.class);
 		
 		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
 		when(driver.getBrowserInfo()).thenReturn(browserInfo);
@@ -107,8 +107,8 @@ public class TestScreenZone extends MockitoTest {
 		ScreenZone picElement = spy(screenZone);
 		picElement.setObjectPictureFile(new File(""));
 		
-		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
-		PowerMockito.mockStatic(WebUIDriver.class);
+//		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
+//		PowerMockito.mockStatic(WebUIDriver.class);
 		
 		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
 		when(driver.getBrowserInfo()).thenReturn(browserInfo);
@@ -147,8 +147,8 @@ public class TestScreenZone extends MockitoTest {
 		ScreenZone picElement = spy(screenZone);
 		picElement.setObjectPictureFile(new File(""));
 		
-		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
-		PowerMockito.mockStatic(WebUIDriver.class);
+//		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
+//		PowerMockito.mockStatic(WebUIDriver.class);
 		
 		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
 		when(driver.getBrowserInfo()).thenReturn(browserInfo);
@@ -168,8 +168,8 @@ public class TestScreenZone extends MockitoTest {
 		ScreenZone picElement = spy(screenZone);
 		picElement.setObjectPictureFile(new File(""));
 		
-		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
-		PowerMockito.mockStatic(WebUIDriver.class);
+//		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
+//		PowerMockito.mockStatic(WebUIDriver.class);
 		
 		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
 		when(driver.getBrowserInfo()).thenReturn(browserInfo);
@@ -189,8 +189,8 @@ public class TestScreenZone extends MockitoTest {
 		ScreenZone picElement = spy(screenZone);
 		picElement.setObjectPictureFile(new File(""));
 		
-		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
-		PowerMockito.mockStatic(WebUIDriver.class);
+//		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
+//		PowerMockito.mockStatic(WebUIDriver.class);
 		
 		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
 		when(driver.getBrowserInfo()).thenReturn(browserInfo);

@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+import io.appium.java_client.android.options.UiAutomator2Options;
+import io.appium.java_client.android.options.context.SupportsChromedriverExecutableOption;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -36,8 +38,6 @@ import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.logging.DebugMode;
 
-import io.appium.java_client.remote.AndroidMobileCapabilityType;
-
 public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 
 	private static final String USER_DATA_DIR_OPTION = "--user-data-dir=";
@@ -49,8 +49,8 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 	/**
 	 * Create capabilities for mobile chrome
 	 */
-	public DesiredCapabilities createMobileCapabilities(final DriverConfig webDriverConfig) {
-		DesiredCapabilities capabilities = new DesiredCapabilities();
+	public MutableCapabilities createMobileCapabilities(final DriverConfig webDriverConfig) {
+		MutableCapabilities capabilities = new DesiredCapabilities();
 		ChromeOptions options = new ChromeOptions();
         if (webDriverConfig.getUserAgentOverride() != null) {
             options.addArguments("--user-agent=" + webDriverConfig.getUserAgentOverride());
@@ -73,11 +73,11 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
         capabilities.setCapability(ChromeOptions.CAPABILITY, options);
         
         // TEST_MOBILE
-        capabilities.setCapability(AndroidMobileCapabilityType.NATIVE_WEB_SCREENSHOT, true);
+		((UiAutomator2Options)capabilities).setNativeWebScreenshot(true);
         // TEST_MOBILE
         
         if (webDriverConfig.getMode() == DriverMode.LOCAL) {
-        	capabilities.setCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, System.getProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY));
+			((UiAutomator2Options)capabilities).setChromedriverExecutable(System.getProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY));
         	
         	// driver logging
         	setLogging();

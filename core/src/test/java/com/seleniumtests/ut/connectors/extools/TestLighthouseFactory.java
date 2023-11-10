@@ -11,8 +11,8 @@ import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.remote.CapabilityType;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -25,7 +25,7 @@ import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 
-@PrepareForTest({WebUIDriver.class})
+//@PrepareForTest({WebUIDriver.class})
 public class TestLighthouseFactory extends MockitoTest {
 	
 	@Mock
@@ -33,8 +33,8 @@ public class TestLighthouseFactory extends MockitoTest {
 	
 	@BeforeMethod(groups="ut", alwaysRun = true)
 	public void init() {
-		PowerMockito.mockStatic(WebUIDriver.class);
-		PowerMockito.when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
+//		PowerMockito.mockStatic(WebUIDriver.class);
+//		PowerMockito.when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
 	}
 	
 	@Test(groups="ut")

@@ -21,8 +21,8 @@ import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.mails.*;
 import com.seleniumtests.customexception.ScenarioException;
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -41,7 +41,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.*;
 
-@PrepareForTest({EmailClientSelector.class})
+//@PrepareForTest({EmailClientSelector.class})
 public class TestEmailAccount extends MockitoTest {
 
 
@@ -57,7 +57,7 @@ public class TestEmailAccount extends MockitoTest {
 
     @BeforeMethod(groups = {"ut"})
     public void init() throws Exception {
-        PowerMockito.mockStatic(EmailClientSelector.class);
+//        PowerMockito.mockStatic(EmailClientSelector.class);
         when(EmailClientSelector.routeEmail(any(EmailServer.class), anyString(), anyString(), anyString())).thenReturn(emailClientMock);
         when(emailClientMock.getEmail(anyString(), anyList())).thenCallRealMethod();
         when(emailClientMock.getEmail(anyString(), any(String[].class))).thenCallRealMethod();

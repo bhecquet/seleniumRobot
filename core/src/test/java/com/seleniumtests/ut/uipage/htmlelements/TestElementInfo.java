@@ -19,8 +19,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebElement;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -35,7 +35,7 @@ import com.seleniumtests.uipage.htmlelements.ElementInfo;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.util.imaging.ImageProcessor;
 
-@PrepareForTest({ImageProcessor.class})
+//@PrepareForTest({ImageProcessor.class})
 public class TestElementInfo extends MockitoTest {
 
 	private static String JSON_INFO = "{" + 
@@ -140,7 +140,7 @@ public class TestElementInfo extends MockitoTest {
 	
 	@BeforeMethod(groups={"ut"})
 	private void init() throws Exception {
-		PowerMockito.mockStatic(ImageProcessor.class);
+//		PowerMockito.mockStatic(ImageProcessor.class);
 		
 		// delete all previously created information
 		ElementInfo.purgeAll();
@@ -162,8 +162,8 @@ public class TestElementInfo extends MockitoTest {
 		when(driver.executeScript(ElementInfo.JAVASCRIPT_GET_ATTRIBUTES, element)).thenReturn(attributes);
 		
 		when(driver.getScrollPosition()).thenReturn(new Point(10, 10));
-		PowerMockito.when(ImageProcessor.cropImage(any(BufferedImage.class), anyInt(), anyInt(), anyInt(), anyInt())).thenReturn(image);
-		PowerMockito.when(ImageProcessor.toBase64(image)).thenReturn("ABCD");
+//		PowerMockito.when(ImageProcessor.cropImage(any(BufferedImage.class), anyInt(), anyInt(), anyInt(), anyInt())).thenReturn(image);
+//		PowerMockito.when(ImageProcessor.toBase64(image)).thenReturn("ABCD");
 		
 		// remove elementInfo file that could have been created
 		File elementInfoPath = ElementInfo.buildElementInfoPath(htmlElement);

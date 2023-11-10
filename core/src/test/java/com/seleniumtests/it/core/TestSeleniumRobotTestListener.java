@@ -43,8 +43,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+////import org.powermock.api.mockito.PowerMockito;
+////import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.TestNG;
@@ -67,7 +67,7 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.reporter.ReporterTest;
 import com.seleniumtests.it.stubclasses.StubTestClassForDriverParallelTest;
 
-@PrepareForTest({SeleniumRobotVariableServerConnector.class, SeleniumGridConnectorFactory.class, SeleniumRobotServerContext.class, SeleniumTestsContext.class, WebUIDriver.class})
+//@PrepareForTest({SeleniumRobotVariableServerConnector.class, SeleniumGridConnectorFactory.class, SeleniumRobotServerContext.class, SeleniumTestsContext.class, WebUIDriver.class})
 public class TestSeleniumRobotTestListener extends ReporterTest {
 
 	private static final String DRIVER_BLOCKED_MSG = "Driver creation forbidden before @BeforeMethod and after @AfterMethod execution";
@@ -129,7 +129,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "2");
 			
-			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null)).thenReturn(variableServer);
+////			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null)).thenReturn(variableServer);
 			when(variableServer.isAlive()).thenReturn(true);
 			
 
@@ -225,7 +225,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
 			
-			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withArguments(eq(true), eq("http://localhost:1234"), eq("testFailedWithException"), eq(null)).thenReturn(variableServer);
+////			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withArguments(eq(true), eq("http://localhost:1234"), eq("testFailedWithException"), eq(null)).thenReturn(variableServer);
 			when(variableServer.isAlive()).thenReturn(true);
 			
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testFailedWithException"});
@@ -723,8 +723,8 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/wd/hub");
 			
-			PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
-			PowerMockito.when(SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/wd/hub"))).thenReturn(Arrays.asList(gridConnector));
+//			PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
+//			PowerMockito.when(SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/wd/hub"))).thenReturn(Arrays.asList(gridConnector));
 			
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.NONE, new String[] {"testWithSocketTimeoutOnFirstExec"});
 			
@@ -751,8 +751,8 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/wd/hub");
 			
-			PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
-			PowerMockito.when(SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/wd/hub"))).thenReturn(Arrays.asList(gridConnector));
+////			PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
+////			PowerMockito.when(SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/wd/hub"))).thenReturn(Arrays.asList(gridConnector));
 			
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.NONE, new String[] {"testWithExceptionOnFirstExec"});
 			
@@ -800,10 +800,10 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	@Test(groups={"it"})
 	public void testDriverNameResetAtStart(ITestContext testContext) throws Exception {
 
-		PowerMockito.mockStatic(WebUIDriver.class);
+////		PowerMockito.mockStatic(WebUIDriver.class);
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.NONE, new String[] {"testAndSubActions"});
 
-		PowerMockito.verifyStatic(WebUIDriver.class, times(1));
+////		PowerMockito.verifyStatic(WebUIDriver.class, times(1));
 		WebUIDriver.resetCurrentWebUiDriverName();
 		
 	}

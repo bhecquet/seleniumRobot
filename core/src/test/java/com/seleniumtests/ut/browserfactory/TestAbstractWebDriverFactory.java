@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.api.mockito.PowerMockito;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -47,7 +47,7 @@ public class TestAbstractWebDriverFactory extends MockitoTest {
 		when(context.getTestType()).thenReturn(TestType.WEB);
 		
 		// connect to grid
-		PowerMockito.whenNew(RemoteWebDriver.class).withAnyArguments().thenReturn(driver);
+//		PowerMockito.whenNew(RemoteWebDriver.class).withAnyArguments().thenReturn(driver);
 		HtmlUnitDriverFactory driverFactory = new HtmlUnitDriverFactory(config);
 		
 		Assert.assertEquals(caps.getCapability("foo"), "bar");

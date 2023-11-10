@@ -41,8 +41,8 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.api.mockito.PowerMockito;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -57,7 +57,7 @@ import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
 
 
-@PrepareForTest({HttpClients.class, Unirest.class})
+//@PrepareForTest({HttpClients.class, Unirest.class})
 public class TestSeleniumGridConnector extends ConnectorsTest {
 
 	@Mock
@@ -85,7 +85,7 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 	
 	@BeforeMethod(groups={"ut"})
 	private void init() throws ClientProtocolException, IOException {
-		PowerMockito.mockStatic(HttpClients.class);
+//		PowerMockito.mockStatic(HttpClients.class);
 		
 		when(HttpClients.createDefault()).thenReturn(client);
 		when(response.getEntity()).thenReturn(entity);
