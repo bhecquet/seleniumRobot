@@ -39,11 +39,8 @@ import org.mockito.Mock;
 import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.quality.Strictness;
 import org.mockito.stubbing.Answer;
 import org.mockito.stubbing.OngoingStubbing;
-import org.mockito.testng.MockitoSettings;
-import org.mockito.testng.MockitoTestNGListener;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Platform;
@@ -86,10 +83,8 @@ import kong.unirest.UnirestInstance;
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
-import org.testng.annotations.Listeners;
 
-@Listeners(MockitoTestNGListener.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
+
 public class ConnectorsTest extends MockitoTest {
 	
 	@Mock
@@ -125,7 +120,7 @@ public class ConnectorsTest extends MockitoTest {
 	@Mock
 	public UnirestInstance unirestInstance;
 
-	protected MockedStatic mocked;
+	protected MockedStatic mockedUnirest;
 	protected MockedStatic mockedWebUiDriverFactory;
 	protected MockedConstruction mockedWebUiDriver;
 	protected MockedConstruction mockedRemoteWebDriver;
@@ -246,14 +241,14 @@ public class ConnectorsTest extends MockitoTest {
 
 	@BeforeMethod(groups={"ut", "it"})  
 	public void initMocks(final Method method, final ITestContext testNGCtx, final ITestResult testResult) throws Exception {
-		mocked = mockStatic(Unirest.class);
-		mocked.when(() -> Unirest.spawnInstance()).thenReturn(unirestInstance);
-		mocked.when(() -> Unirest.config()).thenReturn(unirestConfig);
+		mockedUnirest = mockStatic(Unirest.class);
+		mockedUnirest.when(() -> Unirest.spawnInstance()).thenReturn(unirestInstance);
+		mockedUnirest.when(() -> Unirest.config()).thenReturn(unirestConfig);
 	}
 
-	@AfterMethod(groups={"ut", "it"})
+	@AfterMethod(groups={"ut", "it"}, alwaysRun = true)
 	public void resetMocks() {
-		mocked.close(); // as we do not use try-with-resource
+		mockedUnirest.close(); // as we do not use try-with-resource
 
 		if (mockedWebUiDriver != null) {
 			mockedWebUiDriver.close();
@@ -467,7 +462,7 @@ public class ConnectorsTest extends MockitoTest {
 			case "GET":
 				GetRequest getRequest = mock(GetRequest.class);
 
-				mocked.when(() -> Unirest.get(serverUrl + apiPath)).thenReturn(getRequest);
+				mockedUnirest.when(() -> Unirest.get(serverUrl + apiPath)).thenReturn(getRequest);
 				when(getRequest.downloadMonitor(any())).thenReturn(getRequest);
 				when(getRequest.socketTimeout(anyInt())).thenReturn(getRequest);
 				when(unirestInstance.get(serverUrl + apiPath)).thenReturn(getRequest);
@@ -488,19 +483,19 @@ public class ConnectorsTest extends MockitoTest {
 				when(getRequest.asPaged(any(), (Function<HttpResponse<JsonNode>, String>) any(Function.class))).thenReturn(pageList);
 				return getRequest;
 			case "POST":
-				mocked.when(() -> Unirest.post(serverUrl + apiPath)).thenReturn(postRequest);
+				mockedUnirest.when(() -> Unirest.post(serverUrl + apiPath)).thenReturn(postRequest);
 				when(unirestInstance.post(serverUrl + apiPath)).thenReturn(postRequest);
 				return preparePostRequest(serverUrl, responseType, postRequest, response, jsonResponse);
 			case "PATCH":
-				mocked.when(() -> Unirest.patch(serverUrl + apiPath)).thenReturn(postRequest);
+				mockedUnirest.when(() -> Unirest.patch(serverUrl + apiPath)).thenReturn(postRequest);
 				when(unirestInstance.patch(serverUrl + apiPath)).thenReturn(postRequest);
 				return preparePostRequest(serverUrl, responseType, postRequest, response, jsonResponse);
 			case "PUT":
-				mocked.when(() -> Unirest.put(serverUrl + apiPath)).thenReturn(postRequest);
+				mockedUnirest.when(() -> Unirest.put(serverUrl + apiPath)).thenReturn(postRequest);
 				when(unirestInstance.put(serverUrl + apiPath)).thenReturn(postRequest);
 				return preparePostRequest(serverUrl, responseType, postRequest, response, jsonResponse);
 			case "DELETE":
-				mocked.when(() -> Unirest.delete(serverUrl + apiPath)).thenReturn(postRequest);
+				mockedUnirest.when(() -> Unirest.delete(serverUrl + apiPath)).thenReturn(postRequest);
 				when(unirestInstance.delete(serverUrl + apiPath)).thenReturn(postRequest);
 				return preparePostRequest(serverUrl, responseType, postRequest, response, jsonResponse);
 
@@ -573,7 +568,7 @@ public class ConnectorsTest extends MockitoTest {
 			case "GET":
 				GetRequest getRequest = mock(GetRequest.class);
 
-				mocked.when(() -> Unirest.get(SERVER_URL + apiPath)).thenReturn(getRequest);
+				mockedUnirest.when(() -> Unirest.get(SERVER_URL + apiPath)).thenReturn(getRequest);
 
 				when(getRequest.header(anyString(), anyString())).thenReturn(getRequest);
 				when(getRequest.asJson()).thenReturn(jsonResponse);
@@ -582,9 +577,9 @@ public class ConnectorsTest extends MockitoTest {
 				when(getRequest.queryString(anyString(), anyBoolean())).thenReturn(getRequest);
 				return stub;
 			case "POST":
-				mocked.when(() -> Unirest.post(SERVER_URL + apiPath)).thenReturn(postRequest);
+				mockedUnirest.when(() -> Unirest.post(SERVER_URL + apiPath)).thenReturn(postRequest);
 			case "PATCH":
-				mocked.when(() -> Unirest.patch(SERVER_URL + apiPath)).thenReturn(postRequest);
+				mockedUnirest.when(() -> Unirest.patch(SERVER_URL + apiPath)).thenReturn(postRequest);
 				when(postRequest.field(anyString(), anyString())).thenReturn(requestMultipartBody);
 				when(postRequest.field(anyString(), anyInt())).thenReturn(requestMultipartBody);
 				when(postRequest.field(anyString(), anyLong())).thenReturn(requestMultipartBody);

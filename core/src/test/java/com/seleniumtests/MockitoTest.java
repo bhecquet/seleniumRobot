@@ -28,6 +28,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.Logger;
 import org.mockito.MockitoAnnotations;
+import org.mockito.quality.Strictness;
+import org.mockito.testng.MockitoSettings;
+import org.mockito.testng.MockitoTestNGListener;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterClass;
@@ -48,7 +51,8 @@ import com.seleniumtests.util.video.VideoCaptureMode;
  */
 
 //@PowerMockIgnore({"javax.net.ssl.*", "com.google.inject.*", "javax.imageio.*", "javax.swing.*"})
-@Listeners({CaptureVideoListener.class})
+@Listeners({CaptureVideoListener.class, MockitoTestNGListener.class})
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class MockitoTest /* extends PowerMockTestCase */ {
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(MockitoTest.class);

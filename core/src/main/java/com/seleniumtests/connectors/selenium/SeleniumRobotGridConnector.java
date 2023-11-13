@@ -105,7 +105,9 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	@Override
 	public void uploadMobileApp(Capabilities caps) {
 		Optional<String> applicationOption;
-		if (new BaseOptions(caps).getPlatformName().is(Platform.ANDROID)) {
+		if (new BaseOptions(caps).getPlatformName() == null) {
+			return;
+		} else if (new BaseOptions(caps).getPlatformName().is(Platform.ANDROID)) {
 			applicationOption = new UiAutomator2Options(caps).getApp();
 		} else if (new BaseOptions(caps).getPlatformName().is(Platform.IOS)) {
 			applicationOption = new XCUITestOptions(caps).getApp();

@@ -34,8 +34,6 @@ import java.util.Map;
 
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
-//import org.powermock.api.mockito.PowerMockito;
-//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeMethod;
@@ -58,7 +56,6 @@ import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
 
-//@PrepareForTest({Unirest.class})
 public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
 	@Mock
@@ -319,9 +316,8 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
 		TestVariable existingVariable = new TestVariable(12, "key", "value", false, TestVariable.TEST_VARIABLE_PREFIX + "key");
 		TestVariable variable = connector.upsertVariable(existingVariable, true);
-		
-//		PowerMockito.verifyStatic(Unirest.class);
-		Unirest.patch(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL));
+
+		mockedUnirest.verify(() -> Unirest.patch(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL)));
 		
 		Assert.assertEquals(variable.getValue(), "value");
 	}
@@ -348,10 +344,10 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
 			TestTasks.createOrUpdateParam("foo", "value");
 			TestTasks.createOrUpdateParam("foo", "value");
-	
-//			PowerMockito.verifyStatic(Unirest.class);
-			Unirest.post(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL));
-			Unirest.patch(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL));
+
+			mockedUnirest.verify(() -> Unirest.patch(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL)));
+			mockedUnirest.verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL)));
+
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
@@ -397,10 +393,8 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		TestVariable variable = connector.upsertVariable(existingVariable, true);
 		
 		// check we tried a PATCH and then create the variable with a POST
-//		PowerMockito.verifyStatic(Unirest.class);
-		Unirest.patch(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL));
-//		PowerMockito.verifyStatic(Unirest.class);
-		Unirest.post(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL));
+		mockedUnirest.verify(() -> Unirest.patch(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL)));
+		mockedUnirest.verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL)));
 		
 		Assert.assertEquals(variable.getValue(), "value");
 	}
@@ -428,9 +422,8 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
 		TestVariable existingVariable = new TestVariable(12, "key", "value", false, "key");
 		TestVariable variable = connector.upsertVariable(existingVariable, true);
-		
-//		PowerMockito.verifyStatic(Unirest.class);
-		Unirest.post(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL));
+
+		mockedUnirest.verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL)));
 		
 		Assert.assertEquals(variable.getValue(), "value");
 	}
@@ -442,9 +435,8 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
 		TestVariable existingVariable = new TestVariable("key", "value");
 		TestVariable variable = connector.upsertVariable(existingVariable, true);
-		
-//		PowerMockito.verifyStatic(Unirest.class);
-		Unirest.post(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL));
+
+		mockedUnirest.verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL)));
 		
 		Assert.assertEquals(variable.getValue(), "value");
 		Assert.assertEquals(variable.getName(), "key");
@@ -471,8 +463,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		connector.unreserveVariables(variables);
 		
 		// only one dereservation should be called
-//		PowerMockito.verifyStatic(Unirest.class);
-		Unirest.patch(ArgumentMatchers.contains(String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 2)));
+		mockedUnirest.verify(() -> Unirest.patch(ArgumentMatchers.contains(String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 2))));
 	}
 	
 	@Test(groups= {"ut"})
@@ -482,10 +473,8 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		List<TestVariable> variables = Arrays.asList(new TestVariable("key", "value"));
 		
 		connector.unreserveVariables(variables);
-		
-		// only one dereservation should be called
-//		PowerMockito.verifyStatic(Unirest.class, times(0));
-		Unirest.patch(ArgumentMatchers.contains(String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 2)));
+
+		mockedUnirest.verify(() -> Unirest.patch(ArgumentMatchers.contains(String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 2))));
 	}
 	
 	/**

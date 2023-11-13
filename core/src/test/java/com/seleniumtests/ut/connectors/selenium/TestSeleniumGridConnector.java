@@ -18,10 +18,7 @@
 package com.seleniumtests.ut.connectors.selenium;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -36,14 +33,14 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.logging.log4j.Logger;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
-//import org.powermock.api.mockito.PowerMockito;
-//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -56,8 +53,6 @@ import kong.unirest.GetRequest;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
 
-
-//@PrepareForTest({HttpClients.class, Unirest.class})
 public class TestSeleniumGridConnector extends ConnectorsTest {
 
 	@Mock
@@ -82,11 +77,12 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 	private RemoteWebDriver driver2;
 	
 	private Capabilities capabilities = new DesiredCapabilities();
+	private MockedStatic mockedHttpClient;
 	
 	@BeforeMethod(groups={"ut"})
 	private void init() throws ClientProtocolException, IOException {
-//		PowerMockito.mockStatic(HttpClients.class);
-		
+		mockedHttpClient = mockStatic(HttpClients.class);
+
 		when(HttpClients.createDefault()).thenReturn(client);
 		when(response.getEntity()).thenReturn(entity);
 		when(response.getStatusLine()).thenReturn(statusLine);
@@ -95,6 +91,13 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 		when(driver.getSessionId()).thenReturn(new SessionId("abcdef"));
 		when(driver2.getCapabilities()).thenReturn(capabilities); 
 		when(driver2.getSessionId()).thenReturn(new SessionId("ghijkl"));
+	}
+
+	@AfterMethod(groups={"ut"}, alwaysRun = true)
+	private void closeMocks() {
+		if (mockedHttpClient != null) {
+			mockedHttpClient.close();
+		}
 	}
 	
 	@Test(groups={"ut"})
