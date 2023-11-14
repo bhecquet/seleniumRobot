@@ -474,7 +474,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		
 		connector.unreserveVariables(variables);
 
-		mockedUnirest.verify(() -> Unirest.patch(ArgumentMatchers.contains(String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 2))));
+		mockedUnirest.verify(() -> Unirest.patch(ArgumentMatchers.contains(String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 2))), never());
 	}
 	
 	/**

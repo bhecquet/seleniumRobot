@@ -31,7 +31,6 @@ public class SquashTMConnector extends TestManager {
 
 	public SquashTMConnector() {
 		// to be called with init method
-
 		campaignCache = new HashMap<>();
 		iterationCache = new HashMap<>();
 	}
@@ -84,7 +83,9 @@ public class SquashTMConnector extends TestManager {
 		
 		initialized = true;
 
-		
+		// for tests
+		if (campaignCache == null) campaignCache = new HashMap<>();
+		if (iterationCache == null) iterationCache = new HashMap<>();
 	}
 
 	@Override

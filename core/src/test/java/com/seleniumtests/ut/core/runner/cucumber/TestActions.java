@@ -3,24 +3,22 @@ package com.seleniumtests.ut.core.runner.cucumber;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 
+import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Spy;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver.Navigation;
 import org.openqa.selenium.WebDriver.TargetLocator;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
-//import org.powermock.api.mockito.PowerMockito;
-//import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -33,11 +31,7 @@ import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.uipage.htmlelements.FrameElement;
-import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
-import io.appium.java_client.AppiumDriver;
-
-//@PrepareForTest({ WebUIDriver.class, AppiumDriver.class })
 public class TestActions extends MockitoTest {
 
 
@@ -46,8 +40,6 @@ public class TestActions extends MockitoTest {
 	private RemoteWebDriver driver;
 	@Mock
 	private RemoteWebElement element;
-	@Mock
-	private RemoteWebElement frameElement;
 
 	@Mock
 	private TargetLocator locator;
@@ -57,9 +49,6 @@ public class TestActions extends MockitoTest {
 
 	@Mock
 	private WebUIDriver uiDriver;
-
-	@Mock
-	private DriverConfig driverConfig;
 
 	@Spy
 	private HtmlElement el = new HtmlElement("element", By.id("el"));
@@ -71,8 +60,11 @@ public class TestActions extends MockitoTest {
 
 	private CustomEventFiringWebDriver eventDriver;
 
+	private MockedStatic mockedWebUIDriver;
+
 	@BeforeMethod(groups = { "ut" })
 	private void init() throws WebDriverException, IOException {
+
 		SeleniumTestsContextManager.getGlobalContext().setCucumberImplementationPackage("com.seleniumtests.ut.core.runner.cucumber");
 
 		when(driver.getCapabilities()).thenReturn(new DesiredCapabilities()); // add capabilities to allow augmenting driver
@@ -80,17 +72,21 @@ public class TestActions extends MockitoTest {
 		// add DriverExceptionListener to reproduce driver behavior
 		eventDriver = spy(new CustomEventFiringWebDriver(driver));
 
-//		PowerMockito.mockStatic(WebUIDriver.class);
-		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
-		when(WebUIDriver.getWebDriver(anyBoolean(), any(BrowserType.class), isNull(), isNull())).thenReturn(eventDriver);
-		when(WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(uiDriver);
+		mockedWebUIDriver = mockStatic(WebUIDriver.class);
+		mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
+		mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean(), any(BrowserType.class), isNull(), isNull())).thenReturn(eventDriver);
+		mockedWebUIDriver.when(() -> WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(uiDriver);
 		when(driver.navigate()).thenReturn(navigation);
 		when(driver.switchTo()).thenReturn(locator);
 		when(eventDriver.switchTo()).thenReturn(locator);
 
-
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
+	}
+
+	@AfterMethod(groups = { "ut" }, alwaysRun = true)
+	private void closeMocks() {
+		mockedWebUIDriver.close();
 	}
 	
 	@Test(groups={"ut"})

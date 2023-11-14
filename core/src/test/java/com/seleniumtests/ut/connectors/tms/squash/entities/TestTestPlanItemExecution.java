@@ -8,7 +8,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 
 import java.util.Arrays;
 
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -27,7 +26,6 @@ import kong.unirest.UnirestException;
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
 
-@PrepareForTest({Unirest.class})
 public class TestTestPlanItemExecution extends ConnectorsTest {
 
 	@BeforeMethod(groups={"ut"})

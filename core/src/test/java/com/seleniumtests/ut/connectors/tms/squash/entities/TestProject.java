@@ -6,7 +6,6 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.function.Function;
 
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -24,7 +23,6 @@ import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
 import kong.unirest.json.JSONObject;
 
-@PrepareForTest({Unirest.class})
 public class TestProject extends ConnectorsTest {
 	
 	@BeforeMethod(groups={"ut"})

@@ -252,12 +252,15 @@ public class ConnectorsTest extends MockitoTest {
 
 		if (mockedWebUiDriver != null) {
 			mockedWebUiDriver.close();
+			mockedWebUiDriver = null;
 		}
 		if (mockedRemoteWebDriver != null) {
 			mockedRemoteWebDriver.close();
+			mockedRemoteWebDriver = null;
 		}
 		if (mockedWebUiDriverFactory != null) {
 			mockedWebUiDriverFactory.close();
+			mockedWebUiDriverFactory = null;
 		}
 	}
 	
