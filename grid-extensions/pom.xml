@@ -40,7 +40,7 @@
 			<artifactId>neotys-selenium-proxy</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.vdurmont</groupId>
+			<groupId>org.semver4j</groupId>
 			<artifactId>semver4j</artifactId>
 		</dependency>
 		<dependency>
@@ -55,10 +55,6 @@
 		    <groupId>org.zeroturnaround</groupId>
 		    <artifactId>zt-zip</artifactId>
 		</dependency>
-		<dependency>
-	        <groupId>net.lightbody.bmp</groupId>
-	        <artifactId>browsermob-core</artifactId>
-   		</dependency>
    		<dependency>
 			<groupId>com.github.stephenc.monte</groupId>
 			<artifactId>monte-screen-recorder</artifactId>

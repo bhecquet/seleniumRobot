@@ -43,17 +43,10 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.video.VideoCaptureMode;
 
-/**
- * Redefine calls to PowerMockTestCase methods as they are not called when using TestNG groups
- * we MUST mark them as "alwaysRun"
- * @author behe
- *
- */
 
-//@PowerMockIgnore({"javax.net.ssl.*", "com.google.inject.*", "javax.imageio.*", "javax.swing.*"})
 @Listeners({CaptureVideoListener.class, MockitoTestNGListener.class})
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class MockitoTest /* extends PowerMockTestCase */ {
+public class MockitoTest {
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(MockitoTest.class);
 
@@ -64,7 +57,6 @@ public class MockitoTest /* extends PowerMockTestCase */ {
 	@BeforeMethod(groups={"ut", "it", "ie"})  
 	public void beforeMethod(final Method method, final ITestContext testNGCtx, final ITestResult testResult) throws Exception {
 		doBeforeMethod(method);
-		//beforePowerMockTestMethod();
 		beforeMethodDone.put(method, true);
 		initThreadContext(testNGCtx, null, testResult);
 		MockitoAnnotations.initMocks(this); 
@@ -90,16 +82,9 @@ public class MockitoTest /* extends PowerMockTestCase */ {
 		SeleniumTestsContextManager.getGlobalContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
 	}
 	
-	@BeforeClass(groups={"ut", "it", "ie"})  
-	public void beforeClass() throws Exception {
-		//beforePowerMockTestClass();
-	}
-	
+
 	@AfterMethod(groups={"ut", "it", "ie"}, alwaysRun=true)
 	public void afterMethod(final Method method) throws Exception {
-		if (beforeMethodDone.getOrDefault(method, false) == true) {
-			//afterPowerMockTestMethod();
-		}
 
 		GenericTest.resetTestNGREsultAndLogger();
 	}
@@ -113,12 +98,7 @@ public class MockitoTest /* extends PowerMockTestCase */ {
 
 		return tempFile;
 	}
-	
-	@AfterClass(groups={"ut", "it", "ie"}, alwaysRun=true)
-	public void afterClass() throws Exception {
-		//afterPowerMockTestClass();
-	}
-	
+
 	public void myTest() {
 		
 	}
