@@ -178,9 +178,7 @@
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
-			<version>7.3.0</version>
-			<!-- Cannot upgrade to 7.5: https://github.com/powermock/powermock/issues/1118 -->
-			<!-- Cannot upgrade to 7.4.0: https://github.com/cbeust/testng/issues/2642 -->
+			<version>7.8.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.inject</groupId>
