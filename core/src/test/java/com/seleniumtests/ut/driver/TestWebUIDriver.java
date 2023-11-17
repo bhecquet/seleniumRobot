@@ -4,16 +4,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,11 +22,15 @@ import org.mockito.invocation.InvocationOnMock;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.logging.Logs;
+import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
+import org.testng.ITestResult;
+import org.testng.Reporter;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -66,7 +65,8 @@ import net.lightbody.bmp.BrowserMobProxy;
 				SeleniumGridDriverFactory.class, 
 				WebUIDriver.class,
 				WebUIDriverFactory.class,
-				PageObject.class})
+				PageObject.class,
+				Augmenter.class})
 public class TestWebUIDriver extends MockitoTest {
 	
 	@Mock
@@ -80,6 +80,9 @@ public class TestWebUIDriver extends MockitoTest {
 	
 	@Mock
 	private VideoRecorder videoRecorder;
+
+	@Mock
+	private Augmenter augmenter;
 	
 	@Mock
 	private CustomEventFiringWebDriver eventDriver1;
@@ -96,11 +99,27 @@ public class TestWebUIDriver extends MockitoTest {
 	@Mock
 	private SeleniumGridDriverFactory gridDriverFactory;
 
+	@Mock
+	private WebDriver.Options options;
+
+	@Mock
+	private Logs logs;
+
+	@Mock
+	private WebDriver.Timeouts timeouts;
+
+	@Mock
+	private WebDriver.TargetLocator targetLocator;
+
 
 	@BeforeMethod(groups={"ut"})
 	private void init() throws Exception {
 		// add capabilities to allow augmenting driver
-		when(drv1.getCapabilities()).thenReturn(new DesiredCapabilities()); 
+		when(drv1.getCapabilities()).thenReturn(new DesiredCapabilities());
+		when(drv1.manage()).thenReturn(options);
+		when(drv1.switchTo()).thenReturn(targetLocator);
+		when(options.timeouts()).thenReturn(timeouts);
+		when(options.logs()).thenReturn(logs);
 		when(drv2.getCapabilities()).thenReturn(new DesiredCapabilities()); 
 		when(neoloadDriver.getCapabilities()).thenReturn(new DesiredCapabilities()); 
 	}
@@ -292,7 +311,74 @@ public class TestWebUIDriver extends MockitoTest {
 		Assert.assertEquals(ceDriver.getBrowserInfo().getVersion(), "1.1");
 		
 	}
-	
+
+	/**
+	 * #619: Check that when driver creation fails, cleanUp operations are normal
+	 * In this test, driver creation completely fails
+	 * @throws Exception
+	 */
+	@Test(groups={"ut"})
+	public void testDriverCreationInGridFails() throws Exception {
+		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
+		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://localhost:4444/wd/hub");
+		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
+
+
+		// set connector to simulate the driver creation on grid
+		SeleniumTestsContextManager.getThreadContext().setSeleniumGridConnectors(Arrays.asList(gridConnector));
+		when(gridConnector.getNodeUrl()).thenReturn("http://localhost:5555/");
+
+		whenNew(SeleniumGridDriverFactory.class).withAnyArguments().thenReturn(gridDriverFactory);
+		doAnswer((invocation) -> {
+			throw new IOException("KO");
+		}).when(gridDriverFactory).createWebDriver();
+		when(gridDriverFactory.getSelectedBrowserInfo()).thenReturn(new BrowserInfo(BrowserType.HTMLUNIT, "1.1"));
+
+		try {
+			WebUIDriver.getWebDriver(true);
+		} catch (Exception e) {
+			// it's expected
+		}
+		// check cleanUp is correct
+		WebUIDriver.cleanUp();
+	}
+
+	/**
+	 * #619: test the case where driver is created, but when CustomEventFiringWebDriver augments the driver, it step fails on CDP connection
+	 * "remotely closed"
+	 * @throws Exception
+	 */
+	@Test(groups={"ut"})
+	public void testDriverCreationInGridSuccessAndAngmentingFails() throws Exception {
+		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
+		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://localhost:4444/wd/hub");
+		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
+
+
+		// set connector to simulate the driver creation on grid
+		SeleniumTestsContextManager.getThreadContext().setSeleniumGridConnectors(Arrays.asList(gridConnector));
+		when(gridConnector.getNodeUrl()).thenReturn("http://localhost:5555/");
+
+		whenNew(SeleniumGridDriverFactory.class).withAnyArguments().thenReturn(gridDriverFactory);
+		when(gridDriverFactory.createWebDriver()).thenReturn(drv1);
+		when(gridDriverFactory.getSelectedBrowserInfo()).thenReturn(new BrowserInfo(BrowserType.HTMLUNIT, "1.1"));
+		whenNew(Augmenter.class).withAnyArguments().thenReturn(augmenter);
+		doAnswer((invocation) -> {
+			throw new IOException("Remotely closed"); // simulate the case where CDP connection cannot be established
+		}).when(augmenter).augment(any());
+
+		try {
+			WebUIDriver.getWebDriver(true);
+		} catch (Exception e) {
+			// it's expected
+		}
+		// check cleanUp is correct and driver is closed
+		WebUIDriver.logFinalDriversState(Reporter.getCurrentTestResult());
+		verify(targetLocator).defaultContent();
+		WebUIDriver.cleanUp();
+		verify(drv1).quit();
+	}
+
 	/**
 	 * Test that 2 drivers can be created specifying different name
 	 */
