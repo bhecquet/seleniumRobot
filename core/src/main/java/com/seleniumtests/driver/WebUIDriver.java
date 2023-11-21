@@ -36,6 +36,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import com.seleniumtests.customexception.RetryableDriverException;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
@@ -174,7 +175,7 @@ public class WebUIDriver {
             // gets an updated version once the driver has been created on grid
             driver = handleListeners(driver, webDriverBuilder.getSelectedBrowserInfo(), driverPids);
             
-            if (driver != null) {
+            if (driver != null) { // driver is a CustomEventFiringWebDriver here
     			MutableCapabilities caps = ((CustomEventFiringWebDriver)driver).getInternalCapabilities();
     			caps.setCapability(SeleniumRobotCapabilityType.STARTUP_DURATION, duration);
                 caps.setCapability(SeleniumRobotCapabilityType.START_TIME, start);
@@ -322,7 +323,7 @@ public class WebUIDriver {
      * Logs current state of the browser
      */
     private void logFinalDriverState(ITestResult testResult) {
-    	if (driver != null && ((CustomEventFiringWebDriver)driver).isDriverExited()) {
+    	if (driver != null && driver instanceof CustomEventFiringWebDriver && ((CustomEventFiringWebDriver)driver).isDriverExited()) {
     		driver = null;
     	}
     	
@@ -336,14 +337,17 @@ public class WebUIDriver {
 				}
 				
 				// force screenshotUtil to use the driver of this WebUiDriver, not the currently selected one
-				for (ScreenShot screenshot: new ScreenshotUtil(driver).capture(SnapshotTarget.PAGE, ScreenShot.class, true, true)) {
-					scenarioLogger.logScreenshot(screenshot, null, name, SnapshotCheckType.FALSE);
-					
-					// add the last screenshots to TestInfo so that there is a quicklink on reports
-					Info lastStateInfo = TestNGResultUtils.getTestInfo(testResult).get(TestStepManager.LAST_STATE_NAME);
-		        	if (lastStateInfo != null) {
-		        		((MultipleInfo)lastStateInfo).addInfo(new ImageLinkInfo(TestNGResultUtils.getUniqueTestName(testResult) + "/" + screenshot.getImagePath()));
-		        	}
+				// do it only when driver is a regular CustomEventFiringWebdriver (#619)
+				if (driver instanceof CustomEventFiringWebDriver) {
+					for (ScreenShot screenshot : new ScreenshotUtil(driver).capture(SnapshotTarget.PAGE, ScreenShot.class, true, true)) {
+						scenarioLogger.logScreenshot(screenshot, null, name, SnapshotCheckType.FALSE);
+
+						// add the last screenshots to TestInfo so that there is a quicklink on reports
+						Info lastStateInfo = TestNGResultUtils.getTestInfo(testResult).get(TestStepManager.LAST_STATE_NAME);
+						if (lastStateInfo != null) {
+							((MultipleInfo) lastStateInfo).addInfo(new ImageLinkInfo(TestNGResultUtils.getUniqueTestName(testResult) + "/" + screenshot.getImagePath()));
+						}
+					}
 				}
 			} catch (Exception e) {
 				scenarioLogger.log("Error while logging: " + e.getMessage());
@@ -389,7 +393,7 @@ public class WebUIDriver {
      */
     private void clean() {
     	
-    	if (driver != null && ((CustomEventFiringWebDriver)driver).isDriverExited()) {
+    	if (driver != null && driver instanceof CustomEventFiringWebDriver && ((CustomEventFiringWebDriver)driver).isDriverExited()) {
     		driver = null;
     	}
 
@@ -482,9 +486,10 @@ public class WebUIDriver {
      * @return  webDriver
      */
     public static WebDriver getNativeWebDriver() {
-    	CustomEventFiringWebDriver eventFiringWebDriver = (CustomEventFiringWebDriver) getWebDriver(true);
-    	if (eventFiringWebDriver != null) {
-    		return eventFiringWebDriver.getOriginalDriver();
+
+		WebDriver driver = getWebDriver(true);
+    	if (driver != null && driver instanceof CustomEventFiringWebDriver) {
+    		return ((CustomEventFiringWebDriver)driver).getOriginalDriver();
     	} else {
     		return null;
     	}
@@ -504,9 +509,9 @@ public class WebUIDriver {
 	 * @return
 	 */
 	public static NLWebDriver getNeoloadDriver() {
-		CustomEventFiringWebDriver driver = (CustomEventFiringWebDriver)WebUIDriver.getWebDriver(false);
-		if (driver != null && driver.getNeoloadDriver() != null) {
-			return driver.getNeoloadDriver();
+		WebDriver driver = getWebDriver(false);
+		if (driver != null && driver instanceof CustomEventFiringWebDriver && ((CustomEventFiringWebDriver)driver).getNeoloadDriver() != null) {
+			return ((CustomEventFiringWebDriver)driver).getNeoloadDriver();
 		} else {
 			return null;
 		}
@@ -576,17 +581,29 @@ public class WebUIDriver {
 	        	if (uxDriverSession.get() != null && uxDriverSession.get().size() > 1 && uiDriver.config.getSeleniumGridConnector() != null) {
 	        		uiDriver.config.setRunOnSameNode(uiDriver.getConfig().getSeleniumGridConnector().getNodeUrl());
 	        	}
-	        	
-	        	try {
-					uiDriver.createWebDriver();
-				} catch (Exception e) {
-	        		// in case driver fails to start, remove any reference to its name so that we cannot switch to it
-					setCurrentWebUiDriverName(previousDriverName);
-					if (driverName != DEFAULT_DRIVER_NAME) {
-						uxDriverSession.get().remove(driverName);
+
+				int maxRetry = 2;
+				for (int i = 0; i < maxRetry; i++) {
+					try {
+						uiDriver.createWebDriver();
+						break;
+
+					} catch (Exception e) {
+						// clean and retry
+						if (e instanceof RetryableDriverException && i < maxRetry - 1) {
+							logger.warn("Driver creation failed: " + e.getMessage() + " => retrying");
+							uiDriver.clean();
+						} else {
+
+							// in case driver fails to start, remove any reference to its name so that we cannot switch to it
+							setCurrentWebUiDriverName(previousDriverName);
+							if (driverName != DEFAULT_DRIVER_NAME) {
+								uxDriverSession.get().remove(driverName);
+							}
+							switchToDriver(previousDriverName);
+							throw e;
+						}
 					}
-					switchToDriver(previousDriverName);
-					throw e;
 				}
         	}
         } else {
@@ -734,7 +751,7 @@ public class WebUIDriver {
      * Get version from browser capabilities and display it
      */
     private void displayBrowserVersion() {
-    	if (driver == null) {
+    	if (driver == null || !(driver instanceof CustomEventFiringWebDriver)) {
     		return;
     	}
     	Capabilities caps = ((CustomEventFiringWebDriver) driver).getCapabilities();
