@@ -269,12 +269,12 @@ public class ReporterControler implements IReporter {
 			// add the test result
 			newTestResult.setStatus(snapshotComparisonResult);
 			if (snapshotComparisonResult == ITestResult.SUCCESS) {
-				suiteResult.getTestContext().getPassedTests().addResult(newTestResult, newTestResult.getMethod());
+				suiteResult.getTestContext().getPassedTests().addResult(newTestResult);
 			} else if (snapshotComparisonResult == ITestResult.FAILURE) {
 				newTestResult.setThrowable(new ScenarioException("Snapshot comparison failed"));
-				suiteResult.getTestContext().getFailedTests().addResult(newTestResult, newTestResult.getMethod());
+				suiteResult.getTestContext().getFailedTests().addResult(newTestResult);
 			} else if (snapshotComparisonResult == ITestResult.SKIP) {
-				suiteResult.getTestContext().getSkippedTests().addResult(newTestResult, newTestResult.getMethod());
+				suiteResult.getTestContext().getSkippedTests().addResult(newTestResult);
 			}
 			
 			// add a snapshot comparison result for the newly created test result (which correspond to snapshot comparison)
@@ -413,7 +413,7 @@ public class ReporterControler implements IReporter {
 	
 	/**
 	 * Delete all files in html and screenshot folders that are not directly references by test steps in current result
-	 * @param resultSet
+	 * @param currentResult
 	 */
 	private void cleanAttachments(ITestResult currentResult) {
 

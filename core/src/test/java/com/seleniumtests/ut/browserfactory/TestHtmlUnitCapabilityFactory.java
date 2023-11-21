@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 import org.mockito.Mock;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.CapabilityType;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -32,7 +32,7 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.util.osutility.OSUtility;
 
-@PrepareForTest({OSUtility.class})
+//@PrepareForTest({OSUtility.class})
 public class TestHtmlUnitCapabilityFactory extends MockitoTest {
 
 	@Mock

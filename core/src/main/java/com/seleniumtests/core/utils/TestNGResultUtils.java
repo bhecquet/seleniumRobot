@@ -453,7 +453,7 @@ public class TestNGResultUtils {
 							// move test from passedTests to failedTests if test is not already in failed tests
 							if (testResult.getTestContext().getPassedTests().getAllMethods().contains(testResult.getMethod())) {
 								testResult.getTestContext().getPassedTests().removeResult(testResult);
-								testResult.getTestContext().getFailedTests().addResult(testResult, testResult.getMethod());
+								testResult.getTestContext().getFailedTests().addResult(testResult);
 							}
 							return;
 						}
@@ -509,7 +509,7 @@ public class TestNGResultUtils {
 		// move test from passedTests to failedTests if test is not already in failed tests
 		if (result.getTestContext().getPassedTests().getAllMethods().contains(result.getMethod())) {
 			result.getTestContext().getPassedTests().removeResult(result);
-			result.getTestContext().getFailedTests().addResult(result, result.getMethod());
+			result.getTestContext().getFailedTests().addResult(result);
 		}
 	}	
 	

@@ -4,14 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-//import static org.powermock.api.mockito.PowerMockito.whenNew;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,8 +16,11 @@ import java.util.Map;
 
 import com.seleniumtests.driver.*;
 import org.mockito.Mock;
+import org.mockito.MockedConstruction;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -32,10 +28,7 @@ import org.openqa.selenium.logging.Logs;
 import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
-import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -49,29 +42,17 @@ import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.browserfactory.SeleniumGridDriverFactory;
 import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
-import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.StatisticsStorage;
 import com.seleniumtests.core.StatisticsStorage.DriverUsage;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.it.stubclasses.StubTestPage;
-import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.util.osutility.OSUtility;
-import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.video.VideoRecorder;
 
-import net.lightbody.bmp.BrowserMobProxy;
+//import net.lightbody.bmp.BrowserMobProxy;
 
-//@PrepareForTest({OSUtility.class,
-//				OSUtilityFactory.class,
-//				NLWebDriverFactory.class,
-//				CustomEventFiringWebDriver.class,
-//				SeleniumGridConnectorFactory.class,
-//				SeleniumGridDriverFactory.class,
-//				WebUIDriver.class,
-//				WebUIDriverFactory.class,
-//				PageObject.class})
 public class TestWebUIDriver extends MockitoTest {
 	
 	@Mock
@@ -87,9 +68,6 @@ public class TestWebUIDriver extends MockitoTest {
 	private VideoRecorder videoRecorder;
 
 	@Mock
-	private Augmenter augmenter;
-
-	@Mock
 	private CustomEventFiringWebDriver eventDriver1;
 	
 	@Mock
@@ -100,9 +78,6 @@ public class TestWebUIDriver extends MockitoTest {
 	
 //	@Mock
 //	private BrowserMobProxy mobProxy;
-	
-	@Mock
-	private SeleniumGridDriverFactory gridDriverFactory;
 
 	@Mock
 	private WebDriver.Options options;
@@ -150,14 +125,16 @@ public class TestWebUIDriver extends MockitoTest {
 	 */
 	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Browser HTMLUNIT is not available.*")
 	public void testDriverCreationBrowserNotAvailable() {
-		
-//		PowerMockito.mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
-		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "96.0", "", false, false)));
-//		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(anyBoolean())).thenReturn(browserInfos);
-		
-		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		WebUIDriver.getWebDriver(true);
+
+		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class, CALLS_REAL_METHODS)) {
+			Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
+			browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "96.0", "", false, false)));
+
+			mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(anyBoolean())).thenReturn(browserInfos);
+
+			SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
+			WebUIDriver.getWebDriver(true);
+		}
 	}
 	
 	/**
@@ -165,41 +142,44 @@ public class TestWebUIDriver extends MockitoTest {
 	 */
 	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Browser HTMLUNIT is not available.*")
 	public void testDriverCreationBrowserNotAvailable2() {
-		
-//		PowerMockito.mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
-		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.HTMLUNIT, new ArrayList<>());
-//		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(anyBoolean())).thenReturn(browserInfos);
-		
-		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		WebUIDriver.getWebDriver(true);
+
+		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class, CALLS_REAL_METHODS)) {
+			Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
+			browserInfos.put(BrowserType.HTMLUNIT, new ArrayList<>());
+			mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(anyBoolean())).thenReturn(browserInfos);
+
+			SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
+			WebUIDriver.getWebDriver(true);
+		}
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Browser CHROME beta is not available.*")
 	public void testDriverCreationBrowserBetaNotAvailable() {
-		
-//		PowerMockito.mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
-		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "96.0", "", false, false)));
-//		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(anyBoolean())).thenReturn(browserInfos);
-		
-		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
-		SeleniumTestsContextManager.getThreadContext().setBetaBrowser(true);
-		WebUIDriver.getWebDriver(true);
+
+		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class, CALLS_REAL_METHODS)) {
+			Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
+			browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "96.0", "", false, false)));
+			mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(anyBoolean())).thenReturn(browserInfos);
+
+			SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
+			SeleniumTestsContextManager.getThreadContext().setBetaBrowser(true);
+			WebUIDriver.getWebDriver(true);
+		}
 	}
 	
 	
 	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Browser CHROME  is not available.*")
 	public void testDriverCreationBrowserNonBetaNotAvailable() {
-		
-//		PowerMockito.mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
-		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "96.0", "", false, true)));
-//		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(anyBoolean())).thenReturn(browserInfos);
-		
-		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
-		SeleniumTestsContextManager.getThreadContext().setBetaBrowser(false);
-		WebUIDriver.getWebDriver(true);
+
+		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class, CALLS_REAL_METHODS)) {
+			Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
+			browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "96.0", "", false, true)));
+			mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(anyBoolean())).thenReturn(browserInfos);
+
+			SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
+			SeleniumTestsContextManager.getThreadContext().setBetaBrowser(false);
+			WebUIDriver.getWebDriver(true);
+		}
 	}
 	
 	/**
@@ -226,12 +206,10 @@ public class TestWebUIDriver extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testDriverCreationWithNeoload() {
-		
 
-//		PowerMockito.mockStatic(NLWebDriverFactory.class);
-//		PowerMockito.when(NLWebDriverFactory.newNLWebDriver(any(WebDriver.class), anyString())).thenReturn(neoloadDriver);
-		
-		try {
+		try (MockedStatic mockedOsUtility = mockStatic(NLWebDriverFactory.class)) {
+			mockedOsUtility.when(() -> NLWebDriverFactory.newNLWebDriver(any(WebDriver.class), anyString())).thenReturn(neoloadDriver);
+
 			SeleniumTestsContextManager.getThreadContext().setNeoloadUserPath("path");
 			System.setProperty("nl.selenium.proxy.mode", "Design");
 			SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
@@ -263,7 +241,7 @@ public class TestWebUIDriver extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testConstructor() {
-		WebUIDriverFactory.getInstance("foo");
+		WebUIDriverFactory.getInstance("foo").initInstance();
 		Assert.assertEquals(WebUIDriver.getUxDriverSession().get().size(), 1);
 		Assert.assertEquals(WebUIDriver.getCurrentWebUiDriverName(), "foo");
 	}
@@ -273,8 +251,8 @@ public class TestWebUIDriver extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testMultipleConstructor() {
-		WebUIDriverFactory.getInstance("foo");
-		WebUIDriverFactory.getInstance("bar");
+		WebUIDriverFactory.getInstance("foo").initInstance();
+		WebUIDriverFactory.getInstance("bar").initInstance();
 		Assert.assertEquals(WebUIDriver.getUxDriverSession().get().size(), 2);
 
 		Assert.assertEquals(WebUIDriver.getCurrentWebUiDriverName(), "bar");
@@ -306,17 +284,18 @@ public class TestWebUIDriver extends MockitoTest {
 		// set connector to simulate the driver creation on grid
 		SeleniumTestsContextManager.getThreadContext().setSeleniumGridConnectors(Arrays.asList(gridConnector));
 		when(gridConnector.getNodeUrl()).thenReturn("http://localhost:5555/");
-		
-//		whenNew(SeleniumGridDriverFactory.class).withAnyArguments().thenReturn(gridDriverFactory);
-		when(gridDriverFactory.createWebDriver()).thenReturn(drv1);
-		when(gridDriverFactory.getSelectedBrowserInfo()).thenReturn(new BrowserInfo(BrowserType.HTMLUNIT, "1.1"));
-		
-		CustomEventFiringWebDriver ceDriver = (CustomEventFiringWebDriver)WebUIDriver.getWebDriver(true);
-		Assert.assertNotNull(ceDriver.getBrowserInfo());
-		Assert.assertEquals(ceDriver.getBrowserInfo().getVersion(), "1.1");
 
-		verify(gridDriverFactory).createWebDriver();
+		try (MockedConstruction mockedGridDriverFactory = mockConstruction(SeleniumGridDriverFactory.class, (gridDriverFactory, context) -> {
+			when(gridDriverFactory.createWebDriver()).thenReturn(drv1);
+			when(gridDriverFactory.getSelectedBrowserInfo()).thenReturn(new BrowserInfo(BrowserType.HTMLUNIT, "1.1"));
+		})) {
 
+			CustomEventFiringWebDriver ceDriver = (CustomEventFiringWebDriver) WebUIDriver.getWebDriver(true);
+			Assert.assertNotNull(ceDriver.getBrowserInfo());
+			Assert.assertEquals(ceDriver.getBrowserInfo().getVersion(), "1.1");
+
+			verify((SeleniumGridDriverFactory)mockedGridDriverFactory.constructed().get(0)).createWebDriver();
+		}
 	}
 
 	/**
@@ -330,28 +309,29 @@ public class TestWebUIDriver extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://localhost:4444/wd/hub");
 		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
 
-
 		// set connector to simulate the driver creation on grid
 		SeleniumTestsContextManager.getThreadContext().setSeleniumGridConnectors(Arrays.asList(gridConnector));
 		when(gridConnector.getNodeUrl()).thenReturn("http://localhost:5555/");
 
-		whenNew(SeleniumGridDriverFactory.class).withAnyArguments().thenReturn(gridDriverFactory);
-		doAnswer((invocation) -> {
-			throw new IOException("KO");
-		}).when(gridDriverFactory).createWebDriver();
-		when(gridDriverFactory.getSelectedBrowserInfo()).thenReturn(new BrowserInfo(BrowserType.HTMLUNIT, "1.1"));
+		try (MockedConstruction mockedGridDriverFactory = mockConstruction(SeleniumGridDriverFactory.class, (gridDriverFactory, context) -> {
+			doAnswer((invocation) -> {
+				throw new IOException("KO");
+			}).when(gridDriverFactory).createWebDriver();
+			when(gridDriverFactory.getSelectedBrowserInfo()).thenReturn(new BrowserInfo(BrowserType.HTMLUNIT, "1.1"));
+		})) {
 
-		try {
-			WebUIDriver.getWebDriver(true);
-		} catch (Exception e) {
-			// it's expected
+			try {
+				WebUIDriver.getWebDriver(true);
+			} catch (Exception e) {
+				// it's expected
+			}
+
+			// check we try to create the driver only once, because on the first try, it fails completely
+			verify((SeleniumGridDriverFactory)mockedGridDriverFactory.constructed().get(0)).createWebDriver();
+
+			// check cleanUp is correct
+			WebUIDriver.cleanUp();
 		}
-
-		// check we try to create the driver only once, because on the first try, it fails completely
-		verify(gridDriverFactory).createWebDriver();
-
-		// check cleanUp is correct
-		WebUIDriver.cleanUp();
 	}
 
 	/**
@@ -370,27 +350,33 @@ public class TestWebUIDriver extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setSeleniumGridConnectors(Arrays.asList(gridConnector));
 		when(gridConnector.getNodeUrl()).thenReturn("http://localhost:5555/");
 
-		whenNew(SeleniumGridDriverFactory.class).withAnyArguments().thenReturn(gridDriverFactory);
-		when(gridDriverFactory.createWebDriver()).thenReturn(drv1);
-		when(gridDriverFactory.getSelectedBrowserInfo()).thenReturn(new BrowserInfo(BrowserType.HTMLUNIT, "1.1"));
-		whenNew(Augmenter.class).withAnyArguments().thenReturn(augmenter);
-		doAnswer((invocation) -> {
-			throw new IOException("Remotely closed"); // simulate the case where CDP connection cannot be established
-		}).when(augmenter).augment(any());
+		try (MockedConstruction mockedGridDriverFactory = mockConstruction(SeleniumGridDriverFactory.class, (gridDriverFactory, context) -> {
+			when(gridDriverFactory.createWebDriver()).thenReturn(drv1);
+			when(gridDriverFactory.getSelectedBrowserInfo()).thenReturn(new BrowserInfo(BrowserType.HTMLUNIT, "1.1"));
+			});
+			MockedConstruction mockedAugmenter = mockConstruction(Augmenter.class, (augmenter, context) -> {
+				doAnswer((invocation) -> {
+					throw new IOException("Remotely closed"); // simulate the case where CDP connection cannot be established
+				}).when(augmenter).augment(any());
+			});
+		) {
 
-		try {
-			WebUIDriver.getWebDriver(true);
-		} catch (Exception e) {
-			// it's expected
+
+			try {
+				WebUIDriver.getWebDriver(true);
+			} catch (Exception e) {
+				// it's expected
+			}
+			// check we tried to create driver 2 times, because driver was created on grid, but failed to be augmented
+			verify((Augmenter) mockedAugmenter.constructed().get(0)).augment(any(WebDriver.class));
+			verify((Augmenter) mockedAugmenter.constructed().get(1)).augment(any(WebDriver.class));
+
+			// check cleanUp is correct and driver is closed
+			WebUIDriver.logFinalDriversState(Reporter.getCurrentTestResult());
+			verify(targetLocator).defaultContent();
+			WebUIDriver.cleanUp();
+			verify(drv1, times(2)).quit();
 		}
-		// check we tried to create driver 2 times, because driver was created on grid, but failed to be augmented
-		verify(augmenter, times(2)).augment(any(WebDriver.class));
-
-		// check cleanUp is correct and driver is closed
-		WebUIDriver.logFinalDriversState(Reporter.getCurrentTestResult());
-		verify(targetLocator).defaultContent();
-		WebUIDriver.cleanUp();
-		verify(drv1, times(2)).quit();
 	}
 
 	/**
@@ -432,29 +418,35 @@ public class TestWebUIDriver extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
 		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://localhost:4444/wd/hub");
 		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
-		
-		WebUIDriver uiDriver1 = spy(new WebUIDriver("main"));
-		WebUIDriver uiDriver2 = spy(new WebUIDriver("other"));
-		
-//		PowerMockito.whenNew(WebUIDriver.class).withArguments("main").thenReturn(uiDriver1);
-//		PowerMockito.whenNew(WebUIDriver.class).withArguments("other").thenReturn(uiDriver2);
-		WebUIDriver.getUxDriverSession().remove();
-		
-		doReturn(drv1).when(uiDriver1).createWebDriver();
-		WebUIDriver.getWebDriver(true, BrowserType.HTMLUNIT, "main", null);
 
-		// set connector to simulate the driver creation on grid
-		SeleniumTestsContextManager.getThreadContext().setSeleniumGridConnector(gridConnector);
-		when(gridConnector.getNodeUrl()).thenReturn("http://localhost:5555/");
-		
-		doThrow(new WebDriverException("error")).when(uiDriver2).createWebDriver();
-		try {
-			WebUIDriver.getWebDriver(true, BrowserType.HTMLUNIT, "other", null);
-		} catch (WebDriverException e) {}
-		Assert.assertNull(uiDriver1.getConfig().getRunOnSameNode());
-		Assert.assertNotNull(uiDriver2.getConfig().getRunOnSameNode());
-		
-		Assert.assertEquals(WebUIDriver.getCurrentWebUiDriverName(), "main");
+
+		try (MockedConstruction mockedWebUIDriver = mockConstruction(WebUIDriver.class,
+				withSettings().defaultAnswer(CALLS_REAL_METHODS),
+				(uiDriver, context) -> {
+			if (context.arguments().get(0).equals("main")) {
+				doReturn(drv1).when(uiDriver).createWebDriver();
+			} else {
+				doThrow(new WebDriverException("error")).when(uiDriver).createWebDriver();
+			}
+			uiDriver.setName(context.arguments().get(0).toString()); // mandatory to set the name on the instance, as it's what constructor does
+		})) {
+			WebUIDriver.getUxDriverSession().remove();
+
+			WebUIDriver.getWebDriver(true, BrowserType.HTMLUNIT, "main", null);
+
+			// set connector to simulate the driver creation on grid
+			SeleniumTestsContextManager.getThreadContext().setSeleniumGridConnector(gridConnector);
+			when(gridConnector.getNodeUrl()).thenReturn("http://localhost:5555/");
+
+			try {
+				WebUIDriver.getWebDriver(true, BrowserType.HTMLUNIT, "other", null);
+			} catch (WebDriverException e) {
+			}
+			Assert.assertNull(((WebUIDriver)mockedWebUIDriver.constructed().get(0)).getConfig().getRunOnSameNode());
+			Assert.assertNotNull(((WebUIDriver)mockedWebUIDriver.constructed().get(1)).getConfig().getRunOnSameNode());
+
+			Assert.assertEquals(WebUIDriver.getCurrentWebUiDriverName(), "main");
+		}
 
 	}
 	
@@ -539,37 +531,39 @@ public class TestWebUIDriver extends MockitoTest {
 	public void testDriverCreationWithVideo() throws Exception {
 		SeleniumTestsContextManager.getThreadContext().setVideoCapture("true");
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		
-//		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
-//		PowerMockito.doReturn(videoRecorder).when(CustomEventFiringWebDriver.class, "startVideoCapture",
-//					eq(DriverMode.LOCAL),
-//					eq(null),
-//					any(File.class),
-//					eq("videoCapture.avi"));
-		
-		WebDriver driver = WebUIDriver.getWebDriver(true);
-		
-		Assert.assertTrue(driver instanceof CustomEventFiringWebDriver);
-		Assert.assertNotNull(WebUIDriver.getVideoRecorder().get());
-		
+
+		try (MockedStatic mockedCustomEventFiringWebDriver = mockStatic(CustomEventFiringWebDriver.class)) {
+			mockedCustomEventFiringWebDriver.when(() -> CustomEventFiringWebDriver.startVideoCapture(
+					eq(DriverMode.LOCAL),
+					eq(null),
+					any(File.class),
+					eq("videoCapture.avi"))).thenReturn(videoRecorder);
+
+			WebDriver driver = WebUIDriver.getWebDriver(true);
+
+			Assert.assertTrue(driver instanceof CustomEventFiringWebDriver);
+			Assert.assertNotNull(WebUIDriver.getVideoRecorder().get());
+			Assert.assertEquals(WebUIDriver.getVideoRecorder().get(), videoRecorder);
+		}
 	}
 	
 	@Test(groups={"ut"})
 	public void testDriverCreationWithVideoInError() throws Exception {
 		SeleniumTestsContextManager.getThreadContext().setVideoCapture("true");
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		
-//		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
-//		PowerMockito.doThrow(new ScenarioException("error")).when(CustomEventFiringWebDriver.class, "startVideoCapture",
-//				eq(DriverMode.LOCAL),
-//				eq(null),
-//				any(File.class),
-//				eq("videoCapture.avi"));
-		
-		WebDriver driver = WebUIDriver.getWebDriver(true);
-		
-		Assert.assertTrue(driver instanceof CustomEventFiringWebDriver);
-		Assert.assertNull(WebUIDriver.getVideoRecorder().get());
+
+		try (MockedStatic mockedCustomEventFiringWebDriver = mockStatic(CustomEventFiringWebDriver.class)) {
+			mockedCustomEventFiringWebDriver.when(() -> CustomEventFiringWebDriver.startVideoCapture(
+					eq(DriverMode.LOCAL),
+					eq(null),
+					any(File.class),
+					eq("videoCapture.avi"))).thenThrow(new ScenarioException("error"));
+
+			WebDriver driver = WebUIDriver.getWebDriver(true);
+
+			Assert.assertTrue(driver instanceof CustomEventFiringWebDriver);
+			Assert.assertNull(WebUIDriver.getVideoRecorder().get());
+		}
 		
 	}
 	
@@ -590,6 +584,8 @@ public class TestWebUIDriver extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
 		WebUIDriver uiDriver1 = WebUIDriverFactory.getInstance("foo");
 		WebUIDriver uiDriver2 = WebUIDriverFactory.getInstance("bar");
+		uiDriver1.initInstance();
+		uiDriver2.initInstance();
 		uiDriver1.createRemoteWebDriver();
 		uiDriver2.createRemoteWebDriver();
 
@@ -607,7 +603,7 @@ public class TestWebUIDriver extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCleanUp() {
 		
-		SeleniumTestsContextManager.getThreadContext().setCaptureNetwork(true);
+		SeleniumTestsContextManager.getThreadContext().setCaptureNetwork(false);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
 		WebDriver driver = spy(WebUIDriver.getWebDriver(true));
 		WebUIDriver uiDriver = WebUIDriver.getWebUIDriver(false);
@@ -625,7 +621,7 @@ public class TestWebUIDriver extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCleanUpDriverExited() {
 		
-		SeleniumTestsContextManager.getThreadContext().setCaptureNetwork(true);
+		SeleniumTestsContextManager.getThreadContext().setCaptureNetwork(false);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
 		WebDriver driver = spy(WebUIDriver.getWebDriver(true));
 		WebUIDriver uiDriver = WebUIDriver.getWebUIDriver(false);
@@ -645,9 +641,10 @@ public class TestWebUIDriver extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCleanUpDriverNull() {
 		
-		SeleniumTestsContextManager.getThreadContext().setCaptureNetwork(true);
+		SeleniumTestsContextManager.getThreadContext().setCaptureNetwork(false);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
 		WebUIDriver uiDriver = WebUIDriverFactory.getInstance("foo");
+		uiDriver.initInstance();
 		uiDriver.setDriver(null);
 		
 		WebUIDriver.cleanUp();	
@@ -659,7 +656,7 @@ public class TestWebUIDriver extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCleanUpWithError() {
 		
-		SeleniumTestsContextManager.getThreadContext().setCaptureNetwork(true);
+		SeleniumTestsContextManager.getThreadContext().setCaptureNetwork(false);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
 		WebDriver driver = spy(WebUIDriver.getWebDriver(true));
 		WebUIDriver uiDriver = WebUIDriver.getWebUIDriver(false);
@@ -718,27 +715,27 @@ public class TestWebUIDriver extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testCleanUpWithVideoCapture() throws Exception {
-		
-//		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
-//		PowerMockito.doReturn(videoRecorder).when(CustomEventFiringWebDriver.class, "startVideoCapture",
-//					eq(DriverMode.LOCAL),
-//					eq(null),
-//					any(File.class),
-//					eq("videoCapture.avi"));
 
-		SeleniumTestsContextManager.getThreadContext().setVideoCapture("true");
-		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		WebUIDriver uiDriver = WebUIDriverFactory.getInstance("foo");
-		uiDriver.createRemoteWebDriver();
-		VideoRecorder vRecorder = WebUIDriver.getVideoRecorder().get();
-		
-		Assert.assertNotNull(WebUIDriver.getVideoRecorder().get());
-		
-		WebUIDriver.cleanUp();
-//		PowerMockito.verifyStatic(CustomEventFiringWebDriver.class, times(1));
-		CustomEventFiringWebDriver.stopVideoCapture(eq(DriverMode.LOCAL), eq(null), eq(vRecorder));
-		
-		Assert.assertNull(WebUIDriver.getVideoRecorder().get());
+		try (MockedStatic mockedCustomEventFiringWebDriver = mockStatic(CustomEventFiringWebDriver.class)) {
+			mockedCustomEventFiringWebDriver.when(() -> CustomEventFiringWebDriver.startVideoCapture(
+					eq(DriverMode.LOCAL),
+					eq(null),
+					any(File.class),
+					eq("videoCapture.avi"))).thenReturn(videoRecorder);
+			SeleniumTestsContextManager.getThreadContext().setVideoCapture("true");
+			SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
+			WebUIDriver uiDriver = WebUIDriverFactory.getInstance("foo");
+			uiDriver.initInstance();
+			uiDriver.createRemoteWebDriver();
+			VideoRecorder vRecorder = WebUIDriver.getVideoRecorder().get();
+
+			Assert.assertNotNull(WebUIDriver.getVideoRecorder().get());
+
+			WebUIDriver.cleanUp();
+			mockedCustomEventFiringWebDriver.verify(() -> CustomEventFiringWebDriver.stopVideoCapture(eq(DriverMode.LOCAL), eq(null), eq(vRecorder)));
+
+			Assert.assertNull(WebUIDriver.getVideoRecorder().get());
+		}
 	}
 	
 	/**
@@ -748,34 +745,35 @@ public class TestWebUIDriver extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testCleanUpWithVideoCaptureWithError() throws Exception {
-		
-//		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
-//		PowerMockito.doReturn(videoRecorder).when(CustomEventFiringWebDriver.class, "startVideoCapture",
-//				eq(DriverMode.LOCAL),
-//				eq(null),
-//				any(File.class),
-//				eq("videoCapture.avi"));
-//		PowerMockito.doThrow(new NullPointerException("error")).when(CustomEventFiringWebDriver.class, "stopVideoCapture",
-//				eq(DriverMode.LOCAL),
-//				eq(null),
-//				any(VideoRecorder.class));
-		
-		SeleniumTestsContextManager.getThreadContext().setVideoCapture("true");
-		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		WebUIDriver uiDriver = WebUIDriverFactory.getInstance("foo");
-		uiDriver.createRemoteWebDriver();
-		VideoRecorder vRecorder = WebUIDriver.getVideoRecorder().get();
-		
-		Assert.assertNotNull(WebUIDriver.getVideoRecorder().get());
-		
-		WebUIDriver.cleanUp();
-//		PowerMockito.verifyStatic(CustomEventFiringWebDriver.class, times(1));
-		CustomEventFiringWebDriver.stopVideoCapture(eq(DriverMode.LOCAL), eq(null), eq(vRecorder));
-		
-		Assert.assertNull(WebUIDriver.getVideoRecorder().get());
+
+		try (MockedStatic mockedCustomEventFiringWebDriver = mockStatic(CustomEventFiringWebDriver.class)) {
+			mockedCustomEventFiringWebDriver.when(() -> CustomEventFiringWebDriver.startVideoCapture(
+					eq(DriverMode.LOCAL),
+					eq(null),
+					any(File.class),
+					eq("videoCapture.avi"))).thenReturn(videoRecorder);
+
+			mockedCustomEventFiringWebDriver.when(() -> CustomEventFiringWebDriver.stopVideoCapture(
+					eq(DriverMode.LOCAL),
+					eq(null),
+					any(VideoRecorder.class))).thenThrow(new NullPointerException("error"));
+
+			SeleniumTestsContextManager.getThreadContext().setVideoCapture("true");
+			SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
+			WebUIDriver uiDriver = WebUIDriverFactory.getInstance("foo");
+			uiDriver.initInstance();
+			uiDriver.createRemoteWebDriver();
+			VideoRecorder vRecorder = WebUIDriver.getVideoRecorder().get();
+
+			Assert.assertNotNull(WebUIDriver.getVideoRecorder().get());
+
+			WebUIDriver.cleanUp();
+			mockedCustomEventFiringWebDriver.verify(() -> CustomEventFiringWebDriver.stopVideoCapture(eq(DriverMode.LOCAL), eq(null), eq(vRecorder)));
+
+			Assert.assertNull(WebUIDriver.getVideoRecorder().get());
+		}
 	}
-	
-	
+
 	@Test(groups={"ut"})
 	public void testDriverSwitching() {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
@@ -853,33 +851,39 @@ public class TestWebUIDriver extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("none");
 		// this call is normally done on test start
 		WebUIDriver.resetCurrentWebUiDriverName();
-		
-//		PowerMockito.mockStatic(WebUIDriver.class, Mockito.CALLS_REAL_METHODS);
-//		PowerMockito.doAnswer(new org.mockito.stubbing.Answer<Object>() {
-//		    @Override
-//		    public Object answer(InvocationOnMock invocation) throws Throwable {
-//		    	WebUIDriver.setCurrentWebUiDriverName("main"); // as we mock driver creation, current driver name is never set
-//		        return eventDriver1;
-//		    }}).when(WebUIDriver.class, "getWebDriver", eq(true), any(BrowserType.class), eq("main"), eq(null));
-//		PowerMockito.doAnswer(new org.mockito.stubbing.Answer<Object>() {
-//		    @Override
-//		    public Object answer(InvocationOnMock invocation) throws Throwable {
-//		    	WebUIDriver.setCurrentWebUiDriverName("app"); // as we mock driver creation, current driver name is never set
-//		        return eventDriver2;
-//		    }}).when(WebUIDriver.class, "getWebDriver", eq(true), any(BrowserType.class), eq("app"), any());
-		
-		// create a first page. This creates the default driver
-		StubTestPage page1 = new StubTestPage();
-		
-		// create a new page linked to a new driver. This creates a new driver names "app"
-		StubTestPage page2 = new StubTestPage(BrowserType.NONE);
-		
-		// create an other page which sould use the last created driver
-		StubTestPage page3 = new StubTestPage();
-		
-		Assert.assertEquals(page1.getDriver(), eventDriver1);
-		Assert.assertEquals(page2.getDriver(), eventDriver2);
-		Assert.assertEquals(page3.getDriver(), eventDriver2); // last page uses the driver created in the previous page
+
+		try (MockedStatic mockedWebUiDriver = mockStatic(WebUIDriver.class, Mockito.CALLS_REAL_METHODS)) {
+
+			mockedWebUiDriver.when(() -> WebUIDriver.getWebDriver(eq(true), any(BrowserType.class), eq("main"), eq(null))).thenAnswer(
+					new Answer() {
+						@Override
+						public Object answer(InvocationOnMock invocation) throws Throwable {
+							WebUIDriver.setCurrentWebUiDriverName("main"); // as we mock driver creation, current driver name is never set
+							return eventDriver1;
+						}}
+			);
+			mockedWebUiDriver.when(() -> WebUIDriver.getWebDriver(eq(true), any(BrowserType.class), eq("app"), any())).thenAnswer(
+					new Answer() {
+						@Override
+						public Object answer(InvocationOnMock invocation) throws Throwable {
+							WebUIDriver.setCurrentWebUiDriverName("app"); // as we mock driver creation, current driver name is never set
+		        			return eventDriver2;
+						}}
+			);
+
+			// create a first page. This creates the default driver
+			StubTestPage page1 = new StubTestPage();
+
+			// create a new page linked to a new driver. This creates a new driver names "app"
+			StubTestPage page2 = new StubTestPage(BrowserType.NONE);
+
+			// create an other page which sould use the last created driver
+			StubTestPage page3 = new StubTestPage();
+
+			Assert.assertEquals(page1.getDriver(), eventDriver1);
+			Assert.assertEquals(page2.getDriver(), eventDriver2);
+			Assert.assertEquals(page3.getDriver(), eventDriver2); // last page uses the driver created in the previous page
+		}
 	}
 	
 	/**

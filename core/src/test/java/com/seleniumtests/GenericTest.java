@@ -34,6 +34,7 @@ import org.testng.internal.TestNGMethod;
 import org.testng.internal.TestResult;
 import org.testng.internal.annotations.DefaultAnnotationTransformer;
 import org.testng.internal.annotations.JDK15AnnotationFinder;
+import org.testng.internal.objects.DefaultTestObjectFactory;
 import org.testng.xml.XmlSuite;
 import org.testng.xml.XmlTest;
 
@@ -143,7 +144,7 @@ public class GenericTest {
 		XmlTest test = new XmlTest(suite);
 		test.setName("myTestNg");
 		
-		ITestNGMethod testMethod = new TestNGMethod(clazz.getMethod("myTest"), new JDK15AnnotationFinder(new DefaultAnnotationTransformer()), test, null);
+		ITestNGMethod testMethod = new TestNGMethod(new DefaultTestObjectFactory(), clazz.getMethod("myTest"), new JDK15AnnotationFinder(new DefaultAnnotationTransformer()), test, null);
 		Field methodField = TestResult.class.getDeclaredField("m_method");
 		methodField.setAccessible(true);
 		methodField.set(testResult, testMethod);

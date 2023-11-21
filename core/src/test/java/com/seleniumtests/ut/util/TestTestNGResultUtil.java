@@ -479,7 +479,7 @@ public class TestTestNGResultUtil extends MockitoTest {
 		// check that test result has been changed
 		verify(testResult).setStatus(ITestResult.FAILURE);
 		verify(passedTests).removeResult(testResult);
-		verify(failedTests).addResult(testResult, testNGMethod);
+		verify(failedTests).addResult(testResult);
 	}
 	
 	/**
@@ -494,7 +494,7 @@ public class TestTestNGResultUtil extends MockitoTest {
 		// check that test result has been changed
 		verify(testResult, never()).setStatus(ITestResult.FAILURE);
 		verify(passedTests, never()).removeResult(testResult);
-		verify(failedTests, never()).addResult(testResult, testNGMethod);
+		verify(failedTests, never()).addResult(testResult);
 		verify(snapshotServerConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString());
 	}
 	@Test(groups={"ut"})
@@ -505,7 +505,7 @@ public class TestTestNGResultUtil extends MockitoTest {
 		// check that test result has been changed
 		verify(testResult, never()).setStatus(ITestResult.FAILURE);
 		verify(passedTests, never()).removeResult(testResult);
-		verify(failedTests, never()).addResult(testResult, testNGMethod);
+		verify(failedTests, never()).addResult(testResult);
 		verify(snapshotServerConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString());
 	}
 	
@@ -521,7 +521,7 @@ public class TestTestNGResultUtil extends MockitoTest {
 		// check that test result has been changed
 		verify(testResult, never()).setStatus(ITestResult.FAILURE);
 		verify(passedTests, never()).removeResult(testResult);
-		verify(failedTests, never()).addResult(testResult, testNGMethod);
+		verify(failedTests, never()).addResult(testResult);
 		verify(snapshotServerConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString());
 	}
 	
@@ -690,7 +690,7 @@ public class TestTestNGResultUtil extends MockitoTest {
 		
 		// check that test result has been changed
 		verify(passedTests).removeResult(testResult);
-		verify(failedTests).addResult(testResult, testNGMethod);
+		verify(failedTests).addResult(testResult);
 	}
 
 	@Test(groups={"ut"})

@@ -32,7 +32,7 @@ import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -48,7 +48,7 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.osutility.OSCommand;
 
-@PrepareForTest({AdbWrapper.class, OSCommand.class})
+//@PrepareForTest({AdbWrapper.class, OSCommand.class})
 public class TestMobileDeviceSelector extends MockitoTest {
 	
 	@Mock

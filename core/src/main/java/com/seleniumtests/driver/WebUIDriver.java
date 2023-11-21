@@ -116,6 +116,14 @@ public class WebUIDriver {
 		return name;
 	}
 
+	/**
+	 * For test only
+	 * @param name
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
     /**
      * prepare driver:
      * - create it
