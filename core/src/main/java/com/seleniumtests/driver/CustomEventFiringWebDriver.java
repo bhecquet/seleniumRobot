@@ -23,6 +23,8 @@ import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.core.StatisticsStorage;
 import com.seleniumtests.core.StatisticsStorage.DriverUsage;
+import com.seleniumtests.customexception.DriverExceptions;
+import com.seleniumtests.customexception.RetryableDriverException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.customexception.WebSessionEndedException;
 import com.seleniumtests.util.helper.WaitHelper;
@@ -650,7 +652,11 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 
 		// Augmenter is only supported for web test because augmenting driver namely tries to create a CDP connection with a browser
 		if (isWebTest()) {
-			this.driver = new Augmenter().augment(this.driver);
+			try {
+				this.driver = new Augmenter().augment(this.driver);
+			} catch (Exception e) {
+				throw new RetryableDriverException("Error augmenting driver", e);
+			}
 		}
 	
 		// NEOLOAD //

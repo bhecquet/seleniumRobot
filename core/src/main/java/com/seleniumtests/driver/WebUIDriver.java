@@ -35,6 +35,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import com.seleniumtests.customexception.RetryableDriverException;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
@@ -575,17 +576,29 @@ public class WebUIDriver {
 	        	if (uxDriverSession.get() != null && uxDriverSession.get().size() > 1 && uiDriver.config.getSeleniumGridConnector() != null) {
 	        		uiDriver.config.setRunOnSameNode(uiDriver.getConfig().getSeleniumGridConnector().getNodeUrl());
 	        	}
-	        	
-	        	try {
-					uiDriver.createWebDriver();
-				} catch (Exception e) {
-	        		// in case driver fails to start, remove any reference to its name so that we cannot switch to it
-					setCurrentWebUiDriverName(previousDriverName);
-					if (driverName != DEFAULT_DRIVER_NAME) {
-						uxDriverSession.get().remove(driverName);
+
+				int maxRetry = 2;
+				for (int i = 0; i < maxRetry; i++) {
+					try {
+						uiDriver.createWebDriver();
+						break;
+
+					} catch (Exception e) {
+						// clean and retry
+						if (e instanceof RetryableDriverException && i < maxRetry - 1) {
+							logger.warn("Driver creation failed: " + e.getMessage() + " => retrying");
+							uiDriver.clean();
+						} else {
+
+							// in case driver fails to start, remove any reference to its name so that we cannot switch to it
+							setCurrentWebUiDriverName(previousDriverName);
+							if (driverName != DEFAULT_DRIVER_NAME) {
+								uxDriverSession.get().remove(driverName);
+							}
+							switchToDriver(previousDriverName);
+							throw e;
+						}
 					}
-					switchToDriver(previousDriverName);
-					throw e;
 				}
         	}
         } else {

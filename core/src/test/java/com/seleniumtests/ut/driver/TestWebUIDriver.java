@@ -309,6 +309,8 @@ public class TestWebUIDriver extends MockitoTest {
 		CustomEventFiringWebDriver ceDriver = (CustomEventFiringWebDriver)WebUIDriver.getWebDriver(true);
 		Assert.assertNotNull(ceDriver.getBrowserInfo());
 		Assert.assertEquals(ceDriver.getBrowserInfo().getVersion(), "1.1");
+
+		verify(gridDriverFactory).createWebDriver();
 		
 	}
 
@@ -339,6 +341,10 @@ public class TestWebUIDriver extends MockitoTest {
 		} catch (Exception e) {
 			// it's expected
 		}
+
+		// check we try to create the driver only once, because on the first try, it fails completely
+		verify(gridDriverFactory).createWebDriver();
+
 		// check cleanUp is correct
 		WebUIDriver.cleanUp();
 	}
@@ -372,11 +378,14 @@ public class TestWebUIDriver extends MockitoTest {
 		} catch (Exception e) {
 			// it's expected
 		}
+		// check we tried to create driver 2 times, because driver was created on grid, but failed to be augmented
+		verify(augmenter, times(2)).augment(any(WebDriver.class));
+
 		// check cleanUp is correct and driver is closed
 		WebUIDriver.logFinalDriversState(Reporter.getCurrentTestResult());
 		verify(targetLocator).defaultContent();
 		WebUIDriver.cleanUp();
-		verify(drv1).quit();
+		verify(drv1, times(2)).quit();
 	}
 
 	/**
