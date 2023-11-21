@@ -50,7 +50,7 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 	 * Create capabilities for mobile chrome
 	 */
 	public MutableCapabilities createMobileCapabilities(final DriverConfig webDriverConfig) {
-		MutableCapabilities capabilities = new DesiredCapabilities();
+		UiAutomator2Options capabilities = new UiAutomator2Options();
 		ChromeOptions options = new ChromeOptions();
         if (webDriverConfig.getUserAgentOverride() != null) {
             options.addArguments("--user-agent=" + webDriverConfig.getUserAgentOverride());
@@ -73,17 +73,17 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
         capabilities.setCapability(ChromeOptions.CAPABILITY, options);
         
         // TEST_MOBILE
-		((UiAutomator2Options)capabilities).setNativeWebScreenshot(true);
+		capabilities.setNativeWebScreenshot(true);
         // TEST_MOBILE
         
         if (webDriverConfig.getMode() == DriverMode.LOCAL) {
-			((UiAutomator2Options)capabilities).setChromedriverExecutable(System.getProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY));
-        	
+			capabilities.setChromedriverExecutable(System.getProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY));
+
         	// driver logging
         	setLogging();
         }
         
-        return capabilities;
+        return new MutableCapabilities(capabilities);
 	}
 	
 	private void setLogging() {

@@ -1,6 +1,5 @@
 package com.seleniumtests.browserfactory;
 
-import io.appium.java_client.remote.options.SupportsAppOption;
 import org.openqa.selenium.MutableCapabilities;
 
 import com.seleniumtests.driver.DriverConfig;
@@ -25,11 +24,11 @@ public abstract class ICloudCapabilityFactory extends ICapabilitiesFactory {
 	 * @return
 	 */
 	protected boolean isUploadApp(MutableCapabilities capabilities) {
-		Optional<String> applicationOption = ((SupportsAppOption)capabilities).getApp();
+		Optional<String> applicationOption = getApp(capabilities);
 		boolean uploadApp = true;
 		if (applicationOption.isPresent() && applicationOption.get().startsWith(NO_APP_UPLOAD)) {
 			uploadApp = false;
-			((SupportsAppOption)capabilities).setApp(applicationOption.get().replace(NO_APP_UPLOAD, ""));
+			capabilities.merge(setApp(capabilities, applicationOption.get().replace(NO_APP_UPLOAD, "")));
 		}
 		
 		return uploadApp;

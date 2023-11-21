@@ -2216,6 +2216,7 @@ public class SeleniumTestsContext {
     
 
     public void setAutomationName(String automationName) {
+        // this parameter has no effect with Appium 2.x
     	setAttribute(AUTOMATION_NAME, automationName);
     }
     

@@ -78,8 +78,9 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	 * Do nothing as we are not a SeleniumRobotGrid
 	 * @param caps
 	 */
-	public void uploadMobileApp(Capabilities caps) {
+	public MutableCapabilities uploadMobileApp(Capabilities caps) {
 		logger.warn("application upload is only available with seleniumRobot grid");
+		return (MutableCapabilities) caps;
 	}
 	
 	/**

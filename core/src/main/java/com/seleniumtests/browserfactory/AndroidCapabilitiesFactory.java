@@ -35,7 +35,7 @@ public class AndroidCapabilitiesFactory extends IMobileCapabilityFactory {
 	@Override
 	protected String getAutomationName() {
 		if (webDriverConfig.getAutomationName() == null) {
-    		return "Appium";
+    		return "UiAutomator2";
     	} else {
     		return webDriverConfig.getAutomationName();
     	}

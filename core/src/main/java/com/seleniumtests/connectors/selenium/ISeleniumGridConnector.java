@@ -5,10 +5,11 @@ import java.io.File;
 import java.util.List;
 
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.MutableCapabilities;
 
 public interface ISeleniumGridConnector {
 
-	public void uploadMobileApp(Capabilities caps);
+	public MutableCapabilities uploadMobileApp(Capabilities caps);
 	
 	/**
 	 * Upload a file given file path

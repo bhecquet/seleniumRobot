@@ -23,11 +23,10 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import io.appium.java_client.remote.options.SupportsAppOption;
+import io.appium.java_client.remote.options.BaseOptions;
 import org.apache.http.auth.AuthenticationException;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
@@ -50,12 +49,11 @@ public class SauceLabsCapabilitiesFactory extends ICloudCapabilityFactory {
      * https://docs.saucelabs.com/dev/test-configuration-options/
      */
 	@Override
-    public DesiredCapabilities createCapabilities() {
+    public MutableCapabilities createCapabilities() {
 
-        final DesiredCapabilities capabilities = new DesiredCapabilities();
+        final BaseOptions capabilities = new BaseOptions();
 
-        
-        MutableCapabilities sauceOptions = new MutableCapabilities();
+		MutableCapabilities sauceOptions = new MutableCapabilities();
         capabilities.setCapability("sauce:options", sauceOptions);
 		
 		if(ANDROID_PLATFORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
@@ -77,7 +75,7 @@ public class SauceLabsCapabilitiesFactory extends ICloudCapabilityFactory {
         }
 		
 		// we need to upload something
-		Optional<String> applicationCapability = ((SupportsAppOption)capabilities).getApp();
+		Optional<String> applicationCapability = getApp(capabilities);
 		if (applicationCapability.isPresent() && applicationCapability.get() != null) {
 
 			boolean uploadApp = isUploadApp(capabilities);
@@ -85,11 +83,12 @@ public class SauceLabsCapabilitiesFactory extends ICloudCapabilityFactory {
 			if (uploadApp) {
 				uploadFile(applicationCapability.get());
 			}
-			((SupportsAppOption)capabilities).setApp("storage:filename=" + new File(applicationCapability.get()).getName()); //  saucelabs waits for app capability a special file: sauce-storage:<filename>
+			setApp(capabilities, "storage:filename=" + new File(applicationCapability.get()).getName()); //  saucelabs waits for app capability a special file: sauce-storage:<filename>
 
 		}
-        
-        return capabilities;
+
+		// be sure not to have appium capabilities so that further setCapabilities do not add "appium:" prefix
+        return new MutableCapabilities(capabilities);
     }
 	
 

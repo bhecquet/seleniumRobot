@@ -201,9 +201,43 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		InputStream is = IOUtils.toInputStream("file:app/zip", Charset.forName("UTF-8"));
 		when(statusLine.getStatusCode()).thenReturn(200);
 		when(entity.getContent()).thenReturn(is);
-		
-		connector.uploadMobileApp(mobileCapabilities);
-		Assert.assertEquals(((UiAutomator2Options)mobileCapabilities).getApp().orElse(null), "file:app/zip/" + appFile.getName());
+
+		mobileCapabilities = connector.uploadMobileApp(new MutableCapabilities(mobileCapabilities));
+		Assert.assertEquals(new UiAutomator2Options(mobileCapabilities).getApp().orElse(null), "file:app/zip/" + appFile.getName());
+	}
+
+	@Test(groups={"ut"})
+	public void testSendAppNoApp() throws UnsupportedOperationException, IOException {
+
+		// prepare response
+		InputStream is = IOUtils.toInputStream("file:app/zip", Charset.forName("UTF-8"));
+		when(statusLine.getStatusCode()).thenReturn(200);
+		when(entity.getContent()).thenReturn(is);
+		mobileCapabilities.setCapability("foo", "bar");
+
+		mobileCapabilities = connector.uploadMobileApp(new MutableCapabilities(mobileCapabilities));
+		Assert.assertEquals(mobileCapabilities.getCapability("appium:foo"), "bar");
+	}
+
+	@Test(groups={"ut"})
+	public void testSendAppNotMobile() throws UnsupportedOperationException, IOException {
+
+		// prepare app file
+		File appFile = File.createTempFile("app", ".apk");
+		appFile.deleteOnExit();
+
+		// prepare response
+		InputStream is = IOUtils.toInputStream("file:app/zip", Charset.forName("UTF-8"));
+		when(statusLine.getStatusCode()).thenReturn(200);
+		when(entity.getContent()).thenReturn(is);
+
+		MutableCapabilities caps = new MutableCapabilities();
+		caps.setCapability("appium:app", appFile.getAbsolutePath());
+
+		mobileCapabilities = connector.uploadMobileApp(caps);
+
+		// nothing has been uploaded
+		Assert.assertEquals(new UiAutomator2Options(mobileCapabilities).getApp().orElse(null), appFile.getAbsolutePath());
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions = SeleniumGridException.class)

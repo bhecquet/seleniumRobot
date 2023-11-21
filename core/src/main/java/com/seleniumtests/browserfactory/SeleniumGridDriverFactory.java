@@ -139,7 +139,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
         // app must be uploaded before driver creation because driver will need it in mobile app testing
         // upload file on all available grids as we don't know which one will be chosen before driver has been created
         for (SeleniumGridConnector gridConnector: gridConnectors) {
-        	gridConnector.uploadMobileApp(capabilities);
+			capabilities = gridConnector.uploadMobileApp(capabilities);
         }
 
         // connection to grid is made here

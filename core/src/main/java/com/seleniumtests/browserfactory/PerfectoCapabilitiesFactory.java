@@ -9,7 +9,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import io.appium.java_client.remote.options.BaseOptions;
-import io.appium.java_client.remote.options.SupportsAppOption;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -44,7 +43,7 @@ public class PerfectoCapabilitiesFactory extends ICloudCapabilityFactory {
 		
 		String apiKey = extractApiKey();
 		
-		MutableCapabilities  capabilities = new DesiredCapabilities ();
+		BaseOptions capabilities = new BaseOptions<> ();
 		capabilities.setCapability("enableAppiumBehavior", true);
 		capabilities.setCapability("autoLaunch", true);
 		capabilities.setCapability("securityToken", apiKey);
@@ -60,7 +59,7 @@ public class PerfectoCapabilitiesFactory extends ICloudCapabilityFactory {
         } 
 		
 		// we need to upload something
-		Optional<String> applicationCapability = ((SupportsAppOption)capabilities).getApp();
+		Optional<String> applicationCapability = getApp(capabilities);
 		if (applicationCapability.isPresent() && applicationCapability.get() != null) {
 			boolean uploadApp = isUploadApp(capabilities);
 			
@@ -77,10 +76,11 @@ public class PerfectoCapabilitiesFactory extends ICloudCapabilityFactory {
 					throw new ScenarioException("Could not upload file", e);
 				}
 			}
-			((SupportsAppOption)capabilities).setApp(repositoryKey);
+			capabilities = (BaseOptions) setApp(capabilities, repositoryKey);
 		}
 
-		return capabilities;
+		// be sure not to have appium capabilities so that further setCapabilities do not add "appium:" prefix
+		return new MutableCapabilities(capabilities);
 	}
 	
 	private String extractApiKey() {

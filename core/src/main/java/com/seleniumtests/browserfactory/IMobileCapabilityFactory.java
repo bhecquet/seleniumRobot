@@ -22,10 +22,8 @@ import java.time.Duration;
 import java.util.Optional;
 
 import io.appium.java_client.remote.options.BaseOptions;
-import io.appium.java_client.remote.options.SupportsAppOption;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.BrowserType;
@@ -44,14 +42,15 @@ public abstract class IMobileCapabilityFactory extends ICapabilitiesFactory {
 	protected abstract MutableCapabilities getSystemSpecificCapabilities();
 	
 	protected abstract MutableCapabilities getBrowserSpecificCapabilities();
-	  
+
+
+
 	@Override
     public MutableCapabilities createCapabilities() {
 
     	String app = webDriverConfig.getApp().trim();
     	
     	BaseOptions options = new BaseOptions();
-    	options.setAutomationName(getAutomationName());
     
     	if (app != null && !app.trim().isEmpty()) {
 	    	options.setFullReset(webDriverConfig.isFullReset());
@@ -64,14 +63,14 @@ public abstract class IMobileCapabilityFactory extends ICapabilitiesFactory {
     	options.setNewCommandTimeout(Duration.ofSeconds(webDriverConfig.getNewCommandTimeout()));
     	
     	// in case app has not been specified for cloud provider
-		Optional<String> applicationOption = ((SupportsAppOption)options).getApp();
-        if (applicationOption.isPresent() && applicationOption.get() == null && app != null && !app.isEmpty()) {
+		Optional<String> applicationOption = getApp(options);
+        if ((!applicationOption.isPresent() || applicationOption.get() == null) && app != null && !app.isEmpty()) {
         	
         	// in case of local file, give absolute path to file. For remote files (e.g: http://myapp.apk), it will be transmitted as is
         	if (new File(app).isFile()) {
         		app = new File(app).getAbsolutePath();
         	}
-			((SupportsAppOption)options).setApp(app.replace("\\", "/"));
+			options = (BaseOptions) setApp(options, app.replace("\\", "/"));
         }
         
         if (webDriverConfig.getTestContext() != null && webDriverConfig.getTestContext().getTestNGResult() != null) {
@@ -83,7 +82,7 @@ public abstract class IMobileCapabilityFactory extends ICapabilitiesFactory {
     	// do not configure application and browser as they are mutualy exclusive
         if (app == null || app.isEmpty() && webDriverConfig.getBrowserType() != BrowserType.NONE) {
         	options.setCapability(CapabilityType.BROWSER_NAME, webDriverConfig.getBrowserType().toString().toLowerCase());
-        	options.merge(getBrowserSpecificCapabilities());
+			options = options.merge(getBrowserSpecificCapabilities());
         } else {
         	options.setCapability(CapabilityType.BROWSER_NAME, (String)null);
         }
@@ -94,13 +93,13 @@ public abstract class IMobileCapabilityFactory extends ICapabilitiesFactory {
         }
         
         // add OS specific capabilities
-        options.merge(getSystemSpecificCapabilities());
+        options = options.merge(getSystemSpecificCapabilities());
         
         // add user configurations
-        options.merge(webDriverConfig.getAppiumCapabilities());
-        
-        
-        return options;
+		options = options.merge(webDriverConfig.getAppiumCapabilities());
+
+		// be sure not to have appium capabilities so that further setCapabilities do not add "appium:" prefix
+        return new MutableCapabilities(options);
     }
 
 }

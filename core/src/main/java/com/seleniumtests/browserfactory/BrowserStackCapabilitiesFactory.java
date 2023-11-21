@@ -24,7 +24,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import io.appium.java_client.android.options.UiAutomator2Options;
-import io.appium.java_client.remote.options.SupportsAppOption;
 import org.apache.http.auth.AuthenticationException;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
@@ -103,14 +102,14 @@ public class BrowserStackCapabilitiesFactory extends ICloudCapabilityFactory {
         capabilities.setCapability("project", SeleniumTestsContextManager.getApplicationName());
         
         // we need to upload something
-		Optional<String> applicationOption = ((SupportsAppOption)capabilities).getApp();
+		Optional<String> applicationOption = getApp(capabilities);
  		if (applicationOption.isPresent() && applicationOption.get() != null) {
  			String appUrl = uploadFile(applicationOption.get());
  			capabilities.setCapability("app", appUrl);
-
  		}
-        
-        return capabilities;
+
+		 // be sure not to have appium capabilities so that further setCapabilities do not add "appium:" prefix
+        return new MutableCapabilities(capabilities);
     }
 	
 	 /**
