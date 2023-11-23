@@ -3,16 +3,14 @@ package com.seleniumtests.ut.uipage.htmlelements;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver.Options;
@@ -21,9 +19,8 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
-//import org.powermock.api.mockito.PowerMockito;
-//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -34,10 +31,8 @@ import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.htmlelements.SelectList;
 import com.seleniumtests.uipage.htmlelements.select.NativeSelect;
-import com.seleniumtests.uipage.htmlelements.select.StubSelect;
 
 /**
  * Class for testing SelectList object without its implementations
@@ -68,6 +63,8 @@ public class TestSelectList extends MockitoTest {
 	
 
 	private CustomEventFiringWebDriver eventDriver;
+
+	private MockedStatic mockedWebUIDriver;
 
 	@BeforeMethod(groups={"ut"})
 	private void init() throws IOException {
@@ -108,14 +105,17 @@ public class TestSelectList extends MockitoTest {
 		when(option1.getAttribute("index")).thenReturn("1");
 		when(option2.getAttribute("index")).thenReturn("2");
 
-//		PowerMockito.mockStatic(WebUIDriver.class);
-		when(WebUIDriver.getCurrentWebUiDriverName()).thenReturn("main");
-		when(WebUIDriver.getWebDriver(anyBoolean(), eq(BrowserType.FIREFOX), eq("main"), isNull())).thenReturn(eventDriver);
-		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
+		mockedWebUIDriver = mockStatic(WebUIDriver.class);
+		mockedWebUIDriver.when(() -> WebUIDriver.getCurrentWebUiDriverName()).thenReturn("main");
+		mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean(), eq(BrowserType.FIREFOX), eq("main"), isNull())).thenReturn(eventDriver);
+		mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
 		when(eventDriver.executeScript("if (document.readyState === \"complete\") { return \"ok\"; }")).thenReturn("ok");
 		when(eventDriver.getBrowserInfo()).thenReturn(new BrowserInfo(BrowserType.FIREFOX, "78.0"));
+	}
 
-		
+	@AfterMethod(groups= {"ut"}, alwaysRun = true)
+	private void closeMocks() {
+		mockedWebUIDriver.close();
 	}
 
 	@Test(groups={"ut"})

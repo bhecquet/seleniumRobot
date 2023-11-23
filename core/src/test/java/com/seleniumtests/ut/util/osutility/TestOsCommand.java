@@ -1,27 +1,22 @@
 package com.seleniumtests.ut.util.osutility;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.spy;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import org.mockito.Mock;
+import org.mockito.MockedConstruction;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-//import org.powermock.api.mockito.PowerMockito;
-//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.OSUtility;
 
-//@PrepareForTest({ProcessBuilder.class, OSCommand.class, OSUtility.class, Runtime.class})
+import static org.mockito.Mockito.*;
+
 public class TestOsCommand extends MockitoTest {
 	
 	@Mock
@@ -32,36 +27,36 @@ public class TestOsCommand extends MockitoTest {
 	
 	@Mock
 	private Runtime runtime;
-	
-	@BeforeMethod(groups={"ut"}, alwaysRun = true)
-	public void init() {
-//		PowerMockito.mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
-	}
+
 	
 	@Test(groups={"ut"})
 	public void testExecuteCommandAndWait() throws IOException {
-		
-//		ProcessBuilder processBuilder = PowerMockito.mock(ProcessBuilder.class);
-//
-//		when(processBuilder.start()).thenReturn(process);
-//		new OSCommand(Arrays.asList("myCmd"), 5, StandardCharsets.UTF_8, processBuilder).execute();
-//
-//		verify(processBuilder).command(Arrays.asList("myCmd"));
+		try (MockedConstruction mockedProcessBuilder = mockConstruction(ProcessBuilder.class, (processBuilder, context) -> {
+			when(processBuilder.start()).thenReturn(process);
+		})) {
+			ProcessBuilder processBuilder = new ProcessBuilder();
+			new OSCommand(Arrays.asList("myCmd"), 5, StandardCharsets.UTF_8, processBuilder).execute();
+
+			verify(processBuilder).command(Arrays.asList("myCmd"));
+		}
 	}
 
 	@Test(groups={"ut"})
 	public void testExecuteCommandAndWaitInPathWindows() throws IOException {
-		
-//		ProcessBuilder processBuilder = PowerMockito.mock(ProcessBuilder.class);
-//		PowerMockito.when(OSUtility.isWindows()).thenReturn(true);
-//
-////		when(processBuilder.start()).thenReturn(processSearchInPath, process);
-//		OSCommand osCommand = spy(new OSCommand(Arrays.asList(OSCommand.USE_PATH + "myCmd"), 5, StandardCharsets.UTF_8, processBuilder));
-		
-//		doReturn("C:\\bin\\myCmd.bat").when(osCommand).searchInWindowsPath("myCmd");
-//		osCommand.execute();
-		
-//		verify(processBuilder).command(Arrays.asList("C:\\bin\\myCmd.bat"));
+		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
+			 MockedConstruction mockedProcessBuilder = mockConstruction(ProcessBuilder.class);
+			 ) {
+			ProcessBuilder processBuilder = new ProcessBuilder();
+			mockedOsUtility.when(() -> OSUtility.isWindows()).thenReturn(true);
+
+			when(processBuilder.start()).thenReturn(processSearchInPath, process);
+			OSCommand osCommand = spy(new OSCommand(Arrays.asList(OSCommand.USE_PATH + "myCmd"), 5, StandardCharsets.UTF_8, processBuilder));
+
+			doReturn("C:\\bin\\myCmd.bat").when(osCommand).searchInWindowsPath("myCmd");
+			osCommand.execute();
+
+			verify(processBuilder).command(Arrays.asList("C:\\bin\\myCmd.bat"));
+		}
 	}
 	
 	/**
@@ -70,17 +65,21 @@ public class TestOsCommand extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testExecuteCommandAndWaitInPathLinux() throws IOException {
-		
-//		ProcessBuilder processBuilder = PowerMockito.mock(ProcessBuilder.class);
-//		PowerMockito.when(OSUtility.isWindows()).thenReturn(false);
-		
-//		when(processBuilder.start()).thenReturn(processSearchInPath, process);
-//		OSCommand osCommand = spy(new OSCommand(Arrays.asList(OSCommand.USE_PATH + "myCmd"), 5, StandardCharsets.UTF_8, processBuilder));
-//
-//		doReturn("C:\\bin\\myCmd.bat").when(osCommand).searchInWindowsPath("myCmd");
-//		osCommand.execute();
-		
-//		verify(processBuilder).command(Arrays.asList("myCmd"));
+		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
+			 MockedConstruction mockedProcessBuilder = mockConstruction(ProcessBuilder.class);
+			 ) {
+
+			ProcessBuilder processBuilder = new ProcessBuilder();
+			mockedOsUtility.when(() -> OSUtility.isWindows()).thenReturn(false);
+
+			when(processBuilder.start()).thenReturn(processSearchInPath, process);
+			OSCommand osCommand = spy(new OSCommand(Arrays.asList(OSCommand.USE_PATH + "myCmd"), 5, StandardCharsets.UTF_8, processBuilder));
+
+			doReturn("C:\\bin\\myCmd.bat").when(osCommand).searchInWindowsPath("myCmd");
+			osCommand.execute();
+
+			verify(processBuilder).command(Arrays.asList("myCmd"));
+		}
 	}
 	
 

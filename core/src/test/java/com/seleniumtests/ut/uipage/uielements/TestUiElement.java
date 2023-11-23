@@ -2,11 +2,7 @@ package com.seleniumtests.ut.uipage.uielements;
 
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.awt.Rectangle;
 import java.io.File;
@@ -18,11 +14,11 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.remote.ScreenshotException;
-//import org.powermock.api.mockito.PowerMockito;
-//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -47,7 +43,6 @@ import com.seleniumtests.uipage.uielements.UiElement;
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
 
-//@PrepareForTest({CustomEventFiringWebDriver.class, WebUIDriver.class, SeleniumRobotSnapshotServerConnector.class})
 public class TestUiElement extends MockitoTest {
 	
 	public TestUiElement() throws IOException {
@@ -61,10 +56,6 @@ public class TestUiElement extends MockitoTest {
 	
 	@Mock
 	private SeleniumRobotSnapshotServerConnector serverConnector;
-	
-	@Mock
-	private BrowserInfo browserInfo;
-	
 	
 	private Field field1;
 	private Field fieldWithLabel;
@@ -83,7 +74,11 @@ public class TestUiElement extends MockitoTest {
 	private ScreenShot screenCapture;
 	private ScreenShot browserCapture;
 
-	
+	private MockedStatic mockedWebUIDriver;
+	private MockedStatic mockedCustomFiringWebDriver;
+	private MockedStatic mockedSnapshotServerConnector;
+
+
 	@BeforeMethod(groups= {"ut"})
 	public void init() throws IOException {
 		UiElement.resetPageInformation();
@@ -115,11 +110,12 @@ public class TestUiElement extends MockitoTest {
 		label1Below = new Label(200, 252, 70, 90, "label_with_field_below"); // label shorter than field
 		label2 = new Label(100, 150, 0, 20, "label_without_field");
 		labelInside = new Label(200, 250, 100, 120, "label_inside");
-		
-//		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
-//		PowerMockito.mockStatic(WebUIDriver.class);
-		
-//		PowerMockito.when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
+
+		mockedWebUIDriver = mockStatic(WebUIDriver.class);
+		mockedCustomFiringWebDriver = mockStatic(CustomEventFiringWebDriver.class);
+		mockedSnapshotServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
+
+		mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
 		when(driver.getBrowserInfo()).thenReturn(new BrowserInfo(BrowserType.CHROME, "83.0"));
 		
 		File screenCaptureFile = createImageFromResource("tu/imageFieldDetection/screenCapture.png");
@@ -133,15 +129,21 @@ public class TestUiElement extends MockitoTest {
 		browserCapture = new ScreenShot(newBrowserCaptureFile, null, "");
 
 	}
+
+	@AfterMethod(groups= {"ut"}, alwaysRun = true)
+	private void closeMocks() {
+		mockedCustomFiringWebDriver.close();
+		mockedWebUIDriver.close();
+		mockedSnapshotServerConnector.close();
+	}
 	
 	private void initDetector(UiElement element, List<Field> fields, List<Label> labels) {
 		// mock part of viewport detection
 		doReturn(screenshotUtil).when(element).getScreenshotUtil();
 		when(screenshotUtil.capture(SnapshotTarget.PAGE, ScreenShot.class, true)).thenReturn(browserCapture);
 		when(screenshotUtil.capture(SnapshotTarget.MAIN_SCREEN, ScreenShot.class, true)).thenReturn(screenCapture);
-		
-//		PowerMockito.mockStatic(SeleniumRobotSnapshotServerConnector.class);
-//		PowerMockito.when(SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(serverConnector);
+
+		mockedSnapshotServerConnector.when(() -> SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(serverConnector);
 		
 		// build detect response from fields and labels
 		JSONObject detectResult = new JSONObject();
@@ -351,20 +353,18 @@ public class TestUiElement extends MockitoTest {
 		doReturn(screenshotUtil).when(element).getScreenshotUtil();
 		when(screenshotUtil.capture(SnapshotTarget.PAGE, ScreenShot.class, true)).thenReturn(null);
 		when(screenshotUtil.capture(SnapshotTarget.MAIN_SCREEN, ScreenShot.class, true)).thenReturn(screenCapture);
-		
-//		PowerMockito.mockStatic(SeleniumRobotSnapshotServerConnector.class);
-//		PowerMockito.when(SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(serverConnector);
-		
+
 		// build detect response from fields and labels
 		JSONObject detectResult = new JSONObject();
 		detectResult.put("version", "aaa");
-		detectResult.put("error", (String)null);
+		detectResult.put("error", (String) null);
 		detectResult.put("fileName", "foo.png");
 		detectResult.put("fields", new JSONArray(Arrays.asList(field1, fieldWithLabel, field2).stream().map(Field::toJson).collect(Collectors.toList())));
 		detectResult.put("labels", new JSONArray(Arrays.asList(label1Right, label2).stream().map(Label::toJson).collect(Collectors.toList())));
 		when(serverConnector.detectFieldsInPicture(browserCapture)).thenReturn(detectResult);
 
 		element.findElement();
+
 		
 	}
 	
@@ -405,8 +405,7 @@ public class TestUiElement extends MockitoTest {
 		// - the element positions (field1 center is at (250, 110) in web page
 		// - scroll position in page (0, 100) as defined in this test
 		// - viewport position in screen (0, 115)
-//		PowerMockito.verifyStatic(CustomEventFiringWebDriver.class, times(1));
-		CustomEventFiringWebDriver.leftClicOnDesktopAt(eq(true), eq(250), eq(125), eq(DriverMode.LOCAL), eq(null));
+		mockedCustomFiringWebDriver.verify(() -> CustomEventFiringWebDriver.leftClicOnDesktopAt(eq(true), eq(250), eq(125), eq(DriverMode.LOCAL), eq(null)));
 	}
 	
 	@Test(groups= {"ut"})
@@ -429,8 +428,7 @@ public class TestUiElement extends MockitoTest {
 		// - scroll position in page (0, 100) as defined in this test
 		// - viewport position in screen (0, 115)
 		// - click offset (10, 15)
-//		PowerMockito.verifyStatic(CustomEventFiringWebDriver.class, times(1));
-		CustomEventFiringWebDriver.doubleClickOnDesktopAt(eq(true), eq(260), eq(140), eq(DriverMode.LOCAL), eq(null));
+		mockedCustomFiringWebDriver.verify(() -> CustomEventFiringWebDriver.doubleClickOnDesktopAt(eq(true), eq(260), eq(140), eq(DriverMode.LOCAL), eq(null)));
 	}
 	
 	@Test(groups= {"ut"})
@@ -453,8 +451,7 @@ public class TestUiElement extends MockitoTest {
 		// - scroll position in page (0, 100) as defined in this test
 		// - viewport position in screen (0, 115)
 		// - click offset (10, 15)
-//		PowerMockito.verifyStatic(CustomEventFiringWebDriver.class, times(1));
-		CustomEventFiringWebDriver.rightClicOnDesktopAt(eq(true), eq(260), eq(240), eq(DriverMode.LOCAL), eq(null));
+		mockedCustomFiringWebDriver.verify(() -> CustomEventFiringWebDriver.rightClicOnDesktopAt(eq(true), eq(260), eq(240), eq(DriverMode.LOCAL), eq(null)));
 	}
 
 	@Test(groups= {"ut"})
@@ -476,11 +473,8 @@ public class TestUiElement extends MockitoTest {
 		// - the element positions (field1 center is at (250, 110) in web page
 		// - scroll position in page (0, 100) as defined in this test
 		// - viewport position in screen (0, 115)
-//		PowerMockito.verifyStatic(CustomEventFiringWebDriver.class, times(1));
-		CustomEventFiringWebDriver.leftClicOnDesktopAt(eq(true), eq(260), eq(135), eq(DriverMode.LOCAL), eq(null));
-
-//		PowerMockito.verifyStatic(CustomEventFiringWebDriver.class, times(1));
-		CustomEventFiringWebDriver.writeToDesktop(eq("foo"), eq(DriverMode.LOCAL), eq(null));
+		mockedCustomFiringWebDriver.verify(() -> CustomEventFiringWebDriver.leftClicOnDesktopAt(eq(true), eq(260), eq(135), eq(DriverMode.LOCAL), eq(null)));
+		mockedCustomFiringWebDriver.verify(() -> CustomEventFiringWebDriver.writeToDesktop(eq("foo"), eq(DriverMode.LOCAL), eq(null)));
 	}
 	
 	@Test(groups= {"ut"})

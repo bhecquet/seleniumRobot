@@ -1180,7 +1180,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	 * Returns the rectangle of all screens on the system
 	 * @return
 	 */
-	private static Rectangle getScreensRectangle() {
+	public static Rectangle getScreensRectangle() {
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		
 		Rectangle screenRect = new Rectangle(0, 0, 0, 0);
