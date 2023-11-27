@@ -48,15 +48,6 @@ public class TestErrorCauseFinder extends MockitoTest {
 	@Mock
 	SeleniumRobotSnapshotServerConnector serverConnector;
 	
-	@Mock
-	StepReferenceComparator stepReferenceComparatorStep3;
-	
-	@Mock
-	StepReferenceComparator stepReferenceComparatorStep2;
-	
-	@Mock
-	StepReferenceComparator stepReferenceComparatorStep1;
-	
 	private TestStep step1;
 	private TestStep step2;
 	private TestStep stepFailed;

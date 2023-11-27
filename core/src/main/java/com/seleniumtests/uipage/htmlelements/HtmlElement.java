@@ -1103,7 +1103,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     /**
      * Get underlying WebDriver.
      */
-    protected WebDriver updateDriver() {
+    public WebDriver updateDriver() {
 		setDriver(WebUIDriver.getWebDriver(false));
 		if (getDriver() == null) {
     		throw new ScenarioException("Driver has not already been created");
