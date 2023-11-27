@@ -20,16 +20,13 @@ package com.seleniumtests.ut.uipage.htmlelements;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -38,12 +35,10 @@ import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
-//import org.powermock.api.mockito.PowerMockito;
-//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -70,7 +65,6 @@ import com.seleniumtests.uipage.htmlelements.TextFieldElement;
  * @author behe
  *
  */
-//@PrepareForTest(WebUIDriver.class)
 public class TestFrameElement extends MockitoTest {
 	
 	@Mock
@@ -96,6 +90,7 @@ public class TestFrameElement extends MockitoTest {
 	@Mock
 	private TargetLocator locator;
 
+	private MockedStatic mockedWebUIDriver;
 	
 	@BeforeMethod(groups={"ut"})
 	private void init() {
@@ -103,8 +98,9 @@ public class TestFrameElement extends MockitoTest {
 		when(driver.getCapabilities()).thenReturn(new FirefoxOptions()); // add capabilities to allow augmenting driver
 		
 		eventDriver = spy(new CustomEventFiringWebDriver(driver));
-//		PowerMockito.mockStatic(WebUIDriver.class);
-		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
+
+		mockedWebUIDriver = mockStatic(WebUIDriver.class);
+		mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
 		when(driver.findElement(By.id("el"))).thenReturn(element);
 		when(element.findElement(By.id("link"))).thenReturn(link);
 		when(element.findElements(By.tagName("tr"))).thenReturn(Arrays.asList(row));
@@ -122,6 +118,11 @@ public class TestFrameElement extends MockitoTest {
 		when(element.getSize()).thenReturn(new Dimension(1, 1));
 		when(element.isDisplayed()).thenReturn(true);
 		when(link.isDisplayed()).thenReturn(true);
+	}
+
+	@AfterMethod(groups={"ut"}, alwaysRun = true)
+	private void closeMocks() {
+		mockedWebUIDriver.close();
 	}
 
 	@Test(groups={"ut"})

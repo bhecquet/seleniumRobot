@@ -19,24 +19,18 @@ package com.seleniumtests.ut.uipage.htmlelements;
 
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyCollection;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.MockedConstruction;
+import org.mockito.MockedStatic;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.interactions.Coordinates;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
-//import org.powermock.api.mockito.PowerMockito;
-//import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -45,40 +39,39 @@ import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.util.helper.WaitHelper;
 
-//@PrepareForTest({WebUIDriver.class, WaitHelper.class, RemoteWebDriver.class})
 public class TestCompositeActions extends MockitoTest {
 
-//	@Mock
-	private RemoteWebDriver driver;
 	
 	@Mock
 	private RemoteWebElement element;
-	
+
 	@Mock
-	private Coordinates coordinates;
+	private RemoteWebDriver driver;
 	
 	@Mock
 	private BrowserInfo browserInfo;
 	
 	private CustomEventFiringWebDriver eventDriver;
-	
+
+	private MockedStatic mockedWebUIDriver;
 
 	@BeforeMethod(groups={"ut"})
 	private void init() throws Exception {
-		
-//		driver = PowerMockito.mock(RemoteWebDriver.class);
+
+		mockedWebUIDriver = mockStatic(WebUIDriver.class);
 		when(driver.getCapabilities()).thenReturn(new ChromeOptions()); // add capabilities to allow augmenting driver
-		
+		doCallRealMethod().when(driver).perform(ArgumentMatchers.anyCollection());
 		eventDriver = spy(new CustomEventFiringWebDriver(driver));
-		
-//		PowerMockito.mockStatic(WebUIDriver.class);
-		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
+		mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
 		when(eventDriver.getBrowserInfo()).thenReturn(browserInfo);
 		when(browserInfo.getBrowser()).thenReturn(BrowserType.CHROME);
-		Mockito.doCallRealMethod().when(driver).perform(ArgumentMatchers.anyCollection());
 		
+	}
+
+	@AfterMethod(groups={"ut"}, alwaysRun = true)
+	private void closeMocks() {
+		mockedWebUIDriver.close();
 	}
 	
 	/**

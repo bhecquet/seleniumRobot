@@ -6,7 +6,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -15,9 +15,9 @@ import java.util.Map;
 
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-//import org.powermock.api.mockito.PowerMockito;
-//import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.mockito.MockedStatic;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -29,21 +29,23 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
-import com.seleniumtests.reporter.logger.TestMessage;
-import com.seleniumtests.reporter.logger.TestMessage.MessageType;
 import com.seleniumtests.reporter.logger.TestStep;
-import com.seleniumtests.reporter.logger.TestStep.StepStatus;
 
-//@PrepareForTest({Uft.class, TestTasks.class})
 public class TestUft extends MockitoTest {
 
 	@Mock
 	SeleniumRobotGridConnector connector;
-	
+
+	private MockedStatic mockedTestTask;
 
 	@BeforeMethod(groups= {"ut"})
 	public void init() {
-//		PowerMockito.mockStatic(TestTasks.class);
+		mockedTestTask = mockStatic(TestTasks.class);
+	}
+
+	@AfterMethod(groups={"ut"}, alwaysRun = true)
+	private void closeMocks() {
+		mockedTestTask.close();
 	}
 
 	/**
@@ -266,7 +268,7 @@ public class TestUft extends MockitoTest {
 	public void testLoad() throws Exception {
 		String report = GenericTest.readResourceToString("tu/uftReport2023.xml");
 		report = "some comments\n_____OUTPUT_____\n" + report + "\n_____ENDOUTPUT_____\nsome other comments";
-//		PowerMockito.when(TestTasks.class, "executeCommand", eq("cscript.exe"), anyInt(), nullable(Charset.class), any()).thenReturn(report);
+		mockedTestTask.when(() -> TestTasks.executeCommand(eq("cscript.exe"), anyInt(), nullable(Charset.class), any(String[].class))).thenReturn(report);
 		
 		Map<String, String> args = new HashMap<>();
 		args.put("User", "toto");
@@ -275,14 +277,13 @@ public class TestUft extends MockitoTest {
 		uft.loadScript(false);
 	
 		ArgumentCaptor<String[]> argsArgument = ArgumentCaptor.forClass(String[].class);
-		
-//		PowerMockito.verifyStatic(TestTasks.class);
-		TestTasks.executeCommand(eq("cscript.exe"), eq(60), isNull(), argsArgument.capture());
+
+		mockedTestTask.verify(() -> TestTasks.executeCommand(eq("cscript.exe"), eq(60), isNull(), argsArgument.capture()));
 		
 		// test parameters are not copied
-		Assert.assertEquals(argsArgument.getAllValues().size(), 3);
-		Assert.assertEquals(argsArgument.getAllValues().get(1), "[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
-		Assert.assertEquals(argsArgument.getAllValues().get(2), "/load");
+		Assert.assertEquals(argsArgument.getAllValues().get(0).length, 3);
+		Assert.assertEquals(argsArgument.getAllValues().get(0)[1], "[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
+		Assert.assertEquals(argsArgument.getAllValues().get(0)[2], "/load");
 	}
 	
 	/**
@@ -293,7 +294,7 @@ public class TestUft extends MockitoTest {
 	public void testExecuteNoLoad() throws Exception {
 		String report = GenericTest.readResourceToString("tu/uftReport2023.xml");
 		report = "some comments\n_____OUTPUT_____\n" + report + "\n_____ENDOUTPUT_____\nsome other comments";
-//		PowerMockito.when(TestTasks.class, "executeCommand", eq("cscript.exe"), anyInt(), nullable(Charset.class), any()).thenReturn(report);
+		mockedTestTask.when(() -> TestTasks.executeCommand(eq("cscript.exe"), anyInt(), nullable(Charset.class), any(String[].class))).thenReturn(report);
 
 		Uft uft = new Uft("[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
 
@@ -308,7 +309,7 @@ public class TestUft extends MockitoTest {
 	public void testExecuteNoLoadBeforeSecondExecution() throws Exception {
 		String report = GenericTest.readResourceToString("tu/uftReport2023.xml");
 		report = "some comments\n_____OUTPUT_____\n" + report + "\n_____ENDOUTPUT_____\nsome other comments";
-//		PowerMockito.when(TestTasks.class, "executeCommand", eq("cscript.exe"), anyInt(), nullable(Charset.class), any()).thenReturn(report);
+		mockedTestTask.when(() -> TestTasks.executeCommand(eq("cscript.exe"), anyInt(), nullable(Charset.class), any(String[].class))).thenReturn(report);
 
 		Uft uft = new Uft("[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
 		uft.loadScript(false);
@@ -322,14 +323,14 @@ public class TestUft extends MockitoTest {
 	public void testExecute() throws Exception {
 		String report = GenericTest.readResourceToString("tu/uftReport2023.xml");
 		report = "some comments\n_____OUTPUT_____\n" + report + "\n_____ENDOUTPUT_____\nsome other comments";
-//		PowerMockito.when(TestTasks.class, "executeCommand", eq("cscript.exe"), anyInt(), nullable(Charset.class), any()).thenReturn(report);
+		mockedTestTask.when(() -> TestTasks.executeCommand(eq("cscript.exe"), anyInt(), nullable(Charset.class), any(String[].class))).thenReturn(report);
 		
 		Map<String, String> args = new HashMap<>();
 		args.put("User", "toto");
 		Uft uft = new Uft("[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
 		uft.loadScript(false);
 		List<TestStep> testSteps = uft.executeScript(120, args);
-		
+
 		// check a step is returned
 		Assert.assertNotNull(testSteps);
 		Assert.assertEquals(testSteps.size(), 3);
@@ -337,14 +338,13 @@ public class TestUft extends MockitoTest {
 		Assert.assertEquals(testSteps.get(0).getFiles().get(0).getName(), "Uft report");
 		
 		ArgumentCaptor<String[]> argsArgument = ArgumentCaptor.forClass(String[].class);
-		
-//		PowerMockito.verifyStatic(TestTasks.class);
-		TestTasks.executeCommand(eq("cscript.exe"), eq(120), isNull(), argsArgument.capture());
-		Assert.assertEquals(argsArgument.getAllValues().size(), 4);
 
-		Assert.assertEquals(argsArgument.getAllValues().get(1), "[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
-		Assert.assertEquals(argsArgument.getAllValues().get(2), "/execute");
-		Assert.assertEquals(argsArgument.getAllValues().get(3), "\"User=toto\"");
+		mockedTestTask.verify(() -> TestTasks.executeCommand(eq("cscript.exe"), eq(120), isNull(), argsArgument.capture()));
+		Assert.assertEquals(argsArgument.getAllValues().get(0).length, 4);
+
+		Assert.assertEquals(argsArgument.getAllValues().get(0)[1], "[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
+		Assert.assertEquals(argsArgument.getAllValues().get(0)[2], "/execute");
+		Assert.assertEquals(argsArgument.getAllValues().get(0)[3], "\"User=toto\"");
 		
 	}
 	
@@ -356,7 +356,7 @@ public class TestUft extends MockitoTest {
 	public void testExecute2() throws Exception {
 		String report = GenericTest.readResourceToString("tu/uftReport.xml");
 		report = "some comments\n_____OUTPUT_____\n" + report + "\n_____ENDOUTPUT_____\nsome other comments";
-//		PowerMockito.when(TestTasks.class, "executeCommand", eq("cscript.exe"), anyInt(), nullable(Charset.class), any()).thenReturn(report);
+		mockedTestTask.when(() -> TestTasks.executeCommand(eq("cscript.exe"), anyInt(), nullable(Charset.class), any(String[].class))).thenReturn(report);
 		
 		Map<String, String> args = new HashMap<>();
 		args.put("User", "toto");
@@ -368,14 +368,13 @@ public class TestUft extends MockitoTest {
 		Assert.assertNotNull(testSteps);
 		
 		ArgumentCaptor<String[]> argsArgument = ArgumentCaptor.forClass(String[].class);
-		
-//		PowerMockito.verifyStatic(TestTasks.class);
-		TestTasks.executeCommand(eq("cscript.exe"), eq(120), isNull(), argsArgument.capture());
-		Assert.assertEquals(argsArgument.getAllValues().size(), 4);
 
-		Assert.assertEquals(argsArgument.getAllValues().get(1), "[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
-		Assert.assertEquals(argsArgument.getAllValues().get(2), "/execute");
-		Assert.assertEquals(argsArgument.getAllValues().get(3), "\"User=toto\"");
+		mockedTestTask.verify(() -> TestTasks.executeCommand(eq("cscript.exe"), eq(120), isNull(), argsArgument.capture()));
+		Assert.assertEquals(argsArgument.getAllValues().get(0).length, 4);
+
+		Assert.assertEquals(argsArgument.getAllValues().get(0)[1], "[QualityCenter]Subject\\OUTILLAGE\\Tests_BHE\\test1");
+		Assert.assertEquals(argsArgument.getAllValues().get(0)[2], "/execute");
+		Assert.assertEquals(argsArgument.getAllValues().get(0)[3], "\"User=toto\"");
 		
 	}
 	
@@ -386,7 +385,7 @@ public class TestUft extends MockitoTest {
 	@Test(groups = { "ut" })
 	public void testExecuteWithReport2() throws Exception {
 		String report = GenericTest.readResourceToString("tu/uftResult.txt");
-//		PowerMockito.when(TestTasks.class, "executeCommand", eq("cscript.exe"), anyInt(), nullable(Charset.class), any()).thenReturn(report);
+		mockedTestTask.when(() -> TestTasks.executeCommand(eq("cscript.exe"), anyInt(), nullable(Charset.class), any(String[].class))).thenReturn(report);
 		
 		Map<String, String> args = new HashMap<>();
 		args.put("User", "toto");
@@ -410,7 +409,7 @@ public class TestUft extends MockitoTest {
 		
 		String report = GenericTest.readResourceToString("tu/uftReport2023.xml");
 		report = "some comments\n_____OUTPUT_____B\n" + report + "\n_____ENDOUTPUT_____\nsome other comments";
-//		PowerMockito.when(TestTasks.class, "executeCommand", eq("cscript.exe"), anyInt(), nullable(Charset.class), any()).thenReturn(report);
+		mockedTestTask.when(() -> TestTasks.executeCommand(eq("cscript.exe"), anyInt(), nullable(Charset.class), any(String[].class))).thenReturn(report);
 		
 		
 		Map<String, String> args = new HashMap<>();
@@ -427,7 +426,7 @@ public class TestUft extends MockitoTest {
 	@Test(groups = { "ut" })
 	public void testExecuteNothingReturned() throws Exception {
 		String report = "";
-//		PowerMockito.when(TestTasks.class, "executeCommand", eq("cscript.exe"), anyInt(), nullable(Charset.class), any()).thenReturn(report);
+		mockedTestTask.when(() -> TestTasks.executeCommand(eq("cscript.exe"), anyInt(), nullable(Charset.class), any(String[].class))).thenReturn(report);
 		
 		Map<String, String> args = new HashMap<>();
 		args.put("User", "toto");
