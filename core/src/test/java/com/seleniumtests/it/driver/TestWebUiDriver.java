@@ -80,13 +80,7 @@ public class TestWebUiDriver extends ReporterTest {
 	private static final Logger logger = SeleniumRobotLogger.getLogger(TestWebUiDriver.class);
 	
 	@Mock
-	private InstrumentsWrapper instrumentsWrapper;
-	
-	@Mock
 	private AndroidDriver androidDriver;
-	
-	@Mock
-	private IOSDriver iosDriver;
 	
 	@Mock
 	private Options driverOptions;
@@ -182,37 +176,41 @@ public class TestWebUiDriver extends ReporterTest {
 	
 	@Test(groups={"it"})
 	public void testLocaliOSDriverWithRemoteAppiumServer() throws Exception {
-//		whenNew(InstrumentsWrapper.class).withNoArguments().thenReturn(instrumentsWrapper);
-		
+
 		List<MobileDevice> deviceList = new ArrayList<>();
-		when(instrumentsWrapper.parseIosDevices()).thenReturn(deviceList);
-		
-//		whenNew(IOSDriver.class).withAnyArguments().thenReturn(iosDriver);
-		when(iosDriver.manage()).thenReturn(driverOptions);
-		when(iosDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
-		when(driverOptions.timeouts()).thenReturn(timeouts);
-		
-		SeleniumTestsContextManager.getThreadContext().setRunMode("local");
-		SeleniumTestsContextManager.getThreadContext().setAppiumServerUrl("http://localhost:4321/wd/hub/");
-		SeleniumTestsContextManager.getThreadContext().setDeviceId("123456");
-		SeleniumTestsContextManager.getThreadContext().setPlatform("ios");
-		SeleniumTestsContextManager.getThreadContext().setMobilePlatformVersion("13.0");
-		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_IOS);
-		
-		createServerMock("GET", "/wd/hub/sessions", 200, "{}");
-		
-//		PowerMockito.mockStatic(AppiumLauncherFactory.class);
-		ExistingAppiumLauncher appiumLauncher;
-		
-		appiumLauncher = spy(new ExistingAppiumLauncher("http://localhost:4321/wd/hub/"));
-		when(AppiumLauncherFactory.getInstance()).thenReturn(appiumLauncher);	
-		
-		WebUIDriver.getWebDriver(true);
-		
-//		PowerMockito.verifyNew(IOSDriver.class).withArguments(any(URL.class), any(Capabilities.class));
-		
-		WebUIDriver.cleanUp();
-		verify(appiumLauncher).stopAppium();
+
+		try (MockedConstruction mockedInstrument = mockConstruction(InstrumentsWrapper.class, (instrumentsWrapper, context) -> {
+				when(instrumentsWrapper.parseIosDevices()).thenReturn(deviceList);
+			});
+			 MockedConstruction mockedIOSDriver = mockConstruction(IOSDriver.class, (iosDriver, context) -> {
+				 when(iosDriver.manage()).thenReturn(driverOptions);
+				 when(iosDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
+			 });
+			 MockedStatic mockedAppiumLauncher = mockStatic(AppiumLauncherFactory.class);
+		) {
+
+			when(driverOptions.timeouts()).thenReturn(timeouts);
+
+			SeleniumTestsContextManager.getThreadContext().setRunMode("local");
+			SeleniumTestsContextManager.getThreadContext().setAppiumServerUrl("http://localhost:4321/wd/hub/");
+			SeleniumTestsContextManager.getThreadContext().setDeviceId("123456");
+			SeleniumTestsContextManager.getThreadContext().setPlatform("ios");
+			SeleniumTestsContextManager.getThreadContext().setMobilePlatformVersion("13.0");
+			SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_IOS);
+
+			createServerMock("GET", "/wd/hub/sessions", 200, "{}");
+
+			ExistingAppiumLauncher appiumLauncher;
+
+			appiumLauncher = spy(new ExistingAppiumLauncher("http://localhost:4321/wd/hub/"));
+			mockedAppiumLauncher.when(() -> AppiumLauncherFactory.getInstance()).thenReturn(appiumLauncher);
+
+			WebUIDriver.getWebDriver(true);
+
+			Assert.assertEquals(mockedIOSDriver.constructed().size(), 1);
+			WebUIDriver.cleanUp();
+			verify(appiumLauncher).stopAppium();
+		}
 	}
 	
 	/**

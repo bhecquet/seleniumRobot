@@ -103,9 +103,15 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
 				}
 				
 				if (capabilities.getCapability(CapabilityType.PLATFORM_NAME).toString().equalsIgnoreCase(ANDROID_PLATORM)) {
-					((UiAutomator2Options)capabilities).setDeviceName(webDriverConfig.getDeviceId());
+					UiAutomator2Options androidCaps = new UiAutomator2Options(capabilities);
+					androidCaps.setDeviceName(webDriverConfig.getDeviceId());
+
+					return androidCaps;
 				} else { // iOS
-					((XCUITestOptions)capabilities).setUdid(webDriverConfig.getDeviceId());
+					XCUITestOptions iosCaps = new XCUITestOptions(capabilities);
+					iosCaps.setUdid(webDriverConfig.getDeviceId());
+
+					return iosCaps;
 					//capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + IOSMobileCapabilityType.XCODE_CONFIG_FILE, (String)null); // remove this capability as it may not be accurate
 
 				}

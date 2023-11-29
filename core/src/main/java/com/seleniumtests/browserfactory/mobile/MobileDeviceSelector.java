@@ -95,7 +95,7 @@ public class MobileDeviceSelector {
 		isInitialized();
 		Object deviceName = capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX +  SupportsDeviceNameOption.DEVICE_NAME_OPTION);
 		Object platformName = capabilities.getCapability(CapabilityType.PLATFORM_NAME);
-		Optional<String> platformVersion = ((BaseOptions)capabilities).getPlatformVersion();
+		Optional<String> platformVersion = new BaseOptions<>(capabilities).getPlatformVersion();
 		
 		if (deviceName == null
 				&& platformName == null
