@@ -18,12 +18,7 @@
 package com.seleniumtests.ut.uipage.htmlelements;
 
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.awt.AWTException;
 import java.awt.event.KeyEvent;
@@ -31,9 +26,8 @@ import java.io.File;
 
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.openqa.selenium.Rectangle;
-//import org.powermock.api.mockito.PowerMockito;
-//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
@@ -42,20 +36,17 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
-import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
-import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.SnapshotTarget;
 import com.seleniumtests.uipage.htmlelements.ScreenZone;
 import com.seleniumtests.util.imaging.ImageDetector;
 
-//@PrepareForTest({CustomEventFiringWebDriver.class, WebUIDriver.class})
 public class TestScreenZone extends MockitoTest {
 	
 	@Mock
@@ -80,23 +71,24 @@ public class TestScreenZone extends MockitoTest {
 
 	@Test(groups={"ut"})
 	public void testClick() {
-		ScreenZone picElement = spy(screenZone);
-		picElement.setObjectPictureFile(new File(""));
+		try (MockedStatic mockedCustomFiringWebDriver = mockStatic(CustomEventFiringWebDriver.class);
+			MockedStatic mockedWebUIDriver = mockStatic(WebUIDriver.class);
+		) {
+			ScreenZone picElement = spy(screenZone);
+			picElement.setObjectPictureFile(new File(""));
 
-//		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
-//		PowerMockito.mockStatic(WebUIDriver.class);
-		
-		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
-		when(driver.getBrowserInfo()).thenReturn(browserInfo);
-		when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
-		
-		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
-		when(screenshotUtil.capture(SnapshotTarget.SCREEN, File.class, true)).thenReturn(new File(""));
-		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
-		when(imageDetector.getSizeRatio()).thenReturn(1.0);
-		
-		picElement.click();
-		verify(picElement).moveAndLeftClick(35, 60);
+			mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
+			when(driver.getBrowserInfo()).thenReturn(browserInfo);
+			when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
+
+			doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
+			when(screenshotUtil.capture(SnapshotTarget.SCREEN, File.class, true)).thenReturn(new File(""));
+			when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
+			when(imageDetector.getSizeRatio()).thenReturn(1.0);
+
+			picElement.click();
+			verify(picElement).moveAndLeftClick(35, 60);
+		}
 	}
 	
 	/**
@@ -104,26 +96,27 @@ public class TestScreenZone extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testClickTwice() {
-		ScreenZone picElement = spy(screenZone);
-		picElement.setObjectPictureFile(new File(""));
-		
-//		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
-//		PowerMockito.mockStatic(WebUIDriver.class);
-		
-		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
-		when(driver.getBrowserInfo()).thenReturn(browserInfo);
-		when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
-		
-		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
-		when(screenshotUtil.capture(SnapshotTarget.SCREEN, File.class, true)).thenReturn(new File(""));
-		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
-		when(imageDetector.getSizeRatio()).thenReturn(1.0);
-		
-		picElement.click();
-		picElement.click();
-		verify(imageDetector).getDetectedRectangle();
-		verify(picElement, times(2)).findElement();
-		verify(picElement, times(2)).moveAndLeftClick(35, 60);
+		try (MockedStatic mockedCustomFiringWebDriver = mockStatic(CustomEventFiringWebDriver.class);
+			 MockedStatic mockedWebUIDriver = mockStatic(WebUIDriver.class);
+		) {
+			ScreenZone picElement = spy(screenZone);
+			picElement.setObjectPictureFile(new File(""));
+
+			mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
+			when(driver.getBrowserInfo()).thenReturn(browserInfo);
+			when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
+
+			doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
+			when(screenshotUtil.capture(SnapshotTarget.SCREEN, File.class, true)).thenReturn(new File(""));
+			when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
+			when(imageDetector.getSizeRatio()).thenReturn(1.0);
+
+			picElement.click();
+			picElement.click();
+			verify(imageDetector).getDetectedRectangle();
+			verify(picElement, times(2)).findElement();
+			verify(picElement, times(2)).moveAndLeftClick(35, 60);
+		}
 	}
 	
 	/**
@@ -144,65 +137,68 @@ public class TestScreenZone extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testDoubleClick() {
-		ScreenZone picElement = spy(screenZone);
-		picElement.setObjectPictureFile(new File(""));
-		
-//		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
-//		PowerMockito.mockStatic(WebUIDriver.class);
-		
-		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
-		when(driver.getBrowserInfo()).thenReturn(browserInfo);
-		when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
-		
-		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
-		when(screenshotUtil.capture(SnapshotTarget.SCREEN, File.class, true)).thenReturn(new File(""));
-		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
-		when(imageDetector.getSizeRatio()).thenReturn(1.0);
-		
-		picElement.doubleClickAt(0, 0);
-		verify(picElement).moveAndDoubleClick(35, 60);
+		try (MockedStatic mockedCustomFiringWebDriver = mockStatic(CustomEventFiringWebDriver.class);
+			 MockedStatic mockedWebUIDriver = mockStatic(WebUIDriver.class);
+		) {
+			ScreenZone picElement = spy(screenZone);
+			picElement.setObjectPictureFile(new File(""));
+
+			mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
+			when(driver.getBrowserInfo()).thenReturn(browserInfo);
+			when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
+
+			doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
+			when(screenshotUtil.capture(SnapshotTarget.SCREEN, File.class, true)).thenReturn(new File(""));
+			when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
+			when(imageDetector.getSizeRatio()).thenReturn(1.0);
+
+			picElement.doubleClickAt(0, 0);
+			verify(picElement).moveAndDoubleClick(35, 60);
+		}
 	}
 
 	@Test(groups={"ut"})
 	public void testRightClick() {
-		ScreenZone picElement = spy(screenZone);
-		picElement.setObjectPictureFile(new File(""));
-		
-//		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
-//		PowerMockito.mockStatic(WebUIDriver.class);
-		
-		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
-		when(driver.getBrowserInfo()).thenReturn(browserInfo);
-		when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
-		
-		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
-		when(screenshotUtil.capture(SnapshotTarget.SCREEN, File.class, true)).thenReturn(new File(""));
-		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
-		when(imageDetector.getSizeRatio()).thenReturn(1.0);
-		
-		picElement.rightClickAt(0, 0);
-		verify(picElement).moveAndRightClick(35, 60);
+		try (MockedStatic mockedCustomFiringWebDriver = mockStatic(CustomEventFiringWebDriver.class);
+			 MockedStatic mockedWebUIDriver = mockStatic(WebUIDriver.class);
+		) {
+			ScreenZone picElement = spy(screenZone);
+			picElement.setObjectPictureFile(new File(""));
+
+			mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
+			when(driver.getBrowserInfo()).thenReturn(browserInfo);
+			when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
+
+			doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
+			when(screenshotUtil.capture(SnapshotTarget.SCREEN, File.class, true)).thenReturn(new File(""));
+			when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
+			when(imageDetector.getSizeRatio()).thenReturn(1.0);
+
+			picElement.rightClickAt(0, 0);
+			verify(picElement).moveAndRightClick(35, 60);
+		}
 	}
 
 	@Test(groups={"ut"})
 	public void testSendKeys() {
-		ScreenZone picElement = spy(screenZone);
-		picElement.setObjectPictureFile(new File(""));
-		
-//		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
-//		PowerMockito.mockStatic(WebUIDriver.class);
-		
-		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
-		when(driver.getBrowserInfo()).thenReturn(browserInfo);
-		when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
-		
-		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
-		when(screenshotUtil.capture(SnapshotTarget.SCREEN, File.class, true)).thenReturn(new File(""));
-		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
-		when(imageDetector.getSizeRatio()).thenReturn(1.0);
-		
-		picElement.sendKeys(0, 0, KeyEvent.VK_0);
-		verify(picElement).moveAndLeftClick(35, 60);
+		try (MockedStatic mockedCustomFiringWebDriver = mockStatic(CustomEventFiringWebDriver.class);
+			 MockedStatic mockedWebUIDriver = mockStatic(WebUIDriver.class);
+		) {
+			ScreenZone picElement = spy(screenZone);
+			picElement.setObjectPictureFile(new File(""));
+
+			mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
+			when(driver.getBrowserInfo()).thenReturn(browserInfo);
+			when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
+
+			doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
+			when(screenshotUtil.capture(SnapshotTarget.SCREEN, File.class, true)).thenReturn(new File(""));
+			when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
+			when(imageDetector.getSizeRatio()).thenReturn(1.0);
+
+			picElement.sendKeys(0, 0, KeyEvent.VK_0);
+			verify(picElement).moveAndLeftClick(35, 60);
+		}
 	}
 	
 	

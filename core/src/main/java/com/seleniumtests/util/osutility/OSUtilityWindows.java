@@ -79,7 +79,7 @@ public class OSUtilityWindows extends OSUtility {
     	 * and /V displays also : Status ;  Username ;  CPU time ;  Windows title .
     	 * or /SVC displays only : Image name ;  PID ;  Services .
     	 */
-    	String command = System.getenv("windir") + "\\system32\\" + "tasklist.exe /NH /SVC";
+    	String command = SystemUtility.getenv("windir") + "\\system32\\" + "tasklist.exe /NH /SVC";
     	List<String> strProcessList = Arrays.asList(OSCommand.executeCommandAndWait(command).split("\n"));
     	Pattern pTasklist = Pattern.compile("([^\\s]+)\\s++(\\d++)\\s++.*");
     	

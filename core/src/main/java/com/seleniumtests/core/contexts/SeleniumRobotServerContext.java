@@ -1,5 +1,6 @@
 package com.seleniumtests.core.contexts;
 
+import com.seleniumtests.util.osutility.SystemUtility;
 import org.apache.logging.log4j.Logger;
 import org.testng.ITestResult;
 
@@ -94,8 +95,8 @@ public class SeleniumRobotServerContext {
     public void setSeleniumRobotServerUrl(String url) {
     	if (url != null) {
     		context.setAttribute(SELENIUMROBOTSERVER_URL, url);
-    	} else if (System.getenv(SELENIUMROBOTSERVER_URL) != null) {
-    		context.setAttribute(SELENIUMROBOTSERVER_URL, System.getenv(SELENIUMROBOTSERVER_URL));
+    	} else if (SystemUtility.getenv(SELENIUMROBOTSERVER_URL) != null) {
+    		context.setAttribute(SELENIUMROBOTSERVER_URL, SystemUtility.getenv(SELENIUMROBOTSERVER_URL));
     	} else {
     		context.setAttribute(SELENIUMROBOTSERVER_URL, DEFAULT_SELENIUMROBOTSERVER_URL);
     	}

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.seleniumtests.util.osutility.SystemUtility;
 import org.apache.logging.log4j.Logger;
 
 import com.seleniumtests.browserfactory.BrowserInfo;
@@ -69,7 +70,7 @@ public class AdbWrapper {
 		
 	}
 	private void checkInstallation(String androidEnvVarName) {
-		String androidHome = System.getenv(androidEnvVarName);
+		String androidHome = SystemUtility.getenv(androidEnvVarName);
 		if (androidHome != null) {
 			adbCommand = Paths.get(androidHome, "platform-tools", "adb").toString();
 		} else {

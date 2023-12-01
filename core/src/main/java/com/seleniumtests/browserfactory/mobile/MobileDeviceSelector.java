@@ -163,7 +163,7 @@ public class MobileDeviceSelector {
 		} else if ("ios".equalsIgnoreCase(selectedDevice.getPlatform())) {
 			((XCUITestOptions)capabilities).setUdid(selectedDevice.getId())
 							.setDeviceName(selectedDevice.getName());
-//			capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + IOSMobileCapabilityType.XCODE_CONFIG_FILE, System.getenv("APPIUM_HOME") + "/node_modules/appium/node_modules/appium-xcuitest-driver/WebDriverAgent/xcodeConfigFile.xcconfig");
+//			capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + IOSMobileCapabilityType.XCODE_CONFIG_FILE, SystemUtility.getenv("APPIUM_HOME") + "/node_modules/appium/node_modules/appium-xcuitest-driver/WebDriverAgent/xcodeConfigFile.xcconfig");
 		}
 		capabilities.setCapability(CapabilityType.PLATFORM_NAME, selectedDevice.getPlatform());
 		((BaseOptions)capabilities).setPlatformVersion(selectedDevice.getVersion());

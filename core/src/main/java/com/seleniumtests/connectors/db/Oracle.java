@@ -22,6 +22,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import com.seleniumtests.util.osutility.SystemUtility;
 import org.openqa.selenium.Platform;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -103,7 +104,7 @@ public class Oracle extends SqlDatabase {
      * @return	root path of Oracle folder or null if none found
      */
     public static String findOracleClient() {
-    	String oracleEnv = System.getenv("ORACLE_HOME");
+    	String oracleEnv = SystemUtility.getenv("ORACLE_HOME");
     	if (oracleEnv != null) {
     		return oracleEnv;
     	}

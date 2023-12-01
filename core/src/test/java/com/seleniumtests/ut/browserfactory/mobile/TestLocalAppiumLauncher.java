@@ -26,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import com.seleniumtests.util.osutility.SystemUtility;
 import org.apache.commons.io.FileUtils;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -55,7 +56,7 @@ public class TestLocalAppiumLauncher extends MockitoTest {
 	private void initValidAppiumInstallation() throws IOException {
 //		PowerMockito.mockStatic(FileUtils.class);
 //		PowerMockito.mockStatic(System.class);
-		when(System.getenv("APPIUM_HOME")).thenReturn("/opt/appium/");
+		when(SystemUtility.getenv("APPIUM_HOME")).thenReturn("/opt/appium/");
 		when(FileUtils.readFileToString(new File("/opt/appium/node_modules/appium/package.json"), StandardCharsets.UTF_8))
 					  .thenReturn("{\"name\":\"appium\",\"version\":\"1.4.13\"}");
 		
@@ -72,7 +73,7 @@ public class TestLocalAppiumLauncher extends MockitoTest {
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testAppiumNotFound() {
 //		PowerMockito.mockStatic(System.class);
-		when(System.getenv("APPIUM_HOME")).thenReturn(null);
+		when(SystemUtility.getenv("APPIUM_HOME")).thenReturn(null);
 		new LocalAppiumLauncher();
 	}
 	
@@ -98,7 +99,7 @@ public class TestLocalAppiumLauncher extends MockitoTest {
 //		PowerMockito.mockStatic(FileUtils.class);
 //		PowerMockito.mockStatic(System.class);
 //		PowerMockito.mockStatic(OSCommand.class);
-		when(System.getenv("APPIUM_HOME")).thenReturn("/opt/appium/");
+		when(SystemUtility.getenv("APPIUM_HOME")).thenReturn("/opt/appium/");
 		when(FileUtils.readFileToString(new File("/opt/appium/node_modules/appium/package.json"), StandardCharsets.UTF_8))
 					  .thenReturn("{\"name\":\"application\"}");
 		new LocalAppiumLauncher();

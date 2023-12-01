@@ -7,13 +7,14 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.util.osutility.OSCommand;
+import com.seleniumtests.util.osutility.SystemUtility;
 import org.apache.commons.io.FileUtils;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-//import org.powermock.api.mockito.PowerMockito;
-//import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.mockito.MockedStatic;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -25,9 +26,7 @@ import java.util.ArrayList;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-//import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
-//@PrepareForTest({TestTasks.class, Lighthouse.class})
 public class TestLighthouse extends MockitoTest {
 
 	@Captor
@@ -36,22 +35,31 @@ public class TestLighthouse extends MockitoTest {
 	@Mock
 	private SeleniumGridConnector connector;
 
+	private MockedStatic mockedTestTasks;
+	private MockedStatic mockedSystem;
 
 	@BeforeMethod(groups = "ut", alwaysRun = true)
 	public void init() {
-		mockStatic(TestTasks.class);
+
+		mockedTestTasks = mockStatic(TestTasks.class);
+		mockedSystem = mockStatic(SystemUtility.class);
 
 		// by default, say that lighthouse in installed
-//		PowerMockito.when(TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(90), isNull(), eq("--help"))).thenReturn("      --chrome-flags                 Custom flags to pass to Chrome (space-delimited). For a full list of flags, see https://bit.ly/chrome-flags\r\n"
-//				+ "\r\n"
-//				+ "                                          Additionally, use the CHROME_PATH environment variable to use a specific Chrome binary. Requires Chromium vers\r\n"
-//				+ "                                     ion 66.0 or later. If omitted, any detected Chrome Canary or Chrome stable will be used.\r\n"
-//				+ "                                                                                                                    [chaîne de caractères] [défaut : \"\"]\r\n"
-//				+ "      --port                         The port to use for the debugging protocol. Use 0 for a random port                           [nombre] [défaut : 0]\r\n"
-//				+ "      --hostname                     The hostname to use for the debugging protocol.");
+		mockedTestTasks.when(() -> TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(90), isNull(), eq("--help"))).thenReturn("      --chrome-flags                 Custom flags to pass to Chrome (space-delimited). For a full list of flags, see https://bit.ly/chrome-flags\r\n"
+				+ "\r\n"
+				+ "                                          Additionally, use the CHROME_PATH environment variable to use a specific Chrome binary. Requires Chromium vers\r\n"
+				+ "                                     ion 66.0 or later. If omitted, any detected Chrome Canary or Chrome stable will be used.\r\n"
+				+ "                                                                                                                    [chaîne de caractères] [défaut : \"\"]\r\n"
+				+ "      --port                         The port to use for the debugging protocol. Use 0 for a random port                           [nombre] [défaut : 0]\r\n"
+				+ "      --hostname                     The hostname to use for the debugging protocol.");
 
-//		PowerMockito.mockStatic(System.class);
-		when(System.getenv("LIGHTHOUSE_HOME")).thenReturn(null);
+		mockedSystem.when(() -> SystemUtility.getenv("LIGHTHOUSE_HOME")).thenReturn(null);
+	}
+
+	@AfterMethod(groups = "ut", alwaysRun = true)
+	private void closeMocks() {
+		mockedTestTasks.close();
+		mockedSystem.close();
 	}
 
 
@@ -66,7 +74,7 @@ public class TestLighthouse extends MockitoTest {
 
 	@Test(groups = "ut")
 	public void testLighthouseNotInstalled() {
-//		PowerMockito.when(TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(90), isNull(), eq("--help"))).thenReturn("Unknown program");
+		mockedTestTasks.when(() -> TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(90), isNull(), eq("--help"))).thenReturn("Unknown program");
 
 		Lighthouse lighthouse = new Lighthouse(1234, "/home/selenium/out");
 		Assert.assertFalse(lighthouse.isAvailable());
@@ -75,8 +83,8 @@ public class TestLighthouse extends MockitoTest {
 
 	@Test(groups = "ut")
 	public void testLighthouseNotFound() {
-//		PowerMockito.when(TestTasks.executeCommand(eq(OSCommand.USE_PATH + "lighthouse"), eq(90), isNull(), eq("--help")))
-//				.thenReturn("No program found");
+		mockedTestTasks.when(() -> TestTasks.executeCommand(eq(OSCommand.USE_PATH + "lighthouse"), eq(90), isNull(), eq("--help")))
+				.thenReturn("No program found");
 
 		Lighthouse lighthouse = new Lighthouse(1234, "/home/selenium/out");
 		boolean available = lighthouse.isAvailable();
@@ -86,7 +94,7 @@ public class TestLighthouse extends MockitoTest {
 
 	@Test(groups = "ut")
 	public void testCheckLighthouseHomeIsntOnPath() throws IOException {
-		when(System.getenv("LIGHTHOUSE_HOME")).thenReturn("/test/lighthouse/");
+		mockedSystem.when(() -> SystemUtility.getenv("LIGHTHOUSE_HOME")).thenReturn("/test/lighthouse/");
 
 		Lighthouse lighthouse = new Lighthouse(1234, "/home/selenium/out");
 		Assert.assertFalse(lighthouse.isLighthouseInPath());
@@ -100,8 +108,8 @@ public class TestLighthouse extends MockitoTest {
 
 	@Test(groups = "ut")
 	public void testExecuteLighthouseIndexWithPath() throws IOException {
-//		PowerMockito.when(TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(90), isNull(), any()))
-//				.thenReturn("mocked output with path");
+		mockedTestTasks.when(() -> TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(90), isNull(), eq(new String[]{})))
+				.thenReturn("mocked output with path");
 
 		Lighthouse lighthouse = new Lighthouse(1234, "/home/selenium/out");
 		String out = lighthouse.executeLighthouse(new ArrayList<>());
@@ -111,11 +119,10 @@ public class TestLighthouse extends MockitoTest {
 
 	@Test(groups = "ut")
 	public void testExecuteLighthouseIndexWithoutPath() throws IOException {
-//		PowerMockito.mockStatic(System.class);
-		when(System.getenv("LIGHTHOUSE_HOME")).thenReturn("/test/lighthouse/");
+		mockedSystem.when(() -> SystemUtility.getenv("LIGHTHOUSE_HOME")).thenReturn("/test/lighthouse/");
 
-//		PowerMockito.when(TestTasks.executeCommand(eq("_USE_PATH_node"), eq(90), isNull(), eq("/test/lighthouse/index.js")))
-//				.thenReturn("mocked output without path");
+		mockedTestTasks.when(() -> TestTasks.executeCommand(eq("_USE_PATH_node"), eq(90), isNull(), eq("/test/lighthouse/index.js")))
+				.thenReturn("mocked output without path");
 
 		Lighthouse lighthouse = new Lighthouse(1234, "/home/selenium/out");
 		String out = lighthouse.executeLighthouse(new ArrayList<>());
@@ -146,14 +153,13 @@ public class TestLighthouse extends MockitoTest {
 		args[2] = "--output=html,json";
 		args[3] = "--output-path=" + resultFolder.toPath().resolve("out").toString();
 
-//		PowerMockito.when(TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(90), isNull(), eq("--help"))).thenReturn("--port");
-//		PowerMockito.when(TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(90), isNull(), eq(args[0]), eq(args[1]), eq(args[2]), eq(args[3]))).thenReturn("json output written to");
+		mockedTestTasks.when(() -> TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(90), isNull(), eq("--help"))).thenReturn("--port");
+		mockedTestTasks.when(() -> TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(90), isNull(), eq(args[0]), eq(args[1]), eq(args[2]), eq(args[3]))).thenReturn("json output written to");
 
 		Lighthouse lighthouse = new Lighthouse(1234, resultFolder.toPath().resolve("out").toString());
 		lighthouse.execute("http://myurl.com", new ArrayList<>());
 
-//		PowerMockito.verifyStatic(TestTasks.class, times(2));
-		TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(90), isNull(), any());
+		mockedTestTasks.verify(() -> TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(90), isNull(), any()));
 
 		// execution successful => no logs
 		Assert.assertNull(lighthouse.getLogs());
@@ -184,8 +190,8 @@ public class TestLighthouse extends MockitoTest {
 		args[2] = "--output=html,json";
 		args[3] = "--output-path=upload/lighthouseOut";
 
-//		PowerMockito.when(TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(90), isNull(), eq("--help"))).thenReturn("--port");
-//		PowerMockito.when(TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(90), isNull(), eq(args[0]), eq(args[1]), eq(args[2]), eq(args[3]))).thenReturn("json output written to");
+		mockedTestTasks.when(() -> TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(90), isNull(), eq("--help"))).thenReturn("--port");
+		mockedTestTasks.when(() -> TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(90), isNull(), eq(args[0]), eq(args[1]), eq(args[2]), eq(args[3]))).thenReturn("json output written to");
 
 		Lighthouse lighthouse = new Lighthouse(1234, "upload/lighthouseOut");
 		lighthouse.execute("http://myurl.com", new ArrayList<>());
@@ -204,8 +210,8 @@ public class TestLighthouse extends MockitoTest {
 		args[2] = "--output=html,json";
 		args[3] = "--output-path=" +  resultFolder.toPath().resolve("out").toString();
 
-//		PowerMockito.when(TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(90), isNull(), eq("--help"))).thenReturn("--port");
-//		PowerMockito.when(TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(90), isNull(), eq(args[0]), eq(args[1]), eq(args[2]), eq(args[3]))).thenReturn("LH:CriConnection:error sendRawMessage() was called without an established connection");
+		mockedTestTasks.when(() -> TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(90), isNull(), eq("--help"))).thenReturn("--port");
+		mockedTestTasks.when(() -> TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(90), isNull(), eq(args[0]), eq(args[1]), eq(args[2]), eq(args[3]))).thenReturn("LH:CriConnection:error sendRawMessage() was called without an established connection");
 
 
 		Lighthouse lighthouse = new Lighthouse(1234, resultFolder.toPath().resolve("out").toString());
@@ -229,8 +235,8 @@ public class TestLighthouse extends MockitoTest {
 	@Test(groups = "ut", expectedExceptions = ScenarioException.class, expectedExceptionsMessageRegExp = "Lighthouse not available")
 	public void testLighthouseExecuteNotAvailable() throws IOException {
 
-//		PowerMockito.when(TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(5), isNull(), eq("--help"))).thenReturn("Unknown program");
-//		PowerMockito.when(TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(90), isNull(), any())).thenReturn("json output written to file");
+		mockedTestTasks.when(() -> TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(5), isNull(), eq("--help"))).thenReturn("Unknown program");
+		mockedTestTasks.when(() -> TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(90), isNull(), any())).thenReturn("json output written to file");
 
 		File resultFolder = createFilesForExecution();
 

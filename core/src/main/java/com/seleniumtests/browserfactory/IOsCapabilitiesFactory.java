@@ -45,7 +45,7 @@ public class IOsCapabilitiesFactory extends IMobileCapabilityFactory {
 		options.setDeviceName(webDriverConfig.getDeviceName());
 
     	if (webDriverConfig.getMode() == DriverMode.LOCAL) {
-    		//capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + IOSMobileCapabilityType.XCODE_CONFIG_FILE, System.getenv("APPIUM_HOME") + "/node_modules/appium/node_modules/appium-xcuitest-driver/WebDriverAgent/xcodeConfigFile.xcconfig");
+    		//capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + IOSMobileCapabilityType.XCODE_CONFIG_FILE, SystemUtility.getenv("APPIUM_HOME") + "/node_modules/appium/node_modules/appium-xcuitest-driver/WebDriverAgent/xcodeConfigFile.xcconfig");
     	}
 
     	return options;

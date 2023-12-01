@@ -24,6 +24,7 @@ import java.util.List;
 
 //import org.powermock.api.mockito.PowerMockito;
 //import org.powermock.core.classloader.annotations.PrepareForTest;
+import com.seleniumtests.util.osutility.SystemUtility;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -41,8 +42,8 @@ public class TestAdbWrapper extends MockitoTest {
 	public void testAdbNotFound() {
 //		PowerMockito.mockStatic(OSCommand.class);
 //		PowerMockito.mockStatic(System.class);
-		when(System.getenv("ANDROID_HOME")).thenReturn(null);
-		when(System.getenv("ANDROID_SDK_ROOT")).thenReturn(null);
+		when(SystemUtility.getenv("ANDROID_HOME")).thenReturn(null);
+		when(SystemUtility.getenv("ANDROID_SDK_ROOT")).thenReturn(null);
 		when(OSCommand.executeCommandAndWait("adb version")).thenReturn("Cannot run program \"adb\": CreateProcess error=2, Le fichier spécifié est introuvable");
 		new AdbWrapper();
 	}
@@ -51,8 +52,8 @@ public class TestAdbWrapper extends MockitoTest {
 	public void testAdbFoundInEnvVariable() {
 //		PowerMockito.mockStatic(OSCommand.class);
 //		PowerMockito.mockStatic(System.class);
-		when(System.getenv("ANDROID_HOME")).thenReturn("/opt/android-sdk/");
-		when(System.getenv("ANDROID_SDK_ROOT")).thenReturn(null);
+		when(SystemUtility.getenv("ANDROID_HOME")).thenReturn("/opt/android-sdk/");
+		when(SystemUtility.getenv("ANDROID_SDK_ROOT")).thenReturn(null);
 		when(OSCommand.executeCommandAndWait("adb version")).thenReturn("Cannot run program \"adb\": CreateProcess error=2, Le fichier spécifié est introuvable");
 		when(OSCommand.executeCommandAndWait(Paths.get("/opt/android-sdk/platform-tools/adb version").toString())).thenReturn("Android Debug Bridge version 1.0.32\nRevision 09a0d98bebce-android");
 		
@@ -67,8 +68,8 @@ public class TestAdbWrapper extends MockitoTest {
 	public void testAdbFoundInEnvVariable2() {
 //		PowerMockito.mockStatic(OSCommand.class);
 //		PowerMockito.mockStatic(System.class);
-		when(System.getenv("ANDROID_HOME")).thenReturn(null);
-		when(System.getenv("ANDROID_SDK_ROOT")).thenReturn("/opt/android-sdk/");
+		when(SystemUtility.getenv("ANDROID_HOME")).thenReturn(null);
+		when(SystemUtility.getenv("ANDROID_SDK_ROOT")).thenReturn("/opt/android-sdk/");
 		when(OSCommand.executeCommandAndWait("adb version")).thenReturn("Cannot run program \"adb\": CreateProcess error=2, Le fichier spécifié est introuvable");
 		when(OSCommand.executeCommandAndWait(Paths.get("/opt/android-sdk/platform-tools/adb version").toString())).thenReturn("Android Debug Bridge version 1.0.32\nRevision 09a0d98bebce-android");
 		
@@ -80,8 +81,8 @@ public class TestAdbWrapper extends MockitoTest {
 	public void testAdbPresentInSystemPath() {
 //		PowerMockito.mockStatic(OSCommand.class);
 //		PowerMockito.mockStatic(System.class);
-		when(System.getenv("ANDROID_HOME")).thenReturn(null);
-		when(System.getenv("ANDROID_SDK_ROOT")).thenReturn(null);
+		when(SystemUtility.getenv("ANDROID_HOME")).thenReturn(null);
+		when(SystemUtility.getenv("ANDROID_SDK_ROOT")).thenReturn(null);
 		when(OSCommand.executeCommandAndWait("adb version")).thenReturn("Android Debug Bridge version 1.0.32\nRevision 09a0d98bebce-android");
 		
 		AdbWrapper adb = new AdbWrapper();
@@ -92,8 +93,8 @@ public class TestAdbWrapper extends MockitoTest {
 	public void testAdbNotPresentInSystemPath() {
 //		PowerMockito.mockStatic(OSCommand.class);
 //		PowerMockito.mockStatic(System.class);
-		when(System.getenv("ANDROID_HOME")).thenReturn(null);
-		when(System.getenv("ANDROID_SDK_ROOT")).thenReturn(null);
+		when(SystemUtility.getenv("ANDROID_HOME")).thenReturn(null);
+		when(SystemUtility.getenv("ANDROID_SDK_ROOT")).thenReturn(null);
 		when(OSCommand.executeCommandAndWait("adb version")).thenReturn("adb command not found");
 		
 		new AdbWrapper();
@@ -103,8 +104,8 @@ public class TestAdbWrapper extends MockitoTest {
 	public void testDeviceList() {
 //		PowerMockito.mockStatic(OSCommand.class);
 //		PowerMockito.mockStatic(System.class);
-		when(System.getenv("ANDROID_HOME")).thenReturn(null);
-		when(System.getenv("ANDROID_SDK_ROOT")).thenReturn(null);
+		when(SystemUtility.getenv("ANDROID_HOME")).thenReturn(null);
+		when(SystemUtility.getenv("ANDROID_SDK_ROOT")).thenReturn(null);
 		when(OSCommand.executeCommandAndWait("adb version")).thenReturn("Android Debug Bridge version 1.0.32\nRevision 09a0d98bebce-android");
 		when(OSCommand.executeCommandAndWait("adb -s emulator-5554 shell \"dumpsys package com.android.browser | grep versionName\"")).thenReturn("  versionName=6.0-123.4");
 		when(OSCommand.executeCommandAndWait("adb -s emulator-5554 shell \"dumpsys package com.android.chrome | grep versionName\"")).thenReturn("  versionName=56.0.123.4");

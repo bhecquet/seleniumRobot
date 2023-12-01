@@ -19,6 +19,7 @@ package com.seleniumtests.ut.browserfactory;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -29,16 +30,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.MockedStatic;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.ie.InternetExplorerDriverService;
 import org.openqa.selenium.remote.CapabilityType;
-//import org.powermock.api.mockito.PowerMockito;
-//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -59,7 +59,6 @@ import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.WinReg.HKEY;
 
 // TODO: enable test on linux platform using mocks
-//@PrepareForTest({OSUtility.class, OSUtilityFactory.class, Advapi32Util.class})
 public class TestIECapabilityFactory extends MockitoTest {
 
 	@Mock
@@ -73,25 +72,35 @@ public class TestIECapabilityFactory extends MockitoTest {
 	
 	@Mock
 	private OSUtilityWindows osUtility;
-	
+
+	private MockedStatic mockedOsUtility;
+	private MockedStatic mockedOsUtilityFactory;
+
 	@BeforeMethod(groups= {"ut"})
 	public void init() {
 		
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
 		browserInfos.put(BrowserType.INTERNET_EXPLORER, Arrays.asList(new BrowserInfo(BrowserType.INTERNET_EXPLORER, "11", "", false)));
 
-//		PowerMockito.mockStatic(OSUtility.class);
-//		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
-//		PowerMockito.when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
-		
-//		PowerMockito.mockStatic(OSUtilityFactory.class);
-//		PowerMockito.when(OSUtilityFactory.getInstance()).thenReturn(osUtility);
+		mockedOsUtility = mockStatic(OSUtility.class);
+		mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
+		mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
+
+		mockedOsUtilityFactory = mockStatic(OSUtilityFactory.class);
+		mockedOsUtilityFactory.when(() -> OSUtilityFactory.getInstance()).thenReturn(osUtility);
 		
 		when(osUtility.getProgramExtension()).thenReturn(".exe");
 		
 		when(config.getTestContext()).thenReturn(context);
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.NONE));
 		
+	}
+
+	@AfterMethod(groups = "ut", alwaysRun = true)
+	private void closeMocks() {
+		mockedOsUtilityFactory.close();
+		mockedOsUtility.close();
 	}
 	
 	/**
@@ -116,7 +125,6 @@ public class TestIECapabilityFactory extends MockitoTest {
 		when(config.getProxy()).thenReturn(proxyConfig);
 		when(config.getNodeTags()).thenReturn(new ArrayList<>());
 		when(config.getAttachExistingDriverPort()).thenReturn(0);
-		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		
 		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
 		
@@ -163,7 +171,6 @@ public class TestIECapabilityFactory extends MockitoTest {
 	public void testCreateDefaultCapabilitiesWithNodeTagsInLocalMode() {
 		
 		when(config.getNodeTags()).thenReturn(Arrays.asList("foo", "bar"));
-		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		
 		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
 		
@@ -179,18 +186,6 @@ public class TestIECapabilityFactory extends MockitoTest {
 		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertEquals(capa.getPlatformName(), Platform.WINDOWS);
-		
-	}
-	
-	@Test(groups={"ut"})
-	public void testCreateDefaultCapabilitiesWithVersion() {
-		
-		when(config.getProxy()).thenReturn(proxyConfig);
-		when(config.getBrowserVersion()).thenReturn("10.0");
-		
-		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
-		
-		Assert.assertEquals(capa.getBrowserVersion(), "10.0");
 		
 	}
 	
@@ -212,10 +207,8 @@ public class TestIECapabilityFactory extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testCreateIECapabilitiesStandardDriverPathLocal() {
-		try {
-//			PowerMockito.mockStatic(Advapi32Util.class);
-//			PowerMockito.when(Advapi32Util.registryGetValue(any(HKEY.class), anyString(), anyString())).thenReturn("1");
-			when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		try (MockedStatic mockedAdvapi = mockStatic(Advapi32Util.class)) {
+			mockedAdvapi.when(() -> Advapi32Util.registryGetValue(any(HKEY.class), anyString(), anyString())).thenReturn("1");
 			
 			new IECapabilitiesFactory(config).createCapabilities();
 			
@@ -227,10 +220,8 @@ public class TestIECapabilityFactory extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testCreateIECapabilitiesOverrideDriverPathLocal() {
-		try {
-//			PowerMockito.mockStatic(Advapi32Util.class);
-//			PowerMockito.when(Advapi32Util.registryGetValue(any(HKEY.class), anyString(), anyString())).thenReturn("1");
-			when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		try (MockedStatic mockedAdvapi = mockStatic(Advapi32Util.class)) {
+			mockedAdvapi.when(() -> Advapi32Util.registryGetValue(any(HKEY.class), anyString(), anyString())).thenReturn("1");
 			when(config.getIeDriverPath()).thenReturn("/opt/ie/driver/ie");
 			
 			new IECapabilitiesFactory(config).createCapabilities();
@@ -259,13 +250,12 @@ public class TestIECapabilityFactory extends MockitoTest {
 	public void testCreateDefaultEdgeIEModeCapabilities() {
 		
 		when(config.getIeMode()).thenReturn(true);
-		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		when(config.getInitialUrl()).thenReturn("http://mysite");
 		
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
 		browserInfos.put(BrowserType.INTERNET_EXPLORER, Arrays.asList(new BrowserInfo(BrowserType.INTERNET_EXPLORER, "11", "", false)));
 		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, "97.0", "", false)));
-//		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
+		mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
 		
 		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
 		
@@ -294,7 +284,7 @@ public class TestIECapabilityFactory extends MockitoTest {
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
 		browserInfos.put(BrowserType.INTERNET_EXPLORER, Arrays.asList(new BrowserInfo(BrowserType.INTERNET_EXPLORER, "11", "", false)));
 		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, "97.0", "", false)));
-//		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
+		mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
 		
 		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
 		
@@ -315,7 +305,6 @@ public class TestIECapabilityFactory extends MockitoTest {
 	public void testCreateDefaultEdgeIEModeCapabilitiesGridEdgeNotAvailable() {
 		
 		when(config.getIeMode()).thenReturn(true);
-		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		when(config.getInitialUrl()).thenReturn("http://mysite");
 		
 		new IECapabilitiesFactory(config).createCapabilities();

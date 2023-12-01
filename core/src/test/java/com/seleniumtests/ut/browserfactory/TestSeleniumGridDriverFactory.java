@@ -2,17 +2,18 @@ package com.seleniumtests.ut.browserfactory;
 
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.*;
 
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.seleniumtests.core.TestStepManager;
+import com.seleniumtests.util.helper.WaitHelper;
+import io.appium.java_client.remote.options.BaseOptions;
 import org.mockito.Mock;
+import org.mockito.MockedConstruction;
 import org.mockito.Mockito;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
@@ -22,10 +23,7 @@ import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
-//import org.powermock.api.mockito.PowerMockito;
-//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -46,7 +44,6 @@ import com.seleniumtests.util.logging.DebugMode;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 
-//@PrepareForTest({SeleniumGridDriverFactory.class})
 public class TestSeleniumGridDriverFactory extends MockitoTest {
 
 	@Mock
@@ -65,23 +62,12 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 	private SeleniumTestsContext context;
 	
 	@Mock
-	private RemoteWebDriver driver;
-	
-	@Mock
-	private RemoteWebDriver driver2;
-	
-	@Mock
-	private AndroidDriver androidDriver;
-	
-	@Mock
-	private IOSDriver iosDriver;
-	
-	@Mock
 	private Options options;
 	
 	@Mock
 	private Timeouts timeouts;
-	
+
+	private Capabilities caps;
 
 	@BeforeMethod(groups= {"ut"})
 	public void init() throws Exception {
@@ -95,22 +81,16 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 		Map<String, String> capsMap = new HashMap<>();
 		capsMap.put(CapabilityType.BROWSER_NAME, "htmlunit");
 		capsMap.put(CapabilityType.BROWSER_VERSION, "70.0.1.2.3");
-		Capabilities caps = new MutableCapabilities(capsMap);
-		
-		when(driver.manage()).thenReturn(options);
-		when(driver.getCapabilities()).thenReturn(caps);
-		when(driver2.manage()).thenReturn(options);
-		when(driver2.getCapabilities()).thenReturn(caps);
-		when(options.timeouts()).thenReturn(timeouts);
+		caps = new MutableCapabilities(capsMap);
 
-		when(androidDriver.manage()).thenReturn(options);
-		when(androidDriver.getCapabilities()).thenReturn(caps);
-		
-		when(iosDriver.manage()).thenReturn(options);
-		when(iosDriver.getCapabilities()).thenReturn(caps);
+		when(options.timeouts()).thenReturn(timeouts);
 		
 		when(gridConnector1.getHubUrl()).thenReturn(new URL("http://localhost:1111/wd/hub"));
 		when(gridConnector2.getHubUrl()).thenReturn(new URL("http://localhost:2222/wd/hub"));
+		when(gridConnector1.uploadMobileApp(any())).thenReturn((MutableCapabilities) caps);
+		when(gridConnector2.uploadMobileApp(any())).thenReturn((MutableCapabilities) caps);
+		when(context.getTestStepManager()).thenReturn(new TestStepManager());
+		SeleniumTestsContextManager.setThreadContext(context);
 	}
 	
 	/**
@@ -119,73 +99,87 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testDriverCreation() throws Exception {
-		
-		SeleniumTestsContextManager.setThreadContext(context);
+
 		when(context.getTestType()).thenReturn(TestType.WEB);
 		
 		when(gridConnector1.isGridActive()).thenReturn(true);
 		when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1));
 		
 		// connect to grid
-//		PowerMockito.whenNew(RemoteWebDriver.class).withAnyArguments().thenReturn(driver);
-		SeleniumGridDriverFactory driverFactory = new SeleniumGridDriverFactory(config);
-		WebDriver newDriver = driverFactory.createWebDriver();
-		
-		// check that with a single driver creation, retry timeout is 30 mins
-		Assert.assertEquals(driverFactory.getInstanceRetryTimeout(), SeleniumGridDriverFactory.DEFAULT_RETRY_TIMEOUT);
-		
-		// issue #280: also check that BrowserInfo is not null
-		Assert.assertNotNull(newDriver);
-		Assert.assertEquals(newDriver, driver);
-		Assert.assertNotNull(driverFactory.getSelectedBrowserInfo());
-		Assert.assertEquals(driverFactory.getSelectedBrowserInfo().getBrowser(), BrowserType.HTMLUNIT);
-		Assert.assertEquals(driverFactory.getSelectedBrowserInfo().getVersion(), "70.0.1.2.3");
+		try (MockedConstruction mockedRemoteWebDriver = mockConstruction(RemoteWebDriver.class, (driver, context1) -> {
+
+			when(driver.manage()).thenReturn(options);
+			when(driver.getCapabilities()).thenReturn(caps);
+		})) {
+			SeleniumGridDriverFactory driverFactory = new SeleniumGridDriverFactory(config);
+			WebDriver newDriver = driverFactory.createWebDriver();
+
+			// check that with a single driver creation, retry timeout is 30 mins
+			Assert.assertEquals(driverFactory.getInstanceRetryTimeout(), SeleniumGridDriverFactory.DEFAULT_RETRY_TIMEOUT);
+
+			// issue #280: also check that BrowserInfo is not null
+			Assert.assertNotNull(newDriver);
+			Assert.assertEquals(newDriver, mockedRemoteWebDriver.constructed().get(0));
+			Assert.assertNotNull(driverFactory.getSelectedBrowserInfo());
+			Assert.assertEquals(driverFactory.getSelectedBrowserInfo().getBrowser(), BrowserType.HTMLUNIT);
+			Assert.assertEquals(driverFactory.getSelectedBrowserInfo().getVersion(), "70.0.1.2.3");
+		}
 	}
 	
 	@Test(groups={"ut"})
 	public void testMobileDriverCreation() throws Exception {
 		
-		SeleniumTestsContextManager.setThreadContext(context);
+
 		when(config.getPlatform()).thenReturn("android");
 		when(config.getApp()).thenReturn("myApp.apk");
 		when(context.getTestType()).thenReturn(TestType.APPIUM_APP_ANDROID);
 		
 		when(gridConnector1.isGridActive()).thenReturn(true);
 		when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1));
+		when(config.getAppiumCapabilities()).thenReturn(new BaseOptions<>());
 		
 		// connect to grid
-//		PowerMockito.whenNew(AndroidDriver.class).withAnyArguments().thenReturn(androidDriver);
-		SeleniumGridDriverFactory driverFactory = new SeleniumGridDriverFactory(config);
-		WebDriver newDriver = driverFactory.createWebDriver();
+		try (MockedConstruction mockedAndroidDriver = mockConstruction(AndroidDriver.class, (androidDriver, context1) -> {
+			when(androidDriver.manage()).thenReturn(options);
+			when(androidDriver.getCapabilities()).thenReturn(caps);
+		})) {
+			SeleniumGridDriverFactory driverFactory = new SeleniumGridDriverFactory(config);
+			WebDriver newDriver = driverFactory.createWebDriver();
 
-		// verify app is uploaded
-		verify(gridConnector1).uploadMobileApp(any());
-		
-		// verify driver is an android driver
-		Assert.assertTrue(newDriver instanceof AndroidDriver);
+			// verify app is uploaded
+			verify(gridConnector1).uploadMobileApp(any());
+
+			// verify driver is an android driver
+			Assert.assertTrue(newDriver instanceof AndroidDriver);
+		}
 	}
 	
 	@Test(groups={"ut"})
 	public void testIosMobileDriverCreation() throws Exception {
 		
-		SeleniumTestsContextManager.setThreadContext(context);
+
 		when(config.getPlatform()).thenReturn("ios");
 		when(config.getApp()).thenReturn("myApp.ipa");
 		when(context.getTestType()).thenReturn(TestType.APPIUM_APP_IOS);
 		
 		when(gridConnector1.isGridActive()).thenReturn(true);
 		when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1));
+		when(config.getAppiumCapabilities()).thenReturn(new MutableCapabilities());
 		
 		// connect to grid
-//		PowerMockito.whenNew(IOSDriver.class).withAnyArguments().thenReturn(iosDriver);
-		SeleniumGridDriverFactory driverFactory = new SeleniumGridDriverFactory(config);
-		WebDriver newDriver = driverFactory.createWebDriver();
-		
-		// verify app is uploaded
-		verify(gridConnector1).uploadMobileApp(any());
-		
-		// verify driver is an android driver
-		Assert.assertTrue(newDriver instanceof IOSDriver);
+		try (MockedConstruction mockedIOSDriver = mockConstruction(IOSDriver.class, (iosDriver, context1) -> {
+			when(iosDriver.manage()).thenReturn(options);
+			when(iosDriver.getCapabilities()).thenReturn(caps);
+		})) {
+			SeleniumGridDriverFactory driverFactory = new SeleniumGridDriverFactory(config);
+			WebDriver newDriver = driverFactory.createWebDriver();
+
+			// verify app is uploaded
+			verify(gridConnector1).uploadMobileApp(any());
+
+			// verify driver is an android driver
+			Assert.assertTrue(newDriver instanceof IOSDriver);
+		}
 	}
 
 	
@@ -195,19 +189,19 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 	 */
 	@Test(groups={"ut"}, expectedExceptions=SeleniumGridNodeNotAvailable.class)
 	public void testDriverNotCreatedIfGridNotActive() throws Exception {
-		
-		try {
+
+		try (MockedConstruction mockedRemoteWebDriver = mockConstruction(RemoteWebDriver.class, (driver, context1) -> {
+			when(driver.manage()).thenReturn(options);
+			when(driver.getCapabilities()).thenReturn(caps);
+		})) {
 			SeleniumGridDriverFactory.setRetryTimeout(2);
-			
-			SeleniumTestsContextManager.setThreadContext(context);
+
 			when(context.getTestType()).thenReturn(TestType.WEB);
 			
 			when(gridConnector1.isGridActive()).thenReturn(false);
 			when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1));
-			
-			// connect to grid
-//			PowerMockito.whenNew(RemoteWebDriver.class).withAnyArguments().thenReturn(driver);
-			SeleniumGridDriverFactory driverFactory = new SeleniumGridDriverFactory(config);
+
+			SeleniumGridDriverFactory driverFactory = new SeleniumGridDriverFactory(config, false);
 			driverFactory.createWebDriver();
 			
 		} finally {
@@ -222,19 +216,22 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 	 */
 	@Test(groups={"ut"}, expectedExceptions=SeleniumGridNodeNotAvailable.class)
 	public void testDriverNotCreatedIfError() throws Exception {
-		
-		try {
+
+		try (MockedConstruction mockedRemoteWebDriver = mockConstruction(RemoteWebDriver.class, (driver, context1) -> {
+			when(driver.manage()).thenReturn(options);
+			when(driver.getCapabilities()).thenReturn(caps);
+		})) {
 			SeleniumGridDriverFactory.setRetryTimeout(1);
-			
-			SeleniumTestsContextManager.setThreadContext(context);
+
 			when(context.getTestType()).thenReturn(TestType.WEB);
 			
 			when(gridConnector1.isGridActive()).thenReturn(true);
 			when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1));
 			
 			// connect to grid;
-//			PowerMockito.whenNew(RemoteWebDriver.class).withParameterTypes(URL.class, Capabilities.class).withArguments(eq(new URL("http://localhost:1111/wd/hub")), any(DesiredCapabilities.class)).thenThrow(new WebDriverException(""));
-			new SeleniumGridDriverFactory(config).createWebDriver();
+			SeleniumGridDriverFactory factory = spy(new SeleniumGridDriverFactory(config));
+			when(factory.getDriverInstance(any(URL.class), any(MutableCapabilities.class))).thenThrow(new WebDriverException(""));
+			factory.createWebDriver();
 			
 		} finally {
 			SeleniumGridDriverFactory.setRetryTimeout(SeleniumGridDriverFactory.DEFAULT_RETRY_TIMEOUT);
@@ -247,19 +244,48 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testDriverCreationWithSeveralGridConnectors() throws Exception {
-		
-		SeleniumTestsContextManager.setThreadContext(context);
+		try (MockedConstruction mockedRemoteWebDriver = mockConstruction(RemoteWebDriver.class, (driver, context1) -> {
+			when(driver.manage()).thenReturn(options);
+			when(driver.getCapabilities()).thenReturn(caps);
+		})) {
+
+			when(context.getTestType()).thenReturn(TestType.WEB);
+
+			when(gridConnector1.isGridActive()).thenReturn(true);
+			when(gridConnector2.isGridActive()).thenReturn(true);
+			when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1, gridConnector2));
+
+			SeleniumGridDriverFactory factory = new SeleniumGridDriverFactory(config, false);
+			WebDriver newDriver = factory.createWebDriver();
+			Assert.assertNotNull(newDriver);
+
+			// check the second grid connector has never been called
+			verify(gridConnector1).isGridActive();
+			verify(gridConnector2, never()).isGridActive();
+
+			Assert.assertEquals(factory.getActiveGridConnector(), gridConnector1);
+		}
+	}
+
+	@Test(groups={"ut"})
+	public void testShuffleGridConnectors() throws Exception {
+
 		when(context.getTestType()).thenReturn(TestType.WEB);
-		
-		when(gridConnector1.isGridActive()).thenReturn(true);
-		when(gridConnector2.isGridActive()).thenReturn(true);
 		when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1, gridConnector2));
-		
-		// connect to grid. One driver for each connector so that it's easy to distinguish them
-//		PowerMockito.whenNew(RemoteWebDriver.class).withParameterTypes(URL.class, Capabilities.class).withArguments(eq(new URL("http://localhost:1111/wd/hub")), any(DesiredCapabilities.class)).thenReturn(driver);
-//		PowerMockito.whenNew(RemoteWebDriver.class).withParameterTypes(URL.class, Capabilities.class).withArguments(eq(new URL("http://localhost:2222/wd/hub")), any(DesiredCapabilities.class)).thenReturn(driver2);
-		WebDriver newDriver = new SeleniumGridDriverFactory(config).createWebDriver();
-		Assert.assertNotNull(newDriver);
+
+		// check that at least once, order is changed
+		boolean ok = false;
+		for (int i = 0; i < 10; i++) {
+			try {
+				SeleniumGridDriverFactory factory = new SeleniumGridDriverFactory(config, true);
+				Assert.assertEquals(factory.getGridConnectors().get(0), gridConnector2);
+				ok = true;
+				break;
+			} catch (AssertionError e) {
+				WaitHelper.waitForMilliSeconds(100);
+			}
+		}
+		Assert.assertTrue(ok);
 	}
 	
 	/**
@@ -268,21 +294,26 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testDriverCreationWithSeveralGridConnectorsOneUnavailable() throws Exception {
-		
-		SeleniumTestsContextManager.setThreadContext(context);
-		when(context.getTestType()).thenReturn(TestType.WEB);
-		
-		when(gridConnector1.isGridActive()).thenReturn(false);
-		when(gridConnector2.isGridActive()).thenReturn(true);
-		when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1, gridConnector2));
-		
-		// connect to grid. One driver for each connector so that it's easy to distinguish them
-//		PowerMockito.whenNew(RemoteWebDriver.class).withParameterTypes(URL.class, Capabilities.class).withArguments(eq(new URL("http://localhost:1111/wd/hub")), any(DesiredCapabilities.class)).thenReturn(driver);
-//		PowerMockito.whenNew(RemoteWebDriver.class).withParameterTypes(URL.class, Capabilities.class).withArguments(eq(new URL("http://localhost:2222/wd/hub")), any(DesiredCapabilities.class)).thenReturn(driver2);
-		WebDriver newDriver = new SeleniumGridDriverFactory(config).createWebDriver();
-		Assert.assertNotNull(newDriver);
-		
-		Assert.assertEquals(newDriver, driver2);
+
+		try (MockedConstruction mockedRemoteWebDriver = mockConstruction(RemoteWebDriver.class, (driver, context1) -> {
+
+			when(driver.manage()).thenReturn(options);
+			when(driver.getCapabilities()).thenReturn(caps);
+		})) {
+			when(context.getTestType()).thenReturn(TestType.WEB);
+
+			when(gridConnector1.isGridActive()).thenReturn(false);
+			when(gridConnector2.isGridActive()).thenReturn(true);
+			when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1, gridConnector2));
+
+			SeleniumGridDriverFactory factory = new SeleniumGridDriverFactory(config, false);
+			WebDriver newDriver = factory.createWebDriver();
+			Assert.assertNotNull(newDriver);
+
+			verify(gridConnector1).isGridActive();
+			verify(gridConnector2).isGridActive();
+			Assert.assertEquals(factory.getActiveGridConnector(), gridConnector2);
+		}
 	}
 	
 	/**
@@ -291,11 +322,15 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testDriverCreationWithSeveralGridConnectorsOneInError() throws Exception {
-		
-		try {
+
+		try (MockedConstruction mockedRemoteWebDriver = mockConstruction(RemoteWebDriver.class, (driver, context1) -> {
+
+			when(driver.manage()).thenReturn(options);
+			when(driver.getCapabilities()).thenReturn(caps);
+		})) {
 			SeleniumGridDriverFactory.setRetryTimeout(1);
 			
-			SeleniumTestsContextManager.setThreadContext(context);
+
 			when(context.getTestType()).thenReturn(TestType.WEB);
 			
 			when(gridConnector1.isGridActive()).thenReturn(true);
@@ -303,12 +338,19 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 			when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1, gridConnector2));
 			
 			// first driver will create an exception
-//			PowerMockito.whenNew(RemoteWebDriver.class).withParameterTypes(URL.class, Capabilities.class).withArguments(eq(new URL("http://localhost:1111/wd/hub")), any(DesiredCapabilities.class)).thenThrow(new WebDriverException(""));
-//			PowerMockito.whenNew(RemoteWebDriver.class).withParameterTypes(URL.class, Capabilities.class).withArguments(eq(new URL("http://localhost:2222/wd/hub")), any(DesiredCapabilities.class)).thenReturn(driver2);
-			WebDriver newDriver = new SeleniumGridDriverFactory(config).createWebDriver();
+			SeleniumGridDriverFactory factory = spy(new SeleniumGridDriverFactory(config, false));
+
+			// first driver creation will fail, the second one (on second grid) will succeed
+			when(factory.getDriverInstance(eq(new URL("http://localhost:1111/wd/hub")), any(MutableCapabilities.class))).thenThrow(new WebDriverException(""));
+			RemoteWebDriver drv = new RemoteWebDriver(new URL("http://localhost:2222/wd/hub"), caps);
+			when(factory.getDriverInstance(eq(new URL("http://localhost:2222/wd/hub")), any(MutableCapabilities.class))).thenReturn(drv);
+			WebDriver newDriver = factory.createWebDriver();
 			Assert.assertNotNull(newDriver);
-			
-			Assert.assertEquals(newDriver, driver2);
+
+			// both grid connectors have been called
+			verify(factory, times(2)).getDriverInstance(any(URL.class), any(MutableCapabilities.class));
+
+			Assert.assertEquals(factory.getActiveGridConnector(), gridConnector2);
 			
 		} finally {
 			SeleniumGridDriverFactory.setRetryTimeout(SeleniumGridDriverFactory.DEFAULT_RETRY_TIMEOUT);
@@ -324,25 +366,29 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testDriverCreationOnSameNode() throws Exception {
-		
-		SeleniumTestsContextManager.setThreadContext(context);
-		when(context.getTestType()).thenReturn(TestType.WEB);
-		
-		when(gridConnector1.isGridActive()).thenReturn(true);
-		when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1));
-		when(config.getRunOnSameNode()).thenReturn("http://localhost:5556/");
-		when(config.getSeleniumGridConnector()).thenReturn(gridConnector1); // simulate a previously created driver
-		
-		// connect to grid
-//		PowerMockito.whenNew(RemoteWebDriver.class).withAnyArguments().thenReturn(driver);
-		SeleniumGridDriverFactory driverFactory = new SeleniumGridDriverFactory(config);
-		WebDriver newDriver = driverFactory.createWebDriver();
-		
-		// check that with a multiple drivers creation, retry timeout is 1 min 30 for the second drivers because runOnSameNode is set
-		Assert.assertEquals(driverFactory.getInstanceRetryTimeout(), 90);
-		
-		Assert.assertNotNull(newDriver);
-		Assert.assertEquals(newDriver, driver);
+		try (MockedConstruction mockedRemoteWebDriver = mockConstruction(RemoteWebDriver.class, (driver, context1) -> {
+
+			when(driver.manage()).thenReturn(options);
+			when(driver.getCapabilities()).thenReturn(caps);
+		})) {
+
+			when(context.getTestType()).thenReturn(TestType.WEB);
+
+			when(gridConnector1.isGridActive()).thenReturn(true);
+			when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1));
+			when(config.getRunOnSameNode()).thenReturn("http://localhost:5556/");
+			when(config.getSeleniumGridConnector()).thenReturn(gridConnector1); // simulate a previously created driver
+
+			// connect to grid
+			SeleniumGridDriverFactory driverFactory = new SeleniumGridDriverFactory(config, false);
+			WebDriver newDriver = driverFactory.createWebDriver();
+
+			// check that with a multiple drivers creation, retry timeout is 1 min 30 for the second drivers because runOnSameNode is set
+			Assert.assertEquals(driverFactory.getInstanceRetryTimeout(), 90);
+
+			Assert.assertNotNull(newDriver);
+			Assert.assertEquals(newDriver, mockedRemoteWebDriver.constructed().get(0));
+		}
 	}
 	
 	/**
@@ -352,15 +398,14 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCapabilitiesCreationOnSameNode() throws Exception {
 		
-		SeleniumTestsContextManager.setThreadContext(context);
+
 		when(context.getTestType()).thenReturn(TestType.WEB);
 		
 		when(gridConnector1.isGridActive()).thenReturn(true);
 		when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1));
 		when(config.getRunOnSameNode()).thenReturn("http://localhost:5556/");
 		when(config.getSeleniumGridConnector()).thenReturn(gridConnector1); // simulate a previously created driver
-		
-	
+
 		MutableCapabilities caps = new SeleniumGridDriverFactory(config).createSpecificGridCapabilities(config);
 		Assert.assertEquals(caps.getCapability(SeleniumRobotCapabilityType.ATTACH_SESSION_ON_NODE), "http://localhost:5556/");
 	}
@@ -372,26 +417,30 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testDriverCreationOnSameNodeMultipleHubs() throws Exception {
-		
-		SeleniumTestsContextManager.setThreadContext(context);
-		when(context.getTestType()).thenReturn(TestType.WEB);
-		
-		when(gridConnector1.isGridActive()).thenReturn(true);
-		when(gridConnector2.isGridActive()).thenReturn(true);
-		when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1, gridConnector2));
-		when(config.getRunOnSameNode()).thenReturn("http://localhost:5556/");
-		when(config.getSeleniumGridConnector()).thenReturn(gridConnector2); // simulate a previously created driver
 
-		// connect to grid
-//		PowerMockito.whenNew(RemoteWebDriver.class)
-//						.withAnyArguments().thenReturn(driver);
-		SeleniumGridDriverFactory driverFactory = new SeleniumGridDriverFactory(config);
-		WebDriver newDriver = driverFactory.createWebDriver();
-		Assert.assertNotNull(newDriver);
-		Assert.assertEquals(newDriver, driver);
+		try (MockedConstruction mockedRemoteWebDriver = mockConstruction(RemoteWebDriver.class, (driver, context1) -> {
 
-		// Check selected grid connector is the requested one
-		Assert.assertEquals(driverFactory.getActiveGridConnector(), gridConnector2);
+			when(driver.manage()).thenReturn(options);
+			when(driver.getCapabilities()).thenReturn(caps);
+		})) {
+
+			when(context.getTestType()).thenReturn(TestType.WEB);
+
+			when(gridConnector1.isGridActive()).thenReturn(true);
+			when(gridConnector2.isGridActive()).thenReturn(true);
+			when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1, gridConnector2));
+			when(config.getRunOnSameNode()).thenReturn("http://localhost:5556/");
+			when(config.getSeleniumGridConnector()).thenReturn(gridConnector2); // simulate a previously created driver
+
+			// connect to grid
+			SeleniumGridDriverFactory driverFactory = new SeleniumGridDriverFactory(config, false);
+			WebDriver newDriver = driverFactory.createWebDriver();
+			Assert.assertNotNull(newDriver);
+			Assert.assertEquals(newDriver, mockedRemoteWebDriver.constructed().get(0));
+
+			// Check selected grid connector is the requested one
+			Assert.assertEquals(driverFactory.getActiveGridConnector(), gridConnector2);
+		}
 	}
 	
 	/**
@@ -403,7 +452,7 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 		
 		try {
 			SeleniumGridDriverFactory.setRetryTimeout(1);
-			SeleniumTestsContextManager.setThreadContext(context);
+
 			when(context.getTestType()).thenReturn(TestType.WEB);
 			
 			when(gridConnector1.isGridActive()).thenReturn(true);

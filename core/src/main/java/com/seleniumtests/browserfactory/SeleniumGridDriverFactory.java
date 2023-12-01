@@ -59,12 +59,27 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 	private static AtomicInteger counter = new AtomicInteger(0); // a global counter counting times where we never get matching nodes
 
     public SeleniumGridDriverFactory(final DriverConfig cfg) {
+		this(cfg, true);
+	}
+
+	public List<SeleniumGridConnector> getGridConnectors() {
+		return gridConnectors;
+	}
+
+	/**
+	 *
+	 * @param cfg
+	 * @param shuffle	if true, grid connector list will be shuffled so that it's not the same hub that gets driver
+	 */
+    public SeleniumGridDriverFactory(final DriverConfig cfg, boolean shuffle) {
         super(cfg);
         gridConnectors = new ArrayList<>(SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnectors());
         instanceRetryTimeout = retryTimeout;
         
         // reorder list so that we do not always use the same grid for connection
-        Collections.shuffle(gridConnectors);
+		if (shuffle) {
+			Collections.shuffle(gridConnectors);
+		}
     }    
 
 	@Override
@@ -111,7 +126,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     	MutableCapabilities capabilities = new MutableCapabilities();
     	
     	if (SeleniumTestsContextManager.isMobileTest()) {
-			((BaseOptions)capabilities).setPlatformVersion(webDriverConfig.getMobilePlatformVersion());
+			capabilities = new BaseOptions(capabilities).setPlatformVersion(webDriverConfig.getMobilePlatformVersion());
     	} else {
     		capabilities.setCapability(CapabilityType.PLATFORM_NAME, webDriverConfig.getPlatform().toLowerCase());
     		if (webDriverConfig.getBrowserVersion() != null && capabilities.getCapability(CapabilityType.BROWSER_VERSION) == null) {
@@ -176,7 +191,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
         throw new SessionNotCreatedException("Session not created on any grid hub, after 3 tries");
     }
     
-    private WebDriver getDriverInstance(URL hubUrl, MutableCapabilities capabilities) {
+    public WebDriver getDriverInstance(URL hubUrl, MutableCapabilities capabilities) {
 		if (SeleniumTestsContextManager.isDesktopWebTest()) {
 		        return new RemoteWebDriver(hubUrl, capabilities);
 		} else if (SeleniumTestsContextManager.isMobileTest()) {

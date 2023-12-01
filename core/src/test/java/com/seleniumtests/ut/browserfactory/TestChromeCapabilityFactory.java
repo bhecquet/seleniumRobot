@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.ut.browserfactory;
 
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.PageLoadStrategy;
@@ -35,9 +37,8 @@ import org.openqa.selenium.Proxy;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.CapabilityType;
-//import org.powermock.api.mockito.PowerMockito;
-//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -53,7 +54,6 @@ import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.osutility.OSUtility;
 
-//@PrepareForTest({OSUtility.class, BrowserInfo.class})
 public class TestChromeCapabilityFactory extends MockitoTest {
 
 	public static final String CURRENT_CHROME_VERSION = "115.0";
@@ -68,18 +68,27 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	
 	@Mock
 	private SeleniumTestsContext context;
+
+	private MockedStatic mockedOsUtility;
 	
 	@BeforeMethod(groups= {"ut"})
 	public void init() {
 		browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "72.0", "", false)));
-//		PowerMockito.mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
-//		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion()).thenReturn(browserInfos);
+		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, CURRENT_CHROME_VERSION, "", false)));
+		mockedOsUtility = mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
+		mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
 		when(config.getTestContext()).thenReturn(context);
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.NONE));
 		when(config.getPageLoadStrategy()).thenReturn(PageLoadStrategy.NORMAL);
 		when(config.getBrowserType()).thenReturn(BrowserType.CHROME);
 		when(config.getAttachExistingDriverPort()).thenReturn(null);
+	}
+
+	@AfterMethod(groups = "ut", alwaysRun = true)
+	private void closeMocks() {
+		mockedOsUtility.close();
+		System.clearProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY);
 	}
 	
 
@@ -93,7 +102,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
 		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, CURRENT_CHROME_VERSION, "", false, false),
 				new BrowserInfo(BrowserType.CHROME, NEXT_CHROME_VERSION, "", false, true)));
-//		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
+		mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
 		
 		ChromeCapabilitiesFactory capaFactory = new ChromeCapabilitiesFactory(config);
 		capaFactory.createCapabilities();
@@ -111,7 +120,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
 		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, NEXT_CHROME_VERSION, "", false, true)));
-//		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
+		mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
 
 		ChromeCapabilitiesFactory capaFactory = new ChromeCapabilitiesFactory(config);
 		capaFactory.createCapabilities();
@@ -128,7 +137,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, CURRENT_CHROME_VERSION, "", false, false),
 				new BrowserInfo(BrowserType.CHROME, NEXT_CHROME_VERSION, "", false, true)));
 
-//		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(true)).thenReturn(browserInfos);
+		mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(true)).thenReturn(browserInfos);
 		when(config.getBetaBrowser()).thenReturn(true);
 
 		ChromeCapabilitiesFactory capaFactory = new ChromeCapabilitiesFactory(config);
@@ -146,7 +155,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
 		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, CURRENT_CHROME_VERSION, "", false, false)));
-//		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(true)).thenReturn(browserInfos);
+		mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(true)).thenReturn(browserInfos);
 		when(config.getBetaBrowser()).thenReturn(true);
 
 		ChromeCapabilitiesFactory capaFactory = new ChromeCapabilitiesFactory(config);
@@ -214,16 +223,24 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		
 	}
 
-	
+	/**
+	 * When version is specified, check it's choosen
+	 */
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithVersion() {
+
+		browserInfos = new HashMap<>();
+		browserInfos.put(BrowserType.CHROME, List.of(new BrowserInfo(BrowserType.CHROME, CURRENT_CHROME_VERSION, "", false),
+				new BrowserInfo(BrowserType.CHROME, NEXT_CHROME_VERSION, "", false)
+				));
+		mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
 		
 		when(config.getProxy()).thenReturn(proxyConfig);
-		when(config.getBrowserVersion()).thenReturn("60.0");
+		when(config.getBrowserVersion()).thenReturn(NEXT_CHROME_VERSION);
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(capa.getBrowserVersion(), "60.0");
+		Assert.assertEquals(capa.getBrowserVersion(), NEXT_CHROME_VERSION);
 		
 	}
 	
@@ -331,7 +348,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		updatedBrowserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, CURRENT_CHROME_VERSION, "", false),
 																	new BrowserInfo(BrowserType.CHROME, NEXT_CHROME_VERSION, "/opt/chrome/bin/chrome", false)));
 
-//		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(updatedBrowserInfos);
+		mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(updatedBrowserInfos);
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
@@ -367,11 +384,15 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testCreateChromeCapabilitiesStandardDriverPathGrid() {
-		when(config.getMode()).thenReturn(DriverMode.GRID);
-		
-		new ChromeCapabilitiesFactory(config).createCapabilities();
-		
-		Assert.assertNull(System.getProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY));
+		try {
+			when(config.getMode()).thenReturn(DriverMode.GRID);
+
+			new ChromeCapabilitiesFactory(config).createCapabilities();
+
+			Assert.assertNull(System.getProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY));
+		} finally {
+			System.clearProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY);
+		}
 	}
 	
 	/**
