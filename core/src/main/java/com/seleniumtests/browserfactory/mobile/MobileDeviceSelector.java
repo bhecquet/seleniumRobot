@@ -121,7 +121,7 @@ public class MobileDeviceSelector {
 		List<MobileDevice> filteredDeviceList = filterDevices(deviceList, 
 																deviceName == null ? null: deviceName.toString(), 
 																platformName == null ? null: platformName.toString(), 
-																platformVersion == null ? null: platformVersion.toString()
+																platformVersion.isEmpty() ? null: platformVersion.get().toString()
 		);
 		
 		if (filteredDeviceList.isEmpty()) {
@@ -140,9 +140,12 @@ public class MobileDeviceSelector {
 	 */
 	public MutableCapabilities updateCapabilitiesWithSelectedDevice(MutableCapabilities capabilities, DriverMode driverMode) {
 		MobileDevice selectedDevice = getRelevantMobileDevice(capabilities);
+		capabilities.setCapability(CapabilityType.PLATFORM_NAME, selectedDevice.getPlatform());
 		
 		if ("android".equals(selectedDevice.getPlatform())) {
-			((UiAutomator2Options)capabilities).setDeviceName(selectedDevice.getName())
+			UiAutomator2Options updatedCapabilities;
+			updatedCapabilities = new UiAutomator2Options(capabilities);
+			updatedCapabilities.setDeviceName(selectedDevice.getName())
 					.setUdid(selectedDevice.getId());
 			
 			// set the right chromedriver executable according to android browser / chromeversion
@@ -156,19 +159,25 @@ public class MobileDeviceSelector {
 	        	}
 				if (chromeDriverFile != null) {
 					// driver extraction will be done later. For example in AppiumDriverFactory
-					((UiAutomator2Options)capabilities).setChromedriverExecutable(chromeDriverFile);
+					updatedCapabilities.setChromedriverExecutable(chromeDriverFile);
 				}
 			}
+
+			updatedCapabilities.setPlatformVersion(selectedDevice.getVersion());
+			return new MutableCapabilities(updatedCapabilities);
 			
 		} else if ("ios".equalsIgnoreCase(selectedDevice.getPlatform())) {
-			((XCUITestOptions)capabilities).setUdid(selectedDevice.getId())
+			XCUITestOptions updatedCapabilities = new XCUITestOptions(capabilities);
+			updatedCapabilities.setUdid(selectedDevice.getId())
 							.setDeviceName(selectedDevice.getName());
-//			capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + IOSMobileCapabilityType.XCODE_CONFIG_FILE, SystemUtility.getenv("APPIUM_HOME") + "/node_modules/appium/node_modules/appium-xcuitest-driver/WebDriverAgent/xcodeConfigFile.xcconfig");
+//			updatedCapabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + IOSMobileCapabilityType.XCODE_CONFIG_FILE, SystemUtility.getenv("APPIUM_HOME") + "/node_modules/appium/node_modules/appium-xcuitest-driver/WebDriverAgent/xcodeConfigFile.xcconfig");
+
+
+			updatedCapabilities.setPlatformVersion(selectedDevice.getVersion());
+			return new MutableCapabilities(updatedCapabilities);
+		} else {
+			return capabilities;
 		}
-		capabilities.setCapability(CapabilityType.PLATFORM_NAME, selectedDevice.getPlatform());
-		((BaseOptions)capabilities).setPlatformVersion(selectedDevice.getVersion());
-		
-		return capabilities;
 	}
 	
 	

@@ -55,8 +55,6 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
-//import org.powermock.api.mockito.PowerMockito;
-//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -65,7 +63,6 @@ import org.testng.annotations.Test;
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
 import com.seleniumtests.ConnectorsTest;
-import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
 import com.seleniumtests.customexception.ScenarioException;
@@ -76,9 +73,6 @@ import kong.unirest.HttpRequest;
 import kong.unirest.HttpRequestWithBody;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
-
-
-//@PrepareForTest({HttpClients.class, Unirest.class})
 public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	

@@ -17,8 +17,6 @@
  */
 package com.seleniumtests.ut.browserfactory;
 
-import static org.mockito.Mockito.when;
-
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -29,19 +27,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.MockedStatic;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.GeckoDriverService;
 import org.openqa.selenium.remote.CapabilityType;
-//import org.powermock.api.mockito.PowerMockito;
-//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -56,7 +52,8 @@ import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.osutility.OSUtility;
 
-//@PrepareForTest({OSUtility.class})
+import static org.mockito.Mockito.*;
+
 public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 
 	@Mock
@@ -68,17 +65,26 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 	@Mock
 	private SeleniumTestsContext context;
 
+	private MockedStatic mockedOsUtility;
+
 	@BeforeMethod(groups= {"ut"})
 	public void init() {
+		mockedOsUtility = mockStatic(OSUtility.class, CALLS_REAL_METHODS);
+
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
 		browserInfos.put(BrowserType.FIREFOX, Arrays.asList(new BrowserInfo(BrowserType.FIREFOX, "58.0", "/usr/bin/firefox", false)));
-//		PowerMockito.mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
-//		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
+
+		mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
 		when(config.getTestContext()).thenReturn(context);
 		when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.NONE));
 		when(config.getPageLoadStrategy()).thenReturn(PageLoadStrategy.NORMAL);
 		when(config.getBrowserType()).thenReturn(BrowserType.FIREFOX);
 		when(config.isSetAcceptUntrustedCertificates()).thenReturn(true);
+	}
+
+	@AfterMethod(groups = "ut", alwaysRun = true)
+	private void closeMocks() {
+		mockedOsUtility.close();
 	}
 	
 	/**
@@ -210,7 +216,7 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		updatedBrowserInfos.put(BrowserType.FIREFOX, Arrays.asList(new BrowserInfo(BrowserType.FIREFOX, "57.0", "", false), 
 																	new BrowserInfo(BrowserType.FIREFOX, "58.0", "/opt/firefox/bin/firefox", false)));
 
-//		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(updatedBrowserInfos);
+		mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(updatedBrowserInfos);
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		

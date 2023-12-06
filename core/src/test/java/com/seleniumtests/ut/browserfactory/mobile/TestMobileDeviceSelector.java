@@ -25,14 +25,12 @@ import java.util.List;
 
 import io.appium.java_client.android.options.UiAutomator2Options;
 import io.appium.java_client.remote.options.BaseOptions;
-import io.appium.java_client.remote.options.SupportsBrowserNameOption;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
-//import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -48,7 +46,6 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.osutility.OSCommand;
 
-//@PrepareForTest({AdbWrapper.class, OSCommand.class})
 public class TestMobileDeviceSelector extends MockitoTest {
 	
 	@Mock
@@ -70,7 +67,7 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
 		
 		// requested caps
-		MutableCapabilities requestedCaps = new DesiredCapabilities();
+		MutableCapabilities requestedCaps = new BaseOptions();
 		((BaseOptions)requestedCaps).setPlatformName("android");
 
 		deviceSelector.setAndroidReady(true);
@@ -89,7 +86,7 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
 		
 		// requested caps
-		DesiredCapabilities requestedCaps = new DesiredCapabilities();
+		BaseOptions requestedCaps = new BaseOptions();
 		requestedCaps.setCapability(CapabilityType.BROWSER_NAME, "firefox");
 		
 		deviceSelector.setAndroidReady(true);
@@ -106,7 +103,7 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
 		
 		// requested caps
-		MutableCapabilities requestedCaps = new DesiredCapabilities();
+		MutableCapabilities requestedCaps = new BaseOptions();
 		((BaseOptions)requestedCaps).setPlatformName("android");
 		
 		deviceSelector.setAndroidReady(false);
@@ -123,7 +120,7 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		when(instrumentsWrapper.parseIosDevices()).thenReturn(deviceList);
 		
 		// requested caps
-		MutableCapabilities requestedCaps = new DesiredCapabilities();
+		MutableCapabilities requestedCaps = new BaseOptions();
 		((BaseOptions)requestedCaps).setPlatformName("iOS");
 		
 		deviceSelector.setAndroidReady(true);
@@ -149,7 +146,7 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		when(instrumentsWrapper.parseIosDevices()).thenReturn(deviceListIos);
 		
 		// requested caps
-		MutableCapabilities requestedCaps = new DesiredCapabilities();
+		MutableCapabilities requestedCaps = new BaseOptions();
 		((BaseOptions)requestedCaps).setPlatformName("android");
 		
 		deviceSelector.setAndroidReady(true);
@@ -176,7 +173,7 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		when(instrumentsWrapper.parseIosDevices()).thenReturn(deviceListIos);
 		
 		// requested caps
-		MutableCapabilities requestedCaps = new DesiredCapabilities();
+		MutableCapabilities requestedCaps = new BaseOptions<>();
 		((BaseOptions)requestedCaps).setPlatformName("iOS");
 		
 		deviceSelector.setAndroidReady(true);
@@ -198,7 +195,7 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
 		
 		// requested caps
-		MutableCapabilities requestedCaps = new DesiredCapabilities();
+		MutableCapabilities requestedCaps = new BaseOptions();
 		((BaseOptions)requestedCaps).setPlatformName("android")
 				.setPlatformVersion("6.0");
 
@@ -221,18 +218,19 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		deviceList.add(new MobileDevice("nexus 5", "1234", "android", "5.0", new ArrayList<>()));
 		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
 		
-		MutableCapabilities requestedCaps = new DesiredCapabilities();
+		MutableCapabilities requestedCaps = new UiAutomator2Options();
 		((UiAutomator2Options)requestedCaps).setDeviceName("Nexus 5");
 		
 		deviceSelector.setAndroidReady(true);
 		deviceSelector.setIosReady(false);
 
-		UiAutomator2Options updatedCaps = (UiAutomator2Options)deviceSelector.updateCapabilitiesWithSelectedDevice(requestedCaps, DriverMode.LOCAL);
+		// pass a MutableCapabilities to be sure castings are correct. In core, it's this type which is transmitted
+		UiAutomator2Options updatedCaps = new UiAutomator2Options(deviceSelector.updateCapabilitiesWithSelectedDevice(new MutableCapabilities(requestedCaps), DriverMode.LOCAL));
 		Assert.assertEquals(updatedCaps.getPlatformName(), Platform.ANDROID);
 		Assert.assertEquals(updatedCaps.getDeviceName().orElse(null), "nexus 5");
 		Assert.assertEquals(updatedCaps.getUdid().orElse(null), "1234");
 		Assert.assertEquals(updatedCaps.getPlatformVersion().orElse(null), "5.0");
-		Assert.assertNull(updatedCaps.getChromedriverExecutable().orElse(""));
+		Assert.assertTrue(updatedCaps.getChromedriverExecutable().isEmpty());
 	}
 	
 	/**
@@ -247,13 +245,13 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		deviceList.add(new MobileDevice("nexus 5", "1234", "android", "5.0", Arrays.asList(chromeInfo)));
 		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
 
-		MutableCapabilities requestedCaps = new DesiredCapabilities();
+		MutableCapabilities requestedCaps = new UiAutomator2Options();
 		((UiAutomator2Options)requestedCaps).setDeviceName("Nexus 5").withBrowserName("chrome");
 		
 		deviceSelector.setAndroidReady(true);
 		deviceSelector.setIosReady(false);
 
-		UiAutomator2Options updatedCaps = (UiAutomator2Options) deviceSelector.updateCapabilitiesWithSelectedDevice(requestedCaps, DriverMode.LOCAL);
+		UiAutomator2Options updatedCaps = new UiAutomator2Options(deviceSelector.updateCapabilitiesWithSelectedDevice(new MutableCapabilities(requestedCaps), DriverMode.LOCAL));
 		Assert.assertEquals(updatedCaps.getChromedriverExecutable().orElse(null), "chromedriver.exe");
 		
 	}
@@ -270,14 +268,14 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		deviceList.add(new MobileDevice("nexus 5", "1234", "android", "5.0", Arrays.asList(chromeInfo)));
 		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
 
-		MutableCapabilities requestedCaps = new DesiredCapabilities();
+		MutableCapabilities requestedCaps = new UiAutomator2Options();
 		((UiAutomator2Options)requestedCaps).setDeviceName("Nexus 5").withBrowserName("browser");
 		
 		deviceSelector.setAndroidReady(true);
 		deviceSelector.setIosReady(false);
 
-		UiAutomator2Options updatedCaps = (UiAutomator2Options) deviceSelector.updateCapabilitiesWithSelectedDevice(requestedCaps, DriverMode.LOCAL);
-		Assert.assertNull(updatedCaps.getChromedriverExecutable().orElse(""));
+		UiAutomator2Options updatedCaps = new UiAutomator2Options(deviceSelector.updateCapabilitiesWithSelectedDevice(new MutableCapabilities(requestedCaps), DriverMode.GRID));
+		Assert.assertTrue(updatedCaps.getChromedriverExecutable().isEmpty());
 		
 	}
 }
