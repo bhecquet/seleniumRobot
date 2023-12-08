@@ -31,12 +31,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import io.appium.java_client.android.options.UiAutomator2Options;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
@@ -47,6 +49,7 @@ import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.DriverCommand;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -196,25 +199,9 @@ public class TestHtmlElement extends MockitoTest {
 		when(subElement1.getLocation()).thenReturn(new Point(5, 5));
 		when(subElement2.getLocation()).thenReturn(new Point(5, 5));
 
-		when(mobileElement.getLocation()).thenReturn(new Point(1, 1));
-		when(mobileElement.getSize()).thenReturn(new Dimension(8, 8));
-		when(mobileElement.isDisplayed()).thenReturn(true);
-		when(mobileElement.getId()).thenReturn("1234");
+		mobileDriver = mock(AndroidDriver.class);
+		when(mobileDriver.getCapabilities()).thenReturn(new UiAutomator2Options());
 
-//		// init for mobile tests
-		AppiumCommandExecutor ce = Mockito.mock(AppiumCommandExecutor.class);
-		Response response = new Response(new SessionId("1"));
-		response.setValue(new HashMap<>());
-		Response findResponse = new Response(new SessionId("1"));
-		findResponse.setValue(mobileElement);
-
-		// newSession, getSession, getSession, findElement
-		when(ce.execute(any())).thenReturn(response, response, response, findResponse);
-		doReturn(response).when(ce).execute(argThat(command -> DriverCommand.NEW_SESSION.equals(command.getName())));
-		doReturn(response).when(ce).execute(argThat(command -> DriverCommand.FIND_ELEMENT.equals(command.getName())));
-		doReturn(response).when(ce).execute(argThat(command -> "getSession".equals(command.getName())));
-
-		mobileDriver = Mockito.spy(new AndroidDriver(ce, new DesiredCapabilities()));
 		doReturn("my.package").when(mobileDriver).getCurrentPackage();
 
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);

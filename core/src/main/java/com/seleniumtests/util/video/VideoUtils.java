@@ -1,7 +1,6 @@
 package com.seleniumtests.util.video;
 
 import static java.lang.Math.min;
-import static org.monte.media.FormatKeys.MediaTypeKey;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -13,17 +12,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.Logger;
-import org.monte.media.FormatKeys.MediaType;
+import org.monte.media.av.FormatKeys;
+import org.monte.media.avi.AVIReader;
 import org.monte.media.math.Rational;
 
-import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
-import com.seleniumtests.util.video.avi.AVIReader;
 
 /**
  * Class for doing several action on video recorded by SeleniumRobot
@@ -59,7 +57,7 @@ public class VideoUtils {
             // Look for the first video track
             int trackId = 0;
             while (trackId < in.getTrackCount()
-                    && in.getFormat(trackId).get(MediaTypeKey) != MediaType.VIDEO) {
+                    && in.getFormat(trackId).get(FormatKeys.MediaTypeKey) != FormatKeys.MediaType.VIDEO) {
                 trackId++;
             }
             

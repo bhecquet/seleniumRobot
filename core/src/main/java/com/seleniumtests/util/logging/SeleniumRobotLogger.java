@@ -334,9 +334,12 @@ public class SeleniumRobotLogger {
 			((LoggerContext)LogManager.getContext(false)).updateLoggers();
 
 		}
-		Path logFilePath = Paths.get(outputDirectory, SeleniumRobotLogger.LOG_FILE_NAME).toAbsolutePath();
-		if (logFilePath.toFile().exists()) {
-			Files.delete(logFilePath);
+		if (outputDirectory != null) {
+			Path logFilePath = Paths.get(outputDirectory, SeleniumRobotLogger.LOG_FILE_NAME).toAbsolutePath();
+			if (logFilePath.toFile().exists()) {
+				Files.delete(logFilePath);
+
+			}
 		}
 	}
 	

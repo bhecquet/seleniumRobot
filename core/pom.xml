@@ -112,9 +112,9 @@
 		    <groupId>org.zeroturnaround</groupId>
 		    <artifactId>zt-zip</artifactId>
 		</dependency>
-   		<dependency>
-			<groupId>com.github.stephenc.monte</groupId>
-			<artifactId>monte-screen-recorder</artifactId>
+		<dependency>
+			<groupId>ch.randelshofer</groupId>
+			<artifactId>org.monte.media.screenrecorder</artifactId>
 		</dependency>
 		<dependency>
 		    <groupId>com.konghq</groupId>
@@ -519,11 +519,10 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.11.0</version>
-<!--				<version>3.9.0</version>-->
 				<configuration>
 					<encoding>utf-8</encoding>
-					<source>11</source>
-					<target>11</target>
+					<source>17</source>
+					<target>17</target>
 					<!-- https://stackoverflow.com/questions/26817884/netbeans-and-bad-service-configuration-file-or-exception-thrown-while-construct-->
 <!--					<compilerArgument>-proc:none</compilerArgument>-->
 					<compilerArgs>
@@ -569,9 +568,11 @@
 							<value>${testng.utTestnames}</value>
 						</property>
 					</properties>
-				<!-- JDK11 ??
-				<argLine>- -illegal-access=permit </argLine> 
-				-->
+					<argLine>
+						--add-opens=java.base/java.lang=ALL-UNNAMED
+						--add-opens=java.base/java.util=ALL-UNNAMED
+					</argLine>
+
 					
 				<!-- comment for online instrumentation -->
 					<systemPropertyVariables>
@@ -600,7 +601,7 @@
                         <jacoco-agent.destfile>${project.build.directory}/coverage-reports/jacoco-it.exec</jacoco-agent.destfile>
                         <mavenExecution>true</mavenExecution>
 					</systemPropertyVariables>
-					<argLine>${argLine} -Ddebug=${seleniumRobot.debug} -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"</argLine>
+					<argLine>${argLine} -Ddebug=${seleniumRobot.debug} -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar" --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED</argLine>
 				<!-- /comment -->
 				<!-- uncomment for online instrumentation -->
 					<!-- <argLine>${failsafeArgLine} -Ddebug=${seleniumRobot.debug} -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"</argLine> -->
@@ -652,9 +653,9 @@
 					</dependency>
 				</dependencies>
 				<configuration>
-					<complianceLevel>11</complianceLevel>
-					<source>11</source>
-					<target>11</target>
+					<complianceLevel>17</complianceLevel>
+					<source>17</source>
+					<target>17</target>
 					<showWeaveInfo>false</showWeaveInfo>
 					<Xlint>unmatchedSuperTypeInCall=ignore</Xlint>
 					<weaveDependencies>
@@ -834,12 +835,6 @@
 							<goal>test-jar</goal>
 						</goals>
 					</execution>
-					<execution>
-						<id>jar</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
 				</executions>
 			</plugin>
 			<plugin>
@@ -847,7 +842,7 @@
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>3.6.0</version>
 				<configuration>
-			      <source>11</source>
+			      <source>17</source>
 					<skip>${skipJavadoc}</skip>
 			    </configuration> 
 				<executions>
