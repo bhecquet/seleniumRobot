@@ -35,6 +35,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.testng.Assert;
 import org.testng.SkipException;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -82,6 +83,13 @@ public class TestWindowsOsUtility extends MockitoTest {
 		
 		if (!OSUtility.isWindows()) {
 			throw new SkipException("Test only available on Windows platform");
+		}
+	}
+	@AfterMethod(groups={"ut"}, alwaysRun = true)
+	public void resetBrowserList() {
+
+		if (OSUtility.isWindows()) {
+			OSUtility.resetInstalledBrowsersWithVersion();
 		}
 	}
 

@@ -1,5 +1,5 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
-<suite name="Unit test suite" parallel="false" verbose="1" thread-count="1" configfailurepolicy="continue" group-by-instances="true">
+<suite name="Unit test suite" parallel="none" verbose="1" thread-count="1" configfailurepolicy="continue" group-by-instances="true">
    
 	<parameter name="implicitWaitTimeOut" value="2"></parameter>
 	<parameter name="browser" value="chrome" />
