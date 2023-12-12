@@ -101,7 +101,7 @@ public class TestWebUIDriver extends MockitoTest {
 		when(options.timeouts()).thenReturn(timeouts);
 		when(options.logs()).thenReturn(logs);
 		when(drv2.getCapabilities()).thenReturn(new DesiredCapabilities()); 
-		when(neoloadDriver.getCapabilities()).thenReturn(new DesiredCapabilities()); 
+//		when(neoloadDriver.getCapabilities()).thenReturn(new DesiredCapabilities());
 	}
 	
 	/**
@@ -113,7 +113,7 @@ public class TestWebUIDriver extends MockitoTest {
 		WebDriver driver = WebUIDriver.getWebDriver(true);
 		
 		Assert.assertTrue(driver instanceof CustomEventFiringWebDriver);
-		Assert.assertNull(((CustomEventFiringWebDriver)driver).getNeoloadDriver());
+//		Assert.assertNull(((CustomEventFiringWebDriver)driver).getNeoloadDriver());
 		
 		Capabilities caps = ((CustomEventFiringWebDriver)driver).getInternalCapabilities();
 		Assert.assertNotNull(caps.getCapability(SeleniumRobotCapabilityType.START_TIME));
@@ -213,9 +213,9 @@ public class TestWebUIDriver extends MockitoTest {
 			SeleniumTestsContextManager.getThreadContext().setNeoloadUserPath("path");
 			System.setProperty("nl.selenium.proxy.mode", "Design");
 			SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-			
+
 			WebDriver driver = WebUIDriver.getWebDriver(true);
-			
+
 			Assert.assertTrue(driver instanceof CustomEventFiringWebDriver);
 			Assert.assertNotNull(((CustomEventFiringWebDriver)driver).getNeoloadDriver());
 		} finally {

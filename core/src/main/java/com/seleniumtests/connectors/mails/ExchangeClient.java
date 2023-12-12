@@ -17,14 +17,14 @@
  */
 package com.seleniumtests.connectors.mails;
 
-import java.io.IOException;
+import jakarta.mail.MessagingException;
 
-import javax.mail.MessagingException;
+import java.io.IOException;
 
 
 public class ExchangeClient extends ImapClient {
 	
-	public ExchangeClient(String host, String username, String password, String folder) throws MessagingException, IOException {
+	public ExchangeClient(String host, String username, String password, String folder) throws MessagingException {
 		super(host, username, password, folder, 143);
 	}
 }

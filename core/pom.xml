@@ -40,11 +40,22 @@
 		  <groupId>com.deque.html.axe-core</groupId>
 		  <artifactId>selenium</artifactId>
 		  <version>4.8.0</version>
+			<!-- JDK 17: exclude webdrivermanager as we don't need it-->
+			<!--<exclusions>
+				<exclusion>
+					<groupId>io.github.bonigarcia</groupId>
+					<artifactId>webdrivermanager</artifactId>
+				</exclusion>
+			</exclusions>-->
 		</dependency>
 		<dependency>
 		  <groupId>com.eatthepath</groupId>
 		  <artifactId>java-otp</artifactId>
 		  <version>0.4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.atlassian.jira</groupId>
@@ -151,19 +162,14 @@
             <version>2.0</version>
 		</dependency>
 		<dependency>
-            <groupId>javax.xml.ws</groupId>
-            <artifactId>jaxws-api</artifactId>
-            <version>2.3.1</version>
-        </dependency>
-		<dependency>
 			<groupId>com.hierynomus</groupId>
 			<artifactId>sshj</artifactId>
 			<version>0.37.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.mail</groupId>
-			<artifactId>javax.mail</artifactId>
-			<version>1.6.2</version>
+			<artifactId>jakarta.mail</artifactId>
+			<version>2.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jsoup</groupId>
@@ -290,11 +296,6 @@
         	<artifactId>jdom</artifactId>
         	<version>2.0.2</version>
         </dependency>
-		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
-			<version>2.3.1</version>
-		</dependency>
         
         <dependency>
 	        <groupId>org.sonarsource.java</groupId>
@@ -314,22 +315,16 @@
 			<version>0.5.2</version>
 			<scope>test</scope>
 		</dependency>
-<!--	   <dependency>-->
-<!--	      <groupId>org.powermock</groupId>-->
-<!--	      <artifactId>powermock-api-mockito2</artifactId>-->
-<!--	      <version>${powermock.version}</version>-->
-<!--	      <scope>test</scope>-->
-<!--	   </dependency>-->
-<!--	   <dependency>-->
-<!--	      <groupId>org.powermock</groupId>-->
-<!--	      <artifactId>powermock-module-testng</artifactId>-->
-<!--	      <version>${powermock.version}</version>-->
-<!--	      <scope>test</scope>-->
-<!--	   </dependency>-->
-        <dependency>
-			<groupId>org.seleniumhq.selenium</groupId>
-			<artifactId>jetty-repacked</artifactId>
-			<version>9.4.12.v20180830.1</version>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>9.4.45.v20220203</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-servlet</artifactId>
+			<version>9.4.45.v20220203</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- needed for offline instrumentation. Offline is used because tests using powermockito are not correctly analyzed due to https://github.com/powermock/powermock/issues/727 -->
@@ -528,6 +523,7 @@
 					<compilerArgs>
 						<arg>--add-modules</arg>
 						<arg>java.desktop</arg>
+						<arg>--patch-module=java.annotation=jsr305-3.0.2.jar</arg>
 					</compilerArgs>
 				</configuration>
 				
@@ -558,6 +554,7 @@
 						<suiteXmlFile>data/core/testng/tu.xml</suiteXmlFile>
 					</suiteXmlFiles>
 					<skipTests>${skipUTs}</skipTests>
+					<useModulePath>false</useModulePath>
 					<properties>
 						<property>
 							<name>usedefaultlisteners</name>
@@ -571,6 +568,12 @@
 					<argLine>
 						--add-opens=java.base/java.lang=ALL-UNNAMED
 						--add-opens=java.base/java.util=ALL-UNNAMED
+
+						<!-- JDK 17 modules
+						-patch-module=java.annotation=jsr305-3.0.2.jar > to avoid error Modules jsr305 and java.annotation export package javax.annotation ...
+						-patch-module=org.aspectj.runtime=aspectjweaver-${aspectj.version}.jar > to avoid error Modules org.aspectj.runtime and org.aspectj.weaver export package org.aspectj.runtime.reflect ...
+						-patch-module=jdk.jsobject=${settings.localRepository}/org/htmlunit/htmlunit/3.7.0/htmlunit-3.7.0.jar > to avoid  Modules jdk.jsobject and htmlunit export package netscape.javascript to module
+						-->
 					</argLine>
 
 					

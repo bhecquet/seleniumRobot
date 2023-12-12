@@ -20,6 +20,7 @@ package com.seleniumtests.ut.connectors.mails;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.mails.*;
 import com.seleniumtests.customexception.ScenarioException;
+import jakarta.mail.MessagingException;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.testng.Assert;
@@ -29,7 +30,6 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.customexception.ConfigurationException;
 
-import javax.mail.MessagingException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;

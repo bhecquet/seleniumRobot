@@ -30,10 +30,7 @@ import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.mail.MessagingException;
-
 import com.seleniumtests.customexception.ScenarioException;
-import net.bytebuddy.implementation.bytecode.Throw;
 import org.apache.logging.log4j.Logger;
 
 import com.seleniumtests.util.helper.WaitHelper;
@@ -95,7 +92,6 @@ public abstract class EmailClientImpl implements EmailClient {
      *
      * @param folderName        name of folder to read
      * @param firstMessageIndex date from which we should get messages
-     * @throws MessagingException
      * @throws IOException
      */
     @Override

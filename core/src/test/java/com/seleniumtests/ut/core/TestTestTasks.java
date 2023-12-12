@@ -714,12 +714,12 @@ public class TestTestTasks extends MockitoTest {
 
 			SeleniumTestsContextManager.getThreadContext().setManualTestSteps(true);
 			TestTasks.addStep("foo");
-			TestTasks.addStep(null); 
-			
+			TestTasks.addStep(null);
+
 			// check we crate a new page
 			verify(neoloadDriver).startTransaction("foo");
 			verify(neoloadDriver).stopTransaction();
-			
+
 		} finally {
 			GenericTest.resetTestNGREsultAndLogger();
 		}

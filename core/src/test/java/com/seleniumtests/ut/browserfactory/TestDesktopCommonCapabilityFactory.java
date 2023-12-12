@@ -143,24 +143,24 @@ public class TestDesktopCommonCapabilityFactory extends MockitoTest {
 	public void testCreateHtmlUnitCapabilitiesWithNeoloadDesign() {
 		Proxy nlproxy = new Proxy();
 		nlproxy.setHttpProxy("localhost:8090");
-		
+
 		DesiredCapabilities nlCaps = new DesiredCapabilities();
 		nlCaps.setCapability(CapabilityType.PROXY, nlproxy);
-		
+
 		try (MockedStatic mockedNLDriverFactory = mockStatic(NLWebDriverFactory.class)){
 
 			mockedNLDriverFactory.when(() -> NLWebDriverFactory.addProxyCapabilitiesIfNecessary(any(DesiredCapabilities.class))).thenReturn(nlCaps);
 			when(config.isNeoloadActive()).thenReturn(true);
 			System.setProperty("nl.selenium.proxy.mode", "Design");
-			
+
 			MutableCapabilities capa = new HtmlUnitCapabilitiesFactory(config).createCapabilities();
-			
+
 			// we check that we have called the neoload method
 			Assert.assertNotNull(capa.getCapability(CapabilityType.PROXY));
 			Assert.assertEquals(((Proxy)capa.getCapability(CapabilityType.PROXY)).getHttpProxy(), "localhost:8090");
-			
-			
-			
+
+
+
 		} finally {
 			System.clearProperty("nl.selenium.proxy.mode");
 		}
@@ -171,12 +171,12 @@ public class TestDesktopCommonCapabilityFactory extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testCreateHtmlUnitCapabilitiesWithNeoloadRecording() {
-		
+
 		Proxy proxy = new Proxy();
 		proxy.setHttpProxy("localhost:1234");
 		Proxy nlproxy = new Proxy();
 		nlproxy.setHttpProxy("localhost:8090");
-		
+
 		DesiredCapabilities nlCaps = new DesiredCapabilities();
 		nlCaps.setCapability(CapabilityType.PROXY, nlproxy);
 
@@ -186,11 +186,11 @@ public class TestDesktopCommonCapabilityFactory extends MockitoTest {
 			when(config.isNeoloadActive()).thenReturn(true);
 			when(config.getProxy()).thenReturn(proxy);
 			System.setProperty("nl.selenium.proxy.mode", "Design");
-			
+
 			MutableCapabilities capa = new HtmlUnitCapabilitiesFactory(config).createCapabilities();
 			Assert.assertNotNull(capa.getCapability(CapabilityType.PROXY));
 			Assert.assertEquals(((Proxy)capa.getCapability(CapabilityType.PROXY)).getHttpProxy(), "localhost:8090");
-			
+
 		} finally {
 			System.clearProperty("nl.selenium.proxy.mode");
 		}
@@ -206,9 +206,9 @@ public class TestDesktopCommonCapabilityFactory extends MockitoTest {
 			mockedNLDriverFactory.when(() -> NLWebDriverFactory.addProxyCapabilitiesIfNecessary(any(DesiredCapabilities.class))).thenThrow(ExceptionInInitializerError.class);
 			when(config.isNeoloadActive()).thenReturn(true);
 			System.setProperty("nl.selenium.proxy.mode", "Design");
-			
+
 			new HtmlUnitCapabilitiesFactory(config).createCapabilities();
-			
+
 		} finally {
 			System.clearProperty("nl.selenium.proxy.mode");
 		}
@@ -225,9 +225,9 @@ public class TestDesktopCommonCapabilityFactory extends MockitoTest {
 			mockedNLDriverFactory.when(() -> NLWebDriverFactory.addProxyCapabilitiesIfNecessary(any(DesiredCapabilities.class))).thenThrow(RuntimeException.class);
 			when(config.isNeoloadActive()).thenReturn(true);
 			System.setProperty("nl.selenium.proxy.mode", "Design");
-			
+
 			new HtmlUnitCapabilitiesFactory(config).createCapabilities();
-			
+
 		} finally {
 			System.clearProperty("nl.selenium.proxy.mode");
 		}
