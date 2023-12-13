@@ -20,6 +20,7 @@ package com.seleniumtests;
 import java.io.IOException;
 import java.net.ServerSocket;
 
+import com.seleniumtests.util.osutility.OSUtility;
 import org.openqa.selenium.WebDriver;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -75,6 +76,7 @@ public class GenericDriverTest {
 		WebUIDriver.cleanUp();
 
 		GenericTest.resetTestNGREsultAndLogger();
+		OSUtility.resetInstalledBrowsersWithVersion();
 	}
 	
 	public static int findFreePort() {

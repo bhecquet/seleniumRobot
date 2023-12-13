@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 
+import com.seleniumtests.util.osutility.OSUtility;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.testng.ITestContext;
@@ -89,6 +90,7 @@ public class GenericTest {
 	@AfterMethod(groups={"ut", "it", "ut context2"}, alwaysRun=true) 
 	public void reset() {
 		resetTestNGREsultAndLogger();
+		OSUtility.resetInstalledBrowsersWithVersion();
 	}
 	
 	@AfterClass(groups={"ut", "it", "ut context2"}, alwaysRun=true)

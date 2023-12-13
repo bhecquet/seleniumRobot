@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.seleniumtests.util.osutility.OSUtility;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.Logger;
@@ -87,6 +88,7 @@ public class MockitoTest {
 	public void afterMethod(final Method method) throws Exception {
 
 		GenericTest.resetTestNGREsultAndLogger();
+		OSUtility.resetInstalledBrowsersWithVersion();
 	}
 	
 

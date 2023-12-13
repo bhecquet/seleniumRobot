@@ -41,6 +41,7 @@ public class TestSeleniumTestsContext extends GenericTest {
 			String log = ReporterTest.readSeleniumRobotLogFile();
 			Assert.assertTrue(log.contains("Test is OK"));
 		} finally {
+			OSUtility.resetInstalledBrowsersWithVersion();
 			System.clearProperty(SeleniumTestsContext.CHROME_BINARY_PATH);
 		}
 	}
