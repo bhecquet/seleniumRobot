@@ -37,4 +37,11 @@ public class OSUtilityFactory {
 		}
 		return instance;
 	}
+
+	/**
+	 * For tests
+	 */
+	public static void resetInstance() {
+		instance = null;
+	}
 }

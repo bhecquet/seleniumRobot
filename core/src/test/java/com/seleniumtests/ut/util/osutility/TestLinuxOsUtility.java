@@ -30,13 +30,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.seleniumtests.util.osutility.OSUtilityFactory;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.openqa.selenium.Platform;
 import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
@@ -64,8 +67,9 @@ public class TestLinuxOsUtility extends MockitoTest {
 
 	private MockedStatic mockedOsUtility;
 	
-	@BeforeClass(groups = {"ut"})
+	@BeforeMethod(groups = {"ut"})
     public void isWindows() throws Exception {
+		OSUtilityFactory.resetInstance(); // reset OSUtility instance to force recreation with Linux OS
 		mockedOsUtility = mockStatic(OSUtility.class);
 
 		mockedOsUtility.when(() -> OSUtility.getCharset()).thenCallRealMethod();
@@ -80,9 +84,11 @@ public class TestLinuxOsUtility extends MockitoTest {
 		mockedOsUtility.when(() -> OSUtility.extractChromeOrChromiumVersion(anyString())).thenCallRealMethod();
     }
 
-	@AfterClass(groups = {"ut"})
+	@AfterMethod(groups = {"ut"})
 	public void closeMocks() {
 		mockedOsUtility.close();
+
+		OSUtilityFactory.resetInstance(); // remove OSUtility instance so that context initialization occurs on the host OS
 	}
 	
 	
