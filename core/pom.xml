@@ -832,10 +832,10 @@
 							<classpathPrefix>lib/</classpathPrefix>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                 			<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-							<manifestEntries>
-								<Add-Opens>java.base/java.lang java.base/java.util java.base/java.time</Add-Opens>
-							</manifestEntries>
 						</manifest>
+						<manifestEntries>
+							<Add-Opens>java.base/java.lang java.base/java.util java.base/java.time</Add-Opens>
+						</manifestEntries>
 					</archive>
 				</configuration>
 				<executions>
