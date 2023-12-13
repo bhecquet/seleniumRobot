@@ -563,11 +563,13 @@ public class WebUIDriver {
     	if (Boolean.TRUE.equals(isCreate) && !SeleniumTestsContextManager.isNonGuiTest()) {
 	    	if (uxDriverSession.get() == null 
 	        		|| uxDriverSession.get().get(driverName) == null 
-	        		|| uxDriverSession.get().get(driverName).driver == null) {
+	        		|| uxDriverSession.get().get(driverName).driver == null
+					|| !(uxDriverSession.get().get(driverName).driver instanceof CustomEventFiringWebDriver)) {
 	    		createDriver = true;
 	    	
 	    	// we have a driver referenced for this name, is it still available (not closed)
-	    	} else if (((CustomEventFiringWebDriver) uxDriverSession.get().get(driverName).driver).isBrowserClosed()) {
+	    	} else if (uxDriverSession.get().get(driverName).driver instanceof CustomEventFiringWebDriver
+					&& ((CustomEventFiringWebDriver) uxDriverSession.get().get(driverName).driver).isBrowserClosed()) {
     			uxDriverSession.get().remove(driverName);
     			createDriver = true;
 	    	}
@@ -634,10 +636,18 @@ public class WebUIDriver {
     	if (uxDriverSession.get() == null || !uxDriverSession.get().containsKey(driverName)) {
     		throw new ScenarioException(String.format("driver with name %s has not been created", driverName));
     	}
-    	
-    	if (uxDriverSession.get().get(driverName).driver != null && ((CustomEventFiringWebDriver)(uxDriverSession.get().get(driverName).driver)).isBrowserClosed()) {
+
+		if (!(uxDriverSession.get().get(driverName).driver instanceof CustomEventFiringWebDriver)) {
+			logger.warn("Cannot switch to driver, this is not a CustomEventFiringWebDriver");
+			return;
+		}
+
+		if (uxDriverSession.get().get(driverName).driver != null
+				&& uxDriverSession.get().get(driverName).driver instanceof CustomEventFiringWebDriver
+				&& ((CustomEventFiringWebDriver)(uxDriverSession.get().get(driverName).driver)).isBrowserClosed()) {
     		throw new ScenarioException("Cannot switch to a closed driver");
     	}
+
     	setCurrentWebUiDriverName(driverName);
     	
     	scenarioLogger.info(String.format("Switching to driver named '%s'", driverName));

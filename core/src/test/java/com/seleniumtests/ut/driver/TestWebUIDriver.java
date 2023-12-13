@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.seleniumtests.customexception.RetryableDriverException;
 import com.seleniumtests.driver.*;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
@@ -365,7 +366,7 @@ public class TestWebUIDriver extends MockitoTest {
 
 			try {
 				WebUIDriver.getWebDriver(true);
-			} catch (Exception e) {
+			} catch (RetryableDriverException e) {
 				// it's expected
 			}
 			// check we tried to create driver 2 times, because driver was created on grid, but failed to be augmented
@@ -462,7 +463,24 @@ public class TestWebUIDriver extends MockitoTest {
 		
 		Assert.assertNotEquals(driver1, driver2);
 	}
-	
+
+	/**
+	 * #619: when driver augmenting fails, we get a RemoteWebDriver instead of a CustomEventFiringWebDriver
+	 * Check getWebDriver won't fail
+	 */
+	@Test(groups={"ut"})
+	public void testNewDriverCreationWithExistingFailed() {
+		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
+
+		WebUIDriver uiDriver1 = spy(WebUIDriver.getWebUIDriver(true, "main"));
+		RemoteWebDriver realDriver = mock(RemoteWebDriver.class);
+		uiDriver1.setDriver(realDriver);
+		WebUIDriver.getUxDriverSession().get().put("main", uiDriver1);
+
+		WebDriver driver2 = WebUIDriver.getWebDriver(true);
+		Assert.assertNotEquals(driver2, realDriver);
+	}
+
 	/**
 	 * If BrowserType is not given, the type is taken from context parameter
 	 */
