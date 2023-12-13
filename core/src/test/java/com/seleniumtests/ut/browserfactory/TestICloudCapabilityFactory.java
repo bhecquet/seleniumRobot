@@ -46,7 +46,7 @@ public class TestICloudCapabilityFactory extends GenericTest {
 		caps.setApp("/home/app.apk");
 		boolean upload = new StubCloudCapabilityFactory(config).isUploadApp(caps);
 		Assert.assertTrue(upload);
-		Assert.assertEquals(caps.getApp(), "/home/app.apk");
+		Assert.assertEquals(caps.getApp().get(), "/home/app.apk");
 	}
 	
 	@Test(groups="ut")
@@ -55,7 +55,7 @@ public class TestICloudCapabilityFactory extends GenericTest {
 		caps.setApp("NO_UPLOAD:/home/app.apk");
 		boolean upload = new StubCloudCapabilityFactory(config).isUploadApp(caps);
 		Assert.assertFalse(upload);
-		Assert.assertEquals(caps.getApp(), "/home/app.apk");
+		Assert.assertEquals(caps.getApp().get(), "/home/app.apk");
 	}
 
 	

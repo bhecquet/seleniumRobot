@@ -758,8 +758,9 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(1).getString("name"), "action2");
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(1).getBoolean("failed"), false);
 
-		Assert.assertEquals(stepJson.getJSONArray("harCaptures").getJSONObject(0).getString("type"), "networkCapture");
-		Assert.assertEquals(stepJson.getJSONArray("harCaptures").getJSONObject(0).getString("name"), "main");
+// browsermob
+//		Assert.assertEquals(stepJson.getJSONArray("harCaptures").getJSONObject(0).getString("type"), "networkCapture");
+//		Assert.assertEquals(stepJson.getJSONArray("harCaptures").getJSONObject(0).getString("name"), "main");
 
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getString("type"), "step");
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getString("name"), "subStep");

@@ -248,7 +248,10 @@ public class ConnectorsTest extends MockitoTest {
 
 	@AfterMethod(groups={"ut", "it"}, alwaysRun = true)
 	public void resetMocks() {
-		mockedUnirest.close(); // as we do not use try-with-resource
+		if (mockedUnirest != null) {
+			mockedUnirest.close(); // as we do not use try-with-resource
+			mockedUnirest = null;
+		}
 
 		if (mockedWebUiDriver != null) {
 			mockedWebUiDriver.close();

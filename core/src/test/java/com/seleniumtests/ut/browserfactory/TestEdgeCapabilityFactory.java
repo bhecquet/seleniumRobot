@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -87,6 +88,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		when(config.getBrowserType()).thenReturn(BrowserType.EDGE);
 		when(config.getAttachExistingDriverPort()).thenReturn(null);
 		when(config.isSetAcceptUntrustedCertificates()).thenReturn(true);
+		when(config.getOutputDirectory()).thenReturn(SeleniumTestsContextManager.getThreadContext().getOutputDirectory());
 	}
 
 	@AfterMethod(groups = "ut", alwaysRun = true)

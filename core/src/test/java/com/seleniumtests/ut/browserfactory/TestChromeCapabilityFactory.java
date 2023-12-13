@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -83,6 +84,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		when(config.getPageLoadStrategy()).thenReturn(PageLoadStrategy.NORMAL);
 		when(config.getBrowserType()).thenReturn(BrowserType.CHROME);
 		when(config.getAttachExistingDriverPort()).thenReturn(null);
+		when(config.getOutputDirectory()).thenReturn(SeleniumTestsContextManager.getThreadContext().getOutputDirectory());
 	}
 
 	@AfterMethod(groups = "ut", alwaysRun = true)

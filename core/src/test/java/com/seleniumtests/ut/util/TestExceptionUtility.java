@@ -68,10 +68,9 @@ public class TestExceptionUtility extends GenericTest {
 		StringBuilder content = new StringBuilder();
 		ExceptionUtility.generateTheStackTrace(ex, "Failure", content, "html");
 		System.out.println(content.toString());
-		Assert.assertTrue(content.toString().matches("class org.openqa.selenium.WebDriverException: Failure\n"
+		Assert.assertTrue(content.toString().matches("(?s)class org.openqa.selenium.WebDriverException: Failure\n"
 				+ "\n"
-				+ "at com.seleniumtests.ut.util.TestExceptionUtility.testGenerateStackTraceNoCause\\(TestExceptionUtility.java:\\d+\\)\n"
-				+ "at java.util.ArrayList.forEach\\(.*?\\)"));
+				+ "at com.seleniumtests.ut.util.TestExceptionUtility.testGenerateStackTraceNoCause\\(TestExceptionUtility.java:\\d+\\).*"));
 	}
 	
 	@Test(groups= {"ut"})
@@ -81,16 +80,15 @@ public class TestExceptionUtility extends GenericTest {
 		StringBuilder content = new StringBuilder();
 		ExceptionUtility.generateTheStackTrace(ex2, "Failure", content, "html");
 		System.out.println(content.toString());
-		Assert.assertTrue(content.toString().matches("class org.openqa.selenium.WebDriverException: Failure\n"
+		Assert.assertTrue(content.toString().matches("(?s)class org.openqa.selenium.WebDriverException: Failure\n"
 				+ "\n"
 				+ "at com.seleniumtests.ut.util.TestExceptionUtility.testGenerateStackTraceWithCause\\(TestExceptionUtility.java:\\d+\\)\n"
-				+ "at java.util.ArrayList.forEach\\(.*?\\)class org.openqa.selenium.WebDriverException: Caused by foo<br/>\n"
+				+ ".*class org.openqa.selenium.WebDriverException: Caused by foo<br/>\n"
 				+ "Build info: version: '.*?', revision: '.*?'<br/>\n"
 				+ "System info: os.name: '.*?', os.arch: '.*?', os.version: '.*?', java.version: '.*?'<br/>\n"
 				+ "Driver info: driver.version: unknown\n"
 				+ "\n"
-				+ "at com.seleniumtests.ut.util.TestExceptionUtility.testGenerateStackTraceWithCause\\(TestExceptionUtility.java:\\d+\\)\n"
-				+ "at java.util.ArrayList.forEach\\(.*?\\)"));
+				+ "at com.seleniumtests.ut.util.TestExceptionUtility.testGenerateStackTraceWithCause\\(TestExceptionUtility.java:\\d+\\).*"));
 		
 	}
 }

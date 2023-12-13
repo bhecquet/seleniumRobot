@@ -101,7 +101,8 @@ public class TestWebUIDriver extends MockitoTest {
 		when(options.timeouts()).thenReturn(timeouts);
 		when(options.logs()).thenReturn(logs);
 		when(drv2.getCapabilities()).thenReturn(new DesiredCapabilities()); 
-//		when(neoloadDriver.getCapabilities()).thenReturn(new DesiredCapabilities());
+		when(neoloadDriver.getCapabilities()).thenReturn(new DesiredCapabilities());
+		StatisticsStorage.reset();
 	}
 	
 	/**

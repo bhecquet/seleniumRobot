@@ -154,12 +154,14 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 
 	private MockedStatic mockedHttpClients;
 	
-	private MutableCapabilities capabilities = new MutableCapabilities();
-	private MutableCapabilities mobileCapabilities = new UiAutomator2Options();
+	private MutableCapabilities capabilities;
+	private MutableCapabilities mobileCapabilities;
 
 	@BeforeMethod(groups={"ut"})
 	private void init() throws ClientProtocolException, IOException {
 
+		capabilities = new MutableCapabilities();
+		mobileCapabilities = new UiAutomator2Options();
 		mockedHttpClients = mockStatic(HttpClients.class);
 		mockedHttpClients.when(() -> HttpClients.createDefault()).thenReturn(client);
 		when(response.getEntity()).thenReturn(entity);

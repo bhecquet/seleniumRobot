@@ -572,6 +572,7 @@
 					<argLine>
 						--add-opens=java.base/java.lang=ALL-UNNAMED
 						--add-opens=java.base/java.util=ALL-UNNAMED
+						--add-opens=java.base/java.time=ALL-UNNAMED <!-- for GSON -->
 						<!-- JDK 17 modules
 						-patch-module=java.annotation=jsr305-3.0.2.jar > to avoid error Modules jsr305 and java.annotation export package javax.annotation ...
 						-patch-module=org.aspectj.runtime=aspectjweaver-${aspectj.version}.jar > to avoid error Modules org.aspectj.runtime and org.aspectj.weaver export package org.aspectj.runtime.reflect ...
@@ -831,6 +832,9 @@
 							<classpathPrefix>lib/</classpathPrefix>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                 			<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+							<manifestEntries>
+								<Add-Opens>java.base/java.lang java.base/java.util java.base/java.time</Add-Opens>
+							</manifestEntries>
 						</manifest>
 					</archive>
 				</configuration>

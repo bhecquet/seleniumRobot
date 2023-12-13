@@ -352,9 +352,9 @@ public class TestTasks {
 //	    	}
 	    	
 	    	// start a new transaction when using Neoload
-//	    	if (neoloadDriver != null) {
-//				neoloadDriver.startTransaction(stepName);
-//			}
+	    	if (neoloadDriver != null) {
+				neoloadDriver.startTransaction(stepName);
+			}
     	}
     }
     
