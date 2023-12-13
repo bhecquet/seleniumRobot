@@ -360,6 +360,7 @@ public class TestSeleniumIdeParser extends GenericTest {
 				+ "    vars.put(\"dateFin\", driver.findElement(By.xpath(\"//td[8]/div/lds-datepicker/div/input\")).getAttribute(\"value\"));\n"
 				+ "    vars.put(\"dateAujourdhui\", js.executeScript(\"return new Date().toLocaleDateString(\\'fr-FR\\');\"));\n"
 				+ "    assertEquals(vars.get(\"dateAujourdhui\").toString(), vars.get(\"dateFin\").toString());\n"
+				+ "    assertThat(value, is(vars.get(\"dateDemain\").toString()));\n"
 				+ "}\n"
 				+ "\n"
 				+ "\n"

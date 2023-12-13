@@ -103,7 +103,7 @@ public class SeleniumIdeParser {
 		Pattern patternUrl = Pattern.compile("^\\s+driver.get\\(\"(.*?)\"\\);$");
 		Pattern patternCall = Pattern.compile(".*System.out.println\\(\"CALL:(.*)\"\\);$");
 		Pattern patternWait = Pattern.compile(".*new WebDriverWait\\(driver, (\\d+)\\);$");
-		Pattern patternVariableQuote = Pattern.compile("(.*assert.*)\"(vars.get.*)\"\\);$"); // for files of type assertEquals(vars.get("dateAujourdhui").toString(), "vars.get("dateFin").toString()");
+		Pattern patternVariableQuote = Pattern.compile("(.*?)\\\"(vars.get.*.toString\\(\\))\\\"(.*;)$"); // https://github.com/SeleniumHQ/selenium-ide/issues/1175: for files of type assertEquals(vars.get("dateAujourdhui").toString(), "vars.get("dateFin").toString()");
 		try {
 			StringBuilder newContent = new StringBuilder();
 			String content = FileUtils.readFileToString(javaFile, StandardCharsets.UTF_8);
@@ -125,7 +125,7 @@ public class SeleniumIdeParser {
 				
 				// remove quotes around 'vars.get' when present in an assert
 				} else if (matcherQuote.matches()) {
-					newContent.append(String.format("%s%s);\n", matcherQuote.group(1), matcherQuote.group(2)));
+					newContent.append(String.format("%s%s%s\n", matcherQuote.group(1), matcherQuote.group(2), matcherQuote.group(3)));
 					
 				// get first URL (driver.get() call) to pass it the the driver on init
 				} else if (matcherUrl.matches() && !initialUrlFound) {
