@@ -357,7 +357,7 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<artifactId>maven-dependency-plugin</artifactId>
+				<artifactId>maven-dependency-plugin</artifactId><!-- phase: prepare-package-->
 				<version>3.6.1</version>
 				<executions>
 					<execution>
@@ -381,7 +381,7 @@
 			<!-- Put Jacoco plugin before clirr plugin, as they are bound to the same phase 'verify' and clirr may recompile classes which annoys Jacoco -->
 			<plugin>
 				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
+				<artifactId>jacoco-maven-plugin</artifactId><!-- phase: verify -->
 				<version>${jacoco.version}</version>
 
 				<executions>
@@ -474,49 +474,10 @@
                     </execution> -->
 				</executions>
 			</plugin>
-			<plugin>
-		        <groupId>org.codehaus.mojo</groupId>
-		        <artifactId>clirr-maven-plugin</artifactId>
-		        <version>2.8</version>
-		         <dependencies>
-	              <dependency>
-	                <groupId>org.apache.bcel</groupId>
-	                <artifactId>bcel</artifactId>
-	                <version>6.3</version>
-	              </dependency>
-				</dependencies>
-		        <configuration>
-		        	<skip>false</skip>
-        			<ignoredDifferencesFile>${project.build.directory}/classes/clirr-differences.xml</ignoredDifferencesFile>
-        			<includes>
-        				<include>com/seleniumtests/connectors/db/**</include>
-        				<include>com/seleniumtests/connectors/extools/**</include>
-        				<include>com/seleniumtests/connectors/mails/**</include>
-        				<include>com/seleniumtests/connectors/remote/**</include>
-        				<include>com/seleniumtests/core/runner/SeleniumRobotTestPlan.java</include>
-        				<include>com/seleniumtests/core/SeleniumTestsContext.java</include>
-        				<include>com/seleniumtests/core/SeleniumTestsContextManager.java</include>
-        				<include>com/seleniumtests/customexception/**</include>
-        				<include>com/seleniumtests/uipage/**</include>
-        				<include>com/seleniumtests/reporter/reporters/CommonReporter.java</include>
-        			</includes>
-        			<excludes>
-        				<exclude>com/seleniumtests/uipage/aspects/**</exclude>
-        				<exclude>com/seleniumtests/uipage/ReplayOnError</exclude>
-        			</excludes>
-        		</configuration>
-		        <executions>
-		        	<execution>
-			        	<goals>
-			        		<goal>check</goal>
-			        	</goals>
-		        	</execution>
-		        </executions>
-		      </plugin>
 			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
+				<artifactId>maven-compiler-plugin</artifactId> <!-- phase: compile et test-compile -->
 				<version>3.11.0</version>
 				<configuration>
 					<encoding>utf-8</encoding>
@@ -533,7 +494,7 @@
 				
 			</plugin>
 			<plugin>
-			    <artifactId>maven-antrun-plugin</artifactId>
+			    <artifactId>maven-antrun-plugin</artifactId>  <!-- phase: generate-source -->
 			    <version>3.1.0</version>
 			    <executions>
 			        <execution>
@@ -551,7 +512,7 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
+				<artifactId>maven-surefire-plugin</artifactId>  <!-- phase: test -->
 				<version>3.2.1</version>
 				<configuration>
 					<suiteXmlFiles>
@@ -598,7 +559,7 @@
 			</plugin>
 			<plugin>
 		        <groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-failsafe-plugin</artifactId>
+				<artifactId>maven-failsafe-plugin</artifactId>  <!-- phase: integration-test et verify-->
 				<version>3.2.1</version>
 				<configuration>
 					<skipTests>${skipTests}</skipTests>
@@ -650,7 +611,7 @@
     		</plugin>
             <plugin>
 				<groupId>dev.aspectj</groupId>
-				<artifactId>aspectj-maven-plugin</artifactId>
+				<artifactId>aspectj-maven-plugin</artifactId>  <!-- phase: compile / test-compile -->
 				<version>1.13.1</version>
 				<dependencies>
 					<dependency>
@@ -701,7 +662,7 @@
 				</executions>
 			</plugin>
             <plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
+				<artifactId>maven-assembly-plugin</artifactId>  <!-- phase: package -->
 				<version>3.6.0</version>
 				<dependencies>
 					<dependency>
@@ -730,7 +691,7 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
+				<artifactId>maven-resources-plugin</artifactId>  <!-- phase: process-resources / process-test-resources -->
 				<version>3.3.1</version>
 				<executions>
 					<execution>
@@ -808,7 +769,7 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
+				<artifactId>maven-source-plugin</artifactId>  <!-- phase: package -->
 				<version>3.3.0</version>
 				<executions>
 					<execution>
@@ -821,7 +782,7 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
+				<artifactId>maven-jar-plugin</artifactId> <!-- phase: package -->
 				<version>3.3.0</version>
 				<configuration>
 					<skip>${skipJar}</skip>
@@ -849,7 +810,7 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
+				<artifactId>maven-javadoc-plugin</artifactId>  <!-- phase: package -->
 				<version>3.6.0</version>
 				<configuration>
 			      <source>17</source>
@@ -873,7 +834,7 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-gpg-plugin</artifactId>
+				<artifactId>maven-gpg-plugin</artifactId> <!-- phase: verify -->
 				<version>3.1.0</version>
 				<executions>
 					<execution>
@@ -900,7 +861,7 @@
 			</plugin>
 			<plugin>
 		        <groupId>org.apache.maven.plugins</groupId>
-		        <artifactId>maven-release-plugin</artifactId>
+		        <artifactId>maven-release-plugin</artifactId> <!-- phase: release -->
 		        <version>3.0.1</version>
 		        <configuration>
 		        	<arguments>${proxyString}</arguments>
