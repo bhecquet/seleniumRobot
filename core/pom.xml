@@ -54,6 +54,10 @@
 		  <version>0.4.0</version>
 		</dependency>
 		<dependency>
+			<groupId>jakarta.xml.bind</groupId>
+			<artifactId>jakarta.xml.bind-api</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
 		</dependency>
@@ -568,7 +572,6 @@
 					<argLine>
 						--add-opens=java.base/java.lang=ALL-UNNAMED
 						--add-opens=java.base/java.util=ALL-UNNAMED
-
 						<!-- JDK 17 modules
 						-patch-module=java.annotation=jsr305-3.0.2.jar > to avoid error Modules jsr305 and java.annotation export package javax.annotation ...
 						-patch-module=org.aspectj.runtime=aspectjweaver-${aspectj.version}.jar > to avoid error Modules org.aspectj.runtime and org.aspectj.weaver export package org.aspectj.runtime.reflect ...

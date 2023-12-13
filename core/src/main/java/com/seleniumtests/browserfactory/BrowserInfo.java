@@ -500,6 +500,7 @@ public class BrowserInfo {
 		return driverList;
 	}
 
+	// for tests only
 	public static void setDriverList(List<String> driverList) {
 		BrowserInfo.driverList = driverList;
 	}

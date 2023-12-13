@@ -64,6 +64,10 @@
 		    <artifactId>unirest-java</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>jakarta.xml.bind</groupId>
+			<artifactId>jakarta.xml.bind-api</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.infotel.seleniumRobot</groupId>
 			<artifactId>seleniumRobot-windows-driver</artifactId>
 		</dependency>
