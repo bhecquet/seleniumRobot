@@ -21,6 +21,7 @@ package com.seleniumtests.ut.connectors.selenium;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.net.SocketException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -102,7 +103,7 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 	 */
 	@Test(groups={"ut"})
 	public void testWithSeleniumRobotGrid() throws UnsupportedOperationException, IOException, UnirestException {
-		
+
 		createGridServletServerMock("GET", SeleniumRobotGridConnector.GUI_SERVLET, 200, guiServletContent);	
 		createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, consoleServletContent);			
 		
@@ -118,12 +119,15 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 	 */
 	@Test(groups={"ut"})
 	public void testWithSeveralSeleniumRobotGrid() throws UnsupportedOperationException, IOException, UnirestException {
-		
+
+		// SeleniumRobot grid
 		createGridServletServerMock("GET", SeleniumRobotGridConnector.GUI_SERVLET, 200, guiServletContent);		
 		createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, consoleServletContent);	
 
-		createServerMock("http://localhost:4431", "GET", SeleniumRobotGridConnector.GUI_SERVLET, 404, "default monitoring page", "request");
-		createServerMock("http://localhost:4421", "GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, consoleServletContent);		
+		// Selenium grid
+		GetRequest getRequest = (GetRequest)createServerMock("http://localhost:4431", "GET", SeleniumRobotGridConnector.GUI_SERVLET, 404, "default monitoring page");
+		when(getRequest.asString()).thenThrow(new UnirestException(new SocketException("permission denied")));
+		createServerMock("http://localhost:4421", "GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, consoleServletContent);
 		
 		List<SeleniumGridConnector> gridConnectors = SeleniumGridConnectorFactory.getInstances(Arrays.asList(SERVER_URL + "/wd/hub", "http://localhost:4421/wd/hub"));
 		
@@ -142,8 +146,9 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 	public void testWithSeveralSeleniumGridNotAllThere() throws UnsupportedOperationException, IOException, UnirestException {
 				
 		// only the second grid replies
-		createServerMock("http://localhost:4431", "GET", SeleniumRobotGridConnector.GUI_SERVLET, 404, "default monitoring page", "request");
-		createServerMock("http://localhost:4421", "GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, consoleServletContent);		
+		GetRequest getRequest = (GetRequest)createServerMock("http://localhost:4431", "GET", SeleniumRobotGridConnector.GUI_SERVLET, 404, "default monitoring page");
+		when(getRequest.asString()).thenThrow(new UnirestException(new SocketException("permission denied")));
+		createServerMock("http://localhost:4421", "GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, consoleServletContent);
 		
 		// 2 grid URL given
 		List<SeleniumGridConnector> gridConnectors = SeleniumGridConnectorFactory.getInstances(Arrays.asList(SERVER_URL + "/wd/hub", "http://localhost:4421/wd/hub"));
@@ -160,9 +165,11 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 	 */
 	@Test(groups={"ut"})
 	public void testWithSeleniumGrid() throws UnsupportedOperationException, IOException, UnirestException {
-		
-		createGridServletServerMock("GET", SeleniumRobotGridConnector.GUI_SERVLET, 404, "default monitoring page");
-		createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, consoleServletContent);			
+
+
+		GetRequest getRequest = (GetRequest)createGridServletServerMock("GET", SeleniumRobotGridConnector.GUI_SERVLET, 404, "default monitoring page");
+		when(getRequest.asString()).thenThrow(new UnirestException(new SocketException("permission denied")));
+		createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, consoleServletContent);
 		
 		Assert.assertTrue(SeleniumGridConnectorFactory.getInstances(Arrays.asList(SERVER_URL + "/wd/hub")).get(0) instanceof SeleniumGridConnector);
 	}
