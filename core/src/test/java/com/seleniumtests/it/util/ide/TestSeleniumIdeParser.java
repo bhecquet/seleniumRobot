@@ -326,11 +326,17 @@ public class TestSeleniumIdeParser extends GenericTest {
 	/**
 	 * Selenium IDE may generate this code:
 	 * <code>
-	 *     vars.put("dateFin", driver.findElement(By.xpath("//td[8]/div/lds-datepicker/div/input")).getAttribute("value"));
-	 *     vars.put("dateAujourdhui", js.executeScript("return new Date().toLocaleDateString(\'fr-FR\');"));
 	 *     assertEquals(vars.get("dateAujourdhui").toString(), "vars.get("dateFin").toString()");
 	 * </code>
-	 * Check we unquote the last "vars.get"
+	 * or
+	 * <code>
+	 *     assertThat(value, is("vars.get("dateDemain").toString()"));
+	 * </code>
+	 * or
+	 * <code>
+	 *     assertThat(driver.findElement(By.xpath("//div/input")).getText(), is("vars.get(\"stringVide\").toString()"));
+	 * </code>
+	 * Check we unquote the last "vars.get" and unescape escaped quotes
 	 */
 	@Test(groups={"it"})
 	public void testCodeGenerationunquoteAssertVariables() throws IOException {
@@ -361,6 +367,7 @@ public class TestSeleniumIdeParser extends GenericTest {
 				+ "    vars.put(\"dateAujourdhui\", js.executeScript(\"return new Date().toLocaleDateString(\\'fr-FR\\');\"));\n"
 				+ "    assertEquals(vars.get(\"dateAujourdhui\").toString(), vars.get(\"dateFin\").toString());\n"
 				+ "    assertThat(value, is(vars.get(\"dateDemain\").toString()));\n"
+				+ "    assertThat(driver.findElement(By.xpath(\"//div/input\")).getText(), is(vars.get(\"stringVide\").toString()));\n"
 				+ "}\n"
 				+ "\n"
 				+ "\n"
@@ -384,6 +391,12 @@ public class TestSeleniumIdeParser extends GenericTest {
 		}
 	}
 
+	/**
+	 * assertThat(driver.findElement(By.xpath("//h2[@class=\"slds-text-heading_small\"]")).getText(), is("Veuillez renseigner l\\\'exhaustivitÃ© "));
+	 * becomes
+	 * assertThat(driver.findElement(By.xpath("//h2[@class=\"slds-text-heading_small\"]")).getText(), is("Veuillez renseigner l'exhaustivitÃ© "));
+	 * @throws IOException
+	 */
 	@Test(groups={"it"})
 	public void testCodeGenerationUnescapeSingleQuote() throws IOException {
 

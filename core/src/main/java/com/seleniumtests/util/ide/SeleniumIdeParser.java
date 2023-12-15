@@ -125,8 +125,9 @@ public class SeleniumIdeParser {
 					newContent.append(String.format("WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(%s));\n", matcherWait.group(1)));
 				
 				// remove quotes around 'vars.get' when present in an assert
+				// also remove escaped quotes : is("vars.get(\"stringVide\").toString()") => is(vars.get("stringVide").toString())
 				} else if (matcherQuote.matches()) {
-					newContent.append(String.format("%s%s%s\n", matcherQuote.group(1), matcherQuote.group(2), matcherQuote.group(3)));
+					newContent.append(String.format("%s%s%s\n", matcherQuote.group(1), matcherQuote.group(2).replace("\\\"", "\""), matcherQuote.group(3)));
 					
 				// get first URL (driver.get() call) to pass it the the driver on init
 				} else if (matcherUrl.matches() && !initialUrlFound) {
