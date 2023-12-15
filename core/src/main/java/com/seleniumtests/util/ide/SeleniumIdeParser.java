@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.github.javaparser.ParseProblemException;
 import com.seleniumtests.core.TestStepManager;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
@@ -148,33 +149,38 @@ public class SeleniumIdeParser {
 	}
 	
 	public Map<String, String> parseSeleniumIdeFile() throws FileNotFoundException {
+		logger.info("Reading file " + javaFile);
 		String initialUrl = prepareJavaFile(javaFile);
 		Map<String, String> classInfo = new HashMap<>();
 		
 		// parse the file
         ParseResult<CompilationUnit> cu = new JavaParser().parse(javaFile);
 
-        cu.getResult().get().accept(new TestMethodVisitor(), new StringBuilder[] {testCode, webPageCode});
-        
-        webPageCode.append(FOOTER);
-        testCode.append(FOOTER);
-        String testCodeStr = testCode
-				.toString()
-				.replace("new WebPage().", String.format("new %sPage().", className));
-        
-        String webPageCodeStr = webPageCode.toString()
-				.replace("https://initialurl.com", initialUrl);
-        
-        classInfo.put("com.infotel.selenium.ide." + className, testCodeStr);
-        classInfo.put("com.infotel.selenium.ide." + className + "Page", webPageCodeStr);
-        
-        logger.info(String.format("generated class %s", className));
-        logger.info("\n" + testCodeStr);
-        logger.info("------------------------------------------");
-        logger.info(String.format("generated class %sPage", className));
-        logger.info("\n" + webPageCodeStr);
-        
-        return classInfo;
+		if (cu.isSuccessful()) {
+			cu.getResult().get().accept(new TestMethodVisitor(), new StringBuilder[]{testCode, webPageCode});
+
+			webPageCode.append(FOOTER);
+			testCode.append(FOOTER);
+			String testCodeStr = testCode
+					.toString()
+					.replace("new WebPage().", String.format("new %sPage().", className));
+
+			String webPageCodeStr = webPageCode.toString()
+					.replace("https://initialurl.com", initialUrl);
+
+			classInfo.put("com.infotel.selenium.ide." + className, testCodeStr);
+			classInfo.put("com.infotel.selenium.ide." + className + "Page", webPageCodeStr);
+
+			logger.info(String.format("generated class %s", className));
+			logger.info("\n" + testCodeStr);
+			logger.info("------------------------------------------");
+			logger.info(String.format("generated class %sPage", className));
+			logger.info("\n" + webPageCodeStr);
+
+			return classInfo;
+		} else {
+			throw new ParseProblemException(cu.getProblems());
+		}
 	}
 	
 

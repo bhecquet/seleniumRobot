@@ -431,7 +431,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 				
 			}
 			
-			verify(logger).error(ArgumentMatchers.contains("invalid code, one element is missing : "));
+			verify(logger).error(ArgumentMatchers.contains("invalid code, one element is missing : (line 68,col 61) Parse error. Found "));
 
 
 		} finally {
@@ -439,6 +439,46 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
 			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);
 			
+			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
+		}
+	}
+
+	@Test(groups={"it"})
+	public void testParseIssue2() throws IOException, ClassNotFoundException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+		try {
+		    SeleniumIdeLauncher seleniumIde = new SeleniumIdeLauncher();
+
+		    Logger logger = spy(SeleniumRobotLogger.getLogger(SeleniumIdeLauncher.class));
+		    Field loggerField = SeleniumIdeLauncher.class.getDeclaredField("logger");
+		    loggerField.setAccessible(true);
+		    loggerField.set(seleniumIde, logger);
+
+
+			CompilerUtils.addClassPath("target/test-classes");
+			System.setProperty(SeleniumTestsContext.BROWSER, "chrome");
+			System.setProperty(SeleniumTestsContext.MANUAL_TEST_STEPS, "true");
+			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "false");
+
+			// use a different file from the previous test to avoid problems with compiler cache
+			File tmpSuiteFile = GenericTest.createFileFromResource("ti/ide/MainPageTestError2.java");
+			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTestError2.java").toFile();
+			FileUtils.copyFile(tmpSuiteFile, suiteFile);
+
+			try {
+				seleniumIde.executeScripts(Arrays.asList(suiteFile.getAbsolutePath()), 1);
+				Assert.assertFalse(true, "Exception should have been raised");
+			} catch (ScenarioException e) {
+
+			}
+
+			verify(logger).error(ArgumentMatchers.contains("invalid code, one element is missing : Lexical error at line 68, column 88"));
+
+
+		} finally {
+			System.clearProperty(SeleniumTestsContext.BROWSER);
+			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
+			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);
+
 			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		}
 	}
