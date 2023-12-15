@@ -18,12 +18,14 @@
 package com.seleniumtests.connectors.selenium;
 
 import java.net.MalformedURLException;
+import java.net.SocketException;
 import java.net.URL;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import kong.unirest.UnirestException;
 import org.apache.logging.log4j.Logger;
 
 import com.seleniumtests.customexception.ConfigurationException;
@@ -114,11 +116,17 @@ public class SeleniumGridConnectorFactory {
 					if (response.getStatus() == 200) {
 						
 						// try to connect to a SeleniumRobot grid specific servlet. If it replies, we are on a seleniumRobot grid
-						HttpResponse<String> responseGuiServlet = Unirest.get(String.format("http://%s:%s%s", hubUrl.getHost(), hubUrl.getPort() + 10, SeleniumRobotGridConnector.GUI_SERVLET)).asString();
-						if (responseGuiServlet.getStatus() == 200) {
-							seleniumGridConnectors.add(new SeleniumRobotGridConnector(hubUrl.toString()));
-		        		} else {
-		        			seleniumGridConnectors.add(new SeleniumGridConnector(hubUrl.toString()));
+						try {
+							HttpResponse<String> responseGuiServlet = Unirest.get(String.format("http://%s:%s%s", hubUrl.getHost(), hubUrl.getPort() + 10, SeleniumRobotGridConnector.GUI_SERVLET)).asString();
+							if (responseGuiServlet.getStatus() == 200) {
+								seleniumGridConnectors.add(new SeleniumRobotGridConnector(hubUrl.toString()));
+							}
+						} catch (UnirestException e) {
+							if (e.getCause() instanceof SocketException) {
+								seleniumGridConnectors.add(new SeleniumGridConnector(hubUrl.toString()));
+							} else {
+								throw e;
+							}
 		        		}
 		        	} else {
 		        		logger.error("Cannot connect to the grid hub at " + hubUrl.toString());
