@@ -637,7 +637,7 @@ public class WebUIDriver {
     		throw new ScenarioException(String.format("driver with name %s has not been created", driverName));
     	}
 
-		if (!(uxDriverSession.get().get(driverName).driver instanceof CustomEventFiringWebDriver)) {
+		if (uxDriverSession.get().get(driverName).driver != null && !(uxDriverSession.get().get(driverName).driver instanceof CustomEventFiringWebDriver)) {
 			logger.warn("Cannot switch to driver, this is not a CustomEventFiringWebDriver");
 			return;
 		}
