@@ -12,10 +12,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.github.javaparser.ParseProblemException;
-import com.seleniumtests.core.TestStepManager;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
@@ -83,7 +81,20 @@ public class SeleniumIdeParser {
 			"import org.testng.annotations.Test;\n" +
 			"\n" + 
 			"public class %s extends SeleniumTestPlan {\n\n";
-	
+
+	public static final String FAILED_PARSING =  "package com.infotel.selenium.ide;\n" +
+			"\n" +
+			"import java.io.IOException;\n" +
+			"import com.seleniumtests.core.runner.SeleniumTestPlan;\n" +
+			"import org.testng.annotations.Test;\n" +
+			"import org.testng.Assert;\n" +
+			"\n" +
+			"public class %s extends SeleniumTestPlan {\n\n" +
+			"	 @Test\n" +
+			"    public void test%s() {\n" +
+			"        Assert.assertFalse(true, \"%s\");\n" +
+			"    }\n" +
+			"}\n";
 	public SeleniumIdeParser(String filePath) {
 		
 		javaFile = new File(filePath);
@@ -180,7 +191,18 @@ public class SeleniumIdeParser {
 
 			return classInfo;
 		} else {
-			throw new ParseProblemException(cu.getProblems());
+			String parse = new ParseProblemException(cu.getProblems()).getMessage().split("Problem")[0];
+			logger.error("--------------------------------------------------------------------------------------------------------------------------------------------------------");
+			logger.error("invalid code, one element is missing : " + parse);
+			logger.error("--------------------------------------------------------------------------------------------------------------------------------------------------------");
+
+			String testCodeStr = String.format(FAILED_PARSING, className, className, parse.replace("\"", "\\\"").replace("\r", "").replace("\n", ""));
+			logger.info(String.format("generated error parsing class %s", className));
+			logger.info("\n" + testCodeStr);
+
+			classInfo.put("com.infotel.selenium.ide." + className, testCodeStr);
+
+			return classInfo;
 		}
 	}
 	
