@@ -788,6 +788,18 @@ public class TestDriver extends GenericMultiBrowserTest {
 	public void testIsElementPresentAndDisplayed() {
 		Assert.assertTrue(DriverTestPage.textElement.isElementPresentAndDisplayed(2));
 	}
+
+	public void testIsElementPresentAndDisplayedWithDelay() {
+
+		try {
+			DriverTestPage.delayHiddenButton.click();
+			Assert.assertFalse(new HtmlElement("", By.id("hiddenContent")).isElementPresentAndDisplayed(1));
+			WaitHelper.waitForSeconds(3);
+			Assert.assertTrue(new HtmlElement("", By.id("hiddenContent")).isElementPresentAndDisplayed(4));
+		} finally {
+			DriverTestPage.delayHiddenButtonReset.click();
+		}
+	}
 	
 	/**
 	 * Element is not present => returns false

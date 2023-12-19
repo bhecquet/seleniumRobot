@@ -347,6 +347,11 @@ public class TestDriverChrome extends TestDriver {
 	}
 
 	@Test(groups={"it", "ut"})
+	public void testIsElementPresentAndDisplayedWithDelay() {
+		super.testIsElementPresentAndDisplayedWithDelay();
+	}
+
+	@Test(groups={"it", "ut"})
 	public void testIsElementNotPresentAndNotDisplayed() {
 		super.testIsElementNotPresentAndNotDisplayed();
 	}

@@ -364,6 +364,11 @@ public class TestDriverInternetExplorer extends TestDriver {
 		super.testIsElementPresentAndDisplayed();
 	}
 
+	@Test(groups={"it", "ut"})
+	public void testIsElementPresentAndDisplayedWithDelay() {
+		super.testIsElementPresentAndDisplayedWithDelay();
+	}
+
 	@Test(groups= {"ie"})
 	public void testIsElementNotPresentAndNotDisplayed() {
 		super.testIsElementNotPresentAndNotDisplayed();

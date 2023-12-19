@@ -1303,14 +1303,19 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     
     /**
      * Search for an element to be present AND displayed
+	 * If element is present and not displayed when method is called, it will wait for it to appear
 	 * 
      * @param timeout	timeout in seconds
      * @return false if the element is not present or present but not displayed
      */
     public boolean isElementPresentAndDisplayed(int timeout) {        
         try {
+			long start = System.currentTimeMillis();
     		waitForPresent(timeout);
-    		return isDisplayed();
+			Long duration = (System.currentTimeMillis() - start) / 1000;
+
+			waitFor(Math.max(1, timeout - duration.intValue()), ExpectedConditions.visibilityOf(this));
+    		return true;
     	} catch (TimeoutException e) {
 			scenarioLogger.warn(String.format("Element %s is not present", getBy()));
     		return false;
