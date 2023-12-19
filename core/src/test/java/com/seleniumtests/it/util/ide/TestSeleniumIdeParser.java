@@ -364,9 +364,10 @@ public class TestSeleniumIdeParser extends GenericTest {
 				+ "    vars.put(\"user\", \"myUser\");\n"
 				+ "    driver.findElement(By.linkText(\"Lib/operator.py\")).click();\n"
 				+ "    vars.put(\"dateFin\", driver.findElement(By.xpath(\"//td[8]/div/lds-datepicker/div/input\")).getAttribute(\"value\"));\n"
-				+ "    vars.put(\"dateAujourdhui\", js.executeScript(\"return new Date().toLocaleDateString(\\'fr-FR\\');\"));\n"
+				+ "    vars.put(\"dateAujourdhui\", js.executeScript(\"return new Date().toLocaleDateString('fr-FR');\"));\n"
 				+ "    assertEquals(vars.get(\"dateAujourdhui\").toString(), vars.get(\"dateFin\").toString());\n"
 				+ "    assertThat(value, is(vars.get(\"dateDemain\").toString()));\n"
+				+ "    assertThat(value, is(vars.get(\"immatriculation_1\").toString()));\n"
 				+ "    assertThat(driver.findElement(By.xpath(\"//div/input\")).getText(), is(vars.get(\"stringVide\").toString()));\n"
 				+ "}\n"
 				+ "\n"
@@ -423,7 +424,7 @@ public class TestSeleniumIdeParser extends GenericTest {
 				+ "    vars.put(\"user\", \"myUser\");\n"
 				+ "    driver.findElement(By.linkText(\"Lib/operator.py\")).click();\n"
 				+ "    vars.put(\"dateFin\", driver.findElement(By.xpath(\"//td[8]/div/lds-datepicker/div/input\")).getAttribute(\"value\"));\n"
-				+ "    vars.put(\"dateAujourdhui\", js.executeScript(\"return new Date().toLocaleDateString(\\'fr-FR\\');\"));\n"
+				+ "    vars.put(\"dateAujourdhui\", js.executeScript(\"return new Date().toLocaleDateString('fr-FR');\"));\n"
 				+ "    assertThat(driver.findElement(By.xpath(\"//h2[@class=\\\"slds-text-heading_small\\\"]\")).getText(), is(\"Veuillez renseigner l'exhaustivitÃ© \"));\n"
 				+ "}\n"
 				+ "\n"
@@ -443,6 +444,58 @@ public class TestSeleniumIdeParser extends GenericTest {
 
 			Assert.assertEquals(classInfo.get("com.infotel.selenium.ide.MainPageSimpleQuoteEscape"), testClassCode);
 			Assert.assertEquals(classInfo.get("com.infotel.selenium.ide.MainPageSimpleQuoteEscapePage"), pageClassCode);
+		} finally {
+			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
+		}
+	}
+
+	@Test(groups={"it"})
+	public void testCodeGenerationVariableInXPath() throws IOException {
+
+		String testClassCode = "package com.infotel.selenium.ide;\n"
+				+ "\n"
+				+ "import java.io.IOException;\n"
+				+ "import com.seleniumtests.core.runner.SeleniumTestPlan;\n"
+				+ "import org.testng.annotations.Test;\n"
+				+ "\n"
+				+ "public class MainPageSimpleXPathContent extends SeleniumTestPlan {\n"
+				+ "\n"
+				+ "    @Test\n"
+				+ "    public void mainPage() throws IOException {\n"
+				+ "        new MainPageSimpleXPathContentPage().mainPage();\n"
+				+ "    }\n"
+				+ "\n"
+				+ "}";
+
+		String pageClassCode = String.format(SeleniumIdeParser.PAGE_OBJECT_HEADER, "MainPageSimpleXPathContent", "MainPageSimpleXPathContent")
+				.replace("https://initialurl.com", "https://docs.python.org/3/library/operator.html") +
+				"public void mainPage(){\n"
+				+ "    driver.get(\"https://docs.python.org/3/library/operator.html\");\n"
+				+ "    driver.manage().window().setSize(new Dimension(1150, 825));\n"
+				+ "    vars.put(\"user\", \"myUser\");\n"
+				+ "    driver.findElement(By.linkText(\"Lib/operator.py\")).click();\n"
+				+ "    vars.put(\"dateFin\", driver.findElement(By.xpath(\"//td[8]/div/lds-datepicker/div/input\")).getAttribute(\"value\"));\n"
+				+ "    vars.put(\"dateAujourdhui\", js.executeScript(\"return new Date().toLocaleDateString('fr-FR');\"));\n"
+				+ "    wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(\"//table//tr[contains(td[1], '\" + vars.get(\"immatriculation\").toString() + \"') and contains(td[2], 'AUDI') and contains(td[3], 'AFRem') and contains(td[4], 'SITE') and contains(td[5], 'FR') and contains(td[6], 'OUI')]\")));\n"
+				+ "    vars.put(\"nbVHOK\", driver.findElements(By.xpath(\"//tr/td[8][(translate(concat(substring(., 8, 4), '-', substring(., 5, 2), '-',  substring(., 2, 2)),  '-', '') >= translate(concat(substring('\" + vars.get(\"dateFinGarantie\").toString() + \"', 7, 4), '-',  substring('\" + vars.get(\"firstVariable\").toString() + \"', 4, 2), '-',  substring('\" + vars.get(\"secondVariable\").toString() + \"', 1, 2)), '-', '')) or not(normalize-space()) or normalize-space()]\")).size());\n"
+				+ "}\n"
+				+ "\n"
+				+ "\n"
+				+ "}";
+
+		try {
+			System.setProperty(SeleniumTestsContext.MANUAL_TEST_STEPS, "false");
+
+			File tmpSuiteFile = createFileFromResource("ti/ide/MainPageSimpleXPathContent.java");
+			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageSimpleXPathContent.java").toFile();
+			FileUtils.copyFile(tmpSuiteFile, suiteFile);
+
+			Map<String, String> classInfo = new SeleniumIdeParser(suiteFile.getAbsolutePath()).parseSeleniumIdeFile();
+
+			Assert.assertTrue(classInfo.containsKey("com.infotel.selenium.ide.MainPageSimpleXPathContent"));
+
+			Assert.assertEquals(classInfo.get("com.infotel.selenium.ide.MainPageSimpleXPathContent"), testClassCode);
+			Assert.assertEquals(classInfo.get("com.infotel.selenium.ide.MainPageSimpleXPathContentPage"), pageClassCode);
 		} finally {
 			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
 		}

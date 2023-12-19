@@ -111,22 +111,37 @@ public class SeleniumIdeParser {
 	private String prepareJavaFile(File javaFile) {
 		String initialUrl = "https://www.selenium.dev";
 		boolean initialUrlFound = false;
-		
+
 		Pattern patternUrl = Pattern.compile("^\\s+driver.get\\(\"(.*?)\"\\);$");
 		Pattern patternCall = Pattern.compile(".*System.out.println\\(\"CALL:(.*)\"\\);$");
 		Pattern patternWait = Pattern.compile(".*new WebDriverWait\\(driver, (\\d+)\\);$");
-		Pattern patternVariableQuote = Pattern.compile("(.*?)\\\"(vars.get.*.toString\\(\\))\\\"(.*;)$"); // https://github.com/SeleniumHQ/selenium-ide/issues/1175: for files of type assertEquals(vars.get("dateAujourdhui").toString(), "vars.get("dateFin").toString()");
+		Pattern patternXPath = Pattern.compile("(.*By.xpath\\(\\\")(.*?)(\\\"\\)[,)].*)");
+		Pattern patternVariableQuote = Pattern.compile("(.*?)\\\"\\s*(vars.get.*.toString\\(\\))\\\"(.*;)$"); // https://github.com/SeleniumHQ/selenium-ide/issues/1175: for files of type assertEquals(vars.get("dateAujourdhui").toString(), "vars.get("dateFin").toString()");
+		Pattern patternVariable = Pattern.compile("(\\$\\{.*?\\})");
+
 		try {
 			StringBuilder newContent = new StringBuilder();
 			String content = FileUtils.readFileToString(javaFile, StandardCharsets.UTF_8);
 			for (String line: content.split("\n")) {
 				line = line.replace("\r", "")
-						.replace("\\\\\\'", "'");
+						.replace("\\\\\\'", "'") // remove double escaping of single quotes
+						.replace("\\'", "'"); // remove escaping of single quotes, which are not necessary
+
+				Matcher matcherVariable = patternVariable.matcher(line);
+
+				// replace ${someVar} by vars.get("someVar");
+				while (matcherVariable.find()) {
+					String variableName = matcherVariable.group(1);
+					line = line.replace(variableName, String.format("vars.get(\"%s\").toString()", variableName.substring(2, variableName.length() - 1)));
+
+				}
+
 				Matcher matcherUrl = patternUrl.matcher(line);
 				Matcher matcherCall = patternCall.matcher(line);
 				Matcher matcherWait = patternWait.matcher(line);
 				Matcher matcherQuote = patternVariableQuote.matcher(line);
-				
+				Matcher matcherXPath = patternXPath.matcher(line);
+
 				// allow calling seleniumRobot code from inside a Selenium IDE script, with the use of "CALL:" comment
 				if (matcherCall.matches()) {
 					newContent.append(matcherCall.group(1).replace("\\\"", "\"") + "\n");
@@ -139,7 +154,23 @@ public class SeleniumIdeParser {
 				// also remove escaped quotes : is("vars.get(\"stringVide\").toString()") => is(vars.get("stringVide").toString())
 				} else if (matcherQuote.matches()) {
 					newContent.append(String.format("%s%s%s\n", matcherQuote.group(1), matcherQuote.group(2).replace("\\\"", "\""), matcherQuote.group(3)));
-					
+
+				// inside a By.xpath, extract variables: By.xpath("//table//tr[contains(td[1], 'vars.get("immatriculation").toString()') ") => By.xpath("//table//tr[contains(td[1], '" + vars.get("immatriculation").toString() + "') ")
+				} else if (matcherXPath.matches()) {
+					String xpath = matcherXPath.group(2);
+					Matcher variables = Pattern.compile("'(vars.get.*?.toString\\(\\))'").matcher(xpath);
+					while (variables.find()) {
+						xpath = xpath.replace(variables.group(1), "\" + " + variables.group(1) + " + \"");
+					}
+
+					Matcher variables2 = Pattern.compile("\\\\\" \\+ vars.get.*?.toString\\(\\) \\+ \\\\\"").matcher(xpath);
+					while (variables2.find()) {
+						xpath = xpath.replace(variables2.group(0), variables2.group(0).replace("\\\"", "\""));
+					}
+
+
+					newContent.append(String.format("%s%s%s\n", matcherXPath.group(1), xpath, matcherXPath.group(3)));
+
 				// get first URL (driver.get() call) to pass it the the driver on init
 				} else if (matcherUrl.matches() && !initialUrlFound) {
 					initialUrl = matcherUrl.group(1);
