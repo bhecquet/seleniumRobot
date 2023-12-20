@@ -564,12 +564,18 @@
 				<configuration>
 					<skipTests>${skipTests}</skipTests>
                 	<skipITs>${skipITs}</skipITs>
+					<useModulePath>false</useModulePath>
                 	<!-- comment for online instrumentation -->
 					<systemPropertyVariables>
                         <jacoco-agent.destfile>${project.build.directory}/coverage-reports/jacoco-it.exec</jacoco-agent.destfile>
                         <mavenExecution>true</mavenExecution>
 					</systemPropertyVariables>
-					<argLine>${argLine} -Ddebug=${seleniumRobot.debug} -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar" --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED</argLine>
+					<argLine>--add-opens=java.base/java.lang=ALL-UNNAMED
+						--add-opens=java.base/java.util=ALL-UNNAMED
+						--add-opens=java.base/java.time=ALL-UNNAMED
+						${argLine}
+						-Ddebug=${seleniumRobot.debug}
+						-javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"</argLine>
 				<!-- /comment -->
 				<!-- uncomment for online instrumentation -->
 					<!-- <argLine>${failsafeArgLine} -Ddebug=${seleniumRobot.debug} -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"</argLine> -->
