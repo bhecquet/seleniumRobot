@@ -30,6 +30,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -704,7 +705,8 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			
 			// delete file if it exists as '.asFile()' will not overwrite it
 			deleteExistingVideo(outputFile);
-				
+
+			long start = System.currentTimeMillis();
 			GetRequest getRequest = Unirest.get(String.format("%s%s", nodeServletUrl, NODE_TASK_SERVLET));
 			if (SeleniumTestsContextManager.getThreadContext().getDebug().contains(DebugMode.NETWORK)) {
 				getRequest = getRequest
@@ -720,7 +722,8 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			if (videoResponse.getStatus() != 200) {
 				logger.error(String.format("stop video capture error: %s", videoResponse.getBody()));
 				return null;
-			} else {				
+			} else {
+				logger.info(String.format("Video file downloaded (%d kb in %d ms)", videoResponse.getBody().length() / 1000, System.currentTimeMillis() - start));
 				return videoResponse.getBody();
 			}
 			

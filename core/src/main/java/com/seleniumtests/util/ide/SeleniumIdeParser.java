@@ -12,10 +12,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.github.javaparser.ParseProblemException;
-import com.seleniumtests.core.TestStepManager;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
@@ -83,7 +81,20 @@ public class SeleniumIdeParser {
 			"import org.testng.annotations.Test;\n" +
 			"\n" + 
 			"public class %s extends SeleniumTestPlan {\n\n";
-	
+
+	public static final String FAILED_PARSING =  "package com.infotel.selenium.ide;\n" +
+			"\n" +
+			"import java.io.IOException;\n" +
+			"import com.seleniumtests.core.runner.SeleniumTestPlan;\n" +
+			"import org.testng.annotations.Test;\n" +
+			"import org.testng.Assert;\n" +
+			"\n" +
+			"public class %s extends SeleniumTestPlan {\n\n" +
+			"	 @Test\n" +
+			"    public void test%s() {\n" +
+			"        Assert.assertFalse(true, \"%s\");\n" +
+			"    }\n" +
+			"}\n";
 	public SeleniumIdeParser(String filePath) {
 		
 		javaFile = new File(filePath);
@@ -100,22 +111,37 @@ public class SeleniumIdeParser {
 	private String prepareJavaFile(File javaFile) {
 		String initialUrl = "https://www.selenium.dev";
 		boolean initialUrlFound = false;
-		
+
 		Pattern patternUrl = Pattern.compile("^\\s+driver.get\\(\"(.*?)\"\\);$");
 		Pattern patternCall = Pattern.compile(".*System.out.println\\(\"CALL:(.*)\"\\);$");
 		Pattern patternWait = Pattern.compile(".*new WebDriverWait\\(driver, (\\d+)\\);$");
-		Pattern patternVariableQuote = Pattern.compile("(.*?)\\\"(vars.get.*.toString\\(\\))\\\"(.*;)$"); // https://github.com/SeleniumHQ/selenium-ide/issues/1175: for files of type assertEquals(vars.get("dateAujourdhui").toString(), "vars.get("dateFin").toString()");
+		Pattern patternXPath = Pattern.compile("(.*By.xpath\\(\\\")(.*?)(\\\"\\)[,)].*)");
+		Pattern patternVariableQuote = Pattern.compile("(.*?)\\\"\\s*(vars.get.*.toString\\(\\))\\\"(.*;)$"); // https://github.com/SeleniumHQ/selenium-ide/issues/1175: for files of type assertEquals(vars.get("dateAujourdhui").toString(), "vars.get("dateFin").toString()");
+		Pattern patternVariable = Pattern.compile("(\\$\\{.*?\\})");
+
 		try {
 			StringBuilder newContent = new StringBuilder();
 			String content = FileUtils.readFileToString(javaFile, StandardCharsets.UTF_8);
 			for (String line: content.split("\n")) {
 				line = line.replace("\r", "")
-						.replace("\\\\\\'", "'");
+						.replace("\\\\\\'", "'") // remove double escaping of single quotes
+						.replace("\\'", "'"); // remove escaping of single quotes, which are not necessary
+
+				Matcher matcherVariable = patternVariable.matcher(line);
+
+				// replace ${someVar} by vars.get("someVar");
+				while (matcherVariable.find()) {
+					String variableName = matcherVariable.group(1);
+					line = line.replace(variableName, String.format("vars.get(\"%s\").toString()", variableName.substring(2, variableName.length() - 1)));
+
+				}
+
 				Matcher matcherUrl = patternUrl.matcher(line);
 				Matcher matcherCall = patternCall.matcher(line);
 				Matcher matcherWait = patternWait.matcher(line);
 				Matcher matcherQuote = patternVariableQuote.matcher(line);
-				
+				Matcher matcherXPath = patternXPath.matcher(line);
+
 				// allow calling seleniumRobot code from inside a Selenium IDE script, with the use of "CALL:" comment
 				if (matcherCall.matches()) {
 					newContent.append(matcherCall.group(1).replace("\\\"", "\"") + "\n");
@@ -128,7 +154,23 @@ public class SeleniumIdeParser {
 				// also remove escaped quotes : is("vars.get(\"stringVide\").toString()") => is(vars.get("stringVide").toString())
 				} else if (matcherQuote.matches()) {
 					newContent.append(String.format("%s%s%s\n", matcherQuote.group(1), matcherQuote.group(2).replace("\\\"", "\""), matcherQuote.group(3)));
-					
+
+				// inside a By.xpath, extract variables: By.xpath("//table//tr[contains(td[1], 'vars.get("immatriculation").toString()') ") => By.xpath("//table//tr[contains(td[1], '" + vars.get("immatriculation").toString() + "') ")
+				} else if (matcherXPath.matches()) {
+					String xpath = matcherXPath.group(2);
+					Matcher variables = Pattern.compile("'(vars.get.*?.toString\\(\\))'").matcher(xpath);
+					while (variables.find()) {
+						xpath = xpath.replace(variables.group(1), "\" + " + variables.group(1) + " + \"");
+					}
+
+					Matcher variables2 = Pattern.compile("\\\\\" \\+ vars.get.*?.toString\\(\\) \\+ \\\\\"").matcher(xpath);
+					while (variables2.find()) {
+						xpath = xpath.replace(variables2.group(0), variables2.group(0).replace("\\\"", "\""));
+					}
+
+
+					newContent.append(String.format("%s%s%s\n", matcherXPath.group(1), xpath, matcherXPath.group(3)));
+
 				// get first URL (driver.get() call) to pass it the the driver on init
 				} else if (matcherUrl.matches() && !initialUrlFound) {
 					initialUrl = matcherUrl.group(1);
@@ -180,7 +222,18 @@ public class SeleniumIdeParser {
 
 			return classInfo;
 		} else {
-			throw new ParseProblemException(cu.getProblems());
+			String parse = new ParseProblemException(cu.getProblems()).getMessage().split("Problem")[0];
+			logger.error("--------------------------------------------------------------------------------------------------------------------------------------------------------");
+			logger.error("invalid code, one element is missing : " + parse);
+			logger.error("--------------------------------------------------------------------------------------------------------------------------------------------------------");
+
+			String testCodeStr = String.format(FAILED_PARSING, className, className, parse.replace("\"", "\\\"").replace("\r", "").replace("\n", ""));
+			logger.info(String.format("generated error parsing class %s", className));
+			logger.info("\n" + testCodeStr);
+
+			classInfo.put("com.infotel.selenium.ide." + className, testCodeStr);
+
+			return classInfo;
 		}
 	}
 	

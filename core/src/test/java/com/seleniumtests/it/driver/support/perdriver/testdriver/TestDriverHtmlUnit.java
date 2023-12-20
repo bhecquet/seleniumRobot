@@ -346,6 +346,11 @@ public class TestDriverHtmlUnit extends TestDriver {
 		super.testIsElementPresentAndDisplayed();
 	}
 
+	@Test(groups={"it", "ut"})
+	public void testIsElementPresentAndDisplayedWithDelay() {
+		super.testIsElementPresentAndDisplayedWithDelay();
+	}
+
 	@Test(groups={"it"})
 	public void testIsElementNotPresentAndNotDisplayed() {
 		super.testIsElementNotPresentAndNotDisplayed();

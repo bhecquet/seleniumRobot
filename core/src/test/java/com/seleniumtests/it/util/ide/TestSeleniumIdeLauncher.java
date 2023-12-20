@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.seleniumtests.util.ide.SeleniumIdeParser;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -396,7 +397,8 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 	}
 	
 	/**
-	 * 
+	 * When parsing error occurs, we should generate a fake test code so that it doesn't prevent other tests from executing
+	 * A test will be executed and fail, showing the parsing error
 	 * @throws IOException
 	 * @throws ClassNotFoundException
 	 * @throws NoSuchFieldException 
@@ -407,13 +409,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 	public void testParseIssue() throws IOException, ClassNotFoundException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 		try {		    
 		    SeleniumIdeLauncher seleniumIde = new SeleniumIdeLauncher();
-		    
-		    Logger logger = spy(SeleniumRobotLogger.getLogger(SeleniumIdeLauncher.class));
-		    Field loggerField = SeleniumIdeLauncher.class.getDeclaredField("logger");
-		    loggerField.setAccessible(true);
-		    loggerField.set(seleniumIde, logger);
-		    
-		
+
 			CompilerUtils.addClassPath("target/test-classes");
 			System.setProperty(SeleniumTestsContext.BROWSER, "chrome");
 			System.setProperty(SeleniumTestsContext.MANUAL_TEST_STEPS, "true");
@@ -424,61 +420,22 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTestError.java").toFile();
 			FileUtils.copyFile(tmpSuiteFile, suiteFile);
 			
-			try {
-				seleniumIde.executeScripts(Arrays.asList(suiteFile.getAbsolutePath()), 1);
-				Assert.assertFalse(true, "Exception should have been raised");
-			} catch (ScenarioException e) {
-				
-			}
-			
-			verify(logger).error(ArgumentMatchers.contains("invalid code, one element is missing : (line 68,col 61) Parse error. Found "));
+			seleniumIde.executeScripts(Arrays.asList(suiteFile.getAbsolutePath()), 1);
 
+			String mainReportContent = ReporterTest.readSummaryFile();
 
-		} finally {
-			System.clearProperty(SeleniumTestsContext.BROWSER);
-			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
-			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);
-			
-			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
-		}
-	}
+			// check that test is seen and OK
+			Assert.assertTrue(mainReportContent.matches(".*<a href='testMainPageTestError/TestReport.html' info=\"ko\" .*?>testMainPageTestError</a>.*"));
 
-	@Test(groups={"it"})
-	public void testParseIssue2() throws IOException, ClassNotFoundException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-		try {
-		    SeleniumIdeLauncher seleniumIde = new SeleniumIdeLauncher();
-
-		    Logger logger = spy(SeleniumRobotLogger.getLogger(SeleniumIdeLauncher.class));
-		    Field loggerField = SeleniumIdeLauncher.class.getDeclaredField("logger");
-		    loggerField.setAccessible(true);
-		    loggerField.set(seleniumIde, logger);
-
-
-			CompilerUtils.addClassPath("target/test-classes");
-			System.setProperty(SeleniumTestsContext.BROWSER, "chrome");
-			System.setProperty(SeleniumTestsContext.MANUAL_TEST_STEPS, "true");
-			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "false");
-
-			// use a different file from the previous test to avoid problems with compiler cache
-			File tmpSuiteFile = GenericTest.createFileFromResource("ti/ide/MainPageTestError2.java");
-			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTestError2.java").toFile();
-			FileUtils.copyFile(tmpSuiteFile, suiteFile);
-
-			try {
-				seleniumIde.executeScripts(Arrays.asList(suiteFile.getAbsolutePath()), 1);
-				Assert.assertFalse(true, "Exception should have been raised");
-			} catch (ScenarioException e) {
-
-			}
-
-			verify(logger).error(ArgumentMatchers.contains("invalid code, one element is missing : Lexical error at line 68, column 88"));
-
+			// check that detailed result contains the "hello" written in test
+			String detailedReportContent1 = ReporterTest.readTestMethodResultFile("testMainPageTestError");
+			Assert.assertTrue(detailedReportContent1.contains("Test is KO with error: class java.lang.AssertionError: (line 68,col 61) Parse error. Found"));
 
 		} finally {
 			System.clearProperty(SeleniumTestsContext.BROWSER);
 			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
 			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);
-
+			
 			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		}
 	}

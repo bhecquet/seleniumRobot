@@ -133,6 +133,10 @@
 	<button id="buttonDelay" onclick="javascript:display();">Display field!</button>
 	<button id="buttonDelayReset" onclick="javascript:hide();">Hide field!</button>
 	<div id="displayContent"></div>
+	<br/>
+	<button id="buttonHiddenDelay" onclick="javascript:displayHidden();">Display hidden field!</button>
+	<button id="buttonHiddenDelayReset" onclick="javascript:hideHidden();">Hide hidden field!</button>
+	<input id="hiddenContent" style="display:none;" value="hidden value"/>
 	
 	<h3>Test server delay</h3>
 	delay: <input id="delay" value="500"/> ms
@@ -288,8 +292,18 @@ function display() {
      }, 7000);
 	
 }
+
 function hide() {
       $("#displayContent").html('');
+}
+function displayHidden() {
+	setTimeout(function() {
+      $("#hiddenContent").show();
+     }, 7000);
+	
+}
+function hideHidden() {
+      $("#hiddenContent").hide();
 }
 
 function displayServer() {

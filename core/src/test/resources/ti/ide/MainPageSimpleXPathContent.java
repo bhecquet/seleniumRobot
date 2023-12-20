@@ -44,9 +44,9 @@ public class MainPageTest {
     driver.findElement(By.linkText("Lib/operator.py")).click();
     vars.put("dateFin", driver.findElement(By.xpath("//td[8]/div/lds-datepicker/div/input")).getAttribute("value"));
     vars.put("dateAujourdhui", js.executeScript("return new Date().toLocaleDateString(\'fr-FR\');"));
-    assertEquals(vars.get("dateAujourdhui").toString(), "vars.get("dateFin").toString()");
-    assertThat(value, is("vars.get("dateDemain").toString()"));
-    assertThat(value, is(" vars.get("immatriculation_1").toString()"));
-    assertThat(driver.findElement(By.xpath("//div/input")).getText(), is("vars.get(\"stringVide\").toString()"));
+    // vars.get in xpath expression
+    wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//table//tr[contains(td[1], \'vars.get("immatriculation").toString()\') and contains(td[2], \'AUDI\') and contains(td[3], \'AFRem\') and contains(td[4], \'SITE\') and contains(td[5], \'FR\') and contains(td[6], \'OUI\')]")));
+    vars.put("nbVHOK", driver.findElements(By.xpath("//tr/td[8][(translate(concat(substring(., 8, 4), \'-\', substring(., 5, 2), \'-\',  substring(., 2, 2)),  \'-\', \'\') >= translate(concat(substring(\'\" + vars.get("dateFinGarantie").toString() + \"\', 7, 4), \'-\',  substring(\'\" + ${firstVariable} + \"\', 4, 2), \'-\',  substring(\'\" + ${secondVariable} + \"\', 1, 2)), \'-\', \'\')) or not(normalize-space()) or normalize-space()]")).size());
+
   }
 }

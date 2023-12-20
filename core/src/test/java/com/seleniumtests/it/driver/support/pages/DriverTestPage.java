@@ -50,8 +50,10 @@ public class DriverTestPage extends PageObject {
 	public static final CheckBoxElement checkElement = new CheckBoxElement("Check", By.id("checkboxClick"));
 	public static final ButtonElement startButton = new ButtonElement("Start Animation", By.id("button"));
 	public static final ButtonElement resetButton = new ButtonElement("Reset", By.id("button2"));
-	public static final ButtonElement delayButton = new ButtonElement("Reset", By.id("buttonDelay"));
+	public static final ButtonElement delayButton = new ButtonElement("Display", By.id("buttonDelay"));
 	public static final ButtonElement delayButtonReset = new ButtonElement("Reset", By.id("buttonDelayReset"));
+	public static final ButtonElement delayHiddenButton = new ButtonElement("Display hidden", By.id("buttonHiddenDelay"));
+	public static final ButtonElement delayHiddenButtonReset = new ButtonElement("Reset", By.id("buttonHiddenDelayReset"));
 	public static final HtmlElement greenSquare = new HtmlElement("Green square", By.id("carre"));
 	public static final HtmlElement redSquare = new HtmlElement("Red Square", By.id("carre2"));
 	public static final HtmlElement bottomSquare = new HtmlElement("Bottom Square", By.id("carreBottom"));
