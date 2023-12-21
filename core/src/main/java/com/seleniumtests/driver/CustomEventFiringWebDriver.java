@@ -644,11 +644,8 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		this.gridConnector = gridConnector;
 		this.attachExistingDriverPort = attachExistingDriverPort;
 		this.originalDriver = driver; // store the original driver in case decorated one cannot be used (getSessionId)
-		this.driver = new EventFiringDecorator(new DriverExceptionListener(this)).decorate(driver);
-		
-        for (WebDriverListener wdListener: wdListeners) {
-        	this.driver = new EventFiringDecorator(wdListener).decorate(this.driver);
-        }
+		this.driver = driver;
+
 
 		// Augmenter is only supported for web test because augmenting driver namely tries to create a CDP connection with a browser
 		if (isWebTest()) {
@@ -657,6 +654,11 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 			} catch (Exception e) {
 				throw new RetryableDriverException("Error augmenting driver", e);
 			}
+		}
+
+		this.driver = new EventFiringDecorator(new DriverExceptionListener(this)).decorate(this.driver);
+		for (WebDriverListener wdListener: wdListeners) {
+			this.driver = new EventFiringDecorator(wdListener).decorate(this.driver);
 		}
 	
 		// NEOLOAD //
