@@ -644,7 +644,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		this.gridConnector = gridConnector;
 		this.attachExistingDriverPort = attachExistingDriverPort;
 		this.originalDriver = driver; // store the original driver in case decorated one cannot be used (getSessionId)
-		this.driver = new EventFiringDecorator(new DriverExceptionListener(this)).decorate(this.driver);
+		this.driver = new EventFiringDecorator(new DriverExceptionListener(this)).decorate(driver);
 		for (WebDriverListener wdListener: wdListeners) {
 			this.driver = new EventFiringDecorator(wdListener).decorate(this.driver);
 		}
