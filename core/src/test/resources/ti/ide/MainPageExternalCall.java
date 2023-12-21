@@ -42,6 +42,6 @@ public class MainPageExternalCall {
 	driver.manage().window().setSize(new Dimension(1150, 825));
 	vars.put("user", "myUser");
 	driver.findElement(By.linkText("Lib/operator.py")).click();
-    System.out.println("CALL:new com.company.AuthenticationPage()._accessAuthentication(vars.get("user").toString());");
+    System.out.println("CALL:driver.findElement(By.linkText(vars.get("user").toString()));");
   }
 }
