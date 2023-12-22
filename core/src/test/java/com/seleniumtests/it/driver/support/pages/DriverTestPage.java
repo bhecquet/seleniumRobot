@@ -166,22 +166,31 @@ public class DriverTestPage extends PageObject {
 	
 	public DriverTestPage() throws Exception {
         super(textElement);
-    }
-    
-    public DriverTestPage(boolean openPageURL) throws Exception {
+		clearPictureMemories();
+	}
+
+	private static void clearPictureMemories() {
+		picture.clearMemory();
+		privatePicture.clearMemory();
+	}
+
+	public DriverTestPage(boolean openPageURL) throws Exception {
     	this(openPageURL, getPageUrl(SeleniumTestsContextManager.getThreadContext().getBrowser()));
     }
     
     public DriverTestPage(boolean openPageURL, BrowserType browserType) throws Exception {
     	super(textElement, getPageUrl(browserType), browserType, "second", null);
+		clearPictureMemories();
     }
     
     public DriverTestPage(BrowserType browserType, Integer attachExistingDriverPort) throws Exception {
     	super(textElement, getPageUrl(browserType), browserType, "second", attachExistingDriverPort);
+		clearPictureMemories();
     }
     
     public DriverTestPage(boolean openPageURL, String url) throws Exception {
     	super(textElement, openPageURL ? url : null);
+		clearPictureMemories();
     	openedPageUrl = url;
     }
     

@@ -45,19 +45,7 @@ public class DriverScrollingTestPage extends PageObject {
 	
 	
 	private String openedPageUrl;
-	
-	public DriverScrollingTestPage() throws Exception {
-        super(textElement);
-    }
-    
-    public DriverScrollingTestPage(boolean openPageURL) throws Exception {
-    	this(openPageURL, getPageUrl(SeleniumTestsContextManager.getThreadContext().getBrowser()));
-    }
-    
-    public DriverScrollingTestPage(boolean openPageURL, BrowserType browserType) throws Exception {
-    	super(textElement, getPageUrl(browserType), browserType, "second", null);
-    }
-    
+
     public DriverScrollingTestPage(boolean openPageURL, String url) throws Exception {
     	super(textElement, openPageURL ? url : null);
     	openedPageUrl = url;

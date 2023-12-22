@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.JoinPoint;
@@ -458,10 +459,10 @@ public class LogAction {
 	 * @return
 	 */
 	private String getAnnotationValue(Annotation annotation) {
-		return annotation.toString().replaceFirst("timeout=\\d+", "")
-			.replace("@" + annotation.annotationType().getCanonicalName() + "(", "")
+		return StringEscapeUtils.unescapeJava(annotation.toString().replaceFirst("timeout=\\d+", "")
+			.replace("@" + annotation.annotationType().getCanonicalName() + "(\"", "")
 			.replaceFirst(",?\\s?value=", "")
-			.replaceFirst("\\)$", "");
+			.replaceFirst("\"\\)$", ""));
 	}
 	
 	/**

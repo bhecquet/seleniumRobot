@@ -67,19 +67,22 @@ public class DriverTestPageWithoutFixedPattern extends PageObject {
 	
 	public DriverTestPageWithoutFixedPattern()  {
         super(textElement);
-    }
-	
-	public DriverTestPageWithoutFixedPattern(String url, BrowserType browserType, String driverName) {
-		super(textElement, url, browserType, driverName, null);
+		clearPictureMemories();
 	}
-    
-    public DriverTestPageWithoutFixedPattern(boolean openPageURL) {
-        super(textElement, openPageURL ? getPageUrl() : null);
-    }
+
+	private static void clearPictureMemories() {
+		googleForDesktop.clearMemory();
+		googleForDesktopWithFile.clearMemory();
+		firefoxForDesktop.clearMemory();
+		googlePicture.clearMemory();
+		googlePrivatePicture.clearMemory();
+		googlePictureWithFile.clearMemory();
+	}
 
     public DriverTestPageWithoutFixedPattern(boolean openPageURL, String url) {
     	super(textElement, openPageURL ? url : null);
     	openedPageUrl = url;
+		clearPictureMemories();
     }
     
     public void clickGooglePicture() {

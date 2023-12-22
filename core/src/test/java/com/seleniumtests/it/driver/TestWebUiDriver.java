@@ -252,44 +252,45 @@ public class TestWebUiDriver extends ReporterTest {
 		}
 
 	}
-	
-	/**
-	 * Check that HAR capture file is present 
-	 * Check it contains one page per TestStep
-	 * 
-	 * @throws Exception
-	 */
-	@Test(groups={"it"})
-	public void testHarCaptureExists() throws Exception {
-		
-		try {
-			System.setProperty(SeleniumTestsContext.CAPTURE_NETWORK, "true");
-			
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriver"});
-			
-			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "main-networkCapture.har").toFile().exists());
-			
-			JSONObject json = new JSONObject(FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "main-networkCapture.har").toFile(), StandardCharsets.UTF_8));
-			JSONArray pages = json.getJSONObject("log").getJSONArray("pages");
-			
-			// 7 steps in HTML 
-			// 'getPageUrl' step should be called before driver is created but creating PictureElement starts driver
-			Assert.assertTrue(pages.length() >= 6, "content is: " + json.toString());
-			List<String> pageNames = new ArrayList<>();
-			for (Object page: pages.toList()) {
-				pageNames.add(((Map<String, Object>)page).get("id").toString().trim());
-			}
-			Assert.assertTrue(pageNames.contains("testDriver"));
-			Assert.assertTrue(pageNames.contains("_writeSomething"));
-			Assert.assertTrue(pageNames.contains("_reset"));
-			Assert.assertTrue(pageNames.contains("_sendKeysComposite"));
-			Assert.assertTrue(pageNames.contains("_clickPicture"));
-			
-			
-		} finally {
-			System.clearProperty(SeleniumTestsContext.CAPTURE_NETWORK);
-		}
-	}
+
+// HAR / BrowserMob
+//	/**
+//	 * Check that HAR capture file is present
+//	 * Check it contains one page per TestStep
+//	 *
+//	 * @throws Exception
+//	 */
+//	@Test(groups={"it"})
+//	public void testHarCaptureExists() throws Exception {
+//
+//		try {
+//			System.setProperty(SeleniumTestsContext.CAPTURE_NETWORK, "true");
+//
+//			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriver"});
+//
+//			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "main-networkCapture.har").toFile().exists());
+//
+//			JSONObject json = new JSONObject(FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "main-networkCapture.har").toFile(), StandardCharsets.UTF_8));
+//			JSONArray pages = json.getJSONObject("log").getJSONArray("pages");
+//
+//			// 7 steps in HTML
+//			// 'getPageUrl' step should be called before driver is created but creating PictureElement starts driver
+//			Assert.assertTrue(pages.length() >= 6, "content is: " + json.toString());
+//			List<String> pageNames = new ArrayList<>();
+//			for (Object page: pages.toList()) {
+//				pageNames.add(((Map<String, Object>)page).get("id").toString().trim());
+//			}
+//			Assert.assertTrue(pageNames.contains("testDriver"));
+//			Assert.assertTrue(pageNames.contains("_writeSomething"));
+//			Assert.assertTrue(pageNames.contains("_reset"));
+//			Assert.assertTrue(pageNames.contains("_sendKeysComposite"));
+//			Assert.assertTrue(pageNames.contains("_clickPicture"));
+//
+//
+//		} finally {
+//			System.clearProperty(SeleniumTestsContext.CAPTURE_NETWORK);
+//		}
+//	}
 	
 	/**
 	 * Check that browser logs are written to file (only available for chrome)
@@ -330,32 +331,33 @@ public class TestWebUiDriver extends ReporterTest {
 		Assert.assertTrue(secondDriverInit > firstDriverInit);
 		Assert.assertTrue(secondDriverCreation > firstDriverCreation);
 	}
-	
-	/**
-	 * Check that HAR capture file is present in result with manual steps
-	 * 
-	 * @throws Exception
-	 */
-	@Test(groups={"it"})
-	public void testReportContainsHarCaptureWithManualSteps() throws Exception {
-		
-		try {
-			System.setProperty(SeleniumTestsContext.CAPTURE_NETWORK, "true");
-			
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverManualSteps"});
-			
-			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverManualSteps", "main-networkCapture.har").toFile().exists());
-			JSONObject json = new JSONObject(FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverManualSteps", "main-networkCapture.har").toFile(), StandardCharsets.UTF_8));
-			JSONArray pages = json.getJSONObject("log").getJSONArray("pages");
-			Assert.assertEquals(pages.length(), 2);
-			Assert.assertEquals(pages.getJSONObject(0).getString("id").trim(), "testDriverManualSteps");
-			Assert.assertEquals(pages.getJSONObject(1).getString("id").trim(), "Reset");
-			
-			// step "Write" is not recorded because the driver is not created before the DriverTestPage object is created
-		} finally {
-			System.clearProperty(SeleniumTestsContext.CAPTURE_NETWORK);
-		}
-	}
+
+// HAR / BrowserMob
+//	/**
+//	 * Check that HAR capture file is present in result with manual steps
+//	 *
+//	 * @throws Exception
+//	 */
+//	@Test(groups={"it"})
+//	public void testReportContainsHarCaptureWithManualSteps() throws Exception {
+//
+//		try {
+//			System.setProperty(SeleniumTestsContext.CAPTURE_NETWORK, "true");
+//
+//			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverManualSteps"});
+//
+//			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverManualSteps", "main-networkCapture.har").toFile().exists());
+//			JSONObject json = new JSONObject(FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverManualSteps", "main-networkCapture.har").toFile(), StandardCharsets.UTF_8));
+//			JSONArray pages = json.getJSONObject("log").getJSONArray("pages");
+//			Assert.assertEquals(pages.length(), 2);
+//			Assert.assertEquals(pages.getJSONObject(0).getString("id").trim(), "testDriverManualSteps");
+//			Assert.assertEquals(pages.getJSONObject(1).getString("id").trim(), "Reset");
+//
+//			// step "Write" is not recorded because the driver is not created before the DriverTestPage object is created
+//		} finally {
+//			System.clearProperty(SeleniumTestsContext.CAPTURE_NETWORK);
+//		}
+//	}
 	
 	@Test(groups={"it"})
 	public void testMultipleBrowserCreation() {

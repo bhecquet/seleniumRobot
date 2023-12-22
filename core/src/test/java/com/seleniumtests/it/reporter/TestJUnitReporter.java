@@ -92,18 +92,18 @@ public class TestJUnitReporter extends ReporterTest {
 		
 		
 		String result = readJUnitFile(testList.get(0));
-		Assert.assertTrue(result.contains("<failure type=\"java.lang.AssertionError\" message=\"error\">"));
-		Assert.assertTrue(result.contains("<error type=\"com.seleniumtests.customexception.DriverExceptions\" message=\"some exception\">")); // errors
+		Assert.assertTrue(result.contains("<failure message=\"error\" type=\"java.lang.AssertionError\">"));
+		Assert.assertTrue(result.contains("<error message=\"some exception\" type=\"com.seleniumtests.customexception.DriverExceptions\">")); // errors
 		Assert.assertTrue(result.contains("[main] SeleniumRobotTestListener: Finish method testSkipped")); // some logs
 		
 		// issue #397: test we get only the executed tests 
-		Assert.assertTrue(result.contains("<testcase name=\"testInError\""));
-		Assert.assertTrue(result.contains("<testcase name=\"testAndSubActions\""));
-		Assert.assertTrue(result.contains("<testcase name=\"testWithException\""));
-		Assert.assertTrue(result.contains("<testcase name=\"testSkipped\""));
-		Assert.assertFalse(result.contains("<testcase name=\"testWithExceptionAndDataProvider\""));
-		Assert.assertFalse(result.contains("<testcase name=\"testWithExceptionAndMaxRetryIncreased\""));
-		Assert.assertFalse(result.contains("<testcase name=\"testWithExceptionAndMaxRetryIncreasedWithLimit\""));
+		Assert.assertTrue(result.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"testInError\""));
+		Assert.assertTrue(result.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"testAndSubActions\""));
+		Assert.assertTrue(result.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"testWithException\""));
+		Assert.assertTrue(result.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"testSkipped\""));
+		Assert.assertFalse(result.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"testWithExceptionAndDataProvider\""));
+		Assert.assertFalse(result.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"testWithExceptionAndMaxRetryIncreased\""));
+		Assert.assertFalse(result.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"testWithExceptionAndMaxRetryIncreasedWithLimit\""));
 	
 	}
 	
@@ -118,8 +118,8 @@ public class TestJUnitReporter extends ReporterTest {
 		List<String> testList = executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testOkWithTestName", "testOkWithTestNameAndDataProvider"});
 
 		String result = readJUnitFile(testList.get(0));
-		Assert.assertTrue(result.contains("<testcase name=\"A test which is &lt;OK&gt; é&amp;\""));
-		Assert.assertTrue(result.contains("<testcase name=\"A test which is OK (data2, data3)\""));
+		Assert.assertTrue(result.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"A test which is &lt;OK&gt; é&amp;\""));
+		Assert.assertTrue(result.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"A test which is OK (data2, data3)\""));
 		
 	}
 	
@@ -149,7 +149,7 @@ public class TestJUnitReporter extends ReporterTest {
 			
 			Assert.assertTrue(result.contains("tests=\"2\""));
 			Assert.assertTrue(result.contains("errors=\"1\""));
-			Assert.assertTrue(result.contains("<error type=\"com.seleniumtests.customexception.ScenarioException\" message=\"Snapshot comparison failed\">"));
+			Assert.assertTrue(result.contains("<error message=\"Snapshot comparison failed\" type=\"com.seleniumtests.customexception.ScenarioException\">"));
 			
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
@@ -182,7 +182,7 @@ public class TestJUnitReporter extends ReporterTest {
 			Assert.assertTrue(result.contains("errors=\"0\""));
 			Assert.assertTrue(result.contains("skipped=\"1\""));
 			
-			Assert.assertTrue(result.matches(".*<testcase name=\"snapshots-testAndSubActions\" time=\"\\d+\\.\\d+\" classname=\"com.seleniumtests.it.stubclasses.StubTestClass\"><skipped/>.*"));
+			Assert.assertTrue(result.matches(".*<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"snapshots-testAndSubActions\" time=\"\\d+\\.\\d+\"><skipped/>.*"));
 
 			
 		} finally {
@@ -218,7 +218,7 @@ public class TestJUnitReporter extends ReporterTest {
 			String result = readJUnitFile(testList.get(0));
 			Assert.assertTrue(result.contains("tests=\"1\""));
 			Assert.assertTrue(result.contains("errors=\"1\""));
-			Assert.assertTrue(result.contains("<error type=\"com.seleniumtests.customexception.ScenarioException\" message=\"Snapshot comparison failed\">"));
+			Assert.assertTrue(result.contains("<error message=\"Snapshot comparison failed\" type=\"com.seleniumtests.customexception.ScenarioException\">"));
 			
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);

@@ -366,7 +366,8 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 		try {
 			image = ImageProcessor.loadFromFile(getViewportScreenshotFile());
 
-			BufferedImage croppedImage = ImageProcessor.cropImage(image, 0, 0, image.getWidth(), 150);
+			// do not take the full width of the picture as sometimes, browsers like Edge display suggestions / popup in the right corner
+			BufferedImage croppedImage = ImageProcessor.cropImage(image, 0, 0, image.getWidth() / 2, 150);
 			File cropScreenshotFile = File.createTempFile("img", ".png");
 			ImageIO.write(croppedImage, "png", cropScreenshotFile);
 
