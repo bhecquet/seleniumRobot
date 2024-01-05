@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.it.driver.support.perdriver.testscrolling;
 
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.driver.BrowserType;
@@ -55,7 +56,8 @@ public class TestScrollingInternetExplorer extends TestAutoScrolling {
 	
 	@Test(groups= {"ie"})
 	public void testScrollToDivBottomWithCompositeAction() {
-		super.testScrollToDivBottomWithCompositeAction();
+		throw new SkipException("Does not work with Internet explorer");
+//		super.testScrollToDivBottomWithCompositeAction();
 	}
 
 	@Test(groups= {"ie"})

@@ -540,6 +540,7 @@
 						--add-opens=java.base/java.lang=ALL-UNNAMED
 						--add-opens=java.base/java.util=ALL-UNNAMED
 						--add-opens=java.base/java.time=ALL-UNNAMED <!-- for GSON -->
+						--add-opens jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED <!-- for https://github.com/OpenHFT/Java-Runtime-Compiler/issues/91 -->
 						<!-- JDK 17 modules
 						-patch-module=java.annotation=jsr305-3.0.2.jar > to avoid error Modules jsr305 and java.annotation export package javax.annotation ...
 						-patch-module=org.aspectj.runtime=aspectjweaver-${aspectj.version}.jar > to avoid error Modules org.aspectj.runtime and org.aspectj.weaver export package org.aspectj.runtime.reflect ...
@@ -579,6 +580,7 @@
 					<argLine>--add-opens=java.base/java.lang=ALL-UNNAMED
 						--add-opens=java.base/java.util=ALL-UNNAMED
 						--add-opens=java.base/java.time=ALL-UNNAMED
+						--add-opens jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
 						${argLine}
 						-Ddebug=${seleniumRobot.debug}
 						-javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"</argLine>
