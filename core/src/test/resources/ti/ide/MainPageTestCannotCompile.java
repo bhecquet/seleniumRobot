@@ -36,18 +36,13 @@ public class MainPageTest {
   public void tearDown() {
     driver.quit();
   }
+
   @Test
   public void mainPage() {
-    driver.get("https://docs.python.org/3/library/operator.html");
-    driver.manage().window().setSize(new Dimension(1150, 825));
-    vars.put("user", "myUser");
-    driver.findElement(By.linkText("Lib/operator.py")).click();
-    vars.put("dateFin", driver.findElement(By.xpath("//td[8]/div/lds-datepicker/div/input")).getAttribute("value"));
-    vars.put("dateAujourdhui", js.executeScript("return new Date().toLocaleDateString(\'fr-FR\');"));
-    WebDriverWait wait = new WebDriverWait(driver, 30);
-    // vars.get in xpath expression
-    wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//table//tr[contains(td[1], \'vars.get("immatriculation").toString()\') and contains(td[2], \'AUDI\') and contains(td[3], \'AFRem\') and contains(td[4], \'SITE\') and contains(td[5], \'FR\') and contains(td[6], \'OUI\')]")));
-    vars.put("nbVHOK", driver.findElements(By.xpath("//tr/td[8][(translate(concat(substring(., 8, 4), \'-\', substring(., 5, 2), \'-\',  substring(., 2, 2)),  \'-\', \'\') >= translate(concat(substring(\'\" + vars.get("dateFinGarantie").toString() + \"\', 7, 4), \'-\',  substring(\'\" + ${firstVariable} + \"\', 4, 2), \'-\',  substring(\'\" + ${secondVariable} + \"\', 1, 2)), \'-\', \'\')) or not(normalize-space()) or normalize-space()]")).size());
-
+    vars.put("toto", "coucou");
+    System.out.println(vars.get("foo"));
+    driver.get("http://localhost:55555/testWithoutFixedPattern.html");
+    driver.manage().window().setSize(new Dimension(934, NaN));
+    // above "NaN" is invalid: parsing OK, but compile KO
   }
 }

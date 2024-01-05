@@ -216,7 +216,7 @@ public class TestSeleniumIdeParser extends GenericTest {
 	
 	/**
 	 * Test it's possible to call java code from Selenium IDE test, using an echo command 
-	 * System.out.println("CALL:new covea.selenium.commons.webpage.AuthentificationSbcPage()._accederAuthentification(vars.get("foo").toString());");
+	 * System.out.println("CALL:driver.findElement(By.linkText(vars.get("user").toString()));");
 	 * @throws IOException
 	 */
 	@Test(groups={"it"})
@@ -244,7 +244,7 @@ public class TestSeleniumIdeParser extends GenericTest {
 				+ "    driver.manage().window().setSize(new Dimension(1150, 825));\n"
 				+ "    vars.put(\"user\", \"myUser\");\n"
 				+ "    driver.findElement(By.linkText(\"Lib/operator.py\")).click();\n"
-				+ "    new com.company.AuthenticationPage()._accessAuthentication(vars.get(\"user\").toString());\n"
+				+ "    driver.findElement(By.linkText(vars.get(\"user\").toString()));\n"
 				+ "}\n" 
 				+ "\n" 
 				+ "\n" 
@@ -272,7 +272,7 @@ public class TestSeleniumIdeParser extends GenericTest {
 	/**
 	 * Test it's possible to call java code from Selenium IDE test, using an echo command 
 	 * Here, call parameters has escaped quotes
-	 * System.out.println("CALL:new covea.selenium.commons.webpage.AuthentificationSbcPage()._accederAuthentification(\"foo\");");
+	 * System.out.println("CALL:driver.findElement(By.linkText(vars.get(\"user\").toString()));");
 	 * @throws IOException
 	 */
 	@Test(groups={"it"})
@@ -300,7 +300,7 @@ public class TestSeleniumIdeParser extends GenericTest {
 				+ "    driver.manage().window().setSize(new Dimension(1150, 825));\n"
 				+ "    vars.put(\"user\", \"myUser\");\n"
 				+ "    driver.findElement(By.linkText(\"Lib/operator.py\")).click();\n"
-				+ "    new com.company.AuthenticationPage()._accessAuthentication(\"user\");\n"
+				+ "    driver.findElement(By.linkText(vars.get(\"user\").toString()));\n"
 				+ "}\n" 
 				+ "\n" 
 				+ "\n" 
@@ -366,8 +366,8 @@ public class TestSeleniumIdeParser extends GenericTest {
 				+ "    vars.put(\"dateFin\", driver.findElement(By.xpath(\"//td[8]/div/lds-datepicker/div/input\")).getAttribute(\"value\"));\n"
 				+ "    vars.put(\"dateAujourdhui\", js.executeScript(\"return new Date().toLocaleDateString('fr-FR');\"));\n"
 				+ "    assertEquals(vars.get(\"dateAujourdhui\").toString(), vars.get(\"dateFin\").toString());\n"
-				+ "    assertThat(value, is(vars.get(\"dateDemain\").toString()));\n"
-				+ "    assertThat(value, is(vars.get(\"immatriculation_1\").toString()));\n"
+				+ "    assertThat(\"\", is(vars.get(\"dateDemain\").toString()));\n"
+				+ "    assertThat(\"\", is(vars.get(\"immatriculation_1\").toString()));\n"
 				+ "    assertThat(driver.findElement(By.xpath(\"//div/input\")).getText(), is(vars.get(\"stringVide\").toString()));\n"
 				+ "}\n"
 				+ "\n"
@@ -387,6 +387,86 @@ public class TestSeleniumIdeParser extends GenericTest {
 			
 			Assert.assertEquals(classInfo.get("com.infotel.selenium.ide.MainPageVariableQuote"), testClassCode);
 			Assert.assertEquals(classInfo.get("com.infotel.selenium.ide.MainPageVariableQuotePage"), pageClassCode);
+		} finally {
+			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
+		}
+	}
+
+	/**
+	 * Check that if code is parsed ok but does not compile, a stub test class is generated
+	 * @throws IOException
+	 */
+	@Test(groups={"it"})
+	public void testCodeParseButCannotCompile() throws IOException {
+
+		String testClassCode = "package com.infotel.selenium.ide;\n" +
+				"\n" +
+				"import java.io.IOException;\n" +
+				"import com.seleniumtests.core.runner.SeleniumTestPlan;\n" +
+				"import org.testng.annotations.Test;\n" +
+				"import org.testng.Assert;\n" +
+				"\n" +
+				"public class MainPageTestCannotCompile extends SeleniumTestPlan {\n" +
+				"\n" +
+				"\t @Test\n" +
+				"    public void testMainPageTestCannotCompile() {\n" +
+				"        Assert.assertFalse(true, \"com.infotel.selenium.ide.MainPageTestCannotCompilePage class cannot be compiled, code may be invalid. See generation logs for details\");\n" +
+				"    }\n" +
+				"}\n";
+
+		try {
+			System.setProperty(SeleniumTestsContext.MANUAL_TEST_STEPS, "false");
+
+			File tmpSuiteFile = createFileFromResource("ti/ide/MainPageTestCannotCompile.java");
+			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTestCannotCompile.java").toFile();
+			FileUtils.copyFile(tmpSuiteFile, suiteFile);
+
+			Map<String, String> classInfo = new SeleniumIdeParser(suiteFile.getAbsolutePath()).parseSeleniumIdeFile();
+
+			// when code cannot compile, page class is not provided
+			Assert.assertFalse(classInfo.containsKey("com.infotel.selenium.ide.MainPageTestCannotCompilePage"));
+
+			Assert.assertEquals(classInfo.get("com.infotel.selenium.ide.MainPageTestCannotCompile"), testClassCode);
+		} finally {
+			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
+		}
+	}
+
+	/**
+	 * If code cannot be parsed, a stub class is generated
+	 * @throws IOException
+	 */
+	@Test(groups={"it"})
+	public void testCodeCannotParse() throws IOException {
+
+		String testClassCode = "package com.infotel.selenium.ide;\n" +
+				"\n" +
+				"import java.io.IOException;\n" +
+				"import com.seleniumtests.core.runner.SeleniumTestPlan;\n" +
+				"import org.testng.annotations.Test;\n" +
+				"import org.testng.Assert;\n" +
+				"\n" +
+				"public class MainPageTestError extends SeleniumTestPlan {\n" +
+				"\n" +
+				"\t @Test\n" +
+				"    public void testMainPageTestError() {\n" +
+				"        Assert.assertFalse(true, \"(line 68,col 61) Parse error. Found  \\\"driver\\\" <IDENTIFIER>, expected one of  \\\"%=\\\" \\\"&=\\\" \\\"*=\\\" \\\"++\\\" \\\"+=\\\" \\\"--\\\" \\\"-=\\\" \\\"/=\\\" \\\";\\\" \\\"<<=\\\" \\\"=\\\" \\\">>=\\\" \\\">>>=\\\" \\\"^=\\\" \\\"|=\\\"\");\n" +
+				"    }\n" +
+				"}\n";
+
+		try {
+			System.setProperty(SeleniumTestsContext.MANUAL_TEST_STEPS, "false");
+
+			File tmpSuiteFile = createFileFromResource("ti/ide/MainPageTestError.java");
+			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTestError.java").toFile();
+			FileUtils.copyFile(tmpSuiteFile, suiteFile);
+
+			Map<String, String> classInfo = new SeleniumIdeParser(suiteFile.getAbsolutePath()).parseSeleniumIdeFile();
+
+			// when code cannot compile, page class is not provided
+			Assert.assertFalse(classInfo.containsKey("com.infotel.selenium.ide.MainPageTestErrorPage"));
+
+			Assert.assertEquals(classInfo.get("com.infotel.selenium.ide.MainPageTestError"), testClassCode);
 		} finally {
 			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
 		}
@@ -476,6 +556,7 @@ public class TestSeleniumIdeParser extends GenericTest {
 				+ "    driver.findElement(By.linkText(\"Lib/operator.py\")).click();\n"
 				+ "    vars.put(\"dateFin\", driver.findElement(By.xpath(\"//td[8]/div/lds-datepicker/div/input\")).getAttribute(\"value\"));\n"
 				+ "    vars.put(\"dateAujourdhui\", js.executeScript(\"return new Date().toLocaleDateString('fr-FR');\"));\n"
+				+ "    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));\n"
 				+ "    wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(\"//table//tr[contains(td[1], '\" + vars.get(\"immatriculation\").toString() + \"') and contains(td[2], 'AUDI') and contains(td[3], 'AFRem') and contains(td[4], 'SITE') and contains(td[5], 'FR') and contains(td[6], 'OUI')]\")));\n"
 				+ "    vars.put(\"nbVHOK\", driver.findElements(By.xpath(\"//tr/td[8][(translate(concat(substring(., 8, 4), '-', substring(., 5, 2), '-',  substring(., 2, 2)),  '-', '') >= translate(concat(substring('\" + vars.get(\"dateFinGarantie\").toString() + \"', 7, 4), '-',  substring('\" + vars.get(\"firstVariable\").toString() + \"', 4, 2), '-',  substring('\" + vars.get(\"secondVariable\").toString() + \"', 1, 2)), '-', '')) or not(normalize-space()) or normalize-space()]\")).size());\n"
 				+ "}\n"

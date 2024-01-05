@@ -45,8 +45,8 @@ public class MainPageTest {
     vars.put("dateFin", driver.findElement(By.xpath("//td[8]/div/lds-datepicker/div/input")).getAttribute("value"));
     vars.put("dateAujourdhui", js.executeScript("return new Date().toLocaleDateString(\'fr-FR\');"));
     assertEquals(vars.get("dateAujourdhui").toString(), "vars.get("dateFin").toString()");
-    assertThat(value, is("vars.get("dateDemain").toString()"));
-    assertThat(value, is(" vars.get("immatriculation_1").toString()"));
+    assertThat("", is("vars.get("dateDemain").toString()"));
+    assertThat("", is(" vars.get("immatriculation_1").toString()"));
     assertThat(driver.findElement(By.xpath("//div/input")).getText(), is("vars.get(\"stringVide\").toString()"));
   }
 }

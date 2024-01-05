@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.github.javaparser.ParseProblemException;
+import net.openhft.compiler.CompilerUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
 
@@ -198,8 +199,10 @@ public class SeleniumIdeParser {
 		
 		// parse the file
         ParseResult<CompilationUnit> cu = new JavaParser().parse(javaFile);
+		boolean codeValid = cu.isSuccessful();
+		String error = cu.isSuccessful() ? null : new ParseProblemException(cu.getProblems()).getMessage().split("Problem")[0];
 
-		if (cu.isSuccessful()) {
+		if (codeValid) {
 			cu.getResult().get().accept(new TestMethodVisitor(), new StringBuilder[]{testCode, webPageCode});
 
 			webPageCode.append(FOOTER);
@@ -211,30 +214,41 @@ public class SeleniumIdeParser {
 			String webPageCodeStr = webPageCode.toString()
 					.replace("https://initialurl.com", initialUrl);
 
-			classInfo.put("com.infotel.selenium.ide." + className, testCodeStr);
-			classInfo.put("com.infotel.selenium.ide." + className + "Page", webPageCodeStr);
-
 			logger.info(String.format("generated class %s", className));
 			logger.info("\n" + testCodeStr);
 			logger.info("------------------------------------------");
 			logger.info(String.format("generated class %sPage", className));
 			logger.info("\n" + webPageCodeStr);
 
-			return classInfo;
-		} else {
-			String parse = new ParseProblemException(cu.getProblems()).getMessage().split("Problem")[0];
+			// try to load page code. Sometimes, parsing is done, but compilation fails
+			// if compilation is done correctly, it won't be done on the next call
+			try {
+				CompilerUtils.CACHED_COMPILER.loadFromJava(Thread.currentThread().getContextClassLoader(), "com.infotel.selenium.ide." + className + "Page", webPageCodeStr);
+
+				classInfo.put("com.infotel.selenium.ide." + className, testCodeStr);
+				classInfo.put("com.infotel.selenium.ide." + className + "Page", webPageCodeStr);
+
+			} catch (ClassNotFoundException e) {
+				codeValid = false;
+				error = e.getMessage() + " class cannot be compiled, code may be invalid. See generation logs for details";
+			}
+		}
+
+		if (!codeValid) {
+
 			logger.error("--------------------------------------------------------------------------------------------------------------------------------------------------------");
-			logger.error("invalid code, one element is missing : " + parse);
+			logger.error("invalid code, one element is missing : " + error);
 			logger.error("--------------------------------------------------------------------------------------------------------------------------------------------------------");
 
-			String testCodeStr = String.format(FAILED_PARSING, className, className, parse.replace("\"", "\\\"").replace("\r", "").replace("\n", ""));
+			String testCodeStr = String.format(FAILED_PARSING, className, className, error.replace("\"", "\\\"").replace("\r", "").replace("\n", ""));
 			logger.info(String.format("generated error parsing class %s", className));
 			logger.info("\n" + testCodeStr);
 
 			classInfo.put("com.infotel.selenium.ide." + className, testCodeStr);
 
-			return classInfo;
 		}
+
+		return classInfo;
 	}
 	
 
