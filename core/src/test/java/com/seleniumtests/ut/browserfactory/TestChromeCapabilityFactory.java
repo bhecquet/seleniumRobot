@@ -232,7 +232,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 
-		Assert.assertTrue(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4, --remote-allow-origins=*"));
+		Assert.assertTrue(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades, --remote-allow-origins=*"));
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "chrome");
 		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("prefs").toString(), "{profile.exit_type=Normal}");
 		Assert.assertNull(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("debuggerAddress")); // no debuger address set as we do not attach an existing browser
@@ -247,7 +247,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		when(config.getAttachExistingDriverPort()).thenReturn(10);
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertTrue(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4, --remote-allow-origins=*"));
+		Assert.assertTrue(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades, --remote-allow-origins=*"));
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "chrome");
 		Assert.assertNull(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("prefs")); // no preference set when attaching to existing browser
 		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("debuggerAddress"), "127.0.0.1:10");
@@ -301,7 +301,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		Assert.assertTrue(chromeArgs.contains("--no-sandbox"));
 		Assert.assertTrue(chromeArgs.contains("--remote-allow-origins=*"));
 		Assert.assertTrue(chromeArgs.contains("--disable-site-isolation-trials"));
-		Assert.assertTrue(chromeArgs.contains("--disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4"));
+		Assert.assertTrue(chromeArgs.contains("--disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades"));
 		Assert.assertTrue(chromeArgs.contains("--user-data-dir="));
 	}
 	
@@ -385,7 +385,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createMobileCapabilities(config);
 
 		Assert.assertNull(capa.getCapability(CapabilityType.ACCEPT_INSECURE_CERTS));
-		Assert.assertEquals(((Map<?,?>)capa.getCapability(ChromeOptions.CAPABILITY)).get("args").toString(), "[--disable-translate, --disable-web-security, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4, --remote-allow-origins=*]");
+		Assert.assertEquals(((Map<?,?>)capa.getCapability(ChromeOptions.CAPABILITY)).get("args").toString(), "[--disable-translate, --disable-web-security, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades, --remote-allow-origins=*]");
 	}
 	
 	@Test(groups={"ut"})
@@ -394,7 +394,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createMobileCapabilities(config);
 		
-		Assert.assertEquals(((Map<?,?>)(capa.asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--user-agent=CHROME 55, --disable-translate, --disable-web-security, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4, --remote-allow-origins=*]");
+		Assert.assertEquals(((Map<?,?>)(capa.asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--user-agent=CHROME 55, --disable-translate, --disable-web-security, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades, --remote-allow-origins=*]");
 	}
 	
 
