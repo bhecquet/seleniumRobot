@@ -146,7 +146,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		connector.setApplicationId(null); // reset to be sure it's recreated
 		
 		connector.createApplication();
-		mockedUnirest.verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.APPLICATION_API_URL)), never());
+		mockedUnirest.get().verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.APPLICATION_API_URL)), never());
 	}
 	
 	// version creation
@@ -193,7 +193,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		
 		connector.createVersion();
 
-		mockedUnirest.verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.VERSION_API_URL)),  never());
+		mockedUnirest.get().verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.VERSION_API_URL)),  never());
 	}
 	
 	// environment creation
@@ -225,7 +225,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		connector.setEnvironmentId(null); // reset to be sure it's recreated
 		
 		connector.createEnvironment();
-		mockedUnirest.verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.ENVIRONMENT_API_URL)), never());
+		mockedUnirest.get().verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.ENVIRONMENT_API_URL)), never());
 	}
 	
 	// session creation => as environment is not defined, error raised
@@ -292,7 +292,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
 		
 		connector.createSession("Session1");
-		mockedUnirest.verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.SESSION_API_URL)), never());
+		mockedUnirest.get().verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.SESSION_API_URL)), never());
 	}
 	
 	// test case creation
@@ -366,7 +366,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
 		
 		connector.createTestCase("Test 1");
-		mockedUnirest.verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.TESTCASE_API_URL)), never());
+		mockedUnirest.get().verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.TESTCASE_API_URL)), never());
 	}
 	
 	// test case in session creation
@@ -431,7 +431,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
 		
 		connector.createTestCaseInSession(1, 1, "Test 1", "SUCCESS", "LOCAL");
-		mockedUnirest.verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL)), never());
+		mockedUnirest.get().verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL)), never());
 	}
 	
 	// test step creation
@@ -480,7 +480,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
 		
 		connector.createTestStep("Step 1", 1);
-		mockedUnirest.verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.TESTSTEP_API_URL)), never());
+		mockedUnirest.get().verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.TESTSTEP_API_URL)), never());
 	}
 	
 	// getStepList
@@ -550,7 +550,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SKIPPED","LOCAL");
 		connector.addTestStepsToTestCases(new ArrayList<>(), testCaseInSessionId);
 
-		mockedUnirest.verify(() -> Unirest.patch(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL)), never());
+		mockedUnirest.get().verify(() -> Unirest.patch(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL)), never());
 	}
 	
 	// snapshot creation
@@ -700,7 +700,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 
 
 		Integer snapshotId = connector.createSnapshot(snapshot, 1, 1, 1, new ArrayList<>());
-		mockedUnirest.verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL)), never());
+		mockedUnirest.get().verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL)), never());
 		
 		Assert.assertNull(snapshotId);
 	}
@@ -839,7 +839,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
 		
 		Integer excludeZoneId = connector.createExcludeZones(new Rectangle(1, 1, 1, 1), 0);
-		mockedUnirest.verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL)), never());
+		mockedUnirest.get().verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL)), never());
 		
 		Assert.assertNull(excludeZoneId);
 	}
@@ -887,7 +887,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
 
 		Integer stepResultId = connector.recordStepResult(true, "", 1, 1, 1, 1);
-		mockedUnirest.verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.STEPRESULT_API_URL)), never());
+		mockedUnirest.get().verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.STEPRESULT_API_URL)), never());
 		
 		Assert.assertNull(stepResultId);
 	}
@@ -1322,7 +1322,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 
 
 		connector.createStepReferenceSnapshot(snapshot, 1);
-		mockedUnirest.verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL)), never());
+		mockedUnirest.get().verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL)), never());
 		
 	}
 	
@@ -1396,7 +1396,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		
 		
 		connector.getReferenceSnapshot(1);
-		mockedUnirest.verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL)), never());
+		mockedUnirest.get().verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL)), never());
 		
 	}
 	
@@ -1422,7 +1422,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
 
 		connector.detectFieldsInPicture(snapshot);
-		mockedUnirest.verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.DETECT_API_URL)), never());
+		mockedUnirest.get().verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.DETECT_API_URL)), never());
 	}
 	
 	/**
@@ -1528,7 +1528,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		
 		connector.getStepReferenceDetectFieldInformation(1, "afcc45");
 
-		mockedUnirest.verify(() -> Unirest.get(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.DETECT_API_URL)), never());
+		mockedUnirest.get().verify(() -> Unirest.get(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.DETECT_API_URL)), never());
 	}
 	
 	

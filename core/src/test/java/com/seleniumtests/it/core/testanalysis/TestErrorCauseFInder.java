@@ -2,6 +2,9 @@ package com.seleniumtests.it.core.testanalysis;
 
 import java.util.Arrays;
 
+import com.seleniumtests.ConnectorsTest;
+import org.mockito.MockitoAnnotations;
+import org.mockito.exceptions.base.MockitoException;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.Test;
@@ -234,6 +237,34 @@ public class TestErrorCauseFInder extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
 		}
 	}
+
+	/**
+	 * This method is used by testErrorInLastStepMultithread so that we can initialize mocks on the test threads
+	 * Mockito only mocks the current thread. This callback will be called on 'testImageDetection' test start
+	 * @throws Exception
+	 */
+	public void initMockForTestErrorInLastStepMultithread() throws Exception {
+
+		MockitoAnnotations.initMocks(this);
+		ConnectorsTest ct = new ConnectorsTest();
+		try {
+			ct.initMocks(null, null, null);
+			ct.configureMockedSnapshotServerConnection();
+			ct.createServerMock(SERVER_URL,
+					"POST",
+					SeleniumRobotSnapshotServerConnector.DETECT_API_URL,
+					200,
+					Arrays.asList(
+							String.format(DETECT_ERROR_REPLY, "testImageDetection_5-1_Test_end-.png"),
+							String.format(DETECT_FIELD_REPLY, "testImageDetection_4-1__clickErrorButtonInError_-.jpg")
+					),
+					"request"
+			); // detect field
+			ct.createServerMock("GET", SeleniumRobotSnapshotServerConnector.DETECT_API_URL, 200, String.format(DETECT_FIELD_REPLY, "testImageDetection_4-1__clickErrorButtonInError_-.jpg")); // get fields detected for reference
+		} catch (MockitoException e) {
+			logger.info("Mocks already initialized for this thread");
+		}
+	}
 	
 	/**
 	 * Test  when there is an error in last step, check we display the analysis in report
@@ -251,20 +282,8 @@ public class TestErrorCauseFInder extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.FIND_ERROR_CAUSE, "true");
 			System.setProperty(SeleniumTestsContext.RANDOM_IN_ATTACHMENT_NAME, "false");
 			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, VideoCaptureMode.ON_ERROR.toString());
-			
-			configureMockedSnapshotServerConnection();
-			createServerMock(SERVER_URL,
-					"POST", 
-					SeleniumRobotSnapshotServerConnector.DETECT_API_URL, 
-					200, 
-					Arrays.asList(
-							String.format(DETECT_ERROR_REPLY, "testImageDetection_5-1_Test_end-.png"),
-							String.format(DETECT_FIELD_REPLY, "testImageDetection_4-1__clickErrorButtonInError_-.jpg")
-							),
-					"request"
-					); // detect field
-			createServerMock("GET", SeleniumRobotSnapshotServerConnector.DETECT_API_URL, 200, String.format(DETECT_FIELD_REPLY, "testImageDetection_4-1__clickErrorButtonInError_-.jpg")); // get fields detected for reference
-		
+			System.setProperty("mockTestExecutionMethod", "com.seleniumtests.it.core.testanalysis.TestErrorCauseFInder#initMockForTestErrorInLastStepMultithread");
+
 			ReporterTest.executeSubTest(3, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS,  new String[] {"testImageDetection"});
 			
 			// check the error cause is displayed at the top of the report
@@ -278,6 +297,7 @@ public class TestErrorCauseFInder extends ReporterTest {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
 			System.clearProperty(SeleniumTestsContext.RANDOM_IN_ATTACHMENT_NAME);
 			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
+			System.clearProperty("mockTestExecutionMethod");
 		}
 	}
 	

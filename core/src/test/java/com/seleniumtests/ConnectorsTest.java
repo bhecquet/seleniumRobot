@@ -38,6 +38,7 @@ import org.apache.commons.io.FileUtils;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
+import org.mockito.exceptions.base.MockitoException;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.mockito.stubbing.OngoingStubbing;
@@ -86,41 +87,20 @@ import kong.unirest.json.JSONObject;
 
 
 public class ConnectorsTest extends MockitoTest {
-	
-	@Mock
-	private RemoteWebDriver driver;
-	
-	@Mock
-	private Options options;
-	
-	@Mock
-	private Timeouts timeouts;
-	
-	@Mock
-	private Navigation navigation;
-	
-	@Mock
-	private TargetLocator targetLocator;
-	
-	@Mock
-	private RemoteWebElement element;
 
-	@Mock
+	// mocks
+	private Options options;
+	private Timeouts timeouts;
+	private Navigation navigation;
+	private TargetLocator targetLocator;
+	private RemoteWebElement element;
 	public GetRequest getAliveRequest;
-	
-	@Mock
 	public Config unirestConfig;
-	
-	@Mock
 	public HttpRequestWithBody postRequest;
-	
-	@Mock
-	public HttpResponse<String> responseAliveString;	
-	
-	@Mock
+	public HttpResponse<String> responseAliveString;
 	public UnirestInstance unirestInstance;
 
-	protected MockedStatic mockedUnirest;
+	protected static ThreadLocal<MockedStatic> mockedUnirest = new ThreadLocal<>();
 	protected MockedStatic mockedWebUiDriverFactory;
 	protected MockedConstruction mockedWebUiDriver;
 	protected MockedConstruction mockedRemoteWebDriver;
@@ -241,16 +221,38 @@ public class ConnectorsTest extends MockitoTest {
 
 	@BeforeMethod(groups={"ut", "it"})  
 	public void initMocks(final Method method, final ITestContext testNGCtx, final ITestResult testResult) throws Exception {
-		mockedUnirest = mockStatic(Unirest.class);
-		mockedUnirest.when(() -> Unirest.spawnInstance()).thenReturn(unirestInstance);
-		mockedUnirest.when(() -> Unirest.config()).thenReturn(unirestConfig);
+		options = mock(Options.class);
+		timeouts = mock(Timeouts.class);
+		navigation = mock(Navigation.class);
+		targetLocator = mock(TargetLocator.class);
+		element = mock(RemoteWebElement.class);
+		getAliveRequest = mock(GetRequest.class);
+		unirestConfig = mock(Config.class);
+		postRequest = mock(HttpRequestWithBody.class);
+		responseAliveString = mock(HttpResponse.class);
+		unirestInstance = mock(UnirestInstance.class);
+
+		// for multi-thread tests (typically TestErrorCauseFinder), we need to initialize a ConnectorsTest instance at subTest start
+		// so discard the mock for current thread and recreate it for our instance
+		try {
+			mockedUnirest.set(mockStatic(Unirest.class));
+		} catch (MockitoException e) {
+			if (mockedUnirest.get() != null) {
+				mockedUnirest.get().close();
+				mockedUnirest.set(mockStatic(Unirest.class));
+			}
+		}
+		mockedUnirest.get().when(() -> Unirest.spawnInstance()).thenReturn(unirestInstance);
+		mockedUnirest.get().when(() -> Unirest.config()).thenReturn(unirestConfig);
+
+
 	}
 
 	@AfterMethod(groups={"ut", "it"}, alwaysRun = true)
 	public void resetMocks() {
-		if (mockedUnirest != null) {
-			mockedUnirest.close(); // as we do not use try-with-resource
-			mockedUnirest = null;
+		if (mockedUnirest.get() != null) {
+			mockedUnirest.get().close(); // as we do not use try-with-resource
+			mockedUnirest.remove();
 		}
 
 		if (mockedWebUiDriver != null) {
@@ -271,28 +273,28 @@ public class ConnectorsTest extends MockitoTest {
 	 * Method for creating server reply mock
 	 * @throws UnirestException 
 	 */
-	protected HttpRequest<?> createGridServletServerMock(String requestType, String apiPath, int statusCode, String replyData) throws UnirestException {
+	public HttpRequest<?> createGridServletServerMock(String requestType, String apiPath, int statusCode, String replyData) throws UnirestException {
 		return createServerMock(GRID_SERVLET_URL, requestType, apiPath, statusCode, replyData, "request");
 	}
-	protected HttpRequest<?> createGridServletServerMock(String requestType, String apiPath, int statusCode, File replyData) throws UnirestException {
+	public HttpRequest<?> createGridServletServerMock(String requestType, String apiPath, int statusCode, File replyData) throws UnirestException {
 		return createServerMock(GRID_SERVLET_URL, requestType, apiPath, statusCode, replyData, "request");
 	}
-	protected HttpRequest<?> createGridServletServerMock(String requestType, String apiPath, int statusCode, String replyData, String responseType) throws UnirestException {
+	public HttpRequest<?> createGridServletServerMock(String requestType, String apiPath, int statusCode, String replyData, String responseType) throws UnirestException {
 		return createServerMock(GRID_SERVLET_URL, requestType, apiPath, statusCode, replyData, responseType);
 	}
-	protected HttpRequest<?> createGridServletServerMock(String requestType, String apiPath, int statusCode, File replyData, String responseType) throws UnirestException {
+	public HttpRequest<?> createGridServletServerMock(String requestType, String apiPath, int statusCode, File replyData, String responseType) throws UnirestException {
 		return createServerMock(GRID_SERVLET_URL, requestType, apiPath, statusCode, replyData, responseType);
 	}
-	protected HttpRequest<?> createServerMock(String requestType, String apiPath, int statusCode, String replyData) throws UnirestException {
+	public HttpRequest<?> createServerMock(String requestType, String apiPath, int statusCode, String replyData) throws UnirestException {
 		return createServerMock(requestType, apiPath, statusCode, replyData, "request");
 	}
-	protected HttpRequest<?> createServerMock(String requestType, String apiPath, int statusCode, File replyData) throws UnirestException {
+	public HttpRequest<?> createServerMock(String requestType, String apiPath, int statusCode, File replyData) throws UnirestException {
 		return createServerMock(requestType, apiPath, statusCode, replyData, "request");
 	}
-	protected HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, String replyData) throws UnirestException {
+	public HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, String replyData) throws UnirestException {
 		return createServerMock(serverUrl, requestType, apiPath, statusCode, replyData, "request");
 	}
-	protected HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, File replyData) throws UnirestException {
+	public HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, File replyData) throws UnirestException {
 		return createServerMock(serverUrl, requestType, apiPath, statusCode, replyData, "request");
 	}
 	
@@ -306,24 +308,24 @@ public class ConnectorsTest extends MockitoTest {
 	 * @return
 	 * @throws UnirestException
 	 */
-	protected HttpRequest<?> createServerMock(String requestType, String apiPath, int statusCode, File replyData, String responseType) throws UnirestException {
+	public HttpRequest<?> createServerMock(String requestType, String apiPath, int statusCode, File replyData, String responseType) throws UnirestException {
 		return createServerMock(SERVER_URL, requestType, apiPath, statusCode, (Object)replyData, responseType);
 	}
-	protected HttpRequest<?> createServerMock(String requestType, String apiPath, int statusCode, String replyData, String responseType) throws UnirestException {
+	public HttpRequest<?> createServerMock(String requestType, String apiPath, int statusCode, String replyData, String responseType) throws UnirestException {
 		return createServerMock(SERVER_URL, requestType, apiPath, statusCode, (Object)replyData, responseType);
 	}
-	
-	protected HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, File replyData, String responseType) throws UnirestException {
+
+	public HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, File replyData, String responseType) throws UnirestException {
 		return createServerMock(serverUrl, requestType, apiPath, statusCode, (Object)replyData, responseType);
 	}
-	protected HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, String replyData, String responseType) throws UnirestException {
+	public HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, String replyData, String responseType) throws UnirestException {
 		return createServerMock(serverUrl, requestType, apiPath, statusCode, (Object)replyData, responseType);
 	}
-	
-	protected HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, Object replyData, String responseType) throws UnirestException {
+
+	public HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, Object replyData, String responseType) throws UnirestException {
 		return createServerMock(serverUrl, requestType, apiPath, statusCode, Arrays.asList(replyData), responseType);
 	}
-	protected HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, final List<Object> replyData, String responseType) throws UnirestException {
+	public HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, final List<Object> replyData, String responseType) throws UnirestException {
 
 
 		if (replyData.isEmpty()) {
@@ -468,7 +470,7 @@ public class ConnectorsTest extends MockitoTest {
 			case "GET":
 				GetRequest getRequest = mock(GetRequest.class);
 
-				mockedUnirest.when(() -> Unirest.get(serverUrl + apiPath)).thenReturn(getRequest);
+				mockedUnirest.get().when(() -> Unirest.get(serverUrl + apiPath)).thenReturn(getRequest);
 				when(getRequest.downloadMonitor(any())).thenReturn(getRequest);
 				when(getRequest.socketTimeout(anyInt())).thenReturn(getRequest);
 				when(unirestInstance.get(serverUrl + apiPath)).thenReturn(getRequest);
@@ -489,19 +491,19 @@ public class ConnectorsTest extends MockitoTest {
 				when(getRequest.asPaged(any(), (Function<HttpResponse<JsonNode>, String>) any(Function.class))).thenReturn(pageList);
 				return getRequest;
 			case "POST":
-				mockedUnirest.when(() -> Unirest.post(serverUrl + apiPath)).thenReturn(postRequest);
+				mockedUnirest.get().when(() -> Unirest.post(serverUrl + apiPath)).thenReturn(postRequest);
 				when(unirestInstance.post(serverUrl + apiPath)).thenReturn(postRequest);
 				return preparePostRequest(serverUrl, responseType, postRequest, response, jsonResponse);
 			case "PATCH":
-				mockedUnirest.when(() -> Unirest.patch(serverUrl + apiPath)).thenReturn(postRequest);
+				mockedUnirest.get().when(() -> Unirest.patch(serverUrl + apiPath)).thenReturn(postRequest);
 				when(unirestInstance.patch(serverUrl + apiPath)).thenReturn(postRequest);
 				return preparePostRequest(serverUrl, responseType, postRequest, response, jsonResponse);
 			case "PUT":
-				mockedUnirest.when(() -> Unirest.put(serverUrl + apiPath)).thenReturn(postRequest);
+				mockedUnirest.get().when(() -> Unirest.put(serverUrl + apiPath)).thenReturn(postRequest);
 				when(unirestInstance.put(serverUrl + apiPath)).thenReturn(postRequest);
 				return preparePostRequest(serverUrl, responseType, postRequest, response, jsonResponse);
 			case "DELETE":
-				mockedUnirest.when(() -> Unirest.delete(serverUrl + apiPath)).thenReturn(postRequest);
+				mockedUnirest.get().when(() -> Unirest.delete(serverUrl + apiPath)).thenReturn(postRequest);
 				when(unirestInstance.delete(serverUrl + apiPath)).thenReturn(postRequest);
 				return preparePostRequest(serverUrl, responseType, postRequest, response, jsonResponse);
 
@@ -574,7 +576,7 @@ public class ConnectorsTest extends MockitoTest {
 			case "GET":
 				GetRequest getRequest = mock(GetRequest.class);
 
-				mockedUnirest.when(() -> Unirest.get(SERVER_URL + apiPath)).thenReturn(getRequest);
+				mockedUnirest.get().when(() -> Unirest.get(SERVER_URL + apiPath)).thenReturn(getRequest);
 
 				when(getRequest.header(anyString(), anyString())).thenReturn(getRequest);
 				when(getRequest.asJson()).thenReturn(jsonResponse);
@@ -583,9 +585,9 @@ public class ConnectorsTest extends MockitoTest {
 				when(getRequest.queryString(anyString(), anyBoolean())).thenReturn(getRequest);
 				return stub;
 			case "POST":
-				mockedUnirest.when(() -> Unirest.post(SERVER_URL + apiPath)).thenReturn(postRequest);
+				mockedUnirest.get().when(() -> Unirest.post(SERVER_URL + apiPath)).thenReturn(postRequest);
 			case "PATCH":
-				mockedUnirest.when(() -> Unirest.patch(SERVER_URL + apiPath)).thenReturn(postRequest);
+				mockedUnirest.get().when(() -> Unirest.patch(SERVER_URL + apiPath)).thenReturn(postRequest);
 				when(postRequest.field(anyString(), anyString())).thenReturn(requestMultipartBody);
 				when(postRequest.field(anyString(), anyInt())).thenReturn(requestMultipartBody);
 				when(postRequest.field(anyString(), anyLong())).thenReturn(requestMultipartBody);
@@ -664,18 +666,15 @@ public class ConnectorsTest extends MockitoTest {
 	 * simulate an alive snapshot sever responding to all requests
 	 * @throws UnirestException 
 	 */
-	protected SeleniumRobotSnapshotServerConnector configureMockedSnapshotServerConnection() throws UnirestException {
+	public SeleniumRobotSnapshotServerConnector configureMockedSnapshotServerConnection() throws UnirestException {
 		
 		// snapshot server comes with variable server
 		configureMockedVariableServerConnection();
 		
 		when(getAliveRequest.asString()).thenReturn(responseAliveString);
 		when(responseAliveString.getStatus()).thenReturn(200);
-		when(Unirest.get(SERVER_URL + "/snapshot/")).thenReturn(getAliveRequest);
+		mockedUnirest.get().when(() -> Unirest.get(SERVER_URL + "/snapshot/")).thenReturn(getAliveRequest);
 		when(unirestInstance.get(SERVER_URL + "/snapshot/")).thenReturn(getAliveRequest);
-		
-		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerUrl(SERVER_URL);
-		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerActive(true);
 		
 		// set default reply from server. To override this behaviour, redefine some steps in test after connector creation
 		createServerMock("POST", SeleniumRobotSnapshotServerConnector.APPLICATION_API_URL, 200, "{'id': '9'}");	
@@ -722,17 +721,13 @@ public class ConnectorsTest extends MockitoTest {
 	 * @throws UnirestException 
 	 */
 	protected void configureMockedVariableServerConnection() throws UnirestException {
-
-		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerUrl(SERVER_URL);
-		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerActive(true);
-		
 		configureMockedVariableServerConnection(SERVER_URL);
 	}
 	protected void configureMockedVariableServerConnection(String serverUrl) throws UnirestException {
 		when(getAliveRequest.asString()).thenReturn(responseAliveString);
 		when(getAliveRequest.header(anyString(), anyString())).thenReturn(getAliveRequest);
 		when(responseAliveString.getStatus()).thenReturn(200);
-		when(Unirest.get(serverUrl + SeleniumRobotServerConnector.PING_API_URL)).thenReturn(getAliveRequest);
+		mockedUnirest.get().when(() -> Unirest.get(serverUrl + SeleniumRobotServerConnector.PING_API_URL)).thenReturn(getAliveRequest);
 		when(unirestInstance.get(serverUrl + SeleniumRobotServerConnector.PING_API_URL)).thenReturn(getAliveRequest);
 		
 		// set default reply from server. To override this behaviour, redefine some steps in test after connector creation
