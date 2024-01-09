@@ -322,4 +322,11 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 	public static int getCounter() {
 		return counter.get();
 	}
+
+	/**
+	 * For tests
+	 */
+	public static void resetCounter() {
+		counter.set(0);
+	}
 }

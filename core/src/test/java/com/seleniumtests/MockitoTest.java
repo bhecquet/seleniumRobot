@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.seleniumtests.browserfactory.SeleniumGridDriverFactory;
 import com.seleniumtests.util.osutility.OSUtility;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -60,6 +61,7 @@ public class MockitoTest {
 		doBeforeMethod(method);
 		beforeMethodDone.put(method, true);
 		initThreadContext(testNGCtx, null, testResult);
+		SeleniumGridDriverFactory.resetCounter();
 		MockitoAnnotations.initMocks(this); 
 	}
 	
