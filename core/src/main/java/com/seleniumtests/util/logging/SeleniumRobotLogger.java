@@ -316,7 +316,11 @@ public class SeleniumRobotLogger {
 		for (File file: FileUtils.listFiles(new File(defaultOutputDirectory),
 				FileFilterUtils.nameFileFilter("execution.log"),
 				TrueFileFilter.INSTANCE )) {
-			file.delete();
+			try {
+				Files.delete(file.toPath());
+			} catch (IOException e) {
+				getLogger(SeleniumRobotLogger.class).warn(String.format("Cannot delete %s: %s", file.getAbsolutePath(), e.getMessage()));
+			}
 		}
 	}
 	
