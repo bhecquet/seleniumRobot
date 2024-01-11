@@ -17,7 +17,7 @@ public class TestLigthouse extends GenericMultiBrowserTest {
 		super(BrowserType.CHROME, "DriverTestPage");
 	}
 	
-	@Test(groups="it", enabled=false)
+	@Test(groups="it-driver", enabled=false)
 	public  void testLighthouseExecution() {
 		Lighthouse lighthouseInstance = LighthouseFactory.getInstance();
 		lighthouseInstance.execute(testPageUrl, new ArrayList<>());
@@ -27,7 +27,7 @@ public class TestLigthouse extends GenericMultiBrowserTest {
 		Assert.assertTrue(lighthouseInstance.getScore(Category.ACCESSIBILITY) > 30);
 	}
 	
-	@Test(groups="it", enabled=false)
+	@Test(groups="it-driver", enabled=false)
 	public  void testLighthouseExecutionInError() {
 		Lighthouse lighthouseInstance = LighthouseFactory.getInstance();
 		lighthouseInstance.execute("badUrl", new ArrayList<>());

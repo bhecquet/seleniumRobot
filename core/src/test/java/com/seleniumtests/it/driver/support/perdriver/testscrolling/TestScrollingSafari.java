@@ -28,72 +28,72 @@ public class TestScrollingSafari extends TestAutoScrolling {
 		super(BrowserType.SAFARI);
 	}
 	
-	@Test(groups={"it", "ut"})
+	@Test(groups="it")
 	public void testScrollToMiddleDiv1() {
 		super.testScrollToMiddleDiv1();
 	}
 	
-	@Test(groups={"it", "ut"})
+	@Test(groups="it")
 	public void testScrollToMiddleDiv2() {
 		super.testScrollToMiddleDiv2();
 	}
 	
-	@Test(groups={"it", "ut"})
+	@Test(groups="it")
 	public void testScrollToDivTop() {
 		super.testScrollToDivTop();
 	}
 	
-	@Test(groups={"it", "ut"})
+	@Test(groups="it")
 	public void testScrollToDivBottom() {
 		super.testScrollToDivBottom();
 	}
 	
-	@Test(groups={"it", "ut"})
+	@Test(groups="it")
 	public void testScrollToDivBottomWithCompositeAction() {
 		super.testScrollToDivBottomWithCompositeAction();
 	}
 
-	@Test(groups={"it", "ut"})
+	@Test(groups="it")
 	public void testScrollToBottom() {
 		super.testScrollToBottom();
 	}
 	
-	@Test(groups={"it", "ut"})
+	@Test(groups="it")
 	public void testScrollToBottomNoHeader() {
 		super.testScrollToBottomNoHeader();
 	}
 	
-	@Test(groups={"it", "ut"})
+	@Test(groups="it")
 	public void testAutoScrollToMiddleDiv1() {
 		super.testAutoScrollToMiddleDiv1();
 	}
 	
-	@Test(groups={"it", "ut"})
+	@Test(groups="it")
 	public void testAutoScrollToMiddleDiv2() {
 		super.testAutoScrollToMiddleDiv2();
 	}
 	
-	@Test(groups={"it", "ut"})
+	@Test(groups="it")
 	public void testAutoScrollToDivTop() {
 		super.testAutoScrollToDivTop();
 	}
 	
-	@Test(groups={"it", "ut"})
+	@Test(groups="it")
 	public void testAutoScrollToDivBottom() {
 		super.testAutoScrollToDivBottom();
 	}
 
-	@Test(groups={"it"})
+	@Test(groups={"it-driver"})
 	public void testScrollToDivBottomClickMouse() {
 		super.testScrollToDivBottomClickMouse();
 	}
 	
-	@Test(groups={"it", "ut"})
+	@Test(groups="it")
 	public void testAutoScrollToBottom() {
 		super.testAutoScrollToBottom();
 	}
 
-	@Test(groups={"it", "ut"})
+	@Test(groups="it")
 	public void testAutoScrollToMenu() {
 		super.testAutoScrollToMenu();
 	}

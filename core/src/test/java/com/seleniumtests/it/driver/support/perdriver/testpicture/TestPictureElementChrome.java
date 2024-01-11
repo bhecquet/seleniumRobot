@@ -29,17 +29,17 @@ public class TestPictureElementChrome extends TestPictureElement {
 	}
 	
 	//copy all tests so that they can be played individually for debug
-	@Test(groups={"it"})
+	@Test(groups={"it-driver"})
 	public void testClickOnPicture() {
 		super.testClickOnPicture();
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups={"it-driver"})
 	public void testMultipleActionsOnPicture() {
 		super.testMultipleActionsOnPicture();
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups={"it-driver"})
 	public void testMultipleActionsOnPictureWithAnotherPage() {
 		super.testMultipleActionsOnPictureWithAnotherPage();
 	}
@@ -47,42 +47,42 @@ public class TestPictureElementChrome extends TestPictureElement {
 	/**
 	 * issue #529: test done only with chrome as it does not depend on browser
 	 */
-	@Test(groups={"it"})
+	@Test(groups={"it-driver"})
 	public void testMultipleActionsOnPictureWithAnotherPagePrivateField() {
 		super.testMultipleActionsOnPictureWithAnotherPagePrivateField();
 	}
 
-	@Test(groups={"it"})
+	@Test(groups={"it-driver"})
 	public void testDoubleClickOnPicture() {
 		super.testDoubleClickOnPicture();
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups={"it-driver"})
 	public void testClickOnGooglePicture() {	
 		super.testClickOnGooglePicture();
 	}
 
-	@Test(groups={"it"})
+	@Test(groups={"it-driver"})
 	public void testActionDurationIsLogged() {
 		super.testActionDurationIsLogged();
 	}
 
-	@Test(groups={"it"})
+	@Test(groups={"it-driver"})
 	public void testClickOnGooglePictureFromFile() {
 		super.testClickOnGooglePictureFromFile();
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups={"it-driver"})
 	public void testSendKeysOnPicture() {
 		super.testSendKeysOnPicture();
 	}
 
-	@Test(groups={"it"})
+	@Test(groups={"it-driver"})
 	public void testIsVisible() { 
 		super.testIsVisible();
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups={"it-driver"})
 	public void testIsNotVisible() {
 		super.testIsNotVisible();
 	}

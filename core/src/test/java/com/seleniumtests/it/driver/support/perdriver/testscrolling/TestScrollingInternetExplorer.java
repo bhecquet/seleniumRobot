@@ -49,7 +49,7 @@ public class TestScrollingInternetExplorer extends TestAutoScrolling {
 		super.testScrollToDivBottom();
 	}
 
-	@Test(groups={"it"})
+	@Test(groups={"ie"})
 	public void testScrollToDivBottomClickMouse() {
 		super.testScrollToDivBottomClickMouse();
 	}
