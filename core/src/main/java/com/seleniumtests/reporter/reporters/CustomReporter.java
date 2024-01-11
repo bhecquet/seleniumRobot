@@ -198,6 +198,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			context.put("stacktrace", stack);
 			context.put("failedStep", StringUtility.encodeString(failedStep, reportFormat.toLowerCase()));
 			String logs = SeleniumRobotLogger.getTestLogs(getTestName(testResult));
+			logger.info("test name: " + getTestName(testResult));
 			getTestLogs(context, reportFormat, logs);
 
 			context.put("testInfos", TestNGResultUtils.getTestInfoEncoded(testResult, reportFormat));
