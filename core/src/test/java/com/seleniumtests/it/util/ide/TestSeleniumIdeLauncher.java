@@ -59,7 +59,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 		return mapping;
 	}
 	
-	@BeforeClass(groups={"it", "ut"})
+	@BeforeClass(groups={"it-driver"})
 	public void exposeTestPage(final ITestContext testNGCtx) throws Exception {
 
 		String localAddress = Inet4Address.getLocalHost().getHostAddress();
@@ -68,7 +68,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
         logger.info(String.format("exposing server on http://%s:%d", localAddress, server.getServerHost().getPort()));
 	}
 
-	@AfterClass(groups={"it", "ut"}, alwaysRun=true)
+	@AfterClass(groups={"it-driver"}, alwaysRun=true)
 	public void stop() throws Exception {
 		if (server != null) {
 			logger.info("stopping web server");
@@ -76,7 +76,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 		}
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups={"it-driver"})
 	public void testSeleniumExecution() throws IOException, ClassNotFoundException {
 		try {
 			CompilerUtils.addClassPath("target/test-classes");
@@ -130,7 +130,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 		}
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups={"it-driver"})
 	public void testSeleniumExecutionMaskPassword() throws IOException, ClassNotFoundException {
 		try {
 			CompilerUtils.addClassPath("target/test-classes");
@@ -172,7 +172,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 	 * @throws IOException
 	 * @throws ClassNotFoundException
 	 */
-	@Test(groups={"it"})
+	@Test(groups={"it-driver"})
 	public void testSeleniumExecutionInternetExplorer() throws IOException, ClassNotFoundException {
 		try {
 			CompilerUtils.addClassPath("target/test-classes");
@@ -217,7 +217,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 	 * @throws IOException
 	 * @throws ClassNotFoundException
 	 */
-	@Test(groups={"it"}, enabled = false)
+	@Test(groups={"it-driver"}, enabled = false)
 	public void testSeleniumIDE() throws IOException, ClassNotFoundException {
 		try {
 			CompilerUtils.addClassPath("target/test-classes");
@@ -233,7 +233,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 		}
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups={"it-driver"})
 	public void testSeleniumExecutionParallel() throws IOException, ClassNotFoundException {
 		try {
 			CompilerUtils.addClassPath("target/test-classes");
@@ -287,7 +287,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 	 * @throws IOException
 	 * @throws ClassNotFoundException
 	 */
-	@Test(groups={"it"})
+	@Test(groups={"it-driver"})
 	public void testSeleniumExecutionWithManualSteps() throws IOException, ClassNotFoundException {
 		try {
 			CompilerUtils.addClassPath("target/test-classes");
@@ -334,7 +334,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 	 * @throws IOException
 	 * @throws ClassNotFoundException
 	 */
-	@Test(groups={"it"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "'-Dbrowser=<browser>' option is mandatory")
+	@Test(groups={"it-driver"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "'-Dbrowser=<browser>' option is mandatory")
 	public void testSeleniumExecutionWithoutBrowser() throws IOException, ClassNotFoundException {
 		try {
 			CompilerUtils.addClassPath("target/test-classes");
@@ -362,7 +362,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 	 * @throws ClassNotFoundException
 	 * @throws IOException
 	 */
-	@Test(groups={"it"})
+	@Test(groups={"it-driver"})
 	public void testSimpleExecution() throws ClassNotFoundException, IOException {
 		try {
 			String cls = "package covea.selenium.commons.tests;" + 
@@ -405,7 +405,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 	 * @throws IllegalAccessException 
 	 * @throws IllegalArgumentException 
 	 */
-	@Test(groups={"it"})
+	@Test(groups={"it-driver"})
 	public void testParseIssue() throws IOException, ClassNotFoundException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 		try {		    
 		    SeleniumIdeLauncher seleniumIde = new SeleniumIdeLauncher();
