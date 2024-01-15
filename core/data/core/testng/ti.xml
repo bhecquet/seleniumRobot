@@ -54,48 +54,60 @@
     </test>
     
     <!-- below are tests with smaller sized groups -->
-    <test name="reporter" parallel="false">
- 		<parameter name="variable1" value="value1" />
+    <test name="IntegrationTestsNoBrowser" parallel="true" thread-count="2">
+        <parameter name="variable1" value="value1" />
+
+        <groups>
+            <run>
+                <include name="it"/>
+                <exclude name="pageobject" /> <!--  exclude pageobject groups as this class is already tested in "Page Object" test -->
+            </run>
+        </groups>
 
         <packages>
-            <package name="com.seleniumtests.it.reporter.*" />
+            <package name="com.seleniumtests.it.*" >
+                <!--  exclude stub tests classes as they make SeleniumRobotTestListener available for listening when executing integration tests -->
+                <exclude name="com.seleniumtests.it.stubclasses.*"></exclude>
+                <exclude name="com.seleniumtests.it.driver.*"></exclude>
+            </package>
         </packages>
     </test>
-    <test name="util" parallel="false">
- 		<parameter name="variable1" value="value1" />
 
+    <test name="BrowserChrome" parallel="false">
         <packages>
-            <package name="com.seleniumtests.it.util.*" />
+            <package name="com.seleniumtests.it.driver.*" >
+                <exclude name="com.seleniumtests.it.driver.edge.*"></exclude>
+                <exclude name="com.seleniumtests.it.driver.firefox.*"></exclude>
+                <exclude name="com.seleniumtests.it.driver.htmlunit.*"></exclude>
+                <exclude name="com.seleniumtests.it.driver.ie.*"></exclude>
+                <exclude name="com.seleniumtests.it.driver.safari.*"></exclude>
+            </package>
         </packages>
     </test>
-    <test name="webelements" parallel="false">
- 		<parameter name="variable1" value="value1" />
-
+    <test name="BrowserEdge" parallel="false">
         <packages>
-            <package name="com.seleniumtests.it.webelements.*" />
+            <package name="com.seleniumtests.it.driver.edge.*" />
         </packages>
     </test>
-    <test name="connector" parallel="false">
- 		<parameter name="variable1" value="value1" />
-
+    <test name="BrowserFirefox" parallel="false">
         <packages>
-            <package name="com.seleniumtests.it.connector.*" />
+            <package name="com.seleniumtests.it.driver.firefox.*" />
         </packages>
     </test>
-    <test name="browserfactory" parallel="false">
- 		<parameter name="variable1" value="value1" />
-
+    <test name="BrowserHtmlUnit" parallel="false">
         <packages>
-            <package name="com.seleniumtests.it.browserfactory.*" />
+            <package name="com.seleniumtests.it.driver.htmlunit.*" />
         </packages>
     </test>
-    <test name="browser3" parallel="false">
- 		<parameter name="variable1" value="value1" />
-
-		<packages>
-            <package name="com.seleniumtests.it.driver.screenshots" />
+    <test name="BrowserSafari" parallel="false">
+        <packages>
+            <package name="com.seleniumtests.it.driver.safari.*" />
         </packages>
-
+    </test>
+    <test name="BrowserInternetExplorer" parallel="false">
+        <packages>
+            <package name="com.seleniumtests.it.driver.ie.*" />
+        </packages>
     </test>
    
 
