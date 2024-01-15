@@ -1,0 +1,95 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+<suite name="Integration test suite" parallel="none" verbose="1" thread-count="1" configfailurepolicy="continue" group-by-instances="true">
+   
+	<parameter name="implicitWaitTimeOut" value="2"></parameter>
+	<parameter name="browser" value="*firefox" />
+	<parameter name="app" value="https://www.test.google.fr" />
+	<parameter name="aParam" value="value1" />
+	<parameter name="anOtherParam" value="value2" />
+	<parameter name="variable1" value="value4" />
+	<parameter name="debug" value="none" />
+    <parameter name="overrideSeleniumNativeAction" value="true" />
+
+    <!-- the 3 next "tests" will execute all the integration tests -->
+    <test name="IExplorer" parallel="false">
+
+		<groups>
+            <run>
+                <include name="ie"/>
+                <exclude name="pageobject" /> 
+            </run>
+        </groups>
+
+        <packages>
+            <package name="com.seleniumtests.it.*" >
+            	<exclude name="com.seleniumtests.it.stubclasses.*"></exclude>
+            </package>
+        </packages>
+    </test>
+    
+    <test name="IntegrationTestsNoBrowser" parallel="true" thread-count="2">
+ 		<parameter name="variable1" value="value1" />
+ 
+        <groups>
+            <run>
+                <include name="it"/>
+                <exclude name="pageobject" /> <!--  exclude pageobject groups as this class is already tested in "Page Object" test -->
+            </run>
+        </groups>
+
+        <packages>
+            <package name="com.seleniumtests.it.*" >
+            <!--  exclude stub tests classes as they make SeleniumRobotTestListener available for listening when executing integration tests -->
+            	<exclude name="com.seleniumtests.it.stubclasses.*"></exclude>
+            	<exclude name="com.seleniumtests.it.driver.*"></exclude>
+            </package>
+        </packages>
+    </test>
+    
+    <test name="PageObject" parallel="false">
+ 		<parameter name="variable1" value="value3" />
+
+        <classes>
+            <class name="com.seleniumtests.it.webelements.TestPageObject" />
+        </classes>
+    </test>
+
+    <test name="BrowserChrome" parallel="false">
+        <packages>
+            <package name="com.seleniumtests.it.driver.*" >
+                <exclude name="com.seleniumtests.it.driver.edge.*"></exclude>
+                <exclude name="com.seleniumtests.it.driver.firefox.*"></exclude>
+                <exclude name="com.seleniumtests.it.driver.htmlunit.*"></exclude>
+                <exclude name="com.seleniumtests.it.driver.ie.*"></exclude>
+                <exclude name="com.seleniumtests.it.driver.safari.*"></exclude>
+            </package>
+        </packages>
+    </test>
+    <test name="BrowserEdge" parallel="false">
+        <packages>
+            <package name="com.seleniumtests.it.driver.edge.*" />
+        </packages>
+    </test>
+    <test name="BrowserFirefox" parallel="false">
+        <packages>
+            <package name="com.seleniumtests.it.driver.firefox.*" />
+        </packages>
+    </test>
+    <test name="BrowserHtmlUnit" parallel="false">
+        <packages>
+            <package name="com.seleniumtests.it.driver.htmlunit.*" />
+        </packages>
+    </test>
+    <test name="BrowserSafari" parallel="false">
+        <packages>
+            <package name="com.seleniumtests.it.driver.safari.*" />
+        </packages>
+    </test>
+    <test name="BrowserInternetExplorer" parallel="false">
+        <packages>
+            <package name="com.seleniumtests.it.driver.ie.*" />
+        </packages>
+    </test>
+
+
+</suite> 

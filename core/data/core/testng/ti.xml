@@ -9,7 +9,8 @@
 	<parameter name="variable1" value="value4" />
 	<parameter name="debug" value="none" />
     <parameter name="overrideSeleniumNativeAction" value="true" />
-    
+
+    <!-- the 3 next "tests" will execute all the integration tests -->
     <test name="IExplorer" parallel="false">
 
 		<groups>
@@ -88,64 +89,12 @@
             <package name="com.seleniumtests.it.browserfactory.*" />
         </packages>
     </test>
-    <test name="browser1" parallel="false">
- 		<parameter name="variable1" value="value1" />
-
-        <classes>
-        	<class name="com.seleniumtests.it.driver.TestWebUiDriver"></class>
-        	<class name="com.seleniumtests.it.driver.TestDesktopDrivers"></class>
-        	<class name="com.seleniumtests.it.driver.TestCustomEventFiringWebDriver"></class>
-        	<class name="com.seleniumtests.it.driver.TestBrowserProxy"></class>
-        	<class name="com.seleniumtests.it.driver.TestBrowserSnapshot"></class>
-        </classes>
-    </test>
-    <test name="browser2" parallel="false">
- 		<parameter name="variable1" value="value1" />
-
-        <classes>
-        	<class name="com.seleniumtests.it.driver.TestUiSelect"></class>
-        	<class name="com.seleniumtests.it.driver.TestTable"></class>
-        	<class name="com.seleniumtests.it.driver.TestNewWindow"></class>
-        	<class name="com.seleniumtests.it.driver.TestScreenZone"></class>
-        	<class name="com.seleniumtests.it.driver.TestNativeSeleniumActions"></class>
-        	<class name="com.seleniumtests.it.driver.TestHtmlUnitBrowserSnapshot"></class>
-        	<class name="com.seleniumtests.it.driver.TestFrameForAngular"></class>
-        </classes>
-    </test>
     <test name="browser3" parallel="false">
  		<parameter name="variable1" value="value1" />
 
 		<packages>
             <package name="com.seleniumtests.it.driver.screenshots" />
         </packages>
-
-    </test>
-    <test name="browserChrome" parallel="false">
- 		<parameter name="variable1" value="value1" />
-
-		<classes>
-        	<class name="com.seleniumtests.it.driver.support.perdriver.testangularcontrols.TestAngularControlsChrome"></class>
-        	<class name="com.seleniumtests.it.driver.support.perdriver.testdriver.TestDriverChrome"></class>
-        	<class name="com.seleniumtests.it.driver.support.perdriver.testframe.TestFrameChrome"></class>
-        	<class name="com.seleniumtests.it.driver.support.perdriver.testngselect.TestNgSelectChrome"></class>
-        	<class name="com.seleniumtests.it.driver.support.perdriver.testpicture.TestPictureElementChrome"></class>
-        	<class name="com.seleniumtests.it.driver.support.perdriver.testscrolling.TestScrollingChrome"></class>
-        	<class name="com.seleniumtests.it.driver.support.perdriver.testuiactions.TestUiActionsChrome"></class>
-        </classes>
-
-    </test>
-    <test name="browserFirefox" parallel="false">
- 		<parameter name="variable1" value="value1" />
-
-		<classes>
-        	<class name="com.seleniumtests.it.driver.support.perdriver.testangularcontrols.TestAngularControlsFirefox"></class>
-        	<class name="com.seleniumtests.it.driver.support.perdriver.testdriver.TestDriverFirefox"></class>
-        	<class name="com.seleniumtests.it.driver.support.perdriver.testframe.TestFrameFirefox"></class>
-        	<class name="com.seleniumtests.it.driver.support.perdriver.testngselect.TestNgSelectFirefox"></class>
-        	<class name="com.seleniumtests.it.driver.support.perdriver.testpicture.TestPictureElementFirefox"></class>
-        	<class name="com.seleniumtests.it.driver.support.perdriver.testscrolling.TestScrollingFirefox"></class>
-        	<class name="com.seleniumtests.it.driver.support.perdriver.testuiactions.TestUiActionsFirefox"></class>
-        </classes>
 
     </test>
    
