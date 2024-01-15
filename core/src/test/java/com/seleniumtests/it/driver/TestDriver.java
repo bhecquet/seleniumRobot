@@ -68,7 +68,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	}
 	
 
-	@AfterMethod(groups={"it", "it-driver", "ie"}, alwaysRun=true)
+	@AfterMethod(groups={"it", "ie"}, alwaysRun=true)
 	public void reset() {
 		if (driver != null) {
 			DriverTestPage.logoText.clear();

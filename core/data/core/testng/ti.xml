@@ -26,7 +26,7 @@
         </packages>
     </test>
     
-    <test name="IntegrationTests" parallel="classes" thread-count="2" >
+    <test name="IntegrationTests" parallel="true" thread-count="2">
  		<parameter name="variable1" value="value1" />
  
         <groups>

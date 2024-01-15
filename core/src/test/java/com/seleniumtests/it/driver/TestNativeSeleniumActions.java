@@ -37,7 +37,7 @@ public class TestNativeSeleniumActions extends GenericMultiBrowserTest {
 	}
 	
 	public TestNativeSeleniumActions() throws Exception {
-		super(BrowserType.CHROME, "DriverTestPageNativeActions");
+		super(BrowserType.INTERNET_EXPLORER, "DriverTestPageNativeActions");  
 	}
 
 	@AfterMethod(groups={"it"}, alwaysRun=true)

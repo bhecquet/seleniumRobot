@@ -20,7 +20,7 @@ public class TestAutoScrolling extends GenericMultiBrowserTest {
 		super(browserType, "DriverScrollingTestPage");  
 	}
 	
-	@AfterMethod(groups={"it", "it-driver", "ut"})
+	@AfterMethod(groups={"it", "ut"})
 	public void reset() {
 		if (driver == null) {
 			return;

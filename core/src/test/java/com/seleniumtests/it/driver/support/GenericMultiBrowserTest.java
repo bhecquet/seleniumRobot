@@ -107,7 +107,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 		this.targetSeleniumGrid = targetSeleniumGrid;
 	}
 	
-	@BeforeMethod(groups={"ut", "it", "it-driver", "upload", "ie"})
+	@BeforeMethod(groups={"ut", "it", "upload", "ie"})  
 	public void initBeforeMethod() {
 		if (browserType == null || !installedBrowsers.contains(browserType)) {
 			return;
@@ -144,7 +144,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	}
 	
 	
-	@BeforeClass(groups={"it", "it-driver", "ut", "upload", "ie"})
+	@BeforeClass(groups={"it", "ut", "upload", "ie"})
 	public void exposeTestPage(final ITestContext testNGCtx) throws Exception {
 
         // skip following if driver is already defined from an other test
@@ -208,7 +208,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	}
 	
 
-	@AfterClass(groups={"it", "it-driver", "ut", "upload", "ie"}, alwaysRun=true)
+	@AfterClass(groups={"it", "ut", "upload", "ie"}, alwaysRun=true)
 	public void stop() throws Exception {
 		if (server != null) {
 			server.stopServer();
@@ -220,7 +220,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 		driver = null;
 	}
 	
-	@BeforeMethod(groups={"it", "it-driver", "ut", "upload", "ie"})
+	@BeforeMethod(groups={"it", "ut", "upload", "ie"}) 
 	public void skipIfDriverNull() {
 		if (driver == null) {
 			throw new SkipException("skipped, browser not installed: " + browserType);
@@ -228,7 +228,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	}
 	
 
-	@AfterMethod(groups={"it", "it-driver", "ut", "upload", "ie"})
+	@AfterMethod(groups={"it", "ut", "upload", "ie"})
 	public void cleanAlert() {
 		GenericTest.resetTestNGREsultAndLogger();
 		if (driver == null) {
