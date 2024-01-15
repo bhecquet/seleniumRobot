@@ -44,7 +44,7 @@ TestCucumberRunner extends GenericMultiBrowserTest {
 		super(BrowserType.CHROME, "DriverTestPage");  
 	}
 	
-	@BeforeClass(groups={"it", "ut", "upload", "it-driver"})
+	@BeforeClass(groups={"it", "ut", "upload"})
 	public void closeDriver() {
 		if (WebUIDriver.getWebDriver(false) != null) {
 			logger.info("closing driver as it's recreated by each test");
@@ -53,7 +53,7 @@ TestCucumberRunner extends GenericMultiBrowserTest {
 		driver = null;
 	}
 
-	@BeforeMethod(groups={"it", "ut", "upload", "it-driver"})
+	@BeforeMethod(groups={"it", "ut", "upload"}) 
 	public void skipIfDriverNull() {
 		// override default behaviour
 	}
@@ -65,7 +65,7 @@ TestCucumberRunner extends GenericMultiBrowserTest {
 	 * @param testContext
 	 * @throws Exception
 	 */
-	@Test(groups={"it-driver"})
+	@Test(groups={"it"})
 	public void testEnglishGenericSteps(ITestContext testContext) throws Exception {
 		
 		try {
@@ -93,7 +93,7 @@ TestCucumberRunner extends GenericMultiBrowserTest {
 	 * @param testContext
 	 * @throws Exception
 	 */
-	@Test(groups={"it-driver"})
+	@Test(groups={"it"})
 	public void testGenericStepsWithMultiplePages(ITestContext testContext) throws Exception {
 		
 		try {

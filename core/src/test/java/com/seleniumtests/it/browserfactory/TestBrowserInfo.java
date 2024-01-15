@@ -106,7 +106,7 @@ public class TestBrowserInfo extends GenericDriverTest {
 		Assert.assertNull(browserInfo.getDriverFileName());
 	}
 	
-	@Test(groups={"it-driver"})
+	@Test(groups={"it"})
 	public void testGetInternetExplorerPid(final ITestContext testNGCtx) {
 		if (!SystemUtils.IS_OS_WINDOWS) {
 			throw new SkipException("This test can only be done on Windows");
@@ -123,7 +123,7 @@ public class TestBrowserInfo extends GenericDriverTest {
 		Assert.assertTrue(OSUtilityFactory.getInstance().getProgramNameFromPid((Long)pids.get(0)).contains("IEDriverServer"));
 	}
 	
-	@Test(groups={"it-driver"})
+	@Test(groups={"it"})
 	public void testGetChromePid(final ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
@@ -136,7 +136,7 @@ public class TestBrowserInfo extends GenericDriverTest {
 		Assert.assertTrue(OSUtilityFactory.getInstance().getProgramNameFromPid((Long)pids.get(0)).contains("chromedriver"));
 	}
 	
-	@Test(groups={"it-driver"})
+	@Test(groups={"it"})
 	public void testGetFirefoxPid(final ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*firefox");
@@ -150,7 +150,7 @@ public class TestBrowserInfo extends GenericDriverTest {
 	}
 	
 
-	@Test(groups={"it-driver"})
+	@Test(groups={"it"})
 	public void testGetAllProcess(final ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*chrome");

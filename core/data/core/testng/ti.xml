@@ -1,5 +1,5 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
-<suite name="Integration test suite" parallel="none" verbose="1" thread-count="5" configfailurepolicy="continue" group-by-instances="true">
+<suite name="Integration test suite" parallel="none" verbose="1" thread-count="1" configfailurepolicy="continue" group-by-instances="true">
    
 	<parameter name="implicitWaitTimeOut" value="2"></parameter>
 	<parameter name="browser" value="*firefox" />
@@ -26,7 +26,7 @@
         </packages>
     </test>
     
-    <test name="IntegrationTests" parallel="true" thread-count="5">
+    <test name="IntegrationTests" parallel="false">
  		<parameter name="variable1" value="value1" />
  
         <groups>
@@ -40,24 +40,6 @@
             <package name="com.seleniumtests.it.*" >
             <!--  exclude stub tests classes as they make SeleniumRobotTestListener available for listening when executing integration tests -->
             	<exclude name="com.seleniumtests.it.stubclasses.*"></exclude>
-            </package>
-        </packages>
-    </test>
-
-    <test name="IntegrationTestsDriver" parallel="false" >
-        <parameter name="variable1" value="value1" />
-
-        <groups>
-            <run>
-                <include name="it-driver"/>
-                <exclude name="pageobject" /> <!--  exclude pageobject groups as this class is already tested in "Page Object" test -->
-            </run>
-        </groups>
-
-        <packages>
-            <package name="com.seleniumtests.it.*" >
-                <!--  exclude stub tests classes as they make SeleniumRobotTestListener available for listening when executing integration tests -->
-                <exclude name="com.seleniumtests.it.stubclasses.*"></exclude>
             </package>
         </packages>
     </test>

@@ -56,7 +56,7 @@ public class GenericTest {
 	 * Beware that this reset does not affect the set context
 	 * @param testNGCtx
 	 */
-	@BeforeMethod(groups={"ut", "it", "ut context2", "it-driver"})
+	@BeforeMethod(groups={"ut", "it", "ut context2"})  
 	public void initTest(final ITestContext testNGCtx, final ITestResult testResult) {
 		SeleniumTestsContextManager.initGlobalContext(testNGCtx);
 		SeleniumTestsContextManager.initThreadContext(testNGCtx, testResult);
@@ -87,13 +87,13 @@ public class GenericTest {
 		SeleniumTestsContext.resetOutputFolderNames();
 	}
 	
-	@AfterMethod(groups={"ut", "it", "ut context2", "it-driver"}, alwaysRun=true)
+	@AfterMethod(groups={"ut", "it", "ut context2"}, alwaysRun=true) 
 	public void reset() {
 		resetTestNGREsultAndLogger();
 		OSUtility.resetInstalledBrowsersWithVersion();
 	}
 	
-	@AfterClass(groups={"ut", "it", "ut context2", "it-driver"}, alwaysRun=true)
+	@AfterClass(groups={"ut", "it", "ut context2"}, alwaysRun=true)
 	public void closeBrowser() {
 		WebUIDriver.cleanUp();
 	}

@@ -47,7 +47,7 @@ public class GenericDriverTest {
 	
 	public WebDriver driver = null;
 
-	@BeforeMethod(groups={"ut", "it", "it-driver"})
+	@BeforeMethod(groups={"ut", "it"})  
 	public void initTest(final ITestContext testNGCtx, final ITestResult testResult) {
 		SeleniumTestsContextManager.initGlobalContext(testNGCtx);
 		SeleniumTestsContextManager.initThreadContext(testNGCtx, testResult);
@@ -74,7 +74,7 @@ public class GenericDriverTest {
 	/**
 	 * destroys the driver if one has been created
 	 */
-	@AfterMethod(groups={"ut", "it", "it-driver"}, alwaysRun=true)
+	@AfterMethod(groups={"ut", "it"}, alwaysRun=true)
 	public void destroyDriver() {
 		WebUIDriver.cleanUp();
 

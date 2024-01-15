@@ -56,7 +56,7 @@ public class MockitoTest {
 	protected static final String GRID_SERVLET_URL = "http://localhost:4331"; // grid servlet are listening on port of router (or node) + 10
 	private static Map<Method, Boolean> beforeMethodDone = Collections.synchronizedMap(new HashMap<>());
 
-	@BeforeMethod(groups={"ut", "it", "ie", "it-driver"})
+	@BeforeMethod(groups={"ut", "it", "ie"})  
 	public void beforeMethod(final Method method, final ITestContext testNGCtx, final ITestResult testResult) throws Exception {
 		doBeforeMethod(method);
 		beforeMethodDone.put(method, true);
@@ -86,7 +86,7 @@ public class MockitoTest {
 	}
 	
 
-	@AfterMethod(groups={"ut", "it", "ie", "it-driver"}, alwaysRun=true)
+	@AfterMethod(groups={"ut", "it", "ie"}, alwaysRun=true)
 	public void afterMethod(final Method method) throws Exception {
 
 		GenericTest.resetTestNGREsultAndLogger();

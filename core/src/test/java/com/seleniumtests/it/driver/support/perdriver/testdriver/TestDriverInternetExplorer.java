@@ -102,7 +102,7 @@ public class TestDriverInternetExplorer extends TestDriver {
 		super.testClickActionCheckbox();
 	}
 
-	@Test(groups={"ie"})
+	@Test(groups={"it"})
 	public void testClickWithMouse() {
 		super.testClickWithMouse();
 	}
@@ -127,7 +127,7 @@ public class TestDriverInternetExplorer extends TestDriver {
 		super.testSendKeysActionWithPause();
 	}
 
-	@Test(groups={"ie"})
+	@Test(groups={"it"})
 	public void testSendKeysKeyboard() {
 		super.testSendKeysKeyboard();
 	}
@@ -364,7 +364,7 @@ public class TestDriverInternetExplorer extends TestDriver {
 		super.testIsElementPresentAndDisplayed();
 	}
 
-	@Test(groups={"ie"})
+	@Test(groups={"it", "ut"})
 	public void testIsElementPresentAndDisplayedWithDelay() {
 		super.testIsElementPresentAndDisplayedWithDelay();
 	}

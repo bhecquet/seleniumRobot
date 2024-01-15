@@ -31,431 +31,431 @@ public class TestDriverEdge extends TestDriver {
 	public TestDriverEdge() throws Exception {
 		super(BrowserType.EDGE);
 	}
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testAlertDisplay() {
 		super.testAlertDisplay();
 	}
 	
-	@Test(groups="it", expectedExceptions=UnhandledAlertException.class, enabled=false)
+	@Test(groups={"it", "ut"}, expectedExceptions=UnhandledAlertException.class, enabled=false)
 	public void testFindWithAlert() {
 		super.testFindWithAlert();
 	}
    
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testClickDiv() {
 		super.testClickDiv();
 	}
    
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testClickRadio() {
 		super.testClickRadio();
 	}
    
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testClickCheckBox() {
 		super.testClickCheckBox();
 	}
   
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testClickJsDiv() {
 		super.testClickJsDiv();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testDoubleClickDiv() {
 		super.testDoubleClickDiv();
 	}
    
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testClickJsRadio() {
 		super.testClickJsRadio();
 	}
    
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testClickJsCheckbox() {
 		super.testClickJsCheckbox();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testClickActionDiv() {
 		super.testClickActionDiv();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testDoubleClickActionDiv() {
 		super.testDoubleClickActionDiv();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testClickActionRadio() {
 		super.testClickActionRadio();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testClickActionCheckbox() {
 		super.testClickActionCheckbox();
 	}
 
-	@Test(groups={"it-driver"})
+	@Test(groups={"it"})
 	public void testClickWithMouse() {
 		super.testClickWithMouse();
 	}
    
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testSendKeys() {
 		super.testSendKeys();
 	}
    
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testSendKeysJs() {
 		super.testSendKeysJs();
 	}
 
-	@Test(groups = "it")
+	@Test(groups = {"it", "ut"})
 	public void testSendKeysAction() {
 		super.testSendKeysAction();
 	}
 
-	@Test(groups = "it")
+	@Test(groups = {"it", "ut"})
 	public void testSendKeysActionPause() {
 		super.testSendKeysActionWithPause();
 	}
 	
-	@Test(groups={"it-driver"})
+	@Test(groups={"it"})
 	public void testSendKeysKeyboard() {
 		super.testSendKeysKeyboard();
 	}
 
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testOnBlur() {
 		super.testOnBlur();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindElements() {
 		super.testFindElements();
 	}
 
-	@Test(groups="it", expectedExceptions = NoSuchElementException.class)
+	@Test(groups={"it", "ut"}, expectedExceptions = NoSuchElementException.class)
 	public void testElementNotPresent() {
 		super.testElementNotPresent();
 	}
 
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindElementsNotExist() {
 		super.testFindElementsNotExist();
 	}
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindElementsBy() {
 		super.testFindElementsBy();
 	}
 
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindElementsByNotExist() {
 		super.testFindElementsByNotExist();
 	}
 
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindHtmlElementsBy() {
 		super.testFindHtmlElementsBy();
 	}
 
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindHtmlElementsByNotExist() {
 		super.testFindHtmlElementsByNotExist();
 	}
 
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindHtmlElementsByInsideFrame() {
 		super.testFindHtmlElementsByInsideFrame();
 	}
 
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindHtmlElementsByWithSimilarElements() {
 		super.testFindHtmlElementsByWithSimilarElements();
 	}
 
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindSubElement() {
 		super.testFindSubElement();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testHiddenElementByDisplay() { 
 		super.testHiddenElementByDisplay();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testHiddenElementByOpacity() { 
 		super.testHiddenElementByOpacity();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testHiddenElementByVisibility() { 
 		super.testHiddenElementByVisibility();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindNthSubElement() {
 		super.testFindNthSubElement();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindNthElement() {
 		super.testFindNthElement();
 	}
 
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindPattern1() {
 		super.testFindPattern1();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindPattern2() {
 		super.testFindPattern2();
 	}
 	
-	@Test(groups="it") 
+	@Test(groups={"it", "ut"}) 
 	public void testFindPattern3() {
 		super.testFindPattern3();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindPattern4() {
 		super.testFindPattern4();
 	}
 	
-	@Test(groups="it") 
+	@Test(groups={"it", "ut"}) 
 	public void testDelay() {
 		super.testDelay();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testHiddenElement() {
 		super.testHiddenElement(); 
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testWebDriverWaitWithLowTimeout() {
 		super.testWebDriverWaitWithLowTimeout();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testSearchDoneSeveralTimes() {
 		super.testSearchDoneSeveralTimes();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testIsElementPresent1() {
 		super.testIsElementPresent1();
 	}
 
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testAutoScrolling() {
 		super.testAutoScrolling();
 	}
 	
-	@Test(groups= "it-driver")
+	@Test(groups= {"it", "ut"})
 	public void testUploadFileWithRobot() throws AWTException, InterruptedException {
 		super.testUploadFileWithRobot();
 	}
 	
-	@Test(groups= "it-driver")
+	@Test(groups= {"it", "ut"})
 	public void testUploadFileWithRobotKeyboard() throws AWTException, InterruptedException {
 		super.testUploadFileWithRobotKeyboard();
 	}
 	
-	@Test(groups= "it")
+	@Test(groups= {"it", "ut"})
 	public void testUploadFile() throws AWTException, InterruptedException {
 		super.testUploadFile();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindFirstElement() {
 		super.testFindFirstElement();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindFirstVisibleElement() {
 		super.testFindFirstVisibleElement();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindFirstElementWithParent() {
 		super.testFindFirstElementWithParent();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindFirstVisibleElementWithParent() {
 		super.testFindFirstVisibleElementWithParent();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindElementsUnderAnOtherElement() {
 		super.testFindElementsUnderAnOtherElement();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindElementsInsideParent() {
 		super.testFindElementsInsideParent();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindLastElement() {
 		super.testFindLastElement();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindSubElementByXpath() {
 		super.testFindSubElementByXpath();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindSubElementByRelativeXpath() {
 		super.testFindSubElementByRelativeXpath();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindElementByXpath() {
 		super.testFindElementByXpath();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testIsElementPresent() {
 		super.testIsElementPresent();
 	}
 
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testIsElementNotPresentWithIndex() {
 		super.testIsElementNotPresentWithIndex();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testIsElementPresentAndNotDisplayedWithIndex() {
 		super.testIsElementPresentAndNotDisplayedWithIndex();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testIsElementPresentAndDisplayed() {
 		super.testIsElementPresentAndDisplayed();
 	}
 
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testIsElementPresentAndDisplayedWithDelay() {
 		super.testIsElementPresentAndDisplayedWithDelay();
 	}
 
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testIsElementNotPresentAndNotDisplayed() {
 		super.testIsElementNotPresentAndNotDisplayed();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testIsElementPresentAndNotDisplayed() {
 		super.testIsElementPresentAndNotDisplayed();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testIsElementNotPresent() {
 		super.testIsElementNotPresent();
 	}
 
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testTextElementInsideHtmlElementIsPresent() {
 		super.testTextElementInsideHtmlElementIsPresent();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testTextElementInsideHtmlElementIsNotPresent() {
 		super.testTextElementInsideHtmlElementIsNotPresent();
 	}
 
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testElementWithIFrameAbsent() {
 		super.testElementWithIFrameAbsent();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindTextElementInsideHtmlElement() {
 		super.testFindTextElementInsideHtmlElement();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindRadioElementInsideHtmlElement() {
 		super.testFindRadioElementInsideHtmlElement();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindCheckElementInsideHtmlElement() {
 		super.testFindCheckElementInsideHtmlElement();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindButtonElementInsideHtmlElement() {
 		super.testFindButtonElementInsideHtmlElement();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindLinkElementInsideHtmlElement() {
 		super.testFindLinkElementInsideHtmlElement();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindSelectElementInsideHtmlElement() {
 		super.testFindSelectElementInsideHtmlElement();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindTableInsideHtmlElement() {
 		super.testFindTableInsideHtmlElement();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindTextElementsInsideHtmlElement() {
 		super.testFindTextElementsInsideHtmlElement();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindRadioElementsInsideHtmlElement() {
 		super.testFindRadioElementsInsideHtmlElement();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindCheckElementsInsideHtmlElement() {
 		super.testFindCheckElementsInsideHtmlElement();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindButtonElementsInsideHtmlElement() {
 		super.testFindButtonElementsInsideHtmlElement();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindLinkElementsInsideHtmlElement() {
 		super.testFindLinkElementsInsideHtmlElement();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindSelectElementsInsideHtmlElement() {
 		super.testFindSelectElementsInsideHtmlElement();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testFindTablesInsideHtmlElement() {
 		super.testFindTablesInsideHtmlElement();
 	}
 	
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testScrollIntoDiv() {
 		super.testScrollIntoDiv();
 	}
 
-	@Test(groups="it")
+	@Test(groups={"it", "ut"})
 	public void testScrollToBottom() {
 		super.testScrollToBottom();
 	}
 
-	@Test(groups= "it")
+	@Test(groups= {"it", "ut"})
 	public void testCaptureWhenWindowIsClosed() throws Exception {
 		super.testCaptureWhenWindowIsClosed();
 	}

@@ -219,7 +219,7 @@ public class ConnectorsTest extends MockitoTest {
 			+ "  }"
 			+ "}";
 
-	@BeforeMethod(groups={"ut", "it", "it-driver"})
+	@BeforeMethod(groups={"ut", "it"})  
 	public void initMocks(final Method method, final ITestContext testNGCtx, final ITestResult testResult) throws Exception {
 		options = mock(Options.class);
 		timeouts = mock(Timeouts.class);
@@ -248,7 +248,7 @@ public class ConnectorsTest extends MockitoTest {
 
 	}
 
-	@AfterMethod(groups={"ut", "it", "it-driver"}, alwaysRun = true)
+	@AfterMethod(groups={"ut", "it"}, alwaysRun = true)
 	public void resetMocks() {
 		if (mockedUnirest.get() != null) {
 			mockedUnirest.get().close(); // as we do not use try-with-resource
