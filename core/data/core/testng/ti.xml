@@ -54,7 +54,7 @@
     </test>
     
     <!-- below are tests with smaller sized groups -->
-    <test name="IntegrationTestsNoBrowser" parallel="true" thread-count="2">
+    <test name="IntegrationTestsNoBrowser" parallel="false">
         <parameter name="variable1" value="value1" />
 
         <groups>
