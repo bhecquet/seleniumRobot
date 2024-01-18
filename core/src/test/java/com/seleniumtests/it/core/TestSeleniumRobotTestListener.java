@@ -374,7 +374,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener3-1/PERF-result.xml"), 1);
 		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener4/PERF-result.xml"), 1);
 		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener1-1/PERF-result.xml"), 1);
-		Assert.assertEquals(StringUtils.countMatches(logs, "SeleniumTestReport.html"), 10); // 1 per executed test + 1 for final generation
+		Assert.assertEquals(StringUtils.countMatches(logs, "SeleniumTestReport.html"), 11); // 1 per executed test + 1 for final generation
 	}
 	
 	@Test(groups={"it"})
@@ -401,7 +401,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener3-1/PERF-result.xml"), 1);
 		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener4/PERF-result.xml"), 1);
 		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener1-1/PERF-result.xml"), 1);
-		Assert.assertEquals(StringUtils.countMatches(logs, "SeleniumTestReport.html"), 10); // 1 per executed test + 1 for final generation
+		Assert.assertEquals(StringUtils.countMatches(logs, "SeleniumTestReport.html"), 11); // 1 per executed test + 1 for final generation
 	}
 	
 	@Test(groups={"it"})
@@ -428,7 +428,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener3-1/PERF-result.xml"), 1);
 		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener4/PERF-result.xml"), 1);
 		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener1-1/PERF-result.xml"), 1);
-		Assert.assertEquals(StringUtils.countMatches(logs, "SeleniumTestReport.html"), 10); // 1 per executed test + 1 for final generation
+		Assert.assertEquals(StringUtils.countMatches(logs, "SeleniumTestReport.html"), 11); // 1 per executed test + 1 for final generation
 	}
 	
 	/**
