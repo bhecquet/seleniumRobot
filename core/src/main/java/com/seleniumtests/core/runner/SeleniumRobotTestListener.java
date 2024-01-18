@@ -176,6 +176,9 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 					testResult.getTestContext()
 					);
 		}
+
+		// as skipped tests never call "AfterMethod", generate report here
+		onTestFullyFinished(testResult);
 	}
 	
 	/**
