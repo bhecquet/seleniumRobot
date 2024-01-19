@@ -655,7 +655,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 			}
 		}
 
-		this.driver = new EventFiringDecorator(new DriverExceptionListener(this)).decorate(driver);
+		this.driver = new EventFiringDecorator(new DriverExceptionListener(this)).decorate(this.driver);
 		for (WebDriverListener wdListener: wdListeners) {
 			this.driver = new EventFiringDecorator(wdListener).decorate(this.driver);
 		}
