@@ -26,6 +26,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.seleniumtests.ut.MockWebDriver;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -33,6 +34,7 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Coordinates;
+import org.openqa.selenium.interactions.Sequence;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.powermock.api.mockito.PowerMockito;
@@ -46,6 +48,8 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.util.helper.WaitHelper;
+
+import java.util.Collection;
 
 @PrepareForTest({WebUIDriver.class, WaitHelper.class, RemoteWebDriver.class})
 public class TestCompositeActions extends MockitoTest {
@@ -63,6 +67,8 @@ public class TestCompositeActions extends MockitoTest {
 	private BrowserInfo browserInfo;
 	
 	private CustomEventFiringWebDriver eventDriver;
+
+
 	
 
 	@BeforeMethod(groups={"ut"})
@@ -71,7 +77,7 @@ public class TestCompositeActions extends MockitoTest {
 		driver = PowerMockito.mock(RemoteWebDriver.class);
 		when(driver.getCapabilities()).thenReturn(new ChromeOptions()); // add capabilities to allow augmenting driver
 		
-		eventDriver = spy(new CustomEventFiringWebDriver(driver));
+		eventDriver = spy(new CustomEventFiringWebDriver(new CompositeActionsWebDriver(driver)));
 		
 		PowerMockito.mockStatic(WebUIDriver.class);
 		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);

@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 
+import com.seleniumtests.ut.MockWebDriver;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -102,7 +103,7 @@ public class TestFrameElement extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
 		when(driver.getCapabilities()).thenReturn(new FirefoxOptions()); // add capabilities to allow augmenting driver
 		
-		eventDriver = spy(new CustomEventFiringWebDriver(driver));
+		eventDriver = spy(new CustomEventFiringWebDriver(new MockWebDriver(driver)));
 		PowerMockito.mockStatic(WebUIDriver.class);
 		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
 		when(driver.findElement(By.id("el"))).thenReturn(element);

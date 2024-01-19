@@ -37,6 +37,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
+import com.seleniumtests.ut.MockWebDriver;
 import org.apache.commons.io.FileUtils;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
@@ -582,7 +583,7 @@ public class ConnectorsTest extends MockitoTest {
 		WebUIDriver uiDriver = spy(new WebUIDriver("main"));
 		
 		PowerMockito.whenNew(WebUIDriver.class).withArguments(any()).thenReturn(uiDriver);
-		PowerMockito.whenNew(RemoteWebDriver.class).withAnyArguments().thenReturn(driver);
+		PowerMockito.whenNew(RemoteWebDriver.class).withAnyArguments().thenReturn(new MockWebDriver(driver));
 		when(driver.manage()).thenReturn(options);
 		when(options.timeouts()).thenReturn(timeouts);
 		when(driver.getSessionId()).thenReturn(new SessionId("abcdef"));

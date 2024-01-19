@@ -18,6 +18,7 @@ import java.util.HashSet;
 
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.ut.MockWebDriver;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
@@ -120,7 +121,7 @@ public class TestPageObject2 extends MockitoTest {
 
 		// add capabilities to allow augmenting driver
 		when(driver.getCapabilities()).thenReturn(new FirefoxOptions()); 
-		eventDriver = spy(new CustomEventFiringWebDriver(driver));
+		eventDriver = spy(new CustomEventFiringWebDriver(new MockWebDriver(driver)));
 
 		when(eventDriver.switchTo()).thenReturn(target);
 		when(driver.findElement(By.id("el"))).thenReturn(element);
