@@ -2220,10 +2220,10 @@ public class SeleniumTestsContext {
     }
     
     public void setAppiumServerUrl(String appiumServerUrl) {
-    	if ((appiumServerUrl != null && appiumServerUrl.endsWith("/wd/hub/")) || appiumServerUrl == null) {
+    	if ((appiumServerUrl != null && (appiumServerUrl.endsWith("/wd/hub/") || appiumServerUrl.endsWith("/"))) || appiumServerUrl == null) {
     		setAttribute(APPIUM_SERVER_URL, appiumServerUrl);
     	} else {
-    		throw new ConfigurationException("appiumServerUrl must be 'http://<host>:<port>/wd/hub/");
+    		throw new ConfigurationException("appiumServerUrl must be 'http://<host>:<port>/wd/hub/' (appium 1) or 'http://<host>:<port>/' (appium 2)");
     	}
     }
     

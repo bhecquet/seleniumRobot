@@ -175,7 +175,11 @@ public class LocalAppiumLauncher implements AppiumLauncher {
 	 * @return
 	 */
 	public String getAppiumServerUrl() {
-		return String.format("http://localhost:%d/wd/hub/", appiumPort);
+		if (appiumVersion.startsWith("1")) {
+			return String.format("http://localhost:%d/wd/hub/", appiumPort);
+		} else {
+			return String.format("http://localhost:%d/", appiumPort);
+		}
 	}
 	
 	/**
