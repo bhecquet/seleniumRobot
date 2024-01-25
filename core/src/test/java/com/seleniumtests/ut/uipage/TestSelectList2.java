@@ -9,6 +9,7 @@ import static org.mockito.Mockito.*;
 import java.io.IOException;
 import java.util.Arrays;
 
+import com.seleniumtests.ut.MockWebDriver;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -89,7 +90,7 @@ public class TestSelectList2 extends MockitoTest {
 
 		// add capabilities to allow augmenting driver
 		when(driver.getCapabilities()).thenReturn(new FirefoxOptions()); 
-		eventDriver = spy(new CustomEventFiringWebDriver(driver));
+		eventDriver = spy(new CustomEventFiringWebDriver(new MockWebDriver(driver)));
 
 		when(eventDriver.switchTo()).thenReturn(target);
 		when(driver.findElement(By.id("select"))).thenReturn(element);

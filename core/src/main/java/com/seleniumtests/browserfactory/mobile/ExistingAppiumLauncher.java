@@ -16,10 +16,10 @@ public class ExistingAppiumLauncher implements AppiumLauncher {
 	private String appiumServerUrl;
 
 	public ExistingAppiumLauncher(String appiumServerUrl) {
-		if (appiumServerUrl.endsWith("/wd/hub/")) {
+		if (appiumServerUrl.endsWith("/wd/hub/") || appiumServerUrl.endsWith("/")) {
 			this.appiumServerUrl = appiumServerUrl;
 		} else {
-			this.appiumServerUrl = appiumServerUrl + "/wd/hub/";
+			this.appiumServerUrl = appiumServerUrl + "/";
 		}
 	}
 	

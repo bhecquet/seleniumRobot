@@ -59,7 +59,7 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
         options.addArguments("--disable-translate");
         options.addArguments("--disable-web-security");
         options.addArguments("--disable-site-isolation-trials");
-        options.addArguments("--disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4");
+        options.addArguments("--disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades");
         options.addArguments("--remote-allow-origins=*"); // workaround for https://github.com/SeleniumHQ/selenium/issues/11750 on chrome >= 111 
         
         if (webDriverConfig.getChromeOptions() != null) {
@@ -112,7 +112,8 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
         options.addArguments("--disable-web-security");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-site-isolation-trials");
-        options.addArguments("--disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4");
+		// list of features: https://chromium.googlesource.com/chromium/src/+/refs/heads/main/chrome/common/chrome_features.cc
+        options.addArguments("--disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades");
         options.addArguments("--remote-allow-origins=*"); // workaround for https://github.com/SeleniumHQ/selenium/issues/11750 on chrome >= 111 
         
         

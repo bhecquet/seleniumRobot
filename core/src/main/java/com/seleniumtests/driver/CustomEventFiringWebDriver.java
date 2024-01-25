@@ -655,12 +655,11 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 			}
 		}
 
-		this.driver = new EventFiringDecorator(new DriverExceptionListener(this)).decorate(driver);
-
+		this.driver = new EventFiringDecorator(new DriverExceptionListener(this)).decorate(this.driver);
 		for (WebDriverListener wdListener: wdListeners) {
 			this.driver = new EventFiringDecorator(wdListener).decorate(this.driver);
 		}
-	
+
 		// NEOLOAD //
 		if (driver instanceof NLWebDriver) {
 			neoloadDriver = (NLWebDriver)driver;
@@ -1182,7 +1181,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	 * Returns the rectangle of all screens on the system
 	 * @return
 	 */
-	public static Rectangle getScreensRectangle() {
+	private static Rectangle getScreensRectangle() {
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		
 		Rectangle screenRect = new Rectangle(0, 0, 0, 0);
@@ -1718,9 +1717,9 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		}
     }
 
-//	public BrowserMobProxy getMobProxy() {
-//		return mobProxy;
-//	}
+	public BrowserMobProxy getMobProxy() {
+		return mobProxy;
+	}
 
 	// NEOLOAD //
 	public NLWebDriver getNeoloadDriver() {

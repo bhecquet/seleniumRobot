@@ -23,7 +23,10 @@ import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
@@ -398,9 +401,12 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 		SeleniumTestsContextManager.updateThreadContext(testResult);
 
 		String key = testNGCtx.getSuite().getName() + "-" + testNGCtx.getName() + "-"
-				+ "com.seleniumtests.ut.core.TestSeleniumTestContext3" + "-" + "-test__with_@_chars-" + "-"
-				+ Arrays.hashCode(params);
-		Assert.assertTrue(SeleniumTestsContext.getOutputFolderNames().containsKey(key));
+				+ "com.seleniumtests.ut.core.TestSeleniumTestContext3" + "-" + "-test__with_@_chars-"
+				+ "-" + Arrays.hashCode(params)
+				+ "-" + "org.testng.internal.TestNGMethod";
+
+		Optional<String> keys = SeleniumTestsContext.getOutputFolderNames().keySet().stream().filter(o -> o.contains("test__with_@_chars")).findFirst();
+		Assert.assertTrue(keys.isPresent() && keys.get().contains(key));
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getRelativeOutputDir(),
 				"-test__with_@_chars-");
 

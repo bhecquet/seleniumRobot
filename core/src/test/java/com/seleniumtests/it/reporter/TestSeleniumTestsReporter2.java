@@ -62,6 +62,32 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 
 	/**
+	 * Test that if a test is called with "invocationCount", we have as many results as incovations
+	 * @throws Exception
+	 */
+	@Test(groups = {"it"})
+	public void testMultithreadReportWithInvocationCount() throws Exception {
+
+		SeleniumTestsContextManager.removeThreadContext();
+		executeSubTest(5, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testOkWithInvocationCount"});
+
+		// check content of summary report file
+		String mainReportContent = readSummaryFile();
+
+		// check we have the 3 executions in report
+		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testOkWithInvocationCount/TestReport\\.html'.*?>testOkWithInvocationCount</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testOkWithInvocationCount-1/TestReport\\.html'.*?>testOkWithInvocationCount-1</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testOkWithInvocationCount-2/TestReport\\.html'.*?>testOkWithInvocationCount-2</a>.*"));
+
+		String detailedReportContent = readTestMethodResultFile("testOkWithInvocationCount");
+		Assert.assertTrue(detailedReportContent.contains("Start method testOkWithInvocationCount"));
+		String detailedReportContent1 = readTestMethodResultFile("testOkWithInvocationCount-1");
+		Assert.assertTrue(detailedReportContent1.contains("Start method testOkWithInvocationCount-1"));
+		String detailedReportContent2 = readTestMethodResultFile("testOkWithInvocationCount-2");
+		Assert.assertTrue(detailedReportContent2.contains("Start method testOkWithInvocationCount-2"));
+	}
+
+	/**
 	 * Check that test report do not display tabs when no snapshot comparison is requested
 	 * @throws Exception
 	 */

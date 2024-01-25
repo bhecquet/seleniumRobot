@@ -23,6 +23,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.PageLoadStrategy;
@@ -1007,10 +1008,16 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	
 	@Test(groups="ut context")
-	public void testAppiumServerUrl(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testAppium1ServerUrl(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setAppiumServerUrl("http://appium:4123/wd/hub/");
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAppiumServerUrl(), "http://appium:4123/wd/hub/");
+	}
+	@Test(groups="ut context")
+	public void testAppium2ServerUrl(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setAppiumServerUrl("http://appium:4123/");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAppiumServerUrl(), "http://appium:4123/");
 	}
 	@Test(groups="ut context", expectedExceptions = ConfigurationException.class)
 	public void testWrongAppiumServerUrl(final ITestContext testNGCtx, final XmlTest xmlTest) {
@@ -1540,8 +1547,11 @@ public class TestSeleniumTestContext extends GenericTest {
 				+ "-" + testNGCtx.getName()
 				+ "-" + "com.seleniumtests.ut.core.TestSeleniumTestContext"
 				+ "-" + "myTest"
-				+ "-" + "3247054";
-		Assert.assertTrue(SeleniumTestsContext.getOutputFolderNames().containsKey(key));
+				+ "-" + "3247054"
+				+ "-" + "org.testng.internal.TestNGMethod";
+
+		List<String> keys = SeleniumTestsContext.getOutputFolderNames().keySet().stream().map(o -> o.split("@")[0]).collect(Collectors.toList());
+		Assert.assertTrue(keys.contains(key));
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getRelativeOutputDir(), "myTest");
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), 
 							Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "myTest").toString().replace(File.separator, "/"));
@@ -1603,14 +1613,18 @@ public class TestSeleniumTestContext extends GenericTest {
 				+ "-" + testNGCtx.getName()
 				+ "-" + "com.seleniumtests.ut.core.TestSeleniumTestContext"
 				+ "-" + "myTest"
-				+ "-" + "3247054";
+				+ "-" + "3247054"
+				+ "-" + "org.testng.internal.TestNGMethod";
 		String key2 = testNGCtx.getSuite().getName()
 				+ "-" + testNGCtx.getName()
 				+ "-" + "com.seleniumtests.ut.core.TestSeleniumTestContext"
 				+ "-" + "myTest"
-				+ "-" + "6166074";
-		Assert.assertTrue(SeleniumTestsContext.getOutputFolderNames().containsKey(key));
-		Assert.assertTrue(SeleniumTestsContext.getOutputFolderNames().containsKey(key2));
+				+ "-" + "6166074"
+				+ "-" + "org.testng.internal.TestNGMethod";
+
+		List<String> keys = SeleniumTestsContext.getOutputFolderNames().keySet().stream().map(o -> o.split("@")[0]).collect(Collectors.toList());
+		Assert.assertTrue(keys.contains(key));
+		Assert.assertTrue(keys.contains(key2));
 		
 		// check second created context
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getRelativeOutputDir(), "myTest-1");

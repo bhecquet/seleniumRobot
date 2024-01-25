@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.logging.log4j.Logger;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
@@ -210,7 +211,12 @@ public class TestNGResultUtils {
 	    			+ "-" + xmlTestName
 	    			+ "-" + className
 	    			+ "-" + testNameModified
-	    			+ "-" + Arrays.hashCode(testMethodParams);
+	    			+ "-" + Arrays.hashCode(testMethodParams)
+					+ "-" + ObjectUtils.identityToString(testNGResult.getMethod()); // #626: add ID of the test method itself.
+			// During a test retry, method object remains the same so that we build the same output folder when test is retried
+			// During a new invocation (through invocationCount for example), method object is different among executions
+
+
     	} else {
     		uniqueIdentifier = "null-null-null-null-0";
     	}
