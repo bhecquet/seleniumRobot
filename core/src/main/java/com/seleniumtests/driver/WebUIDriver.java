@@ -556,7 +556,7 @@ public class WebUIDriver {
 	    	
 	    	// we have a driver referenced for this name, is it still available (not closed)
 	    	} else if (uxDriverSession.get().get(driverName).driver instanceof CustomEventFiringWebDriver
-					&& ((CustomEventFiringWebDriver) uxDriverSession.get().get(driverName).driver).isBrowserClosed()) {
+					&& ((CustomEventFiringWebDriver) uxDriverSession.get().get(driverName).driver).isBrowserOrAppClosed()) {
     			uxDriverSession.get().remove(driverName);
     			createDriver = true;
 	    	}
@@ -631,7 +631,7 @@ public class WebUIDriver {
 
 		if (uxDriverSession.get().get(driverName).driver != null
 				&& uxDriverSession.get().get(driverName).driver instanceof CustomEventFiringWebDriver
-				&& ((CustomEventFiringWebDriver)(uxDriverSession.get().get(driverName).driver)).isBrowserClosed()) {
+				&& ((CustomEventFiringWebDriver)(uxDriverSession.get().get(driverName).driver)).isBrowserOrAppClosed()) {
     		throw new ScenarioException("Cannot switch to a closed driver");
     	}
 

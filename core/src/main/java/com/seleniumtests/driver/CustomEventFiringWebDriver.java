@@ -23,7 +23,6 @@ import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.core.StatisticsStorage;
 import com.seleniumtests.core.StatisticsStorage.DriverUsage;
-import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.customexception.RetryableDriverException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.customexception.WebSessionEndedException;
@@ -118,7 +117,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	private WebDriver driver;
 	private final WebDriver originalDriver;
 	private final NLWebDriver neoloadDriver;
-	private final boolean isWebTest;
+	private boolean isWebTest;
 	private boolean driverExited = false;
 	private final DriverMode driverMode;
 	private final BrowserInfo browserInfo;
@@ -817,13 +816,20 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     
     /**
      * Returns true if all browser windows are closed and so, no actions can be performed
+	 * In case of mobile App, check the app is still there
      * @return
      */
-    public boolean isBrowserClosed() {
+    public boolean isBrowserOrAppClosed() {
     	try {
     		getSessionId();
     		getCapabilities();
-    		return driver.getWindowHandles().isEmpty();
+			if (isWebTest) {
+				return driver.getWindowHandles().isEmpty();
+			} else {
+				// in case of mobile app, we assume the app is not closed. Closing the app should only be done at test end
+				// closing the session. If we are here, the session is still alive
+				return false;
+			}
     	} catch (NoSuchSessionException | UnsupportedCommandException e) {
     		return true;
     	}
@@ -1794,6 +1800,14 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 
 	public boolean isWebTest() {
 		return isWebTest;
+	}
+
+	/**
+	 * For tests
+	 * @param webTest
+	 */
+	public void setWebTest(boolean webTest) {
+		this.isWebTest = webTest;
 	}
 
 	public boolean isDriverExited() {

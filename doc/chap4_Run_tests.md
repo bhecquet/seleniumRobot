@@ -218,7 +218,7 @@ Params for mobile testing
 | app 						| 			| Path to the application file (local or remote). For local, if application is for example in 'data/<artifact>/myApp.apk', then give this path | 
 | deviceName 				| 			| Name of the device to use for mobile tests. It's the Human readable name (e.g: Nexus 6 as given by `adb -s <id_device> shell getprop`, line [ro.product.model] property on Android or `xcrun simctl list --json devices available`), not it's id. SeleniumRobot will replace this name with id when communicating with Appium | 
 | fullReset 				| true		| enable full reset capability for appium tests | 
-| appiumServerUrl			|			| Appium server already started, that will be used to execute the test. It's useful to debug tests locally |
+| appiumServerUrl			|			| Appium server already started, that will be used to execute the test. It's useful to debug tests locally. "http://<host>:<port>/wd/hub/" for appium 1 and "http://<host>:<port>/" for appium 2.x |
 | appiumCaps                |           | Set of capabilities that will be added and sent to appium. These are the capabilities that are not already handled by the framework. See: http://appium.io/docs/en/writing-running-appium/caps/. Format is "key1=value1;key2=value2" |
 | appPackage 				| 			| Package name of application (android only) | 
 | appActivity 				| 			| Activity started by mobile application (Android) | 
@@ -226,7 +226,7 @@ Params for mobile testing
 | newCommandTimeout 		| 120		| Max wait (in seconds) between 2 appium commands in seconds. Increase this time when debugging | 
 | version 					| 			| Platform version | 
 | platform 					| 			| platform on which test should execute. Ex: Windows 7, Android 5.0, iOS 9.1, Linux, OS X 10.10. Defaults to the current platform |
-| automationName			| Appium / XCUITest | Default is "Appium" for Android and "XCUITest" for iOS. The automationName to use. See http://appium.io/docs/en/writing-running-appium/caps/index.html 
+| automationName			| Appium / XCUITest | "UiAutomator2" for Android and "XCUITest" for iOS.
 | cloudApiKey 				| 			| Access key for service |  
 | testConfig 				|  			| Additional configuration. This should contain common configuration through all TestNG files.<br/>See `exampleConfigGenericParams.xml` file for format | 
 

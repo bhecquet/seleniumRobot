@@ -1328,6 +1328,10 @@ It's also possible to attach to a remote appium server the same way (change URL)
 - provide the device id (`-DdeviceId=<UDID or android ID`) to the test. iOS UDID can be found with command `instruments -s devices`. Android Id can be found with `adb devices` command.
 - provide a local path (local the the remote machine) to the application. An HTTP path may also be provided but you may have trouble with android
 
+#### Automatic ID for Android ####
+
+On android, id of elements is always precedeed with package name: `com.myapp:id/elementId`. With SeleniumRobot, you can skip the package part and only write `By.id("elementId")`. Package part will be added automatically
+
 ### 13 Implement custom SelectList ###
 
 It's possible to implement new SelectList that adapt to your web interface. The purpose of this custom select list is to give seleniumRobot the way to search

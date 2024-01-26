@@ -32,9 +32,9 @@ public class TestCustomEventFiringWebDriver extends GenericDriverTest {
 		
 		WebDriver driver = WebUIDriver.getWebDriver(true, BrowserType.HTMLUNIT, "main", null);
 		try {
-			Assert.assertFalse(((CustomEventFiringWebDriver)driver).isBrowserClosed());
+			Assert.assertFalse(((CustomEventFiringWebDriver)driver).isBrowserOrAppClosed());
 			driver.close();
-			Assert.assertTrue(((CustomEventFiringWebDriver)driver).isBrowserClosed());
+			Assert.assertTrue(((CustomEventFiringWebDriver)driver).isBrowserOrAppClosed());
 		} finally {
 			driver.quit();
 		}
@@ -48,9 +48,9 @@ public class TestCustomEventFiringWebDriver extends GenericDriverTest {
 		
 		WebDriver driver = WebUIDriver.getWebDriver(true, BrowserType.CHROME, "main", null);
 		try {
-			Assert.assertFalse(((CustomEventFiringWebDriver)driver).isBrowserClosed());
+			Assert.assertFalse(((CustomEventFiringWebDriver)driver).isBrowserOrAppClosed());
 			driver.close();
-			Assert.assertTrue(((CustomEventFiringWebDriver)driver).isBrowserClosed());
+			Assert.assertTrue(((CustomEventFiringWebDriver)driver).isBrowserOrAppClosed());
 		} finally {
 			driver.quit();
 		}
@@ -64,9 +64,9 @@ public class TestCustomEventFiringWebDriver extends GenericDriverTest {
 		
 		WebDriver driver = WebUIDriver.getWebDriver(true, BrowserType.FIREFOX, "main", null);
 		try {
-			Assert.assertFalse(((CustomEventFiringWebDriver)driver).isBrowserClosed());
+			Assert.assertFalse(((CustomEventFiringWebDriver)driver).isBrowserOrAppClosed());
 			driver.close();
-			Assert.assertTrue(((CustomEventFiringWebDriver)driver).isBrowserClosed());
+			Assert.assertTrue(((CustomEventFiringWebDriver)driver).isBrowserOrAppClosed());
 		} finally {
 			driver.quit();
 		}
@@ -80,9 +80,9 @@ public class TestCustomEventFiringWebDriver extends GenericDriverTest {
 		
 		WebDriver driver = WebUIDriver.getWebDriver(true, BrowserType.INTERNET_EXPLORER, "main", null);
 		try {
-			Assert.assertFalse(((CustomEventFiringWebDriver)driver).isBrowserClosed());
+			Assert.assertFalse(((CustomEventFiringWebDriver)driver).isBrowserOrAppClosed());
 			driver.close();
-			Assert.assertTrue(((CustomEventFiringWebDriver)driver).isBrowserClosed());
+			Assert.assertTrue(((CustomEventFiringWebDriver)driver).isBrowserOrAppClosed());
 		} finally {
 			driver.quit();
 		}
@@ -96,9 +96,9 @@ public class TestCustomEventFiringWebDriver extends GenericDriverTest {
 		
 		WebDriver driver = WebUIDriver.getWebDriver(true, BrowserType.EDGE, "main", null);
 		try {
-			Assert.assertFalse(((CustomEventFiringWebDriver)driver).isBrowserClosed());
+			Assert.assertFalse(((CustomEventFiringWebDriver)driver).isBrowserOrAppClosed());
 			driver.close();
-			Assert.assertTrue(((CustomEventFiringWebDriver)driver).isBrowserClosed());
+			Assert.assertTrue(((CustomEventFiringWebDriver)driver).isBrowserOrAppClosed());
 		} finally {
 			driver.quit();
 		}
