@@ -24,6 +24,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.seleniumtests.util.helper.WaitHelper;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
@@ -299,19 +300,25 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	 * @return
 	 */
 	private JSONObject getCurrentSessionObject(RemoteWebDriver driver) {
-		JSONObject status = Unirest.get(String.format("http://%s:%d%s", hubUrl.getHost(), hubUrl.getPort(), STATUS_SERVLET))
-        		.asJson()
-        		.getBody()
-        		.getObject();
-		
-		JSONArray nodes = status.getJSONObject("value").getJSONArray("nodes");
-		
-		for (JSONObject node: (List<JSONObject>)nodes.toList()) {
-			for (JSONObject slot: (List<JSONObject>)node.getJSONArray("slots").toList()) {
-				if (slot.optJSONObject("session") != null && slot.getJSONObject("session").getString("sessionId").equals(driver.getSessionId().toString())) {
-					return slot.getJSONObject("session");
+
+		// sometimes, session is not immediately reported in hub status, wait a bit
+		for (int i = 0; i < 5; i++) {
+			JSONObject status = Unirest.get(String.format("http://%s:%d%s", hubUrl.getHost(), hubUrl.getPort(), STATUS_SERVLET))
+					.asJson()
+					.getBody()
+					.getObject();
+
+			JSONArray nodes = status.getJSONObject("value").getJSONArray("nodes");
+
+			for (JSONObject node : (List<JSONObject>) nodes.toList()) {
+				for (JSONObject slot : (List<JSONObject>) node.getJSONArray("slots").toList()) {
+					if (slot.optJSONObject("session") != null && slot.getJSONObject("session").getString("sessionId").equals(driver.getSessionId().toString())) {
+						return slot.getJSONObject("session");
+					}
 				}
 			}
+			WaitHelper.waitForSeconds(1);
+			logger.info("Retry get session information from grid");
 		}
 		throw new SessionNotCreatedException("Could not get session information from grid");
 	}
@@ -324,12 +331,14 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 		getSessionInformationFromGrid(driver, 0);
 	}
 	public void getSessionInformationFromGrid(RemoteWebDriver driver, long driverCreationDuration) {
-		
-        // logging node ip address:
+
+		// logging node ip address:
 		JSONObject object;
-        try {
-        	object = getCurrentSessionObject(driver);
-        } catch (Exception e) {
+		try {
+			object = getCurrentSessionObject(driver);
+		} catch (SessionNotCreatedException e) {
+			throw e;
+		} catch (Exception e) {
         	throw new SessionNotCreatedException(String.format("Could not get session information from grid: %s", e.getMessage()));
         }
  

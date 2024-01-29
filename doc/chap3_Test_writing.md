@@ -73,6 +73,7 @@
   - [Call Java code](#call-java-code)
   - [Mask passwords](#mask-passwords)
 - [12 Write mobile tests](#12-write-mobile-tests)
+  - [Automatic ID for Android](#automatic-id-for-android)
 - [13 Implement custom SelectList](#13-implement-custom-selectlist)
 - [14 Using custom UI libraries](#14-using-custom-ui-libraries)
 
@@ -1327,6 +1328,10 @@ You should get the inspector running
 It's also possible to attach to a remote appium server the same way (change URL). In this case, you MUST
 - provide the device id (`-DdeviceId=<UDID or android ID`) to the test. iOS UDID can be found with command `instruments -s devices`. Android Id can be found with `adb devices` command.
 - provide a local path (local the the remote machine) to the application. An HTTP path may also be provided but you may have trouble with android
+
+#### Automatic ID for Android ####
+
+On android, id of elements is always precedeed with package name: `com.myapp:id/elementId`. With SeleniumRobot, you can skip the package part and only write `By.id("elementId")`. Package part will be added automatically
 
 ### 13 Implement custom SelectList ###
 

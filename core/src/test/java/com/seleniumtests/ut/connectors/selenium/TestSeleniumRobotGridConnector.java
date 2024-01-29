@@ -51,6 +51,7 @@ import org.apache.logging.log4j.Logger;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -1542,7 +1543,50 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		Assert.assertEquals(connector.getNodeServletUrl(), "http://localhost:4331");
 		verify(connector).setNodeUrl("http://localhost:4321");
 	}
-	
+
+
+	@Test(groups={"ut"})
+	public void testGetSessionInformationFromGridMultipleTries() throws UnsupportedOperationException, IOException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, UnirestException {
+
+		createJsonServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200, String.format(GRID_STATUS_WITH_SESSION, "aaaaa"), String.format(GRID_STATUS_WITH_SESSION, "abcdef"));
+
+		capabilities.setCapability(CapabilityType.BROWSER_NAME, "firefox");
+		capabilities.setCapability(CapabilityType.BROWSER_VERSION, "50.0");
+
+		SeleniumGridConnector connector = spy(new SeleniumRobotGridConnector(SERVER_URL));
+
+		Logger logger = spy(SeleniumRobotLogger.getLogger(SeleniumGridConnector.class));
+		Field loggerField = SeleniumGridConnector.class.getDeclaredField("logger");
+		loggerField.setAccessible(true);
+		loggerField.set(connector, logger);
+
+		connector.getSessionInformationFromGrid(driver);
+
+		verify(logger).info("Brower firefox (50.0) created in 0.0 secs on node localhost [http://localhost:4321] with session abcdef");
+
+		// check sessionId is set when test is started
+		verify(connector).setSessionId(any(SessionId.class));
+		Assert.assertEquals(connector.getNodeUrl(), "http://localhost:4321");
+	}
+
+	@Test(groups={"ut"}, expectedExceptions = {WebDriverException.class})
+	public void testGetSessionInformationFromGridNotGet() throws UnsupportedOperationException, IOException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, UnirestException {
+
+		createJsonServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200, String.format(GRID_STATUS_WITH_SESSION, "aaaaa"));
+
+		capabilities.setCapability(CapabilityType.BROWSER_NAME, "firefox");
+		capabilities.setCapability(CapabilityType.BROWSER_VERSION, "50.0");
+
+		SeleniumGridConnector connector = spy(new SeleniumRobotGridConnector(SERVER_URL));
+
+		Logger logger = spy(SeleniumRobotLogger.getLogger(SeleniumGridConnector.class));
+		Field loggerField = SeleniumGridConnector.class.getDeclaredField("logger");
+		loggerField.setAccessible(true);
+		loggerField.set(connector, logger);
+
+		connector.getSessionInformationFromGrid(driver);
+	}
+
 	@Test(groups={"ut"})
 	public void testGetSessionInformationFromGridWithSecondDriver() throws UnsupportedOperationException, IOException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, UnirestException {
 		

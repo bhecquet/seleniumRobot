@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 import javax.imageio.ImageIO;
@@ -157,6 +158,35 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testGetSessionIdWithIncopmatibleDriver() {
 		when(driver.getSessionId()).thenThrow(ClassCastException.class);
 		Assert.assertNotEquals(eventDriver.getSessionId(), "1234");
+	}
+
+	@Test(groups = {"ut"})
+	public void testIsBrowserOrAppClosedWithBrowserPresent() {
+		when(driver.getWindowHandles()).thenReturn(new TreeSet<>(Arrays.asList("12345")));
+		Assert.assertFalse(eventDriver.isBrowserOrAppClosed());
+	}
+	@Test(groups = {"ut"})
+	public void testIsBrowserOrAppClosedWithoutBrowserWindow() {
+		when(driver.getWindowHandles()).thenReturn(new TreeSet<>());
+		Assert.assertTrue(eventDriver.isBrowserOrAppClosed());
+	}
+	@Test(groups = {"ut"})
+	public void testIsBrowserOrAppClosedWithoutBrowser() {
+		when(driver.getWindowHandles()).thenReturn(new TreeSet<>(Arrays.asList("12345")));
+		when(eventDriver.getSessionId()).thenThrow(NoSuchSessionException.class);
+		Assert.assertTrue(eventDriver.isBrowserOrAppClosed());
+	}
+	@Test(groups = {"ut"})
+	public void testIsBrowserOrAppClosedWithoutBrowser2() {
+		when(driver.getWindowHandles()).thenReturn(new TreeSet<>(Arrays.asList("12345")));
+		when(eventDriver.getCapabilities()).thenThrow(UnsupportedCommandException.class);
+		Assert.assertTrue(eventDriver.isBrowserOrAppClosed());
+	}
+	@Test(groups = {"ut"})
+	public void testIsBrowserOrAppClosedMobileApp() {
+		when(driver.getWindowHandles()).thenReturn(new TreeSet<>());
+		eventDriver.setWebTest(false); // mobile application test
+		Assert.assertFalse(eventDriver.isBrowserOrAppClosed());
 	}
 	
 	@Test(groups = {"ut"})
