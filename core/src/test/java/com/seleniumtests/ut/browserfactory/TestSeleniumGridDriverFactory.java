@@ -18,6 +18,7 @@ import org.mockito.Mockito;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Proxy;
+import org.openqa.selenium.SessionNotCreatedException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.Timeouts;
@@ -182,6 +183,36 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 		}
 	}
 
+	/**
+	 * When getSessionInformationFromGrid fails, we should quit the driver in case it has been created
+	 * @throws Exception
+	 */
+	@Test(groups={"ut"}, expectedExceptions = SessionNotCreatedException.class)
+	public void testDriverCreationWithSessionInformationFailing() throws Exception {
+
+		when(context.getTestType()).thenReturn(TestType.WEB);
+
+		when(gridConnector1.isGridActive()).thenReturn(true);
+		when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1));
+		doThrow(new SessionNotCreatedException("some error")).when(gridConnector1).getSessionInformationFromGrid(any(RemoteWebDriver.class), anyLong());
+
+		// connect to grid
+		try (MockedConstruction mockedRemoteWebDriver = mockConstruction(RemoteWebDriver.class, (driver, context1) -> {
+
+			when(driver.manage()).thenReturn(options);
+			when(driver.getCapabilities()).thenReturn(caps);
+		})) {
+			SeleniumGridDriverFactory driverFactory = new SeleniumGridDriverFactory(config);
+			try {
+				driverFactory.createWebDriver();
+			} finally {
+				// check driver has been quit (1 time for each retry)
+				verify((RemoteWebDriver) mockedRemoteWebDriver.constructed().get(0)).quit();
+				verify((RemoteWebDriver) mockedRemoteWebDriver.constructed().get(1)).quit();
+				verify((RemoteWebDriver) mockedRemoteWebDriver.constructed().get(2)).quit();
+			}
+		}
+	}
 	
 	/**
 	 * If grid is not active, driver is not created and exception is raised
