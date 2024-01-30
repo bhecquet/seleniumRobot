@@ -124,7 +124,15 @@ public class MobileDeviceSelector {
 		);
 		
 		if (filteredDeviceList.isEmpty()) {
-			throw new ConfigurationException("no matching device found among: " + deviceList);
+			StringBuilder message = new StringBuilder();
+			if (deviceName != null) {
+				message.append(String.format("deviceName=%s;", deviceName));
+			}if (platformName != null) {
+				message.append(String.format("platform=%s;", platformName));
+			}if (platformVersion != null) {
+				message.append(String.format("version=%s;", platformVersion));
+			}
+			throw new ConfigurationException(String.format("no matching device found. Looking for [%s] among: %s", message.toString(), deviceList));
 		}
 		
 		// returns the first matching device
