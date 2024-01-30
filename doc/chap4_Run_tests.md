@@ -398,7 +398,7 @@ APPIUM_HOME:
 - On Windows, using .exe, it's the root path where Appium.exe is located
 - On Mac, using .dmg, it will be `/Applications/Appium.app/Contents/Resources/app`
 - On any platform using npm installation, it will be the path where root `node_modules` folder has been created. This folder should contain an `appium` subfolder
-- `ANDROID_SDK_ROOT` / `ANDROID_HOME`: path to Android SDK (e.g: where SDK Manager resides). This is the root folder containing 'platform-tools', 'system-images', ... folders
+- `ANDROID_SDK_ROOT` / `ANDROID_HOME`: path to Android SDK (e.g: where SDK Manager resides). This is the root folder containing 'platform-tools', 'system-images', ... folders. If tools has been installed through Android Studio, they are located at `C:\Users\<user>\AppData\Local\Android\Sdk` on windows
 
 Also check that there is only one version of ADB on computer. Otherwise, there may be conflicts and ADB client you provide may not get relevant information from devices
 
