@@ -299,7 +299,7 @@ public class ByC extends By {
      * method for searching an element by a locator or an other.
      * It also checks if the locator is relevant to the tested platform (in case of mobile), which allow to write
      *
-     * <code>ByC.or(android(By.tagName("input")), ios(By.xpath("")))</code>
+     * <code>ByC.or(android(By.tagName("input")), ios(By.xpath(""), web(By.id("myId"))</code>
      
      * @author S047432
      *
@@ -307,7 +307,16 @@ public class ByC extends By {
     public static ByC or(By ... bies) {
         return new Or(bies);
     }
-    
+
+    /**
+     * Says that the locator in parameter is for Web only. It doesn't do anything else and should be used with ByC.or() to have an effect
+     * @param by
+     * @return
+     */
+    public static ByC web(By by) {
+        return new Web(by);
+    }
+
     /**
      * Says that the locator in parameter is for android only. It doesn't do anything else and should be used with ByC.or() to have an effect
      * @param by
@@ -830,6 +839,7 @@ public class ByC extends By {
         public List<WebElement> findElements(SearchContext context) {
             
             String platform = SeleniumTestsContextManager.getThreadContext().getPlatform();
+            boolean webTest = SeleniumTestsContextManager.isWebTest();
             List<WebElement> elements = new ArrayList<>();
             
             
@@ -837,6 +847,8 @@ public class ByC extends By {
                 // check this 'by' applies to the platform
                 if ((by instanceof Android && !platform.equalsIgnoreCase("android"))
                         || (by instanceof Ios && !platform.equalsIgnoreCase("ios"))
+                        || ((by instanceof Ios || by instanceof Android) && webTest)
+                        || (by instanceof Web && !webTest)
                 ) {
                     continue;
                 } else if (by instanceof ByPlatformSpecific) {
@@ -877,33 +889,35 @@ public class ByC extends By {
     
     /**
      *
+     * Selector for specifying that the underlying selector is specific to web
+     * This is usefull using ByC.or, when an element is the same in web and mobile but with different selector strategies
      *
      */
-    public static class Android extends ByC implements Serializable, ByPlatformSpecific {
+    public static class Web extends ByC implements Serializable, ByPlatformSpecific {
         
-        private static final long serialVersionUID = 6341968046120092161L;
+        private static final long serialVersionUID = 6341968046120092151L;
         
         private transient By by;
         
-        public Android(By by) {
+        public Web(By by) {
             this.by = by;
         }
         
         @Override
         public List<WebElement> findElements(SearchContext context) {
-            throw new UnsupportedOperationException("You cannot use ByC.android directly");
+            throw new UnsupportedOperationException("You cannot use ByC.web directly");
             
         }
         
         @Override
         public WebElement findElement(SearchContext context) {
-            throw new UnsupportedOperationException("You cannot use ByC.android directly");
+            throw new UnsupportedOperationException("You cannot use ByC.web directly");
         }
         
         
         @Override
         public String toString() {
-            return String.format("android[%s]", by.toString());
+            return String.format("web[%s]", by.toString());
         }
         
         @Override
@@ -911,10 +925,45 @@ public class ByC extends By {
             return by;
         }
     }
+
+    /**
+     * Selector for specifying that the underlying selector is specific to android
+     */
+    public static class Android extends ByC implements Serializable, ByPlatformSpecific {
+
+        private static final long serialVersionUID = 6341968046120092161L;
+
+        private transient By by;
+
+        public Android(By by) {
+            this.by = by;
+        }
+
+        @Override
+        public List<WebElement> findElements(SearchContext context) {
+            throw new UnsupportedOperationException("You cannot use ByC.android directly");
+
+        }
+
+        @Override
+        public WebElement findElement(SearchContext context) {
+            throw new UnsupportedOperationException("You cannot use ByC.android directly");
+        }
+
+
+        @Override
+        public String toString() {
+            return String.format("android[%s]", by.toString());
+        }
+
+        @Override
+        public By getBy() {
+            return by;
+        }
+    }
     
     /**
-     *
-     *
+     * Selector for specifying that the underlying selector is specific to Ios
      */
     public static class Ios extends ByC implements Serializable, ByPlatformSpecific {
         

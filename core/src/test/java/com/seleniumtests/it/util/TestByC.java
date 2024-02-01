@@ -17,9 +17,6 @@
  */
 package com.seleniumtests.it.util;
 
-import static com.seleniumtests.uipage.ByC.android;
-import static com.seleniumtests.uipage.ByC.ios;
-
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -41,6 +38,8 @@ import com.seleniumtests.uipage.ByC;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.uipage.htmlelements.RadioButtonElement;
 import com.seleniumtests.uipage.htmlelements.TextFieldElement;
+
+import static com.seleniumtests.uipage.ByC.*;
 
 public class TestByC extends GenericTest {
 	
@@ -67,6 +66,7 @@ public class TestByC extends GenericTest {
 	
 	@AfterMethod(groups={"it"})
 	public void reset() {
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 		DriverTestPage.textSelectedId.clear();
 		DriverTestPage.textSelectedText.clear();
 	}
@@ -483,7 +483,7 @@ public class TestByC extends GenericTest {
 	 * When first locator do not allow to find element, go to the next one
 	 */
 	@Test(groups={"it"})
-	public void testByOrWithOneIvalidLocator() {
+	public void testByOrWithOneInvalidLocator() {
 		Assert.assertEquals(new HtmlElement("or", ByC.or(By.id("text2Invalid"), By.name("textField"))).getTagName(), "input");
 		
 	}
@@ -504,19 +504,76 @@ public class TestByC extends GenericTest {
 	@Test(groups={"it"})
 	public void testByOrWithPlatformSpecificLocatorAndAndroidPlatform() {
 		SeleniumTestsContextManager.getThreadContext().setPlatform("ANDROID");
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_ANDROID);
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(3);
-		Assert.assertEquals(new HtmlElement("or", ByC.or(ios(By.name("textField")), android(By.id("text2")))).getTagName(), "input");
-		
+		Assert.assertEquals(new HtmlElement("or", ByC.or(
+				web(By.id("carre")),
+				ios(By.name("textField")),
+				android(By.id("text2")))).getTagName(),
+				"input");
+	}
+	@Test(groups={"it"})
+	public void testByOrWithPlatformSpecificLocatorAndAndroidPlatformWeb() {
+		SeleniumTestsContextManager.getThreadContext().setPlatform("ANDROID");
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(3);
+		Assert.assertEquals(new HtmlElement("or", ByC.or(
+				web(By.id("carre")),
+				ios(By.name("textField")),
+				android(By.id("text2")))).getTagName(),
+				"div");
 	}
 	/**
 	 * Test specific locator with mobile platform. Element should be found
 	 */
 	@Test(groups={"it"})
-	public void testByOrWithPlatformSpecificLocatorAndIoslatform() {
+	public void testByOrWithPlatformSpecificLocatorAndIosPlatform() {
 		SeleniumTestsContextManager.getThreadContext().setPlatform("IOS");
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_IOS);
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(3);
-		Assert.assertEquals(new HtmlElement("or", ByC.or(ios(By.id("text2")), android(By.id("textField")))).getTagName(), "input");
+		Assert.assertEquals(new HtmlElement("or", ByC.or(
+				web(By.id("carre")),
+				ios(By.id("text2")),
+				android(By.id("textField")))).getTagName(),
+				"input");
 		
+	}
+	@Test(groups={"it"})
+	public void testByOrWithPlatformSpecificLocatorAndIosPlatformWeb() {
+		SeleniumTestsContextManager.getThreadContext().setPlatform("IOS");
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_IOS);
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(3);
+		Assert.assertEquals(new HtmlElement("or", ByC.or(
+				web(By.id("carre")),
+				ios(By.id("text2")),
+				android(By.id("textField")))).getTagName(),
+				"div");
+
+	}
+
+	@Test(groups={"it"})
+	public void testByOrWithPlatformSpecificLocatorAndWebPlatform() {
+		SeleniumTestsContextManager.getThreadContext().setPlatform("ANY");
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(3);
+		Assert.assertEquals(new HtmlElement("or", ByC.or(
+						ios(By.id("carre")),
+						web(By.id("text2")),
+						android(By.id("textField")))).getTagName(),
+				"input");
+
+	}
+	@Test(groups={"it"})
+	public void testByOrWithPlatformSpecificLocatorAndWebPlatform2() {
+		SeleniumTestsContextManager.getThreadContext().setPlatform("WIN10");
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(3);
+		Assert.assertEquals(new HtmlElement("or", ByC.or(
+						ios(By.id("carre")),
+						web(By.id("text2")),
+						android(By.id("textField")))).getTagName(),
+				"input");
+
 	}
 
 	@Test(groups={"it"})
