@@ -867,7 +867,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	 * 
      * @param allElements
      */
-    private <T extends SearchContext> T getElementByIndex(List<T> allElements) {
+    protected <T extends SearchContext> T getElementByIndex(List<T> allElements) {
     	if (elementIndex != null && elementIndex.equals(FIRST_VISIBLE)) {
 			for (T el: allElements) {
 				if (el instanceof WebElement &&  ((WebElement)el).isDisplayed()) {
@@ -904,7 +904,6 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 		}
 
 		for (FrameElement frameEl: frameTree) {
-			Integer idx = frameEl.getElementIndex() == null ? 0: frameEl.getElementIndex();
 			WebElement frameWebElement;
 			
 			SearchContext searchContext;
@@ -914,12 +913,14 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 			} else {
 				searchContext = getDriver();
 			}
-			
+
 			try {
-				frameWebElement = searchContext.findElements(frameEl.getBy()).get(idx);
-			} catch (IndexOutOfBoundsException e) {
-				throw new NoSuchFrameException(String.format("Frame %s with index %d has not been found", frameEl, idx));
+				List<WebElement> frameElements = searchContext.findElements(frameEl.getBy());
+				frameWebElement = frameEl.getElementByIndex(frameElements);
+			} catch (NoSuchElementException e) {
+				throw new NoSuchFrameException(e.getMessage());
 			}
+
 			((CustomEventFiringWebDriver) getDriver()).scrollToElement(frameWebElement, -20);
 			getDriver().switchTo().frame(frameWebElement);
 		}
