@@ -177,8 +177,8 @@ public class TestStep extends TestAction {
 	/**
 	 * Return 
 	 * StepStatus.FAILED if and only if the step is marked as failed
-	 * StepStatus.WARNIG if any of the sub actions (or steps) are failed, but not the step itself
-	 * StepStatus.SUCESS in any other cases
+	 * StepStatus.WARNING if any of the sub actions (or steps) are failed, but not the step itself
+	 * StepStatus.SUCCESS in any other cases
 	 */
 	public StepStatus getStepStatus() {
 		if (Boolean.TRUE.equals(getFailed())) {
