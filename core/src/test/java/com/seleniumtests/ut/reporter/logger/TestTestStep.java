@@ -713,7 +713,7 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testToJson() throws IOException {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1", null, Arrays.asList("foobar"), true);
 		step.addMessage(new TestMessage("everything OK", MessageType.INFO));
 		step.addAction(new TestAction("action2", false, new ArrayList<>()));
 
@@ -735,7 +735,7 @@ public class TestTestStep extends GenericTest {
 		Snapshot snapshot = new Snapshot(screenshot, "main", SnapshotCheckType.FALSE);
 		step.addSnapshot(snapshot, 0, "foo");
 
-		TestStep subStep = new TestStep("subStep", null, new ArrayList<>(), true);
+		TestStep subStep = new TestStep("subStep with password foobar", null, new ArrayList<>(), true);
 		subStep.addMessage(new TestMessage("everything in subStep almost OK", MessageType.WARNING));
 		subStep.addAction(new TestAction("action1", false, new ArrayList<>()));
 		step.addAction(subStep);
@@ -762,7 +762,7 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(stepJson.getJSONArray("harCaptures").getJSONObject(0).getString("name"), "main");
 
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getString("type"), "step");
-		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getString("name"), "subStep");
+		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getString("name"), "subStep with password ******");
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getJSONArray("actions").length(), 2);
 
 		Assert.assertEquals(stepJson.getJSONArray("files").getJSONObject(0).getString("type"), "file");
