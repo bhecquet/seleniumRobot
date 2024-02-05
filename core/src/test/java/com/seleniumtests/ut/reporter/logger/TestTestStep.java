@@ -713,7 +713,7 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testToJson() throws IOException {
-		TestStep step = new TestStep("step1", null, Arrays.asList("foobar"), true);
+		TestStep step = new TestStep("step1 with args: (https://myserver)", null, Arrays.asList("foobar"), true);
 		step.addMessage(new TestMessage("everything OK", MessageType.INFO));
 		step.addAction(new TestAction("action2", false, new ArrayList<>()));
 
@@ -744,7 +744,7 @@ public class TestTestStep extends GenericTest {
 
 		Assert.assertEquals(stepJson.getString("type"), "step");
 		Assert.assertTrue(stepJson.isNull("exception"));
-		Assert.assertEquals(stepJson.getString("name"), "step1");
+		Assert.assertEquals(stepJson.getString("name"), "step1 with args: (https:\\/\\/myserver)");
 		Assert.assertEquals(stepJson.getString("status"), "SUCCESS");
 		Assert.assertEquals(stepJson.getLong("timestamp"), step.getTimestamp().toInstant(ZoneOffset.UTC).toEpochMilli());
 		Assert.assertEquals(stepJson.getJSONArray("actions").length(), 3);

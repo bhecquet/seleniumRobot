@@ -127,7 +127,7 @@ public class TestSnapshot extends GenericTest {
 		File tmpImgFile = File.createTempFile("img", ".png");
 		File tmpHtmlFile = File.createTempFile("html", ".html");
 		ScreenShot screenshot = new ScreenShot(tmpImgFile, tmpHtmlFile, "");
-		screenshot.setTitle("title");
+		screenshot.setTitle("title /");
 		screenshot.setLocation("http://location");
 		Snapshot snapshotLogger = new Snapshot(screenshot, "main", SnapshotCheckType.TRUE);
 		snapshotLogger.getScreenshot().getHtml().setId(2);
@@ -136,8 +136,8 @@ public class TestSnapshot extends GenericTest {
 		JSONObject json = snapshotLogger.toJson();
 		
 		Assert.assertEquals(json.getString("type"), "snapshot");
-		Assert.assertEquals(json.getString("url"), "http://location");
-		Assert.assertEquals(json.getString("title"), "title");
+		Assert.assertEquals(json.getString("url"), "http:\\/\\/location");
+		Assert.assertEquals(json.getString("title"), "title \\/");
 		Assert.assertEquals(json.getString("name"), "main");
 		Assert.assertEquals(json.getInt("idHtml"), 2);
 		Assert.assertEquals(json.getInt("idImage"), 3);
