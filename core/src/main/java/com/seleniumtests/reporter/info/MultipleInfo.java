@@ -1,5 +1,9 @@
 package com.seleniumtests.reporter.info;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.testng.ITestResult;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,8 +13,6 @@ import java.util.List;
  *
  */
 public class MultipleInfo extends Info {
-
-
 
 	private List<Info> infos;
 	
@@ -35,6 +37,18 @@ public class MultipleInfo extends Info {
 			}
 		}
 		return out.toString();
+	}
+
+	@Override
+	public JSONObject toJson() {
+		JSONObject infosJson = new JSONObject()
+				.put("type", "multipleinfo")
+				.put("infos", new JSONArray());
+		for (Info info: infos) {
+			infosJson.getJSONArray("infos").put(info.toJson());
+		}
+
+		return infosJson;
 	}
 
 	public List<Info> getInfos() {

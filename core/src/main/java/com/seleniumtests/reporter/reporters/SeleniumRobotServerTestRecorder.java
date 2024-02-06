@@ -172,7 +172,12 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 				// record test case
 				Integer testCaseId = serverConnector.createTestCase(testName);
 				String gridNode = getGridNode();
-				Integer testCaseInSessionId = serverConnector.createTestCaseInSession(sessionId, testCaseId, getVisualTestName(testResult), TestNGResultUtils.getTestStatusString(testResult), gridNode);
+				Integer testCaseInSessionId = serverConnector.createTestCaseInSession(sessionId,
+						testCaseId,
+						getVisualTestName(testResult),
+						TestNGResultUtils.getTestStatusString(testResult),
+						gridNode,
+						TestNGResultUtils.getTestDescription(testResult));
 				serverConnector.addLogsToTestCaseInSession(testCaseInSessionId, generateExecutionLogs(testResult).toString());
 				
 				List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
@@ -265,7 +270,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 	private void recordAllAttachments(SeleniumRobotSnapshotServerConnector serverConnector, Integer stepResultId, TestStep testStep) {
 
 		List<FileContent> attachments;
-		// in case snapshot comparison is not requested, we still want captured pictured to be displayed in report
+		// in case snapshot comparison is not requested, we still want captured pictures to be displayed in report
 		if (SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshot()) {
 			attachments = testStep.getAllAttachments(false, SnapshotCheckType.NONE, SnapshotCheckType.REFERENCE_ONLY);
 		} else {

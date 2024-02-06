@@ -2,6 +2,8 @@ package com.seleniumtests.reporter.info;
 
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.util.StringUtility;
+import org.json.JSONObject;
+import org.testng.ITestResult;
 
 public class StringInfo extends Info {
 
@@ -20,6 +22,13 @@ public class StringInfo extends Info {
                 return description;
             }
         //}
+    }
+
+    @Override
+    public JSONObject toJson() {
+        return new JSONObject().put("type", "string")
+                .put("info", description == null ? JSONObject.NULL: StringUtility.encodeString(description, "json"));
+
     }
 }
 

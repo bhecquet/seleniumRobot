@@ -1,6 +1,8 @@
 package com.seleniumtests.reporter.info;
 
 import com.seleniumtests.util.StringUtility;
+import org.json.JSONObject;
+import org.testng.ITestResult;
 
 /**
  * class for displaying a log in report, e.g, an error
@@ -23,6 +25,13 @@ public class LogInfo extends StringInfo {
 		} else {
 			return super.encode(format);
 		}
+	}
+
+	@Override
+	public JSONObject toJson() {
+		return new JSONObject().put("type", "log")
+				.put("info", StringUtility.encodeString(logs, "json"));
+
 	}
 
 }

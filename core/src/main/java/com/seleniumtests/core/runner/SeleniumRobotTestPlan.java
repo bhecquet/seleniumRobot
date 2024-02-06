@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import com.seleniumtests.reporter.logger.FileContent;
 import org.openqa.selenium.WebDriver;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
@@ -117,11 +118,11 @@ public class SeleniumRobotTestPlan {
 	        		|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_SUCCESS && testResult.isSuccess())
 	        		|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_ERROR && !testResult.isSuccess())) {
 
-	        	((ScenarioLogger)logger).logFileToTestEnd(videoFile.getAbsoluteFile(), "Video capture");
+	        	FileContent videoFileContent = logger.logFileToTestEnd(videoFile.getAbsoluteFile(), "Video capture");
 
 	        	Info lastStateInfo = TestNGResultUtils.getTestInfo(testResult).get(TestStepManager.LAST_STATE_NAME);
 	        	if (lastStateInfo != null) {
-	        		((MultipleInfo)lastStateInfo).addInfo(new VideoLinkInfo(TestNGResultUtils.getUniqueTestName(testResult) + "/videoCapture.avi"));
+	        		((MultipleInfo)lastStateInfo).addInfo(new VideoLinkInfo(videoFileContent));
 	        	}
 	        	
 	        	logger.info("Video file copied to " + videoFile.getAbsolutePath());

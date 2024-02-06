@@ -172,7 +172,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	 */
 	@Deprecated
 	public Integer createTestCaseInSession(Integer sessionId, Integer testCaseId) {
-		return createTestCaseInSession(sessionId, testCaseId, "", "UNKNOWN", "LOCAL");
+		return createTestCaseInSession(sessionId, testCaseId, "", "UNKNOWN", "LOCAL", null);
 	}
 	
 	/**
@@ -184,7 +184,8 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	 * @param gridNode		name of the grid node where test run
 	 * @return	the id of the created testCaseInSession
 	 */
-	public Integer createTestCaseInSession(Integer sessionId, Integer testCaseId, String name, String status, String gridNode) {
+
+	public Integer createTestCaseInSession(Integer sessionId, Integer testCaseId, String name, String status, String gridNode, String description) {
 		if (!active) {
 			return null;
 		}
@@ -203,7 +204,8 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field(FIELD_SESSION, sessionId.toString())
 					.field(FIELD_STATUS, status)
 					.field("gridNode", gridNode)
-					.field(FIELD_NAME, strippedName));
+					.field(FIELD_NAME, strippedName)
+					.field("description", description));
 			return testInSessionJson.getInt("id");
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 			throw new SeleniumRobotServerException("cannot create test case", e);
@@ -215,7 +217,8 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	 * @return
 	 */
 	private String getTestStepName(String testStepName) {
-		return testStepName.length() > MAX_TESTSTEP_NAME_LENGTH ? testStepName.substring(0, MAX_TESTSTEP_NAME_LENGTH): testStepName;
+		String stepName = testStepName.split(" with args")[0];
+		return stepName.length() > MAX_TESTSTEP_NAME_LENGTH ? stepName.substring(0, MAX_TESTSTEP_NAME_LENGTH): stepName;
 	}
 	
 

@@ -17,13 +17,7 @@
  */
 package com.seleniumtests.it.reporter;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.contains;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -103,11 +97,11 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector).createTestCase("testWithException");
 			verify(serverConnector).createTestCase("testSkipped");
 			verify(serverConnector, times(5)).addLogsToTestCaseInSession(anyInt(), anyString());
-			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testAndSubActions"), eq("SUCCESS"), eq("LOCAL"));
-			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testInError"), eq("FAILURE"), eq("LOCAL"));
-			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testWithException"), eq("FAILURE"), eq("LOCAL"));
-			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testSkipped"), eq("SKIP"), eq("LOCAL"));
-			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("A test which is <OK> é&"), eq("SUCCESS"), eq("LOCAL")); // a test with custom name
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testAndSubActions"), eq("SUCCESS"), eq("LOCAL"), eq("a test with steps"));
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testInError"), eq("FAILURE"), eq("LOCAL"), eq(""));
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testWithException"), eq("FAILURE"), eq("LOCAL"), eq(""));
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testSkipped"), eq("SKIP"), eq("LOCAL"), eq(""));
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("A test which is <OK> é&"), eq("SUCCESS"), eq("LOCAL"), eq("")); // a test with custom name
 			verify(serverConnector, times(4)).createTestStep(eq("step 1"), anyInt());
 			verify(serverConnector).createTestStep(eq("step 2"), anyInt());
 			verify(serverConnector).createSnapshot(any(Snapshot.class), anyInt(), anyInt(), anyInt(), eq(new ArrayList<>())); // two snapshots but only once is sent because the other has no name
@@ -158,7 +152,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector, never()).createSession(anyString(), anyString());
 			verify(serverConnector, never()).createTestCase(anyString());
 			verify(serverConnector, never()).addLogsToTestCaseInSession(anyInt(), anyString());
-			verify(serverConnector, never()).createTestCaseInSession(anyInt(), anyInt(), anyString(), anyString(), anyString());
+			verify(serverConnector, never()).createTestCaseInSession(anyInt(), anyInt(), anyString(), anyString(), anyString(), eq(""));
 			verify(serverConnector, never()).createTestStep(anyString(), anyInt());
 			verify(serverConnector, never()).createSnapshot(any(Snapshot.class), anyInt(), anyInt(), anyInt(), eq(new ArrayList<>())); // two snapshots but only once is sent because the other has no name
 			
@@ -197,7 +191,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			// issue #331: check all test cases are created, call MUST be done only once to avoid result to be recorded several times
 			verify(serverConnector).createTestCase("testDriverCustomSnapshot");
 			verify(serverConnector).addLogsToTestCaseInSession(anyInt(), anyString());
-			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testDriverCustomSnapshot"), eq("SUCCESS"), eq("LOCAL"));
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testDriverCustomSnapshot"), eq("SUCCESS"), eq("LOCAL"), eq(""));
 			verify(serverConnector).createTestStep(eq("_captureSnapshot with args: (my snapshot, )"), anyInt());
 			verify(serverConnector).createSnapshot(any(Snapshot.class), anyInt(), anyInt(), anyInt(), listArgument.capture()); // 1 custom snapshot taken with name
 
@@ -244,7 +238,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			// issue #331: check all test cases are created, call MUST be done only once to avoid result to be recorded several times
 			verify(serverConnector).createTestCase("testDriverCustomSnapshot");
 			verify(serverConnector).addLogsToTestCaseInSession(anyInt(), anyString());
-			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testDriverCustomSnapshot"), eq("SUCCESS"), eq("LOCAL"));
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testDriverCustomSnapshot"), eq("SUCCESS"), eq("LOCAL"), eq(""));
 			verify(serverConnector).createTestStep(eq("_captureSnapshot with args: (my snapshot, )"), anyInt());
 
 			// check capture recorded for comparison is sent to server as attachment
@@ -295,7 +289,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 			// check all test cases are created, in both test classes
 			verify(serverConnector, never()).createTestCase(anyString());
-			verify(serverConnector, never()).createTestCaseInSession(anyInt(), anyInt(), anyString(), anyString(), anyString());
+			verify(serverConnector, never()).createTestCaseInSession(anyInt(), anyInt(), anyString(), anyString(), anyString(), eq(""));
 			verify(serverConnector, never()).createTestStep(anyString(), anyInt());
 			
 		} finally {
