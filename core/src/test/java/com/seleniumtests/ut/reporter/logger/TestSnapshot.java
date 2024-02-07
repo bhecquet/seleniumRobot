@@ -156,7 +156,7 @@ public class TestSnapshot extends GenericTest {
 		JSONObject json = snapshotLogger.toJson();
 		
 		Assert.assertEquals(json.getString("type"), "snapshot");
-		Assert.assertEquals(json.getString("url"), "http://location");
+		Assert.assertEquals(json.getString("url"), "http:\\/\\/location");
 		Assert.assertEquals(json.getString("title"), "title");
 		Assert.assertEquals(json.getString("name"), "main");
 		Assert.assertTrue(json.isNull("idHtml"));
