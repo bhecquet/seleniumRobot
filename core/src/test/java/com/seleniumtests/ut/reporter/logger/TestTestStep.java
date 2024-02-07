@@ -744,7 +744,7 @@ public class TestTestStep extends GenericTest {
 
 		Assert.assertEquals(stepJson.getString("type"), "step");
 		Assert.assertTrue(stepJson.isNull("exception"));
-		Assert.assertEquals(stepJson.getString("name"), "step1 with args: (https:\\/\\/myserver)");
+		Assert.assertEquals(stepJson.getString("name"), "step1 with args: (https://myserver)");
 		Assert.assertEquals(stepJson.getString("status"), "SUCCESS");
 		Assert.assertEquals(stepJson.getLong("timestamp"), step.getTimestamp().toInstant(ZoneOffset.UTC).toEpochMilli());
 		Assert.assertEquals(stepJson.getJSONArray("actions").length(), 3);

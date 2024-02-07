@@ -31,7 +31,7 @@ public class HyperlinkInfo extends Info {
 	@Override
 	public JSONObject toJson() {
 		return new JSONObject().put("type", "hyperlink")
-				.put("info", StringUtility.encodeString(description, "json"))
-				.put("link", StringUtility.encodeString(link, "json"));
+				.put("info", description)
+				.put("link", link);
 	}
 }

@@ -27,7 +27,7 @@ public class StringInfo extends Info {
     @Override
     public JSONObject toJson() {
         return new JSONObject().put("type", "string")
-                .put("info", description == null ? JSONObject.NULL: StringUtility.encodeString(description, "json"));
+                .put("info", description == null ? JSONObject.NULL: description);
 
     }
 }

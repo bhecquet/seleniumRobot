@@ -24,9 +24,13 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.seleniumtests.reporter.info.FileLinkInfo;
+import com.seleniumtests.reporter.info.Info;
+import com.seleniumtests.reporter.logger.FileContent;
 import com.seleniumtests.reporter.logger.TestStep;
 import org.openqa.selenium.Rectangle;
 import org.testng.ITestResult;
@@ -63,6 +67,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	public static final String TESTSTEP_API_URL = "/snapshot/api/teststep/";
 	public static final String STEPRESULT_API_URL = "/snapshot/api/stepresult/";
 	public static final String EXCLUDE_API_URL = "/snapshot/api/exclude/";
+	public static final String TESTINFO_API_URL = "/snapshot/api/testinfo/";
 	public static final String FILE_API_URL = "/snapshot/api/file/";
 	public static final String LOGS_API_URL = "/snapshot/api/logs/";
 	public static final String SNAPSHOT_API_URL = "/snapshot/upload/image";
@@ -399,16 +404,11 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	/**
 	 * Create snapshot on server that will be used to show differences between 2 versions of the application
 	 */
-	public Integer createSnapshot(Snapshot snapshot, Integer sessionId, Integer testCaseInSessionId, Integer stepResultId, List<Rectangle> excludeZones) {
+	public Integer createSnapshot(Snapshot snapshot, Integer stepResultId, List<Rectangle> excludeZones) {
 		if (!active) {
 			return null;
 		}
-		if (sessionId == null) {
-			throw new ConfigurationException("Session must be previously recorded");
-		}
-		if (testCaseInSessionId == null) {
-			throw new ConfigurationException("TestCaseInSession must be previously recorded");
-		}
+
 		checkStepResult(stepResultId);
 		if (snapshot == null || snapshot.getScreenshot() == null || snapshot.getScreenshot().getImage() == null) {
 			throw new SeleniumRobotServerException(NAPSHOT_DOES_NOT_EXIST_ERROR);
@@ -421,8 +421,6 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			
 			MultipartBody request = buildPostRequest(url + SNAPSHOT_API_URL)
 					.field("stepResult", stepResultId)
-					.field("sessionId", sessionUUID)
-					.field(FIELD_TEST_CASE, testCaseInSessionId.toString())
 					.field(FIELD_IMAGE, pictureFile)
 					.field(FIELD_NAME, snapshotName)
 					.field("compare", snapshot.getCheckSnapshot().getName())
@@ -531,21 +529,54 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	}
 
 	/**
+	 * Record the test info
+	 * We expect files to have been already uploaded, so that id has been given to files
+	 * @param infos
+	 * @param testCaseInSessionId
+	 */
+	public void recordTestInfo(Map<String, Info> infos, Integer testCaseInSessionId) {
+		if (!active) {
+			return;
+		}
+		if (infos == null) {
+			throw new ConfigurationException("An infos map must be provided");
+		}
+		if (testCaseInSessionId == null) {
+			throw new ConfigurationException("TestCaseInSession must be previously defined");
+		}
+
+		for (Map.Entry<String, Info> info: infos.entrySet()) {
+
+			if (info instanceof FileLinkInfo && ((FileLinkInfo) info).getFileContent().getId() == null) {
+				logger.error(String.format("File has not been uploaded", ((FileLinkInfo) info).getFileContent().getName()));
+			}
+
+			try {
+				getStringResponse(buildPostRequest(url + TESTINFO_API_URL)
+						.field(FIELD_TEST_CASE, testCaseInSessionId.toString())
+						.field("infoKey", info.getKey())
+						.field("info", info.getValue().toJson().toString()));
+			} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
+				logger.error("cannot create test info", e);
+			}
+		}
+	}
+
+	/**
 	 * Record step result
 	 * for each file present in step
 	 * @param testStep				the test step
-	 * @param sessionId				session id as recorded on server
 	 * @param testCaseInSessionId   test case in session id as recorded on server
 	 * @param testStepId			test step id as recorded on server
 	 * @return the stepResult id stored on server
 	 */
-	public Integer recordStepResult(TestStep testStep, Integer sessionId, Integer testCaseInSessionId, Integer testStepId) {
+	public Integer recordStepResult(TestStep testStep, Integer testCaseInSessionId, Integer testStepId) {
 		if (testStep == null) {
 			throw new ConfigurationException("A test step must be provided");
 		}
 
 
-		Integer stepResultId = recordStepResult(!testStep.getFailed(), "", testStep.getDuration(), sessionId, testCaseInSessionId, testStepId);
+		Integer stepResultId = recordStepResult(!testStep.getFailed(), "", testStep.getDuration(), testCaseInSessionId, testStepId);
 		
 		return stepResultId;
 	}
@@ -555,17 +586,13 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	 * @param result				step result (true of false)
 	 * @param logs					step details
 	 * @param duration				step duration in milliseconds
-	 * @param sessionId				session id as recorded on server
 	 * @param testCaseInSessionId   test case in session id as recorded on server
 	 * @param testStepId			test step id as recorded on server
 	 * @return the stepResult id stored on server
 	 */
-	public Integer recordStepResult(Boolean result, String logs, long duration, Integer sessionId, Integer testCaseInSessionId, Integer testStepId) {
+	public Integer recordStepResult(Boolean result, String logs, long duration, Integer testCaseInSessionId, Integer testStepId) {
 		if (!active) {
 			return null;
-		}
-		if (sessionId == null) {
-			throw new ConfigurationException("Test session must be previously defined");
 		}
 		if (testCaseInSessionId == null) {
 			throw new ConfigurationException("TestCaseInSession must be previously defined");

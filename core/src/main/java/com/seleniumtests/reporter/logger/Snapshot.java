@@ -136,9 +136,9 @@ public class Snapshot extends TestAction {
     	snapshotJson.put("snapshotCheckType", snapshotCheckType.getName());
     	snapshotJson.put("idImage", (screenshot.getImage() == null || screenshot.getImage().getId() == null) ? JSONObject.NULL: screenshot.getImage().getId());
     	snapshotJson.put("idHtml", (screenshot.getHtml() == null || screenshot.getHtml().getId() == null) ? JSONObject.NULL: screenshot.getHtml().getId());;
-    	snapshotJson.put("name", encodeString(name, "json"));
-    	snapshotJson.put("title", encodeString(screenshot.getTitle(), "json"));
-    	snapshotJson.put("url", encodeString(screenshot.getLocation(), "json"));
+    	snapshotJson.put("name", name);
+    	snapshotJson.put("title",screenshot.getTitle());
+    	snapshotJson.put("url", screenshot.getLocation());
     	snapshotJson.put("displayInReport", displayInReport);
     	snapshotJson.put("type", "snapshot");
     	

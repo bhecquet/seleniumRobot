@@ -9,7 +9,7 @@ import org.testng.ITestResult;
 import java.io.File;
 import java.nio.file.Paths;
 
-public class ImageLinkInfo extends HyperlinkInfo {
+public class ImageLinkInfo extends HyperlinkInfo implements FileLinkInfo {
 
 	FileContent imageFileContent;
 
@@ -48,6 +48,11 @@ public class ImageLinkInfo extends HyperlinkInfo {
 				.put("info", description)
 				.put("link", imageFileContent.getName())
 				.put("id", imageFileContent.getId() == null ? JSONObject.NULL: imageFileContent.getId());
+	}
+
+	@Override
+	public FileContent getFileContent() {
+		return imageFileContent;
 	}
 
 }

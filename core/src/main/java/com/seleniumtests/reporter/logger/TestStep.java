@@ -299,7 +299,7 @@ public class TestStep extends TestAction {
 	public JSONObject toJson() {
 		JSONObject stepJSon = super.toJson();
 		
-		stepJSon.put("name", encodeString(getName(), "json"));
+		stepJSon.put("name", getName());
 		stepJSon.put("duration", getDuration());
 		stepJSon.put("date", startDate);
 		stepJSon.put("videoTimeStamp", videoTimeStamp);

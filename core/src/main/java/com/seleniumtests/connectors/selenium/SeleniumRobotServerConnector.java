@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.connectors.selenium;
 
+import kong.unirest.*;
 import org.apache.logging.log4j.Logger;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -27,13 +28,6 @@ import com.seleniumtests.customexception.SeleniumRobotServer500Exception;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
-import kong.unirest.GetRequest;
-import kong.unirest.HttpRequest;
-import kong.unirest.HttpRequestWithBody;
-import kong.unirest.HttpResponse;
-import kong.unirest.Unirest;
-import kong.unirest.UnirestException;
-import kong.unirest.UnirestInstance;
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
@@ -332,6 +326,31 @@ public abstract class SeleniumRobotServerConnector {
 		}
 		
 		return new JSONObject(response.getBody());
+	}
+
+	/**
+	 * Get the response to HTTP request and control status
+ 	 * @param request
+	 * @return
+	 */
+	protected String getStringResponse(HttpRequest<?> request) {
+
+		HttpResponse<String> response = request.asString();
+
+		if (response.getStatus() == 423) {
+			String error = new JSONObject(response.getBody()).getString(RESPONSE_DETAIL);
+			throw new SeleniumRobotServerException(error);
+		}
+
+		if (response.getStatus() >= 400) {
+			throw getRightSeleniumServerException(response, request.getUrl());
+		}
+
+		if (response.getStatus() == 204) {
+			return "";
+		}
+
+		return response.getBody();
 	}
 	
 	protected JSONArray getJSonArray(HttpRequest<?> request)  {

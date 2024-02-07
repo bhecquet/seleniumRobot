@@ -655,6 +655,7 @@ public class ConnectorsTest extends MockitoTest {
 		createServerMock("POST", SeleniumRobotSnapshotServerConnector.EXCLUDE_API_URL, 200, "{'id': '18'}");
 		createServerMock("POST", SeleniumRobotSnapshotServerConnector.STEPRESULT_API_URL, 200, "{'id': '17'}");
 		createServerMock("PATCH", SeleniumRobotSnapshotServerConnector.STEPRESULT_API_URL + "17/", 200, "{'id': '17'}");
+		createServerMock("POST", SeleniumRobotSnapshotServerConnector.TESTINFO_API_URL, 200, "");
 
 		createServerMock("POST", SeleniumRobotSnapshotServerConnector.FILE_API_URL, 201, "{'id': '18'}");
 		createServerMock("POST", SeleniumRobotSnapshotServerConnector.LOGS_API_URL, 201, "{'id': '19'}");

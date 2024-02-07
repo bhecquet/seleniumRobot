@@ -11,7 +11,7 @@ import org.testng.ITestResult;
 import java.io.File;
 import java.nio.file.Paths;
 
-public class VideoLinkInfo extends HyperlinkInfo {
+public class VideoLinkInfo extends HyperlinkInfo implements FileLinkInfo {
 
 	FileContent videoFileContent;
 
@@ -48,4 +48,8 @@ public class VideoLinkInfo extends HyperlinkInfo {
 				.put("id", videoFileContent.getId());
 	}
 
+	@Override
+	public FileContent getFileContent() {
+		return videoFileContent;
+	}
 }

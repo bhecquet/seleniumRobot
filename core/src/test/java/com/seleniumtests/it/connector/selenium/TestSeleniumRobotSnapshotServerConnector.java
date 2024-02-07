@@ -131,7 +131,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		Integer testCaseId = connector.createTestCase("Test 2");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 2", "SUCCESS", "LOCAL", "some description");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, "logs", 1, sessionId, testCaseInSessionId, testStepId);
+		Integer stepResultId = connector.recordStepResult(true, "logs", 1, testCaseInSessionId, testStepId);
 		
 		File image = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "img.png").toFile();
 		image.deleteOnExit();
@@ -159,13 +159,13 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		Integer testCaseId = connector.createTestCase("Test 2");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 2", "SUCCESS", "LOCAL", "some description");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, "logs", 1, sessionId, testCaseInSessionId, testStepId);
+		Integer stepResultId = connector.recordStepResult(true, "logs", 1, testCaseInSessionId, testStepId);
 		File image = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "img.png").toFile();
 		image.deleteOnExit();
 		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/images/ffLogoConcat.png"), image);
 		ScreenShot screenshot = new ScreenShot(image, null, "");
 		Snapshot snapshot = new Snapshot(screenshot, "img", SnapshotCheckType.TRUE);
-		Integer snapshotId = connector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId, Arrays.asList(new Rectangle(10, 11, 120, 230), 
+		Integer snapshotId = connector.createSnapshot(snapshot, stepResultId, Arrays.asList(new Rectangle(10, 11, 120, 230),
 				new Rectangle(100, 110, 220, 130)));
 		
 		Assert.assertNotNull(snapshotId);
@@ -183,7 +183,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		Integer testCaseId = connector.createTestCase("Test 2");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 2", "SUCCESS", "LOCAL", "some description");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, "logs", 1, sessionId, testCaseInSessionId, testStepId);
+		Integer stepResultId = connector.recordStepResult(true, "logs", 1, testCaseInSessionId, testStepId);
 		File image = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "img.png").toFile();
 		image.deleteOnExit();
 		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/images/ffLogoConcat.png"), image);
@@ -204,7 +204,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		Integer testCaseId = connector.createTestCase("Test 2");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 2", "SUCCESS", "LOCAL", "some description");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, "some logs", 1, sessionId, testCaseInSessionId, testStepId);
+		Integer stepResultId = connector.recordStepResult(true, "some logs", 1, testCaseInSessionId, testStepId);
 		
 		Assert.assertNotNull(stepResultId);
 	}

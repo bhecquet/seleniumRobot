@@ -33,8 +33,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestStepManager;
+import com.seleniumtests.reporter.info.Info;
+import com.seleniumtests.reporter.info.MultipleInfo;
 import com.seleniumtests.reporter.logger.TestStep;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -104,13 +108,13 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("A test which is <OK> é&"), eq("SUCCESS"), eq("LOCAL"), eq("")); // a test with custom name
 			verify(serverConnector, times(4)).createTestStep(eq("step 1"), anyInt());
 			verify(serverConnector).createTestStep(eq("step 2"), anyInt());
-			verify(serverConnector).createSnapshot(any(Snapshot.class), anyInt(), anyInt(), anyInt(), eq(new ArrayList<>())); // two snapshots but only once is sent because the other has no name
+			verify(serverConnector).createSnapshot(any(Snapshot.class), anyInt(), eq(new ArrayList<>())); // two snapshots but only once is sent because the other has no name
 			verify(serverConnector, never()).createExcludeZones(any(Rectangle.class), anyInt());
 			
 			String logs = readSeleniumRobotLogFile();
 			Assert.assertTrue(logs.contains("Snapshot hasn't any name, it won't be sent to server")); // one snapshot has no name, error message is displayed
 
-			verify(serverConnector, times(30)).recordStepResult(any(TestStep.class), anyInt(), anyInt(), anyInt()); // all steps are recorded
+			verify(serverConnector, times(30)).recordStepResult(any(TestStep.class), anyInt(), anyInt()); // all steps are recorded
 			// files are uploaded. Only 'testWithException' holds a Snapshot with snapshotCheckType.NONE and so, only its 2 files are uploaded
 			// other snapshots, which are used for image comparison / regression are uploaded through an other service 'createSnapshot'
 			verify(serverConnector).uploadFile(eq(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithException", "htmls", "testWithException_0-1_step_1--tened.html").toFile()), anyInt());
@@ -123,7 +127,14 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector, times(5)).uploadLogs(any(File.class), eq(0));
 			verify(serverConnector).uploadLogs(eq(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithException", "execution.log").toFile()), eq(0));
 			verify(serverConnector).uploadLogs(eq(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "execution.log").toFile()), eq(0));
-			
+
+			// check test infos has been sent
+			ArgumentCaptor<Map<String, Info>> infosArgument = ArgumentCaptor.forClass(Map.class);
+			verify(serverConnector, times(5)).recordTestInfo(infosArgument.capture(), eq(0));
+			Map<String, Info> infos = infosArgument.getValue();
+			Assert.assertEquals(infos.size(), 1);
+			Assert.assertTrue(infos.get(TestStepManager.LAST_STATE_NAME) instanceof MultipleInfo);
+
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
@@ -154,8 +165,38 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector, never()).addLogsToTestCaseInSession(anyInt(), anyString());
 			verify(serverConnector, never()).createTestCaseInSession(anyInt(), anyInt(), anyString(), anyString(), anyString(), eq(""));
 			verify(serverConnector, never()).createTestStep(anyString(), anyInt());
-			verify(serverConnector, never()).createSnapshot(any(Snapshot.class), anyInt(), anyInt(), anyInt(), eq(new ArrayList<>())); // two snapshots but only once is sent because the other has no name
+			verify(serverConnector, never()).createSnapshot(any(Snapshot.class), anyInt(), eq(new ArrayList<>())); // two snapshots but only once is sent because the other has no name
 			
+		} finally {
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+		}
+	}
+
+	@Test(groups={"it"})
+	public void testReportGenerationErrorCreatingTestStep() throws Exception {
+
+		try {
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+
+			initMocks();
+			doThrow(SeleniumRobotServerException.class).when(serverConnector).createTestStep(anyString(), anyInt());
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+
+			String logs = readSeleniumRobotLogFile();
+			Assert.assertTrue(logs.contains("Error recording result on selenium robot server")); // one snapshot has no name, error message is displayed
+
+			// check logs has NOT been uploaded
+			verify(serverConnector, never()).uploadLogs(any(File.class), eq(0));
+
+			// check test infos has NOT been sent
+			verify(serverConnector, never()).recordTestInfo(any(), eq(0));
+
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
@@ -193,7 +234,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector).addLogsToTestCaseInSession(anyInt(), anyString());
 			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testDriverCustomSnapshot"), eq("SUCCESS"), eq("LOCAL"), eq(""));
 			verify(serverConnector).createTestStep(eq("_captureSnapshot with args: (my snapshot, )"), anyInt());
-			verify(serverConnector).createSnapshot(any(Snapshot.class), anyInt(), anyInt(), anyInt(), listArgument.capture()); // 1 custom snapshot taken with name
+			verify(serverConnector).createSnapshot(any(Snapshot.class), anyInt(), listArgument.capture()); // 1 custom snapshot taken with name
 
 			verify(serverConnector, times(4)).uploadFile(fileCapture.capture(), eq(0));
 			Assert.assertTrue(fileCapture.getAllValues().stream().noneMatch(f -> f.getName().contains("my_snapshot")));
@@ -244,7 +285,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			// check capture recorded for comparison is sent to server as attachment
 			verify(serverConnector, times(6)).uploadFile(fileCapture.capture(), eq(0));
 			Assert.assertEquals(fileCapture.getAllValues().stream().filter(f -> f.getName().contains("my_snapshot")).count(), 2);
-			verify(serverConnector, never()).createSnapshot(any(Snapshot.class), anyInt(), anyInt(), anyInt(), eq(new ArrayList<>())); // 1 custom snapshot taken with name
+			verify(serverConnector, never()).createSnapshot(any(Snapshot.class), anyInt(), eq(new ArrayList<>())); // 1 custom snapshot taken with name
 			verify(serverConnector, never()).createExcludeZones(any(Rectangle.class), anyInt()); // one exclude zone created with that snapshot
 			
 		} finally {
@@ -315,13 +356,13 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 
 			initMocks();
-			doThrow(SeleniumRobotServerException.class).when(serverConnector).recordStepResult(anyBoolean(), anyString(), anyLong(), anyInt(), anyInt(), anyInt());
+			doThrow(SeleniumRobotServerException.class).when(serverConnector).recordStepResult(anyBoolean(), anyString(), anyLong(), anyInt(), anyInt());
 	
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError"});
 			
 			// check server has been called for session
 			verify(serverConnector).createSession(anyString(), eq("BROWSER:NONE")); // once per TestNG context (so 1 time here)
-			verify(serverConnector, times(13)).recordStepResult(any(TestStep.class), anyInt(), anyInt(), anyInt());
+			verify(serverConnector, times(13)).recordStepResult(any(TestStep.class), anyInt(), anyInt());
 			
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
@@ -348,7 +389,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			initMocks();
 			
 			when(serverConnector.createTestStep("_writeSomethingOnNonExistentElement ", 0)).thenReturn(120);
-			doReturn(123).when(serverConnector).recordStepResult(eq(false), anyString(), anyLong(), anyInt(), anyInt(), eq(120));
+			doReturn(123).when(serverConnector).recordStepResult(eq(false), anyString(), anyLong(), anyInt(), eq(120));
 
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShortKo"});
 
@@ -384,7 +425,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 
 			initMocks();
 			when(serverConnector.createTestStep("_writeSomethingOnNonExistentElement ", 0)).thenReturn(120);
-			doReturn(123).when(serverConnector).recordStepResult(eq(false), anyString(), anyLong(), anyInt(), anyInt(), eq(120));
+			doReturn(123).when(serverConnector).recordStepResult(eq(false), anyString(), anyLong(), anyInt(), eq(120));
 
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShortKo"});
 			
@@ -421,7 +462,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			initMocks();
 			// check failed step is recorded
 			when(serverConnector.createTestStep("_writeSomethingOnNonExistentElement ", 0)).thenReturn(120);
-			doReturn(123).when(serverConnector).recordStepResult(any(TestStep.class), anyInt(), anyInt(), eq(120));
+			doReturn(123).when(serverConnector).recordStepResult(any(TestStep.class), anyInt(), eq(120));
 			
 			
 			doThrow(SeleniumRobotServerException.class).doNothing().when(serverConnector).createStepReferenceSnapshot(any(Snapshot.class), anyInt());
@@ -459,7 +500,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 			initMocks();
 			when(serverConnector.createTestStep("_writeSomethingOnNonExistentElement ", 0)).thenReturn(120);
-			doReturn(123).when(serverConnector).recordStepResult(any(TestStep.class), anyInt(), anyInt(), eq(120));
+			doReturn(123).when(serverConnector).recordStepResult(any(TestStep.class), anyInt(), eq(120));
 			
 			
 			doThrow(SeleniumRobotServerException.class).when(serverConnector).createStepReferenceSnapshot(any(Snapshot.class), anyInt());

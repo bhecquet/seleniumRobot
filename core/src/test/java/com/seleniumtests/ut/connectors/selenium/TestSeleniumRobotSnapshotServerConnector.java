@@ -23,9 +23,17 @@ import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
+import com.seleniumtests.core.TestStepManager;
+import com.seleniumtests.reporter.info.ImageLinkInfo;
+import com.seleniumtests.reporter.info.Info;
+import com.seleniumtests.reporter.info.MultipleInfo;
+import com.seleniumtests.reporter.info.StringInfo;
 import com.seleniumtests.reporter.logger.FileContent;
 import com.seleniumtests.reporter.logger.GenericFile;
 import com.seleniumtests.reporter.logger.TestStep;
@@ -585,7 +593,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer sessionId = connector.createSession("Session1");
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS","LOCAL", "a test description");
-		connector.createSnapshot(snapshot, sessionId, testCaseInSessionId, null, new ArrayList<>());
+		connector.createSnapshot(snapshot, null, new ArrayList<>());
 	}
 	
 	
@@ -598,8 +606,8 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS","LOCAL", "a test description");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, "", 1, sessionId, testCaseInSessionId, testStepId);
-		Integer snapshotId = connector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId, null);
+		Integer stepResultId = connector.recordStepResult(true, "", 1, testCaseInSessionId, testStepId);
+		Integer snapshotId = connector.createSnapshot(snapshot, stepResultId, null);
 		
 		// check prerequisites has been created
 		Assert.assertEquals((int)sessionId, 13);
@@ -620,10 +628,8 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS","LOCAL", "a test description");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, "", 1, sessionId, testCaseInSessionId, testStepId);
-		Integer snapshotId = connector.createSnapshot(snapshot, 
-				sessionId, 
-				testCaseInSessionId, 
+		Integer stepResultId = connector.recordStepResult(true, "", 1, testCaseInSessionId, testStepId);
+		Integer snapshotId = connector.createSnapshot(snapshot,
 				stepResultId, 
 				Arrays.asList(new Rectangle(10, 11, 120, 230), 
 											new Rectangle(100, 110, 220, 130)));
@@ -647,8 +653,8 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS","LOCAL", "a test description");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, "", 1, sessionId, testCaseInSessionId, testStepId);
-		connector.createSnapshot(null, sessionId, testCaseInSessionId, stepResultId, new ArrayList<>());
+		Integer stepResultId = connector.recordStepResult(true, "", 1, testCaseInSessionId, testStepId);
+		connector.createSnapshot(null, stepResultId, new ArrayList<>());
 	}
 	@Test(groups= {"ut"}, expectedExceptions = SeleniumRobotServerException.class)
 	public void testCreateSnapshotNull2() throws UnirestException {
@@ -658,9 +664,9 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS","LOCAL", "a test description");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, "", 1, sessionId, testCaseInSessionId, testStepId);
+		Integer stepResultId = connector.recordStepResult(true, "", 1, testCaseInSessionId, testStepId);
 		when(snapshot.getScreenshot()).thenReturn(null);
-		connector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId, null);
+		connector.createSnapshot(snapshot, stepResultId, null);
 	}
 	@Test(groups= {"ut"}, expectedExceptions = SeleniumRobotServerException.class)
 	public void testCreateSnapshotNull3() throws UnirestException {
@@ -670,9 +676,9 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS","LOCAL", "a test description");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, "", 1, sessionId, testCaseInSessionId, testStepId);
+		Integer stepResultId = connector.recordStepResult(true, "", 1, testCaseInSessionId, testStepId);
 		when(screenshot.getImage()).thenReturn(null);
-		connector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId, new ArrayList<>());
+		connector.createSnapshot(snapshot, stepResultId, new ArrayList<>());
 	}
 	
 	/**
@@ -689,8 +695,8 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", "a test description");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, "", 1, sessionId, testCaseInSessionId, testStepId);
-		Integer snapshotId = connector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId, null);
+		Integer stepResultId = connector.recordStepResult(true, "", 1, testCaseInSessionId, testStepId);
+		Integer snapshotId = connector.createSnapshot(snapshot, stepResultId, null);
 		
 		
 		verify(request).field("name", ("snapshot" + StringUtils.repeat("-", 92)));
@@ -713,8 +719,8 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", "a test description");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, "", 1, sessionId, testCaseInSessionId, testStepId);
-		Integer snapshotId = connector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId, null);
+		Integer stepResultId = connector.recordStepResult(true, "", 1, testCaseInSessionId, testStepId);
+		Integer snapshotId = connector.createSnapshot(snapshot, stepResultId, null);
 		Assert.assertNull(snapshotId);
 	}
 	
@@ -723,7 +729,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
 
 
-		Integer snapshotId = connector.createSnapshot(snapshot, 1, 1, 1, new ArrayList<>());
+		Integer snapshotId = connector.createSnapshot(snapshot, 1, new ArrayList<>());
 		PowerMockito.verifyStatic(Unirest.class, never());
 		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL));
 		
@@ -826,8 +832,8 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", "a test description");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, "", 1, sessionId, testCaseInSessionId, testStepId);
-		Integer snapshotId = connector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId, null);
+		Integer stepResultId = connector.recordStepResult(true, "", 1, testCaseInSessionId, testStepId);
+		Integer snapshotId = connector.createSnapshot(snapshot, stepResultId, null);
 		int excludeZoneId = connector.createExcludeZones(new Rectangle(1, 1, 1, 1), snapshotId);
 		
 		// check prerequisites has been created
@@ -846,8 +852,8 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", "a test description");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, "", 1, sessionId, testCaseInSessionId, testStepId);
-		Integer snapshotId = connector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId, null);
+		Integer stepResultId = connector.recordStepResult(true, "", 1, testCaseInSessionId, testStepId);
+		Integer snapshotId = connector.createSnapshot(snapshot, stepResultId, null);
 		connector.createExcludeZones(new Rectangle(1, 1, 1, 1), snapshotId);
 	}
 	
@@ -869,13 +875,105 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		
 		Assert.assertNull(excludeZoneId);
 	}
+
+	@Test(groups = {"ut"})
+	public void testRecordTestInfo() {
+		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
+
+		Integer sessionId = connector.createSession("Session1");
+		Integer testCaseId = connector.createTestCase("Test 1");
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", "a test description");
+
+		Map<String, Info> infos = new HashMap<>();
+		MultipleInfo mInfo = new MultipleInfo(TestStepManager.LAST_STATE_NAME);
+		File imageFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "image", "imageCapture.png").toFile();
+		mInfo.addInfo(new ImageLinkInfo(new FileContent(imageFile)));
+		infos.put(TestStepManager.LAST_STATE_NAME, mInfo);
+		infos.put("Issue", new StringInfo("ID=12"));
+
+		connector.recordTestInfo(infos, testCaseInSessionId);
+
+		PowerMockito.verifyStatic(Unirest.class, times(2)); // 2 test infos
+		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.TESTINFO_API_URL));
+	}
+
+	@Test(groups = {"ut"})
+	public void testRecordTestInfoEmptyMap() {
+		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
+
+		Integer sessionId = connector.createSession("Session1");
+		Integer testCaseId = connector.createTestCase("Test 1");
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", "a test description");
+
+		Map<String, Info> infos = new HashMap<>();
+
+		connector.recordTestInfo(infos, testCaseInSessionId);
+
+		PowerMockito.verifyStatic(Unirest.class, never()); // 0 test infos
+		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.TESTINFO_API_URL));
+	}
+
+	@Test(groups = {"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "An infos map must be provided")
+	public void testRecordTestInfoNull() {
+		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
+
+		Integer sessionId = connector.createSession("Session1");
+		Integer testCaseId = connector.createTestCase("Test 1");
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", "a test description");
+
+		connector.recordTestInfo(null, testCaseInSessionId);
+	}
+
+	@Test(groups = {"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "TestCaseInSession must be previously defined")
+	public void testRecordTestInfoNullTestCase() {
+		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
+
+		Integer sessionId = connector.createSession("Session1");
+		Integer testCaseId = connector.createTestCase("Test 1");
+
+		Map<String, Info> infos = new HashMap<>();
+
+		connector.recordTestInfo(infos, null);
+	}
+
+	/**
+	 * If error occurs, do not raise exception
+	 */
+	@Test(groups = {"ut"})
+	public void testRecordTestInfoInError() {
+		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
+		HttpRequest<?> req = createServerMock("POST", SeleniumRobotSnapshotServerConnector.TESTINFO_API_URL, 500, "", "body");
+		when(req.asString()).thenThrow(UnirestException.class);
+
+		Integer sessionId = connector.createSession("Session1");
+		Integer testCaseId = connector.createTestCase("Test 1");
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", "a test description");
+
+		Map<String, Info> infos = new HashMap<>();
+
+		connector.recordTestInfo(infos, testCaseInSessionId);
+	}
+
+	@Test(groups = {"ut"})
+	public void testRecordTestInfoServerInactive() {
+		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
+
+		Map<String, Info> infos = new HashMap<>();
+		MultipleInfo mInfo = new MultipleInfo(TestStepManager.LAST_STATE_NAME);
+		infos.put(TestStepManager.LAST_STATE_NAME, mInfo);
+
+		connector.recordTestInfo(infos, 1);
+
+		PowerMockito.verifyStatic(Unirest.class, never()); // 0 test infos
+		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.TESTINFO_API_URL));
+	}
 	
 	// step result creation
 	@Test(groups= {"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testCreateStepResultNoStep() throws UnirestException {
 		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
 		
-		connector.recordStepResult(true, "", 1, 1, 1, null);
+		connector.recordStepResult(true, "", 1   , 1, null);
 	}
 
 	@Test(groups= {"ut"})
@@ -886,7 +984,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", "a test description");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, "", 1, sessionId, testCaseInSessionId, testStepId);
+		Integer stepResultId = connector.recordStepResult(true, "", 1, testCaseInSessionId, testStepId);
 		
 		// check prerequisites has been created
 		Assert.assertEquals((int)sessionId, 13);
@@ -904,7 +1002,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", "a test description");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, "", 1, sessionId, testCaseInSessionId, testStepId);
+		Integer stepResultId = connector.recordStepResult(true, "", 1, testCaseInSessionId, testStepId);
 		Assert.assertNull(stepResultId);
 	}
 	
@@ -912,7 +1010,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	public void testCreateStepResultServerInactive() throws UnirestException {
 		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
 
-		Integer stepResultId = connector.recordStepResult(true, "", 1, 1, 1, 1);
+		Integer stepResultId = connector.recordStepResult(true, "", 1, 1, 1);
 		PowerMockito.verifyStatic(Unirest.class, never());
 		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.STEPRESULT_API_URL));
 		
@@ -932,10 +1030,10 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		GenericFile file = new GenericFile(File.createTempFile("video", ".avi"), "video file");
 		testStep.addFile(file);
 		testStep.addFile(file);
-		Integer stepResultId = connector.recordStepResult(testStep, sessionId, testCaseInSessionId, testStepId);
+		Integer stepResultId = connector.recordStepResult(testStep, testCaseInSessionId, testStepId);
 
 		// check we record step, then update it and store all files
-		verify(connector).recordStepResult(true, "", 0, sessionId, testCaseInSessionId, testStepId);
+		verify(connector).recordStepResult(true, "", 0, testCaseInSessionId, testStepId);
 		String filePath = file.getFile().getAbsolutePath().replace("\\", "/");
 	}
 
@@ -961,10 +1059,10 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		testStep.addFile(file);
 		testStep.addFile(file);
 
-		Integer stepResultId = connector.recordStepResult(testStep, sessionId, testCaseInSessionId, testStepId);
+		Integer stepResultId = connector.recordStepResult(testStep, testCaseInSessionId, testStepId);
 
 		// check we record step, then update it and store all files
-		verify(connector).recordStepResult(true, "", 0, sessionId, testCaseInSessionId, testStepId);
+		verify(connector).recordStepResult(true, "", 0, testCaseInSessionId, testStepId);
 		String filePath = file.getFile().getAbsolutePath().replace("\\", "/");
 	}
 	@Test(groups= {"ut"})
@@ -982,10 +1080,10 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		testStep.addFile(fileKo);
 		fileKo.getFile().delete(); // delete file so that upload fails
 		testStep.addFile(fileOk);
-		Integer stepResultId = connector.recordStepResult(testStep, sessionId, testCaseInSessionId, testStepId);
+		Integer stepResultId = connector.recordStepResult(testStep, testCaseInSessionId, testStepId);
 
 		// check we record step, then update it and store all files
-		verify(connector).recordStepResult(true, "", 0, sessionId, testCaseInSessionId, testStepId);
+		verify(connector).recordStepResult(true, "", 0, testCaseInSessionId, testStepId);
 		String filePath = fileOk.getFile().getAbsolutePath().replace("\\", "/");
 	}
 
@@ -998,7 +1096,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", "a test description");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
 
-		Integer stepResultId = connector.recordStepResult(null, sessionId, testCaseInSessionId, testStepId);
+		Integer stepResultId = connector.recordStepResult(null, testCaseInSessionId, testStepId);
 
 	}
 
@@ -1279,7 +1377,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", "a test description");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, "", 1, sessionId, testCaseInSessionId, testStepId);
+		Integer stepResultId = connector.recordStepResult(true, "", 1, testCaseInSessionId, testStepId);
 		connector.createStepReferenceSnapshot(snapshot, stepResultId);
 		
 		// check prerequisites has been created
@@ -1300,7 +1398,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", "a test description");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, "", 1, sessionId, testCaseInSessionId, testStepId);
+		Integer stepResultId = connector.recordStepResult(true, "", 1, testCaseInSessionId, testStepId);
 		connector.createStepReferenceSnapshot(null, stepResultId);
 	}
 	@Test(groups= {"ut"}, expectedExceptions = SeleniumRobotServerException.class)
@@ -1311,7 +1409,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", "a test description");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, "", 1, sessionId, testCaseInSessionId, testStepId);
+		Integer stepResultId = connector.recordStepResult(true, "", 1, testCaseInSessionId, testStepId);
 		when(snapshot.getScreenshot()).thenReturn(null);
 		connector.createStepReferenceSnapshot(snapshot, stepResultId);
 	}
@@ -1323,7 +1421,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", "a test description");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, "", 1, sessionId, testCaseInSessionId, testStepId);
+		Integer stepResultId = connector.recordStepResult(true, "", 1, testCaseInSessionId, testStepId);
 		when(screenshot.getImage()).thenReturn(null);
 		connector.createStepReferenceSnapshot(snapshot, stepResultId);
 	}
@@ -1339,7 +1437,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", "a test description");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, "", 1, sessionId, testCaseInSessionId, testStepId);
+		Integer stepResultId = connector.recordStepResult(true, "", 1, testCaseInSessionId, testStepId);
 		connector.createStepReferenceSnapshot(snapshot, stepResultId);
 	}
 	
@@ -1375,7 +1473,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", "a test description");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, "", 1, sessionId, testCaseInSessionId, testStepId);
+		Integer stepResultId = connector.recordStepResult(true, "", 1, testCaseInSessionId, testStepId);
 		createServerMock("GET", String.format("%s%d/", SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL, stepResultId), 200, createImageFromResource("tu/ffLogo1.png"));	
 		
 		File picture = connector.getReferenceSnapshot(stepResultId);
@@ -1393,7 +1491,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", "a test description");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, "", 1, sessionId, testCaseInSessionId, testStepId);
+		Integer stepResultId = connector.recordStepResult(true, "", 1, testCaseInSessionId, testStepId);
 		createServerMock("GET", String.format("%s%d/", SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL, stepResultId), 404, createImageFromResource("tu/ffLogo1.png"));	
 		
 		File picture = connector.getReferenceSnapshot(stepResultId);
@@ -1410,7 +1508,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", "a test description");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, "", 1, sessionId, testCaseInSessionId, testStepId);
+		Integer stepResultId = connector.recordStepResult(true, "", 1, testCaseInSessionId, testStepId);
 		
 		HttpRequest<?> req = createServerMock("GET", String.format("%s%d/", SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL, stepResultId), 200, createImageFromResource("tu/ffLogo1.png"));	
 		when(req.asBytes()).thenThrow(UnirestException.class);

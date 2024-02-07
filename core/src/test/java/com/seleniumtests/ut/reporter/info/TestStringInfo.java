@@ -49,7 +49,7 @@ public class TestStringInfo extends GenericTest {
     @Test(groups = {"ut"})
     public void testToJson() {
         JSONObject info = new StringInfo("foo /").toJson();
-        Assert.assertEquals(info.getString("info"), "foo \\/");
+        Assert.assertEquals(info.getString("info"), "foo /");
         Assert.assertEquals(info.getString("type"), "string");
     }
     @Test(groups = {"ut"})
