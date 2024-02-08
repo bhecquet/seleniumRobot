@@ -886,6 +886,8 @@ SeleniumRobot provides standard Dataprovider for common use cases which will sea
 ```
 Assuming the DEV environment, file will be searched in `<root>/data/<app>/dataset/DEV/testStandardDataProvider.csv`
 
+There is as many method parameters as columns in the dataset file. So, in the example above, csv file has 2 columns
+
 4 dataproviders are defined
 
 - 'dataset' => CSV file with "," as separator / XLSX file and no header
