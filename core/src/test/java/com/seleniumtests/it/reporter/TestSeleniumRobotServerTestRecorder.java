@@ -588,5 +588,6 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 
 		doReturn(serverConnector).when(reporter).getServerConnector();
 		when(serverConnector.getActive()).thenReturn(true);
+		when(serverConnector.getUrl()).thenReturn("http://localhost:1234");
 	}
 }

@@ -178,6 +178,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 						TestNGResultUtils.getTestStatusString(testResult),
 						gridNode,
 						TestNGResultUtils.getTestDescription(testResult));
+				logger.info(String.format("Result for '%s' will be visible at: %s/snapshot/testResults/result/%d/", testName, serverConnector.getUrl(), testCaseInSessionId));
 				serverConnector.addLogsToTestCaseInSession(testCaseInSessionId, generateExecutionLogs(testResult).toString());
 				
 				List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
