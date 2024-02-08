@@ -21,8 +21,16 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.seleniumtests.core.TestStepManager;
+import com.seleniumtests.reporter.info.ImageLinkInfo;
+import com.seleniumtests.reporter.info.Info;
+import com.seleniumtests.reporter.info.MultipleInfo;
+import com.seleniumtests.reporter.info.StringInfo;
+import com.seleniumtests.reporter.logger.FileContent;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.Rectangle;
 import org.testng.Assert;
@@ -51,7 +59,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		initThreadContext(ctx);
 		
 		// pass the token via  -DseleniumRobotServerToken=xxxxxx
-		connector = new SeleniumRobotSnapshotServerConnector(true, "http://localhost:8002", SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerToken());
+		connector = new SeleniumRobotSnapshotServerConnector(true, "http://localhost:8000", SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerToken());
 		if (!connector.getActive()) {
 			throw new SkipException("no seleniumrobot server available");
 		}
@@ -106,6 +114,22 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		Assert.assertNotNull(sessionId);
 		Assert.assertNotNull(testCaseInSessionId);
 		Assert.assertNotNull(connector.getApplicationId());
+	}
+
+	@Test(groups={"it"})
+	public void testSendTestInfos() {
+		Integer sessionId = connector.createSession("Session1");
+		Integer testCaseId = connector.createTestCase("Test 1");
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", null);
+
+		Map<String, Info> infos = new HashMap<>();
+		MultipleInfo mInfo = new MultipleInfo(TestStepManager.LAST_STATE_NAME);
+		File imageFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "image", "imageCapture.png").toFile();
+		mInfo.addInfo(new ImageLinkInfo(new FileContent(imageFile)));
+		infos.put(TestStepManager.LAST_STATE_NAME, mInfo);
+		infos.put("Issue", new StringInfo("ID=12"));
+
+		connector.recordTestInfo(infos, testCaseInSessionId);
 	}
 	
 	/**
@@ -249,6 +273,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		Assert.assertNull(detectionData.get("error"));
 		
 	}
+
 	
 	
 	

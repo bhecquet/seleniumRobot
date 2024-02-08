@@ -210,7 +210,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field(FIELD_STATUS, status)
 					.field("gridNode", gridNode)
 					.field(FIELD_NAME, strippedName)
-					.field("description", description));
+					.field("description", description == null ? "": description));
 			return testInSessionJson.getInt("id");
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 			throw new SeleniumRobotServerException("cannot create test case", e);
@@ -554,7 +554,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			try {
 				getStringResponse(buildPostRequest(url + TESTINFO_API_URL)
 						.field(FIELD_TEST_CASE, testCaseInSessionId.toString())
-						.field("infoKey", info.getKey())
+						.field("name", info.getKey())
 						.field("info", info.getValue().toJson().toString()));
 			} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 				logger.error("cannot create test info", e);

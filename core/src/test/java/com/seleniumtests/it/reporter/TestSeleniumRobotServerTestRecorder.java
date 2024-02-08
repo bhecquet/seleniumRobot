@@ -175,6 +175,10 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 		}
 	}
 
+	/**
+	 * When creation of test steps fails, logs and test infos are not sent
+	 * @throws Exception
+	 */
 	@Test(groups={"it"})
 	public void testReportGenerationErrorCreatingTestStep() throws Exception {
 
@@ -190,6 +194,43 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 
 			String logs = readSeleniumRobotLogFile();
 			Assert.assertTrue(logs.contains("Error recording result on selenium robot server")); // one snapshot has no name, error message is displayed
+
+			// check logs has NOT been uploaded
+			verify(serverConnector, never()).uploadLogs(any(File.class), eq(0));
+
+			// check test infos has NOT been sent
+			verify(serverConnector, never()).recordTestInfo(any(), eq(0));
+
+		} finally {
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+		}
+	}
+
+	/**
+	 * When creation of test case fails, steps, logs and test infos are not sent
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportGenerationErrorCreatingTestCase() throws Exception {
+
+		try {
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+
+			initMocks();
+			doThrow(SeleniumRobotServerException.class).when(serverConnector).createTestCase(anyString());
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+
+			String logs = readSeleniumRobotLogFile();
+			Assert.assertTrue(logs.contains("Error recording result on selenium robot server")); // one snapshot has no name, error message is displayed
+
+			// check steps are NOT sent
+			verify(serverConnector, never()).createTestStep(anyString(), anyInt());
 
 			// check logs has NOT been uploaded
 			verify(serverConnector, never()).uploadLogs(any(File.class), eq(0));
