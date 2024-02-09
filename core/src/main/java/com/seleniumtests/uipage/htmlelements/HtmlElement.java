@@ -849,17 +849,31 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     		}
     	} 
     	
-    	// add package name before the id
-		 if (SeleniumTestsContextManager.isMobileAppTest() 
-				 && "android".equalsIgnoreCase(SeleniumTestsContextManager.getThreadContext().getPlatform())
-				 && (by instanceof By.ById || by instanceof AppiumBy.ById || by instanceof AppiumBy.ByAccessibilityId)
-				 && !by.toString().split(":", 2)[1].contains(":")) {
-			 WebDriver drv = ((CustomEventFiringWebDriver)getDriver()).getOriginalDriver();
-			 String packageName = ((AndroidDriver)drv).getCurrentPackage();
-			 by = By.id(packageName + ":id/" + by.toString().split(":", 2)[1].trim());
-		 }
+    	// add package name before the id for mobile application (not webview)
+		if (SeleniumTestsContextManager.isMobileAppTest()) {
+			boolean isWebTest = ((CustomEventFiringWebDriver)getDriver()).isWebTest();
 
-    			 
+			if (isWebTest) {
+				// in mobile webviews id, name, classname is not supported
+				String locatorValue = by.toString().split(":", 2)[1].trim();
+				if ((by instanceof By.ById || by instanceof AppiumBy.ById)) {
+					by = By.cssSelector("#" + locatorValue);
+				} else if (by instanceof By.ByName || by instanceof AppiumBy.ByName) {
+					by = By.cssSelector(String.format("*[name='%s']", locatorValue.replace("'", "\\'")));
+				} else if (by instanceof By.ByClassName || by instanceof AppiumBy.ByClassName) {
+					by = By.cssSelector("." + locatorValue);
+				}
+			} else if (
+					!isWebTest
+							&& "android".equalsIgnoreCase(SeleniumTestsContextManager.getThreadContext().getPlatform())
+							&& (by instanceof By.ById || by instanceof AppiumBy.ById || by instanceof AppiumBy.ByAccessibilityId)
+							&& !by.toString().split(":", 2)[1].contains(":")
+			) {
+				WebDriver drv = ((CustomEventFiringWebDriver)getDriver()).getOriginalDriver();
+				String packageName = ((AndroidDriver)drv).getCurrentPackage();
+				by = By.id(packageName + ":id/" + by.toString().split(":", 2)[1].trim());
+			}
+		 }
     }
         
     /**

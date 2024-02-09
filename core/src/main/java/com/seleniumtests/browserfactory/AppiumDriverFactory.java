@@ -50,7 +50,7 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
     }
     
     private void extractAndroidDriver(MutableCapabilities capabilities) {
-    	String chromeDriverFile = (String)capabilities.getCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE);
+    	String chromeDriverFile = (String)capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE);
 		if (chromeDriverFile != null) {
 			String driverPath;
 			try {

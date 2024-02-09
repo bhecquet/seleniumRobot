@@ -700,7 +700,7 @@ public class WebUIDriver {
     	WebDriver listeningDriver = new CustomEventFiringWebDriver(driver, 
 																	driverPids, 
 																	browserInfo, 
-																	SeleniumTestsContextManager.isWebTest(), 
+																	SeleniumTestsContextManager.getThreadContext().getTestType(),
 																	SeleniumTestsContextManager.getThreadContext().getRunMode(),
 																	config.getBrowserMobProxy(),
 																	SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(),

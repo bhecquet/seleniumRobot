@@ -24,17 +24,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.regex.Pattern;
 
+import com.seleniumtests.uipage.annotations.Context;
+import com.seleniumtests.uipage.annotations.ContextNativeApp;
+import com.seleniumtests.uipage.annotations.ContextWebView;
+import io.appium.java_client.NoSuchContextException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -438,6 +434,9 @@ public class PageObject extends BasePage implements IPage {
         	((CustomEventFiringWebDriver)driver).updateWindowsHandles();
         }
 
+        // switch to the context if we are on mobile app
+        switchToContext();
+
         assertCurrentPage(false, pageIdentifierElement);
 
         Calendar end = Calendar.getInstance();
@@ -447,6 +446,36 @@ public class PageObject extends BasePage implements IPage {
         logger.log("Open web page in :" + (endTime - startTime) / 1000.0 + " seconds");
         
         setPageOnElements();
+    }
+
+    /**
+     * Allow to switch to the appropriate context depending on the Page type
+     */
+    private void switchToContext() {
+        Instant end = systemClock.instant().plusSeconds(SeleniumTestsContextManager.getThreadContext().getReplayTimeout());
+
+        String context = null;
+        if (getClass().isAnnotationPresent(ContextWebView.class)) {
+            context = "web";
+        } else if (getClass().isAnnotationPresent(ContextNativeApp.class)) {
+            context = "native";
+        } else if (getClass().isAnnotationPresent(Context.class)) {
+            context = getClass().getAnnotation(Context.class).name();
+        }
+        final String finalContext = context;
+
+        while (end.isAfter(systemClock.instant())) {
+            if (context != null) {
+                Optional<String> foundContext = getContexts().stream().filter(ctx -> ctx.toLowerCase().contains(finalContext)).findFirst();
+                if (foundContext.isPresent()) {
+                    switchToContext(foundContext.get());
+                    return;
+                }
+
+            } else {
+                return;
+            }
+        }
     }
     
     /**
@@ -984,6 +1013,31 @@ public class PageObject extends BasePage implements IPage {
         } catch (WebDriverException e) {
         	internalLogger.error(e);
             throw new CustomSeleniumTestsException(e);
+        }
+    }
+
+    /**
+     * Hides keyboard
+     * This only affects mobile tests
+     */
+    public void hideKeyboard() {
+        ((CustomEventFiringWebDriver)driver).hideKeyboard();
+    }
+
+    /**
+     * Returns the list of context. This only applies to mobile
+     * For desktop web tests, "WEB" will be returned
+     * @return
+     */
+    public List<String> getContexts() {
+        return new ArrayList<>(((CustomEventFiringWebDriver)driver).getContextHandles());
+    }
+
+    public void switchToContext(String name) {
+        try {
+            ((CustomEventFiringWebDriver) driver).context(name);
+        } catch (NoSuchContextException e) {
+            throw new ScenarioException(String.format("Only %s contexts are available", getContexts()));
         }
     }
 

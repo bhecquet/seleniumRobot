@@ -154,12 +154,14 @@ public class MobileDeviceSelector {
 			
 			// set the right chromedriver executable according to android browser / chromeversion
 			// it's only the file name, not it's path
-			if (driverMode == DriverMode.LOCAL && !capabilities.getBrowserName().isEmpty()) {
+			// set it for browser tests and also application tests (for webview automation)
+			if (driverMode == DriverMode.LOCAL) {
 				String chromeDriverFile = null;
-				if (BrowserType.CHROME.toString().equalsIgnoreCase(capabilities.getBrowserName())) {
+				if (BrowserType.BROWSER.toString().equalsIgnoreCase(capabilities.getBrowserName())) {
+					chromeDriverFile = selectedDevice.getBrowserInfo(BrowserType.BROWSER).getDriverFileName();
+				// by default, chrome is used on android devices (for webview)
+				} else {
 					chromeDriverFile = selectedDevice.getBrowserInfo(BrowserType.CHROME).getDriverFileName();
-	        	} else if (BrowserType.BROWSER.toString().equalsIgnoreCase(capabilities.getBrowserName())) {
-	        		chromeDriverFile = selectedDevice.getBrowserInfo(BrowserType.BROWSER).getDriverFileName();
 	        	}
 				if (chromeDriverFile != null) {
 					// driver extraction will be done later. For example in AppiumDriverFactory
