@@ -160,7 +160,7 @@ public class MobileDeviceSelector {
 				if (BrowserType.BROWSER.toString().equalsIgnoreCase(capabilities.getBrowserName())) {
 					chromeDriverFile = selectedDevice.getBrowserInfo(BrowserType.BROWSER).getDriverFileName();
 				// by default, chrome is used on android devices (for webview)
-				} else {
+				} else if (selectedDevice.getBrowserInfo(BrowserType.CHROME) != null) {
 					chromeDriverFile = selectedDevice.getBrowserInfo(BrowserType.CHROME).getDriverFileName();
 	        	}
 				if (chromeDriverFile != null) {

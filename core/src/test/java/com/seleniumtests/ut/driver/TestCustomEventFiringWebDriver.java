@@ -49,6 +49,7 @@ import java.util.TreeSet;
 import javax.imageio.ImageIO;
 
 import com.seleniumtests.driver.TestType;
+import io.appium.java_client.android.AndroidDriver;
 import org.apache.commons.io.FileUtils;
 import org.mockito.Mock;
 import org.openqa.selenium.*;
@@ -82,6 +83,9 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 
 	@Mock
 	private RemoteWebDriver driver;
+
+	@Mock
+	AndroidDriver mobileDriver;
 	
 	@Mock
 	private Options options;
@@ -149,6 +153,13 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		PowerMockito.when(MouseInfo.getPointerInfo()).thenReturn(pointerInfo);
 		when(pointerInfo.getLocation()).thenReturn(new java.awt.Point(2, 3));
 		CustomEventFiringWebDriver.resetVideoRecorder();
+
+		when(mobileDriver.manage()).thenReturn(options);
+		when(mobileDriver.getCapabilities()).thenReturn(capabilities);
+		when(mobileDriver.switchTo()).thenReturn(target);
+		when(mobileDriver.getSessionId()).thenReturn(new SessionId("1234"));
+		when(mobileDriver.getPageSource()).thenReturn("<html></html>");
+		when(mobileDriver.getCapabilities()).thenReturn(new DesiredCapabilities());
 	}
 	
 	@Test(groups = {"ut"})
@@ -190,8 +201,10 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	}
 	@Test(groups = {"ut"})
 	public void testIsBrowserOrAppClosedMobileApp() {
-		when(driver.getWindowHandles()).thenReturn(new TreeSet<>()); // check we don't call getWindowHandles
-		eventDriver.setTestType(TestType.APPIUM_APP_ANDROID); // mobile application test
+		when(mobileDriver.getWindowHandles()).thenReturn(new TreeSet<>()); // check we don't call getWindowHandles
+		when(mobileDriver.getContext()).thenReturn("NATIVE_APP");
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null, null));
+
 		Assert.assertFalse(eventDriver.isBrowserOrAppClosed());
 	}
 	
@@ -355,8 +368,10 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testContentDimensionNonWebTest() {
-		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, null, TestType.APP, DriverMode.LOCAL, null, null));
-		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(120L, 80L));
+		when(mobileDriver.executeScript(anyString())).thenReturn(Arrays.asList(120L, 80L));
+		when(mobileDriver.getContext()).thenReturn("NATIVE_APP");
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APP, DriverMode.LOCAL, null, null));
+
 		Dimension dim = eventDriver.getContentDimension();
 		
 		// check we get the window dimension
@@ -450,8 +465,9 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testContentDimensionWithoutScrollbarNonWebTest() {
-		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, null, TestType.APP, DriverMode.LOCAL, null, null));
-		when(driver.executeScript(anyString(), eq(true))).thenReturn(120L).thenReturn(80L);
+		when(mobileDriver.executeScript(anyString(), eq(true))).thenReturn(120L).thenReturn(80L);
+		when(mobileDriver.getContext()).thenReturn("NATIVE_APP");
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APP, DriverMode.LOCAL, null, null));
 		Dimension dim = eventDriver.getViewPortDimensionWithoutScrollbar();
 		
 		// check we get the window dimension
@@ -502,7 +518,8 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"}, expectedExceptions=WebDriverException.class)
 	public void testScrollPositionNonWebTest() {
-		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, null, TestType.APP, DriverMode.LOCAL, null, null));
+		when(mobileDriver.getContext()).thenReturn("NATIVE_APP");
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APP, DriverMode.LOCAL, null, null));
 		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(120L, 80L));
 		eventDriver.getScrollPosition();
 
