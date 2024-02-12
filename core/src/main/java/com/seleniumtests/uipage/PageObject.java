@@ -425,7 +425,7 @@ public class PageObject extends BasePage implements IPage {
         }
 
         screenshotUtil = new ScreenshotUtil(driver);
-        
+
         // open page
         openPage(url);
         
@@ -433,9 +433,6 @@ public class PageObject extends BasePage implements IPage {
         if (driver != null && attachExistingDriverPort != null && url == null) {
         	((CustomEventFiringWebDriver)driver).updateWindowsHandles();
         }
-
-        // switch to the context if we are on mobile app
-        switchToContext();
 
         assertCurrentPage(false, pageIdentifierElement);
 
@@ -542,10 +539,13 @@ public class PageObject extends BasePage implements IPage {
             ((CustomEventFiringWebDriver)driver).updateWindowsHandles();
         }
 
+        // switch to the context if we are on mobile app
+        switchToContext();
+
         // Wait for page load is applicable only for web test
         // When running tests on an iframe embedded site then test will fail if this command is not used
         // in case of mobile application, only capture screenshot
-        if (SeleniumTestsContextManager.isWebTest()) {
+        if (((CustomEventFiringWebDriver)driver).isWebTest()) {
             waitForPageToLoad();
         } else if (SeleniumTestsContextManager.isAppTest() && captureSnapshot) {
         	capturePageSnapshot();

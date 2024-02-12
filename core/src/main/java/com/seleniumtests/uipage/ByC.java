@@ -24,6 +24,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import io.appium.java_client.AppiumBy;
+import io.appium.java_client.android.AndroidDriver;
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.NotImplementedException;
 import org.openqa.selenium.By;
@@ -578,6 +581,34 @@ public class ByC extends By {
                 return String.format("[@%s=%s]", attributeName, escapedAttributeValue);
             }
         }
+
+        private String buildAndroidUiSelector() {
+            String selector = null;
+            if (attributeName.equals("text*")) {
+                selector = String.format("textContains(\"%s\")", attributeValue);
+            } else if (attributeName.equals("text^")) {
+                selector = String.format("textStartsWith(\"%s\")", attributeValue);
+            } else if (attributeName.equals("text$")) {
+                selector = String.format("textMatches(\"%s\")", attributeValue);
+            } else if (attributeName.equals("text")) {
+                selector = String.format("text(\"%s\")", attributeValue);
+            } else if (attributeName.equals("content-desc*")) {
+                selector = String.format("descriptionContains(\"%s\")", attributeValue);
+            } else if (attributeName.equals("content-desc^")) {
+                selector = String.format("descriptionStartsWith(\"%s\")", attributeValue);
+            } else if (attributeName.equals("content-desc$")) {
+                selector = String.format("descriptionMatches(\"%s\")", attributeValue);
+            } else if (attributeName.equals("content-desc")) {
+                selector = String.format("description(\"%s\")", attributeValue);
+            } else if (attributeName.equals("resource-id$")) {
+                selector = String.format("resourceIdMatches(\"%s\")", attributeValue);
+            } else if (attributeName.equals("resource-id")) {
+                selector = String.format("resourceId(\"%s\")", attributeValue);
+            } else {
+                return null;
+            }
+            return String.format("new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().%s.instance(0))", selector);
+        }
         
         @Override
         public String getEffectiveCssSelector() {
@@ -586,19 +617,39 @@ public class ByC extends By {
         
         @Override
         public List<WebElement> findElements(SearchContext context) {
-            if (useCssSelector) {
-                return context.findElements(By.cssSelector(getEffectiveCssSelector()));
+            CustomEventFiringWebDriver currentDriver = (CustomEventFiringWebDriver) WebUIDriver.getWebDriver(false);
+            String androidSelector = null;
+            if (!currentDriver.isWebTest()
+                    && currentDriver.getOriginalDriver() instanceof AndroidDriver) {
+                androidSelector = buildAndroidUiSelector();
+            }
+            if (androidSelector != null) {
+                return context.findElements(AppiumBy.androidUIAutomator(androidSelector));
             } else {
-                return context.findElements(By.xpath(getEffectiveXPath()));
+                if (useCssSelector) {
+                    return context.findElements(By.cssSelector(getEffectiveCssSelector()));
+                } else {
+                    return context.findElements(By.xpath(getEffectiveXPath()));
+                }
             }
         }
         
         @Override
         public WebElement findElement(SearchContext context) {
-            if (useCssSelector) {
-                return context.findElement(By.cssSelector(getEffectiveCssSelector()));
+            CustomEventFiringWebDriver currentDriver = (CustomEventFiringWebDriver) WebUIDriver.getWebDriver(false);
+            String androidSelector = null;
+            if (!currentDriver.isWebTest()
+                    && currentDriver.getOriginalDriver() instanceof AndroidDriver) {
+                androidSelector = buildAndroidUiSelector();
+            }
+            if (androidSelector != null) {
+                return context.findElement(AppiumBy.androidUIAutomator(androidSelector));
             } else {
-                return context.findElement(By.xpath(getEffectiveXPath()));
+                if (useCssSelector) {
+                    return context.findElement(By.cssSelector(getEffectiveCssSelector()));
+                } else {
+                    return context.findElement(By.xpath(getEffectiveXPath()));
+                }
             }
         }
         
