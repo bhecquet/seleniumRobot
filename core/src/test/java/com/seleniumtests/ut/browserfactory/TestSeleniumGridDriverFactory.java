@@ -492,7 +492,6 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 			when(config.getSeleniumGridConnector()).thenReturn(null);			// simulate the case where no previous driver was created
 			
 			// connect to grid
-//			PowerMockito.whenNew(RemoteWebDriver.class).withAnyArguments().thenReturn(driver);
 			new SeleniumGridDriverFactory(config).createWebDriver();
 
 		} finally {

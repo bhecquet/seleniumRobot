@@ -186,13 +186,18 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportGenerationErrorCreatingTestStep() throws Exception {
 
-		try {
+		try (MockedConstruction mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+			when(variableServer.isAlive()).thenReturn(true);
+		});
+			 MockedStatic mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
+			 MockedStatic mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+		) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 
-			initMocks();
+			initMocks(mockedCommonReporter, mockedServerConnector);
 			doThrow(SeleniumRobotServerException.class).when(serverConnector).createTestStep(anyString(), anyInt());
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
 
@@ -220,13 +225,18 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportGenerationErrorCreatingTestCase() throws Exception {
 
-		try {
+		try (MockedConstruction mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+			when(variableServer.isAlive()).thenReturn(true);
+		});
+			 MockedStatic mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
+			 MockedStatic mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+		) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 
-			initMocks();
+			initMocks(mockedCommonReporter, mockedServerConnector);
 			doThrow(SeleniumRobotServerException.class).when(serverConnector).createTestCase(anyString());
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
 
@@ -421,7 +431,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 			// check server has been called for session
 			verify(serverConnector).createSession(anyString(), eq("BROWSER:NONE")); // once per TestNG context (so 1 time here)
-			verify(serverConnector, times(13)).recordStepResult(any(TestStep.class), anyInt(), anyInt(), anyInt());
+			verify(serverConnector, times(13)).recordStepResult(any(TestStep.class), anyInt(), anyInt());
 			
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);

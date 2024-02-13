@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import com.seleniumtests.reporter.info.Har;
 import com.seleniumtests.reporter.logger.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

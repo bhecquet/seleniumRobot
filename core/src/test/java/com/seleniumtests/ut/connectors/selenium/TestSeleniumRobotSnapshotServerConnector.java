@@ -880,8 +880,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 
 		connector.recordTestInfo(infos, testCaseInSessionId);
 
-		PowerMockito.verifyStatic(Unirest.class, times(2)); // 2 test infos
-		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.TESTINFO_API_URL));
+		mockedUnirest.get().verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.TESTINFO_API_URL)), times(2));// 2 test infos
 	}
 
 	@Test(groups = {"ut"})
@@ -896,8 +895,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 
 		connector.recordTestInfo(infos, testCaseInSessionId);
 
-		PowerMockito.verifyStatic(Unirest.class, never()); // 0 test infos
-		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.TESTINFO_API_URL));
+		mockedUnirest.get().verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.TESTINFO_API_URL)), never());// 0 test infos
 	}
 
 	@Test(groups = {"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "An infos map must be provided")
@@ -951,8 +949,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 
 		connector.recordTestInfo(infos, 1);
 
-		PowerMockito.verifyStatic(Unirest.class, never()); // 0 test infos
-		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.TESTINFO_API_URL));
+		mockedUnirest.get().verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.TESTINFO_API_URL)), never());// 0 test infos
 	}
 
 	// step result creation

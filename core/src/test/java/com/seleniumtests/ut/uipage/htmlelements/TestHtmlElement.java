@@ -835,7 +835,7 @@ public class TestHtmlElement extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
 		
 		HtmlElement present = new HtmlElement("element", By.id("present"));
-		present.setDriver(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null, null)); // mimic the findElement call were we update driver before doing anything
+		present.setDriver(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null)); // mimic the findElement call were we update driver before doing anything
 		present.replaceSelector();
 		Assert.assertEquals(present.getBy(), By.id("my.package:id/present"));
 	}
@@ -850,7 +850,7 @@ public class TestHtmlElement extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
 		
 		HtmlElement present = new HtmlElement("element", By.id("present"));
-		present.setDriver(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_WEB_ANDROID, DriverMode.LOCAL, null, null)); // mimic the findElement call were we update driver before doing anything
+		present.setDriver(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_WEB_ANDROID, DriverMode.LOCAL, null)); // mimic the findElement call were we update driver before doing anything
 		present.replaceSelector();
 		Assert.assertEquals(present.getBy(), By.id("present"));
 	}
@@ -865,7 +865,7 @@ public class TestHtmlElement extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setPlatform("ios");
 		
 		HtmlElement present = new HtmlElement("element", By.id("present"));
-		present.setDriver(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_IOS, DriverMode.LOCAL, null, null)); // mimic the findElement call were we update driver before doing anything
+		present.setDriver(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_IOS, DriverMode.LOCAL, null)); // mimic the findElement call were we update driver before doing anything
 		present.replaceSelector();
 		Assert.assertEquals(present.getBy(), By.id("present"));
 	}
@@ -880,7 +880,7 @@ public class TestHtmlElement extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
 		
 		HtmlElement present = new HtmlElement("element", AppiumBy.id("present"));
-		present.setDriver(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null, null)); // mimic the findElement call were we update driver before doing anything
+		present.setDriver(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null)); // mimic the findElement call were we update driver before doing anything
 		present.replaceSelector();
 		Assert.assertEquals(present.getBy(), By.id("my.package:id/present"));
 	}
@@ -894,7 +894,7 @@ public class TestHtmlElement extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
 		
 		HtmlElement present = new HtmlElement("element", AppiumBy.accessibilityId("present"));
-		present.setDriver(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null, null)); // mimic the findElement call were we update driver before doing anything
+		present.setDriver(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null)); // mimic the findElement call were we update driver before doing anything
 		present.replaceSelector();
 		Assert.assertEquals(present.getBy(), By.id("my.package:id/present"));
 	}
@@ -909,7 +909,7 @@ public class TestHtmlElement extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
 		
 		HtmlElement present = new HtmlElement("element", By.id("a.package:id/present"));
-		present.setDriver(new CustomEventFiringWebDriver(mobileDriver,null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null, null)); // mimic the findElement call were we update driver before doing anything
+		present.setDriver(new CustomEventFiringWebDriver(mobileDriver,null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null)); // mimic the findElement call were we update driver before doing anything
 		present.replaceSelector();
 		Assert.assertEquals(present.getBy(), By.id("a.package:id/present"));
 	}

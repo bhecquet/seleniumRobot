@@ -32,6 +32,8 @@ import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.video.VideoRecorder;
 //import net.lightbody.bmp.BrowserMobProxy;
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.ExecutesMethod;
+import io.appium.java_client.HidesKeyboard;
 import io.appium.java_client.remote.SupportsContextSwitching;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Base64OutputStream;
@@ -602,13 +604,13 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     		"var action = 'capture_desktop_snapshot_to_base64_string';return '';";
     
     public CustomEventFiringWebDriver(final WebDriver driver) {
-    	this(driver, null, null, TestType.WEB, DriverMode.LOCAL, null, null);
+    	this(driver, null, null, TestType.WEB, DriverMode.LOCAL, null);
     }
 
-    public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, TestType testType, DriverMode localDriver, BrowserMobProxy mobProxy, SeleniumGridConnector gridConnector) {
-    	this(driver, driverPids, browserInfo, testType, localDriver, mobProxy, gridConnector, null, new ArrayList<>());
+    public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, TestType testType, DriverMode localDriver, SeleniumGridConnector gridConnector) {
+    	this(driver, driverPids, browserInfo, testType, localDriver, gridConnector, null, new ArrayList<>());
     }
-	public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, TestType testType, DriverMode localDriver, BrowserMobProxy mobProxy, SeleniumGridConnector gridConnector, Integer attachExistingDriverPort, List<WebDriverListener> wdListeners) {
+	public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, TestType testType, DriverMode localDriver, SeleniumGridConnector gridConnector, Integer attachExistingDriverPort, List<WebDriverListener> wdListeners) {
 
 		this.driverPids = driverPids == null ? new ArrayList<>(): driverPids;
 		this.browserInfo = browserInfo;
@@ -1891,5 +1893,21 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	 */
 	public void setTestType(TestType testType) {
 		this.testType = testType;
+	}
+
+	@Override
+	public ExecutesMethod assertExtensionExists(String extName) {
+		if (testType.isMobile()) {
+			return ((HidesKeyboard) originalDriver).assertExtensionExists(extName);
+		}
+		return null;
+	}
+
+	@Override
+	public ExecutesMethod markExtensionAbsence(String extName) {
+		if (testType.isMobile()) {
+			return ((HidesKeyboard) originalDriver).markExtensionAbsence(extName);
+		}
+		return null;
 	}
 }

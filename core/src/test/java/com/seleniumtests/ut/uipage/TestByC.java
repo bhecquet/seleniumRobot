@@ -1,9 +1,7 @@
 package com.seleniumtests.ut.uipage;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.testng.Assert.assertTrue;
 import static org.testng.AssertJUnit.assertEquals;
 
@@ -19,8 +17,6 @@ import org.mockito.Mockito;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -29,7 +25,6 @@ import org.testng.annotations.Test;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.uipage.ByC;
 
-@PrepareForTest(WebUIDriver.class)
 public class TestByC extends MockitoTest {
     @Mock
     private WebElement element1;
@@ -59,13 +54,19 @@ public class TestByC extends MockitoTest {
 
     @BeforeMethod(groups = {"ut"})
     public void init() throws Exception {
-        PowerMockito.mockStatic(WebUIDriver.class);
+        mockedWebUIDriver = mockStatic(WebUIDriver.class);
         when(id.findElements(driver)).thenReturn(Arrays.asList(element1));
         when(name.findElements(driver)).thenReturn(Arrays.asList(element1, element2));
         when(noElementsFound.findElements(driver)).thenReturn(new ArrayList<>());
 
-        PowerMockito.when(WebUIDriver.getWebDriver(false)).thenReturn(eventDriver);
+        mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(false)).thenReturn(eventDriver);
     }
+
+    @AfterMethod(groups = {"ut"})
+    public void closeMocks() {
+        mockedWebUIDriver.close();
+    }
+
 
     /**
      * Tests getEffectiveXPath
