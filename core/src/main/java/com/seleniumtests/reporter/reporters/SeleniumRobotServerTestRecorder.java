@@ -172,7 +172,13 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 				// record test case
 				Integer testCaseId = serverConnector.createTestCase(testName);
 				String gridNode = getGridNode();
-				Integer testCaseInSessionId = serverConnector.createTestCaseInSession(sessionId, testCaseId, getVisualTestName(testResult), TestNGResultUtils.getTestStatusString(testResult), gridNode);
+				Integer testCaseInSessionId = serverConnector.createTestCaseInSession(sessionId,
+						testCaseId,
+						getVisualTestName(testResult),
+						TestNGResultUtils.getTestStatusString(testResult),
+						gridNode,
+						TestNGResultUtils.getTestDescription(testResult));
+				logger.info(String.format("Result for '%s' will be visible at: %s/snapshot/testResults/result/%d/", testName, serverConnector.getUrl(), testCaseInSessionId));
 				serverConnector.addLogsToTestCaseInSession(testCaseInSessionId, generateExecutionLogs(testResult).toString());
 				
 				List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
@@ -180,8 +186,9 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 					continue;
 				}
 				
-				recordSteps(serverConnector, sessionId, testCaseInSessionId, testSteps, testResult);
+				recordSteps(serverConnector, testCaseInSessionId, testSteps, testResult);
 				recordLogs(serverConnector, testCaseInSessionId, testResult);
+				recordTestInfos(serverConnector, testCaseInSessionId, testResult);
 				
 				logger.info(String.format("Snapshots has been recorded with TestCaseSessionId: %d", testCaseInSessionId));
 				TestNGResultUtils.setSnapshotTestCaseInSessionId(testResult, testCaseInSessionId);
@@ -201,20 +208,18 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 	/**
 	 * Record test steps to server
 	 * @param serverConnector
-	 * @param sessionId
 	 * @param testCaseInSessionId
 	 * @param testSteps
 	 */
-	private void recordSteps(SeleniumRobotSnapshotServerConnector serverConnector, Integer sessionId, Integer testCaseInSessionId, List<TestStep> testSteps, ITestResult testResult) {
+	private void recordSteps(SeleniumRobotSnapshotServerConnector serverConnector, Integer testCaseInSessionId, List<TestStep> testSteps, ITestResult testResult) {
 		for (TestStep testStep: testSteps) {
 			
 			logger.info(String.format("Recording step %s on server", testStep.getName()));
 			
 			// record test step
 			Integer testStepId = serverConnector.createTestStep(testStep.getName(), testCaseInSessionId);
-			String stepLogs = testStep.toJson().toString();
 			
-			Integer stepResultId = serverConnector.recordStepResult(testStep, sessionId, testCaseInSessionId, testStepId);
+			Integer stepResultId = serverConnector.recordStepResult(testStep, testCaseInSessionId, testStepId);
 			testStep.setStepResultId(stepResultId);
 			
 			// sends all snapshots that are flagged as comparable, when user request them to be compared
@@ -226,7 +231,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 						continue;
 					} 
 					
-					recordSnapshot(serverConnector, sessionId, testCaseInSessionId, stepResultId, snapshot);
+					recordSnapshot(serverConnector, stepResultId, snapshot);
 					
 				// record reference image on server if step is successful
 				} else if (snapshot.getCheckSnapshot().recordSnapshotOnServerForReference() && SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerRecordResults()) {
@@ -252,7 +257,15 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 		try {
 			serverConnector.uploadLogs(SeleniumRobotLogger.getTestLogsFile(getTestName(testResult)), testCaseInSessionId);
 		} catch (SeleniumRobotServerException | ConfigurationException e) {
-			logger.error(e);
+			logger.error("Error uploading file: " + e.getMessage(), e);
+		}
+	}
+
+	private void recordTestInfos(SeleniumRobotSnapshotServerConnector serverConnector, Integer testCaseInSessionId, ITestResult testResult) {
+		try {
+			serverConnector.recordTestInfo(TestNGResultUtils.getTestInfo(testResult), testCaseInSessionId);
+		} catch (SeleniumRobotServerException | ConfigurationException e) {
+			logger.error("Error sending test infos: " + e.getMessage(), e);
 		}
 	}
 
@@ -265,7 +278,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 	private void recordAllAttachments(SeleniumRobotSnapshotServerConnector serverConnector, Integer stepResultId, TestStep testStep) {
 
 		List<FileContent> attachments;
-		// in case snapshot comparison is not requested, we still want captured pictured to be displayed in report
+		// in case snapshot comparison is not requested, we still want captured pictures to be displayed in report
 		if (SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshot()) {
 			attachments = testStep.getAllAttachments(false, SnapshotCheckType.NONE, SnapshotCheckType.REFERENCE_ONLY);
 		} else {
@@ -287,15 +300,12 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 	/**
 	 * record a snpashot on server, for snapshot comparison
 	 * @param serverConnector
-	 * @param sessionId
-	 * @param testCaseInSessionId
 	 * @param stepResultId
 	 * @param snapshot
 	 */
-	private void recordSnapshot(SeleniumRobotSnapshotServerConnector serverConnector, Integer sessionId,
-			Integer testCaseInSessionId, Integer stepResultId, Snapshot snapshot) {
+	private void recordSnapshot(SeleniumRobotSnapshotServerConnector serverConnector, Integer stepResultId, Snapshot snapshot) {
 		try {
-			serverConnector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId, snapshot.getCheckSnapshot().getExcludeElementsRect());
+			serverConnector.createSnapshot(snapshot, stepResultId, snapshot.getCheckSnapshot().getExcludeElementsRect());
 			logger.info("Check snapshot created");
 		} catch (SeleniumRobotServerException e) {
 			logger.error("Could not create snapshot on server", e);

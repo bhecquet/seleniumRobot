@@ -850,17 +850,31 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     		}
     	} 
     	
-    	// add package name before the id
-		 if (SeleniumTestsContextManager.isMobileAppTest() 
-				 && "android".equalsIgnoreCase(SeleniumTestsContextManager.getThreadContext().getPlatform())
-				 && (by instanceof By.ById || by instanceof AppiumBy.ById || by instanceof AppiumBy.ByAccessibilityId)
-				 && !by.toString().split(":", 2)[1].contains(":")) {
-			 WebDriver drv = ((CustomEventFiringWebDriver)getDriver()).getOriginalDriver();
-			 String packageName = ((AndroidDriver)drv).getCurrentPackage();
-			 by = By.id(packageName + ":id/" + by.toString().split(":", 2)[1].trim());
-		 }
+    	// add package name before the id for mobile application (not webview)
+		if (SeleniumTestsContextManager.isMobileAppTest()) {
+			boolean isWebTest = ((CustomEventFiringWebDriver)getDriver()).isWebTest();
 
-    			 
+			if (isWebTest) {
+				// in mobile webviews id, name, classname is not supported
+				String locatorValue = by.toString().split(":", 2)[1].trim();
+				if ((by instanceof By.ById || by instanceof AppiumBy.ById)) {
+					by = By.cssSelector("#" + locatorValue);
+				} else if (by instanceof By.ByName || by instanceof AppiumBy.ByName) {
+					by = By.cssSelector(String.format("*[name='%s']", locatorValue.replace("'", "\\'")));
+				} else if (by instanceof By.ByClassName || by instanceof AppiumBy.ByClassName) {
+					by = By.cssSelector("." + locatorValue);
+				}
+			} else if (
+					!isWebTest
+							&& "android".equalsIgnoreCase(SeleniumTestsContextManager.getThreadContext().getPlatform())
+							&& (by instanceof By.ById || by instanceof AppiumBy.ById || by instanceof AppiumBy.ByAccessibilityId)
+							&& !by.toString().split(":", 2)[1].contains(":")
+			) {
+				WebDriver drv = ((CustomEventFiringWebDriver)getDriver()).getOriginalDriver();
+				String packageName = ((AndroidDriver)drv).getCurrentPackage();
+				by = By.id(packageName + ":id/" + by.toString().split(":", 2)[1].trim());
+			}
+		 }
     }
         
     /**
@@ -868,7 +882,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	 * 
      * @param allElements
      */
-    private <T extends SearchContext> T getElementByIndex(List<T> allElements) {
+    protected <T extends SearchContext> T getElementByIndex(List<T> allElements) {
     	if (elementIndex != null && elementIndex.equals(FIRST_VISIBLE)) {
 			for (T el: allElements) {
 				if (el instanceof WebElement &&  ((WebElement)el).isDisplayed()) {
@@ -905,7 +919,6 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 		}
 
 		for (FrameElement frameEl: frameTree) {
-			Integer idx = frameEl.getElementIndex() == null ? 0: frameEl.getElementIndex();
 			WebElement frameWebElement;
 			
 			SearchContext searchContext;
@@ -915,12 +928,14 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 			} else {
 				searchContext = getDriver();
 			}
-			
+
 			try {
-				frameWebElement = searchContext.findElements(frameEl.getBy()).get(idx);
-			} catch (IndexOutOfBoundsException e) {
-				throw new NoSuchFrameException(String.format("Frame %s with index %d has not been found", frameEl, idx));
+				List<WebElement> frameElements = searchContext.findElements(frameEl.getBy());
+				frameWebElement = frameEl.getElementByIndex(frameElements);
+			} catch (NoSuchElementException e) {
+				throw new NoSuchFrameException(e.getMessage());
 			}
+
 			((CustomEventFiringWebDriver) getDriver()).scrollToElement(frameWebElement, -20);
 			getDriver().switchTo().frame(frameWebElement);
 		}

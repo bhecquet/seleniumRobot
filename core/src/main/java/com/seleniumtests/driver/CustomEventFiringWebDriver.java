@@ -31,38 +31,21 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.video.VideoRecorder;
 //import net.lightbody.bmp.BrowserMobProxy;
+import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.remote.SupportsContextSwitching;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.Alert;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.HasCapabilities;
-import org.openqa.selenium.JavascriptException;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.NoSuchSessionException;
-import org.openqa.selenium.NoSuchWindowException;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.Point;
-import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.UnhandledAlertException;
-import org.openqa.selenium.UnsupportedCommandException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Interactive;
 import org.openqa.selenium.interactions.Sequence;
-import org.openqa.selenium.remote.Augmenter;
-import org.openqa.selenium.remote.FileDetector;
-import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.remote.UselessFileDetector;
+import org.openqa.selenium.remote.*;
 import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.openqa.selenium.support.events.WebDriverListener;
 
+import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
 import java.awt.AWTError;
 import java.awt.AWTException;
@@ -83,15 +66,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * This class acts as a proxy for everything related to selenium driver actions (mostly a bypass) or with the machine holding
@@ -104,7 +79,7 @@ import java.util.UUID;
  * When action do not need a real driver, static methods are provided
  * It also handles the grid mode, masking it to requester.
  */
-public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, JavascriptExecutor, TakesScreenshot, Interactive {
+public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, JavascriptExecutor, TakesScreenshot, Interactive, SupportsContextSwitching, HidesKeyboard {
 	
 	private static final String OTHER_BROWSER = "other";
 	private static final String SAFARI_BROWSER = "safari";
@@ -117,7 +92,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	private WebDriver driver;
 	private final WebDriver originalDriver;
 	private final NLWebDriver neoloadDriver;
-	private boolean isWebTest;
+	private TestType testType;
 	private boolean driverExited = false;
 	private final DriverMode driverMode;
 	private final BrowserInfo browserInfo;
@@ -627,17 +602,17 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     		"var action = 'capture_desktop_snapshot_to_base64_string';return '';";
     
     public CustomEventFiringWebDriver(final WebDriver driver) {
-    	this(driver, null, null, true, DriverMode.LOCAL, null);
+    	this(driver, null, null, TestType.WEB, DriverMode.LOCAL, null, null);
     }
 
-    public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, Boolean isWebTest, DriverMode localDriver, SeleniumGridConnector gridConnector) {
-    	this(driver, driverPids, browserInfo, isWebTest, localDriver, gridConnector, null, new ArrayList<>());
+    public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, TestType testType, DriverMode localDriver, BrowserMobProxy mobProxy, SeleniumGridConnector gridConnector) {
+    	this(driver, driverPids, browserInfo, testType, localDriver, mobProxy, gridConnector, null, new ArrayList<>());
     }
-	public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, Boolean isWebTest, DriverMode localDriver, SeleniumGridConnector gridConnector, Integer attachExistingDriverPort, List<WebDriverListener> wdListeners) {
+	public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, TestType testType, DriverMode localDriver, BrowserMobProxy mobProxy, SeleniumGridConnector gridConnector, Integer attachExistingDriverPort, List<WebDriverListener> wdListeners) {
 
 		this.driverPids = driverPids == null ? new ArrayList<>(): driverPids;
 		this.browserInfo = browserInfo;
-		this.isWebTest = isWebTest;
+		this.testType = testType;
 		this.driverMode = localDriver;
 //		this.mobProxy = mobProxy;
 		this.gridConnector = gridConnector;
@@ -659,7 +634,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		for (WebDriverListener wdListener: wdListeners) {
 			this.driver = new EventFiringDecorator(wdListener).decorate(this.driver);
 		}
-	
+
 		// NEOLOAD //
 		if (driver instanceof NLWebDriver) {
 			neoloadDriver = (NLWebDriver)driver;
@@ -681,7 +656,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
      * This is called for Composite actions, native actions (from DriverListener) and JS actions
      */
     public void updateWindowsHandles() {
-    	if (isWebTest) {
+    	if (isWebTest()) {
     		currentHandles = getWindowHandles();
     			
     	} else {
@@ -696,7 +671,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	@Override
     public Set<String> getWindowHandles() {
     	
-    	if (!isWebTest) {
+    	if (!isWebTest()) {
     		return new TreeSet<>();
     	}
     	
@@ -732,7 +707,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     @Override
     public String getWindowHandle() {
     	
-    	if (!isWebTest) {
+    	if (!isWebTest()) {
     		return "";
     	}
     	
@@ -824,7 +799,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     	try {
     		getSessionId();
     		getCapabilities();
-			if (isWebTest) {
+			if (isWebTest()) {
 				return driver.getWindowHandles().isEmpty();
 			} else {
 				// in case of mobile app, we assume the app is not closed. Closing the app should only be done at test end
@@ -876,7 +851,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
      * @return
      */
     public double getDeviceAspectRatio() {
-    	if (isWebTest) {
+    	if (isWebTest()) {
     		Number devicePixelRatio = (Number) ((JavascriptExecutor)driver).executeScript(JS_PIXEL_RATIO + " return pixelRatio;", true);
     		return devicePixelRatio.doubleValue();
     	} else {
@@ -893,7 +868,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	 * @return
 	 */
 	public int getViewPortWidthWithoutScrollbar(boolean usePixelAspectRatio) {
-    	if (isWebTest) {
+    	if (isWebTest()) {
     		try {
     			
 	    		Number width = (Number)executeScript(JS_GET_VIEWPORT_SIZE_WIDTH, usePixelAspectRatio);
@@ -927,7 +902,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	 * @return
 	 */
 	public int getViewPortHeighthWithoutScrollbar(boolean usePixelAspectRatio) {
-		if (isWebTest) {
+		if (isWebTest()) {
 			try {
 				
 				Number height = (Number)executeScript(JS_GET_VIEWPORT_SIZE_HEIGHT, usePixelAspectRatio);
@@ -985,7 +960,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 
 	@SuppressWarnings("unchecked")
     public Dimension getContentDimension(boolean usePixelAspectRatio) {
-    	if (isWebTest) {
+    	if (isWebTest()) {
     		try {
 				List<Number> dims = (List<Number>)executeScript(JS_GET_CONTENT_ENTIRE_SIZE, usePixelAspectRatio);
 		    	
@@ -1009,13 +984,13 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	 * TODO: handle mobile app case
 	 */
 	public void scrollTop() {
-		if (isWebTest) {
+		if (isWebTest()) {
 			((JavascriptExecutor) driver).executeScript("window.top.scroll(0, 0)");
 		} 
 	}
 	
 	public void scrollTo(int x, int y) {
-		if (isWebTest) {
+		if (isWebTest()) {
 			((JavascriptExecutor) driver).executeScript(String.format("window.top.scroll(%d, %d)", x, y));
 			
 			// wait for scrolling end
@@ -1048,7 +1023,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		return getTopFixedHeaderSize(true);
 	}
 	public Long getTopFixedHeaderSize(boolean usePixelAspectRatio) {
-		if (isWebTest) {
+		if (isWebTest()) {
 			return (Long) ((JavascriptExecutor) driver).executeScript(JS_GET_TOP_HEADER, usePixelAspectRatio);
 		} else { 
 			return 0L;
@@ -1064,7 +1039,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		return getBottomFixedFooterSize(true);
 	}
 	public Long getBottomFixedFooterSize(boolean usePixelAspectRatio) {
-		if (isWebTest) {
+		if (isWebTest()) {
 			return (Long) ((JavascriptExecutor) driver).executeScript(JS_GET_BOTTOM_FOOTER, usePixelAspectRatio);
 		} else { 
 			return 0L;
@@ -1076,7 +1051,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	 * @return
 	 */
 	public boolean isModalDisplayed() {
-		if (isWebTest) {
+		if (isWebTest()) {
 			return (Boolean) ((JavascriptExecutor) driver).executeScript(JS_GET_MODAL);
 		} else { 
 			return false;
@@ -1089,7 +1064,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	 * @param element
 	 */
 	public void scrollToElement(WebElement element, int yOffset) {
-		if (isWebTest) {
+		if (isWebTest()) {
 			try {
 				WebElement parentScrollableElement = (WebElement) ((JavascriptExecutor) driver).executeScript(JS_SCROLL_PARENT, element, (driver instanceof SafariDriver) ? SAFARI_BROWSER: OTHER_BROWSER);
 				Long topHeaderSize = (Long) ((JavascriptExecutor) driver).executeScript(JS_GET_TOP_HEADER);
@@ -1172,7 +1147,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	 */
 	@SuppressWarnings("unchecked")
 	public Point getScrollPosition() {
-		if (isWebTest) {
+		if (isWebTest()) {
 			try {
 				List<Number> dims = (List<Number>)((JavascriptExecutor) driver).executeScript(JS_GET_CURRENT_SCROLL_POSITION);
 				return new Point(dims.get(0).intValue(), dims.get(1).intValue());
@@ -1788,6 +1763,26 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	}
 
 	@Override
+	public ScriptKey pin(String script) {
+		return JavascriptExecutor.super.pin(script);
+	}
+
+	@Override
+	public void unpin(ScriptKey key) {
+		JavascriptExecutor.super.unpin(key);
+	}
+
+	@Override
+	public Set<ScriptKey> getPinnedScripts() {
+		return JavascriptExecutor.super.getPinnedScripts();
+	}
+
+	@Override
+	public Object executeScript(ScriptKey key, Object... args) {
+		return JavascriptExecutor.super.executeScript(key, args);
+	}
+
+	@Override
 	public void perform(Collection<Sequence> actions) {
 		((Interactive)driver).perform(actions);
 		
@@ -1799,16 +1794,13 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		
 	}
 
-	public boolean isWebTest() {
-		return isWebTest;
-	}
-
 	/**
-	 * For tests
-	 * @param webTest
+	 * Returns true if this is a web test
+	 * a web test may be a desktop or mobile web test (e.g: using chrome browser), but also a mobile application test where webview context is in use
+	 * @return
 	 */
-	public void setWebTest(boolean webTest) {
-		this.isWebTest = webTest;
+	public boolean isWebTest() {
+		return (testType.family().equals(TestType.WEB) || testType.family().equals(TestType.APP) && getContext().toLowerCase().contains("web"));
 	}
 
 	public boolean isDriverExited() {
@@ -1839,4 +1831,65 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		videoRecorders.clear();
 	}
 
+	@Override
+	public void hideKeyboard() {
+		if (testType.isMobile()) {
+			((HidesKeyboard)originalDriver).hideKeyboard();
+		}
+	}
+
+	@Override
+	public WebDriver context(String name) {
+		if (testType.isMobile()) {
+			((SupportsContextSwitching)originalDriver).context(name);
+		}
+		return this;
+	}
+
+	@Override
+	public Set<String> getContextHandles() {
+		if (testType.isMobile()) {
+			return ((SupportsContextSwitching)originalDriver).getContextHandles();
+		} else {
+			Set<String> contexts = new HashSet<>();
+			contexts.add("WEB");
+			return contexts;
+		}
+	}
+
+	@Nullable
+	@Override
+	public String getContext() {
+		if (testType.isMobile()) {
+			return ((SupportsContextSwitching) originalDriver).getContext();
+		} else {
+			return "WEB";
+		}
+	}
+
+	@Override
+	public Response execute(String driverCommand, Map<String, ?> parameters) {
+		if (testType.isMobile()) {
+			return ((AppiumDriver) originalDriver).execute(driverCommand, parameters);
+		} else {
+			throw new UnsupportedCommandException("execute is specific to mobile");
+		}
+	}
+
+	@Override
+	public Response execute(String driverCommand) {
+		if (testType.isMobile()) {
+			return ((AppiumDriver) originalDriver).execute(driverCommand);
+		} else {
+			throw new UnsupportedCommandException("execute is specific to mobile");
+		}
+	}
+
+	/**
+	 * For tests
+	 * @param testType
+	 */
+	public void setTestType(TestType testType) {
+		this.testType = testType;
+	}
 }

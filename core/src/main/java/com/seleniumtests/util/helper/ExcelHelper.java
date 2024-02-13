@@ -108,7 +108,7 @@ public class ExcelHelper {
                 }
 
                 int empytCells = 0;
-                Map<String, String> rowContent = new HashMap<>();
+                Map<String, String> rowContent = new LinkedHashMap<>();
 
                 for (colIdx = firstColumn; colIdx <= lastColumn; colIdx++) {
 

@@ -80,4 +80,8 @@ public interface SeleniumRobotCapabilityType {
 	String SESSION_ID = "sr:sessionId";
 	String BROWSER = "sr:browser";
 	String STARTUP_DURATION = "sr:startupDuration";
+
+	// number of tries for this driver creation
+	String SESSION_CREATION_TRY = "sr:try";
+	String SESSION_CREATION_REQUEST_TIME = "sr:creationRequestTime";
 }

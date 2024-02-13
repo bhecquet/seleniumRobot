@@ -55,9 +55,9 @@ public class TestValue extends TestAction {
 		JSONObject actionJson = new JSONObject();
 		
 		actionJson.put("type", "value");
-		actionJson.put("message", encodeString(message, "json"));
-		actionJson.put("id", encodeString(name, "json"));
-		actionJson.put("value", encodeString(value, "json"));
+		actionJson.put("message", message);
+		actionJson.put("id", name);
+		actionJson.put("value", value);
 		
 		return actionJson;
 	}

@@ -40,22 +40,17 @@ public class DriverExceptionListener implements WebDriverListener {
 	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(DriverExceptionListener.class);
 
-	private final boolean isWebTest;
 	private final CustomEventFiringWebDriver driver;
 	
 	public DriverExceptionListener(CustomEventFiringWebDriver driver) {
-		this.isWebTest = driver.isWebTest();
 		this.driver = driver;
 	}
 
     @Override
     public void beforeClick(WebElement arg0) {
-    	if (isWebTest) {
-    		driver.updateWindowsHandles();
-    	}
+		driver.updateWindowsHandles();
     }
 
- 
     @Override
     public void onError(Object target, Method method, Object[] args, InvocationTargetException e) {
     	

@@ -107,14 +107,15 @@ public class TestFrameElement extends MockitoTest {
 		when(row.findElements(any(By.class))).thenReturn(Arrays.asList(cell));
 		when(driver.findElements(By.id("frameId"))).thenReturn(Arrays.asList(frameEl));
 		when(driver.findElements(By.id("frameId2"))).thenReturn(Arrays.asList(subFrameEl));
-		when(driver.findElements(By.tagName("iframe"))).thenReturn(Arrays.asList(frameEl));
 		when(driver.findElements(By.tagName("iframe"))).thenReturn(Arrays.asList(frameEl, frameEl2));
 		when(driver.switchTo()).thenReturn(locator);
 		doNothing().when(eventDriver).scrollToElement(any(WebElement.class),  anyInt());
 		
 		when(frameEl.getText()).thenReturn("111");
 		when(frameEl2.getText()).thenReturn("222");
-		
+		when(frameEl.isDisplayed()).thenReturn(false);
+		when(frameEl2.isDisplayed()).thenReturn(true);
+
 		when(element.getSize()).thenReturn(new Dimension(1, 1));
 		when(element.isDisplayed()).thenReturn(true);
 		when(link.isDisplayed()).thenReturn(true);
@@ -134,7 +135,7 @@ public class TestFrameElement extends MockitoTest {
 		el.click();
 
 		verify(locator).frame(frameArgument.capture());
-		Assert.assertEquals(frameArgument.getValue().getText(), "111");
+		Assert.assertEquals(frameArgument.getValue().getText(), "111"); // check the frame used
 		verify(locator).defaultContent();
 	}
 
@@ -151,7 +152,33 @@ public class TestFrameElement extends MockitoTest {
 		el.click();
 		
 		verify(locator).frame(frameArgument.capture());
-		Assert.assertEquals(frameArgument.getValue().getText(), "222");
+		Assert.assertEquals(frameArgument.getValue().getText(), "222"); // check the frame used
+		verify(locator).defaultContent();
+	}
+
+	@Test(groups={"ut"})
+	public void testUseElementInsideFrameWithNegativeIndex() throws Exception {
+		ArgumentCaptor<WebElement> frameArgument = ArgumentCaptor.forClass(WebElement.class);
+
+		FrameElement frame = new FrameElement("", By.tagName("iframe"), -1);
+		HtmlElement el = new HtmlElement("", By.id("el"), frame);
+		el.click();
+
+		verify(locator).frame(frameArgument.capture());
+		Assert.assertEquals(frameArgument.getValue().getText(), "222"); // check the frame used
+		verify(locator).defaultContent();
+	}
+
+	@Test(groups={"ut"})
+	public void testUseElementInsideFrameWithFirstVisibleIndex() throws Exception {
+		ArgumentCaptor<WebElement> frameArgument = ArgumentCaptor.forClass(WebElement.class);
+
+		FrameElement frame = new FrameElement("", By.tagName("iframe"), HtmlElement.FIRST_VISIBLE);
+		HtmlElement el = new HtmlElement("", By.id("el"), frame);
+		el.click();
+
+		verify(locator).frame(frameArgument.capture());
+		Assert.assertEquals(frameArgument.getValue().getText(), "222"); // check the frame used
 		verify(locator).defaultContent();
 	}
 	/**

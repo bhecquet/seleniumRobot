@@ -2,6 +2,8 @@ package com.seleniumtests.reporter.info;
 
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.util.StringUtility;
+import org.json.JSONObject;
+import org.testng.ITestResult;
 
 public class HyperlinkInfo extends Info {
 
@@ -26,4 +28,10 @@ public class HyperlinkInfo extends Info {
 		}
 	}
 
+	@Override
+	public JSONObject toJson() {
+		return new JSONObject().put("type", "hyperlink")
+				.put("info", description)
+				.put("link", link);
+	}
 }

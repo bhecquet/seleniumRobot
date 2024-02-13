@@ -47,7 +47,7 @@ public class TestMessage extends TestAction {
 		JSONObject actionJson = new JSONObject();
 		
 		actionJson.put("type", "message");
-		actionJson.put("name", encodeString(name, "json"));
+		actionJson.put("name", name);
 		actionJson.put("messageType", messageType.toString());
 		
 		return actionJson;

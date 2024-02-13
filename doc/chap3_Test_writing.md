@@ -74,6 +74,7 @@
   - [Mask passwords](#mask-passwords)
 - [12 Write mobile tests](#12-write-mobile-tests)
   - [Automatic ID for Android](#automatic-id-for-android)
+  - [Use the same test code for multiple platform](#use-the-same-test-code-for-multiple-platform)
 - [13 Implement custom SelectList](#13-implement-custom-selectlist)
 - [14 Using custom UI libraries](#14-using-custom-ui-libraries)
 
@@ -449,11 +450,12 @@ Additional search using the `ByC` class are
 - search element by attribute: `new TextFieldElement("", ByC.attribute("attr", "attribute")).sendKeys("element found by attribute");`. See: [https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors](https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors) for special syntax like searching with attribute value starting by some pattern `ByC.attribute("attr^", "attributeStartPattern")`. Only '*' (contains), '^' (startswith) and '$' (endswith) syntax are supported.
 - search element after a label: `new TextFieldElement("", ByC.labelForward("By id forward", "input")).sendKeys("element found by label");`. See: [https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors](https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors) for special syntax like searching with label starting by some pattern `ByC.labelForward("By id forw^", "input"))`. Only '*' (contains), '^' (startswith) and '$' (endswith) syntax are supported
 - search element before a label: `new TextFieldElement("", ByC.labelBackward("By id backward", "input")).sendKeys("element found by label backward");`. See: [https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors](https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors) for special syntax like searching with label starting by some pattern `ByC.labelBackward("By id back^", "input")`. Only '*' (contains), '^' (startswith) and '$' (endswith) syntax are supported
+- search element by label: `new TextFieldElement("", ByC.label("Your name")).sendKeys("my name");`. Specific to forms where a <label> tag references an other element, using the "for" attribute. In this case, specify the content of label element to get the targeted one
 - search element by text: `new TextFieldElement("", ByC.text("my text")).sendKeys("element found by text");`. See: [https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors](https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors) for special syntax like searching with attribute value starting by some pattern `ByC.text("mytex^")`. Only '*' (contains), '^' (startswith) and '$' (endswith) syntax are supported
 - search by first visible element: `new HtmlElement("", By.className("otherClass"), HtmlElement.FIRST_VISIBLE).getText()`
 - search in reverse order (get the last element): `new TextFieldElement("", By.className("someClass"), -1);` get the last element on the list
 - search with several criteria: `new TextFieldElement("", ByC.and(By.tagName("input"), By.name("textField")))`
-- search element with one criteria or an other. Specifically usefull to handle multiple mobile OS: `new HtmlElement("or", ByC.or(ByC.ios(By.name("textField")), ByC.android(By.id("text2")))`
+- search element with one criteria or an other. Specifically usefull to handle multiple mobile OS: `new HtmlElement("or", ByC.or(ByC.ios(By.name("textField")), ByC.android(By.id("text2")), ByC.web(By.id("text")))`
 - search element inside shadow-root: see below
 
 `ByC` selectors ('xId', 'xName', 'xTagName', 'xLinkText' and 'xPartialLinkText') replicate the behavior of standard Selenium selectors but using xpath method. This is needed for salesforce UI automation where lightning UI prevents selenium to discover sub-elements of a custom element.
@@ -883,6 +885,8 @@ SeleniumRobot provides standard Dataprovider for common use cases which will sea
 	}
 ```
 Assuming the DEV environment, file will be searched in `<root>/data/<app>/dataset/DEV/testStandardDataProvider.csv`
+
+There is as many method parameters as columns in the dataset file. So, in the example above, csv file has 2 columns
 
 4 dataproviders are defined
 
@@ -1332,6 +1336,15 @@ It's also possible to attach to a remote appium server the same way (change URL)
 #### Automatic ID for Android ####
 
 On android, id of elements is always precedeed with package name: `com.myapp:id/elementId`. With SeleniumRobot, you can skip the package part and only write `By.id("elementId")`. Package part will be added automatically
+
+#### Use the same test code for multiple platform ####
+
+In case you have 2 mobile applications that have the same screens, but different locators (or even mobile apps that "borrow" some screen to a web site), you do not want to write twice the same code. To avoid this, you can use the ByC.or locator
+
+`TextFieldElement loginField = new TextFieldElement("login", ByC.or(ByC.android(By.id("android-locator")), ByC.ios(By.name("ios-locator")), ByC.web(By.id("username"))));`
+
+In the above code, `ByC.android`, `ByC.ios`, `ByC.web` help seleniumRobot to filter which locator to use depending on the platform used to launch the test.
+For example, if you execute the test on iOS, android and web locators will be ignored
 
 ### 13 Implement custom SelectList ###
 

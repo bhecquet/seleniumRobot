@@ -43,6 +43,8 @@ import java.util.TreeSet;
 
 import javax.imageio.ImageIO;
 
+import com.seleniumtests.driver.TestType;
+import io.appium.java_client.android.AndroidDriver;
 import org.apache.commons.io.FileUtils;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
@@ -77,7 +79,10 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 
 	@Mock
 	private RemoteWebDriver driver;
-	
+
+	@Mock
+	AndroidDriver mobileDriver;
+
 	@Mock
 	private Options options;
 	
@@ -89,13 +94,13 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	
 	@Mock
 	private BrowserInfo browserInfo;
-	
+
 	@Mock 
 	private SeleniumGridConnector gridConnector;
 	
 	@Mock
 	private TargetLocator target;
-	
+
 	@Mock
 	private Capabilities capabilities;
 	
@@ -116,8 +121,8 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		when(driver.getCapabilities()).thenReturn(new DesiredCapabilities()); // add capabilities to allow augmenting driver
 		
 		// add DriverExceptionListener to reproduce driver behavior
-		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, browserInfo, true, DriverMode.LOCAL, null));
-		attachedEventDriver = spy(new CustomEventFiringWebDriver(driver, null, browserInfo, true, DriverMode.LOCAL, null, 12345, new ArrayList<>()));
+		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, browserInfo, TestType.WEB, DriverMode.LOCAL, null));
+		attachedEventDriver = spy(new CustomEventFiringWebDriver(driver, null, browserInfo, TestType.WEB, DriverMode.LOCAL, null, 12345, new ArrayList<>()));
 		when(driver.manage()).thenReturn(options);
 		when(driver.getCapabilities()).thenReturn(capabilities);
 		when(driver.switchTo()).thenReturn(target);
@@ -136,6 +141,13 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		mockedMouse.when(() -> MouseInfo.getPointerInfo()).thenReturn(pointerInfo);
 		when(pointerInfo.getLocation()).thenReturn(new java.awt.Point(2, 3));
 		CustomEventFiringWebDriver.resetVideoRecorder();
+
+		when(mobileDriver.manage()).thenReturn(options);
+		when(mobileDriver.getCapabilities()).thenReturn(capabilities);
+		when(mobileDriver.switchTo()).thenReturn(target);
+		when(mobileDriver.getSessionId()).thenReturn(new SessionId("1234"));
+		when(mobileDriver.getPageSource()).thenReturn("<html></html>");
+		when(mobileDriver.getCapabilities()).thenReturn(new DesiredCapabilities());
 	}
 
 	@AfterMethod(groups = "ut", alwaysRun = true)
@@ -144,7 +156,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		mockedCustomEventFiringWebDriver.close();
 		mockedMouse.close();
 	}
-	
+
 	@Test(groups = {"ut"})
 	public void testGetSessionId() {
 		Assert.assertEquals(eventDriver.getSessionId(), "1234");
@@ -184,8 +196,10 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	}
 	@Test(groups = {"ut"})
 	public void testIsBrowserOrAppClosedMobileApp() {
-		when(driver.getWindowHandles()).thenReturn(new TreeSet<>());
-		eventDriver.setWebTest(false); // mobile application test
+		when(mobileDriver.getWindowHandles()).thenReturn(new TreeSet<>()); // check we don't call getWindowHandles
+		when(mobileDriver.getContext()).thenReturn("NATIVE_APP");
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null, null));
+
 		Assert.assertFalse(eventDriver.isBrowserOrAppClosed());
 	}
 	
@@ -349,8 +363,10 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testContentDimensionNonWebTest() {
-		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, null, false, DriverMode.LOCAL, null));
-		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(120L, 80L));
+		when(mobileDriver.executeScript(anyString())).thenReturn(Arrays.asList(120L, 80L));
+		when(mobileDriver.getContext()).thenReturn("NATIVE_APP");
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APP, DriverMode.LOCAL, null, null));
+
 		Dimension dim = eventDriver.getContentDimension();
 		
 		// check we get the window dimension
@@ -444,8 +460,9 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testContentDimensionWithoutScrollbarNonWebTest() {
-		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, null, false, DriverMode.LOCAL, null));
-		when(driver.executeScript(anyString(), eq(true))).thenReturn(120L).thenReturn(80L);
+		when(mobileDriver.executeScript(anyString(), eq(true))).thenReturn(120L).thenReturn(80L);
+		when(mobileDriver.getContext()).thenReturn("NATIVE_APP");
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APP, DriverMode.LOCAL, null, null));
 		Dimension dim = eventDriver.getViewPortDimensionWithoutScrollbar();
 		
 		// check we get the window dimension
@@ -496,7 +513,8 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"}, expectedExceptions=WebDriverException.class)
 	public void testScrollPositionNonWebTest() {
-		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, null, false, DriverMode.LOCAL, null));
+		when(mobileDriver.getContext()).thenReturn("NATIVE_APP");
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APP, DriverMode.LOCAL, null, null));
 		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(120L, 80L));
 		eventDriver.getScrollPosition();
 
@@ -574,7 +592,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testQuitInErrorOnGrid() {
-		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, browserInfo, true, DriverMode.LOCAL, gridConnector));
+		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, browserInfo, TestType.WEB, DriverMode.LOCAL, null, gridConnector));
 		
 		when(browserInfo.getAllBrowserSubprocessPids(new ArrayList<>())).thenReturn(Arrays.asList(1000L));
 		when(capabilities.getCapability(SeleniumRobotCapabilityType.GRID_NODE_URL)).thenReturn("http://grid-node:5555");

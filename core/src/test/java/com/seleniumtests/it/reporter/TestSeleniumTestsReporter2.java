@@ -397,7 +397,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			SeleniumTestsContextManager.removeThreadContext();
 			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions"});
 
-			// check result is ok and comparison result is shown through red bullet (comparison KO)
+			// check result is ok and comparison result is shown through blue bullet (comparison skipped)
 			String summaryReport = readSummaryFile();
 			Assert.assertTrue(summaryReport.contains("<i class=\"fas fa-circle circleSkipped\" data-toggle=\"tooltip\" title=\"snapshot comparison skipped\">"));
 			Assert.assertTrue(summaryReport.contains("info=\"ok\" data-toggle=\"tooltip\""));

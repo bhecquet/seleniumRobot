@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import com.seleniumtests.reporter.info.Har;
+import com.seleniumtests.reporter.logger.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.ITestResult;
@@ -205,18 +205,21 @@ public class ScenarioLogger {
      * @param file
      * @param description
      */
-    public void logFileToTestEnd(File file, String description) {
+    public FileContent logFileToTestEnd(File file, String description) {
     	
     	try {
     		TestStep runningStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getLastTestStep();
     		if (runningStep != null) {
-    			runningStep.addFile(new GenericFile(file, description));
+				GenericFile genericFile = new GenericFile(file, description);
+    			runningStep.addFile(genericFile);
+				return genericFile.getFileContent();
     		}
     	} catch (IndexOutOfBoundsException e) {
     		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
     	} catch (IOException e) {
 			error(e.getMessage());
 		}
+		return null;
     }
  
     /**

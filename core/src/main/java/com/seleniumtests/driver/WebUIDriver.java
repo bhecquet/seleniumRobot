@@ -353,7 +353,7 @@ public class WebUIDriver {
 						// add the last screenshots to TestInfo so that there is a quicklink on reports
 						Info lastStateInfo = TestNGResultUtils.getTestInfo(testResult).get(TestStepManager.LAST_STATE_NAME);
 						if (lastStateInfo != null) {
-							((MultipleInfo) lastStateInfo).addInfo(new ImageLinkInfo(TestNGResultUtils.getUniqueTestName(testResult) + "/" + screenshot.getImagePath()));
+							((MultipleInfo) lastStateInfo).addInfo(new ImageLinkInfo(screenshot.getImage()));
 						}
 					}
 				}
@@ -725,7 +725,7 @@ public class WebUIDriver {
     	WebDriver listeningDriver = new CustomEventFiringWebDriver(driver, 
 																	driverPids, 
 																	browserInfo, 
-																	SeleniumTestsContextManager.isWebTest(), 
+																	SeleniumTestsContextManager.getThreadContext().getTestType(),
 																	SeleniumTestsContextManager.getThreadContext().getRunMode(),
 																	SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(),
 																	config.getAttachExistingDriverPort(), 

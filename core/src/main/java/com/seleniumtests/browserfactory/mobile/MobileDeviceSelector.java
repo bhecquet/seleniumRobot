@@ -125,7 +125,15 @@ public class MobileDeviceSelector {
 		);
 		
 		if (filteredDeviceList.isEmpty()) {
-			throw new ConfigurationException("no matching device found among: " + deviceList);
+			StringBuilder message = new StringBuilder();
+			if (deviceName != null) {
+				message.append(String.format("deviceName=%s;", deviceName));
+			}if (platformName != null) {
+				message.append(String.format("platform=%s;", platformName));
+			}if (platformVersion != null) {
+				message.append(String.format("version=%s;", platformVersion));
+			}
+			throw new ConfigurationException(String.format("no matching device found. Looking for [%s] among: %s", message.toString(), deviceList));
 		}
 		
 		// returns the first matching device
@@ -150,12 +158,14 @@ public class MobileDeviceSelector {
 			
 			// set the right chromedriver executable according to android browser / chromeversion
 			// it's only the file name, not it's path
-			if (driverMode == DriverMode.LOCAL && !capabilities.getBrowserName().isEmpty()) {
+			// set it for browser tests and also application tests (for webview automation)
+			if (driverMode == DriverMode.LOCAL) {
 				String chromeDriverFile = null;
-				if (BrowserType.CHROME.toString().equalsIgnoreCase(capabilities.getBrowserName())) {
+				if (BrowserType.BROWSER.toString().equalsIgnoreCase(capabilities.getBrowserName())) {
+					chromeDriverFile = selectedDevice.getBrowserInfo(BrowserType.BROWSER).getDriverFileName();
+				// by default, chrome is used on android devices (for webview)
+				} else if (selectedDevice.getBrowserInfo(BrowserType.CHROME) != null) {
 					chromeDriverFile = selectedDevice.getBrowserInfo(BrowserType.CHROME).getDriverFileName();
-	        	} else if (BrowserType.BROWSER.toString().equalsIgnoreCase(capabilities.getBrowserName())) {
-	        		chromeDriverFile = selectedDevice.getBrowserInfo(BrowserType.BROWSER).getDriverFileName();
 	        	}
 				if (chromeDriverFile != null) {
 					// driver extraction will be done later. For example in AppiumDriverFactory

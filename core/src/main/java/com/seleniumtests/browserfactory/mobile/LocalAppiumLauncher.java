@@ -103,8 +103,8 @@ public class LocalAppiumLauncher implements AppiumLauncher {
 	}
 
 	private void checkAppiumVersion() {
+		File packageFile = Paths.get(appiumHome, "node_modules", "appium", "package.json").toFile();
 		try {
-			File packageFile = Paths.get(appiumHome, "node_modules", "appium", "package.json").toFile();
 			String appiumConfig = FileUtils.readFileToString(packageFile, StandardCharsets.UTF_8);
 			JSONObject packages = new JSONObject(appiumConfig);
 			if (!"appium".equals(packages.getString("name"))) {
@@ -114,7 +114,7 @@ public class LocalAppiumLauncher implements AppiumLauncher {
 			appiumVersion = packages.getString("version");
 
 		} catch (IOException e) {
-			throw new ConfigurationException("File package.json not found, appium does not seem to be installed in " + appiumHome, e);
+			throw new ConfigurationException(String.format("File %s not found, appium does not seem to be installed in %s", packageFile, appiumHome), e);
 		}
 	}
 

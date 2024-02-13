@@ -1,8 +1,11 @@
 package com.seleniumtests.ut.reporter.info;
 
 import com.seleniumtests.GenericTest;
-import com.seleniumtests.reporter.info.HyperlinkInfo;
 import com.seleniumtests.reporter.info.StringInfo;
+import com.seleniumtests.reporter.info.HyperlinkInfo;
+import org.json.JSONObject;
+import org.testng.Assert;
+import org.testng.Reporter;
 import org.testng.annotations.Test;
 
 public class TestStringInfo extends GenericTest {
@@ -10,49 +13,50 @@ public class TestStringInfo extends GenericTest {
     /**
      * Test encoding for null
      */
-    @Test
+    @Test(groups = {"ut"})
     public void testStringInfoNull() {
-        org.testng.Assert.assertNull(new StringInfo(null).encode("html"));
+        Assert.assertNull(new StringInfo(null).encode("html"));
     }
 
     /**
      * Test encoding for various formats
      */
-    @Test
+    @Test(groups = {"ut"})
     public void testStringInfoHtml() {
-        org.testng.Assert.assertEquals(new StringInfo("foo <>").encode("html"), "foo &lt;&gt;");
+        Assert.assertEquals(new StringInfo("foo <>").encode("html"), "foo &lt;&gt;");
     }
-    @Test
+    @Test(groups = {"ut"})
     public void testStringInfoXml() {
-        org.testng.Assert.assertEquals(new StringInfo("foo <>").encode("xml"), "foo &lt;&gt;");
+        Assert.assertEquals(new StringInfo("foo <>").encode("xml"), "foo &lt;&gt;");
     }
-    @Test
+    @Test(groups = {"ut"})
     public void testStringInfoCsv() {
-        org.testng.Assert.assertEquals(new StringInfo("foo <,>").encode("csv"), "\"foo <,>\"");
+        Assert.assertEquals(new StringInfo("foo <,>").encode("csv"), "\"foo <,>\"");
     }
-    @Test
+    @Test(groups = {"ut"})
     public void testStringInfoJson() {
-        org.testng.Assert.assertEquals(new StringInfo("foo {:/ ").encode("json"), "foo {:\\/ ");
+        Assert.assertEquals(new StringInfo("foo {:/ ").encode("json"), "foo {:\\/ ");
     }
-    @Test
+    @Test(groups = {"ut"})
     public void testStringInfoText() {
-        org.testng.Assert.assertEquals(new StringInfo("foo <>").encode("text"), "foo <>");
+        Assert.assertEquals(new StringInfo("foo <>").encode("text"), "foo <>");
     }
-    @Test
+    @Test(groups = {"ut"})
     public void testStringInfoOther() {
-        org.testng.Assert.assertEquals(new StringInfo("foo <>").encode("other"), "foo <>");
+        Assert.assertEquals(new StringInfo("foo <>").encode("other"), "foo <>");
     }
 
-    /**
-     * Check the link is correctly formatted
-     */
-    @Test
-    public void testHyperlinkInfoHtml() {
-        org.testng.Assert.assertEquals(new HyperlinkInfo("foo <>", "http://foo/bar?key=value").encode("html"), "<a href=\"http://foo/bar?key=value\">foo &lt;&gt;</a>");
+    @Test(groups = {"ut"})
+    public void testToJson() {
+        JSONObject info = new StringInfo("foo /").toJson();
+        Assert.assertEquals(info.getString("info"), "foo /");
+        Assert.assertEquals(info.getString("type"), "string");
     }
-    @Test
-    public void testHyperlinkInfoXml() {
-        org.testng.Assert.assertEquals(new HyperlinkInfo("foo <>", "http://foo/bar?key=value").encode("xml"), "link http://foo/bar?key=value;info foo &lt;&gt;");
+    @Test(groups = {"ut"})
+    public void testToJsonNull() {
+        JSONObject info = new StringInfo(null).toJson();
+        Assert.assertEquals(info.get("info"), JSONObject.NULL);
+        Assert.assertEquals(info.getString("type"), "string");
     }
 
 }

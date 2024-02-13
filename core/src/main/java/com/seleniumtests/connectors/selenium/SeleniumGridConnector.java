@@ -302,7 +302,7 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	private JSONObject getCurrentSessionObject(RemoteWebDriver driver) {
 
 		// sometimes, session is not immediately reported in hub status, wait a bit
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 15; i++) {
 			JSONObject status = Unirest.get(String.format("http://%s:%d%s", hubUrl.getHost(), hubUrl.getPort(), STATUS_SERVLET))
 					.asJson()
 					.getBody()

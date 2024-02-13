@@ -20,6 +20,8 @@ package com.seleniumtests.browserfactory;
 import java.net.URL;
 import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -245,8 +247,8 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 		int i = 0;
 		while (end.isAfter(clock.instant())) {
 
-			logger.debug("getting driver #{}", i);
-			capabilities.setCapability("sr:try", i);
+			capabilities.setCapability(SeleniumRobotCapabilityType.SESSION_CREATION_TRY, i);
+			capabilities.setCapability(SeleniumRobotCapabilityType.SESSION_CREATION_REQUEST_TIME, LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 			i += 1;
 			
 			for (SeleniumGridConnector gridConnector: gridConnectors) {

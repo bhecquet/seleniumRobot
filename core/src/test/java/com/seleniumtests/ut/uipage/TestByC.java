@@ -11,17 +11,25 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import com.seleniumtests.driver.WebUIDriver;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.uipage.ByC;
 
+@PrepareForTest(WebUIDriver.class)
 public class TestByC extends MockitoTest {
     @Mock
     private WebElement element1;
@@ -43,12 +51,20 @@ public class TestByC extends MockitoTest {
     @Mock
     private WebElement elements;
 
+    @Mock
+    private CustomEventFiringWebDriver eventDriver;
+
+    private MockedStatic mockedWebUIDriver;
+
 
     @BeforeMethod(groups = {"ut"})
     public void init() throws Exception {
+        PowerMockito.mockStatic(WebUIDriver.class);
         when(id.findElements(driver)).thenReturn(Arrays.asList(element1));
         when(name.findElements(driver)).thenReturn(Arrays.asList(element1, element2));
         when(noElementsFound.findElements(driver)).thenReturn(new ArrayList<>());
+
+        PowerMockito.when(WebUIDriver.getWebDriver(false)).thenReturn(eventDriver);
     }
 
     /**
@@ -256,6 +272,7 @@ public class TestByC extends MockitoTest {
     // ByAttribute
     @Test(groups = {"ut"})
     public void testFindElementByAttribute() {
+        when(eventDriver.isWebTest()).thenReturn(true);
         ByC.ByAttribute byAttribute = spy(new ByC.ByAttribute("name", "value"));
         byAttribute.findElement(driver);
         verify(driver).findElement(By.xpath(".//*[@name='value']"));
@@ -263,6 +280,7 @@ public class TestByC extends MockitoTest {
     
     @Test
     public void testFindElementByAttributeWithCssSelector() {
+        when(eventDriver.isWebTest()).thenReturn(true);
         ByC.ByAttribute byAttribute = spy(new ByC.ByAttribute("name", "value"));
         byAttribute.setUseCssSelector(true);
         byAttribute.findElement(driver);
@@ -271,6 +289,7 @@ public class TestByC extends MockitoTest {
 
     @Test(groups = {"ut"})
     public void testFindElementsByAttribute() {
+        when(eventDriver.isWebTest()).thenReturn(true);
         ByC.ByAttribute byAttribute = spy(new ByC.ByAttribute("jellyfish", "sweety"));
         byAttribute.findElements(driver);
         verify(driver).findElements(By.xpath(".//*[@jellyfish='sweety']"));

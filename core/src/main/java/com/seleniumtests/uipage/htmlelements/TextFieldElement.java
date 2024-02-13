@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.uipage.htmlelements;
 
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import org.openqa.selenium.By;
 
 import com.seleniumtests.uipage.ReplayOnError;
@@ -86,6 +87,9 @@ public class TextFieldElement extends HtmlElement {
         	getRealElementNoSearch().clear();
         } 
         getRealElementNoSearch().click();
+
+        // hide keyboard for mobile
+        ((CustomEventFiringWebDriver)getDriver()).hideKeyboard();
         getRealElementNoSearch().sendKeys(keysToSend);
         
         if (blurAfter) {
