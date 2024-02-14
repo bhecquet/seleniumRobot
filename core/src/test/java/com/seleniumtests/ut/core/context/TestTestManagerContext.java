@@ -3,8 +3,8 @@ package com.seleniumtests.ut.core.context;
 import static org.mockito.ArgumentMatchers.argThat;
 
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -15,17 +15,15 @@ import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.connectors.tms.TestManager;
 import com.seleniumtests.connectors.tms.squash.SquashTMConnector;
-import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.contexts.TestManagerContext;
 
-@PrepareForTest({ TestManager.class, SeleniumTestsContext.class })
 public class TestTestManagerContext extends ConnectorsTest {
 
 
 	@Mock
 	private TestManager testManager;
-	
+
 	@Mock
 	private SquashTMConnector squashTmConnector;
 	
@@ -102,17 +100,14 @@ public class TestTestManagerContext extends ConnectorsTest {
 	}
 	@Test(groups="ut")
 	public void testTmsSquashCampaign(final ITestContext testNGCtx, final XmlTest xmlTest) throws NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-		try {
+		try (MockedStatic mockedTestManager = Mockito.mockStatic(TestManager.class)) {
 			System.setProperty(TestManagerContext.TMS_TYPE, "squash");
 			System.setProperty(TestManagerContext.TMS_URL, "http://localhost:1234");
 			System.setProperty(TestManagerContext.TMS_USER, "user");
 			System.setProperty(TestManagerContext.TMS_PASSWORD, "password");
 			System.setProperty(TestManagerContext.TMS_PROJECT, "project");
 
-			PowerMockito.mockStatic(TestManager.class);
-
-
-			PowerMockito.when(TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
+			mockedTestManager.when(() -> TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
 
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
 
@@ -134,18 +129,15 @@ public class TestTestManagerContext extends ConnectorsTest {
 	 */
 	@Test(groups="ut")
 	public void testTmsSquashCampaign2(final ITestContext testNGCtx, final XmlTest xmlTest) throws NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-		try {
+		try (MockedStatic mockedTestManager = Mockito.mockStatic(TestManager.class)) {
 			System.setProperty(TestManagerContext.TMS_TYPE, "squash");
 			System.setProperty(TestManagerContext.TMS_URL, "http://localhost:1234");
 			System.setProperty(TestManagerContext.TMS_USER, "user");
 			System.setProperty(TestManagerContext.TMS_PASSWORD, "password");
 			System.setProperty(TestManagerContext.TMS_PROJECT, "project");
 			System.setProperty(SquashTMConnector.SQUASH_CAMPAIGN, "campaign2");
-			
-			PowerMockito.mockStatic(TestManager.class);
-			
-			
-			PowerMockito.when(TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
+
+			mockedTestManager.when(() -> TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
 			
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
 			
@@ -171,17 +163,14 @@ public class TestTestManagerContext extends ConnectorsTest {
 	 */
 	@Test(groups="ut")
 	public void testTmsSquashCampaignFolderPath(final ITestContext testNGCtx, final XmlTest xmlTest) throws NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-		try {
+		try (MockedStatic mockedTestManager = Mockito.mockStatic(TestManager.class)) {
 			System.setProperty(TestManagerContext.TMS_TYPE, "squash");
 			System.setProperty(TestManagerContext.TMS_URL, "http://localhost:1234");
 			System.setProperty(TestManagerContext.TMS_USER, "user");
 			System.setProperty(TestManagerContext.TMS_PASSWORD, "password");
 			System.setProperty(TestManagerContext.TMS_PROJECT, "project");
-			
-			PowerMockito.mockStatic(TestManager.class);
-			
-			
-			PowerMockito.when(TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
+
+			mockedTestManager.when(() -> TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
 			
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
 			
@@ -204,18 +193,15 @@ public class TestTestManagerContext extends ConnectorsTest {
 	 */
 	@Test(groups="ut")
 	public void testTmsSquashCampaignFolderPath2(final ITestContext testNGCtx, final XmlTest xmlTest) throws NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-		try {
+		try (MockedStatic mockedTestManager = Mockito.mockStatic(TestManager.class)) {
 			System.setProperty(TestManagerContext.TMS_TYPE, "squash");
 			System.setProperty(TestManagerContext.TMS_URL, "http://localhost:1234");
 			System.setProperty(TestManagerContext.TMS_USER, "user");
 			System.setProperty(TestManagerContext.TMS_PASSWORD, "password");
 			System.setProperty(TestManagerContext.TMS_PROJECT, "project");
 			System.setProperty(SquashTMConnector.SQUASH_CAMPAIGN_FOLDER, "folder1");
-			
-			PowerMockito.mockStatic(TestManager.class);
-			
-			
-			PowerMockito.when(TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
+
+			mockedTestManager.when(() -> TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
 			
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
 			
@@ -233,17 +219,14 @@ public class TestTestManagerContext extends ConnectorsTest {
 	}
 	@Test(groups="ut")
 	public void testTmsSquashCampaignFolderPathNull(final ITestContext testNGCtx, final XmlTest xmlTest) throws NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-		try {
+		try (MockedStatic mockedTestManager = Mockito.mockStatic(TestManager.class)) {
 			System.setProperty(TestManagerContext.TMS_TYPE, "squash");
 			System.setProperty(TestManagerContext.TMS_URL, "http://localhost:1234");
 			System.setProperty(TestManagerContext.TMS_USER, "user");
 			System.setProperty(TestManagerContext.TMS_PASSWORD, "password");
 			System.setProperty(TestManagerContext.TMS_PROJECT, "project");
-			
-			PowerMockito.mockStatic(TestManager.class);
-			
-			
-			PowerMockito.when(TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
+
+			mockedTestManager.when(() -> TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
 			
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
 			
@@ -266,17 +249,14 @@ public class TestTestManagerContext extends ConnectorsTest {
 	}
 	@Test(groups="ut")
 	public void testTmsSquashIteration(final ITestContext testNGCtx, final XmlTest xmlTest) throws NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-		try {
+		try (MockedStatic mockedTestManager = Mockito.mockStatic(TestManager.class)) {
 			System.setProperty(TestManagerContext.TMS_TYPE, "squash");
 			System.setProperty(TestManagerContext.TMS_URL, "http://localhost:1234");
 			System.setProperty(TestManagerContext.TMS_USER, "user");
 			System.setProperty(TestManagerContext.TMS_PASSWORD, "password");
 			System.setProperty(TestManagerContext.TMS_PROJECT, "project");
-			
-			PowerMockito.mockStatic(TestManager.class);
-			
-			
-			PowerMockito.when(TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
+
+			mockedTestManager.when(() -> TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
 			
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
 			
@@ -294,18 +274,15 @@ public class TestTestManagerContext extends ConnectorsTest {
 	}
 	@Test(groups="ut")
 	public void testTmsSquashIteration2(final ITestContext testNGCtx, final XmlTest xmlTest) throws NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-		try {
+		try (MockedStatic mockedTestManager = Mockito.mockStatic(TestManager.class)) {
 			System.setProperty(TestManagerContext.TMS_TYPE, "squash");
 			System.setProperty(TestManagerContext.TMS_URL, "http://localhost:1234");
 			System.setProperty(TestManagerContext.TMS_USER, "user");
 			System.setProperty(TestManagerContext.TMS_PASSWORD, "password");
 			System.setProperty(TestManagerContext.TMS_PROJECT, "project");
 			System.setProperty(SquashTMConnector.SQUASH_ITERATION, "iteration2");
-			
-			PowerMockito.mockStatic(TestManager.class);
-			
-			
-			PowerMockito.when(TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
+
+			mockedTestManager.when(() -> TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash")))).thenReturn(squashTmConnector);
 			
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
 			
@@ -325,7 +302,7 @@ public class TestTestManagerContext extends ConnectorsTest {
 
 	@Test(groups = "ut")
 	public void testInitTestManager(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
-		try {
+		try (MockedStatic mockedTestManager = Mockito.mockStatic(TestManager.class)) {
 			System.setProperty(TestManagerContext.TMS_TYPE, "squash");
 			System.setProperty(TestManagerContext.TMS_URL, "http://localhost:1234");
 			System.setProperty(TestManagerContext.TMS_USER, "user");
@@ -333,10 +310,7 @@ public class TestTestManagerContext extends ConnectorsTest {
 			System.setProperty(TestManagerContext.TMS_PROJECT, "project");
 			System.setProperty("tmsDomain", "domain"); // check that any parameter starting with "tms" will be used for configuration
 
-			PowerMockito.mockStatic(TestManager.class);
-
-
-			PowerMockito.when(TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash") && config.getString("tmsDomain").equals("domain")))).thenReturn(testManager);
+			mockedTestManager.when(() -> TestManager.getInstance(argThat(config -> config.getString("tmsType").equals("squash") && config.getString("tmsDomain").equals("domain")))).thenReturn(testManager);
 
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
 

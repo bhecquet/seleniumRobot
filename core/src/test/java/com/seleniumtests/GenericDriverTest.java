@@ -20,6 +20,9 @@ package com.seleniumtests;
 import java.io.IOException;
 import java.net.ServerSocket;
 
+import com.seleniumtests.browserfactory.SeleniumGridDriverFactory;
+import com.seleniumtests.core.runner.SeleniumRobotTestListener;
+import com.seleniumtests.util.osutility.OSUtility;
 import org.openqa.selenium.WebDriver;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -52,6 +55,7 @@ public class GenericDriverTest {
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getThreadContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
 		SeleniumTestsContextManager.getGlobalContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
+		SeleniumGridDriverFactory.resetCounter();
 	}
 	
 	public void initThreadContext(final ITestContext testNGCtx) {
@@ -75,6 +79,7 @@ public class GenericDriverTest {
 		WebUIDriver.cleanUp();
 
 		GenericTest.resetTestNGREsultAndLogger();
+		OSUtility.resetInstalledBrowsersWithVersion();
 	}
 	
 	public static int findFreePort() {

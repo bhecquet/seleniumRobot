@@ -1,5 +1,6 @@
 package com.seleniumtests.ut.browserfactory;
 
+import io.appium.java_client.android.options.UiAutomator2Options;
 import org.mockito.Mock;
 import org.openqa.selenium.MutableCapabilities;
 import org.testng.Assert;
@@ -10,8 +11,6 @@ import com.seleniumtests.GenericTest;
 import com.seleniumtests.browserfactory.ICloudCapabilityFactory;
 import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.driver.DriverConfig;
-
-import io.appium.java_client.remote.MobileCapabilityType;
 
 public class TestICloudCapabilityFactory extends GenericTest {
 
@@ -43,20 +42,20 @@ public class TestICloudCapabilityFactory extends GenericTest {
 	
 	@Test(groups="ut")
 	public void testIsUploadApp() {
-		MutableCapabilities caps = new MutableCapabilities();
-		caps.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP, "/home/app.apk");
+		UiAutomator2Options caps = new UiAutomator2Options();
+		caps.setApp("/home/app.apk");
 		boolean upload = new StubCloudCapabilityFactory(config).isUploadApp(caps);
 		Assert.assertTrue(upload);
-		Assert.assertEquals(caps.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP), "/home/app.apk");
+		Assert.assertEquals(caps.getApp().get(), "/home/app.apk");
 	}
 	
 	@Test(groups="ut")
 	public void testNoUploadApp() {
-		MutableCapabilities caps = new MutableCapabilities();
-		caps.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP, "NO_UPLOAD:/home/app.apk");
+		UiAutomator2Options caps = new UiAutomator2Options();
+		caps.setApp("NO_UPLOAD:/home/app.apk");
 		boolean upload = new StubCloudCapabilityFactory(config).isUploadApp(caps);
 		Assert.assertFalse(upload);
-		Assert.assertEquals(caps.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP), "/home/app.apk");
+		Assert.assertEquals(caps.getApp().get(), "/home/app.apk");
 	}
 
 	

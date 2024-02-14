@@ -4,15 +4,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.util.Arrays;
 
-import com.seleniumtests.ut.MockWebDriver;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -24,9 +23,8 @@ import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -43,7 +41,6 @@ import com.seleniumtests.uipage.htmlelements.select.NativeSelect;
 import com.seleniumtests.uipage.htmlelements.select.NgSelect;
 import com.seleniumtests.ut.core.runner.cucumber.PageForActions;
 
-@PrepareForTest({ WebUIDriver.class })
 public class TestSelectList2 extends MockitoTest {
 
 	@Mock
@@ -62,15 +59,6 @@ public class TestSelectList2 extends MockitoTest {
 	private WebElement element;
 
 	@Mock
-	private WebElement option1;
-
-	@Mock
-	private WebElement row1;
-
-	@Mock
-	private WebElement column1;
-
-	@Mock
 	private TargetLocator targetLocator;
 
 	@Mock
@@ -87,6 +75,8 @@ public class TestSelectList2 extends MockitoTest {
 
 	private CustomEventFiringWebDriver eventDriver;
 
+	private MockedStatic mockedWebUiDriver;
+
 	@BeforeMethod(groups = { "ut" })
 	private void init() throws IOException {
 
@@ -99,7 +89,7 @@ public class TestSelectList2 extends MockitoTest {
 
 		// add capabilities to allow augmenting driver
 		when(driver.getCapabilities()).thenReturn(new FirefoxOptions()); 
-		eventDriver = spy(new CustomEventFiringWebDriver(new MockWebDriver(driver)));
+		eventDriver = spy(new CustomEventFiringWebDriver(driver));
 
 		when(eventDriver.switchTo()).thenReturn(target);
 		when(driver.findElement(By.id("select"))).thenReturn(element);
@@ -115,11 +105,11 @@ public class TestSelectList2 extends MockitoTest {
 		when(alert.getText()).thenReturn("alert text");
 		when(driver.switchTo()).thenReturn(targetLocator);
 
-		PowerMockito.mockStatic(WebUIDriver.class);
-		when(WebUIDriver.getCurrentWebUiDriverName()).thenReturn("main");
-		when(WebUIDriver.getWebDriver(anyBoolean(), eq(BrowserType.FIREFOX), eq("main"), isNull()))
+		mockedWebUiDriver = mockStatic(WebUIDriver.class);
+		mockedWebUiDriver.when(() -> WebUIDriver.getCurrentWebUiDriverName()).thenReturn("main");
+		mockedWebUiDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean(), eq(BrowserType.FIREFOX), eq("main"), isNull()))
 				.thenReturn(eventDriver);
-		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
+		mockedWebUiDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
 		when(eventDriver.executeScript("if (document.readyState === \"complete\") { return \"ok\"; }"))
 				.thenReturn("ok");
 		when(eventDriver.getBrowserInfo()).thenReturn(new BrowserInfo(BrowserType.FIREFOX, "78.0"));
@@ -127,7 +117,11 @@ public class TestSelectList2 extends MockitoTest {
 				.thenReturn(screenshot);
 		when(screenshot.getHtmlSourcePath()).thenReturn("foo");
 
+	}
 
+	@AfterMethod(groups = {"ut"})
+	public void closeMocks() {
+		mockedWebUiDriver.close();
 	}
 	
 

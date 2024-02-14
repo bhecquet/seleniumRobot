@@ -18,19 +18,18 @@
 package com.seleniumtests.ut.uipage.htmlelements;
 
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Spy;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebElement;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -41,8 +40,6 @@ import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.uipage.htmlelements.Table;
 
-
-@PrepareForTest(WebUIDriver.class)
 public class TestTable extends MockitoTest {
 	
 	@Mock
@@ -66,11 +63,13 @@ public class TestTable extends MockitoTest {
 	private Table table = new Table("", By.id("table"));
 	
 	private List<WebElement> rowEl;
+
+	private MockedStatic mockedWebUIDriver;
 	
 	@BeforeMethod(groups={"ut"})
 	private void init() {
-		PowerMockito.mockStatic(WebUIDriver.class);
-		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
+		mockedWebUIDriver = mockStatic(WebUIDriver.class);
+		mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
 		when(driver.findElement(By.id("table"))).thenReturn(tableEl);
 		when(driver.switchTo()).thenReturn(locator);
 		
@@ -80,28 +79,36 @@ public class TestTable extends MockitoTest {
 		
 		when(tableEl.findElements(By.tagName("tr"))).thenReturn(rowEl);
 	}
-	
+
 	/**
 	 * Always check that findElement is called when accessing table
 	 */
-	@AfterMethod(groups={"ut"}) 
+	@AfterMethod(groups={"ut"}, alwaysRun = true)
 	public void checkTableRefresh() {
 		verify(table).findTableElement();
+		mockedWebUIDriver.close();
 	}
 
 	@Test(groups={"ut"})
 	public void testGetRows() throws Exception {
+		List<WebElement> list1 = new ArrayList<>();
+		list1.add(col1);
+		list1.add(col2);
+
+		doReturn(list1).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row1)));
+		doReturn(list1).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row2)));
+
 		Assert.assertEquals(table.getRows().size(), 2);
 	}
 	
 	@Test(groups={"ut"})
 	public void testGetColumns() throws Exception {
-		
-		List<WebElement> colEl = new ArrayList<>();
-		colEl.add(col1);
-		colEl.add(col2);
-		
-		when(table.getRowCells(row1)).thenReturn(colEl);
+		List<WebElement> list1 = new ArrayList<>();
+		list1.add(col1);
+		list1.add(col2);
+
+		doReturn(list1).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row1)));
+		doReturn(new ArrayList<>()).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row2)));
 		
 		Assert.assertEquals(table.getColumns().size(), 2);
 	}
@@ -115,14 +122,13 @@ public class TestTable extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testGetColumnsWithFirstEmptyRow() throws Exception {
-		
-		List<WebElement> colEl = new ArrayList<>();
-		colEl.add(col1);
-		colEl.add(col2);
-		
+		List<WebElement> list1 = new ArrayList<>();
+		list1.add(col1);
+		list1.add(col2);
 
-		when(table.getRowCells(row2)).thenReturn(colEl);
-		
+		doReturn(new ArrayList<>()).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row1)));
+		doReturn(list1).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row2)));
+
 		Assert.assertEquals(table.getColumns().size(), 2);
 	}
 

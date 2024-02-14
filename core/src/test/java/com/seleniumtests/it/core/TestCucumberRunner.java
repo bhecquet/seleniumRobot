@@ -32,7 +32,8 @@ import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.it.reporter.ReporterTest;
 
-public class TestCucumberRunner extends GenericMultiBrowserTest {
+public class
+TestCucumberRunner extends GenericMultiBrowserTest {
 
 
 	public TestCucumberRunner(WebDriver driver, DriverTestPage testPage) throws Exception {

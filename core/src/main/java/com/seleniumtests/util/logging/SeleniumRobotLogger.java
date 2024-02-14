@@ -48,14 +48,12 @@ import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 public class SeleniumRobotLogger {
 	
 	private static final String LOG_PATTERN = " %-5p %d [%t] %C{1}: %m%n";
 
 	private static final String FILE_APPENDER_NAME = "FileLogger";
-	private static final Pattern LOG_FILE_PATTERN = Pattern.compile(".*?\\d \\[([^\\]]+)\\](.*)");
 	private static Map<String, File> testLogs = Collections.synchronizedMap(new HashMap<>());
 	private static ThreadLocal<String> loggerNames = new ThreadLocal();
 	private static String outputDirectory;
@@ -149,11 +147,8 @@ public class SeleniumRobotLogger {
 				.newFilter("MarkerFilter", Filter.Result.DENY, Filter.Result.NEUTRAL)
 			    .addAttribute("marker", "FLOW"));
 
-		
 		builder.add(consoleAppenderBuilder);
-		
 
-		
 		RootLoggerComponentBuilder rootLogger;
 		// use System property instead of SeleniumTestsContext class as SeleniumrobotLogger class is used for grid extension package and 
         // we do not want to depend on "SeleniumTestsContext" class here
@@ -309,6 +304,7 @@ public class SeleniumRobotLogger {
 				continue;
 			}
 			for (Appender appender: loggerConfig.getAppenders().values()) {
+				System.out.println(String.format("Stopping appender %s for logger %s", loggerConfig.getName(), appender.getName()));
 				appender.stop();
 			}
 		}
@@ -316,7 +312,11 @@ public class SeleniumRobotLogger {
 		for (File file: FileUtils.listFiles(new File(defaultOutputDirectory),
 				FileFilterUtils.nameFileFilter("execution.log"),
 				TrueFileFilter.INSTANCE )) {
-			file.delete();
+			try {
+				Files.delete(file.toPath());
+			} catch (IOException e) {
+				getLogger(SeleniumRobotLogger.class).warn(String.format("Cannot delete %s: %s", file.getAbsolutePath(), e.getMessage()));
+			}
 		}
 	}
 	
@@ -334,9 +334,12 @@ public class SeleniumRobotLogger {
 			((LoggerContext)LogManager.getContext(false)).updateLoggers();
 
 		}
-		Path logFilePath = Paths.get(outputDirectory, SeleniumRobotLogger.LOG_FILE_NAME).toAbsolutePath();
-		if (logFilePath.toFile().exists()) {
-			Files.delete(logFilePath);
+		if (outputDirectory != null) {
+			Path logFilePath = Paths.get(outputDirectory, SeleniumRobotLogger.LOG_FILE_NAME).toAbsolutePath();
+			if (logFilePath.toFile().exists()) {
+				Files.delete(logFilePath);
+
+			}
 		}
 	}
 	

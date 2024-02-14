@@ -2,9 +2,7 @@ package com.seleniumtests.ut.uipage.htmlelements;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -15,13 +13,13 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebElement;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -35,7 +33,6 @@ import com.seleniumtests.uipage.htmlelements.ElementInfo;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.util.imaging.ImageProcessor;
 
-@PrepareForTest({ImageProcessor.class})
 public class TestElementInfo extends MockitoTest {
 
 	private static String JSON_INFO = "{" + 
@@ -137,10 +134,12 @@ public class TestElementInfo extends MockitoTest {
 	
 	@Mock
 	private BufferedImage image;
+
+	private MockedStatic mockedImageProcessor;
 	
 	@BeforeMethod(groups={"ut"})
 	private void init() throws Exception {
-		PowerMockito.mockStatic(ImageProcessor.class);
+		mockedImageProcessor = mockStatic(ImageProcessor.class);
 		
 		// delete all previously created information
 		ElementInfo.purgeAll();
@@ -162,12 +161,17 @@ public class TestElementInfo extends MockitoTest {
 		when(driver.executeScript(ElementInfo.JAVASCRIPT_GET_ATTRIBUTES, element)).thenReturn(attributes);
 		
 		when(driver.getScrollPosition()).thenReturn(new Point(10, 10));
-		PowerMockito.when(ImageProcessor.cropImage(any(BufferedImage.class), anyInt(), anyInt(), anyInt(), anyInt())).thenReturn(image);
-		PowerMockito.when(ImageProcessor.toBase64(image)).thenReturn("ABCD");
+		mockedImageProcessor.when(() -> ImageProcessor.cropImage(any(BufferedImage.class), anyInt(), anyInt(), anyInt(), anyInt())).thenReturn(image);
+		mockedImageProcessor.when(() -> ImageProcessor.toBase64(image)).thenReturn("ABCD");
 		
 		// remove elementInfo file that could have been created
 		File elementInfoPath = ElementInfo.buildElementInfoPath(htmlElement);
 		elementInfoPath.delete();
+	}
+
+	@AfterMethod(groups = {"ut"})
+	public void closeMocks() {
+		mockedImageProcessor.close();
 	}
 	
 	/**

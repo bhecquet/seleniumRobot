@@ -18,17 +18,11 @@
 package com.seleniumtests.it.reporter;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.mockito.MockedConstruction;
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
@@ -36,20 +30,12 @@ import org.testng.xml.XmlSuite.ParallelMode;
 import com.seleniumtests.connectors.tms.squash.SquashTMApi;
 import com.seleniumtests.connectors.tms.squash.SquashTMConnector;
 import com.seleniumtests.connectors.tms.squash.entities.Campaign;
-import com.seleniumtests.connectors.tms.squash.entities.CampaignFolder;
 import com.seleniumtests.connectors.tms.squash.entities.Iteration;
 import com.seleniumtests.connectors.tms.squash.entities.IterationTestPlanItem;
-import com.seleniumtests.connectors.tms.squash.entities.Project;
-import com.seleniumtests.connectors.tms.squash.entities.TestCase;
 import com.seleniumtests.connectors.tms.squash.entities.TestPlanItemExecution.ExecutionStatus;
-import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.contexts.TestManagerContext;
 import com.seleniumtests.customexception.ConfigurationException;
-import com.seleniumtests.reporter.reporters.CommonReporter;
 
-import kong.unirest.Unirest;
-
-@PrepareForTest({SquashTMConnector.class, Project.class, CampaignFolder.class, Campaign.class, Iteration.class, Unirest.class, TestCase.class, CommonReporter.class, SeleniumTestsContext.class})
 public class TestTestManagerReporter extends ReporterTest {
 
 
@@ -65,14 +51,12 @@ public class TestTestManagerReporter extends ReporterTest {
 	@Mock
 	private IterationTestPlanItem iterationTestPlanItem;
 	
+
 	private SquashTMConnector squash;
 	
 	@BeforeMethod(groups={"it"})
 	public void initTestManager() throws Exception {
 
-		squash = spy(new SquashTMConnector());
-		PowerMockito.whenNew(SquashTMConnector.class).withNoArguments().thenReturn(squash);
-		doReturn(api).when(squash).getApi();
 		when(api.createCampaign(anyString(), anyString())).thenReturn(campaign);
 		when(api.createIteration(any(Campaign.class), anyString())).thenReturn(iteration);
 		when(api.addTestCaseInIteration(eq(iteration), anyInt())).thenReturn(iterationTestPlanItem);
@@ -81,7 +65,11 @@ public class TestTestManagerReporter extends ReporterTest {
 	
 	@Test(groups={"it"})
 	public void testResultIsRecorded() throws Exception {
-		try {
+		try (MockedConstruction mockedSquash = mockConstruction(SquashTMConnector.class,
+				withSettings().defaultAnswer(CALLS_REAL_METHODS),
+				(mock, context) -> {
+			doReturn(api).when(mock).getApi();
+		})) {
 			System.setProperty(TestManagerContext.TMS_TYPE, "squash");
 			System.setProperty(TestManagerContext.TMS_URL, "http://localhost:1234");
 			System.setProperty(TestManagerContext.TMS_PROJECT, "Project");
@@ -107,13 +95,16 @@ public class TestTestManagerReporter extends ReporterTest {
 	
 	@Test(groups={"it"})
 	public void testResultIsNotRecordedServerUnavailable() throws Exception {
-		try {
+		try (MockedConstruction mockedSquash = mockConstruction(SquashTMConnector.class,
+				withSettings().defaultAnswer(CALLS_REAL_METHODS),
+				(mock, context) -> {
+					doThrow(new ConfigurationException("Cannot contact Squash TM server API")).when(mock).getApi();
+				})) {
 			System.setProperty(TestManagerContext.TMS_TYPE, "squash");
 			System.setProperty(TestManagerContext.TMS_URL, "http://localhost:1234");
 			System.setProperty(TestManagerContext.TMS_PROJECT, "Project");
 			System.setProperty(TestManagerContext.TMS_USER, "squash");
 			System.setProperty(TestManagerContext.TMS_PASSWORD, "squash");
-			doThrow(new ConfigurationException("Cannot contact Squash TM server API")).when(squash).getApi();
 			
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
 			
@@ -131,7 +122,11 @@ public class TestTestManagerReporter extends ReporterTest {
 	
 	@Test(groups={"it"})
 	public void testResultIsNotRecordedServerNotConfigured() throws Exception {
-		try {
+		try (MockedConstruction mockedSquash = mockConstruction(SquashTMConnector.class,
+				withSettings().defaultAnswer(CALLS_REAL_METHODS),
+				(mock, context) -> {
+					doReturn(api).when(mock).getApi();
+				})) {
 			System.setProperty(TestManagerContext.TMS_URL, "http://localhost:1234");
 			System.setProperty(TestManagerContext.TMS_PROJECT, "Project");
 			System.setProperty(TestManagerContext.TMS_USER, "squash");
@@ -140,7 +135,7 @@ public class TestTestManagerReporter extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
 			
 			// check we do not try to access squash
-			verify(squash, never()).getApi();
+			Assert.assertEquals(mockedSquash.constructed().size(), 0);
 			
 		} finally {
 			System.clearProperty(TestManagerContext.TMS_TYPE);
@@ -153,15 +148,18 @@ public class TestTestManagerReporter extends ReporterTest {
 	
 	@Test(groups={"it"})
 	public void testResultIsNotRecordedWrongTestId() throws Exception {
-		try {
+		try (MockedConstruction mockedSquash = mockConstruction(SquashTMConnector.class,
+				withSettings().defaultAnswer(CALLS_REAL_METHODS),
+				(mock, context) -> {
+					doReturn(api).when(mock).getApi();
+					doThrow(new ConfigurationException("Wrong Test ID")).when(api).addTestCaseInIteration(eq(iteration), anyInt());
+				})) {
 			System.setProperty(TestManagerContext.TMS_TYPE, "squash");
 			System.setProperty(TestManagerContext.TMS_URL, "http://localhost:1234");
 			System.setProperty(TestManagerContext.TMS_PROJECT, "Project");
 			System.setProperty(TestManagerContext.TMS_USER, "squash");
 			System.setProperty(TestManagerContext.TMS_PASSWORD, "squash");
-			
-			doThrow(new ConfigurationException("Wrong Test ID")).when(api).addTestCaseInIteration(eq(iteration), anyInt());
-			
+
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
 			
 			// check no result has been recorded

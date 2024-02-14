@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.ut.browserfactory;
 
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -26,14 +27,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.remote.CapabilityType;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -50,7 +51,6 @@ import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.osutility.OSUtilityWindows;
 
 // TODO: enable test on linux platform using mocks
-@PrepareForTest({OSUtility.class, OSUtilityFactory.class})
 public class TestSafariCapabilityFactory extends MockitoTest {
 
 	@Mock
@@ -61,6 +61,9 @@ public class TestSafariCapabilityFactory extends MockitoTest {
 	
 	@Mock
 	private OSUtilityWindows osUtility;
+
+	private MockedStatic mockedOsUtility;
+	private MockedStatic mockedOsUtilityFactory;
 	
 	@BeforeMethod(groups= {"ut"})
 	public void init() {
@@ -68,12 +71,12 @@ public class TestSafariCapabilityFactory extends MockitoTest {
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
 		browserInfos.put(BrowserType.SAFARI, Arrays.asList(new BrowserInfo(BrowserType.SAFARI, "7.2", "", false)));
 
-		PowerMockito.mockStatic(OSUtility.class);
-		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
-		PowerMockito.when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
-		
-		PowerMockito.mockStatic(OSUtilityFactory.class);
-		PowerMockito.when(OSUtilityFactory.getInstance()).thenReturn(osUtility);
+		mockedOsUtility = mockStatic(OSUtility.class);
+		mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
+		mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
+
+		mockedOsUtilityFactory = mockStatic(OSUtilityFactory.class);
+		mockedOsUtilityFactory.when(() -> OSUtilityFactory.getInstance()).thenReturn(osUtility);
 		
 		when(osUtility.getProgramExtension()).thenReturn(".exe");
 		when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.NONE));
@@ -81,6 +84,12 @@ public class TestSafariCapabilityFactory extends MockitoTest {
 		when(config.getBrowserType()).thenReturn(BrowserType.SAFARI);
 		when(config.isSetAcceptUntrustedCertificates()).thenReturn(true);
 		
+	}
+
+	@AfterMethod(groups = "ut", alwaysRun = true)
+	private void closeMocks() {
+		mockedOsUtilityFactory.close();
+		mockedOsUtility.close();
 	}
 	
 	/**

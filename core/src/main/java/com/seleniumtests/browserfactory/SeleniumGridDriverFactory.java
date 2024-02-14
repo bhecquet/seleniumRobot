@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import io.appium.java_client.remote.options.BaseOptions;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.SessionNotCreatedException;
 import org.openqa.selenium.WebDriver;
@@ -49,7 +50,6 @@ import com.seleniumtests.util.helper.WaitHelper;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
-import io.appium.java_client.remote.MobileCapabilityType;
 
 public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
 	
@@ -61,12 +61,27 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 	private static AtomicInteger counter = new AtomicInteger(0); // a global counter counting times where we never get matching nodes
 
     public SeleniumGridDriverFactory(final DriverConfig cfg) {
+		this(cfg, true);
+	}
+
+	public List<SeleniumGridConnector> getGridConnectors() {
+		return gridConnectors;
+	}
+
+	/**
+	 *
+	 * @param cfg
+	 * @param shuffle	if true, grid connector list will be shuffled so that it's not the same hub that gets driver
+	 */
+    public SeleniumGridDriverFactory(final DriverConfig cfg, boolean shuffle) {
         super(cfg);
         gridConnectors = new ArrayList<>(SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnectors());
         instanceRetryTimeout = retryTimeout;
         
         // reorder list so that we do not always use the same grid for connection
-        Collections.shuffle(gridConnectors);
+		if (shuffle) {
+			Collections.shuffle(gridConnectors);
+		}
     }    
 
 	@Override
@@ -109,11 +124,11 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
      * OS version is only updated for mobile. It has no real sense on desktop
      * @return
      */
-    public DesiredCapabilities createSpecificGridCapabilities(DriverConfig webDriverConfig) {
-    	DesiredCapabilities capabilities = new DesiredCapabilities();
+    public MutableCapabilities createSpecificGridCapabilities(DriverConfig webDriverConfig) {
+    	MutableCapabilities capabilities = new MutableCapabilities();
     	
     	if (SeleniumTestsContextManager.isMobileTest()) {
-    		capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.PLATFORM_VERSION, webDriverConfig.getMobilePlatformVersion());
+			capabilities = new BaseOptions(capabilities).setPlatformVersion(webDriverConfig.getMobilePlatformVersion());
     	} else {
     		capabilities.setCapability(CapabilityType.PLATFORM_NAME, webDriverConfig.getPlatform().toLowerCase());
     		if (webDriverConfig.getBrowserVersion() != null && capabilities.getCapability(CapabilityType.BROWSER_VERSION) == null) {
@@ -141,7 +156,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
         // app must be uploaded before driver creation because driver will need it in mobile app testing
         // upload file on all available grids as we don't know which one will be chosen before driver has been created
         for (SeleniumGridConnector gridConnector: gridConnectors) {
-        	gridConnector.uploadMobileApp(capabilities);
+			capabilities = gridConnector.uploadMobileApp(capabilities);
         }
 
         // connection to grid is made here
@@ -183,7 +198,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
         throw new SessionNotCreatedException("Session not created on any grid hub, after 3 tries");
     }
     
-    private WebDriver getDriverInstance(URL hubUrl, MutableCapabilities capabilities) {
+    public WebDriver getDriverInstance(URL hubUrl, MutableCapabilities capabilities) {
 		if (SeleniumTestsContextManager.isDesktopWebTest()) {
 		        return new RemoteWebDriver(hubUrl, capabilities);
 		} else if (SeleniumTestsContextManager.isMobileTest()) {
@@ -313,5 +328,12 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 
 	public static int getCounter() {
 		return counter.get();
+	}
+
+	/**
+	 * For tests
+	 */
+	public static void resetCounter() {
+		counter.set(0);
 	}
 }

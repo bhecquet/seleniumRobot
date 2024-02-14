@@ -39,7 +39,7 @@
 		<dependency>
 		  <groupId>com.deque.html.axe-core</groupId>
 		  <artifactId>selenium</artifactId>
-		  <version>4.7.0</version>
+		  <version>4.8.0</version>
 		</dependency>
 		<dependency>
 		  <groupId>com.eatthepath</groupId>
@@ -93,7 +93,7 @@
             <artifactId>java-client</artifactId>
         </dependency>
         <dependency>
-		  <groupId>com.vdurmont</groupId>
+		  <groupId>org.semver4j</groupId>
 		  <artifactId>semver4j</artifactId>
 		</dependency>
 		<dependency>
@@ -170,8 +170,8 @@
 		</dependency>
 		<dependency>
 			<groupId>com.sun.mail</groupId>
-			<artifactId>javax.mail</artifactId>
-			<version>1.6.2</version>
+			<artifactId>jakarta.mail</artifactId>
+			<version>2.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jsoup</groupId>
@@ -309,26 +309,27 @@
         </dependency>
         <dependency> 
 	      <groupId>org.mockito</groupId>
-	      <artifactId>mockito-core</artifactId>
-	      <version>3.12.4</version>
+	      <artifactId>mockito-inline</artifactId>
+	      <version>4.11.0</version>
 	      <scope>test</scope>
 	    </dependency>
-	   <dependency>
-	      <groupId>org.powermock</groupId>
-	      <artifactId>powermock-api-mockito2</artifactId>
-	      <version>${powermock.version}</version>
-	      <scope>test</scope>
-	   </dependency>
-	   <dependency>
-	      <groupId>org.powermock</groupId>
-	      <artifactId>powermock-module-testng</artifactId>
-	      <version>${powermock.version}</version>
-	      <scope>test</scope>
-	   </dependency>
-        <dependency>
-			<groupId>org.seleniumhq.selenium</groupId>
-			<artifactId>jetty-repacked</artifactId>
-			<version>9.4.12.v20180830.1</version>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-testng</artifactId>
+			<version>0.5.2</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>9.4.45.v20220203</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-servlet</artifactId>
+			<version>9.4.45.v20220203</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- needed for offline instrumentation. Offline is used because tests using powermockito are not correctly analyzed due to https://github.com/powermock/powermock/issues/727 -->

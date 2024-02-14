@@ -413,7 +413,7 @@ public class ReporterControler implements IReporter {
 	
 	/**
 	 * Delete all files in html and screenshot folders that are not directly references by test steps in current result
-	 * @param resultSet
+	 * @param currentResult
 	 */
 	private void cleanAttachments(ITestResult currentResult) {
 

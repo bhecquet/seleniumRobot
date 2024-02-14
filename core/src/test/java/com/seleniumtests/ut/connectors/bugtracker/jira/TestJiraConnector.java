@@ -3,12 +3,7 @@ package com.seleniumtests.ut.connectors.bugtracker.jira;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.net.URI;
@@ -20,13 +15,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.mockito.MockedConstruction;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -77,15 +71,11 @@ import com.seleniumtests.reporter.logger.TestStep;
 
 import io.atlassian.util.concurrent.Promise;
 
-@PrepareForTest({JiraConnector.class})
 public class TestJiraConnector extends MockitoTest {
 	
 	public TestJiraConnector() throws Exception {
 		// nothing to do
 	}
-
-	@Mock
-	private AsynchronousJiraRestClientFactory restClientFactory;
 	
 	@Mock
     private JiraRestClient restClient;
@@ -204,6 +194,8 @@ public class TestJiraConnector extends MockitoTest {
 	private TestStep stepWithErrorCause;
 	private TestStep stepEnd;
 
+	private MockedConstruction mockedRestClient;
+
 	@BeforeMethod(groups={"ut"})
 	public void initJira() throws Exception {
 		Map<String, URI> avatars = new HashMap<>();
@@ -253,9 +245,10 @@ public class TestJiraConnector extends MockitoTest {
 		stepEnd.setPosition(2);
 		
 		// mock all clients
-		PowerMockito.whenNew(AsynchronousJiraRestClientFactory.class).withNoArguments().thenReturn(restClientFactory);
-		when(restClientFactory.createWithBasicHttpAuthentication(any(URI.class), eq("user"), eq("password"))).thenReturn(restClient);
-		
+		mockedRestClient = mockConstruction(AsynchronousJiraRestClientFactory.class, (restClientFactory, context) -> {
+			when(restClientFactory.createWithBasicHttpAuthentication(any(URI.class), eq("user"), eq("password"))).thenReturn(restClient);
+		});
+
 		when(restClient.getProjectClient()).thenReturn(projectRestClient);
 		when(projectRestClient.getProject(anyString())).thenReturn(promiseProject);
 		when(promiseProject.claim()).thenReturn(project);
@@ -314,6 +307,11 @@ public class TestJiraConnector extends MockitoTest {
 		
 		jiraOptions.put("bugtracker.jira.openStates", "Open,To Do");
 		jiraOptions.put("bugtracker.jira.closeTransition", "close");
+	}
+
+	@AfterMethod(groups={"ut"}, alwaysRun = true)
+	private void closeMocks() {
+		mockedRestClient.close();
 	}
 
 	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class)

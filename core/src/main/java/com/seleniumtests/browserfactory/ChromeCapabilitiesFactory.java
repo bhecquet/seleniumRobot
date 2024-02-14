@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+import io.appium.java_client.android.options.UiAutomator2Options;
+import io.appium.java_client.android.options.context.SupportsChromedriverExecutableOption;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -36,11 +38,6 @@ import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.logging.DebugMode;
 
-import io.appium.java_client.remote.AndroidMobileCapabilityType;
-
-/**
- * See common flags: https://github.com/GoogleChrome/chrome-launcher/blob/main/docs/chrome-flags-for-tools.md
- */
 public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 
 	private static final String USER_DATA_DIR_OPTION = "--user-data-dir=";
@@ -52,8 +49,8 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 	/**
 	 * Create capabilities for mobile chrome
 	 */
-	public DesiredCapabilities createMobileCapabilities(final DriverConfig webDriverConfig) {
-		DesiredCapabilities capabilities = new DesiredCapabilities();
+	public MutableCapabilities createMobileCapabilities(final DriverConfig webDriverConfig) {
+		UiAutomator2Options capabilities = new UiAutomator2Options();
 		ChromeOptions options = new ChromeOptions();
         if (webDriverConfig.getUserAgentOverride() != null) {
             options.addArguments("--user-agent=" + webDriverConfig.getUserAgentOverride());
@@ -76,17 +73,17 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
         capabilities.setCapability(ChromeOptions.CAPABILITY, options);
         
         // TEST_MOBILE
-        capabilities.setCapability(AndroidMobileCapabilityType.NATIVE_WEB_SCREENSHOT, true);
+		capabilities.setNativeWebScreenshot(true);
         // TEST_MOBILE
         
         if (webDriverConfig.getMode() == DriverMode.LOCAL) {
-        	capabilities.setCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, System.getProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY));
-        	
+			capabilities.setChromedriverExecutable(System.getProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY));
+
         	// driver logging
         	setLogging();
         }
         
-        return capabilities;
+        return new MutableCapabilities(capabilities);
 	}
 	
 	private void setLogging() {

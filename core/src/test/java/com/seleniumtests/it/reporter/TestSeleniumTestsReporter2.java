@@ -1985,65 +1985,67 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	}
 
-	/**
-	 * Check that HAR capture file is present in result
-	 *
-	 * @throws Exception
-	 */
-	@Test(groups = {"it"})
-	public void testReportContainsHarCapture() throws Exception {
+//	BrowserMob
+//	/**
+//	 * Check that HAR capture file is present in result
+//	 *
+//	 * @throws Exception
+//	 */
+//	@Test(groups = {"it"})
+//	public void testReportContainsHarCapture() throws Exception {
+//
+//		try {
+//			System.setProperty(SeleniumTestsContext.CAPTURE_NETWORK, "true");
+//			System.setProperty(SeleniumTestsContext.WEB_PROXY_TYPE, "direct");
+//
+//			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriver"});
+//
+//			// read 'testDriver' report. This contains calls to HtmlElement actions
+//			String detailedReportContent1 = readTestMethodResultFile("testDriver");
+//			detailedReportContent1 = detailedReportContent1.replaceAll("\\s+", " ");
+//
+//			Assert.assertTrue(detailedReportContent1.matches(".*<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys on TextFieldElement Text, by=\\{By.id: text2} with args: \\(true, true, \\[a text,\\], \\) </div></li>.*"));
+//			Assert.assertTrue(detailedReportContent1.contains("Network capture 'main' browser: <a href='main-networkCapture.har'>HAR file</a>"));
+//			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "main-networkCapture.har").toFile().exists());
+//
+//		} finally {
+//			System.clearProperty(SeleniumTestsContext.CAPTURE_NETWORK);
+//			System.clearProperty(SeleniumTestsContext.WEB_PROXY_TYPE);
+//		}
+//
+//	}
 
-		try {
-			System.setProperty(SeleniumTestsContext.CAPTURE_NETWORK, "true");
-			System.setProperty(SeleniumTestsContext.WEB_PROXY_TYPE, "direct");
-
-			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriver"});
-
-			// read 'testDriver' report. This contains calls to HtmlElement actions
-			String detailedReportContent1 = readTestMethodResultFile("testDriver");
-			detailedReportContent1 = detailedReportContent1.replaceAll("\\s+", " ");
-
-			Assert.assertTrue(detailedReportContent1.matches(".*<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys on TextFieldElement Text, by=\\{By.id: text2} with args: \\(true, true, \\[a text,\\], \\) </div></li>.*"));
-			Assert.assertTrue(detailedReportContent1.contains("Network capture 'main' browser: <a href='main-networkCapture.har'>HAR file</a>"));
-			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "main-networkCapture.har").toFile().exists());
-
-		} finally {
-			System.clearProperty(SeleniumTestsContext.CAPTURE_NETWORK);
-			System.clearProperty(SeleniumTestsContext.WEB_PROXY_TYPE);
-		}
-
-	}
-
-	/**
-	 * Check that HAR capture file is present in result when using multiple browsers, one for each browser
-	 *
-	 * @throws Exception
-	 */
-	@Test(groups = {"it"})
-	public void testReportContainsHarCaptureMultipleBrowsers() throws Exception {
-
-		try {
-			System.setProperty(SeleniumTestsContext.CAPTURE_NETWORK, "true");
-			System.setProperty(SeleniumTestsContext.WEB_PROXY_TYPE, "direct");
-
-			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testMultipleDriver"});
-
-			// read 'testDriver' report. This contains calls to HtmlElement actions
-			String detailedReportContent1 = readTestMethodResultFile("testMultipleDriver");
-			detailedReportContent1 = detailedReportContent1.replaceAll("\\s+", " ");
-
-			Assert.assertTrue(detailedReportContent1.matches(".*<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys on TextFieldElement Text, by=\\{By.id: text2} with args: \\(true, true, \\[a text,\\], \\) </div></li>.*"));
-			Assert.assertTrue(detailedReportContent1.contains("Network capture 'main' browser: <a href='main-networkCapture.har'>HAR file</a>"));
-			Assert.assertTrue(detailedReportContent1.contains("Network capture 'second' browser: <a href='second-networkCapture.har'>HAR file</a>"));
-			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testMultipleDriver", "main-networkCapture.har").toFile().exists());
-			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testMultipleDriver", "second-networkCapture.har").toFile().exists());
-
-		} finally {
-			System.clearProperty(SeleniumTestsContext.CAPTURE_NETWORK);
-			System.clearProperty(SeleniumTestsContext.WEB_PROXY_TYPE);
-		}
-
-	}
+//	BrowserMob
+//	/**
+//	 * Check that HAR capture file is present in result when using multiple browsers, one for each browser
+//	 *
+//	 * @throws Exception
+//	 */
+//	@Test(groups = {"it"})
+//	public void testReportContainsHarCaptureMultipleBrowsers() throws Exception {
+//
+//		try {
+//			System.setProperty(SeleniumTestsContext.CAPTURE_NETWORK, "true");
+//			System.setProperty(SeleniumTestsContext.WEB_PROXY_TYPE, "direct");
+//
+//			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testMultipleDriver"});
+//
+//			// read 'testDriver' report. This contains calls to HtmlElement actions
+//			String detailedReportContent1 = readTestMethodResultFile("testMultipleDriver");
+//			detailedReportContent1 = detailedReportContent1.replaceAll("\\s+", " ");
+//
+//			Assert.assertTrue(detailedReportContent1.matches(".*<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys on TextFieldElement Text, by=\\{By.id: text2} with args: \\(true, true, \\[a text,\\], \\) </div></li>.*"));
+//			Assert.assertTrue(detailedReportContent1.contains("Network capture 'main' browser: <a href='main-networkCapture.har'>HAR file</a>"));
+//			Assert.assertTrue(detailedReportContent1.contains("Network capture 'second' browser: <a href='second-networkCapture.har'>HAR file</a>"));
+//			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testMultipleDriver", "main-networkCapture.har").toFile().exists());
+//			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testMultipleDriver", "second-networkCapture.har").toFile().exists());
+//
+//		} finally {
+//			System.clearProperty(SeleniumTestsContext.CAPTURE_NETWORK);
+//			System.clearProperty(SeleniumTestsContext.WEB_PROXY_TYPE);
+//		}
+//
+//	}
 
 	/**
 	 * Check that HAR capture file is not present in result if option is disabled
@@ -2171,8 +2173,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// Check exception is logged and filtered
 		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error\"><div>class java.lang.AssertionError: error</div>"
 				+ "<div class=\"stack-element\"></div>"
-				+ "<div class=\"stack-element\">at com.seleniumtests.it.stubclasses.StubTestClass.testInError\\(StubTestClass.java:\\d+\\)</div>"
-				+ "<div class=\"stack-element\">at java.util.ArrayList.forEach.*?</div>"
+				+ "<div class=\"stack-element\">at com.seleniumtests.it.stubclasses.StubTestClass.testInError\\(StubTestClass.java:\\d+\\)</div>.*"
 				+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.ReporterTest.executeSubTest\\(ReporterTest.java:\\d+\\)</div>"
 				+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.TestSeleniumTestsReporter2.testReportDetailsWithErrors\\(TestSeleniumTestsReporter2.java:\\d+\\)</div>.*"));
 

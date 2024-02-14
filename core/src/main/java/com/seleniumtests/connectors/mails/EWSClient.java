@@ -28,8 +28,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.mail.MessagingException;
-
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 
@@ -173,7 +171,7 @@ public class EWSClient extends EmailClientImpl {
 	 * 
 	 * @param folderName		folder to read
 	 * @param firstMessageTime	date from which we should get messages
-	 * @throws MessagingException
+	 * @throws jakarta.mail.MessagingException
 	 * @throws IOException
 	 */
 	@Override

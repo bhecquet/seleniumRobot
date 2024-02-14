@@ -18,11 +18,7 @@
 package com.seleniumtests.it.core;
 
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -43,8 +39,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.mockito.MockedConstruction;
+import org.mockito.MockedStatic;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.TestNG;
@@ -67,13 +63,9 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.reporter.ReporterTest;
 import com.seleniumtests.it.stubclasses.StubTestClassForDriverParallelTest;
 
-@PrepareForTest({SeleniumRobotVariableServerConnector.class, SeleniumGridConnectorFactory.class, SeleniumRobotServerContext.class, SeleniumTestsContext.class, WebUIDriver.class})
 public class TestSeleniumRobotTestListener extends ReporterTest {
 
 	private static final String DRIVER_BLOCKED_MSG = "Driver creation forbidden before @BeforeMethod and after @AfterMethod execution";
-	
-	@Mock
-	private SeleniumRobotVariableServerConnector variableServer;
 	
 	@Mock
 	private SeleniumGridConnector gridConnector;
@@ -124,21 +116,26 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	@Test(groups={"it"})
 	public void testWithRetry(ITestContext testContext) throws Exception {
 		
-		try {
+		try (MockedConstruction mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+			when(variableServer.isAlive()).thenReturn(true);
+		})) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "2");
-			
-			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null)).thenReturn(variableServer);
-			when(variableServer.isAlive()).thenReturn(true);
-			
 
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testFailedWithException"});
-			
+			SeleniumRobotVariableServerConnector variableServer = (SeleniumRobotVariableServerConnector) mockedVariableServer.constructed().get(0);
+
 			// check get variables has been called once for each retry
-			verify(variableServer, times(3)).getVariables(0, -1);
-			verify(variableServer, times(3)).unreserveVariables(anyList());
-			
+			// the fact that it's not the same instance that reserve variable and unreserve them is due to init of variable server in @Before methods
+			// and variableServer instances are not reused
+			verify((SeleniumRobotVariableServerConnector) mockedVariableServer.constructed().get(0)).getVariables(0, -1);
+			verify((SeleniumRobotVariableServerConnector) mockedVariableServer.constructed().get(3)).getVariables(0, -1);
+			verify((SeleniumRobotVariableServerConnector) mockedVariableServer.constructed().get(6)).getVariables(0, -1);
+			verify((SeleniumRobotVariableServerConnector) mockedVariableServer.constructed().get(2)).unreserveVariables(anyList());
+			verify((SeleniumRobotVariableServerConnector) mockedVariableServer.constructed().get(5)).unreserveVariables(anyList());
+			verify((SeleniumRobotVariableServerConnector) mockedVariableServer.constructed().get(8)).unreserveVariables(anyList());
+
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
@@ -220,15 +217,15 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	@Test(groups={"it"})
 	public void testWithoutRetry(ITestContext testContext) throws Exception {
 		
-		try {
+		try (MockedConstruction mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+			when(variableServer.isAlive()).thenReturn(true);
+		})) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
 			
-			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withArguments(eq(true), eq("http://localhost:1234"), eq("testFailedWithException"), eq(null)).thenReturn(variableServer);
-			when(variableServer.isAlive()).thenReturn(true);
-			
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testFailedWithException"});
+			SeleniumRobotVariableServerConnector variableServer = (SeleniumRobotVariableServerConnector) mockedVariableServer.constructed().get(0);
 			
 			// check get variables has been called once for each retry
 			verify(variableServer).getVariables(0, -1);
@@ -377,7 +374,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener3-1/PERF-result.xml"), 1);
 		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener4/PERF-result.xml"), 1);
 		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener1-1/PERF-result.xml"), 1);
-		Assert.assertEquals(StringUtils.countMatches(logs, "SeleniumTestReport.html"), 10); // 1 per executed test + 1 for final generation
+		Assert.assertEquals(StringUtils.countMatches(logs, "SeleniumTestReport.html"), 11); // 1 per executed test + 1 for final generation
 	}
 	
 	@Test(groups={"it"})
@@ -404,7 +401,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener3-1/PERF-result.xml"), 1);
 		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener4/PERF-result.xml"), 1);
 		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener1-1/PERF-result.xml"), 1);
-		Assert.assertEquals(StringUtils.countMatches(logs, "SeleniumTestReport.html"), 10); // 1 per executed test + 1 for final generation
+		Assert.assertEquals(StringUtils.countMatches(logs, "SeleniumTestReport.html"), 11); // 1 per executed test + 1 for final generation
 	}
 	
 	@Test(groups={"it"})
@@ -431,7 +428,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener3-1/PERF-result.xml"), 1);
 		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener4/PERF-result.xml"), 1);
 		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener1-1/PERF-result.xml"), 1);
-		Assert.assertEquals(StringUtils.countMatches(logs, "SeleniumTestReport.html"), 10); // 1 per executed test + 1 for final generation
+		Assert.assertEquals(StringUtils.countMatches(logs, "SeleniumTestReport.html"), 11); // 1 per executed test + 1 for final generation
 	}
 	
 	/**
@@ -718,13 +715,12 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	@Test(groups={"it"})
 	public void testRetriedWithSocketTimeoutError() throws Exception {
 		
-		try {
+		try (MockedStatic mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/wd/hub");
-			
-			PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
-			PowerMockito.when(SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/wd/hub"))).thenReturn(Arrays.asList(gridConnector));
+
+			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/wd/hub"))).thenReturn(Arrays.asList(gridConnector));
 			
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.NONE, new String[] {"testWithSocketTimeoutOnFirstExec"});
 			
@@ -746,13 +742,12 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	@Test(groups={"it"})
 	public void testNotRetriedWithAnyError() throws Exception {
 		
-		try {
+		try (MockedStatic mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/wd/hub");
-			
-			PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
-			PowerMockito.when(SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/wd/hub"))).thenReturn(Arrays.asList(gridConnector));
+
+			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/wd/hub"))).thenReturn(Arrays.asList(gridConnector));
 			
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.NONE, new String[] {"testWithExceptionOnFirstExec"});
 			
@@ -800,11 +795,11 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	@Test(groups={"it"})
 	public void testDriverNameResetAtStart(ITestContext testContext) throws Exception {
 
-		PowerMockito.mockStatic(WebUIDriver.class);
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.NONE, new String[] {"testAndSubActions"});
+		try (MockedStatic mockedWebUiDriver = mockStatic(WebUIDriver.class)) {
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.NONE, new String[]{"testAndSubActions"});
 
-		PowerMockito.verifyStatic(WebUIDriver.class, times(1));
-		WebUIDriver.resetCurrentWebUiDriverName();
+			mockedWebUiDriver.verify(() -> WebUIDriver.resetCurrentWebUiDriverName());
+		}
 		
 	}
 	

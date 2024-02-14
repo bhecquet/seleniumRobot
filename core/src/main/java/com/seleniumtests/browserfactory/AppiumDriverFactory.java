@@ -20,7 +20,10 @@ package com.seleniumtests.browserfactory;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Optional;
 
+import io.appium.java_client.android.options.UiAutomator2Options;
+import io.appium.java_client.ios.options.XCUITestOptions;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.CapabilityType;
@@ -36,9 +39,6 @@ import com.seleniumtests.util.FileUtility;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
-import io.appium.java_client.remote.AndroidMobileCapabilityType;
-import io.appium.java_client.remote.IOSMobileCapabilityType;
-import io.appium.java_client.remote.MobileCapabilityType;
 
 public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
 
@@ -50,12 +50,12 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
     }
     
     private void extractAndroidDriver(MutableCapabilities capabilities) {
-    	String chromeDriverFile = (String)capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE);
-		if (chromeDriverFile != null) {
+		Optional<String> chromeDriverFile = ((UiAutomator2Options)capabilities).getChromedriverExecutable();
+		if (chromeDriverFile.isPresent() &&  chromeDriverFile.get() != null) {
 			String driverPath;
 			try {
-				driverPath = FileUtility.decodePath(new DriverExtractor().extractDriver(chromeDriverFile));
-				capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, driverPath);
+				driverPath = FileUtility.decodePath(new DriverExtractor().extractDriver(chromeDriverFile.get()));
+				((UiAutomator2Options)capabilities).setChromedriverExecutable(driverPath);
 			} catch (UnsupportedEncodingException e) {
 				logger.error("cannot get driver path", e);
 			}
@@ -103,10 +103,17 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
 				}
 				
 				if (capabilities.getCapability(CapabilityType.PLATFORM_NAME).toString().equalsIgnoreCase(ANDROID_PLATORM)) {
-					capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.DEVICE_NAME, webDriverConfig.getDeviceId());
+					UiAutomator2Options androidCaps = new UiAutomator2Options(capabilities);
+					androidCaps.setDeviceName(webDriverConfig.getDeviceId());
+
+					return androidCaps;
 				} else { // iOS
-					capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + IOSMobileCapabilityType.XCODE_CONFIG_FILE, (String)null); // remove this capability as it may not be accurate
-					capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.UDID, webDriverConfig.getDeviceId());
+					XCUITestOptions iosCaps = new XCUITestOptions(capabilities);
+					iosCaps.setUdid(webDriverConfig.getDeviceId());
+
+					return iosCaps;
+					//capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + IOSMobileCapabilityType.XCODE_CONFIG_FILE, (String)null); // remove this capability as it may not be accurate
+
 				}
 			} else {
 				throw e;

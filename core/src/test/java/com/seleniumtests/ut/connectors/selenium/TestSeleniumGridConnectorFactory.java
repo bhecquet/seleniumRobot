@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -42,7 +41,6 @@ import kong.unirest.GetRequest;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
 
-@PrepareForTest({Unirest.class})
 public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 	
 	@Mock

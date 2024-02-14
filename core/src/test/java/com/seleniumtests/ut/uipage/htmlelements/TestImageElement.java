@@ -18,15 +18,14 @@
 package com.seleniumtests.ut.uipage.htmlelements;
 
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.*;
 
 import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.MockedStatic;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebElement;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -35,8 +34,6 @@ import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.uipage.htmlelements.ImageElement;
 
-
-@PrepareForTest(WebUIDriver.class)
 public class TestImageElement extends MockitoTest {
 	
 	@Mock
@@ -50,20 +47,21 @@ public class TestImageElement extends MockitoTest {
 
 	@Test(groups={"ut"})
 	public void testImageElement() throws Exception {
-		PowerMockito.mockStatic(WebUIDriver.class);
-		Mockito.when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
-		Mockito.when(driver.findElement(By.id("img"))).thenReturn(element);
-		Mockito.when(driver.switchTo()).thenReturn(locator);
-		Mockito.when(element.getSize()).thenReturn(new Dimension(10,10));
-		Mockito.when(element.getDomAttribute("src")).thenReturn("http://nowhere.com/jpg");
-		
-		ImageElement el = Mockito.spy(new ImageElement("image", By.id("img")));
-	
-		Assert.assertEquals(el.getHeight(), 10);
-		Assert.assertEquals(el.getWidth(), 10);
-		Assert.assertEquals(el.getUrl(), "http://nowhere.com/jpg");
-		
-		// check we called getDriver before using it
-		PowerMockito.verifyPrivate(el, Mockito.times(3)).invoke("updateDriver");
+		try (MockedStatic mockedWebUIDriver = mockStatic(WebUIDriver.class)) {
+			mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
+			when(driver.findElement(By.id("img"))).thenReturn(element);
+			when(driver.switchTo()).thenReturn(locator);
+			when(element.getSize()).thenReturn(new Dimension(10, 10));
+			when(element.getDomAttribute("src")).thenReturn("http://nowhere.com/jpg");
+
+			ImageElement el = spy(new ImageElement("image", By.id("img")));
+
+			Assert.assertEquals(el.getHeight(), 10);
+			Assert.assertEquals(el.getWidth(), 10);
+			Assert.assertEquals(el.getUrl(), "http://nowhere.com/jpg");
+
+			// check we called getDriver before using it
+			verify(el, times(3)).updateDriver();
+		}
 	}
 }

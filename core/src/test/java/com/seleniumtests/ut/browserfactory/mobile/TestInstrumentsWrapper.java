@@ -17,14 +17,14 @@
  */
 package com.seleniumtests.ut.browserfactory.mobile;
 
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.List;
 
+import org.mockito.MockedStatic;
 import org.openqa.selenium.Platform;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -37,59 +37,64 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.OSUtility;
 
-@PrepareForTest({OSCommand.class, InstrumentsWrapper.class, OSUtility.class})
 public class TestInstrumentsWrapper extends MockitoTest {
 	
 
 	
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testInstrumentsNotFound() {
-		PowerMockito.mockStatic(OSCommand.class);
-		when(OSCommand.executeCommandAndWait("instruments")).thenReturn("instruments: command not found");
-		new InstrumentsWrapper();
+		try (MockedStatic mockedOSCommand = mockStatic(OSCommand.class)) {
+			mockedOSCommand.when(() -> OSCommand.executeCommandAndWait("instruments")).thenReturn("instruments: command not found");
+			new InstrumentsWrapper();
+		}
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testNotOnMac() {
-		PowerMockito.mockStatic(OSUtility.class);
-		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
-		
-		new InstrumentsWrapper();
+		try (MockedStatic mockedOSUtility = mockStatic(OSUtility.class)) {
+			mockedOSUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
+
+			new InstrumentsWrapper();
+		}
 	}
 	
 
 	@Test(groups={"ut"})
 	public void testOnMac() {
-		PowerMockito.mockStatic(OSUtility.class);
-		PowerMockito.mockStatic(OSCommand.class);
-		when(OSCommand.executeCommandAndWait("xcrun")).thenReturn("Usage: xcrun [options] <tool name> ... arguments ...");
-		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
-		
-		new InstrumentsWrapper();
+		try (MockedStatic mockedOSCommand = mockStatic(OSCommand.class);
+			 MockedStatic mockedOSUtility = mockStatic(OSUtility.class)) {
+
+			mockedOSCommand.when(() -> OSCommand.executeCommandAndWait("xcrun")).thenReturn("Usage: xcrun [options] <tool name> ... arguments ...");
+			mockedOSUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
+
+			new InstrumentsWrapper();
+		}
 	}
 	
 	
 	@Test(groups={"ut"})
 	public void testiOSDeviceRetrieving() throws IOException {
-		PowerMockito.mockStatic(OSCommand.class);
-		PowerMockito.mockStatic(OSUtility.class);
-		when(OSCommand.executeCommandAndWait("xcrun")).thenReturn("Usage: xcrun [options] <tool name> ... arguments ...");
-		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
-		
-		String deviceList = GenericTest.readResourceToString("tu/devices.json");
-		
-		when(OSCommand.executeCommandAndWait("xcrun simctl list devices available --json")).thenReturn(deviceList);
-		
-		InstrumentsWrapper wrapper = new InstrumentsWrapper();
-		List<MobileDevice> devs = wrapper.parseIosDevices();
-		
-		Assert.assertEquals(devs.size(), 10);
-		Assert.assertEquals(devs.get(1).getName(), "iPhone 14");
-		Assert.assertEquals(devs.get(8).getName(), "iPad Pro");
-		Assert.assertEquals(devs.get(1).getVersion(), "16.2");
-		Assert.assertEquals(devs.get(1).getId(), "F588AFB8-5DF5-475C-B01C-28707D0CBD19");
-		Assert.assertEquals(devs.get(1).getPlatform(), "iOS");
-		Assert.assertEquals(devs.get(1).getBrowsers().get(0).getBrowser(), BrowserType.SAFARI);
+		try (MockedStatic mockedOSCommand = mockStatic(OSCommand.class);
+			 MockedStatic mockedOSUtility = mockStatic(OSUtility.class)) {
+
+			mockedOSCommand.when(() -> OSCommand.executeCommandAndWait("xcrun")).thenReturn("Usage: xcrun [options] <tool name> ... arguments ...");
+			mockedOSUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
+
+			String deviceList = GenericTest.readResourceToString("tu/devices.json");
+
+			mockedOSCommand.when(() -> OSCommand.executeCommandAndWait("xcrun simctl list devices available --json")).thenReturn(deviceList);
+
+			InstrumentsWrapper wrapper = new InstrumentsWrapper();
+			List<MobileDevice> devs = wrapper.parseIosDevices();
+
+			Assert.assertEquals(devs.size(), 10);
+			Assert.assertEquals(devs.get(1).getName(), "iPhone 14");
+			Assert.assertEquals(devs.get(8).getName(), "iPad Pro");
+			Assert.assertEquals(devs.get(1).getVersion(), "16.2");
+			Assert.assertEquals(devs.get(1).getId(), "F588AFB8-5DF5-475C-B01C-28707D0CBD19");
+			Assert.assertEquals(devs.get(1).getPlatform(), "iOS");
+			Assert.assertEquals(devs.get(1).getBrowsers().get(0).getBrowser(), BrowserType.SAFARI);
+		}
 	}
 	
 }

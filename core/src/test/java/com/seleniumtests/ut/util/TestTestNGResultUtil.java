@@ -2,9 +2,7 @@ package com.seleniumtests.ut.util;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,9 +11,8 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.openqa.selenium.WebDriverException;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.IResultMap;
 import org.testng.ISuite;
@@ -24,7 +21,6 @@ import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.CustomAttribute;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
@@ -44,7 +40,6 @@ import com.seleniumtests.reporter.info.StringInfo;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestStep;
 
-@PrepareForTest({SeleniumRobotSnapshotServerConnector.class})
 public class TestTestNGResultUtil extends MockitoTest {
 
 	@Mock
@@ -89,8 +84,7 @@ public class TestTestNGResultUtil extends MockitoTest {
 		when(testContext.getSuite()).thenReturn(suite);
 		when(suite.getName()).thenReturn("mySuite");
 		when(testContext.getName()).thenReturn("myTest");
-		
-		PowerMockito.mockStatic(SeleniumRobotSnapshotServerConnector.class);
+
 		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerUrl(SERVER_URL);
 	}
 	
@@ -166,7 +160,7 @@ public class TestTestNGResultUtil extends MockitoTest {
 		when(testNGMethod.isBeforeMethodConfiguration()).thenReturn(false);
 		when(testNGMethod.getMethodName()).thenReturn("testMethod");
 		
-		Assert.assertTrue(TestNGResultUtils.getHashForTest(testResult).startsWith("mySuite-myTest-com.seleniumtests.ut.util.TestTestNGResultUtil-testMethod-1-org.mockito.codegen."));
+		Assert.assertTrue(TestNGResultUtils.getHashForTest(testResult).startsWith("mySuite-myTest-com.seleniumtests.ut.util.TestTestNGResultUtil-testMethod-1-org.testng.ITestNGMethod"));
 		
 	}
 
@@ -178,7 +172,7 @@ public class TestTestNGResultUtil extends MockitoTest {
 		when(testNGMethod.isBeforeMethodConfiguration()).thenReturn(true);
 		when(testNGMethod.getMethodName()).thenReturn("testHashWithBeforeTestMethod");
 		
-		Assert.assertTrue(TestNGResultUtils.getHashForTest(testResult).startsWith("mySuite-myTest-com.seleniumtests.ut.util.TestTestNGResultUtil-before-testHashWithBeforeTestMethod-1-org.mockito.codegen."));
+		Assert.assertTrue(TestNGResultUtils.getHashForTest(testResult).startsWith("mySuite-myTest-com.seleniumtests.ut.util.TestTestNGResultUtil-before-testHashWithBeforeTestMethod-1-org.testng.ITestNGMethod"));
 		
 	}
 	
@@ -559,12 +553,13 @@ public class TestTestNGResultUtil extends MockitoTest {
 		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerActive(true);
 		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerCompareSnapshot(true);
 		
-		
-		PowerMockito.when(SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(snapshotServerConnector);
-		when(snapshotServerConnector.checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString())).thenReturn(comparisonResult);
-		
-		TestNGResultUtils.changeTestResultWithSnapshotComparison(testResult);
 
+		try (MockedStatic mockedSnapshotServer = mockStatic(SeleniumRobotSnapshotServerConnector.class)) {
+			mockedSnapshotServer.when(() -> SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(snapshotServerConnector);
+			when(snapshotServerConnector.checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString())).thenReturn(comparisonResult);
+
+			TestNGResultUtils.changeTestResultWithSnapshotComparison(testResult);
+		}
 	}
 	
 	@Test(groups={"ut"})
@@ -574,12 +569,13 @@ public class TestTestNGResultUtil extends MockitoTest {
 		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerCompareSnapshotBehaviour("changeTestResult");
 		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerActive(true);
 		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerCompareSnapshot(true);
-		
-		
-		PowerMockito.when(SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(snapshotServerConnector);
-		
-		TestNGResultUtils.changeTestResultWithSnapshotComparison(testResult);
-		verify(snapshotServerConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString());
+
+		try (MockedStatic mockedSnapshotServer = mockStatic(SeleniumRobotSnapshotServerConnector.class)) {
+			mockedSnapshotServer.when(() -> SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(snapshotServerConnector);
+
+			TestNGResultUtils.changeTestResultWithSnapshotComparison(testResult);
+			verify(snapshotServerConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString());
+		}
 	}
 	
 	@Test(groups={"ut"})
@@ -590,11 +586,12 @@ public class TestTestNGResultUtil extends MockitoTest {
 		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerActive(true);
 		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerCompareSnapshot(false);
 		
-		
-		PowerMockito.when(SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(snapshotServerConnector);
-		
-		TestNGResultUtils.changeTestResultWithSnapshotComparison(testResult);
-		verify(snapshotServerConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString());
+
+		try (MockedStatic mockedSnapshotServer = mockStatic(SeleniumRobotSnapshotServerConnector.class)) {
+			mockedSnapshotServer.when(() -> SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(snapshotServerConnector);
+			TestNGResultUtils.changeTestResultWithSnapshotComparison(testResult);
+			verify(snapshotServerConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString());
+		}
 	}
 	
 	/**
@@ -608,11 +605,12 @@ public class TestTestNGResultUtil extends MockitoTest {
 		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerActive(false);
 		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerCompareSnapshot(true);
 		
-		
-		PowerMockito.when(SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(snapshotServerConnector);
-		
-		TestNGResultUtils.changeTestResultWithSnapshotComparison(testResult);
-		verify(snapshotServerConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString());
+
+		try (MockedStatic mockedSnapshotServer = mockStatic(SeleniumRobotSnapshotServerConnector.class)) {
+			mockedSnapshotServer.when(() -> SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(snapshotServerConnector);
+			TestNGResultUtils.changeTestResultWithSnapshotComparison(testResult);
+			verify(snapshotServerConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString());
+		}
 	}
 	
 	/**
@@ -625,12 +623,12 @@ public class TestTestNGResultUtil extends MockitoTest {
 		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerCompareSnapshotBehaviour("addTestResult");
 		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerActive(true);
 		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerCompareSnapshot(true);
-		
-		
-		PowerMockito.when(SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(snapshotServerConnector);
-		
-		TestNGResultUtils.changeTestResultWithSnapshotComparison(testResult);
-		verify(snapshotServerConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString());
+
+		try (MockedStatic mockedSnapshotServer = mockStatic(SeleniumRobotSnapshotServerConnector.class)) {
+			mockedSnapshotServer.when(() -> SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(snapshotServerConnector);
+			TestNGResultUtils.changeTestResultWithSnapshotComparison(testResult);
+			verify(snapshotServerConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString());
+		}
 	}
 
 	/**
@@ -643,12 +641,12 @@ public class TestTestNGResultUtil extends MockitoTest {
 		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerCompareSnapshotBehaviour("displayOnly");
 		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerActive(true);
 		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerCompareSnapshot(true);
-		
-		
-		PowerMockito.when(SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(snapshotServerConnector);
-		
-		TestNGResultUtils.changeTestResultWithSnapshotComparison(testResult);
-		verify(snapshotServerConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString());
+
+		try (MockedStatic mockedSnapshotServer = mockStatic(SeleniumRobotSnapshotServerConnector.class)) {
+			mockedSnapshotServer.when(() -> SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(snapshotServerConnector);
+			TestNGResultUtils.changeTestResultWithSnapshotComparison(testResult);
+			verify(snapshotServerConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString());
+		}
 	}
 	
 	

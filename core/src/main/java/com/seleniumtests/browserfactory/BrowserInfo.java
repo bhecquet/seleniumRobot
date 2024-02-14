@@ -176,7 +176,7 @@ public class BrowserInfo {
 		checkResourceExists();
 	}
 	
-	private void checkResourceExists() {
+	public void checkResourceExists() {
 		if (driverFileName != null && getClass().getClassLoader()
 				.getResourceAsStream(String.format("drivers/%s/%s%s", os, driverFileName, OSUtilityFactory.getInstance().getProgramExtension())) == null) {
 			throw new ConfigurationException(String.format("Driver file %s does not exist in resources", driverFileName));
@@ -500,6 +500,7 @@ public class BrowserInfo {
 		return driverList;
 	}
 
+	// for tests only
 	public static void setDriverList(List<String> driverList) {
 		BrowserInfo.driverList = driverList;
 	}

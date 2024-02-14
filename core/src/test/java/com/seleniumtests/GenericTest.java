@@ -23,6 +23,7 @@ import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 
 import com.seleniumtests.core.utils.TestNGResultUtils;
+import com.seleniumtests.util.osutility.OSUtility;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.testng.ITestContext;
@@ -66,7 +67,7 @@ public class GenericTest {
 		SeleniumTestsContext.resetOutputFolderNames();
 
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		
+
 		try {
 			FileUtils.deleteDirectory(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
 		} catch (IOException e) {
@@ -91,6 +92,7 @@ public class GenericTest {
 	@AfterMethod(groups={"ut", "it", "ut context2"}, alwaysRun=true) 
 	public void reset() {
 		resetTestNGREsultAndLogger();
+		OSUtility.resetInstalledBrowsersWithVersion();
 	}
 	
 	@AfterClass(groups={"ut", "it", "ut context2"}, alwaysRun=true)

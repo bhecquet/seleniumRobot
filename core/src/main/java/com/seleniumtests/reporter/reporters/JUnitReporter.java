@@ -10,11 +10,14 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.Logger;
 import org.testng.ITestContext;
@@ -43,7 +46,7 @@ public class JUnitReporter extends CommonReporter {
 	
 	private void generateTestReport(ITestContext testContext, Set<ITestResult> testResults, String outdir) {
 
-		Properties p1 = new Properties();
+		Properties p1 = new OrderedProperties();
 		p1.setProperty(XMLConstants.ATTR_NAME, testContext.getName());
 		p1.setProperty(XMLConstants.ATTR_TIMESTAMP, timeAsGmt());
 
@@ -106,9 +109,9 @@ public class JUnitReporter extends CommonReporter {
 		xsb.push(XMLConstants.TESTSUITE, p1);
 		for (TestTag testTag : testCases) {
 			if (putElement(xsb, XMLConstants.TESTCASE, testTag.properties, testTag.childTag != null)) {
-				Properties p = new Properties();
-				safeSetProperty(p, XMLConstants.ATTR_MESSAGE, testTag.message);
+				Properties p = new OrderedProperties();
 				safeSetProperty(p, XMLConstants.ATTR_TYPE, testTag.type);
+				safeSetProperty(p, XMLConstants.ATTR_MESSAGE, testTag.message);
 
 				if (putElement(xsb, testTag.childTag, p, testTag.stackTrace != null)) {
 					xsb.addCDATA(testTag.stackTrace);
@@ -153,9 +156,9 @@ public class JUnitReporter extends CommonReporter {
 	private TestTag createTestTagFor(ITestResult tr, String className) {
 		TestTag testTag = new TestTag();
 
-		Properties p2 = new Properties();
-		p2.setProperty(XMLConstants.ATTR_CLASSNAME, className);
+		Properties p2 = new OrderedProperties();
 		p2.setProperty(XMLConstants.ATTR_NAME, getVisualTestName(tr));
+		p2.setProperty(XMLConstants.ATTR_CLASSNAME, className);
 		int status = tr.getStatus();
 		if (status == ITestResult.SKIP || status == ITestResult.SUCCESS_PERCENTAGE_FAILURE) {
 			testTag.childTag = XMLConstants.SKIPPED;
@@ -233,6 +236,19 @@ public class JUnitReporter extends CommonReporter {
 		String childTag;
 		String logTag = XMLConstants.SYSTEM_OUT;
 		
+	}
+
+	@SuppressWarnings("serial")
+	private static class OrderedProperties extends Properties {
+
+		@Override
+		public synchronized Set<Map.Entry<Object, Object>> entrySet() {
+			return Collections.synchronizedSet(
+					super.entrySet()
+							.stream()
+							.sorted(Comparator.comparing(e -> e.getKey().toString()))
+							.collect(Collectors.toCollection(LinkedHashSet::new)));
+		}
 	}
 
 }

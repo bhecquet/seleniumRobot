@@ -20,30 +20,27 @@ package com.seleniumtests.ut.connectors.mails;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.mails.*;
 import com.seleniumtests.customexception.ScenarioException;
+import jakarta.mail.MessagingException;
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.mockito.MockedStatic;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.customexception.ConfigurationException;
 
-import javax.mail.MessagingException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.seleniumtests.connectors.tms.TestManager.TMS_SERVER_URL;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.*;
 
-@PrepareForTest({EmailClientSelector.class})
 public class TestEmailAccount extends MockitoTest {
-
 
     private String serverUrl = "";
     private String emailAddress = "";
@@ -55,9 +52,12 @@ public class TestEmailAccount extends MockitoTest {
     @Mock
     private ImapClient emailClientMock;
 
+    private MockedStatic mockedEmailSelector;
+
     @BeforeMethod(groups = {"ut"})
     public void init() throws Exception {
-        PowerMockito.mockStatic(EmailClientSelector.class);
+
+        mockedEmailSelector = mockStatic(EmailClientSelector.class);
         when(EmailClientSelector.routeEmail(any(EmailServer.class), anyString(), anyString(), anyString())).thenReturn(emailClientMock);
         when(emailClientMock.getEmail(anyString(), anyList())).thenCallRealMethod();
         when(emailClientMock.getEmail(anyString(), any(String[].class))).thenCallRealMethod();
@@ -82,6 +82,11 @@ public class TestEmailAccount extends MockitoTest {
         when(emailClientMock.getEmails(nullable(LocalDateTime.class))).thenCallRealMethod();
         when(emailClientMock.getLastMessageIndex()).thenReturn(1);
         when(emailClientMock.isTestMode()).thenReturn(true);
+    }
+
+    @AfterMethod(groups={"ut"}, alwaysRun = true)
+    private void closeMocks() {
+        mockedEmailSelector.close();
     }
 
 

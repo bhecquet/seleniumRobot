@@ -2,7 +2,6 @@ package com.seleniumtests.ut.connectors.tms.squash.entities;
 
 import static org.mockito.Mockito.when;
 
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -17,7 +16,6 @@ import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
 import kong.unirest.json.JSONObject;
 
-@PrepareForTest({Unirest.class})
 public class TestTestCase extends ConnectorsTest {
 	
 	@BeforeMethod(groups={"ut"})

@@ -17,6 +17,18 @@
  */
 package com.seleniumtests.connectors.mails;
 
+import jakarta.mail.BodyPart;
+import jakarta.mail.Folder;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Multipart;
+import jakarta.mail.Session;
+import jakarta.mail.Store;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.search.SearchTerm;
+import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -25,19 +37,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
-
-import javax.mail.BodyPart;
-import javax.mail.Folder;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Session;
-import javax.mail.Store;
-import javax.mail.internet.MimeMessage;
-import javax.mail.search.SearchTerm;
-
-import org.apache.commons.lang.NotImplementedException;
-import org.apache.commons.lang3.StringEscapeUtils;
 
 
 public class ImapClient extends EmailClientImpl {
@@ -58,7 +57,6 @@ public class ImapClient extends EmailClientImpl {
 	 * @param password			password for server
 	 * @param folder			folder to read
 	 * @param imapPort			port to use to connect
-	 * @param timeOffset		workaround when server does not report the same time
 	 * @throws Exception 
 	 */
 	public ImapClient(String host, String username, String password, String folder, Integer imapPort) throws MessagingException {

@@ -17,15 +17,13 @@
  */
 package com.seleniumtests.ut.connectors.extools;
 
-import static org.mockito.Mockito.verify;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.mockito.MockedStatic;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -36,27 +34,37 @@ import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.osutility.OSCommand;
 
-@PrepareForTest({ExternalTool.class, FileUtility.class, OSCommand.class})
+import static org.mockito.Mockito.*;
+
 public class TestExternalTool extends MockitoTest {
 	
 	@Mock
 	Process process;
-	
+
+	private MockedStatic mockedFileUtility;
+	private MockedStatic mockedExternalTools;
+
 	@BeforeMethod(groups={"ut"})
 	public void init() throws Exception {
-		PowerMockito.spy(ExternalTool.class);
-		PowerMockito.spy(FileUtility.class);
-		
+
 		Map<String, String> env = new HashMap<>();
 		env.put("JAVA_HOME", "/usr/bin/java");
 		env.put("SELENIUM_TOOL_MyTool", "/opt/mytool/mytool");
 		env.put("SELENIUM_TOOL_MyOtherTool", "/opt/mytool/myothertool");
+
+		mockedExternalTools = mockStatic(ExternalTool.class, CALLS_REAL_METHODS);
+		mockedExternalTools.when(() -> ExternalTool.readEnvVariables()).thenReturn(env);
+
+		mockedFileUtility = mockStatic(FileUtility.class, CALLS_REAL_METHODS);
+		mockedFileUtility.when(() -> FileUtility.fileExists("/opt/mytool/mytool")).thenReturn(true);
+		mockedFileUtility.when(() -> FileUtility.fileExists("/opt/mytool/myothertool")).thenReturn(false);
 		
-		PowerMockito.when(ExternalTool.readEnvVariables()).thenReturn(env);
-		
-		PowerMockito.when(FileUtility.fileExists("/opt/mytool/mytool")).thenReturn(true);
-		PowerMockito.when(FileUtility.fileExists("/opt/mytool/myothertool")).thenReturn(false);
-		
+	}
+
+	@AfterMethod(groups={"ut"}, alwaysRun = true)
+	private void closeMocks() {
+		mockedFileUtility.close();
+		mockedExternalTools.close();
 	}
 	
 	@Test(groups={"ut"})
@@ -92,22 +100,26 @@ public class TestExternalTool extends MockitoTest {
 
 	@Test(groups={"ut"})
 	public void testStartProgram() {
-		PowerMockito.mockStatic(OSCommand.class);
-		PowerMockito.when(OSCommand.executeCommand(new String[] {"/opt/mytool/mytool"})).thenReturn(process);
-		
-		ExternalTool tool = new ExternalTool("MyTool").start();
-		Assert.assertTrue(tool.isStarted());
+		try (MockedStatic mockedOSCommand = mockStatic(OSCommand.class)) {
+
+			mockedOSCommand.when(() -> OSCommand.executeCommand(new String[] {"/opt/mytool/mytool"})).thenReturn(process);
+
+			ExternalTool tool = new ExternalTool("MyTool").start();
+			Assert.assertTrue(tool.isStarted());
+		}
 	}
 	
 	@Test(groups={"ut"})
 	public void testStopProgram() {
-		PowerMockito.mockStatic(OSCommand.class);
-		PowerMockito.when(OSCommand.executeCommand(new String[] {"/opt/mytool/mytool"})).thenReturn(process);
-		
-		ExternalTool tool = new ExternalTool("MyTool").start().stop();
-		Assert.assertFalse(tool.isStarted());
-		
-		verify(process).destroyForcibly();
+		try (MockedStatic mockedOSCommand = mockStatic(OSCommand.class)) {
+
+			mockedOSCommand.when(() -> OSCommand.executeCommand(new String[] {"/opt/mytool/mytool"})).thenReturn(process);
+
+			ExternalTool tool = new ExternalTool("MyTool").start().stop();
+			Assert.assertFalse(tool.isStarted());
+
+			verify(process).destroyForcibly();
+		}
 	}
 
 	/**
@@ -116,9 +128,11 @@ public class TestExternalTool extends MockitoTest {
 	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
 	public void testStartStartedProgram() {
 
-		PowerMockito.mockStatic(OSCommand.class);
-		PowerMockito.when(OSCommand.executeCommand(new String[] {"/opt/mytool/mytool"})).thenReturn(process);
-		
-		new ExternalTool("MyTool").start().start();
+		try (MockedStatic mockedOSCommand = mockStatic(OSCommand.class)) {
+
+			mockedOSCommand.when(() -> OSCommand.executeCommand(new String[] {"/opt/mytool/mytool"})).thenReturn(process);
+
+			new ExternalTool("MyTool").start().start();
+		}
 	}
 }

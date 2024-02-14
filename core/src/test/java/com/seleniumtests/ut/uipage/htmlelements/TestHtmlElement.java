@@ -20,16 +20,7 @@ package com.seleniumtests.ut.uipage.htmlelements;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -40,12 +31,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import io.appium.java_client.android.options.UiAutomator2Options;
 import com.seleniumtests.driver.DriverMode;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
@@ -56,16 +50,16 @@ import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.DriverCommand;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.remote.Response;
 import org.openqa.selenium.remote.SessionId;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.Reporter;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -97,7 +91,6 @@ import io.appium.java_client.remote.AppiumCommandExecutor;
  * @author behe
  *
  */
-@PrepareForTest({ WebUIDriver.class, AndroidDriver.class, RemoteWebDriver.class })
 public class TestHtmlElement extends MockitoTest {
 
 	@Mock
@@ -145,6 +138,8 @@ public class TestHtmlElement extends MockitoTest {
 
 	private CustomEventFiringWebDriver eventDriver;
 
+	private MockedStatic mockedWebUIDriver;
+
 	@BeforeMethod(groups = { "ut" })
 	private void init() throws WebDriverException, IOException {
 
@@ -163,7 +158,7 @@ public class TestHtmlElement extends MockitoTest {
 		// add DriverExceptionListener to reproduce driver behavior
 		eventDriver = spy(new CustomEventFiringWebDriver(driver));
 
-		PowerMockito.mockStatic(WebUIDriver.class);
+		mockedWebUIDriver = mockStatic(WebUIDriver.class);
 		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
 		when(WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(uiDriver);
 		when(driver.findElement(By.id("el"))).thenReturn(element);
@@ -181,7 +176,7 @@ public class TestHtmlElement extends MockitoTest {
 		when(driverConfig.getBrowserType()).thenReturn(BrowserType.HTMLUNIT);
 		when(driverConfig.getMajorBrowserVersion()).thenReturn(1);
 		
-		when(((CustomEventFiringWebDriver)eventDriver).getBrowserInfo()).thenReturn(new BrowserInfo(BrowserType.HTMLUNIT, "999.9"));
+		when(eventDriver.getBrowserInfo()).thenReturn(new BrowserInfo(BrowserType.HTMLUNIT, "999.9"));
 
 		when(element.findElement(By.name("subEl"))).thenReturn(subElement1);
 		when(element.findElements(By.name("subEl"))).thenReturn(subElList);
@@ -205,39 +200,27 @@ public class TestHtmlElement extends MockitoTest {
 		when(subElement1.getLocation()).thenReturn(new Point(5, 5));
 		when(subElement2.getLocation()).thenReturn(new Point(5, 5));
 
-		when(mobileElement.getLocation()).thenReturn(new Point(1, 1));
-		when(mobileElement.getSize()).thenReturn(new Dimension(8, 8));
-		when(mobileElement.isDisplayed()).thenReturn(true);
-		when(mobileElement.getId()).thenReturn("1234");
+		mobileDriver = mock(AndroidDriver.class);
+		when(mobileDriver.getCapabilities()).thenReturn(new UiAutomator2Options());
 
-		// init for mobile tests
-		AppiumCommandExecutor ce = Mockito.mock(AppiumCommandExecutor.class);
-		Response response = new Response(new SessionId("1"));
-		response.setValue(new HashMap<String, Object>());
-		Response findResponse = new Response(new SessionId("1"));
-		findResponse.setValue(mobileElement);
-
-		when(ce.execute(any())).thenReturn(response, response, response, findResponse);
-		doReturn(response).when(ce).execute(argThat(command -> DriverCommand.NEW_SESSION.equals(command.getName())));
-		doReturn(response).when(ce).execute(argThat(command -> DriverCommand.FIND_ELEMENT.equals(command.getName())));
-		doReturn(response).when(ce).execute(argThat(command -> "getSession".equals(command.getName())));
-
-		// newSession, getSession, getSession, findElement
-
-		mobileDriver = Mockito.spy(new AndroidDriver(ce, new DesiredCapabilities()));
 		doReturn("my.package").when(mobileDriver).getCurrentPackage();
 
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
 	}
 
+	@AfterMethod(groups={"ut"}, alwaysRun = true)
+	private void closeMocks() {
+		mockedWebUIDriver.close();
+	}
+
 	private void finalCheck(boolean findElement) throws Exception {
 		// check we called getDriver before using it
-		PowerMockito.verifyPrivate(el, atLeastOnce()).invoke("updateDriver");
+		verify(el, atLeastOnce()).updateDriver();
 
 		// isElementPresent does not call findElement as we use WebDriverWait
 		if (findElement) {
-			PowerMockito.verifyPrivate(el).invoke("findElement", anyBoolean(), anyBoolean());
+			verify(el).findElement(anyBoolean(), anyBoolean());
 		}
 	}
 
@@ -384,7 +367,7 @@ public class TestHtmlElement extends MockitoTest {
 
 		// updateDriver is called on every replay, so if we have 2 invocations, it means
 		// that replay has been done
-		PowerMockito.verifyPrivate(el, atLeast(2)).invoke("updateDriver");
+		verify(el, atLeast(2)).updateDriver();
 
 		verify(el, times(1)).isDisplayedRetry();
 	}
@@ -852,7 +835,7 @@ public class TestHtmlElement extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
 		
 		HtmlElement present = new HtmlElement("element", By.id("present"));
-		present.setDriver(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null, null)); // mimic the findElement call were we update driver before doing anything
+		present.setDriver(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null)); // mimic the findElement call were we update driver before doing anything
 		present.replaceSelector();
 		Assert.assertEquals(present.getBy(), By.id("my.package:id/present"));
 	}
@@ -867,7 +850,7 @@ public class TestHtmlElement extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
 		
 		HtmlElement present = new HtmlElement("element", By.id("present"));
-		present.setDriver(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_WEB_ANDROID, DriverMode.LOCAL, null, null)); // mimic the findElement call were we update driver before doing anything
+		present.setDriver(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_WEB_ANDROID, DriverMode.LOCAL, null)); // mimic the findElement call were we update driver before doing anything
 		present.replaceSelector();
 		Assert.assertEquals(present.getBy(), By.id("present"));
 	}
@@ -882,7 +865,7 @@ public class TestHtmlElement extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setPlatform("ios");
 		
 		HtmlElement present = new HtmlElement("element", By.id("present"));
-		present.setDriver(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_IOS, DriverMode.LOCAL, null, null)); // mimic the findElement call were we update driver before doing anything
+		present.setDriver(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_IOS, DriverMode.LOCAL, null)); // mimic the findElement call were we update driver before doing anything
 		present.replaceSelector();
 		Assert.assertEquals(present.getBy(), By.id("present"));
 	}
@@ -897,7 +880,7 @@ public class TestHtmlElement extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
 		
 		HtmlElement present = new HtmlElement("element", AppiumBy.id("present"));
-		present.setDriver(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null, null)); // mimic the findElement call were we update driver before doing anything
+		present.setDriver(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null)); // mimic the findElement call were we update driver before doing anything
 		present.replaceSelector();
 		Assert.assertEquals(present.getBy(), By.id("my.package:id/present"));
 	}
@@ -911,7 +894,7 @@ public class TestHtmlElement extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
 		
 		HtmlElement present = new HtmlElement("element", AppiumBy.accessibilityId("present"));
-		present.setDriver(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null, null)); // mimic the findElement call were we update driver before doing anything
+		present.setDriver(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null)); // mimic the findElement call were we update driver before doing anything
 		present.replaceSelector();
 		Assert.assertEquals(present.getBy(), By.id("my.package:id/present"));
 	}
@@ -926,7 +909,7 @@ public class TestHtmlElement extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
 		
 		HtmlElement present = new HtmlElement("element", By.id("a.package:id/present"));
-		present.setDriver(new CustomEventFiringWebDriver(mobileDriver,null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null, null)); // mimic the findElement call were we update driver before doing anything
+		present.setDriver(new CustomEventFiringWebDriver(mobileDriver,null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null)); // mimic the findElement call were we update driver before doing anything
 		present.replaceSelector();
 		Assert.assertEquals(present.getBy(), By.id("a.package:id/present"));
 	}

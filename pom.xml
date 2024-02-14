@@ -199,9 +199,9 @@
 				  </exclusions>
 			</dependency>
 			<dependency>
-				<groupId>com.vdurmont</groupId>
+				<groupId>org.semver4j</groupId>
 				<artifactId>semver4j</artifactId>
-				<version>3.1.0</version>
+				<version>5.2.2</version>
 			</dependency>
 			<dependency>
 				<groupId>org.json</groupId>

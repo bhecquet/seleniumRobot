@@ -17,13 +17,6 @@
  */
 package com.seleniumtests.it.driver;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
-
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -36,18 +29,15 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.mockito.Mock;
+import org.mockito.MockedConstruction;
+import org.mockito.MockedStatic;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
@@ -55,7 +45,6 @@ import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
 import com.seleniumtests.GenericDriverTest;
-import com.seleniumtests.browserfactory.AppiumDriverFactory;
 import com.seleniumtests.browserfactory.AppiumLauncherFactory;
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.browserfactory.mobile.AdbWrapper;
@@ -63,7 +52,6 @@ import com.seleniumtests.browserfactory.mobile.ExistingAppiumLauncher;
 import com.seleniumtests.browserfactory.mobile.InstrumentsWrapper;
 import com.seleniumtests.browserfactory.mobile.LocalAppiumLauncher;
 import com.seleniumtests.browserfactory.mobile.MobileDevice;
-import com.seleniumtests.browserfactory.mobile.MobileDeviceSelector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
@@ -83,22 +71,16 @@ import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 import kong.unirest.Unirest;
 
-@PrepareForTest({AdbWrapper.class, AndroidDriver.class, MobileDeviceSelector.class, AppiumDriverFactory.class, AppiumLauncherFactory.class, Unirest.class, InstrumentsWrapper.class})
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mockConstruction;
+
+//@PrepareForTest({AdbWrapper.class, AndroidDriver.class, MobileDeviceSelector.class, AppiumDriverFactory.class, AppiumLauncherFactory.class, Unirest.class, InstrumentsWrapper.class})
 public class TestWebUiDriver extends ReporterTest {
 	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(TestWebUiDriver.class);
-
-	@Mock
-	private AdbWrapper adbWrapper;
-	
-	@Mock
-	private InstrumentsWrapper instrumentsWrapper;
 	
 	@Mock
 	private AndroidDriver androidDriver;
-	
-	@Mock
-	private IOSDriver iosDriver;
 	
 	@Mock
 	private Options driverOptions;
@@ -109,40 +91,43 @@ public class TestWebUiDriver extends ReporterTest {
 
 	@Test(groups={"it"})
 	public void testLocalAndroidDriver() throws Exception {
-		whenNew(AdbWrapper.class).withNoArguments().thenReturn(adbWrapper);
-
 		List<MobileDevice> deviceList = new ArrayList<>();
 		deviceList.add(new MobileDevice("IPhone 6", "0000", "ios", "10.2", new ArrayList<>()));
 		deviceList.add(new MobileDevice("Nexus 5", "1234", "android", "5.0", new ArrayList<>()));
 		deviceList.add(new MobileDevice("Nexus 7", "1235", "android", "6.0", new ArrayList<>()));
-		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
-		
-		whenNew(AndroidDriver.class).withAnyArguments().thenReturn(androidDriver);
-		when(androidDriver.manage()).thenReturn(driverOptions);
-		when(androidDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
-		when(driverOptions.timeouts()).thenReturn(timeouts);
-		
-		SeleniumTestsContextManager.getThreadContext().setRunMode("local");
-		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
-		SeleniumTestsContextManager.getThreadContext().setMobilePlatformVersion("5.0");
-		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_ANDROID);
-		
-		PowerMockito.mockStatic(AppiumLauncherFactory.class);
-		LocalAppiumLauncher appiumLauncher;
-		
-		try {
-			appiumLauncher = spy(new LocalAppiumLauncher());
-			when(AppiumLauncherFactory.getInstance()).thenReturn(appiumLauncher);	
-		
-			WebUIDriver.getWebDriver(true);
-		} catch (ConfigurationException e) {
-			throw new SkipException("Test skipped, appium not correctly configured", e);
+
+		try (MockedConstruction mockedAdbWrapper = mockConstruction(AdbWrapper.class, (adbWrapper, context) -> {
+			when(adbWrapper.getDeviceList()).thenReturn(deviceList);
+		});
+			MockedConstruction mockedAndroidDriver = mockConstruction(AndroidDriver.class, (androidDriver, context) -> {
+			when(androidDriver.manage()).thenReturn(driverOptions);
+			when(androidDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
+		});
+			 MockedStatic mockedAppiumLauncher = mockStatic(AppiumLauncherFactory.class);
+		) {
+
+			when(driverOptions.timeouts()).thenReturn(timeouts);
+
+			SeleniumTestsContextManager.getThreadContext().setRunMode("local");
+			SeleniumTestsContextManager.getThreadContext().setPlatform("android");
+			SeleniumTestsContextManager.getThreadContext().setMobilePlatformVersion("5.0");
+			SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_ANDROID);
+
+			LocalAppiumLauncher appiumLauncher;
+
+			try {
+				appiumLauncher = spy(new LocalAppiumLauncher());
+				mockedAppiumLauncher.when(() -> AppiumLauncherFactory.getInstance()).thenReturn(appiumLauncher);
+
+				WebUIDriver.getWebDriver(true);
+			} catch (ConfigurationException e) {
+				throw new SkipException("Test skipped, appium not correctly configured", e);
+			}
+
+			Assert.assertEquals(mockedAndroidDriver.constructed().size(), 1);
+
+			verify(appiumLauncher).stopAppium();
 		}
-		 
-		PowerMockito.verifyNew(AndroidDriver.class).withArguments(any(URL.class), any(Capabilities.class));
-				
-		
-		verify(appiumLauncher).stopAppium();
 	}
 	
 	/**
@@ -151,72 +136,81 @@ public class TestWebUiDriver extends ReporterTest {
 	 */
 	@Test(groups={"it"})
 	public void testLocalAndroidDriverWithRemoteAppiumServer() throws Exception {
-		whenNew(AdbWrapper.class).withNoArguments().thenReturn(adbWrapper);
-		
-		List<MobileDevice> deviceList = new ArrayList<>();
-		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
-		
-		whenNew(AndroidDriver.class).withAnyArguments().thenReturn(androidDriver);
-		when(androidDriver.manage()).thenReturn(driverOptions);
-		when(androidDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
-		when(driverOptions.timeouts()).thenReturn(timeouts);
-		
-		SeleniumTestsContextManager.getThreadContext().setRunMode("local");
-		SeleniumTestsContextManager.getThreadContext().setAppiumServerUrl("http://localhost:4321/wd/hub/");
-		SeleniumTestsContextManager.getThreadContext().setDeviceId("emulator-5556");
-		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
-		SeleniumTestsContextManager.getThreadContext().setMobilePlatformVersion("5.0");
-		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_ANDROID);
-		
-		createServerMock("GET", "/wd/hub/sessions", 200, "{}");
-		
-		PowerMockito.mockStatic(AppiumLauncherFactory.class);
-		ExistingAppiumLauncher appiumLauncher;
 
-		appiumLauncher = spy(new ExistingAppiumLauncher("http://localhost:4321/wd/hub/"));
-		when(AppiumLauncherFactory.getInstance()).thenReturn(appiumLauncher);	
-		
-		WebUIDriver.getWebDriver(true);
-		
-		PowerMockito.verifyNew(AndroidDriver.class).withArguments(any(URL.class), any(Capabilities.class));
-		
-		WebUIDriver.cleanUp();
-		verify(appiumLauncher).stopAppium();
+		List<MobileDevice> deviceList = new ArrayList<>();
+
+		try (MockedConstruction mockedAdbWrapper = mockConstruction(AdbWrapper.class, (adbWrapper, context) -> {
+			when(adbWrapper.getDeviceList()).thenReturn(deviceList);
+		});
+			 MockedConstruction mockedAndroidDriver = mockConstruction(AndroidDriver.class, (androidDriver, context) -> {
+				 when(androidDriver.manage()).thenReturn(driverOptions);
+				 when(androidDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
+			 });
+			 MockedStatic mockedAppiumLauncher = mockStatic(AppiumLauncherFactory.class);
+		) {
+			when(driverOptions.timeouts()).thenReturn(timeouts);
+
+			SeleniumTestsContextManager.getThreadContext().setRunMode("local");
+			SeleniumTestsContextManager.getThreadContext().setAppiumServerUrl("http://localhost:4321/wd/hub/");
+			SeleniumTestsContextManager.getThreadContext().setDeviceId("emulator-5556");
+			SeleniumTestsContextManager.getThreadContext().setPlatform("android");
+			SeleniumTestsContextManager.getThreadContext().setMobilePlatformVersion("5.0");
+			SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_ANDROID);
+
+			createServerMock("GET", "/wd/hub/sessions", 200, "{}");
+
+			ExistingAppiumLauncher appiumLauncher;
+
+			appiumLauncher = spy(new ExistingAppiumLauncher("http://localhost:4321/wd/hub/"));
+			mockedAppiumLauncher.when(() -> AppiumLauncherFactory.getInstance()).thenReturn(appiumLauncher);
+
+			WebUIDriver.getWebDriver(true);
+
+			// 1 driver has been created
+			Assert.assertEquals(mockedAndroidDriver.constructed().size(), 1);
+
+			WebUIDriver.cleanUp();
+			verify(appiumLauncher).stopAppium();
+		}
 	}
 	
 	@Test(groups={"it"})
 	public void testLocaliOSDriverWithRemoteAppiumServer() throws Exception {
-		whenNew(InstrumentsWrapper.class).withNoArguments().thenReturn(instrumentsWrapper);
-		
+
 		List<MobileDevice> deviceList = new ArrayList<>();
-		when(instrumentsWrapper.parseIosDevices()).thenReturn(deviceList);
-		
-		whenNew(IOSDriver.class).withAnyArguments().thenReturn(iosDriver);
-		when(iosDriver.manage()).thenReturn(driverOptions);
-		when(iosDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
-		when(driverOptions.timeouts()).thenReturn(timeouts);
-		
-		SeleniumTestsContextManager.getThreadContext().setRunMode("local");
-		SeleniumTestsContextManager.getThreadContext().setAppiumServerUrl("http://localhost:4321/wd/hub/");
-		SeleniumTestsContextManager.getThreadContext().setDeviceId("123456");
-		SeleniumTestsContextManager.getThreadContext().setPlatform("ios");
-		SeleniumTestsContextManager.getThreadContext().setMobilePlatformVersion("13.0");
-		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_IOS);
-		
-		createServerMock("GET", "/wd/hub/sessions", 200, "{}");
-		
-		PowerMockito.mockStatic(AppiumLauncherFactory.class);
-		ExistingAppiumLauncher appiumLauncher;
-		
-		appiumLauncher = spy(new ExistingAppiumLauncher("http://localhost:4321/wd/hub/"));
-		when(AppiumLauncherFactory.getInstance()).thenReturn(appiumLauncher);	
-		
-		WebUIDriver.getWebDriver(true);
-		
-		PowerMockito.verifyNew(IOSDriver.class).withArguments(any(URL.class), any(Capabilities.class));
-		
-		WebUIDriver.cleanUp();
-		verify(appiumLauncher).stopAppium();
+
+		try (MockedConstruction mockedInstrument = mockConstruction(InstrumentsWrapper.class, (instrumentsWrapper, context) -> {
+				when(instrumentsWrapper.parseIosDevices()).thenReturn(deviceList);
+			});
+			 MockedConstruction mockedIOSDriver = mockConstruction(IOSDriver.class, (iosDriver, context) -> {
+				 when(iosDriver.manage()).thenReturn(driverOptions);
+				 when(iosDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
+			 });
+			 MockedStatic mockedAppiumLauncher = mockStatic(AppiumLauncherFactory.class);
+		) {
+
+			when(driverOptions.timeouts()).thenReturn(timeouts);
+
+			SeleniumTestsContextManager.getThreadContext().setRunMode("local");
+			SeleniumTestsContextManager.getThreadContext().setAppiumServerUrl("http://localhost:4321/wd/hub/");
+			SeleniumTestsContextManager.getThreadContext().setDeviceId("123456");
+			SeleniumTestsContextManager.getThreadContext().setPlatform("ios");
+			SeleniumTestsContextManager.getThreadContext().setMobilePlatformVersion("13.0");
+			SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_IOS);
+
+			createServerMock("GET", "/wd/hub/sessions", 200, "{}");
+
+			ExistingAppiumLauncher appiumLauncher;
+
+			appiumLauncher = spy(new ExistingAppiumLauncher("http://localhost:4321/wd/hub/"));
+			mockedAppiumLauncher.when(() -> AppiumLauncherFactory.getInstance()).thenReturn(appiumLauncher);
+
+			WebUIDriver.getWebDriver(true);
+
+			Assert.assertEquals(mockedIOSDriver.constructed().size(), 1);
+			WebUIDriver.cleanUp();
+			verify(appiumLauncher).stopAppium();
+		}
 	}
 	
 	/**
@@ -225,15 +219,18 @@ public class TestWebUiDriver extends ReporterTest {
 	 */
 	@Test(groups={"it"}, expectedExceptions = ConfigurationException.class)
 	public void testLocalAndroidDriverWithRemoteAppiumServerAndNoDeviceId() throws Exception {
-		try {
-			whenNew(AdbWrapper.class).withNoArguments().thenReturn(adbWrapper);
-			
-			List<MobileDevice> deviceList = new ArrayList<>();
+
+		List<MobileDevice> deviceList = new ArrayList<>();
+		try (MockedConstruction mockedAdbWrapper = mockConstruction(AdbWrapper.class, (adbWrapper, context) -> {
 			when(adbWrapper.getDeviceList()).thenReturn(deviceList);
-			
-			whenNew(AndroidDriver.class).withAnyArguments().thenReturn(androidDriver);
-			when(androidDriver.manage()).thenReturn(driverOptions);
-			when(androidDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
+		});
+			 MockedConstruction mockedAndroidDriver = mockConstruction(AndroidDriver.class, (androidDriver, context) -> {
+				 when(androidDriver.manage()).thenReturn(driverOptions);
+				 when(androidDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
+			 });
+			 MockedStatic mockedAppiumLauncher = mockStatic(AppiumLauncherFactory.class);
+		) {
+
 			when(driverOptions.timeouts()).thenReturn(timeouts);
 			
 			SeleniumTestsContextManager.getThreadContext().setRunMode("local");
@@ -243,13 +240,11 @@ public class TestWebUiDriver extends ReporterTest {
 			SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_ANDROID);
 			
 			createServerMock("GET", "/wd/hub/sessions", 200, "{}");
-			
-			PowerMockito.mockStatic(AppiumLauncherFactory.class);
+
 			ExistingAppiumLauncher appiumLauncher;
-			
-	
+
 			appiumLauncher = spy(new ExistingAppiumLauncher("http://localhost:4321/wd/hub/"));
-			when(AppiumLauncherFactory.getInstance()).thenReturn(appiumLauncher);	
+			mockedAppiumLauncher.when(() -> AppiumLauncherFactory.getInstance()).thenReturn(appiumLauncher);
 			
 			WebUIDriver.getWebDriver(true);
 		} finally {
@@ -257,44 +252,45 @@ public class TestWebUiDriver extends ReporterTest {
 		}
 
 	}
-	
-	/**
-	 * Check that HAR capture file is present 
-	 * Check it contains one page per TestStep
-	 * 
-	 * @throws Exception
-	 */
-	@Test(groups={"it"})
-	public void testHarCaptureExists() throws Exception {
-		
-		try {
-			System.setProperty(SeleniumTestsContext.CAPTURE_NETWORK, "true");
-			
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriver"});
-			
-			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "main-networkCapture.har").toFile().exists());
-			
-			JSONObject json = new JSONObject(FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "main-networkCapture.har").toFile(), StandardCharsets.UTF_8));
-			JSONArray pages = json.getJSONObject("log").getJSONArray("pages");
-			
-			// 7 steps in HTML 
-			// 'getPageUrl' step should be called before driver is created but creating PictureElement starts driver
-			Assert.assertTrue(pages.length() >= 6, "content is: " + json.toString());
-			List<String> pageNames = new ArrayList<>();
-			for (Object page: pages.toList()) {
-				pageNames.add(((Map<String, Object>)page).get("id").toString().trim());
-			}
-			Assert.assertTrue(pageNames.contains("testDriver"));
-			Assert.assertTrue(pageNames.contains("_writeSomething"));
-			Assert.assertTrue(pageNames.contains("_reset"));
-			Assert.assertTrue(pageNames.contains("_sendKeysComposite"));
-			Assert.assertTrue(pageNames.contains("_clickPicture"));
-			
-			
-		} finally {
-			System.clearProperty(SeleniumTestsContext.CAPTURE_NETWORK);
-		}
-	}
+
+// HAR / BrowserMob
+//	/**
+//	 * Check that HAR capture file is present
+//	 * Check it contains one page per TestStep
+//	 *
+//	 * @throws Exception
+//	 */
+//	@Test(groups={"it"})
+//	public void testHarCaptureExists() throws Exception {
+//
+//		try {
+//			System.setProperty(SeleniumTestsContext.CAPTURE_NETWORK, "true");
+//
+//			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriver"});
+//
+//			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "main-networkCapture.har").toFile().exists());
+//
+//			JSONObject json = new JSONObject(FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "main-networkCapture.har").toFile(), StandardCharsets.UTF_8));
+//			JSONArray pages = json.getJSONObject("log").getJSONArray("pages");
+//
+//			// 7 steps in HTML
+//			// 'getPageUrl' step should be called before driver is created but creating PictureElement starts driver
+//			Assert.assertTrue(pages.length() >= 6, "content is: " + json.toString());
+//			List<String> pageNames = new ArrayList<>();
+//			for (Object page: pages.toList()) {
+//				pageNames.add(((Map<String, Object>)page).get("id").toString().trim());
+//			}
+//			Assert.assertTrue(pageNames.contains("testDriver"));
+//			Assert.assertTrue(pageNames.contains("_writeSomething"));
+//			Assert.assertTrue(pageNames.contains("_reset"));
+//			Assert.assertTrue(pageNames.contains("_sendKeysComposite"));
+//			Assert.assertTrue(pageNames.contains("_clickPicture"));
+//
+//
+//		} finally {
+//			System.clearProperty(SeleniumTestsContext.CAPTURE_NETWORK);
+//		}
+//	}
 	
 	/**
 	 * Check that browser logs are written to file (only available for chrome)
@@ -335,32 +331,33 @@ public class TestWebUiDriver extends ReporterTest {
 		Assert.assertTrue(secondDriverInit > firstDriverInit);
 		Assert.assertTrue(secondDriverCreation > firstDriverCreation);
 	}
-	
-	/**
-	 * Check that HAR capture file is present in result with manual steps
-	 * 
-	 * @throws Exception
-	 */
-	@Test(groups={"it"})
-	public void testReportContainsHarCaptureWithManualSteps() throws Exception {
-		
-		try {
-			System.setProperty(SeleniumTestsContext.CAPTURE_NETWORK, "true");
-			
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverManualSteps"});
-			
-			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverManualSteps", "main-networkCapture.har").toFile().exists());
-			JSONObject json = new JSONObject(FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverManualSteps", "main-networkCapture.har").toFile(), StandardCharsets.UTF_8));
-			JSONArray pages = json.getJSONObject("log").getJSONArray("pages");
-			Assert.assertEquals(pages.length(), 2);
-			Assert.assertEquals(pages.getJSONObject(0).getString("id").trim(), "testDriverManualSteps");
-			Assert.assertEquals(pages.getJSONObject(1).getString("id").trim(), "Reset");
-			
-			// step "Write" is not recorded because the driver is not created before the DriverTestPage object is created
-		} finally {
-			System.clearProperty(SeleniumTestsContext.CAPTURE_NETWORK);
-		}
-	}
+
+// HAR / BrowserMob
+//	/**
+//	 * Check that HAR capture file is present in result with manual steps
+//	 *
+//	 * @throws Exception
+//	 */
+//	@Test(groups={"it"})
+//	public void testReportContainsHarCaptureWithManualSteps() throws Exception {
+//
+//		try {
+//			System.setProperty(SeleniumTestsContext.CAPTURE_NETWORK, "true");
+//
+//			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverManualSteps"});
+//
+//			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverManualSteps", "main-networkCapture.har").toFile().exists());
+//			JSONObject json = new JSONObject(FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverManualSteps", "main-networkCapture.har").toFile(), StandardCharsets.UTF_8));
+//			JSONArray pages = json.getJSONObject("log").getJSONArray("pages");
+//			Assert.assertEquals(pages.length(), 2);
+//			Assert.assertEquals(pages.getJSONObject(0).getString("id").trim(), "testDriverManualSteps");
+//			Assert.assertEquals(pages.getJSONObject(1).getString("id").trim(), "Reset");
+//
+//			// step "Write" is not recorded because the driver is not created before the DriverTestPage object is created
+//		} finally {
+//			System.clearProperty(SeleniumTestsContext.CAPTURE_NETWORK);
+//		}
+//	}
 	
 	@Test(groups={"it"})
 	public void testMultipleBrowserCreation() {

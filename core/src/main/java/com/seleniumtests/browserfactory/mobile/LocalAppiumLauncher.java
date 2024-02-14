@@ -23,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.List;
 
+import com.seleniumtests.util.osutility.SystemUtility;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -40,7 +41,7 @@ import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.osutility.ProcessInfo;
-import com.vdurmont.semver4j.Semver;
+import org.semver4j.Semver;
 
 public class LocalAppiumLauncher implements AppiumLauncher {
 
@@ -121,7 +122,7 @@ public class LocalAppiumLauncher implements AppiumLauncher {
 	 * Check that node and appium are installed
 	 */
 	private void checkInstallation() {
-		appiumHome = System.getenv("APPIUM_HOME");
+		appiumHome = SystemUtility.getenv("APPIUM_HOME");
 		if (appiumHome != null) {
 			if (Paths.get(appiumHome, "node").toFile().exists()
 					|| Paths.get(appiumHome, "node.exe").toFile().exists()) {

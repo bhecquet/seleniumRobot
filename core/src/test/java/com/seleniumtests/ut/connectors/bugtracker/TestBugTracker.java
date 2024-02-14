@@ -4,10 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,10 +14,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.mockito.MockedConstruction;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -38,8 +33,6 @@ import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.reporters.SeleniumTestsReporter2;
-
-@PrepareForTest({BugTracker.class})
 public class TestBugTracker extends MockitoTest {
 
 	@Mock
@@ -95,19 +88,20 @@ public class TestBugTracker extends MockitoTest {
 	}
 
 	@Test(groups={"ut"})
-	public void testJiraBugtracker() throws Exception {
-		PowerMockito.whenNew(JiraConnector.class).withAnyArguments().thenReturn(jiraConnector);
-		
-		BugTracker bugtracker = BugTracker.getInstance("jira", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
-		Assert.assertTrue(bugtracker instanceof JiraConnector);
+	public void testJiraBugtracker() {
+		try (MockedConstruction mockedJira = mockConstruction(JiraConnector.class)) {
+			BugTracker bugtracker = BugTracker.getInstance("jira", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
+			Assert.assertTrue(bugtracker instanceof JiraConnector);
+		}
 
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class)
-	public void testUnknownBugtracker() throws Exception {
-		PowerMockito.whenNew(JiraConnector.class).withAnyArguments().thenReturn(jiraConnector);
-		
-		BugTracker.getInstance("mantis", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
+	public void testUnknownBugtracker() {
+
+		try (MockedConstruction mockedJira = mockConstruction(JiraConnector.class)) {
+			BugTracker.getInstance("mantis", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
+		}
 	}
 	
 	/**
@@ -116,19 +110,22 @@ public class TestBugTracker extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testCreateIssue() throws Exception {
-		FakeBugTracker fbt = spy(new FakeBugTracker());
-		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
-		BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
-			
-		bugtracker.createIssue("selenium", "DEV", "ngName", "testCreateIssue", "some description", 
-				Arrays.asList(step2, stepEnd),
-				issueOptions);
-		
-		// check that we check if the issue already exists
-		verify(fbt).issueAlreadyExists(any(IssueBean.class));
-		
-		// check that issue is created
-		verify(fbt).createIssue(any(IssueBean.class));
+
+		try (MockedConstruction mockedBugTracker = mockConstruction(FakeBugTracker.class, withSettings().defaultAnswer(CALLS_REAL_METHODS))) {
+			BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
+
+			bugtracker.createIssue("selenium", "DEV", "ngName", "testCreateIssue", "some description",
+					Arrays.asList(step2, stepEnd),
+					issueOptions);
+
+			FakeBugTracker fbt = (FakeBugTracker) mockedBugTracker.constructed().get(0);
+
+			// check that we check if the issue already exists
+			verify(fbt).issueAlreadyExists(any(IssueBean.class));
+
+			// check that issue is created
+			verify(fbt).createIssue(any(IssueBean.class));
+		}
 	}
 	
 	/**
@@ -137,19 +134,21 @@ public class TestBugTracker extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testDoNotCreateIssue() throws Exception {
-		FakeBugTracker fbt = spy(new FakeBugTracker());
-		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
-		BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
-		
-		bugtracker.createIssue("selenium", "DEV", "ngName", "testDoNotCreateIssue", "some description", 
-				Arrays.asList(step1, stepEnd),
-				issueOptions);
-		
-		// check that we check if the issue already exists
-		verify(fbt, never()).issueAlreadyExists(any(IssueBean.class));
-		
-		// check that issue is created
-		verify(fbt, never()).createIssue(any(IssueBean.class));
+		try (MockedConstruction mockedBugTracker = mockConstruction(FakeBugTracker.class, withSettings().defaultAnswer(CALLS_REAL_METHODS))) {
+			BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
+
+			bugtracker.createIssue("selenium", "DEV", "ngName", "testDoNotCreateIssue", "some description",
+					Arrays.asList(step1, stepEnd),
+					issueOptions);
+
+			FakeBugTracker fbt = (FakeBugTracker) mockedBugTracker.constructed().get(0);
+
+			// check that we check if the issue already exists
+			verify(fbt, never()).issueAlreadyExists(any(IssueBean.class));
+
+			// check that issue is created
+			verify(fbt, never()).createIssue(any(IssueBean.class));
+		}
 	}
 	
 	/**
@@ -181,20 +180,25 @@ public class TestBugTracker extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testUpdateIssue() throws Exception {
-		FakeBugTracker fbt = spy(new FakeBugTracker());
-		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
-		when(fbt.issueAlreadyExists(any(IssueBean.class))).thenReturn(new IssueBean("ISSUE-1", "[Selenium][app][env][ng] test Test1 KO", "Test KO"));
-		BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
-			
-		bugtracker.createIssue("selenium", "DEV", "ngName", "testUpdateIssue", "some description", 
-				Arrays.asList(step1, step2, stepEnd), issueOptions);
-		
-		// check that we check if the issue already exists
-		verify(fbt).issueAlreadyExists(any(IssueBean.class));
-		
-		// check that issue is not created
-		verify(fbt, never()).createIssue(any(IssueBean.class));
-		verify(fbt).updateIssue(eq("ISSUE-1"), anyString(), anyList(), eq(step2));
+		try (MockedConstruction mockedBugTracker = mockConstruction(FakeBugTracker.class, withSettings().defaultAnswer(CALLS_REAL_METHODS), (fbt, context) -> {
+				when(fbt.issueAlreadyExists(any(IssueBean.class))).thenReturn(new IssueBean("ISSUE-1", "[Selenium][app][env][ng] test Test1 KO", "Test KO"));
+			})
+		) {
+
+			BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
+
+			bugtracker.createIssue("selenium", "DEV", "ngName", "testUpdateIssue", "some description",
+					Arrays.asList(step1, step2, stepEnd), issueOptions);
+
+			FakeBugTracker fbt = (FakeBugTracker) mockedBugTracker.constructed().get(0);
+
+			// check that we check if the issue already exists
+			verify(fbt).issueAlreadyExists(any(IssueBean.class));
+
+			// check that issue is not created
+			verify(fbt, never()).createIssue(any(IssueBean.class));
+			verify(fbt).updateIssue(eq("ISSUE-1"), anyString(), anyList(), eq(step2));
+		}
 	}
 	
 	/**
@@ -203,20 +207,24 @@ public class TestBugTracker extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testDoNotUpdateIssue() throws Exception {
-		FakeBugTracker fbt = spy(new FakeBugTracker());
-		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
-		when(fbt.issueAlreadyExists(any(IssueBean.class))).thenReturn(new IssueBean("ISSUE-1", "[Selenium][app][env][ng] test Test1 KO", String.format(BugTracker.STEP_KO_PATTERN, 1)));
-		BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
-	
-		bugtracker.createIssue("selenium", "DEV", "ngName", "testDoNotUpdateIssue", "some description", 
-				Arrays.asList(step1, step2, stepEnd), issueOptions);
-		
-		// check that we check if the issue already exists
-		verify(fbt).issueAlreadyExists(any(IssueBean.class));
-		
-		// check that issue is not created
-		verify(fbt, never()).createIssue(any(IssueBean.class));
-		verify(fbt, never()).updateIssue(eq("ISSUE-1"), anyString(), anyList(), eq(step2));
+		try (MockedConstruction mockedBugTracker = mockConstruction(FakeBugTracker.class, withSettings().defaultAnswer(CALLS_REAL_METHODS), (fbt, context) -> {
+				when(fbt.issueAlreadyExists(any(IssueBean.class))).thenReturn(new IssueBean("ISSUE-1", "[Selenium][app][env][ng] test Test1 KO", String.format(BugTracker.STEP_KO_PATTERN, 1)));
+			})
+		) {
+			BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
+
+			bugtracker.createIssue("selenium", "DEV", "ngName", "testDoNotUpdateIssue", "some description",
+					Arrays.asList(step1, step2, stepEnd), issueOptions);
+
+			FakeBugTracker fbt = (FakeBugTracker) mockedBugTracker.constructed().get(0);
+
+			// check that we check if the issue already exists
+			verify(fbt).issueAlreadyExists(any(IssueBean.class));
+
+			// check that issue is not created
+			verify(fbt, never()).createIssue(any(IssueBean.class));
+			verify(fbt, never()).updateIssue(eq("ISSUE-1"), anyString(), anyList(), eq(step2));
+		}
 	}
 	
 
@@ -228,41 +236,41 @@ public class TestBugTracker extends MockitoTest {
 	public void testCreateIssueBean() throws Exception {
 		// copy resources so that we can be sure something has been copied to zip file
 		new SeleniumTestsReporter2().copyResources();
-		
-		FakeBugTracker fbt = spy(new FakeBugTracker());
-		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
-		BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
-			
-		
-		IssueBean issueBean = bugtracker.createIssueBean("[Selenium][selenium][DEV][ngName] test myTest KO", "testCreateIssueBean", "some description", 
-				Arrays.asList(step1, step2, stepEnd), issueOptions);
-		
-		Assert.assertEquals(issueBean.getAssignee(), "me");
-		Assert.assertEquals(issueBean.getDescription(), "Test: testCreateIssueBean\n" + 
-				"Description: some description\n" +
-				"Error step 1 (step 2): java.lang.NullPointerException: Error clicking\n" + 
-				"\n" + 
-				"Steps in error\n" +
-				"Step 1: step 2\n" + 
-				"------------------------------------\n" + 
-				"Step step 2\n" + 
-				"  - action1\n" + 
-				"  - action2\n" + 
-				"\n" + 
-				"Last logs\n" + 
-				"Step Test end\n" + 
-				"\n" + 
-				"For more details, see attached .zip file");
-		Assert.assertEquals(issueBean.getSummary(), "[Selenium][selenium][DEV][ngName] test myTest KO");
-		Assert.assertEquals(issueBean.getReporter(), "you");
-		Assert.assertEquals(issueBean.getTestName(), "testCreateIssueBean");
-		Assert.assertEquals(issueBean.getScreenShots(), Arrays.asList(screenshot, screenshot)); // screenshots from the last step
-		Assert.assertEquals(issueBean.getTestStep(), step2); // we take the last failing step (not Test end)
-		Assert.assertEquals(issueBean.getDateTime().getDayOfMonth(),  ZonedDateTime.now().plusHours(3).getDayOfMonth()); 
-		Assert.assertTrue(issueBean.getDetailedResult().isFile());
-		Assert.assertEquals(issueBean.getDetailedResult().getName(), "detailedResult.zip");
-		Assert.assertTrue(issueBean.getDetailedResult().length() > 900000);
-		Assert.assertNull(issueBean.getId()); // not initialized by default
+
+		try (MockedConstruction mockedBugTracker = mockConstruction(FakeBugTracker.class, withSettings().defaultAnswer(CALLS_REAL_METHODS))) {
+			BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
+
+
+			IssueBean issueBean = bugtracker.createIssueBean("[Selenium][selenium][DEV][ngName] test myTest KO", "testCreateIssueBean", "some description",
+					Arrays.asList(step1, step2, stepEnd), issueOptions);
+
+			Assert.assertEquals(issueBean.getAssignee(), "me");
+			Assert.assertEquals(issueBean.getDescription(), "Test: testCreateIssueBean\n" +
+					"Description: some description\n" +
+					"Error step 1 (step 2): java.lang.NullPointerException: Error clicking\n" +
+					"\n" +
+					"Steps in error\n" +
+					"Step 1: step 2\n" +
+					"------------------------------------\n" +
+					"Step step 2\n" +
+					"  - action1\n" +
+					"  - action2\n" +
+					"\n" +
+					"Last logs\n" +
+					"Step Test end\n" +
+					"\n" +
+					"For more details, see attached .zip file");
+			Assert.assertEquals(issueBean.getSummary(), "[Selenium][selenium][DEV][ngName] test myTest KO");
+			Assert.assertEquals(issueBean.getReporter(), "you");
+			Assert.assertEquals(issueBean.getTestName(), "testCreateIssueBean");
+			Assert.assertEquals(issueBean.getScreenShots(), Arrays.asList(screenshot, screenshot)); // screenshots from the last step
+			Assert.assertEquals(issueBean.getTestStep(), step2); // we take the last failing step (not Test end)
+			Assert.assertEquals(issueBean.getDateTime().getDayOfMonth(), ZonedDateTime.now().plusHours(3).getDayOfMonth());
+			Assert.assertTrue(issueBean.getDetailedResult().isFile());
+			Assert.assertEquals(issueBean.getDetailedResult().getName(), "detailedResult.zip");
+			Assert.assertTrue(issueBean.getDetailedResult().length() > 900000);
+			Assert.assertNull(issueBean.getId()); // not initialized by default
+		}
 	}
 	
 	/**
@@ -271,14 +279,14 @@ public class TestBugTracker extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testDoNotCreateIssueBeanWithStepDisabled() throws Exception {
-		FakeBugTracker fbt = spy(new FakeBugTracker());
-		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
-		BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
-			
-		
-		IssueBean issueBean = bugtracker.createIssueBean("[Selenium][selenium][DEV][ngName] test myTest KO", "testDoNotCreateIssueBeanWithStepDisabled", "some description", 
-				Arrays.asList(step1, stepFailedWithDisabledBugtracker, stepEnd), issueOptions);
-		Assert.assertNull(issueBean);
+		try (MockedConstruction mockedBugTracker = mockConstruction(FakeBugTracker.class, withSettings().defaultAnswer(CALLS_REAL_METHODS))) {
+			BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
+
+
+			IssueBean issueBean = bugtracker.createIssueBean("[Selenium][selenium][DEV][ngName] test myTest KO", "testDoNotCreateIssueBeanWithStepDisabled", "some description",
+					Arrays.asList(step1, stepFailedWithDisabledBugtracker, stepEnd), issueOptions);
+			Assert.assertNull(issueBean);
+		}
 	}
 	
 	/**
@@ -287,31 +295,31 @@ public class TestBugTracker extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testCreateIssueBeanWithStepDisabled() throws Exception {
-		FakeBugTracker fbt = spy(new FakeBugTracker());
-		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
-		BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
-		
-		
-		IssueBean issueBean = bugtracker.createIssueBean("[Selenium][selenium][DEV][ngName] test myTest KO", "testCreateIssueBeanWithStepDisabled", "some description", 
-				Arrays.asList(step1, step2, stepFailedWithDisabledBugtracker, stepEnd), issueOptions);
-		Assert.assertNotNull(issueBean);
-		
-		// check description only points step2 as the failed step
-		Assert.assertEquals(issueBean.getDescription(), "Test: testCreateIssueBeanWithStepDisabled\n" + 
-				"Description: some description\n" +
-				"Error step 1 (step 2): java.lang.NullPointerException: Error clicking\n" + 
-				"\n" + 
-				"Steps in error\n" +
-				"Step 1: step 2\n" + 
-				"------------------------------------\n" + 
-				"Step step 2\n" + 
-				"  - action1\n" + 
-				"  - action2\n" + 
-				"\n" + 
-				"Last logs\n" + 
-				"Step Test end\n" + 
-				"\n" + 
-				"For more details, see attached .zip file");
+		try (MockedConstruction mockedBugTracker = mockConstruction(FakeBugTracker.class, withSettings().defaultAnswer(CALLS_REAL_METHODS))) {
+			BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
+
+
+			IssueBean issueBean = bugtracker.createIssueBean("[Selenium][selenium][DEV][ngName] test myTest KO", "testCreateIssueBeanWithStepDisabled", "some description",
+					Arrays.asList(step1, step2, stepFailedWithDisabledBugtracker, stepEnd), issueOptions);
+			Assert.assertNotNull(issueBean);
+
+			// check description only points step2 as the failed step
+			Assert.assertEquals(issueBean.getDescription(), "Test: testCreateIssueBeanWithStepDisabled\n" +
+					"Description: some description\n" +
+					"Error step 1 (step 2): java.lang.NullPointerException: Error clicking\n" +
+					"\n" +
+					"Steps in error\n" +
+					"Step 1: step 2\n" +
+					"------------------------------------\n" +
+					"Step step 2\n" +
+					"  - action1\n" +
+					"  - action2\n" +
+					"\n" +
+					"Last logs\n" +
+					"Step Test end\n" +
+					"\n" +
+					"For more details, see attached .zip file");
+		}
 	}
 	
 	/**
@@ -320,14 +328,14 @@ public class TestBugTracker extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testCreateIssueBeanNoStep() throws Exception {
-		FakeBugTracker fbt = spy(new FakeBugTracker());
-		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
-		BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
-		
-		IssueBean issueBean = bugtracker.createIssueBean("[Selenium][selenium][DEV][ngName] test myTest KO", "myTest", "some description", 
-				new ArrayList<>(), issueOptions);
-		
-		Assert.assertNull(issueBean);
+		try (MockedConstruction mockedBugTracker = mockConstruction(FakeBugTracker.class, withSettings().defaultAnswer(CALLS_REAL_METHODS))) {
+			BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
+
+			IssueBean issueBean = bugtracker.createIssueBean("[Selenium][selenium][DEV][ngName] test myTest KO", "myTest", "some description",
+					new ArrayList<>(), issueOptions);
+
+			Assert.assertNull(issueBean);
+		}
 	}
 	
 	/**
@@ -336,13 +344,13 @@ public class TestBugTracker extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testCreateIssueBeanNoEndStep() throws Exception {
-		FakeBugTracker fbt = spy(new FakeBugTracker());
-		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
-		BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
-		
-		IssueBean issueBean = bugtracker.createIssueBean("[Selenium][selenium][DEV][ngName] test myTest KO", "myTest", "some description", 
-				Arrays.asList(step1), issueOptions);
-		
-		Assert.assertNull(issueBean);
+		try (MockedConstruction mockedBugTracker = mockConstruction(FakeBugTracker.class, withSettings().defaultAnswer(CALLS_REAL_METHODS))) {
+			BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
+
+			IssueBean issueBean = bugtracker.createIssueBean("[Selenium][selenium][DEV][ngName] test myTest KO", "myTest", "some description",
+					Arrays.asList(step1), issueOptions);
+
+			Assert.assertNull(issueBean);
+		}
 	}
 }

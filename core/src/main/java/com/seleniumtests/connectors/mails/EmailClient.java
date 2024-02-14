@@ -20,9 +20,8 @@ package com.seleniumtests.connectors.mails;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import javax.mail.MessagingException;
-
 import com.seleniumtests.connectors.mails.EmailClientImpl.SearchMode;
+import jakarta.mail.MessagingException;
 
 
 public interface EmailClient {

@@ -17,12 +17,15 @@
  */
 package com.seleniumtests.it.stubclasses;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
+import com.seleniumtests.MockitoTestListener;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.WebTestPageServer;
@@ -40,10 +43,12 @@ import com.seleniumtests.it.driver.support.pages.DriverTestPageNativeActions;
 import com.seleniumtests.it.driver.support.pages.ImageDetectorPage;
 import com.seleniumtests.util.helper.WaitHelper;
 
+@Listeners(MockitoTestListener.class)
 public class StubTestClassForDriverTest extends StubParentClass {
 	
 	@BeforeMethod(groups="stub")
-	public void init(Method method) {
+	public void init(Method method) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 		SeleniumTestsContextManager.getThreadContext().setOverrideSeleniumNativeAction(true);
 		if (System.getProperty(SeleniumTestsContext.TEST_RETRY_COUNT) == null) {
@@ -288,7 +293,6 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	
 	@Test(groups="stub")
 	public void testImageDetection() throws Exception {
-
 		new ImageDetectorPage()
 			._clickErrorButtonInError();// force test to fail
 	}

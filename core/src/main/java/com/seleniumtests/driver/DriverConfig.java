@@ -38,7 +38,7 @@ import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.video.VideoCaptureMode;
 
-import net.lightbody.bmp.BrowserMobProxy;
+//import net.lightbody.bmp.BrowserMobProxy;
 
 public class DriverConfig {
 	
@@ -47,7 +47,7 @@ public class DriverConfig {
     private WebDriver driver;
     private Integer attachExistingDriverPort = null;
     private String runOnSameNode = null;
-    private BrowserMobProxy browserMobProxy;
+//    private BrowserMobProxy browserMobProxy;
     private SeleniumTestsContext testContext;
     private BrowserType browserType;
     private Integer majorBrowserVersion;
@@ -358,13 +358,13 @@ public class DriverConfig {
 		return testContext.isHeadlessBrowser();
 	}
 
-	public BrowserMobProxy getBrowserMobProxy() {
-		return browserMobProxy;
-	}
-
-	public void setBrowserMobProxy(BrowserMobProxy browserMobProxy) {
-		this.browserMobProxy = browserMobProxy;
-	}
+//	public BrowserMobProxy getBrowserMobProxy() {
+//		return browserMobProxy;
+//	}
+//
+//	public void setBrowserMobProxy(BrowserMobProxy browserMobProxy) {
+//		this.browserMobProxy = browserMobProxy;
+//	}
 
 	public SeleniumTestsContext getTestContext() {
 		return testContext;

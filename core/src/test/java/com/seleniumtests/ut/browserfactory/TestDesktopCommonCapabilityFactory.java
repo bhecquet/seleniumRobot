@@ -18,19 +18,19 @@
 package com.seleniumtests.ut.browserfactory;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -43,9 +43,7 @@ import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
-import com.seleniumtests.util.osutility.OSUtility;
 
-@PrepareForTest({OSUtility.class, NLWebDriverFactory.class})
 public class TestDesktopCommonCapabilityFactory extends MockitoTest {
 
 	@Mock
@@ -145,25 +143,24 @@ public class TestDesktopCommonCapabilityFactory extends MockitoTest {
 	public void testCreateHtmlUnitCapabilitiesWithNeoloadDesign() {
 		Proxy nlproxy = new Proxy();
 		nlproxy.setHttpProxy("localhost:8090");
-		
+
 		DesiredCapabilities nlCaps = new DesiredCapabilities();
 		nlCaps.setCapability(CapabilityType.PROXY, nlproxy);
-		
-		try {
 
-			PowerMockito.mockStatic(NLWebDriverFactory.class);
-			PowerMockito.when(NLWebDriverFactory.addProxyCapabilitiesIfNecessary(any(DesiredCapabilities.class))).thenReturn(nlCaps);
+		try (MockedStatic mockedNLDriverFactory = mockStatic(NLWebDriverFactory.class)){
+
+			mockedNLDriverFactory.when(() -> NLWebDriverFactory.addProxyCapabilitiesIfNecessary(any(DesiredCapabilities.class))).thenReturn(nlCaps);
 			when(config.isNeoloadActive()).thenReturn(true);
 			System.setProperty("nl.selenium.proxy.mode", "Design");
-			
+
 			MutableCapabilities capa = new HtmlUnitCapabilitiesFactory(config).createCapabilities();
-			
+
 			// we check that we have called the neoload method
 			Assert.assertNotNull(capa.getCapability(CapabilityType.PROXY));
 			Assert.assertEquals(((Proxy)capa.getCapability(CapabilityType.PROXY)).getHttpProxy(), "localhost:8090");
-			
-			
-			
+
+
+
 		} finally {
 			System.clearProperty("nl.selenium.proxy.mode");
 		}
@@ -174,27 +171,26 @@ public class TestDesktopCommonCapabilityFactory extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testCreateHtmlUnitCapabilitiesWithNeoloadRecording() {
-		
+
 		Proxy proxy = new Proxy();
 		proxy.setHttpProxy("localhost:1234");
 		Proxy nlproxy = new Proxy();
 		nlproxy.setHttpProxy("localhost:8090");
-		
+
 		DesiredCapabilities nlCaps = new DesiredCapabilities();
 		nlCaps.setCapability(CapabilityType.PROXY, nlproxy);
-		
-		try {
 
-			PowerMockito.mockStatic(NLWebDriverFactory.class);
-			PowerMockito.when(NLWebDriverFactory.addProxyCapabilitiesIfNecessary(any(DesiredCapabilities.class))).thenReturn(nlCaps);
+		try (MockedStatic mockedNLDriverFactory = mockStatic(NLWebDriverFactory.class)){
+
+			mockedNLDriverFactory.when(() -> NLWebDriverFactory.addProxyCapabilitiesIfNecessary(any(DesiredCapabilities.class))).thenReturn(nlCaps);
 			when(config.isNeoloadActive()).thenReturn(true);
 			when(config.getProxy()).thenReturn(proxy);
 			System.setProperty("nl.selenium.proxy.mode", "Design");
-			
+
 			MutableCapabilities capa = new HtmlUnitCapabilitiesFactory(config).createCapabilities();
 			Assert.assertNotNull(capa.getCapability(CapabilityType.PROXY));
 			Assert.assertEquals(((Proxy)capa.getCapability(CapabilityType.PROXY)).getHttpProxy(), "localhost:8090");
-			
+
 		} finally {
 			System.clearProperty("nl.selenium.proxy.mode");
 		}
@@ -206,14 +202,13 @@ public class TestDesktopCommonCapabilityFactory extends MockitoTest {
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testCreateHtmlUnitCapabilitiesWithNeoloadNotAccessible() {
-		try {
-			PowerMockito.mockStatic(NLWebDriverFactory.class);
-			PowerMockito.when(NLWebDriverFactory.addProxyCapabilitiesIfNecessary(any(DesiredCapabilities.class))).thenThrow(ExceptionInInitializerError.class);
+		try (MockedStatic mockedNLDriverFactory = mockStatic(NLWebDriverFactory.class)){
+			mockedNLDriverFactory.when(() -> NLWebDriverFactory.addProxyCapabilitiesIfNecessary(any(DesiredCapabilities.class))).thenThrow(ExceptionInInitializerError.class);
 			when(config.isNeoloadActive()).thenReturn(true);
 			System.setProperty("nl.selenium.proxy.mode", "Design");
-			
+
 			new HtmlUnitCapabilitiesFactory(config).createCapabilities();
-			
+
 		} finally {
 			System.clearProperty("nl.selenium.proxy.mode");
 		}
@@ -226,14 +221,13 @@ public class TestDesktopCommonCapabilityFactory extends MockitoTest {
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testCreateHtmlUnitCapabilitiesWithNeoloadNotLicensed() {
-		try {
-			PowerMockito.mockStatic(NLWebDriverFactory.class);
-			PowerMockito.when(NLWebDriverFactory.addProxyCapabilitiesIfNecessary(any(DesiredCapabilities.class))).thenThrow(RuntimeException.class);
+		try (MockedStatic mockedNLDriverFactory = mockStatic(NLWebDriverFactory.class)){
+			mockedNLDriverFactory.when(() -> NLWebDriverFactory.addProxyCapabilitiesIfNecessary(any(DesiredCapabilities.class))).thenThrow(RuntimeException.class);
 			when(config.isNeoloadActive()).thenReturn(true);
 			System.setProperty("nl.selenium.proxy.mode", "Design");
-			
+
 			new HtmlUnitCapabilitiesFactory(config).createCapabilities();
-			
+
 		} finally {
 			System.clearProperty("nl.selenium.proxy.mode");
 		}

@@ -18,7 +18,7 @@
 package com.seleniumtests.ut.browserfactory;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,9 +31,8 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.SystemUtils;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.openqa.selenium.Platform;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -43,7 +42,6 @@ import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.util.osutility.OSUtility;
 
-@PrepareForTest({BrowserInfo.class, OSUtility.class})
 public class TestBrowserInfo extends MockitoTest {
 	
 	@Mock
@@ -116,10 +114,10 @@ public class TestBrowserInfo extends MockitoTest {
 	public void testChromeVersionHighestDriverVersion() throws Exception {
 
 		List<String> driverList = Arrays.asList("chromedriver_2.28_chrome-55-57_android_7.0.exe", "chromedriver_2.29_chrome-56-58_android_7.0.exe", "chromedriver_2.31_chrome-58-60.exe");
-		BrowserInfo bInfo = PowerMockito.spy(new BrowserInfo(BrowserType.CHROME, "58.0", null));
-		PowerMockito.when(bInfo, "getDriverFiles").thenReturn(driverList);
-		PowerMockito.doNothing().when(bInfo, "checkResourceExists");
-		
+		BrowserInfo bInfo = spy(new BrowserInfo(BrowserType.CHROME, "58.0", null));
+		when(bInfo.getDriverFiles()).thenReturn(driverList);
+		doNothing().when(bInfo).checkResourceExists();
+
 		Assert.assertEquals(bInfo.getDriverFileName(), "chromedriver_2.31_chrome-58-60");
 	}
 	
@@ -129,13 +127,17 @@ public class TestBrowserInfo extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testGetFilesFromList() throws Exception {
-		
-		List<String> driverList = Arrays.asList("chromedriver_2.28_chrome-55-57_android_7.0.exe", "chromedriver_2.29_chrome-56-58_android_7.0.exe", "chromedriver_2.31_chrome-58-60.exe");
-		BrowserInfo bInfo = PowerMockito.spy(new BrowserInfo(BrowserType.CHROME, "58.0", null));
-		BrowserInfo.setDriverList(driverList);
-		PowerMockito.doNothing().when(bInfo, "checkResourceExists");
-		
-		Assert.assertEquals(bInfo.getDriverFileName(), "chromedriver_2.31_chrome-58-60");
+
+		try {
+			List<String> driverList = Arrays.asList("chromedriver_2.28_chrome-55-57_android_7.0.exe", "chromedriver_2.29_chrome-56-58_android_7.0.exe", "chromedriver_2.31_chrome-58-60.exe");
+			BrowserInfo bInfo = spy(new BrowserInfo(BrowserType.CHROME, "58.0", null));
+			BrowserInfo.setDriverList(driverList);
+			doNothing().when(bInfo).checkResourceExists();
+
+			Assert.assertEquals(bInfo.getDriverFileName(), "chromedriver_2.31_chrome-58-60");
+		} finally {
+			BrowserInfo.setDriverList(null);
+		}
 	}
 	
 	/**
@@ -145,10 +147,10 @@ public class TestBrowserInfo extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testChromeVersionMiddleRange() throws Exception {
 		List<String> driverList = Arrays.asList("chromedriver_2.28_chrome-55-57_android_7.0", "chromedriver_2.29_chrome-56-58_android_7.0", "chromedriver_2.31_chrome-58-60");
-		BrowserInfo bInfo = PowerMockito.spy(new BrowserInfo(BrowserType.CHROME, "57.1", null));
-		PowerMockito.when(bInfo, "getDriverFiles").thenReturn(driverList);
-		PowerMockito.doNothing().when(bInfo, "checkResourceExists");
-		
+		BrowserInfo bInfo = spy(new BrowserInfo(BrowserType.CHROME, "57.1", null));
+		when(bInfo.getDriverFiles()).thenReturn(driverList);
+		doNothing().when(bInfo).checkResourceExists();
+
 		Assert.assertEquals(bInfo.getDriverFileName(), "chromedriver_2.29_chrome-56-58_android_7.0");
 	}
 	
@@ -159,10 +161,10 @@ public class TestBrowserInfo extends MockitoTest {
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testChromeVersionNotFound() throws Exception {
 		List<String> driverList = Arrays.asList("chromedriver_2.28_chrome-55-57_android_7.0", "chromedriver_2.29_chrome-56-58_android_7.0", "chromedriver_2.31_chrome-58-60");
-		BrowserInfo bInfo = PowerMockito.spy(new BrowserInfo(BrowserType.CHROME, "1.0", null));
-		PowerMockito.when(bInfo, "getDriverFiles").thenReturn(driverList);
-		PowerMockito.doNothing().when(bInfo, "checkResourceExists");
-		
+		BrowserInfo bInfo = spy(new BrowserInfo(BrowserType.CHROME, "1.0", null));
+		when(bInfo.getDriverFiles()).thenReturn(driverList);
+		doNothing().when(bInfo).checkResourceExists();
+
 		bInfo.getDriverFileName();
 	}
 	
@@ -174,10 +176,10 @@ public class TestBrowserInfo extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testChromeVersionHigherThanDriverVersion() throws Exception {
 		List<String> driverList = Arrays.asList("chromedriver_2.28_chrome-55-57_android_7.0", "chromedriver_2.29_chrome-56-58_android_7.0", "chromedriver_2.31_chrome-58-60");
-		BrowserInfo bInfo = PowerMockito.spy(new BrowserInfo(BrowserType.CHROME, "70.0", null));
-		PowerMockito.when(bInfo, "getDriverFiles").thenReturn(driverList);
-		PowerMockito.doNothing().when(bInfo, "checkResourceExists");
-		
+		BrowserInfo bInfo = spy(new BrowserInfo(BrowserType.CHROME, "70.0", null));
+		when(bInfo.getDriverFiles()).thenReturn(driverList);
+		doNothing().when(bInfo).checkResourceExists();
+
 		Assert.assertEquals(bInfo.getDriverFileName(), "chromedriver_2.31_chrome-58-60");
 	}
 	
@@ -188,10 +190,10 @@ public class TestBrowserInfo extends MockitoTest {
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testChromeVersionNoDriver() throws Exception {
 		List<String> driverList = Arrays.asList("chromedriver_2.20_android-6.0");
-		BrowserInfo bInfo = PowerMockito.spy(new BrowserInfo(BrowserType.CHROME, "70.0", null));
-		PowerMockito.when(bInfo, "getDriverFiles").thenReturn(driverList);
-		PowerMockito.doNothing().when(bInfo, "checkResourceExists");
-		
+		BrowserInfo bInfo = spy(new BrowserInfo(BrowserType.CHROME, "70.0", null));
+		when(bInfo.getDriverFiles()).thenReturn(driverList);
+		doNothing().when(bInfo).checkResourceExists();
+
 		bInfo.getDriverFileName();
 	}
 	
@@ -202,10 +204,10 @@ public class TestBrowserInfo extends MockitoTest {
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testChromeVersionBadPattern() throws Exception {
 		List<String> driverList = Arrays.asList("chromedriver_2.20_chrome-55.0-57.0");
-		BrowserInfo bInfo = PowerMockito.spy(new BrowserInfo(BrowserType.CHROME, "55.0", null));
-		PowerMockito.when(bInfo, "getDriverFiles").thenReturn(driverList);
-		PowerMockito.doNothing().when(bInfo, "checkResourceExists");
-		
+		BrowserInfo bInfo = spy(new BrowserInfo(BrowserType.CHROME, "55.0", null));
+		when(bInfo.getDriverFiles()).thenReturn(driverList);
+		doNothing().when(bInfo).checkResourceExists();
+
 		bInfo.getDriverFileName();
 	}
 
@@ -218,10 +220,10 @@ public class TestBrowserInfo extends MockitoTest {
 	public void testAndroidVersionExactMatch() throws Exception {
 
 		List<String> driverList = Arrays.asList("chromedriver_2.20_chrome-55-57_android-6.0.exe", "chromedriver_2.29_chrome-56-58_android-7.0", "chromedriver_2.31_chrome-58-60");
-		BrowserInfo bInfo = PowerMockito.spy(new BrowserInfo(BrowserType.BROWSER, "6.0", null));
-		PowerMockito.when(bInfo, "getDriverFiles").thenReturn(driverList);
-		PowerMockito.doNothing().when(bInfo, "checkResourceExists");
-		
+		BrowserInfo bInfo = spy(new BrowserInfo(BrowserType.BROWSER, "6.0", null));
+		when(bInfo.getDriverFiles()).thenReturn(driverList);
+		doNothing().when(bInfo).checkResourceExists();
+
 		Assert.assertEquals(bInfo.getDriverFileName(), "chromedriver_2.20_chrome-55-57_android-6.0");
 	}
 	
@@ -233,10 +235,10 @@ public class TestBrowserInfo extends MockitoTest {
 	public void testAndroidVersionWrongPattern() throws Exception {
 		
 		List<String> driverList = Arrays.asList("chromedriver_2.20_chrome-55-57_android-6");
-		BrowserInfo bInfo = PowerMockito.spy(new BrowserInfo(BrowserType.BROWSER, "6.0", null));
-		PowerMockito.when(bInfo, "getDriverFiles").thenReturn(driverList);
-		PowerMockito.doNothing().when(bInfo, "checkResourceExists");
-		
+		BrowserInfo bInfo = spy(new BrowserInfo(BrowserType.BROWSER, "6.0", null));
+		when(bInfo.getDriverFiles()).thenReturn(driverList);
+		doNothing().when(bInfo).checkResourceExists();
+
 		bInfo.getDriverFileName();
 	}
 	
@@ -248,10 +250,10 @@ public class TestBrowserInfo extends MockitoTest {
 	public void testAndroidVersionNoMatch() throws Exception {
 		
 		List<String> driverList = Arrays.asList("chromedriver_2.20_chrome-55-57_android-6.0", "chromedriver_2.29_chrome-56-58_android-7.0", "chromedriver_2.31_chrome-58-60");
-		BrowserInfo bInfo = PowerMockito.spy(new BrowserInfo(BrowserType.BROWSER, "5.0", null));
-		PowerMockito.when(bInfo, "getDriverFiles").thenReturn(driverList);
-		PowerMockito.doNothing().when(bInfo, "checkResourceExists");
-		
+		BrowserInfo bInfo = spy(new BrowserInfo(BrowserType.BROWSER, "5.0", null));
+		when(bInfo.getDriverFiles()).thenReturn(driverList);
+		doNothing().when(bInfo).checkResourceExists();
+
 		bInfo.getDriverFileName();
 	}
 
@@ -261,15 +263,16 @@ public class TestBrowserInfo extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testGetDriverFilesWithInstalledArtifact() throws Exception {
-		PowerMockito.mockStatic(OSUtility.class);
-		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
-		
-		String[] driversFiles = new String[] {"windows/chromedriver_2.20_chrome-55-57_android-6.0.exe", "windows/chromedriver_2.29_chrome-56-58_android-7.0.exe", "windows/chromedriver_2.31_chrome-58-60.exe"};
-		
-		BrowserInfo bInfo = PowerMockito.spy(new BrowserInfo(BrowserType.CHROME, "55.0", null));
-		PowerMockito.when(bInfo, "getDriverListFromJarResources", "driver-list-windows.txt").thenReturn(driversFiles);
-		
-		Assert.assertEquals(bInfo.getDriverFiles().size(), 3);
+		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
+
+			String[] driversFiles = new String[]{"windows/chromedriver_2.20_chrome-55-57_android-6.0.exe", "windows/chromedriver_2.29_chrome-56-58_android-7.0.exe", "windows/chromedriver_2.31_chrome-58-60.exe"};
+
+			BrowserInfo bInfo = spy(new BrowserInfo(BrowserType.CHROME, "55.0", null));
+			when(bInfo.getDriverListFromJarResources( "driver-list-windows.txt")).thenReturn(driversFiles);
+
+			Assert.assertEquals(bInfo.getDriverFiles().size(), 3);
+		}
 	}
 	
 	/**
@@ -278,13 +281,14 @@ public class TestBrowserInfo extends MockitoTest {
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testGetDriverFilesWithNotInstalledArtifact() throws Exception {
-		PowerMockito.mockStatic(OSUtility.class);
-		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
-		
-		BrowserInfo bInfo = PowerMockito.spy(new BrowserInfo(BrowserType.CHROME, "55.0", null));
-		PowerMockito.when(bInfo, "getDriverListFromJarResources", "driver-list-windows.txt").thenThrow(NullPointerException.class);
-		
-		Assert.assertEquals(bInfo.getDriverFiles().size(), 3);
+		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
+
+			BrowserInfo bInfo = spy(new BrowserInfo(BrowserType.CHROME, "55.0", null));
+			when(bInfo.getDriverListFromJarResources("driver-list-windows.txt")).thenThrow(NullPointerException.class);
+
+			Assert.assertEquals(bInfo.getDriverFiles().size(), 3);
+		}
 	}
 	
 	/**
@@ -293,15 +297,16 @@ public class TestBrowserInfo extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testGetDriverFilesWithInstalledArtifactForOtherOS() throws Exception {
-		PowerMockito.mockStatic(OSUtility.class);
-		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.LINUX);
-		
-		String[] driversFiles = new String[] {"windows/chromedriver_2.20_chrome-55-57_android-6.0.exe", "windows/chromedriver_2.29_chrome-56-58_android-7.0.exe", "windows/chromedriver_2.31_chrome-58-60.exe"};
-		
-		BrowserInfo bInfo = PowerMockito.spy(new BrowserInfo(BrowserType.CHROME, "55.0", null));
-		PowerMockito.when(bInfo, "getDriverListFromJarResources", "driver-list-linux.txt").thenReturn(driversFiles);
-		
-		Assert.assertEquals(bInfo.getDriverFiles().size(), 0);
+		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.LINUX);
+
+			String[] driversFiles = new String[]{"windows/chromedriver_2.20_chrome-55-57_android-6.0.exe", "windows/chromedriver_2.29_chrome-56-58_android-7.0.exe", "windows/chromedriver_2.31_chrome-58-60.exe"};
+
+			BrowserInfo bInfo = spy(new BrowserInfo(BrowserType.CHROME, "55.0", null));
+			when(bInfo.getDriverListFromJarResources("driver-list-linux.txt")).thenReturn(driversFiles);
+
+			Assert.assertEquals(bInfo.getDriverFiles().size(), 0);
+		}
 	}
 	
 	/**
@@ -312,10 +317,10 @@ public class TestBrowserInfo extends MockitoTest {
 	public void testAndroidVersionNoDriver() throws Exception {
 		
 		List<String> driverList = Arrays.asList("chromedriver_2.31_chrome-58-60");
-		BrowserInfo bInfo = PowerMockito.spy(new BrowserInfo(BrowserType.BROWSER, "5.0", null));
-		PowerMockito.when(bInfo, "getDriverFiles").thenReturn(driverList);
-		PowerMockito.doNothing().when(bInfo, "checkResourceExists");
-		
+		BrowserInfo bInfo = spy(new BrowserInfo(BrowserType.BROWSER, "5.0", null));
+		when(bInfo.getDriverFiles()).thenReturn(driverList);
+		doNothing().when(bInfo).checkResourceExists();
+
 		bInfo.getDriverFileName();
 	}
 	
@@ -391,95 +396,107 @@ public class TestBrowserInfo extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testGetDefaultEdgeWindowsProfile() throws Exception {
-		PowerMockito.mockStatic(OSUtility.class);
-		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
-		
-		BrowserInfo bi = new BrowserInfo(BrowserType.EDGE, "90.0", null);
-		Assert.assertTrue(bi.getDefaultProfilePath().replace("\\",  "/").matches("C:/Users/.*?/AppData/Local/Microsoft/Edge/User Data"));
+		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
+
+			BrowserInfo bi = new BrowserInfo(BrowserType.EDGE, "90.0", null);
+			Assert.assertTrue(bi.getDefaultProfilePath().replace("\\", "/").matches("C:/Users/.*?/AppData/Local/Microsoft/Edge/User Data"));
+		}
 	}
 
 	@Test(groups={"ut"})
 	public void testGetDefaultEdgeLinuxProfile() throws Exception {
-		PowerMockito.mockStatic(OSUtility.class);
-		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.LINUX);
-		
-		BrowserInfo bi = new BrowserInfo(BrowserType.EDGE, "90.0", null);
-		Assert.assertTrue(bi.getDefaultProfilePath().matches("/home/.*?/.config/edge/default"));
+		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.LINUX);
+
+			BrowserInfo bi = new BrowserInfo(BrowserType.EDGE, "90.0", null);
+			Assert.assertTrue(bi.getDefaultProfilePath().matches("/home/.*?/.config/edge/default"));
+		}
 	}
 
 	@Test(groups={"ut"})
 	public void testGetDefaultEdgeMacProfile() throws Exception {
-		PowerMockito.mockStatic(OSUtility.class);
-		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
-		
-		BrowserInfo bi = new BrowserInfo(BrowserType.EDGE, "90.0", null);
-		Assert.assertTrue(bi.getDefaultProfilePath().matches("/Users/.*?/Library/Application Support/Microsoft/Edge"));
+		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
+
+			BrowserInfo bi = new BrowserInfo(BrowserType.EDGE, "90.0", null);
+			Assert.assertTrue(bi.getDefaultProfilePath().matches("/Users/.*?/Library/Application Support/Microsoft/Edge"));
+		}
 	}
 	
 	@Test(groups={"ut"})
 	public void testGetDefaultChromeWindowsProfile() throws Exception {
-		PowerMockito.mockStatic(OSUtility.class);
-		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
-		
-		BrowserInfo bi = new BrowserInfo(BrowserType.CHROME, "58.0", null);
-		Assert.assertTrue(bi.getDefaultProfilePath().replace("\\",  "/").matches("C:/Users/.*?/AppData/Local/Google/Chrome/User Data"));
+		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
+
+			BrowserInfo bi = new BrowserInfo(BrowserType.CHROME, "58.0", null);
+			Assert.assertTrue(bi.getDefaultProfilePath().replace("\\", "/").matches("C:/Users/.*?/AppData/Local/Google/Chrome/User Data"));
+		}
 	}
 	
 	
 	@Test(groups={"ut"})
 	public void testGetDefaultChromeLinuxProfile() throws Exception {
-		PowerMockito.mockStatic(OSUtility.class);
-		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.LINUX);
-		
-		BrowserInfo bi = new BrowserInfo(BrowserType.CHROME, "58.0", null);
-		Assert.assertTrue(bi.getDefaultProfilePath().matches("/home/.*?/.config/google-chrome/default"));
+		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.LINUX);
+
+			BrowserInfo bi = new BrowserInfo(BrowserType.CHROME, "58.0", null);
+			Assert.assertTrue(bi.getDefaultProfilePath().matches("/home/.*?/.config/google-chrome/default"));
+		}
 	}
 	
 	@Test(groups={"ut"})
 	public void testGetDefaultChromeMacProfile() throws Exception {
-		PowerMockito.mockStatic(OSUtility.class);
-		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
-		
-		BrowserInfo bi = new BrowserInfo(BrowserType.CHROME, "58.0", null);
-		Assert.assertTrue(bi.getDefaultProfilePath().matches("/Users/.*?/Library/Application Support/Google/Chrome"));
+		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
+
+			BrowserInfo bi = new BrowserInfo(BrowserType.CHROME, "58.0", null);
+			Assert.assertTrue(bi.getDefaultProfilePath().matches("/Users/.*?/Library/Application Support/Google/Chrome"));
+		}
 	}
 	
 	@Test(groups={"ut"})
 	public void testGetDefaultFirefoxWindowsProfile() throws Exception {
-		PowerMockito.mockStatic(OSUtility.class);
-		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
-		
-		BrowserInfo bi = new BrowserInfo(BrowserType.FIREFOX, "58.0", null);
-		Assert.assertTrue(bi.getDefaultProfilePath().replace("\\",  "/").matches("C:/Users/.*?/AppData/Roaming/Mozilla/Firefox/Profiles/.*\\.default"));
+		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
+
+			BrowserInfo bi = new BrowserInfo(BrowserType.FIREFOX, "58.0", null);
+			Assert.assertTrue(bi.getDefaultProfilePath().replace("\\", "/").matches("C:/Users/.*?/AppData/Roaming/Mozilla/Firefox/Profiles/.*\\.default"));
+		}
 	}
 	
 	@Test(groups={"ut"})
 	public void testGetDefaultFirefoxLinuxProfile() throws Exception {
-		PowerMockito.mockStatic(Files.class);
-		PowerMockito.mockStatic(OSUtility.class);
-		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.LINUX);
-		when(Files.list(any(Path.class))).thenReturn(streamPaths);
-		when(streamPaths.filter(any(Predicate.class))).thenReturn(streamPaths);
-		when(streamPaths.collect(any())).thenReturn(Arrays.asList(Paths.get("/home/user/.mozilla/firefox")));
-		
-		BrowserInfo bi = new BrowserInfo(BrowserType.FIREFOX, "58.0", null);
-		
-		Assert.assertEquals(bi.getDefaultProfilePath().replace("\\",  "/"), "/home/user/.mozilla/firefox");
+		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class);
+			MockedStatic mockedFiles = mockStatic(Files.class);
+		) {
+			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
+			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.LINUX);
+			mockedFiles.when(() -> Files.list(any(Path.class))).thenReturn(streamPaths);
+			when(streamPaths.filter(any(Predicate.class))).thenReturn(streamPaths);
+			when(streamPaths.collect(any())).thenReturn(Arrays.asList(Paths.get("/home/user/.mozilla/firefox")));
+
+			BrowserInfo bi = new BrowserInfo(BrowserType.FIREFOX, "58.0", null);
+
+			Assert.assertEquals(bi.getDefaultProfilePath().replace("\\", "/"), "/home/user/.mozilla/firefox");
+		}
 	}
 	
 	@Test(groups={"ut"})
 	public void testGetDefaultFirefoxMacProfile() throws Exception {
+		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class);
+			 MockedStatic mockedFiles = mockStatic(Files.class);
+		) {
+			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
+			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
+			mockedFiles.when(() -> Files.list(any(Path.class))).thenReturn(streamPaths);
+			when(streamPaths.filter(any(Predicate.class))).thenReturn(streamPaths);
+			when(streamPaths.collect(any())).thenReturn(Arrays.asList(Paths.get("/Users/user/Library/Application Support/Firefox/Profiles/")));
 
-		PowerMockito.mockStatic(Files.class);
-		PowerMockito.mockStatic(OSUtility.class);
-		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
-		when(Files.list(any(Path.class))).thenReturn(streamPaths);
-		when(streamPaths.filter(any(Predicate.class))).thenReturn(streamPaths);
-		when(streamPaths.collect(any())).thenReturn(Arrays.asList(Paths.get("/Users/user/Library/Application Support/Firefox/Profiles/")));
-		
-		BrowserInfo bi = new BrowserInfo(BrowserType.FIREFOX, "58.0", null);
-		
-		Assert.assertEquals(bi.getDefaultProfilePath().replace("\\",  "/"), "/Users/user/Library/Application Support/Firefox/Profiles");
+			BrowserInfo bi = new BrowserInfo(BrowserType.FIREFOX, "58.0", null);
+
+			Assert.assertEquals(bi.getDefaultProfilePath().replace("\\", "/"), "/Users/user/Library/Application Support/Firefox/Profiles");
+		}
 	}
 
 }

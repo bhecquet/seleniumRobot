@@ -19,18 +19,20 @@ package com.seleniumtests.browserfactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import io.appium.java_client.android.options.UiAutomator2Options;
 import org.apache.http.auth.AuthenticationException;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.DriverConfig;
 
-import io.appium.java_client.remote.MobileCapabilityType;
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
@@ -48,9 +50,9 @@ public class BrowserStackCapabilitiesFactory extends ICloudCapabilityFactory {
  
 
 	@Override
-    public DesiredCapabilities createCapabilities() {
+    public MutableCapabilities createCapabilities() {
 
-        final DesiredCapabilities capabilities = new DesiredCapabilities();
+        final MutableCapabilities capabilities = new DesiredCapabilities();
 
         // platform must be the concatenation of 'os' and 'os_version' that browserstack undestands
         String platform = webDriverConfig.getPlatform();
@@ -63,7 +65,7 @@ public class BrowserStackCapabilitiesFactory extends ICloudCapabilityFactory {
 	        	Capabilities androidCaps = new AndroidCapabilitiesFactory(webDriverConfig).createCapabilities();
 	        	capabilities.merge(androidCaps);
 
-	        	capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.AUTOMATION_NAME, "UIAutomator2");
+				((UiAutomator2Options)capabilities).setAutomationName("UIAutomator2");
 	            
 	        } else if (IOS_PLATFORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
 	        	Capabilities iosCaps = new IOsCapabilitiesFactory(webDriverConfig).createCapabilities();
@@ -100,19 +102,18 @@ public class BrowserStackCapabilitiesFactory extends ICloudCapabilityFactory {
         capabilities.setCapability("project", SeleniumTestsContextManager.getApplicationName());
         
         // we need to upload something
- 		if (capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP) != null) {
- 			String appUrl = uploadFile((String)capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP));
+		Optional<String> applicationOption = getApp(capabilities);
+ 		if (applicationOption.isPresent() && applicationOption.get() != null) {
+ 			String appUrl = uploadFile(applicationOption.get());
  			capabilities.setCapability("app", appUrl);
-
  		}
-        
-        return capabilities;
+
+		 // be sure not to have appium capabilities so that further setCapabilities do not add "appium:" prefix
+        return new MutableCapabilities(capabilities);
     }
 	
 	 /**
-     * Upload application to saucelabs server
-     * @param targetAppPath
-     * @param serverURL
+     * Upload application to browserstack server
      * @return
      * @throws IOException
      * @throws AuthenticationException 

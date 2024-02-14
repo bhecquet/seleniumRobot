@@ -18,17 +18,16 @@
 package com.seleniumtests.ut.uipage;
 
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.remote.RemoteWebElement;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -38,7 +37,6 @@ import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.uipage.BasePage;
 
-@PrepareForTest(WebUIDriver.class)
 public class TestBasePage extends MockitoTest {
 	
 	@Mock
@@ -57,14 +55,16 @@ public class TestBasePage extends MockitoTest {
 	private Alert alert;
 	
 	private BasePage page;
+
+	private MockedStatic mockedWebUiDriver;
 	
 	@BeforeMethod(groups={"ut"})
 	public void init() throws Exception{
 		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
-		
-		PowerMockito.mockStatic(WebUIDriver.class);
-		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
-		when(WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(webUiDriver);
+
+		mockedWebUiDriver = mockStatic(WebUIDriver.class);
+		mockedWebUiDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
+		mockedWebUiDriver.when(() -> WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(webUiDriver);
 		
 		// use this to test abstract class
 		page = mock(BasePage.class, Mockito.CALLS_REAL_METHODS);
@@ -77,6 +77,11 @@ public class TestBasePage extends MockitoTest {
 		
 		when(element.getText()).thenReturn("element text");
 
+	}
+
+	@AfterMethod(groups = {"ut"})
+	public void closeMocks() {
+		mockedWebUiDriver.close();
 	}
 
 	

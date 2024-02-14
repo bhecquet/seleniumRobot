@@ -1,16 +1,11 @@
 package com.seleniumtests.ut.core.context;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.mockito.MockedConstruction;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -27,13 +22,8 @@ import com.seleniumtests.core.contexts.SeleniumRobotServerContext;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.screenshots.SnapshotComparisonBehaviour;
 
-
-@PrepareForTest({ SeleniumRobotVariableServerConnector.class, SeleniumRobotServerContext.class})
 public class TestSeleniumRobotServerContext extends ConnectorsTest {
 	
-
-	@Mock
-	private SeleniumRobotVariableServerConnector variableServer;
 
 
 	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
@@ -174,15 +164,13 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 		Map<String, TestVariable> variables = new HashMap<>();
 		variables.put("key1", new TestVariable("key1", "val1"));
 
-		try {
+		try (MockedConstruction mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+			when(variableServer.isAlive()).thenReturn(true);
+			when(variableServer.getVariables(0, -1)).thenReturn(variables);
+		})) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 
-			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class)
-					.withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null))
-					.thenReturn(variableServer);
-			when(variableServer.isAlive()).thenReturn(true);
-			when(variableServer.getVariables(0, -1)).thenReturn(variables);
 			System.setProperty("key1", "userValue");
 
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
@@ -211,15 +199,12 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 		Map<String, TestVariable> variables = new HashMap<>();
 		variables.put("key1", new TestVariable("key1", "val1"));
 
-		try {
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
-
-			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class)
-					.withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null))
-					.thenReturn(variableServer);
+		try (MockedConstruction mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
 			when(variableServer.isAlive()).thenReturn(true);
 			when(variableServer.getVariables(0, -1)).thenReturn(variables);
+		})) {
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
 			initThreadContext(testNGCtx, "myTest", testResult);
@@ -246,24 +231,21 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 		Map<String, TestVariable> variables = new HashMap<>();
 		variables.put("key1", new TestVariable("key1", "val1"));
 		
-		try {
+		try (MockedConstruction mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+			when(variableServer.isAlive()).thenReturn(true);
+			when(variableServer.getVariables(0, 300)).thenReturn(variables);
+		})) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_VARIABLES_RESERVATION, "300");
-			
-			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class)
-			.withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null))
-			.thenReturn(variableServer);
-			when(variableServer.isAlive()).thenReturn(true);
-			when(variableServer.getVariables(0, 300)).thenReturn(variables);
-			
+
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
 			initThreadContext(testNGCtx, "myTest", testResult);
 			
 			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
 			seleniumTestsCtx.configureContext(testResult);
 			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key1").getValue(), "val1");
-			verify(variableServer).getVariables(0, 300);
+			verify((SeleniumRobotVariableServerConnector)mockedVariableServerConnector.constructed().get(0)).getVariables(0, 300);
 			
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
@@ -281,20 +263,17 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 	 */
 	@Test(groups = "ut")
 	public void testVariableServerConnection(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
-		try {
+		try (MockedConstruction mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+			when(variableServer.isAlive()).thenReturn(true);
+		})) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
-
-			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class)
-					.withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null))
-					.thenReturn(variableServer);
-			when(variableServer.isAlive()).thenReturn(true);
 
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
 			initThreadContext(testNGCtx, "myTest", testResult);
 
 			// check upsert has been called
-			verify(variableServer).isAlive();
+			verify((SeleniumRobotVariableServerConnector)mockedVariableServerConnector.constructed().get(0)).isAlive();
 
 			Assert.assertNotNull(SeleniumTestsContextManager.getThreadContext().getVariableServer());
 
@@ -358,20 +337,17 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 	 */
 	@Test(groups = "ut", expectedExceptions = ConfigurationException.class)
 	public void testNoVariableServerIfNotAlive(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
-		try {
+		try (MockedConstruction mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+			when(variableServer.isAlive()).thenReturn(false);
+		})) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
-
-			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class)
-					.withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null))
-					.thenReturn(variableServer);
-			when(variableServer.isAlive()).thenReturn(false);
 
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
 			initThreadContext(testNGCtx, "myTest", testResult);
 
 			// check upsert has been called
-			verify(variableServer).isAlive();
+			verify((SeleniumRobotVariableServerConnector)mockedVariableServerConnector.constructed().get(0)).isAlive();
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);

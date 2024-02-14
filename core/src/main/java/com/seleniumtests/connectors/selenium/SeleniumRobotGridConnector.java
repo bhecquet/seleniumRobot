@@ -34,11 +34,16 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.util.logging.DebugMode;
+import io.appium.java_client.android.options.UiAutomator2Options;
+import io.appium.java_client.ios.options.XCUITestOptions;
+import io.appium.java_client.remote.options.BaseOptions;
+import io.appium.java_client.remote.options.SupportsAppOption;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -51,6 +56,8 @@ import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
@@ -62,7 +69,6 @@ import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.customexception.SeleniumGridException;
 import com.seleniumtests.util.FileUtility;
 
-import io.appium.java_client.remote.MobileCapabilityType;
 import kong.unirest.GetRequest;
 import kong.unirest.HttpRequestWithBody;
 import kong.unirest.HttpResponse;
@@ -99,17 +105,23 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	 * 
 	 */
 	@Override
-	public void uploadMobileApp(Capabilities caps) {
-		
-		String appPath = (String)caps.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP);
-		
+	public MutableCapabilities uploadMobileApp(Capabilities caps) {
+		SupportsAppOption mobileOptions;
+		if (new BaseOptions(caps).getPlatformName() == null) {
+			return (MutableCapabilities) caps;
+		} else if (new BaseOptions(caps).getPlatformName().is(Platform.ANDROID)) {
+			mobileOptions = new UiAutomator2Options(caps);
+		} else if (new BaseOptions(caps).getPlatformName().is(Platform.IOS)) {
+			mobileOptions = new XCUITestOptions(caps);
+		} else return (MutableCapabilities) caps;
+
 		// check whether app is given and app path is a local file
-		if (appPath != null && new File(appPath).isFile()) {
+		if (mobileOptions.getApp().isPresent() && mobileOptions.getApp().get() != null && new File(String.valueOf(mobileOptions.getApp().get())).isFile()) {
 			
 			try (CloseableHttpClient client = HttpClients.createDefault();) {
 				// zip file
 				List<File> appFiles = new ArrayList<>();
-				appFiles.add(new File(appPath));
+				appFiles.add(new File(String.valueOf(mobileOptions.getApp().get())));
 				File zipFile = FileUtility.createZipArchiveFromFiles(appFiles);
 				
 				HttpHost serverHost = new HttpHost(hubServletUrl.getHost(), hubServletUrl.getPort());
@@ -127,13 +139,16 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		        	throw new SeleniumGridException("could not upload application file: " + response.getStatusLine().getReasonPhrase());
 		        } else {
 		        	// set path to the mobile application as an URL on the grid hub
-		        	((DesiredCapabilities)caps).setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP, IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8) + "/" + appFiles.get(0).getName());
+					mobileOptions.setApp(IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8) + "/" + appFiles.get(0).getName());
 		        }
+				// update original caps so that any change made here can be reused later
+				return new MutableCapabilities(mobileOptions);
 		        
 			} catch (IOException | URISyntaxException e) {
 				throw new SeleniumGridException("could not upload application file", e);
 			}
 		}
+		return (MutableCapabilities) caps;
 	}
 	
 	/**

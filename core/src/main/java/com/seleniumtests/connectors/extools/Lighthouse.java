@@ -9,6 +9,7 @@ import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.osutility.OSCommand;
+import com.seleniumtests.util.osutility.SystemUtility;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -181,7 +182,7 @@ public class Lighthouse {
 	public boolean isLighthouseInPath() {
 		String name = "LIGHTHOUSE_HOME";
 		try {
-			String lighthouseHomeEnv = System.getenv(name);
+			String lighthouseHomeEnv = SystemUtility.getenv(name);
 			if (lighthouseHomeEnv == null || lighthouseHomeEnv.isEmpty()) {
 				logger.info("Lighthouse is on path");
 				return true;

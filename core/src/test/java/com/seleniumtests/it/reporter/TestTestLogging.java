@@ -21,6 +21,7 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.List;
 
+import com.seleniumtests.util.helper.WaitHelper;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeMethod;
@@ -48,7 +49,9 @@ public class TestTestLogging extends ReporterTest {
 	public void checkFileLogger() throws Exception {
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassWithWait"});
 		Assert.assertTrue(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + "/seleniumRobot.log").isFile());
-		
+
+		WaitHelper.waitForSeconds(1);
+
 		// check all execution files has been removed once test is finished
 		Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "test1", "execution.log").toFile().exists());
 		Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "test2", "execution.log").toFile().exists());

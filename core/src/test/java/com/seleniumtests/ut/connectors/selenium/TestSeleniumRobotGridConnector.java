@@ -20,10 +20,7 @@ package com.seleniumtests.ut.connectors.selenium;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.awt.Point;
 import java.awt.event.KeyEvent;
@@ -37,7 +34,10 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import com.seleniumtests.driver.WebUIDriverFactory;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
+import io.appium.java_client.android.options.UiAutomator2Options;
+import io.appium.java_client.remote.options.BaseOptions;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -49,35 +49,31 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.logging.log4j.Logger;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
 import com.seleniumtests.ConnectorsTest;
-import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.customexception.SeleniumGridException;
 
-import io.appium.java_client.remote.MobileCapabilityType;
 import kong.unirest.GetRequest;
 import kong.unirest.HttpRequest;
 import kong.unirest.HttpRequestWithBody;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
-
-
-@PrepareForTest({HttpClients.class, Unirest.class})
 public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	
@@ -156,13 +152,19 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	private SeleniumRobotGridConnector connector;
 	private Logger gridLogger;
+
+	private MockedStatic mockedHttpClients;
 	
-	private DesiredCapabilities capabilities = new DesiredCapabilities();
-	
+	private MutableCapabilities capabilities;
+	private MutableCapabilities mobileCapabilities;
+
 	@BeforeMethod(groups={"ut"})
 	private void init() throws ClientProtocolException, IOException {
-		PowerMockito.mockStatic(HttpClients.class);
-		when(HttpClients.createDefault()).thenReturn(client);
+
+		capabilities = new MutableCapabilities();
+		mobileCapabilities = new UiAutomator2Options();
+		mockedHttpClients = mockStatic(HttpClients.class);
+		mockedHttpClients.when(() -> HttpClients.createDefault()).thenReturn(client);
 		when(response.getEntity()).thenReturn(entity);
 		when(response.getStatusLine()).thenReturn(statusLine);
 		when(client.execute((HttpHost)any(), any())).thenReturn(response);
@@ -174,9 +176,14 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		connector = new SeleniumRobotGridConnector(SERVER_URL + "/wd/hub");
 		connector.setNodeUrl("http://localhost:4321");
 		connector.setSessionId(new SessionId("1234"));
-		gridLogger = spy(connector.getLogger());
+		gridLogger = spy(SeleniumRobotLogger.getLogger(SeleniumGridConnector.class));
 		SeleniumRobotGridConnector.setLogger(gridLogger);
 
+	}
+
+	@AfterMethod(alwaysRun = true)
+	private void reset () {
+		mockedHttpClients.close();
 	}
 	
 	@Test(groups={"ut"})
@@ -185,15 +192,49 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		// prepare app file
 		File appFile = File.createTempFile("app", ".apk");
 		appFile.deleteOnExit();
-		capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP, appFile.getAbsolutePath());
+		((UiAutomator2Options)mobileCapabilities).setApp(appFile.getAbsolutePath());
 		
 		// prepare response
 		InputStream is = IOUtils.toInputStream("file:app/zip", Charset.forName("UTF-8"));
 		when(statusLine.getStatusCode()).thenReturn(200);
 		when(entity.getContent()).thenReturn(is);
-		
-		connector.uploadMobileApp(capabilities);
-		Assert.assertEquals(capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP), "file:app/zip/" + appFile.getName());
+
+		mobileCapabilities = connector.uploadMobileApp(new MutableCapabilities(mobileCapabilities));
+		Assert.assertEquals(new UiAutomator2Options(mobileCapabilities).getApp().orElse(null), "file:app/zip/" + appFile.getName());
+	}
+
+	@Test(groups={"ut"})
+	public void testSendAppNoApp() throws UnsupportedOperationException, IOException {
+
+		// prepare response
+		InputStream is = IOUtils.toInputStream("file:app/zip", Charset.forName("UTF-8"));
+		when(statusLine.getStatusCode()).thenReturn(200);
+		when(entity.getContent()).thenReturn(is);
+		mobileCapabilities.setCapability("foo", "bar");
+
+		mobileCapabilities = connector.uploadMobileApp(new MutableCapabilities(mobileCapabilities));
+		Assert.assertEquals(mobileCapabilities.getCapability("appium:foo"), "bar");
+	}
+
+	@Test(groups={"ut"})
+	public void testSendAppNotMobile() throws UnsupportedOperationException, IOException {
+
+		// prepare app file
+		File appFile = File.createTempFile("app", ".apk");
+		appFile.deleteOnExit();
+
+		// prepare response
+		InputStream is = IOUtils.toInputStream("file:app/zip", Charset.forName("UTF-8"));
+		when(statusLine.getStatusCode()).thenReturn(200);
+		when(entity.getContent()).thenReturn(is);
+
+		MutableCapabilities caps = new MutableCapabilities();
+		caps.setCapability("appium:app", appFile.getAbsolutePath());
+
+		mobileCapabilities = connector.uploadMobileApp(caps);
+
+		// nothing has been uploaded
+		Assert.assertEquals(new UiAutomator2Options(mobileCapabilities).getApp().orElse(null), appFile.getAbsolutePath());
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions = SeleniumGridException.class)
@@ -202,14 +243,14 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		// prepare app file
 		File appFile = File.createTempFile("app", ".apk");
 		appFile.deleteOnExit();
-		capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP, appFile.getAbsolutePath());
+		((UiAutomator2Options)mobileCapabilities).setApp(appFile.getAbsolutePath());
 		
 		// prepare response
 		InputStream is = IOUtils.toInputStream("file:app/zip", Charset.forName("UTF-8"));
 		when(statusLine.getStatusCode()).thenReturn(500);
 		when(entity.getContent()).thenReturn(is);
 		
-		connector.uploadMobileApp(capabilities);
+		connector.uploadMobileApp(mobileCapabilities);
 	}
 	
 	/**
@@ -222,12 +263,12 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	public void testDontSendAppWhenHttp() throws ClientProtocolException, IOException {
 		
 		// prepare app key
-		capabilities.setCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP, "http://server:port/data/application.apk");
+		((UiAutomator2Options)mobileCapabilities).setApp("http://server:port/data/application.apk");
 		
-		connector.uploadMobileApp(capabilities);
+		connector.uploadMobileApp(mobileCapabilities);
 		
 		verify(client, never()).execute((HttpHost)any(), any());
-		Assert.assertEquals(capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP), "http://server:port/data/application.apk");
+		Assert.assertEquals(((UiAutomator2Options)mobileCapabilities).getApp().orElse(null), "http://server:port/data/application.apk");
 	}
 	
 	/**
@@ -242,7 +283,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		connector.uploadMobileApp(new DesiredCapabilities());
 		
 		verify(client, never()).execute((HttpHost)any(), any());
-		Assert.assertEquals(capabilities.getCapability(SeleniumRobotCapabilityType.APPIUM_PREFIX + MobileCapabilityType.APP), null);
+		Assert.assertEquals(((UiAutomator2Options)mobileCapabilities).getApp().orElse(""), "");
 	}
 	
 	/**
@@ -1483,8 +1524,8 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		
 		createJsonServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200, String.format(GRID_STATUS_WITH_SESSION, "abcdef"));
 		
-		((DesiredCapabilities)capabilities).setCapability(CapabilityType.BROWSER_NAME, "firefox");
-		((DesiredCapabilities)capabilities).setCapability(CapabilityType.BROWSER_VERSION, "50.0");
+		capabilities.setCapability(CapabilityType.BROWSER_NAME, "firefox");
+		capabilities.setCapability(CapabilityType.BROWSER_VERSION, "50.0");
 		
 		SeleniumRobotGridConnector connector = spy(new SeleniumRobotGridConnector(SERVER_URL));
 		
@@ -1509,8 +1550,8 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 
 		createJsonServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200, String.format(GRID_STATUS_WITH_SESSION, "aaaaa"), String.format(GRID_STATUS_WITH_SESSION, "abcdef"));
 
-		((DesiredCapabilities)capabilities).setCapability(CapabilityType.BROWSER_NAME, "firefox");
-		((DesiredCapabilities)capabilities).setCapability(CapabilityType.BROWSER_VERSION, "50.0");
+		capabilities.setCapability(CapabilityType.BROWSER_NAME, "firefox");
+		capabilities.setCapability(CapabilityType.BROWSER_VERSION, "50.0");
 
 		SeleniumGridConnector connector = spy(new SeleniumRobotGridConnector(SERVER_URL));
 
@@ -1533,8 +1574,8 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 
 		createJsonServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200, String.format(GRID_STATUS_WITH_SESSION, "aaaaa"));
 
-		((DesiredCapabilities)capabilities).setCapability(CapabilityType.BROWSER_NAME, "firefox");
-		((DesiredCapabilities)capabilities).setCapability(CapabilityType.BROWSER_VERSION, "50.0");
+		capabilities.setCapability(CapabilityType.BROWSER_NAME, "firefox");
+		capabilities.setCapability(CapabilityType.BROWSER_VERSION, "50.0");
 
 		SeleniumGridConnector connector = spy(new SeleniumRobotGridConnector(SERVER_URL));
 
@@ -1545,14 +1586,14 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 
 		connector.getSessionInformationFromGrid(driver);
 	}
-	
+
 	@Test(groups={"ut"})
 	public void testGetSessionInformationFromGridWithSecondDriver() throws UnsupportedOperationException, IOException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, UnirestException {
 		
 		createJsonServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200, String.format(GRID_STATUS_WITH_SESSION, "abcdef"), String.format(GRID_STATUS_WITH_SESSION_OTHER_NODE, "ghijkl"));
 		
-		((DesiredCapabilities)capabilities).setCapability(CapabilityType.BROWSER_NAME, "firefox");
-		((DesiredCapabilities)capabilities).setCapability(CapabilityType.BROWSER_VERSION, "50.0");
+		capabilities.setCapability(CapabilityType.BROWSER_NAME, "firefox");
+		capabilities.setCapability(CapabilityType.BROWSER_VERSION, "50.0");
 		
 		SeleniumRobotGridConnector connector = spy(new SeleniumRobotGridConnector(SERVER_URL));
 		

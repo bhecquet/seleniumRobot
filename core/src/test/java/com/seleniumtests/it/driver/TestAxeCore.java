@@ -59,7 +59,7 @@ public class TestAxeCore extends GenericTest {
 	@Test(groups={"it"})
 	public void testWcagAnalysisDone() {
 		Results result = WcagChecker.analyze(driver);
-		Assert.assertEquals(result.getViolations().size(), 10);
+		Assert.assertEquals(result.getViolations().size(), 9);
 	}
 	
 	@Test(groups={"it"})

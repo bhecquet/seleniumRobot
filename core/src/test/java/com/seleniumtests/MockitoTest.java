@@ -24,12 +24,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.seleniumtests.browserfactory.SeleniumGridDriverFactory;
+import com.seleniumtests.util.osutility.OSUtility;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.Logger;
 import org.mockito.MockitoAnnotations;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.modules.testng.PowerMockTestCase;
+import org.mockito.quality.Strictness;
+import org.mockito.testng.MockitoSettings;
+import org.mockito.testng.MockitoTestNGListener;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterClass;
@@ -42,16 +45,10 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.video.VideoCaptureMode;
 
-/**
- * Redefine calls to PowerMockTestCase methods as they are not called when using TestNG groups
- * we MUST mark them as "alwaysRun"
- * @author behe
- *
- */
 
-@PowerMockIgnore({"javax.net.ssl.*", "com.google.inject.*", "javax.imageio.*", "javax.swing.*"})
-@Listeners({CaptureVideoListener.class})
-public class MockitoTest  extends PowerMockTestCase {
+@Listeners({CaptureVideoListener.class, MockitoTestNGListener.class})
+@MockitoSettings(strictness = Strictness.LENIENT)
+public class MockitoTest {
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(MockitoTest.class);
 
@@ -62,9 +59,9 @@ public class MockitoTest  extends PowerMockTestCase {
 	@BeforeMethod(groups={"ut", "it", "ie"})  
 	public void beforeMethod(final Method method, final ITestContext testNGCtx, final ITestResult testResult) throws Exception {
 		doBeforeMethod(method);
-		beforePowerMockTestMethod();
 		beforeMethodDone.put(method, true);
 		initThreadContext(testNGCtx, null, testResult);
+		SeleniumGridDriverFactory.resetCounter();
 		MockitoAnnotations.initMocks(this); 
 	}
 	
@@ -88,18 +85,12 @@ public class MockitoTest  extends PowerMockTestCase {
 		SeleniumTestsContextManager.getGlobalContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
 	}
 	
-	@BeforeClass(groups={"ut", "it", "ie"})  
-	public void beforeClass() throws Exception {
-		beforePowerMockTestClass();
-	}
-	
+
 	@AfterMethod(groups={"ut", "it", "ie"}, alwaysRun=true)
 	public void afterMethod(final Method method) throws Exception {
-		if (beforeMethodDone.getOrDefault(method, false) == true) {
-			afterPowerMockTestMethod();
-		}
 
 		GenericTest.resetTestNGREsultAndLogger();
+		OSUtility.resetInstalledBrowsersWithVersion();
 	}
 	
 
@@ -111,12 +102,7 @@ public class MockitoTest  extends PowerMockTestCase {
 
 		return tempFile;
 	}
-	
-	@AfterClass(groups={"ut", "it", "ie"}, alwaysRun=true)
-	public void afterClass() throws Exception {
-		afterPowerMockTestClass();
-	}
-	
+
 	public void myTest() {
 		
 	}

@@ -17,9 +17,9 @@
  */
 package com.seleniumtests.connectors.mails;
 
-import java.io.IOException;
+import jakarta.mail.MessagingException;
 
-import javax.mail.MessagingException;
+import java.io.IOException;
 
 
 public class GMailClient extends ImapClient {

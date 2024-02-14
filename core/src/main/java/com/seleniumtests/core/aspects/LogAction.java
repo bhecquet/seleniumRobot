@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.JoinPoint;
@@ -56,7 +57,7 @@ import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.video.VideoRecorder;
 
-import net.lightbody.bmp.BrowserMobProxy;
+//import net.lightbody.bmp.BrowserMobProxy;
 
 /**
  * Aspect to intercept calls to methods of HtmlElement. It allows to retry discovery and action 
@@ -458,10 +459,10 @@ public class LogAction {
 	 * @return
 	 */
 	private String getAnnotationValue(Annotation annotation) {
-		return annotation.toString().replaceFirst("timeout=\\d+", "")
-			.replace("@" + annotation.annotationType().getCanonicalName() + "(", "")
+		return StringEscapeUtils.unescapeJava(annotation.toString().replaceFirst("timeout=\\d+", "")
+			.replace("@" + annotation.annotationType().getCanonicalName() + "(\"", "")
 			.replaceFirst(",?\\s?value=", "")
-			.replaceFirst("\\)$", "");
+			.replaceFirst("\"\\)$", ""));
 	}
 	
 	/**
@@ -519,7 +520,7 @@ public class LogAction {
 			currentStep.addAction(new TestAction(String.format("Opening page %s",  page.getClass().getSimpleName()), false, new ArrayList<>()));
 		}
 		
-		BrowserMobProxy mobProxy = WebUIDriver.getBrowserMobProxy();
+//		BrowserMobProxy mobProxy = WebUIDriver.getBrowserMobProxy();
 		NLWebDriver neoloadDriver = WebUIDriver.getNeoloadDriver();
 		VideoRecorder videoRecorder = WebUIDriver.getThreadVideoRecorder();
 		
@@ -532,9 +533,9 @@ public class LogAction {
 			TestStepManager.setCurrentRootTestStep(currentStep); // will also set parent step
 			rootStep = true;
 			
-			if (mobProxy != null) {
+			/*if (mobProxy != null) {
 				mobProxy.newPage(currentStep.getName());
-			}
+			}*/
 			if (videoRecorder != null) {
 				CustomEventFiringWebDriver.displayStepOnScreen(currentStep.getName(), 
 						SeleniumTestsContextManager.getThreadContext().getRunMode(), 

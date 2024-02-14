@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.ut.browserfactory;
 
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -26,7 +27,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.PageLoadStrategy;
@@ -35,9 +38,8 @@ import org.openqa.selenium.Proxy;
 import org.openqa.selenium.edge.EdgeDriverService;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.remote.CapabilityType;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -52,10 +54,7 @@ import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.osutility.OSUtility;
-import com.seleniumtests.util.osutility.OSUtilityFactory;
-import com.seleniumtests.util.osutility.OSUtilityWindows;
 
-@PrepareForTest({OSUtility.class, OSUtilityFactory.class, EdgeCapabilitiesFactory.class})
 public class TestEdgeCapabilityFactory extends MockitoTest {
 
 	private static final String BETA_VERSION = "118.0";
@@ -69,28 +68,36 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 	private Proxy proxyConfig;
 	
 	@Mock
-	private OSUtilityWindows osUtility;
-	
-	@Mock
 	private SeleniumTestsContext context;
 	
 	private Map<BrowserType, List<BrowserInfo>> browserInfos;
+
+
+	private MockedStatic mockedOsUtility;
 	
 	@BeforeMethod(groups= {"ut"})
 	public void init() {
 		browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, "72.0", "", false)));
-		PowerMockito.mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
-		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion()).thenReturn(browserInfos);
+		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, RELEASE_VERSION, "", false)));
+		mockedOsUtility = mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
+		mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
 		when(config.getTestContext()).thenReturn(context);
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.NONE));
 		when(config.getPageLoadStrategy()).thenReturn(PageLoadStrategy.NORMAL);
 		when(config.getBrowserType()).thenReturn(BrowserType.EDGE);
 		when(config.getAttachExistingDriverPort()).thenReturn(null);
 		when(config.isSetAcceptUntrustedCertificates()).thenReturn(true);
+		when(config.getOutputDirectory()).thenReturn(SeleniumTestsContextManager.getThreadContext().getOutputDirectory());
 	}
-		
-	
+
+	@AfterMethod(groups = "ut", alwaysRun = true)
+	private void closeMocks() {
+		mockedOsUtility.close();
+		System.clearProperty(EdgeDriverService.EDGE_DRIVER_EXE_PROPERTY);
+	}
+
+
 	/**
 	 * If beta is not requested, get the non beta version even if both are present
 	 */
@@ -101,7 +108,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
 		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, RELEASE_VERSION, "", false, false), 
 				new BrowserInfo(BrowserType.EDGE, BETA_VERSION, "", false, true)));
-		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
+		mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
 		
 		EdgeCapabilitiesFactory capaFactory = new EdgeCapabilitiesFactory(config);
 		capaFactory.createCapabilities();
@@ -118,7 +125,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
 		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, BETA_VERSION, "", false, true)));
-		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
+		mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
 		
 		EdgeCapabilitiesFactory capaFactory = new EdgeCapabilitiesFactory(config);
 		capaFactory.createCapabilities();
@@ -134,7 +141,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
 		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, RELEASE_VERSION, "", false, false), 
 				new BrowserInfo(BrowserType.EDGE, BETA_VERSION, "", false, true)));
-		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(true)).thenReturn(browserInfos);
+		mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(true)).thenReturn(browserInfos);
 		when(config.getBetaBrowser()).thenReturn(true);
 		
 		EdgeCapabilitiesFactory capaFactory = new EdgeCapabilitiesFactory(config);
@@ -152,7 +159,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
 		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, RELEASE_VERSION, "", false, false)));
-		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(true)).thenReturn(browserInfos);
+		mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(true)).thenReturn(browserInfos);
 		when(config.getBetaBrowser()).thenReturn(true);
 		
 		EdgeCapabilitiesFactory capaFactory = new EdgeCapabilitiesFactory(config);
@@ -221,13 +228,20 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithVersion() {
+
+		browserInfos = new HashMap<>();
+		List<BrowserInfo> browserInfoList = new ArrayList<>();
+		browserInfoList.add(new BrowserInfo(BrowserType.CHROME, RELEASE_VERSION, "", false));
+		browserInfoList.add(new BrowserInfo(BrowserType.EDGE, BETA_VERSION, "", false));
+		browserInfos.put(BrowserType.EDGE, browserInfoList);
+		mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
 		
 		when(config.getProxy()).thenReturn(proxyConfig);
-		when(config.getBrowserVersion()).thenReturn("60.0");
+		when(config.getBrowserVersion()).thenReturn(BETA_VERSION);
 		
 		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(capa.getBrowserVersion(), "60.0");
+		Assert.assertEquals(capa.getBrowserVersion(), BETA_VERSION);
 		
 	}
 	
@@ -413,7 +427,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		
 		try {
 			when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.DRIVER));
-		when(config.getMode()).thenReturn(DriverMode.LOCAL);
+			when(config.getMode()).thenReturn(DriverMode.LOCAL);
 			new EdgeCapabilitiesFactory(config).createCapabilities();
 		
 			Assert.assertEquals(System.getProperty(EdgeDriverService.EDGE_DRIVER_VERBOSE_LOG_PROPERTY), "true");

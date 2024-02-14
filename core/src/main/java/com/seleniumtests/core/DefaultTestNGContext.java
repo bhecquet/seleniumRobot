@@ -162,8 +162,8 @@ public class DefaultTestNGContext implements ITestContext {
         return new ArrayList<>();
     }
 
-    public void addGuiceModule(final Class<? extends Module> cls, final Module module) { 
-    	//TODO
+    public void addGuiceModule(final Class<? extends Module> cls, final Module module) {
+        //TODO
     }
 
     @Override
@@ -172,13 +172,15 @@ public class DefaultTestNGContext implements ITestContext {
     }
 
     @Override
-    public void addInjector(final List<Module> moduleInstances, final Injector injector) { 
-    	// do nothing
+    public void addInjector(final List<Module> moduleInstances, final Injector injector) {
+        // do nothing
     }
 
     @Override
-	public Injector getInjector(IClass iClass) {
-		return null;
-	}
+    public Injector getInjector(IClass iClass) {
+        return null;
+    }
+
+
 
 }

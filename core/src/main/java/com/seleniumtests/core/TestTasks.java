@@ -44,7 +44,7 @@ import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.osutility.ProcessInfo;
 
-import net.lightbody.bmp.BrowserMobProxy;
+//import net.lightbody.bmp.BrowserMobProxy;
 
 /**
  * Class for storing tasks that can be used in test and / or in webpages
@@ -345,11 +345,11 @@ public class TestTasks {
 	    	TestStepManager.setCurrentRootTestStep(step);
 	    	capturePageSnapshot();
 	    	
-	    	// start a new page when using BrowserMobProxy (network capture)
-	    	BrowserMobProxy mobProxy = WebUIDriver.getBrowserMobProxy();
-	    	if (mobProxy != null) {
-	    		mobProxy.newPage(stepName);
-	    	}
+//	    	// start a new page when using BrowserMobProxy (network capture)
+//	    	BrowserMobProxy mobProxy = WebUIDriver.getBrowserMobProxy();
+//	    	if (mobProxy != null) {
+//	    		mobProxy.newPage(stepName);
+//	    	}
 	    	
 	    	// start a new transaction when using Neoload
 	    	if (neoloadDriver != null) {

@@ -42,11 +42,11 @@ import com.seleniumtests.driver.DriverExtractor;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.osutility.OSUtility;
 
-import net.lightbody.bmp.BrowserMobProxy;
-import net.lightbody.bmp.BrowserMobProxyServer;
-import net.lightbody.bmp.client.ClientUtil;
-import net.lightbody.bmp.proxy.CaptureType;
-import net.lightbody.bmp.proxy.auth.AuthType;
+//import net.lightbody.bmp.BrowserMobProxy;
+//import net.lightbody.bmp.BrowserMobProxyServer;
+//import net.lightbody.bmp.client.ClientUtil;
+//import net.lightbody.bmp.proxy.CaptureType;
+//import net.lightbody.bmp.proxy.auth.AuthType;
 
 public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
 
@@ -215,8 +215,9 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
         	if (webDriverConfig.getWebProxyType() != ProxyType.DIRECT && webDriverConfig.getWebProxyType() != ProxyType.MANUAL) {
         		throw new ConfigurationException("PAC/AUTODETECT/SYSTEM proxy cannot be used with browsermob proxy");
         	}
+			throw new ConfigurationException("HAR capture is not supported anymore");
         	
-			BrowserMobProxy mobProxy = new BrowserMobProxyServer();
+			/*BrowserMobProxy mobProxy = new BrowserMobProxyServer();
 			
 			if (webDriverConfig.getWebProxyType() == ProxyType.MANUAL) {
 				mobProxy.setChainedProxy(new InetSocketAddress(webDriverConfig.getWebProxyAddress(), webDriverConfig.getWebProxyPort()));
@@ -231,7 +232,7 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
 		    Proxy seleniumProxy = ClientUtil.createSeleniumProxy(mobProxy);
 	    
         	capability.setCapability(PROXY, Require.nonNull("Proxy", seleniumProxy));
-		    webDriverConfig.setBrowserMobProxy(mobProxy);
+		    webDriverConfig.setBrowserMobProxy(mobProxy);*/
         } else if (proxy != null) {
         	capability.setCapability(PROXY, Require.nonNull("Proxy", proxy));
         }

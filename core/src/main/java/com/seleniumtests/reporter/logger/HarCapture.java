@@ -24,11 +24,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+import com.seleniumtests.reporter.info.Har;
 import org.json.JSONObject;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 
-import net.lightbody.bmp.core.har.Har;
+//import net.lightbody.bmp.core.har.Har;
 
 public class HarCapture extends TestAction {
 

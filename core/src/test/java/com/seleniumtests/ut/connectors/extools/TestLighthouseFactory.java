@@ -1,19 +1,21 @@
 package com.seleniumtests.ut.connectors.extools;
 
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import java.nio.file.Paths;
 import java.util.HashMap;
 
+import com.seleniumtests.driver.WebUIDriver;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.remote.CapabilityType;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -23,18 +25,23 @@ import com.seleniumtests.connectors.extools.LighthouseFactory;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
-import com.seleniumtests.driver.WebUIDriver;
 
-@PrepareForTest({WebUIDriver.class})
 public class TestLighthouseFactory extends MockitoTest {
 	
 	@Mock
 	private CustomEventFiringWebDriver driver;
+
+	private MockedStatic mockedWebUIDriver;
 	
 	@BeforeMethod(groups="ut", alwaysRun = true)
 	public void init() {
-		PowerMockito.mockStatic(WebUIDriver.class);
-		PowerMockito.when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
+		mockedWebUIDriver = mockStatic(WebUIDriver.class);
+		mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
+	}
+
+	@AfterMethod(groups={"ut"}, alwaysRun = true)
+	private void closeMocks() {
+		mockedWebUIDriver.close();
 	}
 	
 	@Test(groups="ut")

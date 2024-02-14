@@ -5,11 +5,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,10 +14,10 @@ import java.util.HashSet;
 
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.reporter.logger.TestStep;
-import com.seleniumtests.ut.MockWebDriver;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
@@ -30,19 +26,16 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.Navigation;
 import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Interactive;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -62,9 +55,7 @@ import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.ut.core.runner.cucumber.PageForActions;
 import com.seleniumtests.util.helper.WaitHelper;
-import com.seleniumtests.util.osutility.OSCommand;
 
-@PrepareForTest({ WebUIDriver.class })
 public class TestPageObject2 extends MockitoTest {
 
 	@Mock
@@ -109,21 +100,24 @@ public class TestPageObject2 extends MockitoTest {
 	private CustomEventFiringWebDriver eventDriver;
 	private PageObject page;
 
+	private MockedStatic mockedWebUIDriver;
+
 	@BeforeMethod(groups = { "ut" })
 	private void init() throws IOException {
 
 		SeleniumTestsContextManager.getGlobalContext()
 				.setCucumberImplementationPackage("com.seleniumtests.ut.core.runner.cucumber");
-		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(1);
 		SeleniumTestsContextManager.getThreadContext().setImplicitWaitTimeout(1);
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(2);
 
 		// add capabilities to allow augmenting driver
-		when(driver.getCapabilities()).thenReturn(new FirefoxOptions()); 
-		eventDriver = spy(new CustomEventFiringWebDriver(new MockWebDriver(driver)));
+		when(driver.getCapabilities()).thenReturn(new ChromeOptions());
+		eventDriver = spy(new CustomEventFiringWebDriver(driver));
 
-		when(eventDriver.switchTo()).thenReturn(target);
+//		when(eventDriver.switchTo()).thenReturn(target);
+//		when(target.alert()).thenReturn(alert);
 		when(driver.findElement(By.id("el"))).thenReturn(element);
 		when(driver.navigate()).thenReturn(navigation);
 		when(driver.getCurrentUrl()).thenReturn("http://foo");
@@ -136,14 +130,14 @@ public class TestPageObject2 extends MockitoTest {
 		when(alert.getText()).thenReturn("alert text");
 		when(driver.switchTo()).thenReturn(targetLocator);
 
-		PowerMockito.mockStatic(WebUIDriver.class);
-		when(WebUIDriver.getCurrentWebUiDriverName()).thenReturn("main");
-		when(WebUIDriver.getWebDriver(anyBoolean(), eq(BrowserType.FIREFOX), eq("main"), isNull()))
+		mockedWebUIDriver = mockStatic(WebUIDriver.class);
+		mockedWebUIDriver.when(() -> WebUIDriver.getCurrentWebUiDriverName()).thenReturn("main");
+		mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean(), eq(BrowserType.CHROME), eq("main"), isNull()))
 				.thenReturn(eventDriver);
-		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
+		mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
 		when(eventDriver.executeScript("if (document.readyState === \"complete\") { return \"ok\"; }"))
 				.thenReturn("ok");
-		when(eventDriver.getBrowserInfo()).thenReturn(new BrowserInfo(BrowserType.FIREFOX, "78.0"));
+		when(eventDriver.getBrowserInfo()).thenReturn(new BrowserInfo(BrowserType.CHROME, "78.0"));
 		when(screenshotUtil.capture(any(SnapshotTarget.class), ArgumentMatchers.<Class<ScreenShot>>any()))
 				.thenReturn(screenshot);
 		when(screenshotUtil.capture(any(SnapshotTarget.class), ArgumentMatchers.<Class<ScreenShot>>any(), anyInt()))
@@ -153,6 +147,11 @@ public class TestPageObject2 extends MockitoTest {
 
 		page = new PageForActions();
 
+	}
+
+	@AfterMethod(groups = "ut", alwaysRun = true)
+	private void closeMocks() {
+		mockedWebUIDriver.close();
 	}
 
 	@Test(groups = { "ut" })
@@ -1295,7 +1294,7 @@ public class TestPageObject2 extends MockitoTest {
 		
 		public void run() {
 			SeleniumTestsContextManager.setThreadContext(SeleniumTestsContextManager.getGlobalContext());
-			SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
+			SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 			otherPage = new PageForActions();
 			callingPage = otherPage.getPicture().getCallingPage();
 		}

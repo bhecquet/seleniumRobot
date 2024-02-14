@@ -176,6 +176,9 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 					testResult.getTestContext()
 					);
 		}
+
+		// as skipped tests never call "AfterMethod", generate report here
+		onTestFullyFinished(testResult);
 	}
 	
 	/**
@@ -601,8 +604,10 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
         	} else {
         		logger.info("cannot increase max retry, limit is reached");
         	}
-	    } catch (ClassCastException | NullPointerException e) {
+	    } catch (ClassCastException e) {
 			logger.error("Retry analyzer is not a TestRetryAnalyzer instance");
+		} catch (NullPointerException e) {
+			logger.error("RetryAnalyzer is null, 'increaseMaxRetry' can be called only inside test methods");
 		}
 	}
 

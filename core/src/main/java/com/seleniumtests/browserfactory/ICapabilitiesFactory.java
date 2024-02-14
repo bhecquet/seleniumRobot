@@ -17,15 +17,49 @@
  */
 package com.seleniumtests.browserfactory;
 
+import io.appium.java_client.android.options.UiAutomator2Options;
+import io.appium.java_client.ios.options.XCUITestOptions;
+import io.appium.java_client.remote.options.BaseOptions;
 import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
+import org.openqa.selenium.Platform;
+
+import java.util.Optional;
 
 public abstract class ICapabilitiesFactory {
 
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(ICapabilitiesFactory.class);
+
+    /**
+     * returns the app in capabilities
+     * @param caps
+     * @return
+     */
+    protected Optional<String> getApp(Capabilities caps) {
+
+        if (new BaseOptions(caps).getPlatformName() == null) {
+            return Optional.empty();
+        } else if (new BaseOptions(caps).getPlatformName().is(Platform.ANDROID)) {
+            return new UiAutomator2Options(caps).getApp();
+        } else if (new BaseOptions(caps).getPlatformName().is(Platform.IOS)) {
+            return new XCUITestOptions(caps).getApp();
+        } else return Optional.empty();
+    }
+
+    protected Capabilities setApp(Capabilities caps, String app) {
+        if (new BaseOptions(caps).getPlatformName().is(Platform.ANDROID)) {
+            return new UiAutomator2Options(caps).setApp(app);
+        } else if (new BaseOptions(caps).getPlatformName().is(Platform.IOS)) {
+            return new XCUITestOptions(caps).setApp(app);
+        } else {
+            return caps;
+        }
+    }
+
 	protected DriverConfig webDriverConfig;
     
     protected ICapabilitiesFactory(DriverConfig webDriverConfig) {

@@ -984,7 +984,11 @@ public class TestDriver extends GenericMultiBrowserTest {
 		DriverSubTestPage.closeButton.click();
 		Alert alert = page.waitForAlert(3);
 		if (alert != null) {
-			alert.accept();
+			try {
+				alert.accept();
+			} catch (Exception e) {
+				// in case window has closed, alert is not present anymore
+			}
 		}
 		
 		try {

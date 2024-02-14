@@ -25,6 +25,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -83,8 +84,8 @@ import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.video.VideoCaptureMode;
 import com.seleniumtests.util.video.VideoRecorder;
 
-import net.lightbody.bmp.BrowserMobProxy;
-import net.lightbody.bmp.core.har.Har;
+//import net.lightbody.bmp.BrowserMobProxy;
+//import net.lightbody.bmp.core.har.Har;
 
 /**
  * This class provides factory to create webDriver session.
@@ -110,6 +111,18 @@ public class WebUIDriver {
         }
     	this.name = name;
     }
+
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * For test only
+	 * @param name
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
 
     /**
      * prepare driver:
@@ -184,9 +197,9 @@ public class WebUIDriver {
 			}
     	
 
-			if (config.getBrowserMobProxy() != null) {
-				config.getBrowserMobProxy().newHar(SeleniumTestsContextManager.getThreadContext().getRelativeOutputDir());
-			}
+//			if (config.getBrowserMobProxy() != null) {
+//				config.getBrowserMobProxy().newHar(SeleniumTestsContextManager.getThreadContext().getRelativeOutputDir());
+//			}
 			
 			if (config.getVideoCapture() != VideoCaptureMode.FALSE && videoRecorder.get() == null) {
 				try {
@@ -349,19 +362,19 @@ public class WebUIDriver {
 			}
 		}
 		
-		try {
-	    	// stop HAR capture
-			if (config.getBrowserMobProxy() != null) {
-				Har har = config.getBrowserMobProxy().endHar();
-				scenarioLogger.logNetworkCapture(har, name);
-			}
-			
-			
-		} catch (Exception e) {
-			scenarioLogger.log("Error while logging: " + e.getMessage());
-		} finally {
-			config.setBrowserMobProxy(null);
-		}
+//		try {
+//	    	// stop HAR capture
+//			if (config.getBrowserMobProxy() != null) {
+//				Har har = config.getBrowserMobProxy().endHar();
+//				scenarioLogger.logNetworkCapture(har, name);
+//			}
+//
+//
+//		} catch (Exception e) {
+//			scenarioLogger.log("Error while logging: " + e.getMessage());
+//		} finally {
+//			config.setBrowserMobProxy(null);
+//		}
     }
     
     class DriverAliveTask implements Callable<String> {
@@ -436,15 +449,15 @@ public class WebUIDriver {
         }
     
         // stop HAR capture in case it has not already been done by SeleniumRobotTestListener. This may be the case when a driver is created in @AfterMethod
-		try {
-	        if (config.getBrowserMobProxy() != null) {
-	        	config.getBrowserMobProxy().endHar();
-			}
-		} catch (Exception e) {
-			logger.error("Error stopping browsermob proxy: " + e.getMessage());
-		} finally {
-			config.setBrowserMobProxy(null);
-		}
+//		try {
+//	        if (config.getBrowserMobProxy() != null) {
+//	        	config.getBrowserMobProxy().endHar();
+//			}
+//		} catch (Exception e) {
+//			logger.error("Error stopping browsermob proxy: " + e.getMessage());
+//		} finally {
+//			config.setBrowserMobProxy(null);
+//		}
 		
 		// stop video capture
 		stopVideoCapture();
@@ -490,14 +503,14 @@ public class WebUIDriver {
     	}
     }
 
-	public static BrowserMobProxy getBrowserMobProxy() {
-		WebDriver driver = getWebDriver(false);
-		BrowserMobProxy mobProxy = null;
-		if (driver != null && driver instanceof CustomEventFiringWebDriver) {
-			mobProxy = ((CustomEventFiringWebDriver)driver).getMobProxy();
-		}
-		return mobProxy;
-	}
+//	public static BrowserMobProxy getBrowserMobProxy() {
+//		CustomEventFiringWebDriver driver = (CustomEventFiringWebDriver)WebUIDriver.getWebDriver(false);
+//		BrowserMobProxy mobProxy = null;
+//		if (driver != null) {
+//			mobProxy = driver.getMobProxy();
+//		}
+//		return mobProxy;
+//	}
 	
 	/**
 	 * Returns the Neoload driver for the current running driver
@@ -661,7 +674,8 @@ public class WebUIDriver {
      */
     public static WebUIDriver getWebUIDriver(boolean create, String name) {
         if ((uxDriverSession.get() == null || uxDriverSession.get().get(name) == null) && create) {
-            WebUIDriverFactory.getInstance(name);
+            WebUIDriver uiDriver = WebUIDriverFactory.getInstance(name);
+			uiDriver.initInstance();
         }
         
         try {
@@ -671,6 +685,16 @@ public class WebUIDriver {
         }
     }
 
+	public void initInstance() {
+		setConfig(new DriverConfig(SeleniumTestsContextManager.getThreadContext()));
+
+		if (WebUIDriver.getUxDriverSession().get() == null) {
+			WebUIDriver.getUxDriverSession().set(new HashMap<>());
+		}
+		WebUIDriver.getUxDriverSession().get().put(name, this);
+
+		WebUIDriver.switchToDriver(name);
+	}
 	/**
      * Lets user set their own driver This can be retrieved as WebUIDriver.getWebDriver().
      *
@@ -702,7 +726,6 @@ public class WebUIDriver {
 																	browserInfo, 
 																	SeleniumTestsContextManager.getThreadContext().getTestType(),
 																	SeleniumTestsContextManager.getThreadContext().getRunMode(),
-																	config.getBrowserMobProxy(),
 																	SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(),
 																	config.getAttachExistingDriverPort(), 
 																	config.getWebDriverListeners());

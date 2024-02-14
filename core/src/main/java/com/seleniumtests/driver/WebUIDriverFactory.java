@@ -11,16 +11,6 @@ public class WebUIDriverFactory {
 	}
 
 	public static WebUIDriver getInstance(String name) {
-		WebUIDriver uiDriver = new WebUIDriver(name);
-		uiDriver.setConfig(new DriverConfig(SeleniumTestsContextManager.getThreadContext()));
-		
-		if (WebUIDriver.getUxDriverSession().get() == null) {
-			WebUIDriver.getUxDriverSession().set(new HashMap<>());
-        }
-		WebUIDriver.getUxDriverSession().get().put(name, uiDriver);
-        
-		WebUIDriver.switchToDriver(name);
-		
-		return uiDriver;
+		return new WebUIDriver(name);
 	}
 }
