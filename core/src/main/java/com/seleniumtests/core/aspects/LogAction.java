@@ -542,9 +542,9 @@ public class LogAction {
 						SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(), 
 						videoRecorder);
 			}
-//			if (neoloadDriver != null) {
-//				neoloadDriver.startTransaction(currentStep.getName());
-//			}
+			if (neoloadDriver != null) {
+				neoloadDriver.startTransaction(currentStep.getName());
+			}
 			
 			
 			
@@ -575,9 +575,9 @@ public class LogAction {
 				TestStepManager.getCurrentRootTestStep().updateDuration();
 				TestStepManager.logTestStep(TestStepManager.getCurrentRootTestStep());
 				
-//				if (neoloadDriver != null) {
-//					neoloadDriver.stopTransaction();
-//				}
+				if (neoloadDriver != null) {
+					neoloadDriver.stopTransaction();
+				}
 			} else {
 				TestStepManager.setParentTestStep(previousParent);
 			}
