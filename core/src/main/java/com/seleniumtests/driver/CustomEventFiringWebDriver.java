@@ -680,11 +680,11 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     	// issue #169: workaround for ios / IE tests where getWindowHandles sometimes fails with: class org.openqa.selenium.WebDriverException: Returned value cannot be converted to List<String>: true
     	for (int i = 0; i < 10; i++) {
 			try  {
-				return driver.getWindowHandles();
+				return originalDriver.getWindowHandles();
 			} catch (UnhandledAlertException e) {
 	    		logger.info("getWindowHandles: Handling alert");
 	    		handleAlert();
-	    		return driver.getWindowHandles();
+	    		return originalDriver.getWindowHandles();
 			} catch (WebSessionEndedException e) {
 				logger.warn("session already terminated");
 				return new TreeSet<>();
@@ -693,13 +693,13 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 				WaitHelper.waitForSeconds(2);
 			}
 		}
-    	return driver.getWindowHandles();
+    	return originalDriver.getWindowHandles();
     	
     }
     
     private void handleAlert() {
     	try {
-	    	Alert alert = driver.switchTo().alert();
+	    	Alert alert = originalDriver.switchTo().alert();
 			alert.dismiss();
     	} catch (Exception e) {
     		// do nothing in case of error
@@ -714,36 +714,36 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     	}
     	
     	try {
-    		return driver.getWindowHandle();
+    		return originalDriver.getWindowHandle();
     	} catch (UnhandledAlertException e) {
     		logger.info("getWindowHandle: Handling alert");
     		handleAlert();
-    		return driver.getWindowHandle();
+    		return originalDriver.getWindowHandle();
     	}
     }
     
     @Override
     public void close() {
     	try {
-			driver.close();
+			originalDriver.close();
 		} catch (NullPointerException e) {
 			// NPE raised with IE when closing session
 			// nothing to do
     	} catch (UnhandledAlertException e) {
     		logger.info("close: Handling alert");
     		handleAlert();
-    		driver.close();
+			originalDriver.close();
     	}
     }
     
     @Override
     public String getCurrentUrl() {
     	try {
-	    	return driver.getCurrentUrl();
+	    	return originalDriver.getCurrentUrl();
 	    } catch (UnhandledAlertException e) {
     		logger.info("getCurrentUrl: Handling alert");
 			handleAlert();
-			return driver.getCurrentUrl();
+			return originalDriver.getCurrentUrl();
 		} catch (NoSuchWindowException e) {
 			return "";
 		}
@@ -752,11 +752,11 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     @Override
     public String getTitle() {
     	try {
-    		return driver.getTitle();
+    		return originalDriver.getTitle();
     	} catch (UnhandledAlertException e) {
     		logger.info("getTitle: Handling alert");
 			handleAlert();
-			return driver.getTitle();
+			return originalDriver.getTitle();
     	} catch (NoSuchWindowException e) {
 			return "";
     	}
@@ -802,7 +802,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     		getSessionId();
     		getCapabilities();
 			if (isWebTest()) {
-				return driver.getWindowHandles().isEmpty();
+				return originalDriver.getWindowHandles().isEmpty();
 			} else {
 				// in case of mobile app, we assume the app is not closed. Closing the app should only be done at test end
 				// closing the session. If we are here, the session is still alive
@@ -830,11 +830,11 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     @Override
     public String getPageSource() {
     	try {
-    		return driver.getPageSource();
+    		return originalDriver.getPageSource();
     	} catch (UnhandledAlertException e) {
     		logger.info("getPageSource: Handling alert");
 			handleAlert();
-			return driver.getPageSource();
+			return originalDriver.getPageSource();
     	} catch (WebDriverException e) {
     		logger.info("page source not get: " + e.getMessage());
     		return null;
@@ -854,7 +854,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
      */
     public double getDeviceAspectRatio() {
     	if (isWebTest()) {
-    		Number devicePixelRatio = (Number) ((JavascriptExecutor)driver).executeScript(JS_PIXEL_RATIO + " return pixelRatio;", true);
+    		Number devicePixelRatio = (Number) ((JavascriptExecutor)originalDriver).executeScript(JS_PIXEL_RATIO + " return pixelRatio;", true);
     		return devicePixelRatio.doubleValue();
     	} else {
     		return 1;
@@ -877,16 +877,16 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	    		
 	    		// issue #238: check we get a non max size
 	    		if (width.intValue() == MAX_DIMENSION) {
-	    			driver.switchTo().defaultContent();
+					originalDriver.switchTo().defaultContent();
 	    			width = (Number)executeScript(JS_GET_VIEWPORT_SIZE_WIDTH, usePixelAspectRatio);
 	    		}
 	    		return width.intValue();
 	    		
     		} catch (Exception e) {
-    			return driver.manage().window().getSize().getWidth();
+    			return originalDriver.manage().window().getSize().getWidth();
     		}
     	} else {
-    		return driver.manage().window().getSize().getWidth();
+    		return originalDriver.manage().window().getSize().getWidth();
     	}
     }
 	
@@ -911,16 +911,16 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 				
 				// issue #238: check we get a non max size
 				if (height.intValue() == MAX_DIMENSION) {
-					driver.switchTo().defaultContent();
+					originalDriver.switchTo().defaultContent();
 					height = (Number)executeScript(JS_GET_VIEWPORT_SIZE_HEIGHT, usePixelAspectRatio);
 				}
 				return height.intValue();
 				
 			} catch (Exception e) {
-				return driver.manage().window().getSize().getHeight();
+				return originalDriver.manage().window().getSize().getHeight();
 			}
 		} else {
-			return driver.manage().window().getSize().getHeight();
+			return originalDriver.manage().window().getSize().getHeight();
 		}
 	}
     
@@ -968,17 +968,17 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		    	
 		    	// issue #238: check we get a non zero size
 		    	if (dims.get(0).intValue() == 0 || dims.get(1).intValue() == 0) {
-		    		driver.switchTo().defaultContent();
+					originalDriver.switchTo().defaultContent();
 		    		dims = (List<Number>)executeScript(JS_GET_CONTENT_ENTIRE_SIZE, usePixelAspectRatio);
 		    	}
 		    	
 		    	return new Dimension(dims.get(0).intValue(), dims.get(1).intValue());
 		    	
     		} catch (Exception e) {
-    			return driver.manage().window().getSize();
+    			return originalDriver.manage().window().getSize();
     		}
     	} else {
-    		return driver.manage().window().getSize();
+    		return originalDriver.manage().window().getSize();
     	}
     }
 	
@@ -987,13 +987,13 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	 */
 	public void scrollTop() {
 		if (isWebTest()) {
-			((JavascriptExecutor) driver).executeScript("window.top.scroll(0, 0)");
+			((JavascriptExecutor) originalDriver).executeScript("window.top.scroll(0, 0)");
 		} 
 	}
 	
 	public void scrollTo(int x, int y) {
 		if (isWebTest()) {
-			((JavascriptExecutor) driver).executeScript(String.format("window.top.scroll(%d, %d)", x, y));
+			((JavascriptExecutor) originalDriver).executeScript(String.format("window.top.scroll(%d, %d)", x, y));
 			
 			// wait for scrolling end
 			Point previousScrollPosition = getScrollPosition();
@@ -1026,7 +1026,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	}
 	public Long getTopFixedHeaderSize(boolean usePixelAspectRatio) {
 		if (isWebTest()) {
-			return (Long) ((JavascriptExecutor) driver).executeScript(JS_GET_TOP_HEADER, usePixelAspectRatio);
+			return (Long) ((JavascriptExecutor) originalDriver).executeScript(JS_GET_TOP_HEADER, usePixelAspectRatio);
 		} else { 
 			return 0L;
 		}
@@ -1042,7 +1042,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	}
 	public Long getBottomFixedFooterSize(boolean usePixelAspectRatio) {
 		if (isWebTest()) {
-			return (Long) ((JavascriptExecutor) driver).executeScript(JS_GET_BOTTOM_FOOTER, usePixelAspectRatio);
+			return (Long) ((JavascriptExecutor) originalDriver).executeScript(JS_GET_BOTTOM_FOOTER, usePixelAspectRatio);
 		} else { 
 			return 0L;
 		}
@@ -1054,7 +1054,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	 */
 	public boolean isModalDisplayed() {
 		if (isWebTest()) {
-			return (Boolean) ((JavascriptExecutor) driver).executeScript(JS_GET_MODAL);
+			return (Boolean) ((JavascriptExecutor) originalDriver).executeScript(JS_GET_MODAL);
 		} else { 
 			return false;
 		}
@@ -1068,8 +1068,8 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	public void scrollToElement(WebElement element, int yOffset) {
 		if (isWebTest()) {
 			try {
-				WebElement parentScrollableElement = (WebElement) ((JavascriptExecutor) driver).executeScript(JS_SCROLL_PARENT, element, (driver instanceof SafariDriver) ? SAFARI_BROWSER: OTHER_BROWSER);
-				Long topHeaderSize = (Long) ((JavascriptExecutor) driver).executeScript(JS_GET_TOP_HEADER);
+				WebElement parentScrollableElement = (WebElement) ((JavascriptExecutor) originalDriver).executeScript(JS_SCROLL_PARENT, element, (driver instanceof SafariDriver) ? SAFARI_BROWSER: OTHER_BROWSER);
+				Long topHeaderSize = (Long) ((JavascriptExecutor) originalDriver).executeScript(JS_GET_TOP_HEADER);
 
 				// try a second method (the first one is quicker but does not work when element is inside a document fragment, slot or shadow DOM
 //				if ((parentScrollableElement == null || "html".equalsIgnoreCase(parentScrollableElement.getTagName())) && !(driver instanceof InternetExplorerDriver)) {
@@ -1118,7 +1118,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		
 		// When scrollable element is a "div" or anything else, use scrollIntoView because it's the easiest way to make the element visible
 		} else {
-			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
+			((JavascriptExecutor) originalDriver).executeScript("arguments[0].scrollIntoView(true);", element);
 			
 			// check if scrollbar of parent is at bottom. In this case, going upside (yOffset < 0), could hide searched element.
 			// scrollIntoView is configured to position scrollbar to top position of the searched element.
@@ -1128,7 +1128,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 			// if top header is present, scroll up so that our element is not hidden behind it (scrollIntoView scrolls so that element is at the top of the view even if header masks it)
 			if (topHeaderSize > 0) {// equivalent to HtmlElement.OPTIMAL_SCROLLING but, for grid, we do not want dependency between the 2 classes
 				Integer scrollOffset = (int) (yOffset == Integer.MAX_VALUE ? topHeaderSize: topHeaderSize - yOffset);
-				((JavascriptExecutor) driver).executeScript(
+				((JavascriptExecutor) originalDriver).executeScript(
 						"if((arguments[0].scrollHeight - arguments[0].scrollTop - arguments[0].clientHeight) > 0) {" +
 						"   var rootElement = arguments[1] === \"safari\" ? document.body: document.documentElement;" +
 						"   rootElement.scrollTop -= " + scrollOffset + ";" +
@@ -1141,7 +1141,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	}
 	
 	private void scrollWindowToElement(WebElement element, int yOffset) {
-		((JavascriptExecutor) driver).executeScript("window.top.scroll(" + Math.max(element.getLocation().x - 200, 0) + "," + Math.max(element.getLocation().y + yOffset, 0) + ")");
+		((JavascriptExecutor) originalDriver).executeScript("window.top.scroll(" + Math.max(element.getLocation().x - 200, 0) + "," + Math.max(element.getLocation().y + yOffset, 0) + ")");
 	}
 	
 	/**
@@ -1151,7 +1151,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	public Point getScrollPosition() {
 		if (isWebTest()) {
 			try {
-				List<Number> dims = (List<Number>)((JavascriptExecutor) driver).executeScript(JS_GET_CURRENT_SCROLL_POSITION);
+				List<Number> dims = (List<Number>)((JavascriptExecutor) originalDriver).executeScript(JS_GET_CURRENT_SCROLL_POSITION);
 				return new Point(dims.get(0).intValue(), dims.get(1).intValue());
 			} catch (Exception e) {
     			return new Point(0, 0);
@@ -1242,12 +1242,12 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		
 		// close windows before quitting (this is the only way to close chrome attached browser when it's not started by selenium)
 		try {
-			List<String> handles = new ArrayList<>(driver.getWindowHandles());
+			List<String> handles = new ArrayList<>(originalDriver.getWindowHandles());
 	        Collections.reverse(handles);
 
 	        for (String handle: handles) {
-				driver.switchTo().window(handle);
-				driver.close();
+				originalDriver.switchTo().window(handle);
+				originalDriver.close();
 			}
 		} catch (Exception e) {
 			// nothing to do
@@ -1276,7 +1276,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		StatisticsStorage.addDriverUsage(usage);
 		
 		try {
-			driver.quit();
+			originalDriver.quit();
 		} catch (WebDriverException e) {
 			
 			logger.error("Error while quitting driver: " + e.getMessage());
@@ -1695,7 +1695,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	@Override
     public Capabilities getCapabilities() {
 		try {
-			return ((HasCapabilities)driver).getCapabilities();
+			return ((HasCapabilities)originalDriver).getCapabilities();
 		} catch (ClassCastException e) {
 			return new MutableCapabilities();
 		}
@@ -1716,38 +1716,38 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 
 	@Override
 	public void get(String url) {
-		driver.get(url);
+		originalDriver.get(url);
 	}
 
 	@Override
 	public List<WebElement> findElements(By by) {
-		return driver.findElements(by);
+		return originalDriver.findElements(by);
 	}
 
 	@Override
 	public WebElement findElement(By by) {
-		return driver.findElement(by);
+		return originalDriver.findElement(by);
 	}
 
 	@Override
 	public TargetLocator switchTo() {
-		return driver.switchTo();
+		return originalDriver.switchTo();
 	}
 
 	@Override
 	public Navigation navigate() {
-		return driver.navigate();
+		return originalDriver.navigate();
 	}
 
 	@Override
 	public Options manage() {
-		return driver.manage();
+		return originalDriver.manage();
 	}
 
 	@Override
 	public <X> X getScreenshotAs(OutputType<X> target) throws WebDriverException {
 		try {
-			return ((TakesScreenshot)driver).getScreenshotAs(target);
+			return ((TakesScreenshot)originalDriver).getScreenshotAs(target);
 		} catch (ClassCastException e) {
 			// HTMLUNIT does not support taking screenshots, so casting is impossible
 			return null;
@@ -1756,12 +1756,12 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 
 	@Override
 	public Object executeScript(String script, Object... args) {
-		return ((JavascriptExecutor)driver).executeScript(script, args);
+		return ((JavascriptExecutor)originalDriver).executeScript(script, args);
 	}
 
 	@Override
 	public Object executeAsyncScript(String script, Object... args) {
-		return ((JavascriptExecutor)driver).executeAsyncScript(script, args);
+		return ((JavascriptExecutor)originalDriver).executeAsyncScript(script, args);
 	}
 
 	@Override
@@ -1786,13 +1786,13 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 
 	@Override
 	public void perform(Collection<Sequence> actions) {
-		((Interactive)driver).perform(actions);
+		((Interactive)originalDriver).perform(actions);
 		
 	}
 
 	@Override
 	public void resetInputState() {
-		((Interactive)driver).resetInputState();
+		((Interactive)originalDriver).resetInputState();
 		
 	}
 

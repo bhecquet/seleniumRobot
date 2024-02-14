@@ -159,7 +159,7 @@ public class TestTestNGResultUtil extends MockitoTest {
 		when(testNGMethod.isBeforeMethodConfiguration()).thenReturn(false);
 		when(testNGMethod.getMethodName()).thenReturn("testMethod");
 		
-		Assert.assertTrue(TestNGResultUtils.getHashForTest(testResult).startsWith("mySuite-myTest-com.seleniumtests.ut.util.TestTestNGResultUtil-testMethod-1-org.mockito.codegen."));
+		Assert.assertTrue(TestNGResultUtils.getHashForTest(testResult).startsWith("mySuite-myTest-com.seleniumtests.ut.util.TestTestNGResultUtil-testMethod-1-org.testng.ITestNGMethod"));
 		
 	}
 
@@ -171,7 +171,7 @@ public class TestTestNGResultUtil extends MockitoTest {
 		when(testNGMethod.isBeforeMethodConfiguration()).thenReturn(true);
 		when(testNGMethod.getMethodName()).thenReturn("testHashWithBeforeTestMethod");
 		
-		Assert.assertTrue(TestNGResultUtils.getHashForTest(testResult).startsWith("mySuite-myTest-com.seleniumtests.ut.util.TestTestNGResultUtil-before-testHashWithBeforeTestMethod-1-org.mockito.codegen."));
+		Assert.assertTrue(TestNGResultUtils.getHashForTest(testResult).startsWith("mySuite-myTest-com.seleniumtests.ut.util.TestTestNGResultUtil-before-testHashWithBeforeTestMethod-1-org.testng.ITestNGMethod"));
 		
 	}
 	
