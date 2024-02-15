@@ -22,6 +22,7 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -70,6 +71,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 
 	@AfterMethod(groups={"it", "ie"}, alwaysRun=true)
 	public void reset() {
+		driver.switchTo().window(new ArrayList<>(driver.getWindowHandles()).get(0));
 		if (driver != null) {
 			DriverTestPage.logoText.clear();
 			DriverTestPage.textElement.clear();

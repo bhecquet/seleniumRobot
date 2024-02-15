@@ -202,6 +202,7 @@ public class TestHtmlElement extends MockitoTest {
 
 		mobileDriver = mock(AndroidDriver.class);
 		when(mobileDriver.getCapabilities()).thenReturn(new UiAutomator2Options());
+		when(mobileDriver.getContext()).thenReturn("NATIVE_APP");
 
 		doReturn("my.package").when(mobileDriver).getCurrentPackage();
 
