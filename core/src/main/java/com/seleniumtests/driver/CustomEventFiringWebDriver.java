@@ -623,8 +623,9 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		this.driver = driver;
 
 		// Augmenter is only supported for web test because augmenting driver namely tries to create a CDP connection with a browser
-		// do not augment mocked drivers (used in unit tests), as the mocked driver is masked by augmentation
-		if (isWebTest() && !Mockito.mockingDetails(driver).isMock()) {
+		// do not augment mocked drivers (used in unit tests), as the mocked driver is masked by augmentation. Spyed driver are OK
+		// as they behave as real drivers
+		if (isWebTest() && !(Mockito.mockingDetails(driver).isMock() && !Mockito.mockingDetails(driver).isSpy())) {
 			try {
 				this.driver = new Augmenter().augment(this.driver);
 			} catch (Exception e) {

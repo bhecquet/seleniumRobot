@@ -159,7 +159,7 @@ public class TestLighthouse extends MockitoTest {
 		Lighthouse lighthouse = new Lighthouse(1234, resultFolder.toPath().resolve("out").toString());
 		lighthouse.execute("http://myurl.com", new ArrayList<>());
 
-		mockedTestTasks.verify(() -> TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(90), isNull(), any()));
+		mockedTestTasks.verify(() -> TestTasks.executeCommand(eq("_USE_PATH_lighthouse"), eq(90), isNull(), any()), times(2));
 
 		// execution successful => no logs
 		Assert.assertNull(lighthouse.getLogs());

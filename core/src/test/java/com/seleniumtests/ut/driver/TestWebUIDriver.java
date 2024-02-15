@@ -25,6 +25,7 @@ import org.mockito.stubbing.Answer;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.logging.Logs;
 import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -351,9 +352,12 @@ public class TestWebUIDriver extends MockitoTest {
 		// set connector to simulate the driver creation on grid
 		SeleniumTestsContextManager.getThreadContext().setSeleniumGridConnectors(Arrays.asList(gridConnector));
 		when(gridConnector.getNodeUrl()).thenReturn("http://localhost:5555/");
+		WebDriver realDriver = spy(new HtmlUnitDriver());
+		when(realDriver.switchTo()).thenReturn(targetLocator);
 
 		try (MockedConstruction mockedGridDriverFactory = mockConstruction(SeleniumGridDriverFactory.class, (gridDriverFactory, context) -> {
-			when(gridDriverFactory.createWebDriver()).thenReturn(drv1);
+
+			when(gridDriverFactory.createWebDriver()).thenReturn(realDriver);
 			when(gridDriverFactory.getSelectedBrowserInfo()).thenReturn(new BrowserInfo(BrowserType.HTMLUNIT, "1.1"));
 			});
 			MockedConstruction mockedAugmenter = mockConstruction(Augmenter.class, (augmenter, context) -> {
@@ -377,7 +381,7 @@ public class TestWebUIDriver extends MockitoTest {
 			WebUIDriver.logFinalDriversState(Reporter.getCurrentTestResult());
 			verify(targetLocator).defaultContent();
 			WebUIDriver.cleanUp();
-			verify(drv1, times(2)).quit();
+			verify(realDriver, times(2)).quit();
 		}
 	}
 

@@ -609,6 +609,25 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		// this test is "local", so no node is available, we won't try to stop session on grid node
 		verify(gridConnector).stopSession("1234");
 	}
+
+	@Test(groups = {"ut"})
+	public void testIsWebTestDesktop() {
+		eventDriver.setTestType(TestType.WEB);
+		Assert.assertTrue(eventDriver.isWebTest());
+	}
+
+	@Test(groups = {"ut"})
+	public void testIsWebTestMobileWeb() {
+		when(eventDriver.getContext()).thenReturn("WEBVIEW");
+		eventDriver.setTestType(TestType.APPIUM_WEB_ANDROID);
+		Assert.assertTrue(eventDriver.isWebTest());
+	}
+	@Test(groups = {"ut"})
+	public void testIsWebTestMobileApp() {
+		when(eventDriver.getContext()).thenReturn("NATIVE_APP");
+		eventDriver.setTestType(TestType.APPIUM_APP_IOS);
+		Assert.assertTrue(eventDriver.isWebTest());
+	}
 	
 	/**
 	 * Test mouse coordinates in local mode
