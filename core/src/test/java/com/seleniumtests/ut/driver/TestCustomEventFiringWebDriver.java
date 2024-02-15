@@ -44,7 +44,9 @@ import java.util.TreeSet;
 import javax.imageio.ImageIO;
 
 import com.seleniumtests.driver.TestType;
+import io.appium.java_client.HidesKeyboard;
 import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.remote.SupportsContextSwitching;
 import org.apache.commons.io.FileUtils;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
@@ -148,6 +150,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		when(mobileDriver.getSessionId()).thenReturn(new SessionId("1234"));
 		when(mobileDriver.getPageSource()).thenReturn("<html></html>");
 		when(mobileDriver.getCapabilities()).thenReturn(new DesiredCapabilities());
+		when(mobileDriver.getContext()).thenReturn("WEB");
 	}
 
 	@AfterMethod(groups = "ut", alwaysRun = true)
@@ -1407,6 +1410,86 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		eventDriver.setCurrentHandles(new TreeSet<>(Arrays.asList("12345", "67890")));
 		Assert.assertEquals(eventDriver.getCurrentHandles(), new TreeSet<>(Arrays.asList("12345", "67890")));
 		verify((CustomEventFiringWebDriver)eventDriver, never()).updateWindowsHandles();
+	}
+
+	@Test(groups = {"ut"})
+	public void testHideKeyboardMobile() {
+		when(mobileDriver.getContext()).thenReturn("NATIVE_APP");
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_IOS, DriverMode.LOCAL, null));
+		eventDriver.hideKeyboard();
+		verify(((HidesKeyboard)mobileDriver)).hideKeyboard();
+	}
+
+	@Test(groups = {"ut"})
+	public void testHideKeyboardWebMobile() {
+		when(mobileDriver.getContext()).thenReturn("WEBVIEW");
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_WEB_ANDROID, DriverMode.LOCAL, null));
+		eventDriver.hideKeyboard();
+		verify(((HidesKeyboard)mobileDriver)).hideKeyboard();
+	}
+
+	@Test(groups = {"ut"})
+	public void testHideKeyboardDesktop() {
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.WEB, DriverMode.LOCAL, null));
+		eventDriver.hideKeyboard();
+		verify(((HidesKeyboard)mobileDriver), never()).hideKeyboard();
+	}
+
+	@Test(groups = {"ut"})
+	public void testContextMobile() {
+		when(mobileDriver.getContext()).thenReturn("NATIVE_APP");
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_IOS, DriverMode.LOCAL, null));
+		WebDriver wd = eventDriver.context("foo");
+		Assert.assertEquals(wd, eventDriver);
+		verify(((SupportsContextSwitching)mobileDriver)).context("foo");
+	}
+
+	@Test(groups = {"ut"})
+	public void testContextDesktop() {
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.WEB, DriverMode.LOCAL, null));
+		WebDriver wd = eventDriver.context("foo");
+		Assert.assertEquals(wd, eventDriver);
+		verify(((SupportsContextSwitching)mobileDriver), never()).context("foo");
+	}
+
+	@Test(groups = {"ut"})
+	public void testContextHandlesMobile() {
+		when(mobileDriver.getContextHandles()).thenReturn(new TreeSet<>(Arrays.asList("NATIVE_APP", "WEBVIEW")));
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_IOS, DriverMode.LOCAL, null));
+		Set<String> handles = eventDriver.getContextHandles();
+		verify(((SupportsContextSwitching)mobileDriver)).getContextHandles();
+		Assert.assertEquals(handles.size(), 2);
+		Assert.assertTrue(handles.contains("NATIVE_APP"));
+		Assert.assertTrue(handles.contains("WEBVIEW"));
+	}
+
+	@Test(groups = {"ut"})
+	public void testContextHandlesDesktop() {
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.WEB, DriverMode.LOCAL, null));
+		eventDriver.context("foo");
+		Set<String> handles = eventDriver.getContextHandles();
+		verify(((SupportsContextSwitching)mobileDriver), never()).getContextHandles();
+		Assert.assertEquals(handles.size(), 1);
+		Assert.assertTrue(handles.contains("WEB"));
+	}
+
+
+	@Test(groups = {"ut"})
+	public void testGetContextMobile() {
+		when(mobileDriver.getContext()).thenReturn("NATIVE_APP");
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_IOS, DriverMode.LOCAL, null));
+		String context = eventDriver.getContext();
+		Assert.assertEquals(context, "NATIVE_APP");
+		verify(((SupportsContextSwitching)mobileDriver), times(2)).getContext(); // one for isWebTest(), one for getContext()
+	}
+
+	@Test(groups = {"ut"})
+	public void testGetContextDesktop() {
+		when(mobileDriver.getContext()).thenReturn("WEBVIEW");
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.WEB, DriverMode.LOCAL, null));
+		String context = eventDriver.getContext();
+		Assert.assertEquals(context, "WEB");
+		verify(((SupportsContextSwitching)mobileDriver), never()).getContext();
 	}
 	
 }

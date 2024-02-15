@@ -8,29 +8,22 @@ import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.*;
 
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.reporter.logger.TestStep;
+import io.appium.java_client.NoSuchContextException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.openqa.selenium.Alert;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Cookie;
-import org.openqa.selenium.Dimension;
+import org.openqa.selenium.*;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.Point;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver.Navigation;
 import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebDriver.Timeouts;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Interactive;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -1238,6 +1231,33 @@ public class TestPageObject2 extends MockitoTest {
 	public void testWithEmptyUiLibrary() {
 		new PageForActions();
 		Assert.assertTrue(PageForActions.getUiLibraries(PageForActions.class.getCanonicalName()).isEmpty());
+	}
+
+	@Test(groups = { "ut" })
+	public void testHideKeyboard() {
+		page.hideKeyboard();
+		verify(eventDriver).hideKeyboard();
+	}
+
+	@Test(groups = { "ut" })
+	public void testGetContext() {
+		when(eventDriver.getContextHandles()).thenReturn(new TreeSet<>(Arrays.asList("NATIVE_APP", "WEBVIEW")));
+		List<String> contexts = page.getContexts();
+		Assert.assertEquals(contexts.size(), 2);
+		verify(eventDriver).getContextHandles();
+	}
+
+	@Test(groups = { "ut" })
+	public void testSwitchToContext() {
+		page.switchToContext("myContext");
+		verify(eventDriver).context("myContext");
+	}
+
+	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class, expectedExceptionsMessageRegExp = "Only \\[NATIVE_APP, WEBVIEW\\] contexts are available")
+	public void testSwitchToContextInError() {
+		when(eventDriver.getContextHandles()).thenReturn(new TreeSet<>(Arrays.asList("NATIVE_APP", "WEBVIEW")));
+		when(eventDriver.context("myContext")).thenThrow(new NoSuchContextException("Context foo not available"));
+		page.switchToContext("myContext");
 	}
 	
 	/**
