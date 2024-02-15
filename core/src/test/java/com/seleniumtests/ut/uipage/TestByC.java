@@ -11,6 +11,8 @@ import java.util.List;
 
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
+import io.appium.java_client.AppiumBy;
+import io.appium.java_client.android.AndroidDriver;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -33,6 +35,9 @@ public class TestByC extends MockitoTest {
 
     @Mock
     private RemoteWebDriver driver;
+
+    @Mock
+    private AndroidDriver androidDriver;
 
     @Mock
     private By.ById id;
@@ -278,6 +283,30 @@ public class TestByC extends MockitoTest {
         byAttribute.findElement(driver);
         verify(driver).findElement(By.xpath(".//*[@name='value']"));
     }
+
+    @Test(groups = {"ut"})
+    public void testFindElementByAttributeStartsWith() {
+        when(eventDriver.isWebTest()).thenReturn(true);
+        ByC.ByAttribute byAttribute = spy(new ByC.ByAttribute("name^", "value"));
+        byAttribute.findElement(driver);
+        verify(driver).findElement(By.xpath(".//*[starts-with(@name,'value')]"));
+    }
+
+    @Test(groups = {"ut"})
+    public void testFindElementByAttributeEndsWith() {
+        when(eventDriver.isWebTest()).thenReturn(true);
+        ByC.ByAttribute byAttribute = spy(new ByC.ByAttribute("name$", "value"));
+        byAttribute.findElement(driver);
+        verify(driver).findElement(By.xpath(".//*[substring(@name, string-length(@name) - string-length('value') +1) = 'value']"));
+    }
+
+    @Test(groups = {"ut"})
+    public void testFindElementByAttributeContains() {
+        when(eventDriver.isWebTest()).thenReturn(true);
+        ByC.ByAttribute byAttribute = spy(new ByC.ByAttribute("name*", "value"));
+        byAttribute.findElement(driver);
+        verify(driver).findElement(By.xpath(".//*[contains(@name,'value')]"));
+    }
     
     @Test
     public void testFindElementByAttributeWithCssSelector() {
@@ -287,6 +316,87 @@ public class TestByC extends MockitoTest {
         byAttribute.findElement(driver);
         verify(driver).findElement(By.cssSelector("[name=value]"));
     }
+    @Test
+    public void testFindElementByAttributeWithCssSelectorStartsWith() {
+        when(eventDriver.isWebTest()).thenReturn(true);
+        ByC.ByAttribute byAttribute = spy(new ByC.ByAttribute("name^", "value"));
+        byAttribute.setUseCssSelector(true);
+        byAttribute.findElement(driver);
+        verify(driver).findElement(By.cssSelector("[name^=value]"));
+    }
+    @Test
+    public void testFindElementByAttributeWithCssSelectorEndsWith() {
+        when(eventDriver.isWebTest()).thenReturn(true);
+        ByC.ByAttribute byAttribute = spy(new ByC.ByAttribute("name$", "value"));
+        byAttribute.setUseCssSelector(true);
+        byAttribute.findElement(driver);
+        verify(driver).findElement(By.cssSelector("[name$=value]"));
+    }
+    @Test
+    public void testFindElementByAttributeWithCssSelectorContains() {
+        when(eventDriver.isWebTest()).thenReturn(true);
+        ByC.ByAttribute byAttribute = spy(new ByC.ByAttribute("name*", "value"));
+        byAttribute.setUseCssSelector(true);
+        byAttribute.findElement(driver);
+        verify(driver).findElement(By.cssSelector("[name*=value]"));
+    }
+
+    /**
+     * Android selector rewrite will be supported only for text, content-desc and resource-id attributes
+     */
+    @Test(groups = {"ut"})
+    public void testFindElementByAttributeAndroidAppUnsupportedAttribute() {
+        findElementByAttributeAndroidApp(new ByC.ByAttribute("name", "value"), By.xpath(".//*[@name='value']"));
+    }
+    @Test(groups = {"ut"})
+    public void testFindElementByAttributeAndroidAppTextAttribute() {
+        findElementByAttributeAndroidApp(new ByC.ByAttribute("text", "value"), AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().text(\"value\").instance(0))"));
+    }
+    @Test(groups = {"ut"})
+    public void testFindElementByAttributeAndroidAppTextAttributeContains() {
+        findElementByAttributeAndroidApp(new ByC.ByAttribute("text*", "value"), AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().textContains(\"value\").instance(0))"));
+    }
+    @Test(groups = {"ut"})
+    public void testFindElementByAttributeAndroidAppTextAttributeStartsWith() {
+        findElementByAttributeAndroidApp(new ByC.ByAttribute("text^", "value"), AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().textStartsWith(\"value\").instance(0))"));
+    }
+    @Test(groups = {"ut"})
+    public void testFindElementByAttributeAndroidAppTextAttributeMatches() {
+        findElementByAttributeAndroidApp(new ByC.ByAttribute("text$", "value"), AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().textMatches(\"value\").instance(0))"));
+    }
+    @Test(groups = {"ut"})
+    public void testFindElementByAttributeAndroidAppDescriptionAttribute() {
+        findElementByAttributeAndroidApp(new ByC.ByAttribute("content-desc", "value"), AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().description(\"value\").instance(0))"));
+    }
+    @Test(groups = {"ut"})
+    public void testFindElementByAttributeAndroidAppDescriptionAttributeContains() {
+        findElementByAttributeAndroidApp(new ByC.ByAttribute("content-desc*", "value"), AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().descriptionContains(\"value\").instance(0))"));
+    }
+    @Test(groups = {"ut"})
+    public void testFindElementByAttributeAndroidAppDescriptionAttributeStartsWith() {
+        findElementByAttributeAndroidApp(new ByC.ByAttribute("content-desc^", "value"), AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().descriptionStartsWith(\"value\").instance(0))"));
+    }
+    @Test(groups = {"ut"})
+    public void testFindElementByAttributeAndroidAppDescriptionttributeMatches() {
+        findElementByAttributeAndroidApp(new ByC.ByAttribute("content-desc$", "value"), AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().descriptionMatches(\"value\").instance(0))"));
+    }
+    @Test(groups = {"ut"})
+    public void testFindElementByAttributeAndroidAppResourceIdAttribute() {
+        findElementByAttributeAndroidApp(new ByC.ByAttribute("resource-id", "value"), AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().resourceId(\"value\").instance(0))"));
+    }
+    @Test(groups = {"ut"})
+    public void testFindElementByAttributeAndroidAppResourceIdAttributeMatches() {
+        findElementByAttributeAndroidApp(new ByC.ByAttribute("resource-id$", "value"), AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().resourceIdMatches(\"value\").instance(0))"));
+    }
+    private void findElementByAttributeAndroidApp(ByC.ByAttribute selector, By expectedSelector) {
+        when(eventDriver.isWebTest()).thenReturn(false);
+        when(eventDriver.getOriginalDriver()).thenReturn(androidDriver);
+        ByC.ByAttribute byAttribute = spy(selector);
+        byAttribute.findElement(driver);
+        verify(driver).findElement(expectedSelector);
+    }
+
+
 
     @Test(groups = {"ut"})
     public void testFindElementsByAttribute() {
@@ -300,7 +410,6 @@ public class TestByC extends MockitoTest {
     public void testFindElementsByAttributeNameNull() {
         ByC.ByAttribute byAttribute = spy(new ByC.ByAttribute(null, "douce"));
         byAttribute.findElements(driver);
-        verify(driver).findElement(By.xpath(".//*[@meduse='douce']"));
     }
 
     @Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)

@@ -289,7 +289,7 @@ public class TestWebUIDriver extends MockitoTest {
 		when(gridConnector.getNodeUrl()).thenReturn("http://localhost:5555/");
 
 		try (MockedConstruction mockedGridDriverFactory = mockConstruction(SeleniumGridDriverFactory.class, (gridDriverFactory, context) -> {
-			when(gridDriverFactory.createWebDriver()).thenReturn(drv1);
+			when(gridDriverFactory.createWebDriver()).thenReturn(new HtmlUnitDriver());
 			when(gridDriverFactory.getSelectedBrowserInfo()).thenReturn(new BrowserInfo(BrowserType.HTMLUNIT, "1.1"));
 		})) {
 

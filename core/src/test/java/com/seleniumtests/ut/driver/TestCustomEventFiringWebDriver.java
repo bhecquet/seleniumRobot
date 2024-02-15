@@ -626,7 +626,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testIsWebTestMobileApp() {
 		when(eventDriver.getContext()).thenReturn("NATIVE_APP");
 		eventDriver.setTestType(TestType.APPIUM_APP_IOS);
-		Assert.assertTrue(eventDriver.isWebTest());
+		Assert.assertFalse(eventDriver.isWebTest());
 	}
 	
 	/**

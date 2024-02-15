@@ -831,14 +831,15 @@ public class TestHtmlElement extends MockitoTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testReplaceSelectorAndroidId() {
-		
-		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_ANDROID);
-		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
-		
-		HtmlElement present = new HtmlElement("element", By.id("present"));
-		present.setDriver(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null)); // mimic the findElement call were we update driver before doing anything
-		present.replaceSelector();
-		Assert.assertEquals(present.getBy(), By.id("my.package:id/present"));
+		replaceAndroidSelector(By.id("present"), By.id("my.package:id/present"));
+	}
+
+	/**
+	 * TagName not rewritten
+	 */
+	@Test(groups = { "ut" })
+	public void testReplaceSelectorAndroidTagName() {
+		replaceAndroidSelector(By.tagName("TextField"), By.tagName("TextField"));
 	}
 	
 	/**
@@ -846,7 +847,7 @@ public class TestHtmlElement extends MockitoTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testReplaceSelectorAndroidWebId() {
-		
+
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
 		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
 		
@@ -876,28 +877,14 @@ public class TestHtmlElement extends MockitoTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testReplaceSelectorAndroidAppiumId() {
-		
-		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_ANDROID);
-		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
-		
-		HtmlElement present = new HtmlElement("element", AppiumBy.id("present"));
-		present.setDriver(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null)); // mimic the findElement call were we update driver before doing anything
-		present.replaceSelector();
-		Assert.assertEquals(present.getBy(), By.id("my.package:id/present"));
+		replaceAndroidSelector(AppiumBy.id("present"), By.id("my.package:id/present"));
 	}
 	/**
 	 * #540: add automatically package name for AppiumBy.id selector on android
 	 */
 	@Test(groups = { "ut" })
 	public void testReplaceSelectorAndroidAppiumAccessibilityId() {
-		
-		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_ANDROID);
-		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
-		
-		HtmlElement present = new HtmlElement("element", AppiumBy.accessibilityId("present"));
-		present.setDriver(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null)); // mimic the findElement call were we update driver before doing anything
-		present.replaceSelector();
-		Assert.assertEquals(present.getBy(), By.id("my.package:id/present"));
+		replaceAndroidSelector(AppiumBy.accessibilityId("present"), By.id("my.package:id/present"));
 	}
 	
 	/**
@@ -905,22 +892,87 @@ public class TestHtmlElement extends MockitoTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testReplaceSelectorAndroidIdPackageGiven() {
-		
+		replaceAndroidSelector(By.id("a.package:id/present"), By.id("a.package:id/present"));
+	}
+
+	/**
+	 * Id is not supported by chrome in webview, replace it with cssSelector
+	 */
+	@Test(groups = { "ut" })
+	public void testReplaceSelectorWebviewId() {
+		when(mobileDriver.getContext()).thenReturn("WEBVIEW");
+		replaceAndroidSelector(By.id("present"), By.cssSelector("#present"));
+	}
+
+	@Test(groups = { "ut" })
+	public void testReplaceSelectorWebviewAppiumId() {
+		when(mobileDriver.getContext()).thenReturn("WEBVIEW");
+		replaceAndroidSelector(AppiumBy.id("present"), By.cssSelector("#present"));
+	}
+
+	/**
+	 * Name is not supported by chrome in webview, replace it with cssSelector
+	 */
+	@Test(groups = { "ut" })
+	public void testReplaceSelectorWebviewName() {
+
+		when(mobileDriver.getContext()).thenReturn("WEBVIEW");
+		replaceAndroidSelector(By.name("present"), By.cssSelector("*[name='present']"));
+	}
+
+	@Test(groups = { "ut" })
+	public void testReplaceSelectorWebviewAppiumName() {
+		when(mobileDriver.getContext()).thenReturn("WEBVIEW");
+		replaceAndroidSelector(AppiumBy.name("present"), By.cssSelector("*[name='present']"));
+	}
+
+	/**
+	 * ClassName is not supported by chrome in webview, replace it with cssSelector
+	 */
+	@Test(groups = { "ut" })
+	public void testReplaceSelectorWebviewClassName() {
+		when(mobileDriver.getContext()).thenReturn("WEBVIEW");
+		replaceAndroidSelector(By.className("present"), By.cssSelector(".present"));
+	}
+
+	@Test(groups = { "ut" })
+	public void testReplaceSelectorWebviewAppiumClassName() {
+		when(mobileDriver.getContext()).thenReturn("WEBVIEW");
+		replaceAndroidSelector(AppiumBy.className("present"), By.cssSelector(".present"));
+	}
+
+	/**
+	 * TagName not replaced
+	 */
+	@Test(groups = { "ut" })
+	public void testReplaceSelectorWebviewTagName() {
+		when(mobileDriver.getContext()).thenReturn("WEBVIEW");
+		replaceAndroidSelector(By.tagName("div"), By.tagName("div"));
+	}
+
+	@Test(groups = { "ut" })
+	public void testReplaceSelectorWebviewCssSelector() {
+		when(mobileDriver.getContext()).thenReturn("WEBVIEW");
+		replaceAndroidSelector(By.cssSelector("div"), By.cssSelector("div"));
+	}
+
+	@Test(groups = { "ut" })
+	public void testReplaceSelectorWebviewXPath() {
+		when(mobileDriver.getContext()).thenReturn("WEBVIEW");
+		replaceAndroidSelector(By.xpath("//div"), By.xpath("//div"));
+	}
+
+	private void replaceAndroidSelector(By locator, By expectedLocator) {
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_ANDROID);
 		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
-		
-		HtmlElement present = new HtmlElement("element", By.id("a.package:id/present"));
-		present.setDriver(new CustomEventFiringWebDriver(mobileDriver,null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null)); // mimic the findElement call were we update driver before doing anything
+
+		HtmlElement present = new HtmlElement("element", locator);
+		CustomEventFiringWebDriver eventDriver = new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null);
+		present.setDriver(eventDriver); // mimic the findElement call were we update driver before doing anything
 		present.replaceSelector();
-		Assert.assertEquals(present.getBy(), By.id("a.package:id/present"));
+		Assert.assertEquals(present.getBy(), expectedLocator);
 	}
-	
-	
-	
-	
-	
-	
-	
-	
+
+
 }
 	

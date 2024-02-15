@@ -93,6 +93,8 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
 		try {
 			capabilities = new MobileDeviceSelector().initialize().updateCapabilitiesWithSelectedDevice(driverOptions, webDriverConfig.getMode());
 		} catch (ConfigurationException e) {
+			logger.warn(e.getMessage());
+
 			// when connecting to an existing appium server that may be a remote appium, we cannot know which devices are started / connected
 			// driverOptions should contain every capabilities needed to start the test
 			if (appiumLauncher instanceof ExistingAppiumLauncher) {
