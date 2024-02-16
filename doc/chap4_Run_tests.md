@@ -213,22 +213,22 @@ Settings for customizing timeouts
 
 Params for mobile testing
 
-| Param name       			| Default 	| Description  |
-| -------------------------	| ------- 	| ------------ |
-| app 						| 			| Path to the application file (local or remote). For local, if application is for example in 'data/<artifact>/myApp.apk', then give this path | 
-| deviceName 				| 			| Name of the device to use for mobile tests. It's the Human readable name (e.g: Nexus 6 as given by `adb -s <id_device> shell getprop`, line [ro.product.model] property on Android or `xcrun simctl list --json devices available`), not it's id. SeleniumRobot will replace this name with id when communicating with Appium | 
-| fullReset 				| true		| enable full reset capability for appium tests | 
-| appiumServerUrl			|			| Appium server already started, that will be used to execute the test. It's useful to debug tests locally. "http://<host>:<port>/wd/hub/" for appium 1 and "http://<host>:<port>/" for appium 2.x |
-| appiumCaps                |           | Set of capabilities that will be added and sent to appium. These are the capabilities that are not already handled by the framework. See: http://appium.io/docs/en/writing-running-appium/caps/. Format is "key1=value1;key2=value2" |
-| appPackage 				| 			| Package name of application (android only) | 
-| appActivity 				| 			| Activity started by mobile application (Android) | 
-| appWaitActivity 			| 			| In some cases, the first started activity is not the main app activity | 
-| newCommandTimeout 		| 120		| Max wait (in seconds) between 2 appium commands in seconds. Increase this time when debugging | 
-| version 					| 			| Platform version | 
-| platform 					| 			| platform on which test should execute. Ex: Windows 7, Android 5.0, iOS 9.1, Linux, OS X 10.10. Defaults to the current platform |
-| automationName			| Appium / XCUITest | "UiAutomator2" for Android and "XCUITest" for iOS.
-| cloudApiKey 				| 			| Access key for service |  
-| testConfig 				|  			| Additional configuration. This should contain common configuration through all TestNG files.<br/>See `exampleConfigGenericParams.xml` file for format | 
+ | Param name       			| Default 	| Description  |
+ | -------------------------	| ------- 	| ------------ |
+ | app 						| 			| Path to the application file (local or remote). For local, if application is for example in 'data/<artifact>/myApp.apk', then give this path | 
+ | deviceName 				| 			| Name of the device to use for mobile tests. It's the Human readable name (e.g: Nexus 6 as given by `adb -s <id_device> shell getprop`, line [ro.product.model] property on Android or `xcrun simctl list --json devices available`), not it's id. SeleniumRobot will replace this name with id when communicating with Appium | 
+ | fullReset 				| true		| enable full reset capability for appium tests | 
+ | appiumServerUrl			|			| Appium server already started, that will be used to execute the test. It's useful to debug tests locally. "http://<host>:<port>/wd/hub/" for appium 1 and "http://<host>:<port>/" for appium 2.x |
+ | appiumCaps                |           | Set of capabilities that will be added and sent to appium. These are the capabilities that are not already handled by the framework. See: http://appium.io/docs/en/writing-running-appium/caps/. Format is "key1=value1;key2=value2" |
+ | appPackage 				| 			| Package name of application (android only) | 
+ | appActivity 				| 			| Activity started by mobile application (Android) | 
+ | appWaitActivity 			| 			| In some cases, the first started activity is not the main app activity | 
+ | newCommandTimeout 		| 120		| Max wait (in seconds) between 2 appium commands in seconds. Increase this time when debugging | 
+ | version 					| 			| Platform version | 
+ | platform 					| 			| platform on which test should execute. Ex: Windows 7, Android 5.0, iOS 9.1, Linux, OS X 10.10. Defaults to the current platform |
+ | automationName			| Appium / XCUITest | "UiAutomator2" for Android and "XCUITest" for iOS.
+ | cloudApiKey 				| 			| Access key for service |  
+ | testConfig 				|  			| Additional configuration. This should contain common configuration through all TestNG files.<br/>See `exampleConfigGenericParams.xml` file for format | 
 
 #### Reporting ####
 
@@ -393,19 +393,31 @@ If you run behind a proxy, also use the JVM options: `-Dhttps.proxyHost=<host> -
 
 ### 3 Test with Appium locally ###
 
+#### Install appium ####
+
+- Install appium following this guide: http://appium.io/docs/en/latest/quickstart/install/
+- Install appium drivers for android `appium driver install uiautomator2` or iOS `appium driver install xcuitest`
+- Install appium inspector: https://github.com/appium/appium-inspector
+
+#### Environment variables ####
+
 For mobile tests, set the following environment variables on your local computer:
 APPIUM_HOME: 
-- On Windows, using .exe, it's the root path where Appium.exe is located
-- On Mac, using .dmg, it will be `/Applications/Appium.app/Contents/Resources/app`
 - On any platform using npm installation, it will be the path where root `node_modules` folder has been created. This folder should contain an `appium` subfolder
-- `ANDROID_SDK_ROOT` / `ANDROID_HOME`: path to Android SDK (e.g: where SDK Manager resides). This is the root folder containing 'platform-tools', 'system-images', ... folders. If tools has been installed through Android Studio, they are located at `C:\Users\<user>\AppData\Local\Android\Sdk` on windows
+- `ANDROID_HOME`: path to Android SDK (e.g: where SDK Manager resides). This is the root folder containing 'platform-tools', 'system-images', ... folders. If tools has been installed through Android Studio, they are located at `C:\Users\<user>\AppData\Local\Android\Sdk` on windows
 
 Also check that there is only one version of ADB on computer. Otherwise, there may be conflicts and ADB client you provide may not get relevant information from devices
 
 When using seleniumRobot-grid, these environment variables will be set on grid node
 For cloud test, these variables are not needed
 
-If you want to set some appium capabilities, use 'appiumCaps' parameter when the needed capabilities are not provided by framework
+#### Run ####
+
+Start appium: `appium` in command line
+Start your test with `-DappiumServerUrl=http://127.0.0.1:4723/`
+
+If you want to set some appium capabilities, use `appiumCaps` parameter when the needed capabilities are not provided by framework
+
 
 #### Application test on android ####
 

@@ -22,7 +22,6 @@ import java.nio.file.Paths;
 import com.seleniumtests.browserfactory.mobile.AppiumLauncher;
 import com.seleniumtests.browserfactory.mobile.ExistingAppiumLauncher;
 import com.seleniumtests.browserfactory.mobile.GridAppiumLauncher;
-import com.seleniumtests.browserfactory.mobile.LocalAppiumLauncher;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.DriverMode;
@@ -40,7 +39,7 @@ public class AppiumLauncherFactory {
 		
 		if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.LOCAL) {
 			if (SeleniumTestsContextManager.getThreadContext().getAppiumServerUrl() == null) {
-				return new LocalAppiumLauncher(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "logs", "appium").toString());
+				throw new ConfigurationException("'appiumServerUrl' parameter MUST be set");
 			} else {
 				return new ExistingAppiumLauncher(SeleniumTestsContextManager.getThreadContext().getAppiumServerUrl());
 			}

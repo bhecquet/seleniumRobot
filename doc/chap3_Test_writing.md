@@ -1315,15 +1315,15 @@ The variable name **MUST** contain either 'pwd', 'password', or 'passwd'.
 
 ### 12 Write mobile tests ###
 
-SeleniumRobot supports appium (see chap4_Run_tests, §3 to configure execution) out of the box. Be default, seleniumRobot will start the appium server itself for running the test locally, and stop it at the end of the test.
-For writing test, this is easier to use Appium desktop which provides an inspector.
-From version 4.15.0, seleniumRobot allows to use an existing appium server. To use it:
+SeleniumRobot supports appium (see chap4_Run_tests, §3 to configure execution) out of the box. 
+To execute a mobile test through appium, you have to start an appium server locally (refer to appium installation procedure).
+For writing test, this is easier to use Appium inspector.
 
-- start Appium desktop and click on "Start server"
+- start appium in command line
 - Configure seleniumRobot with options: `-DappiumServerUrl=http://localhost:4723/wd/hub/ -DnewCommandTimeout=120 -DfullReset=false`
 - Add a breakpoint into your code 
-- Start your test. When test stop on breakpoint, click "start inspector session" inside appium console
-- In the new window, go to "attach existing session tab"
+- Start your test. When test stop on breakpoint, start appium inspector 
+- In the new window, go to "attach existing session tab". (in case you see many session, look at driver name, it contains the session id)
 ![](images/appium-desktop-inspector.png)
 - Click "Start Session"
 
@@ -1331,7 +1331,7 @@ You should get the inspector running
 
 It's also possible to attach to a remote appium server the same way (change URL). In this case, you MUST
 - provide the device id (`-DdeviceId=<UDID or android ID`) to the test. iOS UDID can be found with command `instruments -s devices`. Android Id can be found with `adb devices` command.
-- provide a local path (local the the remote machine) to the application. An HTTP path may also be provided but you may have trouble with android
+- provide a local path (local to the remote machine) to the application. An HTTP path may also be provided but you may have trouble with android
 
 #### Automatic ID for Android ####
 
@@ -1345,6 +1345,77 @@ In case you have 2 mobile applications that have the same screens, but different
 
 In the above code, `ByC.android`, `ByC.ios`, `ByC.web` help seleniumRobot to filter which locator to use depending on the platform used to launch the test.
 For example, if you execute the test on iOS, android and web locators will be ignored
+
+#### Hybrid application #####
+
+In case the application uses web content on some page, you may need to change context during navigation.
+
+##### Automatic context switching #####
+
+SeleniumRobot provides automatic context switching using the `@Context`, `@ContextWebView`, `@ContextNativeApp` annotations
+These annotation must be located on the page class
+
+```java
+@ContextNativeApp
+public class AccessAuthentication extends PageObject {
+    // your code here ...
+}
+```
+
+or 
+```java
+@ContextWebView
+public class AuthenticationScreen extends PageObject {
+    // your code here ...
+}
+```
+
+- `@Context(name="myContext")` will handle special case where context name is different from "NATIE_APP" and "...WEB..."
+- `@ContextWebView` handles any context containing "WEB" in its name
+- `@ContextNativeApp` handles "NATIVE_APP" context
+
+When doing `new AccessAuthentication()`, seleniumRobot will get all context handles and search the one that matches the requested context (NATIVE_APP in our example).
+Then, it switches automatically to it
+
+##### Manual context switching #####
+
+In case the above behaviour does not match your need, PageObject exposes 
+
+- `getContexts` method to list all contexts
+- `switchToContext` method to switch to any context
+
+#### Auto hide keyboard ####
+
+By default, when using TextFieldElement, the keyboard is displayed because seleniumRobot clicks on the field before sending keys
+On mobile, this is annoying because keyboard can mask some elements. So, `hideKeyboard` method is called just after click
+
+PageObject class exposes `hideKeyboard` method for other cases
+
+#### Auto scrolling element ####
+
+##### iOS #####[chap4_Run_tests.md](chap4_Run_tests.md)
+
+According to appium documentation, this is done by default on iOS
+
+##### Android #####
+On Android **Web view context** or full Web navigation, this is done automatically as for any browser.
+
+On Android, **Native app** context, only visible elements can be accessed using `findElement`. Use of elements that are not visible requires scrolling.
+Appium provides many way to do it manually.
+To scroll automatically on elements, you must use `ByC.attribute`
+
+Native app android elements can be searched through [https://developer.android.com/reference/android/support/test/uiautomator/UiSelector#public-methods_1](https://developer.android.com/reference/android/support/test/uiautomator/UiSelector#public-methods_1)
+- `text` attribute
+- `content-desc` attribute
+- `resource-id` attribute
+
+These 3 attributes (and only these) will be rewritten to `AppiumBy.androidUIAutomator`.
+Rules for ByC.attribute applies (starts with, contains, ...)
+
+- text attribute **equals**: `ByC.attribute("text", "value")` => `AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().text(\"value\").instance(0))")`
+- text attribute **contains**: `ByC.attribute("text*", "value")` => `AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().textContains(\"value\").instance(0))")`
+- content-desc attribute **starts with**: `new ByC.attribute("content-desc^", "value")` => `AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().descriptionStartsWith(\"value\").instance(0))")`
+- resource-id attribute **matches**: `ByC.attribute("resource-id$", "value")`, `AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().resourceIdMatches(\"value\").instance(0))")`
 
 ### 13 Implement custom SelectList ###
 
