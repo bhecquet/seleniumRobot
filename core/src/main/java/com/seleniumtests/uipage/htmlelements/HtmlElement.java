@@ -34,6 +34,9 @@ import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
+import com.seleniumtests.uipage.selectorupdaters.MobileAndroidAppUpdater;
+import com.seleniumtests.uipage.selectorupdaters.MobileWebViewUpdater;
+import com.seleniumtests.uipage.selectorupdaters.ShadowDomRootUpdater;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.By.ByXPath;
@@ -833,48 +836,23 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     }
     
     /**
-     * Some selectors are not allowed as direct children of a Shadow root (tagName, xPath, name)
-     * For xPath, we can't do anything as it's impossible to convert any xPath to its cssSelector equivalent
-     * For name and tagName, we provide the equivalent cssSelector
+     *
      */
     public void replaceSelector() {
-    	if (parent != null && parent.by instanceof ByC.Shadow) {
-    		if (by instanceof By.ByXPath || by instanceof ByC.ByForcedXPath || (by instanceof ByC && !(by instanceof ByC.ByHasCssSelector))) {
-    			throw new ScenarioException(String.format("%s is not supported as a direct child of a shadow DOM as it uses XPath. Try to add an intermediate selector (e.g: By.tagName) before", by.getClass()));
-    		} else if (by instanceof By.ByTagName) {
-    			by = By.cssSelector(by.toString().split(":")[1].trim());
-    		} else if (by instanceof By.ByName) {
-    			by = By.cssSelector(String.format("[name=%s]", by.toString().split(":")[1].trim()));
-    		} else if (by instanceof ByC.ByHasCssSelector) {
-    			((ByC.ByHasCssSelector)by).setUseCssSelector(true);
-    		}
-    	} 
-    	
-    	// add package name before the id for mobile application (not webview)
-		if (SeleniumTestsContextManager.isMobileAppTest()) {
-			boolean isWebTest = ((CustomEventFiringWebDriver)getDriver()).isWebTest();
 
-			if (isWebTest) {
-				// in mobile webviews id, name, classname is not supported
-				String locatorValue = by.toString().split(":", 2)[1].trim();
-				if ((by instanceof By.ById || by instanceof AppiumBy.ById)) {
-					by = By.cssSelector("#" + locatorValue);
-				} else if (by instanceof By.ByName || by instanceof AppiumBy.ByName) {
-					by = By.cssSelector(String.format("*[name='%s']", locatorValue.replace("'", "\\'")));
-				} else if (by instanceof By.ByClassName || by instanceof AppiumBy.ByClassName) {
-					by = By.cssSelector("." + locatorValue);
-				}
-			} else if (
-					!isWebTest
-							&& "android".equalsIgnoreCase(SeleniumTestsContextManager.getThreadContext().getPlatform())
-							&& (by instanceof By.ById || by instanceof AppiumBy.ById || by instanceof AppiumBy.ByAccessibilityId)
-							&& !by.toString().split(":", 2)[1].contains(":")
-			) {
-				WebDriver drv = ((CustomEventFiringWebDriver)getDriver()).getOriginalDriver();
-				String packageName = ((AndroidDriver)drv).getCurrentPackage();
-				by = By.id(packageName + ":id/" + by.toString().split(":", 2)[1].trim());
-			}
-		 }
+		boolean isWebTest = ((CustomEventFiringWebDriver)getDriver()).isWebTest();
+		String platform = SeleniumTestsContextManager.getThreadContext().getPlatform();
+		boolean isAppTest = SeleniumTestsContextManager.isMobileAppTest();
+		String packageName = null;
+		try {
+			WebDriver drv = ((CustomEventFiringWebDriver)getDriver()).getOriginalDriver();
+			packageName = ((AndroidDriver)drv).getCurrentPackage();
+		} catch (Exception e) {}
+
+    	new ShadowDomRootUpdater().update(this);
+    	new MobileWebViewUpdater(isWebTest, isAppTest).update(this);
+		new MobileAndroidAppUpdater(platform, packageName, isWebTest, isAppTest).update(this);
+
     }
         
     /**

@@ -49,18 +49,20 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
         super(cfg);
     }
     
-    private void extractAndroidDriver(MutableCapabilities capabilities) {
-		Optional<String> chromeDriverFile = ((UiAutomator2Options)capabilities).getChromedriverExecutable();
+    private MutableCapabilities extractAndroidDriver(MutableCapabilities capabilities) {
+		UiAutomator2Options androidOptions = new UiAutomator2Options(capabilities);
+		Optional<String> chromeDriverFile = androidOptions.getChromedriverExecutable();
 		if (chromeDriverFile.isPresent() &&  chromeDriverFile.get() != null) {
 			String driverPath;
 			try {
 				driverPath = FileUtility.decodePath(new DriverExtractor().extractDriver(chromeDriverFile.get()));
-				((UiAutomator2Options)capabilities).setChromedriverExecutable(driverPath);
+				androidOptions.setChromedriverExecutable(driverPath);
 			} catch (UnsupportedEncodingException e) {
 				logger.error("cannot get driver path", e);
 			}
 			
 		}
+		return androidOptions;
     }
     
     @Override
@@ -73,7 +75,7 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
     	try {
     		MutableCapabilities capabilities = getMobileCapabilities();
 	        if(ANDROID_PLATORM.equalsIgnoreCase(webDriverConfig.getPlatform())) {
-	        	extractAndroidDriver(capabilities);
+	        	capabilities = extractAndroidDriver(capabilities);
 
 	            return new AndroidDriver(new URL(appiumLauncher.getAppiumServerUrl()), capabilities);
 	            

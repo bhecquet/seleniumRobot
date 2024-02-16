@@ -735,16 +735,6 @@ public class TestHtmlElement extends MockitoTest {
 	}
 	
 	/**
-	 * Check selector is not replaced if we are not a child of shadow root
-	 */
-	@Test(groups = { "ut" })
-	public void testReplaceSelector() {
-		HtmlElement present = new HtmlElement("element", By.xpath("present"));
-		present.replaceSelector();
-		Assert.assertEquals(present.getBy(), By.xpath("present"));
-	}
-	
-	/**
 	 * Check xpath selector is not valid if we are a child of shadow root
 	 */
 	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
@@ -752,215 +742,35 @@ public class TestHtmlElement extends MockitoTest {
 		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(By.xpath("//div"));
 		present.replaceSelector();
 	}
+
+	/**
+	 * Test ShadowRootUpdater is applied
+	 */
 	@Test(groups = { "ut" })
-	public void testReplaceSelectorWithShadowRootAndTagName() {
+	public void testReplaceSelectorShadowRootUpdaterApplied() {
 		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(By.tagName("div"));
 		present.replaceSelector();
 		Assert.assertEquals(present.getBy(), By.cssSelector("div"));
 	}
-	@Test(groups = { "ut" })
-	public void testReplaceSelectorWithShadowRootAndName() {
-		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(By.name("foo"));
-		present.replaceSelector();
-		Assert.assertEquals(present.getBy(), By.cssSelector("[name=foo]"));
-	}
-	@Test(groups = { "ut" })
-	public void testReplaceSelectorWithShadowRootAndId() {
-		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(By.id("foo"));
-		present.replaceSelector();
-		Assert.assertEquals(present.getBy(), By.id("foo"));
-	}
-	@Test(groups = { "ut" })
-	public void testReplaceSelectorWithShadowRootAndLinkText() {
-		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(By.linkText("foo"));
-		present.replaceSelector();
-		Assert.assertEquals(present.getBy(), By.linkText("foo"));
-	}
-	@Test(groups = { "ut" })
-	public void testReplaceSelectorWithShadowRootAndXId() {
-		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(ByC.xId("foo"));
-		present.replaceSelector();
-		Assert.assertEquals(present.getBy(), ByC.attribute("id", "foo"));
-	}
-	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
-	public void testReplaceSelectorWithShadowRootAndXClassName() {
-		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(ByC.xClassName("foo"));
-		present.replaceSelector();
-	}
-	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
-	public void testReplaceSelectorWithShadowRootAndXTagName() {
-		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(ByC.xTagName("foo"));
-		present.replaceSelector();
-	}
-	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
-	public void testReplaceSelectorWithShadowRootAndXLinkText() {
-		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(ByC.xLinkText("foo"));
-		present.replaceSelector();
-	}
-	@Test(groups = { "ut" })
-	public void testReplaceSelectorWithShadowRootAndXName() {
-		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(ByC.xName("foo"));
-		present.replaceSelector();
-		Assert.assertEquals(present.getBy(), ByC.attribute("name", "foo"));
-	}
-	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
-	public void testReplaceSelectorWithShadowRootAndText() {
-		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(ByC.text("foo", "div"));
-		present.replaceSelector();
-	}
-	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
-	public void testReplaceSelectorWithShadowRootAndLabelForward() {
-		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(ByC.labelForward("foo", "div"));
-		present.replaceSelector();
-	}
-	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
-	public void testReplaceSelectorWithShadowRootAndLabelBackward() {
-		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(ByC.labelBackward("foo", "div"));
-		present.replaceSelector();
-	}
-	@Test(groups = { "ut" })
-	public void testReplaceSelectorWithShadowRootAndAttribute() {
-		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(ByC.attribute("foo", "bar"));
-		present.replaceSelector();
-		Assert.assertEquals(present.getBy(), ByC.attribute("foo", "bar"));
-		Assert.assertTrue(((ByC.ByAttribute)present.getBy()).isUseCssSelector()); // check we use the Css Selector instead of XPath
-	}
 	
 	/**
-	 * #540: add automatically package name for id selector on android
+	 * Test MobileAndroidAppUpdater is applied
 	 */
 	@Test(groups = { "ut" })
-	public void testReplaceSelectorAndroidId() {
+	public void testReplaceSelectorMobileAndroidAppUpdater() {
 		replaceAndroidSelector(By.id("present"), By.id("my.package:id/present"));
 	}
 
 	/**
-	 * TagName not rewritten
-	 */
-	@Test(groups = { "ut" })
-	public void testReplaceSelectorAndroidTagName() {
-		replaceAndroidSelector(By.tagName("TextField"), By.tagName("TextField"));
-	}
-	
-	/**
-	 * #540: do not add automatically package name for id selector on chrome android
-	 */
-	@Test(groups = { "ut" })
-	public void testReplaceSelectorAndroidWebId() {
-
-		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
-		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
-		
-		HtmlElement present = new HtmlElement("element", By.id("present"));
-		present.setDriver(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_WEB_ANDROID, DriverMode.LOCAL, null)); // mimic the findElement call were we update driver before doing anything
-		present.replaceSelector();
-		Assert.assertEquals(present.getBy(), By.id("present"));
-	}
-	
-	/**
-	 * #540: do not add automatically package name for id selector on iOS
-	 */
-	@Test(groups = { "ut" })
-	public void testReplaceSelectorIOsId() {
-		
-		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_IOS);
-		SeleniumTestsContextManager.getThreadContext().setPlatform("ios");
-		
-		HtmlElement present = new HtmlElement("element", By.id("present"));
-		present.setDriver(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_IOS, DriverMode.LOCAL, null)); // mimic the findElement call were we update driver before doing anything
-		present.replaceSelector();
-		Assert.assertEquals(present.getBy(), By.id("present"));
-	}
-	
-	/**
-	 * #540: add automatically package name for AppiumBy.id selector on android
-	 */
-	@Test(groups = { "ut" })
-	public void testReplaceSelectorAndroidAppiumId() {
-		replaceAndroidSelector(AppiumBy.id("present"), By.id("my.package:id/present"));
-	}
-	/**
-	 * #540: add automatically package name for AppiumBy.id selector on android
-	 */
-	@Test(groups = { "ut" })
-	public void testReplaceSelectorAndroidAppiumAccessibilityId() {
-		replaceAndroidSelector(AppiumBy.accessibilityId("present"), By.id("my.package:id/present"));
-	}
-	
-	/**
-	 * #540: If andoird package is already specified, do not add it
-	 */
-	@Test(groups = { "ut" })
-	public void testReplaceSelectorAndroidIdPackageGiven() {
-		replaceAndroidSelector(By.id("a.package:id/present"), By.id("a.package:id/present"));
-	}
-
-	/**
 	 * Id is not supported by chrome in webview, replace it with cssSelector
+	 * Test MobileWebviewUpdater is applied
 	 */
 	@Test(groups = { "ut" })
-	public void testReplaceSelectorWebviewId() {
+	public void testReplaceSelectorMobileWebviewUpdater() {
 		when(mobileDriver.getContext()).thenReturn("WEBVIEW");
 		replaceAndroidSelector(By.id("present"), By.cssSelector("#present"));
 	}
 
-	@Test(groups = { "ut" })
-	public void testReplaceSelectorWebviewAppiumId() {
-		when(mobileDriver.getContext()).thenReturn("WEBVIEW");
-		replaceAndroidSelector(AppiumBy.id("present"), By.cssSelector("#present"));
-	}
-
-	/**
-	 * Name is not supported by chrome in webview, replace it with cssSelector
-	 */
-	@Test(groups = { "ut" })
-	public void testReplaceSelectorWebviewName() {
-
-		when(mobileDriver.getContext()).thenReturn("WEBVIEW");
-		replaceAndroidSelector(By.name("present"), By.cssSelector("*[name='present']"));
-	}
-
-	@Test(groups = { "ut" })
-	public void testReplaceSelectorWebviewAppiumName() {
-		when(mobileDriver.getContext()).thenReturn("WEBVIEW");
-		replaceAndroidSelector(AppiumBy.name("present"), By.cssSelector("*[name='present']"));
-	}
-
-	/**
-	 * ClassName is not supported by chrome in webview, replace it with cssSelector
-	 */
-	@Test(groups = { "ut" })
-	public void testReplaceSelectorWebviewClassName() {
-		when(mobileDriver.getContext()).thenReturn("WEBVIEW");
-		replaceAndroidSelector(By.className("present"), By.cssSelector(".present"));
-	}
-
-	@Test(groups = { "ut" })
-	public void testReplaceSelectorWebviewAppiumClassName() {
-		when(mobileDriver.getContext()).thenReturn("WEBVIEW");
-		replaceAndroidSelector(AppiumBy.className("present"), By.cssSelector(".present"));
-	}
-
-	/**
-	 * TagName not replaced
-	 */
-	@Test(groups = { "ut" })
-	public void testReplaceSelectorWebviewTagName() {
-		when(mobileDriver.getContext()).thenReturn("WEBVIEW");
-		replaceAndroidSelector(By.tagName("div"), By.tagName("div"));
-	}
-
-	@Test(groups = { "ut" })
-	public void testReplaceSelectorWebviewCssSelector() {
-		when(mobileDriver.getContext()).thenReturn("WEBVIEW");
-		replaceAndroidSelector(By.cssSelector("div"), By.cssSelector("div"));
-	}
-
-	@Test(groups = { "ut" })
-	public void testReplaceSelectorWebviewXPath() {
-		when(mobileDriver.getContext()).thenReturn("WEBVIEW");
-		replaceAndroidSelector(By.xpath("//div"), By.xpath("//div"));
-	}
 
 	private void replaceAndroidSelector(By locator, By expectedLocator) {
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_ANDROID);
