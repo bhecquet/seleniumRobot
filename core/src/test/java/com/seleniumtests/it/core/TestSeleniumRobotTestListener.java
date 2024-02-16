@@ -142,6 +142,38 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
 		}
 	}
+
+	/**
+	 * Issue #637: max retry is not respected when dataprovider is used
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testWithRetryDataProvider(ITestContext testContext) throws Exception {
+
+		try (MockedConstruction mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+			when(variableServer.isAlive()).thenReturn(true);
+		})) {
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
+
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testKo"});
+			SeleniumRobotVariableServerConnector variableServer = (SeleniumRobotVariableServerConnector) mockedVariableServer.constructed().get(0);
+
+			// check that number of retries is respected
+			String detailedReportContent1 = readTestMethodResultFile("testKo");
+			Assert.assertTrue(detailedReportContent1.contains("[NOT RETRYING] max retry count (1) reached"));
+			String detailedReportContent2 = readTestMethodResultFile("testKo-1");
+			Assert.assertTrue(detailedReportContent2.contains("[NOT RETRYING] max retry count (1) reached"));
+
+
+		} finally {
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
+		}
+	}
 	
 	/**
 	 * Check that logs of a failed attempt are kept in the result directory (KEEP_ALL_RESULTS=true)

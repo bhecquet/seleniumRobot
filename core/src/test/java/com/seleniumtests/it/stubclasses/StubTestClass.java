@@ -283,6 +283,12 @@ public class StubTestClass extends StubParentClass {
 		new Integer[] {14, null}
 		};
 	}
+
+	@Test(groups={"stub"}, dataProvider = "data2")
+	public void testKo(String data1, String data2) {
+		logger.info(String.format("data %s - %s", data1, data2));
+		throw new WebDriverException("ko");
+	}
 	
 	@Test(groups="stub", testName="A test which is OK (${arg0}, ${arg1})", dataProvider = "data2")
 	public void testOkWithTestNameAndDataProvider(String col1, String col2) throws IOException {
