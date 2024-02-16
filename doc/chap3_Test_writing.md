@@ -75,6 +75,13 @@
 - [12 Write mobile tests](#12-write-mobile-tests)
   - [Automatic ID for Android](#automatic-id-for-android)
   - [Use the same test code for multiple platform](#use-the-same-test-code-for-multiple-platform)
+  - [Hybrid application](#hybrid-application)
+    - [Automatic context switching](#automatic-context-switching)
+    - [Manual context switching](#manual-context-switching)
+  - [Auto hide keyboard](#auto-hide-keyboard)
+  - [Auto scrolling element](#auto-scrolling-element)
+    - [iOS #####chap4_Run_tests.md](#ios-chap4_run_testsmd)
+    - [Android](#android)
 - [13 Implement custom SelectList](#13-implement-custom-selectlist)
 - [14 Using custom UI libraries](#14-using-custom-ui-libraries)
 
