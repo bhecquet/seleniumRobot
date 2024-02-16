@@ -740,6 +740,7 @@ public class TestHtmlElement extends MockitoTest {
 	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
 	public void testReplaceSelectorWithShadowRootAndXpath() {
 		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(By.xpath("//div"));
+		present.setDriver(eventDriver);
 		present.replaceSelector();
 	}
 
@@ -749,6 +750,7 @@ public class TestHtmlElement extends MockitoTest {
 	@Test(groups = { "ut" })
 	public void testReplaceSelectorShadowRootUpdaterApplied() {
 		HtmlElement present = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(By.tagName("div"));
+		present.setDriver(eventDriver);
 		present.replaceSelector();
 		Assert.assertEquals(present.getBy(), By.cssSelector("div"));
 	}

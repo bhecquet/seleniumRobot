@@ -718,13 +718,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	 *                          displayed
      */
     public void findElement(boolean waitForVisibility, boolean makeVisible) {
-		// TODO:
-		// https://discuss.appium.io/t/how-can-i-scroll-to-an-element-in-appium-im-using-android-native-app/10618/14
-    	// String DESTINATION_ELEMENT_TEXT= "KUBO";
-		// ((AndroidDriver) driver).findElementByAndroidUIAutomator("new
-		// UiScrollable(new UiSelector())
-    	//		.scrollIntoView(new UiSelector().text(DESTINATION_ELEMENT_TEXT))");
-        
+
     	ElementInfo elementInfo = null;
     	
     	// search element information. Do not stop if something goes wrong here
