@@ -18,7 +18,7 @@
 			document.getElementById("shadow4").attachShadow({mode: "open"}).innerHTML='<label for="fail3Shadow">Panda Unicorn</label><slot name="fillme"></slot>';
 
 			//Test5
-			var o=document.getElementById("shadow5").attachShadow({mode: "open"});o.innerHTML='<div id="pass3Shadow">This is a DIV with the ID of pass3Shadow</div><div id="shadow6"></div>';
+			var o=document.getElementById("shadow5").attachShadow({mode: "open"});o.innerHTML='<div id="shadow6"></div><div id="pass3Shadow">This is a DIV with the ID of pass3Shadow</div>';
 			var p=o.getElementById("shadow6").attachShadow({mode: "open"});
 			p.innerHTML='<div id="pass3Shadow">This is a DIV with the ID of pass3Shadow</div>';
 
@@ -116,8 +116,10 @@
 
 	<p>This shadow DOM contains a label and a slot. The slot is populated by a lightDOM form input with an ID matching the label. The label is in the shadowDOM but IDs shouldn't bleed through so the input should be flagged for lack of a label.</p>
 
-	<div id="shadow4">
-			<input slot="fillme" id="fail3" type="text" />
+	<div id="shadow4Parent">
+		<span id="shadow4">
+				<input slot="fillme" id="fail3" type="text" />
+		</span>
 	</div>
 
 <hr>

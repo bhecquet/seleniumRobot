@@ -28,6 +28,9 @@ public class DriverTestPageShadowDom extends PageObject {
 	public static final HtmlElement shadowWithFrame = new HtmlElement("", ByC.shadow(By.id("shadow12")));
 	public static final FrameElement frameInShadow = new FrameElement("", By.id("frame11"), shadowWithFrame);
 	public static final HtmlElement divPassInShadowAndFrame = new HtmlElement("", By.id("pass1"), frameInShadow);
+	public static final HtmlElement shadow4Parent = new HtmlElement("", By.id("shadow4Parent"));
+	public static final HtmlElement labelInShadowByTagName = new HtmlElement("", ByC.shadow(By.tagName("span")), shadow4Parent).findElement(By.tagName("label"));
+	public static final HtmlElement divPass3MultipleShadowTagName = new HtmlElement("", ByC.shadow(By.id("shadow5"), By.tagName("div"))).findElement(By.id("pass3Shadow"));
 	
 	
 	public static final TextFieldElement textInScroll = new HtmlElement("", ByC.shadow(By.id("shadow11"))).findTextFieldElement(By.id("textInScroll"));

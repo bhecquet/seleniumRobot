@@ -115,4 +115,16 @@ public class TestShadowDomRootUpdater extends GenericTest {
         HtmlElement el = new HtmlElement("element", ByC.shadow(By.id("present"))).findElement(By.xpath("//div"));
         new ShadowDomRootUpdater().update(el);
     }
+
+    @Test(groups = { "ut" })
+    public void testReplaceSelectorInsideByCShadow() {
+        HtmlElement el = new HtmlElement("element", ByC.shadow(By.id("present"), By.tagName("div"), By.name("foo"), By.className("myClass"), ByC.attribute("key", "value")));
+        new ShadowDomRootUpdater().update(el);
+        Assert.assertEquals(((ByC.Shadow)el.getBy()).getBies()[0], By.id("present"));
+        Assert.assertEquals(((ByC.Shadow)el.getBy()).getBies()[1], By.cssSelector("div"));
+        Assert.assertEquals(((ByC.Shadow)el.getBy()).getBies()[2], By.cssSelector("[name=foo]"));
+        Assert.assertEquals(((ByC.Shadow)el.getBy()).getBies()[3], By.className("myClass"));
+        Assert.assertEquals(((ByC.Shadow)el.getBy()).getBies()[4], ByC.attribute("key", "value"));
+        Assert.assertTrue(((ByC.ByAttribute)((ByC.Shadow)el.getBy()).getBies()[4]).isUseCssSelector());
+    }
 }

@@ -70,6 +70,15 @@ public class TestShadowDom extends GenericTest {
 	public void testAccessSubShadowElement() {
 		Assert.assertEquals(DriverTestPageShadowDom.divPass1Shadow.getText(), "This is a div with an ID of pass1Shadow");
 	}
+
+	/**
+	 * #636: searching a shadow root by tagName while already in a shadow root leads to
+	 * org.openqa.selenium.JavascriptException: javascript error: b.getElementsByTagName is not a function
+	 */
+	@Test(groups={"it"})
+	public void testAccessSubShadowElementByTagName() {
+		Assert.assertEquals(DriverTestPageShadowDom.divPass3MultipleShadowTagName.getText(), "This is a DIV with the ID of pass3Shadow");
+	}
 	
 	@Test(groups={"it"})
 	public void testAccessMultipleSubShadowElement() {
