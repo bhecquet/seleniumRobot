@@ -71,8 +71,8 @@ public class TestDriver extends GenericMultiBrowserTest {
 
 	@AfterMethod(groups={"it", "ie"}, alwaysRun=true)
 	public void reset() {
-		driver.switchTo().window(new ArrayList<>(driver.getWindowHandles()).get(0));
 		if (driver != null) {
+			driver.switchTo().window(new ArrayList<>(driver.getWindowHandles()).get(0));
 			DriverTestPage.logoText.clear();
 			DriverTestPage.textElement.clear();
 			((CustomEventFiringWebDriver)driver).scrollTop();

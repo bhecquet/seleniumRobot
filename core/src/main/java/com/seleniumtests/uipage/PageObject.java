@@ -529,10 +529,10 @@ public class PageObject extends BasePage implements IPage {
         // switch to the context if we are on mobile app
         switchToContext();
 
-        // Wait for page load is applicable only for web test
+        // Wait for page load is applicable only for web test and mobile webview
         // When running tests on an iframe embedded site then test will fail if this command is not used
-        // in case of mobile application, only capture screenshot
-        if (((CustomEventFiringWebDriver)driver).isWebTest()) {
+        // in case of mobile application and native context, only capture page
+        if (driver != null && ((CustomEventFiringWebDriver)driver).isWebTest()) {
             waitForPageToLoad();
         } else if (SeleniumTestsContextManager.isAppTest() && captureSnapshot) {
         	capturePageSnapshot();
