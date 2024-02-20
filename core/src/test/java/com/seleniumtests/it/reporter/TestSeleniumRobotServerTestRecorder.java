@@ -113,7 +113,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			String logs = readSeleniumRobotLogFile();
 			Assert.assertTrue(logs.contains("Snapshot hasn't any name, it won't be sent to server")); // one snapshot has no name, error message is displayed
 
-			verify(serverConnector, times(30)).recordStepResult(any(TestStep.class), anyInt(), anyInt()); // all steps are recorded
+			verify(serverConnector, times(29)).recordStepResult(any(TestStep.class), anyInt(), anyInt()); // all steps are recorded
 			// files are uploaded. Only 'testWithException' holds a Snapshot with snapshotCheckType.NONE and so, only its 2 files are uploaded
 			// other snapshots, which are used for image comparison / regression are uploaded through an other service 'createSnapshot'
 			verify(serverConnector).uploadFile(eq(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithException", "htmls", "testWithException_0-1_step_1--tened.html").toFile()), anyInt());

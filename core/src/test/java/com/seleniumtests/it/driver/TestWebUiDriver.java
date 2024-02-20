@@ -102,6 +102,7 @@ public class TestWebUiDriver extends ReporterTest {
 		});
 			 MockedConstruction mockedAndroidDriver = mockConstruction(AndroidDriver.class, (androidDriver, context) -> {
 				 when(androidDriver.manage()).thenReturn(driverOptions);
+				 when(androidDriver.getContext()).thenReturn("NATIVE_APP");
 				 when(androidDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
 			 });
 			 MockedStatic mockedAppiumLauncher = mockStatic(AppiumLauncherFactory.class);
@@ -142,6 +143,7 @@ public class TestWebUiDriver extends ReporterTest {
 			});
 			 MockedConstruction mockedIOSDriver = mockConstruction(IOSDriver.class, (iosDriver, context) -> {
 				 when(iosDriver.manage()).thenReturn(driverOptions);
+				 when(iosDriver.getContext()).thenReturn("NATIVE_APP");
 				 when(iosDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
 			 });
 			 MockedStatic mockedAppiumLauncher = mockStatic(AppiumLauncherFactory.class);
