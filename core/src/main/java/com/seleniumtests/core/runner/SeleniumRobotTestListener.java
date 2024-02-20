@@ -568,8 +568,6 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	private void executeAfterTestMethod(IInvokedMethod method, ITestResult testResult) {
 		logger.info(SeleniumRobotLogger.END_TEST_PATTERN + TestNGResultUtils.getUniqueTestName(testResult));
 
-		Reporter.setCurrentTestResult(testResult);
-
 		// Handle Soft CustomAssertion
 		if (method.isTestMethod()) {
 			TestNGResultUtils.changeTestResultWithSoftAssertion(testResult);

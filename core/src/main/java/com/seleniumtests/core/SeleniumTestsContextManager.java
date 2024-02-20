@@ -43,6 +43,7 @@ import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.internal.ConfigurationMethod;
+import org.testng.internal.thread.ThreadUtil;
 import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
@@ -140,7 +141,7 @@ public class SeleniumTestsContextManager {
     
     private static String getKeyForMethod(ITestContext testNGCtx, String className, String methodName) {
     	if (methodName != null && className != null) {
-        	return getKeyForClass(testNGCtx, className) + "." + methodName;
+        	return getKeyForClass(testNGCtx, className) + "." + methodName + "_" + ThreadUtil.currentThreadInfo();
     	} else {
     		return null;
     	}
@@ -195,7 +196,7 @@ public class SeleniumTestsContextManager {
     	return getOrCreateContext(testNGCtx, className, null, false);
     }
     private static SeleniumTestsContext storeMethodContext(ITestContext testNGCtx, String className, String methodName) {
-    	// unicity is on test + class + method because the same method name may exist in several classes or 2 testNG tests could execute the same test methods 
+    	// unicity is on test + class + method + thread because the same method name may exist in several classes or 2 testNG tests could execute the same test methods
     	SeleniumTestsContext mtdContext = getMethodContext(testNGCtx, className, methodName, true);
     	setMethodContext(testNGCtx, className, methodName, mtdContext);
     	return mtdContext;
@@ -221,7 +222,7 @@ public class SeleniumTestsContextManager {
      */
     private static SeleniumTestsContext getOrCreateContext(ITestContext testNGCtx, String className, String methodName, boolean createCopy) {
     	
-    	// unicity is on test + class + method because the same method name may exist in several classes or 2 testNG tests could execute the same test methods 
+    	// unicity is on test + class + method + thread because the same method name may exist in several classes or 2 testNG tests could execute the same test methods
     	String keyMethod = getKeyForMethod(testNGCtx, className, methodName);
     	String keyClass = getKeyForClass(testNGCtx, className);
     	
@@ -332,7 +333,7 @@ public class SeleniumTestsContextManager {
     
     /**
      * Selects the right context to insert into thread context for use in the subsequent methods
-     * This method shoul
+     * @param method	the method to link the context to
      */
     public static void insertThreadContext(ITestNGMethod method, ITestResult testResult, ITestContext context) {
     	SeleniumTestsContext currentContext = null;
@@ -444,7 +445,6 @@ public class SeleniumTestsContextManager {
     /**
      * Update the current thread context without recreating it
      * This is a correction for issue #94
-     * @param testName
      */
     public static void updateThreadContext(ITestResult testResult) {
     	if (threadLocalContext.get() != null) {
@@ -529,7 +529,6 @@ public class SeleniumTestsContextManager {
      * get SR context stored in test result if it exists. Else, create a new one (happens when a test method has been skipped for example)
      * called from reporters only
      * @param testNGCtx
-     * @param testName
      * @param testResult
      */
     public static SeleniumTestsContext setThreadContextFromTestResult(ITestContext testNGCtx, ITestResult testResult) {

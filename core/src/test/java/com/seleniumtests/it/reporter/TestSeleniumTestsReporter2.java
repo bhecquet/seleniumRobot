@@ -81,10 +81,26 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 		String detailedReportContent = readTestMethodResultFile("testOkWithInvocationCount");
 		Assert.assertTrue(detailedReportContent.contains("Start method testOkWithInvocationCount"));
+
+		// check each step is seen only once
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "<span class=\"step-title\"> Pre test step: setCount"), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "<span class=\"step-title\"> Pre test step: slow"), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "<span class=\"step-title\"> Pre test step: set "), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "<span class=\"step-title\"> step 1"), 1);
+
 		String detailedReportContent1 = readTestMethodResultFile("testOkWithInvocationCount-1");
 		Assert.assertTrue(detailedReportContent1.contains("Start method testOkWithInvocationCount-1"));
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "<span class=\"step-title\"> Pre test step: setCount"), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "<span class=\"step-title\"> Pre test step: slow"), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "<span class=\"step-title\"> Pre test step: set "), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "<span class=\"step-title\"> step 1"), 1);
+
 		String detailedReportContent2 = readTestMethodResultFile("testOkWithInvocationCount-2");
 		Assert.assertTrue(detailedReportContent2.contains("Start method testOkWithInvocationCount-2"));
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "<span class=\"step-title\"> Pre test step: setCount"), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "<span class=\"step-title\"> Pre test step: slow"), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "<span class=\"step-title\"> Pre test step: set "), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "<span class=\"step-title\"> step 1"), 1);
 	}
 
 	/**
