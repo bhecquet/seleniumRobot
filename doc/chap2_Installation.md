@@ -204,7 +204,7 @@ When running seleniumRobot from eclipse, it may not inherit the user environment
 
 - Create a virtual machine (activate graphic acceleration) and start it. You should be able to use your Android virtual device: `avdmanager create avd -n <avd_name> -k system-images;android-30;google_apis;x86 -c 200M -p D:\tmp\avd`
 - Add `ANDROID_HOME` environment variable pointing to root of android tools. This is the directory where all android tools are (This is the root folder containing 'platform-tools', 'system-images', ... folders). Using Android studio, path will be `C:\Users\<user>\AppData\Local\Android\Sdk` on windows
-- Install android driver: `appium driverappium driver install uiautomator2` or `APPIUM_SKIP_CHROMEDRIVER_INSTALL=1 appium driverappium driver install uiautomator2` if you have problem downloading chromedriver
+- Install android driver: `appium driver install uiautomator2` or `set APPIUM_SKIP_CHROMEDRIVER_INSTALL=1 && appium driver install uiautomator2` if you have problem downloading chromedriver
 - Start emulator (from Android Studio or command line): `emulator -avd <avd_name> -netdelay none -netspeed full -port 5560 -no-snapshot-load`
 
 #### Configuring iOS for tests ####
