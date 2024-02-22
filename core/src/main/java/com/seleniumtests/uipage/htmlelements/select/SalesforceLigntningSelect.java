@@ -33,11 +33,6 @@ public class SalesforceLigntningSelect extends AngularSelect implements ISelectL
 		deselectedOptionAttributeValue = "false";
 	}
 	
-
-	public static String getUiLibrary() {
-		return "SalesforceLightning";
-	}
-	
 	@Override
 	public boolean isApplicable() {
 		return "lightning-base-combobox".equalsIgnoreCase(parentElement.getTagName());

@@ -29,11 +29,6 @@ public class PageForActions extends PageObject {
 		super();
 	}
 	
-	public PageForActions(List<String> uiLibraries) {
-		super(uiLibraries);
-		
-	}
-	
 	public PictureElement getPicture() {
 		return picture;
 	}

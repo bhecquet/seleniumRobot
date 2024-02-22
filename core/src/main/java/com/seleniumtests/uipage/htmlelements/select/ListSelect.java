@@ -25,10 +25,6 @@ public class ListSelect extends CommonSelectList implements ISelectList {
 		super(parentElement, frameElement);
 	}
 
-	public static String getUiLibrary() {
-		return PageObject.HTML_UI_LIBRARY;
-	}
-
 	@Override
 	public boolean isApplicable() {
 		return "ul".equalsIgnoreCase(parentElement.getTagName());

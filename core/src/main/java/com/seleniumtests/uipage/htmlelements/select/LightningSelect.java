@@ -31,10 +31,6 @@ public class LightningSelect extends AngularSelect implements ISelectList {
 		selectedOptionAttributeValue = "true";
 		deselectedOptionAttributeValue = "false";
 	}
-
-	public static String getUiLibrary() {
-		return "Lightning"; // mimic salesforce lightning for angular applications
-	}
 	
 	@Override
 	public String getOptionText(WebElement option) {

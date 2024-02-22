@@ -66,7 +66,6 @@ import com.seleniumtests.uipage.htmlelements.LinkElement;
 import com.seleniumtests.uipage.htmlelements.RadioButtonElement;
 import com.seleniumtests.uipage.htmlelements.SelectList;
 import com.seleniumtests.uipage.htmlelements.Table;
-import com.seleniumtests.uipage.htmlelements.UiLibraryRegistry;
 import com.seleniumtests.util.helper.WaitHelper;
 
 public class PageObject extends BasePage implements IPage {
@@ -80,7 +79,6 @@ public class PageObject extends BasePage implements IPage {
     private String suiteName = null;
     private String outputDirectory = null;
     private boolean captureSnapshot = true;
-    private static Map<String, List<String>> uiLibraries = Collections.synchronizedMap(new HashMap<>()); // the UI libraries used for searching elements. Allows to speed up search when several UI libs are declared (e.g for SelectList)
     private ScreenshotUtil screenshotUtil;
     private Clock systemClock;
     private PageLoadStrategy pageLoadStrategy;
@@ -97,9 +95,7 @@ public class PageObject extends BasePage implements IPage {
     public PageObject() {
         this(null, (String)null);
     }
-    public PageObject(List<String> uiLibs) {
-    	this(null, null, uiLibs);
-    }
+
 
     /**
      * Constructor for non-entry point page. The control is supposed to have reached the page from other API call.
@@ -113,21 +109,7 @@ public class PageObject extends BasePage implements IPage {
     public PageObject(final HtmlElement pageIdentifierElement)   {
         this(pageIdentifierElement, (String)null);
     }
-    
-    /**
-     * Base Constructor.
-     * Represents a page on our web site or mobile application.
-     *
-     * @param	pageIdentifierElement	The element to search for so that we check we are on the right page. 
-     * 									May be null if we do not want to check we are on the page
-     * @param	uiLibs					List of UI libraries that may be used in this page (normally one). e.g: 'Angular'. These libs must have been registred by HtmlElements. Failing to give the right one will display the list of available
-     * @throws IOException 
-     *
-     * @throws  Exception
-     */
-    public PageObject(final HtmlElement pageIdentifierElement, List<String> uiLibs)   {
-    	this(pageIdentifierElement, null, uiLibs);
-    }
+
     
     /**
      * Base Constructor.
@@ -141,31 +123,13 @@ public class PageObject extends BasePage implements IPage {
      * @throws  Exception
      */
     public PageObject(final HtmlElement pageIdentifierElement, final String url) {
-    	this(pageIdentifierElement, 
-    			url,
-    			new ArrayList<>());
+        this(pageIdentifierElement,
+                url,
+                SeleniumTestsContextManager.getThreadContext().getBrowser(),
+                WebUIDriver.getCurrentWebUiDriverName(),
+                null);
     }
-    
-    /**
-     * Base Constructor.
-     * Represents a page on our web site or mobile application.
-     *
-     * @param	pageIdentifierElement	The element to search for so that we check we are on the right page. 
-     * 									May be null if we do not want to check we are on the page
-     * @param   url						the URL to which we should connect. May be null if we do not want to go to a specific URL
-     * @param	uiLibs					List of UI libraries that may be used in this page (normally one). e.g: 'Angular'. These libs must have been registred by HtmlElements. Failing to give the right one will display the list of available
-     * @throws IOException 
-     *
-     * @throws  Exception
-     */
-    public PageObject(final HtmlElement pageIdentifierElement, final String url, List<String> uiLibs) {
-    	this(pageIdentifierElement, 
-    			url, 
-    			SeleniumTestsContextManager.getThreadContext().getBrowser(), 
-    			WebUIDriver.getCurrentWebUiDriverName(), 
-    			null,
-    			uiLibs);
-    }
+
     
     /**
      * Base Constructor.
@@ -197,31 +161,6 @@ public class PageObject extends BasePage implements IPage {
      * 									May be null if we do not want to check we are on the page
      * @param   url						the URL to which we should connect. May be null if we do not want to go to a specific URL
      * @param	pageLoadStrategy		whether to wait for the page to load or not (this is complementary to Selenium driver strategy. If not null, it will override selenium
-     * @param	uiLibs					List of UI libraries that may be used in this page (normally one). e.g: 'Angular'. These libs must have been registred by HtmlElements. Failing to give the right one will display the list of available
-     * @throws IOException 
-     *
-     * @throws  Exception
-     */
-    public PageObject(final HtmlElement pageIdentifierElement, final String url, PageLoadStrategy pageLoadStrategy, List<String> uiLibs) {
-    	this(pageIdentifierElement, 
-    			url, 
-    			SeleniumTestsContextManager.getThreadContext().getBrowser(), 
-    			WebUIDriver.getCurrentWebUiDriverName(), 
-    			null,
-    			pageLoadStrategy,
-    			true,
-    			uiLibs);
-    }
-    
-    
-    /**
-     * Base Constructor.
-     * Represents a page on our web site or mobile application.
-     *
-     * @param	pageIdentifierElement	The element to search for so that we check we are on the right page. 
-     * 									May be null if we do not want to check we are on the page
-     * @param   url						the URL to which we should connect. May be null if we do not want to go to a specific URL
-     * @param	pageLoadStrategy		whether to wait for the page to load or not (this is complementary to Selenium driver strategy. If not null, it will override selenium
      * @param	captureSnapshot			if true, snapshot will be captured after page loading. 'false' should only be used when capturing snapshot interfere with a popup alert
      * @throws IOException 
      *
@@ -244,31 +183,6 @@ public class PageObject extends BasePage implements IPage {
      * @param	pageIdentifierElement	The element to search for so that we check we are on the right page. 
      * 									May be null if we do not want to check we are on the page
      * @param   url						the URL to which we should connect. May be null if we do not want to go to a specific URL
-     * @param	pageLoadStrategy		whether to wait for the page to load or not (this is complementary to Selenium driver strategy. If not null, it will override selenium
-     * @param	captureSnapshot			if true, snapshot will be captured after page loading. 'false' should only be used when capturing snapshot interfere with a popup alert
-     * @param	uiLibs					List of UI libraries that may be used in this page (normally one). e.g: 'Angular'. These libs must have been registred by HtmlElements. Failing to give the right one will display the list of available
-     * @throws IOException 
-     *
-     * @throws  Exception
-     */
-    public PageObject(final HtmlElement pageIdentifierElement, final String url, PageLoadStrategy pageLoadStrategy, boolean captureSnapshot, List<String> uiLibs) {
-    	this(pageIdentifierElement, 
-    			url, 
-    			SeleniumTestsContextManager.getThreadContext().getBrowser(), 
-    			WebUIDriver.getCurrentWebUiDriverName(), 
-    			null,
-    			pageLoadStrategy,
-    			captureSnapshot, 
-    			uiLibs);
-    }
-    
-    /**
-     * Base Constructor.
-     * Represents a page on our web site or mobile application.
-     *
-     * @param	pageIdentifierElement	The element to search for so that we check we are on the right page. 
-     * 									May be null if we do not want to check we are on the page
-     * @param   url						the URL to which we should connect. May be null if we do not want to go to a specific URL
      * @param	browserType				the new browser type to create
      * @param	driverName				a logical name to give to the created driver
      * @param	attachExistingDriverPort 	 if we need to attach to an existing browser instead of creating one, then specify the port here
@@ -278,24 +192,6 @@ public class PageObject extends BasePage implements IPage {
      */
     public PageObject(HtmlElement pageIdentifierElement, String url, BrowserType browserType, String driverName, Integer attachExistingDriverPort) {
     	this(pageIdentifierElement, url, browserType, driverName, attachExistingDriverPort, null, true);
-    }
-    /**
-     * Base Constructor.
-     * Represents a page on our web site or mobile application.
-     *
-     * @param	pageIdentifierElement	The element to search for so that we check we are on the right page. 
-     * 									May be null if we do not want to check we are on the page
-     * @param   url						the URL to which we should connect. May be null if we do not want to go to a specific URL
-     * @param	browserType				the new browser type to create
-     * @param	driverName				a logical name to give to the created driver
-     * @param	attachExistingDriverPort 	 if we need to attach to an existing browser instead of creating one, then specify the port here
-     * @param	uiLibs					List of UI libraries that may be used in this page (normally one). e.g: 'Angular'. These libs must have been registred by HtmlElements. Failing to give the right one will display the list of available
-     * @throws IOException 
-     *
-     * @throws  Exception
-     */
-    public PageObject(HtmlElement pageIdentifierElement, String url, BrowserType browserType, String driverName, Integer attachExistingDriverPort, List<String> uiLibs) {
-    	this(pageIdentifierElement, url, browserType, driverName, attachExistingDriverPort, null, true, uiLibs);
     }
     
     /**
@@ -327,58 +223,13 @@ public class PageObject extends BasePage implements IPage {
      * @param	browserType				the new browser type to create
      * @param	driverName				a logical name to give to the created driver
      * @param	attachExistingDriverPort 	 if we need to attach to an existing browser instead of creating one, then specify the port here
-     * @param	captureSnapshot			if true, snapshot will be captured after page loading. 'false' should only be used when capturing snapshot interfere with a popup alert
-     * @param	uiLibs					List of UI libraries that may be used in this page (normally one). e.g: 'Angular'. These libs must have been registred by HtmlElements. Failing to give the right one will display the list of available
-     * @throws IOException 
-     *
-     * @throws  Exception
-     */
-    public PageObject(HtmlElement pageIdentifierElement, String url, BrowserType browserType, String driverName, Integer attachExistingDriverPort, boolean captureSnapshot, List<String> uiLibs) {
-    	this(pageIdentifierElement, url, browserType, driverName, attachExistingDriverPort, null, captureSnapshot, uiLibs);
-    }
-
-    /**
-     * Base Constructor.
-     * Represents a page on our web site or mobile application.
-     *
-     * @param	pageIdentifierElement	The element to search for so that we check we are on the right page. 
-     * 									May be null if we do not want to check we are on the page
-     * @param   url						the URL to which we should connect. May be null if we do not want to go to a specific URL
-     * @param	browserType				the new browser type to create
-     * @param	driverName				a logical name to give to the created driver
-     * @param	attachExistingDriverPort 	 if we need to attach to an existing browser instead of creating one, then specify the port here
      * @param	pageLoadStrategy		whether to wait for the page to load or not (this is complementary to Selenium driver strategy. If not null, it will override selenium
      * @param	captureSnapshot			if true, snapshot will be captured after page loading. 'false' should only be used when capturing snapshot interfere with a popup alert
-     * @throws IOException 
+     * @throws IOException
      *
      * @throws  Exception
      */
     public PageObject(HtmlElement pageIdentifierElement, String url, BrowserType browserType, String driverName, Integer attachExistingDriverPort, PageLoadStrategy pageLoadStrategy, boolean captureSnapshot)  {
-    	this(pageIdentifierElement, url, browserType, driverName, attachExistingDriverPort, pageLoadStrategy, captureSnapshot, new ArrayList<>());
-    }
-    
-    /**
-     * Base Constructor.
-     * Represents a page on our web site or mobile application.
-     *
-     * @param	pageIdentifierElement	The element to search for so that we check we are on the right page. 
-     * 									May be null if we do not want to check we are on the page
-     * @param   url						the URL to which we should connect. May be null if we do not want to go to a specific URL
-     * @param	browserType				the new browser type to create
-     * @param	driverName				a logical name to give to the created driver
-     * @param	attachExistingDriverPort 	 if we need to attach to an existing browser instead of creating one, then specify the port here
-     * @param	pageLoadStrategy		whether to wait for the page to load or not (this is complementary to Selenium driver strategy. If not null, it will override selenium
-     * @param	captureSnapshot			if true, snapshot will be captured after page loading. 'false' should only be used when capturing snapshot interfere with a popup alert
-     * @param	uiLibs					List of UI libraries that may be used in this page (normally one). e.g: 'Angular'. These libs must have been registred by HtmlElements. Failing to give the right one will display the list of available
-     * @throws IOException 
-     *
-     * @throws  Exception
-     */
-    public PageObject(HtmlElement pageIdentifierElement, String url, BrowserType browserType, String driverName, Integer attachExistingDriverPort, PageLoadStrategy pageLoadStrategy, boolean captureSnapshot, List<String> uiLibs)  {
-
-    	for (String uiLib: uiLibs) {
-    		addUiLibrary(uiLib);
-    	}
     	
     	systemClock = Clock.systemUTC();
     	this.captureSnapshot = captureSnapshot;
@@ -482,23 +333,6 @@ public class PageObject extends BasePage implements IPage {
         	}
         }
     }
-    
-    /**
-     * Set the uiLibrary to use as a preferred library.
-     * For example, by default, for SelectList, all UILibraries are tested before searching the element. With this setting, it's possible to make one of them preferred for this page
-     * @param uiLibrary
-     */
-    private synchronized void addUiLibrary(String uiLibrary) {
-    	String className = getClass().getCanonicalName();
-    	uiLibraries.computeIfAbsent(className, k -> new ArrayList<>());
-
- 
-    	if (UiLibraryRegistry.getUiLibraries().contains(uiLibrary) && !uiLibraries.get(className).contains(uiLibrary)) {
-    		uiLibraries.get(className).add(uiLibrary);
-    	} else {
-    		throw new ScenarioException(String.format("uiLibrary '%s' has not been registered for any element. Available uiLibraries are: %s", uiLibrary, StringUtils.join(UiLibraryRegistry.getUiLibraries())));
-    	}
-    }
 
     protected void setUrl(final String openUrl) {
         this.url = openUrl;
@@ -600,11 +434,16 @@ public class PageObject extends BasePage implements IPage {
     /**
      * Add step inside a page
      * @param stepName
-     * @param passwordsToMask	array of strings that must be replaced by '*****' in reports
      */
     public void addStep(String stepName) {
     	TestTasks.addStep(stepName);
     }
+
+    /**
+     * Add step inside a page
+     * @param stepName
+     * @param passwordToMask	array of strings that must be replaced by '*****' in reports
+     */
     public void addStep(String stepName, String ... passwordToMask) {
     	TestTasks.addStep(stepName, passwordToMask);
     }
@@ -635,7 +474,7 @@ public class PageObject extends BasePage implements IPage {
      * env.ini file 
      * Moreover, created custom variable is specific to tuple (application, version, test environment)
      * @param key					name of the param
-     * @param newValue				value of the parameter (or new value if we update it)
+     * @param value				value of the parameter (or new value if we update it)
      * @param specificToVersion		if true, this param will be stored on server with a reference to the application version. This will have no effect if changing a 
      * 								current variable.
      */
@@ -647,7 +486,7 @@ public class PageObject extends BasePage implements IPage {
      * Method for creating or updating a variable. If variables are get from seleniumRobot server, this method will update the value on the server
      * Moreover, created custom variable is specific to tuple (application, version, test environment)
      * @param key					name of the param
-     * @param newValue				value of the parameter (or new value if we update it)
+     * @param value 				value of the parameter (or new value if we update it)
      * @param specificToVersion		if true, this param will be stored on server with a reference to the application version. This will have no effect if changing a 
      * 								current variable.
      * @param timeToLive			if > 0, this variable will be destroyed after some days (defined by variable). A positive value is mandatory if reservable is set to true 
@@ -1923,14 +1762,5 @@ public class PageObject extends BasePage implements IPage {
 
 	public void setScreenshotUtil(ScreenshotUtil screenshotUtil) {
 		this.screenshotUtil = screenshotUtil;
-	}
-
-	/**
-	 * Returns the list of uiLibraries associated to this page or an empty list if none found
-	 * @param cannonicalClassName
-	 * @return
-	 */
-	public static List<String> getUiLibraries(String cannonicalClassName) {
-		return uiLibraries.getOrDefault(cannonicalClassName, new ArrayList<>());
 	}
 }

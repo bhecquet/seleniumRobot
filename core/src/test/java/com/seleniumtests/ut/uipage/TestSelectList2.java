@@ -123,18 +123,4 @@ public class TestSelectList2 extends MockitoTest {
 	public void closeMocks() {
 		mockedWebUiDriver.close();
 	}
-	
-
-	/**
-	 * Check the first implementation search is done depending on declaration in the page
-	 */
-	@Test(groups = { "ut" })
-	public void testWithValidUiLibrary() {
-		new PageForActions(Arrays.asList("Angular"));
-		PageForActions.select.isMultiple();
-		Assert.assertEquals(PageForActions.select.getImplementationList().get(0), NgSelect.class);
-		new PageForActions(Arrays.asList("html"));
-		PageForActions.select.isMultiple();
-		Assert.assertEquals(PageForActions.select.getImplementationList().get(0), NativeSelect.class);
-	}
 }

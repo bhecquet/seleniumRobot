@@ -1269,24 +1269,6 @@ public class TestPageObject2 extends MockitoTest {
 		when(driver.getPageSource()).thenReturn("<html>bar</html>");
 		page.assertHtmlSource("foo");
 	}
-	
-	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class, expectedExceptionsMessageRegExp = ".*AngularMaterial.*")
-	public void testWithInvalidUiLibrary() {
-		new PageForActions(Arrays.asList("invalid"));
-	}
-	
-	@Test(groups = { "ut" })
-	public void testWithValidUiLibrary() {
-		new PageForActions(Arrays.asList("AngularMaterial"));
-		Assert.assertTrue(PageForActions.getUiLibraries(PageForActions.class.getCanonicalName()).contains("AngularMaterial"));
-		Assert.assertFalse(PageForActions.getUiLibraries(PageObject.class.getCanonicalName()).contains("AngularMaterial"));
-	}
-	
-	@Test(groups = { "ut" })
-	public void testWithEmptyUiLibrary() {
-		new PageForActions();
-		Assert.assertTrue(PageForActions.getUiLibraries(PageForActions.class.getCanonicalName()).isEmpty());
-	}
 
 	@Test(groups = { "ut" })
 	public void testHideKeyboard() {
@@ -1313,14 +1295,6 @@ public class TestPageObject2 extends MockitoTest {
 		when(eventDriver.getContextHandles()).thenReturn(new TreeSet<>(Arrays.asList("NATIVE_APP", "WEBVIEW")));
 		when(eventDriver.context("myContext")).thenThrow(new NoSuchContextException("Context foo not available"));
 		page.switchToContext("myContext");
-	}
-	
-	/**
-	 * No error should be raised
-	 */
-	@Test(groups = { "ut" })
-	public void testUiLibraryWithoutPage() {
-		Assert.assertTrue(PageForActions.getUiLibraries(PageForActions.class.getCanonicalName()).isEmpty());
 	}
 	
 	@Test(groups = { "ut" })

@@ -22,10 +22,6 @@ public class NativeSelect extends CommonSelectList implements ISelectList {
 	public NativeSelect(WebElement parentElement, FrameElement frameElement) {
 		super(parentElement, frameElement);
 	}
-
-	public static String getUiLibrary() {
-		return PageObject.HTML_UI_LIBRARY;
-	}
 	
 	@Override
 	public boolean isApplicable() {

@@ -102,10 +102,7 @@ import io.appium.java_client.android.AndroidDriver;
  * 
  */
 public class HtmlElement extends Element implements WebElement, Locatable { 
-	
-	static {
-		UiLibraryRegistry.register(PageObject.HTML_UI_LIBRARY);
-	}
+
 	
 	// WARNING!!!: we use the deprecated Locatable interface because it's used by Actions class
 	// unit test TestPicutreElement.testClick() fails if the new interface is used
@@ -504,18 +501,6 @@ public class HtmlElement extends Element implements WebElement, Locatable {
             x, 
             y);
 
-    }
-    
-    /**
-     * Returns the list of prefered UI libraries for the current page
-     * Should be used when multiple UiLibraries are defined for an element (e.g: SelectList)
-     * @return
-     */
-    protected List<String> getPreferedUiLibraries() {
-    	if (origin != null) {
-			return PageObject.getUiLibraries(origin);
-    	}
-    	return new ArrayList<>();
     }
     
     /**
