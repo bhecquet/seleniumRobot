@@ -12,6 +12,9 @@ import java.util.*;
 
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.ut.uipage.testpages.NativeAppPage;
+import com.seleniumtests.ut.uipage.testpages.OtherContextPage;
+import com.seleniumtests.ut.uipage.testpages.WebViewPage;
 import io.appium.java_client.NoSuchContextException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
@@ -593,6 +596,58 @@ public class TestPageObject2 extends MockitoTest {
 		when(eventDriver.getWindowHandle()).thenReturn("123");
 		page.switchToWindow(1);
 		verify(targetLocator).window("456");
+	}
+
+	/**
+	 * Test automatic context switching on mobile apps
+	 */
+	@Test(groups = {"ut"})
+	public void testAutomaticSwitchToContextWebView() {
+		when(eventDriver.getContextHandles()).thenReturn(new HashSet<>(Arrays.asList("NATIVE_APP", "WEBVIEW")));
+		new WebViewPage();
+		verify(eventDriver).context("WEBVIEW");
+	}
+	@Test(groups = {"ut"})
+	public void testAutomaticSwitchToContextNativeApp() {
+		when(eventDriver.getContextHandles()).thenReturn(new HashSet<>(Arrays.asList("NATIVE_APP", "WEBVIEW")));
+		new NativeAppPage();
+		verify(eventDriver).context("NATIVE_APP");
+	}
+	@Test(groups = {"ut"})
+	public void testAutomaticSwitchToContextNamedContext() {
+		when(eventDriver.getContextHandles()).thenReturn(new HashSet<>(Arrays.asList("NATIVE_APP", "WEBVIEW", "myContext")));
+		new OtherContextPage();
+		verify(eventDriver).context("myContext");
+	}
+	@Test(groups = {"ut"})
+	public void testAutomaticSwitchNoContext() {
+		new PageForActions();
+		verify(eventDriver, never()).getContextHandles();
+		verify(eventDriver, never()).context(anyString());
+	}
+	@Test(groups = {"ut"})
+	public void testAutomaticSwitchToContextAfterReplay() {
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(5);
+		when(eventDriver.getContextHandles()).thenReturn(new HashSet<>(Arrays.asList("NATIVE_APP", "WEBVIEW")))
+				.thenReturn(new HashSet<>(Arrays.asList("NATIVE_APP", "WEBVIEW")))
+				.thenReturn(new HashSet<>(Arrays.asList("NATIVE_APP", "WEBVIEW", "myContext")));
+		new OtherContextPage();
+		verify(eventDriver).context("myContext");
+		verify(eventDriver, times(3)).getContextHandles();
+	}
+
+	/**
+	 * Check replay when context is not found
+	 */
+	@Test(groups = {"ut"})
+	public void testAutomaticSwitchToContextNotAvailable() {
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(5);
+		when(eventDriver.getContextHandles()).thenReturn(new HashSet<>(Arrays.asList("NATIVE_APP", "WEBVIEW")));
+		long start = System.currentTimeMillis();
+		new OtherContextPage();
+		verify(eventDriver, never()).context("myContext");
+		verify(eventDriver, atLeast(4)).getContextHandles();
+		Assert.assertTrue(System.currentTimeMillis() - start > 4500);
 	}
 
 	@Test(groups = { "ut" })

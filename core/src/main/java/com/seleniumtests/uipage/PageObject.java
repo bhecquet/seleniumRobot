@@ -450,11 +450,12 @@ public class PageObject extends BasePage implements IPage {
 
         while (end.isAfter(systemClock.instant())) {
             if (context != null) {
-                Optional<String> foundContext = getContexts().stream().filter(ctx -> ctx.toLowerCase().contains(finalContext)).findFirst();
+                Optional<String> foundContext = getContexts().stream().filter(ctx -> ctx.toLowerCase().contains(finalContext.toLowerCase())).findFirst();
                 if (foundContext.isPresent()) {
                     switchToContext(foundContext.get());
                     return;
                 }
+                WaitHelper.waitForSeconds(1);
 
             } else {
                 return;
