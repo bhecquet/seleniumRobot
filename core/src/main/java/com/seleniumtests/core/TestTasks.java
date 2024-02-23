@@ -232,6 +232,25 @@ public class TestTasks {
 		
 		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(variable.getName(), variable);
 	}
+
+	/**
+	 * Deletes the variable associated to the provided key if it's stored on server
+	 * @param key		Name of the variable to delete
+	 */
+	public static void deleteParam(String key) {
+		SeleniumRobotVariableServerConnector variableServer = SeleniumTestsContextManager.getThreadContext().getVariableServer();
+
+		// check if we update an existing variable
+		TestVariable variable = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(key);
+		if (variableServer == null || variable == null) {
+			return;
+		}
+
+		if (variable.getId() != null) {
+			variableServer.deleteVariable(variable);
+		}
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().remove(variable.getName());
+	}
 	
 	 /**
      * Get parameter from configuration

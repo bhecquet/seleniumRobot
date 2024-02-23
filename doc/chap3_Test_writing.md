@@ -666,10 +666,14 @@ Test data are get using
 - `param(Pattern.compile(<key_pattern>), Pattern.compile(<value_pattern>))` is used to get a variable by pattern on the name / value. For example `param(Pattern.compile("var.*Name"), Pattern.compile("var.*Value"))` for searching all variables whose name matches "var<something>Name" and value matches "var<someThing>Value". Only one value will be get if multiple variables match.
 - `param(null, Pattern.compile(<value_pattern>))`is used to get a variable by pattern on the value.
 
+Test data can be shared using `createOrUpdateLocalParam(<key>, <value>)`
+Difference with `createOrUpdateParam` is that if seleniumRobot server is used, then, variable won't be sent to it
+
 Test data are updated via `createOrUpdateParam`. The later is only available when seleniumRobot server is used.
 - `createOrUpdateParam(<key>, <value>)` is used to store a variable with reference to environment, application
 - `createOrUpdateParam(<key>, <value>, <attach_to_version>)` is used to store a variable with reference to environment, application. Reference to application version is optional
 - `createOrUpdateParam(<key>, <value>, <attach_to_version>, <time_to_live>, <reservable>)` is used to store a variable with reference to environment, application. Reference to application version is optional. In this case, we can specify that server will destroy variable after X days (the time to live) and that this variable can be reserved. 
+
 
 #### Use variable server to hold variables during some days ####
 
@@ -680,7 +684,14 @@ The use case is:
 - to avoid having too many clients stored in selenium server database, these temp variables are destroyed after timeToLive value.
 
 When storing your variable, use: `createOrUpdateParam(<key>, <value>, <attach_to_version>, <time_to_live>, <reservable>)` with reservable=true and time_to_live > 0
+'reservable' may also be set to false if created variable does not need to be shared among tests
 When executing test, use parameter `seleniumRobotServerVariablesOlderThan=1` so that we only get variables created the day before. Keep in mind that this parameter only applies to variables created with a timeToLive value > 0. Other variables are returned without restriction.
+
+#### Delete variables stored on variable server ####
+
+If, for some reason, you need to delete a variable from variable server, you can do it using `deleteParam(<key>)`.
+This only deletes variables created by test scripts, not the one created manually
+
 
 #### Using TestNG annotations ####
 

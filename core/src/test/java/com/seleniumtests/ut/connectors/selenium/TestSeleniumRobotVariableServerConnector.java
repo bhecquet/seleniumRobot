@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import kong.unirest.*;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.testng.Assert;
@@ -48,13 +49,6 @@ import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.core.contexts.SeleniumRobotServerContext;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
-
-import kong.unirest.GetRequest;
-import kong.unirest.Headers;
-import kong.unirest.HttpRequest;
-import kong.unirest.HttpResponse;
-import kong.unirest.Unirest;
-import kong.unirest.UnirestException;
 
 public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
@@ -475,6 +469,63 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		connector.unreserveVariables(variables);
 
 		mockedUnirest.get().verify(() -> Unirest.patch(ArgumentMatchers.contains(String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 2))), never());
+	}
+
+	@Test(groups= {"ut"})
+	public void testVariableDeletion() {
+		configureMockedVariableServerConnection();
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		TestVariable variable = new TestVariable(1, "key1", "value1", false, "key1");
+		connector.deleteVariable(variable);
+
+		mockedUnirest.get().verify(() -> Unirest.delete(ArgumentMatchers.contains(String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 1))));
+	}
+
+
+	@Test(groups= {"ut"})
+	public void testVariableDeletionNoVariableId() {
+		configureMockedVariableServerConnection();
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		TestVariable variable = new TestVariable(null, "key1", "value1", false, "key1");
+		connector.deleteVariable(variable);
+
+		mockedUnirest.get().verify(() -> Unirest.delete(ArgumentMatchers.contains("/variable/api/variable")), never());
+	}
+
+	@Test(groups= {"ut"})
+	public void testVariableDeletionWithToken() {
+		configureMockedVariableServerConnection();
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", "123");
+		TestVariable variable = new TestVariable(1, "key1", "value1", false, "key1");
+		connector.deleteVariable(variable);
+
+		mockedUnirest.get().verify(() -> Unirest.delete(ArgumentMatchers.contains(String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 1))));
+		verify(deleteVariableRequest, times(1)).header("Authorization", "Token 123");
+	}
+
+	/**
+	 * Check no error is raised if deletion fails
+	 */
+	@Test(groups= {"ut"})
+	public void testVariableDeletionInError() {
+		configureMockedVariableServerConnection();
+		createServerMock(SERVER_URL, "DELETE", String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 1), 404, "");
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		TestVariable variable = new TestVariable(1, "key1", "value1", false, "key1");
+		connector.deleteVariable(variable);
+
+		mockedUnirest.get().verify(() -> Unirest.delete(ArgumentMatchers.contains(String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 1))));
+	}
+	@Test(groups= {"ut"})
+	public void testVariableDeletionInError2() {
+		configureMockedVariableServerConnection();
+		HttpRequest<?> req =  createServerMock(SERVER_URL, "DELETE", String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 1), 404, "");
+		when(req.asString()).thenThrow(new UnirestException("error"));
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		TestVariable variable = new TestVariable(1, "key1", "value1", false, "key1");
+		connector.deleteVariable(variable);
+
+		mockedUnirest.get().verify(() -> Unirest.delete(ArgumentMatchers.contains(String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 1))));
 	}
 	
 	/**

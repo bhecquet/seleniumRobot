@@ -481,6 +481,14 @@ public class PageObject extends BasePage implements IPage {
     public void createOrUpdateParam(String key, String value, boolean specificToVersion) {
     	TestTasks.createOrUpdateParam(key, value, specificToVersion);
     }
+
+    /**
+     * Deletes the variable associated to the provided key if it's stored on server
+     * @param key		Name of the variable to delete
+     */
+    public void deleteParam(String key) {
+        TestTasks.deleteParam(key);
+    }
     
     /**
      * Method for creating or updating a variable. If variables are get from seleniumRobot server, this method will update the value on the server

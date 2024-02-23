@@ -252,6 +252,25 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	}
 
 	/**
+	 * Deletes the variable in parameter
+	 * Server will forbid deleting non custom variables
+	 * @param variable
+	 * @return
+	 */
+	public void deleteVariable(TestVariable variable) {
+		if (variable.getId() == null) {
+			logger.error("Variable has no ID, it cannot be deleted");
+			return;
+		}
+
+		try {
+			getStringResponse(buildDeleteRequest(String.format(url + EXISTING_VARIABLE_API_URL, variable.getId())));
+		} catch (UnirestException | SeleniumRobotServerException e) {
+			logger.error(String.format("Cannot delete variable %s", variable.getName()), e);
+		}
+	}
+
+	/**
 	 * create the variable on the server
 	 * @param variable
 	 * @param specificToVersion

@@ -222,6 +222,14 @@ public class SeleniumRobotTestPlan {
     public void createOrUpdateParam(String key, String value, boolean specificToVersion, int timeToLive, boolean reservable) {
     	TestTasks.createOrUpdateParam(key, value, specificToVersion, timeToLive, reservable);
     }
+
+	/**
+	 * Deletes the variable associated to the provided key if it's stored on server
+	 * @param key		Name of the variable to delete
+	 */
+	public void deleteParam(String key) {
+		TestTasks.deleteParam(key);
+	}
     
     /**
      * In case the scenario uses several drivers, switch to one or another using this method, so that any new calls will go through this driver
