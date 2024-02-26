@@ -30,6 +30,7 @@
 - [3 Write a test](#3-write-a-test)
   - [Accessing test data and storing temp data](#accessing-test-data-and-storing-temp-data)
   - [Use variable server to hold variables during some days](#use-variable-server-to-hold-variables-during-some-days)
+  - [Delete variables stored on variable server](#delete-variables-stored-on-variable-server)
   - [Using TestNG annotations](#using-testng-annotations)
     - [Test context](#test-context)
   - [Use driver inside a @BeforeMethod method](#use-driver-inside-a-beforemethod-method)
