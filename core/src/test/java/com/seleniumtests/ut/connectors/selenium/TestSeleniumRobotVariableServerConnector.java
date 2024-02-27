@@ -230,6 +230,34 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		verify(variablesRequest, never()).queryString(eq("name"), anyString());
 		verify(variablesRequest, never()).queryString(eq("value"), anyString());
 	}
+
+	/**
+	 * Check custom.test.variable has precedence over regular variable of the same name
+	 *
+	 * @throws UnirestException
+	 */
+	@Test(groups= {"ut"})
+	public void testGetVariablesWithDuplicate() throws UnirestException {
+
+		configureMockedVariableServerConnection();
+		variablesRequest = (GetRequest) createServerMock(SERVER_URL, "GET", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, "[{'id': 1, 'name': 'key1', 'value': 'value1', 'reservable': false}, {'id': 2, 'name': 'custom.test.variable.key1', 'value': 'value2', 'reservable': true}]");
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		Map<String, TestVariable> variables = connector.getVariables();
+
+		// check the custom variable takes precedence
+		Assert.assertEquals(variables.get("key1").getValue(), "value2");
+	}
+	@Test(groups= {"ut"})
+	public void testGetVariablesWithDuplicate2() throws UnirestException {
+
+		configureMockedVariableServerConnection();
+		variablesRequest = (GetRequest) createServerMock(SERVER_URL, "GET", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, "[{'id': 2, 'name': 'custom.test.variable.key1', 'value': 'value2', 'reservable': true}, {'id': 1, 'name': 'key1', 'value': 'value1', 'reservable': false}]");
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		Map<String, TestVariable> variables = connector.getVariables();
+
+		// check the custom variable takes precedence
+		Assert.assertEquals(variables.get("key1").getValue(), "value2");
+	}
 	
 	/**
 	 * Check reservation delay is sent to server in seconds (whereas we provide it in minutes)
