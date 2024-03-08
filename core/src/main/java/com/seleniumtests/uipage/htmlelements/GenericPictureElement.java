@@ -46,7 +46,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
  */
 public abstract class GenericPictureElement extends Element {
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(GenericPictureElement.class);
-	
+
 	protected File objectPictureFile;
 	protected String resourcePath;
 	protected Map<PageObject, Rectangle> detectedObjectRectangle = new HashMap<>();
@@ -54,11 +54,11 @@ public abstract class GenericPictureElement extends Element {
 	protected ImageDetector detector;
 	protected boolean searchOnDesktop;
 	protected long actionDuration;
-	protected String label;
 	protected ScreenshotUtil screenshotUtil;
 	protected Clock clock = Clock.systemUTC();
 
 	protected GenericPictureElement() {
+		super("");
 		// for mocks
 	}
 	
@@ -66,45 +66,18 @@ public abstract class GenericPictureElement extends Element {
 	 * 
 	 * @param label
 	 * @param pictureFile			picture to search for in snapshot or on desktop
-	 * @param intoElement			HtmlElement inside of which our picture is. It allows scrolling to the zone where 
-	 * 								picture is searched before doing capture
 	 * @param detectionThreshold	sensitivity of search between 0 and 1. Be default, 0.1. More sensitivity means search can be less accurate, detect unwanted zones
 	 * @param searchOnDesktop		By default, false: search in driver snapshot. If true, we take a desktop screenshot, allowing searching into other elements than browser
 	 */
-	protected GenericPictureElement(String label, File pictureFile, double detectionThreshold, boolean searchOnDesktop) {		
-		
+	protected GenericPictureElement(String label, File pictureFile, double detectionThreshold, boolean searchOnDesktop) {
+		super(label);
 		this.searchOnDesktop = searchOnDesktop;
-		this.label = label;
 		
 		if (pictureFile != null) {
 			detector = new ImageDetector();
 			detector.setDetectionThreshold(detectionThreshold);
 			setObjectPictureFile(pictureFile);
 		}
-		
-	}
-	
-	
-	/**
-	 * 
-	 * @param label
-	 * @param pictureFile			picture to search for in snapshot or on desktop
-	 * @param intoElement			HtmlElement inside of which our picture is. It allows scrolling to the zone where 
-	 * 								picture is searched before doing capture
-	 * @param detectionThreshold	sensitivity of search between 0 and 1. Be default, 0.1. More sensitivity means search can be less accurate, detect unwanted zones
-	 * @param searchOnDesktop		By default, false: search in driver snapshot. If true, we take a desktop screenshot, allowing searching into other elements that browser
-	 */
-	protected GenericPictureElement(String label, File pictureFile, double detectionThreshold, boolean searchOnDesktop, String groupName) {		
-		
-		this.searchOnDesktop = searchOnDesktop;
-		this.label = label;
-		
-		if (pictureFile != null) {
-			detector = new ImageDetector();
-			detector.setDetectionThreshold(detectionThreshold);
-			setObjectPictureFile(pictureFile);
-		}
-	
 	}
 	
 	protected static File createFileFromResource(String resource)  {
@@ -265,6 +238,20 @@ public abstract class GenericPictureElement extends Element {
 		}
 	}
 
+	@Override
+	public String getName() {
+		String name = super.getName();
+		if (name != null) {
+			return name;
+		} else if (resourcePath != null) {
+			return resourcePath;
+		} else if (objectPictureFile != null) {
+			return objectPictureFile.getName();
+		} else {
+			return "screen";
+		}
+	}
+
 	public void setObjectPictureFile(File objectPictureFile) {
 		this.objectPictureFile = objectPictureFile;
 		try {
@@ -290,5 +277,10 @@ public abstract class GenericPictureElement extends Element {
 	public void setActionDuration(long actionDuration) {
 		this.actionDuration = actionDuration;
 	}
+
+	public File getObjectPictureFile() {
+		return objectPictureFile;
+	}
+
 
 }

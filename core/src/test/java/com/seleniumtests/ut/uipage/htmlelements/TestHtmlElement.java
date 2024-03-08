@@ -785,6 +785,28 @@ public class TestHtmlElement extends MockitoTest {
 		Assert.assertEquals(present.getBy(), expectedLocator);
 	}
 
-
+	@Test(groups = { "ut" })
+	public void testGetNameWithLabel() {
+		HtmlElement el = new HtmlElement("myElement", By.id("foo"));
+		el.setFieldName("el");
+		Assert.assertEquals(el.getName(), "myElement");
+	}
+	@Test(groups = { "ut" })
+	public void testGetNameWithEmptyLabel() {
+		HtmlElement el = new HtmlElement("", By.id("foo"));
+		el.setFieldName("el");
+		Assert.assertEquals(el.getName(), "el");
+	}
+	@Test(groups = { "ut" })
+	public void testGetNameWithNullLabel() {
+		HtmlElement el = new HtmlElement(null, By.id("foo"));
+		el.setFieldName("el");
+		Assert.assertEquals(el.getName(), "el");
+	}
+	@Test(groups = { "ut" })
+	public void testGetNameNoFieldName() {
+		HtmlElement el = new HtmlElement(null, By.id("foo"));
+		Assert.assertEquals(el.getName(), "By.id: foo");
+	}
 }
 	

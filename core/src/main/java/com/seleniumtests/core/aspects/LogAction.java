@@ -26,6 +26,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.seleniumtests.uipage.BasePage;
+import com.seleniumtests.uipage.ReplayOnError;
+import com.seleniumtests.uipage.htmlelements.Element;
+import com.seleniumtests.uipage.htmlelements.GenericPictureElement;
+import com.seleniumtests.uipage.htmlelements.SeleniumElement;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -36,6 +41,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 import org.testng.Reporter;
 import org.testng.annotations.AfterMethod;
@@ -110,9 +116,7 @@ public class LogAction {
     		)
 	public Object logPageObjectAction(ProceedingJoinPoint joinPoint) throws Throwable {
 		PageObject page = (PageObject)joinPoint.getTarget();
-		String pageName = page == null ? "": "on page " + page.getClass().getSimpleName();
-
-    	return logAction(joinPoint, pageName);
+    	return logAction(joinPoint, page);
 	}
 	
 	@Around("execution(public * com.seleniumtests.uipage.PageObject+.* (..)) "
@@ -264,26 +268,8 @@ public class LogAction {
 		return commonLogTestStep(joinPoint, stepNamePrefix, configStep);
 	}
 	
-
 	/**
-	 * Log composite action when they are declared
-	 * @param joinPoint
-	 */
-	@After("this(com.seleniumtests.uipage.PageObject) && " +	
-			"call(public org.openqa.selenium.interactions.Actions org.openqa.selenium.interactions.Actions.* (..))")
-	public void logCompositeAction(JoinPoint joinPoint)  {
-
-    	List<String> pwdToReplace = new ArrayList<>();
-		String actionName = String.format("%s %s", joinPoint.getSignature().getName(), buildArgString(joinPoint, pwdToReplace, new HashMap<>()));
-		TestAction currentAction = new TestAction(actionName, false, pwdToReplace);
-		
-		if (TestStepManager.getParentTestStep() != null) {
-			TestStepManager.getParentTestStep().addAction(currentAction);
-		}
-	}
-	
-	/**
-	 * Log native action only when we do not override them. Else, it' HTMLElement logging which is used
+	 * Log native action only when we do not override them. Else, it's HTMLElement logging which is used
 	 * @param joinPoint
 	 * @return
 	 */
@@ -300,17 +286,17 @@ public class LogAction {
 		
 		// build the name of the element
 		String targetName = joinPoint.getTarget().toString();
+		Element target = null;
 		if (joinPoint.getTarget() instanceof Select) {
-			targetName = "Select";
-		} else if (targetName.contains("->")) {
-			try {
-				targetName = "Element located by" + targetName.split("->")[1].replace("]", "").replace("}", "");
-			} catch (IndexOutOfBoundsException e) {
-				// we should never go here
-			}
+			target = new SeleniumElement((Select)joinPoint.getTarget());
+		} else if (joinPoint.getTarget() instanceof WebElement) {
+			target = new SeleniumElement((WebElement)joinPoint.getTarget());
 		}
+
+		target.setCallingPage((PageObject) joinPoint.getThis());
+
 		
-		return logAction(joinPoint, targetName);
+		return logAction(joinPoint, target);
 	}
 	
 	/**
@@ -468,16 +454,26 @@ public class LogAction {
 	/**
 	 * Log an action inside a TestStep
 	 * @param joinPoint		the joinPoint
-	 * @param targetName	target on which action is done (page or element)
+	 * @param target		target on which action is done (page or element)
 	 * @return
 	 * @throws Throwable 
 	 */
-	private Object logAction(ProceedingJoinPoint joinPoint, String targetName) throws Throwable {
+	private Object logAction(ProceedingJoinPoint joinPoint, Object target) throws Throwable {
 		List<String> pwdToReplace = new ArrayList<>();
-		String actionName = String.format("%s on %s %s", joinPoint.getSignature().getName(), targetName, buildArgString(joinPoint, pwdToReplace, new HashMap<>()));
 		Object reply = null;
 		boolean actionFailed = false;
-		TestAction currentAction = new TestAction(actionName, false, pwdToReplace);
+		TestAction currentAction = null;
+
+		if (target instanceof PageObject) {
+			String pageName = target == null ? "": " on page " + target.getClass().getSimpleName();
+			String actionName = String.format("%s%s %s", joinPoint.getSignature().getName(), pageName, buildArgString(joinPoint, pwdToReplace, new HashMap<>()));
+			currentAction = new TestAction(actionName, false, pwdToReplace, joinPoint.getSignature().getName(), (Class<? extends PageObject>) target.getClass());
+		} else if (target instanceof Element) {
+			String actionName = String.format("%s on Element located by %s %s", joinPoint.getSignature().getName(), ((Element) target).getName(), buildArgString(joinPoint, pwdToReplace, new HashMap<>()));
+			currentAction = new TestAction(actionName, false, pwdToReplace, joinPoint.getSignature().getName(), (Element)target);
+		} else {
+			currentAction = new TestAction(joinPoint.getSignature().getName(), false, pwdToReplace);
+		}
 		Throwable currentException = null;
 		
 		// log action before its started. By default, it's OK. Then result may be overwritten if step fails
@@ -517,7 +513,7 @@ public class LogAction {
 		
 		if ("openPage".equals(joinPoint.getSignature().getName()) && joinPoint.getTarget() instanceof PageObject) {
 			PageObject page = (PageObject)joinPoint.getTarget();
-			currentStep.addAction(new TestAction(String.format("Opening page %s",  page.getClass().getSimpleName()), false, new ArrayList<>()));
+			currentStep.addAction(new TestAction(String.format("Opening page %s",  page.getClass().getSimpleName()), false, new ArrayList<>(), "openPage", page.getClass()));
 		}
 		
 //		BrowserMobProxy mobProxy = WebUIDriver.getBrowserMobProxy();
@@ -584,5 +580,124 @@ public class LogAction {
 		}
 		return reply;
 	}
+	/**
+	 * Log actions on generic picture elements
+	 * @param joinPoint
+	 * @param replay
+	 * @return
+	 * @throws Throwable
+	 */
+	@Around("execution(public * com.seleniumtests.uipage.htmlelements.GenericPictureElement+.* (..))"
+			+ "&& execution(@com.seleniumtests.uipage.ReplayOnError public * * (..)) && @annotation(replay)")
+	public Object logGenericPictureElements(ProceedingJoinPoint joinPoint, ReplayOnError replay) throws Throwable {
 
+		String methodName = joinPoint.getSignature().getName();
+		String targetName = joinPoint.getTarget().toString();
+		List<String> pwdToReplace = new ArrayList<>();
+		String actionName = String.format("%s on %s %s", methodName, targetName, LogAction.buildArgString(joinPoint, pwdToReplace, new HashMap<>()));
+		TestAction currentAction = new TestAction(actionName, false, pwdToReplace, methodName, (GenericPictureElement)joinPoint.getTarget());
+
+		// log action before its started. By default, it's OK. Then result may be overwritten if step fails
+		// order of steps is the right one (first called is first displayed)
+		if (TestStepManager.getParentTestStep() != null) {
+			TestStepManager.getParentTestStep().addAction(currentAction);
+		}
+
+		boolean actionFailed = false;
+		Throwable currentException = null;
+
+		try {
+			return joinPoint.proceed(joinPoint.getArgs());
+		} catch (Throwable e) {
+			actionFailed = true;
+			currentException = e;
+			throw e;
+		} finally {
+			if (currentAction != null && TestStepManager.getParentTestStep() != null) {
+				currentAction.setFailed(actionFailed);
+				scenarioLogger.logActionError(currentException);
+
+				if (joinPoint.getTarget() instanceof GenericPictureElement) {
+					currentAction.setDurationToExclude(((GenericPictureElement)joinPoint.getTarget()).getActionDuration());
+				}
+			}
+		}
+	}
+
+	/**
+	 * Log composite action when they are declared
+	 * This will create a step that will enclose all actions (click, pause, ...). This step will be closed when perform will be closed
+	 * @param joinPoint
+	 */
+	@After("this(com.seleniumtests.uipage.PageObject) && " +
+			"call(public org.openqa.selenium.interactions.Actions org.openqa.selenium.interactions.Actions.* (..))")
+	public void logCompositeAction(JoinPoint joinPoint)  {
+
+		TestStep compositeActionStep = TestStepManager.getParentTestStep();
+
+		// check if we already have a step created for storing composite actions
+		if (compositeActionStep != null && !compositeActionStep.getName().startsWith(TestStep.COMPOSITE_STEP_PREFIX)) {
+			compositeActionStep = new TestStep(TestStep.COMPOSITE_STEP_PREFIX);
+			TestStepManager.getParentTestStep().addStep(compositeActionStep);
+			TestStepManager.setParentTestStep(compositeActionStep);
+		}
+
+		List<String> pwdToReplace = new ArrayList<>();
+		String actionName = String.format("%s %s", joinPoint.getSignature().getName(), buildArgString(joinPoint, pwdToReplace, new HashMap<>()));
+
+		Element targetElement = null;
+		Class<? extends PageObject> targetClass = null;
+		// for HtmlElement / GenericPictureElement
+		if (joinPoint.getArgs().length > 0 && (joinPoint.getArgs()[0] instanceof Element)) {
+			targetElement = (Element) joinPoint.getArgs()[0];
+			targetClass = targetElement.getOriginClass();
+		// for Selenium WebElement
+		} else if (joinPoint.getArgs().length > 0 && (joinPoint.getArgs()[0] instanceof WebElement)) {
+			targetElement = new SeleniumElement((WebElement)joinPoint.getTarget());
+			targetClass = ((PageObject)joinPoint.getTarget()).getClass();
+		}
+
+		TestAction currentAction = new TestAction(actionName, false, pwdToReplace, joinPoint.getSignature().getName(), targetElement, targetClass);
+
+		if (compositeActionStep != null) {
+			compositeActionStep.addAction(currentAction);
+		}
+	}
+
+	/**
+	 * Log composite actions when perform is done
+	 * We expect some actions have been logged in a special TestStep. This step will be closed
+	 * @param joinPoint
+	 * @return
+	 * @throws Throwable
+	 */
+	@Around("execution(public void org.openqa.selenium.interactions.Actions.BuiltAction.perform ())")
+	public Object logPerformCompositeAction(ProceedingJoinPoint joinPoint) throws Throwable {
+
+		TestStep currentStep = TestStepManager.getParentTestStep();
+		TestStep compositeActionStep = null;
+
+		// check if we have a step that stored composite actions
+		// if yes, then co
+		if (currentStep != null && currentStep.getName().startsWith(TestStep.COMPOSITE_STEP_PREFIX)) {
+			compositeActionStep = currentStep;
+		}
+
+		boolean actionFailed = false;
+		Throwable currentException = null;
+
+		try {
+			return joinPoint.proceed(joinPoint.getArgs());
+		} catch (Throwable e) {
+			actionFailed = true;
+			currentException = e;
+			throw e;
+		} finally {
+			if (compositeActionStep != null) {
+				compositeActionStep.setFailed(actionFailed);
+				scenarioLogger.logActionError(currentException);
+				TestStepManager.setParentTestStep((TestStep)compositeActionStep.getParent());
+			}
+		}
+	}
 }

@@ -256,12 +256,23 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	}
 
 	@Test(groups= {"ut"})
+	public void testCreateSessionWithStartedBy() throws UnirestException {
+		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
+		MultipartBody request = (MultipartBody) createServerMock("POST", SeleniumRobotSnapshotServerConnector.SESSION_API_URL, 200, "{'id': '14'}", "body");
+
+		connector.createVersion();
+		Integer sessionId = connector.createSession("Session1", "BROWSER:CHROME", "http://myLauncher/test");
+		verify(request).field("browser", "BROWSER:CHROME");
+		verify(request).field("startedBy", "http://myLauncher/test");
+	}
+
+	@Test(groups= {"ut"})
 	public void testCreateSessionLongAppName() throws UnirestException {
 		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
 		MultipartBody request = (MultipartBody) createServerMock("POST", SeleniumRobotSnapshotServerConnector.SESSION_API_URL, 200, "{'id': '14'}", "body");
 
 		connector.createVersion();
-		Integer sessionId = connector.createSession("Session1", "APP:" +  StringUtils.repeat("-", 97));
+		Integer sessionId = connector.createSession("Session1", "APP:" +  StringUtils.repeat("-", 97), null);
 		verify(request).field("browser", ("APP:" + StringUtils.repeat("-", 96)));
 
 		Assert.assertEquals((int)sessionId, 14);

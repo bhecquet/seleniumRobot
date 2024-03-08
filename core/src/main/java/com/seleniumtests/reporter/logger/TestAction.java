@@ -25,6 +25,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.seleniumtests.uipage.PageObject;
+import com.seleniumtests.uipage.htmlelements.Element;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
@@ -48,6 +50,7 @@ public class TestAction {
 	protected TestAction parent = null;
 	protected int position = 0;
 	protected Boolean failed;
+	// actionException & actionExceptionMessage are not set for TestAction, only for TestStep
 	protected Throwable actionException;
 	protected String actionExceptionMessage;
 	protected long durationToExclude = 0L; 	// the duration to exclude from the action duration
@@ -55,6 +58,10 @@ public class TestAction {
 	protected boolean maskPassword = true;
 	protected boolean encoded = false;		// true if we have encoded messages
 	protected LocalDateTime timestamp;
+
+	private String action;			// "click", "sendKeys", ...
+	private Element element;			// name of the element on which action occurs
+	private Class<? extends PageObject> page;		// page on which action is performed
 	
 	/**
 	 * 
@@ -63,6 +70,44 @@ public class TestAction {
 	 * @param pwdToReplace	list of string to replace when returning actions so that passwords are masked. Only password longer that 5 characters are replaced to avoid replacing non password strings
 	 */
 	public TestAction(String name, Boolean failed, List<String> pwdToReplace) {
+		this(name, failed, pwdToReplace, null, null, null);
+	}
+
+	/**
+	 * Creates a test action specifying an element on which action occurs
+	 *
+	 * @param name			action name, this is the presented name
+	 * @param failed		true if this action is failed
+	 * @param pwdToReplace	list of string to replace when returning actions so that passwords are masked. Only password longer that 5 characters are replaced to avoid replacing non password strings
+	 * @param action		the performed action. Difference with name is that, for element actions, 'name' will be "click on HtmlElement...", 'action' will be 'click'
+	 * @param element		the element on which action is performed
+	 */
+	public TestAction(String name, Boolean failed, List<String> pwdToReplace, String action, Element element) {
+		this(name, failed, pwdToReplace, action, element, element.getOriginClass());
+	}
+
+	/**
+	 * Creates a test action specifying an element on which action occurs
+	 *
+	 * @param name			action name, this is the presented name
+	 * @param failed		true if this action is failed
+	 * @param pwdToReplace	list of string to replace when returning actions so that passwords are masked. Only password longer that 5 characters are replaced to avoid replacing non password strings
+	 * @param action		the performed action. Difference with name is that, for element actions, 'name' will be "click on HtmlElement...", 'action' will be 'click'
+	 * @param page			the page class on which action is performed
+	 */
+	public TestAction(String name, Boolean failed, List<String> pwdToReplace, String action, Class<? extends PageObject> page) {
+		this(name, failed, pwdToReplace, action, null, page);
+	}
+
+	/**
+	 *
+	 * @param name			action name, this is the presented name
+	 * @param failed		true if this action is failed
+	 * @param pwdToReplace	list of string to replace when returning actions so that passwords are masked. Only password longer that 5 characters are replaced to avoid replacing non password strings
+	 * @param action		the performed action. Difference with name is that, for element actions, 'name' will be "click on HtmlElement...", 'action' will be 'click'
+	 * @param element		the element on which action is performed
+	 */
+	public TestAction(String name, Boolean failed, List<String> pwdToReplace, String action, Element element, Class<? extends PageObject> page) {
 		this.name = name;
 		this.failed = failed;
 		this.pwdToReplace = pwdToReplace.stream()
@@ -70,6 +115,9 @@ public class TestAction {
 					.filter(s -> s.length() > TestStepManager.MIN_PASSWORD_LENGTH)
 					.collect(Collectors.toList());
 
+		this.action = action;
+		this.element = element;
+		this.page = page;
 
 		timestamp = LocalDateTime.now();
 	}
@@ -139,10 +187,24 @@ public class TestAction {
 		actionJson.put("timestamp", timestamp.atZone(ZoneOffset.UTC).toInstant().toEpochMilli());
 		actionJson.put("type", "action");
 		actionJson.put("name", getName());
-		actionJson.put("exception", actionException == null ? null: actionException.getClass().toString());
-		actionJson.put("exceptionMessage", actionException == null ? null: ExceptionUtility.getExceptionMessage(actionException));
+
+		// TestAction do not receive the exception when it failed
+		if (this instanceof TestAction && parent != null) {
+			actionJson.put("exception", parent.actionException == null ? null : parent.actionException.getClass().getName());
+			actionJson.put("exceptionMessage", parent.actionException == null ? null : ExceptionUtility.getExceptionMessage(parent.actionException));
+		} else {
+			actionJson.put("exception", actionException == null ? null : actionException.getClass().getName());
+			actionJson.put("exceptionMessage", actionException == null ? null : ExceptionUtility.getExceptionMessage(actionException));
+		}
 		actionJson.put("failed", failed);
 		actionJson.put("position", position);
+		actionJson.put("action", action);
+		if (element != null) {
+			actionJson.put("element", element.getName());
+		}
+		if (page != null) {
+			actionJson.put("page", page.getName());
+		}
 
 		return actionJson;
 	}
@@ -167,6 +229,7 @@ public class TestAction {
 		encodedAction.actionException = actionException;
 		encodedAction.maskPassword = maskPassword;
 		encodedAction.timestamp = timestamp;
+		encodedAction.position = position;
 		
 		if (format == null) {
 			encodedAction.encoded = encoded;
@@ -198,6 +261,18 @@ public class TestAction {
 
 	public void setPosition(int position) {
 		this.position = position;
+	}
+
+	public String getAction() {
+		return action;
+	}
+
+	public Element getElement() {
+		return element;
+	}
+
+	public Class<? extends PageObject> getPage() {
+		return page;
 	}
 
 }

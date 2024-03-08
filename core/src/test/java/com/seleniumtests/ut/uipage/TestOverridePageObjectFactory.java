@@ -163,7 +163,7 @@ public class TestOverridePageObjectFactory extends MockitoTest {
 	}
 	
 	/**
-	 * Test that we can find an element inside frame by index, using standard Selenium writing (switchTo().frame())
+	 * Test that we can find an element inside frame by name, using standard Selenium writing (switchTo().frame())
 	 */
 	@Test(groups= {"ut"})
 	public void testSingleFrameByNameOrId() {

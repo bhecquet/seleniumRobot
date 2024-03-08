@@ -86,13 +86,14 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			System.setProperty(SeleniumTestsContext.STARTED_BY, "http://mylauncher/test");
 
 			initMocks(mockedCommonReporter, mockedServerConnector);
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException", "testSkipped", "testOkWithTestName"});
 			
 			// check server has been called for all aspects of test (app, version, ...)
 			// they may be called for each test but server is responsible for uniqueness of the value
-			verify(serverConnector, atLeastOnce()).createSession(anyString(), eq("BROWSER:NONE"));
+			verify(serverConnector, atLeastOnce()).createSession(anyString(), eq("BROWSER:NONE"), eq("http://mylauncher/test"));
 			
 			// issue #331: check all test cases are created, call MUST be done only once to avoid result to be recorded several times
 			verify(serverConnector).createTestCase("testAndSubActions");
@@ -139,6 +140,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+			System.clearProperty(SeleniumTestsContext.STARTED_BY);
 		}
 	}
 	
@@ -164,7 +166,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException", "testSkipped", "testOkWithTestName"});
 			
 			// check server has NOT been called for all aspects of test (app, version, ...)
-			verify(serverConnector, never()).createSession(anyString(), anyString());
+			verify(serverConnector, never()).createSession(anyString(), anyString(), isNull());
 			verify(serverConnector, never()).createTestCase(anyString());
 			verify(serverConnector, never()).addLogsToTestCaseInSession(anyInt(), anyString());
 			verify(serverConnector, never()).createTestCaseInSession(anyInt(), anyInt(), anyString(), anyString(), anyString(), eq(""));
@@ -287,7 +289,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 			// check server has been called for all aspects of test (app, version, ...)
 			// they may be called for each test but server is responsible for uniqueness of the value
-			verify(serverConnector, atLeastOnce()).createSession(anyString(), eq("BROWSER:CHROME"));
+			verify(serverConnector, atLeastOnce()).createSession(anyString(), eq("BROWSER:CHROME"), isNull());
 			
 			// issue #331: check all test cases are created, call MUST be done only once to avoid result to be recorded several times
 			verify(serverConnector).createTestCase("testDriverCustomSnapshot");
@@ -339,7 +341,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 			// check server has been called for all aspects of test (app, version, ...)
 			// they may be called for each test but server is responsible for uniqueness of the value
-			verify(serverConnector, atLeastOnce()).createSession(anyString(), eq("BROWSER:CHROME"));
+			verify(serverConnector, atLeastOnce()).createSession(anyString(), eq("BROWSER:CHROME"), isNull());
 			
 			// issue #331: check all test cases are created, call MUST be done only once to avoid result to be recorded several times
 			verify(serverConnector).createTestCase("testDriverCustomSnapshot");
@@ -390,7 +392,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 	
 			// check server has been called for all aspects of test (app, version, ...)
-			verify(serverConnector, never()).createSession(anyString(), eq("BROWSER:NONE"));
+			verify(serverConnector, never()).createSession(anyString(), eq("BROWSER:NONE"), isNull());
 			
 			// check all test cases are created, in both test classes
 			verify(serverConnector, never()).createTestCase(anyString());
@@ -430,7 +432,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError"});
 			
 			// check server has been called for session
-			verify(serverConnector).createSession(anyString(), eq("BROWSER:NONE")); // once per TestNG context (so 1 time here)
+			verify(serverConnector).createSession(anyString(), eq("BROWSER:NONE"), isNull()); // once per TestNG context (so 1 time here)
 			verify(serverConnector, times(13)).recordStepResult(any(TestStep.class), anyInt(), anyInt());
 			
 		} finally {

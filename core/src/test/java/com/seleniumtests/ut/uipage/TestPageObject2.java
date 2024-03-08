@@ -1296,13 +1296,33 @@ public class TestPageObject2 extends MockitoTest {
 		when(eventDriver.context("myContext")).thenThrow(new NoSuchContextException("Context foo not available"));
 		page.switchToContext("myContext");
 	}
-	
+
+	/**
+	 * For inline elements, calling page is not set, as we cannot know it, but origin is provided
+	 */
 	@Test(groups = { "ut" })
-	public void testCallingPageSetToPictureElement() {
+	public void testInlineElement() {
+		PageForActions p1 = new PageForActions();
+		HtmlElement textElement = p1.clickInlineElement();
+		Assert.assertNull(textElement.getFieldName());
+		Assert.assertEquals(textElement.getOrigin(), "com.seleniumtests.ut.core.runner.cucumber.PageForActions");
+		Assert.assertNull(textElement.getCallingPage());
+	}
+
+	@Test(groups = { "ut" })
+	public void testFieldNameSetToAllElements() {
+		PageForActions p1 = new PageForActions();
+		Assert.assertEquals(p1.getPicture().getFieldName(), "picture");
+		Assert.assertEquals(p1.getScreenZone().getFieldName(), "zoneNotPresent");
+		Assert.assertEquals(p1.getTextField().getFieldName(), "textField");
+	}
+
+	@Test(groups = { "ut" })
+	public void testCallingPageSetToAllElements() {
 		PageForActions p1 = new PageForActions();
 		Assert.assertNotNull(p1.getPicture().getCallingPage());
 		Assert.assertNotNull(p1.getScreenZone().getCallingPage());
-		Assert.assertNull(p1.getTextField().getCallingPage());
+		Assert.assertNotNull(p1.getTextField().getCallingPage());
 	}
 	
 	@Test(groups = { "ut" })

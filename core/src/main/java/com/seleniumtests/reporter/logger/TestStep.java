@@ -56,6 +56,7 @@ import com.seleniumtests.util.ExceptionUtility;
  */
 public class TestStep extends TestAction {
 	private static final String BEFORE_STEP_PREFIX = "before-";
+	public static final String COMPOSITE_STEP_PREFIX = "Composite ";
 	private List<TestAction> stepActions;
 	private Long duration;
 	private Date startDate;

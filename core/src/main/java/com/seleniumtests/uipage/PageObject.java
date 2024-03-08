@@ -83,8 +83,6 @@ public class PageObject extends BasePage implements IPage {
     private Clock systemClock;
     private PageLoadStrategy pageLoadStrategy;
     
-    public static final String HTML_UI_LIBRARY = "html";
-    
     private static final String ERROR_ELEMENT_NOT_PRESENT = "Element %s is not present";
 
     /**
@@ -315,22 +313,30 @@ public class PageObject extends BasePage implements IPage {
     }
     
     /**
-     * asssociates the calling page instance ('this') to each GenericPictureElement instance of the page, so that it can create a sort of cache based on calling page 
+     * associates the calling page instance ('this') to each Element instance of the page, so that it can create a sort of cache based on calling page
+     * associates the name of the field to the element
      */
     private void setPageOnElements() {
 
     	for (Field field: getClass().getDeclaredFields()) {
-        
-        	if (GenericPictureElement.class.isAssignableFrom(field.getType())) {
-        		try {
-        			boolean accessible = field.isAccessible();
-        			field.setAccessible(true);
-					((GenericPictureElement)field.get(this)).setCallingPage(this);
-					field.setAccessible(accessible);
-				} catch (IllegalArgumentException | IllegalAccessException e) {
-					throw new CustomSeleniumTestsException("Problem occured while setting element on page");
-				} 
-        	}
+
+            try {
+                boolean accessible = field.isAccessible();
+                field.setAccessible(true);
+
+                // associate the object with field name / calling page
+                if (Element.class.isAssignableFrom(field.getType())) {
+                    ((Element) field.get(this)).setFieldName(field.getName());
+                    ((Element) field.get(this)).setCallingPage(this);
+                }
+
+                field.setAccessible(accessible);
+            } catch (IllegalArgumentException | IllegalAccessException e) {
+                throw new CustomSeleniumTestsException("Problem occured while setting element on page");
+            }
+
+
+
         }
     }
 
@@ -1216,6 +1222,7 @@ public class PageObject extends BasePage implements IPage {
 	}
 	
     // --------------------- Actions --------------------------
+    // these are essentially present for cucumber test for which we can use generic actions without grouping them into methods
 
 	@GenericStep
     public <T extends PageObject> T goBack() {

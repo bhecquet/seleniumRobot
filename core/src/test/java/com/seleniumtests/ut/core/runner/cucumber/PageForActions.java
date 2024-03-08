@@ -2,17 +2,11 @@ package com.seleniumtests.ut.core.runner.cucumber;
 
 import java.util.List;
 
+import com.seleniumtests.uipage.htmlelements.*;
 import org.mockito.Mockito;
 import org.openqa.selenium.By;
 
 import com.seleniumtests.uipage.PageObject;
-import com.seleniumtests.uipage.htmlelements.CheckBoxElement;
-import com.seleniumtests.uipage.htmlelements.PictureElement;
-import com.seleniumtests.uipage.htmlelements.RadioButtonElement;
-import com.seleniumtests.uipage.htmlelements.ScreenZone;
-import com.seleniumtests.uipage.htmlelements.SelectList;
-import com.seleniumtests.uipage.htmlelements.Table;
-import com.seleniumtests.uipage.htmlelements.TextFieldElement;
 
 public class PageForActions extends PageObject {
 	
@@ -35,6 +29,12 @@ public class PageForActions extends PageObject {
 	
 	public ScreenZone getScreenZone() {
 		return zoneNotPresent;
+	}
+
+	public HtmlElement clickInlineElement() {
+		HtmlElement el = new TextFieldElement("text2", By.id("el"));
+		el.click();
+		return el;
 	}
 	
 	public TextFieldElement getTextField() {

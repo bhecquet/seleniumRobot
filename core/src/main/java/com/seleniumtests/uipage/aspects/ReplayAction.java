@@ -108,7 +108,7 @@ public class ReplayAction {
     	if (!methodName.equals("getCoordinates")) {
     		List<String> pwdToReplace = new ArrayList<>();
     		String actionName = String.format("%s on %s %s", methodName, targetName, LogAction.buildArgString(joinPoint, pwdToReplace, new HashMap<>()));
-    		currentAction = new TestAction(actionName, false, pwdToReplace);
+    		currentAction = new TestAction(actionName, false, pwdToReplace, methodName, element);
     	}
 
 		// log action before its started. By default, it's OK. Then result may be overwritten if step fails
@@ -126,7 +126,7 @@ public class ReplayAction {
 
 	    		// in case we have switched to an iframe for using previous webElement, go to default content
 	    		if (element.getDriver() != null && SeleniumTestsContextManager.isWebTest()) {
-	    			element.getDriver().switchTo().defaultContent(); // TODO: error when clic is done, closing current window
+	    			element.getDriver().switchTo().defaultContent(); // TODO: error when click is done, closing current window
 	    		}
 		    	
 		    	try {
@@ -212,86 +212,45 @@ public class ReplayAction {
 			throw e;
 		}
 	}
-    
-	/**
-	 * Replay all actions annotated by ReplayOnError if the class is not a subclass of 
-	 * HtmlElement
-	 * @param joinPoint
-	 * @throws Throwable
-	 */
-	@Around("!execution(public * com.seleniumtests.uipage.htmlelements.HtmlElement+.* (..))"
-			+ "&& execution(@com.seleniumtests.uipage.ReplayOnError public * * (..)) && @annotation(replay)")
-	public Object replay(ProceedingJoinPoint joinPoint, ReplayOnError replay) throws Throwable {
+
+	private Object replayNonHtmlElement(ProceedingJoinPoint joinPoint, ReplayOnError replay) throws Throwable {
 		
 		int replayDelayMs = replay != null ? replay.replayDelayMs(): 100;
 		
 		Instant end = systemClock.instant().plusSeconds(SeleniumTestsContextManager.getThreadContext().getReplayTimeout());
 		Object reply = null;
-		
-		String targetName = joinPoint.getTarget().toString();
-		TestAction currentAction = null;
 
-		if (joinPoint.getTarget() instanceof GenericPictureElement) {
-	    	String methodName = joinPoint.getSignature().getName();
-	    	List<String> pwdToReplace = new ArrayList<>();
-			String actionName = String.format("%s on %s %s", methodName, targetName, LogAction.buildArgString(joinPoint, pwdToReplace, new HashMap<>()));
-			currentAction = new TestAction(actionName, false, pwdToReplace);
-	
-			// log action before its started. By default, it's OK. Then result may be overwritten if step fails
-			// order of steps is the right one (first called is first displayed)
-			if (TestStepManager.getParentTestStep() != null) {
-				TestStepManager.getParentTestStep().addAction(currentAction);
+		while (end.isAfter(systemClock.instant())) {
+
+			// chrome automatically scrolls to element before interacting but it may scroll behind fixed header and no error is
+			// raised if action cannot be performed
+			if (((CustomEventFiringWebDriver)WebUIDriver.getWebDriver(false)).getBrowserInfo().getBrowser() == BrowserType.CHROME
+					|| ((CustomEventFiringWebDriver)WebUIDriver.getWebDriver(false)).getBrowserInfo().getBrowser() == BrowserType.EDGE) {
+				updateScrollFlagForElement(joinPoint, true, null);
 			}
-		}
-		
-		boolean actionFailed = false;
-		Throwable currentException = null;
-		
-		try {
-			while (end.isAfter(systemClock.instant())) {
-				
-				// chrome automatically scrolls to element before interacting but it may scroll behind fixed header and no error is 
-				// raised if action cannot be performed
-				if (((CustomEventFiringWebDriver)WebUIDriver.getWebDriver(false)).getBrowserInfo().getBrowser() == BrowserType.CHROME
-						|| ((CustomEventFiringWebDriver)WebUIDriver.getWebDriver(false)).getBrowserInfo().getBrowser() == BrowserType.EDGE) {
-					updateScrollFlagForElement(joinPoint, true, null);
-				}
-				
-				try {
-					reply = joinPoint.proceed(joinPoint.getArgs());
-					WaitHelper.waitForMilliSeconds(200);
-					break;
-					
-				// do not replay if error comes from scenario
-				} catch (ScenarioException | ConfigurationException | DatasetException e) {
+
+			try {
+				reply = joinPoint.proceed(joinPoint.getArgs());
+				WaitHelper.waitForMilliSeconds(200);
+				break;
+
+			// do not replay if error comes from scenario
+			} catch (ScenarioException | ConfigurationException | DatasetException e) {
+				throw e;
+			} catch (MoveTargetOutOfBoundsException | InvalidElementStateException e) {
+				updateScrollFlagForElement(joinPoint, null, e);
+			} catch (Throwable e) {
+
+				if (end.minusMillis(200).isAfter(systemClock.instant())) {
+					WaitHelper.waitForMilliSeconds(replayDelayMs);
+					continue;
+				} else {
 					throw e;
-				} catch (MoveTargetOutOfBoundsException | InvalidElementStateException e) {
-					updateScrollFlagForElement(joinPoint, null, e);
-				} catch (Throwable e) {
-	
-					if (end.minusMillis(200).isAfter(systemClock.instant())) {
-						WaitHelper.waitForMilliSeconds(replayDelayMs);
-						continue;
-					} else {
-						throw e;
-					}
 				}
 			}
-			return reply;
-		} catch (Throwable e) {
-			actionFailed = true;
-			currentException = e;
-			throw e;
-		} finally {
-			if (currentAction != null && TestStepManager.getParentTestStep() != null) {
-				currentAction.setFailed(actionFailed);
-				scenarioLogger.logActionError(currentException);
-				
-				if (joinPoint.getTarget() instanceof GenericPictureElement) {
-					currentAction.setDurationToExclude(((GenericPictureElement)joinPoint.getTarget()).getActionDuration());
-				}
-			}		
 		}
+		return reply;
+
 	}
 	
 	/**
@@ -307,8 +266,22 @@ public class ReplayAction {
 	 */
 	@Around("execution(public void org.openqa.selenium.interactions.Actions.BuiltAction.perform ())")
 	public Object replayCompositeAction(ProceedingJoinPoint joinPoint) throws Throwable {
-		return replay(joinPoint, null);
+		return replayNonHtmlElement(joinPoint, null);
 	}
+
+	/**
+	 * Replay all actions annotated by ReplayOnError if the class is not a subclass of
+	 * HtmlElement (e.g: ScreenZone)
+	 * @param joinPoint
+	 * @throws Throwable
+	 */
+	@Around("!execution(public * com.seleniumtests.uipage.htmlelements.HtmlElement+.* (..))"
+			+ "&& execution(@com.seleniumtests.uipage.ReplayOnError public * * (..)) && @annotation(replay)")
+	public Object replayGenericPicture(ProceedingJoinPoint joinPoint, ReplayOnError replay) throws Throwable {
+		return replayNonHtmlElement(joinPoint, replay);
+	}
+
+
 	
 	/**
 	 * Updates the scrollToelementBeforeAction flag of HtmlElement for CompositeActions
@@ -388,26 +361,4 @@ public class ReplayAction {
 		return false;
 
 	}
-	
-	/**
-	 * Returns true if the call to element is made inside a subclass of HtmlElement
-	 * @param stack
-	 * @return
-	 */
-	private boolean isFromHtmlElement(StackTraceElement[] stack) {
-		
-		for(int i=0; i < stack.length; i++) {
-			
-			// when using aspects, class name may contain a "$", remove everything after that symbol
-			String stackClass = stack[i].getClassName().split("\\$")[0];
-			if (stackClass.startsWith("com.seleniumtests.uipage.htmlelements")) {
-				return true;
-			}
-			
-		}
-		return false;
-		
-	}
-	
-    
 }

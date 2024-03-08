@@ -42,7 +42,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.By.ByXPath;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.ElementNotInteractableException;
-import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
@@ -55,11 +54,9 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Coordinates;
 import org.openqa.selenium.interactions.Locatable;
-import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.remote.ScreenshotException;
 import org.openqa.selenium.support.decorators.Decorated;
@@ -80,9 +77,7 @@ import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.SnapshotTarget;
-import com.seleniumtests.uipage.ByC;
 import com.seleniumtests.uipage.ExpectedConditionsC;
-import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.ReplayOnError;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.imaging.ImageDetector;
@@ -91,7 +86,6 @@ import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
-import io.appium.java_client.AppiumBy;
 import io.appium.java_client.android.AndroidDriver;
 
 
@@ -140,13 +134,12 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	private ThreadLocal<WebDriver> driver = new ThreadLocal<>();
 	private ThreadLocal<WebElement> element = new ThreadLocal<>();
     protected ThreadLocal<SearchContext> searchContext = new ThreadLocal<>(); // if searchContext is a WebElement, then, element and searchContext will be the same. Used to store ShadowRoot which are not WebElements
-    protected String label = null;
+
     protected HtmlElement parent = null;
     protected FrameElement frameElement = null;
     private boolean scrollToElementBeforeAction = false;
     private Integer elementIndex = -1;
     private By by = null;
-    private String origin  = null;
 
     public HtmlElement() {
     	this("", By.id(""));
@@ -273,7 +266,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * @param	replayTimeout - how much time we must wait for the element to be present for playing with it
      */
     protected HtmlElement(String label, By by, FrameElement frame, HtmlElement parent, Integer index, Integer replayTimeout) {
-    	this.label = label;
+		super(label);
     	this.by = by;
     	this.elementIndex = index;
     	this.parent = parent;
@@ -284,8 +277,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     		this.frameElement = frame;
     	}
     	this.replayTimeout = replayTimeout;
-    	
-    	origin = PageObject.getCallingPage(Thread.currentThread().getStackTrace());
+
     }
 
     /**
@@ -391,12 +383,13 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * Click element in native way by Actions.
      *
      * <p/>
-	 * 
+	 *
      * <pre class="code">
 	 * clickAt(1, 1);
      * </pre>
      *
-     * @param  value
+     * @param xOffset	X offset to click to
+	 * @param yOffset	Y offset to click to
      */
 	@ReplayOnError(waitAfterAction = true)
     public void clickAt(int xOffset, int yOffset) {
@@ -654,7 +647,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     /**
      * Execute arbitrary script on this element. Renaming of getEval
 	 * 
-	 * @param script the script to execute. It MUST contain 'arguments[0]' and may
+	 * @param javascript the script to execute. It MUST contain 'arguments[0]' and may
 	 *               return something
      * @return 		arbitrary value. You must cast it
      */
@@ -670,7 +663,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * Execute arbitrary script on the provided element
 	 * 
      * @param element	the WebElement on which we call the script
-	 * @param script  the script to execute. It MUST contain 'arguments[0]' and may
+	 * @param javascript  the script to execute. It MUST contain 'arguments[0]' and may
 	 *                return something
 	 * @param args    optional arguments to pass to the script. They should ba
 	 *                accessed using 'arguments[1]' ...
@@ -966,9 +959,9 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	}
 	
 	/**
-	 * Move to element
+	 * Scroll to element
 	 * 
-	 * @param element
+	 * @param yOffset
 	 */	
 	public void scrollToElement(int yOffset) {
 		findElement();
@@ -1132,14 +1125,6 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 		return getRealElementNoSearch().getSize().getHeight();
     }
 
-    /**
-     * Returns the label used during initialization.
-     *
-     * @return
-     */
-    public String getLabel() {
-        return label;
-    }
 
     /**
      * Gets the Point location of the underlying WebElement.
@@ -1329,7 +1314,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	 * Whether or not the indicated text is contained in the element's getText()
 	 * attribute.
      *
-     * @param   text
+     * @param   pattern
      *
      * @return
      */
@@ -1656,7 +1641,8 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     		setImplicitWaitTimeout(SeleniumTestsContextManager.getThreadContext().getImplicitWaitTimeout());
     	}
     }
-    
+
+	@ReplayOnError
     public void waitFor(int timeout, ExpectedCondition<?> condition) {
     	
 		// refresh driver
@@ -1797,10 +1783,6 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 		this.elementIndex = elementIndex;
 	}
 
-	public String getOrigin() {
-		return origin;
-	}
-
 	public boolean isScrollToElementBeforeAction() {
 		return scrollToElementBeforeAction;
 	}
@@ -1809,5 +1791,13 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 		this.scrollToElementBeforeAction = scrollToElementBeforeAction;
 	}
 
-
+	@Override
+	public String getName() {
+		String name = super.getName();
+		if (name != null) {
+			return name;
+		} else {
+			return getBy().toString();
+		}
+	}
 }

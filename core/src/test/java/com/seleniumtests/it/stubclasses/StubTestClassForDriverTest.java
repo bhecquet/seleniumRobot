@@ -20,8 +20,11 @@ package com.seleniumtests.it.stubclasses;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.seleniumtests.MockitoTestListener;
+import com.seleniumtests.it.driver.support.pages.*;
+import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -37,10 +40,6 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.driver.BrowserType;
-import com.seleniumtests.it.driver.support.pages.DriverModalTestPage;
-import com.seleniumtests.it.driver.support.pages.DriverTestPage;
-import com.seleniumtests.it.driver.support.pages.DriverTestPageNativeActions;
-import com.seleniumtests.it.driver.support.pages.ImageDetectorPage;
 import com.seleniumtests.util.helper.WaitHelper;
 
 @Listeners(MockitoTestListener.class)
@@ -262,6 +261,31 @@ public class StubTestClassForDriverTest extends StubParentClass {
 		.sendKeys()
 		.reset()
 		.select();
+	}
+
+	@Test(groups="stub")
+	public void testDriverNativeActionsOnPageObjectFactory() throws Exception {
+		List<WebElement> inputs = new DriverTestPageObjectFatory(true)
+		.sendKeys()
+		.reset()
+		.select()
+		.switchToFirstFrameByIndex()
+		.getElementsInsideFrame();
+		logger.info(inputs.size());
+	}
+
+	@Test(groups="stub")
+	public void testDriverNativeActionsOnPageObjectFactoryWithoutOverride() throws Exception {
+		SeleniumTestsContextManager.getThreadContext().setOverrideSeleniumNativeAction(false);
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
+		SeleniumTestsContextManager.getThreadContext().setImplicitWaitTimeout(1);
+		List<WebElement> inputs = new DriverTestPageObjectFatory(true)
+				.sendKeys()
+				.reset()
+				.select()
+				.switchToFirstFrameByIndex()
+				.getElementsInsideFrame();
+		logger.info(inputs.size());
 	}
 	
 	/**
