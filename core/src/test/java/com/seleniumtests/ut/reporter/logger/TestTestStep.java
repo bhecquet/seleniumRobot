@@ -744,7 +744,7 @@ public class TestTestStep extends GenericTest {
 		JSONObject stepJson = step.toJson();
 
 		Assert.assertEquals(stepJson.getString("type"), "step");
-		Assert.assertEquals(stepJson.getString("exception"), "class org.openqa.selenium.WebDriverException");
+		Assert.assertEquals(stepJson.getString("exception"), "org.openqa.selenium.WebDriverException");
 		Assert.assertTrue(stepJson.getString("exceptionMessage").contains("class org.openqa.selenium.WebDriverException: KO"));
 		Assert.assertEquals(stepJson.getString("name"), "step1");
 		Assert.assertEquals(stepJson.getString("status"), "WARNING");

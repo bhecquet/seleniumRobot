@@ -232,7 +232,7 @@ public class TestLogActions extends GenericDriverTest {
 		Assert.assertTrue(clickAction.getName().contains("click on Element located by"));
 		Assert.assertEquals(clickAction.getPage(), DriverTestPageNativeActions.class);
 		Assert.assertTrue(clickAction.getElement() instanceof SeleniumElement);
-		Assert.assertNull(clickAction.getElement().getCallingPage());	// calling page is null for native WebElements
+		Assert.assertTrue(clickAction.getElement().getCallingPage() instanceof DriverTestPageNativeActions);
 		Assert.assertEquals(clickAction.getElement().getOrigin(), "com.seleniumtests.it.driver.support.pages.DriverTestPageNativeActions");
 		Assert.assertNull(clickAction.getElement().getFieldName()); // null as created inline
 		Assert.assertNotNull(clickAction.getElement().getName());
@@ -257,7 +257,7 @@ public class TestLogActions extends GenericDriverTest {
 		Assert.assertEquals(clickAction.getPage(), DriverTestPageObjectFatory.class);
 		Assert.assertTrue(clickAction.getElement() instanceof SeleniumElement);
 		Assert.assertEquals(clickAction.getElement().getOrigin(), "com.seleniumtests.it.driver.support.pages.DriverTestPageObjectFatory");
-		Assert.assertNull(clickAction.getElement().getCallingPage());	// calling page is null for native WebElements
+		Assert.assertTrue(clickAction.getElement().getCallingPage() instanceof DriverTestPageObjectFatory);
 		Assert.assertNull(clickAction.getElement().getFieldName()); // null as we don't support field name for page factory elements
 																	// this could be possible as elements are initialized on page creation,
 																	// but this is a marginal use case, so we ignore it deliberately
