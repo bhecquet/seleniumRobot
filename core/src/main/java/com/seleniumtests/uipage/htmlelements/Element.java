@@ -136,7 +136,7 @@ public abstract class Element {
 		try {
 			return (Class<? extends PageObject>) Class.forName(origin);
 		} catch (ClassNotFoundException | NullPointerException e) {
-			return getCallingPage().getClass();
+			return getCallingPage() == null ? null : getCallingPage().getClass();
 		}
 	}
 
