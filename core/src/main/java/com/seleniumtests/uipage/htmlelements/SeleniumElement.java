@@ -48,12 +48,17 @@ public class SeleniumElement extends Element {
 
         if (el.toString().contains("->")) {
             try {
-                return el.toString().split("->")[1].replace("]", "").replace("}", "");
+                return el.toString().split("->")[1].replace("]", "").replace("}", "").trim();
             } catch (IndexOutOfBoundsException e) {
                 // we should never go here
             }
         }
         return  el.toString();
+    }
+
+    @Override
+    public String toString() {
+        return webElement.toString();
     }
 
     @Override

@@ -45,7 +45,7 @@ public class TestAction {
 	
 
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(TestAction.class);
-	
+
 	protected String name;
 	protected TestAction parent = null;
 	protected int position = 0;
@@ -134,6 +134,10 @@ public class TestAction {
 			}
 		}
 		return newName;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public LocalDateTime getTimestamp() {

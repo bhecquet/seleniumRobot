@@ -330,10 +330,14 @@ public class LogAction {
 				// add arguments to the name of the method
 				if (arg instanceof Object[]) {
 					argValue.append("[");
-					for (Object obj: (Object[])arg) {
+					for (Object obj : (Object[]) arg) {
 						argValue.append(obj.toString() + ",");
 					}
 					argValue.append("]");
+				} else if (arg instanceof Element) {
+					argValue.append(((Element) arg).toString());
+				} else if (arg instanceof WebElement) {
+					argValue.append(new SeleniumElement((WebElement)arg).getName());
 				} else {
 					argValue.append((arg == null ? "null": arg.toString()));
 				}
@@ -653,8 +657,8 @@ public class LogAction {
 			targetClass = targetElement.getOriginClass();
 		// for Selenium WebElement
 		} else if (joinPoint.getArgs().length > 0 && (joinPoint.getArgs()[0] instanceof WebElement)) {
-			targetElement = new SeleniumElement((WebElement)joinPoint.getTarget());
-			targetClass = ((PageObject)joinPoint.getTarget()).getClass();
+			targetElement = new SeleniumElement((WebElement)joinPoint.getArgs()[0]);
+			targetClass = ((PageObject)joinPoint.getThis()).getClass();
 		}
 
 		TestAction currentAction = new TestAction(actionName, false, pwdToReplace, joinPoint.getSignature().getName(), targetElement, targetClass);
@@ -695,6 +699,22 @@ public class LogAction {
 		} finally {
 			if (compositeActionStep != null) {
 				compositeActionStep.setFailed(actionFailed);
+
+				// change the name of composite action
+				StringBuilder name = new StringBuilder(TestStep.COMPOSITE_STEP_PREFIX);
+				Element mainElement = null; // the last element on which we act
+
+				for (TestAction action: compositeActionStep.getStepActions()) {
+					name.append(action.getAction() + ",");
+					if (action.getElement() != null) {
+						mainElement = action.getElement();
+					}
+					action.setFailed(actionFailed);
+				}
+				String elementName = mainElement instanceof SeleniumElement ? mainElement.getName(): mainElement.toString();
+				name.append("on element '" + elementName + "'");
+				compositeActionStep.setName(name.toString());
+
 				scenarioLogger.logActionError(currentException);
 				TestStepManager.setParentTestStep((TestStep)compositeActionStep.getParent());
 			}

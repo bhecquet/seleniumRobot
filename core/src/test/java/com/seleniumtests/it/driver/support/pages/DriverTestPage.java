@@ -294,6 +294,12 @@ public class DriverTestPage extends PageObject {
     	return this;
     }
 
+	public DriverTestPage _sendKeysCompositeWebElement() {
+    	new Actions(driver).moveToElement(driver.findElement(By.id("text2"))).sendKeys("composite").build().perform();
+    	new Actions(driver).moveToElement(driver.findElement(By.id("button2"))).click().build().perform();
+    	return this;
+    }
+
     public DriverTestPage _sendKeysCompositeInError() {
     	new Actions(driver).moveToElement(textElementNotPresent).sendKeys("composite").click(resetButton).build().perform();
     	return this;

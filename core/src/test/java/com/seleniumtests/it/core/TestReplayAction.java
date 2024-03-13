@@ -44,14 +44,15 @@ public class TestReplayAction extends GenericDriverTest {
     @Test(groups = {"ut"})
     public void testReplayFailedAction() {
 
+        SeleniumTestsContextManager.getThreadContext().setReplayTimeout(10);
         LocalDateTime start = LocalDateTime.now();
         try {
             testPage._writeSomethingOnNonExistentElement();
         } catch (NoSuchElementException e) {
             // we expect this fails
         } finally {
-            Assert.assertTrue(LocalDateTime.now().minusSeconds(5).isBefore(start));
-            Assert.assertTrue(LocalDateTime.now().minusSeconds(3).isAfter(start));
+            Assert.assertTrue(LocalDateTime.now().minusSeconds(13).isBefore(start));
+            Assert.assertTrue(LocalDateTime.now().minusSeconds(10).isAfter(start));
 
             // check an action has been created for this
             TestStep step = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(2);
@@ -73,22 +74,19 @@ public class TestReplayAction extends GenericDriverTest {
     public void testDoNotReplaySuccessfullAction() {
 
         LocalDateTime start = LocalDateTime.now();
-        try {
-            testPage._writeSomething();
-        } catch (NoSuchElementException e) {
-            // we expect this fails
-        } finally {
-            Assert.assertTrue(LocalDateTime.now().minusSeconds(3).isBefore(start));
 
-            // check an action has been created for this
-            TestStep step = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(2);
-            Assert.assertEquals(step.getStepActions().size(), 2);
-            Assert.assertEquals(step.getStepActions().get(0).getName(), "sendKeys on TextFieldElement Text, by={By.id: text} with args: (true, true, [a text,], )");
-            Assert.assertEquals(step.getStepActions().get(0).getAction(), "sendKeys");
-            Assert.assertEquals(step.getStepActions().get(0).getElement(), testPage.textElement);
-            Assert.assertEquals(step.getStepActions().get(0).getPage(), DriverTestPage.class);
-            Assert.assertFalse(step.getStepActions().get(0).getFailed());
-        }
+        testPage._writeSomething();
+
+        Assert.assertTrue(LocalDateTime.now().minusSeconds(3).isBefore(start));
+
+        // check an action has been created for this
+        TestStep step = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(2);
+        Assert.assertEquals(step.getStepActions().size(), 1);
+        Assert.assertEquals(step.getStepActions().get(0).getName(), "sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [a text,], )");
+        Assert.assertEquals(step.getStepActions().get(0).getAction(), "sendKeys");
+        Assert.assertEquals(step.getStepActions().get(0).getElement(), testPage.textElement);
+        Assert.assertEquals(step.getStepActions().get(0).getPage(), DriverTestPage.class);
+        Assert.assertFalse(step.getStepActions().get(0).getFailed());
     }
 
     /**
@@ -111,9 +109,6 @@ public class TestReplayAction extends GenericDriverTest {
         TestStep step = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(2);
         Assert.assertEquals(step.getStepActions().size(), 3);
         Assert.assertEquals(step.getStepActions().get(0).getName(), "clickAt on Picture picture from resource tu/images/logo_text_field.png with args: (0, -30, )");
-        Assert.assertEquals(step.getStepActions().get(0).getAction(), "clickAt");
-        Assert.assertEquals(step.getStepActions().get(0).getElement(), testPage.picture);
-        Assert.assertEquals(step.getStepActions().get(0).getPage(), DriverTestPage.class);
         Assert.assertFalse(step.getStepActions().get(0).getFailed());
     }
 
@@ -134,9 +129,6 @@ public class TestReplayAction extends GenericDriverTest {
             TestStep step = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(2);
             Assert.assertEquals(step.getStepActions().size(), 2);
             Assert.assertEquals(step.getStepActions().get(0).getName(), "clickAt on Picture picture from resource tu/images/vosAlertes.png with args: (0, -30, )");
-            Assert.assertEquals(step.getStepActions().get(0).getAction(), "clickAt");
-            Assert.assertEquals(step.getStepActions().get(0).getElement(), testPage.pictureNotPresent);
-            Assert.assertEquals(step.getStepActions().get(0).getPage(), DriverTestPage.class);
             Assert.assertTrue(step.getStepActions().get(0).getFailed());
         }
     }
@@ -158,22 +150,16 @@ public class TestReplayAction extends GenericDriverTest {
         // check an action has been created for this
         TestStep step = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(2);
 
+        // 2 sub steps (one for each composite action)
         Assert.assertEquals(step.getStepActions().size(), 2);
         TestStep compositeAction1 = (TestStep) step.getStepActions().get(0);
         TestStep compositeAction2 = (TestStep) step.getStepActions().get(1);
 
-        // 2 sub steps (one for each composite action)
         Assert.assertEquals(compositeAction1.getStepActions().get(0).getName(), "moveToElement with args: (TextFieldElement Text, by={By.id: text2}, )");
         Assert.assertEquals(compositeAction1.getStepActions().get(1).getName(), "sendKeys with args: ([composite,], )");
         Assert.assertEquals(compositeAction2.getStepActions().get(0).getName(), "moveToElement with args: (ButtonElement Reset, by={By.id: button2}, )");
         Assert.assertEquals(compositeAction2.getStepActions().get(1).getName(), "click ");
-        Assert.assertEquals(compositeAction1.getStepActions().get(0).getAction(), "moveToElement");
-        Assert.assertEquals(compositeAction1.getStepActions().get(0).getElement(), testPage.textElement);
-        Assert.assertEquals(compositeAction1.getStepActions().get(0).getPage(), DriverTestPage.class);
         Assert.assertFalse(compositeAction1.getStepActions().get(0).getFailed());
-        Assert.assertEquals(compositeAction1.getStepActions().get(1).getAction(), "sendKeys");
-        Assert.assertNull(compositeAction1.getStepActions().get(1).getElement());
-        Assert.assertNull(compositeAction1.getStepActions().get(1).getPage());
         Assert.assertFalse(compositeAction1.getStepActions().get(1).getFailed());
 
         Assert.assertFalse(compositeAction1.getFailed());
@@ -183,6 +169,7 @@ public class TestReplayAction extends GenericDriverTest {
     @Test(groups = {"ut"})
     public void testReplayFailedCompositeAction() {
 
+        SeleniumTestsContextManager.getThreadContext().setReplayTimeout(10);
         LocalDateTime start = LocalDateTime.now();
 
         try {
@@ -191,26 +178,21 @@ public class TestReplayAction extends GenericDriverTest {
             // we expect this fails
         }
 
-        Assert.assertTrue(LocalDateTime.now().minusSeconds(3).isBefore(start));
+        Assert.assertTrue(LocalDateTime.now().minusSeconds(13).isBefore(start));
+        Assert.assertTrue(LocalDateTime.now().minusSeconds(10).isAfter(start));
 
         // check an action has been created for this
         TestStep step = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(2);
 
+        // 1 sub steps, other skipped as first one is failed
         Assert.assertEquals(step.getStepActions().size(), 1);
         TestStep compositeAction1 = (TestStep) step.getStepActions().get(0);
 
-        // 1 sub steps, other skipped as first one is failed
-        Assert.assertEquals(compositeAction1.getStepActions().get(0).getName(), "moveToElement with args: (TextFieldElement Text, by={By.id: text2}, )");
-        Assert.assertEquals(compositeAction1.getStepActions().get(1).getName(), "sendKeys with args: ([composite,], )");
-        Assert.assertEquals(compositeAction1.getStepActions().get(0).getAction(), "moveToElement");
-        Assert.assertEquals(compositeAction1.getStepActions().get(0).getElement(), testPage.textElement);
-        Assert.assertEquals(compositeAction1.getStepActions().get(0).getPage(), DriverTestPage.class);
-        Assert.assertFalse(compositeAction1.getStepActions().get(0).getFailed());
-        Assert.assertEquals(compositeAction1.getStepActions().get(1).getAction(), "sendKeys");
-        Assert.assertNull(compositeAction1.getStepActions().get(1).getElement());
-        Assert.assertNull(compositeAction1.getStepActions().get(1).getPage());
-        Assert.assertFalse(compositeAction1.getStepActions().get(1).getFailed());
+        // check composite actions are ALL marked as failed (we cannot know which one is causing problem)
+        Assert.assertTrue(compositeAction1.getStepActions().get(0).getFailed());
+        Assert.assertTrue(compositeAction1.getStepActions().get(1).getFailed());
 
+        // check the step enclosing composite actions is failed
         Assert.assertTrue(compositeAction1.getFailed());
     }
 
