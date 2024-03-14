@@ -1642,7 +1642,6 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	}
     }
 
-	@ReplayOnError
     public void waitFor(int timeout, ExpectedCondition<?> condition) {
     	
 		// refresh driver

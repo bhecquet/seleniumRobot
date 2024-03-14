@@ -2129,9 +2129,16 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "click on"), 1);
 
 		// check composite actions. We must have the moveToElement, click and sendKeys actions
-		Assert.assertTrue(detailedReportContent1.matches(".*<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> moveToElement with args: \\(TextFieldElement Text, by=\\{By.id: text2}, \\) </div></li><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys with args: \\(\\[composite,\\], \\) </div></li><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> moveToElement with args: \\(ButtonElement Reset, by=\\{By.id: button2}, \\) </div></li><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> click </div></li>.*"));
+		Assert.assertTrue(detailedReportContent1.matches(".*<span class=\"step-title\"> _sendKeysComposite - \\d+.\\d+ secs</span></div>" +
+				"<div class=\"box-body\"><ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-2\">\\d+:\\d+:\\d+.\\d+</span> Composite moveToElement,sendKeys,on element 'TextFieldElement Text, by=\\{By.id: text2\\}' </div></li>" +
+				"<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> moveToElement with args: \\(TextFieldElement Text, by=\\{By.id: text2\\}, \\) </div></li>" +
+				"<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys with args: \\(\\[composite,\\], \\) </div></li><div class=\"row\"></div></ul>" +
+				"<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-2\">\\d+:\\d+:\\d+.\\d+</span> Composite moveToElement,click,on element 'ButtonElement Reset, by=\\{By.id: button2\\}' </div></li>" +
+				"<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> moveToElement with args: \\(ButtonElement Reset, by=\\{By.id: button2\\}, \\) </div></li>" +
+				"<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> click </div></li>.*"));
 
-		// check PictureElement action is logged
+
+		// check PictureElement action is logge
 		Assert.assertTrue(detailedReportContent1.matches(".*<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> clickAt on Picture picture from resource tu/images/logo_text_field.png with args: \\(0, -30, \\) </div></li>.*"));
 
 		// check that when logging PictureElement action which uses composite actions, those are not logged

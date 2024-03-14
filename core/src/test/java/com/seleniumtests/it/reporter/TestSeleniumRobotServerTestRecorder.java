@@ -121,7 +121,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector).uploadFile(eq(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithException", "screenshots", "testWithException_0-1_step_1--rtened.png").toFile()), anyInt());
 			// check image id and html id has been updated once files has been uploaded, for tests where snapshots has been uploaded
 			verify(serverConnector).updateStepResult(contains("\"snapshots\":[{\"idHtml\":0,\"displayInReport\":true,\"name\":\"a name\",\"idImage\":0,\"failed\":false,\"position\":0,\"type\":\"snapshot\",\"snapshotCheckType\":\"NONE\""), eq(0));
-			verify(serverConnector).updateStepResult(contains("\"snapshots\":[{\"idHtml\":null,\"displayInReport\":true,\"name\":\"main\""), eq(0));
+			verify(serverConnector).updateStepResult(contains("\"snapshots\":[{\"exception\":\"org.openqa.selenium.WebDriverException\",\"idHtml\":null,\"displayInReport\":true,\"name\":\"main\""), eq(0));
 			
 			// check logs has been uploaded (one upload for each test)
 			verify(serverConnector, times(5)).uploadLogs(any(File.class), eq(0));
