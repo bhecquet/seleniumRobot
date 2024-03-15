@@ -248,7 +248,6 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 		while (end.isAfter(clock.instant())) {
 
 			capabilities.setCapability(SeleniumRobotCapabilityType.SESSION_CREATION_TRY, i);
-			capabilities.setCapability(SeleniumRobotCapabilityType.SESSION_CREATION_REQUEST_TIME, LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 			i += 1;
 			
 			for (SeleniumGridConnector gridConnector: gridConnectors) {
@@ -263,6 +262,9 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 				if (webDriverConfig.getRunOnSameNode() != null && webDriverConfig.getSeleniumGridConnector() != gridConnector) {
 					continue;
 				}
+
+				// set time of request, for debug
+				capabilities.setCapability(SeleniumRobotCapabilityType.SESSION_CREATION_REQUEST_TIME, LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 				
 				try {
 					driver = getDriverInstance(gridConnector.getHubUrl(), capabilities);
