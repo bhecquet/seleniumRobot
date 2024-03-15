@@ -150,7 +150,7 @@ public class ReporterControler implements IReporter {
 			}
 
 			cleanAttachments(currentTestResult);
-
+			logger.info("Reports generated");
 		}
 	}
 	
