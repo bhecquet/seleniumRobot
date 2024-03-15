@@ -1,4 +1,4 @@
-package com.seleniumtests.it.core;
+package com.seleniumtests.it.core.aspects;
 
 import com.seleniumtests.GenericDriverTest;
 import com.seleniumtests.GenericTest;

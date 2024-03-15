@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import com.seleniumtests.it.driver.support.pages.DriverTestPage;
+import com.seleniumtests.uipage.PageObject;
 import io.appium.java_client.android.options.UiAutomator2Options;
 import com.seleniumtests.driver.DriverMode;
 import org.mockito.Mock;
@@ -791,6 +793,10 @@ public class TestHtmlElement extends MockitoTest {
 		el.setFieldName("el");
 		Assert.assertEquals(el.getName(), "myElement");
 	}
+
+	/**
+	 * When label is empty, field name is used, if it exists
+	 */
 	@Test(groups = { "ut" })
 	public void testGetNameWithEmptyLabel() {
 		HtmlElement el = new HtmlElement("", By.id("foo"));
@@ -807,6 +813,37 @@ public class TestHtmlElement extends MockitoTest {
 	public void testGetNameNoFieldName() {
 		HtmlElement el = new HtmlElement(null, By.id("foo"));
 		Assert.assertEquals(el.getName(), "By.id: foo");
+	}
+
+	/**
+	 * Test that when origin is set (the element is created from a PageObject class), origin is returned
+	 */
+	@Test(groups = { "ut" })
+	public void testGetOriginClassWithPage() {
+		HtmlElement el = spy(new HtmlElement(null, By.id("foo")));
+		el.setOrigin("com.seleniumtests.it.driver.support.pages.DriverTestPage");
+		Assert.assertEquals(el.getOriginClass(), DriverTestPage.class);
+	}
+	@Test(groups = { "ut" })
+	public void testGetOriginClassWithInvalidPage() {
+		HtmlElement el = spy(new HtmlElement(null, By.id("foo")));
+		when(el.getOrigin()).thenReturn("pages.DriverTestPage");
+		Assert.assertNull(el.getOriginClass());
+	}
+
+	/**
+	 * When element is not created inside a PageObject, it's origin is "null"
+	 */
+	@Test(groups = { "ut" })
+	public void testGetOriginClassWithNullPage() {
+		HtmlElement el = new HtmlElement(null, By.id("foo"));
+		Assert.assertNull(el.getOriginClass());
+	}
+	@Test(groups = { "ut" })
+	public void testGetOriginClassCallingPage() {
+		HtmlElement el = new HtmlElement(null, By.id("foo"));
+		el.setCallingPage(new PageObject(null));
+		Assert.assertEquals(el.getOriginClass(), PageObject.class);
 	}
 }
 	

@@ -15,10 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.seleniumtests.it.core;
+package com.seleniumtests.it.core.aspects;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 
 import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
@@ -42,7 +40,7 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.reporter.logger.TestStep;
 
-public class TestLogActions extends GenericDriverTest {
+public class TestLogActions2 extends GenericDriverTest {
 
 
 	private DriverTestPage testPage;

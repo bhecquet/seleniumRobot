@@ -44,7 +44,6 @@ public class SeleniumElement extends Element {
     }
 
     private String getElementLocator(WebElement el) {
-        // handle: Decorated {<button id="button2" name="resetButton" onclick="javascript:addText('text2', '');javascript:resetState();">} ??
 
         if (el.toString().contains("->")) {
             try {

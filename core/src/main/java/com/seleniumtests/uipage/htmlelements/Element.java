@@ -47,8 +47,9 @@ public abstract class Element {
 
 	protected String label;
 
+
 	// origin is the class where object is declared
-	// origin may be null if object is created outside of any PageObject (which should never happen)
+	// origin may be null if object is created outside of any PageObject (which should never happen outside of unit tests)
 	protected String origin;
 
 	// the page instance that uses the object.
@@ -131,6 +132,10 @@ public abstract class Element {
 	}
 	public String getOrigin() {
 		return origin;
+	}
+
+	public void setOrigin(String origin) {
+		this.origin = origin;
 	}
 	public Class<? extends PageObject> getOriginClass() {
 		try {
