@@ -326,6 +326,18 @@ public class ConnectorsTest extends MockitoTest {
 	public HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, Object replyData, String responseType) throws UnirestException {
 		return createServerMock(serverUrl, requestType, apiPath, statusCode, Arrays.asList(replyData), responseType);
 	}
+
+	/**
+	 *
+	 * @param serverUrl			URL of the mock server
+	 * @param requestType		GET, POST, HEAD, ...
+	 * @param apiPath			the endpoint on the mock server (ex: /api/foo/bar)
+	 * @param statusCode		the status code to return: 200, 500, ...
+	 * @param replyData			the list of response data. In case service is called more times than the number of provided responses, the last one will be repeated
+	 * @param responseType		"request", "requestBodyEntity", "body". if "request", replies with the POST request object (HttpRequestWithBody.class). If "body", replies with the body (MultipartBody.class)
+	 * @return
+	 * @throws UnirestException
+	 */
 	public HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, final List<Object> replyData, String responseType) throws UnirestException {
 
 

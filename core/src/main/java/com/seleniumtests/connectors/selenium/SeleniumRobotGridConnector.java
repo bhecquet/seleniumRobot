@@ -25,19 +25,15 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.util.logging.DebugMode;
 import io.appium.java_client.android.options.UiAutomator2Options;
@@ -715,9 +711,10 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 						});
 			}
 			HttpResponse<File> videoResponse = getRequest
-				.queryString(ACTION_FIELD, "stopVideoCapture")
-				.queryString(SESSION_FIELD, sessionId)
-				.asFile(outputFile);
+					.socketTimeout(60000)
+					.queryString(ACTION_FIELD, "stopVideoCapture")
+					.queryString(SESSION_FIELD, sessionId)
+					.asFile(outputFile);
 			
 			if (videoResponse.getStatus() != 200) {
 				logger.error(String.format("stop video capture error: %s", videoResponse.getBody()));
