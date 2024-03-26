@@ -84,7 +84,6 @@
     - [iOS #####chap4_Run_tests.md](#ios-chap4_run_testsmd)
     - [Android](#android)
 - [13 Implement custom SelectList](#13-implement-custom-selectlist)
-- [14 Using custom UI libraries](#14-using-custom-ui-libraries)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -1500,43 +1499,4 @@ To ease the implementation, if your custom SelectList is an Angular one, you can
 
 	}
 ```
-
-### 14 Using custom UI libraries ###
-
-Most of the web sites use JS development frameworks like Angular or react and associated GUI elements (angular material, ...)
-For SelectList especialy (see above), handling elements change from one framework to another.
-By default, seleniumRobot will search for all available UI components (le selectlists it knows) to find a proper way to handle it transparently.
-You can help it by specifying, when declaring your Page object, which GUI components are used
-
-Assuming you have a page 
-
-```java
-	public class MyPage extends PageObject {
-		
-		public static SelectList select = new SelectList("select", By.id("select"));
-	
-		public MyPage() {
-			super();
-		}
-	}
-```
-If you let seleniumRobot do its job, it will search if the select element is in "AngularMaterial", "Angular", "native HTML", ... and then find the proper implementation
-
-
-If you change to (note the "Angular" in constructor)
-
-```java
-	```java
-	public class MyPage extends PageObject {
-		
-		public static SelectList select = new SelectList("select", By.id("select"));
-	
-		public MyPage() {
-			super("Angular");
-		}
-	}
-```
-Then, it will first search for Angular handling, falling back to other implementations if needed
-
-The list of implementations is provided by UI components themselves and if you set the wrong one, PageObject constructor will raise an error and give you the right list.
 
