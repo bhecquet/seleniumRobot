@@ -84,7 +84,6 @@
     - [iOS #####chap4_Run_tests.md](#ios-chap4_run_testsmd)
     - [Android](#android)
 - [13 Implement custom SelectList](#13-implement-custom-selectlist)
-- [14 Using custom UI libraries](#14-using-custom-ui-libraries)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
