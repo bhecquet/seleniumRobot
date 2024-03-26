@@ -13,6 +13,7 @@ import java.util.*;
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.ut.uipage.testpages.NativeAppPage;
+import com.seleniumtests.ut.uipage.testpages.NoStaticFieldPage;
 import com.seleniumtests.ut.uipage.testpages.OtherContextPage;
 import com.seleniumtests.ut.uipage.testpages.WebViewPage;
 import io.appium.java_client.NoSuchContextException;
@@ -1315,6 +1316,14 @@ public class TestPageObject2 extends MockitoTest {
 		Assert.assertEquals(p1.getPicture().getFieldName(), "picture");
 		Assert.assertEquals(p1.getScreenZone().getFieldName(), "zoneNotPresent");
 		Assert.assertEquals(p1.getTextField().getFieldName(), "textField");
+	}
+
+	/**
+	 * In case element fields are not static, raise an error
+	 */
+	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class, expectedExceptionsMessageRegExp = "'textElement' field must be static")
+	public void testFieldNameWhenFieldNotStatic() {
+		NoStaticFieldPage p1 = new NoStaticFieldPage();
 	}
 
 	@Test(groups = { "ut" })

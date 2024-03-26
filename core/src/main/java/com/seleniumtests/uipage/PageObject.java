@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -270,6 +271,9 @@ public class PageObject extends BasePage implements IPage {
         	((CustomEventFiringWebDriver)driver).updateWindowsHandles();
         }
 
+        // add calling page and field name on element
+        setPageOnElements();
+
         assertCurrentPage(false, pageIdentifierElement);
 
         Calendar end = Calendar.getInstance();
@@ -277,8 +281,7 @@ public class PageObject extends BasePage implements IPage {
         long startTime = start.getTimeInMillis();
         long endTime = end.getTimeInMillis();
         logger.log("Open web page in :" + (endTime - startTime) / 1000.0 + " seconds");
-        
-        setPageOnElements();
+
     }
 
     /**
@@ -326,6 +329,9 @@ public class PageObject extends BasePage implements IPage {
 
                 // associate the object with field name / calling page
                 if (Element.class.isAssignableFrom(field.getType())) {
+                    if (!Modifier.isStatic(field.getModifiers())) {
+                        throw new ScenarioException(String.format("'%s' field must be static", field.getName()));
+                    }
                     ((Element) field.get(this)).setFieldName(field.getName());
                     ((Element) field.get(this)).setCallingPage(this);
                 }
@@ -334,9 +340,6 @@ public class PageObject extends BasePage implements IPage {
             } catch (IllegalArgumentException | IllegalAccessException e) {
                 throw new CustomSeleniumTestsException("Problem occured while setting element on page");
             }
-
-
-
         }
     }
 
