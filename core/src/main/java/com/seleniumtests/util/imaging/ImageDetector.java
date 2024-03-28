@@ -144,8 +144,13 @@ public class ImageDetector {
 	}
 	
 	/**
-	 * Allow to test Image matching directly outside of a test
-	 * @param args
+	 * Allow to test Image matching directly outside of a test. Run it with:
+	 * {@code ImageDetector <sceneImage> <objectImage> <detectionThreshold>}
+	 *
+	 * @arg sceneImage			the image in which we want to detect an object
+	 * @arg objectImage			the object we want to detect
+	 * @arg detectionThreshold	default: 0.05. A double between 0 and 1. The higher the value is, less precise the detector will be. e.g: with 0.5, it can find matching that do not fully correspond to the searched object.
+	 * 								increase this value only if the detector cannot find matching
 	 */
 	public static void main(String[] args) {
 		ImageDetector detector = new ImageDetector(new File(args[0]), new File(args[1]), new Double(args[2]));
