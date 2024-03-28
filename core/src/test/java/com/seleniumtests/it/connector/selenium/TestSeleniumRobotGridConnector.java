@@ -9,16 +9,22 @@ import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
+import com.seleniumtests.GenericDriverTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.TestType;
+import com.seleniumtests.driver.WebUIDriver;
 import io.appium.java_client.android.options.UiAutomator2Options;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.SessionId;
 import org.testng.Assert;
@@ -77,6 +83,46 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 		gridLogger = spy(SeleniumRobotGridConnector.getLogger());
 	}
 
+	/**
+	 * Check it's possible to attach to an existing browser using SeleniumRobot grid
+	 */
+	@Test(groups={"it"})
+	public void testMultipleBrowserCreationGridMode() {
+
+		WebDriver driver1 = null;
+		WebDriver driver2 = null;
+		try {
+			SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
+			SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
+			SeleniumTestsContextManager.getThreadContext().setWebDriverGrid(hubUrl);
+			int port = GenericDriverTest.findFreePort();
+			SeleniumTestsContextManager.getThreadContext().setChromeOptions("--remote-debugging-port=" + port);
+
+			// creates the first driver
+			driver1 = WebUIDriver.getWebDriver(true, BrowserType.CHROME, "main", null);
+			driver1.get("chrome://settings/");
+
+			// creates the second driver
+			SeleniumTestsContextManager.getThreadContext().setChromeOptions(null);
+			driver2 = WebUIDriver.getWebDriver(true, BrowserType.CHROME, "second", port);
+			driver2.get("about:config");
+
+			// last created driver has the focus
+			Assert.assertEquals(WebUIDriver.getWebDriver(false), driver2);
+
+			// check second driver is attached to the first created browser
+			Assert.assertEquals(driver1.getCurrentUrl(), driver2.getCurrentUrl());
+		} finally {
+			if (driver1 != null) {
+				driver1.quit();
+			}
+			if (driver2 != null) {
+				driver2.quit();
+			}
+		}
+	}
+
+
 	@Test(groups={"it"})
 	public void testGridLaunchWithMultipleThreads() throws Exception {
 		
@@ -90,9 +136,9 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 			
 			// check drivers are created in parallel
 			int firstDriverCreation = logs.indexOf("driver creation took"); // written when driver is created
-			int firstDriverInit = logs.indexOf("Socket timeout for driver communication updated");
+			int firstDriverInit = logs.indexOf("Start creating *chrome driver");
 			int secondDriverCreation = logs.lastIndexOf("driver creation took");
-			int secondDriverInit = logs.lastIndexOf("Socket timeout for driver communication updated"); // written before creating driver
+			int secondDriverInit = logs.lastIndexOf("Start creating *chrome driver"); // written before creating driver
 			
 			Assert.assertTrue(secondDriverInit < firstDriverCreation);
 			Assert.assertTrue(secondDriverInit > firstDriverInit);
@@ -106,15 +152,15 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 
 	@Test(groups={"it"})
 	public void testUploadMobileApp() throws ClientProtocolException, IOException, UnirestException {
-		
-		File app = GenericTest.createFileFromResource("clirr-differences.xml");
-		
-		MutableCapabilities caps = new DesiredCapabilities();
-		((UiAutomator2Options)caps).setApp(app.getAbsolutePath());
-		connector.uploadMobileApp(caps);
-		String url = ((UiAutomator2Options)caps).getApp().orElse(null);
-		
-		String fileContent = Unirest.get("http://localhost:4454/grid/admin/FileServlet")
+
+		File app = GenericTest.createFileFromResource("tu/env.ini");
+
+		UiAutomator2Options caps = new UiAutomator2Options();
+		caps.setApp(app.getAbsolutePath());
+		caps = new UiAutomator2Options(connector.uploadMobileApp(caps));
+		String url = caps.getApp().orElse(null);
+
+		String fileContent = Unirest.get(String.format("http://%s:%d/grid/admin/FileServlet", new URL(hubUrl).getHost(), new URL(hubUrl).getPort() + 10))
 				.queryString("file", url)
 				.asString()
 				.getBody();
@@ -125,16 +171,16 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	@Test(groups={"it"})
 	public void testUploadFileToNode() throws ClientProtocolException, IOException, UnirestException {
 		
-		File app = GenericTest.createFileFromResource("clirr-differences.xml");
-		
-		MutableCapabilities caps = new DesiredCapabilities();
+		File app = GenericTest.createFileFromResource("tu/env.ini");
 
-		((UiAutomator2Options)caps).setApp(app.getAbsolutePath());
+		UiAutomator2Options caps = new UiAutomator2Options();
+
+		caps.setApp(app.getAbsolutePath());
 		String filePath = connector.uploadFileToNode(app.getAbsolutePath(), true);
 		Assert.assertTrue(filePath.contains("upload/file"));
-		
-		String fileContent = Unirest.get("http://localhost:5565/extra/FileServlet")
-				.queryString("file", "clirr-differences.xml")
+		String partialPath = "upload" + filePath.split("upload")[1] + "/" + app.getName();
+		String fileContent = Unirest.get(String.format("http://%s:%d/extra/FileServlet", new URL(nodeUrl).getHost(), new URL(nodeUrl).getPort() + 10))
+				.queryString("file", "file:" + partialPath)
 				.asString()
 				.getBody();
 		
@@ -145,10 +191,10 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	@Test(groups={"it"})
 	public void testDownloadFileFromNode() throws ClientProtocolException, IOException, UnirestException {
 		
-		File app = GenericTest.createFileFromResource("clirr-differences.xml");
-		
-		MutableCapabilities caps = new DesiredCapabilities();
-		((UiAutomator2Options)caps).setApp(app.getAbsolutePath());
+		File app = GenericTest.createFileFromResource("tu/env.ini");
+
+		UiAutomator2Options caps = new UiAutomator2Options();
+		caps.setApp(app.getAbsolutePath());
 		String filePath = connector.uploadFileToNode(app.getAbsolutePath(), true);
 		File downloaded = connector.downloadFileFromNode("upload" + filePath.split("upload")[1] + "/" + app.getName());
 		
@@ -158,16 +204,16 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	@Test(groups={"it"})
 	public void testUploadFileToNode2() throws ClientProtocolException, IOException, UnirestException {
 		
-		File app = GenericTest.createFileFromResource("clirr-differences.xml");
-		
-		MutableCapabilities caps = new DesiredCapabilities();
+		File app = GenericTest.createFileFromResource("tu/env.ini");
 
-		((UiAutomator2Options)caps).setApp(app.getAbsolutePath());
+		UiAutomator2Options caps = new UiAutomator2Options();
+
+		caps.setApp(app.getAbsolutePath());
 		String filePath = connector.uploadFileToNode(app.getAbsolutePath(), false);
-		Assert.assertEquals(filePath, "");
+		Assert.assertTrue(filePath.startsWith("file:upload/file/"));
 		
-		String fileContent = Unirest.get("http://localhost:5565/extra/FileServlet/")
-				.queryString("file", "clirr-differences.xml")
+		String fileContent = Unirest.get(String.format("http://%s:%d/extra/FileServlet", new URL(nodeUrl).getHost(), new URL(nodeUrl).getPort() + 10))
+				.queryString("file", filePath + "/" + app.getName())
 				.asString()
 				.getBody();
 		

@@ -340,25 +340,6 @@ public class TestWebUiDriver extends ReporterTest {
 		Assert.assertEquals(((CustomEventFiringWebDriver)driver2).getCapabilities().getBrowserName(), "firefox");
 	}
 	
-	@Test(groups={"it"}, enabled=false)
-	public void testMultipleBrowserCreationGridMode() {
-
-		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
-		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
-		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://SN782980:4444/wd/hub");
-		
-		// creates the first driver
-		WebDriver driver1 = WebUIDriver.getWebDriver(true, BrowserType.CHROME, "main", null);
-		driver1.get("chrome://settings/");
-		
-		// creates the second driver
-		WebDriver driver2 = WebUIDriver.getWebDriver(true, BrowserType.FIREFOX, "second", null);
-		driver2.get("about:config");
-		
-		// last created driver has the focus
-		Assert.assertEquals(WebUIDriver.getWebDriver(false), driver2);
-	}
-	
 	/**
 	 * Test we can switch between browsers
 	 */
