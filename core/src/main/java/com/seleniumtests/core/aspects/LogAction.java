@@ -711,8 +711,10 @@ public class LogAction {
 					}
 					action.setFailed(actionFailed);
 				}
-				String elementName = mainElement instanceof SeleniumElement ? mainElement.getName(): mainElement.toString();
-				name.append("on element '" + elementName + "'");
+				if (mainElement != null) {
+					String elementName = mainElement instanceof SeleniumElement ? mainElement.getName() : mainElement.toString();
+					name.append("on element '" + elementName + "'");
+				}
 				compositeActionStep.setName(name.toString());
 
 				scenarioLogger.logActionError(currentException);

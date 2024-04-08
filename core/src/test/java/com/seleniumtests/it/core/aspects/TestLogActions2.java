@@ -321,6 +321,27 @@ public class TestLogActions2 extends GenericDriverTest {
 	}
 
 	/**
+	 * Test logging of composite actions when no element is specified
+	 */
+	@Test(groups = {"ut"})
+	public void testLogCompositeActionWithoutElement() {
+		SeleniumTestsContextManager.getThreadContext().setOverrideSeleniumNativeAction(false);
+		testPage._sendKeysCompositeNoElement();
+
+		// check an action has been created for this
+		TestStep step = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(2);
+
+		Assert.assertEquals(step.getStepActions().size(), 2);
+		TestStep compositeAction2 = (TestStep) step.getStepActions().get(1);
+
+		Assert.assertEquals(compositeAction2.getName(), "Composite moveByOffset,");
+
+		// 2 sub steps (one for each composite action)
+		Assert.assertEquals(compositeAction2.getStepActions().get(0).getName(), "moveByOffset with args: (10, 0, )");
+
+	}
+
+	/**
 	 * Check that when Selenium overrideNativeActions is set to false (the default) these actions in PageFactory pattern are logged
 	 *
 	 * @throws Exception
