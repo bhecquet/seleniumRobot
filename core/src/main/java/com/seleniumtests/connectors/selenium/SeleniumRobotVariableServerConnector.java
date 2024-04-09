@@ -70,8 +70,14 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	public boolean isAlive() {
 		return isAlive("/variable/api/");
 	}
-	
-	public Map<String, TestVariable> getVariables() {
+
+	/**
+	 * Retrieve all variables from the server
+	 * Display a warning when a custom variable prefix "custom.test.variable." overwrites a regular one.
+	 * The custom variable will always take precedence over the regular variable because we assume that if a custom.test.variable has been created in a script,
+	 * this value is the one we need in the next execution.
+	 */
+	 public Map<String, TestVariable> getVariables() {
 		return getVariables(0, -1);
 	}
 	
@@ -88,8 +94,10 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 
 	/**
 	 * Retrieve all variables from the server
-	 * Display a warning when a custom variable prefix "custom.test.variable." overwrites or is overwritten by a regular one
-	 * 
+	 * Display a warning when a custom variable prefix "custom.test.variable." overwrites a regular one.
+	 * The custom variable will always take precedence over the regular variable because we assume that if a custom.test.variable has been created in a script,
+	 * this value is the one we need in the next execution.
+	 *
 	 * @param variablesOlderThanDays number of days since this variable should be created before it can be returned. This only applies to variables which have a time to live (a.k.a: where destroyAfterDays parameter is > 0) 
 	 * @return
 	 */
@@ -99,7 +107,9 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	
 	/**
 	 * Retrieve all variables from the server
-	 * Display a warning when a custom variable prefix "custom.test.variable." overwrites or is overwritten by a regular one
+	 * Display a warning when a custom variable prefix "custom.test.variable." overwrites a regular one.
+	 * The custom variable will always take precedence over the regular variable because we assume that if a custom.test.variable has been created in a script,
+	 * this value is the one we need in the next execution.
 	 * 
 	 * 
 	 * @param variablesOlderThanDays 		number of days since this variable should be created before it can be returned. This only applies to variables which have a time to live (a.k.a: where destroyAfterDays parameter is > 0) 
@@ -114,8 +124,9 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	
 	/**
 	 * Retrieve all variables from the server
-	 * Display a warning when a custom variable prefix "custom.test.variable." overwrites or is overwritten by a regular one
-	 * 
+	 * Display a warning when a custom variable prefix "custom.test.variable." overwrites a regular one.
+	 * The custom variable will always take precedence over the regular variable because we assume that if a custom.test.variable has been created in a script,
+	 * this value is the one we need in the next execution.
 	 * 
 	 * @param variablesOlderThanDays 		number of days since this variable should be created before it can be returned. This only applies to variables which have a time to live (a.k.a: where destroyAfterDays parameter is > 0) 
 	 * @param name							name of the variables to retrieve. If given, only one variable will be get because server only returns one variable for each name
@@ -157,6 +168,11 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 				TestVariable variable = TestVariable.fromJsonObject(variablesJson.getJSONObject(i));
 				
 				if (varNames.contains(variable.getName())) {
+					// overwrite if this variable is a custom one and the already recorded is a regular
+					if (variable.getInternalName().startsWith(TestVariable.TEST_VARIABLE_PREFIX)) {
+						variables.put(variable.getName(), variable);
+					}
+
 					logger.warn(String.format("variable %s has already been get. Check no custom (added by test script) variable has the same name as a regular one", variable.getName()));
 				} else {
 					variables.put(variable.getName(), variable);
@@ -249,6 +265,25 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 				.field(FIELD_TIME_TO_LIVE, String.valueOf(variable.getTimeToLive())));
 		
 		return TestVariable.fromJsonObject(variableJson);
+	}
+
+	/**
+	 * Deletes the variable in parameter
+	 * Server will forbid deleting non custom variables
+	 * @param variable
+	 * @return
+	 */
+	public void deleteVariable(TestVariable variable) {
+		if (variable.getId() == null) {
+			logger.error("Variable has no ID, it cannot be deleted");
+			return;
+		}
+
+		try {
+			getStringResponse(buildDeleteRequest(String.format(url + EXISTING_VARIABLE_API_URL, variable.getId())));
+		} catch (UnirestException | SeleniumRobotServerException e) {
+			logger.error(String.format("Cannot delete variable %s", variable.getName()), e);
+		}
 	}
 
 	/**

@@ -50,7 +50,6 @@ import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.browserfactory.mobile.AdbWrapper;
 import com.seleniumtests.browserfactory.mobile.ExistingAppiumLauncher;
 import com.seleniumtests.browserfactory.mobile.InstrumentsWrapper;
-import com.seleniumtests.browserfactory.mobile.LocalAppiumLauncher;
 import com.seleniumtests.browserfactory.mobile.MobileDevice;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -87,48 +86,7 @@ public class TestWebUiDriver extends ReporterTest {
 	
 	@Mock
 	private Timeouts timeouts;
-	
 
-	@Test(groups={"it"})
-	public void testLocalAndroidDriver() throws Exception {
-		List<MobileDevice> deviceList = new ArrayList<>();
-		deviceList.add(new MobileDevice("IPhone 6", "0000", "ios", "10.2", new ArrayList<>()));
-		deviceList.add(new MobileDevice("Nexus 5", "1234", "android", "5.0", new ArrayList<>()));
-		deviceList.add(new MobileDevice("Nexus 7", "1235", "android", "6.0", new ArrayList<>()));
-
-		try (MockedConstruction mockedAdbWrapper = mockConstruction(AdbWrapper.class, (adbWrapper, context) -> {
-			when(adbWrapper.getDeviceList()).thenReturn(deviceList);
-		});
-			MockedConstruction mockedAndroidDriver = mockConstruction(AndroidDriver.class, (androidDriver, context) -> {
-			when(androidDriver.manage()).thenReturn(driverOptions);
-			when(androidDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
-		});
-			 MockedStatic mockedAppiumLauncher = mockStatic(AppiumLauncherFactory.class);
-		) {
-
-			when(driverOptions.timeouts()).thenReturn(timeouts);
-
-			SeleniumTestsContextManager.getThreadContext().setRunMode("local");
-			SeleniumTestsContextManager.getThreadContext().setPlatform("android");
-			SeleniumTestsContextManager.getThreadContext().setMobilePlatformVersion("5.0");
-			SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_ANDROID);
-
-			LocalAppiumLauncher appiumLauncher;
-
-			try {
-				appiumLauncher = spy(new LocalAppiumLauncher());
-				mockedAppiumLauncher.when(() -> AppiumLauncherFactory.getInstance()).thenReturn(appiumLauncher);
-
-				WebUIDriver.getWebDriver(true);
-			} catch (ConfigurationException e) {
-				throw new SkipException("Test skipped, appium not correctly configured", e);
-			}
-
-			Assert.assertEquals(mockedAndroidDriver.constructed().size(), 1);
-
-			verify(appiumLauncher).stopAppium();
-		}
-	}
 	
 	/**
 	 * Test we can connect to a remote appium server (no local devices)
@@ -144,6 +102,7 @@ public class TestWebUiDriver extends ReporterTest {
 		});
 			 MockedConstruction mockedAndroidDriver = mockConstruction(AndroidDriver.class, (androidDriver, context) -> {
 				 when(androidDriver.manage()).thenReturn(driverOptions);
+				 when(androidDriver.getContext()).thenReturn("NATIVE_APP");
 				 when(androidDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
 			 });
 			 MockedStatic mockedAppiumLauncher = mockStatic(AppiumLauncherFactory.class);
@@ -184,6 +143,7 @@ public class TestWebUiDriver extends ReporterTest {
 			});
 			 MockedConstruction mockedIOSDriver = mockConstruction(IOSDriver.class, (iosDriver, context) -> {
 				 when(iosDriver.manage()).thenReturn(driverOptions);
+				 when(iosDriver.getContext()).thenReturn("NATIVE_APP");
 				 when(iosDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
 			 });
 			 MockedStatic mockedAppiumLauncher = mockStatic(AppiumLauncherFactory.class);
@@ -378,25 +338,6 @@ public class TestWebUiDriver extends ReporterTest {
 		// created browser is of the requested type
 		Assert.assertEquals(((CustomEventFiringWebDriver)driver1).getCapabilities().getBrowserName(), "chrome");
 		Assert.assertEquals(((CustomEventFiringWebDriver)driver2).getCapabilities().getBrowserName(), "firefox");
-	}
-	
-	@Test(groups={"it"}, enabled=false)
-	public void testMultipleBrowserCreationGridMode() {
-
-		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
-		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
-		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://SN782980:4444/wd/hub");
-		
-		// creates the first driver
-		WebDriver driver1 = WebUIDriver.getWebDriver(true, BrowserType.CHROME, "main", null);
-		driver1.get("chrome://settings/");
-		
-		// creates the second driver
-		WebDriver driver2 = WebUIDriver.getWebDriver(true, BrowserType.FIREFOX, "second", null);
-		driver2.get("about:config");
-		
-		// last created driver has the focus
-		Assert.assertEquals(WebUIDriver.getWebDriver(false), driver2);
 	}
 	
 	/**

@@ -30,6 +30,7 @@
 - [3 Write a test](#3-write-a-test)
   - [Accessing test data and storing temp data](#accessing-test-data-and-storing-temp-data)
   - [Use variable server to hold variables during some days](#use-variable-server-to-hold-variables-during-some-days)
+  - [Delete variables stored on variable server](#delete-variables-stored-on-variable-server)
   - [Using TestNG annotations](#using-testng-annotations)
     - [Test context](#test-context)
   - [Use driver inside a @BeforeMethod method](#use-driver-inside-a-beforemethod-method)
@@ -75,8 +76,14 @@
 - [12 Write mobile tests](#12-write-mobile-tests)
   - [Automatic ID for Android](#automatic-id-for-android)
   - [Use the same test code for multiple platform](#use-the-same-test-code-for-multiple-platform)
+  - [Hybrid application](#hybrid-application)
+    - [Automatic context switching](#automatic-context-switching)
+    - [Manual context switching](#manual-context-switching)
+  - [Auto hide keyboard](#auto-hide-keyboard)
+  - [Auto scrolling element](#auto-scrolling-element)
+    - [iOS #####chap4_Run_tests.md](#ios-chap4_run_testsmd)
+    - [Android](#android)
 - [13 Implement custom SelectList](#13-implement-custom-selectlist)
-- [14 Using custom UI libraries](#14-using-custom-ui-libraries)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -659,10 +666,14 @@ Test data are get using
 - `param(Pattern.compile(<key_pattern>), Pattern.compile(<value_pattern>))` is used to get a variable by pattern on the name / value. For example `param(Pattern.compile("var.*Name"), Pattern.compile("var.*Value"))` for searching all variables whose name matches "var<something>Name" and value matches "var<someThing>Value". Only one value will be get if multiple variables match.
 - `param(null, Pattern.compile(<value_pattern>))`is used to get a variable by pattern on the value.
 
+Test data can be shared using `createOrUpdateLocalParam(<key>, <value>)`
+Difference with `createOrUpdateParam` is that if seleniumRobot server is used, then, variable won't be sent to it
+
 Test data are updated via `createOrUpdateParam`. The later is only available when seleniumRobot server is used.
 - `createOrUpdateParam(<key>, <value>)` is used to store a variable with reference to environment, application
 - `createOrUpdateParam(<key>, <value>, <attach_to_version>)` is used to store a variable with reference to environment, application. Reference to application version is optional
 - `createOrUpdateParam(<key>, <value>, <attach_to_version>, <time_to_live>, <reservable>)` is used to store a variable with reference to environment, application. Reference to application version is optional. In this case, we can specify that server will destroy variable after X days (the time to live) and that this variable can be reserved. 
+
 
 #### Use variable server to hold variables during some days ####
 
@@ -673,7 +684,14 @@ The use case is:
 - to avoid having too many clients stored in selenium server database, these temp variables are destroyed after timeToLive value.
 
 When storing your variable, use: `createOrUpdateParam(<key>, <value>, <attach_to_version>, <time_to_live>, <reservable>)` with reservable=true and time_to_live > 0
+'reservable' may also be set to false if created variable does not need to be shared among tests
 When executing test, use parameter `seleniumRobotServerVariablesOlderThan=1` so that we only get variables created the day before. Keep in mind that this parameter only applies to variables created with a timeToLive value > 0. Other variables are returned without restriction.
+
+#### Delete variables stored on variable server ####
+
+If, for some reason, you need to delete a variable from variable server, you can do it using `deleteParam(<key>)`.
+This only deletes variables created by test scripts, not the one created manually
+
 
 #### Using TestNG annotations ####
 
@@ -1315,15 +1333,15 @@ The variable name **MUST** contain either 'pwd', 'password', or 'passwd'.
 
 ### 12 Write mobile tests ###
 
-SeleniumRobot supports appium (see chap4_Run_tests, §3 to configure execution) out of the box. Be default, seleniumRobot will start the appium server itself for running the test locally, and stop it at the end of the test.
-For writing test, this is easier to use Appium desktop which provides an inspector.
-From version 4.15.0, seleniumRobot allows to use an existing appium server. To use it:
+SeleniumRobot supports appium (see chap4_Run_tests, §3 to configure execution) out of the box. 
+To execute a mobile test through appium, you have to start an appium server locally (refer to appium installation procedure).
+For writing test, this is easier to use Appium inspector.
 
-- start Appium desktop and click on "Start server"
+- start appium in command line
 - Configure seleniumRobot with options: `-DappiumServerUrl=http://localhost:4723/wd/hub/ -DnewCommandTimeout=120 -DfullReset=false`
 - Add a breakpoint into your code 
-- Start your test. When test stop on breakpoint, click "start inspector session" inside appium console
-- In the new window, go to "attach existing session tab"
+- Start your test. When test stop on breakpoint, start appium inspector 
+- In the new window, go to "attach existing session tab". (in case you see many session, look at driver name, it contains the session id)
 ![](images/appium-desktop-inspector.png)
 - Click "Start Session"
 
@@ -1331,7 +1349,7 @@ You should get the inspector running
 
 It's also possible to attach to a remote appium server the same way (change URL). In this case, you MUST
 - provide the device id (`-DdeviceId=<UDID or android ID`) to the test. iOS UDID can be found with command `instruments -s devices`. Android Id can be found with `adb devices` command.
-- provide a local path (local the the remote machine) to the application. An HTTP path may also be provided but you may have trouble with android
+- provide a local path (local to the remote machine) to the application. An HTTP path may also be provided but you may have trouble with android
 
 #### Automatic ID for Android ####
 
@@ -1345,6 +1363,77 @@ In case you have 2 mobile applications that have the same screens, but different
 
 In the above code, `ByC.android`, `ByC.ios`, `ByC.web` help seleniumRobot to filter which locator to use depending on the platform used to launch the test.
 For example, if you execute the test on iOS, android and web locators will be ignored
+
+#### Hybrid application #####
+
+In case the application uses web content on some page, you may need to change context during navigation.
+
+##### Automatic context switching #####
+
+SeleniumRobot provides automatic context switching using the `@Context`, `@ContextWebView`, `@ContextNativeApp` annotations
+These annotation must be located on the page class
+
+```java
+@ContextNativeApp
+public class AccessAuthentication extends PageObject {
+    // your code here ...
+}
+```
+
+or 
+```java
+@ContextWebView
+public class AuthenticationScreen extends PageObject {
+    // your code here ...
+}
+```
+
+- `@Context(name="myContext")` will handle special case where context name is different from "NATIE_APP" and "...WEB..."
+- `@ContextWebView` handles any context containing "WEB" in its name
+- `@ContextNativeApp` handles "NATIVE_APP" context
+
+When doing `new AccessAuthentication()`, seleniumRobot will get all context handles and search the one that matches the requested context (NATIVE_APP in our example).
+Then, it switches automatically to it
+
+##### Manual context switching #####
+
+In case the above behaviour does not match your need, PageObject exposes 
+
+- `getContexts` method to list all contexts
+- `switchToContext` method to switch to any context
+
+#### Auto hide keyboard ####
+
+By default, when using TextFieldElement, the keyboard is displayed because seleniumRobot clicks on the field before sending keys
+On mobile, this is annoying because keyboard can mask some elements. So, `hideKeyboard` method is called just after click
+
+PageObject class exposes `hideKeyboard` method for other cases
+
+#### Auto scrolling element ####
+
+##### iOS #####[chap4_Run_tests.md](chap4_Run_tests.md)
+
+According to appium documentation, this is done by default on iOS
+
+##### Android #####
+On Android **Web view context** or full Web navigation, this is done automatically as for any browser.
+
+On Android, **Native app** context, only visible elements can be accessed using `findElement`. Use of elements that are not visible requires scrolling.
+Appium provides many way to do it manually.
+To scroll automatically on elements, you must use `ByC.attribute`
+
+Native app android elements can be searched through [https://developer.android.com/reference/android/support/test/uiautomator/UiSelector#public-methods_1](https://developer.android.com/reference/android/support/test/uiautomator/UiSelector#public-methods_1)
+- `text` attribute
+- `content-desc` attribute
+- `resource-id` attribute
+
+These 3 attributes (and only these) will be rewritten to `AppiumBy.androidUIAutomator`.
+Rules for ByC.attribute applies (starts with, contains, ...)
+
+- text attribute **equals**: `ByC.attribute("text", "value")` => `AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().text(\"value\").instance(0))")`
+- text attribute **contains**: `ByC.attribute("text*", "value")` => `AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().textContains(\"value\").instance(0))")`
+- content-desc attribute **starts with**: `new ByC.attribute("content-desc^", "value")` => `AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().descriptionStartsWith(\"value\").instance(0))")`
+- resource-id attribute **matches**: `ByC.attribute("resource-id$", "value")`, `AppiumBy.androidUIAutomator("new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().resourceIdMatches(\"value\").instance(0))")`
 
 ### 13 Implement custom SelectList ###
 
@@ -1410,43 +1499,4 @@ To ease the implementation, if your custom SelectList is an Angular one, you can
 
 	}
 ```
-
-### 14 Using custom UI libraries ###
-
-Most of the web sites use JS development frameworks like Angular or react and associated GUI elements (angular material, ...)
-For SelectList especialy (see above), handling elements change from one framework to another.
-By default, seleniumRobot will search for all available UI components (le selectlists it knows) to find a proper way to handle it transparently.
-You can help it by specifying, when declaring your Page object, which GUI components are used
-
-Assuming you have a page 
-
-```java
-	public class MyPage extends PageObject {
-		
-		public static SelectList select = new SelectList("select", By.id("select"));
-	
-		public MyPage() {
-			super();
-		}
-	}
-```
-If you let seleniumRobot do its job, it will search if the select element is in "AngularMaterial", "Angular", "native HTML", ... and then find the proper implementation
-
-
-If you change to (note the "Angular" in constructor)
-
-```java
-	```java
-	public class MyPage extends PageObject {
-		
-		public static SelectList select = new SelectList("select", By.id("select"));
-	
-		public MyPage() {
-			super("Angular");
-		}
-	}
-```
-Then, it will first search for Angular handling, falling back to other implementations if needed
-
-The list of implementations is provided by UI components themselves and if you set the wrong one, PageObject constructor will raise an error and give you the right list.
 

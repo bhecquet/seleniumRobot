@@ -73,6 +73,7 @@ public class AppTestDocumentation {
 	private static Integer searchedElements;
 	
 	public static void main(String[] args) throws IOException {
+		System.setProperty("mavenExecution", "true");
 		stepsUsedInTests = new HashMap<>();
 		steps = new ArrayList<>();
 		tests = new ArrayList<>();

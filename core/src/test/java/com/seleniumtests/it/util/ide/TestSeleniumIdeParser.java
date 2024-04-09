@@ -557,7 +557,6 @@ public class TestSeleniumIdeParser extends GenericTest {
 				+ "    vars.put(\"dateFin\", driver.findElement(By.xpath(\"//td[8]/div/lds-datepicker/div/input\")).getAttribute(\"value\"));\n"
 				+ "    vars.put(\"dateAujourdhui\", js.executeScript(\"return new Date().toLocaleDateString('fr-FR');\"));\n"
 				+ "    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));\n"
-				+ "    // vars.get in xpath expression\n"
 				+ "    wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(\"//table//tr[contains(td[1], '\" + vars.get(\"immatriculation\").toString() + \"') and contains(td[2], 'AUDI') and contains(td[3], 'AFRem') and contains(td[4], 'SITE') and contains(td[5], 'FR') and contains(td[6], 'OUI')]\")));\n"
 				+ "    vars.put(\"nbVHOK\", driver.findElements(By.xpath(\"//tr/td[8][(translate(concat(substring(., 8, 4), '-', substring(., 5, 2), '-',  substring(., 2, 2)),  '-', '') >= translate(concat(substring('\" + vars.get(\"dateFinGarantie\").toString() + \"', 7, 4), '-',  substring('\" + vars.get(\"firstVariable\").toString() + \"', 4, 2), '-',  substring('\" + vars.get(\"secondVariable\").toString() + \"', 1, 2)), '-', '')) or not(normalize-space()) or normalize-space()]\")).size());\n"
 				+ "}\n"

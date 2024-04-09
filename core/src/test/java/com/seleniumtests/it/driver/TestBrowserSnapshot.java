@@ -248,7 +248,7 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 		doThrow(JavascriptException.class).when(mockedDriver).scrollTo(anyInt(), anyInt());
 		
 		ScreenShot screenshot = screenshotUtil.capture(SnapshotTarget.PAGE, ScreenShot.class);
-		Assert.assertNotNull(screenshot.getHtmlSourcePath());
+		Assert.assertNull(screenshot.getHtmlSourcePath()); // desktop capture does not have html source
 		Assert.assertNotNull(screenshot.getImage());
 	}
 

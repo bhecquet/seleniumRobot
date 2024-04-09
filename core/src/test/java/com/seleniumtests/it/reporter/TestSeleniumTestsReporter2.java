@@ -81,10 +81,26 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 		String detailedReportContent = readTestMethodResultFile("testOkWithInvocationCount");
 		Assert.assertTrue(detailedReportContent.contains("Start method testOkWithInvocationCount"));
+
+		// check each step is seen only once
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "<span class=\"step-title\"> Pre test step: setCount"), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "<span class=\"step-title\"> Pre test step: slow"), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "<span class=\"step-title\"> Pre test step: set "), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "<span class=\"step-title\"> step 1"), 1);
+
 		String detailedReportContent1 = readTestMethodResultFile("testOkWithInvocationCount-1");
 		Assert.assertTrue(detailedReportContent1.contains("Start method testOkWithInvocationCount-1"));
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "<span class=\"step-title\"> Pre test step: setCount"), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "<span class=\"step-title\"> Pre test step: slow"), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "<span class=\"step-title\"> Pre test step: set "), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "<span class=\"step-title\"> step 1"), 1);
+
 		String detailedReportContent2 = readTestMethodResultFile("testOkWithInvocationCount-2");
 		Assert.assertTrue(detailedReportContent2.contains("Start method testOkWithInvocationCount-2"));
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "<span class=\"step-title\"> Pre test step: setCount"), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "<span class=\"step-title\"> Pre test step: slow"), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "<span class=\"step-title\"> Pre test step: set "), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "<span class=\"step-title\"> step 1"), 1);
 	}
 
 	/**
@@ -2098,7 +2114,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	@Test(groups = {"it"})
 	public void testReportContainsDriverActions() throws Exception {
 
-		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriver", "testDriverNativeActions", "testDriverNativeActionsWithoutOverride", "testDriverWithHtmlElementWithoutOverride"});
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriver"});
 
 		// read 'testDriver' report. This contains calls to HtmlElement actions
 		String detailedReportContent1 = readTestMethodResultFile("testDriver");
@@ -2112,6 +2128,73 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// check that only on reference to 'click' is present for this buttonelement. This means that only the replayed action has been logged, not the ButtonElement.click() one
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "click on"), 1);
 
+		// check composite actions. We must have the moveToElement, click and sendKeys actions
+		Assert.assertTrue(detailedReportContent1.matches(".*<span class=\"step-title\"> _sendKeysComposite - \\d+.\\d+ secs</span></div>" +
+				"<div class=\"box-body\"><ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-2\">\\d+:\\d+:\\d+.\\d+</span> Composite moveToElement,sendKeys,on element 'TextFieldElement Text, by=\\{By.id: text2\\}' </div></li>" +
+				"<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> moveToElement with args: \\(TextFieldElement Text, by=\\{By.id: text2\\}, \\) </div></li>" +
+				"<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys with args: \\(\\[composite,\\], \\) </div></li><div class=\"row\"></div></ul>" +
+				"<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-2\">\\d+:\\d+:\\d+.\\d+</span> Composite moveToElement,click,on element 'ButtonElement Reset, by=\\{By.id: button2\\}' </div></li>" +
+				"<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> moveToElement with args: \\(ButtonElement Reset, by=\\{By.id: button2\\}, \\) </div></li>" +
+				"<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> click </div></li>.*"));
+
+
+		// check PictureElement action is logge
+		Assert.assertTrue(detailedReportContent1.matches(".*<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> clickAt on Picture picture from resource tu/images/logo_text_field.png with args: \\(0, -30, \\) </div></li>.*"));
+
+		// check that when logging PictureElement action which uses composite actions, those are not logged
+		Assert.assertFalse(detailedReportContent1.contains("<ul><li>clickAt on Picture picture from resource tu/images/logo_text_field.png with args: (0, -30, )</li><li>moveToElement with args:"));
+
+	}
+
+	/**
+	 * Check all native actions done with driver are correctly displayed. This indirectly test the LogAction aspect
+	 * Done without overriding native actions
+	 * We check
+	 * - all HtmlElement action logging
+	 * - all composite actions logging
+	 * - all PictureElement action logging
+	 *
+	 * @throws Exception
+	 */
+	@Test(groups = {"it"})
+	public void testReportContainsDriverNativeActionsNoOverride() throws Exception {
+
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverNativeActionsWithoutOverride", "testDriverWithHtmlElementWithoutOverride"});
+
+		// read the 'testDriverNativeActionsWithoutOverride' test result to see if native actions are not logged (overrideSeleniumNativeAction is false)
+		String detailedReportContent = readTestMethodResultFile("testDriverNativeActionsWithoutOverride");
+		detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
+
+		// logging is not done via HtmlElement
+		Assert.assertFalse(detailedReportContent.contains("<li>sendKeys on HtmlElement , by={By.id: text2} with args: (true, true, [some text,], )</li>"));
+		Assert.assertFalse(detailedReportContent.contains("<li>click on HtmlElement , by={By.id: button2} </li>"));
+
+		// check that without override, native actions are logged
+		Assert.assertTrue(detailedReportContent.matches(".*<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys on Element located by id: text2 with args: \\(\\[some text,], \\) </div></li>.*"));
+		Assert.assertTrue(detailedReportContent.matches(".*<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> click on Element located by id: button2 </div></li>.*"));
+		Assert.assertTrue(detailedReportContent.matches(".*<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> selectByVisibleText on Element located by Select id: select with args: \\(option1, \\) </div></li>.*"));
+
+		// no action is logged when step fails (findElement exception). Ok because logging is done on action, not search
+
+		// check that seleniumRobot actions are logged only once when overrideNativeAction is enabled (issue #88)
+		String detailedReportContent4 = readTestMethodResultFile("testDriverWithHtmlElementWithoutOverride");
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent4, "click on ButtonElement Reset, by={By.id: button2}"), 1);
+	}
+
+	/**
+	 * Check all native selenium actions done with driver are correctly displayed. This indirectly test the LogAction aspect
+	 * We check
+	 * - all HtmlElement action logging
+	 * - all composite actions logging
+	 * - all PictureElement action logging
+	 *
+	 * @throws Exception
+	 */
+	@Test(groups = {"it"})
+	public void testReportContainsDriverNativeActionsWithOverride() throws Exception {
+
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverNativeActions"});
+
 		// read the 'testDriverNativeActions' test result to see if native actions are also logged (overrideSeleniumNativeAction is true)
 		String detailedReportContent2 = readTestMethodResultFile("testDriverNativeActions");
 		System.out.println(detailedReportContent2);
@@ -2121,35 +2204,69 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent2.matches(".*<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys on HtmlElement , by=\\{By.id: text2} with args: \\(true, true, \\[some text,], \\) </div></li>.*"));
 		Assert.assertTrue(detailedReportContent2.matches(".*<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> click on HtmlElement , by=\\{By.id: button2} </div></li>.*"));
 
-		// read the 'testDriverNativeActionsWithoutOverride' test result to see if native actions are not logged (overrideSeleniumNativeAction is false)
-		String detailedReportContent3 = readTestMethodResultFile("testDriverNativeActionsWithoutOverride");
-		detailedReportContent3 = detailedReportContent3.replaceAll("\\s+", " ");
+	}
 
-		// logging is not done via HtmlElement
-		Assert.assertFalse(detailedReportContent3.contains("<li>sendKeys on HtmlElement , by={By.id: text2} with args: (true, true, [some text,], )</li>"));
-		Assert.assertFalse(detailedReportContent3.contains("<li>click on HtmlElement , by={By.id: button2} </li>"));
+	/**
+	 * Test reporting on PageObjectFactory (use of @FindBy)
+	 * selenium override is enabled
+	 *
+	 * @throws Exception
+	 */
+	@Test(groups = {"it"})
+	public void testReportContainsDriverNativeActionsWithOverrideOnPageObjectFactory() throws Exception {
+
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverNativeActionsOnPageObjectFactory"});
+
+		String detailedReportContent = readTestMethodResultFile("testDriverNativeActionsOnPageObjectFactory");
+
+		detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
+
+		Assert.assertTrue(detailedReportContent.matches(".*<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys on HtmlElement , by=\\{By.id: text2} with args: \\(true, true, \\[some text,], \\) </div></li>.*"));
+		Assert.assertTrue(detailedReportContent.matches(".*<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> click on HtmlElement , by=\\{By.id: button2} </div></li>.*"));
+
+	}
+	/**
+	 * Test reporting on PageObjectFactory (use of @FindBy)
+	 * selenium override is disabled
+	 * @throws Exception
+	 */
+	@Test(groups = {"it"})
+	public void testReportContainsDriverNativeActionsWithoutOverrideOnPageObjectFactory() throws Exception {
+
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverNativeActionsOnPageObjectFactoryWithoutOverride"});
+
+		String detailedReportContent = readTestMethodResultFile("testDriverNativeActionsOnPageObjectFactoryWithoutOverride");
+
+		detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
 
 		// check that without override, native actions are logged
-		Assert.assertTrue(detailedReportContent3.matches(".*<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys on Element located by id: text2 with args: \\(\\[some text,], \\) </div></li>.*"));
-		Assert.assertTrue(detailedReportContent3.matches(".*<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> click on Element located by id: button2 </div></li>.*"));
-		Assert.assertTrue(detailedReportContent3.matches(".*<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> selectByVisibleText on Select with args: \\(option1, \\) </div></li>.*"));
+		Assert.assertTrue(detailedReportContent.matches(".*<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys on Element located by id: text2 with args: \\(\\[some text,], \\) </div></li>.*"));
+		Assert.assertTrue(detailedReportContent.matches(".*<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> click on Element located by id: button2 </div></li>.*"));
+		Assert.assertTrue(detailedReportContent.matches(".*<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> selectByVisibleText on Element located by Select id: select with args: \\(option1, \\) </div></li>.*"));
 
-		// check composite actions. We must have the moveToElement, click and sendKeys actions
-		Assert.assertTrue(detailedReportContent1.matches(".*<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> moveToElement with args: \\(TextFieldElement Text, by=\\{By.id: text2}, \\) </div></li><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys with args: \\(\\[composite,\\], \\) </div></li><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> moveToElement with args: \\(ButtonElement Reset, by=\\{By.id: button2}, \\) </div></li><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> click </div></li>.*"));
+	}
 
-		// check PictureElement action is logged
-		Assert.assertTrue(detailedReportContent1.matches(".*<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> clickAt on Picture picture from resource tu/images/logo_text_field.png with args: \\(0, -30, \\) </div></li>.*"));
+	/**
+	 * Test display of failed actions / steps
+	 * @throws Exception
+	 */
+	@Test(groups = {"it"})
+	public void testReportContainsDriverFailedActions() throws Exception {
 
-		// check that when logging PictureElement action which uses composite actions, those are not logged
-		Assert.assertFalse(detailedReportContent1.contains("<ul><li>clickAt on Picture picture from resource tu/images/logo_text_field.png with args: (0, -30, )</li><li>moveToElement with args:"));
+		try {
+			System.setProperty(SeleniumTestsContext.REPLAY_TIME_OUT, "3");
 
-		// no action is logged when step fails (findElement exception). Ok because logging is done on action, not search
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverFailed"});
 
-		// check that seleniumRobot actions are logged only once when overrideNativeAction is enabled (issue #88)
-		String detailedReportContent4 = readTestMethodResultFile("testDriverWithHtmlElementWithoutOverride");
-		Assert.assertEquals(StringUtils.countMatches(detailedReportContent4, "click on ButtonElement Reset, by={By.id: button2}"), 1);
+			// read 'testDriver' report. This contains calls to HtmlElement actions
+			String detailedReportContent1 = readTestMethodResultFile("testDriverFailed");
+			detailedReportContent1 = detailedReportContent1.replaceAll("\\s+", " ");
 
-		// TODO: spliter ce test en plusieurs
+			Assert.assertTrue(detailedReportContent1.matches(".*<li class=\"header-failed\"><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys on TextFieldElement Text, by=\\{By.id: text___\\} with args: \\(true, true, \\[a text,\\], \\).*"));
+		} finally {
+			System.clearProperty(SeleniumTestsContext.REPLAY_TIME_OUT);
+		}
+
 
 	}
 

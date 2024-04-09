@@ -8,29 +8,26 @@ import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.*;
 
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.ut.uipage.testpages.NativeAppPage;
+import com.seleniumtests.ut.uipage.testpages.NoStaticFieldPage;
+import com.seleniumtests.ut.uipage.testpages.OtherContextPage;
+import com.seleniumtests.ut.uipage.testpages.WebViewPage;
+import io.appium.java_client.NoSuchContextException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.openqa.selenium.Alert;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Cookie;
-import org.openqa.selenium.Dimension;
+import org.openqa.selenium.*;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.Point;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver.Navigation;
 import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebDriver.Timeouts;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Interactive;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -600,6 +597,58 @@ public class TestPageObject2 extends MockitoTest {
 		when(eventDriver.getWindowHandle()).thenReturn("123");
 		page.switchToWindow(1);
 		verify(targetLocator).window("456");
+	}
+
+	/**
+	 * Test automatic context switching on mobile apps
+	 */
+	@Test(groups = {"ut"})
+	public void testAutomaticSwitchToContextWebView() {
+		when(eventDriver.getContextHandles()).thenReturn(new HashSet<>(Arrays.asList("NATIVE_APP", "WEBVIEW")));
+		new WebViewPage();
+		verify(eventDriver).context("WEBVIEW");
+	}
+	@Test(groups = {"ut"})
+	public void testAutomaticSwitchToContextNativeApp() {
+		when(eventDriver.getContextHandles()).thenReturn(new HashSet<>(Arrays.asList("NATIVE_APP", "WEBVIEW")));
+		new NativeAppPage();
+		verify(eventDriver).context("NATIVE_APP");
+	}
+	@Test(groups = {"ut"})
+	public void testAutomaticSwitchToContextNamedContext() {
+		when(eventDriver.getContextHandles()).thenReturn(new HashSet<>(Arrays.asList("NATIVE_APP", "WEBVIEW", "myContext")));
+		new OtherContextPage();
+		verify(eventDriver).context("myContext");
+	}
+	@Test(groups = {"ut"})
+	public void testAutomaticSwitchNoContext() {
+		new PageForActions();
+		verify(eventDriver, never()).getContextHandles();
+		verify(eventDriver, never()).context(anyString());
+	}
+	@Test(groups = {"ut"})
+	public void testAutomaticSwitchToContextAfterReplay() {
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(5);
+		when(eventDriver.getContextHandles()).thenReturn(new HashSet<>(Arrays.asList("NATIVE_APP", "WEBVIEW")))
+				.thenReturn(new HashSet<>(Arrays.asList("NATIVE_APP", "WEBVIEW")))
+				.thenReturn(new HashSet<>(Arrays.asList("NATIVE_APP", "WEBVIEW", "myContext")));
+		new OtherContextPage();
+		verify(eventDriver).context("myContext");
+		verify(eventDriver, times(3)).getContextHandles();
+	}
+
+	/**
+	 * Check replay when context is not found
+	 */
+	@Test(groups = {"ut"})
+	public void testAutomaticSwitchToContextNotAvailable() {
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(5);
+		when(eventDriver.getContextHandles()).thenReturn(new HashSet<>(Arrays.asList("NATIVE_APP", "WEBVIEW")));
+		long start = System.currentTimeMillis();
+		new OtherContextPage();
+		verify(eventDriver, never()).context("myContext");
+		verify(eventDriver, atLeast(4)).getContextHandles();
+		Assert.assertTrue(System.currentTimeMillis() - start > 4500);
 	}
 
 	@Test(groups = { "ut" })
@@ -1221,39 +1270,68 @@ public class TestPageObject2 extends MockitoTest {
 		when(driver.getPageSource()).thenReturn("<html>bar</html>");
 		page.assertHtmlSource("foo");
 	}
-	
-	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class, expectedExceptionsMessageRegExp = ".*AngularMaterial.*")
-	public void testWithInvalidUiLibrary() {
-		new PageForActions(Arrays.asList("invalid"));
-	}
-	
+
 	@Test(groups = { "ut" })
-	public void testWithValidUiLibrary() {
-		new PageForActions(Arrays.asList("AngularMaterial"));
-		Assert.assertTrue(PageForActions.getUiLibraries(PageForActions.class.getCanonicalName()).contains("AngularMaterial"));
-		Assert.assertFalse(PageForActions.getUiLibraries(PageObject.class.getCanonicalName()).contains("AngularMaterial"));
+	public void testHideKeyboard() {
+		page.hideKeyboard();
+		verify(eventDriver).hideKeyboard();
 	}
-	
+
 	@Test(groups = { "ut" })
-	public void testWithEmptyUiLibrary() {
-		new PageForActions();
-		Assert.assertTrue(PageForActions.getUiLibraries(PageForActions.class.getCanonicalName()).isEmpty());
+	public void testGetContext() {
+		when(eventDriver.getContextHandles()).thenReturn(new TreeSet<>(Arrays.asList("NATIVE_APP", "WEBVIEW")));
+		List<String> contexts = page.getContexts();
+		Assert.assertEquals(contexts.size(), 2);
+		verify(eventDriver).getContextHandles();
 	}
-	
+
+	@Test(groups = { "ut" })
+	public void testSwitchToContext() {
+		page.switchToContext("myContext");
+		verify(eventDriver).context("myContext");
+	}
+
+	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class, expectedExceptionsMessageRegExp = "Only \\[NATIVE_APP, WEBVIEW\\] contexts are available")
+	public void testSwitchToContextInError() {
+		when(eventDriver.getContextHandles()).thenReturn(new TreeSet<>(Arrays.asList("NATIVE_APP", "WEBVIEW")));
+		when(eventDriver.context("myContext")).thenThrow(new NoSuchContextException("Context foo not available"));
+		page.switchToContext("myContext");
+	}
+
 	/**
-	 * No error should be raised
+	 * For inline elements, calling page is not set, as we cannot know it, but origin is provided
 	 */
 	@Test(groups = { "ut" })
-	public void testUiLibraryWithoutPage() {
-		Assert.assertTrue(PageForActions.getUiLibraries(PageForActions.class.getCanonicalName()).isEmpty());
+	public void testInlineElement() {
+		PageForActions p1 = new PageForActions();
+		HtmlElement textElement = p1.clickInlineElement();
+		Assert.assertNull(textElement.getFieldName());
+		Assert.assertEquals(textElement.getOrigin(), "com.seleniumtests.ut.core.runner.cucumber.PageForActions");
+		Assert.assertNull(textElement.getCallingPage());
 	}
-	
+
 	@Test(groups = { "ut" })
-	public void testCallingPageSetToPictureElement() {
+	public void testFieldNameSetToAllElements() {
+		PageForActions p1 = new PageForActions();
+		Assert.assertEquals(p1.getPicture().getFieldName(), "picture");
+		Assert.assertEquals(p1.getScreenZone().getFieldName(), "zoneNotPresent");
+		Assert.assertEquals(p1.getTextField().getFieldName(), "textField");
+	}
+
+	/**
+	 * In case element fields are not static, raise an error
+	 */
+	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class, expectedExceptionsMessageRegExp = "'textElement' field must be static")
+	public void testFieldNameWhenFieldNotStatic() {
+		NoStaticFieldPage p1 = new NoStaticFieldPage();
+	}
+
+	@Test(groups = { "ut" })
+	public void testCallingPageSetToAllElements() {
 		PageForActions p1 = new PageForActions();
 		Assert.assertNotNull(p1.getPicture().getCallingPage());
 		Assert.assertNotNull(p1.getScreenZone().getCallingPage());
-		Assert.assertNull(p1.getTextField().getCallingPage());
+		Assert.assertNotNull(p1.getTextField().getCallingPage());
 	}
 	
 	@Test(groups = { "ut" })

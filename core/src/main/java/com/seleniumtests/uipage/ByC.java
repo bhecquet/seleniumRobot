@@ -776,7 +776,7 @@ public class ByC extends By {
         
         
         private static final long serialVersionUID = 6341668046120372161L;
-        
+
         private transient By[] bies;
         
         public Shadow(By ... bies) {
@@ -807,7 +807,14 @@ public class ByC extends By {
                 }
                 
                 for (WebElement host: hosts) {
-                    SearchContext root = host.getShadowRoot();
+                    SearchContext root;
+                    try {
+                        root = host.getShadowRoot();
+                    } catch (NoSuchShadowRootException e) {
+                        continue;
+                        // do nothing, it may happen when one of the found elements is not a shadow root (e.g: search by tagName)
+                    }
+
                     try {
                         // https://github.com/SeleniumHQ/selenium/issues/10127 => invalid locator raised when using ShadowRoot directly
                         // so we build a remoteWebElement which works
@@ -852,6 +859,14 @@ public class ByC extends By {
             }
             
             return String.join("/", biesString);
+        }
+
+        public By[] getBies() {
+            return bies;
+        }
+
+        public void setBies(By[] bies) {
+            this.bies = bies;
         }
         
     }

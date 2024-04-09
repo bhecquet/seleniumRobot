@@ -118,32 +118,39 @@ public class DriverTestPageObjectFatory extends PageObject {
     	driver.switchTo().frame(frame2);
     }
     
-    public void switchToFirstFrameByIndex() {
+    public DriverTestPageObjectFatory switchToFirstFrameByIndex() {
     	driver.switchTo().frame(0);
+		return this;
     }
     
-    public void switchToFrameWithExpectedConditionsById() {
+    public DriverTestPageObjectFatory switchToFrameWithExpectedConditionsById() {
     	new WebDriverWait(driver, Duration.ofSeconds(5)).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(frame1));
+		return this;
     }
     
-    public void switchToFrameWithExpectedConditionsByName() {
+    public DriverTestPageObjectFatory switchToFrameWithExpectedConditionsByName() {
     	new WebDriverWait(driver, Duration.ofSeconds(5)).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("myIFrame"));
+		return this;
     }
     
-    public void switchToFrameWithExpectedConditionsByIndex() {
+    public DriverTestPageObjectFatory switchToFrameWithExpectedConditionsByIndex() {
     	new WebDriverWait(driver, Duration.ofSeconds(5)).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(0));
+		return this;
     }
     
-    public void switchToFirstFrameByNameOrId() {
+    public DriverTestPageObjectFatory switchToFirstFrameByNameOrId() {
     	driver.switchTo().frame("myIFrame");
+		return this;
     }
     
-    public void switchDefaultContent() {
+    public DriverTestPageObjectFatory switchDefaultContent() {
     	driver.switchTo().defaultContent();
+		return this;
     }
     
-    public void switchParentFrame() {
+    public DriverTestPageObjectFatory switchParentFrame() {
     	driver.switchTo().parentFrame();
+		return this;
     }
     
     /** 

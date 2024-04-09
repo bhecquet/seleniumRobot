@@ -19,6 +19,8 @@ package com.seleniumtests.it.driver.support.pages;
 
 import java.util.List;
 
+import com.seleniumtests.core.Step;
+import io.cucumber.java.en.When;
 import org.openqa.selenium.By;
 import org.openqa.selenium.interactions.Actions;
 
@@ -164,7 +166,7 @@ public class DriverTestPage extends PageObject {
 	
 	private String openedPageUrl;
 	
-	public DriverTestPage() throws Exception {
+	public DriverTestPage() {
         super(textElement);
 		clearPictureMemories();
 	}
@@ -174,21 +176,21 @@ public class DriverTestPage extends PageObject {
 		privatePicture.clearMemory();
 	}
 
-	public DriverTestPage(boolean openPageURL) throws Exception {
+	public DriverTestPage(boolean openPageURL) {
     	this(openPageURL, getPageUrl(SeleniumTestsContextManager.getThreadContext().getBrowser()));
     }
     
-    public DriverTestPage(boolean openPageURL, BrowserType browserType) throws Exception {
+    public DriverTestPage(boolean openPageURL, BrowserType browserType) {
     	super(textElement, getPageUrl(browserType), browserType, "second", null);
 		clearPictureMemories();
     }
     
-    public DriverTestPage(BrowserType browserType, Integer attachExistingDriverPort) throws Exception {
+    public DriverTestPage(BrowserType browserType, Integer attachExistingDriverPort) {
     	super(textElement, getPageUrl(browserType), browserType, "second", attachExistingDriverPort);
 		clearPictureMemories();
     }
     
-    public DriverTestPage(boolean openPageURL, String url) throws Exception {
+    public DriverTestPage(boolean openPageURL, String url) {
     	super(textElement, openPageURL ? url : null);
 		clearPictureMemories();
     	openedPageUrl = url;
@@ -231,6 +233,18 @@ public class DriverTestPage extends PageObject {
     }
     
     public DriverTestPage _reset() {
+    	resetButton.click();
+    	return this;
+    }
+
+	@Step(name = "reset page")
+	public DriverTestPage _resetWithAnnotation() {
+    	resetButton.click();
+    	return this;
+    }
+
+	@When("reset page cucumber")
+	public DriverTestPage _resetWithCucumber() {
     	resetButton.click();
     	return this;
     }
@@ -279,9 +293,31 @@ public class DriverTestPage extends PageObject {
     	new Actions(driver).moveToElement(resetButton).click().build().perform();
     	return this;
     }
+
+	public DriverTestPage _sendKeysCompositeNoElement() {
+		textElement.sendKeys("composite");
+    	new Actions(driver).moveByOffset(10, 0).build().perform();
+    	return this;
+    }
+
+	public DriverTestPage _sendKeysCompositeWebElement() {
+    	new Actions(driver).moveToElement(driver.findElement(By.id("text2"))).sendKeys("composite").build().perform();
+    	new Actions(driver).moveToElement(driver.findElement(By.id("button2"))).click().build().perform();
+    	return this;
+    }
+
+    public DriverTestPage _sendKeysCompositeInError() {
+    	new Actions(driver).moveToElement(textElementNotPresent).sendKeys("composite").click(resetButton).build().perform();
+    	return this;
+    }
     
     public DriverTestPage _clickPicture() {
 		picture.clickAt(0, -30);
+		return this;
+    }
+
+    public DriverTestPage _clickPictureNotPresent() {
+		pictureNotPresent.clickAt(0, -30);
 		return this;
     }
     

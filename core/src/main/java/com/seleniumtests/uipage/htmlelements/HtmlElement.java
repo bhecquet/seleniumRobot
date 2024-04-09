@@ -34,12 +34,14 @@ import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
+import com.seleniumtests.uipage.selectorupdaters.MobileAndroidAppUpdater;
+import com.seleniumtests.uipage.selectorupdaters.MobileWebViewUpdater;
+import com.seleniumtests.uipage.selectorupdaters.ShadowDomRootUpdater;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.By.ByXPath;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.ElementNotInteractableException;
-import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
@@ -52,11 +54,9 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Coordinates;
 import org.openqa.selenium.interactions.Locatable;
-import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.remote.ScreenshotException;
 import org.openqa.selenium.support.decorators.Decorated;
@@ -77,9 +77,7 @@ import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.SnapshotTarget;
-import com.seleniumtests.uipage.ByC;
 import com.seleniumtests.uipage.ExpectedConditionsC;
-import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.ReplayOnError;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.imaging.ImageDetector;
@@ -88,7 +86,6 @@ import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
-import io.appium.java_client.AppiumBy;
 import io.appium.java_client.android.AndroidDriver;
 
 
@@ -99,10 +96,7 @@ import io.appium.java_client.android.AndroidDriver;
  * 
  */
 public class HtmlElement extends Element implements WebElement, Locatable { 
-	
-	static {
-		UiLibraryRegistry.register(PageObject.HTML_UI_LIBRARY);
-	}
+
 	
 	// WARNING!!!: we use the deprecated Locatable interface because it's used by Actions class
 	// unit test TestPicutreElement.testClick() fails if the new interface is used
@@ -140,13 +134,12 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	private ThreadLocal<WebDriver> driver = new ThreadLocal<>();
 	private ThreadLocal<WebElement> element = new ThreadLocal<>();
     protected ThreadLocal<SearchContext> searchContext = new ThreadLocal<>(); // if searchContext is a WebElement, then, element and searchContext will be the same. Used to store ShadowRoot which are not WebElements
-    protected String label = null;
+
     protected HtmlElement parent = null;
     protected FrameElement frameElement = null;
     private boolean scrollToElementBeforeAction = false;
     private Integer elementIndex = -1;
     private By by = null;
-    private String origin  = null;
 
     public HtmlElement() {
     	this("", By.id(""));
@@ -273,7 +266,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * @param	replayTimeout - how much time we must wait for the element to be present for playing with it
      */
     protected HtmlElement(String label, By by, FrameElement frame, HtmlElement parent, Integer index, Integer replayTimeout) {
-    	this.label = label;
+		super(label);
     	this.by = by;
     	this.elementIndex = index;
     	this.parent = parent;
@@ -284,8 +277,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     		this.frameElement = frame;
     	}
     	this.replayTimeout = replayTimeout;
-    	
-    	origin = PageObject.getCallingPage(Thread.currentThread().getStackTrace());
+
     }
 
     /**
@@ -391,12 +383,13 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * Click element in native way by Actions.
      *
      * <p/>
-	 * 
+	 *
      * <pre class="code">
 	 * clickAt(1, 1);
      * </pre>
      *
-     * @param  value
+     * @param xOffset	X offset to click to
+	 * @param yOffset	Y offset to click to
      */
 	@ReplayOnError(waitAfterAction = true)
     public void clickAt(int xOffset, int yOffset) {
@@ -501,18 +494,6 @@ public class HtmlElement extends Element implements WebElement, Locatable {
             x, 
             y);
 
-    }
-    
-    /**
-     * Returns the list of prefered UI libraries for the current page
-     * Should be used when multiple UiLibraries are defined for an element (e.g: SelectList)
-     * @return
-     */
-    protected List<String> getPreferedUiLibraries() {
-    	if (origin != null) {
-			return PageObject.getUiLibraries(origin);
-    	}
-    	return new ArrayList<>();
     }
     
     /**
@@ -666,7 +647,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     /**
      * Execute arbitrary script on this element. Renaming of getEval
 	 * 
-	 * @param script the script to execute. It MUST contain 'arguments[0]' and may
+	 * @param javascript the script to execute. It MUST contain 'arguments[0]' and may
 	 *               return something
      * @return 		arbitrary value. You must cast it
      */
@@ -682,7 +663,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * Execute arbitrary script on the provided element
 	 * 
      * @param element	the WebElement on which we call the script
-	 * @param script  the script to execute. It MUST contain 'arguments[0]' and may
+	 * @param javascript  the script to execute. It MUST contain 'arguments[0]' and may
 	 *                return something
 	 * @param args    optional arguments to pass to the script. They should ba
 	 *                accessed using 'arguments[1]' ...
@@ -715,13 +696,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	 *                          displayed
      */
     public void findElement(boolean waitForVisibility, boolean makeVisible) {
-		// TODO:
-		// https://discuss.appium.io/t/how-can-i-scroll-to-an-element-in-appium-im-using-android-native-app/10618/14
-    	// String DESTINATION_ELEMENT_TEXT= "KUBO";
-		// ((AndroidDriver) driver).findElementByAndroidUIAutomator("new
-		// UiScrollable(new UiSelector())
-    	//		.scrollIntoView(new UiSelector().text(DESTINATION_ELEMENT_TEXT))");
-        
+
     	ElementInfo elementInfo = null;
     	
     	// search element information. Do not stop if something goes wrong here
@@ -833,48 +808,23 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     }
     
     /**
-     * Some selectors are not allowed as direct children of a Shadow root (tagName, xPath, name)
-     * For xPath, we can't do anything as it's impossible to convert any xPath to its cssSelector equivalent
-     * For name and tagName, we provide the equivalent cssSelector
+     *
      */
     public void replaceSelector() {
-    	if (parent != null && parent.by instanceof ByC.Shadow) {
-    		if (by instanceof By.ByXPath || by instanceof ByC.ByForcedXPath || (by instanceof ByC && !(by instanceof ByC.ByHasCssSelector))) {
-    			throw new ScenarioException(String.format("%s is not supported as a direct child of a shadow DOM as it uses XPath. Try to add an intermediate selector (e.g: By.tagName) before", by.getClass()));
-    		} else if (by instanceof By.ByTagName) {
-    			by = By.cssSelector(by.toString().split(":")[1].trim());
-    		} else if (by instanceof By.ByName) {
-    			by = By.cssSelector(String.format("[name=%s]", by.toString().split(":")[1].trim()));
-    		} else if (by instanceof ByC.ByHasCssSelector) {
-    			((ByC.ByHasCssSelector)by).setUseCssSelector(true);
-    		}
-    	} 
-    	
-    	// add package name before the id for mobile application (not webview)
-		if (SeleniumTestsContextManager.isMobileAppTest()) {
-			boolean isWebTest = ((CustomEventFiringWebDriver)getDriver()).isWebTest();
 
-			if (isWebTest) {
-				// in mobile webviews id, name, classname is not supported
-				String locatorValue = by.toString().split(":", 2)[1].trim();
-				if ((by instanceof By.ById || by instanceof AppiumBy.ById)) {
-					by = By.cssSelector("#" + locatorValue);
-				} else if (by instanceof By.ByName || by instanceof AppiumBy.ByName) {
-					by = By.cssSelector(String.format("*[name='%s']", locatorValue.replace("'", "\\'")));
-				} else if (by instanceof By.ByClassName || by instanceof AppiumBy.ByClassName) {
-					by = By.cssSelector("." + locatorValue);
-				}
-			} else if (
-					!isWebTest
-							&& "android".equalsIgnoreCase(SeleniumTestsContextManager.getThreadContext().getPlatform())
-							&& (by instanceof By.ById || by instanceof AppiumBy.ById || by instanceof AppiumBy.ByAccessibilityId)
-							&& !by.toString().split(":", 2)[1].contains(":")
-			) {
-				WebDriver drv = ((CustomEventFiringWebDriver)getDriver()).getOriginalDriver();
-				String packageName = ((AndroidDriver)drv).getCurrentPackage();
-				by = By.id(packageName + ":id/" + by.toString().split(":", 2)[1].trim());
-			}
-		 }
+		boolean isWebTest = ((CustomEventFiringWebDriver)getDriver()).isWebTest();
+		String platform = SeleniumTestsContextManager.getThreadContext().getPlatform();
+		boolean isAppTest = SeleniumTestsContextManager.isMobileAppTest();
+		String packageName = null;
+		try {
+			WebDriver drv = ((CustomEventFiringWebDriver)getDriver()).getOriginalDriver();
+			packageName = ((AndroidDriver)drv).getCurrentPackage();
+		} catch (Exception e) {}
+
+    	new ShadowDomRootUpdater().update(this);
+    	new MobileWebViewUpdater(isWebTest, isAppTest).update(this);
+		new MobileAndroidAppUpdater(platform, packageName, isWebTest, isAppTest).update(this);
+
     }
         
     /**
@@ -1009,9 +959,9 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	}
 	
 	/**
-	 * Move to element
+	 * Scroll to element
 	 * 
-	 * @param element
+	 * @param yOffset
 	 */	
 	public void scrollToElement(int yOffset) {
 		findElement();
@@ -1175,14 +1125,6 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 		return getRealElementNoSearch().getSize().getHeight();
     }
 
-    /**
-     * Returns the label used during initialization.
-     *
-     * @return
-     */
-    public String getLabel() {
-        return label;
-    }
 
     /**
      * Gets the Point location of the underlying WebElement.
@@ -1372,7 +1314,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	 * Whether or not the indicated text is contained in the element's getText()
 	 * attribute.
      *
-     * @param   text
+     * @param   pattern
      *
      * @return
      */
@@ -1699,7 +1641,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     		setImplicitWaitTimeout(SeleniumTestsContextManager.getThreadContext().getImplicitWaitTimeout());
     	}
     }
-    
+
     public void waitFor(int timeout, ExpectedCondition<?> condition) {
     	
 		// refresh driver
@@ -1840,10 +1782,6 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 		this.elementIndex = elementIndex;
 	}
 
-	public String getOrigin() {
-		return origin;
-	}
-
 	public boolean isScrollToElementBeforeAction() {
 		return scrollToElementBeforeAction;
 	}
@@ -1852,5 +1790,13 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 		this.scrollToElementBeforeAction = scrollToElementBeforeAction;
 	}
 
-
+	@Override
+	public String getName() {
+		String name = super.getName();
+		if (name != null) {
+			return name;
+		} else {
+			return getBy().toString();
+		}
+	}
 }

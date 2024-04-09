@@ -34,10 +34,6 @@ public class AngularMaterialSelect extends AngularSelect implements ISelectList 
 		selectedOptionAttributeValue = "true";
 		deselectedOptionAttributeValue = "false";
 	}
-	
-	public static String getUiLibrary() {
-		return "AngularMaterial";
-	}
 
 	@Override
 	public boolean isApplicable() {

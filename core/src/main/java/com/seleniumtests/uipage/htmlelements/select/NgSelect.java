@@ -27,10 +27,6 @@ public class NgSelect extends AngularSelect implements ISelectList {
 		deselectedOptionAttributeValue = "false";
 	}
 
-	public static String getUiLibrary() {
-		return "Angular";
-	}
-
 	@Override
 	public boolean isApplicable() {
 		return "ng-select".equalsIgnoreCase(parentElement.getTagName());

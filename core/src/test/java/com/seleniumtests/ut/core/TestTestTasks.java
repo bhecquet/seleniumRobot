@@ -324,6 +324,87 @@ public class TestTestTasks extends MockitoTest {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
 		}
 	}
+
+	@Test(groups= {"ut"})
+	public void testDeleteVariableWithoutServer(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		try {
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "false");
+			initThreadContext(testNGCtx);
+			TestTasks.deleteParam("key");
+		} finally {
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+		}
+	}
+
+	@Test(groups= {"ut"})
+	public void testDeleteVariable(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+		try (MockedConstruction mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+			when(variableServer.isAlive()).thenReturn(true);
+		})) {
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			initThreadContext(testNGCtx, "myTest", testResult);
+			SeleniumTestsContextManager.getThreadContext().getConfiguration().put("key", new TestVariable(1, "key", "value", true, "key", 1, null));
+			TestTasks.deleteParam("key");
+
+			// check upsert has been called
+			verify((SeleniumRobotVariableServerConnector)mockedVariableServer.constructed().get(0)).deleteVariable(new TestVariable(1, "key", "value", true, "key", 1, null));
+			Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("key"));
+		} finally {
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+		}
+	}
+
+	/**
+	 * If variable has no id, do not try to delete it from server
+	 * @param testNGCtx
+	 * @param xmlTest
+	 * @throws Exception
+	 */
+	@Test(groups= {"ut"})
+	public void testDeleteVariableNoId(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+		try (MockedConstruction mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+			when(variableServer.isAlive()).thenReturn(true);
+		})) {
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			initThreadContext(testNGCtx, "myTest", testResult);
+			SeleniumTestsContextManager.getThreadContext().getConfiguration().put("key", new TestVariable(null, "key", "value", true, "key", 1, null));
+			TestTasks.deleteParam("key");
+
+			// check upsert has been called
+			verify((SeleniumRobotVariableServerConnector)mockedVariableServer.constructed().get(0), never()).deleteVariable(new TestVariable(1, "key", "value", true, "key", 1, null));
+			Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("key"));
+		} finally {
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+		}
+	}
+
+	@Test(groups= {"ut"})
+	public void testDeleteVariableNotPresent(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+		try (MockedConstruction mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+			when(variableServer.isAlive()).thenReturn(true);
+		})) {
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			initThreadContext(testNGCtx, "myTest", testResult);
+			TestTasks.deleteParam("key");
+
+			// check upsert has been called
+			verify((SeleniumRobotVariableServerConnector)mockedVariableServer.constructed().get(0), never()).deleteVariable(new TestVariable(1, "key", "value", true, "key", 1, null));
+		} finally {
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+		}
+	}
 	
 	@Test(groups= {"ut"})
 	public void testKillProcessLocal(final ITestContext testNGCtx) {

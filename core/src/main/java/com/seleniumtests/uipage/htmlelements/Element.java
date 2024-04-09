@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.uipage.htmlelements;
 
+import org.mockito.internal.matchers.Null;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.decorators.Decorated;
 
@@ -31,6 +32,7 @@ import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.PerformsTouchActions;
 import io.appium.java_client.TouchAction;
 
+
 /**
  * parent class for all elements to share code between HtmlElement and non HtmlElement classes
  * @author s047432
@@ -40,7 +42,19 @@ public abstract class Element {
 
 
 	protected Integer replayTimeout = 30;
-	
+
+	protected ThreadLocal<String> fieldName = new ThreadLocal<>();
+
+	protected String label;
+
+
+	// origin is the class where object is declared
+	// origin may be null if object is created outside of any PageObject (which should never happen outside of unit tests)
+	protected String origin;
+
+	// the page instance that uses the object.
+	// will be different for each thread
+	// will be null if Element is not declared as a field of PageObject
 	protected ThreadLocal<PageObject> callingPage = new ThreadLocal<>();
 	
 	protected abstract void findElement(boolean waitForVisibility);
@@ -50,6 +64,11 @@ public abstract class Element {
 	public abstract void sendKeys(CharSequence ... text);
 	
 	public abstract boolean isElementPresent();
+
+	protected Element(String label) {
+		this.label = label;
+		origin = PageObject.getCallingPage(Thread.currentThread().getStackTrace());
+	}
 	
 	/**
 	 * Creates a TouchAction depending on mobile platform. Due to appium 6.0.0 changes
@@ -110,5 +129,53 @@ public abstract class Element {
 	
 	public PageObject getCallingPage() {
 		return callingPage.get();
+	}
+	public String getOrigin() {
+		return origin;
+	}
+
+	public void setOrigin(String origin) {
+		this.origin = origin;
+	}
+	public Class<? extends PageObject> getOriginClass() {
+		try {
+			return (Class<? extends PageObject>) Class.forName(origin);
+		} catch (ClassNotFoundException | NullPointerException e) {
+			return getCallingPage() == null ? null : getCallingPage().getClass();
+		}
+	}
+
+	public String getFieldName() {
+		return fieldName.get();
+	}
+
+	public void setFieldName(String fieldName) {
+		this.fieldName.set(fieldName);
+	}
+
+	/**
+	 * Returns the label used during initialization.
+	 * As this label is optional, it may be empty
+	 *
+	 * @return
+	 */
+	public String getLabel() {
+		return label;
+	}
+
+	/**
+	 * Get the element name
+	 * If label is present and not empty, use it
+	 * If label is not present and element is a class / instance field, use it
+	 * Else, use the selector
+	 * @return
+	 */
+	public String getName() {
+		if (label != null && !label.isEmpty()) {
+			return label;
+		} else if (fieldName.get() != null) {
+			return fieldName.get();
+		}
+		return null;
 	}
 }

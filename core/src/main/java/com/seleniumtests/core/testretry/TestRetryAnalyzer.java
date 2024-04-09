@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.core.testretry;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
 
@@ -29,11 +30,14 @@ public class TestRetryAnalyzer implements IRetryAnalyzer {
 	private static ScenarioLogger logger = ScenarioLogger.getScenarioLogger(TestRetryAnalyzer.class);
 
     private Integer count = 0;
-    private int maxCount = 2;
+    private int maxCount;
 
 
     public TestRetryAnalyzer() {
-    	maxCount = 2;
+
+        // #637: be sure that retry analyzer max count is correctly set
+        // in fact, testRestryAnalyzer is created when we call the "getRetryAnalyzer" method and uses the default contructor
+    	maxCount = SeleniumTestsContextManager.getThreadContext().getTestRetryCount();
     }
     
     public TestRetryAnalyzer(int maxRetryCount) {

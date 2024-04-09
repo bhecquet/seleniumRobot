@@ -617,44 +617,6 @@ public class TestTestStep extends GenericTest {
 		Assert.assertTrue(encodedMsg.getPwdToReplace().contains("myPassword"));
 	}
 
-	@Test(groups = { "ut" })
-	public void testTestActionEncodeXml() {
-		TestAction action = new TestAction("action2 \"'<>&", false, new ArrayList<>());
-		TestAction encodedAction = action.encode("xml");
-		Assert.assertEquals(encodedAction.toString(), "action2 &quot;&apos;&lt;&gt;&amp;");
-	}
-
-	@Test(groups = { "ut" })
-	public void testTestActionEncodeXmlFailedStatus() {
-		TestAction action = new TestAction("action2 \"'<>&", true, new ArrayList<>());
-		TestAction encodedAction = action.encode("xml");
-		Assert.assertTrue(encodedAction.getFailed());
-	}
-
-	@Test(groups = { "ut" })
-	public void testTestActionEncodeXmlPasswordKept() {
-		TestAction action = new TestAction("action2 \"'<>&", false, Arrays.asList("myPassword"));
-		TestAction encodedAction = action.encode("xml");
-		Assert.assertTrue(encodedAction.getPwdToReplace().contains("myPassword"));
-	}
-
-	@Test(groups = { "ut" })
-	public void testTestActionEncodeXmlExceptionKept() {
-		TestAction action = new TestAction("action2 \"'<>&", false, new ArrayList<>());
-		action.setActionException(new Throwable("foo"));
-		TestAction encodedAction = action.encode("xml");
-		Assert.assertNotNull(encodedAction.getActionException());
-		Assert.assertEquals(encodedAction.getActionExceptionMessage(), "class java.lang.Throwable: foo");
-	}
-	
-	@Test(groups = { "ut" })
-	public void testTestActionEncodeXmlWebDriverExceptionKept() {
-		TestAction action = new TestAction("action2 \"'<>&", false, new ArrayList<>());
-		action.setActionException(new NoSuchElementException("foo"));
-		TestAction encodedAction = action.encode("xml");
-		Assert.assertNotNull(encodedAction.getActionException());
-		Assert.assertEquals(encodedAction.getActionExceptionMessage(), "class org.openqa.selenium.NoSuchElementException: foo\n");
-	}
 
 	@Test(groups = { "ut" })
 	public void testTestValueEncodeXml() {
@@ -782,7 +744,7 @@ public class TestTestStep extends GenericTest {
 		JSONObject stepJson = step.toJson();
 
 		Assert.assertEquals(stepJson.getString("type"), "step");
-		Assert.assertEquals(stepJson.getString("exception"), "class org.openqa.selenium.WebDriverException");
+		Assert.assertEquals(stepJson.getString("exception"), "org.openqa.selenium.WebDriverException");
 		Assert.assertTrue(stepJson.getString("exceptionMessage").contains("class org.openqa.selenium.WebDriverException: KO"));
 		Assert.assertEquals(stepJson.getString("name"), "step1");
 		Assert.assertEquals(stepJson.getString("status"), "WARNING");

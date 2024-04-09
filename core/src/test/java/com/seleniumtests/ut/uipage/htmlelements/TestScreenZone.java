@@ -23,10 +23,14 @@ import static org.mockito.Mockito.*;
 import java.awt.AWTException;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.nio.file.Paths;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Rectangle;
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -256,5 +260,40 @@ public class TestScreenZone extends MockitoTest {
 	@AfterMethod(groups={"ut"}, alwaysRun=true)
 	public void reset(ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);
+	}
+
+
+	@Test(groups = { "ut" })
+	public void testGetNameWithLabel() {
+		ScreenZone el = new ScreenZone("myScreen", "tu/ffLogo1.png");
+		el.setFieldName("el");
+		Assert.assertEquals(el.getName(), "myScreen");
+	}
+	@Test(groups = { "ut" })
+	public void testGetNameWithEmptyLabel() {
+		ScreenZone el = new ScreenZone("", "tu/ffLogo1.png");
+		el.setFieldName("el");
+		Assert.assertEquals(el.getName(), "el");
+	}
+	@Test(groups = { "ut" })
+	public void testGetNameWithNullLabel() {
+		ScreenZone el = new ScreenZone(null, "tu/ffLogo1.png");
+		el.setFieldName("el");
+		Assert.assertEquals(el.getName(), "el");
+	}
+	@Test(groups = { "ut" })
+	public void testGetNameResourcePath() {
+		ScreenZone el = new ScreenZone(null, "tu/ffLogo1.png");
+		Assert.assertEquals(el.getName(), "tu/ffLogo1.png");
+	}
+	@Test(groups = { "ut" })
+	public void testGetNameFile() {
+		ScreenZone el = new ScreenZone(null, Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "images", "googleSearch.png").toFile());
+		Assert.assertEquals(el.getName(), "googleSearch.png");
+	}
+	@Test(groups = { "ut" })
+	public void testGetNameNoInfo() {
+		ScreenZone el = new ScreenZone();
+		Assert.assertEquals(el.getName(), "screen");
 	}
 }

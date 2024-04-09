@@ -79,8 +79,8 @@ public class TestBrowserInfo extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testEdgeVersion() {
 		if (SystemUtils.IS_OS_WINDOWS) {
-			BrowserInfo bInfo = new BrowserInfo(BrowserType.EDGE, "115.0", null);
-			Assert.assertEquals(bInfo.getDriverFileName(), "edgedriver_115.0_edge-115-116");
+			BrowserInfo bInfo = new BrowserInfo(BrowserType.EDGE, "122.0", null);
+			Assert.assertEquals(bInfo.getDriverFileName(), "edgedriver_122.0_edge-122-123");
 		}
 	}
 	

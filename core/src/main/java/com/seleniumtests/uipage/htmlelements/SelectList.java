@@ -49,34 +49,10 @@ import net.ricecode.similarity.StringSimilarityServiceImpl;
 public class SelectList extends HtmlElement {
 
 	private static List<Class<? extends ISelectList>> selectImplementations;
-	private static Map<String, Class<? extends ISelectList>> uiLibraries = Collections.synchronizedMap(new HashMap<>());
-	
-	// register all UiLibraries
+
 	static {
 		if (selectImplementations == null) {
     		selectImplementations = searchRelevantImplementation();
-    		
-    		// register UI library
-    		for (Class<? extends ISelectList> selectClass: selectImplementations) {
-    			try {
-					Method getUiLibraryMethod = selectClass.getDeclaredMethod("getUiLibrary");
-
-					String uiLibrary = (String) getUiLibraryMethod.invoke(null);
-					uiLibraries.put(uiLibrary, selectClass);
-					UiLibraryRegistry.register(uiLibrary);
-				
-    			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-    				throw new ConfigurationException(String.format("Error calling 'getUiLibrary' on %s: %s", selectClass.getCanonicalName(), e.getMessage()));
-    			} catch (ClassCastException e) {
-    				throw new ConfigurationException("Method 'getUiLibrary' must return an object of type String");
-				} catch (NoSuchMethodException e) {
-					throw new ConfigurationException(String.format("Class %s does not declare the static method 'public static String getUiLibrary(){return \"myLib\";}'", selectClass.getCanonicalName()));
-					
-				} catch (SecurityException e) {
-					// nothing to do
-				}
-    			
-    		}
     	}
 	}
 
@@ -84,7 +60,7 @@ public class SelectList extends HtmlElement {
 	protected ThreadLocal<List<WebElement>> options = new ThreadLocal<>();
 	private StringSimilarityService service = new StringSimilarityServiceImpl(new JaroWinklerStrategy());
 	private ThreadLocal<ISelectList> selectImplementation = new ThreadLocal<>();
-	private List<Class<? extends ISelectList>> implementationList;
+
 	protected ThreadLocal<Boolean> multiple = new ThreadLocal<>();
 
 	/**
@@ -92,7 +68,7 @@ public class SelectList extends HtmlElement {
 	 * - a standard HTML element => locator should point to the "select" element itself
 	 * - a select list built with HTML lists (ul / li) => locator should point to <ul> element
 	 * - an angular materials select => locator should point to the <mat-select> element
-	 * @param text
+	 * @param label
 	 * @param by
 	 */
 	public SelectList(final String label, final By by) {
@@ -150,21 +126,6 @@ public class SelectList extends HtmlElement {
 		
 		return selectImplementations;
     }
-    
-    /**
-     * Reorder SelectList implementation depending on prefered libraries
-     * @param libraries
-     * @return
-     */
-    private List<Class<? extends ISelectList>> orderImplementations(List<String> libraries) {
-    	List<Class<? extends ISelectList>> reorderedSelectImplementations = new ArrayList<>(selectImplementations);
-    	for (String uiLibrary: libraries) {
-    		if (uiLibraries.containsKey(uiLibrary) && reorderedSelectImplementations.remove(uiLibraries.get(uiLibrary))) {
-    			reorderedSelectImplementations.add(0, uiLibraries.get(uiLibrary));
-    		}
-    	}
-    	return reorderedSelectImplementations;
-    }
 
     @Override
     protected void findElement() {
@@ -173,11 +134,9 @@ public class SelectList extends HtmlElement {
     	setSelectImplementation(new StubSelect());
     	
         super.findElement(true);
-        
-        // if we have a prefered implementation, use it
+
         // search the right select list handler
-        implementationList = orderImplementations(getPreferedUiLibraries());
-        for (Class<? extends ISelectList> selectClass: implementationList) {
+        for (Class<? extends ISelectList> selectClass: selectImplementations) {
         	try {
 				ISelectList selectInstance = selectClass.getConstructor(WebElement.class, FrameElement.class).newInstance(getRealElementNoSearch(), frameElement);
 				if (selectInstance.isApplicable()) {
@@ -565,9 +524,4 @@ public class SelectList extends HtmlElement {
 	public void setSelectImplementation(ISelectList selectImplementation) {
 		this.selectImplementation.set(selectImplementation);
 	}
-
-	public List<Class<? extends ISelectList>> getImplementationList() {
-		return implementationList;
-	}
-    
 }

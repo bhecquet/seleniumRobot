@@ -78,6 +78,7 @@ import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.video.VideoCaptureMode;
+import org.testng.internal.thread.ThreadUtil;
 
 /**
  * Defines TestNG context used in STF.
@@ -288,6 +289,8 @@ public class SeleniumTestsContext {
     private SeleniumRobotServerContext seleniumRobotServerContext;
     private TestStepManager testStepManager; // handles logging of test steps in this context
     private boolean driverCreationBlocked = false;		// if true, inside this thread, driver creation will be forbidden
+
+    private String threadId;
     
     // folder config
  	private Map<String, HashMap<String,String>> idMapping;
@@ -301,6 +304,7 @@ public class SeleniumTestsContext {
     	bugtrackerInstance = null;
     	testManagerContext = null;
     	testStepManager = new TestStepManager();
+        threadId = ThreadUtil.currentThreadInfo();
     }
     
     /**
@@ -340,6 +344,8 @@ public class SeleniumTestsContext {
     	testStepManager = new TestStepManager(toCopy.testStepManager);
     	
     	initSubContexts();
+
+        threadId = ThreadUtil.currentThreadInfo();
     }
     
     private void initSubContexts() {

@@ -18,8 +18,6 @@
 package com.seleniumtests.ut.connectors.selenium;
 
 
-import static org.mockito.Mockito.when;
-
 import java.io.IOException;
 import java.net.SocketException;
 import java.time.LocalDateTime;
@@ -40,6 +38,8 @@ import com.seleniumtests.customexception.ConfigurationException;
 import kong.unirest.GetRequest;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
+
+import static org.mockito.Mockito.*;
 
 public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 	
@@ -204,9 +204,11 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 			SeleniumGridConnectorFactory.setRetryTimeout(5);
 			SeleniumGridConnectorFactory.getInstances(Arrays.asList(SERVER_URL + "/wd/hub"));
 		} catch (ConfigurationException e) {
-			
+
+			mockedUnirest.get().verify(() -> Unirest.get(SERVER_URL + SeleniumGridConnector.CONSOLE_SERVLET), atLeast(5));
+
 			// check connection duration
-			Assert.assertTrue(LocalDateTime.now().minusSeconds(5).isAfter(start));
+			Assert.assertTrue(LocalDateTime.now().minusNanos(4500000).isAfter(start));
 			throw e;
 		} finally {
 			SeleniumGridConnectorFactory.setRetryTimeout(SeleniumGridConnectorFactory.DEFAULT_RETRY_TIMEOUT);

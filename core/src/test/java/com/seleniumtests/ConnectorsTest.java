@@ -117,7 +117,8 @@ public class ConnectorsTest extends MockitoTest {
 	protected HttpRequestWithBody createVariableRequest;
 	protected HttpRequestWithBody updateVariableRequest;
 	protected HttpRequestWithBody updateVariableRequest2;
-	
+	protected HttpRequestWithBody deleteVariableRequest;
+
 	// to call with "String.format(GRID_STATUS_WITH_SESSION, sessionId)"
 	protected static final String GRID_STATUS_WITH_SESSION = "{"
 			+ "  \"value\": {"
@@ -325,6 +326,18 @@ public class ConnectorsTest extends MockitoTest {
 	public HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, Object replyData, String responseType) throws UnirestException {
 		return createServerMock(serverUrl, requestType, apiPath, statusCode, Arrays.asList(replyData), responseType);
 	}
+
+	/**
+	 *
+	 * @param serverUrl			URL of the mock server
+	 * @param requestType		GET, POST, HEAD, ...
+	 * @param apiPath			the endpoint on the mock server (ex: /api/foo/bar)
+	 * @param statusCode		the status code to return: 200, 500, ...
+	 * @param replyData			the list of response data. In case service is called more times than the number of provided responses, the last one will be repeated
+	 * @param responseType		"request", "requestBodyEntity", "body". if "request", replies with the POST request object (HttpRequestWithBody.class). If "body", replies with the body (MultipartBody.class)
+	 * @return
+	 * @throws UnirestException
+	 */
 	public HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, final List<Object> replyData, String responseType) throws UnirestException {
 
 
@@ -743,7 +756,8 @@ public class ConnectorsTest extends MockitoTest {
 		createVariableRequest = (HttpRequestWithBody) createServerMock(serverUrl, "POST", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, "{'id': 13, 'name': 'custom.test.variable.key', 'value': 'value', 'reservable': false}");
 		updateVariableRequest = (HttpRequestWithBody) createServerMock(serverUrl, "PATCH", String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 12), 200, "{'id': 12, 'name': 'custom.test.variable.key', 'value': 'value', 'reservable': false}");
 		updateVariableRequest2 = (HttpRequestWithBody) createServerMock(serverUrl, "PATCH", String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 2), 200, "{}");
-		variablesRequest = (GetRequest) createServerMock(serverUrl, "GET", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, "[{'id': 1, 'name': 'key1', 'value': 'value1', 'reservable': false}, {'id': 2, 'name': 'key2', 'value': 'value2', 'reservable': true}]");	
+		variablesRequest = (GetRequest) createServerMock(serverUrl, "GET", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, "[{'id': 1, 'name': 'key1', 'value': 'value1', 'reservable': false}, {'id': 2, 'name': 'key2', 'value': 'value2', 'reservable': true}]");
+		deleteVariableRequest = (HttpRequestWithBody) createServerMock(serverUrl, "DELETE", String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 1), 200, "");
 
 	}
 }

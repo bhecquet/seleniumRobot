@@ -123,7 +123,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		BrowserType browser = SeleniumTestsContextManager.getGlobalContext().getBrowser();
 		browser = browser == null ? BrowserType.NONE : browser;
 
-		return createSession(sessionName, browser.toString());
+		return createSession(sessionName, browser.toString(), null);
 	}
 
 	/**
@@ -132,7 +132,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	 * @param browserOrApp		name of the browser or application that is run
 	 * @return
 	 */
-	public Integer createSession(String sessionName, String browserOrApp) {
+	public Integer createSession(String sessionName, String browserOrApp, String startedBy) {
 		if (!active) {
 			return null;
 		}
@@ -151,8 +151,8 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 
 		try {
 			sessionUUID = UUID.randomUUID().toString(); // for uniqueness of the session
-			
-			JSONObject sessionJson = getJSonResponse(buildPostRequest(url + SESSION_API_URL)
+
+			MultipartBody request = buildPostRequest(url + SESSION_API_URL)
 					.field("sessionId", sessionUUID)
 					.field("date", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME))
 					.field("browser", strippedBrowserName)
@@ -161,13 +161,19 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field(FIELD_NAME, strippedSessionName)
 					.field("compareSnapshot", String.valueOf(SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshot()))
 					.field("compareSnapshotBehaviour", SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshotBehaviour().toString())
-					.field("ttl", String.format("%d days", SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshotTtl()))); // format is 'x days' as this is the way Django expect a duration in days
+					.field("ttl", String.format("%d days", SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshotTtl()));
+
+			if (startedBy != null) {
+				request.field("startedBy", startedBy);
+			}
+
+			JSONObject sessionJson = getJSonResponse(request); // format is 'x days' as this is the way Django expect a duration in days
 			return sessionJson.getInt("id");
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 			throw new SeleniumRobotServerException("cannot create session", e);
 		}
 	}
-	
+
 	/**
 	 * Create link between test case and session
 	 * @param sessionId		the sessionId which should have been created before

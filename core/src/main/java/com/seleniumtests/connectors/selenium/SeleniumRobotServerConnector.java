@@ -307,6 +307,14 @@ public abstract class SeleniumRobotServerConnector {
 			return Unirest.patch(url);
 		}
 	}
+
+	protected HttpRequestWithBody buildDeleteRequest(String url) {
+		if (authToken != null) {
+			return Unirest.delete(url).header(AUTHORIZATION_HEADER, authToken);
+		} else {
+			return Unirest.delete(url);
+		}
+	}
 	
 	protected JSONObject getJSonResponse(HttpRequest<?> request) {
 

@@ -42,10 +42,10 @@
             </table>
         #else
             #set ($actionException = $action.getActionExceptionMessage())
-            #if ($action.getFailed() && $actionException)
+            #if ($action.getFailed())
                 <li class="header-failed">
                     <div class="message-conf">
-                        <span class="stepTimestamp mr-1">$timestamp</span> $action.getName() $action.getActionExceptionMessage()
+                        <span class="stepTimestamp mr-1">$timestamp</span> $action.getName()
                     </div>
                 </li>
             #else

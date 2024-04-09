@@ -17,8 +17,6 @@
  */
 package com.seleniumtests.ut.browserfactory.mobile;
 
-import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -45,6 +43,8 @@ import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.osutility.OSCommand;
+
+import static org.mockito.Mockito.*;
 
 public class TestMobileDeviceSelector extends MockitoTest {
 	
@@ -254,6 +254,50 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		UiAutomator2Options updatedCaps = new UiAutomator2Options(deviceSelector.updateCapabilitiesWithSelectedDevice(new MutableCapabilities(requestedCaps), DriverMode.LOCAL));
 		Assert.assertEquals(updatedCaps.getChromedriverExecutable().orElse(null), "chromedriver.exe");
 		
+	}
+
+	/**
+	 * Check that chrome driver is set even if we test an application, to be able to access webview
+	 */
+	@Test(groups={"ut"})
+	public void testCapabilitiesUpdateWithDriverInAppTest() {
+		// available devices
+		List<MobileDevice> deviceList = new ArrayList<>();
+		BrowserInfo chromeInfo = new BrowserInfo(BrowserType.CHROME, "47.0", null);
+		chromeInfo.setDriverFileName("chromedriver.exe");
+		deviceList.add(new MobileDevice("nexus 5", "1234", "android", "5.0", Arrays.asList(chromeInfo)));
+		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
+
+		MutableCapabilities requestedCaps = new UiAutomator2Options();
+		((UiAutomator2Options)requestedCaps).setDeviceName("Nexus 5").setApp("myApp.apk");
+
+		deviceSelector.setAndroidReady(true);
+		deviceSelector.setIosReady(false);
+
+		UiAutomator2Options updatedCaps = new UiAutomator2Options(deviceSelector.updateCapabilitiesWithSelectedDevice(new MutableCapabilities(requestedCaps), DriverMode.LOCAL));
+		Assert.assertEquals(updatedCaps.getChromedriverExecutable().orElse(null), "chromedriver.exe");
+	}
+
+	/**
+	 * Test the case where no driver is available for the embedded chrome
+	 */
+	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Chrome version 47 does not have any associated driver, update seleniumRobot version")
+	public void testCapabilitiesUpdateWithDriverInAppTestNoDriver() {
+		// available devices
+		List<MobileDevice> deviceList = new ArrayList<>();
+		BrowserInfo chromeInfo = spy(new BrowserInfo(BrowserType.CHROME, "47.0", null));
+
+		deviceList.add(new MobileDevice("nexus 5", "1234", "android", "5.0", Arrays.asList(chromeInfo)));
+		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
+		doThrow(new ConfigurationException("Chrome version 47 does not have any associated driver, update seleniumRobot version")).when(chromeInfo).getDriverFileName();
+
+		MutableCapabilities requestedCaps = new UiAutomator2Options();
+		((UiAutomator2Options)requestedCaps).setDeviceName("Nexus 5").setApp("myApp.apk");
+
+		deviceSelector.setAndroidReady(true);
+		deviceSelector.setIosReady(false);
+
+		deviceSelector.updateCapabilitiesWithSelectedDevice(new MutableCapabilities(requestedCaps), DriverMode.LOCAL);
 	}
 	
 	/**
