@@ -1,17 +1,20 @@
 package com.seleniumtests.uipage.htmlelements.select;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.seleniumtests.uipage.htmlelements.CachedHtmlElement;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 import com.seleniumtests.uipage.ByC;
 import com.seleniumtests.uipage.htmlelements.FrameElement;
 
 public class SalesforceLigntningSelect extends AngularSelect implements ISelectList {
-	
+
 	
 	// for SPI
 	public SalesforceLigntningSelect() {
@@ -80,11 +83,8 @@ public class SalesforceLigntningSelect extends AngularSelect implements ISelectL
 	@Override
 	public String getOptionText(WebElement option) {
 		try {
-			try {
-				return option.findElements(ByC.xTagName("span")).get(1).findElement(ByC.xTagName("span")).getAttribute("title");
-			} catch (NoSuchElementException e) {
-				return option.findElements(ByC.xTagName("span")).get(2).findElement(ByC.xTagName("span")).getAttribute("title");
-			}
+			return option.findElement(By.xpath(".//span[@title]")).getAttribute("title");
+
 		} catch (NoSuchElementException e) {
 			// sometimes, the span sub-element is not present, so the above line fails. Fall back to getText() method
 			return option.getText();
@@ -117,6 +117,22 @@ public class SalesforceLigntningSelect extends AngularSelect implements ISelectL
 	public void selectByValue(String value) {
 		throw new UnsupportedOperationException("Cannot select by value for LWC select");
 	}
+
+	/**
+	 * Try the quick track where we search option directly
+	 * If this does not work, fall back to slower behaviour where all options are read
+	 * This will at least help to have a nice error message
+	 * @param text
+	 */
+	/*@Override
+	public void selectByText(String text) {
+		try {
+			WebElement option = parentElement.findElement(By.xpath(String.format(".//*[@title='%s']", text)));
+			setSelected(option);
+		} catch (WebDriverException e) {
+			super.selectByText(text);
+		}
+	}*/
 	
 	@Override
 	public void deselectByIndex(Integer index) {
