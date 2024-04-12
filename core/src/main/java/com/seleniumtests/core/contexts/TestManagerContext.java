@@ -43,6 +43,10 @@ public class TestManagerContext {
 	public void setTestId(Integer id) {
 		context.getConfiguration().put(TestManager.TMS_TEST_ID, new TestVariable(TestManager.TMS_TEST_ID, id.toString()));
 	}
+
+	public void setDatasetId(Integer id) {
+		context.getConfiguration().put(TestManager.TMS_DATASET_ID, new TestVariable(TestManager.TMS_DATASET_ID, id.toString()));
+	}
 	
 	public void setCampaignName(String name) {
 		if (context.getTestManagerInstance() instanceof SquashTMConnector) {

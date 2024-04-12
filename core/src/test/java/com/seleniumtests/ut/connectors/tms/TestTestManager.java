@@ -98,4 +98,38 @@ public class TestTestManager extends GenericTest {
 		TestManager manager = TestManager.getInstance(new JSONObject(config));
 		Assert.assertNull(manager.getTestCaseId(tr));
 	}
+
+	@Test(groups={"ut"})
+	public void testDatasetIdFromContext() {
+		ITestResult tr = Reporter.getCurrentTestResult();
+		SeleniumTestsContextManager.getThreadContext().testManager().setDatasetId(23);
+		TestNGResultUtils.setSeleniumRobotTestContext(tr, SeleniumTestsContextManager.getThreadContext());
+		String config = "{'tmsType': 'squash'}";
+		TestManager manager = TestManager.getInstance(new JSONObject(config));
+		Assert.assertEquals(manager.getDatasetId(tr), (Integer)23);
+	}
+
+	@Test(groups={"ut"}, attributes = {@CustomAttribute(name = "testId", values = "12"), @CustomAttribute(name = "datasetId", values = "13")})
+	public void testDatasetId() {
+		ITestResult tr = Reporter.getCurrentTestResult();
+		String config = "{'tmsType': 'squash'}";
+		TestManager manager = TestManager.getInstance(new JSONObject(config));
+		Assert.assertEquals(manager.getDatasetId(tr), (Integer)13);
+	}
+
+	@Test(groups={"ut"}, attributes = {@CustomAttribute(name = "testId", values = "12"), @CustomAttribute(name = "datasetId", values = "foo")})
+	public void testDatasetIdWrongFormat() {
+		ITestResult tr = Reporter.getCurrentTestResult();
+		String config = "{'tmsType': 'squash'}";
+		TestManager manager = TestManager.getInstance(new JSONObject(config));
+		Assert.assertNull(manager.getDatasetId(tr));
+	}
+
+	@Test(groups={"ut"})
+	public void testDatasetIdNotDefined() {
+		ITestResult tr = Reporter.getCurrentTestResult();
+		String config = "{'tmsType': 'squash'}";
+		TestManager manager = TestManager.getInstance(new JSONObject(config));
+		Assert.assertNull(manager.getDatasetId(tr));
+	}
 }

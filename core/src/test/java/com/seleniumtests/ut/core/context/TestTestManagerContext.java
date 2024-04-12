@@ -93,6 +93,12 @@ public class TestTestManagerContext extends ConnectorsTest {
 		SeleniumTestsContextManager.getThreadContext().testManager().setTestId(1);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get(TestManager.TMS_TEST_ID).getValue(), "1");
 	}
+	@Test(groups="ut context")
+	public void testTmsDatasetId(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().testManager().setDatasetId(10);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get(TestManager.TMS_DATASET_ID).getValue(), "10");
+	}
 	@Test(groups="ut", expectedExceptions = UnsupportedOperationException.class)
 	public void testTmsSquashCampaignNullTms(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);

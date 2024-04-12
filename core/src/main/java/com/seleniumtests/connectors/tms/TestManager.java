@@ -44,7 +44,8 @@ public abstract class TestManager {
 	
     // variable that may be defined dynamically
     public static final String TMS_TEST_ID = "tms.testId";					// name of the variable that identifies the id of the test in TMS
-	
+    public static final String TMS_DATASET_ID = "tms.datasetId";					// name of the variable that identifies the id of the dataset in TMS
+
 	protected boolean initialized;
 	
 	protected TestManager() {
@@ -68,7 +69,8 @@ public abstract class TestManager {
 	 
     /**
      * Returns the ID of the test case for this test result or null if it's not defined
-     * It assumes that test method has been annotated with 'testId' custom attribute {@code @Test(attributes = {@CustomAttribute(name = "testId", values = "12")})} 
+     * It assumes that test method has been annotated with 'testId' custom attribute {@code @Test(attributes = {@CustomAttribute(name = "testId", values = "12")})}
+	 * or that testId has been set inside test
      */
     public Integer getTestCaseId(ITestResult testNGResult) {
     	
@@ -90,6 +92,33 @@ public abstract class TestManager {
     	}
     	return null;
     	
+    }
+
+	/**
+	 * Returns the ID of the dataset for this test result or null if it's not defined
+	 * It assumes that test method has been annotated with 'datasetId' custom attribute {@code @Test(attributes = {@CustomAttribute(name = "datasetId", values = "12")})}
+	 * or that datasetId has been set inside test
+	 */
+	public Integer getDatasetId(ITestResult testNGResult) {
+
+    	TestVariable datasetIdVariable = TestNGResultUtils.getSeleniumRobotTestContext(testNGResult) != null ? TestNGResultUtils.getSeleniumRobotTestContext(testNGResult).getConfiguration().get(TMS_DATASET_ID): null;
+
+    	// priority given to variables
+    	if (datasetIdVariable != null) {
+    		return Integer.parseInt(datasetIdVariable.getValue());
+    	}
+
+    	for (CustomAttribute customAttribute: testNGResult.getMethod().getAttributes()) {
+    		if ("datasetId".equals(customAttribute.name()) && customAttribute.values().length > 0) {
+    			try {
+    				return Integer.parseInt(customAttribute.values()[0]);
+    			} catch (NumberFormatException e) {
+    				logger.error(String.format("Could not parse %s as int for getting datasetId of test method %s", customAttribute.values()[0], testNGResult.getMethod().getMethodName()));
+    			}
+    		}
+    	}
+    	return null;
+
     }
 	
 	public static TestManager getInstance(JSONObject configString) {

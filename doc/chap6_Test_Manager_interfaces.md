@@ -126,6 +126,48 @@ So, to provide a test id for each dataset, configure this way
 
 This is equivalent of setting a variable `tms.testId`
 
+#### Test case with dataset ####
+
+Some test cases define a dataset. In order to attach the result to the right test case / dataset couple, set the dataset as well
+Be sure the dataset belongs to the test case
+
+To find the dataset id, 2 methods
+- through API, go to `https://<squash_server>/squash/api/rest/latest/test-cases/<test_case_id>` and look at `datasets` key
+- through UI, display test case details > datasets, then, in the table, with F12, inspect the name. In the DOM, look for an attribute `data-test-row-id`
+
+e.g
+```html
+<div _ngcontent-swn-c90="" class="full-height full-width grid-row ng-star-inserted" data-test-row-id="363418" data-test-dnd-container="false">
+```
+
+##### Configure through annotation #####
+
+In most case, Test id can be configured as a parameter of @Test annotation
+
+```java
+@Test(attributes = {@CustomAttribute(name = "testId", values = "12")}, @CustomAttribute(name = "datasetId", values = "13"))
+public void testMyFeature() {
+	...
+}
+```
+
+##### Configure through context #####
+
+In case of DataProvider, this is not possible to use the annotation, as testId would be the same for all datasets.
+So, to provide a test id for each dataset, configure this way
+
+```
+@Test(groups={"ut"})
+    public void testTestCaseIdFromContext() {
+        robotConfig().testManager().setTestId(23);
+        robotConfig().testManager().setDatasetId(13);
+        ...
+        
+    }
+```
+
+This is equivalent of setting a variable `tms.datasetId`
+
 #### Configure campaign name, campaign folder and iteration ####
 
 By default, a campaign "Selenium <context name>" and an iteration "<application version>" are used to record test results in squash

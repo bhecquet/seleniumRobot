@@ -17,8 +17,8 @@ public class Iteration extends Entity {
 		super(url, id, name);
 	}
 	
-	public IterationTestPlanItem addTestCase(TestCase testCase) {
-		return IterationTestPlanItem.create(this, testCase);
+	public IterationTestPlanItem addTestCase(TestCase testCase, Dataset dataset) {
+		return IterationTestPlanItem.create(this, testCase, dataset);
 	}
 	
 	public List<IterationTestPlanItem> getAllTestCases() {

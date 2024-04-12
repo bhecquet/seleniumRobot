@@ -112,6 +112,7 @@ public class SquashTMConnector extends TestManager {
 				logger.warn("Results won't be recorded, no testId configured for " + TestNGResultUtils.getTestName(testResult));
 				return;
 			}
+			Integer datasetId = getDatasetId(testResult);
 	
 			// campaign
 			String campaignName;
@@ -145,7 +146,7 @@ public class SquashTMConnector extends TestManager {
 				iterationCache.put(iterationName, iteration);
 			}
 			
-			IterationTestPlanItem tpi = sapi.addTestCaseInIteration(iteration, testId);
+			IterationTestPlanItem tpi = sapi.addTestCaseInIteration(iteration, testId, datasetId);
 			
 			
 			if (testResult.isSuccess()) {

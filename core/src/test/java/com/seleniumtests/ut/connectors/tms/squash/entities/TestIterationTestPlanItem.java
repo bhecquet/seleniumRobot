@@ -3,17 +3,12 @@ package com.seleniumtests.ut.connectors.tms.squash.entities;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.seleniumtests.connectors.tms.squash.entities.*;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.ConnectorsTest;
-import com.seleniumtests.connectors.tms.squash.entities.Campaign;
-import com.seleniumtests.connectors.tms.squash.entities.Iteration;
-import com.seleniumtests.connectors.tms.squash.entities.IterationTestPlanItem;
-import com.seleniumtests.connectors.tms.squash.entities.Project;
-import com.seleniumtests.connectors.tms.squash.entities.TestCase;
-import com.seleniumtests.connectors.tms.squash.entities.TestPlanItemExecution;
 import com.seleniumtests.customexception.ScenarioException;
 
 import kong.unirest.HttpRequestWithBody;
@@ -34,7 +29,7 @@ public class TestIterationTestPlanItem extends ConnectorsTest {
 	@Test(groups={"ut"})
 	public void testAsJson() {
 		TestCase testCase = new TestCase(3, "http://localhost:8080/api/rest/latest/test-cases/3");
-		IterationTestPlanItem itpi = new IterationTestPlanItem("http://localhost:8080/api/rest/latest/iteration-test-plan-items/6", 6, testCase);
+		IterationTestPlanItem itpi = new IterationTestPlanItem("http://localhost:8080/api/rest/latest/iteration-test-plan-items/6", 6, testCase, null);
 		
 		JSONObject json = itpi.asJson();
 		Assert.assertEquals(json.getInt("id"), 6);
@@ -100,7 +95,7 @@ public class TestIterationTestPlanItem extends ConnectorsTest {
 				"}", "request");
 		
 		TestCase testCase = new TestCase(3, "http://localhost:8080/api/rest/latest/test-cases/3");
-		IterationTestPlanItem itpi = new IterationTestPlanItem("http://localhost:8080/api/rest/latest/iteration-test-plan-items/1", 1, testCase);
+		IterationTestPlanItem itpi = new IterationTestPlanItem("http://localhost:8080/api/rest/latest/iteration-test-plan-items/1", 1, testCase, null);
 		
 		TestPlanItemExecution execution = itpi.createExecution();
 		Assert.assertEquals(execution.getId(), 22);
@@ -113,7 +108,7 @@ public class TestIterationTestPlanItem extends ConnectorsTest {
 		when(postRequest.asJson()).thenThrow(UnirestException.class);
 		
 		TestCase testCase = new TestCase(3, "http://localhost:8080/api/rest/latest/test-cases/3");
-		IterationTestPlanItem itpi = new IterationTestPlanItem("http://localhost:8080/api/rest/latest/iteration-test-plan-items/1", 1, testCase);
+		IterationTestPlanItem itpi = new IterationTestPlanItem("http://localhost:8080/api/rest/latest/iteration-test-plan-items/1", 1, testCase, null);
 		
 		itpi.createExecution();
 	}
@@ -141,6 +136,44 @@ public class TestIterationTestPlanItem extends ConnectorsTest {
 		IterationTestPlanItem iteration = IterationTestPlanItem.fromJson(json);
 		Assert.assertEquals(iteration.getId(), 6);
 		Assert.assertEquals(iteration.getTestCase().getId(), 25);
+		Assert.assertNull(iteration.getDataset());
+		Assert.assertEquals(iteration.getUrl(), "http://localhost:8080/api/rest/latest/iteration-test-plan-items/6");
+	}
+
+	@Test(groups={"ut"})
+	public void testFromJsonWithDataset() {
+
+		JSONObject json = new JSONObject();
+		json.put("_type", "iteration-test-plan-item");
+		json.put("id", 6);
+		json.put("name", "foo");
+		json.put("_links", new JSONObject("{\"self\" : {" +
+				"          \"href\" : \"http://localhost:8080/api/rest/latest/iteration-test-plan-items/6\"" +
+				"        }}"));
+		json.put("referenced_test_case", new JSONObject("{" +
+			"    \"_type\" : \"test-case\"," +
+			"    \"id\" : 25," +
+			"    \"_links\" : {" +
+			"      \"self\" : {" +
+			"        \"href\" : \"http://localhost:8080/api/rest/latest/test-cases/25\"" +
+			"      }" +
+			"    }" +
+			"  }"));
+		json.put("referenced_dataset", new JSONObject("{" +
+			"        \"_type\" : \"dataset\"," +
+			"        \"id\" : 12," +
+			"        \"name\" : \"Dataset 1\"," +
+			"        \"_links\" : {" +
+			"          \"self\" : {" +
+			"            \"href\" : \"http://localhost/api/rest/latest/datasets/12\"" +
+			"          }" +
+			"        }" +
+			"      }"));
+
+		IterationTestPlanItem iteration = IterationTestPlanItem.fromJson(json);
+		Assert.assertEquals(iteration.getId(), 6);
+		Assert.assertEquals(iteration.getTestCase().getId(), 25);
+		Assert.assertEquals(iteration.getDataset().getId(), 12);
 		Assert.assertEquals(iteration.getUrl(), "http://localhost:8080/api/rest/latest/iteration-test-plan-items/6");
 	}
 
@@ -235,9 +268,74 @@ public class TestIterationTestPlanItem extends ConnectorsTest {
 				"}", "request");
 		
 		Iteration iteration = new Iteration("http://localhost:8080/api/rest/latest/iterations/4", 4, "my_iteration");
-		IterationTestPlanItem itpi = IterationTestPlanItem.create(iteration, new TestCase(25, "http://localhost:8080/api/rest/latest/test-cases/25"));
+		IterationTestPlanItem itpi = IterationTestPlanItem.create(iteration, new TestCase(25, "http://localhost:8080/api/rest/latest/test-cases/25"), null);
 		
 		verify(postRequest).body(new JSONObject("{\"_type\":\"iteration-test-plan-item\",\"test_case\":{\"id\":25,\"_type\":\"test-case\"}}"));
+		Assert.assertEquals(itpi.getId(), 38);
+	}
+	@Test(groups={"ut"})
+	public void testCreateIterationTestPlanItemWithDataset() {
+		HttpRequestWithBody postRequest = (HttpRequestWithBody) createServerMock("POST", "/iterations/4/test-plan", 200, "{" +
+				"  \"_type\" : \"iteration-test-plan-item\"," +
+				"  \"id\" : 38," +
+				"  \"execution_status\" : \"READY\"," +
+				"  \"referenced_test_case\" : {" +
+				"    \"_type\" : \"test-case\"," +
+				"    \"id\" : 25," +
+				"    \"_links\" : {" +
+				"      \"self\" : {" +
+				"        \"href\" : \"http://localhost:8080/api/rest/latest/test-cases/25\"" +
+				"      }" +
+				"    }" +
+				"  }," +
+				"  \"referenced_dataset\" : {" +
+				"    \"_type\" : \"dataset\"," +
+				"    \"id\" : 24," +
+				"    \"_links\" : {" +
+				"      \"self\" : {" +
+				"        \"href\" : \"http://localhost:8080/api/rest/latest/datasets/24\"" +
+				"      }" +
+				"    }" +
+				"  }," +
+				"  \"last_executed_by\" : null," +
+				"  \"last_executed_on\" : null," +
+				"  \"assigned_to\" : \"User-1\"," +
+				"  \"executions\" : [ ]," +
+				"  \"iteration\" : {" +
+				"    \"_type\" : \"iteration\"," +
+				"    \"id\" : 4," +
+				"    \"_links\" : {" +
+				"      \"self\" : {" +
+				"        \"href\" : \"http://localhost:8080/api/rest/latest/iterations/4\"" +
+				"      }" +
+				"    }" +
+				"  }," +
+				"  \"_links\" : {" +
+				"    \"self\" : {" +
+				"      \"href\" : \"http://localhost:8080/api/rest/latest/iteration-test-plan-items/38\"" +
+				"    }," +
+				"    \"project\" : {" +
+				"      \"href\" : \"http://localhost:8080/api/rest/latest/projects/14\"" +
+				"    }," +
+				"    \"test-case\" : {" +
+				"      \"href\" : \"http://localhost:8080/api/rest/latest/test-cases/25\"" +
+				"    }," +
+				"    \"dataset\" : {" +
+				"      \"href\" : \"http://localhost:8080/api/rest/latest/datasets/3\"" +
+				"    }," +
+				"    \"iteration\" : {" +
+				"      \"href\" : \"http://localhost:8080/api/rest/latest/iterations/4\"" +
+				"    }," +
+				"    \"executions\" : {" +
+				"      \"href\" : \"http://localhost:8080/api/rest/latest/iteration-test-plan-items/38/executions\"" +
+				"    }" +
+				"  }" +
+				"}", "request");
+
+		Iteration iteration = new Iteration("http://localhost:8080/api/rest/latest/iterations/4", 4, "my_iteration");
+		IterationTestPlanItem itpi = IterationTestPlanItem.create(iteration, new TestCase(25, "http://localhost:8080/api/rest/latest/test-cases/25"), new Dataset("http://localhost:8080/api/rest/latest/test-cases/24", 24, "DS1"));
+
+		verify(postRequest).body(new JSONObject("{\"_type\":\"iteration-test-plan-item\",\"test_case\":{\"id\":25,\"_type\":\"test-case\"},\"dataset\":{\"id\":24,\"_type\":\"dataset\"}}"));
 		Assert.assertEquals(itpi.getId(), 38);
 	}
 	
@@ -247,7 +345,7 @@ public class TestIterationTestPlanItem extends ConnectorsTest {
 		when(postRequest.asJson()).thenThrow(UnirestException.class);
 		
 		Iteration iteration = new Iteration("http://localhost:8080/api/rest/latest/iterations/4", 4, "my_iteration");
-		 IterationTestPlanItem.create(iteration, new TestCase(25, "http://localhost:8080/api/rest/latest/test-cases/25"));
+		 IterationTestPlanItem.create(iteration, new TestCase(25, "http://localhost:8080/api/rest/latest/test-cases/25"), null);
 		
 	}
 }
