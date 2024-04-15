@@ -104,7 +104,7 @@ public abstract class TestManager {
     	TestVariable datasetIdVariable = TestNGResultUtils.getSeleniumRobotTestContext(testNGResult) != null ? TestNGResultUtils.getSeleniumRobotTestContext(testNGResult).getConfiguration().get(TMS_DATASET_ID): null;
 
     	// priority given to variables
-    	if (datasetIdVariable != null) {
+     	if (datasetIdVariable != null) {
     		return Integer.parseInt(datasetIdVariable.getValue());
     	}
 

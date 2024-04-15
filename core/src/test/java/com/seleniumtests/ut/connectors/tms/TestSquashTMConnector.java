@@ -679,6 +679,7 @@ public class TestSquashTMConnector extends MockitoTest {
 		when(testResult.getName()).thenReturn("MyTest");
 		when(testResult.getTestContext()).thenReturn(testContext);
 		when(testResult.getParameters()).thenReturn(new Object[] {});
+		when(testMethod.getAttributes()).thenReturn(new CustomAttribute[]{});
 		when(testResult.getAttribute("testContext")).thenReturn(SeleniumTestsContextManager.getThreadContext());
 		SeleniumTestsContextManager.getThreadContext().testManager().setTestId(23);
 		SeleniumTestsContextManager.getThreadContext().setTestManagerInstance(squash);
@@ -721,6 +722,7 @@ public class TestSquashTMConnector extends MockitoTest {
 		when(testResult.getTestContext()).thenReturn(testContext);
 		when(testResult.getParameters()).thenReturn(new Object[] {});
 		when(testResult.getAttribute("testContext")).thenReturn(SeleniumTestsContextManager.getThreadContext());
+		when(testMethod.getAttributes()).thenReturn(new CustomAttribute[]{});
 		SeleniumTestsContextManager.getThreadContext().testManager().setTestId(23);
 		SeleniumTestsContextManager.getThreadContext().setTestManagerInstance(squash);
 		SeleniumTestsContextManager.getThreadContext().testManager().setIterationName("My Iteration");
@@ -761,6 +763,7 @@ public class TestSquashTMConnector extends MockitoTest {
 		when(testResult.getTestContext()).thenReturn(testContext);
 		when(testResult.getParameters()).thenReturn(new Object[] {});
 		when(testResult.getAttribute("testContext")).thenReturn(SeleniumTestsContextManager.getThreadContext());
+		when(testMethod.getAttributes()).thenReturn(new CustomAttribute[]{});
 		SeleniumTestsContextManager.getThreadContext().testManager().setTestId(23);
 		SeleniumTestsContextManager.getThreadContext().setTestManagerInstance(squash);
 		SeleniumTestsContextManager.getThreadContext().testManager().setCampaignFolderPath("folder1/folder2");

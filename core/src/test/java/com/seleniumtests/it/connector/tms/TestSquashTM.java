@@ -65,7 +65,7 @@ public class TestSquashTM extends GenericTest {
 	 * - testId in @Test annotation
 	 * @param testContext
 	 */
-	@Test(groups="no-ti", enabled = true, attributes = {@CustomAttribute(name = "testId", values = "1024273"), @CustomAttribute(name = "datasetId", values = "363418")}, expectedExceptions = WebDriverException.class)
+	@Test(groups="no-ti", enabled = true, attributes = {@CustomAttribute(name = "testId", values = "941674")}, expectedExceptions = WebDriverException.class)
 	public void testRecordResult(ITestContext testContext) {
 		SquashTMConnector tm = new SquashTMConnector(server, user, password, project);
 		ITestResult testResult = Reporter.getCurrentTestResult();
