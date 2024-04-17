@@ -425,7 +425,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         String mouseOverScript;
         if ((driverConfig.getBrowserType() == BrowserType.FIREFOX && FirefoxDriverFactory.isMarionetteMode())
             	|| driverConfig.getBrowserType() == BrowserType.EDGE
-        		|| (driverConfig.getBrowserType() == BrowserType.CHROME)) {
+        		|| driverConfig.getBrowserType() == BrowserType.CHROME) {
         		mouseOverScript = "var event = new MouseEvent('mouseover', {view: window, bubbles: true, cancelable: true}) ; arguments[0].dispatchEvent(event);";
             } else {
 				waitAfterEvent = true;
@@ -440,7 +440,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         String clickScript = "";
         if ((driverConfig.getBrowserType() == BrowserType.FIREFOX && FirefoxDriverFactory.isMarionetteMode())
         		|| driverConfig.getBrowserType() == BrowserType.EDGE
-            	|| (driverConfig.getBrowserType() == BrowserType.CHROME)) {
+            	|| driverConfig.getBrowserType() == BrowserType.CHROME) {
         	clickScript = "var event = new MouseEvent('click', {view: window, bubbles: true, cancelable: true}) ;"
             			+ "arguments[0].dispatchEvent(event);";
         } else {
@@ -463,8 +463,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         String doubleClickScript;
         if ((driverConfig.getBrowserType() == BrowserType.FIREFOX && FirefoxDriverFactory.isMarionetteMode())
         		|| driverConfig.getBrowserType() == BrowserType.EDGE
-            	|| (driverConfig.getBrowserType() == BrowserType.CHROME 
-	        			&& driverConfig.getMajorBrowserVersion() >= 75)) {
+            	|| driverConfig.getBrowserType() == BrowserType.CHROME) {
         		doubleClickScript = "var event = new MouseEvent('dblclick', {view: window, bubbles: true, cancelable: true}) ;"
                 			+ "arguments[0].dispatchEvent(event);";
             } else {
