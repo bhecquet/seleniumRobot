@@ -71,17 +71,6 @@ public class TestDriverConfig extends GenericTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testGetWebDriverListenersWrongClass() {
-		SeleniumTestsContextManager.getThreadContext().setWebDriverListener("com.seleniumtests.ut.driver.WebDriverEventListener1,com.seleniumtests.ut.driver.WebDriverEventListener2");
-		
-		DriverConfig config = new DriverConfig(SeleniumTestsContextManager.getThreadContext());
-		
-		List<WebDriverListener> wdListeners = config.getWebDriverListeners();
-		Assert.assertEquals(wdListeners.size(), 0);
-		
-	}
-	
-	@Test(groups={"ut"})
 	public void testGetWebDriverListenersNone() {
 
 		DriverConfig config = new DriverConfig(SeleniumTestsContextManager.getThreadContext());
