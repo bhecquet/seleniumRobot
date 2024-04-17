@@ -39,7 +39,6 @@ import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.Proxy.ProxyType;
 import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.support.events.WebDriverEventListener;
 import org.openqa.selenium.support.events.WebDriverListener;
 import org.testng.IReporter;
 import org.testng.ITestContext;
@@ -2137,10 +2136,7 @@ public class SeleniumTestsContext {
 	    		// check we can access the class
 	    		try {
 
-	    			if (WebDriverEventListener.class.isAssignableFrom(Class.forName(listenerClassName))) {
-	    				logger.warn("WebDriverEventListener interface is deprecated, you should consider to upgrade to WebDriverListener interface");
-	    				oldListeners = true;
-	    			} else if (WebDriverListener.class.isAssignableFrom(Class.forName(listenerClassName))) {
+	    			if (WebDriverListener.class.isAssignableFrom(Class.forName(listenerClassName))) {
 	    				wdListeners = true;
 	    			} else {
 	    				throw new ConfigurationException(String.format("Class %s must implement WebDriverEventListener or WebDriverListener class", listenerClassName));

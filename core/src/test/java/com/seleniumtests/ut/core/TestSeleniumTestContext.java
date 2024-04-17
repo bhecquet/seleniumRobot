@@ -52,8 +52,6 @@ import com.seleniumtests.reporter.reporters.JUnitReporter;
 import com.seleniumtests.reporter.reporters.ReportInfo;
 import com.seleniumtests.reporter.reporters.TestManagerReporter;
 import com.seleniumtests.uipage.htmlelements.ElementInfo;
-import com.seleniumtests.ut.driver.WebDriverEventListener1;
-import com.seleniumtests.ut.driver.WebDriverEventListener2;
 import com.seleniumtests.ut.driver.WebDriverListener2;
 import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.video.VideoCaptureMode;
@@ -1241,16 +1239,6 @@ public class TestSeleniumTestContext extends GenericTest {
 		Assert.assertEquals(reportInfos.get(0).getExtension(), ".xml");
 		Assert.assertEquals(reportInfos.get(0).getTemplatePath(), "reporter/templates/report.perf.vm");
 		Assert.assertEquals(reportInfos.get(0).getPrefix(), "PERF");
-	}
-	
-
-	@Test(groups="ut context")
-	public void testWebDriverEventListener(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setWebDriverListener("com.seleniumtests.ut.driver.WebDriverEventListener1,com.seleniumtests.ut.driver.WebDriverEventListener2");
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebDriverListener().size(), 2); 
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebDriverListener().get(0), WebDriverEventListener1.class.getName());
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebDriverListener().get(1), WebDriverEventListener2.class.getName());
 	}
 	
 	@Test(groups="ut context")

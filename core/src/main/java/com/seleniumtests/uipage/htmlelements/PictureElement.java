@@ -123,13 +123,13 @@ public class PictureElement extends GenericPictureElement {
 		double pixelAspectRatio = ((CustomEventFiringWebDriver)uiDriver.getDriver()).getDeviceAspectRatio();
 		
 		// take into account the aspect ratio
-		detectedRectangle.x = (int)(detectedRectangle.x / pixelAspectRatio);
-		detectedRectangle.y = (int)(detectedRectangle.y / pixelAspectRatio);
-		detectedRectangle.width = (int)(detectedRectangle.width / pixelAspectRatio);
-		detectedRectangle.height = (int)(detectedRectangle.height / pixelAspectRatio);
+		Rectangle updatedRectangle = new Rectangle((int)(detectedRectangle.x / pixelAspectRatio),
+				(int)(detectedRectangle.y / pixelAspectRatio),
+				(int)(detectedRectangle.height / pixelAspectRatio),
+				(int)(detectedRectangle.width / pixelAspectRatio));
 		sizeRatio = sizeRatio / pixelAspectRatio;
 		
-		super.setDetectedObjectRectangleAndAspectRatio(detectedRectangle, sizeRatio);
+		super.setDetectedObjectRectangleAndAspectRatio(updatedRectangle, sizeRatio);
 	}
 	
 	protected void doAfterPictureSearch() {

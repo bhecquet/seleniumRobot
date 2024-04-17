@@ -42,8 +42,6 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.logging.LogEntry;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
-import org.openqa.selenium.support.events.WebDriverEventListener;
 import org.testng.ITestResult;
 
 import com.neotys.selenium.proxies.NLWebDriver;
@@ -730,12 +728,7 @@ public class WebUIDriver {
 																	SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(),
 																	config.getAttachExistingDriverPort(), 
 																	config.getWebDriverListeners());
-    	
 
-    	for (WebDriverEventListener listener: config.getWebDriverEventListeners()) {
-        	listeningDriver = ((EventFiringWebDriver) listeningDriver).register(listener);
-        }
-        
         
 
         return listeningDriver;

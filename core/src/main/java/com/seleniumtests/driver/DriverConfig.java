@@ -28,7 +28,6 @@ import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.Proxy.ProxyType;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.events.WebDriverEventListener;
 import org.openqa.selenium.support.events.WebDriverListener;
 
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
@@ -55,26 +54,6 @@ public class DriverConfig {
     public DriverConfig(SeleniumTestsContext testContext) {
     	this.testContext = testContext;
     	this.browserType = testContext.getBrowser();
-    }
-
-    public List<WebDriverEventListener> getWebDriverEventListeners() {
-    	List<String> listeners = testContext.getWebDriverListener();
-        
-        ArrayList<WebDriverEventListener> oldlistenerList = new ArrayList<>();
-        for (String listenerName : listeners) {
-
-            WebDriverEventListener listener = null;
-            try {
-                if (!"".equals(listenerName)) {
-                    listener = (WebDriverEventListener) (Class.forName(listenerName)).newInstance();
-                    oldlistenerList.add(listener);
-                }
-            } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | ClassCastException e) {
-                logger.error(e);
-            }
-        }
-        
-        return oldlistenerList;
     }
     
     public List<WebDriverListener> getWebDriverListeners() {
