@@ -59,10 +59,15 @@ public class TestTestManagerReporter extends ReporterTest {
 
 		when(api.createCampaign(anyString(), anyString())).thenReturn(campaign);
 		when(api.createIteration(any(Campaign.class), anyString())).thenReturn(iteration);
-		when(api.addTestCaseInIteration(eq(iteration), anyInt())).thenReturn(iterationTestPlanItem);
-		
+		when(api.addTestCaseInIteration(eq(iteration), anyInt(), isNull())).thenReturn(iterationTestPlanItem);
+		when(api.addTestCaseInIteration(eq(iteration), anyInt(), anyInt())).thenReturn(iterationTestPlanItem);
+
 	}
-	
+
+	/**
+	 * Record tests results with tests that have test ID, and other that have testId and datasetId
+	 * @throws Exception
+	 */
 	@Test(groups={"it"})
 	public void testResultIsRecorded() throws Exception {
 		try (MockedConstruction mockedSquash = mockConstruction(SquashTMConnector.class,
@@ -152,7 +157,7 @@ public class TestTestManagerReporter extends ReporterTest {
 				withSettings().defaultAnswer(CALLS_REAL_METHODS),
 				(mock, context) -> {
 					doReturn(api).when(mock).getApi();
-					doThrow(new ConfigurationException("Wrong Test ID")).when(api).addTestCaseInIteration(eq(iteration), anyInt());
+					doThrow(new ConfigurationException("Wrong Test ID")).when(api).addTestCaseInIteration(eq(iteration), anyInt(), isNull());
 				})) {
 			System.setProperty(TestManagerContext.TMS_TYPE, "squash");
 			System.setProperty(TestManagerContext.TMS_URL, "http://localhost:1234");

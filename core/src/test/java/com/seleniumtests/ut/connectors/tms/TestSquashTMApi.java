@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 
+import com.seleniumtests.connectors.tms.squash.entities.*;
 import com.seleniumtests.customexception.ScenarioException;
 import org.mockito.MockedStatic;
 import org.testng.Assert;
@@ -15,12 +16,6 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.connectors.tms.squash.SquashTMApi;
-import com.seleniumtests.connectors.tms.squash.entities.Campaign;
-import com.seleniumtests.connectors.tms.squash.entities.CampaignFolder;
-import com.seleniumtests.connectors.tms.squash.entities.Iteration;
-import com.seleniumtests.connectors.tms.squash.entities.IterationTestPlanItem;
-import com.seleniumtests.connectors.tms.squash.entities.Project;
-import com.seleniumtests.connectors.tms.squash.entities.TestCase;
 import com.seleniumtests.customexception.ConfigurationException;
 
 import kong.unirest.GetRequest;
@@ -38,8 +33,12 @@ public class TestSquashTMApi extends ConnectorsTest {
 	private Iteration iteration2;
 	private IterationTestPlanItem testPlanItem1;
 	private IterationTestPlanItem testPlanItem2;
+	private IterationTestPlanItem testPlanItemWithDataset1;
+	private IterationTestPlanItem testPlanItemWithDataset2;
 	private TestCase testCase1;
 	private TestCase testCase2;
+	private Dataset dataset1;
+	private Dataset dataset2;
 
 
 	@BeforeMethod(groups={"ut"})
@@ -58,8 +57,13 @@ public class TestSquashTMApi extends ConnectorsTest {
 		iteration2 = spy(new Iteration("http://localhost:4321/iterations/2", 2, "iteration2"));
 		testCase1 = spy(new TestCase(1));
 		testCase2 = spy(new TestCase(2));
-		testPlanItem1 = spy(new IterationTestPlanItem("http://localhost:4321/iteration-test-plan-items/1", 1, testCase1));
-		testPlanItem2 = spy(new IterationTestPlanItem("http://localhost:4321/iteration-test-plan-items/1", 1, testCase2));
+		dataset1 = spy(new Dataset("", 4, "DS1", testCase1));
+		dataset2 = spy(new Dataset("", 5, "DS2"));
+		testPlanItem1 = spy(new IterationTestPlanItem("http://localhost:4321/iteration-test-plan-items/1", 1, testCase1, null));
+		testPlanItem2 = spy(new IterationTestPlanItem("http://localhost:4321/iteration-test-plan-items/1", 1, testCase2, null));
+		testPlanItemWithDataset1 = spy(new IterationTestPlanItem("http://localhost:4321/iteration-test-plan-items/1", 1, testCase1, dataset1));
+		testPlanItemWithDataset2 = spy(new IterationTestPlanItem("http://localhost:4321/iteration-test-plan-items/1", 1, testCase2, dataset2));
+
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class)
@@ -256,15 +260,38 @@ public class TestSquashTMApi extends ConnectorsTest {
 			SquashTMApi api = new SquashTMApi("http://localhost:4321", "user", "password", "project1");
 			doReturn(Arrays.asList(testPlanItem1, testPlanItem2)).when(iteration1).getAllTestCases();
 			mockedTestCase.when(() -> TestCase.get(3)).thenReturn(testCase1);
-			doReturn(testPlanItem1).when(iteration1).addTestCase(testCase1);
+			doReturn(testPlanItem1).when(iteration1).addTestCase(testCase1, null);
 
-			IterationTestPlanItem itpi = api.addTestCaseInIteration(iteration1, 3);
+			IterationTestPlanItem itpi = api.addTestCaseInIteration(iteration1, 3, null);
 			Assert.assertEquals(itpi, testPlanItem1);
 
 			// check test case has been added
-			verify(iteration1).addTestCase(any(TestCase.class));
+			verify(iteration1).addTestCase(any(TestCase.class), isNull());
 		}
-		
+	}
+
+	/**
+	 * Add the test case associated to the dataset
+	 */
+	@Test(groups={"ut"})
+	public void testAddTestCaseInIterationWithDataset() {
+		try (MockedStatic mockedProject = mockStatic(Project.class);
+			 MockedStatic mockedTestCase = mockStatic(TestCase.class);
+			 MockedStatic mockedDataset = mockStatic(Dataset.class);
+		) {
+			mockedProject.when(() -> Project.get("project1")).thenReturn(project1);
+			SquashTMApi api = new SquashTMApi("http://localhost:4321", "user", "password", "project1");
+			doReturn(Arrays.asList(testPlanItemWithDataset2)).when(iteration1).getAllTestCases();
+			mockedTestCase.when(() -> TestCase.get(1)).thenReturn(testCase1);
+			mockedDataset.when(() -> Dataset.get(4)).thenReturn(dataset1);
+			doReturn(testPlanItem1).when(iteration1).addTestCase(testCase1, dataset1);
+
+			IterationTestPlanItem itpi = api.addTestCaseInIteration(iteration1, 1, 4);
+			Assert.assertEquals(itpi, testPlanItem1);
+
+			// check test case has been added
+			verify(iteration1).addTestCase(testCase1, dataset1);
+		}
 	}
 	
 	/**
@@ -280,16 +307,56 @@ public class TestSquashTMApi extends ConnectorsTest {
 			doReturn(Arrays.asList(testPlanItem1, testPlanItem2)).when(iteration1).getAllTestCases();
 			mockedTestCase.when(() -> TestCase.get(3)).thenThrow(new ScenarioException(""));
 
-			doReturn(testPlanItem1).when(iteration1).addTestCase(any(TestCase.class));
+			doReturn(testPlanItem1).when(iteration1).addTestCase(any(TestCase.class), isNull());
 
-			api.addTestCaseInIteration(iteration1, 3);
+			api.addTestCaseInIteration(iteration1, 3, null);
 		}
+	}
 
-		
+	/**
+	 * Check exception is raised if dataset does not exist
+	 */
+	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Dataset with id 4 does not exist in Squash")
+	public void testCannotAddDatasetDoesNotExist() {
+		try (MockedStatic mockedProject = mockStatic(Project.class);
+			 MockedStatic mockedTestCase = mockStatic(TestCase.class);
+			 MockedStatic mockedDataset = mockStatic(Dataset.class);
+		) {
+			mockedProject.when(() -> Project.get("project1")).thenReturn(project1);
+			SquashTMApi api = new SquashTMApi("http://localhost:4321", "user", "password", "project1");
+			doReturn(Arrays.asList(testPlanItemWithDataset2)).when(iteration1).getAllTestCases();
+			mockedTestCase.when(() -> TestCase.get(1)).thenReturn(testCase1);
+			mockedDataset.when(() -> Dataset.get(4)).thenThrow(new ScenarioException(""));
+
+			doReturn(testPlanItem1).when(iteration1).addTestCase(any(TestCase.class), any(Dataset.class));
+
+			api.addTestCaseInIteration(iteration1, 1, 4);
+		}
+	}
+
+	/**
+	 * Check exception is raised if dataset does not belong to test case
+	 */
+	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Dataset with id 5 does not belong to Test case with id 1")
+	public void testCannotAddDatasetDoesNotBelongToTestCAse() {
+		try (MockedStatic mockedProject = mockStatic(Project.class);
+			 MockedStatic mockedTestCase = mockStatic(TestCase.class);
+			 MockedStatic mockedDataset = mockStatic(Dataset.class);
+		) {
+			mockedProject.when(() -> Project.get("project1")).thenReturn(project1);
+			SquashTMApi api = new SquashTMApi("http://localhost:4321", "user", "password", "project1");
+			doReturn(Arrays.asList(testPlanItemWithDataset2)).when(iteration1).getAllTestCases();
+			mockedTestCase.when(() -> TestCase.get(1)).thenReturn(testCase1);
+			mockedDataset.when(() -> Dataset.get(5)).thenReturn(dataset2);
+
+			doReturn(testPlanItem1).when(iteration1).addTestCase(any(TestCase.class), any(Dataset.class));
+
+			api.addTestCaseInIteration(iteration1, 1, 5);
+		}
 	}
 	
 	/**
-	 * Iteration already exist, do not recreate it
+	 * Test case already exists in iteration already exist, do not recreate it
 	 */
 	@Test(groups={"ut"})
 	public void testDoNotAddTestCase() {
@@ -300,13 +367,31 @@ public class TestSquashTMApi extends ConnectorsTest {
 			SquashTMApi api = new SquashTMApi("http://localhost:4321", "user", "password", "project1");
 			doReturn(Arrays.asList(testPlanItem1, testPlanItem2)).when(iteration1).getAllTestCases();
 			mockedTestCase.when(() -> TestCase.get(3)).thenReturn(testCase1);
-			doReturn(testPlanItem1).when(iteration1).addTestCase(testCase1);
+			doReturn(testPlanItem1).when(iteration1).addTestCase(testCase1, null);
 
-			IterationTestPlanItem itpi = api.addTestCaseInIteration(iteration1, 2);
+			IterationTestPlanItem itpi = api.addTestCaseInIteration(iteration1, 2, null);
 			Assert.assertEquals(itpi, testPlanItem2);
 
 			// check test case has been added
-			verify(iteration1, never()).addTestCase(any(TestCase.class));
+			verify(iteration1, never()).addTestCase(any(TestCase.class), isNull());
+		}
+	}
+
+	@Test(groups={"ut"})
+	public void testDoNotAddTestCaseWithDataset() {
+		try (MockedStatic mockedProject = mockStatic(Project.class);
+			 MockedStatic mockedTestCase = mockStatic(TestCase.class);
+			 MockedStatic mockedDataset = mockStatic(Dataset.class);
+		) {
+			mockedProject.when(() -> Project.get("project1")).thenReturn(project1);
+			SquashTMApi api = new SquashTMApi("http://localhost:4321", "user", "password", "project1");
+			doReturn(Arrays.asList(testPlanItemWithDataset1, testPlanItemWithDataset2)).when(iteration1).getAllTestCases();
+
+			IterationTestPlanItem itpi = api.addTestCaseInIteration(iteration1, 2, 5);
+			Assert.assertEquals(itpi, testPlanItemWithDataset2);
+
+			// check test case has been added
+			verify(iteration1, never()).addTestCase(any(TestCase.class), isNull());
 		}
 	}
 }

@@ -2,14 +2,7 @@ package com.seleniumtests.connectors.tms.squash;
 
 import java.util.List;
 
-import com.seleniumtests.connectors.tms.squash.entities.Campaign;
-import com.seleniumtests.connectors.tms.squash.entities.CampaignFolder;
-import com.seleniumtests.connectors.tms.squash.entities.Entity;
-import com.seleniumtests.connectors.tms.squash.entities.Iteration;
-import com.seleniumtests.connectors.tms.squash.entities.IterationTestPlanItem;
-import com.seleniumtests.connectors.tms.squash.entities.Project;
-import com.seleniumtests.connectors.tms.squash.entities.TestCase;
-import com.seleniumtests.connectors.tms.squash.entities.TestPlanItemExecution;
+import com.seleniumtests.connectors.tms.squash.entities.*;
 import com.seleniumtests.connectors.tms.squash.entities.TestPlanItemExecution.ExecutionStatus;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
@@ -142,10 +135,11 @@ public class SquashTMApi {
 	 * @param testCaseId	id of the test case (can be found in Squash TM interface)
 	 * @return
 	 */
-	public IterationTestPlanItem addTestCaseInIteration(Iteration iteration, int testCaseId) {
+	public IterationTestPlanItem addTestCaseInIteration(Iteration iteration, int testCaseId, Integer datasetId) {
 		
 		for (IterationTestPlanItem testPlanItem: iteration.getAllTestCases()) {
-			if (testCaseId == testPlanItem.getTestCase().getId()) {
+			if (testPlanItem.getTestCase() != null && testCaseId == testPlanItem.getTestCase().getId()
+			&& (testPlanItem.getDataset() == null || testPlanItem.getDataset() != null && datasetId == testPlanItem.getDataset().getId())) {
 				return testPlanItem;
 			}
 		}
@@ -157,8 +151,22 @@ public class SquashTMApi {
 		} catch (ScenarioException e) {
 			throw new ConfigurationException(String.format("Test case with id %d does not exist in Squash", testCaseId));
 		}
+
+		// check that Dataset is valid
+		Dataset dataset = null;
+		if (datasetId != null) {
+			try {
+				dataset = Dataset.get(datasetId);
+			} catch (ScenarioException e) {
+				throw new ConfigurationException(String.format("Dataset with id %d does not exist in Squash", datasetId));
+			}
+
+			if (dataset.getTestCase() == null || dataset.getTestCase().getId() != testCaseId) {
+				throw new ConfigurationException(String.format("Dataset with id %d does not belong to Test case with id %d", datasetId, testCaseId));
+			}
+		}
 		
-		return iteration.addTestCase(testCase);
+		return iteration.addTestCase(testCase, dataset);
 	}
 	
 	/**

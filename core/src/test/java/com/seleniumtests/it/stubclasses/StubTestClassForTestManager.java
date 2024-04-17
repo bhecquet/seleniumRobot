@@ -65,7 +65,7 @@ public class StubTestClassForTestManager extends StubParentClass {
 		Assert.fail("error");
 	}
 	
-	@Test(groups="stub", attributes = {@CustomAttribute(name = "testId", values = "15")})
+	@Test(groups="stub", attributes = {@CustomAttribute(name = "testId", values = "15"), @CustomAttribute(name = "datasetId", values = "115")})
 	public void testSkipped() throws IOException {
 		new StubTestPage()
 		.skipStep();
