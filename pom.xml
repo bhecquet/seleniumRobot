@@ -298,7 +298,6 @@
 							<overWriteReleases>true</overWriteReleases>
 							<overWriteSnapshots>false</overWriteSnapshots>
 							<overWriteIfNewer>true</overWriteIfNewer>
-							<includeScope>compile</includeScope>
 							<excludeArtifactIds>seleniumRobot-linux-driver,seleniumRobot-mac-driver,seleniumRobot-windows-driver,opencv</excludeArtifactIds>
 						</configuration>
 					</execution>
