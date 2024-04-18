@@ -418,24 +418,29 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 		outlineElement(getRealElementNoSearch());
         DriverConfig driverConfig = WebUIDriver.getWebUIDriver(false).getConfig();
 
+		// on modern browsers, dispatchEvent is used, and so, action is synchronous
+		// on other browsers, fireEvent does not seem to be synchronous, so we wait a bit
+		boolean waitAfterEvent = false;
+
         String mouseOverScript;
         if ((driverConfig.getBrowserType() == BrowserType.FIREFOX && FirefoxDriverFactory.isMarionetteMode())
             	|| driverConfig.getBrowserType() == BrowserType.EDGE
-        		|| (driverConfig.getBrowserType() == BrowserType.CHROME 
-	        			&& driverConfig.getMajorBrowserVersion() >= 75)) {
+        		|| driverConfig.getBrowserType() == BrowserType.CHROME) {
         		mouseOverScript = "var event = new MouseEvent('mouseover', {view: window, bubbles: true, cancelable: true}) ; arguments[0].dispatchEvent(event);";
             } else {
+				waitAfterEvent = true;
             	mouseOverScript = "if(document.createEvent){var evObj = document.createEvent('MouseEvents');evObj.initEvent('mouseover', true, false); arguments[0].dispatchEvent(evObj);} else if(document.createEventObject) { arguments[0].fireEvent('onmouseover');}";
             }
         
 		executeScript(mouseOverScript, getRealElementNoSearch());
-        WaitHelper.waitForSeconds(2);
+		if (waitAfterEvent) {
+			WaitHelper.waitForSeconds(2);
+		}
         
         String clickScript = "";
         if ((driverConfig.getBrowserType() == BrowserType.FIREFOX && FirefoxDriverFactory.isMarionetteMode())
         		|| driverConfig.getBrowserType() == BrowserType.EDGE
-            	|| (driverConfig.getBrowserType() == BrowserType.CHROME 
-	        			&& driverConfig.getMajorBrowserVersion() >= 75)) {
+            	|| driverConfig.getBrowserType() == BrowserType.CHROME) {
         	clickScript = "var event = new MouseEvent('click', {view: window, bubbles: true, cancelable: true}) ;"
             			+ "arguments[0].dispatchEvent(event);";
         } else {
@@ -443,7 +448,9 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         }
 
 		executeScript(clickScript, getRealElementNoSearch());
-        WaitHelper.waitForSeconds(2);
+		if (waitAfterEvent) {
+			WaitHelper.waitForSeconds(2);
+		}
     }
     
 	@ReplayOnError(waitAfterAction = true)
@@ -456,8 +463,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         String doubleClickScript;
         if ((driverConfig.getBrowserType() == BrowserType.FIREFOX && FirefoxDriverFactory.isMarionetteMode())
         		|| driverConfig.getBrowserType() == BrowserType.EDGE
-            	|| (driverConfig.getBrowserType() == BrowserType.CHROME 
-	        			&& driverConfig.getMajorBrowserVersion() >= 75)) {
+            	|| driverConfig.getBrowserType() == BrowserType.CHROME) {
         		doubleClickScript = "var event = new MouseEvent('dblclick', {view: window, bubbles: true, cancelable: true}) ;"
                 			+ "arguments[0].dispatchEvent(event);";
             } else {

@@ -29,9 +29,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -703,29 +702,39 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			deleteExistingVideo(outputFile);
 
 			long start = System.currentTimeMillis();
-			GetRequest getRequest = Unirest.get(String.format("%s%s", nodeServletUrl, NODE_TASK_SERVLET));
-			if (SeleniumTestsContextManager.getThreadContext().getDebug().contains(DebugMode.NETWORK)) {
-				getRequest = getRequest
-						.downloadMonitor((b, fileName, bytesWritten, totalBytes) -> {
-							logger.info(String.format("File %s: %d/%d", fileName, bytesWritten, totalBytes));
-						});
-			}
-			HttpResponse<File> videoResponse = getRequest
-					.socketTimeout(60000)
-					.queryString(ACTION_FIELD, "stopVideoCapture")
-					.queryString(SESSION_FIELD, sessionId)
-					.asFile(outputFile);
-			
-			if (videoResponse.getStatus() != 200) {
-				logger.error(String.format("stop video capture error: %s", videoResponse.getBody()));
-				return null;
-			} else {
-				logger.info(String.format("Video file downloaded (%d kb in %d ms)", videoResponse.getBody().length() / 1000, System.currentTimeMillis() - start));
-				return videoResponse.getBody();
-			}
-			
+
+			ExecutorService executor = Executors.newSingleThreadExecutor();
+			Future<File> future = executor.submit(() -> {
+				GetRequest getRequest = Unirest.get(String.format("%s%s", nodeServletUrl, NODE_TASK_SERVLET));
+				if (SeleniumTestsContextManager.getGlobalContext().getDebug().contains(DebugMode.NETWORK)) {
+					getRequest = getRequest
+							.downloadMonitor((b, fileName, bytesWritten, totalBytes) -> {
+								logger.info(String.format("File %s: %d/%d", fileName, bytesWritten, totalBytes));
+							});
+				}
+				HttpResponse<File> videoResponse = getRequest
+						.socketTimeout(60000)
+						.queryString(ACTION_FIELD, "stopVideoCapture")
+						.queryString(SESSION_FIELD, sessionId)
+						.asFile(outputFile);
+
+				if (videoResponse.getStatus() != 200) {
+					logger.error(String.format("stop video capture error: %s", videoResponse.getBody()));
+					return null;
+				} else {
+					logger.info(String.format("Video file downloaded (%d kb in %d ms)", videoResponse.getBody().length() / 1000, System.currentTimeMillis() - start));
+					return videoResponse.getBody();
+				}
+			});
+			File videoFile = future.get(60, TimeUnit.SECONDS);
+			future.cancel(true);
+			return videoFile;
+
 		} catch (UnirestException e) {
 			logger.warn(String.format("Could not stop video capture: %s", e.getMessage()));
+			return null;
+		} catch (InterruptedException | ExecutionException | TimeoutException e) {
+			logger.warn("Video file not get due to " + e.getClass().getName());
 			return null;
 		}
 	}

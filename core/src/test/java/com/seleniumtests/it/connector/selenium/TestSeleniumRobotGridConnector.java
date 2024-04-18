@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -374,11 +376,13 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	@Test(groups={"it"})
 	public void testVideoCapture() throws ClientProtocolException, IOException {
 
+		Files.deleteIfExists(Paths.get("d:\\tmp\\out.avi"));
 		connector.setSessionId(new SessionId("video"));
 		
 		connector.startVideoCapture();
 		WaitHelper.waitForMilliSeconds(5000);
-		connector.stopVideoCapture("d:\\tmp\\out.avi");
+		File videoFile = connector.stopVideoCapture("d:\\tmp\\out.avi");
+		Assert.assertNotNull(videoFile);
 		
 	}
 }

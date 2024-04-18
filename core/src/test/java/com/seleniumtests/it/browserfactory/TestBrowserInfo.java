@@ -59,11 +59,11 @@ public class TestBrowserInfo extends GenericDriverTest {
 	
 	@Test(groups={"it"})
 	public void testBrowserInfoChrome() {
-		BrowserInfo browserInfo = new BrowserInfo(BrowserType.CHROME, "116.0", "/some/path", false);
+		BrowserInfo browserInfo = new BrowserInfo(BrowserType.CHROME, "123.0", "/some/path", false);
 		browserInfo.getDriverFileName();
 		
 		Assert.assertTrue(browserInfo.isDriverFileSearched());
-		Assert.assertEquals(browserInfo.getDriverFileName(), "chromedriver_116.0_chrome-116-117");
+		Assert.assertEquals(browserInfo.getDriverFileName(), "chromedriver_123.0_chrome-123-124");
 		
 	}
 	
@@ -86,11 +86,11 @@ public class TestBrowserInfo extends GenericDriverTest {
 			throw new SkipException("This test can only be done on Windows 10");
 		}
 
-		BrowserInfo browserInfo = new BrowserInfo(BrowserType.EDGE, "99.0", "/some/path", false);
+		BrowserInfo browserInfo = new BrowserInfo(BrowserType.EDGE, "123.0", "/some/path", false);
 		browserInfo.getDriverFileName();
 		
 		Assert.assertTrue(browserInfo.isDriverFileSearched());
-		Assert.assertEquals(browserInfo.getDriverFileName(), "edgedriver_98.0_edge-98-99");
+		Assert.assertEquals(browserInfo.getDriverFileName(), "edgedriver_123.0_edge-123-124");
 	}
 	
 	@Test(groups={"it"})
