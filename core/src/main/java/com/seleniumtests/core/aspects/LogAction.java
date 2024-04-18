@@ -449,10 +449,10 @@ public class LogAction {
 	 * @return
 	 */
 	private String getAnnotationValue(Annotation annotation) {
-		return annotation.toString().replaceFirst("timeout=\\d+", "")
-			.replace("@" + annotation.annotationType().getCanonicalName() + "(", "")
-			.replaceFirst(",?\\s?value=", "")
-			.replaceFirst("\\)$", "");
+		return StringEscapeUtils.unescapeJava(annotation.toString().replaceFirst("timeout=\\d+", "")
+				.replace("@" + annotation.annotationType().getCanonicalName() + "(\"", "")
+				.replaceFirst(",?\\s?value=", "")
+				.replaceFirst("\"\\)$", ""));
 	}
 	
 	/**

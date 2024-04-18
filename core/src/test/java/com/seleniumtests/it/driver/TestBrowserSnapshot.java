@@ -246,8 +246,9 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 		
 		doThrow(WebDriverException.class).when(mockedDriver).scrollTop();
 		doThrow(JavascriptException.class).when(mockedDriver).scrollTo(anyInt(), anyInt());
-		
-		ScreenShot screenshot = screenshotUtil.capture(SnapshotTarget.PAGE, ScreenShot.class);
+
+		// add a scrollDelay to force capture to be done without CDP as this is difficult to mock CDP to make it fail
+		ScreenShot screenshot = screenshotUtil.capture(SnapshotTarget.PAGE, ScreenShot.class, 100);
 		Assert.assertNull(screenshot.getHtmlSourcePath()); // desktop capture does not have html source
 		Assert.assertNotNull(screenshot.getImage());
 	}

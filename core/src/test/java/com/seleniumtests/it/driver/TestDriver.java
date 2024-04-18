@@ -343,7 +343,10 @@ public class TestDriver extends GenericMultiBrowserTest {
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(7);
 		long start = new Date().getTime();
 		Assert.assertEquals(new HtmlElement("", By.name("foobar")).findElements().size(), 0);
-		Assert.assertTrue(new Date().getTime() - start > 6500);
+
+		long delay = new Date().getTime() - start;
+		logger.info("Action duration: " + delay + " ms");
+		Assert.assertTrue(delay > 6500);
 	}
 	
 	/**
@@ -356,6 +359,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		DriverTestPage.resetButton.click();
 		DriverTestPage.resetButton.click();
 		long delay = new Date().getTime() - start;
+		logger.info("Action duration: " + delay + " ms");
 		Assert.assertTrue(delay > 14000); // 3 commands with wait
 	}
 	/**
@@ -368,6 +372,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		DriverTestPage.resetButton.click();
 		DriverTestPage.resetButton.click();
 		long delay = new Date().getTime() - start;
+		logger.info("Action duration: " + delay + " ms");
 		Assert.assertTrue(delay < 1500); // 3 commands without wait
 	}
 	/**
@@ -379,6 +384,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		DriverTestPage.redSquare.getCoordinates();
 		DriverTestPage.resetButton.getCenter();
 		long delay = new Date().getTime() - start;
+		logger.info("Action duration: " + delay + " ms");
 		Assert.assertTrue(delay < 1000); // 3 commands without wait
 	}
 	

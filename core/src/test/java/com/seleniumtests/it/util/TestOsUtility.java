@@ -290,20 +290,33 @@ public class TestOsUtility extends GenericTest {
 	@Test(groups={"it"})
 	public void testKillProcess() {
 		if (OSUtility.isWindows()) {
-			OSCommand.executeCommand("calc");
+			// delete processes that could already be present
+			osUtil.killProcessByName("calculator", true);
+			osUtil.killProcessByName("Calculator", true);
+			osUtil.killProcessByName("CalculatorApp", true);
+			osUtil.killProcessByName("win32calc", true);
+			osUtil.killProcessByName("calc", true);
+
+			WaitHelper.waitForSeconds(1);
+			String processName = "calc";
+			OSCommand.executeCommand(processName);
 			WaitHelper.waitForSeconds(2);
 			ProcessInfo pi = osUtil.getRunningProcess("calc");
 			if (pi == null) {
-				pi = osUtil.getRunningProcess("calculator"); // Windows 10
+				processName = "calculator"; // Windows 10
+				pi = osUtil.getRunningProcess(processName);
 			}
 			if (pi == null) {
-				pi = osUtil.getRunningProcess("Calculator"); // Windows 10
+				processName = "Calculator"; // Windows 10
+				pi = osUtil.getRunningProcess(processName);
 			}
 			if (pi == null) {
-				pi = osUtil.getRunningProcess("CalculatorApp"); // Windows 10
+				processName = "CalculatorApp"; // Windows 10
+				pi = osUtil.getRunningProcess(processName);
 			}
 			if (pi == null) {
-				pi = osUtil.getRunningProcess("win32calc"); // Windows 2016
+				processName = "win32calc"; // Windows 2016
+				pi = osUtil.getRunningProcess(processName);
 			}
 			if (pi == null) {
 				throw new ConfigurationException("Cannot find process 'calc', 'win32calc', 'CalculatorApp' or 'calculator'");
@@ -311,11 +324,7 @@ public class TestOsUtility extends GenericTest {
 			logger.info("PID to kill " + pi.getPid());
 			osUtil.killProcess(pi.getPid(), true);
 			WaitHelper.waitForSeconds(1);
-			Assert.assertNull(osUtil.getRunningProcess("calc"));
-			Assert.assertNull(osUtil.getRunningProcess("calculator"));
-			Assert.assertNull(osUtil.getRunningProcess("CalculatorApp"));
-			Assert.assertNull(osUtil.getRunningProcess("Calculator"));
-			Assert.assertNull(osUtil.getRunningProcess("win32calc"));
+			Assert.assertNull(osUtil.getRunningProcess(processName));
 		}
 	}
 	
