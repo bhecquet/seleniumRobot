@@ -105,6 +105,9 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 	protected MutableCapabilities getDriverOptions() {
 		ChromeOptions options = new ChromeOptions();
 
+		// to enable BiDi. this creates a tab on the browser
+		// options.setCapability("webSocketUrl", true);
+
         if (webDriverConfig.getUserAgentOverride() != null) {
             options.addArguments("--user-agent=" + webDriverConfig.getUserAgentOverride());
         }

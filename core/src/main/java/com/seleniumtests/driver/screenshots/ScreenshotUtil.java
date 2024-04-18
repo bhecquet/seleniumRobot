@@ -41,6 +41,8 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.bidi.HasBiDi;
+import org.openqa.selenium.bidi.browsingcontext.BrowsingContext;
 import org.openqa.selenium.devtools.DevTools;
 import org.openqa.selenium.devtools.DevToolsException;
 import org.openqa.selenium.devtools.HasDevTools;
@@ -550,6 +552,17 @@ public class ScreenshotUtil {
 			devTools.disconnectSession();
 		}
     }
+
+	public BufferedImage captureWebPageUsingBidi(String windowHandle) throws IOException {
+		if (!(driver.getWebDriver() instanceof HasBiDi))  {
+			throw new DevToolsException("Bidi not implemented for " + driver.getClass().toString());
+		}
+
+		BrowsingContext browsingContext = new BrowsingContext(driver.getWebDriver(), windowHandle);
+		String screenshot = browsingContext.captureScreenshot();
+
+		return ImageProcessor.loadFromB64String(screenshot);
+	}
     
     /**
      * Captures a web page. If the browser natively returns the whole page, nothing more is done. Else (only webview is returned), we scroll down the page to get more of the page
@@ -561,7 +574,17 @@ public class ScreenshotUtil {
      * @return
      */
     public BufferedImage captureWebPage(int scrollDelay, String windowHandle) {
-    	
+
+		// BiDi screenshot only takes the viewport
+//    	if (driver.getWebDriver() instanceof HasBiDi && scrollDelay == 0) {
+//    		try {
+//    			return captureWebPageUsingBidi(windowHandle);
+//    		} catch (IOException e) {
+//    			logger.warn("Error getting screenshot with CDP, using standard method: " + e.getMessage());
+//    		} catch (DevToolsException e) {
+//    			// ignore and use the standard method
+//    		}
+//    	}
     	if (driver.getWebDriver() instanceof HasDevTools && scrollDelay == 0) {
     		try {
     			return captureWebPageUsingCDP(windowHandle);
