@@ -125,6 +125,14 @@ public class DriverExceptionListener implements WebDriverListener {
                     ) {
             	
             	driver.setDriverExited();
+				// we detect session does not exist anymore
+				// it can be due to browser crashed or only a driver.close() during a test
+				// in this last case, try to quit() so that no remote session get staled
+				try {
+					driver.quit();
+				} catch (Exception e1) {
+					// do nothing
+				}
 
                 // since the session was
                 // terminated.
