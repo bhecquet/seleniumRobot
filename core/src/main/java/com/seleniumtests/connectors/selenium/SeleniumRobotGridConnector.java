@@ -696,7 +696,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		}
 		
 		logger.info("stopping capture");
-		try {
+		try (UnirestInstance unirest = Unirest.spawnInstance()) {
 			
 			// delete file if it exists as '.asFile()' will not overwrite it
 			deleteExistingVideo(outputFile);
@@ -705,7 +705,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 
 			ExecutorService executor = Executors.newSingleThreadExecutor();
 			Future<File> future = executor.submit(() -> {
-				GetRequest getRequest = Unirest.get(String.format("%s%s", nodeServletUrl, NODE_TASK_SERVLET));
+				GetRequest getRequest = unirest.get(String.format("%s%s", nodeServletUrl, NODE_TASK_SERVLET));
 				if (SeleniumTestsContextManager.getGlobalContext().getDebug().contains(DebugMode.NETWORK)) {
 					getRequest = getRequest
 							.downloadMonitor((b, fileName, bytesWritten, totalBytes) -> {
