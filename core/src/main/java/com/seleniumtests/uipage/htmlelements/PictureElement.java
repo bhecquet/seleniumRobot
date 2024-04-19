@@ -221,23 +221,15 @@ public class PictureElement extends GenericPictureElement {
 		WebUIDriver uiDriver = isDriverCreated();
 
 		if (SeleniumTestsContextManager.isWebTest()) {
-			// issue #133: handle new actions specific case
-			// more browsers will be added to this conditions once they are migrated to new composite actions
-			if (uiDriver.getConfig().getBrowserType() == BrowserType.FIREFOX) {
-				// issue #133: firefox moves to center of element in page
-				coordX -= element.getSize().width / 2;
-				coordY -= element.getSize().height / 2;
-				
-			} else if (uiDriver.getConfig().getBrowserType() == BrowserType.INTERNET_EXPLORER
-					|| uiDriver.getConfig().getBrowserType() == BrowserType.EDGE
-					|| (uiDriver.getConfig().getBrowserType() == BrowserType.CHROME 
-						&& uiDriver.getConfig().getMajorBrowserVersion() >= 75)) {
-				// issue #180: internet explorer moves to center of element in viewport
-				// do not take into accoung pixel aspect ratio, because selenium element coordinates are calculated with zooming (element will always have the same size even if zooming is different)
-				Dimension viewportDim = ((CustomEventFiringWebDriver)uiDriver.getDriver()).getViewPortDimensionWithoutScrollbar(false);
-				coordX -= Math.min(element.getSize().width, viewportDim.width) / 2;
-				coordY -= Math.min(element.getSize().height, viewportDim.height) / 2;
-			}
+
+			// issue #180: internet explorer moves to center of element in viewport
+			// all browsers behave like this
+			// do not take into accoung pixel aspect ratio, because selenium element coordinates are calculated with zooming (element will always have the same size even if zooming is different)
+			Dimension viewportDim = ((CustomEventFiringWebDriver)uiDriver.getDriver()).getViewPortDimensionWithoutScrollbar(false);
+			Dimension elementSize = element.getSize();
+			coordX -= Math.min(elementSize.width, viewportDim.width) / 2;
+			coordY -= Math.min(elementSize.height, viewportDim.height) / 2;
+
 		}
 		
 		return new Actions(uiDriver.getDriver()).moveToElement(element, coordX, coordY);
