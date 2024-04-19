@@ -99,6 +99,7 @@ public class TestPictureElement extends MockitoTest {
 			when(driverConfig.getBrowserType()).thenReturn(BrowserType.FIREFOX);
 			when(driver.getBrowserInfo()).thenReturn(browserInfo);
 			when(((CustomEventFiringWebDriver) driver).getDeviceAspectRatio()).thenReturn(1.0);
+			when(((CustomEventFiringWebDriver) driver).getViewPortDimensionWithoutScrollbar(false)).thenReturn(new Dimension(200, 200));
 			when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
 			when(screenshotUtil.capture(SnapshotTarget.PAGE, File.class, true)).thenReturn(new File(""));
 			when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
@@ -132,6 +133,7 @@ public class TestPictureElement extends MockitoTest {
 			when(driverConfig.getBrowserType()).thenReturn(BrowserType.FIREFOX);
 			when(driver.getBrowserInfo()).thenReturn(browserInfo);
 			when(((CustomEventFiringWebDriver) driver).getDeviceAspectRatio()).thenReturn(1.0);
+			when(((CustomEventFiringWebDriver) driver).getViewPortDimensionWithoutScrollbar(false)).thenReturn(new Dimension(200, 200));
 			when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
 			when(screenshotUtil.capture(SnapshotTarget.PAGE, File.class, true)).thenReturn(new File(""));
 			when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
@@ -164,6 +166,7 @@ public class TestPictureElement extends MockitoTest {
 			when(driverConfig.getBrowserType()).thenReturn(BrowserType.FIREFOX);
 			when(driver.getBrowserInfo()).thenReturn(browserInfo);
 			when(((CustomEventFiringWebDriver) driver).getDeviceAspectRatio()).thenReturn(1.5);
+			when(((CustomEventFiringWebDriver) driver).getViewPortDimensionWithoutScrollbar(false)).thenReturn(new Dimension(200, 200));
 			when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
 			when(screenshotUtil.capture(SnapshotTarget.PAGE, File.class, true)).thenReturn(new File(""));
 			when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
