@@ -114,6 +114,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 		}
 
 //		SeleniumTestsContextManager.getThreadContext().setDebug("gui"); // for testing issue #294
+		SeleniumTestsContextManager.getThreadContext().setDebug("driver");
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
 //		SeleniumTestsContextManager.getThreadContext().setBetaBrowser(true);
 		SeleniumTestsContextManager.getThreadContext().setBrowser(browserType.getBrowserType());

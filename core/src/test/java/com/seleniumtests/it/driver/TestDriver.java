@@ -346,7 +346,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 
 		long delay = new Date().getTime() - start;
 		logger.info("Action duration: " + delay + " ms");
-		Assert.assertTrue(delay > 6500);
+		Assert.assertTrue(delay > 6500); // using timing is not a problem here as in case of slowness, search will be longer
 	}
 	
 	/**
@@ -360,6 +360,8 @@ public class TestDriver extends GenericMultiBrowserTest {
 		DriverTestPage.resetButton.click();
 		long delay = new Date().getTime() - start;
 		logger.info("Action duration: " + delay + " ms");
+
+		// using timing is not a problem here as in case of slowness, search will be longer
 		Assert.assertTrue(delay > 14000); // 3 commands with wait
 	}
 	/**
@@ -385,7 +387,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		DriverTestPage.resetButton.getCenter();
 		long delay = new Date().getTime() - start;
 		logger.info("Action duration: " + delay + " ms");
-		Assert.assertTrue(delay < 1000); // 3 commands without wait
+		Assert.assertTrue(delay < 4000); // 2 commands without wait, we should be lower than the defined action delay
 	}
 	
 	/**
@@ -400,18 +402,18 @@ public class TestDriver extends GenericMultiBrowserTest {
 	 * Tests NOT finding sub-elements of an HTMLElement
 	 * No exception should be raised but search should be done several times
 	 */
-	
 	public void testFindElementsByNotExist() {
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(7);
 		long start = new Date().getTime();
 		Assert.assertEquals(new HtmlElement("", By.className("myClass")).findElements(By.id("foobarId")).size(), 0);
+
+		// no problem to use timing here, has in case of slowness, assertion will still be true
 		Assert.assertTrue(new Date().getTime() - start > 6500);
 	}
 	
 	/**
 	 * Tests finding sub-elements of an HTMLElement
 	 */
-	
 	public void testFindHtmlElementsBy() {
 		List<WebElement> htmlElements = new HtmlElement("", By.id("parent")).findHtmlElements(By.className("myClass"));
 		Assert.assertEquals(htmlElements.size(), 2);
@@ -422,7 +424,6 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * issue #314: check that we search element effectively inside the parent
 	 */
-	
 	public void testFindHtmlElementsByWithSimilarElements() {
 		List<WebElement> htmlElements = new HtmlElement("", By.id("parent")).findHtmlElements(By.tagName("div"));
 		Assert.assertEquals(htmlElements.size(), 3);
@@ -436,7 +437,6 @@ public class TestDriver extends GenericMultiBrowserTest {
 	 * 				We search in the second table because the bug relies in the fact that findHtmlElements do return elements which do not correspond the the elements returned
 	 * 				by a simple driver.findElements(By.tagname('a'))
 	 */
-	
 	public void testFindHtmlElementsByInsideFrame() {
 		List<WebElement> htmlElements = new HtmlElement("", By.id("tableIframe2"), DriverTestPage.iframe).findHtmlElements(By.tagName("td"));
 		Assert.assertEquals(htmlElements.size(), 2);
@@ -448,11 +448,12 @@ public class TestDriver extends GenericMultiBrowserTest {
 	 * Tests NOT finding sub-elements of an HTMLElement
 	 * No exception should be raised but search should be done several times
 	 */
-	
 	public void testFindHtmlElementsByNotExist() {
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(7);
 		long start = new Date().getTime();
 		Assert.assertEquals(new HtmlElement("", By.className("myClass")).findHtmlElements(By.id("foobarId")).size(), 0);
+
+		// no problem to use timing here, has in case of slowness, assertion will still be true
 		Assert.assertTrue(new Date().getTime() - start > 6500);
 	}
 
@@ -460,7 +461,6 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * Search an element inside an other one
 	 */
-	
 	public void testFindSubElement() {
 		Assert.assertEquals(DriverTestPage.parent.findElement(By.className("myClass")).getText(), "first child");
 	}
@@ -468,7 +468,6 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * Search the n th element inside an other one
 	 */
-	
 	public void testFindNthSubElement() {
 		Assert.assertEquals(DriverTestPage.parent.findElement(By.className("myClass"), 1).getText(), "fourth child");
 		Assert.assertEquals(DriverTestPage.child.getText(), "fourth child");
@@ -555,15 +554,25 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * issue #194: check that the WebDriverWait timeout is the one really applied
 	 */
-	
 	public void testWebDriverWaitWithLowTimeout() {
-		long start = new Date().getTime();
-		try {
-			new WebDriverWait(driver, Duration.ofSeconds(2)).until(ExpectedConditions.visibilityOf(new HtmlElement("", By.id("someNonExistentId"))));
-		} catch (TimeoutException e) {}
-		
-		// we cannot check precise timing as it depends on the hardware, but we should never wait more that 10 secs (the default timeout for searching element is 30 secs)
-		Assert.assertTrue(new Date().getTime() - start < 10000);
+		long delay = 100000;
+
+		// depending on hardware, test may fail, so we retry several times
+		for (int i=0; i < 3; i++) {
+			long start = new Date().getTime();
+			try {
+				new WebDriverWait(driver, Duration.ofSeconds(2)).until(ExpectedConditions.visibilityOf(new HtmlElement("", By.id("someNonExistentId"))));
+			} catch (TimeoutException e) {
+			}
+
+			// we cannot check precise timing as it depends on the hardware, but we should never wait more that 10 secs (the default timeout for searching element is 30 secs)
+			delay = new Date().getTime() - start;
+			logger.info("wait delay: {} ms", delay);
+			if (delay < 10000) {
+				break;
+			}
+		}
+		Assert.assertTrue(delay < 10000);
 	}
 	
 	

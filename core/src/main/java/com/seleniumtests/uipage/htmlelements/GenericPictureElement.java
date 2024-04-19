@@ -51,6 +51,7 @@ public abstract class GenericPictureElement extends Element {
 	protected String resourcePath;
 	protected Map<PageObject, Rectangle> detectedObjectRectangle = new HashMap<>();
 	protected Map<PageObject, Double> pictureSizeRatio = new HashMap<>();
+
 	protected ImageDetector detector;
 	protected boolean searchOnDesktop;
 	protected long actionDuration;
@@ -280,6 +281,14 @@ public abstract class GenericPictureElement extends Element {
 
 	public File getObjectPictureFile() {
 		return objectPictureFile;
+	}
+
+	public ImageDetector getDetector() {
+		return detector;
+	}
+
+	public void setDetector(ImageDetector detector) {
+		this.detector = detector;
 	}
 
 

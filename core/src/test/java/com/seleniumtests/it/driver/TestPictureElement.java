@@ -19,6 +19,7 @@ package com.seleniumtests.it.driver;
 
 import java.util.Calendar;
 
+import com.seleniumtests.util.imaging.ImageDetector;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
@@ -31,6 +32,8 @@ import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageWithoutFixedPattern;
 import com.seleniumtests.util.helper.WaitHelper;
+
+import static org.mockito.Mockito.*;
 
 public class TestPictureElement extends GenericMultiBrowserTest {
 	
@@ -77,7 +80,11 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 	 * Check that if the same Picture element is used in a single instance of the same page, then, search will be done only once
 	 */
 	public void testMultipleActionsOnPicture() {
+		ImageDetector originalDetector = DriverTestPageWithoutFixedPattern.googlePicture.getDetector();
 		try {
+			ImageDetector spiedDetector = spy(originalDetector);
+			DriverTestPageWithoutFixedPattern.googlePicture.setDetector(spiedDetector);
+
 			DriverTestPageWithoutFixedPattern.googlePicture.clearMemory(); // reset memory for object to detect
 			Calendar start = Calendar.getInstance();
 			testPageWithoutPattern.clickGooglePicture();
@@ -87,14 +94,15 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 			// second click should not search for the element again as we are in the same page
 			start = Calendar.getInstance();
 			testPageWithoutPattern.clickGooglePicture();
+			verify(spiedDetector).detectExactZoneWithScale(); // check detector has been called only once
+
 			long totalTime2 = Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis();
 			logger.info(String.format("Time first click: %d ms - time second click: %d ms", totalTime1, totalTime2));
-			
-			// check second action is much shorter than first one
-			Assert.assertTrue(totalTime2 * 2 < totalTime1);
 
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
+		} finally {
+			DriverTestPageWithoutFixedPattern.googlePicture.setDetector(originalDetector);
 		}
 		WaitHelper.waitForMilliSeconds(500); // in case of browser slowness
 		Assert.assertEquals(DriverTestPageWithoutFixedPattern.textElement.getValue(), "image");
@@ -104,7 +112,11 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 	 * Check that if the same Picture element is used in 2 instances of the same page, then, search will be done twice
 	 */
 	public void testMultipleActionsOnPictureWithAnotherPage() {
+		ImageDetector originalDetector = DriverTestPageWithoutFixedPattern.googlePicture.getDetector();
 		try {
+			ImageDetector spiedDetector = spy(originalDetector);
+			DriverTestPageWithoutFixedPattern.googlePicture.setDetector(spiedDetector);
+
 			DriverTestPageWithoutFixedPattern.googlePicture.clearMemory(); // reset memory for object to detect
 			Calendar start = Calendar.getInstance();
 			testPageWithoutPattern.clickGooglePicture();
@@ -116,12 +128,13 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 			new DriverTestPageWithoutFixedPattern().clickGooglePicture();
 			long totalTime2 = Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis();
 			logger.info(String.format("Time first click: %d ms - time second click: %d ms", totalTime1, totalTime2));
-			
-			// check second action last almost the same as the first one
-			Assert.assertTrue(Math.max(totalTime1, totalTime2)  * 1.0 / Math.min(totalTime1, totalTime2) < 1.5);
+
+			verify(spiedDetector, times(2)).detectExactZoneWithScale(); // check detector has been called 2 times
 			
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
+		} finally {
+			DriverTestPageWithoutFixedPattern.googlePicture.setDetector(originalDetector);
 		}
 		WaitHelper.waitForMilliSeconds(500); // in case of browser slowness
 		Assert.assertEquals(DriverTestPageWithoutFixedPattern.textElement.getValue(), "image");
@@ -131,8 +144,12 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 	 * Check that if the same Picture element is used in 2 instances of the same page and PictureElement is declared private, then, search will be done twice
 	 */
 	public void testMultipleActionsOnPictureWithAnotherPagePrivateField() {
+		ImageDetector originalDetector = DriverTestPageWithoutFixedPattern.getGooglePrivatePicture().getDetector();
 		try {
-			DriverTestPageWithoutFixedPattern.googlePicture.clearMemory(); // reset memory for object to detect
+			ImageDetector spiedDetector = spy(originalDetector);
+			DriverTestPageWithoutFixedPattern.getGooglePrivatePicture().setDetector(spiedDetector);
+
+			DriverTestPageWithoutFixedPattern.getGooglePrivatePicture().clearMemory(); // reset memory for object to detect
 			Calendar start = Calendar.getInstance();
 			testPageWithoutPattern.clickGooglePrivatePicture();
 			long totalTime1 = Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis();
@@ -143,12 +160,13 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 			new DriverTestPageWithoutFixedPattern().clickGooglePrivatePicture();
 			long totalTime2 = Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis();
 			logger.info(String.format("Time first click: %d ms - time second click: %d ms", totalTime1, totalTime2));
-			
-			// check second action last almost the same as the first one
-			Assert.assertTrue(Math.max(totalTime1, totalTime2)  * 1.0 / Math.min(totalTime1, totalTime2) < 1.5);
+
+			verify(spiedDetector, times(2)).detectExactZoneWithScale(); // check detector has been called 2 times
 			
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
+		} finally {
+			DriverTestPageWithoutFixedPattern.getGooglePrivatePicture().setDetector(originalDetector);
 		}
 		WaitHelper.waitForMilliSeconds(500); // in case of browser slowness
 		Assert.assertEquals(DriverTestPageWithoutFixedPattern.textElement.getValue(), "image");

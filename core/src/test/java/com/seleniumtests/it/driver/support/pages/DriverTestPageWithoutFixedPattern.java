@@ -92,6 +92,10 @@ public class DriverTestPageWithoutFixedPattern extends PageObject {
     public void clickGooglePrivatePicture() {
     	googlePrivatePicture.click();
     }
+
+	public static PictureElement getGooglePrivatePicture() {
+		return googlePrivatePicture;
+	}
     
     //for TestInterceptPage (the loader page of By has to be a PageObject)
     public By findById(String id) {
