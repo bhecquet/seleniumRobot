@@ -578,7 +578,7 @@
 					<argLine>--add-opens=java.base/java.lang=ALL-UNNAMED
 						--add-opens=java.base/java.util=ALL-UNNAMED
 						--add-opens=java.base/java.time=ALL-UNNAMED
-						--add-opens jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
+						--add-opens=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
 						${argLine}
 						-Ddebug=${seleniumRobot.debug}
 						-javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"</argLine>
@@ -652,6 +652,7 @@
 			              <artifactId>selenium-support</artifactId>
 			            </weaveDependency>
 		            </weaveDependencies>
+					<
 				</configuration>
 				<executions>
 					<execution>
@@ -807,7 +808,7 @@
                 			<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
 						</manifest>
 						<manifestEntries>
-							<Add-Opens>java.base/java.lang java.base/java.util java.base/java.time</Add-Opens>
+							<Add-Opens>java.base/java.lang java.base/java.util java.base/java.time jdk.compiler/com.sun.tools.javac.file</Add-Opens>
 						</manifestEntries>
 					</archive>
 				</configuration>
