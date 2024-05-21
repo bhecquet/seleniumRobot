@@ -60,7 +60,7 @@ public class TestJiraConnector extends GenericTest {
 		jiraOptions.put("bugtracker.jira.field.Libellé tâche ITBM", "-");
 		
 		JiraConnector jiraConnector = new JiraConnector(System.getProperty("server"), "JGEPV", System.getProperty("user"), System.getProperty("password"), jiraOptions);
-		jiraConnector.createIssue(null, null, "core", "testJira", "testng  http://confluence.covea.priv/display/portailSM/Selenium+-+Descriptions+des+scenarios", Arrays.asList(step1, step2, stepEnd), jiraOptions);
+		jiraConnector.createIssue(null, null, "core", "testJira", "testng ", Arrays.asList(step1, step2, stepEnd), jiraOptions);
 //		jiraConnector.issueAlreadyExists(new JiraBean(null, "[Selenium][core][DEV][testng] test myTest KO", "", "Bogue"));
 //		jiraConnector.updateIssue("FFC-573", "commentaire", Arrays.asList(screenshot));
 //		jiraConnector.closeIssue("FFC-837", "Terminé");
