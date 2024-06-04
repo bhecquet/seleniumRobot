@@ -172,7 +172,7 @@ public class SeleniumIdeParser {
 
 					newContent.append(String.format("%s%s%s\n", matcherXPath.group(1), xpath, matcherXPath.group(3)));
 
-				// get first URL (driver.get() call) to pass it the the driver on init
+				// get first URL (driver.get() call) to pass it to the driver on init
 				} else if (matcherUrl.matches() && !initialUrlFound) {
 					initialUrl = matcherUrl.group(1);
 					initialUrlFound = true;

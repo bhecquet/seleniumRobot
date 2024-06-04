@@ -167,9 +167,9 @@
 			</exclusions>
 	    </dependency>
 		<dependency>
-			<groupId>com.microsoft.ews-java-api</groupId>
-            <artifactId>ews-java-api</artifactId>
-            <version>2.0</version>
+			<groupId>at.datenwort.ews</groupId>
+			<artifactId>de-bwl-lgl-ews-java-api</artifactId>
+			<version>3.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.hierynomus</groupId>
