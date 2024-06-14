@@ -31,7 +31,9 @@ import java.util.stream.Collectors;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.reporter.logger.FileContent;
+import com.seleniumtests.reporter.logger.GenericFile;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.json.JSONObject;
 import org.openqa.selenium.Rectangle;
 import org.testng.IReporter;
@@ -180,7 +182,8 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 						TestNGResultUtils.getTestDescription(testResult));
 				logger.info(String.format("Result for '%s' will be visible at: %s/snapshot/testResults/result/%d/", testName, serverConnector.getUrl(), testCaseInSessionId));
 				serverConnector.addLogsToTestCaseInSession(testCaseInSessionId, generateExecutionLogs(testResult).toString());
-				
+
+				addPreviousExecutionResults(testResult);
 				List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
 				if (testSteps == null) {
 					continue;
@@ -242,12 +245,39 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			// record all attachments (after references so that video files are not included if step is OK)
 			recordAllAttachments(serverConnector, stepResultId, testStep);
 
-			// update logs on server
+			// update logs on server, with id of attachments
 			String jsonStep = testStep.toJson().toString();
 			serverConnector.updateStepResult(jsonStep, stepResultId);
 		}
 	}
-	
+
+	/**
+	 * Add a step, so that previous execution results are recorded on server
+	 * @param testResult
+	 */
+	private static void addPreviousExecutionResults(ITestResult testResult) {
+		TestStep testStep = new TestStep("No previous execution results, you can enable it via parameter '-DkeepAllResults=true'");
+		testStep.setFailed(false);
+		List<File> executionResults = new ArrayList<>();
+		if (SeleniumTestsContextManager.getGlobalContext().getKeepAllResults()) {
+			testStep.setName("Previous execution results");
+			executionResults = FileUtils.listFiles(new File(TestNGResultUtils.getSeleniumRobotTestContext(testResult).getOutputDirectory()),
+							FileFilterUtils.suffixFileFilter(".zip"), null).stream()
+					.collect(Collectors.toList());
+			logger.info("recording previous execution results");
+
+			for (File executionResultFile: executionResults) {
+				try {
+					testStep.addFile(new GenericFile(executionResultFile, executionResultFile.getName().replace(".zip", ""), false));
+				} catch (IOException e) {
+					logger.warn("Could not add previous execution result: " + e.getMessage());
+				}
+			}
+		}
+		TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps().add(testStep);
+
+	}
+
 	/**
 	 * Record logs to server
 	 * @param serverConnector

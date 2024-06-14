@@ -108,13 +108,14 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("A test which is <OK> é&"), eq("SUCCESS"), eq("LOCAL"), eq("")); // a test with custom name
 			verify(serverConnector, times(4)).createTestStep(eq("step 1"), anyInt());
 			verify(serverConnector).createTestStep(eq("step 2"), anyInt());
+			verify(serverConnector, times(5)).createTestStep(eq("No previous execution results, you can enable it via parameter '-DkeepAllResults=true'"), anyInt());
 			verify(serverConnector).createSnapshot(any(Snapshot.class), anyInt(), eq(new ArrayList<>())); // two snapshots but only once is sent because the other has no name
 			verify(serverConnector, never()).createExcludeZones(any(Rectangle.class), anyInt());
 			
 			String logs = readSeleniumRobotLogFile();
 			Assert.assertTrue(logs.contains("Snapshot hasn't any name, it won't be sent to server")); // one snapshot has no name, error message is displayed
 
-			verify(serverConnector, times(29)).recordStepResult(any(TestStep.class), anyInt(), anyInt()); // all steps are recorded
+			verify(serverConnector, times(34)).recordStepResult(any(TestStep.class), anyInt(), anyInt()); // all steps are recorded
 			// files are uploaded. Only 'testWithException' holds a Snapshot with snapshotCheckType.NONE and so, only its 2 files are uploaded
 			// other snapshots, which are used for image comparison / regression are uploaded through an other service 'createSnapshot'
 			verify(serverConnector).uploadFile(eq(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithException", "htmls", "testWithException_0-1_step_1--tened.html").toFile()), anyInt());
@@ -140,6 +141,57 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+			System.clearProperty(SeleniumTestsContext.STARTED_BY);
+		}
+	}
+
+	@Test(groups={"it"})
+	public void testReportGenerationWithPreviousReport() throws Exception {
+
+		try (MockedConstruction mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+			when(variableServer.isAlive()).thenReturn(true);
+		});
+			 MockedStatic mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
+			 MockedStatic mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+		) {
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			System.setProperty(SeleniumTestsContext.KEEP_ALL_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.STARTED_BY, "http://mylauncher/test");
+
+			initMocks(mockedCommonReporter, mockedServerConnector);
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testWithException"});
+
+			// check server has been called for all aspects of test (app, version, ...)
+			// they may be called for each test but server is responsible for uniqueness of the value
+			verify(serverConnector, atLeastOnce()).createSession(anyString(), eq("BROWSER:NONE"), eq("http://mylauncher/test"));
+
+			verify(serverConnector).createTestCase("testWithException");
+			verify(serverConnector).addLogsToTestCaseInSession(anyInt(), anyString());
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testWithException"), eq("FAILURE"), eq("LOCAL"), eq(""));
+			verify(serverConnector).createTestStep(eq("Previous execution results"), anyInt());
+
+			verify(serverConnector, times(7)).recordStepResult(any(TestStep.class), anyInt(), anyInt()); // all steps are recorded
+
+			// check images and previous execution results are recorded
+			verify(serverConnector).uploadFile(eq(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithException", "htmls", "testWithException_0-1_step_1--tened.html").toFile()), anyInt());
+			verify(serverConnector).uploadFile(eq(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithException", "screenshots", "testWithException_0-1_step_1--rtened.png").toFile()), anyInt());
+			verify(serverConnector).uploadFile(eq(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithException", "retry-testWithException-1.zip").toFile()), anyInt());
+			verify(serverConnector).uploadFile(eq(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithException", "retry-testWithException-2.zip").toFile()), anyInt());
+
+			// check logs has been uploaded (one upload for each test)
+			verify(serverConnector).uploadLogs(any(File.class), eq(0));
+			verify(serverConnector).uploadLogs(eq(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithException", "execution.log").toFile()), eq(0));
+
+
+		} finally {
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+			System.clearProperty(SeleniumTestsContext.KEEP_ALL_RESULTS);
 			System.clearProperty(SeleniumTestsContext.STARTED_BY);
 		}
 	}
@@ -433,7 +485,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 			// check server has been called for session
 			verify(serverConnector).createSession(anyString(), eq("BROWSER:NONE"), isNull()); // once per TestNG context (so 1 time here)
-			verify(serverConnector, times(13)).recordStepResult(any(TestStep.class), anyInt(), anyInt());
+			verify(serverConnector, times(15)).recordStepResult(any(TestStep.class), anyInt(), anyInt());
 			
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
