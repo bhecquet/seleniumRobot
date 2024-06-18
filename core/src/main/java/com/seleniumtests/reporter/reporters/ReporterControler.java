@@ -22,15 +22,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.seleniumtests.reporter.logger.FileContent;
@@ -354,10 +346,11 @@ public class ReporterControler implements IReporter {
 	public Set<ITestResult> removeUnecessaryResults(ITestContext context, ITestResult currentTestResult) {
 		
 		// copy current results in context so that it does not change during processing when several threads are used
+		// only keep finished tests (issue #654)
 		List<ITestResult> allResults = new ArrayList<>();
-		Set<ITestResult> passedTests = new TreeSet<>(context.getPassedTests().getAllResults());
-		Set<ITestResult> failedTests = new TreeSet<>(context.getFailedTests().getAllResults());
-		Set<ITestResult> skippedTests = new TreeSet<>(context.getSkippedTests().getAllResults());
+		Set<ITestResult> passedTests = new TreeSet<>(context.getPassedTests().getAllResults().stream().filter(r -> TestNGResultUtils.isFinished(r)).collect(Collectors.toSet()));
+		Set<ITestResult> failedTests = new TreeSet<>(context.getFailedTests().getAllResults().stream().filter(r -> TestNGResultUtils.isFinished(r)).collect(Collectors.toSet()));
+		Set<ITestResult> skippedTests = new TreeSet<>(context.getSkippedTests().getAllResults().stream().filter(r -> TestNGResultUtils.isFinished(r)).collect(Collectors.toSet()));
 		
 		allResults.addAll(passedTests);
 		allResults.addAll(failedTests);
@@ -369,7 +362,7 @@ public class ReporterControler implements IReporter {
 
 		// get an ordered list of test results so that we keep the last one of each test
 		allResults = allResults.stream()
-				.sorted((r1, r2) -> Long.compare(r1.getStartMillis(), r2.getStartMillis()))
+				.sorted(Comparator.comparingLong(ITestResult::getStartMillis))
 				.collect(Collectors.toList());
 		
 		// contains only the results to keep, that means, the last execution of each test
@@ -399,9 +392,9 @@ public class ReporterControler implements IReporter {
 		}
 		
 		Set<ITestResult> resultSet = new HashSet<>(); 
-		resultSet.addAll(context.getFailedTests().getAllResults());
-		resultSet.addAll(context.getPassedTests().getAllResults());
-		resultSet.addAll(context.getSkippedTests().getAllResults());
+		resultSet.addAll(context.getFailedTests().getAllResults().stream().filter(r -> TestNGResultUtils.isFinished(r)).collect(Collectors.toSet()));
+		resultSet.addAll(context.getPassedTests().getAllResults().stream().filter(r -> TestNGResultUtils.isFinished(r)).collect(Collectors.toSet()));
+		resultSet.addAll(context.getSkippedTests().getAllResults().stream().filter(r -> TestNGResultUtils.isFinished(r)).collect(Collectors.toSet()));
 		
 		// it's our current result, so we want if context matches
 		if (currentTestResult != null && currentTestResult.getTestContext() != null && currentTestResult.getTestContext().equals(context)) {

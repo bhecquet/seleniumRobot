@@ -56,13 +56,14 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class SeleniumRobotServerTestRecorder extends CommonReporter implements IReporter {
 
+	private static final Object lock = new Object();
+
 	public SeleniumRobotSnapshotServerConnector getServerConnector() {
 		return SeleniumRobotSnapshotServerConnector.getInstance();
 	}
 	
 	/**
 	 * Generate result for a single test method
-	 * @param ve			velocity engine used to generate file
 	 * @param testResult	result for this test method
 	 */
 	public JSONObject generateExecutionLogs(final ITestResult testResult) {
@@ -85,41 +86,43 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 	@Override
 	protected void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, String outdir, boolean optimizeReport, boolean finalGeneration) {
 		ITestContext testCtx = SeleniumTestsContextManager.getGlobalContext().getTestNGContext();
-		
-		if (testCtx == null) {
-			logger.error("Looks like your class does not extend from SeleniumTestPlan!");
-			return;
-		}
-		
-		// issue #81: use global context because these parameters are known from there (thread context is too narrow)
-		if (!Boolean.TRUE.equals(SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerActive())
-				|| !SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerRecordResults() 
-				&& !SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshot()) {
-			return;
-		}
-		
-		// check that seleniumRobot server is alive
-		SeleniumRobotSnapshotServerConnector serverConnector = getServerConnector();
-		if (!serverConnector.getActive()) {
-			logger.info("selenium-robot-server not found or down");
-			return;
-		} else {
-			try {
-				// do not create application / version / environment from script, they should already be present or created by user to avoid fill database with wrong data
-				// create session only if it has not been before
-				for (ITestContext testContext: resultSet.keySet()) {
-					recordTestSession(testContext);
-				}
-			} catch (SeleniumRobotServerException | ConfigurationException e) {
-				logger.error("Error contacting selenium robot server", e);
+
+		synchronized (lock) { // be sure we do not record the same result several times
+			if (testCtx == null) {
+				logger.error("Looks like your class does not extend from SeleniumTestPlan!");
 				return;
 			}
-		}
-		
-		try {
-			recordResults(serverConnector, resultSet);
-		} catch (SeleniumRobotServerException | ConfigurationException e) {
-			logger.error("Error recording result on selenium robot server", e);
+
+			// issue #81: use global context because these parameters are known from there (thread context is too narrow)
+			if (!Boolean.TRUE.equals(SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerActive())
+					|| !SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerRecordResults()
+					&& !SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshot()) {
+				return;
+			}
+
+			// check that seleniumRobot server is alive
+			SeleniumRobotSnapshotServerConnector serverConnector = getServerConnector();
+			if (!serverConnector.getActive()) {
+				logger.info("selenium-robot-server not found or down");
+				return;
+			} else {
+				try {
+					// do not create application / version / environment from script, they should already be present or created by user to avoid fill database with wrong data
+					// create session only if it has not been before
+					for (ITestContext testContext : resultSet.keySet()) {
+						recordTestSession(testContext);
+					}
+				} catch (SeleniumRobotServerException | ConfigurationException e) {
+					logger.error("Error contacting selenium robot server", e);
+					return;
+				}
+			}
+
+			try {
+				recordResults(serverConnector, resultSet);
+			} catch (SeleniumRobotServerException | ConfigurationException e) {
+				logger.error("Error recording result on selenium robot server", e);
+			}
 		}
 	}
 	

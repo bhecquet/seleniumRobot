@@ -101,7 +101,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	 * @param testResult
 	 */
 	public void onTestFullyFinished(ITestResult testResult) {
-
+		TestNGResultUtils.setFinished(testResult, true);
 		generateTempReport(testResult);
 		
 		SeleniumRobotLogger.removeLoggerForTest();

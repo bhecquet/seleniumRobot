@@ -77,6 +77,7 @@ public class TestNGResultUtils {
 	private static final String ERROR_CAUSES = "errorCauses"; 			// list of causes of the test error
 	private static final String ERROR_CAUSE_IN_LAST_STEP = "errorCauseInLastStep"; // true when we have searched for error cause in the last step
 	private static final String ERROR_CAUSE_IN_REFERENCE = "errorCauseInReference"; // true when we have searched for error cause by comparing reference picture of the failed step
+	private static final String FINISHED = "finished"; // true when all after methods has been executed
 
 	private TestNGResultUtils() {
 		// nothing to do
@@ -553,6 +554,15 @@ public class TestNGResultUtils {
     public static void setErrorCauseSearchedInReferencePicture(ITestResult testNGResult, Boolean errorCauseInReferencePicture) {
     	testNGResult.setAttribute(ERROR_CAUSE_IN_REFERENCE, errorCauseInReferencePicture);
     }
+
+	public static void setFinished(ITestResult testNGResult, Boolean finished) {
+		testNGResult.setAttribute(FINISHED, finished);
+	}
+
+	public static boolean isFinished(ITestResult testNGResult) {
+		Boolean finished = (Boolean) testNGResult.getAttribute(FINISHED);
+		return finished == null ? false: finished;
+	}
 
 	/**
 	 * Returns the string representation of the status: SUCCESS, ERROR, SKIPPED, ...

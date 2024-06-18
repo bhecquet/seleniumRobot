@@ -18,6 +18,7 @@
 package com.seleniumtests.it.reporter;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
@@ -51,7 +52,32 @@ public class TestReporterControler extends ReporterTest {
 		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testng-failed.xml").toFile().isFile());
 		
 	}
-	
+
+	/**
+	 * issue #654: when executing tests in parallel, report generation is performed once test method is finished, not when all "After" methods are executed
+	 * This leads to recorded results not being complete (e.g: step reference are created in @After method)
+	 * @throws IOException
+	 */
+	@Test(groups={"it"})
+	public void testReportGenerationParallel() throws IOException {
+		executeSubTest(5, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForIssue654"}, ParallelMode.METHODS, new String[]{"test1", "test2", "test3"});
+
+		String logs = readSeleniumRobotLogFile().replace("\\", "/");
+
+
+		int test1Finished = StringUtils.indexOf(logs, "after test1 finished");
+		int test1ReportGeneration = StringUtils.indexOf(logs, "test1/TestReport.html");
+		int test2Finished = StringUtils.indexOf(logs, "after test2 finished");
+		int test2ReportGeneration = StringUtils.indexOf(logs, "test2/TestReport.html");
+		int test3Finished = StringUtils.indexOf(logs, "after test3 finished");
+		int test3ReportGeneration = StringUtils.indexOf(logs, "test3/TestReport.html");
+
+		Assert.assertTrue(test1Finished < test2Finished);
+		Assert.assertTrue(test1ReportGeneration < test2ReportGeneration);
+		Assert.assertTrue(test2Finished < test2ReportGeneration);
+		Assert.assertTrue(test3Finished < test3ReportGeneration);
+	}
+
 	/**
 	 * Check that files created by robot but not integrated to tests are deleted
 	 * 
