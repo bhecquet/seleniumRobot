@@ -373,7 +373,12 @@ public class ScreenshotUtil {
     		Rectangle elementPosition = target.getElement().getRect();
     		
     		NamedBufferedImage wholeImage = capturedImages.remove(0);
-    		BufferedImage elementImage = ImageProcessor.cropImage(wholeImage.image, elementPosition.x, elementPosition.y, elementPosition.width, elementPosition.height);
+			double aspectRatio = driver.getDeviceAspectRatio();
+    		BufferedImage elementImage = ImageProcessor.cropImage(wholeImage.image,
+                    (int) Math.round(elementPosition.x * aspectRatio),
+					(int) Math.round(elementPosition.y * aspectRatio),
+					(int) Math.round(elementPosition.width * aspectRatio),
+					(int) Math.round(elementPosition.height * aspectRatio));
     		NamedBufferedImage namedElementImage = new NamedBufferedImage(elementImage, "");
     		namedElementImage.addElementMetaDataToImage(target.getElement());
     		capturedImages.add(0, namedElementImage);

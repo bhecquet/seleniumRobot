@@ -28,9 +28,14 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import com.seleniumtests.customexception.ImageSearchException;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import com.seleniumtests.uipage.ByC;
+import com.seleniumtests.uipage.htmlelements.HtmlElement;
+import com.seleniumtests.uipage.htmlelements.ImageElement;
 import com.seleniumtests.util.imaging.ImageDetector;
 import com.seleniumtests.util.video.VideoCaptureMode;
 import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.devtools.DevToolsException;
@@ -62,6 +67,32 @@ import com.seleniumtests.reporter.logger.TestStep;
  *
  */
 public class TestScreenshotUtil extends ReporterTest {
+
+
+	/**
+	 * Check the aspect ratio is taken into account when capturing element
+	 * Better check with OS zoom setting set to a value > 100%
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testElementScreenshotUsingAspectRatio() throws Exception {
+
+		setBrowser("chrome");
+		new DriverTestPageShadowDom(true);
+		WebDriver driver = WebUIDriver.getWebDriver(true);
+		try {
+			HtmlElement shadowRoot = new HtmlElement("", ByC.shadow(By.id("shadow3")));
+			SnapshotTarget snapshotTarget = new SnapshotTarget(new ImageElement("", By.id("fail2"), shadowRoot));
+
+			File image2 = new ScreenshotUtil(driver).capture(snapshotTarget, File.class);
+			BufferedImage image = new ScreenshotUtil(driver).capture(snapshotTarget, BufferedImage.class);
+			double aspectRatio = ((CustomEventFiringWebDriver)driver).getDeviceAspectRatio();
+			Assert.assertTrue(Math.abs(image.getHeight() - 150 * aspectRatio) < 1);
+			Assert.assertTrue(Math.abs(image.getWidth() - 200 * aspectRatio) < 1);
+		} finally {
+			driver.close();
+		}
+	}
 
 	@Test(groups={"it"})
 	public void testChromeScreenshotUsingCDP() throws Exception {
