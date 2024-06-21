@@ -19,6 +19,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: maven-settings-xml-action
+      uses: whelk-io/maven-settings-xml-action@v22
+      with:
+        servers: '[{ "id": "ossrh", "username": "${{ secrets.MAVEN_USERNAME }}", "password": "${{ secrets.MAVEN_PASSWORD }}" }]'
     - name: Set up Java for publishing to Maven Central Repository
       uses: actions/setup-java@v4
       with:
