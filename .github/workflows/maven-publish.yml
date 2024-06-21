@@ -19,10 +19,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: maven-settings-xml-action
-      uses: whelk-io/maven-settings-xml-action@v22
-      with:
-        servers: '[{ "id": "ossrh", "username": "${{ secrets.MAVEN_USERNAME }}", "password": "${{ secrets.MAVEN_PASSWORD }}" }]'
     - name: Set up Java for publishing to Maven Central Repository
       uses: actions/setup-java@v4
       with:
@@ -39,8 +35,12 @@ jobs:
         path: ~/.m2
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
+    - name: maven-settings-xml-action
+      uses: whelk-io/maven-settings-xml-action@v22
+      with:
+        servers: '[{ "id": "ossrh", "username": "${{ secrets.MAVEN_USERNAME }}", "password": "${{ secrets.MAVEN_PASSWORD }}" }]'
     - name: Build with Maven
-      run: mvn -B package -Dmaven.test.skip=true --file pom.xml
+      run: mvn -X -B package -Dmaven.test.skip=true --file pom.xml
     - name: git config
       run: | 
         git config --global user.email "robot@seleniumRobot.com"
