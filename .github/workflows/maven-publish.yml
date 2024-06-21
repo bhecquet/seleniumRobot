@@ -42,7 +42,7 @@ jobs:
         git config --global user.email "robot@seleniumRobot.com"
         git config --global user.name "Robot"
     - name: Publish to the Maven Central Repository
-      run: mvn release:prepare release:perform -Dmaven.test.skip=true -Dusername=git -Dpassword=${{ secrets.GITHUB_TOKEN }}
+      run: mvn release:prepare release:perform  -Darguments="-Dmaven.test.skip=true" -Dusername=git -Dpassword=${{ secrets.GITHUB_TOKEN }}
       env:
         MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
         MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
