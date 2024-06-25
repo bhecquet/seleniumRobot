@@ -860,7 +860,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     		Number devicePixelRatio = (Number) ((JavascriptExecutor)driver).executeScript(JS_PIXEL_RATIO + " return pixelRatio;", true);
     		return devicePixelRatio.doubleValue();
     	} else {
-    		return 1;
+    		return 1.0;
     	}
     }
     

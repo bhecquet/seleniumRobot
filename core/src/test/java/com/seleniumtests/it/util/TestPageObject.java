@@ -17,7 +17,20 @@
  */
 package com.seleniumtests.it.util;
 
+import com.seleniumtests.driver.screenshots.ScreenshotUtil;
+import com.seleniumtests.driver.screenshots.SnapshotCheckType;
+import com.seleniumtests.driver.screenshots.SnapshotTarget;
+import com.seleniumtests.it.driver.support.pages.DriverTestPageShadowDom;
+import com.seleniumtests.reporter.logger.Snapshot;
+import com.seleniumtests.uipage.ByC;
+import com.seleniumtests.uipage.htmlelements.HtmlElement;
+import com.seleniumtests.uipage.htmlelements.ImageElement;
+import com.seleniumtests.uipage.htmlelements.TextFieldElement;
+import com.seleniumtests.util.imaging.ImageProcessor;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Rectangle;
+import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -27,6 +40,9 @@ import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
+
+import java.awt.image.BufferedImage;
+import java.io.File;
 
 public class TestPageObject extends GenericDriverTest {
 
@@ -78,6 +94,41 @@ public class TestPageObject extends GenericDriverTest {
 		Dimension viewPortSize = ((CustomEventFiringWebDriver)driver).getViewPortDimensionWithoutScrollbar();
 		Assert.assertEquals(viewPortSize.width, 600);
 		Assert.assertEquals(viewPortSize.height, 400);
+	}
+
+	/**
+	 * Check that when an element is excluded from snapshot, its size respects the device aspect ratio
+	 * Better use a screen at a zoom level > 100% to fully check
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testElementScreenshotWithExclusionUsingAspectRatio() throws Exception {
+
+		SeleniumTestsContextManager.getThreadContext().setBrowser("*firefox");
+		SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(true);
+		DriverTestPage page = new DriverTestPage(true);
+		WebDriver driver = WebUIDriver.getWebDriver(true);
+		try {
+			ImageElement element = new ImageElement("", By.id("images"));
+			TextFieldElement elementToExclude = new TextFieldElement("", By.id("logoText"));
+
+			page.captureElementSnapshot("my capture", element, SnapshotCheckType.FULL.exclude(elementToExclude));
+
+			Snapshot elementSnapshot = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(1).getSnapshots().get(1);
+			Assert.assertEquals(elementSnapshot.getName(), "drv:main-my capture");
+			BufferedImage image = ImageProcessor.loadFromFile(elementSnapshot.getScreenshot().getImage().getFile());
+
+			double aspectRatio = ((CustomEventFiringWebDriver)driver).getDeviceAspectRatio();
+			Assert.assertTrue(Math.abs(image.getWidth() - element.getRect().getWidth() * aspectRatio) < 1);
+			Assert.assertTrue(Math.abs(image.getHeight() - element.getRect().getHeight() * aspectRatio) < 1);
+			Assert.assertEquals(elementSnapshot.getCheckSnapshot().getExcludeElementsRect().size(), 1);
+			Rectangle excludedRectangle = elementSnapshot.getCheckSnapshot().getExcludeElementsRect().get(0);
+			Assert.assertTrue(Math.abs(excludedRectangle.width - elementToExclude.getRect().width * aspectRatio) < 1);
+			Assert.assertTrue(Math.abs(excludedRectangle.height - elementToExclude.getRect().height * aspectRatio) < 1);
+
+		} finally {
+			driver.close();
+		}
 	}
 
 }

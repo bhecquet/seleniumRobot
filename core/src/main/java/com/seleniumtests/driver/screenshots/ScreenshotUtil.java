@@ -331,6 +331,7 @@ public class ScreenshotUtil {
 	 */
 	private List<NamedBufferedImage> captureAllImages(SnapshotTarget target, boolean allWindows, int scrollDelay) {
 		List<NamedBufferedImage> capturedImages = new ArrayList<>();
+		double aspectRatio = driver.getDeviceAspectRatio();
     	
     	// capture desktop
     	if (target.isScreenTarget() && SeleniumTestsContextManager.isDesktopWebTest()) {
@@ -355,7 +356,7 @@ public class ScreenshotUtil {
     	} else if (target.isElementTarget() && SeleniumTestsContextManager.isWebTest()) {
     		removeAlert();
     		try {
-    			target.setSnapshotRectangle(target.getElement().getRect());
+    			target.setSnapshotRectangle(getElementRectangleWithAR(target.getElement(), aspectRatio));
     		} catch (WebDriverException e) {
 				throw new ScenarioException(String.format("Cannot check element %s snapshot as it is not available", target.getElement()));
 			}
@@ -370,15 +371,15 @@ public class ScreenshotUtil {
     	
     	// if we want to capture an element only, crop the previous capture
     	if (target.isElementTarget() && target.getElement() != null && !capturedImages.isEmpty()) {
-    		Rectangle elementPosition = target.getElement().getRect();
+    		Rectangle elementPosition = target.getSnapshotRectangle();
     		
     		NamedBufferedImage wholeImage = capturedImages.remove(0);
-			double aspectRatio = driver.getDeviceAspectRatio();
+
     		BufferedImage elementImage = ImageProcessor.cropImage(wholeImage.image,
-                    (int) Math.round(elementPosition.x * aspectRatio),
-					(int) Math.round(elementPosition.y * aspectRatio),
-					(int) Math.round(elementPosition.width * aspectRatio),
-					(int) Math.round(elementPosition.height * aspectRatio));
+                    elementPosition.x,
+					elementPosition.y,
+					elementPosition.width,
+					elementPosition.height);
     		NamedBufferedImage namedElementImage = new NamedBufferedImage(elementImage, "");
     		namedElementImage.addElementMetaDataToImage(target.getElement());
     		capturedImages.add(0, namedElementImage);
@@ -740,5 +741,22 @@ public class ScreenshotUtil {
     	screenShot.setDuration(duration);
 		return screenShot;
     }
+
+	/**
+	 * Returns the element rectangle applying aspect ratio, in case screen / browser is not at 100%
+	 * @param element
+	 * @param aspectRatio
+	 * @return
+	 */
+	public static Rectangle getElementRectangleWithAR(WebElement element, double aspectRatio) {
+		Rectangle rectangle = element.getRect();
+
+		return new Rectangle(
+				(int) Math.round(rectangle.x * aspectRatio),
+				(int) Math.round(rectangle.y * aspectRatio),
+				(int) Math.round(rectangle.height * aspectRatio),
+				(int) Math.round(rectangle.width * aspectRatio)
+		);
+	}
  
 }

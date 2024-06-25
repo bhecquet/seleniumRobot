@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.seleniumtests.connectors.selenium.fielddetector.Field;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import com.seleniumtests.driver.WebUIDriver;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriverException;
@@ -76,18 +78,23 @@ public class SnapshotCheckType {
 	private String rectangleToString(Rectangle rect) {
 		return String.format("Rectangle(%d, %d, %d, %d)", rect.x, rect.y, rect.width, rect.height);
 	}
+
 	
 	/**
 	 * Check if the SnapshotCheckType is valid with the provided target (Screen, Page, Element)
 	 * @param target
 	 */
 	public void check(SnapshotTarget target) {
+
+		WebUIDriver uiDriver = WebUIDriver.getWebUIDriver(false);
+		CustomEventFiringWebDriver driver = (CustomEventFiringWebDriver)uiDriver.getDriver();
+		double aspectRatio = driver.getDeviceAspectRatio();
 		
 		// when target is a screen, do not take into account excluded elements
 		if (target.isPageTarget()) {
 			for (WebElement el: excludeElements) {
 				try {
-					excludeElementsRect.add(el.getRect());
+					excludeElementsRect.add(ScreenshotUtil.getElementRectangleWithAR(el, aspectRatio));
 				} catch (WebDriverException e) {
 					logger.warn(String.format("Element %s not added to exclusion as it cannot be found", el));
 				}
@@ -96,7 +103,7 @@ public class SnapshotCheckType {
 			WebElement targetElement = target.getElement();
 			Rectangle targetRectangle;
 			try {
-				targetRectangle = target.getSnapshotRectangle();
+				targetRectangle = target.getSnapshotRectangle(); // aspect ratio is already applied here
 			} catch (WebDriverException e) {
 				throw new ScenarioException(String.format("Cannot check element %s snapshot as it is not available", targetElement));
 			}
@@ -104,7 +111,9 @@ public class SnapshotCheckType {
 			// check all elements to exclude are included in targetElement
 			for (WebElement el: excludeElements) {
 				try {
-					Rectangle elementRectangle = el.getRect();
+					Rectangle elementRectangle = ScreenshotUtil.getElementRectangleWithAR(el, aspectRatio);
+
+
 					
 					if (elementRectangle.x < targetRectangle.x
 							|| elementRectangle.y < targetRectangle.y
