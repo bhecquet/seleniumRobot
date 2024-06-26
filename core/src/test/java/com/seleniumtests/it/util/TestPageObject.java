@@ -125,6 +125,8 @@ public class TestPageObject extends GenericDriverTest {
 			Rectangle excludedRectangle = elementSnapshot.getCheckSnapshot().getExcludeElementsRect().get(0);
 			Assert.assertTrue(Math.abs(excludedRectangle.width - elementToExclude.getRect().width * aspectRatio) < 1);
 			Assert.assertTrue(Math.abs(excludedRectangle.height - elementToExclude.getRect().height * aspectRatio) < 1);
+			Assert.assertTrue(excludedRectangle.x < 2);
+			Assert.assertTrue(excludedRectangle.y < image.getHeight() / 2 + 10);
 
 		} finally {
 			driver.close();

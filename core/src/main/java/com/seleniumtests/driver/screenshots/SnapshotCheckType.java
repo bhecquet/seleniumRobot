@@ -117,7 +117,12 @@ public class SnapshotCheckType {
 						logger.warn(String.format("Element %s is not inside %s and won't be excluded", rectangleToString(elementRectangle), rectangleToString(targetRectangle)));
 					
 					} else {
-						excludeElementsRect.add(elementRectangle);
+
+						excludeElementsRect.add(new Rectangle(
+								elementRectangle.x - targetRectangle.x,
+								elementRectangle.y - targetRectangle.y,
+								elementRectangle.height,
+								elementRectangle.width));
 					}
 					
 				} catch (WebDriverException e) {
