@@ -331,7 +331,6 @@ public class ScreenshotUtil {
 	 */
 	private List<NamedBufferedImage> captureAllImages(SnapshotTarget target, boolean allWindows, int scrollDelay) {
 		List<NamedBufferedImage> capturedImages = new ArrayList<>();
-		double aspectRatio = driver.getDeviceAspectRatio();
     	
     	// capture desktop
     	if (target.isScreenTarget() && SeleniumTestsContextManager.isDesktopWebTest()) {
@@ -356,6 +355,7 @@ public class ScreenshotUtil {
     	} else if (target.isElementTarget() && SeleniumTestsContextManager.isWebTest()) {
     		removeAlert();
     		try {
+				double aspectRatio = driver.getDeviceAspectRatio();
     			target.setSnapshotRectangle(getElementRectangleWithAR(target.getElement(), aspectRatio));
     		} catch (WebDriverException e) {
 				throw new ScenarioException(String.format("Cannot check element %s snapshot as it is not available", target.getElement()));
