@@ -51,10 +51,25 @@ public class TestSnapshotCheckType extends MockitoTest {
 		when(snapshotTarget.isPageTarget()).thenReturn(true);
 		
 		SnapshotCheckType checkType = SnapshotCheckType.FULL.exclude(elementToExclude1);
-		checkType.check(snapshotTarget);
+		checkType.check(snapshotTarget, 1.0);
 		
 		Assert.assertEquals(checkType.getExcludeElementsRect().size(), 1);
 		Assert.assertEquals(checkType.getExcludeElementsRect().get(0), new Rectangle(1,  2,  3,  4));
+	}
+
+	/**
+	 * Check aspect ratio is applied to excluded rectangle
+	 */
+	@Test(groups= {"ut"})
+	public void testExcludeElementFromPageWithAspectRatio() {
+		when(elementToExclude1.getRect()).thenReturn(new Rectangle(1,  2,  3,  4));
+		when(snapshotTarget.isPageTarget()).thenReturn(true);
+
+		SnapshotCheckType checkType = SnapshotCheckType.FULL.exclude(elementToExclude1);
+		checkType.check(snapshotTarget, 1.5);
+
+		Assert.assertEquals(checkType.getExcludeElementsRect().size(), 1);
+		Assert.assertEquals(checkType.getExcludeElementsRect().get(0), new Rectangle(2,  3,  5,  6));
 	}
 	
 	@Test(groups= {"ut"})
@@ -64,7 +79,7 @@ public class TestSnapshotCheckType extends MockitoTest {
 		when(snapshotTarget.isPageTarget()).thenReturn(true);
 		
 		SnapshotCheckType checkType = SnapshotCheckType.FULL.exclude(Arrays.asList(elementToExclude1, elementToExclude2));
-		checkType.check(snapshotTarget);
+		checkType.check(snapshotTarget, 1.0);
 		
 		Assert.assertEquals(checkType.getExcludeElementsRect().size(), 2);
 		Assert.assertEquals(checkType.getExcludeElementsRect().get(0), new Rectangle(1,  2,  3,  4));
@@ -80,7 +95,7 @@ public class TestSnapshotCheckType extends MockitoTest {
 		when(snapshotTarget.isPageTarget()).thenReturn(true);
 		
 		SnapshotCheckType checkType = SnapshotCheckType.FULL.exclude(elementToExclude1);
-		checkType.check(snapshotTarget);
+		checkType.check(snapshotTarget, 1.0);
 		
 		Assert.assertEquals(checkType.getExcludeElementsRect().size(), 0);
 	}
@@ -98,10 +113,25 @@ public class TestSnapshotCheckType extends MockitoTest {
 		when(snapshotTarget.getSnapshotRectangle()).thenReturn(new Rectangle(0,  0,  100,  100));
 		
 		SnapshotCheckType checkType = SnapshotCheckType.FULL.exclude(elementToExclude1);
-		checkType.check(snapshotTarget);
+		checkType.check(snapshotTarget, 1.0);
 		
 		Assert.assertEquals(checkType.getExcludeElementsRect().size(), 1);
 		Assert.assertEquals(checkType.getExcludeElementsRect().get(0), new Rectangle(1,  2,  3,  4));
+	}
+
+	@Test(groups= {"ut"})
+	public void testExcludeElementInsideViewportWithAspectRatio() {
+		when(elementToExclude1.getRect()).thenReturn(new Rectangle(1,  2,  3,  4));
+		when(snapshotTarget.isPageTarget()).thenReturn(false);
+		when(snapshotTarget.isElementTarget()).thenReturn(false);
+		when(snapshotTarget.isViewportTarget()).thenReturn(true);
+		when(snapshotTarget.getSnapshotRectangle()).thenReturn(new Rectangle(0,  0,  100,  100));
+
+		SnapshotCheckType checkType = SnapshotCheckType.FULL.exclude(elementToExclude1);
+		checkType.check(snapshotTarget, 1.5);
+
+		Assert.assertEquals(checkType.getExcludeElementsRect().size(), 1);
+		Assert.assertEquals(checkType.getExcludeElementsRect().get(0), new Rectangle(2,  3,  5,  6));
 	}
 
 	/**
@@ -117,8 +147,22 @@ public class TestSnapshotCheckType extends MockitoTest {
 		when(snapshotTarget.getSnapshotRectangle()).thenReturn(new Rectangle(0,  0,  100,  100));
 		
 		SnapshotCheckType checkType = SnapshotCheckType.FULL.exclude(elementToExclude1);
-		checkType.check(snapshotTarget);
+		checkType.check(snapshotTarget, 1.0);
 		
+		Assert.assertEquals(checkType.getExcludeElementsRect().size(), 0);
+	}
+
+	@Test(groups= {"ut"})
+	public void testExcludeElementOutsideViewport1AspectRatio() {
+		when(elementToExclude1.getRect()).thenReturn(new Rectangle(67,  20,  3,  4));
+		when(snapshotTarget.isPageTarget()).thenReturn(false);
+		when(snapshotTarget.isElementTarget()).thenReturn(false);
+		when(snapshotTarget.isViewportTarget()).thenReturn(true);
+		when(snapshotTarget.getSnapshotRectangle()).thenReturn(new Rectangle(0,  0,  100,  100));
+
+		SnapshotCheckType checkType = SnapshotCheckType.FULL.exclude(elementToExclude1);
+		checkType.check(snapshotTarget, 1.5);
+
 		Assert.assertEquals(checkType.getExcludeElementsRect().size(), 0);
 	}
 	/**
@@ -134,7 +178,7 @@ public class TestSnapshotCheckType extends MockitoTest {
 		when(snapshotTarget.getSnapshotRectangle()).thenReturn(new Rectangle(1,  0,  100,  100));
 		
 		SnapshotCheckType checkType = SnapshotCheckType.FULL.exclude(elementToExclude1);
-		checkType.check(snapshotTarget);
+		checkType.check(snapshotTarget, 1.0);
 		
 		Assert.assertEquals(checkType.getExcludeElementsRect().size(), 0);
 	}
@@ -151,7 +195,7 @@ public class TestSnapshotCheckType extends MockitoTest {
 		when(snapshotTarget.getSnapshotRectangle()).thenReturn(new Rectangle(0,  1,  100,  100));
 		
 		SnapshotCheckType checkType = SnapshotCheckType.FULL.exclude(elementToExclude1);
-		checkType.check(snapshotTarget);
+		checkType.check(snapshotTarget, 1.0);
 		
 		Assert.assertEquals(checkType.getExcludeElementsRect().size(), 0);
 	}
@@ -168,7 +212,7 @@ public class TestSnapshotCheckType extends MockitoTest {
 		when(snapshotTarget.getSnapshotRectangle()).thenReturn(new Rectangle(0,  0,  100,  100));
 		
 		SnapshotCheckType checkType = SnapshotCheckType.FULL.exclude(elementToExclude1);
-		checkType.check(snapshotTarget);
+		checkType.check(snapshotTarget, 1.0);
 		
 		Assert.assertEquals(checkType.getExcludeElementsRect().size(), 0);
 	}
@@ -185,7 +229,7 @@ public class TestSnapshotCheckType extends MockitoTest {
 		when(snapshotTarget.getSnapshotRectangle()).thenReturn(new Rectangle(0,  0,  100,  100));
 		
 		SnapshotCheckType checkType = SnapshotCheckType.FULL.exclude(elementToExclude1);
-		checkType.check(snapshotTarget);
+		checkType.check(snapshotTarget, 1.0);
 		
 		Assert.assertEquals(checkType.getExcludeElementsRect().size(), 0);
 	}
@@ -202,7 +246,7 @@ public class TestSnapshotCheckType extends MockitoTest {
 		when(snapshotTarget.getSnapshotRectangle()).thenReturn(new Rectangle(0,  0,  100,  100));
 		
 		SnapshotCheckType checkType = SnapshotCheckType.FULL.exclude(elementToExclude1);
-		checkType.check(snapshotTarget);
+		checkType.check(snapshotTarget, 1.0);
 		
 		Assert.assertEquals(checkType.getExcludeElementsRect().size(), 0);
 	}
@@ -219,10 +263,25 @@ public class TestSnapshotCheckType extends MockitoTest {
 		when(snapshotTarget.getSnapshotRectangle()).thenReturn(new Rectangle(0,  0,  100,  100));
 		
 		SnapshotCheckType checkType = SnapshotCheckType.FULL.exclude(elementToExclude1);
-		checkType.check(snapshotTarget);
+		checkType.check(snapshotTarget, 1.0);
 		
 		Assert.assertEquals(checkType.getExcludeElementsRect().size(), 1);
 		Assert.assertEquals(checkType.getExcludeElementsRect().get(0), new Rectangle(1,  2,  3,  4));
+	}
+
+	@Test(groups= {"ut"})
+	public void testExcludeElementInsideElementWithAspectRatio() {
+		when(elementToExclude1.getRect()).thenReturn(new Rectangle(1,  2,  3,  4));
+		when(snapshotTarget.getElement()).thenReturn(element);
+		when(snapshotTarget.isPageTarget()).thenReturn(false);
+		when(snapshotTarget.isElementTarget()).thenReturn(true);
+		when(snapshotTarget.getSnapshotRectangle()).thenReturn(new Rectangle(0,  0,  100,  100));
+
+		SnapshotCheckType checkType = SnapshotCheckType.FULL.exclude(elementToExclude1);
+		checkType.check(snapshotTarget, 1.5);
+
+		Assert.assertEquals(checkType.getExcludeElementsRect().size(), 1);
+		Assert.assertEquals(checkType.getExcludeElementsRect().get(0), new Rectangle(2,  3,  5,  6));
 	}
 
 	/**
@@ -238,7 +297,7 @@ public class TestSnapshotCheckType extends MockitoTest {
 		when(snapshotTarget.getSnapshotRectangle()).thenReturn(new Rectangle(0,  0,  100,  100));
 		
 		SnapshotCheckType checkType = SnapshotCheckType.FULL.exclude(elementToExclude1);
-		checkType.check(snapshotTarget);
+		checkType.check(snapshotTarget, 1.0);
 		
 		Assert.assertEquals(checkType.getExcludeElementsRect().size(), 0);
 	}
@@ -255,7 +314,7 @@ public class TestSnapshotCheckType extends MockitoTest {
 		when(snapshotTarget.getSnapshotRectangle()).thenReturn(new Rectangle(1,  0,  100,  100));
 		
 		SnapshotCheckType checkType = SnapshotCheckType.FULL.exclude(elementToExclude1);
-		checkType.check(snapshotTarget);
+		checkType.check(snapshotTarget, 1.0);
 		
 		Assert.assertEquals(checkType.getExcludeElementsRect().size(), 0);
 	}
@@ -272,8 +331,22 @@ public class TestSnapshotCheckType extends MockitoTest {
 		when(snapshotTarget.getSnapshotRectangle()).thenReturn(new Rectangle(0,  1,  100,  100));
 		
 		SnapshotCheckType checkType = SnapshotCheckType.FULL.exclude(elementToExclude1);
-		checkType.check(snapshotTarget);
+		checkType.check(snapshotTarget, 1.0);
 		
+		Assert.assertEquals(checkType.getExcludeElementsRect().size(), 0);
+	}
+
+	@Test(groups= {"ut"})
+	public void testExcludeElementOutsideElement3WithAspectRatio() {
+		when(elementToExclude1.getRect()).thenReturn(new Rectangle(0,  99,  1,  4));
+		when(snapshotTarget.getElement()).thenReturn(element);
+		when(snapshotTarget.isPageTarget()).thenReturn(false);
+		when(snapshotTarget.isElementTarget()).thenReturn(true);
+		when(snapshotTarget.getSnapshotRectangle()).thenReturn(new Rectangle(0,  1,  100,  100));
+
+		SnapshotCheckType checkType = SnapshotCheckType.FULL.exclude(elementToExclude1);
+		checkType.check(snapshotTarget, 1.5);
+
 		Assert.assertEquals(checkType.getExcludeElementsRect().size(), 0);
 	}
 	/**
@@ -289,7 +362,7 @@ public class TestSnapshotCheckType extends MockitoTest {
 		when(snapshotTarget.getSnapshotRectangle()).thenReturn(new Rectangle(0,  0,  100,  100));
 		
 		SnapshotCheckType checkType = SnapshotCheckType.FULL.exclude(elementToExclude1);
-		checkType.check(snapshotTarget);
+		checkType.check(snapshotTarget, 1.0);
 		
 		Assert.assertEquals(checkType.getExcludeElementsRect().size(), 0);
 	}
@@ -306,7 +379,7 @@ public class TestSnapshotCheckType extends MockitoTest {
 		when(snapshotTarget.getSnapshotRectangle()).thenReturn(new Rectangle(0,  0,  100,  100));
 		
 		SnapshotCheckType checkType = SnapshotCheckType.FULL.exclude(elementToExclude1);
-		checkType.check(snapshotTarget);
+		checkType.check(snapshotTarget, 1.0);
 		
 		Assert.assertEquals(checkType.getExcludeElementsRect().size(), 0);
 	}
@@ -323,7 +396,7 @@ public class TestSnapshotCheckType extends MockitoTest {
 		when(snapshotTarget.getSnapshotRectangle()).thenReturn(new Rectangle(0,  0,  100,  100));
 		
 		SnapshotCheckType checkType = SnapshotCheckType.FULL.exclude(elementToExclude1);
-		checkType.check(snapshotTarget);
+		checkType.check(snapshotTarget, 1.0);
 		
 		Assert.assertEquals(checkType.getExcludeElementsRect().size(), 0);
 	}
@@ -338,7 +411,7 @@ public class TestSnapshotCheckType extends MockitoTest {
 		when(snapshotTarget.isElementTarget()).thenReturn(false);
 		
 		SnapshotCheckType checkType = SnapshotCheckType.FULL.exclude(elementToExclude1);
-		checkType.check(snapshotTarget);
+		checkType.check(snapshotTarget, 1.0);
 		
 		Assert.assertEquals(checkType.getExcludeElementsRect().size(), 0);
 	}

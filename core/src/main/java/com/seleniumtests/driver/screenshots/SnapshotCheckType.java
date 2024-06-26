@@ -8,6 +8,7 @@ import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.Rectangle;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
@@ -84,11 +85,7 @@ public class SnapshotCheckType {
 	 * Check if the SnapshotCheckType is valid with the provided target (Screen, Page, Element)
 	 * @param target
 	 */
-	public void check(SnapshotTarget target) {
-
-		WebUIDriver uiDriver = WebUIDriver.getWebUIDriver(false);
-		CustomEventFiringWebDriver driver = (CustomEventFiringWebDriver)uiDriver.getDriver();
-		double aspectRatio = driver.getDeviceAspectRatio();
+	public void check(SnapshotTarget target, double aspectRatio) {
 		
 		// when target is a screen, do not take into account excluded elements
 		if (target.isPageTarget()) {
@@ -113,8 +110,6 @@ public class SnapshotCheckType {
 				try {
 					Rectangle elementRectangle = ScreenshotUtil.getElementRectangleWithAR(el, aspectRatio);
 
-
-					
 					if (elementRectangle.x < targetRectangle.x
 							|| elementRectangle.y < targetRectangle.y
 							|| elementRectangle.x + elementRectangle.width > targetRectangle.x + targetRectangle.width

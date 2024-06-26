@@ -84,7 +84,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 
 		when(element.getRect()).thenReturn(new Rectangle(10,  11, 12, 13));
 		SnapshotCheckType snapshotCheckType = SnapshotCheckType.FULL.exclude(element);
-		snapshotCheckType.check(SnapshotTarget.PAGE);
+		snapshotCheckType.check(SnapshotTarget.PAGE, 1.0);
 		
 		when(snapshot.getScreenshot()).thenReturn(screenshot);
 		when(snapshot.getName()).thenReturn("snapshot");
@@ -775,7 +775,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		
 		connector.setVersionId(11); // set it directly has it has been reset on creation
 		SnapshotCheckType snapshotCheckType = SnapshotCheckType.FULL;
-		snapshotCheckType.check(SnapshotTarget.PAGE);
+		snapshotCheckType.check(SnapshotTarget.PAGE, 1.0);
 		when(snapshot.getCheckSnapshot()).thenReturn(snapshotCheckType);
 		
 		SnapshotComparisonResult snapshotHasNoDifference = connector.checkSnapshotHasNoDifferences(snapshot, "Test 1", "Step 1");

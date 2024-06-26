@@ -104,7 +104,7 @@ public class TestPageObject extends GenericDriverTest {
 	@Test(groups={"it"})
 	public void testElementScreenshotWithExclusionUsingAspectRatio() throws Exception {
 
-		SeleniumTestsContextManager.getThreadContext().setBrowser("*firefox");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("*chrome");
 		SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(true);
 		DriverTestPage page = new DriverTestPage(true);
 		WebDriver driver = WebUIDriver.getWebDriver(true);

@@ -588,7 +588,7 @@ public class PageObject extends BasePage implements IPage {
     	ScreenShot screenShot = screenshotUtil.capture(SnapshotTarget.PAGE, ScreenShot.class, computeScrollDelay(checkSnapshot));
     	
     	// check SnapshotCheckType configuration is compatible with the snapshot
-    	checkSnapshot.check(SnapshotTarget.PAGE);
+    	checkSnapshot.check(SnapshotTarget.PAGE, ((CustomEventFiringWebDriver)driver).getDeviceAspectRatio());
     	
     	storeSnapshot(snapshotName, screenShot, checkSnapshot);
     }
@@ -603,7 +603,7 @@ public class PageObject extends BasePage implements IPage {
     	ScreenShot screenShot = screenshotUtil.capture(SnapshotTarget.VIEWPORT, ScreenShot.class);
     	
     	// check SnapshotCheckType configuration is compatible with the snapshot
-    	checkSnapshot.check(SnapshotTarget.VIEWPORT);
+    	checkSnapshot.check(SnapshotTarget.VIEWPORT, ((CustomEventFiringWebDriver)driver).getDeviceAspectRatio());
     	
     	storeSnapshot(snapshotName, screenShot, checkSnapshot);
     }
@@ -660,7 +660,7 @@ public class PageObject extends BasePage implements IPage {
     	ScreenShot screenShot = screenshotUtil.capture(snapshotTarget, ScreenShot.class, computeScrollDelay(checkSnapshot));
 
     	// check SnapshotCheckType configuration is compatible with the snapshot
-    	checkSnapshot.check(snapshotTarget);
+    	checkSnapshot.check(snapshotTarget, ((CustomEventFiringWebDriver)driver).getDeviceAspectRatio());
     	
     	storeSnapshot(snapshotName, screenShot, checkSnapshot);
     }
