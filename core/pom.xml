@@ -215,11 +215,6 @@
 		            <groupId>org.apache.commons</groupId>
 		            <artifactId>commons-text</artifactId>
                 </exclusion>
-				<!-- Java > 8 -->
-<!--				<exclusion>-->
-<!--					<groupId>xml-apis</groupId>-->
-<!--					<artifactId>xml-apis</artifactId>-->
-<!--				</exclusion>-->
 		    </exclusions>
 		</dependency>
 		<dependency>
@@ -335,12 +330,12 @@
 			<scope>test</scope>
 		</dependency>
 		<!-- needed for offline instrumentation. Offline is used because tests using powermockito are not correctly analyzed due to https://github.com/powermock/powermock/issues/727 -->
-        <dependency>
+        <!--<dependency>
             <groupId>org.jacoco</groupId>
             <artifactId>org.jacoco.agent</artifactId>
             <version>${jacoco.version}</version>
             <classifier>runtime</classifier>
-		</dependency>
+		</dependency>-->
 	</dependencies>
 
 	<build>
@@ -389,7 +384,7 @@
 
 				<executions>
 					<!-- comment for online instrumentation -->
-					<execution>
+					<!--<execution>
 						<id>default-instrument</id>
 						<goals>
 							<goal>instrument</goal>
@@ -429,9 +424,9 @@
 							<dataFile>${project.build.directory}/coverage-reports/jacoco-it.exec</dataFile>
 							<outputDirectory>${project.build.directory}/jacoco-it</outputDirectory>
 						</configuration>
-					</execution>
+					</execution>-->
 					<!-- /comment -->
-					<!-- <execution>
+					<execution>
                         <id>default-prepare-agent</id>
                         <goals>
                             <goal>prepare-agent</goal>
@@ -474,7 +469,7 @@
                             <dataFile>${project.build.directory}/coverage-reports/jacoco-it.exec</dataFile>
                             <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
                         </configuration>
-                    </execution> -->
+                    </execution>
 				</executions>
 			</plugin>
 			
