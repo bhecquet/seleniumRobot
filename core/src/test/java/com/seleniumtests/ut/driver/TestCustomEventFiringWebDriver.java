@@ -205,6 +205,14 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 
 		Assert.assertFalse(eventDriver.isBrowserOrAppClosed());
 	}
+	@Test(groups = {"ut"})
+	public void testIsBrowserOrAppClosedMobileAppWithWebContext() {
+		when(mobileDriver.getWindowHandles()).thenReturn(new TreeSet<>()); // check we don't call getWindowHandles
+		when(mobileDriver.getContext()).thenReturn("WEBVIEW");
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null));
+
+		Assert.assertFalse(eventDriver.isBrowserOrAppClosed());
+	}
 	
 	@Test(groups = {"ut"})
 	public void testGetPageSource() {

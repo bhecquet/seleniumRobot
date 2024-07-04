@@ -804,7 +804,10 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     	try {
     		getSessionId();
     		getCapabilities();
-			if (isWebTest()) {
+
+			// check only for web browser tests, not browser inside mobile app, as in the later case, embedded browser may not
+			// have any active window, if app has switched to a NATIVE page
+			if (testType.family().equals(TestType.WEB)) {
 				return driver.getWindowHandles().isEmpty();
 			} else {
 				// in case of mobile app, we assume the app is not closed. Closing the app should only be done at test end
