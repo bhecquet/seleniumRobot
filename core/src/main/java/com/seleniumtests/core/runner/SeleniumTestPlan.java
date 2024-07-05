@@ -19,12 +19,17 @@ package com.seleniumtests.core.runner;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 
@@ -42,18 +47,49 @@ public  class SeleniumTestPlan extends SeleniumRobotTestPlan {
 	public void configure() {
 		setCucumberTest(false);
 	}
-	
 
-	private File getDatasetFile(Method testMethod) {
-		File csvDatasetFile = Paths.get(robotConfig().getApplicationDataPath(), "dataset", robotConfig().getTestEnv(), testMethod.getName() + ".csv").toFile();
-		File xlsxDatasetFile = Paths.get(robotConfig().getApplicationDataPath(), "dataset", robotConfig().getTestEnv(), testMethod.getName() + ".xlsx").toFile();
-    	
-		if (csvDatasetFile.exists()) {
-			return csvDatasetFile;
-		} else if (xlsxDatasetFile.exists()) {
-			return xlsxDatasetFile;
+	private File getDatasetFile(InputStream inputStream, String extension) throws IOException {
+		File tempFile = File.createTempFile("dataset", extension);
+		tempFile.deleteOnExit();
+		FileUtils.copyInputStreamToFile(inputStream, tempFile);
+		return tempFile;
+	}
+
+	private File getDatasetFile(Method testMethod) throws IOException {
+		String datasetPath = SeleniumTestsContextManager.getDatasetPath();
+
+		if (datasetPath.startsWith("classpath:")) {
+			String csvResourceName = String.format("%s/%s/%s.csv",
+					datasetPath.replace("classpath:", ""),
+					robotConfig().getTestEnv(),
+					testMethod.getName());
+			InputStream csvResource = Thread.currentThread().getContextClassLoader().getResourceAsStream(csvResourceName);
+			String xlsxResourceName = String.format("%s/%s/%s.xlsx",
+					datasetPath.replace("classpath:", ""),
+					robotConfig().getTestEnv(),
+					testMethod.getName());
+			InputStream xlsxResource = Thread.currentThread().getContextClassLoader().getResourceAsStream(xlsxResourceName);
+
+			if (csvResource != null) {
+				return getDatasetFile(csvResource, ".csv");
+			} else if (xlsxResource != null) {
+				return getDatasetFile(xlsxResource, ".xlsx");
+			} else {
+				throw new ConfigurationException(String.format("Dataset file %s or %s does not exist in resource", csvResourceName, xlsxResourceName));
+			}
+
 		} else {
-			throw new ConfigurationException(String.format("Dataset file %s or %s does not exist", csvDatasetFile, xlsxDatasetFile));
+
+			File csvDatasetFile = Paths.get(robotConfig().getApplicationDataPath(), "dataset", robotConfig().getTestEnv(), testMethod.getName() + ".csv").toFile();
+			File xlsxDatasetFile = Paths.get(robotConfig().getApplicationDataPath(), "dataset", robotConfig().getTestEnv(), testMethod.getName() + ".xlsx").toFile();
+
+			if (csvDatasetFile.exists()) {
+				return csvDatasetFile;
+			} else if (xlsxDatasetFile.exists()) {
+				return xlsxDatasetFile;
+			} else {
+				throw new ConfigurationException(String.format("Dataset file %s or %s does not exist", csvDatasetFile, xlsxDatasetFile));
+			}
 		}
 	}
 	

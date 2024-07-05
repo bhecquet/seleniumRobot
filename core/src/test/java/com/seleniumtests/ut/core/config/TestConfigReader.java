@@ -18,8 +18,12 @@
 package com.seleniumtests.ut.core.config;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.Test;
@@ -47,11 +51,35 @@ public class TestConfigReader extends GenericTest {
 	}
 	
 	@Test(groups={"ut context"})
-	public void getConfigFile(final ITestContext testNGCtx) {
+	public void getConfigFile(final ITestContext testNGCtx) throws IOException {
 		initThreadContext(testNGCtx);
-		File config = ConfigReader.getConfigFile();
-		Assert.assertEquals(config.getName(), "config.ini", "Key should not be overriden");
-		Assert.assertTrue(config.getAbsolutePath().contains("core"));
+		InputStream config = ConfigReader.getConfigFile();
+		String configContent = IOUtils.toString(config, StandardCharsets.UTF_8);
+		Assert.assertTrue(configContent.contains("key1=value1"));
+	}
+
+	/**
+	 * Check case where application name is defined and data should be get from resources
+	 * @param testNGCtx
+	 * @throws IOException
+	 */
+	@Test(groups={"ut context"})
+	public void getConfigFileFromResources(final ITestContext testNGCtx) throws IOException {
+		String suiteFileName = testNGCtx.getCurrentXmlTest().getSuite().getFileName();
+		try {
+			System.setProperty("applicationName", "core2");
+
+			testNGCtx.getCurrentXmlTest().getSuite().setFileName("/home/test/suite.xml");
+
+			// regenerate variables to use the property set above
+			SeleniumTestsContextManager.generateApplicationPath(testNGCtx.getCurrentXmlTest().getSuite());
+			InputStream config = ConfigReader.getConfigFile();
+			String configContent = IOUtils.toString(config, StandardCharsets.UTF_8);
+			Assert.assertTrue(configContent.contains("key1=core2"));
+		} finally {
+			testNGCtx.getCurrentXmlTest().getSuite().setFileName(suiteFileName);
+			System.clearProperty("applicationName");
+		}
 	}
 	
 	/**

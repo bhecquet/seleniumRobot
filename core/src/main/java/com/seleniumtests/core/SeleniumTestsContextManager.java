@@ -64,8 +64,6 @@ public class SeleniumTestsContextManager {
 	private static String dataPath;
 	private static String cachePath;
 	private static String appDataPath;
-	private static String featuresPath;
-	private static String configPath;
 	private static String applicationName;
 	private static String applicationNameWithVersion;
 	private static String applicationVersion;
@@ -655,36 +653,47 @@ public class SeleniumTestsContextManager {
 				applicationName = applicationNameWithVersion;
 			}
 			dataPath = xmlSuite.getFileName().replace(File.separator, "/").split("/"+ DATA_FOLDER_NAME + "/")[0] + "/" + DATA_FOLDER_NAME + "/";
+			appDataPath = Paths.get(dataPath, applicationNameWithVersion).toString();
+
+
 		} catch (IndexOutOfBoundsException | NullPointerException e) {
-			applicationName = "core";
-			applicationNameWithVersion = "core";
+			// suite not in 'data' folder
+			applicationName = xmlSuite.getParameter("applicationName");
+			if (applicationName == null) {
+				applicationName = System.getProperty("applicationName");
+			}
+			if (applicationName == null) {
+				throw new ConfigurationException("Test suite is neither located in the 'data/<app_name>/testng' folder, nor declares an 'applicationName' parameter or '-DapplicationName' is not given");
+			}
+
+			applicationNameWithVersion = applicationName;
 			dataPath = Paths.get(rootPath, DATA_FOLDER_NAME).toString() + "/";
+			appDataPath = Paths.get(dataPath, applicationName).toString();
 		}
-		
-		featuresPath = Paths.get(dataPath, applicationNameWithVersion, "features").toString();
-		configPath = Paths.get(dataPath, applicationNameWithVersion, "config").toString();
-		appDataPath = Paths.get(dataPath, applicationNameWithVersion).toString();
-		cachePath = Paths.get(rootPath, CACHE_FOLDER_NAME, applicationNameWithVersion).toString();
-		
-		if (applicationVersion == null) {
-			applicationVersion = readApplicationVersion();
-			applicationFullVersion = readFullApplicationVersion();
-		}
+
+
 		if (coreVersion == null) {
 			coreVersion = readCoreVersion();
 			coreFullVersion = readFullCoreVersion();
 		}
-		
-		// create data folder if it does not exist (it should already exist)
+		if (applicationVersion == null) {
+			applicationVersion = readApplicationVersion();
+			applicationFullVersion = readFullApplicationVersion();
+		}
+
+		cachePath = Paths.get(rootPath, CACHE_FOLDER_NAME, applicationNameWithVersion).toString();
+
+		// create data folder if it does not exist
+		if (!new File(cachePath).isDirectory()) {
+			new File(cachePath).mkdirs();
+		}
 		if (!new File(dataPath).isDirectory()) {
 			new File(dataPath).mkdirs();
 		}
 		if (!new File(appDataPath).isDirectory()) {
 			new File(appDataPath).mkdirs();
 		}
-		if (!new File(cachePath).isDirectory()) {
-			new File(cachePath).mkdirs();
-		}
+
 	}
     
     /**
@@ -700,7 +709,23 @@ public class SeleniumTestsContextManager {
      * @return
      */
 	public static String getFeaturePath() {
-		return featuresPath;
+		if (Paths.get(dataPath, applicationName, "features").toFile().exists()) {
+			return Paths.get(dataPath, applicationName, "features").toString();
+		} else {
+			return String.format("classpath:%s/features", applicationName);
+		}
+	}
+
+	/**
+	 * Returns the location of dataset files
+	 * @return
+	 */
+	public static String getDatasetPath() {
+		if (Paths.get(dataPath, applicationName, "dataset").toFile().exists()) {
+			return Paths.get(dataPath, applicationName, "dataset").toString();
+		} else {
+			return String.format("classpath:%s/dataset", applicationName);
+		}
 	}
 
 	public static String getApplicationName() {
@@ -732,7 +757,11 @@ public class SeleniumTestsContextManager {
 	 * @return
 	 */
 	public static String getConfigPath() {
-		return configPath;
+		if (Paths.get(dataPath, applicationName, "config").toFile().exists()) {
+			return Paths.get(dataPath, applicationName, "config").toString();
+		} else {
+			return String.format("classpath:%s/config", applicationName);
+		}
 	}
 	
 	/**

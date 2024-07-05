@@ -44,7 +44,6 @@ public class ConfigReader {
 	private static final String GLOBAL_SECTION_NAME = "General";
 
 	private static final Logger logger = SeleniumRobotLogger.getLogger(ConfigReader.class);
-	private static File configFile;
 	
 	private String testEnv;
 	private String iniFiles;
@@ -66,23 +65,29 @@ public class ConfigReader {
 	 * 
 	 * @return
 	 */
-	private static File getCurrentConfigFile() {
+	private static InputStream getCurrentConfigFile() {
 		String configPath = SeleniumTestsContextManager.getConfigPath();
 		if (configPath == null) {
 			return null;
 		}
-		if (new File(configPath + File.separator + "env.ini").isFile()) {
-			return new File(configPath + File.separator + "env.ini");
-		} else {
-			return new File(configPath + File.separator + "config.ini");
+
+		if (configPath.startsWith("classpath:")) {
+			return Thread.currentThread().getContextClassLoader().getResourceAsStream(configPath.replace("classpath:", "") + "/env.ini");
+		}
+		try {
+			if (new File(configPath + File.separator + "env.ini").isFile()) {
+				return FileUtils.openInputStream(new File(configPath + File.separator + "env.ini"));
+			} else {
+				return FileUtils.openInputStream(new File(configPath + File.separator + "config.ini"));
+			}
+		} catch (IOException e) {
+			logger.warn("no valid config.ini file for this application");
+			return null;
 		}
 	}
 
-	public static File getConfigFile() {
-		if (configFile == null) {
-			configFile = getCurrentConfigFile();
-		}
-		return configFile;
+	public static InputStream getConfigFile() {
+		return getCurrentConfigFile();
 	}
 
 	public Map<String, TestVariable> readConfig(InputStream iniFileStream) {
@@ -96,7 +101,7 @@ public class ConfigReader {
 	 */
 	public Map<String, TestVariable> readConfig() {
 		Map<String, TestVariable> variables = new HashMap<>();
-		try (InputStream iniFileStream = FileUtils.openInputStream(getConfigFile());){
+		try (InputStream iniFileStream = getConfigFile()){
 			variables.putAll(readConfig(iniFileStream, testEnv));
 		} catch (NullPointerException e) {
 			logger.warn("config file is null, check config path has been set using 'SeleniumTestsContextManager.generateApplicationPath()'");

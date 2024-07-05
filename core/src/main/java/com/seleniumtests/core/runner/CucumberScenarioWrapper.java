@@ -19,11 +19,14 @@ package com.seleniumtests.core.runner;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 
@@ -56,11 +59,19 @@ public class CucumberScenarioWrapper {
     public CucumberScenarioWrapper(PickleWrapper pickleWrapper, FeatureWrapper cucumberFeature) throws IOException {
         this.pickleWrapper = pickleWrapper;
         this.cucumberFeature = cucumberFeature;
-        
-        int scenarioLineNumber = pickleWrapper.getPickle().getScenarioLine() - 1;
-        File featureFile = new File(pickleWrapper.getPickle().getUri());
 
-    	List<String> featureLines = Files.readLines(featureFile, StandardCharsets.UTF_8);
+        int scenarioLineNumber = pickleWrapper.getPickle().getScenarioLine() - 1;
+        URI pickleUri = pickleWrapper.getPickle().getUri();
+
+        List<String> featureLines = new ArrayList<>();
+        if ("classpath".equals(pickleUri.getScheme())) {
+            featureLines = IOUtils.readLines(Thread.currentThread().getContextClassLoader().getResourceAsStream(pickleUri.toString().replace("classpath:", "")),
+                            StandardCharsets.UTF_8);
+        } else {
+            File featureFile = new File(pickleUri);
+            featureLines = Files.readLines(featureFile, StandardCharsets.UTF_8);
+        }
+
 		String scenarioLine = featureLines.get(scenarioLineNumber);
 		
 		if (scenarioLine.contains("Scenario Outline")) {

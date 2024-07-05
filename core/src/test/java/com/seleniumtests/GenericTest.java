@@ -59,6 +59,7 @@ public class GenericTest {
 	 */
 	@BeforeMethod(groups={"ut", "it", "ut context2"})  
 	public void initTest(final ITestContext testNGCtx, final ITestResult testResult) {
+		System.setProperty("applicationName", "core");
 		SeleniumTestsContextManager.initGlobalContext(testNGCtx);
 		SeleniumTestsContextManager.initThreadContext(testNGCtx, testResult);
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
@@ -92,6 +93,7 @@ public class GenericTest {
 	
 	@AfterMethod(groups={"ut", "it", "ut context2"}, alwaysRun=true) 
 	public void reset() {
+		System.clearProperty("applicationName");
 		resetTestNGREsultAndLogger();
 		OSUtility.resetInstalledBrowsersWithVersion();
 	}

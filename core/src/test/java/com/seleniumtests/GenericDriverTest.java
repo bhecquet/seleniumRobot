@@ -49,6 +49,7 @@ public class GenericDriverTest {
 
 	@BeforeMethod(groups={"ut", "it"})  
 	public void initTest(final ITestContext testNGCtx, final ITestResult testResult) {
+		System.setProperty("applicationName", "core");
 		SeleniumTestsContextManager.initGlobalContext(testNGCtx);
 		SeleniumTestsContextManager.initThreadContext(testNGCtx, testResult);
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
@@ -78,6 +79,7 @@ public class GenericDriverTest {
 	public void destroyDriver() {
 		WebUIDriver.cleanUp();
 
+		System.clearProperty("applicationName");
 		GenericTest.resetTestNGREsultAndLogger();
 		OSUtility.resetInstalledBrowsersWithVersion();
 	}

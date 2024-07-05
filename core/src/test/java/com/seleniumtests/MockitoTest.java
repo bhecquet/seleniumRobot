@@ -77,6 +77,7 @@ public class MockitoTest {
 	}
 	
 	public void initThreadContext(final ITestContext testNGCtx,  final String testName, final ITestResult testResult) {
+		System.setProperty("applicationName", "core");
 		SeleniumTestsContextManager.initGlobalContext(testNGCtx);
 		SeleniumTestsContextManager.initThreadContext(testNGCtx, testResult);
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
@@ -89,6 +90,7 @@ public class MockitoTest {
 	@AfterMethod(groups={"ut", "it", "ie"}, alwaysRun=true)
 	public void afterMethod(final Method method) throws Exception {
 
+		System.clearProperty("applicationName");
 		GenericTest.resetTestNGREsultAndLogger();
 		OSUtility.resetInstalledBrowsersWithVersion();
 	}
