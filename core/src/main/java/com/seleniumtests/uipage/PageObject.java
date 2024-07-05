@@ -302,13 +302,12 @@ public class PageObject extends BasePage implements IPage {
 
         while (end.isAfter(systemClock.instant())) {
             if (context != null) {
-                Optional<String> foundContext = getContexts().stream().filter(ctx -> ctx.toLowerCase().contains(finalContext.toLowerCase())).findFirst();
-                if (foundContext.isPresent()) {
-                    switchToContext(foundContext.get());
+                try {
+                    switchToContext(finalContext);
                     return;
+                } catch (ScenarioException e) {
+                    WaitHelper.waitForSeconds(1);
                 }
-                WaitHelper.waitForSeconds(1);
-
             } else {
                 return;
             }
@@ -878,10 +877,16 @@ public class PageObject extends BasePage implements IPage {
     }
 
     public void switchToContext(String name) {
-        try {
-            ((CustomEventFiringWebDriver) driver).context(name);
-        } catch (NoSuchContextException e) {
-            throw new ScenarioException(String.format("Only %s contexts are available", getContexts()));
+        List<String> contexts = getContexts();
+        Optional<String> foundContext = contexts.stream().filter(ctx -> ctx.toLowerCase().contains(name.toLowerCase())).findFirst();
+        if (foundContext.isPresent()) {
+            try {
+                ((CustomEventFiringWebDriver) driver).context(foundContext.get());
+            } catch (NoSuchContextException e) { // in case context disappears when we switch to it
+                throw new ScenarioException(String.format("Only %s contexts are available", getContexts()));
+            }
+        } else {
+            throw new ScenarioException(String.format("Only %s contexts are available", contexts));
         }
     }
 
