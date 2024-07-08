@@ -1287,8 +1287,9 @@ public class TestPageObject2 extends MockitoTest {
 
 	@Test(groups = { "ut" })
 	public void testSwitchToContext() {
-		page.switchToContext("myContext");
-		verify(eventDriver).context("myContext");
+		when(eventDriver.getContextHandles()).thenReturn(new TreeSet<>(Arrays.asList("NATIVE_APP", "WEBVIEW")));
+		page.switchToContext("web");
+		verify(eventDriver).context("WEBVIEW");
 	}
 
 	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class, expectedExceptionsMessageRegExp = "Only \\[NATIVE_APP, WEBVIEW\\] contexts are available")

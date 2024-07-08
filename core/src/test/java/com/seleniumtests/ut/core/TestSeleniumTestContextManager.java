@@ -18,6 +18,7 @@
 package com.seleniumtests.ut.core;
 
 import java.io.File;
+import java.nio.file.Paths;
 
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -130,61 +131,26 @@ public class TestSeleniumTestContextManager extends GenericTest {
 		Assert.assertEquals(SeleniumTestsContextManager.getApplicationName(), "myApp");
 		Assert.assertEquals(SeleniumTestsContextManager.getApplicationDataPath().replace(File.separator, "/"), "/home/test/seleniumRobot/data/myApp");
 		Assert.assertEquals(SeleniumTestsContextManager.getDataPath().replace(File.separator, "/"), "/home/test/seleniumRobot/data/");
-		Assert.assertEquals(SeleniumTestsContextManager.getConfigPath(), "/home/test/seleniumRobot/data/myApp/config".replace("/", File.separator));
+		Assert.assertEquals(SeleniumTestsContextManager.getConfigPath(), "classpath:myApp/config");
 	}
-	
-	/**
-	 * Check application path is read from TestNG xml file path and it drops version that could be present in path
-	 * Test with standard format 'x.y.z'
-	 */
+
 	@Test(groups= {"ut"})
-	public void testGenerateApplicationPathWithVersion() {
+	public void testGenerateApplicationPathFromXML() {
+
+		String suiteFile = Paths.get(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getParent(), "data", "core", "testng", "mocktestng.xml").toString();
+
 		XmlSuite suite = new XmlSuite();
 		suite.setName("TmpSuite");
 		suite.setParallel(ParallelMode.NONE);
-		suite.setFileName("/home/test/seleniumRobot/data/myApp_1.0.0/testng/testSRTCManager.xml");
-		
+		suite.setFileName(suiteFile);
+
 		SeleniumTestsContextManager.generateApplicationPath(suite);
-		Assert.assertEquals(SeleniumTestsContextManager.getApplicationName(), "myApp");
-		Assert.assertEquals(SeleniumTestsContextManager.getApplicationDataPath().replace(File.separator, "/"), "/home/test/seleniumRobot/data/myApp_1.0.0");
-		Assert.assertEquals(SeleniumTestsContextManager.getDataPath().replace(File.separator, "/"), "/home/test/seleniumRobot/data/");
-		Assert.assertEquals(SeleniumTestsContextManager.getConfigPath(), "/home/test/seleniumRobot/data/myApp_1.0.0/config".replace("/", File.separator));
+		Assert.assertEquals(SeleniumTestsContextManager.getApplicationName(), "core");
+		Assert.assertEquals(SeleniumTestsContextManager.getApplicationDataPath().replace(File.separator, "/"), Paths.get(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getParent(), "data", "core").toString().replace(File.separator, "/"));
+		Assert.assertEquals(SeleniumTestsContextManager.getDataPath().replace(File.separator, "/"), Paths.get(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getParent(), "data").toString().replace(File.separator, "/") + "/");
+		Assert.assertEquals(SeleniumTestsContextManager.getConfigPath().replace(File.separator, "/"), Paths.get(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getParent(), "data", "core", "config").toString().replace(File.separator, "/"));
 	}
-	
-	/**
-	 * Check application path is read from TestNG xml file path and it drops version that could be present in path
-	 * Test with short format 'x'
-	 * 
-	 */
-	@Test(groups= {"ut"})
-	public void testGenerateApplicationPathWithShortVersion() {
-		XmlSuite suite = new XmlSuite();
-		suite.setName("TmpSuite");
-		suite.setParallel(ParallelMode.NONE);
-		suite.setFileName("/home/test/seleniumRobot/data/myApp_1/testng/testSRTCManager.xml");
-		
-		SeleniumTestsContextManager.generateApplicationPath(suite);
-		Assert.assertEquals(SeleniumTestsContextManager.getApplicationName(), "myApp");
-		Assert.assertEquals(SeleniumTestsContextManager.getConfigPath(), "/home/test/seleniumRobot/data/myApp_1/config".replace("/", File.separator));
-	}
-	
-	/**
-	 * Check application path is read from TestNG xml file path and it drops version that could be present in path
-	 * Test with short format 'x'
-	 * 
-	 */
-	@Test(groups= {"ut"})
-	public void testGenerateApplicationPathWithComplicatedVersion() {
-		XmlSuite suite = new XmlSuite();
-		suite.setName("TmpSuite");
-		suite.setParallel(ParallelMode.NONE);
-		suite.setFileName("/home/test/seleniumRobot/data/myApp_alpha.1.2-beta/testng/testSRTCManager.xml");
-		
-		SeleniumTestsContextManager.generateApplicationPath(suite);
-		Assert.assertEquals(SeleniumTestsContextManager.getApplicationName(), "myApp");
-		Assert.assertEquals(SeleniumTestsContextManager.getConfigPath(), "/home/test/seleniumRobot/data/myApp_alpha.1.2-beta/config".replace("/", File.separator));
-	}
-	
+
 	/**
 	 * Check that if TestNG XML file is not on the standard location, default application is core
 	 */

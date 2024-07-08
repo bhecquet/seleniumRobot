@@ -35,7 +35,7 @@ public class TestLaunchNoData {
             executeSubCucumberTests("core_8", 1);
 
             String mainReportContent = ReporterTest.readSummaryFile();
-            Assert.assertTrue(mainReportContent.matches(".*<a href\\='core_8/TestReport\\.html'.*?>core_7</a>.*"));
+            Assert.assertTrue(mainReportContent.matches(".*<a href\\='core_8/TestReport\\.html'.*?>core_8</a>.*"));
 
         } finally {
             System.clearProperty("applicationName");
