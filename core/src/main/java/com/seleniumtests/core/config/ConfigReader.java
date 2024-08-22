@@ -65,7 +65,7 @@ public class ConfigReader {
 	 * 
 	 * @return
 	 */
-	private static InputStream getCurrentConfigFile() {
+	public InputStream getConfigFile() {
 		String configPath = SeleniumTestsContextManager.getConfigPath();
 		if (configPath == null) {
 			return null;
@@ -81,13 +81,9 @@ public class ConfigReader {
 				return FileUtils.openInputStream(new File(configPath + File.separator + "config.ini"));
 			}
 		} catch (IOException e) {
-			logger.warn("no valid config.ini file for this application");
+			logger.warn("no valid env.ini/config.ini file for this application");
 			return null;
 		}
-	}
-
-	public static InputStream getConfigFile() {
-		return getCurrentConfigFile();
 	}
 
 	public Map<String, TestVariable> readConfig(InputStream iniFileStream) {
@@ -104,10 +100,11 @@ public class ConfigReader {
 		try (InputStream iniFileStream = getConfigFile()){
 			variables.putAll(readConfig(iniFileStream, testEnv));
 		} catch (NullPointerException e) {
+			// raised when the config file does not exist
 			logger.warn("config file is null, check config path has been set using 'SeleniumTestsContextManager.generateApplicationPath()'");
 			return variables;
 		} catch (IOException e1) {
-			logger.warn("no valid config.ini file for this application");
+			logger.warn("no valid env.ini/config.ini file for this application");
 			return variables;
 		}
 		
@@ -115,7 +112,13 @@ public class ConfigReader {
 		if (iniFiles != null) {
 			for (String fileName: iniFiles.split(",")) {
 				fileName = fileName.trim();
-				File currentConfFile = Paths.get(SeleniumTestsContextManager.getConfigPath(), fileName).toFile();
+
+				File currentConfFile;
+				if (new File(fileName).isAbsolute()) {
+					currentConfFile = new File(fileName);
+				} else {
+					currentConfFile = Paths.get(SeleniumTestsContextManager.getConfigPath(), fileName).toFile();
+				}
 				logger.info("reading file " + currentConfFile.getAbsolutePath());
 				
 				try (InputStream iniFileStream = FileUtils.openInputStream(currentConfFile);) {

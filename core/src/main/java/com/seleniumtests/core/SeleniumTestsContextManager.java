@@ -667,7 +667,7 @@ public class SeleniumTestsContextManager {
 			}
 
 			applicationNameWithVersion = applicationName;
-			dataPath = Paths.get(rootPath, DATA_FOLDER_NAME).toString() + "/";
+			dataPath = Paths.get(DATA_FOLDER_NAME).toAbsolutePath() + "/";
 			appDataPath = Paths.get(dataPath, applicationName).toString();
 		}
 

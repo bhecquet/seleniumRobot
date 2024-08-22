@@ -17,12 +17,15 @@
  */
 package com.seleniumtests.ut.core.config;
 
-import java.io.File;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+import com.seleniumtests.MockitoTest;
 import org.apache.commons.io.IOUtils;
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -36,7 +39,7 @@ import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.core.config.ConfigReader;
 import com.seleniumtests.customexception.ConfigurationException;
 
-public class TestConfigReader extends GenericTest {
+public class TestConfigReader extends MockitoTest {
 
 	@Test(groups={"ut"})
 	public void readConfigurationWithValueOverride() {
@@ -49,11 +52,37 @@ public class TestConfigReader extends GenericTest {
 		Map<String, TestVariable> config = new ConfigReader("VNR", null).readConfig(Thread.currentThread().getContextClassLoader().getResourceAsStream("tu/env.ini"));
 		Assert.assertEquals(config.get("key1").getValue(), "value1", "Key should not be overriden");
 	}
-	
+
+	/**
+	 * Reads the default config.ini file
+	 */
+	@Test(groups={"ut"})
+	public void testReadConfig() {
+		Map<String, TestVariable> config = new ConfigReader("DEV", null).readConfig();
+		Assert.assertEquals(config.get("key1").getValue(), "value4");
+	}
+
+	@Test(groups={"ut"})
+	public void testReadConfigWithMoreFiles() {
+		Map<String, TestVariable> config = new ConfigReader("DEV", "envSpecific.ini,spec/envSpecific2.ini").readConfig();
+		Assert.assertEquals(config.size(), 7);
+		Assert.assertEquals(config.get("key3").getValue(), "value30");
+		Assert.assertEquals(config.get("key30").getValue(), "value300");
+	}
+
+	@Test(groups={"ut"})
+	public void testReadConfigNoFile() {
+		ConfigReader configReader = spy(new ConfigReader("DEV", null));
+		when(configReader.getConfigFile()).thenThrow(new NullPointerException("No env.ini file"));
+		Map<String, TestVariable> config = configReader.readConfig();
+		Assert.assertEquals(config.size(), 0);
+	}
+
+
 	@Test(groups={"ut context"})
 	public void getConfigFile(final ITestContext testNGCtx) throws IOException {
 		initThreadContext(testNGCtx);
-		InputStream config = ConfigReader.getConfigFile();
+		InputStream config = new ConfigReader("DEV", null).getConfigFile();
 		String configContent = IOUtils.toString(config, StandardCharsets.UTF_8);
 		Assert.assertTrue(configContent.contains("key1=value1"));
 	}
@@ -73,7 +102,7 @@ public class TestConfigReader extends GenericTest {
 
 			// regenerate variables to use the property set above
 			SeleniumTestsContextManager.generateApplicationPath(testNGCtx.getCurrentXmlTest().getSuite());
-			InputStream config = ConfigReader.getConfigFile();
+			InputStream config = new ConfigReader("DEV", null).getConfigFile();
 			String configContent = IOUtils.toString(config, StandardCharsets.UTF_8);
 			Assert.assertTrue(configContent.contains("key1=core2"));
 		} finally {
