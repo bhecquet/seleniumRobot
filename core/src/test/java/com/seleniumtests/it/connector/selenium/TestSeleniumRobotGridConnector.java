@@ -21,6 +21,8 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.util.osutility.OSUtility;
+import com.seleniumtests.util.osutility.SystemUtility;
 import io.appium.java_client.android.options.UiAutomator2Options;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.client.ClientProtocolException;
@@ -356,13 +358,19 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	
 	@Test(groups={"it"})
 	public void testExecuteCommand() throws ClientProtocolException, IOException {
-		String reply = connector.executeCommand("echo", "hello");
-		
+
+		String reply;
+		if (OSUtility.isWindows()) {
+			reply = connector.executeCommand("powershell.exe", "Write-Host 'hello'");
+		} else {
+			reply = connector.executeCommand("echo", "hello");
+		}
+
 		// no error encountered
 		verify(gridLogger, never()).warn(anyString());
 		verify(gridLogger, never()).error(anyString());
 
-		Assert.assertEquals(reply, "hello");
+		Assert.assertEquals(reply.trim(), "hello");
 	}
 
 	@Test(groups={"it"})

@@ -1430,7 +1430,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testProxyTypeNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setWebProxyType(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyType(), ProxyType.AUTODETECT);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyType(), ProxyType.SYSTEM);
 	}
 	
 	@Test(groups="ut context")

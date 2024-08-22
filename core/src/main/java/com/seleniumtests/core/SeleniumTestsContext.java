@@ -251,7 +251,7 @@ public class SeleniumTestsContext {
 	public static final int DEFAULT_IMPLICIT_WAIT_TIME_OUT = 5;
 	public static final int DEFAULT_WEB_SESSION_TIMEOUT = 90000;
 	public static final int DEFAULT_TEST_RETRY_COUNT = 2;
-	public static final ProxyType DEFAULT_WEB_PROXY_TYPE = ProxyType.AUTODETECT;
+	public static final ProxyType DEFAULT_WEB_PROXY_TYPE = ProxyType.SYSTEM;
 	public static final boolean DEFAULT_OPTIMIZE_REPORTS = false;
 	public static final ArchiveMode DEFAULT_ARCHIVE= ArchiveMode.NEVER;
 	public static final boolean DEFAULT_KEEP_ALL_RESULTS = false;
