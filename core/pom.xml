@@ -529,29 +529,26 @@
 						</property>
 					</properties>
 					<argLine>
+						${surefireArgLine}
 						--add-opens=java.base/java.lang=ALL-UNNAMED
 						--add-opens=java.base/java.util=ALL-UNNAMED
 						--add-opens=java.base/java.time=ALL-UNNAMED <!-- for GSON -->
 						--add-opens jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED <!-- for https://github.com/OpenHFT/Java-Runtime-Compiler/issues/91 -->
-						<!-- JDK 17 modules
-						-patch-module=java.annotation=jsr305-3.0.2.jar > to avoid error Modules jsr305 and java.annotation export package javax.annotation ...
-						-patch-module=org.aspectj.runtime=aspectjweaver-${aspectj.version}.jar > to avoid error Modules org.aspectj.runtime and org.aspectj.weaver export package org.aspectj.runtime.reflect ...
-						-patch-module=jdk.jsobject=${settings.localRepository}/org/htmlunit/htmlunit/3.7.0/htmlunit-3.7.0.jar > to avoid  Modules jdk.jsobject and htmlunit export package netscape.javascript to module
-						-->
+
 					</argLine>
 
 					
 				<!-- comment for online instrumentation -->
-					<systemPropertyVariables>
-                        <jacoco-agent.destfile>${project.build.directory}/coverage-reports/jacoco-ut.exec</jacoco-agent.destfile>
-                        <mavenExecution>true</mavenExecution>
-					</systemPropertyVariables>
+<!--					<systemPropertyVariables>-->
+<!--                        <jacoco-agent.destfile>${project.build.directory}/coverage-reports/jacoco-ut.exec</jacoco-agent.destfile>-->
+<!--                        <mavenExecution>true</mavenExecution>-->
+<!--					</systemPropertyVariables>-->
 				<!-- /comment -->
 				<!-- uncomment for online instrumentation -->
-					<!-- <argLine>${surefireArgLine}</argLine> -->
-					<!-- <systemPropertyVariables>
+<!--					<argLine>${surefireArgLine}</argLine>-->
+					<systemPropertyVariables>
                         <mavenExecution>true</mavenExecution>
-					</systemPropertyVariables> -->
+					</systemPropertyVariables>
 				<!-- /uncomment -->
 					<threadCount>1</threadCount>
 				</configuration>
@@ -565,23 +562,30 @@
                 	<skipITs>${skipITs}</skipITs>
 					<useModulePath>false</useModulePath>
                 	<!-- comment for online instrumentation -->
-					<systemPropertyVariables>
-                        <jacoco-agent.destfile>${project.build.directory}/coverage-reports/jacoco-it.exec</jacoco-agent.destfile>
-                        <mavenExecution>true</mavenExecution>
-					</systemPropertyVariables>
-					<argLine>--add-opens=java.base/java.lang=ALL-UNNAMED
-						--add-opens=java.base/java.util=ALL-UNNAMED
-						--add-opens=java.base/java.time=ALL-UNNAMED
-						--add-opens=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
-						${argLine}
-						-Ddebug=${seleniumRobot.debug}
-						-javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"</argLine>
+<!--					<systemPropertyVariables>-->
+<!--                        <jacoco-agent.destfile>${project.build.directory}/coverage-reports/jacoco-it.exec</jacoco-agent.destfile>-->
+<!--                        <mavenExecution>true</mavenExecution>-->
+<!--					</systemPropertyVariables>-->
+<!--					<argLine>&#45;&#45;add-opens=java.base/java.lang=ALL-UNNAMED-->
+<!--						&#45;&#45;add-opens=java.base/java.util=ALL-UNNAMED-->
+<!--						&#45;&#45;add-opens=java.base/java.time=ALL-UNNAMED-->
+<!--						&#45;&#45;add-opens=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED-->
+<!--						${argLine}-->
+<!--						-Ddebug=${seleniumRobot.debug}-->
+<!--						-javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"</argLine>-->
 				<!-- /comment -->
 				<!-- uncomment for online instrumentation -->
-					<!-- <argLine>${failsafeArgLine} -Ddebug=${seleniumRobot.debug} -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"</argLine> -->
-					<!-- <systemPropertyVariables>
+					 <argLine>
+						 --add-opens=java.base/java.lang=ALL-UNNAMED
+						 --add-opens=java.base/java.util=ALL-UNNAMED
+						 --add-opens=java.base/java.time=ALL-UNNAMED
+						 --add-opens=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
+						 ${failsafeArgLine}
+						 -Ddebug=${seleniumRobot.debug}
+						 -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"</argLine>
+					 <systemPropertyVariables>
                         <mavenExecution>true</mavenExecution>
-					</systemPropertyVariables> -->
+					</systemPropertyVariables>
 				<!-- /uncomment -->
 				
 				</configuration>
