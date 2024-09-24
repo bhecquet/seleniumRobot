@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.seleniumtests.browserfactory.mobile.*;
+import com.seleniumtests.util.osutility.OSUtilityFactory;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.Logger;
@@ -38,6 +40,7 @@ import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
@@ -47,10 +50,6 @@ import org.testng.xml.XmlSuite.ParallelMode;
 import com.seleniumtests.GenericDriverTest;
 import com.seleniumtests.browserfactory.AppiumLauncherFactory;
 import com.seleniumtests.browserfactory.BrowserInfo;
-import com.seleniumtests.browserfactory.mobile.AdbWrapper;
-import com.seleniumtests.browserfactory.mobile.ExistingAppiumLauncher;
-import com.seleniumtests.browserfactory.mobile.InstrumentsWrapper;
-import com.seleniumtests.browserfactory.mobile.MobileDevice;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
@@ -172,7 +171,45 @@ public class TestWebUiDriver extends ReporterTest {
 			verify(appiumLauncher).stopAppium();
 		}
 	}
-	
+
+
+	/**
+	 * Check a Windows application can be tested
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testLocalWindowsDriverWithRemoteAppiumServer() throws Exception {
+
+		try (
+			 MockedConstruction mockedWindowsDriver = mockConstruction(RemoteWebDriver.class, (windowsDriver, context) -> {
+				 when(windowsDriver.manage()).thenReturn(driverOptions);
+				 when(windowsDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.WINDOWS));
+			 });
+			 MockedStatic mockedAppiumLauncher = mockStatic(AppiumLauncherFactory.class);
+		) {
+
+			when(driverOptions.timeouts()).thenReturn(timeouts);
+
+			SeleniumTestsContextManager.getThreadContext().setRunMode("local");
+			SeleniumTestsContextManager.getThreadContext().setAppiumServerUrl("http://localhost:4321/wd/hub/");
+			SeleniumTestsContextManager.getThreadContext().setPlatform("windows");
+			SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_WINDOWS);
+
+			createServerMock("GET", "/wd/hub/sessions", 200, "{}");
+
+			ExistingAppiumLauncher appiumLauncher;
+
+			appiumLauncher = spy(new ExistingAppiumLauncher("http://localhost:4321/wd/hub/"));
+			mockedAppiumLauncher.when(() -> AppiumLauncherFactory.getInstance()).thenReturn(appiumLauncher);
+
+			WebUIDriver.getWebDriver(true);
+
+			Assert.assertEquals(mockedWindowsDriver.constructed().size(), 1);
+			WebUIDriver.cleanUp();
+			verify(appiumLauncher).stopAppium();
+		}
+	}
+
 	/**
 	 * Test we get an error when using remote appium and no deviceId is provided
 	 * @throws Exception

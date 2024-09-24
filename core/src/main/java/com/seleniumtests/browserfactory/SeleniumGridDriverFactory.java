@@ -34,7 +34,6 @@ import org.openqa.selenium.SessionNotCreatedException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.SkipException;
@@ -88,30 +87,36 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 	protected ICapabilitiesFactory getCapabilitiesFactory() {
 		if (SeleniumTestsContextManager.isDesktopWebTest()) {
 			switch (webDriverConfig.getBrowserType()) {
-	
-		        case FIREFOX :
-		            return new FirefoxCapabilitiesFactory(webDriverConfig);
-		        case INTERNET_EXPLORER :
-		        	return new IECapabilitiesFactory(webDriverConfig);
-		        case CHROME :
-		        	return new ChromeCapabilitiesFactory(webDriverConfig);
-		        case HTMLUNIT :
-		        	return new HtmlUnitCapabilitiesFactory(webDriverConfig);
-		        case SAFARI :
-		        	return new SafariCapabilitiesFactory(webDriverConfig);
-		        case EDGE :
-		        	return new EdgeCapabilitiesFactory(webDriverConfig);
-		        default :
-		        	throw new ConfigurationException(String.format("Browser %s is unknown for desktop tests", webDriverConfig.getBrowserType()));
-		    }
+
+				case FIREFOX:
+					return new FirefoxCapabilitiesFactory(webDriverConfig);
+				case INTERNET_EXPLORER:
+					return new IECapabilitiesFactory(webDriverConfig);
+				case CHROME:
+					return new ChromeCapabilitiesFactory(webDriverConfig);
+				case HTMLUNIT:
+					return new HtmlUnitCapabilitiesFactory(webDriverConfig);
+				case SAFARI:
+					return new SafariCapabilitiesFactory(webDriverConfig);
+				case EDGE:
+					return new EdgeCapabilitiesFactory(webDriverConfig);
+				default:
+					throw new ConfigurationException(String.format("Browser %s is unknown for desktop tests", webDriverConfig.getBrowserType()));
+			}
+		} else if (SeleniumTestsContextManager.isDesktopAppTest()) {
+			if ("windows".equalsIgnoreCase(webDriverConfig.getPlatform())) {
+				return new WindowsAppCapabilitiesFactory(webDriverConfig);
+			} else {
+				throw new ConfigurationException(String.format("Platform %s is not supported for application tests", webDriverConfig.getPlatform()));
+			}
 		} else if (SeleniumTestsContextManager.isMobileTest()) {
-        	if("android".equalsIgnoreCase(webDriverConfig.getPlatform())) {
-        		return new AndroidCapabilitiesFactory(webDriverConfig);
-	        } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){
-	        	return new IOsCapabilitiesFactory(webDriverConfig);
-	        } else {
-	        	throw new ConfigurationException(String.format("Platform %s is unknown for mobile tests", webDriverConfig.getPlatform()));
-	        }
+			if ("android".equalsIgnoreCase(webDriverConfig.getPlatform())) {
+				return new AndroidCapabilitiesFactory(webDriverConfig);
+			} else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())) {
+				return new IOsCapabilitiesFactory(webDriverConfig);
+			} else {
+				throw new ConfigurationException(String.format("Platform %s is unknown for mobile tests", webDriverConfig.getPlatform()));
+			}
 		} else {
 			throw new ConfigurationException("Wrong test format detected. Should be either mobile or desktop");
 		}
@@ -199,8 +204,8 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     }
     
     public WebDriver getDriverInstance(URL hubUrl, MutableCapabilities capabilities) {
-		if (SeleniumTestsContextManager.isDesktopWebTest()) {
-		        return new RemoteWebDriver(hubUrl, capabilities);
+		if (SeleniumTestsContextManager.isDesktopWebTest() || SeleniumTestsContextManager.isDesktopAppTest()) {
+			return new RemoteWebDriver(hubUrl, capabilities);
 		} else if (SeleniumTestsContextManager.isMobileTest()) {
 			if("android".equalsIgnoreCase(webDriverConfig.getPlatform())) {
         		return new AndroidDriver(hubUrl, capabilities);

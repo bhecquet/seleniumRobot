@@ -91,7 +91,17 @@ public enum TestType {
     	public TestType family() {
         	return APP;
         }
-    };
+    },
+	APPIUM_APP_WINDOWS("appium_app_windows") {
+		@Override
+		public boolean isMobile() {
+			return false;
+		}
+		@Override
+		public TestType family() {
+			return APP;
+		}
+	};
 
     String testType;
 

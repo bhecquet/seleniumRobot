@@ -39,14 +39,14 @@
 		<dependency>
 		  <groupId>com.deque.html.axe-core</groupId>
 		  <artifactId>selenium</artifactId>
-		  <version>4.8.0</version>
+		  <version>4.9.1</version>
 			<!-- JDK 17: exclude webdrivermanager as we don't need it-->
-			<!--<exclusions>
+			<exclusions>
 				<exclusion>
 					<groupId>io.github.bonigarcia</groupId>
 					<artifactId>webdrivermanager</artifactId>
 				</exclusion>
-			</exclusions>-->
+			</exclusions>
 		</dependency>
 		<dependency>
 		  <groupId>com.eatthepath</groupId>
@@ -153,7 +153,7 @@
 	    <dependency>
 	      	<groupId>org.apache.poi</groupId>
 	      	<artifactId>poi-ooxml</artifactId>
-	      	<version>5.2.4</version>
+	      	<version>5.3.0</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>xml-apis</artifactId>
@@ -230,8 +230,8 @@
         </dependency>
 		<dependency>
 			<groupId>org.apache.velocity</groupId>
-			<artifactId>velocity</artifactId>
-			<version>1.7</version>
+			<artifactId>velocity-engine-core</artifactId>
+			<version>2.3</version>
 		</dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
@@ -293,14 +293,9 @@
 		</dependency>
 		<dependency>
         	<groupId>org.jdom</groupId>
-        	<artifactId>jdom</artifactId>
-        	<version>2.0.2</version>
+        	<artifactId>jdom2</artifactId>
+        	<version>2.0.6.1</version>
         </dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-			<version>5.3.16</version>
-		</dependency>
         <dependency>
 	        <groupId>org.sonarsource.java</groupId>
 	        <artifactId>sonar-jacoco-listeners</artifactId>
@@ -320,13 +315,13 @@
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-server</artifactId>
-			<version>9.4.45.v20220203</version>
+			<version>9.4.56.v20240826</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-servlet</artifactId>
-			<version>9.4.45.v20220203</version>
+			<version>9.4.56.v20240826</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- needed for offline instrumentation. Offline is used because tests using powermockito are not correctly analyzed due to https://github.com/powermock/powermock/issues/727 -->
@@ -341,6 +336,14 @@
 	<build>
 		<finalName>seleniumRobot</finalName>
 		<plugins>
+			<plugin>
+				<groupId>org.sonarsource.scanner.maven</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>3.10.0.2594</version>
+				<configuration>
+					<detail></detail>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.sonatype.plugins</groupId>
 				<artifactId>nexus-staging-maven-plugin</artifactId>

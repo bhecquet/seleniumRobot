@@ -39,10 +39,13 @@ import com.seleniumtests.util.FileUtility;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
 
 	private static final String ANDROID_PLATORM = "android";
+	private static final String IOS_PLATORM = "ios";
+	private static final String WINDOWS_PLATORM = "windows";
 	private AppiumLauncher appiumLauncher;
 
     public AppiumDriverFactory(final DriverConfig cfg) {
@@ -73,15 +76,16 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
     	appiumLauncher.startAppium();
     	
     	try {
-    		MutableCapabilities capabilities = getMobileCapabilities();
 	        if(ANDROID_PLATORM.equalsIgnoreCase(webDriverConfig.getPlatform())) {
-	        	capabilities = extractAndroidDriver(capabilities);
-
+	        	MutableCapabilities capabilities = extractAndroidDriver(getMobileCapabilities());
 	            return new AndroidDriver(new URL(appiumLauncher.getAppiumServerUrl()), capabilities);
 	            
-	        } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){
-	            return new IOSDriver(new URL(appiumLauncher.getAppiumServerUrl()), capabilities);
-	            
+	        } else if (IOS_PLATORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
+	            return new IOSDriver(new URL(appiumLauncher.getAppiumServerUrl()), getMobileCapabilities());
+
+			} else if (WINDOWS_PLATORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
+	            return new RemoteWebDriver(new URL(appiumLauncher.getAppiumServerUrl()), driverOptions);
+
 	        } else {
 	        	throw new ConfigurationException(String.format("Platform %s is unknown for Appium tests", webDriverConfig.getPlatform()));
 	        }
@@ -135,8 +139,11 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
 		if(ANDROID_PLATORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
         	return new AndroidCapabilitiesFactory(webDriverConfig);
             
-        } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){
+        } else if (IOS_PLATORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
         	return new IOsCapabilitiesFactory(webDriverConfig);
+
+        } else if (WINDOWS_PLATORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
+        	return new WindowsAppCapabilitiesFactory(webDriverConfig);
             
         } else {
         	throw new ConfigurationException(String.format("Platform %s is unknown for Appium tests", webDriverConfig.getPlatform()));

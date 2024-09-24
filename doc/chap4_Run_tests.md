@@ -233,6 +233,21 @@ Params for mobile testing
  | cloudApiKey 				| 			| Access key for service |  
  | testConfig 				|  			| Additional configuration. This should contain common configuration through all TestNG files.<br/>See `exampleConfigGenericParams.xml` file for format | 
 
+#### Windows app params ####
+
+Params for Windows applications (through appium-flaui-driver: https://github.com/picakia/appium-flaui-driver)
+
+| Param name       			| Default 	| Description                                                                                                                                                                                                                          |
+| -------------------------	| ------- 	|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| app 						| 			| Path to the application, local to machine that runs appium. e.g: "C:\\Windows\\System32\\notepad.exe"                                                                                                                                                                    | 
+| appiumServerUrl			|			| Appium server already started, that will be used to execute the test. It's useful to debug tests locally. "http://<host>:<port>/wd/hub/" for appium 1 and "http://<host>:<port>/" for appium 2.x                                     |
+| appiumCaps                |           | Set of capabilities that will be added and sent to appium. These are the capabilities that are not already handled by the framework. See: http://appium.io/docs/en/writing-running-appium/caps/. Format is "key1=value1;key2=value2" |
+| appActivity 				|             | Title of the application windows (may be a regex). e.g: '.*Notepad'                                                                                                                                                                  | 
+| newCommandTimeout 		| 120		| Max wait (in seconds) between 2 appium commands in seconds. Increase this time when debugging                                                                                                                                        | 
+| platform 					| 			| platform on which test should execute. Ex: Windows 10. Defaults to the current platform                                                                                                                                              |
+
+'app' or 'appActivity' MUST be provided
+
 #### Reporting ####
 
 | Param name       			| Default 	| Description  |
@@ -405,8 +420,8 @@ If you run behind a proxy, also use the JVM options: `-Dhttps.proxyHost=<host> -
 #### Environment variables ####
 
 For mobile tests, set the following environment variables on your local computer:
-APPIUM_HOME: 
-- On any platform using npm installation, it will be the path where root `node_modules` folder has been created. This folder should contain an `appium` subfolder
+
+- `APPIUM_PATH`: On any platform using npm installation, it will be the path where root `node_modules` folder has been created. This folder should contain an `appium` subfolder
 - `ANDROID_HOME`: path to Android SDK (e.g: where SDK Manager resides). This is the root folder containing 'platform-tools', 'system-images', ... folders. If tools has been installed through Android Studio, they are located at `C:\Users\<user>\AppData\Local\Android\Sdk` on windows
 
 Also check that there is only one version of ADB on computer. Otherwise, there may be conflicts and ADB client you provide may not get relevant information from devices
@@ -467,6 +482,24 @@ Define test as follows (minimal needed options)
     </test>
 ```
 
+#### Application test on Windows ####
+
+To test Windows application with appium, one need to 
+- download FlaUI.WebDriver (https://github.com/FlaUI/FlaUI.WebDriver/releases)
+- set `APPIUM_FLAUI_PATH` to FlaUI.WebDriver binary. e.g: D:\drivers\FlaUI.WebDriver.exe
+
+
+```xml
+    <test name="tnr_appium_windows_app" parallel="false">
+    
+    	<parameter name="platform" value="Windows 10"/>
+    	<parameter name="app" value="C:\\Windows\\System32\\notepad.exe"/>
+    
+    	<packages>
+    		<package name="com.seleniumtests.core.runner.*"/>
+    	</packages>
+    </test>
+```
 
 ### 4 Test with SauceLabs ###
 

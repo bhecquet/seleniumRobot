@@ -234,7 +234,7 @@ public class WebUIDriver {
         	
         // local mode
         } else {
-        	if (config.getTestType().isMobile()) {
+        	if (useAppium() || config.getTestType().family().equals(TestType.APP)) {
         		return new AppiumDriverFactory(this.config);
         	} else {
 	            return getLocalWebDriverBuilderFactory();
@@ -735,7 +735,7 @@ public class WebUIDriver {
     }
     
     private void checkBrowserRunnable() {
-		if (config.getMode() == DriverMode.LOCAL && !config.getTestType().isMobile()) {
+		if (config.getMode() == DriverMode.LOCAL && !useAppium()) {
 			Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion(config.getBetaBrowser());
 			if (!browsers.containsKey(config.getBrowserType()) || browsers.get(config.getBrowserType()).isEmpty()) {
 				throw new ConfigurationException(String.format("Browser %s is not available. Available browsers are %s",
@@ -790,16 +790,19 @@ public class WebUIDriver {
     		throw new ScenarioException("Driver creation forbidden before @BeforeMethod and after @AfterMethod execution");
     	}
     	
-    	if (config.getTestType().isMobile()) {
+    	if (useAppium()) {
     		logger.info("Start creating appium driver");
     	} else {
     		logger.info(String.format("Start creating %s driver", config.getBrowserType().getBrowserType()));
     	}
     	checkBrowserRunnable();
         driver = createRemoteWebDriver();
-        displayBrowserVersion();
+
+		if (config.getTestType().family().equals(TestType.WEB)) {
+			displayBrowserVersion();
+		}
  
-        if (config.getTestType().isMobile()) {
+        if (useAppium()) {
     		logger.info("Finished creating appium driver");
     	} else {
     		logger.info(String.format("Finished creating %s driver", config.getBrowserType().getBrowserType()));
@@ -808,7 +811,15 @@ public class WebUIDriver {
         return driver;
     }
 
-    public static void main(final String[] args) {
+	/**
+	 * Use appium for mobile web or any application test
+	 * @return
+	 */
+	private boolean useAppium() {
+		return config.getTestType().isMobile() || config.getTestType().family().equals(TestType.APP);
+	}
+
+	public static void main(final String[] args) {
         logger.info(DriverExceptionListener.class.getName());
     }
 

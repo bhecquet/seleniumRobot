@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.seleniumtests.core.TestStepManager;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.helper.WaitHelper;
 import io.appium.java_client.remote.options.BaseOptions;
 import org.mockito.Mock;
@@ -129,7 +130,6 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testMobileDriverCreation() throws Exception {
-		
 
 		when(config.getPlatform()).thenReturn("android");
 		when(config.getApp()).thenReturn("myApp.apk");
@@ -180,6 +180,54 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 
 			// verify driver is an android driver
 			Assert.assertTrue(newDriver instanceof IOSDriver);
+		}
+	}
+
+	@Test(groups={"ut"})
+	public void testWindowsDriverCreation() throws Exception {
+
+		when(config.getPlatform()).thenReturn("windows");
+		when(config.getApp()).thenReturn("notepad.exe");
+		when(context.getTestType()).thenReturn(TestType.APPIUM_APP_WINDOWS);
+
+		when(gridConnector1.isGridActive()).thenReturn(true);
+		when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1));
+		when(config.getAppiumCapabilities()).thenReturn(new BaseOptions<>());
+
+		// connect to grid
+		try (MockedConstruction mockedDriver = mockConstruction(RemoteWebDriver.class, (windowsDriver, context1) -> {
+			when(windowsDriver.manage()).thenReturn(options);
+			when(windowsDriver.getCapabilities()).thenReturn(caps);
+		})) {
+			SeleniumGridDriverFactory driverFactory = new SeleniumGridDriverFactory(config);
+			WebDriver newDriver = driverFactory.createWebDriver();
+
+			// verify driver is an android driver
+			Assert.assertTrue(newDriver instanceof RemoteWebDriver);
+		}
+	}
+
+	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Platform linux is not supported for application tests")
+	public void testLinuxDriverCreation() throws Exception {
+
+		when(config.getPlatform()).thenReturn("linux");
+		when(config.getApp()).thenReturn("app");
+		when(context.getTestType()).thenReturn(TestType.APPIUM_APP_WINDOWS);
+
+		when(gridConnector1.isGridActive()).thenReturn(true);
+		when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1));
+		when(config.getAppiumCapabilities()).thenReturn(new BaseOptions<>());
+
+		// connect to grid
+		try (MockedConstruction mockedDriver = mockConstruction(RemoteWebDriver.class, (windowsDriver, context1) -> {
+			when(windowsDriver.manage()).thenReturn(options);
+			when(windowsDriver.getCapabilities()).thenReturn(caps);
+		})) {
+			SeleniumGridDriverFactory driverFactory = new SeleniumGridDriverFactory(config);
+			WebDriver newDriver = driverFactory.createWebDriver();
+
+			// verify driver is an android driver
+			Assert.assertTrue(newDriver instanceof RemoteWebDriver);
 		}
 	}
 

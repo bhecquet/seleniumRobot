@@ -33,8 +33,8 @@ public class AppiumLauncherFactory {
 	}
 
 	public static AppiumLauncher getInstance() {
-		if (!SeleniumTestsContextManager.isMobileTest()) {
-			throw new ConfigurationException("AppiumLauncher can only be used in mobile testing");
+		if (!(SeleniumTestsContextManager.isMobileTest() || SeleniumTestsContextManager.isDesktopAppTest())) {
+			throw new ConfigurationException("AppiumLauncher can only be used in mobile / windows app testing");
 		}
 		
 		if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.LOCAL) {

@@ -572,11 +572,13 @@ public class SeleniumTestsContext {
         		setTestType(TestType.APPIUM_APP_ANDROID);
         	}
         } else if (getPlatform().toLowerCase().startsWith("ios")) {
-        	if (getApp().isEmpty() && getBrowser() != BrowserType.NONE) { // a browser name should be defined
-        		setTestType(TestType.APPIUM_WEB_IOS);
-        	} else {
-        		setTestType(TestType.APPIUM_APP_IOS);
-        	}
+            if (getApp().isEmpty() && getBrowser() != BrowserType.NONE) { // a browser name should be defined
+                setTestType(TestType.APPIUM_WEB_IOS);
+            } else {
+                setTestType(TestType.APPIUM_APP_IOS);
+            }
+        } else if (getPlatform().toLowerCase().startsWith("windows") && !getApp().isEmpty()) {
+            setTestType(TestType.APPIUM_APP_WINDOWS);
         } else {
         	if (getBrowser() == BrowserType.NONE) {
         		setTestType(TestType.NON_GUI);

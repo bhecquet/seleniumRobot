@@ -893,7 +893,8 @@ public class PageObject extends BasePage implements IPage {
     public final void maximizeWindow() {
         try {
         	// app test are not compatible with window
-        	if (SeleniumTestsContextManager.getThreadContext().getTestType().family() == TestType.APP || SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.BROWSER) {
+            TestType testType = SeleniumTestsContextManager.getThreadContext().getTestType();
+            if (testType.family() == TestType.APP && testType.isMobile() || SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.BROWSER) {
                 return;
             }
 
@@ -1057,8 +1058,9 @@ public class PageObject extends BasePage implements IPage {
      */
     public final String selectNewWindow(int waitMs) {
     	// app test are not compatible with window
-    	if (SeleniumTestsContextManager.getThreadContext().getTestType().family() == TestType.APP) {
-            throw new ScenarioException("Application are not compatible with Windows");
+        TestType testType = SeleniumTestsContextManager.getThreadContext().getTestType();
+        if (testType.family() == TestType.APP && testType.isMobile()) {
+            throw new ScenarioException("Mobile application are not compatible with Windows");
         }
     	     
         // Keep the name of the current window handle before switching

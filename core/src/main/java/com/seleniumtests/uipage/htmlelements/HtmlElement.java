@@ -1366,7 +1366,8 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     
     public void sendKeys(boolean blurAfter, CharSequence... keysToSend) {
     	// Appium seems to clear field before writing
-    	boolean clearField = SeleniumTestsContextManager.getThreadContext().getTestType().family() != TestType.APP;
+		TestType testType = SeleniumTestsContextManager.getThreadContext().getTestType();
+		boolean clearField = !(testType.family() == TestType.APP && testType.isMobile());
     	sendKeys(clearField, blurAfter, keysToSend);
 
     }
