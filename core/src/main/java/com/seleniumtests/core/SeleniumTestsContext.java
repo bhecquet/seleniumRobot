@@ -577,7 +577,7 @@ public class SeleniumTestsContext {
             } else {
                 setTestType(TestType.APPIUM_APP_IOS);
             }
-        } else if (getPlatform().toLowerCase().startsWith("windows") && !getApp().isEmpty()) {
+        } else if (getPlatform().toLowerCase().startsWith("windows") && !((getApp() == null || getApp().isEmpty()) && (getAppActivity() == null || getAppActivity().isEmpty()))) {
             setTestType(TestType.APPIUM_APP_WINDOWS);
         } else {
         	if (getBrowser() == BrowserType.NONE) {
@@ -1043,7 +1043,7 @@ public class SeleniumTestsContext {
         	obj = getConfiguration().get(name).getValue();
         }
         
-        return obj == null ? null : obj;
+        return obj;
     }
 
     public String getBrowserDownloadDir() {

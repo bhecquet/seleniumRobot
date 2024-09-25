@@ -1638,6 +1638,15 @@ public class TestSeleniumTestContext extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().updateTestAndMobile("Windows 10");
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestType(), TestType.APPIUM_APP_WINDOWS);
 	}
+
+	@Test(groups="ut context")
+	public void testTestTypeDesktopAppAlreadyLaunched(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setAppActivity(".*nodepad.*"); // to override parameter from exampleConfigGenericParams
+		SeleniumTestsContextManager.getThreadContext().setPlatform("Windows 10");
+		SeleniumTestsContextManager.getThreadContext().updateTestAndMobile("Windows 10");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestType(), TestType.APPIUM_APP_WINDOWS);
+	}
 	
 	@Test(groups="ut context")
 	public void testTestTypeAndroidWebFirefox(final ITestContext testNGCtx, final XmlTest xmlTest) {
