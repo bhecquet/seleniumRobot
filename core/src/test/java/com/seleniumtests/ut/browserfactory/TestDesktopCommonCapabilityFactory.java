@@ -159,8 +159,6 @@ public class TestDesktopCommonCapabilityFactory extends MockitoTest {
 			Assert.assertNotNull(capa.getCapability(CapabilityType.PROXY));
 			Assert.assertEquals(((Proxy)capa.getCapability(CapabilityType.PROXY)).getHttpProxy(), "localhost:8090");
 
-
-
 		} finally {
 			System.clearProperty("nl.selenium.proxy.mode");
 		}

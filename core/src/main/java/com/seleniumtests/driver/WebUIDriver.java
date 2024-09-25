@@ -234,7 +234,8 @@ public class WebUIDriver {
         	
         // local mode
         } else {
-        	if (useAppium() || config.getTestType().family().equals(TestType.APP)) {
+			logger.info("TestType: " + config.getTestType());
+        	if (useAppium()) {
         		return new AppiumDriverFactory(this.config);
         	} else {
 	            return getLocalWebDriverBuilderFactory();

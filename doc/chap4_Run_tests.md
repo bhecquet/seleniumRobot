@@ -487,6 +487,7 @@ Define test as follows (minimal needed options)
 To test Windows application with appium, one need to 
 - download FlaUI.WebDriver (https://github.com/FlaUI/FlaUI.WebDriver/releases)
 - set `APPIUM_FLAUI_PATH` to FlaUI.WebDriver binary. e.g: D:\drivers\FlaUI.WebDriver.exe
+- Install appium-flaui-driver: `npx appium driver install --source=npm appium-flaui-driver`
 
 
 ```xml
