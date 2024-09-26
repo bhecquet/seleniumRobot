@@ -92,7 +92,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testTestLevelParam(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
-		Assert.assertEquals(seleniumTestsCtx.getBrowser(), "firefox");
+		Assert.assertTrue(seleniumTestsCtx.getBrowser().getBrowserType().toLowerCase().contains("firefox"));
 	}
 	
 	/**
