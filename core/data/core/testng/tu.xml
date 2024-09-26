@@ -47,7 +47,8 @@
     	<parameter name="variable1" value="value1" />
     	<parameter name="dpTagsInclude" value="aTag" />
 		<parameter name="anOtherParam" value="value3" />
-		
+		<parameter name="browser" value="firefox" />
+
         
         <groups>
             <run>
