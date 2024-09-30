@@ -3,7 +3,6 @@
    
 	<parameter name="implicitWaitTimeOut" value="2"></parameter>
 	<parameter name="browser" value="*firefox" />
-	<parameter name="app" value="https://www.test.google.fr" />
 	<parameter name="aParam" value="value1" />
 	<parameter name="anOtherParam" value="value2" />
 	<parameter name="variable1" value="value4" />
