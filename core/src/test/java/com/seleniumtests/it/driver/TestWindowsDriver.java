@@ -85,7 +85,12 @@ public class TestWindowsDriver extends GenericTest {
         String appiumServerUrl = String.format("http://localhost:%d/", appiumPort);
 
         SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_WINDOWS);
-        SeleniumTestsContextManager.getThreadContext().setAppActivity(".*Bloc-notes");
+
+        if ("fr".equals(System.getProperty("user.language"))) {
+            SeleniumTestsContextManager.getThreadContext().setAppActivity(".*Bloc-notes");
+        } else {
+            SeleniumTestsContextManager.getThreadContext().setAppActivity(".*Notepad");
+        }
         SeleniumTestsContextManager.getThreadContext().setAppiumServerUrl(appiumServerUrl);
 
         String appiumCmd = new OSCommand(List.of("appium")).searchInWindowsPath("appium");

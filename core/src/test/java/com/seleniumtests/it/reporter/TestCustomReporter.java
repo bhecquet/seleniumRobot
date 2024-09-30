@@ -89,7 +89,7 @@ public class TestCustomReporter extends ReporterTest {
 			// check content of the file. It should contain error
 			String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testInError", "SUP-result.xml").toFile(), StandardCharsets.UTF_8);
 			detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
-			Assert.assertTrue(detailedReportContent.contains("<errors><error>				class java.lang.AssertionError: error								at com.seleniumtests"));
+			Assert.assertTrue(detailedReportContent.contains("<errors><error>			class java.lang.AssertionError: error						at com.seleniumtests"));
 			
 			String detailedReportContent2 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "SUP-result.xml").toFile(), StandardCharsets.UTF_8);
 			detailedReportContent2 = detailedReportContent2.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");

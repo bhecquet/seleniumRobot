@@ -18,7 +18,7 @@
 #foreach ($testStep in $testSteps)
 #set($stepDuration = $testStep.getDuration() / 1000.0)
 #set($stepTime = $testStep.getStartDate().getTime() - $startTime)
-		<step id="$velocityCount">
+		<step id="$foreach.count">
 			<duration>$stepTime</duration>
             <name>$testStep.getName()</name>
             <values>

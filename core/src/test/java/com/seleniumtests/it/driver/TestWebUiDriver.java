@@ -191,6 +191,7 @@ public class TestWebUiDriver extends ReporterTest {
 			when(driverOptions.timeouts()).thenReturn(timeouts);
 
 			SeleniumTestsContextManager.getThreadContext().setRunMode("local");
+			SeleniumTestsContextManager.getThreadContext().setApp("myApp");
 			SeleniumTestsContextManager.getThreadContext().setAppiumServerUrl("http://localhost:4321/wd/hub/");
 			SeleniumTestsContextManager.getThreadContext().setPlatform("windows");
 			SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_WINDOWS);
