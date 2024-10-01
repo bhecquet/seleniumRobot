@@ -1,5 +1,6 @@
 package com.seleniumtests.it.driver;
 
+import com.seleniumtests.CaptureVideo;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.browserfactory.mobile.AppiumLauncher;
 import com.seleniumtests.browserfactory.mobile.ExistingAppiumLauncher;
@@ -21,6 +22,7 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.List;
 
+@CaptureVideo
 public class TestWindowsDriver extends GenericTest {
 
     @BeforeClass(groups = "it")
