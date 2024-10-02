@@ -251,6 +251,9 @@ public class TestNGResultUtils {
     }
     
     public static void setLinkedTestMethod(ITestResult testNGResult, ITestNGMethod testMethod) {
+		if (testMethod == null) {
+			return;
+		}
     	testNGResult.setAttribute(LINKED_TEST_METHOD, testMethod);
     }
     

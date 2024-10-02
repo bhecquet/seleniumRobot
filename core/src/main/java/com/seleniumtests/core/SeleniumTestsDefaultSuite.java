@@ -23,14 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.testng.IInvokedMethod;
-import org.testng.IObjectFactory;
-import org.testng.IObjectFactory2;
-import org.testng.ISuite;
-import org.testng.ISuiteResult;
-import org.testng.ITestNGListener;
-import org.testng.ITestNGMethod;
-import org.testng.SuiteRunState;
+import org.testng.*;
 import org.testng.internal.annotations.IAnnotationFinder;
 import org.testng.xml.XmlSuite;
 
@@ -75,12 +68,7 @@ public class SeleniumTestsDefaultSuite implements ISuite {
     }
 
     @Override
-    public IObjectFactory getObjectFactory() {
-        return null;
-    }
-
-    @Override
-    public IObjectFactory2 getObjectFactory2() {
+    public ITestObjectFactory getObjectFactory() {
         return null;
     }
 

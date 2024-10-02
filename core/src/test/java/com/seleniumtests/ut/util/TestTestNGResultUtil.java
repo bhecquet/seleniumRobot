@@ -212,6 +212,12 @@ public class TestTestNGResultUtil extends MockitoTest {
 		Assert.assertEquals(TestNGResultUtils.getLinkedTestMethod(tr), tr.getMethod());
 	}
 	@Test(groups={"ut"})
+	public void testLinkedTestMethodMethodNull() {
+		ITestResult tr = Reporter.getCurrentTestResult();
+		TestNGResultUtils.setLinkedTestMethod(tr, null);
+		Assert.assertNull(TestNGResultUtils.getLinkedTestMethod(tr));
+	}
+	@Test(groups={"ut"})
 	public void testLinkedTestMethodNull() {
 		ITestResult tr = Reporter.getCurrentTestResult(); 
 		Assert.assertNull(TestNGResultUtils.getLinkedTestMethod(tr));

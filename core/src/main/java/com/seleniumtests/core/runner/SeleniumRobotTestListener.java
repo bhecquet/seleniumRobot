@@ -33,18 +33,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.WebDriverException;
-import org.testng.IConfigurationListener;
-import org.testng.IExecutionListener;
-import org.testng.IInvokedMethod;
-import org.testng.IInvokedMethodListener;
-import org.testng.ISuite;
-import org.testng.ISuiteListener;
-import org.testng.ISuiteResult;
-import org.testng.ITestContext;
-import org.testng.ITestListener;
-import org.testng.ITestNGMethod;
-import org.testng.ITestResult;
-import org.testng.Reporter;
+import org.testng.*;
 import org.testng.internal.ConfigurationMethod;
 import org.testng.internal.annotations.DisabledRetryAnalyzer;
 
@@ -76,7 +65,7 @@ import com.seleniumtests.util.video.VideoRecorder;
 
 import kong.unirest.Unirest;
 
-public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodListener, ISuiteListener, IExecutionListener, IConfigurationListener {
+public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodListener, ISuiteListener, IExecutionListener, IConfigurationListener, IDataProviderListener {
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotTestListener.class);
 	private static ScenarioLogger scenarioLogger = ScenarioLogger.getScenarioLogger(SeleniumRobotTestListener.class);
@@ -276,14 +265,16 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	}
 
 	@Override
-	public void beforeInvocation(IInvokedMethod method, ITestResult testResult) {
-		// nothing to do
+	public void beforeDataProviderExecution(IDataProviderMethod dataProviderMethod, ITestNGMethod method, ITestContext context) {
+
+		// in case dataprovider is executed in parallel with other tests, there is no guarantee that the thread executing the dataprovider has a thread context initialized
+		try {
+			SeleniumTestsContextManager.getThreadContext();
+		} catch (ConfigurationException e) {
+			SeleniumTestsContextManager.initThreadContext();
+		}
 	}
 
-	@Override
-	public void afterInvocation(IInvokedMethod method, ITestResult testResult) {
-		// nothing to do
-	}
 
 	@Override
 	public void beforeInvocation(IInvokedMethod method, ITestResult testResult, ITestContext context) {
@@ -292,7 +283,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		// issue #94: add ability to request thread context from a method annotated with @BeforeMethod
 		// for each beforemethod, store the current context so that it can be edited by the configuration method
 		if (method.isConfigurationMethod()) {
-			configureThreadContextBeforeInvoke(method, testResult, context);
+			configureThreadContextBeforeInvoke(method.getTestMethod(), testResult, context);
 		}
 	}
 	
@@ -431,11 +422,6 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	public void beforeConfiguration(ITestResult tr, ITestNGMethod tm) {
 		TestNGResultUtils.setLinkedTestMethod(tr, tm);
 	}
-	
-	@Override
-	public void onConfigurationSuccess(ITestResult testResult) {
-		// nothing to do
-	}
 
 	@Override
 	public void onConfigurationFailure(ITestResult testResult) {
@@ -535,14 +521,14 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	/**
 	 * put in thread context the test / class / method context that may have already be defined in other \@BeforeXXX method
 	 */
-	private void configureThreadContextBeforeInvoke(IInvokedMethod method, ITestResult testResult, ITestContext context) {
-		ConfigurationMethod configMethod = (ConfigurationMethod)method.getTestMethod();
-		SeleniumTestsContextManager.insertThreadContext(method.getTestMethod(), testResult, context);
+	private void configureThreadContextBeforeInvoke(ITestNGMethod method, ITestResult testResult, ITestContext context) {
+
+		SeleniumTestsContextManager.insertThreadContext(method, testResult, context);
 		
 		// issue #137: block driver creation outside of @BeforeMethod / @AfterMethod so that a driver may not remain open without being used
 		// other reason is that context for Class/Test/Group is shared among several test methods
 		// WebDriver.cleanup() is called after @AfterMethod
-		SeleniumTestsContextManager.getThreadContext().setDriverCreationBlocked(!(configMethod.isBeforeMethodConfiguration() || configMethod.isAfterMethodConfiguration()));
+		SeleniumTestsContextManager.getThreadContext().setDriverCreationBlocked(!(method.isBeforeMethodConfiguration() || method.isAfterMethodConfiguration()));
 	}
 	
 
@@ -614,16 +600,6 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	 */
 	public static List<ISuite> getSuiteList() {
 		return suiteList;
-	}
-
-	@Override
-	public void beforeConfiguration(ITestResult testResult) {
-		// nothing to do for now
-	}
-
-	@Override
-	public void onTestFailedButWithinSuccessPercentage(ITestResult result) {
-	
 	}
 
 
