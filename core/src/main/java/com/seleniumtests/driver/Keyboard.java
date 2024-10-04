@@ -98,6 +98,7 @@ public class Keyboard {
     		put('¤',new KeyStroke(KeyEvent.VK_DOLLAR, false, true));
     		put('£',new KeyStroke(KeyEvent.VK_DOLLAR, true));
     		put('&',new KeyStroke(KeyEvent.VK_1, false));
+    		put('%',new KeyStroke("37"));
     		put('é',new KeyStroke(KeyEvent.VK_2, false));
     		put('è',new KeyStroke(KeyEvent.VK_7, false));
     		put('ç',new KeyStroke(KeyEvent.VK_9, false));
@@ -180,10 +181,15 @@ public class Keyboard {
     }
     
     private class KeyStroke{
-        int code;
+        Integer code;
         boolean isShifted;
         boolean isAltGr;
-        
+		String asciiCode;
+
+		public KeyStroke(String asciiCode) {
+			this.asciiCode = asciiCode;
+		}
+
         public KeyStroke(int keyCode,boolean shift){
             code=keyCode;
             isShifted=shift;
@@ -194,7 +200,27 @@ public class Keyboard {
         	isShifted=shift;
         	isAltGr = altGr;
         }
-        public void type(){
+
+		public void type() {
+			if (asciiCode == null) {
+				typeKeyEvent();
+			} else {
+				typeAsciiCode();
+			}
+		}
+
+		private void typeAsciiCode() {
+			robot.keyPress(KeyEvent.VK_ALT);
+			for (int i = 0; i < asciiCode.length(); i++) {
+				int keyEvent = (int)asciiCode.charAt(i) + 48;
+				logger.info(keyEvent);
+				robot.keyPress(keyEvent);
+				robot.keyRelease(keyEvent);
+			}
+			robot.keyRelease(KeyEvent.VK_ALT);
+		}
+
+        private void typeKeyEvent() {
             try{
                 if (isShifted) {
                     robot.keyPress(KeyEvent.VK_SHIFT);
