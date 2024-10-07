@@ -34,10 +34,9 @@ public class StubParentClass extends SeleniumTestPlan {
 	
 	/**
 	 * Generate context to have logger correctly initialized
-	 * @param testContext
 	 */
 	@BeforeSuite(groups="stub")
-	public void initSuite(final ITestContext testContext) {
+	public void initSuite() {
 		if (System.getProperty(SeleniumTestsContext.VIDEO_CAPTURE) == null) {
 			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "false");
 		}
