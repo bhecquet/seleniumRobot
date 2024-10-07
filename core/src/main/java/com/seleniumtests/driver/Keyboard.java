@@ -26,6 +26,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.util.osutility.OSUtility;
 import org.apache.logging.log4j.Logger;
 
 import com.seleniumtests.customexception.ConfigurationException;
@@ -210,14 +212,19 @@ public class Keyboard {
 		}
 
 		private void typeAsciiCode() {
-			robot.keyPress(KeyEvent.VK_ALT);
-			for (int i = 0; i < asciiCode.length(); i++) {
-				int keyEvent = (int)asciiCode.charAt(i) + 48;
-				logger.info(keyEvent);
-				robot.keyPress(keyEvent);
-				robot.keyRelease(keyEvent);
+
+			if (OSUtility.isWindows()) {
+				robot.keyPress(KeyEvent.VK_ALT);
+				for (int i = 0; i < asciiCode.length(); i++) {
+					int keyEvent = (int) asciiCode.charAt(i) + 48;
+					logger.info(keyEvent);
+					robot.keyPress(keyEvent);
+					robot.keyRelease(keyEvent);
+				}
+				robot.keyRelease(KeyEvent.VK_ALT);
+			} else {
+				throw new ScenarioException("Only Windows is supported for 'typeAsciiCode'");
 			}
-			robot.keyRelease(KeyEvent.VK_ALT);
 		}
 
         private void typeKeyEvent() {
