@@ -161,7 +161,7 @@ public class TestConfigReader extends MockitoTest {
 			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key3").getValue(), "value30");
 			
 			// check that if value is not present in additional file, it's taken from env.ini/config.ini
-			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("proxyType").getValue(), "direct");
+			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("startedBy").getValue(), "local");
 		} finally {
 			System.clearProperty(SeleniumTestsContext.LOAD_INI);
 		}
@@ -204,9 +204,6 @@ public class TestConfigReader extends MockitoTest {
 			
 			// check values are overwritten by first loaded ini file 
 			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key2").getValue(), "value20");
-			
-			// check that if value is not present in additional file, it's taken from env.ini/config.ini
-			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("proxyType").getValue(), "direct");
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.LOAD_INI);

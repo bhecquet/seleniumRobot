@@ -40,6 +40,7 @@ public class TestBrowserProxy extends GenericDriverTest {
 	
 	@Test(groups={"it"})
 	public void testFirefoxProxyAuto(final ITestContext testNGCtx) {
+		String currentProxy = System.getProperty(SeleniumTestsContext.WEB_PROXY_TYPE);
 		try {
 			System.setProperty(SeleniumTestsContext.BROWSER, BROWSER);
 			System.setProperty(SeleniumTestsContext.WEB_PROXY_TYPE, "autodetect");
@@ -49,7 +50,13 @@ public class TestBrowserProxy extends GenericDriverTest {
 			Assert.assertTrue(driver.findElement(By.tagName("body")).getText().toLowerCase().contains("gmail"), "Google home page has not been loaded");
 		} finally {
 			System.clearProperty(SeleniumTestsContext.BROWSER);
-			System.clearProperty(SeleniumTestsContext.WEB_PROXY_TYPE);
+
+			// restore Proxy type that may have been set from command line to adapt to specific execution environement
+			if (currentProxy != null) {
+				System.setProperty(SeleniumTestsContext.WEB_PROXY_TYPE, currentProxy);
+			} else {
+				System.clearProperty(SeleniumTestsContext.WEB_PROXY_TYPE);
+			}
 		}
 	}
 	
@@ -59,6 +66,8 @@ public class TestBrowserProxy extends GenericDriverTest {
 	 */
 	@Test(groups={"it"}, expectedExceptions=TimeoutException.class, enabled=false)
 	public void testFirefoxProxyDirect(final ITestContext testNGCtx) {
+
+		String currentProxy = System.getProperty(SeleniumTestsContext.WEB_PROXY_TYPE);
 		try {
 			System.setProperty(SeleniumTestsContext.BROWSER, BROWSER);
 			System.setProperty(SeleniumTestsContext.PAGE_LOAD_TIME_OUT, "5");
@@ -68,7 +77,13 @@ public class TestBrowserProxy extends GenericDriverTest {
 			driver.get("http://www.google.com");
 		} finally {
 			System.clearProperty(SeleniumTestsContext.BROWSER);
-			System.clearProperty(SeleniumTestsContext.WEB_PROXY_TYPE);
+
+			// restore Proxy type that may have been set from command line to adapt to specific execution environement
+			if (currentProxy != null) {
+				System.setProperty(SeleniumTestsContext.WEB_PROXY_TYPE, currentProxy);
+			} else {
+				System.clearProperty(SeleniumTestsContext.WEB_PROXY_TYPE);
+			}
 			System.clearProperty(SeleniumTestsContext.PAGE_LOAD_TIME_OUT);
 			System.clearProperty(SeleniumTestsContext.WEB_SESSION_TIME_OUT);
 		}

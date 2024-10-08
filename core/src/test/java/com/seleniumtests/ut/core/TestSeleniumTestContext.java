@@ -1409,12 +1409,20 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	@Test(groups="ut context")
 	public void testProxyOverride(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		String currentProxy = System.getProperty(SeleniumTestsContext.WEB_PROXY_TYPE);
 		try {
-			System.setProperty("proxyType", "system");
+			System.setProperty(SeleniumTestsContext.WEB_PROXY_TYPE, "direct");
 			initThreadContext(testNGCtx);
-			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyType(), ProxyType.SYSTEM);
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyType(), ProxyType.DIRECT);
 		} finally {
-			System.clearProperty("proxyType");
+			System.clearProperty(SeleniumTestsContext.WEB_PROXY_TYPE);
+
+			// restore Proxy type that may have been set from command line to adapt to specific execution environement
+			if (currentProxy != null) {
+				System.setProperty(SeleniumTestsContext.WEB_PROXY_TYPE, currentProxy);
+			} else {
+				System.clearProperty(SeleniumTestsContext.WEB_PROXY_TYPE);
+			}
 		}
 	}
 	@Test(groups="ut context")
