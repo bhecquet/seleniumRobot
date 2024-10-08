@@ -124,7 +124,7 @@ public class SeleniumIdeParser {
 			StringBuilder newContent = new StringBuilder();
 			String content = FileUtils.readFileToString(javaFile, StandardCharsets.UTF_8);
 			for (String line: content.split("\n")) {
-				line = line.replace("\r", "")
+				line = line.replaceFirst("\\s+$", "").replace("\r", "")
 						.replace("\\\\\\'", "'") // remove double escaping of single quotes
 						.replace("\\'", "'"); // remove escaping of single quotes, which are not necessary
 
