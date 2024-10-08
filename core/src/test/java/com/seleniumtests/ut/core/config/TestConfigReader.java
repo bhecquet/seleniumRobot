@@ -65,7 +65,7 @@ public class TestConfigReader extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testReadConfigWithMoreFiles() {
 		Map<String, TestVariable> config = new ConfigReader("DEV", "envSpecific.ini,spec/envSpecific2.ini").readConfig();
-		Assert.assertEquals(config.size(), 7);
+		Assert.assertEquals(config.size(), 8);
 		Assert.assertEquals(config.get("key3").getValue(), "value30");
 		Assert.assertEquals(config.get("key30").getValue(), "value300");
 	}
