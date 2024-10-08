@@ -21,6 +21,8 @@
 	    <testng.utTestnames>UnitTests,UnitTestsWithContext,UnitTestsWithContext2</testng.utTestnames>
 	    <seleniumRobot.debug>none</seleniumRobot.debug>
 	    <sonar.projectKey>bhecquet_seleniumRobot-core</sonar.projectKey>
+		<surefireArgLine></surefireArgLine>
+		<failsafeArgLine></failsafeArgLine>
 	</properties>
 
 	<repositories> 
@@ -324,13 +326,6 @@
 			<version>9.4.56.v20240826</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- needed for offline instrumentation. Offline is used because tests using powermockito are not correctly analyzed due to https://github.com/powermock/powermock/issues/727 -->
-        <!--<dependency>
-            <groupId>org.jacoco</groupId>
-            <artifactId>org.jacoco.agent</artifactId>
-            <version>${jacoco.version}</version>
-            <classifier>runtime</classifier>
-		</dependency>-->
 	</dependencies>
 
 	<build>
@@ -455,7 +450,7 @@
                         <id>pre-integration-test</id>
                         <phase>pre-integration-test</phase>
                         <goals>
-                            <goal>prepare-agent</goal>
+                            <goal>prepare-agent-integration</goal>
                         </goals>
                         <configuration>
                             <destFile>${project.build.directory}/coverage-reports/jacoco-it.exec</destFile>
@@ -532,7 +527,7 @@
 						</property>
 					</properties>
 					<argLine>
-						${surefireArgLine}
+						@{surefireArgLine}
 						--add-opens=java.base/java.lang=ALL-UNNAMED
 						--add-opens=java.base/java.util=ALL-UNNAMED
 						--add-opens=java.base/java.time=ALL-UNNAMED <!-- for GSON -->
@@ -583,7 +578,7 @@
 						 --add-opens=java.base/java.util=ALL-UNNAMED
 						 --add-opens=java.base/java.time=ALL-UNNAMED
 						 --add-opens=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
-						 ${failsafeArgLine}
+						 @{failsafeArgLine}
 						 -Ddebug=${seleniumRobot.debug}
 						 -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"</argLine>
 					 <systemPropertyVariables>
