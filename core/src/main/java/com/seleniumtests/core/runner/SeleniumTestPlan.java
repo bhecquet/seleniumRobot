@@ -101,17 +101,34 @@ public  class SeleniumTestPlan extends SeleniumRobotTestPlan {
 	 * @throws IOException
 	 */
     @DataProvider(name = "dataset")
-    public Object[][] dataset(Method testMethod) throws IOException {	
-    	File dataset = getDatasetFile(testMethod);
-    	if (dataset.getName().toLowerCase().endsWith("csv")) {
-    		return CSVHelper.read(dataset, ",");
-    	} else {
-    		List<Map<String, String>> data = new ExcelHelper(dataset).readSheet(0, false);
-    		return reformatData(data);
-    	}
-    }
-    
-    private Object[][] reformatData(List<Map<String, String>> data) {
+    public Object[][] dataset(Method testMethod) throws IOException {
+		return getDataset(testMethod);
+	}
+
+	/**
+	 * This data provider can be used to read data from a CSV/XLSX file (NO HEADER) in /data/<app>/dataset/<environment>/<testmethodname>.csv folder
+	 * CSV file MUST use ',' as separator. For (semicolon) ';', use datasetSemicolon
+	 * Execution is in parallel
+	 * @param testMethod
+	 * @return
+	 * @throws IOException
+	 */
+    @DataProvider(name = "datasetParallel", parallel = true)
+    public Object[][] datasetParallel(Method testMethod) throws IOException {
+		return getDataset(testMethod);
+	}
+
+	private Object[][] getDataset(Method testMethod) throws IOException {
+		File dataset = getDatasetFile(testMethod);
+		if (dataset.getName().toLowerCase().endsWith("csv")) {
+			return CSVHelper.read(dataset, ",");
+		} else {
+			List<Map<String, String>> data = new ExcelHelper(dataset).readSheet(0, false);
+			return reformatData(data);
+		}
+	}
+
+	private Object[][] reformatData(List<Map<String, String>> data) {
     	List<String[]> formattedData = new ArrayList<>();
     	for (Map<String, String> dataLine: data) {
     		formattedData.add((String[]) dataLine.values().toArray(new String[] {}));
@@ -129,16 +146,32 @@ public  class SeleniumTestPlan extends SeleniumRobotTestPlan {
 	 */
     @DataProvider(name = "datasetWithHeader")
     public Object[][] datasetWithHeader(Method testMethod) throws IOException {
-    	File dataset = getDatasetFile(testMethod);
-    	if (dataset.getName().toLowerCase().endsWith("csv")) {
-    		return CSVHelper.readWithHeader(getDatasetFile(testMethod), ",");
-    	} else {
-    		List<Map<String, String>> data = new ExcelHelper(dataset).readSheet(0, true);
-    		return reformatData(data);
-    	}
-    }
-    
+		return getDatasetWithHeader(testMethod);
+	}
+
     /**
+	 * This data provider can be used to read data from a CSV/XLSX file (WITH HEADER) in /data/<app>/dataset/<environment>/<testmethodname>.csv folder
+	 * CSV file MUST use ',' as separator. For (semicolon) ';', use datasetSemicolonWithHeader
+	 * @param testMethod
+	 * @return
+	 * @throws IOException
+	 */
+    @DataProvider(name = "datasetWithHeaderParallel", parallel = true)
+    public Object[][] datasetWithHeaderParallel(Method testMethod) throws IOException {
+		return getDatasetWithHeader(testMethod);
+	}
+
+	private Object[][] getDatasetWithHeader(Method testMethod) throws IOException {
+		File dataset = getDatasetFile(testMethod);
+		if (dataset.getName().toLowerCase().endsWith("csv")) {
+			return CSVHelper.readWithHeader(getDatasetFile(testMethod), ",");
+		} else {
+			List<Map<String, String>> data = new ExcelHelper(dataset).readSheet(0, true);
+			return reformatData(data);
+		}
+	}
+
+	/**
 	 * This data provider can be used to read data from a CSV file (NO HEADER) in /data/<app>/dataset/<environment>/<testmethodname>.csv folder
 	 * CSV file MUST use ';' as separator. For (comma) ',', use 'dataset'
 	 * @param testMethod
@@ -147,6 +180,20 @@ public  class SeleniumTestPlan extends SeleniumRobotTestPlan {
 	 */
     @DataProvider(name = "datasetSemicolon")
     public Object[][] datasetSemicolon(Method testMethod) throws IOException {	
+    	return CSVHelper.read(getDatasetFile(testMethod), ";");
+    }
+
+
+	/**
+	 * This data provider can be used to read data from a CSV file (NO HEADER) in /data/<app>/dataset/<environment>/<testmethodname>.csv folder
+	 * CSV file MUST use ';' as separator. For (comma) ',', use 'dataset'
+	 * Execution is in parallel
+	 * @param testMethod
+	 * @return
+	 * @throws IOException
+	 */
+	@DataProvider(name = "datasetSemicolonParallel", parallel = true)
+    public Object[][] datasetSemicolonParallel(Method testMethod) throws IOException {
     	return CSVHelper.read(getDatasetFile(testMethod), ";");
     }
     
@@ -160,6 +207,18 @@ public  class SeleniumTestPlan extends SeleniumRobotTestPlan {
 	 */
     @DataProvider(name = "datasetSemicolonWithHeader")
     public Object[][] datasetSemicolonWithHeader(Method testMethod) throws IOException {
+    	return CSVHelper.readWithHeader(getDatasetFile(testMethod), ";");
+    }
+
+    /**
+	 * This data provider can be used to read data from a CSV file (WITH HEADER) in /data/<app>/dataset/<environment>/<testmethodname>.csv folder
+	 * CSV file MUST use ';' as separator. For (comma) ',', use 'datasetWithHeader'
+	 * @param testMethod
+	 * @return
+	 * @throws IOException
+	 */
+    @DataProvider(name = "datasetSemicolonWithHeaderParallel", parallel = true)
+    public Object[][] datasetSemicolonWithHeaderParallel(Method testMethod) throws IOException {
     	return CSVHelper.readWithHeader(getDatasetFile(testMethod), ";");
     }
 }

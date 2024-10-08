@@ -41,6 +41,14 @@ public class StubTestClassForDataProvider extends StubParentClass {
 		SeleniumTestsContextManager.getThreadContext().setAttribute("data", data);
 		((ScenarioLogger)logger).log("data written: " + SeleniumTestsContextManager.getThreadContext().getAttribute("data"));
 	}
+
+	@Test(groups={"stub"}, dataProvider = "dataParallel")
+	public void testMethodParallel(String data) {
+
+		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getAttribute("data"));
+		SeleniumTestsContextManager.getThreadContext().setAttribute("data", data);
+		((ScenarioLogger)logger).log("data written: " + SeleniumTestsContextManager.getThreadContext().getAttribute("data"));
+	}
 	
 	@BeforeMethod(groups={"stub"})
 	public void before(Method method, ITestContext ctx, ITestResult res) {
@@ -49,6 +57,11 @@ public class StubTestClassForDataProvider extends StubParentClass {
 	
 	@DataProvider
 	public Object[][] data(ITestContext testContext) {
+		return new String[][] {new String[] {"data1"}, new String[] {"data2"}, new String[] {"data3"}};
+	}
+
+	@DataProvider(parallel = true)
+	public Object[][] dataParallel(ITestContext testContext) {
 		return new String[][] {new String[] {"data1"}, new String[] {"data2"}, new String[] {"data3"}};
 	}
 }

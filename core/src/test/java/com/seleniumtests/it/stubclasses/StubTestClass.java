@@ -348,6 +348,22 @@ public class StubTestClass extends StubParentClass {
 	public void testStandardDataProviderSemicolonWithHeader(String col1, String col2) {
 		logger.info(String.format("%s,%s", col1, col2));
 	}
+	@Test(groups="stub", dataProvider = "datasetParallel")
+	public void testStandardDataProviderParallel(String col1, String col2) {
+		logger.info(String.format("%s,%s", col1, col2));
+	}
+	@Test(groups="stub", dataProvider = "datasetSemicolonParallel")
+	public void testStandardDataProviderSemicolonParallel(String col1, String col2) {
+		logger.info(String.format("%s,%s", col1, col2));
+	}
+	@Test(groups="stub", dataProvider = "datasetWithHeaderParallel")
+	public void testStandardDataProviderWithHeaderParallel(String col1, String col2) {
+		logger.info(String.format("%s,%s", col1, col2));
+	}
+	@Test(groups="stub", dataProvider = "datasetSemicolonWithHeaderParallel")
+	public void testStandardDataProviderSemicolonWithHeaderParallel(String col1, String col2) {
+		logger.info(String.format("%s,%s", col1, col2));
+	}
 
 	@Test(groups="stub", dataProvider = "dataset")
 	public void testStandardXlsxDataProvider(String col1, String col2) {

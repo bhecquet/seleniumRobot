@@ -308,10 +308,43 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	@Test(groups={"it"})
 	public void testContextWithDataProvider(ITestContext testContext) throws Exception {
 		
-		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDataProvider.testMethod"}, "", "");
+		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDataProvider.testMethodParallel"}, "", "");
 
 		String mainReportContent = readSummaryFile();
 		
+		// check that all tests are OK and present into summary file. If test is KO (issue #115), the same context is taken for subsequent test method calls
+		Assert.assertTrue(mainReportContent.matches(".*<a href='testMethodParallel/TestReport.html' info=\"ok\" .*?>testMethodParallel</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='testMethodParallel-1/TestReport.html' info=\"ok\" .*?>testMethodParallel-1</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='testMethodParallel-2/TestReport.html' info=\"ok\" .*?>testMethodParallel-2</a>.*"));
+
+		// check each result file to see if it exists and if it only contains information about this method context (log of this method only)
+		// it's not possible to know which thread will take which data
+		// example of output
+		//  INFO  2024-10-08 08:50:52,712 [TestNG-PoolService-3] SeleniumRobotTestListener: Start method testMethodParallel
+		// INFO  2024-10-08 08:50:52,713 [TestNG-PoolService-2] SeleniumRobotTestListener: Start method testMethodParallel-1
+		// INFO  2024-10-08 08:50:52,714 [TestNG-PoolService-1] SeleniumRobotTestListener: Start method testMethodParallel-2
+		String detailedReportContent1 = readTestMethodResultFile("testMethodParallel");
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "data written"), 1);
+		
+		String detailedReportContent2 = readTestMethodResultFile("testMethodParallel-1");
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "data written"), 1);
+		
+		String detailedReportContent3 = readTestMethodResultFile("testMethodParallel-2");
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent3, "data written"), 1);
+	}
+
+	/**
+	 * Checks that with a data provider, test context does not overlap between test methods and that displayed logs correspond to the method execution and not all method executions
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testContextWithDataProviderMultipleThreads(ITestContext testContext) throws Exception {
+
+		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDataProvider.testMethod"}, "", "", 3);
+
+		String mainReportContent = readSummaryFile();
+
 		// check that all tests are OK and present into summary file. If test is KO (issue #115), the same context is taken for subsequent test method calls
 		Assert.assertTrue(mainReportContent.matches(".*<a href='testMethod/TestReport.html' info=\"ok\" .*?>testMethod</a>.*"));
 		Assert.assertTrue(mainReportContent.matches(".*<a href='testMethod-1/TestReport.html' info=\"ok\" .*?>testMethod-1</a>.*"));
@@ -322,12 +355,12 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "data written"), 1);
 		Assert.assertTrue(detailedReportContent1.contains("data written: data1"));
 		Assert.assertTrue(detailedReportContent1.contains("Test Details - testMethod with params: (data1)"));
-		
+
 		String detailedReportContent2 = readTestMethodResultFile("testMethod-1");
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "data written"), 1);
 		Assert.assertTrue(detailedReportContent2.contains("data written: data2"));
 		Assert.assertTrue(detailedReportContent2.contains("Test Details - testMethod-1 with params: (data2)"));
-		
+
 		String detailedReportContent3 = readTestMethodResultFile("testMethod-2");
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent3, "data written"), 1);
 		Assert.assertTrue(detailedReportContent3.contains("data written: data3"));

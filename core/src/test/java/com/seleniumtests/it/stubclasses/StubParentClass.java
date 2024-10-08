@@ -43,7 +43,7 @@ public class StubParentClass extends SeleniumTestPlan {
 	}
 	
 	@AfterSuite(groups="stub")
-	public void resetSuite(final ITestContext testContext) {
+	public void resetSuite() {
 		System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
 	}
 	

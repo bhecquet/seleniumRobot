@@ -29,6 +29,16 @@ public class TestSeleniumTestPlan extends ReporterTest {
 		Assert.assertTrue(logs.contains("r1c1,r1c2"));
 		Assert.assertTrue(logs.contains("r2c1,r2c2"));
 	}
+	@Test(groups={"ut"})
+	public void testWithStandardDataProviderParallel() throws Exception {
+
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testStandardDataProviderParallel"});
+		String logs = readSeleniumRobotLogFile();
+
+		// first line / header has not been skipped => 2 tests
+		Assert.assertTrue(logs.contains("PoolService-1] ScenarioLogger: r1c1,r1c2"));
+		Assert.assertTrue(logs.contains("PoolService-2] ScenarioLogger: r2c1,r2c2"));
+	}
 	
 	@Test(groups={"ut"})
 	public void testWithStandardXlsxDataProvider() throws Exception {
@@ -52,6 +62,18 @@ public class TestSeleniumTestPlan extends ReporterTest {
 		Assert.assertTrue(logs.contains("r2c1b,r2c2b"));
 		Assert.assertTrue(logs.contains("SeleniumRobotTestListener: Start method testStandardDataProviderSemicolon-1"));
 	}
+
+	@Test(groups={"ut"})
+	public void testWithStandardDataProviderSemicolonParallel() throws Exception {
+
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testStandardDataProviderSemicolonParallel"});
+		String logs = readSeleniumRobotLogFile();
+
+		// first line / header has not been skipped => 2 tests
+		Assert.assertTrue(logs.contains("PoolService-1] ScenarioLogger: r1c1b,r1c2b"));
+		Assert.assertTrue(logs.contains("PoolService-2] ScenarioLogger: r2c1b,r2c2b"));
+		Assert.assertTrue(logs.contains("SeleniumRobotTestListener: Start method testStandardDataProviderSemicolonParallel-1"));
+	}
 	
 	@Test(groups={"ut"})
 	public void testWithStandardDataProviderWithHeader() throws Exception {
@@ -62,6 +84,17 @@ public class TestSeleniumTestPlan extends ReporterTest {
 		// first line / header has not been skipped => 1 test
 		Assert.assertFalse(logs.contains("r1c1d,r1c2d")); // first line skipped as considered as header
 		Assert.assertTrue(logs.contains("r2c1d,r2c2d"));
+	}
+
+	@Test(groups={"ut"})
+	public void testWithStandardDataProviderWithHeaderParallel() throws Exception {
+
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testStandardDataProviderWithHeaderParallel"});
+		String logs = readSeleniumRobotLogFile();
+
+		Assert.assertFalse(logs.contains("row,col")); // first line skipped as considered as header
+		Assert.assertTrue(logs.contains("PoolService-1] ScenarioLogger: r1c1d,r1c2d"));
+		Assert.assertTrue(logs.contains("PoolService-2] ScenarioLogger: r2c1d,r2c2d"));
 	}
 	
 	@Test(groups={"ut"})
@@ -74,5 +107,17 @@ public class TestSeleniumTestPlan extends ReporterTest {
 		Assert.assertFalse(logs.contains("r1c1c,r1c2c")); // first line skipped as considered as header
 		Assert.assertTrue(logs.contains("r2c1c,r2c2c"));
 		Assert.assertFalse(logs.contains("SeleniumRobotTestListener: Start method testStandardDataProviderSemicolon-1"));
+	}
+
+	@Test(groups={"ut"})
+	public void testWithStandardDataProviderSemicolonWithHeaderParallel() throws Exception {
+
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testStandardDataProviderSemicolonWithHeaderParallel"});
+		String logs = readSeleniumRobotLogFile();
+
+		// first line / header has not been skipped => 2 tests
+		Assert.assertFalse(logs.contains("row,col")); // first line skipped as considered as header
+		Assert.assertTrue(logs.contains("PoolService-1] ScenarioLogger: r1c1c,r1c2c"));
+		Assert.assertTrue(logs.contains("PoolService-2] ScenarioLogger: r2c1c,r2c2c"));
 	}
 }

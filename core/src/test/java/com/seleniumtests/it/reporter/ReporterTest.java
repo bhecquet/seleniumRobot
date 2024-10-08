@@ -232,6 +232,21 @@ public class ReporterTest extends ConnectorsTest {
      * @throws IOException
      */
     public TestNG executeSubTest(int threadCount, String[] testMethods, String cucumberTests, String group) throws IOException {
+        return executeSubTest(threadCount, testMethods, cucumberTests, group, null);
+    }
+
+    /**
+     * Execute SeleniumTestPlan and cucumber tests
+     * Each test method is put in its own TestNG test
+     * @param threadCount
+     * @param testMethods
+     * @param cucumberTests
+     * @param group
+     * @param dataproviderThreadCount
+     * @return
+     * @throws IOException
+     */
+    public TestNG executeSubTest(int threadCount, String[] testMethods, String cucumberTests, String group, Integer dataproviderThreadCount) throws IOException {
 
         XmlSuite suite = new XmlSuite();
         suite.setName("TmpSuite");
@@ -246,6 +261,9 @@ public class ReporterTest extends ConnectorsTest {
 
         if (threadCount > 1) {
             suite.setThreadCount(threadCount);
+            if (dataproviderThreadCount != null) {
+                suite.setDataProviderThreadCount(dataproviderThreadCount);
+            }
             suite.setParallel(XmlSuite.ParallelMode.TESTS);
         }
 
