@@ -892,7 +892,7 @@ It you use ExpectedConditions that takes a locator (e.g: `ExpectedConditions.vis
 
 #### Use Dataprovider ####
 
-Data provider is a standard TestNG [https://testng.org/doc/documentation-main.html#parameters-dataproviders](https://testng.org/doc/documentation-main.html#parameters-dataproviders) feature that allows executing the same test with several dataset.
+Data provider is a standard TestNG [https://testng.org/doc/documentation-main.html#parameters-dataproviders](https://testng.org/#_parameters_with_dataproviders) feature that allows executing the same test with several dataset.
 
 SeleniumRobot provides standard Dataprovider for common use cases which will search CSV / XLSX file depending on test method name in `<root>/data/<app>/dataset/<environment>/<testMethodName>.csv`
 
@@ -912,6 +912,12 @@ There is as many method parameters as columns in the dataset file. So, in the ex
 - 'datasetWithHeader' => CSV file with "," as separator / XLSX file and with header
 - 'datasetSemicolon' => CSV file with ";" as separator and no header
 - 'datasetSemicolonWithHeader' => CSV file with ";" as separator and with header
+
+These 4 dataproviders are executed sequentially. To execute them in parallel, use their parallel counterpart with `data-provider-thread-count` parameter on suite (or `-dataproviderthreadcount` as command line parameter
+- 'datasetParallel' => CSV file with "," as separator / XLSX file and no header
+- 'datasetWithHeaderParallel' => CSV file with "," as separator / XLSX file and with header
+- 'datasetSemicolonParallel' => CSV file with ";" as separator and no header
+- 'datasetSemicolonWithHeaderParallel' => CSV file with ";" as separator and with header
 
 **WARNING** In case your last cell is empty (a line that ends with ',' or ';'), add a "space" so that cell is taken into account
 
