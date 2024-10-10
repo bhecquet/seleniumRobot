@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.connectors.mails;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -56,5 +57,6 @@ public interface EmailClient {
 	public LocalDateTime getFromDate();
 	public void setFromDate(LocalDateTime fromDate);
 	public void sendMessage(List<String> to, String title, String body) throws Exception;
-	
+	public void sendMessage(List<String> to, String title, String body, List<File> attachments) throws Exception;
+
 }

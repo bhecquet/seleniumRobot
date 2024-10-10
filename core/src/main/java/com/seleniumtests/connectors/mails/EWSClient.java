@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.connectors.mails;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -244,13 +245,21 @@ public class EWSClient extends EmailClientImpl {
 	 */
 	@Override
 	public void sendMessage(List<String> to, String title, String body) throws Exception {
+		sendMessage(to, title, body, new ArrayList<>());
+	}
+
+	@Override
+	public void sendMessage(List<String> to, String title, String body, List<File> attachments) throws Exception {
 		EmailMessage message = new EmailMessage(service);
 		message.setSubject(title);
 		message.setBody(new MessageBody(body));
 		for (String address: to) {
 			message.getToRecipients().add(new EmailAddress(address));
 		}
+		for (File file: attachments) {
+			message.getAttachments().addFileAttachment(file.getAbsolutePath());
+		}
 		message.sendAndSaveCopy();
-		
+
 	}
 }

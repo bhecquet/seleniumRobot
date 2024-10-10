@@ -17,7 +17,9 @@
  */
 package com.seleniumtests.connectors.mails;
 
+import java.io.File;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.seleniumtests.customexception.ScenarioException;
@@ -204,6 +206,9 @@ public class EmailAccount {
      * @throws Exception
      */
     public void sendMessage(List<String> to, String title, String body) throws Exception {
+        sendMessage(to,title, body,new ArrayList<>());
+    }
+    public void sendMessage(List<String> to, String title, String body, List<File> attachments) throws Exception {
 
         getEmailClient();
         if (emailClient != null) {

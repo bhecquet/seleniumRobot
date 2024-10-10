@@ -29,6 +29,7 @@ import jakarta.mail.search.SearchTerm;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang3.StringEscapeUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -316,6 +317,11 @@ public class ImapClient extends EmailClientImpl {
 	public void sendMessage(List<String> to, String title, String body) throws Exception {
 		throw new NotImplementedException();
 		
+	}
+
+	@Override
+	public void sendMessage(List<String> to, String title, String body, List<File> attachments) throws Exception {
+		throw new NotImplementedException();
 	}
 
 }
