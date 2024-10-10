@@ -4,7 +4,7 @@
 	<parent>
 	    <groupId>com.infotel.seleniumRobot</groupId>
 	    <artifactId>core-parent-selenium4</artifactId>
-	    <version>5.1.11-SNAPSHOT</version>
+	    <version>5.1.12-SNAPSHOT</version>
 	</parent>
 
   	<artifactId>core-selenium4</artifactId>
@@ -21,8 +21,8 @@
 	    <testng.utTestnames>UnitTests,UnitTestsWithContext,UnitTestsWithContext2</testng.utTestnames>
 	    <seleniumRobot.debug>none</seleniumRobot.debug>
 	    <sonar.projectKey>bhecquet_seleniumRobot-core</sonar.projectKey>
-		<surefireArgLine></surefireArgLine>
-		<failsafeArgLine></failsafeArgLine>
+		<surefireArgLine />
+		<failsafeArgLine />
 	</properties>
 
 	<repositories> 
@@ -336,7 +336,7 @@
 				<artifactId>sonar-maven-plugin</artifactId>
 				<version>3.10.0.2594</version>
 				<configuration>
-					<detail></detail>
+					<detail />
 				</configuration>
 			</plugin>
 			<plugin>

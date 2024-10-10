@@ -5,7 +5,7 @@
 
 	<groupId>com.infotel.seleniumRobot</groupId>
 	<artifactId>core-parent-selenium4</artifactId>
-	<version>5.1.11-SNAPSHOT</version>
+	<version>5.1.12-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>selenium robot</name>
@@ -83,8 +83,8 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-		<surefireArgLine></surefireArgLine>
-		<failsafeArgLine></failsafeArgLine>
+		<surefireArgLine />
+		<failsafeArgLine />
 		<sonar.projectKey>bhecquet_seleniumRobot</sonar.projectKey>
 	  	<sonar.organization>bhecquet</sonar.organization>
 	  	<sonar.host.url>https://sonarcloud.io</sonar.host.url>
