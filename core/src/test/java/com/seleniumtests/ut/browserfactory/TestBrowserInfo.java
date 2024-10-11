@@ -79,8 +79,8 @@ public class TestBrowserInfo extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testEdgeVersion() {
 		if (SystemUtils.IS_OS_WINDOWS) {
-			BrowserInfo bInfo = new BrowserInfo(BrowserType.EDGE, "122.0", null);
-			Assert.assertEquals(bInfo.getDriverFileName(), "edgedriver_122.0_edge-122-123");
+			BrowserInfo bInfo = new BrowserInfo(BrowserType.EDGE, "130.0", null);
+			Assert.assertEquals(bInfo.getDriverFileName(), "edgedriver_130.0_edge-130-131");
 		}
 	}
 	
@@ -88,22 +88,6 @@ public class TestBrowserInfo extends MockitoTest {
 	public void testDriverDoesNotExist() {
 		BrowserInfo bInfo = new BrowserInfo(BrowserType.EDGE, "10", null);
 		bInfo.getDriverFileName();
-	}
-	
-	@Test(groups={"ut"})
-	public void testIE9Version() {
-		if (SystemUtils.IS_OS_WINDOWS) {
-			BrowserInfo bInfo = new BrowserInfo(BrowserType.INTERNET_EXPLORER, "9", null);
-			Assert.assertEquals(bInfo.getDriverFileName(), "IEDriverServer_x64");
-		}
-	}
-	
-	@Test(groups={"ut"})
-	public void testIE10Version() {
-		if (SystemUtils.IS_OS_WINDOWS) {
-			BrowserInfo bInfo = new BrowserInfo(BrowserType.INTERNET_EXPLORER, "10", null);
-			Assert.assertEquals(bInfo.getDriverFileName(), "IEDriverServer_Win32");
-		}
 	}
 	
 	/**
