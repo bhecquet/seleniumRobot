@@ -22,6 +22,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Optional;
 
+import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.options.UiAutomator2Options;
 import io.appium.java_client.ios.options.XCUITestOptions;
 import org.openqa.selenium.MutableCapabilities;
@@ -84,7 +85,7 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
 	            return new IOSDriver(new URL(appiumLauncher.getAppiumServerUrl()), getMobileCapabilities());
 
 			} else if (WINDOWS_PLATORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
-	            return new RemoteWebDriver(new URL(appiumLauncher.getAppiumServerUrl()), driverOptions);
+	            return new AppiumDriver(new URL(appiumLauncher.getAppiumServerUrl()), driverOptions);
 
 	        } else {
 	        	throw new ConfigurationException(String.format("Platform %s is unknown for Appium tests", webDriverConfig.getPlatform()));

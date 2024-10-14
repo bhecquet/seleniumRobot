@@ -74,11 +74,11 @@
 		<!-- /!\ when changing selenium version, do not forget to change selenium-api version in project file (for aspectj build path) -->
 		<!-- /!\ Also change version in SeleniumTestContextManager.java -->
 		<selenium.version>4.24.0</selenium.version>
-		<appium.version>9.2.0</appium.version>
+		<appium.version>9.3.0</appium.version>
 		<log4j.version>2.21.1</log4j.version>
 		<unirest.version>4.0.12</unirest.version>
 		<aspectj.version>1.9.20.1</aspectj.version>
-		<htmlunitdriver.version>4.18.1</htmlunitdriver.version>
+		<htmlunitdriver.version>4.23.0</htmlunitdriver.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>

@@ -8,6 +8,7 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
@@ -70,8 +71,8 @@ public class TestWindowsDriver extends GenericTest {
         try {
 
             WebDriver driver = WebUIDriver.getWebDriver(true);
-            driver.findElement(By.className("Edit")).sendKeys("hello notepad");
-            Assert.assertEquals(driver.findElement(By.className("Edit")).getText(), "hello notepad");
+            new HtmlElement("", By.className("Edit")).sendKeys("hello from HtmlElement");
+            Assert.assertEquals(driver.findElement(By.className("Edit")).getText(), "hello from HtmlElement");
 
         } finally {
             process.destroyForcibly();

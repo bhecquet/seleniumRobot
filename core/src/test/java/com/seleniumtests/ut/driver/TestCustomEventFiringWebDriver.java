@@ -623,6 +623,11 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		eventDriver.setTestType(TestType.WEB);
 		Assert.assertTrue(eventDriver.isWebTest());
 	}
+	@Test(groups = {"ut"})
+	public void testIsWebTestWindowsApp() {
+		eventDriver.setTestType(TestType.APPIUM_APP_WINDOWS);
+		Assert.assertFalse(eventDriver.isWebTest());
+	}
 
 	@Test(groups = {"ut"})
 	public void testIsWebTestMobileWeb() {
@@ -1512,10 +1517,17 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 
 	@Test(groups = {"ut"})
 	public void testGetContextDesktop() {
-		when(mobileDriver.getContext()).thenReturn("WEBVIEW");
 		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.WEB, DriverMode.LOCAL, null));
 		String context = eventDriver.getContext();
 		Assert.assertEquals(context, "WEB");
+		verify(((SupportsContextSwitching)mobileDriver), never()).getContext();
+	}
+
+	@Test(groups = {"ut"})
+	public void testGetContextWindowsApp() {
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_WINDOWS, DriverMode.LOCAL, null));
+		String context = eventDriver.getContext();
+		Assert.assertEquals(context, "APP");
 		verify(((SupportsContextSwitching)mobileDriver), never()).getContext();
 	}
 	

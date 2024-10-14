@@ -1874,8 +1874,8 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	public String getContext() {
 		if (testType.isMobile()) {
 			return ((SupportsContextSwitching) originalDriver).getContext();
-		} else {
-			return "WEB";
+		} else { // desktop case
+			return testType.family().equals(TestType.APP) ? "APP": "WEB";
 		}
 	}
 
