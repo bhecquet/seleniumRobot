@@ -70,7 +70,7 @@ import com.seleniumtests.util.logging.ScenarioLogger;
  *
  */
 @Aspect
-@DeclarePrecedence("LogAction, ReplayAction")
+@DeclarePrecedence("*LogAction*, *ReplayAction*")
 public class ReplayAction {
 
 	private static Clock systemClock = Clock.systemUTC();
@@ -87,7 +87,7 @@ public class ReplayAction {
 	 * @param joinPoint
 	 * @throws Throwable
 	 */
-	@Around("execution(public * com.seleniumtests.uipage.htmlelements.HtmlElement+.* (..))"
+	/*@Around("execution(public * com.seleniumtests.uipage.htmlelements.HtmlElement+.* (..))"
 			+ "&& execution(@com.seleniumtests.uipage.ReplayOnError public * * (..)) && @annotation(replay)")
     public Object replayHtmlElement(ProceedingJoinPoint joinPoint, ReplayOnError replay) throws Throwable {
 
@@ -187,7 +187,7 @@ public class ReplayAction {
 			// restore element scrolling flag for further uses
     		element.setScrollToElementBeforeAction(false);
 		}
-   }
+   }*/
 
 	/**
 	 * @param replay
@@ -195,7 +195,7 @@ public class ReplayAction {
 	 * @param end
 	 * @param e
 	 */
-	private void handleWebDriverException(ReplayOnError replay, HtmlElement element, Instant end,
+	/*private void handleWebDriverException(ReplayOnError replay, HtmlElement element, Instant end,
 			WebDriverException e) {
 		if (end.minusMillis(replay.replayDelayMs() + 100L).isAfter(systemClock.instant())) {
 			WaitHelper.waitForMilliSeconds(replay.replayDelayMs());
@@ -211,7 +211,7 @@ public class ReplayAction {
 			}
 			throw e;
 		}
-	}
+	}*/
 
 	private Object replayNonHtmlElement(ProceedingJoinPoint joinPoint, ReplayOnError replay) throws Throwable {
 		
@@ -275,11 +275,11 @@ public class ReplayAction {
 	 * @param joinPoint
 	 * @throws Throwable
 	 */
-	@Around("!execution(public * com.seleniumtests.uipage.htmlelements.HtmlElement+.* (..))"
+	/*@Around("execution(public * com.seleniumtests.uipage.htmlelements.GenericPictureElement+.* (..))"
 			+ "&& execution(@com.seleniumtests.uipage.ReplayOnError public * * (..)) && @annotation(replay)")
 	public Object replayGenericPicture(ProceedingJoinPoint joinPoint, ReplayOnError replay) throws Throwable {
 		return replayNonHtmlElement(joinPoint, replay);
-	}
+	}*/
 
 
 	

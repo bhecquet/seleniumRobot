@@ -220,6 +220,12 @@ public class StubTestClassForDriverTest extends StubParentClass {
 		._captureSnapshot("my snapshot")
 		._reset();
 	}
+
+	@Test(groups="stub")
+	public void testDriverPictureElementNotFound() throws Exception {
+		new DriverTestPage(true)
+				._clickPictureNotPresent();
+	}
 	
 
 	@Test(groups="stub")

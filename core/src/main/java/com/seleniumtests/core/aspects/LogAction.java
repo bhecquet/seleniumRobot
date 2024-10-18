@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.uipage.BasePage;
 import com.seleniumtests.uipage.ReplayOnError;
 import com.seleniumtests.uipage.htmlelements.Element;
@@ -36,10 +37,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.After;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -615,6 +613,13 @@ public class LogAction {
 		} catch (Throwable e) {
 			actionFailed = true;
 			currentException = e;
+
+			// log searched image and scene image in case image cannot be found.
+			if (e instanceof ImageSearchException && joinPoint.getThis() instanceof GenericPictureElement) {
+				scenarioLogger.logFile(((GenericPictureElement) joinPoint.getThis()).getObjectPictureFile(), "searched picture");
+				scenarioLogger.logFile(((GenericPictureElement) joinPoint.getThis()).getScenePictureFile(), "scene to search in");
+			}
+
 			throw e;
 		} finally {
 			if (currentAction != null && TestStepManager.getParentTestStep() != null) {

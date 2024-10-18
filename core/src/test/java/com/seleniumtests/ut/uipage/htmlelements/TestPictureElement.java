@@ -233,6 +233,22 @@ public class TestPictureElement extends MockitoTest {
 		
 	}
 
+	@Test(groups={"ut"})
+	public void testPNGResourceCreation() {
+		PictureElement pic = new PictureElement("picture", "tu/images/step.png", null, 0.1);
+		Assert.assertTrue(pic.getObjectPictureFile().getName().endsWith(".png"));
+	}
+	@Test(groups={"ut"})
+	public void testJPGResourceCreation() {
+		PictureElement pic = new PictureElement("picture", "tu/images/goat-4.jpg", null, 0.1);
+		Assert.assertTrue(pic.getObjectPictureFile().getName().endsWith(".jpg"));
+	}
+	@Test(groups={"ut"})
+	public void testINIResourceCreation() {
+		PictureElement pic = new PictureElement("picture", "tu/env.ini", null, 0.1);
+		Assert.assertTrue(pic.getObjectPictureFile().getName().endsWith(".tmp"));
+	}
+
 	
 	@AfterMethod(groups={"ut"}, alwaysRun=true)
 	public void reset(ITestContext testNGCtx) {

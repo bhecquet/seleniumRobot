@@ -828,6 +828,24 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 
 	/**
+	 * In case an image cannot be found, check object file and scene file are present in report
+	 * @throws Exception
+	 */
+	@Test(groups = {"it"})
+	public void testDetailedReportContainsSearchedAndSceneImage() throws Exception {
+
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverPictureElementNotFound"});
+
+		String detailedReportContent = readTestMethodResultFile("testDriverPictureElementNotFound");
+		detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
+
+		// check there is only one message for image not found
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "clickAt on Picture picture from resource tu/images/vosAlertes.png with args: (0, -30, )"), 1);
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-snapshot\">searched picture: <a href='img"));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-snapshot\">scene to search in: <a href='"));
+	}
+
+	/**
 	 * Check behaviour when Assert is used in test scenario (not in webpage)
 	 * Assertion in scenario should be attached to the previous step which will be marked as failed
 	 * Test end will also be in red

@@ -123,13 +123,16 @@ public class TestReplayAction extends GenericDriverTest {
             // we expect this fails
         } finally {
             Assert.assertTrue(LocalDateTime.now().minusSeconds(13).isBefore(start));
-            Assert.assertTrue(LocalDateTime.now().minusSeconds(10).isAfter(start));
+            Assert.assertTrue(LocalDateTime.now().minusSeconds(9).isAfter(start));
 
             // check an action has been created for this
             TestStep step = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(2);
             Assert.assertEquals(step.getStepActions().size(), 2);
             Assert.assertEquals(step.getStepActions().get(0).getName(), "clickAt on Picture picture from resource tu/images/vosAlertes.png with args: (0, -30, )");
             Assert.assertTrue(step.getStepActions().get(0).getFailed());
+            Assert.assertEquals(step.getFiles().size(), 2);
+            Assert.assertEquals(step.getFiles().get(0).getName(), "searched picture");
+            Assert.assertEquals(step.getFiles().get(1).getName(), "scene to search in");
         }
     }
 

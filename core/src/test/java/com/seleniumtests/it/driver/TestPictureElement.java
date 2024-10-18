@@ -17,8 +17,10 @@
  */
 package com.seleniumtests.it.driver;
 
+import java.time.LocalDateTime;
 import java.util.Calendar;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.util.imaging.ImageDetector;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -245,6 +247,17 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 	
 	public void testIsNotVisible() {
 		Assert.assertFalse(DriverTestPageWithoutFixedPattern.pictureNotPresent.isElementPresent());
+	}
+
+	public void testClickOnNonExistingPicture() {
+		LocalDateTime start = LocalDateTime.now();
+		try {
+			SeleniumTestsContextManager.getThreadContext().setReplayTimeout(5);
+			DriverTestPageWithoutFixedPattern.pictureNotPresent.click();
+		} finally {
+			Assert.assertTrue(LocalDateTime.now().minusSeconds(4).isAfter(start));
+		}
+
 	}
 	
 	

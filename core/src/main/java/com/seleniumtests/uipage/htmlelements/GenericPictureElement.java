@@ -48,6 +48,7 @@ public abstract class GenericPictureElement extends Element {
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(GenericPictureElement.class);
 
 	protected File objectPictureFile;
+	protected File screenshotFile;
 	protected String resourcePath;
 	protected Map<PageObject, Rectangle> detectedObjectRectangle = new HashMap<>();
 	protected Map<PageObject, Double> pictureSizeRatio = new HashMap<>();
@@ -83,7 +84,13 @@ public abstract class GenericPictureElement extends Element {
 	
 	protected static File createFileFromResource(String resource)  {
 		try {
-			File tempFile = File.createTempFile("img", null);
+			String suffix = null;
+			if (resource.toLowerCase().endsWith(".png")) {
+				suffix = ".png";
+			} else if (resource.toLowerCase().endsWith(".jpg")) {
+				suffix = ".jpg";
+			}
+			File tempFile = File.createTempFile("img", suffix);
 			tempFile.deleteOnExit();
 			FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream(resource), tempFile);
 			
@@ -122,12 +129,12 @@ public abstract class GenericPictureElement extends Element {
 
 		LocalDateTime start = LocalDateTime.now();
 	
-		File screenshotFile = getScreenshotFile();
+		screenshotFile = getScreenshotFile();
 		
 		if (screenshotFile == null) {
 			throw new ScreenshotException("Screenshot does not exist");
 		}
-		
+
 		// for desktop search, without reference image, do not search
 		if (detector != null) {
 			detector.setSceneImage(screenshotFile);
@@ -291,5 +298,7 @@ public abstract class GenericPictureElement extends Element {
 		this.detector = detector;
 	}
 
-
+	public File getScenePictureFile() {
+		return screenshotFile;
+	}
 }

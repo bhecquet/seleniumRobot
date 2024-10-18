@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.it.driver.support.perdriver.chrome;
 
+import com.seleniumtests.customexception.ImageSearchException;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.driver.BrowserType;
@@ -85,5 +86,10 @@ public class TestPictureElementChrome extends TestPictureElement {
 	@Test(groups={"it"})
 	public void testIsNotVisible() {
 		super.testIsNotVisible();
+	}
+
+	@Test(groups={"it"}, expectedExceptions = ImageSearchException.class)
+	public void testClickOnNonExistingPicture() {
+		super.testClickOnNonExistingPicture();
 	}
 }
