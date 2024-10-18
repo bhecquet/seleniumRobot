@@ -814,7 +814,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 				// closing the session. If we are here, the session is still alive
 				return false;
 			}
-    	} catch (NoSuchSessionException | UnsupportedCommandException e) {
+    	} catch (NoSuchSessionException | UnsupportedCommandException | NullPointerException /* for HtmlUnit */ e) {
     		return true;
     	}
     	
