@@ -1246,7 +1246,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		Capabilities caps;
 		try {
 			caps = getCapabilities();
-		} catch (WebDriverException e) {
+		} catch (WebDriverException | NullPointerException /* for HtmlUnitDriver */ e) {
 			caps = new MutableCapabilities();
 		}
 		

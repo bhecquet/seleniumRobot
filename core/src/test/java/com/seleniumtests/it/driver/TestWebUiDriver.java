@@ -25,6 +25,7 @@ import java.util.Map;
 
 import com.seleniumtests.browserfactory.mobile.*;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
+import io.appium.java_client.AppiumDriver;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.Logger;
@@ -181,7 +182,7 @@ public class TestWebUiDriver extends ReporterTest {
 	public void testLocalWindowsDriverWithRemoteAppiumServer() throws Exception {
 
 		try (
-			 MockedConstruction mockedWindowsDriver = mockConstruction(RemoteWebDriver.class, (windowsDriver, context) -> {
+			 MockedConstruction mockedWindowsDriver = mockConstruction(AppiumDriver.class, (windowsDriver, context) -> {
 				 when(windowsDriver.manage()).thenReturn(driverOptions);
 				 when(windowsDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.WINDOWS));
 			 });
