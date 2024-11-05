@@ -212,7 +212,7 @@ public class EmailAccount {
 
         getEmailClient();
         if (emailClient != null) {
-            emailClient.sendMessage(to, title, body);
+            emailClient.sendMessage(to, title, body, attachments);
         } else {
             throw new ConfigurationException("Mail server client has not been configured");
         }
