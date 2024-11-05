@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang3.NotImplementedException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.openqa.selenium.By;
@@ -190,7 +190,7 @@ public class CachedHtmlElement implements WebElement {
 				field.setAccessible(true);
 				for (Element el: cachedElement.getElementsByTag("a")) {
 					try {
-						el.getElementsContainingOwnText((String)field.get(by)).get(0);
+						Element element = el.getElementsContainingOwnText((String) field.get(by)).get(0);
 						foundElements.add(new CachedHtmlElement(el));
 					} catch (IndexOutOfBoundsException e) {
 						// nothing to do

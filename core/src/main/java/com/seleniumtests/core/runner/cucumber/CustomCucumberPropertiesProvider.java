@@ -2,7 +2,7 @@ package com.seleniumtests.core.runner.cucumber;
 
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.testng.xml.XmlTest;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
