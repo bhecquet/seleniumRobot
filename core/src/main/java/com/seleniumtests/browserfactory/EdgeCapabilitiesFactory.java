@@ -18,7 +18,9 @@
 package com.seleniumtests.browserfactory;
 
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.openqa.selenium.MutableCapabilities;
@@ -46,26 +48,32 @@ public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
         if (webDriverConfig.getUserAgentOverride() != null) {
             options.addArguments("--user-agent=" + webDriverConfig.getUserAgentOverride());
         }
-        
-        options.addArguments("--disable-translate");
-        options.addArguments("--disable-web-security");
-        options.addArguments("--no-sandbox");
-        options.addArguments("--disable-site-isolation-trials");
-        options.addArguments("--disable-features=IsolateOrigins,site-per-process");
-        options.addArguments("--remote-allow-origins=*"); // workaround for https://github.com/SeleniumHQ/selenium/issues/11750 on chrome >= 111 
-                
-        if (webDriverConfig.getEdgeOptions() != null) {
-        	for (String option: webDriverConfig.getEdgeOptions().split(" ")) {
-        		options.addArguments(option);
-        	}
-        }
+
+		List<String> edgeOptions = new ArrayList<>(List.of("--disable-translate",
+				"--disable-web-security",
+				"--no-sandbox",
+				"--disable-site-isolation-trials",
+				"--disable-features=IsolateOrigins,site-per-process",
+				"--remote-allow-origins=*")); // workaround for https://github.com/SeleniumHQ/selenium/issues/11750 on chrome >= 111
         
         if (webDriverConfig.isHeadlessBrowser()) {
         	logger.info("setting edge in headless mode");
-	        options.addArguments("--headless");
-	        options.addArguments("--window-size=1280,1024");
-	        options.addArguments("--disable-gpu");
+			edgeOptions.add("--headless");
+			edgeOptions.add("--window-size=1280,1024");
+			edgeOptions.add("--disable-gpu");
         }
+
+		if (webDriverConfig.getEdgeOptions() != null) {
+			for (String option: webDriverConfig.getEdgeOptions().split(" ")) {
+				if (option.startsWith("++")) {
+					edgeOptions.remove(option.replace("++", "--"));
+				} else {
+					edgeOptions.add(option);
+				}
+			}
+		}
+
+		options.addArguments(edgeOptions);
 
         if (webDriverConfig.getMode() == DriverMode.LOCAL) {
         	setLogging();

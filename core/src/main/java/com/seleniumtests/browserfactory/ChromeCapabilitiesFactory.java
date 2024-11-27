@@ -18,6 +18,7 @@
 package com.seleniumtests.browserfactory;
 
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,19 +56,24 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
         if (webDriverConfig.getUserAgentOverride() != null) {
             options.addArguments("--user-agent=" + webDriverConfig.getUserAgentOverride());
         }
-        
-        options.addArguments("--disable-translate");
-        options.addArguments("--disable-web-security");
-        options.addArguments("--disable-site-isolation-trials");
-        options.addArguments("--disable-search-engine-choice-screen");
-        options.addArguments("--disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades");
-        options.addArguments("--remote-allow-origins=*"); // workaround for https://github.com/SeleniumHQ/selenium/issues/11750 on chrome >= 111 
-        
-        if (webDriverConfig.getChromeOptions() != null) {
-        	for (String option: webDriverConfig.getChromeOptions().split(" ")) {
-        		options.addArguments(option);
-        	}
-        }
+
+		List<String> chromeOptions = new ArrayList<>(List.of("--disable-translate",
+				"--disable-web-security",
+				"--disable-site-isolation-trials",
+				"--disable-search-engine-choice-screen",
+				"--disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades",
+				"--remote-allow-origins=*")); // workaround for https://github.com/SeleniumHQ/selenium/issues/11750 on chrome >= 111
+
+		if (webDriverConfig.getChromeOptions() != null) {
+			for (String option: webDriverConfig.getChromeOptions().split(" ")) {
+				if (option.startsWith("++")) {
+					chromeOptions.remove(option.replace("++", "--"));
+				} else {
+					chromeOptions.add(option);
+				}
+			}
+		}
+		options.addArguments(chromeOptions);
         
         options.setPageLoadStrategy(webDriverConfig.getPageLoadStrategy());
 
@@ -112,29 +118,36 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
         if (webDriverConfig.getUserAgentOverride() != null) {
             options.addArguments("--user-agent=" + webDriverConfig.getUserAgentOverride());
         }
-        options.addArguments("--disable-translate");
-        options.addArguments("--disable-web-security");
-        options.addArguments("--no-sandbox");
-        options.addArguments("--disable-site-isolation-trials");
-		// https://github.com/GoogleChrome/chrome-launcher/blob/main/docs/chrome-flags-for-tools.md
-        options.addArguments("--disable-search-engine-choice-screen");
-		// list of features: https://chromium.googlesource.com/chromium/src/+/refs/heads/main/chrome/common/chrome_features.cc
-        options.addArguments("--disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades");
-        options.addArguments("--remote-allow-origins=*"); // workaround for https://github.com/SeleniumHQ/selenium/issues/11750 on chrome >= 111 
-        
-        
-        if (webDriverConfig.getChromeOptions() != null) {
-        	for (String option: webDriverConfig.getChromeOptions().split(" ")) {
-        		options.addArguments(option);
-        	}
-        }
-        
-        if (webDriverConfig.isHeadlessBrowser()) {
+		List<String> chromeOptions = new ArrayList<>(List.of("--disable-translate",
+				"--disable-web-security",
+				"--no-sandbox",
+				"--disable-site-isolation-trials",
+				// https://github.com/GoogleChrome/chrome-launcher/blob/main/docs/chrome-flags-for-tools.md
+				"--disable-search-engine-choice-screen",
+				// list of features: https://chromium.googlesource.com/chromium/src/+/refs/heads/main/chrome/common/chrome_features.cc
+				"--disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades",
+				// workaround for https://github.com/SeleniumHQ/selenium/issues/11750 on chrome >= 111
+				"--remote-allow-origins=*"));
+
+
+		if (webDriverConfig.isHeadlessBrowser()) {
         	logger.info("setting chrome in headless mode");
-	        options.addArguments("--headless");
-	        options.addArguments("--window-size=1280,1024");
-	        options.addArguments("--disable-gpu");
+			chromeOptions.add("--headless");
+			chromeOptions.add("--window-size=1280,1024");
+			chromeOptions.add("--disable-gpu");
         }
+
+		if (webDriverConfig.getChromeOptions() != null) {
+			for (String option: webDriverConfig.getChromeOptions().split(" ")) {
+				if (option.startsWith("++")) {
+					chromeOptions.remove(option.replace("++", "--"));
+				} else {
+					chromeOptions.add(option);
+				}
+			}
+		}
+
+		options.addArguments(chromeOptions);
         
         if (webDriverConfig.getMode() == DriverMode.LOCAL) {
         	setLogging();

@@ -411,6 +411,18 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		Assert.assertNull(capa.getCapability(CapabilityType.ACCEPT_INSECURE_CERTS));
 		Assert.assertEquals(((Map<?,?>)capa.getCapability(ChromeOptions.CAPABILITY)).get("args").toString(), "[--disable-translate, --disable-web-security, --disable-site-isolation-trials, --disable-search-engine-choice-screen, --disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades, --remote-allow-origins=*]");
 	}
+
+	@Test(groups={"ut"})
+	public void testCreateDefaultMobileCapabilitiesRemoveOption() {
+
+		when(config.getProxy()).thenReturn(proxyConfig);
+		when(config.getChromeOptions()).thenReturn("++disable-web-security");
+
+		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createMobileCapabilities(config);
+
+		Assert.assertNull(capa.getCapability(CapabilityType.ACCEPT_INSECURE_CERTS));
+		Assert.assertEquals(((Map<?,?>)capa.getCapability(ChromeOptions.CAPABILITY)).get("args").toString(), "[--disable-translate, --disable-site-isolation-trials, --disable-search-engine-choice-screen, --disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades, --remote-allow-origins=*]");
+	}
 	
 	@Test(groups={"ut"})
 	public void testCreateMobileCapabilitiesOverrideUserAgent() {
@@ -489,6 +501,19 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertTrue(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--key1=value1, --key2=value2"));
+	}
+
+	/**
+	 * Test it's possible to remove a default chrome option at startup
+	 */
+	@Test(groups={"ut"})
+	public void testCreateChromeCapabilitiesWithRemoveOptions() {
+
+		when(config.getChromeOptions()).thenReturn("++no-sandbox");
+
+		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
+
+		Assert.assertFalse(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--no-sandbox"));
 	}
 	
 	@Test(groups={"ut"})

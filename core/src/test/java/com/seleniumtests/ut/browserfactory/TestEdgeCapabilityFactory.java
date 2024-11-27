@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.seleniumtests.browserfactory.ChromeCapabilitiesFactory;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -35,6 +36,7 @@ import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriverService;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.remote.CapabilityType;
@@ -57,9 +59,9 @@ import com.seleniumtests.util.osutility.OSUtility;
 
 public class TestEdgeCapabilityFactory extends MockitoTest {
 
-	private static final String BETA_VERSION = "124.0";
+	private static final String BETA_VERSION = "131.0";
 
-	private static final String RELEASE_VERSION = "123.0";
+	private static final String RELEASE_VERSION = "130.0";
 
 	@Mock
 	private DriverConfig config;
@@ -276,6 +278,16 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertEquals(((Map<?,?>)(((EdgeOptions)capa).asMap().get(EdgeOptions.CAPABILITY))).get("args").toString(), "[--user-agent=EDGE 55, --disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process, --remote-allow-origins=*]");
+	}
+
+	@Test(groups={"ut"})
+	public void testCreateEdgeCapabilitiesWithRemoveOptions() {
+
+		when(config.getEdgeOptions()).thenReturn("++no-sandbox");
+
+		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
+
+		Assert.assertFalse(((Map<?,?>)(((EdgeOptions)capa).asMap().get(EdgeOptions.CAPABILITY))).get("args").toString().contains("--no-sandbox"));
 	}
 	
 	@Test(groups={"ut"})
