@@ -75,7 +75,7 @@ import com.seleniumtests.util.logging.ScenarioLogger;
 public class ReplayAction {
 
 	private static Clock systemClock = Clock.systemUTC();
-	private static final ScenarioLogger scenarioLogger = ScenarioLogger.getScenarioLogger(com.seleniumtests.core.aspects.replay.ReplayAction.class);
+	private static final ScenarioLogger scenarioLogger = ScenarioLogger.getScenarioLogger(ReplayAction.class);
 
 	private Object replayNonHtmlElement(ProceedingJoinPoint joinPoint, ReplayOnError replay) throws Throwable {
 		

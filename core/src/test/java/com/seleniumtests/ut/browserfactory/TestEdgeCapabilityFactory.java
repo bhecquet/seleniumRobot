@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.seleniumtests.browserfactory.ChromeCapabilitiesFactory;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -36,7 +35,6 @@ import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriverService;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.remote.CapabilityType;
