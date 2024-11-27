@@ -593,44 +593,9 @@ public class LogAction {
 			+ "&& execution(@com.seleniumtests.uipage.ReplayOnError public * * (..)) && @annotation(replay)")
 	public Object logGenericPictureElements(ProceedingJoinPoint joinPoint, ReplayOnError replay) throws Throwable {
 
-		String methodName = joinPoint.getSignature().getName();
-		String targetName = joinPoint.getTarget().toString();
-		List<String> pwdToReplace = new ArrayList<>();
-		String actionName = String.format("%s on %s %s", methodName, targetName, LogAction.buildArgString(joinPoint, pwdToReplace, new HashMap<>()));
-		TestAction currentAction = new TestAction(actionName, false, pwdToReplace, methodName, (GenericPictureElement)joinPoint.getTarget());
+		// #667: code moved to ReplayAction aspect but method kept here for external use (to avoid recompilation)
+		return joinPoint.proceed(joinPoint.getArgs());
 
-		// log action before its started. By default, it's OK. Then result may be overwritten if step fails
-		// order of steps is the right one (first called is first displayed)
-		if (TestStepManager.getParentTestStep() != null) {
-			TestStepManager.getParentTestStep().addAction(currentAction);
-		}
-
-		boolean actionFailed = false;
-		Throwable currentException = null;
-
-		try {
-			return joinPoint.proceed(joinPoint.getArgs());
-		} catch (Throwable e) {
-			actionFailed = true;
-			currentException = e;
-
-			// log searched image and scene image in case image cannot be found.
-			if (e instanceof ImageSearchException && joinPoint.getThis() instanceof GenericPictureElement) {
-				scenarioLogger.logFile(((GenericPictureElement) joinPoint.getThis()).getObjectPictureFile(), "searched picture");
-				scenarioLogger.logFile(((GenericPictureElement) joinPoint.getThis()).getScenePictureFile(), "scene to search in");
-			}
-
-			throw e;
-		} finally {
-			if (currentAction != null && TestStepManager.getParentTestStep() != null) {
-				currentAction.setFailed(actionFailed);
-				scenarioLogger.logActionError(currentException);
-
-				if (joinPoint.getTarget() instanceof GenericPictureElement) {
-					currentAction.setDurationToExclude(((GenericPictureElement)joinPoint.getTarget()).getActionDuration());
-				}
-			}
-		}
 	}
 
 	/**

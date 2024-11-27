@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.seleniumtests.customexception.ImageSearchException;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -74,144 +75,7 @@ import com.seleniumtests.util.logging.ScenarioLogger;
 public class ReplayAction {
 
 	private static Clock systemClock = Clock.systemUTC();
-	private static final ScenarioLogger scenarioLogger = ScenarioLogger.getScenarioLogger(ReplayAction.class);
-	
-	private Integer getActionDelay() {
-		return SeleniumTestsContextManager.getThreadContext().getActionDelay();
-	}
-	
-	/**
-	 * Replay all HtmlElement actions annotated by ReplayOnError.
-	 * Classes which are not subclass of HtmlElement won't go there 
-	 * See javadoc of the annotation for details
-	 * @param joinPoint
-	 * @throws Throwable
-	 */
-	/*@Around("execution(public * com.seleniumtests.uipage.htmlelements.HtmlElement+.* (..))"
-			+ "&& execution(@com.seleniumtests.uipage.ReplayOnError public * * (..)) && @annotation(replay)")
-    public Object replayHtmlElement(ProceedingJoinPoint joinPoint, ReplayOnError replay) throws Throwable {
-
-    	Object reply = null;
-
-    	
-    	// update driver reference of the element
-    	// corrects bug of waitElementPresent which threw a SessionNotFoundError because driver reference were not
-    	// updated before searching element (it used the driver reference of an old test session)
-    	HtmlElement element = (HtmlElement)joinPoint.getTarget();
-    	element.setDriver(WebUIDriver.getWebDriver(false));
-		String targetName = joinPoint.getTarget().toString();
-		
-		Instant end = systemClock.instant().plusSeconds(element.getReplayTimeout());
-    	
-		TestAction currentAction = null;
-    	String methodName = joinPoint.getSignature().getName();
-    	if (!methodName.equals("getCoordinates")) {
-    		List<String> pwdToReplace = new ArrayList<>();
-    		String actionName = String.format("%s on %s %s", methodName, targetName, LogAction.buildArgString(joinPoint, pwdToReplace, new HashMap<>()));
-    		currentAction = new TestAction(actionName, false, pwdToReplace, methodName, element);
-    	}
-
-		// log action before its started. By default, it's OK. Then result may be overwritten if step fails
-		// order of steps is the right one (first called is first displayed)
-		if (currentAction != null && TestStepManager.getParentTestStep() != null) {
-			TestStepManager.getParentTestStep().addAction(currentAction);
-		}	
-		
-		boolean actionFailed = false;
-		boolean ignoreFailure = false;
-		Throwable currentException = null;
-		
-		try {
-	    	while (end.isAfter(systemClock.instant())) {
-
-	    		// in case we have switched to an iframe for using previous webElement, go to default content
-	    		if (element.getDriver() != null && SeleniumTestsContextManager.isWebTest()) {
-	    			element.getDriver().switchTo().defaultContent(); // TODO: error when click is done, closing current window
-	    		}
-		    	
-		    	try {
-		    		reply = joinPoint.proceed(joinPoint.getArgs());
-		    		
-		    		// wait will be done only if action annotation request it
-		    		if (replay.waitAfterAction()) {
-		    			WaitHelper.waitForMilliSeconds(getActionDelay());
-		    		}
-		    		break;
-		    	} catch (UnhandledAlertException e) {
-		    		throw e;
-		    	} catch (MoveTargetOutOfBoundsException | InvalidElementStateException e) {
-		    		
-		    		// if click has been intercepted, it means element could not be interacted, so allow auto scrolling for further retries
-		    		// to avoid trying always the same method, we try without scrolling, then with scrolling, then without, ...
-		    		element.setScrollToElementBeforeAction(!element.isScrollToElementBeforeAction());
-
-		    	} catch (WebDriverException e) { 
-		    		// don't prevent TimeoutException to be thrown when coming from waitForPresent
-		    		// only check that cause is the not found element and not an other error (NoSucheSessionError for example)
-		    		if ((e instanceof TimeoutException 
-		    				&& joinPoint.getSignature().getName().equals("waitForPresent") 
-		    				&& e.getCause() instanceof NoSuchElementException) // issue #104: do not log error when waitForPresent raises TimeoutException
-		    			|| (e instanceof NotFoundException
-		    				&& isFromExpectedConditions(Thread.currentThread().getStackTrace())) // issue #194: return immediately if the action has been performed from ExpectedConditions class
-		    																					 //   This way, we let the FluentWait process to retry or re-raise the exception
-		    			) 
-		    		{
-	    				ignoreFailure = true;  
-	    				throw e;
-		    		}
-	
-		    		handleWebDriverException(replay, element, end, e);
-		    	} 
-				
-	    	}
-	    	return reply;
-		} catch (Throwable e) {
-			if (e instanceof NoSuchElementException 
-					&& joinPoint.getTarget() instanceof HtmlElement
-					&& (joinPoint.getSignature().getName().equals("findElements")
-							|| joinPoint.getSignature().getName().equals("findHtmlElements"))) {
-				return new ArrayList<WebElement>();
-			} else {
-				if (!ignoreFailure) {
-					actionFailed = true;
-					currentException = e;
-				}
-				throw e;
-			}
-		} finally {
-			if (currentAction != null && TestStepManager.getParentTestStep() != null) {
-				currentAction.setFailed(actionFailed);
-				scenarioLogger.logActionError(currentException);
-			}	
-			
-			// restore element scrolling flag for further uses
-    		element.setScrollToElementBeforeAction(false);
-		}
-   }*/
-
-	/**
-	 * @param replay
-	 * @param element
-	 * @param end
-	 * @param e
-	 */
-	/*private void handleWebDriverException(ReplayOnError replay, HtmlElement element, Instant end,
-			WebDriverException e) {
-		if (end.minusMillis(replay.replayDelayMs() + 100L).isAfter(systemClock.instant())) {
-			WaitHelper.waitForMilliSeconds(replay.replayDelayMs());
-		} else {
-			if (e instanceof NoSuchElementException) {
-				if (element instanceof SelectList && e.getMessage().contains("option")) {
-					throw new NoSuchElementException(String.format("'%s' from page '%s': %s", element, element.getOrigin(), e.getMessage()));
-				} else {
-					throw new NoSuchElementException(String.format("Searched element [%s] from page '%s' could not be found", element, element.getOrigin()));
-				}
-			} else if (e instanceof UnreachableBrowserException) {
-				throw new WebDriverException("Browser did not reply, it may have frozen");
-			}
-			throw e;
-		}
-	}*/
+	private static final ScenarioLogger scenarioLogger = ScenarioLogger.getScenarioLogger(com.seleniumtests.core.aspects.replay.ReplayAction.class);
 
 	private Object replayNonHtmlElement(ProceedingJoinPoint joinPoint, ReplayOnError replay) throws Throwable {
 		
@@ -268,20 +132,6 @@ public class ReplayAction {
 	public Object replayCompositeAction(ProceedingJoinPoint joinPoint) throws Throwable {
 		return replayNonHtmlElement(joinPoint, null);
 	}
-
-	/**
-	 * Replay all actions annotated by ReplayOnError if the class is not a subclass of
-	 * HtmlElement (e.g: ScreenZone)
-	 * @param joinPoint
-	 * @throws Throwable
-	 */
-	/*@Around("execution(public * com.seleniumtests.uipage.htmlelements.GenericPictureElement+.* (..))"
-			+ "&& execution(@com.seleniumtests.uipage.ReplayOnError public * * (..)) && @annotation(replay)")
-	public Object replayGenericPicture(ProceedingJoinPoint joinPoint, ReplayOnError replay) throws Throwable {
-		return replayNonHtmlElement(joinPoint, replay);
-	}*/
-
-
 	
 	/**
 	 * Updates the scrollToelementBeforeAction flag of HtmlElement for CompositeActions
@@ -340,7 +190,195 @@ public class ReplayAction {
 			}
 		}
 	}
-	
+
+	private Integer getActionDelay() {
+		return SeleniumTestsContextManager.getThreadContext().getActionDelay();
+	}
+
+	/**
+	 * Replay all HtmlElement actions annotated by ReplayOnError.
+	 * Classes which are not subclass of HtmlElement won't go there
+	 * See javadoc of the annotation for details
+	 * @param joinPoint
+	 * @throws Throwable
+	 */
+	@Around("execution(public * com.seleniumtests.uipage.htmlelements.HtmlElement+.* (..))"
+			+ "&& execution(@com.seleniumtests.uipage.ReplayOnError public * * (..)) && @annotation(replay)")
+	public Object replayHtmlElement(ProceedingJoinPoint joinPoint, ReplayOnError replay) throws Throwable {
+
+		Object reply = null;
+
+
+		// update driver reference of the element
+		// corrects bug of waitElementPresent which threw a SessionNotFoundError because driver reference were not
+		// updated before searching element (it used the driver reference of an old test session)
+		HtmlElement element = (HtmlElement)joinPoint.getTarget();
+		element.setDriver(WebUIDriver.getWebDriver(false));
+		String targetName = joinPoint.getTarget().toString();
+
+		Instant end = systemClock.instant().plusSeconds(element.getReplayTimeout());
+
+		TestAction currentAction = null;
+		String methodName = joinPoint.getSignature().getName();
+		if (!methodName.equals("getCoordinates")) {
+			List<String> pwdToReplace = new ArrayList<>();
+			String actionName = String.format("%s on %s %s", methodName, targetName, LogAction.buildArgString(joinPoint, pwdToReplace, new HashMap<>()));
+			currentAction = new TestAction(actionName, false, pwdToReplace, methodName, element);
+		}
+
+		// log action before its started. By default, it's OK. Then result may be overwritten if step fails
+		// order of steps is the right one (first called is first displayed)
+		if (currentAction != null && TestStepManager.getParentTestStep() != null) {
+			TestStepManager.getParentTestStep().addAction(currentAction);
+		}
+
+		boolean actionFailed = false;
+		boolean ignoreFailure = false;
+		Throwable currentException = null;
+
+		try {
+			while (end.isAfter(systemClock.instant())) {
+
+				// in case we have switched to an iframe for using previous webElement, go to default content
+				if (element.getDriver() != null && SeleniumTestsContextManager.isWebTest()) {
+					element.getDriver().switchTo().defaultContent(); // TODO: error when click is done, closing current window
+				}
+
+				try {
+					reply = joinPoint.proceed(joinPoint.getArgs());
+
+					// wait will be done only if action annotation request it
+					if (replay.waitAfterAction()) {
+						WaitHelper.waitForMilliSeconds(getActionDelay());
+					}
+					break;
+				} catch (UnhandledAlertException e) {
+					throw e;
+				} catch (MoveTargetOutOfBoundsException | InvalidElementStateException e) {
+
+					// if click has been intercepted, it means element could not be interacted, so allow auto scrolling for further retries
+					// to avoid trying always the same method, we try without scrolling, then with scrolling, then without, ...
+					element.setScrollToElementBeforeAction(!element.isScrollToElementBeforeAction());
+
+				} catch (WebDriverException e) {
+					// don't prevent TimeoutException to be thrown when coming from waitForPresent
+					// only check that cause is the not found element and not an other error (NoSucheSessionError for example)
+					if ((e instanceof TimeoutException
+							&& joinPoint.getSignature().getName().equals("waitForPresent")
+							&& e.getCause() instanceof NoSuchElementException) // issue #104: do not log error when waitForPresent raises TimeoutException
+							|| (e instanceof NotFoundException
+							&& isFromExpectedConditions(Thread.currentThread().getStackTrace())) // issue #194: return immediately if the action has been performed from ExpectedConditions class
+						//   This way, we let the FluentWait process to retry or re-raise the exception
+					)
+					{
+						ignoreFailure = true;
+						throw e;
+					}
+
+					handleWebDriverException(replay, element, end, e);
+				}
+
+			}
+			return reply;
+		} catch (Throwable e) {
+			if (e instanceof NoSuchElementException
+					&& joinPoint.getTarget() instanceof HtmlElement
+					&& (joinPoint.getSignature().getName().equals("findElements")
+					|| joinPoint.getSignature().getName().equals("findHtmlElements"))) {
+				return new ArrayList<WebElement>();
+			} else {
+				if (!ignoreFailure) {
+					actionFailed = true;
+					currentException = e;
+				}
+				throw e;
+			}
+		} finally {
+			if (currentAction != null && TestStepManager.getParentTestStep() != null) {
+				currentAction.setFailed(actionFailed);
+				scenarioLogger.logActionError(currentException);
+			}
+
+			// restore element scrolling flag for further uses
+			element.setScrollToElementBeforeAction(false);
+		}
+	}
+
+	/**
+	 * @param replay
+	 * @param element
+	 * @param end
+	 * @param e
+	 */
+	private void handleWebDriverException(ReplayOnError replay, HtmlElement element, Instant end,
+										  WebDriverException e) {
+		if (end.minusMillis(replay.replayDelayMs() + 100L).isAfter(systemClock.instant())) {
+			WaitHelper.waitForMilliSeconds(replay.replayDelayMs());
+		} else {
+			if (e instanceof NoSuchElementException) {
+				if (element instanceof SelectList && e.getMessage().contains("option")) {
+					throw new NoSuchElementException(String.format("'%s' from page '%s': %s", element, element.getOrigin(), e.getMessage()));
+				} else {
+					throw new NoSuchElementException(String.format("Searched element [%s] from page '%s' could not be found", element, element.getOrigin()));
+				}
+			} else if (e instanceof UnreachableBrowserException) {
+				throw new WebDriverException("Browser did not reply, it may have frozen");
+			}
+			throw e;
+		}
+	}
+
+	/**
+	 * Replay all actions annotated by ReplayOnError if the class is not a subclass of
+	 * HtmlElement (e.g: ScreenZone)
+	 * @param joinPoint
+	 * @throws Throwable
+	 */
+	@Around("execution(public * com.seleniumtests.uipage.htmlelements.GenericPictureElement+.* (..))"
+			+ "&& execution(@com.seleniumtests.uipage.ReplayOnError public * * (..)) && @annotation(replay)")
+	public Object replayGenericPicture(ProceedingJoinPoint joinPoint, ReplayOnError replay) throws Throwable {
+
+		String methodName = joinPoint.getSignature().getName();
+		String targetName = joinPoint.getTarget().toString();
+		List<String> pwdToReplace = new ArrayList<>();
+		String actionName = String.format("%s on %s %s", methodName, targetName, LogAction.buildArgString(joinPoint, pwdToReplace, new HashMap<>()));
+		TestAction currentAction = new TestAction(actionName, false, pwdToReplace, methodName, (GenericPictureElement)joinPoint.getTarget());
+
+		// log action before its started. By default, it's OK. Then result may be overwritten if step fails
+		// order of steps is the right one (first called is first displayed)
+		if (TestStepManager.getParentTestStep() != null) {
+			TestStepManager.getParentTestStep().addAction(currentAction);
+		}
+
+		boolean actionFailed = false;
+		Throwable currentException = null;
+
+		try {
+			return replayNonHtmlElement(joinPoint, replay);
+		} catch (Throwable e) {
+			actionFailed = true;
+			currentException = e;
+
+			// log searched image and scene image in case image cannot be found.
+			if (e instanceof ImageSearchException && joinPoint.getThis() instanceof GenericPictureElement) {
+				scenarioLogger.logFile(((GenericPictureElement) joinPoint.getThis()).getObjectPictureFile(), "searched picture");
+				scenarioLogger.logFile(((GenericPictureElement) joinPoint.getThis()).getScenePictureFile(), "scene to search in");
+			}
+
+			throw e;
+		} finally {
+			if (currentAction != null && TestStepManager.getParentTestStep() != null) {
+				currentAction.setFailed(actionFailed);
+				scenarioLogger.logActionError(currentException);
+
+				if (joinPoint.getTarget() instanceof GenericPictureElement) {
+					currentAction.setDurationToExclude(((GenericPictureElement)joinPoint.getTarget()).getActionDuration());
+				}
+			}
+		}
+	}
+
+
 	/**
 	 * issu #194: Returns true if the call to element action has been done from the org.openqa.selenium.support.ui.ExpectedConditions selenium class
 	 *
@@ -348,9 +386,9 @@ public class ReplayAction {
 	 * @return
 	 */
 	private boolean isFromExpectedConditions(StackTraceElement[] stack) {
-		
+
 		for(int i=0; i < stack.length; i++) {
-			
+
 			// when using aspects, class name may contain a "$", remove everything after that symbol
 			String stackClass = stack[i].getClassName().split("\\$")[0];
 			if (stackClass.equals("org.openqa.selenium.support.ui.ExpectedConditions")) {
@@ -361,4 +399,5 @@ public class ReplayAction {
 		return false;
 
 	}
+
 }
