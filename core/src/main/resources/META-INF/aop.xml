@@ -5,7 +5,6 @@
     	<aspect name="com.seleniumtests.core.aspects.LogUnitTest"/>
     	<aspect name="com.seleniumtests.core.aspects.SoftAssert"/>
     	<aspect name="com.seleniumtests.core.aspects.LogAction"/>
-    	<aspect name="com.seleniumtests.core.aspects.replay.ReplayAction"/>
     	<aspect name="com.seleniumtests.uipage.aspects.InterceptBy"/>
     	<aspect name="com.seleniumtests.uipage.aspects.SeleniumNativeActions"/>
     	<aspect name="com.seleniumtests.uipage.aspects.CompositeActions"/>
