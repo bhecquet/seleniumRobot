@@ -26,6 +26,8 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.seleniumtests.uipage.aspects.ReplayAction;
+import com.seleniumtests.util.logging.ScenarioLogger;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.Rectangle;
@@ -46,6 +48,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
  */
 public abstract class GenericPictureElement extends Element {
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(GenericPictureElement.class);
+	private static final ScenarioLogger scenarioLogger = ScenarioLogger.getScenarioLogger(ReplayAction.class);
 
 	protected File objectPictureFile;
 	protected File screenshotFile;
@@ -138,7 +141,8 @@ public abstract class GenericPictureElement extends Element {
 		// for desktop search, without reference image, do not search
 		if (detector != null) {
 			detector.setSceneImage(screenshotFile);
-			detector.detectExactZoneWithScale();
+			double matchValue = detector.detectExactZoneWithScale();
+			scenarioLogger.info("Object found with match value: " + matchValue);
 			setDetectedObjectRectangleAndAspectRatio(detector.getDetectedRectangle(), detector.getSizeRatio());
 
 		} else {

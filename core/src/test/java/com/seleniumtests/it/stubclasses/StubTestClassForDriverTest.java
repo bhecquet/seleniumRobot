@@ -226,6 +226,12 @@ public class StubTestClassForDriverTest extends StubParentClass {
 		new DriverTestPage(true)
 				._clickPictureNotPresent();
 	}
+
+	@Test(groups="stub")
+	public void testDriverPictureElement() throws Exception {
+		new DriverTestPage(true)
+				._clickPicture();
+	}
 	
 
 	@Test(groups="stub")

@@ -155,11 +155,12 @@ public class ImageDetector {
 	public static void main(String[] args) {
 		ImageDetector detector = new ImageDetector(new File(args[0]), new File(args[1]), new Double(args[2]));
 		
-		detector.detectExactZoneWithScale();
+		double matchValue = detector.detectExactZoneWithScale();
 		Rectangle detectedObjectRectangle = detector.getDetectedRectangle();
 		System.out.println(String.format("Detected Zone (Top, Left, Width, Height): (%d, %d, %d, %d)", detectedObjectRectangle.y, detectedObjectRectangle.x, detectedObjectRectangle.width, detectedObjectRectangle.height));
 		double pictureSizeRatio = detector.getSizeRatio();
 		System.out.println("Aspect ratio: " + pictureSizeRatio);
+		System.out.println("Match value: " + matchValue);
 	}
 	
 	public ImageDetector() {
@@ -377,10 +378,10 @@ public class ImageDetector {
 	 * 
 	 * The best match is at 675
 	 */
-	public void detectExactZoneWithScale() {
-		detectExactZoneWithScale(true);
+	public double detectExactZoneWithScale() {
+		return detectExactZoneWithScale(true);
 	}
-	public void detectExactZoneWithScale(boolean scaleImage) {
+	public double detectExactZoneWithScale(boolean scaleImage) {
 		
 		Mat sceneImageMat = Imgcodecs.imread(sceneImage.getAbsolutePath(), Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE);
         Mat objectImageMat = Imgcodecs.imread(objectImage.getAbsolutePath(), Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE);
@@ -479,6 +480,7 @@ public class ImageDetector {
 			}
 	        rotationAngle = 0;
 	        sizeRatio = detectedRectangle.width / (double)objectImageMat.cols();
+			return bestMatch.getMatchValue();
 	        
 		} else {
 			throw new ImageSearchException("no matching has been found");

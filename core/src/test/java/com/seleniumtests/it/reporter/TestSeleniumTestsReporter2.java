@@ -844,6 +844,22 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-snapshot\">searched picture: <a href='img"));
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-snapshot\">scene to search in: <a href='"));
 	}
+	/**
+	 * In case an image is found, check report displays the matching level
+	 * @throws Exception
+	 */
+	@Test(groups = {"it"})
+	public void testDetailedReportContainsMatchIndex() throws Exception {
+
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverPictureElement"});
+
+		String detailedReportContent = readTestMethodResultFile("testDriverPictureElement");
+		detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
+
+		// check there is only one message for image not found
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "clickAt on Picture picture from resource tu/images/logo_text_field.png with args: (0, -30, )"), 1);
+		Assert.assertTrue(detailedReportContent.contains("Object found with match value: 1.0"));
+	}
 
 	/**
 	 * Check behaviour when Assert is used in test scenario (not in webpage)
