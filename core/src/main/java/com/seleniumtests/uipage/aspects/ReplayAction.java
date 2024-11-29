@@ -352,13 +352,13 @@ public class ReplayAction {
 
 		boolean actionFailed = false;
 		Throwable currentException = null;
-		System.out.println("start");
+
 		try {
 			return replayNonHtmlElement(joinPoint, replay);
 		} catch (Throwable e) {
 			actionFailed = true;
 			currentException = e;
-			System.out.println("KO" + actionFailed);
+
 			// log searched image and scene image in case image cannot be found.
 			if (e instanceof ImageSearchException && joinPoint.getThis() instanceof GenericPictureElement) {
 				scenarioLogger.logFile(((GenericPictureElement) joinPoint.getThis()).getObjectPictureFile(), "searched picture");
@@ -367,7 +367,6 @@ public class ReplayAction {
 
 			throw e;
 		} finally {
-			System.out.println("finally");
 			if (currentAction != null && TestStepManager.getParentTestStep() != null) {
 				currentAction.setFailed(actionFailed);
 				scenarioLogger.logActionError(currentException);
