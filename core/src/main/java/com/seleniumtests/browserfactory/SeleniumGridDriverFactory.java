@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.remote.options.BaseOptions;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.SessionNotCreatedException;
@@ -204,8 +205,10 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     }
     
     public WebDriver getDriverInstance(URL hubUrl, MutableCapabilities capabilities) {
-		if (SeleniumTestsContextManager.isDesktopWebTest() || SeleniumTestsContextManager.isDesktopAppTest()) {
+		if (SeleniumTestsContextManager.isDesktopWebTest()) {
 			return new RemoteWebDriver(hubUrl, capabilities);
+		} else if (SeleniumTestsContextManager.isDesktopAppTest()) {
+			return new AppiumDriver(hubUrl, capabilities);
 		} else if (SeleniumTestsContextManager.isMobileTest()) {
 			if("android".equalsIgnoreCase(webDriverConfig.getPlatform())) {
         		return new AndroidDriver(hubUrl, capabilities);
