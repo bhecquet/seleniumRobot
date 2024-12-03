@@ -183,7 +183,7 @@ Settings for customizing the default seleniumRobot driver features. By default, 
 | viewPortHeight			|			| Height of the viewPort when doing web tests. No effect for mobile apps. If not set, window will be maximized | 
 | extensionX.path			|			| Path (absolute file path or HTTP URL) to the extension (.xpi or .crx). Replace X with extension number. E.g: `extension0.path=http://localhost:8000/myExt.crx`. See §7.17 |
 | extensionX.options		|			| options to pass to extension (only for firefox). Options must have the format: <key1>=<value1>;<key2>=<value2> |
-| chromeOptions				|			| allow to set any options to chrome executable. For example: to put chrome in "Dark mode", you will write: `-DchromeOptions="--force-dark-mode --enable-features=WebUIDarkMode"`. Other chrome options can be found here: https://peter.sh/experiments/chromium-command-line-switches/ |
+| chromeOptions				|			| allow to set any options to chrome executable. For example: to put chrome in "Dark mode", you will write: `-DchromeOptions="--force-dark-mode --enable-features=WebUIDarkMode"`. Other chrome options can be found here: https://peter.sh/experiments/chromium-command-line-switches/. To disable options set by default, use `-DchromeOptions="++no-sandbox"` |
 | edgeOptions				|			| see 'chromeOptions' |
 
 
