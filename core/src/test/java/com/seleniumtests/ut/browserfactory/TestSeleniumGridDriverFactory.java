@@ -12,6 +12,7 @@ import java.util.Map;
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.helper.WaitHelper;
+import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.remote.options.BaseOptions;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
@@ -195,7 +196,7 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 		when(config.getAppiumCapabilities()).thenReturn(new BaseOptions<>());
 
 		// connect to grid
-		try (MockedConstruction mockedDriver = mockConstruction(RemoteWebDriver.class, (windowsDriver, context1) -> {
+		try (MockedConstruction mockedDriver = mockConstruction(AppiumDriver.class, (windowsDriver, context1) -> {
 			when(windowsDriver.manage()).thenReturn(options);
 			when(windowsDriver.getCapabilities()).thenReturn(caps);
 		})) {
@@ -203,7 +204,7 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 			WebDriver newDriver = driverFactory.createWebDriver();
 
 			// verify driver is an android driver
-			Assert.assertTrue(newDriver instanceof RemoteWebDriver);
+			Assert.assertTrue(newDriver instanceof AppiumDriver);
 		}
 	}
 
