@@ -141,6 +141,8 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			}
 
 			Integer sessionId = serverConnector.createSession(testContext.getName(), browserOrApp, SeleniumTestsContextManager.getThreadContext().getStartedBy());
+			logger.info(String.format("Session result will be visible at: %s/snapshot/testResults/summary/%d/", serverConnector.getUrl(), sessionId));
+
 			TestNGContextUtils.setTestSessionCreated(testContext, sessionId);
 		}
 	}

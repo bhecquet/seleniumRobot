@@ -125,9 +125,9 @@
 					                  		#if ($failedSteps == 0)
 					                  			<td name="stepsTotal-$testIdx">$totalTestSteps</td>
 					                  		#else
-					                  			<td name="stepsTotal-$testIdx">$totalTestSteps<sup>
-													<a href="#" data-toggle="tooltip" class="failedStepsTooltip" title="$failedSteps step(s) failed">*</a>
-												  </sup>
+													<td name="stepsTotal-$testIdx">$totalTestSteps<sup>
+														<a href="#" data-toggle="tooltip" class="failedStepsTooltip" title="$failedSteps step(s) failed">*</a>
+													  </sup>
 					                  			</td>
 					                  		#end
 					                  		<td>$stepsDuration sec.</td>
