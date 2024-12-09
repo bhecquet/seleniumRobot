@@ -22,10 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.seleniumtests.reporter.info.FileLinkInfo;
@@ -123,7 +120,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		BrowserType browser = SeleniumTestsContextManager.getGlobalContext().getBrowser();
 		browser = browser == null ? BrowserType.NONE : browser;
 
-		return createSession(sessionName, browser.toString(), null);
+		return createSession(sessionName, browser.toString(), null, LocalDateTime.now());
 	}
 
 	/**
@@ -132,7 +129,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	 * @param browserOrApp		name of the browser or application that is run
 	 * @return
 	 */
-	public Integer createSession(String sessionName, String browserOrApp, String startedBy) {
+	public Integer createSession(String sessionName, String browserOrApp, String startedBy, LocalDateTime startDate) {
 		if (!active) {
 			return null;
 		}
@@ -154,7 +151,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 
 			MultipartBody request = buildPostRequest(url + SESSION_API_URL)
 					.field("sessionId", sessionUUID)
-					.field("date", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME))
+					.field("date", startDate.format(DateTimeFormatter.ISO_DATE_TIME))
 					.field("browser", strippedBrowserName)
 					.field("environment", SeleniumTestsContextManager.getGlobalContext().getTestEnv())
 					.field("version", versionId.toString())
@@ -173,18 +170,6 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			throw new SeleniumRobotServerException("cannot create session", e);
 		}
 	}
-
-	/**
-	 * Create link between test case and session
-	 * @param sessionId		the sessionId which should have been created before
-	 * @param testCaseId	the test case Id to link to this session
-	 * @return	the id of the created testCaseInSession
-	 * @deprecated use the same method with name parameter
-	 */
-	@Deprecated
-	public Integer createTestCaseInSession(Integer sessionId, Integer testCaseId) {
-		return createTestCaseInSession(sessionId, testCaseId, "", "UNKNOWN", "LOCAL", null);
-	}
 	
 	/**
 	 * Create link between test case and session
@@ -193,10 +178,11 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	 * @param name			name of the test case in this session. This is to distinguish the test case (e.g: 'test1') and its full name (e.g: 'test1-1'), when executed with dataprovider
 	 * @param status		status of the test, as reported by TestNG (SKIP, SUCCESS, FAILURE, ...)
 	 * @param gridNode		name of the grid node where test run
+	 * @param startDate		start date
 	 * @return	the id of the created testCaseInSession
 	 */
 
-	public Integer createTestCaseInSession(Integer sessionId, Integer testCaseId, String name, String status, String gridNode, String description) {
+	public Integer createTestCaseInSession(Integer sessionId, Integer testCaseId, String name, String status, String gridNode, String description, LocalDateTime startDate) {
 		if (!active) {
 			return null;
 		}
@@ -216,7 +202,8 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field(FIELD_STATUS, status)
 					.field("gridNode", gridNode)
 					.field(FIELD_NAME, strippedName)
-					.field("description", description == null ? "": description));
+					.field("description", description == null ? "": description)
+					.field("date", startDate.format(DateTimeFormatter.ISO_DATE_TIME)));
 			return testInSessionJson.getInt("id");
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 			throw new SeleniumRobotServerException("cannot create test case", e);

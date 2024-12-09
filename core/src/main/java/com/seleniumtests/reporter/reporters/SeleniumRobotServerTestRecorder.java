@@ -21,6 +21,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -140,7 +142,12 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 				browserOrApp = "BROWSER:" + browser;
 			}
 
-			Integer sessionId = serverConnector.createSession(testContext.getName(), browserOrApp, SeleniumTestsContextManager.getThreadContext().getStartedBy());
+			Integer sessionId = serverConnector.createSession(testContext.getName(),
+					browserOrApp,
+					SeleniumTestsContextManager.getThreadContext().getStartedBy(),
+					Instant.ofEpochMilli(testContext.getStartDate().getTime())
+						.atZone(ZoneId.systemDefault())
+						.toLocalDateTime());
 			logger.info(String.format("Session result will be visible at: %s/snapshot/testResults/summary/%d/", serverConnector.getUrl(), sessionId));
 
 			TestNGContextUtils.setTestSessionCreated(testContext, sessionId);
@@ -184,7 +191,11 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 						getVisualTestName(testResult),
 						TestNGResultUtils.getTestStatusString(testResult),
 						gridNode,
-						TestNGResultUtils.getTestDescription(testResult));
+						TestNGResultUtils.getTestDescription(testResult),
+						Instant
+								.ofEpochMilli(testResult.getStartMillis())
+								.atZone(ZoneId.systemDefault())
+								.toLocalDateTime());
 				logger.info(String.format("Result for '%s' will be visible at: %s/snapshot/testResults/result/%d/", testName, serverConnector.getUrl(), testCaseInSessionId));
 				serverConnector.addLogsToTestCaseInSession(testCaseInSessionId, generateExecutionLogs(testResult).toString());
 

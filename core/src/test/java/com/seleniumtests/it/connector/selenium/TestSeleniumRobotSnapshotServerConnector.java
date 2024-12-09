@@ -20,10 +20,8 @@ package com.seleniumtests.it.connector.selenium;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.reporter.info.ImageLinkInfo;
@@ -110,7 +108,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	public void testCreateTestCaseInSession() {
 		Integer sessionId = connector.createSession("Session1");
 		Integer testCaseId = connector.createTestCase("Test 1");
-		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", null);
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", null, LocalDateTime.now());
 		Assert.assertNotNull(sessionId);
 		Assert.assertNotNull(testCaseInSessionId);
 		Assert.assertNotNull(connector.getApplicationId());
@@ -120,7 +118,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	public void testSendTestInfos() {
 		Integer sessionId = connector.createSession("Session1");
 		Integer testCaseId = connector.createTestCase("Test 1");
-		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", null);
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", null, LocalDateTime.now());
 
 		Map<String, Info> infos = new HashMap<>();
 		MultipleInfo mInfo = new MultipleInfo(TestStepManager.LAST_STATE_NAME);
@@ -139,7 +137,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	public void testCreateTestStep() {
 		Integer sessionId = connector.createSession("Session1");
 		Integer testCaseId = connector.createTestCase("Test 1");
-		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", "some description");
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", "some description", LocalDateTime.now());
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
 		connector.createTestStep("Step 2", testCaseInSessionId);
 		Assert.assertNotNull(testStepId);
@@ -153,7 +151,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	public Integer testCreateStepReferenceSnapshot() throws IOException {
 		Integer sessionId = connector.createSession("Session1");
 		Integer testCaseId = connector.createTestCase("Test 2");
-		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 2", "SUCCESS", "LOCAL", "some description");
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 2", "SUCCESS", "LOCAL", "some description", LocalDateTime.now());
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
 		Integer stepResultId = connector.recordStepResult(true, "logs", 1, testCaseInSessionId, testStepId);
 		
@@ -181,7 +179,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 
 		Integer sessionId = connector.createSession("Session1");
 		Integer testCaseId = connector.createTestCase("Test 2");
-		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 2", "SUCCESS", "LOCAL", "some description");
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 2", "SUCCESS", "LOCAL", "some description", LocalDateTime.now());
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
 		Integer stepResultId = connector.recordStepResult(true, "logs", 1, testCaseInSessionId, testStepId);
 		File image = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "img.png").toFile();
@@ -205,7 +203,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 
 		Integer sessionId = connector.createSession("Session1");
 		Integer testCaseId = connector.createTestCase("Test 2");
-		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 2", "SUCCESS", "LOCAL", "some description");
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 2", "SUCCESS", "LOCAL", "some description", LocalDateTime.now());
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
 		Integer stepResultId = connector.recordStepResult(true, "logs", 1, testCaseInSessionId, testStepId);
 		File image = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "img.png").toFile();
@@ -226,7 +224,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	public void testRecordStepResult() throws IOException {
 		Integer sessionId = connector.createSession("Session1");
 		Integer testCaseId = connector.createTestCase("Test 2");
-		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 2", "SUCCESS", "LOCAL", "some description");
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 2", "SUCCESS", "LOCAL", "some description", LocalDateTime.now());
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
 		Integer stepResultId = connector.recordStepResult(true, "some logs", 1, testCaseInSessionId, testStepId);
 		
