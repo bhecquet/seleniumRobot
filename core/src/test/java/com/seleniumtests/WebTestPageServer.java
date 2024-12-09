@@ -55,7 +55,11 @@ public class WebTestPageServer {
 		mapping.put("/tu/angularAppv9/polyfills-es2015.js", "/angularApp/polyfills-es2015.js");
 		mapping.put("/tu/angularAppv9/polyfills-es5.js", "/angularApp/polyfills-es5.js");
 		mapping.put("/tu/angularAppv9/styles.css", "/angularApp/styles.css");
-		
+
+		// for PDF
+		mapping.put("/tu/testpdf.html", "/testpdf.html");
+		mapping.put("/tu/Test_PDF.pdf", "/Test_PDF.pdf");
+
 		return mapping;
 	}
 	

@@ -30,6 +30,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import com.seleniumtests.it.driver.support.pages.*;
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.WebDriver;
@@ -54,14 +55,6 @@ import com.seleniumtests.customexception.SeleniumGridNodeNotAvailable;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.it.driver.support.pages.DriverScrollingTestPage;
-import com.seleniumtests.it.driver.support.pages.DriverSubAngularTestPage;
-import com.seleniumtests.it.driver.support.pages.DriverTestAngularFrame;
-import com.seleniumtests.it.driver.support.pages.DriverTestPage;
-import com.seleniumtests.it.driver.support.pages.DriverTestPageNativeActions;
-import com.seleniumtests.it.driver.support.pages.DriverTestPageObjectFatory;
-import com.seleniumtests.it.driver.support.pages.DriverTestPageSalesforceLightning;
-import com.seleniumtests.it.driver.support.pages.DriverTestPageWithoutFixedPattern;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 
@@ -81,6 +74,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	protected DriverTestAngularFrame angularFramePage;
 	protected DriverScrollingTestPage scrollingTestPage;
 	protected DriverTestPageSalesforceLightning lightningPage;
+	protected DriverPDFPage testPdfPage;
 	protected ITestContext testNGCtx;
 	private SeleniumGridConnector seleniumGridConnector;
 	private String testPageName;
@@ -195,6 +189,10 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 					break;
 				case "DriverTestPageSalesforceLightning":
 					lightningPage = new DriverTestPageSalesforceLightning();
+					break;
+				case "DriverPDFPage":
+					testPageUrl = String.format("http://%s:%d/testpdf.html", localAddress, server.getServerHost().getPort());
+					testPdfPage = new DriverPDFPage(testPageUrl);
 					break;
 			}
 		} catch (SeleniumGridNodeNotAvailable e) {

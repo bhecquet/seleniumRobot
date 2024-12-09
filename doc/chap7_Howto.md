@@ -795,3 +795,12 @@ Then, in the test
 ```
 
 You can also use some asserts to control scores
+
+### 30 read PDF files ###
+
+Simply call
+```
+new PDFReader(pdfFile).getText()
+```
+
+The tricky part is to get the PDF file, which is outside of this documentation

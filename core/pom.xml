@@ -266,6 +266,11 @@
 		    <artifactId>compiler</artifactId>
 		    <version>2.24ea0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.pdfbox</groupId>
+			<artifactId>pdfbox</artifactId>
+			<version>3.0.2</version>
+		</dependency>
         
         <!-- Specific Neoload -->
         <dependency>
