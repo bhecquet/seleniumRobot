@@ -795,6 +795,11 @@ public class SeleniumTestsContextManager {
 		return deployedMode;
 	}
 
+	/**
+	 * Return true when test is a web test. This does not handle the case of hybrid mobile applications where some screens may be web pages
+	 * So prefer using CustomEventFiringWebDriver.isWebTest() as it look for the mobile context
+	 * @return
+	 */
 	public static boolean isWebTest() {
         return getThreadContext().getTestType().family().equals(TestType.WEB);
     }

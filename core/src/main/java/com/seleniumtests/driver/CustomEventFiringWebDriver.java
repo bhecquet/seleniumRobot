@@ -1872,6 +1872,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	@Nullable
 	@Override
 	public String getContext() {
+		// TODO: cache value so that we don't need to ask it each time we do a "isWebTest" ?
 		if (testType.isMobile()) {
 			return ((SupportsContextSwitching) originalDriver).getContext();
 		} else { // desktop case

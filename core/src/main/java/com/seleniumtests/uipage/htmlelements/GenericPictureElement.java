@@ -227,6 +227,8 @@ public abstract class GenericPictureElement extends Element {
 		Instant end = clock.instant().plusMillis(waitMs);
 		while (end.isAfter(clock.instant()) || waitMs == 0) {
 			try {
+				// in case element has been searched before forget it
+				clearMemory();
 				findElement();
 				return true;
 			} catch (ImageSearchException e) {
@@ -234,6 +236,10 @@ public abstract class GenericPictureElement extends Element {
 					return false;
 				}
 				WaitHelper.waitForMilliSeconds(200);
+			} finally {
+				// when checking if element is present, if we find it, we need to reset so that subsequent searches can be done
+				// if element disappears
+				clearMemory();
 			}
 		}
 		return false;

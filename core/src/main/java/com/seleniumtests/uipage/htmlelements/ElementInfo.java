@@ -80,7 +80,6 @@ public class ElementInfo {
 	/**
 	 * Returns an element info, either by searching in cache or creating a new one if none has been found
 	 * @param htmlElement
-	 * @param driver
 	 * @return
 	 */
 	public static ElementInfo getInstance(HtmlElement htmlElement) {
@@ -116,7 +115,6 @@ public class ElementInfo {
 	/**
 	 * Update information by calling the real element.
 	 * @param htmlElement
-	 * @param driver
 	 */
 	public void updateInfo(HtmlElement htmlElement) {
 		

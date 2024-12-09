@@ -76,7 +76,7 @@ public abstract class BasePage {
 	}
 
     public boolean isTextPresent(final String text) {
-    	if (SeleniumTestsContextManager.isWebTest()) {
+    	if (((CustomEventFiringWebDriver)driver).isWebTest()) {
 	        Assert.assertNotNull(text, "isTextPresent: text should not be null!");
 	        
 	        WebElement body;

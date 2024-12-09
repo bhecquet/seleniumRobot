@@ -335,16 +335,17 @@ public class WebUIDriver {
     	
     	if (driver != null) {
 			try {
-				
-				// #539: mobile tests do not support switch to default content
-				if (SeleniumTestsContextManager.isWebTest()) {
-					// issue #414: capture the whole screen
-					driver.switchTo().defaultContent();
-				}
-				
-				// force screenshotUtil to use the driver of this WebUiDriver, not the currently selected one
-				// do it only when driver is a regular CustomEventFiringWebdriver (#619)
+
 				if (driver instanceof CustomEventFiringWebDriver) {
+
+					// #539: mobile tests do not support switch to default content
+					if (((CustomEventFiringWebDriver)driver).isWebTest()) {
+						// issue #414: capture the whole screen
+						driver.switchTo().defaultContent();
+					}
+
+					// force screenshotUtil to use the driver of this WebUiDriver, not the currently selected one
+					// do it only when driver is a regular CustomEventFiringWebdriver (#619)
 					for (ScreenShot screenshot : new ScreenshotUtil(driver).capture(SnapshotTarget.PAGE, ScreenShot.class, true, true)) {
 						scenarioLogger.logScreenshot(screenshot, null, name, SnapshotCheckType.FALSE);
 

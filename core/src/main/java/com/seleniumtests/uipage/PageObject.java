@@ -829,14 +829,14 @@ public class PageObject extends BasePage implements IPage {
         try {
 
             // Navigate to app URL for browser test
-            if (SeleniumTestsContextManager.isWebTest()) {
+            if (((CustomEventFiringWebDriver)driver).isWebTest()) {
             	setWindowToRequestedSize();
                 driver.navigate().to(url);
             }
         } catch (UnreachableBrowserException e) {
         	// recreate the driver without recreating the enclosing WebUiDriver
         	driver = WebUIDriver.getWebUIDriver(false).createWebDriver();
-            if (SeleniumTestsContextManager.isWebTest()) {
+            if (((CustomEventFiringWebDriver)driver).isWebTest()) {
 	            setWindowToRequestedSize();
 	            driver.navigate().to(url);
             }
@@ -844,7 +844,7 @@ public class PageObject extends BasePage implements IPage {
         	logger.error("get UnsupportedCommandException, retry");
             // recreate the driver without recreating the enclosing WebUiDriver
             driver = WebUIDriver.getWebUIDriver(false).createWebDriver();
-            if (SeleniumTestsContextManager.isWebTest()) {
+            if (((CustomEventFiringWebDriver)driver).isWebTest()) {
             	setWindowToRequestedSize();
 	            driver.navigate().to(url);
             }
@@ -914,7 +914,7 @@ public class PageObject extends BasePage implements IPage {
      * On init set window to size requested by user. Window is maximized if no size is set
      */
     public final void setWindowToRequestedSize() {
-    	if (!SeleniumTestsContextManager.isWebTest()) {
+    	if (!((CustomEventFiringWebDriver)driver).isWebTest()) {
     		return;
     	}
     	
@@ -1407,7 +1407,7 @@ public class PageObject extends BasePage implements IPage {
      */
 	@GenericStep
     public <T extends PageObject> T refresh()  {
-    	if (SeleniumTestsContextManager.isWebTest()) {
+    	if (((CustomEventFiringWebDriver)driver).isWebTest()) {
 	        try {
 	            driver.navigate().refresh();
 	        } catch (org.openqa.selenium.TimeoutException ex) {

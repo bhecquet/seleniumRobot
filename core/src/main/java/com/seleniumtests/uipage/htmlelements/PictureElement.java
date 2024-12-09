@@ -220,7 +220,7 @@ public class PictureElement extends GenericPictureElement {
 		
 		WebUIDriver uiDriver = isDriverCreated();
 
-		if (SeleniumTestsContextManager.isWebTest()) {
+		if (((CustomEventFiringWebDriver)uiDriver.getDriver()).isWebTest()) {
 
 			// issue #180: internet explorer moves to center of element in viewport
 			// all browsers behave like this

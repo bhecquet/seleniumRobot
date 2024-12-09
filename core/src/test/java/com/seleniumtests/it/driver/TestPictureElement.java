@@ -252,9 +252,11 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 	public void testClickOnNonExistingPicture() {
 		LocalDateTime start = LocalDateTime.now();
 		try {
-			SeleniumTestsContextManager.getThreadContext().setReplayTimeout(5);
+			SeleniumTestsContextManager.getThreadContext().setReplayTimeout(6);
 			DriverTestPageWithoutFixedPattern.pictureNotPresent.click();
 		} finally {
+			// replay delay is set to 1 second, and after each try, we check if we can wait this replay delay + 200 ms, so
+			// effective replay duraction is less than the replay timeout
 			Assert.assertTrue(LocalDateTime.now().minusSeconds(4).isAfter(start));
 		}
 

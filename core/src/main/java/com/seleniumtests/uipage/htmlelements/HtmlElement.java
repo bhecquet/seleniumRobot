@@ -410,7 +410,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      */
 	@ReplayOnError(waitAfterAction = true)
     public void simulateClick() {
-    	if (SeleniumTestsContextManager.isWebTest()) {
+    	if (((CustomEventFiringWebDriver)getDriver()).isWebTest()) {
     		((CustomEventFiringWebDriver)updateDriver()).updateWindowsHandles();
     	}
     	
@@ -907,7 +907,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * Element must have been searched before
      */
 	protected void outlineElement(WebElement localElement) {
-		if (localElement == null || !SeleniumTestsContextManager.isWebTest()
+		if (localElement == null || !((CustomEventFiringWebDriver)getDriver()).isWebTest()
 				|| !SeleniumTestsContextManager.getThreadContext().getDebug().contains(DebugMode.GUI)) {
     		return;
     	}
@@ -921,7 +921,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	 * Make element visible. Sometimes useful when real elements are backed by an image element
 	 */
 	protected void makeWebElementVisible(WebElement localElement) {
-		if (SeleniumTestsContextManager.isWebTest()) {
+		if (((CustomEventFiringWebDriver)getDriver()).isWebTest()) {
 			if (localElement.isDisplayed()) {
 				return;
 			}
@@ -1373,7 +1373,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     }
     
     protected void blur() {
-		if (SeleniumTestsContextManager.isWebTest() && "input".equalsIgnoreCase(getRealElementNoSearch().getTagName())) {
+		if (((CustomEventFiringWebDriver)getDriver()).isWebTest() && "input".equalsIgnoreCase(getRealElementNoSearch().getTagName())) {
     		try {
 				executeScript("arguments[0].blur();", getRealElementNoSearch());
     		} catch (Exception e) {	
