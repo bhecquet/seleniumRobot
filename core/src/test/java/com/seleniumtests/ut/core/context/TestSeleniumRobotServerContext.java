@@ -65,6 +65,11 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerToken("123");
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerToken(), "123");
 	}
+	@Test(groups="ut context", enabled = false) // to execute it, you need to set environment variable on launch
+	public void testSeleniumRobotServerTokenFromEnvVar(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerToken(), "456");
+	}
 	@Test(groups="ut context")
 	public void testSeleniumRobotServerTokenNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);

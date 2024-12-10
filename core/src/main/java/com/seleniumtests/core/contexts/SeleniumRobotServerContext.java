@@ -18,6 +18,7 @@ public class SeleniumRobotServerContext {
 	public static final String SELENIUMROBOTSERVER_URL = "seleniumRobotServerUrl";
     public static final String SELENIUMROBOTSERVER_ACTIVE = "seleniumRobotServerActive";
     public static final String SELENIUMROBOTSERVER_TOKEN = "seleniumRobotServerToken";
+	public static final String SELENIUMROBOTSERVER_TOKEN_ENV_VAR = "SELENIUM_ROBOT_SERVER_TOKEN";
     public static final String SELENIUMROBOTSERVER_COMPARE_SNAPSHOT = "seleniumRobotServerCompareSnapshots";			// whether we should use the snapshots created by robot to compare them to a previous execution. This option only operates when SeleniumRobot server is connected
     public static final String SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL = "seleniumRobotServerSnapshotsTtl";			// Time to live of the test session on seleniumRobot server
     public static final String SELENIUMROBOTSERVER_RECORD_RESULTS = "seleniumRobotServerRecordResults";				// whether we should record test results to server. This option only operates when SeleniumRobot server is connected
@@ -47,8 +48,14 @@ public class SeleniumRobotServerContext {
 	public void init() {
 		setSeleniumRobotServerUrl(context.getValueForTest(SELENIUMROBOTSERVER_URL, System.getProperty(SELENIUMROBOTSERVER_URL)));
         setSeleniumRobotServerActive(context.getBoolValueForTest(SELENIUMROBOTSERVER_ACTIVE, System.getProperty(SELENIUMROBOTSERVER_ACTIVE)));
-        setSeleniumRobotServerToken(context.getValueForTest(SELENIUMROBOTSERVER_TOKEN, System.getProperty(SELENIUMROBOTSERVER_TOKEN)));
-        setSeleniumRobotServerCompareSnapshot(context.getBoolValueForTest(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, System.getProperty(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT)));
+
+		// first read environment variable for token, then, override it if properties are set
+		setSeleniumRobotServerToken(System.getenv(SELENIUMROBOTSERVER_TOKEN_ENV_VAR));
+		String tokenFromConfig = context.getValueForTest(SELENIUMROBOTSERVER_TOKEN, System.getProperty(SELENIUMROBOTSERVER_TOKEN));
+		if (tokenFromConfig != null) { // token set in configuration has priority over environment variable
+			setSeleniumRobotServerToken(tokenFromConfig);
+		}
+		setSeleniumRobotServerCompareSnapshot(context.getBoolValueForTest(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, System.getProperty(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT)));
         setSeleniumRobotServerVariableReservationDuration(context.getIntValueForTest(SELENIUMROBOTSERVER_VARIABLES_RESERVATION, System.getProperty(SELENIUMROBOTSERVER_VARIABLES_RESERVATION)));
         setSeleniumRobotServerCompareSnapshotTtl(context.getIntValueForTest(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL, System.getProperty(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL)));
         setSeleniumRobotServerCompareSnapshotBehaviour(context.getValueForTest(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, System.getProperty(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR)));
