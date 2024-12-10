@@ -71,6 +71,7 @@ public class TestBasePage extends MockitoTest {
 		page.setDriver(driver);
 		
 		when(driver.findElement(Mockito.any())).thenReturn(element);
+		when(driver.isWebTest()).thenReturn(true);
 		when(driver.switchTo()).thenReturn(targetLocator);
 		when(targetLocator.alert()).thenReturn(alert);
 		when(alert.getText()).thenReturn("alert text");

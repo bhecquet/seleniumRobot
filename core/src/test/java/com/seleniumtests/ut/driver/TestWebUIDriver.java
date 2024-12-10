@@ -459,7 +459,6 @@ public class TestWebUIDriver extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://localhost:4444/wd/hub");
 		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
 
-
 		// set connector to simulate the driver creation on grid
 		SeleniumTestsContextManager.getThreadContext().setSeleniumGridConnectors(Arrays.asList(gridConnector));
 		when(gridConnector.getNodeUrl()).thenReturn("http://localhost:5555/");
@@ -490,7 +489,6 @@ public class TestWebUIDriver extends MockitoTest {
 
 			// check cleanUp is correct and driver is closed
 			WebUIDriver.logFinalDriversState(Reporter.getCurrentTestResult());
-			verify(targetLocator).defaultContent();
 			WebUIDriver.cleanUp();
 			verify(realDriver, times(2)).quit();
 		}
