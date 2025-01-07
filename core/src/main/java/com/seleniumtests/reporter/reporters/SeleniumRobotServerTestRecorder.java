@@ -19,15 +19,10 @@ package com.seleniumtests.reporter.reporters;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.seleniumtests.driver.BrowserType;
@@ -37,14 +32,12 @@ import com.seleniumtests.reporter.logger.GenericFile;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.json.JSONObject;
-import org.openqa.selenium.Rectangle;
 import org.testng.IReporter;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.utils.TestNGContextUtils;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
@@ -59,10 +52,19 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 public class SeleniumRobotServerTestRecorder extends CommonReporter implements IReporter {
 
 	private static final Object lock = new Object();
+	private static Integer sessionId;
 
 	public SeleniumRobotSnapshotServerConnector getServerConnector() {
 		return SeleniumRobotSnapshotServerConnector.getInstance();
 	}
+
+	/**
+	 * For tests only
+	 */
+	public void resetSessionId() {
+		sessionId = null;
+	}
+
 	
 	/**
 	 * Generate result for a single test method
@@ -110,10 +112,14 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			} else {
 				try {
 					// do not create application / version / environment from script, they should already be present or created by user to avoid fill database with wrong data
-					// create session only if it has not been before
-					for (ITestContext testContext : resultSet.keySet()) {
-						recordTestSession(testContext);
-					}
+					// create session only if it has not been created before
+
+					Optional<Long> sessionStart = resultSet.keySet().stream()
+							.map(ITestContext::getStartDate)
+							.map(Date::getTime)
+							.min(Long::compare);
+					recordTestSession(sessionStart.get());
+
 				} catch (SeleniumRobotServerException | ConfigurationException e) {
 					logger.error("Error contacting selenium robot server", e);
 					return;
@@ -128,9 +134,9 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 		}
 	}
 	
-	public void recordTestSession(ITestContext testContext) {
+	public void recordTestSession(Long sessionStart) {
 		SeleniumRobotSnapshotServerConnector serverConnector = getServerConnector();
-		if (TestNGContextUtils.getTestSessionCreated(testContext) == null) {
+		if (sessionId == null) {
 
 			String browserOrApp;
 			if (SeleniumTestsContextManager.isAppTest()) {
@@ -142,15 +148,15 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 				browserOrApp = "BROWSER:" + browser;
 			}
 
-			Integer sessionId = serverConnector.createSession(testContext.getName(),
+			Integer sessionId = serverConnector.createSession(String.format("%s suite", SeleniumTestsContextManager.getApplicationName()),
 					browserOrApp,
 					SeleniumTestsContextManager.getThreadContext().getStartedBy(),
-					Instant.ofEpochMilli(testContext.getStartDate().getTime())
+					Instant.ofEpochMilli(sessionStart)
 						.atZone(ZoneId.systemDefault())
 						.toLocalDateTime());
 			logger.info(String.format("Session result will be visible at: %s/snapshot/testResults/summary/%d/", serverConnector.getUrl(), sessionId));
 
-			TestNGContextUtils.setTestSessionCreated(testContext, sessionId);
+			this.sessionId = sessionId;
 		}
 	}
 
@@ -168,7 +174,8 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			for (ITestResult testResult: methodResults) {
 				
 				// do not record this result twice if it's already recorded
-				if (TestNGResultUtils.isSeleniumServerReportCreated(testResult) 
+				if (sessionId == null
+					||TestNGResultUtils.isSeleniumServerReportCreated(testResult)
 					// NoMoreRetry is set to false when test is being retried => we do not want to record a temp result, only the last one
 					|| (TestNGResultUtils.getNoMoreRetry(testResult) != null && !TestNGResultUtils.getNoMoreRetry(testResult))) {
 					continue;
@@ -179,9 +186,6 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 				
 				// skipped tests has never been executed and so attribute (set in TestListener) has not been applied
 				String testName = getTestCaseName(testResult);
-				
-				// get sessionId from context
-				Integer sessionId = TestNGContextUtils.getTestSessionCreated(entry.getKey());
 				
 				// record test case
 				Integer testCaseId = serverConnector.createTestCase(testName);
