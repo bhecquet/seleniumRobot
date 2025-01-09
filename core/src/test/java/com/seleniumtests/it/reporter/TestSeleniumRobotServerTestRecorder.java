@@ -47,6 +47,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.openqa.selenium.Rectangle;
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
@@ -67,6 +68,12 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	private SeleniumRobotSnapshotServerConnector serverConnector;
 
 	private SeleniumRobotServerTestRecorder reporter;
+
+	@BeforeMethod(alwaysRun = true)
+	public void init() {
+		// clear sessionID for session recording so that each test is not polluted by others
+		SeleniumRobotServerTestRecorder.resetSessionId();
+	}
 
 	/**
 	 * In this test, everything is fine with seleniumrobot server

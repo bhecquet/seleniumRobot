@@ -61,7 +61,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 	/**
 	 * For tests only
 	 */
-	public void resetSessionId() {
+	public static void resetSessionId() {
 		sessionId = null;
 	}
 
