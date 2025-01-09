@@ -101,7 +101,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 			// check server has been called for all aspects of test (app, version, ...)
 			// they may be called for each test but server is responsible for uniqueness of the value
-			verify(serverConnector, atLeastOnce()).createSession(anyString(), eq("BROWSER:NONE"), eq("http://mylauncher/test"), any(LocalDateTime.class));
+			verify(serverConnector).createSession(anyString(), eq("BROWSER:NONE"), eq("http://mylauncher/test"), any(LocalDateTime.class));
 			
 			// issue #331: check all test cases are created, call MUST be done only once to avoid result to be recorded several times
 			verify(serverConnector).createTestCase("testAndSubActions");
@@ -153,6 +153,45 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 		}
 	}
 
+	/**
+	 * Check test session is created only once even when multiple suites are executed
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportGenerationMultiSuites() throws Exception {
+
+		try (MockedConstruction mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+			when(variableServer.isAlive()).thenReturn(true);
+		});
+			 MockedStatic mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
+			 MockedStatic mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+		) {
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			System.setProperty(SeleniumTestsContext.STARTED_BY, "http://mylauncher/test");
+
+			initMocks(mockedCommonReporter, mockedServerConnector);
+
+			executeMultiSuites(new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, new String[]{"testAndSubActions"});
+
+			// check session is created only once, even with multiple suites
+			verify(serverConnector).createSession(anyString(), eq("BROWSER:NONE"), eq("http://mylauncher/test"), any(LocalDateTime.class));
+			verify(serverConnector, times(2)).createTestCase("testAndSubActions");
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testAndSubActions"), eq("SUCCESS"), eq("LOCAL"), eq("a test with steps"), any(LocalDateTime.class));
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testAndSubActions-1"), eq("SUCCESS"), eq("LOCAL"), eq("a test with steps"), any(LocalDateTime.class));
+
+
+		} finally {
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+			System.clearProperty(SeleniumTestsContext.STARTED_BY);
+		}
+	}
+
 	@Test(groups={"it"})
 	public void testReportGenerationWithPreviousReport() throws Exception {
 
@@ -174,7 +213,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 
 			// check server has been called for all aspects of test (app, version, ...)
 			// they may be called for each test but server is responsible for uniqueness of the value
-			verify(serverConnector, atLeastOnce()).createSession(anyString(), eq("BROWSER:NONE"), eq("http://mylauncher/test"), any(LocalDateTime.class));
+			verify(serverConnector).createSession(anyString(), eq("BROWSER:NONE"), eq("http://mylauncher/test"), any(LocalDateTime.class));
 
 			verify(serverConnector).createTestCase("testWithException");
 			verify(serverConnector).addLogsToTestCaseInSession(anyInt(), anyString());
@@ -349,7 +388,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 			// check server has been called for all aspects of test (app, version, ...)
 			// they may be called for each test but server is responsible for uniqueness of the value
-			verify(serverConnector, atLeastOnce()).createSession(anyString(), eq("BROWSER:CHROME"), isNull(), any(LocalDateTime.class));
+			verify(serverConnector).createSession(anyString(), eq("BROWSER:CHROME"), isNull(), any(LocalDateTime.class));
 			
 			// issue #331: check all test cases are created, call MUST be done only once to avoid result to be recorded several times
 			verify(serverConnector).createTestCase("testDriverCustomSnapshot");
@@ -401,7 +440,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 			// check server has been called for all aspects of test (app, version, ...)
 			// they may be called for each test but server is responsible for uniqueness of the value
-			verify(serverConnector, atLeastOnce()).createSession(anyString(), eq("BROWSER:CHROME"), isNull(), any(LocalDateTime.class));
+			verify(serverConnector).createSession(anyString(), eq("BROWSER:CHROME"), isNull(), any(LocalDateTime.class));
 			
 			// issue #331: check all test cases are created, call MUST be done only once to avoid result to be recorded several times
 			verify(serverConnector).createTestCase("testDriverCustomSnapshot");

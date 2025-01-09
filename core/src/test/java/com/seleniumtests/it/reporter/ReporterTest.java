@@ -123,7 +123,7 @@ public class ReporterTest extends ConnectorsTest {
         suiteParameters.put("softAssertEnabled", "false");
         suite.setParameters(suiteParameters);
 //		suite.setConfigFailurePolicy(FailurePolicy.CONTINUE);
-        List<XmlSuite> suites = new ArrayList<XmlSuite>();
+        List<XmlSuite> suites = new ArrayList<>();
         suites.add(suite);
 
 
@@ -137,7 +137,7 @@ public class ReporterTest extends ConnectorsTest {
             test.setName(String.format("%s_%d", testClass.substring(testClass.lastIndexOf(".") + 1), new Random().nextInt()));
             testList.add(test.getName());
             test.addParameter(SeleniumTestsContext.BROWSER, "none");
-            List<XmlClass> classes = new ArrayList<XmlClass>();
+            List<XmlClass> classes = new ArrayList<>();
             XmlClass xmlClass = new XmlClass(testClass);
             if (methods.length > 0) {
                 List<XmlInclude> includes = new ArrayList<>();
@@ -185,7 +185,7 @@ public class ReporterTest extends ConnectorsTest {
             XmlTest test = new XmlTest(suite);
             test.setName(String.format("%s_%d", testClass.substring(testClass.lastIndexOf(".") + 1), new Random().nextInt()));
             test.addParameter(SeleniumTestsContext.BROWSER, "none");
-            List<XmlClass> classes = new ArrayList<XmlClass>();
+            List<XmlClass> classes = new ArrayList<>();
             XmlClass xmlClass = new XmlClass(testClass);
             if (methods.length > 0) {
                 List<XmlInclude> includes = new ArrayList<>();
@@ -200,7 +200,7 @@ public class ReporterTest extends ConnectorsTest {
             XmlTest test2 = new XmlTest(suite2);
             test2.setName(String.format("%s_%d", testClass.substring(testClass.lastIndexOf(".") + 1), new Random().nextInt()));
             test2.addParameter(SeleniumTestsContext.BROWSER, "none");
-            List<XmlClass> classes2 = new ArrayList<XmlClass>();
+            List<XmlClass> classes2 = new ArrayList<>();
             XmlClass xmlClass2 = new XmlClass(testClass);
             if (methods.length > 0) {
                 List<XmlInclude> includes = new ArrayList<>();
