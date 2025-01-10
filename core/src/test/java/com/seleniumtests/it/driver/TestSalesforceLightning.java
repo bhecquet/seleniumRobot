@@ -35,7 +35,7 @@ import com.seleniumtests.it.driver.support.pages.DriverTestPageSalesforceLightni
 public class TestSalesforceLightning extends GenericMultiBrowserTest {
 
 	public TestSalesforceLightning() throws Exception {
-		super(BrowserType.CHROME, "DriverTestPageSalesforceLightning", false, System.getProperty("salesforceProxyType"));
+		super(BrowserType.FIREFOX, "DriverTestPageSalesforceLightning", false, System.getProperty("salesforceProxyType"));
 	}
 	
 	public TestSalesforceLightning(BrowserType browserType) throws Exception {
