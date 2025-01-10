@@ -557,6 +557,7 @@
 <!--					<argLine>${surefireArgLine}</argLine>-->
 					<systemPropertyVariables>
                         <mavenExecution>true</mavenExecution>
+						<salesforceProxyType>autodetect</salesforceProxyType>
 					</systemPropertyVariables>
 				<!-- /uncomment -->
 					<threadCount>1</threadCount>

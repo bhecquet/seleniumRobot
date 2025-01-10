@@ -19,7 +19,7 @@ import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 public class TestLigthouseGrid extends GenericMultiBrowserTest {
 
 	public TestLigthouseGrid() throws Exception {
-		super(BrowserType.CHROME, "DriverTestPage", true);
+		super(BrowserType.CHROME, "DriverTestPage", true, null);
 	}
 	
 

@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import com.seleniumtests.reporter.reporters.SeleniumRobotServerTestRecorder;
 import org.apache.commons.io.FileUtils;
 import org.testng.ITestContext;
 import org.testng.TestNG;
@@ -77,6 +78,11 @@ public class ReporterTest extends ConnectorsTest {
 
         serverUrl = String.format("http://%s:%d/test.html", localAddress, server.getServerHost().getPort());
         logger.info(String.format("exposing server on http://%s:%d", localAddress, server.getServerHost().getPort()));
+    }
+
+    @BeforeMethod(groups={"it"})
+    public void init(Method method, ITestContext context) throws IOException {
+        SeleniumRobotServerTestRecorder.resetSessionId();
     }
 
     @BeforeMethod(groups={"it"})

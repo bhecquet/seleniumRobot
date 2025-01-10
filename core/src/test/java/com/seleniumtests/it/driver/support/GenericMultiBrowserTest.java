@@ -65,6 +65,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	
 	private WebTestPageServer server;
 	private String localAddress;
+	private String proxyType;
 	protected WebDriver driver;
 	protected DriverTestPage testPage;
 	protected DriverTestPageNativeActions testPageNativeActions;
@@ -92,13 +93,14 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	}
 
 	public GenericMultiBrowserTest(BrowserType browserType, String testPageName) throws Exception {
-		this(browserType, testPageName, false);
+		this(browserType, testPageName, false, null);
 	}
 	
-	public GenericMultiBrowserTest(BrowserType browserType, String testPageName, boolean targetSeleniumGrid) throws Exception {
+	public GenericMultiBrowserTest(BrowserType browserType, String testPageName, boolean targetSeleniumGrid, String proxyType) throws Exception {
 		this.browserType = browserType; 
 		this.testPageName = testPageName;
 		this.targetSeleniumGrid = targetSeleniumGrid;
+		this.proxyType = proxyType;
 	}
 	
 	@BeforeMethod(groups={"ut", "it", "upload", "ie"})  
@@ -115,10 +117,15 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(false);
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(15);
+
 		
 		// edge IE mode forced
 		SeleniumTestsContextManager.getThreadContext().setEdgeIeMode(true);
 //		SeleniumTestsContextManager.getThreadContext().setDebug("driver");
+
+		if (proxyType != null) {
+			SeleniumTestsContextManager.getThreadContext().setWebProxyType(proxyType);
+		}
 
 		// grid support
 		if (targetSeleniumGrid) {

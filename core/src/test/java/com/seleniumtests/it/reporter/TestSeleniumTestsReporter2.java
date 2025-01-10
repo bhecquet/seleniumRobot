@@ -142,7 +142,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			SeleniumTestsContextManager.removeThreadContext();
 			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions"});
 
-			// check result is ok and comparison result is shown through green bullet
+			// check result is ok and comparison result is not shown
 			String summaryReport = readSummaryFile();
 			Assert.assertFalse(summaryReport.contains("<i class=\"fas fa-circle circle")); // no snapshot comparison has been performed
 			Assert.assertTrue(summaryReport.contains("info=\"ok\" data-toggle=\"tooltip\""));

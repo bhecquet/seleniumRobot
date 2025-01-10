@@ -34,7 +34,7 @@ public class TestNewWindow  extends GenericMultiBrowserTest {
 	}
 	
 	public TestNewWindow() throws Exception {
-		super(BrowserType.CHROME, "DriverTestPage", true);  
+		super(BrowserType.CHROME, "DriverTestPage", true, null);
 	}
 	
 	/**

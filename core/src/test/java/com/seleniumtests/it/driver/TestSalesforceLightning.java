@@ -28,14 +28,18 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageSalesforceLightning;
 
+/**
+ * These tests need to connect to Salesforce which may be accessible through a proxy ony
+ * If so, use 'salesforceProxyType' property for launch, so that tests can access Salesforce
+ */
 public class TestSalesforceLightning extends GenericMultiBrowserTest {
 
 	public TestSalesforceLightning() throws Exception {
-		super(BrowserType.CHROME, "DriverTestPageSalesforceLightning"); 
+		super(BrowserType.FIREFOX, "DriverTestPageSalesforceLightning", false, System.getProperty("salesforceProxyType"));
 	}
 	
 	public TestSalesforceLightning(BrowserType browserType) throws Exception {
-		super(browserType, "DriverTestPageSalesforceLightning"); 
+		super(browserType, "DriverTestPageSalesforceLightning", false, System.getProperty("salesforceProxyType"));
 	}
 	
 	@BeforeMethod(groups= {"it"})

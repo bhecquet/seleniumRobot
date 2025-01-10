@@ -48,7 +48,7 @@ import com.seleniumtests.util.helper.WaitHelper;
 public class TestSeleniumRobotGridConnector2 extends GenericMultiBrowserTest {
 
 	public TestSeleniumRobotGridConnector2() throws Exception {
-		super(BrowserType.CHROME, "DriverTestPageWithoutFixedPattern", true);
+		super(BrowserType.CHROME, "DriverTestPageWithoutFixedPattern", true, null);
 	}
 	
 	@BeforeClass(groups={"it"})
