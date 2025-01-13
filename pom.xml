@@ -5,7 +5,7 @@
 
 	<groupId>com.infotel.seleniumRobot</groupId>
 	<artifactId>core-parent-selenium4</artifactId>
-	<version>5.1.14</version>
+	<version>5.1.15-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>selenium robot</name>
@@ -32,7 +32,7 @@
 	   <connection>scm:git:https://github.com/bhecquet/seleniumRobot.git</connection>
         <developerConnection>scm:git:https://github.com/bhecquet/seleniumRobot.git</developerConnection>
 		<url>git@github.com:bhecquet/seleniumRobot.git</url>
-		<tag>core-parent-selenium4-5.1.14</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<distributionManagement>
