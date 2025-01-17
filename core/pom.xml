@@ -594,7 +594,7 @@
 						 -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"</argLine>
 					 <systemPropertyVariables>
                         <mavenExecution>true</mavenExecution>
-						<salesforceProxyType>autodetect</salesforceProxyType>
+						<salesforceProxyType>autodetect</salesforceProxyType> <!-- allow execution of Salesforce tests behind proxy -->
 					</systemPropertyVariables>
 				<!-- /uncomment -->
 				
