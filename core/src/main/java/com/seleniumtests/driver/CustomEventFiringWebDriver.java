@@ -685,10 +685,14 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 			try  {
 				return driver.getWindowHandles();
 			} catch (UnhandledAlertException e) {
-	    		logger.info("getWindowHandles: Handling alert");
-	    		handleAlert();
-	    		return driver.getWindowHandles();
-			} catch (WebSessionEndedException e) {
+				logger.info("getWindowHandles: Handling alert");
+				handleAlert();
+				return driver.getWindowHandles();
+			} catch (TimeoutException e) {
+				setDriverExited();
+				logger.warn("Timeout getting window handles, suspicion of staled driver/browser => stop here");
+				return new TreeSet<>();
+			} catch (WebSessionEndedException | UnreachableBrowserException e) {
 				logger.warn("session already terminated");
 				return new TreeSet<>();
 			} catch (Exception e) {
@@ -792,6 +796,14 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	}
     
     public void setDriverExited() {
+		// we detect session does not exist anymore
+		// it can be due to browser crashed or only a driver.close() during a test
+		// in this last case, try to quit() so that no remote session get staled
+		try {
+			driver.quit();
+		} catch (Exception e) {
+			// do nothing
+		}
     	driverExited = true;
     }
     

@@ -83,7 +83,7 @@ public class DriverExceptionListener implements WebDriverListener {
 
             logger.error(ex);
 
-        } else if (ex.getMessage().contains("Error communicating with the remote browser. It may have died.")) {
+        } else if (ex instanceof org.openqa.selenium.remote.UnreachableBrowserException) {
 
             // Session has lost connection, remove it then ignore quit() method.
         	driver.setDriverExited();
@@ -110,8 +110,7 @@ public class DriverExceptionListener implements WebDriverListener {
             String message = ex.getMessage().split("\\n")[0];
             logger.warn("Got exception:" + message);
             if (
-            		ex instanceof org.openqa.selenium.remote.UnreachableBrowserException
-            		|| ex instanceof NoSuchSessionException
+            		ex instanceof NoSuchSessionException
             		|| message.matches("Session .*? was terminated due to.*")
             		|| message.matches("Session .*? not available .*")
                     || message.matches("cannot forward the request .*")
@@ -125,14 +124,6 @@ public class DriverExceptionListener implements WebDriverListener {
                     ) {
             	
             	driver.setDriverExited();
-				// we detect session does not exist anymore
-				// it can be due to browser crashed or only a driver.close() during a test
-				// in this last case, try to quit() so that no remote session get staled
-				try {
-					driver.quit();
-				} catch (Exception e1) {
-					// do nothing
-				}
 
                 // since the session was
                 // terminated.
