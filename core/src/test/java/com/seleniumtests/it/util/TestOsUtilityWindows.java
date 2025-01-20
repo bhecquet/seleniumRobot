@@ -1,5 +1,6 @@
 package com.seleniumtests.it.util;
 
+import jakarta.xml.bind.DatatypeConverter;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.Proxy.ProxyType;
 import org.testng.SkipException;
@@ -34,7 +35,7 @@ public class TestOsUtilityWindows extends GenericTest {
 		proxy.setProxyType(ProxyType.AUTODETECT);
 		
 		((OSUtilityWindows)OSUtilityFactory.getInstance()).setSystemProxy(proxy);
-		logger.info(javax.xml.bind.DatatypeConverter.printHexBinary(Advapi32Util.registryGetBinaryValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Connections", "DefaultConnectionSettings")));
+		logger.info(DatatypeConverter.printHexBinary(Advapi32Util.registryGetBinaryValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Connections", "DefaultConnectionSettings")));
 	}
 	
 	@Test(groups="no")

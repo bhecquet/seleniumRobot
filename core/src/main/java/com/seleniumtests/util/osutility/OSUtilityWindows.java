@@ -33,6 +33,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import jakarta.xml.bind.DatatypeConverter;
 import org.apache.commons.codec.binary.Hex;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.Proxy.ProxyType;
@@ -67,7 +68,6 @@ public class OSUtilityWindows extends OSUtility {
     }
 
 	/**
-     * @param fast : true gets only Image Name and pId of the process
      * @return list of ProcessInfo
      */
 	@Override
@@ -103,7 +103,7 @@ public class OSUtilityWindows extends OSUtility {
     
     /**
      * Terminate process from command line terminal.
-     * @param process
+     * @param pid
      * @param force to kill the process
      * @return
      * @throws IOException
@@ -198,7 +198,7 @@ public class OSUtilityWindows extends OSUtility {
 	
 	/**
 	 * Search for a folder with version name where msedge.exe is located (e.g: 58.0.3029.81)
-	 * @param chromePath
+	 * @param edgePath
 	 * @return
 	 */
 	public String getEdgeVersionFromFolder(String edgePath) {
@@ -233,7 +233,7 @@ public class OSUtilityWindows extends OSUtility {
 	}
 
 	/**
-	 * @param chromePath
+	 * @param edgeBetaPath
 	 * @return
 	 */
 	private String getWindowsEdgeVersion(String edgeBetaPath) {
@@ -600,7 +600,7 @@ public class OSUtilityWindows extends OSUtility {
         } catch (UnsupportedEncodingException e) {
         }
 
-        byte[] data = javax.xml.bind.DatatypeConverter.parseHexBinary(hexString);
+        byte[] data = DatatypeConverter.parseHexBinary(hexString);
         Advapi32Util.registrySetBinaryValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Connections", "DefaultConnectionSettings", data);
 //        Advapi32Util.registrySetBinaryValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Connections", "SavedLegacySettings", data);
 
