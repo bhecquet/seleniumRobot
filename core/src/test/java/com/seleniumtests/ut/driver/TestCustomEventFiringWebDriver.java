@@ -43,6 +43,7 @@ import java.util.TreeSet;
 
 import javax.imageio.ImageIO;
 
+import com.seleniumtests.customexception.WebSessionEndedException;
 import com.seleniumtests.driver.TestType;
 import io.appium.java_client.HidesKeyboard;
 import io.appium.java_client.android.AndroidDriver;
@@ -59,6 +60,7 @@ import org.openqa.selenium.WebDriver.Window;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
+import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -173,6 +175,37 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testGetSessionIdWithIncopmatibleDriver() {
 		when(driver.getSessionId()).thenThrow(ClassCastException.class);
 		Assert.assertNotEquals(eventDriver.getSessionId(), "1234");
+	}
+
+	/**
+	 * Check that if a TimeoutException is returned when getting window handles, we consider driver/browser as died
+	 */
+	@Test(groups = {"ut"})
+	public void testGetWindowHandlesInTimeout() {
+		when(driver.getWindowHandles()).thenThrow(new TimeoutException());
+		Set<String> handles = eventDriver.getWindowHandles();
+		Assert.assertTrue(handles.isEmpty());
+		Assert.assertTrue(eventDriver.isDriverExited());
+	}
+	/**
+	 * Check that if a UnreachableBrowserException is returned when getting window handles, we consider driver/browser as died
+	 */
+	@Test(groups = {"ut"})
+	public void testGetWindowHandlesBrowserUnreachable() {
+		when(driver.getWindowHandles()).thenThrow(new UnreachableBrowserException("not here"));
+		Set<String> handles = eventDriver.getWindowHandles();
+		Assert.assertTrue(handles.isEmpty());
+		Assert.assertTrue(eventDriver.isDriverExited());
+	}
+	/**
+	 * Check that if a UnreachableBrowserException is returned when getting window handles, we consider driver/browser as died
+	 */
+	@Test(groups = {"ut"})
+	public void testGetWindowHandlesWebSessionEndedException() {
+		when(driver.getWindowHandles()).thenThrow(new WebSessionEndedException());
+		Set<String> handles = eventDriver.getWindowHandles();
+		Assert.assertTrue(handles.isEmpty());
+		Assert.assertTrue(eventDriver.isDriverExited());
 	}
 
 	@Test(groups = {"ut"})
