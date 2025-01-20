@@ -23,7 +23,6 @@ import org.json.JSONObject;
 import org.testng.ITestResult;
 import org.testng.annotations.CustomAttribute;
 
-import com.seleniumtests.connectors.tms.hpalm.HpAlmConnector;
 import com.seleniumtests.connectors.tms.squash.SquashTMConnector;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.core.utils.TestNGResultUtils;
@@ -130,9 +129,7 @@ public abstract class TestManager {
 			throw new ConfigurationException("Test manager type must be provided. ex: {'tmsType': 'hp', 'run': '3'}");
 		}
 		
-		if ("hp".equals(type)) {
-			return new HpAlmConnector(configString);
-		} else if ("squash".equals(type)) {
+		if ("squash".equals(type)) {
 			return new SquashTMConnector();
 		} else {
 			throw new ConfigurationException(String.format("TestManager type [%s] is unknown, valid values are: ['hp', 'squash']", type));

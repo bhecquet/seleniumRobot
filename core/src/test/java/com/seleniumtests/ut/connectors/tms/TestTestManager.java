@@ -26,7 +26,6 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.connectors.tms.TestManager;
-import com.seleniumtests.connectors.tms.hpalm.HpAlmConnector;
 import com.seleniumtests.connectors.tms.squash.SquashTMConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.utils.TestNGResultUtils;
@@ -34,13 +33,6 @@ import com.seleniumtests.customexception.ConfigurationException;
 
 
 public class TestTestManager extends GenericTest {
-
-	@Test(groups={"ut"})
-	public void testTmsSelectionHpAlm() {
-		String config = "{'tmsType': 'hp', 'tmsRun': '3'}";
-		TestManager manager = TestManager.getInstance(new JSONObject(config));
-		Assert.assertTrue(manager instanceof HpAlmConnector);
-	}
 	
 	@Test(groups={"ut"})
 	public void testTmsSelectionSquashTm() {
