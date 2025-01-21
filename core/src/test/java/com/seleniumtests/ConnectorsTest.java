@@ -709,10 +709,10 @@ public class ConnectorsTest extends MockitoTest {
 		createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': true}");		
 		createServerMock("PATCH", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15/", 200, "{\"id\":12,\"name\":\"Test 1\",\"version\":11,\"testSteps\":[14]}");		
 		createServerMock("POST", SeleniumRobotSnapshotServerConnector.TESTSTEP_API_URL, 200, "{'id': '14'}");
-		createServerMock("GET", SeleniumRobotServerConnector.NAMED_APPLICATION_API_URL, 200, "{'id': 9}");		
-		createServerMock("GET", SeleniumRobotServerConnector.NAMED_ENVIRONMENT_API_URL, 200, "{'id': 10}");		
-		createServerMock("GET", SeleniumRobotServerConnector.NAMED_TESTCASE_API_URL, 200, "{'id': 12}");		
-		createServerMock("GET", SeleniumRobotServerConnector.NAMED_VERSION_API_URL, 200, "{'id': 11}");	
+		createServerMock("GET", SeleniumRobotServerConnector.APPLICATION_API_URL, 200, "{'id': 9}");
+		createServerMock("GET", SeleniumRobotServerConnector.ENVIRONMENT_API_URL, 200, "{'id': 10}");
+		createServerMock("GET", SeleniumRobotServerConnector.TESTCASE_API_URL, 200, "{'id': 12}");
+		createServerMock("GET", SeleniumRobotServerConnector.VERSION_API_URL, 200, "{'id': 11}");
 		
 		createServerMock("POST", SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL, 200, "{'result': 'OK'}"); // upload reference image for step
 		createServerMock("GET", SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL + "17/", 200, Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "images", "googleSearch.png").toFile()); // get reference image
@@ -745,10 +745,10 @@ public class ConnectorsTest extends MockitoTest {
 		when(unirestInstance.get(serverUrl + SeleniumRobotServerConnector.PING_API_URL)).thenReturn(getAliveRequest);
 		
 		// set default reply from server. To override this behaviour, redefine some steps in test after connector creation
-		namedApplicationRequest = (GetRequest) createServerMock(serverUrl, "GET", SeleniumRobotVariableServerConnector.NAMED_APPLICATION_API_URL, 200, "{'id': 1}");		
-		namedEnvironmentRequest = (GetRequest) createServerMock(serverUrl, "GET", SeleniumRobotVariableServerConnector.NAMED_ENVIRONMENT_API_URL, 200, "{'id': 2}");		
-		namedTestCaseRequest = (GetRequest) createServerMock(serverUrl, "GET", SeleniumRobotVariableServerConnector.NAMED_TESTCASE_API_URL, 200, "{'id': 3}");		
-		namedVersionRequest = (GetRequest) createServerMock(serverUrl, "GET", SeleniumRobotVariableServerConnector.NAMED_VERSION_API_URL, 200, "{'id': 4}");	
+		namedApplicationRequest = (GetRequest) createServerMock(serverUrl, "GET", SeleniumRobotVariableServerConnector.APPLICATION_API_URL, 200, "{'id': 1}");
+		namedEnvironmentRequest = (GetRequest) createServerMock(serverUrl, "GET", SeleniumRobotVariableServerConnector.ENVIRONMENT_API_URL, 200, "{'id': 2}");
+		namedTestCaseRequest = (GetRequest) createServerMock(serverUrl, "GET", SeleniumRobotVariableServerConnector.TESTCASE_API_URL, 200, "{'id': 3}");
+		namedVersionRequest = (GetRequest) createServerMock(serverUrl, "GET", SeleniumRobotVariableServerConnector.VERSION_API_URL, 200, "{'id': 4}");
 		createApplicationRequest = (HttpRequestWithBody) createServerMock(serverUrl, "POST", SeleniumRobotSnapshotServerConnector.APPLICATION_API_URL, 200, "{'id': '1'}");	
 		createEnvironmentRequest = (HttpRequestWithBody) createServerMock(serverUrl, "POST", SeleniumRobotSnapshotServerConnector.ENVIRONMENT_API_URL, 200, "{'id': '2'}");	
 		createVersionRequest = (HttpRequestWithBody) createServerMock(serverUrl, "POST", SeleniumRobotSnapshotServerConnector.VERSION_API_URL, 200, "{'id': '4'}");	

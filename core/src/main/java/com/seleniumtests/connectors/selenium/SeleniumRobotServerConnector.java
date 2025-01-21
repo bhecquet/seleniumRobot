@@ -41,12 +41,6 @@ public abstract class SeleniumRobotServerConnector {
 
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotServerConnector.class);
 
-	// api to get items from name
-	public static final String NAMED_VERSION_API_URL = "/commons/api/gversion/";
-	public static final String NAMED_APPLICATION_API_URL = "/commons/api/gapplication/";
-	public static final String NAMED_ENVIRONMENT_API_URL = "/commons/api/genvironment/";
-	public static final String NAMED_TESTCASE_API_URL = "/commons/api/gtestcase/";
-
 	public static final String PING_API_URL = "/variable/api/";
 	
 	public static final String VERSION_API_URL = "/commons/api/version/";
@@ -151,7 +145,7 @@ public abstract class SeleniumRobotServerConnector {
 			return applicationId;
 		}
 		try {
-			JSONObject response = getJSonResponse(buildGetRequest(url + NAMED_APPLICATION_API_URL)
+			JSONObject response = getJSonResponse(buildGetRequest(url + APPLICATION_API_URL)
 					.queryString(FIELD_NAME, SeleniumTestsContextManager.getApplicationName()));
 			applicationId = response.getInt("id");
 			return applicationId;
@@ -170,7 +164,7 @@ public abstract class SeleniumRobotServerConnector {
 			return environmentId;
 		}
 		try {
-			JSONObject response = getJSonResponse(buildGetRequest(url + NAMED_ENVIRONMENT_API_URL)
+			JSONObject response = getJSonResponse(buildGetRequest(url + ENVIRONMENT_API_URL)
 					.queryString(FIELD_NAME, SeleniumTestsContextManager.getGlobalContext().getTestEnv()));
 			environmentId = response.getInt("id");
 			return environmentId;

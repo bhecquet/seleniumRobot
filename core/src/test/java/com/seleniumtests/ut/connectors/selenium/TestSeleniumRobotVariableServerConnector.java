@@ -190,7 +190,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	public void testApplicationDoesNotExist() throws UnirestException {
 
 		configureMockedVariableServerConnection();
-		createServerMock("GET", SeleniumRobotVariableServerConnector.NAMED_APPLICATION_API_URL, 404, "");		
+		createServerMock("GET", SeleniumRobotVariableServerConnector.APPLICATION_API_URL, 404, "");
 		new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
 	}
 	
@@ -202,7 +202,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	public void testEnvironmentDoesNotExist() throws UnirestException {
 		
 		configureMockedVariableServerConnection();
-		createServerMock("GET", SeleniumRobotVariableServerConnector.NAMED_ENVIRONMENT_API_URL, 404, "");		
+		createServerMock("GET", SeleniumRobotVariableServerConnector.ENVIRONMENT_API_URL, 404, "");
 		new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
 	}
 	
