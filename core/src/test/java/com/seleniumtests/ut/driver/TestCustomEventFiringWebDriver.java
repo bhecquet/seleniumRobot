@@ -110,6 +110,9 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	
 	@Mock
 	private PointerInfo pointerInfo;
+
+	@Mock
+	private TargetLocator targetLocator;
 	
 	private CustomEventFiringWebDriver eventDriver;
 	private CustomEventFiringWebDriver attachedEventDriver;
@@ -295,8 +298,18 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testSwitchTo() {
-		eventDriver.switchTo();
+		eventDriver.switchTo().defaultContent();
 		verify(driver).switchTo();
+	}
+	@Test(groups = {"ut"})
+	public void testSwitchToTimeout() {
+		when(driver.switchTo()).thenReturn(targetLocator);
+		when(targetLocator.defaultContent()).thenThrow(new TimeoutException());
+		Assert.assertThrows(WebSessionEndedException.class, () -> {
+			TargetLocator targetLocator = eventDriver.switchTo();
+			targetLocator.defaultContent();
+		});
+		Assert.assertTrue(eventDriver.isDriverExited());
 	}
 	
 	/**
