@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import com.seleniumtests.customexception.WebSessionEndedException;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.Alert;
@@ -239,6 +240,8 @@ public class ScreenshotUtil {
     	try {
 	    	Alert alert = driver.switchTo().alert();
 			alert.dismiss();
+		} catch (WebSessionEndedException e) {
+			throw e;
     	} catch (Exception e) {
     		// nothing to do
     	}

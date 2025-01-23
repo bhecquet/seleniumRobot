@@ -689,8 +689,8 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 				handleAlert();
 				return driver.getWindowHandles();
 			} catch (TimeoutException e) {
-				setDriverExited();
 				logger.warn("Timeout getting window handles, suspicion of staled driver/browser => stop here");
+				setDriverExited();
 				return new TreeSet<>();
 			} catch (WebSessionEndedException | UnreachableBrowserException e) {
 				setDriverExited();
@@ -707,8 +707,10 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     
     private void handleAlert() {
     	try {
-	    	Alert alert = driver.switchTo().alert();
+			Alert alert = switchTo().alert();
 			alert.dismiss();
+		} catch (WebSessionEndedException e) {
+			throw e;
     	} catch (Exception e) {
     		// do nothing in case of error
     	}
@@ -896,16 +898,18 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	public int getViewPortWidthWithoutScrollbar(boolean usePixelAspectRatio) {
     	if (isWebTest()) {
     		try {
-    			
-	    		Number width = (Number)executeScript(JS_GET_VIEWPORT_SIZE_WIDTH, usePixelAspectRatio);
-	    		
-	    		// issue #238: check we get a non max size
-	    		if (width.intValue() == MAX_DIMENSION) {
-	    			driver.switchTo().defaultContent();
-	    			width = (Number)executeScript(JS_GET_VIEWPORT_SIZE_WIDTH, usePixelAspectRatio);
-	    		}
-	    		return width.intValue();
-	    		
+
+				Number width = (Number) executeScript(JS_GET_VIEWPORT_SIZE_WIDTH, usePixelAspectRatio);
+
+				// issue #238: check we get a non max size
+				if (width.intValue() == MAX_DIMENSION) {
+					switchTo().defaultContent();
+					width = (Number) executeScript(JS_GET_VIEWPORT_SIZE_WIDTH, usePixelAspectRatio);
+				}
+				return width.intValue();
+
+			} catch (WebSessionEndedException e) {
+				throw e;
     		} catch (Exception e) {
     			return driver.manage().window().getSize().getWidth();
     		}
@@ -935,11 +939,13 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 				
 				// issue #238: check we get a non max size
 				if (height.intValue() == MAX_DIMENSION) {
-					driver.switchTo().defaultContent();
+					switchTo().defaultContent();
 					height = (Number)executeScript(JS_GET_VIEWPORT_SIZE_HEIGHT, usePixelAspectRatio);
 				}
 				return height.intValue();
-				
+
+			} catch (WebSessionEndedException e) {
+				throw e;
 			} catch (Exception e) {
 				return driver.manage().window().getSize().getHeight();
 			}
@@ -992,12 +998,14 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		    	
 		    	// issue #238: check we get a non zero size
 		    	if (dims.get(0).intValue() == 0 || dims.get(1).intValue() == 0) {
-					driver.switchTo().defaultContent();
+					switchTo().defaultContent();
 		    		dims = (List<Number>)executeScript(JS_GET_CONTENT_ENTIRE_SIZE, usePixelAspectRatio);
 		    	}
 		    	
 		    	return new Dimension(dims.get(0).intValue(), dims.get(1).intValue());
-		    	
+
+			} catch (WebSessionEndedException e) {
+				throw e;
     		} catch (Exception e) {
     			return driver.manage().window().getSize();
     		}
@@ -1270,9 +1278,10 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	        Collections.reverse(handles);
 
 	        for (String handle: handles) {
-				driver.switchTo().window(handle);
+				switchTo().window(handle);
 				driver.close();
 			}
+
 		} catch (Exception e) {
 			// nothing to do
 		}
@@ -1758,7 +1767,8 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		if (isDriverExited()) {
 			throw new WebSessionEndedException("Driver could not be contacted. Skip switch to");
 		}
-		return driver.switchTo();
+
+		return new TimedoutTargetLocator(driver.switchTo(), this);
 	}
 
 	@Override
