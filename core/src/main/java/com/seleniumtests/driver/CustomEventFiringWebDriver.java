@@ -1755,6 +1755,9 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 
 	@Override
 	public TargetLocator switchTo() {
+		if (isDriverExited()) {
+			throw new WebSessionEndedException("Driver could not be contacted. Skip switch to");
+		}
 		return driver.switchTo();
 	}
 

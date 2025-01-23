@@ -30,4 +30,7 @@ public class WebSessionEndedException extends WebDriverException {
     public WebSessionEndedException(final Throwable ex) {
         super(ex);
     }
+    public WebSessionEndedException(final String message) {
+        super(message);
+    }
 }
