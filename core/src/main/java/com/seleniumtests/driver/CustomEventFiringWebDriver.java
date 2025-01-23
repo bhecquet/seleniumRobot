@@ -676,7 +676,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	@Override
     public Set<String> getWindowHandles() {
     	
-    	if (!isWebTest()) {
+    	if (!isWebTest() || isDriverExited()) {
     		return new TreeSet<>();
     	}
     	

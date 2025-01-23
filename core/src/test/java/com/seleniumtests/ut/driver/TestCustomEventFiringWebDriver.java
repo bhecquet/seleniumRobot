@@ -187,6 +187,17 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		Assert.assertTrue(handles.isEmpty());
 		Assert.assertTrue(eventDriver.isDriverExited());
 	}
+
+	/**
+	 * If driver has already exited, do not try to reach it
+	 */
+	@Test(groups = {"ut"})
+	public void testGetWindowHandlesDriverExited() {
+		eventDriver.setDriverExited();
+		Set<String> handles = eventDriver.getWindowHandles();
+		Assert.assertTrue(handles.isEmpty());
+		verify(driver, never()).getWindowHandles();
+	}
 	/**
 	 * Check that if a UnreachableBrowserException is returned when getting window handles, we consider driver/browser as died
 	 */
