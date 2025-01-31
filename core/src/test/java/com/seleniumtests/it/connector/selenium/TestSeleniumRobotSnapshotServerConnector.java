@@ -211,7 +211,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/images/ffLogoConcat.png"), image);
 		ScreenShot screenshot = new ScreenShot(image, null, "");
 		Snapshot snapshot = new Snapshot(screenshot, "img", SnapshotCheckType.TRUE);
-		SnapshotComparisonResult comparisonResult = connector.checkSnapshotHasNoDifferences(snapshot, "Test 2", "Step 1");
+		SnapshotComparisonResult comparisonResult = connector.checkSnapshotHasNoDifferences(snapshot, "Test 2", "Step 1", "BROWSER:CHROME");
 		
 		Assert.assertEquals(comparisonResult, SnapshotComparisonResult.OK);
 	}

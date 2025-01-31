@@ -102,7 +102,8 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			// check server has been called for all aspects of test (app, version, ...)
 			// they may be called for each test but server is responsible for uniqueness of the value
 			verify(serverConnector).createSession(anyString(), eq("BROWSER:NONE"), eq("http://mylauncher/test"), any(LocalDateTime.class));
-			
+			verify(serverConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString(), anyString()); // with snapshot behaviour set to "display_only", this method should not be called
+
 			// issue #331: check all test cases are created, call MUST be done only once to avoid result to be recorded several times
 			verify(serverConnector).createTestCase("testAndSubActions");
 			verify(serverConnector).createTestCase("testInError");
@@ -118,7 +119,6 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector).createTestStep(eq("step 2"), anyInt());
 			verify(serverConnector, times(5)).createTestStep(eq("No previous execution results, you can enable it via parameter '-DkeepAllResults=true'"), anyInt());
 			verify(serverConnector).createSnapshot(any(Snapshot.class), anyInt(), eq(new ArrayList<>())); // two snapshots but only once is sent because the other has no name
-			verify(serverConnector, never()).createExcludeZones(any(Rectangle.class), anyInt());
 			
 			String logs = readSeleniumRobotLogFile();
 			Assert.assertTrue(logs.contains("Snapshot hasn't any name, it won't be sent to server")); // one snapshot has no name, error message is displayed
@@ -137,6 +137,8 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector).uploadLogs(eq(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithException", "execution.log").toFile()), eq(0));
 			verify(serverConnector).uploadLogs(eq(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "execution.log").toFile()), eq(0));
 
+			verify(serverConnector, times(5)).getTestCaseInSessionComparisonResult(anyInt(), any(StringBuilder.class)); // called once per test
+
 			// check test infos has been sent
 			ArgumentCaptor<Map<String, Info>> infosArgument = ArgumentCaptor.forClass(Map.class);
 			verify(serverConnector, times(5)).recordTestInfo(infosArgument.capture(), eq(0));
@@ -150,6 +152,121 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
 			System.clearProperty(SeleniumTestsContext.STARTED_BY);
+		}
+	}
+
+	/**
+	 * Check all calls are done when using a real driver
+	 * Use the behaviour "changeTestResult" as more calls are done
+	 * #677: check calls on snapshot comparison are homogeneous with browser information
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportGenerationWithChangeTestResult() throws Exception {
+
+		try (MockedConstruction mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+			when(variableServer.isAlive()).thenReturn(true);
+		});
+			 MockedStatic mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
+			 MockedStatic mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+		) {
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, "changeTestResult");
+			System.setProperty(SeleniumTestsContext.BROWSER, "chrome");
+			System.setProperty(SeleniumTestsContext.STARTED_BY, "http://mylauncher/test");
+
+			initMocks(mockedCommonReporter, mockedServerConnector);
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverCustomSnapshot"});
+
+			// check browser has the same valeurs for all calls
+			verify(serverConnector).createSession(anyString(), eq("BROWSER:CHROME"), eq("http://mylauncher/test"), any(LocalDateTime.class));
+			// one snapshot is compared with reference during test run to check if test must be replayed
+			verify(serverConnector).checkSnapshotHasNoDifferences(any(Snapshot.class), eq("testDriverCustomSnapshot"), eq("_captureSnapshot with args: (my snapshot, )"), eq("BROWSER:CHROME"));
+
+			// issue #331: check all test cases are created, call MUST be done only once to avoid result to be recorded several times
+			verify(serverConnector).createTestCase("testDriverCustomSnapshot");
+			verify(serverConnector, times(1)).addLogsToTestCaseInSession(anyInt(), anyString());
+			ArgumentCaptor<List<Rectangle>> rectangleArgument = ArgumentCaptor.forClass(List.class);
+			verify(serverConnector).createSnapshot(any(Snapshot.class), anyInt(), rectangleArgument.capture()); // 1 snapshot sent for comparison
+			List<Rectangle> rectangles = rectangleArgument.getValue();
+			Assert.assertEquals(rectangles.size(), 1); // 1 exclude zone sent with snapshot
+
+			// verify that the final check for comparison result is done
+			verify(serverConnector).getTestCaseInSessionComparisonResult(eq(0), any(StringBuilder.class));
+
+			String logs = readSeleniumRobotLogFile();
+			Assert.assertTrue(logs.contains("Snapshots has been recorded with TestCaseSessionId: 0")); // one snapshot has no name, error message is displayed
+
+			verify(serverConnector, times(10)).recordStepResult(any(TestStep.class), anyInt(), anyInt()); // all steps are recorded
+
+		} finally {
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR);
+			System.clearProperty(SeleniumTestsContext.STARTED_BY);
+			System.clearProperty(SeleniumTestsContext.BROWSER);
+		}
+	}
+
+	/**
+	 * Check all calls are done when using a real driver
+	 * Use the behaviour "addTestResult" as more calls are done
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportGenerationWithAddTestResult() throws Exception {
+
+		try (MockedConstruction mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+			when(variableServer.isAlive()).thenReturn(true);
+		});
+			 MockedStatic mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
+			 MockedStatic mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+		) {
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, "addTestResult");
+			System.setProperty(SeleniumTestsContext.BROWSER, "chrome");
+			System.setProperty(SeleniumTestsContext.STARTED_BY, "http://mylauncher/test");
+
+			initMocks(mockedCommonReporter, mockedServerConnector);
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverCustomSnapshot"});
+
+			// check browser has the same valeurs for all calls
+			verify(serverConnector).createSession(anyString(), eq("BROWSER:CHROME"), eq("http://mylauncher/test"), any(LocalDateTime.class));
+			// one snapshot is compared with reference during test run to check if test must be replayed
+			verify(serverConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), eq("testDriverCustomSnapshot"), eq("_captureSnapshot with args: (my snapshot, )"), eq("BROWSER:CHROME"));
+
+			// issue #331: check all test cases are created, call MUST be done only once to avoid result to be recorded several times
+			verify(serverConnector).createTestCase("testDriverCustomSnapshot");
+			verify(serverConnector, times(1)).addLogsToTestCaseInSession(anyInt(), anyString());
+			ArgumentCaptor<List<Rectangle>> rectangleArgument = ArgumentCaptor.forClass(List.class);
+			verify(serverConnector).createSnapshot(any(Snapshot.class), anyInt(), rectangleArgument.capture()); // 1 snapshot sent for comparison
+			List<Rectangle> rectangles = rectangleArgument.getValue();
+			Assert.assertEquals(rectangles.size(), 1); // 1 exclude zone sent with snapshot
+
+			// verify that the final check for comparison result is done
+			verify(serverConnector).getTestCaseInSessionComparisonResult(eq(0), any(StringBuilder.class));
+
+			String logs = readSeleniumRobotLogFile();
+			Assert.assertTrue(logs.contains("Snapshots has been recorded with TestCaseSessionId: 0")); // one snapshot has no name, error message is displayed
+
+			verify(serverConnector, times(10)).recordStepResult(any(TestStep.class), anyInt(), anyInt()); // all steps are recorded
+
+		} finally {
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR);
+			System.clearProperty(SeleniumTestsContext.STARTED_BY);
+			System.clearProperty(SeleniumTestsContext.BROWSER);
 		}
 	}
 
@@ -452,7 +569,6 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector, times(6)).uploadFile(fileCapture.capture(), eq(0));
 			Assert.assertEquals(fileCapture.getAllValues().stream().filter(f -> f.getName().contains("my_snapshot")).count(), 2);
 			verify(serverConnector, never()).createSnapshot(any(Snapshot.class), anyInt(), eq(new ArrayList<>())); // 1 custom snapshot taken with name
-			verify(serverConnector, never()).createExcludeZones(any(Rectangle.class), anyInt()); // one exclude zone created with that snapshot
 			
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);

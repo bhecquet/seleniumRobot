@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.seleniumtests.driver.BrowserType;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
 import org.apache.velocity.app.VelocityEngine;
@@ -267,5 +268,17 @@ public abstract class CommonReporter implements IReporter {
 		} else {
 			return "noclass";
 		}
+	}
+	public static String getBrowserOrApp() {
+		String browserOrApp;
+		if (SeleniumTestsContextManager.isAppTest()) {
+			String appPath = SeleniumTestsContextManager.getGlobalContext().getApp() == null ? "noApp": SeleniumTestsContextManager.getGlobalContext().getApp();
+			browserOrApp = "APP:" + new File(appPath).getName();
+		} else {
+			BrowserType browser = SeleniumTestsContextManager.getGlobalContext().getBrowser();
+			browser = browser == null ? BrowserType.NONE : browser;
+			browserOrApp = "BROWSER:" + browser;
+		}
+		return browserOrApp;
 	}
 }

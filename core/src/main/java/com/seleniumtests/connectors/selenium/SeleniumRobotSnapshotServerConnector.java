@@ -29,6 +29,7 @@ import com.seleniumtests.reporter.info.FileLinkInfo;
 import com.seleniumtests.reporter.info.Info;
 import com.seleniumtests.reporter.logger.FileContent;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.reporter.reporters.CommonReporter;
 import org.openqa.selenium.Rectangle;
 import org.testng.ITestResult;
 
@@ -116,6 +117,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		return isAlive("/snapshot/");
 	}
 
+	// only used for tests
 	public Integer createSession(String sessionName) {
 		BrowserType browser = SeleniumTestsContextManager.getGlobalContext().getBrowser();
 		browser = browser == null ? BrowserType.NONE : browser;
@@ -319,7 +321,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	 * - computing error occurred
 	 * - server side error ( e.g: if the server is not up to date)
 	 */
-	public SnapshotComparisonResult checkSnapshotHasNoDifferences(Snapshot snapshot, String testName, String stepName) {
+	public SnapshotComparisonResult checkSnapshotHasNoDifferences(Snapshot snapshot, String testName, String stepName, String browserOrApp) {
 		
 		if (!active) {
 			return SnapshotComparisonResult.NOT_DONE;
@@ -338,8 +340,6 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		
 		try {
 			File pictureFile = snapshot.getScreenshot().getImage().getFile();
-			BrowserType browser = SeleniumTestsContextManager.getGlobalContext().getBrowser();
-			browser = browser == null ? BrowserType.NONE : browser;
 			String strippedTestName = getTestName(testName);
 			String strippedStepName = getTestStepName(stepName);
 			
@@ -351,7 +351,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field("diffTolerance", String.valueOf(snapshot.getCheckSnapshot().getErrorThreshold()))
 					.field("versionId", versionId.toString())
 					.field("environmentId", environmentId.toString())
-					.field("browser", browser.getBrowserType())
+					.field("browser", browserOrApp)
 					.field("testCaseName", strippedTestName)
 					.field("stepName", strippedStepName);
 			
@@ -431,32 +431,6 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 			throw new SeleniumRobotServerException("cannot create test snapshot", e);
-		}
-	}
-	
-	/**
-	 * Send exclude zones, stored in snapshot to the server
-	 */
-	public Integer createExcludeZones(Rectangle excludeZone, Integer snapshotId) {
-		if (!active) {
-			return null;
-		}
-		if (snapshotId == null) {
-			throw new ConfigurationException("snapshotId must be provided");
-		}
-
-		try {
-			JSONObject excludeJson = getJSonResponse(buildPostRequest(url + EXCLUDE_API_URL)
-					.field("snapshot", snapshotId)
-					.field("x", String.valueOf(excludeZone.x))
-					.field("y", String.valueOf(excludeZone.y))
-					.field("width", String.valueOf(excludeZone.width))
-					.field("height", String.valueOf(excludeZone.height))
-					);
-			return excludeJson.getInt("id");
-			
-		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
-			throw new SeleniumRobotServerException("cannot create exclude zone", e);
 		}
 	}
 

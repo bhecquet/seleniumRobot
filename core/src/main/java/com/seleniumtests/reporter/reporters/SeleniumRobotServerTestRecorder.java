@@ -138,16 +138,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 		SeleniumRobotSnapshotServerConnector serverConnector = getServerConnector();
 		if (sessionId == null) {
 
-			String browserOrApp;
-			if (SeleniumTestsContextManager.isAppTest()) {
-				String appPath = SeleniumTestsContextManager.getGlobalContext().getApp() == null ? "noApp": SeleniumTestsContextManager.getGlobalContext().getApp();
-				browserOrApp = "APP:" + new File(appPath).getName();
-			} else {
-				BrowserType browser = SeleniumTestsContextManager.getGlobalContext().getBrowser();
-				browser = browser == null ? BrowserType.NONE : browser;
-				browserOrApp = "BROWSER:" + browser;
-			}
-
+			String browserOrApp = CommonReporter.getBrowserOrApp();
 			Integer sessionId = serverConnector.createSession(String.format("%s suite", SeleniumTestsContextManager.getApplicationName()),
 					browserOrApp,
 					SeleniumTestsContextManager.getThreadContext().getStartedBy(),

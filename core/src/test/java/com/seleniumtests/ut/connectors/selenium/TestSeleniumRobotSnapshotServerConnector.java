@@ -744,7 +744,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		
 		createServerMock("PUT", SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL, 200, "{'id': '16'}");
 		
-		SnapshotComparisonResult snapshotHasNoDifference = connector.checkSnapshotHasNoDifferences(snapshot, "Test 1", "Step 1");
+		SnapshotComparisonResult snapshotHasNoDifference = connector.checkSnapshotHasNoDifferences(snapshot, "Test 1", "Step 1", "BROWSER:CHROME");
 		
 		// In case API is not up to date, checkSnapshotHasNoDifferences returns 'NOT_DONE'
 		Assert.assertEquals(snapshotHasNoDifference, SnapshotComparisonResult.NOT_DONE);
@@ -757,7 +757,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		
 		connector.setVersionId(11); // set it directly has it has been reset on creation
 
-		SnapshotComparisonResult snapshotHasNoDifference = connector.checkSnapshotHasNoDifferences(snapshot, "Test 1", "Step 1");
+		SnapshotComparisonResult snapshotHasNoDifference = connector.checkSnapshotHasNoDifferences(snapshot, "Test 1", "Step 1", "BROWSER:CHROME");
 
 		// When no difference is found, return true
 		Assert.assertEquals(snapshotHasNoDifference, SnapshotComparisonResult.OK);
@@ -776,7 +776,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		snapshotCheckType.check(SnapshotTarget.PAGE, 1.0);
 		when(snapshot.getCheckSnapshot()).thenReturn(snapshotCheckType);
 		
-		SnapshotComparisonResult snapshotHasNoDifference = connector.checkSnapshotHasNoDifferences(snapshot, "Test 1", "Step 1");
+		SnapshotComparisonResult snapshotHasNoDifference = connector.checkSnapshotHasNoDifferences(snapshot, "Test 1", "Step 1", "BROWSER:CHROME");
 		
 		// When no difference is found, return true
 		Assert.assertEquals(snapshotHasNoDifference, SnapshotComparisonResult.OK);
@@ -792,7 +792,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		
 		createServerMock("PUT", SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL, 200, "{'id': null, 'computed': true, 'computingError': '', 'diffPixelPercentage': 10.0, 'tooManyDiffs': true}");
 		
-		SnapshotComparisonResult snapshotHasNoDifference = connector.checkSnapshotHasNoDifferences(snapshot, "Test 1", "Step 1");
+		SnapshotComparisonResult snapshotHasNoDifference = connector.checkSnapshotHasNoDifferences(snapshot, "Test 1", "Step 1", "BROWSER:CHROME");
 		
 		// When there are differences, return false
 		Assert.assertEquals(snapshotHasNoDifference, SnapshotComparisonResult.KO);
@@ -804,7 +804,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		connector.setVersionId(11); // set it directly has it has been reset on creation
 		createServerMock("PUT", SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL, 200, "{'id': null, 'computed': true, 'computingError': 'Error computing', 'diffPixelPercentage': 0.0, 'tooManyDiffs': false}");
 
-		SnapshotComparisonResult snapshotHasNoDifference = connector.checkSnapshotHasNoDifferences(snapshot, "Test 1", "Step 1");
+		SnapshotComparisonResult snapshotHasNoDifference = connector.checkSnapshotHasNoDifferences(snapshot, "Test 1", "Step 1", "BROWSER:CHROME");
 		
 		// In case of computing errors, it may be due to server problem, so do not retry
 		Assert.assertEquals(snapshotHasNoDifference, SnapshotComparisonResult.NOT_DONE);
@@ -814,62 +814,10 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	public void testCheckSnapshotHasNoDifferencesServerInactive() throws UnirestException {
 		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
 		
-		SnapshotComparisonResult snapshotHasNoDifference = connector.checkSnapshotHasNoDifferences(snapshot, "Test 1", "Step 1");
+		SnapshotComparisonResult snapshotHasNoDifference = connector.checkSnapshotHasNoDifferences(snapshot, "Test 1", "Step 1", "BROWSER:CHROME");
 		
 		// When server is not there, no error should be raised for this check
 		Assert.assertEquals(snapshotHasNoDifference, SnapshotComparisonResult.NOT_DONE);
-	}
-	
-	
-	@Test(groups= {"ut"})
-	public void testCreateExcludeZone() throws UnirestException {
-		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
-		
-		Integer sessionId = connector.createSession("Session1");
-		Integer testCaseId = connector.createTestCase("Test 1");
-		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", "a test description", LocalDateTime.now());
-		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, "", 1, testCaseInSessionId, testStepId);
-		Integer snapshotId = connector.createSnapshot(snapshot, stepResultId, null);
-		int excludeZoneId = connector.createExcludeZones(new Rectangle(1, 1, 1, 1), snapshotId);
-		
-		// check prerequisites has been created
-		Assert.assertEquals(excludeZoneId, 18);
-	}
-	
-	
-	@Test(groups= {"ut"}, expectedExceptions=SeleniumRobotServerException.class)
-	public void testCreateExcludeZoneInError() throws UnirestException {
-		
-		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
-		HttpRequest<?> req = createServerMock("POST", SeleniumRobotSnapshotServerConnector.EXCLUDE_API_URL, 200, "{'id': '18'}", "body");	
-		when(req.asString()).thenThrow(UnirestException.class);
-		
-		Integer sessionId = connector.createSession("Session1");
-		Integer testCaseId = connector.createTestCase("Test 1");
-		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", "a test description", LocalDateTime.now());
-		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, "", 1, testCaseInSessionId, testStepId);
-		Integer snapshotId = connector.createSnapshot(snapshot, stepResultId, null);
-		connector.createExcludeZones(new Rectangle(1, 1, 1, 1), snapshotId);
-	}
-	
-	@Test(groups= {"ut"}, expectedExceptions=ConfigurationException.class)
-	public void testCreateExcludeZoneNoSnapshotId() throws UnirestException {
-		
-		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
-
-		connector.createExcludeZones(new Rectangle(1, 1, 1, 1), null);
-	}
-	
-	@Test(groups= {"ut"})
-	public void testCreateExcludeZoneServerInactive() throws UnirestException {
-		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
-		
-		Integer excludeZoneId = connector.createExcludeZones(new Rectangle(1, 1, 1, 1), 0);
-		mockedUnirest.get().verify(() -> Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL)), never());
-		
-		Assert.assertNull(excludeZoneId);
 	}
 
 	@Test(groups = {"ut"})

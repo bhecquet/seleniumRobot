@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.seleniumtests.driver.TestType;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.openqa.selenium.WebDriverException;
@@ -476,17 +477,41 @@ public class TestTestNGResultUtil extends MockitoTest {
 	/**
 	 * Check that test result is set to KO if comparison fails
 	 * Comparison behaviour is set to "changeTestResult"
+	 * Check browser information is sent correctly
 	 * @throws IOException
 	 */
 	@Test(groups={"ut"})
 	public void testChangeTestResultWithSnapshotComparison() throws IOException {
+
+		SeleniumTestsContextManager.getGlobalContext().setBrowser("chrome");
 		testChangeTestResultWithSnapshot("main", SnapshotCheckType.FULL, SnapshotComparisonResult.KO);
-		
 
 		// check that test result has been changed
 		verify(testResult).setStatus(ITestResult.FAILURE);
 		verify(passedTests).removeResult(testResult);
 		verify(failedTests).addResult(testResult);
+
+		verify(snapshotServerConnector).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString(), eq("BROWSER:CHROME"));
+	}
+
+	/**
+	 * Check in case of application test, only the "APP" is sent so that comparison can be done between successive minor versions of application
+	 * covers the case were a test application is published every day with a different name, but they represent the same business version
+	 * @throws IOException
+	 */
+	@Test(groups={"ut"})
+	public void testChangeTestResultWithSnapshotComparisonWithApp() throws IOException {
+
+		SeleniumTestsContextManager.getThreadContext().setApp("http://company/myapp.apk");
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_ANDROID);
+		testChangeTestResultWithSnapshot("main", SnapshotCheckType.FULL, SnapshotComparisonResult.KO);
+
+		// check that test result has been changed
+		verify(testResult).setStatus(ITestResult.FAILURE);
+		verify(passedTests).removeResult(testResult);
+		verify(failedTests).addResult(testResult);
+
+		verify(snapshotServerConnector).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString(), eq("APP"));
 	}
 	
 	/**
@@ -502,8 +527,9 @@ public class TestTestNGResultUtil extends MockitoTest {
 		verify(testResult, never()).setStatus(ITestResult.FAILURE);
 		verify(passedTests, never()).removeResult(testResult);
 		verify(failedTests, never()).addResult(testResult);
-		verify(snapshotServerConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString());
+		verify(snapshotServerConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString(), anyString());
 	}
+
 	@Test(groups={"ut"})
 	public void testChangeTestResultWithSnapshotComparisonNullName() throws IOException {
 		testChangeTestResultWithSnapshot(null, SnapshotCheckType.FULL, SnapshotComparisonResult.KO);
@@ -513,7 +539,7 @@ public class TestTestNGResultUtil extends MockitoTest {
 		verify(testResult, never()).setStatus(ITestResult.FAILURE);
 		verify(passedTests, never()).removeResult(testResult);
 		verify(failedTests, never()).addResult(testResult);
-		verify(snapshotServerConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString());
+		verify(snapshotServerConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString(), anyString());
 	}
 	
 	/**
@@ -529,7 +555,7 @@ public class TestTestNGResultUtil extends MockitoTest {
 		verify(testResult, never()).setStatus(ITestResult.FAILURE);
 		verify(passedTests, never()).removeResult(testResult);
 		verify(failedTests, never()).addResult(testResult);
-		verify(snapshotServerConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString());
+		verify(snapshotServerConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString(), anyString());
 	}
 	
 	private void testChangeTestResultWithSnapshot(String snapshotName, SnapshotCheckType snapshotCheckType, SnapshotComparisonResult comparisonResult) throws IOException {
@@ -540,7 +566,6 @@ public class TestTestNGResultUtil extends MockitoTest {
 		
 		ScreenShot screenshot = new ScreenShot(tmpImg, tmpHtml);
 		step1.addSnapshot(new Snapshot(screenshot, snapshotName, snapshotCheckType), 1, null);
-		
 
 		SeleniumTestsContext context = SeleniumTestsContextManager.getThreadContext();
 		TestStepManager.logTestStep(step1);
@@ -557,11 +582,10 @@ public class TestTestNGResultUtil extends MockitoTest {
 		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerCompareSnapshotBehaviour("changeTestResult");
 		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerActive(true);
 		SeleniumTestsContextManager.getGlobalContext().seleniumServer().setSeleniumRobotServerCompareSnapshot(true);
-		
 
 		try (MockedStatic mockedSnapshotServer = mockStatic(SeleniumRobotSnapshotServerConnector.class)) {
 			mockedSnapshotServer.when(() -> SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(snapshotServerConnector);
-			when(snapshotServerConnector.checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString())).thenReturn(comparisonResult);
+			when(snapshotServerConnector.checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString(), anyString())).thenReturn(comparisonResult);
 
 			TestNGResultUtils.changeTestResultWithSnapshotComparison(testResult);
 		}
@@ -579,7 +603,7 @@ public class TestTestNGResultUtil extends MockitoTest {
 			mockedSnapshotServer.when(() -> SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(snapshotServerConnector);
 
 			TestNGResultUtils.changeTestResultWithSnapshotComparison(testResult);
-			verify(snapshotServerConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString());
+			verify(snapshotServerConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString(), anyString());
 		}
 	}
 	
@@ -595,7 +619,7 @@ public class TestTestNGResultUtil extends MockitoTest {
 		try (MockedStatic mockedSnapshotServer = mockStatic(SeleniumRobotSnapshotServerConnector.class)) {
 			mockedSnapshotServer.when(() -> SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(snapshotServerConnector);
 			TestNGResultUtils.changeTestResultWithSnapshotComparison(testResult);
-			verify(snapshotServerConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString());
+			verify(snapshotServerConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString(), anyString());
 		}
 	}
 	
@@ -614,7 +638,7 @@ public class TestTestNGResultUtil extends MockitoTest {
 		try (MockedStatic mockedSnapshotServer = mockStatic(SeleniumRobotSnapshotServerConnector.class)) {
 			mockedSnapshotServer.when(() -> SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(snapshotServerConnector);
 			TestNGResultUtils.changeTestResultWithSnapshotComparison(testResult);
-			verify(snapshotServerConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString());
+			verify(snapshotServerConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString(), anyString());
 		}
 	}
 	
@@ -632,7 +656,7 @@ public class TestTestNGResultUtil extends MockitoTest {
 		try (MockedStatic mockedSnapshotServer = mockStatic(SeleniumRobotSnapshotServerConnector.class)) {
 			mockedSnapshotServer.when(() -> SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(snapshotServerConnector);
 			TestNGResultUtils.changeTestResultWithSnapshotComparison(testResult);
-			verify(snapshotServerConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString());
+			verify(snapshotServerConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString(), anyString());
 		}
 	}
 
@@ -650,7 +674,7 @@ public class TestTestNGResultUtil extends MockitoTest {
 		try (MockedStatic mockedSnapshotServer = mockStatic(SeleniumRobotSnapshotServerConnector.class)) {
 			mockedSnapshotServer.when(() -> SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(snapshotServerConnector);
 			TestNGResultUtils.changeTestResultWithSnapshotComparison(testResult);
-			verify(snapshotServerConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString());
+			verify(snapshotServerConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString(), anyString());
 		}
 	}
 	
