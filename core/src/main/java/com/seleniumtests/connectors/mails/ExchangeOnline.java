@@ -107,7 +107,7 @@ public class ExchangeOnline extends EmailClientImpl {
      */
     public List<Email> readMail(String searchFolder, String searchWhen, String searchValue, boolean isRead) throws Exception {
         final GraphServiceClient graphClient = new GraphServiceClient(ap);
-        String searchFolderId = graphClient.me().mailFolders().get(folderReqConfig -> folderReqConfig.queryParameters.filter = String.format("displayName eq '%s'", searchFolder)).getValue().getFirst().getId();
+        String searchFolderId = graphClient.me().mailFolders().get(folderReqConfig -> folderReqConfig.queryParameters.filter = String.format("displayName eq '%s'", searchFolder)).getValue().get(0).getId();
 
         if (searchFolderId == null) {
             return new ArrayList<>();
@@ -148,7 +148,7 @@ public class ExchangeOnline extends EmailClientImpl {
         Message message;
         List<String> attachments = new ArrayList<>();
         if (folderByName == null) {
-            message = graphClient.me().mailFolders().byMailFolderId("inbox").messages().get().getValue().getFirst();
+            message = graphClient.me().mailFolders().byMailFolderId("inbox").messages().get().getValue().get(0);
 
         } else {
             message = folderByName.getValue().get(0).getMessages().get(0);
