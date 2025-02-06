@@ -1173,7 +1173,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	}
 	
 	private void scrollWindowToElement(WebElement element, int yOffset) {
-		((JavascriptExecutor) driver).executeScript("window.top.scroll(" + Math.max(element.getLocation().x - 200, 0) + "," + Math.max(element.getLocation().y + yOffset, 0) + ")");
+		scrollTo(Math.max(element.getLocation().x - 200, 0), Math.max(element.getLocation().y + yOffset, 0));
 	}
 	
 	/**
