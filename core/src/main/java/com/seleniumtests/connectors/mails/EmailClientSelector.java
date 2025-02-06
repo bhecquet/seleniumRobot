@@ -58,7 +58,13 @@ public class EmailClientSelector {
 				return new Exchange2010Client(server.getUrl(), loginEmailAccount, passwordEmailAccount, emailAddress, server.getDomain(), "Inbox", 0);
 			} catch (Exception e) {
 				logger.error("Cannot connect to exchange via web service: " + e.getMessage());
-			} 
+			}
+		} else if (server.getType() == EmailServerTypes.EXCHANGE_ONLINE) {
+			try {
+				return new ExchangeOnline(server.getUrl(), loginEmailAccount, passwordEmailAccount, emailAddress);
+			} catch (Exception e) {
+				logger.error("Cannot connect to exchange via web service: " + e.getMessage());
+			}
 		} else if (server.getType() == EmailServerTypes.GMAIL) {
 				try {
 					return new GMailClient(server.getUrl(), loginEmailAccount, passwordEmailAccount, INBOX);

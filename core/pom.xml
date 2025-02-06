@@ -23,6 +23,7 @@
 	    <sonar.projectKey>bhecquet_seleniumRobot-core</sonar.projectKey>
 		<surefireArgLine />
 		<failsafeArgLine />
+		<microsoft.kiota.version>1.1.13</microsoft.kiota.version>
 	</properties>
 
 	<repositories> 
@@ -182,6 +183,61 @@
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>
 			<version>1.18.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.microsoft.azure</groupId>
+			<artifactId>msal4j</artifactId>
+			<version>1.16.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.microsoft.graph</groupId>
+			<artifactId>microsoft-graph</artifactId>
+			<version>6.13.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.microsoft.graph</groupId>
+			<artifactId>microsoft-graph-core</artifactId>
+			<version>3.1.13</version>
+		</dependency>
+		<dependency>
+			<groupId>com.azure</groupId>
+			<artifactId>azure-identity</artifactId>
+			<version>1.13.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.microsoft.kiota</groupId>
+			<artifactId>microsoft-kiota-abstractions</artifactId>
+			<version>${microsoft.kiota.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.microsoft.kiota</groupId>
+			<artifactId>microsoft-kiota-authentication-azure</artifactId>
+			<version>${microsoft.kiota.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.microsoft.kiota</groupId>
+			<artifactId>microsoft-kiota-http-okHttp</artifactId>
+			<version>${microsoft.kiota.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.microsoft.kiota</groupId>
+			<artifactId>microsoft-kiota-serialization-json</artifactId>
+			<version>${microsoft.kiota.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.microsoft.kiota</groupId>
+			<artifactId>microsoft-kiota-serialization-text</artifactId>
+			<version>${microsoft.kiota.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.microsoft.kiota</groupId>
+			<artifactId>microsoft-kiota-serialization-form</artifactId>
+			<version>${microsoft.kiota.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.microsoft.kiota</groupId>
+			<artifactId>microsoft-kiota-serialization-multipart</artifactId>
+			<version>${microsoft.kiota.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.oracle.database.jdbc</groupId>

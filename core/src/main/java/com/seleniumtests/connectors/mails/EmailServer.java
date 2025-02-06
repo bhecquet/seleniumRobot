@@ -29,7 +29,7 @@ public class EmailServer {
 	private String domain;
 	
 	public enum EmailServerTypes {
-		EXCHANGE, EXCHANGE_EWS, IMAP, GMAIL
+		EXCHANGE, EXCHANGE_EWS, IMAP, GMAIL, EXCHANGE_ONLINE
 	}
 	
 	public EmailServer(String url, EmailServerTypes type, String domain) {
