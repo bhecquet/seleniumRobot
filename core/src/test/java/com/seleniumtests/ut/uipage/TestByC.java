@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.Assert;
@@ -205,35 +206,42 @@ public class TestByC extends MockitoTest {
     // ByText
     @Test(groups = {"ut"})
     public void testXPathByTextQuote() {
-        ByC.ByText byText = new ByC.ByText("'text", "label", true);
+        ByC.ByText byText = new ByC.ByText("'text", "label", true, false);
         String stringPath = byText.getEffectiveXPath();
         assertEquals(stringPath, ".//label[contains(text(),concat('',\"'\",'text'))]");
     }
 
     @Test(groups = {"ut"})
     public void testXPathByText() {
-        ByC.ByText byText = new ByC.ByText("scyphozoa", "td", false);
+        ByC.ByText byText = new ByC.ByText("scyphozoa", "td", false, false);
         String stringPath = byText.getEffectiveXPath();
         assertEquals(stringPath, ".//td[text() = 'scyphozoa']");
     }
 
     @Test(groups = {"ut"})
     public void testXPathByTextPartialTrue() {
-        ByC.ByText byText = new ByC.ByText("scyphozoa", "td", true);
+        ByC.ByText byText = new ByC.ByText("scyphozoa", "td", true, false);
         String stringPath = byText.getEffectiveXPath();
         assertEquals(stringPath, ".//td[contains(text(),'scyphozoa')]");
     }
 
     @Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)
     public void testXPathByTextNull() {
-        ByC.ByText byText = new ByC.ByText(null, "td", false);
+        ByC.ByText byText = new ByC.ByText(null, "td", false, false);
         byText.getEffectiveXPath();
     }
 
     @Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)
     public void testXPathByTextTagNameNull() {
-        ByC.ByText byText = new ByC.ByText("scyphozoa", null, false);
+        ByC.ByText byText = new ByC.ByText("scyphozoa", null, false, false);
         byText.getEffectiveXPath();
+    }
+
+    @Test(groups = {"ut"})
+    public void testXPathByTextInsideChild() {
+        ByC.ByText byText = new ByC.ByText("scyphozoa", "td", false, true);
+        String stringPath = byText.getEffectiveXPath();
+        assertEquals(stringPath, ".//td[* and .//*[text() = 'scyphozoa']]");
     }
 
     // ByxClassName
@@ -521,35 +529,51 @@ public class TestByC extends MockitoTest {
     // ByText
     @Test(groups = {"ut"})
     public void testFindElementByText() {
-        ByC.ByText byText = spy(new ByC.ByText("Pelagia", "li", true));
+        ByC.ByText byText = spy(new ByC.ByText("Pelagia", "li", true, false));
         byText.findElement(driver);
         verify(driver).findElement(By.xpath(".//li[contains(text(),'Pelagia')]"));
     }
 
     @Test(groups = {"ut"})
     public void testFindElementsByText() {
-        ByC.ByText byText = spy(new ByC.ByText("Aequorea","ol",true));
+        ByC.ByText byText = spy(new ByC.ByText("Aequorea","ol",true, false));
         byText.findElements(driver);
         verify(driver).findElements(By.xpath(".//ol[contains(text(),'Aequorea')]"));
     }
     
     @Test(groups = {"ut"})
     public void testFindElementsByTextPartialFalse() {
-        ByC.ByText byText = spy(new ByC.ByText("Aequorea", "ol", false));
+        ByC.ByText byText = spy(new ByC.ByText("Aequorea", "ol", false, false));
         byText.findElements(driver);
         verify(driver).findElements(By.xpath(".//ol[text() = 'Aequorea']"));
     }
     
     @Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)
     public void testFindElementByTextNull() {
-        ByC.ByText byText = spy(new ByC.ByText(null, "li", true));
+        ByC.ByText byText = spy(new ByC.ByText(null, "li", true, false));
         byText.findElement(driver);
     }
 
     @Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)
     public void testFindElementByTextTagNameNull() {
-        ByC.ByText byText = spy(new ByC.ByText("Aequorea", null, true));
+        ByC.ByText byText = spy(new ByC.ByText("Aequorea", null, true, false));
         byText.findElement(driver);
+    }
+
+    @Test(groups = {"ut"})
+    public void testFindElementByTextInsideChild() {
+        ByC.ByText byText = spy(new ByC.ByText("Aequorea","ol",false, true));
+        when(driver.findElements(By.xpath(".//ol[* and .//*[text() = 'Aequorea']]"))).thenReturn(List.of(element1, element2));
+        WebElement el = byText.findElement(driver);
+        verify(driver).findElements(By.xpath(".//ol[* and .//*[text() = 'Aequorea']]"));
+        Assert.assertEquals(el, element2);
+    }
+    @Test(groups = {"ut"}, expectedExceptions = NoSuchElementException.class)
+    public void testFindElementByTextInsideChildNoElement() {
+        ByC.ByText byText = spy(new ByC.ByText("Aequorea","ol",false, true));
+        when(driver.findElements(By.xpath(".//ol[* and .//*[text() = 'Aequorea']]"))).thenReturn(new ArrayList<>());
+        WebElement el = byText.findElement(driver);
+        verify(driver).findElements(By.xpath(".//ol[* and .//*[text() = 'Aequorea']]"));
     }
 
     // ByXClassName

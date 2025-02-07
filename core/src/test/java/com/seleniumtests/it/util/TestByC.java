@@ -48,6 +48,7 @@ public class TestByC extends GenericTest {
 	
 	@BeforeClass(groups={"it"})
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
+		System.setProperty("applicationName", "core");
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*chrome");
@@ -281,7 +282,21 @@ public class TestByC extends GenericTest {
 	public void testFindElementByNullTagName() { 
 		new TextFieldElement("", ByC.text("Test select", null)).getTagName();
 	}
-	
+
+	@Test(groups={"it"})
+	public void testFindElementByTextInsideChild() {
+		Assert.assertEquals(new TextFieldElement("", ByC.textInside("child of child", "div")).getAttribute("id"), "child5");
+	}
+	@Test(groups={"it"})
+	public void testFindElementByTextInsideChild2() {
+		Assert.assertEquals(new TextFieldElement("", ByC.textInside("child of*", "div")).getAttribute("id"), "child5");
+	}
+	@Test(groups={"it"}, expectedExceptions = NoSuchElementException.class)
+	public void testFindElementByTextInsideChildNotFound() {
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(5);
+		new TextFieldElement("", ByC.textInside("child ", "div")).getAttribute("id");
+	}
+
 	/**
 	 * issue #166: Search subElement by attribute
 	 */

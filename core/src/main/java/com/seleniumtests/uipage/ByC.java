@@ -240,14 +240,24 @@ public class ByC extends By {
      * @return
      */
     public static ByC partialText(final String textToSearch, final String tagName) {
-        return text(textToSearch, tagName, true);
+        return text(textToSearch, tagName, true, false);
     }
     public static ByC text(final String textToSearch, final String tagName) {
-        return text(textToSearch, tagName, false);
+        return text(textToSearch, tagName, false, false);
+    }
+
+    /**
+     * Search for an element with 'tagName' whose text is found inside a sub-element
+     * @param textToSearch      The text to search in sub elements
+     * @param tagName           The tagname of the element we want to find
+     * @return
+     */
+    public static ByC textInside(final String textToSearch, final String tagName) {
+        return text(textToSearch, tagName, false, true);
     }
     
-    private static ByC text(final String textToSearch, String tagName, boolean partial) {
-        return new ByText(textToSearch, tagName, partial);
+    private static ByC text(final String textToSearch, String tagName, boolean partial, boolean textInSubElement) {
+        return new ByText(textToSearch, tagName, partial, textInSubElement);
     }
     
     /**
@@ -354,7 +364,7 @@ public class ByC extends By {
      * @return A By which locates A elements by the exact text it displays.
      */
     public static By xLinkText(String linkText) {
-        return new ByText(linkText, "*", false);
+        return new ByText(linkText, "*", false, false);
     }
     
     /**
@@ -364,7 +374,7 @@ public class ByC extends By {
      * @return a By which locates elements that contain the given link text.
      */
     public static By xPartialLinkText(String partialLinkText) {
-        return new ByText(partialLinkText, "*", true);
+        return new ByText(partialLinkText, "*", true, false);
     }
     
     /**
@@ -660,8 +670,8 @@ public class ByC extends By {
     
     /**
      * Find element with the text content given
-     * @author s047432
-     *
+     * for text inside the searched element, it will be like "//div[contains(text(), '1min 49s')]"
+     * for text inside a child element, it will be like "//*[contains(@class, 'stage-cell-0 SUCCESS') and .//*[contains(text(), '1min 49s')]]"
      */
     public static class ByText extends ByC implements Serializable {
         
@@ -670,8 +680,9 @@ public class ByC extends By {
         private String text;
         private String tagName;
         private boolean partial;
+        private boolean textInSubElement;
         
-        public ByText(String text, String tagName, boolean partial) {
+        public ByText(String text, String tagName, boolean partial, boolean textInSubElement) {
             
             if (text == null) {
                 throw new IllegalArgumentException("Cannot find elements with a null text content.");
@@ -683,6 +694,7 @@ public class ByC extends By {
             this.text = text;
             this.tagName = tagName;
             this.partial = partial;
+            this.textInSubElement = textInSubElement;
         }
         
         @Override
@@ -690,7 +702,11 @@ public class ByC extends By {
             if (partial && !text.endsWith("*")) {
                 text += "*";
             }
-            return String.format(".//%s%s", tagName, buildSelectorForText(text));
+            if (textInSubElement) {
+                return String.format(".//%s[* and .//*%s]", tagName, buildSelectorForText(text));
+            } else {
+                return String.format(".//%s%s", tagName, buildSelectorForText(text));
+            }
         }
         
         @Override
@@ -700,7 +716,16 @@ public class ByC extends By {
         
         @Override
         public WebElement findElement(SearchContext context) {
-            return context.findElement(By.xpath(getEffectiveXPath()));
+            if (textInSubElement) {
+                List<WebElement> elements = context.findElements(By.xpath(getEffectiveXPath()));
+                try {
+                    return elements.get(elements.size() - 1);
+                } catch (IndexOutOfBoundsException e) {
+                    throw new NoSuchElementException("Cannot find any element by text " + text);
+                }
+            } else {
+                return context.findElement(By.xpath(getEffectiveXPath()));
+            }
         }
         
         
