@@ -23,7 +23,7 @@
 	    <sonar.projectKey>bhecquet_seleniumRobot-core</sonar.projectKey>
 		<surefireArgLine />
 		<failsafeArgLine />
-		<microsoft.kiota.version>1.1.13</microsoft.kiota.version>
+		<microsoft.kiota.version>1.8.2</microsoft.kiota.version>
 	</properties>
 
 	<repositories> 
@@ -208,16 +208,37 @@
 			<groupId>com.microsoft.kiota</groupId>
 			<artifactId>microsoft-kiota-abstractions</artifactId>
 			<version>${microsoft.kiota.version}</version>
+			<exclusions>
+				<exclusion>
+					<!-- Already provided by selenium-->
+					<groupId>io.opentelemetry</groupId>
+					<artifactId>opentelemetry-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.microsoft.kiota</groupId>
 			<artifactId>microsoft-kiota-authentication-azure</artifactId>
 			<version>${microsoft.kiota.version}</version>
+			<exclusions>
+				<exclusion>
+					<!-- Already provided by selenium-->
+					<groupId>io.opentelemetry</groupId>
+					<artifactId>opentelemetry-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.microsoft.kiota</groupId>
 			<artifactId>microsoft-kiota-http-okHttp</artifactId>
 			<version>${microsoft.kiota.version}</version>
+			<exclusions>
+				<exclusion>
+					<!-- Already provided by selenium-->
+					<groupId>io.opentelemetry</groupId>
+					<artifactId>opentelemetry-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.microsoft.kiota</groupId>
@@ -238,6 +259,11 @@
 			<groupId>com.microsoft.kiota</groupId>
 			<artifactId>microsoft-kiota-serialization-multipart</artifactId>
 			<version>${microsoft.kiota.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.opentelemetry</groupId>
+			<artifactId>opentelemetry-api-incubator</artifactId>
+			<version>1.44.1-alpha</version>
 		</dependency>
 		<dependency>
 			<groupId>com.oracle.database.jdbc</groupId>
