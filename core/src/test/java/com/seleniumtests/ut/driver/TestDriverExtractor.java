@@ -45,7 +45,7 @@ public class TestDriverExtractor extends MockitoTest {
 	private DriverExtractor extractor;
 	private Path driverPath;
 	
-	private static final String DRIVER_VERSION = "chromedriver_126.0_chrome-126-127";
+	private static final String DRIVER_VERSION = "chromedriver_132.0_chrome-132-133";
 	
 	@BeforeClass(groups={"ut"})
 	public void initContext(final ITestContext testNGCtx) throws Exception {
