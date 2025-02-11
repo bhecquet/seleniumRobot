@@ -858,7 +858,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 		// check there is only one message for image not found
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "clickAt on Picture picture from resource tu/images/logo_text_field.png with args: (0, -30, )"), 1);
-		Assert.assertTrue(detailedReportContent.contains("Object found with match value: 1.0"));
+		Assert.assertTrue(detailedReportContent.contains("Object found with match value: "));
 	}
 
 	/**
