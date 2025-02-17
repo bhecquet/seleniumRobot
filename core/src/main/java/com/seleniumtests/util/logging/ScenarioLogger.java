@@ -4,9 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import com.seleniumtests.reporter.info.Har;
 import com.seleniumtests.reporter.logger.*;
-import org.apache.logging.log4j.LogManager;
+import com.seleniumtests.util.har.Har;
 import org.apache.logging.log4j.Logger;
 import org.testng.ITestResult;
 import org.testng.Reporter;
@@ -119,7 +118,7 @@ public class ScenarioLogger {
     /**
      * Store a key / value pair in test, so that it can be added to reports at test level. Contrary to 'logTestValue' which is stored at test step level
      * @param key
-     * @param value. A StringInfo object (either StringInfo or HyperlinkInfo)
+     * @param value 	A StringInfo object (either StringInfo or HyperlinkInfo)
      */
     public void logTestInfo(String key, Info value) {
     	logTestInfo(key, value, Reporter.getCurrentTestResult());

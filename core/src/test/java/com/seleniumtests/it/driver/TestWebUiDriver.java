@@ -252,44 +252,43 @@ public class TestWebUiDriver extends ReporterTest {
 
 	}
 
-// HAR / BrowserMob
-//	/**
-//	 * Check that HAR capture file is present
-//	 * Check it contains one page per TestStep
-//	 *
-//	 * @throws Exception
-//	 */
-//	@Test(groups={"it"})
-//	public void testHarCaptureExists() throws Exception {
-//
-//		try {
-//			System.setProperty(SeleniumTestsContext.CAPTURE_NETWORK, "true");
-//
-//			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriver"});
-//
-//			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "main-networkCapture.har").toFile().exists());
-//
-//			JSONObject json = new JSONObject(FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "main-networkCapture.har").toFile(), StandardCharsets.UTF_8));
-//			JSONArray pages = json.getJSONObject("log").getJSONArray("pages");
-//
-//			// 7 steps in HTML
-//			// 'getPageUrl' step should be called before driver is created but creating PictureElement starts driver
-//			Assert.assertTrue(pages.length() >= 6, "content is: " + json.toString());
-//			List<String> pageNames = new ArrayList<>();
-//			for (Object page: pages.toList()) {
-//				pageNames.add(((Map<String, Object>)page).get("id").toString().trim());
-//			}
-//			Assert.assertTrue(pageNames.contains("testDriver"));
-//			Assert.assertTrue(pageNames.contains("_writeSomething"));
-//			Assert.assertTrue(pageNames.contains("_reset"));
-//			Assert.assertTrue(pageNames.contains("_sendKeysComposite"));
-//			Assert.assertTrue(pageNames.contains("_clickPicture"));
-//
-//
-//		} finally {
-//			System.clearProperty(SeleniumTestsContext.CAPTURE_NETWORK);
-//		}
-//	}
+	/**
+	 * Check that HAR capture file is present
+	 * Check it contains one page per TestStep
+	 *
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testHarCaptureExists() throws Exception {
+
+		try {
+			System.setProperty(SeleniumTestsContext.CAPTURE_NETWORK, "true");
+
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriver"});
+
+			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "main-networkCapture.har").toFile().exists());
+
+			JSONObject json = new JSONObject(FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "main-networkCapture.har").toFile(), StandardCharsets.UTF_8));
+			JSONArray pages = json.getJSONObject("log").getJSONArray("pages");
+
+			// 7 steps in HTML
+			// 'getPageUrl' step should be called before driver is created but creating PictureElement starts driver
+			Assert.assertTrue(pages.length() >= 6, "content is: " + json.toString());
+			List<String> pageNames = new ArrayList<>();
+			for (Object page: pages.toList()) {
+				pageNames.add(((Map<String, Object>)page).get("id").toString().trim());
+			}
+			Assert.assertTrue(pageNames.contains("testDriver"));
+			Assert.assertTrue(pageNames.contains("_writeSomething"));
+			Assert.assertTrue(pageNames.contains("_reset"));
+			Assert.assertTrue(pageNames.contains("_sendKeysComposite"));
+			Assert.assertTrue(pageNames.contains("_clickPicture"));
+
+
+		} finally {
+			System.clearProperty(SeleniumTestsContext.CAPTURE_NETWORK);
+		}
+	}
 	
 	/**
 	 * Check that browser logs are written to file (only available for chrome)

@@ -10,10 +10,10 @@ public class Response {
     private List<Cookie> cookies;
     private Content content;
     private String redirectURL;
-    private int headerSize;
+    private int headersSize;
     private int bodySize;
 
-    public Response(int status, String statusText, String httpVersion, List<Header> headers, List<Cookie> cookies, Content content, String redirectURL, int headerSize, int bodySize) {
+    public Response(int status, String statusText, String httpVersion, List<Header> headers, List<Cookie> cookies, Content content, String redirectURL, int headersSize, int bodySize) {
         this.status = status;
         this.statusText = statusText;
         this.httpVersion = httpVersion;
@@ -21,7 +21,7 @@ public class Response {
         this.cookies = cookies;
         this.content = content;
         this.redirectURL = redirectURL;
-        this.headerSize = headerSize;
+        this.headersSize = headersSize;
         this.bodySize = bodySize;
     }
 }

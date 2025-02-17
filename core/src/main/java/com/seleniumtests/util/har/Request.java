@@ -11,9 +11,9 @@ public class Request {
     private List<Header> headers;
     private List<Cookie> cookies;
     private List<QueryString> queryString;
-    private int headerSize;
+    private int headersSize;
 
-    public Request(int bodySize, String method, String url, String httpVersion, List<Header> headers, List<Cookie> cookies, List<QueryString> queryString, int headerSize) {
+    public Request(int bodySize, String method, String url, String httpVersion, List<Header> headers, List<Cookie> cookies, List<QueryString> queryString, int headersSize) {
         this.bodySize = bodySize;
         this.method = method;
         this.url = url;
@@ -21,6 +21,6 @@ public class Request {
         this.headers = headers;
         this.cookies = cookies;
         this.queryString = queryString;
-        this.headerSize = headerSize;
+        this.headersSize = headersSize;
     }
 }

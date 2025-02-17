@@ -1,5 +1,11 @@
 package com.seleniumtests.util.har;
 
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
 public class Har {
     private Log log;
 
@@ -9,5 +15,9 @@ public class Har {
 
     public Log getLog() {
         return log;
+    }
+
+    public void writeTo(File file) throws IOException {
+        FileUtils.write(file, new kong.unirest.json.JSONObject(this).toString(), StandardCharsets.UTF_8);
     }
 }
