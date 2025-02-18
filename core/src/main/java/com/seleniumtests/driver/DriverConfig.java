@@ -147,10 +147,6 @@ public class DriverConfig {
     public WebDriver getDriver() {
         return driver;
     }
-    
-    public boolean getCaptureNetwork() {
-    	return testContext.getCaptureNetwork();
-    }
 
     public int getExplicitWaitTimeout() {
         if (testContext.getExplicitWaitTimeout() < getImplicitWaitTimeout()) {

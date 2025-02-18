@@ -209,31 +209,7 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
      */
     private void configureProxyCap(MutableCapabilities capability) {
     	Proxy proxy = webDriverConfig.getProxy();
-
-        if (webDriverConfig.getCaptureNetwork()) {
-        	
-        	if (webDriverConfig.getWebProxyType() != ProxyType.DIRECT && webDriverConfig.getWebProxyType() != ProxyType.MANUAL) {
-        		throw new ConfigurationException("PAC/AUTODETECT/SYSTEM proxy cannot be used with browsermob proxy");
-        	}
-			throw new ConfigurationException("HAR capture is not supported anymore");
-        	
-			/*BrowserMobProxy mobProxy = new BrowserMobProxyServer();
-			
-			if (webDriverConfig.getWebProxyType() == ProxyType.MANUAL) {
-				mobProxy.setChainedProxy(new InetSocketAddress(webDriverConfig.getWebProxyAddress(), webDriverConfig.getWebProxyPort()));
-				
-				if (webDriverConfig.getWebProxyLogin() != null && webDriverConfig.getWebProxyPassword() != null) {
-					mobProxy.chainedProxyAuthorization(webDriverConfig.getWebProxyLogin(), webDriverConfig.getWebProxyPassword(), AuthType.BASIC);
-				}
-			}
-			mobProxy.setTrustAllServers(true);
-			mobProxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.REQUEST_HEADERS, CaptureType.RESPONSE_HEADERS);
-			mobProxy.start(0);
-		    Proxy seleniumProxy = ClientUtil.createSeleniumProxy(mobProxy);
-	    
-        	capability.setCapability(PROXY, Require.nonNull("Proxy", seleniumProxy));
-		    webDriverConfig.setBrowserMobProxy(mobProxy);*/
-        } else if (proxy != null) {
+		if (proxy != null) {
         	capability.setCapability(PROXY, Require.nonNull("Proxy", proxy));
         }
     }

@@ -2097,29 +2097,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 //
 //	}
 
-	/**
-	 * Check that HAR capture file is not present in result if option is disabled
-	 *
-	 * @throws Exception
-	 */
-	@Test(groups = {"it"})
-	public void testReportDoNotContainsHarCapture() throws Exception {
-		try {
-			System.setProperty(SeleniumTestsContext.CAPTURE_NETWORK, "false");
-
-			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriver"});
-
-			// read 'testDriver' report. This contains calls to HtmlElement actions
-			String detailedReportContent1 = readTestMethodResultFile("testDriver");
-			detailedReportContent1 = detailedReportContent1.replaceAll("\\s+", " ");
-
-			Assert.assertTrue(detailedReportContent1.matches(".*<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys on TextFieldElement Text, by=\\{By.id: text2} with args: \\(true, true, \\[a text,\\], \\) </div></li>.*"));
-			Assert.assertFalse(detailedReportContent1.contains("Network capture: <a href='networkCapture.har'>HAR file</a>"));
-			Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "networkCapture.har").toFile().exists());
-		} finally {
-			System.clearProperty(SeleniumTestsContext.CAPTURE_NETWORK);
-		}
-	}
 
 	@Test(groups = {"it"})
 	public void testReportContainsWcagResults() throws Exception {

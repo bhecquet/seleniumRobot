@@ -1,7 +1,11 @@
 package com.seleniumtests.browserfactory.chrome;
 
+import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.har.*;
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
+import org.apache.logging.log4j.Logger;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.logging.LogEntry;
 
@@ -15,20 +19,23 @@ import java.util.stream.Collectors;
 
 public class ChromeUtils {
 
+    private static final Logger logger = SeleniumRobotLogger.getLogger(WebUIDriver.class);
+
     public static Har parsePerformanceLogs(List<LogEntry> logEntries, List<TestStep> testSteps) {
         Map<String, HashMap<String, Object>> requests = new LinkedHashMap<>();
 
         Har har = new Har();
         Log log = har.getLog();
 
-        Map<Long, String> pageStart = new LinkedHashMap<>();
+        Map<Long, Page> pageStart = new LinkedHashMap<>();
+        Map<Page, Boolean> usedPages = new LinkedHashMap<>();
         int id = 0;
         for (TestStep testStep: testSteps) {
             Instant instant = Instant.ofEpochMilli(testStep.getStartDate().getTime());
             String pageId = String.format("page_" + id++);
             Page page = new Page(instant.atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME), pageId, testStep.getName());
-            pageStart.put(testStep.getStartDate().getTime(), pageId);
-            log.addPage(page);
+            pageStart.put(testStep.getStartDate().getTime(), page);
+            usedPages.put(page, false);
         }
 
         for (LogEntry line: logEntries) {
@@ -75,83 +82,105 @@ public class ChromeUtils {
 
         for (Map.Entry<String, HashMap<String, Object>> requestsEntry: requests.entrySet()) {
             String requestId = requestsEntry.getKey();
-            JSONObject jsonRequest = (JSONObject) requestsEntry.getValue().get("requestWillBeSent");
-            JSONObject jsonRequestHeaders = jsonRequest.getJSONObject("params").getJSONObject("request").getJSONObject("headers");
+            try {
 
-            Request request = new Request(0,
-                    jsonRequest.getJSONObject("params").getJSONObject("request").getString("method"),
-                    jsonRequest.getJSONObject("params").getJSONObject("request").getString("url"),
-                    "HTTP N/A",
-                    jsonRequestHeaders.keySet().stream().map(key -> new Header(key, jsonRequestHeaders.getString(key))).collect(Collectors.toList()),
-                    new ArrayList<>(), // cookies
-                    new ArrayList<>(),
-                    0
-            );
+                JSONObject jsonRequest = (JSONObject) requestsEntry.getValue().get("requestWillBeSent");
+                JSONObject jsonRequestHeaders = jsonRequest.getJSONObject("params").getJSONObject("request").getJSONObject("headers");
 
-            JSONObject jsonResponse = (JSONObject) requestsEntry.getValue().get("responseReceived");;
-            JSONObject jsonResponseHeaders = jsonResponse.getJSONObject("params").getJSONObject("response").getJSONObject("headers");
+                Request request = new Request(0,
+                        jsonRequest.getJSONObject("params").getJSONObject("request").getString("method"),
+                        jsonRequest.getJSONObject("params").getJSONObject("request").getString("url"),
+                        "HTTP N/A",
+                        jsonRequestHeaders.keySet().stream().map(key -> new Header(key, jsonRequestHeaders.getString(key))).collect(Collectors.toList()),
+                        new ArrayList<>(), // cookies
+                        new ArrayList<>(),
+                        0
+                );
 
-            int statusCode = jsonResponse.getJSONObject("params").getJSONObject("response").getInt("status");
-            if (requestsEntry.getValue().get("responseReceivedExtraInfo") != null) {
-                JSONObject jsonResponseExtraInfo = (JSONObject) requestsEntry.getValue().get("responseReceivedExtraInfo");
-                statusCode = jsonResponseExtraInfo.getJSONObject("params").getInt("statusCode");
-            }
+                JSONObject jsonResponse = (JSONObject) requestsEntry.getValue().get("responseReceived");
+                ;
+                JSONObject jsonResponseHeaders = jsonResponse.getJSONObject("params").getJSONObject("response").getJSONObject("headers");
 
-            Response response = new Response(
-                    statusCode,
-                    jsonResponse.getJSONObject("params").getJSONObject("response").getString("statusText"),
-                    jsonResponse.getJSONObject("params").getJSONObject("response").getString("protocol"),
-                    jsonResponseHeaders.keySet().stream().map(key -> new Header(key, jsonResponseHeaders.getString(key))).collect(Collectors.toList()),
-                    new ArrayList<>(), // cookies
-                    new Content(
-                            jsonResponse.getJSONObject("params").getJSONObject("response").getString("mimeType"),
-                            jsonResponseHeaders.optInt("Content-Length", 0),
-                            "_masked_"
-                    ),
-                    "",
-                    jsonResponse.getJSONObject("params").getJSONObject("response").getInt("encodedDataLength"),
-                    jsonResponseHeaders.optInt("Content-Length", 0)
-            );
-
-            JSONObject jsonTimings = jsonResponse.getJSONObject("params").getJSONObject("response").getJSONObject("timing");
-            double startLoadingTimestamp = jsonTimings.getDouble("requestTime");
-            double endLoadingTimestamp = jsonResponse.getJSONObject("params").getDouble("timestamp");
-            if (requestsEntry.getValue().get("loadingFinished") != null) {
-                JSONObject jsonLoadingFinished = (JSONObject) requestsEntry.getValue().get("loadingFinished");
-                endLoadingTimestamp = jsonLoadingFinished.getJSONObject("params").getDouble("timestamp");
-            }
-
-            // for details about timings: https://chromedevtools.github.io/devtools-protocol/tot/Network/
-            Timing timings = new Timing(
-                    // assume that 'blocked' is the time between 'requestTime' and start of proxy negociation
-                    Math.min(jsonTimings.getDouble("proxyStart"), jsonTimings.getDouble("sendStart")),
-                    jsonTimings.getDouble("dnsEnd") == -1 ? -1: jsonTimings.getDouble("dnsEnd") - jsonTimings.getDouble("dnsStart"),
-                    jsonTimings.getDouble("connectEnd") == -1 ? -1: jsonTimings.getDouble("connectEnd") - jsonTimings.getDouble("connectStart"),
-                    jsonTimings.getDouble("sslEnd") == -1 ? -1: jsonTimings.getDouble("sslEnd") - jsonTimings.getDouble("sslStart"),
-                    jsonTimings.getDouble("sendEnd") - jsonTimings.getDouble("sendStart"),
-                    jsonTimings.getDouble("receiveHeadersStart") - jsonTimings.getDouble("sendEnd"),
-                    (endLoadingTimestamp - startLoadingTimestamp) * 1000 - jsonTimings.getDouble("receiveHeadersEnd")
-            );
-
-            double duration = (endLoadingTimestamp - jsonRequest.getJSONObject("params").getDouble("timestamp")) * 1000;
-
-            long entryDate = (long)(jsonRequest.getJSONObject("params").getDouble("wallTime") * 1000);
-
-            String pageRef = "";
-            for (Map.Entry<Long, String> pageEntry: pageStart.entrySet()) {
-                if (entryDate > pageEntry.getKey() || pageRef.isEmpty()) {
-                    pageRef = pageEntry.getValue();
+                int statusCode = jsonResponse.getJSONObject("params").getJSONObject("response").getInt("status");
+                if (requestsEntry.getValue().get("responseReceivedExtraInfo") != null) {
+                    JSONObject jsonResponseExtraInfo = (JSONObject) requestsEntry.getValue().get("responseReceivedExtraInfo");
+                    statusCode = jsonResponseExtraInfo.getJSONObject("params").getInt("statusCode");
                 }
-            }
 
-            Entry entry = new Entry(
-                    pageRef,
-                    Instant.ofEpochMilli((long) (jsonRequest.getJSONObject("params").getDouble("wallTime") * 1000)).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
-                    request,
-                    response,
-                    timings,
-                    (int)duration);
-            log.addEntry(entry);
+                Response response = new Response(
+                        statusCode,
+                        jsonResponse.getJSONObject("params").getJSONObject("response").getString("statusText"),
+                        jsonResponse.getJSONObject("params").getJSONObject("response").getString("protocol"),
+                        jsonResponseHeaders.keySet().stream().map(key -> new Header(key, jsonResponseHeaders.getString(key))).collect(Collectors.toList()),
+                        new ArrayList<>(), // cookies
+                        new Content(
+                                jsonResponse.getJSONObject("params").getJSONObject("response").getString("mimeType"),
+                                jsonResponseHeaders.optInt("Content-Length", 0),
+                                "_masked_"
+                        ),
+                        "",
+                        jsonResponse.getJSONObject("params").getJSONObject("response").getInt("encodedDataLength"),
+                        jsonResponseHeaders.optInt("Content-Length", 0)
+                );
+
+                Timing timings;
+                double endLoadingTimestamp = jsonResponse.getJSONObject("params").getDouble("timestamp");
+                try {
+                    JSONObject jsonTimings = jsonResponse.getJSONObject("params").getJSONObject("response").getJSONObject("timing");
+                    double startLoadingTimestamp = jsonTimings.getDouble("requestTime");
+                    if (requestsEntry.getValue().get("loadingFinished") != null) {
+                        JSONObject jsonLoadingFinished = (JSONObject) requestsEntry.getValue().get("loadingFinished");
+                        endLoadingTimestamp = jsonLoadingFinished.getJSONObject("params").getDouble("timestamp");
+                    }
+
+                    // for details about timings: https://chromedevtools.github.io/devtools-protocol/tot/Network/
+                    timings = new Timing(
+                            // assume that 'blocked' is the time between 'requestTime' and start of proxy negociation
+                            Math.min(jsonTimings.getDouble("proxyStart"), jsonTimings.getDouble("sendStart")),
+                            jsonTimings.getDouble("dnsEnd") == -1 ? -1 : jsonTimings.getDouble("dnsEnd") - jsonTimings.getDouble("dnsStart"),
+                            jsonTimings.getDouble("connectEnd") == -1 ? -1 : jsonTimings.getDouble("connectEnd") - jsonTimings.getDouble("connectStart"),
+                            jsonTimings.getDouble("sslEnd") == -1 ? -1 : jsonTimings.getDouble("sslEnd") - jsonTimings.getDouble("sslStart"),
+                            jsonTimings.getDouble("sendEnd") - jsonTimings.getDouble("sendStart"),
+                            jsonTimings.getDouble("receiveHeadersStart") - jsonTimings.getDouble("sendEnd"),
+                            (endLoadingTimestamp - startLoadingTimestamp) * 1000 - jsonTimings.getDouble("receiveHeadersEnd")
+                    );
+                } catch (JSONException e) {
+                    // when timings are not found (case for files), create a stub object
+                    timings = new Timing(
+                            0, 0, 0, 0, 0, 0, 0
+                    );
+                }
+
+                double duration = (endLoadingTimestamp - jsonRequest.getJSONObject("params").getDouble("timestamp")) * 1000;
+
+                long entryDate = (long) (jsonRequest.getJSONObject("params").getDouble("wallTime") * 1000);
+
+                Page pageRef = null;
+                for (Map.Entry<Long, Page> pageEntry : pageStart.entrySet()) {
+                    if (entryDate > pageEntry.getKey() || pageRef == null) {
+                        pageRef = pageEntry.getValue();
+                    }
+                }
+                usedPages.replace(pageRef, true);
+
+                Entry entry = new Entry(
+                        pageRef.getId(),
+                        Instant.ofEpochMilli((long) (jsonRequest.getJSONObject("params").getDouble("wallTime") * 1000)).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
+                        request,
+                        response,
+                        timings,
+                        (int) duration);
+                log.addEntry(entry);
+            } catch (JSONException e) {
+                logger.error("Error parsing request " + requestId, e);
+            }
+        }
+
+        // add only used pages
+        for (Map.Entry<Page, Boolean> pageEntry: usedPages.entrySet()) {
+            //if (Boolean.TRUE.equals(pageEntry.getValue())) {
+                log.addPage(pageEntry.getKey());
+            //}
         }
 
         // use of kong jsonObject so that sub-objects are serialized

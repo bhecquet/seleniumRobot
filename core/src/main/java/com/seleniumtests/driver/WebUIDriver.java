@@ -490,12 +490,16 @@ public class WebUIDriver {
 
 	private void parsePerformanceLogs(List<LogEntry> logEntries) {
 		Har har = null;
-		if (driver != null && driver instanceof CustomEventFiringWebDriver && ((CustomEventFiringWebDriver)driver).getBrowserInfo().getBrowser() == BrowserType.CHROME ) {
-			har = ChromeUtils.parsePerformanceLogs(logEntries, TestStepManager.getInstance().getTestSteps());
+		try {
+			if (driver != null && driver instanceof CustomEventFiringWebDriver && ((CustomEventFiringWebDriver) driver).getBrowserInfo().getBrowser() == BrowserType.CHROME) {
+				har = ChromeUtils.parsePerformanceLogs(logEntries, TestStepManager.getInstance().getTestSteps());
+			}
+		} catch (Exception e) {
+			logger.error("error parsing performance logs", e);
 		}
 
 		if (har != null) {
-			scenarioLogger.logNetworkCapture(har, "networkCapture.har");
+			scenarioLogger.logNetworkCapture(har, "main");
 		}
 	}
 

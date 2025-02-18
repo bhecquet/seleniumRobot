@@ -734,8 +734,7 @@ public class TestWebUIDriver extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testCleanUp() {
-		
-		SeleniumTestsContextManager.getThreadContext().setCaptureNetwork(false);
+
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
 		WebDriver driver = spy(WebUIDriver.getWebDriver(true));
 		WebUIDriver uiDriver = WebUIDriver.getWebUIDriver(false);
@@ -752,8 +751,7 @@ public class TestWebUIDriver extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testCleanUpDriverExited() {
-		
-		SeleniumTestsContextManager.getThreadContext().setCaptureNetwork(false);
+
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
 		WebDriver driver = spy(WebUIDriver.getWebDriver(true));
 		WebUIDriver uiDriver = WebUIDriver.getWebUIDriver(false);
@@ -772,8 +770,7 @@ public class TestWebUIDriver extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testCleanUpDriverNull() {
-		
-		SeleniumTestsContextManager.getThreadContext().setCaptureNetwork(false);
+
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
 		WebUIDriver uiDriver = WebUIDriverFactory.getInstance("foo");
 		uiDriver.initInstance();
@@ -787,8 +784,7 @@ public class TestWebUIDriver extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testCleanUpWithError() {
-		
-		SeleniumTestsContextManager.getThreadContext().setCaptureNetwork(false);
+
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
 		WebDriver driver = spy(WebUIDriver.getWebDriver(true));
 		WebUIDriver uiDriver = WebUIDriver.getWebUIDriver(false);
