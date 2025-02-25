@@ -1,14 +1,14 @@
 /**
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
- * 				Copyright 2017-2019 B.Hecquet
- *
+ * Copyright 2017-2019 B.Hecquet
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,35 +16,6 @@
  * limitations under the License.
  */
 package com.seleniumtests.core;
-
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.apache.logging.log4j.Logger;
-import org.json.JSONObject;
-import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.PageLoadStrategy;
-import org.openqa.selenium.Platform;
-import org.openqa.selenium.Proxy;
-import org.openqa.selenium.Proxy.ProxyType;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.support.events.WebDriverListener;
-import org.testng.IReporter;
-import org.testng.ITestContext;
-import org.testng.ITestResult;
-import org.testng.TestRunner;
-import org.testng.internal.TestResult;
 
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
@@ -59,324 +30,335 @@ import com.seleniumtests.core.contexts.SeleniumRobotServerContext;
 import com.seleniumtests.core.contexts.TestManagerContext;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
-import com.seleniumtests.driver.screenshots.SnapshotComparisonBehaviour;
 import com.seleniumtests.reporter.logger.ArchiveMode;
-import com.seleniumtests.reporter.reporters.BugTrackerReporter;
-import com.seleniumtests.reporter.reporters.CustomReporter;
-import com.seleniumtests.reporter.reporters.ReportInfo;
-import com.seleniumtests.reporter.reporters.SeleniumRobotServerTestRecorder;
-import com.seleniumtests.reporter.reporters.SeleniumTestsReporter2;
-import com.seleniumtests.reporter.reporters.TestManagerReporter;
+import com.seleniumtests.reporter.reporters.*;
 import com.seleniumtests.uipage.htmlelements.ElementInfo;
 import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.video.VideoCaptureMode;
+import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
+import org.openqa.selenium.*;
+import org.openqa.selenium.Proxy.ProxyType;
+import org.openqa.selenium.support.events.WebDriverListener;
+import org.testng.IReporter;
+import org.testng.ITestContext;
+import org.testng.ITestResult;
+import org.testng.TestRunner;
+import org.testng.internal.TestResult;
 import org.testng.internal.thread.ThreadUtil;
+
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 /**
  * Defines TestNG context used in STF.
  */
 public class SeleniumTestsContext {
-	
-	private static final Object lock = new Object();
-	private static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumTestsContext.class);
-	private static Map<String, String> outputFolderNames = Collections.synchronizedMap(new HashMap<>());
+
+    private static final Object lock = new Object();
+    private static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumTestsContext.class);
+    private static Map<String, String> outputFolderNames = Collections.synchronizedMap(new HashMap<>());
 
     /* configuration defined in testng.xml */
-    public static final String TEST_CONFIGURATION = "testConfig"; 				// parameter name for additional configuration to load (should only be used in XML)
-    public static final String LOAD_INI = "loadIni";							// comma separated list of files to load. They are searched in data/<app>/config folder. They will append to env.ini file with variable overwriting. Last file will overwrite previous ones
-    public static final String STARTED_BY = "startedBy";						// any string saying who started the test. It may be a URL where to find result, for reports in bugtrackers
-    public static final String INITIAL_URL = "initialUrl";						// the initial URL the browser will connect to
-    
-    public static final String DEVICE_LIST = "deviceList"; 						// List of known devices in json format (internal use only)
-    public static final String WEB_SESSION_TIME_OUT = "webSessionTimeOut";		// timeout de la session du navigateur
-    public static final String IMPLICIT_WAIT_TIME_OUT = "implicitWaitTimeOut";	// attente implicite du navigateur
-    public static final String EXPLICIT_WAIT_TIME_OUT = "explicitWaitTimeOut";	// attente explicite du navigateur
+    public static final String TEST_CONFIGURATION = "testConfig";                // parameter name for additional configuration to load (should only be used in XML)
+    public static final String LOAD_INI = "loadIni";                            // comma separated list of files to load. They are searched in data/<app>/config folder. They will append to env.ini file with variable overwriting. Last file will overwrite previous ones
+    public static final String STARTED_BY = "startedBy";                        // any string saying who started the test. It may be a URL where to find result, for reports in bugtrackers
+    public static final String INITIAL_URL = "initialUrl";                        // the initial URL the browser will connect to
+
+    public static final String DEVICE_LIST = "deviceList";                        // List of known devices in json format (internal use only)
+    public static final String WEB_SESSION_TIME_OUT = "webSessionTimeOut";        // timeout de la session du navigateur
+    public static final String IMPLICIT_WAIT_TIME_OUT = "implicitWaitTimeOut";    // attente implicite du navigateur
+    public static final String EXPLICIT_WAIT_TIME_OUT = "explicitWaitTimeOut";    // attente explicite du navigateur
     public static final String HEADLESS_BROWSER = "headless";
-    public static final String REPLAY_TIME_OUT = "replayTimeOut";				// time during which an action is replayed. By default 30 secs
-    public static final String ACTION_DELAY = "actionDelay";					// time in milliseconds between 2 actions (e.g: 2 clicks). It allows to slow down or speed up tests
-    public static final String PAGE_LOAD_TIME_OUT = "pageLoadTimeout";			// temps d'attente de chargement d'une page
-    public static final String PAGE_LOAD_STRATEGY = "pageLoadStrategy";			// page load strategy as defined in selenium spec. Will be applied to driver
-    public static final String WEB_DRIVER_GRID = "webDriverGrid";				// adresse du serveur seleniumGrid
-    public static final String RUN_MODE = "runMode";							// local ou grid. Pourrait également contenir sauceLabs / testDroid
-    public static final String NODE_TAGS = "nodeTags";							// Comma seperated list of strings. Requests that this test should execute only on a node (grid mode only) announcing all of these tags (issue #190)
-    public static final String MASK_PASSWORD = "maskPassword";					// whether seleniumRobot should hide passwords or not
-    public static final String MANUAL_TEST_STEPS = "manualTestSteps";			// set test steps manual (default is false) for creating them inside tests
-    public static final String DEBUG = "debug";									// whether to debug test (logs from browser / core). Valid values are: 'none', 'core', 'driver' or 'core,driver'
+    public static final String REPLAY_TIME_OUT = "replayTimeOut";                // time during which an action is replayed. By default 30 secs
+    public static final String ACTION_DELAY = "actionDelay";                    // time in milliseconds between 2 actions (e.g: 2 clicks). It allows to slow down or speed up tests
+    public static final String PAGE_LOAD_TIME_OUT = "pageLoadTimeout";            // temps d'attente de chargement d'une page
+    public static final String PAGE_LOAD_STRATEGY = "pageLoadStrategy";            // page load strategy as defined in selenium spec. Will be applied to driver
+    public static final String WEB_DRIVER_GRID = "webDriverGrid";                // adresse du serveur seleniumGrid
+    public static final String RUN_MODE = "runMode";                            // local ou grid. Pourrait également contenir sauceLabs / testDroid
+    public static final String NODE_TAGS = "nodeTags";                            // Comma seperated list of strings. Requests that this test should execute only on a node (grid mode only) announcing all of these tags (issue #190)
+    public static final String MASK_PASSWORD = "maskPassword";                    // whether seleniumRobot should hide passwords or not
+    public static final String MANUAL_TEST_STEPS = "manualTestSteps";            // set test steps manual (default is false) for creating them inside tests
+    public static final String DEBUG = "debug";                                    // whether to debug test (logs from browser / core). Valid values are: 'none', 'core', 'driver' or 'core,driver'
     public static final String INTERNAL_DEBUG = "internalDebug";
-    public static final String BROWSER = "browser";								// navigateur utilisé. Sur Android, le navigateur par défaut est "Browser"
-    public static final String BROWSER_VERSION = "browserVersion";				// version de navigateur utilisé
-    public static final String FIREFOX_USER_PROFILE_PATH = "firefoxUserProfilePath";	// firefox user profile
-    public static final String CHROME_USER_PROFILE_PATH = "chromeUserProfilePath";	// chrome user profile
-    public static final String EDGE_USER_PROFILE_PATH = "edgeUserProfilePath";	// edge user profile
-    public static final String CHROME_OPTIONS = "chromeOptions";				// options to give to chrome at startup
-    public static final String EDGE_OPTIONS = "edgeOptions";					// options to give to edge at startup
-    public static final String FIREFOX_BINARY_PATH = "firefoxBinaryPath";		// chemin vers le binaire firefox (firefox portable ou pour utiliser une version spécifique
-    public static final String CHROME_DRIVER_PATH = "chromeDriverPath";			// chemin vers chromeDriver si on souhaite utiliser une version différente
-    public static final String GECKO_DRIVER_PATH = "geckoDriverPath";			// chemin vers chromeDriver si on souhaite utiliser une version différente
-    public static final String EDGE_DRIVER_PATH = "edgeDriverPath";				// path to Edge driver binary if we want to use an other version than the provided one
-    public static final String CHROME_BINARY_PATH = "chromeBinaryPath";			// chemin vers le binaire chrome lorsque celui-ci n'est pas installé de manière normale
-    public static final String IE_DRIVER_PATH = "ieDriverPath";					// chemin vers le driver Internet Explorer
-    public static final String USER_AGENT = "userAgent";						// user agent utilisé pour les tests. Permet d'écraser le user-agent par défaut du navigateur, sur firefox et chrome uniquement
-    public static final String BETA_BROWSER = "betaBrowser";					// enable usage of beta browsers	
-    public static final String EDGE_IE_MODE  = "edgeIeMode";					// if true, Edge is started in IE mode
-    public static final String CAPABILITIES  = "capabilities";					// The capability to add to driver. `-Dcapabilities=<key1>=<value1>,<key2>=<value2>`
-    
-    public static final String VIEWPORT_WIDTH = "viewPortWidth";					// width of viewport	
-    public static final String VIEWPORT_HEIGHT = "viewPortHeight";					// height of viewport
-    
-    public static final String ADVANCED_ELEMENT_SEARCH = "advancedElementSearch";	// 'false' (default), 'full', 'dom'. if 'dom', store and possibly use found element information to adapt to changes in DOM, using only DOM information. If element is not found, it will try to use other element information to find it
-    																				// if 'full', search will also be done using element picture, if available
-    
-    public static final String FIND_ERROR_CAUSE = "findErrorCause";				// if 'true', try to find why the test failed
+    public static final String BROWSER = "browser";                                // navigateur utilisé. Sur Android, le navigateur par défaut est "Browser"
+    public static final String BROWSER_VERSION = "browserVersion";                // version de navigateur utilisé
+    public static final String FIREFOX_USER_PROFILE_PATH = "firefoxUserProfilePath";    // firefox user profile
+    public static final String CHROME_USER_PROFILE_PATH = "chromeUserProfilePath";    // chrome user profile
+    public static final String EDGE_USER_PROFILE_PATH = "edgeUserProfilePath";    // edge user profile
+    public static final String CHROME_OPTIONS = "chromeOptions";                // options to give to chrome at startup
+    public static final String EDGE_OPTIONS = "edgeOptions";                    // options to give to edge at startup
+    public static final String FIREFOX_BINARY_PATH = "firefoxBinaryPath";        // chemin vers le binaire firefox (firefox portable ou pour utiliser une version spécifique
+    public static final String CHROME_DRIVER_PATH = "chromeDriverPath";            // chemin vers chromeDriver si on souhaite utiliser une version différente
+    public static final String GECKO_DRIVER_PATH = "geckoDriverPath";            // chemin vers chromeDriver si on souhaite utiliser une version différente
+    public static final String EDGE_DRIVER_PATH = "edgeDriverPath";                // path to Edge driver binary if we want to use an other version than the provided one
+    public static final String CHROME_BINARY_PATH = "chromeBinaryPath";            // chemin vers le binaire chrome lorsque celui-ci n'est pas installé de manière normale
+    public static final String IE_DRIVER_PATH = "ieDriverPath";                    // chemin vers le driver Internet Explorer
+    public static final String USER_AGENT = "userAgent";                        // user agent utilisé pour les tests. Permet d'écraser le user-agent par défaut du navigateur, sur firefox et chrome uniquement
+    public static final String BETA_BROWSER = "betaBrowser";                    // enable usage of beta browsers
+    public static final String EDGE_IE_MODE = "edgeIeMode";                    // if true, Edge is started in IE mode
+    public static final String CAPABILITIES = "capabilities";                    // The capability to add to driver. `-Dcapabilities=<key1>=<value1>,<key2>=<value2>`
+
+    public static final String VIEWPORT_WIDTH = "viewPortWidth";                    // width of viewport
+    public static final String VIEWPORT_HEIGHT = "viewPortHeight";                    // height of viewport
+
+    public static final String ADVANCED_ELEMENT_SEARCH = "advancedElementSearch";    // 'false' (default), 'full', 'dom'. if 'dom', store and possibly use found element information to adapt to changes in DOM, using only DOM information. If element is not found, it will try to use other element information to find it
+    // if 'full', search will also be done using element picture, if available
+
+    public static final String FIND_ERROR_CAUSE = "findErrorCause";                // if 'true', try to find why the test failed
 
     public static final String SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER = "setAssumeUntrustedCertificateIssuer"; // Firefox uniquement pour qu'il ne prenne pas en compte les certificats invalides 
     public static final String SET_ACCEPT_UNTRUSTED_CERTIFICATES = "setAcceptUntrustedCertificates"; // Firefox uniquement pour qu'il ne prenne pas en compte les certificats invalides
-    public static final String NTLM_AUTH_TRUSTED_URIS = "ntlmAuthTrustedUris";	// Firefox uniquement
-    public static final String BROWSER_DOWNLOAD_DIR = "browserDownloadDir";		// répertoire où seront enregistrés les fichiers
+    public static final String NTLM_AUTH_TRUSTED_URIS = "ntlmAuthTrustedUris";    // Firefox uniquement
+    public static final String BROWSER_DOWNLOAD_DIR = "browserDownloadDir";        // répertoire où seront enregistrés les fichiers
 
     public static final String SNAPSHOT_TOP_CROPPING = "snapshotTopCropping";
     public static final String SNAPSHOT_BOTTOM_CROPPING = "snapshotBottomCropping";
-    public static final String SNAPSHOT_SCROLL_DELAY = "snapshotScrollDelay";	// time in ms between the browser scrolling (when it's needed) and effective capture. A higher value means we have chance all picture have been loaded (with progressive loading) but capture take more time. This is only valid when captures are done for image comparison
-    
-    public static final String WEB_PROXY_TYPE = "proxyType";					// type de proxy. AUTO, MANUAL, NO
-    public static final String WEB_PROXY_TYPE_FROM_USER = "proxyTypeFromUser";	// issue #158: proxy type as requested by user. Store it 
-    public static final String WEB_PROXY_ADDRESS = "proxyAddress";				// adresse du proxy. 
-    public static final String WEB_PROXY_PORT = "proxyPort";					// port du proxy
-    public static final String WEB_PROXY_LOGIN = "proxyLogin";					// login du proxy (si nécessaire)
-    public static final String WEB_PROXY_PASSWORD = "proxyPassword";			// mot de passe du proxy (si nécessaire)
-    public static final String WEB_PROXY_EXCLUDE = "proxyExclude";				// exclusion des adresse de proxy
-    public static final String WEB_PROXY_PAC = "proxyPac";						// adresse de configuration automatique du proxy
+    public static final String SNAPSHOT_SCROLL_DELAY = "snapshotScrollDelay";    // time in ms between the browser scrolling (when it's needed) and effective capture. A higher value means we have chance all picture have been loaded (with progressive loading) but capture take more time. This is only valid when captures are done for image comparison
 
-    public static final String TEST_ENTITY = "testEntity";						// Jamais utilisé
-    
+    public static final String WEB_PROXY_TYPE = "proxyType";                    // type de proxy. AUTO, MANUAL, NO
+    public static final String WEB_PROXY_TYPE_FROM_USER = "proxyTypeFromUser";    // issue #158: proxy type as requested by user. Store it
+    public static final String WEB_PROXY_ADDRESS = "proxyAddress";                // adresse du proxy.
+    public static final String WEB_PROXY_PORT = "proxyPort";                    // port du proxy
+    public static final String WEB_PROXY_LOGIN = "proxyLogin";                    // login du proxy (si nécessaire)
+    public static final String WEB_PROXY_PASSWORD = "proxyPassword";            // mot de passe du proxy (si nécessaire)
+    public static final String WEB_PROXY_EXCLUDE = "proxyExclude";                // exclusion des adresse de proxy
+    public static final String WEB_PROXY_PAC = "proxyPac";                        // adresse de configuration automatique du proxy
+
+    public static final String TEST_ENTITY = "testEntity";                        // Jamais utilisé
+
     public static final String CAPTURE_SNAPSHOT = "captureSnapshot";
     public static final String CAPTURE_NETWORK = "captureNetwork";
     public static final String VIDEO_CAPTURE = "captureVideo";
 
-    public static final String SOFT_ASSERT_ENABLED = "softAssertEnabled";		// le test ne s'arrête pas lorsqu'une assertion est rencontrée
-    public static final String TEST_RETRY_COUNT = "testRetryCount";				// number of times the test can be retried
-    
-    public static final String OVERRIDE_SELENIUM_NATIVE_ACTION = "overrideSeleniumNativeAction";	// intercept driver.findElement and driver.frame operations to move to HtmlElement methods 
-    
-    public static final String OUTPUT_DIRECTORY = "outputDirectory";     		// folder where HTML report will be written
+    public static final String SOFT_ASSERT_ENABLED = "softAssertEnabled";        // le test ne s'arrête pas lorsqu'une assertion est rencontrée
+    public static final String TEST_RETRY_COUNT = "testRetryCount";                // number of times the test can be retried
+
+    public static final String OVERRIDE_SELENIUM_NATIVE_ACTION = "overrideSeleniumNativeAction";    // intercept driver.findElement and driver.frame operations to move to HtmlElement methods
+
+    public static final String OUTPUT_DIRECTORY = "outputDirectory";            // folder where HTML report will be written
     public static final String DEFAULT_OUTPUT_DIRECTORY = "defaultOutputDirectory";    // folder where TestNG would write it's results if not overwritten
     public static final String CUSTOM_TEST_REPORTS = "customTestReports";
     public static final String CUSTOM_SUMMARY_REPORTS = "customSummaryReports";
-    public static final String ARCHIVE_TO_FILE = "archiveToFile";				// path to the file where archive will be done.
-    public static final String ARCHIVE = "archive";								// whether archiving is done. DEfault is false, other values are 'true', 'onSuccess', 'onError'
-    public static final String KEEP_ALL_RESULTS = "keepAllResults";				// if true, will keep all result even if test is retried, allowing to analyze them
-    
+    public static final String ARCHIVE_TO_FILE = "archiveToFile";                // path to the file where archive will be done.
+    public static final String ARCHIVE = "archive";                                // whether archiving is done. DEfault is false, other values are 'true', 'onSuccess', 'onError'
+    public static final String KEEP_ALL_RESULTS = "keepAllResults";                // if true, will keep all result even if test is retried, allowing to analyze them
+
     public static final String WEB_DRIVER_LISTENER = "webDriverListener";
     public static final String OPTIMIZE_REPORTS = "optimizeReports";
 
     public static final String TEST_METHOD_SIGNATURE = "testMethodSignature";
-    public static final String REPORTER_PLUGIN_CLASSES = "reporterPluginClasses";	// comma-seperated list of classes to call when a custom reporter needs to be added
+    public static final String REPORTER_PLUGIN_CLASSES = "reporterPluginClasses";    // comma-seperated list of classes to call when a custom reporter needs to be added
 
-    public static final String TEST_TYPE = "testType";							// configured automatically
+    public static final String TEST_TYPE = "testType";                            // configured automatically
 
-    public static final String CUCUMBER_TESTS = "cucumberTests";				// liste des tests en mode cucumber
-    public static final String CUCUMBER_TAGS = "cucumberTags";					// liste des tags cucumber
-    public static final String TEST_ENV = "env";								// environnement de test pour le SUT. Permet d'accéder aux configurations spécifiques du fichier env.ini
-    public static final String CUCUMBER_IMPLEMENTATION_PKG = "cucumberPackage";	// nom du package java pour les classes cucumber, car celui-ci n'est pas accessible par testNG
-    
+    public static final String CUCUMBER_TESTS = "cucumberTests";                // liste des tests en mode cucumber
+    public static final String CUCUMBER_TAGS = "cucumberTags";                    // liste des tags cucumber
+    public static final String TEST_ENV = "env";                                // environnement de test pour le SUT. Permet d'accéder aux configurations spécifiques du fichier env.ini
+    public static final String CUCUMBER_IMPLEMENTATION_PKG = "cucumberPackage";    // nom du package java pour les classes cucumber, car celui-ci n'est pas accessible par testNG
+
     // Appium specific properties
-    public static final String APP = "app";										// Chemin de l'application mobile (local ou distant)
+    public static final String APP = "app";                                        // Chemin de l'application mobile (local ou distant)
     public static final String MOBILE_PLATFORM_VERSION = "mobilePlatformVersion";// Mobile OS version. It's deduced from platform name and not read directly from parameters
-    public static final String DEVICE_NAME = "deviceName";						// Nom du terminal utilisé pour le test
-    public static final String DEVICE_ID = "deviceId";							// Id of the device on which test session will be started. This only mandatory when using a remote appium server with 'appiumServerUrl' parameter. In all other cases, deviceId is set automatically through discovery 
-    public static final String FULL_RESET = "fullReset";						// whether we should do a full reset (default is true)
-    public static final String AUTOMATION_NAME = "automationName";				// Default is "Appium". The automationName to use. See http://appium.io/docs/en/writing-running-appium/caps/index.html
-    public static final String APPIUM_SERVER_URL = "appiumServerUrl";			// URL of an already started appium server. I set, this appium server will be used instead of starting a new one
-    public static final String APPIUM_CAPS = "appiumCaps";						// Set of capabilities that will be added and sent to appium. These are the capabilities that are not already handled by the framework. See: http://appium.io/docs/en/writing-running-appium/caps/
-    																			// Format is "key1=value1;key2=value2"
-    
-    public static final String APP_PACKAGE = "appPackage";						// package de l'application
-    public static final String APP_ACTIVITY = "appActivity";					// activité à démarrer (Android)
-    public static final String APP_WAIT_ACTIVITY = "appWaitActivity";			// dans certains cas, l'activité qui démarre l'application n'est pas l'activité principale. C'est celle-ci qu'on attend
-    public static final String NEW_COMMAND_TIMEOUT = "newCommandTimeout";		// Attente maximale entre 2 commandes envoyées à appium
+    public static final String DEVICE_NAME = "deviceName";                        // Nom du terminal utilisé pour le test
+    public static final String DEVICE_ID = "deviceId";                            // Id of the device on which test session will be started. This only mandatory when using a remote appium server with 'appiumServerUrl' parameter. In all other cases, deviceId is set automatically through discovery
+    public static final String FULL_RESET = "fullReset";                        // whether we should do a full reset (default is true)
+    public static final String AUTOMATION_NAME = "automationName";                // Default is "Appium". The automationName to use. See http://appium.io/docs/en/writing-running-appium/caps/index.html
+    public static final String APPIUM_SERVER_URL = "appiumServerUrl";            // URL of an already started appium server. I set, this appium server will be used instead of starting a new one
+    public static final String APPIUM_CAPS = "appiumCaps";                        // Set of capabilities that will be added and sent to appium. These are the capabilities that are not already handled by the framework. See: http://appium.io/docs/en/writing-running-appium/caps/
+    // Format is "key1=value1;key2=value2"
+
+    public static final String APP_PACKAGE = "appPackage";                        // package de l'application
+    public static final String APP_ACTIVITY = "appActivity";                    // activité à démarrer (Android)
+    public static final String APP_WAIT_ACTIVITY = "appWaitActivity";            // dans certains cas, l'activité qui démarre l'application n'est pas l'activité principale. C'est celle-ci qu'on attend
+    public static final String NEW_COMMAND_TIMEOUT = "newCommandTimeout";        // Attente maximale entre 2 commandes envoyées à appium
 
     // Cloud specific properties
-    public static final String VERSION = "version";								// browser version
-    public static final String PLATFORM = "platform";							// platform on which test should execute. Ex: Windows 7, Android, iOS, Linux, OS X 10.10. 	
+    public static final String VERSION = "version";                                // browser version
+    public static final String PLATFORM = "platform";                            // platform on which test should execute. Ex: Windows 7, Android, iOS, Linux, OS X 10.10.
 
     // Neoload specific properties
-    public static final String NEOLOAD_USER_PATH = "neoloadUserPath";			// name of the neoload "user path" that will be created in Design mode
+    public static final String NEOLOAD_USER_PATH = "neoloadUserPath";            // name of the neoload "user path" that will be created in Design mode
 
     // internal use
-    public static final String TEST_VARIABLES = "testVariables"; 				// configuration (aka variables, get via 'param()' method) used for the current test. It is not updated via XML file
+    public static final String TEST_VARIABLES = "testVariables";                // configuration (aka variables, get via 'param()' method) used for the current test. It is not updated via XML file
     public static final String TEST_NAME = "testName";
     public static final String RELATIVE_OUTPUT_DIR = "relativeOutputDir";
     public static final String RANDOM_IN_ATTACHMENT_NAME = "randomInAttachmentName"; // by default, snapshots are renamed with a random part so that if several steps have the same name, their snapshot do not overwrite.
-    																				// this option disables the behaviour FOR TEST PURPOSE
-    
+    // this option disables the behaviour FOR TEST PURPOSE
+
     // default values
     protected static final List<ReportInfo> DEFAULT_CUSTOM_TEST_REPORTS = Arrays.asList(new ReportInfo("PERF::xml::reporter/templates/report.perf.vm"));
     protected static final List<ReportInfo> DEFAULT_CUSTOM_SUMMARY_REPORTS = Arrays.asList(new ReportInfo("results::json::reporter/templates/report.summary.json.vm"));
-	public static final int DEFAULT_NEW_COMMAND_TIMEOUT = 120;
-	public static final String DEFAULT_TEST_ENV = "DEV";
-	public static final String DEFAULT_CUCUMBER_TESTS = "";
-	public static final String DEFAULT_CUCUMBER_TAGS = "";
-	public static final String DEFAULT_APP = "";
-	public static final String DEFAULT_DEVICE_LIST = "{}";
-	public static final boolean DEFAULT_SOFT_ASSERT_ENABLED = true;
-	public static final boolean DEFAULT_ENABLE_EXCEPTION_LISTENER = true;
-	public static final boolean DEFAULT_CAPTURE_SNAPSHOT = true;
-	public static final boolean DEFAULT_CAPTURE_NETWORK = false;
-	public static final String DEFAULT_INITIAL_URL = "about:blank";
-	public static final String DEFAULT_VIDEO_CAPTURE = "onError";
-	public static final Integer DEFAULT_SNAPSHOT_TOP_CROPPING = null;
-	public static final Integer DEFAULT_SNAPSHOT_BOTTOM_CROPPING = null;
-	public static final int DEFAULT_SNAPSHOT_SCROLL_DELAY = 0;
-	public static final boolean DEFAULT_ENABLE_JAVASCRIPT = true;
-	public static final boolean DEFAULT_SET_ACCEPT_UNTRUSTED_CERTIFICATES = true;
-	public static final boolean DEFAULT_SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER = true;
-	public static final String DEFAULT_BROWSER = "none";
-	public static final boolean DEFAULT_BETA_BROWSER = false;
-	public static final boolean DEFAULT_MANUAL_TEST_STEPS = false;
-	public static final boolean DEFAULT_HEADLESS_BROWSER = false;
-	public static final boolean DEFAULT_MASK_PASSWORD = true;
-	public static final boolean DEFAULT_FIND_ERROR_CAUSE = false;
-	public static final String DEFAULT_RUN_MODE = "LOCAL";
-	public static final boolean DEFAULT_OVERRIDE_SELENIUM_NATIVE_ACTION = false;
-	public static final int DEFAULT_PAGE_LOAD_TIME_OUT = 90;
-	public static final PageLoadStrategy DEFAULT_PAGE_LOAD_STRATEGY = PageLoadStrategy.NORMAL;
-	public static final int DEFAULT_EXPLICIT_WAIT_TIME_OUT = 15;
-	public static final int DEFAULT_IMPLICIT_WAIT_TIME_OUT = 5;
-	public static final int DEFAULT_WEB_SESSION_TIMEOUT = 90000;
-	public static final int DEFAULT_TEST_RETRY_COUNT = 2;
-	public static final ProxyType DEFAULT_WEB_PROXY_TYPE = ProxyType.SYSTEM;
-	public static final boolean DEFAULT_OPTIMIZE_REPORTS = false;
-	public static final ArchiveMode DEFAULT_ARCHIVE= ArchiveMode.NEVER;
-	public static final boolean DEFAULT_KEEP_ALL_RESULTS = false;
-	public static final String DEFAULT_NODE_TAGS = "";
-	public static final String DEFAULT_DEBUG = "none";
-	public static final String DEFAULT_AUTOMATION_NAME = "Appium";
-	public static final String DEFAULT_STARTED_BY = null;
-	public static final boolean DEFAULT_REPORTPORTAL_ACTIVE = false;
-	public static final boolean DEFAULT_RANDOM_IN_ATTACHMENT_NAME = true;
-	public static final ElementInfo.Mode DEFAULT_ADVANCED_ELEMENT_SEARCH = ElementInfo.Mode.FALSE;
-	public static final boolean DEFAULT_EDGE_IE_MODE = false;
-    
+    public static final int DEFAULT_NEW_COMMAND_TIMEOUT = 120;
+    public static final String DEFAULT_TEST_ENV = "DEV";
+    public static final String DEFAULT_CUCUMBER_TESTS = "";
+    public static final String DEFAULT_CUCUMBER_TAGS = "";
+    public static final String DEFAULT_APP = "";
+    public static final String DEFAULT_DEVICE_LIST = "{}";
+    public static final boolean DEFAULT_SOFT_ASSERT_ENABLED = true;
+    public static final boolean DEFAULT_ENABLE_EXCEPTION_LISTENER = true;
+    public static final boolean DEFAULT_CAPTURE_SNAPSHOT = true;
+    public static final boolean DEFAULT_CAPTURE_NETWORK = false;
+    public static final String DEFAULT_INITIAL_URL = "about:blank";
+    public static final String DEFAULT_VIDEO_CAPTURE = "onError";
+    public static final Integer DEFAULT_SNAPSHOT_TOP_CROPPING = null;
+    public static final Integer DEFAULT_SNAPSHOT_BOTTOM_CROPPING = null;
+    public static final int DEFAULT_SNAPSHOT_SCROLL_DELAY = 0;
+    public static final boolean DEFAULT_ENABLE_JAVASCRIPT = true;
+    public static final boolean DEFAULT_SET_ACCEPT_UNTRUSTED_CERTIFICATES = true;
+    public static final boolean DEFAULT_SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER = true;
+    public static final String DEFAULT_BROWSER = "none";
+    public static final boolean DEFAULT_BETA_BROWSER = false;
+    public static final boolean DEFAULT_MANUAL_TEST_STEPS = false;
+    public static final boolean DEFAULT_HEADLESS_BROWSER = false;
+    public static final boolean DEFAULT_MASK_PASSWORD = true;
+    public static final boolean DEFAULT_FIND_ERROR_CAUSE = false;
+    public static final String DEFAULT_RUN_MODE = "LOCAL";
+    public static final boolean DEFAULT_OVERRIDE_SELENIUM_NATIVE_ACTION = false;
+    public static final int DEFAULT_PAGE_LOAD_TIME_OUT = 90;
+    public static final PageLoadStrategy DEFAULT_PAGE_LOAD_STRATEGY = PageLoadStrategy.NORMAL;
+    public static final int DEFAULT_EXPLICIT_WAIT_TIME_OUT = 15;
+    public static final int DEFAULT_IMPLICIT_WAIT_TIME_OUT = 5;
+    public static final int DEFAULT_WEB_SESSION_TIMEOUT = 90000;
+    public static final int DEFAULT_TEST_RETRY_COUNT = 2;
+    public static final ProxyType DEFAULT_WEB_PROXY_TYPE = ProxyType.SYSTEM;
+    public static final boolean DEFAULT_OPTIMIZE_REPORTS = false;
+    public static final ArchiveMode DEFAULT_ARCHIVE = ArchiveMode.NEVER;
+    public static final boolean DEFAULT_KEEP_ALL_RESULTS = false;
+    public static final String DEFAULT_NODE_TAGS = "";
+    public static final String DEFAULT_DEBUG = "none";
+    public static final String DEFAULT_AUTOMATION_NAME = "Appium";
+    public static final String DEFAULT_STARTED_BY = null;
+    public static final boolean DEFAULT_REPORTPORTAL_ACTIVE = false;
+    public static final boolean DEFAULT_RANDOM_IN_ATTACHMENT_NAME = true;
+    public static final ElementInfo.Mode DEFAULT_ADVANCED_ELEMENT_SEARCH = ElementInfo.Mode.FALSE;
+    public static final boolean DEFAULT_EDGE_IE_MODE = false;
+
     public static final int DEFAULT_REPLAY_TIME_OUT = 30;
     public static final int DEFAULT_ACTION_DELAY = 200;
-    
-	
 
-	// group of fields below must be copied in SeleniumTestsContext constructor because they are not rediscovered with 'configureContext' method
+
+    // group of fields below must be copied in SeleniumTestsContext constructor because they are not rediscovered with 'configureContext' method
     // Data object to store all context data
     private Map<String, Object> contextDataMap = Collections.synchronizedMap(new HashMap<String, Object>());
     private String baseOutputDirectory; // the 'test-output' folder if not overridden
     private ITestContext testNGContext = null;
     private ITestResult testNGResult = null;
     private Map<ITestResult, List<Throwable>> verificationFailuresMap = new HashMap<>();
-    
+
     private SeleniumRobotVariableServerConnector variableServer;
     private Map<String, TestVariable> variableAlreadyRequestedFromServer;
     private SeleniumGridConnector seleniumGridConnector;
     private List<SeleniumGridConnector> seleniumGridConnectors;
     private TestManager testManagerInstance;
     private TestManagerContext testManagerContext;
-    private BugTracker	bugtrackerInstance;
+    private BugTracker bugtrackerInstance;
     private BugTrackerContext bugtrackerContext;
     private SeleniumRobotServerContext seleniumRobotServerContext;
     private TestStepManager testStepManager; // handles logging of test steps in this context
-    private boolean driverCreationBlocked = false;		// if true, inside this thread, driver creation will be forbidden
+    private boolean driverCreationBlocked = false;        // if true, inside this thread, driver creation will be forbidden
 
     private String threadId;
-    
+
     // folder config
- 	private Map<String, HashMap<String,String>> idMapping;
-    
+    private Map<String, HashMap<String, String>> idMapping;
+
     public SeleniumTestsContext() {
-    	// for test purpose only
-    	variableServer = null;
-    	seleniumGridConnector = null;
-    	seleniumGridConnectors = new ArrayList<>();
-    	testManagerInstance = null;
-    	bugtrackerInstance = null;
-    	testManagerContext = null;
-    	testStepManager = new TestStepManager();
+        // for test purpose only
+        variableServer = null;
+        seleniumGridConnector = null;
+        seleniumGridConnectors = new ArrayList<>();
+        testManagerInstance = null;
+        bugtrackerInstance = null;
+        testManagerContext = null;
+        testStepManager = new TestStepManager();
         threadId = ThreadUtil.currentThreadInfo();
     }
-    
+
     /**
      * Create a new context from this one. This does copy only TestNG context and data map / variables
-     * @param toCopy		the context to copy in this one
+     *
+     * @param toCopy the context to copy in this one
      */
     public SeleniumTestsContext(SeleniumTestsContext toCopy) {
-    	this(toCopy, true);
+        this(toCopy, true);
     }
-    
+
     /**
-     * 
-     * @param toCopy							source context from which we copy data
-     * @param allowRequestsToDependencies		if true, we will request to variable server / grid hub for new session or data		
+     * @param toCopy                      source context from which we copy data
+     * @param allowRequestsToDependencies if true, we will request to variable server / grid hub for new session or data
      */
     public SeleniumTestsContext(SeleniumTestsContext toCopy, boolean allowRequestsToDependencies) {
-    	contextDataMap = new HashMap<>(toCopy.contextDataMap); 
-    	testNGContext = toCopy.testNGContext;
-    	if (!allowRequestsToDependencies && toCopy.variableAlreadyRequestedFromServer != null) {
-    		variableAlreadyRequestedFromServer = new HashMap<>(toCopy.variableAlreadyRequestedFromServer);
-    	}
-    	
-    	// issue #291: also copy gridConnector and gridConnectors so that they can be re-used between BeforeMethod and Test Method
-    	if (!allowRequestsToDependencies && toCopy.seleniumGridConnector != null) {
-    		seleniumGridConnector = toCopy.seleniumGridConnector;
-    		seleniumGridConnectors = new ArrayList<>(toCopy.seleniumGridConnectors);
-    	}
-    	
-    	if (!allowRequestsToDependencies) {
-    		testManagerInstance = toCopy.testManagerInstance;
-    		bugtrackerInstance = toCopy.bugtrackerInstance;
-    	}
-    	
-    	testNGResult = toCopy.testNGResult;
-    	baseOutputDirectory = toCopy.baseOutputDirectory;
-    	verificationFailuresMap = new HashMap<>(toCopy.verificationFailuresMap);
-    	testStepManager = new TestStepManager(toCopy.testStepManager);
-    	
-    	initSubContexts();
+        contextDataMap = new HashMap<>(toCopy.contextDataMap);
+        testNGContext = toCopy.testNGContext;
+        if (!allowRequestsToDependencies && toCopy.variableAlreadyRequestedFromServer != null) {
+            variableAlreadyRequestedFromServer = new HashMap<>(toCopy.variableAlreadyRequestedFromServer);
+        }
+
+        // issue #291: also copy gridConnector and gridConnectors so that they can be re-used between BeforeMethod and Test Method
+        if (!allowRequestsToDependencies && toCopy.seleniumGridConnector != null) {
+            seleniumGridConnector = toCopy.seleniumGridConnector;
+            seleniumGridConnectors = new ArrayList<>(toCopy.seleniumGridConnectors);
+        }
+
+        if (!allowRequestsToDependencies) {
+            testManagerInstance = toCopy.testManagerInstance;
+            bugtrackerInstance = toCopy.bugtrackerInstance;
+        }
+
+        testNGResult = toCopy.testNGResult;
+        baseOutputDirectory = toCopy.baseOutputDirectory;
+        verificationFailuresMap = new HashMap<>(toCopy.verificationFailuresMap);
+        testStepManager = new TestStepManager(toCopy.testStepManager);
+
+        initSubContexts();
 
         threadId = ThreadUtil.currentThreadInfo();
     }
-    
+
     private void initSubContexts() {
-    	testManagerContext = new TestManagerContext(this);
-    	bugtrackerContext = new BugTrackerContext(this);
-    	seleniumRobotServerContext = new SeleniumRobotServerContext(this);
+        testManagerContext = new TestManagerContext(this);
+        bugtrackerContext = new BugTrackerContext(this);
+        seleniumRobotServerContext = new SeleniumRobotServerContext(this);
     }
-    
+
     public SeleniumTestsContext(final ITestContext context) {
         testNGContext = context;
 
-    	testStepManager = new TestStepManager();
-    	
-    	initSubContexts();
-    	
+        testStepManager = new TestStepManager();
+
+        initSubContexts();
+
         buildContextFromConfig();
     }
-    
+
     private void buildContextFromConfig() {
-    	setConfiguration(new HashMap<>());
-    	
-    	testManagerContext.init();
-    	bugtrackerContext.init();
-    	seleniumRobotServerContext.init();
-    	   
+        setConfiguration(new HashMap<>());
+
+        testManagerContext.init();
+        bugtrackerContext.init();
+        seleniumRobotServerContext.init();
+
         setFindErrorCause(getBoolValueForTest(FIND_ERROR_CAUSE, System.getProperty(FIND_ERROR_CAUSE)));
-        
+
         setWebDriverGrid(getValueForTest(WEB_DRIVER_GRID, System.getProperty(WEB_DRIVER_GRID)));
-        setRunMode(getValueForTest(RUN_MODE, System.getProperty(RUN_MODE)));   
-        setNodeTags(getValueForTest(NODE_TAGS, System.getProperty(NODE_TAGS)));   
-        
-        setMaskPassword(getBoolValueForTest(MASK_PASSWORD, System.getProperty(MASK_PASSWORD)));       
+        setRunMode(getValueForTest(RUN_MODE, System.getProperty(RUN_MODE)));
+        setNodeTags(getValueForTest(NODE_TAGS, System.getProperty(NODE_TAGS)));
+
+        setMaskPassword(getBoolValueForTest(MASK_PASSWORD, System.getProperty(MASK_PASSWORD)));
         setLoadIni(getValueForTest(LOAD_INI, System.getProperty(LOAD_INI)));
         setWebSessionTimeout(getIntValueForTest(WEB_SESSION_TIME_OUT, System.getProperty(WEB_SESSION_TIME_OUT)));
         setImplicitWaitTimeout(getIntValueForTest(IMPLICIT_WAIT_TIME_OUT, System.getProperty(IMPLICIT_WAIT_TIME_OUT)));
@@ -406,11 +388,11 @@ public class SeleniumTestsContext {
         setNtlmAuthTrustedUris(getValueForTest(NTLM_AUTH_TRUSTED_URIS, System.getProperty(NTLM_AUTH_TRUSTED_URIS)));
         setBrowserDownloadDir(getValueForTest(BROWSER_DOWNLOAD_DIR, System.getProperty(BROWSER_DOWNLOAD_DIR)));
         setCapabilities(getValueForTest(CAPABILITIES, System.getProperty(CAPABILITIES)));
-        
+
         setOverrideSeleniumNativeAction(getBoolValueForTest(OVERRIDE_SELENIUM_NATIVE_ACTION, System.getProperty(OVERRIDE_SELENIUM_NATIVE_ACTION)));
 
         setAdvancedElementSearch(getValueForTest(ADVANCED_ELEMENT_SEARCH, System.getProperty(ADVANCED_ELEMENT_SEARCH)));
-        
+
         setWebProxyType(getValueForTest(WEB_PROXY_TYPE, System.getProperty(WEB_PROXY_TYPE)));
         setWebProxyAddress(getValueForTest(WEB_PROXY_ADDRESS, System.getProperty(WEB_PROXY_ADDRESS)));
         setWebProxyLogin(getValueForTest(WEB_PROXY_LOGIN, System.getProperty(WEB_PROXY_LOGIN)));
@@ -418,7 +400,7 @@ public class SeleniumTestsContext {
         setWebProxyPort(getIntValueForTest(WEB_PROXY_PORT, System.getProperty(WEB_PROXY_PORT)));
         setWebProxyExclude(getValueForTest(WEB_PROXY_EXCLUDE, System.getProperty(WEB_PROXY_EXCLUDE)));
         setWebProxyPac(getValueForTest(WEB_PROXY_PAC, System.getProperty(WEB_PROXY_PAC)));
-        
+
         setSnapshotScrollDelay(getIntValueForTest(SNAPSHOT_SCROLL_DELAY, System.getProperty(SNAPSHOT_SCROLL_DELAY)));
         setSnapshotBottomCropping(getIntValueForTest(SNAPSHOT_BOTTOM_CROPPING, System.getProperty(SNAPSHOT_BOTTOM_CROPPING)));
         setSnapshotTopCropping(getIntValueForTest(SNAPSHOT_TOP_CROPPING, System.getProperty(SNAPSHOT_TOP_CROPPING)));
@@ -442,7 +424,7 @@ public class SeleniumTestsContext {
 
         setApp(getValueForTest(APP, System.getProperty(APP)));
         setStartedBy(getValueForTest(STARTED_BY, System.getProperty(STARTED_BY)));
-       
+
         setCucumberTags(getValueForTest(CUCUMBER_TAGS, System.getProperty(CUCUMBER_TAGS)));
         setCucumberTests(getValueForTest(CUCUMBER_TESTS, System.getProperty(CUCUMBER_TESTS)));
         setCucumberImplementationPackage(getValueForTest(CUCUMBER_IMPLEMENTATION_PKG, System.getProperty(CUCUMBER_IMPLEMENTATION_PKG)));
@@ -454,123 +436,124 @@ public class SeleniumTestsContext {
         setAppActivity(getValueForTest(APP_ACTIVITY, System.getProperty(APP_ACTIVITY)));
         setAppWaitActivity(getValueForTest(APP_WAIT_ACTIVITY, System.getProperty(APP_WAIT_ACTIVITY)));
         setNewCommandTimeout(getIntValueForTest(NEW_COMMAND_TIMEOUT, System.getProperty(NEW_COMMAND_TIMEOUT)));
-        
+
         setActionDelay(getIntValueForTest(ACTION_DELAY, System.getProperty(ACTION_DELAY)));
 
         setVersion(getValueForTest(VERSION, System.getProperty(VERSION)));
         setPlatform(getValueForTest(PLATFORM, System.getProperty(PLATFORM)));
-        
+
         setCustomTestReports(getValueForTest(CUSTOM_TEST_REPORTS, System.getProperty(CUSTOM_TEST_REPORTS)));
         setCustomSummaryReports(getValueForTest(CUSTOM_SUMMARY_REPORTS, System.getProperty(CUSTOM_SUMMARY_REPORTS)));
         setArchiveToFile(getValueForTest(ARCHIVE_TO_FILE, System.getProperty(ARCHIVE_TO_FILE)));
         setArchive(getValueForTest(ARCHIVE, System.getProperty(ARCHIVE)));
         setOptimizeReports(getBoolValueForTest(OPTIMIZE_REPORTS, System.getProperty(OPTIMIZE_REPORTS)));
         setKeepAllResults(getBoolValueForTest(KEEP_ALL_RESULTS, System.getProperty(KEEP_ALL_RESULTS)));
-        
+
         setViewPortWidth(getIntValueForTest(VIEWPORT_WIDTH, System.getProperty(VIEWPORT_WIDTH)));
         setViewPortHeight(getIntValueForTest(VIEWPORT_HEIGHT, System.getProperty(VIEWPORT_HEIGHT)));
-        
+
         setNeoloadUserPath(getValueForTest(NEOLOAD_USER_PATH, System.getProperty(NEOLOAD_USER_PATH)));
-        
+
         setRandomInAttachmentNames(getBoolValueForTest(RANDOM_IN_ATTACHMENT_NAME, System.getProperty(RANDOM_IN_ATTACHMENT_NAME)));
-        
+
         //setReportPortalActive(getBoolValueForTest(REPORTPORTAL_ACTIVE, System.getProperty(REPORTPORTAL_ACTIVE)));
-        
+
         if (testNGContext != null) {
-        	
-        	// this value will be overwritten for thread context by a call to "configureContext"
-        	setOutputDirectory(getValueForTest(OUTPUT_DIRECTORY, System.getProperty(OUTPUT_DIRECTORY)), testNGContext, true);
-        	baseOutputDirectory = getOutputDirectory();
+
+            // this value will be overwritten for thread context by a call to "configureContext"
+            setOutputDirectory(getValueForTest(OUTPUT_DIRECTORY, System.getProperty(OUTPUT_DIRECTORY)), testNGContext, true);
+            baseOutputDirectory = getOutputDirectory();
 
             // parse other parameters that are defined in testng xml or as user parameters but not defined
             // in this context. Called here so that user defined parameters can be accessed inside @Before / @After annotated methods
             setTestConfiguration();
         }
     }
-    
+
     /**
      * If chrome or firefox binary is redefined in parameter, update list of installed browser so
      * that it matches those really used
      */
     private void updateInstalledBrowsers() {
-    	Map<BrowserType, List<BrowserInfo>> installedBrowsers = OSUtility.getInstalledBrowsersWithVersion(getBetaBrowser());
-    	
-    	if (getFirefoxBinPath() != null) {
-    		String version = OSUtility.getFirefoxVersion(getFirefoxBinPath());
-    		List<BrowserInfo> infos = installedBrowsers.getOrDefault(BrowserType.FIREFOX, new ArrayList<>());
-    		infos.add(new BrowserInfo(BrowserType.FIREFOX, OSUtility.extractFirefoxVersion(version), getFirefoxBinPath()));
-    		installedBrowsers.put(BrowserType.FIREFOX, infos);
-    	}
-    	
-    	if (getChromeBinPath() != null) {
-    		String version = OSUtility.getChromeVersion(getChromeBinPath());
-    		List<BrowserInfo> infos = installedBrowsers.getOrDefault(BrowserType.CHROME, new ArrayList<>());
-    		infos.add(new BrowserInfo(BrowserType.CHROME, OSUtility.extractChromeOrChromiumVersion(version), getChromeBinPath()));
-    		installedBrowsers.put(BrowserType.CHROME, infos);
-    	}
+        Map<BrowserType, List<BrowserInfo>> installedBrowsers = OSUtility.getInstalledBrowsersWithVersion(getBetaBrowser());
+
+        if (getFirefoxBinPath() != null) {
+            String version = OSUtility.getFirefoxVersion(getFirefoxBinPath());
+            List<BrowserInfo> infos = installedBrowsers.getOrDefault(BrowserType.FIREFOX, new ArrayList<>());
+            infos.add(new BrowserInfo(BrowserType.FIREFOX, OSUtility.extractFirefoxVersion(version), getFirefoxBinPath()));
+            installedBrowsers.put(BrowserType.FIREFOX, infos);
+        }
+
+        if (getChromeBinPath() != null) {
+            String version = OSUtility.getChromeVersion(getChromeBinPath());
+            List<BrowserInfo> infos = installedBrowsers.getOrDefault(BrowserType.CHROME, new ArrayList<>());
+            infos.add(new BrowserInfo(BrowserType.CHROME, OSUtility.extractChromeOrChromiumVersion(version), getChromeBinPath()));
+            installedBrowsers.put(BrowserType.CHROME, infos);
+        }
     }
-    
+
     /**
      * update test data according to platform
+     *
      * @param platform
      */
     public void updateTestAndMobile(String platform) {
-    	
-    	setPlatform(platform);
-    	
-    	 // determines test_type according to input configuration
+
+        setPlatform(platform);
+
+        // determines test_type according to input configuration
         configureTestType();
 
         // get mobile platform version if one is defined in device list and a deviceName is set in parameters
         updateDeviceMobileVersion();
-        
+
         // get mobile platform version
         updatePlatformVersion();
     }
-    
+
     /**
      * From platform name, in case of Desktop platform, do nothing and in case of mobile, extract OS version from name
      * as platformName will be 'Android 5.0' for example
      *
-     * @throws ConfigurationException 	in mobile, if version is not present
+     * @throws ConfigurationException in mobile, if version is not present
      */
     private void updatePlatformVersion() {
-    	try {
-	    	Platform currentPlatform = Platform.fromString(getPlatform());
-	    	if (!(currentPlatform.is(Platform.WINDOWS) 
-	    		|| currentPlatform.is(Platform.MAC) 
-	    		|| currentPlatform.is(Platform.UNIX)
-	    		|| currentPlatform.is(Platform.ANY) && getRunMode() == DriverMode.GRID)) {
-	    		throw new WebDriverException("");
-	    	
-	    	} 
-	    } catch (WebDriverException e) {
-	    	if (getPlatform().toLowerCase().startsWith("android") || getPlatform().toLowerCase().startsWith("ios")) {
-	    		String[] pfVersion = getPlatform().split(" ", 2);
-	    		try {
-		    		setPlatform(pfVersion[0]);
-		    		setMobilePlatformVersion(pfVersion[1]);
-	    		} catch (IndexOutOfBoundsException x) {
-	    			setMobilePlatformVersion(null);
-	    			logger.warn("For mobile platform, platform name should contain version. Ex: 'Android 5.0' or 'iOS 9.1'. Else, first found device is used");
-	    		}
-	    		
-			} else {
-				throw new ConfigurationException(String.format("Platform %s has not been recognized as a valid platform", getPlatform()));
-			}
-    	}
+        try {
+            Platform currentPlatform = Platform.fromString(getPlatform());
+            if (!(currentPlatform.is(Platform.WINDOWS)
+                    || currentPlatform.is(Platform.MAC)
+                    || currentPlatform.is(Platform.UNIX)
+                    || currentPlatform.is(Platform.ANY) && getRunMode() == DriverMode.GRID)) {
+                throw new WebDriverException("");
+
+            }
+        } catch (WebDriverException e) {
+            if (getPlatform().toLowerCase().startsWith("android") || getPlatform().toLowerCase().startsWith("ios")) {
+                String[] pfVersion = getPlatform().split(" ", 2);
+                try {
+                    setPlatform(pfVersion[0]);
+                    setMobilePlatformVersion(pfVersion[1]);
+                } catch (IndexOutOfBoundsException x) {
+                    setMobilePlatformVersion(null);
+                    logger.warn("For mobile platform, platform name should contain version. Ex: 'Android 5.0' or 'iOS 9.1'. Else, first found device is used");
+                }
+
+            } else {
+                throw new ConfigurationException(String.format("Platform %s has not been recognized as a valid platform", getPlatform()));
+            }
+        }
     }
-    
+
     /**
      * Configure test type according to platform, browser and app parameters
      */
     private void configureTestType() {
-    	if (getPlatform().toLowerCase().startsWith("android")) {
-        	if (getApp().isEmpty() && getAppActivity() == null) { // a browser name should be defined
-        		setTestType(TestType.APPIUM_WEB_ANDROID);
-        	} else {
-        		setTestType(TestType.APPIUM_APP_ANDROID);
-        	}
+        if (getPlatform().toLowerCase().startsWith("android")) {
+            if (getApp().isEmpty() && getAppActivity() == null) { // a browser name should be defined
+                setTestType(TestType.APPIUM_WEB_ANDROID);
+            } else {
+                setTestType(TestType.APPIUM_APP_ANDROID);
+            }
         } else if (getPlatform().toLowerCase().startsWith("ios")) {
             if (getApp().isEmpty() && getBrowser() != BrowserType.NONE) { // a browser name should be defined
                 setTestType(TestType.APPIUM_WEB_IOS);
@@ -580,38 +563,39 @@ public class SeleniumTestsContext {
         } else if (getPlatform().toLowerCase().startsWith("windows") && !((getApp() == null || getApp().isEmpty()) && (getAppActivity() == null || getAppActivity().isEmpty()))) {
             setTestType(TestType.APPIUM_APP_WINDOWS);
         } else {
-        	if (getBrowser() == BrowserType.NONE) {
-        		setTestType(TestType.NON_GUI);
-        	} else {
-        		setTestType(TestType.WEB);
-        	}
+            if (getBrowser() == BrowserType.NONE) {
+                setTestType(TestType.NON_GUI);
+            } else {
+                setTestType(TestType.WEB);
+            }
         }
     }
-    
+
     /**
      * Search mobile platform version according to device name if one has been defined in testConfig file
      */
     private void updateDeviceMobileVersion() {
-    	Map<String, String> deviceList = getDeviceList();
-    	if (getDeviceName() != null && !getDeviceName().isEmpty() && !deviceList.isEmpty()) {
-    		setPlatform(deviceList.get(getDeviceName()));
-    	}
+        Map<String, String> deviceList = getDeviceList();
+        if (getDeviceName() != null && !getDeviceName().isEmpty() && !deviceList.isEmpty()) {
+            setPlatform(deviceList.get(getDeviceName()));
+        }
     }
-    
+
     /**
      * returns the selenium grid connector if mode requests it
+     *
      * @return
      */
     private List<SeleniumGridConnector> connectGrid() {
-    	if (getRunMode() == DriverMode.GRID) {
-    		if (getWebDriverGrid() != null && !getWebDriverGrid().isEmpty()) {
-    			return SeleniumGridConnectorFactory.getInstances(getWebDriverGrid());
-    		} else {
-    			throw new ConfigurationException("Test should be executed with Selenium Grid but URL is not set");
-    		}
-    	} else {
-    		return null;
-    	}
+        if (getRunMode() == DriverMode.GRID) {
+            if (getWebDriverGrid() != null && !getWebDriverGrid().isEmpty()) {
+                return SeleniumGridConnectorFactory.getInstances(getWebDriverGrid());
+            } else {
+                throw new ConfigurationException("Test should be executed with Selenium Grid but URL is not set");
+            }
+        } else {
+            return null;
+        }
     }
 
     public void addVerificationFailures(final ITestResult result, final List<Throwable> failures) {
@@ -630,66 +614,70 @@ public class SeleniumTestsContext {
         }
     }
 
-       
+
     /**
      * Get all JVM properties and filters the java one so that only user defined JVM arguments are returned
+     *
      * @return
      */
     public Map<String, String> getCommandLineProperties() {
-	    Map<String, String> props = new HashMap<>();
-	    for (Entry<Object,Object> entry: System.getProperties().entrySet()) {
-	    	String key = entry.getKey().toString();
-	    	if (key.startsWith("java.") 
-	    			|| key.startsWith("sun.")
-	    			|| key.startsWith("user.")
-	    			|| key.startsWith("os.")
-	    			|| key.startsWith("file.")
-	    			|| key.startsWith("awt.")
-	    			|| "line.separator".equals(key)
-	    			|| "jnidispatch.path".equals(key)
-	    			) {
-	    		continue;
-	    	}
-	    	props.put(key, System.getProperty(key));
-	    }
-	    return props;
+        Map<String, String> props = new HashMap<>();
+        for (Entry<Object, Object> entry : System.getProperties().entrySet()) {
+            String key = entry.getKey().toString();
+            if (key.startsWith("java.")
+                    || key.startsWith("sun.")
+                    || key.startsWith("user.")
+                    || key.startsWith("os.")
+                    || key.startsWith("file.")
+                    || key.startsWith("awt.")
+                    || "line.separator".equals(key)
+                    || "jnidispatch.path".equals(key)
+            ) {
+                continue;
+            }
+            props.put(key, System.getProperty(key));
+        }
+        return props;
     }
-    
+
     /**
      * Returns list of variables defined by user from command line
+     *
      * @return
      */
     private Map<String, TestVariable> getUserDefinedVariablesFromCommandLine() {
-    	return extractCustomVariables(getCommandLineProperties());
+        return extractCustomVariables(getCommandLineProperties());
     }
-    
+
     /**
      * Returns list of variables defined by user from TestNG XML file
+     *
      * @return
      */
     private Map<String, TestVariable> getUserDefinedVariablesFromXMLFile() {
-    	if (testNGContext != null) {
-        	Map<String, String> testParameters;
-        	if (testNGContext.getCurrentXmlTest() == null) {
-        		testParameters = testNGContext.getSuite().getXmlSuite().getParameters();
-        	} else {
-        		testParameters = testNGContext.getCurrentXmlTest().getAllParameters();
-        	}
+        if (testNGContext != null) {
+            Map<String, String> testParameters;
+            if (testNGContext.getCurrentXmlTest() == null) {
+                testParameters = testNGContext.getSuite().getXmlSuite().getParameters();
+            } else {
+                testParameters = testNGContext.getCurrentXmlTest().getAllParameters();
+            }
 
             return extractCustomVariables(testParameters);
         }
-    	return new HashMap<>();
+        return new HashMap<>();
     }
-    
+
     /**
      * from a list of variables, extract those who are variables created by user (not seleniumRobot technical variables)
-     * If parameter is already known in contextDataMap (technical parameters defined in this class), it's not added 
+     * If parameter is already known in contextDataMap (technical parameters defined in this class), it's not added
+     *
      * @param parameters
      */
     private Map<String, TestVariable> extractCustomVariables(Map<String, String> parameters) {
-    	Map<String, TestVariable> variables = new HashMap<>();
-    	
-    	for (Entry<String, String> entry : parameters.entrySet()) {
+        Map<String, TestVariable> variables = new HashMap<>();
+
+        for (Entry<String, String> entry : parameters.entrySet()) {
             String attributeName = entry.getKey();
 
             // contextDataMap already contains all technical parameters
@@ -697,352 +685,368 @@ public class SeleniumTestsContext {
                 variables.put(attributeName, new TestVariable(attributeName, entry.getValue()));
             }
         }
-    	
-    	return variables;
+
+        return variables;
     }
 
     /**
      * Get (in order of importance) user value (if exist), test value (if exist), suite value (if exist) or null
      *
-     * @param  attributeName
-     * @param  sysPropertyValue
+     * @param attributeName
+     * @param sysPropertyValue
      */
     public String getValueForTest(final String attributeName, final String sysPropertyValue) {
-    	String value = null;
+        String value = null;
         if (testNGContext != null) {
-        	
-        	// default suite value, even if currentXmlTest is null
-        	value = testNGContext.getSuite().getXmlSuite().getParameter(attributeName);
-        	
-        	if (testNGContext.getCurrentXmlTest() != null) {
-        	
-	        	// priority given to test parameter
-	        	String testValue = testNGContext.getCurrentXmlTest().getParameter(attributeName);
-	        	
-	        	if (testValue == null) {
-	        		
-	        		// if test parameter does not exist, look at suite parameter
-	        		value = testNGContext.getCurrentXmlTest().getSuite().getParameter(attributeName);
-	        		
-	        	} else {
-	        		value = testValue;
-	        	}
-        	}
+
+            // default suite value, even if currentXmlTest is null
+            value = testNGContext.getSuite().getXmlSuite().getParameter(attributeName);
+
+            if (testNGContext.getCurrentXmlTest() != null) {
+
+                // priority given to test parameter
+                String testValue = testNGContext.getCurrentXmlTest().getParameter(attributeName);
+
+                if (testValue == null) {
+
+                    // if test parameter does not exist, look at suite parameter
+                    value = testNGContext.getCurrentXmlTest().getSuite().getParameter(attributeName);
+
+                } else {
+                    value = testValue;
+                }
+            }
         }
-        
+
         return sysPropertyValue != null ? sysPropertyValue : value;
     }
-    
+
     /**
      * Return an int value from test parameters
+     *
      * @param attributeName
      * @param sysPropertyValue
      * @return
      */
     public Integer getIntValueForTest(final String attributeName, final String sysPropertyValue) {
-    	String value = getValueForTest(attributeName, sysPropertyValue);
-    	try {
-    		return value == null ? null: Integer.parseInt(value);
-    	} catch (NumberFormatException e) {
-    		throw new ConfigurationException(String.format("Option [%s] value should be integer or null, found [%s]", attributeName, value));
-    	}
+        String value = getValueForTest(attributeName, sysPropertyValue);
+        try {
+            return value == null ? null : Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            throw new ConfigurationException(String.format("Option [%s] value should be integer or null, found [%s]", attributeName, value));
+        }
     }
-    
+
     /**
      * Return a boolean value from test parameters
+     *
      * @param attributeName
      * @param sysPropertyValue
      * @return
      */
     public Boolean getBoolValueForTest(final String attributeName, final String sysPropertyValue) {
-    	String value = getValueForTest(attributeName, sysPropertyValue);
-    	return value == null ? null: Boolean.parseBoolean(value);
+        String value = getValueForTest(attributeName, sysPropertyValue);
+        return value == null ? null : Boolean.parseBoolean(value);
     }
-    
+
     private void createContextConnectors() {
-    	
-    	// create selenium grid connectors. They will be created if it's null
-    	// in this phase, we chek that grid is alive
-    	getSeleniumGridConnectors();
-    	
-    	// create Test Manager connector
-    	testManagerInstance = testManagerContext.createTestManagerConnector();
-    	
-    	bugtrackerInstance = bugtrackerContext.createBugtracker();
-    	
+
+        // create selenium grid connectors. They will be created if it's null
+        // in this phase, we chek that grid is alive
+        getSeleniumGridConnectors();
+
+        // create Test Manager connector
+        testManagerInstance = testManagerContext.createTestManagerConnector();
+
+        bugtrackerInstance = bugtrackerContext.createBugtracker();
+
     }
-    
+
     /**
      * Created the directory specific to this test. It must be unique even if the same test is executed twice
      * So the created directory is 'test-ouput/<test_name>-<index>'
      */
     public void createTestSpecificOutputDirectory(ITestResult testNGResult) {
-    	String testOutputFolderName = hashTest(testNGResult);
-    	
-    	// use base directory as it's fixed along the life of the test
-		Path outputDir = Paths.get(baseOutputDirectory, testOutputFolderName);
-		setRelativeOutputDir(testOutputFolderName);
-		setOutputDirectory(outputDir.toString(), testNGContext, false);
+        String testOutputFolderName = hashTest(testNGResult);
+
+        // use base directory as it's fixed along the life of the test
+        Path outputDir = Paths.get(baseOutputDirectory, testOutputFolderName);
+        setRelativeOutputDir(testOutputFolderName);
+        setOutputDirectory(outputDir.toString(), testNGContext, false);
 
     }
-    
+
     /**
      * Returns the name of the folder where all files (result, snapshots) will be stored inside 'test-output' folder
-     * By default, folder name is the name of the test. But if the same test is executed twice, with for example DataProvider or through different suites / tests, 
+     * By default, folder name is the name of the test. But if the same test is executed twice, with for example DataProvider or through different suites / tests,
      * then increment a suffix so that there is no collision between test results
+     *
      * @param testNGResult
      * @return
      */
     private String hashTest(ITestResult testNGResult) {
-    	
-    	synchronized (lock) { // issue #352: be sure we create the unique folder name once at a time
-    		String uniqueIdentifier = TestNGResultUtils.getHashForTest(testNGResult);
-        	String testNameModified = StringUtility.replaceOddCharsFromFileName(TestNGResultUtils.getTestName(testNGResult));
-        	
-        	// issue #361: handle names that end with '..'
-        	if (testNameModified.endsWith("..")) {
-        		testNameModified += "-";
-        	}
-        	
-        	if (!outputFolderNames.containsKey(uniqueIdentifier)) {
-        		if (!outputFolderNames.values().contains(testNameModified)) {
-        			outputFolderNames.put(uniqueIdentifier, testNameModified);
-        		} else {
-    	    		int i = 0;
-    	    		while (i++ < 1000) {
-    	    			if (!outputFolderNames.values().contains(testNameModified + "-" + i)) {
-    	        			outputFolderNames.put(uniqueIdentifier, testNameModified + "-" + i);
-    	        			break;
-    	    			}
-    	    		}
-        		}
-        	}
-        	return outputFolderNames.get(uniqueIdentifier);
-		}
+
+        synchronized (lock) { // issue #352: be sure we create the unique folder name once at a time
+            String uniqueIdentifier = TestNGResultUtils.getHashForTest(testNGResult);
+            String testNameModified = StringUtility.replaceOddCharsFromFileName(TestNGResultUtils.getTestName(testNGResult));
+
+            // issue #361: handle names that end with '..'
+            if (testNameModified.endsWith("..")) {
+                testNameModified += "-";
+            }
+
+            if (!outputFolderNames.containsKey(uniqueIdentifier)) {
+                if (!outputFolderNames.values().contains(testNameModified)) {
+                    outputFolderNames.put(uniqueIdentifier, testNameModified);
+                } else {
+                    int i = 0;
+                    while (i++ < 1000) {
+                        if (!outputFolderNames.values().contains(testNameModified + "-" + i)) {
+                            outputFolderNames.put(uniqueIdentifier, testNameModified + "-" + i);
+                            break;
+                        }
+                    }
+                }
+            }
+            return outputFolderNames.get(uniqueIdentifier);
+        }
     }
-    
+
     /**
      * post configuration of the context
      * This should be done only inside the test method as we need the 'Test' method result and not an 'Before' or 'After' method result
      */
     public void configureContext(ITestResult testNGResult) {
-    	
-    	// to do before creating connectors because seleniumRobot server needs it
-    	this.testNGResult = testNGResult; 
-    	
-    	// context may be missing from testNgResult, so add it to avoid problems when getting hash for test
-    	if (testNGResult.getTestContext() == null) {
-    		((TestResult)testNGResult).setContext(testNGContext);
-    	}
+
+        // to do before creating connectors because seleniumRobot server needs it
+        this.testNGResult = testNGResult;
+
+        // context may be missing from testNgResult, so add it to avoid problems when getting hash for test
+        if (testNGResult.getTestContext() == null) {
+            ((TestResult) testNGResult).setContext(testNGContext);
+        }
 
         updateTestAndMobile(getPlatform());
-        
+
         // update browser version: replace installed one with those given in parameters
         updateInstalledBrowsers();
-        
+
         // update ouput directory
         createTestSpecificOutputDirectory(testNGResult);
-        
+
         // create seleniumRobot server instance
         variableServer = seleniumRobotServerContext.createSeleniumRobotServer(testNGResult);
-    	
+
         // read and set test configuration from env.ini file and from seleniumRobot server
-    	setTestConfiguration();
-    	updateProxyConfig();
-    	
-    	// create other connectors that may use variables
-    	createContextConnectors();
+        try {
+            testNGResult.setAttribute("hasVariableServerFailed", false);
+            setTestConfiguration();
+        } catch (Exception e) {
+            // If the setTestConfiguration fails, it must be an error from the SeleniumRobot Server
+            // In this case, add a flag to ensure that the test won't be executed but the Exception is displayed in the report
+            testNGResult.setThrowable(new SeleniumRobotServerException("An error occured while fetching variables from the SeleniumRobot Server. Test execution is skipped."));
+            testNGResult.setAttribute("hasVariableServerFailed", true);
+        }
+        updateProxyConfig();
+
+        // create other connectors that may use variables
+        createContextConnectors();
     }
-    
+
     /**
      * Extract proxy settings from environment configuration (env.ini) and write them to context if they are not already present in XML file or on command line
      */
     public void updateProxyConfig() {
-    	Map<String, TestVariable> envConfig = getConfiguration();
-    	for (Entry<String, TestVariable> entry: envConfig.entrySet()) {
-    		String key = entry.getKey();
-    		switch (key) {
-    			case WEB_PROXY_TYPE:
-    				setWebProxyType(getAttribute(WEB_PROXY_TYPE_FROM_USER) == null ? envConfig.get(key).getValue(): getWebProxyType().name());
-    				break;
-    			case WEB_PROXY_ADDRESS:
-    				setWebProxyAddress(getWebProxyAddress() == null ? envConfig.get(key).getValue(): getWebProxyAddress());
-    				break;
-    			case WEB_PROXY_PORT:
-    				setWebProxyPort(getWebProxyPort() == null ? Integer.valueOf(envConfig.get(key).getValue()): getWebProxyPort());
-    				break;
-    			case WEB_PROXY_LOGIN:
-    				setWebProxyLogin(getWebProxyLogin() == null ? envConfig.get(key).getValue(): getWebProxyLogin());
-    				break;
-    			case WEB_PROXY_PASSWORD:
-    				setWebProxyPassword(getWebProxyPassword() == null ? envConfig.get(key).getValue(): getWebProxyPassword());
-    				break;
-    			case WEB_PROXY_PAC:
-    				setWebProxyPac(getWebProxyPac() == null ? envConfig.get(key).getValue(): getWebProxyPac());
-    				break;
-    			case WEB_PROXY_EXCLUDE:
-    				setWebProxyExclude(getWebProxyExclude() == null ? envConfig.get(key).getValue(): getWebProxyExclude());
-    				break;
-    			default:
-    				continue;
-    		}
-    	}
-    	
-    	// set default value for proxy type if none as been set before
-    	if (getWebProxyType() == null) {
-    		setWebProxyType(DEFAULT_WEB_PROXY_TYPE.toString());
-    	}
-    	
-    	// exclude browserMobProxy if proxy type is set to PAC
-    	if (getCaptureNetwork() && getWebProxyType() != ProxyType.DIRECT && getWebProxyType() != ProxyType.MANUAL) {
-    		throw new ConfigurationException("Browsermob proxy (captureNetwork option) is only compatible with DIRECT and MANUAL");
-    	}
+        Map<String, TestVariable> envConfig = getConfiguration();
+        for (Entry<String, TestVariable> entry : envConfig.entrySet()) {
+            String key = entry.getKey();
+            switch (key) {
+                case WEB_PROXY_TYPE:
+                    setWebProxyType(getAttribute(WEB_PROXY_TYPE_FROM_USER) == null ? envConfig.get(key).getValue() : getWebProxyType().name());
+                    break;
+                case WEB_PROXY_ADDRESS:
+                    setWebProxyAddress(getWebProxyAddress() == null ? envConfig.get(key).getValue() : getWebProxyAddress());
+                    break;
+                case WEB_PROXY_PORT:
+                    setWebProxyPort(getWebProxyPort() == null ? Integer.valueOf(envConfig.get(key).getValue()) : getWebProxyPort());
+                    break;
+                case WEB_PROXY_LOGIN:
+                    setWebProxyLogin(getWebProxyLogin() == null ? envConfig.get(key).getValue() : getWebProxyLogin());
+                    break;
+                case WEB_PROXY_PASSWORD:
+                    setWebProxyPassword(getWebProxyPassword() == null ? envConfig.get(key).getValue() : getWebProxyPassword());
+                    break;
+                case WEB_PROXY_PAC:
+                    setWebProxyPac(getWebProxyPac() == null ? envConfig.get(key).getValue() : getWebProxyPac());
+                    break;
+                case WEB_PROXY_EXCLUDE:
+                    setWebProxyExclude(getWebProxyExclude() == null ? envConfig.get(key).getValue() : getWebProxyExclude());
+                    break;
+                default:
+                    continue;
+            }
+        }
+
+        // set default value for proxy type if none as been set before
+        if (getWebProxyType() == null) {
+            setWebProxyType(DEFAULT_WEB_PROXY_TYPE.toString());
+        }
+
+        // exclude browserMobProxy if proxy type is set to PAC
+        if (getCaptureNetwork() && getWebProxyType() != ProxyType.DIRECT && getWebProxyType() != ProxyType.MANUAL) {
+            throw new ConfigurationException("Browsermob proxy (captureNetwork option) is only compatible with DIRECT and MANUAL");
+        }
     }
-    
+
     public Proxy getProxy() {
 
-    	Proxy proxy = new Proxy();
-    	ProxyType proxyType = getWebProxyType();
-    	String addressAndPort = String.format("%s:%s", getWebProxyAddress(), getWebProxyPort());
-    	
-    	proxy.setProxyType(proxyType);
-    	
-		if (proxyType == ProxyType.PAC) {
-			proxy.setProxyAutoconfigUrl(getWebProxyPac());
-			
-		// manual proxy configuration
-		} else if (proxyType == ProxyType.MANUAL) {
-			proxy.setHttpProxy(addressAndPort);
-			proxy.setSslProxy(addressAndPort);
-			//proxy.setFtpProxy(addressAndPort);
-			
-			if (getWebProxyLogin() != null && getWebProxyPassword() != null) {
-				proxy.setSocksUsername(getWebProxyLogin());
-				proxy.setSocksPassword(getWebProxyPassword());
-			}
-			
-			if (getWebProxyExclude() != null) {
-				proxy.setNoProxy(getWebProxyExclude().replace(";", ","));
-			}
-		} 	
-		
-		return proxy;
+        Proxy proxy = new Proxy();
+        ProxyType proxyType = getWebProxyType();
+        String addressAndPort = String.format("%s:%s", getWebProxyAddress(), getWebProxyPort());
+
+        proxy.setProxyType(proxyType);
+
+        if (proxyType == ProxyType.PAC) {
+            proxy.setProxyAutoconfigUrl(getWebProxyPac());
+
+            // manual proxy configuration
+        } else if (proxyType == ProxyType.MANUAL) {
+            proxy.setHttpProxy(addressAndPort);
+            proxy.setSslProxy(addressAndPort);
+            //proxy.setFtpProxy(addressAndPort);
+
+            if (getWebProxyLogin() != null && getWebProxyPassword() != null) {
+                proxy.setSocksUsername(getWebProxyLogin());
+                proxy.setSocksPassword(getWebProxyPassword());
+            }
+
+            if (getWebProxyExclude() != null) {
+                proxy.setNoProxy(getWebProxyExclude().replace(";", ","));
+            }
+        }
+
+        return proxy;
     }
-    
+
     /**
      * Read configuration from environment specific data and undefined parameters present un testng xml file
      * these configurations will be overiden by server if it's present
      */
-	public void setTestConfiguration() {
-		
-		// get variables from XML
-    	getConfiguration().putAll(getUserDefinedVariablesFromXMLFile());
-		
-		// get variables from env.ini
-    	getConfiguration().putAll(new ConfigReader(getTestEnv(), getLoadIni()).readConfig());
-    	
-    	// get variables from command line
-    	getConfiguration().putAll(getUserDefinedVariablesFromCommandLine());
-    	
-    	if (variableServer != null) {
-    		
-    		// get variable from server if they have never been get
-    		if (variableAlreadyRequestedFromServer == null) {
-				variableAlreadyRequestedFromServer = variableServer.getVariables(seleniumRobotServerContext.getSeleniumRobotServerVariableOlderThan(), seleniumRobotServerContext.getSeleniumRobotServerVariableReservationDuration());
-    		}
-    		getConfiguration().putAll(variableAlreadyRequestedFromServer);
+    public void setTestConfiguration() {
 
-			// give priority to command line parameters over those from server, so overwrite variable server if overlapping
-			getConfiguration().putAll(getUserDefinedVariablesFromCommandLine());
-    	}
+        // get variables from XML
+        getConfiguration().putAll(getUserDefinedVariablesFromXMLFile());
+
+        // get variables from env.ini
+        getConfiguration().putAll(new ConfigReader(getTestEnv(), getLoadIni()).readConfig());
+
+        // get variables from command line
+        getConfiguration().putAll(getUserDefinedVariablesFromCommandLine());
+
+        if (variableServer != null) {
+            // get variable from server if they have never been get
+            if (variableAlreadyRequestedFromServer == null) {
+                variableAlreadyRequestedFromServer = variableServer.getVariables(seleniumRobotServerContext.getSeleniumRobotServerVariableOlderThan(), seleniumRobotServerContext.getSeleniumRobotServerVariableReservationDuration());
+            }
+            getConfiguration().putAll(variableAlreadyRequestedFromServer);
+
+            // give priority to command line parameters over those from server, so overwrite variable server if overlapping
+            getConfiguration().putAll(getUserDefinedVariablesFromCommandLine());
+        }
     }
 
-	
-	// ------------------------- accessors ------------------------------------------------------
-	
-	// getters from contextManager
-	public String getApplicationName() {
-		return SeleniumTestsContextManager.getApplicationName();
-	}
 
-	public String getApplicationNameWithVersion() {
-		return SeleniumTestsContextManager.getApplicationNameWithVersion();
-	}
+    // ------------------------- accessors ------------------------------------------------------
 
-	public String getApplicationVersion() {
-		return SeleniumTestsContextManager.getApplicationVersion();
-	}
+    // getters from contextManager
+    public String getApplicationName() {
+        return SeleniumTestsContextManager.getApplicationName();
+    }
 
-	public String getCoreVersion() {
-		return SeleniumTestsContextManager.getCoreVersion();
-	}
-	
-	/**
+    public String getApplicationNameWithVersion() {
+        return SeleniumTestsContextManager.getApplicationNameWithVersion();
+    }
+
+    public String getApplicationVersion() {
+        return SeleniumTestsContextManager.getApplicationVersion();
+    }
+
+    public String getCoreVersion() {
+        return SeleniumTestsContextManager.getCoreVersion();
+    }
+
+    /**
      * Returns application root path
+     *
      * @return
      */
     public String getRootPath() {
-		return SeleniumTestsContextManager.getRootPath();
-	}
+        return SeleniumTestsContextManager.getRootPath();
+    }
 
     /**
      * Returns location of feature files
      * /<root>/data/<app>/features/
+     *
      * @return
      */
-	public String getFeaturePath() {
-		return SeleniumTestsContextManager.getFeaturePath();
-	}
+    public String getFeaturePath() {
+        return SeleniumTestsContextManager.getFeaturePath();
+    }
 
-	/**
-	 * Returns location of config files: /<root>/data/<app>/config/
-	 * @return
-	 */
-	public String getConfigPath() {
-		return SeleniumTestsContextManager.getConfigPath();
-	}
-	
-	/**
-	 * Returns location of data folder: /<root>/data/
-	 * @return
-	 */
-	public String getDataPath() {
-		return SeleniumTestsContextManager.getDataPath();
-	}
-	
-	/**
-	 * Returns location of application specific data: /<root>/data/<app>/
-	 * @return
-	 */
-	public String getApplicationDataPath() {
-		return SeleniumTestsContextManager.getApplicationDataPath();
-	}
-	
-	// getters for this object
+    /**
+     * Returns location of config files: /<root>/data/<app>/config/
+     *
+     * @return
+     */
+    public String getConfigPath() {
+        return SeleniumTestsContextManager.getConfigPath();
+    }
+
+    /**
+     * Returns location of data folder: /<root>/data/
+     *
+     * @return
+     */
+    public String getDataPath() {
+        return SeleniumTestsContextManager.getDataPath();
+    }
+
+    /**
+     * Returns location of application specific data: /<root>/data/<app>/
+     *
+     * @return
+     */
+    public String getApplicationDataPath() {
+        return SeleniumTestsContextManager.getApplicationDataPath();
+    }
+
+    // getters for this object
     public Boolean getFullReset() {
         return (Boolean) getAttribute(FULL_RESET);
     }
 
 
     public Object getAttribute(final String name) {
-    	return getAttribute(name, false);
+        return getAttribute(name, false);
     }
-    
+
     /**
      * Returns attribute value searched in context
      * If no value is found, search in variables
+     *
      * @param name
-     * @param searchInVariables		if true, will search in variables if attribute cannot be found in configuration. Beware that configuration only contains strings
-     * 								so casting may fail
+     * @param searchInVariables if true, will search in variables if attribute cannot be found in configuration. Beware that configuration only contains strings
+     *                          so casting may fail
      * @return
      */
     public Object getAttribute(final String name, boolean searchInVariables) {
         Object obj = contextDataMap.get(name);
-        
+
         if (searchInVariables && obj == null && getConfiguration().get(name) != null) {
-        	obj = getConfiguration().get(name).getValue();
+            obj = getConfiguration().get(name).getValue();
         }
-        
+
         return obj;
     }
 
@@ -1053,21 +1057,21 @@ public class SeleniumTestsContext {
             return this.getOutputDirectory() + "\\downloads\\";
         }
     }
-    
+
     public Capabilities getCapabilities() {
-    	return (Capabilities) getAttribute(CAPABILITIES);
+        return (Capabilities) getAttribute(CAPABILITIES);
     }
-    
+
     public Integer getSnapshotScrollDelay() {
-    	return (Integer) getAttribute(SNAPSHOT_SCROLL_DELAY);
+        return (Integer) getAttribute(SNAPSHOT_SCROLL_DELAY);
     }
-    
+
     public Integer getSnapshotBottomCropping() {
-    	return (Integer) getAttribute(SNAPSHOT_BOTTOM_CROPPING);
+        return (Integer) getAttribute(SNAPSHOT_BOTTOM_CROPPING);
     }
-    
+
     public Integer getSnapshotTopCropping() {
-    	return (Integer) getAttribute(SNAPSHOT_TOP_CROPPING);
+        return (Integer) getAttribute(SNAPSHOT_TOP_CROPPING);
     }
 
     public boolean getCaptureSnapshot() {
@@ -1084,17 +1088,17 @@ public class SeleniumTestsContext {
 
         return (Boolean) getAttribute(CAPTURE_SNAPSHOT);
     }
-    
-    public String getStartedBy() {    	
-    	return (String) getAttribute(STARTED_BY);
+
+    public String getStartedBy() {
+        return (String) getAttribute(STARTED_BY);
     }
-    
-    public boolean getCaptureNetwork() {    	
-    	return (Boolean) getAttribute(CAPTURE_NETWORK);
+
+    public boolean getCaptureNetwork() {
+        return (Boolean) getAttribute(CAPTURE_NETWORK);
     }
-    
-    public VideoCaptureMode getVideoCapture() {    	
-    	return (VideoCaptureMode) getAttribute(VIDEO_CAPTURE);
+
+    public VideoCaptureMode getVideoCapture() {
+        return (VideoCaptureMode) getAttribute(VIDEO_CAPTURE);
     }
 
 
@@ -1105,41 +1109,41 @@ public class SeleniumTestsContext {
     public String getChromeDriverPath() {
         return (String) getAttribute(CHROME_DRIVER_PATH);
     }
-    
-    public String getGeckoDriverPath() {
-    	return (String) getAttribute(GECKO_DRIVER_PATH);
-    }
-    
-    public String getEdgeDriverPath() {
-    	return (String) getAttribute(EDGE_DRIVER_PATH);
-    }
-    
-    public Boolean getEdgeIeMode() {
-    	return (Boolean) getAttribute(EDGE_IE_MODE);
-    }
-    
-    public Boolean getBetaBrowser() {
-    	return (Boolean) getAttribute(BETA_BROWSER);
-    }
-    
-    @SuppressWarnings("unchecked")
-	public List<Class<?>> getReporterPluginClasses() {
-    	List<Class<?>> userDefinedClasses = new ArrayList<>();
 
-    	// add core reporter classes
-		userDefinedClasses.add(BugTrackerReporter.class);
-    	userDefinedClasses.add(SeleniumTestsReporter2.class);
-    	userDefinedClasses.add(TestManagerReporter.class);
-		userDefinedClasses.add(SeleniumRobotServerTestRecorder.class);
-		userDefinedClasses.add(CustomReporter.class);
-    	
-		userDefinedClasses.addAll((List<Class<?>>) getAttribute(REPORTER_PLUGIN_CLASSES));
-    	
-    	return userDefinedClasses;
+    public String getGeckoDriverPath() {
+        return (String) getAttribute(GECKO_DRIVER_PATH);
+    }
+
+    public String getEdgeDriverPath() {
+        return (String) getAttribute(EDGE_DRIVER_PATH);
+    }
+
+    public Boolean getEdgeIeMode() {
+        return (Boolean) getAttribute(EDGE_IE_MODE);
+    }
+
+    public Boolean getBetaBrowser() {
+        return (Boolean) getAttribute(BETA_BROWSER);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Class<?>> getReporterPluginClasses() {
+        List<Class<?>> userDefinedClasses = new ArrayList<>();
+
+        // add core reporter classes
+        userDefinedClasses.add(BugTrackerReporter.class);
+        userDefinedClasses.add(SeleniumTestsReporter2.class);
+        userDefinedClasses.add(TestManagerReporter.class);
+        userDefinedClasses.add(SeleniumRobotServerTestRecorder.class);
+        userDefinedClasses.add(CustomReporter.class);
+
+        userDefinedClasses.addAll((List<Class<?>>) getAttribute(REPORTER_PLUGIN_CLASSES));
+
+        return userDefinedClasses;
     }
 
     public String getNeoloadUserPath() {
-    	return (String) getAttribute(NEOLOAD_USER_PATH);
+        return (String) getAttribute(NEOLOAD_USER_PATH);
     }
 
     public int getExplicitWaitTimeout() {
@@ -1168,9 +1172,9 @@ public class SeleniumTestsContext {
     public String getIEDriverPath() {
         return (String) getAttribute(IE_DRIVER_PATH);
     }
- 
+
     public boolean getOverrideSeleniumNativeAction() {
-    	return (Boolean) getAttribute(OVERRIDE_SELENIUM_NATIVE_ACTION);
+        return (Boolean) getAttribute(OVERRIDE_SELENIUM_NATIVE_ACTION);
     }
 
     public int getImplicitWaitTimeout() {
@@ -1180,75 +1184,75 @@ public class SeleniumTestsContext {
             return DEFAULT_IMPLICIT_WAIT_TIME_OUT;
         }
     }
-    
+
     public int getReplayTimeout() {
-    	try {
-    		return (Integer) getAttribute(REPLAY_TIME_OUT);
-    	} catch (Exception e) {
-    		return DEFAULT_REPLAY_TIME_OUT;
-    	}
+        try {
+            return (Integer) getAttribute(REPLAY_TIME_OUT);
+        } catch (Exception e) {
+            return DEFAULT_REPLAY_TIME_OUT;
+        }
     }
-    
+
     public PageLoadStrategy getPageLoadStrategy() {
-    	return (PageLoadStrategy) getAttribute(PAGE_LOAD_STRATEGY);
+        return (PageLoadStrategy) getAttribute(PAGE_LOAD_STRATEGY);
     }
 
     public String getNtlmAuthTrustedUris() {
         return (String) getAttribute(NTLM_AUTH_TRUSTED_URIS);
     }
-	
-	public Boolean getAssumeUntrustedCertificateIssuer() {
+
+    public Boolean getAssumeUntrustedCertificateIssuer() {
         return (Boolean) getAttribute(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER);
     }
 
-	public Boolean getAcceptUntrustedCertificates() {
+    public Boolean getAcceptUntrustedCertificates() {
         return (Boolean) getAttribute(SET_ACCEPT_UNTRUSTED_CERTIFICATES);
     }
-    
+
     public String getChromeUserProfilePath() {
-    	return (String) getAttribute(CHROME_USER_PROFILE_PATH);
+        return (String) getAttribute(CHROME_USER_PROFILE_PATH);
     }
-    
+
     public String getEdgeUserProfilePath() {
-    	return (String) getAttribute(EDGE_USER_PROFILE_PATH);
+        return (String) getAttribute(EDGE_USER_PROFILE_PATH);
     }
-    
+
     public String getChromeOptions() {
-    	return (String) getAttribute(CHROME_OPTIONS);
+        return (String) getAttribute(CHROME_OPTIONS);
     }
-    
+
     public String getEdgeOptions() {
-    	return (String) getAttribute(EDGE_OPTIONS);
+        return (String) getAttribute(EDGE_OPTIONS);
     }
 
     public String getOutputDirectory() {
         return (String) getAttribute(OUTPUT_DIRECTORY);
     }
-    
+
     public String getScreenshotOutputDirectory() {
-    	return Paths.get((String)getAttribute(OUTPUT_DIRECTORY), ScreenshotUtil.SCREENSHOT_DIR).toString();
+        return Paths.get((String) getAttribute(OUTPUT_DIRECTORY), ScreenshotUtil.SCREENSHOT_DIR).toString();
     }
-    
+
     public String getDefaultOutputDirectory() {
-    	return (String) getAttribute(DEFAULT_OUTPUT_DIRECTORY);
+        return (String) getAttribute(DEFAULT_OUTPUT_DIRECTORY);
     }
-    
+
     public String getInitialUrl() {
-    	return (String) getAttribute(INITIAL_URL);
+        return (String) getAttribute(INITIAL_URL);
     }
-    
-	public Boolean getMaskedPassword() {
-		return (Boolean) getAttribute(MASK_PASSWORD);
-	}
-	
-	public Boolean getRandomInAttachments() {
-		return (Boolean) getAttribute(RANDOM_IN_ATTACHMENT_NAME);
-	}
-	
-	public ITestResult getTestNGResult() {
-		return testNGResult;
-	}
-    
+
+    public Boolean getMaskedPassword() {
+        return (Boolean) getAttribute(MASK_PASSWORD);
+    }
+
+    public Boolean getRandomInAttachments() {
+        return (Boolean) getAttribute(RANDOM_IN_ATTACHMENT_NAME);
+    }
+
+    public ITestResult getTestNGResult() {
+        return testNGResult;
+    }
+
     public String getLoadIni() {
         return (String) getAttribute(LOAD_INI);
     }
@@ -1264,8 +1268,7 @@ public class SeleniumTestsContext {
     /**
      * Get TestNG suite parameter from testng.xml. Return System value for CI job.
      *
-     * @param   key		name of the parameter
-     *
+     * @param key name of the parameter
      * @return value of the parameter
      */
     public String getSuiteParameter(final String key) {
@@ -1277,33 +1280,33 @@ public class SeleniumTestsContext {
     }
 
     @SuppressWarnings("unchecked")
-	public List<ReportInfo> getCustomTestReports() {
-    	return (List<ReportInfo>) getAttribute(CUSTOM_TEST_REPORTS);
+    public List<ReportInfo> getCustomTestReports() {
+        return (List<ReportInfo>) getAttribute(CUSTOM_TEST_REPORTS);
     }
-    
+
     @SuppressWarnings("unchecked")
-	public List<ReportInfo> getCustomSummaryReports() {
-    	return (List<ReportInfo>) getAttribute(CUSTOM_SUMMARY_REPORTS);
+    public List<ReportInfo> getCustomSummaryReports() {
+        return (List<ReportInfo>) getAttribute(CUSTOM_SUMMARY_REPORTS);
     }
-    
+
     public boolean getOptimizeReports() {
         return (Boolean) getAttribute(OPTIMIZE_REPORTS);
     }
-    
+
     public boolean getKeepAllResults() {
-    	return (Boolean) getAttribute(KEEP_ALL_RESULTS);
+        return (Boolean) getAttribute(KEEP_ALL_RESULTS);
     }
-    
+
     public String getArchiveToFile() {
-    	return (String) getAttribute(ARCHIVE_TO_FILE);
+        return (String) getAttribute(ARCHIVE_TO_FILE);
     }
-    
+
     public List<ArchiveMode> getArchive() {
-    	return (List<ArchiveMode>) getAttribute(ARCHIVE);
+        return (List<ArchiveMode>) getAttribute(ARCHIVE);
     }
-    
+
     public ElementInfo.Mode getAdvancedElementSearch() {
-    	return (ElementInfo.Mode) getAttribute(ADVANCED_ELEMENT_SEARCH);
+        return (ElementInfo.Mode) getAttribute(ADVANCED_ELEMENT_SEARCH);
     }
 
     public TestType getTestType() {
@@ -1311,32 +1314,32 @@ public class SeleniumTestsContext {
     }
 
     public boolean isDriverCreationBlocked() {
-		return driverCreationBlocked;
-	}
+        return driverCreationBlocked;
+    }
 
-	public String getCucumberTags() {
-    	return (String) getAttribute(CUCUMBER_TAGS);
+    public String getCucumberTags() {
+        return (String) getAttribute(CUCUMBER_TAGS);
     }
-    
+
     public List<String> getCucumberTests() {
-    	List<String> tests = new ArrayList<>();
-    	if (((String)getAttribute(CUCUMBER_TESTS)).isEmpty()) {
-    		return tests;
-    	}
-    	for (String test: ((String)getAttribute(CUCUMBER_TESTS)).replace("\"", "").replace("&nbsp;", " ").split(",")) {
-    		tests.add(test.trim());
-    	}
-    	return tests;
+        List<String> tests = new ArrayList<>();
+        if (((String) getAttribute(CUCUMBER_TESTS)).isEmpty()) {
+            return tests;
+        }
+        for (String test : ((String) getAttribute(CUCUMBER_TESTS)).replace("\"", "").replace("&nbsp;", " ").split(",")) {
+            tests.add(test.trim());
+        }
+        return tests;
     }
-    
+
     public String getCucmberPkg() {
-    	return (String) getAttribute(CUCUMBER_IMPLEMENTATION_PKG);
+        return (String) getAttribute(CUCUMBER_IMPLEMENTATION_PKG);
     }
-    
+
     public String getTestEnv() {
-    	return (String) getAttribute(TEST_ENV);
+        return (String) getAttribute(TEST_ENV);
     }
-    
+
     public String getTestMethodSignature() {
         return (String) getAttribute(TEST_METHOD_SIGNATURE);
     }
@@ -1350,7 +1353,7 @@ public class SeleniumTestsContext {
     }
 
     @SuppressWarnings("unchecked")
-	public List<String> getWebDriverListener() {
+    public List<String> getWebDriverListener() {
         return (List<String>) getAttribute(WEB_DRIVER_LISTENER);
     }
 
@@ -1380,73 +1383,73 @@ public class SeleniumTestsContext {
     }
 
     public Integer getWebProxyPort() {
-		return (Integer) getAttribute(WEB_PROXY_PORT);
-	}
+        return (Integer) getAttribute(WEB_PROXY_PORT);
+    }
 
-	public String getWebProxyLogin() {
-		return (String) getAttribute(WEB_PROXY_LOGIN);
-	}
+    public String getWebProxyLogin() {
+        return (String) getAttribute(WEB_PROXY_LOGIN);
+    }
 
-	public String getWebProxyPassword() {
-		return (String) getAttribute(WEB_PROXY_PASSWORD);
-	}
+    public String getWebProxyPassword() {
+        return (String) getAttribute(WEB_PROXY_PASSWORD);
+    }
 
-	public String getWebProxyExclude() {
-		return (String) getAttribute(WEB_PROXY_EXCLUDE);
-	}
+    public String getWebProxyExclude() {
+        return (String) getAttribute(WEB_PROXY_EXCLUDE);
+    }
 
-	public String getWebProxyPac() {
-		return (String) getAttribute(WEB_PROXY_PAC);
-	}
+    public String getWebProxyPac() {
+        return (String) getAttribute(WEB_PROXY_PAC);
+    }
 
-	public BrowserType getBrowser() {
+    public BrowserType getBrowser() {
         return (BrowserType) getAttribute(BROWSER);
     }
 
     public DriverMode getRunMode() {
         return (DriverMode) getAttribute(RUN_MODE);
     }
-    
+
     public List<String> getNodeTags() {
-    	List<String> extTools = (List<String>) getAttribute(NODE_TAGS);
-    	if (extTools == null) {
-    		return new ArrayList<>();
-    	} else {
-    		return extTools;
-    	}
+        List<String> extTools = (List<String>) getAttribute(NODE_TAGS);
+        if (extTools == null) {
+            return new ArrayList<>();
+        } else {
+            return extTools;
+        }
     }
 
     public List<DebugMode> getDebug() {
-    	return (List<DebugMode>) getAttribute(DEBUG);
+        return (List<DebugMode>) getAttribute(DEBUG);
     }
-    
+
     public boolean isHeadlessBrowser() {
-    	return (Boolean) getAttribute(HEADLESS_BROWSER);
+        return (Boolean) getAttribute(HEADLESS_BROWSER);
     }
-    
+
     public boolean isManualTestSteps() {
-    	return (Boolean) getAttribute(MANUAL_TEST_STEPS);
+        return (Boolean) getAttribute(MANUAL_TEST_STEPS);
     }
 
     public boolean isFindErrorCause() {
-    	return (Boolean) getAttribute(FIND_ERROR_CAUSE);
+        return (Boolean) getAttribute(FIND_ERROR_CAUSE);
     }
-    
-	public Map<String, String> getDeviceList() {
-    	HashMap<String, String> deviceList = new HashMap<>();
-    	if (getAttribute(DEVICE_LIST) == null || DEFAULT_DEVICE_LIST.equals(getAttribute(DEVICE_LIST))) {
-    		return deviceList;
-    	}
-    	
-    	JSONObject devList = new JSONObject((String)getAttribute(DEVICE_LIST));
-    	for (String key: (Set<String>)devList.keySet()) {
-    		deviceList.put(key, devList.getString(key));
-    	}
-    	return deviceList;
+
+    public Map<String, String> getDeviceList() {
+        HashMap<String, String> deviceList = new HashMap<>();
+        if (getAttribute(DEVICE_LIST) == null || DEFAULT_DEVICE_LIST.equals(getAttribute(DEVICE_LIST))) {
+            return deviceList;
+        }
+
+        JSONObject devList = new JSONObject((String) getAttribute(DEVICE_LIST));
+        for (String key : (Set<String>) devList.keySet()) {
+            deviceList.put(key, devList.getString(key));
+        }
+        return deviceList;
     }
-	
-	public Integer getTestRetryCount() {
-    	return (Integer) getAttribute(TEST_RETRY_COUNT);
+
+    public Integer getTestRetryCount() {
+        return (Integer) getAttribute(TEST_RETRY_COUNT);
     }
 
     public int getWebSessionTimeout() {
@@ -1460,9 +1463,9 @@ public class SeleniumTestsContext {
     public String getDeviceName() {
         return (String) getAttribute(DEVICE_NAME);
     }
-    
+
     public String getDeviceId() {
-    	return (String) getAttribute(DEVICE_ID);
+        return (String) getAttribute(DEVICE_ID);
     }
 
     public String getApp() {
@@ -1472,33 +1475,33 @@ public class SeleniumTestsContext {
     public String getAppPackage() {
         return (String) getAttribute(APP_PACKAGE);
     }
-    
+
     public String getAutomationName() {
-    	return (String) getAttribute(AUTOMATION_NAME);
+        return (String) getAttribute(AUTOMATION_NAME);
     }
-    
+
     public String getAppiumServerUrl() {
-    	return (String) getAttribute(APPIUM_SERVER_URL);
+        return (String) getAttribute(APPIUM_SERVER_URL);
     }
-    
+
     public Capabilities getAppiumCapabilities() {
-    	return (Capabilities) getAttribute(APPIUM_CAPS);
+        return (Capabilities) getAttribute(APPIUM_CAPS);
     }
 
     public String getAppActivity() {
         return (String) getAttribute(APP_ACTIVITY);
     }
-    
+
     public String getAppWaitActivity() {
-    	return (String) getAttribute(APP_WAIT_ACTIVITY);
+        return (String) getAttribute(APP_WAIT_ACTIVITY);
     }
 
     public int getNewCommandTimeout() {
         return (Integer) getAttribute(NEW_COMMAND_TIMEOUT);
     }
-    
+
     public int getActionDelay() {
-    	return (Integer) getAttribute(ACTION_DELAY);
+        return (Integer) getAttribute(ACTION_DELAY);
     }
 
     public String getVersion() {
@@ -1510,90 +1513,92 @@ public class SeleniumTestsContext {
     }
 
     public String getRelativeOutputDir() {
-    	return (String) getAttribute(RELATIVE_OUTPUT_DIR);
+        return (String) getAttribute(RELATIVE_OUTPUT_DIR);
     }
-    
+
     public Integer getViewPortWidth() {
-		return (Integer) getAttribute(VIEWPORT_WIDTH);
-	}
-    
+        return (Integer) getAttribute(VIEWPORT_WIDTH);
+    }
+
     public Integer getViewPortHeight() {
-    	return (Integer) getAttribute(VIEWPORT_HEIGHT);
+        return (Integer) getAttribute(VIEWPORT_HEIGHT);
     }
-    
+
     @SuppressWarnings("unchecked")
-	public Map<String, TestVariable> getConfiguration() {
-    	
-    	Map<String, TestVariable> config = (HashMap<String, TestVariable>) getAttribute(TEST_VARIABLES);
-    	if (config == null) {
-    		return new HashMap<>();
-    	} else {
-    		return config;
-    	}
+    public Map<String, TestVariable> getConfiguration() {
+
+        Map<String, TestVariable> config = (HashMap<String, TestVariable>) getAttribute(TEST_VARIABLES);
+        if (config == null) {
+            return new HashMap<>();
+        } else {
+            return config;
+        }
     }
-    
+
     public SeleniumRobotVariableServerConnector getVariableServer() {
-		return variableServer;
-	}
+        return variableServer;
+    }
 
     public void setVariableServer(SeleniumRobotVariableServerConnector variableServer) {
         this.variableServer = variableServer;
     }
-    
+
     public List<SeleniumGridConnector> getSeleniumGridConnectors() {
-    	if (seleniumGridConnectors == null) {
-    		seleniumGridConnectors = connectGrid();
-    	}
-    	return seleniumGridConnectors;
+        if (seleniumGridConnectors == null) {
+            seleniumGridConnectors = connectGrid();
+        }
+        return seleniumGridConnectors;
     }
-    
+
     /**
      * from the list of all grid connectors, returns the first one where a session has been created
      * It means that the test runs on it because sessionId is get once driver is created
+     *
      * @return
      */
     public SeleniumGridConnector getSeleniumGridConnector() {
-    	if (seleniumGridConnector == null && seleniumGridConnectors != null) {
-    		for (SeleniumGridConnector gridConnector: seleniumGridConnectors) {
-    			if (gridConnector.getSessionId() != null) {
-    				seleniumGridConnector = gridConnector;
-    				break;
-    			}
-    		}
-    	}
-    	return seleniumGridConnector;
+        if (seleniumGridConnector == null && seleniumGridConnectors != null) {
+            for (SeleniumGridConnector gridConnector : seleniumGridConnectors) {
+                if (gridConnector.getSessionId() != null) {
+                    seleniumGridConnector = gridConnector;
+                    break;
+                }
+            }
+        }
+        return seleniumGridConnector;
     }
-    
-    public TestManager getTestManagerInstance() {
-    	return testManagerInstance;
-    }
-    
-    public BugTracker getBugTrackerInstance() {
-    	return bugtrackerInstance;
-    }
-  
-	public Map<String, Object> getContextDataMap() {
-		return contextDataMap;
-	}
 
-	//Methods for ID_Mapping
+    public TestManager getTestManagerInstance() {
+        return testManagerInstance;
+    }
+
+    public BugTracker getBugTrackerInstance() {
+        return bugtrackerInstance;
+    }
+
+    public Map<String, Object> getContextDataMap() {
+        return contextDataMap;
+    }
+
+    //Methods for ID_Mapping
     //get
     public Map<String, HashMap<String, String>> getIdMapping() {
-    	return idMapping;
+        return idMapping;
     }
 
     /**
      * Returns the TestStepManager which will steps
+     *
      * @return
      */
-	public TestStepManager getTestStepManager() {
-		return testStepManager;
-	}
+    public TestStepManager getTestStepManager() {
+        return testStepManager;
+    }
 
-	//set
-    public void setIdMapping(Map<String, HashMap<String,String>> conf){
-    	idMapping = conf;
-    }    
+    //set
+    public void setIdMapping(Map<String, HashMap<String, String>> conf) {
+        idMapping = conf;
+    }
 
     public boolean isSoftAssertEnabled() {
         try {
@@ -1608,815 +1613,819 @@ public class SeleniumTestsContext {
     }
 
     /**
-     * 
-     * @param timeoutInSecs  timeout of driver session in seconds
+     * @param timeoutInSecs timeout of driver session in seconds
      */
     public void setWebSessionTimeout(Integer timeoutInSecs) {
-    	if (timeoutInSecs != null) {
-    		setAttribute(WEB_SESSION_TIME_OUT, timeoutInSecs * 1000);
-    	} else {
-    		setAttribute(WEB_SESSION_TIME_OUT, DEFAULT_WEB_SESSION_TIMEOUT);
-    	}
+        if (timeoutInSecs != null) {
+            setAttribute(WEB_SESSION_TIME_OUT, timeoutInSecs * 1000);
+        } else {
+            setAttribute(WEB_SESSION_TIME_OUT, DEFAULT_WEB_SESSION_TIMEOUT);
+        }
     }
 
     public void setImplicitWaitTimeout(Integer timeoutInSecs) {
-    	if (timeoutInSecs != null) {
-    		setAttribute(IMPLICIT_WAIT_TIME_OUT, timeoutInSecs);
-    	} else {
-    		setAttribute(IMPLICIT_WAIT_TIME_OUT, DEFAULT_IMPLICIT_WAIT_TIME_OUT);
-    	}
+        if (timeoutInSecs != null) {
+            setAttribute(IMPLICIT_WAIT_TIME_OUT, timeoutInSecs);
+        } else {
+            setAttribute(IMPLICIT_WAIT_TIME_OUT, DEFAULT_IMPLICIT_WAIT_TIME_OUT);
+        }
     }
-    
+
     public void setExplicitWaitTimeout(Integer timeoutInSecs) {
-    	if (timeoutInSecs != null) {
-    		setAttribute(EXPLICIT_WAIT_TIME_OUT, timeoutInSecs);
-    	} else {
-    		setAttribute(EXPLICIT_WAIT_TIME_OUT, DEFAULT_EXPLICIT_WAIT_TIME_OUT);
-    	}
+        if (timeoutInSecs != null) {
+            setAttribute(EXPLICIT_WAIT_TIME_OUT, timeoutInSecs);
+        } else {
+            setAttribute(EXPLICIT_WAIT_TIME_OUT, DEFAULT_EXPLICIT_WAIT_TIME_OUT);
+        }
     }
 
     public void setPageLoadTimeout(Integer timeoutInSecs) {
-    	if (timeoutInSecs != null) {
-    		setAttribute(PAGE_LOAD_TIME_OUT, timeoutInSecs);
-    	} else {
-    		setAttribute(PAGE_LOAD_TIME_OUT, DEFAULT_PAGE_LOAD_TIME_OUT);
-    	}
+        if (timeoutInSecs != null) {
+            setAttribute(PAGE_LOAD_TIME_OUT, timeoutInSecs);
+        } else {
+            setAttribute(PAGE_LOAD_TIME_OUT, DEFAULT_PAGE_LOAD_TIME_OUT);
+        }
     }
-    
+
     public void setPageLoadStrategy(String strategy) {
-    	if (strategy != null) {
-    		PageLoadStrategy pls = PageLoadStrategy.fromString(strategy);
-    		if (pls == null) {
-    			throw new ConfigurationException("PageLoadStrategy values are 'eager', 'normal' (default one) and 'none'");
-    		}
-    		setAttribute(PAGE_LOAD_STRATEGY, pls);
-    	} else {
-    		setAttribute(PAGE_LOAD_STRATEGY, DEFAULT_PAGE_LOAD_STRATEGY);
-    	}
+        if (strategy != null) {
+            PageLoadStrategy pls = PageLoadStrategy.fromString(strategy);
+            if (pls == null) {
+                throw new ConfigurationException("PageLoadStrategy values are 'eager', 'normal' (default one) and 'none'");
+            }
+            setAttribute(PAGE_LOAD_STRATEGY, pls);
+        } else {
+            setAttribute(PAGE_LOAD_STRATEGY, DEFAULT_PAGE_LOAD_STRATEGY);
+        }
     }
-    
+
     public void setCustomTestReports(String customReportsStr) {
-    	if (customReportsStr != null) {
-    		List<ReportInfo> reports = new ArrayList<>();
-    		
-    		// check if report is available in resources
-    		for (String customReport: customReportsStr.split(",")) {
-    			reports.add(new ReportInfo(customReport));
-    		}
-    		setAttribute(CUSTOM_TEST_REPORTS, reports);
-    	} else {
-    		setAttribute(CUSTOM_TEST_REPORTS, DEFAULT_CUSTOM_TEST_REPORTS);
-    	}
+        if (customReportsStr != null) {
+            List<ReportInfo> reports = new ArrayList<>();
+
+            // check if report is available in resources
+            for (String customReport : customReportsStr.split(",")) {
+                reports.add(new ReportInfo(customReport));
+            }
+            setAttribute(CUSTOM_TEST_REPORTS, reports);
+        } else {
+            setAttribute(CUSTOM_TEST_REPORTS, DEFAULT_CUSTOM_TEST_REPORTS);
+        }
     }
-    
+
     public void setCustomSummaryReports(String customReportsStr) {
-    	if (customReportsStr != null) {
-    		List<ReportInfo> reports = new ArrayList<>();
-    		
-    		// check if report is available in resources
-    		for (String customReport: customReportsStr.split(",")) {
-    			reports.add(new ReportInfo(customReport));
-    		}
-    		setAttribute(CUSTOM_SUMMARY_REPORTS, reports);
-    	} else {
-    		setAttribute(CUSTOM_SUMMARY_REPORTS, DEFAULT_CUSTOM_SUMMARY_REPORTS);
-    	}
+        if (customReportsStr != null) {
+            List<ReportInfo> reports = new ArrayList<>();
+
+            // check if report is available in resources
+            for (String customReport : customReportsStr.split(",")) {
+                reports.add(new ReportInfo(customReport));
+            }
+            setAttribute(CUSTOM_SUMMARY_REPORTS, reports);
+        } else {
+            setAttribute(CUSTOM_SUMMARY_REPORTS, DEFAULT_CUSTOM_SUMMARY_REPORTS);
+        }
     }
-    
+
     public void setReplayTimeout(Integer timeout) {
-    	if (timeout != null) {
-    		setAttribute(REPLAY_TIME_OUT, timeout);
-    	} else {
-    		setAttribute(REPLAY_TIME_OUT, DEFAULT_REPLAY_TIME_OUT);
-    	}
+        if (timeout != null) {
+            setAttribute(REPLAY_TIME_OUT, timeout);
+        } else {
+            setAttribute(REPLAY_TIME_OUT, DEFAULT_REPLAY_TIME_OUT);
+        }
     }
-    
+
 
     public void setStartedBy(String startedBy) {
-    	if (startedBy != null) {
-    		setAttribute(STARTED_BY, startedBy);
-    	} else {
-    		setAttribute(STARTED_BY, DEFAULT_STARTED_BY);
-    	}
+        if (startedBy != null) {
+            setAttribute(STARTED_BY, startedBy);
+        } else {
+            setAttribute(STARTED_BY, DEFAULT_STARTED_BY);
+        }
     }
-    
+
     public void setArchiveToFile(String filePath) {
-    	if (filePath != null) {
-    		if (!filePath.endsWith(".zip")) {
-    			throw new ConfigurationException("You must specify a zip file");
-    		}
-    		new File(filePath).getParentFile().mkdirs();
+        if (filePath != null) {
+            if (!filePath.endsWith(".zip")) {
+                throw new ConfigurationException("You must specify a zip file");
+            }
+            new File(filePath).getParentFile().mkdirs();
 
-    	}
-    	setAttribute(ARCHIVE_TO_FILE, filePath);
+        }
+        setAttribute(ARCHIVE_TO_FILE, filePath);
     }
-    
+
     public void setArchive(String archive) {
-    	if (archive == null) {
-    		setAttribute(ARCHIVE, Arrays.asList(DEFAULT_ARCHIVE));
-    	} else {
-    		try {
-    			setAttribute(ARCHIVE, ArchiveMode.fromString(archive));
-    		} catch (IllegalArgumentException e) {
-    			throw new ConfigurationException(e.getMessage());
-    		}
-    	}
+        if (archive == null) {
+            setAttribute(ARCHIVE, Arrays.asList(DEFAULT_ARCHIVE));
+        } else {
+            try {
+                setAttribute(ARCHIVE, ArchiveMode.fromString(archive));
+            } catch (IllegalArgumentException e) {
+                throw new ConfigurationException(e.getMessage());
+            }
+        }
     }
-    public void setAdvancedElementSearch(String advanceElementSearchMode) {
-    	if (advanceElementSearchMode == null) {
-    		setAttribute(ADVANCED_ELEMENT_SEARCH, DEFAULT_ADVANCED_ELEMENT_SEARCH);
-    	} else {
-    		try {
-    			setAttribute(ADVANCED_ELEMENT_SEARCH, ElementInfo.Mode.valueOf(advanceElementSearchMode.toUpperCase()));
-    		} catch (IllegalArgumentException e) {
-    			throw new ConfigurationException(e.getMessage());
-    		}
-    	}
-    }
-    
-    public void setFindErrorCause(Boolean active) {
-    	if (active != null) {
-    		setAttribute(FIND_ERROR_CAUSE, active);
-    	} else {
-    		setAttribute(FIND_ERROR_CAUSE, DEFAULT_FIND_ERROR_CAUSE);
-    	}
-    }
-  
-    public void setVariableAlreadyRequestedFromServer(Map<String, TestVariable> variableAlreadyRequestedFromServer) {
-		this.variableAlreadyRequestedFromServer = variableAlreadyRequestedFromServer;
-	}
 
-	public void setOverrideSeleniumNativeAction(Boolean override) {
-    	if (override != null) {
-    		setAttribute(OVERRIDE_SELENIUM_NATIVE_ACTION, override);
-    	} else {
-    		setAttribute(OVERRIDE_SELENIUM_NATIVE_ACTION, DEFAULT_OVERRIDE_SELENIUM_NATIVE_ACTION);
-    	}
+    public void setAdvancedElementSearch(String advanceElementSearchMode) {
+        if (advanceElementSearchMode == null) {
+            setAttribute(ADVANCED_ELEMENT_SEARCH, DEFAULT_ADVANCED_ELEMENT_SEARCH);
+        } else {
+            try {
+                setAttribute(ADVANCED_ELEMENT_SEARCH, ElementInfo.Mode.valueOf(advanceElementSearchMode.toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                throw new ConfigurationException(e.getMessage());
+            }
+        }
     }
-    
+
+    public void setFindErrorCause(Boolean active) {
+        if (active != null) {
+            setAttribute(FIND_ERROR_CAUSE, active);
+        } else {
+            setAttribute(FIND_ERROR_CAUSE, DEFAULT_FIND_ERROR_CAUSE);
+        }
+    }
+
+    public void setVariableAlreadyRequestedFromServer(Map<String, TestVariable> variableAlreadyRequestedFromServer) {
+        this.variableAlreadyRequestedFromServer = variableAlreadyRequestedFromServer;
+    }
+
+    public void setOverrideSeleniumNativeAction(Boolean override) {
+        if (override != null) {
+            setAttribute(OVERRIDE_SELENIUM_NATIVE_ACTION, override);
+        } else {
+            setAttribute(OVERRIDE_SELENIUM_NATIVE_ACTION, DEFAULT_OVERRIDE_SELENIUM_NATIVE_ACTION);
+        }
+    }
+
     /**
-     *  /!\ FOR TEST ONLY!
+     * /!\ FOR TEST ONLY!
+     *
      * @param seleniumGridConnector
      */
     public void setSeleniumGridConnector(SeleniumGridConnector seleniumGridConnector) {
-		this.seleniumGridConnector = seleniumGridConnector;
-	}
+        this.seleniumGridConnector = seleniumGridConnector;
+    }
 
-	public void setWebDriverGrid(final String driverGrid) {
-    	if (driverGrid == null) {
-    		setAttribute(WEB_DRIVER_GRID, new ArrayList<>());
-    	} else {
-    		String[] gridList = driverGrid.split(",");
-    		for (String gridAddress: gridList) {
-    			if (!gridAddress.startsWith("http")) {
-    				throw new ConfigurationException("grid address should be http://<host>:<port>/wd/hub");
-    			}
-    		}
-    		setAttribute(WEB_DRIVER_GRID, Arrays.asList(driverGrid.split(",")));
-    	}
+    public void setWebDriverGrid(final String driverGrid) {
+        if (driverGrid == null) {
+            setAttribute(WEB_DRIVER_GRID, new ArrayList<>());
+        } else {
+            String[] gridList = driverGrid.split(",");
+            for (String gridAddress : gridList) {
+                if (!gridAddress.startsWith("http")) {
+                    throw new ConfigurationException("grid address should be http://<host>:<port>/wd/hub");
+                }
+            }
+            setAttribute(WEB_DRIVER_GRID, Arrays.asList(driverGrid.split(",")));
+        }
     }
-    
+
     public void setNeoloadUserPath(final String userPath) {
-    	setAttribute(NEOLOAD_USER_PATH, userPath);
+        setAttribute(NEOLOAD_USER_PATH, userPath);
     }
-    
-    public void setConfiguration(Map<String, TestVariable> variables){
-    	setAttribute(TEST_VARIABLES, variables);
+
+    public void setConfiguration(Map<String, TestVariable> variables) {
+        setAttribute(TEST_VARIABLES, variables);
     }
-    
+
     public void setInitialUrl(String url) {
-    	if (url != null) {
-    		setAttribute(INITIAL_URL, url);
-    	} else {
-    		setAttribute(INITIAL_URL, DEFAULT_INITIAL_URL);
-    	}
+        if (url != null) {
+            setAttribute(INITIAL_URL, url);
+        } else {
+            setAttribute(INITIAL_URL, DEFAULT_INITIAL_URL);
+        }
     }
-  
+
     public void setRunMode(String runMode) {
-    	String newRunMode = runMode == null ? DEFAULT_RUN_MODE: runMode;
+        String newRunMode = runMode == null ? DEFAULT_RUN_MODE : runMode;
         setAttribute(RUN_MODE, DriverMode.fromString(newRunMode));
-	}
-    
+    }
+
     public void setNodeTags(String nodeTags) {
-    	if (nodeTags == null || nodeTags.isEmpty()) {
-    		setAttribute(NODE_TAGS, new ArrayList<>());
-    	} else {
-	    	setAttribute(NODE_TAGS, Arrays.asList(nodeTags.split(","))
-										.stream()
-										.map(String::trim)
-										.collect(Collectors.toList())
-						);
-    	}
+        if (nodeTags == null || nodeTags.isEmpty()) {
+            setAttribute(NODE_TAGS, new ArrayList<>());
+        } else {
+            setAttribute(NODE_TAGS, Arrays.asList(nodeTags.split(","))
+                    .stream()
+                    .map(String::trim)
+                    .collect(Collectors.toList())
+            );
+        }
     }
-    
+
     public void setMaskPassword(Boolean maskPassword) {
-    	if (maskPassword != null) {
-    		setAttribute(MASK_PASSWORD, maskPassword);
-    	} else {
-    		setAttribute(MASK_PASSWORD, DEFAULT_MASK_PASSWORD);
-    	}
+        if (maskPassword != null) {
+            setAttribute(MASK_PASSWORD, maskPassword);
+        } else {
+            setAttribute(MASK_PASSWORD, DEFAULT_MASK_PASSWORD);
+        }
     }
-    
+
     public void setRandomInAttachmentNames(Boolean random) {
-    	if (random != null) {
-    		setAttribute(RANDOM_IN_ATTACHMENT_NAME, random);
-    	} else {
-    		setAttribute(RANDOM_IN_ATTACHMENT_NAME, DEFAULT_RANDOM_IN_ATTACHMENT_NAME);
-    	}
+        if (random != null) {
+            setAttribute(RANDOM_IN_ATTACHMENT_NAME, random);
+        } else {
+            setAttribute(RANDOM_IN_ATTACHMENT_NAME, DEFAULT_RANDOM_IN_ATTACHMENT_NAME);
+        }
     }
-    
+
     /**
      * Record DEBUG
      * also store an INTERNAL_DEBUG System property to be used internally with SeleniumRobotLogger class
+     *
      * @param debug
      */
     public void setDebug(String debug) {
-    	if (debug != null) {
-    		setAttribute(DEBUG, DebugMode.fromString(debug));
-    		System.setProperty(INTERNAL_DEBUG, debug);
-    	} else {
-    		// default value depends on who starts test. If start is done through jar execution, deployed mode will be true (devMode set to false)
-    		setAttribute(DEBUG, DebugMode.fromString(DEFAULT_DEBUG));
-    		System.setProperty(INTERNAL_DEBUG, DEFAULT_DEBUG);
-    	}
+        if (debug != null) {
+            setAttribute(DEBUG, DebugMode.fromString(debug));
+            System.setProperty(INTERNAL_DEBUG, debug);
+        } else {
+            // default value depends on who starts test. If start is done through jar execution, deployed mode will be true (devMode set to false)
+            setAttribute(DEBUG, DebugMode.fromString(DEFAULT_DEBUG));
+            System.setProperty(INTERNAL_DEBUG, DEFAULT_DEBUG);
+        }
     }
-    
+
     public void setHeadlessBrowser(Boolean headless) {
-    	if (headless != null) {
-    		setAttribute(HEADLESS_BROWSER, headless);
-    	} else {
-    		setAttribute(HEADLESS_BROWSER, DEFAULT_HEADLESS_BROWSER);
-    	}
+        if (headless != null) {
+            setAttribute(HEADLESS_BROWSER, headless);
+        } else {
+            setAttribute(HEADLESS_BROWSER, DEFAULT_HEADLESS_BROWSER);
+        }
     }
-    
+
     public void setManualTestSteps(Boolean manualTestSteps) {
-    	if (manualTestSteps != null) {
-    		setAttribute(MANUAL_TEST_STEPS, manualTestSteps);
-    	} else {
-    		setAttribute(MANUAL_TEST_STEPS, DEFAULT_MANUAL_TEST_STEPS);
-    	}
+        if (manualTestSteps != null) {
+            setAttribute(MANUAL_TEST_STEPS, manualTestSteps);
+        } else {
+            setAttribute(MANUAL_TEST_STEPS, DEFAULT_MANUAL_TEST_STEPS);
+        }
     }
 
     public void setBrowser(String browser) {
-    	String newBrowser = browser == null ? DEFAULT_BROWSER: browser;
-    	
-    	setAttribute(BROWSER, BrowserType.getBrowserType(newBrowser));
-    	
-    	// when reconfiguring browser, mostly from integration tests, change test type accordingly
-    	if (getPlatform() != null) {
-        	configureTestType();
-    	}
+        String newBrowser = browser == null ? DEFAULT_BROWSER : browser;
 
-    	// force Edge in IE mode if IE is requested
-    	setEdgeIeMode("iexploreEdge".equals(newBrowser) || "iexplore".equals(newBrowser));
+        setAttribute(BROWSER, BrowserType.getBrowserType(newBrowser));
+
+        // when reconfiguring browser, mostly from integration tests, change test type accordingly
+        if (getPlatform() != null) {
+            configureTestType();
+        }
+
+        // force Edge in IE mode if IE is requested
+        setEdgeIeMode("iexploreEdge".equals(newBrowser) || "iexplore".equals(newBrowser));
 
     }
-    
+
     public void setBrowserVersion(String browserVersion) {
-    	setAttribute(BROWSER_VERSION, browserVersion);
+        setAttribute(BROWSER_VERSION, browserVersion);
     }
-    
+
     public void setFirefoxUserProfilePath(String path) {
-    	if (path != null && getBrowser() == BrowserType.FIREFOX) {
-    		if ((new File(path).exists() && getRunMode() == DriverMode.LOCAL) || getRunMode() != DriverMode.LOCAL || BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(path)) {
-    			setAttribute(FIREFOX_USER_PROFILE_PATH, path);
-    		} else {
-    			throw new ConfigurationException(String.format("Firefox user profile does not exist at %s", path));
-    		}
-    	}
-   
+        if (path != null && getBrowser() == BrowserType.FIREFOX) {
+            if ((new File(path).exists() && getRunMode() == DriverMode.LOCAL) || getRunMode() != DriverMode.LOCAL || BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(path)) {
+                setAttribute(FIREFOX_USER_PROFILE_PATH, path);
+            } else {
+                throw new ConfigurationException(String.format("Firefox user profile does not exist at %s", path));
+            }
+        }
+
     }
-   
+
     public void setChromeOptions(String options) {
-    	setAttribute(CHROME_OPTIONS, options);
+        setAttribute(CHROME_OPTIONS, options);
     }
-    
+
     public void setEdgeOptions(String options) {
-    	setAttribute(EDGE_OPTIONS, options);
+        setAttribute(EDGE_OPTIONS, options);
     }
-    
+
     public void setChromeUserProfilePath(String path) {
-    	if (path != null && getBrowser() == BrowserType.CHROME) {
-    		if ((new File(path).exists() && getRunMode() == DriverMode.LOCAL) || getRunMode() != DriverMode.LOCAL || BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(path)) {
-    			setAttribute(CHROME_USER_PROFILE_PATH, path);
-    		} else {
-    			throw new ConfigurationException(String.format("Chrome user profile does not exist at %s", path));
-    		}
-    	}  		
+        if (path != null && getBrowser() == BrowserType.CHROME) {
+            if ((new File(path).exists() && getRunMode() == DriverMode.LOCAL) || getRunMode() != DriverMode.LOCAL || BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(path)) {
+                setAttribute(CHROME_USER_PROFILE_PATH, path);
+            } else {
+                throw new ConfigurationException(String.format("Chrome user profile does not exist at %s", path));
+            }
+        }
     }
-    
+
     public void setEdgeUserProfilePath(String path) {
-    	if (path != null && getBrowser() == BrowserType.EDGE) {
-    		if ((new File(path).exists() && getRunMode() == DriverMode.LOCAL) || getRunMode() != DriverMode.LOCAL || BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(path)) {
-    			setAttribute(EDGE_USER_PROFILE_PATH, path);
-    		} else {
-    			throw new ConfigurationException(String.format("Edge user profile does not exist at %s", path));
-    		}
-    	}  		
+        if (path != null && getBrowser() == BrowserType.EDGE) {
+            if ((new File(path).exists() && getRunMode() == DriverMode.LOCAL) || getRunMode() != DriverMode.LOCAL || BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(path)) {
+                setAttribute(EDGE_USER_PROFILE_PATH, path);
+            } else {
+                throw new ConfigurationException(String.format("Edge user profile does not exist at %s", path));
+            }
+        }
     }
-    
+
     public void setFirefoxBinary(String path) {
-    	if (path != null && !new File(path).exists()) {
-    		throw new ConfigurationException("Firefox path does not exist: " + path);
-    	}
-    	setAttribute(FIREFOX_BINARY_PATH, path);
+        if (path != null && !new File(path).exists()) {
+            throw new ConfigurationException("Firefox path does not exist: " + path);
+        }
+        setAttribute(FIREFOX_BINARY_PATH, path);
     }
-    
+
     public void setChromeBinary(String path) {
-    	if (path != null && !new File(path).exists()) {
-    		throw new ConfigurationException("Chrome path does not exist: " + path);
-    	}
-    	setAttribute(CHROME_BINARY_PATH, path);
+        if (path != null && !new File(path).exists()) {
+            throw new ConfigurationException("Chrome path does not exist: " + path);
+        }
+        setAttribute(CHROME_BINARY_PATH, path);
     }
-    
+
     public void setChromeDriverPath(String path) {
-    	setAttribute(CHROME_DRIVER_PATH, path);
+        setAttribute(CHROME_DRIVER_PATH, path);
     }
-    
+
     public void setGeckoDriverPath(String path) {
-    	setAttribute(GECKO_DRIVER_PATH, path);
+        setAttribute(GECKO_DRIVER_PATH, path);
     }
-    
+
     public void setEdgeDriverPath(String path) {
-    	setAttribute(EDGE_DRIVER_PATH, path);
+        setAttribute(EDGE_DRIVER_PATH, path);
     }
-    
+
     public void setEdgeIeMode(boolean ieMode) {
-    	setAttribute(EDGE_IE_MODE, ieMode);
+        setAttribute(EDGE_IE_MODE, ieMode);
     }
-    
+
     public void setIEDriverPath(String path) {
-    	setAttribute(IE_DRIVER_PATH, path);
+        setAttribute(IE_DRIVER_PATH, path);
     }
-    
+
     public void setUserAgent(String path) {
-    	setAttribute(USER_AGENT, path);
+        setAttribute(USER_AGENT, path);
     }
-    
+
     public void setBetaBrowser(Boolean betaBrowser) {
-		if (betaBrowser != null) {
-			setAttribute(BETA_BROWSER, betaBrowser);
-		} else {
-			setAttribute(BETA_BROWSER, DEFAULT_BETA_BROWSER);
-    	}
+        if (betaBrowser != null) {
+            setAttribute(BETA_BROWSER, betaBrowser);
+        } else {
+            setAttribute(BETA_BROWSER, DEFAULT_BETA_BROWSER);
+        }
     }
-    
+
     public void setAssumeUntrustedCertificateIssuer(Boolean assume) {
-    	if (assume != null) {
-    		setAttribute(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER, assume);
-    	} else {
-    		setAttribute(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER, DEFAULT_SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER);
-    	}
+        if (assume != null) {
+            setAttribute(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER, assume);
+        } else {
+            setAttribute(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER, DEFAULT_SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER);
+        }
     }
-    
+
     public void setAcceptUntrustedCertificates(Boolean accept) {
-    	if (accept != null) {
-    		setAttribute(SET_ACCEPT_UNTRUSTED_CERTIFICATES, accept);
-    	} else {
-    		setAttribute(SET_ACCEPT_UNTRUSTED_CERTIFICATES, DEFAULT_SET_ACCEPT_UNTRUSTED_CERTIFICATES);
-    	}
+        if (accept != null) {
+            setAttribute(SET_ACCEPT_UNTRUSTED_CERTIFICATES, accept);
+        } else {
+            setAttribute(SET_ACCEPT_UNTRUSTED_CERTIFICATES, DEFAULT_SET_ACCEPT_UNTRUSTED_CERTIFICATES);
+        }
     }
 
     public void setNtlmAuthTrustedUris(String uris) {
-    	setAttribute(NTLM_AUTH_TRUSTED_URIS, uris);
+        setAttribute(NTLM_AUTH_TRUSTED_URIS, uris);
     }
-    
+
     public void setBrowserDownloadDir(String downloadDir) {
-    	setAttribute(BROWSER_DOWNLOAD_DIR, downloadDir);
+        setAttribute(BROWSER_DOWNLOAD_DIR, downloadDir);
     }
-    
+
     public void setCapabilities(String capabilities) {
 
-		MutableCapabilities caps = new MutableCapabilities();
-    	if (capabilities != null) {
-    		for (String cap: capabilities.split(",")) {
-    			String[] keyValue = cap.split("=", 2);
-    			if (keyValue.length != 2) {
-    				throw new ConfigurationException("format of capability is '<key>=<value>'");
-    			}
-    			caps.setCapability(keyValue[0], keyValue[1]);
-    		}
-    		
-    	} 
-    	setAttribute(CAPABILITIES, caps);
+        MutableCapabilities caps = new MutableCapabilities();
+        if (capabilities != null) {
+            for (String cap : capabilities.split(",")) {
+                String[] keyValue = cap.split("=", 2);
+                if (keyValue.length != 2) {
+                    throw new ConfigurationException("format of capability is '<key>=<value>'");
+                }
+                caps.setCapability(keyValue[0], keyValue[1]);
+            }
+
+        }
+        setAttribute(CAPABILITIES, caps);
     }
-    
+
     public void setFullReset(Boolean enabled) {
-    	if (enabled != null) {
-    		setAttribute(FULL_RESET, enabled);
-    	} else {
-    		setAttribute(FULL_RESET, true);
-    	}
+        if (enabled != null) {
+            setAttribute(FULL_RESET, enabled);
+        } else {
+            setAttribute(FULL_RESET, true);
+        }
     }
-    
+
 
     public void setWebProxyType(String proxyType) {
-    	try {
-    		setAttribute(WEB_PROXY_TYPE, ProxyType.valueOf(proxyType.toUpperCase()));
-    		setAttribute(WEB_PROXY_TYPE_FROM_USER, proxyType.toUpperCase());
-    	} catch (NullPointerException | IllegalArgumentException e) {
-    		setAttribute(WEB_PROXY_TYPE, DEFAULT_WEB_PROXY_TYPE);
-    		setAttribute(WEB_PROXY_TYPE_FROM_USER, null);
-    	}
-    	
+        try {
+            setAttribute(WEB_PROXY_TYPE, ProxyType.valueOf(proxyType.toUpperCase()));
+            setAttribute(WEB_PROXY_TYPE_FROM_USER, proxyType.toUpperCase());
+        } catch (NullPointerException | IllegalArgumentException e) {
+            setAttribute(WEB_PROXY_TYPE, DEFAULT_WEB_PROXY_TYPE);
+            setAttribute(WEB_PROXY_TYPE_FROM_USER, null);
+        }
+
     }
-    
+
     public void setWebProxyAddress(String proxyAddress) {
-    	setAttribute(WEB_PROXY_ADDRESS, proxyAddress);
+        setAttribute(WEB_PROXY_ADDRESS, proxyAddress);
     }
-    
+
     public void setWebProxyPort(Integer port) {
-    	setAttribute(WEB_PROXY_PORT, port);    	
+        setAttribute(WEB_PROXY_PORT, port);
     }
-    
+
     public void setWebProxyLogin(String login) {
-    	setAttribute(WEB_PROXY_LOGIN, login);
+        setAttribute(WEB_PROXY_LOGIN, login);
     }
-    
+
     public void setWebProxyPassword(String password) {
-    	setAttribute(WEB_PROXY_PASSWORD, password);
+        setAttribute(WEB_PROXY_PASSWORD, password);
     }
-    
+
     public void setWebProxyPac(String pacAddress) {
-    	setAttribute(WEB_PROXY_PAC, pacAddress);
+        setAttribute(WEB_PROXY_PAC, pacAddress);
     }
-    
+
     public void setWebProxyExclude(String proxyExclude) {
-    	setAttribute(WEB_PROXY_EXCLUDE, proxyExclude);
+        setAttribute(WEB_PROXY_EXCLUDE, proxyExclude);
     }
-    
-    
-    
+
+
     public void setSnapshotScrollDelay(Integer scrollDelay) {
-    	if (scrollDelay != null) {
-    		setAttribute(SNAPSHOT_SCROLL_DELAY, scrollDelay);
-    	} else {
-    		setAttribute(SNAPSHOT_SCROLL_DELAY, DEFAULT_SNAPSHOT_SCROLL_DELAY);
-    	}
+        if (scrollDelay != null) {
+            setAttribute(SNAPSHOT_SCROLL_DELAY, scrollDelay);
+        } else {
+            setAttribute(SNAPSHOT_SCROLL_DELAY, DEFAULT_SNAPSHOT_SCROLL_DELAY);
+        }
     }
-    
+
     public void setSnapshotBottomCropping(Integer crop) {
-    	if (crop != null) {
-    		setAttribute(SNAPSHOT_BOTTOM_CROPPING, crop);
-    	} else {
-    		setAttribute(SNAPSHOT_BOTTOM_CROPPING, DEFAULT_SNAPSHOT_BOTTOM_CROPPING);
-    	}
+        if (crop != null) {
+            setAttribute(SNAPSHOT_BOTTOM_CROPPING, crop);
+        } else {
+            setAttribute(SNAPSHOT_BOTTOM_CROPPING, DEFAULT_SNAPSHOT_BOTTOM_CROPPING);
+        }
     }
-    
+
     public void setSnapshotTopCropping(Integer crop) {
-    	if (crop != null) {
-    		setAttribute(SNAPSHOT_TOP_CROPPING, crop);
-    	} else {
-    		setAttribute(SNAPSHOT_TOP_CROPPING, DEFAULT_SNAPSHOT_TOP_CROPPING);
-    	}
+        if (crop != null) {
+            setAttribute(SNAPSHOT_TOP_CROPPING, crop);
+        } else {
+            setAttribute(SNAPSHOT_TOP_CROPPING, DEFAULT_SNAPSHOT_TOP_CROPPING);
+        }
     }
-    
+
     public void setCaptureSnapshot(Boolean capture) {
-    	if (capture != null) {
-    		setAttribute(CAPTURE_SNAPSHOT, capture);
-    	} else {
-    		setAttribute(CAPTURE_SNAPSHOT, DEFAULT_CAPTURE_SNAPSHOT);
-    	}
+        if (capture != null) {
+            setAttribute(CAPTURE_SNAPSHOT, capture);
+        } else {
+            setAttribute(CAPTURE_SNAPSHOT, DEFAULT_CAPTURE_SNAPSHOT);
+        }
     }
-    
+
     public void setCaptureNetwork(Boolean capture) {
-    	if (capture != null) {
-    		setAttribute(CAPTURE_NETWORK, capture);
-    	} else {
-    		setAttribute(CAPTURE_NETWORK, DEFAULT_CAPTURE_NETWORK);
-    	}
+        if (capture != null) {
+            setAttribute(CAPTURE_NETWORK, capture);
+        } else {
+            setAttribute(CAPTURE_NETWORK, DEFAULT_CAPTURE_NETWORK);
+        }
     }
-    
+
     public void setVideoCapture(String capture) {
-    	String newCapture = capture == null ? DEFAULT_VIDEO_CAPTURE: capture;
-    	try {
-    		setAttribute(VIDEO_CAPTURE, VideoCaptureMode.fromString(newCapture));
-    	} catch (IllegalArgumentException e) {
-    		throw new ConfigurationException("Only 'true', 'false', 'onSuccess', 'onError' are supported for video capture");
-    	}
+        String newCapture = capture == null ? DEFAULT_VIDEO_CAPTURE : capture;
+        try {
+            setAttribute(VIDEO_CAPTURE, VideoCaptureMode.fromString(newCapture));
+        } catch (IllegalArgumentException e) {
+            throw new ConfigurationException("Only 'true', 'false', 'onSuccess', 'onError' are supported for video capture");
+        }
     }
 
     public void setReporterPluginClasses(String classNames) {
-    	if (classNames != null) {
-    		List<Class<IReporter>> reporterClasses = new ArrayList<>();
-    		for (String className: classNames.split(",")) {
-	    		try {
-					Class<IReporter> clazz = (Class<IReporter>) Class.forName(className);
-					if (!IReporter.class.isAssignableFrom(clazz)) {
-						throw new ClassCastException();
-					}
-					reporterClasses.add(clazz);
-				} catch (ClassNotFoundException e) {
-					throw new ConfigurationException(String.format("Class %s cannot be loaded: %s", className, e.getMessage()));
-				} catch (ClassCastException e) {
-					throw new ConfigurationException(String.format("Class %s does not implement IReporter interface", className));
-				}
-    		}
+        if (classNames != null) {
+            List<Class<IReporter>> reporterClasses = new ArrayList<>();
+            for (String className : classNames.split(",")) {
+                try {
+                    Class<IReporter> clazz = (Class<IReporter>) Class.forName(className);
+                    if (!IReporter.class.isAssignableFrom(clazz)) {
+                        throw new ClassCastException();
+                    }
+                    reporterClasses.add(clazz);
+                } catch (ClassNotFoundException e) {
+                    throw new ConfigurationException(String.format("Class %s cannot be loaded: %s", className, e.getMessage()));
+                } catch (ClassCastException e) {
+                    throw new ConfigurationException(String.format("Class %s does not implement IReporter interface", className));
+                }
+            }
 
-        	setAttribute(REPORTER_PLUGIN_CLASSES, reporterClasses);
-    	} else {
-    		setAttribute(REPORTER_PLUGIN_CLASSES, new ArrayList<>());
-    	}
+            setAttribute(REPORTER_PLUGIN_CLASSES, reporterClasses);
+        } else {
+            setAttribute(REPORTER_PLUGIN_CLASSES, new ArrayList<>());
+        }
     }
-    
+
     public void setSoftAssertEnabled(Boolean enable) {
-    	if (enable != null) {
-    		setAttribute(SOFT_ASSERT_ENABLED, enable);
-    	} else {
-    		setAttribute(SOFT_ASSERT_ENABLED, DEFAULT_SOFT_ASSERT_ENABLED);
-    	}
+        if (enable != null) {
+            setAttribute(SOFT_ASSERT_ENABLED, enable);
+        } else {
+            setAttribute(SOFT_ASSERT_ENABLED, DEFAULT_SOFT_ASSERT_ENABLED);
+        }
     }
-    
+
     public void setWebDriverListener(String listener) {
-    	List<String> listeners = new ArrayList<>();
-    	if (listener != null && !listener.isEmpty()) {
-    		
-    		boolean oldListeners = false;
-    		boolean wdListeners = false;
+        List<String> listeners = new ArrayList<>();
+        if (listener != null && !listener.isEmpty()) {
 
-    		for (String listenerClassName: listener.split(",")) {
-	    		// check we can access the class
-	    		try {
+            boolean oldListeners = false;
+            boolean wdListeners = false;
 
-	    			if (WebDriverListener.class.isAssignableFrom(Class.forName(listenerClassName))) {
-	    				wdListeners = true;
-	    			} else {
-	    				throw new ConfigurationException(String.format("Class %s must implement WebDriverEventListener or WebDriverListener class", listenerClassName));
-	    				
-	    			}
+            for (String listenerClassName : listener.split(",")) {
+                // check we can access the class
+                try {
 
-	        		listeners.add(listenerClassName);
-	    		} catch (ExceptionInInitializerError | ClassNotFoundException e) {
-	    			throw new ConfigurationException(String.format("Class %s cannot be loaded", listenerClassName), e);
-	    		}
-    		}
-    		
-    		if (oldListeners && wdListeners) {
-				throw new ConfigurationException("Don't mix 'WebDriverEventListener' and 'WebDriverListener' implementations");
-			}
-    	}
-    		
-		setAttribute(WEB_DRIVER_LISTENER, listeners);
+                    if (WebDriverListener.class.isAssignableFrom(Class.forName(listenerClassName))) {
+                        wdListeners = true;
+                    } else {
+                        throw new ConfigurationException(String.format("Class %s must implement WebDriverEventListener or WebDriverListener class", listenerClassName));
+
+                    }
+
+                    listeners.add(listenerClassName);
+                } catch (ExceptionInInitializerError | ClassNotFoundException e) {
+                    throw new ConfigurationException(String.format("Class %s cannot be loaded", listenerClassName), e);
+                }
+            }
+
+            if (oldListeners && wdListeners) {
+                throw new ConfigurationException("Don't mix 'WebDriverEventListener' and 'WebDriverListener' implementations");
+            }
+        }
+
+        setAttribute(WEB_DRIVER_LISTENER, listeners);
     }
-    
+
     public void setDeviceName(String name) {
-    	setAttribute(DEVICE_NAME, name);
+        setAttribute(DEVICE_NAME, name);
     }
-    
+
     public void setDeviceId(String name) {
-    	setAttribute(DEVICE_ID, name);
+        setAttribute(DEVICE_ID, name);
     }
 
     public void setDeviceList(String list) {
-    	if (list != null) {
-    		setAttribute(DEVICE_LIST, list);
-    	} else {
-    		setAttribute(DEVICE_LIST, DEFAULT_DEVICE_LIST);
-    	}
+        if (list != null) {
+            setAttribute(DEVICE_LIST, list);
+        } else {
+            setAttribute(DEVICE_LIST, DEFAULT_DEVICE_LIST);
+        }
     }
-    
+
     public void setApp(String app) {
-    	if (app != null) {
-    		setAttribute(APP, app);
-    	} else {
-    		setAttribute(APP, DEFAULT_APP);
-    	}
+        if (app != null) {
+            setAttribute(APP, app);
+        } else {
+            setAttribute(APP, DEFAULT_APP);
+        }
     }
-    
+
     public void setCucumberTags(String tags) {
-    	if (tags != null) {
-    		setAttribute(CUCUMBER_TAGS, tags);
-    	} else {
-    		setAttribute(CUCUMBER_TAGS, DEFAULT_CUCUMBER_TAGS);
-    	}
+        if (tags != null) {
+            setAttribute(CUCUMBER_TAGS, tags);
+        } else {
+            setAttribute(CUCUMBER_TAGS, DEFAULT_CUCUMBER_TAGS);
+        }
     }
-    
+
     public void setCucumberTests(String tests) {
-    	if (tests != null) {
-    		setAttribute(CUCUMBER_TESTS, tests);
-    	} else {
-    		setAttribute(CUCUMBER_TESTS, DEFAULT_CUCUMBER_TESTS);
-    	}
+        if (tests != null) {
+            setAttribute(CUCUMBER_TESTS, tests);
+        } else {
+            setAttribute(CUCUMBER_TESTS, DEFAULT_CUCUMBER_TESTS);
+        }
     }
-    
+
     public void setCucumberImplementationPackage(String pkg) {
-    	if (pkg == null && (!getCucumberTests().isEmpty() || !getCucumberTags().isEmpty())) {
-    		throw new ConfigurationException("cucumberPackage parameter not defined whereas cucumberTests or cucumberTags are defined");
-    	}
-    	setAttribute(CUCUMBER_IMPLEMENTATION_PKG, pkg);
+        if (pkg == null && (!getCucumberTests().isEmpty() || !getCucumberTags().isEmpty())) {
+            throw new ConfigurationException("cucumberPackage parameter not defined whereas cucumberTests or cucumberTags are defined");
+        }
+        setAttribute(CUCUMBER_IMPLEMENTATION_PKG, pkg);
     }
-    
+
     public void setTestEnv(String tests) {
-    	if (tests != null) {
-    		setAttribute(TEST_ENV, tests);
-    	} else {
-    		setAttribute(TEST_ENV, DEFAULT_TEST_ENV);
-    	}
+        if (tests != null) {
+            setAttribute(TEST_ENV, tests);
+        } else {
+            setAttribute(TEST_ENV, DEFAULT_TEST_ENV);
+        }
     }
-    
+
     public void setLoadIni(String iniFiles) {
-    	setAttribute(LOAD_INI, iniFiles);
+        setAttribute(LOAD_INI, iniFiles);
     }
-    
+
 
     public void setAutomationName(String automationName) {
         // this parameter has no effect with Appium 2.x
-    	setAttribute(AUTOMATION_NAME, automationName);
+        setAttribute(AUTOMATION_NAME, automationName);
     }
-    
+
     public void setAppiumServerUrl(String appiumServerUrl) {
-    	if ((appiumServerUrl != null && (appiumServerUrl.endsWith("/wd/hub/") || appiumServerUrl.endsWith("/"))) || appiumServerUrl == null) {
-    		setAttribute(APPIUM_SERVER_URL, appiumServerUrl);
-    	} else {
-    		throw new ConfigurationException("appiumServerUrl must be 'http://<host>:<port>/wd/hub/' (appium 1) or 'http://<host>:<port>/' (appium 2)");
-    	}
+        if ((appiumServerUrl != null && (appiumServerUrl.endsWith("/wd/hub/") || appiumServerUrl.endsWith("/"))) || appiumServerUrl == null) {
+            setAttribute(APPIUM_SERVER_URL, appiumServerUrl);
+        } else {
+            throw new ConfigurationException("appiumServerUrl must be 'http://<host>:<port>/wd/hub/' (appium 1) or 'http://<host>:<port>/' (appium 2)");
+        }
     }
-    
+
     public void setAppiumCapabilities(String appiumCapabilites) {
-    	if (appiumCapabilites != null) {
-    		try {
-	    		Map<String, String> capsMap = Arrays.asList(appiumCapabilites.split(";"))
-	    			.stream()
-	    			.map(kv -> kv.split("="))
-	    			.collect(Collectors.toMap(a -> a[0].startsWith(SeleniumRobotCapabilityType.APPIUM_PREFIX) ? a[0]: SeleniumRobotCapabilityType.APPIUM_PREFIX + a[0],
-	    					a -> a[1]));
-	    		setAttribute(APPIUM_CAPS, new MutableCapabilities(capsMap));
-    		} catch (IndexOutOfBoundsException e) {
-    			throw new ConfigurationException("Format for appium capabilities must be 'key1=value1;key2=value2'");
-    		} catch (IllegalStateException e) {
-    			throw new ConfigurationException("Appium capabilities keys must be unique");
-    		}
-    		
-    	} else {
-    		setAttribute(APPIUM_CAPS, new MutableCapabilities());
-    	}
+        if (appiumCapabilites != null) {
+            try {
+                Map<String, String> capsMap = Arrays.asList(appiumCapabilites.split(";"))
+                        .stream()
+                        .map(kv -> kv.split("="))
+                        .collect(Collectors.toMap(a -> a[0].startsWith(SeleniumRobotCapabilityType.APPIUM_PREFIX) ? a[0] : SeleniumRobotCapabilityType.APPIUM_PREFIX + a[0],
+                                a -> a[1]));
+                setAttribute(APPIUM_CAPS, new MutableCapabilities(capsMap));
+            } catch (IndexOutOfBoundsException e) {
+                throw new ConfigurationException("Format for appium capabilities must be 'key1=value1;key2=value2'");
+            } catch (IllegalStateException e) {
+                throw new ConfigurationException("Appium capabilities keys must be unique");
+            }
+
+        } else {
+            setAttribute(APPIUM_CAPS, new MutableCapabilities());
+        }
     }
 
     public void setAppPackage(String pkg) {
-    	setAttribute(APP_PACKAGE, pkg);
+        setAttribute(APP_PACKAGE, pkg);
     }
-    
+
     public void setTestMethodSignature(String signature) {
-    	setAttribute(TEST_METHOD_SIGNATURE, signature);
+        setAttribute(TEST_METHOD_SIGNATURE, signature);
     }
 
     public void setAppActivity(String name) {
-    	setAttribute(APP_ACTIVITY, name);
+        setAttribute(APP_ACTIVITY, name);
     }
 
     public void setAppWaitActivity(String name) {
-    	setAttribute(APP_WAIT_ACTIVITY, name);
+        setAttribute(APP_WAIT_ACTIVITY, name);
     }
 
     public void setTestRetryCount(Integer retry) {
-    	if (retry != null) {
-    		setAttribute(TEST_RETRY_COUNT, retry);
-    	} else {
-    		setAttribute(TEST_RETRY_COUNT, DEFAULT_TEST_RETRY_COUNT);
-    	}
+        if (retry != null) {
+            setAttribute(TEST_RETRY_COUNT, retry);
+        } else {
+            setAttribute(TEST_RETRY_COUNT, DEFAULT_TEST_RETRY_COUNT);
+        }
     }
-    
+
     public void setNewCommandTimeout(Integer timeout) {
-    	if (timeout != null) {
-    		setAttribute(NEW_COMMAND_TIMEOUT, timeout);
-    	} else {
-    		setAttribute(NEW_COMMAND_TIMEOUT, DEFAULT_NEW_COMMAND_TIMEOUT);
-    	}
+        if (timeout != null) {
+            setAttribute(NEW_COMMAND_TIMEOUT, timeout);
+        } else {
+            setAttribute(NEW_COMMAND_TIMEOUT, DEFAULT_NEW_COMMAND_TIMEOUT);
+        }
     }
-    
+
     public void setActionDelay(Integer delay) {
-    	if (delay != null) {
-    		setAttribute(ACTION_DELAY, delay);
-    	} else {
-    		setAttribute(ACTION_DELAY, DEFAULT_ACTION_DELAY);
-    	}
+        if (delay != null) {
+            setAttribute(ACTION_DELAY, delay);
+        } else {
+            setAttribute(ACTION_DELAY, DEFAULT_ACTION_DELAY);
+        }
     }
-    
+
     public void setOutputDirectory(String outputDir, ITestContext context, boolean configureTestNg) {
-    	
-    	if (outputDir == null) {
-    		setAttribute(DEFAULT_OUTPUT_DIRECTORY, new File(context.getOutputDirectory()).getParent());
-    		setAttribute(OUTPUT_DIRECTORY, new File(context.getOutputDirectory()).getParent());
-    	} else {
-    		if (context instanceof TestRunner && configureTestNg) {
-    			((TestRunner)context).setOutputDirectory(outputDir);
-    		}
-    		setAttribute(DEFAULT_OUTPUT_DIRECTORY, new File(outputDir).getAbsolutePath().replace(File.separator, "/"));
-    		setAttribute(OUTPUT_DIRECTORY, new File(outputDir).getAbsolutePath().replace(File.separator, "/"));
-    		try {
-    			new File((String)getAttribute(OUTPUT_DIRECTORY)).mkdirs();
-    		} catch (Exception e) {
-    			logger.error(String.format("Error creating output directory %s", (String)getAttribute(OUTPUT_DIRECTORY)));
-    		}
-    	}
+
+        if (outputDir == null) {
+            setAttribute(DEFAULT_OUTPUT_DIRECTORY, new File(context.getOutputDirectory()).getParent());
+            setAttribute(OUTPUT_DIRECTORY, new File(context.getOutputDirectory()).getParent());
+        } else {
+            if (context instanceof TestRunner && configureTestNg) {
+                ((TestRunner) context).setOutputDirectory(outputDir);
+            }
+            setAttribute(DEFAULT_OUTPUT_DIRECTORY, new File(outputDir).getAbsolutePath().replace(File.separator, "/"));
+            setAttribute(OUTPUT_DIRECTORY, new File(outputDir).getAbsolutePath().replace(File.separator, "/"));
+            try {
+                new File((String) getAttribute(OUTPUT_DIRECTORY)).mkdirs();
+            } catch (Exception e) {
+                logger.error(String.format("Error creating output directory %s", (String) getAttribute(OUTPUT_DIRECTORY)));
+            }
+        }
     }
-    
+
     public void setOptimizeReports(Boolean optimize) {
-    	if (optimize != null) {
-    		setAttribute(OPTIMIZE_REPORTS, optimize);
-    	} else {
-    		setAttribute(OPTIMIZE_REPORTS, DEFAULT_OPTIMIZE_REPORTS);
-    	}
+        if (optimize != null) {
+            setAttribute(OPTIMIZE_REPORTS, optimize);
+        } else {
+            setAttribute(OPTIMIZE_REPORTS, DEFAULT_OPTIMIZE_REPORTS);
+        }
     }
-    
+
     public void setKeepAllResults(Boolean keepAll) {
-    	if (keepAll != null) {
-    		setAttribute(KEEP_ALL_RESULTS, keepAll);
-    	} else {
-    		setAttribute(KEEP_ALL_RESULTS, DEFAULT_KEEP_ALL_RESULTS);
-    	}
+        if (keepAll != null) {
+            setAttribute(KEEP_ALL_RESULTS, keepAll);
+        } else {
+            setAttribute(KEEP_ALL_RESULTS, DEFAULT_KEEP_ALL_RESULTS);
+        }
     }
-    
+
     public void setVersion(String version) {
-    	setAttribute(VERSION, version);
+        setAttribute(VERSION, version);
     }
-    
+
     /**
      * Set platform on which we request to execute the test
      * In mobile, platform parameter will be given (iOS xx or Android yy)
      * In desktop, if we run the test locally, we should get the current platform, else, let user decide on which platform
      * test will be run. It may be any if underlying OS does not matter (for grid)
+     *
      * @param platform
      */
     public void setPlatform(String platform) {
-    	if (platform != null) {
-    		setAttribute(PLATFORM, platform);
-    	} else {
-    		if (getRunMode() == DriverMode.LOCAL) {
-    			setAttribute(PLATFORM, OSUtility.getCurrentPlatorm().toString());
-    		} else {
-    			setAttribute(PLATFORM, Platform.ANY.toString());
-    		}
-    	}
+        if (platform != null) {
+            setAttribute(PLATFORM, platform);
+        } else {
+            if (getRunMode() == DriverMode.LOCAL) {
+                setAttribute(PLATFORM, OSUtility.getCurrentPlatorm().toString());
+            } else {
+                setAttribute(PLATFORM, Platform.ANY.toString());
+            }
+        }
     }
-    
+
     public void setTestType(final TestType testType) {
         setAttribute(TEST_TYPE, testType);
     }
-   
+
     public void setRelativeOutputDir(String name) {
-    	setAttribute(RELATIVE_OUTPUT_DIR, name);
+        setAttribute(RELATIVE_OUTPUT_DIR, name);
     }
-    
+
     public void setMobilePlatformVersion(final String version) {
-    	setAttribute(MOBILE_PLATFORM_VERSION, version);
+        setAttribute(MOBILE_PLATFORM_VERSION, version);
     }
-    
+
     public void setViewPortWidth(Integer width) {
-    	setAttribute(VIEWPORT_WIDTH, width);    	
+        setAttribute(VIEWPORT_WIDTH, width);
     }
-    
+
     public void setViewPortHeight(Integer height) {
-    	setAttribute(VIEWPORT_HEIGHT, height);    	
+        setAttribute(VIEWPORT_HEIGHT, height);
     }
-    
+
     public void setDriverCreationBlocked(boolean driverCreationBlocked) {
-		this.driverCreationBlocked = driverCreationBlocked;
-	}
+        this.driverCreationBlocked = driverCreationBlocked;
+    }
 
-	public static Map<String, String> getOutputFolderNames() {
-		return outputFolderNames;
-	}
+    public static Map<String, String> getOutputFolderNames() {
+        return outputFolderNames;
+    }
 
-	/**
+    /**
      * To be used by unit tests exclusively
      */
     public static void resetOutputFolderNames() {
-    	outputFolderNames.clear();
+        outputFolderNames.clear();
     }
 
-	/**
+    /**
      * To be used by unit tests exclusively
      */
-	public void setSeleniumGridConnectors(List<SeleniumGridConnector> seleniumGridConnectors) {
-		this.seleniumGridConnectors = seleniumGridConnectors;
-	}
-	
-	/**
+    public void setSeleniumGridConnectors(List<SeleniumGridConnector> seleniumGridConnectors) {
+        this.seleniumGridConnectors = seleniumGridConnectors;
+    }
+
+    /**
      * To be used by unit tests exclusively
      */
-	public void setTestManagerInstance(TestManager testManagerInstance) {
-		this.testManagerInstance = testManagerInstance;
-	}
-	
-	/**
-	 * Access method to allow, from test, to write e.g: 'robotConfig().testManager().setTestId(1)'
-	 * @return
-	 */
-	public TestManagerContext testManager() {
-		return testManagerContext;
-	}
-	
-	/**
-	 * Access method to allow, from test, to write e.g: 'robotConfig().bugtracker().setAssignee("foo")'
-	 * @return
-	 */
-	public BugTrackerContext bugtracker() {
-		return bugtrackerContext;
-	}
-	
-	public SeleniumRobotServerContext seleniumServer() {
-		return seleniumRobotServerContext;
-	}
+    public void setTestManagerInstance(TestManager testManagerInstance) {
+        this.testManagerInstance = testManagerInstance;
+    }
+
+    /**
+     * Access method to allow, from test, to write e.g: 'robotConfig().testManager().setTestId(1)'
+     *
+     * @return
+     */
+    public TestManagerContext testManager() {
+        return testManagerContext;
+    }
+
+    /**
+     * Access method to allow, from test, to write e.g: 'robotConfig().bugtracker().setAssignee("foo")'
+     *
+     * @return
+     */
+    public BugTrackerContext bugtracker() {
+        return bugtrackerContext;
+    }
+
+    public SeleniumRobotServerContext seleniumServer() {
+        return seleniumRobotServerContext;
+    }
 
 }
