@@ -10,4 +10,16 @@ public class Content {
         this.size = size;
         this.text = text;
     }
+
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public String getText() {
+        return text;
+    }
 }

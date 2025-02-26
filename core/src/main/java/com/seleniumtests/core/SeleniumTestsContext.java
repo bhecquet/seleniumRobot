@@ -157,7 +157,6 @@ public class SeleniumTestsContext {
     public static final String TEST_ENTITY = "testEntity";						// Jamais utilisé
     
     public static final String CAPTURE_SNAPSHOT = "captureSnapshot";
-    public static final String CAPTURE_NETWORK = "captureNetwork";
     public static final String VIDEO_CAPTURE = "captureVideo";
 
     public static final String SOFT_ASSERT_ENABLED = "softAssertEnabled";		// le test ne s'arrête pas lorsqu'une assertion est rencontrée
@@ -228,7 +227,6 @@ public class SeleniumTestsContext {
 	public static final boolean DEFAULT_SOFT_ASSERT_ENABLED = true;
 	public static final boolean DEFAULT_ENABLE_EXCEPTION_LISTENER = true;
 	public static final boolean DEFAULT_CAPTURE_SNAPSHOT = true;
-	public static final boolean DEFAULT_CAPTURE_NETWORK = false;
 	public static final String DEFAULT_INITIAL_URL = "about:blank";
 	public static final String DEFAULT_VIDEO_CAPTURE = "onError";
 	public static final Integer DEFAULT_SNAPSHOT_TOP_CROPPING = null;
@@ -423,7 +421,6 @@ public class SeleniumTestsContext {
         setSnapshotBottomCropping(getIntValueForTest(SNAPSHOT_BOTTOM_CROPPING, System.getProperty(SNAPSHOT_BOTTOM_CROPPING)));
         setSnapshotTopCropping(getIntValueForTest(SNAPSHOT_TOP_CROPPING, System.getProperty(SNAPSHOT_TOP_CROPPING)));
         setCaptureSnapshot(getBoolValueForTest(CAPTURE_SNAPSHOT, System.getProperty(CAPTURE_SNAPSHOT)));
-        setCaptureNetwork(getBoolValueForTest(CAPTURE_NETWORK, System.getProperty(CAPTURE_NETWORK)));
         setVideoCapture(getValueForTest(VIDEO_CAPTURE, System.getProperty(VIDEO_CAPTURE)));
 
         setReporterPluginClasses(getValueForTest(REPORTER_PLUGIN_CLASSES, System.getProperty(REPORTER_PLUGIN_CLASSES)));
@@ -892,11 +889,6 @@ public class SeleniumTestsContext {
     	if (getWebProxyType() == null) {
     		setWebProxyType(DEFAULT_WEB_PROXY_TYPE.toString());
     	}
-    	
-    	// exclude browserMobProxy if proxy type is set to PAC
-    	if (getCaptureNetwork() && getWebProxyType() != ProxyType.DIRECT && getWebProxyType() != ProxyType.MANUAL) {
-    		throw new ConfigurationException("Browsermob proxy (captureNetwork option) is only compatible with DIRECT and MANUAL");
-    	}
     }
     
     public Proxy getProxy() {
@@ -1087,10 +1079,6 @@ public class SeleniumTestsContext {
     
     public String getStartedBy() {    	
     	return (String) getAttribute(STARTED_BY);
-    }
-    
-    public boolean getCaptureNetwork() {    	
-    	return (Boolean) getAttribute(CAPTURE_NETWORK);
     }
     
     public VideoCaptureMode getVideoCapture() {    	
@@ -2076,14 +2064,6 @@ public class SeleniumTestsContext {
     		setAttribute(CAPTURE_SNAPSHOT, capture);
     	} else {
     		setAttribute(CAPTURE_SNAPSHOT, DEFAULT_CAPTURE_SNAPSHOT);
-    	}
-    }
-    
-    public void setCaptureNetwork(Boolean capture) {
-    	if (capture != null) {
-    		setAttribute(CAPTURE_NETWORK, capture);
-    	} else {
-    		setAttribute(CAPTURE_NETWORK, DEFAULT_CAPTURE_NETWORK);
     	}
     }
     

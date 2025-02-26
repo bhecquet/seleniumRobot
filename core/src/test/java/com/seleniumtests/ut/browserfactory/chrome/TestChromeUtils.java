@@ -1,0 +1,215 @@
+package com.seleniumtests.ut.browserfactory.chrome;
+
+import com.seleniumtests.GenericTest;
+import com.seleniumtests.browserfactory.chrome.ChromeUtils;
+import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.util.har.Har;
+import org.jetbrains.annotations.NotNull;
+import org.openqa.selenium.logging.LogEntry;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
+
+public class TestChromeUtils extends GenericTest {
+
+    @Test(groups="ut")
+    public void testParsePerformanceLogsNoError() throws IOException {
+        List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-all-ok.txt");
+
+        List<TestStep> testSteps = new ArrayList<>();
+        testSteps.add(new TestStep("step 1"));
+        testSteps.get(0).setStartDate(Date.from(Instant.ofEpochMilli(1739547733421L)));
+        testSteps.add(new TestStep("step 2"));
+        testSteps.get(1).setStartDate(Date.from(Instant.ofEpochMilli(1739547734198L)));
+
+        Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
+
+        // check pages
+        Assert.assertEquals(har.getLog().getPages().size(), 2);
+        Assert.assertEquals(har.getLog().getPages().get(0).getTitle(), "step 1");
+        Assert.assertEquals(har.getLog().getPages().get(0).getId(), "page_0");
+        Assert.assertTrue(har.getLog().getPages().get(0).getStartedDateTime().startsWith("2025-02-14T")); // to avoid problems on other time zones
+
+        // check entries
+        Assert.assertEquals(har.getLog().getEntries().size(), 23);
+        Assert.assertEquals(har.getLog().getEntries().get(0).getRequest().getMethod(), "GET");
+        Assert.assertEquals(har.getLog().getEntries().get(0).getRequest().getUrl(), "http://127.0.0.1:56825/test.html");
+        Assert.assertEquals(har.getLog().getEntries().get(0).getRequest().getHeaders().size(), 14);
+        Assert.assertEquals(har.getLog().getEntries().get(0).getResponse().getStatus(), 200);
+        Assert.assertEquals(har.getLog().getEntries().get(0).getResponse().getStatusText(), "OK");
+        Assert.assertEquals(har.getLog().getEntries().get(0).getResponse().getHttpVersion(), "http/1.1");
+        Assert.assertEquals(har.getLog().getEntries().get(0).getResponse().getHeaders().size(), 3);
+        Assert.assertEquals(har.getLog().getEntries().get(0).getResponse().getContent().getMimeType(), "text/html");
+        Assert.assertEquals(har.getLog().getEntries().get(0).getResponse().getContent().getSize(), 12993);
+        Assert.assertEquals(har.getLog().getEntries().get(0).getResponse().getContent().getText(), "_masked_");
+        Assert.assertEquals(har.getLog().getEntries().get(0).getResponse().getHeadersSize(), 103);
+        Assert.assertEquals(har.getLog().getEntries().get(0).getResponse().getBodySize(), 12993);
+        Assert.assertEquals(har.getLog().getEntries().get(0).getPageref(), "page_0");
+        Assert.assertEquals(har.getLog().getEntries().get(0).getTimings().getBlocked(), 0.854);
+        Assert.assertEquals(har.getLog().getEntries().get(0).getTimings().getDns(), -1.0);
+        Assert.assertEquals(har.getLog().getEntries().get(0).getTimings().getWait(), 307.798);
+        Assert.assertTrue(har.getLog().getEntries().get(0).getStartedDateTime().startsWith("2025-02-14T"));
+
+        // check transition between pages, based on timings
+        Assert.assertEquals(har.getLog().getEntries().get(18).getPageref(), "page_0");
+        Assert.assertEquals(har.getLog().getEntries().get(19).getPageref(), "page_1");
+    }
+
+    /**
+     * Check Authorization header is removed
+     * @throws IOException
+     */
+    @Test(groups="ut")
+    public void testParsePerformanceLogsAuthorizationHeaderRemoved() throws IOException {
+        List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-auth-headers.txt");
+
+        List<TestStep> testSteps = new ArrayList<>();
+        testSteps.add(new TestStep("step 1"));
+        testSteps.get(0).setStartDate(Date.from(Instant.ofEpochMilli(1739547733421L)));
+
+        Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
+        Assert.assertTrue(har.getLog().getEntries().get(0).getRequest().getHeaders()
+                .stream()
+                .filter(h -> h.getName().equals("Authorization"))
+                .findAny()
+                .isEmpty());
+    }
+
+    /**
+     * If no steps are provided, no not raise exceptions, only provide empty pages
+     * @throws IOException
+     */
+    @Test(groups="ut")
+    public void testParsePerformanceLogsNoSteps() throws IOException {
+        List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-auth-headers.txt");
+
+        List<TestStep> testSteps = new ArrayList<>();
+
+        Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
+        Assert.assertEquals(har.getLog().getEntries().size(), 1);
+        Assert.assertEquals(har.getLog().getEntries().get(0).getPageref(), "");
+        Assert.assertEquals(har.getLog().getPages().size(), 0);
+    }
+
+    /**
+     * Check that missing requestWillBeSentExtraInfo does not bother analysis
+     * @throws IOException
+     */
+    @Test(groups="ut")
+    public void testParsePerformanceLogsMissingRequestWillBeSentExtraInfo() throws IOException {
+        List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-missing-sentExtraInfo.txt");
+
+        List<TestStep> testSteps = new ArrayList<>();
+        testSteps.add(new TestStep("step 1"));
+        testSteps.get(0).setStartDate(Date.from(Instant.ofEpochMilli(1739547733421L)));
+
+        Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
+        Assert.assertEquals(har.getLog().getEntries().get(0).getRequest().getHeaders().size(), 4);
+    }
+
+    /**
+     * Check that missing responseReceivedExtraInfo does not bother analysis
+     * @throws IOException
+     */
+    @Test(groups="ut")
+    public void testParsePerformanceLogsMissingResponseReceivedExtraInfo() throws IOException {
+        List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-missing-responseReceivedExtraInfo.txt");
+
+        List<TestStep> testSteps = new ArrayList<>();
+        testSteps.add(new TestStep("step 1"));
+        testSteps.get(0).setStartDate(Date.from(Instant.ofEpochMilli(1739547733421L)));
+
+        Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
+        Assert.assertEquals(har.getLog().getEntries().size(), 1);
+    }
+
+    /**
+     * Check that missing responseReceived does not bother analysis (case for CORS)
+     * @throws IOException
+     */
+    @Test(groups="ut")
+    public void testParsePerformanceLogsMissingResponseReceived() throws IOException {
+        List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-missing-responseReceived.txt");
+
+        List<TestStep> testSteps = new ArrayList<>();
+        testSteps.add(new TestStep("step 1"));
+        testSteps.get(0).setStartDate(Date.from(Instant.ofEpochMilli(1739547733421L)));
+
+        Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
+        Assert.assertEquals(har.getLog().getEntries().size(), 1);
+        Assert.assertEquals(har.getLog().getEntries().get(0).getResponse().getStatus(), -1);
+        Assert.assertEquals(har.getLog().getEntries().get(0).getResponse().getStatusText(), "No response received");
+        Assert.assertEquals(har.getLog().getEntries().get(0).getTimings().getConnect(), 0);
+    }
+
+    /**
+     * Check missing timings does not prevent analysis (case with local files)
+     * @throws IOException
+     */
+    @Test(groups="ut")
+    public void testParsePerformanceLogsMissingTimings() throws IOException {
+        List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-missing-timings.txt");
+
+        List<TestStep> testSteps = new ArrayList<>();
+        testSteps.add(new TestStep("step 1"));
+        testSteps.get(0).setStartDate(Date.from(Instant.ofEpochMilli(1739547733421L)));
+
+        Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
+        Assert.assertEquals(har.getLog().getEntries().size(), 1);
+        Assert.assertEquals(har.getLog().getEntries().get(0).getTimings().getConnect(), 0);
+    }
+
+    /**
+     * According to https://chromedevtools.github.io/devtools-protocol/tot/Network/#event-responseReceivedExtraInfo, when cache is used
+     * status code for responseReceivedExtraInfo is different from responseReceived
+     * Check we get status code from responseReceivedExtraInfo
+     * @throws IOException
+     */
+    @Test(groups="ut")
+    public void testParsePerformanceLogsWithCache() throws IOException {
+        List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-with-cache.txt");
+
+        List<TestStep> testSteps = new ArrayList<>();
+        testSteps.add(new TestStep("step 1"));
+        testSteps.get(0).setStartDate(Date.from(Instant.ofEpochMilli(1739547733421L)));
+
+        Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
+        Assert.assertEquals(har.getLog().getEntries().size(), 1);
+        Assert.assertEquals(har.getLog().getEntries().get(0).getResponse().getStatus(), 304);
+    }
+
+    /**
+     * Check that in case some mandatory data is not present, no exception is thrown but entry is discarded
+     * @throws IOException
+     */
+    @Test(groups="ut")
+    public void testParsePerformanceMissingMandatoryData() throws IOException {
+        List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-missing-data.txt");
+
+        List<TestStep> testSteps = new ArrayList<>();
+        testSteps.add(new TestStep("step 1"));
+        testSteps.get(0).setStartDate(Date.from(Instant.ofEpochMilli(1739547733421L)));
+
+        Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
+        Assert.assertEquals(har.getLog().getEntries().size(), 0);
+    }
+
+    private static List<LogEntry> readLogs(String resourcePath) throws IOException {
+        File perfFile = createFileFromResource(resourcePath);
+        List<LogEntry> logEntries = Files.readAllLines(perfFile.toPath())
+                .stream()
+                .map(line -> new LogEntry(Level.INFO, 0, line))
+                .collect(Collectors.toList());
+        return logEntries;
+    }
+}

@@ -6,6 +6,7 @@ import java.util.List;
 public class Log {
     private String version;
     private Creator creator;
+
     private List<Entry> entries;
     private List<Page> pages;
 
@@ -22,5 +23,21 @@ public class Log {
 
     public void addPage(Page page) {
         pages.add(page);
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public Creator getCreator() {
+        return creator;
+    }
+
+    public List<Entry> getEntries() {
+        return entries;
+    }
+
+    public List<Page> getPages() {
+        return pages;
     }
 }

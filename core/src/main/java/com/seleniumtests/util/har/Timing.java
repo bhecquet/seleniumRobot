@@ -18,4 +18,32 @@ public class Timing {
         this.wait = wait;
         this.receive = receive;
     }
+
+    public double getBlocked() {
+        return blocked;
+    }
+
+    public double getDns() {
+        return dns;
+    }
+
+    public double getConnect() {
+        return connect;
+    }
+
+    public double getSsl() {
+        return ssl;
+    }
+
+    public double getSend() {
+        return send;
+    }
+
+    public double getWait() {
+        return wait;
+    }
+
+    public double getReceive() {
+        return receive;
+    }
 }

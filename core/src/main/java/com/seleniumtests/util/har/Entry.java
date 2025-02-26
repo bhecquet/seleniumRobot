@@ -21,4 +21,32 @@ public class Entry {
         this.time = time;
 
     }
+
+    public String getStartedDateTime() {
+        return startedDateTime;
+    }
+
+    public Request getRequest() {
+        return request;
+    }
+
+    public Response getResponse() {
+        return response;
+    }
+
+    public Timing getTimings() {
+        return timings;
+    }
+
+    public int getTime() {
+        return time;
+    }
+
+    public String getPageref() {
+        return pageref;
+    }
+
+    public Map<String, String> getCache() {
+        return cache;
+    }
 }

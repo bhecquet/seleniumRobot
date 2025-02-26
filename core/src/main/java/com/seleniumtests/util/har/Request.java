@@ -23,4 +23,36 @@ public class Request {
         this.queryString = queryString;
         this.headersSize = headersSize;
     }
+
+    public int getBodySize() {
+        return bodySize;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public String getHttpVersion() {
+        return httpVersion;
+    }
+
+    public List<Header> getHeaders() {
+        return headers;
+    }
+
+    public List<Cookie> getCookies() {
+        return cookies;
+    }
+
+    public List<QueryString> getQueryString() {
+        return queryString;
+    }
+
+    public int getHeadersSize() {
+        return headersSize;
+    }
 }
