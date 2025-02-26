@@ -175,7 +175,9 @@ public class TestNGResultUtils {
 	    		getSeleniumRobotTestContext(testNGResult).getConfiguration().put(key, new TestVariable(key, parameter.toString()));
 	    	}
 	    	testName = StringUtility.interpolateString(testAnnotation.testName(), getSeleniumRobotTestContext(testNGResult));
-		} 
+		} else {
+			testName = testNGResult.getMethod().getMethodName();
+		}
 		
 		// store it for usage in reports (velocity access the attribute directly)
 		testNGResult.setAttribute(VISUAL_TEST_NAME, testName);

@@ -181,9 +181,21 @@ public abstract class CommonReporter implements IReporter {
 		}
 		
 		// when test is skipped, UNIQUE_METHOD_NAME may have not been generated
-		if (testResult.getStatus() == ITestResult.SKIP) {
+		/*if (testResult.getStatus() == ITestResult.SKIP) {
 			return testResult.getName();
 		} else {
+			return "N-A";
+		}*/
+		
+		// In case of an error occurring on the SeleniumRobot Server, we can reach this point with a test not skipped but
+		// with a testName that we can return instead of N-A.
+		try {
+			if (testResult.getName() != null && !testResult.getName().isEmpty()) {
+				return testResult.getName();
+			} else {
+				return "N-A";
+			}
+		} catch (Exception e) {
 			return "N-A";
 		}
 	}
@@ -206,9 +218,21 @@ public abstract class CommonReporter implements IReporter {
 		}
 		
 		// when test is skipped, UNIQUE_METHOD_NAME may have not been generated
-		if (testResult.getStatus() == ITestResult.SKIP) {
+		/*if (testResult.getStatus() == ITestResult.SKIP) {
 			return testResult.getName();
 		} else {
+			return "N-A";
+		}*/
+		
+		// In case of an error occurring on the SeleniumRobot Server, we can reach this point with a test not skipped but
+		// with a testName that we can return instead of N-A.
+		try {
+			if (testResult.getName() != null && !testResult.getName().isEmpty()) {
+				return testResult.getName();
+			} else {
+				return "N-A";
+			}
+		} catch (Exception e) {
 			return "N-A";
 		}
 	}

@@ -59,6 +59,7 @@ import com.seleniumtests.core.contexts.SeleniumRobotServerContext;
 import com.seleniumtests.core.contexts.TestManagerContext;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
@@ -847,7 +848,15 @@ public class SeleniumTestsContext {
         variableServer = seleniumRobotServerContext.createSeleniumRobotServer(testNGResult);
     	
         // read and set test configuration from env.ini file and from seleniumRobot server
-    	setTestConfiguration();
+		try {
+			testNGResult.setAttribute("hasVariableServerFailed", false);
+			setTestConfiguration();
+		} catch (Exception e) {
+			// If the setTestConfiguration fails, it must be an error from the SeleniumRobot Server
+			// In this case, add a flag to ensure that the test won't be executed but the Exception is displayed in the report
+			testNGResult.setThrowable(new SeleniumRobotServerException("An error occured while fetching variables from the SeleniumRobot Server. Test execution is skipped."));
+			testNGResult.setAttribute("hasVariableServerFailed", true);
+		}
     	updateProxyConfig();
     	
     	// create other connectors that may use variables

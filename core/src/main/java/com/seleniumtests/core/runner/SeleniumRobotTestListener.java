@@ -47,6 +47,7 @@ import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.core.testretry.TestRetryAnalyzer;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.WebUIDriver;
@@ -284,6 +285,11 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		// for each beforemethod, store the current context so that it can be edited by the configuration method
 		if (method.isConfigurationMethod()) {
 			configureThreadContextBeforeInvoke(method.getTestMethod(), testResult, context);
+		}
+		// Check if an error from the SeleniumRobot Server occured during the configuration of the test
+		// If so, throw an exception to skip the test execution (which will fail anyway since we couldn't fetch the variables)
+		if (testResult.getAttribute("hasVariableServerFailed") != null && (boolean) testResult.getAttribute("hasVariableServerFailed")) {
+			throw new SeleniumRobotServerException("An error occurred while fetching variables from the server. Skip the test execution.");
 		}
 	}
 	
