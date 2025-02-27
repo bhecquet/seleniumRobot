@@ -108,10 +108,13 @@ public class SeleniumRobotTestPlan {
 		File videoFile = WebUIDriver.stopVideoCapture();
 		
 		if (videoFile != null) {
-			try {
-				VideoUtils.extractReferenceForSteps(videoFile, TestStepManager.getInstance().getTestSteps(), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
-			} catch (Exception e) {
-				logger.error("Error extracting step reference, continue anyway", e);
+			// it's useless to generate reference if they are not sent to server
+			if (SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerRecordResults()) {
+				try {
+					VideoUtils.extractReferenceForSteps(videoFile, TestStepManager.getInstance().getTestSteps(), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
+				} catch (Exception e) {
+					logger.error("Error extracting step reference, continue anyway", e);
+				}
 			}
 
 	        if (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.TRUE

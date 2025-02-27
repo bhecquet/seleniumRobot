@@ -1716,7 +1716,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 		try {
 			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
@@ -1760,7 +1759,41 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
 			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+		}
+	}
+
+	/**
+	 * When results are not recorded on selenium server, reference images are not recorded
+	 * @throws Exception
+	 */
+	@Test(groups = {"it"})
+	public void testReferenceImageNotRecorded() throws Exception {
+
+		try {
+			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "false");
+			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
+			configureMockedSnapshotServerConnection();
+
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverShortKo"});
+
+			// read 'testDriver' report. This contains calls to HtmlElement actions
+			String detailedReportContent1 = readTestMethodResultFile("testDriverShortKo");
+
+			// reference is not displayed
+			Assert.assertFalse(detailedReportContent1.contains("Step beginning state"));
+
+			// no pictures has been created from video
+			Assert.assertNull(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverShortKo", "video").toFile().listFiles());
+
+		} finally {
+			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
 		}
 	}
