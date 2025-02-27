@@ -51,37 +51,42 @@ public class ChromeUtils {
                     // message format: {"message":{"method":"Network.requestWillBeSent","params":{"documentURL":"http://10.25.4.70:53669/test.html","frameId":"145E40AEF6F7A76C61973C3946CA0992","hasUserGesture":false,"initiator":{"columnNumber":180,"lineNumber":59,"type":"parser","url":"http://10.25.4.70:53669/test.html"},"loaderId":"6AAED31A84393CDE33A22E12ACA3924B","redirectHasExtraInfo":false,"request":{"headers":{"Referer":"http://10.25.4.70:53669/test.html","User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"},"initialPriority":"Medium","isSameSite":true,"method":"GET","mixedContentType":"none","referrerPolicy":"strict-origin-when-cross-origin","url":"http://10.25.4.70:53669/googleSearch.png"},"requestId":"34060.2","timestamp":171300.445026,"type":"Image","wallTime":1739344558.303674}},"webview":"145E40AEF6F7A76C61973C3946CA0992"}
                     case "Network.requestWillBeSent" -> {
                         String requestId = messageObject.getJSONObject("params").getString("requestId");
-                        requests.put(requestId, new HashMap<>());
+                        requests.putIfAbsent(requestId, new HashMap<>());
                         requests.get(requestId).put("requestWillBeSent", messageObject);
                     }
                     case "Network.requestWillBeSentExtraInfo" -> {
                         String requestId = messageObject.getJSONObject("params").getString("requestId");
+                        requests.putIfAbsent(requestId, new HashMap<>());
                         requests.get(requestId).put("requestWillBeSentExtraInfo", messageObject);
                     }
                     // message format: {"message":{"method":"Network.responseReceived","params":{"frameId":"8C5E01A9EE0BD7556C532FCFBE04EE5D","hasExtraInfo":true,"loaderId":"3149B492109FC8E15361AE661A188A05","requestId":"3149B492109FC8E15361AE661A188A05","response":{"alternateProtocolUsage":"unspecifiedReason","charset":"","connectionId":109,"connectionReused":true,"encodedDataLength":101,"fromDiskCache":false,"fromPrefetchCache":false,"fromServiceWorker":false,"headers":{"Content-Length":"124","Date":"Tue, 11 Feb 2025 09:02:20 GMT","Server":"Jetty(11.0.24)"},"mimeType":"text/html","protocol":"http/1.1","remoteIPAddress":"10.200.38.44","remotePort":51230,"responseTime":1.739264540255014e+12,"securityState":"insecure","status":200,"statusText":"OK","timing":{"connectEnd":-1,"connectStart":-1,"dnsEnd":-1,"dnsStart":-1,"proxyEnd":4.019,"proxyStart":2.804,"pushEnd":0,"pushStart":0,"receiveHeadersEnd":11.977,"receiveHeadersStart":5.365,"requestTime":91274.541644,"sendEnd":4.238,"sendStart":4.129,"sslEnd":-1,"sslStart":-1,"workerFetchStart":-1,"workerReady":-1,"workerRespondWithSettled":-1,"workerStart":-1},"url":"http://10.200.38.44:51230/testIFrame3.html"},"timestamp":91274.558756,"type":"Document"}},"webview":"0327E68CEF262C8D77818DC5C8B14339"}
                     case "Network.responseReceived" -> {
                         String requestId = messageObject.getJSONObject("params").getString("requestId");
+                        requests.putIfAbsent(requestId, new HashMap<>());
                         requests.get(requestId).put("responseReceived", messageObject);
                     }
                     // {"message":{"method":"Network.loadingFinished","params":{"encodedDataLength":924,"requestId":"28364.2","timestamp":192318.813115}},"webview":"D6FD686EEEFF1CF429E60E5D8F6A8D71"}
                     case "Network.loadingFinished" -> {
                         String requestId = messageObject.getJSONObject("params").getString("requestId");
+                        requests.putIfAbsent(requestId, new HashMap<>());
                         requests.get(requestId).put("loadingFinished", messageObject);
                     }
                     case "Network.loadingFailed" -> {
                         String requestId = messageObject.getJSONObject("params").getString("requestId");
+                        requests.putIfAbsent(requestId, new HashMap<>());
                         requests.get(requestId).put("loadingFailed", messageObject);
                     }
                     // {"method":"Network.responseReceivedExtraInfo","params":{"blockedCookies":[],"cookiePartitionKey":{"hasCrossSiteAncestor":false,"topLevelSite":"http://127.0.0.1"},"cookiePartitionKeyOpaque":false,"exemptedCookies":[],"headers":{"Content-Length":"2538","Date":"Fri, 14 Feb 2025 15:42:13 GMT","Server":"Jetty(11.0.24)"},"headersText":"HTTP/1.1 200 OK\r\nDate: Fri, 14 Feb 2025 15:42:13 GMT\r\nContent-Length: 2538\r\nServer: Jetty(11.0.24)\r\n\r\n","requestId":"28364.5","resourceIPAddressSpace":"Local","statusCode":200}},"webview":"D6FD686EEEFF1CF429E60E5D8F6A8D71"}
                     // use to get the real status code (in case of cache loading)
                     case "Network.responseReceivedExtraInfo" -> {
                         String requestId = messageObject.getJSONObject("params").getString("requestId");
+                        requests.putIfAbsent(requestId, new HashMap<>());
                         requests.get(requestId).put("responseReceivedExtraInfo", messageObject);
                     }
                 }
 
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Error reading event " + line.getMessage());
             }
         }
 
