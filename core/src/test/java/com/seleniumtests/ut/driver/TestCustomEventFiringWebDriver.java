@@ -85,7 +85,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	private RemoteWebDriver driver;
 
 	@Mock
-	AndroidDriver mobileDriver;
+	private AndroidDriver mobileDriver;
 
 	@Mock
 	private Options options;
@@ -152,7 +152,6 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		when(mobileDriver.manage()).thenReturn(options);
 		when(mobileDriver.getCapabilities()).thenReturn(capabilities);
 		when(mobileDriver.switchTo()).thenReturn(target);
-		when(mobileDriver.getSessionId()).thenReturn(new SessionId("1234"));
 		when(mobileDriver.getPageSource()).thenReturn("<html></html>");
 		when(mobileDriver.getCapabilities()).thenReturn(new DesiredCapabilities());
 		when(mobileDriver.getContext()).thenReturn("WEB");
