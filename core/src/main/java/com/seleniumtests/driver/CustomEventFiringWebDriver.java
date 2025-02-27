@@ -30,7 +30,6 @@ import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.video.VideoRecorder;
-//import net.lightbody.bmp.BrowserMobProxy;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.ExecutesMethod;
 import io.appium.java_client.HidesKeyboard;
@@ -99,7 +98,6 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	private boolean driverExited = false;
 	private final DriverMode driverMode;
 	private final BrowserInfo browserInfo;
-//	private final BrowserMobProxy mobProxy;
 	private SeleniumGridConnector gridConnector;
 	private final Integer attachExistingDriverPort;
 	private MutableCapabilities internalCapabilities = new MutableCapabilities();
@@ -617,7 +615,6 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		this.browserInfo = browserInfo;
 		this.testType = testType;
 		this.driverMode = localDriver;
-//		this.mobProxy = mobProxy;
 		this.gridConnector = gridConnector;
 		this.attachExistingDriverPort = attachExistingDriverPort;
 		this.originalDriver = driver; // store the original driver in case decorated one cannot be used (getSessionId)
@@ -1733,10 +1730,6 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 			return new MutableCapabilities();
 		}
     }
-
-//	public BrowserMobProxy getMobProxy() {
-//		return mobProxy;
-//	}
 
 	// NEOLOAD //
 	public NLWebDriver getNeoloadDriver() {

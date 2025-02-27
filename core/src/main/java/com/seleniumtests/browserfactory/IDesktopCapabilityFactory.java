@@ -42,12 +42,6 @@ import com.seleniumtests.driver.DriverExtractor;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.osutility.OSUtility;
 
-//import net.lightbody.bmp.BrowserMobProxy;
-//import net.lightbody.bmp.BrowserMobProxyServer;
-//import net.lightbody.bmp.client.ClientUtil;
-//import net.lightbody.bmp.proxy.CaptureType;
-//import net.lightbody.bmp.proxy.auth.AuthType;
-
 public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
 
 	protected BrowserInfo selectedBrowserInfo;
@@ -204,7 +198,6 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
     
     /**
      * Add proxy capability
-     * If network capture is enabled, start browsermob proxy and set it into browser
      * @param capability
      */
     private void configureProxyCap(MutableCapabilities capability) {

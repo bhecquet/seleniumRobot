@@ -30,6 +30,8 @@ import java.util.Collection;
 import java.util.List;
 
 import com.seleniumtests.reporter.logger.*;
+import com.seleniumtests.util.har.Har;
+import com.seleniumtests.util.har.Page;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
@@ -48,9 +50,6 @@ import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
 import com.seleniumtests.reporter.logger.TestStep.StepStatus;
 
-//import net.lightbody.bmp.core.har.Har;
-//import net.lightbody.bmp.core.har.HarLog;
-//import net.lightbody.bmp.core.har.HarPage;
 
 public class TestTestStep extends GenericTest {
 
@@ -572,17 +571,17 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(encodedTestStep.getActionExceptionMessage(), "class org.openqa.selenium.NoSuchElementException: foo\n");
 	}
 
-//	@Test(groups = { "ut" })
-//	public void testTestStepEncodeXmlHarKept() throws IOException {
-//		Har har = new Har(new HarLog());
-//		har.getLog().addPage(new HarPage("title", "a title"));
-//		HarCapture cap = new HarCapture(har, "main");
-//
-//		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>(), true);
-//		step.setHarCaptures(Arrays.asList(cap));
-//		TestStep encodedTestStep = step.encode("xml");
-//		Assert.assertEquals(encodedTestStep.getHarCaptures().get(0), cap);
-//	}
+	@Test(groups = { "ut" })
+	public void testTestStepEncodeXmlHarKept() throws IOException {
+		Har har = new Har();
+		har.getLog().addPage(new Page("", "title", "a title"));
+		HarCapture cap = new HarCapture(har, "main");
+
+		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>(), true);
+		step.setHarCaptures(Arrays.asList(cap));
+		TestStep encodedTestStep = step.encode("xml");
+		Assert.assertEquals(encodedTestStep.getHarCaptures().get(0), cap);
+	}
 
 	@Test(groups = { "ut" })
 	public void testTestStepEncodeXmlFileKept() throws IOException {
@@ -679,13 +678,12 @@ public class TestTestStep extends GenericTest {
 		step.addMessage(new TestMessage("everything OK", MessageType.INFO));
 		step.addAction(new TestAction("action2", false, new ArrayList<>()));
 
-//		Har har = new Har(new HarLog());
-//		har.getLog().addPage(new HarPage("title", "a title"));
-//		step.addNetworkCapture(new HarCapture(har, "main"));
+		Har har = new Har();
+		har.getLog().addPage(new Page("", "title", "a title"));
+		step.addNetworkCapture(new HarCapture(har, "main"));
 
 		GenericFile file = new GenericFile(File.createTempFile("video", ".avi"), "video file");
 		step.addFile(file);
-		
 
 		File tmpImgFile = File.createTempFile("img", ".png");
 		File tmpHtmlFile = File.createTempFile("html", ".html");
@@ -720,9 +718,8 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(1).getString("name"), "action2");
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(1).getBoolean("failed"), false);
 
-// browsermob
-//		Assert.assertEquals(stepJson.getJSONArray("harCaptures").getJSONObject(0).getString("type"), "networkCapture");
-//		Assert.assertEquals(stepJson.getJSONArray("harCaptures").getJSONObject(0).getString("name"), "main");
+		Assert.assertEquals(stepJson.getJSONArray("harCaptures").getJSONObject(0).getString("type"), "networkCapture");
+		Assert.assertEquals(stepJson.getJSONArray("harCaptures").getJSONObject(0).getString("name"), "main");
 
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getString("type"), "step");
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getString("name"), "subStep with password ******");

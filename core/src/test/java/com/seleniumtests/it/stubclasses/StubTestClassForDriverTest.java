@@ -73,6 +73,27 @@ public class StubTestClassForDriverTest extends StubParentClass {
 			._sendKeysComposite()
 			._clickPicture();
 	}
+
+	@Test(groups="stub")
+	public void testDriverExposedViaWebServer() throws Exception {
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
+
+		WebTestPageServer server = new WebTestPageServer();
+		try {
+
+			server.exposeTestPage();
+			String localAddress = server.getLocalAddress();
+			DriverTestPage page = new DriverTestPage(true, String.format("http://%s:%d/test.html", localAddress, server.getServerHost().getPort()));
+
+			page._writeSomething()
+					._reset()
+					._sendKeysComposite()
+					._clickPicture();
+
+		} finally {
+			server.stopServer();
+		}
+	}
 	
 	@Test(groups="stub")
 	public void testDriverLongFailed() throws Exception {
@@ -119,7 +140,7 @@ public class StubTestClassForDriverTest extends StubParentClass {
 		new DriverTestPage(true)
 		._writeSomething()
 		._reset();
-		new DriverTestPage(true, BrowserType.FIREFOX)
+		new DriverTestPage(true, BrowserType.CHROME)
 		._writeSomething()
 		._reset();
 	}

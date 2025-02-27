@@ -38,16 +38,9 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
-import com.seleniumtests.driver.screenshots.SnapshotCheckType;
-import com.seleniumtests.reporter.logger.HarCapture;
-import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestMessage;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
 import com.seleniumtests.reporter.logger.TestStep;
-
-//import net.lightbody.bmp.core.har.Har;
-//import net.lightbody.bmp.core.har.HarLog;
-//import net.lightbody.bmp.core.har.HarPage;
 
 public class TestTestLogging extends GenericTest {
 
@@ -175,16 +168,6 @@ public class TestTestLogging extends GenericTest {
 			FileUtils.deleteQuietly(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved"));
 		}
 	}
-//
-//	@Test(groups={"ut"})
-//	public void testLogHarOk() {
-//		TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
-//		Har har = new Har(new HarLog());
-//		har.getLog().addPage(new HarPage("title", "a title"));
-//		logger.logNetworkCapture(har, "main");
-//		Assert.assertFalse(TestStepManager.getParentTestStep().getHarCaptures().isEmpty());
-//		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "main-networkCapture.har").toFile().exists());
-//	}
 	
 	// GenericFile
 	@Test(groups={"ut"})

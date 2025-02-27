@@ -61,8 +61,6 @@ import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.video.VideoRecorder;
 
-//import net.lightbody.bmp.BrowserMobProxy;
-
 /**
  * Aspect to intercept calls to methods of HtmlElement. It allows to retry discovery and action 
  * when something goes wrong with the driver
@@ -517,8 +515,7 @@ public class LogAction {
 			PageObject page = (PageObject)joinPoint.getTarget();
 			currentStep.addAction(new TestAction(String.format("Opening page %s",  page.getClass().getSimpleName()), false, new ArrayList<>(), "openPage", page.getClass()));
 		}
-		
-//		BrowserMobProxy mobProxy = WebUIDriver.getBrowserMobProxy();
+
 		NLWebDriver neoloadDriver = WebUIDriver.getNeoloadDriver();
 		VideoRecorder videoRecorder = WebUIDriver.getThreadVideoRecorder();
 		
@@ -530,10 +527,7 @@ public class LogAction {
 		if (TestStepManager.getCurrentRootTestStep() == null) {
 			TestStepManager.setCurrentRootTestStep(currentStep); // will also set parent step
 			rootStep = true;
-			
-			/*if (mobProxy != null) {
-				mobProxy.newPage(currentStep.getName());
-			}*/
+
 			if (videoRecorder != null) {
 				CustomEventFiringWebDriver.displayStepOnScreen(currentStep.getName(), 
 						SeleniumTestsContextManager.getThreadContext().getRunMode(), 

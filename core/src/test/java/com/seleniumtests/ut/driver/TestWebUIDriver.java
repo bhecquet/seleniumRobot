@@ -54,8 +54,6 @@ import com.seleniumtests.it.stubclasses.StubTestPage;
 import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.video.VideoRecorder;
 
-//import net.lightbody.bmp.BrowserMobProxy;
-
 public class TestWebUIDriver extends MockitoTest {
 	
 	@Mock
@@ -78,9 +76,6 @@ public class TestWebUIDriver extends MockitoTest {
 	
 	@Mock
 	private SeleniumGridConnector gridConnector;
-	
-//	@Mock
-//	private BrowserMobProxy mobProxy;
 
 	@Mock
 	private WebDriver.Options options;
@@ -371,19 +366,7 @@ public class TestWebUIDriver extends MockitoTest {
 
 		Assert.assertEquals(WebUIDriver.getCurrentWebUiDriverName(), "bar");
 	}
-	
-//	@Test(groups={"ut"})
-//	public void testDriverCreationWithBrowserMob() {
-//		SeleniumTestsContextManager.getThreadContext().setCaptureNetwork(true);
-//		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-//		WebDriver driver = WebUIDriver.getWebDriver(true);
-//
-//		Assert.assertTrue(driver instanceof CustomEventFiringWebDriver);
-//
-//		WebUIDriver uiDriver = WebUIDriver.getWebUIDriver(false);
-//		Assert.assertNotNull(uiDriver.getConfig().getBrowserMobProxy());
-//	}
-	
+
 	/**
 	 * issue #280: check that selectedBrowserInfo is available in grid mode
 	 * @throws Exception 
@@ -798,44 +781,6 @@ public class TestWebUIDriver extends MockitoTest {
 		Assert.assertNull(uiDriver.getDriver());	
 		
 	}
-	
-//	/**
-//	 * BrowserMob proxy is closed when driver is cleaned
-//	 */
-//	@Test(groups={"ut"})
-//	public void testCleanUpWithBrowserMob() {
-//
-//		SeleniumTestsContextManager.getThreadContext().setCaptureNetwork(true);
-//		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-//		WebUIDriver uiDriver = WebUIDriverFactory.getInstance("foo");
-//		uiDriver.createRemoteWebDriver();
-//		Assert.assertNotNull(uiDriver.getConfig().getBrowserMobProxy());
-//
-//		WebUIDriver.cleanUp();
-//
-//		Assert.assertNull(uiDriver.getConfig().getBrowserMobProxy());
-//	}
-	
-//	/**
-//	 * Check no error is raised even if ending browsermob proxy raises an error
-//	 */
-//	@Test(groups={"ut"})
-//	public void testCleanUpWithBrowserMobInError() {
-//
-//		SeleniumTestsContextManager.getThreadContext().setCaptureNetwork(true);
-//		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-//		WebUIDriver uiDriver = WebUIDriverFactory.getInstance("foo");
-//		uiDriver.createRemoteWebDriver();
-//		Assert.assertNotNull(uiDriver.getConfig().getBrowserMobProxy());
-//
-//		// raise an error ending
-//		uiDriver.getConfig().setBrowserMobProxy(mobProxy);
-//		doThrow(new NullPointerException("error")).when(mobProxy).endHar();
-//
-//		WebUIDriver.cleanUp();
-//
-//		Assert.assertNull(uiDriver.getConfig().getBrowserMobProxy());
-//	}
 	
 	/**
 	 * video is closed when driver is cleaned

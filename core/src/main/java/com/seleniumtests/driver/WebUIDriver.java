@@ -86,9 +86,6 @@ import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.video.VideoCaptureMode;
 import com.seleniumtests.util.video.VideoRecorder;
 
-//import net.lightbody.bmp.BrowserMobProxy;
-//import net.lightbody.bmp.core.har.Har;
-
 /**
  * This class provides factory to create webDriver session.
  */
@@ -197,12 +194,7 @@ public class WebUIDriver {
 	                caps.setCapability(SeleniumRobotCapabilityType.TEST_NAME, testName);
                 }
 			}
-    	
 
-//			if (config.getBrowserMobProxy() != null) {
-//				config.getBrowserMobProxy().newHar(SeleniumTestsContextManager.getThreadContext().getRelativeOutputDir());
-//			}
-			
 			if (config.getVideoCapture() != VideoCaptureMode.FALSE && videoRecorder.get() == null) {
 				try {
 					VideoRecorder recorder = CustomEventFiringWebDriver.startVideoCapture(SeleniumTestsContextManager.getThreadContext().getRunMode(), 
@@ -364,20 +356,6 @@ public class WebUIDriver {
 				scenarioLogger.log("Error while logging: " + e.getMessage());
 			}
 		}
-		
-//		try {
-//	    	// stop HAR capture
-//			if (config.getBrowserMobProxy() != null) {
-//				Har har = config.getBrowserMobProxy().endHar();
-//				scenarioLogger.logNetworkCapture(har, name);
-//			}
-//
-//
-//		} catch (Exception e) {
-//			scenarioLogger.log("Error while logging: " + e.getMessage());
-//		} finally {
-//			config.setBrowserMobProxy(null);
-//		}
     }
     
     class DriverAliveTask implements Callable<String> {
@@ -450,18 +428,7 @@ public class WebUIDriver {
         } catch (Exception e) {
         	logger.error("Error stopping Appium: " + e.getMessage());
         }
-    
-        // stop HAR capture in case it has not already been done by SeleniumRobotTestListener. This may be the case when a driver is created in @AfterMethod
-//		try {
-//	        if (config.getBrowserMobProxy() != null) {
-//	        	config.getBrowserMobProxy().endHar();
-//			}
-//		} catch (Exception e) {
-//			logger.error("Error stopping browsermob proxy: " + e.getMessage());
-//		} finally {
-//			config.setBrowserMobProxy(null);
-//		}
-		
+
 		// stop video capture
 		stopVideoCapture();
 		
@@ -499,7 +466,7 @@ public class WebUIDriver {
 		}
 
 		if (har != null) {
-			scenarioLogger.logNetworkCapture(har, "main");
+			scenarioLogger.logNetworkCapture(har, name);
 		}
 	}
 
@@ -527,15 +494,6 @@ public class WebUIDriver {
     		return null;
     	}
     }
-
-//	public static BrowserMobProxy getBrowserMobProxy() {
-//		CustomEventFiringWebDriver driver = (CustomEventFiringWebDriver)WebUIDriver.getWebDriver(false);
-//		BrowserMobProxy mobProxy = null;
-//		if (driver != null) {
-//			mobProxy = driver.getMobProxy();
-//		}
-//		return mobProxy;
-//	}
 	
 	/**
 	 * Returns the Neoload driver for the current running driver

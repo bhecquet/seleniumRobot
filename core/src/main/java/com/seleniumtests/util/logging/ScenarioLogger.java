@@ -26,8 +26,6 @@ import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.logger.TestValue;
 import com.seleniumtests.uipage.PageObject;
 
-//import net.lightbody.bmp.core.har.Har;
-
 public class ScenarioLogger {
 	
 	private Logger logger;
@@ -148,10 +146,14 @@ public class ScenarioLogger {
     }
 
 
+	/**
+	 * Log network capture in "Test end" step
+	 * @param har
+	 * @param name
+	 */
     public void logNetworkCapture(Har har, String name) {
-    	
 
-    	TestStep runningStep = TestStepManager.getParentTestStep();
+    	TestStep runningStep = TestStepManager.getLastTestStepOrParentStep();
     	if (runningStep == null) {
     		runningStep = TestStepManager.getCurrentOrPreviousStep();
     	}

@@ -178,7 +178,25 @@ public class TestStepManager {
     		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
     	}
 	}
-	
+
+	/**
+	 * Returns the the "Test end" step if it already exist, or the current parent step
+	 * @return
+	 */
+	public static TestStep getLastTestStepOrParentStep() {
+		try {
+			TestStep lastStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getLastTestStep();
+			if (lastStep == null) {
+				return getParentTestStep();
+			} else {
+				return lastStep;
+			}
+    	} catch (IndexOutOfBoundsException | ConfigurationException e) {
+    		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
+    		return null;
+    	}
+	}
+
 	public static TestStep getParentTestStep() {
 		try {
 			return SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();

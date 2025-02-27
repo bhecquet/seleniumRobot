@@ -57,17 +57,12 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.osutility.OSUtilityWindows;
-//
-//import net.lightbody.bmp.BrowserMobProxy;
 
 public class TestTestTasks extends MockitoTest {
 	
 	@Mock
 	private OSUtilityWindows osUtility;
 
-//	@Mock
-//	private BrowserMobProxy mobProxy;
-	
 	@Mock
 	private NLWebDriver neoloadDriver;
 
@@ -755,31 +750,6 @@ public class TestTestTasks extends MockitoTest {
 			GenericTest.resetTestNGREsultAndLogger();
 		}
 	}
-	
-//	/**
-//	 * Creation of a manual step, check it's written
-//	 * @param testNGCtx
-//	 * @param xmlTest
-//	 * @throws Exception
-//	 */
-//	@Test(groups= {"ut"})
-//	public void testAddManualStepWithBrowserMobProxy(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
-//
-////		PowerMockito.mockStatic(WebUIDriver.class);
-//		when(WebUIDriver.getBrowserMobProxy()).thenReturn(mobProxy);
-//
-//		try {
-//			SeleniumTestsContextManager.getThreadContext().setManualTestSteps(true);
-//			TestTasks.addStep("foo");
-//			TestTasks.addStep(null);
-//
-//			// check we crate a new page
-//			verify(mobProxy).newPage("foo");
-//
-//		} finally {
-//			GenericTest.resetTestNGREsultAndLogger();
-//		}
-//	}
 	
 	/**
 	 * Creation of a manual step, check it's written

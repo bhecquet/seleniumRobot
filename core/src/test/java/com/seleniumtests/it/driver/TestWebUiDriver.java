@@ -261,11 +261,11 @@ public class TestWebUiDriver extends ReporterTest {
 	@Test(groups={"it"})
 	public void testHarCaptureExists() throws Exception {
 
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriver"});
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverExposedViaWebServer"});
 
-			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "main-networkCapture.har").toFile().exists());
+			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverExposedViaWebServer", "main-networkCapture.har").toFile().exists());
 
-			JSONObject json = new JSONObject(FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "main-networkCapture.har").toFile(), StandardCharsets.UTF_8));
+			JSONObject json = new JSONObject(FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverExposedViaWebServer", "main-networkCapture.har").toFile(), StandardCharsets.UTF_8));
 			JSONArray pages = json.getJSONObject("log").getJSONArray("pages");
 
 			// 7 steps in HTML
@@ -322,32 +322,23 @@ public class TestWebUiDriver extends ReporterTest {
 		Assert.assertTrue(secondDriverCreation > firstDriverCreation);
 	}
 
-// HAR / BrowserMob
-//	/**
-//	 * Check that HAR capture file is present in result with manual steps
-//	 *
-//	 * @throws Exception
-//	 */
-//	@Test(groups={"it"})
-//	public void testReportContainsHarCaptureWithManualSteps() throws Exception {
-//
-//		try {
-//			System.setProperty(SeleniumTestsContext.CAPTURE_NETWORK, "true");
-//
-//			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverManualSteps"});
-//
-//			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverManualSteps", "main-networkCapture.har").toFile().exists());
-//			JSONObject json = new JSONObject(FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverManualSteps", "main-networkCapture.har").toFile(), StandardCharsets.UTF_8));
-//			JSONArray pages = json.getJSONObject("log").getJSONArray("pages");
-//			Assert.assertEquals(pages.length(), 2);
-//			Assert.assertEquals(pages.getJSONObject(0).getString("id").trim(), "testDriverManualSteps");
-//			Assert.assertEquals(pages.getJSONObject(1).getString("id").trim(), "Reset");
-//
-//			// step "Write" is not recorded because the driver is not created before the DriverTestPage object is created
-//		} finally {
-//			System.clearProperty(SeleniumTestsContext.CAPTURE_NETWORK);
-//		}
-//	}
+	/**
+	 * Check that HAR capture file is present in result with manual steps
+	 *
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportContainsHarCaptureWithManualSteps() throws Exception {
+
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverManualSteps"});
+
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverManualSteps", "main-networkCapture.har").toFile().exists());
+		JSONObject json = new JSONObject(FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverManualSteps", "main-networkCapture.har").toFile(), StandardCharsets.UTF_8));
+		JSONArray pages = json.getJSONObject("log").getJSONArray("pages");
+		Assert.assertEquals(pages.length(), 6);
+		Assert.assertEquals(pages.getJSONObject(2).getString("title").trim(), "Write");
+		Assert.assertEquals(pages.getJSONObject(3).getString("title").trim(), "Reset");
+	}
 	
 	@Test(groups={"it"})
 	public void testMultipleBrowserCreation() {

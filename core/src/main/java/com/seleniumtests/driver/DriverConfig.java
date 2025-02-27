@@ -32,12 +32,9 @@ import org.openqa.selenium.support.events.WebDriverListener;
 
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
-import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.video.VideoCaptureMode;
-
-//import net.lightbody.bmp.BrowserMobProxy;
 
 public class DriverConfig {
 	
@@ -46,7 +43,6 @@ public class DriverConfig {
     private WebDriver driver;
     private Integer attachExistingDriverPort = null;
     private String runOnSameNode = null;
-//    private BrowserMobProxy browserMobProxy;
     private SeleniumTestsContext testContext;
     private BrowserType browserType;
     private Integer majorBrowserVersion;
@@ -332,14 +328,6 @@ public class DriverConfig {
 	public boolean isHeadlessBrowser() {
 		return testContext.isHeadlessBrowser();
 	}
-
-//	public BrowserMobProxy getBrowserMobProxy() {
-//		return browserMobProxy;
-//	}
-//
-//	public void setBrowserMobProxy(BrowserMobProxy browserMobProxy) {
-//		this.browserMobProxy = browserMobProxy;
-//	}
 
 	public SeleniumTestsContext getTestContext() {
 		return testContext;
