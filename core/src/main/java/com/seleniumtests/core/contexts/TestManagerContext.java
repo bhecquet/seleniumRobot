@@ -1,5 +1,6 @@
 package com.seleniumtests.core.contexts;
 
+import com.seleniumtests.connectors.tms.ITestManager;
 import org.json.JSONObject;
 
 import com.seleniumtests.connectors.tms.TestManager;
@@ -100,7 +101,7 @@ public class TestManagerContext {
 	 * Creates the TestManager connector
 	 * @return
 	 */
-	public TestManager createTestManagerConnector() {
+	public ITestManager createTestManagerConnector() {
 		if (getTmsType() != null && getTmsUrl() != null) {
 			
 			// build configuration
@@ -118,7 +119,7 @@ public class TestManagerContext {
 				}
 			}
 			
-			TestManager tms = TestManager.getInstance(jsonConfig);
+			ITestManager tms = TestManager.getInstance(jsonConfig);
 			
 			tms.init(jsonConfig);
 			return tms;

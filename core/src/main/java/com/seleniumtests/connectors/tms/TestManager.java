@@ -17,19 +17,26 @@
  */
 package com.seleniumtests.connectors.tms;
 
+import com.seleniumtests.uipage.htmlelements.select.ISelectList;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.testng.ITestResult;
 import org.testng.annotations.CustomAttribute;
 
-import com.seleniumtests.connectors.tms.squash.SquashTMConnector;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
-public abstract class TestManager {
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ServiceLoader;
+
+public abstract class TestManager implements ITestManager {
 	
 
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(TestManager.class);
@@ -50,21 +57,7 @@ public abstract class TestManager {
 	protected TestManager() {
 		initialized = false;
 	}
-	
-	public abstract void recordResult();
-	
-	public abstract void recordResult(ITestResult testResult);
 
-	public abstract void recordResultFiles();
-	
-	public abstract void recordResultFiles(ITestResult testResult);
-	
-	public abstract void login();
-
-	public abstract void init(JSONObject connectParams);
-
-	public abstract void logout();
-	
 	 
     /**
      * Returns the ID of the test case for this test result or null if it's not defined
@@ -120,7 +113,7 @@ public abstract class TestManager {
 
     }
 	
-	public static TestManager getInstance(JSONObject configString) {
+	public static ITestManager getInstance(JSONObject configString) {
 
 		String type;
 		try {
@@ -128,12 +121,28 @@ public abstract class TestManager {
 		} catch (JSONException e) {
 			throw new ConfigurationException("Test manager type must be provided. ex: {'tmsType': 'hp', 'run': '3'}");
 		}
-		
-		if ("squash".equals(type)) {
-			return new SquashTMConnector();
-		} else {
-			throw new ConfigurationException(String.format("TestManager type [%s] is unknown, valid values are: ['hp', 'squash']", type));
+
+		ServiceLoader<ITestManager> selectLoader = ServiceLoader.load(ITestManager.class);
+		Iterator<ITestManager> selectsIterator = selectLoader.iterator();
+
+
+		List<String> registeredTypes = new ArrayList<>();
+		while (selectsIterator.hasNext())
+		{
+			ITestManager testManagerClass = selectsIterator.next();
+            try {
+                ITestManager testManager = testManagerClass.getClass().getConstructor().newInstance();
+				registeredTypes.add(testManager.getType());
+				if (testManager.getType().equals(type)) {
+					return testManager;
+				}
+            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                throw new ConfigurationException(testManagerClass.toString() + " cannot be loaded");
+            }
 		}
+
+		throw new ConfigurationException(String.format("TestManager type [%s] is unknown, valid values are: %s", type, String.join(",", registeredTypes)));
+
 	}
 
 	public boolean getInitialized() {
