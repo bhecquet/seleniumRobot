@@ -20,6 +20,7 @@ package com.seleniumtests.reporter.reporters;
 import java.util.Map;
 import java.util.Set;
 
+import com.seleniumtests.connectors.tms.ITestManager;
 import org.testng.IReporter;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -49,7 +50,7 @@ public class TestManagerReporter extends CommonReporter implements IReporter {
 			for (ITestResult testResult: entry.getValue()) {
 				
 				SeleniumTestsContext testContext = SeleniumTestsContextManager.setThreadContextFromTestResult(testResult.getTestContext(), testResult);
-				TestManager testManager = testContext.getTestManagerInstance();
+				ITestManager testManager = testContext.getTestManagerInstance();
 
 				if (testManager == null) {
 					return;

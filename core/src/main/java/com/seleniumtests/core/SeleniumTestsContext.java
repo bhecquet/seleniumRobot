@@ -30,6 +30,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.seleniumtests.connectors.tms.ITestManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 import org.openqa.selenium.Capabilities;
@@ -279,7 +280,7 @@ public class SeleniumTestsContext {
     private Map<String, TestVariable> variableAlreadyRequestedFromServer;
     private SeleniumGridConnector seleniumGridConnector;
     private List<SeleniumGridConnector> seleniumGridConnectors;
-    private TestManager testManagerInstance;
+    private ITestManager testManagerInstance;
     private TestManagerContext testManagerContext;
     private BugTracker	bugtrackerInstance;
     private BugTrackerContext bugtrackerContext;
@@ -1552,7 +1553,7 @@ public class SeleniumTestsContext {
     	return seleniumGridConnector;
     }
     
-    public TestManager getTestManagerInstance() {
+    public ITestManager getTestManagerInstance() {
     	return testManagerInstance;
     }
     

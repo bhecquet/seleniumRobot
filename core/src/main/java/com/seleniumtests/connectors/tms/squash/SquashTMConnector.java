@@ -94,6 +94,11 @@ public class SquashTMConnector extends TestManager {
 
 	}
 
+	@Override
+	public String getType() {
+		return "squash";
+	}
+
 	public SquashTMApi getApi() {
 		if (api == null) {
 			api = new SquashTMApi(serverUrl, user, password, project);

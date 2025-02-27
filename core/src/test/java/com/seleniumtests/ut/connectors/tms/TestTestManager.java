@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.ut.connectors.tms;
 
+import com.seleniumtests.connectors.tms.ITestManager;
 import org.json.JSONObject;
 import org.testng.Assert;
 import org.testng.ITestResult;
@@ -37,7 +38,7 @@ public class TestTestManager extends GenericTest {
 	@Test(groups={"ut"})
 	public void testTmsSelectionSquashTm() {
 		String config = "{'tmsType': 'squash'}";
-		TestManager manager = TestManager.getInstance(new JSONObject(config));
+		ITestManager manager = TestManager.getInstance(new JSONObject(config));
 		Assert.assertTrue(manager instanceof SquashTMConnector);
 	}
 	
@@ -63,7 +64,7 @@ public class TestTestManager extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().testManager().setTestId(23);
 		TestNGResultUtils.setSeleniumRobotTestContext(tr, SeleniumTestsContextManager.getThreadContext());
 		String config = "{'tmsType': 'squash'}";
-		TestManager manager = TestManager.getInstance(new JSONObject(config));
+		ITestManager manager = TestManager.getInstance(new JSONObject(config));
 		Assert.assertEquals(manager.getTestCaseId(tr), (Integer)23);
 	}
 	
@@ -71,7 +72,7 @@ public class TestTestManager extends GenericTest {
 	public void testTestCaseId() {
 		ITestResult tr = Reporter.getCurrentTestResult();
 		String config = "{'tmsType': 'squash'}";
-		TestManager manager = TestManager.getInstance(new JSONObject(config));
+		ITestManager manager = TestManager.getInstance(new JSONObject(config));
 		Assert.assertEquals(manager.getTestCaseId(tr), (Integer)12);
 	}
 	
@@ -79,7 +80,7 @@ public class TestTestManager extends GenericTest {
 	public void testTestCaseIdWrongFormat() {
 		ITestResult tr = Reporter.getCurrentTestResult();
 		String config = "{'tmsType': 'squash'}";
-		TestManager manager = TestManager.getInstance(new JSONObject(config));
+		ITestManager manager = TestManager.getInstance(new JSONObject(config));
 		Assert.assertNull(manager.getTestCaseId(tr));
 	}
 	
@@ -87,7 +88,7 @@ public class TestTestManager extends GenericTest {
 	public void testTestCaseIdNotDefined() {
 		ITestResult tr = Reporter.getCurrentTestResult();
 		String config = "{'tmsType': 'squash'}";
-		TestManager manager = TestManager.getInstance(new JSONObject(config));
+		ITestManager manager = TestManager.getInstance(new JSONObject(config));
 		Assert.assertNull(manager.getTestCaseId(tr));
 	}
 
@@ -97,7 +98,7 @@ public class TestTestManager extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().testManager().setDatasetId(23);
 		TestNGResultUtils.setSeleniumRobotTestContext(tr, SeleniumTestsContextManager.getThreadContext());
 		String config = "{'tmsType': 'squash'}";
-		TestManager manager = TestManager.getInstance(new JSONObject(config));
+		ITestManager manager = TestManager.getInstance(new JSONObject(config));
 		Assert.assertEquals(manager.getDatasetId(tr), (Integer)23);
 	}
 
@@ -105,7 +106,7 @@ public class TestTestManager extends GenericTest {
 	public void testDatasetId() {
 		ITestResult tr = Reporter.getCurrentTestResult();
 		String config = "{'tmsType': 'squash'}";
-		TestManager manager = TestManager.getInstance(new JSONObject(config));
+		ITestManager manager = TestManager.getInstance(new JSONObject(config));
 		Assert.assertEquals(manager.getDatasetId(tr), (Integer)13);
 	}
 
@@ -113,7 +114,7 @@ public class TestTestManager extends GenericTest {
 	public void testDatasetIdWrongFormat() {
 		ITestResult tr = Reporter.getCurrentTestResult();
 		String config = "{'tmsType': 'squash'}";
-		TestManager manager = TestManager.getInstance(new JSONObject(config));
+		ITestManager manager = TestManager.getInstance(new JSONObject(config));
 		Assert.assertNull(manager.getDatasetId(tr));
 	}
 
@@ -121,7 +122,7 @@ public class TestTestManager extends GenericTest {
 	public void testDatasetIdNotDefined() {
 		ITestResult tr = Reporter.getCurrentTestResult();
 		String config = "{'tmsType': 'squash'}";
-		TestManager manager = TestManager.getInstance(new JSONObject(config));
+		ITestManager manager = TestManager.getInstance(new JSONObject(config));
 		Assert.assertNull(manager.getDatasetId(tr));
 	}
 }
