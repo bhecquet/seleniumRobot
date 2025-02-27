@@ -197,16 +197,20 @@ public class ChromeUtils {
                     jsonResponseHeaders.optInt("Content-Length", 0)
             );
         } else {
+            String error = "No response received";
+            if (requestsEntry.getValue().get("loadingFailed") != null) {
+                error = ((JSONObject)requestsEntry.getValue().get("loadingFailed")).getJSONObject("params").getString("errorText");
+            }
             response = new Response(
-                    -1,
-                    "No response received",
+                    0,
+                    error,
                     "",
                     new ArrayList<>(),
                     new ArrayList<>(), // cookies
-                    null,
+                    new Content("x-unknown", 0, ""),
                     "",
-                    0,
-                    0
+                    -1,
+                    -1
             );
         }
         return response;

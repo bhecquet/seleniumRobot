@@ -58,7 +58,9 @@
 	<input type="radio" id="radioClick" name="radioClick">
 	<input type="checkbox" id="checkboxClick" name="checkboxClick">
 	<input type="image" id="image" name="image" src="googleSearch.png" onclick="javascript:addText('text2', 'image');" ondblclick="javascript:addText('text2', 'double click image');">
-	
+	<input type="image" id="image_not_present" name="image_not_present" src="https://foobarsite.com/none.png" onclick="javascript:addText('text2', 'image');" ondblclick="javascript:addText('text2', 'double click image');">
+	<input type="image" id="image_not_present2" name="image_not_present2" src="googleSearch2.png" onclick="javascript:addText('text2', 'image');" ondblclick="javascript:addText('text2', 'double click image');">
+
 	<h3>Test select</h3>
 	<select id="select" name="select" onChange="javascript:addText('textSelectedId', this.selectedIndex);javascript:addText('textSelectedValue', this.options[selectedIndex].value);javascript:addText('textSelectedText', this.options[selectedIndex].text);">
 		<option value="opt1" name="option">option1</option>

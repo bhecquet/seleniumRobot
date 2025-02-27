@@ -147,8 +147,9 @@ public class TestChromeUtils extends GenericTest {
 
         Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
         Assert.assertEquals(har.getLog().getEntries().size(), 1);
-        Assert.assertEquals(har.getLog().getEntries().get(0).getResponse().getStatus(), -1);
+        Assert.assertEquals(har.getLog().getEntries().get(0).getResponse().getStatus(), 0);
         Assert.assertEquals(har.getLog().getEntries().get(0).getResponse().getStatusText(), "No response received");
+        Assert.assertEquals(har.getLog().getEntries().get(0).getResponse().getContent().getMimeType(), "x-unknown");
         Assert.assertEquals(har.getLog().getEntries().get(0).getTimings().getConnect(), 0);
     }
 
@@ -202,6 +203,20 @@ public class TestChromeUtils extends GenericTest {
 
         Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
         Assert.assertEquals(har.getLog().getEntries().size(), 0);
+    }
+
+    @Test(groups="ut")
+    public void testParsePerformanceLoadingFailed() throws IOException {
+        List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-loading-failed.txt");
+
+        List<TestStep> testSteps = new ArrayList<>();
+        testSteps.add(new TestStep("step 1"));
+        testSteps.get(0).setStartDate(Date.from(Instant.ofEpochMilli(1739547733421L)));
+
+        Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
+        Assert.assertEquals(har.getLog().getEntries().size(), 1);
+        Assert.assertEquals(har.getLog().getEntries().get(0).getResponse().getStatus(), 0);
+        Assert.assertEquals(har.getLog().getEntries().get(0).getResponse().getStatusText(), "net::ERR_NAME_NOT_RESOLVED");
     }
 
     private static List<LogEntry> readLogs(String resourcePath) throws IOException {
