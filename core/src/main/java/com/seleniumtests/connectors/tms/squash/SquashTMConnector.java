@@ -1,13 +1,11 @@
 package com.seleniumtests.connectors.tms.squash;
 
+import io.github.bhecquet.SquashTMApi;
+import io.github.bhecquet.entities.*;
 import org.json.JSONObject;
 import org.testng.ITestResult;
 
 import com.seleniumtests.connectors.tms.TestManager;
-import com.seleniumtests.connectors.tms.squash.entities.Campaign;
-import com.seleniumtests.connectors.tms.squash.entities.Iteration;
-import com.seleniumtests.connectors.tms.squash.entities.IterationTestPlanItem;
-import com.seleniumtests.connectors.tms.squash.entities.TestPlanItemExecution.ExecutionStatus;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 
@@ -23,7 +21,8 @@ public class SquashTMConnector extends TestManager {
 	private String user;
 	private String password;
 	private String serverUrl;
-	private String project;
+	private String projectName;
+	private Project project;
 	private SquashTMApi api;
 
 	private Map<String, Campaign> campaignCache;
@@ -71,13 +70,13 @@ public class SquashTMConnector extends TestManager {
 		String passwordVar = connectParams.optString(TMS_PASSWORD, null);
 		
 
-		if (serverUrlVar == null || projectVar == null || userVar == null || passwordVar == null) {
+		if (serverUrlVar == null || projectVar == null || passwordVar == null) {
 			throw new ConfigurationException(String.format("SquashTM access not correctly configured. Environment configuration must contain variables"
-					+ " %s, %s, %s, %s", TMS_SERVER_URL, TMS_PASSWORD, TMS_USER, TMS_PROJECT));
+					+ " %s, %s, %s", TMS_SERVER_URL, TMS_PASSWORD, TMS_PROJECT));
 		}
 		
 		serverUrl = serverUrlVar;
-		project = projectVar;
+		projectName = projectVar;
 		user = userVar;
 		password = passwordVar;
 		
@@ -101,7 +100,11 @@ public class SquashTMConnector extends TestManager {
 
 	public SquashTMApi getApi() {
 		if (api == null) {
-			api = new SquashTMApi(serverUrl, user, password, project);
+			if (user == null) {
+				api = new SquashTMApi(serverUrl, password, true);
+			} else {
+				api = new SquashTMApi(serverUrl, user, password, true);
+			}
 		}
 		return api;
 	}
@@ -111,6 +114,7 @@ public class SquashTMConnector extends TestManager {
 		
 		try {
 			SquashTMApi sapi = getApi();
+			Project project = Project.get(projectName);
 			Integer testId = getTestCaseId(testResult);
 			if (testId == null) {
 				logger.warn("Results won't be recorded, no testId configured for " + TestNGResultUtils.getTestName(testResult));
@@ -130,7 +134,7 @@ public class SquashTMConnector extends TestManager {
 			if (campaignCache.containsKey(campaignName) && campaignCache.get(campaignName) != null) {
 				campaign = campaignCache.get(campaignName);
 			} else {
-				campaign = sapi.createCampaign(campaignName, TestNGResultUtils.getSeleniumRobotTestContext(testResult).testManager().getCampaignFolderPath());
+				campaign = Campaign.create(project, campaignName, TestNGResultUtils.getSeleniumRobotTestContext(testResult).testManager().getCampaignFolderPath(), new HashMap<>());
 				campaignCache.put(campaignName, campaign);
 			}
 			
@@ -146,23 +150,23 @@ public class SquashTMConnector extends TestManager {
 			if (iterationCache.containsKey(iterationName) && iterationCache.get(iterationName) != null) {
 				iteration = iterationCache.get(iterationName);
 			} else {
-				iteration = sapi.createIteration(campaign, iterationName);
+				iteration = Iteration.create(campaign, iterationName);
 				iterationCache.put(iterationName, iteration);
 			}
 			
-			IterationTestPlanItem tpi = sapi.addTestCaseInIteration(iteration, testId, datasetId);
+			IterationTestPlanItem tpi = iteration.addTestCase(testId, datasetId);
 			
 			
 			if (testResult.isSuccess()) {
-				sapi.setExecutionResult(tpi, ExecutionStatus.SUCCESS);
+				sapi.setExecutionResult(tpi, TestPlanItemExecution.ExecutionStatus.SUCCESS);
 			} else if (testResult.getStatus() == 2){ // failed
 				String comment = null;
 				if (testResult.getThrowable() != null) {
 					comment = testResult.getThrowable().getMessage();
 				}
-				sapi.setExecutionResult(tpi, ExecutionStatus.FAILURE, comment);
+				sapi.setExecutionResult(tpi, TestPlanItemExecution.ExecutionStatus.FAILURE, comment);
 			} else { // skipped or other reason
-				sapi.setExecutionResult(tpi, ExecutionStatus.BLOCKED);
+				sapi.setExecutionResult(tpi, TestPlanItemExecution.ExecutionStatus.BLOCKED);
 			}
 
 		} catch (Exception e) {
