@@ -180,12 +180,9 @@ public abstract class CommonReporter implements IReporter {
 			return TestNGResultUtils.getUniqueTestName(testResult);
 		}
 		
-		// when test is skipped, UNIQUE_METHOD_NAME may have not been generated
-		if (testResult.getStatus() == ITestResult.SKIP) {
-			return testResult.getName();
-		} else {
-			return "N-A";
-		}
+		// In case of an error occurring on the SeleniumRobot Server, we can reach this point with a test not skipped but
+		// with a testName that we can return instead of N-A.
+		return getTestResultName(testResult);
 	}
 	
 	/**
@@ -205,10 +202,27 @@ public abstract class CommonReporter implements IReporter {
 			return TestNGResultUtils.getVisualTestName(testResult);
 		}
 		
-		// when test is skipped, UNIQUE_METHOD_NAME may have not been generated
-		if (testResult.getStatus() == ITestResult.SKIP) {
-			return testResult.getName();
-		} else {
+		// In case of an error occurring on the SeleniumRobot Server, we can reach this point with a test not skipped but
+		// with a testName that we can return instead of N-A.
+		return getTestResultName(testResult);
+		
+	}
+	
+	/**
+	 * Returns the ITestResult object's name. It's useful in case of an error occurring during test configuration.
+	 * At this point, the test won't have a UniqueTestName nor a VisualTestName so this one will do the trick.
+	 * If the test fails really early or is broken and can't be named, it returns N-A.
+	 * @param testResult
+	 * @return a String containing the testResult name
+	 */
+	public static String getTestResultName(ITestResult testResult) {		
+		try {
+			if (testResult.getName() != null && !testResult.getName().isEmpty()) {
+				return testResult.getName();
+			} else {
+				return "N-A";
+			}
+		} catch (Exception e) {
 			return "N-A";
 		}
 	}
