@@ -95,6 +95,10 @@ public class ChromeUtils {
             try {
 
                 JSONObject jsonRequest = (JSONObject) requestsEntry.getValue().get("requestWillBeSent");
+                // without request information, do nothing
+                if (jsonRequest == null) {
+                    continue;
+                }
                 Request request = buildRequest(requestsEntry, jsonRequest);
 
                 JSONObject jsonResponse = (JSONObject) requestsEntry.getValue().get("responseReceived");
