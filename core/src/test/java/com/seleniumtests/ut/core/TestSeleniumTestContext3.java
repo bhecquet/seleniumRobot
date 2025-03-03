@@ -50,6 +50,7 @@ import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.core.contexts.SeleniumRobotServerContext;
 import com.seleniumtests.core.runner.CucumberScenarioWrapper;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.driver.WebUIDriver;
 
 /**
@@ -412,6 +413,83 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 
 	}
 
+	/**
+	 * Check that when no error occurred when setting context (i.e. variable server not available)
+	 * The testResult is not set with specific attributes
+	 *
+	 * @param testNGCtx
+	 * @param xmlTest
+	 * @throws Exception
+	 */
+	@Test(groups = {"ut"})
+	public void testResultIsSetWithAttributesWhenNoErrorOccurredOnContextConfiguration(final ITestContext testNGCtx, final XmlTest xmlTest)
+			throws Exception {
+
+		Map<String, TestVariable> variables = new HashMap<>();
+		variables.put("key", new TestVariable("key", "val1"));
+
+		try (MockedConstruction mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServerMock, context) -> {
+			when(variableServerMock.isAlive()).thenReturn(true);
+			when(variableServerMock.getVariables(0, -1)).thenReturn(variables);
+		})) {
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			initThreadContext(testNGCtx, "myTest", testResult);
+			
+			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
+			seleniumTestsCtx.configureContext(testResult);
+
+			// Since the context configuration didn't fail, we can assert that testResult has default attributes
+			Assert.assertEquals(testResult.getAttribute("hasVariableServerFailed"), false);
+			Assert.assertNull(testResult.getThrowable());
+
+		} finally {
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+		}
+	}	
+	
+	/**
+	 * Check that when error occurred when setting context (i.e. variable server not available)
+	 * The testResult is set with attributes to help with report construction later
+	 *
+	 * @param testNGCtx
+	 * @param xmlTest
+	 * @throws Exception
+	 */
+	@Test(groups = {"ut"})
+	public void testResultIsSetWithAttributesWhenErrorOccurredOnContextConfiguration(final ITestContext testNGCtx, final XmlTest xmlTest)
+			throws Exception {
+
+		Map<String, TestVariable> variables = new HashMap<>();
+		variables.put("key", new TestVariable("key", "val1"));
+
+		try (MockedConstruction mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServerMock, context) -> {
+			when(variableServerMock.isAlive()).thenReturn(true);
+			// Return null so the setTestConfiguration will fail
+			when(variableServerMock.getVariables(0, -1)).thenReturn(null);
+		})) {
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			initThreadContext(testNGCtx, "myTest", testResult);
+			
+			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
+			seleniumTestsCtx.configureContext(testResult);
+
+			// Since the context configuration did fail, we can assert that testResult has valued attributes
+			Assert.assertEquals(testResult.getAttribute("hasVariableServerFailed"), true);
+			Assert.assertEquals(testResult.getThrowable().getMessage(), "An error occurred while fetching variables from the SeleniumRobot Server. Test execution is skipped.");
+
+		} finally {
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+		}
+	}	
+	
 	// used for generating TestResult
 	public void myTest() {
 	}
