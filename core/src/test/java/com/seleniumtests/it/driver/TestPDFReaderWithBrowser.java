@@ -1,8 +1,12 @@
 package com.seleniumtests.it.driver;
 
+import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
+import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.io.File;
 
 public class TestPDFReaderWithBrowser  extends GenericMultiBrowserTest {
 
@@ -11,8 +15,8 @@ public class TestPDFReaderWithBrowser  extends GenericMultiBrowserTest {
         super(BrowserType.CHROME, "DriverPDFPage");
     }
 
-    @Test
-    public void testPDFReader() throws Exception {
+    @Test(groups = "it")
+    public void testPDFReader() {
         testPdfPage.clickPDF();
 // ((CustomEventFiringWebDriver) driver).executeScript("fetch('http://10.166.162.235:64690/Test_PDF.pdf').then(res => res).then(console.log)");
 
@@ -27,5 +31,13 @@ public class TestPDFReaderWithBrowser  extends GenericMultiBrowserTest {
             devTools.disconnectSession();
         }*/
     }
+
+    @Test(groups = "it")
+    public void testDownloadPDF() {
+        testPdfPage.clickPDFToDownload();
+        File file = TestTasks.getDownloadedFile("nom-du-fichier.pdf");
+        Assert.assertTrue(file.exists());
+    }
+
 
 }

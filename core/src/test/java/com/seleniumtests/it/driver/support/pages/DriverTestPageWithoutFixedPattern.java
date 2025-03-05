@@ -62,6 +62,7 @@ public class DriverTestPageWithoutFixedPattern extends PageObject {
 	
 	public static final TextFieldUiElement uiTextElement = new TextFieldUiElement(ByUI.toRightOf("Mon label.*"));
 	public static final TextFieldUiElement uiTextElementBelow = new TextFieldUiElement(ByUI.below(".* onblur"));
+	public static final LinkElement downloadPdf = new LinkElement("PDF file", By.linkText("Click to download file"));
 	
 	private String openedPageUrl;
 	
@@ -129,4 +130,5 @@ public class DriverTestPageWithoutFixedPattern extends PageObject {
 	public String getOpenedPageUrl() {
 		return openedPageUrl;
 	}
+
 }

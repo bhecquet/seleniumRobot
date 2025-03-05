@@ -19,16 +19,20 @@ package com.seleniumtests.connectors.selenium;
 
 import java.awt.Point;
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.util.helper.WaitHelper;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.SessionNotCreatedException;
+import org.openqa.selenium.io.Zip;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
 
@@ -109,6 +113,64 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 		logger.warn("file download is only available with seleniumRobot grid");
 		return null;
 	}
+
+	/**
+	 * Returns the list of files that are present on grid node
+	 * @return
+	 */
+	public List<String> listFilesToDownload() {
+		if (nodeUrl == null) {
+			throw new ScenarioException("You cannot download file before driver has been created and corresponding node instanciated");
+		}
+		try {
+			JSONObject fileList = Unirest.get(String.format("http://%s:%d/session/%s/se/files", hubUrl.getHost(), hubUrl.getPort(), sessionId))
+					.asJson()
+					.getBody()
+					.getObject();
+			return fileList.getJSONObject("value").getJSONArray("names").toList();
+
+		} catch (UnirestException e) {
+			logger.error("Cannot get list of files to download: " + e.getMessage());
+			return new ArrayList<>();
+		}
+	}
+
+	/**
+	 * Download file from grid node, using full name
+	 * @param name
+	 * @return
+	 */
+	public File downloadFileFromName(String name) {
+		try {
+			JSONObject fileList = Unirest.post(String.format("http://%s:%d/session/%s/se/files", hubUrl.getHost(), hubUrl.getPort(), sessionId))
+					.header("Content-Type", "application/json; charset=utf-8")
+					.body(String.format("{\"name\":\"%s\"}", name))
+					.asJson()
+					.getBody()
+					.getObject();
+			JSONObject fileJson = fileList.getJSONObject("value");
+			if (fileJson.has("filename")) {
+				String content = fileJson.getString("contents");
+				File downloadDir = Zip.unzipToTempDir(content, "download", "");
+				logger.info(String.format("File %s downloaded to %s", name, downloadDir));
+				// Read the file contents
+				return Optional.ofNullable(downloadDir.listFiles()).orElse(new File[]{null})[0];
+			} else if (fileJson.has("message")) {
+				logger.warn("Error downloading file: " + fileJson.getString("message"));
+				return null;
+			} else {
+				logger.warn("No file found with name " + name);
+				return null;
+			}
+
+		} catch (UnirestException e) {
+			logger.error(String.format("Cannot download file %s: %s", name, e.getMessage()));
+			return null;
+		} catch (IOException e) {
+			logger.error("Error reading file content: " + e.getMessage());
+            return null;
+        }
+    }
 	
 	/**
 	 * Kill process

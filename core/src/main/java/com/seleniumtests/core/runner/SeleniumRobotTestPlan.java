@@ -338,4 +338,14 @@ public class SeleniumRobotTestPlan {
     	((ScenarioLogger)logger).logTestInfo(key, value);
     }
 
+	/**
+	 * Download the file from grid (or local)
+	 *
+	 * @param fileName		name of the file (may be partial name)
+	 * @return	the file or null if the file cannot be found
+	 */
+	public File getDownloadedFile(String fileName) {
+		return TestTasks.getDownloadedFile(fileName);
+	}
+
 }

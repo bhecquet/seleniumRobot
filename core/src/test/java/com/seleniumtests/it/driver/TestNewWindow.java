@@ -28,13 +28,15 @@ import com.seleniumtests.it.driver.support.pages.DriverSubTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 
 public class TestNewWindow  extends GenericMultiBrowserTest {
-	
+
+	private static final String SELENIUM_GRID_URL = "http://127.0.0.1:4444/wd/hub";
+
 	public TestNewWindow(WebDriver driver, DriverTestPage testPage) throws Exception {
 		super(driver, testPage);
 	}
 	
 	public TestNewWindow() throws Exception {
-		super(BrowserType.CHROME, "DriverTestPage", true, null);
+		super(BrowserType.CHROME, "DriverTestPage", SELENIUM_GRID_URL, null);
 	}
 	
 	/**
