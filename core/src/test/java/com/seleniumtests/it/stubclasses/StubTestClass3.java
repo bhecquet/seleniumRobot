@@ -21,9 +21,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
@@ -31,6 +29,7 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.core.aspects.CalcPage;
 import com.seleniumtests.util.helper.WaitHelper;
 
+@Listeners(StubTestClass3Listener.class)
 public class StubTestClass3 extends StubParentClass {
 	
 	@AfterClass(groups={"stub"})
@@ -45,7 +44,7 @@ public class StubTestClass3 extends StubParentClass {
 	}
 
 	@Test(groups="stub")
-	public void testOk() throws IOException {
+	public void testOk() {
 		new CalcPage()
 			.add(1, 1);
 	}
@@ -55,21 +54,21 @@ public class StubTestClass3 extends StubParentClass {
 	 * @throws IOException 
 	 */
 	@Test(groups="stub")
-	public void testFailedWithException() throws IOException {
+	public void testFailedWithException() {
 		new CalcPage()
 			.failAction()
 			.add(1);
 	}
 	
 	@Test(groups="stub")
-	public void testOkWithOneStepFailed() throws IOException {
+	public void testOkWithOneStepFailed() {
 		new CalcPage()
 		.addWithCatchedError(1)
 		.add(1);
 	}
 	
 	@Test(groups="stub")
-	public void testOkWithOneSubStepFailed() throws IOException {
+	public void testOkWithOneSubStepFailed() {
 		new CalcPage()
 		.addWithSubStepCatchedError(1)
 		.add(1);
@@ -80,7 +79,7 @@ public class StubTestClass3 extends StubParentClass {
 	 * @throws IOException 
 	 */
 	@Test(groups="stub")
-	public void testFailedWithSoftAssertDisabled() throws IOException {
+	public void testFailedWithSoftAssertDisabled() {
 		new CalcPage()
 			.assertAction()
 			.add(1);
@@ -91,7 +90,7 @@ public class StubTestClass3 extends StubParentClass {
 	 * @throws IOException 
 	 */
 	@Test(groups="stub")
-	public void testFailedWithSoftAssertEnabled() throws IOException {
+	public void testFailedWithSoftAssertEnabled() {
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(true);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(true);
 		new CalcPage()
@@ -104,7 +103,7 @@ public class StubTestClass3 extends StubParentClass {
 	 * @throws IOException 
 	 */
 	@Test(groups="stub")
-	public void testMultipleFailedWithSoftAssertEnabled() throws IOException {
+	public void testMultipleFailedWithSoftAssertEnabled() {
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(true);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(true);
 		new CalcPage()
@@ -119,7 +118,7 @@ public class StubTestClass3 extends StubParentClass {
 	 * @throws IOException
 	 */
 	@Test(groups="stub")
-	public void testWithAssertInTest() throws IOException {
+	public void testWithAssertInTest() {
 		
 		
 		CalcPage page = new CalcPage()
@@ -135,7 +134,7 @@ public class StubTestClass3 extends StubParentClass {
 	 * @throws IOException
 	 */
 	@Test(groups="stub")
-	public void testWithAssertOnTestEnd() throws IOException {
+	public void testWithAssertOnTestEnd() {
 		
 		
 		CalcPage page = new CalcPage()
@@ -144,7 +143,7 @@ public class StubTestClass3 extends StubParentClass {
 	}
 	
 	@Test(groups="stub")
-	public void testWithAssertInSubStep() throws IOException {
+	public void testWithAssertInSubStep() {
 		
 		
 		new CalcPage()
@@ -153,5 +152,18 @@ public class StubTestClass3 extends StubParentClass {
 				.add(2)
 				.add(3);
 	}
+
+	/**
+	 * This test will raise a WebDriverException which will be turned into ApplicationError with StubTestClass3Listener
+	 */
+	@Test(groups="stub")
+	public void testWithApplicationError() {
+		new CalcPage()
+				.add(1)
+				.failApplicationError();
+	}
+
+
+
 
 }

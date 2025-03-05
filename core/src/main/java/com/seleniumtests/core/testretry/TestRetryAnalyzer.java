@@ -18,6 +18,7 @@
 package com.seleniumtests.core.testretry;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ApplicationError;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
 
@@ -79,6 +80,10 @@ public class TestRetryAnalyzer implements IRetryAnalyzer {
         		logger.log("[NOT RETRYING] due to grid node not available");
             	TestNGResultUtils.setNoMoreRetry(result, true);
         		return false;
+            } else if (result.getThrowable() instanceof ApplicationError) {
+        		logger.log("[NOT RETRYING] due to application error");
+            	TestNGResultUtils.setNoMoreRetry(result, true);
+        		return false;
         	}
         	
         	logger.log("[RETRYING] " + testClassName + " FAILED, " + "Retrying " + count + " time");
@@ -93,9 +98,6 @@ public class TestRetryAnalyzer implements IRetryAnalyzer {
         return false;
     }
 
-    
-  
-    
     /**
      * check whether the test will be retried / is retrying by comparing the count indiactor stored in test result with the max allowed retry count
      * Retry count is set only when retry method has been called

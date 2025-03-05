@@ -20,6 +20,7 @@ package com.seleniumtests.it.core.aspects;
 import java.io.IOException;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriverException;
 import org.testng.Assert;
 
 import com.seleniumtests.core.Mask;
@@ -38,7 +39,7 @@ public class CalcPage extends PageObject {
 	
 	private int result = 0;
 
-	public CalcPage() throws IOException {
+	public CalcPage() {
 		super();
 	}
 	
@@ -63,7 +64,11 @@ public class CalcPage extends PageObject {
 	public CalcPage failAction() {
 		throw new DriverExceptions("fail");
 	}
-	
+
+	public CalcPage failApplicationError() {
+		throw new WebDriverException("no element found");
+	}
+
 	public CalcPage assertAction() {
 		Assert.assertTrue(false, "false error");
 		return this;

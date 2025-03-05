@@ -268,6 +268,36 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
 		}
 	}
+
+	/**
+	 * Check that if ApplicationError is raised, test is not retried
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testWithoutRetryOnApplicationError(ITestContext testContext) throws Exception {
+
+		try (MockedConstruction mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+			when(variableServer.isAlive()).thenReturn(true);
+		})) {
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
+
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testWithApplicationError"});
+
+			String detailedReportContent1 = readTestMethodResultFile("testWithApplicationError");
+			Assert.assertTrue(detailedReportContent1.contains("[NOT RETRYING] due to application error"));
+			Assert.assertTrue(detailedReportContent1.contains("</span> Test is KO with error: class org.openqa.selenium.WebDriverException: no element found<br/>"));
+			Assert.assertTrue(detailedReportContent1.contains("class org.openqa.selenium.WebDriverException: no element found<br/>"));
+			Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-error\"><div>class com.seleniumtests.customexception.ApplicationError: error on application</div>"));
+
+		} finally {
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
+		}
+	}
 	
 
 	/**
