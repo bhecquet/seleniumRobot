@@ -64,6 +64,7 @@
   - [Using placeholders in variable value (>= 4.20.0)](#using-placeholders-in-variable-value--4200)
 - [7 Optional features](#7-optional-features)
   - [Soft assertions](#soft-assertions)
+- [Prevent test to retry](#prevent-test-to-retry)
   - [Log some information inside a test step](#log-some-information-inside-a-test-step)
   - [Log some information at test level](#log-some-information-at-test-level)
 - [8 Write good tests and Page Objects](#8-write-good-tests-and-page-objects)
