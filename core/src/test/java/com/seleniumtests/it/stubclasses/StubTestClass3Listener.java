@@ -10,7 +10,7 @@ import org.testng.ITestResult;
 
 public class StubTestClass3Listener implements IInvokedMethodListener {
 
-    private static ScenarioLogger scenarioLogger = ScenarioLogger.getScenarioLogger(SeleniumRobotTestListener.class);
+    private static ScenarioLogger scenarioLogger = ScenarioLogger.getScenarioLogger(StubTestClass3Listener.class);
     /**
      * This afterInvocation aims at raising ApplicationError when error occurs in 'testWithApplicationError'
      * This will mimic the user behaviour where, on error raised during test, an analysis on page shows that this is due to application

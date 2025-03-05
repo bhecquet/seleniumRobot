@@ -1204,14 +1204,53 @@ By default, inside a test, checks will be done using TestNG `Assert` class
 On assert failure, test will continue but error will be reported
 If this behaviour is not expected, then use the parameter `softAssertEnabled` and set it to false
 
+### Prevent test to retry ###
+By default, when error occurs, test will retry (if testRetryCount is > 0)
+Most causes of retry are elements not found (page is not the expected one, site unavailable, page changed, ...)
+If you're able to know that some errors are due to the application (e.g: an application failure redirects you to an error page), then retrying is useless (it takes more time, and retry may hide the failure)
+
+In this case, create a listener
+
+```java
+public class FailureListener implements IInvokedMethodListener {
+
+    private static ScenarioLogger scenarioLogger = ScenarioLogger.getScenarioLogger(FailureListener.class);
+
+    /**
+     * Check page of known errors
+     * @param method
+     * @param testResult
+     */
+    @Override
+    public void afterInvocation(IInvokedMethod method, ITestResult testResult) {
+
+        String source = WebUIDriver.getWebDriver(false).getPageSource();
+        if (source.contains("an error occured")) {
+            scenarioLogger.error("Application failed");
+            testResult.setThrowable(new ApplicationError("error on application"));
+        }
+    }
+}
+```
+
+Use this listener in your test class (**This will apply to all of your test classes**)
+
+```java
+@Listeners(FailureListener.class)
+public class TestClass extends SeleniumTestPlan {
+    ...
+}
+```
+
 #### Log some information inside a test step ####
 You can make seleniumRobot display some test information in logs and test steps
 
-- `TestLogging.info("my message")`: displays a message (green in HTML report)
-- `TestLogging.warning("my warn")`: displays a warning (orange in HTML report)
-- `TestLogging.error("my error")`: displays an error (red in HTML report)
-- `TestLogging.log("my log")`: displays the message without style
-- `TestLogging.logTestValue("key", "my message", "my value")`: stores the key/value pair (displays a table in HTML report)
+- `logger.info("my message")`: displays a message (green in HTML report)
+- `logger.warning("my warn")`: displays a warning (orange in HTML report)
+- `logger.error("my error")`: displays an error (red in HTML report)
+- `logger.log("my log")`: displays the message without style
+- `logger.logTestInfo("key", "value")`: log a key and its value at test level
+- `logger.logTestValue("key", "my message", "my value")`: stores the key/value pair (displays a table in HTML report)
 
 #### Log some information at test level ####
 
