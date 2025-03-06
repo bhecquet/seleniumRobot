@@ -49,6 +49,7 @@
   - [Execute or kill a process](#execute-or-kill-a-process)
     - [Kill an existing process](#kill-an-existing-process)
     - [Start a process / execute a command](#start-a-process--execute-a-command)
+  - [A word on exceptions](#a-word-on-exceptions)
 - [4 Write a cucumber test](#4-write-a-cucumber-test)
   - [Feature file example](#feature-file-example)
   - [TestNG file](#testng-file-1)
