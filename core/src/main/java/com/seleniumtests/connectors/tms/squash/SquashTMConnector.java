@@ -33,7 +33,18 @@ public class SquashTMConnector extends TestManager {
 		campaignCache = new HashMap<>();
 		iterationCache = new HashMap<>();
 	}
-	
+
+	/**
+	 * Initialize a connection to Squash TM
+	 * You can connect to API using
+	 * - login/password (will be removed in 2026 on Squash TM)
+	 * - API token: in this case, don't specify user, only token as password
+	 *
+	 * @param url		URL of the squash TM server
+	 * @param user		User to connect with (when using login/password)
+	 * @param password	Password to connect with (when using login/password) or API token
+	 * @param project	The project to connect to on Squash TM
+	 */
 	public SquashTMConnector(String url, String user, String password, String project) {
 		this();
 		JSONObject config = new JSONObject();
