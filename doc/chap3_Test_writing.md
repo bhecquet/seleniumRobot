@@ -1030,6 +1030,26 @@ If the program you execute is in the path, you do not need to give the full path
 executeCommand(OSCommand.USE_PATH" + <my_program>, <arg1>, <arg2>)
 ```
 
+#### A word on exceptions ####
+
+SeleniumRobot provides several exceptions that may be raised.
+You may also want to raise some of them
+- `ApplicationError`: you may decide to raise this exception when you know that the error comes from application. This way, test won't be retried. see [Prevent test to retry](#prevent-test-to-retry)
+- `ScenarioException`: raised when something (some operation done by SeleniumRobot) goes wrong during test
+- - `ConfigurationException`: raised by SeleniumRobot when error occured configuring test, wrong provided values, ...
+- `CustomSeleniumTestsException`: this is the most generic exception raised by SeleniumRobot
+
+The following are only for internal use
+- `NotCurrentPageException`: raised when opening a new page and the element that should be on page is not present
+- `DatasetException`: raised when error occurs reading CSV file 
+- `DisabledConnector`: raised when a connector cannot be used
+- `DriverException`: raised when driver cannot be created
+- `ImageSearchException`: raised when failing to find an image during the test
+- `RetryableDriverException`: raised to tell to retry driver creation
+- `SeleniumGridException`: raised when some operations fail on selenium grid
+- `SeleniumGridNodeNotAvailable`: raised when no node is available on grid
+
+
 ### 4 Write a cucumber test ###
 Cucumber styled tests rely on a `.feature` file where each test step is defined. Look at [https://cucumber.io/docs/gherkin/reference/](https://cucumber.io/docs/gherkin/reference/) for more information about writing a feature file.
 
