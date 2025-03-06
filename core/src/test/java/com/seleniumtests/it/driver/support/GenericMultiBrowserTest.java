@@ -80,7 +80,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	private SeleniumGridConnector seleniumGridConnector;
 	private String testPageName;
 	protected String testPageUrl;
-	private boolean targetSeleniumGrid = false;
+	private String seleniumGridUrl = null;
 	
 	protected List<BrowserType> installedBrowsers = OSUtilityFactory.getInstance().getInstalledBrowsers();
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(GenericMultiBrowserTest.class);
@@ -93,13 +93,13 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	}
 
 	public GenericMultiBrowserTest(BrowserType browserType, String testPageName) throws Exception {
-		this(browserType, testPageName, false, null);
+		this(browserType, testPageName, null, null);
 	}
 	
-	public GenericMultiBrowserTest(BrowserType browserType, String testPageName, boolean targetSeleniumGrid, String proxyType) throws Exception {
+	public GenericMultiBrowserTest(BrowserType browserType, String testPageName, String seleniumGridUrl, String proxyType) throws Exception {
 		this.browserType = browserType; 
 		this.testPageName = testPageName;
-		this.targetSeleniumGrid = targetSeleniumGrid;
+		this.seleniumGridUrl = seleniumGridUrl;
 		this.proxyType = proxyType;
 	}
 	
@@ -128,9 +128,9 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 		}
 
 		// grid support
-		if (targetSeleniumGrid) {
+		if (seleniumGridUrl != null) {
 			SeleniumGridDriverFactory.setRetryTimeout(1);
-			SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://localhost:4444/wd/hub");
+			SeleniumTestsContextManager.getThreadContext().setWebDriverGrid(seleniumGridUrl);
 			SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
 
 			// restore the grid connector as it's not in context for this test
@@ -139,7 +139,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 			}
 			
 			// Skip test when local grid is not present
-			if (!new SeleniumRobotGridConnector("http://127.0.0.1:4444/wd/hub").isGridActive()) {
+			if (!new SeleniumRobotGridConnector(seleniumGridUrl).isGridActive()) {
 				throw new SkipException("no local seleniumrobot grid available");
 			}
 		}

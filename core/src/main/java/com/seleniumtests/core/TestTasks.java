@@ -17,13 +17,22 @@
  */
 package com.seleniumtests.core;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import com.seleniumtests.util.helper.WaitHelper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.WebDriver;
 import org.testng.Reporter;
@@ -46,7 +55,6 @@ import com.seleniumtests.util.osutility.ProcessInfo;
 
 /**
  * Class for storing tasks that can be used in test and / or in webpages
- * @author s047432
  *
  */
 public class TestTasks {
@@ -387,4 +395,47 @@ public class TestTasks {
     	WebUIDriver.switchToDriver(driverName);
     	return WebUIDriver.getWebDriver(false);
     }
+
+	/**
+	 * Download the file from grid (or local)
+	 *
+	 * @param fileName
+	 * @return	the file or null if the file cannot be found
+	 */
+	public static File getDownloadedFile(String fileName) {
+		logger.info("try downloading file " + fileName);
+		if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.LOCAL) {
+			Instant end = Instant.now().plusSeconds(10);
+			Optional<File> optionalName = Optional.empty();
+			do {
+				WaitHelper.waitForMilliSeconds(500);
+				try {
+					optionalName = Files.list(Paths.get(SeleniumTestsContextManager.getThreadContext().getDownloadOutputDirectory()))
+							.filter(path -> path.toFile().getName().contains(fileName))
+							.map(Path::toFile)
+							.findFirst();
+				} catch (NullPointerException | IOException e) {}
+			} while (optionalName.isEmpty() && end.isAfter(Instant.now()));
+			return optionalName.orElse(null);
+		} else {
+			SeleniumGridConnector gridConnector = SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector();
+			if (gridConnector != null) {
+
+				Optional<String> optionalName;
+				Instant end = Instant.now().plusSeconds(10);
+				do {
+					WaitHelper.waitForMilliSeconds(500);
+					List<String> fileNames = gridConnector.listFilesToDownload();
+					optionalName = fileNames.stream()
+							.filter(name -> name.contains(fileName))
+							.findFirst();
+				} while (!optionalName.isPresent() && end.isAfter(Instant.now()));
+				return optionalName.map(name -> gridConnector.downloadFileFromName(name, new File(SeleniumTestsContextManager.getThreadContext().getDownloadOutputDirectory())))
+						.orElse(null);
+
+			} else {
+				throw new ScenarioException(ERROR_NO_GRID_CONNECTOR_ACTIVE);
+			}
+		}
+	}
 }

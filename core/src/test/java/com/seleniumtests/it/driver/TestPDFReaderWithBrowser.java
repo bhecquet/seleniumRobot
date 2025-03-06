@@ -1,19 +1,43 @@
 package com.seleniumtests.it.driver;
 
+import com.seleniumtests.GenericDriverTest;
+import com.seleniumtests.WebTestPageServer;
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.TestType;
 import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
+import com.seleniumtests.it.driver.support.pages.DriverPDFPage;
+import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class TestPDFReaderWithBrowser  extends GenericMultiBrowserTest {
+import java.io.File;
 
+public class TestPDFReaderWithBrowser  extends GenericDriverTest {
 
-    public TestPDFReaderWithBrowser() throws Exception {
-        super(BrowserType.CHROME, "DriverPDFPage");
+    private String localAddress;
+    private WebTestPageServer server;
+
+    @BeforeMethod(groups = "it", alwaysRun = true)
+    public void init() throws Exception {
+        server = new WebTestPageServer();
+        server.exposeTestPage();
+        localAddress = server.getLocalAddress();
     }
 
-    @Test
-    public void testPDFReader() throws Exception {
-        testPdfPage.clickPDF();
+    @AfterMethod(groups = "it", alwaysRun = true)
+    public void reset() {
+        try {
+            server.stopServer();
+        } catch (Exception e) {
+        }
+    }
+
+    @Test(groups = "it")
+    public void testPDFReader() {
+//        testPdfPage.clickPDF();
 // ((CustomEventFiringWebDriver) driver).executeScript("fetch('http://10.166.162.235:64690/Test_PDF.pdf').then(res => res).then(console.log)");
 
         /*DevTools devTools = ((HasDevTools) ajc$this.driver.getOriginalDriver()).getDevTools();
@@ -27,5 +51,31 @@ public class TestPDFReaderWithBrowser  extends GenericMultiBrowserTest {
             devTools.disconnectSession();
         }*/
     }
+
+    @Test(groups = "it")
+    public void testDownloadPDFChrome() {
+        downloadPdf("chrome");
+    }
+
+    @Test(groups = "it")
+    public void testDownloadPDFEdge() {
+        downloadPdf("edge");
+    }
+
+    @Test(groups = "it")
+    public void testDownloadPDFFirefox() {
+        downloadPdf("firefox");
+    }
+
+    private void downloadPdf(String browser) {
+        SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
+        SeleniumTestsContextManager.getThreadContext().setBrowser(browser);
+
+        DriverPDFPage testPdfPage = new DriverPDFPage(String.format("http://%s:%d/testpdf.html", localAddress, server.getServerHost().getPort()));
+        testPdfPage.clickPDFToDownload();
+        File file = TestTasks.getDownloadedFile("nom-du-fichier.pdf");
+        Assert.assertTrue(file.exists());
+    }
+
 
 }

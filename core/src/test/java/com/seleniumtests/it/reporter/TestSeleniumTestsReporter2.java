@@ -625,6 +625,23 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(mainReportContent.contains("<th> Last State </th>"));
 	}
 
+	@Test(groups = {"it"})
+	public void testDownloadedFileInReport() throws Exception {
+		SeleniumTestsContextManager.removeThreadContext();
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDownloadFile"});
+
+		// file present in report dir (not in 'downloads' subdir because we log it
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDownloadFile", "nom-du-fichier.pdf").toFile().exists());
+
+		// issue #331: check that result files have been generated at least twice (one during test run and one at the end)
+		String logs = readSeleniumRobotLogFile().replace("\\", "/");
+		Assert.assertTrue(logs.contains("try downloading file nom-du-fichier.pdf"));
+
+		// check file is present in report
+		String detailedReportContent = readTestMethodResultFile("testDownloadFile");
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-snapshot\">PDF example: <a href='nom-du-fichier.pdf'>file</a></div>"));
+	}
+
 	/**
 	 * Check if param "Gridnode" is ok
 	 * @throws Exception

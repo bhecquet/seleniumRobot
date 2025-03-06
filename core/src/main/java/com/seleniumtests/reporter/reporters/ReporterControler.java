@@ -458,11 +458,11 @@ public class ReporterControler implements IReporter {
 
 		String outputSubDirectory = new File(testContext.getOutputDirectory()).getName();
 		String outputDirectoryParent = new File(testContext.getOutputDirectory()).getParent();
-		File htmlDir = Paths.get(outputDirectoryParent, outputSubDirectory, ScreenshotUtil.HTML_DIR).toFile();
-		File htmlBeforeDir = Paths.get(outputDirectoryParent, "before-" + outputSubDirectory, ScreenshotUtil.HTML_DIR).toFile();
-		File screenshotDir = Paths.get(outputDirectoryParent, outputSubDirectory, ScreenshotUtil.SCREENSHOT_DIR).toFile();
-		File screenshotBeforeDir = Paths.get(outputDirectoryParent, "before-" + outputSubDirectory, ScreenshotUtil.SCREENSHOT_DIR).toFile();
-		File videoDir = Paths.get(outputDirectoryParent, outputSubDirectory, VideoUtils.VIDEO_DIR).toFile();
+		File htmlDir = Paths.get(outputDirectoryParent, outputSubDirectory, SeleniumTestsContext.SCREENSHOT_DIRECTORY).toFile();
+		File htmlBeforeDir = Paths.get(outputDirectoryParent, "before-" + outputSubDirectory, SeleniumTestsContext.HTML_DIRECTORY).toFile();
+		File screenshotDir = Paths.get(outputDirectoryParent, outputSubDirectory, SeleniumTestsContext.SCREENSHOT_DIRECTORY).toFile();
+		File screenshotBeforeDir = Paths.get(outputDirectoryParent, "before-" + outputSubDirectory, SeleniumTestsContext.SCREENSHOT_DIRECTORY).toFile();
+		File videoDir = Paths.get(outputDirectoryParent, outputSubDirectory, SeleniumTestsContext.VIDEO_DIRECTORY).toFile();
 		
 		// get list of existing files
 		if (htmlDir.isDirectory()) {

@@ -178,7 +178,6 @@ Settings for customizing the default seleniumRobot driver features. By default, 
 | edgeDriverPath			| 			| Path to a different edge driver executable |
 | userAgent 				| 			| Allow defining a specific user-agent in chrome and firefox only | 
 | enableJavascript 			| true		| Javascript activation |
-| browserDownloadDir 		| 			| Path where files are downloaded. Firefox only |
 | viewPortWidth				|			| Width of the viewPort when doing web tests. No effect for mobile apps. If not set, window will be maximized |
 | viewPortHeight			|			| Height of the viewPort when doing web tests. No effect for mobile apps. If not set, window will be maximized | 
 | extensionX.path			|			| Path (absolute file path or HTTP URL) to the extension (.xpi or .crx). Replace X with extension number. E.g: `extension0.path=http://localhost:8000/myExt.crx`. See §7.17 |

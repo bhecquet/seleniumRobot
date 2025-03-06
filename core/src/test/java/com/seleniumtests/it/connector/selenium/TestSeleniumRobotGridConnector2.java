@@ -19,14 +19,17 @@ package com.seleniumtests.it.connector.selenium;
 
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 
+import com.seleniumtests.core.TestTasks;
 import org.openqa.selenium.Rectangle;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
@@ -47,14 +50,16 @@ import com.seleniumtests.util.helper.WaitHelper;
 
 public class TestSeleniumRobotGridConnector2 extends GenericMultiBrowserTest {
 
+	private static final String SELENIUM_GRID_URL = "http://10.165.161.49:44444/wd/hub";
+
 	public TestSeleniumRobotGridConnector2() throws Exception {
-		super(BrowserType.CHROME, "DriverTestPageWithoutFixedPattern", true, null);
+		super(BrowserType.CHROME, "DriverTestPageWithoutFixedPattern", SELENIUM_GRID_URL, null);
 	}
 	
 	@BeforeClass(groups={"it"})
 	public void initConnector(ITestContext ctx) {
 
-		if (!new SeleniumRobotGridConnector("http://127.0.0.1:4444/wd/hub").isGridActive()) {
+		if (!new SeleniumRobotGridConnector(SELENIUM_GRID_URL).isGridActive()) {
 			throw new SkipException("no local seleniumrobot grid available");
 		}
 	}
@@ -66,6 +71,13 @@ public class TestSeleniumRobotGridConnector2 extends GenericMultiBrowserTest {
 			DriverTestPageWithoutFixedPattern.textElement.clear();
 			((CustomEventFiringWebDriver)driver).scrollTop();
 		}
+	}
+
+	@Test(groups={"it"})
+	public void testDonwloadFile() {
+		DriverTestPageWithoutFixedPattern.downloadPdf.click();
+		File pdfFile = TestTasks.getDownloadedFile("nom-du-fichier.pdf");
+		Assert.assertTrue(pdfFile.exists());
 	}
 	
 	@Test(groups={"it"})

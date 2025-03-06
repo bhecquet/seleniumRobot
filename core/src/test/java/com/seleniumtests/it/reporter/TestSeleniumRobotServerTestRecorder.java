@@ -824,6 +824,45 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 		}
 	}
 
+	@Test(groups={"it"})
+	public void testReportContainsDownloadedFile() throws Exception {
+
+		try (MockedConstruction mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+			when(variableServer.isAlive()).thenReturn(true);
+		});
+			 MockedStatic mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
+			 MockedStatic mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+		) {
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			System.setProperty(SeleniumTestsContext.BROWSER, "chrome");
+			System.setProperty(SeleniumTestsContext.STARTED_BY, "http://mylauncher/test");
+
+			initMocks(mockedCommonReporter, mockedServerConnector);
+			ArgumentCaptor<File> fileCapture = ArgumentCaptor.forClass(File.class);
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDownloadFile"});
+
+			// check browser has the same valeurs for all calls
+			verify(serverConnector).createSession(anyString(), eq("BROWSER:CHROME"), eq("http://mylauncher/test"), any(LocalDateTime.class));
+
+			// issue #331: check all test cases are created, call MUST be done only once to avoid result to be recorded several times
+			verify(serverConnector).createTestCase("testDownloadFile");
+			verify(serverConnector, times(6)).uploadFile(fileCapture.capture(), eq(0));
+			Assert.assertTrue(fileCapture.getAllValues().stream().filter(f -> f.getName().equals("nom-du-fichier.pdf")).findFirst().isPresent());
+
+		} finally {
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR);
+			System.clearProperty(SeleniumTestsContext.STARTED_BY);
+			System.clearProperty(SeleniumTestsContext.BROWSER);
+		}
+	}
+
 	/**
 	 * @throws Exception
 	 * @throws InstantiationException

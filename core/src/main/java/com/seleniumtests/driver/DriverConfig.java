@@ -79,10 +79,6 @@ public class DriverConfig {
     public void setBrowserType(BrowserType browserType) {
 		this.browserType = browserType;
 	}
-
-	public String getBrowserDownloadDir() {
-        return testContext.getBrowserDownloadDir();
-    }
 	
 	public Capabilities getCapabilites() {
 		return testContext.getCapabilities();
@@ -190,6 +186,10 @@ public class DriverConfig {
 
     public String getOutputDirectory() {
         return testContext.getOutputDirectory();
+    }
+
+    public String getDownloadOutputDirectory() {
+        return testContext.getDownloadOutputDirectory();
     }
 
     public int getPageLoadTimeout() {

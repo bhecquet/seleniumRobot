@@ -27,6 +27,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.reporter.logger.FileContent;
 import com.seleniumtests.util.FileUtility;
@@ -64,14 +65,14 @@ public class ScreenShot {
         
         String filename = HashCodeGenerator.getRandomHashCode("web");
         if (imageBuffer != null) {
-            Path filePath = Paths.get(outputDirectory, ScreenshotUtil.SCREENSHOT_DIR, filename + ".png");
+            Path filePath = Paths.get(SeleniumTestsContextManager.getThreadContext().getScreenshotOutputDirectory(), filename + ".png");
             FileUtility.writeImage(filePath.toString(), imageBuffer);
             this.image = new FileContent(filePath.toFile());
         }
 
         if (pageSource != null) {
             try {
-                File htmlFile = Paths.get(outputDirectory, ScreenshotUtil.HTML_DIR, filename + ".html").toFile();
+                File htmlFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getHtmlsOutputDirectory(), filename + ".html").toFile();
                 FileUtils.writeStringToFile(htmlFile, pageSource, StandardCharsets.UTF_8);
                 html = new FileContent(htmlFile);
             } catch (IOException e) {
@@ -85,10 +86,10 @@ public class ScreenShot {
      * @param imageFile
      */
     public ScreenShot(File imageFile) {
-        this(imageFile, null, ScreenshotUtil.SCREENSHOT_DIR);
+        this(imageFile, null, SeleniumTestsContext.SCREENSHOT_DIRECTORY);
     }
     public ScreenShot(File imageFile, File htmlFile) {
-        this(imageFile, htmlFile, ScreenshotUtil.SCREENSHOT_DIR);
+        this(imageFile, htmlFile, SeleniumTestsContext.SCREENSHOT_DIRECTORY);
     }
     
     /**
@@ -96,9 +97,7 @@ public class ScreenShot {
      * @param imageFile
      */
     public ScreenShot(File imageFile, File htmlFile, String relativePath) {
-        
-        
-    
+
         initializeOutputDirectory();
     
         // copy the input image file to <output_directory>/screenshots/<file_name>
@@ -115,7 +114,7 @@ public class ScreenShot {
     
         // copy the input HTML file to <output_directory>/htmls/<file_name>
         if (htmlFile != null && htmlFile.exists()) {
-            Path htmlFilePath = Paths.get(outputDirectory, ScreenshotUtil.HTML_DIR, htmlFile.getName());
+            Path htmlFilePath = Paths.get(SeleniumTestsContextManager.getThreadContext().getHtmlsOutputDirectory(), htmlFile.getName());
             htmlFilePath.getParent().toFile().mkdirs();
             try {
                 Files.move(htmlFile.toPath(), htmlFilePath, StandardCopyOption.REPLACE_EXISTING);

@@ -17,6 +17,10 @@
  */
 package com.seleniumtests.browserfactory;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,13 +29,17 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import io.appium.java_client.android.options.UiAutomator2Options;
 import io.appium.java_client.android.options.context.SupportsChromedriverExecutableOption;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.io.TemporaryFilesystem;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
+import org.openqa.selenium.remote.AbstractDriverOptions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
@@ -112,6 +120,7 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 	@Override
 	protected MutableCapabilities getDriverOptions() {
 		ChromeOptions options = new ChromeOptions();
+		Map<String, Object> experientalOptions = new HashMap<>();
 
 		// to enable BiDi. this creates a tab on the browser
 		// options.setCapability("webSocketUrl", true);
@@ -148,6 +157,27 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 			}
 		}
 
+		// configure options for file download
+		if (webDriverConfig.getMode() == DriverMode.LOCAL) {
+			// inspired by LocalNode.java
+			Path downloadDir;
+            try {
+                downloadDir = Files.createDirectories(Paths.get(webDriverConfig.getDownloadOutputDirectory()));
+				experientalOptions.putAll(
+						Map.of(
+								"download.prompt_for_download",
+								false,
+								"download.default_directory",
+								downloadDir.toAbsolutePath().toString(),
+								"savefile.default_directory",
+								downloadDir.toAbsolutePath().toString()));
+            } catch (IOException e) {
+                logger.error("Error creating 'downloads' directory: " + e.getMessage());
+            }
+		} else {
+			options.setEnableDownloads(true);
+		}
+
 		options.addArguments(chromeOptions);
         
         if (webDriverConfig.getMode() == DriverMode.LOCAL) {
@@ -179,13 +209,11 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
         	options.setExperimentalOption("debuggerAddress", "127.0.0.1:" + webDriverConfig.getAttachExistingDriverPort());
         } else {
         	 // issue #480: disable "restore pages" popup, but not when we attach an existing browser as it crashes driver (from invalid argument: cannot parse capability: goog:chromeOptions, from invalid argument: unrecognized chrome option: prefs)
-            Map<String, Object> prefs = new HashMap<>();
-            prefs.put("profile.exit_type", "Normal");
-            options.setExperimentalOption("prefs", prefs);
-            
+            experientalOptions.put("profile.exit_type", "Normal");
         }
-        
-        
+		if (!experientalOptions.isEmpty()) {
+			options.setExperimentalOption("prefs", experientalOptions);
+		}
         options.setPageLoadStrategy(webDriverConfig.getPageLoadStrategy());
         
         return options;

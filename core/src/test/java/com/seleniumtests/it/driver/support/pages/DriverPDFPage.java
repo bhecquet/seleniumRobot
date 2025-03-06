@@ -33,14 +33,32 @@ import java.util.List;
 public class DriverPDFPage extends PageObject {
 
 	public static final LinkElement link = new LinkElement("My link", By.linkText("Click to open in a new tab"));
+	public static final LinkElement linkDownload = new LinkElement("My link", By.linkText("Click to download file"));
 
 
 	public DriverPDFPage(String url) {
         super(link, url);
 	}
 
+	public DriverPDFPage(BrowserType browserType) {
+		super(link, getPageUrl(browserType), browserType, "main", null);
+	}
+
 	public DriverPDFPage clickPDF() {
 		link.click();
 		return this;
+	}
+
+	public DriverPDFPage clickPDFToDownload() {
+		linkDownload.click();
+		return this;
+	}
+
+	public static String getPageUrl(BrowserType browserType) {
+		if (browserType == BrowserType.FIREFOX) {
+			return "file://" + Thread.currentThread().getContextClassLoader().getResource("tu/testpdf.html").getFile();
+		} else {
+			return "file:///" + Thread.currentThread().getContextClassLoader().getResource("tu/testpdf.html").getFile();
+		}
 	}
 }

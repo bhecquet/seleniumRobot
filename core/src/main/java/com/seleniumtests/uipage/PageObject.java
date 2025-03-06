@@ -524,6 +524,16 @@ public class PageObject extends BasePage implements IPage {
     }
 
     /**
+     * Download the file from grid (or local)
+     *
+     * @param fileName		name of the file (may be partial name)
+     * @return	the file or null if the file cannot be found
+     */
+    public File getDownloadedFile(String fileName) {
+        return TestTasks.getDownloadedFile(fileName);
+    }
+
+    /**
      * Capture the whole page, scrolling if necessary
      * @param <T>
      * @return

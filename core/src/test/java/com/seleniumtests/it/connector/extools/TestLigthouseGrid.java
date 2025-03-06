@@ -18,14 +18,16 @@ import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 
 public class TestLigthouseGrid extends GenericMultiBrowserTest {
 
+	private static final String SELENIUM_GRID_URL = "http://127.0.0.1:4444/wd/hub";
+
 	public TestLigthouseGrid() throws Exception {
-		super(BrowserType.CHROME, "DriverTestPage", true, null);
+		super(BrowserType.CHROME, "DriverTestPage", SELENIUM_GRID_URL, null);
 	}
 	
 
 	@BeforeMethod(groups={"it"})
 	public void initConnector(ITestContext ctx) {
-		SeleniumGridConnector connector = new SeleniumRobotGridConnector("http://127.0.0.1:4444/wd/hub");
+		SeleniumGridConnector connector = new SeleniumRobotGridConnector(SELENIUM_GRID_URL);
 		
 		if (!connector.isGridActive()) {
 			throw new SkipException("no seleniumrobot grid available");

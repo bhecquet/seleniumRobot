@@ -45,6 +45,7 @@
   - [Use WebDriverWait](#use-webdriverwait)
   - [Use Dataprovider](#use-dataprovider)
   - [Use placeholders in test description and test name](#use-placeholders-in-test-description-and-test-name)
+  - [Download file](#download-file)
   - [Execute or kill a process](#execute-or-kill-a-process)
     - [Kill an existing process](#kill-an-existing-process)
     - [Start a process / execute a command](#start-a-process--execute-a-command)
@@ -64,7 +65,7 @@
   - [Using placeholders in variable value (>= 4.20.0)](#using-placeholders-in-variable-value--4200)
 - [7 Optional features](#7-optional-features)
   - [Soft assertions](#soft-assertions)
-- [Prevent test to retry](#prevent-test-to-retry)
+  - [Prevent test to retry](#prevent-test-to-retry)
   - [Log some information inside a test step](#log-some-information-inside-a-test-step)
   - [Log some information at test level](#log-some-information-at-test-level)
 - [8 Write good tests and Page Objects](#8-write-good-tests-and-page-objects)
@@ -985,6 +986,22 @@ or
     }
 ```
 
+#### Download file ####
+
+If during test, clicking a file download it to disk, you can access this file inside PageObject or Test itself using
+
+```java
+page.clickPDFToDownload();
+File file = getDownloadedFile("myFile.pdf");
+```
+File name may be partial (seleniumRobot searches for the name you provide in all downloaded files)
+
+**This feature is only available for chrome / edge / firefox**
+
+In case you want to add this downloaded file to the report, you can do 
+
+`logger.logFile(file, "some description")`
+
 #### Execute or kill a process ####
 
 If, for some reason, you need to access a system process: 
@@ -1205,7 +1222,7 @@ By default, inside a test, checks will be done using TestNG `Assert` class
 On assert failure, test will continue but error will be reported
 If this behaviour is not expected, then use the parameter `softAssertEnabled` and set it to false
 
-### Prevent test to retry ###
+#### Prevent test to retry ####
 By default, when error occurs, test will retry (if testRetryCount is > 0)
 Most causes of retry are elements not found (page is not the expected one, site unavailable, page changed, ...)
 If you're able to know that some errors are due to the application (e.g: an application failure redirects you to an error page), then retrying is useless (it takes more time, and retry may hide the failure)

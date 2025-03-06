@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 
+import com.seleniumtests.core.SeleniumTestsContext;
 import org.apache.commons.io.FileUtils;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
@@ -37,8 +38,8 @@ public class TestScreenshot extends GenericTest {
 		File tmpHtmlFile = File.createTempFile("html", ".html");
 		ScreenShot screenshot = new ScreenShot(tmpImgFile, tmpHtmlFile);
 		
-		Assert.assertTrue(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR, tmpImgFile.getName()).toFile().exists());
-		Assert.assertTrue(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.HTML_DIR, tmpHtmlFile.getName()).toFile().exists());
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getScreenshotOutputDirectory(), tmpImgFile.getName()).toFile().exists());
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getHtmlsOutputDirectory(), tmpHtmlFile.getName()).toFile().exists());
 		Assert.assertNotNull(screenshot.getImage());
 		Assert.assertNotNull(screenshot.getHtml());
 	}
@@ -50,16 +51,16 @@ public class TestScreenshot extends GenericTest {
 	@Test(groups= {"ut"})
 	public void testScreenshotFilePresent() throws IOException {
 		File tmpImgFile = File.createTempFile("img", ".png");
-		File newImgPath = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR, tmpImgFile.getName()).toFile();
+		File newImgPath = Paths.get(SeleniumTestsContextManager.getThreadContext().getScreenshotOutputDirectory(), tmpImgFile.getName()).toFile();
 		FileUtils.moveFile(tmpImgFile, newImgPath);
 		File tmpHtmlFile = File.createTempFile("html", ".html");
-		File newHtmlPath = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.HTML_DIR, tmpHtmlFile.getName()).toFile();
+		File newHtmlPath = Paths.get(SeleniumTestsContextManager.getThreadContext().getHtmlsOutputDirectory(), tmpHtmlFile.getName()).toFile();
 		FileUtils.moveFile(tmpHtmlFile, newHtmlPath);
 		
 		ScreenShot screenshot = new ScreenShot(newImgPath, newHtmlPath);
 		
-		Assert.assertTrue(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR, tmpImgFile.getName()).toFile().exists());
-		Assert.assertTrue(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.HTML_DIR, tmpHtmlFile.getName()).toFile().exists());
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getScreenshotOutputDirectory(), tmpImgFile.getName()).toFile().exists());
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getHtmlsOutputDirectory(), tmpHtmlFile.getName()).toFile().exists());
 		Assert.assertNotNull(screenshot.getImage());
 		Assert.assertNotNull(screenshot.getHtml());
 	}
@@ -72,7 +73,7 @@ public class TestScreenshot extends GenericTest {
 		ScreenShot screenshot = new ScreenShot(tmpImgFile, tmpHtmlFile);
 		
 		Assert.assertNull(screenshot.getImage());
-		Assert.assertTrue(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.HTML_DIR, tmpHtmlFile.getName()).toFile().exists());
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getHtmlsOutputDirectory(), tmpHtmlFile.getName()).toFile().exists());
 	}
 	
 	@Test(groups= {"ut"})
@@ -82,7 +83,7 @@ public class TestScreenshot extends GenericTest {
 		tmpHtmlFile.delete();
 		ScreenShot screenshot = new ScreenShot(tmpImgFile, tmpHtmlFile);
 		
-		Assert.assertTrue(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR, tmpImgFile.getName()).toFile().exists());
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getScreenshotOutputDirectory(), tmpImgFile.getName()).toFile().exists());
 		Assert.assertNull(screenshot.getHtml());
 	}
 	
@@ -91,7 +92,7 @@ public class TestScreenshot extends GenericTest {
 		File tmpImgFile = File.createTempFile("img", ".png");
 		ScreenShot screenshot = new ScreenShot(tmpImgFile, null);
 		
-		Assert.assertTrue(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR, tmpImgFile.getName()).toFile().exists());
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getScreenshotOutputDirectory(), tmpImgFile.getName()).toFile().exists());
 	}
 	
 	@Test(groups= {"ut"})
@@ -100,7 +101,7 @@ public class TestScreenshot extends GenericTest {
 		ScreenShot screenshot = new ScreenShot(null, tmpHtmlFile);
 		
 		Assert.assertNull(screenshot.getImage());
-		Assert.assertTrue(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.HTML_DIR, tmpHtmlFile.getName()).toFile().exists());
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getHtmlsOutputDirectory(), tmpHtmlFile.getName()).toFile().exists());
 	}
 	
 	@Test(groups= {"ut"})
@@ -110,7 +111,7 @@ public class TestScreenshot extends GenericTest {
 		ScreenShot screenshot = new ScreenShot(tmpImgFile, tmpHtmlFile, "foo");
 		
 		Assert.assertTrue(Paths.get(screenshot.getOutputDirectory(), "foo", tmpImgFile.getName()).toFile().exists());
-		Assert.assertTrue(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.HTML_DIR, tmpHtmlFile.getName()).toFile().exists());
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getHtmlsOutputDirectory(), tmpHtmlFile.getName()).toFile().exists());
 	}
 	
 	@Test(groups= {"ut"})
@@ -119,8 +120,8 @@ public class TestScreenshot extends GenericTest {
 		BufferedImage img = ImageIO.read(Thread.currentThread().getContextClassLoader().getResourceAsStream("tu/ffLogo1.png"));
 		ScreenShot screenshot = new ScreenShot(img, "<html>");
 		
-		Assert.assertEquals(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR).toFile().listFiles().length, 1);
-		Assert.assertEquals(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.HTML_DIR).toFile().listFiles().length, 1);
+		Assert.assertEquals(Paths.get(SeleniumTestsContextManager.getThreadContext().getScreenshotOutputDirectory()).toFile().listFiles().length, 1);
+		Assert.assertEquals(Paths.get(SeleniumTestsContextManager.getThreadContext().getHtmlsOutputDirectory()).toFile().listFiles().length, 1);
 		Assert.assertNotNull(screenshot.getImage());
 		Assert.assertNotNull(screenshot.getHtml());
 	}
@@ -129,8 +130,8 @@ public class TestScreenshot extends GenericTest {
 
 		ScreenShot screenshot = new ScreenShot(null, "<html>");
 		
-		Assert.assertNull(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR).toFile().listFiles()); // listFiles returns null if directory does not exist
-		Assert.assertEquals(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.HTML_DIR).toFile().listFiles().length, 1);
+		Assert.assertNull(Paths.get(SeleniumTestsContextManager.getThreadContext().getScreenshotOutputDirectory()).toFile().listFiles()); // listFiles returns null if directory does not exist
+		Assert.assertEquals(Paths.get(SeleniumTestsContextManager.getThreadContext().getHtmlsOutputDirectory()).toFile().listFiles().length, 1);
 		Assert.assertNull(screenshot.getImage());
 		Assert.assertNotNull(screenshot.getHtml());
 	}
@@ -140,8 +141,8 @@ public class TestScreenshot extends GenericTest {
 		BufferedImage img = ImageIO.read(Thread.currentThread().getContextClassLoader().getResourceAsStream("tu/ffLogo1.png"));
 		ScreenShot screenshot = new ScreenShot(img, null);
 		
-		Assert.assertEquals(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR).toFile().listFiles().length, 1);
-		Assert.assertNull(Paths.get(screenshot.getOutputDirectory(), ScreenshotUtil.HTML_DIR).toFile().listFiles()); // listFiles returns 'null' when directory does not exist
+		Assert.assertEquals(Paths.get(SeleniumTestsContextManager.getThreadContext().getScreenshotOutputDirectory()).toFile().listFiles().length, 1);
+		Assert.assertNull(Paths.get(SeleniumTestsContextManager.getThreadContext().getHtmlsOutputDirectory()).toFile().listFiles()); // listFiles returns 'null' when directory does not exist
 		Assert.assertNotNull(screenshot.getImage());
 		Assert.assertNull(screenshot.getHtml());
 	}
@@ -178,8 +179,8 @@ public class TestScreenshot extends GenericTest {
 		ScreenShot s = new ScreenShot(createFileFromResource("tu/ffLogo1.png"));
 		String fileName = s.getImageName();
 		s.relocate(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out").toString());
-		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out", ScreenshotUtil.SCREENSHOT_DIR, fileName).toFile().exists());
-		Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR, fileName).toFile().exists());
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out", SeleniumTestsContext.SCREENSHOT_DIRECTORY, fileName).toFile().exists());
+		Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(),SeleniumTestsContext.SCREENSHOT_DIRECTORY, fileName).toFile().exists());
 	}
 	
 	/**
@@ -191,10 +192,10 @@ public class TestScreenshot extends GenericTest {
 		FileUtils.deleteDirectory(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
 		
 		ScreenShot s = new ScreenShot(createFileFromResource("tu/ffLogo1.png"), null, "video");
-		s.relocate(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), Paths.get(ScreenshotUtil.SCREENSHOT_DIR, "foo.jpg").toString(), null);
-		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR, "foo.jpg").toFile().exists());
+		s.relocate(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), Paths.get(SeleniumTestsContext.SCREENSHOT_DIRECTORY, "foo.jpg").toString(), null);
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getScreenshotOutputDirectory(), "foo.jpg").toFile().exists());
 		Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "video", "foo.jpg").toFile().exists());
-		Assert.assertEquals(s.getImagePath(),  ScreenshotUtil.SCREENSHOT_DIR + "/foo.jpg");
+		Assert.assertEquals(s.getImagePath(),  SeleniumTestsContext.SCREENSHOT_DIRECTORY + "/foo.jpg");
 	}
 	
 	/**
@@ -207,7 +208,7 @@ public class TestScreenshot extends GenericTest {
 		FileUtils.deleteDirectory(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out").toFile());
 		
 		File imageFile = createFileFromResource("tu/ffLogo1.png");
-		FileUtils.copyFile(imageFile, Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out", ScreenshotUtil.SCREENSHOT_DIR, imageFile.getName()).toFile());
+		FileUtils.copyFile(imageFile, Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out", SeleniumTestsContext.SCREENSHOT_DIRECTORY, imageFile.getName()).toFile());
 		ScreenShot s = new ScreenShot(imageFile);
 		s.relocate(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out").toString());
 		
@@ -249,8 +250,8 @@ public class TestScreenshot extends GenericTest {
 		File htmlFile = createFileFromResource("tu/test.html");
 		ScreenShot s = new ScreenShot(null, htmlFile);
 		s.relocate(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out").toString());
-		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out", ScreenshotUtil.HTML_DIR, htmlFile.getName()).toFile().exists());
-		Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.HTML_DIR, htmlFile.getName()).toFile().exists());
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out", SeleniumTestsContext.HTML_DIRECTORY, htmlFile.getName()).toFile().exists());
+		Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getThreadContext().getHtmlsOutputDirectory(), htmlFile.getName()).toFile().exists());
 	}
 	
 	/**
@@ -263,10 +264,10 @@ public class TestScreenshot extends GenericTest {
 		
 		File htmlFile = createFileFromResource("tu/test.html");
 		ScreenShot s = new ScreenShot(null, htmlFile);
-		s.relocate(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), null, Paths.get(ScreenshotUtil.SCREENSHOT_DIR, "test.html").toString());
-		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.SCREENSHOT_DIR, "test.html").toFile().exists());
-		Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), ScreenshotUtil.HTML_DIR, htmlFile.getName()).toFile().exists());
-		Assert.assertEquals(s.getHtmlSourcePath(),  ScreenshotUtil.SCREENSHOT_DIR + "/test.html");
+		s.relocate(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), null, Paths.get(SeleniumTestsContext.HTML_DIRECTORY, "test.html").toString());
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getHtmlsOutputDirectory(), "test.html").toFile().exists());
+		Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getThreadContext().getHtmlsOutputDirectory(), htmlFile.getName()).toFile().exists());
+		Assert.assertEquals(s.getHtmlSourcePath(),  SeleniumTestsContext.HTML_DIRECTORY + "/test.html");
 	}
 	
 	/**
@@ -279,7 +280,7 @@ public class TestScreenshot extends GenericTest {
 		FileUtils.deleteDirectory(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out").toFile());
 		
 		File htmlFile = createFileFromResource("tu/test.html");
-		FileUtils.copyFile(htmlFile, Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out", ScreenshotUtil.HTML_DIR, htmlFile.getName()).toFile());
+		FileUtils.copyFile(htmlFile, Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out", SeleniumTestsContext.HTML_DIRECTORY, htmlFile.getName()).toFile());
 		ScreenShot s = new ScreenShot(htmlFile);
 		s.relocate(Paths.get(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory(), "out").toString());
 	}

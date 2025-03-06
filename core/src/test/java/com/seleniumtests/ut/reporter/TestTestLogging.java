@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.seleniumtests.core.SeleniumTestsContext;
 import org.apache.commons.io.FileUtils;
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -106,7 +107,7 @@ public class TestTestLogging extends GenericTest {
 			
 			// relocate
 			TestStepManager.getParentTestStep().getSnapshots().get(0).relocate(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved");
-			File movedFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved", ScreenshotUtil.HTML_DIR, initialFile.getName()).toFile();
+			File movedFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved", SeleniumTestsContext.HTML_DIRECTORY, initialFile.getName()).toFile();
 	
 			Assert.assertTrue(movedFile.exists());
 			Assert.assertFalse(initialFile.exists());
@@ -136,7 +137,7 @@ public class TestTestLogging extends GenericTest {
 			
 			// relocate
 			TestStepManager.getParentTestStep().getSnapshots().get(0).relocate(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved");
-			File movedFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved", ScreenshotUtil.SCREENSHOT_DIR, initialFile.getName()).toFile();
+			File movedFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved", SeleniumTestsContext.SCREENSHOT_DIRECTORY, initialFile.getName()).toFile();
 
 			Assert.assertTrue(movedFile.exists());
 			Assert.assertFalse(initialFile.exists());

@@ -121,6 +121,7 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
             	options.setCapability(SeleniumRobotCapabilityType.NODE_TAGS, webDriverConfig.getNodeTags());
             }
             options.setCapability(SeleniumRobotCapabilityType.BETA_BROWSER, webDriverConfig.getBetaBrowser());
+
             updateGridOptionsWithSelectedBrowserInfo(options);
         }
 
