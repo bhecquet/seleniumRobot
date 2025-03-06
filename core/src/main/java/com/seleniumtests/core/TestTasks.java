@@ -18,7 +18,11 @@
 package com.seleniumtests.core;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
@@ -401,22 +405,32 @@ public class TestTasks {
 	public static File getDownloadedFile(String fileName) {
 		logger.info("try downloading file " + fileName);
 		if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.LOCAL) {
-			return null;
+			Instant end = Instant.now().plusSeconds(10);
+			Optional<File> optionalName = Optional.empty();
+			do {
+				WaitHelper.waitForMilliSeconds(500);
+				try {
+					optionalName = Files.list(Paths.get(SeleniumTestsContextManager.getThreadContext().getDownloadOutputDirectory()))
+							.filter(path -> path.toFile().getName().contains(fileName))
+							.map(Path::toFile)
+							.findFirst();
+				} catch (NullPointerException | IOException e) {}
+			} while (optionalName.isEmpty() && end.isAfter(Instant.now()));
+			return optionalName.orElse(null);
 		} else {
 			SeleniumGridConnector gridConnector = SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector();
 			if (gridConnector != null) {
-
-				List<String> fileNames = gridConnector.listFilesToDownload();
 
 				Optional<String> optionalName;
 				Instant end = Instant.now().plusSeconds(10);
 				do {
 					WaitHelper.waitForMilliSeconds(500);
+					List<String> fileNames = gridConnector.listFilesToDownload();
 					optionalName = fileNames.stream()
 							.filter(name -> name.contains(fileName))
 							.findFirst();
 				} while (!optionalName.isPresent() && end.isAfter(Instant.now()));
-				return optionalName.map(name -> gridConnector.downloadFileFromName(name))
+				return optionalName.map(name -> gridConnector.downloadFileFromName(name, new File(SeleniumTestsContextManager.getThreadContext().getDownloadOutputDirectory())))
 						.orElse(null);
 
 			} else {

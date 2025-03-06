@@ -250,7 +250,7 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateMarionetteCapabilitiesOverrideDownloadDir() throws IOException {
 		
-		when(config.getBrowserDownloadDir()).thenReturn("/home/download");
+		when(config.getDownloadOutputDirectory()).thenReturn("/home/download");
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
@@ -273,7 +273,7 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateMarionetteCapabilitiesNoOverrideDownloadDirRemote() throws IOException {
 		
-		when(config.getBrowserDownloadDir()).thenReturn("/home/download");
+		when(config.getDownloadOutputDirectory()).thenReturn("/home/download");
 		when(config.getMode()).thenReturn(DriverMode.GRID);
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();

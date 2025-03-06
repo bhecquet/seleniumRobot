@@ -127,8 +127,8 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
             profile.setPreference("network.automatic-ntlm-auth.trusted-uris", webDriverConfig.getNtlmAuthTrustedUris());
         }
 
-        if (webDriverConfig.getBrowserDownloadDir() != null && webDriverConfig.getMode() == DriverMode.LOCAL) {
-            profile.setPreference("browser.download.dir", webDriverConfig.getBrowserDownloadDir());
+        if (webDriverConfig.getDownloadOutputDirectory() != null && webDriverConfig.getMode() == DriverMode.LOCAL) {
+            profile.setPreference("browser.download.dir", webDriverConfig.getDownloadOutputDirectory());
             profile.setPreference("browser.download.folderList", 2);
             profile.setPreference("browser.download.manager.showWhenStarting", false);
             profile.setPreference("browser.helperApps.neverAsk.saveToDisk",

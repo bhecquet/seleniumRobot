@@ -23,13 +23,24 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.*;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
+import org.apache.commons.lang3.stream.Streams;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.openqa.selenium.remote.SessionId;
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -924,6 +935,161 @@ public class TestTestTasks extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("foofoo", new TestVariable("foofoo", "barbar"));
 		SeleniumTestsContextManager.getGlobalContext().getConfiguration().put("foobar", new TestVariable("foobar", "barbar2"));
 		Assert.assertEquals(TestTasks.param(Pattern.compile("foo"), Pattern.compile("rbba")), "");
+	}
+
+	@Test(groups= {"ut"})
+	public void testDownloadFileLocal(final ITestContext testNGCtx) {
+		try (MockedStatic mockedFiles = mockStatic(Files.class)) {
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "local");
+			mockedFiles.when(() -> Files.list(any(Path.class))).thenReturn(List.of(new File("file1.pdf").toPath(), new File("file2.pdf").toPath()).stream());
+			initThreadContext(testNGCtx);
+			File file = TestTasks.getDownloadedFile("file1.pdf");
+			Assert.assertEquals(file.getName(), "file1.pdf");
+		} finally {
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+		}
+	}
+	@Test(groups= {"ut"})
+	public void testDownloadFileLocalNoFile(final ITestContext testNGCtx) {
+		try (MockedStatic mockedFiles = mockStatic(Files.class)) {
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "local");
+			mockedFiles.when(() -> Files.list(any(Path.class))).thenAnswer((Answer<Stream>) invocation -> {
+                return new ArrayList<>().stream();
+            }
+            );
+			initThreadContext(testNGCtx);
+			Instant start = Instant.now();
+			File file = TestTasks.getDownloadedFile("file1.pdf");
+			Assert.assertNull(file);
+			Assert.assertTrue(Instant.now().minusSeconds(9).isAfter(start));
+		} finally {
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+		}
+	}
+
+	/**
+	 * Exception thrown when accessing file system
+	 * @param testNGCtx
+	 */
+	@Test(groups= {"ut"})
+	public void testDownloadFileLocalNoFile2(final ITestContext testNGCtx) {
+		try (MockedStatic mockedFiles = mockStatic(Files.class)) {
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "local");
+			mockedFiles.when(() -> Files.list(any(Path.class))).thenThrow(new IOException());
+			initThreadContext(testNGCtx);
+			Instant start = Instant.now();
+			File file = TestTasks.getDownloadedFile("file1.pdf");
+			Assert.assertNull(file);
+			Assert.assertTrue(Instant.now().minusSeconds(9).isAfter(start));
+		} finally {
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+		}
+	}
+
+	@Test(groups= {"ut"})
+	public void testDownloadFileLocalWithTimeout(final ITestContext testNGCtx) {
+		try (MockedStatic mockedOsCommand = mockStatic(OSCommand.class)) {
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "local");
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(ArgumentMatchers.any(String[].class), eq(35), isNull())).thenReturn("hello guys");
+			initThreadContext(testNGCtx);
+			String response = TestTasks.executeCommand("echo", 35, null, "hello");
+			Assert.assertEquals(response, "hello guys");
+
+
+		} finally {
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+		}
+	}
+
+	@Test(groups= {"ut"})
+	public void testDownloadFileGrid(final ITestContext testNGCtx) {
+		File file = downloadFileWithGrid(testNGCtx, List.of("file1.pdf", "file2.pdf"), "file1.pdf");
+		Assert.assertEquals(file.getName(), "file1.pdf");
+	}
+	@Test(groups= {"ut"})
+	public void testDownloadFileGridNoFile(final ITestContext testNGCtx) {
+		File file = downloadFileWithGrid(testNGCtx, new ArrayList<>(), "file1.pdf");
+		Assert.assertNull(file);
+	}
+	@Test(groups= {"ut"})
+	public void testDownloadFileGridPartialName(final ITestContext testNGCtx) {
+		File file = downloadFileWithGrid(testNGCtx, List.of("file1.pdf", "file2.pdf"), "file1");
+		Assert.assertEquals(file.getName(), "file1.pdf");
+	}
+	@Test(groups= {"ut"} ,expectedExceptions = ScenarioException.class, expectedExceptionsMessageRegExp = "No grid connector active")
+	public void testDownloadFileGridNoGrid(final ITestContext testNGCtx) {
+
+		try (MockedStatic mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
+			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd"))).thenReturn(new ArrayList<>());
+
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
+			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/hub/wd");
+			initThreadContext(testNGCtx);
+
+			SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnectors();
+			TestTasks.getDownloadedFile("file1.pdf");
+		} finally {
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
+		}
+
+	}
+
+	/**
+	 * In case download takes time, wait until 10 secs
+	 * @param testNGCtx
+	 */
+	@Test(groups= {"ut"})
+	public void testDownloadBigFile(final ITestContext testNGCtx) {
+		SeleniumGridConnector gridConnector = spy(new SeleniumRobotGridConnector("http://localhost:4444/hub/wd"));
+		gridConnector.setNodeUrl("http://localhost:5555/hub/wd");
+		doReturn(new ArrayList<>(), new ArrayList<>(), List.of("file1.pdf")).when(gridConnector).listFilesToDownload();
+		when(gridConnector.downloadFileFromName(eq("file1.pdf"), any(File.class))).thenReturn(new File("file1.pdf"));
+
+		// grid connector is in use only if session Id exists
+		doReturn(new SessionId("1234")).when(gridConnector).getSessionId();
+
+		try (MockedStatic mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
+			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd"))).thenReturn(Arrays.asList(gridConnector));
+
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
+			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/hub/wd");
+			initThreadContext(testNGCtx);
+
+			SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnectors();
+			File file =  TestTasks.getDownloadedFile("file1.pdf");
+			Assert.assertEquals(file.getName(), "file1.pdf");
+			verify(gridConnector, times(3)).listFilesToDownload();
+
+		} finally {
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
+		}
+	}
+
+	private File downloadFileWithGrid(ITestContext testNGCtx, List<String> filesPresentOnGrid, String fileToDownload) {
+		SeleniumGridConnector gridConnector = spy(new SeleniumRobotGridConnector("http://localhost:4444/hub/wd"));
+		gridConnector.setNodeUrl("http://localhost:5555/hub/wd");
+		doReturn(filesPresentOnGrid).when(gridConnector).listFilesToDownload();
+		when(gridConnector.downloadFileFromName(eq("file1.pdf"), any(File.class))).thenReturn(new File("file1.pdf"));
+
+		// grid connector is in use only if session Id exists
+		doReturn(new SessionId("1234")).when(gridConnector).getSessionId();
+
+		try (MockedStatic mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
+			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd"))).thenReturn(Arrays.asList(gridConnector));
+
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
+			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/hub/wd");
+			initThreadContext(testNGCtx);
+
+			SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnectors();
+			return TestTasks.getDownloadedFile(fileToDownload);
+
+		} finally {
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
+		}
 	}
 
 }

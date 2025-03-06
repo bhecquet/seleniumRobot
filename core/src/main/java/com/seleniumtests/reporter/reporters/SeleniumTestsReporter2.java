@@ -68,7 +68,6 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
  */
 public class SeleniumTestsReporter2 extends CommonReporter implements IReporter {
 
-	public static final String RESOURCES_FOLDER = "resources";
 	private static final String STATUS = "status";
 	private static final String HEADER = "header";
 	private static final String APPLICATION = "application";
@@ -189,10 +188,10 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			copyResources();
 			
 			// issue #284: copy resources specific to the single test report. They are moved here so that the file can be used without global resources
-			FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream("reporter/templates/seleniumRobot_solo.css"), Paths.get(testContext.getOutputDirectory(), RESOURCES_FOLDER, "seleniumRobot_solo.css").toFile());
-			FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream("reporter/templates/app.min.js"), Paths.get(testContext.getOutputDirectory(), RESOURCES_FOLDER, "app.min.js").toFile());
+			FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream("reporter/templates/seleniumRobot_solo.css"), Paths.get(testContext.getResourcesOutputDirectory(), "seleniumRobot_solo.css").toFile());
+			FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream("reporter/templates/app.min.js"), Paths.get(testContext.getResourcesOutputDirectory(), "app.min.js").toFile());
 			if (!SeleniumTestsContextManager.getGlobalContext().getOptimizeReports()) {
-				FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream("reporter/templates/iframeResizer.min.js"), Paths.get(testContext.getOutputDirectory(), RESOURCES_FOLDER, "iframeResizer.min.js").toFile());
+				FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream("reporter/templates/iframeResizer.min.js"), Paths.get(testContext.getResourcesOutputDirectory(), "iframeResizer.min.js").toFile());
 			}
 			
 			generateExecutionReport(testContext, testResult, getTestStatus(testResult), resourcesFromCdn);
@@ -350,7 +349,6 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 	/**
 	 * @param testResult
 	 * @param context
-	 * @param testSteps
 	 */
 	private void fillContextWithSteps(ITestResult testResult, VelocityContext context) {
 		List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();

@@ -19,6 +19,8 @@ package com.seleniumtests.browserfactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,6 +29,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import io.appium.java_client.android.options.UiAutomator2Options;
 import io.appium.java_client.android.options.context.SupportsChromedriverExecutableOption;
 import org.openqa.selenium.MutableCapabilities;
@@ -154,23 +158,22 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 		}
 
 		// configure options for file download
-
 		if (webDriverConfig.getMode() == DriverMode.LOCAL) {
 			// inspired by LocalNode.java
-			File tempDir = null;
-			try {
-				tempDir = TemporaryFilesystem.getDefaultTmpFS().createTempDir("selenium", "");
-			} catch (Exception e) {
-				logger.warn("Download dir not created, downloading file may not be available: " + e.getMessage());
-			}
-			experientalOptions.putAll(
-					Map.of(
-							"download.prompt_for_download",
-							false,
-							"download.default_directory",
-							tempDir.getAbsolutePath(),
-							"savefile.default_directory",
-							tempDir.getAbsolutePath()));
+			Path downloadDir;
+            try {
+                downloadDir = Files.createDirectories(Paths.get(webDriverConfig.getDownloadOutputDirectory()));
+				experientalOptions.putAll(
+						Map.of(
+								"download.prompt_for_download",
+								false,
+								"download.default_directory",
+								downloadDir.toAbsolutePath().toString(),
+								"savefile.default_directory",
+								downloadDir.toAbsolutePath().toString()));
+            } catch (IOException e) {
+                logger.error("Error creating 'downloads' directory: " + e.getMessage());
+            }
 		} else {
 			options.setEnableDownloads(true);
 		}

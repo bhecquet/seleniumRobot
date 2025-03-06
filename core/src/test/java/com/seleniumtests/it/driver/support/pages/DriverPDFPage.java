@@ -40,6 +40,10 @@ public class DriverPDFPage extends PageObject {
         super(link, url);
 	}
 
+	public DriverPDFPage(BrowserType browserType) {
+		super(link, getPageUrl(browserType), browserType, "main", null);
+	}
+
 	public DriverPDFPage clickPDF() {
 		link.click();
 		return this;
@@ -48,5 +52,13 @@ public class DriverPDFPage extends PageObject {
 	public DriverPDFPage clickPDFToDownload() {
 		linkDownload.click();
 		return this;
+	}
+
+	public static String getPageUrl(BrowserType browserType) {
+		if (browserType == BrowserType.FIREFOX) {
+			return "file://" + Thread.currentThread().getContextClassLoader().getResource("tu/testpdf.html").getFile();
+		} else {
+			return "file:///" + Thread.currentThread().getContextClassLoader().getResource("tu/testpdf.html").getFile();
+		}
 	}
 }

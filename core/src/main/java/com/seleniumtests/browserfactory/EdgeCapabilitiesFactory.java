@@ -17,6 +17,9 @@
  */
 package com.seleniumtests.browserfactory;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,6 +47,7 @@ public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
 	protected MutableCapabilities getDriverOptions() {
         
         EdgeOptions options = new EdgeOptions();
+		Map<String, Object> experientalOptions = new HashMap<>();
         
         if (webDriverConfig.getUserAgentOverride() != null) {
             options.addArguments("--user-agent=" + webDriverConfig.getUserAgentOverride());
@@ -73,6 +77,27 @@ public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
 			}
 		}
 
+		// configure options for file download
+		if (webDriverConfig.getMode() == DriverMode.LOCAL) {
+			// inspired by LocalNode.java
+			Path downloadDir;
+			try {
+				downloadDir = Files.createDirectories(Paths.get(webDriverConfig.getDownloadOutputDirectory()));
+				experientalOptions.putAll(
+						Map.of(
+								"download.prompt_for_download",
+								false,
+								"download.default_directory",
+								downloadDir.toAbsolutePath().toString(),
+								"savefile.default_directory",
+								downloadDir.toAbsolutePath().toString()));
+			} catch (IOException e) {
+				logger.error("Error creating 'downloads' directory: " + e.getMessage());
+			}
+		} else {
+			options.setEnableDownloads(true);
+		}
+
 		options.addArguments(edgeOptions);
 
         if (webDriverConfig.getMode() == DriverMode.LOCAL) {
@@ -83,11 +108,12 @@ public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
         	options.setExperimentalOption("debuggerAddress", "127.0.0.1:" + webDriverConfig.getAttachExistingDriverPort());
         } else {
         	 // issue #480: disable "restore pages" popup, but not when we attach an existing browser as it crashes driver (from invalid argument: cannot parse capability: goog:chromeOptions, from invalid argument: unrecognized chrome option: prefs)
-            Map<String, Object> prefs = new HashMap<>();
-            prefs.put("profile.exit_type", "Normal");
-            options.setExperimentalOption("prefs", prefs);
+			experientalOptions.put("profile.exit_type", "Normal");
             
         }
+		if (!experientalOptions.isEmpty()) {
+			options.setExperimentalOption("prefs", experientalOptions);
+		}
 
         options.setPageLoadStrategy(webDriverConfig.getPageLoadStrategy());
         

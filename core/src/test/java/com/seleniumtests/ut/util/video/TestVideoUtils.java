@@ -46,7 +46,7 @@ public class TestVideoUtils extends GenericTest {
 		step.setVideoTimeStamp(1000);
 		Assert.assertEquals(step.getSnapshots().size(), 0);
 		
-		VideoUtils.extractReferenceForSteps(createVideoFileFromResource("tu/env.ini"), Arrays.asList(step), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
+		VideoUtils.extractReferenceForSteps(createVideoFileFromResource("tu/env.ini"), Arrays.asList(step), Paths.get(SeleniumTestsContextManager.getThreadContext().getVideoOutputDirectory()));
 		
 	}
 	
@@ -65,7 +65,7 @@ public class TestVideoUtils extends GenericTest {
 		step.setVideoTimeStamp(1000);
 		Assert.assertEquals(step.getSnapshots().size(), 0);
 		
-		VideoUtils.extractReferenceForSteps(createVideoFileFromResource("tu/video/videoCapture.avi"), Arrays.asList(step), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
+		VideoUtils.extractReferenceForSteps(createVideoFileFromResource("tu/video/videoCapture.avi"), Arrays.asList(step), Paths.get(SeleniumTestsContextManager.getThreadContext().getVideoOutputDirectory()));
 		
 		Assert.assertEquals(step.getSnapshots().size(), 1);
 		Assert.assertEquals(step.getSnapshots().get(0).getName(), "Step beginning state");
@@ -87,7 +87,7 @@ public class TestVideoUtils extends GenericTest {
 		step.setVideoTimeStamp(100000);
 		Assert.assertEquals(step.getSnapshots().size(), 0);
 		
-		VideoUtils.extractReferenceForSteps(createVideoFileFromResource("tu/video/videoCapture.avi"), Arrays.asList(step), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
+		VideoUtils.extractReferenceForSteps(createVideoFileFromResource("tu/video/videoCapture.avi"), Arrays.asList(step), Paths.get(SeleniumTestsContextManager.getThreadContext().getVideoOutputDirectory()));
 		
 		Assert.assertEquals(step.getSnapshots().size(), 0);
 		
@@ -108,7 +108,7 @@ public class TestVideoUtils extends GenericTest {
 		step.setVideoTimeStamp(1000);
 		Assert.assertEquals(step.getSnapshots().size(), 0);
 		
-		VideoUtils.extractReferenceForSteps(createVideoFileFromResource("tu/video/videoCapture.avi"), Arrays.asList(step), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
+		VideoUtils.extractReferenceForSteps(createVideoFileFromResource("tu/video/videoCapture.avi"), Arrays.asList(step), Paths.get(SeleniumTestsContextManager.getThreadContext().getVideoOutputDirectory()));
 		
 		Assert.assertEquals(step.getSnapshots().size(), 0);
 		
@@ -133,7 +133,7 @@ public class TestVideoUtils extends GenericTest {
 		Assert.assertEquals(step.getSnapshots().size(), 0);
 		Assert.assertEquals(step2.getSnapshots().size(), 0);
 		
-		VideoUtils.extractReferenceForSteps(createVideoFileFromResource("tu/video/videoCapture.avi"), Arrays.asList(step, step2), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()));
+		VideoUtils.extractReferenceForSteps(createVideoFileFromResource("tu/video/videoCapture.avi"), Arrays.asList(step, step2), Paths.get(SeleniumTestsContextManager.getThreadContext().getVideoOutputDirectory()));
 		
 		Assert.assertEquals(step.getSnapshots().size(), 0);
 		Assert.assertEquals(step2.getSnapshots().size(), 1);

@@ -141,7 +141,6 @@ public class SeleniumTestsContext {
     public static final String SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER = "setAssumeUntrustedCertificateIssuer"; // Firefox uniquement pour qu'il ne prenne pas en compte les certificats invalides 
     public static final String SET_ACCEPT_UNTRUSTED_CERTIFICATES = "setAcceptUntrustedCertificates"; // Firefox uniquement pour qu'il ne prenne pas en compte les certificats invalides
     public static final String NTLM_AUTH_TRUSTED_URIS = "ntlmAuthTrustedUris";	// Firefox uniquement
-    public static final String BROWSER_DOWNLOAD_DIR = "browserDownloadDir";		// répertoire où seront enregistrés les fichiers
 
     public static final String SNAPSHOT_TOP_CROPPING = "snapshotTopCropping";
     public static final String SNAPSHOT_BOTTOM_CROPPING = "snapshotBottomCropping";
@@ -266,8 +265,14 @@ public class SeleniumTestsContext {
     
     public static final int DEFAULT_REPLAY_TIME_OUT = 30;
     public static final int DEFAULT_ACTION_DELAY = 200;
-    
-	
+
+    public static final String VIDEO_DIRECTORY = "video";
+    public static final String SCREENSHOT_DIRECTORY = "screenshots";
+    public static final String RESOURCES_DIRECTORY = "resources";
+    public static final String HTML_DIRECTORY = "htmls";
+    public static final String DOWNLOADS_DIRECTORY = "downloads";
+
+
 
 	// group of fields below must be copied in SeleniumTestsContext constructor because they are not rediscovered with 'configureContext' method
     // Data object to store all context data
@@ -404,7 +409,6 @@ public class SeleniumTestsContext {
         setAssumeUntrustedCertificateIssuer(getBoolValueForTest(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER, System.getProperty(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER)));
         setAcceptUntrustedCertificates(getBoolValueForTest(SET_ACCEPT_UNTRUSTED_CERTIFICATES, System.getProperty(SET_ACCEPT_UNTRUSTED_CERTIFICATES)));
         setNtlmAuthTrustedUris(getValueForTest(NTLM_AUTH_TRUSTED_URIS, System.getProperty(NTLM_AUTH_TRUSTED_URIS)));
-        setBrowserDownloadDir(getValueForTest(BROWSER_DOWNLOAD_DIR, System.getProperty(BROWSER_DOWNLOAD_DIR)));
         setCapabilities(getValueForTest(CAPABILITIES, System.getProperty(CAPABILITIES)));
         
         setOverrideSeleniumNativeAction(getBoolValueForTest(OVERRIDE_SELENIUM_NATIVE_ACTION, System.getProperty(OVERRIDE_SELENIUM_NATIVE_ACTION)));
@@ -1048,13 +1052,6 @@ public class SeleniumTestsContext {
         return obj;
     }
 
-    public String getBrowserDownloadDir() {
-        if (getAttribute(BROWSER_DOWNLOAD_DIR) != null) {
-            return (String) getAttribute(BROWSER_DOWNLOAD_DIR);
-        } else {
-            return this.getOutputDirectory() + "\\downloads\\";
-        }
-    }
     
     public Capabilities getCapabilities() {
     	return (Capabilities) getAttribute(CAPABILITIES);
@@ -1224,7 +1221,23 @@ public class SeleniumTestsContext {
     }
     
     public String getScreenshotOutputDirectory() {
-    	return Paths.get((String)getAttribute(OUTPUT_DIRECTORY), ScreenshotUtil.SCREENSHOT_DIR).toString();
+    	return Paths.get((String)getAttribute(OUTPUT_DIRECTORY), SCREENSHOT_DIRECTORY).toString();
+    }
+
+    public String getVideoOutputDirectory() {
+    	return Paths.get((String)getAttribute(OUTPUT_DIRECTORY), VIDEO_DIRECTORY).toString();
+    }
+
+    public String getDownloadOutputDirectory() {
+    	return Paths.get((String)getAttribute(OUTPUT_DIRECTORY), DOWNLOADS_DIRECTORY).toString();
+    }
+
+    public String getHtmlsOutputDirectory() {
+    	return Paths.get((String)getAttribute(OUTPUT_DIRECTORY), HTML_DIRECTORY).toString();
+    }
+
+    public String getResourcesOutputDirectory() {
+    	return Paths.get((String)getAttribute(OUTPUT_DIRECTORY), RESOURCES_DIRECTORY).toString();
     }
     
     public String getDefaultOutputDirectory() {
@@ -1978,11 +1991,7 @@ public class SeleniumTestsContext {
     public void setNtlmAuthTrustedUris(String uris) {
     	setAttribute(NTLM_AUTH_TRUSTED_URIS, uris);
     }
-    
-    public void setBrowserDownloadDir(String downloadDir) {
-    	setAttribute(BROWSER_DOWNLOAD_DIR, downloadDir);
-    }
-    
+
     public void setCapabilities(String capabilities) {
 
 		MutableCapabilities caps = new MutableCapabilities();

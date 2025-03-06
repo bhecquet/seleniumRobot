@@ -73,9 +73,6 @@ public class ScreenshotUtil {
     private CustomEventFiringWebDriver driver;
     private WebUIDriver uiDriver;
     private String filename;
-    public static final String SCREENSHOT_DIR = "screenshots";
-    public static final String HTML_DIR = "htmls";
-    
 
 	public ScreenshotUtil() {
 		uiDriver = WebUIDriver.getWebUIDriver(false);
@@ -722,7 +719,7 @@ public class ScreenshotUtil {
      */
     private File exportToFile(BufferedImage image) {
     	filename = HashCodeGenerator.getRandomHashCode("web");
-        String filePath = Paths.get(outputDirectory, SCREENSHOT_DIR, filename + ".png").toString();
+        String filePath = Paths.get(SeleniumTestsContextManager.getThreadContext().getScreenshotOutputDirectory(), filename + ".png").toString();
         FileUtility.writeImage(filePath, image);
         logger.debug("Captured image copied to " + filePath);
         return new File(filePath);

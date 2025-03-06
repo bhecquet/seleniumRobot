@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.it.stubclasses;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -368,5 +369,15 @@ public class StubTestClassForDriverTest extends StubParentClass {
 		new ImageDetectorPage()
 		._clickErrorButton();
 	}
+
+	@Test(groups="stub")
+	public void testDownloadFile() {
+		DriverPDFPage page = new DriverPDFPage(BrowserType.CHROME);
+		page.clickPDFToDownload();
+		File file = TestTasks.getDownloadedFile("nom-du-fichier.pdf");
+		Assert.assertTrue(file.exists());
+		logger.logFile(file, "PDF example");
+	}
+
 
 }

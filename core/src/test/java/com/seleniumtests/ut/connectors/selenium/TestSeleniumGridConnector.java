@@ -20,9 +20,18 @@ package com.seleniumtests.ut.connectors.selenium;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Base64;
+import java.util.List;
 
+import com.seleniumtests.customexception.ScenarioException;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
@@ -258,5 +267,202 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 		createServerMock("http://localhost:5555", "DELETE", "/se/grid/node/session/1234", 200, "some text");	
 		
 		Assert.assertTrue(connector.stopSession("1234"));
+	}
+
+
+	@Test(groups={"ut"})
+	public void testListFilesToDownload() {
+
+		createServerMock("GET", "/session/1234/se/files", 200, "{\n" +
+				"  \"value\": {\n" +
+				"    \"names\": [\n" +
+				"      \"Red-blue-green-channel.jpg\"\n" +
+				"    ]\n" +
+				"  }\n" +
+				"}\n");
+
+		SeleniumGridConnector connector = spy(new SeleniumGridConnector(SERVER_URL));
+		connector.setNodeUrl("http://localhost:4421");
+		connector.setSessionId(new SessionId("1234"));
+
+		List<String> fileNames = connector.listFilesToDownload();
+		Assert.assertEquals(fileNames.size(), 1);
+		Assert.assertEquals(fileNames.get(0), "Red-blue-green-channel.jpg");
+	}
+
+	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class)
+	public void testListFilesToDownloadNodeUrlNull() {
+
+		createServerMock("GET", "/session/1234/se/files", 200, "{\n" +
+				"  \"value\": {\n" +
+				"    \"names\": [\n" +
+				"      \"Red-blue-green-channel.jpg\"\n" +
+				"    ]\n" +
+				"  }\n" +
+				"}\n");
+
+		SeleniumGridConnector connector = spy(new SeleniumGridConnector(SERVER_URL));
+
+
+		List<String> fileNames = connector.listFilesToDownload();
+	}
+
+	@Test(groups={"ut"})
+	public void testListFilesToDownloadNoFile() {
+
+		createServerMock("GET", "/session/1234/se/files", 200, "{\n" +
+				"  \"value\": {\n" +
+				"    \"names\": [\n" +
+				"    ]\n" +
+				"  }\n" +
+				"}\n");
+
+		SeleniumGridConnector connector = spy(new SeleniumGridConnector(SERVER_URL));
+		connector.setNodeUrl("http://localhost:4421");
+		connector.setSessionId(new SessionId("1234"));
+
+		List<String> fileNames = connector.listFilesToDownload();
+		Assert.assertEquals(fileNames.size(), 0);
+	}
+
+	@Test(groups={"ut"})
+	public void testListFilesToDownloadError() {
+
+		createServerMock("GET", "/session/1234/se/files", 200, "{\n" +
+				"  \"value\": {\n" +
+				"    \"message\": \"error\"," +
+				"  }\n" +
+				"}\n");
+
+		SeleniumGridConnector connector = spy(new SeleniumGridConnector(SERVER_URL));
+		connector.setNodeUrl("http://localhost:4421");
+		connector.setSessionId(new SessionId("1234"));
+
+		List<String> fileNames = connector.listFilesToDownload();
+		Assert.assertEquals(fileNames.size(), 0);
+	}
+
+	@Test(groups={"ut"})
+	public void testListFilesToDownloadError2() {
+
+		kong.unirest.HttpRequest<?> request = createServerMock("GET", "/session/1234/se/files", 500, "{}");
+		when(request.asJson()).thenThrow(UnirestException.class);
+
+		SeleniumGridConnector connector = spy(new SeleniumGridConnector(SERVER_URL));
+		connector.setNodeUrl("http://localhost:4421");
+		connector.setSessionId(new SessionId("1234"));
+
+		List<String> fileNames = connector.listFilesToDownload();
+		Assert.assertEquals(fileNames.size(), 0);
+	}
+
+	@Test(groups={"ut"})
+	public void testDownloadFileFromName() throws IOException, NoSuchFieldException, IllegalAccessException {
+
+		kong.unirest.HttpRequest<?> request = createServerMock("POST", "/session/1234/se/files", 200, "{\n" +
+				"  \"value\": {\n" +
+				"    \"filename\": \"foo.txt\",\n" +
+				"    \"contents\": \"UEsDBBQACAAIAC12ZloAAAAAAAAAAAAAAAAHACAAZm9vLnR4dHV4CwABBAAAAAAEAAAAAFVUDQAH56fJZ+enyWfbp8lnS8vPBwBQSwcIIWVzjAUAAAADAAAAUEsBAhQDFAAIAAgALXZmWiFlc4wFAAAAAwAAAAcAGAAAAAAAAAAAALaBAAAAAGZvby50eHR1eAsAAQQAAAAABAAAAABVVAUAAeenyWdQSwUGAAAAAAEAAQBNAAAAWgAAAAAA\"\n" +
+				"  }\n" +
+				"}\n");
+
+		File file = configureAndDownload(logger);
+		Assert.assertTrue(file.exists());
+		Assert.assertEquals(FileUtils.readFileToString(file, StandardCharsets.UTF_8), "foo");
+		verify(request).header("Content-Type", "application/json; charset=utf-8");
+	}
+
+	@Test(groups={"ut"})
+	public void testDownloadFileFromNameException1() throws IOException, NoSuchFieldException, IllegalAccessException {
+
+		kong.unirest.HttpRequest<?> request = createServerMock("POST", "/session/1234/se/files", 500, "{}", "requestBodyEntity");
+		when(request.asJson()).thenThrow(UnirestException.class);
+
+		Logger logger = spy(SeleniumRobotLogger.getLogger(SeleniumGridConnector.class));
+		File file = configureAndDownload(logger);
+		Assert.assertNull(file);
+		verify(logger).error(contains("Cannot download file foo.txt: null"));
+	}
+
+	@Test(groups={"ut"})
+	public void testDownloadFileFromNameException2() throws IOException, NoSuchFieldException, IllegalAccessException {
+
+		kong.unirest.HttpRequest<?> request = createServerMock("POST", "/session/1234/se/files", 500, "{}", "requestBodyEntity");
+		when(request.asJson()).thenThrow(new RuntimeException("foo"));
+
+		Logger logger = spy(SeleniumRobotLogger.getLogger(SeleniumGridConnector.class));
+		File file = configureAndDownload(logger);
+		Assert.assertNull(file);
+		verify(logger).error(contains("Error downloading file: foo"));
+	}
+
+	@Test(groups={"ut"})
+	public void testDownloadFileFromNameInvalidPath() throws IOException, NoSuchFieldException, IllegalAccessException {
+
+		createServerMock("POST", "/session/1234/se/files", 200, "{\n" +
+				"  \"value\": {\n" +
+				"    \"filename\": \"foo.txt\",\n" +
+				"    \"contents\": \"UEsDBBQACAAIAC12ZloAAAAAAAAAAAAAAAAHACAAZm9vLnR4dHV4CwABBAAAAAAEAAAAAFVUDQAH56fJZ+enyWfbp8lnS8vPBwBQSwcIIWVzjAUAAAADAAAAUEsBAhQDFAAIAAgALXZmWiFlc4wFAAAAAwAAAAcAGAAAAAAAAAAAALaBAAAAAGZvby50eHR1eAsAAQQAAAAABAAAAABVVAUAAeenyWdQSwUGAAAAAAEAAQBNAAAAWgAAAAAA\"\n" +
+				"  }\n" +
+				"}\n");
+		Logger logger = spy(SeleniumRobotLogger.getLogger(SeleniumGridConnector.class));
+		SeleniumGridConnector connector = spy(new SeleniumGridConnector(SERVER_URL));
+		Field loggerField = SeleniumGridConnector.class.getDeclaredField("logger");
+		loggerField.setAccessible(true);
+		loggerField.set(connector, logger);
+
+		connector.setNodeUrl("http://localhost:4421");
+		connector.setSessionId(new SessionId("1234"));
+
+		File file = connector.downloadFileFromName("foo.txt", new File("G:\\somefolder"));
+		Assert.assertNull(file);
+		verify(logger).error(contains("Error downloading file: Cannot invoke \"java.io.File.exists()\" because \"dir\" is null"));
+	}
+
+	@Test(groups={"ut"})
+	public void testDownloadFileFromNameNoFile() throws IOException, NoSuchFieldException, IllegalAccessException {
+
+		kong.unirest.HttpRequest<?> request = createServerMock("POST", "/session/1234/se/files", 200, "{\n" +
+				"  \"value\": {}\n" +
+				"}\n");
+
+		File file = configureAndDownload(logger);
+		Assert.assertNull(file);
+	}
+
+	/**
+	 * Selenium grid returns an error with message
+	 * @throws IOException
+	 * @throws NoSuchFieldException
+	 * @throws IllegalAccessException
+	 */
+	@Test(groups={"ut"})
+	public void testDownloadFileFromNameWithError() throws IOException, NoSuchFieldException, IllegalAccessException {
+
+		kong.unirest.HttpRequest<?> request = createServerMock("POST", "/session/1234/se/files", 200, "{\n" +
+				"  \"value\": {\n" +
+				"    \"message\": \"error message\"\n" +
+				"  }\n" +
+				"}\n");
+
+
+		Logger logger = spy(SeleniumRobotLogger.getLogger(SeleniumGridConnector.class));
+		File file = configureAndDownload(logger);
+		Assert.assertNull(file);
+		verify(logger).warn("Error downloading file: error message");
+	}
+
+	private static File configureAndDownload(Logger logger) throws NoSuchFieldException, IllegalAccessException, IOException {
+		SeleniumGridConnector connector = spy(new SeleniumGridConnector(SERVER_URL));
+		Field loggerField = SeleniumGridConnector.class.getDeclaredField("logger");
+		loggerField.setAccessible(true);
+		loggerField.set(connector, logger);
+
+		connector.setNodeUrl("http://localhost:4421");
+		connector.setSessionId(new SessionId("1234"));
+
+		Path tempsDir = Files.createTempDirectory("sel");
+		File file = connector.downloadFileFromName("foo.txt", tempsDir.toFile());
+		return file;
 	}
 }

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.seleniumtests.core.SeleniumTestsContext;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -69,10 +70,11 @@ public abstract class BugTracker {
 	 * For any bugtracker, description is quite simple but it can be improved depending on bug tracker 
 	 * /!\ any method overriding this one MUST provide "STEP_KO_PATTERN" in the description because it's used to know if the failed step is the same 
 	 * 
-	 * @param testSteps
+	 * @param testName
+	 * @param failedSteps
+	 * @param lastTestStep
+	 * @param description
 	 * @param fullDescription
-	 * @param screenShots
-	 * @return
 	 */
 	protected void formatDescription(String testName, List<TestStep> failedSteps, TestStep lastTestStep, String description, StringBuilder fullDescription) {
 
@@ -110,10 +112,10 @@ public abstract class BugTracker {
 		File zipFile = null;
 		Path outRoot = null;
 		try {
-			File resourcesFolder = Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), SeleniumTestsReporter2.RESOURCES_FOLDER).toFile().getAbsoluteFile();
+			File resourcesFolder = new File(SeleniumTestsContextManager.getGlobalContext().getResourcesOutputDirectory()).getAbsoluteFile();
 			File testResultFolder = Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), testName).toFile().getAbsoluteFile();
 			outRoot = Files.createTempDirectory("result");
-			Path tempResourcesFolder = Files.createDirectory(Paths.get(outRoot.toString(), SeleniumTestsReporter2.RESOURCES_FOLDER));
+			Path tempResourcesFolder = Files.createDirectory(Paths.get(outRoot.toString(), SeleniumTestsContext.RESOURCES_DIRECTORY));
 			Path tempResultFolder = Files.createDirectory(Paths.get(outRoot.toString(), testName));
 
 			IOFileFilter aviFiles = FileFilterUtils.notFileFilter(

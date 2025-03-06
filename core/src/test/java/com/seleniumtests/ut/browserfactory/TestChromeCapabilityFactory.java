@@ -85,6 +85,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		when(config.getBrowserType()).thenReturn(BrowserType.CHROME);
 		when(config.getAttachExistingDriverPort()).thenReturn(null);
 		when(config.getOutputDirectory()).thenReturn(SeleniumTestsContextManager.getThreadContext().getOutputDirectory());
+		when(config.getDownloadOutputDirectory()).thenReturn(SeleniumTestsContextManager.getThreadContext().getDownloadOutputDirectory());
 	}
 
 	@AfterMethod(groups = "ut", alwaysRun = true)
@@ -253,7 +254,11 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 
 		Assert.assertTrue(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-search-engine-choice-screen, --disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades, --remote-allow-origins=*"));
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "chrome");
-		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("prefs").toString(), "{profile.exit_type=Normal}");
+		Map<?,?> prefs = (Map<?,?>)(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("prefs"));
+		Assert.assertEquals(prefs.get("profile.exit_type"), "Normal");
+		Assert.assertTrue(prefs.get("savefile.default_directory").toString().contains("downloads"));
+		Assert.assertEquals(prefs.get("download.prompt_for_download"), false);
+		Assert.assertTrue(prefs.get("download.default_directory").toString().contains("downloads"));
 		Assert.assertNull(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("debuggerAddress")); // no debuger address set as we do not attach an existing browser
 	}
 	
@@ -268,7 +273,11 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		
 		Assert.assertTrue(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-search-engine-choice-screen, --disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades, --remote-allow-origins=*"));
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "chrome");
-		Assert.assertNull(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("prefs")); // no preference set when attaching to existing browser
+		Map<?,?> prefs = (Map<?,?>)(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("prefs"));
+		Assert.assertNull(prefs.get("profile.exit_type")); // no preference set when attaching to existing browser
+		Assert.assertTrue(prefs.get("savefile.default_directory").toString().contains("downloads"));
+		Assert.assertEquals(prefs.get("download.prompt_for_download"), false);
+		Assert.assertTrue(prefs.get("download.default_directory").toString().contains("downloads"));
 		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("debuggerAddress"), "127.0.0.1:10");
 	}
 	

@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.reporter.reporters.CommonReporter;
 import org.apache.logging.log4j.Logger;
 import org.monte.media.av.FormatKeys;
 import org.monte.media.avi.AVIReader;
@@ -32,7 +34,6 @@ public class VideoUtils {
 	
 
 	private static final Logger logger = SeleniumRobotLogger.getLogger(VideoUtils.class);
-	public static final String VIDEO_DIR = "video";
 
 	private VideoUtils() {
 		// do nothing
@@ -42,12 +43,10 @@ public class VideoUtils {
 	 * Extract the picture associated to the beginning of a step to <output_dir>/video
 	 * @param videoFile
 	 * @param testSteps
-	 * @param outputDirectory
+	 * @param videoOutputDirectory	Directory where pictures from video will be extracted
 	 */
-	public static void extractReferenceForSteps(File videoFile, List<TestStep> testSteps, Path outputDirectory) {
-		
-		// create output
-		Path videoOutputDirectory = outputDirectory.resolve(VIDEO_DIR);
+	public static void extractReferenceForSteps(File videoFile, List<TestStep> testSteps, Path videoOutputDirectory) {
+
 		videoOutputDirectory.toFile().mkdirs();
 		AVIReader in = null;
 		try {
@@ -85,7 +84,7 @@ public class VideoUtils {
 	            	Path extractedPicture = videoOutputDirectory.resolve(String.format("video-%d.jpg", j));
 	                FileUtility.writeImage(extractedPicture.toString(), img);
 	                try {
-		                Snapshot snapshot = new Snapshot(new ScreenShot(extractedPicture.toFile(), null, VIDEO_DIR), "Step beginning state", SnapshotCheckType.REFERENCE_ONLY);
+		                Snapshot snapshot = new Snapshot(new ScreenShot(extractedPicture.toFile(), null, SeleniumTestsContext.VIDEO_DIRECTORY), "Step beginning state", SnapshotCheckType.REFERENCE_ONLY);
 		                snapshot.setDisplayInReport(false); // by default, reference snapshot won't be displayed in report. This flag will be set to "true" only if step fails and we have a reference picture from server
 						samples.get(i).addSnapshot(snapshot, j, null);
 	                } catch (FileNotFoundException e) {}

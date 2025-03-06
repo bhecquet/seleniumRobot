@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -129,7 +130,7 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 					.getObject();
 			return fileList.getJSONObject("value").getJSONArray("names").toList();
 
-		} catch (UnirestException e) {
+		} catch (Exception e) {
 			logger.error("Cannot get list of files to download: " + e.getMessage());
 			return new ArrayList<>();
 		}
@@ -140,7 +141,7 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	 * @param name
 	 * @return
 	 */
-	public File downloadFileFromName(String name) {
+	public File downloadFileFromName(String name, File downloadDir) {
 		try {
 			JSONObject fileList = Unirest.post(String.format("http://%s:%d/session/%s/se/files", hubUrl.getHost(), hubUrl.getPort(), sessionId))
 					.header("Content-Type", "application/json; charset=utf-8")
@@ -151,7 +152,7 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 			JSONObject fileJson = fileList.getJSONObject("value");
 			if (fileJson.has("filename")) {
 				String content = fileJson.getString("contents");
-				File downloadDir = Zip.unzipToTempDir(content, "download", "");
+				Zip.unzip(content, downloadDir);
 				logger.info(String.format("File %s downloaded to %s", name, downloadDir));
 				// Read the file contents
 				return Optional.ofNullable(downloadDir.listFiles()).orElse(new File[]{null})[0];
@@ -169,7 +170,10 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 		} catch (IOException e) {
 			logger.error("Error reading file content: " + e.getMessage());
             return null;
-        }
+        } catch (Exception e) {
+			logger.error("Error downloading file: " + e.getMessage());
+			return null;
+		}
     }
 	
 	/**
