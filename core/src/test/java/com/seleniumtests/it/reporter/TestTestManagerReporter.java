@@ -20,19 +20,18 @@ package com.seleniumtests.it.reporter;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import io.github.bhecquet.SquashTMApi;
+import io.github.bhecquet.entities.*;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
+import org.mockito.MockedStatic;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
-import com.seleniumtests.connectors.tms.squash.SquashTMApi;
 import com.seleniumtests.connectors.tms.squash.SquashTMConnector;
-import com.seleniumtests.connectors.tms.squash.entities.Campaign;
-import com.seleniumtests.connectors.tms.squash.entities.Iteration;
-import com.seleniumtests.connectors.tms.squash.entities.IterationTestPlanItem;
-import com.seleniumtests.connectors.tms.squash.entities.TestPlanItemExecution.ExecutionStatus;
 import com.seleniumtests.core.contexts.TestManagerContext;
 import com.seleniumtests.customexception.ConfigurationException;
 
@@ -47,21 +46,38 @@ public class TestTestManagerReporter extends ReporterTest {
 	
 	@Mock
 	private Iteration iteration;
+
+	@Mock
+	private Project project;
 	
 	@Mock
 	private IterationTestPlanItem iterationTestPlanItem;
 	
 
 	private SquashTMConnector squash;
-	
+	MockedStatic mockedCampaign;
+	MockedStatic mockedIteration;
+	MockedStatic mockedProject;
+
 	@BeforeMethod(groups={"it"})
 	public void initTestManager() throws Exception {
 
-		when(api.createCampaign(anyString(), anyString())).thenReturn(campaign);
-		when(api.createIteration(any(Campaign.class), anyString())).thenReturn(iteration);
-		when(api.addTestCaseInIteration(eq(iteration), anyInt(), isNull())).thenReturn(iterationTestPlanItem);
-		when(api.addTestCaseInIteration(eq(iteration), anyInt(), anyInt())).thenReturn(iterationTestPlanItem);
+		mockedCampaign = mockStatic(Campaign.class);
+		mockedIteration = mockStatic(Iteration.class);
+		mockedProject = mockStatic(Project.class);
 
+		mockedProject.when(() -> Project.get(anyString())).thenReturn(project);
+		mockedCampaign.when(() -> Campaign.create(any(Project.class), anyString(), anyString(), anyMap())).thenReturn(campaign);
+		mockedIteration.when(() -> Iteration.create(eq(campaign), anyString())).thenReturn(iteration);
+		when(iteration.addTestCase(1, null)).thenReturn(iterationTestPlanItem);
+		when(iteration.addTestCase(eq(1), anyInt())).thenReturn(iterationTestPlanItem);
+
+	}
+
+	@AfterMethod(groups = "it", alwaysRun = true)
+	public void reset() {
+		mockedCampaign.close();
+		mockedIteration.close();
 	}
 
 	/**
@@ -80,14 +96,17 @@ public class TestTestManagerReporter extends ReporterTest {
 			System.setProperty(TestManagerContext.TMS_PROJECT, "Project");
 			System.setProperty(TestManagerContext.TMS_USER, "squash");
 			System.setProperty(TestManagerContext.TMS_PASSWORD, "squash");
-			
+
+			when(iteration.addTestCase(anyInt(), isNull())).thenReturn(iterationTestPlanItem);
+			when(iteration.addTestCase(anyInt(), anyInt())).thenReturn(iterationTestPlanItem);
+
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testWithAssert", "testInError", "testSkipped"});
 			
 			// check we have only one result recording for each test method
-			verify(api).setExecutionResult(iterationTestPlanItem, ExecutionStatus.SUCCESS);
-			verify(api).setExecutionResult(iterationTestPlanItem, ExecutionStatus.FAILURE, "error");
-			verify(api).setExecutionResult(eq(iterationTestPlanItem), eq(ExecutionStatus.FAILURE), contains("fail"));
-			verify(api).setExecutionResult(iterationTestPlanItem, ExecutionStatus.BLOCKED);
+			verify(api).setExecutionResult(iterationTestPlanItem, TestPlanItemExecution.ExecutionStatus.SUCCESS);
+			verify(api).setExecutionResult(iterationTestPlanItem, TestPlanItemExecution.ExecutionStatus.FAILURE, "error");
+			verify(api).setExecutionResult(eq(iterationTestPlanItem), eq(TestPlanItemExecution.ExecutionStatus.FAILURE), contains("fail"));
+			verify(api).setExecutionResult(iterationTestPlanItem, TestPlanItemExecution.ExecutionStatus.BLOCKED);
 			
 		} finally {
 			System.clearProperty(TestManagerContext.TMS_TYPE);
@@ -157,7 +176,7 @@ public class TestTestManagerReporter extends ReporterTest {
 				withSettings().defaultAnswer(CALLS_REAL_METHODS),
 				(mock, context) -> {
 					doReturn(api).when(mock).getApi();
-					doThrow(new ConfigurationException("Wrong Test ID")).when(api).addTestCaseInIteration(eq(iteration), anyInt(), isNull());
+					doThrow(new ConfigurationException("Wrong Test ID")).when(iteration).addTestCase(anyInt(), isNull());
 				})) {
 			System.setProperty(TestManagerContext.TMS_TYPE, "squash");
 			System.setProperty(TestManagerContext.TMS_URL, "http://localhost:1234");
