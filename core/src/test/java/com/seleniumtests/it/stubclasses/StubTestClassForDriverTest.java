@@ -375,6 +375,7 @@ public class StubTestClassForDriverTest extends StubParentClass {
 		DriverPDFPage page = new DriverPDFPage(BrowserType.CHROME);
 		page.clickPDFToDownload();
 		File file = TestTasks.getDownloadedFile("nom-du-fichier.pdf");
+		Assert.assertNotNull(file, "file is null");
 		Assert.assertTrue(file.exists());
 		logger.logFile(file, "PDF example");
 	}

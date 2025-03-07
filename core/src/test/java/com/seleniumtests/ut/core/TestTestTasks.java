@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -986,16 +987,24 @@ public class TestTestTasks extends MockitoTest {
 		}
 	}
 
+	/**
+	 * If file in not present immediately, wait for it
+	 * @param testNGCtx
+	 */
 	@Test(groups= {"ut"})
 	public void testDownloadFileLocalWithTimeout(final ITestContext testNGCtx) {
-		try (MockedStatic mockedOsCommand = mockStatic(OSCommand.class)) {
+		try (MockedStatic mockedFiles = mockStatic(Files.class)) {
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "local");
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(ArgumentMatchers.any(String[].class), eq(35), isNull())).thenReturn("hello guys");
+			mockedFiles.when(() -> Files.list(any(Path.class))).thenAnswer((Answer<Stream>) invocation -> {
+						return new ArrayList<>().stream();
+					}
+			).thenAnswer((Answer<Stream>) invocation -> {
+				return List.of(new File("file1.pdf").toPath()).stream();
+			});
 			initThreadContext(testNGCtx);
-			String response = TestTasks.executeCommand("echo", 35, null, "hello");
-			Assert.assertEquals(response, "hello guys");
-
-
+			Instant start = Instant.now();
+			File file = TestTasks.getDownloadedFile("file1.pdf");
+			Assert.assertEquals(file.getName(), "file1.pdf");
 		} finally {
 			System.clearProperty(SeleniumTestsContext.RUN_MODE);
 		}
