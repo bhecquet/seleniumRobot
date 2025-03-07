@@ -514,7 +514,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector).createTestStep(eq("_captureSnapshot with args: (my snapshot, )"), anyInt());
 			verify(serverConnector).createSnapshot(any(Snapshot.class), anyInt(), listArgument.capture()); // 1 custom snapshot taken with name
 
-			verify(serverConnector, times(4)).uploadFile(fileCapture.capture(), eq(0));
+			verify(serverConnector, times(5)).uploadFile(fileCapture.capture(), eq(0)); // 2 pictures, 2 HTML, 1 HAR
 			Assert.assertTrue(fileCapture.getAllValues().stream().noneMatch(f -> f.getName().contains("my_snapshot")));
 
 			// check exclude zones have been sent
@@ -566,7 +566,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector).createTestStep(eq("_captureSnapshot with args: (my snapshot, )"), anyInt());
 
 			// check capture recorded for comparison is sent to server as attachment
-			verify(serverConnector, times(6)).uploadFile(fileCapture.capture(), eq(0));
+			verify(serverConnector, times(7)).uploadFile(fileCapture.capture(), eq(0)); // 1 HAR, 2 picture + HTML, 2 pictures for comparison
 			Assert.assertEquals(fileCapture.getAllValues().stream().filter(f -> f.getName().contains("my_snapshot")).count(), 2);
 			verify(serverConnector, never()).createSnapshot(any(Snapshot.class), anyInt(), eq(new ArrayList<>())); // 1 custom snapshot taken with name
 			
