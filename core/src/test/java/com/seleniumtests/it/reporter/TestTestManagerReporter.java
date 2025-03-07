@@ -78,6 +78,7 @@ public class TestTestManagerReporter extends ReporterTest {
 	public void reset() {
 		mockedCampaign.close();
 		mockedIteration.close();
+		mockedProject.close();
 	}
 
 	/**
