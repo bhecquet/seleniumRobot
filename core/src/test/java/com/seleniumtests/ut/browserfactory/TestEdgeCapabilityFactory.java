@@ -35,6 +35,7 @@ import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriverService;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.remote.CapabilityType;
@@ -269,11 +270,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
 		Assert.assertEquals(((Map<?,?>)(((EdgeOptions)capa).asMap().get(EdgeOptions.CAPABILITY))).get("args").toString(), "[--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process, --remote-allow-origins=*]");
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "MicrosoftEdge");
-		Map<?,?> prefs = (Map<?,?>)(((Map<?,?>)(((EdgeOptions)capa).asMap().get(EdgeOptions.CAPABILITY))).get("prefs"));
-		Assert.assertNull(prefs.get("profile.exit_type")); // no preference set when attaching to existing browser
-		Assert.assertTrue(prefs.get("savefile.default_directory").toString().contains("downloads"));
-		Assert.assertEquals(prefs.get("download.prompt_for_download"), false);
-		Assert.assertTrue(prefs.get("download.default_directory").toString().contains("downloads"));
+		Assert.assertNull(((Map<?,?>)(((EdgeOptions)capa).asMap().get(EdgeOptions.CAPABILITY))).get("prefs")); // no preference set when attaching to existing browser
 		Assert.assertEquals(((Map<?,?>)(((EdgeOptions)capa).asMap().get(EdgeOptions.CAPABILITY))).get("debuggerAddress"), "127.0.0.1:10");
 		}
 	
