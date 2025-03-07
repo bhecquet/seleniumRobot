@@ -78,7 +78,7 @@ public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
 		}
 
 		// configure options for file download
-		if (webDriverConfig.getMode() == DriverMode.LOCAL) {
+		if (webDriverConfig.getMode() == DriverMode.LOCAL && webDriverConfig.getAttachExistingDriverPort() == null) {
 			// inspired by LocalNode.java
 			Path downloadDir;
 			try {
@@ -109,11 +109,10 @@ public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
         } else {
         	 // issue #480: disable "restore pages" popup, but not when we attach an existing browser as it crashes driver (from invalid argument: cannot parse capability: goog:chromeOptions, from invalid argument: unrecognized chrome option: prefs)
 			experientalOptions.put("profile.exit_type", "Normal");
-            
+			if (!experientalOptions.isEmpty()) {
+				options.setExperimentalOption("prefs", experientalOptions);
+			}
         }
-		if (!experientalOptions.isEmpty()) {
-			options.setExperimentalOption("prefs", experientalOptions);
-		}
 
         options.setPageLoadStrategy(webDriverConfig.getPageLoadStrategy());
         
