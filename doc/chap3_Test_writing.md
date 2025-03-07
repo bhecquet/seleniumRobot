@@ -999,6 +999,8 @@ File name may be partial (seleniumRobot searches for the name you provide in all
 
 **This feature is only available for chrome / edge / firefox**
 
+**This will be only possible when browser is created by Selenium. When attaching to an existing browser, feature won't be available**
+
 In case you want to add this downloaded file to the report, you can do 
 
 `logger.logFile(file, "some description")`
