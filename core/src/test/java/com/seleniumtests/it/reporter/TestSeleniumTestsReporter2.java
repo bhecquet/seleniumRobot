@@ -1336,8 +1336,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent1 = readTestMethodResultFile("test1Listener5");
 
 		// check all files are displayed
-		Assert.assertTrue(detailedReportContent1.contains("src=\"screenshots/N-A_2-1_Pre_test_step._beforeMethod"));
-		Assert.assertTrue(detailedReportContent1.contains("<a href='htmls/N-A_2-1_Pre_test_step._beforeMethod-"));
+		Assert.assertTrue(detailedReportContent1.contains("src=\"screenshots/beforeMethod_2-1_Pre_test_step._beforeMethod"));
+		Assert.assertTrue(detailedReportContent1.contains("<a href='htmls/beforeMethod_2-1_Pre_test_step._beforeMethod-"));
 		Assert.assertTrue(detailedReportContent1.contains("src=\"screenshots/test1Listener5_3-1_Test_end"));
 		Assert.assertTrue(detailedReportContent1.contains("<a href='htmls/test1Listener5_3-1_Test_end"));
 
