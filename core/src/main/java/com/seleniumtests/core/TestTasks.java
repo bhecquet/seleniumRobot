@@ -409,8 +409,8 @@ public class TestTasks {
 			Optional<File> optionalName = Optional.empty();
 			do {
 				WaitHelper.waitForMilliSeconds(500);
-				try {
-					optionalName = Files.list(Paths.get(SeleniumTestsContextManager.getThreadContext().getDownloadOutputDirectory()))
+				try (Stream<Path> stream = Files.list(Paths.get(SeleniumTestsContextManager.getThreadContext().getDownloadOutputDirectory()))) {
+					optionalName = stream
 							.filter(path -> path.toFile().getName().contains(fileName))
 							.map(Path::toFile)
 							.findFirst();
