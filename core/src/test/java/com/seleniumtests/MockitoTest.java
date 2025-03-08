@@ -48,9 +48,7 @@ import com.seleniumtests.util.video.VideoCaptureMode;
 
 @Listeners({CaptureVideoListener.class, MockitoTestNGListener.class})
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class MockitoTest {
-	
-	protected static final Logger logger = SeleniumRobotLogger.getLogger(MockitoTest.class);
+public class MockitoTest extends ParentTest {
 
 	protected static final String SERVER_URL = "http://localhost:4321";
 	protected static final String GRID_SERVLET_URL = "http://localhost:4331"; // grid servlet are listening on port of router (or node) + 10
@@ -85,16 +83,6 @@ public class MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
 		SeleniumTestsContextManager.getGlobalContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
 	}
-	
-
-	@AfterMethod(groups={"ut", "it", "ie"}, alwaysRun=true)
-	public void afterMethod(final Method method) throws Exception {
-
-		System.clearProperty("applicationName");
-		GenericTest.resetTestNGREsultAndLogger();
-		OSUtility.resetInstalledBrowsersWithVersion();
-	}
-	
 
 	protected File createImageFromResource(String resource) throws IOException {
 		File tempFile = File.createTempFile("img", "." + FilenameUtils.getExtension(resource));

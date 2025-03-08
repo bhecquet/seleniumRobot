@@ -42,7 +42,7 @@ import com.seleniumtests.util.video.VideoCaptureMode;
  *
  */
 @Listeners({CaptureVideoListener.class})
-public class GenericDriverTest {
+public class GenericDriverTest extends ParentTest {
 	protected static final ScenarioLogger logger = ScenarioLogger.getScenarioLogger(SeleniumRobotTestPlan.class);
 	
 	public WebDriver driver = null;
@@ -78,10 +78,6 @@ public class GenericDriverTest {
 	@AfterMethod(groups={"ut", "it"}, alwaysRun=true)
 	public void destroyDriver() {
 		WebUIDriver.cleanUp();
-
-		System.clearProperty("applicationName");
-		GenericTest.resetTestNGREsultAndLogger();
-		OSUtility.resetInstalledBrowsersWithVersion();
 	}
 	
 	public static int findFreePort() {

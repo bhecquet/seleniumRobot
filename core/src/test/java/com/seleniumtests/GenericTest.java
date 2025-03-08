@@ -48,8 +48,8 @@ import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.video.VideoCaptureMode;
 
-public class GenericTest {
-	
+public class GenericTest extends ParentTest {
+
 	protected static final ScenarioLogger logger = ScenarioLogger.getScenarioLogger(SeleniumRobotTestPlan.class);
 
 	/**
@@ -90,13 +90,7 @@ public class GenericTest {
 		SeleniumTestsContextManager.getGlobalContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
 		SeleniumTestsContext.resetOutputFolderNames();
 	}
-	
-	@AfterMethod(groups={"ut", "it", "ut context2"}, alwaysRun=true) 
-	public void reset() {
-		System.clearProperty("applicationName");
-		resetTestNGREsultAndLogger();
-		OSUtility.resetInstalledBrowsersWithVersion();
-	}
+
 	
 	@AfterClass(groups={"ut", "it", "ut context2"}, alwaysRun=true)
 	public void closeBrowser() {
@@ -115,21 +109,8 @@ public class GenericTest {
 	public static String readResourceToString(String resourceName) throws IOException {
 		return IOUtils.toString(Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName), StandardCharsets.UTF_8);
 	}
-	
 
-	public static void resetCurrentTestResult() {
-		//Reporter.setCurrentTestResult(null); // do not reset, TestNG do this for us
-	}
 
-	public static void resetTestNGREsultAndLogger() {
-		resetCurrentTestResult();
-		
-		try {
-			SeleniumRobotLogger.reset();
-		} catch (IOException e) {
-			logger.error("Cannot delete log file" + e.getMessage());
-		}
-	}
 	
 
 	/**
