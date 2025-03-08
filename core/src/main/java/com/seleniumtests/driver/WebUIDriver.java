@@ -398,7 +398,7 @@ public class WebUIDriver {
 						retrieveLogs(logType);
 	        		}
 	            } catch (Exception e) {
-	            	e.printStackTrace();
+	            	logger.error("Error retrieving logs from driver: " + e.getMessage());
 	            }
 	    		
 	    		
