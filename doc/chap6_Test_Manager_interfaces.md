@@ -193,109 +193,44 @@ It's also possible to set it via variables:
 `tms.squash.campaign.folder`
 
   
-### 4 HP ALM ###
- 
-From ALM v11 HP ALM can run seleniumRobot tests using VBScript connector
+### Add an other Test Manager ###
 
-**WARNING**: This connector is not currently fully fonctional as launch_SeleniumRobot.bat script does not exist anymore
-VBS script should be updated, for example, using a direct java call with JVM options and TestNG parameters clearly identified
+It's possible to extend SeleniumRobot to add a new TestManager
+For this, create a class extending "TestManager" and implement at least
 
-#### Configure environment to access HP ALM ####
+```java
+ @Override
+    public void recordResult(ITestResult testResult) {
+        "Send your result to the Test manager here"
+    }
 
-- `tmsType` => 'hp'
-- `tmsUrl` => url of ALM server. (e.g: http://myamlserver:8080)
-- `tmsUser` => user to connect 
-- `tmsPassword` => password used to connect
-- `tmsProject`=> project to which these tests belong
-- `tmsDomain` => Domain of the project
-- `tmsRun` => id of the current run
+    @Override
+    public String getType() {
+      return "an-other-test-manager";
+    }
 
+    @Override
+    public void init(JSONObject connectParams) {
+      String serverUrlVar = connectParams.optString(TMS_SERVER_URL, null);
+      String projectVar = connectParams.optString(TMS_PROJECT, null);
+      String userdVar = connectParams.optString(TMS_USER, null);
+      String passwordVar = connectParams.optString(TMS_PASSWORD, null);
+    
+      if (serverUrlVar == null || projectVar == null || passwordVar == null) {
+        throw new ConfigurationException(String.format("SquashTM Connector access not correctly configured. Environment configuration must contain variables"
+                + " %s, %s, %s", TMS_SERVER_URL, TMS_PASSWORD, TMS_PROJECT));
+      }
+    
+      serverUrl = serverUrlVar;
+      project = projectVar;
+      password = passwordVar;
+    
+      initialized = true;
+    }
+```
 
-This paramater is common to all tests and can be written in TestNG XML file or in a common configuration file loaded by TestNG XML file (param `testConfig`) 
-
-Run information (specific to test running) must be put in `tmsRun`
-
- 
-#### Configure test runner computer ####
- 
-Create `SELENIUMROBOT_HOME` environment variable, pointing to the path where robot is available (unzipped, presence of launch.bat file)
- 
-#### Create test on ALM ####
- 
-In ALM, create a VAPI-XP test
-
-![](images/alm_vapi.png)
-
-Click 'OK'
-
-![](images/alm_vbscript.png)
-
-Keep 'VBSCript' and click 'Next'
-
-![](images/alm_console.png)
-
-Choose 'Console application' and click 'Finish'
-
-#### Test script ####
-
-In Test plan, go to newly created test, "Test script" tab and paste the following content
- 	
-
-	' ----------------------------------------------------
-	' Main Test Function
-	' Debug - Boolean. Equals to false if running in [Test Mode] : reporting to Quality Center
-	' CurrentTestSet - [OTA COM Library].TestSet.
-	' CurrentTSTest - [OTA COM Library].TSTest.
-	' CurrentRun - [OTA COM Library].Run.
-	' ----------------------------------------------------
-	Sub Test_Main(Debug, CurrentTestSet, CurrentTSTest, CurrentRun)
-	  ' *** VBScript Limitation ! ***
-	  ' "On Error Resume Next" statement suppresses run-time script errors.
-	  ' To handle run-time error in a right way, you need to put "If Err.Number <> 0 Then"
-	  ' after each line of code that can cause such a run-time error.
-	  On Error Resume Next
-	
-	  ' clear output window
-	  TDOutput.Clear
-	
-	  seleniumRobotHome = CreateObject( "WScript.Shell" ).Environment( "SYSTEM" )("SELENIUMROBOT_HOME") & "\launch_seleniumRobot.bat"
-	  
-	  options = ""
-	  With CurrentTSTest.Params
-	    For i = 0 To .Count - 1
-	      options = options & "-D" & Trim(.ParamName(i)) & "=" & .ParamValue(i) & " "
-	    Next
-	  End With
-	
-	
-	  ' Run seleniumBot application
-	  result = XTools.run(seleniumRobotHome , options & " -DtmsRun={'type':'hp','run':" & CurrentRun.ID & "}", -1)
-	
-	  If Err.Number <> 0 Or result <> 0 Then
-	    TDOutput.Print "Run-time error [" & Err.Number & "] : " & Err.Description
-	    ' update execution status in "Test" mode
-	    If Not Debug Then
-	      CurrentRun.Status = "Failed"
-	      CurrentTSTest.Status = "Failed"
-	    End If
-	  End If
-	End Sub
-	
-#### test parameters ####
-	
-In 'parameters' tab, add specific test parameters 
-
-![](images/alm_parameters.png)
-
-#### Run test ####
-
-In test lab, create a test set with this automated test. Double click test instance and configure "execution settings"
-
-![](images/alm_runtest.png)
-
-Test run is possible when actual values are configured. You can use "copy default values" if they are correct. When test finishes, robot records test details as a test attachment
-
-![](images/alm_result.png)
+Then, add a file `src/main/resources/META-INF/services/com.seleniumtests.connectors.tms.ITestManager` containing the full class name (with package)
+When adding the jar containing the new Test Manager interface to class path, this one will be automatically loaded
 
 ## Bugtrackers ##
 
