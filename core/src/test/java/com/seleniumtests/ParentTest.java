@@ -31,7 +31,7 @@ public class ParentTest {
             logger.info("delete output directory: " + outputDirectory);
             FileUtils.deleteDirectory(outputDirectory);
         } catch (IOException e) {
-            logger.error("Cannot delete output directory: " + outputDirectory, e);
+            logger.error("Cannot delete output directory: " + outputDirectory, e.getMessage());
         }
     }
 

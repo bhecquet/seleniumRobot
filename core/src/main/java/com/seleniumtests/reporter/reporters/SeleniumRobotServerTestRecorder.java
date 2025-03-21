@@ -280,7 +280,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 
 			for (File executionResultFile: executionResults) {
 				try {
-					testStep.addFile(new GenericFile(executionResultFile, executionResultFile.getName().replace(".zip", ""), false));
+					testStep.addFile(new GenericFile(executionResultFile, executionResultFile.getName().replace(".zip", ""), GenericFile.FileOperation.KEEP));
 				} catch (IOException e) {
 					logger.warn("Could not add previous execution result: " + e.getMessage());
 				}

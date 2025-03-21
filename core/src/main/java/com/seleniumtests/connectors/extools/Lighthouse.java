@@ -6,6 +6,7 @@ import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.DriverMode;
+import com.seleniumtests.reporter.logger.GenericFile;
 import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.osutility.OSCommand;
@@ -136,7 +137,7 @@ public class Lighthouse {
 				jsonReport = jsonFile;
 			}
 
-			logger.logFile(jsonReport, "Lighthouse JSON " + url, false);
+			logger.logFile(jsonReport, "Lighthouse JSON " + url, GenericFile.FileOperation.KEEP);
 
 
 			htmlReport = storagePath.resolve(baseName + ".html").toFile();
@@ -146,7 +147,7 @@ public class Lighthouse {
 			} catch (IOException e) {
 				htmlReport = htmlFile;
 			}
-			logger.logFile(htmlReport, "Lighthouse HTML " + url, false);
+			logger.logFile(htmlReport, "Lighthouse HTML " + url, GenericFile.FileOperation.KEEP);
 		}
 	}
 

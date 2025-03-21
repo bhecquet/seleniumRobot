@@ -37,7 +37,7 @@ public class TestGenericFile extends GenericTest {
 	public void testFileMovedIfNotInOutputDirectory() throws IOException {
 		File videoFile = File.createTempFile("video", ".avi");
 		videoFile.deleteOnExit();
-		GenericFile genericFile = new GenericFile(videoFile, "description", false);
+		GenericFile genericFile = new GenericFile(videoFile, "description", GenericFile.FileOperation.KEEP);
 		Assert.assertEquals(genericFile.getFile(), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), videoFile.getName()).toFile());
 		Assert.assertEquals(genericFile.getRelativeFilePath(), videoFile.getName());
 	}
@@ -51,7 +51,7 @@ public class TestGenericFile extends GenericTest {
 		File videoFile = File.createTempFile("video", ".avi");
 		File newVideoFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "video", videoFile.getName()).toFile();
 		FileUtils.copyFile(videoFile, newVideoFile);
-		GenericFile genericFile = new GenericFile(newVideoFile, "description", false);
+		GenericFile genericFile = new GenericFile(newVideoFile, "description", GenericFile.FileOperation.KEEP);
 		Assert.assertEquals(genericFile.getFile(), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "video", videoFile.getName()).toFile());
 		Assert.assertEquals(genericFile.getRelativeFilePath(), "video/" + videoFile.getName());
 	}
@@ -66,9 +66,25 @@ public class TestGenericFile extends GenericTest {
 		File videoFile = File.createTempFile("video", ".avi");
 		File newVideoFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "video", videoFile.getName()).toFile();
 		FileUtils.copyFile(videoFile, newVideoFile);
-		GenericFile genericFile = new GenericFile(newVideoFile, "description", true);
+		GenericFile genericFile = new GenericFile(newVideoFile, "description", GenericFile.FileOperation.MOVE);
 		Assert.assertEquals(genericFile.getFile(), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), videoFile.getName()).toFile());
 		Assert.assertEquals(genericFile.getRelativeFilePath(), videoFile.getName());
+	}
+
+	/**
+	 * Check copy is done and original file is kept
+	 * @throws IOException
+	 */
+	@Test(groups={"ut"})
+	public void testFileCopiedIfRequested() throws IOException {
+		File videoFile = File.createTempFile("video", ".avi");
+		File newVideoFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "video", videoFile.getName()).toFile();
+		FileUtils.copyFile(videoFile, newVideoFile);
+		GenericFile genericFile = new GenericFile(newVideoFile, "description", GenericFile.FileOperation.COPY);
+		Assert.assertEquals(genericFile.getFile(), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), videoFile.getName()).toFile());
+		Assert.assertEquals(genericFile.getRelativeFilePath(), videoFile.getName());
+		Assert.assertTrue(genericFile.getFile().exists());
+		Assert.assertTrue(newVideoFile.exists());
 	}
 	
 	@Test(groups={"ut"})
@@ -76,7 +92,7 @@ public class TestGenericFile extends GenericTest {
 		File videoFile = File.createTempFile("video", ".avi");
 		File newVideoFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "video", videoFile.getName()).toFile();
 		FileUtils.copyFile(videoFile, newVideoFile);
-		GenericFile genericFile = new GenericFile(newVideoFile, "description", false);
+		GenericFile genericFile = new GenericFile(newVideoFile, "description", GenericFile.FileOperation.KEEP);
 		Assert.assertEquals(genericFile.buildLog(), String.format("description: <a href='video/%s'>file</a>", videoFile.getName()));
 	}
 	
@@ -84,7 +100,7 @@ public class TestGenericFile extends GenericTest {
 	public void testBuildLog() throws IOException {
 		File videoFile = File.createTempFile("video", ".avi");
 		videoFile.deleteOnExit();
-		GenericFile genericFile = new GenericFile(videoFile, "description", false);
+		GenericFile genericFile = new GenericFile(videoFile, "description", GenericFile.FileOperation.KEEP);
 		Assert.assertEquals(genericFile.buildLog(), String.format("description: <a href='%s'>file</a>", videoFile.getName()));
 	}
 	

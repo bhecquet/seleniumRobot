@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.seleniumtests.customexception.ImageSearchException;
+import com.seleniumtests.reporter.logger.GenericFile;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -361,8 +362,8 @@ public class ReplayAction {
 
 			// log searched image and scene image in case image cannot be found.
 			if (e instanceof ImageSearchException && joinPoint.getThis() instanceof GenericPictureElement) {
-				scenarioLogger.logFile(((GenericPictureElement) joinPoint.getThis()).getObjectPictureFile(), "searched picture");
-				scenarioLogger.logFile(((GenericPictureElement) joinPoint.getThis()).getScenePictureFile(), "scene to search in");
+				scenarioLogger.logFile(((GenericPictureElement) joinPoint.getThis()).getObjectPictureFile(), "searched picture", GenericFile.FileOperation.COPY); // file is copied because we need to keep source for further executions
+				scenarioLogger.logFile(((GenericPictureElement) joinPoint.getThis()).getScenePictureFile(), "scene to search in", GenericFile.FileOperation.MOVE); // no need to keep this file among executions
 			}
 
 			throw e;

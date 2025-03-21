@@ -32,12 +32,18 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 
 public class GenericFile extends TestAction {
 
+	public enum FileOperation {
+		COPY, // copy the file to test output directory
+		MOVE, // move the file to test output directory
+		KEEP // don't do anything on file, keep it where it is
+	}
+
 	private FileContent file;
 	private String relativeFilePath; // path relative to the root of test output directory
 	
 
 	public GenericFile(File file, String description) throws IOException {
-		this(file, description, true);
+		this(file, description, FileOperation.MOVE);
 	}
 	public GenericFile(FileContent file, String description, String relativeFilePath)  {
 		super(description, false, new ArrayList<>());
@@ -49,38 +55,42 @@ public class GenericFile extends TestAction {
 	 * Store a file in log folder
 	 * @param file
 	 * @param description
-	 * @param move			if true, move the file to log folder
+	 * @param fileOperation			copy / move / keep file
 	 * @throws IOException
 	 */
-	public GenericFile(File file, String description, boolean move) throws IOException {
+	public GenericFile(File file, String description, FileOperation fileOperation) throws IOException {
 		super(description, false, new ArrayList<>());
 		
 		if (file == null || !file.exists()) {
 			throw new FileNotFoundException("GenericFile needs a file");
 		}
 		
-		// in case file is not in output directory, move it
+		// in case file is not in output directory, copy it (we expect original file to be deleted on exit)
 		try {
 			relativeFilePath = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()).relativize(file.toPath()).toString().replace("\\", "/");
 		} catch (IllegalArgumentException e) {
 			relativeFilePath = file.getName();
-			move = true;
+			fileOperation = FileOperation.COPY;
 		}
 		
 		// move the file to the root of test specific output directory
-		if (move) {
+		if (fileOperation == FileOperation.MOVE || fileOperation == FileOperation.COPY) {
 			File loggedFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), file.getName()).toFile();
 			relativeFilePath = file.getName(); // correct relavtive path, as we moved the file
-			
+
 			try {
 				loggedFile.mkdirs();
-				Files.move(file.toPath(), loggedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+				if (fileOperation == FileOperation.MOVE) {
+					Files.move(file.toPath(), loggedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+				} else {
+					Files.copy(file.toPath(), loggedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+				}
 				this.file = new FileContent(loggedFile);
 			} catch (Exception e) {
 				logger.error(String.format("Failed to move file %s to %s: %s", file.getAbsolutePath(), loggedFile.getAbsolutePath(), e.getMessage()));
 				this.file = new FileContent(file);
 			}
-		
+
 		} else {
 			this.file = new FileContent(file);
 		}

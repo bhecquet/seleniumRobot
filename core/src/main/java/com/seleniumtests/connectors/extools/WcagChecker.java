@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.UUID;
 
+import com.seleniumtests.reporter.logger.GenericFile;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -62,7 +63,7 @@ public class WcagChecker {
 		if (!result.violationFree()) {
 			logger.warn(String.format("%d violations found, see attached file", result.getViolations().size()));
 		}
-		logger.logFile(new File(outputPath + ".txt"), "WCAG report", false);
+		logger.logFile(new File(outputPath + ".txt"), "WCAG report", GenericFile.FileOperation.KEEP);
 		
 		return result;
 	}

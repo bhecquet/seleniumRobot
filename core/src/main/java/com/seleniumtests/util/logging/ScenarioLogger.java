@@ -176,16 +176,29 @@ public class ScenarioLogger {
      * @param description	a comment for the file
      */
     public void logFile(File file, String description) {
-    	logFile(file, description, true);
+    	logFile(file, description, GenericFile.FileOperation.MOVE);
+    }
+
+	/**
+	 *
+	 * @param file            file to log
+	 * @param description	a comment for the file
+	 * @param move
+	 *
+	 * Deprecated: use logFile(File file, String description, GenericFile.FileOperation fileOperation) instead
+	 */
+	@Deprecated
+	public void logFile(File file, String description, boolean move) {
+    	logFile(file, description, move ? GenericFile.FileOperation.MOVE: GenericFile.FileOperation.KEEP);
     }
      
     /**
      * Log the given file to HTML result
      * @param file			file to log
      * @param description	a comment for the file
-     * @param move			if true, the file will be moved to log folder. Useful when the input file is outside the selenium result tree
+     * @param fileOperation			if FileOperation.MOVE, the file will be moved to log folder. Useful when the input file is outside the selenium result tree
      */
-    public void logFile(File file, String description, boolean move) {
+    public void logFile(File file, String description, GenericFile.FileOperation fileOperation) {
 
     	try {
 	    	TestStep runningStep = TestStepManager.getParentTestStep();
@@ -193,7 +206,7 @@ public class ScenarioLogger {
 	    		runningStep = TestStepManager.getCurrentOrPreviousStep();
 	    	}
 	    	if (runningStep != null) {
-	    		runningStep.addFile(new GenericFile(file, description, move));
+	    		runningStep.addFile(new GenericFile(file, description, fileOperation));
 	    	}
     	} catch (IndexOutOfBoundsException e) {
     		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup

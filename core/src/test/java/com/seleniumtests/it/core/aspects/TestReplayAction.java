@@ -125,6 +125,10 @@ public class TestReplayAction extends GenericDriverTest {
             Assert.assertTrue(LocalDateTime.now().minusSeconds(13).isBefore(start));
             Assert.assertTrue(LocalDateTime.now().minusSeconds(9).isAfter(start));
 
+            // check object picture has not been deleted
+            Assert.assertTrue(testPage.pictureNotPresent.getObjectPictureFile().exists());
+            Assert.assertFalse(testPage.pictureNotPresent.getScenePictureFile().exists()); // this file has been moved
+
             // check an action has been created for this
             TestStep step = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(2);
             Assert.assertEquals(step.getStepActions().size(), 2);
@@ -132,7 +136,9 @@ public class TestReplayAction extends GenericDriverTest {
             Assert.assertTrue(step.getStepActions().get(0).getFailed());
             Assert.assertEquals(step.getFiles().size(), 2);
             Assert.assertEquals(step.getFiles().get(0).getName(), "searched picture");
+            Assert.assertTrue(step.getFiles().get(0).getFile().exists());
             Assert.assertEquals(step.getFiles().get(1).getName(), "scene to search in");
+            Assert.assertTrue(step.getFiles().get(1).getFile().exists());
         }
     }
 
