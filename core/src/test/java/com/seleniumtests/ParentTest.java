@@ -33,6 +33,7 @@ public class ParentTest {
         } catch (IOException e) {
             logger.error("Cannot delete output directory: " + outputDirectory, e.getMessage());
         }
+
     }
 
     public static void resetTestNGREsultAndLogger() {

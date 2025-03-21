@@ -1101,29 +1101,41 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	@Test(groups="ut context")
 	public void testOutputDirectoryFromSystem(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		String testngOutputDirectory = ((TestRunner) testNGCtx).getOutputDirectory();
 		try {
 			System.setProperty(SeleniumTestsContext.OUTPUT_DIRECTORY, "/home/user/test-output");
 			initThreadContext(testNGCtx);
 			Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getOutputDirectory().endsWith("/home/user/test-output/myTest")); // test name is myTest due to TestResult generation in GenericTest class
 		} finally {
+			((TestRunner) testNGCtx).setOutputDirectory(testngOutputDirectory); // restore
 			System.clearProperty(SeleniumTestsContext.OUTPUT_DIRECTORY);
 		}
 	}
 	@Test(groups="ut context")
 	public void testOutputDirectoryNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		initThreadContext(testNGCtx);
-		((TestRunner)testNGCtx).setOutputDirectory("/home/other/test-output/testsuite");
-		SeleniumTestsContextManager.getThreadContext().setOutputDirectory(null, testNGCtx, false);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "/home/other/test-output".replace("/", File.separator));
+		String testngOutputDirectory = ((TestRunner) testNGCtx).getOutputDirectory();
+		try {
+			initThreadContext(testNGCtx);
+			((TestRunner)testNGCtx).setOutputDirectory("/home/other/test-output/testsuite");
+			SeleniumTestsContextManager.getThreadContext().setOutputDirectory(null, testNGCtx, false);
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "/home/other/test-output".replace("/", File.separator));
+		} finally {
+			((TestRunner) testNGCtx).setOutputDirectory(testngOutputDirectory); // restore
+		}
 	}
 	
 	@Test(groups="ut context")
 	public void testDefaultOutputDirectory(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		String out = SeleniumTestsContextManager.getRootPath();
-		((TestRunner)testNGCtx).setOutputDirectory(out);
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setOutputDirectory(out, testNGCtx, true);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory().replace("\\", "/") + "/", out);
+		String testngOutputDirectory = ((TestRunner) testNGCtx).getOutputDirectory();
+		try {
+			String out = Paths.get(testngOutputDirectory, "output").toString();
+			((TestRunner) testNGCtx).setOutputDirectory(out);
+			initThreadContext(testNGCtx);
+			SeleniumTestsContextManager.getThreadContext().setOutputDirectory(out, testNGCtx, true);
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory().replace("\\", "/"), out.replace("\\", "/"));
+		} finally {
+			((TestRunner) testNGCtx).setOutputDirectory(testngOutputDirectory); // restore
+		}
 	}
 
 
