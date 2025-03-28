@@ -27,13 +27,14 @@ public class ParentTest {
         OSUtility.resetInstalledBrowsersWithVersion();
 
         File outputDirectory = new File(testContext.getOutputDirectory()).getParentFile();
-        try {
-            logger.info("delete output directory: " + outputDirectory);
-            FileUtils.deleteDirectory(outputDirectory);
-        } catch (IOException e) {
-            logger.error("Cannot delete output directory: " + outputDirectory, e.getMessage());
+        if ("true".equals(System.getProperty(SeleniumRobotLogger.MAVEN_EXECUTION))) {
+            try {
+                logger.info("delete output directory: " + outputDirectory);
+                FileUtils.deleteDirectory(outputDirectory);
+            } catch (IOException e) {
+                logger.error("Cannot delete output directory: " + outputDirectory, e.getMessage());
+            }
         }
-
     }
 
     public static void resetTestNGREsultAndLogger() {

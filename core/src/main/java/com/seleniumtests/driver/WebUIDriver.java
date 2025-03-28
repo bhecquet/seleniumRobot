@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
 import com.seleniumtests.browserfactory.chrome.ChromeUtils;
 import com.seleniumtests.customexception.RetryableDriverException;
 import com.seleniumtests.util.har.*;
+import com.seleniumtests.util.logging.DebugMode;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -443,11 +444,14 @@ public class WebUIDriver {
 												"UTF-8")) {
 
 			List<LogEntry> logEntries = driver.manage().logs().get(logType).getAll();
+			boolean writeToFile = true;
 			if ("performance".equalsIgnoreCase(logType)) {
-				parsePerformanceLogs(logEntries);
+				writeToFile = !parsePerformanceLogs(logEntries);
 			}
-			for (LogEntry line: logEntries) {
-				writer.println(line.toString());
+			if (writeToFile || config.getDebug().contains(DebugMode.DRIVER)) {
+				for (LogEntry line : logEntries) {
+					writer.println(line.toString());
+				}
 			}
 
 		} catch (FileNotFoundException | UnsupportedEncodingException e) {
@@ -455,7 +459,12 @@ public class WebUIDriver {
 		}
 	}
 
-	private void parsePerformanceLogs(List<LogEntry> logEntries) {
+	/**
+	 * Returns true if HAR file has been produced
+	 * @param logEntries
+	 * @return
+	 */
+	private boolean parsePerformanceLogs(List<LogEntry> logEntries) {
 		Har har = null;
 		try {
 			if (driver != null && driver instanceof CustomEventFiringWebDriver && ((CustomEventFiringWebDriver) driver).getBrowserInfo().getBrowser() == BrowserType.CHROME) {
@@ -467,7 +476,9 @@ public class WebUIDriver {
 
 		if (har != null) {
 			scenarioLogger.logNetworkCapture(har, name);
+			return true;
 		}
+		return false;
 	}
 
 
