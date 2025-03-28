@@ -261,25 +261,43 @@ public class TestWebUiDriver extends ReporterTest {
 	@Test(groups={"it"})
 	public void testHarCaptureExists() throws Exception {
 
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverExposedViaWebServer"});
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverExposedViaWebServer"});
+
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverExposedViaWebServer", "main-networkCapture.har").toFile().exists());
+
+		JSONObject json = new JSONObject(FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverExposedViaWebServer", "main-networkCapture.har").toFile(), StandardCharsets.UTF_8));
+		JSONArray pages = json.getJSONObject("log").getJSONArray("pages");
+
+		// 7 steps in HTML
+		Assert.assertTrue(pages.length() >= 6, "content is: " + json.toString());
+		List<String> pageNames = new ArrayList<>();
+		for (Object page: pages.toList()) {
+			pageNames.add(((Map<String, Object>)page).get("title").toString().trim());
+		}
+
+		Assert.assertTrue(pageNames.contains("_writeSomething"));
+		Assert.assertTrue(pageNames.contains("_reset"));
+		Assert.assertTrue(pageNames.contains("_sendKeysComposite"));
+		Assert.assertTrue(pageNames.contains("_clickPicture"));
+
+		// Check "driver-log-performance.txt file is empty (HAR has been produced)
+		Assert.assertEquals(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverExposedViaWebServer", "driver-log-performance.txt").toFile().length(), 0);
+	}
+
+	@Test(groups={"it"})
+	public void testHarCaptureExistsAndPerformanceLogsPresent() throws Exception {
+
+		try {
+			System.setProperty(SeleniumTestsContext.DEBUG, "driver");
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverExposedViaWebServer"});
 
 			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverExposedViaWebServer", "main-networkCapture.har").toFile().exists());
 
-			JSONObject json = new JSONObject(FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverExposedViaWebServer", "main-networkCapture.har").toFile(), StandardCharsets.UTF_8));
-			JSONArray pages = json.getJSONObject("log").getJSONArray("pages");
-
-			// 7 steps in HTML
-			Assert.assertTrue(pages.length() >= 6, "content is: " + json.toString());
-			List<String> pageNames = new ArrayList<>();
-			for (Object page: pages.toList()) {
-				pageNames.add(((Map<String, Object>)page).get("title").toString().trim());
-			}
-
-			Assert.assertTrue(pageNames.contains("_writeSomething"));
-			Assert.assertTrue(pageNames.contains("_reset"));
-			Assert.assertTrue(pageNames.contains("_sendKeysComposite"));
-			Assert.assertTrue(pageNames.contains("_clickPicture"));
-
+			// Check "driver-log-performance.txt file is empty (HAR has been produced)
+			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverExposedViaWebServer", "driver-log-performance.txt").toFile().length() > 0);
+		} finally {
+			System.clearProperty(SeleniumTestsContext.DEBUG);
+		}
 	}
 	
 	/**
