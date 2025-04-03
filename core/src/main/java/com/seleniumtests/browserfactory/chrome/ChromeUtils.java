@@ -299,13 +299,16 @@ public class ChromeUtils {
 		for (Map.Entry<String, Object> wsRequest : requestsEntry.getValue().entrySet()) {
 			JSONObject jswsRequest = (JSONObject) wsRequest.getValue();
 			if (jswsRequest.get("method").toString().contains("FrameSent")) {
-				String fullPayload = jswsRequest.getJSONObject("params").getJSONObject("response").getString("payloadData");
+				String payloadData = jswsRequest.getJSONObject("params").getJSONObject("response").getString("payloadData");
 				//Substring the payload to give info on what data has been transferred without giving away sensitive data
+				if (payloadData.length() > 20) {
+					payloadData = payloadData.substring(0, 10) + " [...] " + payloadData.substring(payloadData.length() - 10);
+				}
 				webSocketMessages.add(new WebSocketMessage(
 						"send",
 						jswsRequest.getJSONObject("params").getDouble("timestamp"),
 						jswsRequest.getJSONObject("params").getJSONObject("response").getInt("opcode"),
-						fullPayload.substring(0, Math.min(fullPayload.length(), 10)) + " [...] " + fullPayload.substring(Math.max(0, fullPayload.length() - 10))));
+						payloadData));
 			} else if (jswsRequest.get("method").toString().contains("FrameReceived")) {
 				String payloadData = jswsRequest.getJSONObject("params").getJSONObject("response").getString("payloadData");
 				//Substring the payload to give info on what data has been transferred without giving away sensitive data
