@@ -67,6 +67,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -625,6 +629,8 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		// as they behave as real drivers
 		if (isWebTest() && !(Mockito.mockingDetails(driver).isMock() && !Mockito.mockingDetails(driver).isSpy())) {
 			try {
+				updateBidiPort(this.driver);
+				logger.info(((HasCapabilities)driver).getCapabilities().getCapability("se:cdp"));
 				this.driver = new Augmenter().augment(this.driver);
 			} catch (Exception e) {
 				throw new RetryableDriverException("Error augmenting driver", e);
@@ -644,6 +650,30 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 			neoloadDriver = null;
 		}
     }
+
+	/**
+	 * Update se:cdp address with grid hub port
+	 * This is necessary when driver is created with testContainers. In this case, the external URL of the hub is http://localhost:12345 but its internal address is http://localhost:4444
+	 * so the se:cdp uri is ws://localhost:4444/... which is unreachable from host (so augmenting fails)
+	 * Changing port to '12345' allow driver augmentation
+	 * @param driver
+	 */
+	private void updateBidiPort(WebDriver driver) {
+
+		if (((HasCapabilities)driver).getCapabilities().getCapability("se:cdp") != null && ((HasCapabilities)driver).getCapabilities().getCapability(SeleniumRobotCapabilityType.GRID_HUB) != null) {
+
+			try {
+				String cdp = ((HasCapabilities)driver).getCapabilities().getCapability("se:cdp").toString();
+				int cdpPort = new URI(cdp).getPort();
+				int hubPort = new URL(((HasCapabilities)driver).getCapabilities().getCapability(SeleniumRobotCapabilityType.GRID_HUB).toString()).getPort();
+				cdp = cdp.replace(":" + cdpPort + "/", ":" + hubPort + "/");
+				((MutableCapabilities)((HasCapabilities)driver).getCapabilities()).setCapability("se:cdp", cdp);
+			} catch (MalformedURLException | URISyntaxException e) {
+				return;
+			}
+
+		}
+	}
 
     public void setFileDetector(final FileDetector detector) {
         if (detector == null) {
