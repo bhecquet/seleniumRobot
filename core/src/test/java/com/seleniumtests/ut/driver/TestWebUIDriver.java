@@ -441,16 +441,23 @@ public class TestWebUIDriver extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
 		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://localhost:4444/wd/hub");
 		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
+		List<WebDriver> drivers = new ArrayList<>();
 
 		// set connector to simulate the driver creation on grid
 		SeleniumTestsContextManager.getThreadContext().setSeleniumGridConnectors(Arrays.asList(gridConnector));
 		when(gridConnector.getNodeUrl()).thenReturn("http://localhost:5555/");
-		WebDriver realDriver = spy(new HtmlUnitDriver());
-		when(realDriver.switchTo()).thenReturn(targetLocator);
 
 		try (MockedConstruction mockedGridDriverFactory = mockConstruction(SeleniumGridDriverFactory.class, (gridDriverFactory, context) -> {
 
-			when(gridDriverFactory.createWebDriver()).thenReturn(realDriver);
+			when(gridDriverFactory.createWebDriver()).thenAnswer(
+					(Answer<WebDriver>) invocation -> {
+						WebDriver realDriver = spy(new HtmlUnitDriver());
+						when(realDriver.switchTo()).thenReturn(targetLocator);
+						drivers.add(realDriver);
+						return realDriver;
+					}
+			);
+
 			when(gridDriverFactory.getSelectedBrowserInfo()).thenReturn(new BrowserInfo(BrowserType.HTMLUNIT, "1.1"));
 			});
 			MockedConstruction mockedAugmenter = mockConstruction(Augmenter.class, (augmenter, context) -> {
@@ -473,7 +480,8 @@ public class TestWebUIDriver extends MockitoTest {
 			// check cleanUp is correct and driver is closed
 			WebUIDriver.logFinalDriversState(Reporter.getCurrentTestResult());
 			WebUIDriver.cleanUp();
-			verify(realDriver, times(2)).quit();
+			verify(drivers.get(0)).quit();
+			verify(drivers.get(1)).quit();
 		}
 	}
 
