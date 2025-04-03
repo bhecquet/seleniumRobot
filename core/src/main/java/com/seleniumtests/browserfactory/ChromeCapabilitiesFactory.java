@@ -159,43 +159,47 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 
 		// configure options for file download,
 		// only when chrome is started by selenium. Else, we get 'unrecognized chrome option: prefs '
-		if (webDriverConfig.getMode() == DriverMode.LOCAL && webDriverConfig.getAttachExistingDriverPort() == null) {
-			// inspired by LocalNode.java
-			Path downloadDir;
-            try {
-                downloadDir = Files.createDirectories(Paths.get(webDriverConfig.getDownloadOutputDirectory()));
-				experientalOptions.putAll(
-						Map.of(
-								"download.prompt_for_download",
-								false,
-								"download.default_directory",
-								downloadDir.toAbsolutePath().toString(),
-								"savefile.default_directory",
-								downloadDir.toAbsolutePath().toString()));
-            } catch (IOException e) {
-                logger.error("Error creating 'downloads' directory: " + e.getMessage());
-            }
-		} else {
-			options.setEnableDownloads(true);
+		if (webDriverConfig.getAttachExistingDriverPort() == null) {
+			if (webDriverConfig.getMode() == DriverMode.LOCAL) {
+				// inspired by LocalNode.java
+				Path downloadDir;
+				try {
+					downloadDir = Files.createDirectories(Paths.get(webDriverConfig.getDownloadOutputDirectory()));
+					experientalOptions.putAll(
+							Map.of(
+									"download.prompt_for_download",
+									false,
+									"download.default_directory",
+									downloadDir.toAbsolutePath().toString(),
+									"savefile.default_directory",
+									downloadDir.toAbsolutePath().toString()));
+				} catch (IOException e) {
+					logger.error("Error creating 'downloads' directory: " + e.getMessage());
+				}
+			} else {
+				options.setEnableDownloads(true);
+			}
 		}
 
 		options.addArguments(chromeOptions);
+
         
         if (webDriverConfig.getMode() == DriverMode.LOCAL) {
         	setLogging();
         }
 
         // performance logging
-        Map<String, Object> perfLogPrefs = new HashMap<>();
-        //perfLogPrefs.put("traceCategories", "browser,devtools.timeline,devtools");
-        perfLogPrefs.put("enableNetwork", true);
+		Map<String, Object> perfLogPrefs = new HashMap<>();
+		//perfLogPrefs.put("traceCategories", "browser,devtools.timeline,devtools");
+		perfLogPrefs.put("enableNetwork", true);
 		perfLogPrefs.put("enablePage", true);
-        options.setExperimentalOption("perfLoggingPrefs", perfLogPrefs);
+		options.setExperimentalOption("perfLoggingPrefs", perfLogPrefs);
 
-        // For Enabling performance Logs for WebPageTest
-        LoggingPreferences logPrefs = new LoggingPreferences();
-        logPrefs.enable(LogType.PERFORMANCE, Level.ALL);
-        options.setCapability("goog:loggingPrefs", logPrefs);
+		// For Enabling performance Logs for WebPageTest
+		LoggingPreferences logPrefs = new LoggingPreferences();
+		logPrefs.enable(LogType.PERFORMANCE, Level.ALL);
+		options.setCapability("goog:loggingPrefs", logPrefs);
+
         
         // extensions
         List<BrowserExtension> extensions = BrowserExtension.getExtensions(webDriverConfig.getTestContext().getConfiguration());
