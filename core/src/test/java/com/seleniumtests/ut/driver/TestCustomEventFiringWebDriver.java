@@ -57,10 +57,8 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebDriver.Window;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.remote.SessionId;
-import org.openqa.selenium.remote.UnreachableBrowserException;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import org.openqa.selenium.remote.*;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -162,6 +160,22 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		mockedOsUtilityFactory.close();
 		mockedCustomEventFiringWebDriver.close();
 		mockedMouse.close();
+	}
+
+	@Test(groups = {"ut"})
+	public void testConstructor() {
+
+		WebDriver realDriver = new HtmlUnitDriver();
+		try (MockedConstruction mockedAugmenter = mockConstruction(Augmenter.class, (augmenter, context) -> {
+			doAnswer((invocation) -> {
+				return realDriver;
+			}).when(augmenter).augment(any());
+		});
+		) {
+
+			new CustomEventFiringWebDriver(realDriver, null, browserInfo, TestType.WEB, DriverMode.LOCAL, null);
+			verify((Augmenter) mockedAugmenter.constructed().get(0)).augment(realDriver);
+		}
 	}
 
 	@Test(groups = {"ut"})
