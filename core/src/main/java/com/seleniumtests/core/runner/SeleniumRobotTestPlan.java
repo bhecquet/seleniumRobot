@@ -143,14 +143,6 @@ public class SeleniumRobotTestPlan {
 		SeleniumTestsContextManager.getThreadContext().setDriverCreationBlocked(true);
 		
 		SeleniumRobotTestListener.getCurrentListener().onTestFullyFinished(testResult);
-		
-		//add driver-log-browser.txt file to the Test end step if it exists
-		try {
-			logger.logFileToTestEnd(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "driver-log-browser.txt").toFile(), "Browser log file");
-		} catch (Exception e) {
-			logger.info("Browser log file not found");
-		}
-		
 	}
 
 	/**

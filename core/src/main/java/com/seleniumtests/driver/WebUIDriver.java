@@ -446,6 +446,9 @@ public class WebUIDriver {
 			if ("performance".equalsIgnoreCase(logType)) {
 				parsePerformanceLogs(logEntries);
 			}
+			if ("browser".equalsIgnoreCase(logType)) {				
+				scenarioLogger.logFileToTestEnd(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "driver-log-browser.txt").toFile(), "Browser log file");				
+			}
 			for (LogEntry line: logEntries) {
 				writer.println(line.toString());
 			}
