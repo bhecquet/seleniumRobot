@@ -36,6 +36,18 @@ import java.util.Arrays;
 public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	@Test(groups = {"it"})
+	public void testDriverLogBrowserFileInTestEndStep() throws Exception {
+		
+		SeleniumTestsContextManager.removeThreadContext();
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForGenericSteps"}, ParallelMode.METHODS, new String[]{"testDriver"});
+		
+		// check content of Test end steps
+		String testOkDetailedReport = readTestMethodResultFile("testDriver");
+		
+		Assert.assertTrue(testOkDetailedReport.matches(".*<span class=\"step-title\"> Test end -.*<div class=\"message-snapshot\">Browser log file: <a href='driver-log-browser.txt'>file</a></div><div class=\"message-har\">Network capture 'main' browser:.*"));
+	}
+	
+	@Test(groups = {"it"})
 	public void testErrorOnVariableServerWithTestNameInReport() throws Exception {
 		
 		try {

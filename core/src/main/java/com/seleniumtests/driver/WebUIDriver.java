@@ -439,10 +439,10 @@ public class WebUIDriver {
 	 * @param logType
 	 */
 	private void retrieveLogs(String logType) {
-		try (PrintWriter writer = new PrintWriter(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), 
-																		String.format("driver-log-%s.txt", logType)).toFile().getAbsolutePath(),
-												"UTF-8")) {
-
+		File logFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(),
+				String.format("driver-log-%s.txt", logType)).toFile();
+		try (PrintWriter writer = new PrintWriter(logFile.getAbsolutePath(), "UTF-8")) {
+			
 			List<LogEntry> logEntries = driver.manage().logs().get(logType).getAll();
 			boolean writeToFile = true;
 			if ("performance".equalsIgnoreCase(logType)) {
@@ -452,6 +452,9 @@ public class WebUIDriver {
 				for (LogEntry line : logEntries) {
 					writer.println(line.toString());
 				}
+			}
+			if ("browser".equalsIgnoreCase(logType)) {
+				scenarioLogger.logFileToTestEnd(logFile, "Browser log file");
 			}
 
 		} catch (FileNotFoundException | UnsupportedEncodingException e) {
