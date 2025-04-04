@@ -4,6 +4,8 @@ import com.seleniumtests.GenericTest;
 import com.seleniumtests.browserfactory.chrome.ChromeUtils;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.har.Har;
+import com.seleniumtests.util.har.WebSocketEntry;
+
 import org.jetbrains.annotations.NotNull;
 import org.openqa.selenium.logging.LogEntry;
 import org.testng.Assert;
@@ -22,6 +24,201 @@ import java.util.stream.Collectors;
 
 public class TestChromeUtils extends GenericTest {
 
+	@Test(groups = "ut")
+	public void testParsePerformanceLogsWebSocket() throws IOException {
+		List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-with-websockets.txt");
+		
+		List<TestStep> testSteps = new ArrayList<>();
+		testSteps.add(new TestStep("step 1"));
+		testSteps.get(0).setStartDate(Date.from(Instant.ofEpochMilli(1739547733421L)));
+		testSteps.add(new TestStep("step 2"));
+		testSteps.get(1).setStartDate(Date.from(Instant.ofEpochMilli(1739547734198L)));
+		
+		Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
+		
+		// check pages
+		Assert.assertEquals(har.getLog().getPages().size(), 2);
+		Assert.assertEquals(har.getLog().getPages().get(0).getTitle(), "step 1");
+		Assert.assertEquals(har.getLog().getPages().get(0).getId(), "page_0");
+		Assert.assertTrue(har.getLog().getPages().get(0).getStartedDateTime().startsWith("2025-02-14T")); // to avoid problems on other time zones
+		
+		// check entries
+		Assert.assertEquals(har.getLog().getEntries().size(), 13);
+		Assert.assertEquals(har.getLog().getEntries().get(10).getRequest().getMethod(), "GET");
+		Assert.assertEquals(har.getLog().getEntries().get(10).getRequest().getUrl(), "wss://127.0.0.1:0001/test");
+		Assert.assertEquals(har.getLog().getEntries().get(10).getRequest().getHeaders().size(), 13);
+		Assert.assertEquals(har.getLog().getEntries().get(10).getResponse().getStatus(), 101);
+		Assert.assertEquals(har.getLog().getEntries().get(10).getResponse().getStatusText(), "Switching Protocols");
+		Assert.assertEquals(har.getLog().getEntries().get(10).getResponse().getHttpVersion(), "HTTP/1.1");
+		Assert.assertEquals(har.getLog().getEntries().get(10).getResponse().getHeaders().size(), 8);
+		Assert.assertEquals(har.getLog().getEntries().get(10).getResponse().getHeadersSize(), 0);
+		Assert.assertEquals(har.getLog().getEntries().get(10).getResponse().getBodySize(), 0);
+		Assert.assertEquals(har.getLog().getEntries().get(10).getPageref(), "page_1");
+		Assert.assertEquals(har.getLog().getEntries().get(10).getTime(), 3202);
+		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().size(), 9);
+		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().get(1).getData(), "somePayloa [...] esntMatter");
+		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().get(5).getData(), "Payloads less than 20 chars are redacted.");
+		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().get(0).getType(), "receive");
+		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().get(1).getType(), "send");
+		Assert.assertTrue(har.getLog().getEntries().get(10).getStartedDateTime().startsWith("2025-03-26T"));
+		
+		// check transition between pages, based on timings
+		Assert.assertEquals(har.getLog().getEntries().get(7).getPageref(), "page_0");
+		Assert.assertEquals(har.getLog().getEntries().get(8).getPageref(), "page_1");
+	}
+	
+	@Test(groups = "ut")
+	public void testParsePerformanceLogsWebSocketNoHandshake() throws IOException {
+		List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-with-websockets-no-handshake.txt");
+		
+		List<TestStep> testSteps = new ArrayList<>();
+		testSteps.add(new TestStep("step 1"));
+		testSteps.get(0).setStartDate(Date.from(Instant.ofEpochMilli(1739547733421L)));
+		testSteps.add(new TestStep("step 2"));
+		testSteps.get(1).setStartDate(Date.from(Instant.ofEpochMilli(1739547734198L)));
+		
+		Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
+		
+		// check pages
+		Assert.assertEquals(har.getLog().getPages().size(), 2);
+		Assert.assertEquals(har.getLog().getPages().get(0).getTitle(), "step 1");
+		Assert.assertEquals(har.getLog().getPages().get(0).getId(), "page_0");
+		Assert.assertTrue(har.getLog().getPages().get(0).getStartedDateTime().startsWith("2025-02-14T")); // to avoid problems on other time zones
+		
+		// check entries
+		Assert.assertEquals(har.getLog().getEntries().size(), 13);
+		Assert.assertEquals(har.getLog().getEntries().get(10).getRequest().getMethod(), "GET");
+		Assert.assertEquals(har.getLog().getEntries().get(10).getRequest().getUrl(), "wss://127.0.0.1:0001/test");
+		Assert.assertEquals(har.getLog().getEntries().get(10).getRequest().getHeaders().size(), 0);
+		Assert.assertNull(har.getLog().getEntries().get(10).getResponse());
+		Assert.assertEquals(har.getLog().getEntries().get(10).getPageref(), "");
+		Assert.assertEquals(har.getLog().getEntries().get(10).getTime(), -1);
+		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().size(), 9);
+		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().get(1).getData(), "somePayloa [...] esntMatter");
+		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().get(5).getData(), "Payloads less than 20 chars are redacted.");
+		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().get(0).getType(), "receive");
+		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().get(1).getType(), "send");
+		Assert.assertTrue(har.getLog().getEntries().get(10).getStartedDateTime().startsWith("1970-01-01T"));
+		
+		// check transition between pages, based on timings
+		Assert.assertEquals(har.getLog().getEntries().get(7).getPageref(), "page_0");
+		Assert.assertEquals(har.getLog().getEntries().get(8).getPageref(), "page_1");
+	}
+	
+	@Test(groups = "ut")
+	public void testParsePerformanceLogsWebSocketNoHandshakeRespNoCreated() throws IOException {
+		List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-with-websockets-no-handshake-resp.txt");
+		
+		List<TestStep> testSteps = new ArrayList<>();
+		testSteps.add(new TestStep("step 1"));
+		testSteps.get(0).setStartDate(Date.from(Instant.ofEpochMilli(1739547733421L)));
+		testSteps.add(new TestStep("step 2"));
+		testSteps.get(1).setStartDate(Date.from(Instant.ofEpochMilli(1739547734198L)));
+		
+		Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
+		
+		// check pages
+		Assert.assertEquals(har.getLog().getPages().size(), 2);
+		Assert.assertEquals(har.getLog().getPages().get(0).getTitle(), "step 1");
+		Assert.assertEquals(har.getLog().getPages().get(0).getId(), "page_0");
+		Assert.assertTrue(har.getLog().getPages().get(0).getStartedDateTime().startsWith("2025-02-14T")); // to avoid problems on other time zones
+		
+		// check entries
+		Assert.assertEquals(har.getLog().getEntries().size(), 13);
+		Assert.assertEquals(har.getLog().getEntries().get(10).getRequest().getUrl(), "wss://not.found");
+		Assert.assertEquals(har.getLog().getEntries().get(10).getRequest().getHeaders().size(), 13);
+		Assert.assertNull(har.getLog().getEntries().get(10).getResponse());
+		Assert.assertEquals(har.getLog().getEntries().get(10).getPageref(), "page_1");
+		Assert.assertEquals(har.getLog().getEntries().get(10).getTime(), 3202);
+		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().size(), 9);
+		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().get(1).getData(), "somePayloa [...] esntMatter");
+		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().get(5).getData(), "Payloads less than 20 chars are redacted.");
+		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().get(0).getType(), "receive");
+		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().get(1).getType(), "send");
+		Assert.assertTrue(har.getLog().getEntries().get(10).getStartedDateTime().startsWith("2025-03-26T"));
+		
+		// check transition between pages, based on timings
+		Assert.assertEquals(har.getLog().getEntries().get(7).getPageref(), "page_0");
+		Assert.assertEquals(har.getLog().getEntries().get(8).getPageref(), "page_1");
+	}
+	
+	@Test(groups = "ut")
+	public void testParsePerformanceLogsWebSocketOneFrameOnly() throws IOException {
+		List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-with-websockets-one-frame-only.txt");
+		
+		List<TestStep> testSteps = new ArrayList<>();
+		testSteps.add(new TestStep("step 1"));
+		testSteps.get(0).setStartDate(Date.from(Instant.ofEpochMilli(1739547733421L)));
+		testSteps.add(new TestStep("step 2"));
+		testSteps.get(1).setStartDate(Date.from(Instant.ofEpochMilli(1739547734198L)));
+		
+		Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
+		
+		// check pages
+		Assert.assertEquals(har.getLog().getPages().size(), 2);
+		Assert.assertEquals(har.getLog().getPages().get(0).getTitle(), "step 1");
+		Assert.assertEquals(har.getLog().getPages().get(0).getId(), "page_0");
+		Assert.assertTrue(har.getLog().getPages().get(0).getStartedDateTime().startsWith("2025-02-14T")); // to avoid problems on other time zones
+		
+		// check entries
+		Assert.assertEquals(har.getLog().getEntries().size(), 13);
+		Assert.assertNull(har.getLog().getEntries().get(10).getRequest());
+		Assert.assertNull(har.getLog().getEntries().get(10).getResponse());
+		Assert.assertEquals(har.getLog().getEntries().get(10).getPageref(), "");
+		Assert.assertEquals(har.getLog().getEntries().get(10).getTime(), -1);
+		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().size(), 1);
+		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().get(0).getData(), "somePayloa [...] esntMatter");
+		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().get(0).getType(), "receive");
+		Assert.assertTrue(har.getLog().getEntries().get(10).getStartedDateTime().startsWith("1970-01-01T"));
+		
+		// check transition between pages, based on timings
+		Assert.assertEquals(har.getLog().getEntries().get(7).getPageref(), "page_0");
+		Assert.assertEquals(har.getLog().getEntries().get(8).getPageref(), "page_1");
+	}
+
+	@Test(groups = "ut")
+	public void testParsePerformanceLogsWebSocketWithMissingMessages() throws IOException {
+		List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-with-websockets.txt");
+		
+		List<TestStep> testSteps = new ArrayList<>();
+		testSteps.add(new TestStep("step 1"));
+		testSteps.get(0).setStartDate(Date.from(Instant.ofEpochMilli(1739547733421L)));
+		testSteps.add(new TestStep("step 2"));
+		testSteps.get(1).setStartDate(Date.from(Instant.ofEpochMilli(1739547734198L)));
+		
+		Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
+		
+		// check pages
+		Assert.assertEquals(har.getLog().getPages().size(), 2);
+		Assert.assertEquals(har.getLog().getPages().get(0).getTitle(), "step 1");
+		Assert.assertEquals(har.getLog().getPages().get(0).getId(), "page_0");
+		Assert.assertTrue(har.getLog().getPages().get(0).getStartedDateTime().startsWith("2025-02-14T")); // to avoid problems on other time zones
+		
+		// check entries
+		Assert.assertEquals(har.getLog().getEntries().size(), 13);
+		Assert.assertEquals(har.getLog().getEntries().get(10).getRequest().getMethod(), "GET");
+		Assert.assertEquals(har.getLog().getEntries().get(10).getRequest().getUrl(), "wss://127.0.0.1:0001/test");
+		Assert.assertEquals(har.getLog().getEntries().get(10).getRequest().getHeaders().size(), 13);
+		Assert.assertEquals(har.getLog().getEntries().get(10).getResponse().getStatus(), 101);
+		Assert.assertEquals(har.getLog().getEntries().get(10).getResponse().getStatusText(), "Switching Protocols");
+		Assert.assertEquals(har.getLog().getEntries().get(10).getResponse().getHttpVersion(), "HTTP/1.1");
+		Assert.assertEquals(har.getLog().getEntries().get(10).getResponse().getHeaders().size(), 8);
+		Assert.assertEquals(har.getLog().getEntries().get(10).getResponse().getHeadersSize(), 0);
+		Assert.assertEquals(har.getLog().getEntries().get(10).getResponse().getBodySize(), 0);
+		Assert.assertEquals(har.getLog().getEntries().get(10).getPageref(), "page_1");
+		Assert.assertEquals(har.getLog().getEntries().get(10).getTime(), 3202);
+		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().size(), 9);
+		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().get(1).getData(), "somePayloa [...] esntMatter");
+		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().get(5).getData(), "Payloads less than 20 chars are redacted.");
+		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().get(0).getType(), "receive");
+		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().get(1).getType(), "send");
+		Assert.assertTrue(har.getLog().getEntries().get(10).getStartedDateTime().startsWith("2025-03-26T"));
+		
+		// check transition between pages, based on timings
+		Assert.assertEquals(har.getLog().getEntries().get(7).getPageref(), "page_0");
+		Assert.assertEquals(har.getLog().getEntries().get(8).getPageref(), "page_1");
+	}
+	
     @Test(groups="ut")
     public void testParsePerformanceLogsNoError() throws IOException {
         List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-all-ok.txt");
