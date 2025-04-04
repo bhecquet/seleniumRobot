@@ -209,7 +209,7 @@ public class TestChromeUtils extends GenericTest {
 		Assert.assertEquals(har.getLog().getEntries().get(10).getTime(), 3202);
 		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().size(), 9);
 		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().get(1).getData(), "somePayloa [...] esntMatter");
-		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().get(5).getData(), "{}");
+		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().get(5).getData(), "Payloads less than 20 chars are redacted.");
 		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().get(0).getType(), "receive");
 		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().get(1).getType(), "send");
 		Assert.assertTrue(har.getLog().getEntries().get(10).getStartedDateTime().startsWith("2025-03-26T"));
