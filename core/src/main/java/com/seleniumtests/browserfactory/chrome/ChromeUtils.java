@@ -1,9 +1,12 @@
-package com.seleniumtests.browserfactory.chrome;
+	package com.seleniumtests.browserfactory.chrome;
 
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.har.*;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
+
+import io.cucumber.cienvironment.internal.com.eclipsesource.json.Json;
+
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
@@ -83,6 +86,44 @@ public class ChromeUtils {
                         requests.putIfAbsent(requestId, new HashMap<>());
                         requests.get(requestId).put("responseReceivedExtraInfo", messageObject);
                     }
+                    //{"message":{"method":"Network.webSocketCreated","params":{"initiator":{"stack":{"callFrames":[{"columnNumber":26053,"functionName":"start","lineNumber":8,"scriptId":"19","url":"https://127.0.0.1:0001/file/script/jquery.signalR.js"},{"columnNumber":20898,"functionName":"f","lineNumber":0,"scriptId":"10","url":"https://127.0.0.1/letmein/somefile.js"}]},"type":"script"},"requestId":"18060.25","url":"wss://127.0.0.1:0001/test"}},"webview":"0A33F09BEE850DE612D04D06EE1884AC"}
+					case "Network.webSocketCreated" -> {
+						String requestId = messageObject.getJSONObject("params").getString("requestId");
+						requests.putIfAbsent(requestId, new HashMap<>());
+						requests.get(requestId).put("webSocketCreated", messageObject);
+					}
+					//{"message":{"method":"Network.webSocketClosed","params":{"requestId":"18060.25","timestamp":7892.631933}},"webview":"0A33F09BEE850DE612D04D06EE1884AC"}
+					case "Network.webSocketClosed" -> {
+						String requestId = messageObject.getJSONObject("params").getString("requestId");
+						requests.putIfAbsent(requestId, new HashMap<>());
+						requests.get(requestId).put("webSocketClosed", messageObject);
+					}
+					//{"message":{"method":"Network.webSocketWillSendHandshakeRequest","params":{"request":{"headers":{someHeaders}},"requestId":"18060.25","timestamp":7889.427888,"wallTime":1742975479.222366}},"webview":"0A33F09BEE850DE612D04D06EE1884AC"}
+					case "Network.webSocketWillSendHandshakeRequest" -> {
+						String requestId = messageObject.getJSONObject("params").getString("requestId");
+						requests.putIfAbsent(requestId, new HashMap<>());
+						requests.get(requestId).put("webSocketWillSendHandshakeRequest", messageObject);
+					}
+					//{"message":{"method":"Network.webSocketHandshakeResponseReceived","params":{"requestId":"18060.25","response":{"headers":{"someHeaders"},"headersText":"someHeadersText","requestHeaders":{[...],"status":101,"statusText":"Switching Protocols"},"timestamp":7889.430853}},"webview":"0A33F09BEE850DE612D04D06EE1884AC"}
+					case "Network.webSocketHandshakeResponseReceived" -> {
+						String requestId = messageObject.getJSONObject("params").getString("requestId");
+						requests.putIfAbsent(requestId, new HashMap<>());
+						requests.get(requestId).put("webSocketHandshakeResponseReceived", messageObject);
+					}
+					//{"message":{"method":"Network.webSocketFrameSent","params":{"requestId":"18060.25","response":{"mask":true,"opcode":1,"payloadData":"somePayloadDataItDoesntMatter"},"timestamp":7889.443974}},"webview":"0A33F09BEE850DE612D04D06EE1884AC"}
+					case "Network.webSocketFrameSent" -> {
+						String requestId = messageObject.getJSONObject("params").getString("requestId");
+						requests.putIfAbsent(requestId, new HashMap<>());
+						//I'm adding the size as a way to unify the key in order to avoid overriding previous frames
+						requests.get(requestId).put("webSocketFrameSent" + requests.get(requestId).size(), messageObject);
+					}
+					//{"message":{"method":"Network.webSocketFrameReceived","params":{"requestId":"18060.25","response":{"mask":false,"opcode":1,"payloadData":"somePayloadDataItDoesntMatter"},"timestamp":7889.552894}},"webview":"0A33F09BEE850DE612D04D06EE1884AC"}
+					case "Network.webSocketFrameReceived" -> {
+						String requestId = messageObject.getJSONObject("params").getString("requestId");
+						requests.putIfAbsent(requestId, new HashMap<>());
+						//I'm adding the size as a way to unify the key in order to avoid overriding previous frames
+						requests.get(requestId).put("webSocketFrameReceived" + requests.get(requestId).size(), messageObject);
+					}
                 }
 
             } catch (Exception e) {
@@ -97,7 +138,16 @@ public class ChromeUtils {
                 JSONObject jsonRequest = (JSONObject) requestsEntry.getValue().get("requestWillBeSent");
                 // without request information, do nothing
                 if (jsonRequest == null) {
-                    continue;
+                	//Check if requestsEntry is of webSocket type
+                	Set<String> isThereAWebSocketHere = requestsEntry.getValue().keySet().stream().filter(s -> s.contains("webSocket")).collect(Collectors.toSet());
+					if (!isThereAWebSocketHere.isEmpty()) {
+						ArrayList<Object> webSocketEntry = getWebSocketEntry(requestsEntry, pageStart);
+						if (!webSocketEntry.isEmpty()) {
+							log.addEntry((WebSocketEntry) webSocketEntry.get(0));
+							usedPages.replace((Page) webSocketEntry.get(1), true);
+						}
+					}
+					continue;
                 }
                 Request request = buildRequest(requestsEntry, jsonRequest);
 
@@ -144,12 +194,7 @@ public class ChromeUtils {
 
                 long entryDate = (long) (jsonRequest.getJSONObject("params").getDouble("wallTime") * 1000);
 
-                Page pageRef = null;
-                for (Map.Entry<Long, Page> pageEntry : pageStart.entrySet()) {
-                    if (entryDate > pageEntry.getKey() || pageRef == null) {
-                        pageRef = pageEntry.getValue();
-                    }
-                }
+                Page pageRef = getPageRef(pageStart, entryDate);
                 usedPages.replace(pageRef, true);
 
                 Entry entry = new Entry(
@@ -174,7 +219,174 @@ public class ChromeUtils {
 
         return har;
     }
+    
+    private static Page getPageRef(Map<Long, Page> pageStart, long entryDate) {
+		Page pageRef = null;
+		for (Map.Entry<Long, Page> pageEntry : pageStart.entrySet()) {
+			if (entryDate > pageEntry.getKey() || pageRef == null) {
+				pageRef = pageEntry.getValue();
+			}
+		}
+		return pageRef;
+	}
+	
+    private static ArrayList<Object> getWebSocketEntry(Map.Entry<String, HashMap<String, Object>> requestsEntry, Map<Long, Page> pageStart) {
+		try {
+			JSONObject createdWebSocket = (JSONObject) requestsEntry.getValue().get("webSocketCreated");
+			JSONObject sendHandshakeReq = (JSONObject) requestsEntry.getValue().get("webSocketWillSendHandshakeRequest");
+			JSONObject receiveHandshakeResp = (JSONObject) requestsEntry.getValue().get("webSocketHandshakeResponseReceived");
+			JSONObject closedWebSocket = (JSONObject) requestsEntry.getValue().get("webSocketClosed");
+			
+			//Init the datas
+			String url = "wss://not.found";
+			Page pageRef = null;
+			long entryDate = 0;
+			Request req = null;
+			Response res = null;
+			int duration = -1;
+			
+			//Setting every data possible following the available requests entries
+			if (createdWebSocket != null) {
+				url = createdWebSocket.getJSONObject("params").getString("url");
+				req = buildWebSocketRequest(createdWebSocket, url);
+			}
+			
+			if (receiveHandshakeResp != null) {
+				//Set the request
+				req = buildWebSocketRequest(receiveHandshakeResp, url);
+				
+				//Set the response
+				JSONObject jsonResponseHeaders = receiveHandshakeResp.getJSONObject("params").getJSONObject("response").getJSONObject("headers");
+				res = new Response(
+						receiveHandshakeResp.getJSONObject("params").getJSONObject("response").getInt("status"),
+						receiveHandshakeResp.getJSONObject("params").getJSONObject("response").getString("statusText"),
+						receiveHandshakeResp.getJSONObject("params").getJSONObject("response").getString("headersText").split(" ")[0],
+						jsonResponseHeaders.keySet().stream()
+								.filter(key -> !key.toLowerCase().contains("token"))
+								.map(key -> new Header(key, jsonResponseHeaders.getString(key)))
+								.collect(Collectors.toList()),
+						new ArrayList<>(),
+						null,
+						null,
+						jsonResponseHeaders.optInt("Content-Length", 0),
+						0);
+			}
+			
+			if (sendHandshakeReq != null) {
+				entryDate = (long) (sendHandshakeReq.getJSONObject("params").getDouble("wallTime") * 1000);
+				pageRef = getPageRef(pageStart, entryDate);
+				//Set the request in case there's no response message
+				if (req == null) {
+					req = buildWebSocketRequest(sendHandshakeReq, url);
+				}
+				if (closedWebSocket != null) {
+					duration = (int) (closedWebSocket.getJSONObject("params").getDouble("timestamp") * 1000 - sendHandshakeReq.getJSONObject("params").getDouble("timestamp") * 1000);
+				}
+			}
+			
+			//Get the messages, ordered by their timestamps
+			List<WebSocketMessage> webSocketMessages = buildWebSocketMessages(requestsEntry);
+			
+			WebSocketEntry webSocketEntry = new WebSocketEntry(
+					pageRef == null ? "" : pageRef.getId(),
+					Instant.ofEpochMilli(entryDate).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
+					req,
+					res,
+					null,
+					duration,
+					webSocketMessages);
+			
+			//Return the WebSocketEntry object and the Page in order to maintain the logic in the parent parsing function
+			ArrayList<Object> responseArray = new ArrayList<>();
+			responseArray.add(webSocketEntry);
+			responseArray.add(pageRef);
+			
+			return responseArray;
+		} catch (Exception e) {
+			return new ArrayList<>();
+		}
+	}
+	
+	private static Request buildWebSocketRequest(JSONObject jsonEntry, String originalURL) {
+		String url = originalURL;
+		List<Header> jsonHeaders;
+		int jsonHeadersSize;
+		
+		//First, determine if it's a Response entry or a Request entry
+		String entryMethod = jsonEntry.getString("method");
+		
+		if (entryMethod.contains("Response")) {
+			JSONObject jsonRespHeaders = jsonEntry.getJSONObject("params").getJSONObject("response").getJSONObject("requestHeaders");
+			jsonHeaders = jsonRespHeaders.keySet().stream()
+					.filter(key -> !key.toLowerCase().contains("token"))
+					.map(key -> new Header(key, jsonRespHeaders.getString(key)))
+					.collect(Collectors.toList());
+			jsonHeadersSize = jsonRespHeaders.optInt("Content-Length", 0);
+			//in case the url hasn't been found in the webSocketCreated message
+			url = jsonEntry.getJSONObject("params").getJSONObject("response").getString("requestHeadersText").split(" ")[1];
+		} else if (entryMethod.contains("Request")) {
+			JSONObject jsonReqHeaders = jsonEntry.getJSONObject("params").getJSONObject("request").getJSONObject("headers");
+			jsonHeaders = jsonReqHeaders.keySet().stream()
+					.filter(key -> !key.toLowerCase().contains("token"))
+					.map(key -> new Header(key, jsonReqHeaders.getString(key)))
+					.collect(Collectors.toList());
+			jsonHeadersSize = jsonReqHeaders.optInt("Content-Length", 0);
+		} else if (entryMethod.contains("Created")) {
+			//We accept webSocketCreated message because even if there's no headers 
+			//We at least can return the url this WS tried to reach which can help in debug
+			jsonHeaders = new ArrayList<>();
+			jsonHeadersSize = 0;
+		} else {
+			//if it's another entry type just return null instead of an mostly empty object
+			return null;
+		}
 
+		return new Request(0,
+				"GET",
+				url,
+				"HTTP N/A",
+				jsonHeaders,
+				new ArrayList<>(),
+				new ArrayList<>(),
+				jsonHeadersSize);
+	}
+	
+	private static List<WebSocketMessage> buildWebSocketMessages(Map.Entry<String, HashMap<String, Object>> requestsEntry) {
+		List<WebSocketMessage> webSocketMessages = new ArrayList<>();
+		for (Map.Entry<String, Object> wsRequest : requestsEntry.getValue().entrySet()) {
+			JSONObject jswsRequest = (JSONObject) wsRequest.getValue();
+			if (jswsRequest.get("method").toString().contains("FrameSent")) {
+				String payloadData = jswsRequest.getJSONObject("params").getJSONObject("response").getString("payloadData");
+				//Substring the payload to give info on what data has been transferred without giving away sensitive data
+				if (payloadData.length() > 20) {
+					payloadData = payloadData.substring(0, 10) + " [...] " + payloadData.substring(payloadData.length() - 10);
+				} else {
+					payloadData = "Payloads less than 20 chars are redacted.";
+				}
+				webSocketMessages.add(new WebSocketMessage(
+						"send",
+						jswsRequest.getJSONObject("params").getDouble("timestamp"),
+						jswsRequest.getJSONObject("params").getJSONObject("response").getInt("opcode"),
+						payloadData));
+			} else if (jswsRequest.get("method").toString().contains("FrameReceived")) {
+				String payloadData = jswsRequest.getJSONObject("params").getJSONObject("response").getString("payloadData");
+				//Substring the payload to give info on what data has been transferred without giving away sensitive data
+				if (payloadData.length() > 20) {
+					payloadData = payloadData.substring(0, 10) + " [...] " + payloadData.substring(payloadData.length() - 10);
+				} else {
+					payloadData = "Payloads less than 20 chars are redacted.";
+				}
+				webSocketMessages.add(new WebSocketMessage(
+						"receive",
+						jswsRequest.getJSONObject("params").getDouble("timestamp"),
+						jswsRequest.getJSONObject("params").getJSONObject("response").getInt("opcode"),
+						payloadData));
+			}
+		}
+		webSocketMessages.sort((p1, p2) -> (int) (p1.getTime() * 1000 - p2.getTime() * 1000));
+		return webSocketMessages;
+	}
+	
     private static Response buildResponse(Map.Entry<String, HashMap<String, Object>> requestsEntry, JSONObject jsonResponse) {
         Response response;
         // according to spec, responseReceived event may not be fired in case of CORS
