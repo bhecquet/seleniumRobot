@@ -4,6 +4,9 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.har.*;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
+
+import io.cucumber.cienvironment.internal.com.eclipsesource.json.Json;
+
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
@@ -83,7 +86,7 @@ public class ChromeUtils {
                         requests.putIfAbsent(requestId, new HashMap<>());
                         requests.get(requestId).put("responseReceivedExtraInfo", messageObject);
                     }
-                    //{"message":{"method":"Network.webSocketCreated","params":{"initiator":{"stack":{"callFrames":[{"columnNumber":26053,"functionName":"start","lineNumber":8,"scriptId":"19","url":"https://127.0.0.1:0001/file/script/jquery.signalR.js"},{"columnNumber":16671,"functionName":"start","lineNumber":8,"scriptId":"19","url":"https://127.0.0.1:0001/file/script/jquery.signalR.js"},{"columnNumber":9617,"functionName":"g","lineNumber":8,"scriptId":"19","url":"https://127.0.0.1:0001/file/script/jquery.signalR.js"},{"columnNumber":12937,"functionName":"p","lineNumber":8,"scriptId":"19","url":"https://127.0.0.1:0001/file/script/jquery.signalR.js"},{"columnNumber":28326,"functionName":"c","lineNumber":1,"scriptId":"18","url":"https://127.0.0.1:0001/file/script/jquery.js"},{"columnNumber":29071,"functionName":"fireWith","lineNumber":1,"scriptId":"18","url":"https://127.0.0.1:0001/file/script/jquery.js"},{"columnNumber":79900,"functionName":"l","lineNumber":1,"scriptId":"18","url":"https://127.0.0.1:0001/file/script/jquery.js"},{"columnNumber":82354,"functionName":"","lineNumber":1,"scriptId":"18","url":"https://127.0.0.1:0001/file/script/jquery.js"},{"columnNumber":16699,"functionName":"T","lineNumber":0,"scriptId":"10","url":"https://127.0.0.1/letmein/somefile.js"},{"columnNumber":7241,"functionName":"invokeTask","lineNumber":0,"scriptId":"10","url":"https://127.0.0.1/letmein/somefile.js"},{"columnNumber":141936,"functionName":"onInvokeTask","lineNumber":0,"scriptId":"11","url":"https://127.0.0.1/letmein/somefile.js"},{"columnNumber":7162,"functionName":"invokeTask","lineNumber":0,"scriptId":"10","url":"https://127.0.0.1/letmein/somefile.js"},{"columnNumber":2650,"functionName":"runTask","lineNumber":0,"scriptId":"10","url":"https://127.0.0.1/letmein/somefile.js"},{"columnNumber":8291,"functionName":"invokeTask","lineNumber":0,"scriptId":"10","url":"https://127.0.0.1/letmein/somefile.js"},{"columnNumber":20574,"functionName":"p","lineNumber":0,"scriptId":"10","url":"https://127.0.0.1/letmein/somefile.js"},{"columnNumber":20898,"functionName":"f","lineNumber":0,"scriptId":"10","url":"https://127.0.0.1/letmein/somefile.js"}]},"type":"script"},"requestId":"18060.25","url":"wss://127.0.0.1:0001/test"}},"webview":"0A33F09BEE850DE612D04D06EE1884AC"}
+                    //{"message":{"method":"Network.webSocketCreated","params":{"initiator":{"stack":{"callFrames":[{"columnNumber":26053,"functionName":"start","lineNumber":8,"scriptId":"19","url":"https://127.0.0.1:0001/file/script/jquery.signalR.js"},{"columnNumber":20898,"functionName":"f","lineNumber":0,"scriptId":"10","url":"https://127.0.0.1/letmein/somefile.js"}]},"type":"script"},"requestId":"18060.25","url":"wss://127.0.0.1:0001/test"}},"webview":"0A33F09BEE850DE612D04D06EE1884AC"}
 					case "Network.webSocketCreated" -> {
 						String requestId = messageObject.getJSONObject("params").getString("requestId");
 						requests.putIfAbsent(requestId, new HashMap<>());
@@ -95,13 +98,13 @@ public class ChromeUtils {
 						requests.putIfAbsent(requestId, new HashMap<>());
 						requests.get(requestId).put("webSocketClosed", messageObject);
 					}
-					//{"message":{"method":"Network.webSocketWillSendHandshakeRequest","params":{"request":{"headers":{"Accept-Encoding":"gzip, deflate, br, zstd","Accept-Language":"fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7","Cache-Control":"no-cache","Connection":"Upgrade","Host":"127.0.0.1:0001","Origin":"https://letmein.fr","Pragma":"no-cache","Sec-WebSocket-Extensions":"permessage-deflate; client_max_window_bits","Sec-WebSocket-Key":"+dZURNKZRymLmSs7AXNGvg==","Sec-WebSocket-Version":"13","Upgrade":"websocket","User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"}},"requestId":"18060.25","timestamp":7889.427888,"wallTime":1742975479.222366}},"webview":"0A33F09BEE850DE612D04D06EE1884AC"}
+					//{"message":{"method":"Network.webSocketWillSendHandshakeRequest","params":{"request":{"headers":{someHeaders}},"requestId":"18060.25","timestamp":7889.427888,"wallTime":1742975479.222366}},"webview":"0A33F09BEE850DE612D04D06EE1884AC"}
 					case "Network.webSocketWillSendHandshakeRequest" -> {
 						String requestId = messageObject.getJSONObject("params").getString("requestId");
 						requests.putIfAbsent(requestId, new HashMap<>());
 						requests.get(requestId).put("webSocketWillSendHandshakeRequest", messageObject);
 					}
-					//{"message":{"method":"Network.webSocketHandshakeResponseReceived","params":{"requestId":"18060.25","response":{"headers":{"Access-Control-Allow-Credentials":"true","Access-Control-Allow-Origin":"https://letmein.fr","Connection":"Upgrade","Date":"Wed, 26 Mar 2025 07:51:18 GMT","Sec-WebSocket-Accept":"ad2mfXkWLaT2s3LbAm0dDr6X+DE=","Server":"Microsoft-HTTPAPI/2.0","Upgrade":"websocket","X-Content-Type-Options":"nosniff"},"headersText":"HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nServer: Microsoft-HTTPAPI/2.0\r\nAccess-Control-Allow-Origin: https://letmein.fr\r\nAccess-Control-Allow-Credentials: true\r\nX-Content-Type-Options: nosniff\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: ad2mfXkWLaT2s3LbAm0dDr6X+DE=\r\nDate: Wed, 26 Mar 2025 07:51:18 GMT\r\n\r\n","requestHeaders":{"Accept-Encoding":"gzip, deflate, br, zstd","Accept-Language":"fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7","Authorization":"Negotiate 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","Cache-Control":"no-cache","Connection":"Upgrade","Host":"127.0.0.1:0001","Origin":"https://letmein.fr","Pragma":"no-cache","Sec-WebSocket-Extensions":"permessage-deflate; client_max_window_bits","Sec-WebSocket-Key":"pDrWkMtDHAUKh1PrNOTy5w==","Sec-WebSocket-Version":"13","Upgrade":"websocket","User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"},"requestHeadersText":"GET wss://127.0.0.1:0001/test HTTP/1.1\r\nHost: 127.0.0.1:0001\r\nConnection: Upgrade\r\nPragma: no-cache\r\nCache-Control: no-cache\r\nAuthorization: Negotiate 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\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36\r\nUpgrade: websocket\r\nOrigin: https://letmein.fr\r\nSec-WebSocket-Version: 13\r\nAccept-Encoding: gzip, deflate, br, zstd\r\nAccept-Language: fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7\r\nSec-WebSocket-Key: pDrWkMtDHAUKh1PrNOTy5w==\r\nSec-WebSocket-Extensions: permessage-deflate; client_max_window_bits\r\n\r\n","status":101,"statusText":"Switching Protocols"},"timestamp":7889.430853}},"webview":"0A33F09BEE850DE612D04D06EE1884AC"}
+					//{"message":{"method":"Network.webSocketHandshakeResponseReceived","params":{"requestId":"18060.25","response":{"headers":{"someHeaders"},"headersText":"someHeadersText","requestHeaders":{[...],"status":101,"statusText":"Switching Protocols"},"timestamp":7889.430853}},"webview":"0A33F09BEE850DE612D04D06EE1884AC"}
 					case "Network.webSocketHandshakeResponseReceived" -> {
 						String requestId = messageObject.getJSONObject("params").getString("requestId");
 						requests.putIfAbsent(requestId, new HashMap<>());
@@ -136,8 +139,8 @@ public class ChromeUtils {
                 // without request information, do nothing
                 if (jsonRequest == null) {
                 	//Check if requestsEntry is of webSocket type
-					JSONObject jsonWSRequest = (JSONObject) requestsEntry.getValue().get("webSocketCreated");
-					if (jsonWSRequest != null) {
+                	Set<String> isThereAWebSocketHere = requestsEntry.getValue().keySet().stream().filter(s -> s.contains("webSocket")).collect(Collectors.toSet());
+					if (!isThereAWebSocketHere.isEmpty()) {
 						ArrayList<Object> webSocketEntry = getWebSocketEntry(requestsEntry, pageStart);
 						if (!webSocketEntry.isEmpty()) {
 							log.addEntry((WebSocketEntry) webSocketEntry.get(0));
@@ -227,35 +230,33 @@ public class ChromeUtils {
 		return pageRef;
 	}
 	
-	private static ArrayList<Object> getWebSocketEntry(Map.Entry<String, HashMap<String, Object>> requestsEntry, Map<Long, Page> pageStart) {
+    private static ArrayList<Object> getWebSocketEntry(Map.Entry<String, HashMap<String, Object>> requestsEntry, Map<Long, Page> pageStart) {
 		try {
+			JSONObject createdWebSocket = (JSONObject) requestsEntry.getValue().get("webSocketCreated");
 			JSONObject sendHandshakeReq = (JSONObject) requestsEntry.getValue().get("webSocketWillSendHandshakeRequest");
 			JSONObject receiveHandshakeResp = (JSONObject) requestsEntry.getValue().get("webSocketHandshakeResponseReceived");
 			JSONObject closedWebSocket = (JSONObject) requestsEntry.getValue().get("webSocketClosed");
 			
-			long entryDate = (long) (sendHandshakeReq.getJSONObject("params").getDouble("wallTime") * 1000);
-			Page pageRef = getPageRef(pageStart, entryDate);
-			
-			//Set the request headers
-			JSONObject jsonRequestHeaders = receiveHandshakeResp.getJSONObject("params").getJSONObject("response").getJSONObject("requestHeaders");
-			Request req = new Request(0,
-					receiveHandshakeResp.getJSONObject("params").getJSONObject("response").getString("requestHeadersText").split(" ")[0],
-					receiveHandshakeResp.getJSONObject("params").getJSONObject("response").getString("requestHeadersText").split(" ")[1],
-					"HTTP N/A",
-					jsonRequestHeaders.keySet().stream()
-							.filter(key -> !key.toLowerCase().contains("token"))
-							.map(key -> new Header(key, jsonRequestHeaders.getString(key)))
-							.collect(Collectors.toList()),
-					new ArrayList<>(),
-					null,
-					jsonRequestHeaders.optInt("Content-Length", 0));
-			
-			//Set the response headers if there's a response
-			JSONObject jsonResponseHeaders = receiveHandshakeResp.getJSONObject("params").getJSONObject("response").getJSONObject("headers");
-			
-			int duration = -1;
+			//Init the datas
+			String url = "wss://not.found";
+			Page pageRef = null;
+			long entryDate = 0;
+			Request req = null;
 			Response res = null;
-			if (jsonResponseHeaders != null) {
+			int duration = -1;
+			
+			//Setting every data possible following the available requests entries
+			if (createdWebSocket != null) {
+				url = createdWebSocket.getJSONObject("params").getString("url");
+				req = buildWebSocketRequest(createdWebSocket, url);
+			}
+			
+			if (receiveHandshakeResp != null) {
+				//Set the request
+				req = buildWebSocketRequest(receiveHandshakeResp, url);
+				
+				//Set the response
+				JSONObject jsonResponseHeaders = receiveHandshakeResp.getJSONObject("params").getJSONObject("response").getJSONObject("headers");
 				res = new Response(
 						receiveHandshakeResp.getJSONObject("params").getJSONObject("response").getInt("status"),
 						receiveHandshakeResp.getJSONObject("params").getJSONObject("response").getString("statusText"),
@@ -269,29 +270,85 @@ public class ChromeUtils {
 						null,
 						jsonResponseHeaders.optInt("Content-Length", 0),
 						0);
-				duration = (int) (closedWebSocket.getJSONObject("params").getDouble("timestamp") * 1000 - sendHandshakeReq.getJSONObject("params").getDouble("timestamp") * 1000);
+			}
+			
+			if (sendHandshakeReq != null) {
+				entryDate = (long) (sendHandshakeReq.getJSONObject("params").getDouble("wallTime") * 1000);
+				pageRef = getPageRef(pageStart, entryDate);
+				//Set the request in case there's no response message
+				if (req == null) {
+					req = buildWebSocketRequest(sendHandshakeReq, url);
+				}
+				if (closedWebSocket != null) {
+					duration = (int) (closedWebSocket.getJSONObject("params").getDouble("timestamp") * 1000 - sendHandshakeReq.getJSONObject("params").getDouble("timestamp") * 1000);
+				}
 			}
 			
 			//Get the messages, ordered by their timestamps
 			List<WebSocketMessage> webSocketMessages = buildWebSocketMessages(requestsEntry);
 			
-			//Return the WebSocketEntry object and the Page in order to maintain the logic in the parent parsing function
-			ArrayList<Object> responseArray = new ArrayList<>();
-			responseArray.add(new WebSocketEntry(
+			WebSocketEntry webSocketEntry = new WebSocketEntry(
 					pageRef == null ? "" : pageRef.getId(),
-					Instant.ofEpochMilli((long) (sendHandshakeReq.getJSONObject("params").getDouble("wallTime") * 1000)).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
+					Instant.ofEpochMilli(entryDate).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
 					req,
 					res,
 					null,
 					duration,
-					webSocketMessages));
+					webSocketMessages);
 			
+			//Return the WebSocketEntry object and the Page in order to maintain the logic in the parent parsing function
+			ArrayList<Object> responseArray = new ArrayList<>();
+			responseArray.add(webSocketEntry);
 			responseArray.add(pageRef);
+			
 			return responseArray;
 		} catch (Exception e) {
-			logger.info(e);
 			return new ArrayList<>();
 		}
+	}
+	
+	private static Request buildWebSocketRequest(JSONObject jsonEntry, String originalURL) {
+		String url = originalURL;
+		List<Header> jsonHeaders;
+		int jsonHeadersSize;
+		
+		//First, determine if it's a Response entry or a Request entry
+		String entryMethod = jsonEntry.getString("method");
+		
+		if (entryMethod.contains("Response")) {
+			JSONObject jsonRespHeaders = jsonEntry.getJSONObject("params").getJSONObject("response").getJSONObject("requestHeaders");
+			jsonHeaders = jsonRespHeaders.keySet().stream()
+					.filter(key -> !key.toLowerCase().contains("token"))
+					.map(key -> new Header(key, jsonRespHeaders.getString(key)))
+					.collect(Collectors.toList());
+			jsonHeadersSize = jsonRespHeaders.optInt("Content-Length", 0);
+			//in case the url hasn't been found in the webSocketCreated message
+			url = jsonEntry.getJSONObject("params").getJSONObject("response").getString("requestHeadersText").split(" ")[1];
+		} else if (entryMethod.contains("Request")) {
+			JSONObject jsonReqHeaders = jsonEntry.getJSONObject("params").getJSONObject("request").getJSONObject("headers");
+			jsonHeaders = jsonReqHeaders.keySet().stream()
+					.filter(key -> !key.toLowerCase().contains("token"))
+					.map(key -> new Header(key, jsonReqHeaders.getString(key)))
+					.collect(Collectors.toList());
+			jsonHeadersSize = jsonReqHeaders.optInt("Content-Length", 0);
+		} else if (entryMethod.contains("Created")) {
+			//We accept webSocketCreated message because even if there's no headers 
+			//We at least can return the url this WS tried to reach which can help in debug
+			jsonHeaders = new ArrayList<>();
+			jsonHeadersSize = 0;
+		} else {
+			//if it's another entry type just return null instead of an mostly empty object
+			return null;
+		}
+
+		return new Request(0,
+				"GET",
+				url,
+				"HTTP N/A",
+				jsonHeaders,
+				new ArrayList<>(),
+				new ArrayList<>(),
+				jsonHeadersSize);
 	}
 	
 	private static List<WebSocketMessage> buildWebSocketMessages(Map.Entry<String, HashMap<String, Object>> requestsEntry) {
@@ -303,6 +360,8 @@ public class ChromeUtils {
 				//Substring the payload to give info on what data has been transferred without giving away sensitive data
 				if (payloadData.length() > 20) {
 					payloadData = payloadData.substring(0, 10) + " [...] " + payloadData.substring(payloadData.length() - 10);
+				} else {
+					payloadData = "Payloads less than 20 chars are redacted.";
 				}
 				webSocketMessages.add(new WebSocketMessage(
 						"send",
@@ -314,6 +373,8 @@ public class ChromeUtils {
 				//Substring the payload to give info on what data has been transferred without giving away sensitive data
 				if (payloadData.length() > 20) {
 					payloadData = payloadData.substring(0, 10) + " [...] " + payloadData.substring(payloadData.length() - 10);
+				} else {
+					payloadData = "Payloads less than 20 chars are redacted.";
 				}
 				webSocketMessages.add(new WebSocketMessage(
 						"receive",
