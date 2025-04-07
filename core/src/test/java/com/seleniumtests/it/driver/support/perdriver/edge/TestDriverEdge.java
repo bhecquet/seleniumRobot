@@ -339,6 +339,18 @@ public class TestDriverEdge extends TestDriver {
 	public void testIsElementPresentAndDisplayed() {
 		super.testIsElementPresentAndDisplayed();
 	}
+	@Test(groups={"it", "ut"})
+	public void testWaitForElementPresentAndDisplayedWithDelay() {
+		super.testWaitForElementPresentAndDisplayedWithDelay();
+	}
+	@Test(groups={"it", "ut"})
+	public void testWaitForElementNotPresentAndNotDisplayed() {
+		super.testWaitForElementNotPresentAndNotDisplayed();
+	}
+	@Test(groups={"it", "ut"})
+	public void testWaitForElementPresentAndNotDisplayed() {
+		super.testWaitForElementPresentAndNotDisplayed();
+	}
 
 	@Test(groups={"it", "ut"})
 	public void testIsElementPresentAndDisplayedWithDelay() {

@@ -21,6 +21,7 @@ import java.awt.AWTException;
 import java.io.File;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -837,6 +838,41 @@ public class TestDriver extends GenericMultiBrowserTest {
 	
 	public void testIsElementNotPresent() {
 		Assert.assertFalse(new HtmlElement("", By.id("divNotFound")).isElementPresent(2));
+	}
+
+	public void testWaitForElementPresentAndDisplayedWithDelay() {
+
+		try {
+			DriverTestPage.delayHiddenButton.click();
+			new HtmlElement("", By.id("hiddenContent")).waitForPresentAndDisplayed(8);
+		} finally {
+			DriverTestPage.delayHiddenButtonReset.click();
+		}
+	}
+
+	public void testWaitForElementNotPresentAndNotDisplayed() {
+		Instant start = Instant.now();
+		boolean exceptionRaised = false;
+		try {
+			new HtmlElement("", By.id("divNotFound")).waitForPresentAndDisplayed(2);
+		} catch (TimeoutException e) {
+			exceptionRaised = true;
+		}
+		Assert.assertTrue(exceptionRaised);
+		Assert.assertTrue(Instant.now().isBefore(start.plusSeconds(5)));
+	}
+
+	// Will raise TimeoutException
+	public void testWaitForElementPresentAndNotDisplayed() {
+		Instant start = Instant.now();
+		boolean exceptionRaised = false;
+		try {
+			new HtmlElement("", By.id("deu")).waitForPresentAndDisplayed(2);
+		} catch (TimeoutException e) {
+			exceptionRaised = true;
+		}
+		Assert.assertTrue(exceptionRaised);
+		Assert.assertTrue(Instant.now().isBefore(start.plusSeconds(5)));
 	}
 	
 	/**

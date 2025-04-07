@@ -1274,11 +1274,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      */
     public boolean isElementPresentAndDisplayed(int timeout) {        
         try {
-			long start = System.currentTimeMillis();
-    		waitForPresent(timeout);
-			Long duration = (System.currentTimeMillis() - start) / 1000;
-
-			waitFor(Math.max(1, timeout - duration.intValue()), ExpectedConditions.visibilityOf(this));
+			waitForPresentAndDisplayed(timeout);
     		return true;
     	} catch (TimeoutException e) {
 			scenarioLogger.warn(String.format("Element %s is not present", getBy()));
@@ -1648,6 +1644,22 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     		setImplicitWaitTimeout(SeleniumTestsContextManager.getThreadContext().getImplicitWaitTimeout());
     	}
     }
+
+	/**
+	 * Wait for an element to be present and displayed
+	 * If not present or displayed, a TimeoutException is raised
+	 * @param timeout	timeout in seconds
+	 */
+	public void waitForPresentAndDisplayed(int timeout) {
+		long start = System.currentTimeMillis();
+		waitForPresent(timeout);
+		Long duration = (System.currentTimeMillis() - start) / 1000;
+
+		waitFor(Math.max(1, timeout - duration.intValue()), ExpectedConditions.visibilityOf(this));
+	}
+	public void waitForPresentAndDisplayed() {
+		waitForPresentAndDisplayed(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout());
+	}
 
     public void waitFor(int timeout, ExpectedCondition<?> condition) {
     	
