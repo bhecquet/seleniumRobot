@@ -51,11 +51,11 @@ public class PerfectoCapabilitiesFactory extends ICloudCapabilityFactory {
 		
 		if(ANDROID_PLATFORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
         	Capabilities androidCaps = new AndroidCapabilitiesFactory(webDriverConfig).createCapabilities();
-        	capabilities.merge(androidCaps);
+			capabilities = capabilities.merge(androidCaps);
             
         } else if (IOS_PLATFORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
         	Capabilities iosCaps = new IOsCapabilitiesFactory(webDriverConfig).createCapabilities();
-        	capabilities.merge(iosCaps);
+			capabilities = capabilities.merge(iosCaps);
         } 
 		
 		// we need to upload something

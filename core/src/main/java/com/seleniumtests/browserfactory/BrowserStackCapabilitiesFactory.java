@@ -52,7 +52,7 @@ public class BrowserStackCapabilitiesFactory extends ICloudCapabilityFactory {
 	@Override
     public MutableCapabilities createCapabilities() {
 
-        final MutableCapabilities capabilities = new DesiredCapabilities();
+        MutableCapabilities capabilities = new DesiredCapabilities();
 
         // platform must be the concatenation of 'os' and 'os_version' that browserstack undestands
         String platform = webDriverConfig.getPlatform();
@@ -63,13 +63,13 @@ public class BrowserStackCapabilitiesFactory extends ICloudCapabilityFactory {
 	        if(ANDROID_PLATFORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
 		        
 	        	Capabilities androidCaps = new AndroidCapabilitiesFactory(webDriverConfig).createCapabilities();
-	        	capabilities.merge(androidCaps);
+				capabilities = capabilities.merge(androidCaps);
 
 				((UiAutomator2Options)capabilities).setAutomationName("UIAutomator2");
 	            
 	        } else if (IOS_PLATFORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
 	        	Capabilities iosCaps = new IOsCapabilitiesFactory(webDriverConfig).createCapabilities();
-	        	capabilities.merge(iosCaps);
+				capabilities = capabilities.merge(iosCaps);
 	        }
 	        
 	        capabilities.setCapability("device", webDriverConfig.getDeviceName()); // pour deviceName

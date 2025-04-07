@@ -51,7 +51,7 @@ public class SauceLabsCapabilitiesFactory extends ICloudCapabilityFactory {
 	@Override
     public MutableCapabilities createCapabilities() {
 
-        final BaseOptions capabilities = new BaseOptions();
+        BaseOptions capabilities = new BaseOptions();
 
 		MutableCapabilities sauceOptions = new MutableCapabilities();
         capabilities.setCapability("sauce:options", sauceOptions);
@@ -59,11 +59,11 @@ public class SauceLabsCapabilitiesFactory extends ICloudCapabilityFactory {
 		if(ANDROID_PLATFORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
 	        
         	Capabilities androidCaps = new AndroidCapabilitiesFactory(webDriverConfig).createCapabilities();
-        	capabilities.merge(androidCaps);
+			capabilities = capabilities.merge(androidCaps);
             
         } else if (IOS_PLATFORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
         	Capabilities iosCaps = new IOsCapabilitiesFactory(webDriverConfig).createCapabilities();
-        	capabilities.merge(iosCaps);
+			capabilities = capabilities.merge(iosCaps);
         	
         	
         } else {
