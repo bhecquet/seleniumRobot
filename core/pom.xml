@@ -278,7 +278,7 @@
 		<dependency>
 			<groupId>io.github.bhecquet</groupId>
 			<artifactId>squash-tm-java-client</artifactId>
-			<version>1.0.12</version>
+			<version>1.0.17</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.inject</groupId>
