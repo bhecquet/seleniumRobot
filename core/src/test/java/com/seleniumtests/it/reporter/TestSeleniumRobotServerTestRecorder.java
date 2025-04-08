@@ -514,8 +514,14 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector).createTestStep(eq("_captureSnapshot with args: (my snapshot, )"), anyInt());
 			verify(serverConnector).createSnapshot(any(Snapshot.class), anyInt(), listArgument.capture()); // 1 custom snapshot taken with name
 
-			verify(serverConnector, times(5)).uploadFile(fileCapture.capture(), eq(0)); // 2 pictures, 2 HTML, 1 HAR
-			Assert.assertTrue(fileCapture.getAllValues().stream().noneMatch(f -> f.getName().contains("my_snapshot")));
+			verify(serverConnector, times(6)).uploadFile(fileCapture.capture(), eq(0)); // 2 pictures, 2 HTML, 1 HAR, 1 driver logs
+			List<File> allFiles = fileCapture.getAllValues();
+
+			Assert.assertTrue(allFiles.stream().noneMatch(f -> f.getName().contains("my_snapshot")));
+			Assert.assertTrue(allFiles.stream().anyMatch(f -> f.getName().contains("driver-log-browser.txt")));
+			Assert.assertTrue(allFiles.stream().anyMatch(f -> f.getName().contains("main-networkCapture.har")));
+			Assert.assertEquals(allFiles.stream().filter(f -> f.getName().endsWith(".html")).count(), 2);
+			Assert.assertEquals(allFiles.stream().filter(f -> f.getName().endsWith(".png")).count(), 2);
 
 			// check exclude zones have been sent
 			Assert.assertEquals(listArgument.getValue().size(), 1);
@@ -566,7 +572,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector).createTestStep(eq("_captureSnapshot with args: (my snapshot, )"), anyInt());
 
 			// check capture recorded for comparison is sent to server as attachment
-			verify(serverConnector, times(7)).uploadFile(fileCapture.capture(), eq(0)); // 1 HAR, 2 picture + HTML, 2 pictures for comparison
+			verify(serverConnector, times(8)).uploadFile(fileCapture.capture(), eq(0)); // 1 HAR, 2 picture + HTML + 2 pictures for comparison + driver logs
 			Assert.assertEquals(fileCapture.getAllValues().stream().filter(f -> f.getName().contains("my_snapshot")).count(), 2);
 			verify(serverConnector, never()).createSnapshot(any(Snapshot.class), anyInt(), eq(new ArrayList<>())); // 1 custom snapshot taken with name
 			
@@ -849,7 +855,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 
 			// issue #331: check all test cases are created, call MUST be done only once to avoid result to be recorded several times
 			verify(serverConnector).createTestCase("testDownloadFile");
-			verify(serverConnector, times(6)).uploadFile(fileCapture.capture(), eq(0));
+			verify(serverConnector, times(7)).uploadFile(fileCapture.capture(), eq(0));
 			Assert.assertTrue(fileCapture.getAllValues().stream().filter(f -> f.getName().equals("nom-du-fichier.pdf")).findFirst().isPresent());
 
 		} finally {
