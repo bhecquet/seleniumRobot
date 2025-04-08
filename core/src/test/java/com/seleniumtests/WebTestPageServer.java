@@ -65,8 +65,8 @@ public class WebTestPageServer {
 	
 	public void exposeTestPage() throws Exception {
 
-//		localAddress = Inet4Address.getLocalHost().getHostAddress();
-		localAddress = Inet4Address.getByName("localhost").getHostAddress();
+		localAddress = Inet4Address.getLocalHost().getHostAddress();
+//		localAddress = Inet4Address.getByName("localhost").getHostAddress();
         server = new WebServer(localAddress, getPageMapping());
         server.expose();
         logger.info(String.format("exposing server on http://%s:%d", localAddress, server.getServerHost().getPort()));
