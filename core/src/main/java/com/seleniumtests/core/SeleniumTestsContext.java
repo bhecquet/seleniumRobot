@@ -404,7 +404,27 @@ public class SeleniumTestsContext {
         setGeckoDriverPath(getValueForTest(GECKO_DRIVER_PATH, System.getProperty(GECKO_DRIVER_PATH)));
         setEdgeDriverPath(getValueForTest(EDGE_DRIVER_PATH, System.getProperty(EDGE_DRIVER_PATH)));
         setIEDriverPath(getValueForTest(IE_DRIVER_PATH, System.getProperty(IE_DRIVER_PATH)));
-        setUserAgent(getValueForTest(USER_AGENT, System.getProperty(USER_AGENT)));
+
+		// ISSUE #705: To let users do some tuning on the userAgent, we need to replace some place-holders
+		// If the expected value is null, use the default value, if there's no default let it empty
+		// For now, the only available place-holders are <<browser>>, <<testName>>
+		String userAgent = System.getProperty(USER_AGENT);
+		if (userAgent != null) {
+			//Browser - has default value
+			if (System.getProperty(BROWSER) != null) {
+				userAgent = userAgent.replace("<<browser>>", System.getProperty(BROWSER));
+			} else {
+				userAgent = userAgent.replace("<<browser>>", DEFAULT_BROWSER);
+			}
+			//TestName - no default value
+			if (System.getProperty(TEST_NAME) != null) {
+				userAgent = userAgent.replace("<<testName>>", System.getProperty(TEST_NAME));
+			} else {
+				userAgent = userAgent.replace("<<testName>>", "");
+			}
+		}
+		setUserAgent(getValueForTest(USER_AGENT, userAgent));
+		
         setBetaBrowser(getBoolValueForTest(BETA_BROWSER, System.getProperty(BETA_BROWSER)));
         setAssumeUntrustedCertificateIssuer(getBoolValueForTest(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER, System.getProperty(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER)));
         setAcceptUntrustedCertificates(getBoolValueForTest(SET_ACCEPT_UNTRUSTED_CERTIFICATES, System.getProperty(SET_ACCEPT_UNTRUSTED_CERTIFICATES)));

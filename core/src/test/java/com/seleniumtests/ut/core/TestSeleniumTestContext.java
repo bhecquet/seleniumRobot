@@ -65,6 +65,78 @@ import com.seleniumtests.util.video.VideoCaptureMode;
  */
 public class TestSeleniumTestContext extends GenericTest {
 
+	@Test(groups = {"ut context"})
+	public void testSetCustomUserAgent(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		try {
+			System.setProperty("userAgent", "SeleniumRobot <<browser>> - somePath/someValue/<<testName>>");
+			System.setProperty("browser", "Chrome");
+			System.setProperty("testName", "mytestname");
+			initThreadContext(testNGCtx);
+			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
+			Assert.assertEquals(seleniumTestsCtx.getUserAgent(), "SeleniumRobot Chrome - somePath/someValue/mytestname");
+		} finally {
+			System.clearProperty("userAgent");
+			System.clearProperty("browser");
+			System.clearProperty("testName");
+		}
+	}
+	
+	@Test(groups = {"ut context"})
+	public void testSetCustomUserAgentNoBrowser(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		try {
+			System.setProperty("userAgent", "SeleniumRobot <<browser>> - somePath/someValue/<<testName>>");
+			System.setProperty("testName", "mytestname");
+			initThreadContext(testNGCtx);
+			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
+			Assert.assertEquals(seleniumTestsCtx.getUserAgent(), "SeleniumRobot none - somePath/someValue/mytestname");
+		} finally {
+			System.clearProperty("userAgent");
+			System.clearProperty("testName");
+		}
+	}
+	
+	@Test(groups = {"ut context"})
+	public void testSetCustomUserAgentNoTestName(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		try {
+			System.setProperty("userAgent", "SeleniumRobot <<browser>> - somePath/someValue/<<testName>>");
+			System.setProperty("browser", "Chrome");
+			initThreadContext(testNGCtx);
+			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
+			Assert.assertEquals(seleniumTestsCtx.getUserAgent(), "SeleniumRobot Chrome - somePath/someValue/");
+		} finally {
+			System.clearProperty("userAgent");
+			System.clearProperty("browser");
+		}
+	}
+	
+	@Test(groups = {"ut context"})
+	public void testSetCustomUserAgentNoProps(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		try {
+			System.setProperty("userAgent", "SeleniumRobot <<browser>> - somePath/someValue/<<testName>>");
+			initThreadContext(testNGCtx);
+			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
+			Assert.assertEquals(seleniumTestsCtx.getUserAgent(), "SeleniumRobot none - somePath/someValue/");
+		} finally {
+			System.clearProperty("userAgent");
+		}
+	}
+	
+	@Test(groups = {"ut context"})
+	public void testSetCustomUserAgentNoPlaceholders(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		try {
+			System.setProperty("userAgent", "SeleniumRobot - no-placeholders/no-chocolate");
+			System.setProperty("browser", "Chrome");
+			System.setProperty("testName", "mytestname");
+			initThreadContext(testNGCtx);
+			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
+			Assert.assertEquals(seleniumTestsCtx.getUserAgent(), "SeleniumRobot - no-placeholders/no-chocolate");
+		} finally {
+			System.clearProperty("userAgent");
+			System.clearProperty("browser");
+			System.clearProperty("testName");
+		}
+	}
+	
 	/**
 	 * If parameter is only defined in test suite, it's correctly read
 	 */
@@ -1723,4 +1795,20 @@ public class TestSeleniumTestContext extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().setAttribute("foo", "bar");
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAttribute("foo2", true), "bar2");
 	}
+	
+	//Check with TimeOut test parameter
+	@Test(groups={"ut context"})
+	public void testTimeOutFromTest(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		try {
+			xmlTest.addParameter("timeOut", "30");	
+			testNGCtx.setAttribute("timeOut", 30);
+			initThreadContext(testNGCtx);
+			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
+			Assert.assertEquals(seleniumTestsCtx.getPlatform(), "Android");
+		} finally {
+			xmlTest.getLocalParameters().remove("timeOut");
+			testNGCtx.removeAttribute("timeOut");
+		}
+	}
+	
 }
