@@ -75,7 +75,7 @@ These operations can be done using maven:
 - Install test application: `mvn -U org.apache.maven.plugins:maven-dependency-plugin:2.8:unpack -Dartifact=<app_groupId>:<app_artifactId>:RELEASE:zip -DoutputDirectory=<path_to_deployed_selenium_robot>  -Dmdep.overWriteReleases=true`
 
 Previous commands will take the last release by default, but you can replace 'RELEASE' by a specific version
-
+ 
 #### Run ####
 Tests are run using command line (`;lib/drivers/*` is mandatory for seleniumRobot > 3.14.x)  : `java -cp seleniumRobot.jar;plugins/<app>-tests.jar;lib/drivers/* -D<option1>=<value1> -D<option2>=<value2> org.testng.TestNG <path_to_TestNG_xml_file>"`</br>
 
@@ -104,18 +104,18 @@ In this case, this user passed value will overwrite test or suite parameters
 
 | Param name       			| Default 	| Description  |
 | -------------------------	| ------- 	| ------------ |
-| webDriverGrid 			| 			| Address of seleniumGrid server. It's possible to specify several URL `http://grid1.company.com,http://grid2.company.com`. This way, seleniumRobot will choose one of the available grid |
-| runMode 					| LOCAL		| `local`: current computer<br/>`grid`: seleniumGrid<br/>`sauceLabs`: run on sauceLabs device<br/> |
+| webDriverGrid 			| 			| Address of seleniumGrid server. It's possible to specify several URL `http://grid1.company.com,http://grid2.company.com`. This way, seleniumRobot will choose one of the available grid | 
+| runMode 					| LOCAL		| `local`: current computer<br/>`grid`: seleniumGrid<br/>`sauceLabs`: run on sauceLabs device<br/> | 
 | nodeTags					| null		| Commat seperated list of strings. Requests that this test should execute only on a node (grid mode only) announcing all of these tags. On grid, this is declared with option `-nodeTags <tag1>,<tag2>`. If no slot matches the requested tags, session is not created |
-| browser 					| firefox	| Browser used to start test. Valid values are:<br/>`firefox`, `chrome`, `safari`, `iexplore`, `edge`, `iexploreEdge` for Edge in Internet Explorer mode, `htmlunit`, `opera`, `phantomjs`, `none` for no driver, `browser` for android default browser |
-| env 						| DEV		| Test environment for the SUT. Allow accessing param values defined in env.ini file
+| browser 					| firefox	| Browser used to start test. Valid values are:<br/>`firefox`, `chrome`, `safari`, `iexplore`, `edge`, `iexploreEdge` for Edge in Internet Explorer mode, `htmlunit`, `opera`, `phantomjs`, `none` for no driver, `browser` for android default browser | 
+| env 						| DEV		| Test environment for the SUT. Allow accessing param values defined in env.ini file  
 | captureVideo				| onError	| If `true`, always capture video. Other possible values are: `onSuccess` (keep video when test is OK), `false` and `onError` (capture video when test is KO) |
 | captureNetwork			| false		| If true, creates a HAR file which capture traffic. This is only available with MANUAL and DIRECT proxy settings because there is no way, when automatic mode is used, to know which proxy is used by browser and the authentication used. |
 | testRetryCount			| 2			| Number of times a failed test is retried. Set to 0 for no retry. **This parameter is not accepted in XML file, only on command line**. This number can be increased dynamically inside test with `increaseMaxRetry()`|
 | seleniumRobotServerActive	| false		| whether we use seleniumRobot server. If true, seleniumRobotServerUrl MUST be specified (in XML, command line or through env variable |
 | seleniumRobotServerUrl	| 			| URL of the seleniumRobot server. Can be specified as an environment variable |
 | seleniumRobotServerToken	|			| Token to use when connecting to seleniumRobot server API (by default with server >= 2.0) |
-| outputDirectory 			| <exec folder>	| folder where HTML report will be written. By default, it's 'test-output' subfolder. If you want to write test in an other directory, use `test-output/myResult` to write them relative to SeleniumRobot root. An absolute path may also be specified. This will allow to execute several tests in parallel without overwritting existing results. If you want to set the current date and time in output directory folder name, see §7.18 |
+| outputDirectory 			| <exec folder>	| folder where HTML report will be written. By default, it's 'test-output' subfolder. If you want to write test in an other directory, use `test-output/myResult` to write them relative to SeleniumRobot root. An absolute path may also be specified. This will allow to execute several tests in parallel without overwritting existing results. If you want to set the current date and time in output directory folder name, see §7.18 | 
 
 **In case eof Linux Chromium**: set chromeBinaryPath to '/snap/chromium/current/usr/lib/chromium-brower/chrome'
 
@@ -125,22 +125,22 @@ The proxy settings below apply to the browser used to test your application
 
 | Param name       			| Default 	| Description  |
 | -------------------------	| ------- 	| ------------ |
-| proxyType 				| AUTO		| Proxy type. Valid values are `AUTODETECT`, `MANUAL`, `DIRECT`, `PAC`, `SYSTEM` |
-| proxyAddress 				| 			| Proxy address, if MANUAL type is choosen |
-| proxyPort 				| 			| Proxy port, if MANUAL type is choosen |
-| proxyLogin 				| 			| Proxy login, if MANUAL type is choosen |
-| proxyPassword 			| 			| Proxy password, if MANUAL type is choosen |
-| proxyExclude 				|			| Proxy address exclusion, if MANUAL type is choosen |
-| proxyPac 					| 			| Automatic configuration address, if PAC type is choosen |
+| proxyType 				| AUTO		| Proxy type. Valid values are `AUTODETECT`, `MANUAL`, `DIRECT`, `PAC`, `SYSTEM` | 
+| proxyAddress 				| 			| Proxy address, if MANUAL type is choosen | 
+| proxyPort 				| 			| Proxy port, if MANUAL type is choosen | 
+| proxyLogin 				| 			| Proxy login, if MANUAL type is choosen |  
+| proxyPassword 			| 			| Proxy password, if MANUAL type is choosen | 
+| proxyExclude 				|			| Proxy address exclusion, if MANUAL type is choosen | 
+| proxyPac 					| 			| Automatic configuration address, if PAC type is choosen | 
 
 #### Test execution settings ####
 
-Settings for changing the test behavior
+Settings for changing the test behavior 
 
 | Param name       			| Default 	| Description  |
 | -------------------------	| ------- 	| ------------ |
-| debug 					| none		| The debug mode. 'gui', 'driver', 'core', 'network'. It's also possible to specify several debug modes at once: 'core,driver'. Details can be found in chapter §7.20 |
-| softAssertEnabled 		| true		| Test does not stop is an assertion fails. Only valid when using assertions defined in `CustomAssertion` class or assert methods in `BasePage` class |
+| debug 					| none		| The debug mode. 'gui', 'driver', 'core', 'network'. It's also possible to specify several debug modes at once: 'core,driver'. Details can be found in chapter §7.20 | 
+| softAssertEnabled 		| true		| Test does not stop is an assertion fails. Only valid when using assertions defined in `CustomAssertion` class or assert methods in `BasePage` class | 
 | loadIni					|			| comma separated list of path to ini formatted files to load. Their values will overwrite those from env.ini file if the same key is present. Path is relative to data/<app>/config path |
 | overrideSeleniumNativeAction      | false | intercept driver.findElement and driver.frame operations so that seleniumRobot element operations can be use (replay, error handling, ...) even when using standard selenium code. Only findElement(By) and findElements(By) are supported, not findElementByxxx(String). Logging is also better |
 | webDriverListener 		| 			| additional driver listener class. See chapter §7.21 for implementation details |
@@ -151,9 +151,9 @@ Cucumber options
 
 | Param name       			| Default 	| Description  |
 | -------------------------	| ------- 	| ------------ |
-| cucumberTests 			|  			| Comma seperated list of tests to execute when using cucumber mode. Test name can be the feature name, the feature file name (without extension) or the scenario name. You can also give regex that will match String in java. e.g: scenario .* |
-| cucumberTags 				|  			| List of cucumber tags that will allow determining tests to execute. Format can be:<br/>`@new4 AND @new5` for filtering scenario containing tag new4 AND new5<br/>`@new,@new2` for filtering scenarios containing new OR new2<br/>`@new` for filtering scenario containing new tag |
-| cucumberPackage 			| 			| **Mandatory for cucumberTests:** name of the package where cucumber implementation class reside |
+| cucumberTests 			|  			| Comma seperated list of tests to execute when using cucumber mode. Test name can be the feature name, the feature file name (without extension) or the scenario name. You can also give regex that will match String in java. e.g: scenario .* | 
+| cucumberTags 				|  			| List of cucumber tags that will allow determining tests to execute. Format can be:<br/>`@new4 AND @new5` for filtering scenario containing tag new4 AND new5<br/>`@new,@new2` for filtering scenarios containing new OR new2<br/>`@new` for filtering scenario containing new tag | 
+| cucumberPackage 			| 			| **Mandatory for cucumberTests:** name of the package where cucumber implementation class reside | 
 
 
 #### Browser specific settings ####
@@ -162,24 +162,24 @@ Settings for customizing the default seleniumRobot driver features. By default, 
 
 | Param name       			| Default 	| Description  |
 | -------------------------	| ------- 	| ------------ |
-| browserVersion 			|  			| Browser version to use. By default, it's the last one, or the installed one in local mode. This option has sense when using sauceLabs where browser version can be choosen |
+| browserVersion 			|  			| Browser version to use. By default, it's the last one, or the installed one in local mode. This option has sense when using sauceLabs where browser version can be choosen | 
 | betaBrowser				| false		| If true, we search for installed beta version of browsers (chrome, edge)  |
 | headless					| false		| If true, start browser in headless mode. This is supported by chrome >= 60 and firefox >= 56  |
-| firefoxUserProfilePath 	|  			| Firefox user profile if a specific one is defined. This path MUST exist. It can also take 'default' value. In this case, the current user profile is used. If not set, an empty temp profile is created |
-| chromeUserProfilePath 	|  			| Chrome user profile if a specific one is defined. This path MUST exist. It can also take 'default' value. In this case, the current user profile is used. If not set, an empty temp profile is created |
-| edgeUserProfilePath       |           | Edge user profile if a specific one is defined. This path MUST exist. It can also take 'default' value. In this case, the current user profile is used. If not set, an empty temp profile is created |
-| useFirefoxDefaultProfile	| true		| Use default firefox profile |
-| operaUserProfilePath 		| 			| Opera user profile if a specific one is defined |
-| firefoxBinaryPath 		| 			| Path to firefox binary if a specific one should be used (for example when using portable versions. Else, the default firefox installation is choosen |
-| geckoDriverPath 			| 			| Path to a different installation of geckodriver executable |
-| chromeDriverPath 			| 			| Path to a different installation of chromedriver executable |
-| chromeBinaryPath 			| 			| Path to chrome binary if using a portable installation (not detected by system). In case of Linux box, with chrome installed with snap package, set the path to '/snap/chromium/current/usr/lib/chromium-brower/chrome' |
-| ieDriverPath 				| 			| Path to a different ieDriverServer executable |
+| firefoxUserProfilePath 	|  			| Firefox user profile if a specific one is defined. This path MUST exist. It can also take 'default' value. In this case, the current user profile is used. If not set, an empty temp profile is created | 
+| chromeUserProfilePath 	|  			| Chrome user profile if a specific one is defined. This path MUST exist. It can also take 'default' value. In this case, the current user profile is used. If not set, an empty temp profile is created | 
+| edgeUserProfilePath       |           | Edge user profile if a specific one is defined. This path MUST exist. It can also take 'default' value. In this case, the current user profile is used. If not set, an empty temp profile is created | 
+| useFirefoxDefaultProfile	| true		| Use default firefox profile | 
+| operaUserProfilePath 		| 			| Opera user profile if a specific one is defined | 
+| firefoxBinaryPath 		| 			| Path to firefox binary if a specific one should be used (for example when using portable versions. Else, the default firefox installation is choosen | 
+| geckoDriverPath 			| 			| Path to a different installation of geckodriver executable | 
+| chromeDriverPath 			| 			| Path to a different installation of chromedriver executable | 
+| chromeBinaryPath 			| 			| Path to chrome binary if using a portable installation (not detected by system). In case of Linux box, with chrome installed with snap package, set the path to '/snap/chromium/current/usr/lib/chromium-brower/chrome' | 
+| ieDriverPath 				| 			| Path to a different ieDriverServer executable | 
 | edgeDriverPath			| 			| Path to a different edge driver executable |
-| userAgent 				| 			| Allow defining a specific user-agent in chrome and firefox only. It can contains any variable available in the SeleniumTestsContext written as ${foo}, it will be automatically interpolate. |
+| userAgent 				| 			| Allow defining a specific user-agent in chrome and firefox only. It can contains any variable available in the SeleniumTestsContext written as ${foo}, it will be automatically interpolate. | 
 | enableJavascript 			| true		| Javascript activation |
 | viewPortWidth				|			| Width of the viewPort when doing web tests. No effect for mobile apps. If not set, window will be maximized |
-| viewPortHeight			|			| Height of the viewPort when doing web tests. No effect for mobile apps. If not set, window will be maximized |
+| viewPortHeight			|			| Height of the viewPort when doing web tests. No effect for mobile apps. If not set, window will be maximized | 
 | extensionX.path			|			| Path (absolute file path or HTTP URL) to the extension (.xpi or .crx). Replace X with extension number. E.g: `extension0.path=http://localhost:8000/myExt.crx`. See §7.17 |
 | extensionX.options		|			| options to pass to extension (only for firefox). Options must have the format: <key1>=<value1>;<key2>=<value2> |
 | chromeOptions				|			| allow to set any options to chrome executable. For example: to put chrome in "Dark mode", you will write: `-DchromeOptions="--force-dark-mode --enable-features=WebUIDarkMode"`. Other chrome options can be found here: https://peter.sh/experiments/chromium-command-line-switches/. To disable options set by default, use `-DchromeOptions="++no-sandbox"` |
@@ -192,10 +192,10 @@ Settings for customizing timeouts
 
 | Param name       			| Default 	| Description  |
 | -------------------------	| ------- 	| ------------ |
-| webSessionTimeOut 		| 90	 	| browser session timeout in seconds |
-| implicitWaitTimeOut 		| 5			| implicit wait of the browser, in seconds (selenium definition) |
-| explicitWaitTimeOut 		| 15		| explicit wait of the browser, in seconds. Used when checking if an element is present and no wait value is defined (`waitElementPresent` & `isElementPresent`). This value is also used when checking that browser is on the right page (PageObject constructor) |
-| pageLoadTimeout 			| 90		| Value defined in selenium driver. Wait delay for page loading |
+| webSessionTimeOut 		| 90	 	| browser session timeout in seconds | 
+| implicitWaitTimeOut 		| 5			| implicit wait of the browser, in seconds (selenium definition) | 
+| explicitWaitTimeOut 		| 15		| explicit wait of the browser, in seconds. Used when checking if an element is present and no wait value is defined (`waitElementPresent` & `isElementPresent`). This value is also used when checking that browser is on the right page (PageObject constructor) | 
+| pageLoadTimeout 			| 90		| Value defined in selenium driver. Wait delay for page loading | 
 | replayTimeOut				| 30		| Delay during which an action is replayed
 | pageLoadStrategy			| normal	| set page load strategy as defined in [https://www.w3.org/TR/webdriver/#dfn-table-of-page-load-strategies](https://www.w3.org/TR/webdriver/#dfn-table-of-page-load-strategies). Values are 'normal', 'eager', 'none'|
 
@@ -219,20 +219,20 @@ Params for mobile testing
 
  | Param name       			| Default 	| Description  |
  | -------------------------	| ------- 	| ------------ |
- | app 						| 			| Path to the application file (local or remote). For local, if application is for example in 'data/<artifact>/myApp.apk', then give this path |
- | deviceName 				| 			| Name of the device to use for mobile tests. It's the Human readable name (e.g: Nexus 6 as given by `adb -s <id_device> shell getprop`, line [ro.product.model] property on Android or `xcrun simctl list --json devices available`), not it's id. SeleniumRobot will replace this name with id when communicating with Appium |
- | fullReset 				| true		| enable full reset capability for appium tests |
+ | app 						| 			| Path to the application file (local or remote). For local, if application is for example in 'data/<artifact>/myApp.apk', then give this path | 
+ | deviceName 				| 			| Name of the device to use for mobile tests. It's the Human readable name (e.g: Nexus 6 as given by `adb -s <id_device> shell getprop`, line [ro.product.model] property on Android or `xcrun simctl list --json devices available`), not it's id. SeleniumRobot will replace this name with id when communicating with Appium | 
+ | fullReset 				| true		| enable full reset capability for appium tests | 
  | appiumServerUrl			|			| Appium server already started, that will be used to execute the test. It's useful to debug tests locally. "http://<host>:<port>/wd/hub/" for appium 1 and "http://<host>:<port>/" for appium 2.x |
  | appiumCaps                |           | Set of capabilities that will be added and sent to appium. These are the capabilities that are not already handled by the framework. See: http://appium.io/docs/en/writing-running-appium/caps/. Format is "key1=value1;key2=value2" |
- | appPackage 				| 			| Package name of application (android only) |
- | appActivity 				| 			| Activity started by mobile application (Android) |
- | appWaitActivity 			| 			| In some cases, the first started activity is not the main app activity |
- | newCommandTimeout 		| 120		| Max wait (in seconds) between 2 appium commands in seconds. Increase this time when debugging |
- | version 					| 			| Platform version |
+ | appPackage 				| 			| Package name of application (android only) | 
+ | appActivity 				| 			| Activity started by mobile application (Android) | 
+ | appWaitActivity 			| 			| In some cases, the first started activity is not the main app activity | 
+ | newCommandTimeout 		| 120		| Max wait (in seconds) between 2 appium commands in seconds. Increase this time when debugging | 
+ | version 					| 			| Platform version | 
  | platform 					| 			| platform on which test should execute. Ex: Windows 7, Android 5.0, iOS 9.1, Linux, OS X 10.10. Defaults to the current platform |
  | automationName			| Appium / XCUITest | "UiAutomator2" for Android and "XCUITest" for iOS.
- | cloudApiKey 				| 			| Access key for service |
- | testConfig 				|  			| Additional configuration. This should contain common configuration through all TestNG files.<br/>See `exampleConfigGenericParams.xml` file for format |
+ | cloudApiKey 				| 			| Access key for service |  
+ | testConfig 				|  			| Additional configuration. This should contain common configuration through all TestNG files.<br/>See `exampleConfigGenericParams.xml` file for format | 
 
 #### Windows app params ####
 
@@ -240,11 +240,11 @@ Params for Windows applications (through appium-flaui-driver: https://github.com
 
 | Param name       			| Default 	| Description                                                                                                                                                                                                                          |
 | -------------------------	| ------- 	|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| app 						| 			| Path to the application, local to machine that runs appium. e.g: "C:\\Windows\\System32\\notepad.exe"                                                                                                                                                                    |
+| app 						| 			| Path to the application, local to machine that runs appium. e.g: "C:\\Windows\\System32\\notepad.exe"                                                                                                                                                                    | 
 | appiumServerUrl			|			| Appium server already started, that will be used to execute the test. It's useful to debug tests locally. "http://<host>:<port>/wd/hub/" for appium 1 and "http://<host>:<port>/" for appium 2.x                                     |
 | appiumCaps                |           | Set of capabilities that will be added and sent to appium. These are the capabilities that are not already handled by the framework. See: http://appium.io/docs/en/writing-running-appium/caps/. Format is "key1=value1;key2=value2" |
-| appActivity 				|             | Title of the application windows (may be a regex). e.g: '.*Notepad'                                                                                                                                                                  |
-| newCommandTimeout 		| 120		| Max wait (in seconds) between 2 appium commands in seconds. Increase this time when debugging                                                                                                                                        |
+| appActivity 				|             | Title of the application windows (may be a regex). e.g: '.*Notepad'                                                                                                                                                                  | 
+| newCommandTimeout 		| 120		| Max wait (in seconds) between 2 appium commands in seconds. Increase this time when debugging                                                                                                                                        | 
 | platform 					| 			| platform on which test should execute. Ex: Windows 10. Defaults to the current platform                                                                                                                                              |
 
 'app' or 'appActivity' MUST be provided
@@ -260,7 +260,7 @@ Params for Windows applications (through appium-flaui-driver: https://github.com
 | keepAllResults			| false		| By default, when a test fails and is retried, the failed test data are overwritten. If true, will keep all result even if test is retried, allowing to analyze them |
 | optimizeReports			| false		| If true, compress HTML, get HTML resources from internet so that logs are smaller |
 | manualTestSteps			| false		| If true, it's possible to add test steps in Test and Page Object (`addTest("my step name")`). An error will be raised if manual steps are added when automatic steps are enabled |
-| maskPassword 				| true		| Whether seleniumRobot should detect passwords in method calls and mask them in reports |
+| maskPassword 				| true		| Whether seleniumRobot should detect passwords in method calls and mask them in reports | 
 | reporterPluginClasses     | null		| comma-seperated list of classes to call when a custom reporter needs to be added. See chap7_Howto.md, §19 |
 | startedBy 				| null		| allow to tell who called seleniumRobot. May be any string but can be used to display the result URL when using bugtracker. In case this is set, BugTracker won't receive the detailed result as a zip file, to avoid sending too big files |
 
@@ -306,7 +306,7 @@ Jira needs more parameters
 | bugtracker.jira.components	| <empty>		| Comma seperated list of components that will be added to the issue. |
 | bugtracker.jira.openStates	|				| Comma seperated list of states (or status) that says that an issue is still open. It helps searching for existing issues. e.g: 'Open,Todo'. It MUST be set |
 | bugtracker.jira.closeTransition|				| '/' separated list of transition names that will be applied to an issue when closing it. It may depend on projects. MUST be set. These transitions are localized and must lead to "closed" or "done" state. e.g: 'Start review/Finished review/Done' |
-| bugtracker.jira.field.<fieldName>|			| Set 'bugtracker.jira.field.application=myApp' to set the field 'application' to 'myApp' when creating the issue. It's useful when some custom fields are mandatory to issue creation|
+| bugtracker.jira.field.<fieldName>|			| Set 'bugtracker.jira.field.application=myApp' to set the field 'application' to 'myApp' when creating the issue. It's useful when some custom fields are mandatory to issue creation|				
 
 ##### Performance reporting #####
 
@@ -340,31 +340,31 @@ Below is an example of this file extending TestNG configuration
 
 ```xml
 	<parameters>
-
+	
 		<!-- common parameters -->
 		<parameter name="app" value="myMobileApp.apk" />
-
+		
 		<!-- mobile device definition -->
 		<device name="Samsung Galaxy Nexus SPH-L700 4.3" platform="Android 4.3" />
-
+		
 		<!-- service definitions for run mode -->
 		<service name="grid">
 			<parameter name="webDriverGrid" value="http://localhost:4444/wd/hub" />
 		</service>
-
+		
 		<service name="local">
 			<parameter name="webDriverGrid" value="http://localhost:4723/wd/hub" />
 		</service>
-
+		
 		<service name="saucelabs">
 			<parameter name="webDriverGrid" value="http://xxx:aaaaa-26d7-44fa-bbbb-b2c75cdccafd@ondemand.saucelabs.com:80/wd/hub" />
 		</service>
-
+		
 	<parameters>
 ```
-
+	
 You can define:
-
+ 
 - *parameters* like in main XML configuration.
 - *device definition*: Allows to only specify the device name in parameter. Platform will then be get from device definition
 _e.g_: in testNG.xml, you have <parameter name="deviceName" value="Samsung Galaxy Nexus SPH-L700 4.3" /><br/>
@@ -388,13 +388,13 @@ The minimal parameters to pass to SeleniumRobot are:
 #### Test with SeleniumRobot Grid ####
 
 Test must be configured with `runMode` and `webDriverGrid` options (or use `-DrunMode=grid -DwebDriverGrid=http://127.0.0.1:4444/wd/hub`)
-
+ 
 ```xml
 	<test name="MRH">
     	<parameter name="runMode" value="grid" />
     	<parameter name="webDriverGrid" value="http://127.0.0.1:4444/wd/hub" />
-
-        <packages>
+    	
+        <packages> 
             <package name="com.seleniumtests.core.runner.*"/>
         </packages>
     </test>
@@ -444,16 +444,16 @@ Define test as follows (minimal needed options)
 
 ```xml
     <test name="tnr_appium_mobile_app" parallel="false">
-
+    
     	<!-- cucumber part -->
     	<parameter name="browser" value="*android" />
     	<parameter name="platform" value="Android 6.0"/>
     	<parameter name="deviceName" value="Nexus 6"/>
-
+    
     	<parameter name="app" value="<local_path_to_apk>"/>
     	<parameter name="appPackage" value="com.infotel.mobile.infolidays"/>
     	<parameter name="appActivity" value="com.infotel.mobile.mesconges.view.activity.StartActivity"/>
-
+    
     	<packages>
     		<package name="com.seleniumtests.core.runner.*"/>
     	</packages>
@@ -471,12 +471,12 @@ Define test as follows (minimal needed options)
 
 ```xml
     <test name="tnr_appium_mobile_app" parallel="false">
-
+    
     	<parameter name="browser" value="*safari" />
     	<parameter name="platform" value="iOS 10.3"/>
     	<parameter name="deviceName" value="iPhone SE"/>
     	<parameter name="app" value="<local_path_to_ipa_or_app.zip file>"/>
-
+    
     	<packages>
     		<package name="com.seleniumtests.core.runner.*"/>
     	</packages>
@@ -485,7 +485,7 @@ Define test as follows (minimal needed options)
 
 #### Application test on Windows ####
 
-To test Windows application with appium, one need to
+To test Windows application with appium, one need to 
 - download FlaUI.WebDriver (https://github.com/FlaUI/FlaUI.WebDriver/releases)
 - set `APPIUM_FLAUI_PATH` to FlaUI.WebDriver binary. e.g: D:\drivers\FlaUI.WebDriver.exe
 - Install appium-flaui-driver: `npx appium driver install --source=npm appium-flaui-driver`
@@ -493,10 +493,10 @@ To test Windows application with appium, one need to
 
 ```xml
     <test name="tnr_appium_windows_app" parallel="false">
-
+    
     	<parameter name="platform" value="Windows 10"/>
     	<parameter name="app" value="C:\\Windows\\System32\\notepad.exe"/>
-
+    
     	<packages>
     		<package name="com.seleniumtests.core.runner.*"/>
     	</packages>
@@ -508,7 +508,7 @@ To test Windows application with appium, one need to
 You the MUST use options:
 - `runMode=saucelabs` to enable SauceLabs
 - `DwebDriverGrid=http://<user>:<key>@ondemand.eu-central-1.saucelabs.com:443/wd/hub` => see saucelabs documentation
-- `platform=<platform>`
+- `platform=<platform>` 
 - `deviceName=<name>` => name of the device to use.
 - `app=<application file>` => the application to test. By default, application is uploaded. If you want to avoid this step (application has already been uploaded), add 'NO_UPLOAD:' prefix to application path
 
@@ -519,11 +519,11 @@ Define test as follows
     	<parameter name="cucumberTests" value="Configuration" />
 	    <parameter name="cucumberTags" value="" />
 	    <parameter name="runMode" value="saucelabs" />
-
+	    
         <parameter name="webDriverGrid" value="http://<user>:<key>@ondemand.saucelabs.com:80/wd/hub"/>
         <parameter name="deviceName" value="Android Emulator"/>
         <parameter name="platform" value="Android 5.1"/>
-
+        
         <parameter name="app" value="<local_path_to_apk>"/>
     	<parameter name="appPackage" value="com.infotel.mobile.infolidays"/>
     	<parameter name="appActivity" value="com.infotel.mobile.mesconges.view.activity.StartActivity"/>
@@ -533,7 +533,7 @@ Define test as follows
         </packages>
     </test>
 ```
-
+    
 ### 5 Test with BrowserStack ####
 
 BrowserStack is seen as a selenium grid.
@@ -552,16 +552,16 @@ Perfecto is seen as a selenium grid.
 You the MUST use options:
 - `runMode=perfecto` to enable browserstack
 - `DwebDriverGrid=https://<apiKey>@<cloudname>.perfectomobile.com/nexperience/perfectomobile/wd/hub` => see perfecto documentation
-- `platform=<platform>`
-- `deviceName=<name>` => name of the device to use.
+- `platform=<platform>` 
+- `deviceName=<name>` => name of the device to use. 
 - `app=<application file>` => the application to test. By default, application is uploaded. If you want to avoid this step (application has already been uploaded), add 'NO_UPLOAD:' prefix to application path
 
 If you run behind a proxy, also use the JVM options: `-Dhttps.nonProxyHosts=<nonProxy> -Dhttps.proxyHost=<host> -Dhttps.proxyPort=<port>`
-
+ 
 ### 7 Test with SeleniumGrid ###
 
 SeleniumGrid allows to address multiple selenium nodes from one central point
-![](/images/seleniumGrid.png)
+![](/images/seleniumGrid.png) 
 In this mode, SeleniumRobot addresses the Hub and then, the hub dispatches browser creation on available nodes, for mobile or desktop tests.
 
 Use seleniumRobot-grid which is based on standard grid
@@ -569,13 +569,13 @@ Use seleniumRobot-grid which is based on standard grid
 #### Configure SeleniumRobot ####
 
 Test must be configured like the example below (or use `-DrunMode=grid -DwebDriverGrid=http://127.0.0.1:4444/wd/hub`)
-
+ 
  ```xml
 	<test name="MRH">
     	<parameter name="runMode" value="grid" />
     	<parameter name="webDriverGrid" value="http://127.0.0.1:4444/wd/hub" />
-
-        <packages>
+    	
+        <packages> 
             <package name="com.seleniumtests.core.runner.*"/>
         </packages>
     </test>
@@ -605,7 +605,7 @@ When testing among several browsers or devices is requested, it's easier to run 
 #### Test NG way ####
 Test NG is able to run tests in parallel using the XML configuration
 To do so, configure several tests, one for each browser / mobile device
-
+	
 ```xml
 	<test name="tnr_chrome">
 	     <parameter name="browser" value="*chrome" />
@@ -613,7 +613,7 @@ To do so, configure several tests, one for each browser / mobile device
 	         <class name="com.infotel.seleniumTests.googleTest.tests.NextTest"/>
 	     </classes>
 	</test>
-
+    
 	<test name="tnr_firefox">
 	     <parameter name="browser" value="*firefox" />
 	     <classes>
@@ -621,7 +621,7 @@ To do so, configure several tests, one for each browser / mobile device
 	     </classes>
 	</test>
 ```
-
+    
 Then, in suite definition, in the XML, set parallel mode
 
 ```xml
@@ -746,4 +746,4 @@ e.g: `java -cp seleniumRobot.jar -D<option1>=<value1> -D<option2>=<value2> -Dbro
 
 ### Cyclic dependency when executing TestNG Test ###
 
-This may be due to the fact that 2 test configuration methods (seen with @BeforeTest) have the same name when executed in the same TestNG <test>
+This may be due to the fact that 2 test configuration methods (seen with @BeforeTest) have the same name when executed in the same TestNG <test> 
