@@ -33,6 +33,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.TestVariable;
+import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -173,8 +174,15 @@ public class StringUtility {
 
     	if (testContext == null || testContext.getConfiguration() == null) {
     		return initialString;
-    	}
-    	Map<String, TestVariable> variables = testContext.getConfiguration();
+    	}    	
+    	Map<String, TestVariable> variables = testContext.getFullContextDataMapAsTestVariables();
+		String testName = "testNameNotFound";
+		try {
+			testName = TestNGResultUtils.getVisualTestName(testContext.getTestNGResult());
+		} catch (Exception e) {
+			testName = TestNGResultUtils.getTestName(testContext.getTestNGResult());
+		}
+		variables.put("testName", new TestVariable("testName", testName));
     	List<String> unknownKeys = new ArrayList<>();
 
     	for (int i = 0; i < 10; i++) {

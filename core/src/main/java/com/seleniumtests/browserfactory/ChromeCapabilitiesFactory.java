@@ -46,6 +46,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
+import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.DebugMode;
 
 public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
@@ -63,7 +64,7 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 		UiAutomator2Options capabilities = new UiAutomator2Options();
 		ChromeOptions options = new ChromeOptions();
         if (webDriverConfig.getUserAgentOverride() != null) {
-            options.addArguments("--user-agent=" + webDriverConfig.getUserAgentOverride());
+        	options.addArguments("--user-agent=" + StringUtility.interpolateString(webDriverConfig.getUserAgentOverride(), webDriverConfig.getTestContext()));
         }
 
 		List<String> chromeOptions = new ArrayList<>(List.of("--disable-translate",
@@ -126,7 +127,7 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 		// options.setCapability("webSocketUrl", true);
 
         if (webDriverConfig.getUserAgentOverride() != null) {
-            options.addArguments("--user-agent=" + webDriverConfig.getUserAgentOverride());
+        	options.addArguments("--user-agent=" + StringUtility.interpolateString(webDriverConfig.getUserAgentOverride(), webDriverConfig.getTestContext()));
         }
 		List<String> chromeOptions = new ArrayList<>(List.of("--disable-translate",
 				"--disable-web-security",

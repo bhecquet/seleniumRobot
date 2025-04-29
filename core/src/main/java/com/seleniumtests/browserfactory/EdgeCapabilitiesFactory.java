@@ -33,6 +33,7 @@ import org.openqa.selenium.edge.EdgeOptions;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
+import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.DebugMode;
 
 public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
@@ -50,7 +51,7 @@ public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
 		Map<String, Object> experientalOptions = new HashMap<>();
         
         if (webDriverConfig.getUserAgentOverride() != null) {
-            options.addArguments("--user-agent=" + webDriverConfig.getUserAgentOverride());
+        	options.addArguments("--user-agent=" + StringUtility.interpolateString(webDriverConfig.getUserAgentOverride(), webDriverConfig.getTestContext()));
         }
 
 		List<String> edgeOptions = new ArrayList<>(List.of("--disable-translate",

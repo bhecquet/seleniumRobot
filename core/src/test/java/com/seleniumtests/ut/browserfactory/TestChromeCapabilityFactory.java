@@ -287,6 +287,29 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		Assert.assertTrue(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--user-agent=CHROME 55"));
 	}
 	
+	@Test(groups = {"ut"})
+	public void testCreateChromeCapabilitiesOverrideUserAgentWithVariables() {
+		
+		when(config.getUserAgentOverride()).thenReturn("CHROME 55 and variable ${browser}");
+		SeleniumTestsContext stc = new SeleniumTestsContext();
+		stc.setBrowser("chrome");
+		when(config.getTestContext()).thenReturn(stc);
+		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
+		
+		Assert.assertTrue(((Map<?, ?>) (((ChromeOptions) capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--user-agent=CHROME 55 and variable CHROME"));
+	}
+	
+	@Test(groups = {"ut"})
+	public void testCreateChromeCapabilitiesOverrideUserAgentWithWrongVariables() {
+		
+		when(config.getUserAgentOverride()).thenReturn("CHROME 55 and variable ${bowser}");
+		SeleniumTestsContext stc = new SeleniumTestsContext();
+		stc.setBrowser("chrome");
+		when(config.getTestContext()).thenReturn(stc);
+		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
+		
+		Assert.assertTrue(((Map<?, ?>) (((ChromeOptions) capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--user-agent=CHROME 55 and variable ${bowser}"));
+	}	
 	@Test(groups={"ut"})
 	public void testCreateChromeCapabilitiesHeadless() {
 		

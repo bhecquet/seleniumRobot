@@ -283,6 +283,30 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		
 		Assert.assertEquals(((Map<?,?>)(((EdgeOptions)capa).asMap().get(EdgeOptions.CAPABILITY))).get("args").toString(), "[--user-agent=EDGE 55, --disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process, --remote-allow-origins=*]");
 	}
+	
+	@Test(groups = {"ut"})
+	public void testCreateEdgeCapabilitiesOverrideUserAgentWithVariables() {
+		
+		when(config.getUserAgentOverride()).thenReturn("EDGE 55 and variable ${browser}");
+		SeleniumTestsContext stc = new SeleniumTestsContext();
+		stc.setBrowser("edge");
+		when(config.getTestContext()).thenReturn(stc);
+		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
+		
+		Assert.assertTrue(((Map<?, ?>) (((EdgeOptions) capa).asMap().get(EdgeOptions.CAPABILITY))).get("args").toString().contains("--user-agent=EDGE 55 and variable EDGE"));
+	}
+	
+	@Test(groups = {"ut"})
+	public void testCreateEdgeCapabilitiesOverrideUserAgentWithWrongVariables() {
+		
+		when(config.getUserAgentOverride()).thenReturn("EDGE 55 and variable ${bowser}");
+		SeleniumTestsContext stc = new SeleniumTestsContext();
+		stc.setBrowser("edge");
+		when(config.getTestContext()).thenReturn(stc);
+		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
+		
+		Assert.assertTrue(((Map<?, ?>) (((EdgeOptions) capa).asMap().get(EdgeOptions.CAPABILITY))).get("args").toString().contains("--user-agent=EDGE 55 and variable ${bowser}"));
+	}
 
 	@Test(groups={"ut"})
 	public void testCreateEdgeCapabilitiesWithRemoveOptions() {
