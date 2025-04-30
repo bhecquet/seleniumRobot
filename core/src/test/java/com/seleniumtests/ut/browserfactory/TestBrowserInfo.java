@@ -35,16 +35,12 @@ import org.mockito.MockedStatic;
 import org.openqa.selenium.Platform;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.util.osutility.OSUtility;
-
-import static com.seleniumtests.it.reporter.ReporterTest.executeSubTest;
-import static com.seleniumtests.it.reporter.ReporterTest.readTestMethodResultFile;
 
 public class TestBrowserInfo extends MockitoTest {
 	
@@ -486,5 +482,5 @@ public class TestBrowserInfo extends MockitoTest {
 			Assert.assertEquals(bi.getDefaultProfilePath().replace("\\", "/"), "/Users/user/Library/Application Support/Firefox/Profiles");
 		}
 	}
-	
+
 }

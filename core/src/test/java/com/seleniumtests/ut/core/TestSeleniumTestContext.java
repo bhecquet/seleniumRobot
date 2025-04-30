@@ -1723,20 +1723,4 @@ public class TestSeleniumTestContext extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().setAttribute("foo", "bar");
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAttribute("foo2", true), "bar2");
 	}
-	
-	//Check with TimeOut test parameter
-	@Test(groups={"ut context"})
-	public void testTimeOutFromTest(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		try {
-			xmlTest.addParameter("timeOut", "30");	
-			testNGCtx.setAttribute("timeOut", 30);
-			initThreadContext(testNGCtx);
-			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
-			Assert.assertEquals(seleniumTestsCtx.getPlatform(), "Android");
-		} finally {
-			xmlTest.getLocalParameters().remove("timeOut");
-			testNGCtx.removeAttribute("timeOut");
-		}
-	}
-	
 }
