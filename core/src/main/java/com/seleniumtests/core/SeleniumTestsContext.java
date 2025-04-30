@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -277,6 +278,7 @@ public class SeleniumTestsContext {
 	// group of fields below must be copied in SeleniumTestsContext constructor because they are not rediscovered with 'configureContext' method
     // Data object to store all context data
     private Map<String, Object> contextDataMap = Collections.synchronizedMap(new HashMap<String, Object>());
+    private Map<String, TestVariable> fullContextDataMapAsTestVariables = Collections.synchronizedMap(new HashMap<String, TestVariable>());
     private String baseOutputDirectory; // the 'test-output' folder if not overridden
     private ITestContext testNGContext = null;
     private ITestResult testNGResult = null;
@@ -325,7 +327,8 @@ public class SeleniumTestsContext {
      * @param allowRequestsToDependencies		if true, we will request to variable server / grid hub for new session or data		
      */
     public SeleniumTestsContext(SeleniumTestsContext toCopy, boolean allowRequestsToDependencies) {
-    	contextDataMap = new HashMap<>(toCopy.contextDataMap); 
+    	contextDataMap = new HashMap<>(toCopy.contextDataMap);
+    	fullContextDataMapAsTestVariables = new HashMap<>(toCopy.fullContextDataMapAsTestVariables);
     	testNGContext = toCopy.testNGContext;
     	if (!allowRequestsToDependencies && toCopy.variableAlreadyRequestedFromServer != null) {
     		variableAlreadyRequestedFromServer = new HashMap<>(toCopy.variableAlreadyRequestedFromServer);
@@ -403,8 +406,9 @@ public class SeleniumTestsContext {
         setChromeDriverPath(getValueForTest(CHROME_DRIVER_PATH, System.getProperty(CHROME_DRIVER_PATH)));
         setGeckoDriverPath(getValueForTest(GECKO_DRIVER_PATH, System.getProperty(GECKO_DRIVER_PATH)));
         setEdgeDriverPath(getValueForTest(EDGE_DRIVER_PATH, System.getProperty(EDGE_DRIVER_PATH)));
-        setIEDriverPath(getValueForTest(IE_DRIVER_PATH, System.getProperty(IE_DRIVER_PATH)));
-        setUserAgent(getValueForTest(USER_AGENT, System.getProperty(USER_AGENT)));
+        setIEDriverPath(getValueForTest(IE_DRIVER_PATH, System.getProperty(IE_DRIVER_PATH)));        
+		setUserAgent(getValueForTest(USER_AGENT, System.getProperty(USER_AGENT)));
+		
         setBetaBrowser(getBoolValueForTest(BETA_BROWSER, System.getProperty(BETA_BROWSER)));
         setAssumeUntrustedCertificateIssuer(getBoolValueForTest(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER, System.getProperty(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER)));
         setAcceptUntrustedCertificates(getBoolValueForTest(SET_ACCEPT_UNTRUSTED_CERTIFICATES, System.getProperty(SET_ACCEPT_UNTRUSTED_CERTIFICATES)));
@@ -1543,6 +1547,10 @@ public class SeleniumTestsContext {
     	}
     }
     
+    public Map<String, TestVariable> getFullContextDataMapAsTestVariables() {
+		return fullContextDataMapAsTestVariables;
+	}
+    
     public SeleniumRobotVariableServerConnector getVariableServer() {
 		return variableServer;
 	}
@@ -1616,6 +1624,7 @@ public class SeleniumTestsContext {
 
     public void setAttribute(final String name, final Object value) {
         contextDataMap.put(name, value);
+        fullContextDataMapAsTestVariables.put(name, new TestVariable(name, Objects.toString(value, null)));
     }
 
     /**

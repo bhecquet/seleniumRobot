@@ -380,5 +380,12 @@ public class StubTestClassForDriverTest extends StubParentClass {
 		logger.logFile(file, "PDF example");
 	}
 
+	@Test(groups="stub")
+	public void testUserAgent() {
+		DriverTestPage dtp = new DriverTestPage(true)
+				._writeSomething()
+				._reset();
+		dtp.getBrowserUserAgent();
+	}
 
 }

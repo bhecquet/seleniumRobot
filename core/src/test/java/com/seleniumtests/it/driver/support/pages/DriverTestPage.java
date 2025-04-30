@@ -22,6 +22,7 @@ import java.util.List;
 import com.seleniumtests.core.Step;
 import io.cucumber.java.en.When;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.interactions.Actions;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -348,5 +349,9 @@ public class DriverTestPage extends PageObject {
 
 	public String getOpenedPageUrl() {
 		return openedPageUrl;
+	}
+	
+	public void getBrowserUserAgent() {
+		logger.info("User-Agent = " + ((JavascriptExecutor) driver).executeScript("return navigator.userAgent;"));
 	}
 }

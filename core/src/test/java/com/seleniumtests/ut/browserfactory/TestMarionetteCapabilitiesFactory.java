@@ -206,6 +206,45 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		Assert.assertEquals(profile.getStringPreference("general.useragent.override", ""), "FIREFOX 55");
 	}
 	
+
+	@Test(groups = {"ut"})
+	public void testCreateMarionetteCapabilitiesOverrideUserAgentWithVariables() throws IOException {
+		
+		when(config.getUserAgentOverride()).thenReturn("FIREFOX 55 and variable ${browser}");
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		SeleniumTestsContext stc = new SeleniumTestsContext();
+		stc.setBrowser("firefox");
+		when(config.getTestContext()).thenReturn(stc);
+		
+		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
+		
+		FirefoxProfile profile = FirefoxProfile.fromJson((String) ((Map<String, Object>) capa
+				.getCapability(FirefoxOptions.FIREFOX_OPTIONS))
+				.get("profile"));
+		
+		// check profile
+		Assert.assertEquals(profile.getStringPreference("general.useragent.override", ""), "FIREFOX 55 and variable FIREFOX");
+	}
+	
+	@Test(groups = {"ut"})
+	public void testCreateMarionetteCapabilitiesOverrideUserAgentWithWrongVariables() throws IOException {
+		
+		when(config.getUserAgentOverride()).thenReturn("FIREFOX 55 and variable ${bowser}");
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		SeleniumTestsContext stc = new SeleniumTestsContext();
+		stc.setBrowser("firefox");
+		when(config.getTestContext()).thenReturn(stc);
+		
+		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
+		
+		FirefoxProfile profile = FirefoxProfile.fromJson((String) ((Map<String, Object>) capa
+				.getCapability(FirefoxOptions.FIREFOX_OPTIONS))
+				.get("profile"));
+		
+		// check profile
+		Assert.assertEquals(profile.getStringPreference("general.useragent.override", ""), "FIREFOX 55 and variable ${bowser}");
+	}
+	
 	@Test(groups={"ut"})
 	public void testCreateMarionetteCapabilitiesOverrideBinPath() {
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);

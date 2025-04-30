@@ -36,6 +36,7 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.FileUtility;
+import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.DebugMode;
 
 public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
@@ -120,7 +121,7 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
         profile.setAssumeUntrustedCertificateIssuer(webDriverConfig.isSetAssumeUntrustedCertificateIssuer());
 
         if (webDriverConfig.getUserAgentOverride() != null) {
-            profile.setPreference("general.useragent.override", webDriverConfig.getUserAgentOverride());
+        	profile.setPreference("general.useragent.override", StringUtility.interpolateString(webDriverConfig.getUserAgentOverride(), webDriverConfig.getTestContext()));
         }
 
         if (webDriverConfig.getNtlmAuthTrustedUris() != null) {

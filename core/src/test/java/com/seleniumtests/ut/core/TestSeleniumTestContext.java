@@ -64,7 +64,7 @@ import com.seleniumtests.util.video.VideoCaptureMode;
  *
  */
 public class TestSeleniumTestContext extends GenericTest {
-
+	
 	/**
 	 * If parameter is only defined in test suite, it's correctly read
 	 */

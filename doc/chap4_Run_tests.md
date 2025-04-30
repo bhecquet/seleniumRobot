@@ -176,7 +176,7 @@ Settings for customizing the default seleniumRobot driver features. By default, 
 | chromeBinaryPath 			| 			| Path to chrome binary if using a portable installation (not detected by system). In case of Linux box, with chrome installed with snap package, set the path to '/snap/chromium/current/usr/lib/chromium-brower/chrome' | 
 | ieDriverPath 				| 			| Path to a different ieDriverServer executable | 
 | edgeDriverPath			| 			| Path to a different edge driver executable |
-| userAgent 				| 			| Allow defining a specific user-agent in chrome and firefox only | 
+| userAgent 				| 			| Allow defining a specific user-agent in chrome and firefox only. It can contain any variable available in the SeleniumTestsContext written as ${foo}, it will be automatically interpolated. | 
 | enableJavascript 			| true		| Javascript activation |
 | viewPortWidth				|			| Width of the viewPort when doing web tests. No effect for mobile apps. If not set, window will be maximized |
 | viewPortHeight			|			| Height of the viewPort when doing web tests. No effect for mobile apps. If not set, window will be maximized | 
