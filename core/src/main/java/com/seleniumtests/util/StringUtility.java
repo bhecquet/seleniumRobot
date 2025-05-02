@@ -176,6 +176,7 @@ public class StringUtility {
     		return initialString;
     	}    	
     	Map<String, TestVariable> variables = testContext.getFullContextDataMapAsTestVariables();
+    	variables.putAll(testContext.getConfiguration());
 		String testName = "testNameNotFound";
 		try {
 			testName = TestNGResultUtils.getVisualTestName(testContext.getTestNGResult());
