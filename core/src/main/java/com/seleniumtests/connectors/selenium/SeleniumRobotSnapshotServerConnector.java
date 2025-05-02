@@ -216,8 +216,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	 * Returns testStepName or a shorter version if it's too long
 	 * @return
 	 */
-	private String getTestStepName(String testStepName) {
-		String stepName = testStepName.split(" with args")[0];
+	private String getStrippedTestStepName(String stepName) {
 		return stepName.length() > MAX_TESTSTEP_NAME_LENGTH ? stepName.substring(0, MAX_TESTSTEP_NAME_LENGTH): stepName;
 	}
 	
@@ -233,7 +232,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			return null;
 		}
 		
-		String strippedName = getTestStepName(testStep);
+		String strippedName = getStrippedTestStepName(testStep);
 		
 		try {
 			JSONObject stepJson = getJSonResponse(buildPostRequest(url + TESTSTEP_API_URL)
@@ -341,7 +340,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		try {
 			File pictureFile = snapshot.getScreenshot().getImage().getFile();
 			String strippedTestName = getTestName(testName);
-			String strippedStepName = getTestStepName(stepName);
+			String strippedStepName = getStrippedTestStepName(stepName);
 			
 			MultipartBody request = buildPutRequest(url + SNAPSHOT_API_URL)
 					.socketTimeout(5000)

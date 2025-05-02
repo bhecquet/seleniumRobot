@@ -28,7 +28,7 @@ public class TestHarCapture extends GenericTest {
 
 	@Test(groups={"ut"})
 	public void testBuildHarLog() throws IOException {
-		TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
+		TestStepManager.setCurrentRootTestStep(new TestStep("step", "step", this.getClass(), null, new ArrayList<>(), true));
 		Har har = new Har();
 		har.getLog().addPage(new Page("", "title", "a title"));
 		HarCapture capture = new HarCapture(har, "main");

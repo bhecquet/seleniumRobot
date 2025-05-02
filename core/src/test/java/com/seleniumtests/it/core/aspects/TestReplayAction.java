@@ -60,7 +60,7 @@ public class TestReplayAction extends GenericDriverTest {
             Assert.assertEquals(step.getStepActions().get(0).getName(), "sendKeys on TextFieldElement Text, by={By.id: text___} with args: (true, true, [a text,], )");
             Assert.assertEquals(step.getStepActions().get(0).getAction(), "sendKeys");
             Assert.assertEquals(step.getStepActions().get(0).getElement(), testPage.textElementNotPresent);
-            Assert.assertEquals(step.getStepActions().get(0).getPage(), DriverTestPage.class);
+            Assert.assertEquals(step.getStepActions().get(0).getOrigin(), DriverTestPage.class);
             Assert.assertTrue(step.getStepActions().get(0).getFailed());
         }
     }
@@ -85,7 +85,7 @@ public class TestReplayAction extends GenericDriverTest {
         Assert.assertEquals(step.getStepActions().get(0).getName(), "sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [a text,], )");
         Assert.assertEquals(step.getStepActions().get(0).getAction(), "sendKeys");
         Assert.assertEquals(step.getStepActions().get(0).getElement(), testPage.textElement);
-        Assert.assertEquals(step.getStepActions().get(0).getPage(), DriverTestPage.class);
+        Assert.assertEquals(step.getStepActions().get(0).getOrigin(), DriverTestPage.class);
         Assert.assertFalse(step.getStepActions().get(0).getFailed());
     }
 

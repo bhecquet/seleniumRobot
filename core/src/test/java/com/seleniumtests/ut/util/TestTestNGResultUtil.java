@@ -560,7 +560,7 @@ public class TestTestNGResultUtil extends MockitoTest {
 	
 	private void testChangeTestResultWithSnapshot(String snapshotName, SnapshotCheckType snapshotCheckType, SnapshotComparisonResult comparisonResult) throws IOException {
 		// create a step with snapshot that should be compared
-		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
+		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), true);
 		File tmpImg = File.createTempFile("img", "_with_very_very_very_long_name_to_be_shortened.png");
 		File tmpHtml = File.createTempFile("html", "_with_very_very_very_long_name_to_be_shortened.html");
 		

@@ -477,20 +477,6 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Assert.assertEquals((int)testStepId, 9);
 	}
 
-	@Test(groups= {"ut"})
-	public void testCreateTestStepWithArgs() throws UnirestException {
-		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
-		HttpRequestWithBody request = (HttpRequestWithBody) createServerMock("POST", SeleniumRobotSnapshotServerConnector.TESTSTEP_API_URL, 200, "{'id': '9'}", "request");
-
-		Integer sessionId = connector.createSession("Session1");
-		Integer testCaseId = connector.createTestCase("Test 1");
-		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "FAILURE","LOCAL", "a test description", LocalDateTime.now());
-		Integer testStepId = connector.createTestStep("Step 1 with args: (https://www.qwant.com, )", testCaseInSessionId);
-
-		verify(request).field("name", ("Step 1"));
-		Assert.assertEquals((int)testStepId, 9);
-	}
-
 	@Test(groups= {"ut"}, expectedExceptions=SeleniumRobotServerException.class)
 	public void testCreateTestStepInError() throws UnirestException {	
 		
@@ -966,7 +952,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", "a test description", LocalDateTime.now());
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
 
-		TestStep testStep = new TestStep("Step 1", null, new ArrayList<>(), true);
+		TestStep testStep = new TestStep("Step 1", "Step 1", this.getClass(), null, new ArrayList<>(), true);
 		GenericFile file = new GenericFile(File.createTempFile("video", ".avi"), "video file");
 		testStep.addFile(file);
 		testStep.addFile(file);
@@ -994,7 +980,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", "a test description", LocalDateTime.now());
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
 
-		TestStep testStep = new TestStep("Step 1", null, new ArrayList<>(), true);
+		TestStep testStep = new TestStep("Step 1", "Step 1", this.getClass(), null, new ArrayList<>(), true);
 		GenericFile file = new GenericFile(File.createTempFile("video", ".avi"), "video file");
 		testStep.addFile(file);
 		testStep.addFile(file);
@@ -1014,7 +1000,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", "a test description", LocalDateTime.now());
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
 
-		TestStep testStep = new TestStep("Step 1", null, new ArrayList<>(), true);
+		TestStep testStep = new TestStep("Step 1", "Step 1", this.getClass(), null, new ArrayList<>(), true);
 		GenericFile fileOk = new GenericFile(File.createTempFile("video", ".avi"), "video file");
 		GenericFile fileKo = new GenericFile(File.createTempFile("video", ".png"), "no file");
 		testStep.addFile(fileKo);

@@ -221,7 +221,7 @@ public class ReporterControler implements IReporter {
 	 */
 	private void createTestStepForComparisonResult(ITestResult testResult, int snapshotComparisonResult, String errorMessage) {
 		// create a step for snapshot comparison
-		TestStep testStep = new TestStep("Snapshot comparison", testResult, new ArrayList<>(), false);
+		TestStep testStep = new TestStep("Snapshot comparison", "Snapshot comparison", ReporterControler.class, testResult, new ArrayList<>(), false);
 	
 		if (snapshotComparisonResult == ITestResult.FAILURE) {
 			testStep.addMessage(new TestMessage("Comparison failed: " + errorMessage, MessageType.ERROR));

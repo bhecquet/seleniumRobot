@@ -55,11 +55,11 @@ public class TestBugTracker extends MockitoTest {
 		
 		screenshot = new ScreenShot(tmpImg, tmpHtml);
 		
-		step1 = new TestStep("step 1", null, new ArrayList<>(), false);
+		step1 = new TestStep("step 1", "step 1", this.getClass(), null, new ArrayList<>(), false);
 		step1.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);
 		step1.setPosition(0);
 
-		step2 = new TestStep("step 2", null, new ArrayList<>(), false);
+		step2 = new TestStep("step 2", "step 2", this.getClass(), null, new ArrayList<>(), false);
 		step2.setFailed(true);
 		step2.setActionException(new NullPointerException("Error clicking"));
 		step2.addAction(new TestAction("action1", false, new ArrayList<>()));
@@ -67,7 +67,7 @@ public class TestBugTracker extends MockitoTest {
 		step2.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);
 		step2.setPosition(1);
 		
-		stepFailedWithDisabledBugtracker = new TestStep("step 2", null, new ArrayList<>(), false, RootCause.NONE, "", true);
+		stepFailedWithDisabledBugtracker = new TestStep("step 2", "step 2", this.getClass(), null, new ArrayList<>(), false, RootCause.NONE, "", true);
 		stepFailedWithDisabledBugtracker.setFailed(true);
 		stepFailedWithDisabledBugtracker.setActionException(new NullPointerException("Error clicking"));
 		stepFailedWithDisabledBugtracker.addAction(new TestAction("action1", false, new ArrayList<>()));
@@ -75,7 +75,7 @@ public class TestBugTracker extends MockitoTest {
 		stepFailedWithDisabledBugtracker.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);
 		stepFailedWithDisabledBugtracker.setPosition(1);
 		
-		stepEnd = new TestStep("Test end", null, new ArrayList<>(), false);
+		stepEnd = new TestStep("Test end", "Test end", this.getClass(), null, new ArrayList<>(), false);
 		stepEnd.addSnapshot(new Snapshot(screenshot, "end", SnapshotCheckType.FULL), 1, null);
 		stepEnd.addSnapshot(new Snapshot(screenshot, "end2", SnapshotCheckType.FULL), 1, null);
 		stepEnd.setPosition(2);

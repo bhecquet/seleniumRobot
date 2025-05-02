@@ -454,7 +454,12 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			// no problem as it's to close the previous manual step
 		}
 		
-		TestStep tearDownStep = new TestStep(TestStepManager.LAST_STEP_NAME, testResult, new ArrayList<>(), true);
+		TestStep tearDownStep = new TestStep(TestStepManager.LAST_STEP_NAME,
+				TestStepManager.LAST_STEP_NAME,
+				null,
+				testResult,
+				new ArrayList<>(),
+				true);
 		scenarioLogger.logTestInfo(TestStepManager.LAST_STATE_NAME, new MultipleInfo(TestStepManager.LAST_STATE_NAME));
 		
 		// add step to video

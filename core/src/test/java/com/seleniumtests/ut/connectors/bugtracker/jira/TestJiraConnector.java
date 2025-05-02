@@ -210,11 +210,11 @@ public class TestJiraConnector extends MockitoTest {
 		
 		screenshot = new ScreenShot(tmpImg, tmpHtml);
 		
-		step1 = new TestStep("step 1", null, new ArrayList<>(), false);
+		step1 = new TestStep("step 1", "step 1", this.getClass(), null, new ArrayList<>(), false);
 		step1.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);
 		step1.setPosition(0);
 		
-		step2 = new TestStep("step 2", null, new ArrayList<>(), false);
+		step2 = new TestStep("step 2", "step 2", this.getClass(), null, new ArrayList<>(), false);
 		step2.setFailed(true);
 		step2.setActionException(new NullPointerException("Error clicking"));
 		step2.addAction(new TestAction("action1", false, new ArrayList<>()));
@@ -223,7 +223,7 @@ public class TestJiraConnector extends MockitoTest {
 		step2.setPosition(1);
 		
 
-		stepWithErrorCauseAndDetails = new TestStep("step 3", null, new ArrayList<>(), false, RootCause.REGRESSION, "Check  your script", false);
+		stepWithErrorCauseAndDetails = new TestStep("step 3", "step 3", this.getClass(), null, new ArrayList<>(), false, RootCause.REGRESSION, "Check  your script", false);
 		stepWithErrorCauseAndDetails.setFailed(true);
 		stepWithErrorCauseAndDetails.setActionException(new NullPointerException("Error clicking"));
 		stepWithErrorCauseAndDetails.addAction(new TestAction("action1", false, new ArrayList<>()));
@@ -231,7 +231,7 @@ public class TestJiraConnector extends MockitoTest {
 		stepWithErrorCauseAndDetails.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);
 		stepWithErrorCauseAndDetails.setPosition(1);
 		
-		stepWithErrorCause = new TestStep("step 4", null, new ArrayList<>(), false, RootCause.REGRESSION, "", false);
+		stepWithErrorCause = new TestStep("step 4", "step 4", this.getClass(), null, new ArrayList<>(), false, RootCause.REGRESSION, "", false);
 		stepWithErrorCause.setFailed(true);
 		stepWithErrorCause.setActionException(new NullPointerException("Error clicking"));
 		stepWithErrorCause.addAction(new TestAction("action1", false, new ArrayList<>()));
@@ -239,7 +239,7 @@ public class TestJiraConnector extends MockitoTest {
 		stepWithErrorCause.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);
 		stepWithErrorCause.setPosition(1);
 		
-		stepEnd = new TestStep("Test end", null, new ArrayList<>(), false);
+		stepEnd = new TestStep("Test end", "Test end", this.getClass(), null, new ArrayList<>(), false);
 		stepEnd.addSnapshot(new Snapshot(screenshot, "end", SnapshotCheckType.FULL), 1, null);
 		stepEnd.addSnapshot(new Snapshot(screenshot, "end2", SnapshotCheckType.FULL), 1, null);
 		stepEnd.setPosition(2);

@@ -53,6 +53,16 @@ import com.seleniumtests.reporter.logger.TestStep.StepStatus;
 
 public class TestTestStep extends GenericTest {
 
+	@Test(groups = { "ut" })
+	public void testGetFullActionName() {
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
+		Assert.assertEquals(step.getFullActionName(), "TestTestStep.step1");
+	}
+	@Test(groups = { "ut" })
+	public void testGetFullActionNameNoOrigin() {
+		TestStep step = new TestStep("step1");
+		Assert.assertEquals(step.getFullActionName(), "step1");
+	}
 	
 	/**
 	 * Checks getStepStatus correctly compute test step status if action is failed
@@ -60,7 +70,7 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testGetFailedWithActionKo() {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
 		step.addAction(new TestAction("action1", false, new ArrayList<>()));
 		step.addAction(new TestAction("action2", true, new ArrayList<>()));
 		Assert.assertFalse(step.getFailed());
@@ -73,7 +83,7 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testGetFailedWithActionOk() {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
 		step.addAction(new TestAction("action1", false, new ArrayList<>()));
 		step.addAction(new TestAction("action2", false, new ArrayList<>()));
 		Assert.assertFalse(step.getFailed());
@@ -86,7 +96,7 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testGetFailedWithStepKo() {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
 		step.setFailed(true);
 		step.addAction(new TestAction("action1", false, new ArrayList<>()));
 		step.addAction(new TestAction("action2", false, new ArrayList<>()));
@@ -99,8 +109,8 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testGetFailedWithActionSubStepKo() {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
-		TestStep subStep = new TestStep("subStep", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
+		TestStep subStep = new TestStep("subStep", "subStep", this.getClass(), null, new ArrayList<>(), true);
 		subStep.addAction(new TestAction("action1", true, new ArrayList<>()));
 		step.addAction(new TestAction("action2", false, new ArrayList<>()));
 		step.addAction(subStep);
@@ -113,8 +123,8 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testGetFailedWithActionSubStepOk() {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
-		TestStep subStep = new TestStep("subStep", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
+		TestStep subStep = new TestStep("subStep", "subStep", this.getClass(), null, new ArrayList<>(), true);
 		subStep.addAction(new TestAction("action1", false, new ArrayList<>()));
 		step.addAction(new TestAction("action2", false, new ArrayList<>()));
 		Assert.assertFalse(step.getFailed());
@@ -129,7 +139,7 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testSnapshotRenaming() throws IOException {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
 
 		File tmpImgFile = File.createTempFile("img", ".png");
 		File tmpHtmlFile = File.createTempFile("html", ".html");
@@ -156,7 +166,7 @@ public class TestTestStep extends GenericTest {
 	@Test(groups = { "ut" })
 	public void testSnapshotRenamingNoRandom() throws IOException {
 		SeleniumTestsContextManager.getThreadContext().setRandomInAttachmentNames(false);
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
 		
 		File tmpImgFile = File.createTempFile("img", ".png");
 		File tmpHtmlFile = File.createTempFile("html", ".html");
@@ -184,7 +194,7 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testSnapshotRenamingWithCustomName() throws IOException {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
 
 		File tmpImgFile = File.createTempFile("img", ".png");
 		File tmpHtmlFile = File.createTempFile("html", ".html");
@@ -206,7 +216,7 @@ public class TestTestStep extends GenericTest {
 
 	@Test(groups = { "ut" })
 	public void testSnapshotRenamingWithSubFolder() throws IOException {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
 
 		File tmpImgFile = File.createTempFile("img", ".png");
 		File tmpHtmlFile = File.createTempFile("html", ".html");
@@ -234,7 +244,7 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testSnapshotInSubStep() throws IOException {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
 
 		File tmpImgFile = File.createTempFile("img", ".png");
 		File tmpHtmlFile = File.createTempFile("html", ".html");
@@ -245,7 +255,7 @@ public class TestTestStep extends GenericTest {
 
 		step.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.TRUE), 0, null);
 
-		TestStep subStep = new TestStep("step1", null, new ArrayList<>(), true);
+		TestStep subStep = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
 		File tmpImgFileSubStep = File.createTempFile("img", ".png");
 		File tmpHtmlFileSubStep = File.createTempFile("html", ".html");
 		ScreenShot screenshotSubStep = new ScreenShot(tmpImgFileSubStep, tmpHtmlFileSubStep);
@@ -277,7 +287,7 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testGetSnapshotSubStep() throws IOException {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
 
 		File tmpImgFile = File.createTempFile("img", ".png");
 		File tmpHtmlFile = File.createTempFile("html", ".html");
@@ -288,7 +298,7 @@ public class TestTestStep extends GenericTest {
 
 		step.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.TRUE), 0, null);
 
-		TestStep subStep = new TestStep("step1", null, new ArrayList<>(), true);
+		TestStep subStep = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
 		File tmpImgFileSubStep = File.createTempFile("img", ".png");
 		File tmpHtmlFileSubStep = File.createTempFile("html", ".html");
 		ScreenShot screenshotSubStep = new ScreenShot(tmpImgFileSubStep, tmpHtmlFileSubStep);
@@ -310,7 +320,7 @@ public class TestTestStep extends GenericTest {
 
 	@Test(groups = { "ut" })
 	public void testMultipleSnapshotsInStep() throws IOException {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
 
 		File tmpImgFile = File.createTempFile("img", ".png");
 		File tmpHtmlFile = File.createTempFile("html", ".html");
@@ -352,7 +362,7 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testGetAllAttachments() throws IOException {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
 
 		// create screenshot for main step
 
@@ -367,7 +377,7 @@ public class TestTestStep extends GenericTest {
 		screenshot1.setTitle("mysite");
 		step.addSnapshot(new Snapshot(screenshot1, "main", SnapshotCheckType.FALSE), 0, null);
 
-		TestStep subStep = new TestStep("subStep", null, new ArrayList<>(), true);
+		TestStep subStep = new TestStep("subStep", "subStep", this.getClass(), null, new ArrayList<>(), true);
 
 		// create screenshot for sub step
 
@@ -396,7 +406,7 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testGetAllAttachmentsFilterSnapshotCheckType() throws IOException {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
 
 		// create screenshot for main step
 		File tmpImgFile = File.createTempFile("img", ".png");
@@ -413,7 +423,7 @@ public class TestTestStep extends GenericTest {
 		step.addSnapshot(new Snapshot(screenshot1, "main", SnapshotCheckType.FALSE), 0, null);
 		step.addSnapshot(new Snapshot(screenshot1, "main", SnapshotCheckType.NONE), 0, null);
 
-		TestStep subStep = new TestStep("subStep", null, new ArrayList<>(), true);
+		TestStep subStep = new TestStep("subStep", "subStep", this.getClass(), null, new ArrayList<>(), true);
 
 		// create screenshot for sub step
 		File tmpImgFile3 = File.createTempFile("img", ".png");
@@ -443,7 +453,7 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testGetAllAttachmentsFilterHtml() throws IOException {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
 
 		// create screenshot for main step
 
@@ -458,7 +468,7 @@ public class TestTestStep extends GenericTest {
 		screenshot1.setTitle("mysite");
 		step.addSnapshot(new Snapshot(screenshot1, "main", SnapshotCheckType.FALSE), 0, null);
 
-		TestStep subStep = new TestStep("subStep", null, new ArrayList<>(), true);
+		TestStep subStep = new TestStep("subStep", "subStep", this.getClass(), null, new ArrayList<>(), true);
 
 		// create screenshot for sub step
 		File tmpImgFile3 = File.createTempFile("img", ".png");
@@ -481,13 +491,13 @@ public class TestTestStep extends GenericTest {
 
 	@Test(groups = { "ut" }, expectedExceptions = CustomSeleniumTestsException.class)
 	public void testTestStepEncodeUnexpected() {
-		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1 \"'<>&", "step1 \"'<>&", this.getClass(), null, new ArrayList<>(), true);
 		step.encode("wrongFormat");
 	}
 
 	@Test(groups = { "ut" })
 	public void testTestStepEncodeHtml() {
-		TestStep step = new TestStep("step1 \"'<>&\u0192", null, new ArrayList<>(), true, RootCause.REGRESSION, "\"'<>&\u0192", false);
+		TestStep step = new TestStep("step1 \"'<>&\u0192", "step1 \"'<>&\u0192", this.getClass(), null, new ArrayList<>(), true, RootCause.REGRESSION, "\"'<>&\u0192", false);
 		step.setFailed(true); // mandatory so that errorCauseDetails is not null
 		TestStep encodedTestStep = step.encode("html");
 		Assert.assertEquals(encodedTestStep.toString(), "Step step1 &quot;'&lt;&gt;&amp;&fnof;");
@@ -496,17 +506,18 @@ public class TestTestStep extends GenericTest {
 
 	@Test(groups = { "ut" })
 	public void testTestStepEncodeJson() {
-		TestStep step = new TestStep("step1 \"/\\", null, new ArrayList<>(), true, RootCause.REGRESSION, "\"/\\", false);
+		TestStep step = new TestStep("step1 \"/\\", "step1 \"/\\", this.getClass(), null, new ArrayList<>(), true, RootCause.REGRESSION, "\"/\\", false);
 
 		step.setFailed(true); // mandatory so that errorCauseDetails is not null
 		TestStep encodedTestStep = step.encode("json");
 		Assert.assertEquals(encodedTestStep.toString(), "Step step1 \\\"\\/\\\\");
+		Assert.assertEquals(encodedTestStep.getAction(), "step1 \\\"\\/\\\\");
 		Assert.assertEquals(encodedTestStep.getRootCauseDetails(), "\\\"\\/\\\\");
 	}
 
 	@Test(groups = { "ut" })
 	public void testTestStepEncodeXml() {
-		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>(), true, RootCause.REGRESSION, "\"'<>&", false);
+		TestStep step = new TestStep("step1 \"'<>&", "step1 \"'<>&", this.getClass(), null, new ArrayList<>(), true, RootCause.REGRESSION,  "\"'<>&", false);
 		step.setFailed(true); // mandatory so that errorCauseDetails is not null
 		TestStep encodedTestStep = step.encode("xml");
 		Assert.assertEquals(encodedTestStep.toString(), "Step step1 &quot;&apos;&lt;&gt;&amp;");
@@ -515,7 +526,7 @@ public class TestTestStep extends GenericTest {
 	
 	@Test(groups = { "ut" })
 	public void testDeepCopy() {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true, RootCause.REGRESSION, "\"'<>&\u0192", false);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true, RootCause.REGRESSION, "\"'<>&\u0192", false);
 		TestStep encodedTestStep = step.deepCopy();
 		Assert.assertEquals(step.getName(), encodedTestStep.getName());
 		Assert.assertEquals(step.getStepActions(), encodedTestStep.getStepActions());
@@ -537,7 +548,7 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testTestStepEncodeXmlStatusFailed() {
-		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1 \"'<>&", "step1 \"'<>&", this.getClass(), null, new ArrayList<>(), true);
 		step.setFailed(true);
 		TestStep encodedTestStep = step.encode("xml");
 		Assert.assertTrue(encodedTestStep.getFailed());
@@ -545,14 +556,14 @@ public class TestTestStep extends GenericTest {
 
 	@Test(groups = { "ut" })
 	public void testTestStepEncodeXmlPasswordKept() {
-		TestStep step = new TestStep("step1 \"'<>&", null, Arrays.asList("myPassword"), true);
+		TestStep step = new TestStep("step1 \"'<>&", "step1 \"'<>&", this.getClass(), null, Arrays.asList("myPassword"), true);
 		TestStep encodedTestStep = step.encode("xml");
 		Assert.assertTrue(encodedTestStep.getPwdToReplace().contains("myPassword"));
 	}
 
 	@Test(groups = { "ut" })
 	public void testTestStepEncodeXmlExceptionKept() {
-		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1 \"'<>&", "step1 \"'<>&", this.getClass(), null, new ArrayList<>(), true);
 		step.setActionException(new Throwable("foo"));
 		TestStep encodedTestStep = step.encode("xml");
 		Assert.assertNotNull(encodedTestStep.getActionException());
@@ -564,7 +575,7 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testTestStepEncodeXmlWebDriverExceptionKept() {
-		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1 \"'<>&", "step1 \"'<>&", this.getClass(), null, new ArrayList<>(), true);
 		step.setActionException(new NoSuchElementException("foo"));
 		TestStep encodedTestStep = step.encode("xml");
 		Assert.assertNotNull(encodedTestStep.getActionException());
@@ -577,7 +588,7 @@ public class TestTestStep extends GenericTest {
 		har.getLog().addPage(new Page("", "title", "a title"));
 		HarCapture cap = new HarCapture(har, "main");
 
-		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1 \"'<>&", "step1 \"'<>&", this.getClass(), null, new ArrayList<>(), true);
 		step.setHarCaptures(Arrays.asList(cap));
 		TestStep encodedTestStep = step.encode("xml");
 		Assert.assertEquals(encodedTestStep.getHarCaptures().get(0), cap);
@@ -588,7 +599,7 @@ public class TestTestStep extends GenericTest {
 
 		GenericFile file = new GenericFile(File.createTempFile("video", ".avi"), "video file");
 
-		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1 \"'<>&", "step1 \"'<>&", this.getClass(), null, new ArrayList<>(), true);
 		step.addFile(file);
 		TestStep encodedTestStep = step.encode("xml");
 		Assert.assertEquals(encodedTestStep.getFiles().get(0).getFile(), file.getFile());
@@ -632,7 +643,7 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testTestStepNoreencodeXml() {
-		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1 \"'<>&", "step1 \"'<>&", this.getClass(), null, new ArrayList<>(), true);
 		TestStep encodedTestStep = step.encode("xml");
 		TestStep encodedTestStep2 = encodedTestStep.encode("xml");
 		Assert.assertEquals(encodedTestStep2.toString(), "Step step1 &quot;&apos;&lt;&gt;&amp;");
@@ -640,7 +651,7 @@ public class TestTestStep extends GenericTest {
 
 	@Test(groups = { "ut" })
 	public void testTestStepNoReEncodeJson() {
-		TestStep step = new TestStep("step1 \"/\\", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1 \"/\\", "step1 \"/\\", this.getClass(), null, new ArrayList<>(), true);
 		TestStep encodedTestStep = step.encode("json");
 		Assert.assertEquals(encodedTestStep.toJson().getString("name"), "step1 \\\"\\/\\\\");
 	}
@@ -650,11 +661,11 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testEncodeXml() {
-		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1 \"'<>&", "step1 \"'<>&", this.getClass(), null, new ArrayList<>(), true);
 		step.addMessage(new TestMessage("everything OK \"'<>&", MessageType.INFO));
 		step.addAction(new TestAction("action2 \"'<>&", false, new ArrayList<>()));
 
-		TestStep subStep = new TestStep("subStep", null, new ArrayList<>(), true);
+		TestStep subStep = new TestStep("subStep", "subStep", this.getClass(), null, new ArrayList<>(), true);
 		subStep.addMessage(new TestMessage("everything in subStep almost OK", MessageType.WARNING));
 		subStep.addAction(new TestAction("action1 \"'<>&", false, new ArrayList<>()));
 		step.addAction(subStep);
@@ -674,7 +685,7 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testToJson() throws IOException {
-		TestStep step = new TestStep("step1 with args: (https://myserver)", null, Arrays.asList("foobar"), true);
+		TestStep step = new TestStep("step1 with args: (https://myserver)", "step1", this.getClass(), null, Arrays.asList("foobar"), true);
 		step.addMessage(new TestMessage("everything OK", MessageType.INFO));
 		step.addAction(new TestAction("action2", false, new ArrayList<>()));
 
@@ -695,7 +706,7 @@ public class TestTestStep extends GenericTest {
 		Snapshot snapshot = new Snapshot(screenshot, "main", SnapshotCheckType.FALSE);
 		step.addSnapshot(snapshot, 0, "foo");
 
-		TestStep subStep = new TestStep("subStep with password foobar", null, new ArrayList<>(), true);
+		TestStep subStep = new TestStep("subStep with password foobar", "subStep with password foobar", this.getClass(), null, new ArrayList<>(), true);
 		subStep.addMessage(new TestMessage("everything in subStep almost OK", MessageType.WARNING));
 		subStep.addAction(new TestAction("action1", false, new ArrayList<>()));
 		step.addAction(subStep);
@@ -705,6 +716,8 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(stepJson.getString("type"), "step");
 		Assert.assertTrue(stepJson.isNull("exception"));
 		Assert.assertEquals(stepJson.getString("name"), "step1 with args: (https://myserver)");
+		Assert.assertEquals(stepJson.getString("action"), "step1");
+		Assert.assertEquals(stepJson.getString("origin"), "com.seleniumtests.ut.reporter.logger.TestTestStep");
 		Assert.assertEquals(stepJson.getString("status"), "SUCCESS");
 		Assert.assertEquals(stepJson.getLong("timestamp"), step.getTimestamp().toInstant(ZoneOffset.UTC).toEpochMilli());
 		Assert.assertEquals(stepJson.getJSONArray("actions").length(), 3);
@@ -733,7 +746,7 @@ public class TestTestStep extends GenericTest {
 	}
 	@Test(groups = { "ut" })
 	public void testToJsonWithException() throws IOException {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
 		step.setActionException(new WebDriverException("KO"));
 		step.addMessage(new TestMessage("OK", MessageType.INFO));
 		step.addAction(new TestAction("action2", true, new ArrayList<>()));
@@ -754,7 +767,7 @@ public class TestTestStep extends GenericTest {
 
 	@Test(groups = { "ut" })
 	public void testToString() throws IOException {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
 		step.addMessage(new TestMessage("everything OK", MessageType.INFO));
 		step.addAction(new TestAction("action2", false, new ArrayList<>()));
 
@@ -765,7 +778,7 @@ public class TestTestStep extends GenericTest {
 		GenericFile file = new GenericFile(File.createTempFile("video", ".avi"), "video file");
 		step.addFile(file);
 
-		TestStep subStep = new TestStep("subStep", null, new ArrayList<>(), true);
+		TestStep subStep = new TestStep("subStep", "subStep", this.getClass(), null, new ArrayList<>(), true);
 		subStep.addMessage(new TestMessage("everything in subStep almost OK", MessageType.WARNING));
 		subStep.addAction(new TestAction("action1", false, new ArrayList<>()));
 		step.addAction(subStep);
@@ -787,10 +800,10 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testPasswordMaskingMainStep() {
-		TestStep step = new TestStep("step1 with args: (bar, passwd)", null, Arrays.asList("passwd"), true);
+		TestStep step = new TestStep("step1 with args: (bar, passwd)", "step1 with args: (bar, passwd)", this.getClass(), null, Arrays.asList("passwd"), true);
 		TestAction action = new TestAction("action in step1 with args: (foo, passwd)", false, new ArrayList<>());
 		TestMessage message = new TestMessage("everything OK on passwd", MessageType.INFO);
-		TestStep substep = new TestStep("substep with args: (passwd)", null, new ArrayList<>(), true);
+		TestStep substep = new TestStep("substep with args: (passwd)", "substep with args: (passwd)", this.getClass(), null, new ArrayList<>(), true);
 		step.addAction(action);
 		step.addMessage(message);
 		step.addStep(substep);
@@ -813,16 +826,16 @@ public class TestTestStep extends GenericTest {
 	public void testPasswordMaskingNull() {
 		List<String> pwd = new ArrayList<>();
 		pwd.add(null);
-		TestStep step = new TestStep("step1 with args: (bar, passwd)", null, pwd, true);
+		TestStep step = new TestStep("step1 with args: (bar, passwd)", "step1 with args: (bar, passwd)", this.getClass(), null, pwd, true);
 		Assert.assertTrue(step.getPwdToReplace().isEmpty());
 	}
 	
 	@Test(groups = { "ut" })
 	public void testPasswordMaskingHtmlEncodedMainStep() {
-		TestStep step = new TestStep("step1 with args: (bar, passwd)", null, Arrays.asList("passwd"), true);
+		TestStep step = new TestStep("step1 with args: (bar, passwd)", "step1 with args: (bar, passwd)", this.getClass(), null, Arrays.asList("passwd"), true);
 		TestAction action = new TestAction("action in step1 with args: (foo, passwd)", false, new ArrayList<>());
 		TestMessage message = new TestMessage("everything OK on passwd", MessageType.INFO);
-		TestStep substep = new TestStep("substep with args: (passwd)", null, new ArrayList<>(), true);
+		TestStep substep = new TestStep("substep with args: (passwd)", "substep with args: (passwd)", this.getClass(), null, new ArrayList<>(), true);
 		step.addAction(action);
 		step.addMessage(message);
 		step.addStep(substep);
@@ -843,10 +856,10 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testPasswordMaskingHtmlEncodedMainStepWithSpecialCharacters() {
-		TestStep step = new TestStep("step1 with args: (bar, passwd§~$µ)", null, Arrays.asList("passwd§~$µ"), true);
+		TestStep step = new TestStep("step1 with args: (bar, passwd§~$µ)", "step1 with args: (bar, passwd§~$µ)", this.getClass(), null, Arrays.asList("passwd§~$µ"), true);
 		TestAction action = new TestAction("action in step1 with args: (foo, passwd§~$µ)", false, new ArrayList<>());
 		TestMessage message = new TestMessage("everything OK on passwd§~$µ", MessageType.INFO);
-		TestStep substep = new TestStep("substep with args: (passwd§~$µ)", null, new ArrayList<>(), true);
+		TestStep substep = new TestStep("substep with args: (passwd§~$µ)", "substep with args: (passwd§~$µ)", this.getClass(), null, new ArrayList<>(), true);
 		step.addAction(action);
 		step.addMessage(message);
 		step.addStep(substep);
@@ -865,10 +878,10 @@ public class TestTestStep extends GenericTest {
 	
 	@Test(groups = { "ut" })
 	public void testPasswordMaskingXmlEncodedMainStepWithSpecialCharacters() {
-		TestStep step = new TestStep("step1 with args: (bar, passwd§~$µ)", null, Arrays.asList("passwd§~$µ"), true);
+		TestStep step = new TestStep("step1 with args: (bar, passwd§~$µ)", "step1 with args: (bar, passwd§~$µ)", this.getClass(), null, Arrays.asList("passwd§~$µ"), true);
 		TestAction action = new TestAction("action in step1 with args: (foo, passwd§~$µ)", false, new ArrayList<>());
 		TestMessage message = new TestMessage("everything OK on passwd§~$µ", MessageType.INFO);
-		TestStep substep = new TestStep("substep with args: (passwd§~$µ)", null, new ArrayList<>(), true);
+		TestStep substep = new TestStep("substep with args: (passwd§~$µ)", "substep with args: (passwd§~$µ)", this.getClass(), null, new ArrayList<>(), true);
 		step.addAction(action);
 		step.addMessage(message);
 		step.addStep(substep);
@@ -889,8 +902,8 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testPasswordMaskingSubStep() {
-		TestStep step = new TestStep("step1 with args: (bar, passwd)", null, new ArrayList<>(), true);
-		TestStep substep = new TestStep("substep with args: (passwd)", null, Arrays.asList("passwd"), true);
+		TestStep step = new TestStep("step1 with args: (bar, passwd)", "step1 with args: (bar, passwd)", this.getClass(), null, new ArrayList<>(), true);
+		TestStep substep = new TestStep("substep with args: (passwd)", "substep with args: (passwd)", this.getClass(), null, Arrays.asList("passwd"), true);
 		TestAction action = new TestAction("action in step1 with args: (foo, passwd)", false, new ArrayList<>());
 		TestMessage message = new TestMessage("everything OK on passwd", MessageType.INFO);
 		step.addAction(substep);
@@ -908,8 +921,8 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testNoPasswordMasking() {
-		TestStep step = new TestStep("step1 with args: (bar, passwd)", null, new ArrayList<>(), false);
-		TestStep substep = new TestStep("substep with args: (passwd)", null, Arrays.asList("passwd"), false);
+		TestStep step = new TestStep("step1 with args: (bar, passwd)", "step1 with args: (bar, passwd)", this.getClass(), null, new ArrayList<>(), false);
+		TestStep substep = new TestStep("substep with args: (passwd)", "substep with args: (passwd)", this.getClass(), null, Arrays.asList("passwd"), false);
 		TestAction action = new TestAction("action in step1 with args: (foo, passwd)", false, new ArrayList<>());
 		TestMessage message = new TestMessage("everything OK on passwd", MessageType.INFO);
 		step.addAction(substep);
@@ -929,7 +942,7 @@ public class TestTestStep extends GenericTest {
 	public void testPasswordMaskingWithEmptyPassword() {
 		List<String> toReplace = new ArrayList<>();
 		toReplace.add("");
-		TestStep step = new TestStep("step1 with args: (bar, to)", null, toReplace, true);
+		TestStep step = new TestStep("step1 with args: (bar, to)", "step1 with args: (bar, to)", this.getClass(), null, toReplace, true);
 
 		Assert.assertEquals(step.getName(), "step1 with args: (bar, to)");
 	}
@@ -942,7 +955,7 @@ public class TestTestStep extends GenericTest {
 	public void testPasswordMaskingWithTooShortPassword() {
 		List<String> toReplace = new ArrayList<>();
 		toReplace.add("passw");
-		TestStep step = new TestStep("step1 with args: (bar, passw)", null, toReplace, true);
+		TestStep step = new TestStep("step1 with args: (bar, passw)", "step1 with args: (bar, passw)", this.getClass(), null, toReplace, true);
 
 		Assert.assertEquals(step.getName(), "step1 with args: (bar, passw)");
 	}
@@ -955,7 +968,7 @@ public class TestTestStep extends GenericTest {
 	public void testPasswordMaskingWithLongerPassword() {
 		List<String> toReplace = new ArrayList<>();
 		toReplace.add("passwd");
-		TestStep step = new TestStep("step1 with args: (bar, passwd)", null, toReplace, true);
+		TestStep step = new TestStep("step1 with args: (bar, passwd)", "step1 with args: (bar, passwd)", this.getClass(), null, toReplace, true);
 
 		Assert.assertEquals(step.getName(), "step1 with args: (bar, ******)");
 	}
@@ -966,10 +979,10 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testPasswordMaskingAddPassword() {
-		TestStep step = new TestStep("step1 with args: (bar, passwd)", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1 with args: (bar, passwd)", "step1 with args: (bar, passwd)", this.getClass(), null, new ArrayList<>(), true);
 		TestAction action = new TestAction("action in step1 with args: (foo, passwd)", false, new ArrayList<>());
 		TestMessage message = new TestMessage("everything OK on passwd", MessageType.INFO);
-		TestStep substep = new TestStep("substep with args: (passwd)", null, new ArrayList<>(), true);
+		TestStep substep = new TestStep("substep with args: (passwd)", "substep with args: (passwd)", this.getClass(), null, new ArrayList<>(), true);
 		step.addAction(action);
 		step.addMessage(message);
 		step.addPasswordToReplace("passwd");
@@ -985,7 +998,7 @@ public class TestTestStep extends GenericTest {
 	
 	@Test(groups = { "ut" })
 	public void testPasswordMaskingAddPasswordNull() {
-		TestStep step = new TestStep("step1 with args: (bar, passwd)", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1 with args: (bar, passwd)", "step1 with args: (bar, passwd)", this.getClass(), null, new ArrayList<>(), true);
 		step.addPasswordToReplace(null);
 		
 		// check 'null' is refused
@@ -998,7 +1011,7 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testDuration() {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
 		step.setDuration(5000L);
 		step.setDurationToExclude(500L);
 		TestAction action = new TestAction("action2", false, new ArrayList<>());
@@ -1012,11 +1025,11 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testDurationWithSubStep() {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
 		step.setDuration(5000L);
 		step.setDurationToExclude(500L);
 
-		TestStep subStep = new TestStep("subStep", null, new ArrayList<>(), true);
+		TestStep subStep = new TestStep("subStep", "subStep", this.getClass(), null, new ArrayList<>(), true);
 		TestAction action = new TestAction("action2", false, new ArrayList<>());
 		action.setDurationToExclude(600L);
 		subStep.addAction(action);
@@ -1026,7 +1039,7 @@ public class TestTestStep extends GenericTest {
 
 	@Test(groups = { "ut" })
 	public void testDurationWithSnapshot() throws IOException {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
 		step.setDuration(5000L);
 		step.setDurationToExclude(500L);
 
@@ -1039,17 +1052,17 @@ public class TestTestStep extends GenericTest {
 
 	@Test(groups = { "ut" })
 	public void testTestStepPositionAndParent() {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
 		Assert.assertEquals(step.getPosition(), 0);
 		Assert.assertNull(step.getParent());
 	}
 
 	@Test(groups = { "ut" })
 	public void testTestSubStepPositionAndParent() {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
-		TestStep subStep = new TestStep("subStep1", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
+		TestStep subStep = new TestStep("subStep1", "subStep1", this.getClass(), null, new ArrayList<>(), true);
 		step.addStep(subStep);
-		TestStep subStep2 = new TestStep("subStep2", null, new ArrayList<>(), true);
+		TestStep subStep2 = new TestStep("subStep2", "subStep2", this.getClass(), null, new ArrayList<>(), true);
 		step.addStep(subStep2);
 		Assert.assertEquals(subStep.getPosition(), 0);
 		Assert.assertEquals(subStep2.getPosition(), 1);
@@ -1059,8 +1072,8 @@ public class TestTestStep extends GenericTest {
 
 	@Test(groups = { "ut" })
 	public void testTestSubActionPositionAndParent() {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
-		TestStep subStep = new TestStep("subStep1", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
+		TestStep subStep = new TestStep("subStep1", "subStep1", this.getClass(), null, new ArrayList<>(), true);
 		step.addStep(subStep);
 		TestAction action = new TestAction("subStep2", null, new ArrayList<>());
 		step.addAction(action);
@@ -1070,8 +1083,8 @@ public class TestTestStep extends GenericTest {
 
 	@Test(groups = { "ut" })
 	public void testTestSubMessagePositionAndParent() {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
-		TestStep subStep = new TestStep("subStep1", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
+		TestStep subStep = new TestStep("subStep1", "subStep1", this.getClass(), null, new ArrayList<>(), true);
 		step.addStep(subStep);
 		TestMessage message = new TestMessage("everything OK on passwd", MessageType.INFO);
 		step.addAction(message);
@@ -1081,8 +1094,8 @@ public class TestTestStep extends GenericTest {
 //
 //	@Test(groups = { "ut" })
 //	public void testTestSubCapturePositionAndParent() throws IOException {
-//		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
-//		TestStep subStep = new TestStep("subStep1", null, new ArrayList<>(), true);
+//		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
+//		TestStep subStep = new TestStep("subStep1", "subStep1", this.getClass(), null, new ArrayList<>(), true);
 //		step.addStep(subStep);
 //
 //		Har har = new Har(new HarLog());
@@ -1095,8 +1108,8 @@ public class TestTestStep extends GenericTest {
 
 	@Test(groups = { "ut" })
 	public void testTestSubFilePositionAndParent() throws IOException {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
-		TestStep subStep = new TestStep("subStep1", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
+		TestStep subStep = new TestStep("subStep1", "subStep1", this.getClass(), null, new ArrayList<>(), true);
 		step.addStep(subStep);
 
 		GenericFile file = new GenericFile(File.createTempFile("video", ".avi"), "video file");
@@ -1107,8 +1120,8 @@ public class TestTestStep extends GenericTest {
 
 	@Test(groups = { "ut" })
 	public void testTestSubSnapshotPositionAndParent() throws IOException {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
-		TestStep subStep = new TestStep("subStep1", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
+		TestStep subStep = new TestStep("subStep1", "subStep1", this.getClass(), null, new ArrayList<>(), true);
 		step.addStep(subStep);
 
 
@@ -1129,7 +1142,7 @@ public class TestTestStep extends GenericTest {
 
 	@Test(groups = { "ut" })
 	public void testTestStepWithrootCause() {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true, RootCause.REGRESSION, "details", false);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true, RootCause.REGRESSION, "details", false);
 
 		step.setFailed(true); // mandatory so that errorCauseDetails is not null
 		Assert.assertEquals(step.getRootCause(), RootCause.REGRESSION);
@@ -1141,7 +1154,7 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testTestStepSuccessWithrootCause() {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true, RootCause.REGRESSION, "details", false);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true, RootCause.REGRESSION, "details", false);
 		
 		Assert.assertNull(step.getRootCause());
 		Assert.assertNull(step.getRootCauseDetails());
@@ -1152,8 +1165,8 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testTestStepWithrootCauseInSubStep() {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
-		TestStep subStep = new TestStep("step1", null, new ArrayList<>(), true, RootCause.REGRESSION, "details", false);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
+		TestStep subStep = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true, RootCause.REGRESSION, "details", false);
 
 		subStep.setFailed(true); // mandatory so that errorCauseDetails is not null
 		step.addStep(subStep);
@@ -1163,20 +1176,20 @@ public class TestTestStep extends GenericTest {
 	
 	@Test(groups = { "ut" })
 	public void testTestStepWithRootCauseNone() {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true, RootCause.NONE, "details", false);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true, RootCause.NONE, "details", false);
 		Assert.assertNull(step.getRootCause());
 		Assert.assertNull(step.getRootCauseDetails());
 	}
 	
 	@Test(groups = { "ut" })
 	public void testIsTestEndStep() {
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
 		Assert.assertFalse(step.isTestEndStep());
 	}
 	
 	@Test(groups = { "ut" })
 	public void testIsTestEndStep2() {
-		TestStep step = new TestStep("Test end", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("Test end", "Test end", this.getClass(), null, new ArrayList<>(), true);
 		Assert.assertTrue(step.isTestEndStep());
 	}
 	
@@ -1193,7 +1206,7 @@ public class TestTestStep extends GenericTest {
 		} catch (IOException e) {
 		}
 		
-		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
 		
 		// create screenshot for main step
 		File tmpImgFile = File.createTempFile("img", ".png");
@@ -1217,7 +1230,7 @@ public class TestTestStep extends GenericTest {
 		screenshot1.setTitle("mysite");
 		step.addSnapshot(new Snapshot(screenshot1, "main", SnapshotCheckType.FALSE), 0, null);
 		
-		TestStep subStep = new TestStep("subStep", null, new ArrayList<>(), true);
+		TestStep subStep = new TestStep("subStep", "subStep", this.getClass(), null, new ArrayList<>(), true);
 		
 		// create screenshot for sub step
 		File tmpImgFile3 = File.createTempFile("img", ".png");

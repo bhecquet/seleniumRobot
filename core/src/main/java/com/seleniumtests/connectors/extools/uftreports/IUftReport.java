@@ -38,7 +38,7 @@ public abstract class IUftReport {
     protected void addStepWithoutXml(String scriptName, List<TestStep> listStep, String messageException, Exception e) {
     	String completeMessage = e != null ? e.getMessage(): "";
         logger.error(messageException + ": " + completeMessage);
-        TestStep readStep = new TestStep("UFT: " + scriptName, Reporter.getCurrentTestResult(), new ArrayList<>(), false);
+        TestStep readStep = new TestStep("UFT: " + scriptName, "UFT: " + scriptName, IUftReport.class, Reporter.getCurrentTestResult(), new ArrayList<>(), false);
         readStep.addMessage(new TestMessage(messageException + ": " + completeMessage, MessageType.ERROR));
         listStep.add(readStep);
     }

@@ -48,7 +48,7 @@ public class TestSeleniumRobotTestPlan extends MockitoTest {
 			Map<String, String> params = new HashMap<>();
 			params.put("foo", "bar");
 
-			TestStep step = new TestStep("step", null, new ArrayList<String>(), false);
+			TestStep step = new TestStep("step", "step", this.getClass(), null, new ArrayList<String>(), false);
 
 			when(uft.executeScript(5, params)).thenReturn(Arrays.asList(step));
 
@@ -69,7 +69,7 @@ public class TestSeleniumRobotTestPlan extends MockitoTest {
 		Map<String, String> params = new HashMap<>();
 		params.put("foo", "bar");
 		
-		TestStep step = new TestStep("step", null, new ArrayList<String>(), false);
+		TestStep step = new TestStep("step", "step", this.getClass(), null, new ArrayList<String>(), false);
 		step.setFailed(true);
 		
 		when(uft.executeScript(5, params)).thenReturn(Arrays.asList(step));

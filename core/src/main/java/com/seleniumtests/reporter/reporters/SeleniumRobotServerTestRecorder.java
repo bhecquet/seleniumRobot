@@ -232,7 +232,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			logger.info(String.format("Recording step %s on server", testStep.getName()));
 			
 			// record test step
-			Integer testStepId = serverConnector.createTestStep(testStep.getName(), testCaseInSessionId);
+			Integer testStepId = serverConnector.createTestStep(testStep.getFullActionName(), testCaseInSessionId);
 			
 			Integer stepResultId = serverConnector.recordStepResult(testStep, testCaseInSessionId, testStepId);
 			testStep.setStepResultId(stepResultId);
@@ -273,6 +273,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 		List<File> executionResults = new ArrayList<>();
 		if (SeleniumTestsContextManager.getGlobalContext().getKeepAllResults()) {
 			testStep.setName("Previous execution results");
+			testStep.setAction("Previous execution results");
 			executionResults = FileUtils.listFiles(new File(TestNGResultUtils.getSeleniumRobotTestContext(testResult).getOutputDirectory()),
 							FileFilterUtils.suffixFileFilter(".zip"), null).stream()
 					.collect(Collectors.toList());

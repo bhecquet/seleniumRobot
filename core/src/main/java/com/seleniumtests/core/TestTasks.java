@@ -366,7 +366,12 @@ public class TestTasks {
     	
     	// stepName is null when test is terminating. We don't create a new step
     	if (stepName != null) {
-	    	TestStep step = new TestStep(stepName, Reporter.getCurrentTestResult(), Arrays.asList(passwordsToMask), SeleniumTestsContextManager.getThreadContext().getMaskedPassword());
+	    	TestStep step = new TestStep(stepName,
+					stepName,
+					StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).getCallerClass(),
+					Reporter.getCurrentTestResult(),
+					Arrays.asList(passwordsToMask),
+					SeleniumTestsContextManager.getThreadContext().getMaskedPassword());
 	    	TestStepManager.setCurrentRootTestStep(step);
 	    	capturePageSnapshot();
 	    	

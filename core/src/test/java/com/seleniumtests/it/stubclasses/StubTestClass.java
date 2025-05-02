@@ -78,7 +78,7 @@ public class StubTestClass extends StubParentClass {
 	
 	@Test(groups="stub", description="a test with steps")
 	public void testAndSubActions() throws IOException {
-		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		step1.addAction(new TestAction("sendKeys to text field", true, new ArrayList<>()));
 		
@@ -94,14 +94,14 @@ public class StubTestClass extends StubParentClass {
 		step1.addSnapshot(new Snapshot(screenshot2, null, SnapshotCheckType.FULL), 1, null);
 		
 		step1.setActionException(new WebDriverException("driver exception"));
-		TestStep subStep1 = new TestStep("step 1.3: open page", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		TestStep subStep1 = new TestStep("step 1.3: open page", "step 1.3: open page", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		subStep1.addAction(new TestAction("click link", false, new ArrayList<>()));
 		subStep1.addMessage(new TestMessage("a message", MessageType.LOG));
 		subStep1.addAction(new TestAction("sendKeys to password field", false, new ArrayList<>()));
 		step1.addAction(subStep1);
 		WaitHelper.waitForSeconds(3);
 		step1.setDuration(1230L);
-		TestStep step2 = new TestStep("step 2", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		TestStep step2 = new TestStep("step 2", "step 2", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step2.setDuration(14030L);
 		TestStepManager.logTestStep(step1);
 		TestStepManager.logTestStep(step2);
@@ -115,7 +115,7 @@ public class StubTestClass extends StubParentClass {
 	 */
 	@Test(groups="stub", dependsOnMethods="testAndSubActions")
 	public void testWithException2() {
-		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step1.addAction(new TestAction(String.format("played %d times", count), false, new ArrayList<>()));
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		TestStepManager.logTestStep(step1);
@@ -124,7 +124,7 @@ public class StubTestClass extends StubParentClass {
 	
 	@Test(groups="stub")
 	public void testInError() {
-		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		TestStepManager.setCurrentRootTestStep(step1);
 		TestStepManager.getParentTestStep().addAction(new TestAction("click button", false, new ArrayList<>()));
 		TestStepManager.getParentTestStep().addMessage(new TestMessage("click ok", MessageType.INFO));
@@ -147,7 +147,7 @@ public class StubTestClass extends StubParentClass {
 	@Test(groups="stub")
 	public void testWithException() throws IOException {
 		count++;
-		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		
 		File tmpImg2 = File.createTempFile("img", "_with_very_very_very_long_name_to_be_shortened.png");
 		File tmpHtml2 = File.createTempFile("html", "_with_very_very_very_long_name_to_be_shortened.html");
@@ -170,7 +170,7 @@ public class StubTestClass extends StubParentClass {
 	@Test(groups="stub", dataProvider = "data")
 	public void testWithExceptionAndDataProvider(String data) {
 		count++;
-		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step1.addAction(new TestAction(String.format("played %d times", count), false, new ArrayList<>()));
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		TestStepManager.logTestStep(step1);
@@ -183,7 +183,7 @@ public class StubTestClass extends StubParentClass {
 	@Test(groups="stub")
 	public void testWithExceptionAndMaxRetryIncreased() {
 		count++;
-		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step1.addAction(new TestAction(String.format("played %d times", count), false, new ArrayList<>()));
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		TestStepManager.logTestStep(step1);
@@ -203,7 +203,7 @@ public class StubTestClass extends StubParentClass {
 	@Test(groups="stub")
 	public void testWithExceptionAndMaxRetryIncreasedWithLimit() {
 		count++;
-		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step1.addAction(new TestAction(String.format("played %d times", count), false, new ArrayList<>()));
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		TestStepManager.logTestStep(step1);
@@ -223,7 +223,7 @@ public class StubTestClass extends StubParentClass {
 	 */
 	@Test(groups="stub")
 	public void testOkWithOneStepFailed() {
-		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step1.addAction(new TestAction("first action failed", true, new ArrayList<>()));
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		TestStepManager.logTestStep(step1);
@@ -235,7 +235,7 @@ public class StubTestClass extends StubParentClass {
 	@Test(groups="stub")
 	public void testWithExceptionOnFirstExec() {
 
-		TestStep step1 = new TestStep("step 10", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		TestStep step1 = new TestStep("step 10", "step 10", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step1.addAction(new TestAction(String.format("played %d times", count), false, new ArrayList<>()));
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		TestStepManager.logTestStep(step1);
@@ -252,7 +252,7 @@ public class StubTestClass extends StubParentClass {
 	@Test(groups="stub")
 	public void testWithSocketTimeoutOnFirstExec() {
 		
-		TestStep step1 = new TestStep("step 10", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		TestStep step1 = new TestStep("step 10", "step 10", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step1.addAction(new TestAction(String.format("played %d times", count), false, new ArrayList<>()));
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		TestStepManager.logTestStep(step1);
@@ -266,7 +266,7 @@ public class StubTestClass extends StubParentClass {
 	
 	@Test(groups="stub", testName="A test which is <OK> é&")
 	public void testOkWithTestName() throws IOException {
-		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		step1.addAction(new TestAction("sendKeys to text field", false, new ArrayList<>()));
 		TestStepManager.logTestStep(step1);
@@ -305,7 +305,7 @@ public class StubTestClass extends StubParentClass {
 
 	@Test(groups="stub")
 	public void testOk() throws IOException {
-		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		step1.addAction(new TestAction("sendKeys to text field", false, new ArrayList<>()));
 		TestStepManager.logTestStep(step1);
@@ -314,7 +314,7 @@ public class StubTestClass extends StubParentClass {
 
 	@Test(groups="stub", description="a test with infos")
 	public void testWithInfo1() throws IOException {
-		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		step1.addAction(new TestAction("sendKeys to text field", true, new ArrayList<>()));
 		TestStepManager.logTestStep(step1);
@@ -324,7 +324,7 @@ public class StubTestClass extends StubParentClass {
 	
 	@Test(groups="stub", description="a test with infos")
 	public void testWithInfo2() throws IOException {
-		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		step1.addAction(new TestAction("sendKeys to text field", true, new ArrayList<>()));
 		TestStepManager.logTestStep(step1);
@@ -412,7 +412,7 @@ public class StubTestClass extends StubParentClass {
 
 	@Test(groups="stub", invocationCount = 3, threadPoolSize = 2)
 	public void testOkWithInvocationCount() throws IOException {
-		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		step1.addAction(new TestAction("sendKeys to text field", false, new ArrayList<>()));
 		TestStepManager.logTestStep(step1);

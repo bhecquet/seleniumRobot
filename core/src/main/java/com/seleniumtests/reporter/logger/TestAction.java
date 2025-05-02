@@ -17,11 +17,8 @@
  */
 package com.seleniumtests.reporter.logger;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneOffset;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,9 +56,10 @@ public class TestAction {
 	protected boolean encoded = false;		// true if we have encoded messages
 	protected LocalDateTime timestamp;
 
-	private String action;			// "click", "sendKeys", ...
-	private Element element;			// name of the element on which action occurs
-	private Class<? extends PageObject> page;		// page on which action is performed
+
+	protected String action;			// "click", "sendKeys", ...
+	private Element element;		// name of the element on which action occurs
+	protected Class<?> origin;		// page / scenario on which action is performed
 	
 	/**
 	 * 
@@ -93,10 +91,10 @@ public class TestAction {
 	 * @param failed		true if this action is failed
 	 * @param pwdToReplace	list of string to replace when returning actions so that passwords are masked. Only password longer that 5 characters are replaced to avoid replacing non password strings
 	 * @param action		the performed action. Difference with name is that, for element actions, 'name' will be "click on HtmlElement...", 'action' will be 'click'
-	 * @param page			the page class on which action is performed
+	 * @param origin			the page class on which action is performed
 	 */
-	public TestAction(String name, Boolean failed, List<String> pwdToReplace, String action, Class<? extends PageObject> page) {
-		this(name, failed, pwdToReplace, action, null, page);
+	public TestAction(String name, Boolean failed, List<String> pwdToReplace, String action, Class<? extends PageObject> origin) {
+		this(name, failed, pwdToReplace, action, null, origin);
 	}
 
 	/**
@@ -107,17 +105,17 @@ public class TestAction {
 	 * @param action		the performed action. Difference with name is that, for element actions, 'name' will be "click on HtmlElement...", 'action' will be 'click'
 	 * @param element		the element on which action is performed
 	 */
-	public TestAction(String name, Boolean failed, List<String> pwdToReplace, String action, Element element, Class<? extends PageObject> page) {
-		this.name = name;
+	public TestAction(String name, Boolean failed, List<String> pwdToReplace, String action, Element element, Class<? extends PageObject> origin) {
+		this.name = name; // it's the action performed, with dataset
 		this.failed = failed;
 		this.pwdToReplace = pwdToReplace.stream()
 					.filter(s -> s != null)
 					.filter(s -> s.length() > TestStepManager.MIN_PASSWORD_LENGTH)
 					.collect(Collectors.toList());
 
-		this.action = action;
+		this.action = action; // it's the action performed, without dataset
 		this.element = element;
-		this.page = page;
+		this.origin = origin;
 
 		timestamp = LocalDateTime.now();
 	}
@@ -206,8 +204,8 @@ public class TestAction {
 		if (element != null) {
 			actionJson.put("element", element.getName());
 		}
-		if (page != null) {
-			actionJson.put("page", page.getName());
+		if (origin != null) {
+			actionJson.put("origin", origin.getName());
 		}
 
 		return actionJson;
@@ -275,8 +273,12 @@ public class TestAction {
 		return element;
 	}
 
-	public Class<? extends PageObject> getPage() {
-		return page;
+	public Class<?> getOrigin() {
+		return origin;
+	}
+
+	public void setAction(String action) {
+		this.action = action;
 	}
 
 }

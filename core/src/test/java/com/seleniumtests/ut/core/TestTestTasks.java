@@ -758,6 +758,8 @@ public class TestTestTasks extends MockitoTest {
 			TestTasks.addStep(null); // add a final step so that previous step is written
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().size(), 1);
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(0).getName(), "foo");
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(0).getAction(), "foo");
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(0).getOrigin(), TestTestTasks.class); // check origin is the class that made the call
 		} finally {
 			GenericTest.resetTestNGREsultAndLogger();
 		}

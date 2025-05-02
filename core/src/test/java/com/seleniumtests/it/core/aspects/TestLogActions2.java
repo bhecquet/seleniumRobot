@@ -131,12 +131,12 @@ public class TestLogActions2 extends GenericDriverTest {
 		// check page action has a 'page' field filled but no element
 		TestAction selectNewWindowAction = step.getStepActions().get(2); // get the "selectNewWindow" action
 		Assert.assertEquals(selectNewWindowAction.getAction(), "selectNewWindow");
-		Assert.assertEquals(selectNewWindowAction.getPage(), DriverTestPage.class);
+		Assert.assertEquals(selectNewWindowAction.getOrigin(), DriverTestPage.class);
 		Assert.assertNull(selectNewWindowAction.getElement());
 
 		TestAction openPageAction = ((TestStep) step.getStepActions().get(4)).getStepActions().get(0);
 		Assert.assertEquals(openPageAction.getAction(), "openPage");
-		Assert.assertEquals(openPageAction.getPage(), DriverSubTestPage.class);
+		Assert.assertEquals(openPageAction.getOrigin(), DriverSubTestPage.class);
 		Assert.assertNull(openPageAction.getElement());
 	}
 
@@ -144,18 +144,30 @@ public class TestLogActions2 extends GenericDriverTest {
 	public void testCreateSteps() throws Exception {
 
 		testPage._goToNewPage();
-		TestStep step = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(2);
+
+		TestStep step1 = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(0);
+		Assert.assertEquals(step1.getName(), "getPageUrl with args: (CHROME, )");
+		Assert.assertEquals(step1.getAction(), "getPageUrl");
+		Assert.assertEquals(step1.getOrigin(), DriverTestPage.class);
+		TestStep step2 = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(1);
+		Assert.assertTrue(step2.getName().contains("openPage with args:"));
+		Assert.assertEquals(step2.getAction(), "openPage");
+		Assert.assertEquals(step2.getOrigin(), DriverTestPage.class);
+		TestStep step3 = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(2);
+		Assert.assertEquals(step3.getName(), "_goToNewPage");
+		Assert.assertEquals(step3.getAction(), "_goToNewPage");
+		Assert.assertEquals(step3.getOrigin(), DriverTestPage.class);
 
 		// check we have all actions / steps
-		Assert.assertEquals(step.getStepActions().size(), 7);
-		Assert.assertEquals(step.getStepActions().get(0).getName(), "click on LinkElement My link, by={By.id: link} ");
+		Assert.assertEquals(step3.getStepActions().size(), 7);
+		Assert.assertEquals(step3.getStepActions().get(0).getName(), "click on LinkElement My link, by={By.id: link} ");
 
 		// check sub-step is created
-		Assert.assertTrue(step.getStepActions().get(4) instanceof TestStep);
+		Assert.assertTrue(step3.getStepActions().get(4) instanceof TestStep);
 
 		// check messages are recorded
-		Assert.assertTrue(step.getStepActions().get(6) instanceof TestMessage);
-		Assert.assertTrue(step.getStepActions().get(6).getName().contains("Open web page in"));
+		Assert.assertTrue(step3.getStepActions().get(6) instanceof TestMessage);
+		Assert.assertTrue(step3.getStepActions().get(6).getName().contains("Open web page in"));
 	}
 
 	/**
@@ -230,7 +242,7 @@ public class TestLogActions2 extends GenericDriverTest {
 		TestAction clickAction = step.getStepActions().get(0); // get the "click" action
 		Assert.assertEquals(clickAction.getAction(), "click");
 		Assert.assertTrue(clickAction.getName().contains("click on Element located by"));
-		Assert.assertEquals(clickAction.getPage(), DriverTestPageNativeActions.class);
+		Assert.assertEquals(clickAction.getOrigin(), DriverTestPageNativeActions.class);
 		Assert.assertTrue(clickAction.getElement() instanceof SeleniumElement);
 		Assert.assertTrue(clickAction.getElement().getCallingPage() instanceof DriverTestPageNativeActions);
 		Assert.assertEquals(clickAction.getElement().getOrigin(), "com.seleniumtests.it.driver.support.pages.DriverTestPageNativeActions");
@@ -249,7 +261,7 @@ public class TestLogActions2 extends GenericDriverTest {
 		Assert.assertEquals(step.getStepActions().get(0).getName(), "clickAt on Picture picture from resource tu/images/logo_text_field.png with args: (0, -30, )");
 		Assert.assertEquals(step.getStepActions().get(0).getAction(), "clickAt");
 		Assert.assertEquals(step.getStepActions().get(0).getElement(), testPage.picture);
-		Assert.assertEquals(step.getStepActions().get(0).getPage(), DriverTestPage.class);
+		Assert.assertEquals(step.getStepActions().get(0).getOrigin(), DriverTestPage.class);
 		Assert.assertFalse(step.getStepActions().get(0).getFailed());
 	}
 
@@ -279,11 +291,11 @@ public class TestLogActions2 extends GenericDriverTest {
 		Assert.assertEquals(compositeAction2.getStepActions().get(1).getName(), "click ");
 		Assert.assertEquals(compositeAction1.getStepActions().get(0).getAction(), "moveToElement");
 		Assert.assertEquals(compositeAction1.getStepActions().get(0).getElement(), testPage.textElement);
-		Assert.assertEquals(compositeAction1.getStepActions().get(0).getPage(), DriverTestPage.class);
+		Assert.assertEquals(compositeAction1.getStepActions().get(0).getOrigin(), DriverTestPage.class);
 		Assert.assertFalse(compositeAction1.getStepActions().get(0).getFailed());
 		Assert.assertEquals(compositeAction1.getStepActions().get(1).getAction(), "sendKeys");
 		Assert.assertNull(compositeAction1.getStepActions().get(1).getElement());
-		Assert.assertNull(compositeAction1.getStepActions().get(1).getPage());
+		Assert.assertNull(compositeAction1.getStepActions().get(1).getOrigin());
 		Assert.assertFalse(compositeAction1.getStepActions().get(1).getFailed());
 	}
 
@@ -312,11 +324,11 @@ public class TestLogActions2 extends GenericDriverTest {
 		Assert.assertEquals(compositeAction2.getStepActions().get(1).getName(), "click ");
 		Assert.assertEquals(compositeAction1.getStepActions().get(0).getAction(), "moveToElement");
 		Assert.assertNotNull(compositeAction1.getStepActions().get(0).getElement());
-		Assert.assertEquals(compositeAction1.getStepActions().get(0).getPage(), DriverTestPage.class);
+		Assert.assertEquals(compositeAction1.getStepActions().get(0).getOrigin(), DriverTestPage.class);
 		Assert.assertFalse(compositeAction1.getStepActions().get(0).getFailed());
 		Assert.assertEquals(compositeAction1.getStepActions().get(1).getAction(), "sendKeys");
 		Assert.assertNull(compositeAction1.getStepActions().get(1).getElement());
-		Assert.assertNull(compositeAction1.getStepActions().get(1).getPage());
+		Assert.assertNull(compositeAction1.getStepActions().get(1).getOrigin());
 		Assert.assertFalse(compositeAction1.getStepActions().get(1).getFailed());
 	}
 
@@ -357,7 +369,7 @@ public class TestLogActions2 extends GenericDriverTest {
 		TestAction clickAction = step.getStepActions().get(0); // get the "click" action
 		Assert.assertEquals(clickAction.getAction(), "click");
 		Assert.assertTrue(clickAction.getName().contains("click on Element located by"));
-		Assert.assertEquals(clickAction.getPage(), DriverTestPageObjectFatory.class);
+		Assert.assertEquals(clickAction.getOrigin(), DriverTestPageObjectFatory.class);
 		Assert.assertTrue(clickAction.getElement() instanceof SeleniumElement);
 		Assert.assertEquals(clickAction.getElement().getOrigin(), "com.seleniumtests.it.driver.support.pages.DriverTestPageObjectFatory");
 		Assert.assertTrue(clickAction.getElement().getCallingPage() instanceof DriverTestPageObjectFatory);

@@ -67,7 +67,7 @@ public class TestTestAction extends MockitoTest {
 
     @Test(groups = { "ut" })
     public void testToJsonWithParent() {
-        TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+        TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
         TestAction action = new TestAction("Login with args (user, myPass<>)", false, Arrays.asList("myPass<>"));
         action.setParent(step);
         JSONObject jsonAction = action.toJson();
@@ -81,7 +81,7 @@ public class TestTestAction extends MockitoTest {
      */
     @Test(groups = { "ut" })
     public void testToJsonWithParentException() {
-        TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+        TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
         step.setActionException(new WebDriverException("some exception clicking"));
         TestAction action = new TestAction("Login with args (user, myPass<>)", false, Arrays.asList("myPass<>"));
         action.setParent(step);
@@ -99,7 +99,7 @@ public class TestTestAction extends MockitoTest {
         JSONObject jsonAction = action.toJson();
         Assert.assertEquals(jsonAction.getString("action"), "click");
         Assert.assertEquals(jsonAction.getString("element"), "my element");
-        Assert.assertEquals(jsonAction.getString("page"), "com.seleniumtests.it.driver.support.pages.DriverTestPage");
+        Assert.assertEquals(jsonAction.getString("origin"), "com.seleniumtests.it.driver.support.pages.DriverTestPage");
     }
 
     @Test(groups = { "ut" })
@@ -110,7 +110,7 @@ public class TestTestAction extends MockitoTest {
         JSONObject jsonAction = action.toJson();
         Assert.assertEquals(jsonAction.getString("action"), "maximizeWindow");
         Assert.assertFalse(jsonAction.has("element"));
-        Assert.assertEquals(jsonAction.getString("page"), "com.seleniumtests.it.driver.support.pages.DriverTestPage");
+        Assert.assertEquals(jsonAction.getString("origin"), "com.seleniumtests.it.driver.support.pages.DriverTestPage");
     }
 
     @Test(groups = { "ut" })
