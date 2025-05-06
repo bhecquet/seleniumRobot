@@ -193,10 +193,10 @@ public class TestAction {
 		// TestAction do not receive the exception when it failed
 		if (this instanceof TestAction && parent != null) {
 			actionJson.put("exception", parent.actionException == null ? null : parent.actionException.getClass().getName());
-			actionJson.put("exceptionMessage", parent.actionException == null ? null : ExceptionUtility.getExceptionMessage(parent.actionException));
+			actionJson.put("exceptionMessage", parent.actionException == null ? null : ExceptionUtility.getExceptionMessage(parent.actionException).trim());
 		} else {
 			actionJson.put("exception", actionException == null ? null : actionException.getClass().getName());
-			actionJson.put("exceptionMessage", actionException == null ? null : ExceptionUtility.getExceptionMessage(actionException));
+			actionJson.put("exceptionMessage", actionException == null ? null : ExceptionUtility.getExceptionMessage(actionException).trim());
 		}
 		actionJson.put("failed", failed);
 		actionJson.put("position", position);

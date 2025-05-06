@@ -457,7 +457,7 @@ public class TestNGResultUtils {
 					try {
 						String browserOrApp = CommonReporter.getBrowserOrApp();
 						browserOrApp = browserOrApp.startsWith("APP") ? "APP": browserOrApp;
-						SnapshotComparisonResult comparisonResult = serverConnector.checkSnapshotHasNoDifferences(snapshot, CommonReporter.getTestCaseName(testResult), testStep.getFullActionName(), browserOrApp);
+						SnapshotComparisonResult comparisonResult = serverConnector.checkSnapshotHasNoDifferences(snapshot, CommonReporter.getTestCaseName(testResult), testStep.getName(), browserOrApp);
 						if (comparisonResult == SnapshotComparisonResult.KO) {
 							testResult.setStatus(ITestResult.FAILURE);
 							testResult.setThrowable(new ScenarioException("Snapshot comparison failed"));

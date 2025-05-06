@@ -232,7 +232,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			logger.info(String.format("Recording step %s on server", testStep.getName()));
 			
 			// record test step
-			Integer testStepId = serverConnector.createTestStep(testStep.getFullActionName(), testCaseInSessionId);
+			Integer testStepId = serverConnector.createTestStep(testStep.getName(), testCaseInSessionId);
 			
 			Integer stepResultId = serverConnector.recordStepResult(testStep, testCaseInSessionId, testStepId);
 			testStep.setStepResultId(stepResultId);
