@@ -35,10 +35,10 @@ public class ChromeUtils {
         Map<Page, Boolean> usedPages = new LinkedHashMap<>();
         int id = 0;
         for (TestStep testStep: testSteps) {
-            Instant instant = Instant.ofEpochMilli(testStep.getStartDate().getTime());
+            Instant instant = testStep.getStartDate().toInstant();
             String pageId = String.format("page_" + id++);
             Page page = new Page(instant.atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME), pageId, testStep.getName());
-            pageStart.put(testStep.getStartDate().getTime(), page);
+            pageStart.put(testStep.getStartDate().toInstant().toEpochMilli(), page);
             usedPages.put(page, false);
         }
 

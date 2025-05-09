@@ -19,12 +19,12 @@ package com.seleniumtests.browserfactory;
 
 import java.net.URL;
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -167,9 +167,9 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 
         // connection to grid is made here
         for (int i = 0; i < 3; i++) {
-	        long start = new Date().getTime();
+	        Instant start = Instant.now();
 	        driver = getDriver(capabilities);
-	        long duration = new Date().getTime() - start;
+	        long duration = Duration.between(start, Instant.now()).toMillis();
 	
 	        setImplicitWaitTimeout(webDriverConfig.getImplicitWaitTimeout());
 	        if (webDriverConfig.getPageLoadTimeout() >= 0 && SeleniumTestsContextManager.isWebTest()) {

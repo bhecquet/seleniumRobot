@@ -19,9 +19,9 @@ package com.seleniumtests.reporter.logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,7 +58,7 @@ public class TestStep extends TestAction {
 	public static final String COMPOSITE_STEP_PREFIX = "Composite ";
 	private List<TestAction> stepActions;
 	private Long duration;
-	private Date startDate;
+	private OffsetDateTime startDate;
 	private long videoTimeStamp;
 	private List<HarCapture> harCaptures;
 	private List<GenericFile> files;
@@ -115,7 +115,7 @@ public class TestStep extends TestAction {
 		harCaptures = new ArrayList<>();
 		snapshots = new ArrayList<>();
 		duration = 0L;
-		startDate = new Date();
+		startDate = OffsetDateTime.now();
 		this.testResult = testResult;
 		
 		if (errorCause != RootCause.NONE) {
@@ -137,10 +137,10 @@ public class TestStep extends TestAction {
 	}
 	
 	public void setStartDate() {
-		startDate = new Date();
+		startDate = OffsetDateTime.now();
 	}
 	
-	public void setStartDate(Date date) {
+	public void setStartDate(OffsetDateTime date) {
 		startDate = date;
 	}
 	
@@ -168,7 +168,7 @@ public class TestStep extends TestAction {
 	}
 	
 	public void updateDuration() {
-		duration = new Date().getTime() - startDate.getTime();
+		duration = OffsetDateTime.now().toInstant().toEpochMilli() - startDate.toInstant().toEpochMilli();
 		
 	}
 	
@@ -343,7 +343,7 @@ public class TestStep extends TestAction {
 		return stepJSon;
 	}
 
-	public Date getStartDate() {
+	public OffsetDateTime getStartDate() {
 		return startDate;
 	}
 

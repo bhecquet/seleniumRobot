@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,11 +39,11 @@ public class TestVideoUtils extends GenericTest {
 	@Test(groups= {"ut"})
 	public void testReadAviInvalidFile() throws IOException {
 		
-		LocalDateTime videoStartDateTime = LocalDateTime.parse("2021-11-15T13:15:30");
+		OffsetDateTime videoStartDateTime = OffsetDateTime.parse("2021-11-15T13:15:30+01:00");
 		
-		TestStepManager.getInstance().setVideoStartDate(Date.from(videoStartDateTime.toInstant(ZoneOffset.UTC)));
+		TestStepManager.getInstance().setVideoStartDate(videoStartDateTime);
 		TestStep step = new TestStep("step 1", "step 1", this.getClass(), null, new ArrayList<String>(), false);
-		step.setStartDate(Date.from(videoStartDateTime.plusSeconds(1).toInstant(ZoneOffset.UTC)));
+		step.setStartDate(videoStartDateTime.plusSeconds(1));
 		step.setVideoTimeStamp(1000);
 		Assert.assertEquals(step.getSnapshots().size(), 0);
 		
@@ -56,12 +57,12 @@ public class TestVideoUtils extends GenericTest {
 	 */
 	@Test(groups= {"ut"})
 	public void testReadAvi() throws IOException {
+
+		OffsetDateTime videoStartDateTime = OffsetDateTime.parse("2021-11-15T13:15:30+01:00");
 		
-		LocalDateTime videoStartDateTime = LocalDateTime.parse("2021-11-15T13:15:30");
-		
-		TestStepManager.getInstance().setVideoStartDate(Date.from(videoStartDateTime.toInstant(ZoneOffset.UTC)));
+		TestStepManager.getInstance().setVideoStartDate(videoStartDateTime);
 		TestStep step = new TestStep("step 1", "step 1", this.getClass(), null, new ArrayList<String>(), false);
-		step.setStartDate(Date.from(videoStartDateTime.plusSeconds(1).toInstant(ZoneOffset.UTC)));
+		step.setStartDate(videoStartDateTime.plusSeconds(1));
 		step.setVideoTimeStamp(1000);
 		Assert.assertEquals(step.getSnapshots().size(), 0);
 		
@@ -78,12 +79,12 @@ public class TestVideoUtils extends GenericTest {
 	 */
 	@Test(groups= {"ut"})
 	public void testReadAviTimestampOutsideVideo() throws IOException {
+
+		OffsetDateTime videoStartDateTime = OffsetDateTime.parse("2021-11-15T13:15:30+01:00");
 		
-		LocalDateTime videoStartDateTime = LocalDateTime.parse("2021-11-15T13:15:30");
-		
-		TestStepManager.getInstance().setVideoStartDate(Date.from(videoStartDateTime.toInstant(ZoneOffset.UTC)));
+		TestStepManager.getInstance().setVideoStartDate(videoStartDateTime);
 		TestStep step = new TestStep("step 1", "step 1", this.getClass(), null, new ArrayList<String>(), false);
-		step.setStartDate(Date.from(videoStartDateTime.plusSeconds(100).toInstant(ZoneOffset.UTC)));
+		step.setStartDate(videoStartDateTime.plusSeconds(100));
 		step.setVideoTimeStamp(100000);
 		Assert.assertEquals(step.getSnapshots().size(), 0);
 		
@@ -99,12 +100,12 @@ public class TestVideoUtils extends GenericTest {
 	 */
 	@Test(groups= {"ut"})
 	public void testReadAviLastStep() throws IOException {
+
+		OffsetDateTime videoStartDateTime = OffsetDateTime.parse("2021-11-15T13:15:30+01:00");
 		
-		LocalDateTime videoStartDateTime = LocalDateTime.parse("2021-11-15T13:15:30");
-		
-		TestStepManager.getInstance().setVideoStartDate(Date.from(videoStartDateTime.toInstant(ZoneOffset.UTC)));
+		TestStepManager.getInstance().setVideoStartDate(videoStartDateTime);
 		TestStep step = new TestStep(TestStepManager.LAST_STEP_NAME, TestStepManager.LAST_STEP_NAME, this.getClass(), null, new ArrayList<String>(), false);
-		step.setStartDate(Date.from(videoStartDateTime.plusSeconds(1).toInstant(ZoneOffset.UTC)));
+		step.setStartDate(videoStartDateTime.plusSeconds(1));
 		step.setVideoTimeStamp(1000);
 		Assert.assertEquals(step.getSnapshots().size(), 0);
 		
@@ -120,15 +121,15 @@ public class TestVideoUtils extends GenericTest {
 	 */
 	@Test(groups= {"ut"})
 	public void testReadAviSeveralStepsWithSameTimeStamp() throws IOException {
+
+		OffsetDateTime videoStartDateTime = OffsetDateTime.parse("2021-11-15T13:15:30+01:00");
 		
-		LocalDateTime videoStartDateTime = LocalDateTime.parse("2021-11-15T13:15:30");
-		
-		TestStepManager.getInstance().setVideoStartDate(Date.from(videoStartDateTime.toInstant(ZoneOffset.UTC)));
+		TestStepManager.getInstance().setVideoStartDate(videoStartDateTime);
 		TestStep step = new TestStep("step 1", "step 1", this.getClass(), null, new ArrayList<String>(), false);
-		step.setStartDate(Date.from(videoStartDateTime.plusSeconds(1).toInstant(ZoneOffset.UTC)));
+		step.setStartDate(videoStartDateTime.plusSeconds(1));
 		step.setVideoTimeStamp(1000);
 		TestStep step2 = new TestStep("step 1", "step 1", this.getClass(), null, new ArrayList<String>(), false);
-		step2.setStartDate(Date.from(videoStartDateTime.plusSeconds(1).toInstant(ZoneOffset.UTC)));
+		step2.setStartDate(videoStartDateTime.plusSeconds(1));
 		step2.setVideoTimeStamp(1000);
 		Assert.assertEquals(step.getSnapshots().size(), 0);
 		Assert.assertEquals(step2.getSnapshots().size(), 0);

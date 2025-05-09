@@ -18,6 +18,7 @@
 package com.seleniumtests.reporter.logger;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -186,7 +187,7 @@ public class TestAction {
 	public JSONObject toJson() {
 		JSONObject actionJson = new JSONObject();
 
-		actionJson.put("timestamp", timestamp.atZone(ZoneOffset.UTC).toInstant().toEpochMilli());
+		actionJson.put("timestamp", timestamp.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
 		actionJson.put("type", "action");
 		actionJson.put("name", getName());
 

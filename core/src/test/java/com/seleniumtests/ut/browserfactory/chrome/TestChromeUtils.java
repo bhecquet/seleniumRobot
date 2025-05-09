@@ -14,10 +14,9 @@ import org.testng.annotations.Test;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -30,9 +29,9 @@ public class TestChromeUtils extends GenericTest {
 		
 		List<TestStep> testSteps = new ArrayList<>();
 		testSteps.add(new TestStep("step 1"));
-		testSteps.get(0).setStartDate(Date.from(Instant.ofEpochMilli(1739547733421L)));
+		testSteps.get(0).setStartDate(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 		testSteps.add(new TestStep("step 2"));
-		testSteps.get(1).setStartDate(Date.from(Instant.ofEpochMilli(1739547734198L)));
+		testSteps.get(1).setStartDate(Instant.ofEpochMilli(1739547734198L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 		
 		Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
 		
@@ -73,9 +72,9 @@ public class TestChromeUtils extends GenericTest {
 		
 		List<TestStep> testSteps = new ArrayList<>();
 		testSteps.add(new TestStep("step 1"));
-		testSteps.get(0).setStartDate(Date.from(Instant.ofEpochMilli(1739547733421L)));
+		testSteps.get(0).setStartDate(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 		testSteps.add(new TestStep("step 2"));
-		testSteps.get(1).setStartDate(Date.from(Instant.ofEpochMilli(1739547734198L)));
+		testSteps.get(1).setStartDate(Instant.ofEpochMilli(1739547734198L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 		
 		Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
 		
@@ -111,9 +110,9 @@ public class TestChromeUtils extends GenericTest {
 		
 		List<TestStep> testSteps = new ArrayList<>();
 		testSteps.add(new TestStep("step 1"));
-		testSteps.get(0).setStartDate(Date.from(Instant.ofEpochMilli(1739547733421L)));
+		testSteps.get(0).setStartDate(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 		testSteps.add(new TestStep("step 2"));
-		testSteps.get(1).setStartDate(Date.from(Instant.ofEpochMilli(1739547734198L)));
+		testSteps.get(1).setStartDate(Instant.ofEpochMilli(1739547734198L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 		
 		Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
 		
@@ -148,9 +147,9 @@ public class TestChromeUtils extends GenericTest {
 		
 		List<TestStep> testSteps = new ArrayList<>();
 		testSteps.add(new TestStep("step 1"));
-		testSteps.get(0).setStartDate(Date.from(Instant.ofEpochMilli(1739547733421L)));
+		testSteps.get(0).setStartDate(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 		testSteps.add(new TestStep("step 2"));
-		testSteps.get(1).setStartDate(Date.from(Instant.ofEpochMilli(1739547734198L)));
+		testSteps.get(1).setStartDate(Instant.ofEpochMilli(1739547734198L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 		
 		Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
 		
@@ -182,9 +181,9 @@ public class TestChromeUtils extends GenericTest {
 		
 		List<TestStep> testSteps = new ArrayList<>();
 		testSteps.add(new TestStep("step 1"));
-		testSteps.get(0).setStartDate(Date.from(Instant.ofEpochMilli(1739547733421L)));
+		testSteps.get(0).setStartDate(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 		testSteps.add(new TestStep("step 2"));
-		testSteps.get(1).setStartDate(Date.from(Instant.ofEpochMilli(1739547734198L)));
+		testSteps.get(1).setStartDate(Instant.ofEpochMilli(1739547734198L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 		
 		Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
 		
@@ -225,9 +224,9 @@ public class TestChromeUtils extends GenericTest {
 
         List<TestStep> testSteps = new ArrayList<>();
         testSteps.add(new TestStep("step 1"));
-        testSteps.get(0).setStartDate(Date.from(Instant.ofEpochMilli(1739547733421L)));
+        testSteps.get(0).setStartDate(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
         testSteps.add(new TestStep("step 2"));
-        testSteps.get(1).setStartDate(Date.from(Instant.ofEpochMilli(1739547734198L)));
+        testSteps.get(1).setStartDate(Instant.ofEpochMilli(1739547734198L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 
         Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
 
@@ -272,7 +271,7 @@ public class TestChromeUtils extends GenericTest {
 
         List<TestStep> testSteps = new ArrayList<>();
         testSteps.add(new TestStep("step 1"));
-        testSteps.get(0).setStartDate(Date.from(Instant.ofEpochMilli(1739547733421L)));
+        testSteps.get(0).setStartDate(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 
         Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
         Assert.assertTrue(har.getLog().getEntries().get(0).getRequest().getHeaders()
@@ -308,7 +307,7 @@ public class TestChromeUtils extends GenericTest {
 
         List<TestStep> testSteps = new ArrayList<>();
         testSteps.add(new TestStep("step 1"));
-        testSteps.get(0).setStartDate(Date.from(Instant.ofEpochMilli(1739547733421L)));
+        testSteps.get(0).setStartDate(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 
         Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
         Assert.assertEquals(har.getLog().getEntries().get(0).getRequest().getHeaders().size(), 4);
@@ -324,7 +323,7 @@ public class TestChromeUtils extends GenericTest {
 
         List<TestStep> testSteps = new ArrayList<>();
         testSteps.add(new TestStep("step 1"));
-        testSteps.get(0).setStartDate(Date.from(Instant.ofEpochMilli(1739547733421L)));
+        testSteps.get(0).setStartDate(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 
         Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
         Assert.assertEquals(har.getLog().getEntries().size(), 1);
@@ -340,7 +339,7 @@ public class TestChromeUtils extends GenericTest {
 
         List<TestStep> testSteps = new ArrayList<>();
         testSteps.add(new TestStep("step 1"));
-        testSteps.get(0).setStartDate(Date.from(Instant.ofEpochMilli(1739547733421L)));
+        testSteps.get(0).setStartDate(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 
         Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
         Assert.assertEquals(har.getLog().getEntries().size(), 1);
@@ -360,7 +359,7 @@ public class TestChromeUtils extends GenericTest {
 
         List<TestStep> testSteps = new ArrayList<>();
         testSteps.add(new TestStep("step 1"));
-        testSteps.get(0).setStartDate(Date.from(Instant.ofEpochMilli(1739547733421L)));
+        testSteps.get(0).setStartDate(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 
         Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
         Assert.assertEquals(har.getLog().getEntries().size(), 1);
@@ -379,7 +378,7 @@ public class TestChromeUtils extends GenericTest {
 
         List<TestStep> testSteps = new ArrayList<>();
         testSteps.add(new TestStep("step 1"));
-        testSteps.get(0).setStartDate(Date.from(Instant.ofEpochMilli(1739547733421L)));
+        testSteps.get(0).setStartDate(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 
         Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
         Assert.assertEquals(har.getLog().getEntries().size(), 1);
@@ -396,7 +395,7 @@ public class TestChromeUtils extends GenericTest {
 
         List<TestStep> testSteps = new ArrayList<>();
         testSteps.add(new TestStep("step 1"));
-        testSteps.get(0).setStartDate(Date.from(Instant.ofEpochMilli(1739547733421L)));
+        testSteps.get(0).setStartDate(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 
         Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
         Assert.assertEquals(har.getLog().getEntries().size(), 0);
@@ -408,7 +407,7 @@ public class TestChromeUtils extends GenericTest {
 
         List<TestStep> testSteps = new ArrayList<>();
         testSteps.add(new TestStep("step 1"));
-        testSteps.get(0).setStartDate(Date.from(Instant.ofEpochMilli(1739547733421L)));
+        testSteps.get(0).setStartDate(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 
         Har har = new ChromeUtils().parsePerformanceLogs(logEntries, testSteps);
         Assert.assertEquals(har.getLog().getEntries().size(), 1);

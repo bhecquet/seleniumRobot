@@ -145,7 +145,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 					SeleniumTestsContextManager.getThreadContext().getStartedBy(),
 					Instant.ofEpochMilli(sessionStart)
 						.atZone(ZoneId.systemDefault())
-						.toLocalDateTime());
+						.toOffsetDateTime());
 			logger.info(String.format("Session result will be visible at: %s/snapshot/testResults/summary/%d/", serverConnector.getUrl(), sessionId));
 
 			this.sessionId = sessionId;
@@ -191,7 +191,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 						Instant
 								.ofEpochMilli(testResult.getStartMillis())
 								.atZone(ZoneId.systemDefault())
-								.toLocalDateTime());
+								.toOffsetDateTime());
 				logger.info(String.format("Result for '%s' will be visible at: %s/snapshot/testResults/result/%d/", testName, serverConnector.getUrl(), testCaseInSessionId));
 				serverConnector.addLogsToTestCaseInSession(testCaseInSessionId, generateExecutionLogs(testResult).toString());
 
@@ -232,7 +232,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			logger.info(String.format("Recording step %s on server", testStep.getName()));
 			
 			// record test step
-			Integer testStepId = serverConnector.createTestStep(testStep.getName(), testCaseInSessionId);
+			Integer testStepId = serverConnector.createTestStep(testStep.getAction(), testCaseInSessionId);
 			
 			Integer stepResultId = serverConnector.recordStepResult(testStep, testCaseInSessionId, testStepId);
 			testStep.setStepResultId(stepResultId);

@@ -2,9 +2,8 @@ package com.seleniumtests.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
@@ -21,7 +20,7 @@ public class TestStepManager {
 	List<TestStep> testSteps;  // list of root steps
 	TestStep runningStep;
 	TestStep rootStep;
-	Date videoStartDate;
+	OffsetDateTime videoStartDate;
 	private List<String> pwdToReplace;
 	
 	public TestStepManager() {
@@ -143,7 +142,7 @@ public class TestStepManager {
     
     public static void setVideoStartDate() {
     	try {
-    		SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().setVideoStartDate(new Date());
+    		SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().setVideoStartDate(OffsetDateTime.now());
     	} catch (IndexOutOfBoundsException | ConfigurationException e) {
     		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
     	}
@@ -155,7 +154,7 @@ public class TestStepManager {
 			stepManager.setRootTestStep(testStep);
 			
 			if (stepManager.getVideoStartDate() != null) {
-				testStep.setVideoTimeStamp(TimeUnit.MILLISECONDS.convert(testStep.getStartDate().getTime() - stepManager.getVideoStartDate().getTime(), TimeUnit.MILLISECONDS));
+				testStep.setVideoTimeStamp(TimeUnit.MILLISECONDS.convert(testStep.getStartDate().toInstant().toEpochMilli() - stepManager.getVideoStartDate().toInstant().toEpochMilli(), TimeUnit.MILLISECONDS));
 			}
     	} catch (IndexOutOfBoundsException | ConfigurationException e) {
     		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
@@ -263,11 +262,11 @@ public class TestStepManager {
 		}
 	}
 
-	public Date getVideoStartDate() {
+	public OffsetDateTime getVideoStartDate() {
 		return videoStartDate;
 	}
 
-	public void setVideoStartDate(Date videoStartDate) {
+	public void setVideoStartDate(OffsetDateTime videoStartDate) {
 		this.videoStartDate = videoStartDate;
 	}
 
