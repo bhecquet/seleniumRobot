@@ -32,6 +32,8 @@ import org.openqa.selenium.firefox.GeckoDriverService;
 import org.openqa.selenium.firefox.ProfilesIni;
 
 import com.seleniumtests.browserfactory.customprofile.FireFoxProfileMarker;
+import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
@@ -121,6 +123,15 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
         profile.setAssumeUntrustedCertificateIssuer(webDriverConfig.isSetAssumeUntrustedCertificateIssuer());
 
         if (webDriverConfig.getUserAgentOverride() != null) {
+        	// ISSUE #705 - In order to give the maximum of data available to customize the User Agent,
+        	// we need to pass the testName which is not in the context at this moment
+        	String testName = "";
+			try {
+				testName = TestNGResultUtils.getVisualTestName(webDriverConfig.getTestContext().getTestNGResult());
+			} catch (Exception e) {
+				testName = TestNGResultUtils.getTestName(webDriverConfig.getTestContext().getTestNGResult());
+			}
+			webDriverConfig.getTestContext().setAttribute(SeleniumTestsContext.TEST_NAME, testName);
         	profile.setPreference("general.useragent.override", StringUtility.interpolateString(webDriverConfig.getUserAgentOverride(), webDriverConfig.getTestContext()));
         }
 

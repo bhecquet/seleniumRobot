@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import io.appium.java_client.android.options.UiAutomator2Options;
@@ -127,6 +129,15 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 		// options.setCapability("webSocketUrl", true);
 
         if (webDriverConfig.getUserAgentOverride() != null) {
+        	// ISSUE #705 - In order to give the maximum of data available to customize the User Agent,
+        	// we need to pass the testName which is not in the context at this moment
+        	String testName = "";
+			try {
+				testName = TestNGResultUtils.getVisualTestName(webDriverConfig.getTestContext().getTestNGResult());
+			} catch (Exception e) {
+				testName = TestNGResultUtils.getTestName(webDriverConfig.getTestContext().getTestNGResult());
+			}
+			webDriverConfig.getTestContext().setAttribute(SeleniumTestsContext.TEST_NAME, testName);
         	options.addArguments("--user-agent=" + StringUtility.interpolateString(webDriverConfig.getUserAgentOverride(), webDriverConfig.getTestContext()));
         }
 		List<String> chromeOptions = new ArrayList<>(List.of("--disable-translate",

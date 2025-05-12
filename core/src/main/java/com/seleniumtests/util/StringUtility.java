@@ -177,14 +177,7 @@ public class StringUtility {
     	}    	
     	Map<String, TestVariable> variables = testContext.getFullContextDataMapAsTestVariables();
     	variables.putAll(testContext.getConfiguration());
-		String testName = "testNameNotFound";
-		try {
-			testName = TestNGResultUtils.getVisualTestName(testContext.getTestNGResult());
-		} catch (Exception e) {
-			testName = TestNGResultUtils.getTestName(testContext.getTestNGResult());
-		}
-		variables.put("testName", new TestVariable("testName", testName));
-    	List<String> unknownKeys = new ArrayList<>();
+		List<String> unknownKeys = new ArrayList<>();
 
     	for (int i = 0; i < 10; i++) {
 	    	Matcher matcher = PLACEHOLDER_PATTERN.matcher(interpolatedString);

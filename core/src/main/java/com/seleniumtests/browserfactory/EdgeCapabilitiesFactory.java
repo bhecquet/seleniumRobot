@@ -30,6 +30,8 @@ import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.edge.EdgeDriverService;
 import org.openqa.selenium.edge.EdgeOptions;
 
+import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
@@ -51,6 +53,15 @@ public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
 		Map<String, Object> experientalOptions = new HashMap<>();
         
         if (webDriverConfig.getUserAgentOverride() != null) {
+        	// ISSUE #705 - In order to give the maximum of data available to customize the User Agent,
+        	// we need to pass the testName which is not in the context at this moment
+        	String testName = "";
+			try {
+				testName = TestNGResultUtils.getVisualTestName(webDriverConfig.getTestContext().getTestNGResult());
+			} catch (Exception e) {
+				testName = TestNGResultUtils.getTestName(webDriverConfig.getTestContext().getTestNGResult());
+			}
+			webDriverConfig.getTestContext().setAttribute(SeleniumTestsContext.TEST_NAME, testName);
         	options.addArguments("--user-agent=" + StringUtility.interpolateString(webDriverConfig.getUserAgentOverride(), webDriverConfig.getTestContext()));
         }
 
