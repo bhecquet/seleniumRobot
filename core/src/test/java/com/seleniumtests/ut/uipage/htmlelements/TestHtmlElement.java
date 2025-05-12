@@ -381,7 +381,7 @@ public class TestHtmlElement extends MockitoTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testReplayActionWithNPE() throws Exception {
-		TestStep step = new TestStep("step", Reporter.getCurrentTestResult(), new ArrayList<>(), false);
+		TestStep step = new TestStep("step", "step", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), false);
 		
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
 		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setRootTestStep(step);// add a step so that we can reproduce the NPE bug in "ReplayAction" class
@@ -404,7 +404,7 @@ public class TestHtmlElement extends MockitoTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testIsPresentExceptionDoNotSetStepFailed() throws Exception {
-		TestStep step = new TestStep("step 1", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step 1", "step 1", this.getClass(), null, new ArrayList<>(), true);
 		TestStepManager.setParentTestStep(step);
 
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
@@ -422,7 +422,7 @@ public class TestHtmlElement extends MockitoTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testIsDisplayedExceptionSetStepFailed() throws Exception {
-		TestStep step = new TestStep("step 1", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step 1", "step 1", this.getClass(), null, new ArrayList<>(), true);
 		TestStepManager.setParentTestStep(step);
 
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);

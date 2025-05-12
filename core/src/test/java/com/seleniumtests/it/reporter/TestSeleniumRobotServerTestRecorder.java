@@ -29,7 +29,7 @@ import static org.mockito.Mockito.*;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -101,7 +101,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 			// check server has been called for all aspects of test (app, version, ...)
 			// they may be called for each test but server is responsible for uniqueness of the value
-			verify(serverConnector).createSession(anyString(), eq("BROWSER:NONE"), eq("http://mylauncher/test"), any(LocalDateTime.class));
+			verify(serverConnector).createSession(anyString(), eq("BROWSER:NONE"), eq("http://mylauncher/test"), any(OffsetDateTime.class));
 			verify(serverConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), anyString(), anyString(), anyString()); // with snapshot behaviour set to "display_only", this method should not be called
 
 			// issue #331: check all test cases are created, call MUST be done only once to avoid result to be recorded several times
@@ -110,12 +110,13 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector).createTestCase("testWithException");
 			verify(serverConnector).createTestCase("testSkipped");
 			verify(serverConnector, times(5)).addLogsToTestCaseInSession(anyInt(), anyString());
-			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testAndSubActions"), eq("SUCCESS"), eq("LOCAL"), eq("a test with steps"), any(LocalDateTime.class));
-			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testInError"), eq("FAILURE"), eq("LOCAL"), eq(""), any(LocalDateTime.class));
-			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testWithException"), eq("FAILURE"), eq("LOCAL"), eq(""), any(LocalDateTime.class));
-			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testSkipped"), eq("SKIP"), eq("LOCAL"), eq(""), any(LocalDateTime.class));
-			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("A test which is <OK> é&"), eq("SUCCESS"), eq("LOCAL"), eq(""), any(LocalDateTime.class)); // a test with custom name
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testAndSubActions"), eq("SUCCESS"), eq("LOCAL"), eq("a test with steps"), any(OffsetDateTime.class));
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testInError"), eq("FAILURE"), eq("LOCAL"), eq(""), any(OffsetDateTime.class));
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testWithException"), eq("FAILURE"), eq("LOCAL"), eq(""), any(OffsetDateTime.class));
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testSkipped"), eq("SKIP"), eq("LOCAL"), eq(""), any(OffsetDateTime.class));
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("A test which is <OK> é&"), eq("SUCCESS"), eq("LOCAL"), eq(""), any(OffsetDateTime.class)); // a test with custom name
 			verify(serverConnector, times(4)).createTestStep(eq("step 1"), anyInt());
+			verify(serverConnector, times(5)).createTestStep(eq("Test end"), anyInt());
 			verify(serverConnector).createTestStep(eq("step 2"), anyInt());
 			verify(serverConnector, times(5)).createTestStep(eq("No previous execution results, you can enable it via parameter '-DkeepAllResults=true'"), anyInt());
 			verify(serverConnector).createSnapshot(any(Snapshot.class), anyInt(), eq(new ArrayList<>())); // two snapshots but only once is sent because the other has no name
@@ -182,9 +183,9 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverCustomSnapshot"});
 
 			// check browser has the same valeurs for all calls
-			verify(serverConnector).createSession(anyString(), eq("BROWSER:CHROME"), eq("http://mylauncher/test"), any(LocalDateTime.class));
+			verify(serverConnector).createSession(anyString(), eq("BROWSER:CHROME"), eq("http://mylauncher/test"), any(OffsetDateTime.class));
 			// one snapshot is compared with reference during test run to check if test must be replayed
-			verify(serverConnector).checkSnapshotHasNoDifferences(any(Snapshot.class), eq("testDriverCustomSnapshot"), eq("_captureSnapshot with args: (my snapshot, )"), eq("BROWSER:CHROME"));
+			verify(serverConnector).checkSnapshotHasNoDifferences(any(Snapshot.class), eq("testDriverCustomSnapshot"), eq("_captureSnapshot"), eq("BROWSER:CHROME"));
 
 			// issue #331: check all test cases are created, call MUST be done only once to avoid result to be recorded several times
 			verify(serverConnector).createTestCase("testDriverCustomSnapshot");
@@ -239,9 +240,9 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverCustomSnapshot"});
 
 			// check browser has the same valeurs for all calls
-			verify(serverConnector).createSession(anyString(), eq("BROWSER:CHROME"), eq("http://mylauncher/test"), any(LocalDateTime.class));
+			verify(serverConnector).createSession(anyString(), eq("BROWSER:CHROME"), eq("http://mylauncher/test"), any(OffsetDateTime.class));
 			// one snapshot is compared with reference during test run to check if test must be replayed
-			verify(serverConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), eq("testDriverCustomSnapshot"), eq("_captureSnapshot with args: (my snapshot, )"), eq("BROWSER:CHROME"));
+			verify(serverConnector, never()).checkSnapshotHasNoDifferences(any(Snapshot.class), eq("testDriverCustomSnapshot"), eq("DriverTestPage._captureSnapshot"), eq("BROWSER:CHROME"));
 
 			// issue #331: check all test cases are created, call MUST be done only once to avoid result to be recorded several times
 			verify(serverConnector).createTestCase("testDriverCustomSnapshot");
@@ -294,10 +295,10 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			executeMultiSuites(new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, new String[]{"testAndSubActions"});
 
 			// check session is created only once, even with multiple suites
-			verify(serverConnector).createSession(anyString(), eq("BROWSER:NONE"), eq("http://mylauncher/test"), any(LocalDateTime.class));
+			verify(serverConnector).createSession(anyString(), eq("BROWSER:NONE"), eq("http://mylauncher/test"), any(OffsetDateTime.class));
 			verify(serverConnector, times(2)).createTestCase("testAndSubActions");
-			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testAndSubActions"), eq("SUCCESS"), eq("LOCAL"), eq("a test with steps"), any(LocalDateTime.class));
-			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testAndSubActions-1"), eq("SUCCESS"), eq("LOCAL"), eq("a test with steps"), any(LocalDateTime.class));
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testAndSubActions"), eq("SUCCESS"), eq("LOCAL"), eq("a test with steps"), any(OffsetDateTime.class));
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testAndSubActions-1"), eq("SUCCESS"), eq("LOCAL"), eq("a test with steps"), any(OffsetDateTime.class));
 
 
 		} finally {
@@ -330,11 +331,11 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 
 			// check server has been called for all aspects of test (app, version, ...)
 			// they may be called for each test but server is responsible for uniqueness of the value
-			verify(serverConnector).createSession(anyString(), eq("BROWSER:NONE"), eq("http://mylauncher/test"), any(LocalDateTime.class));
+			verify(serverConnector).createSession(anyString(), eq("BROWSER:NONE"), eq("http://mylauncher/test"), any(OffsetDateTime.class));
 
 			verify(serverConnector).createTestCase("testWithException");
 			verify(serverConnector).addLogsToTestCaseInSession(anyInt(), anyString());
-			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testWithException"), eq("FAILURE"), eq("LOCAL"), eq(""), any(LocalDateTime.class));
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testWithException"), eq("FAILURE"), eq("LOCAL"), eq(""), any(OffsetDateTime.class));
 			verify(serverConnector).createTestStep(eq("Previous execution results"), anyInt());
 
 			verify(serverConnector, times(7)).recordStepResult(any(TestStep.class), anyInt(), anyInt()); // all steps are recorded
@@ -382,10 +383,10 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException", "testSkipped", "testOkWithTestName"});
 			
 			// check server has NOT been called for all aspects of test (app, version, ...)
-			verify(serverConnector, never()).createSession(anyString(), anyString(), isNull(), any(LocalDateTime.class));
+			verify(serverConnector, never()).createSession(anyString(), anyString(), isNull(), any(OffsetDateTime.class));
 			verify(serverConnector, never()).createTestCase(anyString());
 			verify(serverConnector, never()).addLogsToTestCaseInSession(anyInt(), anyString());
-			verify(serverConnector, never()).createTestCaseInSession(anyInt(), anyInt(), anyString(), anyString(), anyString(), eq(""), any(LocalDateTime.class));
+			verify(serverConnector, never()).createTestCaseInSession(anyInt(), anyInt(), anyString(), anyString(), anyString(), eq(""), any(OffsetDateTime.class));
 			verify(serverConnector, never()).createTestStep(anyString(), anyInt());
 			verify(serverConnector, never()).createSnapshot(any(Snapshot.class), anyInt(), eq(new ArrayList<>())); // two snapshots but only once is sent because the other has no name
 			
@@ -505,13 +506,13 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 			// check server has been called for all aspects of test (app, version, ...)
 			// they may be called for each test but server is responsible for uniqueness of the value
-			verify(serverConnector).createSession(anyString(), eq("BROWSER:CHROME"), isNull(), any(LocalDateTime.class));
+			verify(serverConnector).createSession(anyString(), eq("BROWSER:CHROME"), isNull(), any(OffsetDateTime.class));
 			
 			// issue #331: check all test cases are created, call MUST be done only once to avoid result to be recorded several times
 			verify(serverConnector).createTestCase("testDriverCustomSnapshot");
 			verify(serverConnector).addLogsToTestCaseInSession(anyInt(), anyString());
-			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testDriverCustomSnapshot"), eq("SUCCESS"), eq("LOCAL"), eq(""), any(LocalDateTime.class));
-			verify(serverConnector).createTestStep(eq("_captureSnapshot with args: (my snapshot, )"), anyInt());
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testDriverCustomSnapshot"), eq("SUCCESS"), eq("LOCAL"), eq(""), any(OffsetDateTime.class));
+			verify(serverConnector).createTestStep(eq("_captureSnapshot"), anyInt());
 			verify(serverConnector).createSnapshot(any(Snapshot.class), anyInt(), listArgument.capture()); // 1 custom snapshot taken with name
 
 			verify(serverConnector, times(6)).uploadFile(fileCapture.capture(), eq(0)); // 2 pictures, 2 HTML, 1 HAR, 1 driver logs
@@ -563,13 +564,13 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 			// check server has been called for all aspects of test (app, version, ...)
 			// they may be called for each test but server is responsible for uniqueness of the value
-			verify(serverConnector).createSession(anyString(), eq("BROWSER:CHROME"), isNull(), any(LocalDateTime.class));
+			verify(serverConnector).createSession(anyString(), eq("BROWSER:CHROME"), isNull(), any(OffsetDateTime.class));
 			
 			// issue #331: check all test cases are created, call MUST be done only once to avoid result to be recorded several times
 			verify(serverConnector).createTestCase("testDriverCustomSnapshot");
 			verify(serverConnector).addLogsToTestCaseInSession(anyInt(), anyString());
-			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testDriverCustomSnapshot"), eq("SUCCESS"), eq("LOCAL"), eq(""), any(LocalDateTime.class));
-			verify(serverConnector).createTestStep(eq("_captureSnapshot with args: (my snapshot, )"), anyInt());
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testDriverCustomSnapshot"), eq("SUCCESS"), eq("LOCAL"), eq(""), any(OffsetDateTime.class));
+			verify(serverConnector).createTestStep(eq("_captureSnapshot"), anyInt());
 
 			// check capture recorded for comparison is sent to server as attachment
 			verify(serverConnector, times(8)).uploadFile(fileCapture.capture(), eq(0)); // 1 HAR, 2 picture + HTML + 2 pictures for comparison + driver logs
@@ -613,11 +614,11 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 	
 			// check server has been called for all aspects of test (app, version, ...)
-			verify(serverConnector, never()).createSession(anyString(), eq("BROWSER:NONE"), isNull(), any(LocalDateTime.class));
+			verify(serverConnector, never()).createSession(anyString(), eq("BROWSER:NONE"), isNull(), any(OffsetDateTime.class));
 			
 			// check all test cases are created, in both test classes
 			verify(serverConnector, never()).createTestCase(anyString());
-			verify(serverConnector, never()).createTestCaseInSession(anyInt(), anyInt(), anyString(), anyString(), anyString(), eq(""), any(LocalDateTime.class));
+			verify(serverConnector, never()).createTestCaseInSession(anyInt(), anyInt(), anyString(), anyString(), anyString(), eq(""), any(OffsetDateTime.class));
 			verify(serverConnector, never()).createTestStep(anyString(), anyInt());
 			
 		} finally {
@@ -653,7 +654,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError"});
 			
 			// check server has been called for session
-			verify(serverConnector).createSession(anyString(), eq("BROWSER:NONE"), isNull(), any(LocalDateTime.class)); // once per TestNG context (so 1 time here)
+			verify(serverConnector).createSession(anyString(), eq("BROWSER:NONE"), isNull(), any(OffsetDateTime.class)); // once per TestNG context (so 1 time here)
 			verify(serverConnector, times(15)).recordStepResult(any(TestStep.class), anyInt(), anyInt());
 			
 		} finally {
@@ -690,7 +691,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShortKo"});
 
-			verify(serverConnector).createTestStep("_writeSomethingOnNonExistentElement ", 0);
+			verify(serverConnector).createTestStep("_writeSomethingOnNonExistentElement", 0);
 			verify(serverConnector, times(2)).createStepReferenceSnapshot(any(Snapshot.class), eq(0)); // reference recording for other steps
 			verify(serverConnector, never()).createStepReferenceSnapshot(any(Snapshot.class), eq(123)); // no reference recording for failed step
 			verify(serverConnector).getReferenceSnapshot(anyInt()); // check we get reference snapshot for failed step
@@ -730,7 +731,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShortKo"});
 			
-			verify(serverConnector).createTestStep("_writeSomethingOnNonExistentElement ", 0);
+			verify(serverConnector).createTestStep("_writeSomethingOnNonExistentElement", 0);
 			verify(serverConnector, never()).createStepReferenceSnapshot(any(Snapshot.class), eq(0)); // no reference recording at all
 			verify(serverConnector, never()).createStepReferenceSnapshot(any(Snapshot.class), eq(123)); // no reference recording for failed step
 			
@@ -766,7 +767,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 			initMocks(mockedCommonReporter, mockedServerConnector);
 			// check failed step is recorded
-			when(serverConnector.createTestStep("_writeSomethingOnNonExistentElement ", 0)).thenReturn(120);
+			when(serverConnector.createTestStep("_writeSomethingOnNonExistentElement", 0)).thenReturn(120);
 			doReturn(123).when(serverConnector).recordStepResult(any(TestStep.class), anyInt(), eq(120));
 			
 			
@@ -775,7 +776,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShortKo"});
 			
-			verify(serverConnector).createTestStep("_writeSomethingOnNonExistentElement ", 0);
+			verify(serverConnector).createTestStep("_writeSomethingOnNonExistentElement", 0);
 			verify(serverConnector).getReferenceSnapshot(123); // check id of failed "stepResult" is used and we try to get the reference image for this failed step
 			verify(serverConnector, times(2)).createStepReferenceSnapshot(any(Snapshot.class), eq(0)); // reference recording for other steps 
 			
@@ -808,7 +809,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 
 			initMocks(mockedCommonReporter, mockedServerConnector);
-			when(serverConnector.createTestStep("_writeSomethingOnNonExistentElement ", 0)).thenReturn(120);
+			when(serverConnector.createTestStep("_writeSomethingOnNonExistentElement", 0)).thenReturn(120);
 			doReturn(123).when(serverConnector).recordStepResult(any(TestStep.class), anyInt(), eq(120));
 			
 			
@@ -817,7 +818,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShortKo"});
 			
-			verify(serverConnector).createTestStep("_writeSomethingOnNonExistentElement ", 0);
+			verify(serverConnector).createTestStep("_writeSomethingOnNonExistentElement", 0);
 			verify(serverConnector).getReferenceSnapshot(123); // check id of failed "stepResult" is used and we try to get the reference image for this failed step
 			verify(serverConnector, times(2)).createStepReferenceSnapshot(any(Snapshot.class), eq(0)); // reference recording for other steps 
 			
@@ -851,7 +852,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDownloadFile"});
 
 			// check browser has the same valeurs for all calls
-			verify(serverConnector).createSession(anyString(), eq("BROWSER:CHROME"), eq("http://mylauncher/test"), any(LocalDateTime.class));
+			verify(serverConnector).createSession(anyString(), eq("BROWSER:CHROME"), eq("http://mylauncher/test"), any(OffsetDateTime.class));
 
 			// issue #331: check all test cases are created, call MUST be done only once to avoid result to be recorded several times
 			verify(serverConnector).createTestCase("testDownloadFile");

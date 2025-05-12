@@ -81,7 +81,12 @@ public class UftReport2 extends IUftReport {
 	 * @throws DataConversionException
 	 */
 	private TestStep readAction(Element actionElement) throws DataConversionException {
-		TestStep actionStep = new TestStep("UFT: " + actionElement.getChildText("AName").trim(), Reporter.getCurrentTestResult(), new ArrayList<>(), false);
+		TestStep actionStep = new TestStep("UFT: " + actionElement.getChildText("AName").trim(),
+				"UFT: " + actionElement.getChildText("AName").trim(),
+				IUftReport.class,
+				Reporter.getCurrentTestResult(),
+				new ArrayList<>(),
+				false);
 		Element summary = actionElement.getChild("Summary");
 		if (summary != null && summary.getAttribute("failed").getIntValue() != 0) {
 			actionStep.setFailed(true);
@@ -119,7 +124,12 @@ public class UftReport2 extends IUftReport {
 		if (stepList.isEmpty()) {
 			stepAction = new TestAction(stepDescription, false, new ArrayList<>());
 		} else {
-			stepAction = new TestStep(stepDescription, Reporter.getCurrentTestResult(), new ArrayList<>(), false);
+			stepAction = new TestStep(stepDescription,
+					stepDescription,
+					IUftReport.class,
+					Reporter.getCurrentTestResult(),
+					new ArrayList<>(),
+					false);
 			for (Element subStepElement : stepElement.getChildren(TAG_STEP)) {
 				TestAction readAction = readStep(subStepElement);
 				((TestStep) stepAction).addAction(readAction);

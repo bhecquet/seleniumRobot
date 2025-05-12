@@ -33,7 +33,7 @@ public class StubTestClassforTestDescription extends StubParentClass {
 	
 	@Test(groups="stub")
 	public void testNoDescription() throws IOException {
-		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
+		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), true);
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		step1.addAction(new TestAction("sendKeys to text field", false, new ArrayList<>()));
 		TestStepManager.logTestStep(step1);
@@ -41,7 +41,7 @@ public class StubTestClassforTestDescription extends StubParentClass {
 	
 	@Test(groups="stub", description="a test with param ${url}")
 	public void testWithDescription() throws IOException {
-		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
+		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), true);
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		step1.addAction(new TestAction("sendKeys to text field", true, new ArrayList<>()));
 		TestStepManager.logTestStep(step1);
@@ -50,7 +50,7 @@ public class StubTestClassforTestDescription extends StubParentClass {
 	
 	@Test(groups="stub", description = "This test is always <OK> & \"green\"")
 	public void testWithDescriptionAndSpecialCharacters() throws IOException {
-		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
+		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), true);
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		step1.addAction(new TestAction("sendKeys to text field", true, new ArrayList<>()));
 		TestStepManager.logTestStep(step1);
@@ -59,7 +59,7 @@ public class StubTestClassforTestDescription extends StubParentClass {
 	
 	@Test(groups="stub", description="a test with param ${url}\nand line breaks")
 	public void testWithLineBreaksInDescription() throws IOException {
-		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
+		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), true);
 		step1.setFailed(true);
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		step1.addAction(new TestAction("sendKeys to text field", true, new ArrayList<>()));
@@ -82,7 +82,7 @@ public class StubTestClassforTestDescription extends StubParentClass {
 
 	@Test(groups="stub", description="a test on ${client} account ${account}")
 	public void testWithParamCreatedInTest() throws IOException {
-		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
+		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), true);
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		step1.addAction(new TestAction("sendKeys to text field", true, new ArrayList<>()));
 		TestStepManager.logTestStep(step1);

@@ -17,7 +17,7 @@ public class TestTestStepManager extends GenericTest {
 
 	@Test(groups= {"ut"})
 	public void testLogStep() {
-		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
+		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), true);
 		TestStepManager.logTestStep(step1);
 		
 		Assert.assertNull(TestStepManager.getCurrentRootTestStep());
@@ -26,7 +26,7 @@ public class TestTestStepManager extends GenericTest {
 	
 	@Test(groups= {"ut"})
 	public void testLogStepWithPassword() {
-		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
+		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), true);
 		SeleniumTestsContextManager.getThreadContext().getTestStepManager().addPasswordToReplace("foobar");
 		TestStepManager.logTestStep(step1);
 	
@@ -35,7 +35,7 @@ public class TestTestStepManager extends GenericTest {
 	
 	@Test(groups= {"ut"})
 	public void testCurrentRootTestStepWithoutVideoTimeStamp() {
-		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
+		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), true);
 		TestStepManager.setCurrentRootTestStep(step1);
 		
 		Assert.assertEquals(TestStepManager.getCurrentRootTestStep(), step1);
@@ -46,7 +46,7 @@ public class TestTestStepManager extends GenericTest {
 	public void testCurrentRootTestStepWithVideoTimeStamp() {
 		TestStepManager.setVideoStartDate();
 		WaitHelper.waitForSeconds(1); // wait a bit so that step video timestamp is not 0
-		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
+		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), true);
 		TestStepManager.setCurrentRootTestStep(step1);
 		
 		Assert.assertEquals(TestStepManager.getCurrentRootTestStep(), step1);
@@ -63,7 +63,7 @@ public class TestTestStepManager extends GenericTest {
 	}
 	@Test(groups= {"ut"})
 	public void testSetCurrentRootTestStepNoResult() {
-		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
+		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), true);
 		Reporter.setCurrentTestResult(null);
 		TestStepManager.setCurrentRootTestStep(step1);
 	}
@@ -73,7 +73,7 @@ public class TestTestStepManager extends GenericTest {
 	 */
 	@Test(groups= {"ut"})
 	public void testGetLastStep() {
-		TestStep step1 = new TestStep("Test end", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
+		TestStep step1 = new TestStep("Test end", "Test end", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), true);
 		TestStepManager.logTestStep(step1);
 		
 		Assert.assertEquals(TestStepManager.getInstance().getLastTestStep(), step1);
@@ -84,7 +84,7 @@ public class TestTestStepManager extends GenericTest {
 	 */
 	@Test(groups= {"ut"})
 	public void testGetNoLastStep() {
-		TestStep step1 = new TestStep("step", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
+		TestStep step1 = new TestStep("step", "step", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), true);
 		TestStepManager.logTestStep(step1);
 		
 		Assert.assertNull(TestStepManager.getInstance().getLastTestStep());
@@ -92,12 +92,12 @@ public class TestTestStepManager extends GenericTest {
 	
 	@Test(groups= {"ut"})
 	public void testWithSubStep() {
-		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
+		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), true);
 		TestStepManager.setCurrentRootTestStep(step1);
 		
-		TestStep subStep1 = new TestStep("sub step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
+		TestStep subStep1 = new TestStep("sub step 1", "sub step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), true);
 		TestStepManager.getParentTestStep().addStep(subStep1);
-		TestStep subStep2 = new TestStep("sub step 2", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
+		TestStep subStep2 = new TestStep("sub step 2", "sub step 2", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), true);
 		TestStepManager.getParentTestStep().addStep(subStep2);
 		TestStepManager.setParentTestStep(subStep1);
 		
@@ -120,9 +120,9 @@ public class TestTestStepManager extends GenericTest {
 	 */
 	@Test(groups= {"ut"})
 	public void testGetCurrentOrPreviousStep() {
-		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
+		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), true);
 		TestStepManager.logTestStep(step1);
-		TestStep step2 = new TestStep("step 2", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
+		TestStep step2 = new TestStep("step 2", "step 2", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), true);
 		TestStepManager.setCurrentRootTestStep(step2);
 		
 		Assert.assertNotNull(TestStepManager.getCurrentRootTestStep());
@@ -134,9 +134,9 @@ public class TestTestStepManager extends GenericTest {
 	 */
 	@Test(groups= {"ut"})
 	public void testGetCurrentOrPreviousStepWithoutCurrent() {
-		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
+		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), true);
 		TestStepManager.logTestStep(step1);
-		TestStep step2 = new TestStep("step 2", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
+		TestStep step2 = new TestStep("step 2", "step 2", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), true);
 		TestStepManager.logTestStep(step2);
 		
 		Assert.assertNull(TestStepManager.getCurrentRootTestStep());
@@ -148,9 +148,9 @@ public class TestTestStepManager extends GenericTest {
 	 */
 	@Test(groups= {"ut"})
 	public void testPreviousStep() {
-		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
+		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), true);
 		TestStepManager.logTestStep(step1);
-		TestStep step2 = new TestStep("step 2", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
+		TestStep step2 = new TestStep("step 2", "step 2", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), true);
 		TestStepManager.logTestStep(step2);
 		
 		Assert.assertNull(TestStepManager.getCurrentRootTestStep());

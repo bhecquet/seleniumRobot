@@ -33,16 +33,16 @@ public class TestJiraConnector extends GenericTest {
 		
 		screenshot = new ScreenShot(tmpImg, tmpHtml);
 		
-		step1 = new TestStep("step 1", null, new ArrayList<>(), false);
+		step1 = new TestStep("step 1", "step 1", this.getClass(), null, new ArrayList<>(), false);
 		step1.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);
 		
-		step2 = new TestStep("step 2", null, new ArrayList<>(), false);
+		step2 = new TestStep("step 2", "step 2", this.getClass(), null, new ArrayList<>(), false);
 		step2.setFailed(true);
 		step2.addAction(new TestAction("action1", false, new ArrayList<>()));
 		step2.addAction(new TestAction("action2", false, new ArrayList<>()));
 		step2.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);
 		
-		stepEnd = new TestStep("Test end", null, new ArrayList<>(), false);
+		stepEnd = new TestStep("Test end", "Test end", this.getClass(), null, new ArrayList<>(), false);
 		stepEnd.addSnapshot(new Snapshot(screenshot, "end", SnapshotCheckType.FULL), 1, null);
 		stepEnd.addSnapshot(new Snapshot(screenshot, "end2", SnapshotCheckType.FULL), 1, null);
 	}

@@ -20,10 +20,10 @@ package com.seleniumtests.core.runner;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.nio.file.Paths;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +34,6 @@ import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.WebDriverException;
 import org.testng.*;
-import org.testng.internal.ConfigurationMethod;
 import org.testng.internal.annotations.DisabledRetryAnalyzer;
 
 import com.google.common.collect.Iterables;
@@ -72,7 +71,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	private static ScenarioLogger scenarioLogger = ScenarioLogger.getScenarioLogger(SeleniumRobotTestListener.class);
 	
 	private static List<ISuite> suiteList = Collections.synchronizedList(new ArrayList<>());
-	private Date start;
+	private OffsetDateTime start;
 	
 	private static SeleniumRobotTestListener currentListener;
 
@@ -212,7 +211,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 
 	@Override
 	public void onStart(ITestContext context) {
-        start = new Date();
+        start = OffsetDateTime.now();
         
         // global context of the test
         SeleniumTestsContextManager.initGlobalContext(context);	
@@ -343,7 +342,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	@Override
 	public void onFinish(ISuite suite) {
 		if (start != null) {
-			logger.info("Test Suite Execution Time: " + (new Date().getTime() - start.getTime()) / 1000 / 60 + " minutes.");
+			logger.info("Test Suite Execution Time: " + (OffsetDateTime.now().toInstant().toEpochMilli() - start.toInstant().toEpochMilli()) / 1000 / 60 + " minutes.");
 		} else {
 			logger.warn("No test executed");
 		}	
@@ -454,7 +453,12 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			// no problem as it's to close the previous manual step
 		}
 		
-		TestStep tearDownStep = new TestStep(TestStepManager.LAST_STEP_NAME, testResult, new ArrayList<>(), true);
+		TestStep tearDownStep = new TestStep(TestStepManager.LAST_STEP_NAME,
+				TestStepManager.LAST_STEP_NAME,
+				null,
+				testResult,
+				new ArrayList<>(),
+				true);
 		scenarioLogger.logTestInfo(TestStepManager.LAST_STATE_NAME, new MultipleInfo(TestStepManager.LAST_STATE_NAME));
 		
 		// add step to video

@@ -195,7 +195,7 @@ public class Uft {
         stepList.addAll(UftReportFactory.getInstance(uftOutput.toString(), scriptName).readXmlResult());
         try {
         	if (stepList.isEmpty()) {
-        		stepList.add(new TestStep("UFT: " + scriptName, Reporter.getCurrentTestResult(), new ArrayList<>(), false));
+        		stepList.add(new TestStep("UFT: " + scriptName, "UFT: " + scriptName, Uft.class, Reporter.getCurrentTestResult(), new ArrayList<>(), false));
         	}
         	File reportFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), String.format("uftReport-%d.txt", (int)(Math.random() * 100))).toFile();
 			FileUtils.write(reportFile, output, StandardCharsets.UTF_8);

@@ -53,7 +53,7 @@ public class TestTestLogging extends GenericTest {
 	
 	@Test(groups={"ut"})
 	public void testInfo() {
-		TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
+		TestStepManager.setCurrentRootTestStep(new TestStep("step", "step", this.getClass(), null, new ArrayList<>(), true));
 		logger.info("message");
 		Assert.assertEquals(TestStepManager.getParentTestStep().getStepActions().size(), 1);
 		Assert.assertTrue(TestStepManager.getParentTestStep().getStepActions().get(0) instanceof TestMessage);
@@ -62,28 +62,28 @@ public class TestTestLogging extends GenericTest {
 	
 	@Test(groups={"ut"})
 	public void testWarning() {
-		TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
+		TestStepManager.setCurrentRootTestStep(new TestStep("step", "step", this.getClass(), null, new ArrayList<>(), true));
 		logger.warning("message");
 		Assert.assertEquals(((TestMessage)(TestStepManager.getParentTestStep().getStepActions().get(0))).getMessageType(), MessageType.WARNING);
 	}
 	
 	@Test(groups={"ut"})
 	public void testError() {
-		TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
+		TestStepManager.setCurrentRootTestStep(new TestStep("step", "step", this.getClass(), null, new ArrayList<>(), true));
 		logger.error("message");
 		Assert.assertEquals(((TestMessage)(TestStepManager.getParentTestStep().getStepActions().get(0))).getMessageType(), MessageType.ERROR);
 	}
 	
 	@Test(groups={"ut"})
 	public void testLog() {
-		TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
+		TestStepManager.setCurrentRootTestStep(new TestStep("step", "step", this.getClass(), null, new ArrayList<>(), true));
 		logger.log("message");
 		Assert.assertEquals(((TestMessage)(TestStepManager.getParentTestStep().getStepActions().get(0))).getMessageType(), MessageType.LOG);
 	}
 	
 	@Test(groups={"ut"})
 	public void testLogScreenshotOk() throws IOException {
-		TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
+		TestStepManager.setCurrentRootTestStep(new TestStep("step", "step", this.getClass(), null, new ArrayList<>(), true));
 		logger.logScreenshot(new ScreenShot(File.createTempFile("img", ".png")));
 		Assert.assertEquals(TestStepManager.getParentTestStep().getSnapshots().size(), 1);
 	}
@@ -96,7 +96,7 @@ public class TestTestLogging extends GenericTest {
 	public void testRelocateScreenshotHtmlOnly() throws IOException {
 
 		try {
-			TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
+			TestStepManager.setCurrentRootTestStep(new TestStep("step", "step", this.getClass(), null, new ArrayList<>(), true));
 			
 			ScreenShot screenshot = new ScreenShot(null, "<html>");
 
@@ -126,7 +126,7 @@ public class TestTestLogging extends GenericTest {
 	public void testRelocateScreenshotImageOnly() throws IOException {
 		
 		try {
-			TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
+			TestStepManager.setCurrentRootTestStep(new TestStep("step", "step", this.getClass(), null, new ArrayList<>(), true));
 			
 			ScreenShot screenshot = new ScreenShot(File.createTempFile("img", ".png"));
 			
@@ -152,7 +152,7 @@ public class TestTestLogging extends GenericTest {
 	public void testRelocateScreenshotSamePath() throws IOException {
 		
 		try {
-			TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
+			TestStepManager.setCurrentRootTestStep(new TestStep("step", "step", this.getClass(), null, new ArrayList<>(), true));
 			
 			ScreenShot screenshot = new ScreenShot(File.createTempFile("img", ".png"));
 
@@ -174,7 +174,7 @@ public class TestTestLogging extends GenericTest {
 	@Test(groups={"ut"})
 	public void testLogFile() throws IOException {
 
-		TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
+		TestStepManager.setCurrentRootTestStep(new TestStep("step", "step", this.getClass(), null, new ArrayList<>(), true));
 		File videoFile = File.createTempFile("video", ".avi");
 		videoFile.deleteOnExit();
 		logger.logFile(videoFile, "video");
@@ -191,7 +191,7 @@ public class TestTestLogging extends GenericTest {
 	@Test(groups={"ut"})
 	public void testLogFileSamePlace() throws IOException {
 		
-		TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
+		TestStepManager.setCurrentRootTestStep(new TestStep("step", "step", this.getClass(), null, new ArrayList<>(), true));
 		File videoFile = File.createTempFile("video", ".avi");
 		FileUtils.moveFile(videoFile, Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), videoFile.getName()).toFile());
 		
@@ -201,7 +201,7 @@ public class TestTestLogging extends GenericTest {
 	@Test(groups={"ut"})
 	public void testLogFileExists() throws IOException {
 		
-		TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
+		TestStepManager.setCurrentRootTestStep(new TestStep("step", "step", this.getClass(), null, new ArrayList<>(), true));
 		File videoFile = File.createTempFile("video", ".avi");
 		FileUtils.copyFile(videoFile, Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), videoFile.getName()).toFile());
 		
@@ -210,14 +210,14 @@ public class TestTestLogging extends GenericTest {
 	
 	@Test(groups={"ut"})
 	public void testLogHarNull() {
-		TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
+		TestStepManager.setCurrentRootTestStep(new TestStep("step", "step", this.getClass(), null, new ArrayList<>(), true));
 		logger.logNetworkCapture(null, "main");
 		Assert.assertTrue(TestStepManager.getParentTestStep().getHarCaptures().isEmpty());
 	}
 	
 	@Test(groups={"ut"})
 	public void testLogTestStep(ITestContext context) {
-		TestStep testStep = new TestStep("step", null, new ArrayList<>(), true);
+		TestStep testStep = new TestStep("step", "step", this.getClass(), null, new ArrayList<>(), true);
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		
 		Reporter.setCurrentTestResult(testResult);

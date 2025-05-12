@@ -20,7 +20,6 @@ package com.seleniumtests.core;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -32,7 +31,6 @@ import org.testng.ITestNGMethod;
 import org.testng.internal.TestNGMethod;
 import org.testng.xml.XmlTest;
 
-import com.google.inject.Injector;
 import com.google.inject.Module;
 
 public class DefaultTestNGContext implements ITestContext {

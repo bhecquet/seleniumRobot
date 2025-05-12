@@ -149,7 +149,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 	public void init() throws Exception {
 		
 		// create first step
-		step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), false);
+		step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), false);
 		step1.setStepResultId(0);
 		step1.setPosition(0);
 		
@@ -166,7 +166,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 		step1.addSnapshot(new Snapshot(screenshot2, null, SnapshotCheckType.FALSE), 1, null);
 
 		// create an second step
-		step2 = new TestStep("step 2", Reporter.getCurrentTestResult(), new ArrayList<>(), false);
+		step2 = new TestStep("step 2", "step 2", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), false);
 		step2.setStepResultId(1);
 		step2.setPosition(1);
 	
@@ -176,7 +176,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 		step2.addSnapshot(new Snapshot(screenshot, null, SnapshotCheckType.REFERENCE_ONLY), 1, null);
 		
 		// create third step, which will fail
-		stepFailed = new TestStep("step 3", Reporter.getCurrentTestResult(), new ArrayList<>(), false);
+		stepFailed = new TestStep("step 3", "step 3", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), false);
 		stepFailed.setStepResultId(2);
 		stepFailed.setFailed(true);
 		stepFailed.setPosition(2);
@@ -187,7 +187,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 		stepFailed.addSnapshot(new Snapshot(screenshot3, null, SnapshotCheckType.REFERENCE_ONLY), 1, null);
 		
 		// create 'Test end' step
-		lastStep = new TestStep(TestStepManager.LAST_STEP_NAME, Reporter.getCurrentTestResult(), new ArrayList<>(), false);
+		lastStep = new TestStep(TestStepManager.LAST_STEP_NAME, TestStepManager.LAST_STEP_NAME, this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), false);
 		lastStep.setPosition(3);
 		
 		imgLastStep = File.createTempFile("img", ".png");

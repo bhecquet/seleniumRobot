@@ -291,7 +291,6 @@ public class LogAction {
 
 		target.setCallingPage((PageObject) joinPoint.getThis());
 
-		
 		return logAction(joinPoint, target);
 	}
 	
@@ -387,13 +386,15 @@ public class LogAction {
 	 */
 	private TestStep buildRootStep(JoinPoint joinPoint, String stepNamePrefix, boolean returnArgs) {
 		String stepName;
+		String stepNameWithArgs;
 		List<String> pwdToReplace = new ArrayList<>();
 		Map<String, String> arguments = new HashMap<>();
 		String argumentString = buildArgString(joinPoint, pwdToReplace, arguments);
+		stepName = joinPoint.getSignature().getName();
 		if (returnArgs) {
-			stepName = String.format("%s %s", joinPoint.getSignature().getName(), argumentString);
+			stepNameWithArgs = String.format("%s %s", stepName, argumentString).trim();
 		} else {
-			stepName = joinPoint.getSignature().getName();
+			stepNameWithArgs = stepName;
 		}
 		
 		// Get the method called by this joinPoint
@@ -407,14 +408,16 @@ public class LogAction {
 			if ((annotation.annotationType().getCanonicalName().contains("io.cucumber.java.en") 
 				|| annotation.annotationType().getCanonicalName().contains("io.cucumber.java.fr")) 
 				&& SeleniumRobotTestPlan.isCucumberTest()) {
-				stepName = getAnnotationValue(annotation) + " " + argumentString;
+				stepName = getAnnotationValue(annotation);
+				stepNameWithArgs = String.format("%s %s", stepName, argumentString).trim();
 				break;
 			} else if (annotation instanceof StepName) {
 				stepName = ((StepName)annotation).value();
 				
 				// replaces argument placeholders with values
+				stepNameWithArgs = stepName;
 				for (Entry<String, String> entry: arguments.entrySet()) {
-					stepName = stepName.replaceAll(String.format("\\$\\{%s\\}",  entry.getKey()), entry.getValue().replace("$", "\\$"));
+					stepNameWithArgs = stepNameWithArgs.replaceAll(String.format("\\$\\{%s\\}",  entry.getKey()), entry.getValue().replace("$", "\\$"));
 				}
 				break;
 			} else if (annotation instanceof Step) {
@@ -424,13 +427,19 @@ public class LogAction {
 				disableBugtracker = ((Step)annotation).disableBugTracker();
 				
 				// replaces argument placeholders with values
+				stepNameWithArgs = stepName;
 				for (Entry<String, String> entry: arguments.entrySet()) {
-					stepName = stepName.replaceAll(String.format("\\$\\{%s\\}",  entry.getKey()), entry.getValue().replace("$", "\\$"));
+					stepNameWithArgs = stepNameWithArgs.replaceAll(String.format("\\$\\{%s\\}",  entry.getKey()), entry.getValue().replace("$", "\\$"));
 				}
 				break;
 			}
 		}
-		return new TestStep(stepNamePrefix + stepName, 
+
+		// in case of static method, target is not available, so use the class where method is declared
+		Class<?> origin = joinPoint.getTarget() != null ? joinPoint.getTarget().getClass() : joinPoint.getSignature().getDeclaringType();
+		return new TestStep(stepNamePrefix + stepNameWithArgs,
+				stepName,
+				origin,
 				Reporter.getCurrentTestResult(), 
 				pwdToReplace, 
 				SeleniumTestsContextManager.getThreadContext().getMaskedPassword(),
@@ -646,7 +655,6 @@ public class LogAction {
 		TestStep compositeActionStep = null;
 
 		// check if we have a step that stored composite actions
-		// if yes, then co
 		if (currentStep != null && currentStep.getName().startsWith(TestStep.COMPOSITE_STEP_PREFIX)) {
 			compositeActionStep = currentStep;
 		}
@@ -680,6 +688,7 @@ public class LogAction {
 					name.append("on element '" + elementName + "'");
 				}
 				compositeActionStep.setName(name.toString());
+				compositeActionStep.setAction(name.toString());
 
 				scenarioLogger.logActionError(currentException);
 				TestStepManager.setParentTestStep((TestStep)compositeActionStep.getParent());

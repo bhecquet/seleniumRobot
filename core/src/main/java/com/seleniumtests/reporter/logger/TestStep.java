@@ -19,14 +19,13 @@ package com.seleniumtests.reporter.logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -59,7 +58,7 @@ public class TestStep extends TestAction {
 	public static final String COMPOSITE_STEP_PREFIX = "Composite ";
 	private List<TestAction> stepActions;
 	private Long duration;
-	private Date startDate;
+	private OffsetDateTime startDate;
 	private long videoTimeStamp;
 	private List<HarCapture> harCaptures;
 	private List<GenericFile> files;
@@ -82,7 +81,7 @@ public class TestStep extends TestAction {
 	 * @param name
 	 */
 	public TestStep(String name) {
-		this(name, null, new ArrayList<>(), true);
+		this(name, name, null, null, new ArrayList<>(), true);
 	}
 	/**
 	 *
@@ -90,18 +89,33 @@ public class TestStep extends TestAction {
 	 * @param testResult	associated TestNG result
 	 * @param pwdToReplace	list of string to replace when returning actions so that passwords are masked
 	 */
-	public TestStep(String name, ITestResult testResult, List<String> pwdToReplace, boolean maskPassword) {
-		this(name, testResult, pwdToReplace, maskPassword, RootCause.NONE, null, false);
+	public TestStep(String name, String action, Class<?> origin, ITestResult testResult, List<String> pwdToReplace, boolean maskPassword) {
+		this(name, action, origin, testResult, pwdToReplace, maskPassword, RootCause.NONE, null, false);
 	}
-	public TestStep(String name, ITestResult testResult, List<String> pwdToReplace, boolean maskPassword, RootCause errorCause, String errorCauseDetails, boolean disableBugtracker) {
+
+	/**
+	 *
+	 * @param name					Name of the step, as displayed in reports
+	 * @param action				Name of the action performed. Typically, the name of the called method
+	 * @param origin				Class where the method resides
+	 * @param testResult
+	 * @param pwdToReplace			List of string that represent a password that will be masked
+	 * @param maskPassword			if true, password strings will be replaced
+	 * @param errorCause
+	 * @param errorCauseDetails
+	 * @param disableBugtracker
+	 */
+	public TestStep(String name, String action, Class<?> origin, ITestResult testResult, List<String> pwdToReplace, boolean maskPassword, RootCause errorCause, String errorCauseDetails, boolean disableBugtracker) {
 		super(name, false, pwdToReplace);
 		this.maskPassword = maskPassword;
+		this.action = action;
+		this.origin = origin;
 		stepActions = new ArrayList<>();
 		files = new ArrayList<>();
 		harCaptures = new ArrayList<>();
 		snapshots = new ArrayList<>();
 		duration = 0L;
-		startDate = new Date();
+		startDate = OffsetDateTime.now();
 		this.testResult = testResult;
 		
 		if (errorCause != RootCause.NONE) {
@@ -123,10 +137,10 @@ public class TestStep extends TestAction {
 	}
 	
 	public void setStartDate() {
-		startDate = new Date();
+		startDate = OffsetDateTime.now();
 	}
 	
-	public void setStartDate(Date date) {
+	public void setStartDate(OffsetDateTime date) {
 		startDate = date;
 	}
 	
@@ -154,7 +168,7 @@ public class TestStep extends TestAction {
 	}
 	
 	public void updateDuration() {
-		duration = new Date().getTime() - startDate.getTime();
+		duration = OffsetDateTime.now().toInstant().toEpochMilli() - startDate.toInstant().toEpochMilli();
 		
 	}
 	
@@ -329,7 +343,7 @@ public class TestStep extends TestAction {
 		return stepJSon;
 	}
 
-	public Date getStartDate() {
+	public OffsetDateTime getStartDate() {
 		return startDate;
 	}
 
@@ -515,7 +529,7 @@ public class TestStep extends TestAction {
 	public TestStep encode(String format) {
 
 		List<String> encodedPasswords = encodePasswords(pwdToReplace, format);
-		TestStep step = new TestStep(encodeString(name, format), testResult, encodedPasswords, maskPassword);
+		TestStep step = new TestStep(encodeString(name, format), encodeString(action, format), origin, testResult, encodedPasswords, maskPassword);
 		
 		step.stepActions = new ArrayList<>();
 		for (TestAction testAction: stepActions) {
@@ -571,6 +585,14 @@ public class TestStep extends TestAction {
 	}
 	public void setStepResultId(Integer stepResultId) {
 		this.stepResultId = stepResultId;
+	}
+
+	/**
+	 * Returns the action name as concatenation of class + method name
+	 * @return
+	 */
+	public String getFullActionName() {
+		return getOrigin() != null ? getOrigin().getSimpleName() + "." + getAction(): getAction();
 	}
 	
 }

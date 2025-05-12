@@ -126,7 +126,11 @@ public class TestLogActions extends GenericTest {
 		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
+		Assert.assertEquals(steps.get(0).getOrigin(), CalcPage.class);
+		Assert.assertEquals(steps.get(0).getAction(), "openPage");
 		Assert.assertEquals(steps.get(1).getName(), "add with args: (1, 1, )");
+		Assert.assertEquals(steps.get(1).getOrigin(), CalcPage.class);
+		Assert.assertEquals(steps.get(1).getAction(), "add");
 		Assert.assertFalse(steps.get(0).getFailed());
 		Assert.assertFalse(steps.get(1).getFailed());
 		Assert.assertEquals(steps.get(0).getStepActions().size(), 2); // Opening page + timing
@@ -149,6 +153,7 @@ public class TestLogActions extends GenericTest {
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
 		Assert.assertEquals(steps.get(1).getName(), "add something to total");
+		Assert.assertEquals(steps.get(1).getAction(), "add something to total");
 	}
 	
 	/**
@@ -166,6 +171,7 @@ public class TestLogActions extends GenericTest {
 		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(1).getName(), "add 1 to total");
+		Assert.assertEquals(steps.get(1).getAction(), "add ${a} to total");
 	}
 	
 	/**
@@ -186,6 +192,7 @@ public class TestLogActions extends GenericTest {
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
 		Assert.assertEquals(steps.get(1).getName(), "add something to total");
+		Assert.assertEquals(steps.get(1).getAction(), "add something to total");
 	}
 	
 	/**
@@ -205,6 +212,7 @@ public class TestLogActions extends GenericTest {
 		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(1).getName(), "add 1 to total");
+		Assert.assertEquals(steps.get(1).getAction(), "add ${a} to total");
 	}
 	
 	/**
@@ -221,6 +229,7 @@ public class TestLogActions extends GenericTest {
 		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(1).getName(), "Connect to calc with login/******");
+		Assert.assertEquals(steps.get(1).getAction(), "Connect to calc with ${login}/${password}");
 	}
 	@Test(groups={"it"})
 	public void testSimpleNonCucumberStepLoggingWithStepDescriptionPassword2() throws IOException {
@@ -293,6 +302,8 @@ public class TestLogActions extends GenericTest {
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
 		Assert.assertEquals(steps.get(1).getName(), "^add '(\\d+)' to '(\\d+)'$ with args: (1, 1, )");
+		Assert.assertEquals(steps.get(1).getAction(), "^add '(\\d+)' to '(\\d+)'$");
+		Assert.assertEquals(steps.get(1).getOrigin(), CalcPage.class);
 		Assert.assertFalse(steps.get(0).getFailed());
 		Assert.assertFalse(steps.get(1).getFailed());
 		Assert.assertEquals(steps.get(0).getStepActions().size(), 2);

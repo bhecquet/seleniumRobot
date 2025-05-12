@@ -180,7 +180,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			context.put("className", testResult.getTestClass().getName());
 			context.put("tests", newTestSteps == null ? 0: newTestSteps.size());
 			context.put("duration", testDuration / 1000.0);
-			context.put("time", newTestSteps == null || newTestSteps.size() == 0 ? testResult.getStartMillis(): newTestSteps.get(0).getStartDate().getTime());
+			context.put("time", newTestSteps == null || newTestSteps.size() == 0 ? testResult.getStartMillis(): newTestSteps.get(0).getStartDate().toInstant().toEpochMilli());
 			context.put("startDate", newTestSteps == null || newTestSteps.size() == 0 ? new Date(testResult.getStartMillis()): newTestSteps.get(0).getStartDate());
 			context.put("testSteps", newTestSteps);	
 			context.put("retries", TestNGResultUtils.getRetry(testResult) == null ? 0: TestNGResultUtils.getRetry(testResult));	

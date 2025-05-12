@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -122,7 +123,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		BrowserType browser = SeleniumTestsContextManager.getGlobalContext().getBrowser();
 		browser = browser == null ? BrowserType.NONE : browser;
 
-		return createSession(sessionName, browser.toString(), null, LocalDateTime.now());
+		return createSession(sessionName, browser.toString(), null, OffsetDateTime.now());
 	}
 
 	/**
@@ -131,7 +132,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	 * @param browserOrApp		name of the browser or application that is run
 	 * @return
 	 */
-	public Integer createSession(String sessionName, String browserOrApp, String startedBy, LocalDateTime startDate) {
+	public Integer createSession(String sessionName, String browserOrApp, String startedBy, OffsetDateTime startDate) {
 		if (!active) {
 			return null;
 		}
@@ -184,7 +185,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	 * @return	the id of the created testCaseInSession
 	 */
 
-	public Integer createTestCaseInSession(Integer sessionId, Integer testCaseId, String name, String status, String gridNode, String description, LocalDateTime startDate) {
+	public Integer createTestCaseInSession(Integer sessionId, Integer testCaseId, String name, String status, String gridNode, String description, OffsetDateTime startDate) {
 		if (!active) {
 			return null;
 		}
@@ -216,8 +217,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	 * Returns testStepName or a shorter version if it's too long
 	 * @return
 	 */
-	private String getTestStepName(String testStepName) {
-		String stepName = testStepName.split(" with args")[0];
+	private String getStrippedTestStepName(String stepName) {
 		return stepName.length() > MAX_TESTSTEP_NAME_LENGTH ? stepName.substring(0, MAX_TESTSTEP_NAME_LENGTH): stepName;
 	}
 	
@@ -233,7 +233,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			return null;
 		}
 		
-		String strippedName = getTestStepName(testStep);
+		String strippedName = getStrippedTestStepName(testStep);
 		
 		try {
 			JSONObject stepJson = getJSonResponse(buildPostRequest(url + TESTSTEP_API_URL)
@@ -341,7 +341,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		try {
 			File pictureFile = snapshot.getScreenshot().getImage().getFile();
 			String strippedTestName = getTestName(testName);
-			String strippedStepName = getTestStepName(stepName);
+			String strippedStepName = getStrippedTestStepName(stepName);
 			
 			MultipartBody request = buildPutRequest(url + SNAPSHOT_API_URL)
 					.socketTimeout(5000)
