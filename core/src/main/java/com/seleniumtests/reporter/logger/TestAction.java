@@ -17,9 +17,7 @@
  */
 package com.seleniumtests.reporter.logger;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,7 +53,7 @@ public class TestAction {
 	protected List<String> pwdToReplace;
 	protected boolean maskPassword = true;
 	protected boolean encoded = false;		// true if we have encoded messages
-	protected LocalDateTime timestamp;
+	protected OffsetDateTime timestamp;
 
 
 	protected String action;			// "click", "sendKeys", ...
@@ -118,7 +116,7 @@ public class TestAction {
 		this.element = element;
 		this.origin = origin;
 
-		timestamp = LocalDateTime.now();
+		timestamp = OffsetDateTime.now();
 	}
 
 	/**
@@ -139,7 +137,7 @@ public class TestAction {
 		this.name = name;
 	}
 
-	public LocalDateTime getTimestamp() {
+	public OffsetDateTime getTimestamp() {
 		return timestamp;
 	}
 
@@ -187,7 +185,7 @@ public class TestAction {
 	public JSONObject toJson() {
 		JSONObject actionJson = new JSONObject();
 
-		actionJson.put("timestamp", timestamp.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+		actionJson.put("timestamp", timestamp.toInstant().toEpochMilli());
 		actionJson.put("type", "action");
 		actionJson.put("name", getName());
 

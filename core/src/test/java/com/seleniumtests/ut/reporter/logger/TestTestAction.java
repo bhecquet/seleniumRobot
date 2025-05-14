@@ -15,6 +15,7 @@ import org.testng.annotations.Test;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,7 +51,7 @@ public class TestTestAction extends MockitoTest {
 
     @Test(groups = { "ut" })
     public void testToJson() {
-        long actionTimestamp = LocalDateTime.now().atZone(ZoneOffset.UTC).toInstant().toEpochMilli();
+        long actionTimestamp = OffsetDateTime.now().toInstant().toEpochMilli();
         TestAction action = new TestAction("Login with args (user, myPass<>)", false, Arrays.asList("myPass<>"));
         JSONObject jsonAction = action.toJson();
         Assert.assertTrue(jsonAction.getLong("timestamp") >= actionTimestamp);

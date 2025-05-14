@@ -20,18 +20,15 @@ package com.seleniumtests.driver.screenshots;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import com.seleniumtests.customexception.WebSessionEndedException;
-import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.Dimension;
@@ -275,7 +272,7 @@ public class ScreenshotUtil {
             return new ArrayList<>();
         }
 
-    	LocalDateTime start = LocalDateTime.now();
+    	Instant start = Instant.now();
     	List<NamedBufferedImage> capturedImages = captureAllImages(target, allWindows, scrollDelay);
     	
     	// back to page top
@@ -301,14 +298,14 @@ public class ScreenshotUtil {
 	 * @param capturedImages
 	 * @return
 	 */
-	private <T> List<T> exportBufferedImages(Class<T> exportClass, LocalDateTime start, List<NamedBufferedImage> capturedImages) {
+	private <T> List<T> exportBufferedImages(Class<T> exportClass, Instant start, List<NamedBufferedImage> capturedImages) {
 		List<T> out = new ArrayList<>();
     	for (NamedBufferedImage capturedImage: capturedImages) {
     		if (capturedImage != null) {
 		    	if (exportClass.equals(File.class)) {
 		    		out.add((T)exportToFile(capturedImage.image));
 		    	} else if (exportClass.equals(ScreenShot.class)) {
-		    		out.add((T)exportToScreenshot(capturedImage, Duration.between(start, LocalDateTime.now()).toMillis()));
+		    		out.add((T)exportToScreenshot(capturedImage, Duration.between(start, Instant.now()).toMillis()));
 		    	} else if (exportClass.equals(String.class)) {
 		    		try {
 						out.add((T)ImageProcessor.toBase64(capturedImage.image));

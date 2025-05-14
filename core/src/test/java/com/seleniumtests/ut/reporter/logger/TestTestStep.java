@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -719,7 +720,7 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(stepJson.getString("action"), "step1");
 		Assert.assertEquals(stepJson.getString("origin"), "com.seleniumtests.ut.reporter.logger.TestTestStep");
 		Assert.assertEquals(stepJson.getString("status"), "SUCCESS");
-		Assert.assertEquals(stepJson.getLong("timestamp"), step.getTimestamp().toInstant(ZoneOffset.UTC).toEpochMilli());
+		Assert.assertEquals(stepJson.getLong("timestamp"), step.getTimestamp().toInstant().toEpochMilli());
 		Assert.assertEquals(stepJson.getJSONArray("actions").length(), 3);
 		Assert.assertNotNull(stepJson.getLong("timestamp"));
 
@@ -758,7 +759,7 @@ public class TestTestStep extends GenericTest {
 		Assert.assertTrue(stepJson.getString("exceptionMessage").contains("class org.openqa.selenium.WebDriverException: KO"));
 		Assert.assertEquals(stepJson.getString("name"), "step1");
 		Assert.assertEquals(stepJson.getString("status"), "WARNING");
-		Assert.assertEquals(stepJson.getLong("timestamp"), step.getTimestamp().toInstant(ZoneOffset.UTC).toEpochMilli());
+		Assert.assertEquals(stepJson.getLong("timestamp"), step.getTimestamp().toInstant().toEpochMilli());
 		Assert.assertEquals(stepJson.getJSONArray("actions").length(), 2);
 		Assert.assertNotNull(stepJson.getLong("timestamp"));
 
