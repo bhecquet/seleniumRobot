@@ -1732,12 +1732,13 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		}
 	}
 	
-	public static void displayStepOnScreen(String textToWrite, DriverMode driverMode, SeleniumGridConnector gridConnector, VideoRecorder recorder) {
+	public static long displayStepOnScreen(String textToWrite, DriverMode driverMode, SeleniumGridConnector gridConnector, VideoRecorder recorder) {
 		if (driverMode == DriverMode.LOCAL) {
 			
 			recorder.displayRunningStep(textToWrite);
+			return 0;
 		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
-			gridConnector.displayRunningStep(textToWrite);
+			return gridConnector.displayRunningStep(textToWrite);
 		} else {
 			throw new ScenarioException("driver supports writeToDesktop only in local and grid mode");
 		}

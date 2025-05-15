@@ -538,10 +538,12 @@ public class LogAction {
 			rootStep = true;
 
 			if (videoRecorder != null) {
-				CustomEventFiringWebDriver.displayStepOnScreen(currentStep.getName(), 
+				long duration = CustomEventFiringWebDriver.displayStepOnScreen(currentStep.getName(),
 						SeleniumTestsContextManager.getThreadContext().getRunMode(), 
 						SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(), 
 						videoRecorder);
+				currentStep.setVideoTimeStamp(currentStep.getVideoTimeStamp() + Math.max(0, duration - 5));
+				currentStep.setDurationToExclude(duration);
 			}
 			if (neoloadDriver != null) {
 				neoloadDriver.startTransaction(currentStep.getName());

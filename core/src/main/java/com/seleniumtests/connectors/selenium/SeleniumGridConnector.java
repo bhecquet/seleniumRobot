@@ -348,8 +348,9 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	 * Display running step
 	 * @param stepName
 	 */
-	public void displayRunningStep(String stepName) {
+	public long displayRunningStep(String stepName) {
 		logger.warn("displayRunningStep is only available with seleniumRobot grid");
+		return 0;
 	}
 	
 	/**

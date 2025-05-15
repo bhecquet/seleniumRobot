@@ -29,6 +29,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
@@ -508,12 +510,13 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	 * @param stepName
 	 */
 	@Override
-	public void displayRunningStep(String stepName) {
+	public long displayRunningStep(String stepName) {
 		if (nodeUrl == null) {
 			throw new ScenarioException("You cannot display running step before driver has been created and corresponding node instanciated");
 		}
 		
 		try {
+			Instant start = Instant.now();
 			HttpResponse<String> response = Unirest.post(String.format("%s%s", nodeServletUrl, NODE_TASK_SERVLET))
 					.queryString(ACTION_FIELD, "displayRunningStep")
 					.queryString("stepName", stepName)
@@ -523,9 +526,11 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			if (response.getStatus() != 200) {
 				logger.error(String.format("display running step error: %s", response.getBody()));
 			}
+			return Duration.between(start, Instant.now()).toMillis();
 		} catch (UnirestException e) {
 			logger.warn(String.format("Could not display running step: %s", e.getMessage()));
 		}
+		return 0;
 	}
 	
 	/**
