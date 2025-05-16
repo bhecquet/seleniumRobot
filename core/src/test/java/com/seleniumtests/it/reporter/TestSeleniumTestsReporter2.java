@@ -827,7 +827,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 		// check content of summary report file
 		String detailedReportContent = readTestMethodResultFile("testOkWithOneStepFailed");
-		Assert.assertTrue(detailedReportContent.contains("<li class=\"header-failed\">failAction <br/>class com.seleniumtests.customexception.DriverExceptions: fail</li>"));
+		Assert.assertTrue(detailedReportContent.contains("<li class=\"header-failed\">failAction<br/>class com.seleniumtests.customexception.DriverExceptions: fail</li>"));
 
 	}
 
@@ -844,7 +844,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
 
 		// failed action is visible as failed
-		Assert.assertTrue(detailedReportContent.contains("<li class=\"header-failed\">failAction <br/>class com.seleniumtests.customexception.DriverExceptions: fail</li>"));
+		Assert.assertTrue(detailedReportContent.contains("<li class=\"header-failed\">failAction<br/>class com.seleniumtests.customexception.DriverExceptions: fail</li>"));
 
 		// parent action is OK, so it should not be marked as failed
 		Assert.assertTrue(detailedReportContent.matches(".*<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-2\">\\d+:\\d+:\\d+.\\d+</span> addWithCatchedError with args: \\(1, \\) </div></li>.*"));
@@ -1805,7 +1805,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			String detailedReportContent1 = readTestMethodResultFile("testDriverShortKo");
 
 			// reference and current state should be displayed
-			Assert.assertTrue(detailedReportContent1.matches(".* class\\=\"step-title\"> _writeSomethingOnNonExistentElement  - .*"
+			Assert.assertTrue(detailedReportContent1.matches(".* class\\=\"step-title\"> _writeSomethingOnNonExistentElement - .*"
 					+ "at com\\.seleniumtests\\.it\\.driver\\.support\\.pages\\.DriverTestPage\\._writeSomethingOnNonExistentElement\\(DriverTestPage\\.java.*?"
 					+ "<div class\\=\"row\">"
 					+ "<div class\\=\"message-snapshot col\"><div class\\=\"text-center\">"

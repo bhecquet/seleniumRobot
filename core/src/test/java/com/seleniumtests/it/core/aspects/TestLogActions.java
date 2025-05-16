@@ -334,7 +334,7 @@ public class TestLogActions extends GenericTest {
 		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
-		Assert.assertEquals(steps.get(1).getName(), "failAction ");
+		Assert.assertEquals(steps.get(1).getName(), "failAction");
 		Assert.assertFalse(steps.get(0).getFailed());
 		Assert.assertTrue(steps.get(1).getFailed());
 		Assert.assertNotNull(steps.get(1).getActionException());
@@ -361,7 +361,7 @@ public class TestLogActions extends GenericTest {
 		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
-		Assert.assertEquals(steps.get(1).getName(), "assertAction ");
+		Assert.assertEquals(steps.get(1).getName(), "assertAction");
 		Assert.assertFalse(steps.get(0).getFailed());
 		Assert.assertTrue(steps.get(1).getFailed());
 		Assert.assertNotNull(steps.get(1).getActionException());
@@ -396,7 +396,7 @@ public class TestLogActions extends GenericTest {
 		Assert.assertEquals(steps.get(1).getStepActions().size(), 1);
 		TestStep subStep = (TestStep)steps.get(1).getStepActions().get(0);
 		Assert.assertEquals(subStep.getStepActions().size(), 1);
-		Assert.assertEquals(subStep.getName(), "doNothing ");
+		Assert.assertEquals(subStep.getName(), "doNothing");
 		TestAction subSubAction = subStep.getStepActions().get(0);
 		Assert.assertEquals(subSubAction.getName(), "doNothing on HtmlElement none, by={By.id: none} ");
 		
@@ -405,7 +405,7 @@ public class TestLogActions extends GenericTest {
 		Assert.assertEquals(subStep.getStepActions().size(), 1);
 		Assert.assertEquals(subStep.getName(), "add with args: (2, 2, )");
 		TestStep subSubStep = (TestStep)subStep.getStepActions().get(0);
-		Assert.assertEquals(subSubStep.getName(), "doNothing ");
+		Assert.assertEquals(subSubStep.getName(), "doNothing");
 	}
 	
 
