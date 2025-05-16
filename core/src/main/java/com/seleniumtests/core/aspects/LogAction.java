@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.core.aspects;
 
+import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -27,6 +28,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.seleniumtests.customexception.ImageSearchException;
+import com.seleniumtests.driver.screenshots.ScreenshotUtil;
+import com.seleniumtests.driver.screenshots.SnapshotCheckType;
+import com.seleniumtests.driver.screenshots.SnapshotTarget;
 import com.seleniumtests.uipage.BasePage;
 import com.seleniumtests.uipage.ReplayOnError;
 import com.seleniumtests.uipage.htmlelements.Element;
@@ -548,9 +552,11 @@ public class LogAction {
 			if (neoloadDriver != null) {
 				neoloadDriver.startTransaction(currentStep.getName());
 			}
-			
-			
-			
+			// capture at the start of the step except when page is opening, so that we wait for page to be really opened
+			if (!"openPage".equals(joinPoint.getSignature().getName()) && joinPoint.getTarget() instanceof PageObject) {
+				((PageObject)joinPoint.getTarget()).capturePageSnapshot("Step beginning state", SnapshotCheckType.REFERENCE_ONLY);
+			}
+
 		} else {
 			TestStepManager.getParentTestStep().addStep(currentStep);
 			previousParent = TestStepManager.getParentTestStep();
@@ -575,6 +581,12 @@ public class LogAction {
 			}
 		} finally {
 			if (rootStep) {
+
+				// capture after page has opened
+				if ("openPage".equals(joinPoint.getSignature().getName()) && joinPoint.getTarget() instanceof PageObject) {
+					((PageObject)joinPoint.getTarget()).capturePageSnapshot("Step beginning state", SnapshotCheckType.REFERENCE_ONLY);
+				}
+
 				TestStepManager.getCurrentRootTestStep().updateDuration();
 				TestStepManager.logTestStep(TestStepManager.getCurrentRootTestStep());
 				

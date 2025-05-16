@@ -275,17 +275,6 @@ public class ScreenshotUtil {
     	Instant start = Instant.now();
     	List<NamedBufferedImage> capturedImages = captureAllImages(target, allWindows, scrollDelay);
     	
-    	// back to page top
-    	try {
-    		if (target.isPageTarget()) {
-    			driver.scrollTop();
-    		}
-    	} catch (WebDriverException e) {
-    		// ignore errors here.
-    		// com.seleniumtests.it.reporter.TestTestLogging.testManualSteps() with HTMLUnit driver
-    		// org.openqa.selenium.WebDriverException: Can't execute JavaScript before a page has been loaded!
-    	}
-    	
     	return exportBufferedImages(exportClass, start, capturedImages);
 
     }
@@ -704,6 +693,11 @@ public class ScreenshotUtil {
 
     		loops += 1;
     	}
+
+		// back to top
+		try {
+			driver.scrollTop();
+		} catch (JavascriptException e) {}
 
     	return currentImage;
     	
