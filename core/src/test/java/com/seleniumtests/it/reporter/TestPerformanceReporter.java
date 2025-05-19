@@ -224,7 +224,7 @@ public class TestPerformanceReporter extends ReporterTest {
 		Assert.assertTrue(jmeterReport.contains("at com.seleniumtests.it.core.aspects.CalcPage.failAction_aroundBody"));
 
 		// check the step marked as failed is the last failed step (not 'Test end')
-		Assert.assertTrue(jmeterReport.contains("failedStep=\"failAction \"")); 
+		Assert.assertTrue(jmeterReport.contains("failedStep=\"failAction\""));
 		Assert.assertTrue(jmeterReport.contains("failures=\"1\"")); // only one error
 	}	
 
@@ -339,7 +339,7 @@ public class TestPerformanceReporter extends ReporterTest {
 
 		String detailedReportContent = readTestMethodPerfFile("testSkippedStep");
 		
-		Assert.assertTrue(detailedReportContent.matches(".*<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClassForTestSteps\" name=\"Step 4: skipStep \" time=\"\\d+\\.\\d+\"><skipped/>.*"));
+		Assert.assertTrue(detailedReportContent.matches(".*<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClassForTestSteps\" name=\"Step 4: skipStep\" time=\"\\d+\\.\\d+\"><skipped/>.*"));
 		Assert.assertTrue(detailedReportContent.contains("failures=\"-1\""));
 	}
 	

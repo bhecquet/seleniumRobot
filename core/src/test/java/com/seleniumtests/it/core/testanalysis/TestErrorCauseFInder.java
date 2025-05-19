@@ -226,7 +226,7 @@ public class TestErrorCauseFInder extends ReporterTest {
 			
 			// check the error cause is displayed at the top of the report
 			String output = readTestMethodResultFile("testImageDetection");
-			Assert.assertTrue(output.contains("<th>Possible error causes</th><td><ul><li>Field in error: At least one field in error on step '_clickErrorButtonInError '</li></ul></td>"));
+			Assert.assertTrue(output.contains("<th>Possible error causes</th><td><ul><li>Field in error: At least one field in error on step '_clickErrorButtonInError'</li></ul></td>"));
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.FIND_ERROR_CAUSE);
@@ -288,7 +288,7 @@ public class TestErrorCauseFInder extends ReporterTest {
 			
 			// check the error cause is displayed at the top of the report
 			String output = readTestMethodResultFile("testImageDetection");
-			Assert.assertTrue(output.contains("<th>Possible error causes</th><td><ul><li>Field in error: At least one field in error on step '_clickErrorButtonInError '</li></ul></td>"));
+			Assert.assertTrue(output.contains("<th>Possible error causes</th><td><ul><li>Field in error: At least one field in error on step '_clickErrorButtonInError'</li></ul></td>"));
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.FIND_ERROR_CAUSE);
@@ -334,7 +334,7 @@ public class TestErrorCauseFInder extends ReporterTest {
 			
 			// check the error cause is displayed at the top of the report
 			String output = readTestMethodResultFile("testImageDetection");
-			Assert.assertTrue(output.contains("<th>Possible error causes</th><td><ul><li>The application has been modified: 1 field(s) missing: field[text=null]: java.awt.Rectangle[x=611,y=183,width=100,height=21] on step '_clickErrorButtonInError '</li></ul></td>"));
+			Assert.assertTrue(output.contains("<th>Possible error causes</th><td><ul><li>The application has been modified: 1 field(s) missing: field[text=null]: java.awt.Rectangle[x=611,y=183,width=100,height=21] on step '_clickErrorButtonInError'</li></ul></td>"));
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.FIND_ERROR_CAUSE);
