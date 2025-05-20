@@ -584,7 +584,11 @@ public class LogAction {
 
 				// capture after page has opened
 				if ("openPage".equals(joinPoint.getSignature().getName()) && joinPoint.getTarget() instanceof PageObject) {
-					((PageObject)joinPoint.getTarget()).capturePageSnapshot("Step beginning state", SnapshotCheckType.REFERENCE_ONLY);
+					try {
+						((PageObject) joinPoint.getTarget()).capturePageSnapshot("Step beginning state", SnapshotCheckType.REFERENCE_ONLY);
+					} catch (Exception e) {
+						logger.warn("could not capture step reference: " + e.getMessage());
+					}
 				}
 
 				TestStepManager.getCurrentRootTestStep().updateDuration();

@@ -544,7 +544,7 @@ public class TestPageObject2 extends MockitoTest {
 		when(eventDriver.getWindowHandles()).thenReturn(new HashSet<>(Arrays.asList("123")))
 				.thenReturn(new HashSet<>(Arrays.asList("123", "456")));
 		eventDriver.getCurrentHandles();
-		when(eventDriver.getWindowHandle()).thenReturn("123").thenReturn("456");
+		when(eventDriver.getWindowHandle()).thenReturn("123").thenReturn("123").thenReturn("123").thenReturn("456"); // the first 2 "return" are present for snapshot captures
 		page.switchToNewWindow(1);
 		verify(targetLocator).window("456");
 	}
