@@ -205,7 +205,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			
 			// check the content of the zip file
 			Assert.assertTrue(entries.contains("testDriverShortKo/TestReport.html"));
-			Assert.assertTrue(entries.contains("testDriverShortKo/videoCapture.avi"));
+			Assert.assertTrue(entries.contains("testDriverShortKo/videoCapture.avi") || entries.contains("testDriverShortKo/videoCapture.mp4"));
 			Assert.assertTrue(entries.contains("testDriverShortKo/resources/app.min.js"));
 			Assert.assertTrue(entries.contains("testDriverShortKo/resources/seleniumRobot_solo.css"));
 			Assert.assertTrue(entries.contains("testDriverShortKo/screenshots/testDriverShortKo_3-1_openPage_with_args._"));

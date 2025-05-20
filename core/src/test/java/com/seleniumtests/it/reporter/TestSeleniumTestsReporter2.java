@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.it.reporter;
 
+import com.seleniumtests.connectors.extools.FFMpeg;
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
@@ -26,6 +27,7 @@ import com.seleniumtests.it.stubclasses.StubTestClass;
 import org.apache.commons.lang3.StringUtils;
 import org.testng.Assert;
 import org.testng.ITestContext;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
@@ -34,6 +36,18 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 public class TestSeleniumTestsReporter2 extends ReporterTest {
+
+	private static String videoFileName = "videoCapture.avi";
+
+	@BeforeClass(alwaysRun = true, groups = "ut")
+	public static void init() {
+		try {
+			new FFMpeg();
+			videoFileName = "videoCapture.mp4";
+		} catch (Exception e) {
+			// nothing to do
+		}
+	}
 
 	@Test(groups = {"it"})
 	public void testDriverLogBrowserFileInTestEndStep() throws Exception {
@@ -1730,14 +1744,14 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			// read 'testDriver' report. This contains calls to HtmlElement actions
 			String detailedReportContent1 = readTestMethodResultFile("testDriver");
 
-			Assert.assertFalse(detailedReportContent1.contains("Video capture: <a href='videoCapture.avi'>file</a>"));
+			Assert.assertFalse(detailedReportContent1.contains(String.format("Video capture: <a href='%s'>file</a>", videoFileName)));
 
 			// check shortcut to video is NOT present in detailed report
-			Assert.assertFalse(detailedReportContent1.matches(".*<th>Last State</th><td><a href=\"screenshots/testDriver_8-1_Test_end--\\w+.png\"><i class=\"fas fa-file-image\" aria-hidden=\"true\"></i></a><a href=\"videoCapture.avi\"><i class=\"fas fa-video\" aria-hidden=\"true\"></i></a></td>.*"));
+			Assert.assertFalse(detailedReportContent1.matches(String.format(".*<th>Last State</th><td><a href=\"screenshots/testDriver_8-1_Test_end--\\w+.png\"><i class=\"fas fa-file-image\" aria-hidden=\"true\"></i></a><a href=\"%s\"><i class=\"fas fa-video\" aria-hidden=\"true\"></i></a></td>.*", videoFileName)));
 
 			// check shortcut to video is NOT present in summary report
 			String mainReportContent = readSummaryFile();
-			Assert.assertFalse(mainReportContent.matches(".*<td class=\"info\"><a href=\"testDriver/screenshots/testDriver_8-1_Test_end--\\w+.png\"><i class=\"fas fa-file-image\" aria-hidden=\"true\"></i></a><a href=\"testDriver/videoCapture.avi\"><i class=\"fas fa-video\" aria-hidden=\"true\"></i></a></td>.*"));
+			Assert.assertFalse(mainReportContent.matches(String.format(".*<td class=\"info\"><a href=\"testDriver/screenshots/testDriver_8-1_Test_end--\\w+.png\"><i class=\"fas fa-file-image\" aria-hidden=\"true\"></i></a><a href=\"testDriver/%s\"><i class=\"fas fa-video\" aria-hidden=\"true\"></i></a></td>.*", videoFileName)));
 
 		} finally {
 			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
@@ -1761,14 +1775,14 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			// read 'testDriver' report. This contains calls to HtmlElement actions
 			String detailedReportContent1 = readTestMethodResultFile("testDriver");
 
-			Assert.assertTrue(detailedReportContent1.contains("Video capture: <a href='videoCapture.avi'>file</a>"));
+			Assert.assertTrue(detailedReportContent1.contains(String.format("Video capture: <a href='%s'>file</a>", videoFileName)));
 
 			// check shortcut to video is present in detailed report
-			Assert.assertTrue(detailedReportContent1.matches(".*<th>Last State</th><td><a href=\"screenshots/testDriver_8-1_Test_end--\\w+.png\"><i class=\"fas fa-file-image\" aria-hidden=\"true\"></i></a><a href=\"videoCapture.avi\"><i class=\"fas fa-video\" aria-hidden=\"true\"></i></a></td>.*"));
+			Assert.assertTrue(detailedReportContent1.matches(String.format(".*<th>Last State</th><td><a href=\"screenshots/testDriver_8-1_Test_end--\\w+.png\"><i class=\"fas fa-file-image\" aria-hidden=\"true\"></i></a><a href=\"%s\"><i class=\"fas fa-video\" aria-hidden=\"true\"></i></a></td>.*", videoFileName)));
 
 			// check shortcut to video is present in summary report
 			String mainReportContent = readSummaryFile();
-			Assert.assertTrue(mainReportContent.matches(".*<td class=\"info\"><a href=\"testDriver/screenshots/testDriver_8-1_Test_end--\\w+.png\"><i class=\"fas fa-file-image\" aria-hidden=\"true\"></i></a><a href=\"testDriver/videoCapture.avi\"><i class=\"fas fa-video\" aria-hidden=\"true\"></i></a></td>.*"));
+			Assert.assertTrue(mainReportContent.matches(String.format(".*<td class=\"info\"><a href=\"testDriver/screenshots/testDriver_8-1_Test_end--\\w+.png\"><i class=\"fas fa-file-image\" aria-hidden=\"true\"></i></a><a href=\"testDriver/%s\"><i class=\"fas fa-video\" aria-hidden=\"true\"></i></a></td>.*", videoFileName)));
 
 		} finally {
 			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
@@ -2081,7 +2095,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			// read 'testDriver' report. This contains calls to HtmlElement actions
 			String detailedReportContent1 = readTestMethodResultFile("testDriverShortKo");
 
-			Assert.assertTrue(detailedReportContent1.contains("Video capture: <a href='videoCapture.avi'>file</a>"));
+			Assert.assertTrue(detailedReportContent1.contains(String.format("Video capture: <a href='%s'>file</a>", videoFileName)));
 
 		} finally {
 			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
@@ -2107,7 +2121,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			// read 'testDriver' report. This contains calls to HtmlElement actions
 			String detailedReportContent1 = readTestMethodResultFile("testDriverShortKo");
 
-			Assert.assertTrue(detailedReportContent1.contains("Video capture: <a href='videoCapture.avi'>file</a>"));
+			Assert.assertTrue(detailedReportContent1.contains(String.format("Video capture: <a href='%s'>file</a>", videoFileName)));
 
 		} finally {
 			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
@@ -2132,7 +2146,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			// read 'testDriver' report. This contains calls to HtmlElement actions
 			String detailedReportContent1 = readTestMethodResultFile("testMultipleDriver");
 
-			Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Video capture: <a href='videoCapture.avi'>file</a>"), 1);
+			Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, String.format("Video capture: <a href='%s'>file</a>", videoFileName)), 1);
 
 		} finally {
 			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);

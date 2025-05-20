@@ -17,15 +17,15 @@ public class TestVideoLinkInfo extends GenericTest {
 
     @Test(groups = {"ut"})
     public void testHtmlLink() {
-        File videoFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "video", "videoCapture.avi").toFile();
+        File videoFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "video", "videoCapture.mp4").toFile();
         String formatHtml = new VideoLinkInfo(new FileContent(videoFile))
                 .encode("html");
-        Assert.assertEquals(formatHtml, "<a href=\"testHtmlLink/video/videoCapture.avi\"><i class=\"fas fa-video\" aria-hidden=\"true\"></i></a>");
+        Assert.assertEquals(formatHtml, "<a href=\"testHtmlLink/video/videoCapture.mp4\"><i class=\"fas fa-video\" aria-hidden=\"true\"></i></a>");
     }
 
     @Test(groups = {"ut"})
     public void testOtherFormatLink() {
-        File videoFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "videoCapture.avi").toFile();
+        File videoFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "videoCapture.mp4").toFile();
         String formatOther = new VideoLinkInfo(new FileContent(videoFile))
                 .encode("avi");
         Assert.assertEquals(formatOther, "Video");
@@ -34,7 +34,7 @@ public class TestVideoLinkInfo extends GenericTest {
 
     @Test(groups = {"ut"})
     public void testNullFormatLink() {
-        File videoFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "videoCapture.avi").toFile();
+        File videoFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "videoCapture.mp4").toFile();
         String formatNull = new VideoLinkInfo(new FileContent(videoFile))
                 .encode(null);
         Assert.assertEquals(formatNull, "Video");
@@ -42,23 +42,23 @@ public class TestVideoLinkInfo extends GenericTest {
 
     @Test(groups = {"ut"})
     public void testToJson() {
-        File imageFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "video", "videoCapture.avi").toFile();
+        File imageFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "video", "videoCapture.mp4").toFile();
         JSONObject json = new VideoLinkInfo(new FileContent(imageFile))
                 .toJson();
         Assert.assertEquals(json.getString("type"), "videolink");
         Assert.assertEquals(json.getString("info"), "Video");
-        Assert.assertEquals(json.getString("link"), "videoCapture.avi");
+        Assert.assertEquals(json.getString("link"), "videoCapture.mp4");
         Assert.assertNull(json.toMap().get("id"));
     }
 
     @Test(groups = {"ut"})
     public void testToJsonWithId() {
-        File imageFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "video", "videoCapture.avi").toFile();
+        File imageFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "video", "videoCapture.mp4").toFile();
         JSONObject json = new VideoLinkInfo(new FileContent(imageFile, 12))
                 .toJson();
         Assert.assertEquals(json.getString("type"), "videolink");
         Assert.assertEquals(json.getString("info"), "Video");
-        Assert.assertEquals(json.getString("link"), "videoCapture.avi");
+        Assert.assertEquals(json.getString("link"), "videoCapture.mp4");
         Assert.assertEquals(json.getInt("id"), 12);
     }
 }

@@ -27,11 +27,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.WindowConstants;
 
+import com.seleniumtests.connectors.extools.FFMpeg;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.Logger;
 import org.monte.media.av.Format;
 import org.monte.media.av.FormatKeys;
@@ -52,6 +55,7 @@ public class VideoRecorder {
 	private File folderPath;
 	private JLabel label;
 	private JFrame window;
+	private FFMpeg ffmpeg;
 	private static final Logger logger = SeleniumRobotLogger.getLogger(VideoRecorder.class);
 	
 	/**
@@ -69,6 +73,12 @@ public class VideoRecorder {
 	 */
 	public VideoRecorder(File folderPath, String fileName, boolean localRecording) {
 		this(folderPath, fileName, localRecording, true);
+
+		try {
+			ffmpeg = new FFMpeg();
+		} catch (Exception e) {
+			logger.warn(e.getMessage());
+		}
 		
 	}
 	
@@ -182,6 +192,19 @@ public class VideoRecorder {
 						logger.info("could not delete video temp file: " + e.getMessage());
 					}
 				}
+
+				// encode file
+				if (ffmpeg != null) {
+					File mp4VideoFile = Paths.get(videoFile.getParent(), FilenameUtils.getBaseName(videoFile.getName()) + ".mp4").toFile();
+					String out = ffmpeg.runFFmpegCommand(List.of("-i", videoFile.getAbsolutePath(), "-c:v", "libopenh264", "-preset", "veryfast", "-tune", "animation", mp4VideoFile.getAbsolutePath()));
+					if (mp4VideoFile.exists() && mp4VideoFile.length() > 0) {
+						videoFile.delete();
+						videoFile = mp4VideoFile;
+
+					} else {
+						logger.warn("Transcoding not done. FFmpeg says: " + out);
+					}
+				}
 				
 				return videoFile;
 			} else {
@@ -225,4 +248,11 @@ public class VideoRecorder {
 		return window;
 	}
 
+	public void setFfmpeg(FFMpeg ffmpeg) {
+		this.ffmpeg = ffmpeg;
+	}
+
+	public FFMpeg getFfmpeg() {
+		return ffmpeg;
+	}
 }
