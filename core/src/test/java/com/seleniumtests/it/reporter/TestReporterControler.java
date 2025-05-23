@@ -90,10 +90,10 @@ public class TestReporterControler extends ReporterTest {
 		
 		// if a file belongs to a step, it's renamed
 		for (File htmlFile: Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverNativeActions", "htmls").toFile().listFiles()) {
-			Assert.assertTrue(htmlFile.getName().startsWith("testDriver"));
+			Assert.assertTrue(htmlFile.getName().startsWith("testDriver") || htmlFile.getName().startsWith("Step_start_state"));
 		}
 		for (File imgFile: Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverNativeActions", "screenshots").toFile().listFiles()) {
-			Assert.assertTrue(imgFile.getName().startsWith("testDriver"));
+			Assert.assertTrue(imgFile.getName().startsWith("testDriver") || imgFile.getName().startsWith("Step_start_state"));
 		}
 	}
 	
@@ -107,15 +107,15 @@ public class TestReporterControler extends ReporterTest {
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverWithFailure"});
 		
 		// check files are there
-		Assert.assertEquals(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverWithFailure", "htmls").toFile().listFiles().length, 2);
-		Assert.assertEquals(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverWithFailure", "screenshots").toFile().listFiles().length, 2);
+		Assert.assertEquals(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverWithFailure", "htmls").toFile().listFiles().length, 4);
+		Assert.assertEquals(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverWithFailure", "screenshots").toFile().listFiles().length, 4);
 		
 		// if a file belongs to a step, it's renamed
 		for (File htmlFile: Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverWithFailure", "htmls").toFile().listFiles()) {
-			Assert.assertTrue(htmlFile.getName().startsWith("testDriverWithFailure"));
+			Assert.assertTrue(htmlFile.getName().startsWith("testDriverWithFailure") || htmlFile.getName().startsWith("Step_start_state"));
 		}
 		for (File imgFile: Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverWithFailure", "screenshots").toFile().listFiles()) {
-			Assert.assertTrue(imgFile.getName().startsWith("testDriverWithFailure"));
+			Assert.assertTrue(imgFile.getName().startsWith("testDriverWithFailure") || imgFile.getName().startsWith("Step_start_state"));
 		}
 	}
 	

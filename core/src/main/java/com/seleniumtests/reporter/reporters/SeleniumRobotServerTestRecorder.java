@@ -371,9 +371,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			} catch (SeleniumRobotServerException e) {
 				logger.error("Could not create reference snapshot on server", e);
 			}
-			
-			// remove this snapshot, extracted from video as it won't be used anymore
-			testStep.removeSnapshot(snapshot);
+			// keep reference as it's not extracted from video anymore
 
 		} else {
 			try {

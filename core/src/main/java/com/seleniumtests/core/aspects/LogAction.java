@@ -553,8 +553,8 @@ public class LogAction {
 				neoloadDriver.startTransaction(currentStep.getName());
 			}
 			// capture at the start of the step except when page is opening, so that we wait for page to be really opened
-			if (!"openPage".equals(joinPoint.getSignature().getName()) && joinPoint.getTarget() instanceof PageObject) {
-				((PageObject)joinPoint.getTarget()).capturePageSnapshot("Step beginning state", SnapshotCheckType.REFERENCE_ONLY);
+			if (!"openPage".equals(joinPoint.getSignature().getName()) && WebUIDriver.getWebDriver(false) != null && joinPoint.getTarget() instanceof PageObject) {
+				((PageObject)joinPoint.getTarget()).capturePageSnapshot("Step start state " + currentStep.getPosition(), SnapshotCheckType.REFERENCE_ONLY);
 			}
 
 		} else {
@@ -583,12 +583,12 @@ public class LogAction {
 			if (rootStep) {
 
 				// capture after page has opened
-				if ("openPage".equals(joinPoint.getSignature().getName()) && joinPoint.getTarget() instanceof PageObject) {
-					try {
-						((PageObject) joinPoint.getTarget()).capturePageSnapshot("Step beginning state", SnapshotCheckType.REFERENCE_ONLY);
-					} catch (Exception e) {
-						logger.warn("could not capture step reference: " + e.getMessage());
+				try {
+					if ("openPage".equals(joinPoint.getSignature().getName()) && joinPoint.getTarget() instanceof PageObject && WebUIDriver.getWebDriver(false) != null) {
+						((PageObject) joinPoint.getTarget()).capturePageSnapshot("Step start state "  + currentStep.getPosition(), SnapshotCheckType.REFERENCE_ONLY);
 					}
+				} catch (Exception e) {
+					logger.warn("could not capture step reference: " + e.getMessage());
 				}
 
 				TestStepManager.getCurrentRootTestStep().updateDuration();

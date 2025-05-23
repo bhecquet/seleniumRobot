@@ -381,6 +381,9 @@ public class PageObject extends BasePage implements IPage {
         	capturePageSnapshot();
         
         }
+
+        // store the window / tab on which this page is loaded
+        windowHandle = driver.getWindowHandle();
     }
 
     @Override
@@ -695,9 +698,6 @@ public class PageObject extends BasePage implements IPage {
 	    	
 	    	logger.logScreenshot(screenShot, snapshotName, checkSnapshot);
     	}
-    	
-    	// store the window / tab on which this page is loaded
-    	windowHandle = driver.getWindowHandle();
     }
     
     /**

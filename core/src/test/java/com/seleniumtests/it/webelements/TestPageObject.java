@@ -84,7 +84,7 @@ public class TestPageObject extends GenericTest {
 		DriverSubTestPage subPage2 = testPage._goToNewPage();
 		subPage2.close();
 		
-		// check we are on the seconde page (an instance of the DriverSubTestPage)
+		// check we are on the second page (an instance of the DriverSubTestPage)
 		// next line will produce error if we are not on the page
 		new DriverSubTestPage();
 	}

@@ -515,14 +515,14 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector).createTestStep(eq("_captureSnapshot"), anyInt());
 			verify(serverConnector).createSnapshot(any(Snapshot.class), anyInt(), listArgument.capture()); // 1 custom snapshot taken with name
 
-			verify(serverConnector, times(6)).uploadFile(fileCapture.capture(), eq(0)); // 2 pictures, 2 HTML, 1 HAR, 1 driver logs
+			verify(serverConnector, times(12)).uploadFile(fileCapture.capture(), eq(0)); // 5 pictures, 5 HTML, 1 HAR, 1 driver logs
 			List<File> allFiles = fileCapture.getAllValues();
 
 			Assert.assertTrue(allFiles.stream().noneMatch(f -> f.getName().contains("my_snapshot")));
 			Assert.assertTrue(allFiles.stream().anyMatch(f -> f.getName().contains("driver-log-browser.txt")));
 			Assert.assertTrue(allFiles.stream().anyMatch(f -> f.getName().contains("main-networkCapture.har")));
-			Assert.assertEquals(allFiles.stream().filter(f -> f.getName().endsWith(".html")).count(), 2);
-			Assert.assertEquals(allFiles.stream().filter(f -> f.getName().endsWith(".png")).count(), 2);
+			Assert.assertEquals(allFiles.stream().filter(f -> f.getName().endsWith(".html")).count(), 5);
+			Assert.assertEquals(allFiles.stream().filter(f -> f.getName().endsWith(".png")).count(), 5);
 
 			// check exclude zones have been sent
 			Assert.assertEquals(listArgument.getValue().size(), 1);
@@ -573,7 +573,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector).createTestStep(eq("_captureSnapshot"), anyInt());
 
 			// check capture recorded for comparison is sent to server as attachment
-			verify(serverConnector, times(8)).uploadFile(fileCapture.capture(), eq(0)); // 1 HAR, 2 picture + HTML + 2 pictures for comparison + driver logs
+			verify(serverConnector, times(14)).uploadFile(fileCapture.capture(), eq(0)); // 1 HAR, 5 picture + HTML + 2 pictures for comparison + driver logs
 			Assert.assertEquals(fileCapture.getAllValues().stream().filter(f -> f.getName().contains("my_snapshot")).count(), 2);
 			verify(serverConnector, never()).createSnapshot(any(Snapshot.class), anyInt(), eq(new ArrayList<>())); // 1 custom snapshot taken with name
 			
@@ -692,7 +692,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShortKo"});
 
 			verify(serverConnector).createTestStep("_writeSomethingOnNonExistentElement", 0);
-			verify(serverConnector, times(2)).createStepReferenceSnapshot(any(Snapshot.class), eq(0)); // reference recording for other steps
+			verify(serverConnector, times(1)).createStepReferenceSnapshot(any(Snapshot.class), eq(0)); // reference recording for other steps OK
 			verify(serverConnector, never()).createStepReferenceSnapshot(any(Snapshot.class), eq(123)); // no reference recording for failed step
 			verify(serverConnector).getReferenceSnapshot(anyInt()); // check we get reference snapshot for failed step
 			
@@ -778,7 +778,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 			verify(serverConnector).createTestStep("_writeSomethingOnNonExistentElement", 0);
 			verify(serverConnector).getReferenceSnapshot(123); // check id of failed "stepResult" is used and we try to get the reference image for this failed step
-			verify(serverConnector, times(2)).createStepReferenceSnapshot(any(Snapshot.class), eq(0)); // reference recording for other steps 
+			verify(serverConnector, times(1)).createStepReferenceSnapshot(any(Snapshot.class), eq(0)); // reference recording for steps OK
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
@@ -820,7 +820,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 			verify(serverConnector).createTestStep("_writeSomethingOnNonExistentElement", 0);
 			verify(serverConnector).getReferenceSnapshot(123); // check id of failed "stepResult" is used and we try to get the reference image for this failed step
-			verify(serverConnector, times(2)).createStepReferenceSnapshot(any(Snapshot.class), eq(0)); // reference recording for other steps 
+			verify(serverConnector, times(1)).createStepReferenceSnapshot(any(Snapshot.class), eq(0)); // reference recording for other steps
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
@@ -856,7 +856,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 
 			// issue #331: check all test cases are created, call MUST be done only once to avoid result to be recorded several times
 			verify(serverConnector).createTestCase("testDownloadFile");
-			verify(serverConnector, times(7)).uploadFile(fileCapture.capture(), eq(0));
+			verify(serverConnector, times(5)).uploadFile(fileCapture.capture(), eq(0)); // 1 PDF + 1 HTML + 1 PNG + 1 HAR + 1 driver logs
 			Assert.assertTrue(fileCapture.getAllValues().stream().filter(f -> f.getName().equals("nom-du-fichier.pdf")).findFirst().isPresent());
 
 		} finally {
