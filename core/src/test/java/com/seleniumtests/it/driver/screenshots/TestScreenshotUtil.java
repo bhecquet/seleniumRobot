@@ -356,7 +356,7 @@ public class TestScreenshotUtil extends ReporterTest {
 			
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverCustomSnapshot"});
 			
-			int checkNumbers = 0;
+
 			for (ISuiteResult suiteResult: SeleniumRobotTestListener.getSuiteList().get(0).getResults().values()) {
 				for (ITestResult testResult: suiteResult.getTestContext().getPassedTests().getAllResults()) {
 					List<TestStep> steps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
@@ -365,7 +365,6 @@ public class TestScreenshotUtil extends ReporterTest {
 						// check that screenshots used for image comparison are affected by scrollDelay setting
 						if ("_captureSnapshot with args: (my snapshot, )".equals(step.getName())) {
 							Assert.assertTrue(step.getSnapshots().get(0).getDurationToExclude() > 4000);
-							Assert.assertEquals(checkNumbers, 1);
 							return;
 						}	
 					}

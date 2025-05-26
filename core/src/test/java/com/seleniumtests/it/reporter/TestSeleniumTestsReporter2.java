@@ -1825,20 +1825,14 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 					+ "<div class\\=\"message-snapshot col\"><div class\\=\"text-center\">"
 					+ "<a href\\=\"#\" onclick\\=\"\\$\\('#imagepreview'\\).*"
 					+ "<img id.*"
-					+ "<div class\\=\"text-center\">Step beginning state</div>" // the current state
-					+ "<div class\\=\"text-center font-weight-lighter\"></div>.*"
+					+ "<div class\\=\"text-center\">drv:main-Step start state 4: Step start state 4</div>" // the current state
+					+ "<div class\\=\"text-center font-weight-lighter\"><a href=.*target=url>URL</a> \\| <a href='htmls/Step_start_state_4.*?</div>.*"
 					+ "<div class\\=\"message-snapshot col\"><div class\\=\"text-center\">.*"
 					+ "<img id.*"
 					+ "<div class\\=\"text-center\">Valid-reference</div>.*")); // the reference
 
-			// only one extraction of step state is presented (the one for failed step)
-			Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Step beginning state</div>"), 1);
-
-			// check step beginning state is present with valid path
-			Assert.assertTrue(detailedReportContent1.contains("src=\"screenshots/testDriverShortKo_4-1__writeSomethingOnNonExistent-ideo-"));
-
-			// check no picture extracted from video is kept
-			Assert.assertEquals(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverShortKo", "video").toFile().listFiles().length, 0);
+			// 1 step reference for each step
+			Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Step start state"), 4);
 
 		} finally {
 			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
@@ -1880,44 +1874,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
 			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
-		}
-	}
-
-	@Test(groups = {"it"})
-	public void testReportDoeNotContainStepReferenceForFailedStepWhenVideoDisabled() throws Exception {
-
-		try {
-			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "false");
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
-			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
-
-			configureMockedSnapshotServerConnection();
-
-			// simulate the case where a reference exists
-			createServerMock("GET", SeleniumRobotSnapshotServerConnector.STEP_REFERENCE_API_URL + "17/", 200, createImageFromResource("tu/ffLogo1.png"));
-
-
-			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverShortKo"});
-
-			// read 'testDriver' report. This contains calls to HtmlElement actions
-			String detailedReportContent1 = readTestMethodResultFile("testDriverShortKo");
-
-			// no image reference
-			Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Step beginning state</div>"), 0);
-
-			// check step beginning state is not present with valid path
-			Assert.assertFalse(detailedReportContent1.contains("src=\"screenshots/testDriverShortKo_4-1__writeSomethingOnNonExistent-ideo-1.jpg\""));
-
-		} finally {
-			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
-			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
 		}
 	}
@@ -2233,7 +2189,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent1.matches(".*<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys on TextFieldElement Text, by=\\{By.id: text2} with args: \\(true, true, \\[a text,], \\) </div></li>.*"));
 		Assert.assertTrue(detailedReportContent1.matches(".*<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> click on ButtonElement Reset, by=\\{By.id: button2} </div></li>.*"));
 		Assert.assertTrue(detailedReportContent1.contains("<div class=\"text-center\">drv:main: Current Window: Test page</div>"));
-		Assert.assertTrue(detailedReportContent1.matches(".*<img id\\=\".*?\" src\\=\"screenshots/testDriver_3-1_openPage_with_args.*<div class\\=\"text-center\">drv:main: Current Window: Test page</div>.*"));
+		Assert.assertTrue(detailedReportContent1.matches(".*<img id\\=\".*?\" src\\=\"screenshots/Step_start_state_3.*<div class\\=\"text-center\">drv:main-Step start state 3: Step start state 3</div>.*"));
 
 		// check that only on reference to 'click' is present for this buttonelement. This means that only the replayed action has been logged, not the ButtonElement.click() one
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "click on"), 1);

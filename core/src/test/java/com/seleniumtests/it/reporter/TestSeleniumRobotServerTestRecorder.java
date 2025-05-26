@@ -856,7 +856,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 
 			// issue #331: check all test cases are created, call MUST be done only once to avoid result to be recorded several times
 			verify(serverConnector).createTestCase("testDownloadFile");
-			verify(serverConnector, times(5)).uploadFile(fileCapture.capture(), eq(0)); // 1 PDF + 1 HTML + 1 PNG + 1 HAR + 1 driver logs
+			verify(serverConnector, times(9)).uploadFile(fileCapture.capture(), eq(0)); // 1 PDF + 3 HTML + 3 PNG + 1 HAR + 1 driver logs
 			Assert.assertTrue(fileCapture.getAllValues().stream().filter(f -> f.getName().equals("nom-du-fichier.pdf")).findFirst().isPresent());
 
 		} finally {
