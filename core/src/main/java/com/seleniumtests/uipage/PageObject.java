@@ -383,7 +383,9 @@ public class PageObject extends BasePage implements IPage {
         }
 
         // store the window / tab on which this page is loaded
-        windowHandle = driver.getWindowHandle();
+        if (driver != null) {
+            windowHandle = driver.getWindowHandle();
+        }
     }
 
     @Override
@@ -1097,7 +1099,7 @@ public class PageObject extends BasePage implements IPage {
  		boolean found = false;
  		
  		while (end.isAfter(systemClock.instant()) && !found) {
- 			
+
  			handles = driver.getWindowHandles();
  			internalLogger.debug("All handles: " + handles.toString());
 
