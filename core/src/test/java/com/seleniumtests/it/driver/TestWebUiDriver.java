@@ -677,7 +677,7 @@ public class TestWebUiDriver extends ReporterTest {
 					chromeDataDir.toFile().deleteOnExit();
 
 					// create chrome browser with the right option
-					chromeProcess = OSCommand.executeCommand(new String[] {path, "--remote-debugging-port=" + port, "--remote-allow-origins=*", "--no-first-run", "about:blank", "--disable-search-engine-choice-screen", "--disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades", "--user-data-dir=" + chromeDataDir.toAbsolutePath().toString()});
+					chromeProcess = OSCommand.executeCommand(new String[] {path, "--remote-debugging-port=" + port, "--remote-allow-origins=*", "--no-first-run", "--disable-search-engine-choice-screen", "--disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades", "--user-data-dir=" + chromeDataDir.toAbsolutePath().toString(), "about:blank"});
 				} catch (IOException e) {
 					throw new RuntimeException(e);
 				}
