@@ -24,6 +24,7 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.contexts.SeleniumRobotServerContext;
 import com.seleniumtests.it.stubclasses.StubTestClass;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -32,8 +33,10 @@ import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.List;
 
 public class TestSeleniumTestsReporter2 extends ReporterTest {
 
@@ -1776,6 +1779,14 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			String detailedReportContent1 = readTestMethodResultFile("testDriver");
 
 			Assert.assertTrue(detailedReportContent1.contains(String.format("Video capture: <a href='%s'>file</a>", videoFileName)));
+
+			// check video has chapters (expect ffmpeg is installed)
+			File videoFile = Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "videoCapture.mp4").toFile();
+			Assert.assertTrue(videoFile.exists());
+			String ffmpegOut = new FFMpeg().runFFmpegCommand(List.of("-i", videoFile.getAbsolutePath()));
+			Assert.assertTrue(ffmpegOut.contains("Chapter #0:0:"));
+			Assert.assertTrue(ffmpegOut.contains("Chapter #0:9:"));
+			Assert.assertTrue(ffmpegOut.contains("title           : _sendKeysComposite"));
 
 			// check shortcut to video is present in detailed report
 			Assert.assertTrue(detailedReportContent1.matches(String.format(".*<th>Last State</th><td><a href=\"screenshots/testDriver_8-1_Test_end--\\w+.png\"><i class=\"fas fa-file-image\" aria-hidden=\"true\"></i></a><a href=\"%s\"><i class=\"fas fa-video\" aria-hidden=\"true\"></i></a></td>.*", videoFileName)));

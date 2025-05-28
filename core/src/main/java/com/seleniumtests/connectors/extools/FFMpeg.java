@@ -4,7 +4,6 @@ package com.seleniumtests.connectors.extools;
  * Interface to FFMpeg
  */
 import com.seleniumtests.customexception.ConfigurationException;
-import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.SystemUtility;
@@ -19,6 +18,18 @@ import java.nio.file.Path;
 import java.util.List;
 
 public class FFMpeg {
+
+    public static class Chapter {
+        String name;
+        Long endTimestamp;
+        Long startTimestamp;
+
+        public Chapter(String name, Long startTimestamp, Long endTimestamp) {
+            this.name = name;
+            this.startTimestamp = startTimestamp;
+            this.endTimestamp = endTimestamp;
+        }
+    }
 
     private String ffmpegPath;
     private boolean openh264 = false;
@@ -76,9 +87,9 @@ public class FFMpeg {
      * Add chapters to video
      *
      * @param videoFile     The video to add chapters to
-     * @param testSteps     list of steps that help creating chapters
+     * @param chapters     list of steps that help creating chapters
      */
-    public void addChapters(File videoFile, List<TestStep> testSteps) {
+    public void addChapters(File videoFile, List<Chapter> chapters) {
 
         if (!videoFile.getName().endsWith(".mp4")) {
             logger.info("Only mp4 files can have chapters");
@@ -94,12 +105,12 @@ public class FFMpeg {
             newVideoFile.toFile().deleteOnExit();
 
             StringBuilder content = new StringBuilder();
-            for (TestStep step : testSteps) {
+            for (Chapter chapter : chapters) {
                 content.append("\n[CHAPTER]\n");
                 content.append("TIMEBASE=1/1000\n");
-                content.append(String.format("START=%d\n", step.getVideoTimeStamp()));
-                content.append(String.format("END=%d\n", step.getVideoTimeStamp() + step.getDuration()));
-                content.append(String.format("title=%s\n\n", step.getName()));
+                content.append(String.format("START=%d\n", chapter.startTimestamp));
+                content.append(String.format("END=%d\n", chapter.endTimestamp));
+                content.append(String.format("title=%s\n\n", chapter.name));
             }
 
             String out = runFFmpegCommand(List.of("-i", videoFile.getAbsolutePath(), "-f", "ffmetadata", metadataFile.toAbsolutePath().toString()));

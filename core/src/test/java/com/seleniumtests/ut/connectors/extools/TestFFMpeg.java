@@ -203,7 +203,9 @@ public class TestFFMpeg extends MockitoTest {
             step2.setVideoTimeStamp(3040);
             step2.setDuration(10040L);
 
-            new FFMpeg().addChapters(mp4VideoFile.toFile(), List.of(step1, step2));
+            new FFMpeg().addChapters(mp4VideoFile.toFile(), List.of(step1, step2).stream()
+                    .map(step -> new FFMpeg.Chapter(step.getName(), step.getVideoTimeStamp(), step.getVideoTimeStamp() + step.getDuration()))
+                    .toList());
 
             // only one execution of ffmpeg, which is the version check
             mockedOsCommand.verify(() -> OSCommand.executeCommandAndWait(any(String[].class)));

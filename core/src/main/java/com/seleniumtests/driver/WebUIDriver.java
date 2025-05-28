@@ -320,7 +320,12 @@ public class WebUIDriver {
 
 			// add chapters to video
 			if (video != null) {
-				new FFMpeg().addChapters(video, TestStepManager.getInstance().getTestSteps());
+				new FFMpeg().addChapters(video, TestStepManager
+							.getInstance()
+							.getTestSteps()
+							.stream()
+							.map(step -> new FFMpeg.Chapter(step.getName(), step.getVideoTimeStamp(), step.getVideoTimeStamp() + step.getDuration()))
+							.toList());
 			}
 		}
     	
