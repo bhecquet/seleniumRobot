@@ -541,12 +541,16 @@ public class TestPageObject2 extends MockitoTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testSwitchToNewWindow() {
-		when(eventDriver.getWindowHandles()).thenReturn(new HashSet<>(Arrays.asList("123")))
-				.thenReturn(new HashSet<>(Arrays.asList("123", "456")));
+		when(eventDriver.getWindowHandles()).thenReturn(Set.of("123"))
+				.thenReturn(Set.of("123")) // need to address the multiple calls to 'getWindowHandles' done when capturing pictures
+				.thenReturn(Set.of("123"))
+				.thenReturn(Set.of("123", "456"));
 		eventDriver.getCurrentHandles();
-		when(eventDriver.getWindowHandle()).thenReturn("123").thenReturn("456");
-		page.switchToNewWindow(1);
+		when(eventDriver.getWindowHandle()).thenReturn("123").thenReturn("123").thenReturn("456"); // the first 2 "return" are present for snapshot captures
+
+		page.switchToNewWindow(1000);
 		verify(targetLocator).window("456");
+
 	}
 
 	/**

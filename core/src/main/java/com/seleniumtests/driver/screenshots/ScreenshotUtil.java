@@ -275,17 +275,6 @@ public class ScreenshotUtil {
     	Instant start = Instant.now();
     	List<NamedBufferedImage> capturedImages = captureAllImages(target, allWindows, scrollDelay);
     	
-    	// back to page top
-    	try {
-    		if (target.isPageTarget()) {
-    			driver.scrollTop();
-    		}
-    	} catch (WebDriverException e) {
-    		// ignore errors here.
-    		// com.seleniumtests.it.reporter.TestTestLogging.testManualSteps() with HTMLUnit driver
-    		// org.openqa.selenium.WebDriverException: Can't execute JavaScript before a page has been loaded!
-    	}
-    	
     	return exportBufferedImages(exportClass, start, capturedImages);
 
     }
@@ -338,18 +327,18 @@ public class ScreenshotUtil {
     		capturedImages.add(new NamedBufferedImage(captureDesktop(true), ""));
     			
     	// capture web with scrolling
-    	} else if (target.isPageTarget() && driver.isWebTest()) {
+    	} else if (target.isPageTarget() && driver != null && driver.isWebTest()) {
     		removeAlert();
     		capturedImages.addAll(captureWebPages(allWindows, scrollDelay));
     		
     	// capture web without scrolling on the main window
-    	} else if (target.isViewportTarget() && driver.isWebTest()) {
+    	} else if (target.isViewportTarget() && driver != null && driver.isWebTest()) {
     		removeAlert();
     		target.setSnapshotRectangle(new Rectangle(driver.getScrollPosition(), driver.getViewPortDimensionWithoutScrollbar()));
     		capturedImages.add(new NamedBufferedImage(capturePage(0, 0), "")); // allow removing of scrollbar (a negative value would not remove it)
     		
     	// capture web with scrolling on the main window
-    	} else if (target.isElementTarget() && driver.isWebTest()) {
+    	} else if (target.isElementTarget() && driver != null && driver.isWebTest()) {
     		removeAlert();
     		try {
 				double aspectRatio = driver.getDeviceAspectRatio();
@@ -704,6 +693,11 @@ public class ScreenshotUtil {
 
     		loops += 1;
     	}
+
+		// back to top
+		try {
+			driver.scrollTop();
+		} catch (JavascriptException e) {}
 
     	return currentImage;
     	

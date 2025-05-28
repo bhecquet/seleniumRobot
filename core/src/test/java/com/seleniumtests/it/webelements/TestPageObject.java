@@ -17,9 +17,13 @@
  */
 package com.seleniumtests.it.webelements;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
@@ -84,7 +88,7 @@ public class TestPageObject extends GenericTest {
 		DriverSubTestPage subPage2 = testPage._goToNewPage();
 		subPage2.close();
 		
-		// check we are on the seconde page (an instance of the DriverSubTestPage)
+		// check we are on the second page (an instance of the DriverSubTestPage)
 		// next line will produce error if we are not on the page
 		new DriverSubTestPage();
 	}
@@ -120,16 +124,22 @@ public class TestPageObject extends GenericTest {
 	 */
 	@Test(groups= {"it", "pageobject"})
 	public void testPageObjectForExternalDriver() throws Exception {
-		
+
+		Path chromeDataDir = null;
+		Process chromeProcess = null;
+
 		try {
 			SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 			
 			Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
 			String path = browsers.get(BrowserType.CHROME).get(0).getPath();
 			int port = GenericDriverTest.findFreePort();
+
+			chromeDataDir = Files.createTempDirectory("chrome");
+			chromeDataDir.toFile().deleteOnExit();
 			
 			// create chrome browser with the right option
-			OSCommand.executeCommand(new String[] {path, "--remote-allow-origins=*",  "--remote-debugging-port=" + port, "about:blank"});
+			chromeProcess = OSCommand.executeCommand(new String[] {path, "--remote-allow-origins=*",  "--remote-debugging-port=" + port, "--no-first-run", "--disable-search-engine-choice-screen", "--disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades", "--user-data-dir=" + chromeDataDir.toAbsolutePath().toString(), "about:blank"});
 			
 			DriverTestPage secondPage = new DriverTestPage(BrowserType.CHROME, port);
 			Assert.assertNotNull(secondPage.getCurrentHandles());
@@ -137,6 +147,17 @@ public class TestPageObject extends GenericTest {
 			
 			// switch back to main driver to avoid annoying other tests
 			testPage.switchToDriver("main");
+
+			if (chromeProcess != null && chromeProcess.isAlive()) {
+				chromeProcess.destroy();
+			}
+			if (chromeDataDir != null) {
+				try {
+					FileUtils.deleteDirectory(chromeDataDir.toFile());
+				} catch (IOException e) {
+					// nothing to do
+				}
+			}
 		}
 		
 	}

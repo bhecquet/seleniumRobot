@@ -17,7 +17,10 @@
  */
 package com.seleniumtests.it.driver;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -434,14 +437,36 @@ public class TestWebUiDriver extends ReporterTest {
 		int port = GenericDriverTest.findFreePort();
 		
 		// create chrome browser with the right option
-		new BrowserLauncher(BrowserType.CHROME, port, path, 0, null).run();
-			
-		// creates the driver
-		WebDriver driver1 = WebUIDriver.getWebDriver(true, BrowserType.CHROME, "main", port);
-		driver1.get("chrome://settings/");
-		Assert.assertTrue(new TextFieldElement("search", By.id("search")).isElementPresent(3));
+		Path chromeDataDir = null;
+		Process chromeProcess = null;
+		try {
+			BrowserLauncher browserLauncher = new BrowserLauncher(BrowserType.CHROME, port, path, 0, null);
+			browserLauncher.run();
+			chromeDataDir = browserLauncher.getChromeDataDir();
+			chromeProcess = browserLauncher.getChromeProcess();
+
+			// creates the driver
+			WebDriver driver1 = WebUIDriver.getWebDriver(true, BrowserType.CHROME, "main", port);
+			driver1.get("chrome://settings/");
+			Assert.assertTrue(new TextFieldElement("search", By.id("search")).isElementPresent(3));
+		} finally {
+			cleanChrome(chromeProcess, chromeDataDir);
+		}
 	}
-	
+
+	private static void cleanChrome(Process chromeProcess, Path chromeDataDir) {
+		if (chromeProcess != null && chromeProcess.isAlive()) {
+			chromeProcess.destroy();
+		}
+		if (chromeDataDir != null) {
+			try {
+				FileUtils.deleteDirectory(chromeDataDir.toFile());
+			} catch (IOException e) {
+				// nothing to do
+			}
+		}
+	}
+
 	/**
 	 * Be sure that we can still attach driver even if it takes a long time to start
 	 * For chrome, max wait time is 1 minute
@@ -456,14 +481,23 @@ public class TestWebUiDriver extends ReporterTest {
 		int port = GenericDriverTest.findFreePort();
 		
 		logger.info("will start browser in 15 secs");
-		new BrowserLauncher(BrowserType.CHROME, port, path, 30, null).run();
+		Path chromeDataDir = null;
+		Process chromeProcess = null;
+		try {
+			BrowserLauncher browserLauncher = new BrowserLauncher(BrowserType.CHROME, port, path, 30, null);
+			browserLauncher.run();
+			chromeDataDir = browserLauncher.getChromeDataDir();
+			chromeProcess = browserLauncher.getChromeProcess();
 
-		logger.info("Waiting for driver");
-		
-		// creates the driver
-		WebDriver driver1 = WebUIDriver.getWebDriver(true, BrowserType.CHROME, "main", port);
-		driver1.get("chrome://settings/");
-		Assert.assertTrue(new TextFieldElement("search", By.id("search")).isElementPresent(3));
+			logger.info("Waiting for driver");
+
+			// creates the driver
+			WebDriver driver1 = WebUIDriver.getWebDriver(true, BrowserType.CHROME, "main", port);
+			driver1.get("chrome://settings/");
+			Assert.assertTrue(new TextFieldElement("search", By.id("search")).isElementPresent(3));
+		} finally {
+			cleanChrome(chromeProcess, chromeDataDir);
+		}
 	}
 	
 	/**
@@ -557,14 +591,23 @@ public class TestWebUiDriver extends ReporterTest {
 		Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
 		String path = browsers.get(BrowserType.EDGE).get(0).getPath();
 		int port = GenericDriverTest.findFreePort();
-		
-		// create chrome browser with the right option
-		new BrowserLauncher(BrowserType.EDGE, port, path, 0, null).run();
-			
-		// creates the driver
-		WebDriver driver1 = WebUIDriver.getWebDriver(true, BrowserType.EDGE, "main", port);
-		driver1.get("edge://settings/");
-		Assert.assertTrue(new TextFieldElement("search", By.id("search_input")).isElementPresent(3));
+
+		Path chromeDataDir = null;
+		Process chromeProcess = null;
+		try {
+			// create chrome browser with the right option
+			BrowserLauncher browserLauncher = new BrowserLauncher(BrowserType.EDGE, port, path, 0, null);
+			browserLauncher.run();
+			chromeDataDir = browserLauncher.getChromeDataDir();
+			chromeProcess = browserLauncher.getChromeProcess();
+
+			// creates the driver
+			WebDriver driver1 = WebUIDriver.getWebDriver(true, BrowserType.EDGE, "main", port);
+			driver1.get("edge://settings/");
+			Assert.assertTrue(new TextFieldElement("search", By.id("search_input")).isElementPresent(3));
+		} finally {
+			cleanChrome(chromeProcess, chromeDataDir);
+		}
 	}
 	
 	@Test(groups={"it"})
@@ -605,6 +648,8 @@ public class TestWebUiDriver extends ReporterTest {
 		private int delay;
 		private BrowserType browserType;
 		private String startupUrl;
+		private Path chromeDataDir;
+		private Process chromeProcess;
 		
 		public BrowserLauncher(BrowserType browserType, int port, String path, int delay, String startupUrl) {
 			this.port = port;
@@ -613,20 +658,35 @@ public class TestWebUiDriver extends ReporterTest {
 			this.browserType = browserType;
 			this.startupUrl = startupUrl;
 		}
-		
+
+		public Path getChromeDataDir() {
+			return chromeDataDir;
+		}
+
+		public Process getChromeProcess() {
+			return chromeProcess;
+		}
+
 		public void run() {
-			
+
 			WaitHelper.waitForSeconds(delay);
 
 			if (BrowserType.CHROME == browserType || BrowserType.EDGE == browserType) {
-				// create chrome browser with the right option
-				OSCommand.executeCommand(new String[] {path, "--remote-debugging-port=" + port, "--remote-allow-origins=*", "about:blank"});
+				try {
+					chromeDataDir = Files.createTempDirectory("chrome");
+					chromeDataDir.toFile().deleteOnExit();
+
+					// create chrome browser with the right option
+					chromeProcess = OSCommand.executeCommand(new String[] {path, "--remote-debugging-port=" + port, "--remote-allow-origins=*", "--no-first-run", "--disable-search-engine-choice-screen", "--disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades", "--user-data-dir=" + chromeDataDir.toAbsolutePath().toString(), "about:blank"});
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
 			} else if (BrowserType.INTERNET_EXPLORER == browserType) {
 				WebDriver driver = WebUIDriver.getWebDriver(true, BrowserType.INTERNET_EXPLORER, "main", null);
 				if (startupUrl != null) {
 					driver.get(startupUrl);
 				}
 			}
-		 }
+		}
 	}
 }

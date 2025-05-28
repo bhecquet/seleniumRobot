@@ -34,6 +34,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import com.seleniumtests.browserfactory.chrome.ChromeUtils;
+import com.seleniumtests.connectors.extools.FFMpeg;
 import com.seleniumtests.customexception.RetryableDriverException;
 import com.seleniumtests.util.har.*;
 import com.seleniumtests.util.logging.DebugMode;
@@ -300,10 +301,12 @@ public class WebUIDriver {
      * Stop video capture
      */
     public static File stopVideoCapture() {
+		File video = null;
+
     	if (videoRecorder.get() != null) {
-			
+
 			try {
-				return CustomEventFiringWebDriver.stopVideoCapture(SeleniumTestsContextManager.getThreadContext().getRunMode(), 
+				video = CustomEventFiringWebDriver.stopVideoCapture(SeleniumTestsContextManager.getThreadContext().getRunMode(),
 																		SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(),
 																		WebUIDriver.getVideoRecorder().get());
 
@@ -314,9 +317,19 @@ public class WebUIDriver {
 			} finally {
 				videoRecorder.remove();
 			}
+
+			// add chapters to video
+			if (video != null) {
+				new FFMpeg().addChapters(video, TestStepManager
+							.getInstance()
+							.getTestSteps()
+							.stream()
+							.map(step -> new FFMpeg.Chapter(step.getName(), step.getVideoTimeStamp(), step.getVideoTimeStamp() + step.getDuration()))
+							.toList());
+			}
 		}
     	
-    	return null;
+    	return video;
     }
     
     /**

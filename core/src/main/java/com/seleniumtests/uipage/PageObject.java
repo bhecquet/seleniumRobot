@@ -149,7 +149,7 @@ public class PageObject extends BasePage implements IPage {
     			WebUIDriver.getCurrentWebUiDriverName(), 
     			null,
     			pageLoadStrategy,
-    			true);
+    			false);
     }
     
     /**
@@ -190,7 +190,7 @@ public class PageObject extends BasePage implements IPage {
      * @throws  Exception
      */
     public PageObject(HtmlElement pageIdentifierElement, String url, BrowserType browserType, String driverName, Integer attachExistingDriverPort) {
-    	this(pageIdentifierElement, url, browserType, driverName, attachExistingDriverPort, null, true);
+    	this(pageIdentifierElement, url, browserType, driverName, attachExistingDriverPort, null, false);
     }
     
     /**
@@ -380,6 +380,11 @@ public class PageObject extends BasePage implements IPage {
         } else if (SeleniumTestsContextManager.isAppTest() && captureSnapshot) {
         	capturePageSnapshot();
         
+        }
+
+        // store the window / tab on which this page is loaded
+        if (driver != null) {
+            windowHandle = driver.getWindowHandle();
         }
     }
 
@@ -695,9 +700,6 @@ public class PageObject extends BasePage implements IPage {
 	    	
 	    	logger.logScreenshot(screenShot, snapshotName, checkSnapshot);
     	}
-    	
-    	// store the window / tab on which this page is loaded
-    	windowHandle = driver.getWindowHandle();
     }
     
     /**
@@ -1097,7 +1099,7 @@ public class PageObject extends BasePage implements IPage {
  		boolean found = false;
  		
  		while (end.isAfter(systemClock.instant()) && !found) {
- 			
+
  			handles = driver.getWindowHandles();
  			internalLogger.debug("All handles: " + handles.toString());
 

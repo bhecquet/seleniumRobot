@@ -3,12 +3,8 @@ package com.seleniumtests.driver.screenshots;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.seleniumtests.connectors.selenium.fielddetector.Field;
-import com.seleniumtests.driver.CustomEventFiringWebDriver;
-import com.seleniumtests.driver.WebUIDriver;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.Rectangle;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 

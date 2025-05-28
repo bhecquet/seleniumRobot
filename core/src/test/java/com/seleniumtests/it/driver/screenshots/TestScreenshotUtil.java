@@ -296,7 +296,7 @@ public class TestScreenshotUtil extends ReporterTest {
 				List<TestStep> steps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
 				for (TestStep step: steps) {
 					if ("_captureSnapshot with args: (my snapshot, )".equals(step.getName())) {
-						Assert.assertEquals(step.getSnapshots().size(), 1);
+						Assert.assertEquals(step.getSnapshots().size(), 2); // 1 reference image + image captured during step
 						Assert.assertNotNull(step.getSnapshots().get(0).getScreenshot().getImage());
 						
 						BufferedImage image = ImageIO.read(step.getSnapshots().get(0).getScreenshot().getImage().getFile());
@@ -356,22 +356,15 @@ public class TestScreenshotUtil extends ReporterTest {
 			
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverCustomSnapshot"});
 			
-			int checkNumbers = 0;
+
 			for (ISuiteResult suiteResult: SeleniumRobotTestListener.getSuiteList().get(0).getResults().values()) {
 				for (ITestResult testResult: suiteResult.getTestContext().getPassedTests().getAllResults()) {
 					List<TestStep> steps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
 					for (TestStep step: steps) {
-						
-						// check that standard screenshots are not affected by scrollDelay setting
-						if (step.getName().startsWith("openPage with args: ")) {
-							Assert.assertTrue(step.getSnapshots().get(0).getDurationToExclude() < 3000);
-							checkNumbers++;
-						}
-						
+
 						// check that screenshots used for image comparison are affected by scrollDelay setting
-						else if ("_captureSnapshot with args: (my snapshot, )".equals(step.getName())) {
+						if ("_captureSnapshot with args: (my snapshot, )".equals(step.getName())) {
 							Assert.assertTrue(step.getSnapshots().get(0).getDurationToExclude() > 4000);
-							Assert.assertEquals(checkNumbers, 1);
 							return;
 						}	
 					}

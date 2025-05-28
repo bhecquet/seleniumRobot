@@ -1,4 +1,4 @@
-package com.seleniumtests.it.connector.exttools;
+package com.seleniumtests.it.connector.extools;
 
 import java.util.HashMap;
 import java.util.List;

@@ -198,19 +198,21 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			ZipUtil.iterate(resultZip, new ZipEntryCallback() {
 		      public void process(InputStream in, ZipEntry zipEntry) throws IOException {
 		        String entryName = zipEntry.getName();
-		        entries.add(entryName.split("\\(file")[0]);
+		        entries.add(entryName.split("-\\w{5,6}\\.")[0]);
 		        
 		      }
 		    });
 			
 			// check the content of the zip file
 			Assert.assertTrue(entries.contains("testDriverShortKo/TestReport.html"));
-			Assert.assertTrue(entries.contains("testDriverShortKo/videoCapture.avi"));
+			Assert.assertTrue(entries.contains("testDriverShortKo/videoCapture.avi") || entries.contains("testDriverShortKo/videoCapture.mp4"));
 			Assert.assertTrue(entries.contains("testDriverShortKo/resources/app.min.js"));
 			Assert.assertTrue(entries.contains("testDriverShortKo/resources/seleniumRobot_solo.css"));
-			Assert.assertTrue(entries.contains("testDriverShortKo/screenshots/testDriverShortKo_3-1_openPage_with_args._"));
-			Assert.assertTrue(entries.contains("testDriverShortKo/htmls/testDriverShortKo_3-1_openPage_with_args._"));
-			
+			Assert.assertTrue(entries.contains("testDriverShortKo/screenshots/Step_start_state_4"));
+			Assert.assertTrue(entries.contains("testDriverShortKo/screenshots/Step_start_state_3"));
+			Assert.assertTrue(entries.contains("testDriverShortKo/htmls/Step_start_state_4"));
+			Assert.assertTrue(entries.contains("testDriverShortKo/htmls/Step_start_state_3"));
+
 		} finally {
 			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
 			System.clearProperty(SeleniumTestsContext.KEEP_ALL_RESULTS);
@@ -938,7 +940,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			
 			// check image dimensions are high enough to know if all the page has been captured
 			File[] images = Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverWithFailureAfterSwitchToFrame", "screenshots").toFile().listFiles();
-			Assert.assertEquals(images.length, 2);
+			Assert.assertEquals(images.length, 3); // 1 image for 'openPage', 1 image for '_goToFrame', 1 for 'Test end'
 
 			BufferedImage image = ImageIO.read(images[1]);
 			Assert.assertTrue(image.getHeight() > 2500);
