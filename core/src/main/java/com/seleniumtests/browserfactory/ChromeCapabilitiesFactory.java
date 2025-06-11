@@ -161,7 +161,10 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 
 		if (webDriverConfig.getChromeOptions() != null) {
 			for (String option: webDriverConfig.getChromeOptions().split(" ")) {
-				if (option.startsWith("++")) {
+				if ("++enable-automation".equals(option.trim())) {
+					// remove option "--enable-automation" as, from chrome 132, it blocks tests that attach a new chrome tab to the current chrome process (https://issues.chromium.org/issues/371112535)
+					options.setExperimentalOption("excludeSwitches", List.of("enable-automation"));
+				} else	if (option.startsWith("++")) {
 					chromeOptions.remove(option.replace("++", "--"));
 				} else {
 					chromeOptions.add(option);
@@ -195,7 +198,6 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 
 		options.addArguments(chromeOptions);
 
-        
         if (webDriverConfig.getMode() == DriverMode.LOCAL) {
         	setLogging();
         }
@@ -212,7 +214,6 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 		logPrefs.enable(LogType.PERFORMANCE, Level.ALL);
 		options.setCapability("goog:loggingPrefs", logPrefs);
 
-        
         // extensions
         List<BrowserExtension> extensions = BrowserExtension.getExtensions(webDriverConfig.getTestContext().getConfiguration());
         if (!extensions.isEmpty()) {

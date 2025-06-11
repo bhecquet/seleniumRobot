@@ -81,7 +81,10 @@ public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
 
 		if (webDriverConfig.getEdgeOptions() != null) {
 			for (String option: webDriverConfig.getEdgeOptions().split(" ")) {
-				if (option.startsWith("++")) {
+				if ("++enable-automation".equals(option.trim())) {
+					// remove option "--enable-automation" as, from edge 132, it blocks tests that attach a new chrome tab to the current chrome process (https://issues.chromium.org/issues/371112535)
+					options.setExperimentalOption("excludeSwitches", List.of("enable-automation"));
+				} else if (option.trim().startsWith("++")) {
 					edgeOptions.remove(option.replace("++", "--"));
 				} else {
 					edgeOptions.add(option);
