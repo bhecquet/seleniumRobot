@@ -73,13 +73,6 @@ public class VideoRecorder {
 	 */
 	public VideoRecorder(File folderPath, String fileName, boolean localRecording) {
 		this(folderPath, fileName, localRecording, true);
-
-		try {
-			ffmpeg = new FFMpeg();
-		} catch (Exception e) {
-			logger.warn(e.getMessage());
-		}
-		
 	}
 	
 	/**
@@ -95,6 +88,13 @@ public class VideoRecorder {
 		
 		//Create a instance of ScreenRecorder with the required configurations
 		if (localRecording) {
+
+			try {
+				ffmpeg = new FFMpeg();
+			} catch (Exception e) {
+				logger.warn(e.getMessage());
+			}
+
 			//Create a instance of GraphicsConfiguration to get the Graphics configuration
 			//of the Screen. This is needed for ScreenRecorder class.
 			GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
