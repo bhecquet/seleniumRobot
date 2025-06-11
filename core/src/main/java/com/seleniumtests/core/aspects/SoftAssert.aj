@@ -65,6 +65,7 @@ public class SoftAssert {
 			if (currentTestStep != null) {
 				// assertion should be clearly seen in report
 				currentTestStep.setFailed(true);
+				currentTestStep.setActionException(e);
 			}
 		}
 	}

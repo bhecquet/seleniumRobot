@@ -180,7 +180,8 @@ public class TestPerformanceReporter extends ReporterTest {
 
 		// issue #418: now it's Test end which is the failed step because in this case execption is raised directly in test scenario
 		Assert.assertTrue(jmeterReport.contains("retries=\"2\"")); 
-		Assert.assertTrue(jmeterReport.contains("failures=\"1\"")); // be sure an error is reported 
+		Assert.assertTrue(jmeterReport.contains("errors=\"1\"")); // be sure an error is reported
+		Assert.assertTrue(jmeterReport.contains("failures=\"0\""));
 		Assert.assertTrue(jmeterReport.contains("failedStep=\"\"")); // failed step is not logged as there are no step logged
 	}
 	
@@ -225,7 +226,7 @@ public class TestPerformanceReporter extends ReporterTest {
 
 		// check the step marked as failed is the last failed step (not 'Test end')
 		Assert.assertTrue(jmeterReport.contains("failedStep=\"failAction\""));
-		Assert.assertTrue(jmeterReport.contains("failures=\"1\"")); // only one error
+		Assert.assertTrue(jmeterReport.contains("errors=\"1\"")); // only one error
 	}	
 
 	/**
@@ -340,7 +341,7 @@ public class TestPerformanceReporter extends ReporterTest {
 		String detailedReportContent = readTestMethodPerfFile("testSkippedStep");
 		
 		Assert.assertTrue(detailedReportContent.matches(".*<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClassForTestSteps\" name=\"Step 4: skipStep\" time=\"\\d+\\.\\d+\"><skipped/>.*"));
-		Assert.assertTrue(detailedReportContent.contains("failures=\"-1\""));
+		Assert.assertTrue(detailedReportContent.contains("errors=\"-1\""));
 	}
 	
 
@@ -422,7 +423,7 @@ public class TestPerformanceReporter extends ReporterTest {
 			// test both files are available
 			String detailedReportContent1 = readTestMethodPerfFile("snapshots-testAndSubActions");
 			Assert.assertTrue(detailedReportContent1.contains("<system-out><![CDATA[Test skipped]]></system-out>"));
-			Assert.assertTrue(detailedReportContent1.contains("failures=\"-1\"")); // -1 means 'skipped' with our reporter
+			Assert.assertTrue(detailedReportContent1.contains("errors=\"-1\"")); // -1 means 'skipped' with our reporter
 			
 			// this file is not re-generated with "snapshot comparison" step, but this not a problem. Important fact is that both files are present
 			String detailedReportContent2 = readTestMethodPerfFile("testAndSubActions");
@@ -435,5 +436,35 @@ public class TestPerformanceReporter extends ReporterTest {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
 		}
+	}
+
+	@Test(groups={"it"})
+	public void testReportErrors(ITestContext testContext) throws Exception {
+
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testFailedWithException"});
+
+		// check content of summary report file
+		String jmeterReport = readTestMethodPerfFile("testFailedWithException");
+
+		// issue #418: now it's Test end which is the failed step because in this case execption is raised directly in test scenario
+		Assert.assertTrue(jmeterReport.contains("retries=\"2\""));
+		Assert.assertTrue(jmeterReport.contains("failures=\"0\"")); // no failure as it's not assertion exception
+		Assert.assertTrue(jmeterReport.contains("errors=\"1\"")); // be sure an error is reported
+		Assert.assertTrue(jmeterReport.contains("failedStep=\"failAction\""));
+	}
+
+	@Test(groups={"it"})
+	public void testReportFailures(ITestContext testContext) throws Exception {
+
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testMultipleFailedWithSoftAssertEnabled"});
+
+		// check content of summary report file
+		String jmeterReport = readTestMethodPerfFile("testMultipleFailedWithSoftAssertEnabled");
+
+		// issue #418: now it's Test end which is the failed step because in this case execption is raised directly in test scenario
+		Assert.assertTrue(jmeterReport.contains("retries=\"0\""));
+		Assert.assertTrue(jmeterReport.contains("failures=\"2\"")); // 2 steps failed
+		Assert.assertTrue(jmeterReport.contains("errors=\"0\"")); // no error, only failure
+		Assert.assertTrue(jmeterReport.contains("failedStep=\"assertAction2\""));
 	}
 }

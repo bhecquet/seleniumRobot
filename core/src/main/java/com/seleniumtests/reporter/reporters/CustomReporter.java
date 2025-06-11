@@ -115,6 +115,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			String reportFormat = reportInfo.getExtension().substring(1);
 			Long testDuration = 0L;
 			Integer errors = 0;
+			Integer failures = 0;
 			String failedStep = "";
 			List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
 			List<TestStep> newTestSteps = new ArrayList<>();
@@ -123,7 +124,11 @@ public class CustomReporter extends CommonReporter implements IReporter {
 					testDuration += step.getDuration();
 					if (Boolean.TRUE.equals(step.getFailed()) && !step.isTestEndStep()) {
 						failedStep = step.getName();
-						errors++;
+						if (step.getActionException() != null && step.getActionException() instanceof AssertionError) {
+							failures++;
+						} else {
+							errors++;
+						}
 					}
 					
 					// encode each step
@@ -151,7 +156,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			}
 			
 			// #573: if test is KO, be sure errors is > 0
-			else if (testResult.getStatus() == ITestResult.FAILURE && errors < 1) {
+			else if (testResult.getStatus() == ITestResult.FAILURE && errors + failures < 1) {
 				errors = 1;
 			}
 			
@@ -172,9 +177,9 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			} else {
 				context.put("gridnode", seleniumTestsContext.getRunMode());
 			}
-			context.put("errors", 0);
+			context.put("errors", errors);
 			context.put("newline", "\n");
-			context.put("failures", errors);
+			context.put("failures", failures);
 			context.put("hostname", testResult.getHost() == null ? "": testResult.getHost());
 			context.put("suiteName", StringUtility.encodeString(TestNGResultUtils.getVisualTestName(testResult), reportFormat.toLowerCase()));
 			context.put("className", testResult.getTestClass().getName());
