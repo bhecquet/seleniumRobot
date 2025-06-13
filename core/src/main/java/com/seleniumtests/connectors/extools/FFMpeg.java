@@ -49,6 +49,7 @@ public class FFMpeg {
 
         String out = OSCommand.executeCommandAndWait(new String[]{ffmpegPath, "-version"});
         if (!out.contains("libavutil")) {
+            logger.error(out);
             throw new ConfigurationException("FFmpeg is not installed at : " + ffmpegPath);
         }
         if (out.contains(" --enable-libopenh264")) {
