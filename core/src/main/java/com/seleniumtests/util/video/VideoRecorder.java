@@ -195,14 +195,18 @@ public class VideoRecorder {
 
 				// encode file
 				if (ffmpeg != null) {
-					File mp4VideoFile = Paths.get(videoFile.getParent(), FilenameUtils.getBaseName(videoFile.getName()) + ".mp4").toFile();
-					String out = ffmpeg.runFFmpegCommand(List.of("-i", videoFile.getAbsolutePath(), "-c:v", "libopenh264", "-preset", "veryfast", "-tune", "animation", mp4VideoFile.getAbsolutePath()));
-					if (mp4VideoFile.exists() && mp4VideoFile.length() > 0) {
-						videoFile.delete();
-						videoFile = mp4VideoFile;
+					try {
+						File mp4VideoFile = Paths.get(videoFile.getParent(), FilenameUtils.getBaseName(videoFile.getName()) + ".mp4").toFile();
+						String out = ffmpeg.runFFmpegCommand(List.of("-i", videoFile.getAbsolutePath(), "-c:v", "libopenh264", "-preset", "veryfast", "-tune", "animation", mp4VideoFile.getAbsolutePath()));
+						if (mp4VideoFile.exists() && mp4VideoFile.length() > 0) {
+							videoFile.delete();
+							videoFile = mp4VideoFile;
 
-					} else {
-						logger.warn("Transcoding not done. FFmpeg says: " + out);
+						} else {
+							logger.warn("Transcoding not done. FFmpeg says: " + out);
+						}
+					} catch (Exception e) {
+						logger.warn("Transcoding failed: " + e.getMessage());
 					}
 				}
 				
