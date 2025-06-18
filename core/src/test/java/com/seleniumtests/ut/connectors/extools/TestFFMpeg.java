@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.extools.FFMpeg;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.SystemUtility;
@@ -94,6 +95,15 @@ public class TestFFMpeg extends MockitoTest {
     public void testFFMpegNotPresent() {
         try (MockedStatic mockedOsCommand = Mockito.mockStatic(OSCommand.class)) {
             mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(new String[] {"ffmpeg", "-version"})).thenReturn("");
+
+            new FFMpeg();
+        }
+    }
+
+    @Test(groups="ut", expectedExceptions = ConfigurationException.class)
+    public void testFFMpegNotPresent2() {
+        try (MockedStatic mockedOsCommand = Mockito.mockStatic(OSCommand.class)) {
+            mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(new String[] {"ffmpeg", "-version"})).thenThrow(new CustomSeleniumTestsException(""));
 
             new FFMpeg();
         }

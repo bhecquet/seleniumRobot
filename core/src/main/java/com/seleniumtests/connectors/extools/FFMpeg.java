@@ -4,6 +4,7 @@ package com.seleniumtests.connectors.extools;
  * Interface to FFMpeg
  */
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.SystemUtility;
@@ -47,10 +48,17 @@ public class FFMpeg {
         String envPath = SystemUtility.getenv("FFMPEG_PATH");
         this.ffmpegPath = (envPath != null && !envPath.isEmpty()) ? envPath : "ffmpeg";
 
-        String out = OSCommand.executeCommandAndWait(new String[]{ffmpegPath, "-version"});
-        if (!out.contains("libavutil")) {
-            logger.error(out);
-            throw new ConfigurationException("FFmpeg is not installed at : " + ffmpegPath);
+        String out = "";
+        try {
+            out = OSCommand.executeCommandAndWait(new String[]{ffmpegPath, "-version"});
+
+            if (!out.contains("libavutil")) {
+                System.out.println("FFMPEG out: " + out);
+                logger.error(out);
+                throw new ConfigurationException("FFmpeg is not installed at : " + ffmpegPath);
+            }
+        } catch (CustomSeleniumTestsException e) {
+            throw new ConfigurationException("FFMPEG is not installed at : " + ffmpegPath);
         }
         if (out.contains(" --enable-libopenh264")) {
             this.openh264 = true;
