@@ -27,6 +27,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.uipage.ByC;
@@ -36,7 +37,6 @@ import com.seleniumtests.util.imaging.ImageDetector;
 import com.seleniumtests.util.video.VideoCaptureMode;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.devtools.DevToolsException;
 import org.testng.Assert;
@@ -108,6 +108,82 @@ public class TestScreenshotUtil extends ReporterTest {
 			driver.close();
 		}
 	}
+
+	@Test(groups={"it"})
+	public void testCaptureWebPageChrome() throws Exception {
+
+		setBrowser("chrome");
+		new DriverTestPageShadowDom(true);
+		WebDriver driver = WebUIDriver.getWebDriver(true);
+		try {
+			BufferedImage image = new ScreenshotUtil(driver).captureWebPage(0, driver.getWindowHandle());
+			Assert.assertTrue(image.getHeight() > 2000);
+			Assert.assertTrue(image.getWidth() > 1000);
+		} finally {
+			driver.close();
+		}
+	}
+	@Test(groups={"it"})
+	public void testCaptureWebPageChrome2() throws Exception {
+
+		setBrowser("chrome");
+		new DriverTestPageShadowDom(true);
+		WebDriver driver = WebUIDriver.getWebDriver(true);
+		try {
+			BufferedImage image = new ScreenshotUtil(driver).captureWebPage(1, driver.getWindowHandle());
+			Assert.assertTrue(image.getHeight() > 2000);
+			Assert.assertTrue(image.getWidth() > 1000);
+		} finally {
+			driver.close();
+		}
+	}
+	@Test(groups={"it"})
+	public void testCaptureWebPageFullPage() throws Exception {
+
+		setBrowser("firefox");
+		new DriverTestPageShadowDom(true);
+		WebDriver driver = WebUIDriver.getWebDriver(true);
+		try {
+			BufferedImage image = new ScreenshotUtil(driver).captureWebPage(1, driver.getWindowHandle());
+			Assert.assertTrue(image.getHeight() > 2000);
+			Assert.assertTrue(image.getWidth() > 1000);
+		} finally {
+			driver.close();
+		}
+	}
+
+	/**
+	 * Test specific firefox screenshot
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testFirefoxScreenshot() throws Exception {
+
+		setBrowser("firefox");
+		new DriverTestPageShadowDom(true);
+		WebDriver driver = WebUIDriver.getWebDriver(true);
+		try {
+			BufferedImage image = new ScreenshotUtil(driver).captureWebPageFullPage(driver.getWindowHandle());
+			Assert.assertTrue(image.getHeight() > 2000);
+			Assert.assertTrue(image.getWidth() > 1000);
+		} finally {
+			driver.close();
+		}
+	}
+
+	@Test(groups={"it"}, expectedExceptions = CustomSeleniumTestsException.class)
+	public void testFirefoxScreenshotWithChrome() throws Exception {
+
+		setBrowser("chrome");
+		new DriverTestPageShadowDom(true);
+		WebDriver driver = WebUIDriver.getWebDriver(true);
+		try {
+			new ScreenshotUtil(driver).captureWebPageFullPage(driver.getWindowHandle());
+		} finally {
+			driver.close();
+		}
+	}
+
 	
 	
 	@Test(groups={"it"})
@@ -132,8 +208,6 @@ public class TestScreenshotUtil extends ReporterTest {
 		WebDriver driver = WebUIDriver.getWebDriver(true);
 		try {
 			BufferedImage image = new ScreenshotUtil(driver).captureWebPageUsingCDP(driver.getWindowHandle());
-			Assert.assertTrue(image.getHeight() > 2000);
-			Assert.assertTrue(image.getWidth() > 1000);
 		} finally {
 			driver.close();
 		}

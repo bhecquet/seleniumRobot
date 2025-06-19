@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.WebSessionEndedException;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.Alert;
@@ -60,6 +61,9 @@ import com.seleniumtests.util.HashCodeGenerator;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.imaging.ImageProcessor;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
+import org.openqa.selenium.firefox.HasFullPageScreenshot;
+
+import javax.imageio.ImageIO;
 
 public class ScreenshotUtil {
 
@@ -519,7 +523,17 @@ public class ScreenshotUtil {
 
         return images;
     }
-    
+
+	public BufferedImage captureWebPageFullPage(String windowHandle) throws IOException {
+		if (!(driver.getOriginalDriver() instanceof HasFullPageScreenshot)) {
+			throw new CustomSeleniumTestsException("Full page capture can only be done on Firefox tests");
+		}
+
+		File screenshot = ((FirefoxDriver) driver.getOriginalDriver()).getFullPageScreenshotAs(OutputType.FILE);
+		return ImageIO.read(screenshot);
+
+	}
+
     /**
      * TODO: may be should we move this code to a specific class
      * Capture web page using the Chrome DevTools Protocol
@@ -577,6 +591,13 @@ public class ScreenshotUtil {
 //    			// ignore and use the standard method
 //    		}
 //    	}
+		try {
+			return captureWebPageFullPage(windowHandle);
+		} catch (CustomSeleniumTestsException e) {
+		} catch (Exception e) {
+			logger.warn("Error getting screenshot with Firefox, using standard method: " + e.getMessage());
+		}
+
     	if (driver.getWebDriver() instanceof HasDevTools && scrollDelay == 0) {
     		try {
     			return captureWebPageUsingCDP(windowHandle);
