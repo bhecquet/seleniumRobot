@@ -42,7 +42,7 @@ public class TestAdbWrapper extends MockitoTest {
 			MockedStatic mockedSystem = mockStatic(SystemUtility.class)) {
 			mockedSystem.when(() -> SystemUtility.getenv("ANDROID_HOME")).thenReturn(null);
 			mockedSystem.when(() -> SystemUtility.getenv("ANDROID_SDK_ROOT")).thenReturn(null);
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("adb version")).thenReturn("Cannot run program \"adb\": CreateProcess error=2, Le fichier spécifié est introuvable");
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("adb version", true)).thenReturn("Cannot run program \"adb\": CreateProcess error=2, Le fichier spécifié est introuvable");
 			new AdbWrapper();
 		}
 	}
@@ -53,8 +53,8 @@ public class TestAdbWrapper extends MockitoTest {
 			 MockedStatic mockedSystem = mockStatic(SystemUtility.class)) {
 			mockedSystem.when(() -> SystemUtility.getenv("ANDROID_HOME")).thenReturn("/opt/android-sdk/");
 			mockedSystem.when(() -> SystemUtility.getenv("ANDROID_SDK_ROOT")).thenReturn(null);
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("adb version")).thenReturn("Cannot run program \"adb\": CreateProcess error=2, Le fichier spécifié est introuvable");
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(Paths.get("/opt/android-sdk/platform-tools/adb version").toString())).thenReturn("Android Debug Bridge version 1.0.32\nRevision 09a0d98bebce-android");
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("adb version", true)).thenReturn("Cannot run program \"adb\": CreateProcess error=2, Le fichier spécifié est introuvable");
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(Paths.get("/opt/android-sdk/platform-tools/adb version").toString(), true)).thenReturn("Android Debug Bridge version 1.0.32\nRevision 09a0d98bebce-android");
 
 			AdbWrapper adb = new AdbWrapper();
 			Assert.assertEquals(adb.getAdbVersion(), "1.0.32");
@@ -70,8 +70,8 @@ public class TestAdbWrapper extends MockitoTest {
 			 MockedStatic mockedSystem = mockStatic(SystemUtility.class)) {
 			mockedSystem.when(() -> SystemUtility.getenv("ANDROID_HOME")).thenReturn(null);
 			mockedSystem.when(() -> SystemUtility.getenv("ANDROID_SDK_ROOT")).thenReturn("/opt/android-sdk/");
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("adb version")).thenReturn("Cannot run program \"adb\": CreateProcess error=2, Le fichier spécifié est introuvable");
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(Paths.get("/opt/android-sdk/platform-tools/adb version").toString())).thenReturn("Android Debug Bridge version 1.0.32\nRevision 09a0d98bebce-android");
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("adb version", true)).thenReturn("Cannot run program \"adb\": CreateProcess error=2, Le fichier spécifié est introuvable");
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(Paths.get("/opt/android-sdk/platform-tools/adb version").toString(), true)).thenReturn("Android Debug Bridge version 1.0.32\nRevision 09a0d98bebce-android");
 
 			AdbWrapper adb = new AdbWrapper();
 			Assert.assertEquals(adb.getAdbVersion(), "1.0.32");
@@ -84,7 +84,7 @@ public class TestAdbWrapper extends MockitoTest {
 			 MockedStatic mockedSystem = mockStatic(SystemUtility.class)) {
 			mockedSystem.when(() -> SystemUtility.getenv("ANDROID_HOME")).thenReturn(null);
 			mockedSystem.when(() -> SystemUtility.getenv("ANDROID_SDK_ROOT")).thenReturn(null);
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("adb version")).thenReturn("Android Debug Bridge version 1.0.32\nRevision 09a0d98bebce-android");
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("adb version", true)).thenReturn("Android Debug Bridge version 1.0.32\nRevision 09a0d98bebce-android");
 
 			AdbWrapper adb = new AdbWrapper();
 			Assert.assertEquals(adb.getAdbVersion(), "1.0.32");
@@ -97,7 +97,7 @@ public class TestAdbWrapper extends MockitoTest {
 			 MockedStatic mockedSystem = mockStatic(SystemUtility.class)) {
 			mockedSystem.when(() -> SystemUtility.getenv("ANDROID_HOME")).thenReturn(null);
 			mockedSystem.when(() -> SystemUtility.getenv("ANDROID_SDK_ROOT")).thenReturn(null);
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("adb version")).thenReturn("adb command not found");
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("adb version", true)).thenReturn("adb command not found");
 
 			new AdbWrapper();
 		}
@@ -109,12 +109,12 @@ public class TestAdbWrapper extends MockitoTest {
 			 MockedStatic mockedSystem = mockStatic(SystemUtility.class)) {
 			mockedSystem.when(() -> SystemUtility.getenv("ANDROID_HOME")).thenReturn(null);
 			mockedSystem.when(() -> SystemUtility.getenv("ANDROID_SDK_ROOT")).thenReturn(null);
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("adb version")).thenReturn("Android Debug Bridge version 1.0.32\nRevision 09a0d98bebce-android");
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("adb -s emulator-5554 shell \"dumpsys package com.android.browser | grep versionName\"")).thenReturn("  versionName=6.0-123.4");
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("adb -s emulator-5554 shell \"dumpsys package com.android.chrome | grep versionName\"")).thenReturn("  versionName=56.0.123.4");
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("adb devices")).thenReturn("List of devices attached\n"
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("adb version", true)).thenReturn("Android Debug Bridge version 1.0.32\nRevision 09a0d98bebce-android");
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("adb -s emulator-5554 shell \"dumpsys package com.android.browser | grep versionName\"", true)).thenReturn("  versionName=6.0-123.4");
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("adb -s emulator-5554 shell \"dumpsys package com.android.chrome | grep versionName\"", true)).thenReturn("  versionName=56.0.123.4");
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("adb devices", true)).thenReturn("List of devices attached\n"
 					+ "emulator-5554   device");
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("adb -s emulator-5554 shell getprop")).thenReturn("[dalvik.vm.dex2oat-Xms]: [64m]\n"
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("adb -s emulator-5554 shell getprop", true)).thenReturn("[dalvik.vm.dex2oat-Xms]: [64m]\n"
 					+ "[dalvik.vm.dex2oat-Xmx]: [512m]\n"
 					+ "[dalvik.vm.heapsize]: [512m]\n"
 					+ "[dalvik.vm.image-dex2oat-Xms]: [64m]\n"
@@ -262,7 +262,7 @@ public class TestAdbWrapper extends MockitoTest {
 					+ "[wlan.driver.status]: [unloaded]\n"
 					+ "[xmpp.auto-presence]: [true]\n");
 
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("adb -s emulator-5554 shell \"pm list packages\"")).thenReturn("package:com.example.android.livecubes\n"
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("adb -s emulator-5554 shell \"pm list packages\"", true)).thenReturn("package:com.example.android.livecubes\n"
 					+ "package:com.android.providers.telephony\n"
 					+ "package:com.android.providers.calendar\n"
 					+ "package:com.android.providers.media\n"
