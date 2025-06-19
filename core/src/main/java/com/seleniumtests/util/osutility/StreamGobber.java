@@ -3,26 +3,32 @@ package com.seleniumtests.util.osutility;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.time.Instant;
 
 import org.apache.commons.io.IOUtils;
 
 import com.seleniumtests.util.helper.WaitHelper;
 
-class StreamGobbler extends Thread {
+public class StreamGobber extends Thread {
     InputStream is;
     Charset charset;
     StringBuilder output;
     private boolean started = false;
-    
-    StreamGobbler(InputStream is, Charset charset)
+
+    public StreamGobber(InputStream is, Charset charset)
     {
         this.is = is;
         this.charset = charset;
         output = new StringBuilder();
     }
     
-    public void halt() {
-    	started = false;
+    public void halt(boolean expectOutput) {
+
+        Instant end = Instant.now().plusSeconds(3); // additional time to wait for stream to be written
+        while (expectOutput && output.isEmpty() && Instant.now().isBefore(end)) {
+            WaitHelper.waitForMilliSeconds(200);
+        }
+        started = false;
     }
     
     @Override

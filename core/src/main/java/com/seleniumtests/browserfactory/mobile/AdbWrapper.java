@@ -79,7 +79,7 @@ public class AdbWrapper {
 		
 		// check command is OK
 		try {
-			String reply = OSCommand.executeCommandAndWait(adbCommand + " version");
+			String reply = OSCommand.executeCommandAndWait(adbCommand + " version", true);
 			adbVersion = reply.split("\n")[0].trim().replace("Android Debug Bridge version", "").trim();
 		} catch (CustomSeleniumTestsException e) {
 			adbVersion = "";
@@ -103,7 +103,7 @@ public class AdbWrapper {
 			String deviceName = "";
 			String osVersion = "";
 			
-			String reply = OSCommand.executeCommandAndWait(String.format("%s -s %s shell getprop", adbCommand, deviceId)).replace("\n", "").replace("\r", "");
+			String reply = OSCommand.executeCommandAndWait(String.format("%s -s %s shell getprop", adbCommand, deviceId), true).replace("\n", "").replace("\r", "");
 			Matcher matcherName = namePattern.matcher(reply);
 			if (matcherName.matches()) {
 				deviceName = matcherName.group(1);
@@ -124,11 +124,11 @@ public class AdbWrapper {
 	
 	private List<BrowserInfo> getInstalledBrowsers(String deviceId) {
 		List<BrowserInfo> browsers = new ArrayList<>();
-		String reply = OSCommand.executeCommandAndWait(String.format("%s -s %s shell \"pm list packages\"", adbCommand, deviceId));
+		String reply = OSCommand.executeCommandAndWait(String.format("%s -s %s shell \"pm list packages\"", adbCommand, deviceId), true);
 		
 		for (String line: reply.split("\n")) {
 			if (line.contains("package:com.android.chrome")) {
-				String chromeVersion = OSCommand.executeCommandAndWait(String.format("%s -s %s shell \"dumpsys package com.android.chrome | grep versionName\"", adbCommand, deviceId));
+				String chromeVersion = OSCommand.executeCommandAndWait(String.format("%s -s %s shell \"dumpsys package com.android.chrome | grep versionName\"", adbCommand, deviceId), true);
 				Matcher versionMatcher = REG_CHROME_VERSION_NAME.matcher(chromeVersion.split("\\n")[0].trim());
 				if (versionMatcher.matches()) {
 					browsers.add(new BrowserInfo(BrowserType.CHROME, versionMatcher.group(1), null));
@@ -138,7 +138,7 @@ public class AdbWrapper {
 				}
 			}
 			if (line.contains("package:com.android.browser")) {
-				String androidVersion = OSCommand.executeCommandAndWait(String.format("%s -s %s shell \"dumpsys package com.android.browser | grep versionName\"", adbCommand, deviceId));
+				String androidVersion = OSCommand.executeCommandAndWait(String.format("%s -s %s shell \"dumpsys package com.android.browser | grep versionName\"", adbCommand, deviceId), true);
 				Matcher versionMatcher = REG_BROWSER_VERSION_NAME.matcher(androidVersion.split("\\n")[0].trim());
 				if (versionMatcher.matches()) {
 					browsers.add(new BrowserInfo(BrowserType.BROWSER, versionMatcher.group(1), null));
@@ -157,7 +157,7 @@ public class AdbWrapper {
 	 */
 	private List<String> getDeviceIds() {
 		List<String> deviceIds = new ArrayList<>();
-		String reply = OSCommand.executeCommandAndWait(adbCommand + " devices");
+		String reply = OSCommand.executeCommandAndWait(adbCommand + " devices", true);
 		
 		for (String line: reply.split("\n")) {
 			Matcher matcher = devicePattern.matcher(line.trim());

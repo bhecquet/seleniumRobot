@@ -35,7 +35,7 @@ public class TestOsCommand extends MockitoTest {
 			when(processBuilder.start()).thenReturn(process);
 		})) {
 			ProcessBuilder processBuilder = new ProcessBuilder();
-			new OSCommand(Arrays.asList("myCmd"), 5, StandardCharsets.UTF_8, processBuilder).execute();
+			new OSCommand(Arrays.asList("myCmd"), 5, StandardCharsets.UTF_8, processBuilder, true).execute();
 
 			verify(processBuilder).command(Arrays.asList("myCmd"));
 		}
@@ -50,7 +50,7 @@ public class TestOsCommand extends MockitoTest {
 			mockedOsUtility.when(() -> OSUtility.isWindows()).thenReturn(true);
 
 			when(processBuilder.start()).thenReturn(processSearchInPath, process);
-			OSCommand osCommand = spy(new OSCommand(Arrays.asList(OSCommand.USE_PATH + "myCmd"), 5, StandardCharsets.UTF_8, processBuilder));
+			OSCommand osCommand = spy(new OSCommand(Arrays.asList(OSCommand.USE_PATH + "myCmd"), 5, StandardCharsets.UTF_8, processBuilder, true));
 
 			doReturn("C:\\bin\\myCmd.bat").when(osCommand).searchInWindowsPath("myCmd");
 			osCommand.execute();
@@ -73,7 +73,7 @@ public class TestOsCommand extends MockitoTest {
 			mockedOsUtility.when(() -> OSUtility.isWindows()).thenReturn(false);
 
 			when(processBuilder.start()).thenReturn(processSearchInPath, process);
-			OSCommand osCommand = spy(new OSCommand(Arrays.asList(OSCommand.USE_PATH + "myCmd"), 5, StandardCharsets.UTF_8, processBuilder));
+			OSCommand osCommand = spy(new OSCommand(Arrays.asList(OSCommand.USE_PATH + "myCmd"), 5, StandardCharsets.UTF_8, processBuilder, true));
 
 			doReturn("C:\\bin\\myCmd.bat").when(osCommand).searchInWindowsPath("myCmd");
 			osCommand.execute();
@@ -89,7 +89,7 @@ public class TestOsCommand extends MockitoTest {
 		Runtime runtime = spy(Runtime.getRuntime());
 
 		doReturn(process).when(runtime).exec("myCmd");
-		new OSCommand("myCmd", 5, StandardCharsets.UTF_8, runtime).executeNoWait();
+		new OSCommand("myCmd", 5, StandardCharsets.UTF_8, runtime, false).executeNoWait();
 		
 		verify(runtime).exec("myCmd");
 	}

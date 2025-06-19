@@ -24,6 +24,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.Logger;
 
@@ -45,21 +46,34 @@ public class OSCommand {
 	private Charset charset;
 	private ProcessBuilder pb;
 	private Runtime runtime;
+	private boolean expectOuput = false;
 	
 	public OSCommand(List<String> cmdList) {
 		this(cmdList, -1, null);
 	}
 	
 	public OSCommand(List<String> cmdList, int timeout, Charset charset) {
-		this(cmdList, timeout, charset, new ProcessBuilder());
+		this(cmdList, timeout, charset, false);
 	}
-	
-	public OSCommand(List<String> cmdList, int timeout, Charset charset, ProcessBuilder pb) {
+	public OSCommand(List<String> cmdList, int timeout, Charset charset, boolean expectOutput) {
+		this(cmdList, timeout, charset, new ProcessBuilder(), expectOutput);
+	}
+
+	/**
+	 *
+	 * @param cmdList		List of commands / arguments to the process
+	 * @param timeout		timeout to wait for process, then we return
+	 * @param charset
+	 * @param pb			processBuilder
+	 * @param expectOutput	If true, then we will wait that process outputs text (except when timeout is reached
+	 */
+	public OSCommand(List<String> cmdList, int timeout, Charset charset, ProcessBuilder pb, boolean expectOutput) {
 		
 		this.timeout = timeout;
 		this.charset = charset;
 		this.pb = pb;
 		this.cmdList = cmdList;
+		this.expectOuput = expectOutput;
 	}
 	
 	/**
@@ -69,14 +83,27 @@ public class OSCommand {
 	 * @param charset
 	 */
 	public OSCommand(String cmdString, int timeout, Charset charset) {
-		this(cmdString, timeout, charset, Runtime.getRuntime());
+		this(cmdString, timeout, charset, Runtime.getRuntime(), false);
 	}
-	public OSCommand(String cmdString, int timeout, Charset charset, Runtime runtime) {
+	public OSCommand(String cmdString, int timeout, Charset charset, boolean expectOutput) {
+		this(cmdString, timeout, charset, Runtime.getRuntime(), expectOutput);
+	}
+
+	/**
+	 * Execute a process, giving the full command as a String (useful when command uses pipe, for example)
+	 * @param cmdString
+	 * @param timeout
+	 * @param charset
+	 * @param runtime
+	 * @param expectOutput	If true, then we will wait that process outputs text (except when timeout is reached
+	 */
+	public OSCommand(String cmdString, int timeout, Charset charset, Runtime runtime, boolean expectOutput) {
 		
 		this.timeout = timeout;
 		this.charset = charset;
 		this.cmdString = cmdString;
 		this.runtime = runtime;
+		this.expectOuput = expectOutput;
 	}
 	
 	/**
@@ -86,7 +113,7 @@ public class OSCommand {
 	 * @return
 	 */
 	public String searchInWindowsPath(String command) {
-		String out = new OSCommand(Arrays.asList("where", command), timeout, charset, pb).execute(); 
+		String out = new OSCommand(Arrays.asList("where", command), timeout, charset, pb, true).execute();
 		try {
 			return out.split("\n")[out.split("\n").length - 1].trim();
 			
@@ -132,6 +159,7 @@ public class OSCommand {
 		if (cmdList != null) {
 			cmdList = updateCommand(cmdList);
 			pb.command(cmdList);
+			pb.redirectErrorStream(true);
 			
 			try {
 				return pb.start();
@@ -164,6 +192,10 @@ public class OSCommand {
     public static String executeCommandAndWait(final String[] cmd) {
     	return executeCommandAndWait(cmd, -1, null);
     }
+
+	public static String executeCommandAndWait(final String[] cmd, boolean expectOuput) {
+    	return executeCommandAndWait(cmd, -1, null, expectOuput);
+    }
     
     /**
      * Execute a command in command line terminal and wait at most 'timeout' seconds
@@ -174,7 +206,19 @@ public class OSCommand {
      * @return 
      */
    	public static String executeCommandAndWait(final String[] cmd, int timeout, Charset charset) {
-        return new OSCommand(Arrays.asList(cmd), timeout, charset).execute();
+		   return executeCommandAndWait(cmd, timeout, charset, false);
+	}
+    /**
+     * Execute a command in command line terminal and wait at most 'timeout' seconds
+     * @param cmd		An array containing the program to execute and its arguments
+     * 					e.g: ["cmd.exe", "foo"]
+     * 					If first item is "_USE_PATH_", then, on Windows, we will start cmd.exe first. This is because ProcessBuilder does not look for programs into the path
+     * @param timeout 	number of seconds to wait for end of execution. A negative value means it will wait 30 secs
+	 * @param expectOutput if true, we will wait for process to output something (due to the fact that under load, process may terminate correctly, but stream has not immediately been flushed
+     * @return
+     */
+   	public static String executeCommandAndWait(final String[] cmd, int timeout, Charset charset, boolean expectOutput) {
+        return new OSCommand(Arrays.asList(cmd), timeout, charset, expectOutput).execute();
     }
     
     /**
@@ -183,7 +227,15 @@ public class OSCommand {
      * @return 
      */
    	public static String executeCommandAndWait(final String cmd) {
-   		return executeCommandAndWait(cmd, -1, null);
+		return executeCommandAndWait(cmd, -1, null, false);
+	}
+    /**
+     * Execute a command in command line terminal
+     * @param cmd for the end of the command execution
+     * @return
+     */
+   	public static String executeCommandAndWait(final String cmd, boolean expectOuput) {
+   		return executeCommandAndWait(cmd, -1, null, expectOuput);
    	}
    	
     /**
@@ -194,13 +246,23 @@ public class OSCommand {
      * @return 
      */
     public static String executeCommandAndWait(final String cmd, int timeout, Charset charset) {
-    	return new OSCommand(cmd, timeout, charset).execute();
+		return executeCommandAndWait(cmd, timeout, charset, false);
+	}
+    /**
+     * Execute a command in command line terminal and wait at most 'timeout' seconds
+     * @param cmd
+     * @param timeout 	number of seconds to wait for end of execution. A negative value means it will wait 30 secs
+     * @param charset	charset used to read program output. If set to null, default charset will be used
+	 * @param expectOutput if true, we will wait for process to output something (due to the fact that under load, process may terminate correctly, but stream has not immediately been flushed
+     * @return
+     */
+    public static String executeCommandAndWait(final String cmd, int timeout, Charset charset, boolean expectOutput) {
+    	return new OSCommand(cmd, timeout, charset, expectOutput).execute();
     }
     
     public String waitProcessTermination(Process proc, int timeout, Charset charset) {
 
     	try {
-
 			return readOutput(proc, timeout, charset);
     	} catch (InterruptedException e) {
         	logger.error("Interruption: " + e.getMessage());
@@ -212,44 +274,25 @@ public class OSCommand {
     	return "";
     }
     
-    private static String readOutput(Process proc, int timeout, Charset charset) throws IOException, InterruptedException {
+    private String readOutput(Process proc, int timeout, Charset charset) throws IOException, InterruptedException {
     	
     	if (charset == null) {
     		charset = OSUtility.getCharset();
     	}
 
-    	Clock clock = Clock.systemUTC();
-		Instant end = clock.instant().plusSeconds(timeout > 0 ? timeout: 30);
-    	
-		StreamGobbler errorGobbler = new StreamGobbler(proc.getErrorStream(), charset);
-		StreamGobbler outputGobbler  = new StreamGobbler(proc.getInputStream(), charset);
-		errorGobbler.start();
+		StreamGobber outputGobbler  = new StreamGobber(proc.getInputStream(), charset);
         outputGobbler.start();
         
         try {
-	        boolean read = false;
-	        boolean terminated = false;
-	        while (end.isAfter(clock.instant()) && (!read || !terminated)) {
-	        	// be sure we read all logs produced by process, event after termination
-	        	if (!proc.isAlive()) {
-	        		terminated = true;
-	        	}
-	        	
-	        	read = true;
-	        	
-	        	Thread.sleep(100);
-	        }
-	        errorGobbler.halt();
-	        outputGobbler.halt();
+			proc.waitFor(timeout > 0 ? timeout: 30, TimeUnit.SECONDS);
+
+	        outputGobbler.halt(expectOuput);
+			StringBuilder output = outputGobbler.getOutput();
 	        
-	        StringBuilder error = errorGobbler.getOutput();
-	        StringBuilder output = outputGobbler.getOutput();
-	        
-	        return output.toString() + '\n' + error.toString();
+	        return output.toString();
         } catch (Exception e) {
         	// in case something gets wrong, stop the threads
-	        errorGobbler.halt();
-	        outputGobbler.halt();
+	        outputGobbler.halt(false);
 	        throw e;
         }
     }

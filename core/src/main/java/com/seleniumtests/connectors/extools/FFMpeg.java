@@ -50,7 +50,7 @@ public class FFMpeg {
 
         String out = "";
         try {
-            out = OSCommand.executeCommandAndWait(new String[]{ffmpegPath, "-version"});
+            out = OSCommand.executeCommandAndWait(new String[]{ffmpegPath, "-version"}, true);
 
             if (!out.contains("libavutil")) {
                 System.out.println("FFMPEG out: " + out);
@@ -58,7 +58,7 @@ public class FFMpeg {
                 throw new ConfigurationException("FFmpeg is not installed at : " + ffmpegPath);
             }
         } catch (CustomSeleniumTestsException e) {
-            throw new ConfigurationException("FFMPEG is not installed at : " + ffmpegPath);
+            throw new ConfigurationException("FFMPEG is not installed at : " + ffmpegPath, e);
         }
         if (out.contains(" --enable-libopenh264")) {
             this.openh264 = true;
