@@ -43,6 +43,7 @@ import io.appium.java_client.remote.options.BaseOptions;
 import io.appium.java_client.remote.options.SupportsAppOption;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.http.HttpHost;
@@ -728,7 +729,16 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 					return null;
 				} else {
 					logger.info(String.format("Video file downloaded (%d kb in %d ms)", videoResponse.getBody().length() / 1000, System.currentTimeMillis() - start));
-					return videoResponse.getBody();
+
+					// the extension depends on mime-type. By default, it's .avi
+					File videoFile = videoResponse.getBody();
+					if (videoFile.exists() && MediaType.MP4_VIDEO.toString().equals(videoResponse.getHeaders().get("Content-Type").getFirst())) {
+						File renamedVideoFile = new File(FilenameUtils.removeExtension(videoFile.getAbsolutePath()) + ".mp4");
+						videoFile.renameTo(renamedVideoFile);
+						videoFile = renamedVideoFile;
+					}
+
+					return videoFile;
 				}
 			});
 			File videoFile = future.get(60, TimeUnit.SECONDS);

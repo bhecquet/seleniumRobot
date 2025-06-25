@@ -385,6 +385,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	public void testVideoCapture() throws ClientProtocolException, IOException {
 
 		Files.deleteIfExists(Paths.get("d:\\tmp\\out.avi"));
+		Files.deleteIfExists(Paths.get("d:\\tmp\\out.mp4"));
 		connector.setSessionId(new SessionId("video"));
 		
 		connector.startVideoCapture();

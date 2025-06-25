@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
+import kong.unirest.Headers;
 import org.apache.commons.io.FileUtils;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
@@ -280,6 +281,9 @@ public class ConnectorsTest extends MockitoTest {
 	public HttpRequest<?> createGridServletServerMock(String requestType, String apiPath, int statusCode, File replyData) throws UnirestException {
 		return createServerMock(GRID_SERVLET_URL, requestType, apiPath, statusCode, replyData, "request");
 	}
+	public HttpRequest<?> createGridServletServerMock(String requestType, String apiPath, int statusCode, File replyData, Headers headers) throws UnirestException {
+		return createServerMock(GRID_SERVLET_URL, requestType, apiPath, statusCode, replyData, "request", headers);
+	}
 	public HttpRequest<?> createGridServletServerMock(String requestType, String apiPath, int statusCode, String replyData, String responseType) throws UnirestException {
 		return createServerMock(GRID_SERVLET_URL, requestType, apiPath, statusCode, replyData, responseType);
 	}
@@ -319,12 +323,18 @@ public class ConnectorsTest extends MockitoTest {
 	public HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, File replyData, String responseType) throws UnirestException {
 		return createServerMock(serverUrl, requestType, apiPath, statusCode, (Object)replyData, responseType);
 	}
+	public HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, File replyData, String responseType, Headers headers) throws UnirestException {
+		return createServerMock(serverUrl, requestType, apiPath, statusCode, (Object)replyData, responseType, headers);
+	}
 	public HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, String replyData, String responseType) throws UnirestException {
 		return createServerMock(serverUrl, requestType, apiPath, statusCode, (Object)replyData, responseType);
 	}
 
 	public HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, Object replyData, String responseType) throws UnirestException {
 		return createServerMock(serverUrl, requestType, apiPath, statusCode, Arrays.asList(replyData), responseType);
+	}
+	public HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, Object replyData, String responseType, Headers headers) throws UnirestException {
+		return createServerMock(serverUrl, requestType, apiPath, statusCode, Arrays.asList(replyData), responseType, headers);
 	}
 
 	/**
@@ -339,6 +349,21 @@ public class ConnectorsTest extends MockitoTest {
 	 * @throws UnirestException
 	 */
 	public HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, final List<Object> replyData, String responseType) throws UnirestException {
+		return createServerMock(serverUrl, requestType, apiPath, statusCode, replyData, responseType, new Headers());
+	}
+	/**
+	 *
+	 * @param serverUrl			URL of the mock server
+	 * @param requestType		GET, POST, HEAD, ...
+	 * @param apiPath			the endpoint on the mock server (ex: /api/foo/bar)
+	 * @param statusCode		the status code to return: 200, 500, ...
+	 * @param replyData			the list of response data. In case service is called more times than the number of provided responses, the last one will be repeated
+	 * @param responseType		"request", "requestBodyEntity", "body". if "request", replies with the POST request object (HttpRequestWithBody.class). If "body", replies with the body (MultipartBody.class)
+	 * @param headers			list of headers to return
+	 * @return
+	 * @throws UnirestException
+	 */
+	public HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, final List<Object> replyData, String responseType, Headers headers) throws UnirestException {
 
 
 		if (replyData.isEmpty()) {
@@ -355,6 +380,11 @@ public class ConnectorsTest extends MockitoTest {
 		HttpRequestWithBody postRequest = spy(HttpRequestWithBody.class);
 
 		PagedList<JsonNode> pageList = new PagedList<>(); // for asPaged method
+
+		when(response.getHeaders()).thenReturn(headers);
+		when(jsonResponse.getHeaders()).thenReturn(headers);
+		when(streamResponse.getHeaders()).thenReturn(headers);
+		when(bytestreamResponse.getHeaders()).thenReturn(headers);
 
 		when(request.getUrl()).thenReturn(serverUrl);
 		if (replyData.get(0) instanceof String) {

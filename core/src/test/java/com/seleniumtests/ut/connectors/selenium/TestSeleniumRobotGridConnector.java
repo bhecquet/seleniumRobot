@@ -33,11 +33,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import com.seleniumtests.driver.WebUIDriverFactory;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import io.appium.java_client.android.options.UiAutomator2Options;
 import io.appium.java_client.remote.options.BaseOptions;
+import kong.unirest.Headers;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -1291,17 +1293,44 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	 */
 	@Test(groups={"ut"})
 	public void testStopVideoCapture() throws UnsupportedOperationException, IOException {
-		
+
+		Headers headers = new Headers();
+		headers.add("Content-Type", "video/x-msvideo");
 		File stream = createImageFromResource("tu/video/videoCapture.avi");
-		GetRequest req = (GetRequest) createGridServletServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, stream);	
-		
-		File out = connector.stopVideoCapture("out.mp4");
+		GetRequest req = (GetRequest) createGridServletServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, stream, headers);
+
+		File out = connector.stopVideoCapture("out.avi");
 		
 		// no error encountered
 		verify(req).queryString("action", "stopVideoCapture");
 		verify(req).queryString("session", new SessionId("1234"));
 		Assert.assertNotNull(out);
+		Assert.assertTrue(out.getName().endsWith(".avi"));
 		Assert.assertEquals(out, stream);
+		verify(gridLogger, never()).warn(anyString());
+		verify(gridLogger, never()).error(anyString());
+	}
+	/**
+	 * Stop video capture
+	 * @throws UnsupportedOperationException
+	 * @throws IOException
+	 * @throws UnirestException
+	 */
+	@Test(groups={"ut"})
+	public void testStopVideoCaptureMp4() throws UnsupportedOperationException, IOException {
+
+		Headers headers = new Headers();
+		headers.add("Content-Type", "video/mp4");
+		File stream = createImageFromResource("tu/video/videoCapture.avi");
+		GetRequest req = (GetRequest) createGridServletServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, stream, headers);
+
+		File out = connector.stopVideoCapture("out.avi");
+
+		// no error encountered
+		verify(req).queryString("action", "stopVideoCapture");
+		verify(req).queryString("session", new SessionId("1234"));
+		Assert.assertNotNull(out);
+		Assert.assertEquals(out.getAbsolutePath(), stream.getAbsolutePath().replace(".avi", ".mp4"));
 		verify(gridLogger, never()).warn(anyString());
 		verify(gridLogger, never()).error(anyString());
 	}
