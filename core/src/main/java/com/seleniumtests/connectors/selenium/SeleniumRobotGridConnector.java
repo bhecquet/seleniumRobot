@@ -732,7 +732,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 
 					// the extension depends on mime-type. By default, it's .avi
 					File videoFile = videoResponse.getBody();
-					if (videoFile.exists() && MediaType.MP4_VIDEO.toString().equals(videoResponse.getHeaders().get("Content-Type").getFirst())) {
+					if (videoFile.exists() && MediaType.MP4_VIDEO.toString().equals(videoResponse.getHeaders().getFirst("Content-Type"))) {
 						File renamedVideoFile = new File(FilenameUtils.removeExtension(videoFile.getAbsolutePath()) + ".mp4");
 						videoFile.renameTo(renamedVideoFile);
 						videoFile = renamedVideoFile;

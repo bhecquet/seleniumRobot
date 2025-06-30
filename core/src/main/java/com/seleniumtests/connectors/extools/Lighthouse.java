@@ -24,7 +24,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 /**
- * Connector for executing UFT tests either locally or remotely on selenium grid
+ * Connector for executing Lighthouse tests either locally or remotely on selenium grid
  *
  * @author S047432
  */
@@ -86,7 +86,7 @@ public class Lighthouse {
 		return out.contains("--port");
 	}
 
-	public void execute(String url, List<String> options) {
+	public boolean execute(String url, List<String> options) {
 
 		jsonReport = null;
 		htmlReport = null;
@@ -115,6 +115,7 @@ public class Lighthouse {
 			} catch (IOException e) {
 				logger.error("Lighthouse logs could not be written: " + e.getMessage());
 			}
+			return false;
 		} else {
 
 			File jsonFile = new File(outputPath + ".report.json");
@@ -148,6 +149,7 @@ public class Lighthouse {
 				htmlReport = htmlFile;
 			}
 			logger.logFile(htmlReport, "Lighthouse HTML " + url, GenericFile.FileOperation.KEEP);
+			return true;
 		}
 	}
 
