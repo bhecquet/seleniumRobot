@@ -4,11 +4,10 @@
 	<parent>
 	    <groupId>com.infotel.seleniumRobot</groupId>
 	    <artifactId>core-parent-selenium4</artifactId>
-	    <version>5.1.29-SNAPSHOT</version>
+	    <version>5.1.28-SNAPSHOT</version>
 	</parent>
 
   	<artifactId>grid-extensions-selenium4</artifactId>
-	<name>SeleniumRobot extension for grid</name>
   	<packaging>jar</packaging>
 	
 	<properties>
