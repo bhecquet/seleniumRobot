@@ -102,7 +102,7 @@
 				<extensions>true</extensions>
 				<configuration>
 					<serverId>ossrh</serverId>
-					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+					<nexusUrl>https://ossrh-staging-api.central.sonatype.com</nexusUrl>
 					<autoReleaseAfterClose>true</autoReleaseAfterClose>
                     <stagingProgressTimeoutMinutes>15</stagingProgressTimeoutMinutes>
 					
