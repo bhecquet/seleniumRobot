@@ -35,15 +35,13 @@ jobs:
     #    path: ~/.m2
     #    key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
     #    restore-keys: ${{ runner.os }}-m2
-    #- name: maven-settings-xml-action
-    #  uses: whelk-io/maven-settings-xml-action@v22
-    #  with:
-    #    servers: '[{ "id": "ossrh", "username": "${{ secrets.MAVEN_USERNAME }}", "password": "${{ secrets.MAVEN_PASSWORD }}" }]'
+    - name: maven-settings-xml-action
+      uses: whelk-io/maven-settings-xml-action@v22
+      with:
+        servers: '[{ "id": "ossrh", "username": "${{ secrets.MAVEN_USERNAME }}", "password": "${{ secrets.MAVEN_PASSWORD }}" }]'
     - name: Publish to Apache Maven Central
       run: mvn verify
       env:
-        MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-        MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
         MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
         MAVEN_GPG_KEY: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
 
