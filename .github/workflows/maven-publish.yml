@@ -39,20 +39,26 @@ jobs:
     #  uses: whelk-io/maven-settings-xml-action@v22
     #  with:
     #    servers: '[{ "id": "ossrh", "username": "${{ secrets.MAVEN_USERNAME }}", "password": "${{ secrets.MAVEN_PASSWORD }}" }]'
-    #- name: Build with Maven
-    #  run: mvn -B package -Dmaven.test.skip=true --file pom.xml
-    - name: Release
-      uses: qcastel/github-actions-maven-release@v1.12.41
+    - name: Publish to Apache Maven Central
+      run: mvn verify
       env:
-        JAVA_HOME: /usr/lib/jvm/java-21-openjdk/
-      with:
-        git-release-bot-name: "Robot"
-        git-release-bot-email: "robot@seleniumRobot.com"
-        maven-args: "-Dmaven.test.skip=true"
-        gpg-enabled: "true"
-        gpg-key-id: ${{ secrets.MAVEN_GPG_KEY_ID }}
-        gpg-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
-        gpg-passphrase: ${{ secrets.MAVEN_GPG_PASSPHRASE }} 
+        MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+        MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+        MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+        MAVEN_GPG_KEY: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+
+    #- name: Release
+    #  uses: qcastel/github-actions-maven-release@v1.12.41
+    #  env:
+    #    JAVA_HOME: /usr/lib/jvm/java-21-openjdk/
+    #  with:
+    #    git-release-bot-name: "Robot"
+    #    git-release-bot-email: "robot@seleniumRobot.com"
+    #    maven-args: "-Dmaven.test.skip=true"
+    #    gpg-enabled: "true"
+    #    gpg-key-id: ${{ secrets.MAVEN_GPG_KEY_ID }}
+    #    gpg-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+    #    gpg-passphrase: ${{ secrets.MAVEN_GPG_PASSPHRASE }} 
 
 
     #- name: Publish to the Maven Central Repository
