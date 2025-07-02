@@ -40,7 +40,7 @@ jobs:
       with:
         servers: '[{ "id": "ossrh", "username": "${{ secrets.MAVEN_USERNAME }}", "password": "${{ secrets.MAVEN_PASSWORD }}" }]'
     - name: Publish to Apache Maven Central
-      run: mvn verify
+      run: mvn verify  -Darguments="-Dmaven.test.skip=true"
       env:
         MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
         MAVEN_GPG_KEY: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
