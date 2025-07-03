@@ -25,6 +25,7 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
         server-id: central
+        cache: 'maven'
         server-username: MAVEN_USERNAME
         server-password: MAVEN_PASSWORD
         gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
