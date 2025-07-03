@@ -31,7 +31,7 @@ jobs:
         gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
         gpg-passphrase: MAVEN_GPG_PASSPHRASE 
     - name: Build with Maven
-      run: mvn -Darguments="-Dmaven.test.skip=true -Dskip.custom.driver=false -Dskip.clean.driver=false" -B package --file pom.xml
+      run: mvn -Dmaven.test.skip=true -B package --file pom.xml
     - name: git config
       run: | 
         git config --global user.email "robot@seleniumRobot.com"
