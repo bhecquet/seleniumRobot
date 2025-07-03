@@ -30,13 +30,13 @@ jobs:
         gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
         gpg-passphrase: MAVEN_GPG_PASSPHRASE 
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      run: mvn -Darguments="-Dmaven.test.skip=true -Dskip.custom.driver=false -Dskip.clean.driver=false" -B package --file pom.xml
     - name: git config
       run: | 
         git config --global user.email "robot@seleniumRobot.com"
         git config --global user.name "Robot"
     - name: Publish to the Maven Central Repository
-      run: mvn release:prepare release:perform -Dusername=git -Dpassword=${{ secrets.GITHUB_TOKEN }}
+      run: mvn -Darguments="-Dmaven.test.skip=true -Dskip.custom.driver=false -Dskip.clean.driver=false" release:prepare release:perform -Dusername=git -Dpassword=${{ secrets.GITHUB_TOKEN }}
       env:
         MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
         MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
