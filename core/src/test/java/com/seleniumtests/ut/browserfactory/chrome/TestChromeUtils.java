@@ -59,6 +59,7 @@ public class TestChromeUtils extends GenericTest {
 		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().get(5).getData(), "Payloads less than 20 chars are redacted.");
 		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().get(0).getType(), "receive");
 		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().get(1).getType(), "send");
+		Assert.assertNotEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getResponse().getContent(), null);
 		Assert.assertTrue(har.getLog().getEntries().get(10).getStartedDateTime().startsWith("2025-03-26T"));
 		
 		// check transition between pages, based on timings
@@ -89,7 +90,7 @@ public class TestChromeUtils extends GenericTest {
 		Assert.assertEquals(har.getLog().getEntries().get(10).getRequest().getMethod(), "GET");
 		Assert.assertEquals(har.getLog().getEntries().get(10).getRequest().getUrl(), "wss://127.0.0.1:0001/test");
 		Assert.assertEquals(har.getLog().getEntries().get(10).getRequest().getHeaders().size(), 0);
-		Assert.assertNull(har.getLog().getEntries().get(10).getResponse());
+		Assert.assertNotEquals(har.getLog().getEntries().get(10).getResponse(), null);
 		Assert.assertEquals(har.getLog().getEntries().get(10).getPageref(), "");
 		Assert.assertEquals(har.getLog().getEntries().get(10).getTime(), -1);
 		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().size(), 9);
@@ -126,7 +127,7 @@ public class TestChromeUtils extends GenericTest {
 		Assert.assertEquals(har.getLog().getEntries().size(), 13);
 		Assert.assertEquals(har.getLog().getEntries().get(10).getRequest().getUrl(), "wss://not.found");
 		Assert.assertEquals(har.getLog().getEntries().get(10).getRequest().getHeaders().size(), 13);
-		Assert.assertNull(har.getLog().getEntries().get(10).getResponse());
+		Assert.assertNotEquals(har.getLog().getEntries().get(10).getResponse(), null);
 		Assert.assertEquals(har.getLog().getEntries().get(10).getPageref(), "page_1");
 		Assert.assertEquals(har.getLog().getEntries().get(10).getTime(), 3202);
 		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().size(), 9);
@@ -161,8 +162,8 @@ public class TestChromeUtils extends GenericTest {
 		
 		// check entries
 		Assert.assertEquals(har.getLog().getEntries().size(), 13);
-		Assert.assertNull(har.getLog().getEntries().get(10).getRequest());
-		Assert.assertNull(har.getLog().getEntries().get(10).getResponse());
+		Assert.assertNotEquals(har.getLog().getEntries().get(10).getRequest(), null);
+		Assert.assertNotEquals(har.getLog().getEntries().get(10).getResponse(), null);
 		Assert.assertEquals(har.getLog().getEntries().get(10).getPageref(), "");
 		Assert.assertEquals(har.getLog().getEntries().get(10).getTime(), -1);
 		Assert.assertEquals(((WebSocketEntry) har.getLog().getEntries().get(10)).getWebSocketMessages().size(), 1);
