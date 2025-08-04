@@ -241,8 +241,27 @@ public class ChromeUtils {
 			String url = "wss://not.found";
 			Page pageRef = null;
 			long entryDate = 0;
-			Request req = null;
-			Response res = null;
+			Request req = new Request(
+					0,
+					"",
+					"",
+					"",
+					new ArrayList<>(),
+					new ArrayList<>(),
+					new ArrayList<>(),
+					0
+			);
+			Response res = new Response(
+					0,
+					"",
+					"",
+					new ArrayList<>(),
+					new ArrayList<>(),
+					new Content("x-unknown", 0, ""),
+					"",
+					0,
+					0
+			);
 			int duration = -1;
 			
 			//Setting every data possible following the available requests entries
@@ -266,8 +285,8 @@ public class ChromeUtils {
 								.map(key -> new Header(key, jsonResponseHeaders.getString(key)))
 								.collect(Collectors.toList()),
 						new ArrayList<>(),
-						null,
-						null,
+						new Content("x-unknown", 0, ""),
+						"",
 						jsonResponseHeaders.optInt("Content-Length", 0),
 						0);
 			}
@@ -292,7 +311,7 @@ public class ChromeUtils {
 					Instant.ofEpochMilli(entryDate).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
 					req,
 					res,
-					null,
+					new Timing(0, 0, 0, 0, 0, 0, 0),
 					duration,
 					webSocketMessages);
 			
