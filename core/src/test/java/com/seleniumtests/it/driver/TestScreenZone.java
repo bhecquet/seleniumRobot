@@ -185,4 +185,30 @@ public class TestScreenZone extends GenericMultiBrowserTest {
 	}
 	
 	
+	/**
+	 * Test the param mainScreen when sending keys to a screenzone 
+	 */
+	@Test(groups={"it"})
+	public void testSendKeysOnMainScreen() {
+		try {
+			DriverTestPageWithoutFixedPattern.logoText.clear();
+			((CustomEventFiringWebDriver)driver).scrollToElement(DriverTestPageWithoutFixedPattern.table, 200);
+			DriverTestPageWithoutFixedPattern.firefoxForDesktop.sendKeys(true, 0, 40, "hello");
+		} catch (ImageSearchException e) {
+			throw new SkipException("Image not found, we may be on screenless slave", e);
+		}
+		Assert.assertEquals(DriverTestPageWithoutFixedPattern.logoText.getValue(), "hello");
+	}
+	@Test(groups={"it"})
+	public void testSendKeyboardKeysOnMainScreen() {
+		try {
+			DriverTestPageWithoutFixedPattern.logoText.clear();
+			((CustomEventFiringWebDriver)driver).scrollToElement(DriverTestPageWithoutFixedPattern.table, 200);
+			DriverTestPageWithoutFixedPattern.firefoxForDesktop.sendKeys(true, 0, 40, KeyEvent.VK_A, KeyEvent.VK_B);
+		} catch (ImageSearchException e) {
+			throw new SkipException("Image not found, we may be on screenless slave", e);
+		}
+		Assert.assertEquals(DriverTestPageWithoutFixedPattern.logoText.getValue(), "hello");
+	}
+	
 }
