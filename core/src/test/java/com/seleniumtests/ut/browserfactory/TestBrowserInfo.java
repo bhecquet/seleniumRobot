@@ -79,8 +79,8 @@ public class TestBrowserInfo extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testEdgeVersion() {
 		if (SystemUtils.IS_OS_WINDOWS) {
-			BrowserInfo bInfo = new BrowserInfo(BrowserType.EDGE, "130.0", null);
-			Assert.assertEquals(bInfo.getDriverFileName(), "edgedriver_130.0_edge-130-131");
+			BrowserInfo bInfo = new BrowserInfo(BrowserType.EDGE, "136.0", null);
+			Assert.assertEquals(bInfo.getDriverFileName(), "edgedriver_136.0_edge-136-137");
 		}
 	}
 	
@@ -389,12 +389,32 @@ public class TestBrowserInfo extends MockitoTest {
 	}
 
 	@Test(groups={"ut"})
+	public void testGetDefaultEdgeBetaWindowsProfile() throws Exception {
+		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
+
+			BrowserInfo bi = new BrowserInfo(BrowserType.EDGE, "90.0", true, null);
+			Assert.assertTrue(bi.getDefaultProfilePath().replace("\\", "/").matches("C:/Users/.*?/AppData/Local/Microsoft/Edge Beta/User Data"));
+		}
+	}
+
+	@Test(groups={"ut"})
 	public void testGetDefaultEdgeLinuxProfile() throws Exception {
 		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
 			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.LINUX);
 
 			BrowserInfo bi = new BrowserInfo(BrowserType.EDGE, "90.0", null);
-			Assert.assertTrue(bi.getDefaultProfilePath().matches("/home/.*?/.config/edge/default"));
+			Assert.assertTrue(bi.getDefaultProfilePath().matches("/home/.*?/.config/edge"));
+		}
+	}
+
+	@Test(groups={"ut"})
+	public void testGetDefaultEdgeBetaLinuxProfile() throws Exception {
+		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.LINUX);
+
+			BrowserInfo bi = new BrowserInfo(BrowserType.EDGE, "90.0", true, null);
+			Assert.assertTrue(bi.getDefaultProfilePath().matches("/home/.*?/.config/edge-beta"));
 		}
 	}
 
@@ -407,7 +427,17 @@ public class TestBrowserInfo extends MockitoTest {
 			Assert.assertTrue(bi.getDefaultProfilePath().matches("/Users/.*?/Library/Application Support/Microsoft/Edge"));
 		}
 	}
-	
+
+	@Test(groups={"ut"})
+	public void testGetDefaultEdgeBetaMacProfile() throws Exception {
+		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
+
+			BrowserInfo bi = new BrowserInfo(BrowserType.EDGE, "90.0", true, null);
+			Assert.assertTrue(bi.getDefaultProfilePath().matches("/Users/.*?/Library/Application Support/Microsoft/Edge Beta"));
+		}
+	}
+
 	@Test(groups={"ut"})
 	public void testGetDefaultChromeWindowsProfile() throws Exception {
 		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
@@ -415,6 +445,16 @@ public class TestBrowserInfo extends MockitoTest {
 
 			BrowserInfo bi = new BrowserInfo(BrowserType.CHROME, "58.0", null);
 			Assert.assertTrue(bi.getDefaultProfilePath().replace("\\", "/").matches("C:/Users/.*?/AppData/Local/Google/Chrome/User Data"));
+		}
+	}
+
+	@Test(groups={"ut"})
+	public void testGetDefaultChromeBetaWindowsProfile() throws Exception {
+		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
+
+			BrowserInfo bi = new BrowserInfo(BrowserType.CHROME, "58.0", true, null);
+			Assert.assertTrue(bi.getDefaultProfilePath().replace("\\", "/").matches("C:/Users/.*?/AppData/Local/Google/Chrome Beta/User Data"));
 		}
 	}
 	
@@ -425,7 +465,17 @@ public class TestBrowserInfo extends MockitoTest {
 			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.LINUX);
 
 			BrowserInfo bi = new BrowserInfo(BrowserType.CHROME, "58.0", null);
-			Assert.assertTrue(bi.getDefaultProfilePath().matches("/home/.*?/.config/google-chrome/default"));
+			Assert.assertTrue(bi.getDefaultProfilePath().matches("/home/.*?/.config/google-chrome"));
+		}
+	}
+
+	@Test(groups={"ut"})
+	public void testGetDefaultChromeBetaLinuxProfile() throws Exception {
+		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.LINUX);
+
+			BrowserInfo bi = new BrowserInfo(BrowserType.CHROME, "58.0", true, null);
+			Assert.assertTrue(bi.getDefaultProfilePath().matches("/home/.*?/.config/google-chrome-beta"));
 		}
 	}
 	
@@ -436,6 +486,16 @@ public class TestBrowserInfo extends MockitoTest {
 
 			BrowserInfo bi = new BrowserInfo(BrowserType.CHROME, "58.0", null);
 			Assert.assertTrue(bi.getDefaultProfilePath().matches("/Users/.*?/Library/Application Support/Google/Chrome"));
+		}
+	}
+
+	@Test(groups={"ut"})
+	public void testGetDefaultChromeBetaMacProfile() throws Exception {
+		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
+
+			BrowserInfo bi = new BrowserInfo(BrowserType.CHROME, "58.0", true, null);
+			Assert.assertTrue(bi.getDefaultProfilePath().matches("/Users/.*?/Library/Application Support/Google/Chrome Beta"));
 		}
 	}
 	

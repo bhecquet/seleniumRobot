@@ -91,7 +91,6 @@ public class BrowserInfo {
 	 * @param browser
 	 * @param version
 	 * @param path				path to browser executable
-	 * @param driverFileName
 	 */
 	public BrowserInfo(BrowserType browser, String version, String path) {
 		this(browser, version, path, true, false);
@@ -349,22 +348,46 @@ public class BrowserInfo {
 	private void addChromeDefaultProfilePath() {
 		Platform platform = OSUtility.getCurrentPlatorm();
 		if (platform == Platform.WINDOWS) {
-			defaultProfilePath = String.format("C:\\Users\\%s\\AppData\\Local\\Google\\Chrome\\User Data", System.getProperty(USER_NAME));
+			if (beta) {
+				defaultProfilePath = String.format("C:\\Users\\%s\\AppData\\Local\\Google\\Chrome Beta\\User Data", System.getProperty(USER_NAME));
+			} else {
+				defaultProfilePath = String.format("C:\\Users\\%s\\AppData\\Local\\Google\\Chrome\\User Data", System.getProperty(USER_NAME));
+			}
 		} else if (platform == Platform.LINUX) {
-			defaultProfilePath = String.format("/home/%s/.config/google-chrome/default", System.getProperty(USER_NAME));
+			if (beta) {
+				defaultProfilePath = String.format("/home/%s/.config/google-chrome-beta", System.getProperty(USER_NAME));
+			} else {
+				defaultProfilePath = String.format("/home/%s/.config/google-chrome", System.getProperty(USER_NAME));
+			}
 		} else if (platform == Platform.MAC) {
-			defaultProfilePath = String.format("/Users/%s/Library/Application Support/Google/Chrome", System.getProperty(USER_NAME));
+			if (beta) {
+				defaultProfilePath = String.format("/Users/%s/Library/Application Support/Google/Chrome Beta", System.getProperty(USER_NAME));
+			} else {
+				defaultProfilePath = String.format("/Users/%s/Library/Application Support/Google/Chrome", System.getProperty(USER_NAME));
+			}
 		}
 	}
 	
 	private void addEdgeDefaultProfilePath() {
 		Platform platform = OSUtility.getCurrentPlatorm();
 		if (platform == Platform.WINDOWS) {
-			defaultProfilePath = String.format("C:\\Users\\%s\\AppData\\Local\\Microsoft\\Edge\\User Data", System.getProperty(USER_NAME));
+			if (beta) {
+				defaultProfilePath = String.format("C:\\Users\\%s\\AppData\\Local\\Microsoft\\Edge Beta\\User Data", System.getProperty(USER_NAME));
+			} else {
+				defaultProfilePath = String.format("C:\\Users\\%s\\AppData\\Local\\Microsoft\\Edge\\User Data", System.getProperty(USER_NAME));
+			}
 		} else if (platform == Platform.LINUX) {
-			defaultProfilePath = String.format("/home/%s/.config/edge/default", System.getProperty(USER_NAME));
+			if (beta) {
+				defaultProfilePath = String.format("/home/%s/.config/edge-beta", System.getProperty(USER_NAME));
+			} else {
+				defaultProfilePath = String.format("/home/%s/.config/edge", System.getProperty(USER_NAME));
+			}
 		} else if (platform == Platform.MAC) {
-			defaultProfilePath = String.format("/Users/%s/Library/Application Support/Microsoft/Edge", System.getProperty(USER_NAME));
+			if (beta) {
+				defaultProfilePath = String.format("/Users/%s/Library/Application Support/Microsoft/Edge Beta", System.getProperty(USER_NAME));
+			} else {
+				defaultProfilePath = String.format("/Users/%s/Library/Application Support/Microsoft/Edge", System.getProperty(USER_NAME));
+			}
 		}
 	}
 	
