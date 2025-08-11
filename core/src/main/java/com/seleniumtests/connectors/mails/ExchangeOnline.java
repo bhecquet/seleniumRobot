@@ -65,15 +65,15 @@ public class ExchangeOnline extends EmailClientImpl {
 		
 		X509Certificate cert = getCertObject(certFileContent);
 		
-		// Connexion vers API Graph
+		// Connection to API Graph
 		IClientCredential credential = ClientCredentialFactory.createFromCertificate(certPrivateKey, cert);
 		ConfidentialClientApplication cca = ConfidentialClientApplication.builder(clientId, credential)
 				.authority(AUTH_URL + tenantId).build();
 		
-		// Ajout de parametres
+		// Add parameters
 		ClientCredentialParameters parameters = ClientCredentialParameters.builder(SCOPE).build();
 		
-		// Appel du token
+		// Call for the token
 		return cca.acquireToken(parameters).join();
 	}
 	
@@ -100,15 +100,15 @@ public class ExchangeOnline extends EmailClientImpl {
 		}
 		String keyFilePath = keyFile.getPath();
 		
-		// 1. Ajouter Bouncy Castle en tant que fournisseur
+		// 1. Add Bouncy Castle as provider
 		Security.addProvider(new BouncyCastleProvider());
 		
-		// 2. Ouvrir le fichier de la clé privée (en format PEM)
+		// 2. Open private key file (PEM format)
 		PEMParser pemParser = new PEMParser(new FileReader(keyFilePath));
 		Object object = pemParser.readObject();
 		pemParser.close();
 		
-		// 3. Préparer le convertisseur Bouncy Castle
+		// 3. Prepare the Bouncy Castle converter
 		JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC");
 		PrivateKey privateKey;
 		
