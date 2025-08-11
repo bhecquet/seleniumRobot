@@ -42,6 +42,12 @@ public class EmailAccount {
     private EmailServer emailServer;
     private static final String DEFAULT_EMAIL = "no.email@free.fr";
     private static final Logger logger = SeleniumRobotLogger.getLogger(EmailAccount.class);
+ // Parameters exclusive to Exchange Online
+ 	private String tenantId;
+ 	private String clientId;
+ 	private String certificate;
+ 	private String certificatePrivateKey;
+ 	private String certificatePrivateKeyPassword;
 
     /**
      * The account should be created before any mail has been send because it will only return email received from the creation date
@@ -69,6 +75,25 @@ public class EmailAccount {
     }
 
     /**
+	 * @param email
+	 * @param tenantId
+	 * @param clientId               given at your entra registration, might be called applicationId
+	 * @param certificateFileContent        the content of your certificate file .pem, without the -----BEGIN CERTIFICATE----- and -----END CERTIFICATE----- lines
+	 * @param certificatePrivateKeyFileContent  the content of your private key file .key, without the -----BEGIN PRIVATE KEY----- and -----END PRIVATE KEY----- lines
+	 * @param certificatePrivateKeyPassword
+	 */
+	public EmailAccount(String email, String tenantId, String clientId, String certificateFileContent, String certificatePrivateKeyFileContent, String certificatePrivateKeyPassword, EmailServer server) {
+		this.email = email;
+		this.tenantId = tenantId;
+		this.clientId = clientId;
+		this.certificate = certificateFileContent;
+		this.certificatePrivateKey = certificatePrivateKeyFileContent;
+		this.certificatePrivateKeyPassword = certificatePrivateKeyPassword;
+		this.emailServer = server;
+	}
+	
+    
+    /**
      * Set email in account without connecting to mailbox
      *
      * @param email
@@ -81,7 +106,11 @@ public class EmailAccount {
      * @return true if all account information are set
      */
     public boolean canConnect() {
-        return !(email.equals(DEFAULT_EMAIL) || emailLogin == null || emailLogin.isEmpty());
+    	if (emailServer.getType().equals(EmailServer.EmailServerTypes.EXCHANGE_ONLINE)) {
+			return !(email.equals(DEFAULT_EMAIL) || certificate == null || certificatePrivateKey == null || certificatePrivateKeyPassword == null);
+		} else {
+			return !(email.equals(DEFAULT_EMAIL) || emailLogin == null || emailLogin.isEmpty());
+		}
     }
 
     /**
@@ -235,11 +264,15 @@ public class EmailAccount {
             throw new ConfigurationException("email server has not been configured");
         }
 
-        emailClient = EmailClientSelector.routeEmail(emailServer,
-                getEmail(),
-                getEmailLogin(),
-                getEmailPassword());
-
+        if (emailServer.getType().equals(EmailServer.EmailServerTypes.EXCHANGE_ONLINE)) {
+			emailClient = EmailClientSelector.routeEmail(emailServer, clientId, tenantId, certificate, certificatePrivateKey, certificatePrivateKeyPassword, email);
+		} else {
+			emailClient = EmailClientSelector.routeEmail(emailServer,
+					getEmail(),
+					getEmailLogin(),
+					getEmailPassword());
+		}
+        
         // we should only get last received emails
         if (emailClient != null) {
             emailClient.setSearchMode(SearchMode.BY_DATE);

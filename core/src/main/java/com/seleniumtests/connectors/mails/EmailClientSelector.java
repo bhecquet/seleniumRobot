@@ -59,12 +59,6 @@ public class EmailClientSelector {
 			} catch (Exception e) {
 				logger.error("Cannot connect to exchange via web service: " + e.getMessage());
 			}
-		} else if (server.getType() == EmailServerTypes.EXCHANGE_ONLINE) {
-			try {
-				return new ExchangeOnline(server.getUrl(), loginEmailAccount, passwordEmailAccount, emailAddress);
-			} catch (Exception e) {
-				logger.error("Cannot connect to exchange via web service: " + e.getMessage());
-			}
 		} else if (server.getType() == EmailServerTypes.GMAIL) {
 				try {
 					return new GMailClient(server.getUrl(), loginEmailAccount, passwordEmailAccount, INBOX);
@@ -77,6 +71,17 @@ public class EmailClientSelector {
 			} catch (Exception e) {
 				logger.error("Cannot connect to imap server: " + e.getMessage());
 			} 
+		}
+		return null;
+	}
+	
+	public static EmailClient routeEmail(EmailServer server, String clientId, String tenantId, String certificateFileContent, String certificatePrivateKeyFileContent, String certPrivateKeyPassword, String email) {
+		if (server.getType() == EmailServerTypes.EXCHANGE_ONLINE) {
+			try {
+				return new ExchangeOnline(tenantId, clientId, certificateFileContent, certificatePrivateKeyFileContent, certPrivateKeyPassword, email);
+			} catch (Exception e) {
+				logger.error("Cannot connect to exchange online: " + e.getMessage());
+			}
 		}
 		return null;
 	}
