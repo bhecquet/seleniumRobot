@@ -432,7 +432,9 @@ For cloud test, these variables are not needed
 
 #### Run ####
 
-Start appium: `appium` in command line
+Start appium: `appium --relaxed-security` in command line
+
+**relaxed-security allow access to "/appium/sessions" endpoint. But if you are in an insecure environment, provide a finer flag: https://appium.io/docs/en/3.0/guides/security/**
 Start your test with `-DappiumServerUrl=http://127.0.0.1:4723/`
 
 If you want to set some appium capabilities, use `appiumCaps` parameter when the needed capabilities are not provided by framework
