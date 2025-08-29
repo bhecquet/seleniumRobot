@@ -187,7 +187,13 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 									"download.default_directory",
 									downloadDir.toAbsolutePath().toString(),
 									"savefile.default_directory",
-									downloadDir.toAbsolutePath().toString()));
+									downloadDir.toAbsolutePath().toString(),
+									"profile.password_manager_enabled",
+									false,
+									"profile.password_manager_leak_detection",
+									false
+									)
+					);
 				} catch (IOException e) {
 					logger.error("Error creating 'downloads' directory: " + e.getMessage());
 				}
