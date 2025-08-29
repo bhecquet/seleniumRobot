@@ -29,7 +29,7 @@ public class TestExistingAppiumLauncher extends GenericTest {
 	@Test(groups={"it"}, enabled = false)
 	public void testAppiumStartup() {
 		try {
-			ExistingAppiumLauncher appium = new ExistingAppiumLauncher("http://localhost:4723/wd/hub/");
+			ExistingAppiumLauncher appium = new ExistingAppiumLauncher("http://localhost:4723/");
 			appium.startAppium();
 			appium.stopAppium();
 		} catch (ConfigurationException e) {

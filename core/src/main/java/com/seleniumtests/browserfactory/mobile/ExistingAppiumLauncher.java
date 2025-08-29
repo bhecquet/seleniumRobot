@@ -48,10 +48,11 @@ public class ExistingAppiumLauncher implements AppiumLauncher {
 	 * Call /wd/hub/sessions to see if appium is started
 	 */
 	private void waitAppiumAlive() {
-		
+
 		for (int i=0; i< 60; i++) {
+			String endPoint = i % 2 == 0 ? "appium/sessions": "sessions"; // appium 3 / appium 2
 			try {
-				HttpResponse<String> response = Unirest.get(appiumServerUrl + "sessions").asString();
+				HttpResponse<String> response = Unirest.get(appiumServerUrl + endPoint).asString();
 				if (response.getStatus() == 200) {
 					logger.info("appium has started");
 		        	break;
