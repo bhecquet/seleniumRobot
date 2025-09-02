@@ -670,6 +670,10 @@ public class BrowserInfo {
 	public String getDefaultProfilePath() {
 		return defaultProfilePath;
 	}
+
+	public void setDefaultProfilePath(String defaultProfilePath) {
+		this.defaultProfilePath = defaultProfilePath;
+	}
 	
 	@Override
 	public String toString() {

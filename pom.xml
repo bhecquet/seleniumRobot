@@ -73,9 +73,9 @@
 
 		<!-- /!\ when changing selenium version, do not forget to change selenium-api version in project file (for aspectj build path) -->
 		<!-- /!\ Also change version in SeleniumTestContextManager.java -->
-		<selenium.version>4.34.0</selenium.version>
-		<htmlunitdriver.version>4.34.0</htmlunitdriver.version>
-		<appium.version>9.5.0</appium.version>
+		<selenium.version>4.35.0</selenium.version>
+		<htmlunitdriver.version>4.35.0</htmlunitdriver.version>
+		<appium.version>10.0.0</appium.version>
 		<log4j.version>2.24.3</log4j.version>
 		<unirest.version>4.4.5</unirest.version>
 		<aspectj.version>1.9.22.1</aspectj.version>
