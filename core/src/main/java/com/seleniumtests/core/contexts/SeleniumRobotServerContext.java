@@ -59,7 +59,13 @@ public class SeleniumRobotServerContext {
         setSeleniumRobotServerVariableReservationDuration(context.getIntValueForTest(SELENIUMROBOTSERVER_VARIABLES_RESERVATION, System.getProperty(SELENIUMROBOTSERVER_VARIABLES_RESERVATION)));
         setSeleniumRobotServerCompareSnapshotTtl(context.getIntValueForTest(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL, System.getProperty(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL)));
         setSeleniumRobotServerCompareSnapshotBehaviour(context.getValueForTest(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, System.getProperty(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR)));
-        setSeleniumRobotServerRecordResults(context.getBoolValueForTest(SELENIUMROBOTSERVER_RECORD_RESULTS, System.getProperty(SELENIUMROBOTSERVER_RECORD_RESULTS)));
+
+		// snapshot comparison needs result recording on server
+		if (getSeleniumRobotServerCompareSnapshot()) {
+			setSeleniumRobotServerRecordResults(true);
+		} else {
+			setSeleniumRobotServerRecordResults(context.getBoolValueForTest(SELENIUMROBOTSERVER_RECORD_RESULTS, System.getProperty(SELENIUMROBOTSERVER_RECORD_RESULTS)));
+		}
         setSeleniumRobotServerVariableOlderThan(context.getIntValueForTest(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN, System.getProperty(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN)));
      
 	}

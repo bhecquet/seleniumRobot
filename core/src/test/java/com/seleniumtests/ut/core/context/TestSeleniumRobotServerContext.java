@@ -358,4 +358,60 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
 		}
 	}
+
+	@Test(groups = "ut")
+	public void testInitParams(final ITestContext testNGCtx, final XmlTest xmlTest) {
+
+		try {
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, "addTestResult");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL, "25");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_VARIABLES_RESERVATION, "10");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN, "7");
+			initThreadContext(testNGCtx);
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerUrl(), "http://localhost:1234");
+			Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerActive());
+			Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerCompareSnapshot());
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerCompareSnapshotBehaviour(), SnapshotComparisonBehaviour.ADD_TEST_RESULT);
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerCompareSnapshotTtl(), 25);
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerVariableReservationDuration(), 10);
+			Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerRecordResults());
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerVariableOlderThan(), 7);
+		} finally {
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_VARIABLES_RESERVATION);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN);
+		}
+	}
+
+	/**
+	 * Check taht if compare snapshot is set to true, recording is activated
+	 * @param testNGCtx
+	 * @param xmlTest
+	 */
+	@Test(groups = "ut")
+	public void testInitComparSnapshot(final ITestContext testNGCtx, final XmlTest xmlTest) {
+
+		try {
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
+			initThreadContext(testNGCtx);
+			Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerActive());
+			Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerCompareSnapshot());
+			Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerRecordResults());
+		} finally {
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+		}
+	}
 }
