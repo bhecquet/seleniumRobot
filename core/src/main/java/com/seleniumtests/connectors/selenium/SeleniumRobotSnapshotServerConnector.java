@@ -455,6 +455,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		try {
 			JSONObject fileJson = getJSonResponse(buildPostRequest(url + FILE_API_URL)
 					.field("file", file)
+					.field("name", file.getName())
 					.field("stepResult", String.valueOf(stepResultId))
 			);
 			return fileJson.getInt("id");

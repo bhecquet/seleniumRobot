@@ -29,6 +29,8 @@ import com.seleniumtests.reporter.info.Info;
 import com.seleniumtests.reporter.info.MultipleInfo;
 import com.seleniumtests.reporter.info.StringInfo;
 import com.seleniumtests.reporter.logger.FileContent;
+import kong.unirest.HttpResponse;
+import kong.unirest.Unirest;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.Rectangle;
 import org.testng.Assert;
@@ -146,15 +148,27 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		Assert.assertEquals(testSteps.size(), 2);
 		Assert.assertEquals(testSteps.get(0), testStepId.toString());
 	}
+
+	@Test(groups={"it"})
+	public void testUploadFile() throws IOException {
+		Integer stepResultId = createStepResult("logs");
+
+		File image = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "img.png").toFile();
+		image.deleteOnExit();
+		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/images/ffLogoConcat.png"), image);
+
+		Integer fileId = connector.uploadFile(image, stepResultId);
+		HttpResponse<File> response = Unirest.get(String.format("http://localhost:8000/snapshot/api/file/%s/", fileId))
+				.header("Authorization", SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerToken())
+				.asFile(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "img_out.png").toString());
+		File file = response.getBody();
+		Assert.assertTrue(file.exists() && file.length() > 0 && image.length() == file.length());
+	}
 	
 	@Test(groups={"it"})
-	public Integer testCreateStepReferenceSnapshot() throws IOException {
-		Integer sessionId = connector.createSession("Session1");
-		Integer testCaseId = connector.createTestCase("Test 2");
-		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 2", "SUCCESS", "LOCAL", "some description", OffsetDateTime.now());
-		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, "logs", 1, testCaseInSessionId, testStepId);
-		
+	public void testCreateStepReferenceSnapshot() throws IOException {
+		Integer stepResultId = createStepResult("logs");
+
 		File image = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "img.png").toFile();
 		image.deleteOnExit();
 		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/images/ffLogoConcat.png"), image);
@@ -166,10 +180,18 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		File referenceImage = connector.getReferenceSnapshot(stepResultId);
 		Assert.assertNotNull(referenceImage);
 		Assert.assertEquals(FileUtils.sizeOf(referenceImage), 5892);
-		
+
+	}
+
+	private Integer createStepResult(String logs) {
+		Integer sessionId = connector.createSession("Session1");
+		Integer testCaseId = connector.createTestCase("Test 2");
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 2", "SUCCESS", "LOCAL", "some description", OffsetDateTime.now());
+		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
+		Integer stepResultId = connector.recordStepResult(true, logs, 1, testCaseInSessionId, testStepId);
 		return stepResultId;
 	}
-	
+
 	/**
 	 * create a snapshot
 	 * @throws IOException 
@@ -177,11 +199,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	@Test(groups={"it"})
 	public void testCreateSnapshot() throws IOException {
 
-		Integer sessionId = connector.createSession("Session1");
-		Integer testCaseId = connector.createTestCase("Test 2");
-		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 2", "SUCCESS", "LOCAL", "some description", OffsetDateTime.now());
-		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, "logs", 1, testCaseInSessionId, testStepId);
+		Integer stepResultId = createStepResult("logs");
 		File image = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "img.png").toFile();
 		image.deleteOnExit();
 		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/images/ffLogoConcat.png"), image);
@@ -201,11 +219,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	@Test(groups={"it"})
 	public void testCheckSnapshotHasNoDifferences() throws IOException {
 
-		Integer sessionId = connector.createSession("Session1");
-		Integer testCaseId = connector.createTestCase("Test 2");
-		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 2", "SUCCESS", "LOCAL", "some description", OffsetDateTime.now());
-		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, "logs", 1, testCaseInSessionId, testStepId);
+		createStepResult("logs");
 		File image = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "img.png").toFile();
 		image.deleteOnExit();
 		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/images/ffLogoConcat.png"), image);
@@ -222,12 +236,8 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	 */
 	@Test(groups={"it"})
 	public void testRecordStepResult() throws IOException {
-		Integer sessionId = connector.createSession("Session1");
-		Integer testCaseId = connector.createTestCase("Test 2");
-		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 2", "SUCCESS", "LOCAL", "some description", OffsetDateTime.now());
-		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, "some logs", 1, testCaseInSessionId, testStepId);
-		
+		Integer stepResultId = createStepResult("some logs");
+
 		Assert.assertNotNull(stepResultId);
 	}
 	
@@ -263,7 +273,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	
 	@Test(groups={"it"})
 	public void testGetStepReferenceDetectFieldInformation() throws IOException {
-		Integer stepResultId = testCreateStepReferenceSnapshot();
+		Integer stepResultId = createStepResult("logs");
 		JSONObject detectionData = connector.getStepReferenceDetectFieldInformation(stepResultId, "afcc45");
 		
 		// no field found because the used picture does not contain any
