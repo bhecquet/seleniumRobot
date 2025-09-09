@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.*;
 
 import com.seleniumtests.core.TestStepManager;
@@ -1358,16 +1359,33 @@ public class TestPageObject2 extends MockitoTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testCallingPageSetForEachThread() {
-		PageLauncher p1 = new PageLauncher();
-		p1.start();
-		PageLauncher p2 = new PageLauncher();
-		p2.start();
-		while (p1.otherPage == null || p2.otherPage == null) {
-			WaitHelper.waitForMilliSeconds(200);
+		PageLauncher p1 = null;
+		PageLauncher p2 = null;
+		try {
+			Instant start = Instant.now();
+			p1 = new PageLauncher();
+			p1.start();
+			while (p1.otherPage == null && Instant.now().minusSeconds(10).isBefore(start)) {
+				WaitHelper.waitForMilliSeconds(200);
+			}
+			Assert.assertNotNull(p1.otherPage);
+			p2 = new PageLauncher();
+			p2.start();
+			while (p2.otherPage == null && Instant.now().minusSeconds(20).isBefore(start)) {
+				WaitHelper.waitForMilliSeconds(200);
+			}
+			Assert.assertNotNull(p2.otherPage);
+
+			// check that for each thread, a different page is recorded
+			Assert.assertNotEquals(p1.getPictureElementPage(), p2.getPictureElementPage());
+		} finally {
+			if (p1 != null && p1.otherPage != null) {
+				p1.otherPage.getDriver().close();
+			}
+			if (p2 != null && p2.otherPage != null) {
+				p2.otherPage.getDriver().close();
+			}
 		}
-		
-		// check that for each thread, a different page is recorded
-		Assert.assertNotEquals(p1.getPictureElementPage(), p2.getPictureElementPage());
 	}
 
 	private class PageLauncher extends Thread {
