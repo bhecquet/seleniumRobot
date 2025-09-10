@@ -27,6 +27,7 @@ import java.nio.file.Paths;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
+import org.jetbrains.annotations.NotNull;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -75,23 +76,12 @@ public class TestScreenZone extends MockitoTest {
 
 	@Test(groups={"ut"})
 	public void testClick() {
-		try (MockedStatic mockedCustomFiringWebDriver = mockStatic(CustomEventFiringWebDriver.class);
-			MockedStatic mockedWebUIDriver = mockStatic(WebUIDriver.class);
+		try (MockedStatic mockedWebUIDriver = mockStatic(WebUIDriver.class);
 		) {
-			ScreenZone picElement = spy(screenZone);
-			picElement.setObjectPictureFile(new File(""));
-
-			mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
-			when(driver.getBrowserInfo()).thenReturn(browserInfo);
-			when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
-
-			doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
-			when(screenshotUtil.capture(SnapshotTarget.SCREEN, File.class, true)).thenReturn(new File(""));
-			when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
-			when(imageDetector.getSizeRatio()).thenReturn(1.0);
+			ScreenZone picElement = prepareScreenZone(mockedWebUIDriver);
 
 			picElement.click();
-			verify(picElement).moveAndLeftClick(35, 60);
+			verify(picElement).moveAndLeftClick(false, 35, 60);
 		}
 	}
 	
@@ -100,26 +90,15 @@ public class TestScreenZone extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testClickTwice() {
-		try (MockedStatic mockedCustomFiringWebDriver = mockStatic(CustomEventFiringWebDriver.class);
-			 MockedStatic mockedWebUIDriver = mockStatic(WebUIDriver.class);
+		try (MockedStatic mockedWebUIDriver = mockStatic(WebUIDriver.class);
 		) {
-			ScreenZone picElement = spy(screenZone);
-			picElement.setObjectPictureFile(new File(""));
-
-			mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
-			when(driver.getBrowserInfo()).thenReturn(browserInfo);
-			when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
-
-			doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
-			when(screenshotUtil.capture(SnapshotTarget.SCREEN, File.class, true)).thenReturn(new File(""));
-			when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
-			when(imageDetector.getSizeRatio()).thenReturn(1.0);
+			ScreenZone picElement = prepareScreenZone(mockedWebUIDriver);
 
 			picElement.click();
 			picElement.click();
 			verify(imageDetector).getDetectedRectangle();
 			verify(picElement, times(2)).findElement();
-			verify(picElement, times(2)).moveAndLeftClick(35, 60);
+			verify(picElement, times(2)).moveAndLeftClick(false, 35, 60);
 		}
 	}
 	
@@ -141,67 +120,82 @@ public class TestScreenZone extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testDoubleClick() {
-		try (MockedStatic mockedCustomFiringWebDriver = mockStatic(CustomEventFiringWebDriver.class);
-			 MockedStatic mockedWebUIDriver = mockStatic(WebUIDriver.class);
+		try (MockedStatic<WebUIDriver> mockedWebUIDriver = mockStatic(WebUIDriver.class);
 		) {
-			ScreenZone picElement = spy(screenZone);
-			picElement.setObjectPictureFile(new File(""));
-
-			mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
-			when(driver.getBrowserInfo()).thenReturn(browserInfo);
-			when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
-
-			doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
-			when(screenshotUtil.capture(SnapshotTarget.SCREEN, File.class, true)).thenReturn(new File(""));
-			when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
-			when(imageDetector.getSizeRatio()).thenReturn(1.0);
+			ScreenZone picElement = prepareScreenZone(mockedWebUIDriver);
 
 			picElement.doubleClickAt(0, 0);
-			verify(picElement).moveAndDoubleClick(35, 60);
+			verify(picElement).moveAndDoubleClick(false, 35, 60);
+		}
+	}
+
+	@Test(groups={"ut"})
+	public void testDoubleClickMainScreen() {
+		try (MockedStatic<WebUIDriver> mockedWebUIDriver = mockStatic(WebUIDriver.class);
+		) {
+			ScreenZone picElement = prepareScreenZone(mockedWebUIDriver);
+
+			picElement.doubleClickAt(true, 0, 0);
+			verify(picElement).moveAndDoubleClick(true, 35, 60);
 		}
 	}
 
 	@Test(groups={"ut"})
 	public void testRightClick() {
-		try (MockedStatic mockedCustomFiringWebDriver = mockStatic(CustomEventFiringWebDriver.class);
-			 MockedStatic mockedWebUIDriver = mockStatic(WebUIDriver.class);
+		try (MockedStatic<WebUIDriver> mockedWebUIDriver = mockStatic(WebUIDriver.class);
 		) {
-			ScreenZone picElement = spy(screenZone);
-			picElement.setObjectPictureFile(new File(""));
-
-			mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
-			when(driver.getBrowserInfo()).thenReturn(browserInfo);
-			when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
-
-			doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
-			when(screenshotUtil.capture(SnapshotTarget.SCREEN, File.class, true)).thenReturn(new File(""));
-			when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
-			when(imageDetector.getSizeRatio()).thenReturn(1.0);
+			ScreenZone picElement = prepareScreenZone(mockedWebUIDriver);
 
 			picElement.rightClickAt(0, 0);
-			verify(picElement).moveAndRightClick(35, 60);
+			verify(picElement).moveAndRightClick(false, 35, 60);
 		}
 	}
 
 	@Test(groups={"ut"})
-	public void testSendKeys() {
-		try (MockedStatic mockedCustomFiringWebDriver = mockStatic(CustomEventFiringWebDriver.class);
-			 MockedStatic mockedWebUIDriver = mockStatic(WebUIDriver.class);
+	public void testRightClickMainScreen() {
+		try (MockedStatic<WebUIDriver> mockedWebUIDriver = mockStatic(WebUIDriver.class);
 		) {
-			ScreenZone picElement = spy(screenZone);
-			picElement.setObjectPictureFile(new File(""));
+			ScreenZone picElement = prepareScreenZone(mockedWebUIDriver);
 
-			mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
-			when(driver.getBrowserInfo()).thenReturn(browserInfo);
-			when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
+			picElement.rightClickAt(true, 0, 0);
+			verify(picElement).moveAndRightClick(true, 35, 60);
+		}
+	}
 
-			doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
-			when(screenshotUtil.capture(SnapshotTarget.SCREEN, File.class, true)).thenReturn(new File(""));
-			when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
-			when(imageDetector.getSizeRatio()).thenReturn(1.0);
+	@NotNull
+	private ScreenZone prepareScreenZone(MockedStatic mockedWebUIDriver) {
+		ScreenZone picElement = spy(screenZone);
+		picElement.setObjectPictureFile(new File(""));
+
+		mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
+		when(driver.getBrowserInfo()).thenReturn(browserInfo);
+		when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
+
+		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
+		when(screenshotUtil.capture(SnapshotTarget.SCREEN, File.class, true)).thenReturn(new File(""));
+		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
+		when(imageDetector.getSizeRatio()).thenReturn(1.0);
+		return picElement;
+	}
+
+	@Test(groups={"ut"})
+	public void testSendKeys() {
+		try (MockedStatic<WebUIDriver> mockedWebUIDriver = mockStatic(WebUIDriver.class);
+		) {
+			ScreenZone picElement = prepareScreenZone(mockedWebUIDriver);
 
 			picElement.sendKeys(0, 0, KeyEvent.VK_0);
-			verify(picElement).moveAndLeftClick(35, 60);
+			verify(picElement).moveAndLeftClick(false, 35, 60);
+		}
+	}
+	@Test(groups={"ut"})
+	public void testSendKeysMainScreen() {
+		try (MockedStatic<WebUIDriver> mockedWebUIDriver = mockStatic(WebUIDriver.class);
+		) {
+			ScreenZone picElement = prepareScreenZone(mockedWebUIDriver);
+
+			picElement.sendKeys(true, 0, 0, KeyEvent.VK_0);
+			verify(picElement).moveAndLeftClick(true, 35, 60);
 		}
 	}
 	

@@ -237,20 +237,11 @@ public class ChromeUtils {
 			JSONObject receiveHandshakeResp = (JSONObject) requestsEntry.getValue().get("webSocketHandshakeResponseReceived");
 			JSONObject closedWebSocket = (JSONObject) requestsEntry.getValue().get("webSocketClosed");
 			
-			//Init the datas
+			// Init the datas
 			String url = "wss://not.found";
 			Page pageRef = null;
 			long entryDate = 0;
-			Request req = new Request(
-					0,
-					"",
-					"",
-					"",
-					new ArrayList<>(),
-					new ArrayList<>(),
-					new ArrayList<>(),
-					0
-			);
+			Request req = null;
 			Response res = new Response(
 					0,
 					"",
@@ -264,17 +255,17 @@ public class ChromeUtils {
 			);
 			int duration = -1;
 			
-			//Setting every data possible following the available requests entries
+			// Setting every data possible following the available requests entries
 			if (createdWebSocket != null) {
 				url = createdWebSocket.getJSONObject("params").getString("url");
 				req = buildWebSocketRequest(createdWebSocket, url);
 			}
 			
 			if (receiveHandshakeResp != null) {
-				//Set the request
+				// Set the request
 				req = buildWebSocketRequest(receiveHandshakeResp, url);
 				
-				//Set the response
+				// Set the response
 				JSONObject jsonResponseHeaders = receiveHandshakeResp.getJSONObject("params").getJSONObject("response").getJSONObject("headers");
 				res = new Response(
 						receiveHandshakeResp.getJSONObject("params").getJSONObject("response").getInt("status"),
@@ -294,7 +285,7 @@ public class ChromeUtils {
 			if (sendHandshakeReq != null) {
 				entryDate = (long) (sendHandshakeReq.getJSONObject("params").getDouble("wallTime") * 1000);
 				pageRef = getPageRef(pageStart, entryDate);
-				//Set the request in case there's no response message
+				// Set the request in case there's no response message
 				if (req == null) {
 					req = buildWebSocketRequest(sendHandshakeReq, url);
 				}
@@ -303,8 +294,22 @@ public class ChromeUtils {
 				}
 			}
 			
-			//Get the messages, ordered by their timestamps
+			// Get the messages, ordered by their timestamps
 			List<WebSocketMessage> webSocketMessages = buildWebSocketMessages(requestsEntry);
+
+			// Initialize request in case it has not been done
+			if (req == null) {
+				req = new Request(
+						0,
+						"",
+						"",
+						"",
+						new ArrayList<>(),
+						new ArrayList<>(),
+						new ArrayList<>(),
+						0
+				);
+			}
 			
 			WebSocketEntry webSocketEntry = new WebSocketEntry(
 					pageRef == null ? "" : pageRef.getId(),
@@ -315,7 +320,7 @@ public class ChromeUtils {
 					duration,
 					webSocketMessages);
 			
-			//Return the WebSocketEntry object and the Page in order to maintain the logic in the parent parsing function
+			// Return the WebSocketEntry object and the Page in order to maintain the logic in the parent parsing function
 			ArrayList<Object> responseArray = new ArrayList<>();
 			responseArray.add(webSocketEntry);
 			responseArray.add(pageRef);
