@@ -158,8 +158,8 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/images/ffLogoConcat.png"), image);
 
 		Integer fileId = connector.uploadFile(image, stepResultId);
-		HttpResponse<File> response = Unirest.get(String.format("http://localhost:8000/snapshot/api/file/%s/", fileId))
-				.header("Authorization", SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerToken())
+		HttpResponse<File> response = Unirest.get(String.format("http://localhost:8000/snapshot/api/file/%s/download/", fileId))
+				.header("Authorization", "Token " + SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerToken())
 				.asFile(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "img_out.png").toString());
 		File file = response.getBody();
 		Assert.assertTrue(file.exists() && file.length() > 0 && image.length() == file.length());
