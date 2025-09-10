@@ -57,8 +57,8 @@ import com.seleniumtests.util.osutility.OSUtility;
 
 public class TestChromeCapabilityFactory extends MockitoTest {
 
-	public static final String CURRENT_CHROME_VERSION = "132.0";
-	public static final String NEXT_CHROME_VERSION = "133.0";
+	public static final String CURRENT_CHROME_VERSION = "140.0";
+	public static final String NEXT_CHROME_VERSION = "141.0";
 	Map<BrowserType, List<BrowserInfo>> browserInfos;
 
 	@Mock
