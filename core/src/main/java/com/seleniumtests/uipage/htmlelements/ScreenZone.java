@@ -103,6 +103,10 @@ public class ScreenZone extends GenericPictureElement {
 	 * In case the size ratio between searched picture and found picture is not 1, then, offset is
 	 * the source offset so that it's compatible with any screen size and resolution.
 	 * Set the mainScreen parameter to true if you want to force the click on the main screen instead of the top-left one.
+	 *
+	 * @param mainScreen true if you want to force the action to be on the main screen, false to stay on the top left screen
+	 * @param xOffset	 Offest from the center of the object image, or absolute image if no object image is provided
+	 * @param yOffset	 Offest from the center of the object image, or absolute image if no object image is provided
 	 */
 	@ReplayOnError(waitAfterAction = true)
 	public void clickAt(boolean mainScreen, int xOffset, int yOffset) {
@@ -113,12 +117,23 @@ public class ScreenZone extends GenericPictureElement {
 
 		moveAndLeftClick(mainScreen, relativeX + (int)(xOffset * getPictureSizeRatio()), relativeY + (int)(yOffset * getPictureSizeRatio()));
 	}
-	
+
+	/**
+	 *
+	 * @param xOffset	 Offest from the center of the object image, or absolute image if no object image is provided
+	 * @param yOffset	 Offest from the center of the object image, or absolute image if no object image is provided
+	 */
 	@ReplayOnError(waitAfterAction = true)
 	public void doubleClickAt(int xOffset, int yOffset) {
 		doubleClickAt(false, xOffset, yOffset);
 	}
-	
+
+	/**
+	 *
+	 * @param mainScreen true if you want to force the action to be on the main screen, false to stay on the top left screen
+	 * @param xOffset	 Offest from the center of the object image, or absolute image if no object image is provided
+	 * @param yOffset	 Offest from the center of the object image, or absolute image if no object image is provided
+	 */
 	@ReplayOnError(waitAfterAction = true)
 	public void doubleClickAt(boolean mainScreen, int xOffset, int yOffset) {
 		findElement();
@@ -128,12 +143,22 @@ public class ScreenZone extends GenericPictureElement {
 		
 		moveAndDoubleClick(mainScreen, relativeX + (int)(xOffset * getPictureSizeRatio()), relativeY + (int)(yOffset * getPictureSizeRatio()));
 	}
-	
+
+	/**
+	 * @param xOffset	 Offest from the center of the object image, or absolute image if no object image is provided
+	 * @param yOffset	 Offest from the center of the object image, or absolute image if no object image is provided
+	 */
 	@ReplayOnError(waitAfterAction = true)
 	public void rightClickAt(int xOffset, int yOffset) {
 		rightClickAt(false, xOffset, yOffset);
 	}
-	
+
+	/**
+	 *
+	 * @param mainScreen true if you want to force the action to be on the main screen, false to stay on the top left screen
+	 * @param xOffset	 Offest from the center of the object image, or absolute image if no object image is provided
+	 * @param yOffset	 Offest from the center of the object image, or absolute image if no object image is provided
+	 */
 	@ReplayOnError(waitAfterAction = true)
 	public void rightClickAt(boolean mainScreen, int xOffset, int yOffset) {
 		findElement();
@@ -157,7 +182,8 @@ public class ScreenZone extends GenericPictureElement {
     }
     
 	public void moveAndLeftClick(boolean mainScreen, int coordX, int coordY) {
-		CustomEventFiringWebDriver.leftClicOnDesktopAt(mainScreen, coordX, coordY, 
+
+		CustomEventFiringWebDriver.leftClicOnDesktopAt(useMainScreen(mainScreen), coordX, coordY,
 				SeleniumTestsContextManager.getThreadContext().getRunMode(), 
 				SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector());
 	}
@@ -167,7 +193,7 @@ public class ScreenZone extends GenericPictureElement {
 	}
 	
 	public void moveAndDoubleClick(boolean mainScreen, int coordX, int coordY) {
-		CustomEventFiringWebDriver.doubleClickOnDesktopAt(mainScreen, coordX, coordY, 
+		CustomEventFiringWebDriver.doubleClickOnDesktopAt(useMainScreen(mainScreen), coordX, coordY,
 				SeleniumTestsContextManager.getThreadContext().getRunMode(), 
 				SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector());
 	}
@@ -177,9 +203,25 @@ public class ScreenZone extends GenericPictureElement {
 	}
 	
 	public void moveAndRightClick(boolean mainScreen, int coordX, int coordY) {
-		CustomEventFiringWebDriver.rightClicOnDesktopAt(mainScreen, coordX, coordY, 
+		CustomEventFiringWebDriver.rightClicOnDesktopAt(useMainScreen(mainScreen), coordX, coordY,
 				SeleniumTestsContextManager.getThreadContext().getRunMode(), 
 				SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector());
+	}
+
+	/**
+	 * Determine if we should perform the action on main screen or not
+	 * In case we search an image on the screen, then, the object coordinates are absolute to all screen, so "mainScreen" must be set to false
+	 * In case we need to perform an action at a given position, without reference to an object, we need to know if action must be done on main screen (generally, where the browser is)
+	 * or at absolute position
+	 * @param mainScreen true if you want to force the action to be on the main screen, false to stay on the top left screen
+	 * @return
+	 */
+	private boolean useMainScreen(boolean mainScreen) {
+		if (objectPictureFile != null) {
+			return false;
+		} else {
+			return mainScreen;
+		}
 	}
 	
 	/**
@@ -196,9 +238,9 @@ public class ScreenZone extends GenericPictureElement {
 	}
 	
 	/**
-	 * Send text to desktop using keyboard at xOffset, yOffset. Before sending keys, we robot clicks on position to gain focus
-	 * @param xOffset	
-	 * @param yOffset
+	 * Send text to desktop using keyboard at xOffset, yOffset. Before sending keys, robot clicks on position to gain focus
+	 * @param xOffset	 Offest from the center of the object image, or absolute image if no object image is provided
+	 * @param yOffset	 Offest from the center of the object image, or absolute image if no object image is provided
 	 * @param text		Text to write
 	 */
 	public void sendKeys(int xOffset, int yOffset, final CharSequence text) {
@@ -208,8 +250,8 @@ public class ScreenZone extends GenericPictureElement {
 	/**
 	 * Send text to desktop using keyboard at xOffset, yOffset. Before sending keys, we robot clicks on position to gain focus
 	 * @param mainScreen true if you want to force the action to be on the main screen, false to stay on the top left screen
-	 * @param xOffset	
-	 * @param yOffset
+	 * @param xOffset	 Offest from the center of the object image, or absolute image if no object image is provided
+	 * @param yOffset	 Offest from the center of the object image, or absolute image if no object image is provided
 	 * @param text		Text to write
 	 */
 	public void sendKeys(boolean mainScreen, int xOffset, int yOffset, final CharSequence text) {
@@ -223,8 +265,8 @@ public class ScreenZone extends GenericPictureElement {
 	/**
 	 * Example of use: page.zone.sendKeys(0, 40, KeyEvent.VK_A, KeyEvent.VK_B);
 	 * Beware of key mapping which may be different depending on locale and keyboard. Use this to send control keys like "VK_ENTER"
-	 * @param xOffset
-	 * @param yOffset
+	 * @param xOffset	 Offest from the center of the object image, or absolute image if no object image is provided
+	 * @param yOffset	 Offest from the center of the object image, or absolute image if no object image is provided
 	 * @param events	Key events to send
 	 */
 	public void sendKeys(int xOffset, int yOffset, Integer ... events) {
@@ -235,9 +277,9 @@ public class ScreenZone extends GenericPictureElement {
 	 * Example of use: page.zone.sendKeys(0, 40, KeyEvent.VK_A, KeyEvent.VK_B);
 	 * Beware of key mapping which may be different depending on locale and keyboard. Use this to send control keys like "VK_ENTER"
 	 * @param mainScreen true if you want to force the action to be on the main screen, false to stay on the top left screen
-	 * @param xOffset
-	 * @param yOffset
-	 * @param events	Key events to send 
+	 * @param xOffset	 Offest from the center of the object image, or absolute image if no object image is provided
+	 * @param yOffset	 Offest from the center of the object image, or absolute image if no object image is provided
+	 * @param events	 Key events to send
 	 */
 	public void sendKeys(boolean mainScreen, int xOffset, int yOffset, Integer ... events) {
 		clickAt(mainScreen, xOffset, yOffset);

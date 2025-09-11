@@ -45,6 +45,7 @@ public class DriverTestPageWithoutFixedPattern extends PageObject {
 	
 	public static final TextFieldElement textElement = new TextFieldElement("Text", By.id("text2"));
 	public static final Table table = new Table("table", By.id("table"));
+	public static final HtmlElement carre = new HtmlElement("table", By.id("carre"));
 	public static final PictureElement picture = new PictureElement("picture", "tu/images/logo_text_field.png", table);
 	public static final PictureElement pictureNotPresent = new PictureElement("picture", "tu/images/vosAlertes.png", table);
 	public static final PictureElement googlePicture = new PictureElement("picture", "tu/googleSearch.png", null);
@@ -53,6 +54,7 @@ public class DriverTestPageWithoutFixedPattern extends PageObject {
 	public static final ScreenZone googleForDesktop = new ScreenZone("picture", "tu/googleSearch.png");
 	public static final ScreenZone googleForDesktopWithFile = new ScreenZone("picture", Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "images", "googleSearch.png").toFile());
 	public static final ScreenZone firefoxForDesktop = new ScreenZone("picture", "tu/images/logo_text_field.png");
+	public static final ScreenZone screenZoneFullScreen = new ScreenZone("screen");
 	public static final ScreenZone zoneNotPresent = new ScreenZone("picture", "tu/images/vosAlertes.png");
 	public static final LinkElement newpage = new LinkElement("New Page", By.id("newpage"));
 	public static final TextFieldElement logoText = new TextFieldElement("logoText", By.id("logoText"));

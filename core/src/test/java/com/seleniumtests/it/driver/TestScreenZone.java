@@ -19,8 +19,8 @@ package com.seleniumtests.it.driver;
 
 import java.awt.event.KeyEvent;
 
-import org.openqa.selenium.Rectangle;
-import org.openqa.selenium.WebDriver;
+import com.seleniumtests.customexception.WebSessionEndedException;
+import org.openqa.selenium.*;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
@@ -36,6 +36,7 @@ import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageWithoutFixedPattern;
 import com.seleniumtests.uipage.htmlelements.ScreenZone;
 import com.seleniumtests.util.helper.WaitHelper;
+import org.w3c.dom.css.Rect;
 
 public class TestScreenZone extends GenericMultiBrowserTest {
 	
@@ -50,6 +51,12 @@ public class TestScreenZone extends GenericMultiBrowserTest {
 	@AfterMethod(groups={"it"}, alwaysRun=true)
 	public void reset() {
 		if (driver != null) {
+
+			try {
+				Alert alert = driver.switchTo().alert();
+				alert.dismiss();
+			} catch (Exception e) {}
+
 			DriverTestPageWithoutFixedPattern.logoText.clear();
 			DriverTestPageWithoutFixedPattern.textElement.clear();
 			((CustomEventFiringWebDriver)driver).scrollTop();
@@ -208,7 +215,40 @@ public class TestScreenZone extends GenericMultiBrowserTest {
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
 		}
-		Assert.assertEquals(DriverTestPageWithoutFixedPattern.logoText.getValue(), "hello");
+		Assert.assertEquals(DriverTestPageWithoutFixedPattern.logoText.getValue(), "ab");
+	}
+	@Test(groups={"it"})
+	public void testSendKeysOnMainScreenNoPicture() {
+		try {
+			DriverTestPageWithoutFixedPattern.logoText.clear();
+			((CustomEventFiringWebDriver)driver).scrollToElement(DriverTestPageWithoutFixedPattern.table, 200);
+			DriverTestPageWithoutFixedPattern.firefoxForDesktop.findElement();
+			Rectangle position = DriverTestPageWithoutFixedPattern.firefoxForDesktop.getDetectedObjectRectangle();
+
+			// compute relative position of main screen so that offset we pass to sendKeys are relative to main screen
+			java.awt.Rectangle mainScreenPosition = CustomEventFiringWebDriver.getMainScreenRectangle();
+			java.awt.Rectangle screenPosition = CustomEventFiringWebDriver.getScreensRectangle();
+			DriverTestPageWithoutFixedPattern.screenZoneFullScreen.sendKeys(true, position.x - (mainScreenPosition.x - screenPosition.x) + 50, position.y - (mainScreenPosition.y - screenPosition.y) + 70, KeyEvent.VK_C, KeyEvent.VK_B);
+		} catch (ImageSearchException e) {
+			throw new SkipException("Image not found, we may be on screenless slave", e);
+		}
+		Assert.assertEquals(DriverTestPageWithoutFixedPattern.logoText.getValue(), "cb");
+	}
+
+	@Test(groups={"it"})
+	public void testSendKeysNoFocus() {
+		try {
+			DriverTestPageWithoutFixedPattern.carre.click();
+			testPageWithoutPattern.getAlert(); // will break if alert is not present
+			DriverTestPageWithoutFixedPattern.screenZoneFullScreen.sendKeysNoFocus(KeyEvent.VK_ENTER);
+			try {
+				testPageWithoutPattern.getDriver().switchTo().alert();
+			} catch (NoAlertPresentException e) {
+				// Ok here
+			}
+		} catch (ImageSearchException e) {
+			throw new SkipException("Image not found, we may be on screenless slave", e);
+		}
 	}
 	
 }

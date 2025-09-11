@@ -1233,7 +1233,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		}
 		return screenRect;
 	}
-	private static Rectangle getMainScreenRectangle() {
+	public static Rectangle getMainScreenRectangle() {
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		
 		GraphicsDevice gd = ge.getDefaultScreenDevice();
