@@ -706,7 +706,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	}
 	
 	/**
-	 * If SELENIUMROBOTSERVER_COMPARE_SNAPSHOT is true but not SELENIUMROBOTSERVER_RECORD_RESULTS, references should not be recorded
+	 * If SELENIUMROBOTSERVER_COMPARE_SNAPSHOT is true but not SELENIUMROBOTSERVER_RECORD_RESULTS, references should STILL be recorded
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})
@@ -732,7 +732,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShortKo"});
 			
 			verify(serverConnector).createTestStep("_writeSomethingOnNonExistentElement", 0);
-			verify(serverConnector, never()).createStepReferenceSnapshot(any(Snapshot.class), eq(0)); // no reference recording at all
+			verify(serverConnector).createStepReferenceSnapshot(any(Snapshot.class), eq(0)); // no reference recording at all
 			verify(serverConnector, never()).createStepReferenceSnapshot(any(Snapshot.class), eq(123)); // no reference recording for failed step
 			
 		} finally {

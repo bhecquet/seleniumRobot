@@ -113,17 +113,18 @@ public class TestWebUiDriver extends ReporterTest {
 			when(driverOptions.timeouts()).thenReturn(timeouts);
 
 			SeleniumTestsContextManager.getThreadContext().setRunMode("local");
-			SeleniumTestsContextManager.getThreadContext().setAppiumServerUrl("http://localhost:4321/wd/hub/");
+			SeleniumTestsContextManager.getThreadContext().setAppiumServerUrl("http://localhost:4321/");
 			SeleniumTestsContextManager.getThreadContext().setDeviceId("emulator-5556");
 			SeleniumTestsContextManager.getThreadContext().setPlatform("android");
 			SeleniumTestsContextManager.getThreadContext().setMobilePlatformVersion("5.0");
 			SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_ANDROID);
 
-			createServerMock("GET", "/wd/hub/sessions", 200, "{}");
+			createServerMock("GET", "/appium/sessions", 200, "{}"); // appium 3
+			createServerMock("GET", "/sessions", 200, "{}");		 // appium 2
 
 			ExistingAppiumLauncher appiumLauncher;
 
-			appiumLauncher = spy(new ExistingAppiumLauncher("http://localhost:4321/wd/hub/"));
+			appiumLauncher = spy(new ExistingAppiumLauncher("http://localhost:4321/"));
 			mockedAppiumLauncher.when(() -> AppiumLauncherFactory.getInstance()).thenReturn(appiumLauncher);
 
 			WebUIDriver.getWebDriver(true);
@@ -155,17 +156,18 @@ public class TestWebUiDriver extends ReporterTest {
 			when(driverOptions.timeouts()).thenReturn(timeouts);
 
 			SeleniumTestsContextManager.getThreadContext().setRunMode("local");
-			SeleniumTestsContextManager.getThreadContext().setAppiumServerUrl("http://localhost:4321/wd/hub/");
+			SeleniumTestsContextManager.getThreadContext().setAppiumServerUrl("http://localhost:4321/");
 			SeleniumTestsContextManager.getThreadContext().setDeviceId("123456");
 			SeleniumTestsContextManager.getThreadContext().setPlatform("ios");
 			SeleniumTestsContextManager.getThreadContext().setMobilePlatformVersion("13.0");
 			SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_IOS);
 
-			createServerMock("GET", "/wd/hub/sessions", 200, "{}");
+			createServerMock("GET", "/appium/sessions", 200, "{}"); // appium 3
+			createServerMock("GET", "/sessions", 200, "{}");		 // appium 2
 
 			ExistingAppiumLauncher appiumLauncher;
 
-			appiumLauncher = spy(new ExistingAppiumLauncher("http://localhost:4321/wd/hub/"));
+			appiumLauncher = spy(new ExistingAppiumLauncher("http://localhost:4321/"));
 			mockedAppiumLauncher.when(() -> AppiumLauncherFactory.getInstance()).thenReturn(appiumLauncher);
 
 			WebUIDriver.getWebDriver(true);
@@ -196,15 +198,16 @@ public class TestWebUiDriver extends ReporterTest {
 
 			SeleniumTestsContextManager.getThreadContext().setRunMode("local");
 			SeleniumTestsContextManager.getThreadContext().setApp("myApp");
-			SeleniumTestsContextManager.getThreadContext().setAppiumServerUrl("http://localhost:4321/wd/hub/");
+			SeleniumTestsContextManager.getThreadContext().setAppiumServerUrl("http://localhost:4321/");
 			SeleniumTestsContextManager.getThreadContext().setPlatform("windows");
 			SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_WINDOWS);
 
-			createServerMock("GET", "/wd/hub/sessions", 200, "{}");
+			createServerMock("GET", "/appium/sessions", 200, "{}"); // appium 3
+			createServerMock("GET", "/sessions", 200, "{}");		 // appium 2
 
 			ExistingAppiumLauncher appiumLauncher;
 
-			appiumLauncher = spy(new ExistingAppiumLauncher("http://localhost:4321/wd/hub/"));
+			appiumLauncher = spy(new ExistingAppiumLauncher("http://localhost:4321/"));
 			mockedAppiumLauncher.when(() -> AppiumLauncherFactory.getInstance()).thenReturn(appiumLauncher);
 
 			WebUIDriver.getWebDriver(true);
@@ -236,16 +239,17 @@ public class TestWebUiDriver extends ReporterTest {
 			when(driverOptions.timeouts()).thenReturn(timeouts);
 			
 			SeleniumTestsContextManager.getThreadContext().setRunMode("local");
-			SeleniumTestsContextManager.getThreadContext().setAppiumServerUrl("http://localhost:4321/wd/hub/");
+			SeleniumTestsContextManager.getThreadContext().setAppiumServerUrl("http://localhost:4321/");
 			SeleniumTestsContextManager.getThreadContext().setPlatform("android");
 			SeleniumTestsContextManager.getThreadContext().setMobilePlatformVersion("5.0");
 			SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_ANDROID);
-			
-			createServerMock("GET", "/wd/hub/sessions", 200, "{}");
+
+			createServerMock("GET", "/appium/sessions", 200, "{}"); // appium 3
+			createServerMock("GET", "/sessions", 200, "{}");		 // appium 2
 
 			ExistingAppiumLauncher appiumLauncher;
 
-			appiumLauncher = spy(new ExistingAppiumLauncher("http://localhost:4321/wd/hub/"));
+			appiumLauncher = spy(new ExistingAppiumLauncher("http://localhost:4321/"));
 			mockedAppiumLauncher.when(() -> AppiumLauncherFactory.getInstance()).thenReturn(appiumLauncher);
 			
 			WebUIDriver.getWebDriver(true);
