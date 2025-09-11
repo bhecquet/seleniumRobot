@@ -80,7 +80,12 @@ public class TestDriverEdge extends TestDriver {
 	public void testClickActionDiv() {
 		super.testClickActionDiv();
 	}
-	
+
+	@Test(groups={"it", "ut"})
+	public void testRightClickActionDiv() {
+		super.testRightClickActionDiv();
+	}
+
 	@Test(groups={"it", "ut"})
 	public void testDoubleClickActionDiv() {
 		super.testDoubleClickActionDiv();
@@ -99,6 +104,11 @@ public class TestDriverEdge extends TestDriver {
 	@Test(groups={"it"})
 	public void testClickWithMouse() {
 		super.testClickWithMouse();
+	}
+
+	@Test(groups={"it"})
+	public void testRightClickWithMouse() {
+		super.testRightClickWithMouse();
 	}
    
 	@Test(groups={"it", "ut"})

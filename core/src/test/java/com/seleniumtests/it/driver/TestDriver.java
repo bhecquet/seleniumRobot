@@ -152,7 +152,6 @@ public class TestDriver extends GenericMultiBrowserTest {
 			Assert.assertEquals( DriverTestPage.textElement.getValue(), "");
 		}
 	}
-   
 	
 	public void testClickRadio() {
 		try {
@@ -220,8 +219,17 @@ public class TestDriver extends GenericMultiBrowserTest {
 			Assert.assertEquals(DriverTestPage.textElement.getValue(), "");
 		}
 	}
-	
-	
+
+	public void testRightClickActionDiv() {
+		try {
+			DriverTestPage.redSquare.rightClickAction();
+			Assert.assertEquals(DriverTestPage.textElement.getValue(), "right coucou");
+		} finally {
+			DriverTestPage.resetButton.click();
+			Assert.assertEquals( DriverTestPage.textElement.getValue(), "");
+		}
+	}
+
 	public void testDoubleClickActionDiv() {
 		try {
 			DriverTestPage.redSquare.doubleClickAction();
@@ -258,6 +266,16 @@ public class TestDriver extends GenericMultiBrowserTest {
 			Assert.assertTrue(DriverTestPage.checkElement.isSelected());
 		} finally {
 			DriverTestPage.resetButton.click();
+		}
+	}
+
+	public void testRightClickWithMouse() {
+		try {
+			DriverTestPage.redSquare.rightClickMouse();
+			Assert.assertEquals(DriverTestPage.textElement.getValue(), "right coucou");
+		} finally {
+			DriverTestPage.resetButton.click();
+			Assert.assertEquals( DriverTestPage.textElement.getValue(), "");
 		}
 	}
    

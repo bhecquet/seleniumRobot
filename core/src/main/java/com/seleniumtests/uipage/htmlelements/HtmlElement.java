@@ -305,6 +305,21 @@ public class HtmlElement extends Element implements WebElement, Locatable {
             logger.error(e);
         }
     }
+
+	/**
+	 * Right Click with CompositeActions
+	 */
+	@ReplayOnError(waitAfterAction = true)
+	public void rightClickAction() {
+		findElement(true);
+
+		outlineElement(getRealElementNoSearch());
+		try {
+			new Actions(getDriver()).contextClick(getRealElementNoSearch()).perform();
+		} catch (InvalidElementStateException e) {
+			logger.error(e);
+		}
+	}
     
     /**
      * Double Click with CompositeActions
@@ -336,6 +351,28 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 		Point scrollPosition = ((CustomEventFiringWebDriver) getDriver()).getScrollPosition();
 
 		CustomEventFiringWebDriver.leftClicOnDesktopAt(true,
+				elementRect.x + elementRect.width / 2 + viewportPosition.x - scrollPosition.x,
+				elementRect.y + elementRect.height / 2 + viewportPosition.y - scrollPosition.y,
+				SeleniumTestsContextManager.getThreadContext().getRunMode(),
+				SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector());
+
+	}
+
+	@ReplayOnError(waitAfterAction = true)
+	public void rightClickMouse() {
+
+		Rectangle viewportPosition = detectViewPortPosition();
+
+		// always scroll to element so that we can click on it with mouse
+		setScrollToElementBeforeAction(true);
+		findElement(true);
+
+		outlineElement(getRealElementNoSearch());
+
+		Rectangle elementRect = getRect();
+		Point scrollPosition = ((CustomEventFiringWebDriver) getDriver()).getScrollPosition();
+
+		CustomEventFiringWebDriver.rightClicOnDesktopAt(true,
 				elementRect.x + elementRect.width / 2 + viewportPosition.x - scrollPosition.x,
 				elementRect.y + elementRect.height / 2 + viewportPosition.y - scrollPosition.y,
 				SeleniumTestsContextManager.getThreadContext().getRunMode(),

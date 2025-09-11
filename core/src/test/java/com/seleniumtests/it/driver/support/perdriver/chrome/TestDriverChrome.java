@@ -97,6 +97,11 @@ public class TestDriverChrome extends TestDriver {
 	}
 	
 	@Test(groups={"it", "ut"})
+	public void testRightClickActionDiv() {
+		super.testRightClickActionDiv();
+	}
+
+	@Test(groups={"it", "ut"})
 	public void testDoubleClickActionDiv() {
 		super.testDoubleClickActionDiv();
 	}
@@ -114,6 +119,11 @@ public class TestDriverChrome extends TestDriver {
 	@Test(groups={"it"})
 	public void testClickWithMouse() {
 		super.testClickWithMouse();
+	}
+
+	@Test(groups={"it"})
+	public void testRightClickWithMouse() {
+		super.testRightClickWithMouse();
 	}
    
 	@Test(groups={"it", "ut"})
