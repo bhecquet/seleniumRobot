@@ -476,6 +476,30 @@ public class TestDriver extends GenericMultiBrowserTest {
 		Assert.assertTrue(new Date().getTime() - start > 6500);
 	}
 
+	public void testFindHtmlElements() {
+		List<WebElement> htmlElements = new HtmlElement("", By.id("parent")).findElement(By.className("myClass")).findHtmlElements();
+		Assert.assertEquals(htmlElements.size(), 2);
+		Assert.assertTrue(htmlElements.get(0) instanceof HtmlElement);
+		Assert.assertEquals(htmlElements.get(0).getText(), "first child");
+	}
+
+	public void testFindHtmlElementsInsideFrame() {
+		List<WebElement> htmlElements = new HtmlElement("", By.id("tableIframe2"), DriverTestPage.iframe).findElement(By.tagName("td")).findHtmlElements();
+		Assert.assertEquals(htmlElements.size(), 2);
+		Assert.assertTrue(htmlElements.get(0) instanceof HtmlElement);
+		Assert.assertEquals(htmlElements.get(0).getText(), "Value 3");
+	}
+
+	public void testFindHtmlElementsNotExist() {
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(7);
+		long start = new Date().getTime();
+		List<WebElement> htmlElements = new HtmlElement("", By.id("parent")).findElement(By.className("myClassNotHere")).findHtmlElements();
+		Assert.assertEquals(htmlElements.size(), 0);
+
+		// no problem to use timing here, has in case of slowness, assertion will still be true
+		Assert.assertTrue(new Date().getTime() - start > 6500);
+	}
+
 
 	/**
 	 * Search an element inside an other one

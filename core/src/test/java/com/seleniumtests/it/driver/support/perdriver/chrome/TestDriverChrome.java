@@ -192,6 +192,21 @@ public class TestDriverChrome extends TestDriver {
 	}
 
 	@Test(groups={"it", "ut"})
+	public void testFindHtmlElements() {
+		super.testFindHtmlElements();
+	}
+
+	@Test(groups={"it", "ut"})
+	public void testFindHtmlElementsInsideFrame() {
+		super.testFindHtmlElementsInsideFrame();
+	}
+
+	@Test(groups={"it", "ut"})
+	public void testFindHtmlElementsNotExist() {
+		super.testFindHtmlElementsNotExist();
+	}
+
+	@Test(groups={"it", "ut"})
 	public void testFindSubElement() {
 		super.testFindSubElement();
 	}

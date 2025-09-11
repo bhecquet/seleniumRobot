@@ -181,6 +181,21 @@ public class TestDriverInternetExplorer extends TestDriver {
 		super.testFindHtmlElementsByWithSimilarElements();
 	}
 
+	@Test(groups={"it", "ut"})
+	public void testFindHtmlElements() {
+		super.testFindHtmlElements();
+	}
+
+	@Test(groups={"it", "ut"})
+	public void testFindHtmlElementsInsideFrame() {
+		super.testFindHtmlElementsInsideFrame();
+	}
+
+	@Test(groups={"it", "ut"})
+	public void testFindHtmlElementsNotExist() {
+		super.testFindHtmlElementsNotExist();
+	}
+
 	@Test(groups= {"ie"})
 	public void testFindSubElement() {
 		super.testFindSubElement();
