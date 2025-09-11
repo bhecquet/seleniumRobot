@@ -19,7 +19,6 @@ package com.seleniumtests.it.driver;
 
 import java.awt.event.KeyEvent;
 
-import com.seleniumtests.customexception.WebSessionEndedException;
 import org.openqa.selenium.*;
 import org.testng.Assert;
 import org.testng.SkipException;
@@ -36,7 +35,6 @@ import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageWithoutFixedPattern;
 import com.seleniumtests.uipage.htmlelements.ScreenZone;
 import com.seleniumtests.util.helper.WaitHelper;
-import org.w3c.dom.css.Rect;
 
 public class TestScreenZone extends GenericMultiBrowserTest {
 	
