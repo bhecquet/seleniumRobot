@@ -4,7 +4,7 @@
 	<parent>
 	    <groupId>com.infotel.seleniumRobot</groupId>
 	    <artifactId>core-parent-selenium4</artifactId>
-	    <version>5.1.32</version>
+	    <version>5.1.33-SNAPSHOT</version>
 	</parent>
 
   	<artifactId>core-selenium4</artifactId>
