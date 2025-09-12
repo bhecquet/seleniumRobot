@@ -255,6 +255,9 @@
 </script>
 <script> 
 $(document).ready(function(){
+	// disable right-click so that "right click" tests are not annoyed by menu
+	window.addEventListener(`contextmenu`, (e) => e.preventDefault());
+
   $("#button").click(function(){
     $("div").animate({left:'1450px'}, 600);
   });
