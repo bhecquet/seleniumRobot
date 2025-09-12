@@ -358,7 +358,7 @@ public abstract class OSUtility {
      * @return
      */
     public static String getFirefoxVersion(String firefoxPath) {
-    	return OSCommand.executeCommandAndWait(String.format("\"%s\" --version | more", firefoxPath), true);
+    	return OSCommand.executeCommandAndWait(String.format("%s --version | more", firefoxPath), true);
     }
     
     public List<BrowserType> getInstalledBrowsers() {

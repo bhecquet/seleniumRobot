@@ -18,6 +18,7 @@
 package com.seleniumtests.ut.util.osutility;
 
 import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
@@ -115,7 +116,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 	public void testGetProcessPidByListenPort() {
 
 		try (MockedStatic mockedOsCommand = mockStatic(OSCommand.class)) {
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("netstat -aon")).thenReturn("Proto  Adresse locale         Adresse distante       État\r\n"
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("netstat -aon", true)).thenReturn("Proto  Adresse locale         Adresse distante       État\r\n"
 					+ "TCP    0.0.0.0:64360          0.0.0.0:0              LISTENING       39320\r\n" +
 					"  TCP    0.0.0.0:64362          0.0.0.0:0              LISTENING       26660\r\n" +
 					"  TCP    0.0.0.0:51239          0.0.0.0:0              LISTENING       22492\r\n" +
@@ -135,7 +136,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 	public void testGetProcessPidByListenPort2() {
 
 		try (MockedStatic mockedOsCommand = mockStatic(OSCommand.class)) {
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("netstat -aon")).thenReturn("Proto  Adresse locale         Adresse distante       État\r\n"
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("netstat -aon", true)).thenReturn("Proto  Adresse locale         Adresse distante       État\r\n"
 					+ "TCP    0.0.0.0:64360          0.0.0.0:0              LISTENING       39320\r\n" + 
 					"  TCP    0.0.0.0:64362          0.0.0.0:0              LISTENING       26660\r\n" + 
 					"  TCP    0.0.0.0:123          0.0.0.0:51239             LISTENING       22492\r\n" + 
@@ -154,7 +155,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 	public void testGetProcessPidByListenPort3() {
 
 		try (MockedStatic mockedOsCommand = mockStatic(OSCommand.class)) {
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("netstat -aon")).thenReturn("Proto  Adresse locale         Adresse distante       État\r\n"
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("netstat -aon", true)).thenReturn("Proto  Adresse locale         Adresse distante       État\r\n"
 					+ "TCP    0.0.0.0:64360          0.0.0.0:0              LISTENING       39320\r\n" +
 					"  TCP    0.0.0.0:64362          0.0.0.0:0              LISTENING       26660\r\n" +
 					"  TCP    0.0.0.0:123          0.0.0.0:0             LISTENING       22492\r\n" +
@@ -170,7 +171,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 	public void testGetProcessPidByListenPortNotFound() {
 
 		try (MockedStatic mockedOsCommand = mockStatic(OSCommand.class)) {
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("netstat -aon")).thenReturn("");
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("netstat -aon", true)).thenReturn("");
 
 			Assert.assertNull(OSUtilityFactory.getInstance().getProcessIdByListeningPort(51239));
 		}
@@ -180,7 +181,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 	public void testGetProcessList() {
 
 		try (MockedStatic mockedOsCommand = mockStatic(OSCommand.class)) {
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(contains("system32\\tasklist.exe /NH /SVC"))).thenReturn("eclipse.exe                   6480 N/A\r\n" +
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(contains("system32\\tasklist.exe /NH /SVC"), eq(true))).thenReturn("eclipse.exe                   6480 N/A\r\n" +
 					"javaw.exe                     7280 N/A\r\n" +
 					"chromedriver_2.45_chrome-    11252 N/A\r\n"
 					+ "svchost.exe                   1784 CryptSvc, Dnscache, LanmanWorkstation,\r\n" +
@@ -222,8 +223,8 @@ public class TestWindowsOsUtility extends MockitoTest {
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenThrow(Win32Exception.class);
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "InstallLocation")).thenThrow(Win32Exception.class);
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_CLASSES_ROOT, "FirefoxHTML\\shell\\open\\command", "")).thenReturn("\"C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe\" -osint -url \"%1\"");
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe --version | more")).thenReturn("Mozilla Firefox 56.0");
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(new String[]{"REG", "QUERY", "HKCR", "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("\r\n" +
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe --version | more", true)).thenReturn("Mozilla Firefox 56.0");
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(new String[]{"REG", "QUERY", "HKCR", "/f", "FirefoxHTML", "/k", "/c"}, true)).thenReturn("\r\n" +
 					"HKEY_CLASSES_ROOT\\FirefoxHTML\r\n" +
 					"Fin de la recherche : 2 correspondance(s) trouvée(s).");
 
@@ -255,8 +256,8 @@ public class TestWindowsOsUtility extends MockitoTest {
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "InstallLocation")).thenThrow(Win32Exception.class);
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_CLASSES_ROOT, "FirefoxHTML-AC250DEAA7389F99\\shell\\open\\command", "")).thenReturn("\"C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe\" -osint -url \"%1\"");
 
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe --version | more")).thenReturn("Mozilla Firefox 56.0");
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(new String[]{"REG", "QUERY", "HKCR", "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("\r\n" +
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe --version | more", true)).thenReturn("Mozilla Firefox 56.0");
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(new String[]{"REG", "QUERY", "HKCR", "/f", "FirefoxHTML", "/k", "/c"}, true)).thenReturn("\r\n" +
 					"HKEY_CLASSES_ROOT\\FirefoxHTML-AC250DEAA7389F99\r\n" +
 					"Fin de la recherche : 2 correspondance(s) trouvée(s).");
 
@@ -291,9 +292,9 @@ public class TestWindowsOsUtility extends MockitoTest {
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "InstallLocation")).thenThrow(Win32Exception.class);
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_CLASSES_ROOT, "FirefoxHTML\\shell\\open\\command", "")).thenReturn("\"C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe\" -osint -url \"%1\"");
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_CLASSES_ROOT, "FirefoxHTML-AC250DEAA7389F99\\shell\\open\\command", "")).thenReturn("\"C:\\Program Files (x86)\\Mozilla2 Firefox\\firefox.exe\" -osint -url \"%1\"");
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe --version | more")).thenReturn("Mozilla Firefox 56.0");
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("C:\\Program Files (x86)\\Mozilla2 Firefox\\firefox.exe --version | more")).thenReturn("Mozilla Firefox 55.0");
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(new String[]{"REG", "QUERY", "HKCR", "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("\r\n" +
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe --version | more", true)).thenReturn("Mozilla Firefox 56.0");
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("C:\\Program Files (x86)\\Mozilla2 Firefox\\firefox.exe --version | more", true)).thenReturn("Mozilla Firefox 55.0");
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(new String[]{"REG", "QUERY", "HKCR", "/f", "FirefoxHTML", "/k", "/c"}, true)).thenReturn("\r\n" +
 					"HKEY_CLASSES_ROOT\\FirefoxHTML\r\n" +
 					"HKEY_CLASSES_ROOT\\FirefoxHTML-AC250DEAA7389F99\r\n" +
 					"Fin de la recherche : 2 correspondance(s) trouvée(s).");
@@ -332,9 +333,9 @@ public class TestWindowsOsUtility extends MockitoTest {
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main", "EdgeSwitchingOSBuildNumber")).thenThrow(Win32Exception.class);
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_CLASSES_ROOT, "FirefoxHTML\\shell\\open\\command", "")).thenReturn("\"C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe\" -osint -url \"%1\"");
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_CLASSES_ROOT, "FirefoxHTML-AC250DEAA7389F99\\shell\\open\\command", "")).thenReturn("\"C:\\Program Files (x86)\\Mozilla2 Firefox\\firefox.exe\" -osint -url \"%1\"");
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe --version | more")).thenReturn("Mozilla Firefox 56.0");
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("C:\\Program Files (x86)\\Mozilla2 Firefox\\firefox.exe --version | more")).thenReturn("Mozilla Firefox 55.0");
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(new String[]{"REG", "QUERY", "HKCR", "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("\r\n" +
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe --version | more", true)).thenReturn("Mozilla Firefox 56.0");
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait("C:\\Program Files (x86)\\Mozilla2 Firefox\\firefox.exe --version | more", true)).thenReturn("Mozilla Firefox 55.0");
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(new String[]{"REG", "QUERY", "HKCR", "/f", "FirefoxHTML", "/k", "/c"}, true)).thenReturn("\r\n" +
 					"HKEY_CLASSES_ROOT\\FirefoxHTML\r\n" +
 					"HKEY_CLASSES_ROOT\\FirefoxHTML-AC250DEAA7389F99\r\n" +
 					"Fin de la recherche : 2 correspondance(s) trouvée(s).");
@@ -367,7 +368,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Google\\Chrome\\BLBeacon", "version")).thenReturn("57.0.2987.110");
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenThrow(Win32Exception.class);
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "InstallLocation")).thenThrow(Win32Exception.class);
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(new String[]{"REG", "QUERY", "HKCR", "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("");
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(new String[]{"REG", "QUERY", "HKCR", "/f", "FirefoxHTML", "/k", "/c"}, true)).thenReturn("");
 
 			OSUtility.refreshBrowserList();
 			Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
@@ -399,7 +400,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Google\\Chrome\\BLBeacon", "version")).thenThrow(Win32Exception.class);
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenThrow(Win32Exception.class);
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "InstallLocation")).thenThrow(Win32Exception.class);
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(new String[] {"REG", "QUERY", "HKCR",  "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("");
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(new String[] {"REG", "QUERY", "HKCR",  "/f", "FirefoxHTML", "/k", "/c"}, true)).thenReturn("");
 
 			OSUtility.refreshBrowserList();
 			Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
@@ -434,7 +435,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Google\\Chrome\\BLBeacon", "version")).thenReturn("57.0.2987.110");
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenThrow(Win32Exception.class);
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "InstallLocation")).thenThrow(Win32Exception.class);
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(new String[]{"REG", "QUERY", "HKCR", "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("");
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(new String[]{"REG", "QUERY", "HKCR", "/f", "FirefoxHTML", "/k", "/c"}, true)).thenReturn("");
 
 			OSUtility.refreshBrowserList(true); // force detecting beta browser
 			Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
@@ -467,7 +468,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Google\\Chrome\\BLBeacon", "version")).thenReturn("57.0.2987.110");
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenThrow(Win32Exception.class);
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "InstallLocation")).thenThrow(Win32Exception.class);
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(new String[]{"REG", "QUERY", "HKCR", "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("");
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(new String[]{"REG", "QUERY", "HKCR", "/f", "FirefoxHTML", "/k", "/c"}, true)).thenReturn("");
 
 			OSUtility.refreshBrowserList();
 			Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
@@ -499,7 +500,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 		mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Google\\Chrome\\BLBeacon", "version")).thenReturn("57.0.2987.110");
 		mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenThrow(Win32Exception.class);
 		mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "InstallLocation")).thenThrow(Win32Exception.class);
-		mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(new String[] {"REG", "QUERY", "HKCR",  "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("");
+		mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(new String[] {"REG", "QUERY", "HKCR",  "/f", "FirefoxHTML", "/k", "/c"}, true)).thenReturn("");
 		
 		OSUtility.refreshBrowserList();
 		Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
@@ -526,7 +527,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenReturn("C:\\Program Files\\Internet_Explorer\\IEXPLORE.EXE");
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Internet Explorer", "svcVersion")).thenReturn("11.0.9600.18000");
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "InstallLocation")).thenThrow(Win32Exception.class);
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(new String[]{"REG", "QUERY", "HKCR", "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("");
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(new String[]{"REG", "QUERY", "HKCR", "/f", "FirefoxHTML", "/k", "/c"}, true)).thenReturn("");
 
 			OSUtility.refreshBrowserList();
 			Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
@@ -559,7 +560,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 		mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenThrow(Win32Exception.class);
 		mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "InstallLocation")).thenReturn("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application");
 		mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "Version")).thenReturn("92.0.902.780");
-		mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(new String[] {"REG", "QUERY", "HKCR",  "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("");
+		mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(new String[] {"REG", "QUERY", "HKCR",  "/f", "FirefoxHTML", "/k", "/c"}, true)).thenReturn("");
 		
 		OSUtility.refreshBrowserList();
 		Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
@@ -600,7 +601,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "InstallLocation")).thenThrow(Win32Exception.class);
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\App Paths\\msedge.exe", "Path")).thenReturn("C:\\Program Files (x86)\\Microsoft_\\Edge\\Application");
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "Version")).thenThrow(Win32Exception.class);
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(new String[]{"REG", "QUERY", "HKCR", "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("");
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(new String[]{"REG", "QUERY", "HKCR", "/f", "FirefoxHTML", "/k", "/c"}, true)).thenReturn("");
 
 			OSUtility.refreshBrowserList();
 			Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
@@ -640,7 +641,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "Version")).thenReturn("92.0.902.780");
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge Beta", "InstallLocation")).thenReturn("C:\\Program Files (x86)\\Microsoft_\\Edge Beta\\Application");
 			mockedAdvapi.when(() -> Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge Beta", "Version")).thenReturn("93.0.902.780");
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(new String[]{"REG", "QUERY", "HKCR", "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("");
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(new String[]{"REG", "QUERY", "HKCR", "/f", "FirefoxHTML", "/k", "/c"}, true)).thenReturn("");
 
 			OSUtility.refreshBrowserList(true); // search beta browsers
 			Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();

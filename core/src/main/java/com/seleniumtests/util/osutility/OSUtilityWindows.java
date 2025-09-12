@@ -255,12 +255,21 @@ public class OSUtilityWindows extends OSUtility {
 	}
 	
 	private List<String> searchFirefoxVersions() {
-
-		String fullFirefoxVersion = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Mozilla\\Mozilla Firefox", "CurrentVersion");
-		String firefoxVersion = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Mozilla\\Mozilla Firefox", "");
-		String firefoxPath = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, String.format("SOFTWARE\\Mozilla\\Mozilla Firefox\\%s\\Main", fullFirefoxVersion), "PathToExe");
-
-		return List.of(firefoxPath, "Mozilla  " + firefoxVersion);
+		List<String> firefoxInstallations = new ArrayList<>();
+		String out = OSCommand.executeCommandAndWait(new String[] {"REG", "QUERY", "HKCR",  "/f", "FirefoxHTML", "/k", "/c"}, true);
+		for (String line: out.split("\n")) {
+			if (line.startsWith("HKEY_CLASSES_ROOT")) {
+				String keyPath = line.replace("HKEY_CLASSES_ROOT\\", "").trim();
+				try {
+					String firefoxPath = Advapi32Util.registryGetStringValue(WinReg.HKEY_CLASSES_ROOT, keyPath + "\\shell\\open\\command", "");
+					firefoxPath = firefoxPath.split(EXE_EXT_QUOTE)[0].replace("\"", "") + ".exe";
+					firefoxInstallations.add(firefoxPath);
+				} catch (Win32Exception e) {
+					// do not crash
+				}
+			}
+		}
+		return firefoxInstallations;
 	}
 	
 	private String getEdgeChromiumPath() {
@@ -282,11 +291,16 @@ public class OSUtilityWindows extends OSUtility {
 		try {
 			browserList.put(BrowserType.FIREFOX, new ArrayList<>());
 			
-			List<String> ffInfos = searchFirefoxVersions();
-
-			browserList.get(BrowserType.FIREFOX).add(new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(ffInfos.get(1)), ffInfos.get(0)));
-		} catch (Exception e) {
-			logger.error("Error searching Firefox, it may not be installed: " + e.getMessage());
+			for (String firefoxPath: searchFirefoxVersions()) {
+				String version = getFirefoxVersion(firefoxPath);
+				try {
+					browserList.get(BrowserType.FIREFOX).add(new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), firefoxPath));
+				} catch (ConfigurationException e) {
+					// ignore
+				}
+			}
+		} catch (IndexOutOfBoundsException e) {
+			// ignore
 		}
 
 
