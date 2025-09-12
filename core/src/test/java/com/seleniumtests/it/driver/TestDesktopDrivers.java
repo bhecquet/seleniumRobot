@@ -97,7 +97,7 @@ public class TestDesktopDrivers extends GenericDriverTest {
 			.collect(Collectors.toList());
 		
 		if (SystemUtils.IS_OS_WINDOWS) {
-			Assert.assertTrue(OSCommand.executeCommandAndWait(String.format("wmic process where \"ProcessID=%s\" get ExecutablePath", newEdge.get(0))).contains("Beta"));
+			Assert.assertTrue(OSCommand.executeCommandAndWait(String.format("wmic process where \"ProcessID=%s\" get ExecutablePath", newEdge.get(0)), true).contains("Beta"));
 		}
 
 	}

@@ -56,9 +56,9 @@ public class OSUtilityWindows extends OSUtility {
 	@Override
 	public int getIEVersion() {
 
-        String output = OSCommand.executeCommandAndWait("reg query \"HKLM\\Software\\Microsoft\\Internet Explorer\" /v svcVersion");
+        String output = OSCommand.executeCommandAndWait("reg query \"HKLM\\Software\\Microsoft\\Internet Explorer\" /v svcVersion", true);
         if (output.split("\n").length < 3) {
-            output = OSCommand.executeCommandAndWait("reg query \"HKLM\\Software\\Microsoft\\Internet Explorer\" /v Version");
+            output = OSCommand.executeCommandAndWait("reg query \"HKLM\\Software\\Microsoft\\Internet Explorer\" /v Version", true);
         }
 
         String internetExplorerValue = output.split("\n")[2];
@@ -80,7 +80,7 @@ public class OSUtilityWindows extends OSUtility {
     	 * or /SVC displays only : Image name ;  PID ;  Services .
     	 */
     	String command = SystemUtility.getenv("windir") + "\\system32\\" + "tasklist.exe /NH /SVC";
-    	List<String> strProcessList = Arrays.asList(OSCommand.executeCommandAndWait(command).split("\n"));
+    	List<String> strProcessList = Arrays.asList(OSCommand.executeCommandAndWait(command, true).split("\n"));
     	Pattern pTasklist = Pattern.compile("([^\\s]+)\\s++(\\d++)\\s++.*");
     	
     	List<ProcessInfo> processInfoList = new ArrayList<>();
@@ -153,7 +153,7 @@ public class OSUtilityWindows extends OSUtility {
 
 	@Override
 	public String getOSBuild() {
-		String version = OSCommand.executeCommandAndWait("cmd /C ver").replace("\r", "").replace("\n", "").trim();
+		String version = OSCommand.executeCommandAndWait("cmd /C ver", true).replace("\r", "").replace("\n", "").trim();
 		Matcher versionMatcher = versionPattern.matcher(version);
 		if (versionMatcher.matches()) {
 			return versionMatcher.group(1);
@@ -255,21 +255,12 @@ public class OSUtilityWindows extends OSUtility {
 	}
 	
 	private List<String> searchFirefoxVersions() {
-		List<String> firefoxInstallations = new ArrayList<>();
-		String out = OSCommand.executeCommandAndWait(new String[] {"REG", "QUERY", "HKCR",  "/f", "FirefoxHTML", "/k", "/c"});
-		for (String line: out.split("\n")) {
-			if (line.startsWith("HKEY_CLASSES_ROOT")) {
-				String keyPath = line.replace("HKEY_CLASSES_ROOT\\", "").trim();
-				try {
-					String firefoxPath = Advapi32Util.registryGetStringValue(WinReg.HKEY_CLASSES_ROOT, keyPath + "\\shell\\open\\command", "");
-					firefoxPath = firefoxPath.split(EXE_EXT_QUOTE)[0].replace("\"", "") + ".exe";
-					firefoxInstallations.add(firefoxPath);
-				} catch (Win32Exception e) {
-					// do not crash
-				}
-			}
-		}
-		return firefoxInstallations;
+
+		String fullFirefoxVersion = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Mozilla\\Mozilla Firefox", "CurrentVersion");
+		String firefoxVersion = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Mozilla\\Mozilla Firefox", "");
+		String firefoxPath = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, String.format("SOFTWARE\\Mozilla\\Mozilla Firefox\\%s\\Main", fullFirefoxVersion), "PathToExe");
+
+		return List.of(firefoxPath, "Mozilla  " + firefoxVersion);
 	}
 	
 	private String getEdgeChromiumPath() {
@@ -291,16 +282,11 @@ public class OSUtilityWindows extends OSUtility {
 		try {
 			browserList.put(BrowserType.FIREFOX, new ArrayList<>());
 			
-			for (String firefoxPath: searchFirefoxVersions()) {
-				String version = getFirefoxVersion(firefoxPath);
-				try {
-					browserList.get(BrowserType.FIREFOX).add(new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), firefoxPath));
-				} catch (ConfigurationException e) {
-					// ignore
-				}
-			}
-		} catch (IndexOutOfBoundsException e) {
-			// ignore
+			List<String> ffInfos = searchFirefoxVersions();
+
+			browserList.get(BrowserType.FIREFOX).add(new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(ffInfos.get(1)), ffInfos.get(0)));
+		} catch (Exception e) {
+			logger.error("Error searching Firefox, it may not be installed: " + e.getMessage());
 		}
 
 
@@ -444,7 +430,7 @@ public class OSUtilityWindows extends OSUtility {
 
 	@Override
 	public String getProgramNameFromPid(Long pid) {
-		String[] processNames = OSCommand.executeCommandAndWait(String.format("wmic process where processId=%d get name", pid)).trim().split("\n");
+		String[] processNames = OSCommand.executeCommandAndWait(String.format("wmic process where processId=%d get name", pid), true).trim().split("\n");
 		String processName = processNames[processNames.length - 1];
 		return processName.endsWith(".exe") ? processName: "";
 	}
@@ -452,7 +438,7 @@ public class OSUtilityWindows extends OSUtility {
 	@Override
 	public Integer getProcessIdByListeningPort(int port) {
 		// example: TCP    127.0.0.1:51239        0.0.0.0:0              LISTENING       22492
-		String lines = OSCommand.executeCommandAndWait("netstat -aon").trim();
+		String lines = OSCommand.executeCommandAndWait("netstat -aon", true).trim();
 		Pattern pattern = Pattern.compile(String.format(".*\\:%d\\s+.*\\:.*LISTENING\\s+(\\d+).*", port));
 		for (String line: lines.split("\n")) {
 			Matcher matcher = pattern.matcher(line.trim());

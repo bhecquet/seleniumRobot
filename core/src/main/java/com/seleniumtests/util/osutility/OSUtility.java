@@ -347,7 +347,7 @@ public abstract class OSUtility {
     	if (osUtility instanceof OSUtilityWindows) {
     		return "Google Chrome " + ((OSUtilityWindows)osUtility).getChromeVersionFromFolder(chromePath);
     	} else {
-    		return OSCommand.executeCommandAndWait(new String[] {chromePath, "--version"});
+    		return OSCommand.executeCommandAndWait(new String[] {chromePath, "--version"}, true);
     	}
     }
 
@@ -358,7 +358,7 @@ public abstract class OSUtility {
      * @return
      */
     public static String getFirefoxVersion(String firefoxPath) {
-    	return OSCommand.executeCommandAndWait(firefoxPath + " --version | more");
+    	return OSCommand.executeCommandAndWait(String.format("\"%s\" --version | more", firefoxPath), true);
     }
     
     public List<BrowserType> getInstalledBrowsers() {
