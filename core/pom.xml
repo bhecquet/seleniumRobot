@@ -227,6 +227,10 @@
 					<groupId>io.opentelemetry</groupId>
 					<artifactId>opentelemetry-api</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>io.opentelemetry</groupId>
+					<artifactId>opentelemetry-context</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -238,6 +242,10 @@
 					<!-- Already provided by selenium-->
 					<groupId>io.opentelemetry</groupId>
 					<artifactId>opentelemetry-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>io.opentelemetry</groupId>
+					<artifactId>opentelemetry-context</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -260,11 +268,6 @@
 			<groupId>com.microsoft.kiota</groupId>
 			<artifactId>microsoft-kiota-serialization-multipart</artifactId>
 			<version>${microsoft.kiota.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.opentelemetry</groupId>
-			<artifactId>opentelemetry-api-incubator</artifactId>
-			<version>1.44.1-alpha</version>
 		</dependency>
 		<dependency>
 			<groupId>com.oracle.database.jdbc</groupId>
