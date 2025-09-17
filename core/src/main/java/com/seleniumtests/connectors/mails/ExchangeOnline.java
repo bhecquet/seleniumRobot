@@ -112,15 +112,15 @@ public class ExchangeOnline extends EmailClientImpl {
 		JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC");
 		PrivateKey privateKey;
 		
-		// 4. Vérifier si la clé est encryptée ou non et déchiffrer le cas échéant
+		// 4. Check if the key is encrypted or not and decrypt if so
 		if (object instanceof PKCS8EncryptedPrivateKeyInfo) {
-			// La clé est encryptée : utiliser le mot de passe pour déchiffrer
+			// Key is encrypted : use the password to decrypt
 			PKCS8EncryptedPrivateKeyInfo encryptedInfo = (PKCS8EncryptedPrivateKeyInfo) object;
 			InputDecryptorProvider decryptorProvider = new JceOpenSSLPKCS8DecryptorProviderBuilder()
 					.build(keyFilePassword.toCharArray());
 			privateKey = converter.getPrivateKey(encryptedInfo.decryptPrivateKeyInfo(decryptorProvider));
 		} else {
-			throw new IllegalArgumentException("Format de clé inconnu ou incompatible");
+			throw new IllegalArgumentException("Key format unknown or incompatible.");
 		}
 		keyFile.delete();
 		return privateKey;
