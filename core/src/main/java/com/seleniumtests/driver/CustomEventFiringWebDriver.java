@@ -37,6 +37,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
+import org.jspecify.annotations.Nullable;
 import org.mockito.Mockito;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Interactive;
@@ -46,7 +47,6 @@ import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.openqa.selenium.support.events.WebDriverListener;
 
-import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
 import java.awt.AWTError;
 import java.awt.AWTException;
