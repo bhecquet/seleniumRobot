@@ -51,7 +51,6 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlTest;
 
-import com.neotys.selenium.proxies.NLWebDriver;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
@@ -74,9 +73,6 @@ public class TestTestTasks extends MockitoTest {
 	
 	@Mock
 	private OSUtilityWindows osUtility;
-
-	@Mock
-	private NLWebDriver neoloadDriver;
 
 	private MockedStatic mockedOsUtilityFactory;
 	
@@ -760,31 +756,6 @@ public class TestTestTasks extends MockitoTest {
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(0).getName(), "foo");
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(0).getAction(), "foo");
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(0).getOrigin(), TestTestTasks.class); // check origin is the class that made the call
-		} finally {
-			GenericTest.resetTestNGREsultAndLogger();
-		}
-	}
-	
-	/**
-	 * Creation of a manual step, check it's written
-	 * @param testNGCtx
-	 * @param xmlTest
-	 * @throws Exception
-	 */
-	@Test(groups= {"ut"})
-	public void testAddManualStepWithNeoload(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
-
-		try (MockedStatic mockedWebUIDriver = mockStatic(WebUIDriver.class)) {
-			mockedWebUIDriver.when(() -> WebUIDriver.getNeoloadDriver()).thenReturn(neoloadDriver);
-
-			SeleniumTestsContextManager.getThreadContext().setManualTestSteps(true);
-			TestTasks.addStep("foo");
-			TestTasks.addStep(null);
-
-			// check we crate a new page
-			verify(neoloadDriver).startTransaction("foo");
-			verify(neoloadDriver).stopTransaction();
-
 		} finally {
 			GenericTest.resetTestNGREsultAndLogger();
 		}

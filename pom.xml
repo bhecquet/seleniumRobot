@@ -46,28 +46,6 @@
 		</repository>
 	</distributionManagement>
 
-	<repositories>
-		<repository>
-			<id>central</id>
-			<name>Maven Repository Switchboard</name>
-			<layout>default</layout>
-			<url>https://repo1.maven.org/maven2</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>neotys-public-releases</id>
-			<url>https://maven.neotys.com/content/repositories/releases/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
-
 	<properties>
 		<jacoco.version>0.8.11</jacoco.version>
 
@@ -157,30 +135,6 @@
 				      <groupId>aspectjweaver</groupId>
 				    </exclusion>
 				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>com.neotys.selenium</groupId>
-				<artifactId>neotys-selenium-proxy</artifactId>
-				<version>3.0.1</version>
-				<exclusions>
-					<exclusion>
-						<groupId>com.google.guava</groupId>
-						<artifactId>guava</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>com.google.code.gson</groupId>
-						<artifactId>gson</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>javax.ws.rs</groupId>
-						<artifactId>javax.ws.rs-api</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-			<dependency> <!-- version retrieved by powermock, but also needed by neotys -->
-				<groupId>org.javassist</groupId>
-				<artifactId>javassist</artifactId>
-				<version>3.30.2-GA</version>
 			</dependency>
 			<dependency>
 				<groupId>com.infotel.seleniumRobot</groupId>

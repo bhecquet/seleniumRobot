@@ -17,7 +17,6 @@
  */
 package com.seleniumtests.driver;
 
-import com.neotys.selenium.proxies.NLWebDriver;
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
@@ -97,7 +96,6 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     private final List<Long> driverPids;
 	private WebDriver driver;
 	private final WebDriver originalDriver;
-	private final NLWebDriver neoloadDriver;
 	private TestType testType;
 	private boolean driverExited = false;
 	private final DriverMode driverMode;
@@ -641,13 +639,6 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 
 		for (WebDriverListener wdListener: wdListeners) {
 			this.driver = new EventFiringDecorator(wdListener).decorate(this.driver);
-		}
-
-		// NEOLOAD //
-		if (driver instanceof NLWebDriver) {
-			neoloadDriver = (NLWebDriver)driver;
-		} else {
-			neoloadDriver = null;
 		}
     }
 
@@ -1761,11 +1752,6 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 			return new MutableCapabilities();
 		}
     }
-
-	// NEOLOAD //
-	public NLWebDriver getNeoloadDriver() {
-		return neoloadDriver;
-	}
 
 	public MutableCapabilities getInternalCapabilities() {
 		return internalCapabilities;

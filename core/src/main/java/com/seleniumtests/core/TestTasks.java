@@ -37,7 +37,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.WebDriver;
 import org.testng.Reporter;
 
-import com.neotys.selenium.proxies.NLWebDriver;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import com.seleniumtests.customexception.ConfigurationException;
@@ -333,17 +332,13 @@ public class TestTasks {
     }
    
     public static void terminateCurrentStep() {
-    	NLWebDriver neoloadDriver = WebUIDriver.getNeoloadDriver();
     	
     	// log the previous step if it exists and create the new one
     	TestStep previousStep = TestStepManager.getCurrentRootTestStep();
     	if (previousStep != null) {
     		previousStep.updateDuration();
     		TestStepManager.logTestStep(previousStep);
-    		
-    		if (neoloadDriver != null) {
-				neoloadDriver.stopTransaction();
-			}
+
     	}
     }
     
@@ -359,8 +354,6 @@ public class TestTasks {
     		throw new ConfigurationException("manual steps can only be used when automatic steps are disabled ('manualTestSteps' option set to true)");
     	}
     	
-    	NLWebDriver neoloadDriver = WebUIDriver.getNeoloadDriver();
-    	
     	// log the previous step if it exists and create the new one
     	terminateCurrentStep();
     	
@@ -374,11 +367,6 @@ public class TestTasks {
 					SeleniumTestsContextManager.getThreadContext().getMaskedPassword());
 	    	TestStepManager.setCurrentRootTestStep(step);
 	    	capturePageSnapshot();
-	    	
-	    	// start a new transaction when using Neoload
-	    	if (neoloadDriver != null) {
-				neoloadDriver.startTransaction(stepName);
-			}
     	}
     }
     

@@ -48,7 +48,6 @@ import org.openqa.selenium.support.ui.Select;
 import org.testng.Reporter;
 import org.testng.annotations.AfterMethod;
 
-import com.neotys.selenium.proxies.NLWebDriver;
 import com.seleniumtests.core.Mask;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.Step;
@@ -530,7 +529,6 @@ public class LogAction {
 			currentStep.addAction(new TestAction(String.format("Opening page %s",  page.getClass().getSimpleName()), false, new ArrayList<>(), "openPage", page.getClass()));
 		}
 
-		NLWebDriver neoloadDriver = WebUIDriver.getNeoloadDriver();
 		VideoRecorder videoRecorder = WebUIDriver.getThreadVideoRecorder();
 		
 		// check if any root step is already registered (a main step)
@@ -549,9 +547,6 @@ public class LogAction {
 						videoRecorder);
 				currentStep.setVideoTimeStamp(currentStep.getVideoTimeStamp() + Math.max(0, duration - 5));
 				currentStep.setDurationToExclude(duration);
-			}
-			if (neoloadDriver != null) {
-				neoloadDriver.startTransaction(currentStep.getName());
 			}
 			// capture at the start of the step except when page is opening, so that we wait for page to be really opened
 			if (!"openPage".equals(joinPoint.getSignature().getName()) && WebUIDriver.getWebDriver(false) != null && joinPoint.getTarget() instanceof PageObject) {
@@ -594,10 +589,6 @@ public class LogAction {
 
 				TestStepManager.getCurrentRootTestStep().updateDuration();
 				TestStepManager.logTestStep(TestStepManager.getCurrentRootTestStep());
-				
-				if (neoloadDriver != null) {
-					neoloadDriver.stopTransaction();
-				}
 			} else {
 				TestStepManager.setParentTestStep(previousParent);
 			}

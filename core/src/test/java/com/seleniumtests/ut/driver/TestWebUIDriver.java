@@ -40,8 +40,6 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.neotys.selenium.proxies.NLRemoteWebDriver;
-import com.neotys.selenium.proxies.NLWebDriverFactory;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
@@ -55,10 +53,7 @@ import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.video.VideoRecorder;
 
 public class TestWebUIDriver extends MockitoTest {
-	
-	@Mock
-	private NLRemoteWebDriver neoloadDriver;
-	
+
 	@Mock
 	private RemoteWebDriver drv1;
 	
@@ -98,14 +93,10 @@ public class TestWebUIDriver extends MockitoTest {
 		when(drv1.switchTo()).thenReturn(targetLocator);
 		when(options.timeouts()).thenReturn(timeouts);
 		when(options.logs()).thenReturn(logs);
-		when(drv2.getCapabilities()).thenReturn(new DesiredCapabilities()); 
-		when(neoloadDriver.getCapabilities()).thenReturn(new DesiredCapabilities());
+		when(drv2.getCapabilities()).thenReturn(new DesiredCapabilities());
 		StatisticsStorage.reset();
 	}
-	
-	/**
-	 * When driver is created, no Neoload driver is instanciated if neoload parameters are not set
-	 */
+
 	@Test(groups={"ut"})
 	public void testDriverCreation() {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
@@ -308,28 +299,6 @@ public class TestWebUIDriver extends MockitoTest {
 		Assert.assertNull(driverUsages.get(0).getGridNode());
 		Assert.assertTrue(driverUsages.get(0).getStartTime() > 0);
 		Assert.assertEquals(driverUsages.get(0).getTestName(), "testCapsOnDriverQuit");
-	}
-	
-	/**
-	 * Check that when user requests  for neoload, it's driver is added 
-	 */
-	@Test(groups={"ut"})
-	public void testDriverCreationWithNeoload() {
-
-		try (MockedStatic mockedOsUtility = mockStatic(NLWebDriverFactory.class)) {
-			mockedOsUtility.when(() -> NLWebDriverFactory.newNLWebDriver(any(WebDriver.class), anyString())).thenReturn(neoloadDriver);
-
-			SeleniumTestsContextManager.getThreadContext().setNeoloadUserPath("path");
-			System.setProperty("nl.selenium.proxy.mode", "Design");
-			SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-
-			WebDriver driver = WebUIDriver.getWebDriver(true);
-
-			Assert.assertTrue(driver instanceof CustomEventFiringWebDriver);
-			Assert.assertNotNull(((CustomEventFiringWebDriver)driver).getNeoloadDriver());
-		} finally {
-			System.clearProperty("nl.selenium.proxy.mode");
-		}
 	}
 	
 	@Test(groups={"ut"})

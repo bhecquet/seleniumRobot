@@ -150,10 +150,6 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
-		<dependency> 
-            <groupId>org.javassist</groupId>
-            <artifactId>javassist</artifactId>
-        </dependency>
 	    <dependency>
 	      	<groupId>org.apache.poi</groupId>
 	      	<artifactId>poi-ooxml</artifactId>
@@ -362,13 +358,6 @@
 			<artifactId>pdfbox</artifactId>
 			<version>3.0.3</version>
 		</dependency>
-        
-        <!-- Specific Neoload -->
-        <dependency>
-			<groupId>com.neotys.selenium</groupId>
-			<artifactId>neotys-selenium-proxy</artifactId>
-		</dependency>
-
         <dependency>
         	<groupId>org.ini4j</groupId>
         	<artifactId>ini4j</artifactId>

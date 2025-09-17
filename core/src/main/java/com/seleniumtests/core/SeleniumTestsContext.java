@@ -207,9 +207,6 @@ public class SeleniumTestsContext {
     public static final String VERSION = "version";								// browser version
     public static final String PLATFORM = "platform";							// platform on which test should execute. Ex: Windows 7, Android, iOS, Linux, OS X 10.10. 	
 
-    // Neoload specific properties
-    public static final String NEOLOAD_USER_PATH = "neoloadUserPath";			// name of the neoload "user path" that will be created in Design mode
-
     // internal use
     public static final String TEST_VARIABLES = "testVariables"; 				// configuration (aka variables, get via 'param()' method) used for the current test. It is not updated via XML file
     public static final String TEST_NAME = "testName";
@@ -476,9 +473,7 @@ public class SeleniumTestsContext {
         
         setViewPortWidth(getIntValueForTest(VIEWPORT_WIDTH, System.getProperty(VIEWPORT_WIDTH)));
         setViewPortHeight(getIntValueForTest(VIEWPORT_HEIGHT, System.getProperty(VIEWPORT_HEIGHT)));
-        
-        setNeoloadUserPath(getValueForTest(NEOLOAD_USER_PATH, System.getProperty(NEOLOAD_USER_PATH)));
-        
+
         setRandomInAttachmentNames(getBoolValueForTest(RANDOM_IN_ATTACHMENT_NAME, System.getProperty(RANDOM_IN_ATTACHMENT_NAME)));
         
         //setReportPortalActive(getBoolValueForTest(REPORTPORTAL_ACTIVE, System.getProperty(REPORTPORTAL_ACTIVE)));
@@ -1137,10 +1132,6 @@ public class SeleniumTestsContext {
     	return userDefinedClasses;
     }
 
-    public String getNeoloadUserPath() {
-    	return (String) getAttribute(NEOLOAD_USER_PATH);
-    }
-
     public int getExplicitWaitTimeout() {
         Integer timeout;
         try {
@@ -1794,10 +1785,6 @@ public class SeleniumTestsContext {
     		}
     		setAttribute(WEB_DRIVER_GRID, Arrays.asList(driverGrid.split(",")));
     	}
-    }
-    
-    public void setNeoloadUserPath(final String userPath) {
-    	setAttribute(NEOLOAD_USER_PATH, userPath);
     }
     
     public void setConfiguration(Map<String, TestVariable> variables){

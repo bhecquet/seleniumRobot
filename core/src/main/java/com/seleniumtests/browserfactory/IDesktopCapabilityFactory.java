@@ -27,13 +27,10 @@ import java.util.List;
 
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Proxy;
-import org.openqa.selenium.Proxy.ProxyType;
 import org.openqa.selenium.internal.Require;
 import org.openqa.selenium.remote.AbstractDriverOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import com.neotys.selenium.proxies.NLWebDriverFactory;
-import com.seleniumtests.core.StatisticsStorage.DriverUsage;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
@@ -176,25 +173,7 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
 
         configureProxyCap(options);
         
-        MutableCapabilities capOptions = options;
-
-        
-    	// NEOLOAD //
-        if (webDriverConfig.isNeoloadActive()) {
-        	if ("Design".equals(System.getProperty("nl.selenium.proxy.mode"))) {
-        		logger.warn("Enabling Neoload Design mode automatically configures a manual proxy through neoload instance, other proxy settings are overriden and network capture won't be possible");
-        	}
-        	try {
-        		DesiredCapabilities capability = NLWebDriverFactory.addProxyCapabilitiesIfNecessary(new DesiredCapabilities());
-        		capOptions = capOptions.merge(capability);
-        	} catch (ExceptionInInitializerError e) {
-        		throw new ConfigurationException("Error while contacting Neoload Design API", e);
-        	} catch (RuntimeException e) {
-        		throw new ConfigurationException("Error while getting neoload project, check license and loaded project", e);
-        	}
-        }
-
-        return capOptions;
+        return options;
     }  
     
     /**

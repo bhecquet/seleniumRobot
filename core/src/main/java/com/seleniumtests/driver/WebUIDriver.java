@@ -39,16 +39,12 @@ import com.seleniumtests.customexception.RetryableDriverException;
 import com.seleniumtests.util.har.*;
 import com.seleniumtests.util.logging.DebugMode;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.logging.LogEntry;
 import org.testng.ITestResult;
 
-import com.neotys.selenium.proxies.NLWebDriver;
-import com.neotys.selenium.proxies.NLWebDriverFactory;
 import com.seleniumtests.browserfactory.AppiumDriverFactory;
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.browserfactory.BrowserStackDriverFactory;
@@ -522,19 +518,6 @@ public class WebUIDriver {
     		return null;
     	}
     }
-	
-	/**
-	 * Returns the Neoload driver for the current running driver
-	 * @return
-	 */
-	public static NLWebDriver getNeoloadDriver() {
-		WebDriver driver = getWebDriver(false);
-		if (driver != null && driver instanceof CustomEventFiringWebDriver && ((CustomEventFiringWebDriver)driver).getNeoloadDriver() != null) {
-			return ((CustomEventFiringWebDriver)driver).getNeoloadDriver();
-		} else {
-			return null;
-		}
-	}
 
     public IWebDriverFactory getWebDriverBuilder() {
 		return webDriverBuilder;
@@ -726,14 +709,7 @@ public class WebUIDriver {
 
     protected WebDriver handleListeners(WebDriver driver, BrowserInfo browserInfo, List<Long> driverPids) {
 
-    	// Use of Neoload
-    	// we must configure the user path, and the proxy mode
-    	// In this case, the read driver is "replaced" by the proxy to the driver
-    	if (config.isNeoloadActive()) {
-    		driver = NLWebDriverFactory.newNLWebDriver(driver, config.getNeoloadUserPath());
-    	}
-    	
-    	WebDriver listeningDriver = new CustomEventFiringWebDriver(driver, 
+    	return new CustomEventFiringWebDriver(driver,
 																	driverPids, 
 																	browserInfo, 
 																	SeleniumTestsContextManager.getThreadContext().getTestType(),
@@ -741,10 +717,6 @@ public class WebUIDriver {
 																	SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(),
 																	config.getAttachExistingDriverPort(), 
 																	config.getWebDriverListeners());
-
-        
-
-        return listeningDriver;
     }
     
     private void checkBrowserRunnable() {
