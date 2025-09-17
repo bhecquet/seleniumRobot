@@ -113,14 +113,16 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			mobileOptions = new XCUITestOptions(caps);
 		} else return (MutableCapabilities) caps;
 
+
+
 		// check whether app is given and app path is a local file
 		if (mobileOptions.getApp().isPresent() && mobileOptions.getApp().get() != null && new File(String.valueOf(mobileOptions.getApp().get())).isFile()) {
-			
+			File zipFile = null;
 			try (CloseableHttpClient client = HttpClients.createDefault();) {
 				// zip file
 				List<File> appFiles = new ArrayList<>();
 				appFiles.add(new File(String.valueOf(mobileOptions.getApp().get())));
-				File zipFile = FileUtility.createZipArchiveFromFiles(appFiles);
+				zipFile = FileUtility.createZipArchiveFromFiles(appFiles);
 				
 				HttpHost serverHost = new HttpHost(hubServletUrl.getHost(), hubServletUrl.getPort());
 				URIBuilder builder = new URIBuilder();
@@ -144,6 +146,10 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		        
 			} catch (IOException | URISyntaxException e) {
 				throw new SeleniumGridException("could not upload application file", e);
+			} finally {
+				if (zipFile != null) {
+					zipFile.delete();
+				}
 			}
 		}
 		return (MutableCapabilities) caps;
@@ -191,6 +197,10 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			}
 		} catch (UnirestException e) {
 			throw new SeleniumGridException(String.format("Cannot upload file: %s", e.getMessage()));
+		} finally {
+			if (zipFile != null) {
+				zipFile.delete();
+			}
 		}
 
 	}
@@ -232,11 +242,12 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	 */
 	@Override
 	public void uploadFile(String filePath) {
+		File zipFile = null;
 		try (CloseableHttpClient client = HttpClients.createDefault();) {
 			// zip file
 			List<File> appFiles = new ArrayList<>();
 			appFiles.add(new File(filePath));
-			File zipFile = FileUtility.createZipArchiveFromFiles(appFiles);
+			zipFile = FileUtility.createZipArchiveFromFiles(appFiles);
 
 			HttpHost serverHost = new HttpHost(hubServletUrl.getHost(), hubServletUrl.getPort());
 			URIBuilder builder = new URIBuilder();
@@ -257,6 +268,10 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	        
 		} catch (IOException | URISyntaxException e) {
 			throw new SeleniumGridException("could not upload file", e);
+		} finally {
+			if (zipFile != null) {
+				zipFile.delete();
+			}
 		}
 	}
 	

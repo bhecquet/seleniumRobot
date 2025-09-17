@@ -306,6 +306,7 @@ public class UiElement {
 		
 			BufferedImage croppedImage = ImageProcessor.cropImage(image, 0, 0, image.getWidth(), 50);
 			File cropScreenshotFile = File.createTempFile("img", ".png");
+			cropScreenshotFile.deleteOnExit();
 			ImageIO.write(croppedImage, "png", cropScreenshotFile);
 			
 			ScreenShot desktopScreenshotFile = getDesktopScreenshotFile();

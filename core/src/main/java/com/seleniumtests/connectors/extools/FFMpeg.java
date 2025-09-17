@@ -108,10 +108,8 @@ public class FFMpeg {
         try {
             Path metadataFile = Files.createTempFile("metadata", ".txt");
             metadataFile.toFile().delete();
-            metadataFile.toFile().deleteOnExit();
             Path newVideoFile = Files.createTempFile("newVideo", ".mp4");
             newVideoFile.toFile().delete();
-            newVideoFile.toFile().deleteOnExit();
 
             StringBuilder content = new StringBuilder();
             for (Chapter chapter : chapters) {
@@ -127,7 +125,8 @@ public class FFMpeg {
             FileUtils.writeStringToFile(metadataFile.toFile(), content.toString(), StandardCharsets.UTF_8, true);
 
             out = runFFmpegCommand(List.of("-i", videoFile.getAbsolutePath(), "-i", metadataFile.toAbsolutePath().toString(), "-map_metadata", "1", "-codec", "copy", newVideoFile.toAbsolutePath().toString()));
-            FileUtils.copyFile(newVideoFile.toFile(), videoFile);
+            FileUtils.moveFile(newVideoFile.toFile(), videoFile);
+            metadataFile.toFile().delete();
         } catch (IOException e) {
             logger.warn("Could not create metadatafile: " + e.getMessage());
         }
