@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 public class FFMpeg {
@@ -125,7 +126,8 @@ public class FFMpeg {
             FileUtils.writeStringToFile(metadataFile.toFile(), content.toString(), StandardCharsets.UTF_8, true);
 
             out = runFFmpegCommand(List.of("-i", videoFile.getAbsolutePath(), "-i", metadataFile.toAbsolutePath().toString(), "-map_metadata", "1", "-codec", "copy", newVideoFile.toAbsolutePath().toString()));
-            FileUtils.moveFile(newVideoFile.toFile(), videoFile);
+            FileUtils.copyFile(newVideoFile.toFile(), videoFile, StandardCopyOption.REPLACE_EXISTING);
+            newVideoFile.toFile().delete();
             metadataFile.toFile().delete();
         } catch (IOException e) {
             logger.warn("Could not create metadatafile: " + e.getMessage());
