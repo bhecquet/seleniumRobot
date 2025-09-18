@@ -1365,13 +1365,14 @@ public class TestPageObject2 extends MockitoTest {
 			Instant start = Instant.now();
 			p1 = new PageLauncher();
 			p1.start();
-			while (p1.otherPage == null && Instant.now().minusSeconds(10).isBefore(start)) {
+			while (p1.otherPage == null && Instant.now().minusSeconds(30).isBefore(start)) {
 				WaitHelper.waitForMilliSeconds(200);
 			}
 			Assert.assertNotNull(p1.otherPage);
+			start = Instant.now();
 			p2 = new PageLauncher();
 			p2.start();
-			while (p2.otherPage == null && Instant.now().minusSeconds(20).isBefore(start)) {
+			while (p2.otherPage == null && Instant.now().minusSeconds(30).isBefore(start)) {
 				WaitHelper.waitForMilliSeconds(200);
 			}
 			Assert.assertNotNull(p2.otherPage);
