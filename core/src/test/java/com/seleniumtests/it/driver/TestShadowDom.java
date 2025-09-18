@@ -37,6 +37,7 @@ public class TestShadowDom extends GenericTest {
 
 	@BeforeClass(groups={"it"})
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
+		System.setProperty("applicationName", "core");
 		initThreadContext(testNGCtx);
 		setBrowser();
 		new DriverTestPageShadowDom(true);

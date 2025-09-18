@@ -147,6 +147,7 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 				// https://github.com/GoogleChrome/chrome-launcher/blob/main/docs/chrome-flags-for-tools.md
 				"--disable-search-engine-choice-screen",
 				// list of features: https://chromium.googlesource.com/chromium/src/+/refs/heads/main/chrome/common/chrome_features.cc
+				// https://gist.github.com/rihardn/47b8e6170dc8f57a998c90b12a3e01bb
 				"--disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades",
 				// workaround for https://github.com/SeleniumHQ/selenium/issues/11750 on chrome >= 111
 				"--remote-allow-origins=*"));

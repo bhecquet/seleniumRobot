@@ -69,7 +69,7 @@ public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
 				"--disable-web-security",
 				"--no-sandbox",
 				"--disable-site-isolation-trials",
-				"--disable-features=IsolateOrigins,site-per-process",
+				"--disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades",
 				"--remote-allow-origins=*")); // workaround for https://github.com/SeleniumHQ/selenium/issues/11750 on chrome >= 111
         
         if (webDriverConfig.isHeadlessBrowser()) {

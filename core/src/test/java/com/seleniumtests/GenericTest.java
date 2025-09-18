@@ -31,6 +31,7 @@ import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.internal.TestNGMethod;
 import org.testng.internal.TestResult;
@@ -51,6 +52,7 @@ import com.seleniumtests.util.video.VideoCaptureMode;
 public class GenericTest extends ParentTest {
 
 	protected static final ScenarioLogger logger = ScenarioLogger.getScenarioLogger(SeleniumRobotTestPlan.class);
+
 
 	/**
 	 * Reinitializes context between tests so that it's clean before test starts
