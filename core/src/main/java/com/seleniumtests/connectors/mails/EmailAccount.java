@@ -106,7 +106,7 @@ public class EmailAccount {
      * @return true if all account information are set
      */
     public boolean canConnect() {
-    	if (emailServer.getType().equals(EmailServer.EmailServerTypes.EXCHANGE_ONLINE)) {
+    	if (emailServer != null && emailServer.getType().equals(EmailServer.EmailServerTypes.EXCHANGE_ONLINE)) {
 			return !(email.equals(DEFAULT_EMAIL) || certificate == null || certificatePrivateKey == null || certificatePrivateKeyPassword == null);
 		} else {
 			return !(email.equals(DEFAULT_EMAIL) || emailLogin == null || emailLogin.isEmpty());
