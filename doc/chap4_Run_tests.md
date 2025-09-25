@@ -110,7 +110,6 @@ In this case, this user passed value will overwrite test or suite parameters
 | browser 					| firefox	| Browser used to start test. Valid values are:<br/>`firefox`, `chrome`, `safari`, `iexplore`, `edge`, `iexploreEdge` for Edge in Internet Explorer mode, `htmlunit`, `opera`, `phantomjs`, `none` for no driver, `browser` for android default browser | 
 | env 						| DEV		| Test environment for the SUT. Allow accessing param values defined in env.ini file  
 | captureVideo				| onError	| If `true`, always capture video. Other possible values are: `onSuccess` (keep video when test is OK), `false` and `onError` (capture video when test is KO) |
-| captureNetwork			| false		| If true, creates a HAR file which capture traffic. This is only available with MANUAL and DIRECT proxy settings because there is no way, when automatic mode is used, to know which proxy is used by browser and the authentication used. |
 | testRetryCount			| 2			| Number of times a failed test is retried. Set to 0 for no retry. **This parameter is not accepted in XML file, only on command line**. This number can be increased dynamically inside test with `increaseMaxRetry()`|
 | seleniumRobotServerActive	| false		| whether we use seleniumRobot server. If true, seleniumRobotServerUrl MUST be specified (in XML, command line or through env variable |
 | seleniumRobotServerUrl	| 			| URL of the seleniumRobot server. Can be specified as an environment variable |

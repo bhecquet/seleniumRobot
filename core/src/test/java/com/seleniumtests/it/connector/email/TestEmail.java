@@ -25,6 +25,7 @@ import com.seleniumtests.connectors.mails.EmailClient;
 import com.seleniumtests.connectors.mails.EmailClientSelector;
 import com.seleniumtests.connectors.mails.EmailServer;
 import com.seleniumtests.connectors.mails.EmailServer.EmailServerTypes;
+import com.seleniumtests.connectors.mails.EmailAccount;
 
 public class TestEmail {
 
@@ -40,8 +41,8 @@ public class TestEmail {
 	}
 	@Test(groups={"it"}, enabled=false)
 	public void testMailExchangeOnline() throws Exception {
-		EmailServer server = new EmailServer("<mail_server_urs>", EmailServerTypes.EXCHANGE_EWS, "<domain_for_user>");
-		EmailClient client = EmailClientSelector.routeEmail(server, "<email_of_mailbox_to_consult>", "<user_to_connect_to_mailbox>", "<password>");
+		EmailServer server = new EmailServer("<mail_server_urs>", EmailServerTypes.EXCHANGE_ONLINE, null);
+		EmailClient client = EmailClientSelector.routeEmail(server, System.getProperty("exoClientId"), System.getProperty("exoTenantId"), System.getProperty("exoCert"), System.getProperty("exoCertPrivateKey"), System.getProperty("exoCertPrivateKeyPass"), System.getProperty("exoUsermail"));
 		client.getLastEmails();
 	}
 
@@ -49,6 +50,13 @@ public class TestEmail {
 	public void testSendMail() throws Exception {
 		EmailServer server = new EmailServer("<mail_server_urs>", EmailServerTypes.EXCHANGE_EWS, "<domain_for_user>");
 		EmailClient client = EmailClientSelector.routeEmail(server, "<email_of_mailbox_to_consult>", "<user_to_connect_to_mailbox>", "<password>");
+		client.sendMessage(Arrays.asList("myaddress@mydomain.com"), "hello", "hello");
+	}
+	
+	@Test(groups={"it"}, enabled=false)
+	public void testSendMailExchangeOnline() throws Exception {
+		EmailServer server = new EmailServer("<mail_server_urs>", EmailServerTypes.EXCHANGE_ONLINE, null);
+		EmailClient client = EmailClientSelector.routeEmail(server, System.getProperty("exoClientId"), System.getProperty("exoTenantId"), System.getProperty("exoCert"), System.getProperty("exoCertPrivateKey"), System.getProperty("exoCertPrivateKeyPass"), System.getProperty("exoUsermail"));
 		client.sendMessage(Arrays.asList("myaddress@mydomain.com"), "hello", "hello");
 	}
 }
