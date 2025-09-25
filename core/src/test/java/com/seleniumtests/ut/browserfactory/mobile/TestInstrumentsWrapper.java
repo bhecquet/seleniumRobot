@@ -18,7 +18,6 @@
 package com.seleniumtests.ut.browserfactory.mobile;
 
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.List;
@@ -43,16 +42,16 @@ public class TestInstrumentsWrapper extends MockitoTest {
 	
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testInstrumentsNotFound() {
-		try (MockedStatic mockedOSCommand = mockStatic(OSCommand.class)) {
-			mockedOSCommand.when(() -> OSCommand.executeCommandAndWait("instruments")).thenReturn("instruments: command not found");
+		try (MockedStatic<OSCommand> mockedOSCommand = mockStatic(OSCommand.class)) {
+			mockedOSCommand.when(() -> OSCommand.executeCommandAndWait(new String[] {"instruments"})).thenReturn("instruments: command not found");
 			new InstrumentsWrapper();
 		}
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testNotOnMac() {
-		try (MockedStatic mockedOSUtility = mockStatic(OSUtility.class)) {
-			mockedOSUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
+		try (MockedStatic<OSUtility> mockedOSUtility = mockStatic(OSUtility.class)) {
+			mockedOSUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.WINDOWS);
 
 			new InstrumentsWrapper();
 		}
@@ -61,11 +60,11 @@ public class TestInstrumentsWrapper extends MockitoTest {
 
 	@Test(groups={"ut"})
 	public void testOnMac() {
-		try (MockedStatic mockedOSCommand = mockStatic(OSCommand.class);
-			 MockedStatic mockedOSUtility = mockStatic(OSUtility.class)) {
+		try (MockedStatic<OSCommand> mockedOSCommand = mockStatic(OSCommand.class);
+			 MockedStatic<OSUtility> mockedOSUtility = mockStatic(OSUtility.class)) {
 
-			mockedOSCommand.when(() -> OSCommand.executeCommandAndWait("xcrun")).thenReturn("Usage: xcrun [options] <tool name> ... arguments ...");
-			mockedOSUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
+			mockedOSCommand.when(() -> OSCommand.executeCommandAndWait(new String[] {"xcrun"})).thenReturn("Usage: xcrun [options] <tool name> ... arguments ...");
+			mockedOSUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.MAC);
 
 			new InstrumentsWrapper();
 		}
@@ -74,15 +73,15 @@ public class TestInstrumentsWrapper extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testiOSDeviceRetrieving() throws IOException {
-		try (MockedStatic mockedOSCommand = mockStatic(OSCommand.class);
-			 MockedStatic mockedOSUtility = mockStatic(OSUtility.class)) {
+		try (MockedStatic<OSCommand> mockedOSCommand = mockStatic(OSCommand.class);
+			 MockedStatic<OSUtility> mockedOSUtility = mockStatic(OSUtility.class)) {
 
-			mockedOSCommand.when(() -> OSCommand.executeCommandAndWait("xcrun")).thenReturn("Usage: xcrun [options] <tool name> ... arguments ...");
-			mockedOSUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
+			mockedOSCommand.when(() -> OSCommand.executeCommandAndWait(new String[] {"xcrun"})).thenReturn("Usage: xcrun [options] <tool name> ... arguments ...");
+			mockedOSUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.MAC);
 
 			String deviceList = GenericTest.readResourceToString("tu/devices.json");
 
-			mockedOSCommand.when(() -> OSCommand.executeCommandAndWait("xcrun simctl list devices available --json")).thenReturn(deviceList);
+			mockedOSCommand.when(() -> OSCommand.executeCommandAndWait(new String[] {"xcrun", "simctl", "list", "devices", "available", "--json"})).thenReturn(deviceList);
 
 			InstrumentsWrapper wrapper = new InstrumentsWrapper();
 			List<MobileDevice> devs = wrapper.parseIosDevices();

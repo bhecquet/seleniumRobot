@@ -2,12 +2,11 @@ package com.seleniumtests.ut.util.osutility;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
+import java.util.List;
 
-import org.mockito.Mock;
-import org.mockito.MockedConstruction;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
+import org.mockito.*;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -18,82 +17,83 @@ import com.seleniumtests.util.osutility.OSUtility;
 import static org.mockito.Mockito.*;
 
 public class TestOsCommand extends MockitoTest {
-	
+
+
 	@Mock
-	private Process process;
-	
+	private DefaultExecutor.Builder builder;
+
 	@Mock
-	private Process processSearchInPath;
-	
-	@Mock
-	private Runtime runtime;
+	private DefaultExecutor executor;
+
 
 	
 	@Test(groups={"ut"})
 	public void testExecuteCommandAndWait() throws IOException {
-		try (MockedConstruction mockedProcessBuilder = mockConstruction(ProcessBuilder.class, (processBuilder, context) -> {
-			when(processBuilder.start()).thenReturn(process);
-		})) {
-			ProcessBuilder processBuilder = new ProcessBuilder();
-			new OSCommand(Arrays.asList("myCmd"), 5, StandardCharsets.UTF_8, processBuilder, true).execute();
+		try (MockedStatic<DefaultExecutor> mockedExecutor = mockStatic(DefaultExecutor.class);
+		 ) {
+			mockedExecutor.when(DefaultExecutor::builder).thenReturn(builder);
+			when(builder.get()).thenReturn(executor);
 
-			verify(processBuilder).command(Arrays.asList("myCmd"));
+			ArgumentCaptor<CommandLine> commandLineArgumentCaptor = ArgumentCaptor.forClass(CommandLine.class);
+			new OSCommand(List.of("myCmd", "firstArg"), 5, StandardCharsets.UTF_8).execute();
+
+			verify(executor).execute(commandLineArgumentCaptor.capture());
+			String[] arguments = commandLineArgumentCaptor.getValue().getArguments();
+			Assert.assertEquals(arguments.length, 1);
+			Assert.assertEquals(arguments[0], "firstArg");
+			Assert.assertEquals(commandLineArgumentCaptor.getValue().getExecutable(), "myCmd");
 		}
+
 	}
 
+	/**
+	 * Check we search in path if requested, on windows
+	 */
 	@Test(groups={"ut"})
 	public void testExecuteCommandAndWaitInPathWindows() throws IOException {
-		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
-			 MockedConstruction mockedProcessBuilder = mockConstruction(ProcessBuilder.class);
-			 ) {
-			ProcessBuilder processBuilder = new ProcessBuilder();
-			mockedOsUtility.when(() -> OSUtility.isWindows()).thenReturn(true);
 
-			when(processBuilder.start()).thenReturn(processSearchInPath, process);
-			OSCommand osCommand = spy(new OSCommand(Arrays.asList(OSCommand.USE_PATH + "myCmd"), 5, StandardCharsets.UTF_8, processBuilder, true));
+		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
+			 MockedStatic<DefaultExecutor> mockedExecutor = mockStatic(DefaultExecutor.class);
+		) {
+			mockedExecutor.when(DefaultExecutor::builder).thenReturn(builder);
+			when(builder.get()).thenReturn(executor);
+			mockedOsUtility.when(OSUtility::isWindows).thenReturn(true);
 
+			OSCommand osCommand = spy(new OSCommand(List.of(OSCommand.USE_PATH + "myCmd", "firstArg"), 5, StandardCharsets.UTF_8));
 			doReturn("C:\\bin\\myCmd.bat").when(osCommand).searchInWindowsPath("myCmd");
+			ArgumentCaptor<CommandLine> commandLineArgumentCaptor = ArgumentCaptor.forClass(CommandLine.class);
 			osCommand.execute();
 
-			verify(processBuilder).command(Arrays.asList("C:\\bin\\myCmd.bat"));
+			verify(executor).execute(commandLineArgumentCaptor.capture());
+			String[] arguments = commandLineArgumentCaptor.getValue().getArguments();
+			Assert.assertEquals(arguments.length, 1);
+			Assert.assertEquals(arguments[0], "firstArg");
+			Assert.assertEquals(commandLineArgumentCaptor.getValue().getExecutable(), "C:\\bin\\myCmd.bat");
 		}
 	}
 	
 	/**
 	 * On Linux, we assume we already search in path
-	 * @throws IOException
 	 */
 	@Test(groups={"ut"})
 	public void testExecuteCommandAndWaitInPathLinux() throws IOException {
-		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
-			 MockedConstruction mockedProcessBuilder = mockConstruction(ProcessBuilder.class);
-			 ) {
+		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
+			 MockedStatic<DefaultExecutor> mockedExecutor = mockStatic(DefaultExecutor.class);
+		) {
+			mockedExecutor.when(DefaultExecutor::builder).thenReturn(builder);
+			when(builder.get()).thenReturn(executor);
 
-			ProcessBuilder processBuilder = new ProcessBuilder();
-			mockedOsUtility.when(() -> OSUtility.isWindows()).thenReturn(false);
+			mockedOsUtility.when(OSUtility::isWindows).thenReturn(false);
 
-			when(processBuilder.start()).thenReturn(processSearchInPath, process);
-			OSCommand osCommand = spy(new OSCommand(Arrays.asList(OSCommand.USE_PATH + "myCmd"), 5, StandardCharsets.UTF_8, processBuilder, true));
-
+			OSCommand osCommand = spy(new OSCommand(List.of(OSCommand.USE_PATH + "myCmd", "firstArg"), 5, StandardCharsets.UTF_8));
 			doReturn("C:\\bin\\myCmd.bat").when(osCommand).searchInWindowsPath("myCmd");
+			ArgumentCaptor<CommandLine> commandLineArgumentCaptor = ArgumentCaptor.forClass(CommandLine.class);
 			osCommand.execute();
 
-			verify(processBuilder).command(Arrays.asList("myCmd"));
+			verify(executor).execute(commandLineArgumentCaptor.capture());
+			Assert.assertEquals(commandLineArgumentCaptor.getValue().getExecutable(), "myCmd");
 		}
 	}
-	
-
-	@Test(groups={"ut"})
-	public void testExecuteCommand() throws IOException {
-		
-		Runtime runtime = spy(Runtime.getRuntime());
-
-		doReturn(process).when(runtime).exec("myCmd");
-		new OSCommand("myCmd", 5, StandardCharsets.UTF_8, runtime, false).executeNoWait();
-		
-		verify(runtime).exec("myCmd");
-	}
-
 	
 	/**
 	 * Check that command is stopped before end
@@ -101,7 +101,8 @@ public class TestOsCommand extends MockitoTest {
 	@Test(groups={"it"})
 	public void testExecutePingCommandAndWait() {
 		if (OSUtility.isWindows()) {
-			String out = OSCommand.executeCommandAndWait("ping localhost -n 10", 5, null);
+			String out = OSCommand.executeCommandAndWait(new String[] {"ping", "localhost", "-n", "10"}, 5, null);
+			System.out.println(out);
 			Assert.assertEquals(out.split("\n").length, 7);
 		}
 	}
@@ -112,8 +113,10 @@ public class TestOsCommand extends MockitoTest {
 	@Test(groups={"it"})
 	public void testExecutePingCommandAndWaitEnd() {
 		if (OSUtility.isWindows()) {
-			String out = OSCommand.executeCommandAndWait("ping localhost -n 4", 10, null);
+			String out = OSCommand.executeCommandAndWait(new String[] {"ping", "localhost", "-n", "4"}, 10, null);
+			System.out.println(out);
 			Assert.assertEquals(out.split("\n").length, 11); // we went to the end of the program, so more result lines are added
 		}
 	}
+
 }

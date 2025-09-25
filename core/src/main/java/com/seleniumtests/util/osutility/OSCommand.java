@@ -17,15 +17,15 @@
  */
 package com.seleniumtests.util.osutility;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.time.Clock;
-import java.time.Instant;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.exec.*;
 import org.apache.logging.log4j.Logger;
 
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
@@ -41,79 +41,39 @@ public class OSCommand {
 	public static final String USE_PATH = "_USE_PATH_";	
 	
 	private List<String> cmdList;
-	private String cmdString;
-	private int timeout;
-	private Charset charset;
-	private ProcessBuilder pb;
-	private Runtime runtime;
-	private boolean expectOuput = false;
+	private final int timeout;
+	private final Charset charset;
 	
 	public OSCommand(List<String> cmdList) {
 		this(cmdList, -1, null);
-	}
-	
-	public OSCommand(List<String> cmdList, int timeout, Charset charset) {
-		this(cmdList, timeout, charset, false);
-	}
-	public OSCommand(List<String> cmdList, int timeout, Charset charset, boolean expectOutput) {
-		this(cmdList, timeout, charset, new ProcessBuilder(), expectOutput);
 	}
 
 	/**
 	 *
 	 * @param cmdList		List of commands / arguments to the process
 	 * @param timeout		timeout to wait for process, then we return
-	 * @param charset
-	 * @param pb			processBuilder
-	 * @param expectOutput	If true, then we will wait that process outputs text (except when timeout is reached
+	 * @param charset		charset to read output
 	 */
-	public OSCommand(List<String> cmdList, int timeout, Charset charset, ProcessBuilder pb, boolean expectOutput) {
+	public OSCommand(List<String> cmdList, int timeout, Charset charset) {
 		
 		this.timeout = timeout;
-		this.charset = charset;
-		this.pb = pb;
+		if (charset == null) {
+			this.charset = OSUtility.getCharset();
+		} else {
+			this.charset = charset;
+		}
 		this.cmdList = cmdList;
-		this.expectOuput = expectOutput;
-	}
-	
-	/**
-	 * Execute a process, giving the full command as a String (useful when command uses pipe, for example)
-	 * @param cmdString
-	 * @param timeout
-	 * @param charset
-	 */
-	public OSCommand(String cmdString, int timeout, Charset charset) {
-		this(cmdString, timeout, charset, Runtime.getRuntime(), false);
-	}
-	public OSCommand(String cmdString, int timeout, Charset charset, boolean expectOutput) {
-		this(cmdString, timeout, charset, Runtime.getRuntime(), expectOutput);
 	}
 
-	/**
-	 * Execute a process, giving the full command as a String (useful when command uses pipe, for example)
-	 * @param cmdString
-	 * @param timeout
-	 * @param charset
-	 * @param runtime
-	 * @param expectOutput	If true, then we will wait that process outputs text (except when timeout is reached
-	 */
-	public OSCommand(String cmdString, int timeout, Charset charset, Runtime runtime, boolean expectOutput) {
-		
-		this.timeout = timeout;
-		this.charset = charset;
-		this.cmdString = cmdString;
-		this.runtime = runtime;
-		this.expectOuput = expectOutput;
-	}
 	
 	/**
 	 * Search a program in windows path
 	 * Throw an exception if it cannot be found
-	 * @param command
-	 * @return
+	 * @param command	The command to execute
+	 * @return the new command with path
 	 */
 	public String searchInWindowsPath(String command) {
-		String out = new OSCommand(Arrays.asList("where", command), timeout, charset, pb, true).execute();
+		String out = new OSCommand(Arrays.asList("where", command), timeout, charset).execute();
 		try {
 			return out.split("\n")[out.split("\n").length - 1].trim();
 			
@@ -124,8 +84,8 @@ public class OSCommand {
 
 	/**
 	 * Update command list
-	 * @param cmd
-	 * @return
+	 * @param cmd	command to update
+	 * @return	the updated command
 	 */
 	private List<String> updateCommand(List<String> cmd) {
 		List<String> newCmd = new ArrayList<>(cmd);
@@ -143,21 +103,46 @@ public class OSCommand {
 	
 	/**
 	 * Execute the process and wait for termination
-	 * @return
+	 * @return	the output of the program
 	 */
 	public String execute() {
-		Process proc = executeNoWait();
-		return waitProcessTermination(proc, timeout, charset);
+		if (cmdList != null && !cmdList.isEmpty()) {
+			cmdList = updateCommand(cmdList);
+			CommandLine commandLine = new CommandLine(cmdList.get(0));
+			for (String arg: cmdList.subList(1, cmdList.size())) {
+				commandLine.addArgument(arg);
+			}
+			DefaultExecutor executor = DefaultExecutor.builder().get();
+			ExecuteWatchdog watchdog = ExecuteWatchdog.builder().setTimeout(Duration.ofSeconds(timeout > 0 ? timeout: 30)).get();
+			executor.setWatchdog(watchdog);
+			// we accept all exit codes from -1 to 256
+			executor.setExitValues(java.util.stream.IntStream.rangeClosed(-1, 256).toArray());
+
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+			PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
+			executor.setStreamHandler(streamHandler);
+
+			try {
+				executor.execute(commandLine);
+				return outputStream.toString(charset);
+			} catch (IOException e) {
+				logger.error("Error executing {}: {}", cmdList.get(0), e.getMessage());
+				return "no output";
+			}
+		} else {
+			return "no output";
+		}
 	}
 	
 	
 	/**
 	 * Executes the command and returns the process
-	 * @return
+	 * @return	created process
 	 */
 	public Process executeNoWait() {
 		if (cmdList != null) {
 			cmdList = updateCommand(cmdList);
+			ProcessBuilder pb = new ProcessBuilder();
 			pb.command(cmdList);
 			pb.redirectErrorStream(true);
 			
@@ -166,135 +151,40 @@ public class OSCommand {
 			} catch (IOException e) {
 				throw new CustomSeleniumTestsException("cannot start process: " + cmdList.get(0), e);
 			}
-		} else {
-			try {
-				return runtime.exec(cmdString);
-			} catch (IOException e) {
-				throw new CustomSeleniumTestsException("cannot execute command: " + cmdString, e);
-			}
 		}
+		return null;
 		
 	}
-	
-	public static Process executeCommand(final String cmd) {
-		return new OSCommand(cmd, -1, null).executeNoWait();
-	}
-	
+
+	/**
+	 * Execute a process and do not wait for termination
+	 * @param cmd	command to execute
+	 * @return		the created process
+	 */
 	public static Process executeCommand(final String[] cmd) {
 		return new OSCommand(Arrays.asList(cmd), -1, null).executeNoWait();		
 	}
 	
 	/**
-     * Execute a command in command line terminal
-     * @param cmd for the end of the command execution
-     * @return 
+     * Execute a command in command line terminal. Wait for the end of the command execution
+     * @param cmd	command to execute, with arguments
+     * @return 	output of the executed command
      */
-    public static String executeCommandAndWait(final String[] cmd) {
-    	return executeCommandAndWait(cmd, -1, null);
-    }
-
-	public static String executeCommandAndWait(final String[] cmd, boolean expectOuput) {
-    	return executeCommandAndWait(cmd, -1, null, expectOuput);
+	public static String executeCommandAndWait(final String[] cmd) {
+    	return executeCommandAndWait(cmd, 30, null);
     }
     
+
     /**
      * Execute a command in command line terminal and wait at most 'timeout' seconds
      * @param cmd		An array containing the program to execute and its arguments
      * 					e.g: ["cmd.exe", "foo"]
      * 					If first item is "_USE_PATH_", then, on Windows, we will start cmd.exe first. This is because ProcessBuilder does not look for programs into the path
      * @param timeout 	number of seconds to wait for end of execution. A negative value means it will wait 30 secs
-     * @return 
+	 * @return 	output of the executed command
      */
    	public static String executeCommandAndWait(final String[] cmd, int timeout, Charset charset) {
-		   return executeCommandAndWait(cmd, timeout, charset, false);
-	}
-    /**
-     * Execute a command in command line terminal and wait at most 'timeout' seconds
-     * @param cmd		An array containing the program to execute and its arguments
-     * 					e.g: ["cmd.exe", "foo"]
-     * 					If first item is "_USE_PATH_", then, on Windows, we will start cmd.exe first. This is because ProcessBuilder does not look for programs into the path
-     * @param timeout 	number of seconds to wait for end of execution. A negative value means it will wait 30 secs
-	 * @param expectOutput if true, we will wait for process to output something (due to the fact that under load, process may terminate correctly, but stream has not immediately been flushed
-     * @return
-     */
-   	public static String executeCommandAndWait(final String[] cmd, int timeout, Charset charset, boolean expectOutput) {
-        return new OSCommand(Arrays.asList(cmd), timeout, charset, expectOutput).execute();
-    }
-    
-    /**
-     * Execute a command in command line terminal
-     * @param cmd for the end of the command execution
-     * @return 
-     */
-   	public static String executeCommandAndWait(final String cmd) {
-		return executeCommandAndWait(cmd, -1, null, false);
-	}
-    /**
-     * Execute a command in command line terminal
-     * @param cmd for the end of the command execution
-     * @return
-     */
-   	public static String executeCommandAndWait(final String cmd, boolean expectOuput) {
-   		return executeCommandAndWait(cmd, -1, null, expectOuput);
-   	}
-   	
-    /**
-     * Execute a command in command line terminal and wait at most 'timeout' seconds
-     * @param cmd
-     * @param timeout 	number of seconds to wait for end of execution. A negative value means it will wait 30 secs
-     * @param charset	charset used to read program output. If set to null, default charset will be used
-     * @return 
-     */
-    public static String executeCommandAndWait(final String cmd, int timeout, Charset charset) {
-		return executeCommandAndWait(cmd, timeout, charset, false);
-	}
-    /**
-     * Execute a command in command line terminal and wait at most 'timeout' seconds
-     * @param cmd
-     * @param timeout 	number of seconds to wait for end of execution. A negative value means it will wait 30 secs
-     * @param charset	charset used to read program output. If set to null, default charset will be used
-	 * @param expectOutput if true, we will wait for process to output something (due to the fact that under load, process may terminate correctly, but stream has not immediately been flushed
-     * @return
-     */
-    public static String executeCommandAndWait(final String cmd, int timeout, Charset charset, boolean expectOutput) {
-    	return new OSCommand(cmd, timeout, charset, expectOutput).execute();
-    }
-    
-    public String waitProcessTermination(Process proc, int timeout, Charset charset) {
-
-    	try {
-			return readOutput(proc, timeout, charset);
-    	} catch (InterruptedException e) {
-        	logger.error("Interruption: " + e.getMessage());
-        	Thread.currentThread().interrupt();
-
-		} catch (IOException e1) {
-        	logger.error(e1);
-        } 
-    	return "";
-    }
-    
-    private String readOutput(Process proc, int timeout, Charset charset) throws IOException, InterruptedException {
-    	
-    	if (charset == null) {
-    		charset = OSUtility.getCharset();
-    	}
-
-		StreamGobber outputGobbler  = new StreamGobber(proc.getInputStream(), charset);
-        outputGobbler.start();
-        
-        try {
-			proc.waitFor(timeout > 0 ? timeout: 30, TimeUnit.SECONDS);
-
-	        outputGobbler.halt(expectOuput);
-			StringBuilder output = outputGobbler.getOutput();
-	        
-	        return output.toString();
-        } catch (Exception e) {
-        	// in case something gets wrong, stop the threads
-	        outputGobbler.halt(false);
-	        throw e;
-        }
+        return new OSCommand(Arrays.asList(cmd), timeout, charset).execute();
     }
 
 }
