@@ -37,7 +37,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.mockito.MockingDetails;
 import org.mockito.Mockito;
@@ -696,7 +696,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		this.currentHandles = currentHandles;
 	}
 
-	@NotNull
+	@NonNull
 	@Override
     public Set<String> getWindowHandles() {
     	
@@ -740,7 +740,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     	}
     }
     
-    @NotNull
+    @NonNull
 	@Override
     public String getWindowHandle() {
     	
@@ -1739,7 +1739,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		return browserInfo;
 	}
 
-	@NotNull
+	@NonNull
 	@Override
     public Capabilities getCapabilities() {
 		try {
@@ -1754,23 +1754,23 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	}
 
 	@Override
-	public void get(@NotNull String url) {
+	public void get(@NonNull String url) {
 		driver.get(url);
 	}
 
-	@NotNull
+	@NonNull
 	@Override
-	public List<WebElement> findElements(@NotNull By by) {
+	public List<WebElement> findElements(@NonNull By by) {
 		return driver.findElements(by);
 	}
 
-	@NotNull
+	@NonNull
 	@Override
-	public WebElement findElement(@NotNull By by) {
+	public WebElement findElement(@NonNull By by) {
 		return driver.findElement(by);
 	}
 
-	@NotNull
+	@NonNull
 	@Override
 	public TargetLocator switchTo() {
 		if (isDriverExited()) {
@@ -1780,13 +1780,13 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		return new TimedoutTargetLocator(driver.switchTo(), this);
 	}
 
-	@NotNull
+	@NonNull
 	@Override
 	public Navigation navigate() {
 		return driver.navigate();
 	}
 
-	@NotNull
+	@NonNull
 	@Override
 	public Options manage() {
 		return driver.manage();
@@ -1794,7 +1794,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 
 
 	@Override
-	public <X> X getScreenshotAs(@NotNull OutputType<X> target) throws WebDriverException {
+	public <X> X getScreenshotAs(@NonNull OutputType<X> target) throws WebDriverException {
 		try {
 			return ((TakesScreenshot)driver).getScreenshotAs(target);
 		} catch (ClassCastException e) {
@@ -1804,39 +1804,39 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	}
 
 	@Override
-	public Object executeScript(@NotNull String script, @NotNull Object... args) {
+	public Object executeScript(@NonNull String script, @NonNull Object... args) {
 		return ((JavascriptExecutor)driver).executeScript(script, args);
 	}
 
 	@Override
-	public Object executeAsyncScript(@NotNull String script, @NotNull Object... args) {
+	public Object executeAsyncScript(@NonNull String script, @NonNull Object... args) {
 		return ((JavascriptExecutor)driver).executeAsyncScript(script, args);
 	}
 
-	@NotNull
+	@NonNull
 	@Override
-	public ScriptKey pin(@NotNull String script) {
+	public ScriptKey pin(@NonNull String script) {
 		return JavascriptExecutor.super.pin(script);
 	}
 
 	@Override
-	public void unpin(@NotNull ScriptKey key) {
+	public void unpin(@NonNull ScriptKey key) {
 		JavascriptExecutor.super.unpin(key);
 	}
 
-	@NotNull
+	@NonNull
 	@Override
 	public Set<ScriptKey> getPinnedScripts() {
 		return JavascriptExecutor.super.getPinnedScripts();
 	}
 
 	@Override
-	public Object executeScript(@NotNull ScriptKey key, @NotNull Object... args) {
+	public Object executeScript(@NonNull ScriptKey key, @NonNull Object... args) {
 		return JavascriptExecutor.super.executeScript(key, args);
 	}
 
 	@Override
-	public void perform(@NotNull Collection<Sequence> actions) {
+	public void perform(@NonNull Collection<Sequence> actions) {
 		((Interactive)driver).perform(actions);
 		
 	}
