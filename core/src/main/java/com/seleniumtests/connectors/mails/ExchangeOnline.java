@@ -51,8 +51,6 @@ public class ExchangeOnline extends EmailClientImpl {
 		IAuthenticationResult tokenProvider = acquireToken(certificateFileContent, certificatePrivateKeyFileContent, certificatePrivateKeyPassword, tenantId, clientId);
 		String token = tokenProvider.accessToken();
 		
-		logger.info(token);
-		
 		Unirest.config().addDefaultHeader("Authorization", "Bearer " + token);
 	}
 	
@@ -89,7 +87,6 @@ public class ExchangeOnline extends EmailClientImpl {
 	}
 	
 	private static PrivateKey readBouncyPrivateKey(String keyFileContent, String keyFilePassword) throws Exception {
-		logger.info(TMP_PRIVATE_KEY_FILE_PATH);
 		File keyFile = new File(TMP_PRIVATE_KEY_FILE_PATH);
 		if (keyFile.createNewFile()) {
 			FileWriter fw = new FileWriter(TMP_PRIVATE_KEY_FILE_PATH);
@@ -308,9 +305,13 @@ public class ExchangeOnline extends EmailClientImpl {
 		List<Email> result = new ArrayList<>();
 		Map<String, Object> params = new HashMap<>();
 		try {
-			String folderId = findFolder(folderName);
-			params.put("folder", folderId);
-			params.put("fromDate", firstMessageTime);
+			if (folderName != null) {
+                String folderId = findFolder(folderName);
+                params.put("folder", folderId);
+            }
+            if (firstMessageTime != null) {
+                params.put("fromDate", firstMessageTime);
+            }
 			params.put("select", "subject,body,from,receivedDateTime,hasAttachments");
 			HttpResponse<JsonNode> readMailResult = readMails(params);
 			JSONArray mails = readMailResult.getBody().getObject().getJSONArray("value");
@@ -330,8 +331,8 @@ public class ExchangeOnline extends EmailClientImpl {
 					}
 					String time = jsmail.getString("receivedDateTime");
 					String timeNoZ = time.substring(0, time.length() - 1);
-					Email toto = new Email(jsmail.getString("subject"), jsmail.getJSONObject("body").getString("content"), jsmail.getJSONObject("from").getJSONObject("emailAddress").getString("address"), LocalDateTime.parse(timeNoZ), attachments);
-					result.add(toto);
+					Email email = new Email(jsmail.getString("subject"), jsmail.getJSONObject("body").getString("content"), jsmail.getJSONObject("from").getJSONObject("emailAddress").getString("address"), LocalDateTime.parse(timeNoZ), attachments);
+					result.add(email);
 				}
 			} else {
 				throw new Exception("Retrieved mail list is empty.");
