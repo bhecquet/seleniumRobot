@@ -95,7 +95,7 @@ public class TestOsUtility extends GenericTest {
 	
 	@Test(groups={"it"})
 	public void testIsProcessNotRunning() {		
-		Assert.assertFalse(osUtil.isProcessRunning("anUnknownProcess"), String.format("process anUnknownProcess should not be found"));
+		Assert.assertFalse(osUtil.isProcessRunning("anUnknownProcess"), "process anUnknownProcess should not be found");
 	}
 	
 
@@ -250,12 +250,13 @@ public class TestOsUtility extends GenericTest {
 	@Test(groups={"it"})
 	public void testKillAllWebBrowserProcess() {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
+		SeleniumTestsContextManager.getThreadContext().setInitialUrl("http://foo.bar");
+		SeleniumTestsContextManager.getThreadContext().setEdgeIeMode(true);
 		WebUIDriver.getWebDriver(true);
 		WebUIDriver.getWebDriver(true, BrowserType.FIREFOX, "ff", null);
 		if (OSUtility.isWindows()) {
+
 			WebUIDriver.getWebDriver(true, BrowserType.INTERNET_EXPLORER, "ie", null);
-		}
-		if (OSUtility.isWindows10()) {
 			WebUIDriver.getWebDriver(true, BrowserType.EDGE, "edge", null);
 		}
 		if (OSUtility.isMac()) {
@@ -263,6 +264,9 @@ public class TestOsUtility extends GenericTest {
 		}
 		osUtil.killAllWebBrowserProcess(true);
 		osUtil.killAllWebDriverProcess();
+
+		// wait for processes to be killed
+		WaitHelper.waitForSeconds(5);
 		
 		Assert.assertNull(osUtil.getRunningProcess("chrome"));
 		Assert.assertNull(osUtil.getRunningProcess("firefox"));
@@ -299,7 +303,7 @@ public class TestOsUtility extends GenericTest {
 
 			WaitHelper.waitForSeconds(1);
 			String processName = "calc";
-			OSCommand.executeCommand(processName);
+			OSCommand.executeCommand(new String[] {processName});
 			WaitHelper.waitForSeconds(2);
 			ProcessInfo pi = osUtil.getRunningProcess("calc");
 			if (pi == null) {

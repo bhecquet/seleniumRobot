@@ -18,7 +18,6 @@
 package com.seleniumtests.it.driver;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.SystemUtils;
 import org.testng.Assert;
@@ -76,7 +75,7 @@ public class TestDesktopDrivers extends GenericDriverTest {
 		List<String> executingEdge = OSUtilityFactory.getInstance().getRunningProcesses("chrome")
 					.stream()
 					.map(ProcessInfo::getPid)
-					.collect(Collectors.toList());
+					.toList();
 		
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
@@ -94,10 +93,10 @@ public class TestDesktopDrivers extends GenericDriverTest {
 			.stream()
 			.map(ProcessInfo::getPid)
 			.filter(pid -> !executingEdge.contains(pid))
-			.collect(Collectors.toList());
+			.toList();
 		
 		if (SystemUtils.IS_OS_WINDOWS) {
-			Assert.assertTrue(OSCommand.executeCommandAndWait(String.format("wmic process where \"ProcessID=%s\" get ExecutablePath", newEdge.get(0)), true).contains("Beta"));
+			Assert.assertTrue(OSCommand.executeCommandAndWait(new String[] {"wmic", "process", "where", String.format("\"ProcessID=%s\"", newEdge.get(0)), "get", "ExecutablePath"}).contains("Beta"));
 		}
 
 	}
@@ -122,9 +121,10 @@ public class TestDesktopDrivers extends GenericDriverTest {
 			throw new SkipException("This test can only be done on Windows");
 		}
 		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setBrowser("*iexplore");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("iexplore");
+		SeleniumTestsContextManager.getThreadContext().setInitialUrl("http://foo.bar");
 		driver = WebUIDriver.getWebDriver(true);
-		Assert.assertTrue(driver.getCurrentUrl().contains("http://localhost:") || driver.getCurrentUrl().contains("about:blank"));
+		Assert.assertTrue(driver.getCurrentUrl().contains("http://foo.bar"));
 		
 		// issue #280: check BrowserInfo exists
 		Assert.assertNotNull(((CustomEventFiringWebDriver)driver).getBrowserInfo());
@@ -133,12 +133,12 @@ public class TestDesktopDrivers extends GenericDriverTest {
 	
 	@Test(groups={"it"})
 	public void testEdgeStartup(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		if (!SystemUtils.IS_OS_WINDOWS_10) {
-			throw new SkipException("This test can only be done on Windows 10");
+		if (!SystemUtils.IS_OS_WINDOWS) {
+			throw new SkipException("This test can only be done on Windows");
 		}
 
 		// check Edge is available
-		Assert.assertTrue(OSUtility.getInstalledBrowsersWithVersion(true).get(BrowserType.EDGE).size() > 0);
+        Assert.assertFalse(OSUtility.getInstalledBrowsersWithVersion(true).get(BrowserType.EDGE).isEmpty());
 		
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*edge");
@@ -152,8 +152,8 @@ public class TestDesktopDrivers extends GenericDriverTest {
 	
 	@Test(groups={"it"})
 	public void testEdgeBetaStartup(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		if (!SystemUtils.IS_OS_WINDOWS_10) {
-			throw new SkipException("This test can only be done on Windows 10");
+		if (!SystemUtils.IS_OS_WINDOWS) {
+			throw new SkipException("This test can only be done on Windows");
 		}
 		
 		// check Edge is available and Edge beta is installed
@@ -165,7 +165,7 @@ public class TestDesktopDrivers extends GenericDriverTest {
 		List<String> executingEdge = OSUtilityFactory.getInstance().getRunningProcesses("msedge")
 					.stream()
 					.map(ProcessInfo::getPid)
-					.collect(Collectors.toList());
+					.toList();
 		
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*edge");
@@ -183,9 +183,9 @@ public class TestDesktopDrivers extends GenericDriverTest {
 			.stream()
 			.map(ProcessInfo::getPid)
 			.filter(pid -> !executingEdge.contains(pid))
-			.collect(Collectors.toList());
+			.toList();
 		
-		Assert.assertTrue(OSCommand.executeCommandAndWait(String.format("wmic process where \"ProcessID=%s\" get ExecutablePath", newEdge.get(0))).contains("Beta"));
+		Assert.assertTrue(OSCommand.executeCommandAndWait(new String[] {"wmic", "process", "where", String.format("\"ProcessID=%s\"", newEdge.get(0)), "get", "ExecutablePath"}).contains("Beta"));
 		
 		
 	}

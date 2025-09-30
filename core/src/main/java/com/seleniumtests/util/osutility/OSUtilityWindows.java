@@ -18,17 +18,10 @@
 package com.seleniumtests.util.osutility;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,22 +40,23 @@ import com.sun.jna.platform.win32.Win32Exception;
 import com.sun.jna.platform.win32.WinReg;
 
 public class OSUtilityWindows extends OSUtility {
-	
+
 	private static final String MSEDGE_EXE = "msedge.exe";
 	private static final String EXE_EXT_QUOTE = ".exe\"";
 	private static final String KEY_VERSION = "version";
+	public static final String TASKKILL_PROCESS = "taskkill";
 	Pattern versionPattern = Pattern.compile(".*?(\\d++\\.\\d++\\.\\d++).*?");
 		
 	@Override
 	public int getIEVersion() {
 
-        String output = OSCommand.executeCommandAndWait("reg query \"HKLM\\Software\\Microsoft\\Internet Explorer\" /v svcVersion", true);
+        String output = OSCommand.executeCommandAndWait(new String[] {"reg", "query", "HKLM\\Software\\Microsoft\\Internet Explorer", "/v", "svcVersion"});
         if (output.split("\n").length < 3) {
-            output = OSCommand.executeCommandAndWait("reg query \"HKLM\\Software\\Microsoft\\Internet Explorer\" /v Version", true);
+            output = OSCommand.executeCommandAndWait(new String[] {"reg", "query", "HKLM\\Software\\Microsoft\\Internet Explorer", "/v", "Version"});
         }
 
         String internetExplorerValue = output.split("\n")[2];
-        String version = internetExplorerValue.trim().split("   ")[2];
+        String version = internetExplorerValue.trim().split(" {3}")[2];
         version = version.trim().split("\\.")[0];
         return Integer.parseInt(version);
     }
@@ -79,8 +73,8 @@ public class OSUtilityWindows extends OSUtility {
     	 * and /V displays also : Status ;  Username ;  CPU time ;  Windows title .
     	 * or /SVC displays only : Image name ;  PID ;  Services .
     	 */
-    	String command = SystemUtility.getenv("windir") + "\\system32\\" + "tasklist.exe /NH /SVC";
-    	List<String> strProcessList = Arrays.asList(OSCommand.executeCommandAndWait(command, true).split("\n"));
+    	String command = SystemUtility.getenv("windir") + "\\system32\\" + "tasklist.exe";
+    	String[] strProcessList = OSCommand.executeCommandAndWait(new String[] {command, "/NH", "/SVC"}).split("\n");
     	Pattern pTasklist = Pattern.compile("([^\\s]+)\\s++(\\d++)\\s++.*");
     	
     	List<ProcessInfo> processInfoList = new ArrayList<>();
@@ -103,24 +97,22 @@ public class OSUtilityWindows extends OSUtility {
     
     /**
      * Terminate process from command line terminal.
-     * @param pid
+     * @param pid	PID of process to kill
      * @param force to kill the process
-     * @return
-     * @throws IOException
      */
     @Override
     public String killProcess(String pid, boolean force) {
 
     	if (force) {
     		try {
-    			OSCommand.executeCommand(String.format("wmic process where \"processid='%s'\" delete", pid));
+    			OSCommand.executeCommand(new String[] {"wmic", "process", "where", String.format("\"processid='%s'\"", pid), "delete"});
     			return "Done";
     		} catch (Exception e) {
     			// use an other mean if wmic fails
     		}
-    		OSCommand.executeCommand("taskkill /F /PID " + pid);
+    		OSCommand.executeCommand(new String[] {TASKKILL_PROCESS, "/F", "/PID", pid});
     	} else {
-    		OSCommand.executeCommand("taskkill /PID " + pid);
+    		OSCommand.executeCommand(new String[] {TASKKILL_PROCESS, "/PID", pid});
     	}
     	return "Done";
     }
@@ -134,14 +126,14 @@ public class OSUtilityWindows extends OSUtility {
 	public String killProcessByName(String programName, boolean force) {
 		if (force) {
 			try {
-    			OSCommand.executeCommand(String.format("wmic process where \"name='%s'\" delete", programName + getProgramExtension()));
+    			OSCommand.executeCommand(new String[] {"wmic", "process", "where", String.format("\"name='%s'\"", programName + getProgramExtension()), "delete"});
     			return "Done";
     		} catch (Exception e) {
     			// use an other mean if wmic fails
     		}
-			OSCommand.executeCommand("taskkill /F /IM " + programName + getProgramExtension());
+			OSCommand.executeCommand(new String[] {TASKKILL_PROCESS, "/F", "/IM", programName + getProgramExtension()});
     	} else {
-    		OSCommand.executeCommand("taskkill /IM " + programName + getProgramExtension());
+    		OSCommand.executeCommand(new String[] {TASKKILL_PROCESS, "/IM", programName + getProgramExtension()});
     	}
 		return "Done";
 	}
@@ -153,7 +145,7 @@ public class OSUtilityWindows extends OSUtility {
 
 	@Override
 	public String getOSBuild() {
-		String version = OSCommand.executeCommandAndWait("cmd /C ver", true).replace("\r", "").replace("\n", "").trim();
+		String version = OSCommand.executeCommandAndWait(new String[] {"cmd", "/C", "ver"}).replace("\r", "").replace("\n", "").trim();
 		Matcher versionMatcher = versionPattern.matcher(version);
 		if (versionMatcher.matches()) {
 			return versionMatcher.group(1);
@@ -181,14 +173,14 @@ public class OSUtilityWindows extends OSUtility {
 	
 	/**
 	 * Search for a folder with version name where chrome.exe is located (e.g: 58.0.3029.81)
-	 * @param chromePath
-	 * @return
+	 * @param chromePath	path to chrome
+	 * @return	the version
 	 */
 	public String getChromeVersionFromFolder(String chromePath) {
 		if (!new File(chromePath).exists()) {
 			throw new ConfigurationException("Chrome version could not be get from folder, chrome path does not exist");
 		}
-		for (File file: new File(chromePath.replace("chrome.exe", "")).listFiles()) {
+		for (File file: Objects.requireNonNull(new File(chromePath.replace("chrome.exe", "")).listFiles())) {
 			if (file.isDirectory() && file.getName().matches("^\\d++.*")) {
 				return file.getName();
 			}
@@ -198,15 +190,15 @@ public class OSUtilityWindows extends OSUtility {
 	
 	/**
 	 * Search for a folder with version name where msedge.exe is located (e.g: 58.0.3029.81)
-	 * @param edgePath
-	 * @return
+	 * @param edgePath path to edge
+	 * @return	version of edge
 	 */
 	public String getEdgeVersionFromFolder(String edgePath) {
 		File parentFolder = Paths.get(edgePath).toFile();
 		if (!parentFolder.exists()) {
 			throw new ConfigurationException("Edge version could not be get from folder, edge path does not exist");
 		}
-		for (File file: parentFolder.listFiles()) {
+		for (File file: Objects.requireNonNull(parentFolder.listFiles())) {
 			if (file.isDirectory() && file.getName().matches("^\\d++.*")) {
 				return file.getName();
 			}
@@ -233,8 +225,8 @@ public class OSUtilityWindows extends OSUtility {
 	}
 
 	/**
-	 * @param edgeBetaPath
-	 * @return
+	 * @param edgeBetaPath path to edge
+	 * @return	version of edge
 	 */
 	private String getWindowsEdgeVersion(String edgeBetaPath) {
 		String version;
@@ -256,7 +248,7 @@ public class OSUtilityWindows extends OSUtility {
 	
 	private List<String> searchFirefoxVersions() {
 		List<String> firefoxInstallations = new ArrayList<>();
-		String out = OSCommand.executeCommandAndWait(new String[] {"REG", "QUERY", "HKCR",  "/f", "FirefoxHTML", "/k", "/c"}, true);
+		String out = OSCommand.executeCommandAndWait(new String[] {"REG", "QUERY", "HKCR",  "/f", "FirefoxHTML", "/k", "/c"});
 		for (String line: out.split("\n")) {
 			if (line.startsWith("HKEY_CLASSES_ROOT")) {
 				String keyPath = line.replace("HKEY_CLASSES_ROOT\\", "").trim();
@@ -285,7 +277,7 @@ public class OSUtilityWindows extends OSUtility {
 			
 		Map<BrowserType, List<BrowserInfo>> browserList = new EnumMap<>(BrowserType.class);
 		
-		browserList.put(BrowserType.HTMLUNIT, Arrays.asList(new BrowserInfo(BrowserType.HTMLUNIT, BrowserInfo.LATEST_VERSION, null)));
+		browserList.put(BrowserType.HTMLUNIT, List.of(new BrowserInfo(BrowserType.HTMLUNIT, BrowserInfo.LATEST_VERSION, null)));
 		
 		// look for Firefox
 		try {
@@ -314,7 +306,7 @@ public class OSUtilityWindows extends OSUtility {
 			String version = getWindowsChromeVersion(chromePath);
 			browserList.get(BrowserType.CHROME).add(new BrowserInfo(BrowserType.CHROME, extractChromeVersion("Google Chrome " + version), false, chromePath));
 		} catch (Win32Exception | ConfigurationException e) {
-			logger.warn("Error searching chrome installations: " + e.getMessage());
+			logger.warn("Error searching chrome installations: {}", e.getMessage());
 		}
 
 		try {
@@ -326,12 +318,8 @@ public class OSUtilityWindows extends OSUtility {
 			browserList.get(BrowserType.CHROME).add(new BrowserInfo(BrowserType.CHROME, extractChromeVersion("Google Chrome " + versionBeta), true, chromeBetaPath));
 
 		} catch (Win32Exception | ConfigurationException e) {
-			logger.warn("Error searching Beta chrome installations: " + e.getMessage());
+			logger.warn("Error searching Beta chrome installations: {}", e.getMessage());
 		}
-
-
-
-
 		
 		// look for ie
 		try {
@@ -340,10 +328,9 @@ public class OSUtilityWindows extends OSUtility {
 			
 			browserList.put(BrowserType.INTERNET_EXPLORER, Arrays.asList(new BrowserInfo(BrowserType.INTERNET_EXPLORER, extractIEVersion(version), null)));
 		} catch (Win32Exception | ConfigurationException e) {
-			logger.warn("Error searching Internet explorer installations: " + e.getMessage());
+			logger.warn("Error searching Internet explorer installations: {}", e.getMessage());
 		}
-		
-		
+
 		// look for edge chromium
 		try {
 			browserList.put(BrowserType.EDGE, new ArrayList<>());
@@ -354,7 +341,7 @@ public class OSUtilityWindows extends OSUtility {
 				browserList.get(BrowserType.EDGE).add(new BrowserInfo(BrowserType.EDGE, extractEdgeVersion(version), false, Paths.get(edgePath, MSEDGE_EXE).toString()));
 			}
 		} catch (Win32Exception | ConfigurationException e) {
-			logger.warn("Error searching Edge chromium installations: " + e.getMessage());
+			logger.warn("Error searching Edge chromium installations: {}", e.getMessage());
 		}
 		
 
@@ -368,15 +355,15 @@ public class OSUtilityWindows extends OSUtility {
 			}
 
 		} catch (Win32Exception | ConfigurationException e) {
-			logger.warn("Error searching Beta Edge chromium installations: " + e.getMessage());
+			logger.warn("Error searching Beta Edge chromium installations: {}", e.getMessage());
 		}
 
 		return browserList;
 	}
 
 	/**
-	 * @param chromeBetaPath
-	 * @return
+	 * @param chromeBetaPath	path to chrome beta
+	 * @return version for chrome
 	 */
 	private String getWindowsBetaChromeVersion(String chromeBetaPath) {
 		String versionBeta;
@@ -419,8 +406,9 @@ public class OSUtilityWindows extends OSUtility {
 	}
 
 	@Override
-	public List<Long> getChildProcessPid(Long parentProcess, String processName, List<Long> existingPids) throws IOException {
-		Scanner scan = new Scanner(Runtime.getRuntime().exec(String.format("wmic process where (ParentProcessId=%d) get Caption,ProcessId", parentProcess)).getInputStream());
+	public List<Long> getChildProcessPid(Long parentProcess, String processName, List<Long> existingPids) {
+		Process process = OSCommand.executeCommand(new String[] {"wmic", "process", "where", String.format("ParentProcessId=%d", parentProcess), "get", "Caption,ProcessId"});
+		Scanner scan = new Scanner(process.getInputStream());
         scan.useDelimiter("\\A");
         String childProcessIds =  scan.hasNext() ? scan.next() : "";
         List<Long> namedSubprocesses = new ArrayList<>();
@@ -429,7 +417,7 @@ public class OSUtilityWindows extends OSUtility {
         	Long pid;
         	try {
         		pid = Long.parseLong(splited[i+1]);
-        	} catch (NumberFormatException e) {
+        	} catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
         		continue;
         	}
             if((processName == null || processName.equalsIgnoreCase(splited[i])) && !existingPids.contains(pid)) {
@@ -444,7 +432,7 @@ public class OSUtilityWindows extends OSUtility {
 
 	@Override
 	public String getProgramNameFromPid(Long pid) {
-		String[] processNames = OSCommand.executeCommandAndWait(String.format("wmic process where processId=%d get name", pid), true).trim().split("\n");
+		String[] processNames = OSCommand.executeCommandAndWait(new String[] {"wmic", "process", "where", String.format("processId=%d", pid), "get", "name"}).trim().split("\n");
 		String processName = processNames[processNames.length - 1];
 		return processName.endsWith(".exe") ? processName: "";
 	}
@@ -452,7 +440,7 @@ public class OSUtilityWindows extends OSUtility {
 	@Override
 	public Integer getProcessIdByListeningPort(int port) {
 		// example: TCP    127.0.0.1:51239        0.0.0.0:0              LISTENING       22492
-		String lines = OSCommand.executeCommandAndWait("netstat -aon", true).trim();
+		String lines = OSCommand.executeCommandAndWait(new String[] {"netstat", "-aon"}).trim();
 		Pattern pattern = Pattern.compile(String.format(".*\\:%d\\s+.*\\:.*LISTENING\\s+(\\d+).*", port));
 		for (String line: lines.split("\n")) {
 			Matcher matcher = pattern.matcher(line.trim());
@@ -570,35 +558,32 @@ public class OSUtilityWindows extends OSUtility {
 		} else {
 			return;
 		}
-		
-        try {
-            // proxy
-            hexString += String.format("%02X000000", proxyUrl.length());
-            hexString += Hex.encodeHexString(proxyUrl.getBytes("UTF-8"));
 
-            // proxy exclusion
-            hexString += String.format("%02X000000", proxyExclusion.length());
-            hexString += Hex.encodeHexString(proxyExclusion.getBytes("UTF-8"));
+		// proxy
+		hexString += String.format("%02X000000", proxyUrl.length());
+		hexString += Hex.encodeHexString(proxyUrl.getBytes(StandardCharsets.UTF_8));
 
-            // auto configuration script
-            hexString += String.format("%02X000000", autoConfigUrl.length());
-            hexString += Hex.encodeHexString(autoConfigUrl.getBytes("UTF-8"));
-            if (proxy.getProxyType() == ProxyType.PAC) {
-            	 // finalisation of string
-	            hexString +=  "0100000000000000" +
-	                          "0000000000000000" +
-	                          "0000000000000000" +
-	                          "0000000000000000";
-            } else {
-	
-	            // finalisation of string
-	            hexString +=  "0000000000000000" +
-	                          "0000000000000000" +
-	                          "0000000000000000" +
-	                          "0000000000000000";
-            }
-        } catch (UnsupportedEncodingException e) {
-        }
+		// proxy exclusion
+		hexString += String.format("%02X000000", proxyExclusion.length());
+		hexString += Hex.encodeHexString(proxyExclusion.getBytes(StandardCharsets.UTF_8));
+
+		// auto configuration script
+		hexString += String.format("%02X000000", autoConfigUrl.length());
+		hexString += Hex.encodeHexString(autoConfigUrl.getBytes(StandardCharsets.UTF_8));
+		if (proxy.getProxyType() == ProxyType.PAC) {
+			 // finalisation of string
+			hexString +=  "0100000000000000" +
+						  "0000000000000000" +
+						  "0000000000000000" +
+						  "0000000000000000";
+		} else {
+
+			// finalisation of string
+			hexString +=  "0000000000000000" +
+						  "0000000000000000" +
+						  "0000000000000000" +
+						  "0000000000000000";
+		}
 
         byte[] data = DatatypeConverter.parseHexBinary(hexString);
         Advapi32Util.registrySetBinaryValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Connections", "DefaultConnectionSettings", data);

@@ -37,7 +37,9 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.mockito.MockingDetails;
 import org.mockito.Mockito;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Interactive;
@@ -69,7 +71,7 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -85,10 +87,11 @@ import java.util.*;
  * It also handles the grid mode, masking it to requester.
  */
 public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, JavascriptExecutor, TakesScreenshot, Interactive, SupportsContextSwitching, HidesKeyboard {
-	
+
 	private static final String OTHER_BROWSER = "other";
 	private static final String SAFARI_BROWSER = "safari";
 	private static final Logger logger = SeleniumRobotLogger.getLogger(CustomEventFiringWebDriver.class);
+	public static final String SE_CDP_PREFIX = "se:cdp";
 	private static Set<VideoRecorder> videoRecorders = Collections.synchronizedSet(new HashSet<>());
     private FileDetector fileDetector = new UselessFileDetector();
     private static final int MAX_DIMENSION = 100000;
@@ -196,7 +199,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 			"    var style = getComputedStyle(element);" +
 			"    var excludeStaticParent = style.position === \"absolute\";" +
 			"    var overflowRegex = includeHidden ? /(auto|scroll|hidden)/ : /(auto|scroll)/;" +
-			"" +
+
 			"    if (style.position === \"fixed\") return null;" +
 			"    for (var parent = element; (parent = getParentNode(parent));) {" +
 			"        style = getComputedStyle(parent);" +
@@ -205,10 +208,10 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 			"        }" +
 			"        if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) return parent;" +
 			"    }" +
-			"" +
+
 			"    return null;" +
 			"}" +
-			"" +
+
 			"function getParentNode(node) {" +
 			// le parent est le document
 			"    if (node.parentNode.nodeType === Node.DOCUMENT_NODE) {" +
@@ -256,21 +259,21 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     		+ "             if (left === right) {"
     		+ "                 return true;"
     		+ "             }"
-    		+ ""
+
     		+ "             if (left.nodeType === Node.ELEMENT_NODE && right.nodeType === Node.ELEMENT_NODE) {"
     		+ "                 return left.localName === right.localName;"
     		+ "             }"
-    		+ ""
+
     		+ "             if (left.nodeType === right.nodeType) {"
     		+ "                 return true;"
     		+ "             }"
-    		+ ""
+
     		// XPath treats CDATA as text nodes.
     		+ "             const leftType = left.nodeType === Node.CDATA_SECTION_NODE ? Node.TEXT_NODE : left.nodeType;"
     		+ "             const rightType = right.nodeType === Node.CDATA_SECTION_NODE ? Node.TEXT_NODE : right.nodeType;"
     		+ "             return leftType === rightType;"
     		+ "         }"
-    		+ ""
+
     		+ "         const siblings = node.parentNode ? node.parentNode.children : null;"
     		// Root node - no siblings.
     		+ "         if (!siblings) {"
@@ -312,7 +315,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     		+ "     } "
     		+ "     "
     		+ "     for (var i=0; i<elements.length; i++) {"
-    		+ ""
+
     		+ "         let p = xpath + '/' + elements[i].localName;"
     		+ "         const ownIndex = _xPathIndex(elements[i]);"
     		+ "         if (ownIndex === -1) {"
@@ -327,13 +330,13 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     		+ "             return p;"
     		+ "             break;"
     		+ "         }"
-    		+ ""
+
     		+ "         var ret = path(elements[i], element, p);"
     		+ "         if (ret != null) {"
     		+ "             return ret;"
     		+ "         }"
     		+ "     }"
-    		+ ""
+
     		+ "     return null;"
     		+ "   "
     		+ " };"
@@ -356,7 +359,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     		+ "     while ((elementFullXpath.match(new RegExp(\"/\", \"g\")) || []).length > 1) {"
     		+ "         elementFullXpath = elementFullXpath.substring(0, elementFullXpath.lastIndexOf('/'));"
     		+ "         let elementToEvaluate = document.evaluate(elementFullXpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;"
-    		+ ""
+
     		+ "         if (elementToEvaluate === null) {"
     		+ "             return rootElement;"
     		+ "         } else {"
@@ -364,7 +367,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     		+ "             if (excludeStaticParent && style.position === \"static\") {"
     		+ "                 continue;"
     		+ "             } "
-    		+ ""
+
     		+ "             if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) return elementToEvaluate;"
     		+ "         }"
     		+ "     }"
@@ -387,7 +390,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     		"    }" + 
     		"    return returns;" + 
     		"  }" + 
-    		"" + 
+
     		"  /* IE and Opera way */" + 
     		"  if (dom.currentStyle) {" + 
     		"    style = dom.currentStyle;" + 
@@ -410,11 +413,11 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 
     private static final String JS_IS_ELEMENT_VISIBLE = "function isVisible(elem) {" + 
     		"  var style = getStyle(elem);" + 
-    		"" + 
+
     		"  if (style[\"display\"] === \"none\") return false;" + 
     		"  if (style[\"visibility\"] !== \"visible\") return false;" + 
     		"  if (style[\"opacity\"] === 0) return false;" + 
-    		"" + 
+
     		"  if (" + 
     		"    elem.offsetWidth +" + 
     		"      elem.offsetHeight +" + 
@@ -423,7 +426,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     		"    0" + 
     		"  )" + 
     		"    return false;" + 
-    		"" + 
+
     		"  var elementPoints = {" + 
     		"    center: {" + 
     		"      x: elem.getBoundingClientRect().left + elem.offsetWidth / 2," + 
@@ -446,15 +449,15 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     		"      y: elem.getBoundingClientRect().bottom" + 
     		"    }" + 
     		"  };" + 
-    		"" + 
+
     		"  var docWidth = document.documentElement.clientWidth || window.innerWidth;" + 
     		"  var docHeight = document.documentElement.clientHeight || window.innerHeight;" + 
-    		"" + 
+
     		"  if (elementPoints.topLeft.x > docWidth) return false;" + 
     		"  if (elementPoints.topLeft.y > docHeight) return false;" + 
     		"  if (elementPoints.bottomRight.x < 0) return false;" + 
     		"  if (elementPoints.bottomRight.y < 0) return false;" + 
-    		"" + 
+
     		"  for (var index in elementPoints) {" + 
     		"    var point = elementPoints[index];" + 
     		"    var pointContainer = document.elementFromPoint(point.x, point.y);" + 
@@ -470,11 +473,10 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     // return true if a modal is present: a 'visible' div whose size is the same as the viewport
     private static final String JS_GET_MODAL = 
     		"function getViewportWidth() {" + JS_GET_VIEWPORT_SIZE_WIDTH + "}" +
-    		"" +
+
     		"function getViewportHeight() {" + JS_GET_VIEWPORT_SIZE_HEIGHT + "}" +
-    		"" +
+
     		JS_GET_ELEMENT_STYLE +
-    		"" + 
     		JS_IS_ELEMENT_VISIBLE + 
 
     		"var modals;" + 
@@ -625,20 +627,22 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		// Augmenter is only supported for web test because augmenting driver namely tries to create a CDP connection with a browser
 		// do not augment mocked drivers (used in unit tests), as the mocked driver is masked by augmentation. Spyed driver are OK
 		// as they behave as real drivers
-		if (isWebTest() && !(Mockito.mockingDetails(driver).isMock() && !Mockito.mockingDetails(driver).isSpy())) {
+
+		MockingDetails mockingDetails = Mockito.mockingDetails(driver);
+		if (isWebTest() && !(mockingDetails.isMock() && !mockingDetails.isSpy())) {
 			try {
 				updateBidiPort(this.driver);
-				logger.info(((HasCapabilities)driver).getCapabilities().getCapability("se:cdp"));
+				logger.info(((HasCapabilities)driver).getCapabilities().getCapability(SE_CDP_PREFIX));
 				this.driver = new Augmenter().augment(this.driver);
 			} catch (Exception e) {
 				throw new RetryableDriverException("Error augmenting driver", e);
 			}
 		}
 
-		this.driver = new EventFiringDecorator(new DriverExceptionListener(this)).decorate(this.driver);
+		this.driver = new EventFiringDecorator<>(new DriverExceptionListener(this)).decorate(this.driver);
 
 		for (WebDriverListener wdListener: wdListeners) {
-			this.driver = new EventFiringDecorator(wdListener).decorate(this.driver);
+			this.driver = new EventFiringDecorator<>(wdListener).decorate(this.driver);
 		}
     }
 
@@ -647,20 +651,21 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	 * This is necessary when driver is created with testContainers. In this case, the external URL of the hub is http://localhost:12345 but its internal address is http://localhost:4444
 	 * so the se:cdp uri is ws://localhost:4444/... which is unreachable from host (so augmenting fails)
 	 * Changing port to '12345' allow driver augmentation
-	 * @param driver
+	 * @param driver	driver to get configuration from
 	 */
 	private void updateBidiPort(WebDriver driver) {
 
-		if (((HasCapabilities)driver).getCapabilities().getCapability("se:cdp") != null && ((HasCapabilities)driver).getCapabilities().getCapability(SeleniumRobotCapabilityType.GRID_HUB) != null) {
+		Capabilities capabilities = ((HasCapabilities) driver).getCapabilities();
+		if (capabilities.getCapability(SE_CDP_PREFIX) != null && capabilities.getCapability(SeleniumRobotCapabilityType.GRID_HUB) != null) {
 
 			try {
-				String cdp = ((HasCapabilities)driver).getCapabilities().getCapability("se:cdp").toString();
+				String cdp = capabilities.getCapability(SE_CDP_PREFIX).toString();
 				int cdpPort = new URI(cdp).getPort();
-				int hubPort = new URL(((HasCapabilities)driver).getCapabilities().getCapability(SeleniumRobotCapabilityType.GRID_HUB).toString()).getPort();
+				int hubPort = new URI(capabilities.getCapability(SeleniumRobotCapabilityType.GRID_HUB).toString()).toURL().getPort();
 				cdp = cdp.replace(":" + cdpPort + "/", ":" + hubPort + "/");
-				((MutableCapabilities)((HasCapabilities)driver).getCapabilities()).setCapability("se:cdp", cdp);
-			} catch (MalformedURLException | URISyntaxException e) {
-				return;
+				((MutableCapabilities) capabilities).setCapability(SE_CDP_PREFIX, cdp);
+			} catch (MalformedURLException | URISyntaxException | NullPointerException e) {
+				//
 			}
 
 		}
@@ -691,6 +696,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		this.currentHandles = currentHandles;
 	}
 
+	@NonNull
 	@Override
     public Set<String> getWindowHandles() {
     	
@@ -715,7 +721,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 				logger.warn("session already terminated");
 				return new TreeSet<>();
 			} catch (Exception e) {
-				logger.info("error getting window handles: " + e.getMessage());
+				logger.info("error getting window handles: {}", e.getMessage());
 				WaitHelper.waitForSeconds(2);
 			}
 		}
@@ -734,7 +740,8 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     	}
     }
     
-    @Override
+    @NonNull
+	@Override
     public String getWindowHandle() {
     	
     	if (!isWebTest()) {
@@ -801,7 +808,6 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
      * This means that if you use a Chrome browser, {@code getWebDriver() instanceof ChromeDriver} will return false.
      * You will have to use {@code getOriginalDriver() instanceof ChromeDriver}
      * However, {@code getWebDriver() instanceof HasCdp} will return true because driver is augmented at creation with all implemented interfaces
-     * @return
      */
     public WebDriver getWebDriver() {
         return driver;
@@ -810,7 +816,6 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	/**
 	 * Method returning the real created driver, before it has been decorated and augmented
 	 * This allows to write {@code getOriginalDriver() instanceof ChromeDriver} which returns true for a chrome browser
-	 * @return
 	 */
 	public WebDriver getOriginalDriver() {
 		return originalDriver;
@@ -832,7 +837,6 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     /**
      * Returns true if all browser windows are closed and so, no actions can be performed
 	 * In case of mobile App, check the app is still there
-     * @return
      */
     public boolean isBrowserOrAppClosed() {
     	try {
@@ -876,7 +880,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 			handleAlert();
 			return driver.getPageSource();
     	} catch (WebDriverException e) {
-    		logger.info("page source not get: " + e.getMessage());
+    		logger.info("page source not get: {}", e.getMessage());
     		return null;
     	}
     }
@@ -890,7 +894,6 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     
     /**
      * Return the device aspect ratio
-     * @return
      */
     public double getDeviceAspectRatio() {
     	if (isWebTest()) {
@@ -911,7 +914,6 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     /**
 	 * Get viewport width, do not take scrollbar into account
 	 * @param usePixelAspectRatio	if true, take zoom level into account to compute size
-	 * @return
 	 */
 	public int getViewPortWidthWithoutScrollbar(boolean usePixelAspectRatio) {
     	if (isWebTest()) {
@@ -938,7 +940,6 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	
 	/**
 	 * Get viewport size, do not take scrollbar into account
-	 * @return
 	 */
 	public int getViewPortHeighthWithoutScrollbar() {
 		return getViewPortHeighthWithoutScrollbar(true);
@@ -947,7 +948,6 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	/**
 	 * Get viewport size, do not take scrollbar into account
 	 * @param usePixelAspectRatio	if true, take zoom level into account to compute size
-	 * @return
 	 */
 	public int getViewPortHeighthWithoutScrollbar(boolean usePixelAspectRatio) {
 		if (isWebTest()) {
@@ -1330,7 +1330,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 			driver.quit();
 		} catch (WebDriverException e) {
 			
-			logger.error("Error while quitting driver: " + e.getMessage());
+			logger.error("Error while quitting driver: {}", e.getMessage());
 			
 			// in case stopping fails, kill the session on node directly
 			// It happens on an InternetExplorer where an unexpected modal, associated to a mechanism that prevents IE to be stopped, driver.close() and driver.quit()
@@ -1368,12 +1368,6 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 			robot = new Robot();
 		
 			WaitHelper.waitForSeconds(1);
-	
-//			// Press Enter
-//			robot.keyPress(KeyEvent.VK_ENTER);
-//	
-//			// Release Enter
-//			robot.keyRelease(KeyEvent.VK_ENTER);
 	
 			// Press CTRL+V
 			robot.keyPress(KeyEvent.VK_CONTROL);
@@ -1443,8 +1437,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	}
 	
 	/**
-	 * move mouse taking screen placing into account. Sometimes, coordinates may be negative if first screen has an other screen on the left 
-	 * @param robot
+	 * move mouse taking screen placing into account. Sometimes, coordinates may be negative if first screen has an other screen on the left
 	 */
 	private static void moveMouse(Robot robot, int x, int y) {
 		Rectangle screenRectangle = getScreensRectangle();
@@ -1510,8 +1503,8 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	
 	/**
 	 * Left clic at coordinates on desktop. Coordinates are from screen point of view
-	 * @param x
-	 * @param y
+	 * @param x		x coordinates
+	 * @param y		y coordinates
 	 */
 	public static void doubleClickOnDesktopAt(int x, int y, DriverMode driverMode, SeleniumGridConnector gridConnector) {
 		doubleClickOnDesktopAt(false, x, y, driverMode, gridConnector);
@@ -1549,8 +1542,8 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	
 	/**
 	 * right clic at coordinates on desktop. Coordinates are from screen point of view
-	 * @param x
-	 * @param y
+	 * @param x		x coordinates
+	 * @param y		y coordinates
 	 */
 	public static void rightClicOnDesktopAt(int x, int y, DriverMode driverMode, SeleniumGridConnector gridConnector) {
 		rightClicOnDesktopAt(false, x, y, driverMode, gridConnector);
@@ -1586,7 +1579,6 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	/**
 	 * write text to desktop.
 	 * @param textToWrite	text to write
-	 * @return
 	 */
 	public static void writeToDesktop(String textToWrite, DriverMode driverMode, SeleniumGridConnector gridConnector) {
 		if (driverMode == DriverMode.LOCAL) {
@@ -1632,8 +1624,8 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	
 	/**
 	 * Returns a Base64 string of the desktop
-	 * @param driverMode
-	 * @param gridConnector
+	 * @param driverMode		grid / local
+	 * @param gridConnector		the grid connector in case of grid test
 	 * @return
 	 */
 	public static String captureDesktopToBase64String(DriverMode driverMode, SeleniumGridConnector gridConnector) {
@@ -1643,14 +1635,16 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	/**
 	 * Returns a Base64 string of the desktop
 	 * @param onlyMainScreen	if true, only capture the default (or main) screen
-	 * @param driverMode
-	 * @param gridConnector
-	 * @return
+	 * @param driverMode		grid or local for example
+	 * @param gridConnector		the grid connector in case of grid test
 	 */
 	public static String captureDesktopToBase64String(boolean onlyMainScreen, DriverMode driverMode, SeleniumGridConnector gridConnector) {
 		if (driverMode == DriverMode.LOCAL) {
 			
-			try {
+			try (
+					ByteArrayOutputStream os = new ByteArrayOutputStream();
+				 	OutputStream b64 = new Base64OutputStream(os);
+					) {
 				disableStepDisplay();
 				
 				BufferedImage bi;
@@ -1660,16 +1654,17 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 					bi = captureDesktopToBuffer();
 				}
 				
-				ByteArrayOutputStream os = new ByteArrayOutputStream();
-				OutputStream b64 = new Base64OutputStream(os);
+
 				try {
 					ImageIO.write(bi, "png", b64);
-					return os.toString("UTF-8");
+					return os.toString(StandardCharsets.UTF_8);
 				} catch (IOException e) {
 					return "";
 				}
 				
-			} finally {
+			} catch (IOException e) {
+                throw new RuntimeException(e);
+            } finally {
 				enableStepDisplay();
 			}
 
@@ -1682,8 +1677,8 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	
 	/**
 	 * Start video capture using VideoRecorder class
-	 * @param driverMode
-	 * @param gridConnector
+	 * @param driverMode		grid or local for example
+	 * @param gridConnector		the grid connector in case of grid test
 	 * @param videoName		name of the video to record so that it's unique. Only used locally. In remote, grid sessionId is used
 	 */
 	public static VideoRecorder startVideoCapture(DriverMode driverMode, SeleniumGridConnector gridConnector, File videoFolder, String videoName) {
@@ -1707,9 +1702,9 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	
 	/**
 	 * Stop video capture using VideoRecorder class
-	 * @param driverMode
-	 * @param gridConnector
-	 * @throws IOException 
+	 * @param driverMode		grid or local for example
+	 * @param gridConnector		the grid connector in case of grid test
+	 * @throws IOException 		ex
 	 */
 	public static File stopVideoCapture(DriverMode driverMode, SeleniumGridConnector gridConnector, VideoRecorder recorder) throws IOException {
 		if (driverMode == DriverMode.LOCAL && recorder != null) {
@@ -1744,6 +1739,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		return browserInfo;
 	}
 
+	@NonNull
 	@Override
     public Capabilities getCapabilities() {
 		try {
@@ -1758,20 +1754,23 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	}
 
 	@Override
-	public void get(String url) {
+	public void get(@NonNull String url) {
 		driver.get(url);
 	}
 
+	@NonNull
 	@Override
-	public List<WebElement> findElements(By by) {
+	public List<WebElement> findElements(@NonNull By by) {
 		return driver.findElements(by);
 	}
 
+	@NonNull
 	@Override
-	public WebElement findElement(By by) {
+	public WebElement findElement(@NonNull By by) {
 		return driver.findElement(by);
 	}
 
+	@NonNull
 	@Override
 	public TargetLocator switchTo() {
 		if (isDriverExited()) {
@@ -1781,18 +1780,21 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		return new TimedoutTargetLocator(driver.switchTo(), this);
 	}
 
+	@NonNull
 	@Override
 	public Navigation navigate() {
 		return driver.navigate();
 	}
 
+	@NonNull
 	@Override
 	public Options manage() {
 		return driver.manage();
 	}
 
+
 	@Override
-	public <X> X getScreenshotAs(OutputType<X> target) throws WebDriverException {
+	public <X> X getScreenshotAs(@NonNull OutputType<X> target) throws WebDriverException {
 		try {
 			return ((TakesScreenshot)driver).getScreenshotAs(target);
 		} catch (ClassCastException e) {
@@ -1802,37 +1804,39 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	}
 
 	@Override
-	public Object executeScript(String script, Object... args) {
+	public Object executeScript(@NonNull String script, @NonNull Object... args) {
 		return ((JavascriptExecutor)driver).executeScript(script, args);
 	}
 
 	@Override
-	public Object executeAsyncScript(String script, Object... args) {
+	public Object executeAsyncScript(@NonNull String script, @NonNull Object... args) {
 		return ((JavascriptExecutor)driver).executeAsyncScript(script, args);
 	}
 
+	@NonNull
 	@Override
-	public ScriptKey pin(String script) {
+	public ScriptKey pin(@NonNull String script) {
 		return JavascriptExecutor.super.pin(script);
 	}
 
 	@Override
-	public void unpin(ScriptKey key) {
+	public void unpin(@NonNull ScriptKey key) {
 		JavascriptExecutor.super.unpin(key);
 	}
 
+	@NonNull
 	@Override
 	public Set<ScriptKey> getPinnedScripts() {
 		return JavascriptExecutor.super.getPinnedScripts();
 	}
 
 	@Override
-	public Object executeScript(ScriptKey key, Object... args) {
+	public Object executeScript(@NonNull ScriptKey key, @NonNull Object... args) {
 		return JavascriptExecutor.super.executeScript(key, args);
 	}
 
 	@Override
-	public void perform(Collection<Sequence> actions) {
+	public void perform(@NonNull Collection<Sequence> actions) {
 		((Interactive)driver).perform(actions);
 		
 	}
@@ -1846,7 +1850,6 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	/**
 	 * Returns true if this is a web test
 	 * a web test may be a desktop or mobile web test (e.g: using chrome browser), but also a mobile application test where webview context is in use
-	 * @return
 	 */
 	public boolean isWebTest() {
 		return (testType.family().equals(TestType.WEB) || testType.family().equals(TestType.APP) && getContext().toLowerCase().contains("web"));
@@ -1937,7 +1940,6 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 
 	/**
 	 * For tests
-	 * @param testType
 	 */
 	public void setTestType(TestType testType) {
 		this.testType = testType;

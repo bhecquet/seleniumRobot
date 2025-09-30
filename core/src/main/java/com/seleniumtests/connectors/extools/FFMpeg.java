@@ -51,7 +51,7 @@ public class FFMpeg {
 
         String out = "";
         try {
-            out = OSCommand.executeCommandAndWait(new String[]{ffmpegPath, "-version"}, true);
+            out = OSCommand.executeCommandAndWait(new String[]{ffmpegPath, "-version"});
 
             if (!out.contains("libavutil")) {
                 System.out.println("FFMPEG out: " + out);

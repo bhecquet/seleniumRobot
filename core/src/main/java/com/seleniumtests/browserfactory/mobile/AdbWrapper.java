@@ -35,13 +35,14 @@ import com.seleniumtests.util.osutility.OSCommand;
 
 public class AdbWrapper {
 
+	public static final String SHELL = "shell";
 	private String adbVersion;
 	private String adbCommand;
-	private static Pattern devicePattern = Pattern.compile("^(.+?)\\s+device$");
-	private static Pattern versionPattern = Pattern.compile(".*\\[ro\\.build\\.version\\.release\\]: \\[(.+?)\\].*");
-	private static Pattern namePattern = Pattern.compile(".*\\[ro\\.product\\.model\\]: \\[(.+?)\\].*");
+	private static final Pattern DEVICE_PATTERN = Pattern.compile("^(.+?)\\s+device$");
+	private static final Pattern VERSION_PATTERN = Pattern.compile(".*\\[ro\\.build\\.version\\.release\\]: \\[(.+?)\\].*");
+	private static final Pattern NAME_PATTERN = Pattern.compile(".*\\[ro\\.product\\.model\\]: \\[(.+?)\\].*");
 	
-	private static Logger logger = SeleniumRobotLogger.getLogger(AdbWrapper.class);
+	private static final Logger logger = SeleniumRobotLogger.getLogger(AdbWrapper.class);
 	
 	private static final Pattern REG_BROWSER_VERSION_NAME = Pattern.compile("versionName=(.+?)-.*");
 	private static final Pattern REG_CHROME_VERSION_NAME = Pattern.compile("versionName=(\\d++\\.\\d++).*");
@@ -56,7 +57,6 @@ public class AdbWrapper {
 	 * If found, use the adb inside that directory
 	 * Else, try to run ADB directly
 	 * @throws ConfigurationException when ADB is not found
-	 * @return
 	 */
 	private void checkInstallation() {
 		
@@ -79,7 +79,7 @@ public class AdbWrapper {
 		
 		// check command is OK
 		try {
-			String reply = OSCommand.executeCommandAndWait(adbCommand + " version", true);
+			String reply = OSCommand.executeCommandAndWait(new String[] {adbCommand, "version"});
 			adbVersion = reply.split("\n")[0].trim().replace("Android Debug Bridge version", "").trim();
 		} catch (CustomSeleniumTestsException e) {
 			adbVersion = "";
@@ -94,7 +94,7 @@ public class AdbWrapper {
 	 * Returns a device list from ADB using the commands
 	 * adb devices -l => get list of connected devices
 	 * adb -s <id> shell getprop  => get specific properties
-	 * @return
+	 * @return	device list
 	 */
 	public List<MobileDevice> getDeviceList() {
 		List<MobileDevice> devices = new ArrayList<>();
@@ -103,18 +103,18 @@ public class AdbWrapper {
 			String deviceName = "";
 			String osVersion = "";
 			
-			String reply = OSCommand.executeCommandAndWait(String.format("%s -s %s shell getprop", adbCommand, deviceId), true).replace("\n", "").replace("\r", "");
-			Matcher matcherName = namePattern.matcher(reply);
+			String reply = OSCommand.executeCommandAndWait(new String[] {adbCommand, "-s", deviceId, SHELL, "getprop"}).replace("\n", "").replace("\r", "");
+			Matcher matcherName = NAME_PATTERN.matcher(reply);
 			if (matcherName.matches()) {
 				deviceName = matcherName.group(1);
 			}
-			Matcher matcherVersion = versionPattern.matcher(reply);
+			Matcher matcherVersion = VERSION_PATTERN.matcher(reply);
 			if (matcherVersion.matches()) {
 				osVersion = matcherVersion.group(1);
 			}
 
 			if (deviceName.isEmpty() || osVersion.isEmpty()) {
-				logger.warn(String.format("device with id %s could not be parsed, device or version not found", deviceId));
+				logger.warn("device with id {} could not be parsed, device or version not found", deviceId);
 			} else {
 				devices.add(new MobileDevice(deviceName, deviceId, "android", osVersion, getInstalledBrowsers(deviceId)));
 			}					
@@ -124,26 +124,26 @@ public class AdbWrapper {
 	
 	private List<BrowserInfo> getInstalledBrowsers(String deviceId) {
 		List<BrowserInfo> browsers = new ArrayList<>();
-		String reply = OSCommand.executeCommandAndWait(String.format("%s -s %s shell \"pm list packages\"", adbCommand, deviceId), true);
+		String reply = OSCommand.executeCommandAndWait(new String[] {adbCommand, "-s", deviceId, SHELL, "\"pm list packages\""});
 		
 		for (String line: reply.split("\n")) {
 			if (line.contains("package:com.android.chrome")) {
-				String chromeVersion = OSCommand.executeCommandAndWait(String.format("%s -s %s shell \"dumpsys package com.android.chrome | grep versionName\"", adbCommand, deviceId), true);
+				String chromeVersion = OSCommand.executeCommandAndWait(new String[] {adbCommand, "-s", deviceId, SHELL, "\"dumpsys package com.android.chrome | grep versionName\""});
 				Matcher versionMatcher = REG_CHROME_VERSION_NAME.matcher(chromeVersion.split("\\n")[0].trim());
 				if (versionMatcher.matches()) {
 					browsers.add(new BrowserInfo(BrowserType.CHROME, versionMatcher.group(1), null));
 				} else {
-					logger.error(String.format("Cannot parse chrome version %s", chromeVersion));
+					logger.error("Cannot parse chrome version {}", chromeVersion);
 					browsers.add(new BrowserInfo(BrowserType.CHROME, chromeVersion, null));
 				}
 			}
 			if (line.contains("package:com.android.browser")) {
-				String androidVersion = OSCommand.executeCommandAndWait(String.format("%s -s %s shell \"dumpsys package com.android.browser | grep versionName\"", adbCommand, deviceId), true);
+				String androidVersion = OSCommand.executeCommandAndWait(new String[] {adbCommand, "-s", deviceId, SHELL, "\"dumpsys package com.android.browser | grep versionName\""});
 				Matcher versionMatcher = REG_BROWSER_VERSION_NAME.matcher(androidVersion.split("\\n")[0].trim());
 				if (versionMatcher.matches()) {
 					browsers.add(new BrowserInfo(BrowserType.BROWSER, versionMatcher.group(1), null));
 				} else {
-					logger.error(String.format("Cannot parse android browser version %s", androidVersion));
+					logger.error("Cannot parse android browser version {}", androidVersion);
 					browsers.add(new BrowserInfo(BrowserType.BROWSER, androidVersion, null));
 				}
 			}
@@ -153,14 +153,14 @@ public class AdbWrapper {
 	
 	/**
 	 * Returns the list of device ids using command 'adb devices'
-	 * @return
+	 * @return list of device ids
 	 */
 	private List<String> getDeviceIds() {
 		List<String> deviceIds = new ArrayList<>();
-		String reply = OSCommand.executeCommandAndWait(adbCommand + " devices", true);
+		String reply = OSCommand.executeCommandAndWait(new String[] {adbCommand, "devices"});
 		
 		for (String line: reply.split("\n")) {
-			Matcher matcher = devicePattern.matcher(line.trim());
+			Matcher matcher = DEVICE_PATTERN.matcher(line.trim());
 			if (matcher.matches()) {
 				deviceIds.add(matcher.group(1));
 			}

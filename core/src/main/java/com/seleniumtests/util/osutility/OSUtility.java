@@ -45,9 +45,9 @@ public abstract class OSUtility {
 	
 	protected static final String LATEST_VERSION = "latest";
 	
-	private String[] webBrowserProcessList = {"chrome", "firefox", "iexplore", "safari", "msedge"};
+	private final String[] webBrowserProcessList = {"chrome", "firefox", "iexplore", "safari", "msedge"};
 
-	private String[] webDriverProcessList = {"chromedriver", "geckodriver", "iedriverserver", "microsoftwebdriver", "edgedriver"};
+	private final String[] webDriverProcessList = {"chromedriver", "geckodriver", "iedriverserver", "microsoftwebdriver", "edgedriver"};
 		
 	private static Map<BrowserType, List<BrowserInfo>> installedBrowsersWithVersion;
 	
@@ -89,7 +89,6 @@ public abstract class OSUtility {
     
     /**
      * Used to simplify mocking
-     * @return
      */
     public static boolean isWindows10() {
     	return SystemUtils.IS_OS_WINDOWS_10;
@@ -125,28 +124,29 @@ public abstract class OSUtility {
         return System.getProperty("sun.arch.data.model");
     }
     
-	/******************************************
+	/*
+	 *****************************************
 	 ********** Process information ***********
-	 ******************************************/
+	 *****************************************
+	 */
     
     /**
      * Returns list of all running processes
-     * @return
      */
     public abstract List<ProcessInfo> getRunningProcessList();
     
     /**
-     * get sub process of parent one
+     * get list of sub process of parent one
      * @param parentProcess		the parent process
      * @param processName		the process name to search. May be null if any child should be matched
      * @param existingPids		reply will not contain these PIDs
-     * @return
-     * @throws IOException
+     * @return	list of child process IDs
+     * @throws IOException	ex
      */
     public abstract List<Long> getChildProcessPid(Long parentProcess, String processName, List<Long> existingPids) throws IOException;
     
     /**
-     * @param name of the process
+     * @param processName of the process
      * @return ProcessInfo
      */
     public ProcessInfo getRunningProcess(String processName) {
@@ -158,7 +158,7 @@ public abstract class OSUtility {
     }
     
     /**
-     * @param name of the process
+     * @param processName of the process
      * @return ProcessInfo
      */
     public List<ProcessInfo> getRunningProcesses(String processName) {
@@ -198,7 +198,7 @@ public abstract class OSUtility {
     
     /**
      * @param pid : pId of the process
-     * @return true if the key is found in the running process list.
+     * @return process corresponding to PID
      */
     public ProcessInfo getProcessRunningByPid(String pid) {
     	
@@ -237,7 +237,7 @@ public abstract class OSUtility {
     		for (String processName : webBrowserProcessList){
 	    		if (processInfo.getName().equalsIgnoreCase(processName)) {
 	    			if (showAll) {
-	    				logger.info("Web browser process still running : " + processInfo.getName());
+	    				logger.info("Web browser process still running : {}", processInfo.getName());
 	    			}
 	    			webBrowserRunningList.add(processInfo);
 	    		}
@@ -253,53 +253,49 @@ public abstract class OSUtility {
     
     /**
      * Kill process by PID
-     * @param process
-     * @param force
-     * @throws IOException
+     * @param pid	pid to kill
+     * @param force	if true, will force kill
      */
     public abstract String killProcess(String pid, boolean force);
     
     
     /**
      * Kill process by name
-     * @param process
-     * @param force
-     * @throws IOException
+     * @param programName	name of process to kill
+     * @param force			if true, will force kill
      */
     public abstract String killProcessByName(String programName, boolean force);
     
 	
     /**
      * Get extension of the program
-     * @return
      */
 	public abstract String getProgramExtension();
 
 
 	/**
 	 * Returns the charset for the console
-	 * @return
 	 */
 	public abstract Charset getConsoleCharset();
 
 
 	/**
 	 * Returns the process that listens for the given port, or null if none is found
-	 * @param port
+	 * @param port		port of listening process
 	 */
 	public abstract Integer getProcessIdByListeningPort(int port);
 
 
     /**
      * Ask system to terminate all the known web browser processes.
-     * @param force
+     * @param force		will force kill
      */
     public void killAllWebBrowserProcess(boolean force){
     	
     	List<ProcessInfo> browserProcesses = whichWebBrowserRunning(false);
     	
     	for (ProcessInfo processInfo : browserProcesses) {
-			logger.info("Asked system to terminate browser: " + processInfo.getName());
+			logger.info("Asked system to terminate browser: {}", processInfo.getName());
     		killProcess(processInfo.getPid(), force);
     	}
     }
@@ -307,13 +303,12 @@ public abstract class OSUtility {
 
     /**
      * Ask system to terminate all the drivers processes
-     * @param force
      */
     public void killAllWebDriverProcess(){
     	for (ProcessInfo processInfo : getRunningProcessList()) {
     		for (String processName : webDriverProcessList) {
     			if (processInfo.getName().contains(processName)){
-    				logger.info("Asked system to terminate webdriver: " + processInfo.getName());
+    				logger.info("Asked system to terminate webdriver: {}", processInfo.getName());
     				killProcess(processInfo.getPid(), true);
     			}
     		}
@@ -339,26 +334,26 @@ public abstract class OSUtility {
     /**
      * Returns the full version of chrome browser
      * String is like "Google Chrome X.Y.Z.T"
-     * @param chromePath
-     * @return
+     * @param chromePath		path to chrome
+     * @return					short version
      */
     public static String getChromeVersion(String chromePath) {
     	OSUtility osUtility = OSUtilityFactory.getInstance();
-    	if (osUtility instanceof OSUtilityWindows) {
-    		return "Google Chrome " + ((OSUtilityWindows)osUtility).getChromeVersionFromFolder(chromePath);
+    	if (osUtility instanceof OSUtilityWindows osUtilityWindows) {
+    		return "Google Chrome " + osUtilityWindows.getChromeVersionFromFolder(chromePath);
     	} else {
-    		return OSCommand.executeCommandAndWait(new String[] {chromePath, "--version"}, true);
+    		return OSCommand.executeCommandAndWait(new String[] {chromePath, "--version"});
     	}
     }
 
 
     /**
      * Returns the full version for firefox browser
-     * @param firefoxPath
-     * @return
+     * @param firefoxPath	path to firefox
+     * @return	version of firefox
      */
     public static String getFirefoxVersion(String firefoxPath) {
-    	return OSCommand.executeCommandAndWait(String.format("%s --version | more", firefoxPath), true);
+    	return OSCommand.executeCommandAndWait(new String[] {firefoxPath, "--version", "|", "more"});
     }
     
     public List<BrowserType> getInstalledBrowsers() {
@@ -376,7 +371,7 @@ public abstract class OSUtility {
     /**
      * Returns the list of browsers for each type. For selenium robot local, this will help selecting the right binary
      * For grid, we will be able to provide each installed browser to the runner
-     * @return
+     * @return		map of installed browsers
      */
     public abstract Map<BrowserType, List<BrowserInfo>> discoverInstalledBrowsersWithVersion(boolean discoverBetaBrowsers);
     
@@ -387,8 +382,8 @@ public abstract class OSUtility {
 
     /**
      * example: Mozilla Firefox 52.0
-     * @param versionString
-     * @return
+     * @param versionString		firefox version to parse
+     * @return					short version
      */
     public static String extractFirefoxVersion(String versionString) {
     	Pattern regMozilla = Pattern.compile("^Mozilla .* (\\d+\\.\\d+).*");
@@ -403,8 +398,8 @@ public abstract class OSUtility {
 
     /**
      * example: Google Chrome 57.0.2987.110
-     * @param versionString
-     * @return
+     * @param versionString		Chrome version to parse
+     * @return					short version
      */
     public static String extractChromeVersion(String versionString) {
     	Pattern regChrome = Pattern.compile("^Google Chrome (\\d+\\.\\d+).*");
@@ -419,8 +414,8 @@ public abstract class OSUtility {
 
     /**
      * Returns the version <major>.<minor> either with chrome or chromium
-     * @param versionString
-     * @return
+     * @param versionString		Chrome version to parse
+     * @return					short version
      */
     public static String extractChromeOrChromiumVersion(String versionString) {
     	if (versionString.contains("Chromium")) {
@@ -433,8 +428,8 @@ public abstract class OSUtility {
 
     /**
      * example: Chromium 56.0.2924.76 Built on Ubuntu , running on Ubuntu 16.04 
-     * @param versionString
-     * @return
+     * @param versionString	Chromium version to parse
+     * @return				short version
      */
     public static String extractChromiumVersion(String versionString) {
     	Pattern regChrome = Pattern.compile("^Chromium (\\d+\\.\\d+).*");
@@ -448,8 +443,8 @@ public abstract class OSUtility {
     
     /**
      * example: 11.0.9600.18499
-     * @param versionString
-     * @return
+     * @param versionString		IE version to parse
+     * @return					short version
      */
     public static String extractIEVersion(String versionString) {
     	return versionString.split("\\.")[0];
@@ -458,8 +453,8 @@ public abstract class OSUtility {
 
     /**
      * example: 10240.th1.160802-1852
-     * @param versionString
-     * @return
+     * @param versionString		Edge version to parse
+     * @return					short version
      */
     public static String extractEdgeVersion(String versionString) {
     	Pattern regEdge = Pattern.compile("^(\\d+\\.\\d+).*");
@@ -474,7 +469,6 @@ public abstract class OSUtility {
 
 	/**
 	 * Clear list of browsers to return it null
-	 * @return
 	 */
 	public static void resetInstalledBrowsersWithVersion() {
 		installedBrowsersWithVersion = null;
@@ -482,7 +476,6 @@ public abstract class OSUtility {
 
 	/**
      * Returns a map of browser, by type. It won't search for Beta browsers
-     * @return
      */
     public static Map<BrowserType, List<BrowserInfo>> getInstalledBrowsersWithVersion() {
     	return getInstalledBrowsersWithVersion(false);
@@ -492,7 +485,6 @@ public abstract class OSUtility {
     /**
      * Returns a map of browser, by type
      * @param discoverBetaBrowsers		if true, also beta browsers will be searched (for now, chrome only)
-     * @return
      */
 	public static Map<BrowserType, List<BrowserInfo>> getInstalledBrowsersWithVersion(boolean discoverBetaBrowsers) {
 		if (installedBrowsersWithVersion == null) {
@@ -515,7 +507,7 @@ public abstract class OSUtility {
 	
 	/**
 	 * Sets the proxy at system level
-	 * @param proxy
+	 * @param proxy		proxy to set
 	 */
 	public abstract void setSystemProxy(Proxy proxy);
 }

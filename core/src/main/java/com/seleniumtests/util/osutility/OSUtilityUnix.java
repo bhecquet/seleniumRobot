@@ -17,11 +17,9 @@
  */
 package com.seleniumtests.util.osutility;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +32,9 @@ import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.driver.BrowserType;
 
 public class OSUtilityUnix extends OSUtility {
-	
+
 	private static final String WHICH_ERROR = "which:";
+	public static final String WHICH_COMMAND = "which";
 
 
 	/**
@@ -45,8 +44,7 @@ public class OSUtilityUnix extends OSUtility {
      */
 	@Override
     public List<ProcessInfo> getRunningProcessList(){
-    	String command = "ps ax";
-    	List<String> strProcessList = Arrays.asList(OSCommand.executeCommandAndWait(command).split("\n"));
+    	String[] strProcessList = OSCommand.executeCommandAndWait(new String[] {"ps", "ax"}).split("\n");
     	
     	List<ProcessInfo> processInfoList = new ArrayList<>();
     	for (String sentence : strProcessList) {
@@ -80,18 +78,16 @@ public class OSUtilityUnix extends OSUtility {
     
     /**
      * Terminate process from command line terminal.
-     * @param process
+     * @param pid	pid of process to kill
      * @param force to kill the process
-     * @return
-     * @throws IOException
      */
     @Override
     public String killProcess(String pid, boolean force) {
     	
     	if (force) {
-    		return OSCommand.executeCommandAndWait("kill -SIGKILL " + pid);
+    		return OSCommand.executeCommandAndWait(new String[] {"kill", "-SIGKILL", pid});
     	} else {
-    		return OSCommand.executeCommandAndWait("kill -SIGTERM " + pid);
+    		return OSCommand.executeCommandAndWait(new String[] {"kill", "-SIGTERM", pid});
     	}
     }
     
@@ -100,7 +96,7 @@ public class OSUtilityUnix extends OSUtility {
      */
 	@Override
 	public String killProcessByName(String programName, boolean force) {
-    	return OSCommand.executeCommandAndWait("killall -I " + programName);
+    	return OSCommand.executeCommandAndWait(new String[] {"killall", "-I", programName});
 	}
 
 	@Override
@@ -116,22 +112,19 @@ public class OSUtilityUnix extends OSUtility {
 
 	@Override
 	public String getOSBuild() {
-		return OSCommand.executeCommandAndWait("uname -a");
+		return OSCommand.executeCommandAndWait(new String[] {"uname", "-a"});
 	}
 	
 	@Override
 	public Map<BrowserType, List<BrowserInfo>> discoverInstalledBrowsersWithVersion(boolean discoverBetaBrowsers) {
 		Map<BrowserType, List<BrowserInfo>> browserList = new EnumMap<>(BrowserType.class);
 		
-		browserList.put(BrowserType.HTMLUNIT, Arrays.asList(new BrowserInfo(BrowserType.HTMLUNIT, BrowserInfo.LATEST_VERSION, null)));
-		
-		
-		
-		// TODO: handle multiple installation of firefox and Chrome
-		String firefoxLocation = OSCommand.executeCommandAndWait("which firefox").trim();
-		String iceweaselLocation = OSCommand.executeCommandAndWait("which iceweasel").trim();
-		String chromeLocation = OSCommand.executeCommandAndWait("which google-chrome").trim();
-		String chromiumLocation = OSCommand.executeCommandAndWait("which chromium-browser").trim();
+		browserList.put(BrowserType.HTMLUNIT, List.of(new BrowserInfo(BrowserType.HTMLUNIT, BrowserInfo.LATEST_VERSION, null)));
+
+		String firefoxLocation = OSCommand.executeCommandAndWait(new String[] {WHICH_COMMAND, "firefox"}).trim();
+		String iceweaselLocation = OSCommand.executeCommandAndWait(new String[] {WHICH_COMMAND, "iceweasel"}).trim();
+		String chromeLocation = OSCommand.executeCommandAndWait(new String[] {WHICH_COMMAND, "google-chrome"}).trim();
+		String chromiumLocation = OSCommand.executeCommandAndWait(new String[] {WHICH_COMMAND, "chromium-browser"}).trim();
 		
 		if (!firefoxLocation.isEmpty() && !firefoxLocation.contains(WHICH_ERROR)) {
 			String version = getFirefoxVersion("firefox");
@@ -162,11 +155,11 @@ public class OSUtilityUnix extends OSUtility {
 	}
 	
 	@Override
-	public List<Long> getChildProcessPid(Long parentProcess, String processName, List<Long> existingPids) throws IOException {
+	public List<Long> getChildProcessPid(Long parentProcess, String processName, List<Long> existingPids) {
 		
 		List<Long> searchedPids = new ArrayList<>();
 		
-		String pids = OSCommand.executeCommandAndWait(String.format("pgrep -P %d -d , -l", parentProcess)).trim();
+		String pids = OSCommand.executeCommandAndWait(new String[] {"pgrep", "-P", String.valueOf(parentProcess), "-d" , "-l"}).trim();
         for(String process: pids.split(",")) {
         	String[] processSplit = process.split(" ");
         	Long pid;
@@ -188,14 +181,14 @@ public class OSUtilityUnix extends OSUtility {
 	
 	@Override
 	public String getProgramNameFromPid(Long pid) {
-		return OSCommand.executeCommandAndWait(String.format("ps -p %d -o comm=", pid));
+		return OSCommand.executeCommandAndWait(new String[] {"ps", "-p", String.valueOf(pid), "-o", "comm="});
 	}
 
 
 	@Override
 	public Integer getProcessIdByListeningPort(int port) {
 		// example: TCP    127.0.0.1:51239        0.0.0.0:0              LISTENING       22492
-		String lines = OSCommand.executeCommandAndWait("netstat -anp").trim();
+		String lines = OSCommand.executeCommandAndWait(new String[] {"netstat", "-anp"}).trim();
 		Pattern pattern = Pattern.compile(String.format(".*\\:%d\\s+.*\\:.*LISTEN\\s+(\\d+).*", port));
 		for (String line: lines.split("\n")) {
 			Matcher matcher = pattern.matcher(line.trim());
