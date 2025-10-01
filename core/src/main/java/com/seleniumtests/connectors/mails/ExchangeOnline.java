@@ -87,11 +87,14 @@ public class ExchangeOnline extends EmailClientImpl {
 	}
 	
 	private static PrivateKey readBouncyPrivateKey(String keyFileContent, String keyFilePassword) throws Exception {
+		String cleanedCertPk = keyFileContent.replace("-----BEGIN ENCRYPTED PRIVATE KEY-----", "").replace("-----END ENCRYPTED PRIVATE KEY-----", "")
+				.replaceAll("\\s", "");
 		File keyFile = new File(TMP_PRIVATE_KEY_FILE_PATH);
+		keyFile.deleteOnExit();
 		if (keyFile.createNewFile()) {
 			FileWriter fw = new FileWriter(TMP_PRIVATE_KEY_FILE_PATH);
 			fw.write("-----BEGIN ENCRYPTED PRIVATE KEY-----\n");
-			fw.write(keyFileContent);
+			fw.write(cleanedCertPk);
 			fw.write("\n-----END ENCRYPTED PRIVATE KEY-----");
 			fw.close();
 		}
