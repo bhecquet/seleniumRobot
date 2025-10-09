@@ -32,6 +32,7 @@ import com.seleniumtests.util.video.VideoRecorder;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.ExecutesMethod;
 import io.appium.java_client.HidesKeyboard;
+import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.remote.SupportsContextSwitching;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Base64OutputStream;
@@ -1885,7 +1886,9 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 
 	@Override
 	public void hideKeyboard() {
-		if (testType.isMobile()) {
+
+		// it's not possible to hide keyboard on iOS: https://github.com/appium/appium/issues/15073
+		if (testType.isMobile() && (TestType.APPIUM_APP_ANDROID.equals(testType) || TestType.APPIUM_WEB_ANDROID.equals(testType) )) {
 			((HidesKeyboard)originalDriver).hideKeyboard();
 		}
 	}

@@ -1519,7 +1519,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		when(mobileDriver.getContext()).thenReturn("NATIVE_APP");
 		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_IOS, DriverMode.LOCAL, null));
 		eventDriver.hideKeyboard();
-		verify(((HidesKeyboard)mobileDriver)).hideKeyboard();
+		verify(((HidesKeyboard)mobileDriver), never()).hideKeyboard();
 	}
 
 	@Test(groups = {"ut"})
