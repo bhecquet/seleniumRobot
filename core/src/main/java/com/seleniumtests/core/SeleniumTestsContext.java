@@ -215,8 +215,8 @@ public class SeleniumTestsContext {
     																				// this option disables the behaviour FOR TEST PURPOSE
     
     // default values
-    protected static final List<ReportInfo> DEFAULT_CUSTOM_TEST_REPORTS = Arrays.asList(new ReportInfo("PERF::xml::reporter/templates/report.perf.vm"));
-    protected static final List<ReportInfo> DEFAULT_CUSTOM_SUMMARY_REPORTS = Arrays.asList(new ReportInfo("results::json::reporter/templates/report.summary.json.vm"));
+    protected static final List<ReportInfo> DEFAULT_CUSTOM_TEST_REPORTS = List.of(new ReportInfo("PERF::xml::reporter/templates/report.perf.vm"), new ReportInfo("step::json::reporter/templates/report.test.json.vm"));
+    protected static final List<ReportInfo> DEFAULT_CUSTOM_SUMMARY_REPORTS = List.of(new ReportInfo("results::json::reporter/templates/report.summary.json.vm"));
 	public static final int DEFAULT_NEW_COMMAND_TIMEOUT = 120;
 	public static final String DEFAULT_TEST_ENV = "DEV";
 	public static final String DEFAULT_CUCUMBER_TESTS = "";

@@ -1,0 +1,10 @@
+#set($stepIdx = 0)
+#set($stepsSize = $testSteps.size())
+{
+	"steps": [
+		#foreach( $testStep in $testSteps )
+			#set($stepIdx = $stepIdx + 1)
+			$testStep.toJson()#if( $stepIdx != $stepsSize),#end
+		#end
+	]
+}

@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -35,7 +34,6 @@ import io.appium.java_client.NoSuchContextException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.UnreachableBrowserException;
@@ -74,25 +72,21 @@ public class PageObject extends BasePage implements IPage {
     private static final String ERROR_ELEMENT_S_IS_NOT_AN_TABLE_ELEMENT = "Element %s is not an Table element";
 	private static final String ELEMENT_S_IS_NOT_AN_HTML_ELEMENT_SUBCLASS = "Element %s is not an HtmlElement subclass";
 	private static final String ERROR_ELEMENT_IS_PRESENT = "Element %s is present";
-	private boolean frameFlag = false;
     private String windowHandle = null; // store the window / tab on which this page is loaded
     private String url = null;
-    private String suiteName = null;
-    private String outputDirectory = null;
     private boolean captureSnapshot = true;
     private ScreenshotUtil screenshotUtil;
-    private Clock systemClock;
-    private PageLoadStrategy pageLoadStrategy;
-    
+    private final PageLoadStrategy pageLoadStrategy;
+    private Instant startLoading;
+    private Instant stopLoading;
+
     private static final String ERROR_ELEMENT_NOT_PRESENT = "Element %s is not present";
 
     /**
      * Constructor for non-entry point page. The control is supposed to have reached the page from other API call.
-     *
-     * @throws  Exception
      */
     public PageObject() {
-        this(null, (String)null);
+        this(null, null);
     }
 
 
@@ -101,12 +95,9 @@ public class PageObject extends BasePage implements IPage {
      *
      * @param	pageIdentifierElement	The element to search for so that we check we are on the right page. 
      * 									May be null if we do not want to check we are on the page
-     * @throws IOException 
-     *
-     * @throws  Exception
      */
     public PageObject(final HtmlElement pageIdentifierElement)   {
-        this(pageIdentifierElement, (String)null);
+        this(pageIdentifierElement, null);
     }
 
     
@@ -117,9 +108,6 @@ public class PageObject extends BasePage implements IPage {
      * @param	pageIdentifierElement	The element to search for so that we check we are on the right page. 
      * 									May be null if we do not want to check we are on the page
      * @param   url						the URL to which we should connect. May be null if we do not want to go to a specific URL
-     * @throws IOException 
-     *
-     * @throws  Exception
      */
     public PageObject(final HtmlElement pageIdentifierElement, final String url) {
         this(pageIdentifierElement,
@@ -138,9 +126,6 @@ public class PageObject extends BasePage implements IPage {
      * 									May be null if we do not want to check we are on the page
      * @param   url						the URL to which we should connect. May be null if we do not want to go to a specific URL
      * @param	pageLoadStrategy		whether to wait for the page to load or not (this is complementary to Selenium driver strategy. If not null, it will override selenium
-     * @throws IOException 
-     *
-     * @throws  Exception
      */
     public PageObject(final HtmlElement pageIdentifierElement, final String url, PageLoadStrategy pageLoadStrategy) {
     	this(pageIdentifierElement, 
@@ -161,9 +146,6 @@ public class PageObject extends BasePage implements IPage {
      * @param   url						the URL to which we should connect. May be null if we do not want to go to a specific URL
      * @param	pageLoadStrategy		whether to wait for the page to load or not (this is complementary to Selenium driver strategy. If not null, it will override selenium
      * @param	captureSnapshot			if true, snapshot will be captured after page loading. 'false' should only be used when capturing snapshot interfere with a popup alert
-     * @throws IOException 
-     *
-     * @throws  Exception
      */
     public PageObject(final HtmlElement pageIdentifierElement, final String url, PageLoadStrategy pageLoadStrategy, boolean captureSnapshot) {
     	this(pageIdentifierElement, 
@@ -185,9 +167,6 @@ public class PageObject extends BasePage implements IPage {
      * @param	browserType				the new browser type to create
      * @param	driverName				a logical name to give to the created driver
      * @param	attachExistingDriverPort 	 if we need to attach to an existing browser instead of creating one, then specify the port here
-     * @throws IOException 
-     *
-     * @throws  Exception
      */
     public PageObject(HtmlElement pageIdentifierElement, String url, BrowserType browserType, String driverName, Integer attachExistingDriverPort) {
     	this(pageIdentifierElement, url, browserType, driverName, attachExistingDriverPort, null, false);
@@ -204,9 +183,6 @@ public class PageObject extends BasePage implements IPage {
      * @param	driverName				a logical name to give to the created driver
      * @param	attachExistingDriverPort 	 if we need to attach to an existing browser instead of creating one, then specify the port here
      * @param	captureSnapshot			if true, snapshot will be captured after page loading. 'false' should only be used when capturing snapshot interfere with a popup alert
-     * @throws IOException 
-     *
-     * @throws  Exception
      */
     public PageObject(HtmlElement pageIdentifierElement, String url, BrowserType browserType, String driverName, Integer attachExistingDriverPort, boolean captureSnapshot) {
     	this(pageIdentifierElement, url, browserType, driverName, attachExistingDriverPort, null, captureSnapshot);
@@ -224,13 +200,10 @@ public class PageObject extends BasePage implements IPage {
      * @param	attachExistingDriverPort 	 if we need to attach to an existing browser instead of creating one, then specify the port here
      * @param	pageLoadStrategy		whether to wait for the page to load or not (this is complementary to Selenium driver strategy. If not null, it will override selenium
      * @param	captureSnapshot			if true, snapshot will be captured after page loading. 'false' should only be used when capturing snapshot interfere with a popup alert
-     * @throws IOException
-     *
-     * @throws  Exception
      */
     public PageObject(HtmlElement pageIdentifierElement, String url, BrowserType browserType, String driverName, Integer attachExistingDriverPort, PageLoadStrategy pageLoadStrategy, boolean captureSnapshot)  {
-    	
-    	systemClock = Clock.systemUTC();
+
+        startLoading = Instant.now();
     	this.captureSnapshot = captureSnapshot;
     	
     	if (pageLoadStrategy == null) {
@@ -238,15 +211,6 @@ public class PageObject extends BasePage implements IPage {
     	} else {
     		this.pageLoadStrategy = pageLoadStrategy;
     	}
-    	
-        Calendar start = Calendar.getInstance();
-        start.setTime(new Date());
-
-        if (SeleniumTestsContextManager.getGlobalContext() != null
-                && SeleniumTestsContextManager.getGlobalContext().getTestNGContext() != null) {
-            suiteName = SeleniumTestsContextManager.getGlobalContext().getTestNGContext().getSuite().getName();
-            outputDirectory = SeleniumTestsContextManager.getGlobalContext().getTestNGContext().getOutputDirectory();
-        }
         
         // set the URL to context if it has been provided. This will then be used on Edge(IE-mode) creation to avoid cross zone boundaries
         if (SeleniumTestsContextManager.getThreadContext() != null && url != null) {
@@ -276,11 +240,7 @@ public class PageObject extends BasePage implements IPage {
 
         assertCurrentPage(false, pageIdentifierElement);
 
-        Calendar end = Calendar.getInstance();
-
-        long startTime = start.getTimeInMillis();
-        long endTime = end.getTimeInMillis();
-        logger.log("Open web page in :" + (endTime - startTime) / 1000.0 + " seconds");
+        logger.log("Open web page in :" + Duration.between(startLoading, stopLoading).toMillis() / 1000.0 + " seconds");
 
     }
 
@@ -288,7 +248,7 @@ public class PageObject extends BasePage implements IPage {
      * Allow to switch to the appropriate context depending on the Page type
      */
     private void switchToContext() {
-        Instant end = systemClock.instant().plusSeconds(SeleniumTestsContextManager.getThreadContext().getReplayTimeout());
+        Instant end = Instant.now().plusSeconds(SeleniumTestsContextManager.getThreadContext().getReplayTimeout());
 
         String context = null;
         if (getClass().isAnnotationPresent(ContextWebView.class)) {
@@ -300,7 +260,7 @@ public class PageObject extends BasePage implements IPage {
         }
         final String finalContext = context;
 
-        while (end.isAfter(systemClock.instant())) {
+        while (end.isAfter(Instant.now())) {
             if (context != null) {
                 try {
                     switchToContext(finalContext);
@@ -360,17 +320,19 @@ public class PageObject extends BasePage implements IPage {
     /**
      * Open page 
      * Wait for page loading
-     * @param url
-     * @throws IOException
+     * @param url   URL to open
      */
     private void openPage(String url) {
     	if (url != null) {
+            // update start instant in case URL is defined because we only want page loading duration, which starts when URL is sent to browser
+            startLoading = Instant.now();
             open(url);
             ((CustomEventFiringWebDriver)driver).updateWindowsHandles();
         }
 
         // switch to the context if we are on mobile app
         switchToContext();
+        stopLoading = Instant.now();
 
         // Wait for page load is applicable only for web test and mobile webview
         // When running tests on an iframe embedded site then test will fail if this command is not used
@@ -407,7 +369,7 @@ public class PageObject extends BasePage implements IPage {
     /**
      * Get parameter from configuration
      * 
-     * @param key
+     * @param key       name of the variable to find
      * 
      * @return String
      */
@@ -419,7 +381,7 @@ public class PageObject extends BasePage implements IPage {
      * Get parameter from configuration using pattern
      * If multiple variables match the pattern, only one is returned
      * @param keyPattern	Pattern for searching key. If null, no filtering will be done on key
-     * @return
+     * @return  the associated value
      */
     public static String param(Pattern keyPattern) {
     	return TestTasks.param(keyPattern);
@@ -430,7 +392,7 @@ public class PageObject extends BasePage implements IPage {
      * If multiple variables match the pattern, only one is returned
      * @param keyPattern	Pattern for searching key. If null, no filtering will be done on key
      * @param valuePattern	Pattern for searching value. If null, no filtering will be done on value
-     * @return
+     * @return  the associated value
      */
     public static String param(Pattern keyPattern, Pattern valuePattern) {
     	return TestTasks.param(keyPattern, valuePattern);
@@ -438,7 +400,7 @@ public class PageObject extends BasePage implements IPage {
     
     /**
      * returns the robot configuration
-     * @return
+     * @return      the current context
      */
     public SeleniumTestsContext robotConfig() {
     	return SeleniumTestsContextManager.getThreadContext();
@@ -446,7 +408,7 @@ public class PageObject extends BasePage implements IPage {
     
     /**
      * Add step inside a page
-     * @param stepName
+     * @param stepName  name of the step to add
      */
     public void addStep(String stepName) {
     	TestTasks.addStep(stepName);
@@ -454,7 +416,7 @@ public class PageObject extends BasePage implements IPage {
 
     /**
      * Add step inside a page
-     * @param stepName
+     * @param stepName          name of the step to add
      * @param passwordToMask	array of strings that must be replaced by '*****' in reports
      */
     public void addStep(String stepName, String ... passwordToMask) {
@@ -475,8 +437,8 @@ public class PageObject extends BasePage implements IPage {
     /**
 	 * Method for creating or updating a variable locally. If selenium server is not used, there is no difference with 'createOrUpdateParam'. 
 	 * If seleniumRobot server is used, then, this method will only change variable value locally, not updating the remote one
-	 * @param key
-	 * @param newValue
+	 * @param key           name of the variable to add
+	 * @param newValue      value to add
 	 */
 	public void createOrUpdateLocalParam(String key, String newValue) {
 		TestTasks.createOrUpdateLocalParam(key, newValue);
@@ -521,7 +483,7 @@ public class PageObject extends BasePage implements IPage {
     
     /**
      * In case the scenario uses several drivers, switch to one or another using this method, so that any new calls will go through this driver
-     * @param driverName
+     * @param driverName    name of the driver to switch to
      */
     public WebDriver switchToDriver(String driverName) {
     	driver = TestTasks.switchToDriver(driverName);
@@ -540,8 +502,7 @@ public class PageObject extends BasePage implements IPage {
 
     /**
      * Capture the whole page, scrolling if necessary
-     * @param <T>
-     * @return
+     * @return  the captured snapshot
      */
     public <T extends PageObject> T capturePageSnapshot() {
         capturePageSnapshot(null);
@@ -550,8 +511,7 @@ public class PageObject extends BasePage implements IPage {
     
     /**
      * Capture only the visible part of the page, no scrolling will be done
-     * @param <T>
-     * @return
+     * @return  the captured snapshot
      */
     public <T extends PageObject> T captureViewportSnapshot() {
     	captureViewportSnapshot(null);
@@ -560,8 +520,7 @@ public class PageObject extends BasePage implements IPage {
     
     /**
      * Capture the desktop
-     * @param <T>
-     * @return
+     * @return  the captured snapshot
      */
     public <T extends PageObject> T captureDesktopSnapshot() {
     	captureDesktopSnapshot(null);
@@ -635,11 +594,11 @@ public class PageObject extends BasePage implements IPage {
     
     /**
      * Returns 0 if snapshot is only taken for test report. Else, returns the defined scrollDelay from params
-     * @param checkSnapshot
+     * @param checkSnapshot     type of snapshot
      */
     private int computeScrollDelay(SnapshotCheckType checkSnapshot) {
     	if (checkSnapshot.getControl() != Control.NONE) {
-    		return robotConfig().getSnapshotScrollDelay().intValue();
+    		return robotConfig().getSnapshotScrollDelay();
     	} else {
     		return 0;
     	}
@@ -682,9 +641,9 @@ public class PageObject extends BasePage implements IPage {
     /**
      * Store the snapshot to test step
      * Check if name is provided, in case we need to compare it to a baseline on server
-     * @param snapshotName
-     * @param screenShot
-     * @param checkSnapshot
+     * @param snapshotName      name of the snapshot
+     * @param screenShot        the image taken
+     * @param checkSnapshot     type of checks associated to snashot
      */
     private void storeSnapshot(String snapshotName, ScreenShot screenShot, SnapshotCheckType checkSnapshot) {
     	
@@ -705,7 +664,7 @@ public class PageObject extends BasePage implements IPage {
     /**
      * Get focus on this page, using the handle we stored when creating it
      * When called, you should write {@code myPage.<MyPageClassName>getFocus().someMethodOfMyPage();}
-     * @return
+     * @return  this page
      */
     @SuppressWarnings("unchecked")
 	public <T extends PageObject> T getFocus() {
@@ -716,8 +675,6 @@ public class PageObject extends BasePage implements IPage {
     /**
      * Close a PageObject. This method can be called when a web session opens several pages and one of them has to be closed
      * In case there are multiple windows opened, switch back to the previous window in the list
-     * 
-     * @throws NotCurrentPageException
      */
     public final void close() { 
     	
@@ -730,13 +687,13 @@ public class PageObject extends BasePage implements IPage {
         if (handles.size() > 1) {
             isMultipleWindow = true;
         }
-        internalLogger.debug("Current handles: " + handles);
+        internalLogger.debug("Current handles: {}", handles);
         
         try {
         	logger.info("close web page: " + getTitle());
             driver.close();
         } catch (WebDriverException ignore) { 
-        	internalLogger.info("Error closing driver: " + ignore.getMessage());
+        	internalLogger.info("Error closing driver: {}", ignore.getMessage());
         }
 
         // wait a bit before going back to main window
@@ -789,8 +746,8 @@ public class PageObject extends BasePage implements IPage {
 
     /**
      * Get the number of elements in page
-     * @param element
-     * @return
+     * @param element   number of element of this type
+     * @return  the number of elements
      */
     public final int getElementCount(final HtmlElement element) {
         return element.findElements().size();
@@ -816,7 +773,6 @@ public class PageObject extends BasePage implements IPage {
     /**
      * Returns the value of the named cookie
      * @param name	name of the cookie
-     * @return
      */
     public final String getCookieByName(final String name) {
         if (driver.manage().getCookieNamed(name) == null) {
@@ -882,7 +838,7 @@ public class PageObject extends BasePage implements IPage {
     /**
      * Returns the list of context. This only applies to mobile
      * For desktop web tests, "WEB" will be returned
-     * @return
+     * @return      list of contexts
      */
     public List<String> getContexts() {
         return new ArrayList<>(((CustomEventFiringWebDriver)driver).getContextHandles());
@@ -943,8 +899,8 @@ public class PageObject extends BasePage implements IPage {
     /**
      * Resize window to given dimensions.
      *
-     * @param  width
-     * @param  height
+     * @param  width        width of browser window
+     * @param  height       height of browser window
      */
     public final void resizeTo(final int width, final int height) {
     	// app test are not compatible with window
@@ -974,56 +930,6 @@ public class PageObject extends BasePage implements IPage {
     }
 
     /**
-     * @deprecated useless
-     * @return
-     */
-    @Deprecated
-    public boolean isFrame() {
-        return frameFlag;
-    }
-
-    /**
-     * @deprecated useless
-     * @return
-     */
-    @Deprecated
-    public final void selectFrame(final Integer index) {
-        driver.switchTo().frame(index);
-        frameFlag = true;
-    }
-
-    /**
-     * @deprecated useless
-     * @return
-     */
-    @Deprecated
-    public final void selectFrame(final By by) {
-    	WebElement element = driver.findElement(by);
-        driver.switchTo().frame(element);
-        frameFlag = true;
-    }
-
-    /**
-     * @deprecated useless
-     * @return
-     */
-    @Deprecated
-    public final void selectFrame(final String locator) {
-        driver.switchTo().frame(locator);
-        frameFlag = true;
-    }
-
-    /**
-     * @deprecated useless
-     * @return
-     */
-    @Deprecated
-    public final void exitFrame() {
-    	driver.switchTo().defaultContent();
-    	frameFlag = false;
-    }
-
-    /**
      * Switch to first window in the list
      */
     public final void selectMainWindow() {
@@ -1047,7 +953,7 @@ public class PageObject extends BasePage implements IPage {
     
     /**
      * Selects the first unknown window. To use we an action creates a new window or tab
-     * @return
+     * @return      handle of the new window
      */
     public final String selectNewWindow() {
     	return selectNewWindow(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout() * 1000);
@@ -1066,7 +972,7 @@ public class PageObject extends BasePage implements IPage {
      * I a new window or tab is displayed, we select it.
      * This also check if the switch has already been done (it's the case for HtmlUnit 3.57 where it switchs automatically
      * @param waitMs	wait for N milliseconds before raising error
-     * @return
+     * @return  handle of the new window
      */
     public final String selectNewWindow(int waitMs) {
     	// app test are not compatible with window
@@ -1091,17 +997,17 @@ public class PageObject extends BasePage implements IPage {
     		return (String) getCurrentHandles().toArray()[0];
     	}
  		
- 		internalLogger.debug("Current handle: " + mainWindowHandle);
+ 		internalLogger.debug("Current handle: {}", mainWindowHandle);
 
  		// wait for window to be displayed
- 		Instant end = systemClock.instant().plusMillis(waitMs + 250L);
+ 		Instant end = Instant.now().plusMillis(waitMs + 250L);
  		Set<String> handles = new TreeSet<>();
  		boolean found = false;
  		
- 		while (end.isAfter(systemClock.instant()) && !found) {
+ 		while (end.isAfter(Instant.now()) && !found) {
 
  			handles = driver.getWindowHandles();
- 			internalLogger.debug("All handles: " + handles.toString());
+ 			internalLogger.debug("All handles: {}", handles);
 
  			for (String handle: handles) {
  				
@@ -1114,21 +1020,9 @@ public class PageObject extends BasePage implements IPage {
 				
 				// wait for a valid address
 				String address = "";
-				Instant endLoad = systemClock.instant().plusMillis(5000);
-				while (address.isEmpty() && endLoad.isAfter(systemClock.instant())) {
+				Instant endLoad = Instant.now().plusMillis(5000);
+				while (address.isEmpty() && endLoad.isAfter(Instant.now())) {
 					address = driver.getCurrentUrl();
-				}
-				
-				// make window display in foreground
-				// TODO: reactivate feature
-				try {
-//					Point windowPosition  = driver.manage().window().getPosition();
-//					org.openqa.selenium.interactions.Mouse mouse = ((HasInputDevices) driver).getMouse();
-//					mouse.click();
-//					Mouse mouse = new DesktopMouse();
-//					mouse.click(new DesktopScreenRegion(Math.max(0, windowPosition.x) + driver.manage().window().getSize().width / 2, Math.max(0, windowPosition.y) + 5, 2, 2).getCenter());
-				} catch (Exception e) {
-					internalLogger.warn("error while giving focus to window");
 				}
 				
 				found = true;
@@ -1168,6 +1062,8 @@ public class PageObject extends BasePage implements IPage {
     	} catch (TimeoutException e) {
     		// nothing
     	}
+
+        stopLoading = Instant.now();
     	
 
         // populate page info
@@ -1182,9 +1078,9 @@ public class PageObject extends BasePage implements IPage {
     }
     
 	public Alert waitForAlert(int waitInSeconds) {
-		Instant end = systemClock.instant().plusSeconds(waitInSeconds);
+		Instant end = Instant.now().plusSeconds(waitInSeconds);
 
-		while (end.isAfter(systemClock.instant())) {
+		while (end.isAfter(Instant.now())) {
 			try {
 				return driver.switchTo().alert();
 			} catch (NoAlertPresentException e) {
@@ -1206,17 +1102,17 @@ public class PageObject extends BasePage implements IPage {
 		Class<?> stackClass = null;
 		
 		//find the PageObject Loader
-		for(int i=0; i<stack.length;i++){
-			try{
-				 stackClass = Class.forName(stack[i].getClassName());
-			} catch (ClassNotFoundException e){
-				continue;
-			}
-			
-			if (PageObject.class.isAssignableFrom(stackClass)){
-				page = stack[i].getClassName();	
-			}
-		}
+        for (StackTraceElement stackTraceElement : stack) {
+            try {
+                stackClass = Class.forName(stackTraceElement.getClassName());
+            } catch (ClassNotFoundException e) {
+                continue;
+            }
+
+            if (PageObject.class.isAssignableFrom(stackClass)) {
+                page = stackTraceElement.getClassName();
+            }
+        }
 		return page;
 	}
 
@@ -1230,7 +1126,6 @@ public class PageObject extends BasePage implements IPage {
 	
 	/**
 	 * Returns an Element object based on field name
-	 * @return
 	 */
 	private Element getElement(String fieldName) {
 		
@@ -1276,8 +1171,8 @@ public class PageObject extends BasePage implements IPage {
 	@GenericStep
 	public <T extends PageObject> T clear(String fieldName) {
 		Element element = getElement(fieldName);
-		if (element instanceof HtmlElement) {
-			((HtmlElement) element).clear();
+		if (element instanceof HtmlElement htmlElement) {
+			htmlElement.clear();
 		} else {
 			throw new ScenarioException(String.format(ELEMENT_S_IS_NOT_AN_HTML_ELEMENT_SUBCLASS, fieldName));
 		}
@@ -1288,8 +1183,8 @@ public class PageObject extends BasePage implements IPage {
 	@GenericStep
     public <T extends PageObject> T selectOption(String fieldName, String value) {
 		Element element = getElement(fieldName);
-		if (element instanceof SelectList) {
-			((SelectList)element).selectByText(value);
+		if (element instanceof SelectList selectElement) {
+			selectElement.selectByText(value);
 		} else {
 			throw new ScenarioException(String.format("Element %s is not an SelectList", fieldName));
 		}
@@ -1306,15 +1201,8 @@ public class PageObject extends BasePage implements IPage {
 	
 	/**
 	 * Click on element and creates a new PageObject of the type of following page
-	 * @param fieldName
+	 * @param fieldName     name of the field
 	 * @param nextPage		Class of the next page
-	 * @return
-	 * @throws SecurityException 
-	 * @throws NoSuchMethodException 
-	 * @throws InvocationTargetException 
-	 * @throws IllegalArgumentException 
-	 * @throws IllegalAccessException 
-	 * @throws InstantiationException 
 	 */
 	@GenericStep
 	public <T extends PageObject> T clickAndChangeToPage(String fieldName, Class<T> nextPage) {
@@ -1330,9 +1218,7 @@ public class PageObject extends BasePage implements IPage {
 	
 	/**
 	 * Return the next page
-	 * @param <T>
-	 * @param nextPage
-	 * @return
+	 * @param nextPage       next page class
 	 */
 	@GenericStep
 	public <T extends PageObject> T changeToPage(Class<T> nextPage) {
@@ -1347,8 +1233,8 @@ public class PageObject extends BasePage implements IPage {
 	@GenericStep
 	public <T extends PageObject> T doubleClick(String fieldName) {
 		Element element = getElement(fieldName);
-		if (element instanceof HtmlElement) {
-			((HtmlElement) element).doubleClickAction();
+		if (element instanceof HtmlElement htmlElement) {
+            htmlElement.doubleClickAction();
 		} else {
 			((GenericPictureElement)element).doubleClick();
 		}
@@ -1364,8 +1250,8 @@ public class PageObject extends BasePage implements IPage {
 	@GenericStep
     public <T extends PageObject> T clickTableCell(Integer row, Integer column, String fieldName) {
 		Element element = getElement(fieldName);
-		if (element instanceof Table) {
-			((Table)element).getCell(row, column).click();
+		if (element instanceof Table table) {
+			table.getCell(row, column).click();
 		} else {
 			throw new ScenarioException(String.format(ERROR_ELEMENT_S_IS_NOT_AN_TABLE_ELEMENT, fieldName));
 		}
@@ -1374,7 +1260,6 @@ public class PageObject extends BasePage implements IPage {
 
     /**
      * Switch to the newly created window
-     * @return
      */
 	@GenericStep
     public <T extends PageObject> T switchToNewWindow() {
@@ -1384,7 +1269,6 @@ public class PageObject extends BasePage implements IPage {
     
     /**
      * Switch to the newly created window with wait
-     * @return
      */
 	@GenericStep
     public <T extends PageObject> T switchToNewWindow(int waitMs) {
@@ -1394,7 +1278,6 @@ public class PageObject extends BasePage implements IPage {
     
     /**
      * Select first window in the list
-     * @return
      */
 	@GenericStep
     public <T extends PageObject> T switchToMainWindow() {
@@ -1404,8 +1287,6 @@ public class PageObject extends BasePage implements IPage {
     
     /**
      * Selects the nth window in list
-     * @param index
-     * @return
      */
 	@GenericStep
     public <T extends PageObject> T switchToWindow(int index) {
@@ -1415,7 +1296,6 @@ public class PageObject extends BasePage implements IPage {
 
     /**
      * Refresh browser window
-     * @return
      */
 	@GenericStep
     public <T extends PageObject> T refresh()  {
@@ -1462,7 +1342,7 @@ public class PageObject extends BasePage implements IPage {
      * /!\ on firefox, clicking MUST be done through 'clickAction'. 'click()' is not supported by browser. 
      * /!\ on firefox, using the uploadFile method several times without other actions between usage may lead to error. Firefox will never click to the button the second time, probably due to focus problems
      * 
-     * @param filePath
+     * @param filePath      path of the file to upload
      */
 	@GenericStep
 	public <T extends PageObject> T uploadFile(String filePath) {
@@ -1488,8 +1368,8 @@ public class PageObject extends BasePage implements IPage {
 	@GenericStep
 	public <T extends PageObject> T waitForPresent(String fieldName) {
 		Element element = getElement(fieldName);
-		if (element instanceof HtmlElement) {
-			((HtmlElement) element).waitForPresent();
+		if (element instanceof HtmlElement htmlElement) {
+			htmlElement.waitForPresent();
 		} else {
 			boolean present = ((GenericPictureElement)element).isElementPresent(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout() * 1000);
 			if (!present) {
@@ -1502,8 +1382,8 @@ public class PageObject extends BasePage implements IPage {
 	@GenericStep
 	public <T extends PageObject> T waitForVisible(String fieldName) {
 		Element element = getElement(fieldName);
-		if (element instanceof HtmlElement) {
-			((HtmlElement) element).waitForVisibility();
+		if (element instanceof HtmlElement htmlElement) {
+			htmlElement.waitForVisibility();
 		} else {
 			boolean present = ((GenericPictureElement)element).isElementPresent(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout() * 1000);
 			if (!present) {
@@ -1516,8 +1396,8 @@ public class PageObject extends BasePage implements IPage {
 	@GenericStep
 	public <T extends PageObject> T waitForNotPresent(String fieldName) {
 		Element element = getElement(fieldName);
-		if (element instanceof HtmlElement) {
-			((HtmlElement) element).waitForNotPresent();
+		if (element instanceof HtmlElement htmlElement) {
+			htmlElement.waitForNotPresent();
 		} else {
 			boolean present = ((GenericPictureElement)element).isElementPresent(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout() * 1000);
 			if (present) {
@@ -1530,8 +1410,8 @@ public class PageObject extends BasePage implements IPage {
 	@GenericStep
 	public <T extends PageObject> T waitForInvisible(String fieldName) {
 		Element element = getElement(fieldName);
-		if (element instanceof HtmlElement) {
-			((HtmlElement) element).waitForInvisibility();
+		if (element instanceof HtmlElement htmlElement) {
+            htmlElement.waitForInvisibility();
 		} else {
 			boolean present = ((GenericPictureElement)element).isElementPresent(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout() * 1000);
 			if (present) {
@@ -1544,11 +1424,11 @@ public class PageObject extends BasePage implements IPage {
 	@GenericStep
 	public <T extends PageObject> T waitForValue(String fieldName, String value) {
 		Element element = getElement(fieldName);
-		if (element instanceof HtmlElement) {
-			((HtmlElement) element).waitFor(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout(), 
+		if (element instanceof HtmlElement htmlElement) {
+            htmlElement.waitFor(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout(),
 					ExpectedConditions.or(
-							ExpectedConditions.domPropertyToBe((HtmlElement)element, "value", value),
-							ExpectedConditions.textToBePresentInElement((HtmlElement)element, value)
+							ExpectedConditions.domPropertyToBe(htmlElement, "value", value),
+							ExpectedConditions.textToBePresentInElement(htmlElement, value)
 							));
 		} else {
 			throw new ScenarioException(String.format(ELEMENT_S_IS_NOT_AN_HTML_ELEMENT_SUBCLASS, fieldName));
@@ -1559,9 +1439,9 @@ public class PageObject extends BasePage implements IPage {
 	@GenericStep
     public <T extends PageObject> T waitTableCellValue(Integer row, Integer column, String fieldName, String value) {
 		Element element = getElement(fieldName);
-		if (element instanceof Table) {
-			((HtmlElement) element).waitFor(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout(), 
-					ExpectedConditions.textToBePresentInElement(((Table)element).getCell(row, column), value));
+		if (element instanceof Table table) {
+			table.waitFor(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout(),
+					ExpectedConditions.textToBePresentInElement(table.getCell(row, column), value));
 			
 		} else {
 			throw new ScenarioException(String.format(ERROR_ELEMENT_S_IS_NOT_AN_TABLE_ELEMENT, fieldName));
@@ -1573,8 +1453,8 @@ public class PageObject extends BasePage implements IPage {
 	@GenericStep
 	public <T extends PageObject> T assertForInvisible(String fieldName) {
 		Element element = getElement(fieldName);
-		if (element instanceof HtmlElement) {
-			Assert.assertFalse(((HtmlElement) element).isElementPresent(0) && ((HtmlElement) element).isDisplayed(), String.format("Element %s is visible", fieldName));
+		if (element instanceof HtmlElement htmlElement) {
+			Assert.assertFalse(htmlElement.isElementPresent(0) && htmlElement.isDisplayed(), String.format("Element %s is visible", fieldName));
 		} else {
 			Assert.assertFalse(((GenericPictureElement)element).isElementPresent(), String.format("Element %s is visible", fieldName));
 		}
@@ -1584,9 +1464,9 @@ public class PageObject extends BasePage implements IPage {
 	@GenericStep
 	public <T extends PageObject> T assertForVisible(String fieldName) {
 		Element element = getElement(fieldName);
-		if (element instanceof HtmlElement) {
-			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format(ERROR_ELEMENT_NOT_PRESENT, fieldName));
-			Assert.assertTrue(((HtmlElement) element).isDisplayed(), String.format("Element %s is not visible", fieldName));
+		if (element instanceof HtmlElement htmlElement) {
+			Assert.assertTrue(htmlElement.isElementPresent(0), String.format(ERROR_ELEMENT_NOT_PRESENT, fieldName));
+			Assert.assertTrue(htmlElement.isDisplayed(), String.format("Element %s is not visible", fieldName));
 		} else {
 			Assert.assertTrue(((GenericPictureElement)element).isElementPresent(), String.format("Element %s is not visible", fieldName));
 		}
@@ -1596,9 +1476,9 @@ public class PageObject extends BasePage implements IPage {
 	@GenericStep
 	public <T extends PageObject> T assertForDisabled(String fieldName) {
 		Element element = getElement(fieldName);
-		if (element instanceof HtmlElement) {
-			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format(ERROR_ELEMENT_NOT_PRESENT, fieldName));
-			Assert.assertFalse(((HtmlElement) element).isEnabled(), String.format("Element %s is enabled", fieldName));
+		if (element instanceof HtmlElement htmlElement) {
+			Assert.assertTrue(htmlElement.isElementPresent(0), String.format(ERROR_ELEMENT_NOT_PRESENT, fieldName));
+			Assert.assertFalse(htmlElement.isEnabled(), String.format("Element %s is enabled", fieldName));
 		} else {
 			throw new ScenarioException(String.format(ELEMENT_S_IS_NOT_AN_HTML_ELEMENT_SUBCLASS, fieldName));
 		}
@@ -1608,9 +1488,9 @@ public class PageObject extends BasePage implements IPage {
 	@GenericStep
 	public <T extends PageObject> T assertForEnabled(String fieldName) {
 		Element element = getElement(fieldName);
-		if (element instanceof HtmlElement) {
-			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format(ERROR_ELEMENT_NOT_PRESENT, fieldName));
-			Assert.assertTrue(((HtmlElement) element).isEnabled(), String.format("Element %s is disabled", fieldName));
+		if (element instanceof HtmlElement htmlElement) {
+			Assert.assertTrue(htmlElement.isElementPresent(0), String.format(ERROR_ELEMENT_NOT_PRESENT, fieldName));
+			Assert.assertTrue(htmlElement.isEnabled(), String.format("Element %s is disabled", fieldName));
 		} else {
 			throw new ScenarioException(String.format(ELEMENT_S_IS_NOT_AN_HTML_ELEMENT_SUBCLASS, fieldName));
 		}
@@ -1620,9 +1500,9 @@ public class PageObject extends BasePage implements IPage {
 	@GenericStep
 	public <T extends PageObject> T assertForValue(String fieldName, String value) {
 		Element element = getElement(fieldName);
-		if (element instanceof HtmlElement) {
-			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format(ERROR_ELEMENT_NOT_PRESENT, fieldName));
-			Assert.assertTrue(((HtmlElement) element).getText().equals(value) || ((HtmlElement) element).getValue().equals(value), String.format("Value of element %s is not %s", fieldName, value));
+		if (element instanceof HtmlElement htmlElement) {
+			Assert.assertTrue(htmlElement.isElementPresent(0), String.format(ERROR_ELEMENT_NOT_PRESENT, fieldName));
+			Assert.assertTrue(htmlElement.getText().equals(value) || htmlElement.getValue().equals(value), String.format("Value of element %s is not %s", fieldName, value));
 		} else {
 			throw new ScenarioException(String.format(ELEMENT_S_IS_NOT_AN_HTML_ELEMENT_SUBCLASS, fieldName));
 		}
@@ -1632,9 +1512,9 @@ public class PageObject extends BasePage implements IPage {
 	@GenericStep
 	public <T extends PageObject> T assertForEmptyValue(String fieldName) {
 		Element element = getElement(fieldName);
-		if (element instanceof HtmlElement) {
-			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format(ERROR_ELEMENT_NOT_PRESENT, fieldName));
-			Assert.assertTrue(((HtmlElement) element).getValue().isEmpty(), String.format("Value or Element %s is not empty", fieldName));
+		if (element instanceof HtmlElement htmlElement) {
+			Assert.assertTrue(htmlElement.isElementPresent(0), String.format(ERROR_ELEMENT_NOT_PRESENT, fieldName));
+			Assert.assertTrue(htmlElement.getValue().isEmpty(), String.format("Value or Element %s is not empty", fieldName));
 		} else {
 			throw new ScenarioException(String.format(ELEMENT_S_IS_NOT_AN_HTML_ELEMENT_SUBCLASS, fieldName));
 		}
@@ -1644,9 +1524,9 @@ public class PageObject extends BasePage implements IPage {
 	@GenericStep
 	public <T extends PageObject> T assertForNonEmptyValue(String fieldName) {
 		Element element = getElement(fieldName);
-		if (element instanceof HtmlElement) {
-			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format(ERROR_ELEMENT_NOT_PRESENT, fieldName));
-			Assert.assertFalse(((HtmlElement) element).getValue().isEmpty(), String.format("Element %s is empty", fieldName));
+		if (element instanceof HtmlElement htmlElement) {
+			Assert.assertTrue(htmlElement.isElementPresent(0), String.format(ERROR_ELEMENT_NOT_PRESENT, fieldName));
+			Assert.assertFalse(htmlElement.getValue().isEmpty(), String.format("Element %s is empty", fieldName));
 		} else {
 			throw new ScenarioException(String.format(ELEMENT_S_IS_NOT_AN_HTML_ELEMENT_SUBCLASS, fieldName));
 		}
@@ -1656,10 +1536,10 @@ public class PageObject extends BasePage implements IPage {
 	@GenericStep
 	public <T extends PageObject> T assertForMatchingValue(String fieldName, String regex) {
 		Element element = getElement(fieldName);
-		if (element instanceof HtmlElement) {
-			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format(ERROR_ELEMENT_NOT_PRESENT, fieldName));
-			Assert.assertTrue(Pattern.compile(regex).matcher(((HtmlElement) element).getText()).find()
-					|| Pattern.compile(regex).matcher(((HtmlElement) element).getValue()).find(),
+		if (element instanceof HtmlElement htmlElement) {
+			Assert.assertTrue(htmlElement.isElementPresent(0), String.format(ERROR_ELEMENT_NOT_PRESENT, fieldName));
+			Assert.assertTrue(Pattern.compile(regex).matcher(htmlElement.getText()).find()
+					|| Pattern.compile(regex).matcher(htmlElement.getValue()).find(),
 					String.format("Value of Element %s does not match %s ", fieldName, regex));
 		} else {
 			throw new ScenarioException(String.format(ELEMENT_S_IS_NOT_AN_HTML_ELEMENT_SUBCLASS, fieldName));
@@ -1670,9 +1550,9 @@ public class PageObject extends BasePage implements IPage {
 	@GenericStep
     public <T extends PageObject> T assertSelectedOption(String fieldName, String value) {
 		Element element = getElement(fieldName);
-		if (element instanceof SelectList) {
+		if (element instanceof SelectList selectList) {
 			try {
-				WebElement selectedOption = ((SelectList)element).getFirstSelectedOption();
+				WebElement selectedOption = selectList.getFirstSelectedOption();
 				Assert.assertNotNull(selectedOption, "No selected option found");
 				Assert.assertEquals(selectedOption.getText(), value, "Selected option is not the expected one");
 			} catch (WebDriverException e) {
@@ -1711,11 +1591,11 @@ public class PageObject extends BasePage implements IPage {
 	@GenericStep
     public <T extends PageObject> T assertTableCellValue(Integer row, Integer column, String fieldName, String value) {
 		Element element = getElement(fieldName);
-		if (element instanceof Table) {
+		if (element instanceof Table table) {
 			try {
-				Assert.assertEquals(((Table)element).getCell(row, column).getText(), value, String.format("Value of cell [%d,%d] in table %s is not %s", row, column, fieldName, value));
+				Assert.assertEquals(table.getCell(row, column).getText(), value, String.format("Value of cell [%d,%d] in table %s is not %s", row, column, fieldName, value));
 			} catch (WebDriverException e) {
-				Assert.assertTrue(false, "Table or cell not found");
+				Assert.assertTrue(false, "Table or cell not found"); // assertFail is not handled by softAssertion
 			}
 		} else {
 			throw new ScenarioException(String.format(ERROR_ELEMENT_S_IS_NOT_AN_TABLE_ELEMENT, fieldName));
@@ -1744,8 +1624,8 @@ public class PageObject extends BasePage implements IPage {
 	@GenericStep
     public <T extends PageObject> T assertElementCount(String fieldName, int elementCount) {
     	Element element = getElement(fieldName);
-    	if (element instanceof HtmlElement) {
-			Assert.assertEquals(((HtmlElement)element).findElements().size(), elementCount);
+    	if (element instanceof HtmlElement htmlElement) {
+			Assert.assertEquals(htmlElement.findElements().size(), elementCount);
 		} else {
 			throw new ScenarioException(String.format("Element %s is not an HtmlElement", fieldName));
 		}
@@ -1768,28 +1648,10 @@ public class PageObject extends BasePage implements IPage {
         Assert.assertTrue(getHtmlSource().contains(text), String.format("Text: {%s} not found on page source.", text));
     }
 
-	
-	/**
-	 * @deprecated useless
-	 * @param text
-	 */
-    @Deprecated
-    public void assertKeywordNotPresent(String text) {
-        Assert.assertFalse(getHtmlSource().contains(text), String.format("Text: {%s} not found on page source.", text));
-    }
 
 	@GenericStep
     public void assertLocation(String urlPattern) {
         Assert.assertTrue(getLocation().contains(urlPattern), "Pattern: {" + urlPattern + "} not found on page location.");
-    }
-
-	/**
-	 * @deprecated useless
-	 * @param text
-	 */
-    @Deprecated
-    public void assertTitle(final String text) {
-        Assert.assertTrue(getTitle().contains(text), String.format("Text: {%s} not found on page title.", text));
     }
 	
 

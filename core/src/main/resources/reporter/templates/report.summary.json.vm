@@ -1,5 +1,7 @@
 #set($driverIdx = 0)
+#set($stepIdx = 0)
 #set($driversSize = $driverUsages.size())
+#set($stepsSize = $testSteps.size())
 {
 	"fail": $fail,
 	"pass": $pass,
@@ -10,5 +12,11 @@
 		#set($driverIdx = $driverIdx + 1)
 		$driverUsage.asJson()#if( $driverIdx != $driversSize),#end
 	#end
+	],
+	"steps": [
+		#foreach( $testStep in $testSteps )
+			#set($stepIdx = $stepIdx + 1)
+			$testStep.toJson()#if( $stepIdx != $stepsSize),#end
+		#end
 	]
 }

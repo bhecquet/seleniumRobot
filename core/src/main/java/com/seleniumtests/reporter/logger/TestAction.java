@@ -20,6 +20,7 @@ package com.seleniumtests.reporter.logger;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.htmlelements.Element;
@@ -110,7 +111,7 @@ public class TestAction {
 		this.pwdToReplace = pwdToReplace.stream()
 					.filter(Objects::nonNull)
 					.filter(s -> s.length() > TestStepManager.MIN_PASSWORD_LENGTH)
-					.toList();
+					.collect(Collectors.toList()); // need to be updated
 
 		this.action = action; // it's the action performed, without dataset
 		this.element = element;
@@ -200,6 +201,7 @@ public class TestAction {
 		actionJson.put("failed", failed);
 		actionJson.put("position", position);
 		actionJson.put("action", action);
+		actionJson.put("durationToExclure", durationToExclude);
 		if (element != null) {
 			actionJson.put("element", element.getName());
 		}
