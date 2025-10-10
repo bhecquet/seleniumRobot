@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.seleniumtests.browserfactory.mobile.*;
-import com.seleniumtests.util.osutility.OSUtilityFactory;
 import io.appium.java_client.AppiumDriver;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -44,7 +43,6 @@ import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
@@ -71,7 +69,6 @@ import com.seleniumtests.util.osutility.OSUtility;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
-import kong.unirest.Unirest;
 
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.mockConstruction;
@@ -100,15 +97,15 @@ public class TestWebUiDriver extends ReporterTest {
 
 		List<MobileDevice> deviceList = new ArrayList<>();
 
-		try (MockedConstruction mockedAdbWrapper = mockConstruction(AdbWrapper.class, (adbWrapper, context) -> {
+		try (MockedConstruction<AdbWrapper> mockedAdbWrapper = mockConstruction(AdbWrapper.class, (adbWrapper, context) -> {
 			when(adbWrapper.getDeviceList()).thenReturn(deviceList);
 		});
-			 MockedConstruction mockedAndroidDriver = mockConstruction(AndroidDriver.class, (androidDriver, context) -> {
+			 MockedConstruction<AndroidDriver> mockedAndroidDriver = mockConstruction(AndroidDriver.class, (androidDriver, context) -> {
 				 when(androidDriver.manage()).thenReturn(driverOptions);
 				 when(androidDriver.getContext()).thenReturn("NATIVE_APP");
 				 when(androidDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
 			 });
-			 MockedStatic mockedAppiumLauncher = mockStatic(AppiumLauncherFactory.class);
+			 MockedStatic<AppiumLauncherFactory> mockedAppiumLauncher = mockStatic(AppiumLauncherFactory.class);
 		) {
 			when(driverOptions.timeouts()).thenReturn(timeouts);
 
@@ -125,7 +122,7 @@ public class TestWebUiDriver extends ReporterTest {
 			ExistingAppiumLauncher appiumLauncher;
 
 			appiumLauncher = spy(new ExistingAppiumLauncher("http://localhost:4321/"));
-			mockedAppiumLauncher.when(() -> AppiumLauncherFactory.getInstance()).thenReturn(appiumLauncher);
+			mockedAppiumLauncher.when(AppiumLauncherFactory::getInstance).thenReturn(appiumLauncher);
 
 			WebUIDriver.getWebDriver(true);
 
@@ -142,15 +139,15 @@ public class TestWebUiDriver extends ReporterTest {
 
 		List<MobileDevice> deviceList = new ArrayList<>();
 
-		try (MockedConstruction mockedInstrument = mockConstruction(InstrumentsWrapper.class, (instrumentsWrapper, context) -> {
+		try (MockedConstruction<InstrumentsWrapper> mockedInstrument = mockConstruction(InstrumentsWrapper.class, (instrumentsWrapper, context) -> {
 				when(instrumentsWrapper.parseIosDevices()).thenReturn(deviceList);
 			});
-			 MockedConstruction mockedIOSDriver = mockConstruction(IOSDriver.class, (iosDriver, context) -> {
+			 MockedConstruction<IOSDriver> mockedIOSDriver = mockConstruction(IOSDriver.class, (iosDriver, context) -> {
 				 when(iosDriver.manage()).thenReturn(driverOptions);
 				 when(iosDriver.getContext()).thenReturn("NATIVE_APP");
 				 when(iosDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
 			 });
-			 MockedStatic mockedAppiumLauncher = mockStatic(AppiumLauncherFactory.class);
+			 MockedStatic<AppiumLauncherFactory> mockedAppiumLauncher = mockStatic(AppiumLauncherFactory.class);
 		) {
 
 			when(driverOptions.timeouts()).thenReturn(timeouts);
@@ -168,7 +165,7 @@ public class TestWebUiDriver extends ReporterTest {
 			ExistingAppiumLauncher appiumLauncher;
 
 			appiumLauncher = spy(new ExistingAppiumLauncher("http://localhost:4321/"));
-			mockedAppiumLauncher.when(() -> AppiumLauncherFactory.getInstance()).thenReturn(appiumLauncher);
+			mockedAppiumLauncher.when(AppiumLauncherFactory::getInstance).thenReturn(appiumLauncher);
 
 			WebUIDriver.getWebDriver(true);
 
@@ -187,11 +184,11 @@ public class TestWebUiDriver extends ReporterTest {
 	public void testLocalWindowsDriverWithRemoteAppiumServer() throws Exception {
 
 		try (
-			 MockedConstruction mockedWindowsDriver = mockConstruction(AppiumDriver.class, (windowsDriver, context) -> {
+			 MockedConstruction<AppiumDriver> mockedWindowsDriver = mockConstruction(AppiumDriver.class, (windowsDriver, context) -> {
 				 when(windowsDriver.manage()).thenReturn(driverOptions);
 				 when(windowsDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.WINDOWS));
 			 });
-			 MockedStatic mockedAppiumLauncher = mockStatic(AppiumLauncherFactory.class);
+			 MockedStatic<AppiumLauncherFactory> mockedAppiumLauncher = mockStatic(AppiumLauncherFactory.class);
 		) {
 
 			when(driverOptions.timeouts()).thenReturn(timeouts);
@@ -208,7 +205,7 @@ public class TestWebUiDriver extends ReporterTest {
 			ExistingAppiumLauncher appiumLauncher;
 
 			appiumLauncher = spy(new ExistingAppiumLauncher("http://localhost:4321/"));
-			mockedAppiumLauncher.when(() -> AppiumLauncherFactory.getInstance()).thenReturn(appiumLauncher);
+			mockedAppiumLauncher.when(AppiumLauncherFactory::getInstance).thenReturn(appiumLauncher);
 
 			WebUIDriver.getWebDriver(true);
 
@@ -226,14 +223,14 @@ public class TestWebUiDriver extends ReporterTest {
 	public void testLocalAndroidDriverWithRemoteAppiumServerAndNoDeviceId() throws Exception {
 
 		List<MobileDevice> deviceList = new ArrayList<>();
-		try (MockedConstruction mockedAdbWrapper = mockConstruction(AdbWrapper.class, (adbWrapper, context) -> {
+		try (MockedConstruction<AdbWrapper> mockedAdbWrapper = mockConstruction(AdbWrapper.class, (adbWrapper, context) -> {
 			when(adbWrapper.getDeviceList()).thenReturn(deviceList);
 		});
-			 MockedConstruction mockedAndroidDriver = mockConstruction(AndroidDriver.class, (androidDriver, context) -> {
+			 MockedConstruction<AndroidDriver> mockedAndroidDriver = mockConstruction(AndroidDriver.class, (androidDriver, context) -> {
 				 when(androidDriver.manage()).thenReturn(driverOptions);
 				 when(androidDriver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "", Platform.ANY));
 			 });
-			 MockedStatic mockedAppiumLauncher = mockStatic(AppiumLauncherFactory.class);
+			 MockedStatic<AppiumLauncherFactory> mockedAppiumLauncher = mockStatic(AppiumLauncherFactory.class);
 		) {
 
 			when(driverOptions.timeouts()).thenReturn(timeouts);
@@ -250,7 +247,7 @@ public class TestWebUiDriver extends ReporterTest {
 			ExistingAppiumLauncher appiumLauncher;
 
 			appiumLauncher = spy(new ExistingAppiumLauncher("http://localhost:4321/"));
-			mockedAppiumLauncher.when(() -> AppiumLauncherFactory.getInstance()).thenReturn(appiumLauncher);
+			mockedAppiumLauncher.when(AppiumLauncherFactory::getInstance).thenReturn(appiumLauncher);
 			
 			WebUIDriver.getWebDriver(true);
 		} finally {
@@ -320,9 +317,10 @@ public class TestWebUiDriver extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriver"});
 			
 			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "chromedriver.log").toFile().exists());
-//			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "driver-log-browser.txt").toFile().exists());
-//			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "driver-log-client.txt").toFile().exists());
-//			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "driver-log-driver.txt").toFile().exists());
+			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "driver-log-browser.txt").toFile().exists());
+			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "driver-log-client.txt").toFile().exists());
+			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "driver-log-driver.txt").toFile().exists());
+			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "driver-log-performance.txt").toFile().exists());
 		} finally {
 			System.clearProperty(SeleniumTestsContext.DEBUG);
 		}
@@ -445,7 +443,7 @@ public class TestWebUiDriver extends ReporterTest {
 		Process chromeProcess = null;
 		try {
 			BrowserLauncher browserLauncher = new BrowserLauncher(BrowserType.CHROME, port, path, 0, null);
-			browserLauncher.run();
+			browserLauncher.start();
 			chromeDataDir = browserLauncher.getChromeDataDir();
 			chromeProcess = browserLauncher.getChromeProcess();
 
@@ -489,7 +487,7 @@ public class TestWebUiDriver extends ReporterTest {
 		Process chromeProcess = null;
 		try {
 			BrowserLauncher browserLauncher = new BrowserLauncher(BrowserType.CHROME, port, path, 30, null);
-			browserLauncher.run();
+			browserLauncher.start();
 			chromeDataDir = browserLauncher.getChromeDataDir();
 			chromeProcess = browserLauncher.getChromeProcess();
 
@@ -562,7 +560,7 @@ public class TestWebUiDriver extends ReporterTest {
 		SeleniumTestsContextManager.getThreadContext().setInitialUrl(serverUrl);
 		
 		logger.info("will start browser in 30 secs");
-		new BrowserLauncher(BrowserType.INTERNET_EXPLORER, 0, null, 30, serverUrl).run();
+		new BrowserLauncher(BrowserType.INTERNET_EXPLORER, 0, null, 30, serverUrl).start();
 		logger.info("Waiting for driver");
 		
 		// creates the driver
@@ -601,7 +599,7 @@ public class TestWebUiDriver extends ReporterTest {
 		try {
 			// create chrome browser with the right option
 			BrowserLauncher browserLauncher = new BrowserLauncher(BrowserType.EDGE, port, path, 0, null);
-			browserLauncher.run();
+			browserLauncher.start();
 			chromeDataDir = browserLauncher.getChromeDataDir();
 			chromeProcess = browserLauncher.getChromeProcess();
 
@@ -641,17 +639,17 @@ public class TestWebUiDriver extends ReporterTest {
 		try {
 			WebUIDriver.cleanUp();
 		} catch (WebDriverException e) {
-			
+			//
 		}
 	}
 	
-	private class BrowserLauncher extends Thread {
+	private static class BrowserLauncher extends Thread {
 		
-		private String path;
-		private int port;
-		private int delay;
-		private BrowserType browserType;
-		private String startupUrl;
+		private final String path;
+		private final int port;
+		private final int delay;
+		private final BrowserType browserType;
+		private final String startupUrl;
 		private Path chromeDataDir;
 		private Process chromeProcess;
 		
@@ -671,6 +669,7 @@ public class TestWebUiDriver extends ReporterTest {
 			return chromeProcess;
 		}
 
+		@Override
 		public void run() {
 
 			WaitHelper.waitForSeconds(delay);
@@ -687,7 +686,7 @@ public class TestWebUiDriver extends ReporterTest {
 				}
 			} else if (BrowserType.INTERNET_EXPLORER == browserType) {
 				WebDriver driver = WebUIDriver.getWebDriver(true, BrowserType.INTERNET_EXPLORER, "main", null);
-				if (startupUrl != null) {
+				if (startupUrl != null && driver != null) {
 					driver.get(startupUrl);
 				}
 			}

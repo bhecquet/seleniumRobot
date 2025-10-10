@@ -155,7 +155,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	}
 
 	@Test(groups={"it"})
-	public void testUploadMobileApp() throws ClientProtocolException, IOException, UnirestException {
+	public void testUploadMobileApp() throws IOException, UnirestException {
 
 		File app = GenericTest.createFileFromResource("tu/env.ini");
 
@@ -173,7 +173,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testUploadFileToNode() throws ClientProtocolException, IOException, UnirestException {
+	public void testUploadFileToNode() throws IOException, UnirestException {
 		
 		File app = GenericTest.createFileFromResource("tu/env.ini");
 
@@ -193,7 +193,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	
 
 	@Test(groups={"it"})
-	public void testDownloadFileFromNode() throws ClientProtocolException, IOException, UnirestException {
+	public void testDownloadFileFromNode() throws IOException, UnirestException {
 		
 		File app = GenericTest.createFileFromResource("tu/env.ini");
 
@@ -206,7 +206,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testUploadFileToNode2() throws ClientProtocolException, IOException, UnirestException {
+	public void testUploadFileToNode2() throws IOException, UnirestException {
 		
 		File app = GenericTest.createFileFromResource("tu/env.ini");
 
