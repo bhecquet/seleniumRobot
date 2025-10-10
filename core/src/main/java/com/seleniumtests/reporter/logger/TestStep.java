@@ -23,7 +23,6 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import org.apache.commons.lang3.StringUtils;
@@ -63,7 +62,7 @@ public class TestStep extends TestAction {
 	private List<HarCapture> harCaptures;
 	private List<GenericFile> files;
 	private List<Snapshot> snapshots;
-	private ITestResult testResult;
+	private final ITestResult testResult;
 	private RootCause errorCause;
 	private String errorCauseDetails;
 	private Integer stepResultId;  // the stepResult if it has been recorded on seleniumRobot-server
@@ -78,7 +77,7 @@ public class TestStep extends TestAction {
 	
 	/**
 	 * Step for test
-	 * @param name
+	 * @param name		name of the step
 	 */
 	public TestStep(String name) {
 		this(name, name, null, null, new ArrayList<>(), true);
@@ -98,12 +97,12 @@ public class TestStep extends TestAction {
 	 * @param name					Name of the step, as displayed in reports
 	 * @param action				Name of the action performed. Typically, the name of the called method
 	 * @param origin				Class where the method resides
-	 * @param testResult
+	 * @param testResult			the TestNG testResult of this test
 	 * @param pwdToReplace			List of string that represent a password that will be masked
 	 * @param maskPassword			if true, password strings will be replaced
-	 * @param errorCause
-	 * @param errorCauseDetails
-	 * @param disableBugtracker
+	 * @param errorCause			root error cause, if known
+	 * @param errorCauseDetails		details about the error
+	 * @param disableBugtracker		whether we will create an issue if this step fails, or not
 	 */
 	public TestStep(String name, String action, Class<?> origin, ITestResult testResult, List<String> pwdToReplace, boolean maskPassword, RootCause errorCause, String errorCauseDetails, boolean disableBugtracker) {
 		super(name, false, pwdToReplace);
@@ -161,7 +160,7 @@ public class TestStep extends TestAction {
 
 	/**
 	 * set duration in milliseconds
-	 * @param duration
+	 * @param duration		duration of this step in milliseconds
 	 */
 	public void setDuration(Long duration) {
 		this.duration = duration;
@@ -200,7 +199,7 @@ public class TestStep extends TestAction {
 			return StepStatus.FAILED;
 		} 
 		for (TestAction action: stepActions) {
-			if ((action instanceof TestStep && ((TestStep) action).getStepStatus() != StepStatus.SUCCESS)
+			if ((action instanceof TestStep step && step.getStepStatus() != StepStatus.SUCCESS)
 					|| Boolean.TRUE.equals(action.getFailed())) {
 				return StepStatus.WARNING;
 			}
@@ -288,15 +287,10 @@ public class TestStep extends TestAction {
 	}
 	private int getSnapshotIndex(int multiplier) {
 		int idx = (position + 1) * multiplier;
-		if (getParent() instanceof TestStep) {
-			idx += ((TestStep)getParent()).getSnapshotIndex(multiplier * 10);
+		if (getParent() instanceof TestStep parentTestStep) {
+			idx += parentTestStep.getSnapshotIndex(multiplier * 10);
 		} 
 		return idx;
-	}
-	
-	@Override
-	public String toString() {
-		return toString(0);
 	}
 	
 	@Override
@@ -304,7 +298,7 @@ public class TestStep extends TestAction {
 		String currentIndent = StringUtils.repeat(" ", spaces);
 		StringBuilder testStepRepr = new StringBuilder(String.format("Step %s\n", getName()));
 		for (TestAction testAction: getStepActions()) {
-			testStepRepr.append(currentIndent + "  - " + testAction.toString(spaces + 2) + "\n");
+			testStepRepr.append(currentIndent).append("  - ").append(testAction.toString(spaces + 2)).append("\n");
 		}
 		
 		return testStepRepr.toString().trim();
@@ -358,7 +352,7 @@ public class TestStep extends TestAction {
 		List<Snapshot> snaps = new ArrayList<>(snapshots);
 
 		if (fromSubSteps) {
-			for (TestAction subStep : stepActions.stream().filter(a -> a instanceof TestStep).collect(Collectors.toList())) {
+			for (TestAction subStep : stepActions.stream().filter(TestStep.class::isInstance).toList()) {
 				snaps.addAll(((TestStep) subStep).getSnapshots(fromSubSteps));
 			}
 		}
@@ -372,7 +366,6 @@ public class TestStep extends TestAction {
 	
 	/**
 	 * Returns the list of files referenced by this test step and sub-steps
-	 * @return
 	 */
 	public List<FileContent> getAllAttachments() {
 		return getAllAttachments(false);
@@ -382,7 +375,6 @@ public class TestStep extends TestAction {
 	 * Returns the list of files referenced by this test step and sub-steps
 	 * @param onlyPictureOfSnapshots		If true, the HTML file linked to snapshot won't be returned
 	 * @param requestedSnapshotCheckTypes   If not empty, only returns Snapshot files whose SnapshotCheckType correspond to this value
-	 * @return
 	 */
 	public List<FileContent> getAllAttachments(boolean onlyPictureOfSnapshots, SnapshotCheckType ... requestedSnapshotCheckTypes) {
 		List<FileContent> usedFiles = new ArrayList<>();
@@ -400,13 +392,13 @@ public class TestStep extends TestAction {
 			}
 		}
 
-		usedFiles.addAll(getFiles().stream().map(GenericFile::getFileContent).collect(Collectors.toList()));
-		usedFiles.addAll(getHarCaptures().stream().map(HarCapture::getFileContent).collect(Collectors.toList()));
+		usedFiles.addAll(getFiles().stream().map(GenericFile::getFileContent).toList());
+		usedFiles.addAll(getHarCaptures().stream().map(HarCapture::getFileContent).toList());
 		
 		// add attachments declared in sub-steps
-		for (TestAction subStep: stepActions.stream().filter(a -> a instanceof TestStep).collect(Collectors.toList())) {
+		for (TestAction subStep: stepActions.stream().filter(TestStep.class::isInstance).toList()) {
 			usedFiles.addAll(((TestStep)subStep).getAllAttachments(onlyPictureOfSnapshots, requestedSnapshotCheckTypes));
-			usedFiles.addAll(((TestStep)subStep).getFiles().stream().map(GenericFile::getFileContent).collect(Collectors.toList()));
+			usedFiles.addAll(((TestStep)subStep).getFiles().stream().map(GenericFile::getFileContent).toList());
 		}
 
 		return usedFiles;
@@ -414,8 +406,8 @@ public class TestStep extends TestAction {
 	
 	/**
 	 * move attachments from "before-" folder to outputDirectory folder
-	 * @param outputDirectory
-	 * @throws IOException 
+	 * @param outputDirectory		where to move attachments
+	 * @throws IOException 			if something goes wrong
 	 */
 	public void moveAttachments(String outputDirectory) throws IOException {
 		
@@ -430,13 +422,13 @@ public class TestStep extends TestAction {
 				try {
 					snapshot.relocate(outputDirectory);
 				} catch (IOException e) {
-					logger.error("Cannot relocate snapshot: " + e.getMessage());
+					logger.error("Cannot relocate snapshot: {}", e.getMessage());
 				}
 			}
 		}
 	
 		// move attachments in sub-steps
-		for (TestAction subStep: stepActions.stream().filter(a -> a instanceof TestStep).collect(Collectors.toList())) {
+		for (TestAction subStep: stepActions.stream().filter(TestStep.class::isInstance).toList()) {
 			((TestStep)subStep).moveAttachments(outputDirectory);
 		}
 	
@@ -466,7 +458,7 @@ public class TestStep extends TestAction {
 	 * @deprecated use 'getRootCause' instead
 	 * @return
 	 */
-	@Deprecated
+	@Deprecated(forRemoval = true)
 	public RootCause getErrorCause() {
 		return getRootCause();
 	}
@@ -479,8 +471,8 @@ public class TestStep extends TestAction {
 			return errorCause;
 		} 
 		for (TestAction action: stepActions) {
-			if ((action instanceof TestStep && ((TestStep) action).getRootCause() != null)) {
-				return ((TestStep) action).getRootCause();
+			if ((action instanceof TestStep step && step.getRootCause() != null)) {
+				return step.getRootCause();
 			}
 		}
 		
@@ -490,16 +482,16 @@ public class TestStep extends TestAction {
 
 	/**
 	 * @deprecated use getRootCauseDetails instead
-	 * @return
+	 *
 	 */
-	@Deprecated
+	@Deprecated(forRemoval = true)
 	public String getErrorCauseDetails() {
 		return getRootCauseDetails();
 	}
 	
 	/**
 	 * Returns the error cause detail of the step or any sub step
-	 * @return
+	 * @return		root cause details
 	 */
 	public String getRootCauseDetails() {
 		if (getStepStatus() == StepStatus.SUCCESS) {
@@ -509,8 +501,8 @@ public class TestStep extends TestAction {
 			return errorCauseDetails;
 		} 
 		for (TestAction action: stepActions) {
-			if ((action instanceof TestStep && ((TestStep) action).getRootCause() != null)) {
-				return ((TestStep) action).getRootCauseDetails();
+			if ((action instanceof TestStep step && step.getRootCause() != null)) {
+				return step.getRootCauseDetails();
 			}
 		}
 		return errorCauseDetails;
@@ -553,9 +545,7 @@ public class TestStep extends TestAction {
 		step.startDate = startDate;
 		step.videoTimeStamp = videoTimeStamp;
 		step.harCaptures = new ArrayList<>();
-		for (HarCapture har: harCaptures) {
-			step.harCaptures.add(har);
-		}
+        step.harCaptures.addAll(harCaptures);
 		step.actionException = actionException;
 		if (actionException != null) {
 			step.actionExceptionMessage = encodeString(ExceptionUtility.getExceptionMessage(actionException), format);
@@ -589,7 +579,7 @@ public class TestStep extends TestAction {
 
 	/**
 	 * Returns the action name as concatenation of class + method name
-	 * @return
+	 * @return		full action name
 	 */
 	public String getFullActionName() {
 		return getOrigin() != null ? getOrigin().getSimpleName() + "." + getAction(): getAction();

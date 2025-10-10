@@ -19,7 +19,7 @@ package com.seleniumtests.reporter.logger;
 
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.htmlelements.Element;
@@ -57,7 +57,7 @@ public class TestAction {
 
 
 	protected String action;			// "click", "sendKeys", ...
-	private Element element;		// name of the element on which action occurs
+	private final Element element;		// name of the element on which action occurs
 	protected Class<?> origin;		// page / scenario on which action is performed
 	
 	/**
@@ -108,9 +108,9 @@ public class TestAction {
 		this.name = name; // it's the action performed, with dataset
 		this.failed = failed;
 		this.pwdToReplace = pwdToReplace.stream()
-					.filter(s -> s != null)
+					.filter(Objects::nonNull)
 					.filter(s -> s.length() > TestStepManager.MIN_PASSWORD_LENGTH)
-					.collect(Collectors.toList());
+					.toList();
 
 		this.action = action; // it's the action performed, without dataset
 		this.element = element;
@@ -121,7 +121,7 @@ public class TestAction {
 
 	/**
 	 * Get the name of the action, replacing passwords
-	 * @return
+	 * @return		the name of the action
 	 */
 	public String getName() {
 		String newName = name;
@@ -190,7 +190,7 @@ public class TestAction {
 		actionJson.put("name", getName());
 
 		// TestAction do not receive the exception when it failed
-		if (this instanceof TestAction && parent != null) {
+		if (parent != null) {
 			actionJson.put("exception", parent.actionException == null ? null : parent.actionException.getClass().getName());
 			actionJson.put("exceptionMessage", parent.actionException == null ? null : ExceptionUtility.getExceptionMessage(parent.actionException).trim());
 		} else {
@@ -221,7 +221,8 @@ public class TestAction {
 	protected List<String> encodePasswords(List<String> passwords, String format) {
 		return passwords
 				.stream()
-				.map(p -> encodeString(p, format)).collect(Collectors.toList());
+				.map(p -> encodeString(p, format))
+				.toList();
 	}
 
 	public TestAction encode(String format) {
@@ -239,7 +240,7 @@ public class TestAction {
 		}
 		encodedAction.durationToExclude = durationToExclude;
 		if (actionException != null) {
-			encodedAction.actionExceptionMessage = encodeString(ExceptionUtility.getExceptionMessage(actionException), format);;
+			encodedAction.actionExceptionMessage = encodeString(ExceptionUtility.getExceptionMessage(actionException), format);
 		}
 		return encodedAction;
 	}
