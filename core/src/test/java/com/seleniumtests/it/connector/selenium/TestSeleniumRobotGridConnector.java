@@ -361,7 +361,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 
 		String reply;
 		if (OSUtility.isWindows()) {
-			reply = connector.executeCommand("powershell.exe", "Write-Host 'hello'");
+			reply = connector.executeCommand("powershell.exe", "Write-Host \"hello\"");
 		} else {
 			reply = connector.executeCommand("echo", "hello");
 		}
