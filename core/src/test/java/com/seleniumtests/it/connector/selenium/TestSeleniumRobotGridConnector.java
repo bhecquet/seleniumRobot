@@ -233,7 +233,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 //	}
 
 	@Test(groups={"it"})
-	public void testGetMouseCoordinates() throws ClientProtocolException, IOException {
+	public void testGetMouseCoordinates() {
 		Point coords = connector.getMouseCoordinates();
 		Assert.assertNotEquals(coords, new Point(0, 0));
 		
@@ -242,7 +242,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 		verify(gridLogger, never()).error(anyString());
 	}
 	@Test(groups={"it"})
-	public void testLeftClick() throws ClientProtocolException, IOException {
+	public void testLeftClick() {
 		connector.leftClic(100, 100);
 		
 		// no error encountered
@@ -250,7 +250,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 		verify(gridLogger, never()).error(anyString());
 	}
 	@Test(groups={"it"})
-	public void testLeftClickMainScreen() throws ClientProtocolException, IOException {
+	public void testLeftClickMainScreen() {
 		connector.leftClic(true, 100, 100);
 		
 		// no error encountered
@@ -259,7 +259,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testDoubleClick() throws ClientProtocolException, IOException {
+	public void testDoubleClick() {
 		connector.doubleClick(100, 100);
 		
 		// no error encountered
@@ -268,7 +268,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testDoubleClickMainScreen() throws ClientProtocolException, IOException {
+	public void testDoubleClickMainScreen() {
 		connector.doubleClick(true, 100, 100);
 		
 		// no error encountered
@@ -277,7 +277,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testRightClick() throws ClientProtocolException, IOException {
+	public void testRightClick() {
 		connector.rightClic(100, 100);
 		
 		// no error encountered
@@ -287,7 +287,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	
 	
 	@Test(groups={"it"})
-	public void testRightClickMainScreen() throws ClientProtocolException, IOException {
+	public void testRightClickMainScreen() {
 		connector.rightClic(true, 100, 100);
 		
 		// no error encountered
@@ -296,7 +296,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testDesktopScreenshot() throws ClientProtocolException, IOException {
+	public void testDesktopScreenshot() throws IOException {
 		
 		new File("d:\\tmp\\out.png").delete();
 		FileUtility.writeImage("d:\\tmp\\out.png", ImageProcessor.loadFromB64String(connector.captureDesktopToBuffer()));
@@ -307,7 +307,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testDesktopScreenshotMainScreen() throws ClientProtocolException, IOException {
+	public void testDesktopScreenshotMainScreen() throws IOException {
 		
 		new File("d:\\tmp\\out.png").delete();
 		FileUtility.writeImage("d:\\tmp\\out.png", ImageProcessor.loadFromB64String(connector.captureDesktopToBuffer(true)));
@@ -318,8 +318,8 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	}
 
 	@Test(groups={"it"})
-	public void testSendKeys() throws ClientProtocolException, IOException {
-		connector.sendKeysWithKeyboard(Arrays.asList(KeyEvent.VK_F1));
+	public void testSendKeys() {
+		connector.sendKeysWithKeyboard(List.of(KeyEvent.VK_F1));
 		
 		// no error encountered
 		verify(gridLogger, never()).warn(anyString());
@@ -327,7 +327,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testdisplayRunningStep() throws ClientProtocolException, IOException {
+	public void testdisplayRunningStep()  {
 		connector.startVideoCapture();
 		connector.displayRunningStep("coucou");
 		WaitHelper.waitForMilliSeconds(5000);
@@ -339,7 +339,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testWriteText() throws ClientProtocolException, IOException {
+	public void testWriteText() {
 		connector.writeText("foo");
 		
 		// no error encountered
@@ -348,7 +348,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testKillProcess() throws ClientProtocolException, IOException {
+	public void testKillProcess() {
 		connector.killProcess("foo");
 		
 		// no error encountered
@@ -357,7 +357,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testExecuteCommand() throws ClientProtocolException, IOException {
+	public void testExecuteCommand() {
 
 		String reply;
 		if (OSUtility.isWindows()) {
@@ -374,15 +374,15 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	}
 
 	@Test(groups={"it"})
-	public void testGetProcessList() throws ClientProtocolException, IOException {
+	public void testGetProcessList() {
 		
 		List<Integer> processes = connector.getProcessList("conhost");
-		
-		Assert.assertTrue(processes.size() > 0);
+
+        Assert.assertFalse(processes.isEmpty());
 	}
 	
 	@Test(groups={"it"})
-	public void testVideoCapture() throws ClientProtocolException, IOException {
+	public void testVideoCapture() throws IOException {
 
 		Files.deleteIfExists(Paths.get("d:\\tmp\\out.avi"));
 		Files.deleteIfExists(Paths.get("d:\\tmp\\out.mp4"));
