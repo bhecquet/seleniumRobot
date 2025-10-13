@@ -1234,10 +1234,13 @@ public class TestSeleniumTestContext extends GenericTest {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setCustomTestReports(null);
 		List<ReportInfo> reportInfos = SeleniumTestsContextManager.getThreadContext().getCustomTestReports();
-		Assert.assertEquals(reportInfos.size(), 1);
+		Assert.assertEquals(reportInfos.size(), 2);
 		Assert.assertEquals(reportInfos.get(0).getExtension(), ".xml");
 		Assert.assertEquals(reportInfos.get(0).getTemplatePath(), "reporter/templates/report.perf.vm");
 		Assert.assertEquals(reportInfos.get(0).getPrefix(), "PERF");
+		Assert.assertEquals(reportInfos.get(1).getExtension(), ".json");
+		Assert.assertEquals(reportInfos.get(1).getTemplatePath(), "reporter/templates/report.test.json.vm");
+		Assert.assertEquals(reportInfos.get(1).getPrefix(), "step");
 	}
 	
 	@Test(groups="ut context")
