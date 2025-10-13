@@ -310,6 +310,7 @@ public class TestStep extends TestAction {
 		
 		stepJSon.put("name", getName());
 		stepJSon.put("duration", getDuration());
+		stepJSon.put("rawDuration", duration); // duration between the start and end timestamp. Technical durations are not removed
 		stepJSon.put("date", startDate);
 		stepJSon.put("videoTimeStamp", videoTimeStamp);
 		stepJSon.put("type", "step");
