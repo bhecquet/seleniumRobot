@@ -4,12 +4,9 @@ package com.seleniumtests.ut.util.video;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 
 import org.apache.commons.io.FileUtils;
 import org.testng.Assert;
@@ -34,7 +31,6 @@ public class TestVideoUtils extends GenericTest {
 	
 	/**
 	 * Test invalid file, no exception should be raised
-	 * @throws IOException
 	 */
 	@Test(groups= {"ut"})
 	public void testReadAviInvalidFile() throws IOException {
@@ -53,7 +49,6 @@ public class TestVideoUtils extends GenericTest {
 	
 	/**
 	 * Check a picture is extracted for each test step
-	 * @throws IOException
 	 */
 	@Test(groups= {"ut"})
 	public void testReadAvi() throws IOException {
@@ -75,7 +70,6 @@ public class TestVideoUtils extends GenericTest {
 	
 	/**
 	 * Check no error is raised and no picture is extracted if timestamp is out of video
-	 * @throws IOException
 	 */
 	@Test(groups= {"ut"})
 	public void testReadAviTimestampOutsideVideo() throws IOException {
@@ -96,7 +90,6 @@ public class TestVideoUtils extends GenericTest {
 	
 	/**
 	 * Check no picture is extracted for "Test end" step
-	 * @throws IOException
 	 */
 	@Test(groups= {"ut"})
 	public void testReadAviLastStep() throws IOException {
@@ -117,7 +110,6 @@ public class TestVideoUtils extends GenericTest {
 	
 	/**
 	 * Check the case where several steps have the same timestamp. In this case, only the last step gets a picture
-	 * @throws IOException
 	 */
 	@Test(groups= {"ut"})
 	public void testReadAviSeveralStepsWithSameTimeStamp() throws IOException {

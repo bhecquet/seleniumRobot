@@ -28,7 +28,7 @@ import com.seleniumtests.uipage.PageObject;
 
 public class ScenarioLogger {
 	
-	private Logger logger;
+	private final Logger logger;
 	
 	private ScenarioLogger(Logger logger) {
 		this.logger = logger;
@@ -54,7 +54,7 @@ public class ScenarioLogger {
     
     /**
      * Kept for compatibility with TestLogging
-     * @param message
+     * @param message	message to log
      */
     public void warning(String message) {
         warn(message);
@@ -63,7 +63,7 @@ public class ScenarioLogger {
     /**
      * Write warning to logger and current test step
      *
-     * @param  message
+     * @param  message	message to log
      */
     public void warn(Object message) {
     	logMessage("Warning: " + cleanMessage(message), MessageType.WARNING);
@@ -73,7 +73,7 @@ public class ScenarioLogger {
     /**
      * Write error to logger and current test step
      *
-     * @param  message
+     * @param  message		message to log
      */
     public void error(Object message) { 
         logMessage(cleanMessage(message), MessageType.ERROR);
@@ -87,7 +87,7 @@ public class ScenarioLogger {
     /**
      * Write log message to logger and current test step
      *
-     * @param  message
+     * @param  message		message to log
      */
     public void log(final String message) {
         logMessage(message, MessageType.LOG);
@@ -123,14 +123,14 @@ public class ScenarioLogger {
     }
     public void logTestInfo(String key, Info value, ITestResult testResult) {
     	TestNGResultUtils.setTestInfo(testResult, key, value);
-    	logger.info(String.format("Storing into test result %s: %s", key, value.getInfo()));
+    	logger.info("Storing into test result {}: {}", key, value.getInfo());
     }
 
     /**
      * Log to current step (root or sub-step)
      * if none found, get the current root step or the previous root step
-     * @param message
-     * @param messageType
+     * @param message		message to log
+     * @param messageType	Error, warning, ...
      */
     private void logMessage(final String message, final MessageType messageType) {
 
@@ -148,8 +148,8 @@ public class ScenarioLogger {
 
 	/**
 	 * Log network capture in "Test end" step
-	 * @param har
-	 * @param name
+	 * @param har		HAR object to log
+	 * @param name		name of this HAR in report
 	 */
     public void logNetworkCapture(Har har, String name) {
 
@@ -161,7 +161,7 @@ public class ScenarioLogger {
     		try {
     			runningStep.addNetworkCapture(new HarCapture(har, name));
 			} catch (IOException e) {
-				logger.error("cannot create network capture file: " + e.getMessage(), e);
+				logger.error("cannot create network capture file: {}", e.getMessage(), e);
 			} catch (NullPointerException e) {
 				logger.error("HAR capture is null");
 			}
@@ -183,11 +183,11 @@ public class ScenarioLogger {
 	 *
 	 * @param file            file to log
 	 * @param description	a comment for the file
-	 * @param move
+	 * @param move			whether file will be moved to result folder
 	 *
-	 * Deprecated: use logFile(File file, String description, GenericFile.FileOperation fileOperation) instead
+	 * @deprecated : use logFile(File file, String description, GenericFile.FileOperation fileOperation) instead
 	 */
-	@Deprecated
+	@Deprecated(forRemoval = true)
 	public void logFile(File file, String description, boolean move) {
     	logFile(file, description, move ? GenericFile.FileOperation.MOVE: GenericFile.FileOperation.KEEP);
     }
@@ -217,8 +217,8 @@ public class ScenarioLogger {
     
     /**
      * Log the file into the "Test end" step
-     * @param file
-     * @param description
+     * @param file			file to record
+     * @param description	what the file represents
      */
     public FileContent logFileToTestEnd(File file, String description) {
     	
@@ -286,47 +286,48 @@ public class ScenarioLogger {
 	    	}
 	    	
 	    	if (runningStep != null) {
-	    		try {
-	    			String displayedScreenshotName = screenshotName == null ? "": "-" + screenshotName;
-	    			runningStep.addSnapshot(new Snapshot(screenshot, String.format("drv:%s%s", driverName, displayedScreenshotName), checkSnapshot), 
-	    					SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getTestSteps().size(),
-	    					screenshotName);
-	    		} catch (FileNotFoundException e) {
-	    			logger.error("screenshot is null");
-	    		}
-	    	}
+				addSnapshotToScreenshot(screenshot, screenshotName, driverName, checkSnapshot, runningStep);
+			}
     	} catch (IndexOutOfBoundsException e) {
     		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
     	}
     }
-    
-    public void logScreenshot(final ScreenShot screenshot) {
+
+	private void addSnapshotToScreenshot(ScreenShot screenshot, String screenshotName, String driverName, SnapshotCheckType checkSnapshot, TestStep runningStep) {
+		try {
+			String displayedScreenshotName = screenshotName == null ? "": "-" + screenshotName;
+			runningStep.addSnapshot(new Snapshot(screenshot, String.format("drv:%s%s", driverName, displayedScreenshotName), checkSnapshot),
+					SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getTestSteps().size(),
+					screenshotName);
+		} catch (FileNotFoundException e) {
+			logger.error("screenshot is null");
+		}
+	}
+
+	public void logScreenshot(final ScreenShot screenshot) {
     	logScreenshot(screenshot, null, WebUIDriver.getCurrentWebUiDriverName());
     }
-    
-    /**
-     * 
-     */
 
 	/**
 	 * Method for logging error on actions (e.g: a click fails)
 	 * It logs some lines of the stack to know where problem occured more precisely
 	 * even if the error is then catched. 
-	 * @param throwable
+	 * @param throwable		the error
 	 */
 	public void logActionError(Throwable throwable) {
 		if (throwable != null) {
 			StackTraceElement[] s1 = throwable.getStackTrace();
 			
 			StringBuilder string = new StringBuilder(throwable.getMessage() == null ? "null": throwable.getMessage());
-			for (int x = 0; x < s1.length; x++) {
-				try {
-					if (PageObject.class.isAssignableFrom(Class.forName(s1[x].getClassName()))) {
-						string.append("\nat " + s1[x].toString());
-					}
-				} catch (ClassNotFoundException e) {
-				}
-			}
+            for (StackTraceElement stackTraceElement : s1) {
+                try {
+                    if (PageObject.class.isAssignableFrom(Class.forName(stackTraceElement.getClassName()))) {
+                        string.append("\nat ").append(stackTraceElement.toString());
+                    }
+                } catch (ClassNotFoundException e) {
+					// ignore
+                }
+            }
 			warn(string);
 		}
 	}

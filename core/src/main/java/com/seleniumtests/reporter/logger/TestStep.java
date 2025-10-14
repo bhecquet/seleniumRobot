@@ -57,7 +57,8 @@ public class TestStep extends TestAction {
 	public static final String COMPOSITE_STEP_PREFIX = "Composite ";
 	private List<TestAction> stepActions;
 	private Long duration;
-	private OffsetDateTime startDate;
+	private OffsetDateTime startDate;		// startDate is the date where actions on the step really start (capture done)
+											// whereas timestamp is the instant where TestStep was created
 	private long videoTimeStamp;
 	private List<HarCapture> harCaptures;
 	private List<GenericFile> files;
@@ -167,7 +168,7 @@ public class TestStep extends TestAction {
 	}
 	
 	public void updateDuration() {
-		duration = OffsetDateTime.now().toInstant().toEpochMilli() - startDate.toInstant().toEpochMilli();
+		duration = OffsetDateTime.now().toInstant().toEpochMilli() - timestamp.toInstant().toEpochMilli();
 		
 	}
 	

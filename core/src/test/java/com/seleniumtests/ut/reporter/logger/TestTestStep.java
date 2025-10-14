@@ -33,6 +33,7 @@ import java.util.List;
 import com.seleniumtests.reporter.logger.*;
 import com.seleniumtests.util.har.Har;
 import com.seleniumtests.util.har.Page;
+import com.seleniumtests.util.helper.WaitHelper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
@@ -1049,6 +1050,16 @@ public class TestTestStep extends GenericTest {
 		Snapshot snapshot = new Snapshot(screenshot, "main", SnapshotCheckType.TRUE);
 		step.addSnapshot(snapshot, 0, "name");
 		Assert.assertEquals(step.getDuration(), (Long) 4300L);
+	}
+
+	@Test(groups = { "ut" })
+	public void testUpdateDuration() {
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
+		WaitHelper.waitForSeconds(1);
+		step.updateDuration();
+		step.setStartDate();
+		// check duration is computed on timestamp, not startDate
+		Assert.assertTrue(step.getDuration() >= 1000);
 	}
 
 	@Test(groups = { "ut" })

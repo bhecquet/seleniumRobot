@@ -102,7 +102,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 	
 	/**
 	 * Generates report for a single test
-	 * @param testResult
+	 * @param testResult		result of this test
 	 */
 	private void generateTestReport(ITestResult testResult, ReportInfo reportInfo) {
 		try {
@@ -114,8 +114,8 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			
 			String reportFormat = reportInfo.getExtension().substring(1);
 			Long testDuration = 0L;
-			Integer errors = 0;
-			Integer failures = 0;
+			int errors = 0;
+			int failures = 0;
 			String failedStep = "";
 			List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
 			List<TestStep> newTestSteps = new ArrayList<>();
@@ -124,7 +124,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 					testDuration += step.getDuration();
 					if (Boolean.TRUE.equals(step.getFailed()) && !step.isTestEndStep()) {
 						failedStep = step.getName();
-						if (step.getActionException() != null && step.getActionException() instanceof AssertionError) {
+						if (step.getActionException() instanceof AssertionError) {
 							failures++;
 						} else {
 							errors++;
@@ -132,10 +132,10 @@ public class CustomReporter extends CommonReporter implements IReporter {
 					}
 					
 					// encode each step
-					if ("xml".equalsIgnoreCase(reportFormat.toLowerCase()) 
-							|| "json".equalsIgnoreCase(reportFormat.toLowerCase())
-							|| "html".equalsIgnoreCase(reportFormat.toLowerCase())
-							|| "csv".equalsIgnoreCase(reportFormat.toLowerCase())
+					if ("xml".equalsIgnoreCase(reportFormat)
+							|| "json".equalsIgnoreCase(reportFormat)
+							|| "html".equalsIgnoreCase(reportFormat)
+							|| "csv".equalsIgnoreCase(reportFormat)
 							) {
 						newTestSteps.add(step.encode(reportFormat.toLowerCase()));
 					} else {
@@ -183,10 +183,10 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			context.put("hostname", testResult.getHost() == null ? "": testResult.getHost());
 			context.put("suiteName", StringUtility.encodeString(TestNGResultUtils.getVisualTestName(testResult), reportFormat.toLowerCase()));
 			context.put("className", testResult.getTestClass().getName());
-			context.put("tests", newTestSteps == null ? 0: newTestSteps.size());
+			context.put("tests", newTestSteps.size());
 			context.put("duration", testDuration / 1000.0);
-			context.put("time", newTestSteps == null || newTestSteps.size() == 0 ? testResult.getStartMillis(): newTestSteps.get(0).getStartDate().toInstant().toEpochMilli());
-			context.put("startDate", newTestSteps == null || newTestSteps.size() == 0 ? new Date(testResult.getStartMillis()): newTestSteps.get(0).getStartDate());
+			context.put("time", newTestSteps.isEmpty() ? testResult.getStartMillis(): newTestSteps.get(0).getTimestamp().toInstant().toEpochMilli());
+			context.put("startDate", newTestSteps.isEmpty() ? new Date(testResult.getStartMillis()): newTestSteps.get(0).getStartDate());
 			context.put("testSteps", newTestSteps);	
 			context.put("retries", TestNGResultUtils.getRetry(testResult) == null ? 0: TestNGResultUtils.getRetry(testResult));	
 			context.put("browser", seleniumTestsContext.getBrowser());	
@@ -202,8 +202,9 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			context.put("parameters", seleniumTestsContext.getContextDataMap());
 			context.put("stacktrace", stack);
 			context.put("failedStep", StringUtility.encodeString(failedStep, reportFormat.toLowerCase()));
-			String logs = SeleniumRobotLogger.getTestLogs(getTestName(testResult));
-			logger.info("test name: " + getTestName(testResult));
+			String testName = getTestName(testResult);
+			String logs = SeleniumRobotLogger.getTestLogs(testName);
+			logger.info("test name: {}", testName);
 			getTestLogs(context, reportFormat, logs);
 
 			context.put("testInfos", TestNGResultUtils.getTestInfoEncoded(testResult, reportFormat));
@@ -220,7 +221,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			generatedFiles.add(fileName);
 			TestNGResultUtils.setCustomReportCreated(testResult, true);
 		} catch (Exception e) {
-			logger.error(String.format("Error generating test result %s: %s", TestNGResultUtils.getUniqueTestName(testResult), e.getMessage()));
+			logger.error("Error generating test result {}: {}", TestNGResultUtils.getUniqueTestName(testResult), e.getMessage());
 		}
 	}
 

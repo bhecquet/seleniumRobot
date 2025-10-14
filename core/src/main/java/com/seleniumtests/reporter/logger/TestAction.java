@@ -141,6 +141,9 @@ public class TestAction {
 	public OffsetDateTime getTimestamp() {
 		return timestamp;
 	}
+	public void setTimestamp(OffsetDateTime timestamp) {
+		this.timestamp = timestamp;
+	}
 
 	public Boolean getFailed() {
 		return failed;
