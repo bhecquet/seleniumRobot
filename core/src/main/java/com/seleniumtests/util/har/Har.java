@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 public class Har {
-    private Log log;
+    private final Log log;
 
     public Har() {
         log = new Log("1.2", new Creator());

@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Log {
-    private String version;
-    private Creator creator;
+    private final String version;
+    private final Creator creator;
 
-    private List<Entry> entries;
-    private List<Page> pages;
+    private final List<Entry> entries;
+    private final List<Page> pages;
 
     public Log(String version, Creator creator) {
         this.version = version;

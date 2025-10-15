@@ -1,8 +1,8 @@
 package com.seleniumtests.util.har;
 
 public class Header {
-    private String name;
-    private String value;
+    private final String name;
+    private final String value;
 
     public Header(String name, String value) {
         this.name = name;

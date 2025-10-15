@@ -1,6 +1,5 @@
 package com.seleniumtests.util.har;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -20,6 +19,6 @@ public class HarGenerator {
     }
 
     public void generate(File harFile) {
-
+        // nothing to do
     }
 }

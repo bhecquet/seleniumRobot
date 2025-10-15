@@ -3,15 +3,15 @@ package com.seleniumtests.util.har;
 import java.util.List;
 
 public class Response {
-    private int status;
-    private String statusText;
-    private String httpVersion;
-    private List<Header> headers;
-    private List<Cookie> cookies;
-    private Content content;
-    private String redirectURL;
-    private int headersSize;
-    private int bodySize;
+    private final int status;
+    private final String statusText;
+    private final String httpVersion;
+    private final List<Header> headers;
+    private final List<Cookie> cookies;
+    private final Content content;
+    private final String redirectURL;
+    private final int headersSize;
+    private final int bodySize;
 
     public Response(int status, String statusText, String httpVersion, List<Header> headers, List<Cookie> cookies, Content content, String redirectURL, int headersSize, int bodySize) {
         this.status = status;

@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Page {
-    private String startedDateTime;
+    private final String startedDateTime;
 
-    private String id;
-    private String title;
-    private List<PageTiming> pageTimings = new ArrayList<>();
+    private final String id;
+    private final String title;
+    private final List<PageTiming> pageTimings = new ArrayList<>();
 
     public Page(String startedDateTime, String id, String title) {
         this.startedDateTime = startedDateTime;

@@ -2,10 +2,10 @@ package com.seleniumtests.util.har;
 
 public class WebSocketMessage {
 	
-	private String type;
-	private double time;
-	private int opcode;
-	private String data;
+	private final String type;
+	private final double time;
+	private final int opcode;
+	private final String data;
 	
 	public WebSocketMessage(String type, double time, int opcode, String data) {
 		this.type = type;

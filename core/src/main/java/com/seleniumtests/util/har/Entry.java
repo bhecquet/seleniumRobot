@@ -4,13 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Entry {
-    private String startedDateTime;
-    private Request request;
-    private Response response;
-    private Timing timings;
-    private int time;
-    private String pageref;
-    private Map<String, String> cache = new HashMap<>();
+    private final String startedDateTime;
+    private final Request request;
+    private final Response response;
+    private final Timing timings;
+    private final int time;
+    private final String pageref;
+    private final Map<String, String> cache = new HashMap<>();
 
     public Entry(String pageref, String startedDateTime, Request request, Response response, Timing timings, int time) {
         this.pageref = pageref;

@@ -1,13 +1,13 @@
 package com.seleniumtests.util.har;
 
 public class Timing {
-    private double blocked;
-    private double dns;
-    private double connect;
-    private double ssl;
-    private double send;
-    private double wait;
-    private double receive;
+    private final double blocked;
+    private final double dns;
+    private final double connect;
+    private final double ssl;
+    private final double send;
+    private final double wait;
+    private final double receive;
 
     public Timing(double blocked, double dns, double connect, double ssl, double send, double wait, double receive) {
         this.blocked = blocked;

@@ -1,9 +1,9 @@
 package com.seleniumtests.util.har;
 
 public class Content {
-    private String mimeType;
-    private int size;
-    private String text;
+    private final String mimeType;
+    private final int size;
+    private final String text;
 
     public Content(String mimeType, int size, String text) {
         this.mimeType = mimeType;
