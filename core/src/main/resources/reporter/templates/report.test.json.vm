@@ -1,10 +1,40 @@
 #set($stepIdx = 0)
+#set($testInfoIdx = 0)
 #set($stepsSize = $testSteps.size())
+#set($testInfoSize = $testInfos.size())
 {
+	"gridnode": "$gridnode",
+	"errors": $errors,
+	"failures": $failures,
+	"hostname": "$hostname",
+	"name": "$suiteName",
+	"stepNumber": $tests,
+	"duration": $duration,
+	"startTime": $time,
+	"browser": "$browser",
+	"appVersion": "$version",
+	"coreVersion": "$coreVersion",
+	"retries": $retries,
+	"mobileApp": "$mobileApp",
+	"device": "$device",
+	"platform": "$platform",
+	"failedStep": "$failedStep",
+	"infos": [
+		#foreach ($testInfo in $testInfos.entrySet())
+			#set($testInfoIdx = $testInfoIdx + 1)
+			{
+				"key": "$testInfo.key",
+				"value": "$testInfo.value"
+			}#if( $testInfoIdx != $testInfoSize),#end
+		#end
+	],
 	"steps": [
 		#foreach( $testStep in $testSteps )
 			#set($stepIdx = $stepIdx + 1)
 			$testStep.toJson()#if( $stepIdx != $stepsSize),#end
 		#end
+	],
+	"pageLoads": [
+
 	]
 }

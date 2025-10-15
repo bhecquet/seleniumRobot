@@ -23,10 +23,9 @@ public class TestPageObject extends GenericDriverTest {
 	
 	/**
 	 * issue #273: check we get a readable error message when browser type is not set
-	 * @throws Exception
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
-	public void testDriverNull() throws Exception {
+	public void testDriverNull() {
 		new DriverTestPage(true, "http://foo.bar.com");
 	}
 

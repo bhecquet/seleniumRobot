@@ -17,13 +17,9 @@
  */
 package com.seleniumtests.it.util;
 
-import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
-import com.seleniumtests.driver.screenshots.SnapshotTarget;
-import com.seleniumtests.it.driver.support.pages.DriverTestPageShadowDom;
 import com.seleniumtests.reporter.logger.Snapshot;
-import com.seleniumtests.uipage.ByC;
-import com.seleniumtests.uipage.htmlelements.HtmlElement;
+import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.uipage.htmlelements.ImageElement;
 import com.seleniumtests.uipage.htmlelements.TextFieldElement;
 import com.seleniumtests.util.imaging.ImageProcessor;
@@ -42,13 +38,12 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 
 public class TestPageObject extends GenericDriverTest {
 
 	
 	@Test(groups={"it"})
-	public void testResizeWindow() throws Exception {
+	public void testResizeWindow() {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*firefox");
 		driver = WebUIDriver.getWebDriver(true);
 		new DriverTestPage(true).resizeTo(600, 400);
@@ -59,10 +54,9 @@ public class TestPageObject extends GenericDriverTest {
 	
 	/**
 	 * issue #421: check snapshot is not done when user set captureSnapshot=false
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testSnapshotNotLogged() throws Exception {
+	public void testSnapshotNotLogged() {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*firefox");
 		SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(false);
 		driver = WebUIDriver.getWebDriver(true);
@@ -73,7 +67,7 @@ public class TestPageObject extends GenericDriverTest {
 
 	}
 	@Test(groups={"it"})
-	public void testSnapshotLogged() throws Exception {
+	public void testSnapshotLogged() {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*firefox");
 		SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(true);
 		driver = WebUIDriver.getWebDriver(true);
@@ -84,9 +78,29 @@ public class TestPageObject extends GenericDriverTest {
 		Assert.assertEquals(TestStepManager.getCurrentOrPreviousStep().getAllAttachments(true).size(), 1);
 		
 	}
+
+	@Test(groups={"it"})
+	public void testPageLoadTimeLogged() {
+		SeleniumTestsContextManager.getThreadContext().setBrowser("*chrome");
+		driver = WebUIDriver.getWebDriver(true);
+		DriverTestPage page = new DriverTestPage(true);
+		TestStep step1 = TestStepManager.getCurrentOrPreviousStep();
+		Assert.assertNotNull(step1.getPageLoadTime());
+		Assert.assertEquals(step1.getAction(), "openPage");
+		Assert.assertEquals(step1.getOrigin().getSimpleName(), "DriverTestPage");
+		Assert.assertTrue(step1.getPageLoadTime().getLoadTime() > 0.1);
+		Assert.assertTrue(step1.getPageLoadTime().getUrl().contains("test.html"));
+		Assert.assertTrue(step1.getPageLoadTime().getName().contains("loading of DriverTestPage took"));
+
+		page._getTextElementContent();
+		TestStep step2 = TestStepManager.getCurrentOrPreviousStep();
+
+		// no page has been loaded for this step
+		Assert.assertNull(step2.getPageLoadTime());
+	}
 	
 	@Test(groups={"it"})
-	public void testResizeWindowHeadless() throws Exception {
+	public void testResizeWindowHeadless() {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*htmlunit");
 		driver = WebUIDriver.getWebDriver(true);
 		new DriverTestPage(true);
@@ -99,7 +113,6 @@ public class TestPageObject extends GenericDriverTest {
 	/**
 	 * Check that when an element is excluded from snapshot, its size respects the device aspect ratio
 	 * Better use a screen at a zoom level > 100% to fully check
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testElementScreenshotWithExclusionUsingAspectRatio() throws Exception {

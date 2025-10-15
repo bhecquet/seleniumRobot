@@ -98,10 +98,10 @@ public class TestPageObject2 extends MockitoTest {
 	private CustomEventFiringWebDriver eventDriver;
 	private PageObject page;
 
-	private MockedStatic mockedWebUIDriver;
+	private MockedStatic<WebUIDriver> mockedWebUIDriver;
 
 	@BeforeMethod(groups = { "ut" })
-	private void init() throws IOException {
+	private void init() {
 
 		SeleniumTestsContextManager.getGlobalContext()
 				.setCucumberImplementationPackage("com.seleniumtests.ut.core.runner.cucumber");
@@ -114,8 +114,6 @@ public class TestPageObject2 extends MockitoTest {
 		when(driver.getCapabilities()).thenReturn(new ChromeOptions());
 		eventDriver = spy(new CustomEventFiringWebDriver(driver));
 
-//		when(eventDriver.switchTo()).thenReturn(target);
-//		when(target.alert()).thenReturn(alert);
 		when(driver.findElement(By.id("el"))).thenReturn(element);
 		when(driver.navigate()).thenReturn(navigation);
 		when(driver.getCurrentUrl()).thenReturn("http://foo");
@@ -129,7 +127,7 @@ public class TestPageObject2 extends MockitoTest {
 		when(driver.switchTo()).thenReturn(targetLocator);
 
 		mockedWebUIDriver = mockStatic(WebUIDriver.class);
-		mockedWebUIDriver.when(() -> WebUIDriver.getCurrentWebUiDriverName()).thenReturn("main");
+		mockedWebUIDriver.when(WebUIDriver::getCurrentWebUiDriverName).thenReturn("main");
 		mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean(), eq(BrowserType.CHROME), eq("main"), isNull()))
 				.thenReturn(eventDriver);
 		mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
@@ -153,7 +151,7 @@ public class TestPageObject2 extends MockitoTest {
 	}
 
 	@Test(groups = { "ut" })
-	public void testCapturePageSnapshotNoArguments() throws IOException {
+	public void testCapturePageSnapshotNoArguments() {
 		
 		TestStepManager.setCurrentRootTestStep(new TestStep("stub"));
 		page.setScreenshotUtil(screenshotUtil);
@@ -170,7 +168,7 @@ public class TestPageObject2 extends MockitoTest {
 	 * @throws IOException
 	 */
 	@Test(groups = { "ut" })
-	public void testCapturePageSnapshotWithCheck() throws IOException {
+	public void testCapturePageSnapshotWithCheck() {
 		
 		TestStepManager.setCurrentRootTestStep(new TestStep("stub"));
 		page.setScreenshotUtil(screenshotUtil);
@@ -185,7 +183,7 @@ public class TestPageObject2 extends MockitoTest {
 	}
 	
 	@Test(groups = { "ut" })
-	public void testCapturPageSnapshotWithCheckAndDelay() throws IOException {
+	public void testCapturePageSnapshotWithCheckAndDelay() {
 	
 		SeleniumTestsContextManager.getThreadContext().setSnapshotScrollDelay(100);
 		
@@ -198,10 +196,9 @@ public class TestPageObject2 extends MockitoTest {
 	
 	/**
 	 * scrollDelay is set, but snapshot is not performed for control
-	 * @throws IOException
 	 */
 	@Test(groups = { "ut" })
-	public void testCapturePageSnapshotWithoutCheckAndDelay() throws IOException {
+	public void testCapturePageSnapshotWithoutCheckAndDelay() {
 		
 		SeleniumTestsContextManager.getThreadContext().setSnapshotScrollDelay(100);
 		
@@ -215,11 +212,9 @@ public class TestPageObject2 extends MockitoTest {
 	/**
 	 * Capture page snapshot and sends it to selenium server. No name is provided
 	 * ScenarioException should be raised
-	 * 
-	 * @throws IOException
 	 */
 	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
-	public void testCapturePageSnapshotWithCheckNoName() throws IOException {
+	public void testCapturePageSnapshotWithCheckNoName() {
 
 		page.setScreenshotUtil(screenshotUtil);
 		page.capturePageSnapshot("", SnapshotCheckType.TRUE);
@@ -227,7 +222,7 @@ public class TestPageObject2 extends MockitoTest {
 	}
 	
 	@Test(groups = { "ut" })
-	public void testCaptureViewportSnapshotNoArguments() throws IOException {
+	public void testCaptureViewportSnapshotNoArguments() {
 		
 		TestStepManager.setCurrentRootTestStep(new TestStep("stub"));
 		page.setScreenshotUtil(screenshotUtil);
@@ -240,11 +235,9 @@ public class TestPageObject2 extends MockitoTest {
 	
 	/**
 	 * Capture viewport snapshot and sends it to selenium server
-	 * 
-	 * @throws IOException
 	 */
 	@Test(groups = { "ut" })
-	public void testCaptureViewportSnapshotWithCheck() throws IOException {
+	public void testCaptureViewportSnapshotWithCheck()  {
 		
 		TestStepManager.setCurrentRootTestStep(new TestStep("stub"));
 		page.setScreenshotUtil(screenshotUtil);
@@ -261,11 +254,9 @@ public class TestPageObject2 extends MockitoTest {
 	/**
 	 * Capture page snapshot and sends it to selenium server. No name is provided
 	 * ScenarioException should be raised
-	 * 
-	 * @throws IOException
 	 */
 	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
-	public void testCaptureViewportSnapshotWithCheckNoName() throws IOException {
+	public void testCaptureViewportSnapshotWithCheckNoName() {
 		
 		page.setScreenshotUtil(screenshotUtil);
 		page.captureViewportSnapshot("", SnapshotCheckType.TRUE);
@@ -273,7 +264,7 @@ public class TestPageObject2 extends MockitoTest {
 	}
 	
 	@Test(groups = { "ut" })
-	public void testCaptureDesktopSnapshotNoArguments() throws IOException {
+	public void testCaptureDesktopSnapshotNoArguments() {
 		
 		TestStepManager.setCurrentRootTestStep(new TestStep("stub"));
 		page.setScreenshotUtil(screenshotUtil);
@@ -286,11 +277,9 @@ public class TestPageObject2 extends MockitoTest {
 	
 	/**
 	 * Capture viewport snapshot and sends it to selenium server
-	 * 
-	 * @throws IOException
 	 */
 	@Test(groups = { "ut" })
-	public void testCaptureDesktopSnapshotWithCheck() throws IOException {
+	public void testCaptureDesktopSnapshotWithCheck() {
 		
 		TestStepManager.setCurrentRootTestStep(new TestStep("stub"));
 		TestStepManager.setCurrentRootTestStep(new TestStep("stub"));
@@ -308,11 +297,9 @@ public class TestPageObject2 extends MockitoTest {
 	/**
 	 * Capture page snapshot and sends it to selenium server. No name is provided
 	 * ScenarioException should be raised
-	 * 
-	 * @throws IOException
 	 */
 	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
-	public void testCaptureDesktopSnapshotWithCheckNoName() throws IOException {
+	public void testCaptureDesktopSnapshotWithCheckNoName()  {
 		
 		TestStepManager.setCurrentRootTestStep(new TestStep("stub"));
 		page.setScreenshotUtil(screenshotUtil);
@@ -322,11 +309,9 @@ public class TestPageObject2 extends MockitoTest {
 
 	/**
 	 * Capture element snapshot and sends it to selenium server
-	 * 
-	 * @throws IOException
 	 */
 	@Test(groups = { "ut" })
-	public void testCaptureElementSnapshotWithCheck() throws IOException {
+	public void testCaptureElementSnapshotWithCheck()  {
 		TestStepManager.setCurrentRootTestStep(new TestStep("stub"));
 		page.setScreenshotUtil(screenshotUtil);
 		page.captureElementSnapshot("img", new HtmlElement("", By.id("el")), SnapshotCheckType.TRUE);
@@ -340,7 +325,7 @@ public class TestPageObject2 extends MockitoTest {
 	}
 	
 	@Test(groups = { "ut" })
-	public void testCaptureElementSnapshotWithCheckAndDelay() throws IOException {
+	public void testCaptureElementSnapshotWithCheckAndDelay()  {
 		
 		SeleniumTestsContextManager.getThreadContext().setSnapshotScrollDelay(100);
 		
@@ -353,10 +338,9 @@ public class TestPageObject2 extends MockitoTest {
 	
 	/**
 	 * scrollDelay s set, but snapshot is not performed for control
-	 * @throws IOException
 	 */
 	@Test(groups = { "ut" })
-	public void testCaptureElementSnapshotWithoutCheckAndDelay() throws IOException {
+	public void testCaptureElementSnapshotWithoutCheckAndDelay() {
 		
 		SeleniumTestsContextManager.getThreadContext().setSnapshotScrollDelay(100);
 		
@@ -370,11 +354,9 @@ public class TestPageObject2 extends MockitoTest {
 	/**
 	 * Capture element snapshot and sends it to selenium server. No name is provided
 	 * ScenarioException should be raised
-	 * 
-	 * @throws IOException
 	 */
 	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
-	public void testCaptureElementSnapshotWithCheckNoName() throws IOException {
+	public void testCaptureElementSnapshotWithCheckNoName() {
 
 		page.setScreenshotUtil(screenshotUtil);
 		page.captureElementSnapshot("", new HtmlElement("", By.id("el")), SnapshotCheckType.TRUE);
@@ -394,44 +376,42 @@ public class TestPageObject2 extends MockitoTest {
 
 	/**
 	 * check we return to default content
-	 * 
-	 * @throws IOException
 	 */
 	@Test(groups = { "ut" })
-	public void testAcceptAlert() throws IOException {
+	public void testAcceptAlert()  {
 		page.acceptAlert();
 		Mockito.verify(alert).accept();
 		Mockito.verify(targetLocator).defaultContent();
 	}
 
 	@Test(groups = { "ut" })
-	public void testDismissAlert() throws IOException {
+	public void testDismissAlert() {
 		page.cancelConfirmation();
 		Mockito.verify(alert, times(2)).dismiss();
 		Mockito.verify(targetLocator).defaultContent();
 	}
 
 	@Test(groups = { "ut" })
-	public void testGoBack() throws IOException {
+	public void testGoBack() {
 		page.goBack();
 		verify(navigation).back();
 	}
 
 	@Test(groups = { "ut" })
-	public void testGoForward() throws IOException {
+	public void testGoForward() {
 		page.goForward();
 		verify(navigation).forward();
 	}
 
 	@Test(groups = { "ut" })
-	public void testSendKeysToField() throws IOException {
+	public void testSendKeysToField() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		page.sendKeysToField("textField", "foo");
 		verify(element).sendKeys("foo");
 	}
 
 	@Test(groups = { "ut" })
-	public void testSendRandomKeysToField() throws IOException {
+	public void testSendRandomKeysToField() {
 		ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
 
 		when(driver.findElement(By.id("text"))).thenReturn(element);
@@ -441,7 +421,7 @@ public class TestPageObject2 extends MockitoTest {
 	}
 
 	@Test(groups = { "ut" })
-	public void testClearHtmlElement() throws IOException {
+	public void testClearHtmlElement() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		page.clear("textField");
 		verify(element).clear();
@@ -449,16 +429,14 @@ public class TestPageObject2 extends MockitoTest {
 
 	/**
 	 * Only HtmlElement is supported
-	 * 
-	 * @throws IOException
 	 */
 	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
-	public void testClearPictureElement() throws IOException {
+	public void testClearPictureElement() {
 		page.clear("screenZone");
 	}
 
 	@Test(groups = { "ut" })
-	public void testSelectOption() throws IOException {
+	public void testSelectOption() {
 		when(driver.findElement(By.id("select"))).thenReturn(element);
 		when(element.getTagName()).thenReturn("select");
 		when(element.isDisplayed()).thenReturn(true);
@@ -473,16 +451,14 @@ public class TestPageObject2 extends MockitoTest {
 
 	/**
 	 * Only SelectList is supported
-	 * 
-	 * @throws IOException
 	 */
 	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
-	public void testSelectOptionNoSelectList() throws IOException {
+	public void testSelectOptionNoSelectList() {
 		page.selectOption("textField", "foo");
 	}
 
 	@Test(groups = { "ut" })
-	public void testClickTo() throws IOException {
+	public void testClickTo() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		PageObject nextPage = page.clickAndChangeToPage("textField", PageForActions.class);
 		verify(element).click();
@@ -490,13 +466,13 @@ public class TestPageObject2 extends MockitoTest {
 	}
 
 	@Test(groups = { "ut" })
-	public void testChangePage() throws IOException {
+	public void testChangePage() {
 		PageObject nextPage = page.changeToPage(PageForActions.class);
 		Assert.assertNotEquals(page, nextPage);
 	}
 
 	@Test(groups = { "ut" })
-	public void testClick() throws IOException {
+	public void testClick() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		PageObject nextPage = page.click("textField");
 		verify(element).click();
@@ -504,20 +480,20 @@ public class TestPageObject2 extends MockitoTest {
 	}
 
 	@Test(groups = { "ut" })
-	public void testDoubleClick() throws IOException {
+	public void testDoubleClick() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		page.doubleClick("textField");
 		verify((Interactive) eventDriver).perform(any());
 	}
 
 	@Test(groups = { "ut" })
-	public void testDoubleClickScreenZone() throws IOException {
+	public void testDoubleClickScreenZone() {
 		page.doubleClick("screenZone");
 		verify(PageForActions.screenZone).doubleClick();
 	}
 
 	@Test(groups = { "ut" })
-	public void testClickTableCell() throws IOException {
+	public void testClickTableCell() {
 		when(driver.findElement(By.id("table"))).thenReturn(element);
 		when(element.findElements(By.tagName("tr"))).thenReturn(Arrays.asList(row1));
 		when(row1.findElements(By.xpath(".//descendant::*[name()=\"th\" or name()=\"td\"]")))
@@ -529,11 +505,9 @@ public class TestPageObject2 extends MockitoTest {
 
 	/**
 	 * Only Table is supported
-	 * 
-	 * @throws IOException
 	 */
 	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
-	public void testClickTableCellNoTableElement() throws IOException {
+	public void testClickTableCellNoTableElement() {
 		page.clickTableCell(0, 0, "textField");
 	}
 
@@ -559,8 +533,8 @@ public class TestPageObject2 extends MockitoTest {
 	 */
 	@Test(groups = { "ut" }, expectedExceptions = CustomSeleniumTestsException.class)
 	public void testSwitchToNewWindowNoNewWindow() {
-		when(eventDriver.getWindowHandles()).thenReturn(new HashSet<>(Arrays.asList("123")))
-				.thenReturn(new HashSet<>(Arrays.asList("123")));
+		when(eventDriver.getWindowHandles()).thenReturn(new HashSet<>(List.of("123")))
+				.thenReturn(new HashSet<>(List.of("123")));
 		eventDriver.getCurrentHandles();
 		when(eventDriver.getWindowHandle()).thenReturn("123");
 		page.switchToNewWindow(1);
@@ -571,8 +545,8 @@ public class TestPageObject2 extends MockitoTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testSwitchToNewWindowNoNewWindowNoWait() {
-		when(eventDriver.getWindowHandles()).thenReturn(new HashSet<>(Arrays.asList("123")))
-				.thenReturn(new HashSet<>(Arrays.asList("123")));
+		when(eventDriver.getWindowHandles()).thenReturn(new HashSet<>(List.of("123")))
+				.thenReturn(new HashSet<>(List.of("123")));
 		eventDriver.getCurrentHandles();
 		when(eventDriver.getWindowHandle()).thenReturn("123");
 		page.switchToNewWindow(0);
@@ -583,8 +557,8 @@ public class TestPageObject2 extends MockitoTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testSwitchToMainWindow() {
-		when(eventDriver.getWindowHandles()).thenReturn(new HashSet<>(Arrays.asList("123")))
-				.thenReturn(new HashSet<>(Arrays.asList("123", "456")));
+		when(eventDriver.getWindowHandles()).thenReturn(new HashSet<>(List.of("123")))
+				.thenReturn(new HashSet<>(List.of("123", "456")));
 		eventDriver.getCurrentHandles();
 		when(eventDriver.getWindowHandle()).thenReturn("456");
 		page.switchToMainWindow();
@@ -596,8 +570,8 @@ public class TestPageObject2 extends MockitoTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testSwitchToNthWindow() {
-		when(eventDriver.getWindowHandles()).thenReturn(new HashSet<>(Arrays.asList("123")))
-				.thenReturn(new HashSet<>(Arrays.asList("123", "456")));
+		when(eventDriver.getWindowHandles()).thenReturn(new HashSet<>(List.of("123")))
+				.thenReturn(new HashSet<>(List.of("123", "456")));
 		eventDriver.getCurrentHandles();
 		when(eventDriver.getWindowHandle()).thenReturn("123");
 		page.switchToWindow(1);
@@ -657,7 +631,7 @@ public class TestPageObject2 extends MockitoTest {
 	}
 
 	@Test(groups = { "ut" })
-	public void testRefresh() throws IOException {
+	public void testRefresh() {
 		page.refresh();
 		verify(navigation).refresh();
 	}
@@ -760,22 +734,22 @@ public class TestPageObject2 extends MockitoTest {
 	}
 
 	@Test(groups = { "ut" })
-	public void testWaitForTableCellValue() throws IOException {
+	public void testWaitForTableCellValue() {
 		when(driver.findElement(By.id("table"))).thenReturn(element);
-		when(element.findElements(By.tagName("tr"))).thenReturn(Arrays.asList(row1));
+		when(element.findElements(By.tagName("tr"))).thenReturn(List.of(row1));
 		when(row1.findElements(By.xpath(".//descendant::*[name()=\"th\" or name()=\"td\"]")))
-				.thenReturn(Arrays.asList(column1));
+				.thenReturn(List.of(column1));
 		when(column1.getText()).thenReturn("foo");
 
 		page.waitTableCellValue(0, 0, "table", "foo");
 	}
 
 	@Test(groups = { "ut" }, expectedExceptions = TimeoutException.class)
-	public void testWaitForTableCellWrongValue() throws IOException {
+	public void testWaitForTableCellWrongValue() {
 		when(driver.findElement(By.id("table"))).thenReturn(element);
-		when(element.findElements(By.tagName("tr"))).thenReturn(Arrays.asList(row1));
+		when(element.findElements(By.tagName("tr"))).thenReturn(List.of(row1));
 		when(row1.findElements(By.xpath(".//descendant::*[name()=\"th\" or name()=\"td\"]")))
-				.thenReturn(Arrays.asList(column1));
+				.thenReturn(List.of(column1));
 		when(column1.getText()).thenReturn("foo");
 
 		page.waitTableCellValue(0, 0, "table", "bar");
@@ -1036,27 +1010,27 @@ public class TestPageObject2 extends MockitoTest {
 	}
 
 	@Test(groups = { "ut" })
-	public void testAssertSelectedOption() throws IOException {
+	public void testAssertSelectedOption() {
 		when(driver.findElement(By.id("select"))).thenReturn(element);
 		when(element.getTagName()).thenReturn("select");
 		when(element.isDisplayed()).thenReturn(true);
-		when(element.findElements(By.tagName("option"))).thenReturn(Arrays.asList(option1));
+		when(element.findElements(By.tagName("option"))).thenReturn(List.of(option1));
 		when(element.findElements(By.xpath(".//option[normalize-space(.) = \"foo\"]")))
-				.thenReturn(Arrays.asList(option1));
+				.thenReturn(List.of(option1));
 		when(option1.isSelected()).thenReturn(true);
 		when(option1.getText()).thenReturn("foo");
 		page.assertSelectedOption("select", "foo");
 	}
 
 	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
-	public void testAssertSelectedOptionNotPresent() throws IOException {
+	public void testAssertSelectedOptionNotPresent() {
 		when(driver.findElement(By.id("select"))).thenThrow(new NoSuchElementException("not found"));
 
 		page.assertSelectedOption("select", "foo");
 	}
 
 	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
-	public void testAssertSelectedOptionNoOption() throws IOException {
+	public void testAssertSelectedOptionNoOption() {
 		when(driver.findElement(By.id("select"))).thenReturn(element);
 		when(element.getTagName()).thenReturn("select");
 		when(element.isDisplayed()).thenReturn(true);
@@ -1065,13 +1039,13 @@ public class TestPageObject2 extends MockitoTest {
 	}
 
 	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
-	public void testAssertSelectedOptionNotSelected() throws IOException {
+	public void testAssertSelectedOptionNotSelected() {
 		when(driver.findElement(By.id("select"))).thenReturn(element);
 		when(element.getTagName()).thenReturn("select");
 		when(element.isDisplayed()).thenReturn(true);
-		when(element.findElements(By.tagName("option"))).thenReturn(Arrays.asList(option1));
+		when(element.findElements(By.tagName("option"))).thenReturn(List.of(option1));
 		when(element.findElements(By.xpath(".//option[normalize-space(.) = \"foo\"]")))
-				.thenReturn(Arrays.asList(option1));
+				.thenReturn(List.of(option1));
 		when(option1.isSelected()).thenReturn(false);
 		when(option1.getText()).thenReturn("foo");
 		page.assertSelectedOption("select", "foo");
@@ -1083,7 +1057,7 @@ public class TestPageObject2 extends MockitoTest {
 	 * @throws IOException
 	 */
 	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
-	public void testAssertSelectedOptionNoSelect() throws IOException {
+	public void testAssertSelectedOptionNoSelect() {
 		page.assertSelectedOption("textField", "foo");
 	}
 
@@ -1118,7 +1092,7 @@ public class TestPageObject2 extends MockitoTest {
 	}
 
 	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
-	public void testAssertCheckedNotcheckbox() throws IOException {
+	public void testAssertCheckedNotcheckbox() {
 		page.assertChecked("textField");
 	}
 
@@ -1153,41 +1127,41 @@ public class TestPageObject2 extends MockitoTest {
 	}
 
 	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
-	public void testAssertNotCheckedNotcheckbox() throws IOException {
+	public void testAssertNotCheckedNotcheckbox() {
 		page.assertNotChecked("textField");
 	}
 
 	@Test(groups = { "ut" })
-	public void testAssertForTableCellValue() throws IOException {
+	public void testAssertForTableCellValue() {
 		when(driver.findElement(By.id("table"))).thenReturn(element);
-		when(element.findElements(By.tagName("tr"))).thenReturn(Arrays.asList(row1));
+		when(element.findElements(By.tagName("tr"))).thenReturn(List.of(row1));
 		when(row1.findElements(By.xpath(".//descendant::*[name()=\"th\" or name()=\"td\"]")))
-				.thenReturn(Arrays.asList(column1));
+				.thenReturn(List.of(column1));
 		when(column1.getText()).thenReturn("foo");
 
 		page.assertTableCellValue(0, 0, "table", "foo");
 	}
 
 	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
-	public void testAssertForTableCellValueNotPresent() throws IOException {
+	public void testAssertForTableCellValueNotPresent() {
 		when(driver.findElement(By.id("table"))).thenThrow(new NoSuchElementException("not found"));
 
 		page.assertTableCellValue(0, 0, "table", "foo");
 	}
 
 	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
-	public void testAssertForTableCellWrongValue() throws IOException {
+	public void testAssertForTableCellWrongValue() {
 		when(driver.findElement(By.id("table"))).thenReturn(element);
-		when(element.findElements(By.tagName("tr"))).thenReturn(Arrays.asList(row1));
+		when(element.findElements(By.tagName("tr"))).thenReturn(List.of(row1));
 		when(row1.findElements(By.xpath(".//descendant::*[name()=\"th\" or name()=\"td\"]")))
-				.thenReturn(Arrays.asList(column1));
+				.thenReturn(List.of(column1));
 		when(column1.getText()).thenReturn("bar");
 
 		page.assertTableCellValue(0, 0, "table", "foo");
 	}
 
 	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
-	public void testAssertForTableCellNotTable() throws IOException {
+	public void testAssertForTableCellNotTable() {
 		page.assertTableCellValue(0, 0, "textField", "foo");
 	}
 
@@ -1246,21 +1220,21 @@ public class TestPageObject2 extends MockitoTest {
 	@Test(groups = { "ut" })
 	public void testAssertElementCount() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
-		when(driver.findElements(By.id("text"))).thenReturn(Arrays.asList(element));
+		when(driver.findElements(By.id("text"))).thenReturn(List.of(element));
 		page.assertElementCount("textField", 1);
 	}
 
 	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
 	public void testAssertElementWrongCount() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
-		when(driver.findElements(By.id("text"))).thenReturn(Arrays.asList(element));
+		when(driver.findElements(By.id("text"))).thenReturn(List.of(element));
 		page.assertElementCount("textField", 2);
 	}
 
 	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
 	public void testAssertElementCountNotPresent() {
 		when(driver.findElement(By.id("text"))).thenThrow(new NoSuchElementException("not found"));
-		when(driver.findElements(By.id("text"))).thenReturn(Arrays.asList());
+		when(driver.findElements(By.id("text"))).thenReturn(List.of());
 		page.assertElementCount("textField", 1);
 	}
 
@@ -1329,7 +1303,7 @@ public class TestPageObject2 extends MockitoTest {
 	 */
 	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class, expectedExceptionsMessageRegExp = "'textElement' field must be static")
 	public void testFieldNameWhenFieldNotStatic() {
-		NoStaticFieldPage p1 = new NoStaticFieldPage();
+		new NoStaticFieldPage();
 	}
 
 	@Test(groups = { "ut" })
@@ -1393,7 +1367,8 @@ public class TestPageObject2 extends MockitoTest {
 		
 		public PageForActions otherPage;
 		public PageObject callingPage;
-		
+
+		@Override
 		public void run() {
 			SeleniumTestsContextManager.setThreadContext(SeleniumTestsContextManager.getGlobalContext());
 			SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");

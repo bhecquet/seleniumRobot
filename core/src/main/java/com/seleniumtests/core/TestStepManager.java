@@ -31,8 +31,7 @@ public class TestStepManager {
 	}
 	
 	/**
-	 * copy the test step manager
-	 * @param managerToCopy
+	 * copy the test step manager into a new instance
 	 */
 	public TestStepManager(TestStepManager managerToCopy) {
 		testSteps = new CopyOnWriteArrayList<>();
@@ -47,7 +46,6 @@ public class TestStepManager {
 	
 	/**
 	 * Returns the currently running step (root step or sub-step)
-	 * @return
 	 */
 	public TestStep getRunningTestStep() {
 		return runningStep;
@@ -55,7 +53,6 @@ public class TestStepManager {
 	
 	/**
 	 * Get the last test step (the one names "Test end") or null if not found
-	 * @return
 	 */
 	public TestStep getLastTestStep() {
 		for (TestStep testStep: testSteps) {
@@ -82,7 +79,7 @@ public class TestStepManager {
 	
 	/**
 	 * Add a password to the list of strings to obfuscate
-	 * @param password
+	 * @param password	the password to hide
 	 */
 	public void addPasswordToReplace(String password) {
 		if (password.length() > MIN_PASSWORD_LENGTH) {
@@ -96,7 +93,7 @@ public class TestStepManager {
 
 	/**
 	 * When iterating over the list, use a 'synchronized' block on the list
-	 * @return
+	 * @return	list of test steps of this manager
 	 */
 	public List<TestStep> getTestSteps() {
 		return testSteps;
@@ -107,16 +104,16 @@ public class TestStepManager {
     /**
      * Logs the testStep for this test
      * Once logging is done, parentTestStep and currentRootTestStep are reset to avoid storing new data in them
-     * @param testStep
-     * @param storeStep
+     * @param testStep	TestStep to log
+     * @param storeStep	whether we should record this step as a "root" step
      */
     public static void logTestStep(TestStep testStep, boolean storeStep) {
     	List<TestAction> actionList = testStep.getStepActions();
     	
     	if (!actionList.isEmpty()) {
     		for (TestAction action: actionList) {
-	    		if (action instanceof TestStep) {	
-					logTestStep((TestStep)action, false);	
+	    		if (action instanceof TestStep testStep1) {
+					logTestStep(testStep1, false);
 				} 
 			}
     	}
@@ -180,7 +177,6 @@ public class TestStepManager {
 
 	/**
 	 * Returns the the "Test end" step if it already exist, or the current parent step
-	 * @return
 	 */
 	public static TestStep getLastTestStepOrParentStep() {
 		try {
@@ -208,7 +204,6 @@ public class TestStepManager {
 	/**
 	 * Get the current TestStepManager for this Test
 	 * Return null if none can be found
-	 * @return
 	 */
 	public static TestStepManager getInstance() {
 		try {
@@ -222,7 +217,6 @@ public class TestStepManager {
 	/**
 	 * Returns the current root test step (not already recorded)
 	 * If not current step exits, returns the previously recorded one, or null if none available
-	 * @return
 	 */
 	public static TestStep getCurrentOrPreviousStep() {
 		TestStep testStep = getCurrentRootTestStep();
@@ -235,7 +229,6 @@ public class TestStepManager {
 
 	/**
 	 * Returns the previous TestStep in the list or null if no step exists for this test
-	 * @return
 	 */
 	public static TestStep getPreviousStep() {
 
@@ -251,7 +244,6 @@ public class TestStepManager {
 	 * For all steps of the test
 	 * - look for files in attachments folder and remove all of them which do not belong to any test step (except .zip)
 	 * - move all attachments in the "before-xxx" folder to the main attachment folder
-	 * @throws IOException 
 	 */
 	public void cleanAttachments(String outputDirectory) throws IOException {
 		
@@ -272,7 +264,7 @@ public class TestStepManager {
 
 	/**
 	 * For tests only
-	 * @param testSteps
+	 * @param testSteps	test steps of this manager
 	 */
 	public void setTestSteps(List<TestStep> testSteps) {
 		this.testSteps = testSteps;

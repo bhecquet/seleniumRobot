@@ -68,6 +68,7 @@ public class TestStep extends TestAction {
 	private String errorCauseDetails;
 	private Integer stepResultId;  // the stepResult if it has been recorded on seleniumRobot-server
 	private boolean disableBugtracker;
+	private PageLoadTime pageLoadTime;
 	
 	public enum StepStatus {
 		SUCCESS,
@@ -266,6 +267,11 @@ public class TestStep extends TestAction {
 		files.add(file);
 		file.setParent(this);
 	}
+	public void addPageLoadTime(PageLoadTime pageLoadTime) {
+		pageLoadTime.setPosition(stepActions.size());
+		pageLoadTime.setParent(this);
+		this.pageLoadTime = pageLoadTime;
+	}
 	
 	/**
 	 * Add snapshot to this step
@@ -335,6 +341,8 @@ public class TestStep extends TestAction {
 		for (Snapshot snapshot: getSnapshots()) {
 			stepJSon.getJSONArray("snapshots").put(snapshot.toJson());
 		}
+
+		stepJSon.put("pageLoadTime", pageLoadTime == null ? null : pageLoadTime.toJson());
 		
 		return stepJSon;
 	}
@@ -587,5 +595,8 @@ public class TestStep extends TestAction {
 	public String getFullActionName() {
 		return getOrigin() != null ? getOrigin().getSimpleName() + "." + getAction(): getAction();
 	}
-	
+
+	public PageLoadTime getPageLoadTime() {
+		return pageLoadTime;
+	}
 }

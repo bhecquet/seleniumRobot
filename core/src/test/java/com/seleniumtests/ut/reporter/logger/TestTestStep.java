@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import com.seleniumtests.it.core.aspects.CalcPage;
 import com.seleniumtests.reporter.logger.*;
 import com.seleniumtests.util.har.Har;
 import com.seleniumtests.util.har.Page;
@@ -682,8 +683,6 @@ public class TestTestStep extends GenericTest {
 
 	/**
 	 * Checks getFailed correctly compute test step status if sub step is not failed
-	 * 
-	 * @throws IOException
 	 */
 	@Test(groups = { "ut" })
 	public void testToJson() throws IOException {
@@ -711,6 +710,7 @@ public class TestTestStep extends GenericTest {
 		TestStep subStep = new TestStep("subStep with password foobar", "subStep with password foobar", this.getClass(), null, new ArrayList<>(), true);
 		subStep.addMessage(new TestMessage("everything in subStep almost OK", MessageType.WARNING));
 		subStep.addAction(new TestAction("action1", false, new ArrayList<>()));
+		subStep.addPageLoadTime(new PageLoadTime("http://localhost", new CalcPage(), 1.23));
 		step.addAction(subStep);
 
 		JSONObject stepJson = step.toJson();
@@ -724,6 +724,7 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(stepJson.getLong("timestamp"), step.getTimestamp().toInstant().toEpochMilli());
 		Assert.assertEquals(stepJson.getJSONArray("actions").length(), 3);
 		Assert.assertNotNull(stepJson.getLong("timestamp"));
+		Assert.assertTrue(stepJson.isNull("pageLoadTime")); // not present as not loading information has been provided
 
 		// check actions order
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(0).getString("type"), "message");
@@ -739,6 +740,9 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getString("type"), "step");
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getString("name"), "subStep with password ******");
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getJSONArray("actions").length(), 2);
+
+		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getJSONObject("pageLoadTime").length(), 4);
+		Assert.assertTrue(stepJson.getJSONArray("actions").getJSONObject(2).getJSONObject("pageLoadTime").getString("name").startsWith( "loading of CalcPage took 1"));
 
 		Assert.assertEquals(stepJson.getJSONArray("files").getJSONObject(0).getString("type"), "file");
 		Assert.assertEquals(stepJson.getJSONArray("files").getJSONObject(0).getString("name"), "video file");
@@ -1128,6 +1132,18 @@ public class TestTestStep extends GenericTest {
 		step.addFile(file);
 		Assert.assertEquals(file.getPosition(), 1);
 		Assert.assertEquals(file.getParent(), step);
+	}
+
+	@Test(groups = { "ut" })
+	public void testTestSubPageTimingAndParent() throws IOException {
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
+		TestStep subStep = new TestStep("subStep1", "subStep1", this.getClass(), null, new ArrayList<>(), true);
+		step.addStep(subStep);
+
+		PageLoadTime pageLoadTime = new PageLoadTime("http://localhost", new CalcPage(), 1.01);
+		step.addPageLoadTime(pageLoadTime);
+		Assert.assertEquals(pageLoadTime.getPosition(), 1);
+		Assert.assertEquals(pageLoadTime.getParent(), step);
 	}
 
 	@Test(groups = { "ut" })

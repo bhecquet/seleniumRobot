@@ -27,6 +27,8 @@ import java.time.Instant;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import com.seleniumtests.core.TestStepManager;
+import com.seleniumtests.reporter.logger.PageLoadTime;
 import com.seleniumtests.uipage.annotations.Context;
 import com.seleniumtests.uipage.annotations.ContextNativeApp;
 import com.seleniumtests.uipage.annotations.ContextWebView;
@@ -347,6 +349,9 @@ public class PageObject extends BasePage implements IPage {
         // store the window / tab on which this page is loaded
         if (driver != null) {
             windowHandle = driver.getWindowHandle();
+
+            // store load time
+            TestStepManager.getCurrentOrPreviousStep().addPageLoadTime(new PageLoadTime(driver.getCurrentUrl(), this, Duration.between(startLoading, stopLoading).toMillis() / 1000.0));
         }
     }
 
