@@ -3,7 +3,6 @@ package com.seleniumtests.ut.reporter.logger;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.it.core.aspects.CalcPage;
 import com.seleniumtests.reporter.logger.PageLoadTime;
-import com.seleniumtests.reporter.logger.TestMessage;
 import org.json.JSONObject;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -19,7 +18,7 @@ public class TestPageLoadTime  extends GenericTest {
         Assert.assertEquals(json.getString("url"), "http://localhost");
         Assert.assertEquals(json.getDouble("loadTime"), 1230);
         Assert.assertEquals(json.getString("page"), "CalcPage");
-        Assert.assertEquals(json.getString("name"), "loading of CalcPage took 1230");
+        Assert.assertEquals(json.getString("name"), "loading of CalcPage took 1230 ms");
     }
 
     @Test(groups={"ut"})
