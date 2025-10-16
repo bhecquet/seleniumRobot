@@ -1,7 +1,9 @@
 #set($stepIdx = 0)
 #set($testInfoIdx = 0)
+#set($pageLoadTimesIdx = 0)
 #set($stepsSize = $testSteps.size())
 #set($testInfoSize = $testInfos.size())
+#set($pageLoadTimesSize = $pageLoadTimes.size())
 {
 	"gridnode": "$gridnode",
 	"errors": $errors,
@@ -35,6 +37,9 @@
 		#end
 	],
 	"pageLoads": [
-
+		#foreach( $pageLoadTime in $pageLoadTimes )
+			#set($pageLoadTimesIdx = $pageLoadTimesIdx + 1)
+			$pageLoadTime.toJson()#if( $pageLoadTimesIdx != $pageLoadTimesSize),#end
+		#end
 	]
 }

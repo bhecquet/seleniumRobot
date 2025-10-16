@@ -18,7 +18,6 @@
 package com.seleniumtests.it.reporter;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 
@@ -38,13 +37,12 @@ import com.seleniumtests.util.osutility.OSUtility;
 
 /**
  * Test that default reporting contains an XML file per test (CustomReporter.java) with default test reports defined in SeleniumTestsContext.DEFAULT_CUSTOM_TEST_REPORTS
- * @author s047432
- *
+ * /!\ this could also test presence and content of detailed-result.json, but it's only a matter of formatting
  */
 public class TestPerformanceReporter extends ReporterTest {
 
 	@BeforeMethod(groups={"it"})
-	private void deleteGeneratedFiles() throws IOException {
+	private void deleteGeneratedFiles() {
 		FileUtils.deleteQuietly(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()));
 	}
 	
@@ -61,7 +59,6 @@ public class TestPerformanceReporter extends ReporterTest {
 
 	/**
 	 * Check if param gridnode is ok in xml report
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testReportGenerationGrid(ITestContext testContext) throws Exception {
@@ -84,7 +81,6 @@ public class TestPerformanceReporter extends ReporterTest {
 	
 	/**
 	 * Check if param gridnode is correctly handled when test has not been executed
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testReportGenerationGridTestSkipped(ITestContext testContext) throws Exception {
@@ -124,8 +120,6 @@ public class TestPerformanceReporter extends ReporterTest {
 
 	/**
 	 * Check all steps of test case are available
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testReportWithSteps(ITestContext testContext) throws Exception {
@@ -167,8 +161,6 @@ public class TestPerformanceReporter extends ReporterTest {
 	/**
 	 * Check number of retries is correctly logged
 	 * This test is failed in "test" part, not in steps. Check it's correctly logged as failed
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testReportWithRetry(ITestContext testContext) throws Exception {
@@ -187,8 +179,6 @@ public class TestPerformanceReporter extends ReporterTest {
 	
 	/**
 	 * Check all steps of test case are available
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testWithStepOkAndStepInError(ITestContext testContext) throws Exception {
@@ -209,8 +199,6 @@ public class TestPerformanceReporter extends ReporterTest {
 	
 	/**
 	 * Check that when a step contains an exception and is failed, this one is written in file
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testErrorWithException(ITestContext testContext) throws Exception {
@@ -231,8 +219,6 @@ public class TestPerformanceReporter extends ReporterTest {
 
 	/**
 	 * Chack that if several custom reports are specified through custom reports, they are all available
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testMultipleReportsWithSteps(ITestContext testContext) throws Exception {
@@ -253,8 +239,6 @@ public class TestPerformanceReporter extends ReporterTest {
 	
 	/**
 	 * Test that performance reporter is correctly encoded
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testXmlCharacterEscape(ITestContext testContext) throws Exception {
@@ -269,8 +253,6 @@ public class TestPerformanceReporter extends ReporterTest {
 	/**
 	 * issue #205
 	 * Test that performance reporter correctly encode error messages
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testXmlErrorMessageEscape(ITestContext testContext) throws Exception {
@@ -287,13 +269,10 @@ public class TestPerformanceReporter extends ReporterTest {
 	
 	/**
 	 * Test all exceptions are there. The root one is only present in text
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testXmlErrorMessageEscapeDoubleException(ITestContext testContext) throws Exception {
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"});
-//		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"}, ParallelMode.METHODS, new String[] {"testWithChainedException"});
 
 		String detailedReportContent = readTestMethodPerfFile("testWithChainedException");
 		
@@ -307,8 +286,6 @@ public class TestPerformanceReporter extends ReporterTest {
 	
 	/**
 	 * Check that if a test is skipped, a performance report is still generated
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testSkippedTestGeneration(ITestContext testContext) throws Exception {
@@ -330,8 +307,6 @@ public class TestPerformanceReporter extends ReporterTest {
 	
 	/**
 	 * Check that if a step is skipped, a performance report is still generated
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testSkippedStepInTest(ITestContext testContext) throws Exception {
@@ -347,7 +322,6 @@ public class TestPerformanceReporter extends ReporterTest {
 
 	/**
 	 * Check that information recorded during test, by calling 'SeleniumRobotTestPlan.addTestInfo(key, value)' are added to summary and test report
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testWithTestInfo() throws Exception {
@@ -370,7 +344,6 @@ public class TestPerformanceReporter extends ReporterTest {
 	/**
 	 * Check that when snapshot server is used with behavior "addTestResult" 2 results should be presented: one with the result of selenium test, a second one with the result of snapshot comparison.
 	 * Both are the same but second test is there for integration with junit parser so that we can differentiate navigation result from GUI result.
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testSnapshotComparisonKoAddTestResult() throws Exception {

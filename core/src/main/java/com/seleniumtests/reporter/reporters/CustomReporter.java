@@ -29,6 +29,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import com.seleniumtests.driver.DriverMode;
+import com.seleniumtests.reporter.logger.PageLoadTime;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -119,6 +120,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			String failedStep = "";
 			List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
 			List<TestStep> newTestSteps = new ArrayList<>();
+			List<PageLoadTime> pageLoadTimes = new ArrayList<>();
 			if (testSteps != null) {
 				for (TestStep step: testSteps) {
 					testDuration += step.getDuration();
@@ -130,6 +132,8 @@ public class CustomReporter extends CommonReporter implements IReporter {
 							errors++;
 						}
 					}
+
+					pageLoadTimes.addAll(step.getPageLoadTimes());
 					
 					// encode each step
 					if ("xml".equalsIgnoreCase(reportFormat)
@@ -202,10 +206,13 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			context.put("parameters", seleniumTestsContext.getContextDataMap());
 			context.put("stacktrace", stack);
 			context.put("failedStep", StringUtility.encodeString(failedStep, reportFormat.toLowerCase()));
+			context.put("pageLoadTimes", pageLoadTimes);
 			String testName = getTestName(testResult);
 			String logs = SeleniumRobotLogger.getTestLogs(testName);
 			logger.info("test name: {}", testName);
 			getTestLogs(context, reportFormat, logs);
+
+			// group page loading information
 
 			context.put("testInfos", TestNGResultUtils.getTestInfoEncoded(testResult, reportFormat));
 			

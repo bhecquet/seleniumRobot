@@ -22,16 +22,12 @@ import static org.mockito.Mockito.*;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.ZipEntry;
 
 import javax.imageio.ImageIO;
 
@@ -42,14 +38,12 @@ import org.mockito.Mock;
 import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
 import org.testng.Assert;
-import org.testng.ITestContext;
 import org.testng.TestNG;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlClass;
 import org.testng.xml.XmlSuite;
 import org.testng.xml.XmlSuite.ParallelMode;
 import org.testng.xml.XmlTest;
-import org.zeroturnaround.zip.ZipEntryCallback;
 import org.zeroturnaround.zip.ZipUtil;
 
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
@@ -75,11 +69,9 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	 * - result is OK
 	 * - test names are OK
 	 * Check is done indirectly from the report files because there seems to be no way to check listener state
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testMultiThreadTests(ITestContext testContext) throws Exception {
+	public void testMultiThreadTests() throws Exception {
 		
 		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions"}, "core_3,core_4", "");
 		
@@ -95,11 +87,9 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	/**
 	 * Test the case where several browsers access the same HtmlElement at the same time (as HtmlElements are almost always declared static)
 	 * Be sure each search in a thread adress the driver of this thread
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testMultiThreadTests2(ITestContext testContext) throws Exception {
+	public void testMultiThreadTests2() throws Exception {
 		
 		executeSubTest(StubTestClassForDriverParallelTest.maxThreads, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverParallelTest"}, ParallelMode.METHODS, new String[] {});
 		String logs = readSeleniumRobotLogFile();
@@ -110,13 +100,11 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	
 	/**
 	 * issue #254: Check we get variable for each test execution (and each retry)
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testWithRetry(ITestContext testContext) throws Exception {
+	public void testWithRetry() throws Exception {
 		
-		try (MockedConstruction mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
 			when(variableServer.isAlive()).thenReturn(true);
 		})) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
@@ -124,17 +112,16 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "2");
 
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testFailedWithException"});
-			SeleniumRobotVariableServerConnector variableServer = (SeleniumRobotVariableServerConnector) mockedVariableServer.constructed().get(0);
 
 			// check get variables has been called once for each retry
 			// the fact that it's not the same instance that reserve variable and unreserve them is due to init of variable server in @Before methods
 			// and variableServer instances are not reused
-			verify((SeleniumRobotVariableServerConnector) mockedVariableServer.constructed().get(0)).getVariables(0, -1);
-			verify((SeleniumRobotVariableServerConnector) mockedVariableServer.constructed().get(3)).getVariables(0, -1);
-			verify((SeleniumRobotVariableServerConnector) mockedVariableServer.constructed().get(6)).getVariables(0, -1);
-			verify((SeleniumRobotVariableServerConnector) mockedVariableServer.constructed().get(2)).unreserveVariables(anyList());
-			verify((SeleniumRobotVariableServerConnector) mockedVariableServer.constructed().get(5)).unreserveVariables(anyList());
-			verify((SeleniumRobotVariableServerConnector) mockedVariableServer.constructed().get(8)).unreserveVariables(anyList());
+			verify(mockedVariableServer.constructed().get(0)).getVariables(0, -1);
+			verify(mockedVariableServer.constructed().get(3)).getVariables(0, -1);
+			verify(mockedVariableServer.constructed().get(6)).getVariables(0, -1);
+			verify(mockedVariableServer.constructed().get(2)).unreserveVariables(anyList());
+			verify(mockedVariableServer.constructed().get(5)).unreserveVariables(anyList());
+			verify(mockedVariableServer.constructed().get(8)).unreserveVariables(anyList());
 
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
@@ -145,13 +132,11 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 
 	/**
 	 * Issue #637: max retry is not respected when dataprovider is used
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testWithRetryDataProvider(ITestContext testContext) throws Exception {
+	public void testWithRetryDataProvider() throws Exception {
 
-		try (MockedConstruction mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
 			when(variableServer.isAlive()).thenReturn(true);
 		})) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
@@ -159,7 +144,6 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
 
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testKo"});
-			SeleniumRobotVariableServerConnector variableServer = (SeleniumRobotVariableServerConnector) mockedVariableServer.constructed().get(0);
 
 			// check that number of retries is respected
 			String detailedReportContent1 = readTestMethodResultFile("testKo");
@@ -179,7 +163,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	 * Check that logs of a failed attempt are kept in the result directory (KEEP_ALL_RESULTS=true)
 	 */
 	@Test(groups={"it"})
-	public void testKeepAllResults(ITestContext testContext) throws Exception {
+	public void testKeepAllResults() throws Exception {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
@@ -195,13 +179,11 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			
 			List<String> entries = new ArrayList<>();
 	
-			ZipUtil.iterate(resultZip, new ZipEntryCallback() {
-		      public void process(InputStream in, ZipEntry zipEntry) throws IOException {
-		        String entryName = zipEntry.getName();
-		        entries.add(entryName.split("-\\w{5,6}\\.")[0]);
-		        
-		      }
-		    });
+			ZipUtil.iterate(resultZip, (in, zipEntry) -> {
+              String entryName = zipEntry.getName();
+              entries.add(entryName.split("-\\w{5,6}\\.")[0]);
+
+            });
 			
 			// check the content of the zip file
 			Assert.assertTrue(entries.contains("testDriverShortKo/TestReport.html"));
@@ -224,7 +206,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	 * Check that logs of a failed attempt are not kept in the result directory (KEEP_ALL_RESULTS=false)
 	 */
 	@Test(groups={"it"})
-	public void testDoNotKeepAllResults(ITestContext testContext) throws Exception {
+	public void testDoNotKeepAllResults() throws Exception {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
@@ -245,13 +227,11 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	/**
 	 * Check variables are get only once when testing
 	 * issue #255: also check that seleniumRobot server is called with the right test name
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testWithoutRetry(ITestContext testContext) throws Exception {
+	public void testWithoutRetry() throws Exception {
 		
-		try (MockedConstruction mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
 			when(variableServer.isAlive()).thenReturn(true);
 		})) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
@@ -259,7 +239,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
 			
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testFailedWithException"});
-			SeleniumRobotVariableServerConnector variableServer = (SeleniumRobotVariableServerConnector) mockedVariableServer.constructed().get(0);
+			SeleniumRobotVariableServerConnector variableServer = mockedVariableServer.constructed().get(0);
 			
 			// check get variables has been called once for each retry
 			verify(variableServer).getVariables(0, -1);
@@ -273,13 +253,11 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 
 	/**
 	 * Check that if ApplicationError is raised, test is not retried
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testWithoutRetryOnApplicationError(ITestContext testContext) throws Exception {
+	public void testWithoutRetryOnApplicationError() throws Exception {
 
-		try (MockedConstruction mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
 			when(variableServer.isAlive()).thenReturn(true);
 		})) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
@@ -303,11 +281,10 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	
 
 	/**
-	 * issue #287: check that test is retried even if a configuration error occurs
-	 * Also check test is KO and not skipped (won't be possible since: https://github.com/cbeust/testng/issues/2148)
-	 * , because error occured in AfterMethod
-	 * @throws Exception
-	 */
+     * issue #287: check that test is retried even if a configuration error occurs
+     * Also check test is KO and not skipped (won't be possible since: <a href="https://github.com/cbeust/testng/issues/2148">2148</a>)
+     * , because error occured in AfterMethod
+     */
 	@Test(groups={"it"})
 	public void testRetriedWithConfigurationErrorAndTestFailure() throws Exception {
 		
@@ -334,11 +311,9 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	
 	/**
 	 * Checks that with a data provider, test context does not overlap between test methods and that displayed logs correspond to the method execution and not all method executions
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testContextWithDataProvider(ITestContext testContext) throws Exception {
+	public void testContextWithDataProvider() throws Exception {
 		
 		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDataProvider.testMethodParallel"}, "", "");
 
@@ -367,11 +342,9 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 
 	/**
 	 * Checks that with a data provider, test context does not overlap between test methods and that displayed logs correspond to the method execution and not all method executions
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testContextWithDataProviderMultipleThreads(ITestContext testContext) throws Exception {
+	public void testContextWithDataProviderMultipleThreads() throws Exception {
 
 		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDataProvider.testMethod"}, "", "", 3);
 
@@ -399,7 +372,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		Assert.assertTrue(detailedReportContent3.contains("Test Details - testMethod-2 with params: (data3)"));
 	}
 	
-	private TestNG executeSubTest2(XmlSuite.ParallelMode parallelMode) throws IOException {
+	private TestNG executeSubTest2(XmlSuite.ParallelMode parallelMode) {
 
 		XmlSuite suite = new XmlSuite();
 		suite.setName("TmpSuite");
@@ -408,7 +381,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		Map<String, String> suiteParameters = new HashMap<>();
 		suiteParameters.put("softAssertEnabled", "false");
 		suite.setParameters(suiteParameters);
-		List<XmlSuite> suites = new ArrayList<XmlSuite>();
+		List<XmlSuite> suites = new ArrayList<>();
 		suites.add(suite);
 	
 		suite.setThreadCount(5);
@@ -424,7 +397,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		test1.setName("test1");
 		test1.addParameter(SeleniumTestsContext.BROWSER, "none");
 	
-		List<XmlClass> classes1 = new ArrayList<XmlClass>();
+		List<XmlClass> classes1 = new ArrayList<>();
 		classes1.add(xmlClass1);
 		classes1.add(xmlClass2);
 		test1.setXmlClasses(classes1) ;
@@ -433,7 +406,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		XmlTest test2 = new XmlTest(suite);
 		test2.setName("test2");
 		test2.addParameter(SeleniumTestsContext.BROWSER, "none");
-		List<XmlClass> classes2 = new ArrayList<XmlClass>();
+		List<XmlClass> classes2 = new ArrayList<>();
 		classes2.add(xmlClass1);
 		classes2.add(xmlClass3);
 		classes2.add(xmlClass4);
@@ -448,7 +421,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testContextStorageParallelTests(ITestContext testContext) throws Exception {
+	public void testContextStorageParallelTests() throws Exception {
 		
 		executeSubTest2(ParallelMode.TESTS);
 		
@@ -458,7 +431,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "TestReport.html"), 9);
 
 		// test1Listener4 fails as expected
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='test1Listener4/TestReport\\.html' info=\"skipped\".*?>test1Listener4</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='test1Listener4/TestReport\\.html' info=\"skipped\".*?>test1Listener4</a>.*"));
 
 		// issue #312: check that result files have been generated at least twice (one during test run and one at the end)
 		String logs = readSeleniumRobotLogFile().replace("\\", "/");
@@ -471,11 +444,20 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener3-1/PERF-result.xml"), 1);
 		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener4/PERF-result.xml"), 1);
 		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener1-1/PERF-result.xml"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener2/detailed-result.json"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test2Listener1/detailed-result.json"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener1/detailed-result.json"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test2Listener1-1/detailed-result.json"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test2Listener1-2/detailed-result.json"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener3/detailed-result.json"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener3-1/detailed-result.json"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener4/detailed-result.json"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener1-1/detailed-result.json"), 1);
 		Assert.assertEquals(StringUtils.countMatches(logs, "SeleniumTestReport.html"), 11); // 1 per executed test + 1 for final generation
 	}
 	
 	@Test(groups={"it"})
-	public void testContextStorageParallelClasses(ITestContext testContext) throws Exception {
+	public void testContextStorageParallelClasses() throws Exception {
 		
 		executeSubTest2(ParallelMode.CLASSES);
 		
@@ -485,7 +467,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "TestReport.html"), 9);
 
 		// test1Listener4 fails as expected
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='test1Listener4/TestReport\\.html' info=\"skipped\".*?>test1Listener4</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='test1Listener4/TestReport\\.html' info=\"skipped\".*?>test1Listener4</a>.*"));
 		
 		// issue #312: check that result files have been generated once
 		String logs = readSeleniumRobotLogFile().replace("\\", "/");
@@ -498,11 +480,20 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener3-1/PERF-result.xml"), 1);
 		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener4/PERF-result.xml"), 1);
 		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener1-1/PERF-result.xml"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener2/detailed-result.json"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test2Listener1/detailed-result.json"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener1/detailed-result.json"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test2Listener1-1/detailed-result.json"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test2Listener1-2/detailed-result.json"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener3/detailed-result.json"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener3-1/detailed-result.json"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener4/detailed-result.json"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener1-1/detailed-result.json"), 1);
 		Assert.assertEquals(StringUtils.countMatches(logs, "SeleniumTestReport.html"), 11); // 1 per executed test + 1 for final generation
 	}
 	
 	@Test(groups={"it"})
-	public void testContextStorageParallelMethods(ITestContext testContext) throws Exception {
+	public void testContextStorageParallelMethods() throws Exception {
 		
 		executeSubTest2(ParallelMode.METHODS);
 		
@@ -512,7 +503,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "TestReport.html"), 9);
 		
 		// test1Listener4 fails as expected
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='test1Listener4/TestReport\\.html' info=\"skipped\".*?>test1Listener4</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='test1Listener4/TestReport\\.html' info=\"skipped\".*?>test1Listener4</a>.*"));
 
 		// issue #312: check that result files have been generated at least twice (one during test run and one at the end)
 		String logs = readSeleniumRobotLogFile().replace("\\", "/");
@@ -525,16 +516,23 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener3-1/PERF-result.xml"), 1);
 		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener4/PERF-result.xml"), 1);
 		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener1-1/PERF-result.xml"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener2/detailed-result.json"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test2Listener1/detailed-result.json"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener1/detailed-result.json"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test2Listener1-1/detailed-result.json"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test2Listener1-2/detailed-result.json"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener3/detailed-result.json"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener3-1/detailed-result.json"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener4/detailed-result.json"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener1-1/detailed-result.json"), 1);
 		Assert.assertEquals(StringUtils.countMatches(logs, "SeleniumTestReport.html"), 11); // 1 per executed test + 1 for final generation
 	}
 	
 	/**
 	 * Test we cannot create a driver in '@BeforeSuite' methods
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testContextDriverBlockingBeforeSuite(ITestContext testContext) throws Exception {
+	public void testContextDriverBlockingBeforeSuite() throws Exception {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.BROWSER, "htmlunit");
@@ -559,11 +557,9 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	
 	/**
 	 * Test we cannot create a driver in '@BeforeTest' methods
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testContextDriverBlockingBeforeTest(ITestContext testContext) throws Exception {
+	public void testContextDriverBlockingBeforeTest() throws Exception {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.BROWSER, "htmlunit");
@@ -591,11 +587,9 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 
 	/**
 	 * Test we cannot create a driver in '@BeforeClass' methods
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testContextDriverBlockingBeforeClass(ITestContext testContext) throws Exception {
+	public void testContextDriverBlockingBeforeClass() throws Exception {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.BROWSER, "htmlunit");
@@ -625,11 +619,9 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 
 	/**
 	 * Test we can create a driver in '@BeforeMethod' methods
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testContextDriverNotBlockingBeforeMethod(ITestContext testContext) throws Exception {
+	public void testContextDriverNotBlockingBeforeMethod() throws Exception {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.BROWSER, "htmlunit");
@@ -660,11 +652,9 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 
 	/**
 	 * Test we can create a driver in '@Test' methods
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testContextDriverNotBlockingInTest(ITestContext testContext) throws Exception {
+	public void testContextDriverNotBlockingInTest() throws Exception {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.BROWSER, "htmlunit");
@@ -696,11 +686,9 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 
 	/**
 	 * Test we can create a driver in '@AfterMethod' methods
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testContextDriverNotBlockingInAfterMethod(ITestContext testContext) throws Exception {
+	public void testContextDriverNotBlockingInAfterMethod() throws Exception {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.BROWSER, "htmlunit");
@@ -732,11 +720,9 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 
 	/**
 	 * Test we cannot create a driver in '@AfterClass' methods
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testContextDriverBlockingAfterClass(ITestContext testContext) throws Exception {
+	public void testContextDriverBlockingAfterClass() throws Exception {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.BROWSER, "htmlunit");
@@ -769,11 +755,9 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 
 	/**
 	 * Test we cannot create a driver in '@AfterTest' methods
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testContextDriverBlockingAfterTest(ITestContext testContext) throws Exception {
+	public void testContextDriverBlockingAfterTest() throws Exception {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.BROWSER, "htmlunit");
@@ -807,17 +791,16 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	
 	/**
 	 * issue #289: Check we increase retry count when SO_TIMEOUT is raised in non-local mode
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testRetriedWithSocketTimeoutError() throws Exception {
 		
-		try (MockedStatic mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
+		try (MockedStatic<SeleniumGridConnectorFactory> mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/wd/hub");
 
-			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/wd/hub"))).thenReturn(Arrays.asList(gridConnector));
+			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(List.of("http://localhost:4444/wd/hub"))).thenReturn(List.of(gridConnector));
 			
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.NONE, new String[] {"testWithSocketTimeoutOnFirstExec"});
 			
@@ -834,17 +817,16 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	}
 	/**
 	 * issue #289: Check do not increase retry count in case error in not a WebDriverException
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testNotRetriedWithAnyError() throws Exception {
 		
-		try (MockedStatic mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
+		try (MockedStatic<SeleniumGridConnectorFactory> mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/wd/hub");
 
-			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/wd/hub"))).thenReturn(Arrays.asList(gridConnector));
+			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(List.of("http://localhost:4444/wd/hub"))).thenReturn(List.of(gridConnector));
 			
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.NONE, new String[] {"testWithExceptionOnFirstExec"});
 			
@@ -862,7 +844,6 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	
 	/**
 	 * issue #289: Check we allow a retry when SO_TIMEOUT is raised in local mode because we only want to avoid problem of communication in grid mode
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testNotRetriedWithSocketTimeoutErrorInLocalMode() throws Exception {
@@ -886,16 +867,14 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	
 	/**
 	 * issue #297: be sure we reset the driver name before the test starts
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testDriverNameResetAtStart(ITestContext testContext) throws Exception {
+	public void testDriverNameResetAtStart() throws Exception {
 
-		try (MockedStatic mockedWebUiDriver = mockStatic(WebUIDriver.class)) {
+		try (MockedStatic<WebUIDriver> mockedWebUiDriver = mockStatic(WebUIDriver.class)) {
 			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.NONE, new String[]{"testAndSubActions"});
 
-			mockedWebUiDriver.verify(() -> WebUIDriver.resetCurrentWebUiDriverName());
+			mockedWebUiDriver.verify(WebUIDriver::resetCurrentWebUiDriverName);
 		}
 		
 	}
@@ -903,7 +882,6 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	/**
 	 * issue #389: check that error raised on startup is the configurationException, and not ScenarioException  "ScenarioException: When using @BeforeMethod / @AfterMethod in tests, this method MUST have a 'java.lang.reflect.Method' "
 	 * This issue can only happen if ConfigFailurePolicy is set to "skip" which is the default behaviour
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testConfigurationExceptionIsRendered() throws Exception {
@@ -916,7 +894,6 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	
 	/**
 	 * Check we get an error message when configuration method do not have a java.lang.reflect.Method as their first parameter
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testErrorRaisedIfConfigurationMethodHasNotMethodReference() throws Exception {
@@ -929,11 +906,9 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	
 	/**
 	 * issue #414: when we capture the last step whereas we have entered a frame, we should capture the whole browser, not only the frame
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testCaptureTakenOnLastStep(ITestContext testContext) throws Exception {
+	public void testCaptureTakenOnLastStep() throws Exception {
 		try {
 			System.setProperty(SeleniumTestsContext.REPLAY_TIME_OUT, "1");
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.NONE, new String[] {"testDriverWithFailureAfterSwitchToFrame"});
@@ -955,11 +930,9 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	
 	/**
 	 * Check increaseMaxRetry is performed when called from test method
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testIncreaseMaxRetryInTest(ITestContext testContext) throws Exception {
+	public void testIncreaseMaxRetryInTest() throws Exception {
 
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForListener6.testIncreaseMaxRetryInTestMethod"}, "", "stub1");
 
@@ -972,11 +945,9 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	
 	/**
 	 * Check we cannot increase max retry outside a test method
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testIncreaseMaxRetryInAfterConfig(ITestContext testContext) throws Exception {
+	public void testIncreaseMaxRetryInAfterConfig() throws Exception {
 		
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForListener6.testIncreaseMaxRetryInAfterTestMethod"}, "", "stub1");
 		
@@ -992,7 +963,6 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 
 	/**
 	 * Check that when snapshot server is used for comparison, if comparison fails, test is retried
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testSnapshotComparisonKoChangeTestResultAndRetried() throws Exception {
@@ -1027,7 +997,6 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	
 	/**
 	 * Check that when snapshot server is used for comparison, if comparison fails, test is not retried as we are in "displayOnly"
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testSnapshotComparisonKoChangeTestResultNotRetried() throws Exception {

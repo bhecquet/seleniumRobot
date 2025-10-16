@@ -24,18 +24,15 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.contexts.SeleniumRobotServerContext;
 import com.seleniumtests.it.stubclasses.StubTestClass;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.testng.Assert;
-import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 
 public class TestSeleniumTestsReporter2 extends ReporterTest {
@@ -76,9 +73,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 				"GET",
 				SeleniumRobotVariableServerConnector.VARIABLE_API_URL,
 				500,
-				Arrays.asList(
-					"VARIABLE NOT FOUND"
-				),
+                    List.of(
+                            "VARIABLE NOT FOUND"
+                    ),
 				"request"
 			);
 			
@@ -91,9 +88,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			String testKoDetailedReport = readTestMethodResultFile("testInError");
 			String testSkipDetailedReport = readTestMethodResultFile("testSkipped");
 			
-			Assert.assertTrue(mainReportContent.matches(".*class=\"testSkipped\".*<a href\\='testAndSubActions/TestReport\\.html'.*?>testAndSubActions</a>.*"));
-			Assert.assertTrue(mainReportContent.matches(".*class=\"testSkipped\".*<a href\\='testInError/TestReport\\.html'.*?>testInError</a>.*"));
-			Assert.assertTrue(mainReportContent.matches(".*class=\"testSkipped\".*<a href\\='testSkipped/TestReport\\.html'.*?>testSkipped</a>.*"));
+			Assert.assertTrue(mainReportContent.matches(".*class=\"testSkipped\".*<a href='testAndSubActions/TestReport\\.html'.*?>testAndSubActions</a>.*"));
+			Assert.assertTrue(mainReportContent.matches(".*class=\"testSkipped\".*<a href='testInError/TestReport\\.html'.*?>testInError</a>.*"));
+			Assert.assertTrue(mainReportContent.matches(".*class=\"testSkipped\".*<a href='testSkipped/TestReport\\.html'.*?>testSkipped</a>.*"));
 			Assert.assertTrue(testOkDetailedReport.matches(".*Execution logs {28}</div><div class=\"box-body logs\"><div class=\"message-error\"><div>class com.seleniumtests.customexception.SeleniumRobotServerException: An error occurred while fetching variables from the SeleniumRobot Server. Test execution is skipped.</div>.*"));
 			Assert.assertTrue(testKoDetailedReport.matches(".*Execution logs {28}</div><div class=\"box-body logs\"><div class=\"message-error\"><div>class com.seleniumtests.customexception.SeleniumRobotServerException: An error occurred while fetching variables from the SeleniumRobot Server. Test execution is skipped.</div>.*"));
 			Assert.assertTrue(testSkipDetailedReport.matches(".*Execution logs {28}</div><div class=\"box-body logs\"><div class=\"message-error\"><div>class com.seleniumtests.customexception.SeleniumRobotServerException: An error occurred while fetching variables from the SeleniumRobot Server. Test execution is skipped.</div>.*"));
@@ -107,7 +104,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	
 	/**
 	 * Check summary format in multithread
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testMultithreadReport() throws Exception {
@@ -118,24 +114,29 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// check content of summary report file
 		String mainReportContent = readSummaryFile();
 
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testAndSubActions/TestReport\\.html'.*?>testAndSubActions</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testInError/TestReport\\.html'.*?>testInError</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='testAndSubActions/TestReport\\.html'.*?>testAndSubActions</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='testInError/TestReport\\.html'.*?>testInError</a>.*"));
 
 		// issue #331: check that result files have been generated only once
 		String logs = readSeleniumRobotLogFile().replace("\\", "/");
-		Assert.assertTrue(StringUtils.countMatches(logs, "testInError/PERF-result.xml") == 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "testAndSubActions/PERF-result.xml") == 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "testWithException/PERF-result.xml") == 3); // once per retry
+        Assert.assertEquals(StringUtils.countMatches(logs, "testInError/PERF-result.xml"), 1);
+        Assert.assertEquals(StringUtils.countMatches(logs, "testInError/detailed-result.json"), 1);
+        Assert.assertEquals(StringUtils.countMatches(logs, "testAndSubActions/PERF-result.xml"), 1);
+        Assert.assertEquals(StringUtils.countMatches(logs, "testAndSubActions/detailed-result.json"), 1);
+        Assert.assertEquals(StringUtils.countMatches(logs, "testWithException/PERF-result.xml"), 3); // once per retry
+        Assert.assertEquals(StringUtils.countMatches(logs, "testWithException/detailed-result.json"), 3); // once per retry
 
 		// issue  #312: check that result files have been generated before test end
-		Assert.assertTrue(StringUtils.indexOf(logs, "testInError/PERF-result.xml") < StringUtils.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
-		Assert.assertTrue(StringUtils.indexOf(logs, "testAndSubActions/PERF-result.xml") < StringUtils.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
-		Assert.assertTrue(StringUtils.indexOf(logs, "testWithException/PERF-result.xml") < StringUtils.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
+		Assert.assertTrue(Strings.CS.indexOf(logs, "testInError/PERF-result.xml") < Strings.CS.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
+		Assert.assertTrue(Strings.CS.indexOf(logs, "testInError/detailed-result.json.xml") < Strings.CS.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
+		Assert.assertTrue(Strings.CS.indexOf(logs, "testAndSubActions/PERF-result.xml") < Strings.CS.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
+		Assert.assertTrue(Strings.CS.indexOf(logs, "testAndSubActions/detailed-result.json") < Strings.CS.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
+		Assert.assertTrue(Strings.CS.indexOf(logs, "testWithException/PERF-result.xml") < Strings.CS.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
+		Assert.assertTrue(Strings.CS.indexOf(logs, "testWithException/detailed-result.json") < Strings.CS.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
 	}
 
 	/**
-	 * Test that if a test is called with "invocationCount", we have as many results as incovations
-	 * @throws Exception
+	 * Test that if a test is called with "invocationCount", we have as many results as invocations
 	 */
 	@Test(groups = {"it"})
 	public void testMultithreadReportWithInvocationCount() throws Exception {
@@ -147,9 +148,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String mainReportContent = readSummaryFile();
 
 		// check we have the 3 executions in report
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testOkWithInvocationCount/TestReport\\.html'.*?>testOkWithInvocationCount</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testOkWithInvocationCount-1/TestReport\\.html'.*?>testOkWithInvocationCount-1</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testOkWithInvocationCount-2/TestReport\\.html'.*?>testOkWithInvocationCount-2</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='testOkWithInvocationCount/TestReport\\.html'.*?>testOkWithInvocationCount</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='testOkWithInvocationCount-1/TestReport\\.html'.*?>testOkWithInvocationCount-1</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='testOkWithInvocationCount-2/TestReport\\.html'.*?>testOkWithInvocationCount-2</a>.*"));
 
 		String detailedReportContent = readTestMethodResultFile("testOkWithInvocationCount");
 		Assert.assertTrue(detailedReportContent.contains("Start method testOkWithInvocationCount"));
@@ -177,7 +178,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Check that test report do not display tabs when no snapshot comparison is requested
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testNoSnapshotComparison() throws Exception {
@@ -197,7 +197,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * issue #351: Check that when snapshot server is used, but a problem occurs posting information, snapshot tab is not displayed
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testSnapshotComparisonErrorDuringTransfer() throws Exception {
@@ -224,7 +223,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			// no snapshot tab displayed
 			Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\"  style=\"display: none;\" >"));
 
-			// message saying that error occured when contacting snapshot server
+			// message saying that error occurred when contacting snapshot server
 			String logs = readSeleniumRobotLogFile();
 			Assert.assertTrue(logs.contains("request to http://localhost:4321 failed: Internal Server Error"));
 
@@ -240,7 +239,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	/**
 	 * Check that when snapshot server is used, we see a tab pointing to snapshot comparison results
 	 * Moreover, a green bullet should be visible on summary result when comparison is OK
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testSnapshotComparisonOkDisplayOnly() throws Exception {
@@ -283,7 +281,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Test case where no snapshot has been sent to server, 'snapshot comparison' step should be green with message stating that no picture has been processed
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testSnapshotNoComparisonDisplayOnly() throws Exception {
@@ -331,7 +328,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check that when snapshot server is used, we see a tab pointing to snapshot comparison results
 	 * Moreover, a red bullet should be visible on summary result when comparison is KO
 	 * Result remains OK as behaviour is "displayOnly"
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testSnapshotComparisonKoDisplayOnly() throws Exception {
@@ -377,7 +373,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check that when snapshot server is used, we see a tab pointing to snapshot comparison results
 	 * Moreover, a red bullet should be visible on summary result when comparison is KO
 	 * Result is KO as behavior is 'changeTestResult'
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testSnapshotComparisonKoChangeTestResult() throws Exception {
@@ -424,7 +419,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Moreover, a red bullet should be visible on summary result when comparison is KO
 	 * 2 results should be presented: one with the result of selenium test, a second one with the result of snapshot comparison.
 	 * Both are the same but second test is there for integration with junit parser so that we can differentiate navigation result from GUI result.
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testSnapshotComparisonKoAddTestResult() throws Exception {
@@ -514,7 +508,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check that when snapshot server is used, we see a tab pointing to snapshot comparison results
 	 * Moreover, a red bullet should be visible on summary result when comparison is KO
 	 * Result remains OK as behaviour is "displayOnly"
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testSnapshotComparisonSkipChangeTestResult() throws Exception {
@@ -563,7 +556,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Moreover, a red bullet should be visible on summary result when comparison is KO
 	 * 2 results should be presented: one with the result of selenium test, a second one with the result of snapshot comparison.
 	 * Both are the same but second test is there for integration with junit parser so that we can differentiate navigation result from GUI result.
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testSnapshotComparisonSkipAddTestResult() throws Exception {
@@ -608,7 +600,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Check summary format in monothread
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testMonothreadReport() throws Exception {
@@ -618,19 +609,25 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// check content of summary report file
 		String mainReportContent = readSummaryFile();
 
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testAndSubActions/TestReport\\.html'.*?>testAndSubActions</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testInError/TestReport\\.html'.*?>testInError</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='testAndSubActions/TestReport\\.html'.*?>testAndSubActions</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='testInError/TestReport\\.html'.*?>testInError</a>.*"));
 
 		// issue #331: check that result files have been generated at least twice (one during test run and one at the end)
 		String logs = readSeleniumRobotLogFile().replace("\\", "/");
-		Assert.assertTrue(StringUtils.countMatches(logs, "testInError/PERF-result.xml") == 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "testAndSubActions/PERF-result.xml") == 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "testWithException/PERF-result.xml") == 3); // once per retry
+        Assert.assertEquals(StringUtils.countMatches(logs, "testInError/PERF-result.xml"), 1);
+        Assert.assertEquals(StringUtils.countMatches(logs, "testInError/detailed-result.json"), 1);
+        Assert.assertEquals(StringUtils.countMatches(logs, "testAndSubActions/PERF-result.xml"), 1);
+        Assert.assertEquals(StringUtils.countMatches(logs, "testAndSubActions/detailed-result.json"), 1);
+        Assert.assertEquals(StringUtils.countMatches(logs, "testWithException/PERF-result.xml"), 3); // once per retry
+        Assert.assertEquals(StringUtils.countMatches(logs, "testWithException/detailed-result.json"), 3); // once per retry
 
 		// issue  #312: check that result files have been generated before test end (meaning they are generated after the test execution
-		Assert.assertTrue(StringUtils.indexOf(logs, "testInError/PERF-result.xml") < StringUtils.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
-		Assert.assertTrue(StringUtils.indexOf(logs, "testAndSubActions/PERF-result.xml") < StringUtils.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
-		Assert.assertTrue(StringUtils.indexOf(logs, "testWithException/PERF-result.xml") < StringUtils.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
+		Assert.assertTrue(Strings.CS.indexOf(logs, "testInError/PERF-result.xml") < Strings.CS.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
+		Assert.assertTrue(Strings.CS.indexOf(logs, "testInError/detailed-result.json") < Strings.CS.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
+		Assert.assertTrue(Strings.CS.indexOf(logs, "testAndSubActions/PERF-result.xml") < Strings.CS.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
+		Assert.assertTrue(Strings.CS.indexOf(logs, "testAndSubActions/detailed-result.json") < Strings.CS.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
+		Assert.assertTrue(Strings.CS.indexOf(logs, "testWithException/PERF-result.xml") < Strings.CS.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
+		Assert.assertTrue(Strings.CS.indexOf(logs, "testWithException/detailed-result.json") < Strings.CS.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
 
 		// issue #319: check that if no test info is recorded, columns are not there / Last State info is always there
 		Assert.assertTrue(mainReportContent.contains("<td class=\"info\">"));
@@ -639,7 +636,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Check "Last State" is always there even if nothing needs to be displayed (should never happen as we should have at least the last screen capture
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testMonothreadReportTestOk() throws Exception {
@@ -673,7 +669,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Check if param "Gridnode" is ok
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testGridnodeExist() throws Exception {
@@ -730,7 +725,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Check generic steps are logged
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testGenericSteps() throws Exception {
@@ -741,7 +735,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// check content of summary report file
 		String mainReportContent = readSummaryFile();
 
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testDriver/TestReport\\.html' info=\"ok\".*?>testDriver</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='testDriver/TestReport\\.html' info=\"ok\".*?>testDriver</a>.*"));
 
 		String detailedReportContent = readTestMethodResultFile("testDriver");
 		detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
@@ -754,7 +748,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Check single test report format when tests have steps
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testMultithreadTestReport() throws Exception {
@@ -765,8 +758,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// check content of summary report file
 		String mainReportContent = readSummaryFile();
 
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testAndSubActions/TestReport\\.html'.*?>testAndSubActions</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testInError/TestReport\\.html'.*?>testInError</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='testAndSubActions/TestReport\\.html'.*?>testAndSubActions</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='testInError/TestReport\\.html'.*?>testInError</a>.*"));
 
 		// check content for details results
 		String detailedReportContent1 = readTestMethodResultFile("testAndSubActions");
@@ -796,7 +789,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Check issue #143 where all \@AfterMethod calls are displayed in all test if its first parameter is not a method reference
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testTestReportContainsOnlyItsAfterMethodSteps() throws Exception {
@@ -817,7 +809,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Check issue #141 where \@AfterMethod calls are displayed as many times as test retries
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testRetriedTestReportContainsOnlyItsAfterMethod() throws Exception {
@@ -835,7 +826,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * issue #251: check error message is displayed for any action that failed
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testDetailedReportWithOneStepFailed() throws Exception {
@@ -850,7 +840,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * issue #251: check error message is displayed for any action that failed
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testDetailedReportWithOneSubStepFailed() throws Exception {
@@ -870,7 +859,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * A snapshot is taken when soft assertion is enabled and assertion fails
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testDetailedReportContainsCaptureOnSoftAssertionEnabled() throws Exception {
@@ -907,7 +895,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 
 			// check that with assertion error, snapshot is present
-			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Assertion Failure: expected \\[true\\] but found \\[false\\] </div>.*"));
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Assertion Failure: expected \\[true] but found \\[false] </div>.*"));
 			Assert.assertFalse(detailedReportContent.contains("<div class=\"message-error\">!!!FAILURE ALERT!!! - Assertion Failure: expected [true] but found [false]</div>"
 					+ "<div class=\"message-snapshot\">Output 'drv:main' browser: Current Window: Test page:"));
 
@@ -918,7 +906,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * In case an image cannot be found, check object file and scene file are present in report
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testDetailedReportContainsSearchedAndSceneImage() throws Exception {
@@ -935,7 +922,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 	/**
 	 * In case an image is found, check report displays the matching level
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testDetailedReportContainsMatchIndex() throws Exception {
@@ -954,7 +940,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check behaviour when Assert is used in test scenario (not in webpage)
 	 * Assertion in scenario should be attached to the previous step which will be marked as failed
 	 * Test end will also be in red
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testDetailedReportWithSoftAssertInScenario() throws Exception {
@@ -973,12 +958,12 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			// check step with assertion inside is failed
 			Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\">"
 					+ "<button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> assertAction"));
-			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> !!!FAILURE ALERT!!! - Assertion Failure: false error expected \\[true\\] but found \\[false\\] </div>.*"));
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> !!!FAILURE ALERT!!! - Assertion Failure: false error expected \\[true] but found \\[false] </div>.*"));
 
 			// that assertion raised in test scenario is attached to previous step
-			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box failed\"><div class\\=\"box-header with-border\">"
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\">"
 					+ "<button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> getResult - \\d+.\\d+ secs</span></div><div class=\"box-body\">"
-					+ "<ul><div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> !!!FAILURE ALERT!!! - Assertion Failure: Error in result expected \\[1\\] but found \\[2\\] </div>.*"));
+					+ "<ul><div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> !!!FAILURE ALERT!!! - Assertion Failure: Error in result expected \\[1] but found \\[2] </div>.*"));
 
 			// check last step shows the assertion
 			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fas fa-plus\"></i>"
@@ -988,7 +973,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-log message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Test is KO with error: class java.lang.AssertionError: !!! Many Test Failures \\(2\\)<br/>.*"));
 
 			// check last step before test end is OK because no error occurs in it
-			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box success\">.*?<i class\\=\"fas fa-plus\"></i></button><span class=\"step-title\"> add with args: \\(3, \\).*"));
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box success\">.*?<i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> add with args: \\(3, \\).*"));
 
 		} finally {
 			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);
@@ -999,7 +984,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check behaviour when Assert is used in test scenario (not in webpage)
 	 * Assertion in scenario should be attached, when there is no step after (final checks) should be displayed in a specific step
 	 * Test end will also be in red
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testDetailedReportWithSoftAssertAtScenarioEnd() throws Exception {
@@ -1017,13 +1001,13 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 			// check last step shows the assertion
 			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fas fa-plus\"></i>"
-					+ "</button><span class=\"step-title\"> Test end - \\d+.\\d+ secs</span></div><div class=\"box-body\"><ul><div class=\"message-log message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Test is KO with error: class java.lang.AssertionError: Error in result expected \\[1\\] but found \\[2\\] </div>.*"));
+					+ "</button><span class=\"step-title\"> Test end - \\d+.\\d+ secs</span></div><div class=\"box-body\"><ul><div class=\"message-log message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Test is KO with error: class java.lang.AssertionError: Error in result expected \\[1] but found \\[2] </div>.*"));
 
 
 			// that assertion raised in test scenario is attached to previous step
 			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\">"
 					+ "<button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> getResult - \\d+.\\d+ secs</span></div><div class=\"box-body\">"
-					+ "<ul><div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> !!!FAILURE ALERT!!! - Assertion Failure: Error in result expected \\[1\\] but found \\[2\\] </div>.*"));
+					+ "<ul><div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> !!!FAILURE ALERT!!! - Assertion Failure: Error in result expected \\[1] but found \\[2] </div>.*"));
 
 
 		} finally {
@@ -1033,7 +1017,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Check that when an assert is raised in sub step, the root step is marked as failed
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testDetailedReportWithSoftAssertInSubStep() throws Exception {
@@ -1055,7 +1038,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 					+ "</button><span class=\"step-title\"> assertWithSubStep - \\d+.\\d+ secs</span></div><div class=\"box-body\"><ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-2\">\\d+:\\d+:\\d+.\\d+</span> doNothing </div></li>"
 					+ "<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> doNothing on HtmlElement none, by=\\{By.id: none} </div></li><div class=\"row\"></div></ul>"
 					+ "<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-2\">\\d+:\\d+:\\d+.\\d+</span> assertAction </div></li><ul>" // => sub step with error
-					+ "<div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> !!!FAILURE ALERT!!! - Assertion Failure: false error expected \\[true\\] but found \\[false\\].*")); // error displayed
+					+ "<div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> !!!FAILURE ALERT!!! - Assertion Failure: false error expected \\[true] but found \\[false].*")); // error displayed
 
 		} finally {
 			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);
@@ -1065,7 +1048,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	/**
 	 * Check behaviur when hard Assert is used in test scenario (not in webpage)
 	 * Test stops on first assertion and step is failed
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testDetailedReportWithHardAssertInScenario() throws Exception {
@@ -1084,13 +1066,13 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			// check step with assertion inside is failed
 			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fas fa-plus\"></i>"
 					+ "</button><span class=\"step-title\"> getResult - \\d+.\\d+ secs</span></div><div class=\"box-body\">.*?"
-					+ "<div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Assertion Failure: Error in result expected \\[1\\] but found \\[2\\].*"));
+					+ "<div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Assertion Failure: Error in result expected \\[1] but found \\[2].*"));
 
 			// Test end step also displays the error
 			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fas fa-plus\"></i>"
 					+ "</button><span class=\"step-title\"> Test end - \\d+.\\d+ secs</span></div><div class=\"box-body\"><ul>.*?"
-					+ "<div class=\"message-log message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> \\[NOT RETRYING\\] due to failed Assertion </div>.*?"
-					+ "<div class=\"message-error\"> class java.lang.AssertionError: Error in result expected \\[1\\] but found \\[2\\].*"
+					+ "<div class=\"message-log message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> \\[NOT RETRYING] due to failed Assertion </div>.*?"
+					+ "<div class=\"message-error\"> class java.lang.AssertionError: Error in result expected \\[1] but found \\[2].*"
 			));
 
 			// test is stopped after assertion raised in test. AssertAction which would be executed later is never reached
@@ -1103,7 +1085,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Check summary format when tests have steps
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportSummaryContentWithSteps() throws Exception {
@@ -1113,8 +1094,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// check content of summary report file
 		String mainReportContent = readSummaryFile();
 
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testAndSubActions/TestReport\\.html'.*?>testAndSubActions</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testInError/TestReport\\.html'.*?>testInError</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='testAndSubActions/TestReport\\.html'.*?>testAndSubActions</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='testInError/TestReport\\.html'.*?>testInError</a>.*"));
 
 		// check number of steps is correctly computed. "test1" has 2 main steps and no failed step, "testInError" has 1 step
 		Assert.assertTrue(mainReportContent.contains("<td name=\"stepsTotal-1\">7</td>"));
@@ -1133,7 +1114,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * issue #148: Check that when test is retried and retry is OK, summary is correct
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testFailsOnlyOnceAndRetriedOk() throws Exception {
@@ -1158,7 +1138,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Check resources referenced in header are get from CDN and resources files are not copied to ouput folder
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportWithResourcesFromCDN() throws Exception {
@@ -1189,7 +1168,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Check resources referenced in header are get from local and resources files are  copied to ouput folder
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportWithResourcesFromLocal() throws Exception {
@@ -1215,7 +1193,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 
 	@Test(groups = {"it"})
-	public void testKeepAllResults(ITestContext testContext) throws Exception {
+	public void testKeepAllResults() throws Exception {
 
 		try {
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
@@ -1243,7 +1221,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 
 	@Test(groups = {"it"})
-	public void testKeepAllResultsNoParallel(ITestContext testContext) throws Exception {
+	public void testKeepAllResultsNoParallel() throws Exception {
 
 		try {
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
@@ -1272,7 +1250,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check the line in report is not present
 	 */
 	@Test(groups = {"it"})
-	public void testKeepAllResultsWithoutRetry(ITestContext testContext) throws Exception {
+	public void testKeepAllResultsWithoutRetry() throws Exception {
 
 		try {
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
@@ -1300,7 +1278,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check that logs of a failed attempt are not kept in the result directory (KEEP_ALL_RESULTS=false)
 	 */
 	@Test(groups = {"it"})
-	public void testDoNotKeepAllResults(ITestContext testContext) throws Exception {
+	public void testDoNotKeepAllResults() throws Exception {
 
 		try {
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
@@ -1361,7 +1339,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.BROWSER);
 		}
 
-		new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
 		String detailedReportContent1 = readTestMethodResultFile("test1Listener5");
 
 		// check all files are displayed
@@ -1375,7 +1352,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Check that automatic steps create all steps in report
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testAutomaticSteps() throws Exception {
@@ -1385,11 +1361,11 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// check content of summary report file
 		String mainReportContent = readSummaryFile();
 
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testFailedWithException/TestReport\\.html'.*?>testFailedWithException</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testFailedWithSoftAssertDisabled/TestReport\\.html'.*?>testFailedWithSoftAssertDisabled</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testFailedWithSoftAssertEnabled/TestReport\\.html'.*?>testFailedWithSoftAssertEnabled</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testMultipleFailedWithSoftAssertEnabled/TestReport\\.html'.*?>testMultipleFailedWithSoftAssertEnabled</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testOk/TestReport\\.html'.*?>testOk</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='testFailedWithException/TestReport\\.html'.*?>testFailedWithException</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='testFailedWithSoftAssertDisabled/TestReport\\.html'.*?>testFailedWithSoftAssertDisabled</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='testFailedWithSoftAssertEnabled/TestReport\\.html'.*?>testFailedWithSoftAssertEnabled</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='testMultipleFailedWithSoftAssertEnabled/TestReport\\.html'.*?>testMultipleFailedWithSoftAssertEnabled</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='testOk/TestReport\\.html'.*?>testOk</a>.*"));
 
 
 		// check that without soft assertion, 'add' step is skipped
@@ -1449,7 +1425,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * manual step option is set inside the StubTestClassManualSteps.testOk() method
 	 * check the failed test case where step should be marked as KO
 	 * Also, error in step should be presented
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testManualSteps() throws Exception {
@@ -1459,8 +1434,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// check content of summary report file
 		String mainReportContent = readSummaryFile();
 
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testOk/TestReport\\.html'.*?>testOk</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testWithAssert/TestReport\\.html'.*?>testWithAssert</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='testOk/TestReport\\.html'.*?>testOk</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='testWithAssert/TestReport\\.html'.*?>testWithAssert</a>.*"));
 
 		// check that without soft assertion, 'add' step is skipped
 		String detailedReportContent1 = readTestMethodResultFile("testOk");
@@ -1492,13 +1467,12 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent2.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> assert exception"));
 
 		// check exception is present in step
-		Assert.assertTrue(detailedReportContent2.matches(".*<div class=\"message-log message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Test is KO with error: class java.lang.AssertionError: false error expected \\[true\\] but found \\[false\\] </div>.*"));
+		Assert.assertTrue(detailedReportContent2.matches(".*<div class=\"message-log message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Test is KO with error: class java.lang.AssertionError: false error expected \\[true] but found \\[false] </div>.*"));
 
 	}
 
 	/**
 	 * Check that manual also mask password if user requests it (gives password to mask in report)
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testManualStepsPasswordMasking() throws Exception {
@@ -1518,7 +1492,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Check state and style of all tests
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportSummaryContentWithDependantTests() throws Exception {
@@ -1528,18 +1501,17 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// check content of summary report file
 		String mainReportContent = readSummaryFile();
 
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='test1/TestReport\\.html' info=\"ok\".*?>test1</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='test4/TestReport\\.html' info=\"ko\".*?>test4</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='test3/TestReport\\.html' info=\"skipped\".*?>test3</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='test5/TestReport\\.html' info=\"ko\".*?>test5</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='test2/TestReport\\.html' info=\"skipped\".*?>test2</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='test6/TestReport\\.html' info=\"ok\".*?>test6</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='test1/TestReport\\.html' info=\"ok\".*?>test1</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='test4/TestReport\\.html' info=\"ko\".*?>test4</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='test3/TestReport\\.html' info=\"skipped\".*?>test3</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='test5/TestReport\\.html' info=\"ko\".*?>test5</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='test2/TestReport\\.html' info=\"skipped\".*?>test2</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='test6/TestReport\\.html' info=\"ok\".*?>test6</a>.*"));
 		Assert.assertFalse(mainReportContent.contains("$testResult.getAttribute(\"methodName\")")); // check all test methods are filled
 	}
 
 	/**
 	 * Check format of messages in detailed report
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportDetailsMessageStyles() throws Exception {
@@ -1567,7 +1539,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	/**
 	 * Check format of steps inside steps
 	 * test1 in com.seleniumtests.it.stubclasses.StubTestClass defines steps inside other steps
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportDetailsWithSubSteps() throws Exception {
@@ -1600,7 +1571,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Check logs are written in file
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportDetailsWithLogs() throws Exception {
@@ -1618,7 +1588,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	/**
 	 * Check all steps are present in detailed report file
 	 * Test OK
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportDetailsSteps() throws Exception {
@@ -1651,7 +1620,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Test the case where "testName" is specified on Test annotation
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportWithCustomTestName() throws Exception {
@@ -1677,7 +1645,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	/**
 	 * Test parameter masking for test method and test step
 	 * Only test method parameter is set as "to mask", but check all steps using the parameter will mask it
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportParametersFromDataProvider() throws Exception {
@@ -1713,7 +1680,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Check test information shows a link to last test step
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportContainsTestEndScreenshotQuicklink() throws Exception {
@@ -1733,8 +1699,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Check that video capture file is not present in result if not requested
-	 *
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportContainsNoVideoCapture() throws Exception {
@@ -1764,8 +1728,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Check that video capture file is present in result if requested
-	 *
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportContainsVideoCapture() throws Exception {
@@ -1805,8 +1767,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	/**
 	 * Check reference image for step is displayed when "recordResult" option is set and video capture is enabled
 	 * This reference is only shown when test fails
-	 *
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportContainsStepReferenceForFailedStep() throws Exception {
@@ -1830,17 +1790,17 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			String detailedReportContent1 = readTestMethodResultFile("testDriverShortKo");
 
 			// reference and current state should be displayed
-			Assert.assertTrue(detailedReportContent1.matches(".* class\\=\"step-title\"> _writeSomethingOnNonExistentElement - .*"
+			Assert.assertTrue(detailedReportContent1.matches(".* class=\"step-title\"> _writeSomethingOnNonExistentElement - .*"
 					+ "at com\\.seleniumtests\\.it\\.driver\\.support\\.pages\\.DriverTestPage\\._writeSomethingOnNonExistentElement\\(DriverTestPage\\.java.*?"
-					+ "<div class\\=\"row\">"
-					+ "<div class\\=\"message-snapshot col\"><div class\\=\"text-center\">"
-					+ "<a href\\=\"#\" onclick\\=\"\\$\\('#imagepreview'\\).*"
+					+ "<div class=\"row\">"
+					+ "<div class=\"message-snapshot col\"><div class=\"text-center\">"
+					+ "<a href=\"#\" onclick=\"\\$\\('#imagepreview'\\).*"
 					+ "<img id.*"
-					+ "<div class\\=\"text-center\">drv:main-Step start state 4: Step start state 4</div>" // the current state
-					+ "<div class\\=\"text-center font-weight-lighter\"><a href=.*target=url>URL</a> \\| <a href='htmls/Step_start_state_4.*?</div>.*"
-					+ "<div class\\=\"message-snapshot col\"><div class\\=\"text-center\">.*"
+					+ "<div class=\"text-center\">drv:main-Step start state 4: Step start state 4</div>" // the current state
+					+ "<div class=\"text-center font-weight-lighter\"><a href=.*target=url>URL</a> \\| <a href='htmls/Step_start_state_4.*?</div>.*"
+					+ "<div class=\"message-snapshot col\"><div class=\"text-center\">.*"
 					+ "<img id.*"
-					+ "<div class\\=\"text-center\">Valid-reference</div>.*")); // the reference
+					+ "<div class=\"text-center\">Valid-reference</div>.*")); // the reference
 
 			// 1 step reference for each step
 			Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Step start state"), 4);
@@ -1856,7 +1816,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * When results are not recorded on selenium server, reference images are not recorded
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReferenceImageNotRecorded() throws Exception {
@@ -1891,7 +1850,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Check step state is not displayed when reference image does not exist on server
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportDoesNotContainStepImageWithoutReference() throws Exception {
@@ -1915,17 +1873,17 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			String detailedReportContent1 = readTestMethodResultFile("testDriverShortKo");
 
 			// reference and current state should be displayed
-			Assert.assertFalse(detailedReportContent1.matches(".* class\\=\"step-title\"> _writeSomethingOnNonExistentElement  - .*"
+			Assert.assertFalse(detailedReportContent1.matches(".* class=\"step-title\"> _writeSomethingOnNonExistentElement {2}- .*"
 					+ "at com\\.seleniumtests\\.it\\.driver\\.support\\.pages\\.DriverTestPage\\._writeSomethingOnNonExistentElement\\(DriverTestPage\\.java.*?"
-					+ "<div class\\=\"row\">"
-					+ "<div class\\=\"message-snapshot col\"><div class\\=\"text-center\">"
-					+ "<a href\\=\"#\" onclick\\=\"\\$\\('#imagepreview'\\).*"
+					+ "<div class=\"row\">"
+					+ "<div class=\"message-snapshot col\"><div class=\"text-center\">"
+					+ "<a href=\"#\" onclick=\"\\$\\('#imagepreview'\\).*"
 					+ "<img id.*"
-					+ "<div class\\=\"text-center\">Step beginning state</div>" // the current state
-					+ "<div class\\=\"text-center font-weight-lighter\"></div>.*"
-					+ "<div class\\=\"message-snapshot col\"><div class\\=\"text-center\">.*"
+					+ "<div class=\"text-center\">Step beginning state</div>" // the current state
+					+ "<div class=\"text-center font-weight-lighter\"></div>.*"
+					+ "<div class=\"message-snapshot col\"><div class=\"text-center\">.*"
 					+ "<img id.*"
-					+ "<div class\\=\"text-center\">Valid-reference</div>.*")); // the reference
+					+ "<div class=\"text-center\">Valid-reference</div>.*")); // the reference
 
 			// only one extraction of step state is presented (the one for failed step)
 			Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Step beginning state</div>"), 0);
@@ -1944,7 +1902,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Check reference is not get if server recording is disabled
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportDoesNotContainStepReferenceWhenRecordingDisabled() throws Exception {
@@ -1968,17 +1925,17 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			String detailedReportContent1 = readTestMethodResultFile("testDriverShortKo");
 
 			// reference and current state should be displayed
-			Assert.assertFalse(detailedReportContent1.matches(".* class\\=\"step-title\"> _writeSomethingOnNonExistentElement  - .*"
+			Assert.assertFalse(detailedReportContent1.matches(".* class=\"step-title\"> _writeSomethingOnNonExistentElement {2}- .*"
 					+ "at com\\.seleniumtests\\.it\\.driver\\.support\\.pages\\.DriverTestPage\\._writeSomethingOnNonExistentElement\\(DriverTestPage\\.java.*?"
-					+ "<div class\\=\"row\">"
-					+ "<div class\\=\"message-snapshot col\"><div class\\=\"text-center\">"
-					+ "<a href\\=\"#\" onclick\\=\"\\$\\('#imagepreview'\\).*"
+					+ "<div class=\"row\">"
+					+ "<div class=\"message-snapshot col\"><div class=\"text-center\">"
+					+ "<a href=\"#\" onclick=\"\\$\\('#imagepreview'\\).*"
 					+ "<img id.*"
-					+ "<div class\\=\"text-center\">Step beginning state</div>" // the current state
-					+ "<div class\\=\"text-center font-weight-lighter\"></div>.*"
-					+ "<div class\\=\"message-snapshot col\"><div class\\=\"text-center\">.*"
+					+ "<div class=\"text-center\">Step beginning state</div>" // the current state
+					+ "<div class=\"text-center font-weight-lighter\"></div>.*"
+					+ "<div class=\"message-snapshot col\"><div class=\"text-center\">.*"
 					+ "<img id.*"
-					+ "<div class\\=\"text-center\">Valid-reference</div>.*")); // the reference
+					+ "<div class=\"text-center\">Valid-reference</div>.*")); // the reference
 
 			// only one extraction of step state is presented (the one for failed step)
 			Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Step beginning state</div>"), 0);
@@ -1997,7 +1954,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * In case test is OK, no reference image is displayed in report
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportDoesNotContainReferenceStep() throws Exception {
@@ -2021,15 +1977,15 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			String detailedReportContent1 = readTestMethodResultFile("testDriverShort");
 
 			// reference and current state should be displayed
-			Assert.assertFalse(detailedReportContent1.matches(".*<div class\\=\"row\">"
-					+ "<div class\\=\"message-snapshot col\"><div class\\=\"text-center\">"
-					+ "<a href\\=\"#\" onclick\\=\"\\$\\('#imagepreview'\\).*"
+			Assert.assertFalse(detailedReportContent1.matches(".*<div class=\"row\">"
+					+ "<div class=\"message-snapshot col\"><div class=\"text-center\">"
+					+ "<a href=\"#\" onclick=\"\\$\\('#imagepreview'\\).*"
 					+ "<img id.*"
-					+ "<div class\\=\"text-center\">Step beginning state</div>" // the current state
-					+ "<div class\\=\"text-center font-weight-lighter\"></div>.*"
-					+ "<div class\\=\"message-snapshot col\"><div class\\=\"text-center\">.*"
+					+ "<div class=\"text-center\">Step beginning state</div>" // the current state
+					+ "<div class=\"text-center font-weight-lighter\"></div>.*"
+					+ "<div class=\"message-snapshot col\"><div class=\"text-center\">.*"
 					+ "<img id.*"
-					+ "<div class\\=\"text-center\">Valid-reference</div>.*")); // the reference
+					+ "<div class=\"text-center\">Valid-reference</div>.*")); // the reference
 
 			// only one extraction of step state is presented (the one for failed step)
 			Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Step beginning state</div>"), 0);
@@ -2048,7 +2004,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * issue #406
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportContainsVideoCaptureOnRetry() throws Exception {
@@ -2074,7 +2029,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	/**
 	 * Check that when driver starts in beforeMethod, it's possible to have video
 	 * issue #406
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportContainsVideoCaptureStartedOnBeforeMethodOnRetry() throws Exception {
@@ -2099,8 +2053,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Check that only one video capture file is present in result even if several drivers are used
-	 *
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportContainsOneVideoCaptureWithMultipleDrivers() throws Exception {
@@ -2123,8 +2075,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Check that HAR capture file is present in result
-	 *
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportContainsHarCapture() throws Exception {
@@ -2135,7 +2085,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent1 = readTestMethodResultFile("testDriver");
 		detailedReportContent1 = detailedReportContent1.replaceAll("\\s+", " ");
 
-		Assert.assertTrue(detailedReportContent1.matches(".*<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys on TextFieldElement Text, by=\\{By.id: text2} with args: \\(true, true, \\[a text,\\], \\) </div></li>.*"));
+		Assert.assertTrue(detailedReportContent1.matches(".*<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys on TextFieldElement Text, by=\\{By.id: text2} with args: \\(true, true, \\[a text,], \\) </div></li>.*"));
 		Assert.assertTrue(detailedReportContent1.contains("Network capture 'main' browser: <a href='main-networkCapture.har'>HAR file</a>"));
 		// check HAR capture is in the "Test end" step
 		Assert.assertTrue(detailedReportContent1.indexOf("Network capture 'main'") > detailedReportContent1.indexOf("\"step-title\"> Test end"));
@@ -2145,8 +2095,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Check that HAR capture file is present in result when using multiple browsers, one for each browser
-	 *
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportContainsHarCaptureMultipleBrowsers() throws Exception {
@@ -2157,7 +2105,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent1 = readTestMethodResultFile("testMultipleDriver");
 		detailedReportContent1 = detailedReportContent1.replaceAll("\\s+", " ");
 
-		Assert.assertTrue(detailedReportContent1.matches(".*<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys on TextFieldElement Text, by=\\{By.id: text2} with args: \\(true, true, \\[a text,\\], \\) </div></li>.*"));
+		Assert.assertTrue(detailedReportContent1.matches(".*<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys on TextFieldElement Text, by=\\{By.id: text2} with args: \\(true, true, \\[a text,], \\) </div></li>.*"));
 		Assert.assertTrue(detailedReportContent1.contains("Network capture 'main' browser: <a href='main-networkCapture.har'>HAR file</a>"));
 		Assert.assertTrue(detailedReportContent1.contains("Network capture 'second' browser: <a href='second-networkCapture.har'>HAR file</a>"));
 		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testMultipleDriver", "main-networkCapture.har").toFile().exists());
@@ -2185,8 +2133,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * - all HtmlElement action logging
 	 * - all composite actions logging
 	 * - all PictureElement action logging
-	 *
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportContainsDriverActions() throws Exception {
@@ -2200,18 +2146,18 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent1.matches(".*<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys on TextFieldElement Text, by=\\{By.id: text2} with args: \\(true, true, \\[a text,], \\) </div></li>.*"));
 		Assert.assertTrue(detailedReportContent1.matches(".*<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> click on ButtonElement Reset, by=\\{By.id: button2} </div></li>.*"));
 		Assert.assertTrue(detailedReportContent1.contains("<div class=\"text-center\">drv:main: Current Window: Test page</div>"));
-		Assert.assertTrue(detailedReportContent1.matches(".*<img id\\=\".*?\" src\\=\"screenshots/Step_start_state_3.*<div class\\=\"text-center\">drv:main-Step start state 3: Step start state 3</div>.*"));
+		Assert.assertTrue(detailedReportContent1.matches(".*<img id=\".*?\" src=\"screenshots/Step_start_state_3.*<div class=\"text-center\">drv:main-Step start state 3: Step start state 3</div>.*"));
 
 		// check that only on reference to 'click' is present for this buttonelement. This means that only the replayed action has been logged, not the ButtonElement.click() one
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "click on"), 1);
 
 		// check composite actions. We must have the moveToElement, click and sendKeys actions
 		Assert.assertTrue(detailedReportContent1.matches(".*<span class=\"step-title\"> _sendKeysComposite - \\d+.\\d+ secs</span></div>" +
-				"<div class=\"box-body\"><ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-2\">\\d+:\\d+:\\d+.\\d+</span> Composite moveToElement,sendKeys,on element 'TextFieldElement Text, by=\\{By.id: text2\\}' </div></li>" +
-				"<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> moveToElement with args: \\(TextFieldElement Text, by=\\{By.id: text2\\}, \\) </div></li>" +
-				"<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys with args: \\(\\[composite,\\], \\) </div></li><div class=\"row\"></div></ul>" +
-				"<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-2\">\\d+:\\d+:\\d+.\\d+</span> Composite moveToElement,click,on element 'ButtonElement Reset, by=\\{By.id: button2\\}' </div></li>" +
-				"<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> moveToElement with args: \\(ButtonElement Reset, by=\\{By.id: button2\\}, \\) </div></li>" +
+				"<div class=\"box-body\"><ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-2\">\\d+:\\d+:\\d+.\\d+</span> Composite moveToElement,sendKeys,on element 'TextFieldElement Text, by=\\{By.id: text2}' </div></li>" +
+				"<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> moveToElement with args: \\(TextFieldElement Text, by=\\{By.id: text2}, \\) </div></li>" +
+				"<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys with args: \\(\\[composite,], \\) </div></li><div class=\"row\"></div></ul>" +
+				"<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-2\">\\d+:\\d+:\\d+.\\d+</span> Composite moveToElement,click,on element 'ButtonElement Reset, by=\\{By.id: button2}' </div></li>" +
+				"<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> moveToElement with args: \\(ButtonElement Reset, by=\\{By.id: button2}, \\) </div></li>" +
 				"<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> click </div></li>.*"));
 
 
@@ -2230,8 +2176,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * - all HtmlElement action logging
 	 * - all composite actions logging
 	 * - all PictureElement action logging
-	 *
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportContainsDriverNativeActionsNoOverride() throws Exception {
@@ -2264,8 +2208,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * - all HtmlElement action logging
 	 * - all composite actions logging
 	 * - all PictureElement action logging
-	 *
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportContainsDriverNativeActionsWithOverride() throws Exception {
@@ -2286,8 +2228,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	/**
 	 * Test reporting on PageObjectFactory (use of @FindBy)
 	 * selenium override is enabled
-	 *
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportContainsDriverNativeActionsWithOverrideOnPageObjectFactory() throws Exception {
@@ -2305,7 +2245,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	/**
 	 * Test reporting on PageObjectFactory (use of @FindBy)
 	 * selenium override is disabled
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportContainsDriverNativeActionsWithoutOverrideOnPageObjectFactory() throws Exception {
@@ -2325,7 +2264,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Test display of failed actions / steps
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportContainsDriverFailedActions() throws Exception {
@@ -2339,7 +2277,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			String detailedReportContent1 = readTestMethodResultFile("testDriverFailed");
 			detailedReportContent1 = detailedReportContent1.replaceAll("\\s+", " ");
 
-			Assert.assertTrue(detailedReportContent1.matches(".*<li class=\"header-failed\"><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys on TextFieldElement Text, by=\\{By.id: text___\\} with args: \\(true, true, \\[a text,\\], \\).*"));
+			Assert.assertTrue(detailedReportContent1.matches(".*<li class=\"header-failed\"><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> sendKeys on TextFieldElement Text, by=\\{By.id: text___} with args: \\(true, true, \\[a text,], \\).*"));
 		} finally {
 			System.clearProperty(SeleniumTestsContext.REPLAY_TIME_OUT);
 		}
@@ -2351,7 +2289,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check all errors are recorded in detailed file
 	 * - in execution logs
 	 * - in Test end step
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportDetailsWithErrors() throws Exception {
@@ -2363,7 +2300,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 		// Check error is present is Last test step
 		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-log message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Test is KO with error: class java.lang.AssertionError: error </div>.*"));
-		System.out.println(detailedReportContent);
+
 		// Check exception is logged and filtered
 		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error\"><div>class java.lang.AssertionError: error</div>"
 				+ "<div class=\"stack-element\"></div>"
@@ -2388,7 +2325,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Check test values are displayed (call to logger.logTestValue()) shown as a table
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testReportDetailsWithTestValues() throws Exception {
@@ -2418,7 +2354,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	/**
 	 * Check all steps are present in detailed report file. For cucumber, check that method name is the Scenario name, not the "feature" generic method
 	 * Test OK
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testCucumberStart2() throws Exception {
@@ -2426,7 +2361,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		executeSubCucumberTests("core_7", 1);
 
 		String mainReportContent = readSummaryFile();
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='core_7/TestReport\\.html'.*?>core_7</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='core_7/TestReport\\.html'.*?>core_7</a>.*"));
 
 		String detailedReportContent = readTestMethodResultFile("core_7");
 		detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
@@ -2438,7 +2373,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * issue #362: check that with scenario outline, we have the 2 results
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testCucumberScenarioOutline() throws Exception {
@@ -2446,14 +2380,13 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		executeSubCucumberTests("core_ .*", 1);
 
 		String mainReportContent = readSummaryFile();
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='core__tata/TestReport\\.html'.*?>core__tata</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='core__titi/TestReport\\.html'.*?>core__titi</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='core__tata/TestReport\\.html'.*?>core__tata</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='core__titi/TestReport\\.html'.*?>core__titi</a>.*"));
 
 	}
 
 	/**
 	 * issue #362: check that with scenario outline, we have the 2 results even if name is the same
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testCucumberScenarioOutlineUniqueName() throws Exception {
@@ -2462,15 +2395,14 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 		String mainReportContent = readSummaryFile();
 
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='core_unique_name-_tata_/TestReport\\.html'.*?>core_unique_name-_tata_</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='core_unique_name-_titi_/TestReport\\.html'.*?>core_unique_name-_titi_</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='core_unique_name-_tata_/TestReport\\.html'.*?>core_unique_name-_tata_</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='core_unique_name-_titi_/TestReport\\.html'.*?>core_unique_name-_titi_</a>.*"));
 
 	}
 
 	/**
 	 * issue #362: check that with scenario outline, we have the 2 results even if name is the same
 	 * issue #366: also check with an accent so that we can verify it's removed
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testCucumberScenarioOutlineUniqueLongName() throws Exception {
@@ -2479,7 +2411,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 		String mainReportContent = readSummaryFile();
 
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='a_very_long_scenario_outline_name_which_should_not_have_been_created_but_is_there_but_we_should/TestReport\\.html'.*?>a_very_long_scenario_outline_name_which_should_not_have_been_created_but_is_there_but_we_should</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='a_very_long_scenario_outline_name_which_should_not_have_been_created_but_is_there_but_we_should/TestReport\\.html'.*?>a_very_long_scenario_outline_name_which_should_not_have_been_created_but_is_there_but_we_should</a>.*"));
 
 		readTestMethodResultFile("a_very_long_scenario_outline_name_which_should_not_have_been_created_but_is_there_but_we_should");
 	}
@@ -2488,7 +2420,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check all steps are present in detailed report file. For cucumber, check that method name is the Scenario name, not the "feature" generic method
 	 * Test OK
 	 * Check if it's possible to have '??' is scenario name
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testCucumberScenarioWithSpecialName() throws Exception {
@@ -2496,7 +2427,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		executeSubCucumberTests("my beautiful scenario ?? ok ??", 1);
 
 		String mainReportContent = readSummaryFile();
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='my_beautiful_scenario_.._ok_..-/TestReport\\.html'.*?>my_beautiful_scenario_.._ok_..-</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='my_beautiful_scenario_.._ok_..-/TestReport\\.html'.*?>my_beautiful_scenario_.._ok_..-</a>.*"));
 
 		String detailedReportContent = readTestMethodResultFile("my_beautiful_scenario_.._ok_..-");
 		detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
@@ -2510,7 +2441,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	/**
 	 * Check that test name is correctly reported in cucumber mode when threads are used
 	 * Test OK
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testCucumberMultiThread() throws Exception {
@@ -2518,16 +2448,14 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		executeSubCucumberTests("core_3,core_4", 5);
 
 		String mainReportContent = readSummaryFile();
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='core_3/TestReport\\.html'.*?>core_3</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='core_3/TestReport\\.html'.*?>core_3</a>.*"));
 	}
 
 	/**
 	 * Test that HTML report is correctly encoded
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
-	public void testHtmlCharacterEscape(ITestContext testContext) throws Exception {
+	public void testHtmlCharacterEscape() throws Exception {
 		executeSubTest(new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"});
 
 		String detailedReportContent = readTestMethodResultFile("testWithException");
@@ -2551,11 +2479,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Test that HTML report is correctly encoded with 2 exceptions
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
-	public void testHtmlCharacterEscapeMultipleExceptions(ITestContext testContext) throws Exception {
+	public void testHtmlCharacterEscapeMultipleExceptions() throws Exception {
 		executeSubTest(new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"});
 
 		String detailedReportContent = readTestMethodResultFile("testWithChainedException");
@@ -2569,7 +2495,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Check that information recorded during test, by calling 'SeleniumRobotTestPlan.addTestInfo(key, value)' are added to summary and test report
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testWithTestInfo() throws Exception {
@@ -2590,7 +2515,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * issue #99: Check summary with multiple suites executing the same test. Both test should be presented
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testMultiSuitesdReport() throws Exception {
@@ -2600,8 +2524,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// check content of summary report file
 		String mainReportContent = readSummaryFile();
 
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testAndSubActions/TestReport\\.html'.*?>testAndSubActions</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testAndSubActions-1/TestReport\\.html'.*?>testAndSubActions-1</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='testAndSubActions/TestReport\\.html'.*?>testAndSubActions</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='testAndSubActions-1/TestReport\\.html'.*?>testAndSubActions-1</a>.*"));
 	}
 
 
@@ -2610,7 +2534,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * This helps in the case the action error is catched
 	 */
 	@Test(groups = {"it"})
-	public void testLogActionErrorsAsWarning(ITestContext testContext) throws Exception {
+	public void testLogActionErrorsAsWarning() throws Exception {
 
 		try {
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
@@ -2632,7 +2556,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Check call to 'isDisplayedRetry' when element is not present should create a failed step with warning, but no exception displayed
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testNoFailedStepForIsDisplayedRetry() throws Exception {
@@ -2655,7 +2578,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 
 	@Test(groups = {"it"})
-	public void testNoDescription(ITestContext testContext) throws Exception {
+	public void testNoDescription() throws Exception {
 
 		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassforTestDescription"}, ParallelMode.METHODS, new String[]{"testNoDescription"});
 
@@ -2668,11 +2591,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Check that if a user param is set from command line, description can use it
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
-	public void testDescriptionWithUserParam(ITestContext testContext) throws Exception {
+	public void testDescriptionWithUserParam() throws Exception {
 
 		try {
 			System.setProperty("url", "http://mysite.com");
@@ -2691,11 +2612,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Test that a param added inside test can also be used
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
-	public void testDescriptionWithParamCreatedInTest(ITestContext testContext) throws Exception {
+	public void testDescriptionWithParamCreatedInTest() throws Exception {
 
 		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassforTestDescription"}, ParallelMode.METHODS, new String[]{"testWithParamCreatedInTest"});
 
@@ -2709,11 +2628,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Test interpolation of method parameters when they are referenced as 'arg0', 'arg1', ..., 'argN' in description
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
-	public void testDescriptionWithDataProvider(ITestContext testContext) throws Exception {
+	public void testDescriptionWithDataProvider() throws Exception {
 
 		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassforTestDescription"}, ParallelMode.METHODS, new String[]{"testDataProvider"});
 
@@ -2731,11 +2648,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Test interpolation of method parameters when they are referenced as 'arg0', 'arg1', ..., 'argN' in description
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
-	public void testDescriptionWithLineBreak(ITestContext testContext) throws Exception {
+	public void testDescriptionWithLineBreak() throws Exception {
 
 		try {
 			System.setProperty("url", "http://mysite.com");
@@ -2753,11 +2668,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Test special characters are correctly handled in description
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
-	public void testDescriptionWithSpecialCharacters(ITestContext testContext) throws Exception {
+	public void testDescriptionWithSpecialCharacters() throws Exception {
 
 		try {
 			System.setProperty("url", "http://mysite.com");
@@ -2775,7 +2688,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	/**
 	 * Check error cause is displayed in report
-	 * @throws Exception
 	 */
 	@Test(groups = {"it"})
 	public void testStepAnnotationWithError() throws Exception {
@@ -2787,8 +2699,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
 
 		// Only failing step contains the information message
-		Assert.assertTrue(detailedReportContent.matches(".*<i class\\=\"fas fa-plus\"></i></button><span class=\"step-title\"> add - 0\\.\\d+ secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fas fa-info-circle\"></i><span>Possibly caused by REGRESSION: Check your scripts</span></div>.*"));
-		Assert.assertFalse(detailedReportContent.matches(".*<i class\\=\"fas fa-plus\"></i></button><span class=\"step-title\"> Test end - 0\\.\\d+ secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fas fa-info-circle\"></i><span>Possibly caused by REGRESSION: Check your scripts</span></div>.*"));
+		Assert.assertTrue(detailedReportContent.matches(".*<i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> add - 0\\.\\d+ secs</span></div><div class=\"box-body\"><div class=\"step-info\"><i class=\"fas fa-info-circle\"></i><span>Possibly caused by REGRESSION: Check your scripts</span></div>.*"));
+		Assert.assertFalse(detailedReportContent.matches(".*<i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> Test end - 0\\.\\d+ secs</span></div><div class=\"box-body\"><div class=\"step-info\"><i class=\"fas fa-info-circle\"></i><span>Possibly caused by REGRESSION: Check your scripts</span></div>.*"));
 	}
 
 	@Test(groups = {"it"})
@@ -2801,7 +2713,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
 
 		// Only failing step contains the information message
-		Assert.assertFalse(detailedReportContent.matches(".*<i class\\=\"fas fa-plus\"></i></button><span class=\"step-title\"> Test end - 0\\.\\d+ secs</span></div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fas fa-info-circle\"></i><span>Possibly caused by REGRESSION: </span></div>.*"));
+		Assert.assertFalse(detailedReportContent.matches(".*<i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> Test end - 0\\.\\d+ secs</span></div><div class=\"box-body\"><div class=\"step-info\"><i class=\"fas fa-info-circle\"></i><span>Possibly caused by REGRESSION: </span></div>.*"));
 	}
 
 	@Test(groups = {"it"})

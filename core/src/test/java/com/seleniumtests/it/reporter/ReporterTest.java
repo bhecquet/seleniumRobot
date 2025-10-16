@@ -81,12 +81,12 @@ public class ReporterTest extends ConnectorsTest {
     }
 
     @BeforeMethod(groups={"it"})
-    public void init(Method method, ITestContext context) throws IOException {
+    public void init(Method method, ITestContext context) {
         SeleniumRobotServerTestRecorder.resetSessionId();
     }
 
     @BeforeMethod(groups={"it"})
-    public void setLogs(Method method, ITestContext context) throws IOException {
+    public void setLogs(Method method, ITestContext context) {
         GenericTest.resetTestNGREsultAndLogger();
 
         SeleniumTestsContext.resetOutputFolderNames();
@@ -101,7 +101,6 @@ public class ReporterTest extends ConnectorsTest {
     /**
      * Execute stub tests using TestNG runner and make SeleniumTestsReporter a listener so that
      * a report is generated
-     * @throws IOException
      */
     protected List<String> executeSubTest(int threadCount, String[] testClasses) throws IOException {
         return executeSubTest(threadCount, testClasses, XmlSuite.ParallelMode.METHODS, new String[] {});
@@ -109,15 +108,13 @@ public class ReporterTest extends ConnectorsTest {
 
     /**
      * Execute SeleniumTestPlan tests
-     * @param threadCount
-     * @param testClasses
-     * @param parallelMode
+     * @param threadCount       Number of threads for test execution
+     * @param testClasses       Test classes to execute
+     * @param parallelMode      whether we execute in parallel or not
      * @param methods			If methods is not empty, then testClasses must contain only one element.
-     * @return
-     * @throws IOException
+     * @return the list of tests
      */
     public static List<String> executeSubTest(int threadCount, String[] testClasses, XmlSuite.ParallelMode parallelMode, String[] methods) throws IOException {
-//		TestListener testListener = new TestListener();
 
         List<String> testList = new ArrayList<>();
 
@@ -128,7 +125,6 @@ public class ReporterTest extends ConnectorsTest {
         Map<String, String> suiteParameters = new HashMap<>();
         suiteParameters.put("softAssertEnabled", "false");
         suite.setParameters(suiteParameters);
-//		suite.setConfigFailurePolicy(FailurePolicy.CONTINUE);
         List<XmlSuite> suites = new ArrayList<>();
         suites.add(suite);
 
@@ -165,7 +161,7 @@ public class ReporterTest extends ConnectorsTest {
         return testList;
     }
 
-    public static TestNG executeMultiSuites(String[] testClasses, String[] methods) throws IOException {
+    public static TestNG executeMultiSuites(String[] testClasses, String[] methods) {
 
         List<XmlSuite> suites = new ArrayList<XmlSuite>();
 
@@ -231,28 +227,26 @@ public class ReporterTest extends ConnectorsTest {
     /**
      * Execute SeleniumTestPlan and cucumber tests
      * Each test method is put in its own TestNG test
-     * @param threadCount
-     * @param testMethods
-     * @param cucumberTests
-     * @return
-     * @throws IOException
+     * @param threadCount   number of threads to use if tests are executed in parallel
+     * @param testMethods   the names of fully qualified test methods (package.class.method)
+     * @param cucumberTests names of cucumber tests if they are used
+     * @return  the TestNG runner
      */
-    public TestNG executeSubTest(int threadCount, String[] testMethods, String cucumberTests, String group) throws IOException {
+    public TestNG executeSubTest(int threadCount, String[] testMethods, String cucumberTests, String group) {
         return executeSubTest(threadCount, testMethods, cucumberTests, group, null);
     }
 
     /**
      * Execute SeleniumTestPlan and cucumber tests
      * Each test method is put in its own TestNG test
-     * @param threadCount
-     * @param testMethods
-     * @param cucumberTests
-     * @param group
-     * @param dataproviderThreadCount
-     * @return
-     * @throws IOException
+     * @param threadCount               number of threads to use if tests are executed in parallel
+     * @param testMethods               the names of fully qualified test methods (package.class.method)
+     * @param cucumberTests             names of cucumber tests if they are used
+     * @param group                     names of groups to executed, if used
+     * @param dataproviderThreadCount   number of threads for the data provider
+     * @return the TestNG runner
      */
-    public TestNG executeSubTest(int threadCount, String[] testMethods, String cucumberTests, String group, Integer dataproviderThreadCount) throws IOException {
+    public TestNG executeSubTest(int threadCount, String[] testMethods, String cucumberTests, String group, Integer dataproviderThreadCount) {
 
         XmlSuite suite = new XmlSuite();
         suite.setName("TmpSuite");
@@ -262,7 +256,7 @@ public class ReporterTest extends ConnectorsTest {
         suiteParameters.put("softAssertEnabled", "false");
         suiteParameters.put("cucumberPackage", "com.seleniumtests");
         suite.setParameters(suiteParameters);
-        List<XmlSuite> suites = new ArrayList<XmlSuite>();
+        List<XmlSuite> suites = new ArrayList<>();
         suites.add(suite);
 
         if (threadCount > 1) {
@@ -301,7 +295,7 @@ public class ReporterTest extends ConnectorsTest {
             XmlTest test = new XmlTest(suite);
             test.setName(String.format("cucumberTest_%d", new Random().nextInt()));
             XmlPackage xmlPackage = new XmlPackage("com.seleniumtests.core.runner.*");
-            test.setXmlPackages(Arrays.asList(xmlPackage));
+            test.setXmlPackages(List.of(xmlPackage));
             Map<String, String> parameters = new HashMap<>();
             parameters.put("cucumberTests", cucumberTests);
             parameters.put("cucumberTags", "");
@@ -320,10 +314,8 @@ public class ReporterTest extends ConnectorsTest {
     /**
      *
      * @param cucumberTests 	cucumber test param as it would be passed in XML file
-     * @return
-     * @throws IOException
      */
-    public static XmlSuite executeSubCucumberTests(String cucumberTests, int threadCount) throws IOException {
+    public static XmlSuite executeSubCucumberTests(String cucumberTests, int threadCount) {
 
         XmlSuite suite = new XmlSuite();
         suite.setName("TmpSuite");
@@ -344,7 +336,7 @@ public class ReporterTest extends ConnectorsTest {
         XmlTest test = new XmlTest(suite);
         test.setName(String.format("cucumberTest_%d", new Random().nextInt()));
         XmlPackage xmlPackage = new XmlPackage("com.seleniumtests.core.runner.*");
-        test.setXmlPackages(Arrays.asList(xmlPackage));
+        test.setXmlPackages(List.of(xmlPackage));
         Map<String, String> parameters = new HashMap<>();
         parameters.put("cucumberTests", cucumberTests);
         parameters.put("cucumberTags", "");
@@ -362,9 +354,8 @@ public class ReporterTest extends ConnectorsTest {
     /**
      * Reads the TestReport.html file for the given test name
      * line breaks are removed
-     * @param testName
-     * @return
-     * @throws IOException
+     * @param testName      name of the test
+     * @return content of the file
      */
     public static String readTestMethodResultFile(String testName) throws IOException {
         String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), testName, "TestReport.html").toFile(), StandardCharsets.UTF_8);
@@ -373,6 +364,11 @@ public class ReporterTest extends ConnectorsTest {
 
     public static String readTestMethodPerfFile(String testName) throws IOException {
         String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), testName, "PERF-result.xml").toFile(), StandardCharsets.UTF_8);
+        return detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+    }
+
+    public static String readTestMethodDetailedFile(String testName) throws IOException {
+        String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), testName, "detailed-result.xml").toFile(), StandardCharsets.UTF_8);
         return detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
     }
 

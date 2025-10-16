@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.seleniumtests.connectors.tms.ITestManager;
@@ -65,8 +64,6 @@ import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
-import com.seleniumtests.driver.screenshots.ScreenshotUtil;
-import com.seleniumtests.driver.screenshots.SnapshotComparisonBehaviour;
 import com.seleniumtests.reporter.logger.ArchiveMode;
 import com.seleniumtests.reporter.reporters.BugTrackerReporter;
 import com.seleniumtests.reporter.reporters.CustomReporter;
@@ -80,7 +77,6 @@ import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.video.VideoCaptureMode;
-import org.testng.internal.thread.ThreadUtil;
 
 /**
  * Defines TestNG context used in STF.
@@ -215,7 +211,7 @@ public class SeleniumTestsContext {
     																				// this option disables the behaviour FOR TEST PURPOSE
     
     // default values
-    protected static final List<ReportInfo> DEFAULT_CUSTOM_TEST_REPORTS = List.of(new ReportInfo("PERF::xml::reporter/templates/report.perf.vm"), new ReportInfo("step::json::reporter/templates/report.test.json.vm"));
+    protected static final List<ReportInfo> DEFAULT_CUSTOM_TEST_REPORTS = List.of(new ReportInfo("PERF::xml::reporter/templates/report.perf.vm"), new ReportInfo("detailed::json::reporter/templates/report.test.json.vm"));
     protected static final List<ReportInfo> DEFAULT_CUSTOM_SUMMARY_REPORTS = List.of(new ReportInfo("results::json::reporter/templates/report.summary.json.vm"));
 	public static final int DEFAULT_NEW_COMMAND_TIMEOUT = 120;
 	public static final String DEFAULT_TEST_ENV = "DEV";
@@ -252,15 +248,11 @@ public class SeleniumTestsContext {
 	public static final boolean DEFAULT_OPTIMIZE_REPORTS = false;
 	public static final ArchiveMode DEFAULT_ARCHIVE= ArchiveMode.NEVER;
 	public static final boolean DEFAULT_KEEP_ALL_RESULTS = false;
-	public static final String DEFAULT_NODE_TAGS = "";
-	public static final String DEFAULT_DEBUG = "none";
-	public static final String DEFAULT_AUTOMATION_NAME = "Appium";
-	public static final String DEFAULT_STARTED_BY = null;
-	public static final boolean DEFAULT_REPORTPORTAL_ACTIVE = false;
-	public static final boolean DEFAULT_RANDOM_IN_ATTACHMENT_NAME = true;
+    public static final String DEFAULT_DEBUG = "none";
+    public static final String DEFAULT_STARTED_BY = null;
+    public static final boolean DEFAULT_RANDOM_IN_ATTACHMENT_NAME = true;
 	public static final ElementInfo.Mode DEFAULT_ADVANCED_ELEMENT_SEARCH = ElementInfo.Mode.FALSE;
-	public static final boolean DEFAULT_EDGE_IE_MODE = false;
-    
+
     public static final int DEFAULT_REPLAY_TIME_OUT = 30;
     public static final int DEFAULT_ACTION_DELAY = 200;
 
@@ -292,8 +284,6 @@ public class SeleniumTestsContext {
     private SeleniumRobotServerContext seleniumRobotServerContext;
     private TestStepManager testStepManager; // handles logging of test steps in this context
     private boolean driverCreationBlocked = false;		// if true, inside this thread, driver creation will be forbidden
-
-    private String threadId;
     
     // folder config
  	private Map<String, HashMap<String,String>> idMapping;
@@ -307,7 +297,6 @@ public class SeleniumTestsContext {
     	bugtrackerInstance = null;
     	testManagerContext = null;
     	testStepManager = new TestStepManager();
-        threadId = ThreadUtil.currentThreadInfo();
     }
     
     /**
@@ -348,8 +337,6 @@ public class SeleniumTestsContext {
     	testStepManager = new TestStepManager(toCopy.testStepManager);
     	
     	initSubContexts();
-
-        threadId = ThreadUtil.currentThreadInfo();
     }
     
     private void initSubContexts() {
@@ -475,9 +462,7 @@ public class SeleniumTestsContext {
         setViewPortHeight(getIntValueForTest(VIEWPORT_HEIGHT, System.getProperty(VIEWPORT_HEIGHT)));
 
         setRandomInAttachmentNames(getBoolValueForTest(RANDOM_IN_ATTACHMENT_NAME, System.getProperty(RANDOM_IN_ATTACHMENT_NAME)));
-        
-        //setReportPortalActive(getBoolValueForTest(REPORTPORTAL_ACTIVE, System.getProperty(REPORTPORTAL_ACTIVE)));
-        
+
         if (testNGContext != null) {
         	
         	// this value will be overwritten for thread context by a call to "configureContext"
@@ -514,7 +499,7 @@ public class SeleniumTestsContext {
     
     /**
      * update test data according to platform
-     * @param platform
+     * @param platform  name of the test platform (ex: Android 13)
      */
     public void updateTestAndMobile(String platform) {
     	
@@ -602,7 +587,7 @@ public class SeleniumTestsContext {
     
     /**
      * returns the selenium grid connector if mode requests it
-     * @return
+     * @return  list of grid connectors that may be used
      */
     private List<SeleniumGridConnector> connectGrid() {
     	if (getRunMode() == DriverMode.GRID) {
@@ -635,7 +620,7 @@ public class SeleniumTestsContext {
        
     /**
      * Get all JVM properties and filters the java one so that only user defined JVM arguments are returned
-     * @return
+     * @return  map of parameters given in command line
      */
     public Map<String, String> getCommandLineProperties() {
 	    Map<String, String> props = new HashMap<>();
@@ -659,7 +644,6 @@ public class SeleniumTestsContext {
     
     /**
      * Returns list of variables defined by user from command line
-     * @return
      */
     private Map<String, TestVariable> getUserDefinedVariablesFromCommandLine() {
     	return extractCustomVariables(getCommandLineProperties());
@@ -667,7 +651,6 @@ public class SeleniumTestsContext {
     
     /**
      * Returns list of variables defined by user from TestNG XML file
-     * @return
      */
     private Map<String, TestVariable> getUserDefinedVariablesFromXMLFile() {
     	if (testNGContext != null) {
@@ -686,7 +669,7 @@ public class SeleniumTestsContext {
     /**
      * from a list of variables, extract those who are variables created by user (not seleniumRobot technical variables)
      * If parameter is already known in contextDataMap (technical parameters defined in this class), it's not added 
-     * @param parameters
+     * @param parameters    parameters from which we get custom variables
      */
     private Map<String, TestVariable> extractCustomVariables(Map<String, String> parameters) {
     	Map<String, TestVariable> variables = new HashMap<>();
@@ -706,8 +689,9 @@ public class SeleniumTestsContext {
     /**
      * Get (in order of importance) user value (if exist), test value (if exist), suite value (if exist) or null
      *
-     * @param  attributeName
-     * @param  sysPropertyValue
+     * @param  attributeName    name of attribute for which we want to get effective value
+     * @param  sysPropertyValue name of system property that user may have given
+     * @return the value
      */
     public String getValueForTest(final String attributeName, final String sysPropertyValue) {
     	String value = null;
@@ -737,9 +721,9 @@ public class SeleniumTestsContext {
     
     /**
      * Return an int value from test parameters
-     * @param attributeName
-     * @param sysPropertyValue
-     * @return
+     * @param  attributeName    name of attribute for which we want to get effective value
+     * @param  sysPropertyValue name of system property that user may have given
+     * @return the value used for test
      */
     public Integer getIntValueForTest(final String attributeName, final String sysPropertyValue) {
     	String value = getValueForTest(attributeName, sysPropertyValue);
@@ -752,9 +736,9 @@ public class SeleniumTestsContext {
     
     /**
      * Return a boolean value from test parameters
-     * @param attributeName
-     * @param sysPropertyValue
-     * @return
+     * @param  attributeName    name of attribute for which we want to get effective value
+     * @param  sysPropertyValue name of system property that user may have given
+     * @return value used for test
      */
     public Boolean getBoolValueForTest(final String attributeName, final String sysPropertyValue) {
     	String value = getValueForTest(attributeName, sysPropertyValue);
@@ -764,7 +748,7 @@ public class SeleniumTestsContext {
     private void createContextConnectors() {
     	
     	// create selenium grid connectors. They will be created if it's null
-    	// in this phase, we chek that grid is alive
+    	// in this phase, we check that grid is alive
     	getSeleniumGridConnectors();
     	
     	// create Test Manager connector
@@ -792,8 +776,8 @@ public class SeleniumTestsContext {
      * Returns the name of the folder where all files (result, snapshots) will be stored inside 'test-output' folder
      * By default, folder name is the name of the test. But if the same test is executed twice, with for example DataProvider or through different suites / tests, 
      * then increment a suffix so that there is no collision between test results
-     * @param testNGResult
-     * @return
+     * @param testNGResult  the current TestNG result
+     * @return  the hash associated to this test
      */
     private String hashTest(ITestResult testNGResult) {
     	
@@ -807,12 +791,12 @@ public class SeleniumTestsContext {
         	}
         	
         	if (!outputFolderNames.containsKey(uniqueIdentifier)) {
-        		if (!outputFolderNames.values().contains(testNameModified)) {
+        		if (!outputFolderNames.containsValue(testNameModified)) {
         			outputFolderNames.put(uniqueIdentifier, testNameModified);
         		} else {
     	    		int i = 0;
     	    		while (i++ < 1000) {
-    	    			if (!outputFolderNames.values().contains(testNameModified + "-" + i)) {
+    	    			if (!outputFolderNames.containsValue(testNameModified + "-" + i)) {
     	        			outputFolderNames.put(uniqueIdentifier, testNameModified + "-" + i);
     	        			break;
     	    			}
@@ -842,7 +826,7 @@ public class SeleniumTestsContext {
         // update browser version: replace installed one with those given in parameters
         updateInstalledBrowsers();
         
-        // update ouput directory
+        // update output directory
         createTestSpecificOutputDirectory(testNGResult);
         
         // create seleniumRobot server instance
@@ -919,7 +903,6 @@ public class SeleniumTestsContext {
 		} else if (proxyType == ProxyType.MANUAL) {
 			proxy.setHttpProxy(addressAndPort);
 			proxy.setSslProxy(addressAndPort);
-			//proxy.setFtpProxy(addressAndPort);
 			
 			if (getWebProxyLogin() != null && getWebProxyPassword() != null) {
 				proxy.setSocksUsername(getWebProxyLogin());
@@ -936,7 +919,7 @@ public class SeleniumTestsContext {
     
     /**
      * Read configuration from environment specific data and undefined parameters present un testng xml file
-     * these configurations will be overiden by server if it's present
+     * these configurations will be overriden by server if it's present
      */
 	public void setTestConfiguration() {
 		
@@ -984,7 +967,6 @@ public class SeleniumTestsContext {
 	
 	/**
      * Returns application root path
-     * @return
      */
     public String getRootPath() {
 		return SeleniumTestsContextManager.getRootPath();
@@ -993,7 +975,6 @@ public class SeleniumTestsContext {
     /**
      * Returns location of feature files
      * /<root>/data/<app>/features/
-     * @return
      */
 	public String getFeaturePath() {
 		return SeleniumTestsContextManager.getFeaturePath();
@@ -1001,7 +982,6 @@ public class SeleniumTestsContext {
 
 	/**
 	 * Returns location of config files: /<root>/data/<app>/config/
-	 * @return
 	 */
 	public String getConfigPath() {
 		return SeleniumTestsContextManager.getConfigPath();
@@ -1009,7 +989,6 @@ public class SeleniumTestsContext {
 	
 	/**
 	 * Returns location of data folder: /<root>/data/
-	 * @return
 	 */
 	public String getDataPath() {
 		return SeleniumTestsContextManager.getDataPath();
@@ -1017,7 +996,6 @@ public class SeleniumTestsContext {
 	
 	/**
 	 * Returns location of application specific data: /<root>/data/<app>/
-	 * @return
 	 */
 	public String getApplicationDataPath() {
 		return SeleniumTestsContextManager.getApplicationDataPath();
@@ -1036,10 +1014,10 @@ public class SeleniumTestsContext {
     /**
      * Returns attribute value searched in context
      * If no value is found, search in variables
-     * @param name
+     * @param name                  name of the attribute
      * @param searchInVariables		if true, will search in variables if attribute cannot be found in configuration. Beware that configuration only contains strings
      * 								so casting may fail
-     * @return
+     * @return the value
      */
     public Object getAttribute(final String name, boolean searchInVariables) {
         Object obj = contextDataMap.get(name);
@@ -1445,7 +1423,7 @@ public class SeleniumTestsContext {
     	}
     	
     	JSONObject devList = new JSONObject((String)getAttribute(DEVICE_LIST));
-    	for (String key: (Set<String>)devList.keySet()) {
+    	for (String key: devList.keySet()) {
     		deviceList.put(key, devList.getString(key));
     	}
     	return deviceList;
@@ -1560,7 +1538,6 @@ public class SeleniumTestsContext {
     /**
      * from the list of all grid connectors, returns the first one where a session has been created
      * It means that the test runs on it because sessionId is get once driver is created
-     * @return
      */
     public SeleniumGridConnector getSeleniumGridConnector() {
     	if (seleniumGridConnector == null && seleniumGridConnectors != null) {
@@ -1594,7 +1571,6 @@ public class SeleniumTestsContext {
 
     /**
      * Returns the TestStepManager which will steps
-     * @return
      */
 	public TestStepManager getTestStepManager() {
 		return testStepManager;
@@ -1683,7 +1659,7 @@ public class SeleniumTestsContext {
     public void setCustomSummaryReports(String customReportsStr) {
     	if (customReportsStr != null) {
     		List<ReportInfo> reports = new ArrayList<>();
-    		
+
     		// check if report is available in resources
     		for (String customReport: customReportsStr.split(",")) {
     			reports.add(new ReportInfo(customReport));
@@ -1693,13 +1669,9 @@ public class SeleniumTestsContext {
     		setAttribute(CUSTOM_SUMMARY_REPORTS, DEFAULT_CUSTOM_SUMMARY_REPORTS);
     	}
     }
-    
+
     public void setReplayTimeout(Integer timeout) {
-    	if (timeout != null) {
-    		setAttribute(REPLAY_TIME_OUT, timeout);
-    	} else {
-    		setAttribute(REPLAY_TIME_OUT, DEFAULT_REPLAY_TIME_OUT);
-    	}
+        setAttribute(REPLAY_TIME_OUT, Objects.requireNonNullElse(timeout, DEFAULT_REPLAY_TIME_OUT));
     }
     
 
@@ -1724,7 +1696,7 @@ public class SeleniumTestsContext {
     
     public void setArchive(String archive) {
     	if (archive == null) {
-    		setAttribute(ARCHIVE, Arrays.asList(DEFAULT_ARCHIVE));
+    		setAttribute(ARCHIVE, List.of(DEFAULT_ARCHIVE));
     	} else {
     		try {
     			setAttribute(ARCHIVE, ArchiveMode.fromString(archive));
@@ -1767,7 +1739,6 @@ public class SeleniumTestsContext {
     
     /**
      *  /!\ FOR TEST ONLY!
-     * @param seleniumGridConnector
      */
     public void setSeleniumGridConnector(SeleniumGridConnector seleniumGridConnector) {
 		this.seleniumGridConnector = seleniumGridConnector;
@@ -1792,11 +1763,7 @@ public class SeleniumTestsContext {
     }
     
     public void setInitialUrl(String url) {
-    	if (url != null) {
-    		setAttribute(INITIAL_URL, url);
-    	} else {
-    		setAttribute(INITIAL_URL, DEFAULT_INITIAL_URL);
-    	}
+        setAttribute(INITIAL_URL, Objects.requireNonNullElse(url, DEFAULT_INITIAL_URL));
     }
   
     public void setRunMode(String runMode) {
@@ -1808,34 +1775,25 @@ public class SeleniumTestsContext {
     	if (nodeTags == null || nodeTags.isEmpty()) {
     		setAttribute(NODE_TAGS, new ArrayList<>());
     	} else {
-	    	setAttribute(NODE_TAGS, Arrays.asList(nodeTags.split(","))
-										.stream()
+	    	setAttribute(NODE_TAGS, Arrays.stream(nodeTags.split(","))
 										.map(String::trim)
-										.collect(Collectors.toList())
+										.toList()
 						);
     	}
     }
     
     public void setMaskPassword(Boolean maskPassword) {
-    	if (maskPassword != null) {
-    		setAttribute(MASK_PASSWORD, maskPassword);
-    	} else {
-    		setAttribute(MASK_PASSWORD, DEFAULT_MASK_PASSWORD);
-    	}
+        setAttribute(MASK_PASSWORD, Objects.requireNonNullElse(maskPassword, DEFAULT_MASK_PASSWORD));
     }
     
     public void setRandomInAttachmentNames(Boolean random) {
-    	if (random != null) {
-    		setAttribute(RANDOM_IN_ATTACHMENT_NAME, random);
-    	} else {
-    		setAttribute(RANDOM_IN_ATTACHMENT_NAME, DEFAULT_RANDOM_IN_ATTACHMENT_NAME);
-    	}
+        setAttribute(RANDOM_IN_ATTACHMENT_NAME, Objects.requireNonNullElse(random, DEFAULT_RANDOM_IN_ATTACHMENT_NAME));
     }
     
     /**
      * Record DEBUG
      * also store an INTERNAL_DEBUG System property to be used internally with SeleniumRobotLogger class
-     * @param debug
+     * @param debug     the debug mode
      */
     public void setDebug(String debug) {
     	if (debug != null) {
@@ -1849,19 +1807,11 @@ public class SeleniumTestsContext {
     }
     
     public void setHeadlessBrowser(Boolean headless) {
-    	if (headless != null) {
-    		setAttribute(HEADLESS_BROWSER, headless);
-    	} else {
-    		setAttribute(HEADLESS_BROWSER, DEFAULT_HEADLESS_BROWSER);
-    	}
+        setAttribute(HEADLESS_BROWSER, Objects.requireNonNullElse(headless, DEFAULT_HEADLESS_BROWSER));
     }
     
     public void setManualTestSteps(Boolean manualTestSteps) {
-    	if (manualTestSteps != null) {
-    		setAttribute(MANUAL_TEST_STEPS, manualTestSteps);
-    	} else {
-    		setAttribute(MANUAL_TEST_STEPS, DEFAULT_MANUAL_TEST_STEPS);
-    	}
+        setAttribute(MANUAL_TEST_STEPS, Objects.requireNonNullElse(manualTestSteps, DEFAULT_MANUAL_TEST_STEPS));
     }
 
     public void setBrowser(String browser) {
@@ -1961,27 +1911,15 @@ public class SeleniumTestsContext {
     }
     
     public void setBetaBrowser(Boolean betaBrowser) {
-		if (betaBrowser != null) {
-			setAttribute(BETA_BROWSER, betaBrowser);
-		} else {
-			setAttribute(BETA_BROWSER, DEFAULT_BETA_BROWSER);
-    	}
+        setAttribute(BETA_BROWSER, Objects.requireNonNullElse(betaBrowser, DEFAULT_BETA_BROWSER));
     }
     
     public void setAssumeUntrustedCertificateIssuer(Boolean assume) {
-    	if (assume != null) {
-    		setAttribute(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER, assume);
-    	} else {
-    		setAttribute(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER, DEFAULT_SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER);
-    	}
+        setAttribute(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER, Objects.requireNonNullElse(assume, DEFAULT_SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER));
     }
     
     public void setAcceptUntrustedCertificates(Boolean accept) {
-    	if (accept != null) {
-    		setAttribute(SET_ACCEPT_UNTRUSTED_CERTIFICATES, accept);
-    	} else {
-    		setAttribute(SET_ACCEPT_UNTRUSTED_CERTIFICATES, DEFAULT_SET_ACCEPT_UNTRUSTED_CERTIFICATES);
-    	}
+        setAttribute(SET_ACCEPT_UNTRUSTED_CERTIFICATES, Objects.requireNonNullElse(accept, DEFAULT_SET_ACCEPT_UNTRUSTED_CERTIFICATES));
     }
 
     public void setNtlmAuthTrustedUris(String uris) {
@@ -2005,11 +1943,7 @@ public class SeleniumTestsContext {
     }
     
     public void setFullReset(Boolean enabled) {
-    	if (enabled != null) {
-    		setAttribute(FULL_RESET, enabled);
-    	} else {
-    		setAttribute(FULL_RESET, true);
-    	}
+        setAttribute(FULL_RESET, Objects.requireNonNullElse(enabled, true));
     }
     
 
@@ -2051,11 +1985,7 @@ public class SeleniumTestsContext {
     
     
     public void setSnapshotScrollDelay(Integer scrollDelay) {
-    	if (scrollDelay != null) {
-    		setAttribute(SNAPSHOT_SCROLL_DELAY, scrollDelay);
-    	} else {
-    		setAttribute(SNAPSHOT_SCROLL_DELAY, DEFAULT_SNAPSHOT_SCROLL_DELAY);
-    	}
+        setAttribute(SNAPSHOT_SCROLL_DELAY, Objects.requireNonNullElse(scrollDelay, DEFAULT_SNAPSHOT_SCROLL_DELAY));
     }
     
     public void setSnapshotBottomCropping(Integer crop) {
@@ -2075,11 +2005,7 @@ public class SeleniumTestsContext {
     }
     
     public void setCaptureSnapshot(Boolean capture) {
-    	if (capture != null) {
-    		setAttribute(CAPTURE_SNAPSHOT, capture);
-    	} else {
-    		setAttribute(CAPTURE_SNAPSHOT, DEFAULT_CAPTURE_SNAPSHOT);
-    	}
+        setAttribute(CAPTURE_SNAPSHOT, Objects.requireNonNullElse(capture, DEFAULT_CAPTURE_SNAPSHOT));
     }
     
     public void setVideoCapture(String capture) {
@@ -2115,29 +2041,20 @@ public class SeleniumTestsContext {
     }
     
     public void setSoftAssertEnabled(Boolean enable) {
-    	if (enable != null) {
-    		setAttribute(SOFT_ASSERT_ENABLED, enable);
-    	} else {
-    		setAttribute(SOFT_ASSERT_ENABLED, DEFAULT_SOFT_ASSERT_ENABLED);
-    	}
+        setAttribute(SOFT_ASSERT_ENABLED, Objects.requireNonNullElse(enable, DEFAULT_SOFT_ASSERT_ENABLED));
     }
     
     public void setWebDriverListener(String listener) {
     	List<String> listeners = new ArrayList<>();
     	if (listener != null && !listener.isEmpty()) {
-    		
-    		boolean oldListeners = false;
-    		boolean wdListeners = false;
+
 
     		for (String listenerClassName: listener.split(",")) {
 	    		// check we can access the class
 	    		try {
 
-	    			if (WebDriverListener.class.isAssignableFrom(Class.forName(listenerClassName))) {
-	    				wdListeners = true;
-	    			} else {
+	    			if (!(WebDriverListener.class.isAssignableFrom(Class.forName(listenerClassName)))) {
 	    				throw new ConfigurationException(String.format("Class %s must implement WebDriverEventListener or WebDriverListener class", listenerClassName));
-	    				
 	    			}
 
 	        		listeners.add(listenerClassName);
@@ -2145,10 +2062,6 @@ public class SeleniumTestsContext {
 	    			throw new ConfigurationException(String.format("Class %s cannot be loaded", listenerClassName), e);
 	    		}
     		}
-    		
-    		if (oldListeners && wdListeners) {
-				throw new ConfigurationException("Don't mix 'WebDriverEventListener' and 'WebDriverListener' implementations");
-			}
     	}
     		
 		setAttribute(WEB_DRIVER_LISTENER, listeners);
@@ -2163,35 +2076,19 @@ public class SeleniumTestsContext {
     }
 
     public void setDeviceList(String list) {
-    	if (list != null) {
-    		setAttribute(DEVICE_LIST, list);
-    	} else {
-    		setAttribute(DEVICE_LIST, DEFAULT_DEVICE_LIST);
-    	}
+        setAttribute(DEVICE_LIST, Objects.requireNonNullElse(list, DEFAULT_DEVICE_LIST));
     }
     
     public void setApp(String app) {
-    	if (app != null) {
-    		setAttribute(APP, app);
-    	} else {
-    		setAttribute(APP, DEFAULT_APP);
-    	}
+        setAttribute(APP, Objects.requireNonNullElse(app, DEFAULT_APP));
     }
     
     public void setCucumberTags(String tags) {
-    	if (tags != null) {
-    		setAttribute(CUCUMBER_TAGS, tags);
-    	} else {
-    		setAttribute(CUCUMBER_TAGS, DEFAULT_CUCUMBER_TAGS);
-    	}
+        setAttribute(CUCUMBER_TAGS, Objects.requireNonNullElse(tags, DEFAULT_CUCUMBER_TAGS));
     }
     
     public void setCucumberTests(String tests) {
-    	if (tests != null) {
-    		setAttribute(CUCUMBER_TESTS, tests);
-    	} else {
-    		setAttribute(CUCUMBER_TESTS, DEFAULT_CUCUMBER_TESTS);
-    	}
+        setAttribute(CUCUMBER_TESTS, Objects.requireNonNullElse(tests, DEFAULT_CUCUMBER_TESTS));
     }
     
     public void setCucumberImplementationPackage(String pkg) {
@@ -2202,11 +2099,7 @@ public class SeleniumTestsContext {
     }
     
     public void setTestEnv(String tests) {
-    	if (tests != null) {
-    		setAttribute(TEST_ENV, tests);
-    	} else {
-    		setAttribute(TEST_ENV, DEFAULT_TEST_ENV);
-    	}
+        setAttribute(TEST_ENV, Objects.requireNonNullElse(tests, DEFAULT_TEST_ENV));
     }
     
     public void setLoadIni(String iniFiles) {
@@ -2230,8 +2123,7 @@ public class SeleniumTestsContext {
     public void setAppiumCapabilities(String appiumCapabilites) {
     	if (appiumCapabilites != null) {
     		try {
-	    		Map<String, String> capsMap = Arrays.asList(appiumCapabilites.split(";"))
-	    			.stream()
+	    		Map<String, String> capsMap = Arrays.stream(appiumCapabilites.split(";"))
 	    			.map(kv -> kv.split("="))
 	    			.collect(Collectors.toMap(a -> a[0].startsWith(SeleniumRobotCapabilityType.APPIUM_PREFIX) ? a[0]: SeleniumRobotCapabilityType.APPIUM_PREFIX + a[0],
 	    					a -> a[1]));
@@ -2264,27 +2156,15 @@ public class SeleniumTestsContext {
     }
 
     public void setTestRetryCount(Integer retry) {
-    	if (retry != null) {
-    		setAttribute(TEST_RETRY_COUNT, retry);
-    	} else {
-    		setAttribute(TEST_RETRY_COUNT, DEFAULT_TEST_RETRY_COUNT);
-    	}
+        setAttribute(TEST_RETRY_COUNT, Objects.requireNonNullElse(retry, DEFAULT_TEST_RETRY_COUNT));
     }
     
     public void setNewCommandTimeout(Integer timeout) {
-    	if (timeout != null) {
-    		setAttribute(NEW_COMMAND_TIMEOUT, timeout);
-    	} else {
-    		setAttribute(NEW_COMMAND_TIMEOUT, DEFAULT_NEW_COMMAND_TIMEOUT);
-    	}
+        setAttribute(NEW_COMMAND_TIMEOUT, Objects.requireNonNullElse(timeout, DEFAULT_NEW_COMMAND_TIMEOUT));
     }
     
     public void setActionDelay(Integer delay) {
-    	if (delay != null) {
-    		setAttribute(ACTION_DELAY, delay);
-    	} else {
-    		setAttribute(ACTION_DELAY, DEFAULT_ACTION_DELAY);
-    	}
+        setAttribute(ACTION_DELAY, Objects.requireNonNullElse(delay, DEFAULT_ACTION_DELAY));
     }
     
     public void setOutputDirectory(String outputDir, ITestContext context, boolean configureTestNg) {
@@ -2293,33 +2173,26 @@ public class SeleniumTestsContext {
     		setAttribute(DEFAULT_OUTPUT_DIRECTORY, new File(context.getOutputDirectory()).getParent());
     		setAttribute(OUTPUT_DIRECTORY, new File(context.getOutputDirectory()).getParent());
     	} else {
-    		if (context instanceof TestRunner && configureTestNg) {
-    			((TestRunner)context).setOutputDirectory(outputDir);
+    		if (context instanceof TestRunner testRunner && configureTestNg) {
+                testRunner.setOutputDirectory(outputDir);
     		}
-    		setAttribute(DEFAULT_OUTPUT_DIRECTORY, new File(outputDir).getAbsolutePath().replace(File.separator, "/"));
-    		setAttribute(OUTPUT_DIRECTORY, new File(outputDir).getAbsolutePath().replace(File.separator, "/"));
+            String updatedOutputDirectory = new File(outputDir).getAbsolutePath().replace(File.separator, "/");
+            setAttribute(DEFAULT_OUTPUT_DIRECTORY, updatedOutputDirectory);
+    		setAttribute(OUTPUT_DIRECTORY, updatedOutputDirectory);
     		try {
     			new File((String)getAttribute(OUTPUT_DIRECTORY)).mkdirs();
     		} catch (Exception e) {
-    			logger.error(String.format("Error creating output directory %s", (String)getAttribute(OUTPUT_DIRECTORY)));
+    			logger.error("Error creating output directory {}", getAttribute(OUTPUT_DIRECTORY));
     		}
     	}
     }
     
     public void setOptimizeReports(Boolean optimize) {
-    	if (optimize != null) {
-    		setAttribute(OPTIMIZE_REPORTS, optimize);
-    	} else {
-    		setAttribute(OPTIMIZE_REPORTS, DEFAULT_OPTIMIZE_REPORTS);
-    	}
+        setAttribute(OPTIMIZE_REPORTS, Objects.requireNonNullElse(optimize, DEFAULT_OPTIMIZE_REPORTS));
     }
     
     public void setKeepAllResults(Boolean keepAll) {
-    	if (keepAll != null) {
-    		setAttribute(KEEP_ALL_RESULTS, keepAll);
-    	} else {
-    		setAttribute(KEEP_ALL_RESULTS, DEFAULT_KEEP_ALL_RESULTS);
-    	}
+        setAttribute(KEEP_ALL_RESULTS, Objects.requireNonNullElse(keepAll, DEFAULT_KEEP_ALL_RESULTS));
     }
     
     public void setVersion(String version) {
@@ -2331,7 +2204,7 @@ public class SeleniumTestsContext {
      * In mobile, platform parameter will be given (iOS xx or Android yy)
      * In desktop, if we run the test locally, we should get the current platform, else, let user decide on which platform
      * test will be run. It may be any if underlying OS does not matter (for grid)
-     * @param platform
+     * @param platform  name of the platform
      */
     public void setPlatform(String platform) {
     	if (platform != null) {
@@ -2396,7 +2269,6 @@ public class SeleniumTestsContext {
 	
 	/**
 	 * Access method to allow, from test, to write e.g: 'robotConfig().testManager().setTestId(1)'
-	 * @return
 	 */
 	public TestManagerContext testManager() {
 		return testManagerContext;
@@ -2404,7 +2276,6 @@ public class SeleniumTestsContext {
 	
 	/**
 	 * Access method to allow, from test, to write e.g: 'robotConfig().bugtracker().setAssignee("foo")'
-	 * @return
 	 */
 	public BugTrackerContext bugtracker() {
 		return bugtrackerContext;

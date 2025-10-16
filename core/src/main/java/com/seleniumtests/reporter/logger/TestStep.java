@@ -22,7 +22,9 @@ import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import org.apache.commons.lang3.StringUtils;
@@ -567,6 +569,7 @@ public class TestStep extends TestAction {
 		step.disableBugtracker = disableBugtracker;
 		step.timestamp = timestamp;
 		step.durationToExclude = durationToExclude;
+		step.pageLoadTime = pageLoadTime;
 		
 		return step;
 	}
@@ -598,5 +601,23 @@ public class TestStep extends TestAction {
 
 	public PageLoadTime getPageLoadTime() {
 		return pageLoadTime;
+	}
+
+	/**
+	 * Returns all page load times that occurred in this step and child steps
+	 * Order depends on timestamp of each page load time
+	 */
+	public List<PageLoadTime> getPageLoadTimes() {
+		List<PageLoadTime> pageLoadTimes = new ArrayList<>();
+		if (pageLoadTime != null) {
+			pageLoadTimes.add(pageLoadTime);
+		}
+		for (TestAction action: stepActions) {
+			if (action instanceof TestStep step) {
+				pageLoadTimes.addAll(step.getPageLoadTimes());
+			}
+		}
+
+		return pageLoadTimes.stream().sorted(Comparator.comparing(TestAction::getTimestamp)).toList();
 	}
 }

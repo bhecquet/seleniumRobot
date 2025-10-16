@@ -18,15 +18,10 @@
 package com.seleniumtests.ut.reporter.logger;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -36,8 +31,8 @@ import com.seleniumtests.util.har.Har;
 import com.seleniumtests.util.har.Page;
 import com.seleniumtests.util.helper.WaitHelper;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriverException;
@@ -137,8 +132,6 @@ public class TestTestStep extends GenericTest {
 	/**
 	 * Test that when adding a snapshot to a test step, it's renamed with a name
 	 * containing test name, step name and index
-	 * 
-	 * @throws IOException
 	 */
 	@Test(groups = { "ut" })
 	public void testSnapshotRenaming() throws IOException {
@@ -164,7 +157,6 @@ public class TestTestStep extends GenericTest {
 	
 	/**
 	 * Check case where random part of attachment is removed
-	 * @throws IOException
 	 */
 	@Test(groups = { "ut" })
 	public void testSnapshotRenamingNoRandom() throws IOException {
@@ -192,8 +184,6 @@ public class TestTestStep extends GenericTest {
 	/**
 	 * Test that when adding a snapshot to a test step, with a custom name, it's
 	 * renamed with this custom name Custom name contains forbidden characters
-	 * 
-	 * @throws IOException
 	 */
 	@Test(groups = { "ut" })
 	public void testSnapshotRenamingWithCustomName() throws IOException {
@@ -242,8 +232,6 @@ public class TestTestStep extends GenericTest {
 	/**
 	 * issue #409: Check that renaming takes into account the index of the parent
 	 * step
-	 * 
-	 * @throws IOException
 	 */
 	@Test(groups = { "ut" })
 	public void testSnapshotInSubStep() throws IOException {
@@ -286,7 +274,6 @@ public class TestTestStep extends GenericTest {
 
 	/**
 	 * Check we get snapshots from substeps, if requested
-	 * @throws IOException
 	 */
 	@Test(groups = { "ut" })
 	public void testGetSnapshotSubStep() throws IOException {
@@ -360,8 +347,6 @@ public class TestTestStep extends GenericTest {
 
 	/**
 	 * Check we get all files from a step and its sub steps
-	 * 
-	 * @throws IOException
 	 */
 	@Test(groups = { "ut" })
 	public void testGetAllAttachments() throws IOException {
@@ -404,8 +389,6 @@ public class TestTestStep extends GenericTest {
 
 	/**
 	 * Check we get all files from a step and its sub steps from a given SnapshotCheckType
-	 *
-	 * @throws IOException
 	 */
 	@Test(groups = { "ut" })
 	public void testGetAllAttachmentsFilterSnapshotCheckType() throws IOException {
@@ -443,16 +426,17 @@ public class TestTestStep extends GenericTest {
 		List<FileContent> attachments = step.getAllAttachments(false, SnapshotCheckType.FALSE);
 		// only the HTML and image from first and second added snapshot
 		Assert.assertEquals(attachments.size(), 4);
-		Assert.assertEquals(attachments.get(0).getFile().getName(), "N-A_0-2_step1--" + tmpHtmlFile.getName().substring(tmpHtmlFile.getName().length() - 10));
-		Assert.assertEquals(attachments.get(1).getFile().getName(), "N-A_0-2_step1--" + tmpImgFile.getName().substring(tmpImgFile.getName().length() - 10));
-		Assert.assertEquals(attachments.get(2).getFile().getName(), "N-A_0-2_step1--" + tmpHtmlFile.getName().substring(tmpHtmlFile.getName().length() - 10));
-		Assert.assertEquals(attachments.get(3).getFile().getName(), "N-A_0-2_step1--" + tmpImgFile.getName().substring(tmpImgFile.getName().length() - 10));
+		String filePrefix = "N-A_0-2_step1--";
+		String htmlFile = filePrefix + tmpHtmlFile.getName().substring(tmpHtmlFile.getName().length() - 10);
+		Assert.assertEquals(attachments.get(0).getFile().getName(), htmlFile);
+		String imgFile = filePrefix + tmpImgFile.getName().substring(tmpImgFile.getName().length() - 10);
+		Assert.assertEquals(attachments.get(1).getFile().getName(), imgFile);
+		Assert.assertEquals(attachments.get(2).getFile().getName(), htmlFile);
+		Assert.assertEquals(attachments.get(3).getFile().getName(), imgFile);
 	}
 	
 	/**
 	 * Check we get all files except HTML when we request it
-	 *
-	 * @throws IOException
 	 */
 	@Test(groups = { "ut" })
 	public void testGetAllAttachmentsFilterHtml() throws IOException {
@@ -559,7 +543,7 @@ public class TestTestStep extends GenericTest {
 
 	@Test(groups = { "ut" })
 	public void testTestStepEncodeXmlPasswordKept() {
-		TestStep step = new TestStep("step1 \"'<>&", "step1 \"'<>&", this.getClass(), null, Arrays.asList("myPassword"), true);
+		TestStep step = new TestStep("step1 \"'<>&", "step1 \"'<>&", this.getClass(), null, List.of("myPassword"), true);
 		TestStep encodedTestStep = step.encode("xml");
 		Assert.assertTrue(encodedTestStep.getPwdToReplace().contains("myPassword"));
 	}
@@ -592,7 +576,7 @@ public class TestTestStep extends GenericTest {
 		HarCapture cap = new HarCapture(har, "main");
 
 		TestStep step = new TestStep("step1 \"'<>&", "step1 \"'<>&", this.getClass(), null, new ArrayList<>(), true);
-		step.setHarCaptures(Arrays.asList(cap));
+		step.setHarCaptures(List.of(cap));
 		TestStep encodedTestStep = step.encode("xml");
 		Assert.assertEquals(encodedTestStep.getHarCaptures().get(0), cap);
 	}
@@ -686,7 +670,72 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testToJson() throws IOException {
-		TestStep step = new TestStep("step1 with args: (https://myserver)", "step1", this.getClass(), null, Arrays.asList("foobar"), true);
+		TestStep step = createSetOfSteps();
+
+		JSONObject stepJson = step.toJson();
+
+		Assert.assertEquals(stepJson.getString("type"), "step");
+		Assert.assertTrue(stepJson.isNull("exception"));
+		Assert.assertEquals(stepJson.getString("name"), "step1 with args: (https://myserver)");
+		Assert.assertEquals(stepJson.getString("action"), "step1");
+		Assert.assertEquals(stepJson.getString("origin"), "com.seleniumtests.ut.reporter.logger.TestTestStep");
+		Assert.assertEquals(stepJson.getString("status"), "SUCCESS");
+		Assert.assertEquals(stepJson.getLong("timestamp"), step.getTimestamp().toInstant().toEpochMilli());
+		Assert.assertEquals(stepJson.getJSONArray("actions").length(), 3);
+		Assert.assertFalse(stepJson.isNull("timestamp"));
+		Assert.assertTrue(stepJson.isNull("pageLoadTime")); // not present as not loading information has been provided
+
+		// check actions order
+		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(0).getString("type"), "message");
+		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(0).getString("messageType"), "INFO");
+
+		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(1).getString("type"), "action");
+		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(1).getString("name"), "action2");
+        Assert.assertFalse(stepJson.getJSONArray("actions").getJSONObject(1).getBoolean("failed"));
+
+		Assert.assertEquals(stepJson.getJSONArray("harCaptures").getJSONObject(0).getString("type"), "networkCapture");
+		Assert.assertEquals(stepJson.getJSONArray("harCaptures").getJSONObject(0).getString("name"), "main");
+
+		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getString("type"), "step");
+		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getString("name"), "subStep with password ******");
+		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getJSONArray("actions").length(), 2);
+
+		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getJSONObject("pageLoadTime").length(), 4);
+		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getJSONObject("pageLoadTime").getString("name"), "loading of CalcPage took 1230");
+
+		Assert.assertEquals(stepJson.getJSONArray("files").getJSONObject(0).getString("type"), "file");
+		Assert.assertEquals(stepJson.getJSONArray("files").getJSONObject(0).getString("name"), "video file");
+		
+		Assert.assertEquals(stepJson.getJSONArray("snapshots").getJSONObject(0).getString("type"), "snapshot");
+	}
+
+	/**
+	 * Check all required fields are present in encoded content
+	 */
+	@Test(groups = { "ut" })
+	public void testEncode() throws IOException {
+		TestStep step = createSetOfSteps();
+		TestStep newStep = step.encode("json");
+
+		Assert.assertEquals(newStep.getStepActions().size(), step.getStepActions().size());
+		Assert.assertEquals(newStep.getStepActions().get(0).getName(), step.getStepActions().get(0).getName());
+		Assert.assertEquals(newStep.getFailed(), step.getFailed());
+		Assert.assertEquals(newStep.getSnapshots(), step.getSnapshots());
+		Assert.assertEquals(newStep.getFiles().size(), step.getFiles().size());
+		Assert.assertEquals(newStep.getDuration(), step.getDuration());
+		Assert.assertEquals(newStep.getStartDate(), step.getStartDate());
+		Assert.assertEquals(newStep.getVideoTimeStamp(), step.getVideoTimeStamp());
+		Assert.assertEquals(newStep.getHarCaptures().size(), step.getHarCaptures().size());
+		Assert.assertEquals(newStep.getActionException(), step.getActionException());
+		Assert.assertEquals(newStep.isDisableBugtracker(), step.isDisableBugtracker());
+		Assert.assertEquals(newStep.getTimestamp(), step.getTimestamp());
+		Assert.assertEquals(newStep.getDurationToExclude(), step.getDurationToExclude());
+		Assert.assertEquals(newStep.getPageLoadTime(), step.getPageLoadTime());
+	}
+
+	@NotNull
+	private TestStep createSetOfSteps() throws IOException {
+		TestStep step = new TestStep("step1 with args: (https://myserver)", "step1", this.getClass(), null, List.of("foobar"), true);
 		step.addMessage(new TestMessage("everything OK", MessageType.INFO));
 		step.addAction(new TestAction("action2", false, new ArrayList<>()));
 
@@ -710,48 +759,13 @@ public class TestTestStep extends GenericTest {
 		TestStep subStep = new TestStep("subStep with password foobar", "subStep with password foobar", this.getClass(), null, new ArrayList<>(), true);
 		subStep.addMessage(new TestMessage("everything in subStep almost OK", MessageType.WARNING));
 		subStep.addAction(new TestAction("action1", false, new ArrayList<>()));
-		subStep.addPageLoadTime(new PageLoadTime("http://localhost", new CalcPage(), 1.23));
+		subStep.addPageLoadTime(new PageLoadTime("http://localhost", new CalcPage(), 1230));
 		step.addAction(subStep);
-
-		JSONObject stepJson = step.toJson();
-
-		Assert.assertEquals(stepJson.getString("type"), "step");
-		Assert.assertTrue(stepJson.isNull("exception"));
-		Assert.assertEquals(stepJson.getString("name"), "step1 with args: (https://myserver)");
-		Assert.assertEquals(stepJson.getString("action"), "step1");
-		Assert.assertEquals(stepJson.getString("origin"), "com.seleniumtests.ut.reporter.logger.TestTestStep");
-		Assert.assertEquals(stepJson.getString("status"), "SUCCESS");
-		Assert.assertEquals(stepJson.getLong("timestamp"), step.getTimestamp().toInstant().toEpochMilli());
-		Assert.assertEquals(stepJson.getJSONArray("actions").length(), 3);
-		Assert.assertNotNull(stepJson.getLong("timestamp"));
-		Assert.assertTrue(stepJson.isNull("pageLoadTime")); // not present as not loading information has been provided
-
-		// check actions order
-		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(0).getString("type"), "message");
-		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(0).getString("messageType"), "INFO");
-
-		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(1).getString("type"), "action");
-		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(1).getString("name"), "action2");
-		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(1).getBoolean("failed"), false);
-
-		Assert.assertEquals(stepJson.getJSONArray("harCaptures").getJSONObject(0).getString("type"), "networkCapture");
-		Assert.assertEquals(stepJson.getJSONArray("harCaptures").getJSONObject(0).getString("name"), "main");
-
-		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getString("type"), "step");
-		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getString("name"), "subStep with password ******");
-		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getJSONArray("actions").length(), 2);
-
-		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getJSONObject("pageLoadTime").length(), 4);
-		Assert.assertTrue(stepJson.getJSONArray("actions").getJSONObject(2).getJSONObject("pageLoadTime").getString("name").startsWith( "loading of CalcPage took 1"));
-
-		Assert.assertEquals(stepJson.getJSONArray("files").getJSONObject(0).getString("type"), "file");
-		Assert.assertEquals(stepJson.getJSONArray("files").getJSONObject(0).getString("name"), "video file");
-		
-		Assert.assertEquals(stepJson.getJSONArray("snapshots").getJSONObject(0).getString("type"), "snapshot");
-
+		return step;
 	}
+
 	@Test(groups = { "ut" })
-	public void testToJsonWithException() throws IOException {
+	public void testToJsonWithException() {
 		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
 		step.setActionException(new WebDriverException("KO"));
 		step.addMessage(new TestMessage("OK", MessageType.INFO));
@@ -766,7 +780,7 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(stepJson.getString("status"), "WARNING");
 		Assert.assertEquals(stepJson.getLong("timestamp"), step.getTimestamp().toInstant().toEpochMilli());
 		Assert.assertEquals(stepJson.getJSONArray("actions").length(), 2);
-		Assert.assertNotNull(stepJson.getLong("timestamp"));
+		Assert.assertFalse(stepJson.isNull("timestamp"));
 
 
 	}
@@ -777,10 +791,6 @@ public class TestTestStep extends GenericTest {
 		step.addMessage(new TestMessage("everything OK", MessageType.INFO));
 		step.addAction(new TestAction("action2", false, new ArrayList<>()));
 
-//		Har har = new Har(new HarLog());
-//		har.getLog().addPage(new HarPage("title", "a title"));
-//		step.addNetworkCapture(new HarCapture(har, "main"));
-
 		GenericFile file = new GenericFile(File.createTempFile("video", ".avi"), "video file");
 		step.addFile(file);
 
@@ -790,13 +800,14 @@ public class TestTestStep extends GenericTest {
 		step.addAction(subStep);
 		step.addAction(new TestAction("action3", false, new ArrayList<>()));
 
-		Assert.assertEquals(step.toString(), "Step step1\n" + 
-				"  - everything OK\n" + 
-				"  - action2\n"	+ 
-				"  - Step subStep\n" + 
-				"    - everything in subStep almost OK\n" + 
-				"    - action1\n" + 
-				"  - action3");
+		Assert.assertEquals(step.toString(), """
+Step step1
+  - everything OK
+  - action2
+  - Step subStep
+    - everything in subStep almost OK
+    - action1
+  - action3""");
 
 	}
 
@@ -806,7 +817,7 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testPasswordMaskingMainStep() {
-		TestStep step = new TestStep("step1 with args: (bar, passwd)", "step1 with args: (bar, passwd)", this.getClass(), null, Arrays.asList("passwd"), true);
+		TestStep step = new TestStep("step1 with args: (bar, passwd)", "step1 with args: (bar, passwd)", this.getClass(), null, List.of("passwd"), true);
 		TestAction action = new TestAction("action in step1 with args: (foo, passwd)", false, new ArrayList<>());
 		TestMessage message = new TestMessage("everything OK on passwd", MessageType.INFO);
 		TestStep substep = new TestStep("substep with args: (passwd)", "substep with args: (passwd)", this.getClass(), null, new ArrayList<>(), true);
@@ -818,11 +829,11 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(action.getName(), "action in step1 with args: (foo, ******)");
 		Assert.assertEquals(message.getName(), "everything OK on ******");
 		Assert.assertEquals(substep.getName(), "substep with args: (******)");
-		Assert.assertEquals(step.toString(),
-				"Step step1 with args: (bar, ******)\n" + 
-				"  - action in step1 with args: (foo, ******)\n" + 
-				"  - everything OK on ******\n" + 
-				"  - Step substep with args: (******)");
+		Assert.assertEquals(step.toString(), """
+Step step1 with args: (bar, ******)
+  - action in step1 with args: (foo, ******)
+  - everything OK on ******
+  - Step substep with args: (******)""");
 	}
 	
 	/**
@@ -838,7 +849,7 @@ public class TestTestStep extends GenericTest {
 	
 	@Test(groups = { "ut" })
 	public void testPasswordMaskingHtmlEncodedMainStep() {
-		TestStep step = new TestStep("step1 with args: (bar, passwd)", "step1 with args: (bar, passwd)", this.getClass(), null, Arrays.asList("passwd"), true);
+		TestStep step = new TestStep("step1 with args: (bar, passwd)", "step1 with args: (bar, passwd)", this.getClass(), null, List.of("passwd"), true);
 		TestAction action = new TestAction("action in step1 with args: (foo, passwd)", false, new ArrayList<>());
 		TestMessage message = new TestMessage("everything OK on passwd", MessageType.INFO);
 		TestStep substep = new TestStep("substep with args: (passwd)", "substep with args: (passwd)", this.getClass(), null, new ArrayList<>(), true);
@@ -850,11 +861,11 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(action.encode("html").getName(), "action in step1 with args: (foo, ******)");
 		Assert.assertEquals(message.encode("html").getName(), "everything OK on ******");
 		Assert.assertEquals(substep.encode("html").getName(), "substep with args: (******)");
-		Assert.assertEquals(step.encode("html").toString(),
-				"Step step1 with args: (bar, ******)\n" + 
-						"  - action in step1 with args: (foo, ******)\n" + 
-						"  - everything OK on ******\n" + 
-				"  - Step substep with args: (******)");
+		Assert.assertEquals(step.encode("html").toString(), """
+Step step1 with args: (bar, ******)
+  - action in step1 with args: (foo, ******)
+  - everything OK on ******
+  - Step substep with args: (******)""");
 	}
 	
 	/**
@@ -862,7 +873,7 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testPasswordMaskingHtmlEncodedMainStepWithSpecialCharacters() {
-		TestStep step = new TestStep("step1 with args: (bar, passwd§~$µ)", "step1 with args: (bar, passwd§~$µ)", this.getClass(), null, Arrays.asList("passwd§~$µ"), true);
+		TestStep step = new TestStep("step1 with args: (bar, passwd§~$µ)", "step1 with args: (bar, passwd§~$µ)", this.getClass(), null, List.of("passwd§~$µ"), true);
 		TestAction action = new TestAction("action in step1 with args: (foo, passwd§~$µ)", false, new ArrayList<>());
 		TestMessage message = new TestMessage("everything OK on passwd§~$µ", MessageType.INFO);
 		TestStep substep = new TestStep("substep with args: (passwd§~$µ)", "substep with args: (passwd§~$µ)", this.getClass(), null, new ArrayList<>(), true);
@@ -874,17 +885,17 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(action.encode("html").getName(), "action in step1 with args: (foo, ******)");
 		Assert.assertEquals(message.encode("html").getName(), "everything OK on ******");
 		Assert.assertEquals(substep.encode("html").getName(), "substep with args: (******)");
-		Assert.assertEquals(step.encode("html").toString(),
-				"Step step1 with args: (bar, ******)\n" + 
-						"  - action in step1 with args: (foo, ******)\n" + 
-						"  - everything OK on ******\n" + 
-				"  - Step substep with args: (******)");
+		Assert.assertEquals(step.encode("html").toString(), """
+Step step1 with args: (bar, ******)
+  - action in step1 with args: (foo, ******)
+  - everything OK on ******
+  - Step substep with args: (******)""");
 	}
 
 	
 	@Test(groups = { "ut" })
 	public void testPasswordMaskingXmlEncodedMainStepWithSpecialCharacters() {
-		TestStep step = new TestStep("step1 with args: (bar, passwd§~$µ)", "step1 with args: (bar, passwd§~$µ)", this.getClass(), null, Arrays.asList("passwd§~$µ"), true);
+		TestStep step = new TestStep("step1 with args: (bar, passwd§~$µ)", "step1 with args: (bar, passwd§~$µ)", this.getClass(), null, List.of("passwd§~$µ"), true);
 		TestAction action = new TestAction("action in step1 with args: (foo, passwd§~$µ)", false, new ArrayList<>());
 		TestMessage message = new TestMessage("everything OK on passwd§~$µ", MessageType.INFO);
 		TestStep substep = new TestStep("substep with args: (passwd§~$µ)", "substep with args: (passwd§~$µ)", this.getClass(), null, new ArrayList<>(), true);
@@ -896,11 +907,11 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(action.encode("xml").getName(), "action in step1 with args: (foo, ******)");
 		Assert.assertEquals(message.encode("xml").getName(), "everything OK on ******");
 		Assert.assertEquals(substep.encode("xml").getName(), "substep with args: (******)");
-		Assert.assertEquals(step.encode("xml").toString(),
-				"Step step1 with args: (bar, ******)\n" + 
-						"  - action in step1 with args: (foo, ******)\n" + 
-						"  - everything OK on ******\n" + 
-				"  - Step substep with args: (******)");
+		Assert.assertEquals(step.encode("xml").toString(), """
+Step step1 with args: (bar, ******)
+  - action in step1 with args: (foo, ******)
+  - everything OK on ******
+  - Step substep with args: (******)""");
 	}
 	
 	/**
@@ -909,7 +920,7 @@ public class TestTestStep extends GenericTest {
 	@Test(groups = { "ut" })
 	public void testPasswordMaskingSubStep() {
 		TestStep step = new TestStep("step1 with args: (bar, passwd)", "step1 with args: (bar, passwd)", this.getClass(), null, new ArrayList<>(), true);
-		TestStep substep = new TestStep("substep with args: (passwd)", "substep with args: (passwd)", this.getClass(), null, Arrays.asList("passwd"), true);
+		TestStep substep = new TestStep("substep with args: (passwd)", "substep with args: (passwd)", this.getClass(), null, List.of("passwd"), true);
 		TestAction action = new TestAction("action in step1 with args: (foo, passwd)", false, new ArrayList<>());
 		TestMessage message = new TestMessage("everything OK on passwd", MessageType.INFO);
 		step.addAction(substep);
@@ -928,7 +939,7 @@ public class TestTestStep extends GenericTest {
 	@Test(groups = { "ut" })
 	public void testNoPasswordMasking() {
 		TestStep step = new TestStep("step1 with args: (bar, passwd)", "step1 with args: (bar, passwd)", this.getClass(), null, new ArrayList<>(), false);
-		TestStep substep = new TestStep("substep with args: (passwd)", "substep with args: (passwd)", this.getClass(), null, Arrays.asList("passwd"), false);
+		TestStep substep = new TestStep("substep with args: (passwd)", "substep with args: (passwd)", this.getClass(), null, List.of("passwd"), false);
 		TestAction action = new TestAction("action in step1 with args: (foo, passwd)", false, new ArrayList<>());
 		TestMessage message = new TestMessage("everything OK on passwd", MessageType.INFO);
 		step.addAction(substep);
@@ -1107,20 +1118,6 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(message.getPosition(), 1);
 		Assert.assertEquals(message.getParent(), step);
 	}
-//
-//	@Test(groups = { "ut" })
-//	public void testTestSubCapturePositionAndParent() throws IOException {
-//		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
-//		TestStep subStep = new TestStep("subStep1", "subStep1", this.getClass(), null, new ArrayList<>(), true);
-//		step.addStep(subStep);
-//
-//		Har har = new Har(new HarLog());
-//		har.getLog().addPage(new HarPage("title", "a title"));
-//		HarCapture capture = new HarCapture(har, "main");
-//		step.addNetworkCapture(capture);
-//		Assert.assertEquals(capture.getPosition(), 1);
-//		Assert.assertEquals(capture.getParent(), step);
-//	}
 
 	@Test(groups = { "ut" })
 	public void testTestSubFilePositionAndParent() throws IOException {
@@ -1135,12 +1132,12 @@ public class TestTestStep extends GenericTest {
 	}
 
 	@Test(groups = { "ut" })
-	public void testTestSubPageTimingAndParent() throws IOException {
+	public void testTestSubPageTimingAndParent()  {
 		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
 		TestStep subStep = new TestStep("subStep1", "subStep1", this.getClass(), null, new ArrayList<>(), true);
 		step.addStep(subStep);
 
-		PageLoadTime pageLoadTime = new PageLoadTime("http://localhost", new CalcPage(), 1.01);
+		PageLoadTime pageLoadTime = new PageLoadTime("http://localhost", new CalcPage(), 1010);
 		step.addPageLoadTime(pageLoadTime);
 		Assert.assertEquals(pageLoadTime.getPosition(), 1);
 		Assert.assertEquals(pageLoadTime.getParent(), step);
@@ -1166,7 +1163,44 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(snapshot.getPosition(), 0);
 		Assert.assertEquals(snapshot.getParent(), step);
 	}
-	
+
+	@Test(groups = { "ut" })
+	public void testGetPageLoadTimes() {
+		TestStep step1 = new TestStep("step1");
+		TestStep step2 = new TestStep("step2");
+		step1.addStep(step2);
+		step2.addPageLoadTime(new PageLoadTime("http://localhost", new CalcPage(), 1010));
+		Assert.assertEquals(step1.getPageLoadTimes().size(), 1);
+	}
+
+	/**
+	 * Check Page load order depends on timestamp
+	 */
+	@Test(groups = { "ut" })
+	public void testGetPageLoadTimesWithOrder() {
+		TestStep step1 = new TestStep("step1");
+		PageLoadTime pageLoadTime1 = new PageLoadTime("http://localhost", new CalcPage(), 1010);
+		step1.addPageLoadTime(pageLoadTime1);
+		TestStep step2 = new TestStep("step2");
+		step1.addStep(step2);
+		PageLoadTime pageLoadTime2 = new PageLoadTime("http://localhost", new CalcPage(), 2500);
+		step2.addPageLoadTime(pageLoadTime2);
+		Assert.assertEquals(step1.getPageLoadTimes(), List.of(pageLoadTime2, pageLoadTime1));
+	}
+	/**
+	 * Check Page load order depends on timestamp
+	 */
+	@Test(groups = { "ut" })
+	public void testGetPageLoadTimesWithOrder2() {
+		TestStep step1 = new TestStep("step1");
+		PageLoadTime pageLoadTime1 = new PageLoadTime("http://localhost", new CalcPage(), 2500);
+		step1.addPageLoadTime(pageLoadTime1);
+		TestStep step2 = new TestStep("step2");
+		step1.addStep(step2);
+		PageLoadTime pageLoadTime2 = new PageLoadTime("http://localhost", new CalcPage(), 2000);
+		step2.addPageLoadTime(pageLoadTime2);
+		Assert.assertEquals(step1.getPageLoadTimes(), List.of(pageLoadTime1, pageLoadTime2));
+	}
 
 	@Test(groups = { "ut" })
 	public void testTestStepWithrootCause() {
@@ -1224,14 +1258,13 @@ public class TestTestStep extends GenericTest {
 	
 	/**
 	 * Check we move all attachments that are located in "before-xxx" folders
-	 *
-	 * @throws IOException
 	 */
 	@Test(groups = { "ut" })
 	public void testMoveAttachements() throws IOException {
 		try {
 			FileUtils.deleteDirectory(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory().replace("testMoveAttachements", "before-testMoveAttachements")));
 		} catch (IOException e) {
+			//
 		}
 		
 		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);

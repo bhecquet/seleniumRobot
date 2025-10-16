@@ -4,19 +4,29 @@ import com.seleniumtests.uipage.PageObject;
 import org.json.JSONObject;
 import org.jspecify.annotations.NonNull;
 
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
 public class PageLoadTime extends TestAction {
 
     private final String url;
-    private final double loadTime;
+    private final long loadTime;
     private final PageObject pageObject;
 
-    public PageLoadTime(String url, @NonNull PageObject pageObject, double loadTime) {
-        super(String.format("loading of %s took %.3f", pageObject.getClass().getSimpleName(), loadTime), false, new ArrayList<>());
+    /**
+     *
+     * @param url           URL of the loaded page
+     * @param pageObject    the page object
+     * @param loadTime      load time of the page in milliseconds
+     *
+     * Timestamp will be the Instant of page load start
+     */
+    public PageLoadTime(String url, @NonNull PageObject pageObject, long loadTime) {
+        super(String.format("loading of %s took %d ms", pageObject.getClass().getSimpleName(), loadTime), false, new ArrayList<>());
         this.url = url;
         this.loadTime = loadTime;
         this.pageObject = pageObject;
+        this.timestamp = this.timestamp.minus(loadTime, ChronoUnit.MILLIS);
     }
 
     @Override
@@ -27,6 +37,7 @@ public class PageLoadTime extends TestAction {
         actionJson.put("name", name);
         actionJson.put("loadTime", loadTime);
         actionJson.put("page", pageObject.getClass().getSimpleName());
+        actionJson.put("timestamp", timestamp);
 
         return actionJson;
     }

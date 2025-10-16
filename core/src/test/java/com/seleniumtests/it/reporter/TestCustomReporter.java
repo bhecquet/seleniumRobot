@@ -18,6 +18,7 @@
 package com.seleniumtests.it.reporter;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 
@@ -35,11 +36,9 @@ public class TestCustomReporter extends ReporterTest {
 	
 	/**
 	 * Check information are present in detailed report
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testDataInReport(ITestContext testContext) throws Exception {
+	public void testDataInReport() throws Exception {
 		
 		try {
 			System.setProperty("customTestReports", "SUP::json::ti/report.test.vm");
@@ -105,8 +104,6 @@ public class TestCustomReporter extends ReporterTest {
 	
 	/**
 	 * Check information are present in summary report
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testDataInSummaryReport(ITestContext testContext) throws Exception {
@@ -129,6 +126,43 @@ public class TestCustomReporter extends ReporterTest {
 			System.clearProperty("customSummaryReports");
 		}
 		
+	}
+
+	/**
+	 * Check detailed-result.json file is present and contains all requested data
+	 */
+	@Test(groups={"it"})
+	public void testStepReport() throws IOException {
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
+
+		// check content of the file. It should contains all fields with a value
+		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverShort", "detailed-result.json").toFile(), StandardCharsets.UTF_8);
+
+		JSONObject json = new JSONObject(detailedReportContent);
+
+		Assert.assertEquals(json.getString("appVersion"), "5.1");
+		Assert.assertEquals(json.getInt("failures"), 0);
+		Assert.assertEquals(json.getString("failedStep"), "");
+		Assert.assertEquals(json.getString("gridnode"), "LOCAL");
+		Assert.assertEquals(json.getString("mobileApp"), "");
+		Assert.assertEquals(json.getJSONArray("steps").length(), 6);
+		Assert.assertEquals(json.getJSONArray("steps").getJSONObject(3).getJSONObject("pageLoadTime").getString("page"), "DriverTestPage");
+		Assert.assertFalse(json.getString("platform").isEmpty());
+		Assert.assertTrue(json.getDouble("duration") > 0);
+		Assert.assertEquals(json.getInt("retries"), 0);
+		Assert.assertEquals(json.getString("browser"), "CHROME");
+		Assert.assertEquals(json.getString("name"), "testDriverShort");
+		Assert.assertTrue(json.getLong("startTime") > 1760604347733L);
+		Assert.assertEquals(json.getInt("stepNumber"), 6);
+		Assert.assertEquals(json.getString("device"), "");
+		Assert.assertEquals(json.getInt("errors"), 0);
+		Assert.assertEquals(json.getJSONArray("infos").length(), 1);
+		Assert.assertEquals(json.getJSONArray("infos").getJSONObject(0).getString("key"), "Last State");
+		Assert.assertEquals(json.getJSONArray("pageLoads").length(), 1);
+		Assert.assertTrue(json.getJSONArray("pageLoads").getJSONObject(0).getString("name").startsWith("loading of DriverTestPage took"));
+		Assert.assertTrue(json.getJSONArray("pageLoads").getJSONObject(0).getString("url").contains("test.html"));
+		Assert.assertEquals(json.getJSONArray("pageLoads").getJSONObject(0).getString("page"), "DriverTestPage");
+
 	}
 	
 	@Test(groups={"it"})
@@ -158,7 +192,6 @@ public class TestCustomReporter extends ReporterTest {
 		} finally {
 			System.clearProperty("customSummaryReports");
 		}
-		
 	}
 	
 	@Test(groups={"it"}, expectedExceptions=ConfigurationException.class)
@@ -216,7 +249,5 @@ public class TestCustomReporter extends ReporterTest {
 			System.clearProperty("customTestReports");
 		}
 	}
-	
-	// tester si le custom report n'existe pas
-	// tester si le summary report n'existe pas
+
 }

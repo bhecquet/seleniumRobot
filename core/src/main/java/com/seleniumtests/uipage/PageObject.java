@@ -351,7 +351,7 @@ public class PageObject extends BasePage implements IPage {
             windowHandle = driver.getWindowHandle();
 
             // store load time
-            TestStepManager.getCurrentOrPreviousStep().addPageLoadTime(new PageLoadTime(driver.getCurrentUrl(), this, Duration.between(startLoading, stopLoading).toMillis() / 1000.0));
+            TestStepManager.getCurrentOrPreviousStep().addPageLoadTime(new PageLoadTime(driver.getCurrentUrl(), this, Duration.between(startLoading, stopLoading).toMillis()));
         }
     }
 
