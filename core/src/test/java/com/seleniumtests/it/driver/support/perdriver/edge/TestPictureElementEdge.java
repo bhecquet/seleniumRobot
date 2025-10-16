@@ -30,42 +30,50 @@ public class TestPictureElementEdge extends TestPictureElement {
 	
 	
 	//copy all tests so that they can be played individually for debug
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testClickOnPicture() {
 		super.testClickOnPicture();
 	}
 
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testDoubleClickOnPicture() {
 		super.testDoubleClickOnPicture();
 	}
 	
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testClickOnGooglePicture() {	
 		super.testClickOnGooglePicture();
 	}
 
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testActionDurationIsLogged() {
 		super.testActionDurationIsLogged();
 	}
 
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testClickOnGooglePictureFromFile() {
 		super.testClickOnGooglePictureFromFile();
 	}
 	
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testSendKeysOnPicture() {
 		super.testSendKeysOnPicture();
 	}
 
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testIsVisible() { 
 		super.testIsVisible();
 	}
 	
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testIsNotVisible() {
 		super.testIsNotVisible();
 	}

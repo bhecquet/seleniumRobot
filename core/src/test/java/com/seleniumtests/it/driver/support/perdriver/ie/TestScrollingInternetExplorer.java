@@ -29,73 +29,87 @@ public class TestScrollingInternetExplorer extends TestAutoScrolling {
 		super(BrowserType.INTERNET_EXPLORER);
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testScrollToMiddleDiv1() {
 		super.testScrollToMiddleDiv1();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testScrollToMiddleDiv2() {
 		super.testScrollToMiddleDiv2();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testScrollToDivTop() {
 		super.testScrollToDivTop();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testScrollToDivBottom() {
 		super.testScrollToDivBottom();
 	}
 
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testScrollToDivBottomClickMouse() {
 		super.testScrollToDivBottomClickMouse();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testScrollToDivBottomWithCompositeAction() {
 		throw new SkipException("Does not work with Internet explorer");
 //		super.testScrollToDivBottomWithCompositeAction();
 	}
 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testScrollToBottom() {
 		super.testScrollToBottom();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testScrollToBottomNoHeader() {
 		super.testScrollToBottomNoHeader();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testAutoScrollToMiddleDiv1() {
 		super.testAutoScrollToMiddleDiv1();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testAutoScrollToMiddleDiv2() {
 		super.testAutoScrollToMiddleDiv2();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testAutoScrollToDivTop() {
 		super.testAutoScrollToDivTop();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testAutoScrollToDivBottom() {
 		super.testAutoScrollToDivBottom();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testAutoScrollToBottom() {
 		super.testAutoScrollToBottom();
 	}
 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testAutoScrollToMenu() {
 		super.testAutoScrollToMenu();
 	}

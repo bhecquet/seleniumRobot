@@ -30,17 +30,20 @@ public class TestPictureElementChrome extends TestPictureElement {
 	}
 	
 	//copy all tests so that they can be played individually for debug
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testClickOnPicture() {
 		super.testClickOnPicture();
 	}
 	
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testMultipleActionsOnPicture() {
 		super.testMultipleActionsOnPicture();
 	}
 	
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testMultipleActionsOnPictureWithAnotherPage() {
 		super.testMultipleActionsOnPictureWithAnotherPage();
 	}
@@ -48,47 +51,56 @@ public class TestPictureElementChrome extends TestPictureElement {
 	/**
 	 * issue #529: test done only with chrome as it does not depend on browser
 	 */
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testMultipleActionsOnPictureWithAnotherPagePrivateField() {
 		super.testMultipleActionsOnPictureWithAnotherPagePrivateField();
 	}
 
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testDoubleClickOnPicture() {
 		super.testDoubleClickOnPicture();
 	}
 	
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testClickOnGooglePicture() {	
 		super.testClickOnGooglePicture();
 	}
 
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testActionDurationIsLogged() {
 		super.testActionDurationIsLogged();
 	}
 
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testClickOnGooglePictureFromFile() {
 		super.testClickOnGooglePictureFromFile();
 	}
 	
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testSendKeysOnPicture() {
 		super.testSendKeysOnPicture();
 	}
 
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testIsVisible() { 
 		super.testIsVisible();
 	}
 	
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testIsNotVisible() {
 		super.testIsNotVisible();
 	}
 
-	@Test(groups={"it"}, expectedExceptions = ImageSearchException.class)
+	@Override
+    @Test(groups={"it"}, expectedExceptions = ImageSearchException.class)
 	public void testClickOnNonExistingPicture() {
 		super.testClickOnNonExistingPicture();
 	}

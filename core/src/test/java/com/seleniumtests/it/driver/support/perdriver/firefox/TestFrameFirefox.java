@@ -28,77 +28,92 @@ public class TestFrameFirefox extends TestFrame {
 		super(BrowserType.FIREFOX);
 	}
 
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testFrameText() {
 		super.testFrameText();
 	}
 	
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testFrameRadio() {
 		super.testFrameRadio();
 	}
 	
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testFrameCheckbox() {
 		super.testFrameCheckbox();
 	}
 	
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testFrameButton() {
 		super.testFrameButton();
 	}
 	
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testFrameLabel() {
 		super.testFrameLabel();
 	}
 	
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testFrameLink() {
 		super.testFrameLink();
 	}
 	
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testFrameSelect() {
 		super.testFrameSelect();
 	}
 	
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testElementInsideOtherElementWithFrame() {
 		super.testElementInsideOtherElementWithFrame();
 	}
 	
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testFrameTable() {
 		super.testFrameTable();
 	}
 	
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testIsElementPresentInFrame() {
 		super.testIsElementPresentInFrame();
 	}
 	
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testFindElements() {
 		super.testFindElements();
 	}
 	
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testFindElementsBy() {
 		super.testFindElementsBy();
 	}
 	
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testFrameInFrameText() {
 		super.testFrameInFrameText();
 	}
 	
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testBackToMainFrame() {
 		super.testBackToMainFrame();
 	}	
 
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testFrameInSecondFrameText() {
 		super.testFrameInSecondFrameText();
 	}

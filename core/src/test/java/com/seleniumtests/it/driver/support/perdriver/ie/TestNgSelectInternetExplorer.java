@@ -29,167 +29,200 @@ public class TestNgSelectInternetExplorer extends TestNgSelect {
 		super(BrowserType.INTERNET_EXPLORER);
 	}
 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testSelectByText() {
 		super.testSelectByText();
 	}
 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testSelectByTextAtBottomOfList() {
 		super.testSelectByTextAtBottomOfList();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testSelectByIndex() {
 		super.testSelectByIndex();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testSelectByValue() {
 		super.testSelectByValue();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testSelectByCorrespondingText() {
 		super.testSelectByCorrespondingText();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testSelectMultipleByText() {
 		super.testSelectMultipleByText();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testSelectMultipleByIndex() {
 		super.testSelectMultipleByIndex();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testSelectMultipleByValue() {
 		super.testSelectMultipleByValue();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testSelectMultipleByCorrespondingText() {
 		super.testSelectMultipleByCorrespondingText();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testDeselectByText() {
 		super.testDeselectByText();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testDeselectByIndex() {
 		super.testDeselectByIndex();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testDeselectByValue() {
 		super.testDeselectByValue();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testDeselectByCorrespondingText() {
 		super.testDeselectByCorrespondingText();
 	}
 	
-	@Test(groups= {"ie"}, expectedExceptions=UnsupportedOperationException.class)
+	@Override
+    @Test(groups= {"ie"}, expectedExceptions=UnsupportedOperationException.class)
 	public void testDeselectByTextNonMultipleSelect() {
 		super.testDeselectByTextNonMultipleSelect();
 	}
 	
-	@Test(groups= {"ie"}, expectedExceptions=UnsupportedOperationException.class)
+	@Override
+    @Test(groups= {"ie"}, expectedExceptions=UnsupportedOperationException.class)
 	public void testDeselectByIndexNonMultipleSelect() {
 		super.testDeselectByIndexNonMultipleSelect();
 	}
 	
-	@Test(groups= {"ie"}, expectedExceptions=UnsupportedOperationException.class)
+	@Override
+    @Test(groups= {"ie"}, expectedExceptions=UnsupportedOperationException.class)
 	public void testDeselectByValueNonMultipleSelect() {
 		super.testDeselectByValueNonMultipleSelect();
 	}
 	
-	@Test(groups= {"ie"}, expectedExceptions=UnsupportedOperationException.class)
+	@Override
+    @Test(groups= {"ie"}, expectedExceptions=UnsupportedOperationException.class)
 	public void testDeselectByCorrespondingTextNonMultipleSelect() {
 		super.testDeselectByCorrespondingTextNonMultipleSelect();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testDeselectByTextNotSelected() {
 		super.testDeselectByTextNotSelected();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testDeselectByIndexNotSelected() {
 		super.testDeselectByIndexNotSelected();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testDeselectByValueNotSelected() {
 		super.testDeselectByValueNotSelected();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testDeselectByCorrespondingTextNotSelected() {
 		super.testDeselectByCorrespondingTextNotSelected();
 	}
 	
-	@Test(groups= {"ie"}, expectedExceptions=NoSuchElementException.class)
+	@Override
+    @Test(groups= {"ie"}, expectedExceptions=NoSuchElementException.class)
 	public void testDeselectByInvalidText() {
 		super.testDeselectByInvalidText();
 	}
 	
-	@Test(groups= {"ie"}, expectedExceptions=NoSuchElementException.class)
+	@Override
+    @Test(groups= {"ie"}, expectedExceptions=NoSuchElementException.class)
 	public void testDeselectByInvalidIndex() {
 		super.testDeselectByInvalidIndex();
 	}
 	
-	@Test(groups= {"ie"}, expectedExceptions=NoSuchElementException.class)
+	@Override
+    @Test(groups= {"ie"}, expectedExceptions=NoSuchElementException.class)
 	public void testDeselectByInvalidValue() {
 		super.testDeselectByInvalidValue();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testSelectNotMultiple() {
 		super.testSelectNotMultiple();
 	}
 	 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testSelectMultiple() {
 		super.testSelectMultiple(); 
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testSelectSameTextMultipleTimes() {
 		super.testSelectSameTextMultipleTimes();
 	}
 	
-	@Test(groups= {"ie"}, expectedExceptions=NoSuchElementException.class)
+	@Override
+    @Test(groups= {"ie"}, expectedExceptions=NoSuchElementException.class)
 	public void testSelectByInvalidText() {
 		super.testSelectByInvalidText();
 	}
 	
-	@Test(groups= {"ie"}, expectedExceptions=NoSuchElementException.class)
+	@Override
+    @Test(groups= {"ie"}, expectedExceptions=NoSuchElementException.class)
 	public void testSelectByInvalidTexts() {
 		super.testSelectByInvalidTexts();
 	}
 	
-	@Test(groups= {"ie"}, expectedExceptions=NoSuchElementException.class)
+	@Override
+    @Test(groups= {"ie"}, expectedExceptions=NoSuchElementException.class)
 	public void testSelectInvalidIndex() {
 		super.testSelectInvalidIndex();
 	}
 	
-	@Test(groups= {"ie"}, expectedExceptions=NoSuchElementException.class)
+	@Override
+    @Test(groups= {"ie"}, expectedExceptions=NoSuchElementException.class)
 	public void testSelectInvalidIndexes() {
 		super.testSelectInvalidIndexes();
 	}
 	
-	@Test(groups= {"ie"}, expectedExceptions=NoSuchElementException.class)
+	@Override
+    @Test(groups= {"ie"}, expectedExceptions=NoSuchElementException.class)
 	public void testSelectByInvalidValue() {
 		super.testSelectByInvalidValue();
 	}
 	
-	@Test(groups= {"ie"}, expectedExceptions=NoSuchElementException.class)
+	@Override
+    @Test(groups= {"ie"}, expectedExceptions=NoSuchElementException.class)
 	public void testSelectByInvalidValues() {
 		super.testSelectByInvalidValues();
 	}

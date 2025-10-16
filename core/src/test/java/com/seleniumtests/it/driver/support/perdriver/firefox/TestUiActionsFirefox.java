@@ -29,32 +29,38 @@ public class TestUiActionsFirefox extends TestUiActions {
 		super(BrowserType.FIREFOX);
 	}
 	
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testNewAction() {
 		super.testNewAction();
 	}
 	
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testNewActionWithHtmlElement() throws Exception {
 		super.testNewActionWithHtmlElement();
 	}
 
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testMoveClick() {
 		super.testMoveClick();
 	}
 	
-	@Test(groups={"it"}) 
+	@Override
+    @Test(groups={"it"}) 
 	public void testSendKeys() {
 		super.testSendKeys();
 	}
 	
-	@Test(groups={"it"}) 
+	@Override
+    @Test(groups={"it"}) 
 	public void testSendKeysWithHtmlElement() throws Exception {
 		super.testSendKeysWithHtmlElement();
 	}
 
-	@Test(groups={"it"}, expectedExceptions=WebDriverException.class) 
+	@Override
+    @Test(groups={"it"}, expectedExceptions=WebDriverException.class) 
 	public void testSendKeysWithHtmlElementNotPresent() throws Exception {
 		super.testSendKeysWithHtmlElementNotPresent();
 	}

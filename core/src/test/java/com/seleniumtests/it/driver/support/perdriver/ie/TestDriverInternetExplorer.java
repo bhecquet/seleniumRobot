@@ -19,7 +19,7 @@ package com.seleniumtests.it.driver.support.perdriver.ie;
 
 import java.awt.AWTException;
 import java.awt.event.KeyEvent;
-import java.util.Arrays;
+import java.util.List;
 
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.UnhandledAlertException;
@@ -37,267 +37,316 @@ public class TestDriverInternetExplorer extends TestDriver {
 		super(BrowserType.INTERNET_EXPLORER);
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testAlertDisplay() {
 		super.testAlertDisplay();
 	}
 	
-	@Test(groups= {"ie"}, expectedExceptions=UnhandledAlertException.class, enabled=false)
+	@Override
+    @Test(groups= {"ie"}, expectedExceptions=UnhandledAlertException.class, enabled=false)
 	public void testFindWithAlert() {
 		super.testFindWithAlert();
 	}
    
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testClickDiv() {
 		super.testClickDiv();
 	}
    
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testClickRadio() {
 		super.testClickRadio();
 	}
    
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testClickCheckBox() {
 		super.testClickCheckBox();
 	}
   
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testClickJsDiv() {
 		super.testClickJsDiv();
 	}
 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testDoubleClickDiv() {
 		super.testDoubleClickDiv();
 	}
    
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testClickJsRadio() {
 		super.testClickJsRadio();
 	}
    
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testClickJsCheckbox() {
 		super.testClickJsCheckbox();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testClickActionDiv() {
 		super.testClickActionDiv();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testDoubleClickActionDiv() {
 		super.testDoubleClickActionDiv();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testClickActionRadio() {
 		super.testClickActionRadio();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testClickActionCheckbox() {
 		super.testClickActionCheckbox();
 	}
 
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testClickWithMouse() {
 		super.testClickWithMouse();
 	}
    
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testSendKeys() {
 		super.testSendKeys();
 	}
    
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testSendKeysJs() {
 		super.testSendKeysJs();
 	}
 
-	@Test(groups = {"it", "ut"})
+	@Override
+    @Test(groups = {"it", "ut"})
 	public void testSendKeysAction() {
 		super.testSendKeysAction();
 	}
 
-	@Test(groups = {"it", "ut"})
-	public void testSendKeysActionPause() {
+	@Override
+    @Test(groups = {"it", "ut"})
+	public void testSendKeysActionWithPause() {
 		super.testSendKeysActionWithPause();
 	}
 
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testSendKeysKeyboard() {
 		super.testSendKeysKeyboard();
 	}
 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testOnBlur() {
 		super.testOnBlur();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindElements() {
 		super.testFindElements();
 	}
 	
-	@Test(groups= {"ie"}, expectedExceptions = NoSuchElementException.class)
+	@Override
+    @Test(groups= {"ie"}, expectedExceptions = NoSuchElementException.class)
 	public void testElementNotPresent() {
 		super.testElementNotPresent();
 	}
 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindElementsNotExist() {
 		super.testFindElementsNotExist();
 	}
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindElementsBy() {
 		super.testFindElementsBy();
 	}
 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindElementsByNotExist() {
 		super.testFindElementsByNotExist();
 	}
 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindHtmlElementsBy() {
 		super.testFindHtmlElementsBy();
 	}
 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindHtmlElementsByNotExist() {
 		super.testFindHtmlElementsByNotExist();
 	}
 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindHtmlElementsByInsideFrame() {
 		super.testFindHtmlElementsByInsideFrame();
 	}
 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindHtmlElementsByWithSimilarElements() {
 		super.testFindHtmlElementsByWithSimilarElements();
 	}
 
-	@Test(groups={"it", "ut"})
+	@Override
+    @Test(groups={"it", "ut"})
 	public void testFindHtmlElements() {
 		super.testFindHtmlElements();
 	}
 
-	@Test(groups={"it", "ut"})
+	@Override
+    @Test(groups={"it", "ut"})
 	public void testFindHtmlElementsInsideFrame() {
 		super.testFindHtmlElementsInsideFrame();
 	}
 
-	@Test(groups={"it", "ut"})
+	@Override
+    @Test(groups={"it", "ut"})
 	public void testFindHtmlElementsNotExist() {
 		super.testFindHtmlElementsNotExist();
 	}
 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindSubElement() {
 		super.testFindSubElement();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindNthSubElement() {
 		super.testFindNthSubElement();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindNthElement() {
 		super.testFindNthElement();
 	}
 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindPattern1() {
 		super.testFindPattern1();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindPattern2() {
 		super.testFindPattern2();
 	}
 	
-	@Test(groups= {"ie"}) 
+	@Override
+    @Test(groups= {"ie"}) 
 	public void testFindPattern3() {
 		super.testFindPattern3();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindPattern4() {
 		super.testFindPattern4();
 	}
 	
-	@Test(groups= {"ie"}) 
+	@Override
+    @Test(groups= {"ie"}) 
 	public void testDelay() {
 		super.testDelay();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testHiddenElement() {
 		super.testHiddenElement(); 
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testHiddenElementByDisplay() { 
 		super.testHiddenElementByDisplay();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testHiddenElementByOpacity() { 
 		super.testHiddenElementByOpacity();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testHiddenElementByVisibility() { 
 		super.testHiddenElementByVisibility();
 	}
 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testWebDriverWaitWithLowTimeout() {
 		super.testWebDriverWaitWithLowTimeout();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testSearchDoneSeveralTimes() {
 		super.testSearchDoneSeveralTimes();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testIsElementPresent1() {
 		super.testIsElementPresent1();
 	}
 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testAutoScrolling() {
 		super.testAutoScrolling();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testUploadFileWithRobot() throws AWTException, InterruptedException {
 		super.testUploadFileWithRobot();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testUploadFileWithRobotKeyboard() throws AWTException, InterruptedException {
 		super.testUploadFileWithRobotKeyboard();
 	}
 	
 	/**
 	 * Retry file upload if something goes wrong
-	 * @param testNGCtx
-	 * @throws Exception
 	 */
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testUploadFile() throws AWTException, InterruptedException {
 		try {
 			super.testUploadFile();
 		} catch (Throwable e) {
 			logger.warn("test upload failed and retried due to session timeout exception");
-			CustomEventFiringWebDriver.sendKeysToDesktop(Arrays.asList(KeyEvent.VK_ESCAPE), DriverMode.LOCAL, null);
+			CustomEventFiringWebDriver.sendKeysToDesktop(List.of(KeyEvent.VK_ESCAPE), DriverMode.LOCAL, null);
 //			try {
 //				stop();
 //				exposeTestPage(testNGCtx);
@@ -309,204 +358,245 @@ public class TestDriverInternetExplorer extends TestDriver {
 		
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindFirstElement() {
 		super.testFindFirstElement();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindFirstVisibleElement() {
 		super.testFindFirstVisibleElement();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindFirstElementWithParent() {
 		super.testFindFirstElementWithParent();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindFirstVisibleElementWithParent() {
 		super.testFindFirstVisibleElementWithParent();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindElementsUnderAnOtherElement() {
 		super.testFindElementsUnderAnOtherElement();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindElementsInsideParent() {
 		super.testFindElementsInsideParent();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindLastElement() {
 		super.testFindLastElement();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindSubElementByXpath() {
 		super.testFindSubElementByXpath();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindSubElementByRelativeXpath() {
 		super.testFindSubElementByRelativeXpath();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindElementByXpath() {
 		super.testFindElementByXpath();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testIsElementPresent() {
 		super.testIsElementPresent();
 	}
 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testIsElementNotPresentWithIndex() {
 		super.testIsElementNotPresentWithIndex();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testIsElementPresentAndNotDisplayedWithIndex() {
 		super.testIsElementPresentAndNotDisplayedWithIndex();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testIsElementPresentAndDisplayed() {
 		super.testIsElementPresentAndDisplayed();
 	}
-	@Test(groups={"it", "ut"})
+	@Override
+    @Test(groups={"it", "ut"})
 	public void testWaitForElementPresentAndDisplayedWithDelay() {
 		super.testWaitForElementPresentAndDisplayedWithDelay();
 	}
-	@Test(groups={"it", "ut"})
+	@Override
+    @Test(groups={"it", "ut"})
 	public void testWaitForElementNotPresentAndNotDisplayed() {
 		super.testWaitForElementNotPresentAndNotDisplayed();
 	}
-	@Test(groups={"it", "ut"})
+	@Override
+    @Test(groups={"it", "ut"})
 	public void testWaitForElementPresentAndNotDisplayed() {
 		super.testWaitForElementPresentAndNotDisplayed();
 	}
 
-	@Test(groups={"it", "ut"})
+	@Override
+    @Test(groups={"it", "ut"})
 	public void testIsElementPresentAndDisplayedWithDelay() {
 		super.testIsElementPresentAndDisplayedWithDelay();
 	}
 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testIsElementNotPresentAndNotDisplayed() {
 		super.testIsElementNotPresentAndNotDisplayed();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testIsElementPresentAndNotDisplayed() {
 		super.testIsElementPresentAndNotDisplayed();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testIsElementNotPresent() {
 		super.testIsElementNotPresent();
 	}
 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testTextElementInsideHtmlElementIsPresent() {
 		super.testTextElementInsideHtmlElementIsPresent();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testTextElementInsideHtmlElementIsNotPresent() {
 		super.testTextElementInsideHtmlElementIsNotPresent();
 	}
 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testElementWithIFrameAbsent() {
 		super.testElementWithIFrameAbsent();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindTextElementInsideHtmlElement() {
 		super.testFindTextElementInsideHtmlElement();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindRadioElementInsideHtmlElement() {
 		super.testFindRadioElementInsideHtmlElement();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindCheckElementInsideHtmlElement() {
 		super.testFindCheckElementInsideHtmlElement();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindButtonElementInsideHtmlElement() {
 		super.testFindButtonElementInsideHtmlElement();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindLinkElementInsideHtmlElement() {
 		super.testFindLinkElementInsideHtmlElement();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindSelectElementInsideHtmlElement() {
 		super.testFindSelectElementInsideHtmlElement();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindTableInsideHtmlElement() {
 		super.testFindTableInsideHtmlElement();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindTextElementsInsideHtmlElement() {
 		super.testFindTextElementsInsideHtmlElement();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindRadioElementsInsideHtmlElement() {
 		super.testFindRadioElementsInsideHtmlElement();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindCheckElementsInsideHtmlElement() {
 		super.testFindCheckElementsInsideHtmlElement();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindButtonElementsInsideHtmlElement() {
 		super.testFindButtonElementsInsideHtmlElement();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindLinkElementsInsideHtmlElement() {
 		super.testFindLinkElementsInsideHtmlElement();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindSelectElementsInsideHtmlElement() {
 		super.testFindSelectElementsInsideHtmlElement();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindTablesInsideHtmlElement() {
 		super.testFindTablesInsideHtmlElement();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testScrollIntoDiv() {
 		super.testScrollIntoDiv();
 	}
 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testScrollToBottom() {
 		super.testScrollToBottom();
 	}
 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testCaptureWhenWindowIsClosed() throws Exception {
 		super.testCaptureWhenWindowIsClosed();
 	}

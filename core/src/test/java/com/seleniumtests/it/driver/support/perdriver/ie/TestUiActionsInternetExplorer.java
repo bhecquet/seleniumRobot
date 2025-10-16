@@ -29,32 +29,38 @@ public class TestUiActionsInternetExplorer extends TestUiActions {
 		super(BrowserType.INTERNET_EXPLORER);
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testNewAction() {
 		super.testNewAction();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testNewActionWithHtmlElement() throws Exception {
 		super.testNewActionWithHtmlElement();
 	}
 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testMoveClick() {
 		super.testMoveClick();
 	}
 	
-	@Test(groups= {"ie"}) 
+	@Override
+    @Test(groups= {"ie"}) 
 	public void testSendKeys() {
 		super.testSendKeys();
 	}
 	
-	@Test(groups= {"ie"}) 
+	@Override
+    @Test(groups= {"ie"}) 
 	public void testSendKeysWithHtmlElement() throws Exception {
 		super.testSendKeysWithHtmlElement();
 	}
 
-	@Test(groups= {"ie"}, expectedExceptions=WebDriverException.class) 
+	@Override
+    @Test(groups= {"ie"}, expectedExceptions=WebDriverException.class) 
 	public void testSendKeysWithHtmlElementNotPresent() throws Exception {
 		super.testSendKeysWithHtmlElementNotPresent();
 	}

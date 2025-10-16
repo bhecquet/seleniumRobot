@@ -28,77 +28,92 @@ public class TestFrameInternetExplorer extends TestFrame {
 		super(BrowserType.INTERNET_EXPLORER);
 	}
 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFrameText() {
 		super.testFrameText();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFrameRadio() {
 		super.testFrameRadio();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFrameCheckbox() {
 		super.testFrameCheckbox();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFrameButton() {
 		super.testFrameButton();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFrameLabel() {
 		super.testFrameLabel();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFrameLink() {
 		super.testFrameLink();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFrameSelect() {
 		super.testFrameSelect();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testElementInsideOtherElementWithFrame() {
 		super.testElementInsideOtherElementWithFrame();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFrameTable() {
 		super.testFrameTable();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testIsElementPresentInFrame() {
 		super.testIsElementPresentInFrame();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindElements() {
 		super.testFindElements();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFindElementsBy() {
 		super.testFindElementsBy();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFrameInFrameText() {
 		super.testFrameInFrameText();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testBackToMainFrame() {
 		super.testBackToMainFrame();
 	}	
 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testFrameInSecondFrameText() {
 		super.testFrameInSecondFrameText();
 	}

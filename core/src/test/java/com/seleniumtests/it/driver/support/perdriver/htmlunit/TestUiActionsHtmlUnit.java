@@ -28,32 +28,38 @@ public class TestUiActionsHtmlUnit extends TestUiActions {
 		super(BrowserType.HTMLUNIT);
 	}
 	
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testNewAction() {
 		// skip as htmlunit does not support it
 	}
 	
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testNewActionWithHtmlElement() throws Exception {
 		// skip as htmlunit does not support it
 	}
 
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testMoveClick() {
 		// skip as htmlunit does not support it
 	}
 	
-	@Test(groups={"it"}) 
+	@Override
+    @Test(groups={"it"}) 
 	public void testSendKeys() {
 		// skip as htmlunit does not support it
 	}
 	
-	@Test(groups={"it"}) 
+	@Override
+    @Test(groups={"it"}) 
 	public void testSendKeysWithHtmlElement() throws Exception {
 		// skip as htmlunit does not support it
 	}
 	
-	@Test(groups={"it"}) 
+	@Override
+    @Test(groups={"it"}) 
 	public void testSendKeysWithHtmlElementNotPresent() throws Exception {
 		// skip as htmlunit does not support it
 	}

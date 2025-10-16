@@ -30,42 +30,50 @@ public class TestPictureElementInternetExplorer extends TestPictureElement {
 	}
 	
 	//copy all tests so that they can be played individually for debug
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testClickOnPicture() {
 		super.testClickOnPicture();
 	}
 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testDoubleClickOnPicture() {
 		super.testDoubleClickOnPicture();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testClickOnGooglePicture() {	
 		super.testClickOnGooglePicture();
 	}
 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testActionDurationIsLogged() {
 		super.testActionDurationIsLogged();
 	}
 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testClickOnGooglePictureFromFile() {
 		super.testClickOnGooglePictureFromFile();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testSendKeysOnPicture() {
 		super.testSendKeysOnPicture();
 	}
 
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testIsVisible() { 
 		super.testIsVisible();
 	}
 	
-	@Test(groups= {"ie"})
+	@Override
+    @Test(groups= {"ie"})
 	public void testIsNotVisible() {
 		super.testIsNotVisible();
 	}

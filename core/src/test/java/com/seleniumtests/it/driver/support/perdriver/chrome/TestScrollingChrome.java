@@ -28,72 +28,86 @@ public class TestScrollingChrome extends TestAutoScrolling {
 		super(BrowserType.CHROME);
 	}
 	
-	@Test(groups={"it", "ut"})
+	@Override
+    @Test(groups={"it", "ut"})
 	public void testScrollToMiddleDiv1() {
 		super.testScrollToMiddleDiv1();
 	}
 	
-	@Test(groups={"it", "ut"})
+	@Override
+    @Test(groups={"it", "ut"})
 	public void testScrollToMiddleDiv2() {
 		super.testScrollToMiddleDiv2();
 	}
 	
-	@Test(groups={"it", "ut"})
+	@Override
+    @Test(groups={"it", "ut"})
 	public void testScrollToDivTop() {
 		super.testScrollToDivTop();
 	}
 	
-	@Test(groups={"it", "ut"})
+	@Override
+    @Test(groups={"it", "ut"})
 	public void testScrollToDivBottom() {
 		super.testScrollToDivBottom();
 	}
 	
-	@Test(groups={"it"})
+	@Override
+    @Test(groups={"it"})
 	public void testScrollToDivBottomClickMouse() {
 		super.testScrollToDivBottomClickMouse();
 	}
 	
-	@Test(groups={"it", "ut"})
+	@Override
+    @Test(groups={"it", "ut"})
 	public void testScrollToDivBottomWithCompositeAction() {
 		super.testScrollToDivBottomWithCompositeAction();
 	}
 
-	@Test(groups={"it", "ut"})
+	@Override
+    @Test(groups={"it", "ut"})
 	public void testScrollToBottom() {
 		super.testScrollToBottom();
 	}
 	
-	@Test(groups={"it", "ut"})
+	@Override
+    @Test(groups={"it", "ut"})
 	public void testScrollToBottomNoHeader() {
 		super.testScrollToBottomNoHeader();
 	}
 	
-	@Test(groups={"it", "ut"})
+	@Override
+    @Test(groups={"it", "ut"})
 	public void testAutoScrollToMiddleDiv1() {
 		super.testAutoScrollToMiddleDiv1();
 	}
 	
-	@Test(groups={"it", "ut"})
+	@Override
+    @Test(groups={"it", "ut"})
 	public void testAutoScrollToMiddleDiv2() {
 		super.testAutoScrollToMiddleDiv2();
 	}
 	
-	@Test(groups={"it", "ut"})
+	@Override
+    @Test(groups={"it", "ut"})
 	public void testAutoScrollToDivTop() {
 		super.testAutoScrollToDivTop();
 	}
 	
-	@Test(groups={"it", "ut"})
+	@Override
+    @Test(groups={"it", "ut"})
 	public void testAutoScrollToDivBottom() {
 		super.testAutoScrollToDivBottom();
 	}
 	
-	@Test(groups={"it", "ut"})
+	@Override
+    @Test(groups={"it", "ut"})
 	public void testAutoScrollToBottom() {
 		super.testAutoScrollToBottom();
 	}
 	
-	@Test(groups={"it", "ut"})
+	@Override
+    @Test(groups={"it", "ut"})
 	public void testAutoScrollToMenu() {
 		super.testAutoScrollToMenu();
 	}
