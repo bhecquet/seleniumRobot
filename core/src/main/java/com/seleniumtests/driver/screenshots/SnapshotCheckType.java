@@ -57,8 +57,7 @@ public class SnapshotCheckType {
 	}
 	
 	/**
-	 * Says whether snasphots will be sent to seleniumRobot server or not for comparing with previous test sessions
-	 * @return
+	 * Says whether snapshots will be sent to seleniumRobot server or not for comparing with previous test sessions
 	 */
 	public boolean recordSnapshotOnServerForComparison() {
 		return control != Control.NONE && control != Control.NONE_REFERENCE;
@@ -66,7 +65,6 @@ public class SnapshotCheckType {
 	
 	/**
 	 * return true if snapshot is a reference image that show what is the application status when step succeed
-	 * @return
 	 */
 	public boolean recordSnapshotOnServerForReference() {
 		return control == Control.NONE_REFERENCE;
@@ -79,7 +77,7 @@ public class SnapshotCheckType {
 	
 	/**
 	 * Check if the SnapshotCheckType is valid with the provided target (Screen, Page, Element)
-	 * @param target
+	 * @param target	target of the snapshot (page, screen, ...)
 	 */
 	public void check(SnapshotTarget target, double aspectRatio) {
 		
@@ -89,7 +87,7 @@ public class SnapshotCheckType {
 				try {
 					excludeElementsRect.add(ScreenshotUtil.getElementRectangleWithAR(el, aspectRatio));
 				} catch (WebDriverException e) {
-					logger.warn(String.format("Element %s not added to exclusion as it cannot be found", el));
+					logger.warn("Element {} not added to exclusion as it cannot be found", el);
 				}
 			}
 		} else if (target.isElementTarget() || target.isViewportTarget()) {
@@ -110,7 +108,7 @@ public class SnapshotCheckType {
 							|| elementRectangle.y < targetRectangle.y
 							|| elementRectangle.x + elementRectangle.width > targetRectangle.x + targetRectangle.width
 							|| elementRectangle.y + elementRectangle.height > targetRectangle.y + targetRectangle.height) {
-						logger.warn(String.format("Element %s is not inside %s and won't be excluded", rectangleToString(elementRectangle), rectangleToString(targetRectangle)));
+						logger.warn("Element {} is not inside {} and won't be excluded", rectangleToString(elementRectangle), rectangleToString(targetRectangle));
 					
 					} else {
 
@@ -122,7 +120,7 @@ public class SnapshotCheckType {
 					}
 					
 				} catch (WebDriverException e) {
-					logger.warn(String.format("Element %s not added to exclusion as it cannot be found", el));
+					logger.warn("Element {} not added to exclusion as it cannot be found", el);
 				}
 			}
 		}
@@ -131,8 +129,8 @@ public class SnapshotCheckType {
 	/**
 	 * Percentage of pixels that can be different when comparing this snapshot to its reference.
 	 * ex: setting 2.3 means that with 2% of different pixels, 
-	 * @param errorThreshold
-	 * @return
+	 * @param errorThreshold	Error that we accept when doing comparison
+	 * @return this
 	 */
 	public SnapshotCheckType withThreshold(double errorThreshold) {
 		SnapshotCheckType newCheck = new SnapshotCheckType(control);
@@ -142,8 +140,8 @@ public class SnapshotCheckType {
 	
 	/**
 	 * Exclude the elements from comparison
-	 * @param element	list of WebElements
-	 * @return
+	 * @param elements	list of WebElements
+	 * @return this
 	 */
 	public SnapshotCheckType exclude(List<WebElement> elements) {
 		SnapshotCheckType newCheck = this;
@@ -155,8 +153,8 @@ public class SnapshotCheckType {
 	
 	/**
 	 * Exclude the element from comparison
-	 * @param element
-	 * @return
+	 * @param element	the element to exclude from comparison
+	 * @return this
 	 */
 	public SnapshotCheckType exclude(WebElement element) {
 		SnapshotCheckType newCheck = new SnapshotCheckType(control);
@@ -190,12 +188,16 @@ public class SnapshotCheckType {
 			return true;
 		}
 		
-		if (obj instanceof SnapshotCheckType) {
-			SnapshotCheckType checkType = (SnapshotCheckType) obj;
+		if (obj instanceof SnapshotCheckType checkType) {
 			return this.getControl() == checkType.getControl();
 		} else {
 			return false;
 		}
+	}
+
+	@Override
+	public int hashCode() {
+		return control.hashCode();
 	}
 		
 }

@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
@@ -65,14 +64,17 @@ import com.seleniumtests.util.StringUtility;
  *
  */
 public class AppTestDocumentation {
-	
-	private static StringBuilder javadoc;
+
+
+	public static final String CELL_CONTENT_INT = "       <td>%d</td>%n";
+	public static final String CELL_CONTENT_STRING = "    <td>%s</td>%n";
 	private static Map<String, List<String>> stepsUsedInTests;
 	private static List<String> steps;
 	private static List<String> tests;
 	private static Integer searchedElements;
 	
 	public static void main(String[] args) throws IOException {
+  StringBuilder javadoc;
 		System.setProperty("mavenExecution", "true");
 		stepsUsedInTests = new HashMap<>();
 		steps = new ArrayList<>();
@@ -87,7 +89,7 @@ public class AppTestDocumentation {
 			rootFolders = files
 			        .filter(Files::isDirectory)
 			        .filter(p -> p.toAbsolutePath().resolve("tests").toFile().exists() && p.toAbsolutePath().resolve("webpage").toFile().exists())
-			        .collect(Collectors.toList());
+			        .toList();
 		}
 
 		javadoc = new StringBuilder("Cette page référence l'ensemble des tests et des opération disponible pour l'application\n");
@@ -111,7 +113,7 @@ public class AppTestDocumentation {
 			List<Path> pagesFolders = files
 		        .filter(Files::isDirectory)
 					.filter(p -> p.getFileName().toString().equals("webpage"))
-		        .collect(Collectors.toList());
+		        .toList();
 			
 			for (Path pagesFolder: pagesFolders) {
 				explorePages(pagesFolder.toFile(), pagesDoc);
@@ -124,19 +126,20 @@ public class AppTestDocumentation {
 		
 		StringBuilder testDoc = new StringBuilder();
 		testDoc.append("<h1>Scénarios de test</h1>\n");
-		testDoc.append("<table>\n"
-				+ "   <tr>\n"
-				+ "       <th>Classe</th>\n" 
-				+ "       <th>Test</th>\n"
-				+ "       <th>Description</th>\n"
-				+ "       <th>Details</th>\n"
-				+ "       <th>Attributes</th>\n"
-				+ "   </tr>\n");
+		testDoc.append("""
+<table>"
+   <tr>"
+       <th>Classe</th>"
+       <th>Test</th>"
+       <th>Description</th>"
+       <th>Details</th>"
+       <th>Attributes</th>"
+   </tr>""");
 		try (Stream<Path> files = Files.walk(rootFolder)) {
 			List<Path> testsFolders = files
 					.filter(Files::isDirectory)
 		        .filter(p -> p.getFileName().toString().equals("tests"))
-					.collect(Collectors.toList());
+					.toList();
 			
 			for (Path testsFolder: testsFolders) {
 				exploreTests(testsFolder.toFile(), testDoc);
@@ -153,10 +156,10 @@ public class AppTestDocumentation {
 		javadoc.append("<hr/>");		
 		
 		// store usage data
-		System.out.println(String.format("Number of tests: %d", tests.size()));
-		System.out.println(String.format("Searched elements: %d", searchedElements));
-		System.out.println(String.format("Test steps: %d", steps.size()));
-		System.out.println(String.format("Mean elements/steps: %.1f\n", searchedElements * 1.0 / steps.size()));
+		System.out.printf("Number of tests: %d%n", tests.size());
+		System.out.printf("Searched elements: %d%n", searchedElements);
+		System.out.printf("Test steps: %d%n", steps.size());
+		System.out.printf("Mean elements/steps: %.1f%n%n", searchedElements * 1.0 / steps.size());
 		
 		int usedSteps = 0;
 		Map<String, Integer> stepReuse = new HashMap<>();
@@ -168,40 +171,42 @@ public class AppTestDocumentation {
 				}
 			}
 		}
-		System.out.println(String.format("Steps reuse percentage: %.2f", usedSteps * 1.0 / stepReuse.size()));
+		System.out.printf("Steps reuse percentage: %.2f%n", usedSteps * 1.0 / stepReuse.size());
 		
 		javadoc.append("<h1>Statistics</h1>\n");
-		javadoc.append("<table>\n"
-				+ "   <tr>\n"
-				+ "       <td>Nombre de tests</td>\n" 
-				+ String.format("       <td>%d</td>\n", tests.size()) 
-				+ "   </tr>\n"
-				+ "   <tr>\n"
-				+ "       <td>Elements recherchés</td>\n" 
-				+ String.format("       <td>%d</td>\n", searchedElements) 
-				+ "   </tr>\n"
-				+ "   <tr>\n"
-				+ "       <td>Nombre de steps</td>\n" 
-				+ String.format("       <td>%d</td>\n", steps.size()) 
-				+ "   </tr>\n"
-				+ "   <tr>\n"
-				+ "       <td>Moyenne elements/steps</td>\n" 
-				+ String.format("       <td>%.1f</td>\n", searchedElements * 1.0 / steps.size()) 
-				+ "   </tr>\n"
-				+ "   <tr>\n"
-				+ "       <td>Taux de réutilisation des steps</td>\n" 
-				+ String.format("       <td>%.1f</td>\n", usedSteps * 1.0 / stepReuse.size()) 
-				+ "   </tr>\n"
-				+ "</table>"
+		javadoc.append("""
+                <table>"
+                    <tr>"
+                        <td>Nombre de tests</td>
+""")
+				.append(String.format(CELL_CONTENT_INT, tests.size()))
+				.append("""
+   </tr>"
+   <tr>"
+       <td>Elements recherchés</td>
+""")
+				.append(String.format(CELL_CONTENT_INT, searchedElements))
+				.append("""
+   </tr>"
+   <tr>"
+       <td>Nombre de steps</td>
+""")
+				.append(String.format(CELL_CONTENT_INT, steps.size()))
+				.append("""
+   </tr>"
+   <tr>"
+       <td>Moyenne elements/steps</td>%n""")
+				.append(String.format("       <td>%.1f</td>%n", searchedElements * 1.0 / steps.size()))
+				.append("""
+   </tr>"
+   <tr>"
+       <td>Taux de réutilisation des steps</td>
+""")
+				.append(String.format("       <td>%.1f</td>%n", usedSteps * 1.0 / stepReuse.size()))
+				.append("""
+   </tr>"
+</table>"""
 				);
-		
-		/*for (String step :steps) {
-			if (!stepReuse.containsKey(step)) {
-				System.out.println(step);
-			}
-		}
-		System.out.println(new JSONObject(stepsUsedInTests).toString(2));*/
-		
 
 		FileUtils.write(Paths.get(args[0], "src/site/confluence/template.confluence").toFile(), javadoc, StandardCharsets.UTF_8);
 		FileUtils.write(Paths.get(args[0], "src/site/confluence/template.xhtml").toFile(), javadoc, StandardCharsets.UTF_8);
@@ -233,32 +238,34 @@ public class AppTestDocumentation {
 
         // parse the file
 		ParseResult<CompilationUnit> cu = new JavaParser().parse(in);
+		Optional<CompilationUnit> result = cu.getResult();
+		if (result.isPresent()) {
 
-        // prints the resulting compilation unit to default system output
-        ClassVisitor classVisitor = new ClassVisitor();
-		cu.getResult().get().accept(classVisitor, "Tests");
-        TestMethodVisitor methodVisitor = new TestMethodVisitor();
-        cu.getResult().get().accept(methodVisitor, null);
-        
-        int i = 0;
-        for (Entry<String, String> testEntry: methodVisitor.getMethodInfos().entrySet()) {
-        	testDoc.append("<tr>\n");
-        	if (i == 0) {
-        		testDoc.append(String.format("    <td rowspan=\"%d\">%s</td>\n", methodVisitor.methodInfos.size(), classVisitor.getClassName()));
-        	}
-        	testDoc.append(String.format("    <td>%s</td>\n", testEntry.getKey().toString().split("\\.")[1])
-        			+ String.format("    <td>%s</td>\n", testEntry.getValue().trim())
-        	);
-        	testDoc.append(String.format("    <td>%s</td>\n", String.join(", ", methodVisitor.getStepsInScenario().get(testEntry.getKey()))));
-        	
-        	Map<String, String> methodAttributes = methodVisitor.getTestAttributes().get(testEntry.getKey());
-        	
-        	testDoc.append(String.format("    <td>%s</td>\n", methodAttributes.toString()));
-        	testDoc.append("</tr>\n");
-        	i += 1;
-        }
-        
-        stepsUsedInTests.putAll(methodVisitor.getStepsInScenario());
+			// prints the resulting compilation unit to default system output
+			ClassVisitor classVisitor = new ClassVisitor();
+			result.get().accept(classVisitor, "Tests");
+			TestMethodVisitor methodVisitor = new TestMethodVisitor();
+			result.get().accept(methodVisitor, null);
+
+			int i = 0;
+			for (Entry<String, String> testEntry : methodVisitor.getMethodInfos().entrySet()) {
+				testDoc.append("<tr>\n");
+				if (i == 0) {
+					testDoc.append(String.format("    <td rowspan=\"%d\">%s</td>%n", methodVisitor.methodInfos.size(), classVisitor.getClassName()));
+				}
+				testDoc.append(String.format(CELL_CONTENT_STRING, testEntry.getKey().split("\\.")[1]))
+						.append(String.format(CELL_CONTENT_STRING, testEntry.getValue().trim()));
+				testDoc.append(String.format(CELL_CONTENT_STRING, String.join(", ", methodVisitor.getStepsInScenario().get(testEntry.getKey()))));
+
+				Map<String, String> methodAttributes = methodVisitor.getTestAttributes().get(testEntry.getKey());
+
+				testDoc.append(String.format(CELL_CONTENT_STRING, methodAttributes.toString()));
+				testDoc.append("</tr>\n");
+				i += 1;
+			}
+
+			stepsUsedInTests.putAll(methodVisitor.getStepsInScenario());
+		}
 	}
 	
 	private static void explorePages(File srcDir, StringBuilder pagesDoc) throws IOException {
@@ -278,21 +285,25 @@ public class AppTestDocumentation {
 	
 
 	private static void parseWebPage(Path path, StringBuilder pagesDoc) throws FileNotFoundException {
-		pagesDoc.append(String.format("\n<h2>Page: %s</h2>\n", path.getFileName().toString()));
+		pagesDoc.append(String.format("%n<h2>Page: %s</h2>%n", path.getFileName().toString()));
 		
 		FileInputStream in = new FileInputStream(path.toAbsolutePath().toString());
 
         // parse the file
         ParseResult<CompilationUnit> cu = new JavaParser().parse(in);
 
+
         // prints the resulting compilation unit to default system output
-        cu.getResult().get().accept(new ClassVisitor(), "Pages");
-        WebPageMethodVisitor methodVisitor = new WebPageMethodVisitor();
-		cu.getResult().get().accept(methodVisitor, null);
-		
-		for (Entry<String, String> pageEntry: methodVisitor.getMethodInfo().entrySet()) {
-			pagesDoc.append(String.format("\n<h4>Operation: %s</h4>\n", pageEntry.getKey()));
-			pagesDoc.append(pageEntry.getValue());
+		Optional<CompilationUnit> result = cu.getResult();
+		if (result.isPresent()) {
+			result.get().accept(new ClassVisitor(), "Pages");
+			WebPageMethodVisitor methodVisitor = new WebPageMethodVisitor();
+			result.get().accept(methodVisitor, null);
+
+			for (Entry<String, String> pageEntry: methodVisitor.getMethodInfo().entrySet()) {
+				pagesDoc.append(String.format("%n<h4>Operation: %s</h4>%n", pageEntry.getKey()));
+				pagesDoc.append(pageEntry.getValue());
+			}
 		}
 	}
 	
@@ -356,15 +367,15 @@ public class AppTestDocumentation {
 	
 	private static class TestMethodVisitor extends VoidVisitorAdapter<Void> {
 		
-		private Map<String, String> methodInfos =  new HashMap<>();
-		private Map<String, Map<String, String>> testAttributes =  new HashMap<>();
-		private Map<String, List<String>> stepsInScenario = new HashMap<>();
+		private final Map<String, String> methodInfos =  new HashMap<>();
+		private final Map<String, Map<String, String>> testAttributes =  new HashMap<>();
+		private final Map<String, List<String>> stepsInScenario = new HashMap<>();
 		
 		private List<MethodCallExpr> findAllMethodCalls(Node instruction) {
 			final List<MethodCallExpr> found = new ArrayList<>();
 			instruction.walk(TreeTraversal.BREADTHFIRST, node -> {
 	            if (MethodCallExpr.class.isAssignableFrom(node.getClass())) {
-	                found.add(MethodCallExpr.class.cast(node));
+	                found.add((MethodCallExpr) node);
 	            }
 	        });
 	
@@ -409,7 +420,7 @@ public class AppTestDocumentation {
 	    	
 	    	// ignore non test methods
 	    	Optional<AnnotationExpr> optAnnotation = n.getAnnotationByClass(Test.class);
-	    	if (!optAnnotation.isPresent()) {
+	    	if (optAnnotation.isEmpty()) {
 	    		return;
 	    	}
 	    	
@@ -444,7 +455,7 @@ public class AppTestDocumentation {
 	
 	private static class WebPageMethodVisitor extends VoidVisitorAdapter<Void> {
 		
-		private Map<String, String> methodInfo = new HashMap<>();
+		private final Map<String, String> methodInfo = new HashMap<>();
 		
 		@Override
 		public void visit(MethodDeclaration n, Void arg) {
@@ -495,7 +506,7 @@ public class AppTestDocumentation {
 					}
 				}
 			
-				searchedElements += n.findAll(MethodCallExpr.class).stream().filter(m -> m.getNameAsString().startsWith("findElement")).collect(Collectors.toList()).size();
+				searchedElements += n.findAll(MethodCallExpr.class).stream().filter(m -> m.getNameAsString().startsWith("findElement")).toList().size();
 			}
 			
 		}
@@ -510,8 +521,7 @@ public class AppTestDocumentation {
 	}
 	
 	/**
-	 * Remove the star in front of each line 
-	 * @return
+	 * Remove the star in front of each line
 	 */
 	private static String formatJavadoc(String javadoc) {
 		StringBuilder out = new StringBuilder();
@@ -526,7 +536,7 @@ public class AppTestDocumentation {
 			if (line.contains("@throws")) {
 				continue;
 			}
-			out.append(line + "\n");
+			out.append(line).append("\n");
 		}
 		return out.toString();
 	}

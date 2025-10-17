@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,7 +36,6 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Rectangle;
-import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -70,10 +69,9 @@ public class ScreenshotUtil {
 	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(ScreenshotUtil.class);
 
-    private String outputDirectory;
-    private CustomEventFiringWebDriver driver;
+    private final String outputDirectory;
+    private final CustomEventFiringWebDriver driver;
     private WebUIDriver uiDriver;
-    private String filename;
 
 	public ScreenshotUtil() {
 		uiDriver = WebUIDriver.getWebUIDriver(false);
@@ -97,16 +95,16 @@ public class ScreenshotUtil {
     
     
     private class NamedBufferedImage {
-    	private BufferedImage image;
-    	private String prefix;
-    	private String url = "app";
-    	private String title = "app";
-    	private String pageSource = "";
+    	private final BufferedImage image;
+    	private final String prefix;
+    	private String url;
+    	private String title;
+    	private String pageSource;
     	
     	/**
     	 * Creates a NamedBufferedImage based on the provided image
-    	 * @param image
-    	 * @param prefix
+    	 * @param image		the buffured image
+    	 * @param prefix	prefix that will be set on name
     	 */
     	public NamedBufferedImage(BufferedImage image, String prefix) {
     		this.prefix = prefix;
@@ -156,7 +154,7 @@ public class ScreenshotUtil {
         
         /**
          * When target is an element, add information relative to element
-         * @return
+         * @return this
          */
         public NamedBufferedImage addElementMetaDataToImage(WebElement element) {
         	
@@ -197,11 +195,11 @@ public class ScreenshotUtil {
      * @param exportClass	The type of export to perform (File, ScreenShot, String, BufferedImage)
      * @return	the screenshot or null if user requested not to take screenshots
      */
-    public <T extends Object> T capture(SnapshotTarget target, Class<T> exportClass) {
+    public <T> T capture(SnapshotTarget target, Class<T> exportClass) {
     	return capture(target, exportClass, false);
     } 
     
-    public <T extends Object> T capture(SnapshotTarget target, Class<T> exportClass, int scrollDelay) {
+    public <T> T capture(SnapshotTarget target, Class<T> exportClass, int scrollDelay) {
     	return capture(target, exportClass, false, scrollDelay);
     } 
     
@@ -212,7 +210,7 @@ public class ScreenshotUtil {
      * @param force			force capture even if set to false in SeleniumTestContext. This allows PictureElement and ScreenZone to work
      * @return the screenshot or null if user requested not to take screenshots and force is "false"
      */
-    public <T extends Object> T capture(SnapshotTarget target, Class<T> exportClass, boolean force) {
+    public <T> T capture(SnapshotTarget target, Class<T> exportClass, boolean force) {
     	return capture(target, exportClass, force, 0);
     }
     
@@ -225,7 +223,7 @@ public class ScreenshotUtil {
      * 						but capture take more time
      * @return the screenshot or null if user requested not to take screenshots and force is "false"
      */
-    public <T extends Object> T capture(SnapshotTarget target, Class<T> exportClass, boolean force, int scrollDelay) {
+    public <T> T capture(SnapshotTarget target, Class<T> exportClass, boolean force, int scrollDelay) {
     	try {
 			return capture(target, exportClass, false, force, scrollDelay).get(0);
 		} catch (IndexOutOfBoundsException e) {
@@ -254,7 +252,7 @@ public class ScreenshotUtil {
      * @return				The image in the requested format
      */
     
-    public <T extends Object> List<T> capture(SnapshotTarget target, Class<T> exportClass, boolean allWindows, boolean force) {
+    public <T> List<T> capture(SnapshotTarget target, Class<T> exportClass, boolean allWindows, boolean force) {
     	return capture(target, exportClass, allWindows, force, 0);
     }
     
@@ -268,7 +266,7 @@ public class ScreenshotUtil {
      * 						but capture take more time
      * @return				The image in the requested format
      */
-    public <T extends Object> List<T> capture(SnapshotTarget target, Class<T> exportClass, boolean allWindows, boolean force, int scrollDelay) {
+    public <T> List<T> capture(SnapshotTarget target, Class<T> exportClass, boolean allWindows, boolean force, int scrollDelay) {
     	
     	if (!force && (SeleniumTestsContextManager.getThreadContext() == null 
         		|| outputDirectory == null 
@@ -284,12 +282,11 @@ public class ScreenshotUtil {
     }
 
 	/**
-	 * Export the captured images
-	 * @param <T>
-	 * @param exportClass
-	 * @param start
-	 * @param capturedImages
-	 * @return
+	 * Export the captured images to the given class
+	 * @param exportClass		class to export to: File, Screenshot, B64 String, BuffuredImage
+	 * @param start				instant when robot started taking capture
+	 * @param capturedImages	list of already captured images
+	 * @return the image in the new format
 	 */
 	private <T> List<T> exportBufferedImages(Class<T> exportClass, Instant start, List<NamedBufferedImage> capturedImages) {
 		List<T> out = new ArrayList<>();
@@ -315,9 +312,9 @@ public class ScreenshotUtil {
 
 	/**
 	 * Capture all images and returns them as BufferedImages
-	 * @param target
-	 * @param allWindows
-	 * @return
+	 * @param target		Target of the snapshot: screen, webview, page, element
+	 * @param allWindows	whether to capture all windows
+	 * @return the captures
 	 */
 	private List<NamedBufferedImage> captureAllImages(SnapshotTarget target, boolean allWindows, int scrollDelay) {
 		List<NamedBufferedImage> capturedImages = new ArrayList<>();
@@ -380,7 +377,7 @@ public class ScreenshotUtil {
     /**
      * Capture current page (either web or app page)
      * This is a wrapper around the selenium screenshot capability
-     * @return
+     * @return the image
      */
     public BufferedImage capturePage(int cropTop, int cropBottom) {
         if (driver == null) {
@@ -393,14 +390,7 @@ public class ScreenshotUtil {
                 return null;
             }
 
-            TakesScreenshot screenShot = (TakesScreenshot) driver;
-            
-         // TEST_MOBILE
-//                ((AndroidDriver<WebElement>)driver.getWebDriver()).getContextHandles();
-//                ((AndroidDriver<WebElement>)driver.getWebDriver()).context("CHROMIUM");
-         // TEST_MOBILE
-
-            String screenshotB64 = screenShot.getScreenshotAs(OutputType.BASE64);
+            String screenshotB64 = driver.getScreenshotAs(OutputType.BASE64);
             if (screenshotB64 == null) {
             	logger.warn("capture cannot be done");
             	return null;
@@ -433,7 +423,7 @@ public class ScreenshotUtil {
     
     /**
      * Capture desktop screenshot. This is not available for mobile tests
-     * @return
+     * @return the image
      */
     public BufferedImage captureDesktop() {
     	return captureDesktop(false);
@@ -442,7 +432,7 @@ public class ScreenshotUtil {
     /**
      * Capture desktop screenshot. This is not available for mobile tests
      * @param onlyMainScreen	only capture the default (or 'main') screen
-     * @return
+     * @return the image
      */
     public BufferedImage captureDesktop(boolean onlyMainScreen) {
     	
@@ -467,7 +457,7 @@ public class ScreenshotUtil {
      * Captures all web pages if requested and if the browser has multiple windows / tabs opened
      * At the end, focus is on the previously selected tab/window
      * @param allWindows		if true, all tabs/windows will be returned
-     * @return
+     * @return list of images
      */
     private List<NamedBufferedImage> captureWebPages(boolean allWindows, int scrollDelay) {
     	 // check driver is accessible
@@ -482,7 +472,7 @@ public class ScreenshotUtil {
         	try {
         		images.add(new NamedBufferedImage(captureDesktop(), "Desktop")); // do not add metadata as driver may not be available
         	} catch (ScenarioException e1) {
-        		logger.warn("could not capture desktop: " + e1.getMessage());
+        		logger.warn("could not capture desktop: {}", e1.getMessage());
         	}
         	return images;
         }
@@ -516,7 +506,7 @@ public class ScreenshotUtil {
         		try {
             		images.add(new NamedBufferedImage(captureDesktop(), "Desktop"));
             	} catch (ScenarioException e1) {
-            		logger.warn("could not capture desktop: " + e1.getMessage());
+            		logger.warn("could not capture desktop: {}", e1.getMessage());
             	}
             }
         }
@@ -524,7 +514,7 @@ public class ScreenshotUtil {
         return images;
     }
 
-	public BufferedImage captureWebPageFullPage(String windowHandle) throws IOException {
+	public BufferedImage captureWebPageFullPage() throws IOException {
 		if (!(driver.getOriginalDriver() instanceof HasFullPageScreenshot)) {
 			throw new CustomSeleniumTestsException("Full page capture can only be done on Firefox tests");
 		}
@@ -535,10 +525,8 @@ public class ScreenshotUtil {
 	}
 
     /**
-     * TODO: may be should we move this code to a specific class
      * Capture web page using the Chrome DevTools Protocol
-     * @return
-     * @throws IOException 
+     * @return the image
      */
     public BufferedImage captureWebPageUsingCDP(String windowHandle) throws IOException {
     	if (!(driver.getWebDriver() instanceof HasDevTools)
@@ -577,7 +565,6 @@ public class ScreenshotUtil {
      *   
      * @param scrollDelay	time in ms to wait between scrolling and snapshot. 
      * @param windowHandle	the window handle of the page to capture
-     * @return
      */
     public BufferedImage captureWebPage(int scrollDelay, String windowHandle) {
 
@@ -592,17 +579,18 @@ public class ScreenshotUtil {
 //    		}
 //    	}
 		try {
-			return captureWebPageFullPage(windowHandle);
+			return captureWebPageFullPage();
 		} catch (CustomSeleniumTestsException e) {
+			//
 		} catch (Exception e) {
-			logger.warn("Error getting screenshot with Firefox, using standard method: " + e.getMessage());
+			logger.warn("Error getting screenshot with Firefox, using standard method: {}", e.getMessage());
 		}
 
     	if (driver.getWebDriver() instanceof HasDevTools && scrollDelay == 0) {
     		try {
     			return captureWebPageUsingCDP(windowHandle);
     		} catch (IOException e) {
-    			logger.warn("Error getting screenshot with CDP, using standard method: " + e.getMessage());
+    			logger.warn("Error getting screenshot with CDP, using standard method: {}", e.getMessage());
     		} catch (DevToolsException e) {
     			// ignore and use the standard method
     		}
@@ -718,7 +706,9 @@ public class ScreenshotUtil {
 		// back to top
 		try {
 			driver.scrollTop();
-		} catch (JavascriptException e) {}
+		} catch (JavascriptException e) {
+			// ignore
+		}
 
     	return currentImage;
     	
@@ -726,22 +716,22 @@ public class ScreenshotUtil {
     
     /**
      * Export buffered image to file
-     * @param image
-     * @return
+     * @param image	the image to export
+     * @return produced file
      */
     private File exportToFile(BufferedImage image) {
-    	filename = HashCodeGenerator.getRandomHashCode("web");
+    	String filename = HashCodeGenerator.getRandomHashCode("web");
         String filePath = Paths.get(SeleniumTestsContextManager.getThreadContext().getScreenshotOutputDirectory(), filename + ".png").toString();
         FileUtility.writeImage(filePath, image);
-        logger.debug("Captured image copied to " + filePath);
+        logger.debug("Captured image copied to {}", filePath);
         return new File(filePath);
     }
     
     /**
      * Export buffered image to screenshot object, adding HTML source, title, ...
-     * @param namedImage
-     * @param duration
-     * @return
+     * @param namedImage	image to export
+     * @param duration		duration of the capture
+     * @return	the screenshot object
      */
     private ScreenShot exportToScreenshot(NamedBufferedImage namedImage, long duration) {
     	ScreenShot screenShot = new ScreenShot(namedImage.image, namedImage.pageSource);
@@ -756,9 +746,9 @@ public class ScreenshotUtil {
 
 	/**
 	 * Returns the element rectangle applying aspect ratio, in case screen / browser is not at 100%
-	 * @param element
-	 * @param aspectRatio
-	 * @return
+	 * @param element		element to capture
+	 * @param aspectRatio	aspect ratio of screen
+	 * @return	the rectangle updated with AR
 	 */
 	public static Rectangle getElementRectangleWithAR(WebElement element, double aspectRatio) {
 		Rectangle rectangle = element.getRect();

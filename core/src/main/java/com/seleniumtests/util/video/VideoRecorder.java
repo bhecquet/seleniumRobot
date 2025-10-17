@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,6 +35,7 @@ import javax.swing.WindowConstants;
 import com.seleniumtests.connectors.extools.FFMpeg;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 import org.monte.media.av.Format;
 import org.monte.media.av.FormatKeys;
 import org.monte.media.av.codec.video.VideoFormatKeys;
@@ -49,9 +50,9 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 public class VideoRecorder {
 	
 	private ScreenRecorder screenRecorder;
-	private String fileName;
-	private boolean displayStep;
-	private File folderPath;
+	private final String fileName;
+	private final boolean displayStep;
+	private final File folderPath;
 	private JLabel label;
 	private JFrame window;
 	private FFMpeg ffmpeg;
@@ -66,9 +67,9 @@ public class VideoRecorder {
 	
 	/**
 	 * 
-	 * @param folderPath
-	 * @param fileName
-	 * @param localRecording		if true, we will capture something locally. Else grid mode is used
+	 * @param folderPath		where to record video
+	 * @param fileName			file name
+	 * @param localRecording	if true, we will capture something locally. Else grid mode is used
 	 */
 	public VideoRecorder(File folderPath, String fileName, boolean localRecording) {
 		this(folderPath, fileName, localRecording, true);
@@ -186,29 +187,14 @@ public class VideoRecorder {
 				// remove temp files
 				for (File f: createdFiles) {
 					try {
-						Files.delete(Paths.get(f.getAbsolutePath()));
+						Files.delete(f.toPath());
 					} catch (IOException e) {
-						logger.info("could not delete video temp file: " + e.getMessage());
+						logger.info("could not delete video temp file: {}", e.getMessage());
 					}
 				}
 
-				// encode file
-				if (ffmpeg != null) {
-					try {
-						File mp4VideoFile = Paths.get(videoFile.getParent(), FilenameUtils.getBaseName(videoFile.getName()) + ".mp4").toFile();
-						String out = ffmpeg.runFFmpegCommand(List.of("-i", videoFile.getAbsolutePath(), "-c:v", "libopenh264", "-preset", "veryfast", "-tune", "animation", mp4VideoFile.getAbsolutePath()));
-						if (mp4VideoFile.exists() && mp4VideoFile.length() > 0) {
-							videoFile.delete();
-							videoFile = mp4VideoFile;
+				videoFile = transcodeVideo(videoFile);
 
-						} else {
-							logger.warn("Transcoding not done. FFmpeg says: " + out);
-						}
-					} catch (Exception e) {
-						logger.warn("Transcoding failed: " + e.getMessage());
-					}
-				}
-				
 				return videoFile;
 			} else {
 				return null;
@@ -217,7 +203,28 @@ public class VideoRecorder {
 			return null;
 		}
 	}
-	
+
+	@Nullable
+	private File transcodeVideo(File videoFile) {
+		// encode file
+		if (ffmpeg != null) {
+			try {
+				File mp4VideoFile = Paths.get(videoFile.getParent(), FilenameUtils.getBaseName(videoFile.getName()) + ".mp4").toFile();
+				String out = ffmpeg.runFFmpegCommand(List.of("-i", videoFile.getAbsolutePath(), "-c:v", "libopenh264", "-preset", "veryfast", "-tune", "animation", mp4VideoFile.getAbsolutePath()));
+				if (mp4VideoFile.exists() && mp4VideoFile.length() > 0) {
+					FileUtility.deleteIgnoreResult(videoFile);
+					videoFile = mp4VideoFile;
+
+				} else {
+					logger.warn("Transcoding not done. FFmpeg says: {}", out);
+				}
+			} catch (Exception e) {
+				logger.warn("Transcoding failed: {}", e.getMessage());
+			}
+		}
+		return videoFile;
+	}
+
 	public void displayRunningStep(String stepName) {	
 		if (label != null && displayStep) {
 			label.setText(stepName);

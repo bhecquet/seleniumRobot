@@ -15,7 +15,9 @@ import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8DecryptorProviderBuilder;
 import org.bouncycastle.operator.InputDecryptorProvider;
+import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
+import org.bouncycastle.pkcs.PKCSException;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -33,19 +35,18 @@ public class ExchangeOnline extends EmailClientImpl {
 	private static final Set<String> SCOPE = Collections.singleton("https://graph.microsoft.com/.default");
 	private static final String GRAPH_URL = "https://graph.microsoft.com/v1.0/users/";
 	private static final String AUTH_URL = "https://login.microsoftonline.com/";
-	private static String baseUrl;
+	private final String baseUrl;
 	protected static final String TMP_PRIVATE_KEY_FILE_PATH = "." + File.separator + "tmpPrivateKeyFilePath.key";
 	
 	/**
-	 * @param tenantId
-	 * @param clientId                  might be called applicationId
-	 * @param certificateFileContent
-	 * @param certificatePrivateKeyFileContent
-	 * @param certificatePrivateKeyPassword
-	 * @param userEmail                 the email address you want to read or send mail from (abc.edf@ghi.com)
-	 * @throws Exception
+	 * @param tenantId							Exchange tenant id
+	 * @param clientId                  		might be called applicationId
+	 * @param certificateFileContent			content of certificate
+	 * @param certificatePrivateKeyFileContent	content of private key file
+	 * @param certificatePrivateKeyPassword		private key password
+	 * @param userEmail                 		the email address you want to read or send mail from (abc.edf@ghi.com)
 	 */
-	public ExchangeOnline(String tenantId, String clientId, String certificateFileContent, String certificatePrivateKeyFileContent, String certificatePrivateKeyPassword, String userEmail) throws Exception {
+	public ExchangeOnline(String tenantId, String clientId, String certificateFileContent, String certificatePrivateKeyFileContent, String certificatePrivateKeyPassword, String userEmail) throws CertificateException, IOException, OperatorCreationException, PKCSException {
 		baseUrl = GRAPH_URL + userEmail + "/";
 		
 		IAuthenticationResult tokenProvider = acquireToken(certificateFileContent, certificatePrivateKeyFileContent, certificatePrivateKeyPassword, tenantId, clientId);
@@ -53,11 +54,17 @@ public class ExchangeOnline extends EmailClientImpl {
 		
 		Unirest.config().addDefaultHeader("Authorization", "Bearer " + token);
 	}
-	
-	// ************************************************************
-	// *********************** GET TOKEN **************************
-	// ************************************************************
-	private static IAuthenticationResult acquireToken(String certFileContent, String certPrivateKeyFileContent, String certPrivateKeyPassword, String tenantId, String clientId) throws Exception {
+
+	/**
+	 * Acquire token from microsoft
+	 * @param certFileContent			content of certificate
+	 * @param certPrivateKeyFileContent	content of private key file
+	 * @param certPrivateKeyPassword	private key password
+	 * @param tenantId					Exchange tenant id
+	 * @param clientId					might be called applicationId
+	 * @return whether connection is done
+	 */
+	private static IAuthenticationResult acquireToken(String certFileContent, String certPrivateKeyFileContent, String certPrivateKeyPassword, String tenantId, String clientId) throws IOException, OperatorCreationException, PKCSException, CertificateException {
 		
 		PrivateKey certPrivateKey = readBouncyPrivateKey(certPrivateKeyFileContent, certPrivateKeyPassword);
 		
@@ -86,17 +93,18 @@ public class ExchangeOnline extends EmailClientImpl {
 		return (X509Certificate) certificateFactory.generateCertificate(new ByteArrayInputStream(byteData));
 	}
 	
-	private static PrivateKey readBouncyPrivateKey(String keyFileContent, String keyFilePassword) throws Exception {
-		String cleanedCertPk = keyFileContent.replace("-----BEGIN ENCRYPTED PRIVATE KEY-----", "").replace("-----END ENCRYPTED PRIVATE KEY-----", "")
+	private static PrivateKey readBouncyPrivateKey(String keyFileContent, String keyFilePassword) throws IOException, OperatorCreationException, PKCSException {
+		String cleanedCertPk = keyFileContent.replace("-----BEGIN ENCRYPTED PRIVATE KEY-----", "")
+				.replace("-----END ENCRYPTED PRIVATE KEY-----", "")
 				.replaceAll("\\s", "");
 		File keyFile = new File(TMP_PRIVATE_KEY_FILE_PATH);
 		keyFile.deleteOnExit();
 		if (keyFile.createNewFile()) {
-			FileWriter fw = new FileWriter(TMP_PRIVATE_KEY_FILE_PATH);
-			fw.write("-----BEGIN ENCRYPTED PRIVATE KEY-----\n");
-			fw.write(cleanedCertPk);
-			fw.write("\n-----END ENCRYPTED PRIVATE KEY-----");
-			fw.close();
+			try (FileWriter fw = new FileWriter(TMP_PRIVATE_KEY_FILE_PATH)) {
+				fw.write("-----BEGIN ENCRYPTED PRIVATE KEY-----\n");
+				fw.write(cleanedCertPk);
+				fw.write("\n-----END ENCRYPTED PRIVATE KEY-----");
+			}
 		}
 		String keyFilePath = keyFile.getPath();
 		
@@ -104,25 +112,26 @@ public class ExchangeOnline extends EmailClientImpl {
 		Security.addProvider(new BouncyCastleProvider());
 		
 		// 2. Open private key file (PEM format)
-		PEMParser pemParser = new PEMParser(new FileReader(keyFilePath));
-		Object object = pemParser.readObject();
-		pemParser.close();
+		Object object;
+		try (PEMParser pemParser = new PEMParser(new FileReader(keyFilePath))) {
+			object = pemParser.readObject();
+		} finally {
+			Files.deleteIfExists(keyFile.toPath());
+		}
 		
 		// 3. Prepare the Bouncy Castle converter
 		JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC");
 		PrivateKey privateKey;
 		
 		// 4. Check if the key is encrypted or not and decrypt if so
-		if (object instanceof PKCS8EncryptedPrivateKeyInfo) {
+		if (object instanceof PKCS8EncryptedPrivateKeyInfo encryptedInfo) {
 			// Key is encrypted : use the password to decrypt
-			PKCS8EncryptedPrivateKeyInfo encryptedInfo = (PKCS8EncryptedPrivateKeyInfo) object;
 			InputDecryptorProvider decryptorProvider = new JceOpenSSLPKCS8DecryptorProviderBuilder()
 					.build(keyFilePassword.toCharArray());
 			privateKey = converter.getPrivateKey(encryptedInfo.decryptPrivateKeyInfo(decryptorProvider));
 		} else {
 			throw new IllegalArgumentException("Key format unknown or incompatible.");
 		}
-		keyFile.delete();
 		return privateKey;
 		
 	}
@@ -282,11 +291,10 @@ public class ExchangeOnline extends EmailClientImpl {
 	/**
 	 * Return the id of existing folder in the mailbox
 	 *
-	 * @param folderName
+	 * @param folderName		name of folder in which mails will be read
 	 * @return id of the folder
-	 * @throws Exception
 	 */
-	private String findFolder(String folderName) throws Exception {
+	private String findFolder(String folderName) {
 		
 		String requestUrl = baseUrl + "mailFolders?$select=id,displayName";
 		HttpResponse<JsonNode> folderResponse = Unirest.get(requestUrl).asJson();
@@ -304,7 +312,7 @@ public class ExchangeOnline extends EmailClientImpl {
 	}
 	
 	@Override
-	public List<Email> getEmails(String folderName, int firstMessageIndex, LocalDateTime firstMessageTime) throws Exception {
+	public List<Email> getEmails(String folderName, int firstMessageIndex, LocalDateTime firstMessageTime) {
 		List<Email> result = new ArrayList<>();
 		Map<String, Object> params = new HashMap<>();
 		try {
@@ -338,10 +346,10 @@ public class ExchangeOnline extends EmailClientImpl {
 					result.add(email);
 				}
 			} else {
-				throw new Exception("Retrieved mail list is empty.");
+				throw new MessagingException("Retrieved mail list is empty.");
 			}
 		} catch (Exception e) {
-			logger.info("Error while reading mails from Exchange Online : " + e.getMessage());
+			logger.info("Error while reading mails from Exchange Online : {}", e.getMessage());
 		}
 		return result;
 	}

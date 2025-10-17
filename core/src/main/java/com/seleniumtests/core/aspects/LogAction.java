@@ -43,6 +43,7 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.jetbrains.annotations.NotNull;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 import org.testng.Reporter;
@@ -95,9 +96,11 @@ import com.seleniumtests.util.video.VideoRecorder;
  */
 @Aspect
 public class LogAction {
-	
+
 	private static final Logger logger = SeleniumRobotLogger.getLogger(LogAction.class);
 	private static final ScenarioLogger scenarioLogger = ScenarioLogger.getScenarioLogger(LogAction.class);
+	public static final String OPEN_PAGE_STEP_NAME = "openPage";
+	public static final String ACTION_FORMAT = "%s %s";
 	private static Map<Thread, Integer> indent = Collections.synchronizedMap(new HashMap<>());
 
 	/**
@@ -293,7 +296,9 @@ public class LogAction {
 			target = new SeleniumElement((WebElement)joinPoint.getTarget());
 		}
 
-		target.setCallingPage((PageObject) joinPoint.getThis());
+		if (target != null) {
+			target.setCallingPage((PageObject) joinPoint.getThis());
+		}
 
 		return logAction(joinPoint, target);
 	}
@@ -323,24 +328,9 @@ public class LogAction {
 				}
 
 				// store the value of the argument containing a password
-				addPasswordsToReplacements(joinPoint, stringToReplace, paramIdx, arg, argName); 
-				
-				StringBuilder argValue = new StringBuilder();
-				// add arguments to the name of the method
-				if (arg instanceof Object[]) {
-					argValue.append("[");
-					for (Object obj : (Object[]) arg) {
-						argValue.append(obj.toString() + ",");
-					}
-					argValue.append("]");
-				} else if (arg instanceof Element) {
-					argValue.append(((Element) arg).toString());
-				} else if (arg instanceof WebElement) {
-					argValue.append(new SeleniumElement((WebElement)arg).getName());
-				} else {
-					argValue.append((arg == null ? "null": arg.toString()));
-				}
-				argString.append(String.format("%s, ", argValue.toString()));
+				addPasswordsToReplacements(joinPoint, stringToReplace, paramIdx, arg, argName);
+
+				StringBuilder argValue = formatArgValue(arg, argString);
 				argValues.put(argName, argValue.toString());
 				paramIdx++;
 			}
@@ -350,11 +340,38 @@ public class LogAction {
 	}
 
 	/**
-	 * @param joinPoint
-	 * @param stringToReplace
-	 * @param paramIdx
-	 * @param arg
-	 * @param argName
+	 * format argument value depending on its type
+	 * @param arg		the argument
+	 * @param argString
+	 * @return
+	 */
+	@NotNull
+	private static StringBuilder formatArgValue(Object arg, StringBuilder argString) {
+		StringBuilder argValue = new StringBuilder();
+		// add arguments to the name of the method
+		if (arg instanceof Object[]) {
+			argValue.append("[");
+			for (Object obj : (Object[]) arg) {
+				argValue.append(obj.toString() + ",");
+			}
+			argValue.append("]");
+		} else if (arg instanceof Element element) {
+			argValue.append(element.toString());
+		} else if (arg instanceof WebElement element) {
+			argValue.append(new SeleniumElement(element).getName());
+		} else {
+			argValue.append((arg == null ? "null": arg.toString()));
+		}
+		argString.append(String.format("%s, ", argValue.toString()));
+		return argValue;
+	}
+
+	/**
+	 * @param joinPoint			the joinpoint
+	 * @param stringToReplace	string to replace by ****, as they are sensible data
+	 * @param paramIdx			index of this param
+	 * @param arg				the step parameter
+	 * @param argName			the name of parameter
 	 */
 	private static void addPasswordsToReplacements(JoinPoint joinPoint, List<String> stringToReplace, int paramIdx,
 			Object arg, String argName) {
@@ -396,7 +413,7 @@ public class LogAction {
 		String argumentString = buildArgString(joinPoint, pwdToReplace, arguments);
 		stepName = joinPoint.getSignature().getName();
 		if (returnArgs) {
-			stepNameWithArgs = String.format("%s %s", stepName, argumentString).trim();
+			stepNameWithArgs = String.format(ACTION_FORMAT, stepName, argumentString).trim();
 		} else {
 			stepNameWithArgs = stepName;
 		}
@@ -413,7 +430,7 @@ public class LogAction {
 				|| annotation.annotationType().getCanonicalName().contains("io.cucumber.java.fr")) 
 				&& SeleniumRobotTestPlan.isCucumberTest()) {
 				stepName = getAnnotationValue(annotation);
-				stepNameWithArgs = String.format("%s %s", stepName, argumentString).trim();
+				stepNameWithArgs = String.format(ACTION_FORMAT, stepName, argumentString).trim();
 				break;
 			} else if (annotation instanceof StepName) {
 				stepName = ((StepName)annotation).value();
@@ -524,9 +541,9 @@ public class LogAction {
 		// step name will contain method arguments only if it's not a configuration method (as they are generic)
 		TestStep currentStep = buildRootStep(joinPoint, stepNamePrefix, !configStep);
 		
-		if ("openPage".equals(joinPoint.getSignature().getName()) && joinPoint.getTarget() instanceof PageObject) {
+		if (OPEN_PAGE_STEP_NAME.equals(joinPoint.getSignature().getName()) && joinPoint.getTarget() instanceof PageObject) {
 			PageObject page = (PageObject)joinPoint.getTarget();
-			currentStep.addAction(new TestAction(String.format("Opening page %s",  page.getClass().getSimpleName()), false, new ArrayList<>(), "openPage", page.getClass()));
+			currentStep.addAction(new TestAction(String.format("Opening page %s",  page.getClass().getSimpleName()), false, new ArrayList<>(), OPEN_PAGE_STEP_NAME, page.getClass()));
 		}
 
 		VideoRecorder videoRecorder = WebUIDriver.getThreadVideoRecorder();
@@ -549,8 +566,8 @@ public class LogAction {
 				currentStep.setDurationToExclude(duration);
 			}
 			// capture at the start of the step except when page is opening, so that we wait for page to be really opened
-			if (!"openPage".equals(joinPoint.getSignature().getName()) && WebUIDriver.getWebDriver(false) != null && joinPoint.getTarget() instanceof PageObject) {
-				((PageObject)joinPoint.getTarget()).capturePageSnapshot("Step start state " + currentStep.getPosition(), SnapshotCheckType.REFERENCE_ONLY);
+			if (!OPEN_PAGE_STEP_NAME.equals(joinPoint.getSignature().getName()) && WebUIDriver.getWebDriver(false) != null && joinPoint.getTarget() instanceof PageObject page) {
+				page.capturePageSnapshot("Step start state " + currentStep.getPosition(), SnapshotCheckType.REFERENCE_ONLY);
 			}
 
 		} else {
@@ -558,7 +575,7 @@ public class LogAction {
 			previousParent = TestStepManager.getParentTestStep();
 			TestStepManager.setParentTestStep(currentStep);
 		}
-		
+
 		// set the start date once step is initialized so that when we get the video frame associated to step, step name displayed on screen is the same as the running step name
 		currentStep.setStartDate();
 		
@@ -576,25 +593,30 @@ public class LogAction {
 				throw e;
 			}
 		} finally {
-			if (rootStep) {
-
-				// capture after page has opened
-				try {
-					if ("openPage".equals(joinPoint.getSignature().getName()) && joinPoint.getTarget() instanceof PageObject && WebUIDriver.getWebDriver(false) != null) {
-						((PageObject) joinPoint.getTarget()).capturePageSnapshot("Step start state "  + currentStep.getPosition(), SnapshotCheckType.REFERENCE_ONLY);
-					}
-				} catch (Exception e) {
-					logger.warn("could not capture step reference: " + e.getMessage());
-				}
-
-				TestStepManager.getCurrentRootTestStep().updateDuration();
-				TestStepManager.logTestStep(TestStepManager.getCurrentRootTestStep());
-			} else {
-				TestStepManager.setParentTestStep(previousParent);
-			}
+			finalizeStepLogging(joinPoint, rootStep, currentStep, previousParent);
 		}
 		return reply;
 	}
+
+	private static void finalizeStepLogging(ProceedingJoinPoint joinPoint, boolean rootStep, TestStep currentStep, TestStep previousParent) {
+		if (rootStep) {
+
+			// capture after page has opened
+			try {
+				if (OPEN_PAGE_STEP_NAME.equals(joinPoint.getSignature().getName()) && joinPoint.getTarget() instanceof PageObject page && WebUIDriver.getWebDriver(false) != null) {
+					page.capturePageSnapshot("Step start state "  + currentStep.getPosition(), SnapshotCheckType.REFERENCE_ONLY);
+				}
+			} catch (Exception e) {
+				logger.warn("could not capture step reference: {}", e.getMessage());
+			}
+
+			TestStepManager.getCurrentRootTestStep().updateDuration();
+			TestStepManager.logTestStep(TestStepManager.getCurrentRootTestStep());
+		} else {
+			TestStepManager.setParentTestStep(previousParent);
+		}
+	}
+
 	/**
 	 * Log actions on generic picture elements
 	 * @param joinPoint
@@ -630,7 +652,7 @@ public class LogAction {
 		}
 
 		List<String> pwdToReplace = new ArrayList<>();
-		String actionName = String.format("%s %s", joinPoint.getSignature().getName(), buildArgString(joinPoint, pwdToReplace, new HashMap<>()));
+		String actionName = String.format(ACTION_FORMAT, joinPoint.getSignature().getName(), buildArgString(joinPoint, pwdToReplace, new HashMap<>()));
 
 		Element targetElement = null;
 		Class<? extends PageObject> targetClass = null;

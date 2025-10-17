@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,11 +20,7 @@ package com.seleniumtests.uipage.aspects;
 import java.lang.reflect.Field;
 import java.time.Clock;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.reporter.logger.GenericFile;
@@ -75,7 +71,7 @@ import com.seleniumtests.util.logging.ScenarioLogger;
 @DeclarePrecedence("*LogAction*, *ReplayAction*")
 public class ReplayAction {
 
-	private static Clock systemClock = Clock.systemUTC();
+	private static final Clock systemClock = Clock.systemUTC();
 	private static final ScenarioLogger scenarioLogger = ScenarioLogger.getScenarioLogger(ReplayAction.class);
 
 	private Object replayNonHtmlElement(ProceedingJoinPoint joinPoint, ReplayOnError replay) throws Throwable {
@@ -106,9 +102,8 @@ public class ReplayAction {
 				updateScrollFlagForElement(joinPoint, null, e);
 			} catch (Throwable e) {
 
-				if (end.minusMillis(replayDelayMs  + 200).isAfter(systemClock.instant())) {
+				if (end.minusMillis(replayDelayMs  + 200L).isAfter(systemClock.instant())) {
 					WaitHelper.waitForMilliSeconds(replayDelayMs);
-					continue;
 				} else {
 					throw e;
 				}
@@ -121,13 +116,11 @@ public class ReplayAction {
 	/**
 	 * Replays the composite action in case any error occurs
 	 * When the composite action is played inside an HtmlElement, and the calling method is annotated with {@code @ReplayOnError}, we have 2 replays
-	 * 
+	 * <p>
 	 *  method replay => ReplayOnError annotation
 	 *  	composite action replay
-	 *  
+	 * <p>
 	 *  This does not seem to be a problem because if 'composite action replay' takes to much time, then 'method replay' will not effectively replay
-	 *  
-	 * @param joinPoint
 	 */
 	@Around("execution(public void org.openqa.selenium.interactions.Actions.BuiltAction.perform ())")
 	public Object replayCompositeAction(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -137,10 +130,6 @@ public class ReplayAction {
 	/**
 	 * Updates the scrollToelementBeforeAction flag of HtmlElement for CompositeActions
 	 * Therefore, it looks at origin field of PointerInput$Move CompositeAction and update the flag
-	 * @throws SecurityException 
-	 * @throws NoSuchFieldException 
-	 * @throws IllegalAccessException 
-	 * @throws IllegalArgumentException 
 	 */
 	private void updateScrollFlagForElement(ProceedingJoinPoint joinPoint, Boolean forcedValue, WebDriverException parentException) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		Object actions = joinPoint.getTarget();
@@ -170,17 +159,8 @@ public class ReplayAction {
 						
 						// we can change 'scrollToelementBeforeAction' flag only for HtmlElement objects. For RemoteWebElement, this cannot be done so we rethrow the exception
 						// so that it can be treated elsewhere (mainly inside replayHtmlElement())
-						if (origin.asArg() instanceof HtmlElement) {
-							HtmlElement element = (HtmlElement) origin.asArg();
-							if (forcedValue == null) {
-								if (element.isScrollToElementBeforeAction()) {
-					    			element.setScrollToElementBeforeAction(false);
-					    		} else {
-					    			element.setScrollToElementBeforeAction(true);
-					    		}
-							} else {
-								element.setScrollToElementBeforeAction(forcedValue);
-							}
+						if (origin.asArg() instanceof HtmlElement element) {
+                            element.setScrollToElementBeforeAction(Objects.requireNonNullElseGet(forcedValue, () -> !element.isScrollToElementBeforeAction()));
 						} else if (origin.asArg() instanceof RemoteWebElement && parentException != null) {
 							throw parentException;
 						}
@@ -200,8 +180,6 @@ public class ReplayAction {
 	 * Replay all HtmlElement actions annotated by ReplayOnError.
 	 * Classes which are not subclass of HtmlElement won't go there
 	 * See javadoc of the annotation for details
-	 * @param joinPoint
-	 * @throws Throwable
 	 */
 	@Around("execution(public * com.seleniumtests.uipage.htmlelements.HtmlElement+.* (..))"
 			+ "&& execution(@com.seleniumtests.uipage.ReplayOnError public * * (..)) && @annotation(replay)")
@@ -242,7 +220,7 @@ public class ReplayAction {
 
 				// in case we have switched to an iframe for using previous webElement, go to default content
 				if (element.getDriver() != null && ((CustomEventFiringWebDriver)element.getDriver()).isWebTest()) {
-					element.getDriver().switchTo().defaultContent(); // TODO: error when click is done, closing current window
+					element.getDriver().switchTo().defaultContent();
 				}
 
 				try {
@@ -306,10 +284,11 @@ public class ReplayAction {
 	}
 
 	/**
-	 * @param replay
-	 * @param element
-	 * @param end
-	 * @param e
+	 * When WebDriverException occur, check if we should replay or not, or throw an other exception
+	 * @param replay	Replay action options
+	 * @param element	element on which action is done
+	 * @param end		end of replay loop
+	 * @param e			the error that has been raised
 	 */
 	private void handleWebDriverException(ReplayOnError replay, HtmlElement element, Instant end,
 										  WebDriverException e) {
@@ -317,7 +296,7 @@ public class ReplayAction {
 			WaitHelper.waitForMilliSeconds(replay.replayDelayMs());
 		} else {
 			if (e instanceof NoSuchElementException) {
-				if (element instanceof SelectList && e.getMessage().contains("option")) {
+				if (element instanceof SelectList && e.getMessage() != null && e.getMessage().contains("option")) {
 					throw new NoSuchElementException(String.format("'%s' from page '%s': %s", element, element.getOrigin(), e.getMessage()));
 				} else {
 					throw new NoSuchElementException(String.format("Searched element [%s] from page '%s' could not be found", element, element.getOrigin()));
@@ -332,8 +311,6 @@ public class ReplayAction {
 	/**
 	 * Replay all actions annotated by ReplayOnError if the class is not a subclass of
 	 * HtmlElement (e.g: ScreenZone)
-	 * @param joinPoint
-	 * @throws Throwable
 	 */
 	@Around("execution(public * com.seleniumtests.uipage.htmlelements.GenericPictureElement+.* (..))"
 			+ "&& execution(@com.seleniumtests.uipage.ReplayOnError public * * (..)) && @annotation(replay)")
@@ -368,12 +345,12 @@ public class ReplayAction {
 
 			throw e;
 		} finally {
-			if (currentAction != null && TestStepManager.getParentTestStep() != null) {
+			if (TestStepManager.getParentTestStep() != null) {
 				currentAction.setFailed(actionFailed);
 				scenarioLogger.logActionError(currentException);
 
-				if (joinPoint.getTarget() instanceof GenericPictureElement) {
-					currentAction.setDurationToExclude(((GenericPictureElement)joinPoint.getTarget()).getActionDuration());
+				if (joinPoint.getTarget() instanceof GenericPictureElement pictureElement) {
+					currentAction.setDurationToExclude(pictureElement.getActionDuration());
 				}
 			}
 		}
@@ -383,20 +360,19 @@ public class ReplayAction {
 	/**
 	 * issu #194: Returns true if the call to element action has been done from the org.openqa.selenium.support.ui.ExpectedConditions selenium class
 	 *
-	 * @param stack
-	 * @return
+	 * @param stack		the stack trace to analyze
 	 */
 	private boolean isFromExpectedConditions(StackTraceElement[] stack) {
 
-		for(int i=0; i < stack.length; i++) {
+        for (StackTraceElement stackTraceElement : stack) {
 
-			// when using aspects, class name may contain a "$", remove everything after that symbol
-			String stackClass = stack[i].getClassName().split("\\$")[0];
-			if (stackClass.equals("org.openqa.selenium.support.ui.ExpectedConditions")) {
-				return true;
-			}
+            // when using aspects, class name may contain a "$", remove everything after that symbol
+            String stackClass = stackTraceElement.getClassName().split("\\$")[0];
+            if (stackClass.equals("org.openqa.selenium.support.ui.ExpectedConditions")) {
+                return true;
+            }
 
-		}
+        }
 		return false;
 
 	}

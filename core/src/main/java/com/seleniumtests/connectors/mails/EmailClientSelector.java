@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,7 +36,7 @@ public class EmailClientSelector {
 	/**
 	 * Returns a client depending on email address
 	 * 
-	 * @param mailServer			mail server address
+	 * @param server			mail server address
 	 * @param emailAddress			email address we should consult
 	 * @param loginEmailAccount		login
 	 * @param passwordEmailAccount	password
@@ -51,25 +51,25 @@ public class EmailClientSelector {
 			try {
 				return new ExchangeClient(server.getUrl(), loginEmailAccount, passwordEmailAccount, INBOX);
 			} catch (Exception e) {
-				logger.error("Cannot connect exchange 2003 server: " + e.getMessage());
+				logger.error("Cannot connect exchange 2003 server: {}", e.getMessage());
 			}
 		} else if (server.getType() == EmailServerTypes.EXCHANGE_EWS) {
 			try {
 				return new Exchange2010Client(server.getUrl(), loginEmailAccount, passwordEmailAccount, emailAddress, server.getDomain(), "Inbox", 0);
 			} catch (Exception e) {
-				logger.error("Cannot connect to exchange via web service: " + e.getMessage());
+				logger.error("Cannot connect to exchange via web service: {}", e.getMessage());
 			}
 		} else if (server.getType() == EmailServerTypes.GMAIL) {
 				try {
 					return new GMailClient(server.getUrl(), loginEmailAccount, passwordEmailAccount, INBOX);
 				} catch (Exception e) {
-					logger.error("Cannot connect to gmail server: " + e.getMessage());
+					logger.error("Cannot connect to gmail server: {}", e.getMessage());
 				} 
 		} else {
 			try {
 				return new ImapClient(server.getUrl(), loginEmailAccount, passwordEmailAccount, INBOX);
 			} catch (Exception e) {
-				logger.error("Cannot connect to imap server: " + e.getMessage());
+				logger.error("Cannot connect to imap server: {}", e.getMessage());
 			} 
 		}
 		return null;
@@ -80,7 +80,7 @@ public class EmailClientSelector {
 			try {
 				return new ExchangeOnline(tenantId, clientId, certificateFileContent, certificatePrivateKeyFileContent, certPrivateKeyPassword, email);
 			} catch (Exception e) {
-				logger.error("Cannot connect to exchange online: " + e.getMessage());
+				logger.error("Cannot connect to exchange online: {}", e.getMessage());
 			}
 		}
 		return null;

@@ -56,6 +56,15 @@ public class FileUtility {
     private FileUtility() {
 		// As a utility method, it is not made to be instantiated.
 	}
+
+    public static void deleteIgnoreResult(File fileToDelete) {
+        if (fileToDelete == null) return;
+        try {
+            Files.deleteIfExists(fileToDelete.toPath());
+        } catch (IOException e) {
+            // ignore error
+        }
+    }
     
     public static void extractJar(final String storeLocation, final Class<?> clz) throws IOException {
         File firefoxProfile = new File(storeLocation);

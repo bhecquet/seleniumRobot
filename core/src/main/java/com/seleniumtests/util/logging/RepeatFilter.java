@@ -18,14 +18,13 @@ import java.time.format.DateTimeFormatter;
 public final class RepeatFilter extends AbstractFilter {
 	
 	private org.apache.logging.log4j.Logger logger = null;
-	private org.apache.logging.log4j.Logger testLogger = null;
  
     private final Level level;
     private final boolean logTests;
-    private ThreadLocal<String> lastLog = new ThreadLocal<>();
-    private ThreadLocal<Integer> lastLogRepeat = new ThreadLocal<>();
-    private ThreadLocal<LocalDateTime> lastLogTime = new ThreadLocal<>();
-    private ThreadLocal<LocalDateTime> firstLogTime = new ThreadLocal<>();
+    private final ThreadLocal<String> lastLog = new ThreadLocal<>();
+    private final ThreadLocal<Integer> lastLogRepeat = new ThreadLocal<>();
+    private final ThreadLocal<LocalDateTime> lastLogTime = new ThreadLocal<>();
+    private final ThreadLocal<LocalDateTime> firstLogTime = new ThreadLocal<>();
  
     private RepeatFilter(Level level, boolean logTests, Result onMatch, Result onMismatch) {
         super(onMatch, onMismatch);
@@ -78,12 +77,12 @@ public final class RepeatFilter extends AbstractFilter {
     		} else {
     			Integer repeatTime = lastLogRepeat.get();
     			lastLogRepeat.set(0);
-    			if (repeatTime != null && repeatTime > 1) {
-    			    if (logger != null) {
-    				    logger.info("... repeated {} times until {} ...", repeatTime, lastLogTime.get().format(DateTimeFormatter.ISO_LOCAL_TIME));
-                    }
-    			}
-    			lastLogRepeat.remove();
+    			if (repeatTime != null && repeatTime > 1 && logger != null) {
+                    String threadLastLogTime = lastLogTime.get().format(DateTimeFormatter.ISO_LOCAL_TIME);
+                    logger.info("... repeated {} times until {} ...", repeatTime, threadLastLogTime);
+                }
+
+                lastLogRepeat.remove();
     			firstLogTime.set(LocalDateTime.now()); // record the time of the first occurence of the message
     		}
     	} else {

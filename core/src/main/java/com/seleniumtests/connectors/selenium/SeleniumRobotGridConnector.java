@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -33,7 +34,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.stream.Collectors;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.util.logging.DebugMode;
@@ -56,12 +56,9 @@ import org.apache.http.impl.client.HttpClients;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Platform;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
-import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.customexception.SeleniumGridException;
@@ -104,26 +101,28 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	 */
 	@Override
 	public MutableCapabilities uploadMobileApp(Capabilities caps) {
-		SupportsAppOption mobileOptions;
-		if (new BaseOptions(caps).getPlatformName() == null) {
+		SupportsAppOption<?> mobileOptions;
+		if (new BaseOptions<>(caps).getPlatformName() == null) {
 			return (MutableCapabilities) caps;
-		} else if (new BaseOptions(caps).getPlatformName().is(Platform.ANDROID)) {
+		} else if (new BaseOptions<>(caps).getPlatformName().is(Platform.ANDROID)) {
 			mobileOptions = new UiAutomator2Options(caps);
-		} else if (new BaseOptions(caps).getPlatformName().is(Platform.IOS)) {
+		} else if (new BaseOptions<>(caps).getPlatformName().is(Platform.IOS)) {
 			mobileOptions = new XCUITestOptions(caps);
 		} else return (MutableCapabilities) caps;
 
 
 
 		// check whether app is given and app path is a local file
-		if (mobileOptions.getApp().isPresent() && mobileOptions.getApp().get() != null && new File(String.valueOf(mobileOptions.getApp().get())).isFile()) {
+
+		Optional<?> application = mobileOptions.getApp();
+		if (application.isPresent() && new File(String.valueOf(application.get())).isFile()) {
 			File zipFile = null;
-			try (CloseableHttpClient client = HttpClients.createDefault();) {
+			try (CloseableHttpClient client = HttpClients.createDefault()) {
 				// zip file
 				List<File> appFiles = new ArrayList<>();
-				appFiles.add(new File(String.valueOf(mobileOptions.getApp().get())));
+				appFiles.add(new File(String.valueOf(application.get())));
 				zipFile = FileUtility.createZipArchiveFromFiles(appFiles);
-				
+
 				HttpHost serverHost = new HttpHost(hubServletUrl.getHost(), hubServletUrl.getPort());
 				URIBuilder builder = new URIBuilder();
 	        	builder.setPath("/grid/admin/FileServlet");
@@ -133,7 +132,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		        FileInputStream fileInputStream = new FileInputStream(zipFile);
 	            InputStreamEntity entity = new InputStreamEntity(fileInputStream);
 	            httpPost.setEntity(entity);
-		        
+
 		        CloseableHttpResponse response = client.execute(serverHost, httpPost);
 		        if (response.getStatusLine().getStatusCode() != 200) {
 		        	throw new SeleniumGridException("could not upload application file: " + response.getStatusLine().getReasonPhrase());
@@ -143,13 +142,11 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		        }
 				// update original caps so that any change made here can be reused later
 				return new MutableCapabilities(mobileOptions);
-		        
+
 			} catch (IOException | URISyntaxException e) {
 				throw new SeleniumGridException("could not upload application file", e);
 			} finally {
-				if (zipFile != null) {
-					zipFile.delete();
-				}
+				FileUtility.deleteIgnoreResult(zipFile);
 			}
 		}
 		return (MutableCapabilities) caps;
@@ -159,7 +156,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	 * Upload file to node
 	 * @param filePath			the file to upload
 	 * @param returnLocalFile	if true, returned path will be the local path on grid node. If false, we get file://upload/file/<uuid>/
-	 * @return
+	 * @return	response message
 	 */
 	@Override
 	public String uploadFileToNode(String filePath, boolean returnLocalFile) {
@@ -169,7 +166,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		}
 		
 		// zip file
-		File zipFile = null;
+		File zipFile;
 		try {
 			List<File> appFiles = new ArrayList<>();
 			appFiles.add(new File(filePath));
@@ -178,7 +175,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			throw new SeleniumGridException("Error in uploading file, when zipping: " + e1.getMessage());
 		}
 
-		logger.info("uploading file to node: " + zipFile.getName());
+		logger.info("uploading file to node: {}", zipFile.getName());
 		try {
 			HttpRequestWithBody req = Unirest.post(String.format("%s%s", nodeServletUrl, FILE_SERVLET))
 					.header(HttpHeaders.CONTENT_TYPE, MediaType.OCTET_STREAM.toString())
@@ -198,9 +195,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		} catch (UnirestException e) {
 			throw new SeleniumGridException(String.format("Cannot upload file: %s", e.getMessage()));
 		} finally {
-			if (zipFile != null) {
-				zipFile.delete();
-			}
+			FileUtility.deleteIgnoreResult(zipFile);
 		}
 
 	}
@@ -231,19 +226,19 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 				return response.getBody();
 			}
 		} catch (UnirestException e) {
-			throw new SeleniumGridException(String.format("Cannot download file: %s", filePath, e.getMessage()));
+			throw new SeleniumGridException(String.format("Cannot download file: %s: %s", filePath, e.getMessage()));
 		}
 
 	}
 	
 	/**
 	 * Upload a file given file path
-	 * @param filePath
+	 * @param filePath	file to upload
 	 */
 	@Override
 	public void uploadFile(String filePath) {
 		File zipFile = null;
-		try (CloseableHttpClient client = HttpClients.createDefault();) {
+		try (CloseableHttpClient client = HttpClients.createDefault()) {
 			// zip file
 			List<File> appFiles = new ArrayList<>();
 			appFiles.add(new File(filePath));
@@ -269,16 +264,14 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		} catch (IOException | URISyntaxException e) {
 			throw new SeleniumGridException("could not upload file", e);
 		} finally {
-			if (zipFile != null) {
-				zipFile.delete();
-			}
+			FileUtility.deleteIgnoreResult(zipFile);
 		}
 	}
 	
 
 	/**
 	 * Get position of mouse pointer
-	 * @return
+	 * @return	the mouse coordinates
 	 */
 	@Override
 	public Point getMouseCoordinates() {
@@ -294,7 +287,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 					.queryString(ACTION_FIELD, "mouseCoordinates")
 					.asString();
 			if (response.getStatus() != 200) {
-				logger.error(String.format("Mouse coordinates error: %s", response.getBody()));
+				logger.error("Mouse coordinates error: {}", response.getBody());
 				return new Point(0,0);
 			}
 			responseBody = response.getBody();
@@ -303,9 +296,9 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			
 			
 		} catch (UnirestException e) {
-			logger.warn(String.format("Could not get mouse coordinates: %s", e.getMessage()));
+			logger.warn("Could not get mouse coordinates: {}", e.getMessage());
 		} catch (IndexOutOfBoundsException | NumberFormatException e) {
-			logger.error(String.format("mouse coordinates '%s' are invalid", responseBody));
+			logger.error("mouse coordinates '{}' are invalid", responseBody);
 		}
 		return new Point(0,0);
 	}
@@ -332,7 +325,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			throw new ScenarioException("You cannot click left before driver has been created and corresponding node instanciated");
 		}
 		
-		logger.info(String.format("click left: %d,%d", x, y));
+		logger.info("click left: {},{}", x, y);
 		try {
 			HttpResponse<String> response = Unirest.post(String.format("%s%s", nodeServletUrl, NODE_TASK_SERVLET))
 				.queryString(ACTION_FIELD, "leftClic")
@@ -341,10 +334,10 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 				.queryString(ONLY_MAIN_SCREEN, onlyMainScreen)
 				.asString();
 			if (response.getStatus() != 200) {
-				logger.error(String.format("Left click error: %s", response.getBody()));
+				logger.error("Left click error: {}", response.getBody());
 			}
 		} catch (UnirestException e) {
-			logger.warn(String.format("Could not click left: %s", e.getMessage()));
+			logger.warn("Could not click left: {}}", e.getMessage());
 		}
 	}
 	
@@ -371,7 +364,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			throw new ScenarioException("You cannot double click before driver has been created and corresponding node instanciated");
 		}
 		
-		logger.info(String.format("double click: %d,%d", x, y));
+		logger.info("double click: {},{}", x, y);
 		try {
 			HttpResponse<String> response = Unirest.post(String.format("%s%s", nodeServletUrl, NODE_TASK_SERVLET))
 			.queryString(ACTION_FIELD, "doubleClick")
@@ -380,10 +373,10 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			.queryString(ONLY_MAIN_SCREEN, onlyMainScreen)
 			.asString();
 			if (response.getStatus() != 200) {
-				logger.error(String.format("Double click error: %s", response.getBody()));
+				logger.error("Double click error: {}", response.getBody());
 			}
 		} catch (UnirestException e) {
-			logger.warn(String.format("Could not double click: %s", e.getMessage()));
+			logger.warn("Could not double click: {}", e.getMessage());
 		}
 	}
 	
@@ -409,7 +402,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			throw new ScenarioException("You cannot click right before driver has been created and corresponding node instanciated");
 		}
 		
-		logger.info(String.format("clic right: %d,%d", x, y));
+		logger.info("clic right: {},{}", x, y);
 		try {
 			HttpResponse<String> response = Unirest.post(String.format("%s%s", nodeServletUrl, NODE_TASK_SERVLET))
 				.queryString(ACTION_FIELD, "rightClic")
@@ -418,10 +411,10 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 				.queryString(ONLY_MAIN_SCREEN, onlyMainScreen)
 				.asString();
 			if (response.getStatus() != 200) {
-				logger.error(String.format("Right click error: %s", response.getBody()));
+				logger.error("Right click error: {}", response.getBody());
 			}
 		} catch (UnirestException e) {
-			logger.warn(String.format("Could not click right: %s", e.getMessage()));
+			logger.warn("Could not click right: {}", e.getMessage());
 		}
 	}
 	
@@ -448,13 +441,13 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 				.asString();
 			
 			if (response.getStatus() != 200) {
-				logger.error(String.format("capture desktop error: %s", response.getBody()));
+				logger.error("capture desktop error: {}", response.getBody());
 			} else {
 				return response.getBody();
 			}
 			
 		} catch (UnirestException e) {
-			logger.warn(String.format("Could not capture desktop: %s", e.getMessage()));
+			logger.warn("Could not capture desktop: {}", e.getMessage());
 		}
 		return "";
 	}
@@ -472,7 +465,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		
 		
 
-		logger.info("uploading file to browser: " + fileName);
+		logger.info("uploading file to browser: {}", fileName);
 		try {
 			byte[] byteArray = base64Content.getBytes();
 			byte[] decodeBuffer = Base64.decodeBase64(byteArray);
@@ -485,10 +478,10 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 				.asString();
 			
 			if (response.getStatus() != 200) {
-				logger.error(String.format("Error uploading file: %s", response.getBody()));
+				logger.error("Error uploading file: {}", response.getBody());
 			}
 		} catch (UnirestException e) {
-			logger.warn(String.format("Cannot upload file: %s", e.getMessage()));
+			logger.warn("Cannot upload file: {}", e.getMessage());
 		} 
 	}
 	
@@ -505,25 +498,25 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		String keyCodeString = String.join(",", keyCodes
 								.stream()
 								.map(k -> Integer.toString(k))
-								.collect(Collectors.toList()));
+								.toList());
 		
-		logger.info("sending keys: " + keyCodes);
+		logger.info("sending keys: {}", keyCodes);
 		try {
 			HttpResponse<String> response = Unirest.post(String.format("%s%s", nodeServletUrl, NODE_TASK_SERVLET))
 				.queryString(ACTION_FIELD, "sendKeys")
 				.queryString("keycodes", keyCodeString).asString();
 			
 			if (response.getStatus() != 200) {
-				logger.error(String.format("Send keys error: %s", response.getBody()));
+				logger.error("Send keys error: {}", response.getBody());
 			}
 		} catch (UnirestException e) {
-			logger.warn(String.format("Could send keys: %s", e.getMessage()));
+			logger.warn("Could send keys: {}", e.getMessage());
 		}
 	}
 	
 	/**
 	 * Display running step
-	 * @param stepName
+	 * @param stepName	step to display on screen
 	 */
 	@Override
 	public long displayRunningStep(String stepName) {
@@ -540,43 +533,44 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 					.asString();
 			
 			if (response.getStatus() != 200) {
-				logger.error(String.format("display running step error: %s", response.getBody()));
+				logger.error("display running step error: {}", response.getBody());
 			}
 			return Duration.between(start, Instant.now()).toMillis();
 		} catch (UnirestException e) {
-			logger.warn(String.format("Could not display running step: %s", e.getMessage()));
+			logger.warn("Could not display running step: {}", e.getMessage());
 		}
 		return 0;
 	}
 	
 	/**
 	 * Write text to desktop using keyboard
-	 * @param text
+	 * @param text		text to write to remote desktop
 	 */
 	@Override
 	public void writeText(String text) {
 		if (nodeUrl == null) {
 			throw new ScenarioException("You cannot write text before driver has been created and corresponding node instanciated");
 		}
-		
-		logger.info("writing text: " + text.substring(0, Math.min(2, text.length())) + "****");
+
+		String maskedText = text.substring(0, Math.min(2, text.length())) + "****";
+		logger.info("writing text: {}", maskedText);
 		try {
 			HttpResponse<String> response = Unirest.post(String.format("%s%s", nodeServletUrl, NODE_TASK_SERVLET))
 				.queryString(ACTION_FIELD, "writeText")
 				.queryString("text", text).asString();
 		
 			if (response.getStatus() != 200) {
-				logger.error(String.format("Write text error: %s", response.getBody()));
+				logger.error("Write text error: {}", response.getBody());
 			}
 		} catch (UnirestException e) {
-			logger.warn(String.format("Could not write text: %s", e.getMessage()));
+			logger.warn("Could not write text: {}", e.getMessage());
 		}
 	}
 	
 	
 	/**
 	 * Kill process
-	 * @param processName
+	 * @param processName	the process to kill
 	 */
 	@Override
 	public void killProcess(String processName) {
@@ -584,17 +578,17 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			throw new ScenarioException("You cannot kill a remote process before driver has been created and corresponding node instanciated");
 		}
 		
-		logger.info("killing process: " + processName);
+		logger.info("killing process: {}", processName);
 		try {
 			HttpResponse<String> response = Unirest.post(String.format("%s%s", nodeServletUrl, NODE_TASK_SERVLET))
 				.queryString(ACTION_FIELD, "kill")
 				.queryString("process", processName).asString();
 			
 			if (response.getStatus() != 200) {
-				logger.error(String.format("kill process error: %s", response.getBody()));
+				logger.error("kill process error: {}", response.getBody());
 			}
 		} catch (UnirestException e) {
-			logger.warn(String.format("Could not kill process %s: %s", processName, e.getMessage()));
+			logger.warn("Could not kill process {}: {}", processName, e.getMessage());
 		}
 	}
 	
@@ -621,7 +615,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			throw new ScenarioException("You cannot execute a remote process before driver has been created and corresponding node instanciated");
 		}
 		
-		logger.info("execute program: " + program);
+		logger.info("execute program: {}", program);
 		try (UnirestInstance unirest = Unirest.spawnInstance()
 				
 				) {
@@ -647,7 +641,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			HttpResponse<String> response = req.asString();
 			return response.getBody();
 		} catch (UnirestException e) {
-			logger.warn(String.format("Could not execute process %s: %s", program, e.getMessage()));
+			logger.warn("Could not execute process {}: {}", program, e.getMessage());
 			return "";
 		}
 	}
@@ -663,7 +657,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			throw new ScenarioException("You cannot get a remote process before driver has been created and corresponding node instanciated");
 		}
 		
-		logger.info("getting process list for: " + processName);
+		logger.info("getting process list for: {}", processName);
 		try {
 			HttpResponse<String> response =  Unirest.get(String.format("%s%s", nodeServletUrl, NODE_TASK_SERVLET))
 				.queryString(ACTION_FIELD, "processList")
@@ -671,7 +665,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 				.asString();
 			
 			if (response.getStatus() != 200) {
-				logger.error(String.format("get process list error: %s", response.getBody()));
+				logger.error("get process list error: {}", response.getBody());
 			} else {
 				List<String> pidListStr = Arrays.asList(
 					response.getBody()
@@ -679,10 +673,10 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 					.split(","));
 				return pidListStr.stream()
 						.filter(p -> !p.isEmpty())
-						.map(Integer::parseInt).collect(Collectors.toList());
+						.map(Integer::parseInt).toList();
 			}
 		} catch (UnirestException e) {
-			logger.warn(String.format("Could not get process list of %s: %s", processName, e.getMessage()));
+			logger.warn("Could not get process list of {}: {}", processName, e.getMessage());
 		}
 		
 		return new ArrayList<>();
@@ -702,11 +696,11 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 				.asString();
 			
 			if (response.getStatus() != 200) {
-				logger.error(String.format("start video capture error: %s", response.getBody()));
+				logger.error("start video capture error: {}", response.getBody());
 			}
 			
 		} catch (UnirestException e) {
-			logger.warn(String.format("Could start video capture: %s", e.getMessage()));
+			logger.warn("Could start video capture: {}", e.getMessage());
 		}
 	}
 	
@@ -717,21 +711,19 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		}
 		
 		logger.info("stopping capture");
-		try (UnirestInstance unirest = Unirest.spawnInstance()) {
+		try (UnirestInstance unirest = Unirest.spawnInstance();
+			 ExecutorService executor = Executors.newSingleThreadExecutor()) {
 			
 			// delete file if it exists as '.asFile()' will not overwrite it
 			deleteExistingVideo(outputFile);
 
 			long start = System.currentTimeMillis();
 
-			ExecutorService executor = Executors.newSingleThreadExecutor();
 			Future<File> future = executor.submit(() -> {
 				GetRequest getRequest = unirest.get(String.format("%s%s", nodeServletUrl, NODE_TASK_SERVLET));
 				if (SeleniumTestsContextManager.getGlobalContext().getDebug().contains(DebugMode.NETWORK)) {
 					getRequest = getRequest
-							.downloadMonitor((b, fileName, bytesWritten, totalBytes) -> {
-								logger.info(String.format("File %s: %d/%d", fileName, bytesWritten, totalBytes));
-							});
+							.downloadMonitor((b, fileName, bytesWritten, totalBytes) -> logger.info("File {}: {}/{}", fileName, bytesWritten, totalBytes));
 				}
 				HttpResponse<File> videoResponse = getRequest
 						.socketTimeout(60000)
@@ -740,10 +732,10 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 						.asFile(outputFile);
 
 				if (videoResponse.getStatus() != 200) {
-					logger.error(String.format("stop video capture error: %s", videoResponse.getBody()));
+					logger.error("stop video capture error: {}", videoResponse.getBody());
 					return null;
 				} else {
-					logger.info(String.format("Video file downloaded (%d kb in %d ms)", videoResponse.getBody().length() / 1000, System.currentTimeMillis() - start));
+					logger.info("Video file downloaded ({} kb in {} ms)", videoResponse.getBody().length() / 1000, System.currentTimeMillis() - start);
 
 					// the extension depends on mime-type. By default, it's .avi
 					File videoFile = videoResponse.getBody();
@@ -761,10 +753,10 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			return videoFile;
 
 		} catch (UnirestException e) {
-			logger.warn(String.format("Could not stop video capture: %s", e.getMessage()));
+			logger.warn("Could not stop video capture: {}", e.getMessage());
 			return null;
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
-			logger.warn("Video file not get due to " + e.getClass().getName());
+			logger.warn("Video file not get due to {}", e.getClass().getName());
 			return null;
 		}
 	}
@@ -775,7 +767,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 				Files.delete(Paths.get(outputFile));
 					
 			} catch (Exception e) {
-				logger.warn("Error deleting previous video file, there may be a problem getting the new one: " + e.getMessage());
+				logger.warn("Error deleting previous video file, there may be a problem getting the new one: {}", e.getMessage());
 			}
 		}
 	}
@@ -793,11 +785,11 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		super.setNodeUrl(nodeUrl);
 		int nodePort;
 		try {
-			nodePort = new URL(nodeUrl).getPort();
-		} catch (MalformedURLException e) {
+			nodePort = new URI(nodeUrl).toURL().getPort();
+		} catch (MalformedURLException | URISyntaxException e) {
 			throw new ConfigurationException("Node URL is invalid: " + nodeUrl);
 		}
-		nodeServletUrl = nodeUrl.replace(Integer.toString(nodePort), Integer.toString(nodePort + 10));
+        nodeServletUrl = nodeUrl.replace(Integer.toString(nodePort), Integer.toString(nodePort + 10));
 	}
 
 	@Override
@@ -805,8 +797,8 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		super.setHubUrl(hubUrl);
 		
 		try {
-			hubServletUrl = new URL(hubUrl.replace(Integer.toString(hubPort), Integer.toString(hubPort + 10)));
-		} catch (MalformedURLException e) {
+			hubServletUrl = new URI(hubUrl.replace(Integer.toString(hubPort), Integer.toString(hubPort + 10))).toURL();
+		} catch (MalformedURLException | URISyntaxException e) {
 			throw new ConfigurationException("Hub URL is invalid: " + nodeUrl);
 		}
 	}

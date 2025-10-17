@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,10 +23,8 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import com.seleniumtests.core.SeleniumTestsContext;
-import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.reporter.logger.FileContent;
 import com.seleniumtests.reporter.logger.GenericFile;
@@ -43,7 +41,6 @@ import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
-import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestStep;
@@ -53,6 +50,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 public class SeleniumRobotServerTestRecorder extends CommonReporter implements IReporter {
 
 	private static final Object lock = new Object();
+	private static final Object sessionIdLock = new Object();
 	private static Integer sessionId;
 
 	public SeleniumRobotSnapshotServerConnector getServerConnector() {
@@ -66,6 +64,11 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 		sessionId = null;
 	}
 
+	private static void setSessionId(Integer sessionId) {
+		synchronized (sessionIdLock) {
+			SeleniumRobotServerTestRecorder.sessionId = sessionId;
+		}
+	}
 	
 	/**
 	 * Generate result for a single test method
@@ -115,11 +118,12 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 					// do not create application / version / environment from script, they should already be present or created by user to avoid fill database with wrong data
 					// create session only if it has not been created before
 
-					Optional<Long> sessionStart = resultSet.keySet().stream()
+					long sessionStart = resultSet.keySet().stream()
 							.map(ITestContext::getStartDate)
 							.map(Date::getTime)
-							.min(Long::compare);
-					recordTestSession(sessionStart.get());
+							.min(Long::compare)
+							.orElse(Instant.now().toEpochMilli());
+					recordTestSession(sessionStart);
 
 				} catch (SeleniumRobotServerException | ConfigurationException e) {
 					logger.error("Error contacting selenium robot server", e);
@@ -140,15 +144,15 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 		if (sessionId == null) {
 
 			String browserOrApp = CommonReporter.getBrowserOrApp();
-			Integer sessionId = serverConnector.createSession(String.format("%s suite", SeleniumTestsContextManager.getApplicationName()),
+			Integer newSessionId = serverConnector.createSession(String.format("%s suite", SeleniumTestsContextManager.getApplicationName()),
 					browserOrApp,
 					SeleniumTestsContextManager.getThreadContext().getStartedBy(),
 					Instant.ofEpochMilli(sessionStart)
 						.atZone(ZoneId.systemDefault())
 						.toOffsetDateTime());
-			logger.info(String.format("Session result will be visible at: %s/snapshot/testResults/summary/%d/", serverConnector.getUrl(), sessionId));
+			logger.info("Session result will be visible at: {}/snapshot/testResults/summary/{}/", serverConnector.getUrl(), newSessionId);
 
-			this.sessionId = sessionId;
+			setSessionId(newSessionId);
 		}
 	}
 
@@ -160,7 +164,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 
 			List<ITestResult> methodResults = entry.getValue().stream()
 						.sorted((r1, r2) -> Long.compare(r1.getStartMillis(), r2.getStartMillis()))
-						.collect(Collectors.toList());
+						.toList();
 			
 			// test case in seleniumRobot naming
 			for (ITestResult testResult: methodResults) {
@@ -192,7 +196,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 								.ofEpochMilli(testResult.getStartMillis())
 								.atZone(ZoneId.systemDefault())
 								.toOffsetDateTime());
-				logger.info(String.format("Result for '%s' will be visible at: %s/snapshot/testResults/result/%d/", testName, serverConnector.getUrl(), testCaseInSessionId));
+				logger.info("Result for '{}' will be visible at: {}/snapshot/testResults/result/{}/", testName, serverConnector.getUrl(), testCaseInSessionId);
 				serverConnector.addLogsToTestCaseInSession(testCaseInSessionId, generateExecutionLogs(testResult).toString());
 
 				addPreviousExecutionResults(testResult);
@@ -205,7 +209,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 				recordLogs(serverConnector, testCaseInSessionId, testResult);
 				recordTestInfos(serverConnector, testCaseInSessionId, testResult);
 				
-				logger.info(String.format("Snapshots has been recorded with TestCaseSessionId: %d", testCaseInSessionId));
+				logger.info("Snapshots has been recorded with TestCaseSessionId: {}", testCaseInSessionId);
 				TestNGResultUtils.setSnapshotTestCaseInSessionId(testResult, testCaseInSessionId);
 				TestNGResultUtils.setSeleniumServerReportCreated(testResult, true);
 			}
@@ -222,14 +226,14 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 
 	/**
 	 * Record test steps to server
-	 * @param serverConnector
-	 * @param testCaseInSessionId
-	 * @param testSteps
+	 * @param serverConnector		the server connector
+	 * @param testCaseInSessionId	testCaseInSessionId recorded on server
+	 * @param testSteps				list of test steps to record
 	 */
 	private void recordSteps(SeleniumRobotSnapshotServerConnector serverConnector, Integer testCaseInSessionId, List<TestStep> testSteps, ITestResult testResult) {
 		for (TestStep testStep: testSteps) {
 			
-			logger.info(String.format("Recording step %s on server", testStep.getName()));
+			logger.info("Recording step {} on server", testStep.getName());
 			
 			// record test step
 			Integer testStepId = serverConnector.createTestStep(testStep.getAction(), testCaseInSessionId);
@@ -265,25 +269,25 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 
 	/**
 	 * Add a step, so that previous execution results are recorded on server
-	 * @param testResult
+	 * @param testResult	the current result for this test
 	 */
 	private static void addPreviousExecutionResults(ITestResult testResult) {
 		TestStep testStep = new TestStep("No previous execution results, you can enable it via parameter '-DkeepAllResults=true'");
 		testStep.setFailed(false);
-		List<File> executionResults = new ArrayList<>();
+		List<File> executionResults;
 		if (SeleniumTestsContextManager.getGlobalContext().getKeepAllResults()) {
 			testStep.setName("Previous execution results");
 			testStep.setAction("Previous execution results");
 			executionResults = FileUtils.listFiles(new File(TestNGResultUtils.getSeleniumRobotTestContext(testResult).getOutputDirectory()),
 							FileFilterUtils.suffixFileFilter(".zip"), null).stream()
-					.collect(Collectors.toList());
+					.toList();
 			logger.info("recording previous execution results");
 
 			for (File executionResultFile: executionResults) {
 				try {
 					testStep.addFile(new GenericFile(executionResultFile, executionResultFile.getName().replace(".zip", ""), GenericFile.FileOperation.KEEP));
 				} catch (IOException e) {
-					logger.warn("Could not add previous execution result: " + e.getMessage());
+					logger.warn("Could not add previous execution result: {}", e.getMessage());
 				}
 			}
 		}
@@ -293,14 +297,14 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 
 	/**
 	 * Record logs to server
-	 * @param serverConnector
-	 * @param testCaseInSessionId
+	 * @param serverConnector		the server connector
+	 * @param testCaseInSessionId	testCaseInSessionId recorded on server
 	 */
 	private void recordLogs(SeleniumRobotSnapshotServerConnector serverConnector, Integer testCaseInSessionId, ITestResult testResult) {
 		try {
 			serverConnector.uploadLogs(SeleniumRobotLogger.getTestLogsFile(getTestName(testResult)), testCaseInSessionId);
 		} catch (SeleniumRobotServerException | ConfigurationException e) {
-			logger.error("Error uploading file: " + e.getMessage(), e);
+			logger.error("Error uploading file: {}", e.getMessage(), e);
 		}
 	}
 
@@ -308,15 +312,15 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 		try {
 			serverConnector.recordTestInfo(TestNGResultUtils.getTestInfo(testResult), testCaseInSessionId);
 		} catch (SeleniumRobotServerException | ConfigurationException e) {
-			logger.error("Error sending test infos: " + e.getMessage(), e);
+			logger.error("Error sending test infos: {}", e.getMessage(), e);
 		}
 	}
 
 	/**
 	 * Records all attachments on server, except the reference pictures and pictures for comparison, as they are recorded by other means
-	 * @param serverConnector
-	 * @param stepResultId
-	 * @param testStep
+	 * @param serverConnector	the server connector
+	 * @param stepResultId		id of this step result
+	 * @param testStep			the test step to record details from
 	 */
 	private void recordAllAttachments(SeleniumRobotSnapshotServerConnector serverConnector, Integer stepResultId, TestStep testStep) {
 
@@ -342,9 +346,9 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 
 	/**
 	 * record a snpashot on server, for snapshot comparison
-	 * @param serverConnector
-	 * @param stepResultId
-	 * @param snapshot
+	 * @param serverConnector	the server connector
+	 * @param stepResultId		id of this step result
+	 * @param snapshot			snapshot to record
 	 */
 	private void recordSnapshot(SeleniumRobotSnapshotServerConnector serverConnector, Integer stepResultId, Snapshot snapshot) {
 		try {
@@ -356,11 +360,11 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 	}
 	/**
 	 * record a step reference snapshot, when step is OK
-	 * @param serverConnector
-	 * @param testResult
-	 * @param testStep
-	 * @param stepResultId
-	 * @param snapshot
+	 * @param serverConnector	the server connector
+	 * @param testResult		this test result
+	 * @param testStep			the test step where snashot it
+	 * @param stepResultId		id of this step result
+	 * @param snapshot			snapshot to record
 	 */
 	private void recordReference(SeleniumRobotSnapshotServerConnector serverConnector, ITestResult testResult,
 			TestStep testStep, Integer stepResultId, Snapshot snapshot) {

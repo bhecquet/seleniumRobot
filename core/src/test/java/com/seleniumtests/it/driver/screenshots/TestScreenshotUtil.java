@@ -163,7 +163,7 @@ public class TestScreenshotUtil extends ReporterTest {
 		new DriverTestPageShadowDom(true);
 		WebDriver driver = WebUIDriver.getWebDriver(true);
 		try {
-			BufferedImage image = new ScreenshotUtil(driver).captureWebPageFullPage(driver.getWindowHandle());
+			BufferedImage image = new ScreenshotUtil(driver).captureWebPageFullPage();
 			Assert.assertTrue(image.getHeight() > 2000);
 			Assert.assertTrue(image.getWidth() > 1000);
 		} finally {
@@ -178,7 +178,7 @@ public class TestScreenshotUtil extends ReporterTest {
 		new DriverTestPageShadowDom(true);
 		WebDriver driver = WebUIDriver.getWebDriver(true);
 		try {
-			new ScreenshotUtil(driver).captureWebPageFullPage(driver.getWindowHandle());
+			new ScreenshotUtil(driver).captureWebPageFullPage();
 		} finally {
 			driver.close();
 		}
