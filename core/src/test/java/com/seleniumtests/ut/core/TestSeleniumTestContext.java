@@ -1240,7 +1240,7 @@ public class TestSeleniumTestContext extends GenericTest {
 		Assert.assertEquals(reportInfos.get(0).getPrefix(), "PERF");
 		Assert.assertEquals(reportInfos.get(1).getExtension(), ".json");
 		Assert.assertEquals(reportInfos.get(1).getTemplatePath(), "reporter/templates/report.test.json.vm");
-		Assert.assertEquals(reportInfos.get(1).getPrefix(), "step");
+		Assert.assertEquals(reportInfos.get(1).getPrefix(), "detailed");
 	}
 	
 	@Test(groups="ut context")
