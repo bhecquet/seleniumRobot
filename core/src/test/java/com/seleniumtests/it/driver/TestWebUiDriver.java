@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -90,7 +90,6 @@ public class TestWebUiDriver extends ReporterTest {
 	
 	/**
 	 * Test we can connect to a remote appium server (no local devices)
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testLocalAndroidDriverWithRemoteAppiumServer() throws Exception {
@@ -178,7 +177,6 @@ public class TestWebUiDriver extends ReporterTest {
 
 	/**
 	 * Check a Windows application can be tested
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testLocalWindowsDriverWithRemoteAppiumServer() throws Exception {
@@ -217,7 +215,6 @@ public class TestWebUiDriver extends ReporterTest {
 
 	/**
 	 * Test we get an error when using remote appium and no deviceId is provided
-	 * @throws Exception
 	 */
 	@Test(groups={"it"}, expectedExceptions = ConfigurationException.class)
 	public void testLocalAndroidDriverWithRemoteAppiumServerAndNoDeviceId() throws Exception {
@@ -259,8 +256,6 @@ public class TestWebUiDriver extends ReporterTest {
 	/**
 	 * Check that HAR capture file is present
 	 * Check it contains one page per TestStep
-	 *
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testHarCaptureExists() throws Exception {
@@ -306,8 +301,6 @@ public class TestWebUiDriver extends ReporterTest {
 	
 	/**
 	 * Check that browser logs are written to file (only available for chrome)
-	 * 
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testBrowserLogsExists() throws Exception {
@@ -347,8 +340,6 @@ public class TestWebUiDriver extends ReporterTest {
 
 	/**
 	 * Check that HAR capture file is present in result with manual steps
-	 *
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testReportContainsHarCaptureWithManualSteps() throws Exception {
@@ -516,7 +507,6 @@ public class TestWebUiDriver extends ReporterTest {
 	
 	/**
 	 * Check we can attach Selenium to a internet explorer process if it's through API
-	 * @throws Exception 
 	 */
 	@Test(groups={"it"})
 	public void testAttachExternalIEBrowser() throws Exception {
@@ -543,7 +533,6 @@ public class TestWebUiDriver extends ReporterTest {
 	/**
 	 * Be sure that we can still attach driver even if it takes a long time to start
 	 * For IE, max wait time is 2 minutes
-	 * @throws Exception 
 	 */
 	@Test(groups={"it"})
 	public void testAttachExternalInternetExplorerStartingLate() throws Exception {
@@ -560,7 +549,7 @@ public class TestWebUiDriver extends ReporterTest {
 		SeleniumTestsContextManager.getThreadContext().setInitialUrl(serverUrl);
 		
 		logger.info("will start browser in 30 secs");
-		new BrowserLauncher(BrowserType.INTERNET_EXPLORER, 0, null, 30, serverUrl).start();
+		new BrowserLauncher(BrowserType.INTERNET_EXPLORER, 0, null, 30, serverUrl).run();
 		logger.info("Waiting for driver");
 		
 		// creates the driver
