@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,24 +28,20 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
-import com.seleniumtests.driver.WebUIDriverFactory;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import io.appium.java_client.android.options.UiAutomator2Options;
-import io.appium.java_client.remote.options.BaseOptions;
 import kong.unirest.Headers;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -155,18 +151,18 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	private SeleniumRobotGridConnector connector;
 	private Logger gridLogger;
 
-	private MockedStatic mockedHttpClients;
+	private MockedStatic<HttpClients> mockedHttpClients;
 	
 	private MutableCapabilities capabilities;
 	private MutableCapabilities mobileCapabilities;
 
 	@BeforeMethod(groups={"ut"})
-	private void init() throws ClientProtocolException, IOException {
+	private void init() throws IOException {
 
 		capabilities = new MutableCapabilities();
 		mobileCapabilities = new UiAutomator2Options();
 		mockedHttpClients = mockStatic(HttpClients.class);
-		mockedHttpClients.when(() -> HttpClients.createDefault()).thenReturn(client);
+		mockedHttpClients.when(HttpClients::createDefault).thenReturn(client);
 		when(response.getEntity()).thenReturn(entity);
 		when(response.getStatusLine()).thenReturn(statusLine);
 		when(client.execute((HttpHost)any(), any())).thenReturn(response);
@@ -197,7 +193,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		((UiAutomator2Options)mobileCapabilities).setApp(appFile.getAbsolutePath());
 		
 		// prepare response
-		InputStream is = IOUtils.toInputStream("file:app/zip", Charset.forName("UTF-8"));
+		InputStream is = IOUtils.toInputStream("file:app/zip", StandardCharsets.UTF_8);
 		when(statusLine.getStatusCode()).thenReturn(200);
 		when(entity.getContent()).thenReturn(is);
 
@@ -209,7 +205,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	public void testSendAppNoApp() throws UnsupportedOperationException, IOException {
 
 		// prepare response
-		InputStream is = IOUtils.toInputStream("file:app/zip", Charset.forName("UTF-8"));
+		InputStream is = IOUtils.toInputStream("file:app/zip", StandardCharsets.UTF_8);
 		when(statusLine.getStatusCode()).thenReturn(200);
 		when(entity.getContent()).thenReturn(is);
 		mobileCapabilities.setCapability("foo", "bar");
@@ -226,7 +222,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		appFile.deleteOnExit();
 
 		// prepare response
-		InputStream is = IOUtils.toInputStream("file:app/zip", Charset.forName("UTF-8"));
+		InputStream is = IOUtils.toInputStream("file:app/zip", StandardCharsets.UTF_8);
 		when(statusLine.getStatusCode()).thenReturn(200);
 		when(entity.getContent()).thenReturn(is);
 
@@ -248,7 +244,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		((UiAutomator2Options)mobileCapabilities).setApp(appFile.getAbsolutePath());
 		
 		// prepare response
-		InputStream is = IOUtils.toInputStream("file:app/zip", Charset.forName("UTF-8"));
+		InputStream is = IOUtils.toInputStream("file:app/zip", StandardCharsets.UTF_8);
 		when(statusLine.getStatusCode()).thenReturn(500);
 		when(entity.getContent()).thenReturn(is);
 		
@@ -257,12 +253,9 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	/**
 	 * When APP is an HTTP link, do nothing
-	 * @throws ClientProtocolException 
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
 	 */
 	@Test(groups={"ut"})
-	public void testDontSendAppWhenHttp() throws ClientProtocolException, IOException {
+	public void testDontSendAppWhenHttp() throws IOException {
 		
 		// prepare app key
 		((UiAutomator2Options)mobileCapabilities).setApp("http://server:port/data/application.apk");
@@ -275,12 +268,9 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	/**
 	 * When APP is null, do nothing
-	 * @throws ClientProtocolException 
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
 	 */
 	@Test(groups={"ut"})
-	public void testDontSendAppWhenAppIsNull() throws ClientProtocolException, IOException {
+	public void testDontSendAppWhenAppIsNull() throws IOException {
 		
 		connector.uploadMobileApp(new DesiredCapabilities());
 		
@@ -290,12 +280,9 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	/**
 	 * Test get mouse coordinates
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testGetMouseCoordinates() throws UnsupportedOperationException, IOException {
+	public void testGetMouseCoordinates() throws UnsupportedOperationException {
 		
 		GetRequest req = (GetRequest) createGridServletServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "13,15");	
 		
@@ -311,11 +298,9 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	/**
 	 * Test mouse coordinates with an invalid response
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
 	 */
 	@Test(groups={"ut"})
-	public void testGetMouseCoordinatesWrontFormat() throws UnsupportedOperationException, IOException {
+	public void testGetMouseCoordinatesWrontFormat() throws UnsupportedOperationException {
 		
 		GetRequest req = (GetRequest) createGridServletServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "13");	
 		
@@ -326,17 +311,15 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		// no error encountered
 		verify(req).queryString("action", "mouseCoordinates");
 		verify(gridLogger, never()).warn(anyString());
-		verify(gridLogger).error(anyString());
+		verify(gridLogger).error("mouse coordinates '{}' are invalid",
+				"13");
 	}
 	
 	/**
 	 * Test get mouse coordinates with status code different from 200
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testGetMouseCoordinatesError500() throws UnsupportedOperationException, IOException {
+	public void testGetMouseCoordinatesError500() throws UnsupportedOperationException {
 		
 		createGridServletServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "");	
 		
@@ -346,17 +329,15 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		
 		// error clicking
 		verify(gridLogger, never()).warn(anyString());
-		verify(gridLogger).error(anyString());
+		verify(gridLogger).error("Mouse coordinates error: {}",
+				"");
 	}
 	
 	/**
 	 * Test get mouse coordinates when connection error occurs
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testGetMouseCoordinatesNoConnection() throws UnsupportedOperationException, IOException {
+	public void testGetMouseCoordinatesNoConnection() throws UnsupportedOperationException {
 		
 		HttpRequest<?> req = createGridServletServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "");
 		when(req.asString()).thenThrow(new UnirestException("connection error"));
@@ -366,12 +347,13 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		Assert.assertEquals(coords.y, 0);
 		
 		// error connecting to node
-		verify(gridLogger).warn(anyString());
+		verify(gridLogger).warn("Could not get mouse coordinates: {}",
+				"connection error");
 		verify(gridLogger, never()).error(anyString());
 	}
 
 	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
-	public void testGetMouseCoordinatesWithoutNodeUrl() throws UnsupportedOperationException, IOException {
+	public void testGetMouseCoordinatesWithoutNodeUrl() throws UnsupportedOperationException {
 		
 		createGridServletServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
 
@@ -381,12 +363,9 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	/**
 	 * Test left click
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testLeftClick() throws UnsupportedOperationException, IOException {
+	public void testLeftClick() throws UnsupportedOperationException {
 		
 		HttpRequestWithBody req = (HttpRequestWithBody) createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
 		
@@ -403,12 +382,9 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	/**
 	 * Test left click on main screen
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testLeftClickOnMainScreen() throws UnsupportedOperationException, IOException {
+	public void testLeftClickOnMainScreen() throws UnsupportedOperationException {
 		
 		HttpRequestWithBody req = (HttpRequestWithBody) createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
 		
@@ -425,12 +401,9 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	/**
 	 * Test left click with status code different from 200
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testLeftClickError500() throws UnsupportedOperationException, IOException {
+	public void testLeftClickError500() throws UnsupportedOperationException {
 		
 		createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "");	
 		
@@ -438,17 +411,15 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		
 		// error clicking
 		verify(gridLogger, never()).warn(anyString());
-		verify(gridLogger).error(anyString());
+		verify(gridLogger).error("Left click error: {}",
+				"");
 	}
 	
 	/**
 	 * Test left click when connection error occurs
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testLeftClickNoConnection() throws UnsupportedOperationException, IOException {
+	public void testLeftClickNoConnection() throws UnsupportedOperationException {
 		
 		HttpRequest<?> req = createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "");
 		when(req.asString()).thenThrow(new UnirestException("connection error"));
@@ -456,12 +427,13 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		connector.leftClic(0, 0);	
 		
 		// error connecting to node
-		verify(gridLogger).warn(anyString());
+		verify(gridLogger).warn("Could not click left: {}}",
+				"connection error");
 		verify(gridLogger, never()).error(anyString());
 	}
 
 	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
-	public void testLeftClickWithoutNodeUrl() throws UnsupportedOperationException, IOException {
+	public void testLeftClickWithoutNodeUrl() throws UnsupportedOperationException {
 		
 		createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
 
@@ -471,12 +443,9 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	/**
 	 * Test double click
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testDoubleClick() throws UnsupportedOperationException, IOException {
+	public void testDoubleClick() throws UnsupportedOperationException {
 		
 		HttpRequestWithBody req = (HttpRequestWithBody) createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
 		
@@ -493,12 +462,9 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	/**
 	 * Test double click on main screen
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testDoubleClickOnMainScreen() throws UnsupportedOperationException, IOException {
+	public void testDoubleClickOnMainScreen() throws UnsupportedOperationException {
 		
 		HttpRequestWithBody req = (HttpRequestWithBody) createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
 		
@@ -515,12 +481,9 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	/**
 	 * Test double click with status code different from 200
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testDoubleClickError500() throws UnsupportedOperationException, IOException {
+	public void testDoubleClickError500() throws UnsupportedOperationException {
 		
 		createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "");	
 		
@@ -528,17 +491,15 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		
 		// error clicking
 		verify(gridLogger, never()).warn(anyString());
-		verify(gridLogger).error(anyString());
+		verify(gridLogger).error("Double click error: {}",
+				"");
 	}
 	
 	/**
 	 * Test double click when connection error occurs
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testDoubleClickNoConnection() throws UnsupportedOperationException, IOException {
+	public void testDoubleClickNoConnection() throws UnsupportedOperationException {
 		
 		HttpRequest<?> req = createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "");
 		when(req.asString()).thenThrow(new UnirestException("connection error"));
@@ -546,12 +507,13 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		connector.doubleClick(0, 0);	
 		
 		// error connecting to node
-		verify(gridLogger).warn(anyString());
+		verify(gridLogger).warn("Could not double click: {}",
+				"connection error");
 		verify(gridLogger, never()).error(anyString());
 	}
 
 	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
-	public void testDoubleClickWithoutNodeUrl() throws UnsupportedOperationException, IOException {
+	public void testDoubleClickWithoutNodeUrl() throws UnsupportedOperationException {
 		
 		createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
 
@@ -561,12 +523,9 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	/**
 	 * Test right click
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testRightClick() throws UnsupportedOperationException, IOException {
+	public void testRightClick() throws UnsupportedOperationException {
 		
 		HttpRequestWithBody req = (HttpRequestWithBody) createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
 		
@@ -583,12 +542,9 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	/**
 	 * Test right click on main screen
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testRightClickOnMainScreen() throws UnsupportedOperationException, IOException {
+	public void testRightClickOnMainScreen() throws UnsupportedOperationException {
 		
 		HttpRequestWithBody req = (HttpRequestWithBody) createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
 		
@@ -605,12 +561,9 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	/**
 	 * Test right click with status code different from 200
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testRightClickError500() throws UnsupportedOperationException, IOException {
+	public void testRightClickError500() throws UnsupportedOperationException {
 		
 		createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "");	
 		
@@ -618,17 +571,15 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		
 		// error clicking
 		verify(gridLogger, never()).warn(anyString());
-		verify(gridLogger).error(anyString());
+		verify(gridLogger).error("Right click error: {}",
+				"");
 	}
 	
 	/**
 	 * Test right click when connection error occurs
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testRightClickNoConnection() throws UnsupportedOperationException, IOException {
+	public void testRightClickNoConnection() throws UnsupportedOperationException {
 		
 		HttpRequest<?> req = createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "");
 		when(req.asString()).thenThrow(new UnirestException("connection error"));
@@ -636,12 +587,13 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		connector.rightClic(0, 0);	
 		
 		// error connecting to node
-		verify(gridLogger).warn(anyString());
+		verify(gridLogger).warn("Could not click right: {}",
+				"connection error");
 		verify(gridLogger, never()).error(anyString());
 	}
 
 	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
-	public void testRightClickWithoutNodeUrl() throws UnsupportedOperationException, IOException {
+	public void testRightClickWithoutNodeUrl() throws UnsupportedOperationException {
 		
 		createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
 
@@ -650,7 +602,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testCaptureDesktop() throws UnsupportedOperationException, IOException {
+	public void testCaptureDesktop() throws UnsupportedOperationException {
 		
 		GetRequest req = (GetRequest) createGridServletServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "ABCDE");	
 		
@@ -664,7 +616,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testCaptureDesktopError500() throws UnsupportedOperationException, IOException {
+	public void testCaptureDesktopError500() throws UnsupportedOperationException {
 		
 		createGridServletServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "ABCDE");	
 		
@@ -673,11 +625,12 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		
 		// error on capture
 		verify(gridLogger, never()).warn(anyString());
-		verify(gridLogger).error(anyString());
+		verify(gridLogger).error("capture desktop error: {}",
+				"ABCDE");
 	}
 	
 	@Test(groups={"ut"})
-	public void testCaptureDesktopNoConnection() throws UnsupportedOperationException, IOException {
+	public void testCaptureDesktopNoConnection() throws UnsupportedOperationException {
 		
 		HttpRequest<?> req = createGridServletServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "ABCDE");	
 		when(req.asString()).thenThrow(new UnirestException("connection error"));
@@ -686,12 +639,13 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		Assert.assertEquals(b64Img, "");
 		
 		// error on capture
-		verify(gridLogger).warn(anyString());
+		verify(gridLogger).warn("Could not capture desktop: {}",
+				"connection error");
 		verify(gridLogger, never()).error(anyString());
 	}
 
 	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
-	public void testCaptureDesktopWithoutNodeUrl() throws UnsupportedOperationException, IOException {
+	public void testCaptureDesktopWithoutNodeUrl() throws UnsupportedOperationException {
 		
 		createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
 
@@ -702,12 +656,9 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 
 	/**
 	 * Test upload file
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testUploadFile() throws UnsupportedOperationException, IOException {
+	public void testUploadFile() throws UnsupportedOperationException {
 		
 		HttpRequestWithBody req = (HttpRequestWithBody) createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
 		
@@ -724,12 +675,9 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	/**
 	 * Test upload file with status code different from 200
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testUploadFileError500() throws UnsupportedOperationException, IOException {
+	public void testUploadFileError500() throws UnsupportedOperationException {
 		
 		createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "");	
 
@@ -737,17 +685,15 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		
 		// error clicking
 		verify(gridLogger, never()).warn(anyString());
-		verify(gridLogger).error(anyString());
+		verify(gridLogger).error("Error uploading file: {}",
+				"");
 	}
 	
 	/**
 	 * Test upload file when connection error occurs
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testUploadFileNoConnection() throws UnsupportedOperationException, IOException {
+	public void testUploadFileNoConnection() throws UnsupportedOperationException {
 		
 		HttpRequest<?> req = createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "", "requestBodyEntity");
 		when(req.asString()).thenThrow(new UnirestException("connection error"));
@@ -755,12 +701,13 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		connector.uploadFileToBrowser("foo", "ABCDE");		
 		
 		// error connecting to node
-		verify(gridLogger).warn(anyString());
+		verify(gridLogger).warn("Cannot upload file: {}",
+				"connection error");
 		verify(gridLogger, never()).error(anyString());
 	}
 
 	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
-	public void testUploadFileWithoutNodeUrl() throws UnsupportedOperationException, IOException {
+	public void testUploadFileWithoutNodeUrl() throws UnsupportedOperationException {
 		
 		createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
 
@@ -771,9 +718,6 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 
 	/**
 	 * Test download file
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
 	public void testDownloadFile() throws UnsupportedOperationException, IOException {
@@ -795,24 +739,19 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	/**
 	 * Test download file when requested path is not in upload folder
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
 	 */
 	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class, expectedExceptionsMessageRegExp = "File path foo is invalid, only path in 'upload' folder are allowed")
 	public void testDownloadFileWrongPath() throws UnsupportedOperationException, IOException {
 		
 		File f = File.createTempFile("foo",  ".bar");
 		FileUtils.write(f, "ABCD", StandardCharsets.UTF_8);
-		GetRequest req = (GetRequest) createGridServletServerMock("GET", SeleniumRobotGridConnector.FILE_SERVLET, 200, f);	
+		createGridServletServerMock("GET", SeleniumRobotGridConnector.FILE_SERVLET, 200, f);
 		
 		connector.downloadFileFromNode("foo");
 	}
 	
 	/**
 	 * Test download file with status code different from 200
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"}, expectedExceptions = SeleniumGridException.class, expectedExceptionsMessageRegExp = "Error downloading file upload/foo: .*")
 	public void testDownloadFileError500() throws UnsupportedOperationException, IOException {
@@ -824,11 +763,8 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	/**
 	 * Test download file when connection error occurs
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
-	@Test(groups={"ut"}, expectedExceptions = SeleniumGridException.class, expectedExceptionsMessageRegExp = "Cannot download file: upload/foo")
+	@Test(groups={"ut"}, expectedExceptions = SeleniumGridException.class, expectedExceptionsMessageRegExp = "Cannot download file: upload/foo: connection error")
 	public void testDownloadFileNoConnection() throws UnsupportedOperationException, IOException {
 		
 		HttpRequest<?> req = createGridServletServerMock("GET", SeleniumRobotGridConnector.FILE_SERVLET, 500, File.createTempFile("foo",  ".bar"), "requestBodyEntity");
@@ -849,12 +785,9 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	/**
 	 * Test send keys with keyboard
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testSendKeysWithKeyboard() throws UnsupportedOperationException, IOException {
+	public void testSendKeysWithKeyboard() throws UnsupportedOperationException {
 		
 		HttpRequestWithBody req = (HttpRequestWithBody) createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
 		
@@ -869,12 +802,9 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	/**
 	 * Test send keys with keyboard with status code different from 200
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testSendKeysWithKeyboardError500() throws UnsupportedOperationException, IOException {
+	public void testSendKeysWithKeyboardError500() throws UnsupportedOperationException {
 		
 		createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "");	
 
@@ -882,17 +812,15 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		
 		// error clicking
 		verify(gridLogger, never()).warn(anyString());
-		verify(gridLogger).error(anyString());
+		verify(gridLogger).error("Send keys error: {}",
+				"");
 	}
 	
 	/**
 	 * Test send keys with keyboard when connection error occurs
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testSendKeysWithKeyboardNoConnection() throws UnsupportedOperationException, IOException {
+	public void testSendKeysWithKeyboardNoConnection() throws UnsupportedOperationException {
 		
 		HttpRequest<?> req = createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "");
 		when(req.asString()).thenThrow(new UnirestException("connection error"));
@@ -900,12 +828,13 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		connector.sendKeysWithKeyboard(Arrays.asList(KeyEvent.VK_0, KeyEvent.VK_ENTER));		
 		
 		// error connecting to node
-		verify(gridLogger).warn(anyString());
+		verify(gridLogger).warn("Could send keys: {}",
+				"connection error");
 		verify(gridLogger, never()).error(anyString());
 	}
 
 	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
-	public void testSendKeysWithoutNodeUrl() throws UnsupportedOperationException, IOException {
+	public void testSendKeysWithoutNodeUrl() throws UnsupportedOperationException {
 		
 		createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
 		
@@ -915,12 +844,9 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	/**
 	 * Test write text
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testWriteText() throws UnsupportedOperationException, IOException {
+	public void testWriteText() throws UnsupportedOperationException {
 		
 		HttpRequestWithBody req = (HttpRequestWithBody) createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
 		
@@ -931,11 +857,11 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		verify(req).queryString("text", "foo");
 		verify(gridLogger, never()).warn(anyString());
 		verify(gridLogger, never()).error(anyString());
-		verify(gridLogger).info("writing text: fo****");
+		verify(gridLogger).info("writing text: {}", "fo****");
 	}
 	
 	@Test(groups={"ut"})
-	public void testWriteShortText() throws UnsupportedOperationException, IOException {
+	public void testWriteShortText() throws UnsupportedOperationException {
 		
 		HttpRequestWithBody req = (HttpRequestWithBody) createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
 		
@@ -946,17 +872,15 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		verify(req).queryString("text", "f");
 		verify(gridLogger, never()).warn(anyString());
 		verify(gridLogger, never()).error(anyString());
-		verify(gridLogger).info("writing text: f****");
+		verify(gridLogger).info("writing text: {}",
+				"f****");
 	}
 	
 	/**
 	 * Test write text with status code different from 200
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testWriteTextError500() throws UnsupportedOperationException, IOException {
+	public void testWriteTextError500() throws UnsupportedOperationException {
 		
 		createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "");	
 
@@ -964,17 +888,14 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		
 		// error clicking
 		verify(gridLogger, never()).warn(anyString());
-		verify(gridLogger).error(anyString());
+		verify(gridLogger).error(anyString(), anyString());
 	}
 	
 	/**
 	 * Test write text when connection error occurs
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testWriteTextNoConnection() throws UnsupportedOperationException, IOException {
+	public void testWriteTextNoConnection() throws UnsupportedOperationException {
 		
 		HttpRequest<?> req = createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "");
 		when(req.asString()).thenThrow(new UnirestException("connection error"));
@@ -982,12 +903,13 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		connector.writeText("foo");			
 		
 		// error connecting to node
-		verify(gridLogger).warn(anyString());
+		verify(gridLogger).warn("Could not write text: {}",
+				"connection error");
 		verify(gridLogger, never()).error(anyString());
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
-	public void testWriteTextWithoutNodeUrl() throws UnsupportedOperationException, IOException {
+	public void testWriteTextWithoutNodeUrl() throws UnsupportedOperationException {
 		
 		createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
 
@@ -997,12 +919,9 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	/**
 	 * Test display running step
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testDisplayRunningStep() throws UnsupportedOperationException, IOException {
+	public void testDisplayRunningStep() throws UnsupportedOperationException {
 		
 		HttpRequestWithBody req = (HttpRequestWithBody) createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
 		
@@ -1018,12 +937,9 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	/**
 	 * Testdisplay running step with status code different from 200
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testDisplayRunningStepError500() throws UnsupportedOperationException, IOException {
+	public void testDisplayRunningStepError500() throws UnsupportedOperationException {
 		
 		createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "");	
 		
@@ -1031,17 +947,15 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		
 		// error clicking
 		verify(gridLogger, never()).warn(anyString());
-		verify(gridLogger).error(anyString());
+		verify(gridLogger).error("display running step error: {}",
+				"");
 	}
 	
 	/**
 	 * Testdisplay running step when connection error occurs
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testDisplayRunningStepNoConnection() throws UnsupportedOperationException, IOException {
+	public void testDisplayRunningStepNoConnection() throws UnsupportedOperationException {
 		
 		HttpRequest<?> req = createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "");
 		when(req.asString()).thenThrow(new UnirestException("connection error"));
@@ -1049,12 +963,13 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		connector.displayRunningStep("foo");			
 		
 		// error connecting to node
-		verify(gridLogger).warn(anyString());
+		verify(gridLogger).warn("Could not display running step: {}",
+				"connection error");
 		verify(gridLogger, never()).error(anyString());
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
-	public void testDisplayRunningStepWithoutNodeUrl() throws UnsupportedOperationException, IOException {
+	public void testDisplayRunningStepWithoutNodeUrl() throws UnsupportedOperationException {
 		
 		createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
 
@@ -1064,12 +979,9 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	/**
 	 * Test killing process
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testKillProcess() throws UnsupportedOperationException, IOException {
+	public void testKillProcess() throws UnsupportedOperationException {
 		
 		HttpRequestWithBody req = (HttpRequestWithBody) createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
 		
@@ -1084,12 +996,9 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	/**
 	 * Test kill process with status code different from 200
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testKillProcessError500() throws UnsupportedOperationException, IOException {
+	public void testKillProcessError500() throws UnsupportedOperationException {
 		
 		createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "");	
 
@@ -1097,17 +1006,15 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		
 		// error clicking
 		verify(gridLogger, never()).warn(anyString());
-		verify(gridLogger).error(anyString());
+		verify(gridLogger).error("kill process error: {}",
+				"");
 	}
 	
 	/**
 	 * Test kill process when connection error occurs
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testKillProcessNoConnection() throws UnsupportedOperationException, IOException {
+	public void testKillProcessNoConnection() throws UnsupportedOperationException {
 		
 		HttpRequest<?> req = createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "");
 		when(req.asString()).thenThrow(new UnirestException("connection error"));
@@ -1115,18 +1022,17 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		connector.killProcess("myProcess");		
 		
 		// error connecting to node
-		verify(gridLogger).warn(anyString());
+		verify(gridLogger).warn("Could not kill process {}: {}",
+				"myProcess",
+				"connection error");
 		verify(gridLogger, never()).error(anyString());
 	}
 	
 	/**
 	 * Test killing process when node is still unknown (driver not initialized). In this case, ScenarioException must be thrown
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
-	public void testKillProcessWithoutNodeUrl() throws UnsupportedOperationException, IOException {
+	public void testKillProcessWithoutNodeUrl() throws UnsupportedOperationException {
 		
 		createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
 
@@ -1135,7 +1041,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testGetProcessList() throws UnsupportedOperationException, IOException {
+	public void testGetProcessList() throws UnsupportedOperationException {
 		
 		GetRequest req = (GetRequest) createGridServletServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "100,200");	
 		
@@ -1149,7 +1055,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testGetProcessListEmpty() throws UnsupportedOperationException, IOException {
+	public void testGetProcessListEmpty() throws UnsupportedOperationException {
 		
 		GetRequest req = (GetRequest) createGridServletServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, " ");	
 		
@@ -1164,12 +1070,9 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 
 	/**
 	 * Test get process list with status code different from 200
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testGetProcessListError500() throws UnsupportedOperationException, IOException {
+	public void testGetProcessListError500() throws UnsupportedOperationException {
 		
 		createGridServletServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "");	
 
@@ -1177,17 +1080,15 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		
 		// error clicking
 		verify(gridLogger, never()).warn(anyString());
-		verify(gridLogger).error(anyString());
+		verify(gridLogger).error("get process list error: {}",
+				"");
 	}
 	
 	/**
 	 * Test get process list when connection error occurs
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testGetProcessListNoConnection() throws UnsupportedOperationException, IOException {
+	public void testGetProcessListNoConnection() throws UnsupportedOperationException {
 		
 		HttpRequest<?> req = createGridServletServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "");
 		when(req.asString()).thenThrow(new UnirestException("connection error"));
@@ -1195,18 +1096,17 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		connector.getProcessList("myProcess");	
 		
 		// error connecting to node
-		verify(gridLogger).warn(anyString());
+		verify(gridLogger).warn("Could not get process list of {}: {}",
+				"myProcess",
+				"connection error");
 		verify(gridLogger, never()).error(anyString());
 	}
 
 	/**
 	 * Test getting process list when node is still unknown (driver not initialized). In this case, ScenarioException must be thrown
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
-	public void testGetProcessListWithoutNodeUrl() throws UnsupportedOperationException, IOException {
+	public void testGetProcessListWithoutNodeUrl() throws UnsupportedOperationException {
 		
 		createGridServletServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "100,200");	
 
@@ -1216,12 +1116,9 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 
 	/**
 	 * Start video capture
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testStartVideoCapture() throws UnsupportedOperationException, IOException {
+	public void testStartVideoCapture() throws UnsupportedOperationException {
 		
 		GetRequest req = (GetRequest) createGridServletServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
 		
@@ -1236,12 +1133,9 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 
 	/**
 	 * Test Start video capture with status code different from 200
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testStartVideoCaptureError500() throws UnsupportedOperationException, IOException {
+	public void testStartVideoCaptureError500() throws UnsupportedOperationException {
 		
 		createGridServletServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "");	
 
@@ -1249,17 +1143,15 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		
 		// error clicking
 		verify(gridLogger, never()).warn(anyString());
-		verify(gridLogger).error(anyString());
+		verify(gridLogger).error("start video capture error: {}",
+				"");
 	}
 	
 	/**
 	 * Test Start video capture when connection error occurs
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testStartVideoCaptureNoConnection() throws UnsupportedOperationException, IOException {
+	public void testStartVideoCaptureNoConnection() throws UnsupportedOperationException {
 		
 		HttpRequest<?> req = createGridServletServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "");
 		when(req.asString()).thenThrow(new UnirestException("connection error"));
@@ -1267,18 +1159,16 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		connector.startVideoCapture();
 		
 		// error connecting to node
-		verify(gridLogger).warn(anyString());
+		verify(gridLogger).warn("Could start video capture: {}",
+				"connection error");
 		verify(gridLogger, never()).error(anyString());
 	}
 
 	/**
 	 * Test Start video capture when node is still unknown (driver not initialized). In this case, ScenarioException must be thrown
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
-	public void testStartVideoCaptureWithoutNodeUrl() throws UnsupportedOperationException, IOException {
+	public void testStartVideoCaptureWithoutNodeUrl() throws UnsupportedOperationException {
 		
 		createGridServletServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
 		
@@ -1287,9 +1177,6 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	}
 	/**
 	 * Stop video capture
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
 	public void testStopVideoCapture() throws UnsupportedOperationException, IOException {
@@ -1312,9 +1199,6 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	}
 	/**
 	 * Stop video capture
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
 	public void testStopVideoCaptureMp4() throws UnsupportedOperationException, IOException {
@@ -1337,9 +1221,6 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 
 	/**
 	 * Test Stop video capture with status code different from 200
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
 	public void testStopVideoCaptureError500() throws UnsupportedOperationException, IOException {
@@ -1351,14 +1232,11 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		
 		Assert.assertNull(out);
 		verify(gridLogger, never()).warn(anyString());
-		verify(gridLogger).error(anyString());
+		verify(gridLogger).error(eq("stop video capture error: {}"), any(File.class));
 	}
 	
 	/**
 	 * Test Stop video capture when connection error occurs
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
 	public void testStopVideoCaptureNoConnection() throws UnsupportedOperationException, IOException {
@@ -1366,23 +1244,21 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		HttpRequest<?> req = createGridServletServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "");
 		when(req.asFile(anyString())).thenThrow(new UnirestException("connection error"));
 
-		new File("out.mp4").delete();
+		Files.deleteIfExists(new File("out.mp4").toPath());
 		File out = connector.stopVideoCapture("out.mp4");
 		
 		// error connecting to node
 		Assert.assertNull(out);
-		verify(gridLogger).warn(anyString());
+		verify(gridLogger).warn("Video file not get due to {}",
+				"java.util.concurrent.ExecutionException");
 		verify(gridLogger, never()).error(anyString());
 	}
 
 	/**
 	 * Test Stop video capture when node is still unknown (driver not initialized). In this case, ScenarioException must be thrown
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
-	public void testStopVideoCaptureWithoutNodeUrl() throws UnsupportedOperationException, IOException {
+	public void testStopVideoCaptureWithoutNodeUrl() throws UnsupportedOperationException {
 		
 		createGridServletServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
 
@@ -1392,11 +1268,11 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 
 	@Test(groups={"ut"})
-	public void testExecuteCommand() throws UnsupportedOperationException, IOException {
+	public void testExecuteCommand() throws UnsupportedOperationException {
 		
 		HttpRequestWithBody req = (HttpRequestWithBody)createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "foo");	
 		
-		SeleniumGridConnector connector = new SeleniumRobotGridConnector("http://localhost:4444/wd/hub");
+		connector = new SeleniumRobotGridConnector("http://localhost:4444/wd/hub");
 		connector.setSessionId(new SessionId("1234"));
 		connector.setNodeUrl("http://localhost:4321");
 		Assert.assertEquals(connector.executeCommand("myProcess", "arg1", "arg2"), "foo");
@@ -1407,23 +1283,20 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	}
 	/**
 	 * Test executing command when node is still unknown (driver not initialized). In this case, ScenarioException must be thrown
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
-	public void testExecuteCommandWithoutNodeUrl() throws UnsupportedOperationException, IOException {
+	public void testExecuteCommandWithoutNodeUrl() throws UnsupportedOperationException {
 		
 		createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "foo");	
 		
-		SeleniumGridConnector connector = new SeleniumRobotGridConnector("http://localhost:4444/wd/hub");
+		connector = new SeleniumRobotGridConnector("http://localhost:4444/wd/hub");
 		connector.executeCommand("myProcess", "arg1");
 	}
 	
 	@Test(groups={"ut"})
-	public void testIsGridActiveWithGridNotPresent() throws ClientProtocolException, IOException {
+	public void testIsGridActiveWithGridNotPresent() {
 		
-		SeleniumGridConnector connector = new SeleniumRobotGridConnector(SERVER_URL);
+		connector = new SeleniumRobotGridConnector(SERVER_URL);
 		when(Unirest.get(SERVER_URL + SeleniumGridConnector.STATUS_SERVLET)).thenReturn(getRequest);
 		when(getRequest.asJson()).thenThrow(UnirestException.class);
 		
@@ -1431,9 +1304,9 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testIsGridActiveWithGridInError() throws ClientProtocolException, IOException {
+	public void testIsGridActiveWithGridInError() {
 		
-		SeleniumGridConnector connector = new SeleniumRobotGridConnector(SERVER_URL);
+		connector = new SeleniumRobotGridConnector(SERVER_URL);
 		createServerMock("GET", SeleniumGridConnector.STATUS_SERVLET, 500, "some text");	
 		
 		Assert.assertFalse(connector.isGridActive());
@@ -1442,14 +1315,11 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	/**
 	 * Check that we get true if the grid is ACTIVE and at least one node is present
-	 * @throws ClientProtocolException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testIsGridActiveWithRobotGridActive() throws ClientProtocolException, IOException {
+	public void testIsGridActiveWithRobotGridActive() {
 		
-		SeleniumGridConnector connector = new SeleniumRobotGridConnector(SERVER_URL);
+		connector = new SeleniumRobotGridConnector(SERVER_URL);
 		createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, "some text");	
 		createServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200, String.format(GRID_STATUS_WITH_SESSION, "abcdef"));	
 		
@@ -1458,30 +1328,28 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	/**
 	 * Check that we get false if the grid is INACTIVE
-	 * @throws ClientProtocolException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testIsGridActiveWithRobotGridInactive() throws ClientProtocolException, IOException {
+	public void testIsGridActiveWithRobotGridInactive() {
 		
-		String hubStatus = "{" +
-				"\"http:\\u002f\\u002fnode1.company.com:5555\": {\r\n" + 
-				"    \"busy\": false,\r\n" + 
-				"    \"lastSessionStart\": \"2018-08-31T08:30:06Z\",\r\n" + 
-				"    \"version\": \"3.14.0\",\r\n" + 
-				"    \"usedTestSlots\": 0,\r\n" + 
-				"    \"testSlots\": 1,\r\n" + 
-				"    \"status\": \"INACTIVE\"\r\n" + 
-				"  },\r\n" + 
-				"  \"hub\": {\r\n" + 
-				"    \"version\": \"3.14.0\",\r\n" + 
-				"    \"status\": \"INACTIVE\"\r\n" + 
-				"  },\r\n" + 
-				"  \"success\": true\r\n" + 
-				"}";
+		String hubStatus = """
+{
+"http:\\u002f\\u002fnode1.company.com:5555": {
+    "busy": false,
+    "lastSessionStart": "2018-08-31T08:30:06Z",
+    "version": "3.14.0",
+    "usedTestSlots": 0,
+    "testSlots": 1,
+    "status": "INACTIVE"
+  },
+  "hub": {
+    "version": "3.14.0",
+    "status": "INACTIVE"
+  },
+  "success": true
+}""";
 		
-		SeleniumGridConnector connector = new SeleniumRobotGridConnector(SERVER_URL);
+		connector = new SeleniumRobotGridConnector(SERVER_URL);
 		createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, "some text");	
 		createServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200, hubStatus);	
 		
@@ -1490,22 +1358,20 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	/**
 	 * Check that we get false if the grid is ACTIVE and no node is present
-	 * @throws ClientProtocolException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testIsGridActiveWithRobotGridActiveWithoutNodes() throws ClientProtocolException, IOException {
+	public void testIsGridActiveWithRobotGridActiveWithoutNodes() {
 		
-		String hubStatus = "{" +
-				"  \"hub\": {\r\n" + 
-				"    \"version\": \"3.14.0\",\r\n" + 
-				"    \"status\": \"ACTIVE\"\r\n" + 
-				"  },\r\n" + 
-				"  \"success\": true\r\n" + 
-				"}";
+		String hubStatus = """
+{" +
+  "hub": {
+    "version": "3.14.0",
+    "status": "ACTIVE"
+  },
+  "success": true
+}""";
 		
-		SeleniumGridConnector connector = new SeleniumRobotGridConnector(SERVER_URL);
+		connector = new SeleniumRobotGridConnector(SERVER_URL);
 		createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, "some text");	
 		createServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200, hubStatus);	
 		
@@ -1514,16 +1380,13 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	/**
 	 * Check that we get false if the status returned by grid is invalid (no JSON)
-	 * @throws ClientProtocolException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testIsGridActiveWithRobotGridActiveInvalidStatus() throws ClientProtocolException, IOException {
+	public void testIsGridActiveWithRobotGridActiveInvalidStatus() {
 		
 		String hubStatus = "null";
 		
-		SeleniumGridConnector connector = new SeleniumRobotGridConnector(SERVER_URL);
+		connector = new SeleniumRobotGridConnector(SERVER_URL);
 		createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, "some text");	
 		createServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200, hubStatus);	
 		
@@ -1532,16 +1395,13 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	/**
 	 * Check that we get false if the server returns code != 200
-	 * @throws ClientProtocolException
-	 * @throws IOException
-	 * @throws UnirestException
 	 */
 	@Test(groups={"ut"})
-	public void testIsGridActiveWithRobotGridReplyInError() throws ClientProtocolException, IOException {
+	public void testIsGridActiveWithRobotGridReplyInError()  {
 		
 		String hubStatus = "Internal Server Error";
 		
-		SeleniumGridConnector connector = new SeleniumRobotGridConnector(SERVER_URL);
+		connector = new SeleniumRobotGridConnector(SERVER_URL);
 		createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, "some text");	
 		createServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 500, hubStatus);	
 		
@@ -1549,14 +1409,14 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testGetSessionInformationFromGrid() throws UnsupportedOperationException, IOException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, UnirestException {
+	public void testGetSessionInformationFromGrid() throws UnsupportedOperationException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, UnirestException {
 		
 		createJsonServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200, String.format(GRID_STATUS_WITH_SESSION, "abcdef"));
 		
 		capabilities.setCapability(CapabilityType.BROWSER_NAME, "firefox");
 		capabilities.setCapability(CapabilityType.BROWSER_VERSION, "50.0");
 		
-		SeleniumRobotGridConnector connector = spy(new SeleniumRobotGridConnector(SERVER_URL));
+		connector = spy(new SeleniumRobotGridConnector(SERVER_URL));
 		
 		Logger logger = spy(SeleniumRobotLogger.getLogger(SeleniumGridConnector.class));
 		Field loggerField = SeleniumGridConnector.class.getDeclaredField("logger");
@@ -1575,14 +1435,14 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 
 
 	@Test(groups={"ut"})
-	public void testGetSessionInformationFromGridMultipleTries() throws UnsupportedOperationException, IOException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, UnirestException {
+	public void testGetSessionInformationFromGridMultipleTries() throws UnsupportedOperationException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, UnirestException {
 
 		createJsonServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200, String.format(GRID_STATUS_WITH_SESSION, "aaaaa"), String.format(GRID_STATUS_WITH_SESSION, "abcdef"));
 
 		capabilities.setCapability(CapabilityType.BROWSER_NAME, "firefox");
 		capabilities.setCapability(CapabilityType.BROWSER_VERSION, "50.0");
 
-		SeleniumGridConnector connector = spy(new SeleniumRobotGridConnector(SERVER_URL));
+		connector = spy(new SeleniumRobotGridConnector(SERVER_URL));
 
 		Logger logger = spy(SeleniumRobotLogger.getLogger(SeleniumGridConnector.class));
 		Field loggerField = SeleniumGridConnector.class.getDeclaredField("logger");
@@ -1599,14 +1459,14 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	}
 
 	@Test(groups={"ut"}, expectedExceptions = {WebDriverException.class})
-	public void testGetSessionInformationFromGridNotGet() throws UnsupportedOperationException, IOException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, UnirestException {
+	public void testGetSessionInformationFromGridNotGet() throws UnsupportedOperationException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, UnirestException {
 
 		createJsonServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200, String.format(GRID_STATUS_WITH_SESSION, "aaaaa"));
 
 		capabilities.setCapability(CapabilityType.BROWSER_NAME, "firefox");
 		capabilities.setCapability(CapabilityType.BROWSER_VERSION, "50.0");
 
-		SeleniumGridConnector connector = spy(new SeleniumRobotGridConnector(SERVER_URL));
+		connector = spy(new SeleniumRobotGridConnector(SERVER_URL));
 
 		Logger logger = spy(SeleniumRobotLogger.getLogger(SeleniumGridConnector.class));
 		Field loggerField = SeleniumGridConnector.class.getDeclaredField("logger");
@@ -1617,14 +1477,14 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	}
 
 	@Test(groups={"ut"})
-	public void testGetSessionInformationFromGridWithSecondDriver() throws UnsupportedOperationException, IOException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, UnirestException {
+	public void testGetSessionInformationFromGridWithSecondDriver() throws UnsupportedOperationException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, UnirestException {
 		
 		createJsonServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200, String.format(GRID_STATUS_WITH_SESSION, "abcdef"), String.format(GRID_STATUS_WITH_SESSION_OTHER_NODE, "ghijkl"));
 		
 		capabilities.setCapability(CapabilityType.BROWSER_NAME, "firefox");
 		capabilities.setCapability(CapabilityType.BROWSER_VERSION, "50.0");
 		
-		SeleniumRobotGridConnector connector = spy(new SeleniumRobotGridConnector(SERVER_URL));
+		connector = spy(new SeleniumRobotGridConnector(SERVER_URL));
 		
 		Logger logger = spy(SeleniumRobotLogger.getLogger(SeleniumGridConnector.class));
 		Field loggerField = SeleniumGridConnector.class.getDeclaredField("logger");
