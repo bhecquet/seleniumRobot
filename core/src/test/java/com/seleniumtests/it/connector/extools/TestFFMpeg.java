@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class TestFFMpeg extends GenericTest {
 
@@ -38,7 +39,7 @@ public class TestFFMpeg extends GenericTest {
         File videoFile = createFileFromResource("tu/video/videoCapture.avi");
         Path mp4VideoFile = Files.createTempFile("video", ".mp4");
 
-        mp4VideoFile.toFile().delete(); // delete file so that FFMPEG can create it
+        Files.deleteIfExists(mp4VideoFile); // delete file so that FFMPEG can create it
         mp4VideoFile.toFile().deleteOnExit();
 
         new FFMpeg().runFFmpegCommand(List.of("-i", videoFile.getAbsolutePath(), "-c:v", "libopenh264", "-preset", "veryfast", "-tune", "animation", mp4VideoFile.toAbsolutePath().toString()));
@@ -50,7 +51,7 @@ public class TestFFMpeg extends GenericTest {
         step2.setVideoTimeStamp(3040);
         step2.setDuration(10040L);
 
-        new FFMpeg().addChapters(mp4VideoFile.toFile(), List.of(step1, step2).stream()
+        new FFMpeg().addChapters(mp4VideoFile.toFile(), Stream.of(step1, step2)
                 .map(step -> new FFMpeg.Chapter(step.getName(), step.getVideoTimeStamp(), step.getVideoTimeStamp() + step.getDuration()))
                 .toList());
 

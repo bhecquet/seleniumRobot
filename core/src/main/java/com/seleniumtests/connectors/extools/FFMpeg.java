@@ -1,8 +1,22 @@
+/**
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
+ * 				Copyright 2017-2019 B.Hecquet
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * 	http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.seleniumtests.connectors.extools;
 
-/**
- * Interface to FFMpeg
- */
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -54,7 +68,6 @@ public class FFMpeg {
             out = OSCommand.executeCommandAndWait(new String[]{ffmpegPath, "-version"});
 
             if (!out.contains("libavutil")) {
-                System.out.println("FFMPEG out: " + out);
                 logger.error(out);
                 throw new ConfigurationException("FFmpeg is not installed at : " + ffmpegPath);
             }
@@ -108,29 +121,32 @@ public class FFMpeg {
 
         try {
             Path metadataFile = Files.createTempFile("metadata", ".txt");
-            metadataFile.toFile().delete();
+            Files.deleteIfExists(metadataFile);
             Path newVideoFile = Files.createTempFile("newVideo", ".mp4");
-            newVideoFile.toFile().delete();
+            Files.deleteIfExists(newVideoFile);
 
             StringBuilder content = new StringBuilder();
             for (Chapter chapter : chapters) {
-                content.append("\n[CHAPTER]\n");
-                content.append("TIMEBASE=1/1000\n");
-                content.append(String.format("START=%d\n", chapter.startTimestamp));
-                content.append(String.format("END=%d\n", chapter.endTimestamp));
-                content.append(String.format("title=%s\n\n", chapter.name));
+                content.append("\n[CHAPTER]\n")
+                        .append("TIMEBASE=1/1000\n")
+                        .append(String.format("START=%d", chapter.startTimestamp))
+                        .append("\n")
+                        .append(String.format("END=%d", chapter.endTimestamp))
+                        .append("\n")
+                        .append(String.format("title=%s", chapter.name))
+                        .append("\n\n");
             }
 
-            String out = runFFmpegCommand(List.of("-i", videoFile.getAbsolutePath(), "-f", "ffmetadata", metadataFile.toAbsolutePath().toString()));
+            runFFmpegCommand(List.of("-i", videoFile.getAbsolutePath(), "-f", "ffmetadata", metadataFile.toAbsolutePath().toString()));
 
             FileUtils.writeStringToFile(metadataFile.toFile(), content.toString(), StandardCharsets.UTF_8, true);
 
-            out = runFFmpegCommand(List.of("-i", videoFile.getAbsolutePath(), "-i", metadataFile.toAbsolutePath().toString(), "-map_metadata", "1", "-codec", "copy", newVideoFile.toAbsolutePath().toString()));
+            runFFmpegCommand(List.of("-i", videoFile.getAbsolutePath(), "-i", metadataFile.toAbsolutePath().toString(), "-map_metadata", "1", "-codec", "copy", newVideoFile.toAbsolutePath().toString()));
             FileUtils.copyFile(newVideoFile.toFile(), videoFile, StandardCopyOption.REPLACE_EXISTING);
-            newVideoFile.toFile().delete();
-            metadataFile.toFile().delete();
+            Files.deleteIfExists(newVideoFile);
+            Files.deleteIfExists(metadataFile);
         } catch (IOException e) {
-            logger.warn("Could not create metadatafile: " + e.getMessage());
+            logger.warn("Could not create metadatafile: {}", e.getMessage());
         }
     }
 }

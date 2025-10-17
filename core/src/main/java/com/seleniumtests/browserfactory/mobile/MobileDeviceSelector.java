@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -89,7 +89,7 @@ public class MobileDeviceSelector {
 	/**
 	 * Returns the mobile device corresponding to the device name and/or OS version specified in test properties
 	 * @throws ConfigurationException if no relevant device is found
-	 * @return
+	 * @return the mobile device that match capabilities
 	 */
 	public MobileDevice getRelevantMobileDevice(MutableCapabilities capabilities) {
 		isInitialized();
@@ -97,11 +97,9 @@ public class MobileDeviceSelector {
 		Object platformName = capabilities.getCapability(CapabilityType.PLATFORM_NAME);
 		Optional<String> platformVersion = new BaseOptions<>(capabilities).getPlatformVersion();
 		
-		if (deviceName == null
-				&& platformName == null
-				&& (!platformVersion.isPresent() || platformVersion.get() == null)
+		if (deviceName == null && platformName == null && platformVersion.isEmpty()
 				) {
-			throw new ConfigurationException("at least one mobile capaiblity must be provided: DEVICE_NAME, PLATFORM_NAME, PLATFORM_VERSION");
+			throw new ConfigurationException("at least one mobile capability must be provided: DEVICE_NAME, PLATFORM_NAME, PLATFORM_VERSION");
 		}
 		
 		List<MobileDevice> deviceList = new ArrayList<>();
@@ -120,17 +118,19 @@ public class MobileDeviceSelector {
 		
 		List<MobileDevice> filteredDeviceList = filterDevices(deviceList, 
 																deviceName == null ? null: deviceName.toString(), 
-																platformName == null ? null: platformName.toString(), 
-																platformVersion.isEmpty() ? null: platformVersion.get().toString()
+																platformName == null ? null: platformName.toString(),
+                												platformVersion.map(String::toString).orElse(null)
 		);
 		
 		if (filteredDeviceList.isEmpty()) {
 			StringBuilder message = new StringBuilder();
 			if (deviceName != null) {
 				message.append(String.format("deviceName=%s;", deviceName));
-			}if (platformName != null) {
+			}
+			if (platformName != null) {
 				message.append(String.format("platform=%s;", platformName));
-			}if (platformVersion != null) {
+			}
+			if (platformVersion.isPresent()) {
 				message.append(String.format("version=%s;", platformVersion));
 			}
 			throw new ConfigurationException(String.format("no matching device found. Looking for [%s] among: %s", message.toString(), deviceList));
@@ -143,8 +143,8 @@ public class MobileDeviceSelector {
 	/**
 	 * From input capabilities, (e.g: platform, version or device real name), update capabilities 
 	 * with deviceName, platform, version, or other useful data
-	 * @param capabilities
-	 * @return
+	 * @param capabilities	the capabilities to update
+	 * @return the updated capabilities
 	 */
 	public MutableCapabilities updateCapabilitiesWithSelectedDevice(MutableCapabilities capabilities, DriverMode driverMode) {
 		MobileDevice selectedDevice = getRelevantMobileDevice(capabilities);
@@ -156,7 +156,7 @@ public class MobileDeviceSelector {
 			updatedCapabilities.setDeviceName(selectedDevice.getName())
 					.setUdid(selectedDevice.getId());
 			
-			// set the right chromedriver executable according to android browser / chromeversion
+			// set the right chromedriver executable according to android browser / chrome version
 			// it's only the file name, not it's path
 			// set it for browser tests and also application tests (for webview automation)
 			if (driverMode == DriverMode.LOCAL) {
