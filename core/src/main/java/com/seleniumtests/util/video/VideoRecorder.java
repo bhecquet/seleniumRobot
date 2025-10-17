@@ -35,7 +35,6 @@ import javax.swing.WindowConstants;
 import com.seleniumtests.connectors.extools.FFMpeg;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.Nullable;
 import org.monte.media.av.Format;
 import org.monte.media.av.FormatKeys;
 import org.monte.media.av.codec.video.VideoFormatKeys;
@@ -204,7 +203,6 @@ public class VideoRecorder {
 		}
 	}
 
-	@Nullable
 	private File transcodeVideo(File videoFile) {
 		// encode file
 		if (ffmpeg != null) {
