@@ -351,7 +351,13 @@ public class PageObject extends BasePage implements IPage {
             windowHandle = driver.getWindowHandle();
 
             // store load time
-            TestStepManager.getCurrentOrPreviousStep().addPageLoadTime(new PageLoadTime(driver.getCurrentUrl(), this, Duration.between(startLoading, stopLoading).toMillis()));
+            PageLoadTime pageLoadTime = new PageLoadTime(driver.getCurrentUrl(), this, Duration.between(startLoading, stopLoading).toMillis());
+
+            if (TestStepManager.getCurrentOrPreviousStep() == null) {
+                logger.warn(String.format("Page load '%s' cannot be recorded - no step", pageLoadTime));
+            } else {
+                TestStepManager.getCurrentOrPreviousStep().addPageLoadTime(pageLoadTime);
+            }
         }
     }
 
