@@ -21,7 +21,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.Platform;
 
@@ -33,7 +36,6 @@ import com.seleniumtests.util.osutility.OSUtility;
 
 /**
  * Class for managing iOS devices
- * @author behe
  *
  */
 public class InstrumentsWrapper {
@@ -44,6 +46,7 @@ public class InstrumentsWrapper {
 	// Apple TV 1080p (10.2) [6444F65D-DA15-4505-8307-4520FD346ACE] (Simulator)
 	// Mac mini [CBFA063D-2535-5FD8-BA05-CE8D3683D6BA]
 	public static final String DEVICES = "devices";
+	private static final Logger logger = SeleniumRobotLogger.getLogger(InstrumentsWrapper.class);
 
 
 	public InstrumentsWrapper() {
@@ -67,8 +70,17 @@ public class InstrumentsWrapper {
 	public List<MobileDevice> parseIosDevices() {
 		String output = OSCommand.executeCommandAndWait(new String[] {"xcrun", "simctl", "list", DEVICES, "available", "--json"});
 		List<MobileDevice> devList = new ArrayList<>();
-		
-		JSONObject devicesJson = new JSONObject(output);
+
+		JSONObject devicesJson;
+		try {
+			devicesJson = new JSONObject(output);
+		} catch (JSONException e) {
+			logger.error(output);
+			if (output.contains("XCode") || output.contains("license")) {
+				logger.error("XCode license has not been accepted, use 'sudo xcodebuild -license");
+			}
+			return devList;
+		}
 		
 		for (String family: devicesJson.getJSONObject(DEVICES).keySet()) {
 			if (!family.contains("iOS")) {

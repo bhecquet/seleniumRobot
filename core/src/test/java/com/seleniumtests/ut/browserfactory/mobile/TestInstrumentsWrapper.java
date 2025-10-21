@@ -95,5 +95,22 @@ public class TestInstrumentsWrapper extends MockitoTest {
 			Assert.assertEquals(devs.get(1).getBrowsers().get(0).getBrowser(), BrowserType.SAFARI);
 		}
 	}
+
+	@Test(groups={"ut"})
+	public void testiOSDeviceRetrievingLicenseNotValidated() {
+		try (MockedStatic<OSCommand> mockedOSCommand = mockStatic(OSCommand.class);
+			 MockedStatic<OSUtility> mockedOSUtility = mockStatic(OSUtility.class)) {
+
+			mockedOSCommand.when(() -> OSCommand.executeCommandAndWait(new String[] {"xcrun"})).thenReturn("Usage: xcrun [options] <tool name> ... arguments ...");
+			mockedOSUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.MAC);
+
+			mockedOSCommand.when(() -> OSCommand.executeCommandAndWait(new String[] {"xcrun", "simctl", "list", "devices", "available", "--json"})).thenReturn("You must accept XCode license");
+
+			InstrumentsWrapper wrapper = new InstrumentsWrapper();
+			List<MobileDevice> devs = wrapper.parseIosDevices();
+
+			Assert.assertEquals(devs.size(), 0);
+		}
+	}
 	
 }
