@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,7 +36,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -52,7 +51,6 @@ import org.apache.commons.io.FileUtils;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.openqa.selenium.*;
 import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.TargetLocator;
@@ -115,13 +113,13 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	private CustomEventFiringWebDriver eventDriver;
 	private CustomEventFiringWebDriver attachedEventDriver;
 
-	private MockedStatic mockedOsUtilityFactory;
-	private MockedStatic mockedCustomEventFiringWebDriver;
-	private MockedStatic mockedMouse;
+	private MockedStatic<OSUtilityFactory> mockedOsUtilityFactory;
+	private MockedStatic<CustomEventFiringWebDriver> mockedCustomEventFiringWebDriver;
+	private MockedStatic<MouseInfo> mockedMouse;
 
 
 	@BeforeMethod(groups={"ut"})
-	private void init() throws Exception {
+	private void init() {
 
 		when(driver.getCapabilities()).thenReturn(new DesiredCapabilities()); // add capabilities to allow augmenting driver
 		
@@ -137,13 +135,13 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		when(window.getSize()).thenReturn(new Dimension(100, 100));
 		
 		mockedOsUtilityFactory = mockStatic(OSUtilityFactory.class);
-		mockedOsUtilityFactory.when(() -> OSUtilityFactory.getInstance()).thenReturn(osUtility);
+		mockedOsUtilityFactory.when(OSUtilityFactory::getInstance).thenReturn(osUtility);
 
 		mockedCustomEventFiringWebDriver = mockStatic(CustomEventFiringWebDriver.class, CALLS_REAL_METHODS);
-		mockedCustomEventFiringWebDriver.when(() -> CustomEventFiringWebDriver.getScreensRectangle()).thenReturn(new Rectangle(1900, 1000));
+		mockedCustomEventFiringWebDriver.when(CustomEventFiringWebDriver::getScreensRectangle).thenReturn(new Rectangle(1900, 1000));
 
 		mockedMouse = mockStatic(MouseInfo.class);
-		mockedMouse.when(() -> MouseInfo.getPointerInfo()).thenReturn(pointerInfo);
+		mockedMouse.when(MouseInfo::getPointerInfo).thenReturn(pointerInfo);
 		when(pointerInfo.getLocation()).thenReturn(new java.awt.Point(2, 3));
 		CustomEventFiringWebDriver.resetVideoRecorder();
 
@@ -166,15 +164,15 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testConstructor() {
 
 		WebDriver realDriver = new HtmlUnitDriver();
-		try (MockedConstruction mockedAugmenter = mockConstruction(Augmenter.class, (augmenter, context) -> {
-			doAnswer((invocation) -> {
+		try (MockedConstruction<Augmenter> mockedAugmenter = mockConstruction(Augmenter.class, (augmenter, context) -> {
+			doAnswer(invocation -> {
 				return realDriver;
 			}).when(augmenter).augment(any());
-		});
+		})
 		) {
 
 			new CustomEventFiringWebDriver(realDriver, null, browserInfo, TestType.WEB, DriverMode.LOCAL, null);
-			verify((Augmenter) mockedAugmenter.constructed().get(0)).augment(realDriver);
+			verify(mockedAugmenter.constructed().get(0)).augment(realDriver);
 		}
 	}
 
@@ -188,7 +186,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 * We shoud get a generated id
 	 */
 	@Test(groups = {"ut"})
-	public void testGetSessionIdWithIncopmatibleDriver() {
+	public void testGetSessionIdWithIncompatibleDriver() {
 		when(driver.getSessionId()).thenThrow(ClassCastException.class);
 		Assert.assertNotEquals(eventDriver.getSessionId(), "1234");
 	}
@@ -237,7 +235,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 
 	@Test(groups = {"ut"})
 	public void testIsBrowserOrAppClosedWithBrowserPresent() {
-		when(driver.getWindowHandles()).thenReturn(new TreeSet<>(Arrays.asList("12345")));
+		when(driver.getWindowHandles()).thenReturn(new TreeSet<>(List.of("12345")));
 		Assert.assertFalse(eventDriver.isBrowserOrAppClosed());
 	}
 	@Test(groups = {"ut"})
@@ -247,13 +245,13 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	}
 	@Test(groups = {"ut"})
 	public void testIsBrowserOrAppClosedWithoutBrowser() {
-		when(driver.getWindowHandles()).thenReturn(new TreeSet<>(Arrays.asList("12345")));
+		when(driver.getWindowHandles()).thenReturn(new TreeSet<>(List.of("12345")));
 		when(eventDriver.getSessionId()).thenThrow(NoSuchSessionException.class);
 		Assert.assertTrue(eventDriver.isBrowserOrAppClosed());
 	}
 	@Test(groups = {"ut"})
 	public void testIsBrowserOrAppClosedWithoutBrowser2() {
-		when(driver.getWindowHandles()).thenReturn(new TreeSet<>(Arrays.asList("12345")));
+		when(driver.getWindowHandles()).thenReturn(new TreeSet<>(List.of("12345")));
 		when(eventDriver.getCapabilities()).thenThrow(UnsupportedCommandException.class);
 		Assert.assertTrue(eventDriver.isBrowserOrAppClosed());
 	}
@@ -365,7 +363,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 * Test the case where driver cannot return page source (case for mobile browsers or old edge versions for example)
 	 */
 	@Test(groups = {"ut"})
-	public void testGetPageSourceWithIncopmatibleDriver() {
+	public void testGetPageSourceWithIncompatibleDriver() {
 		doThrow(new WebDriverException("some error")).when(driver).getPageSource();
 		Assert.assertNull(eventDriver.getPageSource());
 	}
@@ -387,7 +385,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testContentDimension() {
-		when(driver.executeScript(anyString(), eq(true))).thenReturn(Arrays.asList(120L, 80L));
+		when(driver.executeScript(anyString(), eq(true))).thenReturn(List.of(120L, 80L));
 		Dimension dim = eventDriver.getContentDimension();
 		
 		// no need to switch to default content if size is correctly returned
@@ -403,7 +401,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testContentDimensionWithZoomFactor() {
-		when(driver.executeScript(anyString(), eq(true))).thenReturn(Arrays.asList(120.5, 80.67));
+		when(driver.executeScript(anyString(), eq(true))).thenReturn(List.of(120.5, 80.67));
 		Dimension dim = eventDriver.getContentDimension();
 		
 		// check we get the window dimension
@@ -418,7 +416,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testContentDimensionNotGet() {
-		when(driver.executeScript(anyString(), eq(true))).thenReturn(Arrays.asList(100, 0)).thenReturn(Arrays.asList(120, 80));
+		when(driver.executeScript(anyString(), eq(true))).thenReturn(List.of(100, 0)).thenReturn(List.of(120, 80));
 		Dimension dim = eventDriver.getContentDimension();
 		
 		verify(driver).switchTo();
@@ -429,7 +427,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	}
 	@Test(groups = {"ut"})
 	public void testContentDimensionNotGet2() {
-		when(driver.executeScript(anyString(), eq(true))).thenReturn(Arrays.asList(0, 100)).thenReturn(Arrays.asList(120, 80));
+		when(driver.executeScript(anyString(), eq(true))).thenReturn(List.of(0, 100)).thenReturn(List.of(120, 80));
 		Dimension dim = eventDriver.getContentDimension();
 		
 		verify(driver).switchTo();
@@ -444,7 +442,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testContentDimensionNonWebTest() {
-		when(mobileDriver.executeScript(anyString())).thenReturn(Arrays.asList(120L, 80L));
+		when(mobileDriver.executeScript(anyString())).thenReturn(List.of(120L, 80L));
 		when(mobileDriver.getContext()).thenReturn("NATIVE_APP");
 		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APP, DriverMode.LOCAL, null));
 
@@ -568,7 +566,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testScrollPosition() {
-		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(120L, 80L));
+		when(driver.executeScript(anyString())).thenReturn(List.of(120L, 80L));
 		Point point = eventDriver.getScrollPosition();
 		
 		// check we get the scroll position
@@ -581,7 +579,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testScrollPositionWithZoomFactor() {
-		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(120.5, 80.67));
+		when(driver.executeScript(anyString())).thenReturn(List.of(120.5, 80.67));
 		Point point = eventDriver.getScrollPosition();
 		
 		// check we get the window dimension
@@ -596,7 +594,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testScrollPositionNonWebTest() {
 		when(mobileDriver.getContext()).thenReturn("NATIVE_APP");
 		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APP, DriverMode.LOCAL, null));
-		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(120L, 80L));
+		when(driver.executeScript(anyString())).thenReturn(List.of(120L, 80L));
 		eventDriver.getScrollPosition();
 
 	}
@@ -631,7 +629,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testQuit() {
-		when(browserInfo.getAllBrowserSubprocessPids(new ArrayList<>())).thenReturn(Arrays.asList(1000L));
+		when(browserInfo.getAllBrowserSubprocessPids(new ArrayList<>())).thenReturn(List.of(1000L));
 		
 		eventDriver.quit();
 		verify(osUtility).killProcess("1000", true);
@@ -642,10 +640,10 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testQuitWithAttachedChromeBrowser() {
-		when(browserInfo.getAllBrowserSubprocessPids(new ArrayList<>())).thenReturn(Arrays.asList(1000L));
+		when(browserInfo.getAllBrowserSubprocessPids(new ArrayList<>())).thenReturn(List.of(1000L));
 		when(osUtility.getProcessIdByListeningPort(12345)).thenReturn(1001);
 		
-		((CustomEventFiringWebDriver)attachedEventDriver).quit();
+		attachedEventDriver.quit();
 		verify(osUtility).killProcess("1000", true);
 		verify(osUtility).killProcess("1001", true);
 	}
@@ -655,13 +653,15 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testQuitInErrorLocal() {
-		when(browserInfo.getAllBrowserSubprocessPids(new ArrayList<>())).thenReturn(Arrays.asList(1000L));
+		when(browserInfo.getAllBrowserSubprocessPids(new ArrayList<>())).thenReturn(List.of(1000L));
 		when(capabilities.getCapability(SeleniumRobotCapabilityType.GRID_NODE_URL)).thenReturn(null);
 		doThrow(new WebDriverException("some error")).when(driver).quit();
 		
 		try {
 			eventDriver.quit();
-		} catch (WebDriverException e) {}
+		} catch (WebDriverException e) {
+			// ignore
+		}
 		verify(osUtility).killProcess("1000", true);
 		
 		// this test is "local", so no node is available, we won't try to stop session on grid node
@@ -675,13 +675,15 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testQuitInErrorOnGrid() {
 		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, browserInfo, TestType.WEB, DriverMode.LOCAL, gridConnector));
 		
-		when(browserInfo.getAllBrowserSubprocessPids(new ArrayList<>())).thenReturn(Arrays.asList(1000L));
+		when(browserInfo.getAllBrowserSubprocessPids(new ArrayList<>())).thenReturn(List.of(1000L));
 		when(capabilities.getCapability(SeleniumRobotCapabilityType.GRID_NODE_URL)).thenReturn("http://grid-node:5555");
 		doThrow(new WebDriverException("some error")).when(driver).quit();
 		
 		try {
 			eventDriver.quit();
-		} catch (WebDriverException e) {}
+		} catch (WebDriverException e) {
+			//
+		}
 		verify(osUtility).killProcess("1000", true);
 		
 		// this test is "local", so no node is available, we won't try to stop session on grid node
@@ -725,11 +727,10 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	
 	/**
 	 * Test mouse coordinates in headless mode: an error should be raised because there is no session
-	 * @throws Exception 
 	 */
 	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
-	public void testMouseCoordinatesOnDesktopWithoutDesktop() throws Exception {
-		mockedMouse.when(() -> MouseInfo.getPointerInfo()).thenThrow(new HeadlessException());
+	public void testMouseCoordinatesOnDesktopWithoutDesktop() {
+		mockedMouse.when(MouseInfo::getPointerInfo).thenThrow(new HeadlessException());
 		CustomEventFiringWebDriver.getMouseCoordinates(DriverMode.LOCAL, gridConnector);
 	}
 
@@ -737,7 +738,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 * Test mouse coordinates in grid mode
 	 */
 	@Test(groups = {"ut"})
-	public void testMouseCoordinateskOnDesktopWithGrid() {
+	public void testMouseCoordinatesOnDesktopWithGrid() {
 		CustomEventFiringWebDriver.getMouseCoordinates(DriverMode.GRID, gridConnector);
 		
 
@@ -751,11 +752,11 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Test(groups = {"ut"})
 	public void testLeftClickOnDesktop() {
 
-		try (MockedConstruction mockedRobot = mockConstruction(Robot.class);
-			MockedConstruction mockedVideoRecorder = mockConstruction(VideoRecorder.class)
+		try (MockedConstruction<Robot> mockedRobot = mockConstruction(Robot.class);
+			MockedConstruction<VideoRecorder> mockedVideoRecorder = mockConstruction(VideoRecorder.class)
 		) {
 			CustomEventFiringWebDriver.leftClicOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
-			Robot robot = (Robot) mockedRobot.constructed().get(0);
+			Robot robot = mockedRobot.constructed().get(0);
 
 			verify(robot).mousePress(InputEvent.BUTTON1_DOWN_MASK);
 			verify(robot).mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
@@ -770,16 +771,16 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Test(groups = {"ut"})
 	public void testLeftClickOnDesktopWithVideoCapture() throws IOException {
 
-		try (MockedConstruction mockedRobot = mockConstruction(Robot.class);
-			 MockedConstruction mockedVideoRecorder = mockConstruction(VideoRecorder.class)
+		try (MockedConstruction<Robot> mockedRobot = mockConstruction(Robot.class);
+			 MockedConstruction<VideoRecorder> mockedVideoRecorder = mockConstruction(VideoRecorder.class)
 		) {
 			File videoFolder = File.createTempFile("video", ".avi").getParentFile();
 			CustomEventFiringWebDriver.startVideoCapture(DriverMode.LOCAL, gridConnector, videoFolder, "video.avi");
 
 			CustomEventFiringWebDriver.leftClicOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
 
-			Robot robot = (Robot) mockedRobot.constructed().get(0);
-			VideoRecorder videoRecorder = (VideoRecorder) mockedVideoRecorder.constructed().get(0);
+			Robot robot = mockedRobot.constructed().get(0);
+			VideoRecorder videoRecorder = mockedVideoRecorder.constructed().get(0);
 			verify(robot).mousePress(InputEvent.BUTTON1_DOWN_MASK);
 			verify(robot).mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
 			verify(robot).mouseMove(0, 0);
@@ -793,19 +794,20 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Test(groups = {"ut"})
 	public void testLeftClickOnDesktopWithVideoCaptureAndError() throws IOException {
 
-		try (MockedConstruction mockedRobot = mockConstruction(Robot.class, (mock, context) -> {
+		try (MockedConstruction<Robot> mockedRobot = mockConstruction(Robot.class, (mock, context) -> {
 				doThrow(AWTError.class).when(mock).mousePress(InputEvent.BUTTON1_DOWN_MASK);
 			});
-			 MockedConstruction mockedVideoRecorder = mockConstruction(VideoRecorder.class)
+			 MockedConstruction<VideoRecorder> mockedVideoRecorder = mockConstruction(VideoRecorder.class)
 		) {
 			File videoFolder = File.createTempFile("video", ".avi").getParentFile();
 			CustomEventFiringWebDriver.startVideoCapture(DriverMode.LOCAL, gridConnector, videoFolder, "video.avi");
 
-			VideoRecorder videoRecorder = (VideoRecorder) mockedVideoRecorder.constructed().get(0);
+			VideoRecorder videoRecorder = mockedVideoRecorder.constructed().get(0);
 
 			try {
 				CustomEventFiringWebDriver.leftClicOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
 			} catch (AWTError e) {
+				//
 			}
 
 			verify(videoRecorder).disableStepDisplay();
@@ -815,7 +817,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	
 	@Test(groups = {"ut"})
 	public void testLeftClickOnDesktopMainScreen() {
-		try (MockedConstruction mockedRobot = mockConstruction(Robot.class)) {
+		try (MockedConstruction<Robot> mockedRobot = mockConstruction(Robot.class)) {
 			CustomEventFiringWebDriver.leftClicOnDesktopAt(true, 0, 0, DriverMode.LOCAL, gridConnector);
 
 			Robot robot = (Robot) mockedRobot.constructed().get(0);
@@ -828,11 +830,10 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	
 	/**
 	 * Test left click in headless mode: an error should be raised because there is no session
-	 * @throws Exception 
 	 */
 	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
-	public void testLeftClickOnDesktopWithoutDesktop() throws Exception {
-		try (MockedConstruction mockedRobot = mockConstructionWithAnswer(Robot.class, (invocation) -> {
+	public void testLeftClickOnDesktopWithoutDesktop() {
+		try (MockedConstruction<Robot> mockedRobot = mockConstructionWithAnswer(Robot.class, invocation -> {
 			throw new AWTException("");
 		})) {
 			CustomEventFiringWebDriver.leftClicOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
@@ -841,10 +842,9 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	
 	/**
 	 * Test left click with device providers: this is not supported, so exception should be raised
-	 * @throws Exception 
 	 */
 	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
-	public void testLeftClickWithDeviceProviders() throws Exception {
+	public void testLeftClickWithDeviceProviders() {
 		CustomEventFiringWebDriver.leftClicOnDesktopAt(0, 0, DriverMode.SAUCELABS, gridConnector);
 	}
 	
@@ -853,7 +853,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testLeftClickOnDesktopWithGrid() {
-		try (MockedConstruction mockedRobot = mockConstruction(Robot.class)) {
+		try (MockedConstruction<Robot> mockedRobot = mockConstruction(Robot.class)) {
 			CustomEventFiringWebDriver.leftClicOnDesktopAt(0, 0, DriverMode.GRID, gridConnector);
 
 			// in GRID mode, Robot is never called
@@ -864,7 +864,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	
 	@Test(groups = {"ut"})
 	public void testLeftClickOnDesktopWithGridMainScreen() {
-		try (MockedConstruction mockedRobot = mockConstruction(Robot.class)) {
+		try (MockedConstruction<Robot> mockedRobot = mockConstruction(Robot.class)) {
 			CustomEventFiringWebDriver.leftClicOnDesktopAt(true, 0, 0, DriverMode.GRID, gridConnector);
 
 			// in GRID mode, Robot is never called
@@ -878,8 +878,8 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testDoubleClickOnDesktop() {
-		try (MockedConstruction mockedRobot = mockConstruction(Robot.class);
-			 MockedConstruction mockedVideoRecorder = mockConstruction(VideoRecorder.class)
+		try (MockedConstruction<Robot> mockedRobot = mockConstruction(Robot.class);
+			 MockedConstruction<VideoRecorder> mockedVideoRecorder = mockConstruction(VideoRecorder.class)
 		) {
 			CustomEventFiringWebDriver.doubleClickOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
 
@@ -896,8 +896,8 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 
 	@Test(groups = {"ut"})
 	public void testDoubleClickOnDesktopWithVideoCapture() throws IOException {
-		try (MockedConstruction mockedRobot = mockConstruction(Robot.class);
-			 MockedConstruction mockedVideoRecorder = mockConstruction(VideoRecorder.class)
+		try (MockedConstruction<Robot> mockedRobot = mockConstruction(Robot.class);
+			 MockedConstruction<VideoRecorder> mockedVideoRecorder = mockConstruction(VideoRecorder.class)
 		) {
 			File videoFolder = File.createTempFile("video", ".avi").getParentFile();
 			CustomEventFiringWebDriver.startVideoCapture(DriverMode.LOCAL, gridConnector, videoFolder, "video.avi");
@@ -919,10 +919,10 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Test(groups = {"ut"})
 	public void testDoubleClickOnDesktopWithVideoCaptureAndError() throws IOException {
 
-		try (MockedConstruction mockedRobot = mockConstruction(Robot.class, (mock, context) -> {
+		try (MockedConstruction<Robot> mockedRobot = mockConstruction(Robot.class, (mock, context) -> {
 				doThrow(AWTError.class).when(mock).mousePress(InputEvent.BUTTON1_DOWN_MASK);
 			});
-			 MockedConstruction mockedVideoRecorder = mockConstruction(VideoRecorder.class)
+			 MockedConstruction<VideoRecorder> mockedVideoRecorder = mockConstruction(VideoRecorder.class)
 		) {
 			File videoFolder = File.createTempFile("video", ".avi").getParentFile();
 			CustomEventFiringWebDriver.startVideoCapture(DriverMode.LOCAL, gridConnector, videoFolder, "video.avi");
@@ -932,6 +932,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 			try {
 				CustomEventFiringWebDriver.doubleClickOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
 			} catch (AWTError e) {
+				//
 			}
 
 			verify(videoRecorder).disableStepDisplay();
@@ -941,11 +942,10 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	
 	/**
 	 * Test double click in headless mode: an error should be raised because there is no session
-	 * @throws Exception 
 	 */
 	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
-	public void testDoubleClickOnDesktopWithoutDesktop() throws Exception {
-		try (MockedConstruction mockedRobot = mockConstructionWithAnswer(Robot.class, (invocation) -> {
+	public void testDoubleClickOnDesktopWithoutDesktop() {
+		try (MockedConstruction<Robot> mockedRobot = mockConstructionWithAnswer(Robot.class, invocation -> {
 			throw new AWTException("");
 		})) {
 			CustomEventFiringWebDriver.doubleClickOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
@@ -954,10 +954,9 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	
 	/**
 	 * Test double click with device providers: this is not supported, so exception should be raised
-	 * @throws Exception 
 	 */
 	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
-	public void testDoubleClickWithDeviceProviders() throws Exception {
+	public void testDoubleClickWithDeviceProviders() {
 		CustomEventFiringWebDriver.doubleClickOnDesktopAt(0, 0, DriverMode.SAUCELABS, gridConnector);
 	}
 	
@@ -966,7 +965,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testDoubleClickOnDesktopWithGrid() {
-		try (MockedConstruction mockedRobot = mockConstruction(Robot.class)) {
+		try (MockedConstruction<Robot> mockedRobot = mockConstruction(Robot.class)) {
 			CustomEventFiringWebDriver.doubleClickOnDesktopAt(0, 0, DriverMode.GRID, gridConnector);
 
 			// in GRID mode, Robot is never called
@@ -977,7 +976,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	
 	@Test(groups = {"ut"})
 	public void testDoubleClickOnDesktopWithGridMainScreen() {
-		try (MockedConstruction mockedRobot = mockConstruction(Robot.class)) {
+		try (MockedConstruction<Robot> mockedRobot = mockConstruction(Robot.class)) {
 			CustomEventFiringWebDriver.doubleClickOnDesktopAt(true, 0, 0, DriverMode.GRID, gridConnector);
 
 			// in GRID mode, Robot is never called
@@ -991,12 +990,12 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testRightClickOnDesktop() {
-		try (MockedConstruction mockedRobot = mockConstruction(Robot.class);
-			 MockedConstruction mockedVideoRecorder = mockConstruction(VideoRecorder.class)
+		try (MockedConstruction<Robot> mockedRobot = mockConstruction(Robot.class);
+			 MockedConstruction<VideoRecorder> mockedVideoRecorder = mockConstruction(VideoRecorder.class)
 		) {
 			CustomEventFiringWebDriver.rightClicOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
 
-			Robot robot = (Robot) mockedRobot.constructed().get(0);
+			Robot robot = mockedRobot.constructed().get(0);
 			verify(robot).mousePress(InputEvent.BUTTON3_DOWN_MASK);
 			verify(robot).mouseRelease(InputEvent.BUTTON3_DOWN_MASK);
 			verify(robot).mouseMove(0, 0);
@@ -1009,16 +1008,16 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 
 	@Test(groups = {"ut"})
 	public void testRightClickOnDesktopWithVideoCapture() throws IOException {
-		try (MockedConstruction mockedRobot = mockConstruction(Robot.class);
-			 MockedConstruction mockedVideoRecorder = mockConstruction(VideoRecorder.class)
+		try (MockedConstruction<Robot> mockedRobot = mockConstruction(Robot.class);
+			 MockedConstruction<VideoRecorder> mockedVideoRecorder = mockConstruction(VideoRecorder.class)
 		) {
 			File videoFolder = File.createTempFile("video", ".avi").getParentFile();
 			CustomEventFiringWebDriver.startVideoCapture(DriverMode.LOCAL, gridConnector, videoFolder, "video.avi");
 
 			CustomEventFiringWebDriver.rightClicOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
 
-			Robot robot = (Robot) mockedRobot.constructed().get(0);
-			VideoRecorder videoRecorder = (VideoRecorder) mockedVideoRecorder.constructed().get(0);
+			Robot robot = mockedRobot.constructed().get(0);
+			VideoRecorder videoRecorder = mockedVideoRecorder.constructed().get(0);
 			verify(robot).mousePress(InputEvent.BUTTON3_DOWN_MASK);
 			verify(robot).mouseRelease(InputEvent.BUTTON3_DOWN_MASK);
 			verify(robot).mouseMove(0, 0);
@@ -1031,17 +1030,18 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	
 	@Test(groups = {"ut"})
 	public void testRightClickOnDesktopWithVideoCaptureAndError() throws IOException {
-		try (MockedConstruction mockedRobot = mockConstruction(Robot.class, (mock, context) -> {
+		try (MockedConstruction<Robot> mockedRobot = mockConstruction(Robot.class, (mock, context) -> {
 				doThrow(AWTError.class).when(mock).mousePress(InputEvent.BUTTON1_DOWN_MASK);
 			});
-			 MockedConstruction mockedVideoRecorder = mockConstruction(VideoRecorder.class)) {
+			 MockedConstruction<VideoRecorder> mockedVideoRecorder = mockConstruction(VideoRecorder.class)) {
 			File videoFolder = File.createTempFile("video", ".avi").getParentFile();
 			CustomEventFiringWebDriver.startVideoCapture(DriverMode.LOCAL, gridConnector, videoFolder, "video.avi");
 
-			VideoRecorder videoRecorder = (VideoRecorder) mockedVideoRecorder.constructed().get(0);
+			VideoRecorder videoRecorder = mockedVideoRecorder.constructed().get(0);
 			try {
 				CustomEventFiringWebDriver.rightClicOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
 			} catch (AWTError e) {
+				//
 			}
 
 			verify(videoRecorder).disableStepDisplay();
@@ -1051,10 +1051,10 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	
 	@Test(groups = {"ut"})
 	public void testRightClickOnDesktopMainScreen() {
-		try (MockedConstruction mockedRobot = mockConstruction(Robot.class)) {
+		try (MockedConstruction<Robot> mockedRobot = mockConstruction(Robot.class)) {
 			CustomEventFiringWebDriver.rightClicOnDesktopAt(true, 0, 0, DriverMode.LOCAL, gridConnector);
 
-			Robot robot = (Robot) mockedRobot.constructed().get(0);
+			Robot robot = mockedRobot.constructed().get(0);
 			verify(robot).mousePress(InputEvent.BUTTON3_DOWN_MASK);
 			verify(robot).mouseRelease(InputEvent.BUTTON3_DOWN_MASK);
 			verify(robot).mouseMove(0, 0);
@@ -1064,11 +1064,10 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	
 	/**
 	 * Test right clic in headless mode: an error should be raised because there is no session
-	 * @throws Exception 
 	 */
 	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
-	public void testRightClickOnDesktopWithoutDesktop() throws Exception {
-		try (MockedConstruction mockedRobot = mockConstructionWithAnswer(Robot.class, (invocation) -> {
+	public void testRightClickOnDesktopWithoutDesktop() {
+		try (MockedConstruction<Robot> mockedRobot = mockConstructionWithAnswer(Robot.class, invocation -> {
 			throw new AWTException("");
 		})) {
 			CustomEventFiringWebDriver.rightClicOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
@@ -1077,10 +1076,9 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 
 	/**
 	 * Test right click with device providers: this is not supported, so exception should be raised
-	 * @throws Exception 
 	 */
 	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
-	public void testRightClickWithDeviceProviders() throws Exception {
+	public void testRightClickWithDeviceProviders() {
 		CustomEventFiringWebDriver.rightClicOnDesktopAt(0, 0, DriverMode.SAUCELABS, gridConnector);
 	}
 	
@@ -1089,7 +1087,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testRightClickOnDesktopWithGrid() {
-		try (MockedConstruction mockedRobot = mockConstruction(Robot.class)) {
+		try (MockedConstruction<Robot> mockedRobot = mockConstruction(Robot.class)) {
 			CustomEventFiringWebDriver.rightClicOnDesktopAt(0, 0, DriverMode.GRID, gridConnector);
 
 			Assert.assertEquals(mockedRobot.constructed().size(), 0);
@@ -1099,7 +1097,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	
 	@Test(groups = {"ut"})
 	public void testRightClickOnDesktopWithGridMainScreen() {
-		try (MockedConstruction mockedRobot = mockConstruction(Robot.class)) {
+		try (MockedConstruction<Robot> mockedRobot = mockConstruction(Robot.class)) {
 			CustomEventFiringWebDriver.rightClicOnDesktopAt(true, 0, 0, DriverMode.GRID, gridConnector);
 
 			// check Robot is never created in GRID mode
@@ -1113,11 +1111,11 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testWriteToDesktop() {
-		try (MockedConstruction mockedKeyboard = mockConstruction(Keyboard.class)) {
+		try (MockedConstruction<Keyboard> mockedKeyboard = mockConstruction(Keyboard.class)) {
 
 			CustomEventFiringWebDriver.writeToDesktop("text", DriverMode.LOCAL, gridConnector);
 
-			Keyboard keyboard = (Keyboard) mockedKeyboard.constructed().get(0);
+			Keyboard keyboard = mockedKeyboard.constructed().get(0);
 			verify(keyboard).typeKeys("text");
 			verify(gridConnector, never()).writeText(anyString());
 		}
@@ -1125,11 +1123,10 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 
 	/**
 	 * Write text in headless mode: an error should be raised because there is no session
-	 * @throws Exception 
 	 */
 	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
-	public void testWriteToDesktopWithoutDesktop() throws Exception {
-		try (MockedConstruction mockedKeyboard = mockConstructionWithAnswer(Keyboard.class, (invocation) -> {
+	public void testWriteToDesktopWithoutDesktop() {
+		try (MockedConstruction<Keyboard> mockedKeyboard = mockConstructionWithAnswer(Keyboard.class, invocation -> {
 			throw new AWTException("");
 		})) {
 			CustomEventFiringWebDriver.writeToDesktop("text", DriverMode.LOCAL, gridConnector);
@@ -1141,7 +1138,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 * @throws Exception 
 	 */
 	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
-	public void testWriteTextWithDeviceProviders() throws Exception {
+	public void testWriteTextWithDeviceProviders() {
 		CustomEventFiringWebDriver.writeToDesktop("text", DriverMode.SAUCELABS, gridConnector);
 	}
 	
@@ -1150,7 +1147,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testWriteToDesktopWithGrid() {
-		try (MockedConstruction mockedKeyboard = mockConstruction(Keyboard.class)) {
+		try (MockedConstruction<Keyboard> mockedKeyboard = mockConstruction(Keyboard.class)) {
 			CustomEventFiringWebDriver.writeToDesktop("text", DriverMode.GRID, gridConnector);
 
 			// check that in grid mode, Keyboard is never called
@@ -1173,10 +1170,9 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	
 	/**
 	 * write textk with device providers: this is not supported, so exception should be raised
-	 * @throws Exception 
 	 */
 	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
-	public void testDisplayRunningStepWithDeviceProviders() throws Exception {
+	public void testDisplayRunningStepWithDeviceProviders(){
 		VideoRecorder videoRecorder = new VideoRecorder(new File("video"), "foo.avi");
 		CustomEventFiringWebDriver.displayStepOnScreen("text", DriverMode.SAUCELABS, gridConnector, videoRecorder);
 	}
@@ -1199,8 +1195,8 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testSendKeysToDesktop() {
-		try (MockedConstruction mockedRobot = mockConstruction(Robot.class)) {
-			CustomEventFiringWebDriver.sendKeysToDesktop(Arrays.asList(10, 20), DriverMode.LOCAL, gridConnector);
+		try (MockedConstruction<Robot> mockedRobot = mockConstruction(Robot.class)) {
+			CustomEventFiringWebDriver.sendKeysToDesktop(List.of(10, 20), DriverMode.LOCAL, gridConnector);
 
 			Robot robot = (Robot) mockedRobot.constructed().get(0);
 			verify(robot).keyPress(10);
@@ -1213,24 +1209,22 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 
 	/**
 	 * Write text in headless mode: an error should be raised because there is no session
-	 * @throws Exception 
 	 */
 	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
-	public void testSendKeysToDesktopWithoutDesktop() throws Exception {
-		try (MockedConstruction mockedRobot = mockConstructionWithAnswer(Robot.class, (invocation) -> {
+	public void testSendKeysToDesktopWithoutDesktop(){
+		try (MockedConstruction<Robot> mockedRobot = mockConstructionWithAnswer(Robot.class, invocation -> {
 			throw new AWTException("");
 		})) {
-			CustomEventFiringWebDriver.sendKeysToDesktop(Arrays.asList(10, 20), DriverMode.LOCAL, gridConnector);
+			CustomEventFiringWebDriver.sendKeysToDesktop(List.of(10, 20), DriverMode.LOCAL, gridConnector);
 		}
 	}
 
 	/**
 	 * send keys with device providers: this is not supported, so exception should be raised
-	 * @throws Exception 
 	 */
 	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
-	public void testSendKeysWithDeviceProviders() throws Exception {
-		CustomEventFiringWebDriver.sendKeysToDesktop(Arrays.asList(10, 20), DriverMode.SAUCELABS, gridConnector);
+	public void testSendKeysWithDeviceProviders(){
+		CustomEventFiringWebDriver.sendKeysToDesktop(List.of(10, 20), DriverMode.SAUCELABS, gridConnector);
 	}
 	
 	/**
@@ -1238,8 +1232,8 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testSendKeysToDesktopWithGrid() {
-		try (MockedConstruction mockedRobot = mockConstruction(Robot.class)) {
-			CustomEventFiringWebDriver.sendKeysToDesktop(Arrays.asList(10, 20), DriverMode.GRID, gridConnector);
+		try (MockedConstruction<Robot> mockedRobot = mockConstruction(Robot.class)) {
+			CustomEventFiringWebDriver.sendKeysToDesktop(List.of(10, 20), DriverMode.GRID, gridConnector);
 
 			// check we do not create robot as we are not LOCAL
 			Assert.assertEquals(mockedRobot.constructed().size(), 0);
@@ -1249,7 +1243,6 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	
 	/**
 	 * capture picture in local mode, without video capture
-	 * @throws IOException 
 	 */
 	@Test(groups = {"ut"})
 	public void testCaptureDesktop() throws IOException {
@@ -1258,10 +1251,10 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/images/ffLogoConcat.png"), imageFile);
 		BufferedImage bi = ImageIO.read(imageFile);
 
-		try (MockedConstruction mockedRobot = mockConstruction(Robot.class, (mock, context) -> {
+		try (MockedConstruction<Robot> mockedRobot = mockConstruction(Robot.class, (mock, context) -> {
 				when(mock.createScreenCapture(any(Rectangle.class))).thenReturn(bi);
 			});
-			 MockedConstruction mockedVideoRecorder = mockConstruction(VideoRecorder.class)
+			 MockedConstruction<VideoRecorder> mockedVideoRecorder = mockConstruction(VideoRecorder.class)
 		) {
 
 			String b64img = CustomEventFiringWebDriver.captureDesktopToBase64String(DriverMode.LOCAL, gridConnector);
@@ -1274,7 +1267,6 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	
 	/**
 	 * Check that step display is disabled / enabled when video capture has started
-	 * @throws IOException
 	 */
 	@Test(groups = {"ut"})
 	public void testCaptureDesktopWithVideoCapture() throws IOException {
@@ -1284,10 +1276,10 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/images/ffLogoConcat.png"), imageFile);
 		BufferedImage bi = ImageIO.read(imageFile);
 
-		try (MockedConstruction mockedRobot = mockConstruction(Robot.class, (mock, context) -> {
+		try (MockedConstruction<Robot> mockedRobot = mockConstruction(Robot.class, (mock, context) -> {
 				when(mock.createScreenCapture(any(Rectangle.class))).thenReturn(bi);
 			});
-			 MockedConstruction mockedVideoRecorder = mockConstruction(VideoRecorder.class)
+			 MockedConstruction<VideoRecorder> mockedVideoRecorder = mockConstruction(VideoRecorder.class)
 		) {
 
 			File videoFolder = File.createTempFile("video", ".avi").getParentFile();
@@ -1297,7 +1289,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 			Assert.assertTrue(b64img.startsWith("iVBORw0KGgoAAAANSUhEUgAAALoAAACMCAIAAABETy"));
 			verify(gridConnector, never()).captureDesktopToBuffer();
 
-			VideoRecorder videoRecorder = (VideoRecorder) mockedVideoRecorder.constructed().get(0);
+			VideoRecorder videoRecorder = mockedVideoRecorder.constructed().get(0);
 			verify(videoRecorder).disableStepDisplay();
 			verify(videoRecorder).enableStepDisplay();
 		}
@@ -1305,14 +1297,13 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	
 	/**
 	 * Check that step display is disabled / enabled when video capture has started even if error occurs
-	 * @throws IOException
 	 */
 	@Test(groups = {"ut"})
 	public void testCaptureDesktopWithVideoCaptureAndError() throws IOException {
-		try (MockedConstruction mockedRobot = mockConstruction(Robot.class, (mock, context) -> {
+		try (MockedConstruction<Robot> mockedRobot = mockConstruction(Robot.class, (mock, context) -> {
 				when(mock.createScreenCapture(any(Rectangle.class))).thenThrow(ScenarioException.class);
 			});
-			 MockedConstruction mockedVideoRecorder = mockConstruction(VideoRecorder.class)
+			 MockedConstruction<VideoRecorder> mockedVideoRecorder = mockConstruction(VideoRecorder.class)
 		) {
 			File imageFile = File.createTempFile("image-", ".png");
 			imageFile.deleteOnExit();
@@ -1322,8 +1313,9 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 			CustomEventFiringWebDriver.startVideoCapture(DriverMode.LOCAL, gridConnector, videoFolder, "video.avi");
 
 			try {
-				String b64img = CustomEventFiringWebDriver.captureDesktopToBase64String(DriverMode.LOCAL, gridConnector);
+				CustomEventFiringWebDriver.captureDesktopToBase64String(DriverMode.LOCAL, gridConnector);
 			} catch (ScenarioException e) {
+				//
 			}
 			VideoRecorder videoRecorder = (VideoRecorder) mockedVideoRecorder.constructed().get(0);
 			verify(videoRecorder).disableStepDisplay();
@@ -1333,11 +1325,10 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	
 	/**
 	 * capture picture in local headless mode, ScenarioException should be raised
-	 * @throws IOException 
 	 */
 	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
-	public void testCaptureDesktopWithoutDesktop() throws IOException {
-		try (MockedConstruction mockedRobot = mockConstruction(Robot.class, (mock, context) -> {
+	public void testCaptureDesktopWithoutDesktop() {
+		try (MockedConstruction<Robot> mockedRobot = mockConstruction(Robot.class, (mock, context) -> {
 			when(mock.createScreenCapture(any(Rectangle.class))).thenThrow(AWTError.class);
 		})) {
 
@@ -1347,20 +1338,18 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	
 	/**
 	 * capture desktop with device providers: this is not supported, so exception should be raised
-	 * @throws Exception 
 	 */
 	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
-	public void testCaptureDesktopWithDeviceProviders() throws Exception {
+	public void testCaptureDesktopWithDeviceProviders(){
 		CustomEventFiringWebDriver.captureDesktopToBase64String(DriverMode.SAUCELABS, gridConnector);
 	}
 	
 
 	/**
 	 * capture picture in grid mode
-	 * @throws IOException 
 	 */
 	@Test(groups = {"ut"})
-	public void testCaptureDesktopWithGrid() throws IOException {
+	public void testCaptureDesktopWithGrid() {
 
 		CustomEventFiringWebDriver.captureDesktopToBase64String(DriverMode.GRID, gridConnector);
 		verify(gridConnector).captureDesktopToBuffer();
@@ -1368,11 +1357,10 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 
 	/**
 	 * start video capture to desktop in local mode
-	 * @throws IOException 
 	 */
 	@Test(groups = {"ut"})
 	public void testStartVideoCaptureToDesktop() throws IOException {
-		try (MockedConstruction mockedVideoRecorder = mockConstruction(VideoRecorder.class)) {
+		try (MockedConstruction<VideoRecorder> mockedVideoRecorder = mockConstruction(VideoRecorder.class)) {
 			File videoFolder = File.createTempFile("video", ".avi").getParentFile();
 			CustomEventFiringWebDriver.startVideoCapture(DriverMode.LOCAL, gridConnector, videoFolder, "video.avi");
 
@@ -1381,16 +1369,15 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 			verify(gridConnector, never()).startVideoCapture();
 			Assert.assertFalse(CustomEventFiringWebDriver.getVideoRecorders().isEmpty());
 		}
-	}
+    }
 
 	/**
 	 * start video capture in headless mode: an error should be raised because there is no session
-	 * @throws Exception 
 	 */
 	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
-	public void testStartVideoCaptureToDesktopWithoutDesktop() throws Exception {
+	public void testStartVideoCaptureToDesktopWithoutDesktop() throws IOException {
 
-		try (MockedConstruction mockedVideoRecorder = mockConstructionWithAnswer(VideoRecorder.class, (invocation) -> {
+		try (MockedConstruction<VideoRecorder> mockedVideoRecorder = mockConstructionWithAnswer(VideoRecorder.class, invocation -> {
 			throw new HeadlessException();
 		})) {
 			File videoFolder = File.createTempFile("video", ".avi").getParentFile();
@@ -1400,21 +1387,19 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 
 	/**
 	 * start video capture with device providers: this is not supported, so exception should be raised
-	 * @throws Exception 
 	 */
 	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
-	public void testStartVideoCaptureWithDeviceProviders() throws Exception {
+	public void testStartVideoCaptureWithDeviceProviders() throws IOException {
 		File videoFolder = File.createTempFile("video", ".avi").getParentFile();
 		CustomEventFiringWebDriver.startVideoCapture(DriverMode.SAUCELABS, gridConnector, videoFolder, "video.avi");
 	}
 	
 	/**
 	 * start video capture to desktop in grid mode
-	 * @throws IOException 
 	 */
 	@Test(groups = {"ut"})
 	public void testStartVideoCaptureToDesktopWithGrid() throws IOException {
-		try (MockedConstruction mockedVideoRecorder = mockConstruction(VideoRecorder.class)) {
+		try (MockedConstruction<VideoRecorder> mockedVideoRecorder = mockConstruction(VideoRecorder.class)) {
 			File videoFolder = File.createTempFile("video", ".avi").getParentFile();
 			CustomEventFiringWebDriver.startVideoCapture(DriverMode.GRID, gridConnector, videoFolder, "video.avi");
 
@@ -1427,11 +1412,10 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	
 	/**
 	 * stop video capture to desktop in local mode
-	 * @throws IOException 
 	 */
 	@Test(groups = {"ut"})
 	public void testStopVideoCaptureToDesktop() throws IOException {
-		try (MockedConstruction mockedVideoRecorder = mockConstruction(VideoRecorder.class)) {
+		try (MockedConstruction<VideoRecorder> mockedVideoRecorder = mockConstruction(VideoRecorder.class)) {
 			VideoRecorder videoRecorder = new VideoRecorder(new File("video"), "foo.avi");
 			CustomEventFiringWebDriver.stopVideoCapture(DriverMode.LOCAL, gridConnector, videoRecorder);
 
@@ -1442,11 +1426,10 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	
 	/**
 	 * stop video capture to desktop in local mode
-	 * @throws IOException
 	 */
 	@Test(groups = {"ut"})
 	public void testStopVideoCaptureToDesktop2() throws IOException {
-		try (MockedConstruction mockedVideoRecorder = mockConstruction(VideoRecorder.class)) {
+		try (MockedConstruction<VideoRecorder> mockedVideoRecorder = mockConstruction(VideoRecorder.class)) {
 			File videoFolder = File.createTempFile("video", ".avi").getParentFile();
 			CustomEventFiringWebDriver.startVideoCapture(DriverMode.LOCAL, gridConnector, videoFolder, "video.avi");
 			Assert.assertFalse(CustomEventFiringWebDriver.getVideoRecorders().isEmpty());
@@ -1463,26 +1446,23 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	
 	/**
 	 * stop video capture whereas it has not been started, ScenarioException should be raised
-	 * @throws Exception 
 	 */
 	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
-	public void testStopVideoCaptureIfNotStarted() throws Exception {
+	public void testStopVideoCaptureIfNotStarted() throws IOException {
 		CustomEventFiringWebDriver.stopVideoCapture(DriverMode.LOCAL, gridConnector, null);
 	}
 
 	/**
 	 * stop video capture with device providers: this is not supported, so exception should be raised
-	 * @throws Exception 
 	 */
 	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
-	public void testStopVideoCaptureWithDeviceProviders() throws Exception {
+	public void testStopVideoCaptureWithDeviceProviders() throws IOException {
 		VideoRecorder videoRecorder = new VideoRecorder(new File("video"), "foo.avi");
 		CustomEventFiringWebDriver.stopVideoCapture(DriverMode.SAUCELABS, gridConnector, videoRecorder);
 	}
 	
 	/**
 	 * stop video capture to desktop in grid mode
-	 * @throws IOException 
 	 */
 	@Test(groups = {"ut"})
 	public void testStopVideoCaptureToDesktopWithGrid() throws IOException {
@@ -1499,19 +1479,18 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	
 	/**
 	 * Check we never get null, we update if not initialized
-	 * @throws IOException
 	 */
 	@Test(groups = {"ut"})
-	public void testGetCurrentHandlesUpdated() throws IOException {
-		when(driver.getWindowHandles()).thenReturn(new TreeSet<>(Arrays.asList("12345", "67890")));
-		Assert.assertEquals(eventDriver.getCurrentHandles(), new TreeSet<>(Arrays.asList("12345", "67890")));
-		verify((CustomEventFiringWebDriver)eventDriver, times(1)).updateWindowsHandles();
+	public void testGetCurrentHandlesUpdated() {
+		when(driver.getWindowHandles()).thenReturn(new TreeSet<>(List.of("12345", "67890")));
+		Assert.assertEquals(eventDriver.getCurrentHandles(), new TreeSet<>(List.of("12345", "67890")));
+		verify(eventDriver, times(1)).updateWindowsHandles();
 	}
 	@Test(groups = {"ut"})
-	public void testGetCurrentHandlesNotUpdated() throws IOException {
-		eventDriver.setCurrentHandles(new TreeSet<>(Arrays.asList("12345", "67890")));
-		Assert.assertEquals(eventDriver.getCurrentHandles(), new TreeSet<>(Arrays.asList("12345", "67890")));
-		verify((CustomEventFiringWebDriver)eventDriver, never()).updateWindowsHandles();
+	public void testGetCurrentHandlesNotUpdated() {
+		eventDriver.setCurrentHandles(new TreeSet<>(List.of("12345", "67890")));
+		Assert.assertEquals(eventDriver.getCurrentHandles(), new TreeSet<>(List.of("12345", "67890")));
+		verify(eventDriver, never()).updateWindowsHandles();
 	}
 
 	@Test(groups = {"ut"})
@@ -1556,7 +1535,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 
 	@Test(groups = {"ut"})
 	public void testContextHandlesMobile() {
-		when(mobileDriver.getContextHandles()).thenReturn(new TreeSet<>(Arrays.asList("NATIVE_APP", "WEBVIEW")));
+		when(mobileDriver.getContextHandles()).thenReturn(new TreeSet<>(List.of("NATIVE_APP", "WEBVIEW")));
 		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_IOS, DriverMode.LOCAL, null));
 		Set<String> handles = eventDriver.getContextHandles();
 		verify(((SupportsContextSwitching)mobileDriver)).getContextHandles();
