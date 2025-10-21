@@ -1600,5 +1600,46 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		Assert.assertEquals(context, "APP");
 		verify(((SupportsContextSwitching)mobileDriver), never()).getContext();
 	}
+
+	@Test(groups = {"ut"})
+	public void testGetCurrentUrl() {
+		when(driver.getCurrentUrl()).thenReturn("http://google.com");
+		Assert.assertEquals(eventDriver.getCurrentUrl(), "http://google.com");
+	}
+
+	/**
+	 * Check we handle alert
+	 */
+	@Test(groups = {"ut"})
+	public void testGetCurrentUrlWithAlert() {
+		when(driver.getCurrentUrl()).thenThrow(new UnhandledAlertException("Alert preset")).thenReturn("http://google.com");
+		Assert.assertEquals(eventDriver.getCurrentUrl(), "http://google.com");
+		verify(eventDriver).switchTo();
+	}
+
+	/**
+	 * If alert cannot be dismissed, error is raised
+	 */
+	@Test(groups = {"ut"})
+	public void testGetCurrentUrlWithAlert2() {
+		when(driver.getCurrentUrl()).thenThrow(new UnhandledAlertException("Alert preset"));
+		Assert.assertThrows(UnhandledAlertException.class, eventDriver::getCurrentUrl);
+		verify(eventDriver).switchTo();
+	}
+
+	/**
+	 * getCurrentUrl is invalid for native mobile application, UnsupportedOperationException is raised
+	 */
+	@Test(groups = {"ut"})
+	public void testGetCurrentUrlMobile() {
+		when(driver.getCurrentUrl()).thenThrow(new UnsupportedOperationException("command invalid"));
+		Assert.assertEquals(eventDriver.getCurrentUrl(), "");
+	}
+
+	@Test(groups = {"ut"})
+	public void testGetCurrentUrlNoWindow() {
+		when(driver.getCurrentUrl()).thenThrow(new NoSuchWindowException("no window"));
+		Assert.assertEquals(eventDriver.getCurrentUrl(), "");
+	}
 	
 }

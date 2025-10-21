@@ -37,7 +37,7 @@ public class PageLoadTime extends TestAction {
         actionJson.put("name", name);
         actionJson.put("loadTime", loadTime);
         actionJson.put("page", pageObject.getClass().getSimpleName());
-        actionJson.put("timestamp", timestamp);
+        actionJson.put("timestamp", timestamp.toInstant().toEpochMilli());
 
         return actionJson;
     }
