@@ -521,6 +521,7 @@ public class LogAction {
 		} finally {
 			if (TestStepManager.getParentTestStep() != null) {
 				currentAction.setFailed(actionFailed);
+				currentAction.setActionException(currentException);
 				scenarioLogger.logActionError(currentException);
 			}
 		}

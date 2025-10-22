@@ -275,6 +275,7 @@ public class ReplayAction {
 		} finally {
 			if (currentAction != null && TestStepManager.getParentTestStep() != null) {
 				currentAction.setFailed(actionFailed);
+				currentAction.setActionException(currentException);
 				scenarioLogger.logActionError(currentException);
 			}
 
@@ -347,6 +348,7 @@ public class ReplayAction {
 		} finally {
 			if (TestStepManager.getParentTestStep() != null) {
 				currentAction.setFailed(actionFailed);
+				currentAction.setActionException(currentException);
 				scenarioLogger.logActionError(currentException);
 
 				if (joinPoint.getTarget() instanceof GenericPictureElement pictureElement) {

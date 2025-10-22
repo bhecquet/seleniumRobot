@@ -14,17 +14,15 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Field;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 public class TestTestAction extends MockitoTest {
 
     @Test(groups = { "ut" })
     public void testNoPasswordMasking() throws NoSuchFieldException, IllegalAccessException {
-        TestAction action = new TestAction("Login with args (user, myPass<>)", false, Arrays.asList("myPass<>"));
+        TestAction action = new TestAction("Login with args (user, myPass<>)", false, List.of("myPass<>"));
         Field maskPasswordField = TestAction.class.getDeclaredField("maskPassword");
         maskPasswordField.setAccessible(true);
         maskPasswordField.set(action, false);
@@ -33,13 +31,13 @@ public class TestTestAction extends MockitoTest {
 
     @Test(groups = { "ut" })
     public void testPasswordMasking() {
-        TestAction action = new TestAction("Login with args (user, myPass<>)", false, Arrays.asList("myPass<>"));
+        TestAction action = new TestAction("Login with args (user, myPass<>)", false, List.of("myPass<>"));
         Assert.assertEquals(action.getName(), "Login with args (user, ******)");
     }
 
     @Test(groups = { "ut" })
     public void testNoPasswordMaskingShortPassword() {
-        TestAction action = new TestAction("Login with args (user, myPas)", false, Arrays.asList("myPas"));
+        TestAction action = new TestAction("Login with args (user, myPas)", false, List.of("myPas"));
         Assert.assertEquals(action.getName(), "Login with args (user, myPas)");
     }
 
@@ -52,7 +50,7 @@ public class TestTestAction extends MockitoTest {
     @Test(groups = { "ut" })
     public void testToJson() {
         long actionTimestamp = OffsetDateTime.now().toInstant().toEpochMilli();
-        TestAction action = new TestAction("Login with args (user, myPass<>)", false, Arrays.asList("myPass<>"));
+        TestAction action = new TestAction("Login with args (user, myPass<>)", false, List.of("myPass<>"));
         JSONObject jsonAction = action.toJson();
         Assert.assertTrue(jsonAction.getLong("timestamp") >= actionTimestamp);
         Assert.assertEquals(jsonAction.getString("type"), "action");
@@ -69,33 +67,18 @@ public class TestTestAction extends MockitoTest {
     @Test(groups = { "ut" })
     public void testToJsonWithParent() {
         TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
-        TestAction action = new TestAction("Login with args (user, myPass<>)", false, Arrays.asList("myPass<>"));
+        TestAction action = new TestAction("Login with args (user, myPass<>)", false, List.of("myPass<>"));
         action.setParent(step);
         JSONObject jsonAction = action.toJson();
         Assert.assertFalse(jsonAction.has("exception"));
         Assert.assertFalse(jsonAction.has("exceptionMessage"));
     }
 
-    /**
-     * When exception occurs, it's attached to parent test step, not the action itself
-     * Check we can get this exception
-     */
-    @Test(groups = { "ut" })
-    public void testToJsonWithParentException() {
-        TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true);
-        step.setActionException(new WebDriverException("some exception clicking"));
-        TestAction action = new TestAction("Login with args (user, myPass<>)", false, Arrays.asList("myPass<>"));
-        action.setParent(step);
-        JSONObject jsonAction = action.toJson();
-        Assert.assertEquals(jsonAction.getString("exception"), "org.openqa.selenium.WebDriverException");
-        Assert.assertTrue(jsonAction.getString("exceptionMessage").contains("some exception clicking"));
-    }
-
     @Test(groups = { "ut" })
     public void testToJsonWithDetailedElementInformation() {
         HtmlElement el = new HtmlElement("my element", By.id("el"));
         el.setCallingPage(Mockito.mock(DriverTestPage.class));
-        TestAction action = new TestAction("click on HtmlElement By.id(\"el\")", false, Arrays.asList("myPass<>"), "click", el);
+        TestAction action = new TestAction("click on HtmlElement By.id(\"el\")", false, List.of("myPass<>"), "click", el);
         Assert.assertEquals(action.getName(), "click on HtmlElement By.id(\"el\")");
         JSONObject jsonAction = action.toJson();
         Assert.assertEquals(jsonAction.getString("action"), "click");
@@ -106,7 +89,7 @@ public class TestTestAction extends MockitoTest {
     @Test(groups = { "ut" })
     public void testToJsonWithDetailedPageInformation() {
 
-        TestAction action = new TestAction("maximizeWindow on page DriverTestPage", false, Arrays.asList("myPass<>"), "maximizeWindow", DriverTestPage.class);
+        TestAction action = new TestAction("maximizeWindow on page DriverTestPage", false, List.of("myPass<>"), "maximizeWindow", DriverTestPage.class);
         Assert.assertEquals(action.getName(), "maximizeWindow on page DriverTestPage");
         JSONObject jsonAction = action.toJson();
         Assert.assertEquals(jsonAction.getString("action"), "maximizeWindow");
@@ -116,7 +99,7 @@ public class TestTestAction extends MockitoTest {
 
     @Test(groups = { "ut" })
     public void testEncode() {
-        TestAction action = new TestAction("Login with args (user, myPass<>)", false, Arrays.asList("myPass<>"));
+        TestAction action = new TestAction("Login with args (user, myPass<>)", false, List.of("myPass<>"));
         action.setPosition(2);
         action.setDurationToExclude(20);
         TestAction encodedAction = action.encode("html");
@@ -146,7 +129,7 @@ public class TestTestAction extends MockitoTest {
 
     @Test(groups = { "ut" })
     public void testEncodeXmlPasswordKept() {
-        TestAction action = new TestAction("action2 \"'<>&", false, Arrays.asList("myPassword"));
+        TestAction action = new TestAction("action2 \"'<>&", false, List.of("myPassword"));
         TestAction encodedAction = action.encode("xml");
         Assert.assertTrue(encodedAction.getPwdToReplace().contains("myPassword"));
     }
