@@ -704,6 +704,7 @@ public class LogAction {
 		} finally {
 			if (compositeActionStep != null) {
 				compositeActionStep.setFailed(actionFailed);
+				compositeActionStep.setActionException(currentException);
 
 				// change the name of composite action
 				StringBuilder name = new StringBuilder(TestStep.COMPOSITE_STEP_PREFIX);
