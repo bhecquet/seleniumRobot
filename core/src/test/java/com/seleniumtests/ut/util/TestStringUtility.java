@@ -107,11 +107,22 @@ public class TestStringUtility extends GenericTest {
 	public void testKeepNewLineInHtmlWithNullMessage() {
 		Assert.assertNull(StringUtility.encodeString(null, "html"));
 	}
+	@Test(groups={"ut"})
+	public void testNullMessageInCsv() {
+		Assert.assertNull(StringUtility.encodeString(null, "csv"));
+	}
 
 	@Test(groups={"ut"}, expectedExceptions = CustomSeleniumTestsException.class)
 	public void testKeepNewLineInHtmlWithNullFormat() {
 		Assert.assertNull(StringUtility.encodeString("foo\nbar", null));
 	}
+
+	@Test(groups={"ut"})
+	public void testEncodeStringJson() {
+		Assert.assertEquals(StringUtility.encodeString("http://foo.bar", "json"), "http://foo.bar");
+	}
+
+
 
 	@Test(groups={"ut"})
 	public void testInterpolateString() {

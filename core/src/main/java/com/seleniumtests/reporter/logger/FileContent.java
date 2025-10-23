@@ -29,8 +29,7 @@ public class FileContent {
     }
     /**
      * Change path of the file
-     * @param outputDirectory
-     * @throws IOException
+     * @param outputDirectory   where to locate the file
      */
     public void relocate(String outputDirectory) throws IOException {
         relocate(outputDirectory, file.getName());
@@ -38,9 +37,8 @@ public class FileContent {
     
     /**
      * Move the file to a new output directory, respecting its path
-     * @param outputDirectory
-     * @param newFilePath
-     * @throws IOException
+     * @param outputDirectory   where to locate the file
+     * @param newFilePath       the new name / path
      */
     public void relocate(String outputDirectory, String newFilePath) throws IOException {
         if (outputDirectory == null || newFilePath == null) {
@@ -53,7 +51,7 @@ public class FileContent {
             Files.move(file.toPath(), newPath, StandardCopyOption.REPLACE_EXISTING);
             file = newPath.toFile();
         } catch (Exception e) {
-            logger.error(String.format("Failed to relocate file %s to %s: %s", file.getAbsolutePath(), newPath.toString(), e.getMessage()));
+            logger.error("Failed to relocate file {} to {}: {}", file.getAbsolutePath(), newPath.toString(), e.getMessage());
         }
     }
     

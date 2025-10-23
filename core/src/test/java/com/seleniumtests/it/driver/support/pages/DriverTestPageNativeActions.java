@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,15 +35,15 @@ public class DriverTestPageNativeActions extends PageObject {
 	
 	public static final TextFieldElement textElement = new TextFieldElement("Text", By.id("text2"));
 
-	public DriverTestPageNativeActions() throws Exception {
+	public DriverTestPageNativeActions() {
         super(textElement);
     }
     
-    public DriverTestPageNativeActions(boolean openPageURL) throws Exception {
+    public DriverTestPageNativeActions(boolean openPageURL) {
         super(textElement, openPageURL ? getPageUrl() : null);
     }
 
-    public DriverTestPageNativeActions(boolean openPageURL, String url) throws Exception {
+    public DriverTestPageNativeActions(boolean openPageURL, String url) {
     	super(textElement, openPageURL ? url : null);
     }
     
@@ -116,7 +116,6 @@ public class DriverTestPageNativeActions extends PageObject {
     
     /** 
      * must be called after switchToFrameByElement
-     * @return
      */
     public WebElement getElementInsideFrame() {
     	return driver.findElement(By.id("textInIFrameWithValue"));
@@ -124,7 +123,6 @@ public class DriverTestPageNativeActions extends PageObject {
     
     /** 
      * must be called after switchToFrameByElement
-     * @return
      */
     public List<WebElement> getElementsInsideFrame() {
     	return driver.findElements(By.tagName("input"));
@@ -132,7 +130,6 @@ public class DriverTestPageNativeActions extends PageObject {
     
     /** 
      * must be called after switchToFirstFrameByElement and switchToSecondFrameByElement
-     * @return
      */
     public WebElement getElementInsideFrameOfFrame() {
     	return driver.findElement(By.id("textInIFrameWithValue2"));

@@ -1,15 +1,16 @@
 package com.seleniumtests.ut.reporter.logger;
 
 import com.seleniumtests.MockitoTest;
+import com.seleniumtests.it.core.aspects.CalcPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.uipage.htmlelements.ButtonElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import org.json.JSONObject;
 import org.mockito.Mockito;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriverException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -99,16 +100,25 @@ public class TestTestAction extends MockitoTest {
 
     @Test(groups = { "ut" })
     public void testEncode() {
-        TestAction action = new TestAction("Login with args (user, myPass<>)", false, List.of("myPass<>"));
+        TestAction action = new TestAction("Login with args (user, myPass<>)",
+                false,
+                List.of("myPass<>"),
+                "an action<",
+                new ButtonElement("label", By.id("label")),
+                CalcPage.class
+                );
         action.setPosition(2);
         action.setDurationToExclude(20);
-        TestAction encodedAction = action.encode("html");
+        TestAction encodedAction = action.encodeTo("html");
         Assert.assertEquals(encodedAction.getPwdToReplace().get(0), "myPass&lt;&gt;");
         Assert.assertEquals(encodedAction.getName(), "Login with args (user, ******)");
         Assert.assertEquals(encodedAction.getTimestamp(), action.getTimestamp());
         Assert.assertEquals(encodedAction.getFailed(), action.getFailed());
         Assert.assertEquals(encodedAction.getPosition(), action.getPosition());
         Assert.assertEquals(encodedAction.getDurationToExclude(), action.getDurationToExclude());
+        Assert.assertEquals(encodedAction.getElement(), action.getElement());
+        Assert.assertEquals(encodedAction.getOrigin(), action.getOrigin());
+        Assert.assertEquals(encodedAction.getAction(), "an action&lt;");
 
     }
 
@@ -116,21 +126,21 @@ public class TestTestAction extends MockitoTest {
     @Test(groups = { "ut" })
     public void testEncodeXml() {
         TestAction action = new TestAction("action2 \"'<>&", false, new ArrayList<>());
-        TestAction encodedAction = action.encode("xml");
+        TestAction encodedAction = action.encodeTo("xml");
         Assert.assertEquals(encodedAction.toString(), "action2 &quot;&apos;&lt;&gt;&amp;");
     }
 
     @Test(groups = { "ut" })
     public void testEncodeXmlFailedStatus() {
         TestAction action = new TestAction("action2 \"'<>&", true, new ArrayList<>());
-        TestAction encodedAction = action.encode("xml");
+        TestAction encodedAction = action.encodeTo("xml");
         Assert.assertTrue(encodedAction.getFailed());
     }
 
     @Test(groups = { "ut" })
     public void testEncodeXmlPasswordKept() {
         TestAction action = new TestAction("action2 \"'<>&", false, List.of("myPassword"));
-        TestAction encodedAction = action.encode("xml");
+        TestAction encodedAction = action.encodeTo("xml");
         Assert.assertTrue(encodedAction.getPwdToReplace().contains("myPassword"));
     }
 
@@ -138,7 +148,7 @@ public class TestTestAction extends MockitoTest {
     public void testEncodeXmlExceptionKept() {
         TestAction action = new TestAction("action2 \"'<>&", false, new ArrayList<>());
         action.setActionException(new Throwable("foo"));
-        TestAction encodedAction = action.encode("xml");
+        TestAction encodedAction = action.encodeTo("xml");
         Assert.assertNotNull(encodedAction.getActionException());
         Assert.assertEquals(encodedAction.getActionExceptionMessage(), "class java.lang.Throwable: foo");
     }
@@ -147,7 +157,7 @@ public class TestTestAction extends MockitoTest {
     public void testEncodeXmlWebDriverExceptionKept() {
         TestAction action = new TestAction("action2 \"'<>&", false, new ArrayList<>());
         action.setActionException(new NoSuchElementException("foo <>"));
-        TestAction encodedAction = action.encode("xml");
+        TestAction encodedAction = action.encodeTo("xml");
         Assert.assertNotNull(encodedAction.getActionException());
         Assert.assertEquals(encodedAction.getActionExceptionMessage(), "class org.openqa.selenium.NoSuchElementException: foo &lt;&gt;\n");
     }

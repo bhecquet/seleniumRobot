@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,7 +18,6 @@
 package com.seleniumtests.it.stubclasses;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +46,7 @@ import com.seleniumtests.util.helper.WaitHelper;
 public class StubTestClassForDriverTest extends StubParentClass {
 	
 	@BeforeMethod(groups="stub")
-	public void init(Method method) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+	public void init(Method method) {
 
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 		SeleniumTestsContextManager.getThreadContext().setOverrideSeleniumNativeAction(true);
@@ -58,7 +57,6 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	
 	/**
 	 * added for issue #287 where we need to fail on configuration method to reproduce the bug
-	 * @param method
 	 */
 	@AfterMethod(groups="stub") 
 	public void reset(Method method) {
@@ -66,7 +64,7 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	}
 
 	@Test(groups="stub")
-	public void testDriver() throws Exception {
+	public void testDriver() {
 
 		new DriverTestPage(true)
 			._writeSomething()
@@ -97,7 +95,7 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	}
 	
 	@Test(groups="stub")
-	public void testDriverLongFailed() throws Exception {
+	public void testDriverLongFailed() {
 		
 		DriverTestPage page = new DriverTestPage(true)
 		._writeSomething()
@@ -108,15 +106,15 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	}
 	
 	@Test(groups="stub")
-	public void testDriverFailed() throws Exception {
+	public void testDriverFailed() {
 		
-		DriverTestPage page = new DriverTestPage(true)
+		new DriverTestPage(true)
 				._sendKeysComposite()
 		._writeSomethingOnNonExistentElement();
 	}
 	
 	@Test(groups="stub")
-	public void testDriverWithWcag() throws Exception {
+	public void testDriverWithWcag() {
 		
 		DriverTestPage page = new DriverTestPage(true)
 		._writeSomething();
@@ -129,14 +127,14 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	 * @throws Exception
 	 */
 	@Test(groups="stub")
-	public void testDriverWithFailureAfterSwitchToFrame() throws Exception {
+	public void testDriverWithFailureAfterSwitchToFrame() {
 		
 		new DriverTestPage(true)
 		._goToFrame();
 	}
 	
 	@Test(groups="stub")
-	public void testMultipleDriver() throws Exception {
+	public void testMultipleDriver() {
 		
 		new DriverTestPage(true)
 		._writeSomething()
@@ -147,27 +145,27 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	}
 	
 	@Test(groups="stub")
-	public void testDriverIsDisplayedRetry() throws Exception {
+	public void testDriverIsDisplayedRetry() {
 		new DriverTestPage(true)._isElementNotPresentDisplayed();
 	}
 	
 	@Test(groups="stub")
-	public void testDriverShort() throws Exception {
+	public void testDriverShort() {
 		new DriverTestPage(true);
 	}
 	
 	@Test(groups="stub")
-	public void testDriverShort2() throws Exception {
+	public void testDriverShort2() {
 		new DriverTestPage(true);
 	}
 	
 	@Test(groups="stub")
-	public void testDriverShort3() throws Exception {
+	public void testDriverShort3() {
 		new DriverTestPage(true);
 	}
 	
 	@Test(groups="stub")
-	public void testDriverShort4() throws Exception {
+	public void testDriverShort4() {
 		new DriverTestPage(true);
 	}
 	
@@ -178,7 +176,7 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	}
 	
 	@Test(groups="stub")
-	public void testDriverShortKo() throws Exception {
+	public void testDriverShortKo() {
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
 		
 		new DriverTestPage(true)
@@ -186,12 +184,12 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	}
 
 	@Test(groups="stub", dependsOnMethods = "testDriverShortKo")
-	public void testDriverShortSkipped() throws Exception {
+	public void testDriverShortSkipped() {
 		new DriverTestPage(true);
 	}
 	
 	@Test(groups="stub")
-	public void testDriverWithAssert() throws Exception {
+	public void testDriverWithAssert() {
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
 		
 		DriverTestPage page = new DriverTestPage(true);
@@ -225,7 +223,7 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	}
 	
 	@Test(groups="stub")
-	public void testDriverShortKoWithCatchException() throws Exception {
+	public void testDriverShortKoWithCatchException() {
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
 		
 		new DriverTestPage(true)
@@ -235,7 +233,7 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	}
 	
 	@Test(groups="stub")
-	public void testDriverCustomSnapshot() throws Exception {
+	public void testDriverCustomSnapshot() {
 		
 		new DriverTestPage(true)
 		._writeSomething()
@@ -244,20 +242,20 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	}
 
 	@Test(groups="stub")
-	public void testDriverPictureElementNotFound() throws Exception {
+	public void testDriverPictureElementNotFound() {
 		new DriverTestPage(true)
 				._clickPictureNotPresent();
 	}
 
 	@Test(groups="stub")
-	public void testDriverPictureElement() throws Exception {
+	public void testDriverPictureElement() {
 		new DriverTestPage(true)
 				._clickPicture();
 	}
 	
 
 	@Test(groups="stub")
-	public void testDriverModalSnapshot() throws Exception {
+	public void testDriverModalSnapshot() {
 		
 		new DriverModalTestPage(true)
 			._openModal()
@@ -265,7 +263,7 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	}
 	
 	@Test(groups="stub")
-	public void testDriverWithFailure() throws Exception {
+	public void testDriverWithFailure() {
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
 		
 		new DriverTestPage(true)
@@ -274,7 +272,7 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	}
 	
 	@Test(groups="stub")
-	public void testDriverManualSteps() throws Exception {
+	public void testDriverManualSteps() {
 
 		SeleniumTestsContextManager.getThreadContext().setManualTestSteps(true);
 
@@ -287,10 +285,9 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	
 	/**
 	 * check that with selenium override, logging is done
-	 * @throws Exception
 	 */
 	@Test(groups="stub")
-	public void testDriverNativeActions() throws Exception {
+	public void testDriverNativeActions() {
 		new DriverTestPageNativeActions(true)
 		.sendKeys()
 		.reset()
@@ -298,7 +295,7 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	}
 
 	@Test(groups="stub")
-	public void testDriverNativeActionsOnPageObjectFactory() throws Exception {
+	public void testDriverNativeActionsOnPageObjectFactory() {
 		List<WebElement> inputs = new DriverTestPageObjectFatory(true)
 		.sendKeys()
 		.reset()
@@ -309,7 +306,7 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	}
 
 	@Test(groups="stub")
-	public void testDriverNativeActionsOnPageObjectFactoryWithoutOverride() throws Exception {
+	public void testDriverNativeActionsOnPageObjectFactoryWithoutOverride() {
 		SeleniumTestsContextManager.getThreadContext().setOverrideSeleniumNativeAction(false);
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
 		SeleniumTestsContextManager.getThreadContext().setImplicitWaitTimeout(1);
@@ -324,10 +321,9 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	
 	/**
 	 * check that without selenium override, logging is not done
-	 * @throws Exception
 	 */
 	@Test(groups="stub")
-	public void testDriverNativeActionsWithoutOverride() throws Exception {
+	public void testDriverNativeActionsWithoutOverride() {
 		SeleniumTestsContextManager.getThreadContext().setOverrideSeleniumNativeAction(false);
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
 		SeleniumTestsContextManager.getThreadContext().setImplicitWaitTimeout(1); 
@@ -339,7 +335,7 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	}
 	
 	@Test(groups="stub")
-	public void testDriverWithHtmlElementWithoutOverride() throws Exception {
+	public void testDriverWithHtmlElementWithoutOverride() {
 		SeleniumTestsContextManager.getThreadContext().setOverrideSeleniumNativeAction(false);
 		
 		new DriverTestPage(true)
@@ -350,13 +346,13 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	}
 	
 	@Test(groups="stub")
-	public void testImageDetection() throws Exception {
+	public void testImageDetection() {
 		new ImageDetectorPage()
 			._clickErrorButtonInError();// force test to fail
 	}
 	
 	@Test(groups="stub")
-	public void testImageDetectionAssertionError() throws Exception {
+	public void testImageDetectionAssertionError() {
 		
 		new ImageDetectorPage()
 		._clickErrorButton();
@@ -364,7 +360,7 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	}
 	
 	@Test(groups="stub")
-	public void testImageDetectionNoError() throws Exception {
+	public void testImageDetectionNoError() {
 		
 		new ImageDetectorPage()
 		._clickErrorButton();

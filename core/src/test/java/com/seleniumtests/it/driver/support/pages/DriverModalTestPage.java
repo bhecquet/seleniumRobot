@@ -33,19 +33,19 @@ public class DriverModalTestPage extends PageObject {
 	
 	private String openedPageUrl;
 	
-	public DriverModalTestPage() throws Exception {
+	public DriverModalTestPage() {
         super(openModal);
     }
     
-    public DriverModalTestPage(boolean openPageURL) throws Exception {
+    public DriverModalTestPage(boolean openPageURL) {
     	this(openPageURL, getPageUrl(SeleniumTestsContextManager.getThreadContext().getBrowser()));
     }
     
-    public DriverModalTestPage(boolean openPageURL, BrowserType browserType) throws Exception {
+    public DriverModalTestPage(boolean openPageURL, BrowserType browserType) {
     	super(openModal, getPageUrl(browserType), browserType, "second", null);
     }
     
-    public DriverModalTestPage(boolean openPageURL, String url) throws Exception {
+    public DriverModalTestPage(boolean openPageURL, String url)  {
     	super(openModal, openPageURL ? url : null);
     	openedPageUrl = url;
     }

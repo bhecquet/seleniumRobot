@@ -141,7 +141,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 							|| "html".equalsIgnoreCase(reportFormat)
 							|| "csv".equalsIgnoreCase(reportFormat)
 							) {
-						newTestSteps.add(step.encode(reportFormat.toLowerCase()));
+						newTestSteps.add(step.encodeTo(reportFormat.toLowerCase()));
 					} else {
 						newTestSteps.add(step);
 					}
@@ -192,7 +192,8 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			context.put("time", newTestSteps.isEmpty() ? testResult.getStartMillis(): newTestSteps.get(0).getTimestamp().toInstant().toEpochMilli());
 			context.put("startDate", newTestSteps.isEmpty() ? new Date(testResult.getStartMillis()): newTestSteps.get(0).getStartDate());
 			context.put("testSteps", newTestSteps);	
-			context.put("retries", TestNGResultUtils.getRetry(testResult) == null ? 0: TestNGResultUtils.getRetry(testResult));	
+			context.put("unencodedTestSteps", testSteps);	 // kept to avoid encoding to times step when JSON file is created and we use toJson methods
+			context.put("retries", TestNGResultUtils.getRetry(testResult) == null ? 0: TestNGResultUtils.getRetry(testResult));
 			context.put("browser", seleniumTestsContext.getBrowser());	
 			context.put("mobileApp", StringUtility.encodeString(seleniumTestsContext.getApp(), reportFormat.toLowerCase()));	
 			context.put("device", StringUtility.encodeString(seleniumTestsContext.getDeviceName() == null ? "": seleniumTestsContext.getDeviceName(), reportFormat.toLowerCase()));

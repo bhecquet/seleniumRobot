@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import org.json.JSONObject;
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
@@ -17,17 +18,28 @@ import com.seleniumtests.reporter.logger.Snapshot;
 
 public class TestSnapshot extends GenericTest {
 
+	File tmpImgFile;
+	File tmpHtmlFile;
 
-	@Test(groups={"ut"})
-	public void testBuildScreenshotString() throws IOException {
-		File tmpImgFile = File.createTempFile("img", ".png");
-		File tmpHtmlFile = File.createTempFile("html", ".html");
+	@BeforeMethod(groups = "ut", alwaysRun = true)
+	private void init() throws IOException {
+		tmpImgFile = File.createTempFile("img", ".png");
+		tmpHtmlFile = File.createTempFile("html", ".html");
+	}
+
+	private Snapshot createSnapshot(SnapshotCheckType snapshotCheckType) throws FileNotFoundException {
+
 		ScreenShot screenshot = new ScreenShot(tmpImgFile, tmpHtmlFile, "");
 		screenshot.setTitle("title");
 		screenshot.setLocation("http://location");
-		Snapshot snapshotLogger = new Snapshot(screenshot, "main", SnapshotCheckType.TRUE);
+		return new Snapshot(screenshot, "main", snapshotCheckType);
+	}
+
+	@Test(groups={"ut"})
+	public void testBuildScreenshotString() throws IOException {
+		Snapshot snapshotLogger = createSnapshot(SnapshotCheckType.TRUE);
 		String screenshotStr = snapshotLogger.buildScreenshotLog().replace("\n", "").replaceAll(">\\s+<", "><");
-		Matcher matcher = Pattern.compile(".*<img id\\=\"(.+)\" src\\=.*").matcher(screenshotStr);
+		Matcher matcher = Pattern.compile(".*<img id=\"(.+)\" src=.*").matcher(screenshotStr);
 		String imageId = "";
 		if (matcher.matches()) {
 			imageId = matcher.group(1);
@@ -43,7 +55,7 @@ public class TestSnapshot extends GenericTest {
 				+ "<div class=\"text-center\">main: title</div>"
 				+ "<div class=\"text-center font-weight-lighter\"><a href='http://location' target=url>URL</a> | <a href='htmls/%s' target=html>HTML Source</a></div>", imageId, imageId, tmpImgFile.getName(), tmpHtmlFile.getName()));
 	}
-	
+
 	@Test(groups={"ut"})
 	public void testBuildScreenshotStringWithoutInfo() throws FileNotFoundException {
 		ScreenShot screenshot = new ScreenShot(null);
@@ -55,7 +67,6 @@ public class TestSnapshot extends GenericTest {
 	
 	@Test(groups={"ut"})
 	public void testBuildScreenshotStringWithoutImage() throws IOException {
-		File tmpHtmlFile = File.createTempFile("html", ".html");
 		ScreenShot screenshot = new ScreenShot(null, tmpHtmlFile, "");
 		screenshot.setTitle("title");
 		screenshot.setLocation("http://location");
@@ -66,15 +77,13 @@ public class TestSnapshot extends GenericTest {
 	
 	@Test(groups={"ut"})
 	public void testBuildScreenshotStringWithoutSource() throws IOException {
-		
-		File tmpImgFile = File.createTempFile("img", ".png");
 		ScreenShot screenshot = new ScreenShot(tmpImgFile, null, "");
 		screenshot.setTitle("title");
 		screenshot.setLocation("http://location");
 		Snapshot snapshotLogger = new Snapshot(screenshot, "main", SnapshotCheckType.FALSE);
 		String screenshotStr = snapshotLogger.buildScreenshotLog().replace("\n", "").replaceAll(">\\s+<", "><");
 		
-		Matcher matcher = Pattern.compile(".*<img id\\=\"(.+)\" src\\=.*").matcher(screenshotStr);
+		Matcher matcher = Pattern.compile(".*<img id=\"(.+)\" src=.*").matcher(screenshotStr);
 		String imageId = "";
 		if (matcher.matches()) {
 			imageId = matcher.group(1);
@@ -92,15 +101,12 @@ public class TestSnapshot extends GenericTest {
 	
 	@Test(groups={"ut"})
 	public void testBuildScreenshotStringWithoutLocation() throws IOException {
-		
-		File tmpImgFile = File.createTempFile("img", ".png");
-		File tmpHtmlFile = File.createTempFile("html", ".html");
 		ScreenShot screenshot = new ScreenShot(tmpImgFile, tmpHtmlFile, "");
 		screenshot.setTitle("title");
 		Snapshot snapshotLogger = new Snapshot(screenshot, "main", SnapshotCheckType.TRUE);
 		String screenshotStr = snapshotLogger.buildScreenshotLog().replace("\n", "").replaceAll(">\\s+<", "><");
 		
-		Matcher matcher = Pattern.compile(".*<img id\\=\"(.+)\" src\\=.*").matcher(screenshotStr);
+		Matcher matcher = Pattern.compile(".*<img id=\"(.+)\" src=.*").matcher(screenshotStr);
 		String imageId = "";
 		if (matcher.matches()) {
 			imageId = matcher.group(1);
@@ -123,13 +129,8 @@ public class TestSnapshot extends GenericTest {
 	
 	@Test(groups={"ut"})
 	public void testToJsonWithId() throws IOException {
-		
-		File tmpImgFile = File.createTempFile("img", ".png");
-		File tmpHtmlFile = File.createTempFile("html", ".html");
-		ScreenShot screenshot = new ScreenShot(tmpImgFile, tmpHtmlFile, "");
-		screenshot.setTitle("title /");
-		screenshot.setLocation("http://location");
-		Snapshot snapshotLogger = new Snapshot(screenshot, "main", SnapshotCheckType.TRUE);
+
+		Snapshot snapshotLogger = createSnapshot(SnapshotCheckType.TRUE);
 		snapshotLogger.getScreenshot().getHtml().setId(2);
 		snapshotLogger.getScreenshot().getImage().setId(3);
 		
@@ -145,14 +146,8 @@ public class TestSnapshot extends GenericTest {
 	}
 	@Test(groups={"ut"})
 	public void testToJson() throws IOException {
-		
-		File tmpImgFile = File.createTempFile("img", ".png");
-		File tmpHtmlFile = File.createTempFile("html", ".html");
-		ScreenShot screenshot = new ScreenShot(tmpImgFile, tmpHtmlFile, "");
-		screenshot.setTitle("title");
-		screenshot.setLocation("http://location");
-		Snapshot snapshotLogger = new Snapshot(screenshot, "main", SnapshotCheckType.TRUE);
-		
+		Snapshot snapshotLogger = createSnapshot(SnapshotCheckType.TRUE);
+
 		JSONObject json = snapshotLogger.toJson();
 		
 		Assert.assertEquals(json.getString("type"), "snapshot");
@@ -162,5 +157,28 @@ public class TestSnapshot extends GenericTest {
 		Assert.assertTrue(json.isNull("idHtml"));
 		Assert.assertTrue(json.isNull("idImage"));
 		Assert.assertEquals(json.getString("snapshotCheckType"), "FULL");
+	}
+
+	@Test(groups={"ut"})
+	public void testEncodeTo() throws IOException {
+
+		Snapshot snapshotLogger = createSnapshot(SnapshotCheckType.FALSE);
+		Snapshot encodedSnapshot = snapshotLogger.encodeTo("html");
+		Assert.assertEquals(encodedSnapshot.getScreenshot(), snapshotLogger.getScreenshot());
+		Assert.assertEquals(encodedSnapshot.getCheckSnapshot(), SnapshotCheckType.FALSE);
+		Assert.assertEquals(encodedSnapshot.getDurationToExclude(), snapshotLogger.getDurationToExclude());
+		Assert.assertTrue(encodedSnapshot.isEncoded());
+	}
+
+	@Test(groups={"ut"})
+	public void testEncodeToNoFormat() throws IOException {
+
+		Snapshot snapshotLogger = createSnapshot(SnapshotCheckType.FALSE);
+		snapshotLogger.getScreenshot().setTitle("<my_title>");
+		Snapshot encodedSnapshot = snapshotLogger.encodeTo(null);
+		Assert.assertEquals(encodedSnapshot.getScreenshot(), snapshotLogger.getScreenshot());
+		Assert.assertEquals(encodedSnapshot.getCheckSnapshot(), SnapshotCheckType.FALSE);
+		Assert.assertEquals(encodedSnapshot.getDurationToExclude(), snapshotLogger.getDurationToExclude());
+		Assert.assertFalse(encodedSnapshot.isEncoded());
 	}
 }

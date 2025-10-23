@@ -47,18 +47,19 @@ public class TestAction {
 	protected TestAction parent = null;
 	protected int position = 0;
 	protected Boolean failed;
-	// actionException & actionExceptionMessage are not set for TestAction, only for TestStep
 	protected Throwable actionException;
 	protected String actionExceptionMessage;
 	protected long durationToExclude = 0L; 	// the duration to exclude from the action duration
 	protected List<String> pwdToReplace;
 	protected boolean maskPassword = true;
+
+
 	protected boolean encoded = false;		// true if we have encoded messages
 	protected OffsetDateTime timestamp;
 
 
 	protected String action;			// "click", "sendKeys", ...
-	private final Element element;		// name of the element on which action occurs
+	private Element element;		// name of the element on which action occurs
 	protected Class<?> origin;		// page / scenario on which action is performed
 	
 	/**
@@ -125,13 +126,22 @@ public class TestAction {
 	 * @return		the name of the action
 	 */
 	public String getName() {
-		String newName = name;
+		return maskPasswordInString(name);
+	}
+
+	/**
+	 * If maskpassword is enabled, replace all occurences of password in the provided string
+	 * @param value	the value where password will be replaced
+	 * @return	the updated value
+	 */
+	protected String maskPasswordInString(String value) {
+		String newValue = value;
 		if (maskPassword) {
 			for (String pwd: pwdToReplace) {
-				newName = newName.replace(pwd, "******");
+				newValue = newValue.replace(pwd, "******");
 			}
 		}
-		return newName;
+		return newValue;
 	}
 
 	public void setName(String name) {
@@ -151,6 +161,10 @@ public class TestAction {
 
 	public List<String> getPwdToReplace() {
 		return pwdToReplace;
+	}
+
+	public void setPwdToReplace(List<String> pwdToReplace) {
+		this.pwdToReplace = pwdToReplace;
 	}
 
 	public void setFailed(Boolean failed) {
@@ -223,29 +237,42 @@ public class TestAction {
 				.toList();
 	}
 
-	public TestAction encode(String format) {
-		List<String> encodedPasswords = encodePasswords(pwdToReplace, format);
-		TestAction encodedAction = new TestAction(encodeString(name, format), failed, encodedPasswords);
-		encodedAction.actionException = actionException;
-		encodedAction.maskPassword = maskPassword;
-		encodedAction.timestamp = timestamp;
-		encodedAction.position = position;
-		encodedAction.parent = parent;
-		
+	/**
+	 * Encode content of action to the specified format
+	 * @param format	json, html, xml
+	 * @return	a new instance with encoded fields
+	 */
+	public TestAction encodeTo(String format) {
+		TestAction encodedAction = new TestAction(name, failed, pwdToReplace);
+		return encode(format, encodedAction);
+	}
+
+	protected TestAction encode(String format, TestAction actionToEncode) {
+		actionToEncode.name = encodeString(name, format);
+		actionToEncode.pwdToReplace = encodePasswords(pwdToReplace, format);
+		actionToEncode.actionException = actionException;
+		actionToEncode.maskPassword = maskPassword;
+		actionToEncode.timestamp = timestamp;
+		actionToEncode.position = position;
+		actionToEncode.parent = parent;
+		actionToEncode.element = element;
+		actionToEncode.origin = origin;
+		actionToEncode.action = encodeString(action, format);
+
 		if (format == null) {
-			encodedAction.encoded = encoded;
+			actionToEncode.encoded = encoded;
 		} else {
-			encodedAction.encoded = true;
+			actionToEncode.encoded = true;
 		}
-		encodedAction.durationToExclude = durationToExclude;
+		actionToEncode.durationToExclude = durationToExclude;
 		if (actionException != null) {
-			encodedAction.actionExceptionMessage = encodeString(ExceptionUtility.getExceptionMessage(actionException), format);
+			actionToEncode.actionExceptionMessage = encodeString(ExceptionUtility.getExceptionMessage(actionException), format);
 		}
-		return encodedAction;
+		return actionToEncode;
 	}
 	
 	public TestAction deepCopy() {
-		return encode(null);
+		return encodeTo(null);
 	}
 
 	public TestAction getParent() {
@@ -278,6 +305,10 @@ public class TestAction {
 
 	public void setAction(String action) {
 		this.action = action;
+	}
+
+	public boolean isEncoded() {
+		return encoded;
 	}
 
 }

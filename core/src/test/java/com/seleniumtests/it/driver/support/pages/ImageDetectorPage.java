@@ -12,11 +12,11 @@ public class ImageDetectorPage extends PageObject {
 	
 	private static final ButtonElement errorButton = new ButtonElement("error button", By.id("errorButton"));
 	
-    public ImageDetectorPage() throws Exception {
+    public ImageDetectorPage() {
     	this(getPageUrl(SeleniumTestsContextManager.getThreadContext().getBrowser()));
     }
 
-    public ImageDetectorPage(String url) throws Exception {
+    public ImageDetectorPage(String url) {
     	super(errorButton, url);
     }
 	

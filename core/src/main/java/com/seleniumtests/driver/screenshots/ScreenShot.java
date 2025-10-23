@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,7 +19,6 @@ package com.seleniumtests.driver.screenshots;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -32,10 +31,8 @@ import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.reporter.logger.FileContent;
 import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.HashCodeGenerator;
-import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONObject;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -57,7 +54,6 @@ public class ScreenShot {
     
     /**
      * File will be copied in <output_directory>/screenshots/<file_name>
-     * @param imageBuffer
      */
     public ScreenShot(BufferedImage imageBuffer, String pageSource) {
     
@@ -83,7 +79,6 @@ public class ScreenShot {
     
     /**
      * File will be copied in <output_directory>/screenshots/<file_name>
-     * @param imageFile
      */
     public ScreenShot(File imageFile) {
         this(imageFile, null, SeleniumTestsContext.SCREENSHOT_DIRECTORY);
@@ -94,7 +89,6 @@ public class ScreenShot {
     
     /**
      * File will be copied in <output_directory>/<relative_path>/<file_name>
-     * @param imageFile
      */
     public ScreenShot(File imageFile, File htmlFile, String relativePath) {
 
@@ -141,7 +135,6 @@ public class ScreenShot {
     
     /**
      * For test
-     * @param outputDirectory
      */
     public void setOutputDirectory(String outputDirectory) {
         this.outputDirectory = outputDirectory;
@@ -149,7 +142,6 @@ public class ScreenShot {
 
     /**
      * URL of the page for which this screenshot has been taken
-     * @return
      */
     public String getLocation() {
         return location;
@@ -169,7 +161,6 @@ public class ScreenShot {
     
     /**
      * Returns the relative path of HTML file (relative to outputDirectory)
-     * @return
      */
     public String getHtmlSourcePath() {
         if (html != null) {
@@ -182,7 +173,6 @@ public class ScreenShot {
 
     /**
      * Get the image path relative to outputDirectory (directory where info for a specific test are recorded)
-     * @return
      */
     public String getImagePath() {
         if (image != null) {
@@ -194,7 +184,6 @@ public class ScreenShot {
 
     /**
      * Get the title of the page associated to this screenshot
-     * @return
      */
     public String getTitle() {
         return title;
@@ -221,7 +210,6 @@ public class ScreenShot {
 	/**
 	 * Move physically the image to 'destOutputDirectory'
 	 * @param destOutputDirectory		the output directory to copy to. It's a root directory where test results / image / html / video are stored
-	 * @throws IOException
 	 */
 	public void relocate(String destOutputDirectory) throws IOException {
 		relocate(destOutputDirectory, getImagePath(), getHtmlSourcePath());
@@ -232,7 +220,6 @@ public class ScreenShot {
 	 * @param destOutputDirectory		the output directory to copy to. It's a root directory where test results / image / html / video are stored
 	 * @param newImagePath				the new path of the image if it needs to be moved inside the output directory
      * @param newHtmlPath               the new path of the html if it needs to be moved inside the output directory
-	 * @throws IOException
 	 */
 	public void relocate(String destOutputDirectory, String newImagePath, String newHtmlPath) throws IOException {
 

@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,27 +20,23 @@ package com.seleniumtests.reporter.logger;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.UUID;
 
+import com.seleniumtests.customexception.ScenarioException;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.json.JSONObject;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.reporter.reporters.CommonReporter;
-import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.StringUtility;
 
 public class Snapshot extends TestAction {
 	
-	private ScreenShot screenshot;
+	private final ScreenShot screenshot;
 	private SnapshotCheckType snapshotCheckType; // whether this snapshot will be sent to Snapshot server to check if it conforms to baseline
 	private boolean displayInReport = true;
 
@@ -67,36 +63,36 @@ public class Snapshot extends TestAction {
      */
     public String buildScreenshotLog() {
 
-        StringBuilder sbMessage = new StringBuilder("");
+        StringBuilder sbMessage = new StringBuilder();
         
         
         if (screenshot.getImagePath() != null) {
         	String uuid = UUID.randomUUID().toString();
-        	sbMessage.append(String.format("<div class=\"text-center\">\n"
-        			+ "      <a href=\"#\" onclick=\"$('#imagepreview').attr('src', $('#%s').attr('src'));$('#imagemodal').modal('show');\">\n"
-        			+ "          <img id=\"%s\" src=\"%s\" style=\"width: 300px\">\n"
-        			+ "      </a>"
-        			+ "</div>\n", uuid, uuid, screenshot.getImagePath()));
+        	sbMessage.append(String.format("""
+<div class="text-center">
+      <a href="#" onclick="$('#imagepreview').attr('src', $('#%s').attr('src'));$('#imagemodal').modal('show');">
+          <img id="%s" src="%s" style="width: 300px">
+      </a>"
+</div>
+""", uuid, uuid, screenshot.getImagePath()));
         }
         
         String snapshotTitle = name;
         if (screenshot.getTitle() != null) {
         	snapshotTitle = snapshotTitle + ": " + screenshot.getTitle();
         }
-        sbMessage.append("<div class=\"text-center\">" + StringEscapeUtils.escapeHtml4(snapshotTitle) + "</div>\n");
+        sbMessage.append("<div class=\"text-center\">").append(StringEscapeUtils.escapeHtml4(snapshotTitle)).append("</div>\n");
         sbMessage.append("<div class=\"text-center font-weight-lighter\">");
         
         if (screenshot.getLocation() != null) {
-            sbMessage.append("<a href='" + screenshot.getLocation() + "' target=url>URL</a>\n");
+            sbMessage.append("<a href='").append(screenshot.getLocation()).append("' target=url>URL</a>\n");
         }
 
         if (screenshot.getHtmlSourcePath() != null) {
-            sbMessage.append(" | <a href='" + screenshot.getHtmlSourcePath() + "' target=html>HTML Source</a>\n");
+            sbMessage.append(" | <a href='").append(screenshot.getHtmlSourcePath()).append("' target=html>HTML Source</a>\n");
         }
 
         sbMessage.append("</div>\n");
-
-        
 
         return sbMessage.toString();
     }
@@ -104,7 +100,7 @@ public class Snapshot extends TestAction {
     /**
      * Rename HTML and PNG files so that they do not present an uuid
      * New name is <test_name>_<step_idx>_<snapshot_idx>_<step_name>_<uuid>
-     * @param testStep
+     * @param testStep		the step where this snapshot is
      * @param stepIdx	   	number of this step
      * @param snapshotIdx	number of this snapshot for this step
      * @param userGivenName	name specified by user, rename to this name
@@ -135,8 +131,8 @@ public class Snapshot extends TestAction {
     	JSONObject snapshotJson = super.toJson();
     	snapshotJson.put("snapshotCheckType", snapshotCheckType.getName());
     	snapshotJson.put("idImage", (screenshot.getImage() == null || screenshot.getImage().getId() == null) ? JSONObject.NULL: screenshot.getImage().getId());
-    	snapshotJson.put("idHtml", (screenshot.getHtml() == null || screenshot.getHtml().getId() == null) ? JSONObject.NULL: screenshot.getHtml().getId());;
-    	snapshotJson.put("name", name);
+    	snapshotJson.put("idHtml", (screenshot.getHtml() == null || screenshot.getHtml().getId() == null) ? JSONObject.NULL: screenshot.getHtml().getId());
+    	snapshotJson.put("name", getName());
     	snapshotJson.put("title",screenshot.getTitle());
     	snapshotJson.put("url", screenshot.getLocation());
     	snapshotJson.put("displayInReport", displayInReport);
@@ -147,7 +143,7 @@ public class Snapshot extends TestAction {
 
 	/**
 	 * Rename the image file with "newBaseName"
-	 * @param newBaseName
+	 * @param newBaseName	the new base of file name
 	 */
 	private void renameImageFile(String newBaseName) {
 		
@@ -168,7 +164,7 @@ public class Snapshot extends TestAction {
 	}
 
 	/**
-	 * @param newBaseName
+	 * @param newBaseName	the new base of file name
 	 */
 	private void renameHtmlSourceFile(String newBaseName) {
 		String oldPath = screenshot.getHtmlSourcePath();
@@ -190,10 +186,10 @@ public class Snapshot extends TestAction {
 	/**
 	 * 	build file name with <base name>-<part of UUID>.html
 	 * 	this way, even when test is repeated multiple times, snapshots will have different names
-	 * 	(usefull for comments in bugtrackers where reference to new file should be different from previous ones)
-	 * @param newBaseName
-	 * @param oldFileName
-	 * @return
+	 * 	(useful for comments in bugtrackers where reference to new file should be different from previous ones)
+	 * @param newBaseName	the new base name
+	 * @param oldFileName	the current file name, so that id of file is kept
+	 * @return the new file name
 	 */
 	private String generateNewFileName(String newBaseName, String oldFileName) {
 		String newName;
@@ -222,9 +218,27 @@ public class Snapshot extends TestAction {
 			screenshot.relocate(outputDirectory, newImagePath, null);
 		}
 	}
-	
-	public Snapshot encode() throws FileNotFoundException {
-		return new Snapshot(screenshot, name, snapshotCheckType);
+
+	/**
+	 * Encode snapshot to a new format
+	 * @param format	json, html, xml
+	 * @return the new Snapshot instance
+	 */
+	@Override
+	public Snapshot encodeTo(String format)  {
+        try {
+            Snapshot encodedSnapshot = new Snapshot(screenshot, name, snapshotCheckType);
+			return encode(format, encodedSnapshot);
+        } catch (FileNotFoundException e) {
+            throw new ScenarioException(e.getMessage());
+        }
+    }
+
+	private Snapshot encode(String format, Snapshot snapshotToEncode) {
+		super.encode(format, snapshotToEncode);
+		snapshotToEncode.displayInReport = displayInReport;
+
+		return snapshotToEncode;
 	}
 	
 	public SnapshotCheckType getCheckSnapshot() {

@@ -137,10 +137,11 @@ public class TestCustomReporter extends ReporterTest {
 
 		// check content of the file. It should contains all fields with a value
 		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverShort", "detailed-result.json").toFile(), StandardCharsets.UTF_8);
-
+		Assert.assertFalse(detailedReportContent.contains(":\\\\/")); // check step has not been double encoded
 		JSONObject json = new JSONObject(detailedReportContent);
 
-		Assert.assertEquals(json.getString("appVersion"), "5.1");
+
+		Assert.assertTrue(json.getString("appVersion").contains(".")); // either 0.0 or the core version
 		Assert.assertEquals(json.getInt("failures"), 0);
 		Assert.assertEquals(json.getString("failedStep"), "");
 		Assert.assertEquals(json.getString("gridnode"), "LOCAL");

@@ -97,11 +97,10 @@ public class ScenarioLogger {
     /**
      * Log a value associated to a message
      * @param id		an id referencing value
-     * @param message	a human readable message
+     * @param message	a human-readable message
      * @param value		value of the message
      */
     public void logTestValue(String id, String message, String value) {
-
 
     	TestStep runningStep = TestStepManager.getParentTestStep();
     	if (runningStep == null) {
@@ -115,7 +114,7 @@ public class ScenarioLogger {
     }
     /**
      * Store a key / value pair in test, so that it can be added to reports at test level. Contrary to 'logTestValue' which is stored at test step level
-     * @param key
+     * @param key		what the info represent
      * @param value 	A StringInfo object (either StringInfo or HyperlinkInfo)
      */
     public void logTestInfo(String key, Info value) {
@@ -310,8 +309,8 @@ public class ScenarioLogger {
 
 	/**
 	 * Method for logging error on actions (e.g: a click fails)
-	 * It logs some lines of the stack to know where problem occured more precisely
-	 * even if the error is then catched. 
+	 * It logs some lines of the stack to know where problem occurred more precisely
+	 * even if the error is then caught.
 	 * @param throwable		the error
 	 */
 	public void logActionError(Throwable throwable) {

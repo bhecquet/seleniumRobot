@@ -1,7 +1,7 @@
 #set($stepIdx = 0)
 #set($testInfoIdx = 0)
 #set($pageLoadTimesIdx = 0)
-#set($stepsSize = $testSteps.size())
+#set($stepsSize = $unencodedTestSteps.size())
 #set($testInfoSize = $testInfos.size())
 #set($pageLoadTimesSize = $pageLoadTimes.size())
 {
@@ -31,9 +31,9 @@
 		#end
 	],
 	"steps": [
-		#foreach( $testStep in $testSteps )
+		#foreach( $unencodedTestStep in $unencodedTestSteps )
 			#set($stepIdx = $stepIdx + 1)
-			$testStep.toJson()#if( $stepIdx != $stepsSize),#end
+			$unencodedTestStep.toJson()#if( $stepIdx != $stepsSize),#end
 		#end
 	],
 	"pageLoads": [

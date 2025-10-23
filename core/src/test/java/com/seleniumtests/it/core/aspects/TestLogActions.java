@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,6 +20,7 @@ package com.seleniumtests.it.core.aspects;
 import java.io.IOException;
 import java.util.List;
 
+import com.seleniumtests.it.stubclasses.StubTestClassForDriverTest;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -66,7 +67,7 @@ public class TestLogActions extends GenericTest {
 	}
 
 	@Test(groups={"it"})
-	public void testVideoStartDateSetWhenVideoRecordingEnabled() throws Exception {
+	public void testVideoStartDateSetWhenVideoRecordingEnabled() {
 		WebDriver driver = null;
 		try {
 			SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
@@ -89,7 +90,7 @@ public class TestLogActions extends GenericTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testVideoStartDateSetWhenVideoRecordingDisabled() throws Exception {
+	public void testVideoStartDateSetWhenVideoRecordingDisabled() {
 		WebDriver driver = null;
 		try {
 			SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
@@ -116,10 +117,9 @@ public class TestLogActions extends GenericTest {
 	 * - page opening
 	 * - add
 	 * Checks that root steps are correctly intercepted
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
-	public void testSimpleNonCucumberStepLogging() throws IOException {
+	public void testSimpleNonCucumberStepLogging() {
 		new CalcPage()
 				.add(1, 1);
 
@@ -142,10 +142,9 @@ public class TestLogActions extends GenericTest {
 	 * - page opening
 	 * - add something to total (this step has the @StepName description
 	 * Checks that root steps are correctly intercepted
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
-	public void testSimpleNonCucumberStepLoggingWithStepDescription() throws IOException {
+	public void testSimpleNonCucumberStepLoggingWithStepDescription() {
 		new CalcPage()
 		.addWithName(1);
 
@@ -161,10 +160,9 @@ public class TestLogActions extends GenericTest {
 	 * - page opening
 	 * - 'add 1 to total' (this step has the @StepName description
 	 * Checks that root steps are correctly intercepted
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
-	public void testSimpleNonCucumberStepLoggingWithStepDescriptionAndArgs() throws IOException {
+	public void testSimpleNonCucumberStepLoggingWithStepDescriptionAndArgs() {
 		new CalcPage()
 		.addWithName2(1);
 
@@ -179,12 +177,10 @@ public class TestLogActions extends GenericTest {
 	 * - page opening
 	 * - add something to total (this step has the @StepName description
 	 * Checks that root steps are correctly intercepted
-	 * 
 	 * Here, we check the "@Step" annotation
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
-	public void testSimpleNonCucumberStepLoggingWithStepDescription2() throws IOException {
+	public void testSimpleNonCucumberStepLoggingWithStepDescription2() {
 		new CalcPage()
 		.addWithNameBis(1);
 		
@@ -200,12 +196,10 @@ public class TestLogActions extends GenericTest {
 	 * - page opening
 	 * - 'add 1 to total' (this step has the @StepName description
 	 * Checks that root steps are correctly intercepted
-	 * 
 	 * Here, we check the "@Step" annotation
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
-	public void testSimpleNonCucumberStepLoggingWithStepDescriptionAndArgs2() throws IOException {
+	public void testSimpleNonCucumberStepLoggingWithStepDescriptionAndArgs2() {
 		new CalcPage()
 		.addWithName2Bis(1);
 		
@@ -218,10 +212,9 @@ public class TestLogActions extends GenericTest {
 	/**
 	 * Check that if step definition contains argument name and one of argument is password, it's masked
 	 * - Connect to calc with login/******
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
-	public void testSimpleNonCucumberStepLoggingWithStepDescriptionPassword() throws IOException {
+	public void testSimpleNonCucumberStepLoggingWithStepDescriptionPassword() {
 		SeleniumTestsContextManager.getThreadContext().setMaskPassword(true);
 		new CalcPage()
 			.connectWithName("login", "somePassToConnect");
@@ -232,7 +225,7 @@ public class TestLogActions extends GenericTest {
 		Assert.assertEquals(steps.get(1).getAction(), "Connect to calc with ${login}/${password}");
 	}
 	@Test(groups={"it"})
-	public void testSimpleNonCucumberStepLoggingWithStepDescriptionPassword2() throws IOException {
+	public void testSimpleNonCucumberStepLoggingWithStepDescriptionPassword2() {
 		SeleniumTestsContextManager.getThreadContext().setMaskPassword(true);
 		new CalcPage()
 		.connectWithName("login", "$§AbCdE$DeF£GhIjKl*:?");
@@ -242,7 +235,7 @@ public class TestLogActions extends GenericTest {
 		Assert.assertEquals(steps.get(1).getName(), "Connect to calc with login/******");
 	}
 	@Test(groups={"it"})
-	public void testSimpleNonCucumberStepLoggingWithStepDescriptionPassword3() throws IOException {
+	public void testSimpleNonCucumberStepLoggingWithStepDescriptionPassword3() {
 		SeleniumTestsContextManager.getThreadContext().setMaskPassword(true);
 		new CalcPage()
 		.connect("login", "$§AbCdE$DeF£GhIjKl*:?");
@@ -254,10 +247,9 @@ public class TestLogActions extends GenericTest {
 	
 	/**
 	 * Check that if step definition contains argument name with array, all values are visible
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
-	public void testSimpleNonCucumberStepLoggingWithStepDescriptionArray() throws IOException {
+	public void testSimpleNonCucumberStepLoggingWithStepDescriptionArray() {
 		SeleniumTestsContextManager.getThreadContext().setMaskPassword(true);
 		new CalcPage()
 		.addWithName3(1, 2, 3);
@@ -269,12 +261,10 @@ public class TestLogActions extends GenericTest {
 	
 	/**
 	 * Check that if step definition contains argument name with array, all values are visible
-	 * 
 	 * Here, we check the "@Step" annotation
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
-	public void testSimpleNonCucumberStepLoggingWithStepDescriptionArray2() throws IOException {
+	public void testSimpleNonCucumberStepLoggingWithStepDescriptionArray2() {
 		SeleniumTestsContextManager.getThreadContext().setMaskPassword(true);
 		new CalcPage()
 		.addWithName3Bis(1, 2, 3);
@@ -290,10 +280,9 @@ public class TestLogActions extends GenericTest {
 	 * 		- addC		=> first interception by calling addC: never happens in real cucumber test
 	 * 			- addC  => cucumber annotation interception
 	 * Checks that root steps are correctly intercepted
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
-	public void testSimpleCucumberStepLogging() throws IOException {
+	public void testSimpleCucumberStepLogging() {
 		SeleniumRobotTestPlan.setCucumberTest(true);
 		new CalcPage()
 			.addC(1, 1);
@@ -320,15 +309,14 @@ public class TestLogActions extends GenericTest {
 	 * - failAction
 	 * Checks that root steps are correctly intercepted with an action in error
 	 * Also check this action is marked as failed and exception is present in step
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
-	public void testFailedStepOnException() throws IOException {
+	public void testFailedStepOnException() {
 		try {
 			new CalcPage()
 				.failAction();
 		} catch (DriverExceptions e) {
-			// continue;
+			// continue
 		}
 
 		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
@@ -340,6 +328,44 @@ public class TestLogActions extends GenericTest {
 		Assert.assertNotNull(steps.get(1).getActionException());
 		Assert.assertEquals(steps.get(1).getActionException().getMessage(), "fail");
 	}
+
+	/**
+	 * Check that if an action fails, it holds the exception, and also the calling step
+	 */
+	@Test(groups="it")
+	public void testFailedAction() {
+
+		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(2);
+		try {
+			new StubTestClassForDriverTest().testDriverFailed();
+		} catch (Exception e) {
+			// ignore error
+		}
+
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
+		Assert.assertEquals(steps.size(), 4);
+
+		Assert.assertFalse(steps.get(2).getFailed());
+		Assert.assertNull(steps.get(2).getActionException());
+		Assert.assertEquals(steps.get(3).getName(), "_writeSomethingOnNonExistentElement");
+		Assert.assertTrue(steps.get(3).getFailed());
+
+		// exception is forwarded to step
+		Assert.assertTrue(steps.get(3).getActionException().getMessage().startsWith("Searched element [TextFieldElement Text, by={By.id: text___}] from page 'com.seleniumtests.it.driver.support.pages.DriverTestPage' could not be found"));
+		Assert.assertEquals(steps.get(3).getStepActions().size(), 2);
+
+		// the failed action has logged exception
+		Assert.assertEquals(steps.get(3).getStepActions().get(0).getName(), "sendKeys on TextFieldElement Text, by={By.id: text___} with args: (true, true, [a text,], )");
+		Assert.assertTrue(steps.get(3).getStepActions().get(0).getActionException().getMessage().startsWith("Searched element [TextFieldElement Text, by={By.id: text___}] from page 'com.seleniumtests.it.driver.support.pages.DriverTestPage' could not be found"));
+		Assert.assertTrue(steps.get(3).getStepActions().get(0).getFailed());
+
+		// a test message is logged for that action in error
+		Assert.assertTrue(steps.get(3).getStepActions().get(1).getName().startsWith("""
+				Warning: Searched element [TextFieldElement Text, by={By.id: text___}] from page 'com.seleniumtests.it.driver.support.pages.DriverTestPage' could not be found
+				For documentation on this error, please visit:"""));
+
+	}
 	
 	/**
 	 * Only test presence of root steps. there should be:
@@ -347,15 +373,14 @@ public class TestLogActions extends GenericTest {
 	 * - failAction
 	 * Checks that root steps are correctly intercepted with an action in error (AssertionError)
 	 * Also check this action is marked as failed and exception is present in step
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
-	public void testFailedStepOnAssertion() throws IOException {
+	public void testFailedStepOnAssertion() {
 		try {
 			new CalcPage()
 			.assertAction();
 		} catch (AssertionError e) {
-			// continue;
+			// continue
 		}
 
 		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
@@ -379,10 +404,9 @@ public class TestLogActions extends GenericTest {
 	 * 			- donothing								=> sub-step
 	 * 				- doNothing on HtmlElement none		=> action on element
 	 * Checks that root steps are correctly intercepted
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
-	public void testSubStepsNonCucumberStepLogging() throws IOException {
+	public void testSubStepsNonCucumberStepLogging() {
 		new CalcPage()
 					.add(1, 1)
 					.add(2);
@@ -409,7 +433,7 @@ public class TestLogActions extends GenericTest {
 	}
 	
 
-	private void testPassword(boolean maskPassword, String password, String expectedPass) throws IOException {
+	private void testPassword(boolean maskPassword, String password, String expectedPass) {
 		SeleniumTestsContextManager.getThreadContext().setMaskPassword(maskPassword);
 		new CalcPage()
 		.connect("login", password);
@@ -422,67 +446,61 @@ public class TestLogActions extends GenericTest {
 	
 	/**
 	 * Check password replacement not done when not requested
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
-	public void testPasswordNoReplacement() throws IOException {
+	public void testPasswordNoReplacement() {
 		testPassword(false, "somePassToConnect", "somePassToConnect");
 	}
 	
 	
 	/**
 	 * Check password replacement when {@code @Mask} annotation is used on parameter
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
-	public void testPasswordMasking() throws IOException {
+	public void testPasswordMasking() {
 		new CalcPage()
 			.addAndMask(1, 234567);
 		
 		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
-		Assert.assertEquals(steps.get(1).getName(), String.format("addAndMask with args: (1, ******, )"));
+		Assert.assertEquals(steps.get(1).getName(), "addAndMask with args: (1, ******, )");
 	}
 	
 	/**
 	 * If password is null do not replace
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
-	public void testPasswordReplacementNull() throws IOException {
+	public void testPasswordReplacementNull() {
 		testPassword(true, null, "null");
 	}
 	
 	/**
 	 * Check password replacement done when requested by start option
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
-	public void testPasswordReplacement() throws IOException {
+	public void testPasswordReplacement() {
 		testPassword(true, "somePassToConnect", "******");
 	}
 	
 	/**
 	 * Check password replacement is not done if password is null
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
-	public void testNullPasswordReplacement() throws IOException {
+	public void testNullPasswordReplacement() {
 		testPassword(true, null, "null");
 	}
 	
 	/**
 	 * A step is defined with error cause
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
-	public void testStepWithErrorCause() throws IOException {
+	public void testStepWithErrorCause() {
 		try {
 			new CalcPage()
 			.addWithErrorCauseErrorAndDetails(1);
 		} catch (DriverExceptions e) {
-			// continue;
+			// continue
 		}
 		
 		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();

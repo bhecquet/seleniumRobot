@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,11 +39,11 @@ public class TestValue extends TestAction {
 	}
 
 	public String getMessage() {
-		return message;
+		return maskPasswordInString(message);
 	}
 
 	public String getValue() {
-		return value;
+		return maskPasswordInString(value);
 	}
 	
 	public String format() {
@@ -55,26 +55,23 @@ public class TestValue extends TestAction {
 		JSONObject actionJson = new JSONObject();
 		
 		actionJson.put("type", "value");
-		actionJson.put("message", message);
-		actionJson.put("id", name);
-		actionJson.put("value", value);
+		actionJson.put("message", getMessage());
+		actionJson.put("id", getName());
+		actionJson.put("value", getValue());
 		
 		return actionJson;
 	}
 	
 	@Override
-	public TestValue encode(String format) {
-		TestValue val =  new TestValue(encodeString(name, format), 
-				encodeString(message, format),
-				encodeString(value, format));
-		
-		if (format == null) {
-			val.encoded = encoded;
-		} else {
-			val.encoded = true;
-		}
-		
-		val.timestamp = timestamp;
-		return val;
+	public TestValue encodeTo(String format) {
+		TestValue valueToEncode =  new TestValue(name, message, value);
+		return encode(format, valueToEncode);
+	}
+
+	private TestValue encode(String format, TestValue valueToEncode) {
+		super.encode(format, valueToEncode);
+		valueToEncode.message = encodeString(message, format);
+		valueToEncode.value = encodeString(value, format);
+		return valueToEncode;
 	}
 }

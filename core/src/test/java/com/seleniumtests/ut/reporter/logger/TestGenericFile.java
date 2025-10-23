@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 
+import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 import org.testng.Assert;
@@ -31,7 +32,6 @@ public class TestGenericFile extends GenericTest {
 
 	/**
 	 * In case file is not in the output directory, move it even if it's not requested
-	 * @throws IOException
 	 */
 	@Test(groups={"ut"})
 	public void testFileMovedIfNotInOutputDirectory() throws IOException {
@@ -44,7 +44,6 @@ public class TestGenericFile extends GenericTest {
 	
 	/**
 	 * In case file is already in the test output directory 'test-output/mytest' for example, do not move it if not requested
-	 * @throws IOException
 	 */
 	@Test(groups={"ut"})
 	public void testFileNotMovedIfInOutputDirectory() throws IOException {
@@ -59,7 +58,6 @@ public class TestGenericFile extends GenericTest {
 	/**
 	 * Path is already relative to the output directory (in a sub-directory)
 	 * Check relativePath is corrected when file is moved
-	 * @throws IOException
 	 */
 	@Test(groups={"ut"})
 	public void testFileMovedIfRequested() throws IOException {
@@ -73,7 +71,6 @@ public class TestGenericFile extends GenericTest {
 
 	/**
 	 * Check copy is done and original file is kept
-	 * @throws IOException
 	 */
 	@Test(groups={"ut"})
 	public void testFileCopiedIfRequested() throws IOException {
@@ -132,7 +129,6 @@ public class TestGenericFile extends GenericTest {
 	
 	/**
 	 * Test case when file cannot be moved
-	 * @throws IOException
 	 */
 	@Test(groups={"ut"})
 	public void testFileNoReplaceOnCreation() throws IOException {
@@ -182,5 +178,27 @@ public class TestGenericFile extends GenericTest {
 		Assert.assertEquals(json.getString("name"), "description");
 		Assert.assertEquals(json.getString("type"), "file");
 		Assert.assertEquals(json.getInt("id"), 1);
+	}
+
+	@Test(groups={"ut"})
+	public void testEncodeTo() throws IOException {
+		File videoFile = File.createTempFile("video", ".avi");
+		videoFile.deleteOnExit();
+		FileUtils.write(videoFile, "bar", StandardCharsets.UTF_8);
+		GenericFile genericFile = new GenericFile(videoFile, "description<");
+		GenericFile encodedFile = genericFile.encodeTo("xml");
+		Assert.assertEquals(encodedFile.getFile(), genericFile.getFile());
+		Assert.assertEquals(encodedFile.getPosition(), genericFile.getPosition());
+		Assert.assertEquals(encodedFile.getTimestamp(), genericFile.getTimestamp());
+		Assert.assertEquals(encodedFile.getName(), "description&lt;");
+	}
+
+	@Test(groups={"ut"}, expectedExceptions = CustomSeleniumTestsException.class, expectedExceptionsMessageRegExp = ".*only escaping of 'xml', 'html', 'csv', 'json' is allowed.*")
+	public void testEncodeToWrongFormat() throws IOException {
+		File videoFile = File.createTempFile("video", ".avi");
+		videoFile.deleteOnExit();
+		FileUtils.write(videoFile, "bar", StandardCharsets.UTF_8);
+		GenericFile genericFile = new GenericFile(videoFile, "description<");
+		genericFile.encodeTo("bla");
 	}
 }

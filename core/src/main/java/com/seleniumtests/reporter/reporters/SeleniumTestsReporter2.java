@@ -361,7 +361,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		for (TestStep testStep: testSteps) {
 			
 			List<Object> stepInfo = new ArrayList<>();
-			TestStep encodedTestStep = testStep.encode("html");
+			TestStep encodedTestStep = testStep.encodeTo("html");
 			
 			stepInfo.add(encodedTestStep.getName());
 			

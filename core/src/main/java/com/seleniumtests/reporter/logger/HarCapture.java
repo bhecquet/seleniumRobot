@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,8 +29,8 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 
 public class HarCapture extends TestAction {
 
-	private Har har;
-	private FileContent harFile;
+	private final Har har;
+	private final FileContent harFile;
 	private static final String HAR_FILE_NAME = "networkCapture.har";
 	
 	public HarCapture(Har har, String name, FileContent harFile) {
@@ -49,7 +49,7 @@ public class HarCapture extends TestAction {
 		
 		har.writeTo(harFile.getFile());
 
-		logger.info("HAR capture file copied to " + harFile.getFile().getAbsolutePath());
+		logger.info("HAR capture file copied to {}", harFile.getFile().getAbsolutePath());
 	}
 	
 	public String buildHarLog() {
@@ -61,7 +61,7 @@ public class HarCapture extends TestAction {
 		JSONObject actionJson = new JSONObject();
 		
 		actionJson.put("type", "networkCapture");
-		actionJson.put("name", name);
+		actionJson.put("name", getName());
 		actionJson.put("id", harFile.getId() == null ? JSONObject.NULL: harFile.getId());
 		
 		return actionJson;
@@ -78,9 +78,16 @@ public class HarCapture extends TestAction {
 	public FileContent getFileContent() {
 		return harFile;
 	}
-	
-	public HarCapture encode() {
-		return new HarCapture(har, name, harFile);
+
+	@Override
+	public HarCapture encodeTo(String format) {
+		HarCapture harToEncode = new HarCapture(har, name, harFile);
+		return encode(format, harToEncode);
+	}
+
+	private HarCapture encode(String format, HarCapture harCaptureToEncode) {
+		super.encode(format, harCaptureToEncode);
+		return harCaptureToEncode;
 	}
 
 }

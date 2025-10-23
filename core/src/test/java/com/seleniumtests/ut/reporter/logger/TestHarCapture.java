@@ -7,11 +7,11 @@ import java.util.ArrayList;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestStepManager;
+import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.reporter.logger.HarCapture;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.har.Har;
 import com.seleniumtests.util.har.Page;
-import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
@@ -63,5 +63,25 @@ public class TestHarCapture extends GenericTest {
 		File harFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "main-networkCapture.har").toFile();
 		Assert.assertTrue(harFile.exists());
 		Assert.assertEquals(json.getInt("id"), 2);
+	}
+
+	@Test(groups={"ut"})
+	public void testEncodeTo() throws IOException {
+		Har har = new Har();
+		har.getLog().addPage(new Page("", "title", "a title"));
+		HarCapture capture = new HarCapture(har, "main");
+		HarCapture encodedHarCapture = capture.encodeTo("xml");
+		Assert.assertEquals(encodedHarCapture.getFile(), capture.getFile());
+		Assert.assertEquals(encodedHarCapture.getPosition(), capture.getPosition());
+		Assert.assertEquals(encodedHarCapture.getTimestamp(), capture.getTimestamp());
+		Assert.assertEquals(encodedHarCapture.getName(), "main");
+	}
+
+	@Test(groups={"ut"}, expectedExceptions = CustomSeleniumTestsException.class, expectedExceptionsMessageRegExp = ".*only escaping of 'xml', 'html', 'csv', 'json' is allowed.*")
+	public void testEncodeToWrongFormat() throws IOException {
+		Har har = new Har();
+		har.getLog().addPage(new Page("", "title", "a title"));
+		HarCapture capture = new HarCapture(har, "main");
+		capture.encodeTo("bla");
 	}
 }

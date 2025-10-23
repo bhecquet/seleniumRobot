@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class PageLoadTime extends TestAction {
 
-    private final String url;
+    private String url;
     private final long loadTime;
     private final PageObject pageObject;
 
@@ -34,7 +34,7 @@ public class PageLoadTime extends TestAction {
         JSONObject actionJson = new JSONObject();
 
         actionJson.put("url", url);
-        actionJson.put("name", name);
+        actionJson.put("name", getName());
         actionJson.put("loadTime", loadTime);
         actionJson.put("page", pageObject.getClass().getSimpleName());
         actionJson.put("timestamp", timestamp.toInstant().toEpochMilli());
@@ -43,16 +43,15 @@ public class PageLoadTime extends TestAction {
     }
 
     @Override
-    public PageLoadTime encode(String format) {
-        PageLoadTime pageLoadTime = new PageLoadTime(encodeString(url, format), pageObject, loadTime);
+    public PageLoadTime encodeTo(String format) {
+        PageLoadTime pageLoadTimeToEncode = new PageLoadTime(url, pageObject, loadTime);
+        return encode(format, pageLoadTimeToEncode);
+    }
 
-        if (format == null) {
-            pageLoadTime.encoded = encoded;
-        } else {
-            pageLoadTime.encoded = true;
-        }
-
-        return pageLoadTime;
+    private PageLoadTime encode(String format, PageLoadTime pageLoadTimeToEncode) {
+        super.encode(format, pageLoadTimeToEncode);
+        pageLoadTimeToEncode.url = encodeString(url, format);
+        return pageLoadTimeToEncode;
     }
 
     public String getUrl() {

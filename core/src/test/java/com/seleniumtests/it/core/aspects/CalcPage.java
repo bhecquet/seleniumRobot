@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,7 +35,7 @@ import io.cucumber.java.en.When;
 
 public class CalcPage extends PageObject {
 	
-	private static HtmlElement nonElement = new HtmlElement("none", By.id("none")); 
+	private static final HtmlElement nonElement = new HtmlElement("none", By.id("none"));
 	
 	private int result = 0;
 
@@ -65,7 +65,7 @@ public class CalcPage extends PageObject {
 		throw new DriverExceptions("fail");
 	}
 
-	public CalcPage failApplicationError() {
+	public void failApplicationError() {
 		throw new WebDriverException("no element found");
 	}
 
@@ -82,14 +82,18 @@ public class CalcPage extends PageObject {
 	public CalcPage addWithSubStepCatchedError(int a) {
 		try {
 			addWithCatchedError(a);
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			// ignore error
+		}
 		return this;
 	}
 	
 	public CalcPage addWithCatchedError(int a) {
 		try {
 			failAction();
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			// ignore error
+		}
 		return this;
 	}
 	

@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,10 +20,7 @@ package com.seleniumtests.reporter.logger;
 import java.io.File;
 import java.io.IOException;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
@@ -246,6 +243,13 @@ public class TestStep extends TestAction {
 	public void addValue(TestValue value) {
 		value.setPosition(stepActions.size());
 		stepActions.add(value);
+
+		// add replacement of the parent to this message
+		value.pwdToReplace.addAll(pwdToReplace);
+
+		// inherit password masking from step
+		value.maskPassword = maskPassword;
+
 		value.setParent(this);
 	}
 	public void addStep(TestStep step) {
@@ -530,53 +534,40 @@ public class TestStep extends TestAction {
 	 * Creates an new TestStep, encoding text of sub-steps and elements.
 	 */
 	@Override
-	public TestStep encode(String format) {
+	public TestStep encodeTo(String format) {
+		TestStep stepToEncode = new TestStep(name, action, origin, testResult, pwdToReplace, maskPassword);
+		return encode(format, stepToEncode);
+	}
 
-		List<String> encodedPasswords = encodePasswords(pwdToReplace, format);
-		TestStep step = new TestStep(encodeString(name, format), encodeString(action, format), origin, testResult, encodedPasswords, maskPassword);
-		
-		step.stepActions = new ArrayList<>();
+	private TestStep encode(String format, TestStep stepToEncode) {
+		super.encode(format, stepToEncode);
+
+		stepToEncode.action = encodeString(action, format);
+		stepToEncode.stepActions = new ArrayList<>();
 		for (TestAction testAction: stepActions) {
-			step.stepActions.add(testAction.encode(format));
+			stepToEncode.stepActions.add(testAction.encodeTo(format));
 		}
-		
-		step.failed = failed;
-		step.snapshots = new ArrayList<>(snapshots);
-		step.files = new ArrayList<>();
-		for (GenericFile file: files) {
-			step.files.add(file.encode(format));
-		}
-		
-		if (format == null) {
-			step.encoded = encoded;
-		} else {
-			step.encoded = true;
-		}
-		
-		step.duration = duration;
-		step.startDate = startDate;
-		step.videoTimeStamp = videoTimeStamp;
-		step.harCaptures = new ArrayList<>();
-        step.harCaptures.addAll(harCaptures);
-		step.actionException = actionException;
-		if (actionException != null) {
-			step.actionExceptionMessage = encodeString(ExceptionUtility.getExceptionMessage(actionException), format);
-		}
-		
 
-		step.errorCause = errorCause;
-		step.errorCauseDetails = encodeString(errorCauseDetails, format);
-		step.disableBugtracker = disableBugtracker;
-		step.timestamp = timestamp;
-		step.durationToExclude = durationToExclude;
-		step.pageLoadTime = pageLoadTime;
+		stepToEncode.failed = failed;
+		stepToEncode.snapshots = snapshots.stream().filter(Objects::nonNull).map(s -> s.encodeTo(format)).toList();
+		stepToEncode.files = files.stream().filter(Objects::nonNull).map(f -> f.encodeTo(format)).toList();
+
+		stepToEncode.duration = duration;
+		stepToEncode.startDate = startDate;
+		stepToEncode.videoTimeStamp = videoTimeStamp;
+		stepToEncode.harCaptures = harCaptures.stream().filter(Objects::nonNull).map(h -> h.encodeTo(format)).toList();
+
+		stepToEncode.errorCause = errorCause;
+		stepToEncode.errorCauseDetails = encodeString(errorCauseDetails, format);
+		stepToEncode.disableBugtracker = disableBugtracker;
+		stepToEncode.pageLoadTime = pageLoadTime == null ? null: pageLoadTime.encodeTo(format);
 		
-		return step;
+		return stepToEncode;
 	}
 
 	@Override
 	public TestStep deepCopy() {
-		return encode(null);
+		return encodeTo(null);
 	}
 	public long getVideoTimeStamp() {
 		return videoTimeStamp;

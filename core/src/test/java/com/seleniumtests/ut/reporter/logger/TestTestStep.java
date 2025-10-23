@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,6 +27,7 @@ import java.util.List;
 
 import com.seleniumtests.it.core.aspects.CalcPage;
 import com.seleniumtests.reporter.logger.*;
+import com.seleniumtests.uipage.htmlelements.ButtonElement;
 import com.seleniumtests.util.har.Har;
 import com.seleniumtests.util.har.Page;
 import com.seleniumtests.util.helper.WaitHelper;
@@ -34,6 +35,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
+import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriverException;
 import org.testng.Assert;
@@ -479,14 +481,14 @@ public class TestTestStep extends GenericTest {
 	@Test(groups = { "ut" }, expectedExceptions = CustomSeleniumTestsException.class)
 	public void testTestStepEncodeUnexpected() {
 		TestStep step = new TestStep("step1 \"'<>&", "step1 \"'<>&", this.getClass(), null, new ArrayList<>(), true);
-		step.encode("wrongFormat");
+		step.encodeTo("wrongFormat");
 	}
 
 	@Test(groups = { "ut" })
 	public void testTestStepEncodeHtml() {
 		TestStep step = new TestStep("step1 \"'<>&\u0192", "step1 \"'<>&\u0192", this.getClass(), null, new ArrayList<>(), true, RootCause.REGRESSION, "\"'<>&\u0192", false);
 		step.setFailed(true); // mandatory so that errorCauseDetails is not null
-		TestStep encodedTestStep = step.encode("html");
+		TestStep encodedTestStep = step.encodeTo("html");
 		Assert.assertEquals(encodedTestStep.toString(), "Step step1 &quot;'&lt;&gt;&amp;&fnof;");
 		Assert.assertEquals(encodedTestStep.getRootCauseDetails(), "&quot;'&lt;&gt;&amp;&fnof;");
 	}
@@ -496,7 +498,7 @@ public class TestTestStep extends GenericTest {
 		TestStep step = new TestStep("step1 \"/\\", "step1 \"/\\", this.getClass(), null, new ArrayList<>(), true, RootCause.REGRESSION, "\"/\\", false);
 
 		step.setFailed(true); // mandatory so that errorCauseDetails is not null
-		TestStep encodedTestStep = step.encode("json");
+		TestStep encodedTestStep = step.encodeTo("json");
 		Assert.assertEquals(encodedTestStep.toString(), "Step step1 \\\"\\/\\\\");
 		Assert.assertEquals(encodedTestStep.getAction(), "step1 \\\"\\/\\\\");
 		Assert.assertEquals(encodedTestStep.getRootCauseDetails(), "\\\"\\/\\\\");
@@ -506,15 +508,18 @@ public class TestTestStep extends GenericTest {
 	public void testTestStepEncodeXml() {
 		TestStep step = new TestStep("step1 \"'<>&", "step1 \"'<>&", this.getClass(), null, new ArrayList<>(), true, RootCause.REGRESSION,  "\"'<>&", false);
 		step.setFailed(true); // mandatory so that errorCauseDetails is not null
-		TestStep encodedTestStep = step.encode("xml");
+		TestStep encodedTestStep = step.encodeTo("xml");
 		Assert.assertEquals(encodedTestStep.toString(), "Step step1 &quot;&apos;&lt;&gt;&amp;");
 		Assert.assertEquals(encodedTestStep.getRootCauseDetails(), "&quot;&apos;&lt;&gt;&amp;");
 	}
 	
 	@Test(groups = { "ut" })
 	public void testDeepCopy() {
-		TestStep step = new TestStep("step1", "step1", this.getClass(), null, new ArrayList<>(), true, RootCause.REGRESSION, "\"'<>&\u0192", false);
+		TestStep step = new TestStep("step1", "step1", this.getClass(), null, List.of("foo"), true, RootCause.REGRESSION, "\"'<>&\u0192", false);
+		step.setDurationToExclude(3);
+		step.setActionException(new WebDriverException());
 		TestStep encodedTestStep = step.deepCopy();
+		Assert.assertFalse(step.isEncoded());
 		Assert.assertEquals(step.getName(), encodedTestStep.getName());
 		Assert.assertEquals(step.getStepActions(), encodedTestStep.getStepActions());
 		Assert.assertEquals(step.getFailed(), encodedTestStep.getFailed());
@@ -527,6 +532,11 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(step.getRootCause(), encodedTestStep.getRootCause());
 		Assert.assertEquals(step.getRootCauseDetails(), encodedTestStep.getRootCauseDetails());
 		Assert.assertEquals(step.isDisableBugtracker(), encodedTestStep.isDisableBugtracker());
+		Assert.assertEquals(step.getPwdToReplace(), encodedTestStep.getPwdToReplace());
+		Assert.assertEquals(step.getPosition(), encodedTestStep.getPosition());
+		Assert.assertEquals(step.getTimestamp(), encodedTestStep.getTimestamp());
+		Assert.assertEquals(step.getDurationToExclude(), encodedTestStep.getDurationToExclude());
+		Assert.assertEquals(step.getActionException(), encodedTestStep.getActionException());
 		Assert.assertNull(step.getActionExceptionMessage());
 	}
 
@@ -537,14 +547,14 @@ public class TestTestStep extends GenericTest {
 	public void testTestStepEncodeXmlStatusFailed() {
 		TestStep step = new TestStep("step1 \"'<>&", "step1 \"'<>&", this.getClass(), null, new ArrayList<>(), true);
 		step.setFailed(true);
-		TestStep encodedTestStep = step.encode("xml");
+		TestStep encodedTestStep = step.encodeTo("xml");
 		Assert.assertTrue(encodedTestStep.getFailed());
 	}
 
 	@Test(groups = { "ut" })
 	public void testTestStepEncodeXmlPasswordKept() {
 		TestStep step = new TestStep("step1 \"'<>&", "step1 \"'<>&", this.getClass(), null, List.of("myPassword"), true);
-		TestStep encodedTestStep = step.encode("xml");
+		TestStep encodedTestStep = step.encodeTo("xml");
 		Assert.assertTrue(encodedTestStep.getPwdToReplace().contains("myPassword"));
 	}
 
@@ -552,7 +562,7 @@ public class TestTestStep extends GenericTest {
 	public void testTestStepEncodeXmlExceptionKept() {
 		TestStep step = new TestStep("step1 \"'<>&", "step1 \"'<>&", this.getClass(), null, new ArrayList<>(), true);
 		step.setActionException(new Throwable("foo"));
-		TestStep encodedTestStep = step.encode("xml");
+		TestStep encodedTestStep = step.encodeTo("xml");
 		Assert.assertNotNull(encodedTestStep.getActionException());
 		Assert.assertEquals(encodedTestStep.getActionExceptionMessage(), "class java.lang.Throwable: foo");
 	}
@@ -564,7 +574,7 @@ public class TestTestStep extends GenericTest {
 	public void testTestStepEncodeXmlWebDriverExceptionKept() {
 		TestStep step = new TestStep("step1 \"'<>&", "step1 \"'<>&", this.getClass(), null, new ArrayList<>(), true);
 		step.setActionException(new NoSuchElementException("foo"));
-		TestStep encodedTestStep = step.encode("xml");
+		TestStep encodedTestStep = step.encodeTo("xml");
 		Assert.assertNotNull(encodedTestStep.getActionException());
 		Assert.assertEquals(encodedTestStep.getActionExceptionMessage(), "class org.openqa.selenium.NoSuchElementException: foo\n");
 	}
@@ -577,8 +587,8 @@ public class TestTestStep extends GenericTest {
 
 		TestStep step = new TestStep("step1 \"'<>&", "step1 \"'<>&", this.getClass(), null, new ArrayList<>(), true);
 		step.setHarCaptures(List.of(cap));
-		TestStep encodedTestStep = step.encode("xml");
-		Assert.assertEquals(encodedTestStep.getHarCaptures().get(0), cap);
+		TestStep encodedTestStep = step.encodeTo("xml");
+		Assert.assertEquals(encodedTestStep.getHarCaptures().get(0).getFile(), cap.getFile());
 	}
 
 	@Test(groups = { "ut" })
@@ -588,21 +598,21 @@ public class TestTestStep extends GenericTest {
 
 		TestStep step = new TestStep("step1 \"'<>&", "step1 \"'<>&", this.getClass(), null, new ArrayList<>(), true);
 		step.addFile(file);
-		TestStep encodedTestStep = step.encode("xml");
+		TestStep encodedTestStep = step.encodeTo("xml");
 		Assert.assertEquals(encodedTestStep.getFiles().get(0).getFile(), file.getFile());
 	}
 
 	@Test(groups = { "ut" })
 	public void testTestMessageEncodeXml() {
 		TestMessage msg = new TestMessage("everything OK \"'<>&", MessageType.INFO);
-		TestMessage encodedMsg = msg.encode("xml");
+		TestMessage encodedMsg = msg.encodeTo("xml");
 		Assert.assertEquals(encodedMsg.toString(), "everything OK &quot;&apos;&lt;&gt;&amp;");
 	}
 
 	@Test(groups = { "ut" })
 	public void testTestMessageEncodeXmlErrorMessage() {
 		TestMessage msg = new TestMessage("everything OK \"'<>&", MessageType.ERROR);
-		TestMessage encodedMsg = msg.encode("xml");
+		TestMessage encodedMsg = msg.encodeTo("xml");
 		Assert.assertTrue(encodedMsg.getFailed());
 	}
 
@@ -610,7 +620,7 @@ public class TestTestStep extends GenericTest {
 	public void testTestMessageEncodeXmlPasswordKept() {
 		TestMessage msg = new TestMessage("everything OK \"'<>&", MessageType.INFO);
 		msg.getPwdToReplace().add("myPassword");
-		TestMessage encodedMsg = msg.encode("xml");
+		TestMessage encodedMsg = msg.encodeTo("xml");
 		Assert.assertTrue(encodedMsg.getPwdToReplace().contains("myPassword"));
 	}
 
@@ -618,7 +628,7 @@ public class TestTestStep extends GenericTest {
 	@Test(groups = { "ut" })
 	public void testTestValueEncodeXml() {
 		TestValue value = new TestValue("id &", "key <>", "value \"'");
-		TestValue encodedValue = value.encode("xml");
+		TestValue encodedValue = value.encodeTo("xml");
 		Assert.assertEquals(encodedValue.toString(), "id &amp;");
 		Assert.assertEquals(encodedValue.getMessage(), "key &lt;&gt;");
 		Assert.assertEquals(encodedValue.getValue(), "value &quot;&apos;");
@@ -631,23 +641,24 @@ public class TestTestStep extends GenericTest {
 	@Test(groups = { "ut" })
 	public void testTestStepNoreencodeXml() {
 		TestStep step = new TestStep("step1 \"'<>&", "step1 \"'<>&", this.getClass(), null, new ArrayList<>(), true);
-		TestStep encodedTestStep = step.encode("xml");
-		TestStep encodedTestStep2 = encodedTestStep.encode("xml");
+		TestStep encodedTestStep = step.encodeTo("xml");
+		TestStep encodedTestStep2 = encodedTestStep.encodeTo("xml");
 		Assert.assertEquals(encodedTestStep2.toString(), "Step step1 &quot;&apos;&lt;&gt;&amp;");
 	}
 
 	@Test(groups = { "ut" })
 	public void testTestStepNoReEncodeJson() {
 		TestStep step = new TestStep("step1 \"/\\", "step1 \"/\\", this.getClass(), null, new ArrayList<>(), true);
-		TestStep encodedTestStep = step.encode("json");
+		TestStep encodedTestStep = step.encodeTo("json");
 		Assert.assertEquals(encodedTestStep.toJson().getString("name"), "step1 \\\"\\/\\\\");
 	}
 
 	/**
 	 * Check Step / sub-step encoding with XML
+	 * We check that every field that needs to be encoded is effectively encoded
 	 */
 	@Test(groups = { "ut" })
-	public void testEncodeXml() {
+	public void testEncodeXml() throws IOException {
 		TestStep step = new TestStep("step1 \"'<>&", "step1 \"'<>&", this.getClass(), null, new ArrayList<>(), true);
 		step.addMessage(new TestMessage("everything OK \"'<>&", MessageType.INFO));
 		step.addAction(new TestAction("action2 \"'<>&", false, new ArrayList<>()));
@@ -655,13 +666,26 @@ public class TestTestStep extends GenericTest {
 		TestStep subStep = new TestStep("subStep", "subStep", this.getClass(), null, new ArrayList<>(), true);
 		subStep.addMessage(new TestMessage("everything in subStep almost OK", MessageType.WARNING));
 		subStep.addAction(new TestAction("action1 \"'<>&", false, new ArrayList<>()));
+		subStep.addFile(new GenericFile(File.createTempFile("video", ".avi"), "video file <>"));
+		Har har = new Har();
+		har.getLog().addPage(new Page("", "title", "a title"));
+		subStep.addNetworkCapture(new HarCapture(har, "main &"));
+		subStep.addPageLoadTime(new PageLoadTime("http://foo.bar?a=b&c=d", new CalcPage(), 1230));
+		subStep.addValue(new TestValue("1", "key&", "value<"));
 		step.addAction(subStep);
 
-		TestStep encodedTestStep = step.encode("xml");
+		TestStep encodedTestStep = step.encodeTo("xml");
 		Assert.assertTrue(encodedTestStep.toString().contains("Step step1 &quot;&apos;&lt;&gt;&amp;"));
 		Assert.assertTrue(encodedTestStep.toString().contains("everything OK &quot;&apos;&lt;&gt;&amp;"));
 		Assert.assertTrue(encodedTestStep.toString().contains("action2 &quot;&apos;&lt;&gt;&amp;"));
 		Assert.assertTrue(encodedTestStep.toString().contains("action1 &quot;&apos;&lt;&gt;&amp;"));
+		Assert.assertEquals(((TestStep)encodedTestStep.getStepActions().get(2)).getStepActions().get(1).getName(), "action1 &quot;&apos;&lt;&gt;&amp;");
+		Assert.assertEquals(((TestStep)encodedTestStep.getStepActions().get(2)).getStepActions().get(2).getName(), "1");
+		Assert.assertEquals(((TestValue)((TestStep)encodedTestStep.getStepActions().get(2)).getStepActions().get(2)).getMessage(), "key&amp;");
+		Assert.assertEquals(((TestValue)((TestStep)encodedTestStep.getStepActions().get(2)).getStepActions().get(2)).getValue(), "value&lt;");
+		Assert.assertEquals(((TestStep) encodedTestStep.getStepActions().get(2)).getFiles().get(0).getName(), "video file &lt;&gt;");
+		Assert.assertEquals(((TestStep) encodedTestStep.getStepActions().get(2)).getHarCaptures().get(0).getName(), "main &amp;");
+		Assert.assertEquals(((TestStep) encodedTestStep.getStepActions().get(2)).getPageLoadTime().getUrl(), "http://foo.bar?a=b&amp;c=d");
 
 	}
 
@@ -675,7 +699,6 @@ public class TestTestStep extends GenericTest {
 		JSONObject stepJson = step.toJson();
 
 		Assert.assertEquals(stepJson.getString("type"), "step");
-		Assert.assertTrue(stepJson.isNull("exception"));
 		Assert.assertEquals(stepJson.getString("name"), "step1 with args: (https://myserver)");
 		Assert.assertEquals(stepJson.getString("action"), "step1");
 		Assert.assertEquals(stepJson.getString("origin"), "com.seleniumtests.ut.reporter.logger.TestTestStep");
@@ -715,29 +738,43 @@ public class TestTestStep extends GenericTest {
 	@Test(groups = { "ut" })
 	public void testEncode() throws IOException {
 		TestStep step = createSetOfSteps();
-		TestStep newStep = step.encode("json");
+		TestStep newStep = step.encodeTo("json");
 
+		Assert.assertTrue(newStep.isEncoded());
 		Assert.assertEquals(newStep.getStepActions().size(), step.getStepActions().size());
 		Assert.assertEquals(newStep.getStepActions().get(0).getName(), step.getStepActions().get(0).getName());
 		Assert.assertEquals(newStep.getFailed(), step.getFailed());
-		Assert.assertEquals(newStep.getSnapshots(), step.getSnapshots());
+		Assert.assertEquals(newStep.getSnapshots().size(), step.getSnapshots().size());
+		Assert.assertEquals(newStep.getSnapshots().get(0).getScreenshot(), step.getSnapshots().get(0).getScreenshot());
 		Assert.assertEquals(newStep.getFiles().size(), step.getFiles().size());
 		Assert.assertEquals(newStep.getDuration(), step.getDuration());
 		Assert.assertEquals(newStep.getStartDate(), step.getStartDate());
 		Assert.assertEquals(newStep.getVideoTimeStamp(), step.getVideoTimeStamp());
 		Assert.assertEquals(newStep.getHarCaptures().size(), step.getHarCaptures().size());
+		Assert.assertEquals(newStep.getHarCaptures().get(0).getFile(), step.getHarCaptures().get(0).getFile());
 		Assert.assertEquals(newStep.getActionException(), step.getActionException());
 		Assert.assertEquals(newStep.isDisableBugtracker(), step.isDisableBugtracker());
 		Assert.assertEquals(newStep.getTimestamp(), step.getTimestamp());
 		Assert.assertEquals(newStep.getDurationToExclude(), step.getDurationToExclude());
 		Assert.assertEquals(newStep.getPageLoadTime(), step.getPageLoadTime());
+		Assert.assertEquals(newStep.getTimestamp(), step.getTimestamp());
+		Assert.assertEquals(newStep.getPosition(), step.getPosition());
+		Assert.assertEquals(newStep.getActionException(), step.getActionException());
+		Assert.assertEquals(newStep.getStepActions().get(0).getPosition(), step.getStepActions().get(0).getPosition());
+		Assert.assertEquals(newStep.getPwdToReplace(), step.getPwdToReplace());
+		Assert.assertEquals(newStep.getDurationToExclude(), step.getDurationToExclude());
 	}
 
 	@NotNull
 	private TestStep createSetOfSteps() throws IOException {
 		TestStep step = new TestStep("step1 with args: (https://myserver)", "step1", this.getClass(), null, List.of("foobar"), true);
 		step.addMessage(new TestMessage("everything OK", MessageType.INFO));
-		step.addAction(new TestAction("action2", false, new ArrayList<>()));
+		step.addAction(new TestAction("action2", false,
+				new ArrayList<>(),
+				"the action",
+				new ButtonElement("label", By.id("buttong")),
+				CalcPage.class));
+		step.setActionException(new WebDriverException());
 
 		Har har = new Har();
 		har.getLog().addPage(new Page("", "title", "a title"));
@@ -857,11 +894,11 @@ Step step1 with args: (bar, ******)
 		step.addMessage(message);
 		step.addStep(substep);
 		
-		Assert.assertEquals(step.encode("html").getName(), "step1 with args: (bar, ******)");
-		Assert.assertEquals(action.encode("html").getName(), "action in step1 with args: (foo, ******)");
-		Assert.assertEquals(message.encode("html").getName(), "everything OK on ******");
-		Assert.assertEquals(substep.encode("html").getName(), "substep with args: (******)");
-		Assert.assertEquals(step.encode("html").toString(), """
+		Assert.assertEquals(step.encodeTo("html").getName(), "step1 with args: (bar, ******)");
+		Assert.assertEquals(action.encodeTo("html").getName(), "action in step1 with args: (foo, ******)");
+		Assert.assertEquals(message.encodeTo("html").getName(), "everything OK on ******");
+		Assert.assertEquals(substep.encodeTo("html").getName(), "substep with args: (******)");
+		Assert.assertEquals(step.encodeTo("html").toString(), """
 Step step1 with args: (bar, ******)
   - action in step1 with args: (foo, ******)
   - everything OK on ******
@@ -881,11 +918,11 @@ Step step1 with args: (bar, ******)
 		step.addMessage(message);
 		step.addStep(substep);
 		
-		Assert.assertEquals(step.encode("html").getName(), "step1 with args: (bar, ******)");
-		Assert.assertEquals(action.encode("html").getName(), "action in step1 with args: (foo, ******)");
-		Assert.assertEquals(message.encode("html").getName(), "everything OK on ******");
-		Assert.assertEquals(substep.encode("html").getName(), "substep with args: (******)");
-		Assert.assertEquals(step.encode("html").toString(), """
+		Assert.assertEquals(step.encodeTo("html").getName(), "step1 with args: (bar, ******)");
+		Assert.assertEquals(action.encodeTo("html").getName(), "action in step1 with args: (foo, ******)");
+		Assert.assertEquals(message.encodeTo("html").getName(), "everything OK on ******");
+		Assert.assertEquals(substep.encodeTo("html").getName(), "substep with args: (******)");
+		Assert.assertEquals(step.encodeTo("html").toString(), """
 Step step1 with args: (bar, ******)
   - action in step1 with args: (foo, ******)
   - everything OK on ******
@@ -903,11 +940,11 @@ Step step1 with args: (bar, ******)
 		step.addMessage(message);
 		step.addStep(substep);
 		
-		Assert.assertEquals(step.encode("xml").getName(), "step1 with args: (bar, ******)");
-		Assert.assertEquals(action.encode("xml").getName(), "action in step1 with args: (foo, ******)");
-		Assert.assertEquals(message.encode("xml").getName(), "everything OK on ******");
-		Assert.assertEquals(substep.encode("xml").getName(), "substep with args: (******)");
-		Assert.assertEquals(step.encode("xml").toString(), """
+		Assert.assertEquals(step.encodeTo("xml").getName(), "step1 with args: (bar, ******)");
+		Assert.assertEquals(action.encodeTo("xml").getName(), "action in step1 with args: (foo, ******)");
+		Assert.assertEquals(message.encodeTo("xml").getName(), "everything OK on ******");
+		Assert.assertEquals(substep.encodeTo("xml").getName(), "substep with args: (******)");
+		Assert.assertEquals(step.encodeTo("xml").toString(), """
 Step step1 with args: (bar, ******)
   - action in step1 with args: (foo, ******)
   - everything OK on ******

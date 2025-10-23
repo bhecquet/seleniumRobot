@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -53,10 +52,9 @@ public class GenericFile extends TestAction {
 	
 	/**
 	 * Store a file in log folder
-	 * @param file
-	 * @param description
-	 * @param fileOperation			copy / move / keep file
-	 * @throws IOException
+	 * @param file			the file to add for reporting
+	 * @param description	what the file represents
+	 * @param fileOperation	copy / move / keep file
 	 */
 	public GenericFile(File file, String description, FileOperation fileOperation) throws IOException {
 		super(description, false, new ArrayList<>());
@@ -98,8 +96,7 @@ public class GenericFile extends TestAction {
 	}
 	
 	/**
-	 * Build a string that can be used in HTML logs
-	 * @return
+	 * return a string that can be used in HTML logs
 	 */
 	public String buildLog() {		
 		return String.format("%s: <a href='%s'>file</a>", name, relativeFilePath);
@@ -112,15 +109,21 @@ public class GenericFile extends TestAction {
 		JSONObject actionJson = new JSONObject();
 		
 		actionJson.put("type", "file");
-		actionJson.put("name", name);
+		actionJson.put("name", getName());
 		actionJson.put("id", file.getId() == null ? JSONObject.NULL: file.getId());
 		
 		return actionJson;
 	}
 	
 	@Override
-	public GenericFile encode(String format) {
-		return new GenericFile(file, encodeString(name, format), relativeFilePath);
+	public GenericFile encodeTo(String format) {
+		GenericFile genericFileToEncode = new GenericFile(file, name, relativeFilePath);
+		return encode(format, genericFileToEncode);
+	}
+
+	private GenericFile encode(String format, GenericFile fileToEncode) {
+		super.encode(format, fileToEncode);
+		return fileToEncode;
 	}
 
 	public File getFile() {
