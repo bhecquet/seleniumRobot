@@ -30,72 +30,78 @@ public class SeleniumIdeParser {
 	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumIdeParser.class);
 
-	private StringBuilder testCode;
-	private StringBuilder webPageCode;
-	private File javaFile;
-	private String className;
+	private final StringBuilder testCode;
+	private final StringBuilder webPageCode;
+	private final File javaFile;
+	private final String className;
 	
-	public static final String PAGE_OBJECT_HEADER = "package com.infotel.selenium.ide;\n" + 
-			"\n" + 
-			"import java.io.IOException;\n" + 
-			"\n" + 
-			"import com.seleniumtests.uipage.PageObject;\n" + 
-			"import org.openqa.selenium.JavascriptExecutor;\n" + 
-			"import static org.testng.Assert.*;\n" + 
-			"import static org.hamcrest.MatcherAssert.*;\n" + 
-			"import static org.hamcrest.CoreMatchers.is;\n" + 
-			"import static org.hamcrest.core.IsNot.not;\n" + 
-			"import org.openqa.selenium.By;\n" + 
-			"import org.openqa.selenium.Dimension;\n" + 
-			"import org.openqa.selenium.WebElement;\n" + 
-			"import org.openqa.selenium.interactions.Actions;\n" + 
-			"import org.openqa.selenium.support.ui.ExpectedConditions;\n" + 
-			"import org.openqa.selenium.support.ui.WebDriverWait;\n" + 
-			"import org.openqa.selenium.JavascriptExecutor;\n" + 
-			"import org.openqa.selenium.Alert;\n" + 
-			"import org.openqa.selenium.Keys;\n" + 
-			"import com.seleniumtests.core.TestVariable;\n" +
-			"import java.util.Map.Entry;\n" +
-			"import com.seleniumtests.util.ide.IdeHashMap;\n" +
-			"import java.time.Duration;\n" +
-			"import java.util.*;\n" +  
-			"\n" + 
-			"public class %sPage extends PageObject {\n" + 
-			"\n" + 
-			"    private Map<String, Object> vars;\n" + 	
-			"    private JavascriptExecutor js;\n" + 	
-			"\n" + 	
-			"    public %sPage() throws IOException {\n" + 
-			"        super(null, \"https://initialurl.com\");\n" +
-			"        js = (JavascriptExecutor) driver;\n" + 
-			"        vars = new IdeHashMap<String, Object>();\n" +
-			"        for (Entry<String, TestVariable> entry: robotConfig().getConfiguration().entrySet()) {\n" + 
-			"            vars.put(entry.getKey(), entry.getValue().getValue());\n" + 
-			"        }\n"	+
-			"    }\n";
+	public static final String PAGE_OBJECT_HEADER = """
+			package com.infotel.selenium.ide;
+			
+			import java.io.IOException;
+			
+			import com.seleniumtests.uipage.PageObject;
+			import org.openqa.selenium.JavascriptExecutor;
+			import static org.testng.Assert.*;
+			import static org.hamcrest.MatcherAssert.*;
+			import static org.hamcrest.CoreMatchers.is;
+			import static org.hamcrest.core.IsNot.not;
+			import org.openqa.selenium.By;
+			import org.openqa.selenium.Dimension;
+			import org.openqa.selenium.WebElement;
+			import org.openqa.selenium.interactions.Actions;
+			import org.openqa.selenium.support.ui.ExpectedConditions;
+			import org.openqa.selenium.support.ui.WebDriverWait;
+			import org.openqa.selenium.JavascriptExecutor;
+			import org.openqa.selenium.Alert;
+			import org.openqa.selenium.Keys;
+			import com.seleniumtests.core.TestVariable;
+			import java.util.Map.Entry;
+			import com.seleniumtests.util.ide.IdeHashMap;
+			import java.time.Duration;
+			import java.util.*;
+			
+			public class %sPage extends PageObject {
+			
+			    private Map<String, Object> vars;
+			    private JavascriptExecutor js;
+			
+			    public %sPage() throws IOException {
+			        super(null, "https://initialurl.com");
+			        js = (JavascriptExecutor) driver;
+			        vars = new IdeHashMap<String, Object>();
+			        for (Entry<String, TestVariable> entry: robotConfig().getConfiguration().entrySet()) {
+			            vars.put(entry.getKey(), entry.getValue().getValue());
+			        }
+			    }""";
 	private static final String FOOTER = "}"; 
 	
-	public static final String TEST_HEADER = "package com.infotel.selenium.ide;\n" + 
-			"\n" + 
-			"import java.io.IOException;\n" + 
-			"import com.seleniumtests.core.runner.SeleniumTestPlan;\n" +  
-			"import org.testng.annotations.Test;\n" +
-			"\n" + 
-			"public class %s extends SeleniumTestPlan {\n\n";
+	public static final String TEST_HEADER = """
+			package com.infotel.selenium.ide;
+			
+			import java.io.IOException;
+			import com.seleniumtests.core.runner.SeleniumTestPlan;
+			import org.testng.annotations.Test;
+			
+			public class %s extends SeleniumTestPlan {
+			
+			""";
 
-	public static final String FAILED_PARSING =  "package com.infotel.selenium.ide;\n" +
-			"\n" +
-			"import java.io.IOException;\n" +
-			"import com.seleniumtests.core.runner.SeleniumTestPlan;\n" +
-			"import org.testng.annotations.Test;\n" +
-			"import org.testng.Assert;\n" +
-			"\n" +
-			"public class %s extends SeleniumTestPlan {\n\n" +
-			"	 @Test\n" +
-			"    public void test%s() {\n" +
-			"        Assert.assertFalse(true, \"%s\");\n" +
-			"    }\n" +
-			"}\n";
+	public static final String FAILED_PARSING =  """
+			package com.infotel.selenium.ide;
+			
+			import java.io.IOException;
+			import com.seleniumtests.core.runner.SeleniumTestPlan;
+			import org.testng.annotations.Test;
+			import org.testng.Assert;
+			
+			public class %s extends SeleniumTestPlan {
+			
+			    @Test
+			    public void test%s() {
+			        Assert.assertFalse(true, "%s");
+			    }
+			}""";
 	public SeleniumIdeParser(String filePath) {
 		
 		javaFile = new File(filePath);
@@ -118,7 +124,7 @@ public class SeleniumIdeParser {
 		Pattern patternWait = Pattern.compile(".*new WebDriverWait\\(driver, (\\d+)\\);$");
 		Pattern patternXPath = Pattern.compile("(.*By.xpath\\(\\\")(.*?)(\\\"\\)[,)].*)");
 		Pattern patternVariableQuote = Pattern.compile("(.*?)\\\"\\s*(vars.get.*.toString\\(\\))\\\"(.*;)$"); // https://github.com/SeleniumHQ/selenium-ide/issues/1175: for files of type assertEquals(vars.get("dateAujourdhui").toString(), "vars.get("dateFin").toString()");
-		Pattern patternVariable = Pattern.compile("(\\$\\{.*?\\})");
+		Pattern patternVariable = Pattern.compile("(\\$\\{.*?})");
 
 		try {
 			StringBuilder newContent = new StringBuilder();
@@ -130,7 +136,7 @@ public class SeleniumIdeParser {
 
 				Matcher matcherVariable = patternVariable.matcher(line);
 
-				// replace ${someVar} by vars.get("someVar");
+				// replace ${someVar} by vars.get("someVar")
 				while (matcherVariable.find()) {
 					String variableName = matcherVariable.group(1);
 					line = line.replace(variableName, String.format("vars.get(\"%s\").toString()", variableName.substring(2, variableName.length() - 1)));
@@ -145,7 +151,7 @@ public class SeleniumIdeParser {
 
 				// allow calling seleniumRobot code from inside a Selenium IDE script, with the use of "CALL:" comment
 				if (matcherCall.matches()) {
-					newContent.append(matcherCall.group(1).replace("\\\"", "\"") + "\n");
+					newContent.append(matcherCall.group(1).replace("\\\"", "\"")).append("\n");
 				
 				// replace WebDriverWait so that they are compatible with Selenium 4
 				} else if (matcherWait.matches()) {
@@ -176,24 +182,24 @@ public class SeleniumIdeParser {
 				} else if (matcherUrl.matches() && !initialUrlFound) {
 					initialUrl = matcherUrl.group(1);
 					initialUrlFound = true;
-					newContent.append(line + "\n");
+					newContent.append(line).append("\n");
 
 				} else {
-					newContent.append(line + "\n");
+					newContent.append(line).append("\n");
 				}
 			}
 			
 			FileUtils.writeStringToFile(javaFile, newContent.toString(), StandardCharsets.UTF_8);
 			
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 		
 		return initialUrl;
 	}
 	
 	public Map<String, String> parseSeleniumIdeFile() throws FileNotFoundException {
-		logger.info("Reading file " + javaFile);
+		logger.info("Reading file {}", javaFile);
 		String initialUrl = prepareJavaFile(javaFile);
 		Map<String, String> classInfo = new HashMap<>();
 		
@@ -202,8 +208,11 @@ public class SeleniumIdeParser {
 		boolean codeValid = cu.isSuccessful();
 		String error = cu.isSuccessful() ? null : new ParseProblemException(cu.getProblems()).getMessage().split("Problem")[0];
 
-		if (codeValid) {
-			cu.getResult().get().accept(new TestMethodVisitor(), new StringBuilder[]{testCode, webPageCode});
+
+		Optional<CompilationUnit> cuResult = cu.getResult();
+
+		if (codeValid && cuResult.isPresent()) {
+			cuResult.get().accept(new TestMethodVisitor(), new StringBuilder[]{testCode, webPageCode});
 
 			webPageCode.append(FOOTER);
 			testCode.append(FOOTER);
@@ -214,11 +223,11 @@ public class SeleniumIdeParser {
 			String webPageCodeStr = webPageCode.toString()
 					.replace("https://initialurl.com", initialUrl);
 
-			logger.info(String.format("generated class %s", className));
-			logger.info("\n" + testCodeStr);
+			logger.info("generated class {}", className);
+			logger.info("\n{}", testCodeStr);
 			logger.info("------------------------------------------");
-			logger.info(String.format("generated class %sPage", className));
-			logger.info("\n" + webPageCodeStr);
+			logger.info("generated class {}Page", className);
+			logger.info("\n{}", webPageCodeStr);
 
 			// try to load page code. Sometimes, parsing is done, but compilation fails
 			// if compilation is done correctly, it won't be done on the next call
@@ -237,12 +246,12 @@ public class SeleniumIdeParser {
 		if (!codeValid) {
 
 			logger.error("--------------------------------------------------------------------------------------------------------------------------------------------------------");
-			logger.error("invalid code, one element is missing : " + error);
+			logger.error("invalid code, one element is missing : {}", error);
 			logger.error("--------------------------------------------------------------------------------------------------------------------------------------------------------");
 
 			String testCodeStr = String.format(FAILED_PARSING, className, className, error.replace("\"", "\\\"").replace("\r", "").replace("\n", ""));
-			logger.info(String.format("generated error parsing class %s", className));
-			logger.info("\n" + testCodeStr);
+			logger.info("generated error parsing class {}", className);
+			logger.info("\n{}", testCodeStr);
 
 			classInfo.put("com.infotel.selenium.ide." + className, testCodeStr);
 
@@ -276,11 +285,11 @@ public class SeleniumIdeParser {
 				String body = optBody.get().toString().replace("\r", "");
 				for (String line: body.split("\n")) {
 					if (line.contains("System.out.println(\"STEP:") && "true".equals(System.getProperty(SeleniumTestsContext.MANUAL_TEST_STEPS))) {
-						pageCode.append(line.replace("System.out.println(\"STEP:", "addStep(\"") + "\n");
+						pageCode.append(line.replace("System.out.println(\"STEP:", "addStep(\"")).append("\n");
 					} else if (line.contains("System.out.println(")) {
-						pageCode.append(line.replace("System.out.println(", "logger.info(") + "\n");
+						pageCode.append(line.replace("System.out.println(", "logger.info(")).append("\n");
 					} else {
-			    		pageCode.append(line + "\n");
+			    		pageCode.append(line).append("\n");
 					}
 				}
 	    		pageCode.append("\n\n");

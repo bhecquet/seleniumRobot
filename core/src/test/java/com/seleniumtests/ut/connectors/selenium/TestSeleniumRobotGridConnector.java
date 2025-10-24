@@ -1425,7 +1425,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		
 		connector.getSessionInformationFromGrid(driver);
 		
-		verify(logger).info("Brower firefox (50.0) created in 0.0 secs on node localhost [http://localhost:4321] with session abcdef");
+		verify(logger).info("Browser firefox (50.0) created in 0.0 secs on node localhost [http://localhost:4321] with session abcdef");
 		
 		// check sessionId is set when test is started
 		verify(connector).setSessionId(any(SessionId.class));
@@ -1451,7 +1451,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 
 		connector.getSessionInformationFromGrid(driver);
 
-		verify(logger).info("Brower firefox (50.0) created in 0.0 secs on node localhost [http://localhost:4321] with session abcdef");
+		verify(logger).info("Browser firefox (50.0) created in 0.0 secs on node localhost [http://localhost:4321] with session abcdef");
 
 		// check sessionId is set when test is started
 		verify(connector).setSessionId(any(SessionId.class));
@@ -1505,7 +1505,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		Assert.assertEquals(connector.getNodeUrl(), "http://localhost:4321");
 		
 		// check that the driver session id is displayed in logs to help debugging
-		verify(logger).info("Brower firefox (50.0) created in 0.0 secs on node localhost [http://localhost:4321] with session abcdef");
-		verify(logger).info("Brower firefox (50.0) created in 0.0 secs on node localhost2 [http://localhost:4321] with session ghijkl");
+		verify(logger).info("Browser firefox (50.0) created in 0.0 secs on node localhost [http://localhost:4321] with session abcdef");
+		verify(logger).info("Browser firefox (50.0) created in 0.0 secs on node localhost2 [http://localhost:4321] with session ghijkl");
 	}
 }
