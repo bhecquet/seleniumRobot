@@ -6,7 +6,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -52,17 +52,10 @@ public class TestErrorCauseFinder extends MockitoTest {
 	private TestStep step2;
 	private TestStep stepFailed;
 	private TestStep lastStep;
+
+    private File referenceImgStep3;
 	
-	private File imgStep1Ref;
-	private File imgStep1;
-	private File imgStep2Ref;
-	private File imgStep3Ref;
-	private File imgLastStep;
-	private File referenceImgStep1;
-	private File referenceImgStep2;
-	private File referenceImgStep3;
-	
-	private JSONObject failedStepFieldInformation = new JSONObject("{"
+	private final JSONObject failedStepFieldInformation = new JSONObject("{"
 			+ "    \"fields\": ["
 			+ "            {"
 			+ "                \"class_id\": 2,"
@@ -82,7 +75,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 			+ "    \"error\": null,"
 			+ "    \"version\": \"afcc45\""
 			+ "}");
-	private JSONObject referenceStepFieldInformation = new JSONObject("{"
+	private final JSONObject referenceStepFieldInformation = new JSONObject("{"
 			+ "    \"fields\": ["
 			+ "            {"
 			+ "                \"class_id\": 2,"
@@ -102,7 +95,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 			+ "    \"error\": null,"
 			+ "    \"version\": \"afcc45\""
 			+ "}");
-	private JSONObject referenceStepFieldInformation2 = new JSONObject("{"
+	private final JSONObject referenceStepFieldInformation2 = new JSONObject("{"
 			+ "    \"fields\": ["
 			+ "            {"
 			+ "                \"class_id\": 2,"
@@ -122,7 +115,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 			+ "    \"error\": null,"
 			+ "    \"version\": \"afcc45\""
 			+ "}");
-	private JSONObject referenceStepFieldInformation3 = new JSONObject("{"
+	private final JSONObject referenceStepFieldInformation3 = new JSONObject("{"
 			+ "    \"fields\": ["
 			+ "            {"
 			+ "                \"class_id\": 2,"
@@ -143,7 +136,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 			+ "    \"version\": \"afcc45\""
 			+ "}");
 
-	private MockedStatic mockedSnapshotServer;
+	private MockedStatic<SeleniumRobotSnapshotServerConnector> mockedSnapshotServer;
 	
 	@BeforeMethod(alwaysRun = true)
 	public void init() throws Exception {
@@ -154,10 +147,10 @@ public class TestErrorCauseFinder extends MockitoTest {
 		step1.setPosition(0);
 		
 		File image = GenericTest.createFileFromResource("tu/images/driverTestPage.png");
-		
-		
-		imgStep1Ref = File.createTempFile("img", ".png");
-		imgStep1 = File.createTempFile("img", ".png");
+
+
+        File imgStep1Ref = File.createTempFile("img", ".png");
+        File imgStep1 = File.createTempFile("img", ".png");
 		
 		ScreenShot screenshot = new ScreenShot(imgStep1Ref, File.createTempFile("html", ".html"));
 		step1.addSnapshot(new Snapshot(screenshot, null, SnapshotCheckType.REFERENCE_ONLY), 1, null);
@@ -169,10 +162,10 @@ public class TestErrorCauseFinder extends MockitoTest {
 		step2 = new TestStep("step 2", "step 2", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), false);
 		step2.setStepResultId(1);
 		step2.setPosition(1);
-	
-		imgStep2Ref = File.createTempFile("img", ".png");
+
+        File imgStep2Ref = File.createTempFile("img", ".png");
 		
-		ScreenShot screenshotStep3 = new ScreenShot(imgStep2Ref, File.createTempFile("html", ".html"));
+		new ScreenShot(imgStep2Ref, File.createTempFile("html", ".html"));
 		step2.addSnapshot(new Snapshot(screenshot, null, SnapshotCheckType.REFERENCE_ONLY), 1, null);
 		
 		// create third step, which will fail
@@ -180,8 +173,8 @@ public class TestErrorCauseFinder extends MockitoTest {
 		stepFailed.setStepResultId(2);
 		stepFailed.setFailed(true);
 		stepFailed.setPosition(2);
-		
-		imgStep3Ref = File.createTempFile("img", ".png");
+
+        File imgStep3Ref = File.createTempFile("img", ".png");
 		
 		ScreenShot screenshot3 = new ScreenShot(imgStep3Ref, File.createTempFile("html", ".html"));
 		stepFailed.addSnapshot(new Snapshot(screenshot3, null, SnapshotCheckType.REFERENCE_ONLY), 1, null);
@@ -189,21 +182,19 @@ public class TestErrorCauseFinder extends MockitoTest {
 		// create 'Test end' step
 		lastStep = new TestStep(TestStepManager.LAST_STEP_NAME, TestStepManager.LAST_STEP_NAME, this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), false);
 		lastStep.setPosition(3);
-		
-		imgLastStep = File.createTempFile("img", ".png");
-		
+
 		ScreenShot screenshot4 = new ScreenShot(imgStep1, File.createTempFile("html", ".html"));
 		lastStep.addSnapshot(new Snapshot(screenshot4, "main", SnapshotCheckType.FALSE), 1, null);
 		lastStep.setStepResultId(10);
 
 		mockedSnapshotServer = mockStatic(SeleniumRobotSnapshotServerConnector.class);
-		mockedSnapshotServer.when(() -> SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(serverConnector);
+		mockedSnapshotServer.when(SeleniumRobotSnapshotServerConnector::getInstance).thenReturn(serverConnector);
 
 
-		referenceImgStep1 = File.createTempFile("img", ".png"); // reference image for step 1
-		FileUtils.copyFile(image, referenceImgStep1);
-		referenceImgStep2 = File.createTempFile("img", ".png"); // reference image for step 2
-		FileUtils.copyFile(image, referenceImgStep2);
+        File referenceImgStep1 = File.createTempFile("img", ".png"); // reference image for step 1
+        FileUtils.copyFile(image, referenceImgStep1);
+        File referenceImgStep2 = File.createTempFile("img", ".png"); // reference image for step 2
+        FileUtils.copyFile(image, referenceImgStep2);
 		referenceImgStep3 = File.createTempFile("img", ".png"); // reference image for step 2
 		FileUtils.copyFile(image, referenceImgStep3);
 		when(serverConnector.getReferenceSnapshot(0)).thenReturn(referenceImgStep1);
@@ -219,66 +210,66 @@ public class TestErrorCauseFinder extends MockitoTest {
 	
 	/**
 	 * Check error causes are found with various error messages
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testSearchInLastStepErrorMessage() throws Exception {
+	public void testSearchInLastStepErrorMessage() {
 		
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, lastStep));
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(List.of(step1, lastStep));
 		
-		when(serverConnector.detectErrorInPicture(lastStep.getSnapshots().get(0))).thenReturn(new JSONObject("{"
-				+ "        \"fields\": ["
-				+ "            {"
-				+ "                \"class_id\": 2,"
-				+ "                \"top\": 20,"
-				+ "                \"bottom\": 50,"
-				+ "                \"left\": 0,"
-				+ "                \"right\": 100,"
-				+ "                \"class_name\": \"field\","
-				+ "                \"text\": null,"
-				+ "                \"related_field\": null,"
-				+ "                \"with_label\": false,"
-				+ "                \"width\": 100,"
-				+ "                \"height\": 20"
-				+ "            },{"
-				+ "                \"class_id\": 2,"
-				+ "                \"top\": 20,"
-				+ "                \"bottom\": 50,"
-				+ "                \"left\": 0,"
-				+ "                \"right\": 100,"
-				+ "                \"class_name\": \"field\","
-				+ "                \"text\": null,"
-				+ "                \"related_field\": null,"
-				+ "                \"with_label\": false,"
-				+ "                \"width\": 100,"
-				+ "                \"height\": 20"
-				+ "            }"
-				+ "        ],"
-				+ "        \"labels\": ["
-				+ "            {"
-				+ "                \"top\": 20,"
-				+ "                \"left\": 0,"
-				+ "                \"width\": 100,"
-				+ "                \"height\": 30,"
-				+ "                \"text\": \"il y a eu un gros problème\","
-				+ "                \"right\": 100,"
-				+ "                \"bottom\": 50"
-				+ "            },{"
-				+ "                \"top\": 100,"
-				+ "                \"left\": 0,"
-				+ "                \"width\": 100,"
-				+ "                \"height\": 20,"
-				+ "                \"text\": \"some error\","
-				+ "                \"right\": 100,"
-				+ "                \"bottom\": 120"
-				+ "            }"
-				+ "        ],"
-				+ ""
-				+ "    \"error\": null,"
-				+ "    \"version\": \"afcc45\""
-				+ "}"));
+		when(serverConnector.detectErrorInPicture(lastStep.getSnapshots().get(0))).thenReturn(new JSONObject("""
+				{
+				        "fields": [
+				            {
+				                "class_id": 2,
+				                "top": 20,
+				                "bottom": 50,
+				                "left": 0,
+				                "right": 100,
+				                "class_name": "field",
+				                "text": null,
+				                "related_field": null,
+				                "with_label": false,
+				                "width": 100,
+				                "height": 20
+				            },{
+				                "class_id": 2,
+				                "top": 20,
+				                "bottom": 50,
+				                "left": 0,
+				                "right": 100,
+				                "class_name": "field",
+				                "text": null,
+				                "related_field": null,
+				                "with_label": false,
+				                "width": 100,
+				                "height": 20
+				            }
+				        ],
+				        "labels": [
+				            {
+				                "top": 20,
+				                "left": 0,
+				                "width": 100,
+				                "height": 30,
+				                "text": "il y a eu un gros problème",
+				                "right": 100,
+				                "bottom": 50
+				            },{
+				                "top": 100,
+				                "left": 0,
+				                "width": 100,
+				                "height": 20,
+				                "text": "some error",
+				                "right": 100,
+				                "bottom": 120
+				            }
+				        ],
+				
+				    "error": null,
+				    "version": "afcc45"
+				}"""));
 	
 		List<ErrorCause> causes = new ArrayList<>();
 		String version = new ErrorCauseFinder(testResult).findErrorInLastStepSnapshots(causes);
@@ -296,69 +287,69 @@ public class TestErrorCauseFinder extends MockitoTest {
 	
 	/**
 	 * When a failed step is present, attach ErrorCause to this one instead of "Last Step"
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testSearchInLastStepErrorMessageWithFailedStep() throws Exception {
+	public void testSearchInLastStepErrorMessageWithFailedStep() {
 		
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(List.of(step1, stepFailed, lastStep));
 		
-		when(serverConnector.detectErrorInPicture(lastStep.getSnapshots().get(0))).thenReturn(new JSONObject("{"
-				+ "        \"fields\": ["
-				+ "            {"
-				+ "                \"class_id\": 2,"
-				+ "                \"top\": 20,"
-				+ "                \"bottom\": 50,"
-				+ "                \"left\": 0,"
-				+ "                \"right\": 100,"
-				+ "                \"class_name\": \"field\","
-				+ "                \"text\": null,"
-				+ "                \"related_field\": null,"
-				+ "                \"with_label\": false,"
-				+ "                \"width\": 100,"
-				+ "                \"height\": 20"
-				+ "            },{"
-				+ "                \"class_id\": 2,"
-				+ "                \"top\": 20,"
-				+ "                \"bottom\": 50,"
-				+ "                \"left\": 0,"
-				+ "                \"right\": 100,"
-				+ "                \"class_name\": \"field\","
-				+ "                \"text\": null,"
-				+ "                \"related_field\": null,"
-				+ "                \"with_label\": false,"
-				+ "                \"width\": 100,"
-				+ "                \"height\": 20"
-				+ "            }"
-				+ "        ],"
-				+ "        \"labels\": ["
-				+ "            {"
-				+ "                \"top\": 20,"
-				+ "                \"left\": 0,"
-				+ "                \"width\": 100,"
-				+ "                \"height\": 30,"
-				+ "                \"text\": \"il y a eu un gros problème\","
-				+ "                \"right\": 100,"
-				+ "                \"bottom\": 50"
-				+ "            },{"
-				+ "                \"top\": 100,"
-				+ "                \"left\": 0,"
-				+ "                \"width\": 100,"
-				+ "                \"height\": 20,"
-				+ "                \"text\": \"some error\","
-				+ "                \"right\": 100,"
-				+ "                \"bottom\": 120"
-				+ "            }"
-				+ "        ],"
-				+ ""
-				+ "    \"error\": null,"
-				+ "    \"version\": \"afcc45\""
-				+ "}"));
+		when(serverConnector.detectErrorInPicture(lastStep.getSnapshots().get(0))).thenReturn(new JSONObject("""
+				{
+				        "fields": [
+				            {
+				                "class_id": 2,
+				                "top": 20,
+				                "bottom": 50,
+				                "left": 0,
+				                "right": 100,
+				                "class_name": "field",
+				                "text": null,
+				                "related_field": null,
+				                "with_label": false,
+				                "width": 100,
+				                "height": 20
+				            },{
+				                "class_id": 2,
+				                "top": 20,
+				                "bottom": 50,
+				                "left": 0,
+				                "right": 100,
+				                "class_name": "field",
+				                "text": null,
+				                "related_field": null,
+				                "with_label": false,
+				                "width": 100,
+				                "height": 20
+				            }
+				        ],
+				        "labels": [
+				            {
+				                "top": 20,
+				                "left": 0,
+				                "width": 100,
+				                "height": 30,
+				                "text": "il y a eu un gros problème",
+				                "right": 100,
+				                "bottom": 50
+				            },{
+				                "top": 100,
+				                "left": 0,
+				                "width": 100,
+				                "height": 20,
+				                "text": "some error",
+				                "right": 100,
+				                "bottom": 120
+				            }
+				        ],
+				
+				    "error": null,
+				    "version": "afcc45"
+				}"""));
 		
 		List<ErrorCause> causes = new ArrayList<>();
-		String version = new ErrorCauseFinder(testResult).findErrorInLastStepSnapshots(causes);
+		new ErrorCauseFinder(testResult).findErrorInLastStepSnapshots(causes);
 		
 		Assert.assertEquals(causes.size(), 2);
 		Assert.assertEquals(causes.get(0).getType(), ErrorType.ERROR_MESSAGE);
@@ -372,14 +363,13 @@ public class TestErrorCauseFinder extends MockitoTest {
 	
 	/**
 	 * Check error is only logged when something goes wrong while analyzing picture
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testSearchInLastStepErrorMessageWithException() throws Exception {
+	public void testSearchInLastStepErrorMessageWithException() {
 		
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, lastStep));
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(List.of(step1, lastStep));
 		
 		when(serverConnector.detectErrorInPicture(lastStep.getSnapshots().get(0))).thenThrow(new SeleniumRobotServerException("error"));
 		
@@ -392,66 +382,66 @@ public class TestErrorCauseFinder extends MockitoTest {
 	
 	/**
 	 * In case an error_field is found, check we show it as an error
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testSearchInLastStepDetectedErrorField() throws Exception {
+	public void testSearchInLastStepDetectedErrorField() {
 		
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, lastStep));
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(List.of(step1, lastStep));
 		
-		when(serverConnector.detectErrorInPicture(lastStep.getSnapshots().get(0))).thenReturn(new JSONObject("{"
-				+ "        \"fields\": ["
-				+ "            {"
-				+ "                \"class_id\": 2,"
-				+ "                \"top\": 20,"
-				+ "                \"bottom\": 50,"
-				+ "                \"left\": 0,"
-				+ "                \"right\": 100,"
-				+ "                \"class_name\": \"error_field\","
-				+ "                \"text\": null,"
-				+ "                \"related_field\": null,"
-				+ "                \"with_label\": false,"
-				+ "                \"width\": 100,"
-				+ "                \"height\": 20"
-				+ "            },{"
-				+ "                \"class_id\": 2,"
-				+ "                \"top\": 20,"
-				+ "                \"bottom\": 50,"
-				+ "                \"left\": 0,"
-				+ "                \"right\": 100,"
-				+ "                \"class_name\": \"field\","
-				+ "                \"text\": null,"
-				+ "                \"related_field\": null,"
-				+ "                \"with_label\": false,"
-				+ "                \"width\": 100,"
-				+ "                \"height\": 20"
-				+ "            }"
-				+ "        ],"
-				+ "        \"labels\": ["
-				+ "            {"
-				+ "                \"top\": 20,"
-				+ "                \"left\": 0,"
-				+ "                \"width\": 100,"
-				+ "                \"height\": 30,"
-				+ "                \"text\": \"ok\","
-				+ "                \"right\": 100,"
-				+ "                \"bottom\": 50"
-				+ "            },{"
-				+ "                \"top\": 100,"
-				+ "                \"left\": 0,"
-				+ "                \"width\": 100,"
-				+ "                \"height\": 20,"
-				+ "                \"text\": \"nothing\","
-				+ "                \"right\": 100,"
-				+ "                \"bottom\": 120"
-				+ "            }"
-				+ "        ],"
-				+ ""
-				+ "    \"error\": null,"
-				+ "    \"version\": \"afcc45\""
-				+ "}"));
+		when(serverConnector.detectErrorInPicture(lastStep.getSnapshots().get(0))).thenReturn(new JSONObject("""
+				{
+				        "fields": [
+				            {
+				                "class_id": 2,
+				                "top": 20,
+				                "bottom": 50,
+				                "left": 0,
+				                "right": 100,
+				                "class_name": "error_field",
+				                "text": null,
+				                "related_field": null,
+				                "with_label": false,
+				                "width": 100,
+				                "height": 20
+				            },{
+				                "class_id": 2,
+				                "top": 20,
+				                "bottom": 50,
+				                "left": 0,
+				                "right": 100,
+				                "class_name": "field",
+				                "text": null,
+				                "related_field": null,
+				                "with_label": false,
+				                "width": 100,
+				                "height": 20
+				            }
+				        ],
+				        "labels": [
+				            {
+				                "top": 20,
+				                "left": 0,
+				                "width": 100,
+				                "height": 30,
+				                "text": "ok",
+				                "right": 100,
+				                "bottom": 50
+				            },{
+				                "top": 100,
+				                "left": 0,
+				                "width": 100,
+				                "height": 20,
+				                "text": "nothing",
+				                "right": 100,
+				                "bottom": 120
+				            }
+				        ],
+				
+				    "error": null,
+				    "version": "afcc45"
+				}"""));
 		
 		List<ErrorCause> causes = new ArrayList<>();
 		new ErrorCauseFinder(testResult).findErrorInLastStepSnapshots(causes);
@@ -464,66 +454,66 @@ public class TestErrorCauseFinder extends MockitoTest {
 	
 	/**
 	 * An error_message field is found. We try to relate it to a label 
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testSearchInLastStepDetectedErrorMessage() throws Exception {
+	public void testSearchInLastStepDetectedErrorMessage() {
 		
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, lastStep));
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(List.of(step1, lastStep));
 		
-		when(serverConnector.detectErrorInPicture(lastStep.getSnapshots().get(0))).thenReturn(new JSONObject("{"
-				+ "        \"fields\": ["
-				+ "            {"
-				+ "                \"class_id\": 2,"
-				+ "                \"top\": 0,"
-				+ "                \"bottom\": 20,"
-				+ "                \"left\": 0,"
-				+ "                \"right\": 100,"
-				+ "                \"class_name\": \"error_message\","
-				+ "                \"text\": null,"
-				+ "                \"related_field\": null,"
-				+ "                \"with_label\": false,"
-				+ "                \"width\": 100,"
-				+ "                \"height\": 20"
-				+ "            },{"
-				+ "                \"class_id\": 2,"
-				+ "                \"top\": 20,"
-				+ "                \"bottom\": 50,"
-				+ "                \"left\": 0,"
-				+ "                \"right\": 100,"
-				+ "                \"class_name\": \"field\","
-				+ "                \"text\": null,"
-				+ "                \"related_field\": null,"
-				+ "                \"with_label\": false,"
-				+ "                \"width\": 100,"
-				+ "                \"height\": 20"
-				+ "            }"
-				+ "        ],"
-				+ "        \"labels\": ["
-				+ "            {"
-				+ "                \"top\": 0,"
-				+ "                \"left\": 0,"
-				+ "                \"width\": 100,"
-				+ "                \"height\": 20,"
-				+ "                \"text\": \"ko\","
-				+ "                \"right\": 100,"
-				+ "                \"bottom\": 20"
-				+ "            },{"
-				+ "                \"top\": 100,"
-				+ "                \"left\": 0,"
-				+ "                \"width\": 100,"
-				+ "                \"height\": 20,"
-				+ "                \"text\": \"nothing\","
-				+ "                \"right\": 100,"
-				+ "                \"bottom\": 120"
-				+ "            }"
-				+ "        ],"
-				+ ""
-				+ "    \"error\": null,"
-				+ "    \"version\": \"afcc45\""
-				+ "}"));
+		when(serverConnector.detectErrorInPicture(lastStep.getSnapshots().get(0))).thenReturn(new JSONObject("""
+				{
+				        "fields": [
+				            {
+				                "class_id": 2,
+				                "top": 0,
+				                "bottom": 20,
+				                "left": 0,
+				                "right": 100,
+				                "class_name": "error_message",
+				                "text": null,
+				                "related_field": null,
+				                "with_label": false,
+				                "width": 100,
+				                "height": 20
+				            },{
+				                "class_id": 2,
+				                "top": 20,
+				                "bottom": 50,
+				                "left": 0,
+				                "right": 100,
+				                "class_name": "field",
+				                "text": null,
+				                "related_field": null,
+				                "with_label": false,
+				                "width": 100,
+				                "height": 20
+				            }
+				        ],
+				        "labels": [
+				            {
+				                "top": 0,
+				                "left": 0,
+				                "width": 100,
+				                "height": 20,
+				                "text": "ko",
+				                "right": 100,
+				                "bottom": 20
+				            },{
+				                "top": 100,
+				                "left": 0,
+				                "width": 100,
+				                "height": 20,
+				                "text": "nothing",
+				                "right": 100,
+				                "bottom": 120
+				            }
+				        ],
+				
+				    "error": null,
+				    "version": "afcc45"
+				}"""));
 		
 
 		List<ErrorCause> causes = new ArrayList<>();
@@ -537,66 +527,66 @@ public class TestErrorCauseFinder extends MockitoTest {
 	
 	/**
 	 * no error message in the page, no cause should be found
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testSearchInLastStepNoErrors() throws Exception {
+	public void testSearchInLastStepNoErrors() {
 		
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, lastStep));
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(List.of(step1, lastStep));
 		
-		when(serverConnector.detectErrorInPicture(lastStep.getSnapshots().get(0))).thenReturn(new JSONObject("{"
-				+ "        \"fields\": ["
-				+ "            {"
-				+ "                \"class_id\": 2,"
-				+ "                \"left\": 0,"
-				+ "                \"right\": 100,"
-				+ "                \"top\": 20,"
-				+ "                \"bottom\": 50,"
-				+ "                \"class_name\": \"field\","
-				+ "                \"text\": null,"
-				+ "                \"related_field\": null,"
-				+ "                \"with_label\": false,"
-				+ "                \"width\": 100,"
-				+ "                \"height\": 20"
-				+ "            },{"
-				+ "                \"class_id\": 2,"
-				+ "                \"left\": 0,"
-				+ "                \"right\": 100,"
-				+ "                \"top\": 100,"
-				+ "                \"bottom\": 120,"
-				+ "                \"class_name\": \"field\","
-				+ "                \"text\": null,"
-				+ "                \"related_field\": null,"
-				+ "                \"with_label\": false,"
-				+ "                \"width\": 100,"
-				+ "                \"height\": 20"
-				+ "            }"
-				+ "        ],"
-				+ "        \"labels\": ["
-				+ "            {"
-				+ "                \"left\": 0,"
-				+ "                \"right\": 100,"
-				+ "                \"top\": 0,"
-				+ "                \"bottom\": 20,"
-				+ "                \"width\": 100,"
-				+ "                \"height\": 30,"
-				+ "                \"text\": \"tout roule\""
-				+ "            },{"
-				+ "                \"left\": 0,"
-				+ "                \"right\": 100,"
-				+ "                \"top\": 200,"
-				+ "                \"bottom\": 220,"
-				+ "                \"width\": 100,"
-				+ "                \"height\": 20,"
-				+ "                \"text\": \"everything is fine\""
-				+ "            }"
-				+ "        ],"
-				+ ""
-				+ "    \"error\": null,"
-				+ "    \"version\": \"afcc45\""
-				+ "}"));
+		when(serverConnector.detectErrorInPicture(lastStep.getSnapshots().get(0))).thenReturn(new JSONObject("""
+				{
+				        "fields": [
+				            {
+				                "class_id": 2,
+				                "left": 0,
+				                "right": 100,
+				                "top": 20,
+				                "bottom": 50,
+				                "class_name": "field",
+				                "text": null,
+				                "related_field": null,
+				                "with_label": false,
+				                "width": 100,
+				                "height": 20
+				            },{
+				                "class_id": 2,
+				                "left": 0,
+				                "right": 100,
+				                "top": 100,
+				                "bottom": 120,
+				                "class_name": "field",
+				                "text": null,
+				                "related_field": null,
+				                "with_label": false,
+				                "width": 100,
+				                "height": 20
+				            }
+				        ],
+				        "labels": [
+				            {
+				                "left": 0,
+				                "right": 100,
+				                "top": 0,
+				                "bottom": 20,
+				                "width": 100,
+				                "height": 30,
+				                "text": "tout roule"
+				            },{
+				                "left": 0,
+				                "right": 100,
+				                "top": 200,
+				                "bottom": 220,
+				                "width": 100,
+				                "height": 20,
+				                "text": "everything is fine"
+				            }
+				        ],
+				
+				    "error": null,
+				    "version": "afcc45"
+				}"""));
 		
 		List<ErrorCause> causes = new ArrayList<>();
 		new ErrorCauseFinder(testResult).findErrorInLastStepSnapshots(causes);
@@ -605,11 +595,11 @@ public class TestErrorCauseFinder extends MockitoTest {
 	}
 	
 	@Test(groups= {"ut"})
-	public void testSearchInLastStepNoLastStep() throws Exception {
+	public void testSearchInLastStepNoLastStep() {
 		
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1));
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Collections.singletonList(step1));
 		
 		List<ErrorCause> causes = new ArrayList<>();
 		new ErrorCauseFinder(testResult).findErrorInLastStepSnapshots(causes);
@@ -618,63 +608,64 @@ public class TestErrorCauseFinder extends MockitoTest {
 	}
 	
 	@Test(groups= {"ut"})
-	public void testSearchInLastStepAlreadyDone() throws Exception {
+	public void testSearchInLastStepAlreadyDone() {
 		
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, lastStep));
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(List.of(step1, lastStep));
 		
-		when(serverConnector.detectErrorInPicture(lastStep.getSnapshots().get(0))).thenReturn(new JSONObject("{"
-				+ "        \"fields\": ["
-				+ "            {"
-				+ "                \"class_id\": 2,"
-				+ "                \"left\": 0,"
-				+ "                \"right\": 100,"
-				+ "                \"top\": 20,"
-				+ "                \"bottom\": 50,"
-				+ "                \"class_name\": \"field\","
-				+ "                \"text\": null,"
-				+ "                \"related_field\": null,"
-				+ "                \"with_label\": false,"
-				+ "                \"width\": 100,"
-				+ "                \"height\": 20"
-				+ "            },{"
-				+ "                \"class_id\": 2,"
-				+ "                \"left\": 0,"
-				+ "                \"right\": 100,"
-				+ "                \"top\": 100,"
-				+ "                \"bottom\": 120,"
-				+ "                \"class_name\": \"field\","
-				+ "                \"text\": null,"
-				+ "                \"related_field\": null,"
-				+ "                \"with_label\": false,"
-				+ "                \"width\": 100,"
-				+ "                \"height\": 20"
-				+ "            }"
-				+ "        ],"
-				+ "        \"labels\": ["
-				+ "            {"
-				+ "                \"left\": 0,"
-				+ "                \"right\": 100,"
-				+ "                \"top\": 0,"
-				+ "                \"bottom\": 20,"
-				+ "                \"width\": 100,"
-				+ "                \"height\": 30,"
-				+ "                \"text\": \"il y a eu un gros problème\""
-				+ "            },{"
-				+ "                \"left\": 0,"
-				+ "                \"right\": 100,"
-				+ "                \"top\": 200,"
-				+ "                \"bottom\": 220,"
-				+ "                \"width\": 100,"
-				+ "                \"height\": 20,"
-				+ "                \"text\": \"some error\""
-				+ "            }"
-				+ "        ],"
-				+ ""
-				+ "    \"error\": null,"
-				+ "    \"version\": \"afcc45\""
-				+ "}"));
+		when(serverConnector.detectErrorInPicture(lastStep.getSnapshots().get(0))).thenReturn(new JSONObject("""
+				{
+				        "fields": [
+				            {
+				                "class_id": 2,
+				                "left": 0,
+				                "right": 100,
+				                "top": 20,
+				                "bottom": 50,
+				                "class_name": "field",
+				                "text": null,
+				                "related_field": null,
+				                "with_label": false,
+				                "width": 100,
+				                "height": 20
+				            },{
+				                "class_id": 2,
+				                "left": 0,
+				                "right": 100,
+				                "top": 100,
+				                "bottom": 120,
+				                "class_name": "field",
+				                "text": null,
+				                "related_field": null,
+				                "with_label": false,
+				                "width": 100,
+				                "height": 20
+				            }
+				        ],
+				        "labels": [
+				            {
+				                "left": 0,
+				                "right": 100,
+				                "top": 0,
+				                "bottom": 20,
+				                "width": 100,
+				                "height": 30,
+				                "text": "il y a eu un gros problème"
+				            },{
+				                "left": 0,
+				                "right": 100,
+				                "top": 200,
+				                "bottom": 220,
+				                "width": 100,
+				                "height": 20,
+				                "text": "some error"
+				            }
+				        ],
+				
+				    "error": null,
+				    "version": "afcc45"
+				}"""));
 				
 
 		TestNGResultUtils.setErrorCauseSearchedInLastStep(testResult, true);
@@ -687,14 +678,13 @@ public class TestErrorCauseFinder extends MockitoTest {
 
 	/**
 	 * Matching between reference picture stored on server and the one for current test is very good (we are on the right page)
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testCompareStepInErrorWithReferenceGoodMatch() throws Exception {
+	public void testCompareStepInErrorWithReferenceGoodMatch() {
 		
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(List.of(step1, stepFailed, lastStep));
 		step1.setPosition(0);
 		stepFailed.setPosition(1);
 		
@@ -702,7 +692,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 		when(serverConnector.getStepReferenceDetectFieldInformation(2, "aa")).thenReturn(referenceStepFieldInformation);
 		
 		// comparison successful
-		try (MockedConstruction mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class, (mock, context) -> {
+		try (MockedConstruction<StepReferenceComparator> mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class, (mock, context) -> {
 			when(mock.compare()).thenReturn(90); // good matching
 		})) {
 
@@ -714,14 +704,14 @@ public class TestErrorCauseFinder extends MockitoTest {
 	}
 	
 	@Test(groups= {"ut"})
-	public void testCompareStepInErrorWithReferenceSearchAlreadyDone() throws Exception {
+	public void testCompareStepInErrorWithReferenceSearchAlreadyDone() {
 		
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		
 		TestNGResultUtils.setErrorCauseSearchedInReferencePicture(testResult, true);
 		
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(List.of(step1, stepFailed, lastStep));
 		step1.setPosition(0);
 		stepFailed.setPosition(1);
 		
@@ -729,7 +719,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 		when(serverConnector.getStepReferenceDetectFieldInformation(2, "aa")).thenReturn(referenceStepFieldInformation);
 		
 		// comparison successful
-		try (MockedConstruction mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class, (mock, context) -> {
+		try (MockedConstruction<StepReferenceComparator> mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class, (mock, context) -> {
 			when(mock.compare()).thenReturn(90); // good matching
 		})) {
 
@@ -745,14 +735,13 @@ public class TestErrorCauseFinder extends MockitoTest {
 	
 	/**
 	 * Matching between reference picture stored on server and the one for current test is good enough (we are on the right page but something changed)
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
 	public void testCompareStepInErrorWithReferenceMediumMatch() throws Exception {
 		
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(List.of(step1, stepFailed, lastStep));
 		step1.setPosition(0);
 		stepFailed.setPosition(1);
 		
@@ -760,17 +749,19 @@ public class TestErrorCauseFinder extends MockitoTest {
 		when(serverConnector.getStepReferenceDetectFieldInformation(2, "aa")).thenReturn(referenceStepFieldInformation);
 		
 		// comparison successful
-		try (MockedConstruction mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class, (mock, context) -> {
+		try (MockedConstruction<StepReferenceComparator> mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class, (mock, context) -> {
 			when(mock.compare()).thenReturn(50);
-			when(mock.getMissingFields()).thenReturn(Arrays.asList(new Field(0, 100, 0, 20, "", "field")));
+			when(mock.getMissingFields()).thenReturn(List.of(new Field(0, 100, 0, 20, "", "field")));
 		})) {
 
 			List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference("aa");
 
 			Assert.assertEquals(causes.size(), 1);
 			Assert.assertEquals(causes.get(0).getType(), ErrorType.APPLICATION_CHANGED);
-			Assert.assertEquals(causes.get(0).getDescription(), "1 field(s) missing: \n"
-					+ "field[text=]: java.awt.Rectangle[x=0,y=0,width=100,height=20]\n");
+			Assert.assertEquals(causes.get(0).getDescription(), """
+					1 field(s) missing:\s
+					field[text=]: java.awt.Rectangle[x=0,y=0,width=100,height=20]
+					""");
 			Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
 
 			// check rectangle has been drawn around the missing field
@@ -787,7 +778,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 		
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(List.of(step1, stepFailed, lastStep));
 		step1.setPosition(0);
 		stepFailed.setPosition(1);
 		
@@ -795,16 +786,18 @@ public class TestErrorCauseFinder extends MockitoTest {
 		when(serverConnector.getStepReferenceDetectFieldInformation(2, "aa")).thenReturn(referenceStepFieldInformation);
 		
 		// comparison successful
-		try (MockedConstruction mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class, (mock, context) -> {
+		try (MockedConstruction<StepReferenceComparator> mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class, (mock, context) -> {
 			when(mock.compare()).thenReturn(50);
-			when(mock.getMissingLabels()).thenReturn(Arrays.asList(new Label(0, 100, 20, 50, "some label")));
+			when(mock.getMissingLabels()).thenReturn(List.of(new Label(0, 100, 20, 50, "some label")));
 		})) {
 			List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference("aa");
 
 			Assert.assertEquals(causes.size(), 1);
 			Assert.assertEquals(causes.get(0).getType(), ErrorType.APPLICATION_CHANGED);
-			Assert.assertEquals(causes.get(0).getDescription(), "1 Label(s) missing: \n"
-					+ "some label\n");
+			Assert.assertEquals(causes.get(0).getDescription(), """
+					1 Label(s) missing:\s
+					some label
+					""");
 			Assert.assertTrue(TestNGResultUtils.isErrorCauseSearchedInReferencePicture(testResult));
 
 			// check line has been drawn below the missing label
@@ -820,14 +813,13 @@ public class TestErrorCauseFinder extends MockitoTest {
 	 * Matching between reference picture stored on server and the one for current test is bad (we are not on the right page)
 	 * Check we try to compare to reference of step1
 	 * Comparison with step 1 is good (we are on previous step)
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testCompareStepInErrorWithReferenceBadMatchPreviousStep() throws Exception {
+	public void testCompareStepInErrorWithReferenceBadMatchPreviousStep() {
 		
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(List.of(step1, stepFailed, lastStep));
 		step1.setPosition(0);
 		stepFailed.setPosition(1);
 
@@ -835,7 +827,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 		when(serverConnector.getStepReferenceDetectFieldInformation(2, "aa")).thenReturn(referenceStepFieldInformation); // reference for stepFailed
 		when(serverConnector.getStepReferenceDetectFieldInformation(0, "aa")).thenReturn(referenceStepFieldInformation2); // reference for step1
 
-		try (MockedConstruction mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class, (mock, context) -> {
+		try (MockedConstruction<StepReferenceComparator> mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class, (mock, context) -> {
 			if (context.arguments().get(2).equals(Field.fromDetectionData(referenceStepFieldInformation))) {
 				when(mock.compare()).thenReturn(49); // comparison between references
 			} else if (context.arguments().get(2).equals(Field.fromDetectionData(referenceStepFieldInformation2))) {
@@ -855,14 +847,13 @@ public class TestErrorCauseFinder extends MockitoTest {
 	
 	/**
 	 * #525: Test that step order is not modified when we compare with previous steps
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testCompareStepInErrorWithReferenceBadMatchPreviousStep2() throws Exception {
+	public void testCompareStepInErrorWithReferenceBadMatchPreviousStep2() {
 		
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, step2, stepFailed, lastStep));
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(List.of(step1, step2, stepFailed, lastStep));
 		step1.setPosition(0);
 		step2.setPosition(1);
 		stepFailed.setPosition(2);
@@ -872,7 +863,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 		when(serverConnector.getStepReferenceDetectFieldInformation(1, "aa")).thenReturn(referenceStepFieldInformation2); // reference for step2
 		when(serverConnector.getStepReferenceDetectFieldInformation(2, "aa")).thenReturn(referenceStepFieldInformation3); // reference for stepFailed
 
-		try (MockedConstruction mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class, (mock, context) -> {
+		try (MockedConstruction<StepReferenceComparator> mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class, (mock, context) -> {
 			if (context.arguments().get(2).equals(Field.fromDetectionData(referenceStepFieldInformation3))) {
 				when(mock.compare()).thenReturn(81); // good comparison with stepFailed reference
 			} else if (context.arguments().get(2).equals(Field.fromDetectionData(referenceStepFieldInformation2))) {
@@ -896,14 +887,13 @@ public class TestErrorCauseFinder extends MockitoTest {
 	 * Matching between reference picture stored on server and the one for current test is bad (we are not on the right page)
 	 * Check we try to compare to reference of step1
 	 * Comparison with step 1 is bad (we are not on previous step)
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testCompareStepInErrorWithReferenceBadMatchNotOnPreviousStep() throws Exception {
+	public void testCompareStepInErrorWithReferenceBadMatchNotOnPreviousStep() {
 		
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(List.of(step1, stepFailed, lastStep));
 		step1.setPosition(0);
 		stepFailed.setPosition(1);
 		
@@ -911,7 +901,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 		when(serverConnector.getStepReferenceDetectFieldInformation(0, "aa")).thenReturn(referenceStepFieldInformation); // reference for step1
 		when(serverConnector.getStepReferenceDetectFieldInformation(2, "aa")).thenReturn(referenceStepFieldInformation2); // reference for stepFailed
 
-		try (MockedConstruction mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class, (mock, context) -> {
+		try (MockedConstruction<StepReferenceComparator> mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class, (mock, context) -> {
 			if (context.arguments().get(2).equals(Field.fromDetectionData(referenceStepFieldInformation2))) {
 				when(mock.compare()).thenReturn(49); // bad comparison with stepFailed reference
 			} else if (context.arguments().get(2).equals(Field.fromDetectionData(referenceStepFieldInformation))) {
@@ -931,20 +921,19 @@ public class TestErrorCauseFinder extends MockitoTest {
 	/**
 	 * Matching between reference picture stored on server and the one for current test is bad (we are not on the right page)
 	 * No previous step can be found
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testCompareStepInErrorWithReferenceBadMatchNoPreviousStep() throws Exception {
+	public void testCompareStepInErrorWithReferenceBadMatchNoPreviousStep() {
 		
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(stepFailed, lastStep));
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(List.of(stepFailed, lastStep));
 		stepFailed.setPosition(0);
 		
 		when(serverConnector.detectFieldsInPicture(stepFailed.getSnapshots().get(0))).thenReturn(failedStepFieldInformation); // no matter the JSONObject as we mock StepReferenceComparator
 		when(serverConnector.getStepReferenceDetectFieldInformation(2, "aa")).thenReturn(referenceStepFieldInformation); // reference for stepFailed
 
-		try (MockedConstruction mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class, (mock, context) -> {
+		try (MockedConstruction<StepReferenceComparator> mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class, (mock, context) -> {
 			when(mock.compare()).thenReturn(49);// bad comparison with step3 reference
 		})) {
 
@@ -961,14 +950,13 @@ public class TestErrorCauseFinder extends MockitoTest {
 	/**
 	 * Bad match: an error occurs when getting reference snapshot information
 	 * We should not fail
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testCompareStepInErrorWithReferenceBadMatchErrorGettingReference() throws Exception {
+	public void testCompareStepInErrorWithReferenceBadMatchErrorGettingReference() {
 		
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(List.of(step1, stepFailed, lastStep));
 		step1.setPosition(0);
 		stepFailed.setPosition(1);
 		
@@ -976,7 +964,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 		when(serverConnector.getStepReferenceDetectFieldInformation(2, "aa")).thenReturn(referenceStepFieldInformation); // reference for stepFailed
 		when(serverConnector.getStepReferenceDetectFieldInformation(0, "aa")).thenThrow(new SeleniumRobotServerException("error detect")); // reference for step1 fails
 
-		try (MockedConstruction mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class, (mock, context) -> {
+		try (MockedConstruction<StepReferenceComparator> mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class, (mock, context) -> {
 			when(mock.compare()).thenReturn(49);// bad comparison with step3 reference
 		})) {
 
@@ -992,14 +980,13 @@ public class TestErrorCauseFinder extends MockitoTest {
 	/**
 	 * Bad match: an exception occurs when getting reference snapshot information
 	 * We should not fail
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testCompareStepInErrorWithReferenceBadMatchErrorGettingReference2() throws Exception {
+	public void testCompareStepInErrorWithReferenceBadMatchErrorGettingReference2() {
 		
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(List.of(step1, stepFailed, lastStep));
 		step1.setPosition(0);
 		stepFailed.setPosition(1);
 		
@@ -1007,7 +994,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 		when(serverConnector.getStepReferenceDetectFieldInformation(2, "aa")).thenReturn(referenceStepFieldInformation); // reference for stepFailed
 		when(serverConnector.getStepReferenceDetectFieldInformation(0, "aa")).thenThrow(new ConfigurationException("error detect")); // reference for step1 fails
 
-		try (MockedConstruction mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class)) {
+		try (MockedConstruction<StepReferenceComparator> mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class)) {
 
 			List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference("aa");
 
@@ -1020,14 +1007,13 @@ public class TestErrorCauseFinder extends MockitoTest {
 	/**
 	 * In case error occurs detecting fields, stop process
 	 * We should not fail
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testCompareStepInErrorWithReferenceBadMatchErrorGettingReference3() throws Exception {
+	public void testCompareStepInErrorWithReferenceBadMatchErrorGettingReference3() {
 		
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(List.of(step1, stepFailed, lastStep));
 		step1.setPosition(0);
 		stepFailed.setPosition(1);
 		
@@ -1035,7 +1021,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 		when(serverConnector.getStepReferenceDetectFieldInformation(2, "aa")).thenReturn(referenceStepFieldInformation); // reference for stepFailed
 		when(serverConnector.getStepReferenceDetectFieldInformation(0, "aa")).thenReturn(referenceStepFieldInformation2); // reference for step1 
 
-		try (MockedConstruction mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class)) {
+		try (MockedConstruction<StepReferenceComparator> mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class)) {
 			List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference("aa");
 
 			Assert.assertEquals(causes.size(), 0);
@@ -1045,14 +1031,13 @@ public class TestErrorCauseFinder extends MockitoTest {
 	/**
 	 * In case error occurs detecting fields, stop process
 	 * We should not fail
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testCompareStepInErrorWithReferenceBadMatchErrorGettingReference4() throws Exception {
+	public void testCompareStepInErrorWithReferenceBadMatchErrorGettingReference4() {
 		
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(List.of(step1, stepFailed, lastStep));
 		step1.setPosition(0);
 		stepFailed.setPosition(1);
 		
@@ -1060,7 +1045,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 		when(serverConnector.getStepReferenceDetectFieldInformation(2, "aa")).thenThrow(new SeleniumRobotServerException("error detect")); // reference for stepFailed
 		when(serverConnector.getStepReferenceDetectFieldInformation(0, "aa")).thenReturn(referenceStepFieldInformation2); // reference for step1 
 
-		try (MockedConstruction mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class)) {
+		try (MockedConstruction<StepReferenceComparator> mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class)) {
 			List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference("aa");
 
 			Assert.assertEquals(causes.size(), 0);
@@ -1070,10 +1055,9 @@ public class TestErrorCauseFinder extends MockitoTest {
 	
 	/**
 	 * Check the case where no TestStep is available
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testCompareStepInErrorWithReferenceNoStep() throws Exception {
+	public void testCompareStepInErrorWithReferenceNoStep() {
 		
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
@@ -1088,18 +1072,17 @@ public class TestErrorCauseFinder extends MockitoTest {
 	/**
 	 * Failed test step does not contain a "reference snapshot" so there is no way to compare it to the one stored on server
 	 * No error should be raised
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testCompareStepInErrorWithReferenceNoReferenceSnapshot() throws Exception {
+	public void testCompareStepInErrorWithReferenceNoReferenceSnapshot() {
 		
 		stepFailed.getSnapshots().removeAll(stepFailed.getSnapshots());
 		
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(List.of(step1, stepFailed, lastStep));
 
-		try (MockedConstruction mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class)) {
+		try (MockedConstruction<StepReferenceComparator> mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class)) {
 			List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference("aa");
 
 			// no comparison done
@@ -1112,16 +1095,15 @@ public class TestErrorCauseFinder extends MockitoTest {
 	
 	/**
 	 * No failed step in test, no error should be returned
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testCompareStepInErrorWithReferenceNoFailedStep() throws Exception {
+	public void testCompareStepInErrorWithReferenceNoFailedStep() {
 		
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, lastStep));
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(List.of(step1, lastStep));
 
-		try (MockedConstruction mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class)) {
+		try (MockedConstruction<StepReferenceComparator> mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class)) {
 			List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference("aa");
 
 			// no comparison done
@@ -1134,10 +1116,9 @@ public class TestErrorCauseFinder extends MockitoTest {
 	
 	/**
 	 * When step has not been stored on server, they have no ID. Check that without ID, no comparison performed, and no error is raised
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testCompareStepInErrorWithReferenceNoIDForStep() throws Exception {
+	public void testCompareStepInErrorWithReferenceNoIDForStep() {
 		
 		step1.setStepResultId(null);
 		stepFailed.setStepResultId(null);
@@ -1145,10 +1126,10 @@ public class TestErrorCauseFinder extends MockitoTest {
 		
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(List.of(step1, stepFailed, lastStep));
 
 
-		try (MockedConstruction mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class)) {
+		try (MockedConstruction<StepReferenceComparator> mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class)) {
 			List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference("aa");
 
 			// no comparison done
@@ -1162,19 +1143,18 @@ public class TestErrorCauseFinder extends MockitoTest {
 	/**
 	 * Same thing as above but only the failed step has no ID
 	 * In this case, we consider comparison has been performed because other steps have IDs
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testCompareStepInErrorWithReferenceNoIDForStep2() throws Exception {
+	public void testCompareStepInErrorWithReferenceNoIDForStep2() {
 		
 		stepFailed.setStepResultId(null);
 		
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(List.of(step1, stepFailed, lastStep));
 
 
-		try (MockedConstruction mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class)) {
+		try (MockedConstruction<StepReferenceComparator> mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class)) {
 			List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference("aa");
 
 			// no comparison done
@@ -1188,16 +1168,15 @@ public class TestErrorCauseFinder extends MockitoTest {
 	/**
 	 * Same thing as above but only step1 has no ID with bad match so we cannot look for previous step reference
 	 * In this case, we get an unknown_page cause
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testCompareStepInErrorWithReferenceNoIDForStep3() throws Exception {
+	public void testCompareStepInErrorWithReferenceNoIDForStep3() {
 		
 		step1.setStepResultId(null);
 		
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(List.of(step1, stepFailed, lastStep));
 		step1.setPosition(0);
 		stepFailed.setPosition(1);
 
@@ -1205,7 +1184,7 @@ public class TestErrorCauseFinder extends MockitoTest {
 		when(serverConnector.getStepReferenceDetectFieldInformation(2, "aa")).thenReturn(referenceStepFieldInformation2); // reference for stepFailed
 		when(serverConnector.getStepReferenceDetectFieldInformation(0, "aa")).thenReturn(referenceStepFieldInformation); // reference for step1
 
-		try (MockedConstruction mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class, (mock, context) -> {
+		try (MockedConstruction<StepReferenceComparator> mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class, (mock, context) -> {
 			if (context.arguments().get(2).equals(Field.fromDetectionData(referenceStepFieldInformation2))) {
 				when(mock.compare()).thenReturn(49); // bad comparison with stepFailed reference
 			} else if (context.arguments().get(2).equals(Field.fromDetectionData(referenceStepFieldInformation))) {
@@ -1223,18 +1202,17 @@ public class TestErrorCauseFinder extends MockitoTest {
 	
 	/**
 	 * When step fails due to assertion error, we do not compare snapshot with reference as the failure is expected
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testCompareStepInErrorWithReferenceAssertionError() throws Exception {
+	public void testCompareStepInErrorWithReferenceAssertionError() {
 		
 		stepFailed.setActionException(new AssertionError("result is not the expected one"));
 		
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(List.of(step1, stepFailed, lastStep));
 
-		try (MockedConstruction mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class)) {
+		try (MockedConstruction<StepReferenceComparator> mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class)) {
 			List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference("aa");
 
 			// no comparison done
@@ -1248,18 +1226,17 @@ public class TestErrorCauseFinder extends MockitoTest {
 	/**
 	 * There is no reference for this step on server
 	 * Search is considered as done
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testCompareStepInErrorWithReferenceNoReferenceOnServer() throws Exception {
+	public void testCompareStepInErrorWithReferenceNoReferenceOnServer() {
 		
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(List.of(step1, stepFailed, lastStep));
 		
 		// no reference exists for stepFailed on server
 		when(serverConnector.getReferenceSnapshot(2)).thenReturn(null);
-		try (MockedConstruction mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class)) {
+		try (MockedConstruction<StepReferenceComparator> mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class)) {
 			List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference("aa");
 
 			// no comparison done
@@ -1272,18 +1249,17 @@ public class TestErrorCauseFinder extends MockitoTest {
 	
 	/**
 	 * We get an error when trying to get reference snapshot from server
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testCompareStepInErrorWithReferenceErrorGettingReferenceOnServer() throws Exception {
+	public void testCompareStepInErrorWithReferenceErrorGettingReferenceOnServer() {
 		
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(Arrays.asList(step1, stepFailed, lastStep));
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().setTestSteps(List.of(step1, stepFailed, lastStep));
 		
 		// no reference exists for stepFailed on server
 		when(serverConnector.getReferenceSnapshot(2)).thenThrow(new SeleniumRobotServerException("error"));
-		try (MockedConstruction mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class)) {
+		try (MockedConstruction<StepReferenceComparator> mockedStepReferenceComparator = mockConstruction(StepReferenceComparator.class)) {
 			List<ErrorCause> causes = new ErrorCauseFinder(testResult).compareStepInErrorWithReference("aa");
 
 			// no comparison done

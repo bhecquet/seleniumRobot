@@ -434,7 +434,7 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
             caps.setCapability(SeleniumRobotCapabilityType.GRID_NODE_URL, nodeUrl);
             
             // log will display the actual driver session ID and node URL so that it reflects the real driver creation (whereas nodeUrl and sessionId variables only store the first driver information for the test)
-            logger.info(String.format("Brower %s (%s) created in %.1f secs on node %s [%s] with session %s", browserName, version, driverCreationDuration / 1000.0, driverNodeHost, hubUrl, driver.getSessionId()).replace(",", "."));
+            logger.info(String.format("Browser %s (%s) created in %.1f secs on node %s [%s] with session %s", browserName, version, driverCreationDuration / 1000.0, driverNodeHost, hubUrl, driver.getSessionId()).replace(",", "."));
             
         } catch (Exception ex) {
         	throw new SessionNotCreatedException(ex.getMessage());

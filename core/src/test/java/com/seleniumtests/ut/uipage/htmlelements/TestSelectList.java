@@ -37,9 +37,7 @@ import com.seleniumtests.uipage.htmlelements.select.NativeSelect;
 /**
  * Class for testing SelectList object without its implementations
  * It will be tested with a mock of HTML select
- * @throws IOException
  */
-//@PrepareForTest({WebUIDriver.class})
 public class TestSelectList extends MockitoTest {
 
 
@@ -60,14 +58,12 @@ public class TestSelectList extends MockitoTest {
 
 	@Mock
 	private Options driverOptions;
-	
 
-	private CustomEventFiringWebDriver eventDriver;
 
-	private MockedStatic mockedWebUIDriver;
+    private MockedStatic<WebUIDriver> mockedWebUIDriver;
 
 	@BeforeMethod(groups={"ut"})
-	private void init() throws IOException {
+	private void init() {
 
 		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(1);
@@ -75,10 +71,9 @@ public class TestSelectList extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(2);
 
 		// add capabilities to allow augmenting driver
-		when(driver.getCapabilities()).thenReturn(new DesiredCapabilities()); 
-		
-		eventDriver = spy(new CustomEventFiringWebDriver(driver));
-		
+		when(driver.getCapabilities()).thenReturn(new DesiredCapabilities());
+
+        CustomEventFiringWebDriver eventDriver = spy(new CustomEventFiringWebDriver(driver));
 
 		when(eventDriver.switchTo()).thenReturn(target);
 		
@@ -106,7 +101,7 @@ public class TestSelectList extends MockitoTest {
 		when(option2.getAttribute("index")).thenReturn("2");
 
 		mockedWebUIDriver = mockStatic(WebUIDriver.class);
-		mockedWebUIDriver.when(() -> WebUIDriver.getCurrentWebUiDriverName()).thenReturn("main");
+		mockedWebUIDriver.when(WebUIDriver::getCurrentWebUiDriverName).thenReturn("main");
 		mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean(), eq(BrowserType.FIREFOX), eq("main"), isNull())).thenReturn(eventDriver);
 		mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
 		when(eventDriver.executeScript("if (document.readyState === \"complete\") { return \"ok\"; }")).thenReturn("ok");
@@ -119,7 +114,7 @@ public class TestSelectList extends MockitoTest {
 	}
 
 	@Test(groups={"ut"})
-	public void testGetOptions() throws IOException {
+	public void testGetOptions() {
 
 		SelectList select = new SelectList("", By.id("select"));
 		List<WebElement> options = select.getOptions();
@@ -128,20 +123,20 @@ public class TestSelectList extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class)
-	public void testFindElementWrongType() throws IOException {
+	public void testFindElementWrongType() {
 		when(element.getTagName()).thenReturn("something");
 		SelectList select = new SelectList("", By.id("select"));
 		select.getOptions();
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions = WebDriverException.class)
-	public void testGetOptionsNotPresent() throws IOException {
+	public void testGetOptionsNotPresent() {
 		when(driver.findElement(By.id("select"))).thenThrow(new NoSuchElementException("not found"));
 		new SelectList("", By.id("select")).getOptions();
 	}
 
 	@Test(groups={"ut"})
-	public void testGetFirstSelectedOption() throws IOException {
+	public void testGetFirstSelectedOption() {
 		when(option1.isSelected()).thenReturn(true);
 		when(option2.isSelected()).thenReturn(true);
 		
@@ -151,14 +146,14 @@ public class TestSelectList extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testGetFirstSelectedOptionNoneSelected() throws IOException {
+	public void testGetFirstSelectedOptionNoneSelected() {
 		SelectList select = new SelectList("", By.id("select"));
 		WebElement option = select.getFirstSelectedOption();
 		Assert.assertNull(option);
 	}
 	
 	@Test(groups={"ut"})
-	public void testGetAllSelectedOption() throws IOException {
+	public void testGetAllSelectedOption() {
 		when(option1.isSelected()).thenReturn(true);
 		when(option2.isSelected()).thenReturn(true);
 		
@@ -168,7 +163,7 @@ public class TestSelectList extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testSelectedText() throws IOException {
+	public void testSelectedText() {
 		when(option1.isSelected()).thenReturn(true);
 		when(option2.isSelected()).thenReturn(true);
 		
@@ -178,7 +173,7 @@ public class TestSelectList extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testSelectedTextNoSelection() throws IOException {
+	public void testSelectedTextNoSelection() {
 		
 		SelectList select = new SelectList("", By.id("select"));
 		String txt = select.getSelectedText();
@@ -186,7 +181,7 @@ public class TestSelectList extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testSelectedTexts() throws IOException {
+	public void testSelectedTexts() {
 		when(option1.isSelected()).thenReturn(true);
 		when(option2.isSelected()).thenReturn(true);
 		
@@ -197,7 +192,7 @@ public class TestSelectList extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testSelectedValue() throws IOException {
+	public void testSelectedValue() {
 		when(option1.isSelected()).thenReturn(true);
 		when(option2.isSelected()).thenReturn(true);
 		
@@ -207,7 +202,7 @@ public class TestSelectList extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testSelectedValueNoSelection() throws IOException {
+	public void testSelectedValueNoSelection() {
 		
 		SelectList select = new SelectList("", By.id("select"));
 		String txt = select.getSelectedValue();
@@ -215,7 +210,7 @@ public class TestSelectList extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testSelectedValues() throws IOException {
+	public void testSelectedValues() {
 		when(option1.isSelected()).thenReturn(true);
 		when(option2.isSelected()).thenReturn(true);
 		
@@ -226,7 +221,7 @@ public class TestSelectList extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testSelectedValuesNoSelection() throws IOException {
+	public void testSelectedValuesNoSelection() {
 
 		SelectList select = new SelectList("", By.id("select"));
 		String[] txt = select.getSelectedValues();
@@ -234,7 +229,7 @@ public class TestSelectList extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testIsMultipleNoAttribute() throws IOException {
+	public void testIsMultipleNoAttribute() {
 		when(option1.isSelected()).thenReturn(true);
 		when(option2.isSelected()).thenReturn(false);
 		
@@ -243,7 +238,7 @@ public class TestSelectList extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testIsMultipleNotMultiple() throws IOException {
+	public void testIsMultipleNotMultiple() {
 		when(option1.isSelected()).thenReturn(true);
 		when(option2.isSelected()).thenReturn(false);
 		when(element.getDomAttribute("multiple")).thenReturn("false");
@@ -253,7 +248,7 @@ public class TestSelectList extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testIsMultipleMultiple() throws IOException {
+	public void testIsMultipleMultiple() {
 		when(option1.isSelected()).thenReturn(true);
 		when(option2.isSelected()).thenReturn(false);
 		when(element.getDomAttribute("multiple")).thenReturn("true");
@@ -264,7 +259,7 @@ public class TestSelectList extends MockitoTest {
 	
 
 	@Test(groups={"ut"})
-	public void testDeselectAll() throws IOException {
+	public void testDeselectAll() {
 		when(option1.isSelected()).thenReturn(true);
 		when(option2.isSelected()).thenReturn(false);
 		when(element.getDomAttribute("multiple")).thenReturn("true");
@@ -276,7 +271,7 @@ public class TestSelectList extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions = UnsupportedOperationException.class)
-	public void testDeselectAllNotMultiple() throws IOException {
+	public void testDeselectAllNotMultiple() {
 		when(option1.isSelected()).thenReturn(true);
 		when(option2.isSelected()).thenReturn(false);
 		when(element.getDomAttribute("multiple")).thenReturn("false");
@@ -286,7 +281,7 @@ public class TestSelectList extends MockitoTest {
 	}
 
 	@Test(groups={"ut"})
-	public void testDeselectByIndex() throws IOException {
+	public void testDeselectByIndex() {
 		when(option1.isSelected()).thenReturn(false);
 		when(option2.isSelected()).thenReturn(true);
 		when(element.getDomAttribute("multiple")).thenReturn("true");
@@ -298,7 +293,7 @@ public class TestSelectList extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testDeselectByText() throws IOException {
+	public void testDeselectByText() {
 		when(option1.isSelected()).thenReturn(false);
 		when(option2.isSelected()).thenReturn(true);
 		when(element.getDomAttribute("multiple")).thenReturn("true");
@@ -310,7 +305,7 @@ public class TestSelectList extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testDeselectByTextNotSelected() throws IOException {
+	public void testDeselectByTextNotSelected() {
 		when(option1.isSelected()).thenReturn(false);
 		when(option2.isSelected()).thenReturn(true);
 		when(element.getDomAttribute("multiple")).thenReturn("true");
@@ -322,7 +317,7 @@ public class TestSelectList extends MockitoTest {
 	}
 
 	@Test(groups={"ut"})
-	public void testDeselectByValue() throws IOException {
+	public void testDeselectByValue() {
 		when(option1.isSelected()).thenReturn(false);
 		when(option2.isSelected()).thenReturn(true);
 		when(element.getDomAttribute("multiple")).thenReturn("true");
@@ -334,7 +329,7 @@ public class TestSelectList extends MockitoTest {
 	}
 
 	@Test(groups={"ut"})
-	public void testSelectByIndex() throws IOException {
+	public void testSelectByIndex() {
 		when(option1.isSelected()).thenReturn(false);
 		when(option2.isSelected()).thenReturn(true);
 		when(element.getDomAttribute("multiple")).thenReturn("true");
@@ -346,7 +341,7 @@ public class TestSelectList extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testSelectByIndexes() throws IOException {
+	public void testSelectByIndexes() {
 		when(option1.isSelected()).thenReturn(false);
 		when(option2.isSelected()).thenReturn(true);
 		when(element.getDomAttribute("multiple")).thenReturn("true");
@@ -358,7 +353,7 @@ public class TestSelectList extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testSelectByText() throws IOException {
+	public void testSelectByText() {
 		when(option1.isSelected()).thenReturn(false);
 		when(option2.isSelected()).thenReturn(true);
 		when(element.getDomAttribute("multiple")).thenReturn("true");
@@ -370,7 +365,7 @@ public class TestSelectList extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testSelectByTexts() throws IOException {
+	public void testSelectByTexts() {
 		when(option1.isSelected()).thenReturn(false);
 		when(option2.isSelected()).thenReturn(false);
 		when(element.getDomAttribute("multiple")).thenReturn("true");
@@ -386,7 +381,7 @@ public class TestSelectList extends MockitoTest {
 	 * @throws IOException
 	 */
 	@Test(groups={"ut"})
-	public void testSelectByCorrespondingText() throws IOException {
+	public void testSelectByCorrespondingText() {
 		when(option1.isSelected()).thenReturn(false);
 		when(option2.isSelected()).thenReturn(false);
 		
@@ -398,10 +393,9 @@ public class TestSelectList extends MockitoTest {
 	
 	/**
 	 * Check only one option is selected when one text is given
-	 * @throws IOException
 	 */
 	@Test(groups={"ut"})
-	public void testSelectByCorrespondingTexts() throws IOException {
+	public void testSelectByCorrespondingTexts() {
 		when(option1.isSelected()).thenReturn(false);
 		when(option2.isSelected()).thenReturn(false);
 		when(element.getDomAttribute("multiple")).thenReturn("true");
@@ -413,7 +407,7 @@ public class TestSelectList extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testDeselectByCorrespondingText() throws IOException {
+	public void testDeselectByCorrespondingText() {
 		when(option1.isSelected()).thenReturn(true);
 		when(option2.isSelected()).thenReturn(true);
 		when(element.getDomAttribute("multiple")).thenReturn("true");
@@ -425,7 +419,7 @@ public class TestSelectList extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions = UnsupportedOperationException.class)
-	public void testDeselectByCorrespondingTextNotMultiple() throws IOException {
+	public void testDeselectByCorrespondingTextNotMultiple() {
 		when(option1.isSelected()).thenReturn(false);
 		when(option2.isSelected()).thenReturn(true);
 		when(element.getDomAttribute("multiple")).thenReturn("false");
@@ -435,7 +429,7 @@ public class TestSelectList extends MockitoTest {
 	}
 
 	@Test(groups={"ut"})
-	public void testSelectByValue() throws IOException {
+	public void testSelectByValue() {
 		when(option1.isSelected()).thenReturn(false);
 		when(option2.isSelected()).thenReturn(true);
 		
@@ -446,7 +440,7 @@ public class TestSelectList extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testSelectByValues() throws IOException {
+	public void testSelectByValues() {
 		when(option1.isSelected()).thenReturn(false);
 		when(option2.isSelected()).thenReturn(false);
 		when(element.getDomAttribute("multiple")).thenReturn("true");
