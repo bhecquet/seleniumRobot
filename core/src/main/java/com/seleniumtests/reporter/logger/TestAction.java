@@ -211,7 +211,7 @@ public class TestAction {
 		actionJson.put("failed", failed);
 		actionJson.put("position", position);
 		actionJson.put("action", action);
-		actionJson.put("durationToExclure", durationToExclude);
+		actionJson.put("durationToExclude", durationToExclude);
 		if (element != null) {
 			actionJson.put("element", element.getName());
 		}

@@ -549,13 +549,13 @@ public class TestStep extends TestAction {
 		}
 
 		stepToEncode.failed = failed;
-		stepToEncode.snapshots = snapshots.stream().filter(Objects::nonNull).map(s -> s.encodeTo(format)).toList();
-		stepToEncode.files = files.stream().filter(Objects::nonNull).map(f -> f.encodeTo(format)).toList();
+		stepToEncode.snapshots = snapshots.stream().filter(Objects::nonNull).map(s -> s.encodeTo(format)).collect(Collectors.toList());
+		stepToEncode.files = files.stream().filter(Objects::nonNull).map(f -> f.encodeTo(format)).collect(Collectors.toList());
 
 		stepToEncode.duration = duration;
 		stepToEncode.startDate = startDate;
 		stepToEncode.videoTimeStamp = videoTimeStamp;
-		stepToEncode.harCaptures = harCaptures.stream().filter(Objects::nonNull).map(h -> h.encodeTo(format)).toList();
+		stepToEncode.harCaptures = harCaptures.stream().filter(Objects::nonNull).map(h -> h.encodeTo(format)).collect(Collectors.toList());
 
 		stepToEncode.errorCause = errorCause;
 		stepToEncode.errorCauseDetails = encodeString(errorCauseDetails, format);
