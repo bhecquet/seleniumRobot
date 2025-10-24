@@ -272,21 +272,6 @@
                                 #end
                             </div>
                         </div>
-
-                            <!-- previous execution logs -->
-                            #if ($title)
-                                <div class="box collapsed-box success">
-                                    <div class="box-header with-border">
-                                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
-                                                class="fas fa-plus"></i></button> $title
-                                    </div>
-                                    <div class="box-body">
-                                        #foreach($line in $files)
-                                            <div><a href="$line">$line</a></div>
-                                        #end
-                                    </div>
-                                </div>
-                            #end
                         </div>
                         </div>
                 </section>

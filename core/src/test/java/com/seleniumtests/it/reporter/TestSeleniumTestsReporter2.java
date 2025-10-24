@@ -1208,11 +1208,11 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 			String detailedReportContent2 = readTestMethodResultFile("testWithException2");
 
-			// check the message and that no previous execution result is visible
+			// check the message and that previous execution result is visible
 			Assert.assertTrue(detailedReportContent2.contains("Previous execution results"));
 			Assert.assertTrue(detailedReportContent2.contains("<h4> Test Details"));
-			Assert.assertTrue(detailedReportContent2.contains("<a href=\"retry-testWithException2-1.zip\">retry-testWithException2-1.zip</a>"));
-
+			Assert.assertTrue(detailedReportContent2.contains("<a href='retry-testWithException2-1.zip'>file</a>"));
+			Assert.assertTrue(detailedReportContent2.indexOf("<a href='retry-testWithException2-1.zip'>file</a>") > detailedReportContent2.indexOf("<span class=\"step-title\"> Post test step: reset"));
 
 		} finally {
 			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
@@ -1233,7 +1233,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 			// check the message and that no previous execution result is visible
 			Assert.assertTrue(detailedReportContent.contains("Previous execution results"));
-			Assert.assertTrue(detailedReportContent.contains("<a href=\"retry-testWithException2-1.zip\">retry-testWithException2-1.zip</a>"));
+			Assert.assertTrue(detailedReportContent.contains("<a href='retry-testWithException2-1.zip'>file</a>"));
 
 			// issue #379: we souhld have Previous result box
 			Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "<div class=\"box collapsed-box"), 8);
@@ -1260,13 +1260,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 			String detailedReportContent = readTestMethodResultFile("testAndSubActions");
 
-			// check the message and that no previous execution result is visible
-			Assert.assertFalse(detailedReportContent.contains("Previous execution results"));
-			Assert.assertFalse(detailedReportContent.contains("<a href=\"retry-testWithException-1.zip\">retry-testAndSubActions-1.zip</a>"));
-
-			// issue #379: we souhld have not Previous result box
-			Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "<div class=\"box collapsed-box"), 8);
-
+			// check the message and that previous execution result is visible
+			Assert.assertTrue(detailedReportContent.contains("Previous execution results"));
+			Assert.assertFalse(detailedReportContent.contains("<a href='retry-testAndSubActions-1.zip'>file</a>"));
 
 		} finally {
 			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
@@ -1290,7 +1286,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 			// check the message and that no previous execution result is visible
 			Assert.assertTrue(detailedReportContent.contains("No previous execution results, you can enable it via parameter '-DkeepAllResults=true'"));
-			Assert.assertFalse(detailedReportContent.contains("<a href=\"retry-testWithException-1.zip\">retry-testWithException-1.zip</a>"));
+			Assert.assertFalse(detailedReportContent.contains("<a href='retry-testWithException-1.zip'>file</a>"));
 		} finally {
 			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
 			System.clearProperty(SeleniumTestsContext.KEEP_ALL_RESULTS);

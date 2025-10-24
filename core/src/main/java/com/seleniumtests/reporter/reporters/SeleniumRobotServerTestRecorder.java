@@ -27,9 +27,6 @@ import java.util.Map.Entry;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.reporter.logger.FileContent;
-import com.seleniumtests.reporter.logger.GenericFile;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.json.JSONObject;
 import org.testng.IReporter;
 import org.testng.ITestContext;
@@ -199,7 +196,6 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 				logger.info("Result for '{}' will be visible at: {}/snapshot/testResults/result/{}/", testName, serverConnector.getUrl(), testCaseInSessionId);
 				serverConnector.addLogsToTestCaseInSession(testCaseInSessionId, generateExecutionLogs(testResult).toString());
 
-				addPreviousExecutionResults(testResult);
 				List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
 				if (testSteps == null) {
 					continue;
@@ -267,33 +263,6 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 		}
 	}
 
-	/**
-	 * Add a step, so that previous execution results are recorded on server
-	 * @param testResult	the current result for this test
-	 */
-	private static void addPreviousExecutionResults(ITestResult testResult) {
-		TestStep testStep = new TestStep("No previous execution results, you can enable it via parameter '-DkeepAllResults=true'");
-		testStep.setFailed(false);
-		List<File> executionResults;
-		if (SeleniumTestsContextManager.getGlobalContext().getKeepAllResults()) {
-			testStep.setName("Previous execution results");
-			testStep.setAction("Previous execution results");
-			executionResults = FileUtils.listFiles(new File(TestNGResultUtils.getSeleniumRobotTestContext(testResult).getOutputDirectory()),
-							FileFilterUtils.suffixFileFilter(".zip"), null).stream()
-					.toList();
-			logger.info("recording previous execution results");
-
-			for (File executionResultFile: executionResults) {
-				try {
-					testStep.addFile(new GenericFile(executionResultFile, executionResultFile.getName().replace(".zip", ""), GenericFile.FileOperation.KEEP));
-				} catch (IOException e) {
-					logger.warn("Could not add previous execution result: {}", e.getMessage());
-				}
-			}
-		}
-		TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps().add(testStep);
-
-	}
 
 	/**
 	 * Record logs to server

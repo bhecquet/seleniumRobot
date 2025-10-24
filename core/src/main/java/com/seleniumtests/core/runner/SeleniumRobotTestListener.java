@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,11 +18,11 @@
 package com.seleniumtests.core.runner;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +30,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+import com.seleniumtests.reporter.logger.GenericFile;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.WebDriverException;
@@ -68,7 +70,7 @@ import kong.unirest.Unirest;
 public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodListener, ISuiteListener, IExecutionListener, IConfigurationListener, IDataProviderListener {
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotTestListener.class);
-	private static ScenarioLogger scenarioLogger = ScenarioLogger.getScenarioLogger(SeleniumRobotTestListener.class);
+	private static final ScenarioLogger scenarioLogger = ScenarioLogger.getScenarioLogger(SeleniumRobotTestListener.class);
 	
 	private static List<ISuite> suiteList = Collections.synchronizedList(new ArrayList<>());
 	private OffsetDateTime start;
@@ -87,18 +89,19 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	
 	/**
 	 * Method to be called when the test has been terminated and all AfterMethod methods has been called
-	 * @param testResult
+	 * @param testResult the current testNG result
 	 */
 	public void onTestFullyFinished(ITestResult testResult) {
 		TestNGResultUtils.setFinished(testResult, true);
+		addPreviousExecutionResults(testResult);
 		generateTempReport(testResult);
-		
+
 		SeleniumRobotLogger.removeLoggerForTest();
 	}
 	
 	/**
 	 * Executed just before the test starts
-	 * @param testResult
+	 * @param testResult	the TestNG result
 	 */
 	@Override
 	public void onTestStart(ITestResult testResult) {
@@ -115,9 +118,10 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		
 		// unique method name is the test name plus an index in case DataProvider is used
 		TestNGResultUtils.setUniqueTestName(testResult, SeleniumTestsContextManager.getThreadContext().getRelativeOutputDir());
-		SeleniumRobotLogger.createLoggerForTest(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), TestNGResultUtils.getUniqueTestName(testResult));
+		String uniqueTestName = TestNGResultUtils.getUniqueTestName(testResult);
+		SeleniumRobotLogger.createLoggerForTest(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), uniqueTestName);
 		
-		logger.info(SeleniumRobotLogger.START_TEST_PATTERN + TestNGResultUtils.getUniqueTestName(testResult));
+		logger.info("{}{}", SeleniumRobotLogger.START_TEST_PATTERN, uniqueTestName);
 		
 		// search method parameters that should be masked
 		Object[] testParameters = testResult.getParameters();
@@ -145,7 +149,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		if (testResult.getMethod().getRetryAnalyzer(testResult) != null && !(testResult.getMethod().getRetryAnalyzer(testResult) instanceof DisabledRetryAnalyzer)) {
 			TestRetryAnalyzer testRetryAnalyzer = (TestRetryAnalyzer) testResult.getMethod().getRetryAnalyzer(testResult);
 
-			logger.info(testResult.getMethod() + " Failed in " + (testRetryAnalyzer.getCount()) + " times");
+			logger.info("{} Failed in {} times", testResult.getMethod(), (testRetryAnalyzer.getCount()));
 		}		
 	}
 
@@ -181,8 +185,8 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			}
 			
 			new ReporterControler().generateReport(
-					Arrays.asList(testContext.getCurrentXmlTest().getSuite()), 
-					Arrays.asList(testContext.getSuite()), 
+                    Collections.singletonList(testContext.getCurrentXmlTest().getSuite()),
+                    Collections.singletonList(testContext.getSuite()),
 					SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(),
 					testResult);
 			
@@ -285,7 +289,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		if (method.isConfigurationMethod()) {
 			configureThreadContextBeforeInvoke(method.getTestMethod(), testResult, context);
 		}
-		// Check if an error from the SeleniumRobot Server occured during the configuration of the test
+		// Check if an error from the SeleniumRobot Server occurred during the configuration of the test
 		// If so, throw an exception to skip the test execution (which will fail anyway since we couldn't fetch the variables)
 		if (testResult.getAttribute("hasVariableServerFailed") != null && (boolean) testResult.getAttribute("hasVariableServerFailed")) {
 			throw new SeleniumRobotServerException("An error occurred while fetching variables from the server. Skip the test execution.");
@@ -320,7 +324,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 				variableServer.unreserveVariables(new ArrayList<>(SeleniumTestsContextManager.getThreadContext().getConfiguration().values()));
 			}
 		} catch (Exception e) {
-			logger.error("could not unreserve variable: " + e.getMessage());
+			logger.error("could not unreserve variable: {}", e.getMessage());
 		}
 	}
 
@@ -332,17 +336,17 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 										 SeleniumTestsContextManager.getGlobalContext().getDefaultOutputDirectory()); 
 		
     	SeleniumTestsContextManager.generateApplicationPath(suite.getXmlSuite());
-    	logger.info(String.format("Application %s version: %s (%s)", SeleniumTestsContextManager.getApplicationName(), 
+    	logger.info("Application {} version: {} ({})", SeleniumTestsContextManager.getApplicationName(),
     									SeleniumTestsContextManager.getApplicationVersion(),
-    									SeleniumTestsContextManager.getApplicationFullVersion()));
-    	logger.info(String.format("Core version: %s (%s)", SeleniumTestsContextManager.getCoreVersion(), SeleniumTestsContextManager.getCoreFullVersion()));
+    									SeleniumTestsContextManager.getApplicationFullVersion());
+    	logger.info("Core version: {} ({})", SeleniumTestsContextManager.getCoreVersion(), SeleniumTestsContextManager.getCoreFullVersion());
 
 	}
 
 	@Override
 	public void onFinish(ISuite suite) {
 		if (start != null) {
-			logger.info("Test Suite Execution Time: " + (OffsetDateTime.now().toInstant().toEpochMilli() - start.toInstant().toEpochMilli()) / 1000 / 60 + " minutes.");
+			logger.info("Test Suite Execution Time: {} minutes.", (OffsetDateTime.now().toInstant().toEpochMilli() - start.toInstant().toEpochMilli()) / 1000 / 60);
 		} else {
 			logger.warn("No test executed");
 		}	
@@ -362,9 +366,9 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	 * Do we archive test results
 	 * if never is set, whatever else is set, no archiving will be done
 	 * if always is set, and not never, archiving will always be done
-	 * @param testSkipped
-	 * @param testFailed
-	 * @return
+	 * @param testSkipped	true if the test is skipped
+	 * @param testFailed	true if the test failed
+	 * @return true if we need to archive result
 	 */
 	private boolean doArchive(boolean testSkipped, boolean testFailed) {
 		List<ArchiveMode> archiveModes = SeleniumTestsContextManager.getGlobalContext().getArchive();
@@ -381,7 +385,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			return true;
 		}
 		return false;
-		
+
 	}
 
 	@Override
@@ -412,9 +416,9 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
         	try {
 				FileUtility.zipFolder(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()), 
 									  new File(SeleniumTestsContextManager.getGlobalContext().getArchiveToFile()));
-				logger.info("Archiving OK => " + SeleniumTestsContextManager.getGlobalContext().getArchiveToFile());
+				logger.info("Archiving OK => {}", SeleniumTestsContextManager.getGlobalContext().getArchiveToFile());
         	} catch (Exception e) {
-        		logger.error(String.format("Archiving KO [%s] => %s", e.getMessage(), SeleniumTestsContextManager.getGlobalContext().getArchiveToFile()));
+        		logger.error("Archiving KO [{}] => {}", e.getMessage(), SeleniumTestsContextManager.getGlobalContext().getArchiveToFile());
         	}
 		}
 
@@ -430,13 +434,13 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 
 	@Override
 	public void onConfigurationFailure(ITestResult testResult) {
-		logger.error(String.format("Error on configuration method %s.%s: %s", testResult.getMethod().getTestClass().getName(), testResult.getMethod().getMethodName(), testResult.getThrowable().getMessage()));
+		logger.error("Error on configuration method {}.{}: {}", testResult.getMethod().getTestClass().getName(), testResult.getMethod().getMethodName(), testResult.getThrowable().getMessage());
 
 	}
 
 	@Override
 	public void onConfigurationSkip(ITestResult testResult) {
-		logger.error(String.format("Skip on method %s.%s", testResult.getMethod().getTestClass().getName(), testResult.getMethod().getMethodName()));
+		logger.error("Skip on method {}.{}", testResult.getMethod().getTestClass().getName(), testResult.getMethod().getMethodName());
 
 	}
 	
@@ -496,7 +500,36 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		logThrowableToTestEndStep(testResult);
 		WebUIDriver.logFinalDriversState(testResult);
 		tearDownStep.updateDuration();
-		TestStepManager.logTestStep(tearDownStep);		
+		TestStepManager.logTestStep(tearDownStep);
+	}
+
+
+	/**
+	 * Add a step, so that previous execution results are recorded on server
+	 * @param testResult	the current result for this test
+	 */
+	private static void addPreviousExecutionResults(ITestResult testResult) {
+		TestStep testStep = new TestStep("No previous execution results, you can enable it via parameter '-DkeepAllResults=true'");
+		testStep.setFailed(false);
+		List<File> executionResults;
+		if (SeleniumTestsContextManager.getGlobalContext().getKeepAllResults()) {
+			testStep.setName("Previous execution results");
+			testStep.setAction("Previous execution results");
+			executionResults = FileUtils.listFiles(new File(TestNGResultUtils.getSeleniumRobotTestContext(testResult).getOutputDirectory()),
+							FileFilterUtils.suffixFileFilter(".zip"), null).stream()
+					.toList();
+			logger.info("recording previous execution results");
+
+			for (File executionResultFile: executionResults) {
+				try {
+					testStep.addFile(new GenericFile(executionResultFile, executionResultFile.getName().replace(".zip", ""), GenericFile.FileOperation.KEEP));
+				} catch (IOException e) {
+					logger.warn("Could not add previous execution result: {}", e.getMessage());
+				}
+			}
+		}
+		TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps().add(testStep);
+
 	}
 	
 	private void logThrowableToTestEndStep(ITestResult testResult) {
@@ -544,9 +577,9 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 
 	/**
 	 * Put back modified thread context to test / class / method context
-	 * @param method
-	 * @param testResult
-	 * @param context
+	 * @param method		the invoked method
+	 * @param testResult 	the current testNG result
+	 * @param context		current test context
 	 */
 	private void configureThreadContextAfterInvoke(IInvokedMethod method, ITestResult testResult, ITestContext context) {
 		SeleniumTestsContextManager.saveThreadContext(method, testResult, context);
@@ -558,11 +591,11 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	 * - set status of the last step and log it
 	 * - dereserve test variables
 	 * - record test method context
-	 * @param method
-	 * @param testResult
+	 * @param method		the invoked method
+	 * @param testResult 	the current testNG result
 	 */
 	private void executeAfterTestMethod(IInvokedMethod method, ITestResult testResult) {
-		logger.info(SeleniumRobotLogger.END_TEST_PATTERN + TestNGResultUtils.getUniqueTestName(testResult));
+		logger.info("{}{}", SeleniumRobotLogger.END_TEST_PATTERN, TestNGResultUtils.getUniqueTestName(testResult));
 
 		// Handle Soft CustomAssertion
 		if (method.isTestMethod()) {
@@ -573,7 +606,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		// store context in test result
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
 
-		// capture snap shot at the end of the test
+		// capture snapshot at the end of the test
 		logLastStep(testResult);
 		
 		// unreserve variables
@@ -606,7 +639,6 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 
 	/**
 	 * For test
-	 * @return
 	 */
 	public static List<ISuite> getSuiteList() {
 		return suiteList;
