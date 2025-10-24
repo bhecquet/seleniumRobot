@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -92,7 +93,6 @@ public class TestBrowserInfo extends MockitoTest {
 	
 	/**
 	 * Check we take the highest driver version matching this chrome version
-	 * @throws Exception 
 	 */
 	@Test(groups={"ut"})
 	public void testChromeVersionHighestDriverVersion() throws Exception {
@@ -107,10 +107,9 @@ public class TestBrowserInfo extends MockitoTest {
 	
 	/**
 	 * Check we take the highest driver version matching this chrome version
-	 * @throws Exception 
 	 */
 	@Test(groups={"ut"})
-	public void testGetFilesFromList() throws Exception {
+	public void testGetFilesFromList() {
 
 		try {
 			List<String> driverList = Arrays.asList("chromedriver_2.28_chrome-55-57_android_7.0.exe", "chromedriver_2.29_chrome-56-58_android_7.0.exe", "chromedriver_2.31_chrome-58-60.exe");
@@ -126,7 +125,6 @@ public class TestBrowserInfo extends MockitoTest {
 	
 	/**
 	 * Check we can discover version inside a range of versions
-	 * @throws Exception 
 	 */
 	@Test(groups={"ut"})
 	public void testChromeVersionMiddleRange() throws Exception {
@@ -140,7 +138,6 @@ public class TestBrowserInfo extends MockitoTest {
 	
 	/**
 	 * Check that an error is raised when no driver matches a lower browser version
-	 * @throws Exception 
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testChromeVersionNotFound() throws Exception {
@@ -155,7 +152,6 @@ public class TestBrowserInfo extends MockitoTest {
 	/**
 	 * Check that no error is raised if browser version is higher than available version
 	 * an error message should be displayed
-	 * @throws Exception 
 	 */
 	@Test(groups={"ut"})
 	public void testChromeVersionHigherThanDriverVersion() throws Exception {
@@ -169,11 +165,10 @@ public class TestBrowserInfo extends MockitoTest {
 	
 	/**
 	 * Error should be raised when no driver is found
-	 * @throws Exception 
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testChromeVersionNoDriver() throws Exception {
-		List<String> driverList = Arrays.asList("chromedriver_2.20_android-6.0");
+		List<String> driverList = List.of("chromedriver_2.20_android-6.0");
 		BrowserInfo bInfo = spy(new BrowserInfo(BrowserType.CHROME, "70.0", null));
 		when(bInfo.getDriverFiles()).thenReturn(driverList);
 		doNothing().when(bInfo).checkResourceExists();
@@ -183,11 +178,10 @@ public class TestBrowserInfo extends MockitoTest {
 	
 	/**
 	 * Error should be raised when file pattern is not correct
-	 * @throws Exception 
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testChromeVersionBadPattern() throws Exception {
-		List<String> driverList = Arrays.asList("chromedriver_2.20_chrome-55.0-57.0");
+		List<String> driverList = List.of("chromedriver_2.20_chrome-55.0-57.0");
 		BrowserInfo bInfo = spy(new BrowserInfo(BrowserType.CHROME, "55.0", null));
 		when(bInfo.getDriverFiles()).thenReturn(driverList);
 		doNothing().when(bInfo).checkResourceExists();
@@ -198,7 +192,6 @@ public class TestBrowserInfo extends MockitoTest {
 	
 	/**
 	 * Check we take the exact driver version matching this android browser version
-	 * @throws Exception 
 	 */
 	@Test(groups={"ut"})
 	public void testAndroidVersionExactMatch() throws Exception {
@@ -213,12 +206,11 @@ public class TestBrowserInfo extends MockitoTest {
 	
 	/**
 	 * Check that if file name does not respect the pattern, file is rejected
-	 * @throws Exception 
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testAndroidVersionWrongPattern() throws Exception {
 		
-		List<String> driverList = Arrays.asList("chromedriver_2.20_chrome-55-57_android-6");
+		List<String> driverList = List.of("chromedriver_2.20_chrome-55-57_android-6");
 		BrowserInfo bInfo = spy(new BrowserInfo(BrowserType.BROWSER, "6.0", null));
 		when(bInfo.getDriverFiles()).thenReturn(driverList);
 		doNothing().when(bInfo).checkResourceExists();
@@ -228,7 +220,6 @@ public class TestBrowserInfo extends MockitoTest {
 	
 	/**
 	 * Error raised if no version matches
-	 * @throws Exception 
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testAndroidVersionNoMatch() throws Exception {
@@ -243,12 +234,11 @@ public class TestBrowserInfo extends MockitoTest {
 
 	/**
 	 * Check that we get the driver list if driver artifact is installed for the right OS
-	 * @throws Exception 
 	 */
 	@Test(groups={"ut"})
 	public void testGetDriverFilesWithInstalledArtifact() throws Exception {
-		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
-			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
+		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.WINDOWS);
 
 			String[] driversFiles = new String[]{"windows/chromedriver_2.20_chrome-55-57_android-6.0.exe", "windows/chromedriver_2.29_chrome-56-58_android-7.0.exe", "windows/chromedriver_2.31_chrome-58-60.exe"};
 
@@ -261,12 +251,11 @@ public class TestBrowserInfo extends MockitoTest {
 	
 	/**
 	 * If artifact is not installed, getDriverListFromJarResources raises NullPointerException
-	 * @throws Exception
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testGetDriverFilesWithNotInstalledArtifact() throws Exception {
-		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
-			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
+		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.WINDOWS);
 
 			BrowserInfo bInfo = spy(new BrowserInfo(BrowserType.CHROME, "55.0", null));
 			when(bInfo.getDriverListFromJarResources("driver-list-windows.txt")).thenThrow(NullPointerException.class);
@@ -277,12 +266,11 @@ public class TestBrowserInfo extends MockitoTest {
 	
 	/**
 	 * Check we filter drivers by OS
-	 * @throws Exception
 	 */
 	@Test(groups={"ut"})
 	public void testGetDriverFilesWithInstalledArtifactForOtherOS() throws Exception {
-		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
-			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.LINUX);
+		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.LINUX);
 
 			String[] driversFiles = new String[]{"windows/chromedriver_2.20_chrome-55-57_android-6.0.exe", "windows/chromedriver_2.29_chrome-56-58_android-7.0.exe", "windows/chromedriver_2.31_chrome-58-60.exe"};
 
@@ -295,12 +283,11 @@ public class TestBrowserInfo extends MockitoTest {
 	
 	/**
 	 * Error raised if no driver file exists
-	 * @throws Exception 
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testAndroidVersionNoDriver() throws Exception {
 		
-		List<String> driverList = Arrays.asList("chromedriver_2.31_chrome-58-60");
+		List<String> driverList = List.of("chromedriver_2.31_chrome-58-60");
 		BrowserInfo bInfo = spy(new BrowserInfo(BrowserType.BROWSER, "5.0", null));
 		when(bInfo.getDriverFiles()).thenReturn(driverList);
 		doNothing().when(bInfo).checkResourceExists();
@@ -379,9 +366,9 @@ public class TestBrowserInfo extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testGetDefaultEdgeWindowsProfile() throws Exception {
-		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
-			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
+	public void testGetDefaultEdgeWindowsProfile() {
+		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.WINDOWS);
 
 			BrowserInfo bi = new BrowserInfo(BrowserType.EDGE, "90.0", null);
 			Assert.assertTrue(bi.getDefaultProfilePath().replace("\\", "/").matches("C:/Users/.*?/AppData/Local/Microsoft/Edge/User Data"));
@@ -389,9 +376,9 @@ public class TestBrowserInfo extends MockitoTest {
 	}
 
 	@Test(groups={"ut"})
-	public void testGetDefaultEdgeBetaWindowsProfile() throws Exception {
-		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
-			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
+	public void testGetDefaultEdgeBetaWindowsProfile() {
+		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.WINDOWS);
 
 			BrowserInfo bi = new BrowserInfo(BrowserType.EDGE, "90.0", true, null);
 			Assert.assertTrue(bi.getDefaultProfilePath().replace("\\", "/").matches("C:/Users/.*?/AppData/Local/Microsoft/Edge Beta/User Data"));
@@ -399,9 +386,9 @@ public class TestBrowserInfo extends MockitoTest {
 	}
 
 	@Test(groups={"ut"})
-	public void testGetDefaultEdgeLinuxProfile() throws Exception {
-		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
-			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.LINUX);
+	public void testGetDefaultEdgeLinuxProfile() {
+		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.LINUX);
 
 			BrowserInfo bi = new BrowserInfo(BrowserType.EDGE, "90.0", null);
 			Assert.assertTrue(bi.getDefaultProfilePath().matches("/home/.*?/.config/edge"));
@@ -409,9 +396,9 @@ public class TestBrowserInfo extends MockitoTest {
 	}
 
 	@Test(groups={"ut"})
-	public void testGetDefaultEdgeBetaLinuxProfile() throws Exception {
-		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
-			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.LINUX);
+	public void testGetDefaultEdgeBetaLinuxProfile() {
+		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.LINUX);
 
 			BrowserInfo bi = new BrowserInfo(BrowserType.EDGE, "90.0", true, null);
 			Assert.assertTrue(bi.getDefaultProfilePath().matches("/home/.*?/.config/edge-beta"));
@@ -419,9 +406,9 @@ public class TestBrowserInfo extends MockitoTest {
 	}
 
 	@Test(groups={"ut"})
-	public void testGetDefaultEdgeMacProfile() throws Exception {
-		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
-			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
+	public void testGetDefaultEdgeMacProfile() {
+		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.MAC);
 
 			BrowserInfo bi = new BrowserInfo(BrowserType.EDGE, "90.0", null);
 			Assert.assertTrue(bi.getDefaultProfilePath().matches("/Users/.*?/Library/Application Support/Microsoft/Edge"));
@@ -429,9 +416,9 @@ public class TestBrowserInfo extends MockitoTest {
 	}
 
 	@Test(groups={"ut"})
-	public void testGetDefaultEdgeBetaMacProfile() throws Exception {
-		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
-			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
+	public void testGetDefaultEdgeBetaMacProfile() {
+		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.MAC);
 
 			BrowserInfo bi = new BrowserInfo(BrowserType.EDGE, "90.0", true, null);
 			Assert.assertTrue(bi.getDefaultProfilePath().matches("/Users/.*?/Library/Application Support/Microsoft/Edge Beta"));
@@ -439,9 +426,9 @@ public class TestBrowserInfo extends MockitoTest {
 	}
 
 	@Test(groups={"ut"})
-	public void testGetDefaultChromeWindowsProfile() throws Exception {
-		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
-			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
+	public void testGetDefaultChromeWindowsProfile() {
+		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.WINDOWS);
 
 			BrowserInfo bi = new BrowserInfo(BrowserType.CHROME, "58.0", null);
 			Assert.assertTrue(bi.getDefaultProfilePath().replace("\\", "/").matches("C:/Users/.*?/AppData/Local/Google/Chrome/User Data"));
@@ -449,9 +436,9 @@ public class TestBrowserInfo extends MockitoTest {
 	}
 
 	@Test(groups={"ut"})
-	public void testGetDefaultChromeBetaWindowsProfile() throws Exception {
-		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
-			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
+	public void testGetDefaultChromeBetaWindowsProfile() {
+		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.WINDOWS);
 
 			BrowserInfo bi = new BrowserInfo(BrowserType.CHROME, "58.0", true, null);
 			Assert.assertTrue(bi.getDefaultProfilePath().replace("\\", "/").matches("C:/Users/.*?/AppData/Local/Google/Chrome Beta/User Data"));
@@ -460,9 +447,9 @@ public class TestBrowserInfo extends MockitoTest {
 	
 	
 	@Test(groups={"ut"})
-	public void testGetDefaultChromeLinuxProfile() throws Exception {
-		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
-			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.LINUX);
+	public void testGetDefaultChromeLinuxProfile() {
+		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.LINUX);
 
 			BrowserInfo bi = new BrowserInfo(BrowserType.CHROME, "58.0", null);
 			Assert.assertTrue(bi.getDefaultProfilePath().matches("/home/.*?/.config/google-chrome"));
@@ -470,9 +457,9 @@ public class TestBrowserInfo extends MockitoTest {
 	}
 
 	@Test(groups={"ut"})
-	public void testGetDefaultChromeBetaLinuxProfile() throws Exception {
-		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
-			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.LINUX);
+	public void testGetDefaultChromeBetaLinuxProfile() {
+		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.LINUX);
 
 			BrowserInfo bi = new BrowserInfo(BrowserType.CHROME, "58.0", true, null);
 			Assert.assertTrue(bi.getDefaultProfilePath().matches("/home/.*?/.config/google-chrome-beta"));
@@ -480,9 +467,9 @@ public class TestBrowserInfo extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testGetDefaultChromeMacProfile() throws Exception {
-		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
-			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
+	public void testGetDefaultChromeMacProfile() {
+		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.MAC);
 
 			BrowserInfo bi = new BrowserInfo(BrowserType.CHROME, "58.0", null);
 			Assert.assertTrue(bi.getDefaultProfilePath().matches("/Users/.*?/Library/Application Support/Google/Chrome"));
@@ -490,9 +477,9 @@ public class TestBrowserInfo extends MockitoTest {
 	}
 
 	@Test(groups={"ut"})
-	public void testGetDefaultChromeBetaMacProfile() throws Exception {
-		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
-			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
+	public void testGetDefaultChromeBetaMacProfile() {
+		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.MAC);
 
 			BrowserInfo bi = new BrowserInfo(BrowserType.CHROME, "58.0", true, null);
 			Assert.assertTrue(bi.getDefaultProfilePath().matches("/Users/.*?/Library/Application Support/Google/Chrome Beta"));
@@ -500,9 +487,9 @@ public class TestBrowserInfo extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testGetDefaultFirefoxWindowsProfile() throws Exception {
-		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class)) {
-			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
+	public void testGetDefaultFirefoxWindowsProfile() {
+		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class)) {
+			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.WINDOWS);
 
 			BrowserInfo bi = new BrowserInfo(BrowserType.FIREFOX, "58.0", null);
 			Assert.assertTrue(bi.getDefaultProfilePath().replace("\\", "/").matches("C:/Users/.*?/AppData/Roaming/Mozilla/Firefox/Profiles/.*\\.default"));
@@ -510,15 +497,15 @@ public class TestBrowserInfo extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testGetDefaultFirefoxLinuxProfile() throws Exception {
-		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class);
-			MockedStatic mockedFiles = mockStatic(Files.class);
+	public void testGetDefaultFirefoxLinuxProfile() {
+		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class);
+			MockedStatic<Files> mockedFiles = mockStatic(Files.class);
 		) {
-			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
-			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.LINUX);
+			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.WINDOWS);
+			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.LINUX);
 			mockedFiles.when(() -> Files.list(any(Path.class))).thenReturn(streamPaths);
 			when(streamPaths.filter(any(Predicate.class))).thenReturn(streamPaths);
-			when(streamPaths.collect(any())).thenReturn(Arrays.asList(Paths.get("/home/user/.mozilla/firefox")));
+			when(streamPaths.collect(any())).thenReturn(Collections.singletonList(Paths.get("/home/user/.mozilla/firefox")));
 
 			BrowserInfo bi = new BrowserInfo(BrowserType.FIREFOX, "58.0", null);
 
@@ -527,15 +514,15 @@ public class TestBrowserInfo extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testGetDefaultFirefoxMacProfile() throws Exception {
-		try (MockedStatic mockedOsUtility = mockStatic(OSUtility.class);
-			 MockedStatic mockedFiles = mockStatic(Files.class);
+	public void testGetDefaultFirefoxMacProfile() {
+		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class);
+			 MockedStatic<Files> mockedFiles = mockStatic(Files.class);
 		) {
-			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
-			mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
+			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.WINDOWS);
+			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.MAC);
 			mockedFiles.when(() -> Files.list(any(Path.class))).thenReturn(streamPaths);
 			when(streamPaths.filter(any(Predicate.class))).thenReturn(streamPaths);
-			when(streamPaths.collect(any())).thenReturn(Arrays.asList(Paths.get("/Users/user/Library/Application Support/Firefox/Profiles/")));
+			when(streamPaths.collect(any())).thenReturn(Collections.singletonList(Paths.get("/Users/user/Library/Application Support/Firefox/Profiles/")));
 
 			BrowserInfo bi = new BrowserInfo(BrowserType.FIREFOX, "58.0", null);
 

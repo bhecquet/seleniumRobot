@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,12 +22,10 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -37,11 +35,9 @@ import io.appium.java_client.android.options.UiAutomator2Options;
 import com.seleniumtests.driver.DriverMode;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
@@ -52,13 +48,9 @@ import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.DriverCommand;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
-import org.openqa.selenium.remote.Response;
-import org.openqa.selenium.remote.SessionId;
 import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.AfterMethod;
@@ -81,9 +73,7 @@ import com.seleniumtests.uipage.ByC;
 import com.seleniumtests.uipage.htmlelements.FrameElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
-import io.appium.java_client.AppiumBy;
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.remote.AppiumCommandExecutor;
 
 /**
  * Test class for checking calls to a standard HTMLElement without using any
@@ -100,8 +90,6 @@ public class TestHtmlElement extends MockitoTest {
 
 	private AndroidDriver mobileDriver;
 
-	@Mock
-	private RemoteWebElement mobileElement;
 	@Mock
 	private RemoteWebElement element;
 	@Mock
@@ -129,9 +117,8 @@ public class TestHtmlElement extends MockitoTest {
 	@Mock
 	private DriverConfig driverConfig;
 
-	@Spy
-	private HtmlElement el = new HtmlElement("element", By.id("el"));
-	private HtmlElement el1 = new HtmlElement("element", By.id("el1"), el);
+	private HtmlElement el;
+	private HtmlElement el1;
 	
 	@Spy
 	private FrameElement frame = new FrameElement("frame", By.id("frame"));
@@ -140,21 +127,24 @@ public class TestHtmlElement extends MockitoTest {
 
 	private CustomEventFiringWebDriver eventDriver;
 
-	private MockedStatic mockedWebUIDriver;
+	private MockedStatic<WebUIDriver> mockedWebUIDriver;
 
 	@BeforeMethod(groups = { "ut" })
-	private void init() throws WebDriverException, IOException {
+	private void init() throws WebDriverException {
+
+		el = spy(new HtmlElement("element", By.id("el")));
+		el1 = new HtmlElement("element", By.id("el1"), el);
 
 		// add capabilities to allow augmenting driver
 		when(driver.getCapabilities()).thenReturn(new DesiredCapabilities()); 
 		
 		// mimic sub elements of the HtmlElement
-		List<WebElement> subElList = new ArrayList<WebElement>();
+		List<WebElement> subElList = new ArrayList<>();
 		subElList.add(subElement1);
 		subElList.add(subElement2);
 
 		// list of elements correspond
-		List<WebElement> elList = new ArrayList<WebElement>();
+		List<WebElement> elList = new ArrayList<>();
 		elList.add(element);
 
 		// add DriverExceptionListener to reproduce driver behavior
@@ -165,7 +155,7 @@ public class TestHtmlElement extends MockitoTest {
 		when(WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(uiDriver);
 		when(driver.findElement(By.id("el"))).thenReturn(element);
 		when(driver.findElement(By.id("frame"))).thenReturn(frameElement);
-		when(driver.findElements(By.id("frame"))).thenReturn(Arrays.asList(frameElement));
+		when(driver.findElements(By.id("frame"))).thenReturn(List.of(frameElement));
 		when(driver.findElements(By.name("subEl"))).thenReturn(subElList);
 		when(driver.findElement(By.name("subEl"))).thenReturn(subElement1);
 		when(driver.findElements(By.id("el"))).thenReturn(elList);
@@ -217,7 +207,7 @@ public class TestHtmlElement extends MockitoTest {
 		mockedWebUIDriver.close();
 	}
 
-	private void finalCheck(boolean findElement) throws Exception {
+	private void finalCheck(boolean findElement) {
 		// check we called getDriver before using it
 		verify(el, atLeastOnce()).updateDriver();
 
@@ -228,13 +218,13 @@ public class TestHtmlElement extends MockitoTest {
 	}
 
 	@Test(groups = { "ut" })
-	public void testToString() throws Exception {
+	public void testToString() {
 		Assert.assertEquals(el1.toString(),
 				"HtmlElement element, by={By.id: el1}, sub-element of HtmlElement element, by={By.id: el}");
 	}
 
 	@Test(groups = { "ut" })
-	public void testClick() throws Exception {
+	public void testClick() {
 		el.click();
 		finalCheck(true);
 
@@ -243,7 +233,7 @@ public class TestHtmlElement extends MockitoTest {
 	}
 
 	@Test(groups = { "ut" })
-	public void testSimulateClick() throws Exception {
+	public void testSimulateClick() {
 		el.simulateClick();
 		finalCheck(true);
 		
@@ -251,12 +241,12 @@ public class TestHtmlElement extends MockitoTest {
 		verify(driver).executeScript("if(document.createEvent){var evObj = document.createEvent('MouseEvents');evObj.initEvent('click', true, false); arguments[0].dispatchEvent(evObj);} else if(document.createEventObject) { arguments[0].fireEvent('onclick');}", el.getRealElement(), new Object[] {});
 
 		// check handled are updated on click
-		verify((CustomEventFiringWebDriver) eventDriver).updateWindowsHandles();
+		verify(eventDriver).updateWindowsHandles();
 
 	}
 
 	@Test(groups = { "ut" })
-	public void testSimulateSendKeys() throws Exception {
+	public void testSimulateSendKeys() {
 		el.simulateSendKeys("foo");
 		verify(driver).executeScript("arguments[0].focus();", el.getRealElement(), new Object[] {});
 		verify(driver).executeScript("arguments[0].value='foo';", el.getRealElement(), new Object[] {});
@@ -264,7 +254,7 @@ public class TestHtmlElement extends MockitoTest {
 	}
 	
 	@Test(groups = { "ut" })
-	public void testSimulateSendKeysClear() throws Exception {
+	public void testSimulateSendKeysClear() {
 		el.simulateSendKeys("");
 		verify(driver).executeScript("arguments[0].focus();", el.getRealElement(), new Object[] {});
 		verify(driver).executeScript("arguments[0].value='';", el.getRealElement(), new Object[] {});
@@ -272,13 +262,13 @@ public class TestHtmlElement extends MockitoTest {
 	}
 
 	@Test(groups = { "ut" })
-	public void testSimulateMoveToElement() throws Exception {
+	public void testSimulateMoveToElement() {
 		el.simulateMoveToElement(1, 1);
 		finalCheck(true);
 	}
 
 	@Test(groups = { "ut" })
-	public void testFindElementsBy() throws Exception {
+	public void testFindElementsBy() {
 		Assert.assertEquals(el.findElements(By.name("subEl")).size(), 2);
 		finalCheck(true);
 	}
@@ -287,7 +277,7 @@ public class TestHtmlElement extends MockitoTest {
 	 * Check we get the first sub-element of our root element "el"
 	 */
 	@Test(groups = { "ut" })
-	public void testFindSubElement() throws Exception {
+	public void testFindSubElement() {
 		HtmlElement subEl = el.findElement(By.name("subEl"));
 		Assert.assertEquals(subEl.getElement().toString(), "Decorated {subElement1}");
 		finalCheck(true);
@@ -297,73 +287,71 @@ public class TestHtmlElement extends MockitoTest {
 	 * Check we get the Nth sub-element of our root element "el"
 	 */
 	@Test(groups = { "ut" })
-	public void testFindNthSubElement() throws Exception {
+	public void testFindNthSubElement() {
 		HtmlElement subEl = el.findElement(By.name("subEl"), 1);
 		Assert.assertEquals(subEl.getElement().toString(), "Decorated {subElement2}");
 		finalCheck(true);
 	}
 
 	@Test(groups = { "ut" })
-	public void testFindElements() throws Exception {
+	public void testFindElements() {
 		Assert.assertEquals(el.findElements().size(), 1);
 		finalCheck(true);
 	}
 
 	@Test(groups = { "ut" })
-	public void testGetAttribute() throws Exception {
+	public void testGetAttribute() {
 		Assert.assertEquals(el.getAttribute("attr"), "attribute");
 		finalCheck(true);
 	}
 
 	@Test(groups = { "ut" })
-	public void testGetHeight() throws Exception {
+	public void testGetHeight() {
 		Assert.assertEquals(el.getHeight(), 10);
 		finalCheck(true);
 	}
 
 	@Test(groups = { "ut" })
-	public void testGetWidth() throws Exception {
+	public void testGetWidth() {
 		Assert.assertEquals(el.getWidth(), 10);
 		finalCheck(true);
 	}
 
 	@Test(groups = { "ut" })
-	public void testLocation() throws Exception {
+	public void testLocation() {
 		Assert.assertEquals(el.getLocation().getX(), 5);
 		finalCheck(true);
 	}
 
 	@Test(groups = { "ut" })
-	public void testTagName() throws Exception {
+	public void testTagName() {
 		Assert.assertEquals(el.getTagName(), "h1");
 		finalCheck(true);
 	}
 
 	@Test(groups = { "ut" })
-	public void testText() throws Exception {
+	public void testText() {
 		Assert.assertEquals(el.getText(), "text");
 		finalCheck(true);
 	}
 
 	@Test(groups = { "ut" })
-	public void testValue() throws Exception {
+	public void testValue() {
 		Assert.assertEquals(el.getValue(), "property");
 		finalCheck(true);
 	}
 
 	@Test(groups = { "ut" })
-	public void testIsDisplayed() throws Exception {
-		Assert.assertEquals(el.isDisplayed(), true);
+	public void testIsDisplayed() {
+        Assert.assertTrue(el.isDisplayed());
 		finalCheck(true);
 	}
 
 	/**
 	 * Check exception handling and action replay
-	 * 
-	 * @throws Exception
 	 */
 	@Test(groups = { "ut" })
-	public void testIsDisplayedException() throws Exception {
+	public void testIsDisplayedException() {
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
 		when(element.isDisplayed()).thenThrow(new WebDriverException("error"));
 		Assert.assertFalse(el.isDisplayed());
@@ -377,10 +365,9 @@ public class TestHtmlElement extends MockitoTest {
 	
 	/**
 	 * #548: check that if a NullPointerException is raised during replay, this does not affect the logging
-	 * @throws Exception
 	 */
 	@Test(groups = { "ut" })
-	public void testReplayActionWithNPE() throws Exception {
+	public void testReplayActionWithNPE() {
 		TestStep step = new TestStep("step", "step", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), false);
 		
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
@@ -399,17 +386,15 @@ public class TestHtmlElement extends MockitoTest {
 	/**
 	 * Check that when using isElementPresent, step is not marked as failed. So
 	 * report will show step as green check correction of issue #104
-	 * 
-	 * @throws Exception
 	 */
 	@Test(groups = { "ut" })
-	public void testIsPresentExceptionDoNotSetStepFailed() throws Exception {
+	public void testIsPresentExceptionDoNotSetStepFailed() {
 		TestStep step = new TestStep("step 1", "step 1", this.getClass(), null, new ArrayList<>(), true);
 		TestStepManager.setParentTestStep(step);
 
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
 		when(driver.findElement(By.id("el"))).thenThrow(new NoSuchElementException(""));
-		Assert.assertEquals(el.isElementPresent(1), false);
+        Assert.assertFalse(el.isElementPresent(1));
 
 		Assert.assertEquals(step.getStepStatus(), StepStatus.SUCCESS);
 	}
@@ -417,11 +402,9 @@ public class TestHtmlElement extends MockitoTest {
 	/**
 	 * check correction of issue #10': step should be failed for all other actions
 	 * but waitForPresent
-	 * 
-	 * @throws Exception
 	 */
 	@Test(groups = { "ut" })
-	public void testIsDisplayedExceptionSetStepFailed() throws Exception {
+	public void testIsDisplayedExceptionSetStepFailed() {
 		TestStep step = new TestStep("step 1", "step 1", this.getClass(), null, new ArrayList<>(), true);
 		TestStepManager.setParentTestStep(step);
 
@@ -433,49 +416,49 @@ public class TestHtmlElement extends MockitoTest {
 	}
 
 	@Test(groups = { "ut" })
-	public void testIsElementPresent() throws Exception {
-		Assert.assertEquals(el.isElementPresent(1), true);
+	public void testIsElementPresent() {
+        Assert.assertTrue(el.isElementPresent(1));
 		finalCheck(false);
 	}
 
 	@Test(groups = { "ut" })
-	public void testIsEnabled() throws Exception {
-		Assert.assertEquals(el.isEnabled(), true);
+	public void testIsEnabled() {
+        Assert.assertTrue(el.isEnabled());
 		finalCheck(true);
 	}
 
 	@Test(groups = { "ut" })
-	public void testIsTextPresentPattern() throws Exception {
-		Assert.assertEquals(el.isTextPresent("\\w+xt"), true);
+	public void testIsTextPresentPattern() {
+        Assert.assertTrue(el.isTextPresent("\\w+xt"));
 		finalCheck(true);
 	}
 
 	@Test(groups = { "ut" })
-	public void testIsTextPresentText() throws Exception {
-		Assert.assertEquals(el.isTextPresent("text"), true);
+	public void testIsTextPresentText() {
+        Assert.assertTrue(el.isTextPresent("text"));
 		finalCheck(true);
 	}
 
 	@Test(groups = { "ut" })
-	public void testSimulateMouseOver() throws Exception {
+	public void testSimulateMouseOver() {
 		el.simulateMouseOver();
 		finalCheck(true);
 	}
 
 	@Test(groups = { "ut" })
-	public void testSendKeys() throws Exception {
+	public void testSendKeys() {
 		el.sendKeys("someText");
 		finalCheck(true);
 	}
 
 	@Test(groups = { "ut" })
-	public void testSendKeysWithPause() throws Exception {
+	public void testSendKeysWithPause() {
 		el.sendKeysAction(10, "toto", "titi", "meduse");
 		finalCheck(true);
 	}
 
 	@Test(groups = { "ut" })
-	public void testSendKeysWithException() throws Exception {
+	public void testSendKeysWithException() {
 		when(element.getAttribute("type")).thenThrow(WebDriverException.class);
 		el.sendKeys("someText");
 		verify(element).clear();
@@ -483,55 +466,54 @@ public class TestHtmlElement extends MockitoTest {
 	}
 
 	@Test(groups = { "ut" })
-	public void testFindPatternInText() throws Exception {
+	public void testFindPatternInText() {
 		Assert.assertEquals(el.findPattern(Pattern.compile("\\w(\\w+)\\w"), "text"), "ex");
 		finalCheck(true);
 	}
 
 	@Test(groups = { "ut" })
-	public void testFindPatternInAttr() throws Exception {
+	public void testFindPatternInAttr() {
 		Assert.assertEquals(el.findPattern(Pattern.compile("\\w(\\w+)\\w"), "attr"), "ttribut");
 		finalCheck(true);
 	}
 
 	@Test(groups = { "ut" })
-	public void testFindPatternInAttrNoMatch() throws Exception {
+	public void testFindPatternInAttrNoMatch() {
 		Assert.assertEquals(el.findPattern(Pattern.compile("\\w(\\d+)\\w"), "attr"), "");
 		finalCheck(true);
 	}
 	
 	/**
 	 * Check selenium method is called
-	 * @throws Exception
 	 */
 	@Test(groups = { "ut" })
-	public void testGetDomAttribute() throws Exception {
+	public void testGetDomAttribute() {
 		Assert.assertEquals(el.getDomAttribute("someAttribute"), "attribute");
 		finalCheck(true);
 	}
 	@Test(groups = { "ut" })
-	public void testGetDomProperty() throws Exception {
+	public void testGetDomProperty() {
 		Assert.assertEquals(el.getDomProperty("someAttribute"), "property");
 		finalCheck(true);
 	}
 	@Test(groups = { "ut" })
-	public void testGetAriaRole() throws Exception {
+	public void testGetAriaRole() {
 		Assert.assertEquals(el.getAriaRole(), "role");
 		finalCheck(true);
 	}
 	@Test(groups = { "ut" })
-	public void testGetAccessibilityName() throws Exception {
+	public void testGetAccessibilityName() {
 		Assert.assertEquals(el.getAccessibleName(), "name");
 		finalCheck(true);
 	}
 	@Test(groups = { "ut" })
-	public void testGetShadowRoot() throws Exception {
+	public void testGetShadowRoot() {
 		Assert.assertEquals(el.getShadowRoot(), searchContext);
 		finalCheck(true);
 	}
 
 	@Test(groups = { "ut" })
-	public void testGetCenter() throws Exception {
+	public void testGetCenter() {
 
 		Point center = el.getCenter();
 		Assert.assertEquals(center.getX(), 110);
@@ -539,27 +521,27 @@ public class TestHtmlElement extends MockitoTest {
 	}
 
 	@Test(groups = { "ut" })
-	public void testElementNotFoundDefaultTimeout() throws Exception {
+	public void testElementNotFoundDefaultTimeout() {
 		HtmlElement elNotPresent = new HtmlElement("element", By.id("notPresent"));
 		when(driver.findElement(By.id("notPresent"))).thenThrow(new NoSuchElementException("Unable to locate element with ID: 'notPresent'"));
 		LocalDateTime start = LocalDateTime.now();
 		try {
 			elNotPresent.getValue();
 		} catch (NoSuchElementException e) {
-
+			// ignore error
 		}
 		Assert.assertTrue(LocalDateTime.now().minusSeconds(29).isAfter(start));
 	}
 	
 	@Test(groups = { "ut" })
-	public void testElementNotFoundLowTimeout() throws Exception {
+	public void testElementNotFoundLowTimeout() {
 		HtmlElement elNotPresent2 = new HtmlElement("element", By.id("notPresent"), (Integer)null, 5);
 		when(driver.findElement(By.id("notPresent"))).thenThrow(new NoSuchElementException("Unable to locate element with ID: 'notPresent'"));
 		LocalDateTime start = LocalDateTime.now();
 		try {
 			elNotPresent2.getValue();
 		} catch (WebDriverException e) {
-			
+			// ignore error
 		}
 		Assert.assertTrue(LocalDateTime.now().minusSeconds(6).isBefore(start));
 		Assert.assertTrue(LocalDateTime.now().minusSeconds(4).isAfter(start));
@@ -567,7 +549,6 @@ public class TestHtmlElement extends MockitoTest {
 
 	/**
 	 * issue #325: check NoSuchElementException exception is raised with index 0
-	 * @throws Exception
 	 */
 	@Test(groups = { "ut" })
 	public void testElementNotFoundWithIndex() throws Exception {
@@ -584,7 +565,7 @@ public class TestHtmlElement extends MockitoTest {
 	
 
 	@Test(groups = { "ut" })
-	public void testIsElementPresentNotFound() throws Exception {
+	public void testIsElementPresentNotFound() {
 		HtmlElement elNotPresent = new HtmlElement("element", By.id("notPresent"));
 		when(driver.findElement(By.id("notPresent"))).thenThrow(new NoSuchElementException("Unable to locate element with ID: 'notPresent'"));
 		LocalDateTime start = LocalDateTime.now();
@@ -600,7 +581,7 @@ public class TestHtmlElement extends MockitoTest {
 	}
 	
 	@Test(groups = { "ut" })
-	public void testIsElementPresentFound() throws Exception {
+	public void testIsElementPresentFound() {
 		HtmlElement present = new HtmlElement("element", By.id("present"));
 		when(driver.findElement(By.id("present"))).thenReturn(el);
 		LocalDateTime start = LocalDateTime.now();
@@ -617,10 +598,9 @@ public class TestHtmlElement extends MockitoTest {
 	
 	/**
 	 * Check that element is found with frame
-	 * @throws Exception
 	 */
 	@Test(groups = { "ut" })
-	public void testIsElementPresentFoundWithFrame() throws Exception {
+	public void testIsElementPresentFoundWithFrame() {
 		HtmlElement present = new HtmlElement("element", By.id("present"), frame);
 		when(driver.findElement(By.id("present"))).thenReturn(el);
 		LocalDateTime start = LocalDateTime.now();
@@ -638,10 +618,9 @@ public class TestHtmlElement extends MockitoTest {
 	
 	/**
 	 * Check that element is not found if frame is not found
-	 * @throws Exception
 	 */
 	@Test(groups = { "ut" })
-	public void testIsElementPresentNotFoundWithFrame() throws Exception {
+	public void testIsElementPresentNotFoundWithFrame() {
 		HtmlElement present = new HtmlElement("element", By.id("present"), frame);
 		when(driver.findElement(By.id("present"))).thenReturn(el);
 		when(driver.findElement(By.id("frame"))).thenThrow(NoSuchElementException.class);
@@ -661,14 +640,13 @@ public class TestHtmlElement extends MockitoTest {
 	
 	/**
 	 * Check that element is found if frame is not found on first search
-	 * @throws Exception
 	 */
 	@Test(groups = { "ut" })
-	public void testIsElementPresentFoundWithFrameNotFoundOnFirstTry() throws Exception {
+	public void testIsElementPresentFoundWithFrameNotFoundOnFirstTry() {
 		HtmlElement present = new HtmlElement("element", By.id("present"), frame);
 		when(driver.findElement(By.id("present"))).thenReturn(el);
 		when(driver.findElement(By.id("frame"))).thenThrow(NoSuchElementException.class).thenReturn(frameElement);
-		when(driver.findElements(By.id("frame"))).thenReturn(new ArrayList<>()).thenReturn(Arrays.asList(frameElement));
+		when(driver.findElements(By.id("frame"))).thenReturn(new ArrayList<>()).thenReturn(List.of(frameElement));
 		LocalDateTime start = LocalDateTime.now();
 		
 		boolean exceptionRaised = false;
@@ -682,7 +660,7 @@ public class TestHtmlElement extends MockitoTest {
 		Assert.assertTrue(LocalDateTime.now().minusSeconds(3).isBefore(start));
 	}
 	@Test(groups = { "ut" })
-	public void testWaitForVisibilityFound() throws Exception {
+	public void testWaitForVisibilityFound() {
 		HtmlElement present = new HtmlElement("element", By.id("present"));
 		when(driver.findElement(By.id("present"))).thenReturn(el);
 		LocalDateTime start = LocalDateTime.now();
@@ -699,7 +677,7 @@ public class TestHtmlElement extends MockitoTest {
 	
 
 	@Test(groups = { "ut" })
-	public void testWaitForVisibilityNotFound() throws Exception {
+	public void testWaitForVisibilityNotFound() {
 		HtmlElement elNotPresent = new HtmlElement("element", By.id("notPresent"));
 		when(driver.findElement(By.id("notPresent"))).thenThrow(new NoSuchElementException("Unable to locate element with ID: 'notPresent'"));
 		LocalDateTime start = LocalDateTime.now();
@@ -717,10 +695,9 @@ public class TestHtmlElement extends MockitoTest {
 
 	/**
 	 * Check that element is visible with frame
-	 * @throws Exception
 	 */
 	@Test(groups = { "ut" })
-	public void testWaitForVisibilityFoundWithFrame() throws Exception {
+	public void testWaitForVisibilityFoundWithFrame() {
 		HtmlElement present = new HtmlElement("element", By.id("present"), frame);
 		when(driver.findElement(By.id("present"))).thenReturn(el);
 		LocalDateTime start = LocalDateTime.now();
@@ -781,7 +758,7 @@ public class TestHtmlElement extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
 
 		HtmlElement present = new HtmlElement("element", locator);
-		CustomEventFiringWebDriver eventDriver = new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null);
+		eventDriver = new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null);
 		present.setDriver(eventDriver); // mimic the findElement call were we update driver before doing anything
 		present.replaceSelector();
 		Assert.assertEquals(present.getBy(), expectedLocator);
@@ -789,9 +766,13 @@ public class TestHtmlElement extends MockitoTest {
 
 	@Test(groups = { "ut" })
 	public void testGetNameWithLabel() {
-		HtmlElement el = new HtmlElement("myElement", By.id("foo"));
+		testGetName("myElement", "myElement");
+	}
+
+	private void testGetName(String label, String expectedLabel) {
+		el = new HtmlElement(label, By.id("foo"));
 		el.setFieldName("el");
-		Assert.assertEquals(el.getName(), "myElement");
+		Assert.assertEquals(el.getName(), expectedLabel);
 	}
 
 	/**
@@ -799,19 +780,19 @@ public class TestHtmlElement extends MockitoTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testGetNameWithEmptyLabel() {
-		HtmlElement el = new HtmlElement("", By.id("foo"));
-		el.setFieldName("el");
-		Assert.assertEquals(el.getName(), "el");
+		testGetName("", "el");
 	}
+
+	/**
+	 * When label is null, field name is used, if it exists
+	 */
 	@Test(groups = { "ut" })
 	public void testGetNameWithNullLabel() {
-		HtmlElement el = new HtmlElement(null, By.id("foo"));
-		el.setFieldName("el");
-		Assert.assertEquals(el.getName(), "el");
+		testGetName(null, "el");
 	}
 	@Test(groups = { "ut" })
 	public void testGetNameNoFieldName() {
-		HtmlElement el = new HtmlElement(null, By.id("foo"));
+		el = new HtmlElement(null, By.id("foo"));
 		Assert.assertEquals(el.getName(), "By.id: foo");
 	}
 
@@ -820,13 +801,13 @@ public class TestHtmlElement extends MockitoTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testGetOriginClassWithPage() {
-		HtmlElement el = spy(new HtmlElement(null, By.id("foo")));
+		el = spy(new HtmlElement(null, By.id("foo")));
 		el.setOrigin("com.seleniumtests.it.driver.support.pages.DriverTestPage");
 		Assert.assertEquals(el.getOriginClass(), DriverTestPage.class);
 	}
 	@Test(groups = { "ut" })
 	public void testGetOriginClassWithInvalidPage() {
-		HtmlElement el = spy(new HtmlElement(null, By.id("foo")));
+		el = spy(new HtmlElement(null, By.id("foo")));
 		when(el.getOrigin()).thenReturn("pages.DriverTestPage");
 		Assert.assertNull(el.getOriginClass());
 	}
@@ -836,12 +817,12 @@ public class TestHtmlElement extends MockitoTest {
 	 */
 	@Test(groups = { "ut" })
 	public void testGetOriginClassWithNullPage() {
-		HtmlElement el = new HtmlElement(null, By.id("foo"));
+		el = new HtmlElement(null, By.id("foo"));
 		Assert.assertNull(el.getOriginClass());
 	}
 	@Test(groups = { "ut" })
 	public void testGetOriginClassCallingPage() {
-		HtmlElement el = new HtmlElement(null, By.id("foo"));
+		el = new HtmlElement(null, By.id("foo"));
 		el.setCallingPage(new PageObject(null));
 		Assert.assertEquals(el.getOriginClass(), PageObject.class);
 	}
