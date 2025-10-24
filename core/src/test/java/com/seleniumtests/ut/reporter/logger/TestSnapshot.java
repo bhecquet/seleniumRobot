@@ -30,7 +30,7 @@ public class TestSnapshot extends GenericTest {
 	private Snapshot createSnapshot(SnapshotCheckType snapshotCheckType) throws FileNotFoundException {
 
 		ScreenShot screenshot = new ScreenShot(tmpImgFile, tmpHtmlFile, "");
-		screenshot.setTitle("title");
+		screenshot.setTitle("title /");
 		screenshot.setLocation("http://location");
 		return new Snapshot(screenshot, "main", snapshotCheckType);
 	}
@@ -52,7 +52,7 @@ public class TestSnapshot extends GenericTest {
 				+ 		"<img id=\"%s\" src=\"%s\" style=\"width: 300px\">"
 				+ 	"</a>"
 				+ "</div>"
-				+ "<div class=\"text-center\">main: title</div>"
+				+ "<div class=\"text-center\">main: title /</div>"
 				+ "<div class=\"text-center font-weight-lighter\"><a href='http://location' target=url>URL</a> | <a href='htmls/%s' target=html>HTML Source</a></div>", imageId, imageId, tmpImgFile.getName(), tmpHtmlFile.getName()));
 	}
 

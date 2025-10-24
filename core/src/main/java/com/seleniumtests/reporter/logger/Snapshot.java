@@ -72,7 +72,7 @@ public class Snapshot extends TestAction {
 <div class="text-center">
       <a href="#" onclick="$('#imagepreview').attr('src', $('#%s').attr('src'));$('#imagemodal').modal('show');">
           <img id="%s" src="%s" style="width: 300px">
-      </a>"
+      </a>
 </div>
 """, uuid, uuid, screenshot.getImagePath()));
         }
