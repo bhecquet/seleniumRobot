@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -93,7 +93,6 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	
 	/**
 	 * simulate an inactive server
-	 * @throws UnirestException 
 	 */
 	private SeleniumRobotSnapshotServerConnector configureNotAliveConnection() throws UnirestException {
 		when(getAliveRequest.asString()).thenThrow(UnirestException.class);
@@ -143,7 +142,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		when(req.asString()).thenThrow(UnirestException.class);
 		
 		connector.createApplication();
-		Assert.assertNull(connector.getApplicationId());
+		connector.getApplicationId();
 	}
 	
 	@Test(groups= {"ut"})
@@ -164,8 +163,8 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		connector.createVersion();
 		
 		// check application has also been created
-		Assert.assertNotNull(connector.getApplicationId());
-		Assert.assertNotNull(connector.getVersionId());
+		Assert.assertTrue(connector.getApplicationId() > 0);
+		Assert.assertTrue(connector.getVersionId() > 0);
 		Assert.assertEquals((int)connector.getVersionId(), 11);
 		verify(connector).createApplication();
 	}
@@ -177,7 +176,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 
 		connector.createVersion();
 		
-		Assert.assertNotNull(connector.getVersionId());
+		Assert.assertTrue(connector.getVersionId() > 0);
 		Assert.assertEquals((int)connector.getVersionId(), 11);
 	}
 	
@@ -222,7 +221,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		when(req.asString()).thenThrow(UnirestException.class);
 		
 		connector.createEnvironment();
-		Assert.assertNull(connector.getEnvironmentId());
+		connector.getEnvironmentId();
 	}
 	
 	@Test(groups= {"ut"})
@@ -259,7 +258,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		MultipartBody request = (MultipartBody) createServerMock("POST", SeleniumRobotSnapshotServerConnector.SESSION_API_URL, 200, "{'id': '14'}", "body");
 
 		connector.createVersion();
-		Integer sessionId = connector.createSession("Session1", "BROWSER:CHROME", "http://myLauncher/test", OffsetDateTime.now());
+		connector.createSession("Session1", "BROWSER:CHROME", "http://myLauncher/test", OffsetDateTime.now());
 		verify(request).field("browser", "BROWSER:CHROME");
 		verify(request).field("startedBy", "http://myLauncher/test");
 	}
@@ -278,7 +277,6 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	
 	/**
 	 * Session name is limited to 100 chars by server, check we strip it
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"})
 	public void testCreateSessionLongName() throws UnirestException {
@@ -335,7 +333,6 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	
 	/**
 	 * Test case name is limited to 150 chars by server, check we strip it
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"})
 	public void testCreateTestCaseLongName() throws UnirestException {	
@@ -415,7 +412,6 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	
 	/**
 	 * Test case in session name is limited to 100 chars by server, check we strip it
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"})
 	public void testCreateTestCaseInSessionLongName() throws UnirestException {	
@@ -576,7 +572,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		
 		Integer sessionId = connector.createSession("Session1");
 		Integer testCaseId = connector.createTestCase("Test 1");
-		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS","LOCAL", "a test description", OffsetDateTime.now());
+		connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS","LOCAL", "a test description", OffsetDateTime.now());
 		connector.createSnapshot(snapshot, null, new ArrayList<>());
 	}
 	
@@ -624,11 +620,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		
 		verify(request).field(SeleniumRobotSnapshotServerConnector.FIELD_EXCLUDE_ZONES, "[{\"x\":10,\"y\":11,\"height\":120,\"width\":230},{\"x\":100,\"y\":110,\"height\":220,\"width\":130}]");
 	}
-	
-	/**
-	 * 
-	 * @throws UnirestException
-	 */
+
 	@Test(groups= {"ut"}, expectedExceptions = SeleniumRobotServerException.class)
 	public void testCreateSnapshotNull() throws UnirestException {
 		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
@@ -667,7 +659,6 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	
 	/**
 	 * snapshot name is limited to 100 chars by server, check we strip it
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"})
 	public void testCreateSnapshotLongName() throws UnirestException {
@@ -721,7 +712,6 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	
 	/**
 	 * Check the case were seleniumRobot server is not up to date and createSnapshot API only returns id
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"})
 	public void testCheckSnapshotHasNoDifferencesWithOutdatedServer() throws UnirestException {
@@ -856,8 +846,8 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	public void testRecordTestInfoNullTestCase() {
 		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
 
-		Integer sessionId = connector.createSession("Session1");
-		Integer testCaseId = connector.createTestCase("Test 1");
+		connector.createSession("Session1");
+		connector.createTestCase("Test 1");
 
 		Map<String, Info> infos = new HashMap<>();
 
@@ -956,16 +946,15 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		GenericFile file = new GenericFile(File.createTempFile("video", ".avi"), "video file");
 		testStep.addFile(file);
 		testStep.addFile(file);
-		Integer stepResultId = connector.recordStepResult(testStep, testCaseInSessionId, testStepId);
+		connector.recordStepResult(testStep, testCaseInSessionId, testStepId);
 
 		// check we record step, then update it and store all files
 		verify(connector).recordStepResult(true, "", 0, testCaseInSessionId, testStepId);
-		String filePath = file.getFile().getAbsolutePath().replace("\\", "/");
+		file.getFile().getAbsolutePath().replace("\\", "/");
 	}
 
 	/**
 	 * When error occurs uploading file, go to the next file
-	 * @throws IOException
 	 */
 	@Test(groups= {"ut"})
 	public void testCreateStepResultFromTestStepErrorUploading() throws IOException {
@@ -985,11 +974,11 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		testStep.addFile(file);
 		testStep.addFile(file);
 
-		Integer stepResultId = connector.recordStepResult(testStep, testCaseInSessionId, testStepId);
+		connector.recordStepResult(testStep, testCaseInSessionId, testStepId);
 
 		// check we record step, then update it and store all files
 		verify(connector).recordStepResult(true, "", 0, testCaseInSessionId, testStepId);
-		String filePath = file.getFile().getAbsolutePath().replace("\\", "/");
+		file.getFile().getAbsolutePath().replace("\\", "/");
 	}
 	@Test(groups= {"ut"})
 	public void testCreateStepResultFromTestStepErrorUploading2() throws IOException {
@@ -1006,11 +995,11 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		testStep.addFile(fileKo);
 		fileKo.getFile().delete(); // delete file so that upload fails
 		testStep.addFile(fileOk);
-		Integer stepResultId = connector.recordStepResult(testStep, testCaseInSessionId, testStepId);
+		connector.recordStepResult(testStep, testCaseInSessionId, testStepId);
 
 		// check we record step, then update it and store all files
 		verify(connector).recordStepResult(true, "", 0, testCaseInSessionId, testStepId);
-		String filePath = fileOk.getFile().getAbsolutePath().replace("\\", "/");
+		fileOk.getFile().getAbsolutePath().replace("\\", "/");
 	}
 
 	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "A test step must be provided")
@@ -1022,7 +1011,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", "a test description", OffsetDateTime.now());
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
 
-		Integer stepResultId = connector.recordStepResult(null, testCaseInSessionId, testStepId);
+		connector.recordStepResult(null, testCaseInSessionId, testStepId);
 
 	}
 
@@ -1044,7 +1033,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	}
 
 	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = ".*does not exist")
-	public void testUploadFileWrongFile() throws IOException {
+	public void testUploadFileWrongFile() {
 		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
 
 		connector.uploadFile(new File(""), 17);
@@ -1061,7 +1050,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	}
 
 	@Test(groups= {"ut"})
-	public void testUploadFileInactive() throws IOException {
+	public void testUploadFileInactive() {
 		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
 
 		Integer fileId = connector.uploadFile(new File(""), 1);
@@ -1086,7 +1075,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	}
 
 	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = ".*does not exist")
-	public void testUploadLogsWrongFile() throws IOException {
+	public void testUploadLogsWrongFile() {
 		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
 
 		connector.uploadLogs(new File(""), 15);
@@ -1103,7 +1092,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	}
 
 	@Test(groups= {"ut"})
-	public void testUploadLogsInactive() throws IOException {
+	public void testUploadLogsInactive() {
 		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
 
 		Integer fileId = connector.uploadLogs(new File(""), 15);
@@ -1216,7 +1205,6 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	
 	/**
 	 * when comparison is not completed, do not interfere with result => returns true
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"})
 	public void testGetComparisonResultNotCompleted() throws UnirestException {
@@ -1234,7 +1222,6 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	
 	/**
 	 * when comparison is not available, do not interfere with result => returns true
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"})
 	public void testGetComparisonResultNotAvailable() throws UnirestException {
@@ -1267,7 +1254,6 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	
 	/**
 	 * If error raised during getting comparison, do not interfere with result
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"})
 	public void testGetComparisonResultInError() throws UnirestException {
@@ -1311,11 +1297,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		
 		return stepResultId;
 	}
-	
-	/**
-	 * 
-	 * @throws UnirestException
-	 */
+
 	@Test(groups= {"ut"}, expectedExceptions = SeleniumRobotServerException.class)
 	public void testCreateStepReferenceSnapshotNull() throws UnirestException {
 		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
@@ -1466,7 +1448,6 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	
 	/**
 	 * Detection fails (e.g: feautre not activated on server, timeout, ...)
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
 	public void testDetectFieldsInPictureServerInactive() {
@@ -1478,10 +1459,9 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	
 	/**
 	 * Detection fails (e.g: feautre not activated on server, timeout, ...)
-	 * @throws IOException
 	 */
 	@Test(groups={"it"}, expectedExceptions = SeleniumRobotServerException.class, expectedExceptionsMessageRegExp = "field detection failed")
-	public void testDetectFieldsInPictureInError() throws IOException {
+	public void testDetectFieldsInPictureInError() {
 		
 		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
 		createServerMock("POST", SeleniumRobotSnapshotServerConnector.DETECT_API_URL, 500, "{'error': 'Field detector disabled'}", "body");	
@@ -1489,7 +1469,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		connector.detectFieldsInPicture(snapshot);
 	}
 	@Test(groups={"it"}, expectedExceptions = SeleniumRobotServerException.class)
-	public void testDetectFieldsInPictureInError2() throws IOException {
+	public void testDetectFieldsInPictureInError2() {
 
 		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
 		HttpRequest<?> req = createServerMock("POST", SeleniumRobotSnapshotServerConnector.DETECT_API_URL, 500, "{'id': '9'}", "body");	
@@ -1500,7 +1480,6 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	
 	/**
 	 * Provided image does not exist
-	 * @throws IOException
 	 */
 	@Test(groups={"it"}, expectedExceptions = SeleniumRobotServerException.class, expectedExceptionsMessageRegExp = "Provided snapshot does not exist")
 	public void testDetectFieldsInPictureInvalidPicture() {

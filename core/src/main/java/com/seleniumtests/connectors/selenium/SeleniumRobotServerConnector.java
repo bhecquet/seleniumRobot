@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -77,7 +77,7 @@ public abstract class SeleniumRobotServerConnector {
 	/**
 	 * Test if the server is alive
 	 * @param testUrl	the URL to test for "alive". It MUST begin with "/" as root url only contains http://<host>:<port>
-	 * @return
+	 * @return true if the server is alive
 	 */
 	protected boolean isAlive(String testUrl) {
 		
@@ -105,7 +105,7 @@ public abstract class SeleniumRobotServerConnector {
 				logger.error("-------------------------------------------------------------------------------------");
 				logger.error("Access to seleniumRobot server unauthorized, access token must be provided");
 				logger.error("Token can be set via 'seleniumRobotServerToken' parameter: '-DseleniumRobotServerToken=<token>");
-				logger.error(String.format("Access token can be generated using your browser at %s/api-token-auth/?username=<user>&password=<password>", url));
+				logger.error("Access token can be generated using your browser at {}/api-token-auth/?username=<user>&password=<password>", url);
 				logger.error("-------------------------------------------------------------------------------------");
 				throw new ConfigurationException("Access to seleniumRobot server unauthorized, access token must be provided by adding '-DseleniumRobotServerToken=<token>' to test command line");
 			
@@ -138,7 +138,7 @@ public abstract class SeleniumRobotServerConnector {
 	/**
 	 * Returns the application id in variable server, from the name of the tested application
 	 * @throws ConfigurationException when environment does not exist to force user to register its variables
-	 * @return
+	 * @return the application id
 	 */
 	public int getApplicationId() {
 		if (applicationId != null) {
@@ -157,7 +157,6 @@ public abstract class SeleniumRobotServerConnector {
 	/**
 	 * Returns the environment id in variable server, from the name of the tested env
 	 * @throws ConfigurationException when environment does not exist to force user to register its variables
-	 * @return
 	 */
 	public int getEnvironmentId() {
 		if (environmentId != null) {
@@ -175,7 +174,6 @@ public abstract class SeleniumRobotServerConnector {
 	
 	/**
 	 * Returns the version id in variable server. Create it if it does not exist
-	 * @return
 	 */
 	public int getVersionId() {
 		if (versionId != null) {
@@ -188,8 +186,7 @@ public abstract class SeleniumRobotServerConnector {
 	
 	/**
 	 * returns the test name or a shorter version if it's too long
-	 * @param testName
-	 * @return
+	 * @param testName	the test name
 	 */
 	protected String getTestName(String testName) {
 		return testName.length() > MAX_TESTCASE_NAME_LENGHT ? testName.substring(0, MAX_TESTCASE_NAME_LENGHT): testName;
@@ -332,8 +329,8 @@ public abstract class SeleniumRobotServerConnector {
 
 	/**
 	 * Get the response to HTTP request and control status
- 	 * @param request
-	 * @return
+ 	 * @param request	the request to get response from
+	 * @return the response as a string
 	 */
 	protected String getStringResponse(HttpRequest<?> request) {
 
@@ -377,9 +374,9 @@ public abstract class SeleniumRobotServerConnector {
 	
 	/**
 	 * Throw the right exception
-	 * @param response
-	 * @param url
-	 * @return
+	 * @param response	the response to analyze
+	 * @param url		called url
+	 * @return	the right exception
 	 */
 	private SeleniumRobotServerException getRightSeleniumServerException(HttpResponse<String> response, String url) {
     	int statusCode = response.getStatus();
@@ -392,17 +389,14 @@ public abstract class SeleniumRobotServerConnector {
 		} catch (Exception e) {
 			message = String.format(SeleniumRobotServerConnector.REQUEST_FAILED_ERROR, url, response.getStatusText());
 		}
-    	
-    	switch (statusCode) {
-    		case 401:
-    			return new SeleniumRobotServer401Exception(message + "\nYou need to provide the API token through 'seleniumRobotServerToken' parameter");
-	    	case 404:
-	    		return new SeleniumRobotServer404Exception(message);
-	    	case 500:
-	    		return new SeleniumRobotServer500Exception(message);
-	    	default:
-	    		return new SeleniumRobotServerException(message);
-    	}
+
+        return switch (statusCode) {
+            case 401 ->
+                    new SeleniumRobotServer401Exception(message + "\nYou need to provide the API token through 'seleniumRobotServerToken' parameter");
+            case 404 -> new SeleniumRobotServer404Exception(message);
+            case 500 -> new SeleniumRobotServer500Exception(message);
+            default -> new SeleniumRobotServerException(message);
+        };
     }
 	
 	public boolean getActive() {

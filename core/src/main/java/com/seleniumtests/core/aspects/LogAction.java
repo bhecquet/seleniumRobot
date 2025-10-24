@@ -17,7 +17,6 @@
  */
 package com.seleniumtests.core.aspects;
 
-import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -27,10 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.seleniumtests.customexception.ImageSearchException;
-import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
-import com.seleniumtests.driver.screenshots.SnapshotTarget;
 import com.seleniumtests.uipage.BasePage;
 import com.seleniumtests.uipage.ReplayOnError;
 import com.seleniumtests.uipage.htmlelements.Element;
@@ -130,17 +126,17 @@ public class LogAction {
 		}
 		
 		String currentIndent = StringUtils.repeat(" ", LogAction.indent.get(Thread.currentThread()));
-		logger.debug(String.format("%sEntering %s", currentIndent, joinPoint.getSignature()));
+		logger.debug("{}Entering {}", currentIndent, joinPoint.getSignature());
 		Object reply = null;
 		try {
 			LogAction.indent.put(Thread.currentThread(), LogAction.indent.get(Thread.currentThread()) + 2);
 			reply = joinPoint.proceed(joinPoint.getArgs());
 		} catch (Throwable e) {
-			logger.debug(String.format("%sError in %s: %s - %s", currentIndent, joinPoint.getSignature(), e.getClass().getName(), e.getMessage()));
+			logger.debug("{}Error in {}: {} - {}", currentIndent, joinPoint.getSignature(), e.getClass().getName(), e.getMessage());
 			throw e;
 		} finally {
 			LogAction.indent.put(Thread.currentThread(), LogAction.indent.get(Thread.currentThread()) - 2);
-			logger.debug(String.format("%sFinishing %s: %s", currentIndent, joinPoint.getSignature(), buildReplyValues(reply)));
+			logger.debug("{}Finishing {}: {}", currentIndent, joinPoint.getSignature(), buildReplyValues(reply));
 		}
 		return reply;
 	}
@@ -150,8 +146,8 @@ public class LogAction {
 		if (reply == null) {
 			return "null";
 		}
-		if (reply instanceof CharSequence[]) {
-			for (Object obj: (CharSequence[])reply) {
+		if (reply instanceof CharSequence[] charSequences) {
+			for (Object obj: charSequences) {
 				replyList.add(obj.toString());
 			}
 		} else if (reply instanceof List) {
@@ -288,12 +284,11 @@ public class LogAction {
 	public Object logNativeAction(ProceedingJoinPoint joinPoint) throws Throwable {
 		
 		// build the name of the element
-		String targetName = joinPoint.getTarget().toString();
 		Element target = null;
-		if (joinPoint.getTarget() instanceof Select) {
-			target = new SeleniumElement((Select)joinPoint.getTarget());
-		} else if (joinPoint.getTarget() instanceof WebElement) {
-			target = new SeleniumElement((WebElement)joinPoint.getTarget());
+		if (joinPoint.getTarget() instanceof Select select) {
+			target = new SeleniumElement(select);
+		} else if (joinPoint.getTarget() instanceof WebElement element) {
+			target = new SeleniumElement(element);
 		}
 
 		if (target != null) {
@@ -349,10 +344,10 @@ public class LogAction {
 	private static StringBuilder formatArgValue(Object arg, StringBuilder argString) {
 		StringBuilder argValue = new StringBuilder();
 		// add arguments to the name of the method
-		if (arg instanceof Object[]) {
+		if (arg instanceof Object[] arrayArg) {
 			argValue.append("[");
-			for (Object obj : (Object[]) arg) {
-				argValue.append(obj.toString() + ",");
+			for (Object obj : arrayArg) {
+				argValue.append(obj.toString()).append(",");
 			}
 			argValue.append("]");
 		} else if (arg instanceof Element element) {
@@ -379,8 +374,8 @@ public class LogAction {
 				|| argName.toLowerCase().contains("pwd") 
 				|| argName.toLowerCase().contains("passwd")
 				|| ((MethodSignature)joinPoint.getSignature()).getMethod().getParameters()[paramIdx].getAnnotationsByType(Mask.class).length > 0)) {
-			if (arg instanceof CharSequence[]) {
-				for (Object obj: (CharSequence[])arg) {
+			if (arg instanceof CharSequence[] charSequences) {
+				for (Object obj: charSequences) {
 					stringToReplace.add(obj.toString());
 				}
 			} else if (arg instanceof List) {
@@ -432,8 +427,8 @@ public class LogAction {
 				stepName = getAnnotationValue(annotation);
 				stepNameWithArgs = String.format(ACTION_FORMAT, stepName, argumentString).trim();
 				break;
-			} else if (annotation instanceof StepName) {
-				stepName = ((StepName)annotation).value();
+			} else if (annotation instanceof StepName step) {
+				stepName = step.value();
 				
 				// replaces argument placeholders with values
 				stepNameWithArgs = stepName;
@@ -441,11 +436,11 @@ public class LogAction {
 					stepNameWithArgs = stepNameWithArgs.replaceAll(String.format("\\$\\{%s\\}",  entry.getKey()), entry.getValue().replace("$", "\\$"));
 				}
 				break;
-			} else if (annotation instanceof Step) {
-				stepName = ((Step)annotation).name();
-				errorCause = ((Step)annotation).errorCause();
-				errorCauseDetails = ((Step)annotation).errorCauseDetails();
-				disableBugtracker = ((Step)annotation).disableBugTracker();
+			} else if (annotation instanceof Step step) {
+				stepName = step.name();
+				errorCause = step.errorCause();
+				errorCauseDetails = step.errorCauseDetails();
+				disableBugtracker = step.disableBugTracker();
 				
 				// replaces argument placeholders with values
 				stepNameWithArgs = stepName;
@@ -495,11 +490,11 @@ public class LogAction {
 		TestAction currentAction = null;
 
 		if (target instanceof PageObject) {
-			String pageName = target == null ? "": " on page " + target.getClass().getSimpleName();
+			String pageName = " on page " + target.getClass().getSimpleName();
 			String actionName = String.format("%s%s %s", joinPoint.getSignature().getName(), pageName, buildArgString(joinPoint, pwdToReplace, new HashMap<>()));
 			currentAction = new TestAction(actionName, false, pwdToReplace, joinPoint.getSignature().getName(), (Class<? extends PageObject>) target.getClass());
-		} else if (target instanceof Element) {
-			String actionName = String.format("%s on Element located by %s %s", joinPoint.getSignature().getName(), ((Element) target).getName(), buildArgString(joinPoint, pwdToReplace, new HashMap<>()));
+		} else if (target instanceof Element element) {
+			String actionName = String.format("%s on Element located by %s %s", joinPoint.getSignature().getName(), element.getName(), buildArgString(joinPoint, pwdToReplace, new HashMap<>()));
 			currentAction = new TestAction(actionName, false, pwdToReplace, joinPoint.getSignature().getName(), (Element)target);
 		} else {
 			currentAction = new TestAction(joinPoint.getSignature().getName(), false, pwdToReplace);
@@ -542,8 +537,7 @@ public class LogAction {
 		// step name will contain method arguments only if it's not a configuration method (as they are generic)
 		TestStep currentStep = buildRootStep(joinPoint, stepNamePrefix, !configStep);
 		
-		if (OPEN_PAGE_STEP_NAME.equals(joinPoint.getSignature().getName()) && joinPoint.getTarget() instanceof PageObject) {
-			PageObject page = (PageObject)joinPoint.getTarget();
+		if (OPEN_PAGE_STEP_NAME.equals(joinPoint.getSignature().getName()) && joinPoint.getTarget() instanceof PageObject page) {
 			currentStep.addAction(new TestAction(String.format("Opening page %s",  page.getClass().getSimpleName()), false, new ArrayList<>(), OPEN_PAGE_STEP_NAME, page.getClass()));
 		}
 
@@ -658,12 +652,12 @@ public class LogAction {
 		Element targetElement = null;
 		Class<? extends PageObject> targetClass = null;
 		// for HtmlElement / GenericPictureElement
-		if (joinPoint.getArgs().length > 0 && (joinPoint.getArgs()[0] instanceof Element)) {
-			targetElement = (Element) joinPoint.getArgs()[0];
-			targetClass = targetElement.getOriginClass();
+		if (joinPoint.getArgs().length > 0 && (joinPoint.getArgs()[0] instanceof Element targElement)) {
+			targetElement = targElement;
+			targetClass = targElement.getOriginClass();
 		// for Selenium WebElement
-		} else if (joinPoint.getArgs().length > 0 && (joinPoint.getArgs()[0] instanceof WebElement)) {
-			targetElement = new SeleniumElement((WebElement)joinPoint.getArgs()[0]);
+		} else if (joinPoint.getArgs().length > 0 && (joinPoint.getArgs()[0] instanceof WebElement element)) {
+			targetElement = new SeleniumElement(element);
 			targetClass = ((PageObject)joinPoint.getThis()).getClass();
 		}
 
@@ -711,7 +705,7 @@ public class LogAction {
 				Element mainElement = null; // the last element on which we act
 
 				for (TestAction action: compositeActionStep.getStepActions()) {
-					name.append(action.getAction() + ",");
+					name.append(action.getAction()).append(",");
 					if (action.getElement() != null) {
 						mainElement = action.getElement();
 					}
