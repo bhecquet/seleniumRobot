@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,10 +18,8 @@
 package com.seleniumtests.ut.connectors.selenium;
 
 
-import java.io.IOException;
 import java.net.SocketException;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 
 import org.mockito.Mock;
@@ -46,40 +44,41 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 	@Mock
 	private GetRequest gRequest;
 
-	private final String guiServletContent = "<html>\r\n" + 
-			"	<head>\r\n" + 
-			"			<link href='/grid/resources/templates/css/report.css' rel='stylesheet' type='text/css' />\r\n" + 
-			"			<script src=\"/grid/resources/templates/js/status.js\"></script>\r\n" + 
-			"			<link href=\"/grid/resources/templates/css/hubCss.css\" rel=\"stylesheet\" type=\"text/css\">\r\n" + 
-			"			<link href=\"/grid/resources/templates/css/bootstrap.min.css\" rel=\"stylesheet\">\r\n" + 
-			"			<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js\"></script>\r\n" + 
-			"			<script src=\"/grid/resources/templates/css/bootstrap.min.js\"></script>\r\n" + 
-			"			<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\r\n" + 
-			"			<link rel=\"icon\" href=\"https://d30y9cdsu7xlg0.cloudfront.net/png/1248-200.png\">\r\n" + 
-			"			<title>Selenium Robot</title>\r\n" + 
-			"	</head>\r\n" + 
-			"	\r\n" + 
-			"	<body>\r\n" + 
-			"			<header>\r\n" + 
-			"					<a ><img src=\"/grid/resources/templates/img/seleniumlogo_low.png\" alt=\"selenium\" id=\"selenium\"></a>\r\n" + 
-			"					<p id=\"titre\" >Infotel</p>\r\n" + 
-			"			</header>\r\n" + 
-			"		\r\n" + 
-			"		\r\n" + 
-			"	<article>\r\n" + 
-			"\r\n" + 
-			"			<h1 id=\"hub\">Hub Status</h1>"
-			+ "</article>\r\n" + 
-			"		\r\n" + 
-			"			\r\n" + 
-			"<footer>\r\n" + 
-			"		<a href=\"#\" class=\"haut\"><img src=\"/grid/resources/templates/img/up.png\" alt=\"haut\" id=\"haut\"></a>\r\n" + 
-			"</footer>\r\n" + 
-			"		\r\n" + 
-			"	</body>\r\n" + 
-			"\r\n" + 
-			"</html>\r\n" + 
-			"";
+	private final String guiServletContent = """
+			<html>
+				<head>
+						<link href='/grid/resources/templates/css/report.css' rel='stylesheet' type='text/css' />
+						<script src="/grid/resources/templates/js/status.js"></script>
+						<link href="/grid/resources/templates/css/hubCss.css" rel="stylesheet" type="text/css">
+						<link href="/grid/resources/templates/css/bootstrap.min.css" rel="stylesheet">
+						<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+						<script src="/grid/resources/templates/css/bootstrap.min.js"></script>
+						<meta http-equiv="X-UA-Compatible" content="IE=edge">
+						<link rel="icon" href="https://d30y9cdsu7xlg0.cloudfront.net/png/1248-200.png">
+						<title>Selenium Robot</title>
+				</head>
+			
+				<body>
+						<header>
+								<a ><img src="/grid/resources/templates/img/seleniumlogo_low.png" alt="selenium" id="selenium"></a>
+								<p id="titre" >Infotel</p>
+						</header>
+			
+			
+				<article>
+			
+						<h1 id="hub">Hub Status</h1>"
+			 "</article>
+			
+			
+			<footer>
+					<a href="#" class="haut"><img src="/grid/resources/templates/img/up.png" alt="haut" id="haut"></a>
+			</footer>
+			
+				</body>
+			
+			</html>
+			""";
 	
 	private final String consoleServletContent = "<html>"
 			+ "<head></head>"
@@ -95,28 +94,22 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 	
 	/**
 	 * If servlet GuiServlet is available, we get a SeleniumRobotGridConnector
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException 
 	 */
 	@Test(groups={"ut"})
-	public void testWithSeleniumRobotGrid() throws UnsupportedOperationException, IOException, UnirestException {
+	public void testWithSeleniumRobotGrid() throws UnsupportedOperationException, UnirestException {
 
 		createGridServletServerMock("GET", SeleniumRobotGridConnector.GUI_SERVLET, 200, guiServletContent);	
 		createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, consoleServletContent);			
 		
-		Assert.assertTrue(SeleniumGridConnectorFactory.getInstances(Arrays.asList(SERVER_URL + "/wd/hub")).get(0) instanceof SeleniumRobotGridConnector);
+		Assert.assertTrue(SeleniumGridConnectorFactory.getInstances(List.of(SERVER_URL + "/wd/hub")).get(0) instanceof SeleniumRobotGridConnector);
 	}
 	
 	/**
 	 * Check that with several selenium grid URL (seleniumRobot or pure selenium), several grid connectors are created, one for each URL
-	 * if they are all accessible 
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
+	 * if they are all accessible
 	 */
 	@Test(groups={"ut"})
-	public void testWithSeveralSeleniumRobotGrid() throws UnsupportedOperationException, IOException, UnirestException {
+	public void testWithSeveralSeleniumRobotGrid() throws UnsupportedOperationException, UnirestException {
 
 		// SeleniumRobot grid
 		createGridServletServerMock("GET", SeleniumRobotGridConnector.GUI_SERVLET, 200, guiServletContent);		
@@ -127,7 +120,7 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 		when(getRequest.asString()).thenThrow(new UnirestException(new SocketException("permission denied")));
 		createServerMock("http://localhost:4421", "GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, consoleServletContent);
 		
-		List<SeleniumGridConnector> gridConnectors = SeleniumGridConnectorFactory.getInstances(Arrays.asList(SERVER_URL + "/wd/hub", "http://localhost:4421/wd/hub"));
+		List<SeleniumGridConnector> gridConnectors = SeleniumGridConnectorFactory.getInstances(List.of(SERVER_URL + "/wd/hub", "http://localhost:4421/wd/hub"));
 		
 		Assert.assertEquals(gridConnectors.size(), 2);
 		Assert.assertTrue(gridConnectors.get(0) instanceof SeleniumRobotGridConnector);
@@ -135,13 +128,10 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 	}
 	
 	/**
-	 * Check that grid connectors are only created if the selenium grid is accessible (replies before timeout) 
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException
+	 * Check that grid connectors are only created if the selenium grid is accessible (replies before timeout)
 	 */
 	@Test(groups={"ut"})
-	public void testWithSeveralSeleniumGridNotAllThere() throws UnsupportedOperationException, IOException, UnirestException {
+	public void testWithSeveralSeleniumGridNotAllThere() throws UnsupportedOperationException, UnirestException {
 				
 		// only the second grid replies
 		GetRequest getRequest = (GetRequest)createServerMock("http://localhost:4431", "GET", SeleniumRobotGridConnector.GUI_SERVLET, 404, "default monitoring page");
@@ -149,7 +139,7 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 		createServerMock("http://localhost:4421", "GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, consoleServletContent);
 		
 		// 2 grid URL given
-		List<SeleniumGridConnector> gridConnectors = SeleniumGridConnectorFactory.getInstances(Arrays.asList(SERVER_URL + "/wd/hub", "http://localhost:4421/wd/hub"));
+		List<SeleniumGridConnector> gridConnectors = SeleniumGridConnectorFactory.getInstances(List.of(SERVER_URL + "/wd/hub", "http://localhost:4421/wd/hub"));
 		
 		Assert.assertEquals(gridConnectors.size(), 1);
 		Assert.assertTrue(gridConnectors.get(0) instanceof SeleniumGridConnector);
@@ -157,52 +147,44 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 	
 	/**
 	 * If servlet GuiServlet is not available, we get a SeleniumGridConnector
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException 
 	 */
 	@Test(groups={"ut"})
-	public void testWithSeleniumGrid() throws UnsupportedOperationException, IOException, UnirestException {
+	public void testWithSeleniumGrid() throws UnsupportedOperationException, UnirestException {
 
 
 		GetRequest getRequest = (GetRequest)createGridServletServerMock("GET", SeleniumRobotGridConnector.GUI_SERVLET, 404, "default monitoring page");
 		when(getRequest.asString()).thenThrow(new UnirestException(new SocketException("permission denied")));
 		createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, consoleServletContent);
 		
-		Assert.assertTrue(SeleniumGridConnectorFactory.getInstances(Arrays.asList(SERVER_URL + "/wd/hub")).get(0) instanceof SeleniumGridConnector);
+		Assert.assertTrue(SeleniumGridConnectorFactory.getInstances(List.of(SERVER_URL + "/wd/hub")).get(0) instanceof SeleniumGridConnector);
 	}
 	
 	/**
 	 * If status code is not 200, throw an error
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException 
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
-	public void testWithErrorCodeHttp() throws UnsupportedOperationException, IOException, UnirestException {
+	public void testWithErrorCodeHttp() throws UnsupportedOperationException, UnirestException {
 		SeleniumGridConnectorFactory.setRetryTimeout(1);
 		createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 404, "default monitoring page");	
 		
-		SeleniumGridConnectorFactory.getInstances(Arrays.asList(SERVER_URL + "/wd/hub"));
+		SeleniumGridConnectorFactory.getInstances(List.of(SERVER_URL + "/wd/hub"));
 	}
 	
 	/**
 	 * If any error occurs when getting servlet, throw an error, grid cannot be contacted
 	 * Check also that we retry connection during N seconds (defined by retryTimeout)
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException 
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
-	public void testWithError() throws UnsupportedOperationException, IOException, UnirestException {
+	public void testWithError() throws UnsupportedOperationException, UnirestException {
 		
 		when(Unirest.get(SERVER_URL + SeleniumGridConnector.CONSOLE_SERVLET)).thenReturn(gRequest);
 		when(gRequest.asString()).thenThrow(UnirestException.class);
 
 		LocalDateTime start = LocalDateTime.now();
 		try {
+
 			SeleniumGridConnectorFactory.setRetryTimeout(5);
-			SeleniumGridConnectorFactory.getInstances(Arrays.asList(SERVER_URL + "/wd/hub"));
+			SeleniumGridConnectorFactory.getInstances(List.of(SERVER_URL + "/wd/hub"));
 		} catch (ConfigurationException e) {
 
 			mockedUnirest.get().verify(() -> Unirest.get(SERVER_URL + SeleniumGridConnector.CONSOLE_SERVLET), atLeast(5));
@@ -210,20 +192,15 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 			// check connection duration
 			Assert.assertTrue(LocalDateTime.now().minusNanos(4500000).isAfter(start));
 			throw e;
-		} finally {
-			SeleniumGridConnectorFactory.setRetryTimeout(SeleniumGridConnectorFactory.DEFAULT_RETRY_TIMEOUT);
 		}
 	}
 	
 
 	/**
 	 * If URL contains browserstack, returns a browserstack connector
-	 * @throws UnsupportedOperationException
-	 * @throws IOException
-	 * @throws UnirestException 
 	 */
 	@Test(groups={"ut"})
-	public void testWithBrowserStack() throws UnsupportedOperationException, IOException, UnirestException {
-		Assert.assertTrue(SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://<user>:<key>@hub-cloud.browserstack.com/wd/hub")).get(0) instanceof BrowserStackGridConnector);
+	public void testWithBrowserStack() throws UnsupportedOperationException, UnirestException {
+		Assert.assertTrue(SeleniumGridConnectorFactory.getInstances(List.of("http://<user>:<key>@hub-cloud.browserstack.com/wd/hub")).get(0) instanceof BrowserStackGridConnector);
 	}
 }

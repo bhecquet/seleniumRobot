@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -53,12 +53,10 @@ import io.appium.java_client.ios.IOSDriver;
 
 public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
 	
-	private List<SeleniumGridConnector> gridConnectors;
+	private final List<SeleniumGridConnector> gridConnectors;
 	private SeleniumGridConnector activeGridConnector;
-	public static final int DEFAULT_RETRY_TIMEOUT = 1800; // timeout in seconds (wait 30 mins for connecting to grid)
-	private static int retryTimeout = DEFAULT_RETRY_TIMEOUT;
-	private int instanceRetryTimeout; 
-	private static AtomicInteger counter = new AtomicInteger(0); // a global counter counting times where we never get matching nodes
+	private int instanceRetryTimeout; // timeout in seconds
+	private static final AtomicInteger counter = new AtomicInteger(0); // a global counter counting times where we never get matching nodes
 
     public SeleniumGridDriverFactory(final DriverConfig cfg) {
 		this(cfg, true);
@@ -70,13 +68,13 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 
 	/**
 	 *
-	 * @param cfg
+	 * @param cfg		the driver configuration
 	 * @param shuffle	if true, grid connector list will be shuffled so that it's not the same hub that gets driver
 	 */
     public SeleniumGridDriverFactory(final DriverConfig cfg, boolean shuffle) {
         super(cfg);
         gridConnectors = new ArrayList<>(SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnectors());
-        instanceRetryTimeout = retryTimeout;
+        instanceRetryTimeout = SeleniumTestsContextManager.getThreadContext().getWebDriverGridTimeout();
         
         // reorder list so that we do not always use the same grid for connection
 		if (shuffle) {
@@ -87,23 +85,16 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 	@Override
 	protected ICapabilitiesFactory getCapabilitiesFactory() {
 		if (SeleniumTestsContextManager.isDesktopWebTest()) {
-			switch (webDriverConfig.getBrowserType()) {
-
-				case FIREFOX:
-					return new FirefoxCapabilitiesFactory(webDriverConfig);
-				case INTERNET_EXPLORER:
-					return new IECapabilitiesFactory(webDriverConfig);
-				case CHROME:
-					return new ChromeCapabilitiesFactory(webDriverConfig);
-				case HTMLUNIT:
-					return new HtmlUnitCapabilitiesFactory(webDriverConfig);
-				case SAFARI:
-					return new SafariCapabilitiesFactory(webDriverConfig);
-				case EDGE:
-					return new EdgeCapabilitiesFactory(webDriverConfig);
-				default:
-					throw new ConfigurationException(String.format("Browser %s is unknown for desktop tests", webDriverConfig.getBrowserType()));
-			}
+            return switch (webDriverConfig.getBrowserType()) {
+                case FIREFOX -> new FirefoxCapabilitiesFactory(webDriverConfig);
+                case INTERNET_EXPLORER -> new IECapabilitiesFactory(webDriverConfig);
+                case CHROME -> new ChromeCapabilitiesFactory(webDriverConfig);
+                case HTMLUNIT -> new HtmlUnitCapabilitiesFactory(webDriverConfig);
+                case SAFARI -> new SafariCapabilitiesFactory(webDriverConfig);
+                case EDGE -> new EdgeCapabilitiesFactory(webDriverConfig);
+                default ->
+                        throw new ConfigurationException(String.format("Browser %s is unknown for desktop tests", webDriverConfig.getBrowserType()));
+            };
 		} else if (SeleniumTestsContextManager.isDesktopAppTest()) {
 			if ("windows".equalsIgnoreCase(webDriverConfig.getPlatform())) {
 				return new WindowsAppCapabilitiesFactory(webDriverConfig);
@@ -128,7 +119,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
      * For example, Appium needs PLATFORM_NAME and PLATFORM_VERSION capabilities, but seleniumGrid matcher (default seleniumGrid)
      * looks at PLATFORM and VERSION capabilities. This method adds them
      * OS version is only updated for mobile. It has no real sense on desktop
-     * @return
+     * @return new capabilities for grid
      */
     public MutableCapabilities createSpecificGridCapabilities(DriverConfig webDriverConfig) {
     	MutableCapabilities capabilities = new MutableCapabilities();
@@ -145,7 +136,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     	// configure the node were browser should be created
     	if (webDriverConfig.getRunOnSameNode() != null) {
     		capabilities.setCapability(SeleniumRobotCapabilityType.ATTACH_SESSION_ON_NODE, webDriverConfig.getRunOnSameNode());
-    		instanceRetryTimeout = Math.min(90, DEFAULT_RETRY_TIMEOUT / 2);
+    		instanceRetryTimeout = Math.min(90, SeleniumTestsContextManager.getThreadContext().getWebDriverGridTimeout() * 60 / 2);
     	}
     	
     	return capabilities;
@@ -166,42 +157,23 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
         }
 
         // connection to grid is made here
-        for (int i = 0; i < 3; i++) {
-	        Instant start = Instant.now();
-	        driver = getDriver(capabilities);
-	        long duration = Duration.between(start, Instant.now()).toMillis();
-	
-	        setImplicitWaitTimeout(webDriverConfig.getImplicitWaitTimeout());
-	        if (webDriverConfig.getPageLoadTimeout() >= 0 && SeleniumTestsContextManager.isWebTest()) {
-	            setPageLoadTimeout(webDriverConfig.getPageLoadTimeout());
-	        }
-	
-	        this.setWebDriver(driver);
-	
-	        // if session has not been really created, we retry
-	        try {
-	        	activeGridConnector.getSessionInformationFromGrid((RemoteWebDriver) driver, duration);
-	        } catch (SessionNotCreatedException e) {
-	        	logger.error(e.getMessage());
-				try {
-					driver.quit();
-				} catch (Exception e1) {
-					// nothing to do
-				}
-	        	continue;
-	        }
-	
-	        // sets a file detector. This is only useful for remote drivers
-	        ((RemoteWebDriver)driver).setFileDetector(new LocalFileDetector());
-	        
-	        // create a BrowserInfo based on information get from grid hub
-	        selectedBrowserInfo = new BrowserInfo(BrowserType.getBrowserTypeFromSeleniumBrowserType(((RemoteWebDriver)driver).getCapabilities().getBrowserName()), 
-		        									((RemoteWebDriver)driver).getCapabilities().getBrowserVersion());
-	
-	        return driver;
-        }
-        
-        throw new SessionNotCreatedException("Session not created on any grid hub, after 3 tries");
+		driver = getDriver(capabilities);
+
+		setImplicitWaitTimeout(webDriverConfig.getImplicitWaitTimeout());
+		if (webDriverConfig.getPageLoadTimeout() >= 0 && SeleniumTestsContextManager.isWebTest()) {
+			setPageLoadTimeout(webDriverConfig.getPageLoadTimeout());
+		}
+
+		this.setWebDriver(driver);
+
+		// sets a file detector. This is only useful for remote drivers
+		((RemoteWebDriver)driver).setFileDetector(new LocalFileDetector());
+
+		// create a BrowserInfo based on information get from grid hub
+		selectedBrowserInfo = new BrowserInfo(BrowserType.getBrowserTypeFromSeleniumBrowserType(((RemoteWebDriver)driver).getCapabilities().getBrowserName()),
+												((RemoteWebDriver)driver).getCapabilities().getBrowserVersion());
+
+		return driver;
     }
     
     public WebDriver getDriverInstance(URL hubUrl, MutableCapabilities capabilities) {
@@ -225,21 +197,20 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     /**
      * Connect to grid using RemoteWebDriver
      * As we may have several grid available, takes the first one where driver is created
-     * 
+     * <p>
      * Several waits are defined
      * By default, we wait 30 mins for a node to be found. For this, we loop through all available hubs
      * In case we do not find any node after 30 mins, we fail and increment a fail counter
      * This fail counter is reset every time we find a node
      * If this counter reaches 3, then we don't even try to get a driver
      *
-     * @param capabilities
-     * @return
+     * @param capabilities	the capabilities that driver should handle
+     * @return the driver
      */
     private WebDriver getDriver(MutableCapabilities capabilities){
     	driver = null;
-    	
-    	Clock clock = Clock.systemUTC();
-		Instant end = clock.instant().plusSeconds(instanceRetryTimeout);
+		Instant start = Instant.now();
+		Instant end = Instant.now().plusSeconds(instanceRetryTimeout);
 		Exception currentException = null;
 		
 		if (webDriverConfig.getRunOnSameNode() != null && webDriverConfig.getSeleniumGridConnector() == null) {
@@ -253,7 +224,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 		}
     	
 		int i = 0;
-		while (end.isAfter(clock.instant())) {
+		while (end.isAfter(Instant.now())) {
 
 			capabilities.setCapability(SeleniumRobotCapabilityType.SESSION_CREATION_TRY, i);
 			i += 1;
@@ -262,7 +233,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 			
 				// if grid is not active, try the next one
 				if (!gridConnector.isGridActive()) {
-					logger.warn(String.format("grid %s is not active, looking for the next one", gridConnector.getHubUrl().toString()));
+					logger.warn("grid %s is not active, looking for the next one {}", gridConnector.getHubUrl());
 					continue;
 				}
 				
@@ -275,11 +246,15 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 				capabilities.setCapability(SeleniumRobotCapabilityType.SESSION_CREATION_REQUEST_TIME, LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 				
 				try {
-					driver = getDriverInstance(gridConnector.getHubUrl(), capabilities);
+					WebDriver createdDriver = getDriverInstance(gridConnector.getHubUrl(), capabilities);
+					getSessionInformationOrQuit(gridConnector, createdDriver, start);
+
+					// everything is OK, driver and connector can be used
 					activeGridConnector = gridConnector;
+					driver = createdDriver;
 					break;
 				} catch (WebDriverException e) {
-					logger.warn(String.format("Error creating driver on hub %s: %s", gridConnector.getHubUrl().toString(), e.getMessage()));
+					logger.warn("Error creating driver on hub {}: {}", gridConnector.getHubUrl(), e.getMessage());
 					currentException = e;
 				}
 			}
@@ -315,17 +290,31 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     	return driver;
     }
 
+	/**
+	 * Try co complete session information by asking to grid hub.
+	 * If there is problem during this phase, kill the driver, so that a new one can be created
+	 * @param gridConnector	the hub associated to this session
+	 * @param start			start of driver creation
+	 */
+	private void getSessionInformationOrQuit(SeleniumGridConnector gridConnector, WebDriver createdDriver, Instant start) {
+		// if session has not been really created, we will retry
+		long duration = Duration.between(start, Instant.now()).toMillis();
+		try {
+			gridConnector.getSessionInformationFromGrid((RemoteWebDriver) createdDriver, duration);
+		} catch (SessionNotCreatedException e) {
+			logger.error(e.getMessage());
+			try {
+				createdDriver.quit();
+			} catch (Exception e1) {
+				// nothing to do
+			}
+			throw e;
+		}
+	}
+
 	@Override
 	protected WebDriver createNativeDriver() {
 		return null;
-	}
-
-	public static int getRetryTimeout() {
-		return retryTimeout;
-	}
-
-	public static void setRetryTimeout(int retryTimeout) {
-		SeleniumGridDriverFactory.retryTimeout = retryTimeout;
 	}
 
 	public SeleniumGridConnector getActiveGridConnector() {

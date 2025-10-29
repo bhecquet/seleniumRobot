@@ -129,7 +129,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 
 		// grid support
 		if (seleniumGridUrl != null) {
-			SeleniumGridDriverFactory.setRetryTimeout(1);
+			SeleniumTestsContextManager.getThreadContext().setWebDriverGridTimeout(1);
 			SeleniumTestsContextManager.getThreadContext().setWebDriverGrid(seleniumGridUrl);
 			SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
 

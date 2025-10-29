@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,7 +22,6 @@ import static org.mockito.Mockito.verify;
 
 import org.apache.commons.lang3.StringUtils;
 import org.testng.Assert;
-import org.testng.ITestContext;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
@@ -32,20 +31,16 @@ import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.driver.WebUIDriverFactory;
 import com.seleniumtests.it.reporter.ReporterTest;
 
-import kong.unirest.Unirest;
 
 public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 	
 	/**
 	 * Test standard case, a driver session is get
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testSessionGet(ITestContext testContext) throws Exception {
+	public void testSessionGet() throws Exception {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
@@ -83,13 +78,11 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 	}
 	
 	/**
-	 * issue #287: check the real behavior of the bug (for now, this cannot be corrected because of https://github.com/cbeust/testng/issues/2148)
-	 * When the AfterMethod fails, test is not retried and this is a bug in testNG
-	 * @param testContext
-	 * @throws Exception
-	 */
+     * issue #287: check the real behavior of the bug (for now, this cannot be corrected because of <a href="https://github.com/cbeust/testng/issues/2148">...</a>)
+     * When the AfterMethod fails, test is not retried and this is a bug in testNG
+     */
 	@Test(groups={"it"})
-	public void testSessionNotGet(ITestContext testContext) throws Exception {
+	public void testSessionNotGet() throws Exception {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
@@ -127,11 +120,9 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 	
 	/**
 	 * issue #287: check driver is recreated if session cannot be get
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testSessionNotGetOnFirstTime(ITestContext testContext) throws Exception {
+	public void testSessionNotGetOnFirstTime() throws Exception {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
@@ -156,15 +147,13 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 	
 	/**
 	 * issue #311: Check we do not restart a test when no node is available to handle the request
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testSessionNeverGet(ITestContext testContext) throws Exception {
+	public void testSessionNeverGet() throws Exception {
 		
 		try {
-			SeleniumGridDriverFactory.setRetryTimeout(1);
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
+			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID_TIMEOUT, "1");
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, SERVER_URL + "/wd/hub");
 			createMockedWebDriver();
 			
@@ -182,7 +171,6 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 			Assert.assertFalse(logs.contains("Retrying 1 time"));
 	
 		} finally {
-			SeleniumGridDriverFactory.setRetryTimeout(SeleniumGridDriverFactory.DEFAULT_RETRY_TIMEOUT);
 
 			System.clearProperty(SeleniumTestsContext.RUN_MODE);
 			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
@@ -191,14 +179,12 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 	
 	/**
 	 * issue #311: Check that after 3 tests that cannot get there node, we skip all the remaining tests
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testTestsAreSkippedIfNodeIsNeverAvailable(ITestContext testContext) throws Exception {
+	public void testTestsAreSkippedIfNodeIsNeverAvailable() throws Exception {
 		
 		try {
-			SeleniumGridDriverFactory.setRetryTimeout(1);
+			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID_TIMEOUT, "1");
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, SERVER_URL + "/wd/hub");
 			createMockedWebDriver();
@@ -224,8 +210,7 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 			Assert.assertTrue(logs.contains("Skipping as the 3 previous tests could not get any matching node"));
 			
 		} finally {
-			SeleniumGridDriverFactory.setRetryTimeout(SeleniumGridDriverFactory.DEFAULT_RETRY_TIMEOUT);
-			
+
 			System.clearProperty(SeleniumTestsContext.RUN_MODE);
 			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
 		}
@@ -233,14 +218,12 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 	
 	/**
 	 * issue #311: Check that after 3 tests that cannot get there node, we skip all the remaining tests
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testTestsAreNotSkippedIfOneNodeIsGet(ITestContext testContext) throws Exception {
-		
+	public void testTestsAreNotSkippedIfOneNodeIsGet() throws Exception {
+
 		try {
-			SeleniumGridDriverFactory.setRetryTimeout(1);
+			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID_TIMEOUT, "1");
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, SERVER_URL + "/wd/hub");
 			createMockedWebDriver();
@@ -289,8 +272,6 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 			Assert.assertEquals(SeleniumGridDriverFactory.getCounter(), 0);
 			
 		} finally {
-			SeleniumGridDriverFactory.setRetryTimeout(SeleniumGridDriverFactory.DEFAULT_RETRY_TIMEOUT);
-			
 			System.clearProperty(SeleniumTestsContext.RUN_MODE);
 			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
 		}

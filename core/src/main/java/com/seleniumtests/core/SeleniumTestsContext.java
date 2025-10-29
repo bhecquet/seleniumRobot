@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -85,7 +85,7 @@ public class SeleniumTestsContext {
 	
 	private static final Object lock = new Object();
 	private static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumTestsContext.class);
-	private static Map<String, String> outputFolderNames = Collections.synchronizedMap(new HashMap<>());
+	private static final Map<String, String> outputFolderNames = Collections.synchronizedMap(new HashMap<>());
 
     /* configuration defined in testng.xml */
     public static final String TEST_CONFIGURATION = "testConfig"; 				// parameter name for additional configuration to load (should only be used in XML)
@@ -103,6 +103,7 @@ public class SeleniumTestsContext {
     public static final String PAGE_LOAD_TIME_OUT = "pageLoadTimeout";			// temps d'attente de chargement d'une page
     public static final String PAGE_LOAD_STRATEGY = "pageLoadStrategy";			// page load strategy as defined in selenium spec. Will be applied to driver
     public static final String WEB_DRIVER_GRID = "webDriverGrid";				// adresse du serveur seleniumGrid
+    public static final String WEB_DRIVER_GRID_TIMEOUT = "webDriverGridTimeout";// Timeout (in seconds) if a grid node cannot be found
     public static final String RUN_MODE = "runMode";							// local ou grid. Pourrait également contenir sauceLabs / testDroid
     public static final String NODE_TAGS = "nodeTags";							// Comma seperated list of strings. Requests that this test should execute only on a node (grid mode only) announcing all of these tags (issue #190)
     public static final String MASK_PASSWORD = "maskPassword";					// whether seleniumRobot should hide passwords or not
@@ -220,15 +221,13 @@ public class SeleniumTestsContext {
 	public static final String DEFAULT_APP = "";
 	public static final String DEFAULT_DEVICE_LIST = "{}";
 	public static final boolean DEFAULT_SOFT_ASSERT_ENABLED = true;
-	public static final boolean DEFAULT_ENABLE_EXCEPTION_LISTENER = true;
-	public static final boolean DEFAULT_CAPTURE_SNAPSHOT = true;
+    public static final boolean DEFAULT_CAPTURE_SNAPSHOT = true;
 	public static final String DEFAULT_INITIAL_URL = "about:blank";
 	public static final String DEFAULT_VIDEO_CAPTURE = "onError";
 	public static final Integer DEFAULT_SNAPSHOT_TOP_CROPPING = null;
 	public static final Integer DEFAULT_SNAPSHOT_BOTTOM_CROPPING = null;
 	public static final int DEFAULT_SNAPSHOT_SCROLL_DELAY = 0;
-	public static final boolean DEFAULT_ENABLE_JAVASCRIPT = true;
-	public static final boolean DEFAULT_SET_ACCEPT_UNTRUSTED_CERTIFICATES = true;
+    public static final boolean DEFAULT_SET_ACCEPT_UNTRUSTED_CERTIFICATES = true;
 	public static final boolean DEFAULT_SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER = true;
 	public static final String DEFAULT_BROWSER = "none";
 	public static final boolean DEFAULT_BETA_BROWSER = false;
@@ -252,6 +251,7 @@ public class SeleniumTestsContext {
     public static final String DEFAULT_STARTED_BY = null;
     public static final boolean DEFAULT_RANDOM_IN_ATTACHMENT_NAME = true;
 	public static final ElementInfo.Mode DEFAULT_ADVANCED_ELEMENT_SEARCH = ElementInfo.Mode.FALSE;
+    public static final int DEFAULT_WEB_DRIVER_GRID_TIMEOUT = 1800;
 
     public static final int DEFAULT_REPLAY_TIME_OUT = 30;
     public static final int DEFAULT_ACTION_DELAY = 200;
@@ -282,7 +282,7 @@ public class SeleniumTestsContext {
     private BugTracker	bugtrackerInstance;
     private BugTrackerContext bugtrackerContext;
     private SeleniumRobotServerContext seleniumRobotServerContext;
-    private TestStepManager testStepManager; // handles logging of test steps in this context
+    private final TestStepManager testStepManager; // handles logging of test steps in this context
     private boolean driverCreationBlocked = false;		// if true, inside this thread, driver creation will be forbidden
     
     // folder config
@@ -365,7 +365,8 @@ public class SeleniumTestsContext {
         setFindErrorCause(getBoolValueForTest(FIND_ERROR_CAUSE, System.getProperty(FIND_ERROR_CAUSE)));
         
         setWebDriverGrid(getValueForTest(WEB_DRIVER_GRID, System.getProperty(WEB_DRIVER_GRID)));
-        setRunMode(getValueForTest(RUN_MODE, System.getProperty(RUN_MODE)));   
+        setWebDriverGridTimeout(getIntValueForTest(WEB_DRIVER_GRID_TIMEOUT, System.getProperty(WEB_DRIVER_GRID_TIMEOUT)));
+        setRunMode(getValueForTest(RUN_MODE, System.getProperty(RUN_MODE)));
         setNodeTags(getValueForTest(NODE_TAGS, System.getProperty(NODE_TAGS)));   
         
         setMaskPassword(getBoolValueForTest(MASK_PASSWORD, System.getProperty(MASK_PASSWORD)));       
@@ -597,7 +598,7 @@ public class SeleniumTestsContext {
     			throw new ConfigurationException("Test should be executed with Selenium Grid but URL is not set");
     		}
     	} else {
-    		return null;
+    		return null; // null used by caller
     	}
     }
 
@@ -1355,6 +1356,13 @@ public class SeleniumTestsContext {
         return (List<String>) getAttribute(WEB_DRIVER_GRID);
     }
 
+    /**
+     * returns timeout in minutes
+     */
+    public Integer getWebDriverGridTimeout() {
+        return (Integer) getAttribute(WEB_DRIVER_GRID_TIMEOUT);
+    }
+
     public String getWebProxyAddress() {
         return (String) getAttribute(WEB_PROXY_ADDRESS);
     }
@@ -1607,27 +1615,15 @@ public class SeleniumTestsContext {
     }
 
     public void setImplicitWaitTimeout(Integer timeoutInSecs) {
-    	if (timeoutInSecs != null) {
-    		setAttribute(IMPLICIT_WAIT_TIME_OUT, timeoutInSecs);
-    	} else {
-    		setAttribute(IMPLICIT_WAIT_TIME_OUT, DEFAULT_IMPLICIT_WAIT_TIME_OUT);
-    	}
+        setAttribute(IMPLICIT_WAIT_TIME_OUT, Objects.requireNonNullElse(timeoutInSecs, DEFAULT_IMPLICIT_WAIT_TIME_OUT));
     }
     
     public void setExplicitWaitTimeout(Integer timeoutInSecs) {
-    	if (timeoutInSecs != null) {
-    		setAttribute(EXPLICIT_WAIT_TIME_OUT, timeoutInSecs);
-    	} else {
-    		setAttribute(EXPLICIT_WAIT_TIME_OUT, DEFAULT_EXPLICIT_WAIT_TIME_OUT);
-    	}
+        setAttribute(EXPLICIT_WAIT_TIME_OUT, Objects.requireNonNullElse(timeoutInSecs, DEFAULT_EXPLICIT_WAIT_TIME_OUT));
     }
 
     public void setPageLoadTimeout(Integer timeoutInSecs) {
-    	if (timeoutInSecs != null) {
-    		setAttribute(PAGE_LOAD_TIME_OUT, timeoutInSecs);
-    	} else {
-    		setAttribute(PAGE_LOAD_TIME_OUT, DEFAULT_PAGE_LOAD_TIME_OUT);
-    	}
+        setAttribute(PAGE_LOAD_TIME_OUT, Objects.requireNonNullElse(timeoutInSecs, DEFAULT_PAGE_LOAD_TIME_OUT));
     }
     
     public void setPageLoadStrategy(String strategy) {
@@ -1718,11 +1714,7 @@ public class SeleniumTestsContext {
     }
     
     public void setFindErrorCause(Boolean active) {
-    	if (active != null) {
-    		setAttribute(FIND_ERROR_CAUSE, active);
-    	} else {
-    		setAttribute(FIND_ERROR_CAUSE, DEFAULT_FIND_ERROR_CAUSE);
-    	}
+        setAttribute(FIND_ERROR_CAUSE, Objects.requireNonNullElse(active, DEFAULT_FIND_ERROR_CAUSE));
     }
   
     public void setVariableAlreadyRequestedFromServer(Map<String, TestVariable> variableAlreadyRequestedFromServer) {
@@ -1730,11 +1722,7 @@ public class SeleniumTestsContext {
 	}
 
 	public void setOverrideSeleniumNativeAction(Boolean override) {
-    	if (override != null) {
-    		setAttribute(OVERRIDE_SELENIUM_NATIVE_ACTION, override);
-    	} else {
-    		setAttribute(OVERRIDE_SELENIUM_NATIVE_ACTION, DEFAULT_OVERRIDE_SELENIUM_NATIVE_ACTION);
-    	}
+        setAttribute(OVERRIDE_SELENIUM_NATIVE_ACTION, Objects.requireNonNullElse(override, DEFAULT_OVERRIDE_SELENIUM_NATIVE_ACTION));
     }
     
     /**
@@ -1756,6 +1744,10 @@ public class SeleniumTestsContext {
     		}
     		setAttribute(WEB_DRIVER_GRID, Arrays.asList(driverGrid.split(",")));
     	}
+    }
+
+    public void setWebDriverGridTimeout(Integer timeout) {
+        setAttribute(WEB_DRIVER_GRID_TIMEOUT, Objects.requireNonNullElse(timeout, DEFAULT_WEB_DRIVER_GRID_TIMEOUT));
     }
     
     public void setConfiguration(Map<String, TestVariable> variables){

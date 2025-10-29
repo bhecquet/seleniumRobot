@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,9 +17,7 @@
  */
 package com.seleniumtests.connectors.selenium;
 
-import java.net.MalformedURLException;
-import java.net.SocketException;
-import java.net.URL;
+import java.net.*;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -57,8 +55,7 @@ public class SeleniumGridConnectorFactory {
 	 * From a list of grid URL, look for grids which are available at the time of request
 	 * If all grids are available, returns all
 	 * If none are available, wait for at least one to be there
-	 * @param urls
-	 * @return
+	 * @param urls	list of all grid connectors
 	 */
 	public static synchronized List<SeleniumGridConnector> getInstances(List<String> urls) {
 		
@@ -70,11 +67,11 @@ public class SeleniumGridConnectorFactory {
 		List<URL> hubUrls = new ArrayList<>();
 		for (String url: urls) {
 			try {
-				hubUrls.add(new URL(url));
-			} catch (MalformedURLException e1) {
+				hubUrls.add(new URI(url).toURL());
+			} catch (MalformedURLException | URISyntaxException e1) {
 				throw new ConfigurationException(String.format("Hub url '%s' is invalid: %s", url, e1.getMessage()));
 			}
-		}
+        }
 		
 		Clock clock = Clock.systemUTC();
 		Instant end = clock.instant().plusSeconds(retryTimeout);
@@ -103,10 +100,9 @@ public class SeleniumGridConnectorFactory {
 	}
 
 	/**
-	 * @param currentException
-	 * @param seleniumGridConnectors
-	 * @param hubUrl
-	 * @return
+	 * @param seleniumGridConnectors	list of grid connectors
+	 * @param hubUrl					the hub to connect to
+	 * @return an exception that may occur
 	 */
 	private static Exception connectHub(Exception currentException, List<SeleniumGridConnector> seleniumGridConnectors,
 			URL hubUrl) {
@@ -129,7 +125,7 @@ public class SeleniumGridConnectorFactory {
 							}
 		        		}
 		        	} else {
-		        		logger.error("Cannot connect to the grid hub at " + hubUrl.toString());
+		        		logger.error("Cannot connect to the grid hub at {}", hubUrl);
 		        	}
 				} catch (Exception ex) {
 					WaitHelper.waitForMilliSeconds(500);
@@ -144,7 +140,7 @@ public class SeleniumGridConnectorFactory {
 
 	/**
 	 * set retry timeout in seconds
-	 * @param retryTimeout
+	 * @param retryTimeout	the retry timeout
 	 */
 	public static void setRetryTimeout(int retryTimeout) {
 		SeleniumGridConnectorFactory.retryTimeout = retryTimeout;

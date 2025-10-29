@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,8 +21,9 @@ import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -72,8 +73,8 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	
 	protected void setHubUrl(String hubUrl) {
 		try {
-			this.hubUrl = new URL(hubUrl);
-		} catch (MalformedURLException e1) {
+			this.hubUrl = new URI(hubUrl).toURL();
+		} catch (MalformedURLException | URISyntaxException e1) {
 			throw new ConfigurationException(String.format("Hub url '%s' is invalid: %s", hubUrl, e1.getMessage()));
 		}
 		hubHost = this.hubUrl.getHost();
@@ -82,7 +83,7 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	
 	/**
 	 * Do nothing as we are not a SeleniumRobotGrid
-	 * @param caps
+	 * @param caps	capabilities for the mobile app
 	 */
 	public MutableCapabilities uploadMobileApp(Capabilities caps) {
 		logger.warn("application upload is only available with seleniumRobot grid");
@@ -91,7 +92,7 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	
 	/**
 	 * Upload a file given file path
-	 * @param filePath
+	 * @param filePath	path of the file to upload
 	 */
 	public void uploadFile(String filePath) {
 		logger.warn("file upload is only available with seleniumRobot grid");
@@ -99,7 +100,7 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	
 	/**
 	 * Upload a file given file path
-	 * @param filePath
+	 * @param filePath	path of the file to upload
 	 */
 	public String uploadFileToNode(String filePath, boolean returnLocalFile) {
 		logger.warn("file upload is only available with seleniumRobot grid");
@@ -108,7 +109,7 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	
 	/**
 	 * Download a file given file path
-	 * @param filePath
+	 * @param filePath path of the file to upload
 	 */
 	public File downloadFileFromNode(String filePath) {
 		logger.warn("file download is only available with seleniumRobot grid");
@@ -117,7 +118,6 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 
 	/**
 	 * Returns the list of files that are present on grid node
-	 * @return
 	 */
 	public List<String> listFilesToDownload() {
 		if (nodeUrl == null) {
@@ -131,15 +131,16 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 			return fileList.getJSONObject("value").getJSONArray("names").toList();
 
 		} catch (Exception e) {
-			logger.error("Cannot get list of files to download: " + e.getMessage());
+			logger.error("Cannot get list of files to download: {}", e.getMessage());
 			return new ArrayList<>();
 		}
 	}
 
 	/**
 	 * Download file from grid node, using full name
-	 * @param name
-	 * @return
+	 * @param name			name of the file to download
+	 * @param downloadDir  	where to put downloaded file
+	 * @return the file
 	 */
 	public File downloadFileFromName(String name, File downloadDir) {
 		try {
@@ -153,32 +154,32 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 			if (fileJson.has("filename")) {
 				String content = fileJson.getString("contents");
 				Zip.unzip(content, downloadDir);
-				logger.info(String.format("File %s downloaded to %s", name, downloadDir));
+				logger.info("File {} downloaded to {}", name, downloadDir);
 				// Read the file contents
 				return Optional.ofNullable(downloadDir.listFiles()).orElse(new File[]{null})[0];
 			} else if (fileJson.has("message")) {
-				logger.warn("Error downloading file: " + fileJson.getString("message"));
+				logger.warn("Error downloading file: {}", fileJson.getString("message"));
 				return null;
 			} else {
-				logger.warn("No file found with name " + name);
+				logger.warn("No file found with name {}", name);
 				return null;
 			}
 
 		} catch (UnirestException e) {
-			logger.error(String.format("Cannot download file %s: %s", name, e.getMessage()));
+			logger.error("Cannot download file {}: {}", name, e.getMessage());
 			return null;
 		} catch (IOException e) {
-			logger.error("Error reading file content: " + e.getMessage());
+			logger.error("Error reading file content: {}", e.getMessage());
             return null;
         } catch (Exception e) {
-			logger.error("Error downloading file: " + e.getMessage());
+			logger.error("Error downloading file: {}", e.getMessage());
 			return null;
 		}
     }
 	
 	/**
 	 * Kill process
-	 * @param processName
+	 * @param processName	name of the process to kill
 	 */
 	public void killProcess(String processName) {
 		logger.warn("kill is only available with seleniumRobot grid");
@@ -206,8 +207,8 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 
 	/**
 	 * Upload a file to a browser uplpoad window
-	 * @param fileName
-	 * @param base64Content
+	 * @param fileName		name of the file to upload
+	 * @param base64Content	content of the file
 	 */
 	public void uploadFileToBrowser(String fileName, String base64Content) {
 		logger.warn("file upload to browser is only available with seleniumRobot grid");
@@ -277,7 +278,6 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	
 	/**
 	 * Take screenshot of the full desktop and return a base64 string of the image
-	 * @return
 	 */
 	public String captureDesktopToBuffer() {
 		logger.warn("captureDesktopToBuffer is only available with seleniumRobot grid");
@@ -288,7 +288,6 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	/**
 	 * Take screenshot of the full desktop and return a base64 string of the image
 	 * @param onlyMainScreen	if true, only take screenshot of the default screen
-	 * @return
 	 */
 	public String captureDesktopToBuffer(boolean onlyMainScreen) {
 		logger.warn("captureDesktopToBuffer is only available with seleniumRobot grid");
@@ -297,7 +296,7 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	
 	/**
 	 * Send keys to desktop
-	 * @param keyCodes
+	 * @param keyCodes	keys to send
 	 */
 	public void sendKeysWithKeyboard(List<Integer> keyCodes) {
 		logger.warn("send keys is only available with seleniumRobot grid");
@@ -327,11 +326,11 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 		try {
 			response = Unirest.get(String.format("http://%s:%s%s", hubUrl.getHost(), hubUrl.getPort(), STATUS_SERVLET)).asJson();
 			if (response.getStatus() != 200) {
-	    		logger.warn("Error connecting to the grid hub at " + hubUrl);
+	    		logger.warn("Error connecting to the grid hub at {}", hubUrl);
 	    		return false;
 	    	} 
 		} catch (UnirestException e) {
-			logger.warn("Cannot connect to the grid hub at " + hubUrl);
+			logger.warn("Cannot connect to the grid hub at {}", hubUrl);
 			return false;
 		}
 		
@@ -346,7 +345,7 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	
 	/**
 	 * Display running step
-	 * @param stepName
+	 * @param stepName	name of the step
 	 */
 	public long displayRunningStep(String stepName) {
 		logger.warn("displayRunningStep is only available with seleniumRobot grid");
@@ -355,16 +354,15 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	
 	/**
 	 * Write text to desktop using keyboard
-	 * @param text
+	 * @param text	text to write with keyboard
 	 */
 	public void writeText(String text) {
 		logger.warn("writeText is only available with seleniumRobot grid");
 	}
 	
 	/**
-	 * Returns the session object form status
-	 * @param driver
-	 * @return
+	 * Returns the session object from status
+	 * @param driver	the driver created on grid
 	 */
 	private JSONObject getCurrentSessionObject(RemoteWebDriver driver) {
 
@@ -392,7 +390,6 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	
 	/**
 	 * Retrieves session information about the created driver
-	 * @param driver
 	 */
 	public void getSessionInformationFromGrid(RemoteWebDriver driver) {
 		getSessionInformationFromGrid(driver, 0);
@@ -444,7 +441,7 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	/**
 	 * Stop the session calling the node URL
 	 * /!\ this will not work if a secret has been defined 
-	 * @param sessionId
+	 * @param sessionId	the session to stop
 	 */
 	public boolean stopSession(String sessionId) {
 		HttpResponse<String> response = Unirest.delete(String.format("%s/se/grid/node/session/%s", nodeUrl, sessionId))
