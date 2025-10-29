@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,6 +23,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.mockito.MockedConstruction;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -32,7 +33,6 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.contexts.SeleniumRobotServerContext;
 import com.seleniumtests.core.testanalysis.ErrorCauseFinder;
-import com.seleniumtests.reporter.reporters.ReporterControler;
 
 import static org.mockito.Mockito.*;
 
@@ -41,7 +41,6 @@ public class TestReporterControler extends ReporterTest {
 
 	/**
 	 * Check testng-failed.xml file is present in test-output directory
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testTestNGFailedFilePresent() throws Exception {
@@ -56,7 +55,6 @@ public class TestReporterControler extends ReporterTest {
 	/**
 	 * issue #654: when executing tests in parallel, report generation is performed once test method is finished, not when all "After" methods are executed
 	 * This leads to recorded results not being complete (e.g: step reference are created in @After method)
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
 	public void testReportGenerationParallel() throws IOException {
@@ -65,12 +63,12 @@ public class TestReporterControler extends ReporterTest {
 		String logs = readSeleniumRobotLogFile().replace("\\", "/");
 
 
-		int test1Finished = StringUtils.indexOf(logs, "after test1 finished");
-		int test1ReportGeneration = StringUtils.indexOf(logs, "test1/TestReport.html");
-		int test2Finished = StringUtils.indexOf(logs, "after test2 finished");
-		int test2ReportGeneration = StringUtils.indexOf(logs, "test2/TestReport.html");
-		int test3Finished = StringUtils.indexOf(logs, "after test3 finished");
-		int test3ReportGeneration = StringUtils.indexOf(logs, "test3/TestReport.html");
+		int test1Finished = Strings.CI.indexOf(logs, "after test1 finished");
+		int test1ReportGeneration = Strings.CI.indexOf(logs, "test1/TestReport.html");
+		int test2Finished = Strings.CI.indexOf(logs, "after test2 finished");
+		int test2ReportGeneration = Strings.CI.indexOf(logs, "test2/TestReport.html");
+		int test3Finished = Strings.CI.indexOf(logs, "after test3 finished");
+		int test3ReportGeneration = Strings.CI.indexOf(logs, "test3/TestReport.html");
 
 		Assert.assertTrue(test1Finished < test2Finished);
 		Assert.assertTrue(test1ReportGeneration < test2ReportGeneration);
@@ -80,8 +78,6 @@ public class TestReporterControler extends ReporterTest {
 
 	/**
 	 * Check that files created by robot but not integrated to tests are deleted
-	 * 
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testUnusedCaptureAreDeleted() throws Exception {
@@ -99,7 +95,6 @@ public class TestReporterControler extends ReporterTest {
 	
 	/**
 	 * Checks that if a test is retried, captures of the last execution are kept (issue #121)
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testUnusedCaptureAreDeletedWhenTestFails() throws Exception {
@@ -125,7 +120,7 @@ public class TestReporterControler extends ReporterTest {
 	 * - always present at the end of the test 
 	 */
 	@Test(groups={"it"})
-	public void testBeforeMethodCapturesArePresent() throws Exception {
+	public void testBeforeMethodCapturesArePresent() {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.BROWSER, "chrome");
@@ -158,7 +153,6 @@ public class TestReporterControler extends ReporterTest {
 	 * - in execution logs
 	 * - a configuration step is displayed
 	 * Check that overall step is skipped
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testReportDetailsWithBeforeConfigurationError() throws Exception {
@@ -168,7 +162,7 @@ public class TestReporterControler extends ReporterTest {
 		String mainReportContent = readSummaryFile();
 		
 		// check main result is skipped with step failed indicated as a link
-		Assert.assertTrue(mainReportContent.contains("<td name=\"stepsTotal-1\">3<sup><a href=\"#\" data-toggle=\"tooltip\" class=\"failedStepsTooltip\" title=\"2 step(s) failed\">*</a></sup></td>"));
+		Assert.assertTrue(mainReportContent.contains("<td name=\"stepsTotal-1\">4<sup><a href=\"#\" data-toggle=\"tooltip\" class=\"failedStepsTooltip\" title=\"2 step(s) failed\">*</a></sup></td>"));
 		
 		
 		String detailedReportContent = readTestMethodResultFile("testWithABeforeMethodError");
@@ -196,7 +190,6 @@ public class TestReporterControler extends ReporterTest {
 	 * - a specific step is displayed
 	 * - logs of this specific step is present in execution logs
 	 * Check that overall test is OK
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testReportDetailsWithAfterConfigurationError() throws Exception {
@@ -206,7 +199,7 @@ public class TestReporterControler extends ReporterTest {
 		String mainReportContent = readSummaryFile();
 		
 		// check main result is skipped with step failed in red
-		Assert.assertTrue(mainReportContent.contains("<td name=\"stepsTotal-1\">5<sup><a href=\"#\" data-toggle=\"tooltip\" class=\"failedStepsTooltip\" title=\"1 step(s) failed\">*</a></sup></td>"));
+		Assert.assertTrue(mainReportContent.contains("<td name=\"stepsTotal-1\">6<sup><a href=\"#\" data-toggle=\"tooltip\" class=\"failedStepsTooltip\" title=\"1 step(s) failed\">*</a></sup></td>"));
 		
 		String detailedReportContent = readTestMethodResultFile("testWithAfterMethodError");
 		
@@ -233,7 +226,6 @@ public class TestReporterControler extends ReporterTest {
 	/**
 	 * Check that all configuration steps are logged in detailed report as pre / post test actions
 	 * Also check that configuration step name does not contain method arguments
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testReportDetailsAllConfigurationSteps() throws Exception {
@@ -292,12 +284,11 @@ public class TestReporterControler extends ReporterTest {
 	 * - findErrorCause=true
 	 * - seleniumServer is active
 	 * - result recording is active (meaning we also record step references)
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testErrorCauseSearched() throws Exception {
 		
-		try (MockedConstruction mockedErrorCauseFinder = mockConstruction(ErrorCauseFinder.class)) {
+		try (MockedConstruction<ErrorCauseFinder> mockedErrorCauseFinder = mockConstruction(ErrorCauseFinder.class)) {
 			System.setProperty(SeleniumTestsContext.FIND_ERROR_CAUSE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
@@ -321,12 +312,11 @@ public class TestReporterControler extends ReporterTest {
 	
 	/**
 	 * Check we do not try to find ErrorCause when error is an AssertionError as we consider this error is raised when a control fails, the application / environment is OK
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testErrorCauseNotSearchedAssertionError() throws Exception {
 		
-		try (MockedConstruction mockedErrorCauseFinder = mockConstruction(ErrorCauseFinder.class)) {
+		try (MockedConstruction<ErrorCauseFinder> mockedErrorCauseFinder = mockConstruction(ErrorCauseFinder.class)) {
 			System.setProperty(SeleniumTestsContext.FIND_ERROR_CAUSE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
@@ -350,12 +340,11 @@ public class TestReporterControler extends ReporterTest {
 	
 	/**
 	 * Error cause won't be searched as test is successful
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testErrorCauseNotSearchedTestSuccess() throws Exception {
 		
-		try (MockedConstruction mockedErrorCauseFinder = mockConstruction(ErrorCauseFinder.class)) {
+		try (MockedConstruction<ErrorCauseFinder> mockedErrorCauseFinder = mockConstruction(ErrorCauseFinder.class)) {
 			System.setProperty(SeleniumTestsContext.FIND_ERROR_CAUSE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
@@ -382,12 +371,11 @@ public class TestReporterControler extends ReporterTest {
 	 * - findErrorCause=false
 	 * - seleniumServer is active
 	 * - result recording is active (meaning we also record step references)
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testErrorCauseNotSearchedFlagFalse() throws Exception {
 		
-		try (MockedConstruction mockedErrorCauseFinder = mockConstruction(ErrorCauseFinder.class)) {
+		try (MockedConstruction<ErrorCauseFinder> mockedErrorCauseFinder = mockConstruction(ErrorCauseFinder.class)) {
 			System.setProperty(SeleniumTestsContext.FIND_ERROR_CAUSE, "false");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
@@ -413,13 +401,12 @@ public class TestReporterControler extends ReporterTest {
 	 * Check we do not try to find error cause when
 	 * - findErrorCause=true
 	 * - seleniumServer is active
-	 * - result recording is inactive 
-	 * @throws Exception
+	 * - result recording is inactive
 	 */
 	@Test(groups={"it"})
 	public void testErrorCauseNotSearchedNoRecordResult() throws Exception {
 		
-		try (MockedConstruction mockedErrorCauseFinder = mockConstruction(ErrorCauseFinder.class)) {
+		try (MockedConstruction<ErrorCauseFinder> mockedErrorCauseFinder = mockConstruction(ErrorCauseFinder.class)) {
 			System.setProperty(SeleniumTestsContext.FIND_ERROR_CAUSE, "false");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, SERVER_URL);

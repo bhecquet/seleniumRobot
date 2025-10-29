@@ -129,7 +129,7 @@ public class TestPerformanceReporter extends ReporterTest {
 		// check content of summary report file
 		String jmeterReport = readTestMethodPerfFile("testWithException");
 		
-		Assert.assertTrue(jmeterReport.contains("hostname=\"\" name=\"testWithException\" tests=\"6\" time=\""));
+		Assert.assertTrue(jmeterReport.contains("hostname=\"\" name=\"testWithException\" tests=\"7\" time=\""));
 		Assert.assertTrue(jmeterReport.contains("browser=\"NONE\""));
 		Assert.assertTrue(jmeterReport.contains("appVersion=\"" + SeleniumTestsContextManager.getApplicationVersion()));
 		Assert.assertTrue(jmeterReport.contains("coreVersion=\"" + SeleniumTestsContextManager.getCoreVersion()));
@@ -143,6 +143,7 @@ public class TestPerformanceReporter extends ReporterTest {
 		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"Step 3: Pre test step: set\" time="));
 		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"Step 5: Test end\" time="));
 		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"Step 6: Post test step: reset\" time="));
+		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"Step 7: No previous execution results, you can enable it via parameter "));
 	}
 	
 	@Test(groups={"it"})
@@ -152,9 +153,9 @@ public class TestPerformanceReporter extends ReporterTest {
 		
 		// check content of summary report file
 		String jmeterReport = readTestMethodPerfFile("testOkWithTestName");
-		Assert.assertTrue(jmeterReport.contains("hostname=\"\" name=\"A test which is &lt;OK&gt; é&amp;\" tests=\"6\" time=\""));
+		Assert.assertTrue(jmeterReport.contains("hostname=\"\" name=\"A test which is &lt;OK&gt; é&amp;\" tests=\"7\" time=\""));
 		String jmeterReport1 = readTestMethodPerfFile("testOkWithTestNameAndDataProvider");
-		Assert.assertTrue(jmeterReport1.contains("hostname=\"\" name=\"A test which is OK (data2, data3)\" tests=\"5\" time=\""));
+		Assert.assertTrue(jmeterReport1.contains("hostname=\"\" name=\"A test which is OK (data2, data3)\" tests=\"6\" time=\""));
 
 	}
 	
@@ -188,13 +189,14 @@ public class TestPerformanceReporter extends ReporterTest {
 		// check content of summary report file
 		String jmeterReport = readTestMethodPerfFile("testOkWithOneStepFailed");
 		
-		Assert.assertTrue(jmeterReport.contains("<testsuite gridnode=\"LOCAL\" errors=\"0\" failures=\"0\" hostname=\"\" name=\"testOkWithOneStepFailed\" tests=\"6\""));
+		Assert.assertTrue(jmeterReport.contains("<testsuite gridnode=\"LOCAL\" errors=\"0\" failures=\"0\" hostname=\"\" name=\"testOkWithOneStepFailed\" tests=\"7\""));
 		Assert.assertTrue(jmeterReport.contains("name=\"Step 1: Pre test step: setCount\""));
 		Assert.assertTrue(jmeterReport.contains("name=\"Step 2: Pre test step: slow\""));
 		Assert.assertTrue(jmeterReport.contains("name=\"Step 3: Pre test step: set\""));
 		Assert.assertTrue(jmeterReport.contains("name=\"Step 4: step 1\""));
 		Assert.assertTrue(jmeterReport.contains("name=\"Step 5: Test end\""));
 		Assert.assertTrue(jmeterReport.contains("name=\"Step 6: Post test step: reset\""));
+		Assert.assertTrue(jmeterReport.contains("name=\"Step 7: No previous execution results"));
 	}
 	
 	/**
@@ -230,7 +232,7 @@ public class TestPerformanceReporter extends ReporterTest {
 			String jmeterReport1 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "PERF-result.xml").toFile(), StandardCharsets.UTF_8);
 			String jmeterReport2 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "PERF2-result.json").toFile(), StandardCharsets.UTF_8);
 			
-			Assert.assertTrue(jmeterReport1.contains("<testsuite gridnode=\"LOCAL\" errors=\"0\" failures=\"0\" hostname=\"\" name=\"testAndSubActions\" tests=\"7\" time=\""));
+			Assert.assertTrue(jmeterReport1.contains("<testsuite gridnode=\"LOCAL\" errors=\"0\" failures=\"0\" hostname=\"\" name=\"testAndSubActions\" tests=\"8\" time=\""));
 			Assert.assertTrue(jmeterReport2.contains("\"suiteName\": \"testAndSubActions\""));
 		} finally {
 			System.clearProperty("customTestReports");
@@ -297,7 +299,7 @@ public class TestPerformanceReporter extends ReporterTest {
 		logger.info("content: ");
 		logger.info(detailedReportContent);
 		Assert.assertTrue(detailedReportContent.contains("Test has not started or has been skipped"));
-		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "<testcase classname"), 1); // only Test end step
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "<testcase classname"), 2); // only Test end step and previous result step
 		
 		// check other file contains steps
 		String detailedReportContent2 = readTestMethodPerfFile("test1");

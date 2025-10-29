@@ -55,10 +55,10 @@ public class TestCustomReporter extends ReporterTest {
 			Assert.assertEquals(json.getString("hostname"), "");
 			Assert.assertEquals(json.getString("suiteName"), "testAndSubActions");
 			Assert.assertEquals(json.getString("className"), "com.seleniumtests.it.stubclasses.StubTestClass");
-			Assert.assertEquals(json.getInt("tests"), 7); // post steps with afterClass won't be presented anymore
+			Assert.assertEquals(json.getInt("tests"), 8); // post steps with afterClass won't be presented anymore
 			Assert.assertTrue(Float.parseFloat(json.get("duration").toString()) > 15);
 			Assert.assertTrue(json.getLong("time") > 1518709523620L);
-			Assert.assertEquals(json.getJSONArray("testSteps").length(), 7);
+			Assert.assertEquals(json.getJSONArray("testSteps").length(), 8);
 			Assert.assertEquals(json.getJSONArray("testSteps").get(3), "Step step 1\\n"
 					+ "  - click button\\n"
 					+ "  - sendKeys to text field\\n"
@@ -146,7 +146,7 @@ public class TestCustomReporter extends ReporterTest {
 		Assert.assertEquals(json.getString("failedStep"), "");
 		Assert.assertEquals(json.getString("gridnode"), "LOCAL");
 		Assert.assertEquals(json.getString("mobileApp"), "");
-		Assert.assertEquals(json.getJSONArray("steps").length(), 6);
+		Assert.assertEquals(json.getJSONArray("steps").length(), 7);
 		Assert.assertEquals(json.getJSONArray("steps").getJSONObject(3).getJSONObject("pageLoadTime").getString("page"), "DriverTestPage");
 		Assert.assertFalse(json.getString("platform").isEmpty());
 		Assert.assertTrue(json.getDouble("duration") > 0);
@@ -154,7 +154,7 @@ public class TestCustomReporter extends ReporterTest {
 		Assert.assertEquals(json.getString("browser"), "CHROME");
 		Assert.assertEquals(json.getString("name"), "testDriverShort");
 		Assert.assertTrue(json.getLong("startTime") > 1760604347733L);
-		Assert.assertEquals(json.getInt("stepNumber"), 6);
+		Assert.assertEquals(json.getInt("stepNumber"), 7);
 		Assert.assertEquals(json.getString("device"), "");
 		Assert.assertEquals(json.getInt("errors"), 0);
 		Assert.assertEquals(json.getJSONArray("infos").length(), 1);

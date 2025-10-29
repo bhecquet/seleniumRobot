@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,10 +30,8 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
 import org.mockito.MockedConstruction;
 import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
@@ -49,18 +47,17 @@ public class TestBugTrackerReporter extends ReporterTest {
 
 
 	@BeforeMethod(groups={"it"})
-	public void initTestManager() throws Exception {
+	public void initTestManager() {
 		BugTracker.resetBugTrackerInstances();
 		
 	}
 	
 	/**
 	 * Check a failed test produces a issue creation
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testIssueIsRecorded() throws Exception {
-		try (MockedConstruction jiraMockConstruction = mockConstruction(JiraConnector.class)) {
+		try (MockedConstruction<JiraConnector> jiraMockConstruction = mockConstruction(JiraConnector.class)) {
 			System.setProperty(BugTrackerContext.BUGTRACKER_TYPE, "jira");
 			System.setProperty(BugTrackerContext.BUGTRACKER_URL, "http://localhost:1234");
 			System.setProperty(BugTrackerContext.BUGTRACKER_PROJECT, "Project");
@@ -75,8 +72,8 @@ public class TestBugTrackerReporter extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testInError"});
 			
 			// check we have only one result recording for each test method
-			verify((JiraConnector)jiraMockConstruction.constructed().get(0)).createIssue(eq("core"), eq("DEV"), anyString(), eq("testInError"), contains("Test 'testInError' failed"), testStepsArgument.capture(), issueOptionsArgument.capture());
-			Assert.assertEquals(testStepsArgument.getValue().size(), 5);
+			verify(jiraMockConstruction.constructed().get(0)).createIssue(eq("core"), eq("DEV"), anyString(), eq("testInError"), contains("Test 'testInError' failed"), testStepsArgument.capture(), issueOptionsArgument.capture());
+			Assert.assertEquals(testStepsArgument.getValue().size(), 6);
 			
 			Assert.assertEquals(issueOptionsArgument.getValue().size(), 3);
 			Assert.assertEquals(issueOptionsArgument.getValue().get(BugTracker.BUGTRACKER_ISSUE_REPORTER), "me");
@@ -98,11 +95,10 @@ public class TestBugTrackerReporter extends ReporterTest {
 	/**
 	 * check that with data provider, a new issue can be created for each execution of the same method (index is present in test name, which guarantees that a different issue 
 	 * will be created.
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testIssueIsRecordedWithDataProvider() throws Exception {
-		try (MockedConstruction jiraMockConstruction = mockConstruction(JiraConnector.class)) {
+		try (MockedConstruction<JiraConnector> jiraMockConstruction = mockConstruction(JiraConnector.class)) {
 			System.setProperty(BugTrackerContext.BUGTRACKER_TYPE, "jira");
 			System.setProperty(BugTrackerContext.BUGTRACKER_URL, "http://localhost:1234");
 			System.setProperty(BugTrackerContext.BUGTRACKER_PROJECT, "Project");
@@ -118,7 +114,7 @@ public class TestBugTrackerReporter extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testInErrorDataProvider"});
 			
 			// check we have only one result recording for each test method
-			verify((JiraConnector)jiraMockConstruction.constructed().get(0)).createIssue(eq("core"), eq("DEV"), anyString(), eq("testInErrorDataProvider"), contains("Test 'testInErrorDataProvider' failed"), any(), issueOptionsArgument.capture());
+			verify(jiraMockConstruction.constructed().get(0)).createIssue(eq("core"), eq("DEV"), anyString(), eq("testInErrorDataProvider"), contains("Test 'testInErrorDataProvider' failed"), any(), issueOptionsArgument.capture());
 			
 			Assert.assertEquals(issueOptionsArgument.getValue().size(), 3);
 			Assert.assertEquals(issueOptionsArgument.getValue().get(BugTracker.BUGTRACKER_ISSUE_REPORTER), "me");
@@ -127,7 +123,7 @@ public class TestBugTrackerReporter extends ReporterTest {
 			
 
 			// check we have only one result recording for each test method
-			verify((JiraConnector)jiraMockConstruction.constructed().get(0)).createIssue(eq("core"), eq("DEV"), anyString(), eq("testInErrorDataProvider-1"), contains("Test 'testInErrorDataProvider-1' failed"), any(), issueOptionsArgument2.capture());
+			verify(jiraMockConstruction.constructed().get(0)).createIssue(eq("core"), eq("DEV"), anyString(), eq("testInErrorDataProvider-1"), contains("Test 'testInErrorDataProvider-1' failed"), any(), issueOptionsArgument2.capture());
 			
 			Assert.assertEquals(issueOptionsArgument2.getValue().size(), 3);
 			Assert.assertEquals(issueOptionsArgument2.getValue().get(BugTracker.BUGTRACKER_ISSUE_REPORTER), "me");
@@ -151,11 +147,10 @@ public class TestBugTrackerReporter extends ReporterTest {
 	/**
 	 * Check that when Jira is created / present, a link is available in report
 	 * We check in HTML report, but, it is the same for XML report (Here, we do not check that Perfreport works correctly)
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testIssueIsRecordedInReportsFakeBugtracker() throws Exception {
-		try (MockedConstruction jiraMockConstruction = mockConstruction(JiraConnector.class)) {
+		try (MockedConstruction<JiraConnector> jiraMockConstruction = mockConstruction(JiraConnector.class)) {
 			System.setProperty(BugTrackerContext.BUGTRACKER_TYPE, "fake");
 			System.setProperty(BugTrackerContext.BUGTRACKER_URL, "http://localhost:1234");
 			System.setProperty(BugTrackerContext.BUGTRACKER_PROJECT, "Project");
@@ -195,7 +190,7 @@ public class TestBugTrackerReporter extends ReporterTest {
 	 */
 	@Test(groups={"it"})
 	public void testIssueRecordedOnceAllRetriesDoneAfterTestMethod() throws Exception {
-		try (MockedConstruction jiraMockConstruction = mockConstruction(JiraConnector.class)) {
+		try (MockedConstruction<JiraConnector> jiraMockConstruction = mockConstruction(JiraConnector.class)) {
 			System.setProperty(BugTrackerContext.BUGTRACKER_TYPE, "fake");
 			System.setProperty(BugTrackerContext.BUGTRACKER_URL, "http://localhost:1234");
 			System.setProperty(BugTrackerContext.BUGTRACKER_PROJECT, "Project");
@@ -234,7 +229,6 @@ public class TestBugTrackerReporter extends ReporterTest {
 	/**
 	 * Check that when Jira is created / present, a link is available in report
 	 * We check in HTML report, but, it is the same for XML report (Here, we do not check that Perfreport works correctly)
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testIssueIsRecordedInReports() throws Exception {
@@ -244,7 +238,7 @@ public class TestBugTrackerReporter extends ReporterTest {
 		ZonedDateTime creationDate = ZonedDateTime.now();
 		jiraBean.setCreationDate(creationDate);
 
-		try (MockedConstruction jiraMockConstruction = mockConstruction(JiraConnector.class, (jiraConnector, context) -> {
+		try (MockedConstruction<JiraConnector> jiraMockConstruction = mockConstruction(JiraConnector.class, (jiraConnector, context) -> {
 			when(jiraConnector.createIssue(eq("core"), eq("DEV"), anyString(), eq("testInError"), contains("Test 'testInError' failed"), any(), any())).thenReturn(jiraBean);
 		})) {
 			System.setProperty(BugTrackerContext.BUGTRACKER_TYPE, "jira");
@@ -284,7 +278,6 @@ public class TestBugTrackerReporter extends ReporterTest {
 	
 	/**
 	 * Check that when Jira is created / present, without hyperlink, the issue name is present
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testIssueIsRecordedInReportsNoURL() throws Exception {
@@ -294,7 +287,7 @@ public class TestBugTrackerReporter extends ReporterTest {
 		ZonedDateTime creationDate = ZonedDateTime.now();
 		jiraBean.setCreationDate(creationDate);
 
-		try (MockedConstruction jiraMockConstruction = mockConstruction(JiraConnector.class, (jiraConnector, context) -> {
+		try (MockedConstruction<JiraConnector> jiraMockConstruction = mockConstruction(JiraConnector.class, (jiraConnector, context) -> {
 			when(jiraConnector.createIssue(eq("core"), eq("DEV"), anyString(), eq("testInError"), contains("Test 'testInError' failed"), any(), any())).thenReturn(jiraBean);
 
 		})) {
@@ -332,11 +325,10 @@ public class TestBugTrackerReporter extends ReporterTest {
 	
 	/**
 	 * With test OK, no issue is recorded but we try to close a matching issue
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testNoIssueIsRecordedWithTestSuccess() throws Exception {
-		try (MockedConstruction jiraMockConstruction = mockConstruction(JiraConnector.class)) {
+		try (MockedConstruction<JiraConnector> jiraMockConstruction = mockConstruction(JiraConnector.class)) {
 			System.setProperty(BugTrackerContext.BUGTRACKER_TYPE, "jira");
 			System.setProperty(BugTrackerContext.BUGTRACKER_URL, "http://localhost:1234");
 			System.setProperty(BugTrackerContext.BUGTRACKER_PROJECT, "Project");
@@ -346,8 +338,8 @@ public class TestBugTrackerReporter extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
 			
 			// check we have only one result recording for each test method
-			verify((JiraConnector)jiraMockConstruction.constructed().get(0), never()).createIssue(any(), any(), any(), any(), any(), any(), any());
-			verify((JiraConnector)jiraMockConstruction.constructed().get(0)).closeIssue(eq("core"), eq("DEV"), anyString(), eq("testAndSubActions"));
+			verify(jiraMockConstruction.constructed().get(0), never()).createIssue(any(), any(), any(), any(), any(), any(), any());
+			verify(jiraMockConstruction.constructed().get(0)).closeIssue(eq("core"), eq("DEV"), anyString(), eq("testAndSubActions"));
 			
 		} finally {
 			System.clearProperty(BugTrackerContext.BUGTRACKER_TYPE);
@@ -360,11 +352,10 @@ public class TestBugTrackerReporter extends ReporterTest {
 	
 	/**
 	 * With test Skipped, no issue is recorded
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testNoIssueIsRecordedWithTestSkipped() throws Exception {
-		try (MockedConstruction jiraMockConstruction = mockConstruction(JiraConnector.class)) {
+		try (MockedConstruction<JiraConnector> jiraMockConstruction = mockConstruction(JiraConnector.class)) {
 			System.setProperty(BugTrackerContext.BUGTRACKER_TYPE, "jira");
 			System.setProperty(BugTrackerContext.BUGTRACKER_URL, "http://localhost:1234");
 			System.setProperty(BugTrackerContext.BUGTRACKER_PROJECT, "Project");
@@ -374,7 +365,7 @@ public class TestBugTrackerReporter extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testSkipped"});
 			
 			// check we have only one result recording for each test method
-			verify((JiraConnector)jiraMockConstruction.constructed().get(0), never()).createIssue(any(), any(), any(), any(), any(), any(), any());
+			verify(jiraMockConstruction.constructed().get(0), never()).createIssue(any(), any(), any(), any(), any(), any(), any());
 			
 			
 		} finally {
@@ -388,11 +379,10 @@ public class TestBugTrackerReporter extends ReporterTest {
 	
 	/**
 	 * Without bugtracker instance, no issue recorded, no error raised
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testNoIssueIsRecordeWithoutBugTracker() throws Exception {
-		try (MockedConstruction jiraMockConstruction = mockConstruction(JiraConnector.class)) {
+		try (MockedConstruction<JiraConnector> jiraMockConstruction = mockConstruction(JiraConnector.class)) {
 			System.setProperty(BugTrackerContext.BUGTRACKER_TYPE, "foo");
 			System.setProperty(BugTrackerContext.BUGTRACKER_URL, "http://localhost:1234");
 			System.setProperty(BugTrackerContext.BUGTRACKER_PROJECT, "Project");
@@ -415,11 +405,10 @@ public class TestBugTrackerReporter extends ReporterTest {
 	
 	/**
 	 * Check that when a test contains description, this is set in issue
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testIssueDescriptionIsInterpolated() throws Exception {
-		try (MockedConstruction jiraMockConstruction = mockConstruction(JiraConnector.class)) {
+		try (MockedConstruction<JiraConnector> jiraMockConstruction = mockConstruction(JiraConnector.class)) {
 			System.setProperty(BugTrackerContext.BUGTRACKER_TYPE, "jira");
 			System.setProperty(BugTrackerContext.BUGTRACKER_URL, "http://localhost:1234");
 			System.setProperty(BugTrackerContext.BUGTRACKER_PROJECT, "Project");
@@ -433,10 +422,15 @@ public class TestBugTrackerReporter extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassforTestDescription"}, ParallelMode.METHODS, new String[] {"testWithLineBreaksInDescription"});
 			
 			// check we have only one result recording for each test method
-			verify((JiraConnector)jiraMockConstruction.constructed().get(0)).createIssue(eq("core"), eq("DEV"), anyString(), eq("testWithLineBreaksInDescription"), contains("Test 'testWithLineBreaksInDescription' failed\n" +
+			verify(jiraMockConstruction.constructed().get(0)).createIssue(eq("core"), eq("DEV"), anyString(), eq("testWithLineBreaksInDescription"), contains("Test 'testWithLineBreaksInDescription' failed\n" +
 					"Test goal: a test with param http://mysite.com\n" + 
 					"and line breaks"), testStepsArgument.capture(), issueOptionsArgument.capture());
-			Assert.assertEquals(testStepsArgument.getValue().size(), 3);
+			List<TestStep> steps = testStepsArgument.getValue();
+			Assert.assertEquals(steps.size(), 4);
+			Assert.assertEquals(steps.get(0).getName(), "Pre test step: slow");
+			Assert.assertEquals(steps.get(1).getName(), "step 1");
+			Assert.assertEquals(steps.get(2).getName(), "Test end");
+			Assert.assertEquals(steps.get(3).getName(), "No previous execution results, you can enable it via parameter '-DkeepAllResults=true'");
 
 			
 		} finally {
