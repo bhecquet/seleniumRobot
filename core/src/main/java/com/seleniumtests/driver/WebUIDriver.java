@@ -78,6 +78,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.video.VideoCaptureMode;
 import com.seleniumtests.util.video.VideoRecorder;
+import org.testng.SkipException;
 
 /**
  * This class provides factory to create webDriver session.
@@ -575,6 +576,7 @@ public class WebUIDriver {
 
 	/**
 	 * Try to create the driver (retry if necessary)
+	 * If driver cannot be created throw a SkipException because test cannot be performed
 	 * @param browserType				type of browser
 	 * @param driverName				name of the driver to create ('main' or something else)
 	 * @param attachExistingDriverPort	the port to attach or null if no attachment needed
@@ -615,7 +617,7 @@ public class WebUIDriver {
 							uxDriverSession.get().remove(driverName);
 						}
 						switchToDriver(previousDriverName);
-						throw e;
+						throw new SkipException("Error creating driver, skip test", e);
 					}
 				}
 			}
