@@ -201,6 +201,6 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 	 */
 	@Test(groups={"ut"})
 	public void testWithBrowserStack() throws UnsupportedOperationException, UnirestException {
-		Assert.assertTrue(SeleniumGridConnectorFactory.getInstances(List.of("http://<user>:<key>@hub-cloud.browserstack.com/wd/hub")).get(0) instanceof BrowserStackGridConnector);
+		Assert.assertTrue(SeleniumGridConnectorFactory.getInstances(List.of("http://user:key@hub-cloud.browserstack.com/wd/hub")).get(0) instanceof BrowserStackGridConnector);
 	}
 }
