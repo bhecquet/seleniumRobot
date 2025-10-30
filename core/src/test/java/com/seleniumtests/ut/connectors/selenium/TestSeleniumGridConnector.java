@@ -368,7 +368,7 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 		Logger logger = spy(SeleniumRobotLogger.getLogger(SeleniumGridConnector.class));
 		File file = configureAndDownload(logger);
 		Assert.assertNull(file);
-		verify(logger).error(contains("Cannot download file foo.txt: null"));
+		verify(logger).error("Cannot download file {}: {}",	"foo.txt",null);
 	}
 
 	@Test(groups={"ut"})
@@ -380,7 +380,7 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 		Logger logger = spy(SeleniumRobotLogger.getLogger(SeleniumGridConnector.class));
 		File file = configureAndDownload(logger);
 		Assert.assertNull(file);
-		verify(logger).error(contains("Error downloading file: foo"));
+		verify(logger).error("Error downloading file: {}","foo");
 	}
 
 	@Test(groups={"ut"})
@@ -404,7 +404,8 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 
 		File file = connector.downloadFileFromName("foo.txt", new File("G:\\somefolder"));
 		Assert.assertNull(file);
-		verify(logger).error(contains("Error downloading file: Cannot invoke \"java.io.File.exists()\" because \"dir\" is null"));
+		verify(logger).error("Error downloading file: {}",
+				"Cannot invoke \"java.io.File.exists()\" because \"dir\" is null");
 	}
 
 	@Test(groups={"ut"})
@@ -436,7 +437,8 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 		Logger logger = spy(SeleniumRobotLogger.getLogger(SeleniumGridConnector.class));
 		File file = configureAndDownload(logger);
 		Assert.assertNull(file);
-		verify(logger).warn("Error downloading file: error message");
+		verify(logger).warn("Error downloading file: {}",
+				"error message");
 	}
 
 	private static File configureAndDownload(Logger logger) throws NoSuchFieldException, IllegalAccessException, IOException {

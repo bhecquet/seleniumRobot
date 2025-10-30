@@ -474,6 +474,7 @@ public class TestWebUIDriver extends MockitoTest {
 	/**
 	 * Check the case where second driver fails to start, we should remove all it's references (name) from WebUiDriver
 	 * and switch back to previous driver
+	 * In that case, we should not raise a SkipException as the test has already started
 	 */
 	@Test(groups={"ut"})
 	public void testNewDriverCreationInGridFails() {

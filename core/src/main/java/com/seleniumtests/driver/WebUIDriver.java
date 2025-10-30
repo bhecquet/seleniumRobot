@@ -612,12 +612,17 @@ public class WebUIDriver {
 					} else {
 
 						// in case driver fails to start, remove any reference to its name so that we cannot switch to it
+						// failing on first driver creation raises SkipException as test cannot start at all
+						// failing on a subsequent driver creation raises the upcoming exception as test has already started
 						setCurrentWebUiDriverName(previousDriverName);
-						if (!DEFAULT_DRIVER_NAME.equals(driverName)) {
+						if (DEFAULT_DRIVER_NAME.equals(driverName)) {
+							switchToDriver(previousDriverName);
+							throw new SkipException("Error creating driver, skip test", e);
+						} else {
 							uxDriverSession.get().remove(driverName);
+							switchToDriver(previousDriverName);
+							throw e;
 						}
-						switchToDriver(previousDriverName);
-						throw new SkipException("Error creating driver, skip test", e);
 					}
 				}
 			}
