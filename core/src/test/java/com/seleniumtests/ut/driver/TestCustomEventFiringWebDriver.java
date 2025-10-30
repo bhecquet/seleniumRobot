@@ -1611,7 +1611,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 */
 	@Test(groups = {"ut"})
 	public void testGetCurrentUrlMobile() {
-		when(driver.getCurrentUrl()).thenThrow(new UnsupportedOperationException("command invalid"));
+		when(driver.getCurrentUrl()).thenThrow(new UnsupportedCommandException("command invalid"));
 		Assert.assertEquals(eventDriver.getCurrentUrl(), "");
 	}
 

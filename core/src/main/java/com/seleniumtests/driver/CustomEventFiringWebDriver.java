@@ -780,7 +780,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     		logger.info("getCurrentUrl: Handling alert");
 			handleAlert();
 			return driver.getCurrentUrl();
-		} catch (NoSuchWindowException | UnsupportedOperationException e) {
+		} catch (NoSuchWindowException | UnsupportedCommandException e) {
 			return "";
 		}
     }
