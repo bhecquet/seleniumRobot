@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,16 +17,9 @@
  */
 package com.seleniumtests.ut.core;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
@@ -50,7 +43,6 @@ import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.core.contexts.SeleniumRobotServerContext;
 import com.seleniumtests.core.runner.CucumberScenarioWrapper;
 import com.seleniumtests.customexception.ConfigurationException;
-import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.driver.WebUIDriver;
 
 /**
@@ -68,26 +60,19 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 
 	/**
 	 * Test that a grid connection is created when all parameters are correct
-	 * 
-	 * @param testNGCtx
-	 * @throws IllegalAccessException
-	 * @throws IllegalArgumentException
-	 * @throws NoSuchFieldException
-	 * @throws SecurityException
-	 * @throws NoSuchMethodException
 	 */
 	@Test(groups = "ut")
 	public void testGridConnection(final ITestContext testNGCtx) throws NoSuchMethodException, SecurityException,
 			NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 
-		try (MockedStatic mockedSeleniumGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
+		try (MockedStatic<SeleniumGridConnectorFactory> mockedSeleniumGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
 			SeleniumGridConnector gridConnector = spy(new SeleniumGridConnector("http://localhost:4444/hub/wd"));
 
 			// grid connector is in use only if session Id exists
 			doReturn(new SessionId("1234")).when(gridConnector).getSessionId();
 
-			mockedSeleniumGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd")))
-				.thenReturn(Arrays.asList(gridConnector));
+			mockedSeleniumGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(List.of("http://localhost:4444/hub/wd")))
+				.thenReturn(Collections.singletonList(gridConnector));
 
 			try {
 				System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
@@ -108,13 +93,6 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 	/**
 	 * Test when grid mode is set, but no grid URL is configured. A configuration
 	 * exception should be raised
-	 * 
-	 * @param testNGCtx
-	 * @throws NoSuchMethodException
-	 * @throws SecurityException
-	 * @throws NoSuchFieldException
-	 * @throws IllegalArgumentException
-	 * @throws IllegalAccessException
 	 */
 	@Test(groups = "ut", expectedExceptions = ConfigurationException.class)
 	public void testGridConnectionEmpty(final ITestContext testNGCtx) throws NoSuchMethodException, SecurityException,
@@ -134,26 +112,19 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 
 	/**
 	 * Local test, no grid connector
-	 * 
-	 * @param testNGCtx
-	 * @throws IllegalAccessException
-	 * @throws IllegalArgumentException
-	 * @throws NoSuchFieldException
-	 * @throws SecurityException
-	 * @throws NoSuchMethodException
 	 */
 	@Test(groups = "ut")
 	public void testNoGridConnection(final ITestContext testNGCtx) throws NoSuchMethodException, SecurityException,
 			NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 
-		try (MockedStatic mockedSeleniumGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
+		try (MockedStatic<SeleniumGridConnectorFactory> mockedSeleniumGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
 			SeleniumGridConnector gridConnector = spy(new SeleniumGridConnector("http://localhost:4444/hub/wd"));
 
 			// grid connector is in use only if session Id exists
 			doReturn(new SessionId("1234")).when(gridConnector).getSessionId();
 
-			mockedSeleniumGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd")))
-					.thenReturn(Arrays.asList(gridConnector));
+			mockedSeleniumGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(List.of("http://localhost:4444/hub/wd")))
+					.thenReturn(Collections.singletonList(gridConnector));
 
 			try {
 				System.setProperty(SeleniumTestsContext.RUN_MODE, "local");
@@ -172,26 +143,19 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 
 	/**
 	 * grid test but missing url. An error should be raised
-	 * 
-	 * @param testNGCtx
-	 * @throws IllegalAccessException
-	 * @throws IllegalArgumentException
-	 * @throws NoSuchFieldException
-	 * @throws SecurityException
-	 * @throws NoSuchMethodException
 	 */
 	@Test(groups = "ut", expectedExceptions = ConfigurationException.class)
 	public void testGridConnectionWithoutUrl(final ITestContext testNGCtx) throws NoSuchMethodException,
 			SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 
-		try (MockedStatic mockedSeleniumGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
+		try (MockedStatic<SeleniumGridConnectorFactory> mockedSeleniumGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
 			SeleniumGridConnector gridConnector = spy(new SeleniumGridConnector("http://localhost:4444/hub/wd"));
 
 			// grid connector is in use only if session Id exists
 			doReturn(new SessionId("1234")).when(gridConnector).getSessionId();
 
-			mockedSeleniumGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd")))
-				.thenReturn(Arrays.asList(gridConnector));
+			mockedSeleniumGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(List.of("http://localhost:4444/hub/wd")))
+				.thenReturn(Collections.singletonList(gridConnector));
 
 			try {
 				System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
@@ -211,10 +175,6 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 	/**
 	 * Check that if we request variable configuration several times, seleniumRobot
 	 * server is called only once to avoid problems with variable reservation
-	 * 
-	 * @param testNGCtx
-	 * @param xmlTest
-	 * @throws Exception
 	 */
 	@Test(groups = { "ut" })
 	public void testVariablesAreGetOnlyOnce(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
@@ -222,7 +182,7 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 		Map<String, TestVariable> variables = new HashMap<>();
 		variables.put("key", new TestVariable("key", "val1"));
 
-		try (MockedConstruction mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServerMock, context) -> {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServerMock, context) -> {
 			when(variableServerMock.isAlive()).thenReturn(true);
 			when(variableServerMock.getVariables(0, -1)).thenReturn(variables);
 		})) {
@@ -249,19 +209,15 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 	/**
 	 * Check that when copying context, it's possible to prevent it to retrieve
 	 * variables from server
-	 * 
-	 * @param testNGCtx
-	 * @param xmlTest
-	 * @throws Exception
 	 */
 	@Test(groups = { "ut" })
-	public void testVariablesAreGetOnlyOnceWithContextCopy(final ITestContext testNGCtx, final XmlTest xmlTest)
+	public void testVariablesAreGetOnlyOnceWithContextCopy(final ITestContext testNGCtx)
 			throws Exception {
 
 		Map<String, TestVariable> variables = new HashMap<>();
 		variables.put("key", new TestVariable("key", "val1"));
 
-		try (MockedConstruction mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServerMock, context) -> {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServerMock, context) -> {
 			when(variableServerMock.isAlive()).thenReturn(true);
 			when(variableServerMock.getVariables(0, -1)).thenReturn(variables);
 		})){
@@ -293,17 +249,10 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 	/**
 	 * issue #291: Check that when copying context, grid connector is also copied so
 	 * that it can be possible to re-use a driver created in \@BeforeMethod
-	 * 
-	 * @param testNGCtx
-	 * @param xmlTest
-	 * @throws Exception
 	 */
 	@Test(groups = { "ut" })
 	public void testGridConnectorIsCopiedWithContextCopy(final ITestContext testNGCtx, final XmlTest xmlTest)
 			throws Exception {
-
-		Map<String, TestVariable> variables = new HashMap<>();
-		variables.put("key", new TestVariable("key", "val1"));
 
 		try {
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4321/wd/hub");
@@ -334,19 +283,15 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 	/**
 	 * Check that when copying context, it's possible to allow it to retrieve
 	 * variables from server
-	 * 
-	 * @param testNGCtx
-	 * @param xmlTest
-	 * @throws Exception
 	 */
 	@Test(groups = { "ut" })
-	public void testVariablesAreGetMultipleTimesWithContextCopy(final ITestContext testNGCtx, final XmlTest xmlTest)
+	public void testVariablesAreGetMultipleTimesWithContextCopy(final ITestContext testNGCtx)
 			throws Exception {
 
 		Map<String, TestVariable> variables = new HashMap<>();
 		variables.put("key", new TestVariable("key", "val1"));
 
-		try (MockedConstruction mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServerMock, context) -> {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServerMock, context) -> {
 			when(variableServerMock.isAlive()).thenReturn(true);
 			when(variableServerMock.getVariables(0, -1)).thenReturn(variables);
 		})) {
@@ -380,12 +325,6 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 	/**
 	 * Check that with a test name containing special characters, we create an
 	 * output folder for this test whose name is the name of the test
-	 * 
-	 * @throws IllegalAccessException
-	 * @throws IllegalArgumentException
-	 * @throws NoSuchFieldException
-	 * @throws SecurityException
-	 * @throws NoSuchMethodException
 	 */
 	@Test(groups = "ut")
 	public void testNewOutputFolderWithOddTestName(final ITestContext testNGCtx) throws NoSuchMethodException,
@@ -416,19 +355,15 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 	/**
 	 * Check that when no error occurred when setting context (i.e. variable server not available)
 	 * The testResult is not set with specific attributes
-	 *
-	 * @param testNGCtx
-	 * @param xmlTest
-	 * @throws Exception
 	 */
 	@Test(groups = {"ut"})
-	public void testResultIsSetWithAttributesWhenNoErrorOccurredOnContextConfiguration(final ITestContext testNGCtx, final XmlTest xmlTest)
+	public void testResultIsSetWithAttributesWhenNoErrorOccurredOnContextConfiguration(final ITestContext testNGCtx)
 			throws Exception {
 
 		Map<String, TestVariable> variables = new HashMap<>();
 		variables.put("key", new TestVariable("key", "val1"));
 
-		try (MockedConstruction mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServerMock, context) -> {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServerMock, context) -> {
 			when(variableServerMock.isAlive()).thenReturn(true);
 			when(variableServerMock.getVariables(0, -1)).thenReturn(variables);
 		})) {
@@ -454,19 +389,12 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 	/**
 	 * Check that when error occurred when setting context (i.e. variable server not available)
 	 * The testResult is set with attributes to help with report construction later
-	 *
-	 * @param testNGCtx
-	 * @param xmlTest
-	 * @throws Exception
 	 */
 	@Test(groups = {"ut"})
-	public void testResultIsSetWithAttributesWhenErrorOccurredOnContextConfiguration(final ITestContext testNGCtx, final XmlTest xmlTest)
+	public void testResultIsSetWithAttributesWhenErrorOccurredOnContextConfiguration(final ITestContext testNGCtx)
 			throws Exception {
 
-		Map<String, TestVariable> variables = new HashMap<>();
-		variables.put("key", new TestVariable("key", "val1"));
-
-		try (MockedConstruction mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServerMock, context) -> {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServerMock, context) -> {
 			when(variableServerMock.isAlive()).thenReturn(true);
 			// Return null so the setTestConfiguration will fail
 			when(variableServerMock.getVariables(0, -1)).thenReturn(null);
@@ -482,15 +410,17 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 
 			// Since the context configuration did fail, we can assert that testResult has valued attributes
 			Assert.assertEquals(testResult.getAttribute("hasVariableServerFailed"), true);
-			Assert.assertEquals(testResult.getThrowable().getMessage(), "An error occurred while fetching variables from the SeleniumRobot Server. Test execution is skipped.");
+			Assert.assertEquals(testResult.getThrowable().getMessage(), "An error occurred while fetching variables from the SeleniumRobot Server. Test execution is skipped.: Cannot invoke \"java.util.Map.size()\" because \"m\" is null");
 
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
 		}
-	}	
-	
-	// used for generating TestResult
+	}
+
+
+	@Override
 	public void myTest() {
+		// used for generating TestResult
 	}
 }

@@ -840,7 +840,7 @@ public class SeleniumTestsContext {
 		} catch (Exception e) {
 			// If the setTestConfiguration fails, it must be an error from the SeleniumRobot Server
 			// In this case, add a flag to ensure that the test won't be executed but the Exception is displayed in the report
-			testNGResult.setThrowable(new SeleniumRobotServerException("An error occurred while fetching variables from the SeleniumRobot Server. Test execution is skipped."));
+			testNGResult.setThrowable(new SeleniumRobotServerException("An error occurred while fetching variables from the SeleniumRobot Server. Test execution is skipped.: " + e.getMessage()));
 			testNGResult.setAttribute("hasVariableServerFailed", true);
 		}
     	updateProxyConfig();
