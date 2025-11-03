@@ -410,7 +410,8 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 
 			// Since the context configuration did fail, we can assert that testResult has valued attributes
 			Assert.assertEquals(testResult.getAttribute("hasVariableServerFailed"), true);
-			Assert.assertEquals(testResult.getThrowable().getMessage(), "An error occurred while fetching variables from the SeleniumRobot Server. Test execution is skipped.: Cannot invoke \"java.util.Map.size()\" because \"m\" is null");
+			Assert.assertEquals(testResult.getThrowable().getMessage(), "An error occurred while fetching variables from the SeleniumRobot Server. Test execution is skipped.");
+			Assert.assertEquals(testResult.getThrowable().getCause().getMessage(), "Cannot invoke \"java.util.Map.size()\" because \"m\" is null");
 
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);

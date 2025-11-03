@@ -91,9 +91,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			Assert.assertTrue(mainReportContent.matches(".*class=\"testSkipped\".*<a href='testAndSubActions/TestReport\\.html'.*?>testAndSubActions</a>.*"));
 			Assert.assertTrue(mainReportContent.matches(".*class=\"testSkipped\".*<a href='testInError/TestReport\\.html'.*?>testInError</a>.*"));
 			Assert.assertTrue(mainReportContent.matches(".*class=\"testSkipped\".*<a href='testSkipped/TestReport\\.html'.*?>testSkipped</a>.*"));
-			Assert.assertTrue(testOkDetailedReport.matches(".*Execution logs {28}</div><div class=\"box-body logs\"><div class=\"message-error\"><div>class com.seleniumtests.customexception.SeleniumRobotServerException: An error occurred while fetching variables from the SeleniumRobot Server. Test execution is skipped.: cannot get variables</div>.*"));
-			Assert.assertTrue(testKoDetailedReport.matches(".*Execution logs {28}</div><div class=\"box-body logs\"><div class=\"message-error\"><div>class com.seleniumtests.customexception.SeleniumRobotServerException: An error occurred while fetching variables from the SeleniumRobot Server. Test execution is skipped.: cannot get variables</div>.*"));
-			Assert.assertTrue(testSkipDetailedReport.matches(".*Execution logs {28}</div><div class=\"box-body logs\"><div class=\"message-error\"><div>class com.seleniumtests.customexception.SeleniumRobotServerException: An error occurred while fetching variables from the SeleniumRobot Server. Test execution is skipped.: cannot get variables</div>.*"));
+			Assert.assertTrue(testOkDetailedReport.matches(".*Execution logs {28}</div><div class=\"box-body logs\"><div class=\"message-error\"><div>class com.seleniumtests.customexception.SeleniumRobotServerException: An error occurred while fetching variables from the SeleniumRobot Server. Test execution is skipped.</div>.*"));
+			Assert.assertTrue(testOkDetailedReport.matches(".*Caused by request to http://localhost:4321 failed: VARIABLE NOT FOUND.*")); // check cause is also present
+			Assert.assertTrue(testKoDetailedReport.matches(".*Execution logs {28}</div><div class=\"box-body logs\"><div class=\"message-error\"><div>class com.seleniumtests.customexception.SeleniumRobotServerException: An error occurred while fetching variables from the SeleniumRobot Server. Test execution is skipped.</div>.*"));
+			Assert.assertTrue(testSkipDetailedReport.matches(".*Execution logs {28}</div><div class=\"box-body logs\"><div class=\"message-error\"><div>class com.seleniumtests.customexception.SeleniumRobotServerException: An error occurred while fetching variables from the SeleniumRobot Server. Test execution is skipped.</div>.*"));
 			
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
