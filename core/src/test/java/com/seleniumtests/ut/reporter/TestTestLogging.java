@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import com.seleniumtests.core.SeleniumTestsContext;
 import org.apache.commons.io.FileUtils;
 import org.testng.Assert;
-import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.annotations.BeforeMethod;

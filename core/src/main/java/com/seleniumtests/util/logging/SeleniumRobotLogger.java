@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.util.logging;
 
+import com.seleniumtests.reporter.reporters.ReporterControler;
 import com.seleniumtests.util.helper.WaitHelper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -54,8 +55,8 @@ public class SeleniumRobotLogger {
 	private static final String LOG_PATTERN = " %-5p %d [%t] %C{1}: %m%n";
 
 	private static final String FILE_APPENDER_NAME = "FileLogger";
-	private static Map<String, File> testLogs = Collections.synchronizedMap(new HashMap<>());
-	private static ThreadLocal<String> loggerNames = new ThreadLocal();
+	private static final Map<String, File> testLogs = Collections.synchronizedMap(new HashMap<>());
+	private static final ThreadLocal<String> loggerNames = new ThreadLocal<>();
 	private static String outputDirectory;
 	private static String defaultOutputDirectory;
 	
@@ -88,13 +89,15 @@ public class SeleniumRobotLogger {
 			
 			// remove the logger so that a new one for the same name can be added (useful during integration tests)
 			config.removeLogger(previousName);
+			Logger logger = SeleniumRobotLogger.getLogger(ReporterControler.class);
+			logger.info("logging stopped for '{}'", previousName);
 		}
 	}
 	
 	/**
 	 * Creates a logger for a test method, so that all logs goes to a specific file
-	 * @param outputDir
-	 * @param loggerName
+	 * @param outputDir		the directory where test log file will be stored
+	 * @param loggerName	name of the logger (typically the test name)
 	 */
 	public static void createLoggerForTest(String outputDir, String loggerName) {
 
@@ -124,6 +127,17 @@ public class SeleniumRobotLogger {
 		ctx.updateLoggers();
 		loggerNames.set(loggerName);
 		testLogs.put(loggerName, logFile);
+
+		for (int i=0; i<5; i++) {
+			try {
+				Logger logger = SeleniumRobotLogger.getLogger(ReporterControler.class);
+				logger.info("logging started for '{}' on {}", loggerName, logFile);
+				break;
+			} catch (Exception e) {
+				System.out.println("logging failed for " + loggerName); // should never happen but needed for debugging
+				WaitHelper.waitForMilliSeconds(100);
+			}
+		}
 	}
 	
 	public static Logger getLoggerForTest() {
@@ -251,6 +265,7 @@ public class SeleniumRobotLogger {
 			        
 			        break;
 				} catch (Exception e) {
+					// ignore error as we retry
 				}
 			}
 
@@ -283,9 +298,10 @@ public class SeleniumRobotLogger {
 						FileUtils.deleteDirectory(directory);
 					}
 				} catch (IOException e) {
+					// no problem in case of errors
 				}
 	    	
-	    	}
+			}
 		}
 	}
 	
@@ -350,8 +366,8 @@ public class SeleniumRobotLogger {
 	/**
 	 * Returns the file containing logs for requested test name (unique test name)
 	 * or else, null
-	 * @param testName
-	 * @return
+	 * @param testName	get test name
+	 * @return	the logs for this test
 	 */
 	public static String getTestLogs(String testName) {
 		File logFile = testLogs.get(testName);
@@ -368,8 +384,8 @@ public class SeleniumRobotLogger {
 	
 	/**
 	 * Returns the log file (execution.log) for the given test name
-	 * @param testName
-	 * @return
+	 * @param testName	the test name
+	 * @return log file associated to this test
 	 */
 	public static File getTestLogsFile(String testName) {
 		return testLogs.get(testName);

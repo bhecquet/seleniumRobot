@@ -43,7 +43,7 @@ public class TestTestLogging extends ReporterTest {
 	 * Check SeleniumRobot creates log file
 	 */
 	@Test(groups = { "it" })
-	public void checkFileLogger() throws Exception {
+	public void checkFileLogger() {
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassWithWait"});
 		Assert.assertTrue(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + "/seleniumRobot.log").isFile());
 
