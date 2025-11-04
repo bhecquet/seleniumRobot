@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,20 +27,16 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.stream.Streams;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.openqa.selenium.remote.SessionId;
 import org.testng.Assert;
@@ -49,7 +45,6 @@ import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import org.testng.xml.XmlTest;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.MockitoTest;
@@ -64,7 +59,6 @@ import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.core.contexts.SeleniumRobotServerContext;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
-import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.osutility.OSUtilityWindows;
@@ -74,13 +68,13 @@ public class TestTestTasks extends MockitoTest {
 	@Mock
 	private OSUtilityWindows osUtility;
 
-	private MockedStatic mockedOsUtilityFactory;
+	private MockedStatic<OSUtilityFactory> mockedOsUtilityFactory;
 	
 	@BeforeMethod(groups= {"ut"})
 	public void init() {
 
 		mockedOsUtilityFactory = mockStatic(OSUtilityFactory.class);
-		mockedOsUtilityFactory.when(() -> OSUtilityFactory.getInstance()).thenReturn(osUtility);
+		mockedOsUtilityFactory.when(OSUtilityFactory::getInstance).thenReturn(osUtility);
 
 		when(osUtility.getProgramExtension()).thenReturn(".exe");
 	}
@@ -94,7 +88,7 @@ public class TestTestTasks extends MockitoTest {
 	 * Issue #374: Now, it's allowed to updateParam without server, check param is then available
 	 */
 	@Test(groups= {"ut"})
-	public void testUpdateVariableWithoutServer(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testUpdateVariableWithoutServer(final ITestContext testNGCtx) {
 		try {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "false");
 			initThreadContext(testNGCtx);
@@ -108,13 +102,10 @@ public class TestTestTasks extends MockitoTest {
 	/**
 	 * Check upsert of a new variable locally
 	 * Verify server is not called and configuration is updated according to the new value
-	 * @param testNGCtx
-	 * @param xmlTest
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testUpdateNewVariableLocally(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
-		try (MockedConstruction mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+	public void testUpdateNewVariableLocally(final ITestContext testNGCtx) throws Exception {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
 			when(variableServer.isAlive()).thenReturn(true);
 		})) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
@@ -125,7 +116,7 @@ public class TestTestTasks extends MockitoTest {
 			TestTasks.createOrUpdateLocalParam("key", "value");
 			
 			// check upsert has been NOT called
-			verify((SeleniumRobotVariableServerConnector)mockedVariableServer.constructed().get(0), never()).upsertVariable(new TestVariable("key", "value"), true);
+			verify(mockedVariableServer.constructed().get(0), never()).upsertVariable(new TestVariable("key", "value"), true);
 			
 			// check configuration is updated
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("key").getValue(), "value");
@@ -138,16 +129,13 @@ public class TestTestTasks extends MockitoTest {
 	/**
 	 * Check upsert of a new variable
 	 * Verify server is called and configuration is updated according to the new value
-	 * @param testNGCtx
-	 * @param xmlTest
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testUpdateNewVariable(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+	public void testUpdateNewVariable(final ITestContext testNGCtx) throws Exception {
 
 		TestVariable varToReturn = new TestVariable(10, "key", "value", false, TestVariable.TEST_VARIABLE_PREFIX + "key");
 
-		try (MockedConstruction mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
 			when(variableServer.isAlive()).thenReturn(true);
 			when(variableServer.upsertVariable(any(TestVariable.class), anyBoolean())).thenReturn(varToReturn);
 		})) {
@@ -160,7 +148,7 @@ public class TestTestTasks extends MockitoTest {
 			TestTasks.createOrUpdateParam("key", "value");
 			
 			// check upsert has been called
-			verify((SeleniumRobotVariableServerConnector)mockedVariableServer.constructed().get(0)).upsertVariable(new TestVariable("key", "value"), true);
+			verify(mockedVariableServer.constructed().get(0)).upsertVariable(new TestVariable("key", "value"), true);
 			
 			// check configuration is updated
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("key"), varToReturn);
@@ -172,15 +160,12 @@ public class TestTestTasks extends MockitoTest {
 	
 	/**
 	 * Check that if variable exists but we request a reservable variable, it's recreated so that we can have multiple variables
-	 * @param testNGCtx
-	 * @param xmlTest
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testUpdateExistingVariable(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+	public void testUpdateExistingVariable(final ITestContext testNGCtx) throws Exception {
 		TestVariable varToReturn = new TestVariable(10, "key", "value", false, TestVariable.TEST_VARIABLE_PREFIX + "key");
 
-		try (MockedConstruction mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
 			when(variableServer.isAlive()).thenReturn(true);
 			when(variableServer.upsertVariable(any(TestVariable.class), anyBoolean())).thenReturn(varToReturn);
 		})) {
@@ -194,7 +179,7 @@ public class TestTestTasks extends MockitoTest {
 			TestTasks.createOrUpdateParam("key", "value", false, 3, true);
 			
 			// check upsert has been called
-			verify((SeleniumRobotVariableServerConnector)mockedVariableServer.constructed().get(0)).upsertVariable(new TestVariable(null, "key", "value", true, "key", 3, null), false);
+			verify(mockedVariableServer.constructed().get(0)).upsertVariable(new TestVariable(null, "key", "value", true, "key", 3, null), false);
 			
 			// check configuration is updated
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("key"), varToReturn);
@@ -206,15 +191,12 @@ public class TestTestTasks extends MockitoTest {
 	
 	/**
 	 * Check that if variable exists, it's updated, if we do not request it to be reservable
-	 * @param testNGCtx
-	 * @param xmlTest
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testRecreateExistingVariableIfReservable(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+	public void testRecreateExistingVariableIfReservable(final ITestContext testNGCtx) throws Exception {
 		TestVariable varToReturn = new TestVariable(10, "key", "value", false, TestVariable.TEST_VARIABLE_PREFIX + "key");
 
-		try (MockedConstruction mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
 			when(variableServer.isAlive()).thenReturn(true);
 			when(variableServer.upsertVariable(any(TestVariable.class), anyBoolean())).thenReturn(varToReturn);
 		})) {
@@ -228,7 +210,7 @@ public class TestTestTasks extends MockitoTest {
 			TestTasks.createOrUpdateParam("key", "value", false, 3, false);
 			
 			// check upsert has been called
-			verify((SeleniumRobotVariableServerConnector)mockedVariableServer.constructed().get(0)).upsertVariable(new TestVariable(10, "key", "value", false, "key", 3, null), false);
+			verify(mockedVariableServer.constructed().get(0)).upsertVariable(new TestVariable(10, "key", "value", false, "key", 3, null), false);
 			
 			// check configuration is updated
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("key"), varToReturn);
@@ -241,15 +223,12 @@ public class TestTestTasks extends MockitoTest {
 	/**
 	 * Check upsert of a new variable which will not be version specific
 	 * Verify server is called and configuration is updated according to the new value
-	 * @param testNGCtx
-	 * @param xmlTest
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testUpdateNewVariableNotSpecificToVersion(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+	public void testUpdateNewVariableNotSpecificToVersion(final ITestContext testNGCtx) throws Exception {
 		TestVariable varToReturn = new TestVariable(10, "key", "value", false, TestVariable.TEST_VARIABLE_PREFIX + "key");
 
-		try (MockedConstruction mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
 			when(variableServer.isAlive()).thenReturn(true);
 			when(variableServer.upsertVariable(any(TestVariable.class), anyBoolean())).thenReturn(varToReturn);
 		})) {
@@ -261,7 +240,7 @@ public class TestTestTasks extends MockitoTest {
 			TestTasks.createOrUpdateParam("key", "value", false);
 			
 			// check upsert has been called
-			verify((SeleniumRobotVariableServerConnector)mockedVariableServer.constructed().get(0)).upsertVariable(new TestVariable("key", "value"), false);
+			verify(mockedVariableServer.constructed().get(0)).upsertVariable(new TestVariable("key", "value"), false);
 			
 			// check configuration is updated
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("key"), varToReturn);
@@ -273,15 +252,12 @@ public class TestTestTasks extends MockitoTest {
 	
 	/**
 	 * Check error is raised when TTL is not specified ( <= 0) for a reservable variable
-	 * @param testNGCtx
-	 * @param xmlTest
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"}, expectedExceptions=ScenarioException.class)
-	public void testUpdateReservableVariableWithoutTTL(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+	public void testUpdateReservableVariableWithoutTTL(final ITestContext testNGCtx) throws Exception {
 		TestVariable varToReturn = new TestVariable(10, "key", "value", false, TestVariable.TEST_VARIABLE_PREFIX + "key");
 
-		try (MockedConstruction mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
 			when(variableServer.isAlive()).thenReturn(true);
 			when(variableServer.upsertVariable(any(TestVariable.class), anyBoolean())).thenReturn(varToReturn);
 		})) {
@@ -300,15 +276,12 @@ public class TestTestTasks extends MockitoTest {
 	
 	/**
 	 * Check that if TTL and reservable is set, all information are passer to server
-	 * @param testNGCtx
-	 * @param xmlTest
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testUpdateReservableVariableWithTTL(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+	public void testUpdateReservableVariableWithTTL(final ITestContext testNGCtx) throws Exception {
 		TestVariable varToReturn = new TestVariable(10, "key", "value", false, TestVariable.TEST_VARIABLE_PREFIX + "key");
 
-		try (MockedConstruction mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
 			when(variableServer.isAlive()).thenReturn(true);
 			when(variableServer.upsertVariable(any(TestVariable.class), anyBoolean())).thenReturn(varToReturn);
 		})) {
@@ -320,7 +293,7 @@ public class TestTestTasks extends MockitoTest {
 			TestTasks.createOrUpdateParam("key", "value", false, 1, true);
 			
 			// check upsert has been called
-			verify((SeleniumRobotVariableServerConnector)mockedVariableServer.constructed().get(0)).upsertVariable(new TestVariable(null, "key", "value", true, "key", 1, null), false);
+			verify(mockedVariableServer.constructed().get(0)).upsertVariable(new TestVariable(null, "key", "value", true, "key", 1, null), false);
 			
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
@@ -329,7 +302,7 @@ public class TestTestTasks extends MockitoTest {
 	}
 
 	@Test(groups= {"ut"})
-	public void testDeleteVariableWithoutServer(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testDeleteVariableWithoutServer(final ITestContext testNGCtx) {
 		try {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "false");
 			initThreadContext(testNGCtx);
@@ -340,8 +313,8 @@ public class TestTestTasks extends MockitoTest {
 	}
 
 	@Test(groups= {"ut"})
-	public void testDeleteVariable(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
-		try (MockedConstruction mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+	public void testDeleteVariable(final ITestContext testNGCtx) throws Exception {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
 			when(variableServer.isAlive()).thenReturn(true);
 		})) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
@@ -353,7 +326,7 @@ public class TestTestTasks extends MockitoTest {
 			TestTasks.deleteParam("key");
 
 			// check upsert has been called
-			verify((SeleniumRobotVariableServerConnector)mockedVariableServer.constructed().get(0)).deleteVariable(new TestVariable(1, "key", "value", true, "key", 1, null));
+			verify(mockedVariableServer.constructed().get(0)).deleteVariable(new TestVariable(1, "key", "value", true, "key", 1, null));
 			Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("key"));
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
@@ -363,13 +336,10 @@ public class TestTestTasks extends MockitoTest {
 
 	/**
 	 * If variable has no id, do not try to delete it from server
-	 * @param testNGCtx
-	 * @param xmlTest
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testDeleteVariableNoId(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
-		try (MockedConstruction mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+	public void testDeleteVariableNoId(final ITestContext testNGCtx) throws Exception {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
 			when(variableServer.isAlive()).thenReturn(true);
 		})) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
@@ -381,7 +351,7 @@ public class TestTestTasks extends MockitoTest {
 			TestTasks.deleteParam("key");
 
 			// check upsert has been called
-			verify((SeleniumRobotVariableServerConnector)mockedVariableServer.constructed().get(0), never()).deleteVariable(new TestVariable(1, "key", "value", true, "key", 1, null));
+			verify(mockedVariableServer.constructed().get(0), never()).deleteVariable(new TestVariable(1, "key", "value", true, "key", 1, null));
 			Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("key"));
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
@@ -390,8 +360,8 @@ public class TestTestTasks extends MockitoTest {
 	}
 
 	@Test(groups= {"ut"})
-	public void testDeleteVariableNotPresent(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
-		try (MockedConstruction mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+	public void testDeleteVariableNotPresent(final ITestContext testNGCtx) throws Exception {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
 			when(variableServer.isAlive()).thenReturn(true);
 		})) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
@@ -402,7 +372,7 @@ public class TestTestTasks extends MockitoTest {
 			TestTasks.deleteParam("key");
 
 			// check upsert has been called
-			verify((SeleniumRobotVariableServerConnector)mockedVariableServer.constructed().get(0), never()).deleteVariable(new TestVariable(1, "key", "value", true, "key", 1, null));
+			verify(mockedVariableServer.constructed().get(0), never()).deleteVariable(new TestVariable(1, "key", "value", true, "key", 1, null));
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
@@ -431,8 +401,8 @@ public class TestTestTasks extends MockitoTest {
 		// grid connector is in use only if session Id exists
 		doReturn(new SessionId("1234")).when(gridConnector).getSessionId();
 
-		try (MockedStatic mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
-			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd"))).thenReturn(Arrays.asList(gridConnector));
+		try (MockedStatic<SeleniumGridConnectorFactory> mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
+			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(List.of("http://localhost:4444/hub/wd"))).thenReturn(List.of(gridConnector));
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/hub/wd");
 			initThreadContext(testNGCtx);
@@ -451,15 +421,14 @@ public class TestTestTasks extends MockitoTest {
 	/**
 	 * Test when the grid connector is not initialized
 	 * When grid connector does not return any sessionId, it's not active
-	 * @param testNGCtx
 	 */
 	@Test(groups= {"ut"}, expectedExceptions=ScenarioException.class)
 	public void testKillProcessGridNotUsed(final ITestContext testNGCtx) {
 		SeleniumGridConnector gridConnector = spy(new SeleniumRobotGridConnector("http://localhost:4444/hub/wd"));
 		doNothing().when(gridConnector).killProcess("some_process");
 
-		try (MockedStatic mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
-			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd"))).thenReturn(Arrays.asList(gridConnector));
+		try (MockedStatic<SeleniumGridConnectorFactory> mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
+			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(List.of("http://localhost:4444/hub/wd"))).thenReturn(List.of(gridConnector));
 
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/hub/wd");
@@ -478,14 +447,13 @@ public class TestTestTasks extends MockitoTest {
 	
 	/**
 	 * Test kill process is not called when not using local or grid mode
-	 * @param testNGCtx
 	 */
 	@Test(groups= {"ut"})
 	public void testKillProcessOtherRunMode(final ITestContext testNGCtx) {
 		SeleniumGridConnector gridConnector = spy(new SeleniumRobotGridConnector("http://saucelabs:4444/hub/wd"));
 
-		try (MockedStatic mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
-			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://saucelabs:4444/hub/wd"))).thenReturn(Arrays.asList(gridConnector));
+		try (MockedStatic<SeleniumGridConnectorFactory> mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
+			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(List.of("http://saucelabs:4444/hub/wd"))).thenReturn(List.of(gridConnector));
 
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "saucelabs");
 			System.setProperty(SeleniumTestsContext.PLATFORM, "windows");
@@ -520,13 +488,13 @@ public class TestTestTasks extends MockitoTest {
 	@Test(groups= {"ut"})
 	public void testGetProcessListGrid(final ITestContext testNGCtx) {
 		SeleniumGridConnector gridConnector = spy(new SeleniumRobotGridConnector("http://localhost:4444/hub/wd"));
-		doReturn(Arrays.asList(10, 20)).when(gridConnector).getProcessList("some_process");
+		doReturn(List.of(10, 20)).when(gridConnector).getProcessList("some_process");
 		
 		// grid connector is in use only if session Id exists
 		doReturn(new SessionId("1234")).when(gridConnector).getSessionId();
 
-		try (MockedStatic mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
-			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd"))).thenReturn(Arrays.asList(gridConnector));
+		try (MockedStatic<SeleniumGridConnectorFactory> mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
+			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(List.of("http://localhost:4444/hub/wd"))).thenReturn(List.of(gridConnector));
 
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/hub/wd");
@@ -546,15 +514,14 @@ public class TestTestTasks extends MockitoTest {
 	/**
 	 * Test when the grid connector is not initialized
 	 * When grid connector does not return any sessionId, it's not active
-	 * @param testNGCtx
 	 */
 	@Test(groups= {"ut"}, expectedExceptions=ScenarioException.class)
 	public void testGetProcessListGridNotUsed(final ITestContext testNGCtx) {
 		SeleniumGridConnector gridConnector = spy(new SeleniumRobotGridConnector("http://localhost:4444/hub/wd"));
-		doReturn(Arrays.asList(10, 20)).when(gridConnector).getProcessList("some_process");
+		doReturn(List.of(10, 20)).when(gridConnector).getProcessList("some_process");
 
-		try (MockedStatic mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
-			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd"))).thenReturn(Arrays.asList(gridConnector));
+		try (MockedStatic<SeleniumGridConnectorFactory> mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
+			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(List.of("http://localhost:4444/hub/wd"))).thenReturn(List.of(gridConnector));
 
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/hub/wd");
@@ -573,14 +540,13 @@ public class TestTestTasks extends MockitoTest {
 	
 	/**
 	 * Test kill process is not called when not using local or grid mode
-	 * @param testNGCtx
 	 */
 	@Test(groups= {"ut"}, expectedExceptions=ScenarioException.class)
 	public void testGetProcessListOtherRunMode(final ITestContext testNGCtx) {
 		SeleniumGridConnector gridConnector = spy(new SeleniumRobotGridConnector("http://saucelabs:4444/hub/wd"));
 
-		try (MockedStatic mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
-			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://saucelabs:4444/hub/wd"))).thenReturn(Arrays.asList(gridConnector));
+		try (MockedStatic<SeleniumGridConnectorFactory> mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
+			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(List.of("http://saucelabs:4444/hub/wd"))).thenReturn(List.of(gridConnector));
 
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "saucelabs");
 			System.setProperty(SeleniumTestsContext.PLATFORM, "windows");
@@ -598,7 +564,7 @@ public class TestTestTasks extends MockitoTest {
 	
 	@Test(groups= {"ut"})
 	public void testExecuteCommandLocal(final ITestContext testNGCtx) {
-		try (MockedStatic mockedOsCommand = mockStatic(OSCommand.class)) {
+		try (MockedStatic<OSCommand> mockedOsCommand = mockStatic(OSCommand.class)) {
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "local");
 			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(ArgumentMatchers.any(String[].class), eq(-1), isNull())).thenReturn("hello guys");
 			initThreadContext(testNGCtx);
@@ -613,7 +579,7 @@ public class TestTestTasks extends MockitoTest {
 	
 	@Test(groups= {"ut"})
 	public void testExecuteCommandLocalWithTimeout(final ITestContext testNGCtx) {
-		try (MockedStatic mockedOsCommand = mockStatic(OSCommand.class)) {
+		try (MockedStatic<OSCommand> mockedOsCommand = mockStatic(OSCommand.class)) {
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "local");
 			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(ArgumentMatchers.any(String[].class), eq(35), isNull())).thenReturn("hello guys");
 			initThreadContext(testNGCtx);
@@ -635,8 +601,8 @@ public class TestTestTasks extends MockitoTest {
 		// grid connector is in use only if session Id exists
 		doReturn(new SessionId("1234")).when(gridConnector).getSessionId();
 
-		try (MockedStatic mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
-			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd"))).thenReturn(Arrays.asList(gridConnector));
+		try (MockedStatic<SeleniumGridConnectorFactory> mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
+			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(List.of("http://localhost:4444/hub/wd"))).thenReturn(List.of(gridConnector));
 
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/hub/wd");
@@ -661,8 +627,8 @@ public class TestTestTasks extends MockitoTest {
 		// grid connector is in use only if session Id exists
 		doReturn(new SessionId("1234")).when(gridConnector).getSessionId();
 
-		try (MockedStatic mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
-			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd"))).thenReturn(Arrays.asList(gridConnector));
+		try (MockedStatic<SeleniumGridConnectorFactory> mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
+			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(List.of("http://localhost:4444/hub/wd"))).thenReturn(List.of(gridConnector));
 
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/hub/wd");
@@ -681,15 +647,14 @@ public class TestTestTasks extends MockitoTest {
 	/**
 	 * Test when the grid connector is not initialized
 	 * When grid connector does not return any sessionId, it's not active
-	 * @param testNGCtx
 	 */
 	@Test(groups= {"ut"}, expectedExceptions=ScenarioException.class)
 	public void testExecuteCommandNotUsed(final ITestContext testNGCtx) {
 		SeleniumGridConnector gridConnector = spy(new SeleniumRobotGridConnector("http://localhost:4444/hub/wd"));
 		doReturn("hello guys").when(gridConnector).executeCommand("echo", "hello");
 
-		try (MockedStatic mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
-			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd"))).thenReturn(Arrays.asList(gridConnector));
+		try (MockedStatic<SeleniumGridConnectorFactory> mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
+			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(List.of("http://localhost:4444/hub/wd"))).thenReturn(List.of(gridConnector));
 
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/hub/wd");
@@ -706,14 +671,13 @@ public class TestTestTasks extends MockitoTest {
 	
 	/**
 	 * Test kill process is not called when not using local or grid mode
-	 * @param testNGCtx
 	 */
 	@Test(groups= {"ut"}, expectedExceptions=ScenarioException.class)
 	public void testExecuteCommandOtherRunMode(final ITestContext testNGCtx) {
 		SeleniumGridConnector gridConnector = spy(new SeleniumRobotGridConnector("http://saucelabs:4444/hub/wd"));
 
-		try (MockedStatic mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
-			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://saucelabs:4444/hub/wd"))).thenReturn(Arrays.asList(gridConnector));
+		try (MockedStatic<SeleniumGridConnectorFactory> mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
+			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(List.of("http://saucelabs:4444/hub/wd"))).thenReturn(List.of(gridConnector));
 
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "saucelabs");
 			System.setProperty(SeleniumTestsContext.PLATFORM, "windows");
@@ -730,24 +694,18 @@ public class TestTestTasks extends MockitoTest {
 	
 	/**
 	 * It should not be possible to create a manual step when automatic steps are enabled
-	 * @param testNGCtx
-	 * @param xmlTest
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"}, expectedExceptions=ConfigurationException.class)
-	public void testAddManualStepInAutomaticMode(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+	public void testAddManualStepInAutomaticMode() {
 		TestTasks.addStep("foo");
 
 	}
 	
 	/**
 	 * Creation of a manual step, check it's written
-	 * @param testNGCtx
-	 * @param xmlTest
-	 * @throws Exception
 	 */
 	@Test(groups= {"ut"})
-	public void testAddManualStepInManualMode(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+	public void testAddManualStepInManualMode() {
 		try {
 			SeleniumTestsContextManager.getThreadContext().setManualTestSteps(true);
 			TestTasks.addStep("foo");
@@ -757,7 +715,7 @@ public class TestTestTasks extends MockitoTest {
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(0).getAction(), "foo");
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(0).getOrigin(), TestTestTasks.class); // check origin is the class that made the call
 		} finally {
-			GenericTest.resetTestNGREsultAndLogger();
+			GenericTest.resetTestNGResultAndLogger();
 		}
 	}
 	
@@ -913,9 +871,9 @@ public class TestTestTasks extends MockitoTest {
 
 	@Test(groups= {"ut"})
 	public void testDownloadFileLocal(final ITestContext testNGCtx) {
-		try (MockedStatic mockedFiles = mockStatic(Files.class)) {
+		try (MockedStatic<Files> mockedFiles = mockStatic(Files.class)) {
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "local");
-			mockedFiles.when(() -> Files.list(any(Path.class))).thenReturn(List.of(new File("file1.pdf").toPath(), new File("file2.pdf").toPath()).stream());
+			mockedFiles.when(() -> Files.list(any(Path.class))).thenReturn(Stream.of(new File("file1.pdf").toPath(), new File("file2.pdf").toPath()));
 			initThreadContext(testNGCtx);
 			File file = TestTasks.getDownloadedFile("file1.pdf");
 			Assert.assertEquals(file.getName(), "file1.pdf");
@@ -925,11 +883,10 @@ public class TestTestTasks extends MockitoTest {
 	}
 	@Test(groups= {"ut"})
 	public void testDownloadFileLocalNoFile(final ITestContext testNGCtx) {
-		try (MockedStatic mockedFiles = mockStatic(Files.class)) {
+		try (MockedStatic<Files> mockedFiles = mockStatic(Files.class)) {
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "local");
-			mockedFiles.when(() -> Files.list(any(Path.class))).thenAnswer((Answer<Stream>) invocation -> {
-                return new ArrayList<>().stream();
-            }
+			mockedFiles.when(() -> Files.list(any(Path.class)))
+					.thenAnswer((Answer<Stream<Path>>) invocation -> new ArrayList<Path>().stream()
             );
 			initThreadContext(testNGCtx);
 			Instant start = Instant.now();
@@ -943,11 +900,10 @@ public class TestTestTasks extends MockitoTest {
 
 	/**
 	 * Exception thrown when accessing file system
-	 * @param testNGCtx
 	 */
 	@Test(groups= {"ut"})
 	public void testDownloadFileLocalNoFile2(final ITestContext testNGCtx) {
-		try (MockedStatic mockedFiles = mockStatic(Files.class)) {
+		try (MockedStatic<Files> mockedFiles = mockStatic(Files.class)) {
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "local");
 			mockedFiles.when(() -> Files.list(any(Path.class))).thenThrow(new IOException());
 			initThreadContext(testNGCtx);
@@ -962,20 +918,15 @@ public class TestTestTasks extends MockitoTest {
 
 	/**
 	 * If file in not present immediately, wait for it
-	 * @param testNGCtx
 	 */
 	@Test(groups= {"ut"})
 	public void testDownloadFileLocalWithTimeout(final ITestContext testNGCtx) {
-		try (MockedStatic mockedFiles = mockStatic(Files.class)) {
+		try (MockedStatic<Files> mockedFiles = mockStatic(Files.class)) {
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "local");
-			mockedFiles.when(() -> Files.list(any(Path.class))).thenAnswer((Answer<Stream>) invocation -> {
-						return new ArrayList<>().stream();
-					}
-			).thenAnswer((Answer<Stream>) invocation -> {
-				return List.of(new File("file1.pdf").toPath()).stream();
-			});
+			mockedFiles.when(() -> Files.list(any(Path.class)))
+					.thenAnswer((Answer<Stream<Path>>) invocation -> new ArrayList<Path>().stream())
+					.thenAnswer((Answer<Stream<Path>>) invocation -> Stream.of(new File("file1.pdf").toPath()));
 			initThreadContext(testNGCtx);
-			Instant start = Instant.now();
 			File file = TestTasks.getDownloadedFile("file1.pdf");
 			Assert.assertEquals(file.getName(), "file1.pdf");
 		} finally {
@@ -1001,8 +952,8 @@ public class TestTestTasks extends MockitoTest {
 	@Test(groups= {"ut"} ,expectedExceptions = ScenarioException.class, expectedExceptionsMessageRegExp = "No grid connector active")
 	public void testDownloadFileGridNoGrid(final ITestContext testNGCtx) {
 
-		try (MockedStatic mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
-			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd"))).thenReturn(new ArrayList<>());
+		try (MockedStatic<SeleniumGridConnectorFactory> mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
+			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(List.of("http://localhost:4444/hub/wd"))).thenReturn(new ArrayList<>());
 
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/hub/wd");
@@ -1019,7 +970,6 @@ public class TestTestTasks extends MockitoTest {
 
 	/**
 	 * In case download takes time, wait until 10 secs
-	 * @param testNGCtx
 	 */
 	@Test(groups= {"ut"})
 	public void testDownloadBigFile(final ITestContext testNGCtx) {
@@ -1031,8 +981,8 @@ public class TestTestTasks extends MockitoTest {
 		// grid connector is in use only if session Id exists
 		doReturn(new SessionId("1234")).when(gridConnector).getSessionId();
 
-		try (MockedStatic mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
-			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd"))).thenReturn(Arrays.asList(gridConnector));
+		try (MockedStatic<SeleniumGridConnectorFactory> mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
+			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(List.of("http://localhost:4444/hub/wd"))).thenReturn(List.of(gridConnector));
 
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/hub/wd");
@@ -1058,8 +1008,8 @@ public class TestTestTasks extends MockitoTest {
 		// grid connector is in use only if session Id exists
 		doReturn(new SessionId("1234")).when(gridConnector).getSessionId();
 
-		try (MockedStatic mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
-			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd"))).thenReturn(Arrays.asList(gridConnector));
+		try (MockedStatic<SeleniumGridConnectorFactory> mockedGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
+			mockedGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(List.of("http://localhost:4444/hub/wd"))).thenReturn(List.of(gridConnector));
 
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/hub/wd");

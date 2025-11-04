@@ -420,7 +420,7 @@ public class TestWebUIDriver extends MockitoTest {
 				doAnswer(invocation -> {
 					throw new IOException("Remotely closed"); // simulate the case where CDP connection cannot be established
 				}).when(augmenter).augment(any());
-			});
+			})
 		) {
 
 
@@ -1027,6 +1027,6 @@ return eventDriver2;
 	public void destroyDriver() {
 		WebUIDriver.cleanUp();
 
-		GenericTest.resetTestNGREsultAndLogger();
+		GenericTest.resetTestNGResultAndLogger();
 	}
 }

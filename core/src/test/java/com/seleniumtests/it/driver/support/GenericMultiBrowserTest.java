@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,6 +26,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -47,7 +48,6 @@ import com.seleniumtests.CaptureVideo;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.WebTestPageServer;
-import com.seleniumtests.browserfactory.SeleniumGridDriverFactory;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -64,8 +64,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	protected BrowserType browserType;
 	
 	private WebTestPageServer server;
-	private String localAddress;
-	private String proxyType;
+    private String proxyType;
 	protected WebDriver driver;
 	protected DriverTestPage testPage;
 	protected DriverTestPageNativeActions testPageNativeActions;
@@ -78,7 +77,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	protected DriverPDFPage testPdfPage;
 	protected ITestContext testNGCtx;
 	private SeleniumGridConnector seleniumGridConnector;
-	private String testPageName;
+	private final String testPageName;
 	protected String testPageUrl;
 	private String seleniumGridUrl = null;
 	
@@ -86,17 +85,17 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(GenericMultiBrowserTest.class);
 	
 
-	public GenericMultiBrowserTest(WebDriver driver, DriverTestPage testPage) throws Exception {
+	public GenericMultiBrowserTest(WebDriver driver, DriverTestPage testPage) {
 		this.driver = driver;
 		this.testPage = testPage;
 		this.testPageName = "DriverTestPage";
 	}
 
-	public GenericMultiBrowserTest(BrowserType browserType, String testPageName) throws Exception {
+	public GenericMultiBrowserTest(BrowserType browserType, String testPageName) {
 		this(browserType, testPageName, null, null);
 	}
 	
-	public GenericMultiBrowserTest(BrowserType browserType, String testPageName, String seleniumGridUrl, String proxyType) throws Exception {
+	public GenericMultiBrowserTest(BrowserType browserType, String testPageName, String seleniumGridUrl, String proxyType) {
 		this.browserType = browserType; 
 		this.testPageName = testPageName;
 		this.seleniumGridUrl = seleniumGridUrl;
@@ -159,7 +158,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 		
 		server = new WebTestPageServer();
 		server.exposeTestPage();
-		localAddress = server.getLocalAddress();
+        String localAddress = server.getLocalAddress();
 		
 		initThreadContext(testNGCtx);
 		initBeforeMethod();
@@ -201,6 +200,8 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 					testPageUrl = String.format("http://%s:%d/testpdf.html", localAddress, server.getServerHost().getPort());
 					testPdfPage = new DriverPDFPage(testPageUrl);
 					break;
+				default:
+					logger.error("Unknown test page: {}", testPageName);
 			}
 		} catch (SeleniumGridNodeNotAvailable e) {
 			throw new SkipException("No grid available, tests won't be run");
@@ -236,22 +237,20 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 
 	@AfterMethod(groups={"it", "ut", "upload", "ie"})
 	public void cleanAlert() {
-		GenericTest.resetTestNGREsultAndLogger();
+		GenericTest.resetTestNGResultAndLogger();
 		if (driver == null) {
 			return;
 		}
 		try {
 			driver.switchTo().alert().accept();
 		} catch (WebDriverException e) {
-			
+			// ignore error
 		}
 
 	}
 
 	/**
 	 * Takes a screenshot and write it to logs as base64 string
-	 * @throws AWTException
-	 * @throws IOException
 	 */
 	//@AfterMethod(groups={"it", "ut", "upload", "ie"}, alwaysRun = true)
 	protected void takeScreenshot(ITestResult testResult) throws AWTException, IOException {
@@ -270,7 +269,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 		    OutputStream b64 = new Base64OutputStream(os);
 		    
 		    ImageIO.write(bi, "png", b64);
-		    logger.error(os.toString("UTF-8"));
+		    logger.error(os.toString(StandardCharsets.UTF_8));
 		}
 	}
 }

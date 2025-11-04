@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,8 +16,6 @@
  * limitations under the License.
  */
 package com.seleniumtests.it.driver;
-
-import java.io.IOException;
 
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
@@ -36,23 +34,22 @@ import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 
 public class TestCustomEventFiringWebDriver2 extends GenericMultiBrowserTest {
-	
-	
-	private final String browserName = "chrome";
-	
-	public TestCustomEventFiringWebDriver2(WebDriver driver, DriverTestPage testPage) throws Exception {
+
+
+    public TestCustomEventFiringWebDriver2(WebDriver driver, DriverTestPage testPage) {
 		super(driver, testPage);
 	}
 	
-	public TestCustomEventFiringWebDriver2() throws Exception {
+	public TestCustomEventFiringWebDriver2() {
 		super(BrowserType.CHROME, "DriverTestPage");  
 	}
 	
 	@BeforeMethod(groups={"it"})
-	public void initDriver(final ITestContext testNGCtx, final ITestResult testResult) throws Exception {
+	public void initDriver(final ITestContext testNGCtx, final ITestResult testResult)  {
 		initThreadContext(testNGCtx, null, testResult);
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
-		SeleniumTestsContextManager.getThreadContext().setBrowser(browserName);
+        String browserName = "chrome";
+        SeleniumTestsContextManager.getThreadContext().setBrowser(browserName);
 		SeleniumTestsContextManager.getThreadContext().setSnapshotBottomCropping(0); // no cropping at all
 		SeleniumTestsContextManager.getThreadContext().setSnapshotTopCropping(0); // no cropping at all
 //		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://127.0.0.1:4444/wd/hub");
@@ -70,24 +67,23 @@ public class TestCustomEventFiringWebDriver2 extends GenericMultiBrowserTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testFixedHeaderFooterDimensions() throws IOException {
+	public void testFixedHeaderFooterDimensions() {
 		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getTopFixedHeaderSize(), (Long)7L);
 		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getBottomFixedFooterSize(), (Long)6L);
 	}
 	
 	/**
 	 * issue #481: check that when header or footer has a height > 50% of viewport height, it's not considered as a header anymore
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
-	public void testFixedBigHeaderFooterDimensionsFullHeight() throws IOException {
+	public void testFixedBigHeaderFooterDimensionsFullHeight() {
 		driver.manage().window().setSize(new Dimension(500, 700));
 		testPage.veryBigHeaderButton.click();
 		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getTopFixedHeaderSize(), (Long)0L);
 	}
 	
 	@Test(groups={"it"})
-	public void testFixedBigHeaderFooterDimensionsFullHeight2() throws IOException {
+	public void testFixedBigHeaderFooterDimensionsFullHeight2() {
 		driver.manage().window().setSize(new Dimension(500, 700));
 		testPage.veryBigFooterButton.click();
 		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getBottomFixedFooterSize(), (Long)0L);
@@ -95,10 +91,9 @@ public class TestCustomEventFiringWebDriver2 extends GenericMultiBrowserTest {
 	
 	/**
 	 * issue #481: check that when header or footer has a height < 50% of viewport height, it's considered as a header / footer
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
-	public void testFixedBigHeaderFooterDimensionsPartialHeight() throws IOException {
+	public void testFixedBigHeaderFooterDimensionsPartialHeight() {
 		testPage.veryBigHeaderButton.click();
 		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getTopFixedHeaderSize(), (Long)300L);
 		testPage.veryBigFooterButton.click();
@@ -107,10 +102,9 @@ public class TestCustomEventFiringWebDriver2 extends GenericMultiBrowserTest {
 	
 	/**
 	 * issue #443
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
-	public void testFixedHeaderFooterDimensionsPartialWidth() throws IOException {
+	public void testFixedHeaderFooterDimensionsPartialWidth() {
 		driver.manage().window().setSize(new Dimension(500, 700));
 		testPage.bigHeaderButton.click();
 		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getTopFixedHeaderSize(), (Long)40L);
@@ -120,10 +114,9 @@ public class TestCustomEventFiringWebDriver2 extends GenericMultiBrowserTest {
 	
 	/**
 	 * issue #443: Check that if footer is less than 50% of page width, we do not consider it as fixed
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
-	public void testFixedHeaderFooterDimensionsFullWidth() throws IOException {
+	public void testFixedHeaderFooterDimensionsFullWidth() {
 		testPage.bigHeaderButton.click();
 		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getTopFixedHeaderSize(), (Long)7L);
 		testPage.bigFooterButton.click();

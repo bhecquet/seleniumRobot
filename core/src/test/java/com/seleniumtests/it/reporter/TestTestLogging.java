@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,7 +23,6 @@ import java.util.List;
 
 import com.seleniumtests.util.helper.WaitHelper;
 import org.testng.Assert;
-import org.testng.ITestContext;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -32,18 +31,16 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.it.core.aspects.CalcPage;
 import com.seleniumtests.reporter.logger.TestStep;
-import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class TestTestLogging extends ReporterTest {
 
 	@BeforeMethod(groups={"ut"})
 	public void reset() {
-		GenericTest.resetTestNGREsultAndLogger();
+		GenericTest.resetTestNGResultAndLogger();
 	}
 	
 	/**
 	 * Check SeleniumRobot creates log file
-	 * @throws Exception
 	 */
 	@Test(groups = { "it" })
 	public void checkFileLogger() throws Exception {
@@ -62,7 +59,6 @@ public class TestTestLogging extends ReporterTest {
 	/**
 	 * Checks logs are correctly extracted from seleniumRobot.log file
 	 * One test at a time
-	 * @throws Exception
 	 */
 	@Test(groups = { "it" })
 	public void checkLogParsing() throws Exception {
@@ -73,7 +69,6 @@ public class TestTestLogging extends ReporterTest {
 	/**
 	 * Checks logs are correctly extracted from seleniumRobot.log file
 	 * Several tests run at the same time
-	 * @throws Exception
 	 */
 	@Test(groups = { "it" })
 	public void checkLogParsingWithThreads() throws Exception {
@@ -105,7 +100,6 @@ public class TestTestLogging extends ReporterTest {
 	/**
 	 * Checks logs are correctly extracted from seleniumRobot.log file when test is executed with pages
 	 * One test at a time
-	 * @throws Exception
 	 */
 	@Test(groups = { "it" })
 	public void checkTestStepHandling() throws Exception {
@@ -120,15 +114,13 @@ public class TestTestLogging extends ReporterTest {
 
 	/**
 	 * Check that manual steps create steps and no other steps are created
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testManualSteps(ITestContext testContext) throws Exception {
+	public void testManualSteps() {
 		
 		SeleniumTestsContextManager.getThreadContext().setManualTestSteps(true);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		GenericTest.resetTestNGREsultAndLogger();
+		GenericTest.resetTestNGResultAndLogger();
 		
 		try {
 			TestTasks.addStep("Tests start");
@@ -136,7 +128,9 @@ public class TestTestLogging extends ReporterTest {
 			
 			TestTasks.addStep("assert exception");
 			cPage.assertAction();
-		} catch (AssertionError e) {}
+		} catch (AssertionError e) {
+			// ignore
+		}
 		
 		// equivalent of "SeleniumRobotTestListener.logLastStep()"
 		TestTasks.addStep(null);

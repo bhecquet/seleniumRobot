@@ -1,7 +1,5 @@
 package com.seleniumtests;
 
-import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
-import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtility;
 import org.apache.commons.io.FileUtils;
@@ -11,10 +9,6 @@ import org.testng.annotations.AfterMethod;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class ParentTest {
 
@@ -23,27 +17,27 @@ public class ParentTest {
     @AfterMethod(groups={"ut", "it", "ut context2", "ie"}, alwaysRun=true)
     public void resetTest(ITestContext testContext) {
         System.clearProperty("applicationName");
-        resetTestNGREsultAndLogger();
+        resetTestNGResultAndLogger();
         OSUtility.resetInstalledBrowsersWithVersion();
 
         File outputDirectory = new File(testContext.getOutputDirectory()).getParentFile();
         if ("true".equals(System.getProperty(SeleniumRobotLogger.MAVEN_EXECUTION))) {
             try {
-                logger.info("delete output directory: " + outputDirectory);
+                logger.info("delete output directory: {}", outputDirectory);
                 FileUtils.deleteDirectory(outputDirectory);
             } catch (IOException e) {
-                logger.error("Cannot delete output directory: " + outputDirectory, e.getMessage());
+                logger.error("Cannot delete output directory: {}: {}", outputDirectory, e.getMessage());
             }
         }
     }
 
-    public static void resetTestNGREsultAndLogger() {
+    public static void resetTestNGResultAndLogger() {
         resetCurrentTestResult();
 
         try {
             SeleniumRobotLogger.reset();
         } catch (IOException e) {
-            logger.error("Cannot delete log file" + e.getMessage());
+            logger.error("Cannot delete log file {}", e.getMessage());
         }
     }
 

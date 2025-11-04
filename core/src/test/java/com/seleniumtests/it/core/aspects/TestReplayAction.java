@@ -26,9 +26,9 @@ public class TestReplayAction extends GenericDriverTest {
     private DriverTestPage testPage;
 
     @BeforeMethod(groups = {"ut"})
-    public void initDriver(final ITestContext testNGCtx) throws Exception {
+    public void initDriver(final ITestContext testNGCtx) {
 
-        GenericTest.resetTestNGREsultAndLogger();
+        GenericTest.resetTestNGResultAndLogger();
         initThreadContext(testNGCtx);
         SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
         SeleniumTestsContextManager.getThreadContext().setReplayTimeout(3);

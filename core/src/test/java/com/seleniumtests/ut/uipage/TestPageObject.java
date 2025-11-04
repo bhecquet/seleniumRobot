@@ -13,9 +13,9 @@ import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 public class TestPageObject extends GenericDriverTest {
 
 	@BeforeMethod(groups={"ut"})
-	public void initDriver(final ITestContext testNGCtx) throws Exception {
+	public void initDriver(final ITestContext testNGCtx) {
 
-		GenericTest.resetTestNGREsultAndLogger();
+		GenericTest.resetTestNGResultAndLogger();
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser(null);
 		

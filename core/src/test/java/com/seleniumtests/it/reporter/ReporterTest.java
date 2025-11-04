@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,7 +24,6 @@ import java.net.Inet4Address;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,14 +86,14 @@ public class ReporterTest extends ConnectorsTest {
 
     @BeforeMethod(groups={"it"})
     public void setLogs(Method method, ITestContext context) {
-        GenericTest.resetTestNGREsultAndLogger();
+        GenericTest.resetTestNGResultAndLogger();
 
         SeleniumTestsContext.resetOutputFolderNames();
         FileUtils.deleteQuietly(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()));
         StatisticsStorage.reset();
     }
 
-    protected List<String> executeSubTest(String[] testClasses) throws IOException {
+    protected List<String> executeSubTest(String[] testClasses) {
         return executeSubTest(1, testClasses);
     }
 
@@ -102,7 +101,7 @@ public class ReporterTest extends ConnectorsTest {
      * Execute stub tests using TestNG runner and make SeleniumTestsReporter a listener so that
      * a report is generated
      */
-    protected List<String> executeSubTest(int threadCount, String[] testClasses) throws IOException {
+    protected List<String> executeSubTest(int threadCount, String[] testClasses) {
         return executeSubTest(threadCount, testClasses, XmlSuite.ParallelMode.METHODS, new String[] {});
     }
 
@@ -114,7 +113,7 @@ public class ReporterTest extends ConnectorsTest {
      * @param methods			If methods is not empty, then testClasses must contain only one element.
      * @return the list of tests
      */
-    public static List<String> executeSubTest(int threadCount, String[] testClasses, XmlSuite.ParallelMode parallelMode, String[] methods) throws IOException {
+    public static List<String> executeSubTest(int threadCount, String[] testClasses, XmlSuite.ParallelMode parallelMode, String[] methods) {
 
         List<String> testList = new ArrayList<>();
 

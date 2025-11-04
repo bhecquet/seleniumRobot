@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,9 +46,9 @@ public class TestLogActions2 extends GenericDriverTest {
 	private DriverTestPage testPage;
 
 	@BeforeMethod(groups = {"ut"})
-	public void initDriver(final ITestContext testNGCtx) throws Exception {
+	public void initDriver(final ITestContext testNGCtx){
 
-		GenericTest.resetTestNGREsultAndLogger();
+		GenericTest.resetTestNGResultAndLogger();
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(3);
@@ -119,8 +119,6 @@ public class TestLogActions2 extends GenericDriverTest {
 
 	/**
 	 * Test that we log the action and page where the action occurs, when TestAction is created
-	 *
-	 * @throws Exception
 	 */
 	@Test(groups = {"ut"})
 	public void testLogPageObjectAction() throws Exception {
@@ -172,10 +170,9 @@ public class TestLogActions2 extends GenericDriverTest {
 
 	/**
 	 * check step and actions are marked as failed when error occurs
-	 * @throws Exception
 	 */
 	@Test(groups = {"ut"})
-	public void testCreateFailedSteps() throws Exception {
+	public void testCreateFailedSteps() {
 
 		try {
 			testPage._writeSomethingOnNonExistentElement();
@@ -197,11 +194,9 @@ public class TestLogActions2 extends GenericDriverTest {
 
 	/**
 	 * Check that if name of method is annotated with @Step, this name is used
-	 *
-	 * @throws Exception
 	 */
 	@Test(groups = {"ut"})
-	public void testNameOfMethodAnnotated() throws Exception {
+	public void testNameOfMethodAnnotated() {
 
 		testPage._resetWithAnnotation();
 		TestStep step = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(2);
@@ -210,11 +205,9 @@ public class TestLogActions2 extends GenericDriverTest {
 
 	/**
 	 * Check that if name of method is annotated with @Step, this name is used
-	 *
-	 * @throws Exception
 	 */
 	@Test(groups = {"ut"})
-	public void testNameOfCucumberMethod() throws Exception {
+	public void testNameOfCucumberMethod() {
 
 		try {
 			SeleniumRobotTestPlan.setCucumberTest(true);
@@ -229,10 +222,9 @@ public class TestLogActions2 extends GenericDriverTest {
 
 	/**
 	 * Check that when Selenium overrideNativeActions is set to false (the default) these actions are logged
-	 * @throws Exception
 	 */
 	@Test(groups = {"ut"})
-	public void testLogNativeSeleniumElementActionNoOverride() throws Exception {
+	public void testLogNativeSeleniumElementActionNoOverride() {
 		SeleniumTestsContextManager.getThreadContext().setOverrideSeleniumNativeAction(false);
 		new DriverTestPageNativeActions(true).reset();
 
@@ -355,11 +347,9 @@ public class TestLogActions2 extends GenericDriverTest {
 
 	/**
 	 * Check that when Selenium overrideNativeActions is set to false (the default) these actions in PageFactory pattern are logged
-	 *
-	 * @throws Exception
 	 */
 	@Test(groups = {"ut"})
-	public void testLogPageFactorySeleniumElementActionNoOverride() throws Exception {
+	public void testLogPageFactorySeleniumElementActionNoOverride() {
 		SeleniumTestsContextManager.getThreadContext().setOverrideSeleniumNativeAction(false);
 		new DriverTestPageObjectFatory(true).reset();
 

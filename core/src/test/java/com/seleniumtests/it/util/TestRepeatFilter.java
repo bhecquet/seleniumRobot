@@ -31,7 +31,6 @@ public class TestRepeatFilter extends ReporterTest {
 	
 	/**
 	 * Test the case where repeat lasts more that 60 secs, message should be displayed at least once every 60 secs
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testRepeatFilteredLong() throws Exception {
@@ -56,7 +55,6 @@ public class TestRepeatFilter extends ReporterTest {
 	
 	/**
 	 * Check that with several threads, each repeat filter works independently
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testRepeatFilteredMultithread() throws Exception {

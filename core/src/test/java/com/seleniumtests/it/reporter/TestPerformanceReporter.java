@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,7 +24,6 @@ import java.nio.file.Paths;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.testng.Assert;
-import org.testng.ITestContext;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
@@ -47,7 +46,7 @@ public class TestPerformanceReporter extends ReporterTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testReportGeneration(ITestContext testContext) throws Exception {
+	public void testReportGeneration() throws Exception {
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 
 		// check all files are generated with the right name
@@ -61,7 +60,7 @@ public class TestPerformanceReporter extends ReporterTest {
 	 * Check if param gridnode is ok in xml report
 	 */
 	@Test(groups={"it"})
-	public void testReportGenerationGrid(ITestContext testContext) throws Exception {
+	public void testReportGenerationGrid() throws Exception {
 		try {
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4321/wd/hub");
@@ -83,7 +82,7 @@ public class TestPerformanceReporter extends ReporterTest {
 	 * Check if param gridnode is correctly handled when test has not been executed
 	 */
 	@Test(groups={"it"})
-	public void testReportGenerationGridTestSkipped(ITestContext testContext) throws Exception {
+	public void testReportGenerationGridTestSkipped() throws Exception {
 		try {
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4321/wd/hub");
@@ -102,7 +101,7 @@ public class TestPerformanceReporter extends ReporterTest {
 	}
 
 	@Test(groups={"it"})
-	public void testReportGenerationLocal(ITestContext testContext) throws Exception {
+	public void testReportGenerationLocal() throws Exception {
 		try {
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "local");
 	
@@ -122,7 +121,7 @@ public class TestPerformanceReporter extends ReporterTest {
 	 * Check all steps of test case are available
 	 */
 	@Test(groups={"it"})
-	public void testReportWithSteps(ITestContext testContext) throws Exception {
+	public void testReportWithSteps() throws Exception {
 
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testWithException"});
 		
@@ -147,7 +146,7 @@ public class TestPerformanceReporter extends ReporterTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testReportWithCustomTestNames(ITestContext testContext) throws Exception {
+	public void testReportWithCustomTestNames() throws Exception {
 		
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testOkWithTestName", "testOkWithTestNameAndDataProvider"});
 		
@@ -164,7 +163,7 @@ public class TestPerformanceReporter extends ReporterTest {
 	 * This test is failed in "test" part, not in steps. Check it's correctly logged as failed
 	 */
 	@Test(groups={"it"})
-	public void testReportWithRetry(ITestContext testContext) throws Exception {
+	public void testReportWithRetry() throws Exception {
 		
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testWithException"});
 		
@@ -182,7 +181,7 @@ public class TestPerformanceReporter extends ReporterTest {
 	 * Check all steps of test case are available
 	 */
 	@Test(groups={"it"})
-	public void testWithStepOkAndStepInError(ITestContext testContext) throws Exception {
+	public void testWithStepOkAndStepInError() throws Exception {
 		
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testOkWithOneStepFailed"});
 		
@@ -203,7 +202,7 @@ public class TestPerformanceReporter extends ReporterTest {
 	 * Check that when a step contains an exception and is failed, this one is written in file
 	 */
 	@Test(groups={"it"})
-	public void testErrorWithException(ITestContext testContext) throws Exception {
+	public void testErrorWithException() throws Exception {
 
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testFailedWithException"});
 		
@@ -223,7 +222,7 @@ public class TestPerformanceReporter extends ReporterTest {
 	 * Chack that if several custom reports are specified through custom reports, they are all available
 	 */
 	@Test(groups={"it"})
-	public void testMultipleReportsWithSteps(ITestContext testContext) throws Exception {
+	public void testMultipleReportsWithSteps() throws Exception {
 
 		try {
 			System.setProperty("customTestReports", "PERF::xml::reporter/templates/report.perf.vm,PERF2::json::ti/report.test.vm");
@@ -243,7 +242,7 @@ public class TestPerformanceReporter extends ReporterTest {
 	 * Test that performance reporter is correctly encoded
 	 */
 	@Test(groups={"it"})
-	public void testXmlCharacterEscape(ITestContext testContext) throws Exception {
+	public void testXmlCharacterEscape() throws Exception {
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
 		
 		String detailedReportContent = readTestMethodPerfFile("testAndSubActions");
@@ -257,7 +256,7 @@ public class TestPerformanceReporter extends ReporterTest {
 	 * Test that performance reporter correctly encode error messages
 	 */
 	@Test(groups={"it"})
-	public void testXmlErrorMessageEscape(ITestContext testContext) throws Exception {
+	public void testXmlErrorMessageEscape() throws Exception {
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"}, ParallelMode.METHODS, new String[] {"testWithException"});
 
 		String detailedReportContent = readTestMethodPerfFile("testWithException");
@@ -273,7 +272,7 @@ public class TestPerformanceReporter extends ReporterTest {
 	 * Test all exceptions are there. The root one is only present in text
 	 */
 	@Test(groups={"it"})
-	public void testXmlErrorMessageEscapeDoubleException(ITestContext testContext) throws Exception {
+	public void testXmlErrorMessageEscapeDoubleException() throws Exception {
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"});
 
 		String detailedReportContent = readTestMethodPerfFile("testWithChainedException");
@@ -290,16 +289,14 @@ public class TestPerformanceReporter extends ReporterTest {
 	 * Check that if a test is skipped, a performance report is still generated
 	 */
 	@Test(groups={"it"})
-	public void testSkippedTestGeneration(ITestContext testContext) throws Exception {
+	public void testSkippedTestGeneration() throws Exception {
 
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass2"});
 
 		// check that files are present and that they contain no step
 		String detailedReportContent = readTestMethodPerfFile("test2");
-		logger.info("content: ");
-		logger.info(detailedReportContent);
 		Assert.assertTrue(detailedReportContent.contains("Test has not started or has been skipped"));
-		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "<testcase classname"), 2); // only Test end step and previous result step
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "<testcase classname"), 1); // only Test end step. Previous result step is not displayed as test method is skipped due to unsatisfied dependency
 		
 		// check other file contains steps
 		String detailedReportContent2 = readTestMethodPerfFile("test1");
@@ -311,7 +308,7 @@ public class TestPerformanceReporter extends ReporterTest {
 	 * Check that if a step is skipped, a performance report is still generated
 	 */
 	@Test(groups={"it"})
-	public void testSkippedStepInTest(ITestContext testContext) throws Exception {
+	public void testSkippedStepInTest() throws Exception {
 		
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestSteps"});
 
@@ -414,7 +411,7 @@ public class TestPerformanceReporter extends ReporterTest {
 	}
 
 	@Test(groups={"it"})
-	public void testReportErrors(ITestContext testContext) throws Exception {
+	public void testReportErrors() throws Exception {
 
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testFailedWithException"});
 
@@ -429,7 +426,7 @@ public class TestPerformanceReporter extends ReporterTest {
 	}
 
 	@Test(groups={"it"})
-	public void testReportFailures(ITestContext testContext) throws Exception {
+	public void testReportFailures() throws Exception {
 
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testMultipleFailedWithSoftAssertEnabled"});
 

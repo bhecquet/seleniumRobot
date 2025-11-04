@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -53,7 +53,7 @@ public class TestPageObject extends GenericTest {
 	private static DriverTestPage testPage;
 
 	@BeforeMethod(groups= {"it", "pageobject"})
-	public void initDriver(final ITestContext testNGCtx) throws Exception {
+	public void initDriver(final ITestContext testNGCtx) {
 
 		OSUtilityFactory.getInstance().killProcessByName("chrome", true);
 		
@@ -66,7 +66,7 @@ public class TestPageObject extends GenericTest {
 	public void destroyDriver() {
 		WebUIDriver.cleanUp();
 
-		GenericTest.resetTestNGREsultAndLogger();
+		GenericTest.resetTestNGResultAndLogger();
 	}
 	
 	/**
@@ -78,8 +78,7 @@ public class TestPageObject extends GenericTest {
 	}
 
 	/**
-	 * open 3 pages and check that when we close the last one, we go to the previous, not the first one 
-	 * @throws Exception 
+	 * open 3 pages and check that when we close the last one, we go to the previous, not the first one
 	 */
 	@Test(groups= {"it", "pageobject"})
 	public void testCloseLastTab() throws Exception {
@@ -95,7 +94,6 @@ public class TestPageObject extends GenericTest {
 	
 	/**
 	 * open 2 pages and check that when we close the first one, we remain on the second one
-	 * @throws Exception 
 	 */
 	@Test(groups= {"it", "pageobject"})
 	public void testCloseFirstTab() throws Exception {
@@ -110,7 +108,6 @@ public class TestPageObject extends GenericTest {
 	/**
 	 * open 2 pages and check that when we close the first one, we remain on the second one
 	 * Use the embedded check inside close method
-	 * @throws Exception 
 	 */
 	@Test(groups= {"it", "pageobject"})
 	public void testCloseFirstTabAndCheck() throws Exception {
@@ -120,7 +117,6 @@ public class TestPageObject extends GenericTest {
 	
 	/**
 	 * issue #324: check handles are not null. We cannot directly reproduce problem because we should have a test site which creates a second window when opened
-	 * @throws Exception
 	 */
 	@Test(groups= {"it", "pageobject"})
 	public void testPageObjectForExternalDriver() throws Exception {

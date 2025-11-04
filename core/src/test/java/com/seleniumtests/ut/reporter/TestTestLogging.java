@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,8 +22,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import org.apache.commons.io.FileUtils;
@@ -38,7 +36,6 @@ import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.driver.screenshots.ScreenShot;
-import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.reporter.logger.TestMessage;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
 import com.seleniumtests.reporter.logger.TestStep;
@@ -48,7 +45,7 @@ public class TestTestLogging extends GenericTest {
 	@BeforeMethod(groups={"ut"})
 	public void reset() {
 
-		resetTestNGREsultAndLogger();
+		resetTestNGResultAndLogger();
 	}
 	
 	@Test(groups={"ut"})
@@ -90,7 +87,6 @@ public class TestTestLogging extends GenericTest {
 	
 	/**
 	 * Check HTML page is moved
-	 * @throws IOException
 	 */
 	@Test(groups={"ut"})
 	public void testRelocateScreenshotHtmlOnly() throws IOException {
@@ -120,7 +116,6 @@ public class TestTestLogging extends GenericTest {
 	
 	/**
 	 * Check image file is moved
-	 * @throws IOException
 	 */
 	@Test(groups={"ut"})
 	public void testRelocateScreenshotImageOnly() throws IOException {
@@ -186,7 +181,6 @@ public class TestTestLogging extends GenericTest {
 	
 	/**
 	 * Check no error is raised if file is already at the right place
-	 * @throws IOException
 	 */
 	@Test(groups={"ut"})
 	public void testLogFileSamePlace() throws IOException {
@@ -216,7 +210,7 @@ public class TestTestLogging extends GenericTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testLogTestStep(ITestContext context) {
+	public void testLogTestStep() {
 		TestStep testStep = new TestStep("step", "step", this.getClass(), null, new ArrayList<>(), true);
 		ITestResult testResult = Reporter.getCurrentTestResult();
 		

@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
-import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.WebDriverException;
 import org.testng.Assert;
 import org.testng.Reporter;
@@ -47,7 +46,6 @@ import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestMessage;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
 import com.seleniumtests.reporter.logger.TestStep;
-import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.ScenarioLogger;
 
@@ -265,7 +263,7 @@ public class StubTestClass extends StubParentClass {
 	
 	
 	@Test(groups="stub", testName="A test which is <OK> é&")
-	public void testOkWithTestName() throws IOException {
+	public void testOkWithTestName() {
 		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		step1.addAction(new TestAction("sendKeys to text field", false, new ArrayList<>()));
@@ -291,12 +289,12 @@ public class StubTestClass extends StubParentClass {
 	}
 	
 	@Test(groups="stub", testName="A test which is OK (${arg0}, ${arg1})", dataProvider = "data2")
-	public void testOkWithTestNameAndDataProvider(String col1, String col2) throws IOException {
+	public void testOkWithTestNameAndDataProvider(String col1, String col2) {
 		logger.info(String.format("%s,%s", col1, col2));
 	}
 	
 	@Test(groups="stub", dataProvider = "data3")
-	public void testOkWithPasswordDataProvider(Integer col1, @Mask Integer sensibleData) throws IOException {
+	public void testOkWithPasswordDataProvider(Integer col1, @Mask Integer sensibleData) {
 		logger.info(String.format("%d,%d", col1, sensibleData == null ? -1: sensibleData));
 		
 		new CalcPage()
@@ -304,7 +302,7 @@ public class StubTestClass extends StubParentClass {
 	}
 
 	@Test(groups="stub")
-	public void testOk() throws IOException {
+	public void testOk() {
 		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		step1.addAction(new TestAction("sendKeys to text field", false, new ArrayList<>()));
@@ -313,7 +311,7 @@ public class StubTestClass extends StubParentClass {
 	
 
 	@Test(groups="stub", description="a test with infos")
-	public void testWithInfo1() throws IOException {
+	public void testWithInfo1() {
 		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		step1.addAction(new TestAction("sendKeys to text field", true, new ArrayList<>()));
@@ -323,7 +321,7 @@ public class StubTestClass extends StubParentClass {
 	}
 	
 	@Test(groups="stub", description="a test with infos")
-	public void testWithInfo2() throws IOException {
+	public void testWithInfo2() {
 		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		step1.addAction(new TestAction("sendKeys to text field", true, new ArrayList<>()));
@@ -392,7 +390,7 @@ public class StubTestClass extends StubParentClass {
 	public void testLogSameInfoMultipleTimesLong() {
 		for (int i=0; i < 15; i++) {
 			logger.info("something interesting");
-			WaitHelper.waitForSeconds(5);
+			WaitHelper.waitForMilliSeconds(5100);
 		}
 		
 	}
@@ -411,7 +409,7 @@ public class StubTestClass extends StubParentClass {
 	}
 
 	@Test(groups="stub", invocationCount = 3, threadPoolSize = 2)
-	public void testOkWithInvocationCount() throws IOException {
+	public void testOkWithInvocationCount() {
 		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		step1.addAction(new TestAction("sendKeys to text field", false, new ArrayList<>()));

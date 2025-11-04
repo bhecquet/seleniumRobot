@@ -13,7 +13,7 @@ import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 
 public class TestLigthouse extends GenericMultiBrowserTest {
 
-	public TestLigthouse() throws Exception {
+	public TestLigthouse() {
 		super(BrowserType.CHROME, "DriverTestPage");
 	}
 	
