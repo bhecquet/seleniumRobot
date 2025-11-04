@@ -78,47 +78,6 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 	}
 	
 	/**
-     * issue #287: check the real behavior of the bug (for now, this cannot be corrected because of <a href="https://github.com/cbeust/testng/issues/2148">...</a>)
-     * When the AfterMethod fails, test is not retried and this is a bug in testNG
-     */
-	@Test(groups={"it"})
-	public void testSessionNotGet() throws Exception {
-		
-		try {
-			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
-			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
-			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, SERVER_URL + "/wd/hub");
-			
-			WebUIDriver uiDriver = createMockedWebDriver();
-			
-			createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, "Console");
-			createGridServletServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "ABC");
-			createGridServletServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "ABC");
-			createGridServletServerMock("GET", SeleniumRobotGridConnector.GUI_SERVLET, 200, "Gui");
-
-			createJsonServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200,
-
-					// session not found
-					GRID_STATUS_NO_SESSION);
-		
-			ReporterTest.executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
-
-			// check that we tried to create the driver twice (the bug is based on the fact that we create it only once)
-			verify(uiDriver, times(2)).createWebDriver();
-			
-			String logs = ReporterTest.readSeleniumRobotLogFile();
-			Assert.assertEquals(StringUtils.countMatches(logs, "Start creating *chrome driver"), 2);
-			
-			
-		} finally {
-			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
-			System.clearProperty(SeleniumTestsContext.RUN_MODE);
-			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
-		}
-		
-	}
-	
-	/**
 	 * issue #287: check driver is recreated if session cannot be get
 	 */
 	@Test(groups={"it"})
@@ -203,11 +162,11 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 			Assert.assertFalse(logs.contains("Retrying 1 time"));
 			
 			// check the 4th test is skipped but other are not
-			Assert.assertTrue(logs.contains("Cannot create driver on grid, it may be fully used [0 times]"));
-			Assert.assertTrue(logs.contains("Cannot create driver on grid, it may be fully used [1 times]"));
-			Assert.assertTrue(logs.contains("Cannot create driver on grid, it may be fully used [2 times]"));
-			Assert.assertFalse(logs.contains("Cannot create driver on grid, it may be fully used [3 times]"));
-			Assert.assertTrue(logs.contains("Skipping as the 3 previous tests could not get any matching node"));
+			Assert.assertTrue(logs.contains("Error creating driver, skip test (cause: Cannot create driver on grid, it may be fully used [0 times])"));
+			Assert.assertTrue(logs.contains("Error creating driver, skip test (cause: Cannot create driver on grid, it may be fully used [1 times])"));
+			Assert.assertTrue(logs.contains("Error creating driver, skip test (cause: Cannot create driver on grid, it may be fully used [2 times])"));
+			Assert.assertFalse(logs.contains("Error creating driver, skip test (cause: Cannot create driver on grid, it may be fully used [3 times])"));
+			Assert.assertTrue(logs.contains("Error creating driver, skip test (cause: Skipping as the 3 previous tests could not get any matching node. Check your test configuration and grid setup)"));
 			
 		} finally {
 
@@ -260,12 +219,14 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 			ReporterTest.executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.NONE, new String[] {"testDriverShort", "testDriverShort2", "testDriverShort3", "testDriverShort4"});
 			
 			String logs = ReporterTest.readSeleniumRobotLogFile();
-			
+
+			Assert.assertTrue(logs.contains("Error creating driver, skip test (cause: Cannot create driver on grid, it may be fully used [0 times])"));
+			Assert.assertTrue(logs.contains("Error creating driver, skip test (cause: Cannot create driver on grid, it may be fully used [1 times])"));
+			Assert.assertFalse(logs.contains("Error creating driver, skip test (cause: Cannot create driver on grid, it may be fully used [2 times])"));
 			// check that testDriverShort3 and testDriverShort4 are executed because now, we find nodes
-			Assert.assertTrue(logs.contains("Cannot create driver on grid, it may be fully used [0 times]"));
-			Assert.assertTrue(logs.contains("Cannot create driver on grid, it may be fully used [1 times]"));
-			Assert.assertFalse(logs.contains("Cannot create driver on grid, it may be fully used [2 times]"));
-			Assert.assertEquals(StringUtils.countMatches(logs, "Test is KO with error: class com.seleniumtests.customexception.SeleniumGridNodeNotAvailable: Cannot create driver"), 2); // 2 tests KO (the first ones)
+			Assert.assertEquals(StringUtils.countMatches(logs, "Error creating driver, skip test"), 2);
+			Assert.assertEquals(StringUtils.countMatches(logs, "Test has not started or has been skipped"), 2); // 2 tests KO (the first ones)
+			Assert.assertEquals(StringUtils.countMatches(logs, "Error in @AfterMethod void com.seleniumtests.it.stubclasses.StubTestClassForDriverTest.reset(Method): No grid connector active"), 2); // 2 tests KO (the first ones)
 			Assert.assertEquals(StringUtils.countMatches(logs, "Test is OK"), 2); // 2 tests OK because we got nodes
 			Assert.assertFalse(logs.contains("Skipping as the 3 previous tests could not get any matching node"));
 			

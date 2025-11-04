@@ -40,7 +40,6 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.SnapshotTarget;
-import com.seleniumtests.util.logging.ScenarioLogger;
 
 /**
  * Stubclass for testing issue #136 and driver creation blocking

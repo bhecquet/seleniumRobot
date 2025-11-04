@@ -233,7 +233,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 			
 				// if grid is not active, try the next one
 				if (!gridConnector.isGridActive()) {
-					logger.warn("grid %s is not active, looking for the next one {}", gridConnector.getHubUrl());
+					logger.warn("grid {} is not active, looking for the next one", gridConnector.getHubUrl());
 					continue;
 				}
 				

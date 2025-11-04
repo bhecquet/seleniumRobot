@@ -583,6 +583,10 @@ public class WebUIDriver {
 	 * @param previousDriverName		the name of the driver currently in use
 	 */
 	private static void tryCreateDriver(BrowserType browserType, String driverName, Integer attachExistingDriverPort, String previousDriverName) {
+		if (SeleniumTestsContextManager.getThreadContext().isDriverCreationBlocked()) {
+			throw new ScenarioException("Driver creation forbidden before @BeforeMethod and after @AfterMethod execution");
+		}
+
 		WebUIDriver uiDriver = getWebUIDriver(true, driverName);
 		if (uiDriver != null) {
 			uiDriver.config.setAttachExistingDriverPort(attachExistingDriverPort);
@@ -617,7 +621,7 @@ public class WebUIDriver {
 						setCurrentWebUiDriverName(previousDriverName);
 						if (DEFAULT_DRIVER_NAME.equals(driverName)) {
 							switchToDriver(previousDriverName);
-							throw new SkipException("Error creating driver, skip test", e);
+							throw new SkipException(String.format("Error creating driver, skip test (cause: %s)", e.getMessage()), e);
 						} else {
 							uxDriverSession.get().remove(driverName);
 							switchToDriver(previousDriverName);
@@ -773,10 +777,6 @@ public class WebUIDriver {
      * @throws ScenarioException in case we are not allowed to create it (if we are in @BeforeMethod and after @AfterMethod)
      */
     public WebDriver createWebDriver() {
-    	
-    	if (SeleniumTestsContextManager.getThreadContext().isDriverCreationBlocked()) {
-    		throw new ScenarioException("Driver creation forbidden before @BeforeMethod and after @AfterMethod execution");
-    	}
     	
     	if (useAppium()) {
     		logger.info("Start creating appium driver");
