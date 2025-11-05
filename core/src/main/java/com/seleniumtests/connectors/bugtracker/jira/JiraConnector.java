@@ -32,7 +32,6 @@ import com.atlassian.jira.rest.client.api.domain.Priority;
 import com.atlassian.jira.rest.client.api.domain.Project;
 import com.atlassian.jira.rest.client.api.domain.Transition;
 import com.atlassian.jira.rest.client.api.domain.User;
-import com.atlassian.jira.rest.client.api.domain.Version;
 import com.atlassian.jira.rest.client.api.domain.input.IssueInput;
 import com.atlassian.jira.rest.client.api.domain.input.IssueInputBuilder;
 import com.atlassian.jira.rest.client.api.domain.input.TransitionInput;
@@ -58,25 +57,24 @@ public class JiraConnector extends BugTracker {
 	public static final String BUGTRACKER_JIRA_COMPONENTS = "bugtracker.jira.components"; // Component this issue should be associated with
 
     private static final String ITEM = "    - %s";
-	private static Logger logger = SeleniumRobotLogger.getLogger(JiraConnector.class);
-    private String projectKey;
-    private String browseUrl;
-    private Map<String, BasicComponent> components;
-    private Map<String, IssueType> issueTypes;
-    private Map<String, Priority> priorities;
-    private Map<String, Field> fields;
-    private Map<String, Version> versions;
-    private JiraRestClient restClient;
-    private Project project;
+	private static final Logger logger = SeleniumRobotLogger.getLogger(JiraConnector.class);
+    private final String projectKey;
+    private final String browseUrl;
+    private final Map<String, BasicComponent> components;
+    private final Map<String, IssueType> issueTypes;
+    private final Map<String, Priority> priorities;
+    private final Map<String, Field> fields;
+    private final JiraRestClient restClient;
+    private final Project project;
 
     List<String> openStates;
     String closeTransition;
     
     /**
      * Constructor only there to allow getting information about a project
-     * @param server        exemple: http://jira.covea.priv
-     * @param user
-     * @param password
+     * @param server        exemple: <a href="http://jira.covea.priv">...</a>
+     * @param user			user to connect to jira
+     * @param password		password to connect to jira
      */
     public JiraConnector(String server, String projectKey, String user, String password) {
     	this.projectKey = projectKey;
@@ -99,8 +97,8 @@ public class JiraConnector extends BugTracker {
         	
         	project = restClient.getProjectClient().getProject(projectKey).claim();
         } catch (RestClientException e) {
-        	for (BasicProject project: restClient.getProjectClient().getAllProjects().claim()) {
-        		logger.info(project.getKey());
+        	for (BasicProject prj: restClient.getProjectClient().getAllProjects().claim()) {
+        		logger.info(prj.getKey());
         	}
         	throw new ConfigurationException(String.format("Project with key '%s' cannot be found on jira server %s", projectKey, server));
         }
@@ -111,15 +109,14 @@ public class JiraConnector extends BugTracker {
         issueTypes = getIssueTypes();
         priorities = getPriorities();
         fields = getCustomFields();
-        versions = getVersions();
     }
     
 
     /**
      * constructor to call for creating new issues
-     * @param server        exemple: http://jira.covea.priv
-     * @param user
-     * @param password
+     * @param server        exemple: <a href="http://jira.covea.priv">...</a>
+	 * @param user			user to connect to jira
+	 * @param password		password to connect to jira
      */
     public JiraConnector(String server, String projectKey, String user, String password, Map<String, String> jiraOptions) {
         this(server, projectKey, user, password);
@@ -130,13 +127,13 @@ public class JiraConnector extends BugTracker {
 		if (jiraOptions.get(BUGTRACKER_JIRA_OPEN_STATES) == null) {
 			throw new ConfigurationException(String.format("'%s' MUST be set. It's the state of an issue when it has juste been create. Used to search for open issues", BUGTRACKER_JIRA_OPEN_STATES));
 		} else {
-			openStates = Arrays.asList(jiraOptions.get(BUGTRACKER_JIRA_OPEN_STATES).split(",")).stream().map(String::trim).collect(Collectors.toList());
+			openStates = Arrays.stream(jiraOptions.get(BUGTRACKER_JIRA_OPEN_STATES).split(",")).map(String::trim).toList();
 		}
 		if (closeTransition == null) {
 			throw new ConfigurationException(String.format("'%s' MUST be set. It's the name of the transition that will close an issue", BUGTRACKER_JIRA_CLOSE_TRANSITION));
 		}
 
-        logger.info(String.format("Connecting to Jira API [%s], on project [%s] with user [%s]", server, projectKey, user));
+        logger.info("Connecting to Jira API [{}], on project [{}] with user [{}]", server, projectKey, user);
     }
 
     private Map<String, BasicComponent> getComponents() {
@@ -149,12 +146,6 @@ public class JiraConnector extends BugTracker {
         Map<String, IssueType> jiraIssueTypes = new HashMap<>();
         project.getIssueTypes().forEach(issueType -> jiraIssueTypes.put(issueType.getName(), issueType));
         return jiraIssueTypes;
-    }
-
-    private Map<String, Version> getVersions() {
-        Map<String, Version> jiraVersions = new HashMap<>();
-        project.getVersions().forEach(version -> jiraVersions.put(version.getName(), version));
-        return jiraVersions;
     }
 
     private Map<String, Priority> getPriorities() {
@@ -191,17 +182,14 @@ public class JiraConnector extends BugTracker {
     /**
      * Check if issue already exists, and if so, returns an updated IssueBean
      * @param issueBean		a JiraBean instance
-     *
-     * @return
      */
     @Override
     public IssueBean issueAlreadyExists(IssueBean issueBean) {
 
-    	if (!(issueBean instanceof JiraBean)) {
+    	if (!(issueBean instanceof JiraBean jiraBean)) {
     		throw new ClassCastException("JiraConnector needs JiraBean instances");
     	}
-    	JiraBean jiraBean = (JiraBean)issueBean;
-    	
+
         String jql = String.format("project=%s and summary ~ \"%s\" and status in (\"%s\")", projectKey, jiraBean.getSummary()
         		.replace("[", "\\\\[")
                 .replace("]", "\\\\]")
@@ -306,7 +294,7 @@ public class JiraConnector extends BugTracker {
 			
     		List<ScreenShot> screenshots = lastTestStep.getSnapshots().stream()
     				.map(Snapshot::getScreenshot)
-    				.collect(Collectors.toList());
+    				.toList();
     		for (ScreenShot screenshot: screenshots) {
     			if (screenshot.getImage() != null && screenshot.getImage().getFile().exists()) {
     				fullDescription.append(String.format("!%s|thumbnail!\n", screenshot.getImage().getName()));
@@ -317,8 +305,9 @@ public class JiraConnector extends BugTracker {
 
 
 	/**
-	 * @param failedSteps
-	 * @param fullDescription
+	 * Format a failed step
+	 * @param failedSteps		list of failed steps
+	 * @param fullDescription	the issue description to alter
 	 */
 	private void formatFailedStep(List<TestStep> failedSteps, StringBuilder fullDescription) {
 		if (!failedSteps.isEmpty()) {
@@ -340,13 +329,12 @@ public class JiraConnector extends BugTracker {
      */
     public void createIssue(IssueBean issueBean) {
 
-    	if (!(issueBean instanceof JiraBean)) {
+    	if (!(issueBean instanceof JiraBean jiraBean)) {
     		throw new ClassCastException("JiraConnector needs JiraBean instances");
     	}
-    	JiraBean jiraBean = (JiraBean)issueBean;
-    	
-        	
-    	IssueType issueType = issueTypes.get(jiraBean.getIssueType());
+
+
+        IssueType issueType = issueTypes.get(jiraBean.getIssueType());
     	if (issueType == null) {
     		throw new ConfigurationException(String.format("Issue type %s cannot be found among valid issue types %s", jiraBean.getIssueType(), issueTypes.keySet()));
     	}
@@ -389,8 +377,8 @@ public class JiraConnector extends BugTracker {
         issueBuilder.setComponents(jiraBean.getComponents()
                 .stream()
                 .filter(component -> components.get(component) != null)
-                .map(component -> components.get(component))
-                .collect(Collectors.toList())
+                .map(components::get)
+                .toList()
                 .toArray(new BasicComponent[] {}));
 
         // add issue
@@ -407,19 +395,19 @@ public class JiraConnector extends BugTracker {
 
 	/**
 	 * Add attachments to the issue
-	 * @param jiraBean
-	 * @param issueClient
-	 * @param issue
+	 * @param jiraBean		the jira bean to alter
+	 * @param issueClient	jira client to communicate with server
+	 * @param issue			the issue where attachment will be added
 	 */
 	private void addAttachments(JiraBean jiraBean, IssueRestClient issueClient, Issue issue) {
 		if (!jiraBean.getScreenShots().isEmpty()) {
         	File[] files = jiraBean.getScreenShots()
                     .stream()
 					.filter(s -> s.getImage() != null)
-					.peek(s -> logger.info("file -> " + s.getImageName()))
+					.peek(s -> logger.info("file -> {}", s.getImageName()))
                     .map(s -> s.getImage().getFile())
                     .filter(File::exists)
-                    .collect(Collectors.toList())
+                    .toList()
                     .toArray(new File[] {});
         	if (files.length > 0) {
         		issueClient.addAttachments(issue.getAttachmentsUri(), files).claim();
@@ -434,9 +422,9 @@ public class JiraConnector extends BugTracker {
 
 	/**
 	 * Add custom fields to the issue
-	 * @param jiraBean
-	 * @param fieldInfos
-	 * @param issueBuilder
+	 * @param jiraBean			the jira bean to alter
+	 * @param fieldInfos		custom fields values
+	 * @param issueBuilder		the issue builder
 	 */
 	private void setCustomFields(JiraBean jiraBean, Map<String, CimFieldInfo> fieldInfos, IssueInputBuilder issueBuilder) {
 		
@@ -464,10 +452,10 @@ public class JiraConnector extends BugTracker {
 
     /**
      * Search the right field option among all allowed values or return null if value is not valid or field cannot be found
-     * @param fieldInfos
-     * @param fieldName
-     * @param fieldValue
-     * @return
+     * @param fieldInfos	the jira field
+     * @param fieldName		field name
+     * @param fieldValue	field value
+     * @return	the custom field option to select
      */
 	private CustomFieldOption getOptionForField(Map<String, CimFieldInfo> fieldInfos, String fieldName, String fieldValue) {
 		CimFieldInfo fieldInfo = fieldInfos.get(fieldName);
@@ -475,8 +463,8 @@ public class JiraConnector extends BugTracker {
 			return null;
 		} else {
 			for (Object obj: fieldInfo.getAllowedValues()) {
-				if (obj instanceof CustomFieldOption && ((CustomFieldOption)obj).getValue().equals(fieldValue)) {
-					return (CustomFieldOption)obj;
+				if (obj instanceof CustomFieldOption customFieldOption && customFieldOption.getValue().equals(fieldValue)) {
+					return customFieldOption;
 				}
 			}
 		}
@@ -511,12 +499,12 @@ public class JiraConnector extends BugTracker {
 					) {
 				List<String> allowedValues = new ArrayList<>();
 				entry.getValue().getAllowedValues().forEach(v -> {
-					if (v instanceof CustomFieldOption) {
-						allowedValues.add(((CustomFieldOption)v).getValue());
-					} else if (v instanceof BasicComponent) {
-						allowedValues.add(((BasicComponent)v).getName());
-					} else if (v instanceof BasicPriority) {
-						allowedValues.add(((BasicPriority)v).getName());
+					if (v instanceof CustomFieldOption customFieldOption) {
+						allowedValues.add(customFieldOption.getValue());
+					} else if (v instanceof BasicComponent basicComponent) {
+						allowedValues.add(basicComponent.getName());
+					} else if (v instanceof BasicPriority basicPriority) {
+						allowedValues.add(basicPriority.getName());
 					}
 				});
 				requiredFields.put(entry.getKey(), allowedValues);
@@ -534,7 +522,7 @@ public class JiraConnector extends BugTracker {
      */
     public void closeIssue(String issueId, String closingMessage){
 
-    	logger.info(String.format("closing issue %s", issueId));
+    	logger.info("closing issue {}", issueId);
         IssueRestClient issueClient = restClient.getIssueClient();
         Issue issue;
         try {
@@ -565,11 +553,11 @@ public class JiraConnector extends BugTracker {
 
 
 	/**
-	 * Transition issue
-	 * @param issueClient
-	 * @param issue
-	 * @param transitions
-	 * @param transitionName
+	 * Transition issue from one state to an other
+	 * @param issueClient		jira client
+	 * @param issue				the issue to transition
+	 * @param transitions		list of transitions
+	 * @param transitionName	the transition where to go
 	 */
 	private void transitionIssue(IssueRestClient issueClient, Issue issue, Map<String, Transition> transitions,
 			String transitionName) {
@@ -596,10 +584,10 @@ public class JiraConnector extends BugTracker {
 
     /**
      * Create description for issue update
-     * @param messageUpdate
-     * @param screenShots
-     * @param lastFailedStep
-     * @return
+     * @param messageUpdate		the message
+     * @param screenShots		screeshots to add to issue
+     * @param lastFailedStep	the last failed step
+     * @return	the description
      */
     private StringBuilder formatUpdateDescription(String messageUpdate, List<ScreenShot> screenShots, TestStep lastFailedStep) {
     	StringBuilder fullDescription = new StringBuilder(messageUpdate + "\n");
@@ -650,9 +638,9 @@ public class JiraConnector extends BugTracker {
 	            issueClient.addAttachments(issue.getAttachmentsUri(), screenShots
 	                    .stream()
 						.filter(s -> s.getImage() != null)
-	                    .peek(s -> logger.info("file ->" + s.getImagePath()))
+	                    .peek(s -> logger.info("file ->{}", s.getImagePath()))
 	                    .map(s -> s.getImage().getFile())
-	                    .collect(Collectors.toList())
+	                    .toList()
 	                    .toArray(new File[] {})
 	            );
 	        }
@@ -661,10 +649,10 @@ public class JiraConnector extends BugTracker {
             issueClient.addComment(issue.getCommentsUri(), Comment.valueOf(formatUpdateDescription(messageUpdate, screenShots, lastFailedStep).toString()));
             
             
-            logger.info(String.format("Jira %s updated", issueId));
+            logger.info("Jira {} updated", issueId);
             
         } catch (Exception e) {
-        	logger.error(String.format("Jira %s not modified: %s", issueId, e.getMessage()));
+        	logger.error("Jira {} not modified: {}", issueId, e.getMessage());
         	throw e;
         }
     }

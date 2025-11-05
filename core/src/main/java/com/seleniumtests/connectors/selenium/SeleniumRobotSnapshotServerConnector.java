@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,9 +27,7 @@ import java.util.stream.Collectors;
 
 import com.seleniumtests.reporter.info.FileLinkInfo;
 import com.seleniumtests.reporter.info.Info;
-import com.seleniumtests.reporter.logger.FileContent;
 import com.seleniumtests.reporter.logger.TestStep;
-import com.seleniumtests.reporter.reporters.CommonReporter;
 import org.openqa.selenium.Rectangle;
 import org.testng.ITestResult;
 
@@ -51,7 +49,7 @@ import kong.unirest.json.JSONObject;
 public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerConnector {
 	
 	public static final String FIELD_EXCLUDE_ZONES = "excludeZones";
-	private static final String NAPSHOT_DOES_NOT_EXIST_ERROR = "Provided snapshot does not exist";
+	private static final String SNAPSHOT_DOES_NOT_EXIST_ERROR = "Provided snapshot does not exist";
 	private static final String FIELD_IMAGE = "image";
 	private static final String FIELD_IS_OK_WITH_SNAPSHOTS = "isOkWithSnapshots";
 	private static final String FIELD_COMPUTING_ERROR = "computingError";
@@ -71,6 +69,8 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	public static final String SNAPSHOT_API_URL = "/snapshot/upload/image";
 	public static final String STEP_REFERENCE_API_URL = "/snapshot/stepReference/";
 	public static final String DETECT_API_URL = "/snapshot/detect/";
+	public static final String FIELD_STEP_RESULT = "stepResult";
+	public static final String FIELD_STACKTRACE = "stacktrace";
 	private String sessionUUID;
 	private static SeleniumRobotSnapshotServerConnector snapshotConnector;
 
@@ -129,7 +129,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	 * Create a test session
 	 * @param sessionName		name of the session
 	 * @param browserOrApp		name of the browser or application that is run
-	 * @return
+	 * @return	id of the created session
 	 */
 	public Integer createSession(String sessionName, String browserOrApp, String startedBy, OffsetDateTime startDate) {
 		if (!active) {
@@ -214,7 +214,6 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	
 	/**
 	 * Returns testStepName or a shorter version if it's too long
-	 * @return
 	 */
 	private String getStrippedTestStepName(String stepName) {
 		return stepName.length() > MAX_TESTSTEP_NAME_LENGTH ? stepName.substring(0, MAX_TESTSTEP_NAME_LENGTH): stepName;
@@ -276,7 +275,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	}
 
 	/**
-	 * @param stepResultId
+	 * @param stepResultId	the step result id
 	 */
 	private void checkStepResult(Integer stepResultId) {
 		if (stepResultId == null) {
@@ -294,14 +293,14 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 
 		checkStepResult(stepResultId);
 		if (snapshot == null || snapshot.getScreenshot() == null || snapshot.getScreenshot().getImage() == null) {
-			throw new SeleniumRobotServerException(NAPSHOT_DOES_NOT_EXIST_ERROR);
+			throw new SeleniumRobotServerException(SNAPSHOT_DOES_NOT_EXIST_ERROR);
 		}
 		
 		try {
 			File pictureFile = snapshot.getScreenshot().getImage().getFile();
 			
 			getJSonResponse(buildPostRequest(url + STEP_REFERENCE_API_URL)
-					.field("stepResult", stepResultId)
+					.field(FIELD_STEP_RESULT, stepResultId)
 					.field(FIELD_IMAGE, pictureFile)
 					
 					);
@@ -332,7 +331,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			throw new ConfigurationException("stepName must not be null");
 		}
 		if (snapshot == null || snapshot.getScreenshot() == null || snapshot.getScreenshot().getImage() == null) {
-			throw new SeleniumRobotServerException(NAPSHOT_DOES_NOT_EXIST_ERROR);
+			throw new SeleniumRobotServerException(SNAPSHOT_DOES_NOT_EXIST_ERROR);
 		}
 		
 		String snapshotName = snapshot.getName().length() > MAX_SNAPSHOT_NAME_LENGTH ? snapshot.getName().substring(0, MAX_SNAPSHOT_NAME_LENGTH): snapshot.getName();
@@ -359,8 +358,8 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 						.getCheckSnapshot()
 						.getExcludeElementsRect()
 						.stream()
-						.map(r -> new JSONObject(r))
-						.collect(Collectors.toList()));
+						.map(JSONObject::new)
+						.toList());
 				request = request.field(FIELD_EXCLUDE_ZONES, excludeZonesJson.toString());
 			}
 			
@@ -403,7 +402,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 
 		checkStepResult(stepResultId);
 		if (snapshot == null || snapshot.getScreenshot() == null || snapshot.getScreenshot().getImage() == null) {
-			throw new SeleniumRobotServerException(NAPSHOT_DOES_NOT_EXIST_ERROR);
+			throw new SeleniumRobotServerException(SNAPSHOT_DOES_NOT_EXIST_ERROR);
 		}
 		
 		String snapshotName = snapshot.getName().length() > MAX_SNAPSHOT_NAME_LENGTH ? snapshot.getName().substring(0, MAX_SNAPSHOT_NAME_LENGTH): snapshot.getName();
@@ -412,7 +411,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			File pictureFile = snapshot.getScreenshot().getImage().getFile();
 			
 			MultipartBody request = buildPostRequest(url + SNAPSHOT_API_URL)
-					.field("stepResult", stepResultId)
+					.field(FIELD_STEP_RESULT, stepResultId)
 					.field(FIELD_IMAGE, pictureFile)
 					.field(FIELD_NAME, snapshotName)
 					.field("compare", snapshot.getCheckSnapshot().getName())
@@ -420,7 +419,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			
 			if (excludeZones != null && !excludeZones.isEmpty()) {
 			
-				JSONArray excludeZonesJson = new JSONArray(excludeZones.stream().map(r -> new JSONObject(r)).collect(Collectors.toList()));
+				JSONArray excludeZonesJson = new JSONArray(excludeZones.stream().map(JSONObject::new).toList());
 				request = request.field(FIELD_EXCLUDE_ZONES, excludeZonesJson.toString());
 			}
 			
@@ -456,7 +455,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			JSONObject fileJson = getJSonResponse(buildPostRequest(url + FILE_API_URL)
 					.field("file", file)
 					.field("name", file.getName())
-					.field("stepResult", String.valueOf(stepResultId))
+					.field(FIELD_STEP_RESULT, String.valueOf(stepResultId))
 			);
 			return fileJson.getInt("id");
 
@@ -486,7 +485,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		try {
 			JSONObject fileJson = getJSonResponse(buildPostRequest(url + LOGS_API_URL)
 					.field("file", file)
-					.field("testCase", String.valueOf(testCaseId))
+					.field(FIELD_TEST_CASE, String.valueOf(testCaseId))
 			);
 			return fileJson.getInt("id");
 
@@ -498,8 +497,8 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	/**
 	 * Record the test info
 	 * We expect files to have been already uploaded, so that id has been given to files
-	 * @param infos
-	 * @param testCaseInSessionId
+	 * @param infos					the info to record
+	 * @param testCaseInSessionId	the testCaseInSessionId
 	 */
 	public void recordTestInfo(Map<String, Info> infos, Integer testCaseInSessionId) {
 		if (!active) {
@@ -514,8 +513,8 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 
 		for (Map.Entry<String, Info> info: infos.entrySet()) {
 
-			if (info instanceof FileLinkInfo && ((FileLinkInfo) info).getFileContent().getId() == null) {
-				logger.error(String.format("File has not been uploaded", ((FileLinkInfo) info).getFileContent().getName()));
+			if (info instanceof FileLinkInfo fileLinkInfo && fileLinkInfo.getFileContent().getId() == null) {
+				logger.error("File {} has not been uploaded", fileLinkInfo.getFileContent().getName());
 			}
 
 			try {
@@ -543,9 +542,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		}
 
 
-		Integer stepResultId = recordStepResult(!testStep.getFailed(), "", testStep.getDuration(), testCaseInSessionId, testStepId);
-		
-		return stepResultId;
+		return recordStepResult(!testStep.getFailed(), "", testStep.getDuration(), testCaseInSessionId, testStepId);
 	}
 	
 	/**
@@ -573,7 +570,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field(FIELD_TEST_CASE, testCaseInSessionId.toString())
 					.field("result", result.toString())
 					.field("duration", String.valueOf(duration))
-					.field("stacktrace", logs)
+					.field(FIELD_STACKTRACE, logs)
 					);
 			return resultJson.getInt("id");
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
@@ -591,7 +588,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		}
 		try {
 			JSONObject resultJson = getJSonResponse(buildPatchRequest(url + STEPRESULT_API_URL + stepResultId + "/")
-					.field("stacktrace", logs)
+					.field(FIELD_STACKTRACE, logs)
 					);
 			return resultJson.getInt("id");
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
@@ -601,7 +598,6 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 
 	/**
 	 * Returns list of test steps in a test case
-	 * @return
 	 */
 	@SuppressWarnings("unchecked")
 	public List<String> getStepListFromTestCase(Integer testCaseInSessionId) {
@@ -662,7 +658,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		}
 		
 		try {
-			getJSonResponse(buildPatchRequest(url + TESTCASEINSESSION_API_URL + testCaseInSessionId + "/").field("stacktrace", logs));
+			getJSonResponse(buildPatchRequest(url + TESTCASEINSESSION_API_URL + testCaseInSessionId + "/").field(FIELD_STACKTRACE, logs));
 		} catch (UnirestException e) {
 			throw new SeleniumRobotServerException("cannot add logs to test case", e);
 		}
@@ -681,7 +677,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	 */
 	public int getTestCaseInSessionComparisonResult(Integer testCaseInSessionId, StringBuilder errorMessage) {
 		
-		logger.info("Getting snapshot comparison result for " + testCaseInSessionId);
+		logger.info("Getting snapshot comparison result for {}", testCaseInSessionId);
 		try {
 			JSONObject response = null;
 			for (int i = 0; i < 5; i++) {
@@ -718,7 +714,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		if (!response.optBoolean(FIELD_IS_OK_WITH_SNAPSHOTS, false) 
 				&& response.optJSONArray(FIELD_COMPUTING_ERROR) != null 
 				&& !response.optJSONArray(FIELD_COMPUTING_ERROR).isEmpty()) {
-			logger.error("Errors while computing snapshot comparisons: \n" + response.optJSONArray(FIELD_COMPUTING_ERROR).join("\n"));
+			logger.error("Errors while computing snapshot comparisons: \n{}", response.optJSONArray(FIELD_COMPUTING_ERROR).join("\n"));
 			errorMessage.append(response.optJSONArray(FIELD_COMPUTING_ERROR).join("\n"));
 		}
 		
@@ -735,7 +731,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	
 	private JSONObject detectInPicture(Snapshot snapshot, String task) {
 		if (snapshot == null) {
-			throw new SeleniumRobotServerException("Provided snapshot does not exist");
+			throw new SeleniumRobotServerException(SNAPSHOT_DOES_NOT_EXIST_ERROR);
 		}
 		return detectInPicture(snapshot.getScreenshot(), task);
 	}
@@ -800,8 +796,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
     "error": null,
     "version": "afcc45"
 }
-	 * @param snapshot
-	 * @return
+	 * @param snapshot	the snapshot=
 	 */
 	public JSONObject detectErrorInPicture(Snapshot snapshot) {
 		return detectInPicture(snapshot, "error");
@@ -846,8 +841,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
     "error": null,
     "version": "afcc45"
 }
-	 * @param snapshot
-	 * @return
+	 * @param snapshot	the snapshot
 	 */
 	public JSONObject detectFieldsInPicture(Snapshot snapshot) {
 		return detectInPicture(snapshot, "field");
@@ -861,7 +855,6 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	 * @param stepResultId		the step result id
 	 * @param computeVersion	the "image-field-detector" version used to compute field information
 	 * 							It's used to check that the information returned by the reference has been computed with the same version of the model
-	 * @return
 	 */
 	public JSONObject getStepReferenceDetectFieldInformation(Integer stepResultId, String computeVersion) {
 		

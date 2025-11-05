@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,7 +22,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
-import java.util.Arrays;
+import java.util.List;
 
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -84,30 +84,28 @@ public class TestFrameElement extends MockitoTest {
 	private RemoteWebElement frameEl2;
 	@Mock
 	private RemoteWebElement subFrameEl;
-	
-	private CustomEventFiringWebDriver eventDriver;
 
-	@Mock
+    @Mock
 	private TargetLocator locator;
 
-	private MockedStatic mockedWebUIDriver;
+	private MockedStatic<WebUIDriver> mockedWebUIDriver;
 	
 	@BeforeMethod(groups={"ut"})
 	private void init() {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
 		when(driver.getCapabilities()).thenReturn(new FirefoxOptions()); // add capabilities to allow augmenting driver
-		
-		eventDriver = spy(new CustomEventFiringWebDriver(driver));
+
+        CustomEventFiringWebDriver eventDriver = spy(new CustomEventFiringWebDriver(driver));
 
 		mockedWebUIDriver = mockStatic(WebUIDriver.class);
 		mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
 		when(driver.findElement(By.id("el"))).thenReturn(element);
 		when(element.findElement(By.id("link"))).thenReturn(link);
-		when(element.findElements(By.tagName("tr"))).thenReturn(Arrays.asList(row));
-		when(row.findElements(any(By.class))).thenReturn(Arrays.asList(cell));
-		when(driver.findElements(By.id("frameId"))).thenReturn(Arrays.asList(frameEl));
-		when(driver.findElements(By.id("frameId2"))).thenReturn(Arrays.asList(subFrameEl));
-		when(driver.findElements(By.tagName("iframe"))).thenReturn(Arrays.asList(frameEl, frameEl2));
+		when(element.findElements(By.tagName("tr"))).thenReturn(List.of(row));
+		when(row.findElements(any(By.class))).thenReturn(List.of(cell));
+		when(driver.findElements(By.id("frameId"))).thenReturn(List.of(frameEl));
+		when(driver.findElements(By.id("frameId2"))).thenReturn(List.of(subFrameEl));
+		when(driver.findElements(By.tagName("iframe"))).thenReturn(List.of(frameEl, frameEl2));
 		when(driver.switchTo()).thenReturn(locator);
 		doNothing().when(eventDriver).scrollToElement(any(WebElement.class),  anyInt());
 		
@@ -127,7 +125,7 @@ public class TestFrameElement extends MockitoTest {
 	}
 
 	@Test(groups={"ut"})
-	public void testUseElementInsideFrame() throws Exception {
+	public void testUseElementInsideFrame() {
 
 		ArgumentCaptor<WebElement> frameArgument = ArgumentCaptor.forClass(WebElement.class);
 		FrameElement frame = new FrameElement("", By.id("frameId"));
@@ -141,10 +139,9 @@ public class TestFrameElement extends MockitoTest {
 
 	/**
 	 * issue #276: Check that we can switch to a frame by index
-	 * @throws Exception
 	 */
 	@Test(groups={"ut"})
-	public void testUseElementInsideFrameWithIndex() throws Exception {
+	public void testUseElementInsideFrameWithIndex() {
 		ArgumentCaptor<WebElement> frameArgument = ArgumentCaptor.forClass(WebElement.class);
 		
 		FrameElement frame = new FrameElement("", By.tagName("iframe"), 1);
@@ -157,7 +154,7 @@ public class TestFrameElement extends MockitoTest {
 	}
 
 	@Test(groups={"ut"})
-	public void testUseElementInsideFrameWithNegativeIndex() throws Exception {
+	public void testUseElementInsideFrameWithNegativeIndex() {
 		ArgumentCaptor<WebElement> frameArgument = ArgumentCaptor.forClass(WebElement.class);
 
 		FrameElement frame = new FrameElement("", By.tagName("iframe"), -1);
@@ -170,7 +167,7 @@ public class TestFrameElement extends MockitoTest {
 	}
 
 	@Test(groups={"ut"})
-	public void testUseElementInsideFrameWithFirstVisibleIndex() throws Exception {
+	public void testUseElementInsideFrameWithFirstVisibleIndex() {
 		ArgumentCaptor<WebElement> frameArgument = ArgumentCaptor.forClass(WebElement.class);
 
 		FrameElement frame = new FrameElement("", By.tagName("iframe"), HtmlElement.FIRST_VISIBLE);
@@ -183,17 +180,16 @@ public class TestFrameElement extends MockitoTest {
 	}
 	/**
 	 * issue #276: Check a clear error is raised when an invalid index is given for finding a frame
-	 * @throws Exception
 	 */
 	@Test(groups={"ut"}, expectedExceptions=NoSuchFrameException.class)
-	public void testUseElementInsideFrameWithWrongIndex() throws Exception {
+	public void testUseElementInsideFrameWithWrongIndex() {
 		FrameElement frame = new FrameElement("", By.tagName("iframe"), 2);
 		HtmlElement el = new HtmlElement("", By.id("el"), frame);
 		el.click();
 	}
 	
 	@Test(groups={"ut"})
-	public void testUseElementInsideFrameRetryOnError() throws Exception {
+	public void testUseElementInsideFrameRetryOnError() {
 		FrameElement frame = new FrameElement("", By.id("frameId"));
 		HtmlElement el = new HtmlElement("", By.id("el"), frame);
 		
@@ -206,7 +202,7 @@ public class TestFrameElement extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testUseElementInside2Frames() throws Exception {
+	public void testUseElementInside2Frames() {
 		FrameElement frame = new FrameElement("", By.id("frameId"));
 		FrameElement frame2 = new FrameElement("", By.id("frameId2"), frame);
 		HtmlElement el = new HtmlElement("", By.id("el"), frame2);
@@ -218,7 +214,7 @@ public class TestFrameElement extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testUseElementOutsideFrame() throws Exception {
+	public void testUseElementOutsideFrame() {
 		HtmlElement el = new HtmlElement("", By.id("el"));
 		el.click();
 		
@@ -228,10 +224,9 @@ public class TestFrameElement extends MockitoTest {
 	/* tests for each element defined in framework */
 	/**
 	 * check we switched to default content and frame
-	 * @throws Exception
 	 */
 	@Test(groups={"ut"})
-	public void testButtonElementInsideFrame() throws Exception {
+	public void testButtonElementInsideFrame() {
 		FrameElement frame = new FrameElement("", By.id("frameId"));
 		ButtonElement el = new ButtonElement("", By.id("el"), frame);
 		el.submit();
@@ -240,7 +235,7 @@ public class TestFrameElement extends MockitoTest {
 		verify(locator).defaultContent();
 	}
 	@Test(groups={"ut"})
-	public void testButtonElementOutsideFrame() throws Exception {
+	public void testButtonElementOutsideFrame() {
 		ButtonElement el = new ButtonElement("", By.id("el"));
 		el.submit();
 		
@@ -248,7 +243,7 @@ public class TestFrameElement extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testCheckBoxElementInsideFrame() throws Exception {
+	public void testCheckBoxElementInsideFrame() {
 		FrameElement frame = new FrameElement("", By.id("frameId"));
 		CheckBoxElement el = new CheckBoxElement("", By.id("el"), frame);
 		el.check();
@@ -257,7 +252,7 @@ public class TestFrameElement extends MockitoTest {
 		verify(locator, times(2)).defaultContent();
 	}
 	@Test(groups={"ut"})
-	public void testCheckBoxElementOutsideFrame() throws Exception {
+	public void testCheckBoxElementOutsideFrame() {
 		CheckBoxElement el = new CheckBoxElement("", By.id("el"));
 		el.uncheck();
 		
@@ -265,7 +260,7 @@ public class TestFrameElement extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testImageElementInsideFrame() throws Exception {
+	public void testImageElementInsideFrame() {
 		FrameElement frame = new FrameElement("", By.id("frameId"));
 		ImageElement el = new ImageElement("", By.id("el"), frame);
 		el.getWidth();
@@ -274,7 +269,7 @@ public class TestFrameElement extends MockitoTest {
 		verify(locator).defaultContent();
 	}
 	@Test(groups={"ut"})
-	public void testImageElementOutsideFrame() throws Exception {
+	public void testImageElementOutsideFrame() {
 		ImageElement el = new ImageElement("", By.id("el"));
 		el.getWidth();
 		
@@ -282,7 +277,7 @@ public class TestFrameElement extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testLabelElementInsideFrame() throws Exception {
+	public void testLabelElementInsideFrame() {
 		FrameElement frame = new FrameElement("", By.id("frameId"));
 		LabelElement el = new LabelElement("", By.id("el"), frame);
 		el.click();
@@ -291,7 +286,7 @@ public class TestFrameElement extends MockitoTest {
 		verify(locator).defaultContent();
 	}
 	@Test(groups={"ut"})
-	public void testLabelElementOutsideFrame() throws Exception {
+	public void testLabelElementOutsideFrame() {
 		LabelElement el = new LabelElement("", By.id("el"));
 		el.click();
 		
@@ -299,7 +294,7 @@ public class TestFrameElement extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testLinkElementInsideFrame() throws Exception {
+	public void testLinkElementInsideFrame() {
 		FrameElement frame = new FrameElement("", By.id("frameId"));
 		LinkElement el = new LinkElement("", By.id("el"), frame);
 		el.click();
@@ -308,7 +303,7 @@ public class TestFrameElement extends MockitoTest {
 		verify(locator).defaultContent();
 	}
 	@Test(groups={"ut"})
-	public void testLinkElementOutsideFrame() throws Exception {
+	public void testLinkElementOutsideFrame() {
 		LinkElement el = new LinkElement("", By.id("el"));
 		el.click();
 		
@@ -316,7 +311,7 @@ public class TestFrameElement extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testRadioButtonElementInsideFrame() throws Exception {
+	public void testRadioButtonElementInsideFrame() {
 		FrameElement frame = new FrameElement("", By.id("frameId"));
 		RadioButtonElement el = new RadioButtonElement("", By.id("el"), frame);
 		el.check();
@@ -325,7 +320,7 @@ public class TestFrameElement extends MockitoTest {
 		verify(locator).defaultContent();
 	}
 	@Test(groups={"ut"})
-	public void testRadioButtonElementOutsideFrame() throws Exception {
+	public void testRadioButtonElementOutsideFrame() {
 		RadioButtonElement el = new RadioButtonElement("", By.id("el"));
 		el.check();
 		
@@ -333,7 +328,7 @@ public class TestFrameElement extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testSelectListInsideFrame() throws Exception {
+	public void testSelectListInsideFrame() {
 		when(element.getTagName()).thenReturn("select");
 		
 		FrameElement frame = new FrameElement("", By.id("frameId"));
@@ -344,7 +339,7 @@ public class TestFrameElement extends MockitoTest {
 		verify(locator, times(1)).defaultContent();
 	}
 	@Test(groups={"ut"})
-	public void testSelectListOutsideFrame() throws Exception {
+	public void testSelectListOutsideFrame() {
 		when(element.getTagName()).thenReturn("select");
 		
 		SelectList el = new SelectList("", By.id("el"));
@@ -353,7 +348,7 @@ public class TestFrameElement extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testTableInsideFrame() throws Exception {
+	public void testTableInsideFrame() {
 		FrameElement frame = new FrameElement("", By.id("frameId"));
 		Table el = new Table("", By.id("el"), frame);
 		el.getColumns();
@@ -363,7 +358,7 @@ public class TestFrameElement extends MockitoTest {
 		verify(locator, times(3)).defaultContent();
 	}
 	@Test(groups={"ut"})
-	public void testTableOutsideFrame() throws Exception {
+	public void testTableOutsideFrame() {
 		Table el = new Table("", By.id("el"));
 		el.getColumns();
 		
@@ -371,7 +366,7 @@ public class TestFrameElement extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testTextFieldElementInsideFrame() throws Exception {
+	public void testTextFieldElementInsideFrame() {
 		FrameElement frame = new FrameElement("", By.id("frameId"));
 		TextFieldElement el = new TextFieldElement("", By.id("el"), frame);
 		el.sendKeys("toto");
@@ -380,7 +375,7 @@ public class TestFrameElement extends MockitoTest {
 		verify(locator).defaultContent();
 	}
 	@Test(groups={"ut"})
-	public void testTextFieldElementOutsideFrame() throws Exception {
+	public void testTextFieldElementOutsideFrame() {
 		TextFieldElement el = new TextFieldElement("", By.id("el"));
 		el.sendKeys("toto");
 		
@@ -389,14 +384,13 @@ public class TestFrameElement extends MockitoTest {
 	
 	/**
 	 * Test that we enter the iframe of the parent element when searching looking a sub-element
-	 * @throws Exception
 	 */
 	@Test(groups={"ut"})
-	public void testUseElementInsideElementInsideFrame() throws Exception {
+	public void testUseElementInsideElementInsideFrame() {
 		FrameElement frame = new FrameElement("", By.id("frameId"));
 		HtmlElement el = new HtmlElement("", By.id("el"), frame);
-		LinkElement link = el.findLinkElement(By.id("link"));
-		link.click();
+		LinkElement link2 = el.findLinkElement(By.id("link"));
+		link2.click();
 		
 		verify(locator).frame(any(WebElement.class));
 		verify(locator).defaultContent();

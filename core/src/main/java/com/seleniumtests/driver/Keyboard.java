@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,6 +21,7 @@ import java.awt.AWTException;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
 import java.awt.im.InputContext;
+import java.io.Serial;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -38,7 +39,8 @@ public class Keyboard {
 	private static final Logger logger = SeleniumRobotLogger.getLogger(Keyboard.class);
 	
 	private Map<Character,KeyStroke> strokeUsMap = new HashMap<Character,KeyStroke>(){
-        private static final long serialVersionUID = 1L;{
+        @Serial
+		private static final long serialVersionUID = 1L;{
 		    put('\n',new KeyStroke(KeyEvent.VK_ENTER, false));
 		    put('\t',new KeyStroke(KeyEvent.VK_TAB, false));
 		    put('\r',new KeyStroke(KeyEvent.VK_HOME, false));
@@ -58,7 +60,7 @@ public class Keyboard {
 		    put('-',new KeyStroke(KeyEvent.VK_MINUS, false));
 		    put('.',new KeyStroke(KeyEvent.VK_PERIOD, false));
 		    put('/',new KeyStroke(KeyEvent.VK_SLASH, false));
-		    for(int i=(int)'0';i<=(int)'9';i++){
+		    for(int i='0';i<='9';i++){
 		        put((char)i,new KeyStroke(i, false));
 		    }
 		    put(':',new KeyStroke(KeyEvent.VK_SEMICOLON, true));
@@ -68,7 +70,7 @@ public class Keyboard {
 		    put('>',new KeyStroke(KeyEvent.VK_PERIOD, true));
 		    put('?',new KeyStroke(KeyEvent.VK_SLASH, true));
 		    put('@',new KeyStroke(KeyEvent.VK_2, true));
-		    for(int i=(int)'A';i<=(int)'Z';i++){
+		    for(int i='A';i<='Z';i++){
 		        put((char)i,new KeyStroke(i, true));
 		    }
 		    put('[',new KeyStroke(KeyEvent.VK_OPEN_BRACKET, false));
@@ -77,8 +79,8 @@ public class Keyboard {
 		    put('^',new KeyStroke(KeyEvent.VK_6, true));
 		    put('_',new KeyStroke(KeyEvent.VK_MINUS, true));
 		    put('`',new KeyStroke(KeyEvent.VK_BACK_QUOTE, false));
-		    for(int i=(int)'A';i<=(int)'Z';i++){
-		        put((char)(i+((int)'a'-(int)'A')),new KeyStroke(i, false));
+		    for(int i='A';i<='Z';i++){
+		        put((char)(i+('a'-'A')),new KeyStroke(i, false));
 		    }
 		    put('{',new KeyStroke(KeyEvent.VK_OPEN_BRACKET, true));
 		    put('|',new KeyStroke(KeyEvent.VK_BACK_SLASH, true));
@@ -87,7 +89,8 @@ public class Keyboard {
 		}};
         
     private Map<Character,KeyStroke> strokeFrMap = new HashMap<Character,KeyStroke>(){
-    	private static final long serialVersionUID = 1L;{
+    	@Serial
+		private static final long serialVersionUID = 1L;{
     		put('\n',new KeyStroke(KeyEvent.VK_ENTER, false));
     		put('\t',new KeyStroke(KeyEvent.VK_TAB, false));
     		put('\r',new KeyStroke(KeyEvent.VK_HOME, false));
@@ -117,7 +120,7 @@ public class Keyboard {
     		put('-',new KeyStroke(KeyEvent.VK_6, false));
     		put('.',new KeyStroke(KeyEvent.VK_SEMICOLON, true));
     		put('/',new KeyStroke(KeyEvent.VK_COLON, true));
-    		for(int i=(int)'0';i<=(int)'9';i++){
+    		for(int i='0';i<='9';i++){
     			put((char)i,new KeyStroke(i, true));
     		}        		
     		put('€',new KeyStroke(KeyEvent.VK_E, false, true));
@@ -128,7 +131,7 @@ public class Keyboard {
     		put('>',new KeyStroke(KeyEvent.VK_LESS, true));
     		put('?',new KeyStroke(KeyEvent.VK_COMMA, true));
     		put('@',new KeyStroke(KeyEvent.VK_0, false, true));
-    		for(int i=(int)'A';i<=(int)'Z';i++){
+    		for(int i='A';i<='Z';i++){
     			put((char)i,new KeyStroke(i, true));
     		}
     		put('[',new KeyStroke(KeyEvent.VK_5, false, true));
@@ -137,8 +140,8 @@ public class Keyboard {
     		put('¨',new KeyStroke(KeyEvent.VK_CIRCUMFLEX, true));
     		put('_',new KeyStroke(KeyEvent.VK_8, false));
     		put('`',new KeyStroke(KeyEvent.VK_7, false, true));
-    		for(int i=(int)'A';i<=(int)'Z';i++){
-    			put((char)(i+((int)'a'-(int)'A')),new KeyStroke(i, false));
+    		for(int i='A';i<='Z';i++){
+    			put((char)(i+('a'-'A')),new KeyStroke(i, false));
     		}
     		put('{',new KeyStroke(KeyEvent.VK_4, false, true));
     		put('|',new KeyStroke(KeyEvent.VK_6, false, true));
@@ -148,7 +151,7 @@ public class Keyboard {
     	
 	private Map<Character,KeyStroke> strokeMap;
     
-    private Robot robot;
+    private final Robot robot;
     public Keyboard() throws AWTException{
         robot = new Robot();
         
@@ -169,7 +172,7 @@ public class Keyboard {
         try{
         	strokeMap.get(key).type();
         }catch(NullPointerException ex){
-            logger.error("'"+key+"': no such key in mappings");
+            logger.error("'{}': no such key in mappings", key);
         }
     }
     
@@ -216,7 +219,7 @@ public class Keyboard {
 			if (OSUtility.isWindows()) {
 				robot.keyPress(KeyEvent.VK_ALT);
 				for (int i = 0; i < asciiCode.length(); i++) {
-					int keyEvent = (int) asciiCode.charAt(i) + 48;
+					int keyEvent = asciiCode.charAt(i) + 48;
 					logger.info(keyEvent);
 					robot.keyPress(keyEvent);
 					robot.keyRelease(keyEvent);
@@ -258,7 +261,7 @@ public class Keyboard {
                         break;
                     }
                 }
-                logger.error("Key Code Not Recognized: '" + ch + "'->" + code);
+                logger.error("Key Code Not Recognized: '{}'->{}", ch, code);
             }
         }
     }

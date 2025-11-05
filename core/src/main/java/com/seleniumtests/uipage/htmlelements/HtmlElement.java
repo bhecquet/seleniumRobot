@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,6 +38,7 @@ import com.seleniumtests.uipage.selectorupdaters.MobileAndroidAppUpdater;
 import com.seleniumtests.uipage.selectorupdaters.MobileWebViewUpdater;
 import com.seleniumtests.uipage.selectorupdaters.ShadowDomRootUpdater;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.openqa.selenium.By;
 import org.openqa.selenium.By.ByXPath;
 import org.openqa.selenium.Dimension;
@@ -103,7 +104,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	// so wait to this old interface to be really removed
 
     protected static Logger logger = SeleniumRobotLogger.getLogger(HtmlElement.class);
-	private static ScenarioLogger scenarioLogger = ScenarioLogger.getScenarioLogger(TestRetryAnalyzer.class);
+	private static final ScenarioLogger scenarioLogger = ScenarioLogger.getScenarioLogger(TestRetryAnalyzer.class);
 	
     public static final Integer FIRST_VISIBLE = Integer.MAX_VALUE;
     public static final Integer OPTIMAL_SCROLLING = Integer.MAX_VALUE;
@@ -117,7 +118,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     		  "emit('mousedown', {buttons: 1}); " +
     		  "emit('mouseup',   {});" +
     		  "emit('click',     {detail: 3});  " +
-    		  "" +
+
     		  "function emit(name, init) {" +
     		    "target.dispatchEvent(new MouseEvent(name, init));" +
     		  "}" ;
@@ -131,15 +132,15 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     		+ "   arguments[0].fireEvent('ondblclick');"
     		+ "}";
     
-	private ThreadLocal<WebDriver> driver = new ThreadLocal<>();
-	private ThreadLocal<WebElement> element = new ThreadLocal<>();
+	private final ThreadLocal<WebDriver> driver = new ThreadLocal<>();
+	private final ThreadLocal<WebElement> element = new ThreadLocal<>();
     protected ThreadLocal<SearchContext> searchContext = new ThreadLocal<>(); // if searchContext is a WebElement, then, element and searchContext will be the same. Used to store ShadowRoot which are not WebElements
 
-    protected HtmlElement parent = null;
+    protected HtmlElement parent;
     protected FrameElement frameElement = null;
     private boolean scrollToElementBeforeAction = false;
     private Integer elementIndex = -1;
-    private By by = null;
+    private By by;
 
     public HtmlElement() {
     	this("", By.id(""));
@@ -150,8 +151,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      *
      * @param   label  - element name for logging
      * @param   by     - By type
-     *
-     * @sample  {@code new HtmlElement("UserId", By.id(userid))}
+     * {@code new HtmlElement("UserId", By.id(userid))}
      */
     
     public HtmlElement(String label, By by) {
@@ -168,8 +168,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * 					 If index is null, use <code>driver.findElement(By)</code> intenally
      *  				 If index is negative, search from the last one (-1)
      *  			     If index is HtmlElement.FIRST_VISIBLE, search the first visible element
-     *
-     * @sample  {@code new HtmlElement("UserId", By.id(userid), 2)}
+     * {@code new HtmlElement("UserId", By.id(userid), 2)}
      */
     public HtmlElement(String label, By by, Integer index) {
     	this(label, by, (FrameElement)null, index);
@@ -240,14 +239,6 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     }
     public HtmlElement(String label, By by, HtmlElement parent, Integer index, Integer replayTimeout) {
     	this(label, by, null, parent, index, replayTimeout);
-    }
-    
-    /**
-     * @deprecated Should not be used as the element is either directly search in a frame or in a parent element which itself is in a frame, not both
-     */
-    @Deprecated
-    public HtmlElement(String label, By by, FrameElement frame, HtmlElement parent, Integer index) {
-    	this(label, by, frame, parent, index, null);	
     }
     
     /**
@@ -419,7 +410,6 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 
     /**
      * Click element in native way by Actions.
-     *
      * <p/>
 	 *
      * <pre class="code">
@@ -542,12 +532,13 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     
     /**
      * Find elements inside this element
-     * @param by
+     * @param by	selector
      * @return 	List of selenium WebElement 
      */
-    @Override
+    @NotNull
+	@Override
     @ReplayOnError
-    public List<WebElement> findElements(By by) {
+    public List<WebElement> findElements(@NotNull By by) {
     	
     	// find the root element
     	findElement(false, false);
@@ -564,7 +555,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     /**
      * Find elements inside this element
 	 * 
-     * @param childBy
+     * @param childBy	selector of the child element
      * @return	List of HtmlElement's based on real WebElement
      */
     @ReplayOnError
@@ -612,13 +603,14 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     }
     
     /**
-     * Find an element inside an other one
+     * Find an element inside another one
 	 * 
-     * @param by
-     * @return
+     * @param by	selector of the element
+     * @return the updated HtmlElement
      */
+	@NotNull
 	@Override
-    public HtmlElement findElement(By by) {
+    public HtmlElement findElement(@NotNull By by) {
     	return new HtmlElement(label, by, this);
     }
     
@@ -656,7 +648,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * except that any action on the found element will be retried if it fails
      * @param by 	locator of the element list
      * @param index	index in the list to get
-     * @return
+     * @return	the updated HtmlElement
      */
     public HtmlElement findElement(By by, Integer index) {
     	return new HtmlElement(label, by, this, index);
@@ -703,8 +695,8 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	 * Change CSS attribute of the element by setting if via javascript:
 	 * arguments[0].style.<attribute>=<value>
 	 * 
-     * @param cssProperty
-     * @param cssPropertyValue
+     * @param cssProperty		CSS property to change
+     * @param cssPropertyValue	CSS value to set
      */
     public void changeCssAttribute(String cssProperty, String cssPropertyValue) {
     	findElement(false, false);
@@ -799,11 +791,11 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         		
         	}
         	
-        	searchContext.set(findSeleniumElement(parent.searchContext.get(), elementInfo));
+        	searchContext.set(findSeleniumElement(parent.searchContext.get()));
         	
 
         } else {
-        	searchContext.set(findSeleniumElement(getDriver(), elementInfo));
+        	searchContext.set(findSeleniumElement(getDriver()));
         }
         
         try {
@@ -823,7 +815,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
             	try {
             		new WebDriverWait(getDriver(), Duration.ofSeconds(1)).until(ExpectedConditions.visibilityOf(getRealElementNoSearch()));
             	} catch (TimeoutException e) {
-            		logger.error(String.format("Element %s has never been made visible", toString()));
+            		logger.error("Element {} has never been made visible", this);
             	}
             }
             
@@ -833,27 +825,23 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	        	elementInfo.updateInfo(this);
     	        	elementInfo.exportToJsonFile(false, this);
             	} catch (Exception e) {
-            		logger.warn("Error storing element information: " + e.getMessage());
+            		logger.warn("Error storing element information: {}", e.getMessage());
             	}
             }
         	
         } catch (ClassCastException e) {
         	// in case it's a ShadowRoot (not a WebElement, do not try to make it visible
         }
-        
-        
-        
     }
     
     /**
      * Call driver to really search the element
      * If index is specified, return the Nth element corresponding to search
      * 
-     * @param context
-     * @param elementInfo
-     * @return
+     * @param context		the search context
+     * @return	the element
      */
-    private SearchContext findSeleniumElement(SearchContext context, ElementInfo elementInfo) {
+    private SearchContext findSeleniumElement(SearchContext context) {
     	
     	enterFrame();
     	
@@ -887,7 +875,9 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 		try {
 			WebDriver drv = ((CustomEventFiringWebDriver)getDriver()).getOriginalDriver();
 			packageName = ((AndroidDriver)drv).getCurrentPackage();
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			// ignore error when package is not found
+		}
 
     	new ShadowDomRootUpdater().update(this);
     	new MobileWebViewUpdater(isWebTest, isAppTest).update(this);
@@ -898,13 +888,13 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     /**
      * returns an element depending on configured index
 	 * 
-     * @param allElements
+     * @param allElements	list of elements to search in
      */
     protected <T extends SearchContext> T getElementByIndex(List<T> allElements) {
     	if (elementIndex != null && elementIndex.equals(FIRST_VISIBLE)) {
 			for (T el: allElements) {
-				if (el instanceof WebElement &&  ((WebElement)el).isDisplayed()) {
-					return (T)el;
+				if (el instanceof WebElement webElement &&  webElement.isDisplayed()) {
+					return el;
 				}
 			}
 			throw new NoSuchElementException("no visible element has been found for " + by.toString());
@@ -915,7 +905,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     			elementIndex = 0;
     		}
     		try {
-    			return (T)allElements.get(elementIndex);
+    			return allElements.get(elementIndex);
     		} catch (IndexOutOfBoundsException e) {
     			throw new NoSuchElementException(String.format("No element found for locator %s with index %d", by.toString(), elementIndex));
     		}
@@ -939,16 +929,16 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 		for (FrameElement frameEl: frameTree) {
 			WebElement frameWebElement;
 			
-			SearchContext searchContext;
+			SearchContext searchContext2;
 			if (frameEl.parent != null) {
 				frameEl.parent.findElement(false, false);
-				searchContext = frameEl.parent.getRealElementNoSearch();
+				searchContext2 = frameEl.parent.getRealElementNoSearch();
 			} else {
-				searchContext = getDriver();
+				searchContext2 = getDriver();
 			}
 
 			try {
-				List<WebElement> frameElements = searchContext.findElements(frameEl.getBy());
+				List<WebElement> frameElements = searchContext2.findElements(frameEl.getBy());
 				frameWebElement = frameEl.getElementByIndex(frameElements);
 			} catch (NoSuchElementException e) {
 				throw new NoSuchFrameException(e.getMessage());
@@ -1029,7 +1019,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	/**
 	 * Scroll to element
 	 * 
-	 * @param yOffset
+	 * @param yOffset	offset to scroll vertically
 	 */	
 	public void scrollToElement(int yOffset) {
 		findElement();
@@ -1038,8 +1028,6 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 
     /**
      * Get all elements in the current page with same locator.
-     *
-     * @return
      */
 	@ReplayOnError
     public List<WebElement> findElements() {
@@ -1059,12 +1047,12 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	 * Gets an attribute (using standard key-value pair) from the underlying
 	 * attribute.
      *
-     * @param   name
+     * @param   name	the attribute name
      *
-     * @return
+     * @return the attribute value
      */
 	@ReplayOnError
-    public String getAttribute(String name) {
+    public String getAttribute(@NotNull String name) {
         findElement(false, false);
 
 		return getRealElementNoSearch().getAttribute(name);
@@ -1072,7 +1060,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	
 	@Override
 	@ReplayOnError
-	public String getDomAttribute(String name) {
+	public String getDomAttribute(@NotNull String name) {
 		findElement(false, false);
 		
 		return getRealElementNoSearch().getDomAttribute(name);
@@ -1080,7 +1068,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	
 	@Override
 	@ReplayOnError
-	public String getDomProperty(String name) {
+	public String getDomProperty(@NotNull String name) {
 		findElement(false, false);
 		
 		return getRealElementNoSearch().getDomProperty(name);
@@ -1102,6 +1090,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 		return getRealElementNoSearch().getAccessibleName();
 	}
 	
+	@NotNull
 	@Override
 	@ReplayOnError
 	public SearchContext getShadowRoot() {
@@ -1112,8 +1101,6 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 
     /**
      * Returns the BY locator stored in the HtmlElement.
-     *
-     * @return
      */
     public By getBy() {
         return by;
@@ -1121,14 +1108,12 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 
     /**
      * Returns the value for the specified CSS key.
-     *
-     * @param   propertyName
-     *
-     * @return
+     * @param   propertyName	name of the CSS property
      */
-    @Override
+    @NotNull
+	@Override
     @ReplayOnError
-    public String getCssValue(String propertyName) {
+    public String getCssValue(@NotNull String propertyName) {
         findElement(false, false);
 
 		return getRealElementNoSearch().getCssValue(propertyName);
@@ -1156,8 +1141,6 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	/**
      * Returns the underlying WebDriver WebElement.
 	 * Search is always done
-     *
-     * @return
      */
     @ReplayOnError
     public WebElement getElement() {
@@ -1166,25 +1149,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     }
 
     /**
-     * Executes the given JavaScript against the underlying WebElement.
-     *
-     * @param   script
-     * @deprecated ...
-     *
-     * @return
-     */
-    @ReplayOnError
-    @Deprecated
-    public String getEval(String script) {
-        findElement(false, false);
-        
-		return (String) ((JavascriptExecutor) getDriver()).executeScript(script, getRealElementNoSearch());
-    }
-
-    /**
      * Returns the 'height' property of the underlying WebElement's Dimension.
-     *
-     * @return
      */
     @ReplayOnError
     public int getHeight() {
@@ -1196,10 +1161,9 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 
     /**
      * Gets the Point location of the underlying WebElement.
-     *
-     * @return
      */
-    @Override
+    @NotNull
+	@Override
     @ReplayOnError
     public Point getLocation() {
         findElement(false, false);
@@ -1208,6 +1172,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     }
     
 
+	@NotNull
 	@Override
 	@ReplayOnError
 	public Rectangle getRect() {
@@ -1217,10 +1182,9 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 
     /**
      * Returns the Dimension property of the underlying WebElement.
-     *
-     * @return
      */
-    @Override
+    @NotNull
+	@Override
     @ReplayOnError
     public Dimension getSize() {
         findElement(false, false);
@@ -1230,10 +1194,9 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 
     /**
      * Returns the HTML Tag for the underlying WebElement (div, a, input, etc).
-     *
-     * @return
      */
-    @Override
+    @NotNull
+	@Override
     @ReplayOnError
     public String getTagName() {
         findElement(false, false);
@@ -1243,10 +1206,9 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 
     /**
      * Returns the text body of the underlying WebElement.
-     *
-     * @return
      */
-    @Override
+    @NotNull
+	@Override
     @ReplayOnError
     public String getText() {
         findElement(false, false);
@@ -1256,8 +1218,6 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 
     /**
      * Returns the 'value' attribute of the underlying WebElement or '' if no value present
-     *
-     * @return
      */
     @ReplayOnError
     public String getValue() {
@@ -1269,8 +1229,6 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 
     /**
      * Returns the 'width' property of the underlying WebElement's Dimension.
-     *
-     * @return
      */
     @ReplayOnError
     public int getWidth() {
@@ -1282,8 +1240,6 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     /**
 	 * Indicates whether or not the web element is currently displayed in the
 	 * browser.
-     *
-     * @return
      */
     @Override
     public boolean isDisplayed() {
@@ -1313,7 +1269,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	 * isElementPresent acts as isElementPresentAndDisplayed
      * 
      * @param timeout 	timeout in seconds
-     * @return
+     * @return true if the element is present in DOM
      */
     public boolean isElementPresent(int timeout) {        
         try {
@@ -1351,7 +1307,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     /**
      * Indicates whether or not the element is enabled in the browser.
      *
-     * @return
+     * @return true if the element can be clicked
      */
     @Override
     @ReplayOnError
@@ -1364,7 +1320,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     /**
      * Indicates whether or not the element is selected in the browser.
      *
-     * @return
+     * @return	true if the element is selected
      */
     @Override
     @ReplayOnError
@@ -1378,31 +1334,13 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	 * Whether or not the indicated text is contained in the element's getText()
 	 * attribute.
      *
-     * @param   pattern
+     * @param   pattern	the pattern of the text ot search
      *
-     * @return
+     * @return true if the text is present
      */
     public boolean isTextPresent(String pattern) {
         String text = getText();
-        return text != null && (text.contains(pattern) || text.matches(pattern));
-    }
-    
-    /**
-	 * @deprecated (due to selenium Mouse deprecation) Forces a mouseDown event on
-	 *             the WebElement.
-     */
-    @Deprecated
-    public void mouseDown() {
-        logger.error("use 'new Actions(driver).moveToElement(element).click().perform();' instead");
-    }
-
-    /**
-	 * @deprecated (due to selenium Mouse deprecation) Forces a mouseOver event on
-	 *             the WebElement.
-     */
-    @Deprecated
-    public void mouseOver() {
-    	logger.error("use 'new Actions(driver).moveToElement(element).click().perform();' instead");
+        return text.contains(pattern) || text.matches(pattern);
     }
 
     /**
@@ -1418,7 +1356,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     }
     
     @Override
-    public void sendKeys(CharSequence... keysToSend) {
+    public void sendKeys(@NotNull CharSequence... keysToSend) {
     	sendKeys(true, keysToSend);
     }
     
@@ -1442,8 +1380,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     
     /**
 	 * Wait few time between keys typing
-	 * @param keysToSend
-	 * @throws InterruptedException
+	 * @param keysToSend			keys to send
 	 */
 	@ReplayOnError(waitAfterAction = true)
 	public void sendKeysAction(long duration, CharSequence... keysToSend) {
@@ -1465,7 +1402,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	 * Send keys through composite actions /!\ does not clear text before and no
 	 * blur after
      * 
-     * @param keysToSend
+     * @param keysToSend	keys to send
      */
 	@ReplayOnError(waitAfterAction = true)
     public void sendKeysAction(CharSequence... keysToSend) {
@@ -1476,7 +1413,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	/**
 	 * Send keys using real keyboard
 	 * 
-	 * @param keysToSend
+	 * @param keysToSend	keys to send
 	 */
 	public void sendKeysKeyboard(CharSequence... keysToSend) {
 		clickMouse();
@@ -1540,9 +1477,11 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 			attributeValue = getRealElementNoSearch().getAttribute(attributeName);
 		}
 
-		Matcher matcher = pattern.matcher(attributeValue);
-		if (matcher.matches() && matcher.groupCount() > 0) {
-			return matcher.group(1);
+        if (attributeValue != null) {
+			Matcher matcher = pattern.matcher(attributeValue);
+			if (matcher.matches() && matcher.groupCount() > 0) {
+				return matcher.group(1);
+			}
 		}
 
 		return "";
@@ -1577,7 +1516,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * Converts the Type, Locator and LabelElement attributes of the HtmlElement into a readable and report-friendly
      * string.
      *
-     * @return
+     * @return	html representation of this element
      */
     public String toHTML() {
         return getClass().getSimpleName().toLowerCase() +
@@ -1592,7 +1531,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public String toString() {
         String elDescr = getClass().getSimpleName() + " " + getLabel() + ", by={" + getBy().toString() + "}";
         if (parent != null) {
-        	elDescr += ", sub-element of " + parent.toString();
+        	elDescr += ", sub-element of " + parent;
         }
         return elDescr;
     }
@@ -1615,7 +1554,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      */
 	private WebElement getUnderlyingElement(WebElement localElement) {
     	try {
-    		return (RemoteWebElement)((Decorated<WebElement>)localElement).getOriginal();
+    		return ((Decorated<WebElement>)localElement).getOriginal();
     	} catch (ClassCastException e) {
     		return localElement;
     	}
@@ -1665,7 +1604,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	
 	public void setImplicitWaitTimeout(int timeout, TemporalUnit unit) {
 		try {
-			getDriver().manage().timeouts().implicitlyWait(Duration.of((long)timeout, unit));
+			getDriver().manage().timeouts().implicitlyWait(Duration.of(timeout, unit));
 		} catch (Exception ex) {
 			logger.error(ex);
 		}
@@ -1715,9 +1654,9 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	public void waitForPresentAndDisplayed(int timeout) {
 		long start = System.currentTimeMillis();
 		waitForPresent(timeout);
-		Long duration = (System.currentTimeMillis() - start) / 1000;
+		long duration = (System.currentTimeMillis() - start) / 1000;
 
-		waitFor(Math.max(1, timeout - duration.intValue()), ExpectedConditions.visibilityOf(this));
+		waitFor(Math.max(1, timeout - (int) duration), ExpectedConditions.visibilityOf(this));
 	}
 	public void waitForPresentAndDisplayed() {
 		waitForPresentAndDisplayed(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout());
@@ -1773,8 +1712,8 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	/**
 	 * Sometimes, the frame defined for the element may change
 	 * 
-	 * @param frameElement
-	 * @return
+	 * @param frameElement	the new frame element
+	 * @return	the updated element
 	 */
 	@SuppressWarnings("unchecked")
 	public <T extends HtmlElement> T changeFrame(FrameElement frameElement, Class<T> type) {
@@ -1783,8 +1722,9 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 		return (T)this;
 	}
 
+	@NotNull
 	@Override
-	public <X> X getScreenshotAs(OutputType<X> target) {
+	public <X> X getScreenshotAs(@NotNull OutputType<X> target) {
 		findElement();
 		return getRealElementNoSearch().getScreenshotAs(target);
 	}
@@ -1823,7 +1763,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	/**
 	 * USE ONLY for testing
 	 * 
-	 * @param element
+	 * @param element	the real element targetted by this HtmlElement
 	 */
 	public void setElement(WebElement element) {
 		this.element.set(element);
@@ -1835,7 +1775,6 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	
 	/**
 	 * Directly returns the real element even if it has not been searched
-	 * @return
 	 */
 	protected WebElement getRealElementNoSearch() {
 		return element.get();
@@ -1844,8 +1783,6 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	/**
 	 * Returns the real web element. issue #313: Search the element if it has not
 	 * been searched before
-	 * 
-	 * @return
 	 */
 	public WebElement getRealElement() {
 		if (getRealElementNoSearch() == null) {
@@ -1857,7 +1794,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	/**
 	 * Change the search index of the element (its order in element list)
 	 * 
-	 * @param elementIndex
+	 * @param elementIndex	the new index
 	 */
 	public void setElementIndex(Integer elementIndex) {
 		this.elementIndex = elementIndex;
