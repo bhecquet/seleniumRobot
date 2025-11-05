@@ -89,6 +89,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	
 	/**
 	 * Method to be called when the test has been terminated and all AfterMethod methods has been called
+	 * If test do not start due to configuration method, this method won't be called
 	 * @param testResult the current testNG result
 	 */
 	public void onTestFullyFinished(ITestResult testResult) {
@@ -158,7 +159,15 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	 */
 	@Override
 	public void onTestSkipped(ITestResult testResult) {
-		
+
+		// Tests skipped due to "SkipException" being raised during the test will call onTestFullyFinished
+		// getSkipCauseBy() is empty in this case
+		if (!testResult.getSkipCausedBy().isEmpty()) {
+
+			// call onTestFullyFinished only when normal test run won't call it
+			onTestFullyFinished(testResult);
+		}
+
 		// be sure that the result contains context. It can happen when the test is never executed
 		// initialize it from the method context as it's the closest for our test
 		if (TestNGResultUtils.getSeleniumRobotTestContext(testResult) == null) {

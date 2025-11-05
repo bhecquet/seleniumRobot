@@ -22,6 +22,7 @@ import static org.mockito.Mockito.*;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -102,7 +103,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	 * issue #254: Check we get variable for each test execution (and each retry)
 	 */
 	@Test(groups={"it"})
-	public void testWithRetry() throws Exception {
+	public void testWithRetry() {
 		
 		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
 			when(variableServer.isAlive()).thenReturn(true);
@@ -163,7 +164,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	 * Check that logs of a failed attempt are kept in the result directory (KEEP_ALL_RESULTS=true)
 	 */
 	@Test(groups={"it"})
-	public void testKeepAllResults() throws Exception {
+	public void testKeepAllResults() {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
@@ -206,7 +207,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	 * Check that logs of a failed attempt are not kept in the result directory (KEEP_ALL_RESULTS=false)
 	 */
 	@Test(groups={"it"})
-	public void testDoNotKeepAllResults() throws Exception {
+	public void testDoNotKeepAllResults() {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
@@ -229,7 +230,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	 * issue #255: also check that seleniumRobot server is called with the right test name
 	 */
 	@Test(groups={"it"})
-	public void testWithoutRetry() throws Exception {
+	public void testWithoutRetry() {
 		
 		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
 			when(variableServer.isAlive()).thenReturn(true);
@@ -869,7 +870,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	 * issue #297: be sure we reset the driver name before the test starts
 	 */
 	@Test(groups={"it"})
-	public void testDriverNameResetAtStart() throws Exception {
+	public void testDriverNameResetAtStart() {
 
 		try (MockedStatic<WebUIDriver> mockedWebUiDriver = mockStatic(WebUIDriver.class)) {
 			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.NONE, new String[]{"testAndSubActions"});
@@ -1027,6 +1028,42 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
 		}
+	}
+
+	/**
+	 * Check finalization of test is done in each case
+	 * - a test skipped during configuration method
+	 * - a test failed
+	 * - a test OK
+	 * - a test skipped during execution
+	 */
+	@Test(groups={"it"})
+	public void testFinalizationOfTests() throws IOException {
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass2"});
+		String logs = readSeleniumRobotLogFile().replace("\\", "/");;
+
+		//  check that for each test, logger is closed
+		Assert.assertTrue(logs.contains("logging started for 'test1'"));
+		Assert.assertTrue(logs.contains("logging started for 'test2'"));
+		Assert.assertTrue(logs.contains("logging started for 'test3'"));
+		Assert.assertTrue(logs.contains("logging started for 'test4'"));
+		Assert.assertTrue(logs.contains("logging started for 'test5'"));
+		Assert.assertTrue(logs.contains("logging started for 'test6'"));
+		Assert.assertTrue(logs.contains("logging started for 'test7'"));
+		Assert.assertTrue(logs.contains("logging stopped for 'test1'"));
+		Assert.assertTrue(logs.contains("logging stopped for 'test2'"));
+		Assert.assertTrue(logs.contains("logging stopped for 'test3'"));
+		Assert.assertTrue(logs.contains("logging stopped for 'test4'"));
+		Assert.assertTrue(logs.contains("logging stopped for 'test5'"));
+		Assert.assertTrue(logs.contains("logging stopped for 'test6'"));
+		Assert.assertTrue(logs.contains("logging stopped for 'test7'"));
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1/TestReport.html"), 2);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test2/TestReport.html"), 2);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test3/TestReport.html"), 2);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test4/TestReport.html"), 2);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test5/TestReport.html"), 2);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test6/TestReport.html"), 2);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test7/TestReport.html"), 2);
 	}
 
 }

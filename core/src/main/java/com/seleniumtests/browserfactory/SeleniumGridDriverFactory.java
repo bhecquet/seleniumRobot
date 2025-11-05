@@ -18,7 +18,6 @@
 package com.seleniumtests.browserfactory;
 
 import java.net.URL;
-import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;

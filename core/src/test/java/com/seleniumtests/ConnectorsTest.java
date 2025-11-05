@@ -683,10 +683,8 @@ public class ConnectorsTest extends MockitoTest {
 	}
 	
 	/**
-	 * Creates a mock for grid on http://localhost:4321
-	 *
-	 * @throws Exception 
-	 */
+     * Creates a mock for grid on <a href="http://localhost:4321">...</a>
+     */
 	protected WebUIDriver createGridHubMockWithNodeOK() throws Exception {
 		
 		WebUIDriver uiDriver = createMockedWebDriver();
@@ -698,7 +696,6 @@ public class ConnectorsTest extends MockitoTest {
 		createJsonServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200,
 				// session not found (null)
 				GRID_STATUS_NO_SESSION, // called when we get grid status
-				GRID_STATUS_NO_SESSION,
 				// session found (id provided)
 				String.format(GRID_STATUS_WITH_SESSION, "abcdef"));
 

@@ -20,6 +20,7 @@ package com.seleniumtests.it.stubclasses;
 import java.lang.reflect.Method;
 
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -62,5 +63,10 @@ public class StubTestClass2 extends StubParentClass {
 	
 	@Test(groups="stub", dependsOnMethods={"test1"})
 	public void test6() {
+	}
+
+	@Test(groups="stub")
+	public void test7() {
+		throw new SkipException("test skipped");
 	}
 }
