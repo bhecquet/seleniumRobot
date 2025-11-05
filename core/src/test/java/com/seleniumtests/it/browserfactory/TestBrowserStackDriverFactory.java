@@ -1,5 +1,6 @@
 package com.seleniumtests.it.browserfactory;
 
+import com.seleniumtests.driver.DriverMode;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.testng.Reporter;
@@ -23,7 +24,7 @@ public class TestBrowserStackDriverFactory extends GenericTest {
 	 * -Dhttps.proxyHost=<proxy_host> -Dhttps.proxyPort=<proxy_port>
 	 */
 	@Test(groups="no-test")
-	public void testBrowserStack() {
+	public void testBrowserStackMobile() {
 		
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_ANDROID);
 
@@ -38,5 +39,30 @@ public class TestBrowserStackDriverFactory extends GenericTest {
 		driver.findElements(By.xpath("//*")).get(0).getText();
 		
 		
+	}
+
+	/**
+	 * For this test to run, you must add the following JVM parameters
+	 * -DwebDriverGrid=https://<user>:<key>@hub.browserstack.com/wd/hub
+	 * -Dhttps.proxyHost=<proxy_host> -Dhttps.proxyPort=<proxy_port>
+	 */
+	@Test(groups="no-test")
+	public void testBrowserStackDesktop() {
+
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
+
+		SeleniumTestsContextManager.getThreadContext().setPlatform("Windows 11");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
+		SeleniumTestsContextManager.getThreadContext().setVideoCapture("true");
+
+		SeleniumTestsContextManager.getThreadContext().setRunMode("browserstack");
+		SeleniumTestsContextManager.getThreadContext().configureContext(Reporter.getCurrentTestResult());
+
+		WebDriver driver = WebUIDriver.getWebDriver(true);
+		WebDriver realDriver = ((CustomEventFiringWebDriver)driver).getWebDriver();
+		driver.get("https://www.google.com");
+		driver.getPageSource();
+		WebUIDriver.cleanUp();
+
 	}
 }

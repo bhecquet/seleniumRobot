@@ -31,6 +31,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import com.seleniumtests.browserfactory.*;
 import com.seleniumtests.browserfactory.chrome.ChromeUtils;
 import com.seleniumtests.connectors.extools.FFMpeg;
 import com.seleniumtests.customexception.RetryableDriverException;
@@ -43,20 +44,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.logging.LogEntry;
 import org.testng.ITestResult;
 
-import com.seleniumtests.browserfactory.AppiumDriverFactory;
-import com.seleniumtests.browserfactory.BrowserInfo;
-import com.seleniumtests.browserfactory.BrowserStackDriverFactory;
-import com.seleniumtests.browserfactory.ChromeDriverFactory;
-import com.seleniumtests.browserfactory.EdgeDriverFactory;
-import com.seleniumtests.browserfactory.FirefoxDriverFactory;
-import com.seleniumtests.browserfactory.HtmlUnitDriverFactory;
-import com.seleniumtests.browserfactory.IEDriverFactory;
-import com.seleniumtests.browserfactory.IWebDriverFactory;
-import com.seleniumtests.browserfactory.PerfectoDriverFactory;
-import com.seleniumtests.browserfactory.SafariDriverFactory;
-import com.seleniumtests.browserfactory.SauceLabsDriverFactory;
-import com.seleniumtests.browserfactory.SeleniumGridDriverFactory;
-import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.core.testretry.TestRetryAnalyzer;
@@ -217,7 +204,7 @@ public class WebUIDriver {
         } else if (config.getMode() == DriverMode.SAUCELABS) {
         	return new SauceLabsDriverFactory(this.config);
         } else if (config.getMode() == DriverMode.BROWSERSTACK) {
-        	return new BrowserStackDriverFactory(this.config);
+        	return new BrowserstackDriverFactory(this.config);
         } else if (config.getMode() == DriverMode.PERFECTO) {
         	return new PerfectoDriverFactory(this.config);
                

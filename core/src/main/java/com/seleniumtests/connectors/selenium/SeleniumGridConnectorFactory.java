@@ -84,7 +84,7 @@ public class SeleniumGridConnectorFactory {
 			for (URL hubUrl: hubUrls) {
 				
 				if (hubUrl.getHost().contains("browserstack")) {
-					seleniumGridConnectors.add(new BrowserStackGridConnector(hubUrl.toString()));
+					seleniumGridConnectors.add(new SeleniumBrowserstackGridConnector(hubUrl));
 					break;
 				}
 				currentException = connectHub(currentException, seleniumGridConnectors, hubUrl);

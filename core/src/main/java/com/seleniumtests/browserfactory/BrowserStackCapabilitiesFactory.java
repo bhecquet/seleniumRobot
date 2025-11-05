@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,16 +18,17 @@
 package com.seleniumtests.browserfactory;
 
 import java.io.File;
-import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.seleniumtests.core.SeleniumTestsContext;
 import io.appium.java_client.android.options.UiAutomator2Options;
-import org.apache.http.auth.AuthenticationException;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
@@ -47,35 +48,43 @@ public class BrowserStackCapabilitiesFactory extends ICloudCapabilityFactory {
     public BrowserStackCapabilitiesFactory(DriverConfig webDriverConfig) {
 		super(webDriverConfig);
 	}
- 
+
+	/**
+	 * Returns the
+	 * @param hubUrl	the URL of the Hub
+	 * @return	<user>:<key>
+	 */
+	public static String getAuthenticationString(String hubUrl) {
+		Matcher matcher = REG_USER_PASSWORD.matcher(hubUrl);
+		String user;
+		String key;
+		if (matcher.matches()) {
+			user = matcher.group(1);
+			key = matcher.group(2);
+		} else {
+			throw new ConfigurationException("webDriverGrid variable does not have the right format for connecting to sauceLabs: \"https://<user>:<token>@hub.browserstack.com/wd/hub\"");
+		}
+		return user + ":" + key;
+	}
 
 	@Override
     public MutableCapabilities createCapabilities() {
 
-        MutableCapabilities capabilities = new DesiredCapabilities();
+        MutableCapabilities capabilities = createDeviceSpecificCapabilities();
 
-        // platform must be the concatenation of 'os' and 'os_version' that browserstack undestands
+        // platform must be the concatenation of 'os' and 'os_version' that browserstack understands
         String platform = webDriverConfig.getPlatform();
         String platformVersion = null;
         String platformName = null;
+
+		Map<String, String> browserStackOptions = new HashMap<>();
         
         if (SeleniumTestsContextManager.isMobileTest()) {
-	        if(ANDROID_PLATFORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
-		        
-	        	Capabilities androidCaps = new AndroidCapabilitiesFactory(webDriverConfig).createCapabilities();
-				capabilities = capabilities.merge(androidCaps);
 
-				((UiAutomator2Options)capabilities).setAutomationName("UIAutomator2");
-	            
-	        } else if (IOS_PLATFORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
-	        	Capabilities iosCaps = new IOsCapabilitiesFactory(webDriverConfig).createCapabilities();
-				capabilities = capabilities.merge(iosCaps);
-	        }
-	        
-	        capabilities.setCapability("device", webDriverConfig.getDeviceName()); // pour deviceName
-			capabilities.setCapability("realMobile", "true");
-			capabilities.setCapability("os_version", webDriverConfig.getMobilePlatformVersion());
-			capabilities.setCapability("os", webDriverConfig.getPlatform());
+			// browserstack capabilities
+			browserStackOptions.put("deviceName", webDriverConfig.getDeviceName()); // pour deviceName
+			browserStackOptions.put("osVersion", webDriverConfig.getMobilePlatformVersion());
+			browserStackOptions.put("os", webDriverConfig.getPlatform());
         	
         } else {
         	if (platform.toLowerCase().startsWith("windows")) {
@@ -91,15 +100,18 @@ public class BrowserStackCapabilitiesFactory extends ICloudCapabilityFactory {
 	        }
         	
         	if (webDriverConfig.getBrowserVersion() != null) {
-            	capabilities.setCapability("browser_version", webDriverConfig.getBrowserVersion());
+				browserStackOptions.put("browserVersion", webDriverConfig.getBrowserVersion());
             }
-            capabilities.setCapability("os", platformName);
-            capabilities.setCapability("os_version", platformVersion); 
+			browserStackOptions.put("os", platformName);
+			browserStackOptions.put("osVersion", platformVersion);
         }
-        
+
+		capabilities.setCapability(SeleniumRobotCapabilityType.GLOBAL_SESSION_ID, SeleniumTestsContext.getContextId().toString());
+		capabilities.setCapability(SeleniumRobotCapabilityType.TEST_ID, Objects.requireNonNullElse(SeleniumTestsContextManager.getThreadContext().getTestMethodSignature(), "no-test"));
         capabilities.setCapability("browserName", webDriverConfig.getBrowserType());
-        capabilities.setCapability("name", SeleniumTestsContextManager.getThreadContext().getTestMethodSignature());
-        capabilities.setCapability("project", SeleniumTestsContextManager.getApplicationName());
+		browserStackOptions.put("sessionName", (String) capabilities.getCapability(SeleniumRobotCapabilityType.TEST_ID));
+		browserStackOptions.put("buildName", (String) capabilities.getCapability(SeleniumRobotCapabilityType.GLOBAL_SESSION_ID));
+		browserStackOptions.put("projectName", SeleniumTestsContextManager.getApplicationName());
         
         // we need to upload something
 		Optional<String> applicationOption = getApp(capabilities);
@@ -108,48 +120,40 @@ public class BrowserStackCapabilitiesFactory extends ICloudCapabilityFactory {
  			capabilities.setCapability("app", appUrl);
  		}
 
+
+		browserStackOptions.put("consoleLogs", "info");
+		capabilities.setCapability("bstack:options", browserStackOptions);
+
 		 // be sure not to have appium capabilities so that further setCapabilities do not add "appium:" prefix
         return new MutableCapabilities(capabilities);
     }
 	
 	 /**
      * Upload application to browserstack server
-     * @return
-     * @throws IOException
-     * @throws AuthenticationException 
      */
     private String uploadFile(String application) {
 
     	// extract user name and password from getWebDriverGrid
-    	Matcher matcher = REG_USER_PASSWORD.matcher(SeleniumTestsContextManager.getThreadContext().getWebDriverGrid().get(0));
-    	String user;
-    	String password;
-    	if (matcher.matches()) {
-    		user = matcher.group(1);
-    		password = matcher.group(2);
-    	} else {
-    		throw new ConfigurationException("webDriverGrid variable does not have the right format for connecting to sauceLabs: \"https://<user>:<token>@hub.browserstack.com/wd/hub\"");
-    	}
-    	
+		String authenticationString = getAuthenticationString(SeleniumTestsContextManager.getThreadContext().getWebDriverGrid().get(0));
+		String user = authenticationString.split(":")[0];
+		String key = authenticationString.split(":")[1];
+
     	try (UnirestInstance unirest = Unirest.spawnInstance();){
     		
     		String proxyHost = System.getProperty("https.proxyHost");
     		String proxyPort = System.getProperty("https.proxyPort");
     		if (proxyHost != null && proxyPort != null) {
-    			unirest.config().proxy(proxyHost, Integer.valueOf(proxyPort));
+    			unirest.config().proxy(proxyHost, Integer.parseInt(proxyPort));
     		}
     		
     		HttpResponse<JsonNode> jsonResponse = unirest.post(BROWSERSTACK_UPLOAD_URL)
-    					.basicAuth(user, password)
+    					.basicAuth(user, key)
     					.field("file", new File(application))
     					.asJson()
     					.ifFailure(response -> {
     						throw new ConfigurationException(String.format("Application file upload failed: %s", response.getStatusText()));
     						})
-    					.ifSuccess(response -> {
-    						logger.info("Application successfuly uploaded to Saucelabs");
-    						
-    					});
+    					.ifSuccess(response -> logger.info("Application successfuly uploaded to Saucelabs"));
     		return jsonResponse.getBody().getObject().getString("app_url");
     		
 
@@ -159,4 +163,33 @@ public class BrowserStackCapabilitiesFactory extends ICloudCapabilityFactory {
     	
     	
     }
+
+	/**
+	 * Initialize capabilities for browser or device
+	 * @return the capabilities
+	 */
+	protected MutableCapabilities createDeviceSpecificCapabilities() {
+		if (SeleniumTestsContextManager.isDesktopWebTest()) {
+			return switch (webDriverConfig.getBrowserType()) {
+				case FIREFOX -> new FirefoxCapabilitiesFactory(webDriverConfig).createCapabilities();
+				case INTERNET_EXPLORER -> new IECapabilitiesFactory(webDriverConfig).createCapabilities();
+				case CHROME -> new ChromeCapabilitiesFactory(webDriverConfig).createCapabilities();
+				case HTMLUNIT -> new HtmlUnitCapabilitiesFactory(webDriverConfig).createCapabilities();
+				case SAFARI -> new SafariCapabilitiesFactory(webDriverConfig).createCapabilities();
+				case EDGE -> new EdgeCapabilitiesFactory(webDriverConfig).createCapabilities();
+				default ->
+						throw new ConfigurationException(String.format("Browser %s is unknown for desktop tests", webDriverConfig.getBrowserType()));
+			};
+		} else if (SeleniumTestsContextManager.isMobileTest()) {
+			if ("android".equalsIgnoreCase(webDriverConfig.getPlatform())) {
+				return new AndroidCapabilitiesFactory(webDriverConfig).createCapabilities();
+			} else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())) {
+				return new IOsCapabilitiesFactory(webDriverConfig).createCapabilities();
+			} else {
+				throw new ConfigurationException(String.format("Platform %s is unknown for mobile tests", webDriverConfig.getPlatform()));
+			}
+		} else {
+			throw new ConfigurationException("Wrong test format detected. Should be either mobile or desktop");
+		}
+	}
 }

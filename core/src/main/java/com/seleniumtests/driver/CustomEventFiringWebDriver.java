@@ -1693,11 +1693,11 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 				throw new ScenarioException("could not initialize video capture with headless robot: " + e.getMessage());
 			}
 			
-		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
+		} else if ((driverMode == DriverMode.GRID || driverMode == DriverMode.BROWSERSTACK) && gridConnector != null) {
 			gridConnector.startVideoCapture();
 			return new VideoRecorder(videoFolder, videoName, false);
 		} else {
-			throw new ScenarioException("driver supports startVideoCapture only in local and grid mode");
+			throw new ScenarioException("driver supports startVideoCapture only in local and grid / browserstack mode");
 		}
 	}
 	
@@ -1711,15 +1711,18 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		if (driverMode == DriverMode.LOCAL && recorder != null) {
 			videoRecorders.remove(recorder);
 			return recorder.stop();
-		} else if (driverMode == DriverMode.GRID && gridConnector != null && recorder != null) {
+		} else if ((driverMode == DriverMode.GRID || driverMode == DriverMode.BROWSERSTACK) && gridConnector != null && recorder != null) {
 			return gridConnector.stopVideoCapture(Paths.get(recorder.getFolderPath().getAbsolutePath(), recorder.getFileName()).toString());
 			
 		} else {
-			throw new ScenarioException("driver supports stopVideoCapture only in local and grid mode");
+			throw new ScenarioException("driver supports stopVideoCapture only in local and grid / browserstack mode");
 		}
 	}
 	
 	public static long displayStepOnScreen(String textToWrite, DriverMode driverMode, SeleniumGridConnector gridConnector, VideoRecorder recorder) {
+		if (driverMode == DriverMode.BROWSERSTACK) {
+			return 0;
+		}
 		if (driverMode == DriverMode.LOCAL) {
 			
 			recorder.displayRunningStep(textToWrite);

@@ -29,10 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.remote.options.BaseOptions;
-import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.SessionNotCreatedException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.*;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -175,7 +172,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 		return driver;
     }
     
-    public WebDriver getDriverInstance(URL hubUrl, MutableCapabilities capabilities) {
+    public RemoteWebDriver getDriverInstance(URL hubUrl, MutableCapabilities capabilities) {
 		if (SeleniumTestsContextManager.isDesktopWebTest()) {
 			return new RemoteWebDriver(hubUrl, capabilities);
 		} else if (SeleniumTestsContextManager.isDesktopAppTest()) {
@@ -245,7 +242,8 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 				capabilities.setCapability(SeleniumRobotCapabilityType.SESSION_CREATION_REQUEST_TIME, LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 				
 				try {
-					WebDriver createdDriver = getDriverInstance(gridConnector.getHubUrl(), capabilities);
+					RemoteWebDriver createdDriver = getDriverInstance(gridConnector.getHubUrl(), capabilities);
+					rewriteCapabilities(createdDriver, capabilities);
 					getSessionInformationOrQuit(gridConnector, createdDriver, start);
 
 					// everything is OK, driver and connector can be used
@@ -288,6 +286,17 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     	
     	return driver;
     }
+
+	private void rewriteCapabilities(RemoteWebDriver driver, Capabilities inputCapabilities) {
+		MutableCapabilities caps = (MutableCapabilities)driver.getCapabilities();
+
+		inputCapabilities.asMap().forEach((key, value) -> {
+			if (key.startsWith("sr:")) {
+				caps.setCapability(key, value);
+		}
+		});
+
+	}
 
 	/**
 	 * Try co complete session information by asking to grid hub.

@@ -366,6 +366,8 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		Unirest.config().reset();
 		Unirest.config().followRedirects(true);
 
+		logger.info("Context ID: {}", SeleniumTestsContext.getContextId());
+
 	}
 
 	/**

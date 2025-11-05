@@ -71,6 +71,10 @@ import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
 import kong.unirest.UnirestInstance;
 
+/**
+ * Object representing the connection to a SeleniumRobot grid hub, specific for one node
+ * Each test will have its own {@link SeleniumGridConnector}
+ */
 public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 
 	private static final String ONLY_MAIN_SCREEN = "onlyMainScreen";
@@ -758,17 +762,6 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			logger.warn("Video file not get due to {}", e.getClass().getName());
 			return null;
-		}
-	}
-	
-	private void deleteExistingVideo(String outputFile) {
-		if (new File(outputFile).exists()) {
-			try {
-				Files.delete(Paths.get(outputFile));
-					
-			} catch (Exception e) {
-				logger.warn("Error deleting previous video file, there may be a problem getting the new one: {}", e.getMessage());
-			}
 		}
 	}
 	

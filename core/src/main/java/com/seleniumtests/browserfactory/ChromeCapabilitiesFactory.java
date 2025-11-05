@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,7 +17,6 @@
  */
 package com.seleniumtests.browserfactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,23 +26,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.utils.TestNGResultUtils;
-import com.seleniumtests.customexception.ConfigurationException;
-import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import io.appium.java_client.android.options.UiAutomator2Options;
-import io.appium.java_client.android.options.context.SupportsChromedriverExecutableOption;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.io.TemporaryFilesystem;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
-import org.openqa.selenium.remote.AbstractDriverOptions;
-import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
@@ -112,7 +103,7 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
     		String chromeDriverLogPath = Paths.get(webDriverConfig.getOutputDirectory(), "chromedriver.log").toString();
         	System.setProperty(ChromeDriverService.CHROME_DRIVER_VERBOSE_LOG_PROPERTY, "true");
         	System.setProperty(ChromeDriverService.CHROME_DRIVER_LOG_PROPERTY, chromeDriverLogPath);
-        	logger.info("Chromedriver logs will be written to " + chromeDriverLogPath);
+        	logger.info("Chromedriver logs will be written to {}", chromeDriverLogPath);
     	} else {
     		// avoid keeping these properties as it breaks chrome during integration tests
     		System.clearProperty(ChromeDriverService.CHROME_DRIVER_VERBOSE_LOG_PROPERTY);
@@ -196,7 +187,7 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 									)
 					);
 				} catch (IOException e) {
-					logger.error("Error creating 'downloads' directory: " + e.getMessage());
+					logger.error("Error creating 'downloads' directory: {}", e.getMessage());
 				}
 			} else {
 				options.setEnableDownloads(true);
@@ -226,7 +217,7 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
         if (!extensions.isEmpty()) {
         	options.addExtensions(extensions.stream()
         		.map(BrowserExtension::getExtensionPath)
-        		.collect(Collectors.toList()));
+        		.toList());
         }
         
        
@@ -270,7 +261,7 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
         	} else if (BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getChromeProfilePath())) {
         		((ChromeOptions)options).addArguments(USER_DATA_DIR_OPTION + selectedBrowserInfo.getDefaultProfilePath()); 
         	} else {
-        		logger.warn(String.format("Chrome profile %s could not be set", webDriverConfig.getChromeProfilePath()));
+        		logger.warn("Chrome profile {} could not be set", webDriverConfig.getChromeProfilePath());
         	}
         }
 	}
@@ -288,7 +279,7 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
         	} else if (BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getChromeProfilePath())) {
         		options.setCapability(SeleniumRobotCapabilityType.CHROME_PROFILE, BrowserInfo.DEFAULT_BROWSER_PRODFILE);
         	} else {
-        		logger.warn(String.format("Chrome profile %s could not be set", webDriverConfig.getChromeProfilePath()));
+        		logger.warn("Chrome profile {} could not be set", webDriverConfig.getChromeProfilePath());
         	}
         }
 	}

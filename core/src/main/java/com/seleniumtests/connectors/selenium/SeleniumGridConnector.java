@@ -24,6 +24,8 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -311,6 +313,17 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 		return null;
 	}
 
+	protected void deleteExistingVideo(String outputFile) {
+		if (new File(outputFile).exists()) {
+			try {
+				Files.delete(Paths.get(outputFile));
+
+			} catch (Exception e) {
+				logger.warn("Error deleting previous video file, there may be a problem getting the new one: {}", e.getMessage());
+			}
+		}
+	}
+
 	public List<Integer> getProcessList(String processName) {
 		logger.warn("process list is only available with seleniumRobot grid");
 		return new ArrayList<>();
@@ -364,7 +377,7 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	 * Returns the session object from status
 	 * @param driver	the driver created on grid
 	 */
-	private JSONObject getCurrentSessionObject(RemoteWebDriver driver) {
+	protected JSONObject getCurrentSessionObject(RemoteWebDriver driver) {
 
 		// sometimes, session is not immediately reported in hub status, wait a bit
 		for (int i = 0; i < 15; i++) {

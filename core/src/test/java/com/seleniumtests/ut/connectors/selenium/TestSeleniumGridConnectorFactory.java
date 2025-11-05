@@ -22,15 +22,12 @@ import java.net.SocketException;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.seleniumtests.connectors.selenium.*;
 import org.mockito.Mock;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.ConnectorsTest;
-import com.seleniumtests.connectors.selenium.BrowserStackGridConnector;
-import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
-import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
-import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
 import com.seleniumtests.customexception.ConfigurationException;
 
 import kong.unirest.GetRequest;
@@ -201,6 +198,6 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 	 */
 	@Test(groups={"ut"})
 	public void testWithBrowserStack() throws UnsupportedOperationException, UnirestException {
-		Assert.assertTrue(SeleniumGridConnectorFactory.getInstances(List.of("http://user:key@hub-cloud.browserstack.com/wd/hub")).get(0) instanceof BrowserStackGridConnector);
+		Assert.assertTrue(SeleniumGridConnectorFactory.getInstances(List.of("http://user:key@hub-cloud.browserstack.com/wd/hub")).get(0) instanceof SeleniumBrowserstackGridConnector);
 	}
 }

@@ -20,14 +20,8 @@ package com.seleniumtests.core;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.seleniumtests.connectors.tms.ITestManager;
@@ -86,6 +80,7 @@ public class SeleniumTestsContext {
 	private static final Object lock = new Object();
 	private static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumTestsContext.class);
 	private static final Map<String, String> outputFolderNames = Collections.synchronizedMap(new HashMap<>());
+    private static final UUID contextId = UUID.randomUUID();
 
     /* configuration defined in testng.xml */
     public static final String TEST_CONFIGURATION = "testConfig"; 				// parameter name for additional configuration to load (should only be used in XML)
@@ -591,7 +586,7 @@ public class SeleniumTestsContext {
      * @return  list of grid connectors that may be used
      */
     private List<SeleniumGridConnector> connectGrid() {
-    	if (getRunMode() == DriverMode.GRID) {
+    	if (getRunMode() == DriverMode.GRID || getRunMode() == DriverMode.BROWSERSTACK) {
     		if (getWebDriverGrid() != null && !getWebDriverGrid().isEmpty()) {
     			return SeleniumGridConnectorFactory.getInstances(getWebDriverGrid());
     		} else {
@@ -2276,5 +2271,13 @@ public class SeleniumTestsContext {
 	public SeleniumRobotServerContext seleniumServer() {
 		return seleniumRobotServerContext;
 	}
+
+    /**
+     * A unique context ID for this TestNG run
+     * During maven test, this ID will never change
+     */
+    public static UUID getContextId() {
+        return contextId;
+    }
 
 }

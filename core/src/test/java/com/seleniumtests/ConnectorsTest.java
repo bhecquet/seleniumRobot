@@ -36,7 +36,6 @@ import java.util.function.Function;
 
 import kong.unirest.Headers;
 import org.apache.commons.io.FileUtils;
-import org.mockito.Mock;
 import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
 import org.mockito.exceptions.base.MockitoException;
@@ -760,7 +759,6 @@ public class ConnectorsTest extends MockitoTest {
 	
 	/**
 	 * simulate an alive variable sever responding to all requests
-	 * @throws UnirestException 
 	 */
 	protected void configureMockedVariableServerConnection() throws UnirestException {
 		configureMockedVariableServerConnection(SERVER_URL);
