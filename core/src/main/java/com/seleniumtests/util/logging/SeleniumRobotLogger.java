@@ -17,7 +17,6 @@
  */
 package com.seleniumtests.util.logging;
 
-import com.seleniumtests.reporter.reporters.ReporterControler;
 import com.seleniumtests.util.helper.WaitHelper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -89,7 +88,7 @@ public class SeleniumRobotLogger {
 			
 			// remove the logger so that a new one for the same name can be added (useful during integration tests)
 			config.removeLogger(previousName);
-			Logger logger = SeleniumRobotLogger.getLogger(ReporterControler.class);
+			Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotLogger.class);
 			logger.info("logging stopped for '{}'", previousName);
 		}
 	}
@@ -130,7 +129,7 @@ public class SeleniumRobotLogger {
 
 		for (int i=0; i<5; i++) {
 			try {
-				Logger logger = SeleniumRobotLogger.getLogger(ReporterControler.class);
+				Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotLogger.class);
 				logger.info("logging started for '{}' on {}", loggerName, logFile);
 				break;
 			} catch (Exception e) {
