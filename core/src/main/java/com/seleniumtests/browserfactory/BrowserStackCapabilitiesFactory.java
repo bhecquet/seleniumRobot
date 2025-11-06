@@ -26,8 +26,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.seleniumtests.core.SeleniumTestsContext;
-import io.appium.java_client.android.options.UiAutomator2Options;
-import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -62,7 +60,7 @@ public class BrowserStackCapabilitiesFactory extends ICloudCapabilityFactory {
 			user = matcher.group(1);
 			key = matcher.group(2);
 		} else {
-			throw new ConfigurationException("webDriverGrid variable does not have the right format for connecting to sauceLabs: \"https://<user>:<token>@hub.browserstack.com/wd/hub\"");
+			throw new ConfigurationException("webDriverGrid variable does not have the right format for connecting to browserstack: \"https://<user>:<token>@hub.browserstack.com/wd/hub\"");
 		}
 		return user + ":" + key;
 	}
@@ -76,6 +74,10 @@ public class BrowserStackCapabilitiesFactory extends ICloudCapabilityFactory {
         String platform = webDriverConfig.getPlatform();
         String platformVersion = null;
         String platformName = null;
+
+		if (platform == null) {
+			throw new ConfigurationException("Browserstack needs platform parameter");
+		}
 
 		Map<String, String> browserStackOptions = new HashMap<>();
         
@@ -174,7 +176,6 @@ public class BrowserStackCapabilitiesFactory extends ICloudCapabilityFactory {
 				case FIREFOX -> new FirefoxCapabilitiesFactory(webDriverConfig).createCapabilities();
 				case INTERNET_EXPLORER -> new IECapabilitiesFactory(webDriverConfig).createCapabilities();
 				case CHROME -> new ChromeCapabilitiesFactory(webDriverConfig).createCapabilities();
-				case HTMLUNIT -> new HtmlUnitCapabilitiesFactory(webDriverConfig).createCapabilities();
 				case SAFARI -> new SafariCapabilitiesFactory(webDriverConfig).createCapabilities();
 				case EDGE -> new EdgeCapabilitiesFactory(webDriverConfig).createCapabilities();
 				default ->

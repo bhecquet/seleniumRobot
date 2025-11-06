@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.testng.Assert;
-import org.testng.ITestContext;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
@@ -21,16 +20,14 @@ public class TestSeleniumTestsContext extends GenericTest {
 
 	/**
 	 * isue #309: check we can start a test with chromeBinaryPath option
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testCustomChromeBrowserGeneration(ITestContext testContext) throws Exception {
+	public void testCustomChromeBrowserGeneration() throws Exception {
 
 		try {
 			Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
 			List<BrowserInfo> chromes = browsers.get(BrowserType.CHROME);
-			if (chromes.size() == 0) {
+			if (chromes.isEmpty()) {
 				throw new SkipException("Chrome not installed");
 			}
 			

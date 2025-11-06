@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,11 +21,7 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import org.mockito.Mock;
@@ -70,17 +66,17 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@Mock
 	private SeleniumTestsContext context;
 
-	private MockedStatic mockedOsUtility;
+	private MockedStatic<OSUtility> mockedOsUtility;
 	
 	@BeforeMethod(groups= {"ut"})
 	public void init() {
-		browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, CURRENT_CHROME_VERSION, "", false)));
+		browserInfos = new EnumMap<>(BrowserType.class);
+		browserInfos.put(BrowserType.CHROME, List.of(new BrowserInfo(BrowserType.CHROME, CURRENT_CHROME_VERSION, "", false)));
 		mockedOsUtility = mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
 		mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
 		when(config.getTestContext()).thenReturn(context);
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
-		when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.NONE));
+		when(config.getDebug()).thenReturn(List.of(DebugMode.NONE));
 		when(config.getPageLoadStrategy()).thenReturn(PageLoadStrategy.NORMAL);
 		when(config.getBrowserType()).thenReturn(BrowserType.CHROME);
 		when(config.getAttachExistingDriverPort()).thenReturn(null);
@@ -99,11 +95,11 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	 * If beta is not requested, get the non beta version even if both are present
 	 */
 	@Test(groups= {"ut"})
-	public void testNonBetaVersionBrowserChoosen() {
+	public void testNonBetaVersionBrowserChosen() {
 
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
-		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, CURRENT_CHROME_VERSION, "", false, false),
+		browserInfos = new EnumMap<>(BrowserType.class);
+		browserInfos.put(BrowserType.CHROME, List.of(new BrowserInfo(BrowserType.CHROME, CURRENT_CHROME_VERSION, "", false, false),
 				new BrowserInfo(BrowserType.CHROME, NEXT_CHROME_VERSION, "", false, true)));
 		mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
 		
@@ -121,8 +117,8 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	public void testNonBetaVersionBrowserAbsent() {
 
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
-		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, NEXT_CHROME_VERSION, "", false, true)));
+		browserInfos = new EnumMap<>(BrowserType.class);
+		browserInfos.put(BrowserType.CHROME, List.of(new BrowserInfo(BrowserType.CHROME, NEXT_CHROME_VERSION, "", false, true)));
 		mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
 
 		ChromeCapabilitiesFactory capaFactory = new ChromeCapabilitiesFactory(config);
@@ -133,11 +129,11 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	 * If beta is requested, get the beta version even if both are present
 	 */
 	@Test(groups= {"ut"})
-	public void testBetaVersionBrowserChoosen() {
+	public void testBetaVersionBrowserChosen() {
 
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
-		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, CURRENT_CHROME_VERSION, "", false, false),
+		browserInfos = new EnumMap<>(BrowserType.class);
+		browserInfos.put(BrowserType.CHROME, List.of(new BrowserInfo(BrowserType.CHROME, CURRENT_CHROME_VERSION, "", false, false),
 				new BrowserInfo(BrowserType.CHROME, NEXT_CHROME_VERSION, "", false, true)));
 
 		mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(true)).thenReturn(browserInfos);
@@ -156,8 +152,8 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	public void testBetaVersionBrowserAbsent() {
 
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
-		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, CURRENT_CHROME_VERSION, "", false, false)));
+		browserInfos = new EnumMap<>(BrowserType.class);
+		browserInfos.put(BrowserType.CHROME, List.of(new BrowserInfo(BrowserType.CHROME, CURRENT_CHROME_VERSION, "", false, false)));
 		mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(true)).thenReturn(browserInfos);
 		when(config.getBetaBrowser()).thenReturn(true);
 
@@ -191,12 +187,12 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	public void testCreateDefaultCapabilitiesWithNodeTagsInGridMode() {
 		
 		when(config.getProxy()).thenReturn(proxyConfig);
-		when(config.getNodeTags()).thenReturn(Arrays.asList("foo", "bar"));
+		when(config.getNodeTags()).thenReturn(List.of("foo", "bar"));
 		when(config.getMode()).thenReturn(DriverMode.GRID);
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.NODE_TAGS), Arrays.asList("foo", "bar"));
+		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.NODE_TAGS), List.of("foo", "bar"));
 	}
 	
 	/**
@@ -206,7 +202,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithNodeTagsInLocalMode() {
 		
-		when(config.getNodeTags()).thenReturn(Arrays.asList("foo", "bar"));
+		when(config.getNodeTags()).thenReturn(List.of("foo", "bar"));
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
@@ -232,7 +228,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithVersion() {
 
-		browserInfos = new HashMap<>();
+		browserInfos = new EnumMap<>(BrowserType.class);
 		browserInfos.put(BrowserType.CHROME, List.of(new BrowserInfo(BrowserType.CHROME, CURRENT_CHROME_VERSION, "", false),
 				new BrowserInfo(BrowserType.CHROME, NEXT_CHROME_VERSION, "", false)
 				));
@@ -252,16 +248,16 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 
-		Assert.assertTrue(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-search-engine-choice-screen, --disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades, --remote-allow-origins=*"));
+		Assert.assertTrue(((Map<?,?>)((capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-search-engine-choice-screen, --disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades, --remote-allow-origins=*"));
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "chrome");
-		Map<?,?> prefs = (Map<?,?>)(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("prefs"));
+		Map<?,?> prefs = (Map<?,?>)(((Map<?,?>)((capa).asMap().get(ChromeOptions.CAPABILITY))).get("prefs"));
 		Assert.assertEquals(prefs.get("profile.exit_type"), "Normal");
 		Assert.assertTrue(prefs.get("savefile.default_directory").toString().contains("downloads"));
 		Assert.assertEquals(prefs.get("download.prompt_for_download"), false);
 		Assert.assertTrue(prefs.get("download.default_directory").toString().contains("downloads"));
 		Assert.assertEquals(prefs.get("profile.password_manager_enabled"), false);
 		Assert.assertEquals(prefs.get("profile.password_manager_leak_detection"), false);
-		Assert.assertNull(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("debuggerAddress")); // no debuger address set as we do not attach an existing browser
+		Assert.assertNull(((Map<?,?>)((capa).asMap().get(ChromeOptions.CAPABILITY))).get("debuggerAddress")); // no debuger address set as we do not attach an existing browser
 	}
 	
 	/**
@@ -273,10 +269,10 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		when(config.getAttachExistingDriverPort()).thenReturn(10);
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertTrue(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-search-engine-choice-screen, --disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades, --remote-allow-origins=*"));
+		Assert.assertTrue(((Map<?,?>)((capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-search-engine-choice-screen, --disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades, --remote-allow-origins=*"));
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "chrome");
-		Assert.assertNull(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("prefs")); // no preference set when attaching to existing browser
-		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("debuggerAddress"), "127.0.0.1:10");
+		Assert.assertNull(((Map<?,?>)((capa).asMap().get(ChromeOptions.CAPABILITY))).get("prefs")); // no preference set when attaching to existing browser
+		Assert.assertEquals(((Map<?,?>)((capa).asMap().get(ChromeOptions.CAPABILITY))).get("debuggerAddress"), "127.0.0.1:10");
 	}
 	
 	@Test(groups={"ut"})
@@ -286,7 +282,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertTrue(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--user-agent=CHROME 55"));
+		Assert.assertTrue(((Map<?,?>)((capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--user-agent=CHROME 55"));
 	}
 	
 	@Test(groups = {"ut"})
@@ -298,7 +294,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		when(config.getTestContext()).thenReturn(stc);
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertTrue(((Map<?, ?>) (((ChromeOptions) capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--user-agent=CHROME 55 and variable CHROME"));
+		Assert.assertTrue(((Map<?, ?>) (( capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--user-agent=CHROME 55 and variable CHROME"));
 	}
 	
 	@Test(groups = {"ut"})
@@ -310,7 +306,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		when(config.getTestContext()).thenReturn(stc);
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertTrue(((Map<?, ?>) (((ChromeOptions) capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--user-agent=CHROME 55 and variable ${bowser}"));
+		Assert.assertTrue(((Map<?, ?>) (( capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--user-agent=CHROME 55 and variable ${bowser}"));
 	}	
 	@Test(groups={"ut"})
 	public void testCreateChromeCapabilitiesHeadless() {
@@ -320,7 +316,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
 		// check headless is configured
-		Assert.assertTrue(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--headless, --window-size=1280,1024, --disable-gpu"));
+		Assert.assertTrue(((Map<?,?>)((capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--headless, --window-size=1280,1024, --disable-gpu"));
 	}
 
 	@Test(groups={"ut"})
@@ -331,7 +327,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertTrue(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--user-data-dir=/home/foo/chrome"));
+		Assert.assertTrue(((Map<?,?>)((capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--user-data-dir=/home/foo/chrome"));
 	}
 	
 	@Test(groups={"ut"})
@@ -343,8 +339,8 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
 		// a user data dir is configured
-		Assert.assertFalse(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--user-data-dir=/home/foo/chrome"));
-		String chromeArgs = ((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString();
+		Assert.assertFalse(((Map<?,?>)((capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--user-data-dir=/home/foo/chrome"));
+		String chromeArgs = ((Map<?,?>)((capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString();
 		Assert.assertTrue(chromeArgs.contains("--disable-translate"));
 		Assert.assertTrue(chromeArgs.contains("--disable-web-security"));
 		Assert.assertTrue(chromeArgs.contains("--no-sandbox"));
@@ -364,7 +360,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
 
-		Assert.assertFalse(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--user-data-dir"));
+		Assert.assertFalse(((Map<?,?>)((capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--user-data-dir"));
 	}
 	
 	/**
@@ -377,15 +373,15 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		when(config.getChromeBinPath()).thenReturn("/opt/chrome/bin/chrome");
 
 		// SeleniumTestsContext class adds a browserInfo when binary path is set
-		Map<BrowserType, List<BrowserInfo>> updatedBrowserInfos = new HashMap<>();
-		updatedBrowserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, CURRENT_CHROME_VERSION, "", false),
+		Map<BrowserType, List<BrowserInfo>> updatedBrowserInfos = new EnumMap<>(BrowserType.class);
+		updatedBrowserInfos.put(BrowserType.CHROME, List.of(new BrowserInfo(BrowserType.CHROME, CURRENT_CHROME_VERSION, "", false),
 																	new BrowserInfo(BrowserType.CHROME, NEXT_CHROME_VERSION, "/opt/chrome/bin/chrome", false)));
 
 		mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(updatedBrowserInfos);
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("binary").toString(), "/opt/chrome/bin/chrome");
+		Assert.assertEquals(((Map<?,?>)((capa).asMap().get(ChromeOptions.CAPABILITY))).get("binary").toString(), "/opt/chrome/bin/chrome");
 	}
 	
 	@Test(groups={"ut"})
@@ -486,7 +482,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		
 		// check option is added with user profile
 		Assert.assertNull(capa.getCapability(SeleniumRobotCapabilityType.CHROME_PROFILE));
-		Assert.assertTrue(((Map<String, List<String>>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").contains("--user-data-dir=/home/user/profile"));
+		Assert.assertTrue(((Map<String, List<String>>)((capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").contains("--user-data-dir=/home/user/profile"));
 	}
 	
 	@Test(groups={"ut"})
@@ -498,7 +494,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		
 		// check 'chromeProfile' is not set as not requested, and no option added
 		Assert.assertNull(capa.getCapability(SeleniumRobotCapabilityType.CHROME_PROFILE));
-		Assert.assertFalse(((Map<String, List<String>>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--user-data-dir=/home/user/profile"));
+		Assert.assertFalse(((Map<String, List<String>>)((capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--user-data-dir=/home/user/profile"));
 	}
 	
 	@Test(groups={"ut"})
@@ -511,7 +507,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 
 		// check 'chromeProfile' is not set as it's wrong profile path, and no option added
 		Assert.assertNull(capa.getCapability(SeleniumRobotCapabilityType.CHROME_PROFILE));
-		Assert.assertFalse(((Map<String, List<String>>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--user-data-dir=/home/user/profile"));
+		Assert.assertFalse(((Map<String, List<String>>)((capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--user-data-dir=/home/user/profile"));
 	}
 	
 
@@ -530,7 +526,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertTrue(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--key1=value1, --key2=value2"));
+		Assert.assertTrue(((Map<?,?>)((capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--key1=value1, --key2=value2"));
 	}
 
 	/**
@@ -543,14 +539,14 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 
-		Assert.assertFalse(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--no-sandbox"));
+		Assert.assertFalse(((Map<?,?>)((capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--no-sandbox"));
 	}
 	
 	@Test(groups={"ut"})
 	public void testCreateChromeCapabilitiesWithLogging() {
 
 		try {
-			when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.DRIVER));
+			when(config.getDebug()).thenReturn(List.of(DebugMode.DRIVER));
 			when(config.getMode()).thenReturn(DriverMode.LOCAL);
 			new ChromeCapabilitiesFactory(config).createCapabilities();
 			

@@ -29,7 +29,6 @@ import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.Test;
-import org.testng.xml.XmlTest;
 
 import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.GenericTest;
@@ -80,8 +79,79 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 
 				ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
 				initThreadContext(testNGCtx, "myTest", testResult);
+
 				Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(),
 						gridConnector);
+
+			} finally {
+				System.clearProperty(SeleniumTestsContext.RUN_MODE);
+				System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
+			}
+		}
+	}
+
+	/**
+	 * Check we start a browserstack test the same way than grid test
+	 */
+	@Test(groups = "ut")
+	public void testGridConnectionWithBrowserStack(final ITestContext testNGCtx) throws NoSuchMethodException, SecurityException,
+			NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+
+		try (MockedStatic<SeleniumGridConnectorFactory> mockedSeleniumGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
+			SeleniumGridConnector gridConnector = spy(new SeleniumGridConnector("http://localhost:4444/hub/wd"));
+
+			// grid connector is in use only if session Id exists
+			doReturn(new SessionId("1234")).when(gridConnector).getSessionId();
+
+			mockedSeleniumGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(List.of("http://localhost:4444/hub/wd")))
+				.thenReturn(Collections.singletonList(gridConnector));
+
+			try {
+				System.setProperty(SeleniumTestsContext.RUN_MODE, "browserstack");
+				System.setProperty(SeleniumTestsContext.PLATFORM, "Windows 11");
+				System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/hub/wd");
+
+				ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+				initThreadContext(testNGCtx, "myTest", testResult);
+
+				Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(),
+						gridConnector);
+
+			} finally {
+				System.clearProperty(SeleniumTestsContext.RUN_MODE);
+				System.clearProperty(SeleniumTestsContext.PLATFORM);
+				System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
+			}
+		}
+	}
+
+	/**
+	 * When multiple grids are available, check we get once
+	 */
+	@Test(groups = "ut")
+	public void testGridConnectionMultipleUrl(final ITestContext testNGCtx) throws NoSuchMethodException, SecurityException,
+			NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+
+		try (MockedStatic<SeleniumGridConnectorFactory> mockedSeleniumGridConnectorFactory = mockStatic(SeleniumGridConnectorFactory.class)) {
+			SeleniumGridConnector gridConnector1 = spy(new SeleniumGridConnector("http://localhost:4444/hub/wd"));
+			SeleniumGridConnector gridConnector2 = spy(new SeleniumGridConnector("http://localhost:4445/hub/wd"));
+
+			// grid connector is in use only if session Id exists
+			doReturn(new SessionId("1234")).when(gridConnector1).getSessionId();
+			doReturn(new SessionId("1235")).when(gridConnector2).getSessionId();
+
+			mockedSeleniumGridConnectorFactory.when(() -> SeleniumGridConnectorFactory.getInstances(List.of("http://localhost:4444/hub/wd", "http://localhost:4445/hub/wd")))
+				.thenReturn(Collections.singletonList(gridConnector1));
+
+			try {
+				System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
+				System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/hub/wd,http://localhost:4445/hub/wd");
+
+				ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+				initThreadContext(testNGCtx, "myTest", testResult);
+
+				Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(),
+						gridConnector1);
 
 			} finally {
 				System.clearProperty(SeleniumTestsContext.RUN_MODE);
@@ -177,7 +247,7 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 	 * server is called only once to avoid problems with variable reservation
 	 */
 	@Test(groups = { "ut" })
-	public void testVariablesAreGetOnlyOnce(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+	public void testVariablesAreGetOnlyOnce(final ITestContext testNGCtx) throws Exception {
 
 		Map<String, TestVariable> variables = new HashMap<>();
 		variables.put("key", new TestVariable("key", "val1"));
@@ -251,7 +321,7 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 	 * that it can be possible to re-use a driver created in \@BeforeMethod
 	 */
 	@Test(groups = { "ut" })
-	public void testGridConnectorIsCopiedWithContextCopy(final ITestContext testNGCtx, final XmlTest xmlTest)
+	public void testGridConnectorIsCopiedWithContextCopy(final ITestContext testNGCtx)
 			throws Exception {
 
 		try {

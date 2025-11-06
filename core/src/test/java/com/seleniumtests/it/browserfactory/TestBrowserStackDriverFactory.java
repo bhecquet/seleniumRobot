@@ -1,6 +1,5 @@
 package com.seleniumtests.it.browserfactory;
 
-import com.seleniumtests.driver.DriverMode;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.testng.Reporter;

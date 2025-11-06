@@ -47,8 +47,8 @@ public abstract class AbstractWebDriverFactory {
         // add user defined capabilities
         driverOptions = driverOptions.merge(webDriverConfig.getCapabilites());
         
-        if (capsFactory instanceof IDesktopCapabilityFactory) {
-        	selectedBrowserInfo = ((IDesktopCapabilityFactory)capsFactory).getSelectedBrowserInfo();
+        if (capsFactory instanceof IDesktopCapabilityFactory iDesktopCapabilityFactory) {
+        	selectedBrowserInfo = iDesktopCapabilityFactory.getSelectedBrowserInfo();
         } else {
         	selectedBrowserInfo = new BrowserInfo(BrowserType.NONE, "0.0");
         }

@@ -131,6 +131,9 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 			Assert.assertNotNull(driverFactory.getSelectedBrowserInfo());
 			Assert.assertEquals(driverFactory.getSelectedBrowserInfo().getBrowser(), BrowserType.HTMLUNIT);
 			Assert.assertEquals(driverFactory.getSelectedBrowserInfo().getVersion(), "70.0.1.2.3");
+
+			// check SeleniumRobot input capabilities has been added to driver after creation
+			Assert.assertEquals(((RemoteWebDriver)newDriver).getCapabilities().getCapability(SeleniumRobotCapabilityType.SESSION_CREATION_TRY), 0);
 		}
 	}
 	
