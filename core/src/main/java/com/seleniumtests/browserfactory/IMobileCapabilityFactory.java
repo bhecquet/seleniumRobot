@@ -50,7 +50,7 @@ public abstract class IMobileCapabilityFactory extends ICapabilitiesFactory {
 
     	String app = webDriverConfig.getApp().trim();
     	
-    	BaseOptions options = new BaseOptions();
+    	BaseOptions<?> options = new BaseOptions<>();
     
     	if (app != null && !app.trim().isEmpty()) {
 	    	options.setFullReset(webDriverConfig.isFullReset());

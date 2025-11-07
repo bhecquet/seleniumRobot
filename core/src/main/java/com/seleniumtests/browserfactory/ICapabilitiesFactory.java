@@ -35,17 +35,19 @@ public abstract class ICapabilitiesFactory {
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(ICapabilitiesFactory.class);
 
     /**
+     * TODO: should be moved to grid connectors
      * returns the app in capabilities
      * @param caps
      * @return
      */
     protected Optional<String> getApp(Capabilities caps) {
 
-        if (new BaseOptions(caps).getPlatformName() == null) {
+        Platform platformName = new BaseOptions<>(caps).getPlatformName();
+        if (platformName == null) {
             return Optional.empty();
-        } else if (new BaseOptions(caps).getPlatformName().is(Platform.ANDROID)) {
+        } else if (platformName.is(Platform.ANDROID)) {
             return new UiAutomator2Options(caps).getApp();
-        } else if (new BaseOptions(caps).getPlatformName().is(Platform.IOS)) {
+        } else if (platformName.is(Platform.IOS)) {
             return new XCUITestOptions(caps).getApp();
         } else return Optional.empty();
     }

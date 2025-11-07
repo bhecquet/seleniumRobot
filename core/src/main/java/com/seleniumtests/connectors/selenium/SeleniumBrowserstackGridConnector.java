@@ -17,10 +17,10 @@
  */
 package com.seleniumtests.connectors.selenium;
 
-import com.google.common.net.MediaType;
 import com.seleniumtests.browserfactory.BrowserStackCapabilitiesFactory;
 import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -29,13 +29,16 @@ import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.File;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.*;
+
 
 /***
  * Class representing a connector to a browserstack grid node
@@ -44,6 +47,7 @@ import java.util.concurrent.*;
 public class SeleniumBrowserstackGridConnector extends SeleniumGridConnector {
 
 	protected static Logger logger = SeleniumRobotLogger.getLogger(SeleniumBrowserstackGridConnector.class);
+	private static final String BROWSERSTACK_UPLOAD_URL = "https://api-cloud.browserstack.com/app-automate/upload";
 
 	private String username;
 	private String key;
@@ -91,6 +95,47 @@ public class SeleniumBrowserstackGridConnector extends SeleniumGridConnector {
 		}
 	}
 
+	/**
+	 * Upload mobile application to browserstack
+	 */
+	@Override
+	public MutableCapabilities uploadMobileApp(Capabilities caps) {
+		MutableCapabilities capabilities = new MutableCapabilities(caps);
+
+		Optional<String> applicationOption = getApp(caps);
+		if (applicationOption.isEmpty()) {
+			return capabilities;
+		}
+
+		// extract user name and password from getWebDriverGrid
+		String authenticationString = BrowserStackCapabilitiesFactory.getAuthenticationString(SeleniumTestsContextManager.getThreadContext().getWebDriverGrid().get(0));
+		String user = authenticationString.split(":")[0];
+		String key = authenticationString.split(":")[1];
+
+		try (UnirestInstance unirest = Unirest.spawnInstance();){
+
+			String proxyHost = System.getProperty("https.proxyHost");
+			String proxyPort = System.getProperty("https.proxyPort");
+			if (proxyHost != null && proxyPort != null) {
+				unirest.config().proxy(proxyHost, Integer.parseInt(proxyPort));
+			}
+
+			HttpResponse<JsonNode> jsonResponse = unirest.post(BROWSERSTACK_UPLOAD_URL)
+					.basicAuth(user, key)
+					.field("file", new File(applicationOption.get()))
+					.asJson()
+					.ifFailure(response -> {
+						throw new ConfigurationException(String.format("Application file upload failed: %s", response.getStatusText()));
+					})
+					.ifSuccess(response -> logger.info("Application successfuly uploaded to Saucelabs"));
+			setApp(capabilities, jsonResponse.getBody().getObject().getString("app_url"));
+
+		} catch (UnirestException e) {
+			throw new ConfigurationException("Application file upload failed: " + e.getMessage());
+		}
+
+		return capabilities;
+	}
 
 	@Override
 	public void startVideoCapture() {

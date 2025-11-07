@@ -105,21 +105,14 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	 */
 	@Override
 	public MutableCapabilities uploadMobileApp(Capabilities caps) {
-		SupportsAppOption<?> mobileOptions;
-		if (new BaseOptions<>(caps).getPlatformName() == null) {
-			return (MutableCapabilities) caps;
-		} else if (new BaseOptions<>(caps).getPlatformName().is(Platform.ANDROID)) {
-			mobileOptions = new UiAutomator2Options(caps);
-		} else if (new BaseOptions<>(caps).getPlatformName().is(Platform.IOS)) {
-			mobileOptions = new XCUITestOptions(caps);
-		} else return (MutableCapabilities) caps;
-
-
+		MutableCapabilities capabilities = new MutableCapabilities(caps);
+		Optional<String> application = getApp(caps);
+		if (application.isEmpty()) {
+			return (MutableCapabilities)caps;
+		}
 
 		// check whether app is given and app path is a local file
-
-		Optional<?> application = mobileOptions.getApp();
-		if (application.isPresent() && new File(String.valueOf(application.get())).isFile()) {
+		if (new File(application.get()).isFile()) {
 			File zipFile = null;
 			try (CloseableHttpClient client = HttpClients.createDefault()) {
 				// zip file
@@ -142,10 +135,10 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		        	throw new SeleniumGridException("could not upload application file: " + response.getStatusLine().getReasonPhrase());
 		        } else {
 		        	// set path to the mobile application as an URL on the grid hub
-					mobileOptions.setApp(IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8) + "/" + appFiles.get(0).getName());
+					setApp(capabilities, IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8) + "/" + appFiles.get(0).getName());
 		        }
 				// update original caps so that any change made here can be reused later
-				return new MutableCapabilities(mobileOptions);
+				return capabilities;
 
 			} catch (IOException | URISyntaxException e) {
 				throw new SeleniumGridException("could not upload application file", e);
@@ -153,7 +146,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 				FileUtility.deleteIgnoreResult(zipFile);
 			}
 		}
-		return (MutableCapabilities) caps;
+		return capabilities;
 	}
 	
 	/**

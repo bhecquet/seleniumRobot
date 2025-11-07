@@ -17,11 +17,9 @@
  */
 package com.seleniumtests.browserfactory;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,16 +30,9 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.DriverConfig;
 
-import kong.unirest.HttpResponse;
-import kong.unirest.JsonNode;
-import kong.unirest.Unirest;
-import kong.unirest.UnirestException;
-import kong.unirest.UnirestInstance;
-
 public class BrowserStackCapabilitiesFactory extends ICloudCapabilityFactory {
 	
 	private static final Pattern REG_USER_PASSWORD = Pattern.compile("https://([^:/]++):([^:@]++)@hub.browserstack.com/wd/hub");
-	private static final String BROWSERSTACK_UPLOAD_URL = "https://api-cloud.browserstack.com/app-automate/upload";
 	
     public BrowserStackCapabilitiesFactory(DriverConfig webDriverConfig) {
 		super(webDriverConfig);
@@ -65,8 +56,19 @@ public class BrowserStackCapabilitiesFactory extends ICloudCapabilityFactory {
 		return user + ":" + key;
 	}
 
+	/**
+	 * Create capabilities
+	 * See:
+     * <a href="https://www.browserstack.com/docs/app-automate/capabilities">...</a>
+     * <a href="https://www.browserstack.com/docs/automate/capabilities">...</a>
+     */
 	@Override
     public MutableCapabilities createCapabilities() {
+
+		// extract user name and password from getWebDriverGrid
+		String authenticationString = BrowserStackCapabilitiesFactory.getAuthenticationString(webDriverConfig.getHubUrl().get(0));
+		String user = authenticationString.split(":")[0];
+		String key = authenticationString.split(":")[1];
 
         MutableCapabilities capabilities = createDeviceSpecificCapabilities();
 
@@ -84,7 +86,6 @@ public class BrowserStackCapabilitiesFactory extends ICloudCapabilityFactory {
         if (SeleniumTestsContextManager.isMobileTest()) {
 
 			// browserstack capabilities
-			browserStackOptions.put("deviceName", webDriverConfig.getDeviceName()); // pour deviceName
 			browserStackOptions.put("osVersion", webDriverConfig.getMobilePlatformVersion());
 			browserStackOptions.put("os", webDriverConfig.getPlatform());
         	
@@ -110,60 +111,17 @@ public class BrowserStackCapabilitiesFactory extends ICloudCapabilityFactory {
 
 		capabilities.setCapability(SeleniumRobotCapabilityType.GLOBAL_SESSION_ID, SeleniumTestsContext.getContextId().toString());
 		capabilities.setCapability(SeleniumRobotCapabilityType.TEST_ID, Objects.requireNonNullElse(SeleniumTestsContextManager.getThreadContext().getTestMethodSignature(), "no-test"));
-        capabilities.setCapability("browserName", webDriverConfig.getBrowserType());
 		browserStackOptions.put("sessionName", (String) capabilities.getCapability(SeleniumRobotCapabilityType.TEST_ID));
 		browserStackOptions.put("buildName", (String) capabilities.getCapability(SeleniumRobotCapabilityType.GLOBAL_SESSION_ID));
 		browserStackOptions.put("projectName", SeleniumTestsContextManager.getApplicationName());
-        
-        // we need to upload something
-		Optional<String> applicationOption = getApp(capabilities);
- 		if (applicationOption.isPresent() && applicationOption.get() != null) {
- 			String appUrl = uploadFile(applicationOption.get());
- 			capabilities.setCapability("app", appUrl);
- 		}
-
+		browserStackOptions.put("userName", user);
+		browserStackOptions.put("accessKey", key);
 
 		browserStackOptions.put("consoleLogs", "info");
 		capabilities.setCapability("bstack:options", browserStackOptions);
 
 		 // be sure not to have appium capabilities so that further setCapabilities do not add "appium:" prefix
         return new MutableCapabilities(capabilities);
-    }
-	
-	 /**
-     * Upload application to browserstack server
-     */
-    private String uploadFile(String application) {
-
-    	// extract user name and password from getWebDriverGrid
-		String authenticationString = getAuthenticationString(SeleniumTestsContextManager.getThreadContext().getWebDriverGrid().get(0));
-		String user = authenticationString.split(":")[0];
-		String key = authenticationString.split(":")[1];
-
-    	try (UnirestInstance unirest = Unirest.spawnInstance();){
-    		
-    		String proxyHost = System.getProperty("https.proxyHost");
-    		String proxyPort = System.getProperty("https.proxyPort");
-    		if (proxyHost != null && proxyPort != null) {
-    			unirest.config().proxy(proxyHost, Integer.parseInt(proxyPort));
-    		}
-    		
-    		HttpResponse<JsonNode> jsonResponse = unirest.post(BROWSERSTACK_UPLOAD_URL)
-    					.basicAuth(user, key)
-    					.field("file", new File(application))
-    					.asJson()
-    					.ifFailure(response -> {
-    						throw new ConfigurationException(String.format("Application file upload failed: %s", response.getStatusText()));
-    						})
-    					.ifSuccess(response -> logger.info("Application successfuly uploaded to Saucelabs"));
-    		return jsonResponse.getBody().getObject().getString("app_url");
-    		
-
-		} catch (UnirestException e) {
-			throw new ConfigurationException("Application file upload failed: " + e.getMessage());
-		}
-    	
-    	
     }
 
 	/**
@@ -174,12 +132,11 @@ public class BrowserStackCapabilitiesFactory extends ICloudCapabilityFactory {
 		if (SeleniumTestsContextManager.isDesktopWebTest()) {
 			return switch (webDriverConfig.getBrowserType()) {
 				case FIREFOX -> new FirefoxCapabilitiesFactory(webDriverConfig).createCapabilities();
-				case INTERNET_EXPLORER -> new IECapabilitiesFactory(webDriverConfig).createCapabilities();
 				case CHROME -> new ChromeCapabilitiesFactory(webDriverConfig).createCapabilities();
 				case SAFARI -> new SafariCapabilitiesFactory(webDriverConfig).createCapabilities();
 				case EDGE -> new EdgeCapabilitiesFactory(webDriverConfig).createCapabilities();
 				default ->
-						throw new ConfigurationException(String.format("Browser %s is unknown for desktop tests", webDriverConfig.getBrowserType()));
+						throw new ConfigurationException(String.format("Browser %s is not supported for desktop tests", webDriverConfig.getBrowserType()));
 			};
 		} else if (SeleniumTestsContextManager.isMobileTest()) {
 			if ("android".equalsIgnoreCase(webDriverConfig.getPlatform())) {

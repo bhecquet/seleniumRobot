@@ -11,12 +11,8 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
-import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.util.logging.DebugMode;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.ios.IOSDriver;
-import io.appium.java_client.remote.options.BaseOptions;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
 import org.mockito.Mockito;
@@ -120,6 +116,8 @@ public class TestBrowserStackDriverFactory extends MockitoTest {
 			Assert.assertEquals(((RemoteWebDriver)newDriver).getCapabilities().getCapability(SeleniumRobotCapabilityType.SESSION_CREATION_TRY), 0);
 			Assert.assertEquals(((RemoteWebDriver)newDriver).getCapabilities().getCapability(SeleniumRobotCapabilityType.GLOBAL_SESSION_ID), SeleniumTestsContext.getContextId().toString());
 			Assert.assertEquals(((RemoteWebDriver)newDriver).getCapabilities().getCapability(SeleniumRobotCapabilityType.TEST_ID), "no-test");
+
+			verify(gridConnector1).uploadMobileApp(any(Capabilities.class));
 		}
 	}
 }

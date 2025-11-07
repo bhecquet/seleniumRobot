@@ -32,9 +32,13 @@ import java.util.Optional;
 
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.util.helper.WaitHelper;
+import io.appium.java_client.android.options.UiAutomator2Options;
+import io.appium.java_client.ios.options.XCUITestOptions;
+import io.appium.java_client.remote.options.BaseOptions;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.SessionNotCreatedException;
 import org.openqa.selenium.io.Zip;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -71,6 +75,42 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	
 	public SeleniumGridConnector(String url) {
 		setHubUrl(url);
+	}
+
+	/**
+	 * Get application from mobile capabilities
+	 * @param caps	the capabilities
+	 * @return	the application
+	 */
+	protected Optional<String> getApp(Capabilities caps) {
+
+		Platform platformName = new BaseOptions<>(caps).getPlatformName();
+		if (platformName == null) {
+			return Optional.empty();
+		} else if (platformName.is(Platform.ANDROID)) {
+			return new UiAutomator2Options(caps).getApp();
+		} else if (platformName.is(Platform.IOS)) {
+			return new XCUITestOptions(caps).getApp();
+		} else return Optional.empty();
+	}
+
+	/**
+	 * Update capabilities with the mobile application
+	 * @param caps	the current capabilities
+	 * @param app	the application path
+	 * @return	the updated capabilities
+	 */
+	protected Capabilities setApp(Capabilities caps, String app) {
+		Platform platformName = new BaseOptions<>(caps).getPlatformName();
+		if (platformName == null) {
+			return caps;
+		} else if (platformName.is(Platform.ANDROID)) {
+			return new UiAutomator2Options(caps).setApp(app);
+		} else if (platformName.is(Platform.IOS)) {
+			return new XCUITestOptions(caps).setApp(app);
+		} else {
+			return caps;
+		}
 	}
 	
 	protected void setHubUrl(String hubUrl) {
