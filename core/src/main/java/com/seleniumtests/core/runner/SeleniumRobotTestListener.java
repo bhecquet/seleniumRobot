@@ -93,11 +93,19 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	 * @param testResult the current testNG result
 	 */
 	public void onTestFullyFinished(ITestResult testResult) {
-		TestNGResultUtils.setFinished(testResult, true);
-		addPreviousExecutionResults(testResult);
-		generateTempReport(testResult);
 
-		SeleniumRobotLogger.removeLoggerForTest();
+		// in case this method is called twice
+		// on most cases this does not happen
+		// - when test method execute, whatever the result, this is called through @AfterMethod
+		// - when configuration method fails, test is skipped, we call it directly because @AfterMethod is not called
+		// - when failure occurs in listener, this method is called from @AfterMethod, and also from onTestSkipped
+		if (!TestNGResultUtils.isFinished(testResult)) {
+			TestNGResultUtils.setFinished(testResult, true);
+			addPreviousExecutionResults(testResult);
+			generateTempReport(testResult);
+
+			SeleniumRobotLogger.removeLoggerForTest();
+		}
 	}
 	
 	/**
@@ -151,7 +159,8 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			TestRetryAnalyzer testRetryAnalyzer = (TestRetryAnalyzer) testResult.getMethod().getRetryAnalyzer(testResult);
 
 			logger.info("{} Failed in {} times", testResult.getMethod(), (testRetryAnalyzer.getCount()));
-		}		
+		}
+
 	}
 
 	/**
@@ -298,7 +307,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		// Check if an error from the SeleniumRobot Server occurred during the configuration of the test
 		// If so, throw an exception to skip the test execution (which will fail anyway since we couldn't fetch the variables)
 		if (testResult.getAttribute("hasVariableServerFailed") != null && (boolean) testResult.getAttribute("hasVariableServerFailed")) {
-			throw new SeleniumRobotServerException("An error occurred while fetching variables from the server. Skip the test execution.");
+			throw new SkipException("An error occurred while fetching variables from the SeleniumRobot server. Skip the test execution.", testResult.getThrowable());
 		}
 	}
 	

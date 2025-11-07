@@ -11,8 +11,7 @@ public class ExceptionUtility {
 	/**
 	 * return the exception message
 	 * Remove extra information in case of WebDriverException
-	 * @param exception
-	 * @return
+	 * @param exception	the exception to modify
 	 */
 	public static String getExceptionMessage(Throwable exception) {
 		if (exception == null) {
@@ -30,23 +29,26 @@ public class ExceptionUtility {
 	 * Method to generate the formated stacktrace
 	 * @param exception		Exception to format
 	 * @param title			title of the exception
-	 * @param contentBuffer	
+	 * @param contentBuffer	buffer
 	 * @param format		format to use to encode ('html', 'csv', 'xml', 'json')
 	 */
 	public static void generateTheStackTrace(Throwable exception, String title, StringBuilder contentBuffer, String format) {
-		contentBuffer.append(exception.getClass() + ": " + StringUtility.encodeString(title, format) + "\n");
+		contentBuffer.append(exception.getClass()).append(": ")
+				.append(StringUtility.encodeString(title, format))
+				.append("\n");
 
 		StackTraceElement[] s1 = exception.getStackTrace();
 		Throwable t2 = exception.getCause();
 		if (t2 == exception) {
 			t2 = null;
 		}
-		for (int x = 0; x < s1.length; x++) {
-			String message = filterStackTrace(s1[x].toString());
-			if (message != null) {
-				contentBuffer.append("\nat " + StringUtility.encodeString(message, format));
-			}
-		}
+        for (StackTraceElement stackTraceElement : s1) {
+            String message = filterStackTrace(stackTraceElement.toString());
+            if (message != null) {
+                contentBuffer.append("\nat ")
+                        .append(StringUtility.encodeString(message, format));
+            }
+        }
 
 		if (t2 != null) {
 			generateTheStackTrace(t2, "Caused by " + t2.getLocalizedMessage(), contentBuffer, format);
@@ -56,8 +58,8 @@ public class ExceptionUtility {
 
 	/**
 	 * Remove useless stacktrace elements (e.g: sun.reflect)
-	 * @param message
-	 * @return
+	 * @param message	the stacktrace element
+	 * @return null if we filter the message or the message ifself
 	 */
 	public static String filterStackTrace(String message) {
 		if (message.startsWith("sun.reflect.")
@@ -67,6 +69,7 @@ public class ExceptionUtility {
 			|| message.startsWith("java.util.concurrent.")
 			|| message.startsWith("org.aspectj.runtime.reflect")
 			|| message.startsWith("org.apache.maven.")
+			|| message.startsWith("java.base/")
 				) {
 			return null;
 		}

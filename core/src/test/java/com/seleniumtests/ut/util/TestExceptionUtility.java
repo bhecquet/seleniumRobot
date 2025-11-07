@@ -33,6 +33,11 @@ public class TestExceptionUtility extends GenericTest {
 	}
 	
 	@Test(groups= {"ut"})
+	public void testFilterStackTraceJavaBase() {
+		Assert.assertNull(ExceptionUtility.filterStackTrace("java.base/java.util.ArrayList.forEach"));
+	}
+
+	@Test(groups= {"ut"})
 	public void testFilterStackTraceSun() {
 		Assert.assertNull(ExceptionUtility.filterStackTrace("sun.reflect.Method(132)"));
 	}

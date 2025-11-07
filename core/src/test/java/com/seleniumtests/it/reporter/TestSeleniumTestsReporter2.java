@@ -60,7 +60,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		Assert.assertTrue(testOkDetailedReport.matches(".*<span class=\"step-title\"> Test end -.*<div class=\"message-snapshot\">Browser log file: <a href='driver-log-browser.txt'>file</a></div><div class=\"message-har\">Network capture 'main' browser:.*"));
 	}
-	
+
+	/**
+	 * Check if error occurred while configuring seleniumRobot server, test will be skipped
+	 */
 	@Test(groups = {"it"})
 	public void testErrorOnVariableServerWithTestNameInReport() throws Exception {
 		
@@ -91,11 +94,24 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			Assert.assertTrue(mainReportContent.matches(".*class=\"testSkipped\".*<a href='testAndSubActions/TestReport\\.html'.*?>testAndSubActions</a>.*"));
 			Assert.assertTrue(mainReportContent.matches(".*class=\"testSkipped\".*<a href='testInError/TestReport\\.html'.*?>testInError</a>.*"));
 			Assert.assertTrue(mainReportContent.matches(".*class=\"testSkipped\".*<a href='testSkipped/TestReport\\.html'.*?>testSkipped</a>.*"));
-			Assert.assertTrue(testOkDetailedReport.matches(".*Execution logs {28}</div><div class=\"box-body logs\"><div class=\"message-error\"><div>class com.seleniumtests.customexception.SeleniumRobotServerException: An error occurred while fetching variables from the SeleniumRobot Server. Test execution is skipped.</div>.*"));
+			Assert.assertTrue(testOkDetailedReport.matches(".*Execution logs {28}</div><div class=\"box-body logs\"><div class=\"message-error\"><div>class org.testng.SkipException: An error occurred while fetching variables from the SeleniumRobot server. Skip the test execution.</div>.*"));
+
+			// cause of error on server is present
 			Assert.assertTrue(testOkDetailedReport.matches(".*Caused by request to http://localhost:4321 failed: VARIABLE NOT FOUND.*")); // check cause is also present
-			Assert.assertTrue(testKoDetailedReport.matches(".*Execution logs {28}</div><div class=\"box-body logs\"><div class=\"message-error\"><div>class com.seleniumtests.customexception.SeleniumRobotServerException: An error occurred while fetching variables from the SeleniumRobot Server. Test execution is skipped.</div>.*"));
-			Assert.assertTrue(testSkipDetailedReport.matches(".*Execution logs {28}</div><div class=\"box-body logs\"><div class=\"message-error\"><div>class com.seleniumtests.customexception.SeleniumRobotServerException: An error occurred while fetching variables from the SeleniumRobot Server. Test execution is skipped.</div>.*"));
-			
+			Assert.assertTrue(testKoDetailedReport.matches(".*Execution logs {28}</div><div class=\"box-body logs\"><div class=\"message-error\"><div>class org.testng.SkipException: An error occurred while fetching variables from the SeleniumRobot server. Skip the test execution.</div>.*"));
+			Assert.assertTrue(testSkipDetailedReport.matches(".*Execution logs {28}</div><div class=\"box-body logs\"><div class=\"message-error\"><div>class org.testng.SkipException: An error occurred while fetching variables from the SeleniumRobot server. Skip the test execution.</div>.*"));
+
+			// previous result only present once
+			Assert.assertEquals(StringUtils.countMatches(testOkDetailedReport, "No previous execution results, you can enable it via parameter"), 1);
+			Assert.assertEquals(StringUtils.countMatches(testKoDetailedReport, "No previous execution results, you can enable it via parameter"), 1);
+			Assert.assertEquals(StringUtils.countMatches(testSkipDetailedReport, "No previous execution results, you can enable it via parameter"), 1);
+
+			String logs = readSeleniumRobotLogFile().replace("\\", "/");;
+
+			//  check that for each test, logger is closed
+			Assert.assertTrue(logs.contains("logging started for 'testAndSubActions'"));
+			Assert.assertTrue(logs.contains("logging stopped for 'testAndSubActions'"));
+
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
