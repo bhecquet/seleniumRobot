@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,6 +50,8 @@ import com.seleniumtests.core.contexts.SeleniumRobotServerContext;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 
+import javax.net.ssl.SSLHandshakeException;
+
 public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
 	@Mock
@@ -69,12 +71,19 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
 	/**
 	 * simulate an inactive server
-	 * @throws UnirestException 
 	 */
 	private SeleniumRobotVariableServerConnector configureNotAliveConnection() throws UnirestException {
 		when(getAliveRequest.asString()).thenThrow(UnirestException.class);
 		when(unirestInstance.get(SERVER_URL + "/variable/api/")).thenReturn(getAliveRequest);
 		
+		return new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+	}
+
+	private SeleniumRobotVariableServerConnector configureNotAliveConnectionWithWrongCertificate() throws UnirestException {
+
+		when(getAliveRequest.asString()).thenThrow(new UnirestException("error", new SSLHandshakeException("PKIX certification failed")));
+		when(unirestInstance.get(SERVER_URL + "/variable/api/")).thenReturn(getAliveRequest);
+
 		return new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
 	}
 	
@@ -139,6 +148,15 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	@Test(groups= {"ut"})
 	public void testServerActiveNotAlive() throws UnirestException {
 		SeleniumRobotVariableServerConnector connector = configureNotAliveConnection();
+		Assert.assertFalse(connector.getActive());
+	}
+
+	/**
+	 * Looking at logs, we should get a message about cacert file
+	 */
+	@Test(groups= {"ut"})
+	public void testServerActiveNotAliveDueToCertificate() throws UnirestException {
+		SeleniumRobotVariableServerConnector connector = configureNotAliveConnectionWithWrongCertificate();
 		Assert.assertFalse(connector.getActive());
 	}
 	

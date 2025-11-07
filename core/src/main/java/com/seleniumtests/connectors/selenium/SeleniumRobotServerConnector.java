@@ -32,6 +32,8 @@ import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
 
+import javax.net.ssl.SSLHandshakeException;
+
 public abstract class SeleniumRobotServerConnector {
 	
 	protected static final String FIELD_NAME = "name";
@@ -113,6 +115,9 @@ public abstract class SeleniumRobotServerConnector {
 				return status == 200;
 			}
 		} catch (UnirestException e) {
+			if (e.getCause() instanceof SSLHandshakeException) {
+				logger.error("Java 'cacert' file does not contain the right certificate chain to connect to server");
+			}
 			return false;
 		} 
 	}
