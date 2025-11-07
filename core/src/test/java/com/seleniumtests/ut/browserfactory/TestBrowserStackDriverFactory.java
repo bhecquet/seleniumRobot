@@ -61,8 +61,9 @@ public class TestBrowserStackDriverFactory extends MockitoTest {
 		when(config.getTestContext()).thenReturn(context);
 		Mockito.when(config.getDebug()).thenReturn(List.of(DebugMode.NONE));
 
-		when(config.getBrowserType()).thenReturn(BrowserType.HTMLUNIT);
+		when(config.getBrowserType()).thenReturn(BrowserType.CHROME);
 		when(config.getPlatform()).thenReturn("windows");
+		when(config.getPageLoadStrategy()).thenReturn(PageLoadStrategy.NORMAL);
 		
 		// configure driver
 		Map<String, String> capsMap = new HashMap<>();
@@ -112,7 +113,7 @@ public class TestBrowserStackDriverFactory extends MockitoTest {
 			Assert.assertNotNull(newDriver);
 			Assert.assertEquals(newDriver, mockedRemoteWebDriver.constructed().get(0));
 			Assert.assertNotNull(driverFactory.getSelectedBrowserInfo());
-			Assert.assertEquals(driverFactory.getSelectedBrowserInfo().getBrowser(), BrowserType.HTMLUNIT);
+			Assert.assertEquals(driverFactory.getSelectedBrowserInfo().getBrowser(), BrowserType.CHROME);
 			Assert.assertEquals(driverFactory.getSelectedBrowserInfo().getVersion(), "70.0.1.2.3");
 
 			// check SeleniumRobot input capabilities has been added to driver after creation
