@@ -26,7 +26,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -37,10 +36,6 @@ import java.util.concurrent.*;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.util.logging.DebugMode;
-import io.appium.java_client.android.options.UiAutomator2Options;
-import io.appium.java_client.ios.options.XCUITestOptions;
-import io.appium.java_client.remote.options.BaseOptions;
-import io.appium.java_client.remote.options.SupportsAppOption;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -55,7 +50,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.Platform;
 
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
@@ -117,7 +111,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			try (CloseableHttpClient client = HttpClients.createDefault()) {
 				// zip file
 				List<File> appFiles = new ArrayList<>();
-				appFiles.add(new File(String.valueOf(application.get())));
+				appFiles.add(new File(application.get()));
 				zipFile = FileUtility.createZipArchiveFromFiles(appFiles);
 
 				HttpHost serverHost = new HttpHost(hubServletUrl.getHost(), hubServletUrl.getPort());
@@ -135,7 +129,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		        	throw new SeleniumGridException("could not upload application file: " + response.getStatusLine().getReasonPhrase());
 		        } else {
 		        	// set path to the mobile application as an URL on the grid hub
-					setApp(capabilities, IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8) + "/" + appFiles.get(0).getName());
+					capabilities = setApp(capabilities, IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8) + "/" + appFiles.get(0).getName());
 		        }
 				// update original caps so that any change made here can be reused later
 				return capabilities;

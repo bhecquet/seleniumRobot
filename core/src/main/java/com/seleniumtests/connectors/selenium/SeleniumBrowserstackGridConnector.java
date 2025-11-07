@@ -128,7 +128,7 @@ public class SeleniumBrowserstackGridConnector extends SeleniumGridConnector {
 						throw new ConfigurationException(String.format("Application file upload failed: %s", response.getStatusText()));
 					})
 					.ifSuccess(response -> logger.info("Application successfuly uploaded to Saucelabs"));
-			setApp(capabilities, jsonResponse.getBody().getObject().getString("app_url"));
+			capabilities = setApp(capabilities, jsonResponse.getBody().getObject().getString("app_url"));
 
 		} catch (UnirestException e) {
 			throw new ConfigurationException("Application file upload failed: " + e.getMessage());

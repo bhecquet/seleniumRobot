@@ -83,7 +83,7 @@ public class TestBrowserStackDriverFactory extends MockitoTest {
 	public void testDriverCreation() {
 
 		when(context.getTestType()).thenReturn(TestType.WEB);
-
+		when(context.getWebDriverGrid()).thenReturn(List.of("https://user:token@hub.browserstack.com/wd/hub"));
 		when(gridConnector1.isGridActive()).thenReturn(true);
 		when(context.getSeleniumGridConnectors()).thenReturn(List.of(gridConnector1));
 		

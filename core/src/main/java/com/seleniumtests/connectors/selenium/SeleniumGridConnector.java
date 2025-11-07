@@ -100,16 +100,16 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	 * @param app	the application path
 	 * @return	the updated capabilities
 	 */
-	protected Capabilities setApp(Capabilities caps, String app) {
+	protected MutableCapabilities setApp(Capabilities caps, String app) {
 		Platform platformName = new BaseOptions<>(caps).getPlatformName();
 		if (platformName == null) {
-			return caps;
+			return new MutableCapabilities(caps);
 		} else if (platformName.is(Platform.ANDROID)) {
 			return new UiAutomator2Options(caps).setApp(app);
 		} else if (platformName.is(Platform.IOS)) {
 			return new XCUITestOptions(caps).setApp(app);
 		} else {
-			return caps;
+			return new MutableCapabilities(caps);
 		}
 	}
 	
