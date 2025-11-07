@@ -66,7 +66,7 @@ public class TestBrowserStackDriverFactory extends MockitoTest {
 		
 		// configure driver
 		Map<String, String> capsMap = new HashMap<>();
-		capsMap.put(CapabilityType.BROWSER_NAME, "htmlunit");
+		capsMap.put(CapabilityType.BROWSER_NAME, "chrome");
 		capsMap.put(CapabilityType.BROWSER_VERSION, "70.0.1.2.3");
 		caps = new MutableCapabilities(capsMap);
 
