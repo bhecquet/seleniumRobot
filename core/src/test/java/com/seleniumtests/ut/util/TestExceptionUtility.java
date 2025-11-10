@@ -87,7 +87,7 @@ public class TestExceptionUtility extends GenericTest {
 		System.out.println(content.toString());
 		Assert.assertTrue(content.toString().matches("(?s)class org.openqa.selenium.WebDriverException: Failure\n"
 				+ "\n"
-				+ "at com.seleniumtests.ut.util.TestExceptionUtility.testGenerateStackTraceWithCause\\(TestExceptionUtility.java:\\d+\\)\n"
+				+ "at com.seleniumtests.ut.util.TestExceptionUtility.testGenerateStackTraceWithCause\\(TestExceptionUtility.java:\\d+\\)"
 				+ ".*class org.openqa.selenium.WebDriverException: Caused by foo<br/>\n"
 				+ "Build info: version: '.*?', revision: '.*?'<br/>\n"
 				+ "System info: os.name: '.*?', os.arch: '.*?', os.version: '.*?', java.version: '.*?'<br/>\n"
