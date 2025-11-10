@@ -510,6 +510,33 @@ public class TestWebUIDriver extends MockitoTest {
 		}
 
 	}
+
+	/**
+	 * Test that browserstack is selected
+	 */
+	@Test(groups={"ut"})
+	public void testDriverCreationInBrowserstack() {
+		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
+		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://user:token@hub.browserstack.com/wd/hub");
+		SeleniumTestsContextManager.getThreadContext().setRunMode("browserstack");
+
+
+		// set connector to simulate the driver creation on grid
+		SeleniumTestsContextManager.getThreadContext().setSeleniumGridConnectors(List.of(gridConnector));
+		when(gridConnector.getNodeUrl()).thenReturn("http://localhost:5555/");
+
+		try (MockedConstruction<BrowserstackDriverFactory> mockedGridDriverFactory = mockConstruction(BrowserstackDriverFactory.class, (gridDriverFactory, context) -> {
+			when(gridDriverFactory.createWebDriver()).thenReturn(new HtmlUnitDriver());
+			when(gridDriverFactory.getSelectedBrowserInfo()).thenReturn(new BrowserInfo(BrowserType.HTMLUNIT, "1.1"));
+		})) {
+
+			CustomEventFiringWebDriver ceDriver = (CustomEventFiringWebDriver) WebUIDriver.getWebDriver(true);
+			Assert.assertNotNull(ceDriver.getBrowserInfo());
+			Assert.assertEquals(ceDriver.getBrowserInfo().getVersion(), "1.1");
+
+			verify(mockedGridDriverFactory.constructed().get(0)).createWebDriver();
+		}
+	}
 	
 	/**
 	 * Check that with grid execution, we set the name of the previous driver execution node on this new driver

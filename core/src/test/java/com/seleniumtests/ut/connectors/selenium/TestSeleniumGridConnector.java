@@ -93,7 +93,7 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 		when(HttpClients.createDefault()).thenReturn(client);
 		when(response.getEntity()).thenReturn(entity);
 		when(response.getStatusLine()).thenReturn(statusLine);
-		when(client.execute((HttpHost)any(HttpHost.class), any(HttpRequest.class))).thenReturn(response);
+		when(client.execute(any(HttpHost.class), any(HttpRequest.class))).thenReturn(response);
 		when(driver.getCapabilities()).thenReturn(capabilities); 
 		when(driver.getSessionId()).thenReturn(new SessionId("abcdef"));
 		when(driver2.getCapabilities()).thenReturn(capabilities); 
@@ -211,7 +211,7 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 		SeleniumGridConnector connector = new SeleniumGridConnector("http://localhost:6666");
 		connector.uploadMobileApp(new DesiredCapabilities());
 		
-		verify(client, never()).execute((HttpHost)any(HttpHost.class), any(HttpRequest.class));
+		verify(client, never()).execute(any(HttpHost.class), any(HttpRequest.class));
 	}
 	
 	@Test(groups={"ut"})

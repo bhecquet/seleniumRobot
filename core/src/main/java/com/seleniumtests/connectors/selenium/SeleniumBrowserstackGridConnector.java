@@ -24,9 +24,9 @@ import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
-import kong.unirest.core.*;
-import kong.unirest.core.json.JSONException;
-import kong.unirest.core.json.JSONObject;
+import kong.unirest.*;
+import kong.unirest.json.JSONException;
+import kong.unirest.json.JSONObject;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.Capabilities;
@@ -35,6 +35,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.*;
@@ -71,6 +72,24 @@ public class SeleniumBrowserstackGridConnector extends SeleniumGridConnector {
 		logsUrl = null;
 	}
 
+	@Override
+	public List<String> listFilesToDownload() {
+		logger.warn("list files to download is not available on browserstack");
+		return new ArrayList<>();
+	}
+
+	@Override
+	public File downloadFileFromName(String name, File downloadDir) {
+		logger.warn("download file from name is not available on browserstack");
+		return null;
+	}
+
+	@Override
+	public boolean stopSession(String sessionId) {
+		logger.warn("stopSession is not available on browserstack");
+		return true;
+	}
+
 	private void configureProxy(UnirestInstance unirest) {
 		String proxyHost = System.getProperty("https.proxyHost");
 		String proxyPort = System.getProperty("https.proxyPort");
@@ -89,7 +108,7 @@ public class SeleniumBrowserstackGridConnector extends SeleniumGridConnector {
 			configureProxy(unirest);
 
 			HttpResponse<JsonNode> response = unirest.get("https://api.browserstack.com/automate/projects.json").basicAuth(username, key).asJson();
-			return response.isSuccess();
+			return response.getStatus() == 200;
 		} catch (UnirestException e) {
 			return false;
 		}
@@ -107,27 +126,18 @@ public class SeleniumBrowserstackGridConnector extends SeleniumGridConnector {
 			return capabilities;
 		}
 
-		// extract user name and password from getWebDriverGrid
-		String authenticationString = BrowserStackCapabilitiesFactory.getAuthenticationString(SeleniumTestsContextManager.getThreadContext().getWebDriverGrid().get(0));
-		String user = authenticationString.split(":")[0];
-		String key = authenticationString.split(":")[1];
-
 		try (UnirestInstance unirest = Unirest.spawnInstance();){
 
-			String proxyHost = System.getProperty("https.proxyHost");
-			String proxyPort = System.getProperty("https.proxyPort");
-			if (proxyHost != null && proxyPort != null) {
-				unirest.config().proxy(proxyHost, Integer.parseInt(proxyPort));
-			}
+			configureProxy(unirest);
 
 			HttpResponse<JsonNode> jsonResponse = unirest.post(BROWSERSTACK_UPLOAD_URL)
-					.basicAuth(user, key)
+					.basicAuth(username, key)
 					.field("file", new File(applicationOption.get()))
 					.asJson()
 					.ifFailure(response -> {
 						throw new ConfigurationException(String.format("Application file upload failed: %s", response.getStatusText()));
 					})
-					.ifSuccess(response -> logger.info("Application successfuly uploaded to Saucelabs"));
+					.ifSuccess(response -> logger.info("Application successfuly uploaded to Browserstack"));
 			capabilities = setApp(capabilities, jsonResponse.getBody().getObject().getString("app_url"));
 
 		} catch (UnirestException e) {
@@ -144,6 +154,10 @@ public class SeleniumBrowserstackGridConnector extends SeleniumGridConnector {
 
 	@Override
 	public File stopVideoCapture(String outputFile) {
+
+		if (videoUrl == null) {
+			throw new ScenarioException("videoUrl is null");
+		}
 
 		logger.info("stopping capture");
 		try (UnirestInstance unirest = Unirest.spawnInstance();
@@ -163,7 +177,7 @@ public class SeleniumBrowserstackGridConnector extends SeleniumGridConnector {
 							.downloadMonitor((b, fileName, bytesWritten, totalBytes) -> logger.info("File {}: {}/{}", fileName, bytesWritten, totalBytes));
 				}
 				HttpResponse<File> videoResponse = getRequest
-						.requestTimeout(60000)
+						.socketTimeout(60000)
 						.asFile(outputFile);
 
 				if (videoResponse.getStatus() != 200) {
@@ -201,7 +215,6 @@ public class SeleniumBrowserstackGridConnector extends SeleniumGridConnector {
 	 */
 	@Override
 	public void getSessionInformationFromGrid(RemoteWebDriver driver, long driverCreationDuration) {
-
 
 		// get information from browserstack
 		String buildId = getCurrentBuildId(driver);
@@ -298,5 +311,9 @@ public class SeleniumBrowserstackGridConnector extends SeleniumGridConnector {
 
 	public String getLogsUrl() {
 		return logsUrl;
+	}
+
+	public void setVideoUrl(String videoUrl) {
+		this.videoUrl = videoUrl;
 	}
 }

@@ -245,6 +245,7 @@ public class ConnectorsTest extends MockitoTest {
 		}
 		mockedUnirest.get().when(() -> Unirest.spawnInstance()).thenReturn(unirestInstance);
 		mockedUnirest.get().when(() -> Unirest.config()).thenReturn(unirestConfig);
+		mockedUnirest.get().when(() -> unirestInstance.config()).thenReturn(unirestConfig);
 
 
 	}
@@ -384,6 +385,9 @@ public class ConnectorsTest extends MockitoTest {
 		when(jsonResponse.getHeaders()).thenReturn(headers);
 		when(streamResponse.getHeaders()).thenReturn(headers);
 		when(bytestreamResponse.getHeaders()).thenReturn(headers);
+
+		when(jsonResponse.ifSuccess(any())).thenReturn(jsonResponse);
+		when(jsonResponse.ifFailure(any())).thenReturn(jsonResponse);
 
 		when(request.getUrl()).thenReturn(serverUrl);
 		if (replyData.get(0) instanceof String) {
@@ -585,6 +589,7 @@ public class ConnectorsTest extends MockitoTest {
 		when(requestBodyEntity.asString()).thenReturn(response);
 		when(requestMultipartBody.getUrl()).thenReturn(serverUrl);
 		when(requestMultipartBody.asJson()).thenReturn(jsonResponse);
+
 		
 		if ("request".equals(responseType)) {
 			return postRequest;
