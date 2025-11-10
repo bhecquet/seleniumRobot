@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.seleniumtests.core.TestStepManager;
+import com.seleniumtests.customexception.CannotRunOnSameSeleniumGridNodeException;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.helper.WaitHelper;
 import io.appium.java_client.AppiumDriver;
@@ -316,6 +317,43 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 			SeleniumGridDriverFactory factory = spy(new SeleniumGridDriverFactory(config));
 			when(factory.getDriverInstance(any(URL.class), any(MutableCapabilities.class))).thenThrow(new WebDriverException(""));
 			factory.createWebDriver();
+		}
+	}
+
+	/**
+	 * Check that error is different when driver cannot be created on the same node as an other one
+	 * This is to ensure that test will be replaced
+	 */
+	@Test(groups={"ut"}, expectedExceptions= CannotRunOnSameSeleniumGridNodeException.class)
+	public void testDriverNotAttachedIfError() {
+
+		try (MockedConstruction<RemoteWebDriver> mockedRemoteWebDriver = mockConstruction(RemoteWebDriver.class, (driver, context1) -> {
+			when(driver.manage()).thenReturn(options);
+			when(driver.getCapabilities()).thenReturn(caps);
+		})) {
+			when(context.getWebDriverGridTimeout()).thenReturn(1);
+
+			when(context.getTestType()).thenReturn(TestType.WEB);
+
+			when(gridConnector1.isGridActive()).thenReturn(true);
+			when(config.getRunOnSameNode()).thenReturn(null);
+			when(config.getSeleniumGridConnector()).thenReturn(null);
+			when(context.getSeleniumGridConnectors()).thenReturn(List.of(gridConnector1));
+
+			// connect to grid
+			SeleniumGridDriverFactory factory = spy(new SeleniumGridDriverFactory(config));
+			when(factory.getDriverInstance(any(URL.class), any(MutableCapabilities.class)))
+					.thenCallRealMethod() // first driver is correctly created
+					.thenThrow(new WebDriverException("")); // second one on same node fails
+
+			// first driver creation ok
+			factory.createWebDriver();
+
+			// second driver creation on same node => will fail
+			when(config.getRunOnSameNode()).thenReturn("http://localhost:4444");
+			when(config.getSeleniumGridConnector()).thenReturn(gridConnector1);
+			factory.createWebDriver();
+
 		}
 	}
 

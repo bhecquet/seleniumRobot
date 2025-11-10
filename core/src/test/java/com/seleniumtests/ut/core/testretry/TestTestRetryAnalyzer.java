@@ -4,6 +4,7 @@ import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.testretry.TestRetryAnalyzer;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ApplicationError;
+import com.seleniumtests.customexception.CannotRunOnSameSeleniumGridNodeException;
 import com.seleniumtests.customexception.SeleniumGridNodeNotAvailable;
 import org.testng.Assert;
 import org.testng.ITestResult;
@@ -43,6 +44,14 @@ public class TestTestRetryAnalyzer extends GenericTest {
         testResult.setThrowable(new SeleniumGridNodeNotAvailable("no node found"));
         TestRetryAnalyzer testRetryAnalyzer = new TestRetryAnalyzer(2);
         Assert.assertFalse(testRetryAnalyzer.retry(testResult));
+    }
+
+    @Test(groups = "ut")
+    public void testRetryCannotRunOnSameSeleniumGridNodeException() {
+        ITestResult testResult = Reporter.getCurrentTestResult();
+        testResult.setThrowable(new CannotRunOnSameSeleniumGridNodeException("cannot attach to driver"));
+        TestRetryAnalyzer testRetryAnalyzer = new TestRetryAnalyzer(2);
+        Assert.assertTrue(testRetryAnalyzer.retry(testResult));
     }
 
     @Test(groups = "ut")

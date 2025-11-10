@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.seleniumtests.customexception.CannotRunOnSameSeleniumGridNodeException;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.remote.options.BaseOptions;
 import org.openqa.selenium.*;
@@ -277,8 +278,14 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 		}
 		
 		if (driver == null) {
-			noDriverCount = counter.getAndIncrement();
-			throw new SeleniumGridNodeNotAvailable(String.format("Cannot create driver on grid, it may be fully used [%d times]", noDriverCount), currentException);
+			// when driver is requested to be run on a same node as an other driver, don't raise the same exception
+			// as we want to replay the test in this case, as it has already started
+			if (webDriverConfig.getRunOnSameNode() != null) {
+				throw new CannotRunOnSameSeleniumGridNodeException(String.format("Cannot start driver on grid node %s", webDriverConfig.getRunOnSameNode()));
+			} else {
+				noDriverCount = counter.getAndIncrement();
+				throw new SeleniumGridNodeNotAvailable(String.format("Cannot create driver on grid, it may be fully used [%d times]", noDriverCount), currentException);
+			}
 		} else {
 			// reset counter as we got a driver
 			counter.set(0); 
