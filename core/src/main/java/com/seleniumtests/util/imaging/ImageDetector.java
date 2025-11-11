@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -74,15 +74,14 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 public class ImageDetector {
 	
 	private Rectangle detectedRectangle;
-	private boolean computed = false;
 	private long rotationAngle;
 	private File sceneImage;
 	private File objectImage;
 	private boolean debug = false;
 	private double detectionThreshold = 0.05;
-	private Mat imgMatch = new Mat();
+	private final Mat imgMatch = new Mat();
 	private double sizeRatio;
-	private static Logger logger = SeleniumRobotLogger.getLogger(ImageDetector.class);
+	private static final Logger logger = SeleniumRobotLogger.getLogger(ImageDetector.class);
 	
 	// load openCV
 	// In case of "UnsatisfiedLinkError, library already loaded in another class loader", during unit tests, check that 
@@ -91,7 +90,7 @@ public class ImageDetector {
 		nu.pattern.OpenCV.loadLocally();
 	}
 	
-	class TemplateMatchProperties {
+	static class TemplateMatchProperties {
 		
 
 		private Point matchLoc;
@@ -157,7 +156,7 @@ public class ImageDetector {
 		
 		double matchValue = detector.detectExactZoneWithScale();
 		Rectangle detectedObjectRectangle = detector.getDetectedRectangle();
-		System.out.println(String.format("Detected Zone (Top, Left, Width, Height): (%d, %d, %d, %d)", detectedObjectRectangle.y, detectedObjectRectangle.x, detectedObjectRectangle.width, detectedObjectRectangle.height));
+		System.out.printf("Detected Zone (Top, Left, Width, Height): (%d, %d, %d, %d)%n", detectedObjectRectangle.y, detectedObjectRectangle.x, detectedObjectRectangle.width, detectedObjectRectangle.height);
 		double pictureSizeRatio = detector.getSizeRatio();
 		System.out.println("Aspect ratio: " + pictureSizeRatio);
 		System.out.println("Match value: " + matchValue);
@@ -192,7 +191,6 @@ public class ImageDetector {
 	/**
 	 * Compute the rectangle where the searched picture is and the rotation angle between both images
 	 * Throw {@link ImageSearchException} if picture is not found
-	 * @return
 	 * @Deprecated Kept here for information, but open CV 3 does not include SURF anymore for java build
 	 */
 	public void detectCorrespondingZone() {
@@ -221,7 +219,7 @@ public class ImageDetector {
 			
 			writeComparisonPictureToFile(tempFile, outImage);
 		} catch (IOException e) {
-			
+			// ignore
 		}
 		
 		// http://stackoverflow.com/questions/29828849/flann-for-opencv-java
@@ -256,8 +254,8 @@ public class ImageDetector {
 		    }
 		}
 		
-		logger.debug("-- Max dist : " + maxDist);
-		logger.debug("-- Min dist : " + minDist);
+		logger.debug("-- Max dist : {}", maxDist);
+		logger.debug("-- Min dist : {}", minDist);
 		
 		LinkedList<DMatch> goodMatches = new LinkedList<>();
 		MatOfDMatch gm = new MatOfDMatch();
@@ -282,10 +280,10 @@ public class ImageDetector {
 		List<KeyPoint> objectKeyPointsList = objectKeyPoints.toList();
 		List<KeyPoint> sceneKeyPointsList = sceneKeyPoints.toList();
 
-		for(int i = 0; i<goodMatches.size(); i++){
-		    objList.addLast(objectKeyPointsList.get(goodMatches.get(i).queryIdx).pt);
-		    sceneList.addLast(sceneKeyPointsList.get(goodMatches.get(i).trainIdx).pt);
-		}
+        for (DMatch goodMatch : goodMatches) {
+            objList.addLast(objectKeyPointsList.get(goodMatch.queryIdx).pt);
+            sceneList.addLast(sceneKeyPointsList.get(goodMatch.trainIdx).pt);
+        }
 
 		MatOfPoint2f obj = new MatOfPoint2f();
 		obj.fromList(objList);
@@ -342,6 +340,7 @@ public class ImageDetector {
 				
 				showResultingPicture(imgMatch);
 			} catch (IOException e) {
+				// ignore
 			}
 		}
 		
@@ -368,14 +367,14 @@ public class ImageDetector {
 	 * steps are 10%, with 0.6 accuracy
 	 * then when a good match is found, we search around by 5% scale steps with 0.7 accuracy
 	 * then when a good match is found, we search around by 2.5% scale steps with 0.8 accuracy
-	 * 
+	 * <p>
 	 * example:
 	 * first pass: scales are: 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200
 	 * 				good matches are found around 600 and 700
 	 * second pass: scales are 550, 600, 650, 700, 750
 	 * 				good matches are found at 650
 	 * third pass: scales are 625, 650, 675
-	 * 
+	 * <p>
 	 * The best match is at 675
 	 */
 	public double detectExactZoneWithScale() {
@@ -476,6 +475,7 @@ public class ImageDetector {
 				
 					showResultingPicture(sceneImageMat);
 				} catch (IOException e) {
+					// ignore
 				}
 			}
 	        rotationAngle = 0;
@@ -490,12 +490,12 @@ public class ImageDetector {
 
 	/**
 	 * Extract matching in parallel
-	 * @param sceneImageMat
-	 * @param objectImageMat
-	 * @param matches
-	 * @param computedScales
-	 * @param currentThreshold
-	 * @param localScales
+	 * @param sceneImageMat		matrix of scene image
+	 * @param objectImageMat	matrix of object image
+	 * @param matches			list of matches
+	 * @param computedScales	the scales list we use for matching (compare object at different scales)
+	 * @param currentThreshold	threshold set for image comparison
+	 * @param localScales		.
 	 */
 	private void extractMatching(Mat sceneImageMat, Mat objectImageMat, List<TemplateMatchProperties> matches,
 			Set<Integer> computedScales, final double currentThreshold, Set<Integer> localScales) {
@@ -556,7 +556,6 @@ public class ImageDetector {
 	/**
 	 * This method uses template matching for exact comparison
 	 * It means that no resizing or rotation can be detected
-	 * @throws IOException
 	 */
 	private TemplateMatchProperties detectExactZone2(Mat sceneImageMat, Mat objectImageMat, int scale, double threshold) {
 		
@@ -608,7 +607,7 @@ public class ImageDetector {
 		if (rotationAngle % 90 != 0) {
 			throw new ImageSearchException("only rotations of 90, 180 or 270 are supported");
 		}
-		logger.debug("rotation angle is " + rotationAngle);
+		logger.debug("rotation angle is {}", rotationAngle);
 		
 		// check that the translated zone is a rectangle
 		if (getAngleBetweenVectors(p2, p3, po2, po3) != rotationAngle
@@ -621,11 +620,6 @@ public class ImageDetector {
 	
 	/**
 	 * In case angles are not strictly multiples of 90°, move points so that we have a real rectangle
-	 * 
-	 * @param p1
-	 * @param p2
-	 * @param p3
-	 * @param p4
 	 */
 	protected void reworkOnScenePoints(Point p1, Point p2, Point p3, Point p4) {
 		if (rotationAngle == 0 || rotationAngle == 180) {
@@ -666,7 +660,7 @@ public class ImageDetector {
 		if (Math.abs(widthRatio - heightRatio) > 0.1) {
 			throw new ImageSearchException("Aspect ratio between source and detected image is not the same");
 		} else {
-			logger.debug("Transform ratio is " + Math.round(widthRatio * 100) / 100.0);
+			logger.debug("Transform ratio is {}", Math.round(widthRatio * 100) / 100.0);
 			sizeRatio = widthRatio;
 		}
 	}
@@ -708,7 +702,7 @@ public class ImageDetector {
 	
 	/**
 	 * File path should end with an image extension (jpg, png)
-	 * @param filePath
+	 * @param filePath	the image to create
 	 */
 	public void writeComparisonPictureToFile(String filePath, Mat img) {
 		if (filePath.toLowerCase().endsWith(".jpg") || filePath.toLowerCase().endsWith(".png")) {
@@ -720,8 +714,7 @@ public class ImageDetector {
 	
 	/**
 	 * Method to display the result of image detection
-	 * @param imgStr
-	 * @param m
+	 * @param filePath	the path of file to display
 	 */
 	public void showResultingImage(String filePath) {
 		JFrame frame = new JFrame("My GUI");
@@ -746,10 +739,6 @@ public class ImageDetector {
 		return detectedRectangle;
 	}
 
-	public boolean isComputed() {
-		return computed;
-	}
-
 	public long getRotationAngle() {
 		return rotationAngle;
 	}
@@ -760,7 +749,6 @@ public class ImageDetector {
 
 	/**
 	 * Returns the ratio between the detected image (in scene) and the source image (to find)
-	 * @return
 	 */
 	public double getSizeRatio() {
 		return sizeRatio;

@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,9 +31,11 @@ import java.lang.reflect.Method;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
+import com.seleniumtests.customexception.ConfigurationException;
 import kong.unirest.Headers;
 import org.apache.commons.io.FileUtils;
 import org.mockito.MockedConstruction;
@@ -100,10 +102,10 @@ public class ConnectorsTest extends MockitoTest {
 	public HttpResponse<String> responseAliveString;
 	public UnirestInstance unirestInstance;
 
-	protected static ThreadLocal<MockedStatic> mockedUnirest = new ThreadLocal<>();
-	protected MockedStatic mockedWebUiDriverFactory;
-	protected MockedConstruction mockedWebUiDriver;
-	protected MockedConstruction mockedRemoteWebDriver;
+	protected static ThreadLocal<MockedStatic<Unirest>> mockedUnirest = new ThreadLocal<>();
+	protected MockedStatic<WebUIDriverFactory> mockedWebUiDriverFactory;
+	protected MockedConstruction<WebUIDriver> mockedWebUiDriver;
+	protected MockedConstruction<RemoteWebDriver> mockedRemoteWebDriver;
 	
 	protected GetRequest namedApplicationRequest;
 	protected GetRequest namedEnvironmentRequest;
@@ -221,7 +223,7 @@ public class ConnectorsTest extends MockitoTest {
 			+ "}";
 
 	@BeforeMethod(groups={"ut", "it"})  
-	public void initMocks(final Method method, final ITestContext testNGCtx, final ITestResult testResult) throws Exception {
+	public void initMocks(final Method method, final ITestContext testNGCtx, final ITestResult testResult) {
 		options = mock(Options.class);
 		timeouts = mock(Timeouts.class);
 		navigation = mock(Navigation.class);
@@ -243,8 +245,8 @@ public class ConnectorsTest extends MockitoTest {
 				mockedUnirest.set(mockStatic(Unirest.class));
 			}
 		}
-		mockedUnirest.get().when(() -> Unirest.spawnInstance()).thenReturn(unirestInstance);
-		mockedUnirest.get().when(() -> Unirest.config()).thenReturn(unirestConfig);
+		mockedUnirest.get().when(Unirest::spawnInstance).thenReturn(unirestInstance);
+		mockedUnirest.get().when(Unirest::config).thenReturn(unirestConfig);
 		mockedUnirest.get().when(() -> unirestInstance.config()).thenReturn(unirestConfig);
 
 
@@ -273,7 +275,6 @@ public class ConnectorsTest extends MockitoTest {
 	
 	/**
 	 * Method for creating server reply mock
-	 * @throws UnirestException 
 	 */
 	public HttpRequest<?> createGridServletServerMock(String requestType, String apiPath, int statusCode, String replyData) throws UnirestException {
 		return createServerMock(GRID_SERVLET_URL, requestType, apiPath, statusCode, replyData, "request");
@@ -305,13 +306,12 @@ public class ConnectorsTest extends MockitoTest {
 	
 	/**
 	 * 
-	 * @param requestType
-	 * @param apiPath
-	 * @param statusCode
-	 * @param replyData
+	 * @param requestType	'GET' , 'POST', ...
+	 * @param apiPath		path of the API: '/someapi/somePath
+	 * @param statusCode	status code returned by the API
+	 * @param replyData		Data to return
 	 * @param responseType		if "request", replies with the POST request object (HttpRequestWithBody.class). If "body", replies with the body (MultipartBody.class)
-	 * @return
-	 * @throws UnirestException
+	 * @return the request
 	 */
 	public HttpRequest<?> createServerMock(String requestType, String apiPath, int statusCode, File replyData, String responseType) throws UnirestException {
 		return createServerMock(SERVER_URL, requestType, apiPath, statusCode, (Object)replyData, responseType);
@@ -331,10 +331,10 @@ public class ConnectorsTest extends MockitoTest {
 	}
 
 	public HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, Object replyData, String responseType) throws UnirestException {
-		return createServerMock(serverUrl, requestType, apiPath, statusCode, Arrays.asList(replyData), responseType);
+		return createServerMock(serverUrl, requestType, apiPath, statusCode, Collections.singletonList(replyData), responseType);
 	}
 	public HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, Object replyData, String responseType, Headers headers) throws UnirestException {
-		return createServerMock(serverUrl, requestType, apiPath, statusCode, Arrays.asList(replyData), responseType, headers);
+		return createServerMock(serverUrl, requestType, apiPath, statusCode, Collections.singletonList(replyData), responseType, headers);
 	}
 
 	/**
@@ -345,8 +345,7 @@ public class ConnectorsTest extends MockitoTest {
 	 * @param statusCode		the status code to return: 200, 500, ...
 	 * @param replyData			the list of response data. In case service is called more times than the number of provided responses, the last one will be repeated
 	 * @param responseType		"request", "requestBodyEntity", "body". if "request", replies with the POST request object (HttpRequestWithBody.class). If "body", replies with the body (MultipartBody.class)
-	 * @return
-	 * @throws UnirestException
+	 * @return the request
 	 */
 	public HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, final List<Object> replyData, String responseType) throws UnirestException {
 		return createServerMock(serverUrl, requestType, apiPath, statusCode, replyData, responseType, new Headers());
@@ -360,8 +359,7 @@ public class ConnectorsTest extends MockitoTest {
 	 * @param replyData			the list of response data. In case service is called more times than the number of provided responses, the last one will be repeated
 	 * @param responseType		"request", "requestBodyEntity", "body". if "request", replies with the POST request object (HttpRequestWithBody.class). If "body", replies with the body (MultipartBody.class)
 	 * @param headers			list of headers to return
-	 * @return
-	 * @throws UnirestException
+	 * @return the request
 	 */
 	public HttpRequest<?> createServerMock(String serverUrl, String requestType, String apiPath, int statusCode, final List<Object> replyData, String responseType, Headers headers) throws UnirestException {
 
@@ -377,7 +375,7 @@ public class ConnectorsTest extends MockitoTest {
 		HttpResponse<byte[]> bytestreamResponse = mock(HttpResponse.class);
 		HttpRequest<?> request = mock(HttpRequest.class);
 		JsonNode json = mock(JsonNode.class);
-		HttpRequestWithBody postRequest = spy(HttpRequestWithBody.class);
+		postRequest = spy(HttpRequestWithBody.class);
 
 		PagedList<JsonNode> pageList = new PagedList<>(); // for asPaged method
 
@@ -471,6 +469,7 @@ public class ConnectorsTest extends MockitoTest {
 				pageList.add(jsonResponse);
 
 			} catch (JSONException | NullPointerException e) {
+				// ignore
 			}
 
 
@@ -491,7 +490,6 @@ public class ConnectorsTest extends MockitoTest {
 				}
 			});
 
-			//when(bytestreamResponse.getBody()).thenReturn(FileUtils.readFileToByteArray((File)replyData));
 			when(bytestreamResponse.getBody()).then(new Answer<byte[]>() {
 				private int count = -1;
 
@@ -499,9 +497,9 @@ public class ConnectorsTest extends MockitoTest {
 
 					count++;
 					if (count >= replyData.size() - 1) {
-						return (byte[]) FileUtils.readFileToByteArray((File) replyData.get(replyData.size() - 1));
+						return FileUtils.readFileToByteArray((File) replyData.get(replyData.size() - 1));
 					} else {
-						return (byte[]) FileUtils.readFileToByteArray((File) replyData.get(count));
+						return FileUtils.readFileToByteArray((File) replyData.get(count));
 					}
 				}
 			});
@@ -552,10 +550,9 @@ public class ConnectorsTest extends MockitoTest {
 				mockedUnirest.get().when(() -> Unirest.delete(serverUrl + apiPath)).thenReturn(postRequest);
 				when(unirestInstance.delete(serverUrl + apiPath)).thenReturn(postRequest);
 				return preparePostRequest(serverUrl, responseType, postRequest, response, jsonResponse);
-
+			default:
+				throw new ConfigurationException("Unknown request type: " + requestType);
 		}
-		return null;
-
 	}
 	
 	private HttpRequest<?> preparePostRequest(String serverUrl, String responseType, HttpRequestWithBody postRequest, HttpResponse<String> response, HttpResponse<JsonNode> jsonResponse) {
@@ -608,7 +605,7 @@ public class ConnectorsTest extends MockitoTest {
 		HttpResponse<JsonNode> jsonResponse = mock(HttpResponse.class);
 		HttpRequest<?> request = mock(HttpRequest.class);
 		MultipartBody requestMultipartBody = mock(MultipartBody.class);
-		HttpRequestWithBody postRequest = mock(HttpRequestWithBody.class);
+		postRequest = mock(HttpRequestWithBody.class);
 
 		when(request.getUrl()).thenReturn(SERVER_URL);
 		when(jsonResponse.getStatus()).thenReturn(statusCode);
@@ -647,13 +644,13 @@ public class ConnectorsTest extends MockitoTest {
 				when(requestMultipartBody.field(anyString(), anyString())).thenReturn(requestMultipartBody);
 				when(requestMultipartBody.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
 				return stub;
+			default:
+				throw new ConfigurationException("Unknown request type: " + requestType);
 
 		}
-
-		return null;	
 	}
 	
-	protected WebUIDriver createMockedWebDriver() throws Exception {
+	protected WebUIDriver createMockedWebDriver() {
 
 		WebUIDriver uiDriver = spy(new WebUIDriver("main"));
 		mockedWebUiDriverFactory = mockStatic(WebUIDriverFactory.class);
@@ -689,7 +686,7 @@ public class ConnectorsTest extends MockitoTest {
 	/**
      * Creates a mock for grid on <a href="http://localhost:4321">...</a>
      */
-	protected WebUIDriver createGridHubMockWithNodeOK() throws Exception {
+	protected WebUIDriver createGridHubMockWithNodeOK() {
 		
 		WebUIDriver uiDriver = createMockedWebDriver();
 		
@@ -709,7 +706,6 @@ public class ConnectorsTest extends MockitoTest {
 
 	/**
 	 * simulate an alive snapshot sever responding to all requests
-	 * @throws UnirestException 
 	 */
 	public SeleniumRobotSnapshotServerConnector configureMockedSnapshotServerConnection() throws UnirestException {
 		

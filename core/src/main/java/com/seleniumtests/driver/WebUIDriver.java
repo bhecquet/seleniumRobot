@@ -399,11 +399,13 @@ public class WebUIDriver {
 	        	} catch (Exception ex) {
 	        		scenarioLogger.error("Exception encountered when quiting driver:" + ex.getMessage());
 	        	}
-			} catch (InterruptedException | ExecutionException | TimeoutException e1) {
+			} catch (ExecutionException | TimeoutException e1) {
 				if (future != null) {
 					future.cancel(true);
 					logger.warn("driver not available");
 				}
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
 			}
 
     		driver = null;
