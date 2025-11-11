@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.seleniumtests.browserfactory.mobile.*;
+import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import io.appium.java_client.AppiumDriver;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -595,7 +596,7 @@ public class TestWebUiDriver extends ReporterTest {
 			// creates the driver
 			WebDriver driver1 = WebUIDriver.getWebDriver(true, BrowserType.EDGE, "main", port);
 			driver1.get("edge://settings/");
-			Assert.assertTrue(new TextFieldElement("search", By.id("search_input")).isElementPresent(3));
+			Assert.assertTrue(new HtmlElement("app", By.tagName("app-shell")).isElementPresent(3));
 		} finally {
 			cleanChrome(chromeProcess, chromeDataDir);
 		}

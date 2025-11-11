@@ -88,6 +88,15 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, SERVER_URL + "/wd/hub");
 			
 			WebUIDriver uiDriver = createGridHubMockWithNodeOK();
+
+			// make the session information fail on first time
+			createJsonServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200,
+					// session not found (null)
+					GRID_STATUS_NO_SESSION, // called when we get grid status
+					GRID_STATUS_NO_SESSION, // first error
+					GRID_STATUS_NO_SESSION, // second error
+					// session found (id provided)
+					String.format(GRID_STATUS_WITH_SESSION, "abcdef"));
 			
 			ReporterTest.executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
 			

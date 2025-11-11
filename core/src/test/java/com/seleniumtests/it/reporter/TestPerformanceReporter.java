@@ -296,7 +296,7 @@ public class TestPerformanceReporter extends ReporterTest {
 		// check that files are present and that they contain no step
 		String detailedReportContent = readTestMethodPerfFile("test2");
 		Assert.assertTrue(detailedReportContent.contains("Test has not started or has been skipped"));
-		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "<testcase classname"), 1); // only Test end step. Previous result step is not displayed as test method is skipped due to unsatisfied dependency
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "<testcase classname"), 2); // only Test end step and previous results
 		
 		// check other file contains steps
 		String detailedReportContent2 = readTestMethodPerfFile("test1");
