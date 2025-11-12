@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,10 +19,10 @@ package com.seleniumtests.core;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -64,6 +64,7 @@ public class SeleniumTestsContextManager {
 	private static String dataPath;
 	private static String cachePath;
 	private static String appDataPath;
+	private static Path profilesPath;
 	private static String applicationName;
 	private static String applicationNameWithVersion;
 	private static String applicationVersion;
@@ -74,25 +75,25 @@ public class SeleniumTestsContextManager {
 
 	public static final String DATA_FOLDER_NAME = "data";
 	public static final String CACHE_FOLDER_NAME = "cache";
-	public static final String SELENIUM_VERSION = "4.7.2";
+	public static final String PROFILES_FOLDER_NAME = "profiles";
 
     // global level context
     private static SeleniumTestsContext globalContext;
 
     // thread level SeleniumTestsContext
-    private static ThreadLocal<SeleniumTestsContext> threadLocalContext = new ThreadLocal<>();
+    private static final ThreadLocal<SeleniumTestsContext> threadLocalContext = new ThreadLocal<>();
     
     // relationship between a SeleniumTestsContext and a TestNG test (<test> tag in XML)
-    private static Map<String, SeleniumTestsContext> testContext = Collections.synchronizedMap(new HashMap<>());
+    private static final Map<String, SeleniumTestsContext> testContext = Collections.synchronizedMap(new HashMap<>());
     
     // relationship between a SeleniumTestsContext and a test class
-    private static Map<String, SeleniumTestsContext> classContext = Collections.synchronizedMap(new HashMap<>());
+    private static final Map<String, SeleniumTestsContext> classContext = Collections.synchronizedMap(new HashMap<>());
     
     // relationship between a SeleniumTestsContext and a test method
-    private static Map<String, SeleniumTestsContext> methodContext = Collections.synchronizedMap(new HashMap<>());
+    private static final Map<String, SeleniumTestsContext> methodContext = Collections.synchronizedMap(new HashMap<>());
     
     // relationship between a ITestResult and its context so that we have a location where to search
-    private static Map<ITestResult, SeleniumTestsContext> testResultContext = Collections.synchronizedMap(new LinkedHashMap<>());
+    private static final Map<ITestResult, SeleniumTestsContext> testResultContext = Collections.synchronizedMap(new LinkedHashMap<>());
 
     private SeleniumTestsContextManager() {
 		// As a utility class, it is not meant to be instantiated.
@@ -166,8 +167,7 @@ public class SeleniumTestsContextManager {
     
     /**
      * Returns test context if it exists. Else, create a new one
-     * @param testNGCtx
-     * @return
+     * @param testNGCtx	TestNG context
      */
     private static SeleniumTestsContext getTestContext(ITestContext testNGCtx) {
     	return getOrCreateContext(testNGCtx, null, null, false);
@@ -186,9 +186,8 @@ public class SeleniumTestsContextManager {
     
     /**
      * Returns class context from test NG context and class name
-     * @param testNGCtx
-     * @param className
-     * @return
+     * @param testNGCtx	TestNG context
+     * @param className	class where test execute
      */
     private static SeleniumTestsContext getClassContext(ITestContext testNGCtx, String className) {
     	return getOrCreateContext(testNGCtx, className, null, false);
@@ -212,11 +211,10 @@ public class SeleniumTestsContextManager {
      * Get the context that will be used for the test method
      * Search for (by order) a specific method context, class context, test context. If none is found, create one 
      * If found, returns a copy of the context if 'createCopy' is true
-     * @param testNGCtx			
+     * @param testNGCtx			TestNG context
      * @param className			class name. May be null and in this case, search only by testNGCtx
      * @param methodName		method name. May be null and in this case, search by class name and testNGCtx
      * @param createCopy		if true and we find class or test context, returns a copy
-     * @return
      */
     private static SeleniumTestsContext getOrCreateContext(ITestContext testNGCtx, String className, String methodName, boolean createCopy) {
     	
@@ -246,15 +244,15 @@ public class SeleniumTestsContextManager {
     
     /**
      * Save the thread context to it's location. 
-     * If we are in {@BeforeTest} , save the thread context to testContext object
-     * If we are in {@BeforeClass} , save the thread context to classContext object
-     * If we are in {@BeforeMethod}, save the thread context to methodContext object
-     * 
+     * If we are in {\@BeforeTest} , save the thread context to testContext object
+     * If we are in {\@BeforeClass} , save the thread context to classContext object
+     * If we are in {\@BeforeMethod}, save the thread context to methodContext object
+     * <p>
      * This way, any change made in the context in a configuration method can be reused in other configuration method or the test method itself
-     * Changes made in {@AfterXXX} method are not saved
-     * @param method
-     * @param testResult
-     * @param context
+     * Changes made in {\@AfterXXX} method are not saved
+     * @param method		the invoked method
+     * @param testResult	the test result for this test
+     * @param context		TestNG context
      */
     public static void saveThreadContext(IInvokedMethod method, ITestResult testResult, ITestContext context) {
     	ConfigurationMethod configMethod = (ConfigurationMethod)method.getTestMethod();
@@ -285,8 +283,8 @@ public class SeleniumTestsContextManager {
     }
     
     /**
-     * {@BeforeMethod} and {@AfterMethod} must define a java.lang.reflect.Method object as first parameter, so read it to get test method name, associated to this configuration method
-     * @param testResult
+     * {\@BeforeMethod} and {\@AfterMethod} must define a java.lang.reflect.Method object as first parameter, so read it to get test method name, associated to this configuration method
+     * @param testResult	the test result
      * @return	the method name of the test method
      */
     private static String getMethodNameFromMethodConfiguration(ITestResult testResult) {
@@ -295,11 +293,14 @@ public class SeleniumTestsContextManager {
     	} catch (Exception e) {
     		if (testResult.getMethod().getConstructorOrMethod().getMethod().getParameterCount() == 0 
     				|| !testResult.getMethod().getConstructorOrMethod().getMethod().getParameterTypes()[0].isAssignableFrom(Method.class) ) {
-				throw new ScenarioException("When using @BeforeMethod / @AfterMethod in tests, this method MUST have a 'java.lang.reflect.Method' object as first argument. Example: \n\n"
-						+ "@BeforeMethod\n" + 
-						"public void beforeMethod(Method method) {\n"
-						+ "    SeleniumTestsContextManager.getThreadContext().setAttribute(\"some attribute\", \"attribute value\");\n"
-						+ "}\n\n");
+				throw new ScenarioException("""
+						When using @BeforeMethod / @AfterMethod in tests, this method MUST have a 'java.lang.reflect.Method' object as first argument. Example:
+						
+						@BeforeMethod
+						public void beforeMethod(Method method) {
+						    SeleniumTestsContextManager.getThreadContext().setAttribute("some attribute", "attribute value");
+						}
+						""");
     		} else {
     			throw e;
     		}
@@ -307,8 +308,8 @@ public class SeleniumTestsContextManager {
     }
     
     /**
-     * {@BeforeMethod} and {@AfterMethod} must define a java.lang.reflect.Method object as first parameter, so read it to get test class name, associated to this configuration method
-     * @param testResult
+     * {\@BeforeMethod} and {\@AfterMethod} must define a java.lang.reflect.Method object as first parameter, so read it to get test class name, associated to this configuration method
+     * @param testResult	the test result
      * @return the class name of the test method
      */
     private static String getClassNameFromMethodConfiguration(ITestResult testResult) {
@@ -318,11 +319,15 @@ public class SeleniumTestsContextManager {
     	} catch (Exception e) {
     		if (testResult.getMethod().getConstructorOrMethod().getMethod().getParameterCount() == 0 
     				|| !testResult.getMethod().getConstructorOrMethod().getMethod().getParameterTypes()[0].isAssignableFrom(Method.class) ) {
-				throw new ScenarioException("When using @BeforeMethod / @AfterMethod in tests, this method MUST have a 'java.lang.reflect.Method' object as first argument. Example: \n\n"
-						+ "@BeforeMethod\n" + 
-						"public void beforeMethod(Method method) {\n"
-						+ "    SeleniumTestsContextManager.getThreadContext().setAttribute(\"some attribute\", \"attribute value\");\n"
-						+ "}\n\n");
+				throw new ScenarioException("""
+						When using @BeforeMethod / @AfterMethod in tests, this method MUST have a 'java.lang.reflect.Method' object as first argument. Example:
+						
+						@BeforeMethod
+						public void beforeMethod(Method method) {
+						    SeleniumTestsContextManager.getThreadContext().setAttribute("some attribute", "attribute value");
+						}
+						
+						""");
     		} else {
     			throw e;
     		}
@@ -500,8 +505,8 @@ public class SeleniumTestsContextManager {
     }
 
 	/**
-	 * @param matchingContexts
-	 * @param testResult
+	 * @param matchingContexts		list of known contexts
+	 * @param testResult			the test result
 	 */
 	private static void addAfterTestContext(List<SeleniumTestsContext> matchingContexts, ITestResult testResult) {
 		for (Entry<ITestResult, SeleniumTestsContext> entry: testResultContext.entrySet()) {
@@ -512,8 +517,8 @@ public class SeleniumTestsContextManager {
 	}
 
 	/**
-	 * @param matchingContexts
-	 * @param testResult
+	 * @param matchingContexts	list of known contexts
+	 * @param testResult		the test result
 	 */
 	private static void addAfterClassContext(List<SeleniumTestsContext> matchingContexts, ITestResult testResult) {
 		for (Entry<ITestResult, SeleniumTestsContext> entry: testResultContext.entrySet()) {
@@ -526,8 +531,8 @@ public class SeleniumTestsContextManager {
     /**
      * get SR context stored in test result if it exists. Else, create a new one (happens when a test method has been skipped for example)
      * called from reporters only
-     * @param testNGCtx
-     * @param testResult
+     * @param testNGCtx			TestNG context
+     * @param testResult		the test result
      */
     public static SeleniumTestsContext setThreadContextFromTestResult(ITestContext testNGCtx, ITestResult testResult) {
     	if (testResult == null) {
@@ -556,25 +561,20 @@ public class SeleniumTestsContextManager {
 	/**
      * Build the root path of STF 
      * method for guessing it is different if we are inside a jar (built mode) or in development
-     * @param clazz
-     * @param path
-     * @return
+     * @param clazz		the test class
+     * @param path		path to build
      */
     public static void getPathFromClass(Class<?> clazz, StringBuilder path) {
-		
-		try {
-			String url = URLDecoder.decode(clazz.getProtectionDomain().getCodeSource().getLocation().getFile(), "UTF-8" );
-			if (url.endsWith(".jar")) {
-				path.append((new File(url).getParentFile().getAbsoluteFile().toString() + "/").replace(File.separator, "/"));
-				deployedMode = true;
-			} else {				
-				path.append((new File(url).getParentFile().getParentFile().getAbsoluteFile().toString() + "/").replace(File.separator, "/"));
-				deployedMode = false;
-			}
-		} catch (UnsupportedEncodingException e) {
-			logger.error(e);
-		}
-	}
+
+        String url = URLDecoder.decode(clazz.getProtectionDomain().getCodeSource().getLocation().getFile(), StandardCharsets.UTF_8);
+        if (url.endsWith(".jar")) {
+            path.append((new File(url).getParentFile().getAbsoluteFile() + "/").replace(File.separator, "/"));
+            deployedMode = true;
+        } else {
+            path.append((new File(url).getParentFile().getParentFile().getAbsoluteFile() + "/").replace(File.separator, "/"));
+            deployedMode = false;
+        }
+    }
     
     
     private static String readApplicationVersion() {
@@ -601,7 +601,7 @@ public class SeleniumTestsContextManager {
 	 * 
 	 * @param	resourceName	name of the resource file to read
 	 * @param	fullVersion		if true, returns the version as is
-	 * @return
+	 * @return the version
 	 */
     public static String readApplicationVersion(String resourceName, boolean fullVersion) {
     	try {
@@ -631,7 +631,7 @@ public class SeleniumTestsContextManager {
      * - root
      * - data
      * - config
-     * @param xmlSuite
+     * @param xmlSuite	testNG suite
      */
     public static void generateApplicationPath(XmlSuite xmlSuite) {
 
@@ -682,6 +682,7 @@ public class SeleniumTestsContextManager {
 		}
 
 		cachePath = Paths.get(rootPath, CACHE_FOLDER_NAME, applicationNameWithVersion).toString();
+		profilesPath = Paths.get(rootPath, PROFILES_FOLDER_NAME);
 
 		// create data folder if it does not exist
 		if (!new File(cachePath).isDirectory()) {
@@ -693,12 +694,14 @@ public class SeleniumTestsContextManager {
 		if (!new File(appDataPath).isDirectory()) {
 			new File(appDataPath).mkdirs();
 		}
+		if (!profilesPath.toFile().isDirectory()) {
+			profilesPath.toFile().mkdirs();
+		}
 
 	}
     
     /**
      * Returns application root path
-     * @return
      */
     public static String getRootPath() {
 		return rootPath;
@@ -706,7 +709,6 @@ public class SeleniumTestsContextManager {
 
     /**
      * Returns location of feature files
-     * @return
      */
 	public static String getFeaturePath() {
 		if (Paths.get(dataPath, applicationName, "features").toFile().exists()) {
@@ -718,7 +720,6 @@ public class SeleniumTestsContextManager {
 
 	/**
 	 * Returns the location of dataset files
-	 * @return
 	 */
 	public static String getDatasetPath() {
 		if (Paths.get(dataPath, applicationName, "dataset").toFile().exists()) {
@@ -754,7 +755,6 @@ public class SeleniumTestsContextManager {
 
 	/**
 	 * Returns location of config files
-	 * @return
 	 */
 	public static String getConfigPath() {
 		if (Paths.get(dataPath, applicationName, "config").toFile().exists()) {
@@ -766,7 +766,6 @@ public class SeleniumTestsContextManager {
 	
 	/**
 	 * Returns location of data folder
-	 * @return
 	 */
 	public static String getDataPath() {
 		return dataPath;
@@ -774,7 +773,6 @@ public class SeleniumTestsContextManager {
 	
 	/**
 	 * Returns location of data folder for this application
-	 * @return
 	 */
 	public static String getApplicationDataPath() {
 		return appDataPath;
@@ -782,10 +780,15 @@ public class SeleniumTestsContextManager {
 	
 	/**
 	 * Returns location of cache folder for this application
-	 * @return
 	 */
 	public static String getCachePath() {
 		return cachePath;
+	}
+	/**
+	 * Returns location of browser profiles folder
+	 */
+	public static Path getProfilesPath() {
+		return profilesPath;
 	}
 
     public static Boolean getDeployedMode() {
@@ -798,7 +801,6 @@ public class SeleniumTestsContextManager {
 	/**
 	 * Return true when test is a web test. This does not handle the case of hybrid mobile applications where some screens may be web pages
 	 * So prefer using CustomEventFiringWebDriver.isWebTest() as it look for the mobile context
-	 * @return
 	 */
 	public static boolean isWebTest() {
         return getThreadContext().getTestType().family().equals(TestType.WEB);

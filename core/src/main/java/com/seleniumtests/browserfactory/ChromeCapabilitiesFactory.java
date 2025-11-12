@@ -251,6 +251,10 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 		return webDriverConfig.getChromeBinPath();
 	}
 
+	/**
+	 * Used in local mode only
+	 * @param options	driver options / capabilities
+	 */
 	@Override
 	protected void updateOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
 		((ChromeOptions)options).setBinary(selectedBrowserInfo.getPath());
@@ -259,7 +263,8 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
         	if (!BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getChromeProfilePath()) && (webDriverConfig.getChromeProfilePath().contains("/") || webDriverConfig.getChromeProfilePath().contains("\\"))) {
         		((ChromeOptions)options).addArguments(USER_DATA_DIR_OPTION + webDriverConfig.getChromeProfilePath()); // e.g: C:\\Users\\MyUser\\AppData\\Local\\Google\\Chrome\\User Data
         	} else if (BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getChromeProfilePath())) {
-        		((ChromeOptions)options).addArguments(USER_DATA_DIR_OPTION + selectedBrowserInfo.getDefaultProfilePath()); 
+				Path tempProfile = copyDefaultProfile(selectedBrowserInfo);
+        		((ChromeOptions)options).addArguments(USER_DATA_DIR_OPTION + tempProfile);
         	} else {
         		logger.warn("Chrome profile {} could not be set", webDriverConfig.getChromeProfilePath());
         	}

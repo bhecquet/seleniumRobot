@@ -21,9 +21,13 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.*;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import org.apache.commons.io.FileUtils;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -557,4 +561,39 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 			System.clearProperty(ChromeDriverService.CHROME_DRIVER_LOG_PROPERTY);
 		}
 	}
+
+	@Test(groups={"ut"})
+	public void testCopyDefaultProfile() throws IOException {
+		when(config.getChromeProfilePath()).thenReturn("default");
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
+
+		FileUtils.deleteDirectory(SeleniumTestsContextManager.getProfilesPath().toFile());
+		new ChromeCapabilitiesFactory(config).createCapabilities();
+		Path chromeProfilePath = SeleniumTestsContextManager.getProfilesPath().resolve("CHROME").resolve("Release");
+		Assert.assertTrue(chromeProfilePath.toFile().exists());
+		Assert.assertTrue(chromeProfilePath.toFile().list().length > 0);
+
+	}
+
+	/**
+	 * When profile already exist, do not copy if it has been modified in the last 4 hours
+	 */
+	@Test(groups={"ut"})
+	public void testCopyDefaultProfileMultipleTimes() throws IOException {
+		when(config.getChromeProfilePath()).thenReturn("default");
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
+
+		FileUtils.deleteDirectory(SeleniumTestsContextManager.getProfilesPath().toFile());
+		new ChromeCapabilitiesFactory(config).createCapabilities();
+		Path chromeProfilePath = SeleniumTestsContextManager.getProfilesPath().resolve("CHROME").resolve("Release");
+		Assert.assertTrue(chromeProfilePath.toFile().exists());
+		FileUtils.write(chromeProfilePath.resolve("touch.txt").toFile(), "touch", StandardCharsets.UTF_8);
+
+		// we should not recreate folder
+		new ChromeCapabilitiesFactory(config).createCapabilities();
+		Assert.assertTrue(chromeProfilePath.toFile().list().length > 0);
+		Assert.assertTrue(chromeProfilePath.resolve("touch.txt").toFile().exists());
+
+	}
+
 }

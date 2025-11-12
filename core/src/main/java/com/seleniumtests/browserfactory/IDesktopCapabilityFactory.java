@@ -22,9 +22,19 @@ import static org.openqa.selenium.remote.CapabilityType.PLATFORM_NAME;
 import static org.openqa.selenium.remote.CapabilityType.PROXY;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.List;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.CustomSeleniumTestsException;
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.internal.Require;
@@ -66,7 +76,7 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
     		selectedBrowserInfo = BrowserInfo.getInfoFromVersion(version, browserInfos);
     	} else if (binPath != null) {
     		selectedBrowserInfo = BrowserInfo.getInfoFromBinary(binPath, browserInfos);
-    		logger.info("Using user defined browser binary from: " + selectedBrowserInfo.getPath());
+    		logger.info("Using user defined browser binary from: {}", selectedBrowserInfo.getPath());
     	} else  {
 			for (BrowserInfo browser : browserInfos) {
 				if (webDriverConfig.getBetaBrowser().equals(browser.getBeta())) {
@@ -77,20 +87,20 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
 		
 		if (selectedBrowserInfo == null ) {
 			throw new ConfigurationException(String.format("Browser %s %s is not available",
-					webDriverConfig.getBrowserType(), webDriverConfig.getBetaBrowser() ? "beta" : ""));
+					webDriverConfig.getBrowserType(), Boolean.TRUE.equals(webDriverConfig.getBetaBrowser()) ? "beta" : ""));
 		}
 
 		// in case of legacy firefox driverFileName is null
     	String newDriverPath = new DriverExtractor().extractDriver(selectedBrowserInfo.getDriverFileName());
     	if (driverPath != null) {
     		newDriverPath = driverPath;
-    		logger.info("using user defined driver from: " + driverPath);
+    		logger.info("using user defined driver from: {}", driverPath);
     	}
     	if (newDriverPath != null) {
     		System.setProperty(getDriverExeProperty(), newDriverPath);
     		
     		if (!OSUtility.isWindows() && !new File(newDriverPath).setExecutable(true)) {
-                logger.error(String.format("Error setting executable on driver %s", newDriverPath));
+                logger.error("Error setting executable on driver {}", newDriverPath);
             }
     	}
 		
@@ -186,4 +196,30 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
         	capability.setCapability(PROXY, Require.nonNull("Proxy", proxy));
         }
     }
+
+	protected Path copyDefaultProfile(BrowserInfo browserInfo) {
+		Path tempProfile = SeleniumTestsContextManager.getProfilesPath().resolve(browserInfo.getBrowser().name()).resolve(browserInfo.getBeta() ? "Beta" : "Release");
+
+		if (tempProfile.toFile().exists()) {
+			if (Instant.ofEpochMilli(tempProfile.toFile().lastModified()).plus(12, ChronoUnit.HOURS).isAfter(Instant.now())) {
+				logger.info("{} has been modified in the last 12 hours, do not copy default profile", tempProfile);
+				return tempProfile;
+			} else {
+				logger.info("{} profile folder is older than 12 hours recreate it", tempProfile);
+				FileUtils.deleteQuietly(tempProfile.toFile());
+			}
+		}
+
+		try {
+			logger.info("Copying default profile to {}", tempProfile);
+
+			Files.createDirectories(tempProfile);
+			FileUtils.copyDirectory(new File(browserInfo.getDefaultProfilePath()), tempProfile.toFile());
+		} catch (IOException e) {
+			throw new CustomSeleniumTestsException(String.format("Cannot create profile directory: %s", tempProfile), e);
+		}
+
+
+		return tempProfile;
+	}
 }
