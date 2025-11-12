@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,7 +39,6 @@ public class TestSeleniumRobotLogger extends MockitoTest {
 	
 	/**
 	 * Check that in DEV mode, debug logs are displayed
-	 * @throws IOException 
 	 */ 
 	@Test(groups= {"ut"})
 	public void testLogInDevMode() throws IOException {
@@ -64,13 +63,13 @@ public class TestSeleniumRobotLogger extends MockitoTest {
 			
 		} finally {
 			System.clearProperty(SeleniumRobotLogger.INTERNAL_DEBUG);
+			SeleniumRobotLogger.removeLoggerForTest();
 			SeleniumRobotLogger.reset();
 		}
 	}
 	
 	/**
 	 * Check that in RUN mode, debug logs are not displayed
-	 * @throws IOException 
 	 */
 	@Test(groups= {"ut"})
 	public void testLogInRunMode() throws IOException {
@@ -96,6 +95,7 @@ public class TestSeleniumRobotLogger extends MockitoTest {
 			
 		} finally {
 			System.clearProperty(SeleniumRobotLogger.INTERNAL_DEBUG);
+			SeleniumRobotLogger.removeLoggerForTest();
 			SeleniumRobotLogger.reset();
 		}
 	}
@@ -103,7 +103,6 @@ public class TestSeleniumRobotLogger extends MockitoTest {
 	/**
 	 * This test is not activated for maven as maven UT disable redirect to System.out and System.err
 	 * If it was not the case, the same log would be written dozen of times
-	 * @throws IOException
 	 */
 	@Test(groups= {"non-ut"})
 	public void testSystemOutRedirectedToLogger() throws IOException {
@@ -134,7 +133,6 @@ public class TestSeleniumRobotLogger extends MockitoTest {
 	/**
 	 * #issue #192: check not NPE is raised when cleaning default output directory which does not exists
 	 * This occurs when default output directory is not the same as the user defined output directory
-	 * @throws IOException 
 	 */
 	@Test(groups= {"ut"})
 	public void testCleanOutputDir() throws IOException {
