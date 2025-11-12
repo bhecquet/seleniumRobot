@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,13 +45,9 @@ import com.seleniumtests.core.testanalysis.ErrorCauseFinder;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.ScenarioException;
-import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.SnapshotComparisonBehaviour;
-import com.seleniumtests.reporter.logger.TestMessage;
-import com.seleniumtests.reporter.logger.TestMessage.MessageType;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
-import com.seleniumtests.util.video.VideoUtils;
 
 /**
  * This reporter controls the execution of all other reporter because TestNG
@@ -63,8 +59,8 @@ public class ReporterControler implements IReporter {
 
 	private static final Object reporterLock = new Object();
 	private static final Logger logger = SeleniumRobotLogger.getLogger(ReporterControler.class);
-	private JUnitReporter junitReporter;
-	private FailedReporter failedReporter;
+	private final JUnitReporter junitReporter;
+	private final FailedReporter failedReporter;
 
 	public ReporterControler() {
 		junitReporter = new JUnitReporter();
@@ -153,13 +149,14 @@ public class ReporterControler implements IReporter {
 				
 				// When SeleniumRobotTestRecorder has been run, results are stored on seleniumRobot server and it's then possible 
 				// to compare reference snapshot with current failed step (if any)
+				String testName = TestNGResultUtils.getTestName(testResult);
 				if (!testResult.isSuccess() && TestNGResultUtils.isSeleniumServerReportCreated(testResult) && testResult.getThrowable() != null && !(testResult.getThrowable() instanceof AssertionError)) {
 
-					logger.info("Search error cause for " + TestNGResultUtils.getTestName(testResult));
+					logger.info("Search error cause for {}", testName);
 					List<ErrorCause> errorCauses = new ErrorCauseFinder(testResult).findErrorCause();
 					TestNGResultUtils.setErrorCauses(testResult, errorCauses);
 				} else {
-					logger.info("Do not search error cause (requirements not satisfied) for " + TestNGResultUtils.getTestName(testResult));
+					logger.info("Do not search error cause (requirements not satisfied) for {}", testName);
 				}
 			}
 		}
@@ -203,10 +200,7 @@ public class ReporterControler implements IReporter {
 					
 					// update snapshot comparison result of the run test.
 					TestNGResultUtils.setSnapshotComparisonResult(testResult, snapshotComparisonResult);
-					
-					// create a step for snapshot comparison => TODO: remove as handled by server
-//					createTestStepForComparisonResult(testResult, snapshotComparisonResult, errorMessage.toString());
-					
+
 					changeTestResultWithSnapshotComparison(suiteResult, testResult, snapshotComparisonResult);
 				}
 			}
@@ -214,34 +208,11 @@ public class ReporterControler implements IReporter {
 	}
 
 	/**
-	 * Create a step with the comparison result
-	 * @param testResult
-	 * @param snapshotComparisonResult
-	 * @return
-	 */
-	private void createTestStepForComparisonResult(ITestResult testResult, int snapshotComparisonResult, String errorMessage) {
-		// create a step for snapshot comparison
-		TestStep testStep = new TestStep("Snapshot comparison", "Snapshot comparison", ReporterControler.class, testResult, new ArrayList<>(), false);
-	
-		if (snapshotComparisonResult == ITestResult.FAILURE) {
-			testStep.addMessage(new TestMessage("Comparison failed: " + errorMessage, MessageType.ERROR));
-			testStep.setFailed(true);
-		} else if (snapshotComparisonResult == ITestResult.SUCCESS) {
-			testStep.addMessage(new TestMessage("Comparison successful", MessageType.INFO));
-		} else if (snapshotComparisonResult == ITestResult.SKIP && !errorMessage.isEmpty()) {
-			testStep.addMessage(new TestMessage("Comparison skipped: " + errorMessage, MessageType.ERROR));
-			testStep.setFailed(true);
-		} else if (snapshotComparisonResult == ITestResult.SKIP && errorMessage.isEmpty()) {
-			testStep.addMessage(new TestMessage("No comparison to do (no snapshots)", MessageType.LOG));
-		}
-		
-		getAllTestSteps(testResult).add(testStep);
-	}
-
-	/**
-	 * @param suiteResult
-	 * @param testResult
-	 * @param snapshotComparisonResult
+	 * Change the test result based on snapshot comparison result if required by test configuration
+	 * If test is OK but comparison fails, then test will be set to "KO" if 'changeTestResult' is set
+	 * @param suiteResult				the TestNG suite
+	 * @param testResult				the test result to update
+	 * @param snapshotComparisonResult	snapshot comparison result which may update the test result
 	 */
 	private void changeTestResultWithSnapshotComparison(ISuiteResult suiteResult, ITestResult testResult, int snapshotComparisonResult) {
 		// based on snapshot comparison flag, change test result only if comparison is KO
@@ -337,20 +308,19 @@ public class ReporterControler implements IReporter {
 	
 	/**
 	 * Remove duplicated results (when a test is reexecuted, we have several results for the same scenario)
-	 * 
 	 * TODO: see if we could remove the same method in SeleniumRobotTestListener
-	 * @param context
+	 * @param context				TestNG context from which we extract list of tests
 	 * @param currentTestResult
-	 * @return
+	 * @return new tests results
 	 */
 	public Set<ITestResult> removeUnecessaryResults(ITestContext context, ITestResult currentTestResult) {
 		
 		// copy current results in context so that it does not change during processing when several threads are used
 		// only keep finished tests (issue #654)
 		List<ITestResult> allResults = new ArrayList<>();
-		Set<ITestResult> passedTests = new TreeSet<>(context.getPassedTests().getAllResults().stream().filter(r -> TestNGResultUtils.isFinished(r)).collect(Collectors.toSet()));
-		Set<ITestResult> failedTests = new TreeSet<>(context.getFailedTests().getAllResults().stream().filter(r -> TestNGResultUtils.isFinished(r)).collect(Collectors.toSet()));
-		Set<ITestResult> skippedTests = new TreeSet<>(context.getSkippedTests().getAllResults().stream().filter(r -> TestNGResultUtils.isFinished(r)).collect(Collectors.toSet()));
+		Set<ITestResult> passedTests = context.getPassedTests().getAllResults().stream().filter(TestNGResultUtils::isFinished).collect(Collectors.toCollection(TreeSet::new));
+		Set<ITestResult> failedTests = context.getFailedTests().getAllResults().stream().filter(TestNGResultUtils::isFinished).collect(Collectors.toCollection(TreeSet::new));
+		Set<ITestResult> skippedTests = context.getSkippedTests().getAllResults().stream().filter(TestNGResultUtils::isFinished).collect(Collectors.toCollection(TreeSet::new));
 		
 		allResults.addAll(passedTests);
 		allResults.addAll(failedTests);
@@ -392,9 +362,9 @@ public class ReporterControler implements IReporter {
 		}
 		
 		Set<ITestResult> resultSet = new HashSet<>(); 
-		resultSet.addAll(context.getFailedTests().getAllResults().stream().filter(r -> TestNGResultUtils.isFinished(r)).collect(Collectors.toSet()));
-		resultSet.addAll(context.getPassedTests().getAllResults().stream().filter(r -> TestNGResultUtils.isFinished(r)).collect(Collectors.toSet()));
-		resultSet.addAll(context.getSkippedTests().getAllResults().stream().filter(r -> TestNGResultUtils.isFinished(r)).collect(Collectors.toSet()));
+		resultSet.addAll(context.getFailedTests().getAllResults().stream().filter(TestNGResultUtils::isFinished).collect(Collectors.toSet()));
+		resultSet.addAll(context.getPassedTests().getAllResults().stream().filter(TestNGResultUtils::isFinished).collect(Collectors.toSet()));
+		resultSet.addAll(context.getSkippedTests().getAllResults().stream().filter(TestNGResultUtils::isFinished).collect(Collectors.toSet()));
 		
 		// it's our current result, so we want if context matches
 		if (currentTestResult != null && currentTestResult.getTestContext() != null && currentTestResult.getTestContext().equals(context)) {
@@ -406,7 +376,7 @@ public class ReporterControler implements IReporter {
 	
 	/**
 	 * Delete all files in html and screenshot folders that are not directly references by test steps in current result
-	 * @param currentResult
+	 * @param currentResult	the test result to parse
 	 */
 	private void cleanAttachments(ITestResult currentResult) {
 
@@ -415,9 +385,8 @@ public class ReporterControler implements IReporter {
 		}
 		
 		List<File> usedFiles = new ArrayList<>();
-		List<File> allFiles = new ArrayList<>();
-		
-			// without context, nothing can be done
+
+        // without context, nothing can be done
 		SeleniumTestsContext testContext = TestNGResultUtils.getSeleniumRobotTestContext(currentResult);
 		if (testContext == null) {
 			return;
@@ -428,20 +397,20 @@ public class ReporterControler implements IReporter {
 			try {
 				testStep.moveAttachments(testContext.getOutputDirectory());
 			} catch (IOException e) {
-				logger.error("Cannot move attachment " + e.getMessage());
+				logger.error("Cannot move attachment {}", e.getMessage());
 			}
-			usedFiles.addAll(testStep.getAllAttachments().stream().map(FileContent::getFile).collect(Collectors.toList()));
+			usedFiles.addAll(testStep.getAllAttachments().stream().map(FileContent::getFile).toList());
 			
 		}
-		
-		allFiles.addAll(listAttachments(testContext));
+
+        List<File> allFiles = new ArrayList<>(listAttachments(testContext));
 		
 		for (File file: allFiles) {
 			if (!usedFiles.contains(file)) {
 				try {
 					Files.deleteIfExists(file.toPath());
 				} catch (IOException e)  {
-					logger.info(String.format("File %s not deleted: %s", file.getAbsolutePath(), e.getMessage()));
+					logger.info("File {} not deleted: {}", file.getAbsolutePath(), e.getMessage());
 				}
 			}
 		}
@@ -449,8 +418,7 @@ public class ReporterControler implements IReporter {
 	
 	/**
 	 * List all attachments in output directory folder
-	 * @param testContext
-	 * @return
+	 * @param testContext	the test context
 	 */
 	private List<File> listAttachments(SeleniumTestsContext testContext) {
 		
@@ -458,7 +426,7 @@ public class ReporterControler implements IReporter {
 
 		String outputSubDirectory = new File(testContext.getOutputDirectory()).getName();
 		String outputDirectoryParent = new File(testContext.getOutputDirectory()).getParent();
-		File htmlDir = Paths.get(outputDirectoryParent, outputSubDirectory, SeleniumTestsContext.SCREENSHOT_DIRECTORY).toFile();
+		File htmlDir = Paths.get(outputDirectoryParent, outputSubDirectory, SeleniumTestsContext.HTML_DIRECTORY).toFile();
 		File htmlBeforeDir = Paths.get(outputDirectoryParent, "before-" + outputSubDirectory, SeleniumTestsContext.HTML_DIRECTORY).toFile();
 		File screenshotDir = Paths.get(outputDirectoryParent, outputSubDirectory, SeleniumTestsContext.SCREENSHOT_DIRECTORY).toFile();
 		File screenshotBeforeDir = Paths.get(outputDirectoryParent, "before-" + outputSubDirectory, SeleniumTestsContext.SCREENSHOT_DIRECTORY).toFile();
