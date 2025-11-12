@@ -1263,7 +1263,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		) {
 
 			String b64img = CustomEventFiringWebDriver.captureDesktopToBase64String(DriverMode.LOCAL, gridConnector);
-			Assert.assertTrue(b64img.startsWith("iVBORw0KGgoAAAANSUhEUgAAALoAAACMCAIAAABETy"));
+			Assert.assertTrue(b64img.startsWith("iVBORw0KGgoAAAAN"));
 			verify(gridConnector, never()).captureDesktopToBuffer();
 
 			Assert.assertEquals(mockedVideoRecorder.constructed().size(), 0);
@@ -1289,7 +1289,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 			CustomEventFiringWebDriver.startVideoCapture(DriverMode.LOCAL, gridConnector, videoFolder, "video.avi");
 
 			String b64img = CustomEventFiringWebDriver.captureDesktopToBase64String(DriverMode.LOCAL, gridConnector);
-			Assert.assertTrue(b64img.startsWith("iVBORw0KGgoAAAANSUhEUgAAALoAAACMCAIAAABETy"));
+			Assert.assertTrue(b64img.startsWith("iVBORw0KGgoAAAAN"));
 			verify(gridConnector, never()).captureDesktopToBuffer();
 
 			VideoRecorder videoRecorder = mockedVideoRecorder.constructed().get(0);

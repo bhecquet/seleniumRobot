@@ -64,11 +64,12 @@ public class VideoUtils {
     		for (TestStep testStep: testSteps) {
     			if (!testStep.isTestEndStep()) {
     				// timestamp outside of video, do not try to extract as we would get the last picture
-    				if (testStep.getVideoTimeStamp() / 1000 * in.getTimeScale(trackId) > in.getChunkCount(0)) {
+    				if (new Rational(testStep.getVideoTimeStamp() / 1000 * in.getTimeScale(trackId), in.getTimeScale(trackId)).compareTo(in.getDuration(0)) > 0) {
     					continue;
     				}
-    				
-    				samples.put(min(in.timeToSample(trackId, new Rational(testStep.getVideoTimeStamp(), 1000)), in.getChunkCount(trackId) - 1), testStep);
+
+					// duration is <number_of_samples>/<time_scale>
+    				samples.put(min(in.timeToSample(trackId, new Rational(testStep.getVideoTimeStamp(), 1000)), in.getDuration(0).multiply(in.getTimeScale(trackId)).intValue()), testStep);
     			}
     		}
     			
