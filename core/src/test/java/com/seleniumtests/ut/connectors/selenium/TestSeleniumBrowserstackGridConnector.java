@@ -486,13 +486,13 @@ public class TestSeleniumBrowserstackGridConnector extends ConnectorsTest {
             "build_name": "pricing_build",
             "project_name": "pricing_project",
             "test_priority": null,
-            "logs": "https://automate.browserstack.com/builds/5343932818f9330c5d2b5c72aaf9dd8fde77b428/sessions/550709149fe79e949363b581e774d5ebffa1b8fe/logs",
-            "browser_url": "https://automate.browserstack.com/builds/5343932818f9330c5d2b5c72aaf9dd8fde77b428/sessions/550709149fe79e949363b581e774d5ebffa1b8fe",
-            "public_url": "https://automate.browserstack.com/builds/5343932818f9330c5d2b5c72aaf9dd8fde77b428/sessions/550709149fe79e949363b581e774d5ebffa1b8fe?auth_token=01df4e51ba67eb743484a08b024a44601a2ae0399c5c011a68d9564147be1387",
-            "video_url": "https://automate.browserstack.com/sessions/550709149fe79e949363b581e774d5ebffa1b8fe/video?token=V3pFcVdqdzJNTnNjMzJxeXNBU3FSMUtYU3lnUGsvSTMwbmhEWlRxWUNnRlJ1eHBzTUE0TXd5Z0o0R2lya25jendNaldoQldtbGJTaUtsTTRYQmdIYkE9PS0tNmVXSW91N25yNERzeWRLRnUya2xvQT09--77b9f745d91d9b99572a9e3c98dd001347f1b62c&source=rest_api&diff=860746.273516167",
-            "browser_console_logs_url": "https://automate.browserstack.com/s3-upload/bs-selenium-logs-aps/s3.ap-south-1/550709149fe79e949363b581e774d5ebffa1b8fe/550709149fe79e949363b581e774d5ebffa1b8fe-console-logs-v2.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA2XUQHUQMHPMYEM4V%2F20200918%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Date=20200918T102438Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=3bfd4e34fd6aa46bead6e16e418f6bee5b7798d7ef82a7e9546980dd7e93e917",
-            "har_logs_url": "https://automate.browserstack.com/s3-upload/bs-selenium-logs-euw/s3.eu-west-1/550709149fe79e949363b581e774d5ebffa1b8fe/550709149fe79e949363b581e774d5ebffa1b8fe-har-logs.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA2XUQHUQMHPMYEM4V%2F20200918%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20200918T102438Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=620e75f00956506e1721d5b610c67173560c7088c893bbf474dafe464328e854",
-            "selenium_logs_url": "https://automate.browserstack.com/s3-upload/bs-selenium-logs-euw/s3.eu-west-1/550709149fe79e949363b581e774d5ebffa1b8fe/550709149fe79e949363b581e774d5ebffa1b8fe-selenium-logs.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA2XUQHUQMHPMYEM4V%2F20200918%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20200918T102438Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=179ea57ef729153fa8f817b612d852385e877f423b694ffdb02a70fd4c2b37ab"
+            "logs": "https://automate.browserstack.com/builds/abcdefg/sessions/hijklm/logs",
+            "browser_url": "https://automate.browserstack.com/builds/abcdefg/sessions/hijklm",
+            "public_url": "https://automate.browserstack.com/builds/abcdefg/sessions/hijklm?auth_token=myToken",
+            "video_url": "https://automate.browserstack.com/sessions/hijklm/video?token=tok--77b9f745d91d9b99572a9e3c98dd001347f1b62c&source=rest_api&diff=860746.273516167",
+            "browser_console_logs_url": "https://automate.browserstack.com/s3-upload/bs-selenium-logs-aps/s3.ap-south-1/hijklm/hijklm-console-logs-v2.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA2XUQHUQMHPMYEM4V%2F20200918%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Date=20200918T102438Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=3bfd4e34fd6aa46bead6e16e418f6bee5b7798d7ef82a7e9546980dd7e93e917",
+            "har_logs_url": "https://automate.browserstack.com/s3-upload/bs-selenium-logs-euw/s3.eu-west-1/hijklm/hijklm-har-logs.txt?",
+            "selenium_logs_url": "https://automate.browserstack.com/s3-upload/bs-selenium-logs-euw/s3.eu-west-1/hijklm/hijklm-selenium-logs.txt?"
         }
     }]""";
 
@@ -507,10 +507,10 @@ public class TestSeleniumBrowserstackGridConnector extends ConnectorsTest {
 
 		connector.getSessionInformationFromGrid(driver);
 
-		Assert.assertEquals(connector.getVideoUrl(), "https://automate.browserstack.com/sessions/550709149fe79e949363b581e774d5ebffa1b8fe/video?token=V3pFcVdqdzJNTnNjMzJxeXNBU3FSMUtYU3lnUGsvSTMwbmhEWlRxWUNnRlJ1eHBzTUE0TXd5Z0o0R2lya25jendNaldoQldtbGJTaUtsTTRYQmdIYkE9PS0tNmVXSW91N25yNERzeWRLRnUya2xvQT09--77b9f745d91d9b99572a9e3c98dd001347f1b62c&source=rest_api&diff=860746.273516167");
-		Assert.assertEquals(connector.getLogsUrl(), "https://automate.browserstack.com/builds/5343932818f9330c5d2b5c72aaf9dd8fde77b428/sessions/550709149fe79e949363b581e774d5ebffa1b8fe/logs");
-		Assert.assertEquals(connector.getHarLogsUrl(), "https://automate.browserstack.com/s3-upload/bs-selenium-logs-euw/s3.eu-west-1/550709149fe79e949363b581e774d5ebffa1b8fe/550709149fe79e949363b581e774d5ebffa1b8fe-har-logs.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA2XUQHUQMHPMYEM4V%2F20200918%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20200918T102438Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=620e75f00956506e1721d5b610c67173560c7088c893bbf474dafe464328e854");
-		Assert.assertEquals(connector.getSeleniumLogsUrl(), "https://automate.browserstack.com/s3-upload/bs-selenium-logs-euw/s3.eu-west-1/550709149fe79e949363b581e774d5ebffa1b8fe/550709149fe79e949363b581e774d5ebffa1b8fe-selenium-logs.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA2XUQHUQMHPMYEM4V%2F20200918%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20200918T102438Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=179ea57ef729153fa8f817b612d852385e877f423b694ffdb02a70fd4c2b37ab");
+		Assert.assertEquals(connector.getVideoUrl(), "https://automate.browserstack.com/sessions/hijklm/video?token=tok--77b9f745d91d9b99572a9e3c98dd001347f1b62c&source=rest_api&diff=860746.273516167");
+		Assert.assertEquals(connector.getLogsUrl(), "https://automate.browserstack.com/builds/abcdefg/sessions/hijklm/logs");
+		Assert.assertEquals(connector.getHarLogsUrl(), "https://automate.browserstack.com/s3-upload/bs-selenium-logs-euw/s3.eu-west-1/hijklm/hijklm-har-logs.txt?");
+		Assert.assertEquals(connector.getSeleniumLogsUrl(), "https://automate.browserstack.com/s3-upload/bs-selenium-logs-euw/s3.eu-west-1/hijklm/hijklm-selenium-logs.txt?");
 		Assert.assertNull(connector.getAppiumLogsUrl());
 
 		// check sessionId is set when test is started
@@ -533,7 +533,7 @@ public class TestSeleniumBrowserstackGridConnector extends ConnectorsTest {
 
 			connector.getSessionInformationFromGrid(driver);
 
-			Assert.assertEquals(connector.getVideoUrl(), "https://automate.browserstack.com/sessions/550709149fe79e949363b581e774d5ebffa1b8fe/video?token=V3pFcVdqdzJNTnNjMzJxeXNBU3FSMUtYU3lnUGsvSTMwbmhEWlRxWUNnRlJ1eHBzTUE0TXd5Z0o0R2lya25jendNaldoQldtbGJTaUtsTTRYQmdIYkE9PS0tNmVXSW91N25yNERzeWRLRnUya2xvQT09--77b9f745d91d9b99572a9e3c98dd001347f1b62c&source=rest_api&diff=860746.273516167");
+			Assert.assertEquals(connector.getVideoUrl(), "https://automate.browserstack.com/sessions/hijklm/video?token=tok--77b9f745d91d9b99572a9e3c98dd001347f1b62c&source=rest_api&diff=860746.273516167");
 			verify(unirestConfig, times(2)).proxy("localhost", 8081); // 2 calls (sessions.json / builds.json)
 
 		} finally {

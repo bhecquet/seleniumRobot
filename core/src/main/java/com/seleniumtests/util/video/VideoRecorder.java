@@ -39,11 +39,13 @@ import org.monte.media.av.Format;
 import org.monte.media.av.FormatKeys;
 import org.monte.media.av.codec.video.VideoFormatKeys;
 import org.monte.media.math.Rational;
+import org.monte.media.screenrecorder.MouseConfigs;
 import org.monte.media.screenrecorder.ScreenRecorder;
 
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
+import org.monte.media.screenrecorder.State;
 
 
 public class VideoRecorder {
@@ -104,7 +106,7 @@ public class VideoRecorder {
 								null,
 								new Format(FormatKeys.MediaTypeKey, FormatKeys.MediaType.FILE, FormatKeys.MimeTypeKey, FormatKeys.MIME_AVI),
 								new Format(FormatKeys.MediaTypeKey, FormatKeys.MediaType.VIDEO, FormatKeys.EncodingKey, VideoFormatKeys.ENCODING_AVI_TECHSMITH_SCREEN_CAPTURE, VideoFormatKeys.CompressorNameKey, VideoFormatKeys.ENCODING_AVI_TECHSMITH_SCREEN_CAPTURE, VideoFormatKeys.DepthKey, 24, FormatKeys.FrameRateKey, Rational.valueOf(25), VideoFormatKeys.QualityKey, 1.0f, FormatKeys.KeyFrameIntervalKey, 15 * 60),
-								new Format(FormatKeys.FrameRateKey, Rational.valueOf(25), FormatKeys.EncodingKey, ScreenRecorder.ENCODING_BLACK_CURSOR),
+								new Format(FormatKeys.FrameRateKey, Rational.valueOf(25), FormatKeys.EncodingKey, MouseConfigs.ENCODING_BLACK_CURSOR),
 								null,
 								folderPath);
 			} catch (Exception e) {
@@ -156,7 +158,7 @@ public class VideoRecorder {
 		}
 		
 		try {
-			if (screenRecorder.getState() == ScreenRecorder.State.RECORDING) {
+			if (screenRecorder.getState() == State.RECORDING) {
 				screenRecorder.stop();
 			}
 			screenRecorder.start();
@@ -170,7 +172,7 @@ public class VideoRecorder {
 			throw new ScenarioException("recorder is null!. do not use the default constructor");
 		}
 		
-		if (screenRecorder.getState() == ScreenRecorder.State.RECORDING) {
+		if (screenRecorder.getState() == State.RECORDING) {
 			
 			if (displayStep) {
 				window.dispose();
