@@ -25,7 +25,7 @@ import com.seleniumtests.util.imaging.ImageProcessor;
 import com.seleniumtests.util.imaging.StepReferenceComparator;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
-import kong.unirest.json.JSONObject;
+import kong.unirest.core.json.JSONObject;
 
 /**
  * Class that may help the tester to know what if the cause of test failure
@@ -192,7 +192,7 @@ public class ErrorCauseFinder {
 	 * e.g: we failed on step 3 so we search in 'step 2', then 'step 1' to see if one of them matches our 'step 3' visually
 	 * @param testStepManager		the TestStepManager
 	 * @param testStep				the TestStep on which we fail
-	 * @param stepSnapshotFile		the snapshot taken at the beginning of the step (which will be compared to references
+	 * @param stepSnapshotDetectionData		the snapshot taken at the beginning of the step (which will be compared to references
 	 * @param errorCauses			the list of error causes
 	 */
 	private void searchMatchingInPreviousStep(TestStepManager testStepManager, TestStep testStep, JSONObject stepSnapshotDetectionData, List<ErrorCause> errorCauses, String version) {

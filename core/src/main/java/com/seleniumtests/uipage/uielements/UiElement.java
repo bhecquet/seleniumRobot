@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -56,7 +56,7 @@ import com.seleniumtests.util.imaging.ImageDetector;
 import com.seleniumtests.util.imaging.ImageProcessor;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
-import kong.unirest.json.JSONObject;
+import kong.unirest.core.json.JSONObject;
 
 /**
  * Element which is found inside driver snapshot
@@ -123,7 +123,7 @@ public class UiElement {
 	
 	/**
 	 * remove information relative to a specific page
-	 * @param pageName
+	 * @param pageName	the page name
 	 */
 	private void resetPageInformation(String pageName) {
 		fieldsPerPage.remove(pageName);
@@ -221,9 +221,6 @@ public class UiElement {
 		throw new ConfigurationException(String.format("No field could be found matching search criteria [%s]", by));
 	}
 
-	/**
-	 * @return
-	 */
 	private Label getLabelText() {
 		if (by.getText() != null) {
 			for (Label lbl: labelsPerPage.get(origin)) {
@@ -235,9 +232,6 @@ public class UiElement {
 		return null;
 	}
 
-	/**
-	 * @return
-	 */
 	private Label getLabelBelow() {
 		if (by.getBelow() != null) {
 			for (Label lbl: labelsPerPage.get(origin)) {
@@ -249,9 +243,6 @@ public class UiElement {
 		return null;
 	}
 
-	/**
-	 * @return
-	 */
 	private Label getLabelAbove() {
 		if (by.getAbove() != null) {
 			for (Label lbl: labelsPerPage.get(origin)) {
@@ -263,9 +254,6 @@ public class UiElement {
 		return null;
 	}
 
-	/**
-	 * @return
-	 */
 	private Label getLabelLeftOf() {
 		if (by.getLeftOf() != null) {
 			for (Label lbl: labelsPerPage.get(origin)) {
@@ -277,9 +265,6 @@ public class UiElement {
 		return null;
 	}
 
-	/**
-	 * @return
-	 */
 	private Label getLabelRightOf() {
 		if (by.getRightOf() != null) {
 			for (Label lbl: labelsPerPage.get(origin)) {
@@ -293,7 +278,6 @@ public class UiElement {
 	
 	/**
 	 * gets the position of the browser viewport compared to screen
-	 * @return
 	 */
 	private Point getViewportOffset() {
 		return offsetPerPage.get(origin);
@@ -369,8 +353,7 @@ public class UiElement {
 	 * Compute mouse position to be able to click on it
 	 * 
 	 * @param xOffset	offset from the center of the element to click on 
-	 * @param yOffset	offset from the center of the element to click on 
-	 * @return
+	 * @param yOffset	offset from the center of the element to click on
 	 */
 	private Point findElementPosition(int xOffset, int yOffset) {
 		findElement();
@@ -422,8 +405,6 @@ public class UiElement {
 	
 	/**
 	 * Send text to desktop using keyboard at xOffset, yOffset. Before sending keys, we robot clicks on position to gain focus
-	 * @param xOffset
-	 * @param yOffset
 	 * @param text		Text to write
 	 */
 	public void sendKeys(int xOffset, int yOffset, final CharSequence text) {
@@ -437,8 +418,6 @@ public class UiElement {
 	/**
 	 * Example of use: page.zone.sendKeys(0, 40, KeyEvent.VK_A, KeyEvent.VK_B);
 	 * Beware of key mapping which may be different depending on locale and keyboard. Use this to send control keys like "VK_ENTER"
-	 * @param xOffset
-	 * @param yOffset
 	 * @param events	Key events to send
 	 */
 	public void sendKeys(int xOffset, int yOffset, Integer ... events) {
@@ -469,8 +448,8 @@ public class UiElement {
 	
 	/**
 	 * Check if picture is visible. This is only available for desktop tests
-	 * @param waitMs
-	 * @return
+	 * @param waitMs	wait period for element to be present
+	 * @return true if element is present
 	 */
 	public boolean isElementPresent(int waitMs) {
 		Instant end = clock.instant().plusMillis(waitMs);

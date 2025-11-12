@@ -7,7 +7,7 @@ import com.seleniumtests.GenericTest;
 import com.seleniumtests.connectors.selenium.fielddetector.Field;
 import com.seleniumtests.connectors.selenium.fielddetector.Label;
 
-import kong.unirest.json.JSONObject;
+import kong.unirest.core.json.JSONObject;
 
 public class TestLabel extends GenericTest {
 
@@ -51,7 +51,7 @@ public class TestLabel extends GenericTest {
 				+ "		\"right\": 104,"
 				+ "		\"bottom\": 2275"
 				+ "	}"));
-		Assert.assertEquals(label.getText(), null);
+        Assert.assertNull(label.getText());
 	}
 	
 	@Test(groups= {"ut"})

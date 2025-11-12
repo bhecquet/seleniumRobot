@@ -18,6 +18,6 @@ public class Har {
     }
 
     public void writeTo(File file) throws IOException {
-        FileUtils.write(file, new kong.unirest.json.JSONObject(this).toString(), StandardCharsets.UTF_8);
+        FileUtils.write(file, new kong.unirest.core.json.JSONObject(this).toString(), StandardCharsets.UTF_8);
     }
 }

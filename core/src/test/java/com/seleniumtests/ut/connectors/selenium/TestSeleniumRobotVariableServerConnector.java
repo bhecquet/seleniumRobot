@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import kong.unirest.*;
+import kong.unirest.core.*;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.testng.Assert;
@@ -173,7 +173,6 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
 	/**
 	 * test exception is raised if no token is provided whereas server is secured
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testServerActiveAliveAndSecured() throws UnirestException {
@@ -184,7 +183,6 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
 	/**
 	 * test connection is done if token provided
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"})
 	public void testServerActiveAliveAndSecuredWithToken() throws UnirestException {
@@ -202,7 +200,6 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 
 	/**
 	 * Force variable server to hold the application
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testApplicationDoesNotExist() throws UnirestException {
@@ -214,7 +211,6 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
 	/**
 	 * Force variable server to hold the environment
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testEnvironmentDoesNotExist() throws UnirestException {
@@ -226,8 +222,6 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
 	/**
 	 * Check default behaviour with query parameters
-	 * 
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"})
 	public void testGetVariables() throws UnirestException {
@@ -251,8 +245,6 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 
 	/**
 	 * Check custom.test.variable has precedence over regular variable of the same name
-	 *
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"})
 	public void testGetVariablesWithDuplicate() throws UnirestException {
@@ -279,7 +271,6 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
 	/**
 	 * Check reservation delay is sent to server in seconds (whereas we provide it in minutes)
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"})
 	public void testGetVariablesWithReservationDelay() throws UnirestException {
@@ -321,7 +312,6 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
 	/**
 	 * get variables failes with error on server side
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"}, expectedExceptions = SeleniumRobotServerException.class)
 	public void testGetVariablesFailed() throws UnirestException {
@@ -420,7 +410,6 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
 	/**
 	 * issue #429: if variable has been deleted, recreate one
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"})
 	public void testVariableUpdateExistingVariableThatDisappeard() throws UnirestException {
@@ -453,7 +442,6 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
 	/**
 	 * Variable is re-created when user has changed the value of a non-custom variable
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"})
 	public void testVariableRecreateExistingVariable() throws UnirestException {
@@ -510,7 +498,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	public void testVariableDereservationNullId() throws UnirestException {
 		configureMockedVariableServerConnection();
 		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
-		List<TestVariable> variables = Arrays.asList(new TestVariable("key", "value"));
+		List<TestVariable> variables = List.of(new TestVariable("key", "value"));
 		
 		connector.unreserveVariables(variables);
 
@@ -576,7 +564,6 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
 	/**
 	 * Check tokens are not added to request when not provided
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"})
 	public void testGetApplicationIdWithoutToken() throws UnirestException {
@@ -588,7 +575,6 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
 	/**
 	 * Check tokens are not added to request when not provided
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"})
 	public void testGetEnvironmentIdWithoutToken() throws UnirestException {
@@ -600,7 +586,6 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
 	/**
 	 * Check tokens are not added to request when not provided
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"})
 	public void testGetVersionIdWithoutToken() throws UnirestException {
@@ -612,7 +597,6 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
 	/**
 	 * Check tokens are not added to request when not provided
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"})
 	public void testGetTestCaseIdWithoutToken() throws UnirestException {
@@ -624,7 +608,6 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
 	/**
 	 * Check tokens are not added to request when not provided
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"})
 	public void testCreateTestCaseWithoutToken() throws UnirestException {
@@ -636,7 +619,6 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
 	/**
 	 * Check tokens are not added to request when not provided
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"})
 	public void testCreateVersionWithoutToken() throws UnirestException {
@@ -648,7 +630,6 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
 	/**
 	 * Check tokens are not added to request when not provided
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"})
 	public void testCreateEnvironmentWithoutToken() throws UnirestException {
@@ -660,7 +641,6 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
 	/**
 	 * Check tokens are not added to request when not provided
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"})
 	public void testCreateApplicationWithoutToken() throws UnirestException {
@@ -672,7 +652,6 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
 	/**
 	 * Check tokens are not added to request when not provided
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"})
 	public void testGetApplicationIdWithToken() throws UnirestException {
@@ -684,7 +663,6 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
 	/**
 	 * Check tokens are not added to request when not provided
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"})
 	public void testGetEnvironmentIdWithToken() throws UnirestException {
@@ -696,7 +674,6 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
 	/**
 	 * Check tokens are not added to request when not provided
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"})
 	public void testCreateTestCaseWithToken() throws UnirestException {
@@ -708,7 +685,6 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
 	/**
 	 * Check tokens are not added to request when not provided
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"})
 	public void testCreateVersionWithToken() throws UnirestException {
@@ -720,7 +696,6 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
 	/**
 	 * Check tokens are not added to request when not provided
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"})
 	public void testCreateEnvironmentWithToken() throws UnirestException {
@@ -732,7 +707,6 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
 	/**
 	 * Check tokens are not added to request when not provided
-	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"})
 	public void testCreateApplicationWithToken() throws UnirestException {

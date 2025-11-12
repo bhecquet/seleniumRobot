@@ -56,9 +56,9 @@ import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
-import kong.unirest.GetRequest;
-import kong.unirest.Unirest;
-import kong.unirest.UnirestException;
+import kong.unirest.core.GetRequest;
+import kong.unirest.core.Unirest;
+import kong.unirest.core.UnirestException;
 
 public class TestSeleniumGridConnector extends ConnectorsTest {
 
@@ -331,7 +331,7 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 	@Test(groups={"ut"})
 	public void testListFilesToDownloadError2() {
 
-		kong.unirest.HttpRequest<?> request = createServerMock("GET", "/session/1234/se/files", 500, "{}");
+		kong.unirest.core.HttpRequest<?> request = createServerMock("GET", "/session/1234/se/files", 500, "{}");
 		when(request.asJson()).thenThrow(UnirestException.class);
 
 		SeleniumGridConnector connector = spy(new SeleniumGridConnector(SERVER_URL));
@@ -345,7 +345,7 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 	@Test(groups={"ut"})
 	public void testDownloadFileFromName() throws IOException, NoSuchFieldException, IllegalAccessException {
 
-		kong.unirest.HttpRequest<?> request = createServerMock("POST", "/session/1234/se/files", 200, """
+		kong.unirest.core.HttpRequest<?> request = createServerMock("POST", "/session/1234/se/files", 200, """
 				{
 				  "value": {
 				    "filename": "foo.txt",
@@ -362,7 +362,7 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 	@Test(groups={"ut"})
 	public void testDownloadFileFromNameException1() throws IOException, NoSuchFieldException, IllegalAccessException {
 
-		kong.unirest.HttpRequest<?> request = createServerMock("POST", "/session/1234/se/files", 500, "{}", "requestBodyEntity");
+		kong.unirest.core.HttpRequest<?> request = createServerMock("POST", "/session/1234/se/files", 500, "{}", "requestBodyEntity");
 		when(request.asJson()).thenThrow(UnirestException.class);
 
 		Logger logger = spy(SeleniumRobotLogger.getLogger(SeleniumGridConnector.class));
@@ -374,7 +374,7 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 	@Test(groups={"ut"})
 	public void testDownloadFileFromNameException2() throws IOException, NoSuchFieldException, IllegalAccessException {
 
-		kong.unirest.HttpRequest<?> request = createServerMock("POST", "/session/1234/se/files", 500, "{}", "requestBodyEntity");
+		kong.unirest.core.HttpRequest<?> request = createServerMock("POST", "/session/1234/se/files", 500, "{}", "requestBodyEntity");
 		when(request.asJson()).thenThrow(new RuntimeException("foo"));
 
 		Logger logger = spy(SeleniumRobotLogger.getLogger(SeleniumGridConnector.class));

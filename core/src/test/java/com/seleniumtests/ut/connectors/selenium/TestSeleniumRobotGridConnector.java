@@ -36,7 +36,7 @@ import java.util.Arrays;
 
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import io.appium.java_client.android.options.UiAutomator2Options;
-import kong.unirest.Headers;
+import kong.unirest.core.Headers;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -67,11 +67,11 @@ import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.customexception.SeleniumGridException;
 
-import kong.unirest.GetRequest;
-import kong.unirest.HttpRequest;
-import kong.unirest.HttpRequestWithBody;
-import kong.unirest.Unirest;
-import kong.unirest.UnirestException;
+import kong.unirest.core.GetRequest;
+import kong.unirest.core.HttpRequest;
+import kong.unirest.core.HttpRequestWithBody;
+import kong.unirest.core.Unirest;
+import kong.unirest.core.UnirestException;
 public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	
 	

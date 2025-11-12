@@ -30,9 +30,9 @@ import org.testng.annotations.Test;
 import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.customexception.ConfigurationException;
 
-import kong.unirest.GetRequest;
-import kong.unirest.Unirest;
-import kong.unirest.UnirestException;
+import kong.unirest.core.GetRequest;
+import kong.unirest.core.Unirest;
+import kong.unirest.core.UnirestException;
 
 import static org.mockito.Mockito.*;
 

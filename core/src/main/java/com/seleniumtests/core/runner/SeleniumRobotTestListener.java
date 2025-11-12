@@ -48,7 +48,6 @@ import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.core.testretry.TestRetryAnalyzer;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
-import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.WebUIDriver;
@@ -65,7 +64,7 @@ import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.video.VideoRecorder;
 
-import kong.unirest.Unirest;
+import kong.unirest.core.Unirest;
 
 public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodListener, ISuiteListener, IExecutionListener, IConfigurationListener, IDataProviderListener {
 	
@@ -328,7 +327,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		        executeAfterTestMethod(method, testResult);
 			}
 		} catch (Exception e) {
-			logger.error(String.format("error while finishing invocation of %s : %s", method.getTestMethod().getQualifiedName(), e.getMessage()));
+			logger.error("error while finishing invocation of {} : {}", method.getTestMethod().getQualifiedName(), e.getMessage());
 		}
 	}
 	

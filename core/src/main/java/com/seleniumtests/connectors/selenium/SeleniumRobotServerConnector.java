@@ -17,7 +17,7 @@
  */
 package com.seleniumtests.connectors.selenium;
 
-import kong.unirest.*;
+import kong.unirest.core.*;
 import org.apache.logging.log4j.Logger;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -28,9 +28,9 @@ import com.seleniumtests.customexception.SeleniumRobotServer500Exception;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONException;
-import kong.unirest.json.JSONObject;
+import kong.unirest.core.json.JSONArray;
+import kong.unirest.core.json.JSONException;
+import kong.unirest.core.json.JSONObject;
 
 import javax.net.ssl.SSLHandshakeException;
 

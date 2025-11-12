@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,16 +26,16 @@ import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestVariable;
 
-import kong.unirest.json.JSONObject;
+import kong.unirest.core.json.JSONObject;
 
 public class TestTestVariable extends GenericTest {
 	
 	@Test(groups={"ut"})
 	public void testSimpleConstructor() {
-		TestVariable var = new TestVariable("key", "value");
-		Assert.assertNull(var.getId());
-		Assert.assertEquals(var.getInternalName(), var.getName());
-		Assert.assertFalse(var.isReservable());
+		TestVariable variable = new TestVariable("key", "value");
+		Assert.assertNull(variable.getId());
+		Assert.assertEquals(variable.getInternalName(), variable.getName());
+		Assert.assertFalse(variable.isReservable());
 	}
 	
 	/**
@@ -52,13 +52,13 @@ public class TestTestVariable extends GenericTest {
 		jsonObject.put("application", 2);
 		jsonObject.put("version", 3);
 		
-		TestVariable var = TestVariable.fromJsonObject(jsonObject);
-		Assert.assertEquals(var.getId(), (Integer)1);
-		Assert.assertEquals(var.getName(), "key");
-		Assert.assertEquals(var.getValue(), "value");
-		Assert.assertEquals(var.isReservable(), false);
-		Assert.assertEquals(var.getInternalName(), "key");
-		Assert.assertNull(var.getCreationDate());
+		TestVariable variable = TestVariable.fromJsonObject(jsonObject);
+		Assert.assertEquals(variable.getId(), (Integer)1);
+		Assert.assertEquals(variable.getName(), "key");
+		Assert.assertEquals(variable.getValue(), "value");
+        Assert.assertFalse(variable.isReservable());
+		Assert.assertEquals(variable.getInternalName(), "key");
+		Assert.assertNull(variable.getCreationDate());
 	}
 	
 	/**
@@ -76,13 +76,13 @@ public class TestTestVariable extends GenericTest {
 		jsonObject.put("version", 3);
 		jsonObject.put("creationDate", "2018-07-12T08:42:56.156727Z");
 		
-		TestVariable var = TestVariable.fromJsonObject(jsonObject);
-		Assert.assertEquals(var.getId(), (Integer)1);
-		Assert.assertEquals(var.getName(), "key");
-		Assert.assertEquals(var.getValue(), "value");
-		Assert.assertEquals(var.isReservable(), false);
-		Assert.assertEquals(var.getInternalName(), "key");
-		Assert.assertEquals(var.getCreationDate(), LocalDateTime.of(2018, 7, 12, 8, 42, 56, 156727000));
+		TestVariable variable = TestVariable.fromJsonObject(jsonObject);
+		Assert.assertEquals(variable.getId(), (Integer)1);
+		Assert.assertEquals(variable.getName(), "key");
+		Assert.assertEquals(variable.getValue(), "value");
+        Assert.assertFalse(variable.isReservable());
+		Assert.assertEquals(variable.getInternalName(), "key");
+		Assert.assertEquals(variable.getCreationDate(), LocalDateTime.of(2018, 7, 12, 8, 42, 56, 156727000));
 	}
 	
 	@Test(groups={"ut"})
@@ -96,13 +96,13 @@ public class TestTestVariable extends GenericTest {
 		jsonObject.put("application", 2);
 		jsonObject.put("version", 3);
 		
-		TestVariable var = TestVariable.fromJsonObject(jsonObject);
-		Assert.assertEquals(var.getId(), (Integer)1);
-		Assert.assertEquals(var.getName(), "key");
-		Assert.assertEquals(var.getValue(), "value");
-		Assert.assertEquals(var.isReservable(), false);
-		Assert.assertEquals(var.getInternalName(), "custom.test.variable.key");
-		Assert.assertNull(var.getCreationDate());
+		TestVariable variable = TestVariable.fromJsonObject(jsonObject);
+		Assert.assertEquals(variable.getId(), (Integer)1);
+		Assert.assertEquals(variable.getName(), "key");
+		Assert.assertEquals(variable.getValue(), "value");
+        Assert.assertFalse(variable.isReservable());
+		Assert.assertEquals(variable.getInternalName(), "custom.test.variable.key");
+		Assert.assertNull(variable.getCreationDate());
 	}
 	
 	@Test(groups={"ut"})

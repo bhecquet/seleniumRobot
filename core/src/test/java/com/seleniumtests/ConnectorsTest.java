@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.function.Function;
 
 import com.seleniumtests.customexception.ConfigurationException;
-import kong.unirest.Headers;
 import org.apache.commons.io.FileUtils;
 import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
@@ -71,21 +70,22 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.WebUIDriverFactory;
 import com.seleniumtests.ut.exceptions.TestConfigurationException;
 
-import kong.unirest.Config;
-import kong.unirest.GetRequest;
-import kong.unirest.HttpRequest;
-import kong.unirest.HttpRequestWithBody;
-import kong.unirest.HttpResponse;
-import kong.unirest.JsonNode;
-import kong.unirest.MultipartBody;
-import kong.unirest.PagedList;
-import kong.unirest.RequestBodyEntity;
-import kong.unirest.Unirest;
-import kong.unirest.UnirestException;
-import kong.unirest.UnirestInstance;
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONException;
-import kong.unirest.json.JSONObject;
+import kong.unirest.core.Headers;
+import kong.unirest.core.Config;
+import kong.unirest.core.GetRequest;
+import kong.unirest.core.HttpRequest;
+import kong.unirest.core.HttpRequestWithBody;
+import kong.unirest.core.HttpResponse;
+import kong.unirest.core.JsonNode;
+import kong.unirest.core.MultipartBody;
+import kong.unirest.core.PagedList;
+import kong.unirest.core.RequestBodyEntity;
+import kong.unirest.core.Unirest;
+import kong.unirest.core.UnirestException;
+import kong.unirest.core.UnirestInstance;
+import kong.unirest.core.json.JSONArray;
+import kong.unirest.core.json.JSONException;
+import kong.unirest.core.json.JSONObject;
 
 
 public class ConnectorsTest extends MockitoTest {
@@ -516,7 +516,7 @@ public class ConnectorsTest extends MockitoTest {
 
 				mockedUnirest.get().when(() -> Unirest.get(serverUrl + apiPath)).thenReturn(getRequest);
 				when(getRequest.downloadMonitor(any())).thenReturn(getRequest);
-				when(getRequest.socketTimeout(anyInt())).thenReturn(getRequest);
+				when(getRequest.requestTimeout(anyInt())).thenReturn(getRequest);
 				when(unirestInstance.get(serverUrl + apiPath)).thenReturn(getRequest);
 
 				when(getRequest.header(anyString(), anyString())).thenReturn(getRequest);
@@ -560,7 +560,7 @@ public class ConnectorsTest extends MockitoTest {
 		RequestBodyEntity requestBodyEntity = mock(RequestBodyEntity.class);
 		MultipartBody requestMultipartBody = mock(MultipartBody.class);
 
-		when(postRequest.socketTimeout(anyInt())).thenReturn(postRequest);
+		when(postRequest.requestTimeout(anyInt())).thenReturn(postRequest);
 		when(postRequest.field(anyString(), anyString())).thenReturn(requestMultipartBody);
 		when(postRequest.field(anyString(), anyInt())).thenReturn(requestMultipartBody);
 		when(postRequest.field(anyString(), anyLong())).thenReturn(requestMultipartBody);

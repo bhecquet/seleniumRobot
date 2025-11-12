@@ -4,9 +4,7 @@ import java.awt.Rectangle;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.seleniumtests.core.testanalysis.ErrorCause;
-
-import kong.unirest.json.JSONObject;
+import kong.unirest.core.json.JSONObject;
 import net.ricecode.similarity.JaroWinklerStrategy;
 import net.ricecode.similarity.SimilarityStrategy;
 import net.ricecode.similarity.StringSimilarityService;

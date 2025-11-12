@@ -27,7 +27,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -60,7 +59,7 @@ import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.reporters.SeleniumRobotServerTestRecorder;
 
-import kong.unirest.json.JSONObject;
+import kong.unirest.core.json.JSONObject;
 
 public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 
@@ -83,11 +82,9 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportGeneration() throws Exception {
 		
-		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
-			when(variableServer.isAlive()).thenReturn(true);
-		});
-			 MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
-			 MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> when(variableServer.isAlive()).thenReturn(true));
+             MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
+             MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS)
 		) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
@@ -163,11 +160,9 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportGenerationWithChangeTestResult() throws Exception {
 
-		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
-			when(variableServer.isAlive()).thenReturn(true);
-		});
-			 MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
-			 MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> when(variableServer.isAlive()).thenReturn(true));
+             MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
+             MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS)
 		) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
@@ -219,11 +214,9 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportGenerationWithAddTestResult() throws Exception {
 
-		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
-			when(variableServer.isAlive()).thenReturn(true);
-		});
-			 MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
-			 MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> when(variableServer.isAlive()).thenReturn(true));
+             MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
+             MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS)
 		) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
@@ -274,11 +267,9 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportGenerationMultiSuites() throws Exception {
 
-		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
-			when(variableServer.isAlive()).thenReturn(true);
-		});
-			 MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
-			 MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> when(variableServer.isAlive()).thenReturn(true));
+             MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
+             MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS)
 		) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
@@ -309,11 +300,9 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportGenerationWithPreviousReport() throws Exception {
 
-		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
-			when(variableServer.isAlive()).thenReturn(true);
-		});
-			 MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
-			 MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> when(variableServer.isAlive()).thenReturn(true));
+             MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
+             MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS)
 		) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
@@ -363,11 +352,9 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportGenerationServerInactive() throws Exception {
 		
-		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
-			when(variableServer.isAlive()).thenReturn(true);
-		});
-			 MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
-			 MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> when(variableServer.isAlive()).thenReturn(true));
+             MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
+             MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS)
 		) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "false");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
@@ -399,11 +386,9 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportGenerationErrorCreatingTestStep() throws Exception {
 
-		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
-			when(variableServer.isAlive()).thenReturn(true);
-		});
-			 MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
-			 MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> when(variableServer.isAlive()).thenReturn(true));
+             MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
+             MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS)
 		) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
@@ -437,11 +422,9 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportGenerationErrorCreatingTestCase() throws Exception {
 
-		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
-			when(variableServer.isAlive()).thenReturn(true);
-		});
-			 MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
-			 MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> when(variableServer.isAlive()).thenReturn(true));
+             MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
+             MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS)
 		) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
@@ -478,11 +461,9 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportGenerationWithSnapshots() throws Exception {
 		
-		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
-			when(variableServer.isAlive()).thenReturn(true);
-		});
-			 MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
-			 MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> when(variableServer.isAlive()).thenReturn(true));
+             MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
+             MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS)
 		) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
@@ -536,11 +517,9 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportGenerationWithoutSnapshots() throws Exception {
 		
-		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
-			when(variableServer.isAlive()).thenReturn(true);
-		});
-			 MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
-			 MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> when(variableServer.isAlive()).thenReturn(true));
+             MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
+             MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS)
 		) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "false");
@@ -581,13 +560,11 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	 * Test when no seleniumrobot server is present
 	 */
 	@Test(groups={"it"})
-	public void testNoReportWhenServerIsOffline() throws Exception {
+	public void testNoReportWhenServerIsOffline() {
 		
-		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
-				when(variableServer.isAlive()).thenReturn(false);
-			});
-			 MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
-			 MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> when(variableServer.isAlive()).thenReturn(false));
+             MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
+             MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS)
 		) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
@@ -628,11 +605,9 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	@Test(groups={"it"})
 	public void testErrorHandlingWhenRecordingTestResult() throws Exception {
 		
-		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
-			when(variableServer.isAlive()).thenReturn(true);
-		});
-			 MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
-			 MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> when(variableServer.isAlive()).thenReturn(true));
+             MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
+             MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS)
 		) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
@@ -662,11 +637,9 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportContainsStepReferenceForFailedStep() throws Exception {
 		
-		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
-			when(variableServer.isAlive()).thenReturn(true);
-		});
-			 MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
-			 MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> when(variableServer.isAlive()).thenReturn(true));
+             MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
+             MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS)
 		) {
 			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
@@ -701,11 +674,9 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportDoesNotContainsStepReferenceForFailedStep() throws Exception {
 		
-		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
-			when(variableServer.isAlive()).thenReturn(true);
-		});
-			 MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
-			 MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> when(variableServer.isAlive()).thenReturn(true));
+             MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
+             MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS)
 		) {
 			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
@@ -741,11 +712,9 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportContainsStepReferenceForFailedStepWithError() throws Exception {
 		
-		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
-			when(variableServer.isAlive()).thenReturn(true);
-		});
-			 MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
-			 MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> when(variableServer.isAlive()).thenReturn(true));
+             MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
+             MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS)
 		) {
 			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
@@ -783,11 +752,9 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportDoesNotContainReferenceIfServerNotUpToDate() throws Exception {
 		
-		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
-			when(variableServer.isAlive()).thenReturn(true);
-		});
-			 MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
-			 MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> when(variableServer.isAlive()).thenReturn(true));
+             MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
+             MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS)
 		) {
 			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
@@ -821,11 +788,9 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportContainsDownloadedFile() throws Exception {
 
-		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
-			when(variableServer.isAlive()).thenReturn(true);
-		});
-			 MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
-			 MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServer = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> when(variableServer.isAlive()).thenReturn(true));
+             MockedStatic<SeleniumRobotSnapshotServerConnector> mockedServerConnector = mockStatic(SeleniumRobotSnapshotServerConnector.class);
+             MockedStatic<CommonReporter> mockedCommonReporter = mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS)
 		) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");

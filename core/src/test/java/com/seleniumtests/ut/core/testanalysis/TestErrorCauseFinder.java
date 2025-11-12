@@ -41,7 +41,7 @@ import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.imaging.StepReferenceComparator;
 
-import kong.unirest.json.JSONObject;
+import kong.unirest.core.json.JSONObject;
 
 public class TestErrorCauseFinder extends MockitoTest {
 

@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
 import org.mockito.Mock;
@@ -40,13 +40,10 @@ import com.seleniumtests.uipage.uielements.ByUI;
 import com.seleniumtests.uipage.uielements.ElementType;
 import com.seleniumtests.uipage.uielements.UiElement;
 
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONObject;
+import kong.unirest.core.json.JSONArray;
+import kong.unirest.core.json.JSONObject;
 
 public class TestUiElement extends MockitoTest {
-	
-	public TestUiElement() throws IOException {
-	}
 	
 	@Mock
 	private ScreenshotUtil screenshotUtil;
@@ -74,9 +71,9 @@ public class TestUiElement extends MockitoTest {
 	private ScreenShot screenCapture;
 	private ScreenShot browserCapture;
 
-	private MockedStatic mockedWebUIDriver;
-	private MockedStatic mockedCustomFiringWebDriver;
-	private MockedStatic mockedSnapshotServerConnector;
+	private MockedStatic<WebUIDriver> mockedWebUIDriver;
+	private MockedStatic<CustomEventFiringWebDriver> mockedCustomFiringWebDriver;
+	private MockedStatic<SeleniumRobotSnapshotServerConnector> mockedSnapshotServerConnector;
 
 
 	@BeforeMethod(groups= {"ut"})
@@ -143,15 +140,15 @@ public class TestUiElement extends MockitoTest {
 		when(screenshotUtil.capture(SnapshotTarget.PAGE, ScreenShot.class, true)).thenReturn(browserCapture);
 		when(screenshotUtil.capture(SnapshotTarget.MAIN_SCREEN, ScreenShot.class, true)).thenReturn(screenCapture);
 
-		mockedSnapshotServerConnector.when(() -> SeleniumRobotSnapshotServerConnector.getInstance()).thenReturn(serverConnector);
+		mockedSnapshotServerConnector.when(SeleniumRobotSnapshotServerConnector::getInstance).thenReturn(serverConnector);
 		
 		// build detect response from fields and labels
 		JSONObject detectResult = new JSONObject();
 		detectResult.put("version", "aaa");
 		detectResult.put("error", (String)null);
 		detectResult.put("fileName", "foo.png");
-		detectResult.put("fields", new JSONArray(fields.stream().map(Field::toJson).collect(Collectors.toList())));
-		detectResult.put("labels", new JSONArray(labels.stream().map(Label::toJson).collect(Collectors.toList())));
+		detectResult.put("fields", new JSONArray(fields.stream().map(Field::toJson).toList()));
+		detectResult.put("labels", new JSONArray(labels.stream().map(Label::toJson).toList()));
 		when(serverConnector.detectFieldsInPicture(browserCapture)).thenReturn(detectResult);
 
 	}
@@ -305,7 +302,7 @@ public class TestUiElement extends MockitoTest {
 	/**
 	 * Check error is raised when the wrong type is specified, even if a field could be found
 	 */
-	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "No field could be found matching search criteria \\[ByUI\\(type='BUTTON', text='label_inside'\\)\\]")
+	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "No field could be found matching search criteria \\[ByUI\\(type='BUTTON', text='label_inside'\\)]")
 	public void testFindElementWrongType() {
 		
 		UiElement element = spy(new UiElement(ByUI.type(ElementType.BUTTON).textMatching("label_inside")));
@@ -321,7 +318,7 @@ public class TestUiElement extends MockitoTest {
 	/**
 	 * Element cannot be found
 	 */
-	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "No field could be found matching search criteria \\[ByUI\\(type='TEXT_FIELD', leftOf='label_with_field_above'\\)\\]")
+	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "No field could be found matching search criteria \\[ByUI\\(type='TEXT_FIELD', leftOf='label_with_field_above'\\)]")
 	public void testFindElementNotFound() {
 		
 		UiElement element = spy(new UiElement(ByUI.type(ElementType.TEXT_FIELD).toTheLeftOfLabel("label_with_field_above")));
@@ -334,7 +331,7 @@ public class TestUiElement extends MockitoTest {
 	/**
 	 * Label cannot be found
 	 */
-	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "No label could be found matching search criteria \\[ByUI\\(type='TEXT_FIELD', leftOf='label_does_not_exist'\\)\\]")
+	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "No label could be found matching search criteria \\[ByUI\\(type='TEXT_FIELD', leftOf='label_does_not_exist'\\)]")
 	public void testFindElementNoLabelFound() {
 		
 		UiElement element = spy(new UiElement(ByUI.type(ElementType.TEXT_FIELD).toTheLeftOfLabel("label_does_not_exist")));
@@ -359,8 +356,8 @@ public class TestUiElement extends MockitoTest {
 		detectResult.put("version", "aaa");
 		detectResult.put("error", (String) null);
 		detectResult.put("fileName", "foo.png");
-		detectResult.put("fields", new JSONArray(Arrays.asList(field1, fieldWithLabel, field2).stream().map(Field::toJson).collect(Collectors.toList())));
-		detectResult.put("labels", new JSONArray(Arrays.asList(label1Right, label2).stream().map(Label::toJson).collect(Collectors.toList())));
+		detectResult.put("fields", new JSONArray(Stream.of(field1, fieldWithLabel, field2).map(Field::toJson).toList()));
+		detectResult.put("labels", new JSONArray(Stream.of(label1Right, label2).map(Label::toJson).toList()));
 		when(serverConnector.detectFieldsInPicture(browserCapture)).thenReturn(detectResult);
 
 		element.findElement();

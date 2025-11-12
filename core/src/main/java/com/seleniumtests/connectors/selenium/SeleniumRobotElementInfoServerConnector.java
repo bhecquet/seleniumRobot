@@ -28,12 +28,12 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.uipage.htmlelements.ElementInfo;
 
-import kong.unirest.GetRequest;
-import kong.unirest.MultipartBody;
-import kong.unirest.UnirestException;
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONException;
-import kong.unirest.json.JSONObject;
+import kong.unirest.core.GetRequest;
+import kong.unirest.core.MultipartBody;
+import kong.unirest.core.UnirestException;
+import kong.unirest.core.json.JSONArray;
+import kong.unirest.core.json.JSONException;
+import kong.unirest.core.json.JSONObject;
 
 public class SeleniumRobotElementInfoServerConnector extends SeleniumRobotServerConnector {
 	

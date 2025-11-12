@@ -39,12 +39,12 @@ import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.util.helper.WaitHelper;
 
-import kong.unirest.HttpResponse;
-import kong.unirest.MultipartBody;
-import kong.unirest.UnirestException;
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONException;
-import kong.unirest.json.JSONObject;
+import kong.unirest.core.HttpResponse;
+import kong.unirest.core.MultipartBody;
+import kong.unirest.core.UnirestException;
+import kong.unirest.core.json.JSONArray;
+import kong.unirest.core.json.JSONException;
+import kong.unirest.core.json.JSONObject;
 
 public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerConnector {
 	
@@ -342,7 +342,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			String strippedStepName = getStrippedTestStepName(stepName);
 			
 			MultipartBody request = buildPutRequest(url + SNAPSHOT_API_URL)
-					.socketTimeout(5000)
+					.requestTimeout(5000)
 					.field(FIELD_IMAGE, pictureFile)
 					.field(FIELD_NAME, snapshotName)
 					.field("compare", snapshot.getCheckSnapshot().getName())

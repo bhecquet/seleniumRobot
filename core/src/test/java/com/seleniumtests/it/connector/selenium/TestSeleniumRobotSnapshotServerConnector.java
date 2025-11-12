@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,8 +29,8 @@ import com.seleniumtests.reporter.info.Info;
 import com.seleniumtests.reporter.info.MultipleInfo;
 import com.seleniumtests.reporter.info.StringInfo;
 import com.seleniumtests.reporter.logger.FileContent;
-import kong.unirest.HttpResponse;
-import kong.unirest.Unirest;
+import kong.unirest.core.HttpResponse;
+import kong.unirest.core.Unirest;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.Rectangle;
 import org.testng.Assert;
@@ -47,8 +47,8 @@ import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.reporter.logger.Snapshot;
 
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONObject;
+import kong.unirest.core.json.JSONArray;
+import kong.unirest.core.json.JSONObject;
 
 public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 
@@ -68,28 +68,28 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	@Test(groups={"it"})
 	public void testCreateApplication() {
 		connector.createApplication();
-		Assert.assertNotNull(connector.getApplicationId());
+		Assert.assertTrue(connector.getApplicationId() > 0);
 	}
 	
 	@Test(groups={"it"})
 	public void testCreateEnvironment() {
 		connector.createEnvironment();
-		Assert.assertNotNull(connector.getEnvironmentId());
+		Assert.assertTrue(connector.getEnvironmentId() > 0);
 	}
 	
 	@Test(groups={"it"})
 	public void testCreateVersion() {
 		connector.createVersion();
-		Assert.assertNotNull(connector.getApplicationId());
-		Assert.assertNotNull(connector.getVersionId());
+		Assert.assertTrue(connector.getApplicationId() > 0);
+		Assert.assertTrue(connector.getVersionId() > 0);
 	}
 	
 	@Test(groups={"it"})
 	public void testCreateSession() {
 		connector.createApplication();
-		Assert.assertNotNull(connector.getEnvironmentId());
-		Assert.assertNotNull(connector.createSession("Session1"));
-		Assert.assertNotNull(connector.getVersionId());
+		Assert.assertTrue(connector.getEnvironmentId() > 0);
+		Assert.assertTrue(connector.createSession("Session1") > 0);
+		Assert.assertTrue(connector.getVersionId() > 0);
 	}
 	
 	/**
@@ -100,7 +100,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		connector.createSession("Session1");
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Assert.assertNotNull(testCaseId);
-		Assert.assertNotNull(connector.getApplicationId());
+		Assert.assertTrue(connector.getApplicationId() > 0);
 	}
 	
 	/**
@@ -113,7 +113,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS", "LOCAL", null, OffsetDateTime.now());
 		Assert.assertNotNull(sessionId);
 		Assert.assertNotNull(testCaseInSessionId);
-		Assert.assertNotNull(connector.getApplicationId());
+		Assert.assertTrue(connector.getApplicationId() > 0);
 	}
 
 	@Test(groups={"it"})
@@ -188,8 +188,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		Integer testCaseId = connector.createTestCase("Test 2");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 2", "SUCCESS", "LOCAL", "some description", OffsetDateTime.now());
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
-		Integer stepResultId = connector.recordStepResult(true, logs, 1, testCaseInSessionId, testStepId);
-		return stepResultId;
+		return connector.recordStepResult(true, logs, 1, testCaseInSessionId, testStepId);
 	}
 
 	/**
@@ -214,7 +213,6 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	
 	/**
 	 * create a snapshot
-	 * @throws IOException 
 	 */
 	@Test(groups={"it"})
 	public void testCheckSnapshotHasNoDifferences() throws IOException {
@@ -232,10 +230,9 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	
 	/**
 	 * create a snapshot
-	 * @throws IOException 
 	 */
 	@Test(groups={"it"})
-	public void testRecordStepResult() throws IOException {
+	public void testRecordStepResult() {
 		Integer stepResultId = createStepResult("some logs");
 
 		Assert.assertNotNull(stepResultId);
@@ -272,7 +269,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testGetStepReferenceDetectFieldInformation() throws IOException {
+	public void testGetStepReferenceDetectFieldInformation() {
 		Integer stepResultId = createStepResult("logs");
 		JSONObject detectionData = connector.getStepReferenceDetectFieldInformation(stepResultId, "afcc45");
 		

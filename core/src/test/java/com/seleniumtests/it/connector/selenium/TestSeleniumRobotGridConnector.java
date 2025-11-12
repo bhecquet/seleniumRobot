@@ -9,11 +9,11 @@ import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 
 import com.seleniumtests.GenericDriverTest;
@@ -22,14 +22,10 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.util.osutility.OSUtility;
-import com.seleniumtests.util.osutility.SystemUtility;
 import io.appium.java_client.android.options.UiAutomator2Options;
 import org.apache.commons.io.FileUtils;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.SessionId;
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -40,7 +36,6 @@ import org.testng.xml.XmlSuite.ParallelMode;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.MockitoTest;
-import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
@@ -49,8 +44,8 @@ import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.imaging.ImageProcessor;
 
-import kong.unirest.Unirest;
-import kong.unirest.UnirestException;
+import kong.unirest.core.Unirest;
+import kong.unirest.core.UnirestException;
 
 /**
  * All these tests need to be executed with a selenium robot grid started on localhost, port 4444
@@ -155,7 +150,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	}
 
 	@Test(groups={"it"})
-	public void testUploadMobileApp() throws IOException, UnirestException {
+	public void testUploadMobileApp() throws IOException, UnirestException, URISyntaxException {
 
 		File app = GenericTest.createFileFromResource("tu/env.ini");
 
@@ -164,7 +159,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 		caps = new UiAutomator2Options(connector.uploadMobileApp(caps));
 		String url = caps.getApp().orElse(null);
 
-		String fileContent = Unirest.get(String.format("http://%s:%d/grid/admin/FileServlet", new URL(hubUrl).getHost(), new URL(hubUrl).getPort() + 10))
+		String fileContent = Unirest.get(String.format("http://%s:%d/grid/admin/FileServlet", new URI(hubUrl).toURL().getHost(), new URI(hubUrl).toURL().getPort() + 10))
 				.queryString("file", url)
 				.asString()
 				.getBody();
@@ -173,7 +168,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testUploadFileToNode() throws IOException, UnirestException {
+	public void testUploadFileToNode() throws IOException, UnirestException, URISyntaxException {
 		
 		File app = GenericTest.createFileFromResource("tu/env.ini");
 
@@ -183,7 +178,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 		String filePath = connector.uploadFileToNode(app.getAbsolutePath(), true);
 		Assert.assertTrue(filePath.contains("upload/file"));
 		String partialPath = "upload" + filePath.split("upload")[1] + "/" + app.getName();
-		String fileContent = Unirest.get(String.format("http://%s:%d/extra/FileServlet", new URL(nodeUrl).getHost(), new URL(nodeUrl).getPort() + 10))
+		String fileContent = Unirest.get(String.format("http://%s:%d/extra/FileServlet", new URI(nodeUrl).toURL().getHost(), new URI(nodeUrl).toURL().getPort() + 10))
 				.queryString("file", "file:" + partialPath)
 				.asString()
 				.getBody();
@@ -206,7 +201,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testUploadFileToNode2() throws IOException, UnirestException {
+	public void testUploadFileToNode2() throws IOException, UnirestException, URISyntaxException {
 		
 		File app = GenericTest.createFileFromResource("tu/env.ini");
 
@@ -216,21 +211,13 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 		String filePath = connector.uploadFileToNode(app.getAbsolutePath(), false);
 		Assert.assertTrue(filePath.startsWith("file:upload/file/"));
 		
-		String fileContent = Unirest.get(String.format("http://%s:%d/extra/FileServlet", new URL(nodeUrl).getHost(), new URL(nodeUrl).getPort() + 10))
+		String fileContent = Unirest.get(String.format("http://%s:%d/extra/FileServlet", new URI(nodeUrl).toURL().getHost(), new URI(nodeUrl).toURL().getPort() + 10))
 				.queryString("file", filePath + "/" + app.getName())
 				.asString()
 				.getBody();
 		
 		Assert.assertEquals(fileContent, FileUtils.readFileToString(app, StandardCharsets.UTF_8));
 	}
-	
-//	@Test(groups={"it"})
-//	public void testUploadFile() throws ClientProtocolException, IOException {
-//		
-//		File app = GenericTest.createFileFromResource("clirr-differences.xml");
-//		
-//		connector.uploadFile(app.getAbsolutePath());
-//	}
 
 	@Test(groups={"it"})
 	public void testGetMouseCoordinates() {

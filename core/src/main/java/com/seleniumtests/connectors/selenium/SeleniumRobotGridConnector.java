@@ -58,12 +58,12 @@ import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.customexception.SeleniumGridException;
 import com.seleniumtests.util.FileUtility;
 
-import kong.unirest.GetRequest;
-import kong.unirest.HttpRequestWithBody;
-import kong.unirest.HttpResponse;
-import kong.unirest.Unirest;
-import kong.unirest.UnirestException;
-import kong.unirest.UnirestInstance;
+import kong.unirest.core.GetRequest;
+import kong.unirest.core.HttpRequestWithBody;
+import kong.unirest.core.HttpResponse;
+import kong.unirest.core.Unirest;
+import kong.unirest.core.UnirestException;
+import kong.unirest.core.UnirestInstance;
 
 /**
  * Object representing the connection to a SeleniumRobot grid hub, specific for one node
@@ -625,7 +625,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 				i++;
 			}
 			if (timeout != null) {
-				unirest.config().socketTimeout((timeout + 5 ) * 1000);
+				unirest.config().requestTimeout((timeout + 5 ) * 1000);
 				req = req.queryString("timeout", timeout);
 			}
 			
@@ -717,7 +717,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 							.downloadMonitor((b, fileName, bytesWritten, totalBytes) -> logger.info("File {}: {}/{}", fileName, bytesWritten, totalBytes));
 				}
 				HttpResponse<File> videoResponse = getRequest
-						.socketTimeout(60000)
+						.requestTimeout(60000)
 						.queryString(ACTION_FIELD, "stopVideoCapture")
 						.queryString(SESSION_FIELD, sessionId)
 						.asFile(outputFile);

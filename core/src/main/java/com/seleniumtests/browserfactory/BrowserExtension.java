@@ -14,8 +14,8 @@ import org.apache.commons.io.FilenameUtils;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
 
-import kong.unirest.Unirest;
-import kong.unirest.UnirestException;
+import kong.unirest.core.Unirest;
+import kong.unirest.core.UnirestException;
 
 public class BrowserExtension {
 	

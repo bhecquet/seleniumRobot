@@ -24,9 +24,9 @@ import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
-import kong.unirest.*;
-import kong.unirest.json.JSONException;
-import kong.unirest.json.JSONObject;
+import kong.unirest.core.*;
+import kong.unirest.core.json.JSONException;
+import kong.unirest.core.json.JSONObject;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.Capabilities;
@@ -177,7 +177,7 @@ public class SeleniumBrowserstackGridConnector extends SeleniumGridConnector {
 							.downloadMonitor((b, fileName, bytesWritten, totalBytes) -> logger.info("File {}: {}/{}", fileName, bytesWritten, totalBytes));
 				}
 				HttpResponse<File> videoResponse = getRequest
-						.socketTimeout(60000)
+						.requestTimeout(60000)
 						.asFile(outputFile);
 
 				if (videoResponse.getStatus() != 200) {
