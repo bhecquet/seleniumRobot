@@ -2559,9 +2559,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			// test all error log is displayed in execution logs
 			Assert.assertTrue(detailedReportContent.contains("[main] ScenarioLogger: Searched element [TextFieldElement Text, by={By.id: text___}] from page 'com.seleniumtests.it.driver.support.pages.DriverTestPage' could not be found</div>"));
 			Assert.assertTrue(detailedReportContent.contains("<div>at com.seleniumtests.it.driver.support.pages.DriverTestPage._writeSomethingOnNonExistentElementWithCatch"));
-			Assert.assertTrue(detailedReportContent.contains("<div>For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#no-such-element-exception</div>")); // checks that line not showing thread name are in logs
+			Assert.assertTrue(detailedReportContent.contains("<div>For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception</div>")); // checks that line not showing thread name are in logs
 			Assert.assertTrue(detailedReportContent.contains("Warning: Searched element [TextFieldElement Text, by={By.id: text___}] from page 'com.seleniumtests.it.driver.support.pages.DriverTestPage' could not be found<br/>"
-					+ "For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#no-such-element-exception<br/>")); // warning displayed in step
+					+ "For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception<br/>")); // warning displayed in step
 		} finally {
 			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
 		}

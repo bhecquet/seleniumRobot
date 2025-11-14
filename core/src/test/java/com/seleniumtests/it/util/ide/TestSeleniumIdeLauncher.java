@@ -1,33 +1,27 @@
 package com.seleniumtests.it.util.ide;
 
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import com.seleniumtests.util.ide.SeleniumIdeParser;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-import org.mockito.ArgumentMatchers;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.lang.reflect.Field;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
-import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.it.driver.support.server.WebServer;
 import com.seleniumtests.it.reporter.ReporterTest;
 import com.seleniumtests.util.FileUtility;
@@ -90,7 +84,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTest.java").toFile();
 			FileUtility.copyFile(tmpSuiteFile, suiteFile);
 			
-			new SeleniumIdeLauncher().executeScripts(Arrays.asList(suiteFile.getAbsolutePath()), 1);
+			new SeleniumIdeLauncher().executeScripts(List.of(suiteFile.getAbsolutePath()), 1);
 			
 			String mainReportContent = ReporterTest.readSummaryFile();
 			
@@ -143,7 +137,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageMaskPassword.java").toFile();
 			FileUtility.copyFile(tmpSuiteFile, suiteFile);
 			
-			new SeleniumIdeLauncher().executeScripts(Arrays.asList(suiteFile.getAbsolutePath()), 1);
+			new SeleniumIdeLauncher().executeScripts(List.of(suiteFile.getAbsolutePath()), 1);
 			
 			String mainReportContent = ReporterTest.readSummaryFile();
 			
@@ -169,8 +163,6 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 	
 	/**
 	 * Test that with IE, test starts correctly (initial url is set)
-	 * @throws IOException
-	 * @throws ClassNotFoundException
 	 */
 	@Test(groups={"it"})
 	public void testSeleniumExecutionInternetExplorer() throws IOException, ClassNotFoundException {
@@ -186,7 +178,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTest.java").toFile();
 			FileUtility.copyFile(tmpSuiteFile, suiteFile);
 			
-			new SeleniumIdeLauncher().executeScripts(Arrays.asList(suiteFile.getAbsolutePath()), 1);
+			new SeleniumIdeLauncher().executeScripts(List.of(suiteFile.getAbsolutePath()), 1);
 			
 			String mainReportContent = ReporterTest.readSummaryFile();
 			
@@ -214,17 +206,15 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 	
 	/**
 	 * Test that with IE, test starts correctly (initial url is set)
-	 * @throws IOException
-	 * @throws ClassNotFoundException
 	 */
 	@Test(groups={"it"}, enabled = false)
-	public void testSeleniumIDE() throws IOException, ClassNotFoundException {
+	public void testSeleniumIDE() throws ClassNotFoundException {
 		try {
 			CompilerUtils.addClassPath("target/test-classes");
 			System.setProperty(SeleniumTestsContext.BROWSER, "iexploreEdge");
 			System.setProperty(SeleniumTestsContext.MANUAL_TEST_STEPS, "false");
 
-			new SeleniumIdeLauncher().executeScripts(Arrays.asList("D:\\tmp\\TestFumeur.java"), 1);
+			new SeleniumIdeLauncher().executeScripts(List.of("D:\\tmp\\TestFumeur.java"), 1);
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.BROWSER);
@@ -283,9 +273,6 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 	/**
 	 * Check that manual steps are displayed in report
 	 * /!\ most of the time, this test fails during maven execution
-	 * 
-	 * @throws IOException
-	 * @throws ClassNotFoundException
 	 */
 	@Test(groups={"it"})
 	public void testSeleniumExecutionWithManualSteps() throws IOException, ClassNotFoundException {
@@ -300,7 +287,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTest4.java").toFile();
 			FileUtility.copyFile(tmpSuiteFile, suiteFile);
 			
-			new SeleniumIdeLauncher().executeScripts(Arrays.asList(suiteFile.getAbsolutePath()), 1);
+			new SeleniumIdeLauncher().executeScripts(List.of(suiteFile.getAbsolutePath()), 1);
 			
 			String mainReportContent = ReporterTest.readSummaryFile();
 			
@@ -316,8 +303,8 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			Assert.assertTrue(detailedReportContent1.contains("click on HtmlElement , by={By.id: buttonIFrame}"));
 			
 			// screenshot is present for the step (taken at the beginning of the step: see anchor)
-			Assert.assertTrue(detailedReportContent1.matches(".*<div class\\=\"message-snapshot col\"><div class\\=\"text-center\">.*"
-					+ "src\\=\"screenshots/mainPage_0-1_new_window_link.*<div class\\=\"text-center\">drv:main: Current Window: </div>"
+			Assert.assertTrue(detailedReportContent1.matches(".*<div class=\"message-snapshot col\"><div class=\"text-center\">.*"
+					+ "src=\"screenshots/mainPage_0-1_new_window_link.*<div class=\"text-center\">drv:main: Current Window: </div>"
 					+ "<div class=\"text-center font-weight-lighter\"><a href='http://localhost:55555/testWithoutFixedPattern.html' target=url>URL</a>.*"));
 			
 		} finally {
@@ -331,8 +318,6 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 	
 	/**
 	 * Check an error is raised if browser is not specified
-	 * @throws IOException
-	 * @throws ClassNotFoundException
 	 */
 	@Test(groups={"it"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "'-Dbrowser=<browser>' option is mandatory")
 	public void testSeleniumExecutionWithoutBrowser() throws IOException, ClassNotFoundException {
@@ -346,7 +331,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTest5.java").toFile();
 			FileUtils.copyFile(tmpSuiteFile, suiteFile);
 			
-			new SeleniumIdeLauncher().executeScripts(Arrays.asList(suiteFile.getAbsolutePath()), 1);
+			new SeleniumIdeLauncher().executeScripts(List.of(suiteFile.getAbsolutePath()), 1);
 
 			
 		} finally {
@@ -359,8 +344,6 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 	
 	/**
 	 * Test we can execute seleniumRobot test class and result files are correctly generated
-	 * @throws ClassNotFoundException
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
 	public void testSimpleExecution() throws ClassNotFoundException, IOException {
@@ -399,14 +382,9 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 	/**
 	 * When parsing error occurs, we should generate a fake test code so that it doesn't prevent other tests from executing
 	 * A test will be executed and fail, showing the parsing error
-	 * @throws IOException
-	 * @throws ClassNotFoundException
-	 * @throws NoSuchFieldException 
-	 * @throws IllegalAccessException 
-	 * @throws IllegalArgumentException 
 	 */
 	@Test(groups={"it"})
-	public void testParseIssue() throws IOException, ClassNotFoundException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+	public void testParseIssue() throws IOException, ClassNotFoundException, IllegalArgumentException {
 		try {		    
 		    SeleniumIdeLauncher seleniumIde = new SeleniumIdeLauncher();
 
@@ -420,7 +398,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTestError.java").toFile();
 			FileUtils.copyFile(tmpSuiteFile, suiteFile);
 			
-			seleniumIde.executeScripts(Arrays.asList(suiteFile.getAbsolutePath()), 1);
+			seleniumIde.executeScripts(List.of(suiteFile.getAbsolutePath()), 1);
 
 			String mainReportContent = ReporterTest.readSummaryFile();
 
