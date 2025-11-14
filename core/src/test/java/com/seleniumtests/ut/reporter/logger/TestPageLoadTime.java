@@ -20,7 +20,7 @@ public class TestPageLoadTime  extends GenericTest {
         Assert.assertEquals(json.getDouble("loadTime"), 1230);
         Assert.assertEquals(json.getString("page"), "CalcPage");
         Assert.assertEquals(json.getString("name"), "loading of CalcPage took 1230 ms");
-        Assert.assertTrue(json.getInt("timestamp") > 1);
+        Assert.assertTrue(json.getLong("timestamp") > 1);
     }
 
     @Test(groups={"ut"})
