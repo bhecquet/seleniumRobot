@@ -30,8 +30,8 @@ import net.openhft.compiler.CompilerUtils;
 
 public class SeleniumIdeLauncher {
 	
-    private static Logger logger = SeleniumRobotLogger.getLogger(SeleniumIdeLauncher.class);
-	private static Random random = new Random();
+    private static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumIdeLauncher.class);
+	private static final Random random = new Random();
 	
 	@Parameter(names = "-scripts", variableArity = true, description= "List of selenium .java files to execute within seleniumRobot. These files are exported from Selenium IDE")
 	public List<String> scripts = new ArrayList<>();
@@ -39,7 +39,7 @@ public class SeleniumIdeLauncher {
 	@Parameter(names = "-threadcount", description = "The default number of threads to use when running tests in parallel.")
 	public int threadCount = 1;
 
-	public static void main(String ... args) throws ClassNotFoundException {
+	public static void main(String ... args) {
 		
 		// read program options
 		SeleniumIdeLauncher main = new SeleniumIdeLauncher();
@@ -53,7 +53,7 @@ public class SeleniumIdeLauncher {
         System.exit(0);
 	}
 
-	public void executeScripts() throws ClassNotFoundException {
+	public void executeScripts() {
 		
 		executeScripts(scripts, threadCount);
 	}
@@ -67,7 +67,7 @@ public class SeleniumIdeLauncher {
 		}
 	}
 	
-	public void executeScripts(List<String> scriptFiles, int numberOfThreads) throws ClassNotFoundException {
+	public void executeScripts(List<String> scriptFiles, int numberOfThreads) {
         try {
 			checkPrerequisites();
 			Map<String, String> classCodes = generateTestClasses(scriptFiles);
@@ -75,7 +75,7 @@ public class SeleniumIdeLauncher {
         } catch (ParseProblemException | ClassNotFoundException e) {
 	        String parse = e.getMessage().split("Problem")[0];
                 logger.error("--------------------------------------------------------------------------------------------------------------------------------------------------------");
-                logger.error("invalid code, one element is missing : " + parse);
+                logger.error("invalid code, one element is missing : {}", parse);
                 logger.error("--------------------------------------------------------------------------------------------------------------------------------------------------------");
             throw new ScenarioException("invalid java code");
         }
@@ -92,7 +92,7 @@ public class SeleniumIdeLauncher {
 			try {
 				classCodes.putAll(new SeleniumIdeParser(scriptFile).parseSeleniumIdeFile());
 			} catch (FileNotFoundException e) {
-				logger.error(String.format("File %s cannot be parsed: %s", scriptFile, e.getMessage()));
+				logger.error("File {} cannot be parsed: {}", scriptFile, e.getMessage());
 			}
 		}
 		return classCodes;

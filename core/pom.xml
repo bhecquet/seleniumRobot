@@ -644,7 +644,8 @@
 						--add-opens=java.base/java.lang=ALL-UNNAMED
 						--add-opens=java.base/java.util=ALL-UNNAMED
 						--add-opens=java.base/java.time=ALL-UNNAMED <!-- for GSON -->
-						--add-opens jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED <!-- for https://github.com/OpenHFT/Java-Runtime-Compiler/issues/91 -->
+						--add-opens jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
+						--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED<!-- for https://github.com/OpenHFT/Java-Runtime-Compiler/issues/91 -->
 
 					</argLine>
 
@@ -691,6 +692,7 @@
 						 --add-opens=java.base/java.util=ALL-UNNAMED
 						 --add-opens=java.base/java.time=ALL-UNNAMED
 						 --add-opens=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
+						 --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
 						 @{failsafeArgLine}
 						 -Ddebug=${seleniumRobot.debug}
 						 -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"</argLine>

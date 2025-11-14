@@ -3,6 +3,7 @@ package com.seleniumtests.it.util.ide;
 import java.io.File;
 import java.io.IOException;
 import java.net.Inet4Address;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
@@ -31,7 +33,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import net.openhft.compiler.CompilerUtils;
 
 /**
- * /!\ to make these tests work from your IDE, you MUST add a VM argument: "-javaagent:<path_to_maven_repo>\org\aspectj\aspectjweaver\1.9.1\aspectjweaver-1.9.1.jar" 
+ * /!\ to make these tests work from your IDE, you MUST add a VM argument: "-javaagent:<path_to_maven_repo>\org\aspectj\aspectjweaver\1.9.25\aspectjweaver-1.9.25.jar --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED"
  * Test and compilation MUST also be executed by a JDK
  * When using java IDE scripts, make sure they have different names accross tests, else, we may encounter problems with class already being in classloader
  */
@@ -39,6 +41,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(TestSeleniumIdeLauncher.class);
 	private WebServer server;
+	private int port;
 	
 	private  Map<String, String> getPageMapping() {
 		Map<String, String> mapping = new HashMap<>();
@@ -58,8 +61,9 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 
 		String localAddress = Inet4Address.getLocalHost().getHostAddress();
 		server = new WebServer(localAddress, getPageMapping());
-        server.expose(55555);
-        logger.info(String.format("exposing server on http://%s:%d", localAddress, server.getServerHost().getPort()));
+        server.expose();
+		port = server.getServerHost().getPort();
+        logger.info(String.format("exposing server on http://%s:%d", localAddress, port));
 	}
 
 	@AfterClass(groups={"it", "ut"}, alwaysRun=true)
@@ -69,9 +73,19 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			server.stop();
 		}
 	}
+
+	private File createFileFromResourceAndReplacePort(String resource) throws IOException {
+		File tempFile = File.createTempFile("img", null);
+		tempFile.deleteOnExit();
+
+		String content = IOUtils.toString(Thread.currentThread().getContextClassLoader().getResourceAsStream(resource), StandardCharsets.UTF_8).replace("55555", Integer.toString(port));
+		FileUtils.write(tempFile, content, StandardCharsets.UTF_8);
+
+		return tempFile;
+	}
 	
 	@Test(groups={"it"})
-	public void testSeleniumExecution() throws IOException, ClassNotFoundException {
+	public void testSeleniumExecution() throws IOException {
 		try {
 			CompilerUtils.addClassPath("target/test-classes");
 			System.setProperty(SeleniumTestsContext.BROWSER, "chrome");
@@ -80,7 +94,8 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			System.setProperty("foo", "Hello Selenium IDE");
 			
 
-			File tmpSuiteFile = GenericTest.createFileFromResource("ti/ide/MainPageTest.java");
+			File tmpSuiteFile = createFileFromResourceAndReplacePort("ti/ide/MainPageTest.java");
+			
 			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTest.java").toFile();
 			FileUtility.copyFile(tmpSuiteFile, suiteFile);
 			
@@ -99,7 +114,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 				// check we have automatic steps corresponding to the single test method "jcommander"
 				Assert.assertFalse(detailedReportContent1.contains("</button> new window link - ")); // manual step is not there
 				Assert.assertTrue(detailedReportContent1.contains("><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> mainPage - ")); // auto step is there
-				Assert.assertTrue(detailedReportContent1.contains("<i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> openPage with args: (http://localhost:55555/testIFrame.html, ) - "));
+				Assert.assertTrue(detailedReportContent1.contains(String.format("<i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> openPage with args: (http://localhost:%d/testIFrame.html, ) - ", port)));
 				Assert.assertTrue(detailedReportContent1.contains("</span> click on HtmlElement , by={By.id: image}")); // action
 				Assert.assertTrue(detailedReportContent1.contains("</span> frame")); // auto sub-step
 				Assert.assertTrue(detailedReportContent1.contains("</span> click on HtmlElement , by={By.id: buttonIFrame}"));
@@ -125,7 +140,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testSeleniumExecutionMaskPassword() throws IOException, ClassNotFoundException {
+	public void testSeleniumExecutionMaskPassword() throws IOException {
 		try {
 			CompilerUtils.addClassPath("target/test-classes");
 			System.setProperty(SeleniumTestsContext.BROWSER, "chrome");
@@ -133,7 +148,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			System.setProperty("foo", "Hello Selenium IDE");
 			
 			
-			File tmpSuiteFile = GenericTest.createFileFromResource("ti/ide/MainPageMaskPassword.java");
+			File tmpSuiteFile = createFileFromResourceAndReplacePort("ti/ide/MainPageMaskPassword.java");
 			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageMaskPassword.java").toFile();
 			FileUtility.copyFile(tmpSuiteFile, suiteFile);
 			
@@ -165,7 +180,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 	 * Test that with IE, test starts correctly (initial url is set)
 	 */
 	@Test(groups={"it"})
-	public void testSeleniumExecutionInternetExplorer() throws IOException, ClassNotFoundException {
+	public void testSeleniumExecutionInternetExplorer() throws IOException {
 		try {
 			CompilerUtils.addClassPath("target/test-classes");
 			System.setProperty(SeleniumTestsContext.BROWSER, "iexploreEdge");
@@ -174,7 +189,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			System.setProperty("foo", "Hello Selenium IDE");
 			
 
-			File tmpSuiteFile = GenericTest.createFileFromResource("ti/ide/MainPageTest.java");
+			File tmpSuiteFile = createFileFromResourceAndReplacePort("ti/ide/MainPageTest.java");
 			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTest.java").toFile();
 			FileUtility.copyFile(tmpSuiteFile, suiteFile);
 			
@@ -208,7 +223,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 	 * Test that with IE, test starts correctly (initial url is set)
 	 */
 	@Test(groups={"it"}, enabled = false)
-	public void testSeleniumIDE() throws ClassNotFoundException {
+	public void testSeleniumIDE() {
 		try {
 			CompilerUtils.addClassPath("target/test-classes");
 			System.setProperty(SeleniumTestsContext.BROWSER, "iexploreEdge");
@@ -224,7 +239,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testSeleniumExecutionParallel() throws IOException, ClassNotFoundException {
+	public void testSeleniumExecutionParallel() throws IOException {
 		try {
 			CompilerUtils.addClassPath("target/test-classes");
 			System.setProperty(SeleniumTestsContext.BROWSER, "chrome");
@@ -233,9 +248,9 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			System.setProperty("foo", "Hello Selenium IDE");
 			
 			
-			File tmpSuiteFile = GenericTest.createFileFromResource("ti/ide/MainPageTest.java");
+			File tmpSuiteFile = createFileFromResourceAndReplacePort("ti/ide/MainPageTest.java");
 			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTest2.java").toFile();
-			File tmpSuiteFile2 = GenericTest.createFileFromResource("ti/ide/MainPageTest2.java");
+			File tmpSuiteFile2 = createFileFromResourceAndReplacePort("ti/ide/MainPageTest2.java");
 			File suiteFile2 = Paths.get(tmpSuiteFile2.getParentFile().getAbsolutePath(), "MainPageTest3.java").toFile();
 			FileUtility.copyFile(tmpSuiteFile, suiteFile);
 			FileUtility.copyFile(tmpSuiteFile2, suiteFile2);
@@ -275,7 +290,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 	 * /!\ most of the time, this test fails during maven execution
 	 */
 	@Test(groups={"it"})
-	public void testSeleniumExecutionWithManualSteps() throws IOException, ClassNotFoundException {
+	public void testSeleniumExecutionWithManualSteps() throws IOException {
 		try {
 			CompilerUtils.addClassPath("target/test-classes");
 			System.setProperty(SeleniumTestsContext.BROWSER, "chrome");
@@ -283,7 +298,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "false");
 			
 			// use a different file from the previous test to avoid problems with compiler cache
-			File tmpSuiteFile = GenericTest.createFileFromResource("ti/ide/MainPageTest2.java");
+			File tmpSuiteFile = createFileFromResourceAndReplacePort("ti/ide/MainPageTest2.java");
 			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTest4.java").toFile();
 			FileUtility.copyFile(tmpSuiteFile, suiteFile);
 			
@@ -303,9 +318,9 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			Assert.assertTrue(detailedReportContent1.contains("click on HtmlElement , by={By.id: buttonIFrame}"));
 			
 			// screenshot is present for the step (taken at the beginning of the step: see anchor)
-			Assert.assertTrue(detailedReportContent1.matches(".*<div class=\"message-snapshot col\"><div class=\"text-center\">.*"
+			Assert.assertTrue(detailedReportContent1.matches(String.format(".*<div class=\"message-snapshot col\"><div class=\"text-center\">.*"
 					+ "src=\"screenshots/mainPage_0-1_new_window_link.*<div class=\"text-center\">drv:main: Current Window: </div>"
-					+ "<div class=\"text-center font-weight-lighter\"><a href='http://localhost:55555/testWithoutFixedPattern.html' target=url>URL</a>.*"));
+					+ "<div class=\"text-center font-weight-lighter\"><a href='http://localhost:%d/testWithoutFixedPattern.html' target=url>URL</a>.*", port)));
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.BROWSER);
@@ -320,14 +335,14 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 	 * Check an error is raised if browser is not specified
 	 */
 	@Test(groups={"it"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "'-Dbrowser=<browser>' option is mandatory")
-	public void testSeleniumExecutionWithoutBrowser() throws IOException, ClassNotFoundException {
+	public void testSeleniumExecutionWithoutBrowser() throws IOException {
 		try {
 			CompilerUtils.addClassPath("target/test-classes");
 			System.setProperty(SeleniumTestsContext.MANUAL_TEST_STEPS, "true");
 			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "false");
 			
 			// use a different file from the previous test to avoid problems with compiler cache
-			File tmpSuiteFile = GenericTest.createFileFromResource("ti/ide/MainPageTest2.java");
+			File tmpSuiteFile = createFileFromResourceAndReplacePort("ti/ide/MainPageTest2.java");
 			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTest5.java").toFile();
 			FileUtils.copyFile(tmpSuiteFile, suiteFile);
 			
@@ -361,7 +376,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 					"    }" + 
 					"}";
 			
-			Map<String, String> clss = new HashMap<String, String>();
+			Map<String, String> clss = new HashMap<>();
 			clss.put("covea.selenium.commons.tests.Default", cls);
 			
 			new SeleniumIdeLauncher().executeGeneratedClasses(clss, 1);
@@ -384,7 +399,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 	 * A test will be executed and fail, showing the parsing error
 	 */
 	@Test(groups={"it"})
-	public void testParseIssue() throws IOException, ClassNotFoundException, IllegalArgumentException {
+	public void testParseIssue() throws IOException, IllegalArgumentException {
 		try {		    
 		    SeleniumIdeLauncher seleniumIde = new SeleniumIdeLauncher();
 
@@ -394,7 +409,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "false");
 
 			// use a different file from the previous test to avoid problems with compiler cache
-			File tmpSuiteFile = GenericTest.createFileFromResource("ti/ide/MainPageTestError.java");
+			File tmpSuiteFile = createFileFromResourceAndReplacePort("ti/ide/MainPageTestError.java");
 			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTestError.java").toFile();
 			FileUtils.copyFile(tmpSuiteFile, suiteFile);
 			
