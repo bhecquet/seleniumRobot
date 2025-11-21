@@ -492,7 +492,7 @@ public class TestSeleniumBrowserstackGridConnector extends ConnectorsTest {
             "browser_url": "https://automate.browserstack.com/builds/abcdefg/sessions/hijklm",
             "public_url": "https://automate.browserstack.com/builds/abcdefg/sessions/hijklm?auth_token=myToken",
             "video_url": "https://automate.browserstack.com/sessions/hijklm/video?token=tok--77b9f745d91d9b99572a9e3c98dd001347f1b62c&source=rest_api&diff=860746.273516167",
-            "browser_console_logs_url": "https://automate.browserstack.com/s3-upload/bs-selenium-logs-aps/s3.ap-south-1/hijklm/hijklm-console-logs-v2.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA2XUQHUQMHPMYEM4V%2F20200918%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Date=20200918T102438Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=3bfd4e34fd6aa46bead6e16e418f6bee5b7798d7ef82a7e9546980dd7e93e917",
+            "browser_console_logs_url": "https://automate.browserstack.com/s3-upload/bs-selenium-logs-aps/s3.ap-south-1/hijklm/hijklm-console-logs-v2.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256",
             "har_logs_url": "https://automate.browserstack.com/s3-upload/bs-selenium-logs-euw/s3.eu-west-1/hijklm/hijklm-har-logs.txt?",
             "selenium_logs_url": "https://automate.browserstack.com/s3-upload/bs-selenium-logs-euw/s3.eu-west-1/hijklm/hijklm-selenium-logs.txt?"
         }
