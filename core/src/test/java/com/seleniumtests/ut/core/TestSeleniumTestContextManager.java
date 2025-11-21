@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,7 +37,6 @@ public class TestSeleniumTestContextManager extends GenericTest {
 	 * Check that version is shorten: 3.0.0 => 3.0
 	 * 
 	 * /!\ This test can only be successful once a 'mvn package' has been performed so that the ant task generates the right file
-	 * @param iTestContext
 	 */
 	@Test(groups={"ut"})
 	public void testReadApplicationVersion(ITestContext iTestContext) {
@@ -49,7 +48,6 @@ public class TestSeleniumTestContextManager extends GenericTest {
 	
 	/**
 	 * Empty version => 0.0
-	 * @param iTestContext
 	 */
 	@Test(groups={"ut"})
 	public void testReadEmptyApplicationVersion(ITestContext iTestContext) {
@@ -59,7 +57,6 @@ public class TestSeleniumTestContextManager extends GenericTest {
 	
 	/**
 	 * 1.2alpha-all.3 => 1.2alpha-all
-	 * @param iTestContext
 	 */
 	@Test(groups={"ut"})
 	public void testReadComplicatedApplicationVersion(ITestContext iTestContext) {
@@ -69,7 +66,6 @@ public class TestSeleniumTestContextManager extends GenericTest {
 	
 	/**
 	 * 1.2alpha-all.3 => 1.2alpha-all
-	 * @param iTestContext
 	 */
 	@Test(groups={"ut"})
 	public void testReadOneDigitApplicationVersion(ITestContext iTestContext) {
@@ -79,7 +75,6 @@ public class TestSeleniumTestContextManager extends GenericTest {
 	
 	/**
 	 * no version => 0.0
-	 * @param iTestContext
 	 */
 	@Test(groups={"ut"})
 	public void testReadUnexistingApplicationVersion(ITestContext iTestContext) {
@@ -89,7 +84,6 @@ public class TestSeleniumTestContextManager extends GenericTest {
 	
 	/**
 	 * Empty version => 0.0
-	 * @param iTestContext
 	 */
 	@Test(groups={"ut"})
 	public void testReadFullEmptyApplicationVersion(ITestContext iTestContext) {
@@ -99,7 +93,6 @@ public class TestSeleniumTestContextManager extends GenericTest {
 	
 	/**
 	 * 1.2alpha-all.3 => 1.2alpha-all.3
-	 * @param iTestContext
 	 */
 	@Test(groups={"ut"})
 	public void testReadFullComplicatedApplicationVersion(ITestContext iTestContext) {
@@ -109,7 +102,6 @@ public class TestSeleniumTestContextManager extends GenericTest {
 	
 	/**
 	 * no version => 0.0
-	 * @param iTestContext
 	 */
 	@Test(groups={"ut"})
 	public void testReadFullUnexistingApplicationVersion(ITestContext iTestContext) {

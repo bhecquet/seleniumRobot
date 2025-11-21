@@ -43,8 +43,15 @@ public class TestPackageUtility extends GenericTest {
 	}
 	
 	@Test(groups={"ut"}, enabled=false)
-	public void testDriverVersion() throws Exception {
+	public void testDriverVersion() {
 		String version = PackageUtility.getDriverVersion();
 		System.out.println(version);
+	}
+
+	@Test(groups = "ut")
+	public void testSeleniumVersion() {
+		String version = PackageUtility.getSeleniumVersion();
+		Assert.assertTrue(version.startsWith("4."));
+        Assert.assertNotEquals(version, "4.37.0"); // we do not get the default version
 	}
 }

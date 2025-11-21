@@ -205,7 +205,7 @@ public class SeleniumBrowserstackGridConnector extends SeleniumGridConnector {
 			logger.warn("Could not stop video capture: {}", e.getMessage());
 			return null;
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
-			logger.warn("Video file not get due to {}", e.getClass().getName());
+			logger.warn("Video file not get due to {}", e.getClass().getName(), e);
 			return null;
 		}
 	}

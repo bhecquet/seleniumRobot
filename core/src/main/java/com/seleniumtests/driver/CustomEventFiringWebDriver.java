@@ -72,6 +72,7 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.*;
@@ -662,7 +663,10 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 			try {
 				String cdp = capabilities.getCapability(SE_CDP_PREFIX).toString();
 				int cdpPort = new URI(cdp).getPort();
-				int hubPort = new URI(capabilities.getCapability(SeleniumRobotCapabilityType.GRID_HUB).toString()).toURL().getPort();
+				URL hubUrl = new URI(capabilities.getCapability(SeleniumRobotCapabilityType.GRID_HUB).toString()).toURL();
+				int hubPort = hubUrl.getPort();
+				hubPort = hubPort == -1 ? hubUrl.getDefaultPort(): hubPort;
+
 				cdp = cdp.replace(":" + cdpPort + "/", ":" + hubPort + "/");
 				((MutableCapabilities) capabilities).setCapability(SE_CDP_PREFIX, cdp);
 			} catch (MalformedURLException | URISyntaxException | NullPointerException e) {

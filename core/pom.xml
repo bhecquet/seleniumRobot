@@ -138,9 +138,14 @@
 			<groupId>ch.randelshofer</groupId>
 			<artifactId>org.monte.media.screenrecorder</artifactId>
 		</dependency>
+		<!-- kept for compatibility -->
 		<dependency>
 		    <groupId>com.konghq</groupId>
 		    <artifactId>unirest-java</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.konghq</groupId>
+			<artifactId>unirest-java-core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.konghq</groupId>

@@ -10,6 +10,7 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
+import com.seleniumtests.util.PackageUtility;
 import com.seleniumtests.util.logging.DebugMode;
 import org.jetbrains.annotations.NotNull;
 import org.mockito.Mock;
@@ -58,8 +59,8 @@ public class TestBrowserStackCapabilitiesFactory extends MockitoTest {
     }
 
 
-    private static String getBrowserstackOption(MutableCapabilities capa, String optionName) {
-        return ((Map<String, String>) capa.getCapability("bstack:options")).get(optionName);
+    private static Object getBrowserstackOption(MutableCapabilities capa, String optionName) {
+        return ((Map<String, Object>) capa.getCapability("bstack:options")).get(optionName);
     }
 
     /**
@@ -97,6 +98,10 @@ public class TestBrowserStackCapabilitiesFactory extends MockitoTest {
         Assert.assertEquals(getBrowserstackOption(capa, "os"), "OS X");
         Assert.assertEquals(getBrowserstackOption(capa, "osVersion"), "sequoia");
         Assert.assertEquals(getBrowserstackOption(capa, "browserVersion"), "140.0");
+        Assert.assertEquals(getBrowserstackOption(capa, "seleniumCdp"), true);
+        Assert.assertEquals(getBrowserstackOption(capa, "seleniumBidi"), true);
+        Assert.assertEquals(getBrowserstackOption(capa, "seleniumVersion"), PackageUtility.getSeleniumVersion());
+        Assert.assertEquals(getBrowserstackOption(capa, "maskCommands"), "setValues, getValues, setCookies, getCookies");
         Assert.assertEquals(capa.getBrowserName(), "chrome");
     }
 

@@ -24,6 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.util.PackageUtility;
 import org.openqa.selenium.MutableCapabilities;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -81,8 +82,15 @@ public class BrowserStackCapabilitiesFactory extends ICloudCapabilityFactory {
 			throw new ConfigurationException("Browserstack needs platform parameter");
 		}
 
-		Map<String, String> browserStackOptions = new HashMap<>();
-        
+		Map<String, Object> browserStackOptions = new HashMap<>();
+		browserStackOptions.put("seleniumCdp", true);
+		browserStackOptions.put("seleniumBidi", true);
+		browserStackOptions.put("seleniumVersion", PackageUtility.getSeleniumVersion());
+		browserStackOptions.put("maskCommands", "setValues, getValues, setCookies, getCookies");
+		if (webDriverConfig.getLocation() != null) {
+			browserStackOptions.put("geoLocation", webDriverConfig.getLocation());
+		}
+
         if (SeleniumTestsContextManager.isMobileTest()) {
 
 			// browserstack capabilities

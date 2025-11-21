@@ -104,24 +104,25 @@ public class SeleniumRobotTestPlan {
 	@AfterMethod(alwaysRun=true)
 	public void finishTestMethod(Method method, ITestResult testResult) {
 		
-		// stop video capture and log file
-		File videoFile = WebUIDriver.stopVideoCapture();
-		
+		// clean driver
+		// It will stop video capture and log file
+		File videoFile = WebUIDriver.cleanUp();
+
 		if (videoFile != null) {
 
-	        if (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.TRUE
-	        		|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_SUCCESS && testResult.isSuccess())
-	        		|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_ERROR && !testResult.isSuccess())) {
+			if (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.TRUE
+					|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_SUCCESS && testResult.isSuccess())
+					|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_ERROR && !testResult.isSuccess())) {
 
-	        	FileContent videoFileContent = logger.logFileToTestEnd(videoFile.getAbsoluteFile(), "Video capture");
+				FileContent videoFileContent = logger.logFileToTestEnd(videoFile.getAbsoluteFile(), "Video capture");
 
-	        	Info lastStateInfo = TestNGResultUtils.getTestInfo(testResult).get(TestStepManager.LAST_STATE_NAME);
-	        	if (lastStateInfo != null) {
-	        		((MultipleInfo)lastStateInfo).addInfo(new VideoLinkInfo(videoFileContent));
-	        	}
-	        	
-	        	logger.info("Video file copied to " + videoFile.getAbsolutePath());
-	        	
+				Info lastStateInfo = TestNGResultUtils.getTestInfo(testResult).get(TestStepManager.LAST_STATE_NAME);
+				if (lastStateInfo != null) {
+					((MultipleInfo)lastStateInfo).addInfo(new VideoLinkInfo(videoFileContent));
+				}
+
+				logger.info("Video file copied to " + videoFile.getAbsolutePath());
+
 			} else {
 				try {
 					Files.delete(Paths.get(videoFile.getAbsolutePath()));
@@ -131,9 +132,7 @@ public class SeleniumRobotTestPlan {
 			}
 		}
 
-		WebUIDriver.cleanUp();
 		SeleniumTestsContextManager.getThreadContext().setDriverCreationBlocked(true);
-		
 		SeleniumRobotTestListener.getCurrentListener().onTestFullyFinished(testResult);
 	}
 

@@ -198,6 +198,7 @@ public class SeleniumTestsContext {
     // Cloud specific properties
     public static final String VERSION = "version";								// browser version
     public static final String PLATFORM = "platform";							// platform on which test should execute. Ex: Windows 7, Android, iOS, Linux, OS X 10.10. 	
+    public static final String LOCATION = "location";							// location from which test will be run
 
     // internal use
     public static final String TEST_VARIABLES = "testVariables"; 				// configuration (aka variables, get via 'param()' method) used for the current test. It is not updated via XML file
@@ -446,7 +447,8 @@ public class SeleniumTestsContext {
 
         setVersion(getValueForTest(VERSION, System.getProperty(VERSION)));
         setPlatform(getValueForTest(PLATFORM, System.getProperty(PLATFORM)));
-        
+        setLocation(getValueForTest(LOCATION, System.getProperty(LOCATION)));
+
         setCustomTestReports(getValueForTest(CUSTOM_TEST_REPORTS, System.getProperty(CUSTOM_TEST_REPORTS)));
         setCustomSummaryReports(getValueForTest(CUSTOM_SUMMARY_REPORTS, System.getProperty(CUSTOM_SUMMARY_REPORTS)));
         setArchiveToFile(getValueForTest(ARCHIVE_TO_FILE, System.getProperty(ARCHIVE_TO_FILE)));
@@ -1496,6 +1498,10 @@ public class SeleniumTestsContext {
         return (String) getAttribute(PLATFORM);
     }
 
+    public String getLocation() {
+        return (String) getAttribute(LOCATION);
+    }
+
     public String getRelativeOutputDir() {
     	return (String) getAttribute(RELATIVE_OUTPUT_DIR);
     }
@@ -2184,6 +2190,10 @@ public class SeleniumTestsContext {
     
     public void setVersion(String version) {
     	setAttribute(VERSION, version);
+    }
+
+    public void setLocation(String location) {
+    	setAttribute(LOCATION, location);
     }
     
     /**

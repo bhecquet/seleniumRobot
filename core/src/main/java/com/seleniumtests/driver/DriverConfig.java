@@ -309,6 +309,10 @@ public class DriverConfig {
         return testContext.getVersion();
     }
 
+    public String getLocation() {
+        return testContext.getLocation();
+    }
+
 	public VideoCaptureMode getVideoCapture() {
 		return testContext.getVideoCapture();
 	}

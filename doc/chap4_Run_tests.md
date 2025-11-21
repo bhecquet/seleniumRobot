@@ -183,7 +183,7 @@ Settings for customizing the default seleniumRobot driver features. By default, 
 | extensionX.options		|			| options to pass to extension (only for firefox). Options must have the format: <key1>=<value1>;<key2>=<value2> |
 | chromeOptions				|			| allow to set any options to chrome executable. For example: to put chrome in "Dark mode", you will write: `-DchromeOptions="--force-dark-mode --enable-features=WebUIDarkMode"`. Other chrome options can be found here: https://peter.sh/experiments/chromium-command-line-switches/. To disable options set by default, use `-DchromeOptions="++no-sandbox"` |
 | edgeOptions				|			| see 'chromeOptions' |
-| webDriverGridTimeout		| 30		| Timeout in seconds when trying to get a session on selenium grid |
+| webDriverGridTimeout		| 1800		| Timeout in seconds when trying to get a session on selenium grid |
 
 
 

@@ -56,6 +56,7 @@ import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebDriver.Window;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import org.openqa.selenium.htmlunit.options.HtmlUnitDriverOptions;
 import org.openqa.selenium.remote.*;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
@@ -172,6 +173,52 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 
 			new CustomEventFiringWebDriver(realDriver, null, browserInfo, TestType.WEB, DriverMode.LOCAL, null);
 			verify(mockedAugmenter.constructed().get(0)).augment(realDriver);
+		}
+	}
+
+	/**
+	 * Check port for BiDi is updated (for testcontainers support)
+	 */
+	@Test(groups = {"ut"})
+	public void testUpdateBidiPort() {
+		MutableCapabilities caps = new HtmlUnitDriverOptions();
+		caps.setCapability("se:cdp", "wss://localhost:12345/abcde/bla");
+		caps.setCapability(SeleniumRobotCapabilityType.GRID_HUB, "https://localhost:4444/wd/hub");
+		HtmlUnitDriver realDriver = spy(new HtmlUnitDriver());
+		when(realDriver.getCapabilities()).thenReturn(caps);
+
+		try (MockedConstruction<Augmenter> mockedAugmenter = mockConstruction(Augmenter.class, (augmenter, context) ->
+				doAnswer(invocation -> realDriver)
+						.when(augmenter)
+						.augment(any()))
+		) {
+
+			CustomEventFiringWebDriver customEventFiringWebDriver = new CustomEventFiringWebDriver(realDriver, null, browserInfo, TestType.WEB, DriverMode.LOCAL, null);
+			Assert.assertEquals(customEventFiringWebDriver.getCapabilities().getCapability("se:cdp"), "wss://localhost:4444/abcde/bla");
+
+		}
+	}
+
+	/**
+	 * Check port for BiDi is updated (for testcontainers support) even if grid URL has no port defined (default port used)
+	 */
+	@Test(groups = {"ut"})
+	public void testUpdateBidiPortNoPortInUrl() {
+		MutableCapabilities caps = new HtmlUnitDriverOptions();
+		caps.setCapability("se:cdp", "wss://localhost:444/abcde/bla");
+		caps.setCapability(SeleniumRobotCapabilityType.GRID_HUB, "https://localhost/wd/hub");
+		HtmlUnitDriver realDriver = spy(new HtmlUnitDriver());
+		when(realDriver.getCapabilities()).thenReturn(caps);
+
+		try (MockedConstruction<Augmenter> mockedAugmenter = mockConstruction(Augmenter.class, (augmenter, context) ->
+				doAnswer(invocation -> realDriver)
+						.when(augmenter)
+						.augment(any()))
+		) {
+
+			CustomEventFiringWebDriver customEventFiringWebDriver = new CustomEventFiringWebDriver(realDriver, null, browserInfo, TestType.WEB, DriverMode.LOCAL, null);
+			Assert.assertEquals(customEventFiringWebDriver.getCapabilities().getCapability("se:cdp"), "wss://localhost:443/abcde/bla");
+
 		}
 	}
 

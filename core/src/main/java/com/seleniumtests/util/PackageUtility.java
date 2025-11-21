@@ -19,11 +19,14 @@ package com.seleniumtests.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -32,6 +35,8 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -226,4 +231,25 @@ public class PackageUtility {
 		version = version == null ? "" : version.trim();
 		return version.isEmpty() ? "unknown" : version;
 	}
+
+	public static String getSeleniumVersion() {
+		// use ChromeDriver because it's one of the sole selenium classes that are not embedded in core-selenium jar file
+		// probably due to weaving
+		URL url = ChromeDriver.class.getProtectionDomain().getCodeSource().getLocation();
+
+        try {
+            String jarFile = Paths.get(url.toURI()).toFile().getName();
+			Pattern versionPattern = Pattern.compile("^.*?(4.\\d+.\\d+).*$");
+			Matcher matcher = versionPattern.matcher(jarFile);
+			if (matcher.find()) {
+				return matcher.group(1);
+			} else {
+				logger.error("Unable to find version from jar file: {}, returns 4.37.0", jarFile);
+				return "4.37.0";
+			}
+        } catch (URISyntaxException e) {
+            logger.error("Cannot get selenium version, returns 4.37.0", e);
+			return "4.37.0";
+        }
+    }
 }

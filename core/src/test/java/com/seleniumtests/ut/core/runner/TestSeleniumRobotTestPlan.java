@@ -1,9 +1,6 @@
 package com.seleniumtests.ut.core.runner;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
@@ -30,27 +27,27 @@ public class TestSeleniumRobotTestPlan extends MockitoTest {
 	private TestStep currentTestStep;
 
 	@Test(groups= {"ut"})
-	public void testLoadUftScript() throws Exception {
+	public void testLoadUftScript() {
 
-		try (MockedConstruction mockedUft = mockConstruction(Uft.class)) {
+		try (MockedConstruction<Uft> mockedUft = mockConstruction(Uft.class)) {
 			Uft uftInstance = new SeleniumRobotTestPlan().loadUftScript("", "", "", "", "", "", false);
 			Assert.assertEquals(uftInstance, mockedUft.constructed().get(0));
-			verify((Uft)mockedUft.constructed().get(0)).loadScript(false);
+			verify(mockedUft.constructed().get(0)).loadScript(false);
 		}
 	}
 	
 	@Test(groups= {"ut"})
-	public void testExecuteUftScriptSuccess() throws Exception {
+	public void testExecuteUftScriptSuccess() {
 
-		try (MockedStatic mockedStepManager = mockStatic(TestStepManager.class)) {
+		try (MockedStatic<TestStepManager> mockedStepManager = mockStatic(TestStepManager.class)) {
 			mockedStepManager.when(TestStepManager::getCurrentRootTestStep).thenReturn(currentTestStep);
 
 			Map<String, String> params = new HashMap<>();
 			params.put("foo", "bar");
 
-			TestStep step = new TestStep("step", "step", this.getClass(), null, new ArrayList<String>(), false);
+			TestStep step = new TestStep("step", "step", this.getClass(), null, new ArrayList<>(), false);
 
-			when(uft.executeScript(5, params)).thenReturn(Arrays.asList(step));
+			when(uft.executeScript(5, params)).thenReturn(List.of(step));
 
 			new SeleniumRobotTestPlan().executeUftScript(uft, 5, params);
 			verify(uft).executeScript(5, params);
@@ -64,15 +61,15 @@ public class TestSeleniumRobotTestPlan extends MockitoTest {
 	}
 	
 	@Test(groups= {"ut"}, expectedExceptions = ScenarioException.class, expectedExceptionsMessageRegExp = "UFT execution failed on script null")
-	public void testExecuteUftScriptFailure() throws Exception {
+	public void testExecuteUftScriptFailure() {
 		
 		Map<String, String> params = new HashMap<>();
 		params.put("foo", "bar");
 		
-		TestStep step = new TestStep("step", "step", this.getClass(), null, new ArrayList<String>(), false);
+		TestStep step = new TestStep("step", "step", this.getClass(), null, new ArrayList<>(), false);
 		step.setFailed(true);
 		
-		when(uft.executeScript(5, params)).thenReturn(Arrays.asList(step));
+		when(uft.executeScript(5, params)).thenReturn(List.of(step));
 		
 		new SeleniumRobotTestPlan().executeUftScript(uft, 5, params);
 	}

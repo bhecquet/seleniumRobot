@@ -239,21 +239,26 @@ public class WebUIDriver {
 
     /**
      * Clean all WebUIDriver for this thread
+	 * @return the video file that has been generated after driver quitting
      */
-    public static void cleanUp() {
-    	
+    public static File cleanUp() {
+
+		File videoFile = null;
     	if (uxDriverSession.get() == null) {
-    		return;
+    		return null;
     	}
     	
     	for (WebUIDriver webuiDriver: uxDriverSession.get().values()) {
     		if (webuiDriver != null) {
-    			webuiDriver.clean();
+    			File file = webuiDriver.clean();
+				if (file != null) {
+					videoFile = file;
+				}
     		}
     	}
     	
 		cleanUpWebUIDriver();
-
+		return videoFile;
     }
     
     /**
@@ -364,13 +369,15 @@ public class WebUIDriver {
     }
     	
     /**
-     * Cleans the driver created by this class: 
-     * quit  browser
-     * remove pids
-     * stop appium
-     * dereference driver in this WebUIDriver
-     */
-    private void clean() {
+	 * Cleans the driver created by this class:
+	 * quit  browser
+	 * remove pids
+	 * stop appium
+	 * dereference driver in this WebUIDriver
+	 *
+	 * @return the video file, or null if it cannot be get
+	 */
+    private File clean() {
     	
     	if (driver != null && driver instanceof CustomEventFiringWebDriver customEventFiringWebDriver && customEventFiringWebDriver.isDriverExited()) {
     		driver = null;
@@ -425,7 +432,7 @@ public class WebUIDriver {
         }
 
 		// stop video capture
-		stopVideoCapture();
+		return stopVideoCapture();
 		
     }
 
