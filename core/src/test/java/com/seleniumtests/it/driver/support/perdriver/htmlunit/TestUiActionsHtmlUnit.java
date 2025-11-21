@@ -36,7 +36,7 @@ public class TestUiActionsHtmlUnit extends TestUiActions {
 	
 	@Override
     @Test(groups={"it"})
-	public void testNewActionWithHtmlElement() throws Exception {
+	public void testNewActionWithHtmlElement() {
 		// skip as htmlunit does not support it
 	}
 
@@ -54,13 +54,13 @@ public class TestUiActionsHtmlUnit extends TestUiActions {
 	
 	@Override
     @Test(groups={"it"}) 
-	public void testSendKeysWithHtmlElement() throws Exception {
+	public void testSendKeysWithHtmlElement() {
 		// skip as htmlunit does not support it
 	}
 	
 	@Override
     @Test(groups={"it"}) 
-	public void testSendKeysWithHtmlElementNotPresent() throws Exception {
+	public void testSendKeysWithHtmlElementNotPresent() {
 		// skip as htmlunit does not support it
 	}
 }

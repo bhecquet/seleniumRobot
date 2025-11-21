@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import com.seleniumtests.browserfactory.*;
-import com.seleniumtests.browserfactory.chrome.ChromeUtils;
+import com.seleniumtests.browserfactory.chrome.ChromiumUtils;
 import com.seleniumtests.connectors.extools.FFMpeg;
 import com.seleniumtests.customexception.RetryableDriverException;
 import com.seleniumtests.util.har.*;
@@ -81,7 +81,7 @@ public class WebUIDriver {
     private static final ThreadLocal<String> currentWebUiDriverName = new ThreadLocal<>();
     private String name;
     private DriverConfig config;
-    private WebDriver driver;
+    private CustomEventFiringWebDriver driver;
     private IWebDriverFactory webDriverBuilder;
     private static final Object createDriverLock = new Object();
 
@@ -113,10 +113,12 @@ public class WebUIDriver {
      * - record driver and browser pid so that they can be deleted at the end of test session
      * @return	the created driver
      */
-	public WebDriver createRemoteWebDriver()  {
-        
+	public CustomEventFiringWebDriver createRemoteWebDriver()  {
+
+		CustomEventFiringWebDriver customEventFiringWebDriver;
+		WebDriver originalDriver;
+
 		webDriverBuilder = getWebDriverBuilderFactory();
-        
 
         // synchronizing is only useful in local mode, as we need to get the PID of browser and driver
         // in grid mode, PID list will be empty
@@ -139,8 +141,8 @@ public class WebUIDriver {
     		long duration;
     		
     		try {
-    			
-    			driver = webDriverBuilder.createWebDriver();
+
+				originalDriver = webDriverBuilder.createWebDriver();
     		} finally {
 
     			duration = new Date().getTime() - start;
@@ -161,10 +163,10 @@ public class WebUIDriver {
             
             // issue #280: we use 'webDriverBuilder.getSelectedBrowserInfo()' as 'browserInfo' variable is null for grid, whereas, 'webDriverBuilder.getSelectedBrowserInfo()'
             // gets an updated version once the driver has been created on grid
-            driver = handleListeners(driver, webDriverBuilder.getSelectedBrowserInfo(), driverPids);
+			customEventFiringWebDriver = handleListeners(originalDriver, webDriverBuilder.getSelectedBrowserInfo(), driverPids);
             
-            if (driver != null) { // driver is a CustomEventFiringWebDriver here
-    			MutableCapabilities caps = ((CustomEventFiringWebDriver)driver).getInternalCapabilities();
+            if (customEventFiringWebDriver != null) { // driver is a CustomEventFiringWebDriver here
+    			MutableCapabilities caps = customEventFiringWebDriver.getInternalCapabilities();
     			caps.setCapability(SeleniumRobotCapabilityType.STARTUP_DURATION, duration);
                 caps.setCapability(SeleniumRobotCapabilityType.START_TIME, start);
 
@@ -192,7 +194,7 @@ public class WebUIDriver {
 
         
 
-        return driver;
+        return customEventFiringWebDriver;
     }
 
 	/**
@@ -320,31 +322,28 @@ public class WebUIDriver {
      * Logs current state of the browser
      */
     private void logFinalDriverState(ITestResult testResult) {
-    	if (driver != null && driver instanceof CustomEventFiringWebDriver customEventFiringWebDriver && customEventFiringWebDriver.isDriverExited()) {
+    	if (driver != null && driver.isDriverExited()) {
     		driver = null;
     	}
     	
     	if (driver != null) {
 			try {
 
-				if (driver instanceof CustomEventFiringWebDriver customEventFiringWebDriver) {
+				// #539: mobile tests do not support switch to default content
+				if (driver.isWebTest()) {
+					// issue #414: capture the whole screen
+					driver.switchTo().defaultContent();
+				}
 
-					// #539: mobile tests do not support switch to default content
-					if (customEventFiringWebDriver.isWebTest()) {
-						// issue #414: capture the whole screen
-						driver.switchTo().defaultContent();
-					}
+				// force screenshotUtil to use the driver of this WebUiDriver, not the currently selected one
+				// do it only when driver is a regular CustomEventFiringWebdriver (#619)
+				for (ScreenShot screenshot : new ScreenshotUtil(driver).capture(SnapshotTarget.PAGE, ScreenShot.class, true, true)) {
+					scenarioLogger.logScreenshot(screenshot, null, name, SnapshotCheckType.FALSE);
 
-					// force screenshotUtil to use the driver of this WebUiDriver, not the currently selected one
-					// do it only when driver is a regular CustomEventFiringWebdriver (#619)
-					for (ScreenShot screenshot : new ScreenshotUtil(driver).capture(SnapshotTarget.PAGE, ScreenShot.class, true, true)) {
-						scenarioLogger.logScreenshot(screenshot, null, name, SnapshotCheckType.FALSE);
-
-						// add the last screenshots to TestInfo so that there is a quicklink on reports
-						Info lastStateInfo = TestNGResultUtils.getTestInfo(testResult).get(TestStepManager.LAST_STATE_NAME);
-						if (lastStateInfo != null) {
-							((MultipleInfo) lastStateInfo).addInfo(new ImageLinkInfo(screenshot.getImage()));
-						}
+					// add the last screenshots to TestInfo so that there is a quicklink on reports
+					Info lastStateInfo = TestNGResultUtils.getTestInfo(testResult).get(TestStepManager.LAST_STATE_NAME);
+					if (lastStateInfo != null) {
+						((MultipleInfo) lastStateInfo).addInfo(new ImageLinkInfo(screenshot.getImage()));
 					}
 				}
 			} catch (Exception e) {
@@ -379,7 +378,7 @@ public class WebUIDriver {
 	 */
     private File clean() {
     	
-    	if (driver != null && driver instanceof CustomEventFiringWebDriver customEventFiringWebDriver && customEventFiringWebDriver.isDriverExited()) {
+    	if (driver != null && driver.isDriverExited()) {
     		driver = null;
     	}
 
@@ -470,8 +469,8 @@ public class WebUIDriver {
 	private boolean parsePerformanceLogs(List<LogEntry> logEntries) {
 		Har har = null;
 		try {
-			if (TestStepManager.getInstance() != null && driver != null && driver instanceof CustomEventFiringWebDriver customEventFiringWebDriver && customEventFiringWebDriver.getBrowserInfo().getBrowser() == BrowserType.CHROME) {
-				har = ChromeUtils.parsePerformanceLogs(logEntries, TestStepManager.getInstance().getTestSteps());
+			if (TestStepManager.getInstance() != null && driver != null && driver.getBrowserInfo().getBrowser() == BrowserType.CHROME) {
+				har = ChromiumUtils.parsePerformanceLogs(logEntries, TestStepManager.getInstance().getTestSteps());
 			}
 		} catch (Exception e) {
 			logger.error("error parsing performance logs", e);
@@ -518,19 +517,20 @@ public class WebUIDriver {
      *
      * @param   isCreate  create webdriver or not
      */
-    public static WebDriver getWebDriver(final Boolean isCreate) {
+    public static CustomEventFiringWebDriver getWebDriver(final Boolean isCreate) {
     	return getWebDriver(isCreate, null, getCurrentWebUiDriverName(), null);
     }
     
     /**
-     * Returns WebDriver instance Creates a new WebDriver Instance if it is null and isCreate is true.
+     * Returns CustomEventFiringWebDriver instance
+	 * Creates a new CustomEventFiringWebDriver Instance if it is null and isCreate is true.
      *
      * @param   isCreate  					create webdriver or not
      * @param	browserType					the new browser type to create. If null, and creation is requested, then the browser configured by user or configuration will be created
      * @param	driverName					a logical name to give to the created driver
      * @param	attachExistingDriverPort 	if we need to attach to an existing browser instead of creating one, then specify the port here
      */
-    public static WebDriver getWebDriver(Boolean isCreate, BrowserType browserType, String driverName, Integer attachExistingDriverPort) {
+    public static CustomEventFiringWebDriver getWebDriver(Boolean isCreate, BrowserType browserType, String driverName, Integer attachExistingDriverPort) {
     	
     	if (driverName == null) {
     		throw new ScenarioException("A name must be given to the driver");
@@ -543,13 +543,11 @@ public class WebUIDriver {
     	if (Boolean.TRUE.equals(isCreate) && !SeleniumTestsContextManager.isNonGuiTest()) {
 	    	if (uxDriverSession.get() == null 
 	        		|| uxDriverSession.get().get(driverName) == null 
-	        		|| uxDriverSession.get().get(driverName).driver == null
-					|| !(uxDriverSession.get().get(driverName).driver instanceof CustomEventFiringWebDriver)) {
+	        		|| uxDriverSession.get().get(driverName).driver == null) {
 	    		createDriver = true;
 	    	
 	    	// we have a driver referenced for this name, is it still available (not closed)
-	    	} else if (uxDriverSession.get().get(driverName).driver instanceof CustomEventFiringWebDriver customEventFiringWebDriver
-					&& customEventFiringWebDriver.isBrowserOrAppClosed()) {
+	    	} else if (uxDriverSession.get().get(driverName).driver.isBrowserOrAppClosed()) {
     			uxDriverSession.get().remove(driverName);
     			createDriver = true;
 	    	}
@@ -638,13 +636,7 @@ public class WebUIDriver {
     		throw new ScenarioException(String.format("driver with name %s has not been created", driverName));
     	}
 
-		if (uxDriverSession.get().get(driverName).driver != null && !(uxDriverSession.get().get(driverName).driver instanceof CustomEventFiringWebDriver)) {
-			logger.warn("Cannot switch to driver, this is not a CustomEventFiringWebDriver");
-			return;
-		}
-
-		if (uxDriverSession.get().get(driverName).driver instanceof CustomEventFiringWebDriver
-				&& ((CustomEventFiringWebDriver)(uxDriverSession.get().get(driverName).driver)).isBrowserOrAppClosed()) {
+		if (uxDriverSession.get().get(driverName).driver.isBrowserOrAppClosed()) {
     		throw new ScenarioException("Cannot switch to a closed driver");
     	}
 
@@ -698,7 +690,7 @@ public class WebUIDriver {
      *
      * @param  driver	the driver to set
      */
-    public static void setWebDriver(final WebDriver driver) {
+    public static void setWebDriver(final CustomEventFiringWebDriver driver) {
         if (driver == null) {
         	if (uxDriverSession.get() != null && uxDriverSession.get().get(getCurrentWebUiDriverName()) != null) {
         		uxDriverSession.get().get(getCurrentWebUiDriverName()).driver = null;
@@ -710,7 +702,7 @@ public class WebUIDriver {
         }
     }
 
-    protected WebDriver handleListeners(WebDriver driver, BrowserInfo browserInfo, List<Long> driverPids) {
+    protected CustomEventFiringWebDriver handleListeners(WebDriver driver, BrowserInfo browserInfo, List<Long> driverPids) {
 
     	return new CustomEventFiringWebDriver(driver,
 																	driverPids, 
@@ -750,10 +742,8 @@ public class WebUIDriver {
      * Get version from browser capabilities and display it
      */
     private void displayBrowserVersion() {
-    	if (!(driver instanceof CustomEventFiringWebDriver)) {
-    		return;
-    	}
-    	Capabilities caps = ((CustomEventFiringWebDriver) driver).getCapabilities();
+
+    	Capabilities caps = driver.getCapabilities();
         String browserName = caps.getBrowserName();
         String browserVersion = caps.getBrowserVersion(); 
         
@@ -772,7 +762,7 @@ public class WebUIDriver {
      * @return the driver
      * @throws ScenarioException in case we are not allowed to create it (if we are in @BeforeMethod and after @AfterMethod)
      */
-    public WebDriver createWebDriver() {
+    public CustomEventFiringWebDriver createWebDriver() {
     	
     	if (useAppium()) {
     		logger.info("Start creating appium driver");
@@ -849,14 +839,14 @@ public class WebUIDriver {
 	/**
 	 * Gets the driver created inside this WebUIDriver
 	 */
-	public WebDriver getDriver() {
+	public CustomEventFiringWebDriver getDriver() {
 		return driver;
 	}
 
 	/**
 	 * FOR TEST ONLY
 	 */
-	public void setDriver(WebDriver driver) {
+	public void setDriver(CustomEventFiringWebDriver driver) {
 		this.driver = driver;
 	}
 

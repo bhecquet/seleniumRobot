@@ -33,8 +33,8 @@ public class TestSauceLabsDriverFactory extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().setRunMode("saucelabs");
 		SeleniumTestsContextManager.getThreadContext().configureContext(Reporter.getCurrentTestResult());
 		
-		WebDriver driver = WebUIDriver.getWebDriver(true);
-		WebDriver realDriver = ((CustomEventFiringWebDriver)driver).getWebDriver();
+		CustomEventFiringWebDriver driver = WebUIDriver.getWebDriver(true);
+		WebDriver realDriver = driver.getWebDriver();
 
 		
 		

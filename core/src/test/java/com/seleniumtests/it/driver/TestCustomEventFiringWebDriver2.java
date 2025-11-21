@@ -18,7 +18,6 @@
 package com.seleniumtests.it.driver;
 
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -36,7 +35,7 @@ import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 public class TestCustomEventFiringWebDriver2 extends GenericMultiBrowserTest {
 
 
-    public TestCustomEventFiringWebDriver2(WebDriver driver, DriverTestPage testPage) {
+    public TestCustomEventFiringWebDriver2(CustomEventFiringWebDriver driver, DriverTestPage testPage) {
 		super(driver, testPage);
 	}
 	
@@ -68,8 +67,8 @@ public class TestCustomEventFiringWebDriver2 extends GenericMultiBrowserTest {
 	
 	@Test(groups={"it"})
 	public void testFixedHeaderFooterDimensions() {
-		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getTopFixedHeaderSize(), (Long)7L);
-		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getBottomFixedFooterSize(), (Long)6L);
+		Assert.assertEquals(driver.getTopFixedHeaderSize(), (Long)7L);
+		Assert.assertEquals(driver.getBottomFixedFooterSize(), (Long)6L);
 	}
 	
 	/**
@@ -79,14 +78,14 @@ public class TestCustomEventFiringWebDriver2 extends GenericMultiBrowserTest {
 	public void testFixedBigHeaderFooterDimensionsFullHeight() {
 		driver.manage().window().setSize(new Dimension(500, 700));
 		testPage.veryBigHeaderButton.click();
-		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getTopFixedHeaderSize(), (Long)0L);
+		Assert.assertEquals(driver.getTopFixedHeaderSize(), (Long)0L);
 	}
 	
 	@Test(groups={"it"})
 	public void testFixedBigHeaderFooterDimensionsFullHeight2() {
 		driver.manage().window().setSize(new Dimension(500, 700));
 		testPage.veryBigFooterButton.click();
-		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getBottomFixedFooterSize(), (Long)0L);
+		Assert.assertEquals(driver.getBottomFixedFooterSize(), (Long)0L);
 	}
 	
 	/**
@@ -95,9 +94,9 @@ public class TestCustomEventFiringWebDriver2 extends GenericMultiBrowserTest {
 	@Test(groups={"it"})
 	public void testFixedBigHeaderFooterDimensionsPartialHeight() {
 		testPage.veryBigHeaderButton.click();
-		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getTopFixedHeaderSize(), (Long)300L);
+		Assert.assertEquals(driver.getTopFixedHeaderSize(), (Long)300L);
 		testPage.veryBigFooterButton.click();
-		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getBottomFixedFooterSize(), (Long)300L);
+		Assert.assertEquals(driver.getBottomFixedFooterSize(), (Long)300L);
 	}
 	
 	/**
@@ -107,9 +106,9 @@ public class TestCustomEventFiringWebDriver2 extends GenericMultiBrowserTest {
 	public void testFixedHeaderFooterDimensionsPartialWidth() {
 		driver.manage().window().setSize(new Dimension(500, 700));
 		testPage.bigHeaderButton.click();
-		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getTopFixedHeaderSize(), (Long)40L);
+		Assert.assertEquals(driver.getTopFixedHeaderSize(), (Long)40L);
 		testPage.bigFooterButton.click();
-		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getBottomFixedFooterSize(), (Long)50L);
+		Assert.assertEquals(driver.getBottomFixedFooterSize(), (Long)50L);
 	}
 	
 	/**
@@ -118,9 +117,9 @@ public class TestCustomEventFiringWebDriver2 extends GenericMultiBrowserTest {
 	@Test(groups={"it"})
 	public void testFixedHeaderFooterDimensionsFullWidth() {
 		testPage.bigHeaderButton.click();
-		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getTopFixedHeaderSize(), (Long)7L);
+		Assert.assertEquals(driver.getTopFixedHeaderSize(), (Long)7L);
 		testPage.bigFooterButton.click();
-		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getBottomFixedFooterSize(), (Long)5L); // should be 6, but has green line is only 1 pixel height, when bigFooter is up, computation fails
+		Assert.assertEquals(driver.getBottomFixedFooterSize(), (Long)5L); // should be 6, but has green line is only 1 pixel height, when bigFooter is up, computation fails
 	}
 
 }

@@ -89,7 +89,7 @@ public class TextFieldElement extends HtmlElement {
         getRealElementNoSearch().click();
 
         // hide keyboard for mobile
-        ((CustomEventFiringWebDriver)getDriver()).hideKeyboard();
+        (getDriver()).hideKeyboard();
         getRealElementNoSearch().sendKeys(keysToSend);
         
         if (blurAfter) {

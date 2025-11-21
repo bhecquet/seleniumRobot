@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,7 +29,7 @@ import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 
 public class TestUiActions extends GenericMultiBrowserTest {
 
-	public TestUiActions(BrowserType browserType) throws Exception {
+	public TestUiActions(BrowserType browserType) {
 		super(browserType, "DriverTestPage"); 
 	}
 	
@@ -43,7 +43,7 @@ public class TestUiActions extends GenericMultiBrowserTest {
 	
 	public void testNewAction() {
 		try {
-			new Actions(((CustomEventFiringWebDriver)driver).getWebDriver()).moveToElement(driver.findElement(By.id("carre2"))).click().build().perform();
+			new Actions(driver.getWebDriver()).moveToElement(driver.findElement(By.id("carre2"))).click().build().perform();
 			Assert.assertEquals(driver.findElement(By.id("text2")).getDomProperty("value"), "coucou");
 		} finally {
 			new Actions(driver).moveToElement(driver.findElement(By.id("button2"))).click().build().perform();
@@ -53,12 +53,11 @@ public class TestUiActions extends GenericMultiBrowserTest {
 
 	/**
 	 * Test composite action with seleniumRobot syntax (HtmlElement) and native driver
-	 * @throws Exception
 	 */
 	
-	public void testNewActionWithHtmlElement() throws Exception {
+	public void testNewActionWithHtmlElement() {
 		try {
-			new Actions(((CustomEventFiringWebDriver)driver).getWebDriver()).moveToElement(DriverTestPage.redSquare).click().build().perform();
+			new Actions(driver.getWebDriver()).moveToElement(DriverTestPage.redSquare).click().build().perform();
 			Assert.assertEquals(driver.findElement(By.id("text2")).getDomProperty("value"), "coucou");
 		} finally {
 			new Actions(driver).moveToElement(driver.findElement(By.id("button2"))).click().build().perform();
@@ -91,7 +90,7 @@ public class TestUiActions extends GenericMultiBrowserTest {
 	}
 	
 	
-	public void testSendKeysWithHtmlElement() throws Exception {
+	public void testSendKeysWithHtmlElement() {
 		try {
 			new Actions(driver).moveToElement(DriverTestPage.textElement).click().sendKeys("youpi2").build().perform();
 			Assert.assertEquals(DriverTestPage.textElement.getDomProperty("value"), "youpi2");
@@ -101,7 +100,7 @@ public class TestUiActions extends GenericMultiBrowserTest {
 	}
 	
 	
-	public void testSendKeysWithHtmlElementNotPresent() throws Exception {
+	public void testSendKeysWithHtmlElementNotPresent() {
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
 		try {
 			new Actions(driver).moveToElement(DriverTestPage.textElementNotPresent).click().sendKeys("youpi2").build().perform();

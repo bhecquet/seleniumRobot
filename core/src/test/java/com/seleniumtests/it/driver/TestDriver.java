@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -57,15 +57,15 @@ import com.seleniumtests.util.helper.WaitHelper;
 
 public class TestDriver extends GenericMultiBrowserTest {
 
-	public TestDriver(WebDriver driver, DriverTestPage testPage) throws Exception {
+	public TestDriver(CustomEventFiringWebDriver driver, DriverTestPage testPage) {
 		super(driver, testPage);
 	}
 	
-	public TestDriver(BrowserType browserType) throws Exception {
+	public TestDriver(BrowserType browserType) {
 		super(browserType, "DriverTestPage"); 
 	}
 	
-	public TestDriver() throws Exception {
+	public TestDriver() {
 		super(null, "DriverTestPage");
 	}
 	
@@ -76,7 +76,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 			driver.switchTo().window(new ArrayList<>(driver.getWindowHandles()).get(0));
 			DriverTestPage.logoText.clear();
 			DriverTestPage.textElement.clear();
-			((CustomEventFiringWebDriver)driver).scrollTop();
+			driver.scrollTop();
 		}
 	}
 	
@@ -116,7 +116,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		DriverTestPage.greenSquare.click();
 		DriverTestPage.redSquare.click();
 		
-		if (((CustomEventFiringWebDriver)driver).getOriginalDriver() instanceof FirefoxDriver && FirefoxDriverFactory.isMarionetteMode()) {
+		if (driver.getOriginalDriver() instanceof FirefoxDriver && FirefoxDriverFactory.isMarionetteMode()) {
 			throw new UnhandledAlertException("fake exception as firefox / marionette does not raise any exception");
 		}
 	}
@@ -364,7 +364,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		Assert.assertEquals(new HtmlElement("", By.name("foobar")).findElements().size(), 0);
 
 		long delay = new Date().getTime() - start;
-		logger.info("Action duration: " + delay + " ms");
+		logger.info("Action duration: {} ms", delay);
 		Assert.assertTrue(delay > 6500); // using timing is not a problem here as in case of slowness, search will be longer
 	}
 	
@@ -378,7 +378,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		DriverTestPage.resetButton.click();
 		DriverTestPage.resetButton.click();
 		long delay = new Date().getTime() - start;
-		logger.info("Action duration: " + delay + " ms");
+		logger.info("Action duration: {} ms", delay);
 
 		// using timing is not a problem here as in case of slowness, search will be longer
 		Assert.assertTrue(delay > 14000); // 3 commands with wait
@@ -393,7 +393,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		DriverTestPage.resetButton.click();
 		DriverTestPage.resetButton.click();
 		long delay = new Date().getTime() - start;
-		logger.info("Action duration: " + delay + " ms");
+		logger.info("Action duration: {} ms", delay);
 		Assert.assertTrue(delay < 1500); // 3 commands without wait
 	}
 	/**
@@ -405,7 +405,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		DriverTestPage.redSquare.getCoordinates();
 		DriverTestPage.resetButton.getCenter();
 		long delay = new Date().getTime() - start;
-		logger.info("Action duration: " + delay + " ms");
+		logger.info("Action duration: {} ms", delay);
 		Assert.assertTrue(delay < 4000); // 2 commands without wait, we should be lower than the defined action delay
 	}
 	
@@ -606,6 +606,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 			try {
 				new WebDriverWait(driver, Duration.ofSeconds(2)).until(ExpectedConditions.visibilityOf(new HtmlElement("", By.id("someNonExistentId"))));
 			} catch (TimeoutException e) {
+				// ignore
 			}
 
 			// we cannot check precise timing as it depends on the hardware, but we should never wait more that 10 secs (the default timeout for searching element is 30 secs)
@@ -625,7 +626,9 @@ public class TestDriver extends GenericMultiBrowserTest {
 		long start = new Date().getTime();
 		try {
 			new HtmlElement("", By.id("someNonExistentId")).getText();
-		} catch (NoSuchElementException e) {}
+		} catch (NoSuchElementException e) {
+			// ignore
+		}
 		
 		// Check we wait at least for the timeout set
 		Assert.assertTrue(new Date().getTime() - start > 6500);
@@ -683,16 +686,14 @@ public class TestDriver extends GenericMultiBrowserTest {
 	public void testAutoScrolling() {
 		((JavascriptExecutor) driver).executeScript("window.scrollTo(0, 0);");
 		DriverTestPage.scrollButton.click();
-		Assert.assertFalse(((JavascriptExecutor) driver).executeScript("return window.pageYOffset;").equals(0L));
+        Assert.assertNotEquals(driver.executeScript("return window.pageYOffset;"), 0L);
 	}
 	
 	/**
 	 * Test file upload in case selenium method does not work. This uses the java Robot version which controls mouse and keyboard
-	 * @throws AWTException
-	 * @throws InterruptedException
 	 */
 	
-	public void testUploadFileWithRobot() throws AWTException, InterruptedException {
+	public void testUploadFileWithRobot() {
 		String path = SeleniumTestsContextManager.getConfigPath() + File.separator + "envSpecific.ini";
 //		DriverTestPage.upload.click();
 		DriverTestPage.uploadedFile.click(); // when executing both testUploadFileWithRobotXX tests, the second one fails on firefox because focus is on '<input type="file">' element
@@ -705,11 +706,9 @@ public class TestDriver extends GenericMultiBrowserTest {
 	
 	/**
 	 * Force driver to use full keyboard typing when writing text instead of using copy-paste feature
-	 * @throws AWTException
-	 * @throws InterruptedException
 	 */
 	
-	public void testUploadFileWithRobotKeyboard() throws AWTException, InterruptedException {
+	public void testUploadFileWithRobotKeyboard() {
 		String path = Paths.get(SeleniumTestsContextManager.getConfigPath(), "spec", "envSpecific2.ini").toString();
 //		DriverTestPage.upload.click();
 		DriverTestPage.uploadedFile.click(); // when executing both testUploadFileWithRobotXX tests, the second one fails on firefox because focus is on '<input type="file">' element
@@ -722,11 +721,9 @@ public class TestDriver extends GenericMultiBrowserTest {
 	
 	/**
 	 * Test file upload with standard selenium method
-	 * @throws AWTException
-	 * @throws InterruptedException
 	 */
 	
-	public void testUploadFile() throws AWTException, InterruptedException {
+	public void testUploadFile() {
 		String path = SeleniumTestsContextManager.getConfigPath() + File.separator + "config.ini";
 		DriverTestPage.upload.sendKeys(path);
 		
@@ -1066,11 +1063,6 @@ public class TestDriver extends GenericMultiBrowserTest {
 		}
 	}
 	
-	/**
-	 * 
-	 * @throws Exception
-	 */
-	
 	public void testCaptureWhenWindowIsClosed() throws Exception {
 		DriverTestPage page = new DriverTestPage();
 		page._goToNewPage();
@@ -1089,6 +1081,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		try {
 			driver.getCurrentUrl();
 		} catch (NoSuchWindowException e) {
+			// ignore
 		}
 		
 		Assert.assertNotNull(WebUIDriver.getWebDriver(false));

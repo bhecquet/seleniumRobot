@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -60,11 +60,9 @@ import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.imaging.ImageDetector;
 
 public class TestBrowserSnapshot extends GenericMultiBrowserTest {
-	
-	
-	private final String browserName = "chrome";
-	
-	public TestBrowserSnapshot(WebDriver driver, DriverTestPage testPage) throws Exception {
+
+
+    public TestBrowserSnapshot(CustomEventFiringWebDriver driver, DriverTestPage testPage) {
 		super(driver, testPage);
 	}
 	
@@ -73,10 +71,11 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 	}
 	
 	@BeforeMethod(groups={"it"})
-	public void initDriver(final ITestContext testNGCtx, final ITestResult testResult) throws Exception {
+	public void initDriver(final ITestContext testNGCtx, final ITestResult testResult) {
 		initThreadContext(testNGCtx, null, testResult);
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
-		SeleniumTestsContextManager.getThreadContext().setBrowser(browserName);
+        String browserName = "chrome";
+        SeleniumTestsContextManager.getThreadContext().setBrowser(browserName);
 		SeleniumTestsContextManager.getThreadContext().setSnapshotBottomCropping(0); // no cropping at all
 		SeleniumTestsContextManager.getThreadContext().setSnapshotTopCropping(0); // no cropping at all
 //		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://127.0.0.1:4444/wd/hub");
@@ -96,8 +95,6 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 	/**
 	 * Read the capture file to detect dimension
 	 * It assumes that picture background is white and counts the number of white pixels in width and height (first column and first row)
-	 * @return
-	 * @throws IOException 
 	 */
 	private Dimension getViewPortDimension(File picture) throws IOException {
 		BufferedImage image = ImageIO.read(picture);
@@ -123,12 +120,7 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 	 * Test page contains fixed header (yellow) and footer (orange) of 5 pixels height. Detect how many
 	 * pixels of these colors are present in picture
 	 * Also count red/green pixels which is a line not to remove when cropping
-	 * 
-	 * /!\ DESKTOP PIXEL ASPECT RATIO MUST BE SET TO 100% so that count is done correctly 
-	 * 
-	 * @param picture
-	 * @return
-	 * @throws IOException 
+	 * /!\ DESKTOP PIXEL ASPECT RATIO MUST BE SET TO 100% so that count is done correctly
 	 */
 	private int[] getHeaderAndFooterPixels(File picture) throws IOException {
 		BufferedImage image = ImageIO.read(picture);
@@ -163,7 +155,6 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 	
 	/**
 	 * Test if we succeed in removing scrollbars from capture (horizontal and vertical)
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
 	public void testRemoveScrollbarCapture() throws IOException {
@@ -185,7 +176,6 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 	
 	/**
 	 * Test when no scrollbar is present in capture
-	 * @throws Exception 
 	 */
 	@Test(groups={"it"})
 	public void testNoScrollbarCapture() throws Exception {
@@ -208,17 +198,16 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 	/**
 	 * issue #272: Test taking snapshot inside an iframe when some javascript error occurs. This happens with some website where access to iframe seems denied
 	 * We want to get source and title, even if picture is not get
-	 * @throws Exception 
 	 */
 	@Test(groups={"it"})
-	public void testSnapshotWithJavascriptErrors() throws Exception {
+	public void testSnapshotWithJavascriptErrors() {
 		
 		driver.switchTo().frame(DriverTestPage.iframe.getElement());
 		
 		// get real capture
 		generateCaptureFilePath();
 
-		CustomEventFiringWebDriver mockedDriver = (CustomEventFiringWebDriver) spy(driver);
+		CustomEventFiringWebDriver mockedDriver = spy(driver);
 		ScreenshotUtil screenshotUtil = spy(new ScreenshotUtil(mockedDriver));
 		
 		doThrow(JavascriptException.class).when(mockedDriver).scrollTop();
@@ -231,17 +220,16 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 	
 	/**
 	 * Test that if an unexpected error occurs when snapshot is taken, take desktop
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testSnapshotWithErrors() throws Exception {
+	public void testSnapshotWithErrors() {
 		
 		driver.switchTo().frame(DriverTestPage.iframe.getElement());
 		
 		// get real capture
 		generateCaptureFilePath();
 		
-		CustomEventFiringWebDriver mockedDriver = (CustomEventFiringWebDriver) spy(driver);
+		CustomEventFiringWebDriver mockedDriver = spy(driver);
 		ScreenshotUtil screenshotUtil = spy(new ScreenshotUtil(mockedDriver));
 		
 		doThrow(WebDriverException.class).when(mockedDriver).scrollTop();
@@ -255,7 +243,6 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 
 	/**
 	 * Test if we succeed in cropping picture according to requested parameters
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
 	public void testRemoveHeader() throws IOException {
@@ -277,10 +264,9 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 	
 	/**
 	 * Test if we succeed in capturing a single element
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
-	public void testCaptureElement() throws IOException {
+	public void testCaptureElement() {
 		driver.manage().window().maximize();
 		WaitHelper.waitForSeconds(1);
 		
@@ -295,10 +281,9 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 	
 	/**
 	 * Check that if element does not exist, a Scenario exception is raised
-	 * @throws IOException
 	 */
 	@Test(groups={"it"}, expectedExceptions = ScenarioException.class)
-	public void testCaptureNonExistingElement() throws IOException {
+	public void testCaptureNonExistingElement() {
 		driver.manage().window().maximize();
 		WaitHelper.waitForSeconds(1);
 		
@@ -313,10 +298,9 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 	
 	/**
 	 * Capture viewport
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
-	public void testCaptureViewport() throws IOException {
+	public void testCaptureViewport() {
 		driver.manage().window().maximize();
 		WaitHelper.waitForSeconds(1);
 		
@@ -333,7 +317,6 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 	
 	/**
 	 * Test if we succeed in cropping picture according to requested parameters
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
 	public void testRemoveFooter() throws IOException {
@@ -355,7 +338,6 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 	
 	/**
 	 * Test if we succeed in cropping picture according to requested parameters
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
 	public void testRemoveHeaderAndFooter() throws IOException {
@@ -378,10 +360,9 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 	/**
 	 * Check we can rebuild the whole page from partial captures
 	 * This is not the default mode for chrome, but test it anyway
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
-	public void testCaptureAllPage() throws IOException {
+	public void testCaptureAllPage() {
 		driver.manage().window().setSize(new Dimension(400, 300));
 		WaitHelper.waitForSeconds(1);
 		
@@ -402,7 +383,6 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 	
 	/**
 	 * Check we are able to get all the content whereas we crop the header and footer manually (top and bottom pixels set automatically)
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
 	public void testFixedHeaderFooterManualCropping() throws IOException {
@@ -430,7 +410,6 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 	
 	/**
 	 * Check we are able to get all the content whereas we crop the header and footer automatically
-	 * @throws IOException
 	 */
 	@Test(groups={"it"})
 	public void testFixedHeaderFooterAutomaticCropping() throws IOException {
@@ -478,7 +457,7 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 	public void testMultipleWindowsCaptureWithError() {
 		DriverTestPage.link.click();
 		
-		WebDriver mockedDriver = spy(driver);
+		CustomEventFiringWebDriver mockedDriver = spy(driver);
 		ScreenshotUtil screenshotUtil = spy(new ScreenshotUtil(mockedDriver));
 		
 		when(mockedDriver.getWindowHandles()).thenThrow(WebDriverException.class);

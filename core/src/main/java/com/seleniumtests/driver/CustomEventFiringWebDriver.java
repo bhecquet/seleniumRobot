@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,9 +19,11 @@ package com.seleniumtests.driver;
 
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
+import com.seleniumtests.browserfactory.chrome.ChromiumUtils;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.core.StatisticsStorage;
 import com.seleniumtests.core.StatisticsStorage.DriverUsage;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.RetryableDriverException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.customexception.WebSessionEndedException;
@@ -32,7 +34,6 @@ import com.seleniumtests.util.video.VideoRecorder;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.ExecutesMethod;
 import io.appium.java_client.HidesKeyboard;
-import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.remote.SupportsContextSwitching;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Base64OutputStream;
@@ -94,7 +95,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	private static final String SAFARI_BROWSER = "safari";
 	private static final Logger logger = SeleniumRobotLogger.getLogger(CustomEventFiringWebDriver.class);
 	public static final String SE_CDP_PREFIX = "se:cdp";
-	private static Set<VideoRecorder> videoRecorders = Collections.synchronizedSet(new HashSet<>());
+	private static final Set<VideoRecorder> videoRecorders = Collections.synchronizedSet(new HashSet<>());
     private FileDetector fileDetector = new UselessFileDetector();
     private static final int MAX_DIMENSION = 100000;
     private Set<String> currentHandles;
@@ -105,9 +106,9 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	private boolean driverExited = false;
 	private final DriverMode driverMode;
 	private final BrowserInfo browserInfo;
-	private SeleniumGridConnector gridConnector;
+	private final SeleniumGridConnector gridConnector;
 	private final Integer attachExistingDriverPort;
-	private MutableCapabilities internalCapabilities = new MutableCapabilities();
+	private final MutableCapabilities internalCapabilities = new MutableCapabilities();
 	
 	/*
 	 * returns pixel aspect ratio of web site, it depends on OS and browser zoom
@@ -244,7 +245,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	- scrollable element in parents
 	*/
     private static final String JS_SCROLL_PARENT2 = "getScrollableParent = function(element, includeHidden, browserName) {"
-    
+
     		/**
     			function for getting the full XPath of an element, or null if element cannot be found
     			Based on example found here: https://stackoverflow.com/questions/2661818/javascript-get-xpath-of-a-node/43688599#43688599
@@ -252,7 +253,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     			@param element	the element for which we want to get xpath
     			@param xpath	the base xpath (should be empty on first call, used for recursion)
     			*/
-    		
+
     		+ "path = function(root, element, xpath) {"
     		+ "    _xPathIndex = function (node) {"
     		// Returns -1 in case of error, 0 if no siblings matching the same expression,"
@@ -649,12 +650,12 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     }
 
 	/**
-	 * Update se:cdp address with grid hub port
-	 * This is necessary when driver is created with testContainers. In this case, the external URL of the hub is http://localhost:12345 but its internal address is http://localhost:4444
-	 * so the se:cdp uri is ws://localhost:4444/... which is unreachable from host (so augmenting fails)
-	 * Changing port to '12345' allow driver augmentation
-	 * @param driver	driver to get configuration from
-	 */
+     * Update se:cdp address with grid hub port
+     * This is necessary when driver is created with testContainers. In this case, the external URL of the hub is <a href="http://localhost:12345">...</a> but its internal address is <a href="http://localhost:4444">...</a>
+     * so the se:cdp uri is ws://localhost:4444/... which is unreachable from host (so augmenting fails)
+     * Changing port to '12345' allow driver augmentation
+     * @param driver    driver to get configuration from
+     */
 	private void updateBidiPort(WebDriver driver) {
 
 		Capabilities capabilities = ((HasCapabilities) driver).getCapabilities();
@@ -980,7 +981,6 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     /**
      * get dimensions of the visible part of the page
      * TODO: handle mobile app case
-     * @return
      */
     @SuppressWarnings("unchecked")
 	public Dimension getViewPortDimensionWithoutScrollbar() {
@@ -989,8 +989,6 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     
     /**
      * get dimensions of the visible part of the page
-     * 
-     * @return
      */
 	public Dimension getViewPortDimensionWithoutScrollbar(boolean usePixelAspectRatio) {
     	Dimension foundDimension = new Dimension(getViewPortWidthWithoutScrollbar(usePixelAspectRatio), getViewPortHeighthWithoutScrollbar(usePixelAspectRatio));
@@ -1010,7 +1008,6 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     /**
      * Get the whole webpage dimension
      * TODO: handle mobile app case
-     * @return
      */
 
 	@SuppressWarnings("unchecked")
@@ -1074,7 +1071,6 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	
 	/**
 	 * Return the size of top header when it is 'fixed' positionned
-	 * @return
 	 */
 	public Long getTopFixedHeaderSize() {
 		return getTopFixedHeaderSize(true);
@@ -1090,7 +1086,6 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	
 	/**
 	 * Return the size of bottom footer when it is 'fixed' positionned
-	 * @return
 	 */
 	public Long getBottomFixedFooterSize() {
 		return getBottomFixedFooterSize(true);
@@ -1105,7 +1100,6 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	
 	/**
 	 * Check if a modal is displayed
-	 * @return
 	 */
 	public boolean isModalDisplayed() {
 		if (isWebTest()) {
@@ -1118,7 +1112,8 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	/**
 	 * scroll to the given element
 	 * we scroll 200 px to the left of the element so that we see all of it
-	 * @param element
+	 * @param element	element to scroll to
+	 * @param yOffset	offset from the center of the element to scroll
 	 */
 	public void scrollToElement(WebElement element, int yOffset) {
 		if (isWebTest()) {
@@ -1153,12 +1148,11 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	}
 
 	/**
-	 * Scroll parent of element, in case we have a scroll inside an other scroll
-	 * @param element
-	 * @param yOffset
-	 * @param parentScrollableElement
-	 * @param topHeaderSize
-	 * @return
+	 * Scroll parent of element, in case we have a scroll inside another scroll
+	 * @param element					the element for which we want to scroll parent
+	 * @param yOffset					vertical offset to screen above the element
+	 * @param parentScrollableElement	the scrollable parent
+	 * @param topHeaderSize				if there is a header, handle it
 	 */
 	private int scrollParent(WebElement element, int yOffset, WebElement parentScrollableElement, Long topHeaderSize) {
 		String parentTagName = parentScrollableElement.getTagName();
@@ -1182,7 +1176,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 			
 			// if top header is present, scroll up so that our element is not hidden behind it (scrollIntoView scrolls so that element is at the top of the view even if header masks it)
 			if (topHeaderSize > 0) {// equivalent to HtmlElement.OPTIMAL_SCROLLING but, for grid, we do not want dependency between the 2 classes
-				Integer scrollOffset = (int) (yOffset == Integer.MAX_VALUE ? topHeaderSize: topHeaderSize - yOffset);
+				int scrollOffset = (int) (yOffset == Integer.MAX_VALUE ? topHeaderSize: topHeaderSize - yOffset);
 				((JavascriptExecutor) driver).executeScript(
 						"if((arguments[0].scrollHeight - arguments[0].scrollTop - arguments[0].clientHeight) > 0) {" +
 						"   var rootElement = arguments[1] === \"safari\" ? document.body: document.documentElement;" +
@@ -1218,7 +1212,6 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	
 	/**
 	 * Returns the rectangle of all screens on the system
-	 * @return
 	 */
 	public static Rectangle getScreensRectangle() {
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -1310,7 +1303,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		}
 		
 		
-		Long duration = 0L;
+		long duration = 0L;
 		try {
 			duration = new Date().getTime() - (Long)internalCapabilities.getCapability(SeleniumRobotCapabilityType.START_TIME);
 		} catch (Exception e) {
@@ -1455,8 +1448,8 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	
 	/**
 	 * Left clic at coordinates on desktop. Coordinates are from screen point of view
-	 * @param x
-	 * @param y
+	 * @param x		x coordinate to click to
+	 * @param y		y coordinate to click to
 	 */
 	public static void leftClicOnDesktopAt(int x, int y, DriverMode driverMode, SeleniumGridConnector gridConnector) {
 		leftClicOnDesktopAt(false, x, y, driverMode, gridConnector);
@@ -1631,7 +1624,6 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	 * Returns a Base64 string of the desktop
 	 * @param driverMode		grid / local
 	 * @param gridConnector		the grid connector in case of grid test
-	 * @return
 	 */
 	public static String captureDesktopToBase64String(DriverMode driverMode, SeleniumGridConnector gridConnector) {
 		return captureDesktopToBase64String(false, driverMode, gridConnector);
@@ -1648,7 +1640,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 			
 			try (
 					ByteArrayOutputStream os = new ByteArrayOutputStream();
-				 	OutputStream b64 = new Base64OutputStream(os);
+				 	OutputStream b64 = new Base64OutputStream(os)
 					) {
 				disableStepDisplay();
 				
@@ -1969,5 +1961,19 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 			return ((HidesKeyboard) originalDriver).markExtensionAbsence(extName);
 		}
 		return null;
+	}
+
+	/**
+	 * Set Geolocation for Edge / Chrome or raise an error
+	 * @param latitude	the latitude
+	 * @param longitude	the longiture
+	 */
+	public void setGeolocation(double latitude, double longitude) {
+		// only chromium browsers will be supported
+		if (browserInfo.getBrowser().equals(BrowserType.CHROME) || browserInfo.getBrowser().equals(BrowserType.EDGE)) {
+			ChromiumUtils.setGeolocation(this.getWebDriver(), latitude, longitude);
+		} else {
+			throw new ConfigurationException("Geolocation is supported only on chrome or edge");
+		}
 	}
 }

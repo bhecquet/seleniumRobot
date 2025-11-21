@@ -47,8 +47,8 @@ public class TestDesktopDrivers extends GenericDriverTest {
 		Assert.assertTrue(driver.getCurrentUrl().equals("about:blank") || driver.getCurrentUrl().contains("http"));
 		
 		// issue #280: check BrowserInfo exists
-		Assert.assertNotNull(((CustomEventFiringWebDriver)driver).getBrowserInfo());
-		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getBrowserInfo().getBrowser(), BrowserType.FIREFOX);
+		Assert.assertNotNull(driver.getBrowserInfo());
+		Assert.assertEquals(driver.getBrowserInfo().getBrowser(), BrowserType.FIREFOX);
 	}
 	
 	@Test(groups={"it"})
@@ -59,8 +59,8 @@ public class TestDesktopDrivers extends GenericDriverTest {
 		Assert.assertEquals(driver.getCurrentUrl(), "data:,");
 		
 		// issue #280: check BrowserInfo exists
-		Assert.assertNotNull(((CustomEventFiringWebDriver)driver).getBrowserInfo());
-		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getBrowserInfo().getBrowser(), BrowserType.CHROME);
+		Assert.assertNotNull(driver.getBrowserInfo());
+		Assert.assertEquals(driver.getBrowserInfo().getBrowser(), BrowserType.CHROME);
 	}
 
 	@Test(groups={"it"})
@@ -85,8 +85,8 @@ public class TestDesktopDrivers extends GenericDriverTest {
 		
 		
 		// issue #280: check BrowserInfo exists
-		Assert.assertNotNull(((CustomEventFiringWebDriver)driver).getBrowserInfo());
-		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getBrowserInfo().getBrowser(), BrowserType.CHROME);
+		Assert.assertNotNull(driver.getBrowserInfo());
+		Assert.assertEquals(driver.getBrowserInfo().getBrowser(), BrowserType.CHROME);
 		
 		// check that Edge Beta has been started
 		List<String> newEdge = OSUtilityFactory.getInstance().getRunningProcesses("chrome")
@@ -110,8 +110,8 @@ public class TestDesktopDrivers extends GenericDriverTest {
 			Assert.assertEquals(driver.getCurrentUrl(), "data:,");
 			
 			// issue #280: check BrowserInfo exists
-			Assert.assertNotNull(((CustomEventFiringWebDriver)driver).getBrowserInfo());
-			Assert.assertEquals(((CustomEventFiringWebDriver)driver).getBrowserInfo().getBrowser(), BrowserType.SAFARI);
+			Assert.assertNotNull(driver.getBrowserInfo());
+			Assert.assertEquals(driver.getBrowserInfo().getBrowser(), BrowserType.SAFARI);
 		}
 	}
 	
@@ -127,8 +127,8 @@ public class TestDesktopDrivers extends GenericDriverTest {
 		Assert.assertTrue(driver.getCurrentUrl().contains("http://foo.bar"));
 		
 		// issue #280: check BrowserInfo exists
-		Assert.assertNotNull(((CustomEventFiringWebDriver)driver).getBrowserInfo());
-		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getBrowserInfo().getBrowser(), BrowserType.INTERNET_EXPLORER);
+		Assert.assertNotNull(driver.getBrowserInfo());
+		Assert.assertEquals(driver.getBrowserInfo().getBrowser(), BrowserType.INTERNET_EXPLORER);
 	}
 	
 	@Test(groups={"it"})
@@ -146,8 +146,8 @@ public class TestDesktopDrivers extends GenericDriverTest {
 		Assert.assertTrue(driver.getCurrentUrl().contains("http://localhost:") || driver.getCurrentUrl().contains("about:start") || driver.getCurrentUrl().contains("data"));
 		
 		// issue #280: check BrowserInfo exists
-		Assert.assertNotNull(((CustomEventFiringWebDriver)driver).getBrowserInfo());
-		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getBrowserInfo().getBrowser(), BrowserType.EDGE);
+		Assert.assertNotNull(driver.getBrowserInfo());
+		Assert.assertEquals(driver.getBrowserInfo().getBrowser(), BrowserType.EDGE);
 	}
 	
 	@Test(groups={"it"})
@@ -175,8 +175,8 @@ public class TestDesktopDrivers extends GenericDriverTest {
 		
 		
 		// issue #280: check BrowserInfo exists
-		Assert.assertNotNull(((CustomEventFiringWebDriver)driver).getBrowserInfo());
-		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getBrowserInfo().getBrowser(), BrowserType.EDGE);
+		Assert.assertNotNull(driver.getBrowserInfo());
+		Assert.assertEquals(driver.getBrowserInfo().getBrowser(), BrowserType.EDGE);
 		
 		// check that Edge Beta has been started
 		List<String> newEdge = OSUtilityFactory.getInstance().getRunningProcesses("msedge")

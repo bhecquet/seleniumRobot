@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,18 +20,15 @@ package com.seleniumtests.ut.uipage.htmlelements;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.*;
 
-import java.awt.AWTException;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.nio.file.Paths;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import org.jetbrains.annotations.NotNull;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
-import org.openqa.selenium.By;
 import org.openqa.selenium.Rectangle;
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -76,7 +73,7 @@ public class TestScreenZone extends MockitoTest {
 
 	@Test(groups={"ut"})
 	public void testClick() {
-		try (MockedStatic mockedWebUIDriver = mockStatic(WebUIDriver.class);
+		try (MockedStatic<WebUIDriver> mockedWebUIDriver = mockStatic(WebUIDriver.class);
 		) {
 			ScreenZone picElement = prepareScreenZone(mockedWebUIDriver);
 
@@ -90,7 +87,7 @@ public class TestScreenZone extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testClickTwice() {
-		try (MockedStatic mockedWebUIDriver = mockStatic(WebUIDriver.class);
+		try (MockedStatic<WebUIDriver> mockedWebUIDriver = mockStatic(WebUIDriver.class);
 		) {
 			ScreenZone picElement = prepareScreenZone(mockedWebUIDriver);
 
@@ -163,7 +160,7 @@ public class TestScreenZone extends MockitoTest {
 	}
 
 	@NotNull
-	private ScreenZone prepareScreenZone(MockedStatic mockedWebUIDriver) {
+	private ScreenZone prepareScreenZone(MockedStatic<WebUIDriver> mockedWebUIDriver) {
 		ScreenZone picElement = spy(screenZone);
 		picElement.setObjectPictureFile(new File(""));
 
@@ -201,7 +198,7 @@ public class TestScreenZone extends MockitoTest {
 	
 	
 	@Test(groups={"ut"})
-	public void testPictureNotVisible() throws AWTException {
+	public void testPictureNotVisible() {
 		ScreenZone picElement = spy(screenZone);
 		picElement.setObjectPictureFile(new File(""));
 		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
@@ -215,7 +212,7 @@ public class TestScreenZone extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testPictureNotVisibleWithReplay() throws AWTException {
+	public void testPictureNotVisibleWithReplay() {
 		ScreenZone picElement = spy(screenZone);
 		picElement.setObjectPictureFile(new File(""));
 		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
@@ -228,7 +225,7 @@ public class TestScreenZone extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testPictureVisible() throws AWTException {
+	public void testPictureVisible() {
 		ScreenZone picElement = spy(screenZone);
 		picElement.setObjectPictureFile(new File(""));
 		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
@@ -241,12 +238,12 @@ public class TestScreenZone extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
-	public void testTapOnDesktop() throws AWTException {	
+	public void testTapOnDesktop() {
 		screenZone.tap();
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
-	public void testSwipeOnDesktop() throws AWTException {	
+	public void testSwipeOnDesktop() {
 		screenZone.swipe(0, 0);
 	}
 

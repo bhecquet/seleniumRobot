@@ -17,8 +17,6 @@
  */
 package com.seleniumtests.ut.uipage;
 
-import java.awt.AWTException;
-
 import com.seleniumtests.CaptureVideo;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.UnhandledAlertException;
@@ -293,7 +291,7 @@ public class TestHtmlElement extends TestDriver {
 
 	@Override
 	@Test(groups= {"ut"})
-	public void testUploadFile() throws AWTException, InterruptedException {
+	public void testUploadFile() {
 		super.testUploadFile();
 	}
 	

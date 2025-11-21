@@ -238,7 +238,7 @@ public class Table extends HtmlElement {
     	WebElement cell = getCell(row, column);
     	if (focus) {
     		Point loc = cell.getLocation();
-    		((CustomEventFiringWebDriver)getDriver()).scrollTo(loc.x - 50, loc.y - 50);
+    		(getDriver()).scrollTo(loc.x - 50, loc.y - 50);
     	}
     	return cell;
     }

@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,11 +32,11 @@ import com.seleniumtests.it.driver.support.pages.DriverTestPageNativeActions;
 
 public class TestNativeSeleniumActions extends GenericMultiBrowserTest {
 	
-	public TestNativeSeleniumActions(WebDriver driver, DriverTestPage testPage) throws Exception {
+	public TestNativeSeleniumActions(CustomEventFiringWebDriver driver, DriverTestPage testPage) {
 		super(driver, testPage);
 	}
 	
-	public TestNativeSeleniumActions() throws Exception {
+	public TestNativeSeleniumActions()  {
 		super(BrowserType.INTERNET_EXPLORER, "DriverTestPageNativeActions");  
 	}
 
@@ -44,7 +44,7 @@ public class TestNativeSeleniumActions extends GenericMultiBrowserTest {
 	public void reset() {
 		if (driver != null && WebUIDriver.getWebDriver(false) != null) {
 			DriverTestPageNativeActions.textElement.clear();
-			((CustomEventFiringWebDriver)driver).scrollTop();
+			driver.scrollTop();
 		}
 	}
 	
@@ -60,7 +60,7 @@ public class TestNativeSeleniumActions extends GenericMultiBrowserTest {
 		try {
 			testPageNativeActions.getDriver().findElement(By.id("foobar"));
 		} catch (Exception e) {
-			
+			// ignore
 		}
 		testPageNativeActions.getElementInsideFrameOfFrame();
 	}
@@ -68,7 +68,6 @@ public class TestNativeSeleniumActions extends GenericMultiBrowserTest {
 	/**
 	 * issue #275: check that with a frame selected in one test (currentFrame inside {@link com.seleniumtests.uipage.aspects.SeleniumNativeActions} aspect), this 
 	 * variable is reset for next step
-	 * @throws Exception
 	 */
 	@Test(groups={"it"}, dependsOnMethods="testIsTextSelect")
 	public void testDriverNativeActionsWithFrame1() {
@@ -80,7 +79,7 @@ public class TestNativeSeleniumActions extends GenericMultiBrowserTest {
 	}
 	
 	@Test(groups={"it"}, dependsOnMethods="testDriverNativeActionsWithFrame1")
-	public void testDriverNativeActionsWithFrame2() throws Exception {
+	public void testDriverNativeActionsWithFrame2() {
 		
 		// create the driver that as been closed in previous test method
 		testPageNativeActions = new DriverTestPageNativeActions(true, testPageUrl);

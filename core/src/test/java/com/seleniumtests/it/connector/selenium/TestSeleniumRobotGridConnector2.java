@@ -69,7 +69,7 @@ public class TestSeleniumRobotGridConnector2 extends GenericMultiBrowserTest {
 		if (driver != null) {
 			DriverTestPageWithoutFixedPattern.logoText.clear();
 			DriverTestPageWithoutFixedPattern.textElement.clear();
-			((CustomEventFiringWebDriver)driver).scrollTop();
+			driver.scrollTop();
 		}
 	}
 
@@ -175,7 +175,7 @@ public class TestSeleniumRobotGridConnector2 extends GenericMultiBrowserTest {
 	public void testSendKeysOnPicture() {
 		try {
 			DriverTestPageWithoutFixedPattern.logoText.clear();
-			((CustomEventFiringWebDriver)driver).scrollToElement(DriverTestPageWithoutFixedPattern.table, 200);
+			driver.scrollToElement(DriverTestPageWithoutFixedPattern.table, 200);
 			DriverTestPageWithoutFixedPattern.firefoxForDesktop.sendKeys(0, 40, "hello");
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
@@ -187,7 +187,7 @@ public class TestSeleniumRobotGridConnector2 extends GenericMultiBrowserTest {
 	public void testSendKeyboardKeysOnPicture() { 
 		try {
 			DriverTestPageWithoutFixedPattern.logoText.clear();
-			((CustomEventFiringWebDriver)driver).scrollToElement(DriverTestPageWithoutFixedPattern.table, 200);
+			driver.scrollToElement(DriverTestPageWithoutFixedPattern.table, 200);
 			DriverTestPageWithoutFixedPattern.firefoxForDesktop.sendKeys(0, 40, KeyEvent.VK_A, KeyEvent.VK_B);
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);

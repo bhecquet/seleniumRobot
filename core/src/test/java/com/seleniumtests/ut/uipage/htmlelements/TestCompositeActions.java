@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,7 +23,6 @@ import static org.mockito.Mockito.*;
 
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
-import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -54,10 +53,10 @@ public class TestCompositeActions extends MockitoTest {
 	
 	private CustomEventFiringWebDriver eventDriver;
 
-	private MockedStatic mockedWebUIDriver;
+	private MockedStatic<WebUIDriver> mockedWebUIDriver;
 
 	@BeforeMethod(groups={"ut"})
-	private void init() throws Exception {
+	private void init() {
 
 		mockedWebUIDriver = mockStatic(WebUIDriver.class);
 		when(driver.getCapabilities()).thenReturn(new ChromeOptions()); // add capabilities to allow augmenting driver
@@ -77,10 +76,9 @@ public class TestCompositeActions extends MockitoTest {
 	/**
 	 * Checks that CompositeAction.updateHandles() aspect is called when 
 	 * a click is done in a composite action
-	 * @throws Exception
 	 */
 	@Test(groups={"ut"})
-	public void testUpdateHandles() throws Exception {
+	public void testUpdateHandles() {
 		new Actions(eventDriver).click().perform();
 
 		// check handled are updated on click
@@ -88,7 +86,7 @@ public class TestCompositeActions extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testHandlesNotUpdated() throws Exception {
+	public void testHandlesNotUpdated() {
 		new Actions(eventDriver).clickAndHold().perform();
 		
 		// check handled are not updated when no click is done
@@ -98,10 +96,9 @@ public class TestCompositeActions extends MockitoTest {
 	/**
 	 * Checks that CompositeAction.updateHandles() aspect is called when 
 	 * a click is done in a composite action with a driver supporting new actions (the real driver)
-	 * @throws Exception
 	 */
 	@Test(groups={"ut"})
-	public void testUpdateHandlesNewActions() throws Exception {	
+	public void testUpdateHandlesNewActions() {
 		new Actions(eventDriver.getWebDriver()).click().perform();
 		
 		// check handles are updated on click
@@ -110,10 +107,9 @@ public class TestCompositeActions extends MockitoTest {
 	
 	/**
 	 * No update when only down or up action is done
-	 * @throws Exception
 	 */
 	@Test(groups={"ut"})
-	public void testUpdateHandlesNotUpdatedNewActions() throws Exception {
+	public void testUpdateHandlesNotUpdatedNewActions() {
 		new Actions(eventDriver.getWebDriver()).clickAndHold().perform();
 		
 		// check handled are updated on click

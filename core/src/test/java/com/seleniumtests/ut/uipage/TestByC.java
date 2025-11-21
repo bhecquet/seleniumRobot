@@ -2,8 +2,6 @@ package com.seleniumtests.ut.uipage;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.testng.Assert.assertTrue;
-import static org.testng.AssertJUnit.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,7 +13,6 @@ import io.appium.java_client.AppiumBy;
 import io.appium.java_client.android.AndroidDriver;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
@@ -55,14 +52,14 @@ public class TestByC extends MockitoTest {
     @Mock
     private CustomEventFiringWebDriver eventDriver;
 
-    private MockedStatic mockedWebUIDriver;
+    private MockedStatic<WebUIDriver> mockedWebUIDriver;
 
 
     @BeforeMethod(groups = {"ut"})
-    public void init() throws Exception {
+    public void init() {
         mockedWebUIDriver = mockStatic(WebUIDriver.class);
-        when(id.findElements(driver)).thenReturn(Arrays.asList(element1));
-        when(name.findElements(driver)).thenReturn(Arrays.asList(element1, element2));
+        when(id.findElements(driver)).thenReturn(List.of(element1));
+        when(name.findElements(driver)).thenReturn(List.of(element1, element2));
         when(noElementsFound.findElements(driver)).thenReturn(new ArrayList<>());
 
         mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(false)).thenReturn(eventDriver);
@@ -83,14 +80,14 @@ public class TestByC extends MockitoTest {
     public void testXPathByAttributeQuote() {
         ByC.ByAttribute byAttribute = new ByC.ByAttribute("'", "'");
         String stringPath = byAttribute.getEffectiveXPath();
-        assertEquals(stringPath, ".//*[@'=co)]");
+        Assert.assertEquals(stringPath, ".//*[@'=co)]");
     }
 
     @Test(groups = {"ut"})
     public void testXPathByAttribute() {
         ByC.ByAttribute byAttribute = new ByC.ByAttribute("span", "myJellyfish");
         String stringPath = byAttribute.getEffectiveXPath();
-        assertEquals(stringPath, ".//*[@span='myJellyfish']");
+        Assert.assertEquals(stringPath, ".//*[@span='myJellyfish']");
     }
 
     @Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)
@@ -110,21 +107,21 @@ public class TestByC extends MockitoTest {
     public void testXPathByLabelBackwardQuote() {
         ByC.ByLabelBackward byLabelBackward = new ByC.ByLabelBackward("'", "source", true, "'");
         String stringPath = byLabelBackward.getEffectiveXPath();
-        assertEquals(stringPath, ".//'[contains(text(),co))]/preceding::source");
+        Assert.assertEquals(stringPath, ".//'[contains(text(),co))]/preceding::source");
     }
 
     @Test(groups = {"ut"})
     public void testXPathByLabelBackward() {
         ByC.ByLabelBackward byLabelBackward = new ByC.ByLabelBackward("universalMusic", "kbd", false, "universalMusicJellyfish");
         String stringPath = byLabelBackward.getEffectiveXPath();
-        assertEquals(stringPath, ".//universalMusicJellyfish[text() = 'universalMusic']/preceding::kbd");
+        Assert.assertEquals(stringPath, ".//universalMusicJellyfish[text() = 'universalMusic']/preceding::kbd");
     }
 
     @Test(groups = {"ut"})
     public void testXPathByLabelBackwardPartialTrue() {
         ByC.ByLabelBackward byLabelBackward = new ByC.ByLabelBackward("universalMusic", "track", true, "universalMusicJellyfish");
         String stringPath = byLabelBackward.getEffectiveXPath();
-        assertEquals(stringPath, ".//universalMusicJellyfish[contains(text(),'universalMusic')]/preceding::track");
+        Assert.assertEquals(stringPath, ".//universalMusicJellyfish[contains(text(),'universalMusic')]/preceding::track");
     }
 
     @Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)
@@ -137,28 +134,28 @@ public class TestByC extends MockitoTest {
     public void testXPathByLabelBackwardTagNameNull() {
         ByC.ByLabelBackward byLabelBackward = new ByC.ByLabelBackward("universalMusic", null, true, "universalMusicJellyfish");
         String stringPath = byLabelBackward.getEffectiveXPath();
-        assertEquals(stringPath, ".//universalMusicJellyfish[contains(text(),'universalMusic')]/preceding::input");
+        Assert.assertEquals(stringPath, ".//universalMusicJellyfish[contains(text(),'universalMusic')]/preceding::input");
     }
 
     @Test(groups = {"ut"})
     public void testXPathByLabelBackwardTagNameNullPartialFalse() {
         ByC.ByLabelBackward byLabelBackward = new ByC.ByLabelBackward("universalMusic", null, false, "universalMusicJellyfish");
         String stringPath = byLabelBackward.getEffectiveXPath();
-        assertEquals(stringPath, ".//universalMusicJellyfish[text() = 'universalMusic']/preceding::input");
+        Assert.assertEquals(stringPath, ".//universalMusicJellyfish[text() = 'universalMusic']/preceding::input");
     }
 
     @Test(groups = {"ut"})
     public void testXPathByLabelBackwardLabelTagNameNull() {
         ByC.ByLabelBackward byLabelBackward = new ByC.ByLabelBackward("universalMusic", "link", true, null);
         String stringPath = byLabelBackward.getEffectiveXPath();
-        assertEquals(stringPath, ".//label[contains(text(),'universalMusic')]/preceding::link");
+        Assert.assertEquals(stringPath, ".//label[contains(text(),'universalMusic')]/preceding::link");
     }
 
     @Test(groups = {"ut"})
     public void testXPathByLabelBackwardLabelTagNameNullPartialFalse() {
         ByC.ByLabelBackward byLabelBackward = new ByC.ByLabelBackward("universalMusic", "button", false, null);
         String stringPath = byLabelBackward.getEffectiveXPath();
-        assertEquals(stringPath, ".//label[text() = 'universalMusic']/preceding::button");
+        Assert.assertEquals(stringPath, ".//label[text() = 'universalMusic']/preceding::button");
     }
 
     // ByLabelForward
@@ -166,21 +163,21 @@ public class TestByC extends MockitoTest {
     public void testXPathByLabelForwardQuote() {
         ByC.ByLabelForward byLabelForward = new ByC.ByLabelForward("'", "table", true, "'");
         String stringPath = byLabelForward.getEffectiveXPath();
-        assertEquals(stringPath, ".//'[contains(text(),co))]/following::table");
+        Assert.assertEquals(stringPath, ".//'[contains(text(),co))]/following::table");
     }
 
     @Test(groups = {"ut"})
     public void testXPathByLabelForward() {
         ByC.ByLabelForward byLabelForward = new ByC.ByLabelForward("span", "header", true, "redBanksy");
         String stringPath = byLabelForward.getEffectiveXPath();
-        assertEquals(stringPath, ".//redBanksy[contains(text(),'span')]/following::header");
+        Assert.assertEquals(stringPath, ".//redBanksy[contains(text(),'span')]/following::header");
     }
 
     @Test(groups = {"ut"})
     public void testXPathByLabelForwardPartialFalse() {
         ByC.ByLabelForward byLabelForward = new ByC.ByLabelForward("span", "col-6", false, "redBanksy");
         String stringPath = byLabelForward.getEffectiveXPath();
-        assertEquals(stringPath, ".//redBanksy[text() = 'span']/following::col-6");
+        Assert.assertEquals(stringPath, ".//redBanksy[text() = 'span']/following::col-6");
     }
 
     @Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)
@@ -193,14 +190,14 @@ public class TestByC extends MockitoTest {
     public void testXPathByLabelForwardTagNameNull() {
         ByC.ByLabelForward byLabelForward = new ByC.ByLabelForward("span", null, true, "redBanksy");
         String stringPath = byLabelForward.getEffectiveXPath();
-        assertEquals(stringPath, ".//redBanksy[contains(text(),'span')]/following::input");
+        Assert.assertEquals(stringPath, ".//redBanksy[contains(text(),'span')]/following::input");
     }
 
     @Test(groups = {"ut"})
     public void testXPathByLabelForwardLabelTagNameNull() {
         ByC.ByLabelForward byLabelForward = new ByC.ByLabelForward("span", "form", true, null);
         String stringPath = byLabelForward.getEffectiveXPath();
-        assertEquals(stringPath, ".//label[contains(text(),'span')]/following::form");
+        Assert.assertEquals(stringPath, ".//label[contains(text(),'span')]/following::form");
     }
 
     // ByText
@@ -208,21 +205,21 @@ public class TestByC extends MockitoTest {
     public void testXPathByTextQuote() {
         ByC.ByText byText = new ByC.ByText("'text", "label", true, false);
         String stringPath = byText.getEffectiveXPath();
-        assertEquals(stringPath, ".//label[contains(text(),concat('',\"'\",'text'))]");
+        Assert.assertEquals(stringPath, ".//label[contains(text(),concat('',\"'\",'text'))]");
     }
 
     @Test(groups = {"ut"})
     public void testXPathByText() {
         ByC.ByText byText = new ByC.ByText("scyphozoa", "td", false, false);
         String stringPath = byText.getEffectiveXPath();
-        assertEquals(stringPath, ".//td[text() = 'scyphozoa']");
+        Assert.assertEquals(stringPath, ".//td[text() = 'scyphozoa']");
     }
 
     @Test(groups = {"ut"})
     public void testXPathByTextPartialTrue() {
         ByC.ByText byText = new ByC.ByText("scyphozoa", "td", true, false);
         String stringPath = byText.getEffectiveXPath();
-        assertEquals(stringPath, ".//td[contains(text(),'scyphozoa')]");
+        Assert.assertEquals(stringPath, ".//td[contains(text(),'scyphozoa')]");
     }
 
     @Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)
@@ -241,7 +238,7 @@ public class TestByC extends MockitoTest {
     public void testXPathByTextInsideChild() {
         ByC.ByText byText = new ByC.ByText("scyphozoa", "td", false, true);
         String stringPath = byText.getEffectiveXPath();
-        assertEquals(stringPath, ".//td[* and .//*[text() = 'scyphozoa']]");
+        Assert.assertEquals(stringPath, ".//td[* and .//*[text() = 'scyphozoa']]");
     }
 
     // ByxClassName
@@ -249,14 +246,14 @@ public class TestByC extends MockitoTest {
     public void testXPathByXClassNameQuote() {
         ByC.ByXClassName byXClassName = new ByC.ByXClassName("'");
         String stringPath = byXClassName.getEffectiveXPath();
-        assertEquals(stringPath, ".//*[contains(concat(' ',normalize-space(@class),' '),' ' ')]");
+        Assert.assertEquals(stringPath, ".//*[contains(concat(' ',normalize-space(@class),' '),' ' ')]");
     }
 
     @Test(groups = {"ut"})
     public void testXPathByXClassName() {
         ByC.ByXClassName byXClassName = new ByC.ByXClassName("aequorea");
         String stringPath = byXClassName.getEffectiveXPath();
-        assertEquals(stringPath, ".//*[contains(concat(' ',normalize-space(@class),' '),' aequorea ')]");
+        Assert.assertEquals(stringPath, ".//*[contains(concat(' ',normalize-space(@class),' '),' aequorea ')]");
     }
 
     @Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)
@@ -270,7 +267,7 @@ public class TestByC extends MockitoTest {
     public void testXPathByXTagName() {
         ByC.ByXTagName byXTagName = new ByC.ByXTagName("span");
         String stringPath = byXTagName.getEffectiveXPath();
-        assertEquals(stringPath, ".//span");
+        Assert.assertEquals(stringPath, ".//span");
     }
 
     @Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)
@@ -463,7 +460,7 @@ public class TestByC extends MockitoTest {
     public void testFindElementByLabelBackwardLabelNull() {
         ByC.ByLabelBackward byLabelBackward = spy(new ByC.ByLabelBackward(null, "div", true, "label"));
         when((driver).findElements(any(By.class))).thenReturn(Arrays.asList(element1, element2));
-        WebElement el = byLabelBackward.findElement(driver);
+        byLabelBackward.findElement(driver);
     }
 
     @Test(groups = {"ut"})
@@ -572,7 +569,7 @@ public class TestByC extends MockitoTest {
     public void testFindElementByTextInsideChildNoElement() {
         ByC.ByText byText = spy(new ByC.ByText("Aequorea","ol",false, true));
         when(driver.findElements(By.xpath(".//ol[* and .//*[text() = 'Aequorea']]"))).thenReturn(new ArrayList<>());
-        WebElement el = byText.findElement(driver);
+        byText.findElement(driver);
         verify(driver).findElements(By.xpath(".//ol[* and .//*[text() = 'Aequorea']]"));
     }
 
@@ -633,9 +630,9 @@ public class TestByC extends MockitoTest {
     @Test(groups = {"ut"})
     public void testFindElementsByAnd() {
         ByC.And byAnd = new ByC.And(id, name);
-        List<WebElement> elements = byAnd.findElements(driver);
-        assertEquals(elements.size(), 1);
-        assertTrue(elements.contains(element1));
+        List<WebElement> elementList = byAnd.findElements(driver);
+        Assert.assertEquals(elementList.size(), 1);
+        Assert.assertTrue(elementList.contains(element1));
     }
 
     @Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)
@@ -664,29 +661,29 @@ public class TestByC extends MockitoTest {
     @Test(groups = {"ut"})
     public void testFindElementsByOr() {
         ByC.Or byOr = new ByC.Or(id, name);
-        List<WebElement> elements = byOr.findElements(driver);
-        assertEquals(elements.size(), 1);
-        assertTrue(elements.contains(element1));
+        List<WebElement> elementList = byOr.findElements(driver);
+        Assert.assertEquals(elementList.size(), 1);
+        Assert.assertTrue(elementList.contains(element1));
     }
     @Test(groups = {"ut"})
     public void testFindElementsByOr2() {
     	ByC.Or byOr = new ByC.Or(noElementsFound, name);
-    	List<WebElement> elements = byOr.findElements(driver);
-    	assertEquals(elements.size(), 2);
-    	assertTrue(elements.contains(element1));
-    	assertTrue(elements.contains(element2));
+    	List<WebElement> elementList = byOr.findElements(driver);
+        Assert.assertEquals(elementList.size(), 2);
+        Assert.assertTrue(elementList.contains(element1));
+        Assert.assertTrue(elementList.contains(element2));
     }
 
     @Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)
     public void testFindElementsByOrIdNull() {
         ByC.Or byOr = new ByC.Or(null, name);
-        List<WebElement> elements = byOr.findElements(driver);
+        byOr.findElements(driver);
     }
 
     @Test(groups = {"ut"}, expectedExceptions = IllegalArgumentException.class)
     public void testFindElementsByOrNameNull() {
         ByC.Or byOr = new ByC.Or(id, null);
-        List<WebElement> elements = byOr.findElements(driver);
+        byOr.findElements(driver);
     }
 
     @Test(groups = {"ut"})

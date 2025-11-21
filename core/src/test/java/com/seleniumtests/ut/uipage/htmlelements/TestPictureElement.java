@@ -19,8 +19,6 @@ package com.seleniumtests.ut.uipage.htmlelements;
 
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.*;
-
-import java.awt.AWTException;
 import java.io.File;
 
 import org.mockito.InjectMocks;
@@ -91,15 +89,15 @@ public class TestPictureElement extends MockitoTest {
 		PictureElement picElement = spy(pictureElement);
 		picElement.setObjectPictureFile(new File(""));
 
-		try (MockedStatic mockedWebUIDriver = mockStatic(WebUIDriver.class)) {
+		try (MockedStatic<WebUIDriver> mockedWebUIDriver = mockStatic(WebUIDriver.class)) {
 			mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
 			mockedWebUIDriver.when(() -> WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(uiDriver);
 			when(uiDriver.getDriver()).thenReturn(driver);
 			when(uiDriver.getConfig()).thenReturn(driverConfig);
 			when(driverConfig.getBrowserType()).thenReturn(BrowserType.FIREFOX);
 			when(driver.getBrowserInfo()).thenReturn(browserInfo);
-			when(((CustomEventFiringWebDriver) driver).getDeviceAspectRatio()).thenReturn(1.0);
-			when(((CustomEventFiringWebDriver) driver).getViewPortDimensionWithoutScrollbar(false)).thenReturn(new Dimension(200, 200));
+			when(driver.getDeviceAspectRatio()).thenReturn(1.0);
+			when(driver.getViewPortDimensionWithoutScrollbar(false)).thenReturn(new Dimension(200, 200));
 			when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
 			when(screenshotUtil.capture(SnapshotTarget.PAGE, File.class, true)).thenReturn(new File(""));
 			when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
@@ -125,15 +123,15 @@ public class TestPictureElement extends MockitoTest {
 		PictureElement picElement = spy(pictureElement);
 		picElement.setObjectPictureFile(new File(""));
 
-		try (MockedStatic mockedWebUIDriver = mockStatic(WebUIDriver.class)) {
+		try (MockedStatic<WebUIDriver> mockedWebUIDriver = mockStatic(WebUIDriver.class)) {
 			mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
 			mockedWebUIDriver.when(() -> WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(uiDriver);
 			when(uiDriver.getDriver()).thenReturn(driver);
 			when(uiDriver.getConfig()).thenReturn(driverConfig);
 			when(driverConfig.getBrowserType()).thenReturn(BrowserType.FIREFOX);
 			when(driver.getBrowserInfo()).thenReturn(browserInfo);
-			when(((CustomEventFiringWebDriver) driver).getDeviceAspectRatio()).thenReturn(1.0);
-			when(((CustomEventFiringWebDriver) driver).getViewPortDimensionWithoutScrollbar(false)).thenReturn(new Dimension(200, 200));
+			when(driver.getDeviceAspectRatio()).thenReturn(1.0);
+			when(driver.getViewPortDimensionWithoutScrollbar(false)).thenReturn(new Dimension(200, 200));
 			when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
 			when(screenshotUtil.capture(SnapshotTarget.PAGE, File.class, true)).thenReturn(new File(""));
 			when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
@@ -158,15 +156,15 @@ public class TestPictureElement extends MockitoTest {
 		PictureElement picElement = spy(pictureElement);
 		picElement.setObjectPictureFile(new File(""));
 
-		try (MockedStatic mockedWebUIDriver = mockStatic(WebUIDriver.class)) {
+		try (MockedStatic<WebUIDriver> mockedWebUIDriver = mockStatic(WebUIDriver.class)) {
 			mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
 			mockedWebUIDriver.when(() -> WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(uiDriver);
 			when(uiDriver.getDriver()).thenReturn(driver);
 			when(uiDriver.getConfig()).thenReturn(driverConfig);
 			when(driverConfig.getBrowserType()).thenReturn(BrowserType.FIREFOX);
 			when(driver.getBrowserInfo()).thenReturn(browserInfo);
-			when(((CustomEventFiringWebDriver) driver).getDeviceAspectRatio()).thenReturn(1.5);
-			when(((CustomEventFiringWebDriver) driver).getViewPortDimensionWithoutScrollbar(false)).thenReturn(new Dimension(200, 200));
+			when(driver.getDeviceAspectRatio()).thenReturn(1.5);
+			when(driver.getViewPortDimensionWithoutScrollbar(false)).thenReturn(new Dimension(200, 200));
 			when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
 			when(screenshotUtil.capture(SnapshotTarget.PAGE, File.class, true)).thenReturn(new File(""));
 			when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
@@ -185,7 +183,7 @@ public class TestPictureElement extends MockitoTest {
 	
 	
 	@Test(groups={"ut"})
-	public void testPictureNotVisible() throws AWTException {
+	public void testPictureNotVisible() {
 		PictureElement picElement = spy(pictureElement);
 		picElement.setObjectPictureFile(new File(""));
 		when(screenshotUtil.capture(SnapshotTarget.PAGE, File.class, true)).thenReturn(new File(""));
@@ -199,7 +197,7 @@ public class TestPictureElement extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testPictureNotVisibleWithReplay() throws AWTException {
+	public void testPictureNotVisibleWithReplay() {
 		PictureElement picElement = spy(pictureElement);
 		picElement.setObjectPictureFile(new File(""));
 		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
@@ -213,14 +211,14 @@ public class TestPictureElement extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testPictureVisible() throws AWTException {
+	public void testPictureVisible() {
 		PictureElement picElement = spy(pictureElement);
 
-		try (MockedStatic mockedWebUIDriver = mockStatic(WebUIDriver.class)) {
+		try (MockedStatic<WebUIDriver> mockedWebUIDriver = mockStatic(WebUIDriver.class)) {
 			mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
 			mockedWebUIDriver.when(() -> WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(uiDriver);
 			when(uiDriver.getDriver()).thenReturn(driver);
-			when(((CustomEventFiringWebDriver) driver).getDeviceAspectRatio()).thenReturn(1.0);
+			when(driver.getDeviceAspectRatio()).thenReturn(1.0);
 			picElement.setObjectPictureFile(new File(""));
 			doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
 			when(screenshotUtil.capture(SnapshotTarget.PAGE, File.class, true)).thenReturn(new File(""));

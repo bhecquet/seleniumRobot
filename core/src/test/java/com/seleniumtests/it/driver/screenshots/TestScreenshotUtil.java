@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,7 +42,6 @@ import org.openqa.selenium.devtools.DevToolsException;
 import org.testng.Assert;
 import org.testng.ISuite;
 import org.testng.ISuiteResult;
-import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
@@ -72,21 +71,20 @@ public class TestScreenshotUtil extends ReporterTest {
 	/**
 	 * Check the aspect ratio is taken into account when capturing element
 	 * Better check with OS zoom setting set to a value > 100%
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testElementScreenshotUsingAspectRatio() throws Exception {
 
 		setBrowser("chrome");
 		new DriverTestPageShadowDom(true);
-		WebDriver driver = WebUIDriver.getWebDriver(true);
+		CustomEventFiringWebDriver driver = WebUIDriver.getWebDriver(true);
 		try {
 			HtmlElement shadowRoot = new HtmlElement("", ByC.shadow(By.id("shadow3")));
 			SnapshotTarget snapshotTarget = new SnapshotTarget(new ImageElement("", By.id("fail2"), shadowRoot));
 
-			File image2 = new ScreenshotUtil(driver).capture(snapshotTarget, File.class);
+			new ScreenshotUtil(driver).capture(snapshotTarget, File.class);
 			BufferedImage image = new ScreenshotUtil(driver).capture(snapshotTarget, BufferedImage.class);
-			double aspectRatio = ((CustomEventFiringWebDriver)driver).getDeviceAspectRatio();
+			double aspectRatio = driver.getDeviceAspectRatio();
 			Assert.assertTrue(Math.abs(image.getHeight() - 150 * aspectRatio) < 1);
 			Assert.assertTrue(Math.abs(image.getWidth() - 200 * aspectRatio) < 1);
 		} finally {
@@ -99,7 +97,7 @@ public class TestScreenshotUtil extends ReporterTest {
 
 		setBrowser("chrome");
 		new DriverTestPageShadowDom(true);
-		WebDriver driver = WebUIDriver.getWebDriver(true);
+		CustomEventFiringWebDriver driver = WebUIDriver.getWebDriver(true);
 		try {
 			BufferedImage image = new ScreenshotUtil(driver).captureWebPageUsingCDP(driver.getWindowHandle());
 			Assert.assertTrue(image.getHeight() > 2000);
@@ -114,7 +112,7 @@ public class TestScreenshotUtil extends ReporterTest {
 
 		setBrowser("chrome");
 		new DriverTestPageShadowDom(true);
-		WebDriver driver = WebUIDriver.getWebDriver(true);
+		CustomEventFiringWebDriver driver = WebUIDriver.getWebDriver(true);
 		try {
 			BufferedImage image = new ScreenshotUtil(driver).captureWebPage(0, driver.getWindowHandle());
 			Assert.assertTrue(image.getHeight() > 2000);
@@ -128,7 +126,7 @@ public class TestScreenshotUtil extends ReporterTest {
 
 		setBrowser("chrome");
 		new DriverTestPageShadowDom(true);
-		WebDriver driver = WebUIDriver.getWebDriver(true);
+		CustomEventFiringWebDriver driver = WebUIDriver.getWebDriver(true);
 		try {
 			BufferedImage image = new ScreenshotUtil(driver).captureWebPage(1, driver.getWindowHandle());
 			Assert.assertTrue(image.getHeight() > 2000);
@@ -142,7 +140,7 @@ public class TestScreenshotUtil extends ReporterTest {
 
 		setBrowser("firefox");
 		new DriverTestPageShadowDom(true);
-		WebDriver driver = WebUIDriver.getWebDriver(true);
+		CustomEventFiringWebDriver driver = WebUIDriver.getWebDriver(true);
 		try {
 			BufferedImage image = new ScreenshotUtil(driver).captureWebPage(1, driver.getWindowHandle());
 			Assert.assertTrue(image.getHeight() > 2000);
@@ -154,14 +152,13 @@ public class TestScreenshotUtil extends ReporterTest {
 
 	/**
 	 * Test specific firefox screenshot
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testFirefoxScreenshot() throws Exception {
 
 		setBrowser("firefox");
 		new DriverTestPageShadowDom(true);
-		WebDriver driver = WebUIDriver.getWebDriver(true);
+		CustomEventFiringWebDriver driver = WebUIDriver.getWebDriver(true);
 		try {
 			BufferedImage image = new ScreenshotUtil(driver).captureWebPageFullPage();
 			Assert.assertTrue(image.getHeight() > 2000);
@@ -176,7 +173,7 @@ public class TestScreenshotUtil extends ReporterTest {
 
 		setBrowser("chrome");
 		new DriverTestPageShadowDom(true);
-		WebDriver driver = WebUIDriver.getWebDriver(true);
+		CustomEventFiringWebDriver driver = WebUIDriver.getWebDriver(true);
 		try {
 			new ScreenshotUtil(driver).captureWebPageFullPage();
 		} finally {
@@ -191,7 +188,7 @@ public class TestScreenshotUtil extends ReporterTest {
 		
 		setBrowser("edge");
 		new DriverTestPageShadowDom(true);
-		WebDriver driver = WebUIDriver.getWebDriver(true);
+		CustomEventFiringWebDriver driver = WebUIDriver.getWebDriver(true);
 		try {
 			BufferedImage image = new ScreenshotUtil(driver).captureWebPageUsingCDP(driver.getWindowHandle());
 			Assert.assertTrue(image.getHeight() > 2000);
@@ -205,9 +202,9 @@ public class TestScreenshotUtil extends ReporterTest {
 		
 		setBrowser("firefox");
 		new DriverTestPageShadowDom(true);
-		WebDriver driver = WebUIDriver.getWebDriver(true);
+		CustomEventFiringWebDriver driver = WebUIDriver.getWebDriver(true);
 		try {
-			BufferedImage image = new ScreenshotUtil(driver).captureWebPageUsingCDP(driver.getWindowHandle());
+			new ScreenshotUtil(driver).captureWebPageUsingCDP(driver.getWindowHandle());
 		} finally {
 			driver.close();
 		}
@@ -220,11 +217,9 @@ public class TestScreenshotUtil extends ReporterTest {
 	
 	/**
 	 * check that duration of screenshots is logged into TestStep
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testScreenshotDurationIsLogged(ITestContext testContext) throws Exception {
+	public void testScreenshotDurationIsLogged() {
 
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
 		for (ISuite suite: SeleniumRobotTestListener.getSuiteList()) {
@@ -247,18 +242,12 @@ public class TestScreenshotUtil extends ReporterTest {
 	
 	/**
 	 * issue #300: check that with multiple windows, we have all screenshots and the corresponding HTML code
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testMultipleScreenshots(ITestContext testContext) throws Exception {
+	public void testMultipleScreenshots() throws Exception {
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverMultipleSnapshot"});
 
-		FilenameFilter fileNameFilter = new FilenameFilter() {
-            public boolean accept( File dir, String name ) { 
-                return name.matches( ".*Test_end.*" );
-            }
-		};
+		FilenameFilter fileNameFilter = (dir, name) -> name.matches( ".*Test_end.*" );
 		
 		Path resultDir = Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverMultipleSnapshot");
 		File[] htmlFiles = resultDir.resolve("htmls")
@@ -283,11 +272,9 @@ public class TestScreenshotUtil extends ReporterTest {
 	
 	/**
 	 * issue #300: check that desktop capture is done
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testDesktopScreenshots(ITestContext testContext) throws Exception {
+	public void testDesktopScreenshots() {
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 		ScreenShot screenshot = new ScreenshotUtil(null).capture(SnapshotTarget.SCREEN, ScreenShot.class);
 		Assert.assertTrue(screenshot.getImage().getFile().exists());
@@ -296,11 +283,9 @@ public class TestScreenshotUtil extends ReporterTest {
 	
 	/**
 	 * Check that step is hidden while we capture desktop
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"}, expectedExceptions = ImageSearchException.class)
-	public void testDesktopScreenshotsWithVideoRecorder(ITestContext testContext) throws Exception {
+	public void testDesktopScreenshotsWithVideoRecorder() throws Exception {
 		
 		SeleniumTestsContextManager.getThreadContext().setVideoCapture(VideoCaptureMode.TRUE.toString());
 		setBrowser("chrome");
@@ -324,11 +309,9 @@ public class TestScreenshotUtil extends ReporterTest {
 	
 	/**
 	 * issue #422: check we return null instead of an empty ScreenShot / File when captureSnapshot is set to false
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testScreenshotIsNull(ITestContext testContext) throws Exception {
+	public void testScreenshotIsNull() {
 
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 		SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(false);
@@ -336,13 +319,13 @@ public class TestScreenshotUtil extends ReporterTest {
 
 	}
 	@Test(groups={"it"})
-	public void testScreenshotIsNotNullWhenForced(ITestContext testContext) throws Exception {
+	public void testScreenshotIsNotNullWhenForced() {
 		
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 		SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(false);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
-		
-		WebDriver localDriver = null;
+
+		CustomEventFiringWebDriver localDriver = null;
 		try {
 			localDriver = WebUIDriver.getWebDriver(true);
 			ScreenShot screenshot = new ScreenshotUtil(localDriver).capture(SnapshotTarget.PAGE, ScreenShot.class, true);
@@ -386,10 +369,9 @@ public class TestScreenshotUtil extends ReporterTest {
 	/**
 	 * Test scrollDelay=0
 	 * Check capture delay is not too high
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testNoScrollDelay() throws Exception {
+	public void testNoScrollDelay() {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.SNAPSHOT_SCROLL_DELAY, "0");
@@ -420,10 +402,9 @@ public class TestScreenshotUtil extends ReporterTest {
 	 * Test scrollDelay=1000 so that it can be distinguished
 	 * Check that capture for report (when page opens or for 'Test end') is not affected by the scrollDelay setting
 	 * Check that for image comparison, setting is used
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testWithScrollDelay() throws Exception {
+	public void testWithScrollDelay() {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.SNAPSHOT_SCROLL_DELAY, "1000");

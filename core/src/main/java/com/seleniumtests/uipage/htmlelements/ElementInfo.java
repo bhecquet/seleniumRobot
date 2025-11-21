@@ -150,7 +150,7 @@ public class ElementInfo {
 		    	// Get width and height of the element
 		    	int eleWidth = newRectangle.getWidth();
 		    	int eleHeight = newRectangle.getHeight();
-		    	Point scrollPosition = ((CustomEventFiringWebDriver)htmlElement.getDriver()).getScrollPosition();
+		    	Point scrollPosition = (htmlElement.getDriver()).getScrollPosition();
 		
 		    	// Crop the entire page screenshot to get only element screenshot. Keep 20 px around the picture
 		    	BufferedImage eleScreenshot = ImageProcessor.cropImage(fullImg, Math.max(0, point.getX() - scrollPosition.getX() - 20), 

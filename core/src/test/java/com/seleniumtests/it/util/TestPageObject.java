@@ -47,7 +47,7 @@ public class TestPageObject extends GenericDriverTest {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*firefox");
 		driver = WebUIDriver.getWebDriver(true);
 		new DriverTestPage(true).resizeTo(600, 400);
-		Dimension viewPortSize = ((CustomEventFiringWebDriver)driver).getViewPortDimensionWithoutScrollbar();
+		Dimension viewPortSize = driver.getViewPortDimensionWithoutScrollbar();
 		Assert.assertEquals(viewPortSize.width, 600);
 		Assert.assertEquals(viewPortSize.height, 400);
 	}
@@ -105,7 +105,7 @@ public class TestPageObject extends GenericDriverTest {
 		driver = WebUIDriver.getWebDriver(true);
 		new DriverTestPage(true);
 		new DriverTestPage(true).resizeTo(600, 400);
-		Dimension viewPortSize = ((CustomEventFiringWebDriver)driver).getViewPortDimensionWithoutScrollbar();
+		Dimension viewPortSize = driver.getViewPortDimensionWithoutScrollbar();
 		Assert.assertEquals(viewPortSize.width, 600);
 		Assert.assertEquals(viewPortSize.height, 400);
 	}
@@ -120,7 +120,7 @@ public class TestPageObject extends GenericDriverTest {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*chrome");
 		SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(true);
 		DriverTestPage page = new DriverTestPage(true);
-		WebDriver driver = WebUIDriver.getWebDriver(true);
+		CustomEventFiringWebDriver driver = WebUIDriver.getWebDriver(true);
 		try {
 			ImageElement element = new ImageElement("", By.id("images"));
 			TextFieldElement elementToExclude = new TextFieldElement("", By.id("logoText"));
@@ -131,7 +131,7 @@ public class TestPageObject extends GenericDriverTest {
 			Assert.assertEquals(elementSnapshot.getName(), "drv:main-my capture");
 			BufferedImage image = ImageProcessor.loadFromFile(elementSnapshot.getScreenshot().getImage().getFile());
 
-			double aspectRatio = ((CustomEventFiringWebDriver)driver).getDeviceAspectRatio();
+			double aspectRatio = driver.getDeviceAspectRatio();
 			Assert.assertTrue(Math.abs(image.getWidth() - element.getRect().getWidth() * aspectRatio) < 1);
 			Assert.assertTrue(Math.abs(image.getHeight() - element.getRect().getHeight() * aspectRatio) < 1);
 			Assert.assertEquals(elementSnapshot.getCheckSnapshot().getExcludeElementsRect().size(), 1);

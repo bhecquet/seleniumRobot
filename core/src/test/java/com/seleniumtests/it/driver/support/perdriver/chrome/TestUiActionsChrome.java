@@ -37,7 +37,7 @@ public class TestUiActionsChrome extends TestUiActions {
 	
 	@Override
     @Test(groups={"it"})
-	public void testNewActionWithHtmlElement() throws Exception {
+	public void testNewActionWithHtmlElement() {
 		super.testNewActionWithHtmlElement();
 	}
 
@@ -55,13 +55,13 @@ public class TestUiActionsChrome extends TestUiActions {
 	
 	@Override
     @Test(groups={"it"}) 
-	public void testSendKeysWithHtmlElement() throws Exception {
+	public void testSendKeysWithHtmlElement() {
 		super.testSendKeysWithHtmlElement();
 	}
 	
 	@Override
     @Test(groups={"it"}, expectedExceptions=WebDriverException.class) 
-	public void testSendKeysWithHtmlElementNotPresent() throws Exception {
+	public void testSendKeysWithHtmlElementNotPresent() {
 		super.testSendKeysWithHtmlElementNotPresent();
 	}
 }

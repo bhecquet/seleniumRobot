@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -234,7 +234,7 @@ public class PageObject extends BasePage implements IPage {
         
         // in case browser has been created outside of selenium and we attach to it, get initial window handles
         if (driver != null && attachExistingDriverPort != null && url == null) {
-        	((CustomEventFiringWebDriver)driver).updateWindowsHandles();
+        	driver.updateWindowsHandles();
         }
 
         // add calling page and field name on element
@@ -329,7 +329,7 @@ public class PageObject extends BasePage implements IPage {
             // update start instant in case URL is defined because we only want page loading duration, which starts when URL is sent to browser
             startLoading = Instant.now();
             open(url);
-            ((CustomEventFiringWebDriver)driver).updateWindowsHandles();
+            driver.updateWindowsHandles();
         }
 
         // switch to the context if we are on mobile app
@@ -339,7 +339,7 @@ public class PageObject extends BasePage implements IPage {
         // Wait for page load is applicable only for web test and mobile webview
         // When running tests on an iframe embedded site then test will fail if this command is not used
         // in case of mobile application and native context, only capture page
-        if (driver != null && ((CustomEventFiringWebDriver)driver).isWebTest()) {
+        if (driver != null && driver.isWebTest()) {
             waitForPageToLoad();
         } else if (SeleniumTestsContextManager.isAppTest() && captureSnapshot) {
         	capturePageSnapshot();
@@ -572,7 +572,7 @@ public class PageObject extends BasePage implements IPage {
     	ScreenShot screenShot = screenshotUtil.capture(SnapshotTarget.PAGE, ScreenShot.class, computeScrollDelay(checkSnapshot));
     	
     	// check SnapshotCheckType configuration is compatible with the snapshot
-    	checkSnapshot.check(SnapshotTarget.PAGE, ((CustomEventFiringWebDriver)driver).getDeviceAspectRatio());
+    	checkSnapshot.check(SnapshotTarget.PAGE, driver.getDeviceAspectRatio());
     	
     	storeSnapshot(snapshotName, screenShot, checkSnapshot);
     }
@@ -587,7 +587,7 @@ public class PageObject extends BasePage implements IPage {
     	ScreenShot screenShot = screenshotUtil.capture(SnapshotTarget.VIEWPORT, ScreenShot.class);
     	
     	// check SnapshotCheckType configuration is compatible with the snapshot
-    	checkSnapshot.check(SnapshotTarget.VIEWPORT, ((CustomEventFiringWebDriver)driver).getDeviceAspectRatio());
+    	checkSnapshot.check(SnapshotTarget.VIEWPORT, driver.getDeviceAspectRatio());
     	
     	storeSnapshot(snapshotName, screenShot, checkSnapshot);
     }
@@ -644,7 +644,7 @@ public class PageObject extends BasePage implements IPage {
     	ScreenShot screenShot = screenshotUtil.capture(snapshotTarget, ScreenShot.class, computeScrollDelay(checkSnapshot));
 
     	// check SnapshotCheckType configuration is compatible with the snapshot
-    	checkSnapshot.check(snapshotTarget, ((CustomEventFiringWebDriver)driver).getDeviceAspectRatio());
+    	checkSnapshot.check(snapshotTarget, driver.getDeviceAspectRatio());
     	
     	storeSnapshot(snapshotName, screenShot, checkSnapshot);
     }
@@ -796,7 +796,6 @@ public class PageObject extends BasePage implements IPage {
     /**
      * Check if named cookie is present
      * @param name	name of the cookie
-     * @return
      */
     public boolean isCookiePresent(final String name) {
         return getCookieByName(name) != null;
@@ -808,14 +807,14 @@ public class PageObject extends BasePage implements IPage {
         try {
 
             // Navigate to app URL for browser test
-            if (((CustomEventFiringWebDriver)driver).isWebTest()) {
+            if (driver.isWebTest()) {
             	setWindowToRequestedSize();
                 driver.navigate().to(url);
             }
         } catch (UnreachableBrowserException e) {
         	// recreate the driver without recreating the enclosing WebUiDriver
         	driver = WebUIDriver.getWebUIDriver(false).createWebDriver();
-            if (((CustomEventFiringWebDriver)driver).isWebTest()) {
+            if (driver.isWebTest()) {
 	            setWindowToRequestedSize();
 	            driver.navigate().to(url);
             }
@@ -823,7 +822,7 @@ public class PageObject extends BasePage implements IPage {
         	logger.error("get UnsupportedCommandException, retry");
             // recreate the driver without recreating the enclosing WebUiDriver
             driver = WebUIDriver.getWebUIDriver(false).createWebDriver();
-            if (((CustomEventFiringWebDriver)driver).isWebTest()) {
+            if (driver.isWebTest()) {
             	setWindowToRequestedSize();
 	            driver.navigate().to(url);
             }
@@ -843,7 +842,7 @@ public class PageObject extends BasePage implements IPage {
      * This only affects mobile tests
      */
     public void hideKeyboard() {
-        ((CustomEventFiringWebDriver)driver).hideKeyboard();
+        driver.hideKeyboard();
     }
 
     /**
@@ -852,7 +851,7 @@ public class PageObject extends BasePage implements IPage {
      * @return      list of contexts
      */
     public List<String> getContexts() {
-        return new ArrayList<>(((CustomEventFiringWebDriver)driver).getContextHandles());
+        return new ArrayList<>(driver.getContextHandles());
     }
 
     public void switchToContext(String name) {
@@ -860,7 +859,7 @@ public class PageObject extends BasePage implements IPage {
         Optional<String> foundContext = contexts.stream().filter(ctx -> ctx.toLowerCase().contains(name.toLowerCase())).findFirst();
         if (foundContext.isPresent()) {
             try {
-                ((CustomEventFiringWebDriver) driver).context(foundContext.get());
+                driver.context(foundContext.get());
             } catch (NoSuchContextException e) { // in case context disappears when we switch to it
                 throw new ScenarioException(String.format("Only %s contexts are available", getContexts()));
             }
@@ -893,7 +892,7 @@ public class PageObject extends BasePage implements IPage {
      * On init set window to size requested by user. Window is maximized if no size is set
      */
     public final void setWindowToRequestedSize() {
-    	if (!((CustomEventFiringWebDriver)driver).isWebTest()) {
+    	if (!driver.isWebTest()) {
     		return;
     	}
     	
@@ -926,7 +925,7 @@ public class PageObject extends BasePage implements IPage {
             
             for (int i=0; i < retries; i++) {
             	driver.manage().window().setSize(setSize);
-            	Dimension viewPortSize = ((CustomEventFiringWebDriver)driver).getViewPortDimensionWithoutScrollbar();
+            	Dimension viewPortSize = driver.getViewPortDimensionWithoutScrollbar();
             	
             	if (viewPortSize.height == height && viewPortSize.width == width) {
             		break;
@@ -1310,7 +1309,7 @@ public class PageObject extends BasePage implements IPage {
      */
 	@GenericStep
     public <T extends PageObject> T refresh()  {
-    	if (((CustomEventFiringWebDriver)driver).isWebTest()) {
+    	if (driver.isWebTest()) {
 	        try {
 	            driver.navigate().refresh();
 	        } catch (org.openqa.selenium.TimeoutException ex) {

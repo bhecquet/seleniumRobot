@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,7 +50,6 @@ import com.seleniumtests.reporter.info.VideoLinkInfo;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.video.VideoCaptureMode;
-import com.seleniumtests.util.video.VideoUtils;
 
 @Listeners({com.seleniumtests.reporter.reporters.ReporterControler.class,
 	com.seleniumtests.core.runner.SeleniumRobotTestListener.class//,
@@ -87,7 +86,6 @@ public class SeleniumRobotTestPlan {
 	/**
 	 * issue #150: set driver to null in case it was not cleaned before
 	 * This method will be called before any other before method
-	 * @param method
 	 */
 	@BeforeMethod(alwaysRun=true) 
 	public void startTestMethod(Method method) {
@@ -139,7 +137,7 @@ public class SeleniumRobotTestPlan {
 	/**
      * Get parameter from configuration
      * 
-     * @param key
+     * @param key	name of the param
      * 
      * @return String
      */
@@ -152,7 +150,7 @@ public class SeleniumRobotTestPlan {
      * Get parameter from configuration using pattern
      * If multiple variables match the pattern, only one is returned
      * @param keyPattern	Pattern for searching key. If null, no filtering will be done on key
-     * @return
+     * @return	the parameter value
      */
     public static String param(Pattern keyPattern) {
     	return TestTasks.param(keyPattern);
@@ -163,7 +161,7 @@ public class SeleniumRobotTestPlan {
      * If multiple variables match the pattern, only one is returned
      * @param keyPattern	Pattern for searching key. If null, no filtering will be done on key
      * @param valuePattern	Pattern for searching value. If null, no filtering will be done on value
-     * @return
+     * @return the parameter value
      */
     public static String param(Pattern keyPattern, Pattern valuePattern) {
     	return TestTasks.param(keyPattern, valuePattern);
@@ -183,8 +181,8 @@ public class SeleniumRobotTestPlan {
     /**
 	 * Method for creating or updating a variable locally. If selenium server is not used, there is no difference with 'createOrUpdateParam'. 
 	 * If seleniumRobot server is used, then, this method will only change variable value locally, not updating the remote one
-	 * @param key
-	 * @param newValue
+	 * @param key		name of the param
+	 * @param newValue	value of the parameter (or new value if we update it)
 	 */
 	public void createOrUpdateLocalParam(String key, String newValue) {
 		TestTasks.createOrUpdateLocalParam(key, newValue);
@@ -227,7 +225,7 @@ public class SeleniumRobotTestPlan {
     
     /**
      * In case the scenario uses several drivers, switch to one or another using this method, so that any new calls will go through this driver
-     * @param driverName
+     * @param driverName	the driver name
      */
     public WebDriver switchToDriver(String driverName) {
     	return TestTasks.switchToDriver(driverName);
@@ -243,7 +241,7 @@ public class SeleniumRobotTestPlan {
     
     /**
      * get list of the named process, locally or remotely
-     * @param processName
+     * @param processName	name of the process, without extension
      */
     public List<Integer> getProcessList(String processName) {
     	return TestTasks.getProcessList(processName);
@@ -251,8 +249,8 @@ public class SeleniumRobotTestPlan {
     
     /**
      * Add step to current test
-     * @param stepName
-     * @param passwordsToMask	array of strings that must be replaced by '*****' in reports
+     * @param stepName			name of the step
+     * @param passwordToMask	array of strings that must be replaced by '*****' in reports
      */
     public void addStep(String stepName, String ... passwordToMask) {
     	TestTasks.addStep(stepName, passwordToMask);
@@ -289,10 +287,10 @@ public class SeleniumRobotTestPlan {
     /**
      * Load a UFT script locally or remotely via a VBS script called through csscript.exe
      * @param almServer		ALM server address
-     * @param almUser		
-     * @param almPassword
-     * @param almDomain
-     * @param almProject
+     * @param almUser		ALM user
+     * @param almPassword	ALM password
+     * @param almDomain		ALM domain
+     * @param almProject	ALM project
      * @param scriptPath	path to ALM script. e.g: '[QualityCenter]Subject\TOOLS\TestsFoo\foo'
      * @param killUftOnStartup	if true, UFT will be killed before starting the UFT test
      */
@@ -306,7 +304,6 @@ public class SeleniumRobotTestPlan {
     
     /**
      * returns the robot configuration
-     * @return
      */
     public SeleniumTestsContext robotConfig() {
     	return SeleniumTestsContextManager.getThreadContext();
@@ -326,7 +323,7 @@ public class SeleniumRobotTestPlan {
      * @param value	A StringInfo or HyperlinkInfo instance to display the value 
      */
     public void addTestInfo(String key, Info value) {
-    	((ScenarioLogger)logger).logTestInfo(key, value);
+    	logger.logTestInfo(key, value);
     }
 
 	/**
@@ -337,6 +334,10 @@ public class SeleniumRobotTestPlan {
 	 */
 	public File getDownloadedFile(String fileName) {
 		return TestTasks.getDownloadedFile(fileName);
+	}
+
+	public void setGeolocation(double latitude, double longitude) {
+		TestTasks.setGeolocation(latitude, longitude);
 	}
 
 }

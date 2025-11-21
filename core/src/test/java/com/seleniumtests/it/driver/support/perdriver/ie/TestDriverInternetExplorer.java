@@ -326,13 +326,13 @@ public class TestDriverInternetExplorer extends TestDriver {
 	
 	@Override
     @Test(groups= {"ie"})
-	public void testUploadFileWithRobot() throws AWTException, InterruptedException {
+	public void testUploadFileWithRobot() {
 		super.testUploadFileWithRobot();
 	}
 	
 	@Override
     @Test(groups= {"ie"})
-	public void testUploadFileWithRobotKeyboard() throws AWTException, InterruptedException {
+	public void testUploadFileWithRobotKeyboard() {
 		super.testUploadFileWithRobotKeyboard();
 	}
 	
@@ -341,7 +341,7 @@ public class TestDriverInternetExplorer extends TestDriver {
 	 */
 	@Override
     @Test(groups= {"ie"})
-	public void testUploadFile() throws AWTException, InterruptedException {
+	public void testUploadFile() {
 		try {
 			super.testUploadFile();
 		} catch (Throwable e) {

@@ -75,7 +75,7 @@ public class ScreenshotUtil {
 
 	public ScreenshotUtil() {
 		uiDriver = WebUIDriver.getWebUIDriver(false);
-		driver = (CustomEventFiringWebDriver)uiDriver.getDriver();
+		driver = uiDriver.getDriver();
     	if (driver == null) {
     		throw new ScenarioException("Driver has not already been created");
     	}
@@ -83,9 +83,9 @@ public class ScreenshotUtil {
         outputDirectory = getOutputDirectory();
     }
 
-    public ScreenshotUtil(final WebDriver driver) {
+    public ScreenshotUtil(final CustomEventFiringWebDriver driver) {
         outputDirectory = getOutputDirectory();
-        this.driver = (CustomEventFiringWebDriver)driver;
+        this.driver = driver;
     }
 
     private static String getOutputDirectory() {
@@ -529,9 +529,7 @@ public class ScreenshotUtil {
      * @return the image
      */
     public BufferedImage captureWebPageUsingCDP(String windowHandle) throws IOException {
-    	if (!(driver.getWebDriver() instanceof HasDevTools)
-    			|| (driver.getOriginalDriver() instanceof FirefoxDriver) // Firefox does not seem to handle CDP correctly ("Unable to establish websocket connection")
-    			) {
+    	if (!(driver.getWebDriver() instanceof HasDevTools)) {
     		throw new DevToolsException("CDP not implemented for " + driver.getClass().toString());
     	}
     	

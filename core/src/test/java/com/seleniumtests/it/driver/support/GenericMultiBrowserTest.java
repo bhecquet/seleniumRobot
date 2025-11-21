@@ -31,10 +31,10 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.it.driver.support.pages.*;
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -65,7 +65,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	
 	private WebTestPageServer server;
     private String proxyType;
-	protected WebDriver driver;
+	protected CustomEventFiringWebDriver driver;
 	protected DriverTestPage testPage;
 	protected DriverTestPageNativeActions testPageNativeActions;
 	protected DriverTestPageObjectFatory testPageObjectFactory;
@@ -85,7 +85,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(GenericMultiBrowserTest.class);
 	
 
-	public GenericMultiBrowserTest(WebDriver driver, DriverTestPage testPage) {
+	public GenericMultiBrowserTest(CustomEventFiringWebDriver driver, DriverTestPage testPage) {
 		this.driver = driver;
 		this.testPage = testPage;
 		this.testPageName = "DriverTestPage";

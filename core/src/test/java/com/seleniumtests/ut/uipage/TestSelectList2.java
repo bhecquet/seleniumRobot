@@ -6,9 +6,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.*;
 
-import java.io.IOException;
-import java.util.Arrays;
-
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -23,10 +20,8 @@ import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
@@ -37,9 +32,6 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.SnapshotTarget;
-import com.seleniumtests.uipage.htmlelements.select.NativeSelect;
-import com.seleniumtests.uipage.htmlelements.select.NgSelect;
-import com.seleniumtests.ut.core.runner.cucumber.PageForActions;
 
 public class TestSelectList2 extends MockitoTest {
 
@@ -73,12 +65,10 @@ public class TestSelectList2 extends MockitoTest {
 	@Mock
 	private Alert alert;
 
-	private CustomEventFiringWebDriver eventDriver;
-
-	private MockedStatic mockedWebUiDriver;
+    private MockedStatic<WebUIDriver> mockedWebUiDriver;
 
 	@BeforeMethod(groups = { "ut" })
-	private void init() throws IOException {
+	private void init() {
 
 		SeleniumTestsContextManager.getGlobalContext()
 				.setCucumberImplementationPackage("com.seleniumtests.ut.core.runner.cucumber");
@@ -88,8 +78,8 @@ public class TestSelectList2 extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(2);
 
 		// add capabilities to allow augmenting driver
-		when(driver.getCapabilities()).thenReturn(new FirefoxOptions()); 
-		eventDriver = spy(new CustomEventFiringWebDriver(driver));
+		when(driver.getCapabilities()).thenReturn(new FirefoxOptions());
+        CustomEventFiringWebDriver eventDriver = spy(new CustomEventFiringWebDriver(driver));
 
 		when(eventDriver.switchTo()).thenReturn(target);
 		when(driver.findElement(By.id("select"))).thenReturn(element);
@@ -106,7 +96,7 @@ public class TestSelectList2 extends MockitoTest {
 		when(driver.switchTo()).thenReturn(targetLocator);
 
 		mockedWebUiDriver = mockStatic(WebUIDriver.class);
-		mockedWebUiDriver.when(() -> WebUIDriver.getCurrentWebUiDriverName()).thenReturn("main");
+		mockedWebUiDriver.when(WebUIDriver::getCurrentWebUiDriverName).thenReturn("main");
 		mockedWebUiDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean(), eq(BrowserType.FIREFOX), eq("main"), isNull()))
 				.thenReturn(eventDriver);
 		mockedWebUiDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);

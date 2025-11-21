@@ -94,11 +94,9 @@ public class TestWebUIDriver extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testDriverCreation() {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		WebDriver driver = WebUIDriver.getWebDriver(true);
-		
-		Assert.assertTrue(driver instanceof CustomEventFiringWebDriver);
-		
-		Capabilities caps = ((CustomEventFiringWebDriver)driver).getInternalCapabilities();
+		CustomEventFiringWebDriver driver = WebUIDriver.getWebDriver(true);
+
+		Capabilities caps = driver.getInternalCapabilities();
 		Assert.assertNotNull(caps.getCapability(SeleniumRobotCapabilityType.START_TIME));
 		Assert.assertNotNull(caps.getCapability(SeleniumRobotCapabilityType.STARTUP_DURATION));
 	}
@@ -116,12 +114,11 @@ public class TestWebUIDriver extends MockitoTest {
 			when(((HasCapabilities)driver).getCapabilities()).thenReturn(new MutableCapabilities(Map.of("app", "notepad", "automationName", "FlaUI", "platformName", "windows")));
 		})) {
 
-			WebDriver driver = WebUIDriver.getWebDriver(true);
+			CustomEventFiringWebDriver driver = WebUIDriver.getWebDriver(true);
 
-			Assert.assertTrue(driver instanceof CustomEventFiringWebDriver);
 			Assert.assertEquals(mockedAppiumDriverFactory.constructed().size(), 1);
 
-			Capabilities caps = ((CustomEventFiringWebDriver) driver).getInternalCapabilities();
+			Capabilities caps = driver.getInternalCapabilities();
 			Assert.assertNotNull(caps.getCapability(SeleniumRobotCapabilityType.START_TIME));
 			Assert.assertNotNull(caps.getCapability(SeleniumRobotCapabilityType.STARTUP_DURATION));
 		}
@@ -143,8 +140,8 @@ public class TestWebUIDriver extends MockitoTest {
 			mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(Map.of(BrowserType.FIREFOX, List.of(new BrowserInfo(BrowserType.FIREFOX, "100"))));
 
 
-			WebDriver driver = WebUIDriver.getWebDriver(true);
-			Assert.assertTrue(((CustomEventFiringWebDriver)driver).getOriginalDriver() instanceof FirefoxDriver);
+			CustomEventFiringWebDriver driver = WebUIDriver.getWebDriver(true);
+			Assert.assertTrue(driver.getOriginalDriver() instanceof FirefoxDriver);
 			Assert.assertEquals(mockedFirefoxDriverFactory.constructed().size(), 1);
 		}
 	}
@@ -165,8 +162,8 @@ public class TestWebUIDriver extends MockitoTest {
 			mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(Map.of(BrowserType.CHROME, List.of(new BrowserInfo(BrowserType.CHROME, "100"))));
 
 
-			WebDriver driver = WebUIDriver.getWebDriver(true);
-			Assert.assertTrue(((CustomEventFiringWebDriver)driver).getOriginalDriver() instanceof ChromeDriver);
+			CustomEventFiringWebDriver driver = WebUIDriver.getWebDriver(true);
+			Assert.assertTrue(driver.getOriginalDriver() instanceof ChromeDriver);
 			Assert.assertEquals(mockedChromeDriverFactory.constructed().size(), 1);
 		}
 	}
@@ -186,8 +183,8 @@ public class TestWebUIDriver extends MockitoTest {
 			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.WINDOWS);
 			mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(Map.of(BrowserType.EDGE, List.of(new BrowserInfo(BrowserType.EDGE, "100"))));
 
-			WebDriver driver = WebUIDriver.getWebDriver(true);
-			Assert.assertTrue(((CustomEventFiringWebDriver)driver).getOriginalDriver() instanceof EdgeDriver);
+			CustomEventFiringWebDriver driver = WebUIDriver.getWebDriver(true);
+			Assert.assertTrue(driver.getOriginalDriver() instanceof EdgeDriver);
 			Assert.assertEquals(mockedEdgeDriverFactory.constructed().size(), 1);
 		}
 	}
@@ -207,8 +204,8 @@ public class TestWebUIDriver extends MockitoTest {
 			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.MAC);
 			mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(Map.of(BrowserType.SAFARI, List.of(new BrowserInfo(BrowserType.SAFARI, "100"))));
 
-			WebDriver driver = WebUIDriver.getWebDriver(true);
-			Assert.assertTrue(((CustomEventFiringWebDriver)driver).getOriginalDriver() instanceof SafariDriver);
+			CustomEventFiringWebDriver driver = WebUIDriver.getWebDriver(true);
+			Assert.assertTrue(driver.getOriginalDriver() instanceof SafariDriver);
 			Assert.assertEquals(mockedSafariDriverFactory.constructed().size(), 1);
 		}
 	}
@@ -282,7 +279,7 @@ public class TestWebUIDriver extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCapsOnDriverQuit() {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		CustomEventFiringWebDriver driver = (CustomEventFiringWebDriver)WebUIDriver.getWebDriver(true);
+		CustomEventFiringWebDriver driver = WebUIDriver.getWebDriver(true);
 		driver.quit();
 		
 		List<DriverUsage> driverUsages = StatisticsStorage.getDriverUsage();
@@ -349,7 +346,7 @@ public class TestWebUIDriver extends MockitoTest {
 			when(gridDriverFactory.getSelectedBrowserInfo()).thenReturn(new BrowserInfo(BrowserType.HTMLUNIT, "1.1"));
 		})) {
 
-			CustomEventFiringWebDriver ceDriver = (CustomEventFiringWebDriver) WebUIDriver.getWebDriver(true);
+			CustomEventFiringWebDriver ceDriver = WebUIDriver.getWebDriver(true);
 			Assert.assertNotNull(ceDriver.getBrowserInfo());
 			Assert.assertEquals(ceDriver.getBrowserInfo().getVersion(), "1.1");
 
@@ -530,7 +527,7 @@ public class TestWebUIDriver extends MockitoTest {
 			when(gridDriverFactory.getSelectedBrowserInfo()).thenReturn(new BrowserInfo(BrowserType.HTMLUNIT, "1.1"));
 		})) {
 
-			CustomEventFiringWebDriver ceDriver = (CustomEventFiringWebDriver) WebUIDriver.getWebDriver(true);
+			CustomEventFiringWebDriver ceDriver = WebUIDriver.getWebDriver(true);
 			Assert.assertNotNull(ceDriver.getBrowserInfo());
 			Assert.assertEquals(ceDriver.getBrowserInfo().getVersion(), "1.1");
 
@@ -551,31 +548,15 @@ public class TestWebUIDriver extends MockitoTest {
 	}
 
 	/**
-	 * #619: when driver augmenting fails, we get a RemoteWebDriver instead of a CustomEventFiringWebDriver
-	 * Check getWebDriver won't fail
-	 */
-	@Test(groups={"ut"})
-	public void testNewDriverCreationWithExistingFailed() {
-		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-
-		WebUIDriver uiDriver1 = spy(WebUIDriver.getWebUIDriver(true, "main"));
-		RemoteWebDriver realDriver = mock(RemoteWebDriver.class);
-		uiDriver1.setDriver(realDriver);
-		WebUIDriver.getUxDriverSession().get().put("main", uiDriver1);
-
-		WebDriver driver2 = WebUIDriver.getWebDriver(true);
-		Assert.assertNotEquals(driver2, realDriver);
-	}
-
-	/**
 	 * If BrowserType is not given, the type is taken from context parameter
 	 */
 	@Test(groups={"ut"})
 	public void testDriverCreationWithDefaultType() {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		WebDriver driver1 = WebUIDriver.getWebDriver(true, null, "main", null);
-		
-		Assert.assertEquals( ((CustomEventFiringWebDriver)driver1).getCapabilities().getBrowserName(), "htmlunit");
+		CustomEventFiringWebDriver driver1 = WebUIDriver.getWebDriver(true, null, "main", null);
+
+        Assert.assertNotNull(driver1);
+        Assert.assertEquals( driver1.getCapabilities().getBrowserName(), "htmlunit");
 	}
 	
 	/**
@@ -646,7 +627,6 @@ public class TestWebUIDriver extends MockitoTest {
 
 			WebDriver driver = WebUIDriver.getWebDriver(true);
 
-			Assert.assertTrue(driver instanceof CustomEventFiringWebDriver);
 			Assert.assertNotNull(WebUIDriver.getVideoRecorder().get());
 			Assert.assertEquals(WebUIDriver.getVideoRecorder().get(), videoRecorder);
 		}
@@ -666,7 +646,6 @@ public class TestWebUIDriver extends MockitoTest {
 
 			WebDriver driver = WebUIDriver.getWebDriver(true);
 
-			Assert.assertTrue(driver instanceof CustomEventFiringWebDriver);
 			Assert.assertNull(WebUIDriver.getVideoRecorder().get());
 		}
 		
@@ -709,7 +688,7 @@ public class TestWebUIDriver extends MockitoTest {
 	public void testCleanUp() {
 
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		WebDriver driver = spy(WebUIDriver.getWebDriver(true));
+		CustomEventFiringWebDriver driver = spy(WebUIDriver.getWebDriver(true));
 		WebUIDriver uiDriver = WebUIDriver.getWebUIDriver(false);
 		uiDriver.setDriver(driver); // force the mocked driver
 		Assert.assertNotNull(uiDriver.getDriver());
@@ -726,10 +705,10 @@ public class TestWebUIDriver extends MockitoTest {
 	public void testCleanUpDriverExited() {
 
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		WebDriver driver = spy(WebUIDriver.getWebDriver(true));
+		CustomEventFiringWebDriver driver = spy(WebUIDriver.getWebDriver(true));
 		WebUIDriver uiDriver = WebUIDriver.getWebUIDriver(false);
 		uiDriver.setDriver(driver); // force the mocked driver
-		((CustomEventFiringWebDriver)driver).setDriverExited();
+		driver.setDriverExited();
 		Assert.assertNotNull(uiDriver.getDriver());
 		
 		WebUIDriver.cleanUp();
@@ -759,7 +738,7 @@ public class TestWebUIDriver extends MockitoTest {
 	public void testCleanUpWithError() {
 
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		WebDriver driver = spy(WebUIDriver.getWebDriver(true));
+		CustomEventFiringWebDriver driver = spy(WebUIDriver.getWebDriver(true));
 		WebUIDriver uiDriver = WebUIDriver.getWebUIDriver(false);
 		uiDriver.setDriver(driver); // force the mocked driver
 		Assert.assertNotNull(uiDriver.getDriver());
@@ -911,8 +890,8 @@ public class TestWebUIDriver extends MockitoTest {
 			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.WINDOWS);
 			mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(Map.of(BrowserType.FIREFOX, List.of(new BrowserInfo(BrowserType.FIREFOX, "100"))));
 
-			WebDriver driver = WebUIDriver.getWebDriver(true);
-			((CustomEventFiringWebDriver)driver).setDriverExited();
+			CustomEventFiringWebDriver driver = WebUIDriver.getWebDriver(true);
+			driver.setDriverExited();
 			WebUIDriver.logFinalDriversState(Reporter.getCurrentTestResult());
 			verify(mockedDriver, never()).switchTo();
 		}

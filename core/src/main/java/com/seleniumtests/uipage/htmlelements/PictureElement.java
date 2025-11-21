@@ -120,7 +120,7 @@ public class PictureElement extends GenericPictureElement {
 	public void setDetectedObjectRectangleAndAspectRatio(Rectangle detectedRectangle, double sizeRatio) {
 
 		WebUIDriver uiDriver = isDriverCreated();
-		double pixelAspectRatio = ((CustomEventFiringWebDriver)uiDriver.getDriver()).getDeviceAspectRatio();
+		double pixelAspectRatio = uiDriver.getDriver().getDeviceAspectRatio();
 		
 		// take into account the aspect ratio
 		Rectangle updatedRectangle = new Rectangle((int)(detectedRectangle.x / pixelAspectRatio),
@@ -202,7 +202,7 @@ public class PictureElement extends GenericPictureElement {
 			throw new ScenarioException("Driver has not already been created");
 		}
 		
-		CustomEventFiringWebDriver driver = (CustomEventFiringWebDriver)uiDriver.getDriver();
+		CustomEventFiringWebDriver driver = uiDriver.getDriver();
     	if (driver == null) {
     		throw new ScenarioException("Driver has not already been created");
     	}
@@ -214,18 +214,18 @@ public class PictureElement extends GenericPictureElement {
 	 * @param element	The element to move to
 	 * @param coordX	x offset from the center of the element
 	 * @param coordY	y offset from the center of the element
-	 * @return
+	 * @return the actions object
 	 */
 	private Actions move(WebElement element, int coordX, int coordY) {
 		
 		WebUIDriver uiDriver = isDriverCreated();
 
-		if (((CustomEventFiringWebDriver)uiDriver.getDriver()).isWebTest()) {
+		if (uiDriver.getDriver().isWebTest()) {
 
 			// issue #180: internet explorer moves to center of element in viewport
 			// all browsers behave like this
 			// do not take into accoung pixel aspect ratio, because selenium element coordinates are calculated with zooming (element will always have the same size even if zooming is different)
-			Dimension viewportDim = ((CustomEventFiringWebDriver)uiDriver.getDriver()).getViewPortDimensionWithoutScrollbar(false);
+			Dimension viewportDim = uiDriver.getDriver().getViewPortDimensionWithoutScrollbar(false);
 			Dimension elementSize = element.getSize();
 			coordX -= Math.min(elementSize.width, viewportDim.width) / 2;
 			coordY -= Math.min(elementSize.height, viewportDim.height) / 2;

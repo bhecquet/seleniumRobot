@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,10 +17,9 @@
  */
 package com.seleniumtests.it.core;
 
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import org.apache.commons.lang3.StringUtils;
-import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
-import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -36,7 +35,7 @@ public class
 TestCucumberRunner extends GenericMultiBrowserTest {
 
 
-	public TestCucumberRunner(WebDriver driver, DriverTestPage testPage) throws Exception {
+	public TestCucumberRunner(CustomEventFiringWebDriver driver, DriverTestPage testPage) {
 		super(driver, testPage);
 	}
 	
@@ -61,12 +60,10 @@ TestCucumberRunner extends GenericMultiBrowserTest {
 	
 	/**
 	 * Check that generic cucumber steps defined in fixture sub-classes can be used
-	 * Moreover, we check that user defined parameters can be used through notation '{{ var }}' 
-	 * @param testContext
-	 * @throws Exception
+	 * Moreover, we check that user defined parameters can be used through notation '{{ var }}'
 	 */
 	@Test(groups={"it"})
-	public void testEnglishGenericSteps(ITestContext testContext) throws Exception {
+	public void testEnglishGenericSteps() throws Exception {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
@@ -90,11 +87,9 @@ TestCucumberRunner extends GenericMultiBrowserTest {
 	
 	/**
 	 * Check both pages are detected and report contains screenshots
-	 * @param testContext
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testGenericStepsWithMultiplePages(ITestContext testContext) throws Exception {
+	public void testGenericStepsWithMultiplePages() throws Exception {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");

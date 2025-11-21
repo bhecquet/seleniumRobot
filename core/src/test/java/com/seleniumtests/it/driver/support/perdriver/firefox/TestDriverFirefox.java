@@ -332,19 +332,19 @@ public class TestDriverFirefox extends TestDriver {
 	
 	@Override
     @Test(groups= {"it", "ut", "upload"})
-	public void testUploadFileWithRobot() throws AWTException, InterruptedException {
+	public void testUploadFileWithRobot() {
 		super.testUploadFileWithRobot();
 	}
 	
 	@Override
     @Test(groups= {"it", "ut", "upload"})
-	public void testUploadFileWithRobotKeyboard() throws AWTException, InterruptedException {
+	public void testUploadFileWithRobotKeyboard() {
 		super.testUploadFileWithRobotKeyboard();
 	}
 	
 	@Override
     @Test(groups= {"it", "ut"})
-	public void testUploadFile() throws AWTException, InterruptedException {
+	public void testUploadFile() {
 		super.testUploadFile();
 	}
 	

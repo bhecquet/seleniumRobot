@@ -325,7 +325,7 @@ public class UiElement {
 		if (uiDriver == null) {
 			throw new ScenarioException("Driver has not already been created");
 		}
-		CustomEventFiringWebDriver driver = (CustomEventFiringWebDriver)uiDriver.getDriver();
+		CustomEventFiringWebDriver driver = uiDriver.getDriver();
     	if (driver == null) {
     		throw new ScenarioException("Driver has not already been created");
     	}

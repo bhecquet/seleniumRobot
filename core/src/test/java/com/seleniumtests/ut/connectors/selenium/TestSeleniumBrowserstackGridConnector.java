@@ -52,6 +52,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -396,8 +397,9 @@ public class TestSeleniumBrowserstackGridConnector extends ConnectorsTest {
 
 		// error connecting to node
 		Assert.assertNull(out);
-		verify(gridLogger).warn("Video file not get due to {}",
-				"java.util.concurrent.ExecutionException");
+		verify(gridLogger).warn(eq("Video file not get due to {}"),
+				eq("java.util.concurrent.ExecutionException"),
+				any(ExecutionException.class));
 		verify(gridLogger, never()).error(anyString());
 	}
 

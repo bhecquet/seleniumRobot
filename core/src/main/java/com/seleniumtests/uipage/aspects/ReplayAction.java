@@ -85,8 +85,8 @@ public class ReplayAction {
 
 			// chrome automatically scrolls to element before interacting but it may scroll behind fixed header and no error is
 			// raised if action cannot be performed
-			if (((CustomEventFiringWebDriver)WebUIDriver.getWebDriver(false)).getBrowserInfo().getBrowser() == BrowserType.CHROME
-					|| ((CustomEventFiringWebDriver)WebUIDriver.getWebDriver(false)).getBrowserInfo().getBrowser() == BrowserType.EDGE) {
+			if ((WebUIDriver.getWebDriver(false)).getBrowserInfo().getBrowser() == BrowserType.CHROME
+					|| (WebUIDriver.getWebDriver(false)).getBrowserInfo().getBrowser() == BrowserType.EDGE) {
 				updateScrollFlagForElement(joinPoint, true, null);
 			}
 
@@ -219,7 +219,7 @@ public class ReplayAction {
 			while (end.isAfter(systemClock.instant())) {
 
 				// in case we have switched to an iframe for using previous webElement, go to default content
-				if (element.getDriver() != null && ((CustomEventFiringWebDriver)element.getDriver()).isWebTest()) {
+				if (element.getDriver() != null && element.getDriver().isWebTest()) {
 					element.getDriver().switchTo().defaultContent();
 				}
 

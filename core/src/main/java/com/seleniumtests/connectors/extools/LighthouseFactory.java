@@ -21,12 +21,16 @@ import com.seleniumtests.driver.WebUIDriver;
 public class LighthouseFactory {
 
 	private static final Pattern DEBUG_PORT_PATTERN = Pattern.compile("localhost:(\\d+)");
+
+	private LighthouseFactory() {
+		// useless
+	}
 	
 	public static Lighthouse getInstance() {
-		WebDriver driver = WebUIDriver.getWebDriver(false);
+		CustomEventFiringWebDriver driver = WebUIDriver.getWebDriver(false);
 		
 		// check for remote debugging port
-		Capabilities caps = ((CustomEventFiringWebDriver) driver).getCapabilities();
+		Capabilities caps = driver.getCapabilities();
 		
 		String cdpOption = (String) caps.getCapability("se:cdp");
 		if (cdpOption == null || cdpOption.isEmpty()) {

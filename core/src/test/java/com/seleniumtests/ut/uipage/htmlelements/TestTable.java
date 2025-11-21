@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -61,10 +61,8 @@ public class TestTable extends MockitoTest {
 	
 	@Spy
 	private Table table = new Table("", By.id("table"));
-	
-	private List<WebElement> rowEl;
 
-	private MockedStatic mockedWebUIDriver;
+    private MockedStatic<WebUIDriver> mockedWebUIDriver;
 	
 	@BeforeMethod(groups={"ut"})
 	private void init() {
@@ -72,8 +70,8 @@ public class TestTable extends MockitoTest {
 		mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
 		when(driver.findElement(By.id("table"))).thenReturn(tableEl);
 		when(driver.switchTo()).thenReturn(locator);
-		
-		rowEl = new ArrayList<>();
+
+        List<WebElement> rowEl = new ArrayList<>();
 		rowEl.add(row1);
 		rowEl.add(row2);
 		
@@ -90,7 +88,7 @@ public class TestTable extends MockitoTest {
 	}
 
 	@Test(groups={"ut"})
-	public void testGetRows() throws Exception {
+	public void testGetRows() {
 
 		doReturn(List.of(col1, col2)).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row1)));
 		doReturn(List.of(col1, col2)).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row2)));
@@ -99,7 +97,7 @@ public class TestTable extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testGetColumns() throws Exception {
+	public void testGetColumns() {
 
 		doReturn(List.of(col1, col2)).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row1)));
 		doReturn(new ArrayList<>()).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row2)));
@@ -108,14 +106,14 @@ public class TestTable extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testGetColumnsWithoutRows() throws Exception {
+	public void testGetColumnsWithoutRows() {
 		when(tableEl.findElements(By.tagName("tr"))).thenReturn(new ArrayList<>());
 		
 		Assert.assertEquals(table.getColumns().size(), 0);
 	}
 	
 	@Test(groups={"ut"})
-	public void testGetColumnsWithFirstEmptyRow() throws Exception {
+	public void testGetColumnsWithFirstEmptyRow() {
 
 		doReturn(new ArrayList<>()).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row1)));
 		doReturn(List.of(col1, col2)).when(table).getRowCells(argThat(element -> ((HtmlElement)element).getRealElement().equals(row2)));

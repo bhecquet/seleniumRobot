@@ -4,9 +4,7 @@ import com.seleniumtests.GenericDriverTest;
 import com.seleniumtests.WebTestPageServer;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
-import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.TestType;
-import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 import com.seleniumtests.it.driver.support.pages.DriverPDFPage;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
@@ -38,7 +36,7 @@ public class TestPDFReaderWithBrowser  extends GenericDriverTest {
     @Test(groups = "it")
     public void testPDFReader() {
 //        testPdfPage.clickPDF();
-// ((CustomEventFiringWebDriver) driver).executeScript("fetch('http://10.166.162.235:64690/Test_PDF.pdf').then(res => res).then(console.log)");
+// driver.executeScript("fetch('http://10.166.162.235:64690/Test_PDF.pdf').then(res => res).then(console.log)");
 
         /*DevTools devTools = ((HasDevTools) ajc$this.driver.getOriginalDriver()).getDevTools();
         devTools.createSession(ajc$this.driver.getWindowHandle());

@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,9 +32,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.util.helper.WaitHelper;
 import org.apache.commons.lang3.ArrayUtils;
-import org.openqa.selenium.WebDriver;
 import org.testng.Reporter;
 
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
@@ -90,15 +90,14 @@ public class TestTasks {
 	 * returns the list of processes, on the node, whose name without extension is the requested one
 	 * e.g: getProcessList("WINWORD")
 	 * Case will be ignored
-	 * @param processName
-	 * @return
+	 * @param processName		name of the process
 	 */
 	public static List<Integer> getProcessList(String processName) {
 		if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.LOCAL) {
 			return OSUtilityFactory.getInstance().getRunningProcesses(processName).stream()
 				.map(ProcessInfo::getPid)
 				.map(Integer::valueOf)
-				.collect(Collectors.toList());
+				.toList();
 			
 		} else if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.GRID) {
 			SeleniumGridConnector gridConnector = SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector();
@@ -116,8 +115,8 @@ public class TestTasks {
      * Execute a command
      * If test is run locally, you can execute any command, limit is the rights given to the user
      * If test is run through seleniumRobot grid, only commands allowed by grid will be allowed
-     * @param program
-     * @param args
+     * @param program	program to execute
+     * @param args		arguments to the program
      */
     public static String executeCommand(String program, String ... args) {
     	return executeCommand(program, -1, null, args);
@@ -154,8 +153,8 @@ public class TestTasks {
 	/**
 	 * Method for creating or updating a variable on the seleniumRobot server (or locally if server is not used)
      * Moreover, created custom variable is specific to tuple (application, version, test environment)
-     * @param key
-     * @param newValue
+     * @param key		name of the param
+     * @param newValue	value to set
      */
 	public static void createOrUpdateParam(String key, String newValue) {
 		createOrUpdateParam(key, newValue, true);
@@ -164,8 +163,8 @@ public class TestTasks {
 	/**
 	 * Method for creating or updating a variable locally. If selenium server is not used, there is no difference with 'createOrUpdateParam'. 
 	 * If seleniumRobot server is used, then, this method will only change variable value locally, not updating the remote one
-	 * @param key
-	 * @param newValue
+	 * @param key		name of the param
+	 * @param newValue  value to set
 	 */
 	public static void createOrUpdateLocalParam(String key, String newValue) {
 		createOrUpdateParam(key, newValue, false, TestVariable.TIME_TO_LIVE_INFINITE, false, true);
@@ -261,7 +260,7 @@ public class TestTasks {
      * Get parameter from configuration
      * If configuration can be get from threadContext, it's done, else, we look at global context
      * 
-     * @param key
+     * @param key 	name of the param
      * 
      * @return String
      */
@@ -277,7 +276,6 @@ public class TestTasks {
      * Get parameter from configuration
      * If multiple variables match the pattern, only one is returned
      * @param keyPattern	Pattern for searching key. If null, no filtering will be done on key
-     * @return
      */
     public static String param(Pattern keyPattern) {
     	try {
@@ -293,7 +291,6 @@ public class TestTasks {
      * If multiple variables match the pattern, only one is returned
      * @param keyPattern	Pattern for searching key. If null, no filtering will be done on key
      * @param valuePattern	Pattern for searching value. If null, no filtering will be done on value
-     * @return
      */
     public static String param(Pattern keyPattern, Pattern valuePattern) {
     	try {
@@ -382,9 +379,9 @@ public class TestTasks {
     
     /**
      * In case the scenario uses several drivers, switch to one or another using this method, so that any new calls will go through this driver
-     * @param driverName
+     * @param driverName	driver name
      */
-    public static WebDriver switchToDriver(String driverName) {
+    public static CustomEventFiringWebDriver switchToDriver(String driverName) {
     	WebUIDriver.switchToDriver(driverName);
     	return WebUIDriver.getWebDriver(false);
     }
@@ -392,7 +389,7 @@ public class TestTasks {
 	/**
 	 * Download the file from grid (or local)
 	 *
-	 * @param fileName
+	 * @param fileName	name of the file to download
 	 * @return	the file or null if the file cannot be found
 	 */
 	public static File getDownloadedFile(String fileName) {
@@ -404,10 +401,12 @@ public class TestTasks {
 				WaitHelper.waitForMilliSeconds(500);
 				try (Stream<Path> stream = Files.list(Paths.get(SeleniumTestsContextManager.getThreadContext().getDownloadOutputDirectory()))) {
 					optionalName = stream
-							.filter(path -> path.toFile().getName().contains(fileName))
 							.map(Path::toFile)
+							.filter(file -> file.getName().contains(fileName))
 							.findFirst();
-				} catch (NullPointerException | IOException e) {}
+				} catch (NullPointerException | IOException e) {
+					// ignore error
+				}
 			} while (optionalName.isEmpty() && end.isAfter(Instant.now()));
 			return optionalName.orElse(null);
 		} else {
@@ -422,7 +421,7 @@ public class TestTasks {
 					optionalName = fileNames.stream()
 							.filter(name -> name.contains(fileName))
 							.findFirst();
-				} while (!optionalName.isPresent() && end.isAfter(Instant.now()));
+				} while (optionalName.isEmpty() && end.isAfter(Instant.now()));
 				return optionalName.map(name -> gridConnector.downloadFileFromName(name, new File(SeleniumTestsContextManager.getThreadContext().getDownloadOutputDirectory())))
 						.orElse(null);
 
@@ -430,5 +429,10 @@ public class TestTasks {
 				throw new ScenarioException(ERROR_NO_GRID_CONNECTOR_ACTIVE);
 			}
 		}
+	}
+
+	public static void setGeolocation(double latitude, double longitude) {
+		CustomEventFiringWebDriver driver = WebUIDriver.getWebDriver(true);
+		driver.setGeolocation(latitude, longitude);
 	}
 }

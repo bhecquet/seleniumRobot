@@ -1,12 +1,11 @@
 package com.seleniumtests.ut.browserfactory.chrome;
 
 import com.seleniumtests.GenericTest;
-import com.seleniumtests.browserfactory.chrome.ChromeUtils;
+import com.seleniumtests.browserfactory.chrome.ChromiumUtils;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.har.Har;
 import com.seleniumtests.util.har.WebSocketEntry;
 
-import org.jetbrains.annotations.NotNull;
 import org.openqa.selenium.logging.LogEntry;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -19,9 +18,8 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
-public class TestChromeUtils extends GenericTest {
+public class TestChromiumUtils extends GenericTest {
 
 	@Test(groups = "ut")
 	public void testParsePerformanceLogsWebSocket() throws IOException {
@@ -33,7 +31,7 @@ public class TestChromeUtils extends GenericTest {
 		testSteps.add(new TestStep("step 2"));
 		testSteps.get(1).setTimestamp(Instant.ofEpochMilli(1739547734198L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 		
-		Har har = ChromeUtils.parsePerformanceLogs(logEntries, testSteps);
+		Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
 		
 		// check pages
 		Assert.assertEquals(har.getLog().getPages().size(), 2);
@@ -77,7 +75,7 @@ public class TestChromeUtils extends GenericTest {
 		testSteps.add(new TestStep("step 2"));
 		testSteps.get(1).setTimestamp(Instant.ofEpochMilli(1739547734198L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 		
-		Har har = ChromeUtils.parsePerformanceLogs(logEntries, testSteps);
+		Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
 		
 		// check pages
 		Assert.assertEquals(har.getLog().getPages().size(), 2);
@@ -115,7 +113,7 @@ public class TestChromeUtils extends GenericTest {
 		testSteps.add(new TestStep("step 2"));
 		testSteps.get(1).setTimestamp(Instant.ofEpochMilli(1739547734198L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 		
-		Har har = ChromeUtils.parsePerformanceLogs(logEntries, testSteps);
+		Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
 		
 		// check pages
 		Assert.assertEquals(har.getLog().getPages().size(), 2);
@@ -152,7 +150,7 @@ public class TestChromeUtils extends GenericTest {
 		testSteps.add(new TestStep("step 2"));
 		testSteps.get(1).setTimestamp(Instant.ofEpochMilli(1739547734198L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 		
-		Har har = ChromeUtils.parsePerformanceLogs(logEntries, testSteps);
+		Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
 		
 		// check pages
 		Assert.assertEquals(har.getLog().getPages().size(), 2);
@@ -186,7 +184,7 @@ public class TestChromeUtils extends GenericTest {
 		testSteps.add(new TestStep("step 2"));
 		testSteps.get(1).setTimestamp(Instant.ofEpochMilli(1739547734198L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 		
-		Har har = ChromeUtils.parsePerformanceLogs(logEntries, testSteps);
+		Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
 		
 		// check pages
 		Assert.assertEquals(har.getLog().getPages().size(), 2);
@@ -229,7 +227,7 @@ public class TestChromeUtils extends GenericTest {
         testSteps.add(new TestStep("step 2"));
         testSteps.get(1).setTimestamp(Instant.ofEpochMilli(1739547734198L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 
-        Har har = ChromeUtils.parsePerformanceLogs(logEntries, testSteps);
+        Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
 
         // check pages
         Assert.assertEquals(har.getLog().getPages().size(), 2);
@@ -273,7 +271,7 @@ public class TestChromeUtils extends GenericTest {
         testSteps.add(new TestStep("step 1"));
         testSteps.get(0).setTimestamp(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 
-        Har har = ChromeUtils.parsePerformanceLogs(logEntries, testSteps);
+        Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
         Assert.assertTrue(har.getLog().getEntries().get(0).getRequest().getHeaders()
                 .stream()
                 .filter(h -> h.getName().equals("Authorization"))
@@ -290,7 +288,7 @@ public class TestChromeUtils extends GenericTest {
 
         List<TestStep> testSteps = new ArrayList<>();
 
-        Har har = ChromeUtils.parsePerformanceLogs(logEntries, testSteps);
+        Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
         Assert.assertEquals(har.getLog().getEntries().size(), 1);
         Assert.assertEquals(har.getLog().getEntries().get(0).getPageref(), "");
         Assert.assertEquals(har.getLog().getPages().size(), 0);
@@ -307,7 +305,7 @@ public class TestChromeUtils extends GenericTest {
         testSteps.add(new TestStep("step 1"));
         testSteps.get(0).setTimestamp(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 
-        Har har = ChromeUtils.parsePerformanceLogs(logEntries, testSteps);
+        Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
         Assert.assertEquals(har.getLog().getEntries().get(0).getRequest().getHeaders().size(), 4);
     }
 
@@ -322,7 +320,7 @@ public class TestChromeUtils extends GenericTest {
         testSteps.add(new TestStep("step 1"));
         testSteps.get(0).setTimestamp(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 
-        Har har = ChromeUtils.parsePerformanceLogs(logEntries, testSteps);
+        Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
         Assert.assertEquals(har.getLog().getEntries().size(), 1);
     }
 
@@ -337,7 +335,7 @@ public class TestChromeUtils extends GenericTest {
         testSteps.add(new TestStep("step 1"));
         testSteps.get(0).setTimestamp(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 
-        Har har = ChromeUtils.parsePerformanceLogs(logEntries, testSteps);
+        Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
         Assert.assertEquals(har.getLog().getEntries().size(), 1);
         Assert.assertEquals(har.getLog().getEntries().get(0).getResponse().getStatus(), 0);
         Assert.assertEquals(har.getLog().getEntries().get(0).getResponse().getStatusText(), "No response received");
@@ -356,7 +354,7 @@ public class TestChromeUtils extends GenericTest {
         testSteps.add(new TestStep("step 1"));
         testSteps.get(0).setTimestamp(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 
-        Har har = ChromeUtils.parsePerformanceLogs(logEntries, testSteps);
+        Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
         Assert.assertEquals(har.getLog().getEntries().size(), 1);
         Assert.assertEquals(har.getLog().getEntries().get(0).getTimings().getConnect(), 0);
     }
@@ -374,7 +372,7 @@ public class TestChromeUtils extends GenericTest {
         testSteps.add(new TestStep("step 1"));
         testSteps.get(0).setTimestamp(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 
-        Har har = ChromeUtils.parsePerformanceLogs(logEntries, testSteps);
+        Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
         Assert.assertEquals(har.getLog().getEntries().size(), 1);
         Assert.assertEquals(har.getLog().getEntries().get(0).getResponse().getStatus(), 304);
     }
@@ -390,7 +388,7 @@ public class TestChromeUtils extends GenericTest {
         testSteps.add(new TestStep("step 1"));
         testSteps.get(0).setTimestamp(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 
-        Har har = ChromeUtils.parsePerformanceLogs(logEntries, testSteps);
+        Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
         Assert.assertEquals(har.getLog().getEntries().size(), 0);
     }
 
@@ -402,7 +400,7 @@ public class TestChromeUtils extends GenericTest {
         testSteps.add(new TestStep("step 1"));
         testSteps.get(0).setTimestamp(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
 
-        Har har = ChromeUtils.parsePerformanceLogs(logEntries, testSteps);
+        Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
         Assert.assertEquals(har.getLog().getEntries().size(), 1);
         Assert.assertEquals(har.getLog().getEntries().get(0).getResponse().getStatus(), 0);
         Assert.assertEquals(har.getLog().getEntries().get(0).getResponse().getStatusText(), "net::ERR_NAME_NOT_RESOLVED");

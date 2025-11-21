@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,7 +38,7 @@ import com.seleniumtests.util.helper.WaitHelper;
 
 public class TestScreenZone extends GenericMultiBrowserTest {
 	
-	public TestScreenZone(WebDriver driver, DriverTestPage testPage) throws Exception {
+	public TestScreenZone(CustomEventFiringWebDriver driver, DriverTestPage testPage) {
 		super(driver, testPage);
 	}
 	
@@ -53,11 +53,13 @@ public class TestScreenZone extends GenericMultiBrowserTest {
 			try {
 				Alert alert = driver.switchTo().alert();
 				alert.dismiss();
-			} catch (Exception e) {}
+			} catch (Exception e) {
+				// ignore
+			}
 
 			DriverTestPageWithoutFixedPattern.logoText.clear();
 			DriverTestPageWithoutFixedPattern.textElement.clear();
-			((CustomEventFiringWebDriver)driver).scrollTop();
+			driver.scrollTop();
 			
 			DriverTestPageWithoutFixedPattern.googleForDesktop.moveAndLeftClick(0, 200);
 			WaitHelper.waitForSeconds(2); // slow down tests because, with search picture cache introduced by #510, 2 successive clicks may be interpreted by a double click
@@ -159,7 +161,7 @@ public class TestScreenZone extends GenericMultiBrowserTest {
 	public void testSendKeysOnPicture() {
 		try {
 			DriverTestPageWithoutFixedPattern.logoText.clear();
-			((CustomEventFiringWebDriver)driver).scrollToElement(DriverTestPageWithoutFixedPattern.table, 200);
+			driver.scrollToElement(DriverTestPageWithoutFixedPattern.table, 200);
 			DriverTestPageWithoutFixedPattern.firefoxForDesktop.sendKeys(0, 40, "hello");
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
@@ -171,7 +173,7 @@ public class TestScreenZone extends GenericMultiBrowserTest {
 	public void testSendKeyboardKeysOnPicture() { 
 		try {
 			DriverTestPageWithoutFixedPattern.logoText.clear();
-			((CustomEventFiringWebDriver)driver).scrollToElement(DriverTestPageWithoutFixedPattern.table, 200);
+			driver.scrollToElement(DriverTestPageWithoutFixedPattern.table, 200);
 			DriverTestPageWithoutFixedPattern.firefoxForDesktop.sendKeys(0, 40, KeyEvent.VK_A, KeyEvent.VK_B);
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
@@ -197,7 +199,7 @@ public class TestScreenZone extends GenericMultiBrowserTest {
 	public void testSendKeysOnMainScreen() {
 		try {
 			DriverTestPageWithoutFixedPattern.logoText.clear();
-			((CustomEventFiringWebDriver)driver).scrollToElement(DriverTestPageWithoutFixedPattern.table, 200);
+			driver.scrollToElement(DriverTestPageWithoutFixedPattern.table, 200);
 			DriverTestPageWithoutFixedPattern.firefoxForDesktop.sendKeys(true, 0, 40, "hello");
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
@@ -208,7 +210,7 @@ public class TestScreenZone extends GenericMultiBrowserTest {
 	public void testSendKeyboardKeysOnMainScreen() {
 		try {
 			DriverTestPageWithoutFixedPattern.logoText.clear();
-			((CustomEventFiringWebDriver)driver).scrollToElement(DriverTestPageWithoutFixedPattern.table, 200);
+			driver.scrollToElement(DriverTestPageWithoutFixedPattern.table, 200);
 			DriverTestPageWithoutFixedPattern.firefoxForDesktop.sendKeys(true, 0, 40, KeyEvent.VK_A, KeyEvent.VK_B);
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
@@ -219,7 +221,7 @@ public class TestScreenZone extends GenericMultiBrowserTest {
 	public void testSendKeysOnMainScreenNoPicture() {
 		try {
 			DriverTestPageWithoutFixedPattern.logoText.clear();
-			((CustomEventFiringWebDriver)driver).scrollToElement(DriverTestPageWithoutFixedPattern.table, 200);
+			driver.scrollToElement(DriverTestPageWithoutFixedPattern.table, 200);
 			DriverTestPageWithoutFixedPattern.firefoxForDesktop.findElement();
 			Rectangle position = DriverTestPageWithoutFixedPattern.firefoxForDesktop.getDetectedObjectRectangle();
 

@@ -5,8 +5,6 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.*;
 
-import java.io.IOException;
-
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -27,7 +25,6 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.runner.cucumber.Actions;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
-import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.uipage.htmlelements.FrameElement;
@@ -58,19 +55,17 @@ public class TestActions extends MockitoTest {
 	
 	// issue #325
 
-	private CustomEventFiringWebDriver eventDriver;
-
-	private MockedStatic mockedWebUIDriver;
+    private MockedStatic<WebUIDriver> mockedWebUIDriver;
 
 	@BeforeMethod(groups = { "ut" })
-	private void init() throws WebDriverException, IOException {
+	private void init() throws WebDriverException {
 
 		SeleniumTestsContextManager.getGlobalContext().setCucumberImplementationPackage("com.seleniumtests.ut.core.runner.cucumber");
 
 		when(driver.getCapabilities()).thenReturn(new DesiredCapabilities()); // add capabilities to allow augmenting driver
 		
 		// add DriverExceptionListener to reproduce driver behavior
-		eventDriver = spy(new CustomEventFiringWebDriver(driver));
+        CustomEventFiringWebDriver eventDriver = spy(new CustomEventFiringWebDriver(driver));
 
 		mockedWebUIDriver = mockStatic(WebUIDriver.class);
 		mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
@@ -90,7 +85,7 @@ public class TestActions extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testOpenPage() throws IOException {
+	public void testOpenPage() {
 		new Actions().openPage("http://www.foo.com");
 		verify(navigation).to("http://www.foo.com");
 	}

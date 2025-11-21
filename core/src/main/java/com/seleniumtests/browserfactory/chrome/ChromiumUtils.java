@@ -1,6 +1,6 @@
 	package com.seleniumtests.browserfactory.chrome;
 
-import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.har.*;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -8,6 +8,10 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.devtools.DevTools;
+import org.openqa.selenium.devtools.HasDevTools;
+import org.openqa.selenium.devtools.v142.emulation.Emulation;
 import org.openqa.selenium.logging.LogEntry;
 
 import java.time.Instant;
@@ -16,9 +20,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ChromeUtils {
+/**
+ * Class providing methods specific to chromium
+ */
 
-	private static final Logger logger = SeleniumRobotLogger.getLogger(ChromeUtils.class);
+public class ChromiumUtils {
+
+	private static final Logger logger = SeleniumRobotLogger.getLogger(ChromiumUtils.class);
 	public static final String KEY_PARAMS = "params";
 	public static final String KEY_REQUEST_ID = "requestId";
 	public static final String KEY_RESPONSE = "response";
@@ -41,7 +49,7 @@ public class ChromeUtils {
 	public static final String KEY_X_UNKNOWN = "x-unknown";
 	public static final String KEY_TOKEN = "token";
 
-	private ChromeUtils() {
+	private ChromiumUtils() {
 		// nothing
 	}
 
@@ -501,4 +509,26 @@ public class ChromeUtils {
                 0
         );
     }
+
+	/**
+	 * Set geolocation using CDP
+	 * @param driver		the driver (augmented driver)
+	 * @param latitude		the latitude
+	 * @param longitude		the longitude
+	 */
+	public static void setGeolocation(WebDriver driver, double latitude, double longitude) {
+		if (driver instanceof HasDevTools devToolsDriver) {
+			DevTools devTools = devToolsDriver.getDevTools();
+			devTools.createSessionIfThereIsNotOne();
+
+			devTools.send(Emulation.setGeolocationOverride(Optional.of(latitude),
+					Optional.of(longitude),
+					Optional.of(1),
+					Optional.empty(),
+					Optional.of(1),
+					Optional.empty(),
+					Optional.empty()
+			));
+		}
+	}
 }

@@ -21,9 +21,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 
 import com.seleniumtests.browserfactory.SeleniumGridDriverFactory;
-import com.seleniumtests.core.runner.SeleniumRobotTestListener;
-import com.seleniumtests.util.osutility.OSUtility;
-import org.openqa.selenium.WebDriver;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
@@ -45,7 +43,7 @@ import com.seleniumtests.util.video.VideoCaptureMode;
 public class GenericDriverTest extends ParentTest {
 	protected static final ScenarioLogger logger = ScenarioLogger.getScenarioLogger(SeleniumRobotTestPlan.class);
 	
-	public WebDriver driver = null;
+	public CustomEventFiringWebDriver driver = null;
 
 	@BeforeMethod(groups={"ut", "it"})  
 	public void initTest(final ITestContext testNGCtx, final ITestResult testResult) {
@@ -65,6 +63,7 @@ public class GenericDriverTest extends ParentTest {
 			SeleniumTestsContextManager.initThreadContext(testNGCtx, GenericTest.generateResult(testNGCtx, getClass()));
 		} catch (NoSuchMethodException | SecurityException | NoSuchFieldException | IllegalArgumentException
 				| IllegalAccessException e) {
+			// ignore
 		}
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
@@ -81,26 +80,17 @@ public class GenericDriverTest extends ParentTest {
 	}
 	
 	public static int findFreePort() {
-		ServerSocket socket = null;
-		try {
-			socket = new ServerSocket(0);
+
+		try (ServerSocket socket = new ServerSocket(0)){
 			socket.setReuseAddress(true);
-			int port = socket.getLocalPort();
-			
-			return port;
-		} catch (IOException e) { 
-		} finally {
-			if (socket != null) {
-				try {
-					socket.close();
-				} catch (IOException e) {
-				}
-			}
+			return socket.getLocalPort();
+		} catch (IOException e) {
+			// ignore
 		}
 		throw new IllegalStateException("Could not find a free TCP/IP port ");
 	}
 	
 	public void myTest() {
-		
+		// for use with tests
 	}
 }

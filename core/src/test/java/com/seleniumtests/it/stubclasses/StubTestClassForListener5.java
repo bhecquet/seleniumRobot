@@ -19,7 +19,7 @@ package com.seleniumtests.it.stubclasses;
 
 import java.lang.reflect.Method;
 
-import org.openqa.selenium.WebDriver;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterGroups;
@@ -48,7 +48,7 @@ import com.seleniumtests.driver.screenshots.SnapshotTarget;
 public class StubTestClassForListener5 extends StubTestClassForListenerParent {
 	
 	private void startDriver() {
-		WebDriver driver = WebUIDriver.getWebDriver(true);
+		CustomEventFiringWebDriver driver = WebUIDriver.getWebDriver(true);
 		driver.get("file:///" + Thread.currentThread().getContextClassLoader().getResource("tu/test.html").getFile());
 		logger.logScreenshot(new ScreenshotUtil(driver).capture(SnapshotTarget.PAGE, ScreenShot.class));
 	}

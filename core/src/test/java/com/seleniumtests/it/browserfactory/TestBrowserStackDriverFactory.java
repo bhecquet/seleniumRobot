@@ -34,8 +34,8 @@ public class TestBrowserStackDriverFactory extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().setRunMode("browserstack");
 		SeleniumTestsContextManager.getThreadContext().configureContext(Reporter.getCurrentTestResult());
 		
-		WebDriver driver = WebUIDriver.getWebDriver(true);
-		WebDriver realDriver = ((CustomEventFiringWebDriver)driver).getWebDriver();
+		CustomEventFiringWebDriver driver = WebUIDriver.getWebDriver(true);
+		WebDriver realDriver = driver.getWebDriver();
 		driver.findElements(By.xpath("//*")).get(0).getText();
 		
 		
@@ -58,8 +58,8 @@ public class TestBrowserStackDriverFactory extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().setRunMode("browserstack");
 		SeleniumTestsContextManager.getThreadContext().configureContext(Reporter.getCurrentTestResult());
 
-		WebDriver driver = WebUIDriver.getWebDriver(true);
-		WebDriver realDriver = ((CustomEventFiringWebDriver)driver).getWebDriver();
+		CustomEventFiringWebDriver driver = WebUIDriver.getWebDriver(true);
+		WebDriver realDriver = driver.getWebDriver();
 		driver.get("https://www.google.com");
 		driver.getPageSource();
 		WebUIDriver.cleanUp();

@@ -626,7 +626,7 @@ public class ByC extends By {
         
         @Override
         public List<WebElement> findElements(SearchContext context) {
-            CustomEventFiringWebDriver currentDriver = (CustomEventFiringWebDriver) WebUIDriver.getWebDriver(false);
+            CustomEventFiringWebDriver currentDriver = WebUIDriver.getWebDriver(false);
             String androidSelector = null;
             if (!currentDriver.isWebTest()
                     && currentDriver.getOriginalDriver() instanceof AndroidDriver) {
@@ -645,7 +645,7 @@ public class ByC extends By {
         
         @Override
         public WebElement findElement(SearchContext context) {
-            CustomEventFiringWebDriver currentDriver = (CustomEventFiringWebDriver) WebUIDriver.getWebDriver(false);
+            CustomEventFiringWebDriver currentDriver = WebUIDriver.getWebDriver(false);
             String androidSelector = null;
             if (!currentDriver.isWebTest()
                     && currentDriver.getOriginalDriver() instanceof AndroidDriver) {

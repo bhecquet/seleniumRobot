@@ -285,7 +285,7 @@ public class TestWebUiDriver extends ReporterTest {
 	}
 
 	@Test(groups={"it"})
-	public void testHarCaptureExistsAndPerformanceLogsPresent() throws Exception {
+	public void testHarCaptureExistsAndPerformanceLogsPresent() {
 
 		try {
 			System.setProperty(SeleniumTestsContext.DEBUG, "driver");
@@ -304,7 +304,7 @@ public class TestWebUiDriver extends ReporterTest {
 	 * Check that browser logs are written to file (only available for chrome)
 	 */
 	@Test(groups={"it"})
-	public void testBrowserLogsExists() throws Exception {
+	public void testBrowserLogsExists() {
 
 		try {
 			System.setProperty(SeleniumTestsContext.DEBUG, "driver");
@@ -361,19 +361,19 @@ public class TestWebUiDriver extends ReporterTest {
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 		
 		// creates the first driver
-		WebDriver driver1 = WebUIDriver.getWebDriver(true, BrowserType.CHROME, "main", null);
+		CustomEventFiringWebDriver driver1 = WebUIDriver.getWebDriver(true, BrowserType.CHROME, "main", null);
 		driver1.get("chrome://settings/");
 		
 		// creates the second driver
-		WebDriver driver2 = WebUIDriver.getWebDriver(true, BrowserType.FIREFOX, "second", null);
+		CustomEventFiringWebDriver driver2 = WebUIDriver.getWebDriver(true, BrowserType.FIREFOX, "second", null);
 		driver2.get("about:config");
 		
 		// last created driver has the focus
 		Assert.assertEquals(WebUIDriver.getWebDriver(false), driver2);
 		
 		// created browser is of the requested type
-		Assert.assertEquals(((CustomEventFiringWebDriver)driver1).getCapabilities().getBrowserName(), "chrome");
-		Assert.assertEquals(((CustomEventFiringWebDriver)driver2).getCapabilities().getBrowserName(), "firefox");
+		Assert.assertEquals(driver1.getCapabilities().getBrowserName(), "chrome");
+		Assert.assertEquals(driver2.getCapabilities().getBrowserName(), "firefox");
 	}
 	
 	/**

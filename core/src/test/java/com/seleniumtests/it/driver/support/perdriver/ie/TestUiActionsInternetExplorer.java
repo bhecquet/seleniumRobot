@@ -37,7 +37,7 @@ public class TestUiActionsInternetExplorer extends TestUiActions {
 	
 	@Override
     @Test(groups= {"ie"})
-	public void testNewActionWithHtmlElement() throws Exception {
+	public void testNewActionWithHtmlElement() {
 		super.testNewActionWithHtmlElement();
 	}
 
@@ -55,13 +55,13 @@ public class TestUiActionsInternetExplorer extends TestUiActions {
 	
 	@Override
     @Test(groups= {"ie"}) 
-	public void testSendKeysWithHtmlElement() throws Exception {
+	public void testSendKeysWithHtmlElement() {
 		super.testSendKeysWithHtmlElement();
 	}
 
 	@Override
     @Test(groups= {"ie"}, expectedExceptions=WebDriverException.class) 
-	public void testSendKeysWithHtmlElementNotPresent() throws Exception {
+	public void testSendKeysWithHtmlElementNotPresent() {
 		super.testSendKeysWithHtmlElementNotPresent();
 	}
 }

@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -115,11 +115,10 @@ public class TestBrowserInfo extends GenericDriverTest {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("iexploreEdge");
 		SeleniumTestsContextManager.getThreadContext().setInitialUrl("https://www.google.fr");
 		driver = WebUIDriver.getWebDriver(true);
-		CustomEventFiringWebDriver efDriver = (CustomEventFiringWebDriver)driver;
 		
 		// there should be one PID for the driver server
-		List<Long> pids = efDriver.getDriverPids();
-		Assert.assertEquals(efDriver.getDriverPids().size(), 1);
+		List<Long> pids = driver.getDriverPids();
+		Assert.assertEquals(driver.getDriverPids().size(), 1);
 		Assert.assertTrue(OSUtilityFactory.getInstance().getProgramNameFromPid((Long)pids.get(0)).contains("IEDriverServer"));
 	}
 	
@@ -128,11 +127,10 @@ public class TestBrowserInfo extends GenericDriverTest {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 		driver = WebUIDriver.getWebDriver(true);
-		CustomEventFiringWebDriver efDriver = (CustomEventFiringWebDriver)driver;
 		
 		// there should be one PID for the driver server
-		List<Long> pids = efDriver.getDriverPids();
-		Assert.assertEquals(efDriver.getDriverPids().size(), 1);
+		List<Long> pids = driver.getDriverPids();
+		Assert.assertEquals(driver.getDriverPids().size(), 1);
 		Assert.assertTrue(OSUtilityFactory.getInstance().getProgramNameFromPid((Long)pids.get(0)).contains("chromedriver"));
 	}
 	
@@ -141,11 +139,10 @@ public class TestBrowserInfo extends GenericDriverTest {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*firefox");
 		driver = WebUIDriver.getWebDriver(true);
-		CustomEventFiringWebDriver efDriver = (CustomEventFiringWebDriver)driver;
 		
 		// there should be one PID for the driver server
-		List<Long> pids = efDriver.getDriverPids();
-		Assert.assertEquals(efDriver.getDriverPids().size(), 1);
+		List<Long> pids = driver.getDriverPids();
+		Assert.assertEquals(driver.getDriverPids().size(), 1);
 		Assert.assertTrue(OSUtilityFactory.getInstance().getProgramNameFromPid((Long)pids.get(0)).contains("geckodriver"));
 	}
 	
@@ -155,10 +152,9 @@ public class TestBrowserInfo extends GenericDriverTest {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*chrome");
 		driver = WebUIDriver.getWebDriver(true);
-		CustomEventFiringWebDriver efDriver = (CustomEventFiringWebDriver)driver;
 		
-		List<Long> pids = efDriver.getDriverPids();
-		List<Long> allPids = efDriver.getBrowserInfo().getAllBrowserSubprocessPids(pids);
+		List<Long> pids = driver.getDriverPids();
+		List<Long> allPids = driver.getBrowserInfo().getAllBrowserSubprocessPids(pids);
 		
 		// one pid for driver and at least one for browser (chrome starts several processes)
 		Assert.assertTrue(allPids.size() >= 2);

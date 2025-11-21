@@ -74,8 +74,6 @@ public class CompositeActions {
 	/**
 	 * Analyse action list and determine if a clic action occured. If it's the case, update window handles
 	 * @param actionsList
-	 * @throws NoSuchFieldException
-	 * @throws IllegalAccessException
 	 */
 	private void updateWindowHandles(LinkedList<Interaction> actionsList)
 			throws NoSuchFieldException, IllegalAccessException {
@@ -114,7 +112,7 @@ public class CompositeActions {
 		}
 		
 		if (clickRequested) {
-			((CustomEventFiringWebDriver)WebUIDriver.getWebDriver(false)).updateWindowsHandles();
+			(WebUIDriver.getWebDriver(false)).updateWindowsHandles();
 		}
 	}
 	
