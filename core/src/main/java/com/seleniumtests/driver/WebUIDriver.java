@@ -636,7 +636,7 @@ public class WebUIDriver {
     		throw new ScenarioException(String.format("driver with name %s has not been created", driverName));
     	}
 
-		if (uxDriverSession.get().get(driverName).driver.isBrowserOrAppClosed()) {
+		if (uxDriverSession.get().get(driverName).driver != null && uxDriverSession.get().get(driverName).driver.isBrowserOrAppClosed()) {
     		throw new ScenarioException("Cannot switch to a closed driver");
     	}
 
