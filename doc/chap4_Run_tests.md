@@ -229,9 +229,10 @@ Params for mobile testing
  | appWaitActivity 			| 			| In some cases, the first started activity is not the main app activity | 
  | newCommandTimeout 		| 120		| Max wait (in seconds) between 2 appium commands in seconds. Increase this time when debugging | 
  | version 					| 			| Platform version | 
- | platform 					| 			| platform on which test should execute. Ex: Windows 7, Android 5.0, iOS 9.1, Linux, OS X 10.10. Defaults to the current platform |
+ | platform 				| 			| platform on which test should execute. Ex: Windows 11, Android 14.0, iOS 26.0, Linux, OS X 10.10. Defaults to the current platform |
  | automationName			| Appium / XCUITest | "UiAutomator2" for Android and "XCUITest" for iOS.
- | cloudApiKey 				| 			| Access key for service |  
+ | cloudApiKey 				| 			| Access key for cloud service |  
+ | location					|			| If cloud provider (e.g: browserstack) allow setting where test will execute, set it. E.g: "FR" for browserstack
  | testConfig 				|  			| Additional configuration. This should contain common configuration through all TestNG files.<br/>See `exampleConfigGenericParams.xml` file for format | 
 
 #### Windows app params ####
@@ -405,8 +406,9 @@ Test must be configured with `runMode` and `webDriverGrid` options (or use `-Dru
 BrowserStack is seen as a selenium grid.
 You the MUST use options:
 - `runMode=browserstack` to enable browserstack
-- `DwebDriverGrid=http://<user>:<key>@hub-cloud.browserstack.com/wd/hub` => see browserstack documentation
-- `platform=<platform>` => Use browserstack [capabilities generator](https://www.browserstack.com/automate/capabilities) to see which platforms are available. Platform to set here is the concatenation of `os` and `os_version` for desktop. E.g: "Windows 10"
+- `DwebDriverGrid=http://<user>:<key>@hub.browserstack.com/wd/hub` => see browserstack documentation
+- `platform=<platform>` => Use browserstack [capabilities generator](https://www.browserstack.com/docs/automate/capabilities) to see which platforms are available. Platform to set here is the concatenation of `os` and `os_version` for desktop. E.g: "Windows 10"
+- `localtion=<location>` => If you need that your tests are executed from a specific location, set it here (https://www.browserstack.com/docs/ip-geolocation). It will be mapped to "geoLocation" capability for desktop
 
 If you run behind a proxy, also use the JVM options: `-Dhttps.proxyHost=<host> -Dhttps.proxyPort=<port> -Dhttps.nonProxyHosts=<nonProxy>`
 
