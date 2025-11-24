@@ -774,7 +774,9 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     		logger.info("close: Handling alert");
     		handleAlert();
     		driver.close();
-    	}
+    	} catch (Exception e) {
+			logger.warn("error closing driver: {}", e.getMessage());
+		}
     }
     
     @Override
