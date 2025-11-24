@@ -42,8 +42,10 @@ import java.util.TreeSet;
 
 import javax.imageio.ImageIO;
 
+import com.seleniumtests.browserfactory.chrome.ChromiumUtils;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.WebSessionEndedException;
-import com.seleniumtests.driver.TestType;
+import com.seleniumtests.driver.*;
 import io.appium.java_client.HidesKeyboard;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.remote.SupportsContextSwitching;
@@ -68,9 +70,6 @@ import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.customexception.ScenarioException;
-import com.seleniumtests.driver.CustomEventFiringWebDriver;
-import com.seleniumtests.driver.DriverMode;
-import com.seleniumtests.driver.Keyboard;
 import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.video.VideoRecorder;
@@ -1696,6 +1695,50 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testGetCurrentUrlNoWindow() {
 		when(driver.getCurrentUrl()).thenThrow(new NoSuchWindowException("no window"));
 		Assert.assertEquals(eventDriver.getCurrentUrl(), "");
+	}
+
+	@Test(groups = {"ut"})
+	public void testGeoLocationWithChrome() {
+		try (MockedStatic<ChromiumUtils> mockedChromiumUtils = mockStatic(ChromiumUtils.class)) {
+			when(browserInfo.getBrowser()).thenReturn(BrowserType.CHROME);
+			eventDriver.setGeolocation(10.0, 12.0);
+			mockedChromiumUtils.verify(() -> ChromiumUtils.setGeolocation(eventDriver.getWebDriver(), 10.0, 12.0));
+		}
+	}
+
+	@Test(groups = {"ut"})
+	public void testGeoLocationWithEdge() {
+		try (MockedStatic<ChromiumUtils> mockedChromiumUtils = mockStatic(ChromiumUtils.class)) {
+			when(browserInfo.getBrowser()).thenReturn(BrowserType.EDGE);
+			eventDriver.setGeolocation(10.0, 12.0);
+			mockedChromiumUtils.verify(() -> ChromiumUtils.setGeolocation(eventDriver.getWebDriver(), 10.0, 12.0));
+		}
+	}
+
+	@Test(groups = {"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Geolocation is supported only on chrome or edge")
+	public void testGeoLocationWithFirefox() {
+		try (MockedStatic<ChromiumUtils> mockedChromiumUtils = mockStatic(ChromiumUtils.class)) {
+			when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
+			eventDriver.setGeolocation(10.0, 12.0);
+		}
+	}
+
+	@Test(groups = {"ut"}, expectedExceptions = ScenarioException.class, expectedExceptionsMessageRegExp = "Latitude must be between -90 and 90 inclusive")
+	public void testGeoLocationWithWrongLatitude1() {
+		eventDriver.setGeolocation(-90.01, 12.0);
+	}
+	@Test(groups = {"ut"}, expectedExceptions = ScenarioException.class, expectedExceptionsMessageRegExp = "Latitude must be between -90 and 90 inclusive")
+	public void testGeoLocationWithWrongLatitude2() {
+		eventDriver.setGeolocation(90.01, 12.0);
+	}
+
+	@Test(groups = {"ut"}, expectedExceptions = ScenarioException.class, expectedExceptionsMessageRegExp = "Longitude must be between -180 and 180 inclusive")
+	public void testGeoLocationWithWrongLongitude1() {
+		eventDriver.setGeolocation(10.0, -180.01);
+	}
+	@Test(groups = {"ut"}, expectedExceptions = ScenarioException.class, expectedExceptionsMessageRegExp = "Longitude must be between -180 and 180 inclusive")
+	public void testGeoLocationWithWrongLongitude2() {
+		eventDriver.setGeolocation(10.0, 180.01);
 	}
 	
 }

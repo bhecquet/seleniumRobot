@@ -158,7 +158,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 		
 		server = new WebTestPageServer();
 		server.exposeTestPage();
-        String localAddress = server.getLocalAddress();
+        String localAddress = "localhost"; //server.getLocalAddress();
 		
 		initThreadContext(testNGCtx);
 		initBeforeMethod();

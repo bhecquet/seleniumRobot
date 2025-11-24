@@ -250,6 +250,10 @@
 	<div id="divForFrame">
 	   <iframe src="testIFrame3.html" id="myIFrameInDiv" width="600px" height="50px"></iframe>
 	</div>
+
+	<h1>Geolocation</h1>
+	<button id="displayGeolocation" onclick="getLocation()">Display Geolocation</button>
+	<span id="geolocation"></span>
 	
 <script src="jquery.min.js">
 </script>
@@ -328,6 +332,20 @@ function hideServer() {
 
 function hideSelect() {
       $("#selectHidable").html('');
+}
+
+const geolocationElement = document.getElementById("geolocation");
+function getLocation() {
+	if (navigator.geolocation) {
+		navigator.geolocation.getCurrentPosition(showPosition);
+	} else {
+		geolocationElement.innerHTML = "Geolocation is not supported by this browser.";
+	}
+}
+
+function showPosition(position) {
+	console.log("current position is:");
+	geolocationElement.innerHTML = "Latitude: " + position.coords.latitude + ",Longitude: " + position.coords.longitude;
 }
 
 var trigger = $('.language_selector');

@@ -1966,9 +1966,16 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	/**
 	 * Set Geolocation for Edge / Chrome or raise an error
 	 * @param latitude	the latitude
-	 * @param longitude	the longiture
+	 * @param longitude	the longitude
 	 */
 	public void setGeolocation(double latitude, double longitude) {
+		if (latitude < -90 || latitude > 90) {
+			throw new ScenarioException("Latitude must be between -90 and 90 inclusive");
+		}
+		if (longitude < -180 || longitude > 180) {
+			throw new ScenarioException("Longitude must be between -180 and 180 inclusive");
+		}
+
 		// only chromium browsers will be supported
 		if (browserInfo.getBrowser().equals(BrowserType.CHROME) || browserInfo.getBrowser().equals(BrowserType.EDGE)) {
 			ChromiumUtils.setGeolocation(this.getWebDriver(), latitude, longitude);

@@ -164,6 +164,10 @@ public class DriverTestPage extends PageObject {
 	// Elements for Angular IFrame
 	public static final FrameElement angularIFrame = new FrameElement("IFrame angular", By.id("angularIFrame"));
 	public static final SelectList angularSelectListIFrame = new SelectList("list", By.id("angularSelect"), angularIFrame);
+
+	// Geolocation
+	public static final ButtonElement displayGeolocation = new ButtonElement("Display Geolocation", By.id("displayGeolocation"));
+	public static final HtmlElement geolocation = new HtmlElement("geolocation", By.id("geolocation"));
 	
 	private String openedPageUrl;
 	
@@ -210,6 +214,11 @@ public class DriverTestPage extends PageObject {
     	textElement.sendKeys(text);
     	return this;
     }
+
+	public String _getGeolocation() {
+		displayGeolocation.click();
+		return geolocation.getText();
+	}
     
     public String _getTextElementContent() {
     	return textElement.getValue();

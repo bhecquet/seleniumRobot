@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import com.seleniumtests.driver.WebUIDriver;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
@@ -1021,6 +1023,16 @@ public class TestTestTasks extends MockitoTest {
 		} finally {
 			System.clearProperty(SeleniumTestsContext.RUN_MODE);
 			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
+		}
+	}
+
+	@Test(groups= {"ut"})
+	public void testGeolocation() {
+		try (MockedStatic<WebUIDriver> mockedWebUIDriver = mockStatic(WebUIDriver.class)) {
+			CustomEventFiringWebDriver mockedDriver = mock(CustomEventFiringWebDriver.class);
+			mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(true)).thenReturn(mockedDriver);
+			TestTasks.setGeolocation(10, 12);
+			verify(mockedDriver).setGeolocation(10, 12);
 		}
 	}
 

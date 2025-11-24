@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.it.driver;
 
+import com.seleniumtests.util.helper.WaitHelper;
 import org.openqa.selenium.Dimension;
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -120,6 +121,18 @@ public class TestCustomEventFiringWebDriver2 extends GenericMultiBrowserTest {
 		Assert.assertEquals(driver.getTopFixedHeaderSize(), (Long)7L);
 		testPage.bigFooterButton.click();
 		Assert.assertEquals(driver.getBottomFixedFooterSize(), (Long)5L); // should be 6, but has green line is only 1 pixel height, when bigFooter is up, computation fails
+	}
+
+	/**
+	 * Test geolocation can be configured
+	 */
+	@Test(groups={"it"})
+	public void testChromeGeolocation() {
+		driver.setGeolocation(43.3025700, 5.3690700);
+		String geolocation = testPage._getGeolocation();
+		WaitHelper.waitForSeconds(5);
+		Assert.assertEquals(geolocation, "Latitude: 43.30257,Longitude: 5.36907");
+
 	}
 
 }
