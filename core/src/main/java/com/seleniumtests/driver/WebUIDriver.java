@@ -81,7 +81,8 @@ public class WebUIDriver {
     private static final ThreadLocal<String> currentWebUiDriverName = new ThreadLocal<>();
     private String name;
     private DriverConfig config;
-    private CustomEventFiringWebDriver driver;
+    private CustomEventFiringWebDriver driver;  // driver once listeners has been added
+	private WebDriver originalDriver;					// driver as created by Selenium. Kept globally so that it can be cleaned if 'CustomEventFiringWebDriver' cannot be created
     private IWebDriverFactory webDriverBuilder;
     private static final Object createDriverLock = new Object();
 
@@ -116,7 +117,6 @@ public class WebUIDriver {
 	public CustomEventFiringWebDriver createRemoteWebDriver()  {
 
 		CustomEventFiringWebDriver customEventFiringWebDriver;
-		WebDriver originalDriver;
 
 		webDriverBuilder = getWebDriverBuilderFactory();
 
@@ -383,39 +383,15 @@ public class WebUIDriver {
     	}
 
     	if (driver != null) {
-
-			Future<String> future = null;
-            try (ExecutorService executor = Executors.newSingleThreadExecutor()) {
-				future = executor.submit(new DriverAliveTask(driver));
-				future.get(3, TimeUnit.SECONDS);
-				
-				// write logs
-	    		try {
-	        		for (String logType: driver.manage().logs().getAvailableLogTypes()) {
-						retrieveLogs(logType);
-	        		}
-	            } catch (Exception e) {
-	            	logger.error("Error retrieving logs from driver: {}", e.getMessage());
-	            }
-	    		
-	    		
-	    		try {
-	    			scenarioLogger.log("quiting webdriver " + Thread.currentThread().getId());
-		            driver.quit();
-	        	} catch (Exception ex) {
-	        		scenarioLogger.error("Exception encountered when quiting driver:" + ex.getMessage());
-	        	}
-			} catch (ExecutionException | TimeoutException e1) {
-				if (future != null) {
-					future.cancel(true);
-					logger.warn("driver not available");
-				}
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-			}
-
-    		driver = null;
+			cleanDriver();
+			driver = null;
         }
+
+		// in case something went wrong during driver creation, clean original driver
+		if (originalDriver != null) {
+			cleanOriginalDriver();
+			originalDriver = null;
+		}
 		
         if (webDriverBuilder != null) {
         	webDriverBuilder.cleanUp();
@@ -434,6 +410,59 @@ public class WebUIDriver {
 		return stopVideoCapture();
 		
     }
+
+	private void cleanDriver() {
+		Future<String> future = null;
+		try (ExecutorService executor = Executors.newSingleThreadExecutor()) {
+			future = executor.submit(new DriverAliveTask(driver));
+			future.get(3, TimeUnit.SECONDS);
+
+			// write logs
+			try {
+				for (String logType: driver.manage().logs().getAvailableLogTypes()) {
+					retrieveLogs(logType);
+				}
+			} catch (Exception e) {
+				logger.error("Error retrieving logs from driver: {}", e.getMessage());
+			}
+
+
+			try {
+				scenarioLogger.log("quiting webdriver " + Thread.currentThread().getId());
+				driver.quit();
+			} catch (Exception ex) {
+				scenarioLogger.error("Exception encountered when quiting driver:" + ex.getMessage());
+			}
+		} catch (ExecutionException | TimeoutException e1) {
+			if (future != null) {
+				future.cancel(true);
+				logger.warn("driver not available");
+			}
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
+	}
+
+	private void cleanOriginalDriver() {
+		Future<String> future = null;
+		try (ExecutorService executor = Executors.newSingleThreadExecutor()) {
+			future = executor.submit(new DriverAliveTask(originalDriver));
+			future.get(3, TimeUnit.SECONDS);
+
+			scenarioLogger.log("quiting original webdriver " + Thread.currentThread().getId());
+			originalDriver.quit();
+
+		} catch (ExecutionException | TimeoutException e1) {
+			if (future != null) {
+				future.cancel(true);
+				logger.warn("driver not available");
+			}
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		} catch (Exception ex) {
+			scenarioLogger.error("Exception encountered when quiting driver:" + ex.getMessage());
+		}
+	}
 
 	/**
 	 * @param logType	name of log to retrieve ('performance', 'browser', ...)
@@ -771,6 +800,7 @@ public class WebUIDriver {
     	}
     	checkBrowserRunnable();
         driver = createRemoteWebDriver();
+		originalDriver = null; // If we are here, the driver has been correctly created and listeners added, so further operation will be done with it. No need to keep original reference
 
 		if (config.getTestType().family().equals(TestType.WEB)) {
 			displayBrowserVersion();

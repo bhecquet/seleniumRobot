@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.*;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
 
@@ -60,9 +59,6 @@ public class TestPageObject2 extends MockitoTest {
 	private RemoteWebDriver driver;
 
 	@Mock
-	private TargetLocator target;
-
-	@Mock
 	private ScreenShot screenshot;
 
 	@Mock
@@ -73,6 +69,8 @@ public class TestPageObject2 extends MockitoTest {
 
 	@Mock
 	private WebElement option1;
+	@Mock
+	private WebElement option2;
 
 	@Mock
 	private WebElement row1;
@@ -164,8 +162,6 @@ public class TestPageObject2 extends MockitoTest {
 
 	/**
 	 * Capture page snapshot and sends it to selenium server
-	 * 
-	 * @throws IOException
 	 */
 	@Test(groups = { "ut" })
 	public void testCapturePageSnapshotWithCheck() {
@@ -441,9 +437,9 @@ public class TestPageObject2 extends MockitoTest {
 		when(element.getTagName()).thenReturn("select");
 		when(element.isDisplayed()).thenReturn(true);
 		when(element.isEnabled()).thenReturn(true);
-		when(element.findElements(By.tagName("option"))).thenReturn(Arrays.asList(option1));
+		when(element.findElements(By.tagName("option"))).thenReturn(List.of(option1));
 		when(element.findElements(By.xpath(".//option[normalize-space(.) = \"foo\"]")))
-				.thenReturn(Arrays.asList(option1));
+				.thenReturn(List.of(option1));
 		when(option1.isEnabled()).thenReturn(true);
 		page.selectOption("select", "foo");
 		verify(option1).click();
@@ -495,9 +491,9 @@ public class TestPageObject2 extends MockitoTest {
 	@Test(groups = { "ut" })
 	public void testClickTableCell() {
 		when(driver.findElement(By.id("table"))).thenReturn(element);
-		when(element.findElements(By.tagName("tr"))).thenReturn(Arrays.asList(row1));
+		when(element.findElements(By.tagName("tr"))).thenReturn(List.of(row1));
 		when(row1.findElements(By.xpath(".//descendant::*[name()=\"th\" or name()=\"td\"]")))
-				.thenReturn(Arrays.asList(column1));
+				.thenReturn(List.of(column1));
 
 		page.clickTableCell(0, 0, "table");
 		verify(column1).click();
@@ -773,20 +769,18 @@ public class TestPageObject2 extends MockitoTest {
 		verify(driver, atLeastOnce()).findElement(By.id("text"));
 	}
 
-	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
+	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp = "Element textField is not present.*")
 	public void testAssertVisibleNotPresent() {
 		when(driver.findElement(By.id("text"))).thenThrow(new NoSuchElementException("not found"));
 		when(element.isDisplayed()).thenReturn(true);
 		page.assertForVisible("textField");
-		verify(driver).findElement(By.id("text"));
 	}
 
-	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
+	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp = "Element textField is not visible.*")
 	public void testAssertVisibleNotVisible() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		when(element.isDisplayed()).thenReturn(false);
 		page.assertForVisible("textField");
-		verify(driver).findElement(By.id("text"));
 	}
 
 	@Test(groups = { "ut" })
@@ -803,20 +797,21 @@ public class TestPageObject2 extends MockitoTest {
 		verify(driver, atLeastOnce()).findElement(By.id("text"));
 	}
 
-	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
+	/**
+	 * When element is not present, it cannot be visible, so no exception is thrown
+	 */
+	@Test(groups = { "ut" })
 	public void testAssertNotVisibleNotPresent() {
 		when(driver.findElement(By.id("text"))).thenThrow(new NoSuchElementException("not found"));
 		when(element.isDisplayed()).thenReturn(false);
 		page.assertForInvisible("textField");
-		verify(driver).findElement(By.id("text"));
 	}
 
-	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
+	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp = "Element textField is visible.*")
 	public void testAssertNotVisibleVisible() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		when(element.isDisplayed()).thenReturn(true);
 		page.assertForInvisible("textField");
-		verify(driver).findElement(By.id("text"));
 	}
 
 	@Test(groups = { "ut" })
@@ -827,20 +822,18 @@ public class TestPageObject2 extends MockitoTest {
 		verify(driver, atLeastOnce()).findElement(By.id("text"));
 	}
 
-	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
+	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp = "Element textField is disabled.*")
 	public void testAssertEnabledNotEnabled() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		when(element.isEnabled()).thenReturn(false);
 		page.assertForEnabled("textField");
-		verify(driver).findElement(By.id("text"));
 	}
 
-	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
+	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp = "Element textField is not present.*")
 	public void testAssertEnabledNotPresent() {
 		when(driver.findElement(By.id("text"))).thenThrow(new NoSuchElementException("not found"));
 		when(element.isEnabled()).thenReturn(false);
 		page.assertForEnabled("textField");
-		verify(driver).findElement(By.id("text"));
 	}
 
 	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
@@ -852,34 +845,31 @@ public class TestPageObject2 extends MockitoTest {
 	@Test(groups = { "ut" })
 	public void testAssertDisabled() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
-		when(element.isEnabled()).thenReturn(true);
-		page.assertForEnabled("textField");
+		when(element.isEnabled()).thenReturn(false);
+		page.assertForDisabled("textField");
 
 		// check element is searched
 		verify(driver, atLeastOnce()).findElement(By.id("text"));
 	}
 
-	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
+	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp = "Element textField is not present.*")
 	public void testAssertDisabledNotPresent() {
 		when(driver.findElement(By.id("text"))).thenThrow(new NoSuchElementException("not found"));
 		when(element.isEnabled()).thenReturn(true);
 		page.assertForEnabled("textField");
 
-		// check element is searched
-		verify(driver).findElement(By.id("text"));
 	}
 
-	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
+	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp = "Element textField is enabled.*")
 	public void testAssertDisabledNotDisabled() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
-		when(element.isEnabled()).thenReturn(false);
-		page.assertForEnabled("textField");
-		verify(driver).findElement(By.id("text"));
+		when(element.isEnabled()).thenReturn(true);
+		page.assertForDisabled("textField");
 	}
 
 	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
 	public void testAssertDisabledScreenZone() {
-		page.assertForEnabled("screenZone");
+		page.assertForDisabled("screenZone");
 		verify(PageForActions.screenZone).isElementPresent();
 	}
 
@@ -891,7 +881,7 @@ public class TestPageObject2 extends MockitoTest {
 		page.assertForValue("textField", "foo");
 	}
 
-	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
+	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp = "Element textField is not present.*")
 	public void testAssertForValueViaValueAttributeNotPresent() {
 		when(driver.findElement(By.id("text"))).thenThrow(new NoSuchElementException("not found"));
 		when(element.getText()).thenReturn("");
@@ -907,7 +897,7 @@ public class TestPageObject2 extends MockitoTest {
 		page.assertForValue("textField", "foo");
 	}
 
-	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
+	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp = "Value of element textField is not foo.*")
 	public void testAssertForWrongValue() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		when(element.getText()).thenReturn("bar");
@@ -927,14 +917,14 @@ public class TestPageObject2 extends MockitoTest {
 		page.assertForEmptyValue("textField");
 	}
 
-	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
+	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp = "Element textField is not present.*")
 	public void testAssertForEmptyValueViaValueAttributeNotPresent() {
 		when(driver.findElement(By.id("text"))).thenThrow(new NoSuchElementException("not found"));
 		when(element.getDomProperty("value")).thenReturn("");
 		page.assertForEmptyValue("textField");
 	}
 
-	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
+	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp = "Value or Element textField is not empty.*")
 	public void testAssertForEmptyValueViaValueAttributeNotEmpty() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		when(element.getDomProperty("value")).thenReturn("foo");
@@ -953,14 +943,14 @@ public class TestPageObject2 extends MockitoTest {
 		page.assertForNonEmptyValue("textField");
 	}
 
-	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
+	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp = "Element textField is not present.*")
 	public void testAssertForNonEmptyValueViaValueAttributeNotPresent() {
 		when(driver.findElement(By.id("text"))).thenThrow(new NoSuchElementException("not found"));
 		when(element.getDomProperty("value")).thenReturn("bar");
 		page.assertForNonEmptyValue("textField");
 	}
 
-	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
+	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp = "Element textField is empty.*")
 	public void testAssertForNonEmptyValueViaValueAttributeNotEmpty() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		when(element.getDomProperty("value")).thenReturn("");
@@ -980,7 +970,7 @@ public class TestPageObject2 extends MockitoTest {
 		page.assertForMatchingValue("textField", "foo");
 	}
 
-	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
+	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp = "Element textField is not present.*")
 	public void testAssertForMatchingValueViaValueAttributeNotPresent() {
 		when(driver.findElement(By.id("text"))).thenThrow(new NoSuchElementException("not found"));
 		when(element.getText()).thenReturn("");
@@ -996,7 +986,7 @@ public class TestPageObject2 extends MockitoTest {
 		page.assertForMatchingValue("textField", "foo");
 	}
 
-	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
+	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp = "Value of Element textField does not match foo .*")
 	public void testAssertForWrongMatchingValue() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		when(element.getText()).thenReturn("bar");
@@ -1022,14 +1012,14 @@ public class TestPageObject2 extends MockitoTest {
 		page.assertSelectedOption("select", "foo");
 	}
 
-	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
+	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp = "Element select is not present.*")
 	public void testAssertSelectedOptionNotPresent() {
 		when(driver.findElement(By.id("select"))).thenThrow(new NoSuchElementException("not found"));
 
 		page.assertSelectedOption("select", "foo");
 	}
 
-	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
+	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp = "No selected option found.*")
 	public void testAssertSelectedOptionNoOption() {
 		when(driver.findElement(By.id("select"))).thenReturn(element);
 		when(element.getTagName()).thenReturn("select");
@@ -1038,23 +1028,23 @@ public class TestPageObject2 extends MockitoTest {
 		page.assertSelectedOption("select", "foo");
 	}
 
-	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
+	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp = "Selected option is not the expected one.*")
 	public void testAssertSelectedOptionNotSelected() {
 		when(driver.findElement(By.id("select"))).thenReturn(element);
 		when(element.getTagName()).thenReturn("select");
 		when(element.isDisplayed()).thenReturn(true);
-		when(element.findElements(By.tagName("option"))).thenReturn(List.of(option1));
+		when(element.findElements(By.tagName("option"))).thenReturn(List.of(option1, option2));
 		when(element.findElements(By.xpath(".//option[normalize-space(.) = \"foo\"]")))
-				.thenReturn(List.of(option1));
+				.thenReturn(List.of(option1, option2));
 		when(option1.isSelected()).thenReturn(false);
 		when(option1.getText()).thenReturn("foo");
+		when(option1.isSelected()).thenReturn(true);
+		when(option1.getText()).thenReturn("bar");
 		page.assertSelectedOption("select", "foo");
 	}
 
 	/**
 	 * Only SelectList is supported
-	 * 
-	 * @throws IOException
 	 */
 	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
 	public void testAssertSelectedOptionNoSelect() {
@@ -1085,7 +1075,7 @@ public class TestPageObject2 extends MockitoTest {
 		page.assertChecked("checkbox");
 	}
 
-	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
+	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp = "Element checkbox is not present.*")
 	public void testAssertCheckedNotPresent() {
 		when(driver.findElement(By.id("checkbox"))).thenThrow(new NoSuchElementException("not found"));
 		page.assertChecked("checkbox");
@@ -1112,7 +1102,7 @@ public class TestPageObject2 extends MockitoTest {
 		page.assertNotChecked("radio");
 	}
 
-	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
+	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp = "Element checkbox is checked.*")
 	public void testAssertNotCheckedChecked() {
 		when(driver.findElement(By.id("checkbox"))).thenReturn(element);
 		when(element.getTagName()).thenReturn("input");
@@ -1120,7 +1110,7 @@ public class TestPageObject2 extends MockitoTest {
 		page.assertNotChecked("checkbox");
 	}
 
-	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
+	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp = "Element checkbox is not present.*")
 	public void testAssertNotCheckedNotPresent() {
 		when(driver.findElement(By.id("checkbox"))).thenThrow(new NoSuchElementException("not found"));
 		page.assertNotChecked("checkbox");
@@ -1142,14 +1132,14 @@ public class TestPageObject2 extends MockitoTest {
 		page.assertTableCellValue(0, 0, "table", "foo");
 	}
 
-	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
+	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp = "Table or cell not found.*")
 	public void testAssertForTableCellValueNotPresent() {
 		when(driver.findElement(By.id("table"))).thenThrow(new NoSuchElementException("not found"));
 
 		page.assertTableCellValue(0, 0, "table", "foo");
 	}
 
-	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
+	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp = "Value of cell \\[0,0] in table table is not foo.*")
 	public void testAssertForTableCellWrongValue() {
 		when(driver.findElement(By.id("table"))).thenReturn(element);
 		when(element.findElements(By.tagName("tr"))).thenReturn(List.of(row1));
@@ -1211,7 +1201,7 @@ public class TestPageObject2 extends MockitoTest {
 		page.assertCookiePresent("foo");
 	}
 
-	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
+	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp = "Cookie: \\{foo} not found.*")
 	public void testAssertCookieNotPresent() {
 		when(driverOptions.getCookieNamed("foo")).thenReturn(null);
 		page.assertCookiePresent("foo");
@@ -1244,7 +1234,7 @@ public class TestPageObject2 extends MockitoTest {
 		page.assertHtmlSource("foo");
 	}
 
-	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class)
+	@Test(groups = { "ut" }, expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp = "Text: \\{foo} not found on page source.*")
 	public void testAssertTextPresentNotInHtml() {
 		when(driver.getPageSource()).thenReturn("<html>bar</html>");
 		page.assertHtmlSource("foo");

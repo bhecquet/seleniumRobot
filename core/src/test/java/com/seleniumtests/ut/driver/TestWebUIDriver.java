@@ -12,6 +12,7 @@ import java.util.*;
 import com.seleniumtests.browserfactory.*;
 import com.seleniumtests.customexception.RetryableDriverException;
 import com.seleniumtests.driver.*;
+import io.appium.java_client.chromium.options.ChromiumOptions;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
@@ -49,12 +50,6 @@ import com.seleniumtests.util.video.VideoRecorder;
 public class TestWebUIDriver extends MockitoTest {
 
 	@Mock
-	private RemoteWebDriver drv1;
-	
-	@Mock
-	private RemoteWebDriver drv2;
-	
-	@Mock
 	private VideoRecorder videoRecorder;
 
 	@Mock
@@ -78,16 +73,20 @@ public class TestWebUIDriver extends MockitoTest {
 	@Mock
 	private WebDriver.TargetLocator targetLocator;
 
+	@Mock
+	private ChromeDriver chromeDriver;
+
 
 	@BeforeMethod(groups={"ut"})
 	private void init() {
 		// add capabilities to allow augmenting driver
-		when(drv1.getCapabilities()).thenReturn(new DesiredCapabilities());
-		when(drv1.manage()).thenReturn(options);
-		when(drv1.switchTo()).thenReturn(targetLocator);
+		when(eventDriver1.getCapabilities()).thenReturn(new DesiredCapabilities());
+		when(eventDriver1.manage()).thenReturn(options);
+		when(eventDriver1.switchTo()).thenReturn(targetLocator);
 		when(options.timeouts()).thenReturn(timeouts);
 		when(options.logs()).thenReturn(logs);
-		when(drv2.getCapabilities()).thenReturn(new DesiredCapabilities());
+		when(eventDriver2.getCapabilities()).thenReturn(new DesiredCapabilities());
+		when(chromeDriver.getCapabilities()).thenReturn(new ChromiumOptions());
 		StatisticsStorage.reset();
 	}
 
@@ -214,7 +213,7 @@ public class TestWebUIDriver extends MockitoTest {
 	/**
 	 * No list for the selected driver
 	 */
-	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Browser HTMLUNIT is not available.*")
+	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Error creating driver, skip test \\(cause: Browser HTMLUNIT is not available.*")
 	public void testDriverCreationBrowserNotAvailable() {
 
 		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class, CALLS_REAL_METHODS)) {
@@ -224,14 +223,82 @@ public class TestWebUIDriver extends MockitoTest {
 			mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(anyBoolean())).thenReturn(browserInfos);
 
 			SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-			WebUIDriver.getWebDriver(true);
+			try {
+				WebUIDriver.getWebDriver(true);
+				Assert.fail("We should get SkipException");
+			} catch (SkipException e) {
+				throw new ConfigurationException(e.getMessage());
+			}
+		}
+	}
+
+	/**
+	 * Check that if we fail to create driver, the test will be skipped
+	 */
+	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Error creating driver, skip test \\(cause: Error creating driver.*")
+	public void testDriverCreationBrowserFails() {
+
+		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class, CALLS_REAL_METHODS);
+			MockedConstruction<ChromeDriverFactory> mockedChromeDriverFactory = mockConstruction(ChromeDriverFactory.class, (chromeDriverFactory, context) -> {
+				when(chromeDriverFactory.createWebDriver()).thenThrow(new WebDriverException("Error creating driver"));
+			})
+		) {
+			Map<BrowserType, List<BrowserInfo>> browserInfos = new EnumMap<>(BrowserType.class);
+			browserInfos.put(BrowserType.CHROME, List.of(new BrowserInfo(BrowserType.CHROME, "96.0", "", false, false)));
+
+			mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(anyBoolean())).thenReturn(browserInfos);
+
+			SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
+			try {
+				WebUIDriver.getWebDriver(true);
+				Assert.fail("We should get SkipException");
+			} catch (SkipException e) {
+				throw new ConfigurationException(e.getMessage());
+			}
+		}
+	}
+
+	/**
+	 * Check that when the second driver of a test fails to create, test is not skipped, it's failed instead and the exception raised is the original one
+	 */
+	@Test(groups={"ut"}, expectedExceptions = WebDriverException.class, expectedExceptionsMessageRegExp = "Error creating second driver.*")
+	public void testDriverCreationBrowserFailsForSecondDriver() {
+
+		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class, CALLS_REAL_METHODS);
+			MockedConstruction<ChromeDriverFactory> mockedChromeDriverFactory = mockConstruction(ChromeDriverFactory.class, (chromeDriverFactory, context) -> {
+
+				when(chromeDriverFactory.createWebDriver()).thenAnswer(invocation -> {
+					System.out.println("context " + context.getCount());
+					if (context.getCount() == 1) {
+						when(chromeDriver.getWindowHandles()).thenReturn(Set.of(UUID.randomUUID().toString()));
+						return chromeDriver; // first driver
+					} else {
+						throw new WebDriverException("Error creating second driver"); // second driver
+					}
+				});
+			})
+		) {
+			Map<BrowserType, List<BrowserInfo>> browserInfos = new EnumMap<>(BrowserType.class);
+			browserInfos.put(BrowserType.CHROME, List.of(new BrowserInfo(BrowserType.CHROME, "96.0", "", false, false)));
+
+			mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(anyBoolean())).thenReturn(browserInfos);
+
+			SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
+			WebUIDriver.getWebDriver(true); // first driver
+			try {
+
+				WebUIDriver.getWebDriver(true, null, "second_driver", null);
+				Assert.fail("We should get SkipException");
+			} catch (SkipException e) {
+				throw new ConfigurationException(e.getMessage());
+			}
 		}
 	}
 	
 	/**
 	 * Empty list for the selected driver
 	 */
-	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Browser HTMLUNIT is not available.*")
+	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Error creating driver, skip test \\(cause: Browser HTMLUNIT is not available.*")
 	public void testDriverCreationBrowserNotAvailable2() {
 
 		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class, CALLS_REAL_METHODS)) {
@@ -240,11 +307,16 @@ public class TestWebUIDriver extends MockitoTest {
 			mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(anyBoolean())).thenReturn(browserInfos);
 
 			SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-			WebUIDriver.getWebDriver(true);
+			try {
+				WebUIDriver.getWebDriver(true);
+				Assert.fail("We should get SkipException");
+			} catch (SkipException e) {
+				throw new ConfigurationException(e.getMessage());
+			}
 		}
 	}
 	
-	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Browser CHROME beta is not available.*")
+	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Error creating driver, skip test \\(cause: Browser CHROME beta is not available.*")
 	public void testDriverCreationBrowserBetaNotAvailable() {
 
 		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class, CALLS_REAL_METHODS)) {
@@ -254,12 +326,17 @@ public class TestWebUIDriver extends MockitoTest {
 
 			SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 			SeleniumTestsContextManager.getThreadContext().setBetaBrowser(true);
-			WebUIDriver.getWebDriver(true);
+			try {
+				WebUIDriver.getWebDriver(true);
+                Assert.fail("We should get SkipException");
+			} catch (SkipException e) {
+				throw new ConfigurationException(e.getMessage());
+			}
 		}
 	}
 	
 	
-	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Browser CHROME {2}is not available.*")
+	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Error creating driver, skip test \\(cause: Browser CHROME {2}is not available.*")
 	public void testDriverCreationBrowserNonBetaNotAvailable() {
 
 		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class, CALLS_REAL_METHODS)) {
@@ -269,7 +346,12 @@ public class TestWebUIDriver extends MockitoTest {
 
 			SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 			SeleniumTestsContextManager.getThreadContext().setBetaBrowser(false);
-			WebUIDriver.getWebDriver(true);
+			try {
+				WebUIDriver.getWebDriver(true);
+				Assert.fail("We should get SkipException");
+			} catch (SkipException e) {
+				throw new ConfigurationException(e.getMessage());
+			}
 		}
 	}
 	
@@ -423,7 +505,9 @@ public class TestWebUIDriver extends MockitoTest {
 
 			try {
 				WebUIDriver.getWebDriver(true);
-			} catch (RetryableDriverException e) {
+			} catch (SkipException e) {
+				Assert.assertTrue(e.getCause() instanceof RetryableDriverException);
+                Assert.assertEquals(e.getMessage(), "Error creating driver, skip test (cause: Error augmenting driver)");
 				// it's expected
 			}
 			// check we tried to create driver 2 times, because driver was created on grid, but failed to be augmented
@@ -449,7 +533,7 @@ public class TestWebUIDriver extends MockitoTest {
 		
 		WebUIDriver uiDriver1 = spy(WebUIDriver.getWebUIDriver(true, "main")); // create it so that we can control it via mock
 		WebUIDriver.getUxDriverSession().get().put("main", uiDriver1);
-		doReturn(drv1).when(uiDriver1).createWebDriver();
+		doReturn(eventDriver1).when(uiDriver1).createWebDriver();
 		WebUIDriver.getWebDriver(true, BrowserType.HTMLUNIT, "main", null);
 
 		// set connector to simulate the driver creation on grid
@@ -458,7 +542,7 @@ public class TestWebUIDriver extends MockitoTest {
 		
 		WebUIDriver uiDriver2 = spy(WebUIDriver.getWebUIDriver(true, "other"));
 		WebUIDriver.getUxDriverSession().get().put("other", uiDriver2);
-		doReturn(drv2).when(uiDriver2).createWebDriver();
+		doReturn(eventDriver2).when(uiDriver2).createWebDriver();
 		WebUIDriver.getWebDriver(true, BrowserType.HTMLUNIT, "other", null);
 		Assert.assertNull(uiDriver1.getConfig().getRunOnSameNode());
 		Assert.assertNotNull(uiDriver2.getConfig().getRunOnSameNode());
@@ -484,7 +568,7 @@ public class TestWebUIDriver extends MockitoTest {
 				withSettings().defaultAnswer(CALLS_REAL_METHODS),
 				(uiDriver, context) -> {
 			if (context.arguments().get(0).equals("main")) {
-				doReturn(drv1).when(uiDriver).createWebDriver();
+				doReturn(eventDriver1).when(uiDriver).createWebDriver();
 			} else {
 				doThrow(new WebDriverException("error")).when(uiDriver).createWebDriver();
 			}
@@ -625,7 +709,7 @@ public class TestWebUIDriver extends MockitoTest {
 					any(File.class),
 					eq("videoCapture.avi"))).thenReturn(videoRecorder);
 
-			WebDriver driver = WebUIDriver.getWebDriver(true);
+			WebUIDriver.getWebDriver(true);
 
 			Assert.assertNotNull(WebUIDriver.getVideoRecorder().get());
 			Assert.assertEquals(WebUIDriver.getVideoRecorder().get(), videoRecorder);
@@ -644,7 +728,7 @@ public class TestWebUIDriver extends MockitoTest {
 					any(File.class),
 					eq("videoCapture.avi"))).thenThrow(new ScenarioException("error"));
 
-			WebDriver driver = WebUIDriver.getWebDriver(true);
+			WebUIDriver.getWebDriver(true);
 
 			Assert.assertNull(WebUIDriver.getVideoRecorder().get());
 		}
