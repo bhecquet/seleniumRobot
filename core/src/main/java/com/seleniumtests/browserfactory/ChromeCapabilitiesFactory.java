@@ -116,9 +116,6 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 		ChromeOptions options = new ChromeOptions();
 		Map<String, Object> experientalOptions = new HashMap<>();
 
-		// to enable BiDi. this creates a tab on the browser
-		// options.setCapability("webSocketUrl", true);
-
         if (webDriverConfig.getUserAgentOverride() != null) {
         	// ISSUE #705 - In order to give the maximum of data available to customize the User Agent,
         	// we need to pass the testName which is not in the context at this moment

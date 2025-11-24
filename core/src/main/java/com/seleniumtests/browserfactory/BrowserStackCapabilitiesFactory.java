@@ -84,7 +84,7 @@ public class BrowserStackCapabilitiesFactory extends ICloudCapabilityFactory {
 
 		Map<String, Object> browserStackOptions = new HashMap<>();
 		browserStackOptions.put("seleniumCdp", true);
-		browserStackOptions.put("seleniumBidi", true);
+		//browserStackOptions.put("seleniumBidi", true);
 		browserStackOptions.put("seleniumVersion", PackageUtility.getSeleniumVersion());
 		browserStackOptions.put("maskCommands", "setValues, getValues, setCookies, getCookies");
 		if (webDriverConfig.getLocation() != null) {

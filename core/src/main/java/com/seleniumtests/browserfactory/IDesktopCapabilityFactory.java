@@ -138,7 +138,7 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
             options.setCapability(SeleniumRobotCapabilityType.STARTED_BY, webDriverConfig.getStartedBy());
         }
 		// enable BiDi
-		options.setCapability("webSocketUrl", true);
+		//options.setCapability("webSocketUrl", true);
      
         return options;
     }
