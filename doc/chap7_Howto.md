@@ -805,3 +805,19 @@ new PDFReader(pdfFile).getText()
 ```
 
 The tricky part is to get the PDF file, which is outside of this documentation
+
+### 31 set chrome / edge geolocation ###
+
+** This will only work if no policy prevent it **
+
+Inside a test scenario, you can write
+
+```
+setGeolocation(25.0134, 54.564)
+```
+
+Or inside a page
+
+```
+driver.setGeolocation(25.0134, 54.564)
+```
