@@ -25,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.customexception.ScenarioException;
@@ -68,8 +69,20 @@ public class ScreenShot {
 
         if (pageSource != null) {
             try {
-                File htmlFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getHtmlsOutputDirectory(), filename + ".html").toFile();
-                FileUtils.writeStringToFile(htmlFile, pageSource, StandardCharsets.UTF_8);
+                File htmlFile;
+                if (SeleniumTestsContextManager.getThreadContext().getOptimizeReports()) {
+                    htmlFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getHtmlsOutputDirectory(), filename + ".zip").toFile();
+                    File tempHtmlFile = File.createTempFile(filename + "-", ".html");
+                    tempHtmlFile.deleteOnExit();
+                    FileUtils.writeStringToFile(tempHtmlFile, pageSource, StandardCharsets.UTF_8);
+                    File zipFile = FileUtility.createZipArchiveFromFiles(List.of(tempHtmlFile));
+                    FileUtils.copyFile(zipFile, htmlFile);
+                    tempHtmlFile.delete();
+                } else {
+
+                    htmlFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getHtmlsOutputDirectory(), filename + ".html").toFile();
+                    FileUtils.writeStringToFile(htmlFile, pageSource, StandardCharsets.UTF_8);
+                }
                 html = new FileContent(htmlFile);
             } catch (IOException e) {
                 logger.warn("Ex", e);

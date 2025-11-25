@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -107,7 +107,7 @@ public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
 								"savefile.default_directory",
 								downloadDir.toAbsolutePath().toString()));
 			} catch (IOException e) {
-				logger.error("Error creating 'downloads' directory: " + e.getMessage());
+				logger.error("Error creating 'downloads' directory: {}", e.getMessage());
 			}
 		} else {
 			options.setEnableDownloads(true);
@@ -142,7 +142,7 @@ public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
     		String edgeDriverLogPath = Paths.get(webDriverConfig.getOutputDirectory(), "edgedriver.log").toString();
         	System.setProperty(EdgeDriverService.EDGE_DRIVER_VERBOSE_LOG_PROPERTY, "true");
         	System.setProperty(EdgeDriverService.EDGE_DRIVER_LOG_PROPERTY, edgeDriverLogPath);
-        	logger.info("Edgedriver logs will be written to " + edgeDriverLogPath);
+        	logger.info("Edgedriver logs will be written to {}", edgeDriverLogPath);
     	} else {
     		System.clearProperty(EdgeDriverService.EDGE_DRIVER_VERBOSE_LOG_PROPERTY);
     		System.clearProperty(EdgeDriverService.EDGE_DRIVER_LOG_PROPERTY);
@@ -174,7 +174,7 @@ public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
         	} else if (BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getEdgeProfilePath())) {
         		((EdgeOptions)options).addArguments(USER_DATA_DIR_OPTION + selectedBrowserInfo.getDefaultProfilePath()); 
         	} else {
-        		logger.warn(String.format("Edge profile %s could not be set", webDriverConfig.getEdgeProfilePath()));
+        		logger.warn("Edge profile {} could not be set", webDriverConfig.getEdgeProfilePath());
         	}
         }
 	}
@@ -192,7 +192,7 @@ public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
         	} else if (BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getEdgeProfilePath())) {
         		options.setCapability(SeleniumRobotCapabilityType.EDGE_PROFILE, BrowserInfo.DEFAULT_BROWSER_PRODFILE);
         	} else {
-        		logger.warn(String.format("Edge profile %s could not be set", webDriverConfig.getEdgeProfilePath()));
+        		logger.warn("Edge profile {} could not be set", webDriverConfig.getEdgeProfilePath());
         	}
         }
 		

@@ -24,6 +24,8 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.contexts.SeleniumRobotServerContext;
 import com.seleniumtests.it.stubclasses.StubTestClass;
+import com.seleniumtests.util.FileUtility;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.testng.Assert;
@@ -32,7 +34,10 @@ import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class TestSeleniumTestsReporter2 extends ReporterTest {
@@ -1181,6 +1186,40 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.contains("<script src=\"https://cdn.jsdelivr.net/npm/iframe-resizer@4.2.10/js/iframeResizer.min.js\">"));
 		Assert.assertTrue(detailedReportContent.contains("<link rel=\"stylesheet\" href=\"https://use.fontawesome.com/releases/v5.15.3/css/all.css\">"));
 		Assert.assertTrue(detailedReportContent.contains("<link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css\""));
+	}
+
+	/**
+	 * When optimizeReport is set, HTML file are compressed
+	 */
+	@Test(groups = {"it"})
+	public void testReportContainsCompressedHtml() throws Exception {
+
+		try {
+			System.setProperty(SeleniumTestsContext.OPTIMIZE_REPORTS, "true");
+
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriver"});
+
+			// read 'testDriver' report. This contains calls to HtmlElement actions
+			String detailedReportContent1 = readTestMethodResultFile("testDriver");
+
+			// check HTML is present in zip file
+			Assert.assertTrue(detailedReportContent1.matches(".*<a href='htmls/Step_start_state_4-\\w+.zip' target=html>HTML Source</a>.*"));
+			List<File> htmlZippedFiles = Arrays.stream(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "htmls").toFile().listFiles()).toList();
+			Assert.assertEquals(htmlZippedFiles.size(), 6);
+
+			// check files can be read
+			for (File htmlZippedFile : htmlZippedFiles) {
+				File tempFile = FileUtility.unzipFile(htmlZippedFile);
+				tempFile.deleteOnExit();
+				Assert.assertTrue(tempFile.listFiles().length == 1);
+				File htmlFile = tempFile.listFiles()[0];
+				Assert.assertTrue(FileUtils.readFileToString(htmlFile, StandardCharsets.UTF_8).contains("<h3>Test clicking an element</h3>"));
+			}
+
+		} finally {
+			System.clearProperty(SeleniumTestsContext.OPTIMIZE_REPORTS);
+		}
+
 	}
 
 	/**
