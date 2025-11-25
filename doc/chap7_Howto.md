@@ -49,6 +49,7 @@
 - [28 Generate One-time password](#28-generate-one-time-password)
 - [29 Execute lighthouse on your webpage](#29-execute-lighthouse-on-your-webpage)
 - [30 read PDF files](#30-read-pdf-files)
+- [31 set chrome / edge geolocation](#31-set-chrome--edge-geolocation)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
