@@ -55,11 +55,15 @@ public class ChromiumUtils {
 	/**
 	 * Parses chrome performance logs from logEntries returned from Selenium
 	 * @param logEntries		log entrie to parse
-	 * @param testSteps			step information. We do not use a TestStep object directly as this object is imported in grid-extension and we want to avoid too many imports
+	 * @param testStepsIn		step information. We do not use a TestStep object directly as this object is imported in grid-extension and we want to avoid too many imports
 	 * @return the Har
 	 */
-	public static Har parsePerformanceLogs(List<LogEntry> logEntries, Map<Instant, String> testSteps) {
-        Map<String, HashMap<String, Object>> requests = new LinkedHashMap<>();
+	public static Har parsePerformanceLogs(List<LogEntry> logEntries, Map<Instant, String> testStepsIn) {
+
+		// Reorder teststeps
+		Map<Instant, String> testSteps = new TreeMap<>(testStepsIn);
+
+		Map<String, HashMap<String, Object>> requests = new LinkedHashMap<>();
 
         Har har = new Har();
         Log log = har.getLog();

@@ -2,7 +2,6 @@ package com.seleniumtests.ut.browserfactory.chrome;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.browserfactory.chrome.ChromiumUtils;
-import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.har.Har;
 import com.seleniumtests.util.har.WebSocketEntry;
 
@@ -14,11 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 
 public class TestChromiumUtils extends GenericTest {
@@ -208,7 +203,7 @@ public class TestChromiumUtils extends GenericTest {
 		Assert.assertEquals(har.getLog().getEntries().get(7).getPageref(), "page_0");
 		Assert.assertEquals(har.getLog().getEntries().get(8).getPageref(), "page_1");
 	}
-	
+
     @Test(groups="ut")
     public void testParsePerformanceLogsNoError() throws IOException {
         List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-all-ok.txt");
@@ -247,6 +242,27 @@ public class TestChromiumUtils extends GenericTest {
         // check transition between pages, based on timings
         Assert.assertEquals(har.getLog().getEntries().get(18).getPageref(), "page_0");
         Assert.assertEquals(har.getLog().getEntries().get(19).getPageref(), "page_1");
+    }
+
+	/**
+	 * Parse logs
+	 * /!\ test steps are voluntary inserted in the wrong order
+	 */
+    @Test(groups="ut")
+    public void testParsePerformanceLogsNoErrorTestStepOrder() throws IOException {
+        List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-all-ok.txt");
+		Map<Instant, String> testSteps = new LinkedHashMap<>();
+		testSteps.put(Instant.ofEpochMilli(1739547734198L), "step 2");
+		testSteps.put(Instant.ofEpochMilli(1739547733421L), "step 1");
+
+        Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
+
+        // check pages
+        Assert.assertEquals(har.getLog().getPages().size(), 2);
+        Assert.assertEquals(har.getLog().getPages().get(0).getTitle(), "step 1");
+        Assert.assertEquals(har.getLog().getPages().get(0).getId(), "page_0");
+        Assert.assertTrue(har.getLog().getPages().get(0).getStartedDateTime().startsWith("2025-02-14T")); // to avoid problems on other time zones
+
     }
 
     /**
