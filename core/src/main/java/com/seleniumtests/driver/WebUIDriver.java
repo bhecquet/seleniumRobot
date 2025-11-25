@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -30,6 +31,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 import com.seleniumtests.browserfactory.*;
 import com.seleniumtests.browserfactory.chrome.ChromiumUtils;
@@ -499,7 +501,12 @@ public class WebUIDriver {
 		Har har = null;
 		try {
 			if (TestStepManager.getInstance() != null && driver != null && driver.getBrowserInfo().getBrowser() == BrowserType.CHROME) {
-				har = ChromiumUtils.parsePerformanceLogs(logEntries, TestStepManager.getInstance().getTestSteps());
+				Map<Instant, String> testSteps = TestStepManager.getInstance()
+						.getTestSteps()
+						.stream()
+						.collect(Collectors.toMap(testStep -> testStep.getTimestamp().toInstant(), TestStep::getName));
+
+				har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
 			}
 		} catch (Exception e) {
 			logger.error("error parsing performance logs", e);

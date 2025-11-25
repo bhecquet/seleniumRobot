@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,13 +23,10 @@ import static org.openqa.selenium.remote.CapabilityType.PROXY;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.List;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -39,7 +36,6 @@ import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.internal.Require;
 import org.openqa.selenium.remote.AbstractDriverOptions;
-import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
@@ -65,7 +61,6 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
 	 * @param binPath			the browser binary to start, if specifically set by user through option. Else, installed browser will be used
 	 * @param driverPath		user defined driver. if null, default driver will be selected depending on browser and version
 	 * @param version			user defined version if user needs to start a specific version of the browser and this version is installed
-	 * @return
 	 */
     private BrowserInfo prepareBinaryAndDriver(final BrowserType browserType, final String binPath, final String driverPath, final String version) {
 
@@ -190,7 +185,7 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
     
     /**
      * Add proxy capability
-     * @param capability
+     * @param capability		capability to update
      */
     private void configureProxyCap(MutableCapabilities capability) {
     	Proxy proxy = webDriverConfig.getProxy();

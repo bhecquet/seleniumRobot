@@ -1,7 +1,6 @@
-	package com.seleniumtests.browserfactory.chrome;
+package com.seleniumtests.browserfactory.chrome;
 
-import com.seleniumtests.driver.CustomEventFiringWebDriver;
-import com.seleniumtests.reporter.logger.TestStep;
+//import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.har.*;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -53,7 +52,13 @@ public class ChromiumUtils {
 		// nothing
 	}
 
-	public static Har parsePerformanceLogs(List<LogEntry> logEntries, List<TestStep> testSteps) {
+	/**
+	 * Parses chrome performance logs from logEntries returned from Selenium
+	 * @param logEntries		log entrie to parse
+	 * @param testSteps			step information. We do not use a TestStep object directly as this object is imported in grid-extension and we want to avoid too many imports
+	 * @return the Har
+	 */
+	public static Har parsePerformanceLogs(List<LogEntry> logEntries, Map<Instant, String> testSteps) {
         Map<String, HashMap<String, Object>> requests = new LinkedHashMap<>();
 
         Har har = new Har();
@@ -62,11 +67,12 @@ public class ChromiumUtils {
         Map<Long, Page> pageStart = new LinkedHashMap<>();
         Map<Page, Boolean> usedPages = new LinkedHashMap<>();
         int id = 0;
-        for (TestStep testStep: testSteps) {
-            Instant instant = testStep.getTimestamp().toInstant();
+        for (Map.Entry<Instant, String> testStep: testSteps.entrySet()) {
+			Instant testStepsTimestamp = testStep.getKey();
+			String stepName = testStep.getValue();
             String pageId = "page_" + id++;
-            Page page = new Page(instant.atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME), pageId, testStep.getName());
-            pageStart.put(testStep.getTimestamp().toInstant().toEpochMilli(), page);
+            Page page = new Page(testStepsTimestamp.atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME), pageId, stepName);
+            pageStart.put(testStepsTimestamp.toEpochMilli(), page);
             usedPages.put(page, false);
         }
 

@@ -125,6 +125,7 @@ public class TestCustomEventFiringWebDriver2 extends GenericMultiBrowserTest {
 
 	/**
 	 * Test geolocation can be configured
+	 * /!\ Chrome seems to block geolocation execution when test page is exposed on LAN IP, so exposition MUST be done with localhost
 	 */
 	@Test(groups={"it"})
 	public void testChromeGeolocation() {

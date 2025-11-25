@@ -16,7 +16,9 @@ import java.nio.file.Files;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 public class TestChromiumUtils extends GenericTest {
@@ -24,13 +26,12 @@ public class TestChromiumUtils extends GenericTest {
 	@Test(groups = "ut")
 	public void testParsePerformanceLogsWebSocket() throws IOException {
 		List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-with-websockets.txt");
-		
-		List<TestStep> testSteps = new ArrayList<>();
-		testSteps.add(new TestStep("step 1"));
-		testSteps.get(0).setTimestamp(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
-		testSteps.add(new TestStep("step 2"));
-		testSteps.get(1).setTimestamp(Instant.ofEpochMilli(1739547734198L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
-		
+		Map<Instant, String> testSteps = Map.of(
+				Instant.ofEpochMilli(1739547733421L), "step 1",
+				Instant.ofEpochMilli(1739547734198L), "step 2"
+		);
+
+
 		Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
 		
 		// check pages
@@ -68,13 +69,12 @@ public class TestChromiumUtils extends GenericTest {
 	@Test(groups = "ut")
 	public void testParsePerformanceLogsWebSocketNoHandshake() throws IOException {
 		List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-with-websockets-no-handshake.txt");
-		
-		List<TestStep> testSteps = new ArrayList<>();
-		testSteps.add(new TestStep("step 1"));
-		testSteps.get(0).setTimestamp(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
-		testSteps.add(new TestStep("step 2"));
-		testSteps.get(1).setTimestamp(Instant.ofEpochMilli(1739547734198L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
-		
+
+		Map<Instant, String> testSteps = Map.of(
+				Instant.ofEpochMilli(1739547733421L), "step 1",
+				Instant.ofEpochMilli(1739547734198L), "step 2"
+		);
+
 		Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
 		
 		// check pages
@@ -106,13 +106,11 @@ public class TestChromiumUtils extends GenericTest {
 	@Test(groups = "ut")
 	public void testParsePerformanceLogsWebSocketNoHandshakeRespNoCreated() throws IOException {
 		List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-with-websockets-no-handshake-resp.txt");
-		
-		List<TestStep> testSteps = new ArrayList<>();
-		testSteps.add(new TestStep("step 1"));
-		testSteps.get(0).setTimestamp(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
-		testSteps.add(new TestStep("step 2"));
-		testSteps.get(1).setTimestamp(Instant.ofEpochMilli(1739547734198L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
-		
+
+		Map<Instant, String> testSteps = Map.of(
+				Instant.ofEpochMilli(1739547733421L), "step 1",
+				Instant.ofEpochMilli(1739547734198L), "step 2"
+		);
 		Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
 		
 		// check pages
@@ -143,13 +141,10 @@ public class TestChromiumUtils extends GenericTest {
 	@Test(groups = "ut")
 	public void testParsePerformanceLogsWebSocketOneFrameOnly() throws IOException {
 		List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-with-websockets-one-frame-only.txt");
-		
-		List<TestStep> testSteps = new ArrayList<>();
-		testSteps.add(new TestStep("step 1"));
-		testSteps.get(0).setTimestamp(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
-		testSteps.add(new TestStep("step 2"));
-		testSteps.get(1).setTimestamp(Instant.ofEpochMilli(1739547734198L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
-		
+		Map<Instant, String> testSteps = Map.of(
+				Instant.ofEpochMilli(1739547733421L), "step 1",
+				Instant.ofEpochMilli(1739547734198L), "step 2"
+		);
 		Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
 		
 		// check pages
@@ -177,13 +172,10 @@ public class TestChromiumUtils extends GenericTest {
 	@Test(groups = "ut")
 	public void testParsePerformanceLogsWebSocketWithMissingMessages() throws IOException {
 		List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-with-websockets.txt");
-		
-		List<TestStep> testSteps = new ArrayList<>();
-		testSteps.add(new TestStep("step 1"));
-		testSteps.get(0).setTimestamp(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
-		testSteps.add(new TestStep("step 2"));
-		testSteps.get(1).setTimestamp(Instant.ofEpochMilli(1739547734198L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
-		
+		Map<Instant, String> testSteps = Map.of(
+				Instant.ofEpochMilli(1739547733421L), "step 1",
+				Instant.ofEpochMilli(1739547734198L), "step 2"
+		);
 		Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
 		
 		// check pages
@@ -220,13 +212,10 @@ public class TestChromiumUtils extends GenericTest {
     @Test(groups="ut")
     public void testParsePerformanceLogsNoError() throws IOException {
         List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-all-ok.txt");
-
-        List<TestStep> testSteps = new ArrayList<>();
-        testSteps.add(new TestStep("step 1"));
-        testSteps.get(0).setTimestamp(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
-        testSteps.add(new TestStep("step 2"));
-        testSteps.get(1).setTimestamp(Instant.ofEpochMilli(1739547734198L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
-
+		Map<Instant, String> testSteps = Map.of(
+				Instant.ofEpochMilli(1739547733421L), "step 1",
+				Instant.ofEpochMilli(1739547734198L), "step 2"
+		);
         Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
 
         // check pages
@@ -267,10 +256,9 @@ public class TestChromiumUtils extends GenericTest {
     public void testParsePerformanceLogsAuthorizationHeaderRemoved() throws IOException {
         List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-auth-headers.txt");
 
-        List<TestStep> testSteps = new ArrayList<>();
-        testSteps.add(new TestStep("step 1"));
-        testSteps.get(0).setTimestamp(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
-
+		Map<Instant, String> testSteps = Map.of(
+				Instant.ofEpochMilli(1739547733421L), "step 1"
+		);
         Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
         Assert.assertTrue(har.getLog().getEntries().get(0).getRequest().getHeaders()
                 .stream()
@@ -286,9 +274,7 @@ public class TestChromiumUtils extends GenericTest {
     public void testParsePerformanceLogsNoSteps() throws IOException {
         List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-auth-headers.txt");
 
-        List<TestStep> testSteps = new ArrayList<>();
-
-        Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
+        Har har = ChromiumUtils.parsePerformanceLogs(logEntries, new HashMap<>());
         Assert.assertEquals(har.getLog().getEntries().size(), 1);
         Assert.assertEquals(har.getLog().getEntries().get(0).getPageref(), "");
         Assert.assertEquals(har.getLog().getPages().size(), 0);
@@ -300,11 +286,9 @@ public class TestChromiumUtils extends GenericTest {
     @Test(groups="ut")
     public void testParsePerformanceLogsMissingRequestWillBeSentExtraInfo() throws IOException {
         List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-missing-sentExtraInfo.txt");
-
-        List<TestStep> testSteps = new ArrayList<>();
-        testSteps.add(new TestStep("step 1"));
-        testSteps.get(0).setTimestamp(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
-
+		Map<Instant, String> testSteps = Map.of(
+				Instant.ofEpochMilli(1739547733421L), "step 1"
+		);
         Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
         Assert.assertEquals(har.getLog().getEntries().get(0).getRequest().getHeaders().size(), 4);
     }
@@ -315,11 +299,9 @@ public class TestChromiumUtils extends GenericTest {
     @Test(groups="ut")
     public void testParsePerformanceLogsMissingResponseReceivedExtraInfo() throws IOException {
         List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-missing-responseReceivedExtraInfo.txt");
-
-        List<TestStep> testSteps = new ArrayList<>();
-        testSteps.add(new TestStep("step 1"));
-        testSteps.get(0).setTimestamp(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
-
+		Map<Instant, String> testSteps = Map.of(
+				Instant.ofEpochMilli(1739547733421L), "step 1"
+		);
         Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
         Assert.assertEquals(har.getLog().getEntries().size(), 1);
     }
@@ -330,11 +312,9 @@ public class TestChromiumUtils extends GenericTest {
     @Test(groups="ut")
     public void testParsePerformanceLogsMissingResponseReceived() throws IOException {
         List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-missing-responseReceived.txt");
-
-        List<TestStep> testSteps = new ArrayList<>();
-        testSteps.add(new TestStep("step 1"));
-        testSteps.get(0).setTimestamp(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
-
+		Map<Instant, String> testSteps = Map.of(
+				Instant.ofEpochMilli(1739547733421L), "step 1"
+		);
         Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
         Assert.assertEquals(har.getLog().getEntries().size(), 1);
         Assert.assertEquals(har.getLog().getEntries().get(0).getResponse().getStatus(), 0);
@@ -349,29 +329,25 @@ public class TestChromiumUtils extends GenericTest {
     @Test(groups="ut")
     public void testParsePerformanceLogsMissingTimings() throws IOException {
         List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-missing-timings.txt");
-
-        List<TestStep> testSteps = new ArrayList<>();
-        testSteps.add(new TestStep("step 1"));
-        testSteps.get(0).setTimestamp(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
-
+		Map<Instant, String> testSteps = Map.of(
+				Instant.ofEpochMilli(1739547733421L), "step 1"
+		);
         Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
         Assert.assertEquals(har.getLog().getEntries().size(), 1);
         Assert.assertEquals(har.getLog().getEntries().get(0).getTimings().getConnect(), 0);
     }
 
     /**
-     * According to https://chromedevtools.github.io/devtools-protocol/tot/Network/#event-responseReceivedExtraInfo, when cache is used
+     * According to <a href="https://chromedevtools.github.io/devtools-protocol/tot/Network/#event-responseReceivedExtraInfo">...</a>, when cache is used
      * status code for responseReceivedExtraInfo is different from responseReceived
      * Check we get status code from responseReceivedExtraInfo
      */
     @Test(groups="ut")
     public void testParsePerformanceLogsWithCache() throws IOException {
         List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-with-cache.txt");
-
-        List<TestStep> testSteps = new ArrayList<>();
-        testSteps.add(new TestStep("step 1"));
-        testSteps.get(0).setTimestamp(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
-
+		Map<Instant, String> testSteps = Map.of(
+				Instant.ofEpochMilli(1739547733421L), "step 1"
+		);
         Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
         Assert.assertEquals(har.getLog().getEntries().size(), 1);
         Assert.assertEquals(har.getLog().getEntries().get(0).getResponse().getStatus(), 304);
@@ -383,11 +359,9 @@ public class TestChromiumUtils extends GenericTest {
     @Test(groups="ut")
     public void testParsePerformanceMissingMandatoryData() throws IOException {
         List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-missing-data.txt");
-
-        List<TestStep> testSteps = new ArrayList<>();
-        testSteps.add(new TestStep("step 1"));
-        testSteps.get(0).setTimestamp(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
-
+		Map<Instant, String> testSteps = Map.of(
+				Instant.ofEpochMilli(1739547733421L), "step 1"
+		);
         Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
         Assert.assertEquals(har.getLog().getEntries().size(), 0);
     }
@@ -395,11 +369,9 @@ public class TestChromiumUtils extends GenericTest {
     @Test(groups="ut")
     public void testParsePerformanceLoadingFailed() throws IOException {
         List<LogEntry> logEntries = readLogs("tu/chromePerformance/driver-log-performance-loading-failed.txt");
-
-        List<TestStep> testSteps = new ArrayList<>();
-        testSteps.add(new TestStep("step 1"));
-        testSteps.get(0).setTimestamp(Instant.ofEpochMilli(1739547733421L).atZone(ZoneId.systemDefault()).toOffsetDateTime());
-
+		Map<Instant, String> testSteps = Map.of(
+				Instant.ofEpochMilli(1739547733421L), "step 1"
+		);
         Har har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
         Assert.assertEquals(har.getLog().getEntries().size(), 1);
         Assert.assertEquals(har.getLog().getEntries().get(0).getResponse().getStatus(), 0);

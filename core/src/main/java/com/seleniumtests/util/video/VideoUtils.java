@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.seleniumtests.core.SeleniumTestsContext;
-import com.seleniumtests.reporter.reporters.CommonReporter;
 import org.apache.logging.log4j.Logger;
 import org.monte.media.av.FormatKeys;
 import org.monte.media.avi.AVIReader;
@@ -27,7 +26,6 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 /**
  * Class for doing several action on video recorded by SeleniumRobot
- * @author S047432
  *
  */
 public class VideoUtils {
@@ -41,8 +39,8 @@ public class VideoUtils {
 	
 	/**
 	 * Extract the picture associated to the beginning of a step to <output_dir>/video
-	 * @param videoFile
-	 * @param testSteps
+	 * @param videoFile		The video file from which we will extract references
+	 * @param testSteps		list of test steps for the test
 	 * @param videoOutputDirectory	Directory where pictures from video will be extracted
 	 */
 	public static void extractReferenceForSteps(File videoFile, List<TestStep> testSteps, Path videoOutputDirectory) {
@@ -96,14 +94,14 @@ public class VideoUtils {
             } while (img != null);
 
         } catch (IOException e) {
-			logger.error("Cannot extract step reference " + e.getMessage());
+			logger.error("Cannot extract step reference {}", e.getMessage());
 		} finally {
             // Close the reader
             if (in != null) {
                 try {
 					in.close();
 				} catch (IOException e) {
-					logger.error("Cannot close video reader " + e.getMessage());
+					logger.error("Cannot close video reader {}", e.getMessage());
 				}
             }
         }
