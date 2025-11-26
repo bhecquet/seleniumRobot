@@ -145,7 +145,7 @@ public class TestBrowserStackCapabilitiesFactory extends MockitoTest {
         Assert.assertEquals(capa.getBrowserName(), "MicrosoftEdge");
 
         // check chrome specific capabilities are present
-        Assert.assertTrue(((Map<?,?>)((capa).asMap().get(EdgeOptions.CAPABILITY))).get("args").toString().contains("--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades, --remote-allow-origins=*"));
+        Assert.assertTrue(((Map<?,?>)((capa).asMap().get(EdgeOptions.CAPABILITY))).get("args").toString().contains("--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-search-engine-choice-screen, --disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades, --remote-allow-origins=*"));
     }
 
     /**
