@@ -1,13 +1,9 @@
 package com.seleniumtests.uipage.htmlelements.select;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import com.seleniumtests.uipage.htmlelements.CachedHtmlElement;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 import com.seleniumtests.uipage.ByC;
@@ -46,7 +42,7 @@ public class SalesforceLigntningSelect extends AngularSelect implements ISelectL
 		parentElement.findElement(locatorClickToOpen).click();
 		options = parentElement.findElements(locatorOption)
 				.stream()
-				.collect(Collectors.toList());
+				.toList();
 		return options;
 	}
 
@@ -117,22 +113,6 @@ public class SalesforceLigntningSelect extends AngularSelect implements ISelectL
 	public void selectByValue(String value) {
 		throw new UnsupportedOperationException("Cannot select by value for LWC select");
 	}
-
-	/**
-	 * Try the quick track where we search option directly
-	 * If this does not work, fall back to slower behaviour where all options are read
-	 * This will at least help to have a nice error message
-	 * @param text
-	 */
-	/*@Override
-	public void selectByText(String text) {
-		try {
-			WebElement option = parentElement.findElement(By.xpath(String.format(".//*[@title='%s']", text)));
-			setSelected(option);
-		} catch (WebDriverException e) {
-			super.selectByText(text);
-		}
-	}*/
 	
 	@Override
 	public void deselectByIndex(Integer index) {

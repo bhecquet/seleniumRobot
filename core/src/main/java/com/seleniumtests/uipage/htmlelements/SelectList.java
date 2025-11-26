@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,48 +18,34 @@
 package com.seleniumtests.uipage.htmlelements;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.ServiceLoader;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
-import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.uipage.ReplayOnError;
 import com.seleniumtests.uipage.htmlelements.select.ISelectList;
 import com.seleniumtests.uipage.htmlelements.select.StubSelect;
 
-import net.ricecode.similarity.JaroWinklerStrategy;
-import net.ricecode.similarity.StringSimilarityService;
-import net.ricecode.similarity.StringSimilarityServiceImpl;
-
 /**
  * Support both standard select tag and fake select consists of tag ul and li.
  */
 public class SelectList extends HtmlElement {
 
-	private static List<Class<? extends ISelectList>> selectImplementations;
+	private static final List<Class<? extends ISelectList>> selectImplementations;
 
 	static {
-		if (selectImplementations == null) {
-    		selectImplementations = searchRelevantImplementation();
-    	}
-	}
+        selectImplementations = searchRelevantImplementation();
+    }
 
     private static final String ERROR_MULTI_SELECT = "You may only deselect all options of a multi-select";
 	protected ThreadLocal<List<WebElement>> options = new ThreadLocal<>();
-	private StringSimilarityService service = new StringSimilarityServiceImpl(new JaroWinklerStrategy());
-	private ThreadLocal<ISelectList> selectImplementation = new ThreadLocal<>();
+	private final ThreadLocal<ISelectList> selectImplementation = new ThreadLocal<>();
 
 	protected ThreadLocal<Boolean> multiple = new ThreadLocal<>();
 
@@ -68,8 +54,8 @@ public class SelectList extends HtmlElement {
 	 * - a standard HTML element => locator should point to the "select" element itself
 	 * - a select list built with HTML lists (ul / li) => locator should point to <ul> element
 	 * - an angular materials select => locator should point to the <mat-select> element
-	 * @param label
-	 * @param by
+	 * @param label		description of the element
+	 * @param by		selector to find the element
 	 */
 	public SelectList(final String label, final By by) {
         super(label, by);
@@ -113,12 +99,9 @@ public class SelectList extends HtmlElement {
 		
 		// load via SPI other Select implementations
 		ServiceLoader<ISelectList> selectLoader = ServiceLoader.load(ISelectList.class);
-		Iterator<ISelectList> selectsIterator = selectLoader.iterator();
-		while (selectsIterator.hasNext())
-		{
-			ISelectList selectClass = selectsIterator.next();
-			selectImplementations.add(selectClass.getClass());
-		}
+        for (ISelectList selectClass : selectLoader) {
+            selectImplementations.add(selectClass.getClass());
+        }
 		
 		if (selectImplementations.isEmpty()) {
 			throw new CustomSeleniumTestsException("Could not get list of Select classes");
@@ -146,7 +129,7 @@ public class SelectList extends HtmlElement {
 				}
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
-				logger.error(String.format("Cannot use Select implementation %s: %s", selectClass.getName(), e.getMessage()));
+				logger.error("Cannot use Select implementation {}: {}", selectClass.getName(), e.getMessage());
 			}
         }
         
@@ -161,8 +144,6 @@ public class SelectList extends HtmlElement {
 
     /**
      * Returns a new Select element (created to facilitate unit testing).
-     *
-     * @return
      */
     protected Select getNewSelectElement(final WebElement element) {
         return new Select(element);
@@ -226,7 +207,6 @@ public class SelectList extends HtmlElement {
 
     /**
      * Do not replayOnError as the called method already does it
-     * @return
      */
     public String getSelectedText() {
     	try {
@@ -373,10 +353,10 @@ public class SelectList extends HtmlElement {
     public void selectByIndex(int ... indexs) {
     	 try {
  	    	findElement();
- 	    	
- 	    	for (int i = 0; i < indexs.length; i++) {
- 	    		getSelectImplementation().selectByIndex(indexs[i]);
- 	    	}
+
+             for (int index : indexs) {
+                 getSelectImplementation().selectByIndex(index);
+             }
      	} finally {
      		getSelectImplementation().finalizeAction();
      	}
@@ -386,7 +366,7 @@ public class SelectList extends HtmlElement {
     /**
      * Select standard select by attribute text, and select fake select with ul and li by attribute title.
      *
-     * @param  text
+     * @param  text		text to select
      */
     @ReplayOnError(waitAfterAction = true)
     public void selectByText(final String text) {
@@ -403,10 +383,10 @@ public class SelectList extends HtmlElement {
     public void selectByText(String ... texts) {
     	try {
 	        findElement();
-	        
-	        for (int i = 0; i < texts.length; i++) {
-	        	getSelectImplementation().selectByText(texts[i]);
-	        }
+
+            for (String text : texts) {
+                getSelectImplementation().selectByText(text);
+            }
 	       
     	} finally {
     		getSelectImplementation().finalizeAction();
@@ -417,13 +397,13 @@ public class SelectList extends HtmlElement {
     /**
      * Select Corresponding select by attribute text, select the most similar text
      *
-     * @param  text
+     * @param  text		the text to select
      */
     @ReplayOnError(waitAfterAction = true)
     public void selectByCorrespondingText(String text) {
     	try {
 	    	findElement();
-	    	selectCorrespondingText(text);
+	    	getSelectImplementation().selectCorrespondingText(text);
     	} finally {
     		getSelectImplementation().finalizeAction();
     	}
@@ -433,34 +413,17 @@ public class SelectList extends HtmlElement {
      * Multiple select by attribute text, similar select
      * For each text, only one option will be selected
      * 
-     * @param text
+     * @param text	the texts to select
      */
     @ReplayOnError(waitAfterAction = true)
     public void selectByCorrespondingText(String ... text) {
     	try {
 	    	findElement();
-	    	for (int i = 0; i < text.length; i++) {
-	    		selectCorrespondingText(text[i]);
-	    	}
+            for (String s : text) {
+                getSelectImplementation().selectCorrespondingText(s);
+            }
     	} finally {
     		getSelectImplementation().finalizeAction();
-    	}
-    }
-    
-    private void selectCorrespondingText(final String text) {
-    	double score = 0;
-    	WebElement optionToSelect = null;
-    	for (WebElement option : getOptionsNoSearch()) {
-    		String source = getSelectImplementation().getOptionText(option).trim();
-    		if (service.score(source, text) > score) {
-    			score = service.score(source, text);
-    			optionToSelect = option;
-    		}
-    	}
-    	if (optionToSelect != null) {
-    		getSelectImplementation().setSelected(optionToSelect);
-    	} else {
-    		throw new NoSuchElementException("Cannot locate option with corresponding text " + text);
     	}
     }
     
@@ -469,32 +432,19 @@ public class SelectList extends HtmlElement {
     	
     	try {
     		findElement();
-    		
-        	if (!isMultipleSelect()) {
-                throw new UnsupportedOperationException(ERROR_MULTI_SELECT);
-            }
 
-	    	double score = 0;
-	    	WebElement optionToSelect = null;
-	    	for (WebElement option : getOptionsNoSearch()) {
-	    		String source = option.getText().trim();
-	    		if (service.score(source, text) > score) {
-	    			score = service.score(source, text);
-	    			optionToSelect = option;
-	    		}
-	    	}
-	    	if (optionToSelect != null) {
-	    		getSelectImplementation().setDeselected(optionToSelect);
-	    	} else {
-	    		throw new NoSuchElementException("Cannot locate option with corresponding text " + text);
-	    	}
-    		
-    	} finally {
+			if (!isMultipleSelect()) {
+				throw new UnsupportedOperationException(ERROR_MULTI_SELECT);
+			}
+
+			getSelectImplementation().deselectCorrespondingText(text);
+
+		} finally {
     		getSelectImplementation().finalizeAction();
     	}
     }
 
-    @ReplayOnError(waitAfterAction = true)
+	@ReplayOnError(waitAfterAction = true)
     public void selectByValue(final String value) {
     	try {
 	    	findElement();
@@ -509,9 +459,9 @@ public class SelectList extends HtmlElement {
     public void selectByValue(final String ... values) {
     	try {
 	        findElement();
-	        for (int i = 0; i < values.length; i++) {
-	        	getSelectImplementation().selectByValue(values[i]);
-	        }
+            for (String value : values) {
+                getSelectImplementation().selectByValue(value);
+            }
     	} finally {
     		getSelectImplementation().finalizeAction();
     	}

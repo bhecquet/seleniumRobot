@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,17 +33,9 @@ import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 public class TestUiSelect extends GenericTest {
 	
 	private static WebDriver driver;
-	
-//	public TestUiSelect()  {
-//	}
-//	
-//	public TestUiSelect(WebDriver driver, DriverTestPage testPage) throws Exception {
-//		TestUiSelect.driver = driver;
-//		TestUiSelect.testPage = testPage;
-//	}
 
 	@BeforeClass(groups={"it", "ut"})
-	public void initDriver(final ITestContext testNGCtx) throws Exception {
+	public void initDriver(final ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);
 		setBrowser();
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
@@ -62,49 +54,48 @@ public class TestUiSelect extends GenericTest {
 				driver.switchTo().alert().accept();
 			}
 		} catch (WebDriverException e) {
-			
+			// ignore
 		}
 	}
-	
+
 	/*
 	 * Test SelectList and MultipleSelectList
 	 */
 	@Test(groups={"it"})
-	public void testIsTextSelect() {
-			DriverTestPage.selectList.selectByText("option2");
-			Assert.assertTrue(DriverTestPage.selectList.getSelectedText().equals("option2"));
+	public void testSelectByText() {
+		DriverTestPage.selectList.selectByText("option2");
+        Assert.assertEquals(DriverTestPage.selectList.getSelectedText(), "option2");
 	}
 	
 	@Test(groups={"it"})
-	public void testIsMultipleTextSelect() {
-			DriverTestPage.selectMultipleList.deselectAll();
-			String[] toSelect = {"option2", "option4"};
-			DriverTestPage.selectMultipleList.selectByText(toSelect);
-			Assert.assertTrue(toSelect[0].equals(DriverTestPage.selectMultipleList.getSelectedTexts()[0]));
-			Assert.assertTrue(toSelect[1].equals(DriverTestPage.selectMultipleList.getSelectedTexts()[1]));
+	public void testSelectByTextWithMultipleOptions() {
+		DriverTestPage.selectMultipleList.deselectAll();
+		Assert.assertTrue(DriverTestPage.selectMultipleList.isMultiple());
+		String[] toSelect = {"option2", "option4"};
+		DriverTestPage.selectMultipleList.selectByText(toSelect);
+        Assert.assertEquals(DriverTestPage.selectMultipleList.getSelectedTexts()[0], toSelect[0]);
+        Assert.assertEquals(DriverTestPage.selectMultipleList.getSelectedTexts()[1], toSelect[1]);
 	}
 	
 	@Test(groups={"it"})
-	public void testIsValueSelect() {
+	public void testSelectByValue() {
 		DriverTestPage.selectList.selectByValue("opt2");
-		Assert.assertTrue(DriverTestPage.selectList.getSelectedValue().equals("opt2"));
+        Assert.assertEquals(DriverTestPage.selectList.getSelectedValue(), "opt2");
 	}
 	
 	@Test(groups={"it"})
-	public void testIsMultipleValueSelect() {
-			DriverTestPage.selectMultipleList.deselectAll();
-			String[] toSelect = {"opt2", "opt4"};
-			DriverTestPage.selectMultipleList.selectByValue(toSelect);
-			Assert.assertTrue(toSelect[0].equals(DriverTestPage.selectMultipleList.getSelectedValues()[0]));
-			Assert.assertTrue(toSelect[1].equals(DriverTestPage.selectMultipleList.getSelectedValues()[1]));
+	public void testSelectByMultipleValues() {
+		DriverTestPage.selectMultipleList.deselectAll();
+		DriverTestPage.selectMultipleList.selectByValue("opt2", "opt4");
+        Assert.assertEquals(DriverTestPage.selectMultipleList.getSelectedValues()[0], "opt2");
+        Assert.assertEquals(DriverTestPage.selectMultipleList.getSelectedValues()[1], "opt4");
 	}
 	
 	@Test(groups={"it"})
 	public void testGetFirstSelectedOption() {
 		DriverTestPage.selectMultipleList.deselectAll();
-		String[] toSelect = {"opt2", "opt4"};
-		DriverTestPage.selectMultipleList.selectByValue(toSelect);
-		Assert.assertTrue("option2".equals(DriverTestPage.selectMultipleList.getFirstSelectedOption().getText()));
+		DriverTestPage.selectMultipleList.selectByValue("opt2", "opt4");
+        Assert.assertEquals(DriverTestPage.selectMultipleList.getFirstSelectedOption().getText(), "option2");
 	}
 	
 	@Test(groups={"it"})
@@ -117,74 +108,79 @@ public class TestUiSelect extends GenericTest {
 	@Test(groups={"it"})
 	public void testGetAllSelectedOptions() {
 		DriverTestPage.selectMultipleList.deselectAll();
-		String[] toSelect = {"opt2", "opt4"};
-		DriverTestPage.selectMultipleList.selectByValue(toSelect);
-		Assert.assertTrue("option2".equals(DriverTestPage.selectMultipleList.getAllSelectedOptions().get(0).getText()));
-		Assert.assertTrue("option4".equals(DriverTestPage.selectMultipleList.getAllSelectedOptions().get(1).getText()));
+		DriverTestPage.selectMultipleList.selectByValue("opt2", "opt4");
+        Assert.assertEquals(DriverTestPage.selectMultipleList.getAllSelectedOptions().get(0).getText(), "option2");
+        Assert.assertEquals(DriverTestPage.selectMultipleList.getAllSelectedOptions().get(1).getText(), "option4");
 	}
 	
 	
 	@Test(groups={"it"})
-	public void testIsCorrespondingTextSelect() {
-			DriverTestPage.selectList.selectByCorrespondingText("option 2");
-			Assert.assertTrue(DriverTestPage.selectList.getSelectedValue().equals("opt2"));
+	public void testSelectByCorrespondingText() {
+		DriverTestPage.selectList.selectByCorrespondingText("option 2");
+        Assert.assertEquals(DriverTestPage.selectList.getSelectedValue(), "opt2");
 	}
 	
 	@Test(groups={"it"})
-	public void testIsMultipleCorrespondingTextSelect() {
-			DriverTestPage.selectMultipleList.deselectAll();
-			String[] toSelect = {"option 2", "opti4"};
-			DriverTestPage.selectMultipleList.selectByCorrespondingText(toSelect);
-			String[] toFind = {"opt2", "opt4"};
-			Assert.assertTrue(toFind[0].equals(DriverTestPage.selectMultipleList.getSelectedValues()[0]));
-			Assert.assertTrue(toFind[1].equals(DriverTestPage.selectMultipleList.getSelectedValues()[1]));
-	}
-	
-	@Test(groups={"it"})
-	public void testIsAllDeselected() {
-		String[] toSelect = {"opt1", "opt2", "opt3", "opt4"};
-		DriverTestPage.selectMultipleList.selectByCorrespondingText(toSelect);
+	public void testSelectByCorrespondingTextWithMultipleOptions() {
 		DriverTestPage.selectMultipleList.deselectAll();
-		Assert.assertTrue(DriverTestPage.selectMultipleList.getSelectedValues().length == 0);
+		DriverTestPage.selectMultipleList.selectByCorrespondingText("option 2", "opti4");
+        Assert.assertEquals(DriverTestPage.selectMultipleList.getSelectedValues()[0], "opt2");
+        Assert.assertEquals(DriverTestPage.selectMultipleList.getSelectedValues()[1], "opt4");
+	}
+
+	@Test(groups={"it"})
+	public void testDeselectByCorrespondingTextWithMultipleOptions() {
+		DriverTestPage.selectMultipleList.deselectAll();
+		DriverTestPage.selectMultipleList.selectByCorrespondingText("option 2", "opti4");
+		DriverTestPage.selectMultipleList.deselectByCorrespondingText("opti4");
+        Assert.assertEquals(DriverTestPage.selectMultipleList.getSelectedValues().length, 1);
+        Assert.assertEquals(DriverTestPage.selectMultipleList.getSelectedValues()[0], "opt2");
 	}
 	
 	@Test(groups={"it"})
-	public void testIsIndexSelect() {
+	public void testDeselectAll() {
+		DriverTestPage.selectMultipleList.selectByCorrespondingText("opt1", "opt2", "opt3", "opt4");
+		DriverTestPage.selectMultipleList.deselectAll();
+        Assert.assertEquals(DriverTestPage.selectMultipleList.getSelectedValues().length, 0);
+	}
+	
+	@Test(groups={"it"})
+	public void testSelectByIndex() {
 		DriverTestPage.selectList.selectByIndex(1);
-		Assert.assertTrue(DriverTestPage.selectList.getSelectedValue().equals("opt2"));
+        Assert.assertEquals(DriverTestPage.selectList.getSelectedValue(), "opt2");
 	}
 	
 	@Test(groups={"it"})
-	public void testIsMultipleIndexSelect() {
+	public void testSelectByMultipleIndex() {
 		DriverTestPage.selectMultipleList.deselectAll();
 		int[] toSelect = {1, 2};
 		DriverTestPage.selectMultipleList.selectByIndex(toSelect);
-		Assert.assertTrue(DriverTestPage.selectMultipleList.getSelectedValues()[0].equals("opt2"));
-		Assert.assertTrue(DriverTestPage.selectMultipleList.getSelectedValues()[1].equals("opt3"));
+        Assert.assertEquals(DriverTestPage.selectMultipleList.getSelectedValues()[0], "opt2");
+        Assert.assertEquals(DriverTestPage.selectMultipleList.getSelectedValues()[1], "opt3");
 	}
 	
 	@Test(groups={"it"})
-	public void testIsIndexDeselect() {
+	public void testDeselectByMultipleIndex() {
 		DriverTestPage.selectMultipleList.deselectAll();
 		DriverTestPage.selectMultipleList.selectByIndex(1);
 		DriverTestPage.selectMultipleList.deselectByIndex(1);
-		Assert.assertTrue(DriverTestPage.selectMultipleList.getSelectedValues().length == 0);
+        Assert.assertEquals(DriverTestPage.selectMultipleList.getSelectedValues().length, 0);
 	}
 	
 	@Test(groups={"it"})
-	public void testIsTextDeselect() {
+	public void testDeselectByText() {
 		DriverTestPage.selectMultipleList.deselectAll();
 		DriverTestPage.selectMultipleList.selectByText("option1");
 		DriverTestPage.selectMultipleList.deselectByText("option1");
-		Assert.assertTrue(DriverTestPage.selectMultipleList.getSelectedValues().length == 0);
+        Assert.assertEquals(DriverTestPage.selectMultipleList.getSelectedValues().length, 0);
 	}
 	
 	@Test(groups={"it"})
-	public void testIsValueDeselect() {
+	public void testDeselectByValue() {
 		DriverTestPage.selectMultipleList.deselectAll();
 		DriverTestPage.selectMultipleList.selectByValue("opt1");
 		DriverTestPage.selectMultipleList.deselectByValue("opt1");
-		Assert.assertTrue(DriverTestPage.selectMultipleList.getSelectedValues().length == 0);
+        Assert.assertEquals(DriverTestPage.selectMultipleList.getSelectedValues().length, 0);
 	}	
 	
 	// test of select as UL/LI lists

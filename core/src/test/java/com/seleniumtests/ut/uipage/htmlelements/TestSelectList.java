@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.*;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -85,11 +84,10 @@ public class TestSelectList extends MockitoTest {
 		when(element.findElements(By.tagName("option"))).thenReturn(Arrays.asList(option1, option2));
 		
 		// the way Select class search for text and value
-		when(element.findElements(By.xpath(".//option[normalize-space(.) = \"opt1\"]"))).thenReturn(Arrays.asList(option1));
-		when(element.findElements(By.xpath(".//option[normalize-space(.) = \"opt2\"]"))).thenReturn(Arrays.asList(option2));
-		when(element.findElements(By.xpath(".//option[@value = \"opti1\"]"))).thenReturn(Arrays.asList(option1));
-		when(element.findElements(By.xpath(".//option[@value = \"opti2\"]"))).thenReturn(Arrays.asList(option2));
-		
+		when(element.findElements(By.xpath(".//option[normalize-space(.) = \"opt1\"]"))).thenReturn(List.of(option1));
+		when(element.findElements(By.xpath(".//option[normalize-space(.) = \"opt2\"]"))).thenReturn(List.of(option2));
+		when(element.findElements(By.xpath(".//option[@value = \"opti1\"]"))).thenReturn(List.of(option1));
+		when(element.findElements(By.xpath(".//option[@value = \"opti2\"]"))).thenReturn(List.of(option2));
 
 		when(option1.getText()).thenReturn("opt1");
 		when(option1.isEnabled()).thenReturn(true);
@@ -378,10 +376,10 @@ public class TestSelectList extends MockitoTest {
 	
 	/**
 	 * Check only one option is selected when one text is given
-	 * @throws IOException
 	 */
 	@Test(groups={"ut"})
 	public void testSelectByCorrespondingText() {
+
 		when(option1.isSelected()).thenReturn(false);
 		when(option2.isSelected()).thenReturn(false);
 		
@@ -390,12 +388,10 @@ public class TestSelectList extends MockitoTest {
 		verify(option1).click();
 		verify(option2, never()).click();
 	}
-	
-	/**
-	 * Check only one option is selected when one text is given
-	 */
+
 	@Test(groups={"ut"})
 	public void testSelectByCorrespondingTexts() {
+
 		when(option1.isSelected()).thenReturn(false);
 		when(option2.isSelected()).thenReturn(false);
 		when(element.getDomAttribute("multiple")).thenReturn("true");
@@ -408,12 +404,13 @@ public class TestSelectList extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testDeselectByCorrespondingText() {
+
 		when(option1.isSelected()).thenReturn(true);
 		when(option2.isSelected()).thenReturn(true);
 		when(element.getDomAttribute("multiple")).thenReturn("true");
 		
 		SelectList select = new SelectList("", By.id("select"));
-		select.deselectByCorrespondingText("Pt2");
+		select.deselectByCorrespondingText("PT2");
 		verify(option1, never()).click();
 		verify(option2).click();
 	}

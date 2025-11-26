@@ -8,38 +8,42 @@ import org.openqa.selenium.WebElement;
 public interface ISelectList {
 	
 
-	public void setDriver(WebDriver driver);
+	void setDriver(WebDriver driver);
 
-	public boolean isApplicable();
+	boolean isApplicable();
  
-    public List<WebElement> getOptions();
+    List<WebElement> getOptions();
     
-    public void finalizeAction();
+    void finalizeAction();
     
-    public String getOptionValue(WebElement option);
+    String getOptionValue(WebElement option);
     
-    public String getOptionText(WebElement option);
+    String getOptionText(WebElement option);
 
     /**
      * @return All selected options belonging to this select tag
      */
-    public List<WebElement> getAllSelectedOptions();
+    List<WebElement> getAllSelectedOptions();
 
-    public void deselectByIndex(final Integer index);
+    void deselectByIndex(final Integer index);
     
-    public void deselectByText(final String text);
+    void deselectByText(final String text);
     
-    public void deselectByValue(final String value);
+    void deselectByValue(final String value);
 
-    public void selectByIndex(int index);
+    void selectByIndex(int index);
     
-    public void selectByText(String text);
+    void selectByText(String text);
     
-    public void selectByValue(String value);
+    void selectByValue(String value);
 
-    public void setSelected(WebElement option);
+    void setSelected(WebElement option);
     
-    public void setDeselected(WebElement option);
+    void setDeselected(WebElement option);
     
-    public boolean isMultipleWithoutFind();
+    boolean isMultipleWithoutFind();
+
+    void selectCorrespondingText(final String text);
+
+    void deselectCorrespondingText(String text);
 }

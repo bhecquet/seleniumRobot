@@ -1,7 +1,6 @@
 package com.seleniumtests.uipage.htmlelements.select;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,18 +19,18 @@ import com.seleniumtests.uipage.htmlelements.HtmlElement;
  * - you must click on the combobox to add the options in the DOM. Most of the time, it is displayed at the end of the DOM in an other container
  * - you select the requested option
  * - close select
- * 
+ * <p>
  * To adapt to specific UI libraries, you need to redefine the fields
  * - locatorClickToOpen						locator on which you have to click to make the option display
  * - locatorClickToclose					locator to click to close, or null if "ESC" key should be sent
  * - locatorParentOfDropdown 				locator for the element which stores all options
  * - locatorOption							locator of the option element. This tag should have an attribute allowing to know if it's selected or not
  * - locatorCheckboxInOption				in case option displays a checkbox, this is the locator to find it
- * 
+ * <p>
  * - selectedOptionAttributeName			name of the attribute in which we search for a value to determine if option is selected. This attribute is searched in the element located by 'locatorOption'
  * - selectedOptionAttributeValue			value of the attribute which says that option is selected
  * - deselectedOptionAttributeValue			value of the attribute which says that option is deselected
- * 
+ * <p>
  * 
  * If this is not enough, you can also redefine the methods 
  * <code>public List<WebElement> getOptions()</code>: fill 'options' field with the list of HtmlElements representing options 
@@ -39,10 +38,7 @@ import com.seleniumtests.uipage.htmlelements.HtmlElement;
  * <code>public String getOptionValue(WebElement option)</code>: get the value of an option
  * <code>public String getOptionText(WebElement option)</code>: get the text of an option
  * <code>public boolean isSelected(WebElement option)</code>: say whether the option is selected.
- * 
- * 
- * 
- * @author S047432
+ *
  *
  */
 public abstract class AngularSelect extends CommonSelectList {
@@ -103,19 +99,19 @@ public abstract class AngularSelect extends CommonSelectList {
 		for (WebElement option: options) {
 			logger.info(option);
 			try {
-				logger.info("text: '" + getOptionText(option) + "'");
+				logger.info("text: '{}'", getOptionText(option));
 			} catch (Exception e) {
-				logger.info("text cannot be retrieved: " + e.getMessage());
+				logger.info("text cannot be retrieved: {}", e.getMessage());
 			}
 			try {
-				logger.info("value: '" + getOptionValue(option) + "'");
+				logger.info("value: '{}'", getOptionValue(option));
 			} catch (Exception e) {
-				logger.info("value cannot be retrieved: " + e.getMessage());
+				logger.info("value cannot be retrieved: {}", e.getMessage());
 			}
 			try {
-				logger.info("isSelected: '" + isSelected(option) + "'");
+				logger.info("isSelected: '{}'", isSelected(option));
 			} catch (Exception e) {
-				logger.info("is selected cannot be retrieved: " + e.getMessage());
+				logger.info("is selected cannot be retrieved: {}", e.getMessage());
 			}
 			logger.info("-----------------------------------------");
 		}
@@ -163,11 +159,10 @@ public abstract class AngularSelect extends CommonSelectList {
 	}
 
 	/**
-	 * Returns 'true' if selement is selected.
+	 * Returns 'true' if element is selected.
 	 * Therefore, we search for attribute 'selectedOptionAttributeName' in the option element
 	 * If the value of this attribute contains 'selectedOptionAttributeValue', then we assume option is selected
-	 * @param option
-	 * @return
+	 * @param option	option to check for selection
 	 */
 	public boolean isSelected(WebElement option) {
 		String selectedAttribute = ((HtmlElement)((CachedHtmlElement)option).getRealElement()).getAttribute(selectedOptionAttributeName);
@@ -181,8 +176,8 @@ public abstract class AngularSelect extends CommonSelectList {
 	@Override
 	public List<WebElement> getAllSelectedOptions() {
 		return options.stream()
-			.filter(option -> isSelected(option))
-			.collect(Collectors.toList());
+			.filter(this::isSelected)
+			.toList();
 	}
 
 	@Override
@@ -297,8 +292,8 @@ public abstract class AngularSelect extends CommonSelectList {
 	private HtmlElement getRealOptionElement(WebElement option) {
 		if (option instanceof CachedHtmlElement) {
 			return ((HtmlElement)((CachedHtmlElement)option).getRealElement());
-		} else if (option instanceof HtmlElement) {
-			return (HtmlElement) option;
+		} else if (option instanceof HtmlElement htmlElementOption) {
+			return htmlElementOption;
 		} else {
 			throw new ClassCastException("getRealOptionElement() can only handle HtmlElement options");
 		}
@@ -349,11 +344,5 @@ public abstract class AngularSelect extends CommonSelectList {
 				getRealOptionElement(option).click();
 			}
 		}
-
-	}
-
-	@Override
-	public WebElement getParentElement() {
-		return parentElement;
 	}
 }
