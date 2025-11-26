@@ -4,7 +4,6 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.util.StringUtility;
-import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.chromium.ChromiumOptions;
 
 import java.util.ArrayList;
