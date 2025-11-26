@@ -21,21 +21,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.edge.EdgeDriverService;
 import org.openqa.selenium.edge.EdgeOptions;
 
-import com.seleniumtests.core.SeleniumTestsContext;
-import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
-import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.DebugMode;
 
 public class EdgeCapabilitiesFactory extends ChromiumCapabilitiesFactory {
