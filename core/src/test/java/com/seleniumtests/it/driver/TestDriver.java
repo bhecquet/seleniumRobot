@@ -17,7 +17,6 @@
  */
 package com.seleniumtests.it.driver;
 
-import java.awt.AWTException;
 import java.io.File;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -36,7 +35,6 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;

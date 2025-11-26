@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,12 +24,10 @@ import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
-import org.testng.xml.XmlTest;
 
 import com.seleniumtests.GenericDriverTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
-import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.OSUtility;
@@ -40,7 +38,7 @@ public class TestDesktopDrivers extends GenericDriverTest {
 	
 	
 	@Test(groups={"it"})
-	public void testFirefoxStartup(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testFirefoxStartup(final ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*firefox");
 		driver = WebUIDriver.getWebDriver(true);
@@ -52,11 +50,11 @@ public class TestDesktopDrivers extends GenericDriverTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testChromeStartup(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testChromeStartup(final ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*chrome");
 		driver = WebUIDriver.getWebDriver(true);
-		Assert.assertEquals(driver.getCurrentUrl(), "data:,");
+		Assert.assertEquals(driver.getCurrentUrl(), "about:blank");
 		
 		// issue #280: check BrowserInfo exists
 		Assert.assertNotNull(driver.getBrowserInfo());
@@ -64,7 +62,7 @@ public class TestDesktopDrivers extends GenericDriverTest {
 	}
 
 	@Test(groups={"it"})
-	public void testChromeBetaStartup(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testChromeBetaStartup(final ITestContext testNGCtx) {
 
 		// check Chrome is available and Edge beta is installed
 		OSUtility.refreshBrowserList(true);
@@ -81,7 +79,7 @@ public class TestDesktopDrivers extends GenericDriverTest {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 		SeleniumTestsContextManager.getThreadContext().setBetaBrowser(true);
 		driver = WebUIDriver.getWebDriver(true);
-		Assert.assertEquals(driver.getCurrentUrl(), "data:,");
+		Assert.assertEquals(driver.getCurrentUrl(), "about:blank");
 		
 		
 		// issue #280: check BrowserInfo exists
@@ -102,12 +100,12 @@ public class TestDesktopDrivers extends GenericDriverTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testSafariStartup(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testSafariStartup(final ITestContext testNGCtx) {
 		if (SystemUtils.IS_OS_MAC_OSX) {
 			initThreadContext(testNGCtx);
 			SeleniumTestsContextManager.getThreadContext().setBrowser("*safari");
 			driver = WebUIDriver.getWebDriver(true);
-			Assert.assertEquals(driver.getCurrentUrl(), "data:,");
+			Assert.assertEquals(driver.getCurrentUrl(), "about:blank");
 			
 			// issue #280: check BrowserInfo exists
 			Assert.assertNotNull(driver.getBrowserInfo());
@@ -116,7 +114,7 @@ public class TestDesktopDrivers extends GenericDriverTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testIEStartup(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testIEStartup(final ITestContext testNGCtx) {
 		if (!SystemUtils.IS_OS_WINDOWS) {
 			throw new SkipException("This test can only be done on Windows");
 		}
@@ -132,7 +130,7 @@ public class TestDesktopDrivers extends GenericDriverTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testEdgeStartup(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testEdgeStartup(final ITestContext testNGCtx) {
 		if (!SystemUtils.IS_OS_WINDOWS) {
 			throw new SkipException("This test can only be done on Windows");
 		}
@@ -143,7 +141,7 @@ public class TestDesktopDrivers extends GenericDriverTest {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*edge");
 		driver = WebUIDriver.getWebDriver(true);
-		Assert.assertTrue(driver.getCurrentUrl().contains("http://localhost:") || driver.getCurrentUrl().contains("about:start") || driver.getCurrentUrl().contains("data"));
+		Assert.assertTrue(driver.getCurrentUrl().contains("http://localhost:") || driver.getCurrentUrl().contains("about:blank") || driver.getCurrentUrl().contains("data"));
 		
 		// issue #280: check BrowserInfo exists
 		Assert.assertNotNull(driver.getBrowserInfo());
@@ -151,7 +149,7 @@ public class TestDesktopDrivers extends GenericDriverTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testEdgeBetaStartup(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testEdgeBetaStartup(final ITestContext testNGCtx) {
 		if (!SystemUtils.IS_OS_WINDOWS) {
 			throw new SkipException("This test can only be done on Windows");
 		}
@@ -171,7 +169,7 @@ public class TestDesktopDrivers extends GenericDriverTest {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*edge");
 		SeleniumTestsContextManager.getThreadContext().setBetaBrowser(true);
 		driver = WebUIDriver.getWebDriver(true);
-		Assert.assertTrue(driver.getCurrentUrl().contains("http://localhost:") || driver.getCurrentUrl().contains("about:start") || driver.getCurrentUrl().contains("data"));
+		Assert.assertTrue(driver.getCurrentUrl().contains("http://localhost:") || driver.getCurrentUrl().contains("about:blank") || driver.getCurrentUrl().contains("data"));
 		
 		
 		// issue #280: check BrowserInfo exists

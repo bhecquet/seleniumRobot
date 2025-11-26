@@ -42,9 +42,7 @@ import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.DebugMode;
 
-public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
-
-	private static final String USER_DATA_DIR_OPTION = "--user-data-dir=";
+public class ChromeCapabilitiesFactory extends ChromiumCapabilitiesFactory {
 
 	public ChromeCapabilitiesFactory(DriverConfig webDriverConfig) {
 		super(webDriverConfig);
@@ -77,7 +75,9 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 			}
 		}
 		options.addArguments(chromeOptions);
-        
+
+		// enable BiDi
+		options.setCapability("webSocketUrl", true);
         options.setPageLoadStrategy(webDriverConfig.getPageLoadStrategy());
 
         capabilities.setCapability(ChromeOptions.CAPABILITY, options);
@@ -110,56 +110,17 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
     		System.clearProperty(ChromeDriverService.CHROME_DRIVER_LOG_PROPERTY);
     	}
 	}
+
+	protected String getUserStartupOptions() {
+		return webDriverConfig.getChromeOptions();
+	}
  
 	@Override
 	protected MutableCapabilities getDriverOptions() {
 		ChromeOptions options = new ChromeOptions();
-		Map<String, Object> experientalOptions = new HashMap<>();
+		Map<String, Object> experimentalOptions = new HashMap<>();
 
-        if (webDriverConfig.getUserAgentOverride() != null) {
-        	// ISSUE #705 - In order to give the maximum of data available to customize the User Agent,
-        	// we need to pass the testName which is not in the context at this moment
-        	String testName = "";
-			try {
-				testName = TestNGResultUtils.getVisualTestName(webDriverConfig.getTestContext().getTestNGResult());
-			} catch (Exception e) {
-				testName = TestNGResultUtils.getTestName(webDriverConfig.getTestContext().getTestNGResult());
-			}
-			webDriverConfig.getTestContext().setAttribute(SeleniumTestsContext.TEST_NAME, testName);
-        	options.addArguments("--user-agent=" + StringUtility.interpolateString(webDriverConfig.getUserAgentOverride(), webDriverConfig.getTestContext()));
-        }
-		List<String> chromeOptions = new ArrayList<>(List.of("--disable-translate",
-				"--disable-web-security",
-				"--no-sandbox",
-				"--disable-site-isolation-trials",
-				// https://github.com/GoogleChrome/chrome-launcher/blob/main/docs/chrome-flags-for-tools.md
-				"--disable-search-engine-choice-screen",
-				// list of features: https://chromium.googlesource.com/chromium/src/+/refs/heads/main/chrome/common/chrome_features.cc
-				// https://gist.github.com/rihardn/47b8e6170dc8f57a998c90b12a3e01bb
-				"--disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades",
-				// workaround for https://github.com/SeleniumHQ/selenium/issues/11750 on chrome >= 111
-				"--remote-allow-origins=*"));
-
-
-		if (webDriverConfig.isHeadlessBrowser()) {
-        	logger.info("setting chrome in headless mode");
-			chromeOptions.add("--headless");
-			chromeOptions.add("--window-size=1280,1024");
-			chromeOptions.add("--disable-gpu");
-        }
-
-		if (webDriverConfig.getChromeOptions() != null) {
-			for (String option: webDriverConfig.getChromeOptions().split(" ")) {
-				if ("++enable-automation".equals(option.trim())) {
-					// remove option "--enable-automation" as, from chrome 132, it blocks tests that attach a new chrome tab to the current chrome process (https://issues.chromium.org/issues/371112535)
-					options.setExperimentalOption("excludeSwitches", List.of("enable-automation"));
-				} else	if (option.startsWith("++")) {
-					chromeOptions.remove(option.replace("++", "--"));
-				} else {
-					chromeOptions.add(option);
-				}
-			}
-		}
+		addChromiumDriverOptions(options);
 
 		// configure options for file download,
 		// only when chrome is started by selenium. Else, we get 'unrecognized chrome option: prefs '
@@ -169,7 +130,7 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 				Path downloadDir;
 				try {
 					downloadDir = Files.createDirectories(Paths.get(webDriverConfig.getDownloadOutputDirectory()));
-					experientalOptions.putAll(
+					experimentalOptions.putAll(
 							Map.of(
 									"download.prompt_for_download",
 									false,
@@ -190,8 +151,6 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 				options.setEnableDownloads(true);
 			}
 		}
-
-		options.addArguments(chromeOptions);
 
         if (webDriverConfig.getMode() == DriverMode.LOCAL) {
         	setLogging();
@@ -222,14 +181,13 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
         	options.setExperimentalOption("debuggerAddress", "127.0.0.1:" + webDriverConfig.getAttachExistingDriverPort());
         } else {
         	 // issue #480: disable "restore pages" popup, but not when we attach an existing browser as it crashes driver (from invalid argument: cannot parse capability: goog:chromeOptions, from invalid argument: unrecognized chrome option: prefs)
-            experientalOptions.put("profile.exit_type", "Normal");
-			if (!experientalOptions.isEmpty()) {
-				options.setExperimentalOption("prefs", experientalOptions);
+            experimentalOptions.put("profile.exit_type", "Normal");
+			if (!experimentalOptions.isEmpty()) {
+				options.setExperimentalOption("prefs", experimentalOptions);
 			}
         }
+		enableBidi(options);
 
-        options.setPageLoadStrategy(webDriverConfig.getPageLoadStrategy());
-        
         return options;
 	}
 

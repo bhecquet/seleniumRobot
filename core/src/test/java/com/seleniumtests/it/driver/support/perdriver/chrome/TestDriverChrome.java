@@ -17,7 +17,6 @@
  */
 package com.seleniumtests.it.driver.support.perdriver.chrome;
 
-import java.awt.AWTException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.testng.annotations.Test;

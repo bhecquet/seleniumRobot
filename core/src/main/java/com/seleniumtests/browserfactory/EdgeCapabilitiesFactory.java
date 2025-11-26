@@ -38,59 +38,24 @@ import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.DebugMode;
 
-public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
-
-	private static final String USER_DATA_DIR_OPTION = "--user-data-dir=";
+public class EdgeCapabilitiesFactory extends ChromiumCapabilitiesFactory {
 
     public EdgeCapabilitiesFactory(DriverConfig webDriverConfig) {
 		super(webDriverConfig);
+	}
+
+
+	protected String getUserStartupOptions() {
+		return webDriverConfig.getEdgeOptions();
 	}
 
 	@Override
 	protected MutableCapabilities getDriverOptions() {
         
         EdgeOptions options = new EdgeOptions();
-		Map<String, Object> experientalOptions = new HashMap<>();
+		Map<String, Object> experimentalOptions = new HashMap<>();
         
-        if (webDriverConfig.getUserAgentOverride() != null) {
-        	// ISSUE #705 - In order to give the maximum of data available to customize the User Agent,
-        	// we need to pass the testName which is not in the context at this moment
-        	String testName = "";
-			try {
-				testName = TestNGResultUtils.getVisualTestName(webDriverConfig.getTestContext().getTestNGResult());
-			} catch (Exception e) {
-				testName = TestNGResultUtils.getTestName(webDriverConfig.getTestContext().getTestNGResult());
-			}
-			webDriverConfig.getTestContext().setAttribute(SeleniumTestsContext.TEST_NAME, testName);
-        	options.addArguments("--user-agent=" + StringUtility.interpolateString(webDriverConfig.getUserAgentOverride(), webDriverConfig.getTestContext()));
-        }
-
-		List<String> edgeOptions = new ArrayList<>(List.of("--disable-translate",
-				"--disable-web-security",
-				"--no-sandbox",
-				"--disable-site-isolation-trials",
-				"--disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades",
-				"--remote-allow-origins=*")); // workaround for https://github.com/SeleniumHQ/selenium/issues/11750 on chrome >= 111
-        
-        if (webDriverConfig.isHeadlessBrowser()) {
-        	logger.info("setting edge in headless mode");
-			edgeOptions.add("--headless");
-			edgeOptions.add("--window-size=1280,1024");
-			edgeOptions.add("--disable-gpu");
-        }
-
-		if (webDriverConfig.getEdgeOptions() != null) {
-			for (String option: webDriverConfig.getEdgeOptions().split(" ")) {
-				if ("++enable-automation".equals(option.trim())) {
-					// remove option "--enable-automation" as, from edge 132, it blocks tests that attach a new chrome tab to the current chrome process (https://issues.chromium.org/issues/371112535)
-					options.setExperimentalOption("excludeSwitches", List.of("enable-automation"));
-				} else if (option.trim().startsWith("++")) {
-					edgeOptions.remove(option.replace("++", "--"));
-				} else {
-					edgeOptions.add(option);
-				}
-			}
-		}
+        addChromiumDriverOptions(options);
 
 		// configure options for file download
 		if (webDriverConfig.getMode() == DriverMode.LOCAL && webDriverConfig.getAttachExistingDriverPort() == null) {
@@ -98,7 +63,7 @@ public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
 			Path downloadDir;
 			try {
 				downloadDir = Files.createDirectories(Paths.get(webDriverConfig.getDownloadOutputDirectory()));
-				experientalOptions.putAll(
+				experimentalOptions.putAll(
 						Map.of(
 								"download.prompt_for_download",
 								false,
@@ -113,8 +78,6 @@ public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
 			options.setEnableDownloads(true);
 		}
 
-		options.addArguments(edgeOptions);
-
         if (webDriverConfig.getMode() == DriverMode.LOCAL) {
         	setLogging();
         }
@@ -123,13 +86,13 @@ public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
         	options.setExperimentalOption("debuggerAddress", "127.0.0.1:" + webDriverConfig.getAttachExistingDriverPort());
         } else {
         	 // issue #480: disable "restore pages" popup, but not when we attach an existing browser as it crashes driver (from invalid argument: cannot parse capability: goog:chromeOptions, from invalid argument: unrecognized chrome option: prefs)
-			experientalOptions.put("profile.exit_type", "Normal");
-			if (!experientalOptions.isEmpty()) {
-				options.setExperimentalOption("prefs", experientalOptions);
+			experimentalOptions.put("profile.exit_type", "Normal");
+			if (!experimentalOptions.isEmpty()) {
+				options.setExperimentalOption("prefs", experimentalOptions);
 			}
         }
 
-        options.setPageLoadStrategy(webDriverConfig.getPageLoadStrategy());
+		enableBidi(options);
         
 		return options;
 	}

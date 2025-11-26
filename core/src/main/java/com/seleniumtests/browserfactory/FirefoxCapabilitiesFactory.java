@@ -69,6 +69,9 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
         if (webDriverConfig.getDebug().contains(DebugMode.DRIVER)) {
         	options.setLogLevel(FirefoxDriverLogLevel.TRACE);
         }
+
+		// enable BiDi
+		options.setCapability("webSocketUrl", true);
         
         // handle https://bugzilla.mozilla.org/show_bug.cgi?id=1429338#c4 and https://github.com/mozilla/geckodriver/issues/789
         //options.setCapability("moz:useNonSpecCompliantPointerOrigin", true);

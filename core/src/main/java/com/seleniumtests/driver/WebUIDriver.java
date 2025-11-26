@@ -501,10 +501,10 @@ public class WebUIDriver {
 		Har har = null;
 		try {
 			if (TestStepManager.getInstance() != null && driver != null && driver.getBrowserInfo().getBrowser() == BrowserType.CHROME) {
-				Map<Instant, String> testSteps = TestStepManager.getInstance()
-						.getTestSteps()
-						.stream()
-						.collect(Collectors.toMap(testStep -> testStep.getTimestamp().toInstant(), TestStep::getName));
+				Map<Instant, String> testSteps = new LinkedHashMap<>();
+				for (TestStep testStep: TestStepManager.getInstance().getTestSteps()) {
+					testSteps.put(testStep.getTimestamp().toInstant(), testStep.getName());
+				}
 
 				har = ChromiumUtils.parsePerformanceLogs(logEntries, testSteps);
 			}
