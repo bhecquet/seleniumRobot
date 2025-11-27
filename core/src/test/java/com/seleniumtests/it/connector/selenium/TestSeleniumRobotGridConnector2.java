@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,7 +20,6 @@ package com.seleniumtests.it.connector.selenium;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 
 import com.seleniumtests.core.TestTasks;
 import org.openqa.selenium.Rectangle;
@@ -29,7 +28,6 @@ import org.testng.ITestContext;
 import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
@@ -37,7 +35,6 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.driver.BrowserType;
-import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.SnapshotTarget;
 import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
@@ -52,7 +49,7 @@ public class TestSeleniumRobotGridConnector2 extends GenericMultiBrowserTest {
 
 	private static final String SELENIUM_GRID_URL = "http://10.165.161.49:44444/wd/hub";
 
-	public TestSeleniumRobotGridConnector2() throws Exception {
+	public TestSeleniumRobotGridConnector2() {
 		super(BrowserType.CHROME, "DriverTestPageWithoutFixedPattern", SELENIUM_GRID_URL, null);
 	}
 	
@@ -232,7 +229,7 @@ public class TestSeleniumRobotGridConnector2 extends GenericMultiBrowserTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testCaptureElement() throws IOException {
+	public void testCaptureElement() {
 
 		try {
 			SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(true);

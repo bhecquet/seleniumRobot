@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,14 +34,10 @@ import com.seleniumtests.it.driver.support.pages.DriverTestPageSalesforceLightni
  */
 public class TestSalesforceLightning extends GenericMultiBrowserTest {
 
-	public TestSalesforceLightning() throws Exception {
+	public TestSalesforceLightning() {
 		super(BrowserType.FIREFOX, "DriverTestPageSalesforceLightning", null, System.getProperty("salesforceProxyType"));
 	}
-	
-	public TestSalesforceLightning(BrowserType browserType) throws Exception {
-		super(browserType, "DriverTestPageSalesforceLightning", null, System.getProperty("salesforceProxyType"));
-	}
-	
+
 	@BeforeMethod(groups= {"it"})
 	public void init() {
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
@@ -120,7 +116,7 @@ public class TestSalesforceLightning extends GenericMultiBrowserTest {
 	
 	@Test(groups = "it", expectedExceptions=NoSuchElementException.class)
 	public void testSelectInvalidIndexes() {
-		DriverTestPageSalesforceLightning.combobox.selectByIndex(new int[] {10, 20});
+		DriverTestPageSalesforceLightning.combobox.selectByIndex(10, 20);
 	}
 	
 	@Test(groups = "it", expectedExceptions = UnsupportedOperationException.class)

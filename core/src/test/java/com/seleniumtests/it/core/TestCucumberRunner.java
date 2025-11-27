@@ -39,7 +39,7 @@ TestCucumberRunner extends GenericMultiBrowserTest {
 		super(driver, testPage);
 	}
 	
-	public TestCucumberRunner() throws Exception {
+	public TestCucumberRunner() {
 		super(BrowserType.CHROME, "DriverTestPage");  
 	}
 	
@@ -52,7 +52,8 @@ TestCucumberRunner extends GenericMultiBrowserTest {
 		driver = null;
 	}
 
-	@BeforeMethod(groups={"it", "ut", "upload"}) 
+	@Override
+	@BeforeMethod(groups={"it", "ut", "upload"})
 	public void skipIfDriverNull() {
 		// override default behaviour
 	}

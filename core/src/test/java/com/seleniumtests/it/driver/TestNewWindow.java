@@ -17,7 +17,6 @@
  */
 package com.seleniumtests.it.driver;
 
-import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -31,11 +30,7 @@ public class TestNewWindow  extends GenericMultiBrowserTest {
 
 	private static final String SELENIUM_GRID_URL = "http://127.0.0.1:4444/wd/hub";
 
-	public TestNewWindow(CustomEventFiringWebDriver driver, DriverTestPage testPage) {
-		super(driver, testPage);
-	}
-	
-	public TestNewWindow() throws Exception {
+	public TestNewWindow() {
 		super(BrowserType.CHROME, "DriverTestPage", SELENIUM_GRID_URL, null);
 	}
 	

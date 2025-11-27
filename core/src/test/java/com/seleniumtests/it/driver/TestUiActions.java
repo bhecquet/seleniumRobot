@@ -23,7 +23,6 @@ import org.testng.Assert;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
-import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 
@@ -33,7 +32,7 @@ public class TestUiActions extends GenericMultiBrowserTest {
 		super(browserType, "DriverTestPage"); 
 	}
 	
-	public TestUiActions() throws Exception {
+	public TestUiActions() {
 		super(null, "DriverTestPage");
 	}
 

@@ -55,10 +55,14 @@ import com.seleniumtests.util.helper.WaitHelper;
 
 public class TestDriver extends GenericMultiBrowserTest {
 
-
 	public TestDriver(BrowserType browserType) {
 		super(browserType, "DriverTestPage"); 
 	}
+
+	public TestDriver() {
+		super(null, "DriverTestPage");
+	}
+
 
 	@AfterMethod(groups={"it", "ie"}, alwaysRun=true)
 	public void reset() {

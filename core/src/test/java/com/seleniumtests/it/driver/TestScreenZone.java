@@ -31,18 +31,13 @@ import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
-import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageWithoutFixedPattern;
 import com.seleniumtests.uipage.htmlelements.ScreenZone;
 import com.seleniumtests.util.helper.WaitHelper;
 
 public class TestScreenZone extends GenericMultiBrowserTest {
-	
-	public TestScreenZone(CustomEventFiringWebDriver driver, DriverTestPage testPage) {
-		super(driver, testPage);
-	}
-	
-	public TestScreenZone() throws Exception {
+
+	public TestScreenZone() {
 		super(BrowserType.CHROME, "DriverTestPageWithoutFixedPattern");  
 	}
 

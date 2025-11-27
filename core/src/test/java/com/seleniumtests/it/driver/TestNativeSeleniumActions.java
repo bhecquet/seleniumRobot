@@ -18,24 +18,17 @@
 package com.seleniumtests.it.driver;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
-import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
-import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageNativeActions;
 
 public class TestNativeSeleniumActions extends GenericMultiBrowserTest {
-	
-	public TestNativeSeleniumActions(CustomEventFiringWebDriver driver, DriverTestPage testPage) {
-		super(driver, testPage);
-	}
-	
+
 	public TestNativeSeleniumActions()  {
 		super(BrowserType.INTERNET_EXPLORER, "DriverTestPageNativeActions");  
 	}

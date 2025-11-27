@@ -21,7 +21,6 @@ import java.time.LocalDateTime;
 import java.util.Calendar;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.util.imaging.ImageDetector;
 import org.openqa.selenium.NoSuchElementException;
 import org.testng.Assert;
@@ -31,18 +30,13 @@ import org.testng.annotations.AfterMethod;
 import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
-import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageWithoutFixedPattern;
 import com.seleniumtests.util.helper.WaitHelper;
 
 import static org.mockito.Mockito.*;
 
 public class TestPictureElement extends GenericMultiBrowserTest {
-	
-	public TestPictureElement(CustomEventFiringWebDriver driver, DriverTestPage testPage) {
-		super(driver, testPage);
-	}
-	
+
 	public TestPictureElement(BrowserType browserType) {
 		super(browserType, "DriverTestPageWithoutFixedPattern"); 
 	}
@@ -99,7 +93,7 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 			verify(spiedDetector).detectExactZoneWithScale(); // check detector has been called only once
 
 			long totalTime2 = Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis();
-			logger.info(String.format("Time first click: %d ms - time second click: %d ms", totalTime1, totalTime2));
+			logger.info("Time first click: {} ms - time second click: {} ms", totalTime1, totalTime2);
 
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
@@ -129,7 +123,7 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 			start = Calendar.getInstance();
 			new DriverTestPageWithoutFixedPattern().clickGooglePicture();
 			long totalTime2 = Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis();
-			logger.info(String.format("Time first click: %d ms - time second click: %d ms", totalTime1, totalTime2));
+			logger.info("Time first click: {} ms - time second click: {} ms", totalTime1, totalTime2);
 
 			verify(spiedDetector, times(2)).detectExactZoneWithScale(); // check detector has been called 2 times
 			
@@ -161,7 +155,7 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 			start = Calendar.getInstance();
 			new DriverTestPageWithoutFixedPattern().clickGooglePrivatePicture();
 			long totalTime2 = Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis();
-			logger.info(String.format("Time first click: %d ms - time second click: %d ms", totalTime1, totalTime2));
+			logger.info("Time first click: {} ms - time second click: {} ms", totalTime1, totalTime2);
 
 			verify(spiedDetector, times(2)).detectExactZoneWithScale(); // check detector has been called 2 times
 			

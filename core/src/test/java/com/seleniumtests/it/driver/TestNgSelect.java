@@ -28,11 +28,11 @@ import com.seleniumtests.it.driver.support.pages.DriverSubAngularTestPage;
 
 public class TestNgSelect extends GenericMultiBrowserTest {
 
-	public TestNgSelect() throws Exception {
+	public TestNgSelect() {
 		super(null, "DriverSubAngularTestPage"); 
 	}
 	
-	public TestNgSelect(BrowserType browserType) throws Exception {
+	public TestNgSelect(BrowserType browserType) {
 		super(browserType, "DriverSubAngularTestPage"); 
 	}
 	

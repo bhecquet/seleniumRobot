@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -40,7 +39,7 @@ import com.seleniumtests.uipage.htmlelements.ElementInfo;
 public class TestElementInfo extends GenericMultiBrowserTest {
 
 	
-	public TestElementInfo() throws Exception {
+	public TestElementInfo() {
 		super(BrowserType.CHROME, "DriverTestPage");
 	}
 
@@ -55,10 +54,9 @@ public class TestElementInfo extends GenericMultiBrowserTest {
 	
 	/**
 	 * Test the info file is created when element is found
-	 * @throws IOException 
 	 */
 	@Test(groups={"it"})
-	public void testNewElementInfo() throws IOException {
+	public void testNewElementInfo() {
 		try {
 			DriverTestPage.textElement.sendKeys("youpi");
 		} finally {
@@ -135,12 +133,11 @@ public class TestElementInfo extends GenericMultiBrowserTest {
 		DriverTestPage.scrollButton.click();
 		File elementInfoPath = ElementInfo.buildElementInfoPath(DriverTestPage.scrollButton);
 		ElementInfo elInfo = ElementInfo.readFromJsonFile(elementInfoPath);
-		Assert.assertTrue(!elInfo.getB64Image().isEmpty());
+        Assert.assertFalse(elInfo.getB64Image().isEmpty());
 	}
 	
 	/**
 	 * With selenium native code, event with overriding, no ElementInfo should be created because we have no label and no way to create a unique one
-	 * @throws IOException 
 	 */
 	@Test(groups={"it"})
 	public void testWithSeleniumNativeSearch() throws IOException {
@@ -148,7 +145,7 @@ public class TestElementInfo extends GenericMultiBrowserTest {
 		driver.findElement(By.id("text2"));
 		List<Path> infoFilePaths = Files.walk(ElementInfo.getElementInfoLocation())
 									.filter(Files::isRegularFile)
-									.collect(Collectors.toList());
+									.toList();
 		Assert.assertEquals(infoFilePaths.size(), 0);
 	}
 	
