@@ -1321,9 +1321,11 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 				(Long) internalCapabilities.getCapability(SeleniumRobotCapabilityType.START_TIME), 
 				duration, 
 				sessionId, 
-				caps.getBrowserName(), 
+				caps.getBrowserName(),
+				caps.getBrowserVersion(),
 				(Long) internalCapabilities.getCapability(SeleniumRobotCapabilityType.STARTUP_DURATION), 
-				(String) internalCapabilities.getCapability(SeleniumRobotCapabilityType.TEST_NAME));
+				(String) internalCapabilities.getCapability(SeleniumRobotCapabilityType.TEST_NAME)
+				);
 		StatisticsStorage.addDriverUsage(usage);
 		
 		try {

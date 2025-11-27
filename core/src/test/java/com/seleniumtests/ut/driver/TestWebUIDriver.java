@@ -367,6 +367,7 @@ public class TestWebUIDriver extends MockitoTest {
 		List<DriverUsage> driverUsages = StatisticsStorage.getDriverUsage();
 		Assert.assertEquals(driverUsages.size(), 1);
 		Assert.assertEquals(driverUsages.get(0).getBrowserName(), "htmlunit");
+		Assert.assertEquals(driverUsages.get(0).getBrowserVersion(), "");
 		Assert.assertTrue(driverUsages.get(0).getDuration() > 0.0);
 		Assert.assertNull(driverUsages.get(0).getGridHub());
 		Assert.assertNull(driverUsages.get(0).getGridNode());

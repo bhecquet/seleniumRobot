@@ -14,8 +14,7 @@ public class StatisticsStorage {
 	
 	public static class DriverUsage {
 		
-		
-		
+
 		String gridHub;
 		String gridNode;
 		Long startTime;
@@ -24,14 +23,17 @@ public class StatisticsStorage {
 		String browserName;
 		Long startupDuration;
 		String testName;
+		String browserVersion;
+
 		
-		public DriverUsage(String gridHub, String gridNode, Long startTime, Long duration, String sessionId, String browser, Long startupDuration, String testName) {
+		public DriverUsage(String gridHub, String gridNode, Long startTime, Long duration, String sessionId, String browser, String browserVersion, Long startupDuration, String testName) {
 			this.gridHub = gridHub;
 			this.gridNode = gridNode;
 			this.startTime = startTime;
 			this.durationV = duration;
 			this.sessionId = sessionId;
 			this.browserName = browser;
+			this.browserVersion = browserVersion;
 			this.startupDuration = startupDuration;
 			this.testName = testName;
 		}
@@ -62,6 +64,10 @@ public class StatisticsStorage {
 
 		public String getBrowserName() {
 			return browserName;
+		}
+
+		public String getBrowserVersion() {
+			return browserVersion;
 		}
 
 		public Long getStartupDuration() {

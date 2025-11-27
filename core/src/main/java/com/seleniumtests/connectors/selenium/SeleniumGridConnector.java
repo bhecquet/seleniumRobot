@@ -36,10 +36,7 @@ import io.appium.java_client.android.options.UiAutomator2Options;
 import io.appium.java_client.ios.options.XCUITestOptions;
 import io.appium.java_client.remote.options.BaseOptions;
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.Platform;
-import org.openqa.selenium.SessionNotCreatedException;
+import org.openqa.selenium.*;
 import org.openqa.selenium.io.Zip;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
@@ -68,6 +65,7 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	protected SessionId sessionId;
 	protected String nodeUrl;
 	protected String nodeHost;
+	protected List<RemoteWebDriver> drivers = new ArrayList<>(); // list of created drivers on this connector
 	
 	public static final String CONSOLE_SERVLET = "/ui/";
 	public static final String STATUS_SERVLET = "/status";
@@ -472,9 +470,9 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
    
 			String driverNodeHost = ((String)object.get("uri")).split("//")[1].split(":")[0];
 			
-            String browserName = driver.getCapabilities().getBrowserName();
-            String version = driver.getCapabilities().getBrowserVersion();
-
+            String browser = driver.getCapabilities().getBrowserName();
+            String browserVersion = driver.getCapabilities().getBrowserVersion();
+			drivers.add(driver);
             
             // store some information about driver creation
             MutableCapabilities caps = (MutableCapabilities)driver.getCapabilities();
@@ -484,7 +482,7 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
             caps.setCapability(SeleniumRobotCapabilityType.GRID_NODE_URL, nodeUrl);
             
             // log will display the actual driver session ID and node URL so that it reflects the real driver creation (whereas nodeUrl and sessionId variables only store the first driver information for the test)
-            logger.info(String.format("Browser %s (%s) created in %.1f secs on node %s [%s] with session %s", browserName, version, driverCreationDuration / 1000.0, driverNodeHost, hubUrl, driver.getSessionId()).replace(",", "."));
+            logger.info(String.format("Browser %s (%s) created in %.1f secs on node %s [%s] with session %s", browser, browserVersion, driverCreationDuration / 1000.0, driverNodeHost, hubUrl, driver.getSessionId()).replace(",", "."));
             
         } catch (Exception ex) {
         	throw new SessionNotCreatedException(ex.getMessage());
@@ -534,5 +532,9 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 
 	public static void setLogger(Logger logger) {
 		SeleniumGridConnector.logger = logger;
+	}
+
+	public List<RemoteWebDriver> getDrivers() {
+		return drivers;
 	}
 }

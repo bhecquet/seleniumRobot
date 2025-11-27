@@ -219,8 +219,9 @@ public class SeleniumBrowserstackGridConnector extends SeleniumGridConnector {
 		// get information from browserstack
 		String buildId = getCurrentBuildId(driver);
 		getCurrentSession(driver, buildId);
-		String browserName = driver.getCapabilities().getBrowserName();
-		String version = driver.getCapabilities().getBrowserVersion();
+		String browser = driver.getCapabilities().getBrowserName();
+		String browserVersion = driver.getCapabilities().getBrowserVersion();
+		drivers.add(driver);
 
 		if (sessionId == null) {
 			setSessionId(driver.getSessionId());
@@ -232,7 +233,7 @@ public class SeleniumBrowserstackGridConnector extends SeleniumGridConnector {
 		caps.setCapability(SeleniumRobotCapabilityType.SESSION_ID, sessionId); // store the scenario session (sessionID of the first created browser to group browsers in logs
 
 		// log will display the actual driver session ID and node URL so that it reflects the real driver creation (whereas nodeUrl and sessionId variables only store the first driver information for the test)
-		logger.info(String.format("Browser %s (%s) created in %.1f secs on browserstack  with session %s", browserName, version, driverCreationDuration / 1000.0, driver.getSessionId()).replace(",", "."));
+		logger.info(String.format("Browser %s (%s) created in %.1f secs on browserstack  with session %s", browser, browserVersion, driverCreationDuration / 1000.0, driver.getSessionId()).replace(",", "."));
 	}
 
 

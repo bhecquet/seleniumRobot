@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -135,7 +135,7 @@ public class TestCustomReporter extends ReporterTest {
 	public void testStepReport() throws IOException {
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
 
-		// check content of the file. It should contains all fields with a value
+		// check content of the file. It should contain all fields with a value
 		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverShort", "detailed-result.json").toFile(), StandardCharsets.UTF_8);
 		Assert.assertFalse(detailedReportContent.contains(":\\\\/")); // check step has not been double encoded
 		JSONObject json = new JSONObject(detailedReportContent);
@@ -152,6 +152,7 @@ public class TestCustomReporter extends ReporterTest {
 		Assert.assertTrue(json.getDouble("duration") > 0);
 		Assert.assertEquals(json.getInt("retries"), 0);
 		Assert.assertEquals(json.getString("browser"), "CHROME");
+		Assert.assertEquals(json.getString("browserVersion"), "N/A");
 		Assert.assertEquals(json.getString("name"), "testDriverShort");
 		Assert.assertTrue(json.getLong("startTime") > 1760604347733L);
 		Assert.assertEquals(json.getInt("stepNumber"), 7);
@@ -196,7 +197,7 @@ public class TestCustomReporter extends ReporterTest {
 	}
 	
 	@Test(groups={"it"}, expectedExceptions=ConfigurationException.class)
-	public void testTestReportDoesNotExists(ITestContext testContext) throws Exception {
+	public void testTestReportDoesNotExists(ITestContext testContext) {
 		try {
 			System.setProperty("customTestReports", "SUP::json::ti/report.test.nowhere.vm");
 			
@@ -207,7 +208,7 @@ public class TestCustomReporter extends ReporterTest {
 	}
 	
 	@Test(groups={"it"}, expectedExceptions=ConfigurationException.class)
-	public void testSummaryReportDoesNotExists(ITestContext testContext) throws Exception {
+	public void testSummaryReportDoesNotExists(ITestContext testContext) {
 		try {
 			System.setProperty("customSummaryReports", "SUP::json::ti/report.summary.nowhere.vm");
 			

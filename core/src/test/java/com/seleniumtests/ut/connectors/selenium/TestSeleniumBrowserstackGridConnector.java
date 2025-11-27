@@ -518,6 +518,7 @@ public class TestSeleniumBrowserstackGridConnector extends ConnectorsTest {
 		// check sessionId is set when test is started
 		Assert.assertEquals(driver.getCapabilities().getCapability(SeleniumRobotCapabilityType.GRID_HUB).toString(), "https://user:token@hub.browserstack.com/wd/hub");
 		Assert.assertEquals(driver.getCapabilities().getCapability(SeleniumRobotCapabilityType.SESSION_ID).toString(), "abcdef");
+		Assert.assertEquals(connector.getDrivers().size(), 1);
 	}
 
 	@Test(groups={"ut"})

@@ -129,6 +129,9 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 		// check sessionId is set when test is started
 		verify(connector).setSessionId(any(SessionId.class));
 		Assert.assertEquals(connector.getNodeUrl(), "http://localhost:4321");
+		Assert.assertEquals(connector.getDrivers().size(), 1);
+		Assert.assertEquals(connector.getDrivers().get(0).getCapabilities().getBrowserName(), "firefox");
+		Assert.assertEquals(connector.getDrivers().get(0).getCapabilities().getBrowserVersion(), "51.0");
 	}
 
 	@Test(groups={"ut"})
@@ -200,6 +203,7 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 		// check that the driver session id is displayed in logs to help debugging
 		verify(logger).info("Browser firefox (50.0) created in 0.0 secs on node localhost [http://localhost:4321] with session abcdef");
 		verify(logger).info("Browser firefox (50.0) created in 0.0 secs on node localhost [http://localhost:4321] with session ghijkl");
+		Assert.assertEquals(connector.getDrivers().size(), 2);
 	}
 	
 	/**

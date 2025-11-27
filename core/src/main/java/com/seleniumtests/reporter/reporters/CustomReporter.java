@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,14 +19,8 @@ package com.seleniumtests.reporter.reporters;
 
 import java.io.StringWriter;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.reporter.logger.PageLoadTime;
@@ -49,11 +43,13 @@ import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class CustomReporter extends CommonReporter implements IReporter {
-	
+
 	private static final String FIELD_TOTAL = "total";
 	private static final String FIELD_SKIP = "skip";
 	private static final String FIELD_FAIL = "fail";
 	private static final String FIELD_PASS = "pass";
+	public static final String BROWSER_VERSION = "browserVersion";
+	public static final String GRIDNODE = "gridnode";
 	private List<String> generatedFiles;
 
 
@@ -176,10 +172,18 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			// if adding some information, don't forget to add them to velocity model for integration tests
 			if (seleniumTestsContext.getRunMode().equals(DriverMode.GRID)) {
 				// in case test is skipped, connector is null
-				context.put("gridnode", seleniumTestsContext.getSeleniumGridConnector() != null ? seleniumTestsContext.getSeleniumGridConnector().getNodeHost(): "N/A");
-
+				context.put(GRIDNODE, seleniumTestsContext.getSeleniumGridConnector() != null ? seleniumTestsContext.getSeleniumGridConnector().getNodeHost() : "N/A");
+				context.put(BROWSER_VERSION, seleniumTestsContext.getSeleniumGridConnector() != null && !seleniumTestsContext.getSeleniumGridConnector().getDrivers().isEmpty() ?
+						seleniumTestsContext.getSeleniumGridConnector().getDrivers().get(0).getCapabilities().getBrowserVersion()
+						: "N/A");
+			} else if (seleniumTestsContext.getRunMode().equals(DriverMode.BROWSERSTACK)) {
+				context.put(GRIDNODE, "browserstack");
+				context.put(BROWSER_VERSION, seleniumTestsContext.getSeleniumGridConnector() != null && !seleniumTestsContext.getSeleniumGridConnector().getDrivers().isEmpty() ?
+						seleniumTestsContext.getSeleniumGridConnector().getDrivers().get(0).getCapabilities().getBrowserVersion()
+						: "N/A");
 			} else {
-				context.put("gridnode", seleniumTestsContext.getRunMode());
+				context.put(GRIDNODE, seleniumTestsContext.getRunMode());
+				context.put(BROWSER_VERSION, Objects.requireNonNullElse(seleniumTestsContext.getWebBrowserVersion(), "N/A"));
 			}
 			context.put("errors", errors);
 			context.put("newline", "\n");
@@ -194,8 +198,8 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			context.put("testSteps", newTestSteps);	
 			context.put("unencodedTestSteps", testSteps);	 // kept to avoid encoding to times step when JSON file is created and we use toJson methods
 			context.put("retries", TestNGResultUtils.getRetry(testResult) == null ? 0: TestNGResultUtils.getRetry(testResult));
-			context.put("browser", seleniumTestsContext.getBrowser());	
-			context.put("mobileApp", StringUtility.encodeString(seleniumTestsContext.getApp(), reportFormat.toLowerCase()));	
+			context.put("browser", seleniumTestsContext.getBrowser());
+			context.put("mobileApp", StringUtility.encodeString(seleniumTestsContext.getApp(), reportFormat.toLowerCase()));
 			context.put("device", StringUtility.encodeString(seleniumTestsContext.getDeviceName() == null ? "": seleniumTestsContext.getDeviceName(), reportFormat.toLowerCase()));
 			if (seleniumTestsContext.getTestType().isMobile()) {
 				context.put("platform", seleniumTestsContext.getPlatform() + " " + seleniumTestsContext.getMobilePlatformVersion());
@@ -274,7 +278,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 		
 			generateReport(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), fileName).toFile(), writer.toString());
 		} catch (Exception e) {
-			logger.error(String.format("Error generating test summary: %s", e.getMessage()));
+			logger.error("Error generating test summary: {}", e.getMessage());
 		}
 	}
 
