@@ -221,20 +221,22 @@ public class PageObject extends BasePage implements IPage {
         
         // creates the driver and switch to it. It may be done twice as when the driver is created, we automatically switch to it, but in case driver
         // is already created,
-        driver = WebUIDriver.getWebDriver(true, browserType, driverName, attachExistingDriverPort);
+        customEventFiringWebDriver = WebUIDriver.getWebDriver(true, browserType, driverName, attachExistingDriverPort);
+        // also fill the driver (for compatibility purpose)
+        driver = customEventFiringWebDriver;
         
-        if (driver == null && url != null) {
+        if (customEventFiringWebDriver == null && url != null) {
         	throw new ConfigurationException("driver is null, 'browser' configuration may be empty");
         }
 
-        screenshotUtil = new ScreenshotUtil(driver);
+        screenshotUtil = new ScreenshotUtil(customEventFiringWebDriver);
 
         // open page
         openPage(url);
         
         // in case browser has been created outside of selenium and we attach to it, get initial window handles
-        if (driver != null && attachExistingDriverPort != null && url == null) {
-        	driver.updateWindowsHandles();
+        if (customEventFiringWebDriver != null && attachExistingDriverPort != null && url == null) {
+            customEventFiringWebDriver.updateWindowsHandles();
         }
 
         // add calling page and field name on element
@@ -310,13 +312,13 @@ public class PageObject extends BasePage implements IPage {
 
     @Override
     public String getHtmlSource() {
-    	return driver.getPageSource();
+    	return customEventFiringWebDriver.getPageSource();
     }
 
 
     @Override
     public String getLocation() {
-        return driver.getCurrentUrl();
+        return customEventFiringWebDriver.getCurrentUrl();
     }
 
     /**
@@ -329,7 +331,7 @@ public class PageObject extends BasePage implements IPage {
             // update start instant in case URL is defined because we only want page loading duration, which starts when URL is sent to browser
             startLoading = Instant.now();
             open(url);
-            driver.updateWindowsHandles();
+            customEventFiringWebDriver.updateWindowsHandles();
         }
 
         // switch to the context if we are on mobile app
@@ -339,7 +341,7 @@ public class PageObject extends BasePage implements IPage {
         // Wait for page load is applicable only for web test and mobile webview
         // When running tests on an iframe embedded site then test will fail if this command is not used
         // in case of mobile application and native context, only capture page
-        if (driver != null && driver.isWebTest()) {
+        if (customEventFiringWebDriver != null && customEventFiringWebDriver.isWebTest()) {
             waitForPageToLoad();
         } else if (SeleniumTestsContextManager.isAppTest() && captureSnapshot) {
         	capturePageSnapshot();
@@ -347,11 +349,11 @@ public class PageObject extends BasePage implements IPage {
         }
 
         // store the window / tab on which this page is loaded
-        if (driver != null) {
-            windowHandle = driver.getWindowHandle();
+        if (customEventFiringWebDriver != null) {
+            windowHandle = customEventFiringWebDriver.getWindowHandle();
 
             // store load time
-            PageLoadTime pageLoadTime = new PageLoadTime(driver.getCurrentUrl(), this, Duration.between(startLoading, stopLoading).toMillis());
+            PageLoadTime pageLoadTime = new PageLoadTime(customEventFiringWebDriver.getCurrentUrl(), this, Duration.between(startLoading, stopLoading).toMillis());
 
             if (TestStepManager.getCurrentOrPreviousStep() == null) {
                 logger.warn(String.format("Page load '%s' cannot be recorded - no step", pageLoadTime));
@@ -372,7 +374,7 @@ public class PageObject extends BasePage implements IPage {
         if (pageIdentifierElement != null && !pageIdentifierElement.isElementPresent()) {
 
             throw new NotCurrentPageException(getClass().getCanonicalName()
-                    + " is not the current page.\nPageIdentifierElement " + pageIdentifierElement.toString()
+                    + " is not the current page.\nPageIdentifierElement " + pageIdentifierElement
                     + " is not found.");
         }
     }
@@ -497,8 +499,8 @@ public class PageObject extends BasePage implements IPage {
      * @param driverName    name of the driver to switch to
      */
     public WebDriver switchToDriver(String driverName) {
-    	driver = TestTasks.switchToDriver(driverName);
-    	return driver;
+        customEventFiringWebDriver = TestTasks.switchToDriver(driverName);
+    	return customEventFiringWebDriver;
     }
 
     /**
@@ -572,7 +574,7 @@ public class PageObject extends BasePage implements IPage {
     	ScreenShot screenShot = screenshotUtil.capture(SnapshotTarget.PAGE, ScreenShot.class, computeScrollDelay(checkSnapshot));
     	
     	// check SnapshotCheckType configuration is compatible with the snapshot
-    	checkSnapshot.check(SnapshotTarget.PAGE, driver.getDeviceAspectRatio());
+    	checkSnapshot.check(SnapshotTarget.PAGE, customEventFiringWebDriver.getDeviceAspectRatio());
     	
     	storeSnapshot(snapshotName, screenShot, checkSnapshot);
     }
@@ -587,7 +589,7 @@ public class PageObject extends BasePage implements IPage {
     	ScreenShot screenShot = screenshotUtil.capture(SnapshotTarget.VIEWPORT, ScreenShot.class);
     	
     	// check SnapshotCheckType configuration is compatible with the snapshot
-    	checkSnapshot.check(SnapshotTarget.VIEWPORT, driver.getDeviceAspectRatio());
+    	checkSnapshot.check(SnapshotTarget.VIEWPORT, customEventFiringWebDriver.getDeviceAspectRatio());
     	
     	storeSnapshot(snapshotName, screenShot, checkSnapshot);
     }
@@ -644,7 +646,7 @@ public class PageObject extends BasePage implements IPage {
     	ScreenShot screenShot = screenshotUtil.capture(snapshotTarget, ScreenShot.class, computeScrollDelay(checkSnapshot));
 
     	// check SnapshotCheckType configuration is compatible with the snapshot
-    	checkSnapshot.check(snapshotTarget, driver.getDeviceAspectRatio());
+    	checkSnapshot.check(snapshotTarget, customEventFiringWebDriver.getDeviceAspectRatio());
     	
     	storeSnapshot(snapshotName, screenShot, checkSnapshot);
     }
@@ -694,7 +696,7 @@ public class PageObject extends BasePage implements IPage {
         }
 
         boolean isMultipleWindow = false;
-        List<String> handles = new ArrayList<>(driver.getWindowHandles());
+        List<String> handles = new ArrayList<>(customEventFiringWebDriver.getWindowHandles());
         if (handles.size() > 1) {
             isMultipleWindow = true;
         }
@@ -702,7 +704,7 @@ public class PageObject extends BasePage implements IPage {
         
         try {
         	logger.info("close web page: " + getTitle());
-            driver.close();
+            customEventFiringWebDriver.close();
         } catch (WebDriverException ignore) { 
         	internalLogger.info("Error closing driver: {}", ignore.getMessage());
         }
@@ -733,7 +735,6 @@ public class PageObject extends BasePage implements IPage {
      * Close the current tab / window which leads to the previous window / tab in the list.
      * This uses the default constructor which MUST be available
      * @param previousPage		the page we go back to, so that we can check we are on the right page
-     * @return
      */
     public <T extends PageObject> T close(Class<T> previousPage) {
     	close();
@@ -752,7 +753,7 @@ public class PageObject extends BasePage implements IPage {
      * @param  offsetY  in pixels from the current location to which the element should be moved, e.g., -300
      */
     public void dragAndDrop(final HtmlElement element, final int offsetX, final int offsetY) {
-        new Actions(driver).dragAndDropBy( element.getElement(), offsetX, offsetY).perform();
+        new Actions(customEventFiringWebDriver).dragAndDropBy( element.getElement(), offsetX, offsetY).perform();
     }
 
     /**
@@ -770,7 +771,7 @@ public class PageObject extends BasePage implements IPage {
 
     @Override
     public String getTitle() {
-        return driver.getTitle();
+        return customEventFiringWebDriver.getTitle();
     }
 
     public String getUrl() {
@@ -786,11 +787,11 @@ public class PageObject extends BasePage implements IPage {
      * @param name	name of the cookie
      */
     public final String getCookieByName(final String name) {
-        if (driver.manage().getCookieNamed(name) == null) {
+        if (customEventFiringWebDriver.manage().getCookieNamed(name) == null) {
             return null;
         }
 
-        return driver.manage().getCookieNamed(name).getValue();
+        return customEventFiringWebDriver.manage().getCookieNamed(name).getValue();
     }
     
     /**
@@ -807,30 +808,30 @@ public class PageObject extends BasePage implements IPage {
         try {
 
             // Navigate to app URL for browser test
-            if (driver.isWebTest()) {
+            if (customEventFiringWebDriver.isWebTest()) {
             	setWindowToRequestedSize();
-                driver.navigate().to(url);
+                customEventFiringWebDriver.navigate().to(url);
             }
         } catch (UnreachableBrowserException e) {
         	// recreate the driver without recreating the enclosing WebUiDriver
-        	driver = WebUIDriver.getWebUIDriver(false).createWebDriver();
-            if (driver.isWebTest()) {
+            customEventFiringWebDriver = WebUIDriver.getWebUIDriver(false).createWebDriver();
+            if (customEventFiringWebDriver.isWebTest()) {
 	            setWindowToRequestedSize();
-	            driver.navigate().to(url);
+                customEventFiringWebDriver.navigate().to(url);
             }
         } catch (UnsupportedCommandException e) {
         	logger.error("get UnsupportedCommandException, retry");
             // recreate the driver without recreating the enclosing WebUiDriver
-            driver = WebUIDriver.getWebUIDriver(false).createWebDriver();
-            if (driver.isWebTest()) {
+            customEventFiringWebDriver = WebUIDriver.getWebUIDriver(false).createWebDriver();
+            if (customEventFiringWebDriver.isWebTest()) {
             	setWindowToRequestedSize();
-	            driver.navigate().to(url);
+                customEventFiringWebDriver.navigate().to(url);
             }
         } catch (org.openqa.selenium.TimeoutException ex) {
         	logger.error("got time out when loading " + url + ", ignored");
         } catch (org.openqa.selenium.UnhandledAlertException ex) {
         	logger.error("got UnhandledAlertException, retry");
-            driver.navigate().to(url);
+            customEventFiringWebDriver.navigate().to(url);
         } catch (WebDriverException e) {
         	internalLogger.error(e);
             throw new CustomSeleniumTestsException(e);
@@ -842,7 +843,7 @@ public class PageObject extends BasePage implements IPage {
      * This only affects mobile tests
      */
     public void hideKeyboard() {
-        driver.hideKeyboard();
+        customEventFiringWebDriver.hideKeyboard();
     }
 
     /**
@@ -851,7 +852,7 @@ public class PageObject extends BasePage implements IPage {
      * @return      list of contexts
      */
     public List<String> getContexts() {
-        return new ArrayList<>(driver.getContextHandles());
+        return new ArrayList<>(customEventFiringWebDriver.getContextHandles());
     }
 
     public void switchToContext(String name) {
@@ -859,7 +860,7 @@ public class PageObject extends BasePage implements IPage {
         Optional<String> foundContext = contexts.stream().filter(ctx -> ctx.toLowerCase().contains(name.toLowerCase())).findFirst();
         if (foundContext.isPresent()) {
             try {
-                driver.context(foundContext.get());
+                customEventFiringWebDriver.context(foundContext.get());
             } catch (NoSuchContextException e) { // in case context disappears when we switch to it
                 throw new ScenarioException(String.format("Only %s contexts are available", getContexts()));
             }
@@ -876,11 +877,11 @@ public class PageObject extends BasePage implements IPage {
                 return;
             }
 
-            driver.manage().window().maximize();
+            customEventFiringWebDriver.manage().window().maximize();
         } catch (Exception ex) {
 
             try {
-                ((JavascriptExecutor) driver).executeScript(
+                ((JavascriptExecutor) customEventFiringWebDriver).executeScript(
                     "if (window.screen){window.moveTo(0, 0);window.resizeTo(window.screen.availWidth,window.screen.availHeight);}");
             } catch (Exception ignore) {
             	logger.log("Unable to maximize browser window. Exception occured: " + ignore.getMessage());
@@ -892,7 +893,7 @@ public class PageObject extends BasePage implements IPage {
      * On init set window to size requested by user. Window is maximized if no size is set
      */
     public final void setWindowToRequestedSize() {
-    	if (!driver.isWebTest()) {
+    	if (!customEventFiringWebDriver.isWebTest()) {
     		return;
     	}
     	
@@ -920,12 +921,12 @@ public class PageObject extends BasePage implements IPage {
     	
         try {
             Dimension setSize = new Dimension(width, height);
-            driver.manage().window().setPosition(new Point(0, 0));
+            customEventFiringWebDriver.manage().window().setPosition(new Point(0, 0));
             int retries = 5;
             
             for (int i=0; i < retries; i++) {
-            	driver.manage().window().setSize(setSize);
-            	Dimension viewPortSize = driver.getViewPortDimensionWithoutScrollbar();
+                customEventFiringWebDriver.manage().window().setSize(setSize);
+            	Dimension viewPortSize = customEventFiringWebDriver.getViewPortDimensionWithoutScrollbar();
             	
             	if (viewPortSize.height == height && viewPortSize.width == width) {
             		break;
@@ -956,8 +957,8 @@ public class PageObject extends BasePage implements IPage {
     	if (SeleniumTestsContextManager.isAppTest()) {
             throw new ScenarioException("Application are not compatible with Windows");
         }
-    	    
-        driver.switchTo().window((String) driver.getWindowHandles().toArray()[index]);
+
+        customEventFiringWebDriver.switchTo().window((String) customEventFiringWebDriver.getWindowHandles().toArray()[index]);
         WaitHelper.waitForSeconds(1);
     }
     
@@ -995,7 +996,7 @@ public class PageObject extends BasePage implements IPage {
         // sometimes, our action made window disappear
  		String mainWindowHandle;
  		try {
- 			mainWindowHandle = driver.getWindowHandle();
+ 			mainWindowHandle = customEventFiringWebDriver.getWindowHandle();
  		} catch (Exception e) {
  			mainWindowHandle = "";
  		}
@@ -1016,7 +1017,7 @@ public class PageObject extends BasePage implements IPage {
  		
  		while (end.isAfter(Instant.now()) && !found) {
 
- 			handles = driver.getWindowHandles();
+ 			handles = customEventFiringWebDriver.getWindowHandles();
  			internalLogger.debug("All handles: {}", handles);
 
  			for (String handle: handles) {
@@ -1032,7 +1033,7 @@ public class PageObject extends BasePage implements IPage {
 				String address = "";
 				Instant endLoad = Instant.now().plusMillis(5000);
 				while (address.isEmpty() && endLoad.isAfter(Instant.now())) {
-					address = driver.getCurrentUrl();
+					address = customEventFiringWebDriver.getCurrentUrl();
 				}
 				
 				found = true;
@@ -1042,7 +1043,7 @@ public class PageObject extends BasePage implements IPage {
  		}
  		
  		// check window has changed
- 		if (waitMs > 0 && mainWindowHandle.equals(driver.getWindowHandle())) {
+ 		if (waitMs > 0 && mainWindowHandle.equals(customEventFiringWebDriver.getWindowHandle())) {
  			throw new CustomSeleniumTestsException("new window has not been found. Handles: " + handles);
  		}
  		return mainWindowHandle;
@@ -1054,7 +1055,7 @@ public class PageObject extends BasePage implements IPage {
      */
     public void switchToDefaultContent() {
         try {
-            driver.switchTo().defaultContent();
+            customEventFiringWebDriver.switchTo().defaultContent();
         } catch (UnhandledAlertException e) {
         	logger.warn("Alert found, you should handle it");
         }
@@ -1065,9 +1066,9 @@ public class PageObject extends BasePage implements IPage {
     		
     		
     		if (pageLoadStrategy == PageLoadStrategy.NORMAL) {
-    			new WebDriverWait(driver, Duration.ofSeconds(5)).until(ExpectedConditions.jsReturnsValue("if (document.readyState === \"complete\") { return \"ok\"; }"));
+    			new WebDriverWait(customEventFiringWebDriver, Duration.ofSeconds(5)).until(ExpectedConditions.jsReturnsValue("if (document.readyState === \"complete\") { return \"ok\"; }"));
     		} else if (pageLoadStrategy == PageLoadStrategy.EAGER) {
-    			new WebDriverWait(driver, Duration.ofSeconds(5)).until(ExpectedConditions.jsReturnsValue("if (document.readyState === \"interactive\") { return \"ok\"; }"));
+    			new WebDriverWait(customEventFiringWebDriver, Duration.ofSeconds(5)).until(ExpectedConditions.jsReturnsValue("if (document.readyState === \"interactive\") { return \"ok\"; }"));
     		}
     	} catch (TimeoutException e) {
     		// nothing
@@ -1092,7 +1093,7 @@ public class PageObject extends BasePage implements IPage {
 
 		while (end.isAfter(Instant.now())) {
 			try {
-				return driver.switchTo().alert();
+				return customEventFiringWebDriver.switchTo().alert();
 			} catch (NoAlertPresentException e) {
 				WaitHelper.waitForSeconds(1);
 			} catch (NoSuchWindowException e) {
@@ -1109,7 +1110,7 @@ public class PageObject extends BasePage implements IPage {
 	 */
 	public static String getCallingPage(StackTraceElement[] stack) {
 		String page = null;
-		Class<?> stackClass = null;
+		Class<?> stackClass;
 		
 		//find the PageObject Loader
         for (StackTraceElement stackTraceElement : stack) {
@@ -1130,7 +1131,7 @@ public class PageObject extends BasePage implements IPage {
     	Alert alert = getAlert();
         String seenText = alert.getText();
         alert.dismiss();
-        driver.switchTo().defaultContent();
+        customEventFiringWebDriver.switchTo().defaultContent();
         return seenText;
     }
 	
@@ -1153,13 +1154,13 @@ public class PageObject extends BasePage implements IPage {
 
 	@GenericStep
     public <T extends PageObject> T goBack() {
-        driver.navigate().back();
+        customEventFiringWebDriver.navigate().back();
         return (T)this;
     }
 	
 	@GenericStep
     public <T extends PageObject> T goForward() {
-        driver.navigate().forward();
+        customEventFiringWebDriver.navigate().forward();
         return (T)this;
     }
 
@@ -1309,9 +1310,9 @@ public class PageObject extends BasePage implements IPage {
      */
 	@GenericStep
     public <T extends PageObject> T refresh()  {
-    	if (driver.isWebTest()) {
+    	if (customEventFiringWebDriver.isWebTest()) {
 	        try {
-	            driver.navigate().refresh();
+                customEventFiringWebDriver.navigate().refresh();
 	        } catch (org.openqa.selenium.TimeoutException ex) {
 	        	logger.error("got time out customexception, ignore");
 	        }
@@ -1325,7 +1326,7 @@ public class PageObject extends BasePage implements IPage {
         if (alert != null) {
         	alert.accept();
         }
-        driver.switchTo().defaultContent();
+        customEventFiringWebDriver.switchTo().defaultContent();
         return (T)this;
     }
 
@@ -1338,20 +1339,20 @@ public class PageObject extends BasePage implements IPage {
     /**
      * Method to handle file upload through robot class
      * /!\ This should only be used as the last option when uploading file cannot be done an other way as explained below
-     * https://saucelabs.com/resources/articles/best-practices-tips-selenium-file-upload
+     * <a href="https://saucelabs.com/resources/articles/best-practices-tips-selenium-file-upload">...</a>
      * <code>
      * driver.setFileDetector(new LocalFileDetector());
      * driver.get("http://sso.dev.saucelabs.com/test/guinea-file-upload");
      *   WebElement upload = driver.findElement(By.id("myfile"));
      *   upload.sendKeys("/Users/sso/the/local/path/to/darkbulb.jpg");
      *   </code> 
-     *   
-     *   
+     *
+     *
      * To use this method, first click on the upload file button / link, then call this method.
-     * 
+     *
      * /!\ on firefox, clicking MUST be done through 'clickAction'. 'click()' is not supported by browser. 
      * /!\ on firefox, using the uploadFile method several times without other actions between usage may lead to error. Firefox will never click to the button the second time, probably due to focus problems
-     * 
+     *
      * @param filePath      path of the file to upload
      */
 	@GenericStep

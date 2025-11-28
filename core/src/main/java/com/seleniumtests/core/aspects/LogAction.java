@@ -27,10 +27,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
-import com.seleniumtests.uipage.BasePage;
 import com.seleniumtests.uipage.ReplayOnError;
 import com.seleniumtests.uipage.htmlelements.Element;
-import com.seleniumtests.uipage.htmlelements.GenericPictureElement;
 import com.seleniumtests.uipage.htmlelements.SeleniumElement;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;

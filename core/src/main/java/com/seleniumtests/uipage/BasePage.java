@@ -21,10 +21,7 @@ import java.time.Duration;
 import java.util.Set;
 
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.Alert;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -43,15 +40,16 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
  */
 public abstract class BasePage {
 
-    protected CustomEventFiringWebDriver driver;
+    protected CustomEventFiringWebDriver customEventFiringWebDriver;
+    protected WebDriver driver;
     private final int explictWaitTimeout = SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout();
 
 	protected static final ScenarioLogger logger = ScenarioLogger.getScenarioLogger(BasePage.class);  // with this logger, information will be added in test step + logs
 	protected static final Logger internalLogger = SeleniumRobotLogger.getLogger(BasePage.class);
     
     public Alert getAlert() {
-    	new WebDriverWait(driver, Duration.ofSeconds(2)).until(ExpectedConditions.alertIsPresent());
-        return driver.switchTo().alert();
+    	new WebDriverWait(customEventFiringWebDriver, Duration.ofSeconds(2)).until(ExpectedConditions.alertIsPresent());
+        return customEventFiringWebDriver.switchTo().alert();
     }
 
     public String getAlertText() {
@@ -63,23 +61,23 @@ public abstract class BasePage {
     protected void assertCurrentPage(boolean log, HtmlElement pageIdentifierElement) { }
 
     public CustomEventFiringWebDriver getDriver() {
-        return driver;
+        return customEventFiringWebDriver;
     }
     
     /**
      * For unit tests because in test scenarios, driver is already created on page initialization
      */
 	public void setDriver(CustomEventFiringWebDriver driver) {
-		this.driver = driver;
+		this.customEventFiringWebDriver = driver;
 	}
 
     public boolean isTextPresent(final String text) {
-    	if (driver.isWebTest()) {
+    	if (customEventFiringWebDriver.isWebTest()) {
 	        Assert.assertNotNull(text, "isTextPresent: text should not be null!");
 	        
 	        WebElement body;
 	        try {
-	        	body = driver.findElement(By.tagName("body"));
+	        	body = customEventFiringWebDriver.findElement(By.tagName("body"));
 	        } catch (WebDriverException e) {
 	        	return false;
 	        }
@@ -103,9 +101,9 @@ public abstract class BasePage {
         }
     	
         if (windowName == null) {
-        	driver.switchTo().defaultContent();
+            customEventFiringWebDriver.switchTo().defaultContent();
         } else {
-        	driver.switchTo().window(windowName);
+            customEventFiringWebDriver.switchTo().window(windowName);
         }
     }
 
@@ -116,12 +114,12 @@ public abstract class BasePage {
      */
     public void waitForCondition(final ExpectedCondition<WebElement> condition) {
     	
-    	WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(explictWaitTimeout));
+    	WebDriverWait wait = new WebDriverWait(customEventFiringWebDriver, Duration.ofSeconds(explictWaitTimeout));
     	wait.until(condition);
     }
 
 	public Set<String> getCurrentHandles() {
-		return driver.getCurrentHandles();
+		return customEventFiringWebDriver.getCurrentHandles();
 	}
 	
 
