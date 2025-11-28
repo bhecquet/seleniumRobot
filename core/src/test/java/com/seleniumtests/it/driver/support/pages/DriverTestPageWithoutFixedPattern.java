@@ -106,7 +106,7 @@ public class DriverTestPageWithoutFixedPattern extends PageObject {
     }
     
     public void move() {
-    	CustomEventFiringWebDriver driver = getDriver();
+    	CustomEventFiringWebDriver driver = (CustomEventFiringWebDriver) getDriver();
     	HtmlElement html = new HtmlElement("", By.tagName("html"));
     	driver.manage().window().getPosition();
     	driver.manage().window().getSize();

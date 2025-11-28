@@ -60,7 +60,7 @@ public abstract class BasePage {
     protected void assertCurrentPage(final boolean log) { }
     protected void assertCurrentPage(boolean log, HtmlElement pageIdentifierElement) { }
 
-    public CustomEventFiringWebDriver getDriver() {
+    public WebDriver getDriver() {
         return customEventFiringWebDriver;
     }
     
