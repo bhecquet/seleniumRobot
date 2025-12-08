@@ -76,7 +76,7 @@ public class ScreenShot {
                     tempHtmlFile.deleteOnExit();
                     FileUtils.writeStringToFile(tempHtmlFile, pageSource, StandardCharsets.UTF_8);
                     File zipFile = FileUtility.createZipArchiveFromFiles(List.of(tempHtmlFile));
-                    FileUtils.copyFile(zipFile, htmlFile);
+                    FileUtils.moveFile(zipFile, htmlFile);
                     tempHtmlFile.delete();
                 } else {
 
