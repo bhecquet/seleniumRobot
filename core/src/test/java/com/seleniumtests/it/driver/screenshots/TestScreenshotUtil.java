@@ -20,6 +20,7 @@ package com.seleniumtests.it.driver.screenshots;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,6 +31,7 @@ import javax.imageio.ImageIO;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.uipage.ByC;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.uipage.htmlelements.ImageElement;
@@ -433,4 +435,66 @@ public class TestScreenshotUtil extends ReporterTest {
 		}
 		
 	}
+
+	@Test(groups={"it"})
+	public void testScreenshotWithMetadata() throws IOException {
+		setBrowser("chrome");
+		DriverTestPage page = null;
+		try {
+			page = new DriverTestPage(true);
+			SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
+			ScreenShot screenshot = new ScreenshotUtil((CustomEventFiringWebDriver) page.getDriver()).capture(SnapshotTarget.PAGE, ScreenShot.class);
+			Assert.assertTrue(screenshot.getLocation().contains("test.html"));
+			Assert.assertEquals(screenshot.getTitle(), "Current Window: Test page");
+			Assert.assertTrue(screenshot.getImage().getFile().exists());
+			Assert.assertTrue(screenshot.getHtml().getFile().exists());
+			String htmlContent = FileUtils.readFileToString(screenshot.getHtml().getFile(), StandardCharsets.UTF_8);
+			Assert.assertTrue(htmlContent.contains("<iframe srcdoc=\"&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;")); // iframe content directly in html
+			Assert.assertTrue(htmlContent.contains("&lt;iframe srcdoc=&quot;&amp;lt;html&amp;gt;&amp;lt;head&amp;gt;&amp;lt;/head&amp;gt;&amp;lt;body&amp;gt;")); // iframe in iframe content directly in html
+
+		} finally {
+			if (page != null) {
+				page.getDriver().close();
+			}
+		}
+	}
+
+	/**
+	 * Check that if we are inside a frame before doing the screenshot, after, we are in the same frame
+	 */
+	@Test(groups={"it"})
+	public void testScreenshotWithMetadataRestoreFrameContext() throws IOException {
+		setBrowser("chrome");
+		DriverTestPage page = null;
+		try {
+			page = new DriverTestPage(true);
+			page.getDriver().switchTo().frame(0).switchTo().frame(0);
+
+			// to be sure we are on the right frame
+			page.getDriver().findElement(By.id("textInIFrameWithValue3")).getText();
+
+			SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
+			ScreenShot screenshot = new ScreenshotUtil((CustomEventFiringWebDriver) page.getDriver()).capture(SnapshotTarget.PAGE, ScreenShot.class);
+			Assert.assertTrue(screenshot.getLocation().contains("test.html"));
+			Assert.assertEquals(screenshot.getTitle(), "Current Window: Test page");
+			Assert.assertTrue(screenshot.getImage().getFile().exists());
+			Assert.assertTrue(screenshot.getHtml().getFile().exists());
+			String htmlContent = FileUtils.readFileToString(screenshot.getHtml().getFile(), StandardCharsets.UTF_8);
+			Assert.assertTrue(htmlContent.contains("<iframe srcdoc=\"&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;")); // iframe content directly in html
+			Assert.assertTrue(htmlContent.contains("&lt;iframe srcdoc=&quot;&amp;lt;html&amp;gt;&amp;lt;head&amp;gt;&amp;lt;/head&amp;gt;&amp;lt;body&amp;gt;")); // iframe in iframe content directly in html
+
+			// check we are in the same context, this should work
+			page.getDriver().findElement(By.id("textInIFrameWithValue3")).getText();
+
+		} finally {
+			if (page != null) {
+				page.getDriver().close();
+			}
+		}
+	}
+
+	/*
+	TODO: test où on est déjà dans une frame avant de faire la capture
+	=> vérifier qu'à la sortie, on est toujours dans la même frame
+	 */
 }

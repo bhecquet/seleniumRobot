@@ -23,21 +23,13 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.WebSessionEndedException;
+import com.seleniumtests.util.StringUtility;
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.Alert;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.JavascriptException;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.Rectangle;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.bidi.HasBiDi;
 import org.openqa.selenium.bidi.browsingcontext.BrowsingContext;
 import org.openqa.selenium.devtools.DevTools;
@@ -60,6 +52,7 @@ import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.imaging.ImageProcessor;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import org.openqa.selenium.firefox.HasFullPageScreenshot;
+import org.openqa.selenium.remote.RemoteWebElement;
 
 import javax.imageio.ImageIO;
 
@@ -117,7 +110,7 @@ public class ScreenshotUtil {
 
         /**
          * Add information (url, source, title) to the captured image
-         * Beware that these information use the current driver so driver state must reflect the provided image
+         * Beware that this information use the current driver so driver state must reflect the provided image
          */
         public NamedBufferedImage addMetaDataToImage() {
 
@@ -142,7 +135,7 @@ public class ScreenshotUtil {
         		title = prefix == null ? title: prefix + title;
         		
         		try {
-                	pageSource = driver.getPageSource();
+                	pageSource = getFullPageSource(0, new HashMap<>());
                 } catch (Exception e) {
                 	pageSource = "";
                 }
@@ -150,6 +143,69 @@ public class ScreenshotUtil {
         	
         	return this;
         }
+
+		/**
+		 * Get the page source
+		 * it will go through frame and replace the frame "src" attribute with srcdoc so that whole content is inside a single file
+		 * @param depth		depth of frames
+		 * @param frameMap	id of the frame, related to it's index in the document, so that we can restore the context at the end of the method
+		 * @return	the full DOM
+		 */
+		private String getFullPageSource(int depth, Map<String, Integer> frameMap) {
+
+			List<String> contextPath = new ArrayList<>();
+			if (depth == 0) {
+				RemoteWebElement currentContext = (RemoteWebElement) driver.getOriginalDriver().switchTo().activeElement();
+				contextPath.add(currentContext.getId());
+				RemoteWebElement currentFrame = currentContext;
+				RemoteWebElement parentFrame = null;
+				while (!currentFrame.equals(parentFrame)) {
+					if (parentFrame != null) {
+						currentFrame = parentFrame;
+					}
+					driver.switchTo().parentFrame();
+					parentFrame = (RemoteWebElement) driver.getOriginalDriver().switchTo().activeElement();
+					contextPath.add(parentFrame.getId());
+				}
+				// remove the root document from list
+				contextPath.removeAll(List.of(parentFrame.getId()));
+				contextPath = contextPath.reversed(); // to go top -> down
+			}
+
+			// go through frames to extract content
+			String mainDom = (String) driver.executeScript("return document.documentElement.outerHTML;");
+			if (mainDom != null && mainDom.contains("<iframe")) {
+				List<WebElement> iframes = driver.getOriginalDriver().findElements(By.tagName("iframe"));
+
+				for (WebElement iframe : iframes) {
+
+					try {
+						String iframeHtml = iframe.getAttribute("outerHTML");
+						driver.switchTo().frame(iframe);
+						frameMap.put(((RemoteWebElement) driver.getOriginalDriver().switchTo().activeElement()).getId(), iframes.indexOf(iframe));
+						String frameSource = getFullPageSource(depth + 1, frameMap);
+						driver.switchTo().parentFrame();
+						mainDom = mainDom.replace(iframeHtml, iframeHtml.replaceAll("src=.*? ", "srcdoc=\"" + StringUtility.encodeString(frameSource, "xml") + "\" "));
+					} catch (Exception e) {
+						logger.error("Could not get frame source", e);
+					}
+				}
+			}
+
+			// restore frame context
+			if (depth == 0) {
+				for (String elementId : contextPath) {
+					try {
+						driver.switchTo().frame(frameMap.get(elementId));
+					} catch (Exception e) {
+						logger.error("Could not switch to frame '{}' while restoring context, go back to default content", elementId, e);
+						driver.switchTo().defaultContent();
+					}
+				}
+			}
+
+			return mainDom;
+		}
         
         /**
          * When target is an element, add information relative to element
