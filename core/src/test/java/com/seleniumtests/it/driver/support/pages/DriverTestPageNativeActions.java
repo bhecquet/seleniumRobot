@@ -132,7 +132,7 @@ public class DriverTestPageNativeActions extends PageObject {
      * must be called after switchToFirstFrameByElement and switchToSecondFrameByElement
      */
     public WebElement getElementInsideFrameOfFrame() {
-    	return driver.findElement(By.id("textInIFrameWithValue2"));
+    	return driver.findElement(By.id("textInIFrameWithValue3"));
     }
     
     public static String getPageUrl() {
