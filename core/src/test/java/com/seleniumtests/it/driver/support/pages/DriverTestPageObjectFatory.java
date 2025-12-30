@@ -61,6 +61,9 @@ public class DriverTestPageObjectFatory extends PageObject {
 	
 	@FindBy(id = "textInIFrameWithValue2")
 	public WebElement textInIFrameWithValue2;
+
+	@FindBy(id = "textInIFrameWithValue3")
+	public WebElement textInIFrameWithValue3;
 	
 	@FindAll({@FindBy(id="text2"), @FindBy(id = "button2")})
 	public List<WebElement> allElements;
@@ -184,7 +187,7 @@ public class DriverTestPageObjectFatory extends PageObject {
      * must be called after switchToFirstFrameByElement and switchToSecondFrameByElement
      */
     public WebElement getElementInsideFrameOfFrame() {
-    	return textInIFrameWithValue2;
+    	return textInIFrameWithValue3;
     }
     
     public static String getPageUrl() {

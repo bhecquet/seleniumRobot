@@ -180,7 +180,7 @@ public class TestOverridePageObjectFactory extends MockitoTest {
 		testPage.switchToFirstFrameByElement();
 		testPage.switchToSecondFrameByElement();
 		WebElement el = testPage.getElementInsideFrameOfFrame();
-		Assert.assertEquals(el.getDomProperty("value"), "an other value in iframe");
+		Assert.assertEquals(el.getDomProperty("value"), "an other value in an other iframe");
 	}
 	
 
@@ -261,7 +261,7 @@ public class TestOverridePageObjectFactory extends MockitoTest {
 		testPage.switchToFirstFrameByElement();
 		testPage.switchToSecondFrameByElement();
 		WebElement el = testPage.getElementInsideFrameOfFrame();
-		Assert.assertEquals(el.getDomProperty("value"), "an other value in iframe");
+		Assert.assertEquals(el.getDomProperty("value"), "an other value in an other iframe");
 		testPage.switchParentFrame();
 		WebElement el1 = testPage.getElementInsideFrame();
 		Assert.assertEquals(el1.getDomProperty("value"), "a value");
