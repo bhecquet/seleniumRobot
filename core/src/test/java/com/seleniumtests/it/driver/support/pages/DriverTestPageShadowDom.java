@@ -35,11 +35,11 @@ public class DriverTestPageShadowDom extends PageObject {
 	
 	public static final TextFieldElement textInScroll = new HtmlElement("", ByC.shadow(By.id("shadow11"))).findTextFieldElement(By.id("textInScroll"));
 	 
-    public DriverTestPageShadowDom(boolean openPageURL) throws Exception {
+    public DriverTestPageShadowDom(boolean openPageURL) {
     	this(openPageURL, getPageUrl(SeleniumTestsContextManager.getThreadContext().getBrowser()));
     }
 
-    public DriverTestPageShadowDom(boolean openPageURL, String url) throws Exception {
+    public DriverTestPageShadowDom(boolean openPageURL, String url) {
     	super(inputFail1, openPageURL ? url : null);
     }
 	

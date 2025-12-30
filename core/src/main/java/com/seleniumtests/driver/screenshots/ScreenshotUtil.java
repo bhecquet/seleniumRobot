@@ -135,7 +135,13 @@ public class ScreenshotUtil {
         		title = prefix == null ? title: prefix + title;
         		
         		try {
-                	pageSource = getFullPageSource(0, new HashMap<>());
+					// CDP browser will be able to get shadow DOM
+					if (driver instanceof HasDevTools) {
+						pageSource = new CdpPageHtmlSnapshot(driver).getFullPageSource();
+					} else {
+						pageSource = getFullPageSource(0, new HashMap<>());
+					}
+
                 } catch (Exception e) {
                 	pageSource = "";
                 }
@@ -143,6 +149,7 @@ public class ScreenshotUtil {
         	
         	return this;
         }
+
 
 		/**
 		 * Get the page source

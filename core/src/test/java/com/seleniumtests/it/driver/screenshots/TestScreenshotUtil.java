@@ -75,7 +75,7 @@ public class TestScreenshotUtil extends ReporterTest {
 	 * Better check with OS zoom setting set to a value > 100%
 	 */
 	@Test(groups={"it"})
-	public void testElementScreenshotUsingAspectRatio() throws Exception {
+	public void testElementScreenshotUsingAspectRatio() {
 
 		setBrowser("chrome");
 		new DriverTestPageShadowDom(true);
@@ -110,7 +110,7 @@ public class TestScreenshotUtil extends ReporterTest {
 	}
 
 	@Test(groups={"it"})
-	public void testCaptureWebPageChrome() throws Exception {
+	public void testCaptureWebPageChrome() {
 
 		setBrowser("chrome");
 		new DriverTestPageShadowDom(true);
@@ -124,7 +124,7 @@ public class TestScreenshotUtil extends ReporterTest {
 		}
 	}
 	@Test(groups={"it"})
-	public void testCaptureWebPageChrome2() throws Exception {
+	public void testCaptureWebPageChrome2() {
 
 		setBrowser("chrome");
 		new DriverTestPageShadowDom(true);
@@ -138,7 +138,7 @@ public class TestScreenshotUtil extends ReporterTest {
 		}
 	}
 	@Test(groups={"it"})
-	public void testCaptureWebPageFullPage() throws Exception {
+	public void testCaptureWebPageFullPage() {
 
 		setBrowser("firefox");
 		new DriverTestPageShadowDom(true);
@@ -436,9 +436,38 @@ public class TestScreenshotUtil extends ReporterTest {
 		
 	}
 
+	/**
+	 * Test page source generation with CDP browser
+	 */
 	@Test(groups={"it"})
 	public void testScreenshotWithMetadata() throws IOException {
 		setBrowser("chrome");
+		DriverTestPage page = null;
+		try {
+			page = new DriverTestPage(true);
+			SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
+			ScreenShot screenshot = new ScreenshotUtil((CustomEventFiringWebDriver) page.getDriver()).capture(SnapshotTarget.PAGE, ScreenShot.class);
+			Assert.assertTrue(screenshot.getLocation().contains("test.html"));
+			Assert.assertEquals(screenshot.getTitle(), "Current Window: Test page");
+			Assert.assertTrue(screenshot.getImage().getFile().exists());
+			Assert.assertTrue(screenshot.getHtml().getFile().exists());
+			String htmlContent = FileUtils.readFileToString(screenshot.getHtml().getFile(), StandardCharsets.UTF_8);
+			Assert.assertTrue(htmlContent.contains("<iframe srcdoc=\"&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;")); // iframe content directly in html
+			Assert.assertTrue(htmlContent.contains("&lt;iframe srcdoc=&quot;&amp;lt;html&amp;gt;&amp;lt;head&amp;gt;&amp;lt;/head&amp;gt;&amp;lt;body&amp;gt;")); // iframe in iframe content directly in html
+
+		} finally {
+			if (page != null) {
+				page.getDriver().close();
+			}
+		}
+	}
+
+	/**
+	 * Test page source retrieving with non CDP browser
+	 */
+	@Test(groups={"it"})
+	public void testScreenshotWithMetadataNonCdp() throws IOException {
+		setBrowser("firefox");
 		DriverTestPage page = null;
 		try {
 			page = new DriverTestPage(true);
@@ -464,7 +493,7 @@ public class TestScreenshotUtil extends ReporterTest {
 	 */
 	@Test(groups={"it"})
 	public void testScreenshotWithMetadataRestoreFrameContext() throws IOException {
-		setBrowser("chrome");
+		setBrowser("firefox");
 		DriverTestPage page = null;
 		try {
 			page = new DriverTestPage(true);
@@ -493,8 +522,28 @@ public class TestScreenshotUtil extends ReporterTest {
 		}
 	}
 
-	/*
-	TODO: test où on est déjà dans une frame avant de faire la capture
-	=> vérifier qu'à la sortie, on est toujours dans la même frame
-	 */
+
+	@Test(groups={"it"})
+	public void testScreenshotWithMetadataOnShadowDom() throws IOException {
+		setBrowser("chrome");
+		DriverTestPageShadowDom page = null;
+		try {
+			page = new DriverTestPageShadowDom(true);
+			SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
+			ScreenShot screenshot = new ScreenshotUtil((CustomEventFiringWebDriver) page.getDriver()).capture(SnapshotTarget.PAGE, ScreenShot.class);
+			Assert.assertTrue(screenshot.getLocation().contains("testShadow.html"));
+			Assert.assertEquals(screenshot.getTitle(), "Current Window: Level Access Inc. ShadowDOM Examples from https://not.webaccessibility.com/shadowdom.html");
+			Assert.assertTrue(screenshot.getImage().getFile().exists());
+			Assert.assertTrue(screenshot.getHtml().getFile().exists());
+			String htmlContent = FileUtils.readFileToString(screenshot.getHtml().getFile(), StandardCharsets.UTF_8);
+			Assert.assertTrue(htmlContent.contains("<div id=\"shadow\"><label for=\"fail1\">This is a label</label></div>")); // shadow dom content is present
+			Assert.assertTrue(htmlContent.contains("<div id=\"shadow12\"><div id=\"anId\"><iframe id=\"frame11\" srcdoc=\"&lt;!DOCTYPE html&gt;&lt;html lang")); // iframe in shadow dom is present
+
+		} finally {
+			if (page != null) {
+				page.getDriver().close();
+			}
+		}
+	}
+
 }

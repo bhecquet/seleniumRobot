@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.devtools.Command;
 import org.openqa.selenium.devtools.DevTools;
 import org.openqa.selenium.devtools.HasDevTools;
 import org.openqa.selenium.devtools.v142.emulation.Emulation;
@@ -529,7 +530,7 @@ public class ChromiumUtils {
 	public static void setGeolocation(WebDriver driver, double latitude, double longitude) {
 		if (driver instanceof HasDevTools devToolsDriver) {
 			DevTools devTools = devToolsDriver.getDevTools();
-			devTools.createSessionIfThereIsNotOne();
+			devTools.createSessionIfThereIsNotOne(driver.getWindowHandle());
 
 			devTools.send(Emulation.setGeolocationOverride(Optional.of(latitude),
 					Optional.of(longitude),
@@ -540,5 +541,23 @@ public class ChromiumUtils {
 					Optional.empty()
 			));
 		}
+	}
+
+	/**
+	 * Capture snapshot of the current page
+	 * By snapshot, we mean the DOM
+	 * @return	MHTML content
+	 */
+	public static String captureSnapshot(WebDriver driver) {
+		if (driver instanceof HasDevTools devToolsDriver) {
+			DevTools devTools = devToolsDriver.getDevTools();
+			devTools.createSessionIfThereIsNotOne(driver.getWindowHandle());
+
+			Map<String, String> data = devTools.send(new Command<>("Page.captureSnapshot", new HashMap<>()));
+			return data.get("data");
+		} else {
+			return null;
+		}
+
 	}
 }
