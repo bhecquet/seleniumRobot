@@ -103,15 +103,18 @@ public class TestCdpPageHtmlSnapshot extends MockitoTest {
                     """);
 
             String source = new CdpPageHtmlSnapshot(driver).getFullPageSource();
-            Assert.assertTrue(source.contains("<iframe srcdoc=\"&lt;html&gt;&lt;head&gt;&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=windows-1252&quot;&gt;&lt;/head&gt;&lt;body&gt;\n" +
+            Assert.assertTrue(source.contains("<iframe srcdoc=\"&lt;html&gt;&lt;head&gt;&gt;&lt;/head&gt;&lt;body&gt;\n" +
                     "\t\t\t\t&lt;input id=&quot;textInIFrame&quot;&gt;")); // first frame is encoded
-            Assert.assertTrue(source.contains("&lt;iframe srcdoc=&quot;&amp;lt;html&amp;gt;&amp;lt;head&amp;gt;&amp;lt;meta http-equiv=&amp;quot;Content-Type&amp;quot; content=&amp;quot;text/html; charset=windows-1252&amp;quot;&amp;gt;&amp;lt;/head&amp;gt;&amp;lt;body&amp;gt;\n" +
-                    "\t\t\t\t&amp;lt;input id=&amp;quot;textInIFrameWithValue3&amp;quot;")); // second frame is double encoded
-            Assert.assertTrue(source.contains("&amp;lt;iframe srcdoc=&amp;quot;&amp;amp;lt;html&amp;amp;gt;&amp;amp;lt;head&amp;amp;gt;&amp;amp;lt;meta http-equiv=&amp;amp;quot;Content-Type&amp;amp;quot; content=&amp;amp;quot;text/html; charset=windows-1252&amp;amp;quot;&amp;amp;gt;&amp;amp;lt;/head&amp;amp;gt;&amp;amp;lt;body&amp;amp;gt;\n" +
-                    "\t\t\t\t&amp;amp;lt;input id=&amp;amp;quot;textInIFrameWithValue2&amp;amp;quot;")); // third frame is triple encoded
+            Assert.assertTrue(source.contains("&lt;iframe srcdoc=&quot;&amp;lt;html&amp;gt;&amp;lt;head&amp;gt;&amp;gt;&amp;lt;/head&amp;gt;&amp;lt;body&amp;gt;\n" +
+                    "\t\t\t\t&amp;lt;input id=&amp;quot;textInIFrameWithValue3")); // second frame is double encoded
+            Assert.assertTrue(source.contains("&amp;lt;iframe srcdoc=&amp;quot;&amp;amp;lt;html&amp;amp;gt;&amp;amp;lt;head&amp;amp;gt;&amp;amp;gt;&amp;amp;lt;/head&amp;amp;gt;&amp;amp;lt;body&amp;amp;gt;\n" +
+                    "\t\t\t\t&amp;amp;lt;input id=&amp;amp;quot;textInIFrameWithValue2")); // third frame is triple encoded
         }
     }
 
+    /**
+     * 2 top level frames, their content is encoded
+     */
     @Test(groups = "ut")
     public void testGetFullPageSourceWithMultipleFrames() throws Exception {
         try (MockedStatic<ChromiumUtils> mockedDriver = Mockito.mockStatic(ChromiumUtils.class)) {
@@ -195,15 +198,18 @@ public class TestCdpPageHtmlSnapshot extends MockitoTest {
                     """);
 
             String source = new CdpPageHtmlSnapshot(driver).getFullPageSource();
-            Assert.assertTrue(source.contains("<iframe srcdoc=\"&lt;html&gt;&lt;head&gt;&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=windows-1252&quot;&gt;&lt;/head&gt;&lt;body&gt;\n" +
+            Assert.assertTrue(source.contains("<iframe srcdoc=\"&lt;html&gt;&lt;head&gt;&gt;&lt;/head&gt;&lt;body&gt;\n" +
                     "\t\t\t\t&lt;input id=&quot;textInIFrame&quot;&gt;")); // first frame is encoded
-            Assert.assertTrue(source.contains("&lt;iframe srcdoc=&quot;&amp;lt;html&amp;gt;&amp;lt;head&amp;gt;&amp;lt;meta http-equiv=&amp;quot;Content-Type&amp;quot; content=&amp;quot;text/html; charset=windows-1252&amp;quot;&amp;gt;&amp;lt;/head&amp;gt;&amp;lt;body&amp;gt;\n" +
-                    "\t\t\t\t&amp;lt;input id=&amp;quot;textInIFrameWithValue3&amp;quot;")); // sub frame is double encoded
-            Assert.assertTrue(source.contains("<iframe srcdoc=\"&lt;html&gt;&lt;head&gt;&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=windows-1252&quot;&gt;&lt;/head&gt;&lt;body&gt;\n" +
-                    "\t\t\t\t&lt;input id=&quot;textInIFrameWithValue2&quot;")); // second frame is encoded
+            Assert.assertTrue(source.contains("&lt;iframe srcdoc=&quot;&amp;lt;html&amp;gt;&amp;lt;head&amp;gt;&amp;gt;&amp;lt;/head&amp;gt;&amp;lt;body&amp;gt;\n" +
+                    "\t\t\t\t&amp;lt;input id=&amp;quot;textInIFrameWithValue3")); // sub frame is double encoded
+            Assert.assertTrue(source.contains("<iframe srcdoc=\"&lt;html&gt;&lt;head&gt;&gt;&lt;/head&gt;&lt;body&gt;\n" +
+                    "\t\t\t\t&lt;input id=&quot;textInIFrameWithValue2")); // second frame is encoded
         }
     }
 
+    /**
+     * 2 frames in a sub frames, both must be double encoded
+     */
     @Test(groups = "ut")
     public void testGetFullPageSourceWithMultipleFramesInFrames() throws Exception {
         try (MockedStatic<ChromiumUtils> mockedDriver = Mockito.mockStatic(ChromiumUtils.class)) {
@@ -287,12 +293,12 @@ public class TestCdpPageHtmlSnapshot extends MockitoTest {
                     """);
 
             String source = new CdpPageHtmlSnapshot(driver).getFullPageSource();
-            Assert.assertTrue(source.contains("<iframe srcdoc=\"&lt;html&gt;&lt;head&gt;&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=windows-1252&quot;&gt;&lt;/head&gt;&lt;body&gt;\n" +
+            Assert.assertTrue(source.contains("<iframe srcdoc=\"&lt;html&gt;&lt;head&gt;&gt;&lt;/head&gt;&lt;body&gt;\n" +
                     "\t\t\t\t&lt;input id=&quot;textInIFrame&quot;&gt;")); // first frame is encoded
-            Assert.assertTrue(source.contains("&lt;iframe srcdoc=&quot;&amp;lt;html&amp;gt;&amp;lt;head&amp;gt;&amp;lt;meta http-equiv=&amp;quot;Content-Type&amp;quot; content=&amp;quot;text/html; charset=windows-1252&amp;quot;&amp;gt;&amp;lt;/head&amp;gt;&amp;lt;body&amp;gt;\n" +
-                    "\t\t\t\t&amp;lt;input id=&amp;quot;textInIFrameWithValue3&amp;quot;")); // first sub frame is double encoded
-            Assert.assertTrue(source.contains("&lt;iframe srcdoc=&quot;&amp;lt;html&amp;gt;&amp;lt;head&amp;gt;&amp;lt;meta http-equiv=&amp;quot;Content-Type&amp;quot; content=&amp;quot;text/html; charset=windows-1252&amp;quot;&amp;gt;&amp;lt;/head&amp;gt;&amp;lt;body&amp;gt;\n" +
-                    "\t\t\t\t&amp;lt;input id=&amp;quot;textInIFrameWithValue2&")); // second sub frame is double encoded
+            Assert.assertTrue(source.contains("&lt;iframe srcdoc=&quot;&amp;lt;html&amp;gt;&amp;lt;head&amp;gt;&amp;gt;&amp;lt;/head&amp;gt;&amp;lt;body&amp;gt;\n" +
+                    "\t\t\t\t&amp;lt;input id=&amp;quot;textInIFrameWithValue3")); // first sub frame is double encoded
+            Assert.assertTrue(source.contains("&lt;iframe srcdoc=&quot;&amp;lt;html&amp;gt;&amp;lt;head&amp;gt;&amp;gt;&amp;lt;/head&amp;gt;&amp;lt;body&amp;gt;\n" +
+                    "\t\t\t\t&amp;lt;input id=&amp;quot;textInIFrameWithValue2")); // second sub frame is double encoded
         }
     }
 }
