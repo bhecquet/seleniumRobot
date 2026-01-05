@@ -1,10 +1,15 @@
 package com.seleniumtests.ut.browserfactory.chrome;
 
-import com.seleniumtests.GenericTest;
+import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.chrome.ChromiumUtils;
 import com.seleniumtests.util.har.Har;
 import com.seleniumtests.util.har.WebSocketEntry;
 
+import org.mockito.ArgumentCaptor;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.devtools.Command;
+import org.openqa.selenium.devtools.DevTools;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.logging.LogEntry;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -16,7 +21,10 @@ import java.time.Instant;
 import java.util.*;
 import java.util.logging.Level;
 
-public class TestChromiumUtils extends GenericTest {
+import static com.seleniumtests.GenericTest.createFileFromResource;
+import static org.mockito.Mockito.*;
+
+public class TestChromiumUtils extends MockitoTest {
 
 	@Test(groups = "ut")
 	public void testParsePerformanceLogsWebSocket() throws IOException {
@@ -401,4 +409,22 @@ public class TestChromiumUtils extends GenericTest {
                 .map(line -> new LogEntry(Level.INFO, 0, line))
                 .toList();
     }
+
+	@Test(groups="ut")
+	public void testCaptureSnapshotChromiumDriver() {
+		ChromeDriver driver = mock(ChromeDriver.class);
+		DevTools devTools = mock(DevTools.class);
+		when(driver.getDevTools()).thenReturn(devTools);
+		ArgumentCaptor<Command<?>> commandArgumentCaptor = ArgumentCaptor.forClass(Command.class);
+		when(devTools.send(any(Command.class))).thenReturn(Map.of("data", "abc"));
+		Assert.assertEquals(ChromiumUtils.captureSnapshot(driver), "abc");
+		verify(devTools).send(commandArgumentCaptor.capture());
+		Assert.assertEquals(commandArgumentCaptor.getValue().getMethod(), "Page.captureSnapshot");
+	}
+
+	@Test(groups="ut")
+	public void testCaptureSnapshotOtherDriver() {
+		FirefoxDriver driver = mock(FirefoxDriver.class);
+		Assert.assertNull(ChromiumUtils.captureSnapshot(driver));
+	}
 }
