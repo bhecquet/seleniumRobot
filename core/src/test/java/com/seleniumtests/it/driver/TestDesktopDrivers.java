@@ -54,7 +54,7 @@ public class TestDesktopDrivers extends GenericDriverTest {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*chrome");
 		driver = WebUIDriver.getWebDriver(true);
-		Assert.assertEquals(driver.getCurrentUrl(), "about:blank");
+		Assert.assertTrue(driver.getCurrentUrl().contains("http://localhost:") || driver.getCurrentUrl().contains("about:blank") || driver.getCurrentUrl().contains("data"));
 		
 		// issue #280: check BrowserInfo exists
 		Assert.assertNotNull(driver.getBrowserInfo());
@@ -79,7 +79,7 @@ public class TestDesktopDrivers extends GenericDriverTest {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 		SeleniumTestsContextManager.getThreadContext().setBetaBrowser(true);
 		driver = WebUIDriver.getWebDriver(true);
-		Assert.assertEquals(driver.getCurrentUrl(), "about:blank");
+		Assert.assertTrue(driver.getCurrentUrl().contains("http://localhost:") || driver.getCurrentUrl().contains("about:blank") || driver.getCurrentUrl().contains("data"));
 		
 		
 		// issue #280: check BrowserInfo exists

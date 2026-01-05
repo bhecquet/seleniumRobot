@@ -136,7 +136,7 @@ public class ScreenshotUtil {
         		
         		try {
 					// CDP browser will be able to get shadow DOM
-					if (driver instanceof HasDevTools) {
+					if (driver.getWebDriver() instanceof HasDevTools) {
 						pageSource = new CdpPageHtmlSnapshot(driver).getFullPageSource();
 					} else {
 						pageSource = getFullPageSource(0, new HashMap<>());

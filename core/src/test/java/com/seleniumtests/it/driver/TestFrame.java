@@ -111,7 +111,7 @@ public class TestFrame extends GenericMultiBrowserTest {
 	}
 	
 	public void testFrameInFrameText() {
-		Assert.assertEquals(DriverTestPage.textElementSubIFrame.getValue(), "an other value in iframe");
+		Assert.assertEquals(DriverTestPage.textElementSubIFrame.getValue(), "an other value in an other iframe");
 	}
 	
 	/**
