@@ -103,11 +103,11 @@ public class TestCdpPageHtmlSnapshot extends MockitoTest {
                     """);
 
             String source = new CdpPageHtmlSnapshot(driver).getFullPageSource();
-            Assert.assertTrue(source.contains("<iframe srcdoc=\"&lt;html&gt;&lt;head&gt;&gt;&lt;/head&gt;&lt;body&gt;\n" +
+            Assert.assertTrue(source.contains("<iframe srcdoc=\"&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;\n" +
                     "\t\t\t\t&lt;input id=&quot;textInIFrame&quot;&gt;")); // first frame is encoded
-            Assert.assertTrue(source.contains("&lt;iframe srcdoc=&quot;&amp;lt;html&amp;gt;&amp;lt;head&amp;gt;&amp;gt;&amp;lt;/head&amp;gt;&amp;lt;body&amp;gt;\n" +
+            Assert.assertTrue(source.contains("&lt;iframe srcdoc=&quot;&amp;lt;html&amp;gt;&amp;lt;head&amp;gt;&amp;lt;/head&amp;gt;&amp;lt;body&amp;gt;\n" +
                     "\t\t\t\t&amp;lt;input id=&amp;quot;textInIFrameWithValue3")); // second frame is double encoded
-            Assert.assertTrue(source.contains("&amp;lt;iframe srcdoc=&amp;quot;&amp;amp;lt;html&amp;amp;gt;&amp;amp;lt;head&amp;amp;gt;&amp;amp;gt;&amp;amp;lt;/head&amp;amp;gt;&amp;amp;lt;body&amp;amp;gt;\n" +
+            Assert.assertTrue(source.contains("&amp;lt;iframe srcdoc=&amp;quot;&amp;amp;lt;html&amp;amp;gt;&amp;amp;lt;head&amp;amp;gt;&amp;amp;lt;/head&amp;amp;gt;&amp;amp;lt;body&amp;amp;gt;\n" +
                     "\t\t\t\t&amp;amp;lt;input id=&amp;amp;quot;textInIFrameWithValue2")); // third frame is triple encoded
         }
     }
@@ -198,11 +198,11 @@ public class TestCdpPageHtmlSnapshot extends MockitoTest {
                     """);
 
             String source = new CdpPageHtmlSnapshot(driver).getFullPageSource();
-            Assert.assertTrue(source.contains("<iframe srcdoc=\"&lt;html&gt;&lt;head&gt;&gt;&lt;/head&gt;&lt;body&gt;\n" +
+            Assert.assertTrue(source.contains("<iframe srcdoc=\"&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;\n" +
                     "\t\t\t\t&lt;input id=&quot;textInIFrame&quot;&gt;")); // first frame is encoded
-            Assert.assertTrue(source.contains("&lt;iframe srcdoc=&quot;&amp;lt;html&amp;gt;&amp;lt;head&amp;gt;&amp;gt;&amp;lt;/head&amp;gt;&amp;lt;body&amp;gt;\n" +
+            Assert.assertTrue(source.contains("&lt;iframe srcdoc=&quot;&amp;lt;html&amp;gt;&amp;lt;head&amp;gt;&amp;lt;/head&amp;gt;&amp;lt;body&amp;gt;\n" +
                     "\t\t\t\t&amp;lt;input id=&amp;quot;textInIFrameWithValue3")); // sub frame is double encoded
-            Assert.assertTrue(source.contains("<iframe srcdoc=\"&lt;html&gt;&lt;head&gt;&gt;&lt;/head&gt;&lt;body&gt;\n" +
+            Assert.assertTrue(source.contains("<iframe srcdoc=\"&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;\n" +
                     "\t\t\t\t&lt;input id=&quot;textInIFrameWithValue2")); // second frame is encoded
         }
     }
@@ -293,11 +293,11 @@ public class TestCdpPageHtmlSnapshot extends MockitoTest {
                     """);
 
             String source = new CdpPageHtmlSnapshot(driver).getFullPageSource();
-            Assert.assertTrue(source.contains("<iframe srcdoc=\"&lt;html&gt;&lt;head&gt;&gt;&lt;/head&gt;&lt;body&gt;\n" +
+            Assert.assertTrue(source.contains("<iframe srcdoc=\"&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;\n" +
                     "\t\t\t\t&lt;input id=&quot;textInIFrame&quot;&gt;")); // first frame is encoded
-            Assert.assertTrue(source.contains("&lt;iframe srcdoc=&quot;&amp;lt;html&amp;gt;&amp;lt;head&amp;gt;&amp;gt;&amp;lt;/head&amp;gt;&amp;lt;body&amp;gt;\n" +
+            Assert.assertTrue(source.contains("&lt;iframe srcdoc=&quot;&amp;lt;html&amp;gt;&amp;lt;head&amp;gt;&amp;lt;/head&amp;gt;&amp;lt;body&amp;gt;\n" +
                     "\t\t\t\t&amp;lt;input id=&amp;quot;textInIFrameWithValue3")); // first sub frame is double encoded
-            Assert.assertTrue(source.contains("&lt;iframe srcdoc=&quot;&amp;lt;html&amp;gt;&amp;lt;head&amp;gt;&amp;gt;&amp;lt;/head&amp;gt;&amp;lt;body&amp;gt;\n" +
+            Assert.assertTrue(source.contains("&lt;iframe srcdoc=&quot;&amp;lt;html&amp;gt;&amp;lt;head&amp;gt;&amp;lt;/head&amp;gt;&amp;lt;body&amp;gt;\n" +
                     "\t\t\t\t&amp;lt;input id=&amp;quot;textInIFrameWithValue2")); // second sub frame is double encoded
         }
     }

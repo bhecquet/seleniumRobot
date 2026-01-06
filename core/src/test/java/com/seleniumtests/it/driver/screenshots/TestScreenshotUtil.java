@@ -264,7 +264,7 @@ public class TestScreenshotUtil extends ReporterTest {
 		
 		String secondWindowCode = FileUtils.readFileToString(htmlFiles[1], StandardCharsets.UTF_8);
 		Assert.assertFalse(secondWindowCode.contains("<h3>Test clicking an element</h3>"));
-		Assert.assertTrue(secondWindowCode.contains("<a href=\"http://www.google.fr\" id=\"linkIFrame\" target=\"_blank\">My link in IFrame</a>"));
+		Assert.assertTrue(secondWindowCode.contains("<a href=\"http://www.google.fr/\" id=\"linkIFrame\" target=\"_blank\">My link in IFrame</a>"));
 		
 		File[] imgFiles = resultDir.resolve("screenshots")
 				.toFile()

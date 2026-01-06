@@ -87,7 +87,7 @@ public class CdpPageHtmlSnapshot {
         Matcher matcher = pattern.matcher(frameContent);
 
         // remove meta tag that is added by chrome
-        frameContent = frameContent.replaceAll("<meta[^>]*+", "");
+        frameContent = frameContent.replaceAll("<meta[^>]*+>", "");
 
         while (matcher.find()) {
             String frameId = matcher.group(1);
