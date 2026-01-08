@@ -27,7 +27,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +60,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	public GetRequest getAliveRequestHttps;
 	
 	@Mock
-	public HttpResponse responseHttps;
+	public HttpResponse<String> responseHttps;
 
 	@BeforeMethod(groups= {"ut"})
 	public void init(final ITestContext testNGCtx) {
@@ -241,6 +240,50 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		verify(variablesRequest, never()).queryString(eq("reservationDuration"), anyInt());
 		verify(variablesRequest, never()).queryString(eq("name"), anyString());
 		verify(variablesRequest, never()).queryString(eq("value"), anyString());
+	}
+
+	/**
+	 * Check the case where variable from linked application overlap a variable from tested application
+	 */
+	@Test(groups= {"ut"})
+	public void testGetVariablesWithLinkedApplication() throws UnirestException {
+
+		configureMockedVariableServerConnection();
+		variablesRequest = (GetRequest) createServerMock(SERVER_URL, "GET", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, """
+		[{'id': 1, 'name': 'key1', 'value': 'value1', 'reservable': false},
+		{'id': 2, 'name': 'key2', 'value': 'value2', 'reservable': true, 'application': 1},
+		{'id': 3, 'name': 'app2.key2', 'value': 'value3', 'reservable': true, 'application': 2}
+		]""");
+
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		Map<String, TestVariable> variables = connector.getVariables();
+		Assert.assertEquals(variables.size(), 3);
+		Assert.assertEquals(variables.get("key1").getValue(), "value1");
+		Assert.assertEquals(variables.get("key2").getValue(), "value2");
+		Assert.assertEquals(variables.get("app2.key2").getValue(), "value3");
+	}
+
+	/**
+	 * Check the case where variable from linked application does not overlap a variable from tested application
+	 * In this case, variable from linked application is accessible with '<app>.<var>' and '<var>'
+	 */
+	@Test(groups= {"ut"})
+	public void testGetVariablesWithLinkedApplication2() throws UnirestException {
+
+		configureMockedVariableServerConnection();
+		variablesRequest = (GetRequest) createServerMock(SERVER_URL, "GET", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, """
+		[{'id': 1, 'name': 'key1', 'value': 'value1', 'reservable': false},
+		{'id': 2, 'name': 'key2', 'value': 'value2', 'reservable': true, 'application': 1},
+		{'id': 3, 'name': 'app2.key3', 'value': 'value3', 'reservable': true, 'application': 2}
+		]""");
+
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		Map<String, TestVariable> variables = connector.getVariables();
+		Assert.assertEquals(variables.size(), 4);
+		Assert.assertEquals(variables.get("key1").getValue(), "value1");
+		Assert.assertEquals(variables.get("key2").getValue(), "value2");
+		Assert.assertEquals(variables.get("key3").getValue(), "value3");
+		Assert.assertEquals(variables.get("app2.key3").getValue(), "value3");
 	}
 
 	/**

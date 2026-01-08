@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
+import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import org.apache.logging.log4j.Logger;
 
 import com.seleniumtests.customexception.ConfigurationException;
@@ -35,7 +36,7 @@ public class TestVariable {
 	private static final Logger logger = SeleniumRobotLogger.getLogger(TestVariable.class);
 	public static final String TEST_VARIABLE_PREFIX = "custom.test.variable.";
 	public static final int TIME_TO_LIVE_INFINITE = -1; // value for saying that varible will never be deleted
-	private final Integer id;
+	private Integer id;
 	private String name;
 	private String internalName;	// name of the variable as stored in variable server. For variables added by test, a prefix is prepended for storage
 									// this prefix is not visible to user.
@@ -43,6 +44,8 @@ public class TestVariable {
 	private final LocalDateTime creationDate;
 	private boolean reservable;
 	private int timeToLive;
+	private Integer application;
+	private String applicationName;
 	
 	
 	/**
@@ -57,6 +60,10 @@ public class TestVariable {
 	}
 	
 	public TestVariable(Integer id, String name, String value, boolean reservable, String internalName, int timeToLive, LocalDateTime creationDate) {
+		this(id, name, value, reservable, internalName, timeToLive, creationDate, null);
+	}
+
+	public TestVariable(Integer id, String name, String value, boolean reservable, String internalName, int timeToLive, LocalDateTime creationDate, Integer application) {
 		this.id = id;
 		this.name = name;
 		this.internalName = internalName;
@@ -64,6 +71,7 @@ public class TestVariable {
 		this.reservable = reservable;
 		this.timeToLive = timeToLive;
 		this.creationDate = creationDate;
+		this.application = application;
 	}
 	
 	/**
@@ -74,8 +82,15 @@ public class TestVariable {
 	public TestVariable(String name, String value) {
 		this(null, name, value, false, name, TIME_TO_LIVE_INFINITE, null);
 	}
-	
-	public static TestVariable fromJsonObject(JSONObject variableJson) {
+
+	/**
+	 * creates a TestVariable from JSON
+	 * @param variableJson				the JSON to parse
+	 * @param currentApplication		the current application ID. Used to see if the variable is from current application or not
+	 * @param currentApplicationName	the current application name. Used to see if the variable is from current application or not
+	 * @return	the variable
+	 */
+	public static TestVariable fromJsonObject(JSONObject variableJson, int currentApplication, String currentApplicationName) throws ConfigurationException {
 		String name = variableJson.getString("name").replace(TEST_VARIABLE_PREFIX, "");
 		LocalDateTime creationDate;
 		try {
@@ -84,13 +99,41 @@ public class TestVariable {
 			creationDate = null;
 		}
 		
-		return new TestVariable(variableJson.getInt("id"), 
+		TestVariable variable = new TestVariable(variableJson.optInt("id", -1),
 							name, 
 							variableJson.getString("value"),
 							variableJson.optBoolean("reservable", false),
 							variableJson.getString("name"),
 							variableJson.optInt("timeToLive", TIME_TO_LIVE_INFINITE),
-							creationDate);
+							creationDate,
+							variableJson.optInt("application", -1)
+		);
+		if (variable.getId() == -1) {
+			variable.setId(null);
+		}
+		if (variable.application == -1) {
+			variable.application = null;
+		} else if (variable.application == currentApplication) {
+			variable.applicationName = currentApplicationName;
+		// in case variable is from a linked application, it's name is prefixed with application name
+		} else {
+			variable.applicationName = variable.name.split("\\.", 2)[0];
+		}
+
+		return variable;
+	}
+
+	public TestVariable copy(String newName) {
+		TestVariable variableCopy = new TestVariable(id,
+				newName,
+				value,
+				reservable,
+				internalName,
+				timeToLive,
+				creationDate,
+				application);
+		variableCopy.applicationName = applicationName;
+		return variableCopy;
 	}
 	
 	public void setValue(String newValue) {
@@ -103,6 +146,14 @@ public class TestVariable {
 
 	public Integer getId() {
 		return id;
+	}
+
+	public Integer getApplication() {
+		return application;
+	}
+
+	public String getApplicationName() {
+		return applicationName;
 	}
 
 	public String getName() {
@@ -150,6 +201,14 @@ public class TestVariable {
 
 	public void setTimeToLive(int timeToLive) {
 		this.timeToLive = timeToLive;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public void setApplication(Integer id) {
+		this.application = id;
 	}
 
 	@Override

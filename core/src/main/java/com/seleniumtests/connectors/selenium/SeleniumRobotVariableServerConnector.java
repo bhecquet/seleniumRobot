@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,12 +17,10 @@
  */
 package com.seleniumtests.connectors.selenium;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.SeleniumRobotServer404Exception;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
@@ -98,8 +96,7 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	 * The custom variable will always take precedence over the regular variable because we assume that if a custom.test.variable has been created in a script,
 	 * this value is the one we need in the next execution.
 	 *
-	 * @param variablesOlderThanDays number of days since this variable should be created before it can be returned. This only applies to variables which have a time to live (a.k.a: where destroyAfterDays parameter is > 0) 
-	 * @return
+	 * @param variablesOlderThanDays number of days since this variable should be created before it can be returned. This only applies to variables which have a time to live (a.k.a: where destroyAfterDays parameter is > 0)
 	 */
 	public Map<String, TestVariable> getVariables(Integer variablesOlderThanDays, int variablesReservationDuration) {
 		return getVariables(variablesOlderThanDays, null, null, true, variablesReservationDuration);
@@ -116,7 +113,6 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	 * @param name							name of the variables to retrieve. If given, only one variable will be get because server only returns one variable for each name
 	 * @param value							value of the variables to retrieve
 	 * @param reserve						if true, reserve the reservable variables, else, only return searched variables
-	 * @return
 	 */
 	public Map<String, TestVariable> getVariables(Integer variablesOlderThanDays, String name, String value, boolean reserve) {
 		return getVariables(variablesOlderThanDays, name, value, reserve, -1);
@@ -133,7 +129,6 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	 * @param value							value of the variables to retrieve
 	 * @param reserve						if true, reserve the reservable variables, else, only return searched variables
 	 * @param variablesReservationDuration	Number of seconds a reservable variable will be reserved
-	 * @return
 	 */
 	public Map<String, TestVariable> getVariables(Integer variablesOlderThanDays, String name, String value, boolean reserve, int variablesReservationDuration) {
 		if (!active) {
@@ -164,21 +159,38 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 			JSONArray variablesJson = getJSonArray(request);
 			
 			Map<String, TestVariable> variables = new HashMap<>();
+			List<TestVariable> linkedVariables = new ArrayList<>();
+
 			for (int i=0; i < variablesJson.length(); i++) {
-				TestVariable variable = TestVariable.fromJsonObject(variablesJson.getJSONObject(i));
-				
+				TestVariable variable = TestVariable.fromJsonObject(variablesJson.getJSONObject(i), applicationId, SeleniumTestsContextManager.getApplicationName());
+
 				if (varNames.contains(variable.getName())) {
 					// overwrite if this variable is a custom one and the already recorded is a regular
 					if (variable.getInternalName().startsWith(TestVariable.TEST_VARIABLE_PREFIX)) {
 						variables.put(variable.getName(), variable);
 					}
 
-					logger.warn(String.format("variable %s has already been get. Check no custom (added by test script) variable has the same name as a regular one", variable.getName()));
+					logger.warn("variable {} has already been get. Check no custom (added by test script) variable has the same name as a regular one", variable.getName());
 				} else {
 					variables.put(variable.getName(), variable);
 					varNames.add(variable.getName());
 				}
+
+				if (variable.getApplication() != null && !Objects.equals(variable.getApplication(), applicationId)) {
+					linkedVariables.add(variable);
+				}
 			}
+
+			// handle linked variables. They will be added without the application prefix if this name does not overlap an existing name
+			for (TestVariable linkedVariable : linkedVariables) {
+				String newName = linkedVariable.getName().replaceFirst(linkedVariable.getApplicationName() + "\\.", "");
+				if (variables.containsKey(newName)) {
+					logger.info("Variable {} overlaps with existing variable {}", linkedVariable.getName(), newName);
+				} else {
+					variables.put(newName, linkedVariable.copy(newName));
+				}
+			}
+
 			return variables;
 			
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
@@ -188,8 +200,7 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	
 	/**
 	 * convert Map<String, TestVariable> to Map<String, String>
-	 * @param rawVariables
-	 * @return
+	 * @param rawVariables	the variable map
 	 */
 	public static Map<String, String> convertRawTestVariableMapToKeyValuePairs(Map<String, TestVariable> rawVariables) {
 		Map<String, String> variables = new HashMap<>();
@@ -201,7 +212,7 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	
 	/**
 	 * Each variable marked as reservable is unreserved
-	 * @param variables
+	 * @param variables	list of variables to unreserve
 	 */
 	public void unreserveVariables(List<TestVariable> variables) {
 		for (TestVariable variable: variables) {
@@ -212,10 +223,10 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	private void unreserveVariable(TestVariable variable) {
 		if (variable.isReservable() && variable.getId() != null) {
 			try {
-				getJSonResponse(buildPatchRequest(String.format(url + EXISTING_VARIABLE_API_URL, variable.getId()))
+				getJSonResponse(buildPatchRequest(String.format("%s" + EXISTING_VARIABLE_API_URL, url, variable.getId()))
 						.field("releaseDate", ""));
 			} catch (UnirestException e) {
-				logger.warn("variable could not be unreserved, server will do it automatically after reservation period: " + e.getMessage());
+				logger.warn("variable could not be unreserved, server will do it automatically after reservation period: {}", e.getMessage());
 			}
 		}
 	}
@@ -255,23 +266,21 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 
 	/**
 	 * Update variable on the server
-	 * @param variable
-	 * @return
+	 * @param variable	variable to update
 	 */
 	private TestVariable updateVariable(TestVariable variable) {
-		JSONObject variableJson = getJSonResponse(buildPatchRequest(String.format(url + EXISTING_VARIABLE_API_URL, variable.getId()))
+		JSONObject variableJson = getJSonResponse(buildPatchRequest(String.format("%s" + EXISTING_VARIABLE_API_URL, url, variable.getId()))
 				.field(FIELD_VALUE, variable.getValue())
 				.field(FIELD_RESERVABLE, String.valueOf(variable.isReservable()))
 				.field(FIELD_TIME_TO_LIVE, String.valueOf(variable.getTimeToLive())));
 		
-		return TestVariable.fromJsonObject(variableJson);
+		return TestVariable.fromJsonObject(variableJson, applicationId, SeleniumTestsContextManager.getApplicationName());
 	}
 
 	/**
 	 * Deletes the variable in parameter
 	 * Server will forbid deleting non custom variables
-	 * @param variable
-	 * @return
+	 * @param variable	variable to delete
 	 */
 	public void deleteVariable(TestVariable variable) {
 		if (variable.getId() == null) {
@@ -280,7 +289,7 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 		}
 
 		try {
-			getStringResponse(buildDeleteRequest(String.format(url + EXISTING_VARIABLE_API_URL, variable.getId())));
+			getStringResponse(buildDeleteRequest(String.format("%s" + EXISTING_VARIABLE_API_URL, url, variable.getId())));
 		} catch (UnirestException | SeleniumRobotServerException e) {
 			logger.error(String.format("Cannot delete variable %s", variable.getName()), e);
 		}
@@ -288,9 +297,8 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 
 	/**
 	 * create the variable on the server
-	 * @param variable
-	 * @param specificToVersion
-	 * @return
+	 * @param variable				variable to create
+	 * @param specificToVersion		whether this variable is specific to this version of tests
 	 */
 	private TestVariable createVariable(TestVariable variable, boolean specificToVersion) {
 		MultipartBody request = buildPostRequest(url + VARIABLE_API_URL)
@@ -308,6 +316,6 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 		
 		JSONObject variableJson = getJSonResponse(request);
 		
-		return TestVariable.fromJsonObject(variableJson);
+		return TestVariable.fromJsonObject(variableJson, applicationId, SeleniumTestsContextManager.getApplicationName());
 	}
 }

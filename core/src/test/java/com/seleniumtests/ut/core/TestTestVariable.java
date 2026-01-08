@@ -52,13 +52,83 @@ public class TestTestVariable extends GenericTest {
 		jsonObject.put("application", 2);
 		jsonObject.put("version", 3);
 		
-		TestVariable variable = TestVariable.fromJsonObject(jsonObject);
+		TestVariable variable = TestVariable.fromJsonObject(jsonObject, 2, "core");
 		Assert.assertEquals(variable.getId(), (Integer)1);
 		Assert.assertEquals(variable.getName(), "key");
 		Assert.assertEquals(variable.getValue(), "value");
         Assert.assertFalse(variable.isReservable());
 		Assert.assertEquals(variable.getInternalName(), "key");
+		Assert.assertEquals(variable.getApplication(), 2);
+		Assert.assertEquals(variable.getApplicationName(), "core");
 		Assert.assertNull(variable.getCreationDate());
+	}
+
+	@Test(groups={"ut"})
+	public void testFromJSonApplicationNull() {
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("id", 1);
+		jsonObject.put("name", "key");
+		jsonObject.put("value", "value");
+		jsonObject.put("reservable", false);
+		jsonObject.put("environment", 1);
+		jsonObject.put("version", 3);
+
+		TestVariable variable = TestVariable.fromJsonObject(jsonObject, 2, "core");
+		Assert.assertNull(variable.getApplication());
+		Assert.assertNull(variable.getApplicationName());
+	}
+
+	@Test(groups={"ut"})
+	public void testFromJSonIdNull() {
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("name", "key");
+		jsonObject.put("value", "value");
+		jsonObject.put("reservable", false);
+		jsonObject.put("environment", 1);
+		jsonObject.put("application", 2);
+		jsonObject.put("version", 3);
+
+		TestVariable variable = TestVariable.fromJsonObject(jsonObject, 2, "core");
+		Assert.assertNull(variable.getId());
+	}
+
+	/**
+	 * When variable is from a linked application, it's name contains the application
+	 */
+	@Test(groups={"ut"})
+	public void testFromJSonWithLinkedVariable() {
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("id", 1);
+		jsonObject.put("name", "app1.key");
+		jsonObject.put("value", "value");
+		jsonObject.put("reservable", false);
+		jsonObject.put("environment", 1);
+		jsonObject.put("application", 3);
+		jsonObject.put("version", 3);
+
+		TestVariable variable = TestVariable.fromJsonObject(jsonObject, 2, "core");
+		Assert.assertEquals(variable.getName(), "app1.key");
+		Assert.assertEquals(variable.getInternalName(), "app1.key");
+		Assert.assertEquals(variable.getApplication(), 3);
+		Assert.assertEquals(variable.getApplicationName(), "app1");
+	}
+
+	@Test(groups={"ut"})
+	public void testFromJSonWithLinkedVariable2() {
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("id", 1);
+		jsonObject.put("name", "app1.key.subkey");
+		jsonObject.put("value", "value");
+		jsonObject.put("reservable", false);
+		jsonObject.put("environment", 1);
+		jsonObject.put("application", 3);
+		jsonObject.put("version", 3);
+
+		TestVariable variable = TestVariable.fromJsonObject(jsonObject, 2, "core");
+		Assert.assertEquals(variable.getName(), "app1.key.subkey");
+		Assert.assertEquals(variable.getInternalName(), "app1.key.subkey");
+		Assert.assertEquals(variable.getApplication(), 3);
+		Assert.assertEquals(variable.getApplicationName(), "app1");
 	}
 	
 	/**
@@ -76,7 +146,7 @@ public class TestTestVariable extends GenericTest {
 		jsonObject.put("version", 3);
 		jsonObject.put("creationDate", "2018-07-12T08:42:56.156727Z");
 		
-		TestVariable variable = TestVariable.fromJsonObject(jsonObject);
+		TestVariable variable = TestVariable.fromJsonObject(jsonObject, 2, "core");
 		Assert.assertEquals(variable.getId(), (Integer)1);
 		Assert.assertEquals(variable.getName(), "key");
 		Assert.assertEquals(variable.getValue(), "value");
@@ -96,7 +166,7 @@ public class TestTestVariable extends GenericTest {
 		jsonObject.put("application", 2);
 		jsonObject.put("version", 3);
 		
-		TestVariable variable = TestVariable.fromJsonObject(jsonObject);
+		TestVariable variable = TestVariable.fromJsonObject(jsonObject, 2, "core");
 		Assert.assertEquals(variable.getId(), (Integer)1);
 		Assert.assertEquals(variable.getName(), "key");
 		Assert.assertEquals(variable.getValue(), "value");
