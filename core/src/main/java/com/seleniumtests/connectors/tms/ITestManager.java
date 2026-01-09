@@ -1,10 +1,7 @@
 package com.seleniumtests.connectors.tms;
 
-import com.seleniumtests.core.TestVariable;
-import com.seleniumtests.core.utils.TestNGResultUtils;
 import org.json.JSONObject;
 import org.testng.ITestResult;
-import org.testng.annotations.CustomAttribute;
 
 public interface ITestManager {
 
@@ -27,4 +24,9 @@ public interface ITestManager {
     Integer getTestCaseId(ITestResult testNGResult);
 
     Integer getDatasetId(ITestResult testNGResult);
+
+    /**
+     * returns the URL to access the test case
+     */
+    String getTestCaseUrl(ITestResult testResult);
 }

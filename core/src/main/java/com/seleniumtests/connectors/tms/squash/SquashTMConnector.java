@@ -109,6 +109,16 @@ public class SquashTMConnector extends TestManager {
 		return "squash";
 	}
 
+	@Override
+	public String getTestCaseUrl(ITestResult testResult) {
+		Integer testCaseId = getTestCaseId(testResult);
+		if (testCaseId != null) {
+			return String.format("%s/test-case-workspace/test-case/%d", serverUrl, testCaseId);
+		} else {
+			return null;
+		}
+	}
+
 	public SquashTMApi getApi() {
 		if (api == null) {
 			if (user == null) {
@@ -128,7 +138,7 @@ public class SquashTMConnector extends TestManager {
 			Project project = Project.get(projectName);
 			Integer testId = getTestCaseId(testResult);
 			if (testId == null) {
-				logger.warn("Results won't be recorded, no testId configured for " + TestNGResultUtils.getTestName(testResult));
+				logger.warn("Results won't be recorded, no testId configured for {}", TestNGResultUtils.getTestName(testResult));
 				return;
 			}
 			Integer datasetId = getDatasetId(testResult);
@@ -184,6 +194,8 @@ public class SquashTMConnector extends TestManager {
 			logger.error(String.format("Could not record result for test method %s: %s", TestNGResultUtils.getTestName(testResult), e.getMessage()));
 		}
 	}
+
+
 
 	@Override
 	public void recordResultFiles(ITestResult testResult) {

@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,8 +17,6 @@
  */
 package com.seleniumtests.connectors.tms;
 
-import com.seleniumtests.uipage.htmlelements.select.ISelectList;
-import org.apache.commons.collections4.ListUtils;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -78,7 +76,7 @@ public abstract class TestManager implements ITestManager {
     			try {
     				return Integer.parseInt(customAttribute.values()[0]);
     			} catch (NumberFormatException e) {
-    				logger.error(String.format("Could not parse %s as int for getting testId of test method %s", customAttribute.values()[0], testNGResult.getMethod().getMethodName()));
+    				logger.error("Could not parse {} as int for getting testId of test method {}", customAttribute.values()[0], testNGResult.getMethod().getMethodName());
     			}
     		}
     	}
@@ -148,5 +146,13 @@ public abstract class TestManager implements ITestManager {
 	public boolean getInitialized() {
 		return initialized;
 	}
+
+	// in case TestManager loaded via service provider does not define it
+	@Override
+	public String getTestCaseUrl(ITestResult testResult) {
+		return "N/A";
+	}
+
+
 
 }

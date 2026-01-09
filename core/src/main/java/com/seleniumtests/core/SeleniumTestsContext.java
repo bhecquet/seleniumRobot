@@ -1098,10 +1098,10 @@ public class SeleniumTestsContext {
 
     	// add core reporter classes
 		userDefinedClasses.add(BugTrackerReporter.class);
+        userDefinedClasses.add(TestManagerReporter.class);
+        userDefinedClasses.add(CustomReporter.class);
     	userDefinedClasses.add(SeleniumTestsReporter2.class);
-    	userDefinedClasses.add(TestManagerReporter.class);
 		userDefinedClasses.add(SeleniumRobotServerTestRecorder.class);
-		userDefinedClasses.add(CustomReporter.class);
     	
 		userDefinedClasses.addAll((List<Class<?>>) getAttribute(REPORTER_PLUGIN_CLASSES));
     	

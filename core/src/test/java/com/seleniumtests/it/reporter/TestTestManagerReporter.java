@@ -1,14 +1,14 @@
 /**
- * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Original work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,6 +35,8 @@ import com.seleniumtests.connectors.tms.squash.SquashTMConnector;
 import com.seleniumtests.core.contexts.TestManagerContext;
 import com.seleniumtests.customexception.ConfigurationException;
 
+import java.io.IOException;
+
 public class TestTestManagerReporter extends ReporterTest {
 
 
@@ -55,12 +57,12 @@ public class TestTestManagerReporter extends ReporterTest {
 	
 
 	private SquashTMConnector squash;
-	MockedStatic mockedCampaign;
-	MockedStatic mockedIteration;
-	MockedStatic mockedProject;
+	MockedStatic<Campaign> mockedCampaign;
+	MockedStatic<Iteration> mockedIteration;
+	MockedStatic<Project> mockedProject;
 
 	@BeforeMethod(groups={"it"})
-	public void initTestManager() throws Exception {
+	public void initTestManager() {
 
 		mockedCampaign = mockStatic(Campaign.class);
 		mockedIteration = mockStatic(Iteration.class);
@@ -83,11 +85,10 @@ public class TestTestManagerReporter extends ReporterTest {
 
 	/**
 	 * Record tests results with tests that have test ID, and other that have testId and datasetId
-	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testResultIsRecorded() throws Exception {
-		try (MockedConstruction mockedSquash = mockConstruction(SquashTMConnector.class,
+	public void testResultIsRecorded() throws IOException {
+		try (MockedConstruction<SquashTMConnector> mockedSquash = mockConstruction(SquashTMConnector.class,
 				withSettings().defaultAnswer(CALLS_REAL_METHODS),
 				(mock, context) -> {
 			doReturn(api).when(mock).getApi();
@@ -108,7 +109,17 @@ public class TestTestManagerReporter extends ReporterTest {
 			verify(api).setExecutionResult(iterationTestPlanItem, TestPlanItemExecution.ExecutionStatus.FAILURE, "error");
 			verify(api).setExecutionResult(eq(iterationTestPlanItem), eq(TestPlanItemExecution.ExecutionStatus.FAILURE), contains("fail"));
 			verify(api).setExecutionResult(iterationTestPlanItem, TestPlanItemExecution.ExecutionStatus.BLOCKED);
-			
+
+			// check summary report and detailed reports contain the link to test manager
+			String mainReportContent = readSummaryFile();
+			Assert.assertTrue(mainReportContent.contains("<td class=\"info\"><a href=\"http://localhost:1234/test-case-workspace/test-case/12\">12</a></td>"));
+			Assert.assertTrue(mainReportContent.contains("<td class=\"info\"><a href=\"http://localhost:1234/test-case-workspace/test-case/13\">13</a></td>"));
+			Assert.assertTrue(mainReportContent.contains("<td class=\"info\"><a href=\"http://localhost:1234/test-case-workspace/test-case/14\">14</a></td>"));
+			Assert.assertTrue(mainReportContent.contains("<td class=\"info\"><a href=\"http://localhost:1234/test-case-workspace/test-case/15\">15</a></td>"));
+
+			String testOkDetailedReport = readTestMethodResultFile("testAndSubActions");
+			Assert.assertTrue(testOkDetailedReport.contains("<th>TestCase</th><td><a href=\"http://localhost:1234/test-case-workspace/test-case/12\">12</a></td>"));
+
 		} finally {
 			System.clearProperty(TestManagerContext.TMS_TYPE);
 			System.clearProperty(TestManagerContext.TMS_PROJECT);
@@ -119,8 +130,8 @@ public class TestTestManagerReporter extends ReporterTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testResultIsNotRecordedServerUnavailable() throws Exception {
-		try (MockedConstruction mockedSquash = mockConstruction(SquashTMConnector.class,
+	public void testResultIsNotRecordedServerUnavailable() {
+		try (MockedConstruction<SquashTMConnector> mockedSquash = mockConstruction(SquashTMConnector.class,
 				withSettings().defaultAnswer(CALLS_REAL_METHODS),
 				(mock, context) -> {
 					doThrow(new ConfigurationException("Cannot contact Squash TM server API")).when(mock).getApi();
@@ -146,8 +157,8 @@ public class TestTestManagerReporter extends ReporterTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testResultIsNotRecordedServerNotConfigured() throws Exception {
-		try (MockedConstruction mockedSquash = mockConstruction(SquashTMConnector.class,
+	public void testResultIsNotRecordedServerNotConfigured() {
+		try (MockedConstruction<SquashTMConnector> mockedSquash = mockConstruction(SquashTMConnector.class,
 				withSettings().defaultAnswer(CALLS_REAL_METHODS),
 				(mock, context) -> {
 					doReturn(api).when(mock).getApi();
@@ -172,8 +183,8 @@ public class TestTestManagerReporter extends ReporterTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testResultIsNotRecordedWrongTestId() throws Exception {
-		try (MockedConstruction mockedSquash = mockConstruction(SquashTMConnector.class,
+	public void testResultIsNotRecordedWrongTestId() {
+		try (MockedConstruction<SquashTMConnector> mockedSquash = mockConstruction(SquashTMConnector.class,
 				withSettings().defaultAnswer(CALLS_REAL_METHODS),
 				(mock, context) -> {
 					doReturn(api).when(mock).getApi();
