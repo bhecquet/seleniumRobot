@@ -430,15 +430,18 @@ public class JiraConnector extends BugTracker {
 		
 		jiraBean.getCustomFields().forEach((fieldName, fieldValue) -> {
             if (fieldInfos.get(fieldName) != null && fields.get(fieldName) != null) {
-            	if ("option".equals(fields.get(fieldName).getSchema().getType())) {
-        			CustomFieldOption option = getOptionForField(fieldInfos, fieldName, fieldValue);
-        			if (option == null) {
-        				logger.warn(String.format("Value %s for field %s does not exist", fieldValue, fieldName));
-        			} else {
-        				issueBuilder.setFieldValue(fields.get(fieldName).getId(), option);
-        			}
-            				
-            	} else if ("string".equals(fields.get(fieldName).getSchema().getType())) {
+				String fieldType = fields.get(fieldName).getSchema().getType();
+				if ("option".equals(fieldType)) {
+					CustomFieldOption option = getOptionForField(fieldInfos, fieldName, fieldValue);
+					if (option == null) {
+						logger.warn(String.format("Value %s for field %s does not exist", fieldValue, fieldName));
+					} else {
+						issueBuilder.setFieldValue(fields.get(fieldName).getId(), option);
+					}
+				} else if ("array".equals(fieldType)) {
+					CustomFieldOption option = getOptionForField(fieldInfos, fieldName, fieldValue);
+					issueBuilder.setFieldValue(fields.get(fieldName).getId(), List.of(option));
+            	} else if ("string".equals(fieldType)) {
             		issueBuilder.setFieldValue(fields.get(fieldName).getId(), fieldValue);
             	} else {
             		logger.warn(String.format("Field %s type cannot be handled", fieldName));
