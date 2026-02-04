@@ -124,7 +124,6 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	
 	/**
 	 * issue #414
-	 * @throws Exception
 	 */
 	@Test(groups="stub")
 	public void testDriverWithFailureAfterSwitchToFrame() {

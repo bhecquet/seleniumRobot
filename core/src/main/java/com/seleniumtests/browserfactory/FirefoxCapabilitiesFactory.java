@@ -24,7 +24,6 @@ import java.util.Map.Entry;
 
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxDriverLogLevel;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
@@ -192,7 +191,7 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
         		ProfilesIni init=new ProfilesIni();
         		return init.getProfile("default");
         	} else {
-        		logger.warn(String.format("Firefox profile %s could not be set", webDriverConfig.getFirefoxProfilePath()));
+        		logger.warn("Firefox profile {}} could not be set", webDriverConfig.getFirefoxProfilePath());
         	}
         }
         return new FirefoxProfile();
@@ -209,10 +208,10 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
         		options.setCapability(SeleniumRobotCapabilityType.FIREFOX_PROFILE, webDriverConfig.getFirefoxProfilePath());
         		return;
         	} else {
-        		logger.warn(String.format("Firefox profile %s could not be set", webDriverConfig.getFirefoxProfilePath()));
+        		logger.warn("Firefox profile {} could not be set", webDriverConfig.getFirefoxProfilePath());
         	}
-        } 		
-		
+        }
+
         configProfile(profile, webDriverConfig);
         ((FirefoxOptions)options).setProfile(profile);
 		

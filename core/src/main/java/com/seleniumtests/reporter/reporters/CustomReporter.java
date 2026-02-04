@@ -112,6 +112,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			String reportFormat = reportInfo.getExtension().substring(1);
 			Long testDuration = 0L;
 			int errors = 0;
+
 			int failures = 0;
 			String failedStep = "";
 			List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
@@ -210,6 +211,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			context.put("coreVersion", SeleniumTestsContextManager.getCoreVersion());	
 			context.put("parameters", seleniumTestsContext.getContextDataMap());
 			context.put("stacktrace", stack);
+			context.put("errorMessage", StringUtility.encodeString(ExceptionUtility.getExceptionMessage(testResult.getThrowable()).trim(), reportFormat.toLowerCase()));
 			context.put("failedStep", StringUtility.encodeString(failedStep, reportFormat.toLowerCase()));
 			context.put("pageLoadTimes", pageLoadTimes);
 			String testName = getTestName(testResult);

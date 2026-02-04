@@ -158,6 +158,7 @@ public class TestCustomReporter extends ReporterTest {
 		Assert.assertEquals(json.getInt("stepNumber"), 7);
 		Assert.assertEquals(json.getString("device"), "");
 		Assert.assertEquals(json.getInt("errors"), 0);
+		Assert.assertEquals(json.getString("errorMessage"), "");
 		Assert.assertEquals(json.getJSONArray("infos").length(), 1);
 		Assert.assertEquals(json.getJSONArray("infos").getJSONObject(0).getString("key"), "Last State");
 		Assert.assertEquals(json.getJSONArray("pageLoads").length(), 1);
@@ -166,7 +167,32 @@ public class TestCustomReporter extends ReporterTest {
 		Assert.assertEquals(json.getJSONArray("pageLoads").getJSONObject(0).getString("page"), "DriverTestPage");
 
 	}
-	
+
+	/**
+	 * Check detailed-result.json file is present and contains all requested data
+	 */
+	@Test(groups={"it"})
+	public void testStepReportForFailedTest() throws IOException {
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverFailed"});
+
+		// check content of the file. It should contain all fields with a value
+		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverFailed", "detailed-result.json").toFile(), StandardCharsets.UTF_8);
+		Assert.assertFalse(detailedReportContent.contains(":\\\\/")); // check step has not been double encoded
+		JSONObject json = new JSONObject(detailedReportContent);
+
+		Assert.assertEquals(json.getInt("failures"), 0);
+		Assert.assertEquals(json.getString("failedStep"), "_writeSomethingOnNonExistentElement");
+		Assert.assertEquals(json.getJSONArray("steps").length(), 9);
+		Assert.assertTrue(json.getJSONArray("steps").getJSONObject(6).getBoolean("failed"));
+		Assert.assertEquals(json.getInt("retries"), 0);
+		Assert.assertEquals(json.getInt("stepNumber"), 9);
+		Assert.assertEquals(json.getInt("errors"), 1);
+		Assert.assertEquals(json.getString("errorMessage"), "class org.openqa.selenium.NoSuchElementException: Searched element [TextFieldElement Text, by={By.id: text___}] from page 'com.seleniumtests.it.driver.support.pages.DriverTestPage' could not be found");
+		Assert.assertEquals(json.getJSONArray("infos").length(), 1);
+		Assert.assertEquals(json.getJSONArray("infos").getJSONObject(0).getString("key"), "Last State");
+
+	}
+
 	@Test(groups={"it"})
 	public void testDriverStatsInReport(ITestContext testContext) throws Exception {
 		

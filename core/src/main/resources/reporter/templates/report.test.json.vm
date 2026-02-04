@@ -7,6 +7,7 @@
 {
 	"gridnode": "$gridnode",
 	"errors": $errors,
+	"errorMessage": "$errorMessage",
 	"failures": $failures,
 	"hostname": "$hostname",
 	"name": "$suiteName",

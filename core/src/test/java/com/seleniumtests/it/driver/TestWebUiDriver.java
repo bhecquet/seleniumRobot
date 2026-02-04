@@ -93,7 +93,7 @@ public class TestWebUiDriver extends ReporterTest {
 	 * Test we can connect to a remote appium server (no local devices)
 	 */
 	@Test(groups={"it"})
-	public void testLocalAndroidDriverWithRemoteAppiumServer() throws Exception {
+	public void testLocalAndroidDriverWithRemoteAppiumServer() {
 
 		List<MobileDevice> deviceList = new ArrayList<>();
 
