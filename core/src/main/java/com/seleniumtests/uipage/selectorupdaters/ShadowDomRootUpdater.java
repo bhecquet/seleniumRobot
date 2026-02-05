@@ -14,7 +14,7 @@ public class ShadowDomRootUpdater implements SelectorUpdater {
      * Some selectors are not allowed as direct children of a Shadow root (tagName, xPath, name)
      * For xPath, we can't do anything as it's impossible to convert any xPath to its cssSelector equivalent
      * For name and tagName, we provide the equivalent cssSelector
-     *
+     * <p>
      * According to https://github.com/SeleniumHQ/selenium/issues/10025, By.tagName is not supported when searching an shadow root by tag name
      * @param element
      */
@@ -29,24 +29,24 @@ public class ShadowDomRootUpdater implements SelectorUpdater {
             element.setBy(by);
 
         // some selectors are not allowed inside by list (https://github.com/SeleniumHQ/selenium/issues/10025)
-        } else if (element.getBy() instanceof ByC.Shadow) {
+        } else if (element.getBy() instanceof ByC.Shadow shadow) {
             List<By> newBies = new ArrayList<>();
-            for (By shadowBy: ((ByC.Shadow)element.getBy()).getBies()) {
+            for (By shadowBy: shadow.getBies()) {
                 newBies.add(rewriteUnsupportedSelector(shadowBy));
             }
-            ((ByC.Shadow)element.getBy()).setBies(newBies.toArray(new By[]{}));
+            shadow.setBies(newBies.toArray(new By[]{}));
         }
     }
 
-    private static By rewriteUnsupportedSelector(By by) {
+    private By rewriteUnsupportedSelector(By by) {
         if (by instanceof By.ByXPath || by instanceof ByC.ByForcedXPath || (by instanceof ByC && !(by instanceof ByC.ByHasCssSelector))) {
             throw new ScenarioException(String.format("%s is not supported as a direct child of a shadow DOM as it uses XPath. Try to add an intermediate selector (e.g: By.tagName) before", by.getClass()));
         } else if (by instanceof By.ByTagName) {
             by = By.cssSelector(by.toString().split(":")[1].trim());
         } else if (by instanceof By.ByName) {
             by = By.cssSelector(String.format("[name=%s]", by.toString().split(":")[1].trim()));
-        } else if (by instanceof ByC.ByHasCssSelector) {
-            ((ByC.ByHasCssSelector) by).setUseCssSelector(true);
+        } else if (by instanceof ByC.ByHasCssSelector cssSelector) {
+           cssSelector.setUseCssSelector(true);
         }
         return by;
     }

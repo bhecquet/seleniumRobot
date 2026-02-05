@@ -26,8 +26,10 @@ public class DriverTestPageShadowDom extends PageObject {
 															.findElement(By.id("pass1InFrameShadow"));
 	
 	public static final HtmlElement shadowWithFrame = new HtmlElement("", ByC.shadow(By.id("shadow12")));
+	public static final FrameElement frameInShadowWithTagName = new FrameElement("", By.tagName("iframe"), shadowWithFrame); // to check selector is updated as tagName is not supported as direct child of shadow root
 	public static final FrameElement frameInShadow = new FrameElement("", By.id("frame11"), shadowWithFrame);
 	public static final HtmlElement divPassInShadowAndFrame = new HtmlElement("", By.id("pass1"), frameInShadow);
+	public static final HtmlElement divPassInShadowAndFrame2 = new HtmlElement("", By.id("pass1"), frameInShadowWithTagName);
 	public static final HtmlElement shadow4Parent = new HtmlElement("", By.id("shadow4Parent"));
 	public static final HtmlElement labelInShadowByTagName = new HtmlElement("", ByC.shadow(By.tagName("span")), shadow4Parent).findElement(By.tagName("label"));
 	public static final HtmlElement divPass3MultipleShadowTagName = new HtmlElement("", ByC.shadow(By.id("shadow5"), By.tagName("div"))).findElement(By.id("pass3Shadow"));

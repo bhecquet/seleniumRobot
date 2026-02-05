@@ -44,7 +44,6 @@ import org.openqa.selenium.By.ByXPath;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.InvalidElementStateException;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NoSuchFrameException;
 import org.openqa.selenium.OutputType;
@@ -938,6 +937,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 			}
 
 			try {
+				new ShadowDomRootUpdater().update(frameEl);
 				List<WebElement> frameElements = searchContext2.findElements(frameEl.getBy());
 				frameWebElement = frameEl.getElementByIndex(frameElements);
 			} catch (NoSuchElementException e) {

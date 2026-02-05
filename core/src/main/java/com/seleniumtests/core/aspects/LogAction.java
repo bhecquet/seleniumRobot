@@ -117,14 +117,21 @@ public class LogAction {
 	}
 	
 	@Around("execution(public * com.seleniumtests.uipage.PageObject+.* (..)) "
-			+ "|| execution(public * com.seleniumtests.uipage.htmlelements.HtmlElement+.* (..))")
+			+ "|| (execution(public * com.seleniumtests.uipage.htmlelements.HtmlElement+.* (..)) "
+			+ "&& !execution(public * com.seleniumtests.uipage.htmlelements.HtmlElement.getBy (..))"
+			+ "&& !execution(public * com.seleniumtests.uipage.htmlelements.HtmlElement.getDriver (..))"
+			+ "&& !execution(public * com.seleniumtests.uipage.htmlelements.HtmlElement.setDriver (..))"
+			+ "&& !execution(public * com.seleniumtests.uipage.htmlelements.HtmlElement.toString (..)))"
+			+ "|| execution(private * com.seleniumtests.uipage.htmlelements.HtmlElement.enterFrame (..)) "
+			+ "|| execution(* com.seleniumtests.uipage.selectorupdaters.SelectorUpdater+.* (..))"
+	)
 	public Object logDebug(ProceedingJoinPoint joinPoint) throws Throwable {
 		if (LogAction.indent.get(Thread.currentThread()) == null) {
 			LogAction.indent.put(Thread.currentThread(), 0);
 		}
 		
 		String currentIndent = StringUtils.repeat(" ", LogAction.indent.get(Thread.currentThread()));
-		logger.debug("{}Entering {}", currentIndent, joinPoint.getSignature());
+		logger.debug("{}Entering {}: {}", currentIndent, joinPoint.getSignature(), joinPoint.getArgs());
 		Object reply = null;
 		try {
 			LogAction.indent.put(Thread.currentThread(), LogAction.indent.get(Thread.currentThread()) + 2);

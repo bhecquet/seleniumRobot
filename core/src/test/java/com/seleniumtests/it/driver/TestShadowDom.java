@@ -205,4 +205,20 @@ public class TestShadowDom extends GenericTest {
 	public void testAccessFrameInShadowElement() {
 		Assert.assertEquals(DriverTestPageShadowDom.divPassInShadowAndFrame.getText(), "This is a DIV with the id of pass1");
 	}
+	/**
+	 * Frame is in a shadow element
+	 * This time, frame is initially searched by tagname which is forbidden under shadow root element, so check selector is rewritten
+	 */
+	@Test(groups={"it"})
+	public void testAccessFrameInShadowElementWithSelectorRewrite() {
+		Assert.assertEquals(DriverTestPageShadowDom.divPassInShadowAndFrame2.getText(), "This is a DIV with the id of pass1");
+	}
+
+	/**
+	 * Check selector rewrite when it's not supported under shadow root
+	 */
+	@Test(groups = "it")
+	public void testAccessElementByTagName() {
+		Assert.assertEquals(DriverTestPageShadowDom.labelInShadowByTagName.getText(), "Panda Unicorn");
+	}
 }
