@@ -541,6 +541,8 @@ For debugging a test, you can:
 - use -Ddebug=gui: it will outline an element before clicking on it or when searching if it's displayed or present. As it slows down the test (250 ms for each outline), use it only for demo.
 - use -Ddebug=network: it will enable download monitor for video
 
+If you want to activate core debugging inside unit tests, then you can launch it with `-DinternalDebug=true`
+
 ### 21 Customize driver behaviour ###
 
 Selenium provides way to extend driver behaviour on some events (clicking, exception, ...) through implementation of WebDriverEventListener interface.
