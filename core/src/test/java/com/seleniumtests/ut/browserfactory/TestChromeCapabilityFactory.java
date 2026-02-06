@@ -261,6 +261,8 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		Assert.assertTrue(prefs.get("download.default_directory").toString().contains("downloads"));
 		Assert.assertEquals(prefs.get("profile.password_manager_enabled"), false);
 		Assert.assertEquals(prefs.get("profile.password_manager_leak_detection"), false);
+		Assert.assertEquals(prefs.get("profile.default_content_setting_values.geolocation"), 1);
+		Assert.assertEquals(prefs.get("profile.default_content_setting_values.notifications"), 1);
 		Assert.assertNull(((Map<?,?>)((capa).asMap().get(ChromeOptions.CAPABILITY))).get("debuggerAddress")); // no debuger address set as we do not attach an existing browser
 	}
 	

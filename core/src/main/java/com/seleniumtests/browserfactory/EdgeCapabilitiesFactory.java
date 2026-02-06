@@ -65,7 +65,15 @@ public class EdgeCapabilitiesFactory extends ChromiumCapabilitiesFactory {
 								"download.default_directory",
 								downloadDir.toAbsolutePath().toString(),
 								"savefile.default_directory",
-								downloadDir.toAbsolutePath().toString()));
+								downloadDir.toAbsolutePath().toString(),
+								"profile.password_manager_enabled",
+								false,
+								"profile.password_manager_leak_detection",
+								false,
+								"profile.default_content_setting_values.geolocation",
+								1,
+								"profile.default_content_setting_values.notifications",
+								1));
 			} catch (IOException e) {
 				logger.error("Error creating 'downloads' directory: {}", e.getMessage());
 			}

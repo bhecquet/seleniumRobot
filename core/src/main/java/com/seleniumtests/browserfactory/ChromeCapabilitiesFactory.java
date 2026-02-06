@@ -139,7 +139,11 @@ public class ChromeCapabilitiesFactory extends ChromiumCapabilitiesFactory {
 									"profile.password_manager_enabled",
 									false,
 									"profile.password_manager_leak_detection",
-									false
+									false,
+									"profile.default_content_setting_values.geolocation",
+									1,
+									"profile.default_content_setting_values.notifications",
+									1
 									)
 					);
 				} catch (IOException e) {
