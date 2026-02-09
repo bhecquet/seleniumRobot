@@ -1249,8 +1249,9 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		
 		// error connecting to node
 		Assert.assertNull(out);
-		verify(gridLogger).warn("Video file not get due to {}",
-				"java.util.concurrent.ExecutionException");
+		verify(gridLogger).warn("Video file not get due to {}: {}",
+				"java.util.concurrent.ExecutionException",
+				"kong.unirest.core.UnirestException: connection error");
 		verify(gridLogger, never()).error(anyString());
 	}
 
