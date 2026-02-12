@@ -111,13 +111,6 @@ public class ReporterControler implements IReporter {
 			} catch (Exception e) {
 				logger.error("Error generating JUnit report", e);
 			}
-
-			// find error causes once tests are finished
-			// TODO: to delete once ErrorCause is integrated into seleniumRobot server ?
-			if (suiteFinished && SeleniumTestsContextManager.getGlobalContext().isFindErrorCause()) {
-				findErrorCauses(resultSet);
-			}
-			
 			
 			for (Class<?> reporterClass: SeleniumTestsContextManager.getGlobalContext().getReporterPluginClasses()) {
 				try {
@@ -141,28 +134,7 @@ public class ReporterControler implements IReporter {
 			logger.info("Reports generated");
 		}
 	}
-	
-	private void findErrorCauses(Map<ITestContext, Set<ITestResult>> resultSet) {
-		for (Set<ITestResult> rs: resultSet.values()) {
-			for (ITestResult testResult: rs) {
-				
-				
-				// When SeleniumRobotTestRecorder has been run, results are stored on seleniumRobot server and it's then possible 
-				// to compare reference snapshot with current failed step (if any)
-				String testName = TestNGResultUtils.getTestName(testResult);
-				if (!testResult.isSuccess() && TestNGResultUtils.isSeleniumServerReportCreated(testResult) && testResult.getThrowable() != null && !(testResult.getThrowable() instanceof AssertionError)) {
 
-					logger.info("Search error cause for {}", testName);
-					List<ErrorCause> errorCauses = new ErrorCauseFinder(testResult).findErrorCause();
-					TestNGResultUtils.setErrorCauses(testResult, errorCauses);
-				} else {
-					logger.info("Do not search error cause (requirements not satisfied) for {}", testName);
-				}
-			}
-		}
-		
-		
-	}
 	
 	/**
 	 * If snapshot comparison has been enabled, request snapshot server for each test result to know if comparison was successful
