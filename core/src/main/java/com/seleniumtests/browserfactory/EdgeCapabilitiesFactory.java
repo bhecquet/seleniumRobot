@@ -44,6 +44,14 @@ public class EdgeCapabilitiesFactory extends ChromiumCapabilitiesFactory {
 		return webDriverConfig.getEdgeOptions();
 	}
 
+	protected String getChromiumProfilePath() {
+		return webDriverConfig.getEdgeProfilePath();
+	}
+
+	protected String getChromiumProfileCapabilityName() {
+		return SeleniumRobotCapabilityType.EDGE_PROFILE;
+	}
+
 	@Override
 	protected MutableCapabilities getDriverOptions() {
         
@@ -131,36 +139,8 @@ public class EdgeCapabilitiesFactory extends ChromiumCapabilitiesFactory {
 	}
 
 	@Override
-	protected void updateOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
-		((EdgeOptions)options).setBinary(selectedBrowserInfo.getPath());
-		
-		if (webDriverConfig.getEdgeProfilePath() != null) {
-        	if (!BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getEdgeProfilePath()) && (webDriverConfig.getEdgeProfilePath().contains("/") || webDriverConfig.getEdgeProfilePath().contains("\\"))) {
-        		((EdgeOptions)options).addArguments(USER_DATA_DIR_OPTION + webDriverConfig.getEdgeProfilePath()); // e.g: C:\\Users\\MyUser\\AppData\\Local\\Microsoft\\Edge\\User Data
-        	} else if (BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getEdgeProfilePath())) {
-        		((EdgeOptions)options).addArguments(USER_DATA_DIR_OPTION + selectedBrowserInfo.getDefaultProfilePath()); 
-        	} else {
-        		logger.warn("Edge profile {} could not be set", webDriverConfig.getEdgeProfilePath());
-        	}
-        }
-	}
-
-	@Override
 	protected BrowserType getBrowserType() {
 		return BrowserType.EDGE;
 	}
 
-	@Override
-	protected void updateGridOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
-		if (webDriverConfig.getEdgeProfilePath() != null) {
-        	if (!BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getEdgeProfilePath()) && (webDriverConfig.getEdgeProfilePath().contains("/") || webDriverConfig.getEdgeProfilePath().contains("\\"))) {
-        		((EdgeOptions)options).addArguments(USER_DATA_DIR_OPTION + webDriverConfig.getEdgeProfilePath()); // e.g: C:\\Users\\MyUser\\AppData\\Local\\Microsoft\\Edge\\User Data
-        	} else if (BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getEdgeProfilePath())) {
-        		options.setCapability(SeleniumRobotCapabilityType.EDGE_PROFILE, BrowserInfo.DEFAULT_BROWSER_PRODFILE);
-        	} else {
-        		logger.warn("Edge profile {} could not be set", webDriverConfig.getEdgeProfilePath());
-        	}
-        }
-		
-	} 
 }

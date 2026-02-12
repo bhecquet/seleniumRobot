@@ -4,8 +4,10 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.util.StringUtility;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.chromium.ChromiumOptions;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +27,9 @@ public abstract class ChromiumCapabilitiesFactory extends IDesktopCapabilityFact
      */
     protected abstract String getUserStartupOptions();
 
+    protected abstract String getChromiumProfilePath();
+
+    protected abstract String getChromiumProfileCapabilityName();
 
     /**
      * Set capabilities that are common to all chromium browsers
@@ -65,11 +70,16 @@ public abstract class ChromiumCapabilitiesFactory extends IDesktopCapabilityFact
             startupOptions.add("--disable-gpu");
         }
 
+        List<String> excludeSwitches = new ArrayList<>();
+        if (BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(getChromiumProfilePath())) {
+            excludeSwitches.add("disable-background-networking");
+        }
+
         if (getUserStartupOptions() != null) {
             for (String option: getUserStartupOptions().split(" ")) {
                 if ("++enable-automation".equals(option.trim())) {
                     // remove option "--enable-automation" as, from chrome 132, it blocks tests that attach a new chrome tab to the current chrome process (https://issues.chromium.org/issues/371112535)
-                    options.setExperimentalOption("excludeSwitches", List.of("enable-automation"));
+                    excludeSwitches.add("enable-automation");
                 } else	if (option.startsWith("++")) {
                     startupOptions.remove(option.replace("++", "--"));
                 } else {
@@ -78,6 +88,9 @@ public abstract class ChromiumCapabilitiesFactory extends IDesktopCapabilityFact
             }
         }
 
+        if (!excludeSwitches.isEmpty()) {
+            options.setExperimentalOption("excludeSwitches", excludeSwitches);
+        }
         options.addArguments(startupOptions);
         options.setPageLoadStrategy(webDriverConfig.getPageLoadStrategy());
     }
@@ -96,5 +109,41 @@ public abstract class ChromiumCapabilitiesFactory extends IDesktopCapabilityFact
         options.setCapability(
                 "unhandledPromptBehavior",
                 userPromptHandler);
+    }
+
+    /**
+     * Used in local mode only
+     * @param options	driver options / capabilities
+     */
+    @Override
+    protected void updateOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
+        ((ChromiumOptions<?>)options).setBinary(selectedBrowserInfo.getPath());
+        String profilePath = getChromiumProfilePath();
+
+        if (profilePath != null) {
+            if (!BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(profilePath) && (profilePath.contains("/") || profilePath.contains("\\"))) {
+                ((ChromiumOptions<?>)options).addArguments(USER_DATA_DIR_OPTION + profilePath); // e.g: C:\\Users\\MyUser\\AppData\\Local\\Google\\Chrome\\User Data
+            } else if (BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(profilePath)) {
+                Path tempProfile = copyDefaultProfile(selectedBrowserInfo);
+                ((ChromiumOptions<?>)options).addArguments(USER_DATA_DIR_OPTION + tempProfile);
+            } else {
+                logger.warn("{} profile {} could not be set", getBrowserType(), profilePath);
+            }
+        }
+    }
+
+
+    @Override
+    protected void updateGridOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
+        String profilePath = getChromiumProfilePath();
+        if (profilePath != null) {
+            if (!BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(profilePath) && (profilePath.contains("/") || profilePath.contains("\\"))) {
+                ((ChromiumOptions<?>)options).addArguments(USER_DATA_DIR_OPTION + profilePath); // e.g: C:\\Users\\MyUser\\AppData\\Local\\Google\\Chrome\\User Data
+            } else if (BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(profilePath)) {
+                options.setCapability(getChromiumProfileCapabilityName(), BrowserInfo.DEFAULT_BROWSER_PRODFILE);
+            } else {
+                logger.warn("{} profile {} could not be set", getBrowserType(), profilePath);
+            }
+        }
     }
 }

@@ -257,6 +257,8 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		Assert.assertEquals(prefs.get("profile.default_content_setting_values.geolocation"), 1);
 		Assert.assertEquals(prefs.get("profile.default_content_setting_values.notifications"), 1);
 		Assert.assertNull(((Map<?,?>)(capa.asMap().get(EdgeOptions.CAPABILITY))).get("debuggerAddress")); // no debuger address set as we do not attach an existing browser
+		List<?> excludeSwitches = (List<?>)(((Map<?,?>)((capa).asMap().get(EdgeOptions.CAPABILITY))).get("excludeSwitches"));
+		Assert.assertNull(excludeSwitches);
 	}
 		
 	/**
@@ -316,6 +318,18 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 
 		Assert.assertFalse(((Map<?,?>)(capa.asMap().get(EdgeOptions.CAPABILITY))).get("args").toString().contains("--no-sandbox"));
 	}
+
+	@Test(groups={"ut"})
+	public void testCreateEdgeCapabilitiesWithRemoveOptions2() {
+
+		when(config.getEdgeOptions()).thenReturn("++enable-automation");
+
+		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
+
+		List<?> excludeSwitches = (List<?>)(((Map<?,?>)((capa).asMap().get(EdgeOptions.CAPABILITY))).get("excludeSwitches"));
+		Assert.assertEquals(excludeSwitches.size(), 1);
+		Assert.assertEquals(excludeSwitches.get(0), "enable-automation");
+	}
 	
 	@Test(groups={"ut"})
 	public void testCreateEdgeCapabilitiesHeadless() {
@@ -349,6 +363,10 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		// a user data dir is configured
 		Assert.assertNotEquals(((Map<?,?>)(capa.asMap().get(EdgeOptions.CAPABILITY))).get("args").toString(), "[--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-search-engine-choice-screen, --disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades, --remote-allow-origins=*, --user-data-dir=/home/foo/edge]");
 		Assert.assertTrue(((Map<?,?>)(capa.asMap().get(EdgeOptions.CAPABILITY))).get("args").toString().startsWith("[--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-search-engine-choice-screen, --disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades, --remote-allow-origins=*, --user-data-dir="));
+
+		List<?> excludeSwitches = (List<?>)(((Map<?,?>)((capa).asMap().get(EdgeOptions.CAPABILITY))).get("excludeSwitches"));
+		Assert.assertEquals(excludeSwitches.size(), 1);
+		Assert.assertEquals(excludeSwitches.get(0), "disable-background-networking");
 	}
 	
 	@Test(groups={"ut"})

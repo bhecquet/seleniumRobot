@@ -31,6 +31,7 @@ import io.appium.java_client.android.options.UiAutomator2Options;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.chromium.ChromiumOptions;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
 
@@ -111,6 +112,14 @@ public class ChromeCapabilitiesFactory extends ChromiumCapabilitiesFactory {
 
 	protected String getUserStartupOptions() {
 		return webDriverConfig.getChromeOptions();
+	}
+
+	protected String getChromiumProfilePath() {
+		return webDriverConfig.getChromeProfilePath();
+	}
+
+	protected String getChromiumProfileCapabilityName() {
+		return SeleniumRobotCapabilityType.CHROME_PROFILE;
 	}
  
 	@Override
@@ -208,41 +217,10 @@ public class ChromeCapabilitiesFactory extends ChromiumCapabilitiesFactory {
 		return webDriverConfig.getChromeBinPath();
 	}
 
-	/**
-	 * Used in local mode only
-	 * @param options	driver options / capabilities
-	 */
-	@Override
-	protected void updateOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
-		((ChromeOptions)options).setBinary(selectedBrowserInfo.getPath());
-		
-        if (webDriverConfig.getChromeProfilePath() != null) {
-        	if (!BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getChromeProfilePath()) && (webDriverConfig.getChromeProfilePath().contains("/") || webDriverConfig.getChromeProfilePath().contains("\\"))) {
-        		((ChromeOptions)options).addArguments(USER_DATA_DIR_OPTION + webDriverConfig.getChromeProfilePath()); // e.g: C:\\Users\\MyUser\\AppData\\Local\\Google\\Chrome\\User Data
-        	} else if (BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getChromeProfilePath())) {
-				Path tempProfile = copyDefaultProfile(selectedBrowserInfo);
-        		((ChromeOptions)options).addArguments(USER_DATA_DIR_OPTION + tempProfile);
-        	} else {
-        		logger.warn("Chrome profile {} could not be set", webDriverConfig.getChromeProfilePath());
-        	}
-        }
-	}
-
 	@Override
 	protected BrowserType getBrowserType() {
 		return BrowserType.CHROME;
 	}
 
-	@Override
-	protected void updateGridOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
-		if (webDriverConfig.getChromeProfilePath() != null) {
-        	if (!BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getChromeProfilePath()) && (webDriverConfig.getChromeProfilePath().contains("/") || webDriverConfig.getChromeProfilePath().contains("\\"))) {
-        		((ChromeOptions)options).addArguments(USER_DATA_DIR_OPTION + webDriverConfig.getChromeProfilePath()); // e.g: C:\\Users\\MyUser\\AppData\\Local\\Google\\Chrome\\User Data
-        	} else if (BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getChromeProfilePath())) {
-        		options.setCapability(SeleniumRobotCapabilityType.CHROME_PROFILE, BrowserInfo.DEFAULT_BROWSER_PRODFILE);
-        	} else {
-        		logger.warn("Chrome profile {} could not be set", webDriverConfig.getChromeProfilePath());
-        	}
-        }
-	}
+
 }

@@ -264,6 +264,8 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		Assert.assertEquals(prefs.get("profile.default_content_setting_values.geolocation"), 1);
 		Assert.assertEquals(prefs.get("profile.default_content_setting_values.notifications"), 1);
 		Assert.assertNull(((Map<?,?>)((capa).asMap().get(ChromeOptions.CAPABILITY))).get("debuggerAddress")); // no debuger address set as we do not attach an existing browser
+		List<?> excludeSwitches = (List<?>)(((Map<?,?>)((capa).asMap().get(ChromeOptions.CAPABILITY))).get("excludeSwitches"));
+		Assert.assertNull(excludeSwitches);
 	}
 	
 	/**
@@ -355,6 +357,10 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		Assert.assertTrue(chromeArgs.contains("--disable-search-engine-choice-screen"));
 		Assert.assertTrue(chromeArgs.contains("--disable-features=IsolateOrigins,site-per-process,PrivacySandboxSettings4,HttpsUpgrades"));
 		Assert.assertTrue(chromeArgs.contains("--user-data-dir="));
+
+		List<?> excludeSwitches = (List<?>)(((Map<?,?>)((capa).asMap().get(ChromeOptions.CAPABILITY))).get("excludeSwitches"));
+		Assert.assertEquals(excludeSwitches.size(), 1);
+		Assert.assertEquals(excludeSwitches.get(0), "disable-background-networking");
 	}
 	
 	@Test(groups={"ut"})
@@ -546,6 +552,18 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 
 		Assert.assertFalse(((Map<?,?>)((capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--no-sandbox"));
+	}
+
+	@Test(groups={"ut"})
+	public void testCreateChromeCapabilitiesWithRemoveOptions2() {
+
+		when(config.getChromeOptions()).thenReturn("++enable-automation");
+
+		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
+
+		List<?> excludeSwitches = (List<?>)(((Map<?,?>)((capa).asMap().get(ChromeOptions.CAPABILITY))).get("excludeSwitches"));
+		Assert.assertEquals(excludeSwitches.size(), 1);
+		Assert.assertEquals(excludeSwitches.get(0), "enable-automation");
 	}
 	
 	@Test(groups={"ut"})
