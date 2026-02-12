@@ -677,10 +677,10 @@ Test data are updated via `createOrUpdateParam`. The later is only available whe
 - `createOrUpdateParam(<key>, <value>, <attach_to_version>)` is used to store a variable with reference to environment, application. Reference to application version is optional
 - `createOrUpdateParam(<key>, <value>, <attach_to_version>, <time_to_live>, <reservable>)` is used to store a variable with reference to environment, application. Reference to application version is optional. In this case, we can specify that server will destroy variable after X days (the time to live) and that this variable can be reserved. 
 
-When variables are stored on seleniumRobot server, they can also be get by their name
-BUT, seleniumRobot-server allows to link applications to others. For example, when the selenium project "project_one" uses data produced by project "project_two".
-Then, if link is configured on server, running "one" tests will get variables from "project_one" and variables (say "url") from "project_two". The latter will be prefixed by "project_two.", so accessible with `param("project_two.url")`.
-If and only if a variable from "project_two" does not have the same name as variable from "project_one", then, it will **ALSO** be available without prefix `param("url")`
+When variables are stored on seleniumRobot server, they can also be get by their name\
+BUT, seleniumRobot-server allows to link applications to others. For example, when the selenium project "project_one" uses data produced by project "project_two".\
+Then, if link is configured on server, running "one" tests will get variables from "project_one" and variables (say "url") from "project_two". The latter will be prefixed by "project_two.", so accessible with `param("project_two.url")`.\
+If and only if a variable from "project_two" does not have the same name as variable from "project_one", then, it will **ALSO** be available without prefix `param("url")`\
 
 #### Use variable server to hold variables during some days ####
 
