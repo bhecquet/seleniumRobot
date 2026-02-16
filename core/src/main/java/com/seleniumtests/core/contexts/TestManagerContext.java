@@ -59,7 +59,7 @@ public class TestManagerContext {
 	
 	public String getCampaignName() {
 		try {
-			return context.getConfiguration().get(SquashTMConnector.SQUASH_CAMPAIGN).getValue();
+			return context.getConfiguration().get(SquashTMConnector.SQUASH_CAMPAIGN).getValue().toString();
 		} catch (NullPointerException e) {
 			return null;
 		}
