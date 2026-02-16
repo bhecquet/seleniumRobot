@@ -855,25 +855,25 @@ public class SeleniumTestsContext {
     		String key = entry.getKey();
     		switch (key) {
     			case WEB_PROXY_TYPE:
-    				setWebProxyType(getAttribute(WEB_PROXY_TYPE_FROM_USER) == null ? envConfig.get(key).getValue(): getWebProxyType().name());
+    				setWebProxyType(getAttribute(WEB_PROXY_TYPE_FROM_USER) == null ? envConfig.get(key).getValue().toString(): getWebProxyType().name());
     				break;
     			case WEB_PROXY_ADDRESS:
-    				setWebProxyAddress(getWebProxyAddress() == null ? envConfig.get(key).getValue(): getWebProxyAddress());
+    				setWebProxyAddress(getWebProxyAddress() == null ? envConfig.get(key).getValue().toString(): getWebProxyAddress());
     				break;
     			case WEB_PROXY_PORT:
-    				setWebProxyPort(getWebProxyPort() == null ? Integer.valueOf(envConfig.get(key).getValue()): getWebProxyPort());
+    				setWebProxyPort(getWebProxyPort() == null ? Integer.valueOf(envConfig.get(key).getValue().toString()): getWebProxyPort());
     				break;
     			case WEB_PROXY_LOGIN:
-    				setWebProxyLogin(getWebProxyLogin() == null ? envConfig.get(key).getValue(): getWebProxyLogin());
+    				setWebProxyLogin(getWebProxyLogin() == null ? envConfig.get(key).getValue().toString(): getWebProxyLogin());
     				break;
     			case WEB_PROXY_PASSWORD:
-    				setWebProxyPassword(getWebProxyPassword() == null ? envConfig.get(key).getValue(): getWebProxyPassword());
+    				setWebProxyPassword(getWebProxyPassword() == null ? envConfig.get(key).getValue().toString(): getWebProxyPassword());
     				break;
     			case WEB_PROXY_PAC:
-    				setWebProxyPac(getWebProxyPac() == null ? envConfig.get(key).getValue(): getWebProxyPac());
+    				setWebProxyPac(getWebProxyPac() == null ? envConfig.get(key).getValue().toString(): getWebProxyPac());
     				break;
     			case WEB_PROXY_EXCLUDE:
-    				setWebProxyExclude(getWebProxyExclude() == null ? envConfig.get(key).getValue(): getWebProxyExclude());
+    				setWebProxyExclude(getWebProxyExclude() == null ? envConfig.get(key).getValue().toString(): getWebProxyExclude());
     				break;
     			default:
     				continue;

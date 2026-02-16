@@ -266,10 +266,25 @@ public class TestTasks {
      */
     public static String param(String key) {
     	try {
-    		return getParam(SeleniumTestsContextManager.getThreadContext(), key);
+    		return getParam(SeleniumTestsContextManager.getThreadContext(), key, String.class);
     	} catch (ConfigurationException e) {
-    		return getParam(SeleniumTestsContextManager.getGlobalContext(), key);
+    		return getParam(SeleniumTestsContextManager.getGlobalContext(), key, String.class);
     	}
+    }
+    
+    /**
+     * Get parameter from configuration - its value must be a File
+     * If configuration can be get from threadContext, it's done, else, we look at global context
+     *
+     * @param key name of the param
+     * @return File
+     */
+    public static File paramFile(String key) {
+        try {
+            return getParam(SeleniumTestsContextManager.getThreadContext(), key, File.class);
+        } catch (ConfigurationException e) {
+            return getParam(SeleniumTestsContextManager.getGlobalContext(), key, File.class);
+        }
     }
     
     /**
@@ -279,12 +294,25 @@ public class TestTasks {
      */
     public static String param(Pattern keyPattern) {
     	try {
-    		return getParamWithPattern(SeleniumTestsContextManager.getThreadContext(), keyPattern, null);
+    		return getParamWithPattern(SeleniumTestsContextManager.getThreadContext(), keyPattern, null, String.class);
     	} catch (ConfigurationException e) {
-    		return getParamWithPattern(SeleniumTestsContextManager.getGlobalContext(), keyPattern, null);
+    		return getParamWithPattern(SeleniumTestsContextManager.getGlobalContext(), keyPattern, null, String.class);
     	}
     }
-    
+
+    /**
+     * Get parameter from configuration - its value must be a File
+     * If multiple variables match the pattern, only one is returned
+     *
+     * @param keyPattern Pattern for searching key. If null, no filtering will be done on key
+     */
+    public static File paramFile(Pattern keyPattern) {
+        try {
+            return getParamWithPattern(SeleniumTestsContextManager.getThreadContext(), keyPattern, null, File.class);
+        } catch (ConfigurationException e) {
+            return getParamWithPattern(SeleniumTestsContextManager.getGlobalContext(), keyPattern, null, File.class);
+        }
+    }
 
     /**
      * Get parameter from configuration
@@ -294,28 +322,32 @@ public class TestTasks {
      */
     public static String param(Pattern keyPattern, Pattern valuePattern) {
     	try {
-    		return getParamWithPattern(SeleniumTestsContextManager.getThreadContext(), keyPattern, valuePattern);
+    		return getParamWithPattern(SeleniumTestsContextManager.getThreadContext(), keyPattern, valuePattern, String.class);
     	} catch (ConfigurationException e) {
-    		return getParamWithPattern(SeleniumTestsContextManager.getGlobalContext(), keyPattern, valuePattern);
+    		return getParamWithPattern(SeleniumTestsContextManager.getGlobalContext(), keyPattern, valuePattern, String.class);
     	}
     }
   
     
-    private static String getParam(SeleniumTestsContext context, String key) {
-    	TestVariable value = context.getConfiguration().get(key);
-    	if (value == null) {
+    private static <T extends Object> T getParam(SeleniumTestsContext context, String key, Class<T> returnType) {
+    	TestVariable variable = context.getConfiguration().get(key);
+    	if (variable == null) {
     		logger.warning(String.format("Variable %s is not defined", key));
-    		return "";
+    		return null;
     	}
-    	return value.getValue();
+    	Object value = variable.getValue();
+        if (returnType.isAssignableFrom(value.getClass())) {
+            return (T) value;
+        }
+        throw new ConfigurationException(String.format("Variable '%s' value is not of type %s", key, returnType.getName()));
     }
     
-    private static String getParamWithPattern(SeleniumTestsContext context, Pattern keyPattern, Pattern valuePattern) {
+    private static <T extends Object> T getParamWithPattern(SeleniumTestsContext context, Pattern keyPattern, Pattern valuePattern, Class<T> returnType) {
     	List<TestVariable> matchingVariables = context.getConfiguration()
 				.values()
 				.stream()
 				.filter(v -> keyPattern == null || keyPattern.matcher(v.getName()).find())
-				.filter(v -> valuePattern == null || valuePattern.matcher(v.getValue()).find())
+				.filter(v -> valuePattern == null || valuePattern.matcher(v.getValue().toString()).find())
 				.collect(Collectors.toList());
     	Collections.shuffle(matchingVariables);
     	
@@ -323,9 +355,13 @@ public class TestTasks {
     		logger.warning(String.format("Variable %s [%s] is not defined", 
     				keyPattern == null ? "null": keyPattern.pattern(), 
     				valuePattern == null ? "null": valuePattern.pattern()));
-    		return "";
+    		return null;
     	}
-    	return matchingVariables.get(0).getValue();
+    	Object value = matchingVariables.get(0).getValue();
+        if (returnType.isAssignableFrom(value.getClass())) {
+            return (T) value;
+        }
+        throw new ConfigurationException(String.format("Variable '%s' value is not of type %s", matchingVariables.get(0).getName(), returnType.getName()));
     }
    
     public static void terminateCurrentStep() {

@@ -36,10 +36,10 @@ public class BrowserExtension {
 		for (Entry<String, TestVariable> entry: variables.entrySet()) {
 			if (entry.getKey().matches(EXTENSION_PATH_REGEX)) {
 				String extKey = entry.getKey().split("\\.")[0];
-				BrowserExtension extension = new BrowserExtension(entry.getValue().getValue());
+				BrowserExtension extension = new BrowserExtension(entry.getValue().getValue().toString());
 				
 				if (variables.containsKey(extKey + EXTENSION_OPTIONS)) {
-					extension.setOptions(variables.get(extKey + EXTENSION_OPTIONS).getValue());
+					extension.setOptions(variables.get(extKey + EXTENSION_OPTIONS).getValue().toString());
 				}
 				
 				browserExtensions.add(extension);

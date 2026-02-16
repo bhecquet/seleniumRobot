@@ -17,6 +17,9 @@
  */
 package com.seleniumtests.connectors.selenium;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -27,6 +30,7 @@ import com.seleniumtests.customexception.SeleniumRobotServerException;
 
 import kong.unirest.core.GetRequest;
 import kong.unirest.core.MultipartBody;
+import kong.unirest.core.Unirest;
 import kong.unirest.core.UnirestException;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
@@ -44,6 +48,7 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	private static final String FIELD_VALUE = "value";
 	public static final String VARIABLE_API_URL = "/variable/api/variable/";
 	public static final String EXISTING_VARIABLE_API_URL = "/variable/api/variable/%d/";
+	public static final String VARIABLE_FILE_API_URL = "/variable/api/variable/%d/file";
 	
 	private Integer testCaseId;
 
@@ -199,11 +204,22 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	}
 	
 	/**
+	 * Download and return the File given as value of the variable
+	 * @param variable
+	 * @return a File object
+	 */
+	public File getVariableFile(TestVariable variable) {
+        String[] fileName = variable.getFileName().split("/");
+        Path whereToDownload = Paths.get(SeleniumTestsContextManager.getDatasetPath(), SeleniumTestsContextManager.getThreadContext().getTestEnv(), fileName[fileName.length - 1]);
+        return Unirest.get(url + String.format(VARIABLE_FILE_API_URL, variable.getId())).asFile(whereToDownload.toString()).getBody();
+    }
+	
+	/**
 	 * convert Map<String, TestVariable> to Map<String, String>
 	 * @param rawVariables	the variable map
 	 */
-	public static Map<String, String> convertRawTestVariableMapToKeyValuePairs(Map<String, TestVariable> rawVariables) {
-		Map<String, String> variables = new HashMap<>();
+	public static Map<String, Object> convertRawTestVariableMapToKeyValuePairs(Map<String, TestVariable> rawVariables) {
+		Map<String, Object> variables = new HashMap<>();
 		for (Entry<String, TestVariable> entry: rawVariables.entrySet()) {
 			variables.put(entry.getKey(), entry.getValue().getValue());
 		}
@@ -303,7 +319,7 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	private TestVariable createVariable(TestVariable variable, boolean specificToVersion) {
 		MultipartBody request = buildPostRequest(url + VARIABLE_API_URL)
 				.field(FIELD_NAME, TestVariable.TEST_VARIABLE_PREFIX + variable.getName())
-				.field(FIELD_VALUE, variable.getValue())
+				.field(FIELD_VALUE, variable.getValue().toString())
 				.field(FIELD_RESERVABLE, String.valueOf(variable.isReservable()))
 				.field(FIELD_ENVIRONMENT, environmentId.toString())
 				.field(FIELD_APPLICATION, applicationId.toString())

@@ -68,7 +68,7 @@ public abstract class TestManager implements ITestManager {
     	
     	// priority given to variables
     	if (testCaseIdVariable != null) {
-    		return Integer.parseInt(testCaseIdVariable.getValue());
+    		return Integer.parseInt(testCaseIdVariable.getValue().toString());
     	}
     	
     	for (CustomAttribute customAttribute: testNGResult.getMethod().getAttributes()) {
@@ -95,7 +95,7 @@ public abstract class TestManager implements ITestManager {
 
     	// priority given to variables
      	if (datasetIdVariable != null) {
-    		return Integer.parseInt(datasetIdVariable.getValue());
+    		return Integer.parseInt(datasetIdVariable.getValue().toString());
     	}
 
     	for (CustomAttribute customAttribute: testNGResult.getMethod().getAttributes()) {

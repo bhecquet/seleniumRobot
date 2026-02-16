@@ -44,7 +44,7 @@ public class BugTrackerContext {
 			Map<String, String> bugtrackerOptions = new HashMap<>();
 			for (TestVariable variable: context.getConfiguration().values()) {
 				if (variable.getName().startsWith(BugTracker.BUGTRACKER_PREFIX)) {
-					bugtrackerOptions.put(variable.getName(), variable.getValue());
+					bugtrackerOptions.put(variable.getName(), variable.getValue().toString());
 				}
 			}
 			

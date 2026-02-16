@@ -175,6 +175,26 @@ public class TestTestVariable extends GenericTest {
 		Assert.assertNull(variable.getCreationDate());
 	}
 	
+	@Test(groups = {"ut"})
+    public void testFromJSonWithFile() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("id", 1);
+        jsonObject.put("name", "key");
+        jsonObject.put("value", "");
+        jsonObject.put("uploadFile", "http://127.0.0.1:8000/media/appName/fileName.ext");
+        jsonObject.put("reservable", false);
+        jsonObject.put("environment", 1);
+        jsonObject.put("application", 2);
+        jsonObject.put("version", 3);
+
+        TestVariable variable = TestVariable.fromJsonObject(jsonObject, 2, "core");
+        Assert.assertEquals(variable.getId(), (Integer) 1);
+        Assert.assertEquals(variable.getName(), "key");
+        Assert.assertEquals(variable.getFileName(), "http://127.0.0.1:8000/media/appName/fileName.ext");
+        Assert.assertFalse(variable.isReservable());
+        Assert.assertEquals(variable.getInternalName(), "key");
+    }
+	
 	@Test(groups={"ut"})
 	public void testInterpolateValue() {
 
