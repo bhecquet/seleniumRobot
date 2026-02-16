@@ -61,7 +61,7 @@ public class TestVariable {
 	}
 	
 	public TestVariable(Integer id, String name, String value, boolean reservable, String internalName, int timeToLive, LocalDateTime creationDate) {
-		this(id, name, value, reservable, internalName, timeToLive, creationDate, null);
+		this(id, name, value, reservable, internalName, timeToLive, creationDate, null, null);
 	}
 
 	public TestVariable(Integer id, String name, String value, boolean reservable, String internalName, int timeToLive, LocalDateTime creationDate, Integer application, String fileName) {
@@ -172,7 +172,7 @@ public class TestVariable {
 		return value;
 	}
 
-	public String getValue() {
+	public Object getValue() {
 		try {
 			if (this.getFileName() != null) {
                 return SeleniumTestsContextManager.getThreadContext().getVariableServer().getVariableFile(this);
