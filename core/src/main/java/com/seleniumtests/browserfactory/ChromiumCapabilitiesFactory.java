@@ -124,8 +124,8 @@ public abstract class ChromiumCapabilitiesFactory extends IDesktopCapabilityFact
             if (!BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(profilePath) && (profilePath.contains("/") || profilePath.contains("\\"))) {
                 ((ChromiumOptions<?>)options).addArguments(USER_DATA_DIR_OPTION + profilePath); // e.g: C:\\Users\\MyUser\\AppData\\Local\\Google\\Chrome\\User Data
             } else if (BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(profilePath)) {
-                Path tempProfile = copyDefaultProfile(selectedBrowserInfo);
-                ((ChromiumOptions<?>)options).addArguments(USER_DATA_DIR_OPTION + tempProfile);
+                //Path tempProfile = copyDefaultProfile(selectedBrowserInfo);
+                //((ChromiumOptions<?>)options).addArguments(USER_DATA_DIR_OPTION + tempProfile);
             } else {
                 logger.warn("{} profile {} could not be set", getBrowserType(), profilePath);
             }
@@ -140,7 +140,7 @@ public abstract class ChromiumCapabilitiesFactory extends IDesktopCapabilityFact
             if (!BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(profilePath) && (profilePath.contains("/") || profilePath.contains("\\"))) {
                 ((ChromiumOptions<?>)options).addArguments(USER_DATA_DIR_OPTION + profilePath); // e.g: C:\\Users\\MyUser\\AppData\\Local\\Google\\Chrome\\User Data
             } else if (BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(profilePath)) {
-                options.setCapability(getChromiumProfileCapabilityName(), BrowserInfo.DEFAULT_BROWSER_PRODFILE);
+                //options.setCapability(getChromiumProfileCapabilityName(), BrowserInfo.DEFAULT_BROWSER_PRODFILE);
             } else {
                 logger.warn("{} profile {} could not be set", getBrowserType(), profilePath);
             }
