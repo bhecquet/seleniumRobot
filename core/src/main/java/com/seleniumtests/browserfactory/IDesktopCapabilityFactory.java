@@ -211,7 +211,7 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
 			Files.createDirectories(tempProfile);
 			FileUtils.copyDirectory(new File(browserInfo.getDefaultProfilePath()), tempProfile.toFile());
 		} catch (IOException e) {
-			throw new CustomSeleniumTestsException(String.format("Cannot create profile directory: %s", tempProfile), e);
+			logger.error("Error creating / copying profile directory: {}", tempProfile, e);
 		}
 
 

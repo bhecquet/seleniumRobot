@@ -197,7 +197,7 @@ public class ChromeCapabilitiesFactory extends ChromiumCapabilitiesFactory {
 				options.setExperimentalOption("prefs", experimentalOptions);
 			}
         }
-		// enableBidi(options);
+		enableBidi(options);
 
         return options;
 	}
