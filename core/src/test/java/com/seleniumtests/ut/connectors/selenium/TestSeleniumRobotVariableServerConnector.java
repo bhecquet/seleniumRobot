@@ -231,6 +231,8 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		Map<String, TestVariable> variables = connector.getVariables();
 		Assert.assertEquals(variables.get("key1").getValue(), "value1");
 		Assert.assertEquals(variables.get("key2").getValue(), "value2");
+		Assert.assertNull(variables.get("key1").getFileName()); //Check with uploadFile: null in the json
+		Assert.assertNull(variables.get("key2").getFileName()); //Check with no key uploadFile in the json
 		
 		verify(variablesRequest).queryString("reserve", true);
 		verify(variablesRequest).queryString("version", 4);
