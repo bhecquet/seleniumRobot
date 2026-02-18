@@ -86,7 +86,7 @@ public class TestFixture extends GenericTest {
 	@Test(groups={"ut"})
 	public void testGetValueWithUnknownParam() {
 		SeleniumTestsContextManager.getGlobalContext().setCucumberImplementationPackage("com.seleniumtests.ut.core.runner.cucumber");
-		Assert.assertNull(new Fixture().getValue("{{ foo }}"));
+		Assert.assertEquals(new Fixture().getValue("{{ foo }}"), "");
 	}
 	
 	@Test(groups={"ut"})
