@@ -112,6 +112,7 @@ public class ConnectorsTest extends MockitoTest {
 	protected GetRequest namedTestCaseRequest;
 	protected GetRequest namedVersionRequest;
 	protected GetRequest variablesRequest;
+	protected GetRequest variableFileRequest;
 	protected HttpRequestWithBody createApplicationRequest;
 	protected HttpRequestWithBody createEnvironmentRequest;
 	protected HttpRequestWithBody createVersionRequest;
@@ -780,11 +781,12 @@ public class ConnectorsTest extends MockitoTest {
 		createEnvironmentRequest = (HttpRequestWithBody) createServerMock(serverUrl, "POST", SeleniumRobotSnapshotServerConnector.ENVIRONMENT_API_URL, 200, "{'id': '2'}");	
 		createVersionRequest = (HttpRequestWithBody) createServerMock(serverUrl, "POST", SeleniumRobotSnapshotServerConnector.VERSION_API_URL, 200, "{'id': '4'}");	
 		createTestCaseRequest = (HttpRequestWithBody) createServerMock(serverUrl, "POST", SeleniumRobotSnapshotServerConnector.TESTCASE_API_URL, 200, "{'id': '3'}");
-		createVariableRequest = (HttpRequestWithBody) createServerMock(serverUrl, "POST", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, "{'id': 13, 'name': 'custom.test.variable.key', 'value': 'value', 'reservable': false}");
-		updateVariableRequest = (HttpRequestWithBody) createServerMock(serverUrl, "PATCH", String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 12), 200, "{'id': 12, 'name': 'custom.test.variable.key', 'value': 'value', 'reservable': false}");
+		createVariableRequest = (HttpRequestWithBody) createServerMock(serverUrl, "POST", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, "{'id': 13, 'name': 'custom.test.variable.key', 'value': 'value', 'uploadFile': null, 'reservable': false}");
+		updateVariableRequest = (HttpRequestWithBody) createServerMock(serverUrl, "PATCH", String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 12), 200, "{'id': 12, 'name': 'custom.test.variable.key', 'value': 'value', 'uploadFile': null, 'reservable': false}");
 		updateVariableRequest2 = (HttpRequestWithBody) createServerMock(serverUrl, "PATCH", String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 2), 200, "{}");
-		variablesRequest = (GetRequest) createServerMock(serverUrl, "GET", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, "[{'id': 1, 'name': 'key1', 'value': 'value1', 'reservable': false}, {'id': 2, 'name': 'key2', 'value': 'value2', 'reservable': true}]");
+		variablesRequest = (GetRequest) createServerMock(serverUrl, "GET", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, "[{'id': 1, 'name': 'key1', 'value': 'value1', 'uploadFile': null, 'reservable': false}, {'id': 2, 'name': 'key2', 'value': 'value2', 'reservable': true}, {'id': 3, 'name': 'key3', 'value': '', 'uploadFile': 'http://127.0.0.1:8000/media/appName/testStandardDataProvider.csv', 'reservable': false}]");		
 		deleteVariableRequest = (HttpRequestWithBody) createServerMock(serverUrl, "DELETE", String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 1), 200, "");
+		variableFileRequest = (GetRequest) createServerMock(serverUrl, "GET", String.format(SeleniumRobotVariableServerConnector.VARIABLE_FILE_API_URL, 3), 200, new File(Paths.get(SeleniumTestsContextManager.getDatasetPath(), "DEV", "testStandardDataProvider.csv").toString()));
 
 	}
 }

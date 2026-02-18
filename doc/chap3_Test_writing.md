@@ -682,6 +682,13 @@ BUT, seleniumRobot-server allows to link applications to others. For example, wh
 Then, if link is configured on server, running "one" tests will get variables from "project_one" and variables (say "url") from "project_two". The latter will be prefixed by "project_two.", so accessible with `param("project_two.url")`.\
 If and only if a variable from "project_two" does not have the same name as variable from "project_one", then, it will **ALSO** be available without prefix `param("url")`\
 
+Since the 4.2.0, the seleniumRobot server can take a file as a variable value. In order to get these files, during the tests, use the following functions : 
+- `paramFile(<key>)` get the file by its variable's full name
+- `paramFile(<Pattern.compile(<key_pattern>))` get the file by searching a pattern in its variable's name (see param(Pattern.compile(<key_pattern>)) above)
+
+These functions download the file in the Dataset_folder/<test_environment> with the same filename it has on the seleniumRobot server.
+It then returns a File Object to interract with directly.
+
 #### Use variable server to hold variables during some days ####
 
 The use case is: 

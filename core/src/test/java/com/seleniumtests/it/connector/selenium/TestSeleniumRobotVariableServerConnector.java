@@ -17,6 +17,8 @@
  */
 package com.seleniumtests.it.connector.selenium;
 
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +31,7 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestVariable;
 
 /**
@@ -40,12 +43,27 @@ import com.seleniumtests.core.TestVariable;
 public class TestSeleniumRobotVariableServerConnector extends GenericTest {
 
 	SeleniumRobotVariableServerConnector connector;
+	private String variableServerUrl;
+    private String authToken;
+    private String testName;
+    private String variableName;
+    private String fileName;
 	
 	@BeforeMethod(groups={"it"})
 	public void init(ITestContext ctx) {
 		initThreadContext(ctx);
 
-		connector = new SeleniumRobotVariableServerConnector(true, "http://localhost:8002", "Test 1", "37023c02b9df77b5e5939cca85bc2f20cd3d001d");
+		variableServerUrl = System.getProperty("variableServerUrl");
+        authToken = System.getProperty("authToken");
+        testName = System.getProperty("testName");
+        variableName = System.getProperty("variableName");
+        fileName = System.getProperty("fileName");
+
+        if (variableServerUrl == null) {
+            variableServerUrl = "https://localhost:8002";
+        }
+
+        connector = new SeleniumRobotVariableServerConnector(true, variableServerUrl, testName, authToken);
 		if (!connector.getActive()) {
 			throw new SkipException("no seleniumrobot server available");
 		}
@@ -98,4 +116,24 @@ public class TestSeleniumRobotVariableServerConnector extends GenericTest {
 		connector.unreserveVariables(vars);
 	}
 	
+	/**
+     * Check manually with the locally started server that variable as file can be downloaded
+     * You need, on your local server
+     * - an Application with name=core
+     * - a TestCase with name=testName (the class variable) and application=core
+     * - a Variable with name=variableName (the class variable) and application=core and a file uploaded
+     * - fileName must be this variable uploadedFile as 'example.csv'
+     */
+    @Test(groups = {"it"}, enabled = true)
+    public void testDownloadVariableFile() {
+        File checkFile = Paths.get(SeleniumTestsContextManager.getDatasetPath(), "DEV", fileName).toFile();
+        if (checkFile.exists()) {
+            Assert.assertTrue(checkFile.delete());
+        }
+        Map<String, TestVariable> variables = connector.getVariables();
+        File varFile = connector.getVariableFile(variables.get(variableName));
+        Assert.assertTrue(varFile.exists());
+    }
+	
 }
+

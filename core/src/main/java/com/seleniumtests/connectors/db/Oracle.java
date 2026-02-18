@@ -84,7 +84,7 @@ public class Oracle extends SqlDatabase {
      */
     @Deprecated
     public Oracle(String dbName, String user, String password) {
-    	this(dbName, user, password, SeleniumTestsContextManager.getThreadContext().getConfiguration().get("tnsnamePath").getValue());
+    	this(dbName, user, password, SeleniumTestsContextManager.getThreadContext().getConfiguration().get("tnsnamePath").getValue().toString());
     }
     
     public Oracle(String dbName, String host, String port, String user, String password) {

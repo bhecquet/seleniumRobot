@@ -59,7 +59,7 @@ public class TestManagerContext {
 	
 	public String getCampaignName() {
 		try {
-			return context.getConfiguration().get(SquashTMConnector.SQUASH_CAMPAIGN).getValue();
+			return context.getConfiguration().get(SquashTMConnector.SQUASH_CAMPAIGN).getValue().toString();
 		} catch (NullPointerException e) {
 			return null;
 		}
@@ -75,7 +75,7 @@ public class TestManagerContext {
 	
 	public String getCampaignFolderPath() {
 		try {
-			return context.getConfiguration().get(SquashTMConnector.SQUASH_CAMPAIGN_FOLDER).getValue();
+			return context.getConfiguration().get(SquashTMConnector.SQUASH_CAMPAIGN_FOLDER).getValue().toString();
 		} catch (NullPointerException e) {
 			return "";
 		}
@@ -91,7 +91,7 @@ public class TestManagerContext {
 	
 	public String getIterationName() {
 		try {
-			return context.getConfiguration().get(SquashTMConnector.SQUASH_ITERATION).getValue();
+			return context.getConfiguration().get(SquashTMConnector.SQUASH_ITERATION).getValue().toString();
 		} catch (NullPointerException e) {
 			return null;
 		}

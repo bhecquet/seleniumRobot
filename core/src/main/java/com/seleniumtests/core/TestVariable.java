@@ -46,6 +46,7 @@ public class TestVariable {
 	private int timeToLive;
 	private Integer application;
 	private String applicationName;
+	private String fileName; //if the variable come from the selenium-server and has a file as value, it will be set here
 	
 	
 	/**
@@ -60,10 +61,10 @@ public class TestVariable {
 	}
 	
 	public TestVariable(Integer id, String name, String value, boolean reservable, String internalName, int timeToLive, LocalDateTime creationDate) {
-		this(id, name, value, reservable, internalName, timeToLive, creationDate, null);
+		this(id, name, value, reservable, internalName, timeToLive, creationDate, null, null);
 	}
 
-	public TestVariable(Integer id, String name, String value, boolean reservable, String internalName, int timeToLive, LocalDateTime creationDate, Integer application) {
+	public TestVariable(Integer id, String name, String value, boolean reservable, String internalName, int timeToLive, LocalDateTime creationDate, Integer application, String fileName) {
 		this.id = id;
 		this.name = name;
 		this.internalName = internalName;
@@ -72,6 +73,7 @@ public class TestVariable {
 		this.timeToLive = timeToLive;
 		this.creationDate = creationDate;
 		this.application = application;
+		this.fileName = fileName;
 	}
 	
 	/**
@@ -106,7 +108,8 @@ public class TestVariable {
 							variableJson.getString("name"),
 							variableJson.optInt("timeToLive", TIME_TO_LIVE_INFINITE),
 							creationDate,
-							variableJson.optInt("application", -1)
+							variableJson.optInt("application", -1),
+							variableJson.optString("uploadFile", null)
 		);
 		if (variable.getId() == -1) {
 			variable.setId(null);
@@ -131,7 +134,8 @@ public class TestVariable {
 				internalName,
 				timeToLive,
 				creationDate,
-				application);
+				application,
+				fileName);
 		variableCopy.applicationName = applicationName;
 		return variableCopy;
 	}
@@ -168,14 +172,19 @@ public class TestVariable {
 		return value;
 	}
 
-	public String getValue() {
+	public Object getValue() {
 		try {
-			return StringUtility.interpolateString(value, SeleniumTestsContextManager.getThreadContext());
+			if (this.getFileName() != null) {				
+                return SeleniumTestsContextManager.getThreadContext().getVariableServer().getVariableFile(this);
+            } else {
+            	String interpolatedValue = StringUtility.interpolateString(value, SeleniumTestsContextManager.getThreadContext()); 
+                return Objects.requireNonNullElse(interpolatedValue, "");
+            }
 		} catch (ConfigurationException e) {
 			if (StringUtility.PLACEHOLDER_PATTERN.matcher(value).find()) {
 				logger.warn("Cannot interpolate variable value, context is not initalized");
-			}
-			return value;
+			}			
+			return Objects.requireNonNullElse(value, "");
 		}
 	}
 
@@ -210,6 +219,14 @@ public class TestVariable {
 	public void setApplication(Integer id) {
 		this.application = id;
 	}
+	
+	public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
 
 	@Override
 	public String toString() {
