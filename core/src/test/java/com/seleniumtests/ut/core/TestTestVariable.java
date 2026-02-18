@@ -203,4 +203,11 @@ public class TestTestVariable extends GenericTest {
 		
 		Assert.assertEquals(new TestVariable("url", "http://mysite${path}").getValue(), "http://mysite/foo/bar");
 	}
+	
+    @Test(groups = {"ut"})
+    public void testVariableWithNullValue() {
+        TestVariable tv = new TestVariable("nullvalue", null);
+        Assert.assertEquals(tv.getName(), "nullvalue");
+        Assert.assertEquals(tv.getValue(), ""); // getValue returns empty string instead of null
+    }
 }

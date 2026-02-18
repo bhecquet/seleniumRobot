@@ -397,6 +397,18 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		Assert.assertEquals(variables.get("key2").getValue(), "value2");
 	}
 	
+	@Test(groups = {"ut"}, expectedExceptions = SeleniumRobotServerException.class)
+    public void testGetVariableFileFailed() throws UnirestException {
+
+        configureMockedVariableServerConnection();
+        createServerMock(SERVER_URL, "GET", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, "{}");
+        when(Unirest.get(SERVER_URL + String.format(SeleniumRobotVariableServerConnector.VARIABLE_FILE_API_URL, 3))).thenThrow(UnirestException.class);
+
+        SeleniumRobotVariableServerConnector connector = new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+        SeleniumTestsContextManager.getThreadContext().setVariableServer(connector);
+        Map<String, TestVariable> variables = connector.getVariables();
+        connector.getVariableFile(variables.get("key3"));
+    }
 
 	@Test(groups= {"ut"})
 	public void testVariableUpdateExistingVariable() throws UnirestException {

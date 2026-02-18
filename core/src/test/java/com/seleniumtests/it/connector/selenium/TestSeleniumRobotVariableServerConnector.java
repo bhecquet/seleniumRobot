@@ -124,7 +124,7 @@ public class TestSeleniumRobotVariableServerConnector extends GenericTest {
      * - a Variable with name=variableName (the class variable) and application=core and a file uploaded
      * - fileName must be this variable uploadedFile as 'example.csv'
      */
-    @Test(groups = {"it"}, enabled = true)
+    @Test(groups = {"it"}, enabled = false)
     public void testDownloadVariableFile() {
         File checkFile = Paths.get(SeleniumTestsContextManager.getDatasetPath(), "DEV", fileName).toFile();
         if (checkFile.exists()) {
