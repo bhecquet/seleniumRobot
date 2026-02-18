@@ -753,7 +753,7 @@ public class TestTestTasks extends ConnectorsTest {
 	public void testParamDoesNotExist() {
 		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("foo", new TestVariable("foo", "bar"));
 		SeleniumTestsContextManager.getGlobalContext().getConfiguration().put("foo", new TestVariable("foo", "bar2"));
-		Assert.assertNull(TestTasks.param("foo2"));
+		Assert.assertEquals(TestTasks.param("foo2"), "");
 	}
 	
 	/**
@@ -842,7 +842,7 @@ public class TestTestTasks extends ConnectorsTest {
 	public void testParamKeyPatternDoesNotExist() {
 		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("foofoo", new TestVariable("foofoo", "bar"));
 		SeleniumTestsContextManager.getGlobalContext().getConfiguration().put("foofoo", new TestVariable("foofoo", "bar_global"));
-		Assert.assertNull(TestTasks.param(Pattern.compile("offo")));
+		Assert.assertEquals(TestTasks.param(Pattern.compile("offo")), "");
 	}
 	
 	/**
@@ -919,7 +919,7 @@ public class TestTestTasks extends ConnectorsTest {
 	public void testParamValuePatternDoesNotExist() {
 		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("foofoo", new TestVariable("foofoo", "barbar"));
 		SeleniumTestsContextManager.getGlobalContext().getConfiguration().put("foobar", new TestVariable("foobar", "barbar2"));
-		Assert.assertNull(TestTasks.param(null, Pattern.compile("rbba")));
+		Assert.assertEquals(TestTasks.param(null, Pattern.compile("rbba")), "");
 	}
 	
 	/**
@@ -959,7 +959,7 @@ public class TestTestTasks extends ConnectorsTest {
 	public void testParamKeyAndValuePatternNoKeyMatching() {
 		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("foofoo", new TestVariable("foofoo", "barbar"));
 		SeleniumTestsContextManager.getGlobalContext().getConfiguration().put("foobar", new TestVariable("foobar", "barbar2"));
-		Assert.assertNull(TestTasks.param(Pattern.compile("ffo"), Pattern.compile("rba")));
+		Assert.assertEquals(TestTasks.param(Pattern.compile("ffo"), Pattern.compile("rba")), "");
 	}
 	
 	/**
@@ -969,7 +969,7 @@ public class TestTestTasks extends ConnectorsTest {
 	public void testParamKeyAndValuePatternNoValueMatching() {
 		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("foofoo", new TestVariable("foofoo", "barbar"));
 		SeleniumTestsContextManager.getGlobalContext().getConfiguration().put("foobar", new TestVariable("foobar", "barbar2"));
-		Assert.assertNull(TestTasks.param(Pattern.compile("foo"), Pattern.compile("rbba")));
+		Assert.assertEquals(TestTasks.param(Pattern.compile("foo"), Pattern.compile("rbba")), "");
 	}
 
 	@Test(groups= {"ut"})

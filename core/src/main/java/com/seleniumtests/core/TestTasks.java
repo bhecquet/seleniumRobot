@@ -27,6 +27,7 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -266,9 +267,11 @@ public class TestTasks {
      */
     public static String param(String key) {
     	try {
-    		return getParam(SeleniumTestsContextManager.getThreadContext(), key, String.class);
+    		String param = getParam(SeleniumTestsContextManager.getThreadContext(), key, String.class); 
+    		return Objects.requireNonNullElse(param, "");
     	} catch (ConfigurationException e) {
-    		return getParam(SeleniumTestsContextManager.getGlobalContext(), key, String.class);
+    		String param = getParam(SeleniumTestsContextManager.getGlobalContext(), key, String.class); 
+    		return Objects.requireNonNullElse(param, "");
     	}
     }
     
@@ -294,9 +297,11 @@ public class TestTasks {
      */
     public static String param(Pattern keyPattern) {
     	try {
-    		return getParamWithPattern(SeleniumTestsContextManager.getThreadContext(), keyPattern, null, String.class);
+    		String param = getParamWithPattern(SeleniumTestsContextManager.getThreadContext(), keyPattern, null, String.class); 
+    		return Objects.requireNonNullElse(param, "");
     	} catch (ConfigurationException e) {
-    		return getParamWithPattern(SeleniumTestsContextManager.getGlobalContext(), keyPattern, null, String.class);
+    		String param = getParamWithPattern(SeleniumTestsContextManager.getGlobalContext(), keyPattern, null, String.class);
+    		return Objects.requireNonNullElse(param, "");
     	}
     }
 
@@ -322,13 +327,14 @@ public class TestTasks {
      */
     public static String param(Pattern keyPattern, Pattern valuePattern) {
     	try {
-    		return getParamWithPattern(SeleniumTestsContextManager.getThreadContext(), keyPattern, valuePattern, String.class);
+    		String param = getParamWithPattern(SeleniumTestsContextManager.getThreadContext(), keyPattern, valuePattern, String.class); 
+    		return Objects.requireNonNullElse(param, "");
     	} catch (ConfigurationException e) {
-    		return getParamWithPattern(SeleniumTestsContextManager.getGlobalContext(), keyPattern, valuePattern, String.class);
+    		String param = getParamWithPattern(SeleniumTestsContextManager.getGlobalContext(), keyPattern, valuePattern, String.class); 
+    		return Objects.requireNonNullElse(param, "");
     	}
     }
-  
-    
+      
     private static <T extends Object> T getParam(SeleniumTestsContext context, String key, Class<T> returnType) {
     	TestVariable variable = context.getConfiguration().get(key);
     	if (variable == null) {
