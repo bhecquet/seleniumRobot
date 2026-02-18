@@ -170,6 +170,7 @@ public class TestTestVariable extends GenericTest {
 		Assert.assertEquals(variable.getId(), (Integer)1);
 		Assert.assertEquals(variable.getName(), "key");
 		Assert.assertEquals(variable.getValue(), "value");
+		Assert.assertNull(variable.getFileName());
         Assert.assertFalse(variable.isReservable());
 		Assert.assertEquals(variable.getInternalName(), "custom.test.variable.key");
 		Assert.assertNull(variable.getCreationDate());

@@ -174,16 +174,17 @@ public class TestVariable {
 
 	public Object getValue() {
 		try {
-			if (this.getFileName() != null) {
+			if (this.getFileName() != null) {				
                 return SeleniumTestsContextManager.getThreadContext().getVariableServer().getVariableFile(this);
             } else {
-                return StringUtility.interpolateString(value, SeleniumTestsContextManager.getThreadContext());
+            	String interpolatedValue = StringUtility.interpolateString(value, SeleniumTestsContextManager.getThreadContext()); 
+                return Objects.requireNonNullElse(interpolatedValue, "");
             }
 		} catch (ConfigurationException e) {
 			if (StringUtility.PLACEHOLDER_PATTERN.matcher(value).find()) {
 				logger.warn("Cannot interpolate variable value, context is not initalized");
-			}
-			return value;
+			}			
+			return Objects.requireNonNullElse(value, "");
 		}
 	}
 
