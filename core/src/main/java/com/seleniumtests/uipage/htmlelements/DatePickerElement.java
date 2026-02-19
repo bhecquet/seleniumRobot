@@ -117,4 +117,9 @@ public class DatePickerElement extends HtmlElement {
         	blur(); 
         }
     }
+
+    @Override
+    public String getType() {
+        return "date picker";
+    }
 }

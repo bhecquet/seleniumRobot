@@ -56,4 +56,9 @@ public class FrameElement extends HtmlElement {
     public FrameElement(final String label, final By by, final FrameElement frame, final Integer index, Integer replayTimeout) {
     	super(label, by, frame, index, replayTimeout);
     }
+
+    @Override
+    public String getType() {
+        return "frame";
+    }
 }

@@ -474,4 +474,9 @@ public class SelectList extends HtmlElement {
 	public void setSelectImplementation(ISelectList selectImplementation) {
 		this.selectImplementation.set(selectImplementation);
 	}
+
+	@Override
+	public String getType() {
+		return "select list";
+	}
 }

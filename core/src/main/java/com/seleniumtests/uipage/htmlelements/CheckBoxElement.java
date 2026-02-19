@@ -83,4 +83,9 @@ public class CheckBoxElement extends HtmlElement {
         	return getRealElementNoSearch().isSelected();
         }
     }
+
+    @Override
+    public String getType() {
+        return "checkbox";
+    }
 }

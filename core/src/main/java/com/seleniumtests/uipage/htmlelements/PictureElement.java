@@ -244,6 +244,11 @@ public class PictureElement extends GenericPictureElement {
 
 		new Actions(isDriverCreated().getDriver()).sendKeys(text).build().perform();
 	}
+
+	@Override
+	public String getType() {
+		return "";
+	}
 	
 	/**
 	 * Check if picture is visible on desktop. This is only available for desktop tests

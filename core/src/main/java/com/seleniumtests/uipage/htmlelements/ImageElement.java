@@ -60,4 +60,9 @@ public class ImageElement extends HtmlElement {
     public String getUrl() {
         return super.getDomAttribute("src");
     }
+
+    @Override
+    public String getType() {
+        return "image";
+    }
 }

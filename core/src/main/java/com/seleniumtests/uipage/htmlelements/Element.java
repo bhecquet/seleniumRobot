@@ -17,7 +17,8 @@
  */
 package com.seleniumtests.uipage.htmlelements;
 
-import org.mockito.internal.matchers.Null;
+import com.seleniumtests.uipage.ByC;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.decorators.Decorated;
 
@@ -31,6 +32,8 @@ import com.seleniumtests.uipage.PageObject;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.PerformsTouchActions;
 import io.appium.java_client.TouchAction;
+
+import java.util.Objects;
 
 
 /**
@@ -48,6 +51,7 @@ public abstract class Element {
 	protected String label;
 
 
+
 	// origin is the class where object is declared
 	// origin may be null if object is created outside of any PageObject (which should never happen outside of unit tests)
 	protected String origin;
@@ -62,7 +66,14 @@ public abstract class Element {
 	public abstract void click();
 	
 	public abstract void sendKeys(CharSequence ... text);
-	
+
+	public String getType() {
+		return "element";
+	}
+
+	public abstract By getSelector();
+
+
 	public abstract boolean isElementPresent();
 
 	protected Element(String label) {
@@ -72,7 +83,6 @@ public abstract class Element {
 	
 	/**
 	 * Creates a TouchAction depending on mobile platform. Due to appium 6.0.0 changes
-	 * @return
 	 */
     protected TouchAction<?> createTouchAction() {
     	String platform = SeleniumTestsContextManager.getThreadContext().getPlatform();
@@ -111,11 +121,7 @@ public abstract class Element {
 
 	public int getReplayTimeout() {
 
-    	if (replayTimeout != null) {
-    		return replayTimeout;
-    	} else {
-    		return SeleniumTestsContextManager.getThreadContext().getReplayTimeout();
-    	}
+        return Objects.requireNonNullElseGet(replayTimeout, () -> SeleniumTestsContextManager.getThreadContext().getReplayTimeout());
 	}
 
 
@@ -156,8 +162,6 @@ public abstract class Element {
 	/**
 	 * Returns the label used during initialization.
 	 * As this label is optional, it may be empty
-	 *
-	 * @return
 	 */
 	public String getLabel() {
 		return label;
@@ -168,13 +172,41 @@ public abstract class Element {
 	 * If label is present and not empty, use it
 	 * If label is not present and element is a class / instance field, use it
 	 * Else, use the selector
-	 * @return
 	 */
 	public String getName() {
 		if (label != null && !label.isEmpty()) {
 			return label;
 		} else if (fieldName.get() != null) {
 			return fieldName.get();
+		}
+		return null;
+	}
+
+	private String getOnlyText(String inputText) {
+		String text = inputText;
+		if (text.endsWith("*") || text.endsWith("^") || text.endsWith("$")) {
+			text = text.substring(0, text.length() - 1);
+		}
+		return text;
+	}
+
+	public String getDescription() {
+		if (label != null && !label.isEmpty()) {
+			return String.format("%s described by '%s'", getType(), label);
+		} else if (getSelector() != null && getSelector() instanceof By.ByLinkText linkTextSelector) {
+			return String.format("%s with link text '%s'", getType(), linkTextSelector.toString().split(":")[1].trim());
+		} else if (getSelector() != null && getSelector() instanceof By.ByPartialLinkText linkTextSelector) {
+			return String.format("%s with link text '%s'", getType(), linkTextSelector.toString().split(":")[1].trim());
+		} else if (getSelector() != null && getSelector() instanceof ByC.ByText textSelector) {
+			return String.format("%s whose text contains '%s'", getType(), getOnlyText(textSelector.getText()));
+		} else if (getSelector() != null && getSelector() instanceof ByC.ByLabel labelSelector) {
+			return String.format("%s with label containing '%s'", getType(), getOnlyText(labelSelector.getLabel()));
+		} else if (getSelector() != null && getSelector() instanceof ByC.ByLabelBackward labelSelector) {
+			return String.format("%s with label on the left containing '%s'", getType(), getOnlyText(labelSelector.getLabel()));
+		} else if (getSelector() != null && getSelector() instanceof ByC.ByLabelForward labelSelector) {
+			return String.format("%s with label on the right containing '%s'", getType(), getOnlyText(labelSelector.getLabel()));
+		} else if (fieldName.get() != null) {
+			return String.format("%s named '%s'", getType(), fieldName.get());
 		}
 		return null;
 	}

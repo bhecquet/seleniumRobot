@@ -1,5 +1,6 @@
 package com.seleniumtests.uipage.htmlelements;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
@@ -62,21 +63,36 @@ public class SeleniumElement extends Element {
 
     @Override
     protected void findElement(boolean waitForVisibility) {
-
+        // nothing to do
     }
 
     @Override
     public void click() {
-
+        // nothing to do
     }
 
     @Override
     public void sendKeys(CharSequence... text) {
-
+        // nothing to do
     }
 
     @Override
     public boolean isElementPresent() {
         return false;
+    }
+
+    @Override
+    public String getType() {
+        return "object";
+    }
+
+    @Override
+    public By getSelector() {
+        return null;
+    }
+
+    @Override
+    public String getDescription() {
+        return getName();
     }
 }

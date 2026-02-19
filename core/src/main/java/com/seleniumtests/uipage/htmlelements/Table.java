@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -105,7 +105,6 @@ public class Table extends HtmlElement {
     
     /**
      * Returns column list
-     * @return
      */
     @ReplayOnError
     public List<WebElement> getColumns() {
@@ -116,7 +115,6 @@ public class Table extends HtmlElement {
 
     /**
      * Returns the number of columns
-     * @return
      */
     @ReplayOnError
     public int getColumnCount() {
@@ -126,11 +124,10 @@ public class Table extends HtmlElement {
     
     /**
      * Given a row WebElement (represents a <tr> html element), returns the list of elements (<tr> or <th>)
-     * 
+     * <p>
      * Tip: returned element is a list of HtmlElement, but you must cast it to use its specific methods
      * 
      * @param row	the row to analyze
-     * @return
      */
     public List<WebElement> getRowCells(WebElement row) {
     	List<WebElement> cells;
@@ -139,8 +136,8 @@ public class Table extends HtmlElement {
     	}
     	
     	By descendants = By.xpath(".//descendant::*[name()=\"th\" or name()=\"td\"]");
-    	if (row instanceof HtmlElement) {
-    		cells = ((HtmlElement)row).findHtmlElements(descendants);
+    	if (row instanceof HtmlElement rowElement) {
+    		cells = rowElement.findHtmlElements(descendants);
     	} else {
     		cells = row.findElements(descendants);
     	}
@@ -157,12 +154,11 @@ public class Table extends HtmlElement {
     
     /**
      * Returns the cell from table, searching for its content by pattern
-     * 
+     * <p>
      * Tip: returned element is a HtmlElement, but you must cast it to use its specific methods 
      * 
      * @param content	pattern to search for
      * @param column	column where pattern should be searched
-     * @return
      */
     @ReplayOnError
     public WebElement getCellFromContent(final Pattern content, final int column) {
@@ -192,12 +188,12 @@ public class Table extends HtmlElement {
     /**
      * issue #306
      * Returns the row from table, searching for its content by pattern. Then you can search for a specific cell using 'getRowCells(row);'
-     *  
+     * <p>
      * Tip: returned element is a HtmlElement, but you must cast it to use its specific methods
      * 
      * @param content	pattern to search for
      * @param column	column where pattern should be searched
-     * @return
+
      */
     @ReplayOnError
     public WebElement getRowFromContent(final Pattern content, final int column) {
@@ -226,13 +222,12 @@ public class Table extends HtmlElement {
     
     /**
      * Get a table cell at row,column coordinates
-     * 
+     * <p>
      * Tip: returned element is a HtmlElement, but you must cast it to use its specific methods
      * 
      * @param row		the row index
      * @param column	the column index
      * @param focus		if true, scroll to this cell
-     * @return
      */
     public WebElement getCell(final int row, final int column, boolean focus) {
     	WebElement cell = getCell(row, column);
@@ -245,7 +240,7 @@ public class Table extends HtmlElement {
     
     /**
      * Get table cell
-     * 
+     * <p>
      * Tip: returned element is a HtmlElement, but you must cast it to use its specific methods
      */
     @ReplayOnError
@@ -267,7 +262,6 @@ public class Table extends HtmlElement {
 
     /**
      * Returns the number of rows
-     * @return
      */
     public int getRowCount() {
         getRows();
@@ -276,9 +270,8 @@ public class Table extends HtmlElement {
 
     /**
      * Returns list of rows
-     * 
+     * <p>
      * Tip: returned element is a list of HtmlElement, but you must cast it to use its specific methods
-     * @return
      */
     @ReplayOnError
     public List<WebElement> getRows() {
@@ -288,5 +281,11 @@ public class Table extends HtmlElement {
 
     public boolean isHasBody() {
         return !getRows().isEmpty();
+    }
+
+
+    @Override
+    public String getType() {
+        return "table";
     }
 }

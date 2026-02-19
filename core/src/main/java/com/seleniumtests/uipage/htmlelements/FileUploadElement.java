@@ -72,4 +72,9 @@ public class FileUploadElement extends HtmlElement {
         findElement(true);
         getRealElementNoSearch().sendKeys(keysToSend);
     }
+
+    @Override
+    public String getType() {
+        return "file upload";
+    }
 }

@@ -25,6 +25,12 @@ public class TestSeleniumElement extends MockitoTest {
     }
 
     @Test(groups="ut")
+    public void testGetDescriptionWebElement() {
+        when(element.toString()).thenReturn("Decorated {[[ChromeDriver: chrome on windows (83c6e18cbc09be7060ef3f92feda6877)] -> id: button2]}");
+        Assert.assertEquals(new SeleniumElement(element).getDescription(), "id: button2");
+    }
+
+    @Test(groups="ut")
     public void testGetNameSelect() {
         when(element.getTagName()).thenReturn("select");
         when(element.toString()).thenReturn("Decorated {[[ChromeDriver: chrome on windows (83c6e18cbc09be7060ef3f92feda6877)] -> id: button2]}");

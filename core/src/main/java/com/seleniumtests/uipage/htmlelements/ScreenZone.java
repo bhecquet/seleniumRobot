@@ -301,4 +301,9 @@ public class ScreenZone extends GenericPictureElement {
 				SeleniumTestsContextManager.getThreadContext().getRunMode(), 
 				SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector());
 	}
+
+	@Override
+	public String getType() {
+		return "screen zone";
+	}
 }

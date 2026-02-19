@@ -30,6 +30,7 @@ import com.seleniumtests.uipage.aspects.ReplayAction;
 import com.seleniumtests.util.logging.ScenarioLogger;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.remote.ScreenshotException;
 
@@ -69,7 +70,7 @@ public abstract class GenericPictureElement extends Element {
 	
 	/**
 	 * 
-	 * @param label
+	 * @param label					label of the element
 	 * @param pictureFile			picture to search for in snapshot or on desktop
 	 * @param detectionThreshold	sensitivity of search between 0 and 1. Be default, 0.1. More sensitivity means search can be less accurate, detect unwanted zones
 	 * @param searchOnDesktop		By default, false: search in driver snapshot. If true, we take a desktop screenshot, allowing searching into other elements than browser
@@ -126,7 +127,7 @@ public abstract class GenericPictureElement extends Element {
 		
 		// we already searched the picture for this page instance, reuse data
 		if (getDetectedObjectRectangle() != null) {
-			logger.info(String.format("Picture %s already searched", objectPictureFile));
+			logger.info("Picture {} already searched", objectPictureFile);
 			return;
 		}
 
@@ -160,8 +161,7 @@ public abstract class GenericPictureElement extends Element {
 
 	
 	/**
-	 * Get File containing the screeenshot, either on desktop or on browser
-	 * @return
+	 * Get File containing the screenshot, either on desktop or on browser
 	 */
 	protected abstract File getScreenshotFile();
 	
@@ -220,8 +220,7 @@ public abstract class GenericPictureElement extends Element {
 	
 	/**
 	 * Check if picture is visible. This is only available for desktop tests
-	 * @param waitMs
-	 * @return
+	 * @param waitMs	time to wait in milliseconds
 	 */
 	public boolean isElementPresent(int waitMs) {
 		Instant end = clock.instant().plusMillis(waitMs);
@@ -310,5 +309,10 @@ public abstract class GenericPictureElement extends Element {
 
 	public File getScenePictureFile() {
 		return screenshotFile;
+	}
+
+	@Override
+	public By getSelector() {
+		return null;
 	}
 }

@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.uipage;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -60,13 +61,15 @@ public class ByC extends By {
      */
     public abstract static class ByForcedXPath extends By implements Serializable {
         
+        @Serial
         private static final long serialVersionUID = 4699295846976948351L;
         
     }
     
     public abstract static class ByHasCssSelector extends ByC implements Serializable {
         
-        private static final long serialVersionUID = 4699295846976949851L;
+        @Serial
+        private static final long serialVersionUID = 4699295846976949852L;
         
         protected boolean useCssSelector;
         
@@ -482,6 +485,10 @@ public class ByC extends By {
         public String toString() {
             return String.format("By.label %s:'%s' forward on element %s", labelTagName, label, tagName);
         }
+
+        public String getLabel() {
+            return label;
+        }
     }
     
     public static class ByLabelBackward extends ByC implements Serializable {
@@ -537,6 +544,10 @@ public class ByC extends By {
         @Override
         public String toString() {
             return String.format("By.label %s:'%s' backward on element %s", labelTagName, label, tagName);
+        }
+
+        public String getLabel() {
+            return label;
         }
     }
     
@@ -732,6 +743,10 @@ public class ByC extends By {
         @Override
         public String toString() {
             return String.format("%s By.text: '%s'", tagName, text);
+        }
+
+        public String getText() {
+            return text;
         }
     }
     
@@ -1223,6 +1238,10 @@ public class ByC extends By {
         @Override
         public String toString() {
             return String.format("By.label '%s' on element", label);
+        }
+
+        public String getLabel() {
+            return label;
         }
     }
     

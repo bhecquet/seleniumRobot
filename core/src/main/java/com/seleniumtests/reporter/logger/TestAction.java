@@ -214,6 +214,8 @@ public class TestAction {
 		actionJson.put("durationToExclude", durationToExclude);
 		if (element != null) {
 			actionJson.put("element", element.getName());
+			actionJson.put("elementType", element.getType());
+			actionJson.put("elementDescription", element.getDescription());
 		}
 		if (origin != null) {
 			actionJson.put("origin", origin.getName());

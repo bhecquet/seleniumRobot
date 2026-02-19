@@ -5,6 +5,7 @@ import com.seleniumtests.it.core.aspects.CalcPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.uipage.ByC;
 import com.seleniumtests.uipage.htmlelements.ButtonElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import org.json.JSONObject;
@@ -77,13 +78,15 @@ public class TestTestAction extends MockitoTest {
 
     @Test(groups = { "ut" })
     public void testToJsonWithDetailedElementInformation() {
-        HtmlElement el = new HtmlElement("my element", By.id("el"));
+        ButtonElement el = new ButtonElement("my element", ByC.text("some text", "div"));
         el.setCallingPage(Mockito.mock(DriverTestPage.class));
         TestAction action = new TestAction("click on HtmlElement By.id(\"el\")", false, List.of("myPass<>"), "click", el);
         Assert.assertEquals(action.getName(), "click on HtmlElement By.id(\"el\")");
         JSONObject jsonAction = action.toJson();
         Assert.assertEquals(jsonAction.getString("action"), "click");
         Assert.assertEquals(jsonAction.getString("element"), "my element");
+        Assert.assertEquals(jsonAction.getString("elementType"), "button");
+        Assert.assertEquals(jsonAction.getString("elementDescription"), "button described by 'my element'");
         Assert.assertEquals(jsonAction.getString("origin"), "com.seleniumtests.it.driver.support.pages.DriverTestPage");
     }
 

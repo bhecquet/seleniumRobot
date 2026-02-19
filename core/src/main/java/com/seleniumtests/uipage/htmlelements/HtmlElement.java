@@ -1817,4 +1817,14 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 			return getBy().toString();
 		}
 	}
+
+	@Override
+	public String getType() {
+		return "object";
+	}
+
+	@Override
+	public By getSelector() {
+		return getBy();
+	}
 }

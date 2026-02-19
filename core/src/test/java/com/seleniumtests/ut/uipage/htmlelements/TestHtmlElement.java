@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.uipage.PageObject;
+import com.seleniumtests.uipage.htmlelements.*;
 import io.appium.java_client.android.options.UiAutomator2Options;
 import com.seleniumtests.driver.DriverMode;
 import org.mockito.Mock;
@@ -70,8 +71,6 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.logger.TestStep.StepStatus;
 import com.seleniumtests.uipage.ByC;
-import com.seleniumtests.uipage.htmlelements.FrameElement;
-import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
 import io.appium.java_client.android.AndroidDriver;
 
@@ -794,6 +793,69 @@ public class TestHtmlElement extends MockitoTest {
 	public void testGetNameNoFieldName() {
 		el = new HtmlElement(null, By.id("foo"));
 		Assert.assertEquals(el.getName(), "By.id: foo");
+	}
+
+	@Test(groups = { "ut" })
+	public void testGetDescriptionWithLabel() {
+		el = new RadioButtonElement("my label", By.id("foo"));
+		el.setFieldName("el");
+		Assert.assertEquals(el.getDescription(), "radio button described by 'my label'");
+	}
+	@Test(groups = { "ut" })
+	public void testGetDescriptionNoLabelByTextSelector() {
+		el = new TextFieldElement("", ByC.text("a text", "div"));
+		Assert.assertEquals(el.getDescription(), "text field whose text contains 'a text'");
+	}
+	@Test(groups = { "ut" })
+	public void testGetDescriptionNoLabelByTextSelector2() {
+		el = new TextFieldElement("", ByC.text("a text*", "div"));
+		Assert.assertEquals(el.getDescription(), "text field whose text contains 'a text'");
+	}
+	@Test(groups = { "ut" })
+	public void testGetDescriptionNoLabelByTextSelector3() {
+		el = new TextFieldElement("", ByC.text("a text$", "div"));
+		Assert.assertEquals(el.getDescription(), "text field whose text contains 'a text'");
+	}
+	@Test(groups = { "ut" })
+	public void testGetDescriptionNoLabelByTextSelector4() {
+		el = new TextFieldElement("", ByC.text("a text^", "div"));
+		Assert.assertEquals(el.getDescription(), "text field whose text contains 'a text'");
+	}
+	@Test(groups = { "ut" })
+	public void testGetDescriptionNoLabelByLinkTextSelector() {
+		el = new LinkElement("", By.linkText("my link"));
+		Assert.assertEquals(el.getDescription(), "link with link text 'my link'");
+	}
+	@Test(groups = { "ut" })
+	public void testGetDescriptionNoLabelByPartialLinkTextSelector() {
+		el = new HtmlElement("", By.partialLinkText("my partial link"));
+		Assert.assertEquals(el.getDescription(), "object with link text 'my partial link'");
+	}
+	@Test(groups = { "ut" })
+	public void testGetDescriptionNoLabelByLabelSelector() {
+		el = new LabelElement("", ByC.label("a label"));
+		Assert.assertEquals(el.getDescription(), "label with label containing 'a label'");
+	}
+	@Test(groups = { "ut" })
+	public void testGetDescriptionNoLabelByLabelForwardSelector() {
+		el = new HtmlElement("", ByC.labelForward("a label F", "div"));
+		Assert.assertEquals(el.getDescription(), "object with label on the right containing 'a label F'");
+	}
+	@Test(groups = { "ut" })
+	public void testGetDescriptionNoLabelByLabelBackwardSelector() {
+		el = new ButtonElement("", ByC.labelBackward("a label B", "div"));
+		Assert.assertEquals(el.getDescription(), "button with label on the left containing 'a label B'");
+	}
+	@Test(groups = { "ut" })
+	public void testGetDescriptionNoLabel() {
+		el = new HtmlElement("", By.id("id"));
+		el.setFieldName("el");
+		Assert.assertEquals(el.getDescription(), "object named 'el'");
+	}
+	@Test(groups = { "ut" })
+	public void testGetDescriptionNoLabelNoName() {
+		el = new HtmlElement("", By.id("id"));
+		Assert.assertNull(el.getDescription());
 	}
 
 	/**
