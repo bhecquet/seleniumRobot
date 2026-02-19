@@ -80,6 +80,9 @@ public abstract class ChromiumCapabilitiesFactory extends IDesktopCapabilityFact
                 if ("++enable-automation".equals(option.trim())) {
                     // remove option "--enable-automation" as, from chrome 132, it blocks tests that attach a new chrome tab to the current chrome process (https://issues.chromium.org/issues/371112535)
                     excludeSwitches.add("enable-automation");
+                } else if ("++disable-background-networking".equals(option.trim())) {
+                    // allow networking for profile, which will allow to download managed extensions
+                    excludeSwitches.add("disable-background-networking");
                 } else	if (option.startsWith("++")) {
                     startupOptions.remove(option.replace("++", "--"));
                 } else {

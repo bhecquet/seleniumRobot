@@ -330,7 +330,20 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		Assert.assertEquals(excludeSwitches.size(), 1);
 		Assert.assertEquals(excludeSwitches.get(0), "enable-automation");
 	}
-	
+
+	@Test(groups={"ut"})
+	public void testCreateEdgeCapabilitiesWithRemoveOptions3() {
+
+		when(config.getEdgeOptions()).thenReturn("++disable-background-networking");
+
+		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
+
+		List<?> excludeSwitches = (List<?>)(((Map<?,?>)((capa).asMap().get(EdgeOptions.CAPABILITY))).get("excludeSwitches"));
+		Assert.assertEquals(excludeSwitches.size(), 1);
+		Assert.assertEquals(excludeSwitches.get(0), "disable-background-networking");
+	}
+
+
 	@Test(groups={"ut"})
 	public void testCreateEdgeCapabilitiesHeadless() {
 		

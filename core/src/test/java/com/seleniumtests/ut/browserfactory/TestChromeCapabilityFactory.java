@@ -565,6 +565,18 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		Assert.assertEquals(excludeSwitches.size(), 1);
 		Assert.assertEquals(excludeSwitches.get(0), "enable-automation");
 	}
+
+	@Test(groups={"ut"})
+	public void testCreateChromeCapabilitiesWithRemoveOptions3() {
+
+		when(config.getChromeOptions()).thenReturn("++disable-background-networking");
+
+		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
+
+		List<?> excludeSwitches = (List<?>)(((Map<?,?>)((capa).asMap().get(ChromeOptions.CAPABILITY))).get("excludeSwitches"));
+		Assert.assertEquals(excludeSwitches.size(), 1);
+		Assert.assertEquals(excludeSwitches.get(0), "disable-background-networking");
+	}
 	
 	@Test(groups={"ut"})
 	public void testCreateChromeCapabilitiesWithLogging() {
