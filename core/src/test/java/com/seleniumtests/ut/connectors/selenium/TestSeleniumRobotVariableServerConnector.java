@@ -26,6 +26,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -230,6 +231,8 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		Map<String, TestVariable> variables = connector.getVariables();
 		Assert.assertEquals(variables.get("key1").getValue(), "value1");
 		Assert.assertEquals(variables.get("key2").getValue(), "value2");
+		Assert.assertNull(variables.get("key1").getFileName()); //Check with uploadFile: null in the json
+		Assert.assertNull(variables.get("key2").getFileName()); //Check with no key uploadFile in the json
 		
 		verify(variablesRequest).queryString("reserve", true);
 		verify(variablesRequest).queryString("version", 4);
@@ -242,6 +245,19 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		verify(variablesRequest, never()).queryString(eq("value"), anyString());
 	}
 
+	@Test(groups = {"ut"})
+    public void testGetVariablesWithFile() {
+        configureMockedVariableServerConnection();
+        SeleniumRobotVariableServerConnector connector = new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+        SeleniumTestsContextManager.getThreadContext().setVariableServer(connector);
+        Map<String, TestVariable> variables = connector.getVariables();
+
+        Assert.assertEquals(variables.get("key1").getValue(), "value1");
+        Assert.assertNull(variables.get("key1").getFileName());
+        Assert.assertEquals(variables.get("key3").getFileName(), "http://127.0.0.1:8000/media/appName/testStandardDataProvider.csv");
+        Assert.assertEquals(variables.get("key3").getValue(), Paths.get(SeleniumTestsContextManager.getDatasetPath(), "DEV", "testStandardDataProvider.csv").toFile());
+    }
+	
 	/**
 	 * Check the case where variable from linked application overlap a variable from tested application
 	 */
@@ -381,6 +397,18 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		Assert.assertEquals(variables.get("key2").getValue(), "value2");
 	}
 	
+	@Test(groups = {"ut"}, expectedExceptions = SeleniumRobotServerException.class)
+    public void testGetVariableFileFailed() throws UnirestException {
+
+        configureMockedVariableServerConnection();
+        createServerMock(SERVER_URL, "GET", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, "{}");
+        when(Unirest.get(SERVER_URL + String.format(SeleniumRobotVariableServerConnector.VARIABLE_FILE_API_URL, 3))).thenThrow(UnirestException.class);
+
+        SeleniumRobotVariableServerConnector connector = new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+        SeleniumTestsContextManager.getThreadContext().setVariableServer(connector);
+        Map<String, TestVariable> variables = connector.getVariables();
+        connector.getVariableFile(variables.get("key3"));
+    }
 
 	@Test(groups= {"ut"})
 	public void testVariableUpdateExistingVariable() throws UnirestException {
@@ -520,7 +548,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		rawVariables.put("key1", new TestVariable(1, "key1", "value1", false, "key1"));
 		rawVariables.put("key2", new TestVariable(1, "key2", "value2", false, "key2"));
 		
-		Map<String, String> variables = SeleniumRobotVariableServerConnector.convertRawTestVariableMapToKeyValuePairs(rawVariables);
+		Map<String, Object> variables = SeleniumRobotVariableServerConnector.convertRawTestVariableMapToKeyValuePairs(rawVariables);
 		Assert.assertEquals(variables.get("key1"), "value1");
 		Assert.assertEquals(variables.get("key2"), "value2");
 	}

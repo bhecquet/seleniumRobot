@@ -168,6 +168,27 @@ public class SeleniumRobotTestPlan {
     }
     
     /**
+     * Get File parameter from configuration
+     *
+     * @param key name of the param
+     * @return String
+     */
+    public static File paramFile(String key) {
+        return TestTasks.paramFile(key);
+    }
+
+    /**
+     * Get File parameter from configuration using pattern
+     * If multiple variables match the pattern, only one is returned
+     *
+     * @param keyPattern Pattern for searching key. If null, no filtering will be done on key
+     * @return the parameter value
+     */
+    public static File paramFile(Pattern keyPattern) {
+        return TestTasks.paramFile(keyPattern);
+    }
+    
+    /**
 	 * Method for creating or updating a variable on the seleniumRobot server (or locally if server is not used)
      * Moreover, created custom variable is specific to tuple (application, version, test environment)
      * Variable will be stored as a variable of the current tested application

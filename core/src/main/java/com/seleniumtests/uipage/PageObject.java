@@ -391,6 +391,16 @@ public class PageObject extends BasePage implements IPage {
     }
 
     /**
+     * Get file parameter from configuration
+     *
+     * @param key name of the variable to find
+     * @return File
+     */
+    public static File paramFile(String key) {
+        return TestTasks.paramFile(key);
+    }
+    
+    /**
      * Get parameter from configuration using pattern
      * If multiple variables match the pattern, only one is returned
      * @param keyPattern	Pattern for searching key. If null, no filtering will be done on key
@@ -398,6 +408,17 @@ public class PageObject extends BasePage implements IPage {
      */
     public static String param(Pattern keyPattern) {
     	return TestTasks.param(keyPattern);
+    }
+    
+    /**
+     * Get file parameter from configuration using pattern
+     * If multiple variables match the pattern, only one is returned
+     *
+     * @param keyPattern Pattern for searching key. If null, no filtering will be done on key
+     * @return the associated value
+     */
+    public static File paramFile(Pattern keyPattern) {
+        return TestTasks.paramFile(keyPattern);
     }
     
     /**

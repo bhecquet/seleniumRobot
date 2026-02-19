@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +49,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
@@ -65,7 +67,7 @@ import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.osutility.OSUtilityWindows;
 
-public class TestTestTasks extends MockitoTest {
+public class TestTestTasks extends ConnectorsTest {
 	
 	@Mock
 	private OSUtilityWindows osUtility;
@@ -732,7 +734,20 @@ public class TestTestTasks extends MockitoTest {
 	}
 	
 	/**
-	 * Check empty string is returned if parameter is not known
+     * Check we get File parameters from the thread context
+     */
+    @Test(groups = {"ut"})
+    public void testParamFile() {
+        configureMockedVariableServerConnection();
+        SeleniumRobotVariableServerConnector connector = new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+        SeleniumTestsContextManager.getThreadContext().setVariableServer(connector);
+        SeleniumTestsContextManager.getThreadContext().getConfiguration().putAll(connector.getVariables());
+
+        Assert.assertEquals(TestTasks.paramFile("key3"), Paths.get(SeleniumTestsContextManager.getDatasetPath(), "DEV", "testStandardDataProvider.csv").toFile());
+    }
+	
+	/**
+	 * Check null is returned if parameter is not known
 	 */
 	@Test(groups= {"ut"})
 	public void testParamDoesNotExist() {
@@ -740,6 +755,19 @@ public class TestTestTasks extends MockitoTest {
 		SeleniumTestsContextManager.getGlobalContext().getConfiguration().put("foo", new TestVariable("foo", "bar2"));
 		Assert.assertEquals(TestTasks.param("foo2"), "");
 	}
+	
+	/**
+     * Check null is returned if parameter is not known
+     */
+    @Test(groups = {"ut"})
+    public void testParamFileNotExist() {
+        configureMockedVariableServerConnection();
+        SeleniumRobotVariableServerConnector connector = new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+        SeleniumTestsContextManager.getThreadContext().setVariableServer(connector);
+        SeleniumTestsContextManager.getThreadContext().getConfiguration().putAll(connector.getVariables());
+
+        Assert.assertNull(TestTasks.paramFile("keyNotFound"));
+    }
 	
 	/**
 	 * Check we look at global context if thread context is not initialized
@@ -752,6 +780,19 @@ public class TestTestTasks extends MockitoTest {
 	}
 	
 	/**
+     * Without thread context, we can't get VariableServer nor the paramFile value
+     */
+    @Test(groups = {"ut"}, expectedExceptions = ConfigurationException.class)
+    public void testParamFileThreadContextNotInitialized() {
+        SeleniumTestsContextManager.setThreadContext(null);
+        configureMockedVariableServerConnection();
+        SeleniumRobotVariableServerConnector connector = new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+        SeleniumTestsContextManager.getGlobalContext().setVariableServer(connector);
+        SeleniumTestsContextManager.getGlobalContext().getConfiguration().putAll(connector.getVariables());
+        TestTasks.paramFile("key3");
+    }
+	
+	/**
 	 * Check error is raised if thread and global context are not initialized
 	 */
 	@Test(groups= {"ut"}, expectedExceptions=ConfigurationException.class)
@@ -760,6 +801,16 @@ public class TestTestTasks extends MockitoTest {
 		SeleniumTestsContextManager.setGlobalContext(null);
 		TestTasks.param("foo");
 	}
+	
+	/**
+     * Check error is raised if thread and global context are not initialized
+     */
+    @Test(groups = {"ut"}, expectedExceptions = ConfigurationException.class)
+    public void testParamFileGlobalContextNotInitialized() {
+        SeleniumTestsContextManager.setThreadContext(null);
+        SeleniumTestsContextManager.setGlobalContext(null);
+        TestTasks.paramFile("foo");
+    }
 	
 	/**
 	 * Check we get parameters with pattern on key from the thread context
@@ -772,7 +823,20 @@ public class TestTestTasks extends MockitoTest {
 	}
 	
 	/**
-	 * Check empty string is returned if parameter is not known
+     * Check we get file parameters with pattern on key from the thread context
+     */
+    @Test(groups = {"ut"})
+    public void testParamFileKeyPattern() {
+        configureMockedVariableServerConnection();
+        SeleniumRobotVariableServerConnector connector = new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+        SeleniumTestsContextManager.getThreadContext().setVariableServer(connector);
+        SeleniumTestsContextManager.getThreadContext().getConfiguration().putAll(connector.getVariables());
+
+        Assert.assertEquals(TestTasks.paramFile(Pattern.compile("y3")), Paths.get(SeleniumTestsContextManager.getDatasetPath(), "DEV", "testStandardDataProvider.csv").toFile());
+    }
+	
+	/**
+	 * Check null is returned if parameter is not known
 	 */
 	@Test(groups= {"ut"})
 	public void testParamKeyPatternDoesNotExist() {
@@ -780,6 +844,19 @@ public class TestTestTasks extends MockitoTest {
 		SeleniumTestsContextManager.getGlobalContext().getConfiguration().put("foofoo", new TestVariable("foofoo", "bar_global"));
 		Assert.assertEquals(TestTasks.param(Pattern.compile("offo")), "");
 	}
+	
+	/**
+     * Check null is returned if parameter is not known
+     */
+    @Test(groups = {"ut"})
+    public void testParamFileKeyPatternDoesNotExist() {
+        configureMockedVariableServerConnection();
+        SeleniumRobotVariableServerConnector connector = new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+        SeleniumTestsContextManager.getThreadContext().setVariableServer(connector);
+        SeleniumTestsContextManager.getThreadContext().getConfiguration().putAll(connector.getVariables());
+
+        Assert.assertNull(TestTasks.paramFile(Pattern.compile("offo")));
+    }
 	
 	/**
 	 * Check we look at global context if thread context is not initialized
@@ -792,6 +869,20 @@ public class TestTestTasks extends MockitoTest {
 	}
 	
 	/**
+     * Without thread context, we can't get VariableServer nor the paramFile value
+     */
+    @Test(groups = {"ut"}, expectedExceptions = ConfigurationException.class)
+    public void testParamFileKeyPatternThreadContextNotInitialized() {
+        SeleniumTestsContextManager.setThreadContext(null);
+        configureMockedVariableServerConnection();
+        SeleniumRobotVariableServerConnector connector = new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+        SeleniumTestsContextManager.getGlobalContext().setVariableServer(connector);
+        SeleniumTestsContextManager.getGlobalContext().getConfiguration().putAll(connector.getVariables());
+
+        TestTasks.paramFile(Pattern.compile("y3"));
+    }
+	
+	/**
 	 * Check error is raised if thread and global context are not initialized
 	 */
 	@Test(groups= {"ut"}, expectedExceptions=ConfigurationException.class)
@@ -800,6 +891,16 @@ public class TestTestTasks extends MockitoTest {
 		SeleniumTestsContextManager.setGlobalContext(null);
 		TestTasks.param(Pattern.compile("ofo"));
 	}
+	
+	/**
+     * Without thread context, we can't get VariableServer nor the paramFile value
+     */
+    @Test(groups = {"ut"}, expectedExceptions = ConfigurationException.class)
+    public void testParamFileKeyPatternGlobalContextNotInitialized() {
+        SeleniumTestsContextManager.setThreadContext(null);
+        SeleniumTestsContextManager.setGlobalContext(null);
+        TestTasks.paramFile(Pattern.compile("y3"));
+    }
 	
 	/**
 	 * Check we get parameters with pattern on value from the thread context
@@ -812,7 +913,7 @@ public class TestTestTasks extends MockitoTest {
 	}
 	
 	/**
-	 * Check empty string is returned if parameter is not known
+	 * Check null is returned if parameter is not known
 	 */
 	@Test(groups= {"ut"})
 	public void testParamValuePatternDoesNotExist() {
