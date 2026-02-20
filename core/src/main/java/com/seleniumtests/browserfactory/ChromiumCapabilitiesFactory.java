@@ -3,8 +3,10 @@ package com.seleniumtests.browserfactory;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.DriverConfig;
+import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.StringUtility;
 import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.UnexpectedAlertBehaviour;
 import org.openqa.selenium.chromium.ChromiumOptions;
 
 import java.nio.file.Path;
@@ -102,16 +104,19 @@ public abstract class ChromiumCapabilitiesFactory extends IDesktopCapabilityFact
 
         // https://github.com/SeleniumHQ/selenium/issues/16230
         options.setCapability("webSocketUrl", true);
-        Map<String, String> userPromptHandler = Map.of(
-                "alert", IGNORE,
-                "beforeUnload", IGNORE,
-                "confirm", IGNORE,
-                "default", IGNORE,
-                "file", IGNORE,
-                "prompt", IGNORE);
-        options.setCapability(
-                "unhandledPromptBehavior",
-                userPromptHandler);
+
+        if (webDriverConfig.getMode() == DriverMode.BROWSERSTACK) {
+            options.setUnhandledPromptBehaviour(UnexpectedAlertBehaviour.IGNORE);
+        } else {
+            Map<String, String> userPromptHandler = Map.of(
+                    "alert", IGNORE,
+                    "beforeUnload", IGNORE,
+                    "confirm", IGNORE,
+                    "default", IGNORE,
+                    "file", IGNORE,
+                    "prompt", IGNORE);
+            options.setCapability("unhandledPromptBehavior", userPromptHandler);
+        }
     }
 
     /**

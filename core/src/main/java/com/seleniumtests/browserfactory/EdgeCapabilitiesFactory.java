@@ -103,7 +103,7 @@ public class EdgeCapabilitiesFactory extends ChromiumCapabilitiesFactory {
 			}
         }
 
-		// enableBidi(options);
+		enableBidi(options);
         
 		return options;
 	}

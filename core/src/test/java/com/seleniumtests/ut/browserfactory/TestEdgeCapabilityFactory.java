@@ -27,10 +27,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.PageLoadStrategy;
-import org.openqa.selenium.Platform;
-import org.openqa.selenium.Proxy;
+import org.openqa.selenium.*;
 import org.openqa.selenium.edge.EdgeDriverService;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.remote.CapabilityType;
@@ -259,6 +256,22 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		Assert.assertNull(((Map<?,?>)(capa.asMap().get(EdgeOptions.CAPABILITY))).get("debuggerAddress")); // no debuger address set as we do not attach an existing browser
 		List<?> excludeSwitches = (List<?>)(((Map<?,?>)((capa).asMap().get(EdgeOptions.CAPABILITY))).get("excludeSwitches"));
 		Assert.assertNull(excludeSwitches);
+
+		Assert.assertTrue((Boolean) capa.getCapability("webSocketUrl"));
+		Assert.assertEquals(((Map<?,?>)capa.getCapability("unhandledPromptBehavior")).get("default"), "ignore");
+	}
+
+	/**
+	 * Check we set debugger address
+	 */
+	@Test(groups={"ut"})
+	public void testCreateDefaultEdgeCapabilitiesBrowserStack() {
+
+		when(config.getMode()).thenReturn(DriverMode.BROWSERSTACK);
+		MutableCapabilities capa = new EdgeCapabilitiesFactory(config).createCapabilities();
+
+		Assert.assertTrue((Boolean) capa.getCapability("webSocketUrl"));
+		Assert.assertEquals(capa.getCapability("unhandledPromptBehavior"), UnexpectedAlertBehaviour.IGNORE);
 	}
 		
 	/**
