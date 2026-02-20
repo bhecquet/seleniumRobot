@@ -128,8 +128,6 @@ public class SeleniumTestsContext {
     
     public static final String ADVANCED_ELEMENT_SEARCH = "advancedElementSearch";	// 'false' (default), 'full', 'dom'. if 'dom', store and possibly use found element information to adapt to changes in DOM, using only DOM information. If element is not found, it will try to use other element information to find it
     																				// if 'full', search will also be done using element picture, if available
-    
-    public static final String FIND_ERROR_CAUSE = "findErrorCause";				// if 'true', try to find why the test failed
 
     public static final String SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER = "setAssumeUntrustedCertificateIssuer"; // Firefox uniquement pour qu'il ne prenne pas en compte les certificats invalides 
     public static final String SET_ACCEPT_UNTRUSTED_CERTIFICATES = "setAcceptUntrustedCertificates"; // Firefox uniquement pour qu'il ne prenne pas en compte les certificats invalides
@@ -357,9 +355,7 @@ public class SeleniumTestsContext {
     	testManagerContext.init();
     	bugtrackerContext.init();
     	seleniumRobotServerContext.init();
-    	   
-        setFindErrorCause(getBoolValueForTest(FIND_ERROR_CAUSE, System.getProperty(FIND_ERROR_CAUSE)));
-        
+
         setWebDriverGrid(getValueForTest(WEB_DRIVER_GRID, System.getProperty(WEB_DRIVER_GRID)));
         setWebDriverGridTimeout(getIntValueForTest(WEB_DRIVER_GRID_TIMEOUT, System.getProperty(WEB_DRIVER_GRID_TIMEOUT)));
         setRunMode(getValueForTest(RUN_MODE, System.getProperty(RUN_MODE)));
@@ -1417,10 +1413,6 @@ public class SeleniumTestsContext {
     	return (Boolean) getAttribute(MANUAL_TEST_STEPS);
     }
 
-    public boolean isFindErrorCause() {
-    	return (Boolean) getAttribute(FIND_ERROR_CAUSE);
-    }
-    
 	public Map<String, String> getDeviceList() {
     	HashMap<String, String> deviceList = new HashMap<>();
     	if (getAttribute(DEVICE_LIST) == null || DEFAULT_DEVICE_LIST.equals(getAttribute(DEVICE_LIST))) {
@@ -1712,10 +1704,6 @@ public class SeleniumTestsContext {
     			throw new ConfigurationException(e.getMessage());
     		}
     	}
-    }
-    
-    public void setFindErrorCause(Boolean active) {
-        setAttribute(FIND_ERROR_CAUSE, Objects.requireNonNullElse(active, DEFAULT_FIND_ERROR_CAUSE));
     }
   
     public void setVariableAlreadyRequestedFromServer(Map<String, TestVariable> variableAlreadyRequestedFromServer) {

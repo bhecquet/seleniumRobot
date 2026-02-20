@@ -40,8 +40,6 @@ import org.testng.xml.XmlSuite;
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.testanalysis.ErrorCause;
-import com.seleniumtests.core.testanalysis.ErrorCauseFinder;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.ScenarioException;

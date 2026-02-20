@@ -1173,20 +1173,7 @@ public class TestSeleniumTestContext extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().setManualTestSteps(null);
 		Assert.assertFalse(SeleniumTestsContextManager.getThreadContext().isManualTestSteps());
 	}
-	
-	@Test(groups="ut context")
-	public void testFindErrorCause(final ITestContext testNGCtx) {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setFindErrorCause(true);
-		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().isFindErrorCause());
-	}
-	@Test(groups="ut context")
-	public void testFindErrorCauseNull(final ITestContext testNGCtx) {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setFindErrorCause(null);
-		Assert.assertFalse(SeleniumTestsContextManager.getThreadContext().isFindErrorCause());
-	}
-	
+
 	@Test(groups="ut context")
 	public void testCustomTestsReports(final ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);

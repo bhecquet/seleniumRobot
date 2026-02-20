@@ -47,9 +47,6 @@ import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.reporter.logger.Snapshot;
 
-import kong.unirest.core.json.JSONArray;
-import kong.unirest.core.json.JSONObject;
-
 public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 
 	SeleniumRobotSnapshotServerConnector connector;
@@ -193,7 +190,6 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 
 	/**
 	 * create a snapshot
-	 * @throws IOException 
 	 */
 	@Test(groups={"it"})
 	public void testCreateSnapshot() throws IOException {
@@ -237,49 +233,6 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 
 		Assert.assertNotNull(stepResultId);
 	}
-	
-	@Test(groups={"it"})
-	public void testDetectErrorInPicture() throws IOException {
-		
-		File image = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "img.png").toFile();
-		image.deleteOnExit();
-		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/imageFieldDetection/login-page-error.jpg"), image);
-		ScreenShot screenshot = new ScreenShot(image, null, "");
-		Snapshot snapshot = new Snapshot(screenshot, "img", SnapshotCheckType.FALSE);
-		JSONObject detectionData = connector.detectErrorInPicture(snapshot);
-		JSONArray errors = detectionData.getJSONArray("fields");
-		
-		Assert.assertEquals(errors.length(), 1);
-		Assert.assertEquals(errors.getJSONObject(0).getString("text"), "Votre email/mot de passe est incorrect");
-	}
-	
-	@Test(groups={"it"})
-	public void testDetectFieldsInPicture() throws IOException {
-		
-		File image = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "img.png").toFile();
-		image.deleteOnExit();
-		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/imageFieldDetection/browserCapture.png"), image);
-		ScreenShot screenshot = new ScreenShot(image, null, "");
-		Snapshot snapshot = new Snapshot(screenshot, "img", SnapshotCheckType.FALSE);
-		JSONObject detectionData = connector.detectFieldsInPicture(snapshot);
-		JSONArray fields = detectionData.getJSONArray("fields");
-		
-		Assert.assertEquals(fields.length(), 50);
-		Assert.assertEquals(fields.getJSONObject(0).getString("text"), "Test delay");
-	}
-	
-	@Test(groups={"it"})
-	public void testGetStepReferenceDetectFieldInformation() {
-		Integer stepResultId = createStepResult("logs");
-		JSONObject detectionData = connector.getStepReferenceDetectFieldInformation(stepResultId, "afcc45");
-		
-		// no field found because the used picture does not contain any
-		// we only check no error occurs calling the service
-		Assert.assertNull(detectionData.get("error"));
-		
-	}
-
-	
 	
 	
 }

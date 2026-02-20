@@ -249,16 +249,6 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 
 		// error causes
 		Map<String, String> testInfos = TestNGResultUtils.getTestInfoEncoded(testResult, "html");
-		if (!TestNGResultUtils.getErrorCauses(testResult).isEmpty()) {
-			
-			String causes = String.join("<br/>", TestNGResultUtils.getErrorCauses(testResult)
-					.stream()
-					.map(e -> String.format("<li>%s</li>", e))
-					.collect(Collectors.toList()));
-			testInfos.put("Possible error causes", String.format("<ul>%s</ul>", causes));
-		}
-		
-		
 		context.put("testInfos", relocateTestInfos(testResult, testInfos));
 		
 		// Application information

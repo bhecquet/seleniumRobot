@@ -55,11 +55,8 @@ import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnecto
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.contexts.SeleniumRobotServerContext;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
-import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.reporters.SeleniumRobotServerTestRecorder;
-
-import kong.unirest.core.json.JSONObject;
 
 public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 
@@ -830,9 +827,6 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 
 		reset(serverConnector); // reset call count
 		when(serverConnector.getReferenceSnapshot(anyInt())).thenReturn(File.createTempFile("img", ".png"));
-		
-		when(serverConnector.detectFieldsInPicture(any(ScreenShot.class))).thenReturn(new JSONObject("{'fields': [], 'labels': [], 'version': 'aaa', 'error': null}"));
-		when(serverConnector.detectErrorInPicture(any(ScreenShot.class))).thenReturn(new JSONObject("{'fields': [], 'labels': [], 'version': 'aaa', 'error': null}"));
 
 		doReturn(serverConnector).when(reporter).getServerConnector();
 		when(serverConnector.getActive()).thenReturn(true);

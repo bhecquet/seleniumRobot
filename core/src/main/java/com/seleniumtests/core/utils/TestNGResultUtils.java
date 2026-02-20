@@ -42,7 +42,6 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.core.runner.CucumberScenarioWrapper;
-import com.seleniumtests.core.testanalysis.ErrorCause;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.driver.screenshots.SnapshotComparisonBehaviour;
@@ -524,26 +523,7 @@ public class TestNGResultUtils {
 			result.getTestContext().getFailedTests().addResult(result);
 		}
 	}	
-	
 
-    @SuppressWarnings("unchecked")
-	public static List<ErrorCause> getErrorCauses(ITestResult testNGResult) {
-    	if (testNGResult.getAttribute(ERROR_CAUSES) == null) {
-    		return new ArrayList<>();
-    	} else {
-    		return (List<ErrorCause>) testNGResult.getAttribute(ERROR_CAUSES);
-    	}
-    }
-    
-    /**
-     * Store the list of detected error causes
-     * @param testNGResult
-     * @param errorCauses
-     */
-    public static void setErrorCauses(ITestResult testNGResult, List<ErrorCause> errorCauses) {
-    	testNGResult.setAttribute(ERROR_CAUSES, errorCauses);
-    }
-    
     public static boolean isErrorCauseSearchedInLastStep(ITestResult testNGResult) {
     	return isReportCreated(testNGResult, ERROR_CAUSE_IN_LAST_STEP);
     }

@@ -24,17 +24,12 @@ import java.util.Arrays;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
-import org.mockito.MockedConstruction;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.contexts.SeleniumRobotServerContext;
-import com.seleniumtests.core.testanalysis.ErrorCauseFinder;
-
-import static org.mockito.Mockito.*;
 
 public class TestReporterControler extends ReporterTest {
 
@@ -43,7 +38,7 @@ public class TestReporterControler extends ReporterTest {
 	 * Check testng-failed.xml file is present in test-output directory
 	 */
 	@Test(groups={"it"})
-	public void testTestNGFailedFilePresent() throws Exception {
+	public void testTestNGFailedFilePresent() {
 		
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverWithFailure"});
 		
@@ -80,7 +75,7 @@ public class TestReporterControler extends ReporterTest {
 	 * Check that files created by robot but not integrated to tests are deleted
 	 */
 	@Test(groups={"it"})
-	public void testUnusedCaptureAreDeleted() throws Exception {
+	public void testUnusedCaptureAreDeleted() {
 		
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverNativeActions"});
 		
@@ -97,7 +92,7 @@ public class TestReporterControler extends ReporterTest {
 	 * Checks that if a test is retried, captures of the last execution are kept (issue #121)
 	 */
 	@Test(groups={"it"})
-	public void testUnusedCaptureAreDeletedWhenTestFails() throws Exception {
+	public void testUnusedCaptureAreDeletedWhenTestFails() {
 		
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverWithFailure"});
 		
@@ -277,154 +272,5 @@ public class TestReporterControler extends ReporterTest {
 		// in case of test method error, it is retried so each Before/After method is also replayed. Check it's the last one we have
 		Assert.assertTrue(detailedReportContent3.matches(".*<div class=\"message-info message-conf\">.*?before count: 2\\s*</div>.*"));
 		Assert.assertTrue(detailedReportContent3.matches(".*<div class=\"message-info message-conf\">.*after count: 3</div>.*"));
-	}
-	
-	/**
-	 * Check we try to find error cause when
-	 * - findErrorCause=true
-	 * - seleniumServer is active
-	 * - result recording is active (meaning we also record step references)
-	 */
-	@Test(groups={"it"})
-	public void testErrorCauseSearched() throws Exception {
-		
-		try (MockedConstruction<ErrorCauseFinder> mockedErrorCauseFinder = mockConstruction(ErrorCauseFinder.class)) {
-			System.setProperty(SeleniumTestsContext.FIND_ERROR_CAUSE, "true");
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
-
-			configureMockedSnapshotServerConnection();
-			
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverWithFailure"});
-			
-			// we search only once for each test result, at the end of test suite
-			verify((ErrorCauseFinder)mockedErrorCauseFinder.constructed().get(0)).findErrorCause();
-			
-		} finally {
-			System.clearProperty(SeleniumTestsContext.FIND_ERROR_CAUSE);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
-		}
-		
-	}
-	
-	/**
-	 * Check we do not try to find ErrorCause when error is an AssertionError as we consider this error is raised when a control fails, the application / environment is OK
-	 */
-	@Test(groups={"it"})
-	public void testErrorCauseNotSearchedAssertionError() throws Exception {
-		
-		try (MockedConstruction<ErrorCauseFinder> mockedErrorCauseFinder = mockConstruction(ErrorCauseFinder.class)) {
-			System.setProperty(SeleniumTestsContext.FIND_ERROR_CAUSE, "true");
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
-
-			configureMockedSnapshotServerConnection();
-			
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverWithAssert"});
-			
-			// ErrorCauseFinder not created as we don't need it (AssertionError)
-			Assert.assertEquals(mockedErrorCauseFinder.constructed().size(), 0);
-			
-		} finally {
-			System.clearProperty(SeleniumTestsContext.FIND_ERROR_CAUSE);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
-		}
-		
-	}
-	
-	/**
-	 * Error cause won't be searched as test is successful
-	 */
-	@Test(groups={"it"})
-	public void testErrorCauseNotSearchedTestSuccess() throws Exception {
-		
-		try (MockedConstruction<ErrorCauseFinder> mockedErrorCauseFinder = mockConstruction(ErrorCauseFinder.class)) {
-			System.setProperty(SeleniumTestsContext.FIND_ERROR_CAUSE, "true");
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
-
-			configureMockedSnapshotServerConnection();
-			
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
-
-			// ErrorCauseFinder not created as we don't need it (test OK)
-			Assert.assertEquals(mockedErrorCauseFinder.constructed().size(), 0);
-			
-		} finally {
-			System.clearProperty(SeleniumTestsContext.FIND_ERROR_CAUSE);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
-		}
-		
-	}
-	
-	/**
-	 * Check we do not try to find error cause when
-	 * - findErrorCause=false
-	 * - seleniumServer is active
-	 * - result recording is active (meaning we also record step references)
-	 */
-	@Test(groups={"it"})
-	public void testErrorCauseNotSearchedFlagFalse() throws Exception {
-		
-		try (MockedConstruction<ErrorCauseFinder> mockedErrorCauseFinder = mockConstruction(ErrorCauseFinder.class)) {
-			System.setProperty(SeleniumTestsContext.FIND_ERROR_CAUSE, "false");
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
-
-			configureMockedSnapshotServerConnection();
-			
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverWithFailure"});
-
-			// ErrorCauseFinder not created as we don't need it (not requested)
-			Assert.assertEquals(mockedErrorCauseFinder.constructed().size(), 0);
-			
-		} finally {
-			System.clearProperty(SeleniumTestsContext.FIND_ERROR_CAUSE);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
-		}
-		
-	}
-	
-	/**
-	 * Check we do not try to find error cause when
-	 * - findErrorCause=true
-	 * - seleniumServer is active
-	 * - result recording is inactive
-	 */
-	@Test(groups={"it"})
-	public void testErrorCauseNotSearchedNoRecordResult() throws Exception {
-		
-		try (MockedConstruction<ErrorCauseFinder> mockedErrorCauseFinder = mockConstruction(ErrorCauseFinder.class)) {
-			System.setProperty(SeleniumTestsContext.FIND_ERROR_CAUSE, "false");
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, SERVER_URL);
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "false");
-
-			configureMockedSnapshotServerConnection();
-			
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverWithFailure"});
-
-			// ErrorCauseFinder not created as we don't need it (result recording is not active)
-			Assert.assertEquals(mockedErrorCauseFinder.constructed().size(), 0);
-			
-		} finally {
-			System.clearProperty(SeleniumTestsContext.FIND_ERROR_CAUSE);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
-		}
-		
 	}
 }
