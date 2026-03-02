@@ -45,9 +45,17 @@ End Sub
 If Wscript.Arguments.Named.Exists("output") Then
 	resultFolder = Wscript.Arguments.Named.Item("output")
 Else
-	resultFolder = "D:\uft\output"
-WScript.Echo "Result file written to: " + resultFolder + "\Report\Results.xml"
-
+    Dim fso, d, objShell
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    Set objShell = CreateObject( "WScript.Shell" )
+    Set d = fso.getDrive("d:")
+    If d.DriveType <> 2 Then
+    	appDataLocation=objShell.ExpandEnvironmentStrings("%APPDATA%")
+        resultFolder = appDataLocation + "\uft\output"
+    Else
+    	resultFolder = "D:\uft\output"
+    End If
+    WScript.Echo "Result file written to: " + resultFolder + "\Report\Results.xml"
 End If
 On Error Resume Next
 DeleteOutput(resultFolder)
