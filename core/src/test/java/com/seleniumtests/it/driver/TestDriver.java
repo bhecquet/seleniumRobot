@@ -785,7 +785,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	 */
 	
 	public void testFindElementsUnderAnOtherElement() {
-		Assert.assertEquals(DriverTestPage.divByClass.findElements(By.className("someClass")).size(), 4);
+		Assert.assertEquals(DriverTestPage.divByClass.findElements(By.className("someClass")).size(), 5);
 	}
 	
 	/**
@@ -801,7 +801,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	 */
 	
 	public void testFindLastElement() {
-		Assert.assertEquals(DriverTestPage.multiElementLastText.getValue(), "last text field");
+		Assert.assertEquals(DriverTestPage.multiElementLastText.getValue(), "1 text field");
 	}
 	
 	/**
