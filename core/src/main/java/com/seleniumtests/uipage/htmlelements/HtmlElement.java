@@ -106,6 +106,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	private static final ScenarioLogger scenarioLogger = ScenarioLogger.getScenarioLogger(TestRetryAnalyzer.class);
 	
     public static final Integer FIRST_VISIBLE = Integer.MAX_VALUE;
+    public static final Integer LAST_VISIBLE = Integer.MIN_VALUE;
     public static final Integer OPTIMAL_SCROLLING = Integer.MAX_VALUE;
     
     private static final String JS_CLICK_TRIPLE = 
@@ -897,6 +898,13 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 				}
 			}
 			throw new NoSuchElementException("no visible element has been found for " + by.toString());
+    	} else if (elementIndex != null && elementIndex.equals(LAST_VISIBLE)) {
+    		for (int counter = allElements.size() - 1; counter >= 0; counter--) {
+                if (allElements.get(counter) instanceof WebElement webElement && webElement.isDisplayed()) {
+                    return allElements.get(counter);
+                }
+            }
+            throw new NoSuchElementException("no visible element has been found for " + by.toString());
     	} else if (elementIndex != null && elementIndex < 0) {
     		return allElements.get(allElements.size() + elementIndex);
     	} else {

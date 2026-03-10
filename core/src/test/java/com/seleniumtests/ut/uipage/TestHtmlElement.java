@@ -309,6 +309,12 @@ public class TestHtmlElement extends TestDriver {
 	
 	@Override
     @Test(groups={"ut"})
+	public void testFindLastVisibleElement() {
+		super.testFindLastVisibleElement();
+	}
+	
+	@Override
+    @Test(groups={"ut"})
 	public void testFindFirstElementWithParent() {
 		super.testFindFirstElementWithParent();
 	}
@@ -317,6 +323,12 @@ public class TestHtmlElement extends TestDriver {
     @Test(groups={"ut"})
 	public void testFindFirstVisibleElementWithParent() {
 		super.testFindFirstVisibleElementWithParent();
+	}
+	
+	@Override
+    @Test(groups={"ut"})
+	public void testFindLastVisibleElementWithParent() {
+		super.testFindLastVisibleElementWithParent();
 	}
 	
 	@Override
