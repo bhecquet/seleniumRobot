@@ -93,7 +93,9 @@ public class DriverTestPage extends PageObject {
 	public static final TextFieldElement multiElementFirstTextWithParent = new HtmlElement("", By.className("otherClass")).findTextFieldElement(By.className("someClass"));
 	public static final TextFieldElement multiElementLastText = new TextFieldElement("", By.className("someClass"), -1);
 	public static final TextFieldElement multiElementFirstVisibleText = new TextFieldElement("", By.className("someClass"), HtmlElement.FIRST_VISIBLE);
+	public static final TextFieldElement multiElementLastVisibleText = new TextFieldElement("", By.className("someClass"), HtmlElement.LAST_VISIBLE);
 	public static final TextFieldElement multiElementFirstVisibleTextWithParent = new HtmlElement("", By.className("otherClass"), HtmlElement.FIRST_VISIBLE).findTextFieldElement(By.className("someClass"));
+	public static final TextFieldElement multiElementLastVisibleTextWithParent = new HtmlElement("", By.className("otherClass"), HtmlElement.LAST_VISIBLE).findTextFieldElement(By.className("someClass"));
 	public static final HtmlElement divByClass = new HtmlElement("", By.className("otherClass"), HtmlElement.FIRST_VISIBLE);
 	public static final HtmlElement searchByXpath = new HtmlElement("", By.xpath("//option[@value=\"opt1\"]"));
 	public static final HtmlElement scrollButton = new HtmlElement("button after scroll", By.id("buttonScroll"));

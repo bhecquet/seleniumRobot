@@ -743,6 +743,16 @@ public class TestDriver extends GenericMultiBrowserTest {
 	}
 	
 	/**
+	 * Check that if LAST_VISIBLE is specified, last visible element is returned
+	 * refresh page to be sure element has not been made visible
+	 */
+	
+	public void testFindLastVisibleElement() {
+		driver.navigate().refresh();
+		Assert.assertEquals(DriverTestPage.multiElementLastVisibleText.getValue(), "last text field");
+	}
+	
+	/**
 	 * Check that if no index is specified, first element is get
 	 */
 	
@@ -761,11 +771,21 @@ public class TestDriver extends GenericMultiBrowserTest {
 	}
 	
 	/**
+	 * Check that if LAST_VISIBLE is specified, last visible element is returned. In this case, LAST_VISIBLE has only been applied to the parent element
+	 * refresh page to be sure element has not been made visible
+	 */
+	
+	public void testFindLastVisibleElementWithParent() {
+		driver.navigate().refresh();
+		Assert.assertEquals(DriverTestPage.multiElementLastVisibleTextWithParent.getValue(), "first text field");
+	}
+	
+	/**
 	 * get findElements inside an other one using findElements(By) method
 	 */
 	
 	public void testFindElementsUnderAnOtherElement() {
-		Assert.assertEquals(DriverTestPage.divByClass.findElements(By.className("someClass")).size(), 4);
+		Assert.assertEquals(DriverTestPage.divByClass.findElements(By.className("someClass")).size(), 5);
 	}
 	
 	/**
@@ -781,7 +801,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	 */
 	
 	public void testFindLastElement() {
-		Assert.assertEquals(DriverTestPage.multiElementLastText.getValue(), "last text field");
+		Assert.assertEquals(DriverTestPage.multiElementLastText.getValue(), "1 text field");
 	}
 	
 	/**
