@@ -63,6 +63,8 @@ public class TestByC extends MockitoTest {
         when(noElementsFound.findElements(driver)).thenReturn(new ArrayList<>());
 
         mockedWebUIDriver.when(() -> WebUIDriver.getWebDriver(false)).thenReturn(eventDriver);
+
+        when(driver.findElement(any(By.class))).thenReturn(elements);
     }
 
     @AfterMethod(groups = {"ut"})

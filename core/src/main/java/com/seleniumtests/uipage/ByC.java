@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,6 +30,8 @@ import io.appium.java_client.AppiumBy;
 import io.appium.java_client.android.AndroidDriver;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.NotImplementedException;
+import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.Nullable;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NoSuchShadowRootException;
@@ -85,15 +87,15 @@ public class ByC extends By {
         
     }
     
+    @NotNull
     @Override
-    public List<WebElement> findElements(SearchContext context) {
+    public List<WebElement> findElements(@NotNull SearchContext context) {
         return new ArrayList<>();
     }
     
     /**
      * Search first 'input' element after label referenced by name
-     * @param label
-     * @return
+     * @param label     label to search
      */
     public static ByC labelForward(final String label) {
         return labelForward(label, null, false, null);
@@ -101,9 +103,8 @@ public class ByC extends By {
     
     /**
      * Search first element for <code>tagName</code> after label referenced by name
-     * @param label
-     * @param tagName
-     * @return
+     * @param label     label to search
+     * @param tagName   tag of the element to search
      */
     public static ByC labelForward(final String label, final String tagName) {
         return labelForward(label, tagName, false, null);
@@ -115,7 +116,6 @@ public class ByC extends By {
      * @param label			label to search
      * @param tagName		tag name after this label. The element we really search
      * @param labelTagName  if label is not in a {@code <label>} tag, define this tag name
-     * @return
      */
     public static ByC labelForward(final String label, final String tagName, final String labelTagName) {
         return labelForward(label, tagName, false, labelTagName);
@@ -123,8 +123,7 @@ public class ByC extends By {
     
     /**
      * Search first 'input' element after label referenced by partial name
-     * @param label
-     * @return
+     * @param label     label to search
      */
     public static ByC partialLabelForward(final String label) {
         return labelForward(label, null, true, null);
@@ -133,9 +132,8 @@ public class ByC extends By {
     /**
      * Search first element for {@code tagName} after label referenced by partial name
      * Use case is {@code <label>some label</label><input type="text" value="" />}
-     * @param label
-     * @param tagName
-     * @return
+     * @param label     label to search
+     * @param tagName   tag of the element to search
      */
     public static ByC partialLabelForward(final String label, final String tagName) {
         return labelForward(label, tagName, true, null);
@@ -147,7 +145,6 @@ public class ByC extends By {
      * @param label			label to search
      * @param tagName		tag name after this label. The element we really search
      * @param labelTagName  if label is not in a {@code <label>} tag, define this tag name
-     * @return
      */
     public static ByC partialLabelForward(final String label, final String tagName, final String labelTagName) {
         return labelForward(label, tagName, true, labelTagName);
@@ -159,8 +156,7 @@ public class ByC extends By {
     
     /**
      * Search first 'input' element before label referenced by name
-     * @param label
-     * @return
+     * @param label     label to search
      */
     public static ByC labelBackward(final String label) {
         return labelBackward(label, null, false, null);
@@ -168,9 +164,8 @@ public class ByC extends By {
     
     /**
      * Search first element for <code>tagName</code> before label referenced by name
-     * @param label
-     * @param tagName
-     * @return
+     * @param label     label to search
+     * @param tagName   tag of the element to search
      */
     public static ByC labelBackward(final String label, final String tagName) {
         return labelBackward(label, tagName, false, null);
@@ -181,8 +176,7 @@ public class ByC extends By {
     
     /**
      * Search first 'input' element before label referenced by partial name
-     * @param label
-     * @return
+     * @param label     label to search
      */
     public static ByC partialLabelBackward(final String label) {
         return labelBackward(label, null, true, null);
@@ -191,9 +185,8 @@ public class ByC extends By {
     /**
      * Search first element for <code>tagName</code> before label referenced by partial name
      * Use case is {@code <input type="text" value="" /><label>some label<label>}
-     * @param label
-     * @param tagName
-     * @return
+     * @param label     label to search
+     * @param tagName   tag of the element to search
      */
     public static ByC partialLabelBackward(final String label, final String tagName) {
         return labelBackward(label, tagName, true, null);
@@ -205,7 +198,6 @@ public class ByC extends By {
      * @param label			label to search
      * @param tagName		tag name after this label. The element we really search
      * @param labelTagName  if label is not in a {@code <label>} tag, define this tag name
-     * @return
      */
     public static ByC partialLabelBackward(final String label, final String tagName, final String labelTagName) {
         return labelBackward(label, tagName, true, labelTagName);
@@ -217,30 +209,36 @@ public class ByC extends By {
     
     /**
      * Search element by attribute name and attribute value
-     * Name and value can have some value accepted for CSS selector: <a>https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors</a>
+     * Name and value can have some value accepted for CSS selector: <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors">...</a>
      * 'attributeName*' => attribute value contains the provided value
      * 'attributeName^' => attribute value starts with the provided value
      * 'attributeName$' => attribute value ends with the provided value
      * 'attributeName' => attribute value equals the provided value
      *
-     * @param attributeName
-     * @param attributeValue
-     * @return
+     * @param attributeName     name of the attribute
+     * @param attributeValue    value of the attribute
      */
     public static ByC attribute(final String attributeName, final String attributeValue) {
         return new ByAttribute(attributeName, attributeValue);
     }
+
+    /**
+     * Search element which has a 'data-selenium-id' attribute
+     * @param id    the attribute value
+     */
+    public static ByC seleniumId(final String id) {
+        return new ByAttribute("data-selenium-id", id);
+    }
     
     /**
      * Search first element of <code>tagName</code> with text. TagName may be '*' if you want to search text among all types of elements
-     * text can have some value accepted for CSS selector: <a>https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors</a>
+     * text can have some value accepted for CSS selector: <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors">...</a><
      * 'text*' => text value contains the provided value
      * 'text^' => text value starts with the provided value
      * 'text$' => text value ends with the provided value
      * 'text' => text value equals the provided value
-     * @param textToSearch
-     * @param tagName
-     * @return
+     * @param textToSearch      the text to search
+     * @param tagName           tag of the element to search
      */
     public static ByC partialText(final String textToSearch, final String tagName) {
         return text(textToSearch, tagName, true, false);
@@ -253,7 +251,6 @@ public class ByC extends By {
      * Search for an element with 'tagName' whose text is found inside a sub-element
      * @param textToSearch      The text to search in sub elements
      * @param tagName           The tagname of the element we want to find
-     * @return
      */
     public static ByC textInside(final String textToSearch, final String tagName) {
         return text(textToSearch, tagName, false, true);
@@ -266,8 +263,7 @@ public class ByC extends By {
     /**
      * Search an element with several criteria
      * Only returns element(s) which matches all criteria
-     * @param bies
-     * @return
+     * @param bies      selectors to combine
      */
     public static ByC and(By ... bies) {
         return new And(bies);
@@ -303,8 +299,7 @@ public class ByC extends By {
      * HtmlElement myElement = new HtmlElement("", By.id("el"), shadowRoot);
      * }</pre>
      *
-     * @param bies
-     * @return
+     * @param bies      selectors to combine
      */
     public static ByC shadow(By ... bies) {
         return new Shadow(bies);
@@ -313,10 +308,7 @@ public class ByC extends By {
     /**
      * method for searching an element by a locator or an other.
      * It also checks if the locator is relevant to the tested platform (in case of mobile), which allow to write
-     *
      * <code>ByC.or(android(By.tagName("input")), ios(By.xpath(""), web(By.id("myId"))</code>
-     
-     * @author S047432
      *
      */
     public static ByC or(By ... bies) {
@@ -325,8 +317,6 @@ public class ByC extends By {
 
     /**
      * Says that the locator in parameter is for Web only. It doesn't do anything else and should be used with ByC.or() to have an effect
-     * @param by
-     * @return
      */
     public static ByC web(By by) {
         return new Web(by);
@@ -334,8 +324,6 @@ public class ByC extends By {
 
     /**
      * Says that the locator in parameter is for android only. It doesn't do anything else and should be used with ByC.or() to have an effect
-     * @param by
-     * @return
      */
     public static ByC android(By by) {
         return new Android(by);
@@ -343,8 +331,6 @@ public class ByC extends By {
     
     /**
      * Says that the locator in parameter is for iOS only. It doesn't do anything else and should be used with ByC.or() to have an effect
-     * @param by
-     * @return
      */
     public static ByC ios(By by) {
         return new Ios(by);
@@ -437,12 +423,13 @@ public class ByC extends By {
     
     public static class ByLabelForward extends ByC implements Serializable {
         
+        @Serial
         private static final long serialVersionUID = 5341968046120372161L;
         
         private String label;
-        private String tagName;
-        private String labelTagName; // tag of the label we are searching. default is label
-        private boolean partial;
+        private final String tagName;
+        private final String labelTagName; // tag of the label we are searching. default is label
+        private final boolean partial;
         
         /**
          *
@@ -471,16 +458,19 @@ public class ByC extends By {
             return String.format(".//%s%s/following::%s", labelTagName, buildSelectorForText(label), tagName);
         }
         
+        @NotNull
         @Override
-        public List<WebElement> findElements(SearchContext context) {
+        public List<WebElement> findElements(@NotNull SearchContext context) {
             return  context.findElements(By.xpath(getEffectiveXPath()));
         }
         
+        @NotNull
         @Override
         public WebElement findElement(SearchContext context) {
             return context.findElement(By.xpath(getEffectiveXPath()));
         }
         
+        @NotNull
         @Override
         public String toString() {
             return String.format("By.label %s:'%s' forward on element %s", labelTagName, label, tagName);
@@ -489,10 +479,25 @@ public class ByC extends By {
         public String getLabel() {
             return label;
         }
+
+
+        @Override
+        public boolean equals(@Nullable Object o) {
+            if (!(o instanceof ByLabelForward that)) {
+                return false;
+            }
+            return this.toString().equals(that.toString());
+        }
+
+        @Override
+        public int hashCode() {
+            return toString().hashCode();
+        }
     }
     
     public static class ByLabelBackward extends ByC implements Serializable {
         
+        @Serial
         private static final long serialVersionUID = 5341968046120372162L;
         
         private String label;
@@ -527,11 +532,13 @@ public class ByC extends By {
             return String.format(".//%s%s/preceding::%s", labelTagName, buildSelectorForText(label), tagName);
         }
         
+        @NotNull
         @Override
-        public List<WebElement> findElements(SearchContext context) {
+        public List<WebElement> findElements(@NotNull SearchContext context) {
             return context.findElements(By.xpath(getEffectiveXPath()));
         }
         
+        @NotNull
         @Override
         public WebElement findElement(SearchContext context) {
             List<WebElement> elements;
@@ -541,6 +548,7 @@ public class ByC extends By {
             return elementsReverse.get(0);
         }
         
+        @NotNull
         @Override
         public String toString() {
             return String.format("By.label %s:'%s' backward on element %s", labelTagName, label, tagName);
@@ -549,15 +557,29 @@ public class ByC extends By {
         public String getLabel() {
             return label;
         }
+
+        @Override
+        public boolean equals(@Nullable Object o) {
+            if (!(o instanceof ByLabelBackward that)) {
+                return false;
+            }
+            return this.toString().equals(that.toString());
+        }
+
+        @Override
+        public int hashCode() {
+            return toString().hashCode();
+        }
     }
     
     
     public static class ByAttribute extends ByHasCssSelector implements Serializable {
         
+        @Serial
         private static final long serialVersionUID = 5341968046120372161L;
         
-        private String attributeName;
-        private String attributeValue;
+        private final String attributeName;
+        private final String attributeValue;
         
         public ByAttribute(String attributeName, String attributeValue) {
             
@@ -578,11 +600,11 @@ public class ByC extends By {
         }
         
         /**
-         *Build a xpath selector so that we understand the CSS syntax: https://www.w3schools.com/cssref/css_selectors.asp
+         * Build a xpath selector so that we understand the CSS syntax: <a href="https://www.w3schools.com/cssref/css_selectors.asp">...</a>
          * '*' => contains
          * '^' => starts with
          * '$' => ends with
-         * @return
+         * @return      the XPath selector
          */
         private String buildSelector() {
             String escapedAttributeValue = escapeQuotes(attributeValue);
@@ -603,29 +625,21 @@ public class ByC extends By {
         }
 
         private String buildAndroidUiSelector() {
-            String selector = null;
-            if (attributeName.equals("text*")) {
-                selector = String.format("textContains(\"%s\")", attributeValue);
-            } else if (attributeName.equals("text^")) {
-                selector = String.format("textStartsWith(\"%s\")", attributeValue);
-            } else if (attributeName.equals("text$")) {
-                selector = String.format("textMatches(\"%s\")", attributeValue);
-            } else if (attributeName.equals("text")) {
-                selector = String.format("text(\"%s\")", attributeValue);
-            } else if (attributeName.equals("content-desc*")) {
-                selector = String.format("descriptionContains(\"%s\")", attributeValue);
-            } else if (attributeName.equals("content-desc^")) {
-                selector = String.format("descriptionStartsWith(\"%s\")", attributeValue);
-            } else if (attributeName.equals("content-desc$")) {
-                selector = String.format("descriptionMatches(\"%s\")", attributeValue);
-            } else if (attributeName.equals("content-desc")) {
-                selector = String.format("description(\"%s\")", attributeValue);
-            } else if (attributeName.equals("resource-id$")) {
-                selector = String.format("resourceIdMatches(\"%s\")", attributeValue);
-            } else if (attributeName.equals("resource-id")) {
-                selector = String.format("resourceId(\"%s\")", attributeValue);
-            } else {
-                return null;
+            String selector;
+            switch (attributeName) {
+                case "text*" -> selector = String.format("textContains(\"%s\")", attributeValue);
+                case "text^" -> selector = String.format("textStartsWith(\"%s\")", attributeValue);
+                case "text$" -> selector = String.format("textMatches(\"%s\")", attributeValue);
+                case "text" -> selector = String.format("text(\"%s\")", attributeValue);
+                case "content-desc*" -> selector = String.format("descriptionContains(\"%s\")", attributeValue);
+                case "content-desc^" -> selector = String.format("descriptionStartsWith(\"%s\")", attributeValue);
+                case "content-desc$" -> selector = String.format("descriptionMatches(\"%s\")", attributeValue);
+                case "content-desc" -> selector = String.format("description(\"%s\")", attributeValue);
+                case "resource-id$" -> selector = String.format("resourceIdMatches(\"%s\")", attributeValue);
+                case "resource-id" -> selector = String.format("resourceId(\"%s\")", attributeValue);
+                default -> {
+                    return null;
+                }
             }
             return String.format("new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().%s.instance(0))", selector);
         }
@@ -635,8 +649,9 @@ public class ByC extends By {
             return String.format("[%s=%s]", attributeName, attributeValue);
         }
         
+        @NotNull
         @Override
-        public List<WebElement> findElements(SearchContext context) {
+        public List<WebElement> findElements(@NotNull SearchContext context) {
             CustomEventFiringWebDriver currentDriver = WebUIDriver.getWebDriver(false);
             String androidSelector = null;
             if (!currentDriver.isWebTest()
@@ -654,8 +669,9 @@ public class ByC extends By {
             }
         }
         
+        @NotNull
         @Override
-        public WebElement findElement(SearchContext context) {
+        public WebElement findElement(@NotNull SearchContext context) {
             CustomEventFiringWebDriver currentDriver = WebUIDriver.getWebDriver(false);
             String androidSelector = null;
             if (!currentDriver.isWebTest()
@@ -673,9 +689,23 @@ public class ByC extends By {
             }
         }
         
+        @NotNull
         @Override
         public String toString() {
             return String.format("By.attribute: %s='%s'", attributeName, attributeValue);
+        }
+
+        @Override
+        public boolean equals(@Nullable Object o) {
+            if (!(o instanceof ByAttribute that)) {
+                return false;
+            }
+            return this.toString().equals(that.toString());
+        }
+
+        @Override
+        public int hashCode() {
+            return toString().hashCode();
         }
     }
     
@@ -686,12 +716,13 @@ public class ByC extends By {
      */
     public static class ByText extends ByC implements Serializable {
         
+        @Serial
         private static final long serialVersionUID = 5341968046120372161L;
         
         private String text;
-        private String tagName;
-        private boolean partial;
-        private boolean textInSubElement;
+        private final String tagName;
+        private final boolean partial;
+        private final boolean textInSubElement;
         
         public ByText(String text, String tagName, boolean partial, boolean textInSubElement) {
             
@@ -720,13 +751,15 @@ public class ByC extends By {
             }
         }
         
+        @NotNull
         @Override
-        public List<WebElement> findElements(SearchContext context) {
+        public List<WebElement> findElements(@NotNull SearchContext context) {
             return context.findElements(By.xpath(getEffectiveXPath()));
         }
         
+        @NotNull
         @Override
-        public WebElement findElement(SearchContext context) {
+        public WebElement findElement(@NotNull SearchContext context) {
             if (textInSubElement) {
                 List<WebElement> elements = context.findElements(By.xpath(getEffectiveXPath()));
                 try {
@@ -740,6 +773,7 @@ public class ByC extends By {
         }
         
         
+        @NotNull
         @Override
         public String toString() {
             return String.format("%s By.text: '%s'", tagName, text);
@@ -748,21 +782,31 @@ public class ByC extends By {
         public String getText() {
             return text;
         }
+
+        @Override
+        public boolean equals(@Nullable Object o) {
+            if (!(o instanceof ByText that)) {
+                return false;
+            }
+            return this.toString().equals(that.toString());
+        }
+
+        @Override
+        public int hashCode() {
+            return toString().hashCode();
+        }
     }
     
     /**
      * Allow to search elements with several criteria
      * It will create intersection between a search for each criteria
-     * @author s047432
      *
      */
     public static class And extends ByC implements Serializable {
-        
-        /**
-         *
-         */
+
+        @Serial
         private static final long serialVersionUID = 6341968046120372161L;
-        private transient By[] bies;
+        private final transient By[] bies;
         
         public And(By ... bies) {
             if (bies.length == 0) {
@@ -779,8 +823,9 @@ public class ByC extends By {
         }
         
         
+        @NotNull
         @Override
-        public List<WebElement> findElements(SearchContext context) {
+        public List<WebElement> findElements(@NotNull SearchContext context) {
             List<WebElement> elements = bies[0].findElements(context);
             for (int i = 1; i < bies.length; i++) {
                 elements = ListUtils.retainAll(elements, bies[i].findElements(context));
@@ -789,16 +834,18 @@ public class ByC extends By {
             
         }
         
+        @NotNull
         @Override
-        public WebElement findElement(SearchContext context) {
+        public WebElement findElement(@NotNull SearchContext context) {
             try {
                 return findElements(context).get(0);
             } catch (IndexOutOfBoundsException e) {
-                throw new NoSuchElementException(ERROR_CANNOT_FIND_ELEMENT_WITH_SUCH_CRITERIA + toString());
+                throw new NoSuchElementException(ERROR_CANNOT_FIND_ELEMENT_WITH_SUCH_CRITERIA);
             }
         }
         
         
+        @NotNull
         @Override
         public String toString() {
             
@@ -809,11 +856,25 @@ public class ByC extends By {
             
             return String.join(" and ", biesString);
         }
+
+        @Override
+        public boolean equals(@Nullable Object o) {
+            if (!(o instanceof And that)) {
+                return false;
+            }
+            return this.toString().equals(that.toString());
+        }
+
+        @Override
+        public int hashCode() {
+            return toString().hashCode();
+        }
     }
     
     public static class Shadow extends ByC implements Serializable {
         
         
+        @Serial
         private static final long serialVersionUID = 6341668046120372161L;
 
         private transient By[] bies;
@@ -829,8 +890,9 @@ public class ByC extends By {
         /**
          * If multiple "By" are provided
          */
+        @NotNull
         @Override
-        public List<WebElement> findElements(SearchContext context) {
+        public List<WebElement> findElements(@NotNull SearchContext context) {
             
             List<WebElement> elements = new ArrayList<>();
             
@@ -879,16 +941,18 @@ public class ByC extends By {
             
         }
         
+        @NotNull
         @Override
-        public WebElement findElement(SearchContext context) {
+        public WebElement findElement(@NotNull SearchContext context) {
             try {
                 return findElements(context).get(0);
             } catch (IndexOutOfBoundsException e) {
-                throw new NoSuchElementException(ERROR_CANNOT_FIND_ELEMENT_WITH_SUCH_CRITERIA + toString());
+                throw new NoSuchElementException(ERROR_CANNOT_FIND_ELEMENT_WITH_SUCH_CRITERIA);
             }
         }
         
         
+        @NotNull
         @Override
         public String toString() {
             
@@ -907,13 +971,26 @@ public class ByC extends By {
         public void setBies(By[] bies) {
             this.bies = bies;
         }
+
+        @Override
+        public boolean equals(@Nullable Object o) {
+            if (!(o instanceof Shadow that)) {
+                return false;
+            }
+            return this.toString().equals(that.toString());
+        }
+
+        @Override
+        public int hashCode() {
+            return toString().hashCode();
+        }
         
     }
     
     /**
      * Class for searching an element by a locator or an other.
      * It also checks if the locator is relevant to the tested platform (in case of mobile), which allow to write
-     *
+     * <p>
      * <code>ByC.or(android(By.tagName("input")), ios(By.xpath("")))</code>
      
      * @author S047432
@@ -921,8 +998,9 @@ public class ByC extends By {
      */
     public static class Or extends ByC implements Serializable {
         
-        private transient By[] bies;
+        private final transient By[] bies;
         
+        @Serial
         private static final long serialVersionUID = 6341968046167372161L;
         
         public Or(By ... bies) {
@@ -940,8 +1018,9 @@ public class ByC extends By {
         }
         
         
+        @NotNull
         @Override
-        public List<WebElement> findElements(SearchContext context) {
+        public List<WebElement> findElements(@NotNull SearchContext context) {
             
             String platform = SeleniumTestsContextManager.getThreadContext().getPlatform();
             boolean webTest = SeleniumTestsContextManager.isWebTest();
@@ -956,8 +1035,8 @@ public class ByC extends By {
                         || (by instanceof Web && !webTest)
                 ) {
                     continue;
-                } else if (by instanceof ByPlatformSpecific) {
-                    by = ((ByPlatformSpecific) by).getBy();
+                } else if (by instanceof ByPlatformSpecific byPlatform) {
+                    by = byPlatform.getBy();
                 }
                 elements = by.findElements(context);
                 
@@ -970,8 +1049,9 @@ public class ByC extends By {
             
         }
         
+        @NotNull
         @Override
-        public WebElement findElement(SearchContext context) {
+        public WebElement findElement(@NotNull SearchContext context) {
             try {
                 return findElements(context).get(0);
             } catch (IndexOutOfBoundsException e) {
@@ -980,6 +1060,7 @@ public class ByC extends By {
         }
         
         
+        @NotNull
         @Override
         public String toString() {
             
@@ -989,6 +1070,19 @@ public class ByC extends By {
             }
             
             return String.join(" or ", biesString);
+        }
+
+        @Override
+        public boolean equals(@Nullable Object o) {
+            if (!(o instanceof Or that)) {
+                return false;
+            }
+            return this.toString().equals(that.toString());
+        }
+
+        @Override
+        public int hashCode() {
+            return toString().hashCode();
         }
     }
     
@@ -1000,26 +1094,30 @@ public class ByC extends By {
      */
     public static class Web extends ByC implements Serializable, ByPlatformSpecific {
         
+        @Serial
         private static final long serialVersionUID = 6341968046120092151L;
         
-        private transient By by;
+        private final transient By by;
         
         public Web(By by) {
             this.by = by;
         }
         
+        @NotNull
         @Override
-        public List<WebElement> findElements(SearchContext context) {
+        public List<WebElement> findElements(@NotNull SearchContext context) {
             throw new UnsupportedOperationException("You cannot use ByC.web directly");
             
         }
         
+        @NotNull
         @Override
-        public WebElement findElement(SearchContext context) {
+        public WebElement findElement(@NotNull SearchContext context) {
             throw new UnsupportedOperationException("You cannot use ByC.web directly");
         }
         
         
+        @NotNull
         @Override
         public String toString() {
             return String.format("web[%s]", by.toString());
@@ -1029,6 +1127,19 @@ public class ByC extends By {
         public By getBy() {
             return by;
         }
+
+        @Override
+        public boolean equals(@Nullable Object o) {
+            if (!(o instanceof Web that)) {
+                return false;
+            }
+            return this.toString().equals(that.toString());
+        }
+
+        @Override
+        public int hashCode() {
+            return toString().hashCode();
+        }
     }
 
     /**
@@ -1036,26 +1147,30 @@ public class ByC extends By {
      */
     public static class Android extends ByC implements Serializable, ByPlatformSpecific {
 
+        @Serial
         private static final long serialVersionUID = 6341968046120092161L;
 
-        private transient By by;
+        private final transient By by;
 
         public Android(By by) {
             this.by = by;
         }
 
+        @NotNull
         @Override
-        public List<WebElement> findElements(SearchContext context) {
+        public List<WebElement> findElements(@NotNull SearchContext context) {
             throw new UnsupportedOperationException("You cannot use ByC.android directly");
 
         }
 
+        @NotNull
         @Override
-        public WebElement findElement(SearchContext context) {
+        public WebElement findElement(@NotNull SearchContext context) {
             throw new UnsupportedOperationException("You cannot use ByC.android directly");
         }
 
 
+        @NotNull
         @Override
         public String toString() {
             return String.format("android[%s]", by.toString());
@@ -1065,6 +1180,19 @@ public class ByC extends By {
         public By getBy() {
             return by;
         }
+
+        @Override
+        public boolean equals(@Nullable Object o) {
+            if (!(o instanceof Android that)) {
+                return false;
+            }
+            return this.toString().equals(that.toString());
+        }
+
+        @Override
+        public int hashCode() {
+            return toString().hashCode();
+        }
     }
     
     /**
@@ -1073,25 +1201,29 @@ public class ByC extends By {
     public static class Ios extends ByC implements Serializable, ByPlatformSpecific {
         
         
+        @Serial
         private static final long serialVersionUID = 6341468046120372161L;
-        private transient By by;
+        private final transient By by;
         
         public Ios(By by) {
             this.by = by;
         }
         
+        @NotNull
         @Override
-        public List<WebElement> findElements(SearchContext context) {
+        public List<WebElement> findElements(@NotNull SearchContext context) {
             throw new UnsupportedOperationException("You cannot use ByC.ios directly");
             
         }
         
+        @NotNull
         @Override
-        public WebElement findElement(SearchContext context) {
+        public WebElement findElement(@NotNull SearchContext context) {
             throw new UnsupportedOperationException("You cannot use ByC.ios directly");
         }
         
         
+        @NotNull
         @Override
         public String toString() {
             return String.format("ios[%s]", by.toString());
@@ -1101,12 +1233,26 @@ public class ByC extends By {
         public By getBy() {
             return by;
         }
+
+        @Override
+        public boolean equals(@Nullable Object o) {
+            if (!(o instanceof Ios that)) {
+                return false;
+            }
+            return this.toString().equals(that.toString());
+        }
+
+        @Override
+        public int hashCode() {
+            return toString().hashCode();
+        }
     }
     
     
     
     public static class ByXTagName extends ByForcedXPath implements Serializable {
         
+        @Serial
         private static final long serialVersionUID = 4699295846984948351L;
         
         private final String tagName;
@@ -1123,24 +1269,41 @@ public class ByC extends By {
             return ".//" + tagName;
         }
         
+        @NotNull
         @Override
         public List<WebElement> findElements(SearchContext context) {
             return context.findElements(By.xpath(getEffectiveXPath()));
         }
         
+        @NotNull
         @Override
         public WebElement findElement(SearchContext context) {
             return context.findElement(By.xpath(getEffectiveXPath()));
         }
         
+        @NotNull
         @Override
         public String toString() {
             return "By.tagName: " + tagName;
+        }
+
+        @Override
+        public boolean equals(@Nullable Object o) {
+            if (!(o instanceof ByXTagName that)) {
+                return false;
+            }
+            return this.toString().equals(that.toString());
+        }
+
+        @Override
+        public int hashCode() {
+            return toString().hashCode();
         }
     }
     
     public static class ByXClassName extends ByForcedXPath implements Serializable {
         
+        @Serial
         private static final long serialVersionUID = -8737882849130394673L;
         
         private final String className;
@@ -1158,11 +1321,13 @@ public class ByC extends By {
             return (".//*[" + containingWord("class", className) + "]");
         }
         
+        @NotNull
         @Override
         public List<WebElement> findElements(SearchContext context) {
             return context.findElements(By.xpath(getEffectiveXPath()));
         }
         
+        @NotNull
         @Override
         public WebElement findElement(SearchContext context) {
             return context.findElement(By.xpath(getEffectiveXPath()));
@@ -1181,9 +1346,23 @@ public class ByC extends By {
             return "contains(concat(' ',normalize-space(@" + attribute + "),' '),' " + word + " ')";
         }
         
+        @NotNull
         @Override
         public String toString() {
             return "By.className: " + className;
+        }
+
+        @Override
+        public boolean equals(@Nullable Object o) {
+            if (!(o instanceof ByXClassName that)) {
+                return false;
+            }
+            return this.toString().equals(that.toString());
+        }
+
+        @Override
+        public int hashCode() {
+            return toString().hashCode();
         }
     }
     
@@ -1194,7 +1373,7 @@ public class ByC extends By {
         } else {
             StringBuilder newString = new StringBuilder("concat(");
             for (String part: aString.split("'")) {
-                newString.append("'" + part + "',\"'\",");
+                newString.append("'").append(part).append("',\"'\",");
             }
             return newString.substring(0, newString.length() - 5) + ")";
         }
@@ -1206,9 +1385,10 @@ public class ByC extends By {
      */
     public static class ByLabel extends ByForcedXPath implements Serializable {
         
+        @Serial
         private static final long serialVersionUID = 5341968046120372161L;
         
-        private String label;
+        private final String label;
         
         /**
          * @param label Value of the "for" attribute of the label to search.
@@ -1224,17 +1404,20 @@ public class ByC extends By {
             return String.format("//input[@id=string(//label[.='%s']/@for)]", label);
         }
         
+        @NotNull
         @Override
         public WebElement findElement(SearchContext context) {
             return context.findElement(By.xpath(getEffectiveXPath()));
         }
         
         
+        @NotNull
         @Override
         public List<WebElement> findElements(SearchContext context) {
             return context.findElements(By.xpath(getEffectiveXPath()));
         }
         
+        @NotNull
         @Override
         public String toString() {
             return String.format("By.label '%s' on element", label);
@@ -1242,6 +1425,19 @@ public class ByC extends By {
 
         public String getLabel() {
             return label;
+        }
+
+        @Override
+        public boolean equals(@Nullable Object o) {
+            if (!(o instanceof ByLabel that)) {
+                return false;
+            }
+            return this.toString().equals(that.toString());
+        }
+
+        @Override
+        public int hashCode() {
+            return toString().hashCode();
         }
     }
     
