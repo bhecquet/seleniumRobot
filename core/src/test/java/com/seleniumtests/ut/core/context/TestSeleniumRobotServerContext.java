@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.seleniumtests.util.osutility.SystemUtility;
 import org.mockito.MockedConstruction;
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -65,10 +66,28 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerToken("123");
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerToken(), "123");
 	}
-	@Test(groups="ut context", enabled = false) // to execute it, you need to set environment variable on launch
+	@Test(groups="ut context")
 	public void testSeleniumRobotServerTokenFromEnvVar(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		initThreadContext(testNGCtx);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerToken(), "456");
+		try {
+			SystemUtility.setenv(SeleniumRobotServerContext.SELENIUMROBOTSERVER_TOKEN_ENV_VAR, "456");
+			initThreadContext(testNGCtx);
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerToken(), "456");
+		} finally {
+			SystemUtility.clear(SeleniumRobotServerContext.SELENIUMROBOTSERVER_TOKEN_ENV_VAR);
+		}
+	}
+	@Test(groups="ut context")
+	public void testSeleniumRobotServerTokenFromEnvVarPriority(final ITestContext testNGCtx, final XmlTest xmlTest) {
+
+		try {
+			System.setProperty("seleniumRobotServerToken", "123");
+			SystemUtility.setenv(SeleniumRobotServerContext.SELENIUMROBOTSERVER_TOKEN_ENV_VAR, "456");
+			initThreadContext(testNGCtx);
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerToken(), "123");
+		} finally {
+			System.clearProperty("seleniumRobotServerToken");
+			SystemUtility.clear(SeleniumRobotServerContext.SELENIUMROBOTSERVER_TOKEN_ENV_VAR);
+		}
 	}
 	@Test(groups="ut context")
 	public void testSeleniumRobotServerTokenNull(final ITestContext testNGCtx, final XmlTest xmlTest) {

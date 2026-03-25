@@ -113,7 +113,7 @@ In this case, this user passed value will overwrite test or suite parameters
 | testRetryCount			| 2			| Number of times a failed test is retried. Set to 0 for no retry. **This parameter is not accepted in XML file, only on command line**. This number can be increased dynamically inside test with `increaseMaxRetry()`|
 | seleniumRobotServerActive	| false		| whether we use seleniumRobot server. If true, seleniumRobotServerUrl MUST be specified (in XML, command line or through env variable |
 | seleniumRobotServerUrl	| 			| URL of the seleniumRobot server. Can be specified as an environment variable |
-| seleniumRobotServerToken	|			| Token to use when connecting to seleniumRobot server API (by default with server >= 2.0) |
+| seleniumRobotServerToken	|			| Token to use when connecting to seleniumRobot server API (by default with server >= 2.0). Value may also be set as environment variable 'SELENIUM_ROBOT_SERVER_TOKEN' |
 | outputDirectory 			| <exec folder>	| folder where HTML report will be written. By default, it's 'test-output' subfolder. If you want to write test in an other directory, use `test-output/myResult` to write them relative to SeleniumRobot root. An absolute path may also be specified. This will allow to execute several tests in parallel without overwritting existing results. If you want to set the current date and time in output directory folder name, see §7.18 | 
 
 **In case eof Linux Chromium**: set chromeBinaryPath to '/snap/chromium/current/usr/lib/chromium-brower/chrome'
@@ -274,7 +274,7 @@ Params for Windows applications (through appium-flaui-driver: https://github.com
 | -------------------------	| ------- 	| ------------ |
 | tmsUrl					| null		| URL of the test manager  (e.g: Squash TM http://<squash_host>:<squash_port>) |
 | tmsUser					| null		| User which will access Test manager  |
-| tmsPassword				| null		| password of the user which will access Test Manager  |
+| tmsPassword				| null		| password of the user which will access Test Manager. Value may also be set as environment variable 'TMS_PASSWORD'  |
 | tmsType					| null		| Type of the Test Manager ('squash' or 'hp')  |
 | tmsProject				| null		| The project to which this test application is linked in Test manager   |
 

@@ -1,6 +1,7 @@
 package com.seleniumtests.core.contexts;
 
 import com.seleniumtests.connectors.tms.ITestManager;
+import com.seleniumtests.util.osutility.SystemUtility;
 import org.json.JSONObject;
 
 import com.seleniumtests.connectors.tms.TestManager;
@@ -19,7 +20,8 @@ public class TestManagerContext {
     public static final String TMS_USER = TestManager.TMS_USER;							// User which will access Test manager
     public static final String TMS_PASSWORD = TestManager.TMS_PASSWORD;					// password of the user which will access Test Manager
     public static final String TMS_PROJECT = TestManager.TMS_PROJECT;						// The project to which this test application is linked in Test manager    
-    public static final String TMS_TYPE = TestManager.TMS_TYPE;							// Type of the Test Manager ('squash' or 'hp')
+    public static final String TMS_TYPE = TestManager.TMS_TYPE;
+	public static final String TMS_PASSWORD_ENV_VAR = "TMS_PASSWORD";						// Type of the Test Manager ('squash' or 'hp')
 
     private static final String DEFAULT_TMS_TYPE = null;
     private static final String DEFAULT_TMS_URL = null;
@@ -37,8 +39,13 @@ public class TestManagerContext {
         setTmsType(context.getValueForTest(TMS_TYPE, System.getProperty(TMS_TYPE)));
         setTmsUrl(context.getValueForTest(TMS_URL, System.getProperty(TMS_URL)));
         setTmsUser(context.getValueForTest(TMS_USER, System.getProperty(TMS_USER)));
-        setTmsPassword(context.getValueForTest(TMS_PASSWORD, System.getProperty(TMS_PASSWORD)));
-        setTmsProject(context.getValueForTest(TMS_PROJECT, System.getProperty(TMS_PROJECT)));
+		setTmsProject(context.getValueForTest(TMS_PROJECT, System.getProperty(TMS_PROJECT)));
+
+		setTmsPassword(SystemUtility.getenv(TMS_PASSWORD_ENV_VAR));
+		String tokenFromConfig = context.getValueForTest(TMS_PASSWORD, System.getProperty(TMS_PASSWORD));
+		if (tokenFromConfig != null) { // token set in configuration has priority over environment variable
+			setTmsPassword(tokenFromConfig);
+		}
 	}
 	
 	public void setTestId(Integer id) {

@@ -50,7 +50,7 @@ public class SeleniumRobotServerContext {
         setSeleniumRobotServerActive(context.getBoolValueForTest(SELENIUMROBOTSERVER_ACTIVE, System.getProperty(SELENIUMROBOTSERVER_ACTIVE)));
 
 		// first read environment variable for token, then, override it if properties are set
-		setSeleniumRobotServerToken(System.getenv(SELENIUMROBOTSERVER_TOKEN_ENV_VAR));
+		setSeleniumRobotServerToken(SystemUtility.getenv(SELENIUMROBOTSERVER_TOKEN_ENV_VAR));
 		String tokenFromConfig = context.getValueForTest(SELENIUMROBOTSERVER_TOKEN, System.getProperty(SELENIUMROBOTSERVER_TOKEN));
 		if (tokenFromConfig != null) { // token set in configuration has priority over environment variable
 			setSeleniumRobotServerToken(tokenFromConfig);

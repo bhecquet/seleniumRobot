@@ -2,6 +2,8 @@ package com.seleniumtests.ut.core.context;
 
 import static org.mockito.ArgumentMatchers.argThat;
 
+import com.seleniumtests.util.logging.Sys;
+import com.seleniumtests.util.osutility.SystemUtility;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -68,6 +70,30 @@ public class TestTestManagerContext extends ConnectorsTest {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().testManager().setTmsPassword("pwd");
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().testManager().getTmsPassword(), "pwd");
+	}
+	@Test(groups="ut context")
+	public void testTmsPasswordFromEnvironmentVariable(final ITestContext testNGCtx, final XmlTest xmlTest) {
+
+		try {
+			SystemUtility.setenv(TestManagerContext.TMS_PASSWORD_ENV_VAR, "password");
+			initThreadContext(testNGCtx);
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().testManager().getTmsPassword(), "password");
+		} finally {
+			SystemUtility.clear(TestManagerContext.TMS_PASSWORD_ENV_VAR);
+		}
+	}
+	@Test(groups="ut context")
+	public void testTmsPasswordFromEnvironmentVariablePriority(final ITestContext testNGCtx, final XmlTest xmlTest) {
+
+		try {
+			System.setProperty(TestManagerContext.TMS_PASSWORD, "password");
+			SystemUtility.setenv(TestManagerContext.TMS_PASSWORD_ENV_VAR, "password");
+			initThreadContext(testNGCtx);
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().testManager().getTmsPassword(), "password");
+		} finally {
+			System.clearProperty(TestManagerContext.TMS_PASSWORD);
+			SystemUtility.clear(TestManagerContext.TMS_PASSWORD_ENV_VAR);
+		}
 	}
 	@Test(groups="ut context")
 	public void testTmsPasswordNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
