@@ -101,25 +101,17 @@
 </head>
 
 <div>
+    <div class="wrapper">
     #if ($header == "passed")
-        <div class="wrapper">
-            <header class='main-header header-success'>
-                <a href='https://github.com/bhecquet/seleniumRobot'>SeleniumRobot</a><br/>
-            </header>
-        </div>
+        <header class='main-header header-success'>
     #elseif ($header == "failed")
-        <div class="wrapper">
-            <header class='main-header header-failed'>
-                <a href='https://github.com/bhecquet/seleniumRobot'>SeleniumRobot</a><br/>
-            </header>
-        </div>
+        <header class='main-header header-failed'>
     #else
-        <div class="wrapper">
-            <header class='main-header header-skipped'>
-                <a href='https://github.com/bhecquet/seleniumRobot'>SeleniumRobot</a><br/>
-            </header>
-        </div>
+        <header class='main-header header-skipped'>
     #end
+            <a href='https://github.com/bhecquet/seleniumRobot'>SeleniumRobot</a><br/>
+        </header>
+    </div>
 
     <div id="tabs" #if ($snapshots)style="display: block;" #else style="display: none;" #end>
         <ul class="nav nav-tabs" id="tab" role="tablist">
@@ -167,6 +159,12 @@
                                     <tr>
                                         <th width="200px">Description</th>
                                         <td>$description</td>
+                                    </tr>
+                                #end
+                                #if ($resultUrl && !$resultUrl.isEmpty())
+                                    <tr>
+                                        <th>Result server Url</th>
+                                        <td><a href="$resultUrl">Online result</a></td>
                                     </tr>
                                 #end
                                 #if ($applicationType && !$applicationType.isEmpty())

@@ -22,6 +22,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.Map.Entry;
 
+import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.reporter.logger.PageLoadTime;
 import org.apache.velocity.Template;
@@ -214,6 +215,8 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			context.put("errorMessage", StringUtility.encodeString(ExceptionUtility.getExceptionMessage(testResult.getThrowable()).trim(), reportFormat.toLowerCase()));
 			context.put("failedStep", StringUtility.encodeString(failedStep, reportFormat.toLowerCase()));
 			context.put("pageLoadTimes", pageLoadTimes);
+			context.put("resultUrl", TestNGResultUtils.getSnapshotTestCaseInSessionId(testResult) == null ? "": String.format("%s/snapshot/testResults/result/%s/", SeleniumRobotSnapshotServerConnector.getInstance().getUrl(), SeleniumRobotServerTestRecorder.getSessionId()));
+
 			String testName = getTestName(testResult);
 			String logs = SeleniumRobotLogger.getTestLogs(testName);
 			logger.info("test name: {}", testName);

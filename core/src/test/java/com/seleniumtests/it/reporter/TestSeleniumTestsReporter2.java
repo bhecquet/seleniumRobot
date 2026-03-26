@@ -846,6 +846,35 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 	}
 
+
+	/**
+	 * Check link to selenium server is there
+	 */
+	@Test(groups = {"it"})
+	public void testDetailedReportWithOnlineResult() throws Exception {
+		try {
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
+
+			configureMockedSnapshotServerConnection();
+			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': null, 'computingError': []}");
+
+			SeleniumTestsContextManager.removeThreadContext();
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions"});
+
+			String detailedReportContent = readTestMethodResultFile("testAndSubActions");
+			detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
+
+			Assert.assertTrue(detailedReportContent.contains("<th>Result server Url</th><td><a href=\"http://localhost:4321/snapshot/testResults/result/13/\">Online result</a></td>"));
+
+		} finally {
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+		}
+	}
+
 	/**
 	 * issue #251: check error message is displayed for any action that failed
 	 */
@@ -1370,6 +1399,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent1 = readTestMethodResultFile("testAndSubActions");
 		Assert.assertTrue(detailedReportContent1.contains("<h4> Test Details - testAndSubActions</h4>"));
 		Assert.assertTrue(detailedReportContent1.contains("<th width=\"200px\">Description</th><td>a test with steps</td>"));
+		Assert.assertFalse(detailedReportContent1.contains("<th>Result server Url</th><td><a href="));
 
 		String detailedReportContent2 = readTestMethodResultFile("testInError");
 		Assert.assertFalse(detailedReportContent2.contains("<h4> Test Details - testInError</h4><pre>"));

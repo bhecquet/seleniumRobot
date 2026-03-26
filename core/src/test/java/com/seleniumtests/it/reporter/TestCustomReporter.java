@@ -159,6 +159,7 @@ public class TestCustomReporter extends ReporterTest {
 		Assert.assertEquals(json.getString("device"), "");
 		Assert.assertEquals(json.getInt("errors"), 0);
 		Assert.assertEquals(json.getString("errorMessage"), "");
+		Assert.assertEquals(json.getString("resultUrl"), "");
 		Assert.assertEquals(json.getJSONArray("infos").length(), 1);
 		Assert.assertEquals(json.getJSONArray("infos").getJSONObject(0).getString("key"), "Last State");
 		Assert.assertEquals(json.getJSONArray("pageLoads").length(), 1);

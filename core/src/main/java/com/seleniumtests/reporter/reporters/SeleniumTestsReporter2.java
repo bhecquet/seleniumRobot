@@ -33,8 +33,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
+import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.driver.DriverMode;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -49,7 +49,6 @@ import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 
-import com.seleniumtests.core.Mask;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.utils.TestNGResultUtils;
@@ -63,8 +62,6 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 /**
  * Class for generating test report
- * @author behe
- *
  */
 public class SeleniumTestsReporter2 extends CommonReporter implements IReporter {
 
@@ -85,7 +82,6 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 	
 	/**
 	 * Copy resources necessary for result file
-	 * @throws IOException
 	 */
 	public void copyResources() throws IOException {
 		
@@ -125,8 +121,6 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 	
 	/**
 	 * Returns the test status as a string
-	 * @param testResult
-	 * @return
 	 */
 	private String getTestStatus(ITestResult testResult) {
 		String testStatus = SKIPPED_TEST;
@@ -176,7 +170,6 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 
 	/**
 	 * Generate HTML report for a single test
-	 * @param testResult
 	 * @param resourcesFromCdn		if true (optimizeReport), resources are linked from CDN
 	 */
 	public void generateSingleTestReport(ITestResult testResult, boolean resourcesFromCdn) {
@@ -201,7 +194,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			// do not recreate this report anymore
 			TestNGResultUtils.setHtmlReportCreated(testResult, true);
 		} catch (Exception e) {
-			logger.error("Error writing test report: " + getVisualTestName(testResult), e);
+			logger.error("Error writing test report: {}", getVisualTestName(testResult), e);
 		}  
 	}
 	public void generateSingleTestReport(ITestResult testResult) {
@@ -285,7 +278,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			List<String> executionResults = FileUtils.listFiles(new File(TestNGResultUtils.getSeleniumRobotTestContext(testResult).getOutputDirectory()), 
 														FileFilterUtils.suffixFileFilter(".zip"), null).stream()
 					.map(File::getName)
-					.collect(Collectors.toList());
+					.toList();
 			if (!executionResults.isEmpty()) {
 				context.put("files", executionResults);
 				context.put("title", "Previous execution results");
@@ -299,11 +292,6 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		generateReport(Paths.get(testContext.getOutputDirectory(), "TestReport.html").toFile(), writer.toString());
 	}
 
-	/**
-	 * @param testContext
-	 * @param testResult
-	 * @param context
-	 */
 	private void fillContextWithTestName(SeleniumTestsContext testContext, ITestResult testResult,
 			VelocityContext context) {
 		// test header
@@ -336,10 +324,6 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		context.put("testName", StringUtility.encodeString(testName.toString(), "html"));
 	}
 
-	/**
-	 * @param testResult
-	 * @param context
-	 */
 	private void fillContextWithSteps(ITestResult testResult, VelocityContext context) {
 		List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
 		if (testSteps == null) {
@@ -382,7 +366,6 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 	
 	/**
 	 * for test HyperlinkInfo that reference a local file (image, video), change path when this info is presented from detailed result HTML file so that link is correct
-	 * @return
 	 */
 	private Map<String, String> relocateTestInfos(ITestResult testResult, Map<String, String> testInfos) {
 		Map<String, String> relocatedTestInfos = new LinkedHashMap<>();
@@ -398,8 +381,6 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 
 	/**
 	 * Generate summary report for all test methods
-	 * @param resultSet
-	 * @param resourcesFromCdn
 	 * @return	map containing test results
 	 */
 	public Map<ITestContext, List<ITestResult>> generateSuiteSummaryReport(Map<ITestContext, Set<ITestResult>> resultSet, boolean resourcesFromCdn) {
@@ -415,7 +396,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		for (Entry<ITestContext, Set<ITestResult>> entry: resultSet.entrySet()) {
 			 List<ITestResult> methodResults = entry.getValue().stream()
 						.sorted((r1, r2) -> Long.compare(r1.getStartMillis(), r2.getStartMillis()))
-						.collect(Collectors.toList());
+						.toList();
 			
 			for (ITestResult result: methodResults) {
 				SeleniumTestsContext testContext = TestNGResultUtils.getSeleniumRobotTestContext(result);
@@ -483,11 +464,6 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 
 	}
 
-	/**
-	 * @param   tests
-	 *
-	 * @return
-	 */
 	protected Collection<ITestResult> getResultSet(final IResultMap tests, final ITestNGMethod method) {
 		Set<ITestResult> r = new TreeSet<>();
 		for (ITestResult result : tests.getAllResults()) {
@@ -513,7 +489,6 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 	
 	/**
 	 * Fill velocity context with test context
-	 * @param velocityContext
 	 */
 	private void fillContextWithTestParams(VelocityContext velocityContext, ITestResult testResult) {
 		SeleniumTestsContext selTestContext = TestNGResultUtils.getSeleniumRobotTestContext(testResult);
@@ -542,6 +517,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			if (browserVersion != null) {
 				browser = browser + browserVersion;
 			}
+			velocityContext.put("resultUrl", TestNGResultUtils.getSnapshotTestCaseInSessionId(testResult) == null ? "": String.format("%s/snapshot/testResults/result/%s/", SeleniumRobotSnapshotServerConnector.getInstance().getUrl(), SeleniumRobotServerTestRecorder.getSessionId()));
 			velocityContext.put(APPLICATION, "");
 			
 			if (testType == null) {

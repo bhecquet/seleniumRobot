@@ -23,6 +23,7 @@
 	"device": "$device",
 	"platform": "$platform",
 	"failedStep": "$failedStep",
+	"resultUrl": "$resultUrl",
 	"infos": [
 		#foreach ($testInfo in $testInfos.entrySet())
 			#set($testInfoIdx = $testInfoIdx + 1)

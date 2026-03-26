@@ -27,6 +27,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -39,6 +40,8 @@ import com.seleniumtests.reporter.info.Info;
 import com.seleniumtests.reporter.info.MultipleInfo;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.reporters.CommonReporter;
+import org.apache.commons.io.FileUtils;
+import org.json.JSONObject;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
@@ -139,6 +142,22 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			Map<String, Info> infos = infosArgument.getValue();
 			Assert.assertEquals(infos.size(), 1);
 			Assert.assertTrue(infos.get(TestStepManager.LAST_STATE_NAME) instanceof MultipleInfo);
+
+			// check information about reports stored on selenium server are present in report files
+			File seleniumServerReport = Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "SeleniumServerTestReport.html").toFile();
+			Assert.assertTrue(seleniumServerReport.exists());
+			String content = FileUtils.readFileToString(seleniumServerReport, StandardCharsets.UTF_8).replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");;
+			Assert.assertEquals(content, "<html><head><meta http-equiv=\"refresh\" content=\"0; url=http://localhost:1234/snapshot/testResults/summary/null/\" /></head></html>");
+
+			String jsonReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testOkWithTestName", "detailed-result.json").toFile(), StandardCharsets.UTF_8);
+			Assert.assertFalse(jsonReportContent.contains(":\\\\/")); // check step has not been double encoded
+			JSONObject json = new JSONObject(jsonReportContent);
+			Assert.assertEquals(json.getString("resultUrl"), "http://localhost:1234/snapshot/testResults/result/0/");
+
+			String detailedReportContent = readTestMethodResultFile("testAndSubActions");
+			detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
+
+			Assert.assertTrue(detailedReportContent.contains("<th>Result server Url</th><td><a href=\"http://localhost:1234/snapshot/testResults/result/0/\">Online result</a></td>"));
 
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);

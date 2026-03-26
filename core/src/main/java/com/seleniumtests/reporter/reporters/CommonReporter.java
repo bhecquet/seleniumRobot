@@ -128,7 +128,7 @@ public abstract class CommonReporter implements IReporter {
 	
 	protected void generateReport(File f, String content) throws IOException {
 
-		logger.info("generating report " + f.getAbsolutePath());
+		logger.info("generating report {}", f.getAbsolutePath());
 		FileUtils.write(f, content, StandardCharsets.UTF_8);
 	}
 	

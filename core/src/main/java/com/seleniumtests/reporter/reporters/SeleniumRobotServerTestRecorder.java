@@ -19,6 +19,8 @@ package com.seleniumtests.reporter.reporters;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.*;
@@ -27,6 +29,9 @@ import java.util.Map.Entry;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.reporter.logger.FileContent;
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.VelocityEngine;
 import org.json.JSONObject;
 import org.testng.IReporter;
 import org.testng.ITestContext;
@@ -48,7 +53,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 
 	private static final Object lock = new Object();
 	private static final Object sessionIdLock = new Object();
-	private static Integer sessionId;
+	private static Integer sessionId = null;
 
 	public SeleniumRobotSnapshotServerConnector getServerConnector() {
 		return SeleniumRobotSnapshotServerConnector.getInstance();
@@ -64,6 +69,12 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 	private static void setSessionId(Integer sessionId) {
 		synchronized (sessionIdLock) {
 			SeleniumRobotServerTestRecorder.sessionId = sessionId;
+		}
+	}
+
+	public static Integer getSessionId() {
+		synchronized (sessionIdLock) {
+			return sessionId;
 		}
 	}
 	
@@ -147,12 +158,27 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 					Instant.ofEpochMilli(sessionStart)
 						.atZone(ZoneId.systemDefault())
 						.toOffsetDateTime());
-			logger.info("Session result will be visible at: {}/snapshot/testResults/summary/{}/", serverConnector.getUrl(), newSessionId);
 
+			logger.info("Session result will be visible at: {}/snapshot/testResults/summary/{}/", serverConnector.getUrl(), newSessionId);
+			createHtmlReport(sessionId);
 			setSessionId(newSessionId);
 		}
 	}
 
+	private void createHtmlReport(Integer sessionId) {
+		VelocityEngine ve = initVelocityEngine();
+
+		Template t = ve.getTemplate("/reporter/templates/report.server.vm");
+		VelocityContext context = new VelocityContext();
+		context.put("url", String.format("%s/snapshot/testResults/summary/%s/", getServerConnector().getUrl(), sessionId));
+		StringWriter writer = new StringWriter();
+		t.merge(context, writer);
+        try {
+            generateReport(Paths.get(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath(), "SeleniumServerTestReport.html").toFile(), writer.toString());
+        } catch (IOException e) {
+            logger.error("Could not generate report {}", e.getMessage());
+        }
+    }
 
 	
 	private void recordResults(SeleniumRobotSnapshotServerConnector serverConnector, Map<ITestContext, Set<ITestResult>> resultSet) {
