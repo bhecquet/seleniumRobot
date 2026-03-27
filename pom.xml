@@ -149,7 +149,7 @@
 			<dependency>
 				<groupId>com.infotel.seleniumRobot</groupId>
 				<artifactId>seleniumRobot-windows-driver</artifactId>
-				<version>[5.0.1,)</version>
+				<version>[4.0.1,)</version>
 			</dependency>
 			<dependency>
 				<groupId>com.infotel.seleniumRobot</groupId>
