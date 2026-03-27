@@ -211,7 +211,7 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	public File getVariableFile(TestVariable variable) {
 		try {
 	        String[] fileName = variable.getFileName().split("/");
-	        Path whereToDownload = Paths.get(SeleniumTestsContextManager.getDatasetPath(), SeleniumTestsContextManager.getThreadContext().getTestEnv(), fileName[fileName.length - 1]);
+	        Path whereToDownload = Paths.get(System.getProperty("user.dir"), "dataset", SeleniumTestsContextManager.getThreadContext().getTestEnv(), fileName[fileName.length - 1]);
 	        return Unirest.get(url + String.format(VARIABLE_FILE_API_URL, variable.getId()))
 	        		.asFile(whereToDownload.toString())
 	        		.getBody();
