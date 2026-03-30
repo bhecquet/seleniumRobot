@@ -437,10 +437,12 @@ public class TestPageObject2 extends MockitoTest {
 		when(element.getTagName()).thenReturn("select");
 		when(element.isDisplayed()).thenReturn(true);
 		when(element.isEnabled()).thenReturn(true);
+		when(element.getCssValue(anyString())).thenReturn("");
 		when(element.findElements(By.tagName("option"))).thenReturn(List.of(option1));
 		when(element.findElements(By.xpath(".//option[normalize-space(.) = \"foo\"]")))
 				.thenReturn(List.of(option1));
 		when(option1.isEnabled()).thenReturn(true);
+		when(option1.getCssValue(anyString())).thenReturn("");
 		page.selectOption("select", "foo");
 		verify(option1).click();
 	}
