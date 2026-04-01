@@ -18,10 +18,16 @@
 package com.seleniumtests.connectors.selenium;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.Map.Entry;
+
+import org.apache.commons.io.FilenameUtils;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestVariable;
@@ -29,6 +35,7 @@ import com.seleniumtests.customexception.SeleniumRobotServer404Exception;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 
 import kong.unirest.core.GetRequest;
+import kong.unirest.core.HttpResponse;
 import kong.unirest.core.MultipartBody;
 import kong.unirest.core.Unirest;
 import kong.unirest.core.UnirestException;
@@ -209,15 +216,21 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	 * @return a File object
 	 */
 	public File getVariableFile(TestVariable variable) {
-		try {
-	        String[] fileName = variable.getFileName().split("/");
-	        Path whereToDownload = Paths.get(System.getProperty("user.dir"), "dataset", SeleniumTestsContextManager.getThreadContext().getTestEnv(), fileName[fileName.length - 1]);
-	        return Unirest.get(url + String.format(VARIABLE_FILE_API_URL, variable.getId()))
-	        		.asFile(whereToDownload.toString())
-	        		.getBody();
-		} catch (UnirestException e) {
-			throw new SeleniumRobotServerException("cannot get variable file", e);
-		}
+        try {
+            URI fileUri = new URI(variable.getFileName());
+            String fileName = FilenameUtils.getName(fileUri.getPath());
+            File varDataFile = File.createTempFile("varfile-", "-" + fileName);
+            varDataFile.deleteOnExit();
+            HttpResponse<File> getVarFileResponse = buildGetRequest(url + String.format(VARIABLE_FILE_API_URL, variable.getId())).asFile(varDataFile.getPath(), StandardCopyOption.REPLACE_EXISTING);
+            if (getVarFileResponse.getStatus() == 200) {
+                varDataFile = getVarFileResponse.getBody();
+            } else {
+                throw new UnirestException("cannot download variable file, server responded with status " + getVarFileResponse.getStatus());
+            }
+            return varDataFile;
+        } catch (UnirestException | IOException | URISyntaxException | NullPointerException e) {
+            throw new SeleniumRobotServerException("cannot get variable file", e);
+        }
     }
 	
 	/**

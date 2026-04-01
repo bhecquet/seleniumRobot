@@ -26,6 +26,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -255,8 +256,39 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
         Assert.assertEquals(variables.get("key1").getValue(), "value1");
         Assert.assertNull(variables.get("key1").getFileName());
         Assert.assertEquals(variables.get("key3").getFileName(), "http://127.0.0.1:8000/media/appName/testStandardDataProvider.csv");
-        Assert.assertEquals(variables.get("key3").getValue(), Paths.get(SeleniumTestsContextManager.getDatasetPath(), "DEV", "testStandardDataProvider.csv").toFile());
+        Assert.assertEquals(variables.get("key3").getValue().toString(), Paths.get(SeleniumTestsContextManager.getDatasetPath(), "DEV", "testStandardDataProvider.csv").toString());
     }
+
+    @Test(groups = {"ut"})
+    public void testGetVariablesFile() {
+        configureMockedVariableServerConnection();
+        SeleniumRobotVariableServerConnector connector = new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+        SeleniumTestsContextManager.getThreadContext().setVariableServer(connector);
+        Map<String, TestVariable> variables = connector.getVariables();
+        createServerMock("GET", "http://localhost:4321" + String.format(SeleniumRobotVariableServerConnector.VARIABLE_FILE_API_URL, variables.get("key3").getId()), 200, "");
+        File test = connector.getVariableFile(variables.get("key3"));
+        Assert.assertTrue(test.exists());
+    }
+
+    @Test(groups = {"ut"}, expectedExceptions = SeleniumRobotServerException.class)
+    public void testGetVariablesFileNoFileName() {
+        configureMockedVariableServerConnection();
+        SeleniumRobotVariableServerConnector connector = new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+        SeleniumTestsContextManager.getThreadContext().setVariableServer(connector);
+        Map<String, TestVariable> variables = connector.getVariables();
+        connector.getVariableFile(variables.get("key2"));
+    }
+
+    @Test(groups = {"ut"}, expectedExceptions = SeleniumRobotServerException.class)
+    public void testGetVariablesFileFail() {
+        configureMockedVariableServerConnection();
+        SeleniumRobotVariableServerConnector connector = new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+        SeleniumTestsContextManager.getThreadContext().setVariableServer(connector);
+        Map<String, TestVariable> variables = connector.getVariables();
+        createServerMock("GET", "http://localhost:4321" + String.format(SeleniumRobotVariableServerConnector.VARIABLE_FILE_API_URL, variables.get("key4").getId()), 404, "");
+        connector.getVariableFile(variables.get("key4"));
+    }
+	
 	
 	/**
 	 * Check the case where variable from linked application overlap a variable from tested application

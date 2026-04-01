@@ -47,7 +47,6 @@ public class TestSeleniumRobotVariableServerConnector extends GenericTest {
     private String authToken;
     private String testName;
     private String variableName;
-    private String fileName;
 	
 	@BeforeMethod(groups={"it"})
 	public void init(ITestContext ctx) {
@@ -57,7 +56,6 @@ public class TestSeleniumRobotVariableServerConnector extends GenericTest {
         authToken = System.getProperty("authToken");
         testName = System.getProperty("testName");
         variableName = System.getProperty("variableName");
-        fileName = System.getProperty("fileName");
 
         if (variableServerUrl == null) {
             variableServerUrl = "https://localhost:8002";
@@ -126,10 +124,6 @@ public class TestSeleniumRobotVariableServerConnector extends GenericTest {
      */
     @Test(groups = {"it"}, enabled = true)
     public void testDownloadVariableFile() {
-        File checkFile = Paths.get(SeleniumTestsContextManager.getDatasetPath(), "DEV", fileName).toFile();
-        if (checkFile.exists()) {
-            Assert.assertTrue(checkFile.delete());
-        }
         Map<String, TestVariable> variables = connector.getVariables();
         File varFile = connector.getVariableFile(variables.get(variableName));
         Assert.assertTrue(varFile.exists());
