@@ -81,6 +81,7 @@ public class TestSelectList extends MockitoTest {
 		when(element.getTagName()).thenReturn("select");
 		when(element.isEnabled()).thenReturn(true);
 		when(element.isDisplayed()).thenReturn(true);
+		when(element.getCssValue(anyString())).thenReturn("");
 		when(element.findElements(By.tagName("option"))).thenReturn(Arrays.asList(option1, option2));
 		
 		// the way Select class search for text and value
@@ -91,8 +92,10 @@ public class TestSelectList extends MockitoTest {
 
 		when(option1.getText()).thenReturn("opt1");
 		when(option1.isEnabled()).thenReturn(true);
+		when(option1.getCssValue(anyString())).thenReturn("");
 		when(option2.getText()).thenReturn("opt2");
 		when(option2.isEnabled()).thenReturn(true);
+		when(option2.getCssValue(anyString())).thenReturn("");
 		when(option1.getDomAttribute("value")).thenReturn("opti1");
 		when(option2.getDomAttribute("value")).thenReturn("opti2");
 		when(option1.getAttribute("index")).thenReturn("1");
