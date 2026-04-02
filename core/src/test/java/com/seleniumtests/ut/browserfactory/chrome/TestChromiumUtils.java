@@ -414,7 +414,7 @@ public class TestChromiumUtils extends MockitoTest {
 	public void testCaptureSnapshotChromiumDriver() {
 		ChromeDriver driver = mock(ChromeDriver.class);
 		DevTools devTools = mock(DevTools.class);
-		when(driver.getDevTools()).thenReturn(devTools);
+		doReturn(devTools).when(driver).getDevTools();
 		ArgumentCaptor<Command<?>> commandArgumentCaptor = ArgumentCaptor.forClass(Command.class);
 		when(devTools.send(any(Command.class))).thenReturn(Map.of("data", "abc"));
 		Assert.assertEquals(ChromiumUtils.captureSnapshot(driver), "abc");

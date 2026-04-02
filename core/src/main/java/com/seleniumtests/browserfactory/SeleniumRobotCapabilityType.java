@@ -32,8 +32,15 @@ public interface SeleniumRobotCapabilityType {
 	/**
 	 * parameter to route browser creation on a specific node on grid even if maxSession is reached
 	 */
-	String ATTACH_SESSION_ON_NODE = "sr:attachSessionOnNode"; 
-	
+	String ATTACH_SESSION_ON_NODE = "sr:attachSessionOnNode";
+
+	/**
+	 * parameter to pass in capabilities to allow other sessions to run on the same grid node
+	 * This is useful when grid node specifies for example maxSessions=1 (while due to attaching sessions, selenium grid allows 3 sessions)
+	 * This should only be used when tests do not use desktop interactions
+	 */
+	String ALLOW_ADDITIONAL_SESSIONS_ON_NODE = "sr:allowAdditionalSessionsOnNode";
+
 	/**
 	 * name of the running test
 	 */

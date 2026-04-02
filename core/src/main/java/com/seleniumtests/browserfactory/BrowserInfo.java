@@ -533,17 +533,11 @@ public class BrowserInfo {
 	 * @return
 	 */
     public List<Long> getProgramPid(String programName, List<Long> existingPids) {
-    	final String jvmName = ManagementFactory.getRuntimeMXBean().getName();
-        final int index = jvmName.indexOf('@');
-        
+
         OSUtility osUtility = OSUtilityFactory.getInstance();
-        
-        if(index == 0) {
-        	return new ArrayList<>();
-        }
+
         try {
-            String processId = Long.toString(Long.parseLong(jvmName.substring(0, index)));
-            return osUtility.getChildProcessPid(Long.parseLong(processId), programName + osUtility.getProgramExtension(), existingPids);
+            return osUtility.getChildProcessPid(ProcessHandle.current().pid(), programName + osUtility.getProgramExtension(), existingPids);
         } catch (Exception e) {
         	logger.warn("could not get driver pid", e);
         	return new ArrayList<>();
@@ -588,7 +582,7 @@ public class BrowserInfo {
     
     /**
      * Get the list of pids for the browser launched by driver and all subprocess created by browser
-     * @param driverPid
+     * @param driverPids
      * @return
      */
     public List<Long> getAllBrowserSubprocessPids(List<Long> driverPids) {
@@ -654,7 +648,6 @@ public class BrowserInfo {
 	/**
 	 * returns the accurate BrowserInfo according to the expected binary. If no matches, raise a ConfigurationException
 	 * Also check that file exists
-	 * @param version
 	 * @return
 	 * @throws ConfigurationException  if no browserinfo matches
 	 */
