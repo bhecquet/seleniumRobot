@@ -18,6 +18,8 @@
 package com.seleniumtests.connectors.mails;
 
 
+import java.io.File;
+
 import org.apache.logging.log4j.Logger;
 
 import com.seleniumtests.connectors.mails.EmailServer.EmailServerTypes;
@@ -86,4 +88,15 @@ public class EmailClientSelector {
 		return null;
 	}
 
+    public static EmailClient routeEmail(EmailServer server, String clientId, String tenantId, File certificateFile, File certificatePrivateKeyFile, String certPrivateKeyPassword, String email) {
+        if (server.getType() == EmailServerTypes.EXCHANGE_ONLINE) {
+            try {
+                return new ExchangeOnline(tenantId, clientId, certificateFile, certificatePrivateKeyFile, certPrivateKeyPassword, email);
+            } catch (Exception e) {
+                logger.error("Cannot connect to exchange online: {}", e.getMessage());
+            }
+        }
+        return null;
+    }
+	
 }

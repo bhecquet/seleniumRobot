@@ -7,6 +7,7 @@ import jakarta.mail.MessagingException;
 import kong.unirest.core.HttpResponse;
 import kong.unirest.core.JsonNode;
 import kong.unirest.core.Unirest;
+import kong.unirest.core.UnirestInstance;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;
 import org.apache.logging.log4j.Logger;
@@ -21,6 +22,7 @@ import org.bouncycastle.pkcs.PKCSException;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.PrivateKey;
 import java.security.Security;
 import java.security.cert.CertificateException;
@@ -37,6 +39,7 @@ public class ExchangeOnline extends EmailClientImpl {
 	private static final String AUTH_URL = "https://login.microsoftonline.com/";
 	private final String baseUrl;
 	protected static final String TMP_PRIVATE_KEY_FILE_PATH = "." + File.separator + "tmpPrivateKeyFilePath.key";
+	private static final UnirestInstance UNIREST_INSTANCE = Unirest.spawnInstance();	
 	
 	/**
 	 * @param tenantId							Exchange tenant id
@@ -52,9 +55,29 @@ public class ExchangeOnline extends EmailClientImpl {
 		IAuthenticationResult tokenProvider = acquireToken(certificateFileContent, certificatePrivateKeyFileContent, certificatePrivateKeyPassword, tenantId, clientId);
 		String token = tokenProvider.accessToken();
 		
-		Unirest.config().addDefaultHeader("Authorization", "Bearer " + token);
+		UNIREST_INSTANCE.config().addDefaultHeader("Authorization", "Bearer " + token);
 	}
 
+	/**
+     * @param tenantId                      Exchange tenant id
+     * @param clientId                      might be called applicationId
+     * @param certificateFile               certificate file
+     * @param certificatePrivateKeyFile     private key file
+     * @param certificatePrivateKeyPassword private key password
+     * @param userEmail                     the email address you want to read or send mail from (abc.edf@ghi.com)
+     */
+    public ExchangeOnline(String tenantId, String clientId, File certificateFile, File certificatePrivateKeyFile, String certificatePrivateKeyPassword, String userEmail) throws CertificateException, IOException, OperatorCreationException, PKCSException {
+        baseUrl = GRAPH_URL + userEmail + "/";
+
+        String certificateFileContent = Files.readString(Path.of(certificateFile.getPath()));
+        String certificatePrivateKeyFileContent = Files.readString(Path.of(certificatePrivateKeyFile.getPath()));
+
+        IAuthenticationResult tokenProvider = acquireToken(certificateFileContent, certificatePrivateKeyFileContent, certificatePrivateKeyPassword, tenantId, clientId);
+        String token = tokenProvider.accessToken();
+
+        UNIREST_INSTANCE.config().addDefaultHeader("Authorization", "Bearer " + token);
+    }
+	
 	/**
 	 * Acquire token from microsoft
 	 * @param certFileContent			content of certificate
@@ -199,7 +222,7 @@ public class ExchangeOnline extends EmailClientImpl {
 			requestUrl.append(String.format("&$select=%1$s", parameters.get("select")));
 		}
 		
-		return Unirest.get(requestUrl.toString().replace("&filter= and ", "&filter=")).asJson();
+		return UNIREST_INSTANCE.get(requestUrl.toString().replace("&filter= and ", "&filter=")).asJson();
 	}
 	
 	/**
@@ -213,7 +236,7 @@ public class ExchangeOnline extends EmailClientImpl {
 				String.format("messages/%1$s/attachments?", mailId) +
 				"$select=id,name,size,contentType";
 		
-		return Unirest.get(requestUrl).asJson();
+		return UNIREST_INSTANCE.get(requestUrl).asJson();
 	}
 	
 	/**
@@ -225,7 +248,7 @@ public class ExchangeOnline extends EmailClientImpl {
 		String requestUrl = baseUrl +
 				String.format("messages/%1$s/attachments/%2$s", mailId, attachmentId);
 		
-		return Unirest.get(requestUrl).asJson();
+		return UNIREST_INSTANCE.get(requestUrl).asJson();
 	}
 
 // ************************************************************
@@ -281,7 +304,7 @@ public class ExchangeOnline extends EmailClientImpl {
 		String requestUrl = baseUrl + "sendMail";
 		logger.info(requestBody);
 		logger.info(requestUrl);
-		return Unirest.post(requestUrl).header("Content-Type", "application/json").body(requestBody).asJson();
+		return UNIREST_INSTANCE.post(requestUrl).header("Content-Type", "application/json").body(requestBody).asJson();
 	}
 
 // ************************************************************
@@ -297,7 +320,7 @@ public class ExchangeOnline extends EmailClientImpl {
 	private String findFolder(String folderName) {
 		
 		String requestUrl = baseUrl + "mailFolders?$select=id,displayName";
-		HttpResponse<JsonNode> folderResponse = Unirest.get(requestUrl).asJson();
+		HttpResponse<JsonNode> folderResponse = UNIREST_INSTANCE.get(requestUrl).asJson();
 		JSONArray jsFolders = folderResponse.getBody().getObject().getJSONArray("value");
 		HashMap<String, String> folders = new HashMap<>();
 		for (Object jsFolder : jsFolders) {
