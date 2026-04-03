@@ -31,6 +31,11 @@ import java.security.cert.X509Certificate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+
+/**
+ * This class doesn't have any UT, please use the TestEmail.java integration tests to validate it.
+ * /core/src/test/java/com/seleniumtests/it/connector/email/TestEmail.java
+ */
 public class ExchangeOnline extends EmailClientImpl {
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(ExchangeOnline.class);
@@ -39,7 +44,7 @@ public class ExchangeOnline extends EmailClientImpl {
 	private static final String AUTH_URL = "https://login.microsoftonline.com/";
 	private final String baseUrl;
 	protected static final String TMP_PRIVATE_KEY_FILE_PATH = "." + File.separator + "tmpPrivateKeyFilePath.key";
-	private static final UnirestInstance UNIREST_INSTANCE = Unirest.spawnInstance();	
+	private final UnirestInstance UNIREST_INSTANCE = Unirest.spawnInstance();	
 	
 	/**
 	 * @param tenantId							Exchange tenant id
