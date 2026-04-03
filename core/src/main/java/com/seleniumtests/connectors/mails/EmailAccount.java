@@ -45,8 +45,8 @@ public class EmailAccount {
  // Parameters exclusive to Exchange Online
  	private String tenantId;
  	private String clientId;
- 	private String certificate;
- 	private String certificatePrivateKey;
+ 	private Object certificate;
+ 	private Object certificatePrivateKey;
  	private String certificatePrivateKeyPassword;
 
     /**
@@ -88,6 +88,24 @@ public class EmailAccount {
 		this.clientId = clientId;
 		this.certificate = certificateFileContent;
 		this.certificatePrivateKey = certificatePrivateKeyFileContent;
+		this.certificatePrivateKeyPassword = certificatePrivateKeyPassword;
+		this.emailServer = server;
+	}
+	
+	/**
+	 * @param email
+	 * @param tenantId
+	 * @param clientId               given at your entra registration, might be called applicationId
+	 * @param certificateFile        your certificate file .pem
+	 * @param certificatePrivateKeyFile  your private key file .key
+	 * @param certificatePrivateKeyPassword
+	 */
+	public EmailAccount(String email, String tenantId, String clientId, File certificateFile, File certificatePrivateKeyFile, String certificatePrivateKeyPassword, EmailServer server) {
+		this.email = email;
+		this.tenantId = tenantId;
+		this.clientId = clientId;
+		this.certificate = certificateFile;
+		this.certificatePrivateKey = certificatePrivateKeyFile;
 		this.certificatePrivateKeyPassword = certificatePrivateKeyPassword;
 		this.emailServer = server;
 	}
@@ -265,7 +283,13 @@ public class EmailAccount {
         }
 
         if (emailServer.getType().equals(EmailServer.EmailServerTypes.EXCHANGE_ONLINE)) {
-			emailClient = EmailClientSelector.routeEmail(emailServer, clientId, tenantId, certificate, certificatePrivateKey, certificatePrivateKeyPassword, email);
+        	if (certificate.getClass() == String.class) {
+                emailClient = EmailClientSelector.routeEmail(emailServer, clientId, tenantId, (String) certificate, (String) certificatePrivateKey, certificatePrivateKeyPassword, email);
+            } else if (certificate.getClass() == File.class) {
+                emailClient = EmailClientSelector.routeEmail(emailServer, clientId, tenantId, (File) certificate, (File) certificatePrivateKey, certificatePrivateKeyPassword, email);
+            } else {
+                throw new ConfigurationException("Certificate should be either a String with the content of the certificate file or a File with the certificate file");
+            }
 		} else {
 			emailClient = EmailClientSelector.routeEmail(emailServer,
 					getEmail(),

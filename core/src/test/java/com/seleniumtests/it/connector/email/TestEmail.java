@@ -25,6 +25,7 @@ import com.seleniumtests.connectors.mails.EmailClient;
 import com.seleniumtests.connectors.mails.EmailClientSelector;
 import com.seleniumtests.connectors.mails.EmailServer;
 import com.seleniumtests.connectors.mails.EmailServer.EmailServerTypes;
+import com.seleniumtests.connectors.mails.Email;
 import com.seleniumtests.connectors.mails.EmailAccount;
 
 public class TestEmail {
@@ -39,13 +40,39 @@ public class TestEmail {
 		EmailClient client = EmailClientSelector.routeEmail(server, "<email_of_mailbox_to_consult>", "<user_to_connect_to_mailbox>", "<password>");
 		client.getLastEmails();
 	}
+	
+	/**
+	 * @param exoClientId                  			Might be called applicationId > id of your RegisterApp which has the right Access Policy on the email you're using
+	 * @param exoTenantId							Exchange tenant id > from your Microsoft Azure instance
+	 * @param exoCertFileAsStringOrFile				Either a File object with the certificate (.pem) or a String with its content > certificate used to log on your RegisterApp
+	 * @param exoCertPrivateKeyFileAsStringOrFile	Either a File object with the private key (.key) or a String with its content > linked to the above certificate
+	 * @param exoCertPrivateKeyPass					Private key password > linked to the above private key
+	 * @param exoUserEmail                 			The email address you want to read or send mail from (abc.edf@ghi.com)
+	 * @throws Exception
+	 */
 	@Test(groups={"it"}, enabled=false)
 	public void testMailExchangeOnline() throws Exception {
 		EmailServer server = new EmailServer("<mail_server_urs>", EmailServerTypes.EXCHANGE_ONLINE, null);
-		EmailClient client = EmailClientSelector.routeEmail(server, System.getProperty("exoClientId"), System.getProperty("exoTenantId"), System.getProperty("exoCert"), System.getProperty("exoCertPrivateKey"), System.getProperty("exoCertPrivateKeyPass"), System.getProperty("exoUsermail"));
+		EmailClient client = EmailClientSelector.routeEmail(server, System.getProperty("exoClientId"), System.getProperty("exoTenantId"), System.getProperty("exoCertAsStringOrFile"), System.getProperty("exoCertPrivateKeyAsStringOrFile"), System.getProperty("exoCertPrivateKeyPass"), System.getProperty("exoUsermail"));
 		client.getLastEmails();
 	}
 
+	/**
+ 	 * @param exoUserEmail                 			The email address you want to read or send mail from (abc.edf@ghi.com)
+ 	 * @param exoTenantId							Exchange tenant id > from your Microsoft Azure instance
+	 * @param exoClientId                  			Might be called applicationId > id of your RegisterApp which has the right Access Policy on the email you're using
+	 * @param exoCertFileAsStringOrFile				Either a File object with the certificate (.pem) or a String with its content > certificate used to log on your RegisterApp
+	 * @param exoCertPrivateKeyFileAsStringOrFile	Either a File object with the private key (.key) or a String with its content > linked to the above certificate
+	 * @param exoCertPrivateKeyPass					Private key password > linked to the above private key
+	 * @throws Exception
+	 */
+	@Test(groups = {"it"}, enabled = false)
+    public void testMailExchangeOnlineViaAccount() throws Exception {
+        EmailServer server = new EmailServer("<mail_server_urs>", EmailServerTypes.EXCHANGE_ONLINE, null);
+        EmailAccount account = new EmailAccount(System.getProperty("exoUsermail"), System.getProperty("exoTenantId"), System.getProperty("exoClientId"), System.getProperty("exoCertAsStringOrFile"), System.getProperty("exoCertPrivateKeyAsStringOrFile"), System.getProperty("exoCertPrivateKeyPass"), server);
+        account.checkEmailPresenceByBody("content of the mail body", new String[]{}, 90);
+    }
+	
 	@Test(groups={"it"}, enabled=false)
 	public void testSendMail() throws Exception {
 		EmailServer server = new EmailServer("<mail_server_urs>", EmailServerTypes.EXCHANGE_EWS, "<domain_for_user>");
