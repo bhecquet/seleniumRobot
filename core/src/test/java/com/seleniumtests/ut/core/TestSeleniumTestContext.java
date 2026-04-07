@@ -911,6 +911,19 @@ public class TestSeleniumTestContext extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().setApp(null);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getApp(), SeleniumTestsContext.DEFAULT_APP);
 	}
+
+	@Test(groups="ut context")
+	public void testAllowConcurrentTestsOnGrid(final ITestContext testNGCtx) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setAllowConcurrentTestsOnGrid(true);
+		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getAllowConcurrentTestsOnGrid());
+	}
+	@Test(groups="ut context")
+	public void testAllowConcurrentTestsOnGridNull(final ITestContext testNGCtx) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setAllowConcurrentTestsOnGrid(null);
+		Assert.assertFalse(SeleniumTestsContextManager.getThreadContext().getAllowConcurrentTestsOnGrid());
+	}
 	
 	@Test(groups="ut context")
 	public void testCucumberTags(final ITestContext testNGCtx) {

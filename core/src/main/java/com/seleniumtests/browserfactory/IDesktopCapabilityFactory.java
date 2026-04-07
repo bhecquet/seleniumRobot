@@ -30,7 +30,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Proxy;
@@ -122,6 +121,11 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
             if (!webDriverConfig.getNodeTags().isEmpty()) {
             	options.setCapability(SeleniumRobotCapabilityType.NODE_TAGS, webDriverConfig.getNodeTags());
             }
+
+			TestNGResultUtils.getRetry(webDriverConfig.getTestContext().getTestNGResult());
+			if (webDriverConfig.getAllowConcurrentTestsOnGrid()) {
+				options.setCapability(SeleniumRobotCapabilityType.ALLOW_ADDITIONAL_SESSIONS_ON_NODE, true);
+			}
             options.setCapability(SeleniumRobotCapabilityType.BETA_BROWSER, webDriverConfig.getBetaBrowser());
 
             updateGridOptionsWithSelectedBrowserInfo(options);

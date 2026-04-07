@@ -122,6 +122,33 @@ public class TestDesktopCommonCapabilityFactory extends MockitoTest {
 		
 		Assert.assertFalse(capa.is(SeleniumRobotCapabilityType.NODE_TAGS));
 	}
+
+
+	/**
+	 * Check we add a capability when requested
+	 */
+	@Test(groups={"ut"})
+	public void testCreateDefaultCapabilitiesWithAllowMultipleTestsInGridMode() {
+
+		when(config.getProxy()).thenReturn(proxyConfig);
+		when(config.getAllowConcurrentTestsOnGrid()).thenReturn(true);
+		when(config.getMode()).thenReturn(DriverMode.GRID);
+
+		MutableCapabilities capa = new HtmlUnitCapabilitiesFactory(config).createCapabilities();
+
+		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.ALLOW_ADDITIONAL_SESSIONS_ON_NODE), true);
+	}
+	@Test(groups={"ut"})
+	public void testCreateDefaultCapabilitiesWithDoNotAllowMultipleTestsInGridMode() {
+
+		when(config.getProxy()).thenReturn(proxyConfig);
+		when(config.getAllowConcurrentTestsOnGrid()).thenReturn(false);
+		when(config.getMode()).thenReturn(DriverMode.GRID);
+
+		MutableCapabilities capa = new HtmlUnitCapabilitiesFactory(config).createCapabilities();
+
+		Assert.assertNull(capa.getCapability(SeleniumRobotCapabilityType.ALLOW_ADDITIONAL_SESSIONS_ON_NODE));
+	}
 	
 	@Test(groups={"ut"})
 	public void testCreateDefaultCapabilitiesWithPlatform() {

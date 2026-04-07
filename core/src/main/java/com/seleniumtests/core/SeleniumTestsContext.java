@@ -99,6 +99,7 @@ public class SeleniumTestsContext {
     public static final String PAGE_LOAD_STRATEGY = "pageLoadStrategy";			// page load strategy as defined in selenium spec. Will be applied to driver
     public static final String WEB_DRIVER_GRID = "webDriverGrid";				// adresse du serveur seleniumGrid
     public static final String WEB_DRIVER_GRID_TIMEOUT = "webDriverGridTimeout";// Timeout (in seconds) if a grid node cannot be found
+    public static final String ALLOW_CONCURRENT_TESTS_ON_GRID = "allowConcurrentTestsOnGrid"; // in case seleniumRobot grid limits number of sessions to 1 per node, allow to bypass this limitation
     public static final String RUN_MODE = "runMode";							// local ou grid. Pourrait également contenir sauceLabs / testDroid
     public static final String NODE_TAGS = "nodeTags";							// Comma seperated list of strings. Requests that this test should execute only on a node (grid mode only) announcing all of these tags (issue #190)
     public static final String MASK_PASSWORD = "maskPassword";					// whether seleniumRobot should hide passwords or not
@@ -225,6 +226,7 @@ public class SeleniumTestsContext {
 	public static final boolean DEFAULT_SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER = true;
 	public static final String DEFAULT_BROWSER = "none";
 	public static final boolean DEFAULT_BETA_BROWSER = false;
+    public static final boolean DEFAULT_ALLOW_CONCURRENT_TESTS_ON_GRID = false;
 	public static final boolean DEFAULT_MANUAL_TEST_STEPS = false;
 	public static final boolean DEFAULT_HEADLESS_BROWSER = false;
 	public static final boolean DEFAULT_MASK_PASSWORD = true;
@@ -358,6 +360,7 @@ public class SeleniumTestsContext {
 
         setWebDriverGrid(getValueForTest(WEB_DRIVER_GRID, System.getProperty(WEB_DRIVER_GRID)));
         setWebDriverGridTimeout(getIntValueForTest(WEB_DRIVER_GRID_TIMEOUT, System.getProperty(WEB_DRIVER_GRID_TIMEOUT)));
+        setAllowConcurrentTestsOnGrid(getBoolValueForTest(ALLOW_CONCURRENT_TESTS_ON_GRID, System.getProperty(ALLOW_CONCURRENT_TESTS_ON_GRID)));
         setRunMode(getValueForTest(RUN_MODE, System.getProperty(RUN_MODE)));
         setNodeTags(getValueForTest(NODE_TAGS, System.getProperty(NODE_TAGS)));   
         
@@ -1356,6 +1359,10 @@ public class SeleniumTestsContext {
         return (Integer) getAttribute(WEB_DRIVER_GRID_TIMEOUT);
     }
 
+    public Boolean getAllowConcurrentTestsOnGrid() {
+        return (Boolean) getAttribute(ALLOW_CONCURRENT_TESTS_ON_GRID);
+    }
+
     public String getWebProxyAddress() {
         return (String) getAttribute(WEB_PROXY_ADDRESS);
     }
@@ -1737,6 +1744,10 @@ public class SeleniumTestsContext {
 
     public void setWebDriverGridTimeout(Integer timeout) {
         setAttribute(WEB_DRIVER_GRID_TIMEOUT, Objects.requireNonNullElse(timeout, DEFAULT_WEB_DRIVER_GRID_TIMEOUT));
+    }
+
+    public void setAllowConcurrentTestsOnGrid(Boolean allowConcurrentTestsOnGrid) {
+        setAttribute(ALLOW_CONCURRENT_TESTS_ON_GRID, Objects.requireNonNullElse(allowConcurrentTestsOnGrid, DEFAULT_ALLOW_CONCURRENT_TESTS_ON_GRID));
     }
     
     public void setConfiguration(Map<String, TestVariable> variables){

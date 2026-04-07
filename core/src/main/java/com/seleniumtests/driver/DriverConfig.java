@@ -136,6 +136,10 @@ public class DriverConfig {
     	return testContext.getDebug();
     }
 
+    public Boolean getAllowConcurrentTestsOnGrid() {
+        return testContext.getAllowConcurrentTestsOnGrid();
+    }
+
     public WebDriver getDriver() {
         return driver;
     }

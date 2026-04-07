@@ -136,14 +136,15 @@ The proxy settings below apply to the browser used to test your application
 
 Settings for changing the test behavior 
 
-| Param name       			| Default 	| Description  |
-| -------------------------	| ------- 	| ------------ |
-| debug 					| none		| The debug mode. 'gui', 'driver', 'core', 'network'. It's also possible to specify several debug modes at once: 'core,driver'. Details can be found in chapter §7.20 | 
-| softAssertEnabled 		| true		| Test does not stop is an assertion fails. Only valid when using assertions defined in `CustomAssertion` class or assert methods in `BasePage` class | 
-| loadIni					|			| comma separated list of path to ini formatted files to load. Their values will overwrite those from env.ini file if the same key is present. Path is relative to data/<app>/config path |
-| overrideSeleniumNativeAction      | false | intercept driver.findElement and driver.frame operations so that seleniumRobot element operations can be use (replay, error handling, ...) even when using standard selenium code. Only findElement(By) and findElements(By) are supported, not findElementByxxx(String). Logging is also better |
-| webDriverListener 		| 			| additional driver listener class. See chapter §7.21 for implementation details |
-| actionDelay               | 200       | delay in millisecondes between 2 actions. It allows to speed up or slow down a test |
+| Param name       			         | Default 	  | Description                                                                                                                                                                                                                                                                                      |
+|------------------------------|------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| debug 					                  | none		     | The debug mode. 'gui', 'driver', 'core', 'network'. It's also possible to specify several debug modes at once: 'core,driver'. Details can be found in chapter §7.20                                                                                                                              | 
+| softAssertEnabled 		         | true		     | Test does not stop is an assertion fails. Only valid when using assertions defined in `CustomAssertion` class or assert methods in `BasePage` class                                                                                                                                              | 
+| loadIni					                 | 			        | comma separated list of path to ini formatted files to load. Their values will overwrite those from env.ini file if the same key is present. Path is relative to data/<app>/config path                                                                                                          |
+| overrideSeleniumNativeAction | false      | intercept driver.findElement and driver.frame operations so that seleniumRobot element operations can be use (replay, error handling, ...) even when using standard selenium code. Only findElement(By) and findElements(By) are supported, not findElementByxxx(String). Logging is also better |
+| webDriverListener 		         | 			        | additional driver listener class. See chapter §7.21 for implementation details                                                                                                                                                                                                                   |
+| actionDelay                  | 200        | delay in millisecondes between 2 actions. It allows to speed up or slow down a test                                                                                                                                                                                                              |
+| allowConcurrentTestsOnGrid   | false      | If true, allow to bypass the max-session parameter on grid node, up to the limit fixed to Selenium. It is only useful when max-sessions=1. In this case, only tests that declare the this parameter will be allowed to run on the same node                                                      |                                                                                                                                                                                                                                 |   
 
 
 Cucumber options
