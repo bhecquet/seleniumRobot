@@ -122,7 +122,6 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
             	options.setCapability(SeleniumRobotCapabilityType.NODE_TAGS, webDriverConfig.getNodeTags());
             }
 
-			TestNGResultUtils.getRetry(webDriverConfig.getTestContext().getTestNGResult());
 			if (webDriverConfig.getAllowConcurrentTestsOnGrid()) {
 				options.setCapability(SeleniumRobotCapabilityType.ALLOW_ADDITIONAL_SESSIONS_ON_NODE, true);
 			}
