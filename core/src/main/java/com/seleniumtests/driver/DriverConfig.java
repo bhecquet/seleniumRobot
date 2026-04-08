@@ -375,4 +375,12 @@ public class DriverConfig {
 	public void setMajorBrowserVersion(Integer majorBrowserVersion) {
 		this.majorBrowserVersion = majorBrowserVersion;
 	}
+
+    public boolean isTestRetrying() {
+        return testContext.isTestRetrying();
+    }
+
+    public Integer getTestRetryCount() {
+        return testContext.getTestRetryCount();
+    }
 }

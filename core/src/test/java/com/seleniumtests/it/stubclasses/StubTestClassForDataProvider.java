@@ -47,12 +47,12 @@ public class StubTestClassForDataProvider extends StubParentClass {
 
 		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getAttribute("data"));
 		SeleniumTestsContextManager.getThreadContext().setAttribute("data", data);
-		((ScenarioLogger)logger).log("data written: " + SeleniumTestsContextManager.getThreadContext().getAttribute("data"));
+		logger.log("data written: " + SeleniumTestsContextManager.getThreadContext().getAttribute("data"));
 	}
 	
 	@BeforeMethod(groups={"stub"})
 	public void before(Method method, ITestContext ctx, ITestResult res) {
-		
+		logger.info("before method");
 	}
 	
 	@DataProvider

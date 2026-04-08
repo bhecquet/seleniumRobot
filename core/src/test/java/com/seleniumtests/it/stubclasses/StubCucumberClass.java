@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.it.stubclasses;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.WebDriverException;
 
@@ -43,6 +44,7 @@ public class StubCucumberClass {
 	
 	@When("^write_error (\\w+)$")
 	public void writeTextWithError(String text) {
+		logger.info("Test is retrying: {}", SeleniumTestsContextManager.getThreadContext().isTestRetrying());
 		throw new WebDriverException("no element found");
 	}
 	

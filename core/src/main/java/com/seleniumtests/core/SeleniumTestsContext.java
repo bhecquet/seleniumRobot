@@ -1512,6 +1512,10 @@ public class SeleniumTestsContext {
     public Integer getViewPortHeight() {
     	return (Integer) getAttribute(VIEWPORT_HEIGHT);
     }
+
+    public boolean isTestRetrying() {
+        return TestNGResultUtils.isTestRetrying(testNGResult);
+    }
     
     @SuppressWarnings("unchecked")
 	public Map<String, TestVariable> getConfiguration() {

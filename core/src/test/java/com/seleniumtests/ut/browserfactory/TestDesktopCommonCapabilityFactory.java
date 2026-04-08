@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,20 +17,16 @@
  */
 package com.seleniumtests.ut.browserfactory;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -38,7 +34,6 @@ import org.testng.annotations.Test;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.HtmlUnitCapabilitiesFactory;
 import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
-import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
@@ -133,21 +128,41 @@ public class TestDesktopCommonCapabilityFactory extends MockitoTest {
 		when(config.getProxy()).thenReturn(proxyConfig);
 		when(config.getAllowConcurrentTestsOnGrid()).thenReturn(true);
 		when(config.getMode()).thenReturn(DriverMode.GRID);
+		when(config.isTestRetrying()).thenReturn(false);
+		when(config.getTestRetryCount()).thenReturn(1);
 
 		MutableCapabilities capa = new HtmlUnitCapabilitiesFactory(config).createCapabilities();
 
 		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.ALLOW_ADDITIONAL_SESSIONS_ON_NODE), true);
 	}
 	@Test(groups={"ut"})
-	public void testCreateDefaultCapabilitiesWithDoNotAllowMultipleTestsInGridMode() {
+	public void testCreateDefaultCapabilitiesWithAllowMultipleTestsInGridModeTestRetrying() {
+		createCapabilitiesWithAllowMultipleTests(true, true, 1);
+	}
 
+	private void createCapabilitiesWithAllowMultipleTests(boolean allowConcurrentTestsOnGrid, boolean testIsRetrying, int maxRetryCount) {
 		when(config.getProxy()).thenReturn(proxyConfig);
-		when(config.getAllowConcurrentTestsOnGrid()).thenReturn(false);
+		when(config.getAllowConcurrentTestsOnGrid()).thenReturn(allowConcurrentTestsOnGrid);
 		when(config.getMode()).thenReturn(DriverMode.GRID);
+		when(config.isTestRetrying()).thenReturn(testIsRetrying);
+		when(config.getTestRetryCount()).thenReturn(maxRetryCount);
 
 		MutableCapabilities capa = new HtmlUnitCapabilitiesFactory(config).createCapabilities();
 
 		Assert.assertNull(capa.getCapability(SeleniumRobotCapabilityType.ALLOW_ADDITIONAL_SESSIONS_ON_NODE));
+	}
+
+	@Test(groups={"ut"})
+	public void testCreateDefaultCapabilitiesWithDoNotAllowMultipleTestsInGridMode() {
+		createCapabilitiesWithAllowMultipleTests(false, false, 1);
+	}
+
+	/**
+	 * If test cannot be retried, then we need to see why test failed, so do not allow to execute on same node as an other one
+	 */
+	@Test(groups={"ut"})
+	public void testCreateDefaultCapabilitiesWithDoNotAllowMultipleTestsInGridModeNoRetryAllowed() {
+		createCapabilitiesWithAllowMultipleTests(true, false, 0);
 	}
 	
 	@Test(groups={"ut"})

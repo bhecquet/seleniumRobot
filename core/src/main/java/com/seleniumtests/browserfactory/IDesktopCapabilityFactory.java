@@ -122,7 +122,11 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
             	options.setCapability(SeleniumRobotCapabilityType.NODE_TAGS, webDriverConfig.getNodeTags());
             }
 
-			if (webDriverConfig.getAllowConcurrentTestsOnGrid()) {
+			if (Boolean.TRUE.equals(webDriverConfig.getAllowConcurrentTestsOnGrid())
+					&& !webDriverConfig.isTestRetrying()
+					&& webDriverConfig.getTestRetryCount() > 0
+			) {
+				logger.info("Test will be allowed to execute on same node than others");
 				options.setCapability(SeleniumRobotCapabilityType.ALLOW_ADDITIONAL_SESSIONS_ON_NODE, true);
 			}
             options.setCapability(SeleniumRobotCapabilityType.BETA_BROWSER, webDriverConfig.getBetaBrowser());

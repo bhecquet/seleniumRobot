@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
+import com.seleniumtests.core.utils.TestNGResultUtils;
 import org.openqa.selenium.WebDriverException;
 import org.testng.Assert;
 import org.testng.Reporter;
@@ -66,6 +67,7 @@ public class StubTestClass extends StubParentClass {
 	public void set(Method method) {
 		WaitHelper.waitForMilliSeconds(100);
 		logger.info("before count: " + count);
+		logger.info(String.format("Before Test %d is retrying: %s", count, robotConfig().isTestRetrying()));
 		maskPassword = SeleniumTestsContextManager.getThreadContext().getMaskedPassword();
 	}
 	
@@ -146,7 +148,7 @@ public class StubTestClass extends StubParentClass {
 	public void testWithException() throws IOException {
 		count++;
 		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
-		
+
 		File tmpImg2 = File.createTempFile("img", "_with_very_very_very_long_name_to_be_shortened.png");
 		File tmpHtml2 = File.createTempFile("html", "_with_very_very_very_long_name_to_be_shortened.html");
 		ScreenShot screenshot2 = new ScreenShot(tmpImg2, tmpHtml2);
@@ -155,7 +157,9 @@ public class StubTestClass extends StubParentClass {
 		
 		step1.addAction(new TestAction(String.format("played %d times", count), false, new ArrayList<>()));
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
+		logger.info(String.format("Test %d is retrying: %s", count, robotConfig().isTestRetrying()));
 		TestStepManager.logTestStep(step1);
+
 		throw new DriverExceptions("some exception");
 	}
 	

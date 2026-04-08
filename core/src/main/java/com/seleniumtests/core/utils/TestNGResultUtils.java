@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,19 +19,15 @@ package com.seleniumtests.core.utils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
+import com.seleniumtests.core.testretry.TestRetryAnalyzer;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.logging.log4j.Logger;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.Reporter;
-import org.testng.annotations.CustomAttribute;
 import org.testng.annotations.Test;
 import org.testng.internal.BaseTestMethod;
 import org.testng.internal.TestResult;
@@ -73,7 +69,6 @@ public class TestNGResultUtils {
 	private static final String METHOD_NAME = "methodName";				// name of the test method (or the cucumber scenario)
 	private static final String SNAPSHOT_COMPARISON_RESULT = "snapshotComparisonResult";	// the result of snapshot comparison, when enabled
 	private static final String DESCRIPTION = "description";			// description of the test method, if any
-	private static final String ERROR_CAUSES = "errorCauses"; 			// list of causes of the test error
 	private static final String ERROR_CAUSE_IN_LAST_STEP = "errorCauseInLastStep"; // true when we have searched for error cause in the last step
 	private static final String ERROR_CAUSE_IN_REFERENCE = "errorCauseInReference"; // true when we have searched for error cause by comparing reference picture of the failed step
 	private static final String FINISHED = "finished"; // true when all after methods has been executed
@@ -84,12 +79,6 @@ public class TestNGResultUtils {
 	
 	/**
 	 * Copy a TestResult into an other one
-	 * @param toCopy
-	 * @return
-	 * @throws SecurityException 
-	 * @throws NoSuchFieldException 
-	 * @throws IllegalAccessException 
-	 * @throws IllegalArgumentException 
 	 */
 	public static ITestResult copy(ITestResult toCopy, String name, String description) throws NoSuchFieldException, IllegalAccessException {
 		
@@ -128,8 +117,6 @@ public class TestNGResultUtils {
 	
 	/**
 	 * Returns the test name (will be method name for SeleniumTestPlan test and scenario name for cucumber test)
-	 * @param testNGResult
-	 * @return
 	 */
 	public static String getTestName(ITestResult testNGResult) {
 		if (testNGResult == null) {
@@ -157,8 +144,6 @@ public class TestNGResultUtils {
 	 * Returns a "visual" name for this test.
 	 * In case "testName" is not specified for @Test annotation, then, we return the "unique test name"
 	 * If "testName" is specified, then, we return it, possibly, interpolating string
-	 * @param testNGResult
-	 * @return
 	 */
 	public static String getVisualTestName(ITestResult testNGResult) {
 		if (testNGResult == null) {
@@ -184,7 +169,6 @@ public class TestNGResultUtils {
 	
     /**
      * Generate a String which is unique for each combination of suite/testNG test/class/test method/parameters
-     * @return
      */
     public static String getHashForTest(ITestResult testNGResult) {
 
@@ -227,7 +211,6 @@ public class TestNGResultUtils {
     /**
      * Returns the unique test name (it's the test name as returned by {@link TestNGResultUtils.getTestName()}) plus an index depending on the execution order of the method
      * (This index is calculated in {@link SeleniumTestsContext.hashTest()}. Resulting name is the folder name and becomes the unique test name, put into testResult attributes
-     * @return
      */
     public static String getUniqueTestName(ITestResult testNGResult) {
     	return (String) testNGResult.getAttribute(UNIQUE_METHOD_NAME);
@@ -272,6 +255,21 @@ public class TestNGResultUtils {
     public static void setRetry(ITestResult testNGResult, Integer retry) {
     	testNGResult.setAttribute(RETRY, retry);
     }
+
+	/**
+	 * Returns true if the test is currently retrying
+	 * If method is called from a @BeforeXXX method, it will check if the method has already been executed, which may be different from having failed
+	 * as several tests may share the same test method (e.g with data providers)
+	 */
+	public static boolean isTestRetrying(ITestResult testNGResult) {
+		try {
+			TestRetryAnalyzer retryAnalyzer = (TestRetryAnalyzer) testNGResult.getMethod().getRetryAnalyzer(testNGResult);
+			return retryAnalyzer.getCount() > 0;
+		} catch (Exception e) {
+			return getLinkedTestMethod(Reporter.getCurrentTestResult()).getCurrentInvocationCount() > 0;
+		}
+
+	}
     
     // TestCaseInSession id as stored in snapshot server
     public static Integer getSnapshotTestCaseInSessionId(ITestResult testNGResult) {
@@ -301,8 +299,6 @@ public class TestNGResultUtils {
     }
     
     /**
-     * 
-     * @param testNGResult
      * @return true if the result has already been recorded to test manager
      */
     public static boolean isTestManagerReportCreated(ITestResult testNGResult) {
@@ -322,8 +318,6 @@ public class TestNGResultUtils {
     }
     
     /**
-     * 
-     * @param testNGResult
      * @return true if the HTML result has already been created for this result
      */
     public static boolean isHtmlReportCreated(ITestResult testNGResult) {
@@ -335,8 +329,6 @@ public class TestNGResultUtils {
     }
     
     /**
-     * 
-     * @param testNGResult
      * @return true if the Custom result has already been created for this result
      */
     public static boolean isCustomReportCreated(ITestResult testNGResult) {
@@ -349,16 +341,11 @@ public class TestNGResultUtils {
     
     private static boolean isReportCreated(ITestResult testNGResult, String attributeName) {
     	Boolean alreadyCreated = (Boolean) testNGResult.getAttribute(attributeName);
-    	if (alreadyCreated == null) {
-    		return false;
-    	} else {
-    		return alreadyCreated;
-    	}
+        return Objects.requireNonNullElse(alreadyCreated, false);
     }
 
     /**
      * whether retry will be allowed for this test
-     * @param testNGResult
      * @return	true if no more retry is planned (test is finally failed) or when test is sucessful
      * 			false if test has failed and will be retried (current status is then skipped)
      * 			null if we never ask for a retry for this test
@@ -374,18 +361,12 @@ public class TestNGResultUtils {
     // information about test
     public static Map<String, Info> getTestInfo(ITestResult testNGResult) {
     	Map<String, Info> testInfo = (Map<String, Info>) testNGResult.getAttribute(TEST_INFO);
-    	if (testInfo != null) {
-    		return testInfo;
-    	} else {
-    		return new HashMap<>();
-    	}
+        return Objects.requireNonNullElseGet(testInfo, HashMap::new);
     }
     
     /**
      * returns test information encoded in the requested format
-     * @param testNGResult
      * @param format		either "xml", "json", "html", "csv"
-     * @return
      */
     public static Map<String, String> getTestInfoEncoded(ITestResult testNGResult, String format) {
 
@@ -408,8 +389,6 @@ public class TestNGResultUtils {
     
     /**
      * Returns the test description, interpolating variable
-     * @param testNGResult
-     * @return
      */
     public static String getTestDescription(ITestResult testNGResult) {
     	int i = 0;
@@ -426,7 +405,6 @@ public class TestNGResultUtils {
      * Change the test result when snapshot comparison fails
      * These comparison are done for every test execution (every retry). At this point, snapshot are not recorded on server. This will be recorded in SeleniumRobotServerTestRecorder
      * only with the last test execution.
-     * @param testResult
      */
 	public static void changeTestResultWithSnapshotComparison(final ITestResult testResult) {
 		
@@ -483,8 +461,6 @@ public class TestNGResultUtils {
 	/**
 	 * In case test result is SUCCESS but some softAssertions were raised, change test result to 
 	 * FAILED
-	 * 
-	 * @param result
 	 */
 	public static void changeTestResultWithSoftAssertion(ITestResult result) {
 		List<Throwable> verificationFailures = SeleniumTestsContextManager.getThreadContext().getVerificationFailures(Reporter.getCurrentTestResult());
@@ -497,7 +473,7 @@ public class TestNGResultUtils {
 		result.setStatus(ITestResult.FAILURE);
 
 		if (size == 1) {
-			result.setThrowable(verificationFailures.get(0));
+			result.setThrowable(verificationFailures.getFirst());
 		} else {
 			
 			StringBuilder stackString = new StringBuilder("!!! Many Test Failures (").append(size).append(")\n\n");
@@ -546,31 +522,22 @@ public class TestNGResultUtils {
 
 	public static boolean isFinished(ITestResult testNGResult) {
 		Boolean finished = (Boolean) testNGResult.getAttribute(FINISHED);
-		return finished == null ? false: finished;
+		return finished != null && finished;
 	}
 
 	/**
 	 * Returns the string representation of the status: SUCCESS, ERROR, SKIPPED, ...
-	 * @param testNGResult
-	 * @return
 	 */
 	public static String getTestStatusString(ITestResult testNGResult) {
 
-		switch (testNGResult.getStatus()) {
-			case -1:
-				return "CREATED";
-			case 1:
-				return "SUCCESS";
-			case 2:
-				return "FAILURE";
-			case 3:
-				return "SKIP";
-			case 4:
-				return "SUCCESS_PERCENTAGE_FAILURE";
-			case 16:
-				return "STARTED";
-			default:
-				return "UNKNOWN";
-		}
+        return switch (testNGResult.getStatus()) {
+            case -1 -> "CREATED";
+            case 1 -> "SUCCESS";
+            case 2 -> "FAILURE";
+            case 3 -> "SKIP";
+            case 4 -> "SUCCESS_PERCENTAGE_FAILURE";
+            case 16 -> "STARTED";
+            default -> "UNKNOWN";
+        };
 	}
 }
