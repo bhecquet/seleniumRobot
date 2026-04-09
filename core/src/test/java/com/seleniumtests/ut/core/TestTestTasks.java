@@ -51,7 +51,6 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.GenericTest;
-import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
@@ -570,7 +569,7 @@ public class TestTestTasks extends ConnectorsTest {
 	public void testExecuteCommandLocal(final ITestContext testNGCtx) {
 		try (MockedStatic<OSCommand> mockedOsCommand = mockStatic(OSCommand.class)) {
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "local");
-			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(ArgumentMatchers.any(String[].class), eq(-1), isNull())).thenReturn("hello guys");
+			mockedOsCommand.when(() -> OSCommand.executeCommandAndWait(ArgumentMatchers.any(String[].class), eq(30), isNull())).thenReturn("hello guys");
 			initThreadContext(testNGCtx);
 			String response = TestTasks.executeCommand("echo", "hello");
 			Assert.assertEquals(response, "hello guys");
@@ -616,7 +615,7 @@ public class TestTestTasks extends ConnectorsTest {
 	public void testExecuteCommandGrid(final ITestContext testNGCtx) {
 		SeleniumGridConnector gridConnector = spy(new SeleniumRobotGridConnector("http://localhost:4444/hub/wd"));
 		gridConnector.setNodeUrl("http://localhost:5555/hub/wd");
-		doReturn("hello guys").when(gridConnector).executeCommand("echo", -1, "hello");
+		doReturn("hello guys").when(gridConnector).executeCommand("echo", 30, "hello");
 		
 		// grid connector is in use only if session Id exists
 		doReturn(new SessionId("1234")).when(gridConnector).getSessionId();

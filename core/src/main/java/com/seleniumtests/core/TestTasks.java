@@ -120,7 +120,7 @@ public class TestTasks {
      * @param args		arguments to the program
      */
     public static String executeCommand(String program, String ... args) {
-    	return executeCommand(program, -1, null, args);
+    	return executeCommand(program, 30, null, args);
     }
     
     /**
