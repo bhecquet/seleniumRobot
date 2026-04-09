@@ -595,6 +595,22 @@ public class TestTestTasks extends ConnectorsTest {
 			System.clearProperty(SeleniumTestsContext.RUN_MODE);
 		}
 	}
+	@Test(groups= {"ut"})
+	public void testExecuteCommandLocalNegativeTimeout(final ITestContext testNGCtx) {
+		Process process = mock(Process.class);
+		when(process.toString()).thenReturn("AProcess");
+		try (MockedStatic<OSCommand> mockedOsCommand = mockStatic(OSCommand.class)) {
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "local");
+			mockedOsCommand.when(() -> OSCommand.executeCommand(ArgumentMatchers.any(String[].class))).thenReturn(process);
+			initThreadContext(testNGCtx);
+			String response = TestTasks.executeCommand("echo", -1, null, "hello");
+			Assert.assertEquals(response, "AProcess");
+
+
+		} finally {
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+		}
+	}
 	
 	@Test(groups= {"ut"})
 	public void testExecuteCommandGrid(final ITestContext testNGCtx) {

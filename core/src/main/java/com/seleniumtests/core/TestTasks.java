@@ -130,13 +130,18 @@ public class TestTasks {
      * @param program	program to execute. If program is to be searched in system path, then, program should be "OSCommand.USE_PATH" + "myprogram", and first arg will be the program name
      * @param charset	the charset used to read program output
      * @param timeout	timeout in seconds. After this duration, program will be terminated
+	 *                  if timeout is < 0, we won't wait program termination
      * @param args		arguments to give to program
      */
     public static String executeCommand(String program, int timeout, Charset charset, String ... args) {
     	if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.LOCAL) {
     		String[] cmd = new String[] {program};
     		cmd = ArrayUtils.addAll(cmd, args);
-    		return OSCommand.executeCommandAndWait(cmd, timeout, charset);
+			if (timeout >= 0) {
+				return OSCommand.executeCommandAndWait(cmd, timeout, charset);
+			} else {
+				return OSCommand.executeCommand(cmd).toString();
+			}
     		
     	} else if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.GRID) {
     		SeleniumGridConnector gridConnector = SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector();
