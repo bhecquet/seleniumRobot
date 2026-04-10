@@ -147,7 +147,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			File seleniumServerReport = Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "SeleniumServerTestReport.html").toFile();
 			Assert.assertTrue(seleniumServerReport.exists());
 			String content = FileUtils.readFileToString(seleniumServerReport, StandardCharsets.UTF_8).replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");;
-			Assert.assertEquals(content, "<html><head><meta http-equiv=\"refresh\" content=\"0; url=http://localhost:1234/snapshot/testResults/summary/null/\" /></head></html>");
+			Assert.assertEquals(content, "<html><head><meta http-equiv=\"refresh\" content=\"0; url=http://localhost:1234/snapshot/testResults/summary/0/\" /></head></html>");
 
 			String jsonReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testOkWithTestName", "detailed-result.json").toFile(), StandardCharsets.UTF_8);
 			Assert.assertFalse(jsonReportContent.contains(":\\\\/")); // check step has not been double encoded

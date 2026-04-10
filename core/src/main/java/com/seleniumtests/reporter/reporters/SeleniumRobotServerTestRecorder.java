@@ -160,8 +160,8 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 						.toOffsetDateTime());
 
 			logger.info("Session result will be visible at: {}/snapshot/testResults/summary/{}/", serverConnector.getUrl(), newSessionId);
-			createHtmlReport(sessionId);
 			setSessionId(newSessionId);
+			createHtmlReport(sessionId);
 		}
 	}
 
