@@ -40,11 +40,6 @@ public class TestManagerReporter extends CommonReporter implements IReporter {
 	@Override
 	protected void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, String outdir, boolean optimizeResult, boolean finalGeneration) {
 
-		// record only when all tests are executed so that intermediate results (a failed test which has been retried) are not present in list
-		if (!finalGeneration) {
-			return;
-		}
-		
 		// Record test method reports for each result which has not already been recorded
 		for (Map.Entry<ITestContext, Set<ITestResult>> entry: resultSet.entrySet()) {
 			for (ITestResult testResult: entry.getValue()) {
@@ -54,12 +49,19 @@ public class TestManagerReporter extends CommonReporter implements IReporter {
 
 				if (testManager == null) {
 					return;
-				} 
+				}
+
+				// record only when all retries are done
+				if (TestNGResultUtils.getNoMoreRetry(testResult) != null && !TestNGResultUtils.getNoMoreRetry(testResult)) {
+					continue;
+				}
 
 				testManager.login();
 				
 				// do not record twice the same result
 				if (!TestNGResultUtils.isTestManagerReportCreated(testResult)) {
+
+					logger.info("Recording result '{}' to {}", TestNGResultUtils.getUniqueTestName(testResult), testManager.getType());
 
 					testManager.recordResult(testResult);
 					testManager.recordResultFiles(testResult);

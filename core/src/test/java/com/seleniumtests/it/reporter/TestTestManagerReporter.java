@@ -22,6 +22,8 @@ import static org.mockito.Mockito.*;
 
 import io.github.bhecquet.SquashTMApi;
 import io.github.bhecquet.entities.*;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
@@ -119,6 +121,51 @@ public class TestTestManagerReporter extends ReporterTest {
 
 			String testOkDetailedReport = readTestMethodResultFile("testAndSubActions");
 			Assert.assertTrue(testOkDetailedReport.contains("<th>TestCase</th><td><a href=\"http://localhost:1234/test-case-workspace/test-case/12\">12</a></td>"));
+
+		} finally {
+			System.clearProperty(TestManagerContext.TMS_TYPE);
+			System.clearProperty(TestManagerContext.TMS_PROJECT);
+			System.clearProperty(TestManagerContext.TMS_URL);
+			System.clearProperty(TestManagerContext.TMS_USER);
+			System.clearProperty(TestManagerContext.TMS_PASSWORD);
+		}
+	}
+
+	/**
+	 * Check result is recorded after retry, only, and before final generation
+	 */
+	@Test(groups={"it"})
+	public void testResultIsRecordedOnceTestHasTerminated() throws IOException {
+		try (MockedConstruction<SquashTMConnector> mockedSquash = mockConstruction(SquashTMConnector.class,
+				withSettings().defaultAnswer(CALLS_REAL_METHODS),
+				(mock, context) -> {
+			doReturn(api).when(mock).getApi();
+		})) {
+			System.setProperty(TestManagerContext.TMS_TYPE, "squash");
+			System.setProperty(TestManagerContext.TMS_URL, "http://localhost:1234");
+			System.setProperty(TestManagerContext.TMS_PROJECT, "Project");
+			System.setProperty(TestManagerContext.TMS_USER, "squash");
+			System.setProperty(TestManagerContext.TMS_PASSWORD, "squash");
+
+			when(iteration.addTestCase(anyInt(), isNull())).thenReturn(iterationTestPlanItem);
+			when(iteration.addTestCase(anyInt(), anyInt())).thenReturn(iterationTestPlanItem);
+
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testInError"});
+
+			// check we have only one result recording for each test method
+			verify(api).setExecutionResult(eq(iterationTestPlanItem), eq(TestPlanItemExecution.ExecutionStatus.FAILURE), contains("fail"));
+
+			// check summary report and detailed reports contain the link to test manager
+			String mainReportContent = readSummaryFile();
+			Assert.assertTrue(mainReportContent.contains("<td class=\"info\"><a href=\"http://localhost:1234/test-case-workspace/test-case/13\">13</a></td>"));
+
+			String testOkDetailedReport = readTestMethodResultFile("testInError");
+			Assert.assertTrue(testOkDetailedReport.contains("<th>TestCase</th><td><a href=\"http://localhost:1234/test-case-workspace/test-case/13\">13</a></td>"));
+
+			// check that Test manager recording is done while all retries are done, and before suite end. So that Test Manager information can be sent to seleniumRobot-server
+			String logs = readSeleniumRobotLogFile();
+			Assert.assertTrue(Strings.CS.indexOf("TestManagerReporter: Recording result 'testInError' to squash", logs) > Strings.CS.indexOf("[NOT RETRYING] max retry count (2) reached", logs));
+			Assert.assertTrue(Strings.CS.indexOf("TestManagerReporter: Recording result 'testInError' to squash", logs) < Strings.CS.indexOf("SeleniumRobotTestListener: Test Suite Execution Time", logs));
 
 		} finally {
 			System.clearProperty(TestManagerContext.TMS_TYPE);
