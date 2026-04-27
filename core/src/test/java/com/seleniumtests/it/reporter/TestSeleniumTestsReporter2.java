@@ -866,7 +866,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			String detailedReportContent = readTestMethodResultFile("testAndSubActions");
 			detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
 
-			Assert.assertTrue(detailedReportContent.contains("<th>Result server Url</th><td><a href=\"http://localhost:4321/snapshot/testResults/result/13/\">Online result</a></td>"));
+			Assert.assertTrue(detailedReportContent.contains("<th>Result server Url</th><td><a href=\"http://localhost:4321/snapshot/testResults/result/15/\">Online result</a></td>"));
 
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);

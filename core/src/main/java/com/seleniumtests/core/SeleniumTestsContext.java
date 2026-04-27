@@ -846,7 +846,8 @@ public class SeleniumTestsContext {
     }
     
     /**
-     * Extract proxy settings from environment configuration (env.ini) and write them to context if they are not already present in XML file or on command line
+     * Extract proxy settings from environment configuration (env.ini or seleniumRobot server) and write them to context if they are not already present in XML file or on command line
+     * This allows to have proxy configured globally from variable server for example
      */
     public void updateProxyConfig() {
     	Map<String, TestVariable> envConfig = getConfiguration();

@@ -517,7 +517,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			if (browserVersion != null) {
 				browser = browser + browserVersion;
 			}
-			velocityContext.put("resultUrl", TestNGResultUtils.getSnapshotTestCaseInSessionId(testResult) == null ? "": String.format("%s/snapshot/testResults/result/%s/", SeleniumRobotSnapshotServerConnector.getInstance().getUrl(), SeleniumRobotServerTestRecorder.getSessionId()));
+			velocityContext.put("resultUrl", TestNGResultUtils.getSnapshotTestCaseInSessionId(testResult) == null ? "": String.format("%s/snapshot/testResults/result/%s/", SeleniumRobotSnapshotServerConnector.getInstance().getUrl(), TestNGResultUtils.getSnapshotTestCaseInSessionId(testResult)));
 			velocityContext.put(APPLICATION, "");
 			
 			if (testType == null) {
