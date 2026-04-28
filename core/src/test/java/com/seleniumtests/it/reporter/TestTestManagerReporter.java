@@ -164,8 +164,8 @@ public class TestTestManagerReporter extends ReporterTest {
 
 			// check that Test manager recording is done while all retries are done, and before suite end. So that Test Manager information can be sent to seleniumRobot-server
 			String logs = readSeleniumRobotLogFile();
-			Assert.assertTrue(Strings.CS.indexOf("TestManagerReporter: Recording result 'testInError' to squash", logs) > Strings.CS.indexOf("[NOT RETRYING] max retry count (2) reached", logs));
-			Assert.assertTrue(Strings.CS.indexOf("TestManagerReporter: Recording result 'testInError' to squash", logs) < Strings.CS.indexOf("SeleniumRobotTestListener: Test Suite Execution Time", logs));
+			Assert.assertTrue(Strings.CS.indexOf(logs, "TestManagerReporter: Recording result 'testInError' to squash") > Strings.CS.indexOf(logs, "[NOT RETRYING] max retry count (2) reached"));
+			Assert.assertTrue(Strings.CS.indexOf(logs, "TestManagerReporter: Recording result 'testInError' to squash") < Strings.CS.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
 
 		} finally {
 			System.clearProperty(TestManagerContext.TMS_TYPE);
