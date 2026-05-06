@@ -34,6 +34,7 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -309,6 +310,7 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 			when(context.getWebDriverGridTimeout()).thenReturn(1);
 
 			when(context.getTestType()).thenReturn(TestType.WEB);
+			when(context.getMaxSkippedOnGridFailure()).thenReturn(3);
 			
 			when(gridConnector1.isGridActive()).thenReturn(true);
 			when(context.getSeleniumGridConnectors()).thenReturn(List.of(gridConnector1));
@@ -317,6 +319,36 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 			SeleniumGridDriverFactory factory = spy(new SeleniumGridDriverFactory(config));
 			when(factory.getDriverInstance(any(URL.class), any(MutableCapabilities.class))).thenThrow(new WebDriverException(""));
 			factory.createWebDriver();
+		}
+	}
+
+	@Test(groups={"ut"}, expectedExceptions = SkipException.class, expectedExceptionsMessageRegExp = "Skipping as the 3 previous tests could not get any matching node. Check your test configuration and grid setup")
+	public void testDriverNotCreatedIfErrorWithMaxSkipped() {
+
+		try (MockedConstruction<RemoteWebDriver> mockedRemoteWebDriver = mockConstruction(RemoteWebDriver.class, (driver, context1) -> {
+			when(driver.manage()).thenReturn(options);
+			when(driver.getCapabilities()).thenReturn(caps);
+		})) {
+			when(context.getWebDriverGridTimeout()).thenReturn(1);
+
+			when(context.getTestType()).thenReturn(TestType.WEB);
+			when(context.getMaxSkippedOnGridFailure()).thenReturn(2);
+
+			when(gridConnector1.isGridActive()).thenReturn(true);
+			when(context.getSeleniumGridConnectors()).thenReturn(List.of(gridConnector1));
+
+			// connect to grid
+			SeleniumGridDriverFactory factory = spy(new SeleniumGridDriverFactory(config));
+			when(factory.getDriverInstance(any(URL.class), any(MutableCapabilities.class))).thenThrow(new WebDriverException(""));
+			try {
+				factory.createWebDriver();
+			} catch (SeleniumGridNodeNotAvailable e) {/* ignore */}
+			try {
+				factory.createWebDriver();
+			} catch (SeleniumGridNodeNotAvailable e) {/* ignore */}
+			try { // should be skipped
+				factory.createWebDriver();
+			} catch (SeleniumGridNodeNotAvailable e) {/* ignore */}
 		}
 	}
 

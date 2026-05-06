@@ -83,7 +83,6 @@ public class SeleniumTestsContext {
     private static final UUID contextId = UUID.randomUUID();
 
     /* configuration defined in testng.xml */
-    public static final String TEST_CONFIGURATION = "testConfig"; 				// parameter name for additional configuration to load (should only be used in XML)
     public static final String LOAD_INI = "loadIni";							// comma separated list of files to load. They are searched in data/<app>/config folder. They will append to env.ini file with variable overwriting. Last file will overwrite previous ones
     public static final String STARTED_BY = "startedBy";						// any string saying who started the test. It may be a URL where to find result, for reports in bugtrackers
     public static final String INITIAL_URL = "initialUrl";						// the initial URL the browser will connect to
@@ -147,13 +146,12 @@ public class SeleniumTestsContext {
     public static final String WEB_PROXY_EXCLUDE = "proxyExclude";				// exclusion des adresse de proxy
     public static final String WEB_PROXY_PAC = "proxyPac";						// adresse de configuration automatique du proxy
 
-    public static final String TEST_ENTITY = "testEntity";						// Jamais utilisé
-    
     public static final String CAPTURE_SNAPSHOT = "captureSnapshot";
     public static final String VIDEO_CAPTURE = "captureVideo";
 
     public static final String SOFT_ASSERT_ENABLED = "softAssertEnabled";		// le test ne s'arrête pas lorsqu'une assertion est rencontrée
     public static final String TEST_RETRY_COUNT = "testRetryCount";				// number of times the test can be retried
+    public static final String MAX_SKIPPED_ON_GRID_FAILURE = "maxSkippedOnGridFailure"; // number of times we accept to skip test when node cannot be found. Default to 3
     
     public static final String OVERRIDE_SELENIUM_NATIVE_ACTION = "overrideSeleniumNativeAction";	// intercept driver.findElement and driver.frame operations to move to HtmlElement methods 
     
@@ -239,6 +237,7 @@ public class SeleniumTestsContext {
 	public static final int DEFAULT_IMPLICIT_WAIT_TIME_OUT = 5;
 	public static final int DEFAULT_WEB_SESSION_TIMEOUT = 90000;
 	public static final int DEFAULT_TEST_RETRY_COUNT = 2;
+    public static final int DEFAULT_MAX_SKIPPED_ON_GRID_FAILURE = 3;
 	public static final ProxyType DEFAULT_WEB_PROXY_TYPE = ProxyType.SYSTEM;
 	public static final boolean DEFAULT_OPTIMIZE_REPORTS = false;
 	public static final ArchiveMode DEFAULT_ARCHIVE= ArchiveMode.NEVER;
@@ -417,6 +416,7 @@ public class SeleniumTestsContext {
 
         setSoftAssertEnabled(getBoolValueForTest(SOFT_ASSERT_ENABLED, System.getProperty(SOFT_ASSERT_ENABLED)));
         setTestRetryCount(getIntValueForTest(TEST_RETRY_COUNT, System.getProperty(TEST_RETRY_COUNT)));
+        setMaxSkippedOnGridFailure(getIntValueForTest(MAX_SKIPPED_ON_GRID_FAILURE, System.getProperty(MAX_SKIPPED_ON_GRID_FAILURE)));
 
         setWebDriverListener(getValueForTest(WEB_DRIVER_LISTENER, System.getProperty(WEB_DRIVER_LISTENER)));
 
@@ -1327,10 +1327,6 @@ public class SeleniumTestsContext {
         return testNGContext;
     }
 
-    public Object getTestEntity() {
-        return getAttribute(TEST_ENTITY);
-    }
-
     @SuppressWarnings("unchecked")
 	public List<String> getWebDriverListener() {
         return (List<String>) getAttribute(WEB_DRIVER_LISTENER);
@@ -1436,6 +1432,10 @@ public class SeleniumTestsContext {
 	
 	public Integer getTestRetryCount() {
     	return (Integer) getAttribute(TEST_RETRY_COUNT);
+    }
+
+	public Integer getMaxSkippedOnGridFailure() {
+    	return (Integer) getAttribute(MAX_SKIPPED_ON_GRID_FAILURE);
     }
 
     public int getWebSessionTimeout() {
@@ -2154,6 +2154,9 @@ public class SeleniumTestsContext {
 
     public void setTestRetryCount(Integer retry) {
         setAttribute(TEST_RETRY_COUNT, Objects.requireNonNullElse(retry, DEFAULT_TEST_RETRY_COUNT));
+    }
+    public void setMaxSkippedOnGridFailure(Integer maxSkipped) {
+        setAttribute(MAX_SKIPPED_ON_GRID_FAILURE, Objects.requireNonNullElse(maxSkipped, DEFAULT_MAX_SKIPPED_ON_GRID_FAILURE));
     }
     
     public void setNewCommandTimeout(Integer timeout) {

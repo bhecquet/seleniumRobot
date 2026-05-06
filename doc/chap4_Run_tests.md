@@ -102,19 +102,20 @@ In this case, this user passed value will overwrite test or suite parameters
 
 #### Common params ####
 
-| Param name       			| Default 	| Description  |
-| -------------------------	| ------- 	| ------------ |
-| webDriverGrid 			| 			| Address of seleniumGrid server. It's possible to specify several URL `http://grid1.company.com,http://grid2.company.com`. This way, seleniumRobot will choose one of the available grid | 
-| runMode 					| LOCAL		| `local`: current computer<br/>`grid`: seleniumGrid<br/>`sauceLabs`: run on sauceLabs device<br/> | 
-| nodeTags					| null		| Commat seperated list of strings. Requests that this test should execute only on a node (grid mode only) announcing all of these tags. On grid, this is declared with option `-nodeTags <tag1>,<tag2>`. If no slot matches the requested tags, session is not created |
-| browser 					| firefox	| Browser used to start test. Valid values are:<br/>`firefox`, `chrome`, `safari`, `iexplore`, `edge`, `iexploreEdge` for Edge in Internet Explorer mode, `htmlunit`, `opera`, `phantomjs`, `none` for no driver, `browser` for android default browser | 
-| env 						| DEV		| Test environment for the SUT. Allow accessing param values defined in env.ini file  
-| captureVideo				| onError	| If `true`, always capture video. Other possible values are: `onSuccess` (keep video when test is OK), `false` and `onError` (capture video when test is KO) |
-| testRetryCount			| 2			| Number of times a failed test is retried. Set to 0 for no retry. **This parameter is not accepted in XML file, only on command line**. This number can be increased dynamically inside test with `increaseMaxRetry()`|
-| seleniumRobotServerActive	| false		| whether we use seleniumRobot server. If true, seleniumRobotServerUrl MUST be specified (in XML, command line or through env variable |
-| seleniumRobotServerUrl	| 			| URL of the seleniumRobot server. Can be specified as an environment variable |
-| seleniumRobotServerToken	|			| Token to use when connecting to seleniumRobot server API (by default with server >= 2.0). Value may also be set as environment variable 'SELENIUM_ROBOT_SERVER_TOKEN' |
-| outputDirectory 			| <exec folder>	| folder where HTML report will be written. By default, it's 'test-output' subfolder. If you want to write test in an other directory, use `test-output/myResult` to write them relative to SeleniumRobot root. An absolute path may also be specified. This will allow to execute several tests in parallel without overwritting existing results. If you want to set the current date and time in output directory folder name, see §7.18 | 
+| Param name       			| Default 	      | Description  |
+| -------------------------	|----------------| ------------ |
+| webDriverGrid 			| 			            | Address of seleniumGrid server. It's possible to specify several URL `http://grid1.company.com,http://grid2.company.com`. This way, seleniumRobot will choose one of the available grid | 
+| runMode 					| LOCAL		        | `local`: current computer<br/>`grid`: seleniumGrid<br/>`sauceLabs`: run on sauceLabs device<br/> | 
+| nodeTags					| null		         | Commat seperated list of strings. Requests that this test should execute only on a node (grid mode only) announcing all of these tags. On grid, this is declared with option `-nodeTags <tag1>,<tag2>`. If no slot matches the requested tags, session is not created |
+| browser 					| firefox	       | Browser used to start test. Valid values are:<br/>`firefox`, `chrome`, `safari`, `iexplore`, `edge`, `iexploreEdge` for Edge in Internet Explorer mode, `htmlunit`, `opera`, `phantomjs`, `none` for no driver, `browser` for android default browser | 
+| env 						| DEV		          | Test environment for the SUT. Allow accessing param values defined in env.ini file  
+| captureVideo				| onError	       | If `true`, always capture video. Other possible values are: `onSuccess` (keep video when test is OK), `false` and `onError` (capture video when test is KO) |
+| testRetryCount			| 2			           | Number of times a failed test is retried. Set to 0 for no retry. **This parameter is not accepted in XML file, only on command line**. This number can be increased dynamically inside test with `increaseMaxRetry()`|
+| maxSkippedOnGridFailure	| 3			           | number of times we accept to skip test when node cannot be found|
+| seleniumRobotServerActive	| false		        | whether we use seleniumRobot server. If true, seleniumRobotServerUrl MUST be specified (in XML, command line or through env variable |
+| seleniumRobotServerUrl	| 			            | URL of the seleniumRobot server. Can be specified as an environment variable |
+| seleniumRobotServerToken	| 			            | Token to use when connecting to seleniumRobot server API (by default with server >= 2.0). Value may also be set as environment variable 'SELENIUM_ROBOT_SERVER_TOKEN' |
+| outputDirectory 			| <exec folder>	 | folder where HTML report will be written. By default, it's 'test-output' subfolder. If you want to write test in an other directory, use `test-output/myResult` to write them relative to SeleniumRobot root. An absolute path may also be specified. This will allow to execute several tests in parallel without overwritting existing results. If you want to set the current date and time in output directory folder name, see §7.18 | 
 
 **In case eof Linux Chromium**: set chromeBinaryPath to '/snap/chromium/current/usr/lib/chromium-brower/chrome'
 
