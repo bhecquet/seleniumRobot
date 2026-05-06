@@ -100,6 +100,7 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 		when(gridConnector1.uploadMobileApp(any())).thenReturn((MutableCapabilities) caps);
 		when(gridConnector2.uploadMobileApp(any())).thenReturn((MutableCapabilities) caps);
 		when(context.getTestStepManager()).thenReturn(new TestStepManager());
+		when(context.getMaxSkippedOnGridFailure()).thenReturn(SeleniumTestsContext.DEFAULT_MAX_SKIPPED_ON_GRID_FAILURE);
 		when(context.getWebDriverGridTimeout()).thenReturn(SeleniumTestsContext.DEFAULT_WEB_DRIVER_GRID_TIMEOUT);
 		SeleniumTestsContextManager.setThreadContext(context);
 	}
@@ -310,7 +311,6 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 			when(context.getWebDriverGridTimeout()).thenReturn(1);
 
 			when(context.getTestType()).thenReturn(TestType.WEB);
-			when(context.getMaxSkippedOnGridFailure()).thenReturn(3);
 			
 			when(gridConnector1.isGridActive()).thenReturn(true);
 			when(context.getSeleniumGridConnectors()).thenReturn(List.of(gridConnector1));
