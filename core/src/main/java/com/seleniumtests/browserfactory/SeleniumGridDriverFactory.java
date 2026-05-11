@@ -216,7 +216,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 		
 		// issue #311: stop after 3 consecutive failure getting nodes
 		int noDriverCount = counter.get();
-		if (noDriverCount >= SeleniumTestsContextManager.getThreadContext().getMaxSkippedOnGridFailure()) {
+		if (noDriverCount > 0 && noDriverCount >= SeleniumTestsContextManager.getThreadContext().getMaxSkippedOnGridFailure()) {
 			throw new SkipException(String.format("Skipping as the %d previous tests could not get any matching node. Check your test configuration and grid setup", SeleniumTestsContextManager.getThreadContext().getMaxSkippedOnGridFailure()));
 		}
     	

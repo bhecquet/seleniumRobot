@@ -322,7 +322,7 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 		}
 	}
 
-	@Test(groups={"ut"}, expectedExceptions = SkipException.class, expectedExceptionsMessageRegExp = "Skipping as the 3 previous tests could not get any matching node. Check your test configuration and grid setup")
+	@Test(groups={"ut"}, expectedExceptions = SkipException.class, expectedExceptionsMessageRegExp = "Skipping as the 2 previous tests could not get any matching node. Check your test configuration and grid setup")
 	public void testDriverNotCreatedIfErrorWithMaxSkipped() {
 
 		try (MockedConstruction<RemoteWebDriver> mockedRemoteWebDriver = mockConstruction(RemoteWebDriver.class, (driver, context1) -> {
