@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,10 +45,10 @@ public class TestDriverExtractor extends MockitoTest {
 	private DriverExtractor extractor;
 	private Path driverPath;
 	
-	private static final String DRIVER_VERSION = "chromedriver_140.0_chrome-140-141";
+	private static final String DRIVER_VERSION = "chromedriver_148.0_chrome-148-149";
 	
 	@BeforeClass(groups={"ut"})
-	public void initContext(final ITestContext testNGCtx) throws Exception {
+	public void initContext(final ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);
 		rootPath = SeleniumTestsContextManager.getRootPath() + "/tmp";
 		extractor = new DriverExtractor(rootPath);
@@ -56,7 +56,7 @@ public class TestDriverExtractor extends MockitoTest {
 	}
 	
 	@BeforeMethod(groups={"ut"})
-	public void deleteTmpDir() throws IOException {
+	public void deleteTmpDir() {
 		
 		
 		// clean output directory
@@ -71,7 +71,7 @@ public class TestDriverExtractor extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testDriverExtraction() throws IOException {
+	public void testDriverExtraction() {
 		
 		extractor.extractDriver(DRIVER_VERSION);
 		
@@ -85,10 +85,9 @@ public class TestDriverExtractor extends MockitoTest {
 	
 	/**
 	 * Driver file already exists with version file up to date
-	 * @throws IOException
 	 */
 	@Test(groups={"ut"})
-	public void testDriverNotExtractedAlreadyExists() throws IOException {
+	public void testDriverNotExtractedAlreadyExists()  {
 
 		extractor.extractDriver(DRIVER_VERSION);
 		
@@ -101,19 +100,17 @@ public class TestDriverExtractor extends MockitoTest {
 	
 	/**
 	 * Error handling when the specified driver does not exist
-	 * @throws IOException
 	 */
 	@Test(groups={"ut"}, expectedExceptions=DriverExceptions.class)
-	public void testCopyDriverNull() throws IOException {
+	public void testCopyDriverNull() {
 		new DriverExtractor(rootPath).extractDriver("toto");
 	}
 	
 	/**
 	 * driver extracted as version file does not exist
-	 * @throws IOException
 	 */
 	@Test(groups={"ut"})
-	public void testDriverNotExtractedAlreadyExistsNoVersion() throws IOException {
+	public void testDriverNotExtractedAlreadyExistsNoVersion() {
 
 		extractor.extractDriver(DRIVER_VERSION);
 		
