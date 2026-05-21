@@ -191,7 +191,7 @@ public abstract class BugTracker {
 		
 		// don't create issue if no failed step is present
 		if (failedSteps.isEmpty()) {
-			logger.info("No failed steps. It may be due to a failed step marked as disabled for bugtracker");
+			logger.warn("No failed steps. It may be due to a failed step marked as disabled for bugtracker => No issue will be created");
 			return null;
 		}
 
