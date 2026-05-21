@@ -47,7 +47,11 @@ public @interface Step {
 	
 	// a String giving details about error cause
 	public String errorCauseDetails() default "";
+	
 	public boolean disableBugTracker() default false;
 	
+    public String description() default "";
+
+    public String expectedResult() default "";
 
 }

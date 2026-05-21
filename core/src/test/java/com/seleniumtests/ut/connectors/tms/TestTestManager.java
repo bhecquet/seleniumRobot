@@ -125,4 +125,13 @@ public class TestTestManager extends GenericTest {
 		ITestManager manager = TestManager.getInstance(new JSONObject(config));
 		Assert.assertNull(manager.getDatasetId(tr));
 	}
+	
+    @Test(groups = {"ut"}, attributes = {@CustomAttribute(name = "updateTestManager", values = "true")})
+    public void testGetUpdateTestManager() {
+        ITestResult tr = Reporter.getCurrentTestResult();
+        String config = "{'tmsType': 'squash'}";
+        ITestManager manager = TestManager.getInstance(new JSONObject(config));
+        Assert.assertTrue(manager.getUpdateTestManager(tr));
+
+    }
 }

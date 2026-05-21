@@ -408,6 +408,8 @@ public class LogAction {
 	private TestStep buildRootStep(JoinPoint joinPoint, String stepNamePrefix, boolean returnArgs) {
 		String stepName;
 		String stepNameWithArgs;
+		String description = "";
+        String expectedResult = "";
 		List<String> pwdToReplace = new ArrayList<>();
 		Map<String, String> arguments = new HashMap<>();
 		String argumentString = buildArgString(joinPoint, pwdToReplace, arguments);
@@ -446,6 +448,8 @@ public class LogAction {
 				errorCause = step.errorCause();
 				errorCauseDetails = step.errorCauseDetails();
 				disableBugtracker = step.disableBugTracker();
+				description = step.description();
+				expectedResult = step.expectedResult();
 				
 				// replaces argument placeholders with values
 				stepNameWithArgs = stepName;
@@ -466,7 +470,9 @@ public class LogAction {
 				SeleniumTestsContextManager.getThreadContext().getMaskedPassword(),
 				errorCause,
 				errorCauseDetails, 
-				disableBugtracker);
+				disableBugtracker,
+				description,
+				expectedResult);
 	}
 	
 	/**
