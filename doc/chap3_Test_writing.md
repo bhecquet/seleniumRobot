@@ -927,7 +927,7 @@ There is as many method parameters as columns in the dataset file. So, in the ex
 - 'datasetSemicolon' => CSV file with ";" as separator and no header
 - 'datasetSemicolonWithHeader' => CSV file with ";" as separator and with header
 
-These 4 dataproviders are executed sequentially. To execute them in parallel, use their parallel counterpart with `data-provider-thread-count` parameter on suite (or `-dataproviderthreadcount` as command line parameter
+These 4 dataproviders are executed sequentially. To execute them in parallel, use their parallel counterpart with `data-provider-thread-count=N` parameter on TestNG XML suite (or `-dataproviderthreadcount N` as command line parameter, where N is the number of threads)
 - 'datasetParallel' => CSV file with "," as separator / XLSX file and no header
 - 'datasetWithHeaderParallel' => CSV file with "," as separator / XLSX file and with header
 - 'datasetSemicolonParallel' => CSV file with ";" as separator and no header
