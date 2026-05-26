@@ -219,7 +219,7 @@ public class SquashTMConnector extends TestManager {
                 testCase.completeDetails();
                 Map<String, Object> testCaseUpdatedDatas = new HashMap<>();
                 testCaseUpdatedDatas.put("description", testResult.getMethod().getDescription());
-                testCase.updateTestCase(testCase.getId(), testCaseUpdatedDatas);
+                testCase.update(testCase.getId(), testCaseUpdatedDatas);
 
                 //Delete all steps in test case
                 //get all ids
