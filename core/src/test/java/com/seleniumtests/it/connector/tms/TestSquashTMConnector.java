@@ -26,6 +26,7 @@ import org.testng.xml.XmlTest;
 
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
+import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
