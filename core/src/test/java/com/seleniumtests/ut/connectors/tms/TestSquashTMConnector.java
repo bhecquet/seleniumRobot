@@ -17,15 +17,14 @@
  */
 package com.seleniumtests.ut.connectors.tms;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.contains;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
-
-import java.lang.annotation.Annotation;
-import java.util.HashMap;
-
+import com.seleniumtests.MockitoTest;
+import com.seleniumtests.connectors.tms.squash.SquashTMConnector;
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.driver.screenshots.ScreenShot;
+import com.seleniumtests.driver.screenshots.SnapshotCheckType;
+import com.seleniumtests.reporter.logger.Snapshot;
+import com.seleniumtests.reporter.logger.TestStep;
 import io.github.bhecquet.SquashTMApi;
 import io.github.bhecquet.entities.*;
 import io.github.bhecquet.exceptions.SquashTmException;
@@ -42,10 +41,15 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.CustomAttribute;
 import org.testng.annotations.Test;
 
-import com.seleniumtests.MockitoTest;
-import com.seleniumtests.connectors.tms.squash.SquashTMConnector;
-import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.customexception.ConfigurationException;
+import java.io.File;
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 public class TestSquashTMConnector extends MockitoTest {
 	
@@ -102,6 +106,40 @@ public class TestSquashTMConnector extends MockitoTest {
 		}
 	};
 
+	CustomAttribute updateTestManagerAttr = new CustomAttribute() {
+		@Override
+		public Class<? extends Annotation> annotationType() {
+			return null;
+		}
+
+		@Override
+		public String[] values() {
+			return new String[] {"true"};
+		}
+
+		@Override
+		public String name() {
+			return "updateTestManager";
+		}
+	};
+
+	CustomAttribute updateTestManagerFalseAttr = new CustomAttribute() {
+		@Override
+		public Class<? extends Annotation> annotationType() {
+			return null;
+		}
+
+		@Override
+		public String[] values() {
+			return new String[] {"false"};
+		}
+
+		@Override
+		public String name() {
+			return "updateTestManager";
+		}
+	};
+	
 	MockedStatic mockedCampaign;
 	MockedStatic mockedIteration;
 	MockedStatic mockedProject;
@@ -116,40 +154,6 @@ public class TestSquashTMConnector extends MockitoTest {
 		mockedProject = mockStatic(Project.class);
 		mockedTestCase = mockStatic(TestCase.class);
 		mockedSquashTestStep = mockStatic(io.github.bhecquet.entities.TestStep.class);
-		
-		CustomAttribute updateTestManagerAttr = new CustomAttribute() {
-			@Override
-			public Class<? extends Annotation> annotationType() {
-				return null;
-			}
-
-			@Override
-			public String[] values() {
-				return new String[] {"true"};
-			}
-
-			@Override
-			public String name() {
-				return "updateTestManager";
-			}
-		};
-
-		CustomAttribute updateTestManagerFalseAttr = new CustomAttribute() {
-			@Override
-			public Class<? extends Annotation> annotationType() {
-				return null;
-			}
-
-			@Override
-			public String[] values() {
-				return new String[] {"false"};
-			}
-
-			@Override
-			public String name() {
-				return "updateTestManager";
-			}
-		};
 
 		mockedCampaign.when(() -> Campaign.create(any(Project.class), anyString(), anyString(), anyMap())).thenReturn(campaign);
 		mockedIteration.when(() -> Iteration.create(eq(campaign), anyString())).thenReturn(iteration);
@@ -623,7 +627,7 @@ public class TestSquashTMConnector extends MockitoTest {
 		verify(testCase).completeDetails();
 
 		// verify description updated
-		verify(testCase).updateTestCase(eq(1), anyMap());
+		verify(testCase).update(eq(1), anyMap());
 
 		// verify old steps deleted
 		mockedSquashTestStep.verify(() -> io.github.bhecquet.entities.TestStep.delete("100,101"));
