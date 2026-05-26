@@ -689,8 +689,8 @@ public class TestSquashTMConnector extends MockitoTest {
 
 		squash.updateTestCase(testResult);
 
-		// delete called with empty string (no old steps)
-		mockedSquashTestStep.verify(() -> io.github.bhecquet.entities.TestStep.delete(""));
+        // delete should NOT be called when there are no old steps
+        mockedSquashTestStep.verify(() -> io.github.bhecquet.entities.TestStep.delete(anyString()), never());
 		// new step created
 		mockedSquashTestStep.verify(() -> io.github.bhecquet.entities.TestStep.create(eq(1), anyMap()));
 	}
