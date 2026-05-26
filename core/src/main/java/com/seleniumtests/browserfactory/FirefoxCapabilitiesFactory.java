@@ -47,8 +47,6 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
 	}
 
 	public static final String ALL_ACCESS = "allAccess";
-	private static boolean isProfileCreated = false;
-    private static Object lockProfile = new Object();
     
 	@Override
 	protected MutableCapabilities getDriverOptions() {
@@ -156,30 +154,6 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
         profile.setPreference("capability.policy.default.Document.compatMode.get", ALL_ACCESS);
         profile.setPreference("dom.max_chrome_script_run_time", 0);
         profile.setPreference("dom.max_script_run_time", 0);
-    }
-
-    /**
-     * extractDefaultProfile to a folder.
-     *
-     * @param   profilePath  The folder to store the profile
-     *
-     * @throws  IOException	 when profile file is not found
-     */
-    protected void extractDefaultProfile(final String profilePath) throws IOException {
-        synchronized (lockProfile) {
-            try {
-                if (!isProfileCreated) {
-                    logger.info("start create profile");
-                    FileUtils.deleteDirectory(new File(profilePath));
-                    FileUtility.extractJar(profilePath, FireFoxProfileMarker.class);
-                }
-            } catch (Exception ex) {
-            	logger.error(ex);
-            }
-            isProfileCreated = true;
-        }
-
-        
     }
 
     protected synchronized FirefoxProfile getFirefoxProfile() {

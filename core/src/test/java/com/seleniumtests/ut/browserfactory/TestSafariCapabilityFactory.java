@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,11 +20,7 @@ package com.seleniumtests.ut.browserfactory;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -50,7 +46,6 @@ import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.osutility.OSUtilityWindows;
 
-// TODO: enable test on linux platform using mocks
 public class TestSafariCapabilityFactory extends MockitoTest {
 
 	@Mock
@@ -62,24 +57,24 @@ public class TestSafariCapabilityFactory extends MockitoTest {
 	@Mock
 	private OSUtilityWindows osUtility;
 
-	private MockedStatic mockedOsUtility;
-	private MockedStatic mockedOsUtilityFactory;
+	private MockedStatic<OSUtility> mockedOsUtility;
+	private MockedStatic<OSUtilityFactory> mockedOsUtilityFactory;
 	
 	@BeforeMethod(groups= {"ut"})
 	public void init() {
 		
-		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.SAFARI, Arrays.asList(new BrowserInfo(BrowserType.SAFARI, "7.2", "", false)));
+		Map<BrowserType, List<BrowserInfo>> browserInfos = new EnumMap<>(BrowserType.class);
+		browserInfos.put(BrowserType.SAFARI, List.of(new BrowserInfo(BrowserType.SAFARI, "7.2", "", false)));
 
 		mockedOsUtility = mockStatic(OSUtility.class);
 		mockedOsUtility.when(() -> OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
-		mockedOsUtility.when(() -> OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
+		mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.MAC);
 
 		mockedOsUtilityFactory = mockStatic(OSUtilityFactory.class);
-		mockedOsUtilityFactory.when(() -> OSUtilityFactory.getInstance()).thenReturn(osUtility);
+		mockedOsUtilityFactory.when(OSUtilityFactory::getInstance).thenReturn(osUtility);
 		
 		when(osUtility.getProgramExtension()).thenReturn(".exe");
-		when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.NONE));
+		when(config.getDebug()).thenReturn(List.of(DebugMode.NONE));
 
 		when(config.getBrowserType()).thenReturn(BrowserType.SAFARI);
 		when(config.isSetAcceptUntrustedCertificates()).thenReturn(true);

@@ -84,8 +84,7 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
 					webDriverConfig.getBrowserType(), Boolean.TRUE.equals(webDriverConfig.getBetaBrowser()) ? "beta" : ""));
 		}
 
-		// in case of legacy firefox driverFileName is null
-    	String newDriverPath = new DriverExtractor().extractDriver(selectedBrowserInfo.getDriverFileName());
+    	String newDriverPath = Boolean.TRUE.equals(webDriverConfig.getDownloadDrivers()) ? null: new DriverExtractor().extractDriver(selectedBrowserInfo.getDriverFileName());
     	if (driverPath != null) {
     		newDriverPath = driverPath;
     		logger.info("using user defined driver from: {}", driverPath);

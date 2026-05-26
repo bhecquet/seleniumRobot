@@ -23,11 +23,13 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.util.*;
 
+import com.seleniumtests.browserfactory.ChromeCapabilitiesFactory;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.edge.EdgeDriverService;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.remote.CapabilityType;
@@ -419,6 +421,16 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		} finally {
 			System.clearProperty(EdgeDriverService.EDGE_DRIVER_EXE_PROPERTY);
 		}
+	}
+
+	@Test(groups={"ut"})
+	public void testCreateEdgeCapabilitiesDownloadDriverPathLocal() {
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		when(config.getDownloadDrivers()).thenReturn(true);
+
+		new EdgeCapabilitiesFactory(config).createCapabilities();
+
+		Assert.assertNull(System.getProperty(EdgeDriverService.EDGE_DRIVER_EXE_PROPERTY));
 	}
 
 	@Test(groups={"ut"})

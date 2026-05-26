@@ -421,6 +421,16 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 			System.clearProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY);
 		}
 	}
+
+	@Test(groups={"ut"})
+	public void testCreateChromeCapabilitiesDownloadDriverPathLocal() {
+		when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		when(config.getDownloadDrivers()).thenReturn(true);
+
+		new ChromeCapabilitiesFactory(config).createCapabilities();
+
+		Assert.assertNull(System.getProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY));
+	}
 	
 	@Test(groups={"ut"})
 	public void testCreateChromeCapabilitiesOverrideDriverPathLocal() {

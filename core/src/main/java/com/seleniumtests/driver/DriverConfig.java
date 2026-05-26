@@ -115,7 +115,11 @@ public class DriverConfig {
     public Boolean getBetaBrowser() {
     	return testContext.getBetaBrowser();
     }
-    
+
+    public Boolean getDownloadDrivers() {
+    	return testContext.getDownloadDrivers();
+    }
+
     public String getAutomationName() {
     	return testContext.getAutomationName();
     }

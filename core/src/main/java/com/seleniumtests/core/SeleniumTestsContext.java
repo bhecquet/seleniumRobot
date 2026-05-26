@@ -122,6 +122,7 @@ public class SeleniumTestsContext {
     public static final String BETA_BROWSER = "betaBrowser";					// enable usage of beta browsers	
     public static final String EDGE_IE_MODE  = "edgeIeMode";					// if true, Edge is started in IE mode
     public static final String CAPABILITIES  = "capabilities";					// The capability to add to driver. `-Dcapabilities=<key1>=<value1>,<key2>=<value2>`
+    public static final String DOWNLOAD_DRIVERS = "downloadDrivers";            // If true, drivers will be downloaded instead of being extracted from JAR. It is only used in local mode. For grid, the grid configuration is used
     
     public static final String VIEWPORT_WIDTH = "viewPortWidth";					// width of viewport	
     public static final String VIEWPORT_HEIGHT = "viewPortHeight";					// height of viewport
@@ -224,6 +225,7 @@ public class SeleniumTestsContext {
 	public static final boolean DEFAULT_SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER = true;
 	public static final String DEFAULT_BROWSER = "none";
 	public static final boolean DEFAULT_BETA_BROWSER = false;
+    public static final boolean DEFAULT_DOWNLOAD_DRIVERS = false;
     public static final boolean DEFAULT_ALLOW_CONCURRENT_TESTS_ON_GRID = false;
 	public static final boolean DEFAULT_MANUAL_TEST_STEPS = false;
 	public static final boolean DEFAULT_HEADLESS_BROWSER = false;
@@ -387,6 +389,7 @@ public class SeleniumTestsContext {
         setEdgeDriverPath(getValueForTest(EDGE_DRIVER_PATH, System.getProperty(EDGE_DRIVER_PATH)));
         setIEDriverPath(getValueForTest(IE_DRIVER_PATH, System.getProperty(IE_DRIVER_PATH)));        
 		setUserAgent(getValueForTest(USER_AGENT, System.getProperty(USER_AGENT)));
+        setDownloadDrivers(getBoolValueForTest(DOWNLOAD_DRIVERS, System.getProperty(DOWNLOAD_DRIVERS)));
 		
         setBetaBrowser(getBoolValueForTest(BETA_BROWSER, System.getProperty(BETA_BROWSER)));
         setAssumeUntrustedCertificateIssuer(getBoolValueForTest(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER, System.getProperty(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER)));
@@ -1336,6 +1339,10 @@ public class SeleniumTestsContext {
         return (String) getAttribute(USER_AGENT);
     }
 
+    public Boolean getDownloadDrivers() {
+        return (Boolean) getAttribute(DOWNLOAD_DRIVERS);
+    }
+
     public List<Throwable> getVerificationFailures(final ITestResult result) {
         List<Throwable> verificationFailures = verificationFailuresMap.get(result);
         return verificationFailures == null ? new ArrayList<>() : verificationFailures;
@@ -1905,6 +1912,14 @@ public class SeleniumTestsContext {
     
     public void setUserAgent(String path) {
     	setAttribute(USER_AGENT, path);
+    }
+
+    public void setDownloadDrivers(Boolean downloadDrivers) {
+        if (Boolean.TRUE.equals(getEdgeIeMode())) { // IE will always get driver from JAR file
+            setAttribute(DOWNLOAD_DRIVERS, false);
+        } else {
+            setAttribute(DOWNLOAD_DRIVERS, Objects.requireNonNullElse(downloadDrivers, DEFAULT_DOWNLOAD_DRIVERS));
+        }
     }
     
     public void setBetaBrowser(Boolean betaBrowser) {

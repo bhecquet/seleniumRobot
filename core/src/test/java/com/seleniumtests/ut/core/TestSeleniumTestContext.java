@@ -604,6 +604,26 @@ public class TestSeleniumTestContext extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().setDebug(null);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getDebug(), List.of(DebugMode.NONE));
 	}
+
+	@Test(groups="ut context")
+	public void testDownloadDrivers(final ITestContext testNGCtx) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setDownloadDrivers(true);
+		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getDownloadDrivers());
+	}
+	@Test(groups="ut context")
+	public void testDownloadDriversNull(final ITestContext testNGCtx) {
+		initThreadContext(testNGCtx);
+		Assert.assertFalse(SeleniumTestsContextManager.getThreadContext().getDownloadDrivers());
+	}
+	@Test(groups="ut context")
+	public void testDownloadDriversIE(final ITestContext testNGCtx) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setEdgeIeMode(true);
+		SeleniumTestsContextManager.getThreadContext().setDownloadDrivers(true);
+		Assert.assertFalse(SeleniumTestsContextManager.getThreadContext().getDownloadDrivers());
+	}
+
 	
 	@Test(groups="ut context")
 	public void testBrowserIE(final ITestContext testNGCtx) {
