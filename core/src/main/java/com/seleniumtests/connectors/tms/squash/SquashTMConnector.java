@@ -239,7 +239,7 @@ public class SquashTMConnector extends TestManager {
                     }
                     Map<String, Object> datas = new HashMap<>();
                     datas.put("action", testStep.getDescription());
-                    datas.put("expectedResult", testStep.getExpectedResult());
+                    datas.put("expected_result", testStep.getExpectedResult());
                     io.github.bhecquet.entities.TestStep newTestStep = io.github.bhecquet.entities.TestStep.create(testCase.getId(), datas);
                     //add attachment if exists
                     for (Snapshot snapshot : testStep.getSnapshots()) {

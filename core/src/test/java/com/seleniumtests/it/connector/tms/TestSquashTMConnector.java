@@ -25,8 +25,12 @@ import org.testng.annotations.Test;
 import org.testng.xml.XmlTest;
 
 import java.awt.image.BufferedImage;
-import java.io.FileNotFoundException;
+import java.io.File;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -221,9 +225,10 @@ public class TestSquashTMConnector extends GenericTest {
      * - description updated to "Integration test for updateTestCase"
      * - old steps deleted
      * - 2 new steps created with appropriate action/expectedResult
+     * @throws IOException 
      */
     @Test(groups = "squash", enabled = true)
-    public void testUpdateTestCase(ITestContext context) throws FileNotFoundException {
+    public void testUpdateTestCase(ITestContext context) throws IOException {
 
         String testCaseId = System.getProperty("testCaseId", "928126");
         SeleniumTestsContextManager.getThreadContext().getConfiguration().put("tms.testId", new TestVariable("tms.testId", testCaseId));
@@ -240,11 +245,9 @@ public class TestSquashTMConnector extends GenericTest {
         TestStep step3 = new TestStep("Step 3", "Step 3", null, null, List.of(), true,
                 com.seleniumtests.core.Step.RootCause.NONE, null, false,
                 "Step with a screenshot", "Check the attachments");
-        SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
-        new DriverTestPage(true);
-        CustomEventFiringWebDriver driver = WebUIDriver.getWebDriver(true);
-        BufferedImage bis = new ScreenshotUtil(driver).captureWebPage(1, driver.getWindowHandle());
-        step3.addSnapshot(new Snapshot(new ScreenShot(bis, "source"), "toto.png", SnapshotCheckType.NONE), 2, "toto");
+        File screenshot = File.createTempFile("screenshot", ".png");
+        Files.copy(Paths.get("src/test/resources/ti/form_picture.png"), screenshot.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        step3.addSnapshot(new Snapshot(new ScreenShot(screenshot), "toto.png", SnapshotCheckType.NONE), 2, "toto");
 
         SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().addAll(List.of(step1, step2, step3));
 

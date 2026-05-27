@@ -109,23 +109,7 @@ public class TestStep extends TestAction {
 	 * @param disableBugtracker		whether we will create an issue if this step fails, or not
 	 */
 	public TestStep(String name, String action, Class<?> origin, ITestResult testResult, List<String> pwdToReplace, boolean maskPassword, RootCause errorCause, String errorCauseDetails, boolean disableBugtracker) {
-		super(name, false, pwdToReplace);
-		this.maskPassword = maskPassword;
-		this.action = action;
-		this.origin = origin;
-		stepActions = new ArrayList<>();
-		files = new ArrayList<>();
-		harCaptures = new ArrayList<>();
-		snapshots = new ArrayList<>();
-		duration = 0L;
-		startDate = OffsetDateTime.now();
-		this.testResult = testResult;
-		
-		if (errorCause != RootCause.NONE) {
-			this.errorCause = errorCause;
-			this.errorCauseDetails = errorCauseDetails;
-		}
-		this.disableBugtracker = disableBugtracker;
+		this(name, action, origin, testResult, pwdToReplace, maskPassword, errorCause, errorCauseDetails, disableBugtracker, "", "");
 	}
 	
 	public TestStep(String name, String action, Class<?> origin, ITestResult testResult, List<String> pwdToReplace, boolean maskPassword, RootCause errorCause, String errorCauseDetails, boolean disableBugtracker, String description, String expectedResult) {
