@@ -17,15 +17,14 @@
  */
 package com.seleniumtests.ut.connectors.tms;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.contains;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
-
-import java.lang.annotation.Annotation;
-import java.util.HashMap;
-
+import com.seleniumtests.MockitoTest;
+import com.seleniumtests.connectors.tms.squash.SquashTMConnector;
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.driver.screenshots.ScreenShot;
+import com.seleniumtests.driver.screenshots.SnapshotCheckType;
+import com.seleniumtests.reporter.logger.Snapshot;
+import com.seleniumtests.reporter.logger.TestStep;
 import io.github.bhecquet.SquashTMApi;
 import io.github.bhecquet.entities.*;
 import io.github.bhecquet.exceptions.SquashTmException;
@@ -42,10 +41,15 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.CustomAttribute;
 import org.testng.annotations.Test;
 
-import com.seleniumtests.MockitoTest;
-import com.seleniumtests.connectors.tms.squash.SquashTMConnector;
-import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.customexception.ConfigurationException;
+import java.io.File;
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 public class TestSquashTMConnector extends MockitoTest {
 	
@@ -73,6 +77,18 @@ public class TestSquashTMConnector extends MockitoTest {
 	@Mock
 	private IterationTestPlanItem iterationTestPlanItem;
 
+	@Mock
+	private TestCase testCase;
+
+	@Mock
+	private io.github.bhecquet.entities.TestStep squashTestStep1;
+
+	@Mock
+	private io.github.bhecquet.entities.TestStep squashTestStep2;
+
+	@Mock
+	private io.github.bhecquet.entities.TestStep newSquashTestStep;
+
 	CustomAttribute testIdAttr = new CustomAttribute() {
 		@Override
 		public Class<? extends Annotation> annotationType() {
@@ -90,9 +106,45 @@ public class TestSquashTMConnector extends MockitoTest {
 		}
 	};
 
+	CustomAttribute updateTestManagerAttr = new CustomAttribute() {
+		@Override
+		public Class<? extends Annotation> annotationType() {
+			return null;
+		}
+
+		@Override
+		public String[] values() {
+			return new String[] {"true"};
+		}
+
+		@Override
+		public String name() {
+			return "updateTestManager";
+		}
+	};
+
+	CustomAttribute updateTestManagerFalseAttr = new CustomAttribute() {
+		@Override
+		public Class<? extends Annotation> annotationType() {
+			return null;
+		}
+
+		@Override
+		public String[] values() {
+			return new String[] {"false"};
+		}
+
+		@Override
+		public String name() {
+			return "updateTestManager";
+		}
+	};
+	
 	MockedStatic mockedCampaign;
 	MockedStatic mockedIteration;
 	MockedStatic mockedProject;
+	MockedStatic<TestCase> mockedTestCase;
+	MockedStatic<io.github.bhecquet.entities.TestStep> mockedSquashTestStep;
 	JSONObject connect;
 
 	@BeforeMethod(groups = "ut")
@@ -100,10 +152,13 @@ public class TestSquashTMConnector extends MockitoTest {
 		mockedCampaign = mockStatic(Campaign.class);
 		mockedIteration = mockStatic(Iteration.class);
 		mockedProject = mockStatic(Project.class);
+		mockedTestCase = mockStatic(TestCase.class);
+		mockedSquashTestStep = mockStatic(io.github.bhecquet.entities.TestStep.class);
 
 		mockedCampaign.when(() -> Campaign.create(any(Project.class), anyString(), anyString(), anyMap())).thenReturn(campaign);
 		mockedIteration.when(() -> Iteration.create(eq(campaign), anyString())).thenReturn(iteration);
 		mockedProject.when(() -> Project.get(anyString())).thenReturn(project);
+		mockedTestCase.when(() -> TestCase.get(anyInt())).thenReturn(testCase);
 
 		connect = new JSONObject();
 		connect.put(SquashTMConnector.TMS_SERVER_URL, "http://myServer");
@@ -124,6 +179,8 @@ public class TestSquashTMConnector extends MockitoTest {
 		mockedCampaign.close();
 		mockedIteration.close();
 		mockedProject.close();
+		mockedTestCase.close();
+		mockedSquashTestStep.close();
 	}
 
 	
@@ -473,5 +530,260 @@ public class TestSquashTMConnector extends MockitoTest {
 
 		squash.recordResult(testResult);
 		mockedCampaign.verify(() -> Campaign.create(any(Project.class), eq("Selenium " + testContext.getName()), eq("folder1/folder2"), eq(new HashMap<>())));
+	}
+	
+	/**
+	 * Check that updateTestCase does nothing when updateTestManager attribute is not set
+	 */
+	@Test(groups={"ut"})
+	public void testUpdateTestCaseNotCalledWhenUpdateTestManagerNotSet() {
+
+		SquashTMConnector squash = spy(new SquashTMConnector());
+		squash.init(connect);
+		doReturn(api).when(squash).getApi();
+
+		when(testMethod.getAttributes()).thenReturn(new CustomAttribute[] {testIdAttr});
+
+		squash.updateTestCase(testResult);
+
+		// TestCase.get should never be called
+		mockedTestCase.verify(() -> TestCase.get(anyInt()), never());
+	}
+
+	/**
+	 * Check that updateTestCase does nothing when updateTestManager is false
+	 */
+	@Test(groups={"ut"})
+	public void testUpdateTestCaseNotCalledWhenUpdateTestManagerFalse() {
+
+		SquashTMConnector squash = spy(new SquashTMConnector());
+		squash.init(connect);
+		doReturn(api).when(squash).getApi();
+
+		when(testMethod.getAttributes()).thenReturn(new CustomAttribute[] {testIdAttr, updateTestManagerFalseAttr});
+
+		squash.updateTestCase(testResult);
+
+		mockedTestCase.verify(() -> TestCase.get(anyInt()), never());
+	}
+
+	/**
+	 * Check that updateTestCase does nothing when testCaseId is not set
+	 */
+	@Test(groups={"ut"})
+	public void testUpdateTestCaseNoTestCaseId() {
+
+		SquashTMConnector squash = spy(new SquashTMConnector());
+		squash.init(connect);
+		doReturn(api).when(squash).getApi();
+
+		when(testMethod.getAttributes()).thenReturn(new CustomAttribute[] {updateTestManagerAttr});
+
+		squash.updateTestCase(testResult);
+
+		mockedTestCase.verify(() -> TestCase.get(anyInt()), never());
+	}
+
+	/**
+	 * Check that updateTestCase properly updates description and steps
+	 */
+	@Test(groups={"ut"})
+	public void testUpdateTestCaseWithSteps() {
+
+		SquashTMConnector squash = spy(new SquashTMConnector());
+		squash.init(connect);
+		doReturn(api).when(squash).getApi();
+
+		when(testMethod.getAttributes()).thenReturn(new CustomAttribute[] {testIdAttr, updateTestManagerAttr});
+		when(testMethod.getDescription()).thenReturn("Test description");
+
+		// setup TestCase mock
+		when(testCase.getId()).thenReturn(1);
+		when(squashTestStep1.getId()).thenReturn(100);
+		when(squashTestStep2.getId()).thenReturn(101);
+		when(testCase.getTestSteps()).thenReturn(Arrays.asList(squashTestStep1, squashTestStep2));
+
+		// setup test steps from SeleniumRobot context
+		TestStep step1 = mock(TestStep.class);
+		when(step1.getDescription()).thenReturn("Step 1 action");
+		when(step1.getExpectedResult()).thenReturn("Step 1 expected");
+		when(step1.getSnapshots()).thenReturn(new ArrayList<>());
+
+		TestStep step2 = mock(TestStep.class);
+		when(step2.getDescription()).thenReturn("Step 2 action");
+		when(step2.getExpectedResult()).thenReturn("Step 2 expected");
+		when(step2.getSnapshots()).thenReturn(new ArrayList<>());
+
+		List<TestStep> testSteps = Arrays.asList(step1, step2);
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().addAll(testSteps);
+
+		mockedSquashTestStep.when(() -> io.github.bhecquet.entities.TestStep.create(eq(1), anyMap())).thenReturn(newSquashTestStep);
+		when(newSquashTestStep.getId()).thenReturn(200);
+
+		squash.updateTestCase(testResult);
+
+		// verify test case was retrieved and completed
+		mockedTestCase.verify(() -> TestCase.get(1));
+		verify(testCase).completeDetails();
+
+		// verify description updated
+		verify(testCase).update(eq(1), anyMap());
+
+		// verify old steps deleted
+		mockedSquashTestStep.verify(() -> io.github.bhecquet.entities.TestStep.delete("100,101"));
+
+		// verify new steps created
+		mockedSquashTestStep.verify(() -> io.github.bhecquet.entities.TestStep.create(eq(1), anyMap()), times(2));
+	}
+
+	/**
+	 * Check that updateTestCase deletes old steps even when there's only one
+	 */
+	@Test(groups={"ut"})
+	public void testUpdateTestCaseDeletesSingleOldStep() {
+
+		SquashTMConnector squash = spy(new SquashTMConnector());
+		squash.init(connect);
+		doReturn(api).when(squash).getApi();
+
+		when(testMethod.getAttributes()).thenReturn(new CustomAttribute[] {testIdAttr, updateTestManagerAttr});
+		when(testMethod.getDescription()).thenReturn("Test description");
+
+		when(testCase.getId()).thenReturn(1);
+		when(squashTestStep1.getId()).thenReturn(100);
+		when(testCase.getTestSteps()).thenReturn(Arrays.asList(squashTestStep1));
+
+		// no new steps
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().clear();
+
+		squash.updateTestCase(testResult);
+
+		mockedSquashTestStep.verify(() -> io.github.bhecquet.entities.TestStep.delete("100"));
+	}
+
+	/**
+	 * Check that updateTestCase works when there are no old steps to delete
+	 */
+	@Test(groups={"ut"})
+	public void testUpdateTestCaseNoOldSteps() {
+
+		SquashTMConnector squash = spy(new SquashTMConnector());
+		squash.init(connect);
+		doReturn(api).when(squash).getApi();
+
+		when(testMethod.getAttributes()).thenReturn(new CustomAttribute[] {testIdAttr, updateTestManagerAttr});
+		when(testMethod.getDescription()).thenReturn("Test description");
+
+		when(testCase.getId()).thenReturn(1);
+		when(testCase.getTestSteps()).thenReturn(new ArrayList<>());
+
+		TestStep step1 = mock(TestStep.class);
+		when(step1.getDescription()).thenReturn("Step action");
+		when(step1.getExpectedResult()).thenReturn("Expected");
+		when(step1.getSnapshots()).thenReturn(new ArrayList<>());
+
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().add(step1);
+
+		mockedSquashTestStep.when(() -> io.github.bhecquet.entities.TestStep.create(eq(1), anyMap())).thenReturn(newSquashTestStep);
+		when(newSquashTestStep.getId()).thenReturn(200);
+
+		squash.updateTestCase(testResult);
+
+        // delete should NOT be called when there are no old steps
+        mockedSquashTestStep.verify(() -> io.github.bhecquet.entities.TestStep.delete(anyString()), never());
+		// new step created
+		mockedSquashTestStep.verify(() -> io.github.bhecquet.entities.TestStep.create(eq(1), anyMap()));
+	}
+
+	/**
+	 * Check that updateTestCase uploads attachments for snapshots with NONE check type
+	 */
+	@Test(groups={"ut"})
+	public void testUpdateTestCaseWithSnapshot() {
+
+		SquashTMConnector squash = spy(new SquashTMConnector());
+		squash.init(connect);
+		doReturn(api).when(squash).getApi();
+
+		when(testMethod.getAttributes()).thenReturn(new CustomAttribute[] {testIdAttr, updateTestManagerAttr});
+		when(testMethod.getDescription()).thenReturn("Test description");
+
+		when(testCase.getId()).thenReturn(1);
+		when(testCase.getTestSteps()).thenReturn(new ArrayList<>());
+
+		// setup step with snapshot
+		TestStep step1 = mock(TestStep.class);
+		when(step1.getDescription()).thenReturn("Step action");
+		when(step1.getExpectedResult()).thenReturn("Expected");
+
+		Snapshot snapshot = mock(Snapshot.class);
+		ScreenShot screenShot = mock(ScreenShot.class);
+		when(snapshot.getCheckSnapshot()).thenReturn(SnapshotCheckType.NONE);
+		when(snapshot.getScreenshot()).thenReturn(screenShot);
+		when(screenShot.getImagePath()).thenReturn("path/to/image.png");
+		when(step1.getSnapshots()).thenReturn(Arrays.asList(snapshot));
+
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().add(step1);
+
+		mockedSquashTestStep.when(() -> io.github.bhecquet.entities.TestStep.create(eq(1), anyMap())).thenReturn(newSquashTestStep);
+		when(newSquashTestStep.getId()).thenReturn(200);
+
+		squash.updateTestCase(testResult);
+
+		// verify attachment uploaded
+		verify(newSquashTestStep).uploadAttachment(any(File.class), eq(200));
+	}
+
+	/**
+	 * Check that updateTestCase does NOT upload attachments for snapshots with non-NONE check type
+	 */
+	@Test(groups={"ut"})
+	public void testUpdateTestCaseWithSnapshotNonNoneCheckType() {
+
+		SquashTMConnector squash = spy(new SquashTMConnector());
+		squash.init(connect);
+		doReturn(api).when(squash).getApi();
+
+		when(testMethod.getAttributes()).thenReturn(new CustomAttribute[] {testIdAttr, updateTestManagerAttr});
+		when(testMethod.getDescription()).thenReturn("Test description");
+
+		when(testCase.getId()).thenReturn(1);
+		when(testCase.getTestSteps()).thenReturn(new ArrayList<>());
+
+		TestStep step1 = mock(TestStep.class);
+		when(step1.getDescription()).thenReturn("Step action");
+		when(step1.getExpectedResult()).thenReturn("Expected");
+
+		Snapshot snapshot = mock(Snapshot.class);
+		when(snapshot.getCheckSnapshot()).thenReturn(SnapshotCheckType.FULL);
+		when(step1.getSnapshots()).thenReturn(Arrays.asList(snapshot));
+
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().add(step1);
+
+		mockedSquashTestStep.when(() -> io.github.bhecquet.entities.TestStep.create(eq(1), anyMap())).thenReturn(newSquashTestStep);
+		when(newSquashTestStep.getId()).thenReturn(200);
+
+		squash.updateTestCase(testResult);
+
+		// verify no attachment uploaded
+		verify(newSquashTestStep, never()).uploadAttachment(any(File.class), anyInt());
+	}
+
+	/**
+	 * Check that no exception is thrown when error occurs during updateTestCase
+	 */
+	@Test(groups={"ut"})
+	public void testUpdateTestCaseNoExceptionOnError() {
+
+		SquashTMConnector squash = spy(new SquashTMConnector());
+		squash.init(connect);
+		doReturn(api).when(squash).getApi();
+
+		when(testMethod.getAttributes()).thenReturn(new CustomAttribute[] {testIdAttr, updateTestManagerAttr});
+
+		mockedTestCase.when(() -> TestCase.get(1)).thenThrow(new SquashTmException("error"));
+
+		// should not throw
+		squash.updateTestCase(testResult);
 	}
 }

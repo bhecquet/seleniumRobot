@@ -25,6 +25,10 @@ public interface ITestManager {
 
     Integer getDatasetId(ITestResult testNGResult);
 
+    boolean getUpdateTestManager(ITestResult testNGResult);
+
+    void updateTestCase(ITestResult testNGResult);
+    
     /**
      * returns the URL to access the test case
      */

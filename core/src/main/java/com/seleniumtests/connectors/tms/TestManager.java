@@ -111,6 +111,19 @@ public abstract class TestManager implements ITestManager {
 
     }
 	
+	public boolean getUpdateTestManager(ITestResult testNGResult) {
+
+        // priority given to variables
+        //TODO if variable can be added dynamically it might be needed to check it right here
+
+        for (CustomAttribute customAttribute : testNGResult.getMethod().getAttributes()) {
+            if ("updateTestManager".equals(customAttribute.name()) && customAttribute.values().length > 0) {
+                return Boolean.parseBoolean(customAttribute.values()[0]);
+            }
+        }
+        return false;
+    }
+	
 	public static ITestManager getInstance(JSONObject configString) {
 
 		String type;
