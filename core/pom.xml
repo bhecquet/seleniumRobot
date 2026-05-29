@@ -24,7 +24,7 @@
 	    <sonar.projectKey>bhecquet_seleniumRobot-core</sonar.projectKey>
 		<surefireArgLine />
 		<failsafeArgLine />
-		<microsoft.kiota.version>1.8.10</microsoft.kiota.version>
+		<microsoft.kiota.version>1.9.1</microsoft.kiota.version>
 	</properties>
 
 	<repositories> 
