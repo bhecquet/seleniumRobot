@@ -2,14 +2,22 @@ package com.seleniumtests.connectors.tms.squash;
 
 import io.github.bhecquet.SquashTMApi;
 import io.github.bhecquet.entities.*;
+
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.testng.ITestResult;
 
 import com.seleniumtests.connectors.tms.TestManager;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.driver.screenshots.SnapshotCheckType;
+import com.seleniumtests.reporter.logger.Snapshot;
+import com.seleniumtests.reporter.logger.TestStep;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SquashTMConnector extends TestManager {
@@ -195,7 +203,56 @@ public class SquashTMConnector extends TestManager {
 		}
 	}
 
+	@Override
+    public void updateTestCase(ITestResult testResult) {
 
+        try {
+            if (getUpdateTestManager(testResult)) {
+                SquashTMApi sapi = getApi();
+                Integer testCaseId = getTestCaseId(testResult);
+                if (testCaseId == null) {
+                    logger.warn("Test Case won't be updated, no testCaseId configured for {}", TestNGResultUtils.getTestName(testResult));
+                    return;
+                }
+
+                TestCase testCase = TestCase.get(testCaseId);
+                testCase.completeDetails();
+                Map<String, Object> testCaseUpdatedDatas = new HashMap<>();
+                testCaseUpdatedDatas.put("description", testResult.getMethod().getDescription());
+                testCase.update(testCase.getId(), testCaseUpdatedDatas);
+
+                //Delete all steps in test case
+                //get all ids
+                List<String> oldStepsIds = new ArrayList<>();
+                for (io.github.bhecquet.entities.TestStep oldTestStep : testCase.getTestSteps()) {
+                    oldStepsIds.add(String.valueOf(oldTestStep.getId()));
+                }
+                //call squash API
+                if (!oldStepsIds.isEmpty()) {
+                    io.github.bhecquet.entities.TestStep.delete(String.join(",", oldStepsIds));
+                }
+
+                List<TestStep> testStepList = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
+                for (TestStep testStep : testStepList) {
+                    if (StringUtils.isBlank(testStep.getDescription()) || StringUtils.isBlank(testStep.getExpectedResult())) {
+                        continue; // skip step if description or expected result is null or blank
+                    }
+                    Map<String, Object> datas = new HashMap<>();
+                    datas.put("action", testStep.getDescription());
+                    datas.put("expected_result", testStep.getExpectedResult());
+                    io.github.bhecquet.entities.TestStep newTestStep = io.github.bhecquet.entities.TestStep.create(testCase.getId(), datas);
+                    //add attachment if exists
+                    for (Snapshot snapshot : testStep.getSnapshots()) {
+                        if (snapshot.getCheckSnapshot() == SnapshotCheckType.NONE) {
+                            newTestStep.uploadAttachment(new File(snapshot.getScreenshot().getOutputDirectory() + "/" + snapshot.getScreenshot().getImagePath()), newTestStep.getId());
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error(String.format("Could not update Test Case for test method %s: %s", TestNGResultUtils.getTestName(testResult), e.getMessage()));
+        }
+    }	
 
 	@Override
 	public void recordResultFiles(ITestResult testResult) {

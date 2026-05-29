@@ -67,6 +67,8 @@ public class TestManagerReporter extends CommonReporter implements IReporter {
 					testManager.recordResultFiles(testResult);
 					TestNGResultUtils.setTestManagereportCreated(testResult, true);
 
+					testManager.updateTestCase(testResult);
+					
 					// add information into report
 					Integer testCaseId = testManager.getTestCaseId(testResult);
 					if (testCaseId != null) {
