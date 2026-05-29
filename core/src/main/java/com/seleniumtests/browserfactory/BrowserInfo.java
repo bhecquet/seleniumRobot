@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,7 +18,6 @@
 package com.seleniumtests.browserfactory;
 
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
@@ -61,12 +59,12 @@ public class BrowserInfo {
 	private static List<String> driverList;
 	
 	private String version;
-	private boolean beta;
-	private String path;
+	private final boolean beta;
+	private final String path;
 	private String driverFileName;
 	private String os;
 	private String defaultProfilePath;
-	private BrowserType browser;
+	private final BrowserType browser;
 	private boolean driverFileSearched = false;
 	
 	/**
@@ -88,8 +86,8 @@ public class BrowserInfo {
 	
 	/**
 	 * Create information about the 
-	 * @param browser
-	 * @param version
+	 * @param browser			the browser
+	 * @param version			browser version
 	 * @param path				path to browser executable
 	 */
 	public BrowserInfo(BrowserType browser, String version, String path) {
@@ -101,8 +99,8 @@ public class BrowserInfo {
 	
 	/**
 	 * 
-	 * @param browser
-	 * @param version
+	 * @param browser           the browser
+	 * @param version			browser version
 	 * @param path				path to browser executable
 	 * @param check				do we check if browser path exists or not. Should not be used outside of tests
 	 */
@@ -121,7 +119,7 @@ public class BrowserInfo {
 			Float.parseFloat(version);
 			this.version = version;
 		} catch (NumberFormatException | NullPointerException e) {
-			logger.warn(String.format("Cannot parse browser version %s for browser %s", version, browser));
+			logger.warn("Cannot parse browser version {} for browser {}", version, browser);
 			this.version = "0.0";
 		}
 		
@@ -152,7 +150,7 @@ public class BrowserInfo {
 		return info;
 	}
 
-	private void addDriverFile() throws IOException {
+	private void addDriverFile() {
 		switch (browser) {
 			case CHROME:
 				addChromeDriverFile();
@@ -186,18 +184,16 @@ public class BrowserInfo {
 	 * SeleniumRobot uses external jar files to hold drivers (seleniumRobot-windows-driver, seleniumRobot-linux-driver,seleniumRobot-mac-driver)
 	 * Each one also contains a file (driver-list-<windows/linux/mac>.txt) which references all driver files in the jar.
 	 * This method returns the content of this text file
-	 * @return
-	 * @throws IOException 
 	 */
-	public String[] getDriverListFromJarResources(String driverListFileName) throws IOException {
-		return IOUtils.readLines(BrowserInfo.class.getClassLoader().getResourceAsStream(driverListFileName), StandardCharsets.UTF_8).get(0).split(",");
+	public String[] getDriverListFromJarResources(String driverListFileName) {
+		return IOUtils.readLines(BrowserInfo.class.getClassLoader().getResourceAsStream(driverListFileName), StandardCharsets.UTF_8).getFirst().split(",");
 	}
 
 	public boolean getBeta() {
 		return beta;
 	}
 	
-	public List<String> getDriverFiles() throws IOException {
+	public List<String> getDriverFiles() {
 		if (driverList != null) {
 			return driverList;
 		} else {
@@ -208,7 +204,7 @@ public class BrowserInfo {
 				
 				String[] driverListFromFile = getDriverListFromJarResources(driverListFileName);
 	
-				logger.info(String.format("getting drivers from %s", driverListFileName));
+				logger.info("getting drivers from {}", driverListFileName);
 		    	for (String driverNameWithPf: driverListFromFile) {
 		    		if (!driverNameWithPf.startsWith(os)) {
 		    			continue;
@@ -217,7 +213,7 @@ public class BrowserInfo {
 		    		drivers.add(driverName);
 		        }
 		    	return drivers;
-			} catch (NullPointerException | IOException e) {
+			} catch (NullPointerException e) {
 				// issue #179: due to driver externalization in jars, it's not possible to read them from resources anymore
 				throw new ConfigurationException(String.format("Could not read driver from resource file %s, make sure that the dependency seleniumRobot-%s-driver.jar is accessible to robot (in maven repo for developpers and in lib/ folder with classpath option for testers)", 
 						driverListFileName,
@@ -228,9 +224,8 @@ public class BrowserInfo {
 	
 	/**
 	 * Get version from chromium based browsers (chrome, edge)
-	 * @param driverFiles
-	 * @param versionRegex
-	 * @return
+	 * @param driverFiles		list of driver files
+	 * @param versionRegex		regex to use to find version
 	 */
 	private Map<Integer, String> getChromiumDriverVersion(List<String> driverFiles, Pattern versionRegex) {
 		Map<Integer, String> driverVersion = new HashMap<>();
@@ -256,15 +251,14 @@ public class BrowserInfo {
 	
 	/**
 	 * Find the most suitable driver when using chrome browser
-	 * @throws IOException
 	 */
-	private void addChromeDriverFile() throws IOException {
+	private void addChromeDriverFile() {
 		List<String> driverFiles = getDriverFiles();
 		driverFiles = driverFiles.stream()
 				.filter(s -> s.contains("chrome-") && s.startsWith("chromedriver_"))
 				.map(s -> s.replace(".exe", ""))
 				.sorted()
-				.collect(Collectors.toList());
+				.toList();
 
 		if (driverFiles.isEmpty()) {
 			throw new ConfigurationException("no chromedriver in resources");
@@ -280,7 +274,7 @@ public class BrowserInfo {
 			driverFileName = driverFiles.get(driverFiles.size() - 1);
 			
 			logger.warn("--------------------------------------------------------------------");
-			logger.warn(String.format("Chrome version %d does not have any associated driver, update seleniumRobot version, the latest driver has been used", chromeVersion));
+			logger.warn("Chrome version {} does not have any associated driver, update seleniumRobot version, the latest driver has been used", chromeVersion);
 			logger.warn("--------------------------------------------------------------------");
 		} else if (driverFileName == null) {
 			throw new ConfigurationException(String.format("Chrome version %d does not have any associated driver, update seleniumRobot version", chromeVersion));
@@ -289,15 +283,14 @@ public class BrowserInfo {
 	
 	/**
 	 * Add the most suitable chrome driver for android driver version
-	 * @throws IOException 
 	 */
-	private void addAndroidDriverFile() throws IOException {
+	private void addAndroidDriverFile() {
 		List<String> driverFiles = getDriverFiles();
 		driverFiles = driverFiles.stream()
 								.filter(s -> s.contains("android-") && s.startsWith("chromedriver_"))
 								.map(s -> s.replace(".exe", ""))
 								.sorted()
-								.collect(Collectors.toList());
+								.toList();
 		
 		if (driverFiles.isEmpty()) {
 			throw new ConfigurationException("no chromedriver in resources");
@@ -324,8 +317,6 @@ public class BrowserInfo {
 	
 	/**
      * use firefox (return true) if version is below 48
-     * @param versionString
-     * @return
      */
     public static boolean useLegacyFirefoxVersion(String versionString) {
     	Pattern regMozilla = Pattern.compile(".*?(\\d++)\\..*");
@@ -406,11 +397,11 @@ public class BrowserInfo {
 			List<Path> profilePaths = files
 			    .filter(Files::isDirectory)
 			    .filter(p -> p.toString().endsWith(".default"))
-			    .collect(Collectors.toList());
+			    .toList();
 			if (profilePaths.isEmpty()) {
 				defaultProfilePath = null;
 			} else {
-				defaultProfilePath = profilePaths.get(0).toString();
+				defaultProfilePath = profilePaths.getFirst().toString();
 			}
 		} catch (IOException | NullPointerException e) {
 			defaultProfilePath = null;
@@ -419,16 +410,15 @@ public class BrowserInfo {
 	
 	/**
 	 * Edge driver depends on windows build
-	 * @throws IOException 
 	 */
-	private void addEdgeDriverFile() throws IOException {
+	private void addEdgeDriverFile() {
 
 		List<String> driverFiles = getDriverFiles();
 		driverFiles = driverFiles.stream()
 				.filter(s -> s.contains("edge-") && s.startsWith("edgedriver_"))
 				.map(s -> s.replace(".exe", ""))
 				.sorted()
-				.collect(Collectors.toList());
+				.toList();
 
 		if (driverFiles.isEmpty()) {
 			throw new ConfigurationException("no edgedriver in resources");
@@ -444,7 +434,7 @@ public class BrowserInfo {
 			driverFileName = driverFiles.get(driverFiles.size() - 1);
 			
 			logger.warn("--------------------------------------------------------------------");
-			logger.warn(String.format("Edge version %d does not have any associated driver, update seleniumRobot driver version, the latest driver has been used", edgeVersion));
+			logger.warn("Edge version {} does not have any associated driver, update seleniumRobot driver version, the latest driver has been used", edgeVersion);
 			logger.warn("--------------------------------------------------------------------");
 		} else if (driverFileName == null) {
 			throw new ConfigurationException(String.format("Edge version %d does not have any associated driver, update seleniumRobot driver version", edgeVersion));
@@ -502,7 +492,7 @@ public class BrowserInfo {
 		if (!driverFileSearched) {
 			try {
 				addDriverFile();
-			} catch (IOException e) {
+			} catch (Exception e) {
 				logger.error("Cannot get driver file", e);
 			} finally {
 				driverFileSearched = true;
@@ -510,10 +500,7 @@ public class BrowserInfo {
 		}
 		return driverFileName;
 	}
-	
-	/**
-	 * @param driverFileName
-	 */
+
 	public void setDriverFileName(String driverFileName) {
 		this.driverFileName = driverFileName;
 		driverFileSearched = true;
@@ -529,8 +516,7 @@ public class BrowserInfo {
 	}
 	
 	/**
-	 * get 
-	 * @return
+	 * get the PID of the named program
 	 */
     public List<Long> getProgramPid(String programName, List<Long> existingPids) {
 
@@ -545,9 +531,7 @@ public class BrowserInfo {
     }
     
     /**
-     * Returns the list of pids for existing drivers and browsers. These are direct programes launched by seleniumRobot
-     * @param existingPids
-     * @return
+     * Returns the list of pids for existing drivers and browsers. These are direct programs launched by seleniumRobot
      */
     public List<Long> getDriverAndBrowserPid(List<Long> existingPids) {
     	
@@ -568,9 +552,7 @@ public class BrowserInfo {
     }
     
     /**
-     * Get the driver process created by selenium. 
-     * @param existingPids
-     * @return
+     * Get the driver process created by selenium.
      */
     public List<Long> getDriverPid(List<Long> existingPids) {
     	return getProgramPid(driverFileName, existingPids);
@@ -582,8 +564,6 @@ public class BrowserInfo {
     
     /**
      * Get the list of pids for the browser launched by driver and all subprocess created by browser
-     * @param driverPids
-     * @return
      */
     public List<Long> getAllBrowserSubprocessPids(List<Long> driverPids) {
     	OSUtility osUtility = OSUtilityFactory.getInstance();
@@ -612,7 +592,6 @@ public class BrowserInfo {
 	
 	/**
 	 * Returns the BrowserInfo with highest version
-	 * @return
 	 */
 	public static BrowserInfo getHighestDriverVersion(List<BrowserInfo> browserInfos) {
 		
@@ -632,9 +611,6 @@ public class BrowserInfo {
 	
 	/**
 	 * returns the accurate BrowserInfo according to the expected version. If no version matches, raise a ConfigurationException
-	 * @param version
-	 * @return
-	 * @throws ConfigurationException  if no browserinfo matches
 	 */
 	public static BrowserInfo getInfoFromVersion(String version, List<BrowserInfo> browserInfos) {
 		for (BrowserInfo browserInfo: browserInfos) {
@@ -648,8 +624,6 @@ public class BrowserInfo {
 	/**
 	 * returns the accurate BrowserInfo according to the expected binary. If no matches, raise a ConfigurationException
 	 * Also check that file exists
-	 * @return
-	 * @throws ConfigurationException  if no browserinfo matches
 	 */
 	public static BrowserInfo getInfoFromBinary(String binPath, List<BrowserInfo> browserInfos) {
 		for (BrowserInfo browserInfo: browserInfos) {

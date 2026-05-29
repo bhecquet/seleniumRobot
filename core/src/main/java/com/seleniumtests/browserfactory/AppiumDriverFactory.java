@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,7 +19,8 @@ package com.seleniumtests.browserfactory;
 
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Optional;
 
 import io.appium.java_client.AppiumDriver;
@@ -40,7 +41,6 @@ import com.seleniumtests.util.FileUtility;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
-import org.openqa.selenium.remote.RemoteWebDriver;
 
 public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
 
@@ -64,7 +64,7 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
 			} catch (UnsupportedEncodingException e) {
 				logger.error("cannot get driver path", e);
 			}
-			
+
 		}
 		return androidOptions;
     }
@@ -79,18 +79,18 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
     	try {
 	        if(ANDROID_PLATORM.equalsIgnoreCase(webDriverConfig.getPlatform())) {
 	        	MutableCapabilities capabilities = extractAndroidDriver(getMobileCapabilities());
-	            return new AndroidDriver(new URL(appiumLauncher.getAppiumServerUrl()), capabilities);
+	            return new AndroidDriver(new URI(appiumLauncher.getAppiumServerUrl()).toURL(), capabilities);
 	            
 	        } else if (IOS_PLATORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
-	            return new IOSDriver(new URL(appiumLauncher.getAppiumServerUrl()), getMobileCapabilities());
+	            return new IOSDriver(new URI(appiumLauncher.getAppiumServerUrl()).toURL(), getMobileCapabilities());
 
 			} else if (WINDOWS_PLATORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
-	            return new AppiumDriver(new URL(appiumLauncher.getAppiumServerUrl()), driverOptions);
+	            return new AppiumDriver(new URI(appiumLauncher.getAppiumServerUrl()).toURL(), driverOptions);
 
 	        } else {
 	        	throw new ConfigurationException(String.format("Platform %s is unknown for Appium tests", webDriverConfig.getPlatform()));
 	        }
-    	} catch (MalformedURLException e) {
+    	} catch (MalformedURLException | URISyntaxException e) {
     		throw new DriverExceptions("Error creating driver: " + e.getMessage());
     	}
     }
@@ -98,7 +98,7 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
 	private MutableCapabilities getMobileCapabilities() {
 		MutableCapabilities capabilities;
 		try {
-			capabilities = new MobileDeviceSelector().initialize().updateCapabilitiesWithSelectedDevice(driverOptions, webDriverConfig.getMode());
+			capabilities = new MobileDeviceSelector().initialize().updateCapabilitiesWithSelectedDevice(driverOptions, webDriverConfig.getMode(), webDriverConfig.getDownloadDrivers());
 		} catch (ConfigurationException e) {
 			logger.warn(e.getMessage());
 

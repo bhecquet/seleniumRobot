@@ -146,7 +146,7 @@ public class MobileDeviceSelector {
 	 * @param capabilities	the capabilities to update
 	 * @return the updated capabilities
 	 */
-	public MutableCapabilities updateCapabilitiesWithSelectedDevice(MutableCapabilities capabilities, DriverMode driverMode) {
+	public MutableCapabilities updateCapabilitiesWithSelectedDevice(MutableCapabilities capabilities, DriverMode driverMode, boolean downloadDrivers) {
 		MobileDevice selectedDevice = getRelevantMobileDevice(capabilities);
 		capabilities.setCapability(CapabilityType.PLATFORM_NAME, selectedDevice.getPlatform());
 		
@@ -159,7 +159,7 @@ public class MobileDeviceSelector {
 			// set the right chromedriver executable according to android browser / chrome version
 			// it's only the file name, not it's path
 			// set it for browser tests and also application tests (for webview automation)
-			if (driverMode == DriverMode.LOCAL) {
+			if (driverMode == DriverMode.LOCAL && !downloadDrivers) {
 				String chromeDriverFile = null;
 				if (BrowserType.BROWSER.toString().equalsIgnoreCase(capabilities.getBrowserName())) {
 					chromeDriverFile = selectedDevice.getBrowserInfo(BrowserType.BROWSER).getDriverFileName();

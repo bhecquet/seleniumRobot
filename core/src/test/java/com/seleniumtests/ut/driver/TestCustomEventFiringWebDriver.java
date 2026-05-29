@@ -175,6 +175,21 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		}
 	}
 
+	@Test(groups = {"ut"})
+	public void testConstructorForAppiumTest() {
+
+		WebDriver realDriver = mock(AndroidDriver.class);
+		try (MockedConstruction<Augmenter> mockedAugmenter = mockConstruction(Augmenter.class, (augmenter, context) ->
+				doAnswer(invocation -> realDriver)
+						.when(augmenter)
+						.augment(any()))
+		) {
+
+			new CustomEventFiringWebDriver(realDriver, null, browserInfo, TestType.APPIUM_WEB_ANDROID, DriverMode.LOCAL, null);
+			Assert.assertEquals(mockedAugmenter.constructed().size(), 0);
+		}
+	}
+
 	/**
 	 * Check port for BiDi is updated (for testcontainers support)
 	 */
