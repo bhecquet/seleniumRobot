@@ -187,7 +187,8 @@ Settings for customizing the default seleniumRobot driver features. By default, 
 | edgeOptions				|			| see 'chromeOptions'                                                                             |
 | webDriverGridTimeout		| 1800		| Timeout in seconds when trying to get a session on selenium grid                 |
 | downloadDrivers			| false		| If true, use Selenium-manager to download drivers from external endpoints (else drivers JAR is used).<br/>
-When executing mobile web/app tests, appium needs to be started with NODE_EXTRA_CA_CERTS environment variable if your are behing a corporate proxy that exposes it's own certificate  |
+When executing mobile web/app tests, appium needs to be started with NODE_EXTRA_CA_CERTS environment variable if your are behing a corporate proxy that exposes it's own certificate<br/>
+Appium autodownload will only be available is `--relaxed-security` (or finer security flag: `--allow-insecure uiautomator2:chromedriver_autodownload`)|
 
 Note for chromium options
 - `enable-automation`: Attachment of an other chrome process to the one created by Selenium will fail with this option (set by default by Selenium)
