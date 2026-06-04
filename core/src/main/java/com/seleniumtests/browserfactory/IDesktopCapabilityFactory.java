@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -82,6 +83,15 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
 		if (selectedBrowserInfo == null ) {
 			throw new ConfigurationException(String.format("Browser %s %s is not available",
 					webDriverConfig.getBrowserType(), Boolean.TRUE.equals(webDriverConfig.getBetaBrowser()) ? "beta" : ""));
+		}
+
+		if (Boolean.TRUE.equals(webDriverConfig.getDownloadDrivers())) {
+			Path seleniumCache = Paths.get(System.getProperty("user.home"), ".cache", "selenium");
+			try {
+				Files.createDirectories(seleniumCache);
+			} catch (IOException e) {
+				logger.error("Cannot create {} folder", seleniumCache);
+			}
 		}
 
     	String newDriverPath = Boolean.TRUE.equals(webDriverConfig.getDownloadDrivers()) ? null: new DriverExtractor().extractDriver(selectedBrowserInfo.getDriverFileName());

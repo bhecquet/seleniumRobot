@@ -17,6 +17,10 @@
  */
 package com.seleniumtests.browserfactory.mobile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -149,7 +153,17 @@ public class MobileDeviceSelector {
 	public MutableCapabilities updateCapabilitiesWithSelectedDevice(MutableCapabilities capabilities, DriverMode driverMode, boolean downloadDrivers) {
 		MobileDevice selectedDevice = getRelevantMobileDevice(capabilities);
 		capabilities.setCapability(CapabilityType.PLATFORM_NAME, selectedDevice.getPlatform());
-		
+
+		if (downloadDrivers) {
+			Path seleniumCache = Paths.get(System.getProperty("user.home"), ".cache", "selenium");
+			try {
+				Files.createDirectories(seleniumCache);
+			} catch (IOException e) {
+				throw new ConfigurationException(String.format("Cannot create %s folder", seleniumCache.toString()));
+			}
+		}
+
+
 		if ("android".equals(selectedDevice.getPlatform())) {
 			UiAutomator2Options updatedCapabilities;
 			updatedCapabilities = new UiAutomator2Options(capabilities);
