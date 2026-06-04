@@ -131,6 +131,31 @@ public class StubTestClassForDriverTest extends StubParentClass {
 		new DriverTestPage(true)
 		._goToFrame();
 	}
+
+
+	@Test(groups = "stub")
+	public void testFrameDefinition1() {
+		DriverMultipleFrameDefinitionsPage page = new DriverMultipleFrameDefinitionsPage(BrowserType.CHROME);
+		page.setFrame();
+
+		for (int i = 0; i < 10; i++) {
+			WaitHelper.waitForSeconds(2);
+			logger.info(String.format("get text 1.%d", i));
+			Assert.assertEquals(page._getText(), "a value in iframe");
+		}
+
+	}
+	@Test(groups = "stub")
+	public void testFrameDefinition2() {
+		DriverMultipleFrameDefinitionsPage page = new DriverMultipleFrameDefinitionsPage(BrowserType.CHROME);
+		page.setFrame2();
+
+		for (int i = 0; i < 10; i++) {
+			WaitHelper.waitForSeconds(2);
+			logger.info(String.format("get text 2.%d", i));
+			Assert.assertEquals(page._getText(), "a value in iframe 2");
+		}
+	}
 	
 	@Test(groups="stub")
 	public void testMultipleDriver() {

@@ -137,7 +137,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     protected ThreadLocal<SearchContext> searchContext = new ThreadLocal<>(); // if searchContext is a WebElement, then, element and searchContext will be the same. Used to store ShadowRoot which are not WebElements
 
     protected HtmlElement parent;
-    protected FrameElement frameElement = null;
+    protected ThreadLocal<FrameElement> frameElement = new ThreadLocal<>();
     private boolean scrollToElementBeforeAction = false;
     private Integer elementIndex = -1;
     private By by;
@@ -265,7 +265,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	if (parent != null && frame != null) {
     		scenarioLogger.error("parent element and frame cannot be set together. If you want to search a element with parent in a frame, define a frame for this parent");
     	} else {
-    		this.frameElement = frame;
+    		this.frameElement.set(frame);
     	}
     	this.replayTimeout = replayTimeout;
 
@@ -1710,11 +1710,11 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     }
 
 	public FrameElement getFrameElement() {
-		return frameElement;
+		return frameElement.get();
 	}
 
 	public void setFrameElement(FrameElement frameElement) {
-		this.frameElement = frameElement;
+		this.frameElement.set(frameElement);
 	}
 	
 	/**

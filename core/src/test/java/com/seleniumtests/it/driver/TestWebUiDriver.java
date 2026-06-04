@@ -30,6 +30,7 @@ import com.seleniumtests.browserfactory.mobile.*;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import io.appium.java_client.AppiumDriver;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
@@ -415,7 +416,14 @@ public class TestWebUiDriver extends ReporterTest {
 		WebUIDriver.switchToDriver("main");
 		
 	}
-	
+
+	@Test(groups={"it"})
+	public void testUpdateFrameWithMultipleThreads() throws IOException {
+
+		ReporterTest.executeSubTest(2, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testFrameDefinition1", "testFrameDefinition2"});
+		String logs = readSeleniumRobotLogFile();
+		Assert.assertEquals(StringUtils.countMatches(logs, "Test is OK"), 2);
+	}
 
 	/**
 	 * Check we can attach Selenium to a chrome process if it's launched with '--remote-debugging-port' option

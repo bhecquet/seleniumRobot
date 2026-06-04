@@ -121,7 +121,7 @@ public class SelectList extends HtmlElement {
         // search the right select list handler
         for (Class<? extends ISelectList> selectClass: selectImplementations) {
         	try {
-				ISelectList selectInstance = selectClass.getConstructor(WebElement.class, FrameElement.class).newInstance(getRealElementNoSearch(), frameElement);
+				ISelectList selectInstance = selectClass.getConstructor(WebElement.class, FrameElement.class).newInstance(getRealElementNoSearch(), getFrameElement());
 				if (selectInstance.isApplicable()) {
 					setSelectImplementation(selectInstance);
 					selectInstance.setDriver(getDriver());

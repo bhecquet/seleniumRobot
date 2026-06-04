@@ -395,5 +395,6 @@ public class TestFrameElement extends MockitoTest {
 		verify(locator).frame(any(WebElement.class));
 		verify(locator).defaultContent();
 	}
+
 	
 }
