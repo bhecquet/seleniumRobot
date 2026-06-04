@@ -54,7 +54,7 @@
 		<selenium.version>4.43.0</selenium.version>
 		<htmlunitdriver.version>4.43.0</htmlunitdriver.version>
 		<appium.version>10.1.1</appium.version>
-		<log4j.version>2.25.2</log4j.version>
+		<log4j.version>2.25.4</log4j.version>
 		<unirest.version>4.5.1</unirest.version>
 		<aspectj.version>1.9.25</aspectj.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
