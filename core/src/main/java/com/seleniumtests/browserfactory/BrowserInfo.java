@@ -492,8 +492,6 @@ public class BrowserInfo {
 		if (!driverFileSearched) {
 			try {
 				addDriverFile();
-			} catch (Exception e) {
-				logger.error("Cannot get driver file", e);
 			} finally {
 				driverFileSearched = true;
 			}

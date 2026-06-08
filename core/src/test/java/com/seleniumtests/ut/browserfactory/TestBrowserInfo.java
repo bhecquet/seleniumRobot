@@ -20,7 +20,6 @@ package com.seleniumtests.ut.browserfactory;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -49,7 +48,7 @@ public class TestBrowserInfo extends MockitoTest {
 	private Stream<Path> streamPaths;
 
 	@Test(groups={"ut"})
-	public void getDriverFiles() throws IOException {
+	public void getDriverFiles() {
 		Assert.assertFalse(new BrowserInfo(BrowserType.CHROME, "58.0", null).getDriverFiles().isEmpty());
 	}
 	
@@ -95,7 +94,7 @@ public class TestBrowserInfo extends MockitoTest {
 	 * Check we take the highest driver version matching this chrome version
 	 */
 	@Test(groups={"ut"})
-	public void testChromeVersionHighestDriverVersion() throws Exception {
+	public void testChromeVersionHighestDriverVersion() {
 
 		List<String> driverList = Arrays.asList("chromedriver_2.28_chrome-55-57_android_7.0.exe", "chromedriver_2.29_chrome-56-58_android_7.0.exe", "chromedriver_2.31_chrome-58-60.exe");
 		BrowserInfo bInfo = spy(new BrowserInfo(BrowserType.CHROME, "58.0", null));
@@ -127,7 +126,7 @@ public class TestBrowserInfo extends MockitoTest {
 	 * Check we can discover version inside a range of versions
 	 */
 	@Test(groups={"ut"})
-	public void testChromeVersionMiddleRange() throws Exception {
+	public void testChromeVersionMiddleRange() {
 		List<String> driverList = Arrays.asList("chromedriver_2.28_chrome-55-57_android_7.0", "chromedriver_2.29_chrome-56-58_android_7.0", "chromedriver_2.31_chrome-58-60");
 		BrowserInfo bInfo = spy(new BrowserInfo(BrowserType.CHROME, "57.1", null));
 		when(bInfo.getDriverFiles()).thenReturn(driverList);
@@ -140,7 +139,7 @@ public class TestBrowserInfo extends MockitoTest {
 	 * Check that an error is raised when no driver matches a lower browser version
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
-	public void testChromeVersionNotFound() throws Exception {
+	public void testChromeVersionNotFound() {
 		List<String> driverList = Arrays.asList("chromedriver_2.28_chrome-55-57_android_7.0", "chromedriver_2.29_chrome-56-58_android_7.0", "chromedriver_2.31_chrome-58-60");
 		BrowserInfo bInfo = spy(new BrowserInfo(BrowserType.CHROME, "1.0", null));
 		when(bInfo.getDriverFiles()).thenReturn(driverList);
@@ -154,7 +153,7 @@ public class TestBrowserInfo extends MockitoTest {
 	 * an error message should be displayed
 	 */
 	@Test(groups={"ut"})
-	public void testChromeVersionHigherThanDriverVersion() throws Exception {
+	public void testChromeVersionHigherThanDriverVersion() {
 		List<String> driverList = Arrays.asList("chromedriver_2.28_chrome-55-57_android_7.0", "chromedriver_2.29_chrome-56-58_android_7.0", "chromedriver_2.31_chrome-58-60");
 		BrowserInfo bInfo = spy(new BrowserInfo(BrowserType.CHROME, "70.0", null));
 		when(bInfo.getDriverFiles()).thenReturn(driverList);
@@ -167,7 +166,7 @@ public class TestBrowserInfo extends MockitoTest {
 	 * Error should be raised when no driver is found
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
-	public void testChromeVersionNoDriver() throws Exception {
+	public void testChromeVersionNoDriver() {
 		List<String> driverList = List.of("chromedriver_2.20_android-6.0");
 		BrowserInfo bInfo = spy(new BrowserInfo(BrowserType.CHROME, "70.0", null));
 		when(bInfo.getDriverFiles()).thenReturn(driverList);
@@ -180,7 +179,7 @@ public class TestBrowserInfo extends MockitoTest {
 	 * Error should be raised when file pattern is not correct
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
-	public void testChromeVersionBadPattern() throws Exception {
+	public void testChromeVersionBadPattern() {
 		List<String> driverList = List.of("chromedriver_2.20_chrome-55.0-57.0");
 		BrowserInfo bInfo = spy(new BrowserInfo(BrowserType.CHROME, "55.0", null));
 		when(bInfo.getDriverFiles()).thenReturn(driverList);
@@ -194,7 +193,7 @@ public class TestBrowserInfo extends MockitoTest {
 	 * Check we take the exact driver version matching this android browser version
 	 */
 	@Test(groups={"ut"})
-	public void testAndroidVersionExactMatch() throws Exception {
+	public void testAndroidVersionExactMatch() {
 
 		List<String> driverList = Arrays.asList("chromedriver_2.20_chrome-55-57_android-6.0.exe", "chromedriver_2.29_chrome-56-58_android-7.0", "chromedriver_2.31_chrome-58-60");
 		BrowserInfo bInfo = spy(new BrowserInfo(BrowserType.BROWSER, "6.0", null));
@@ -208,7 +207,7 @@ public class TestBrowserInfo extends MockitoTest {
 	 * Check that if file name does not respect the pattern, file is rejected
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
-	public void testAndroidVersionWrongPattern() throws Exception {
+	public void testAndroidVersionWrongPattern()  {
 		
 		List<String> driverList = List.of("chromedriver_2.20_chrome-55-57_android-6");
 		BrowserInfo bInfo = spy(new BrowserInfo(BrowserType.BROWSER, "6.0", null));
@@ -222,7 +221,7 @@ public class TestBrowserInfo extends MockitoTest {
 	 * Error raised if no version matches
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
-	public void testAndroidVersionNoMatch() throws Exception {
+	public void testAndroidVersionNoMatch() {
 		
 		List<String> driverList = Arrays.asList("chromedriver_2.20_chrome-55-57_android-6.0", "chromedriver_2.29_chrome-56-58_android-7.0", "chromedriver_2.31_chrome-58-60");
 		BrowserInfo bInfo = spy(new BrowserInfo(BrowserType.BROWSER, "5.0", null));
@@ -236,7 +235,7 @@ public class TestBrowserInfo extends MockitoTest {
 	 * Check that we get the driver list if driver artifact is installed for the right OS
 	 */
 	@Test(groups={"ut"})
-	public void testGetDriverFilesWithInstalledArtifact() throws Exception {
+	public void testGetDriverFilesWithInstalledArtifact() {
 		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class)) {
 			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.WINDOWS);
 
@@ -253,7 +252,7 @@ public class TestBrowserInfo extends MockitoTest {
 	 * If artifact is not installed, getDriverListFromJarResources raises NullPointerException
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
-	public void testGetDriverFilesWithNotInstalledArtifact() throws Exception {
+	public void testGetDriverFilesWithNotInstalledArtifact() {
 		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class)) {
 			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.WINDOWS);
 
@@ -268,7 +267,7 @@ public class TestBrowserInfo extends MockitoTest {
 	 * Check we filter drivers by OS
 	 */
 	@Test(groups={"ut"})
-	public void testGetDriverFilesWithInstalledArtifactForOtherOS() throws Exception {
+	public void testGetDriverFilesWithInstalledArtifactForOtherOS() {
 		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class)) {
 			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.LINUX);
 
@@ -285,7 +284,7 @@ public class TestBrowserInfo extends MockitoTest {
 	 * Error raised if no driver file exists
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
-	public void testAndroidVersionNoDriver() throws Exception {
+	public void testAndroidVersionNoDriver() {
 		
 		List<String> driverList = List.of("chromedriver_2.31_chrome-58-60");
 		BrowserInfo bInfo = spy(new BrowserInfo(BrowserType.BROWSER, "5.0", null));
@@ -501,11 +500,10 @@ public class TestBrowserInfo extends MockitoTest {
 		try (MockedStatic<OSUtility> mockedOsUtility = mockStatic(OSUtility.class);
 			MockedStatic<Files> mockedFiles = mockStatic(Files.class);
 		) {
-			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.WINDOWS);
 			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.LINUX);
 			mockedFiles.when(() -> Files.list(any(Path.class))).thenReturn(streamPaths);
 			when(streamPaths.filter(any(Predicate.class))).thenReturn(streamPaths);
-			when(streamPaths.collect(any())).thenReturn(Collections.singletonList(Paths.get("/home/user/.mozilla/firefox")));
+			when(streamPaths.toList()).thenReturn(Collections.singletonList(Paths.get("/home/user/.mozilla/firefox")));
 
 			BrowserInfo bi = new BrowserInfo(BrowserType.FIREFOX, "58.0", null);
 
@@ -522,7 +520,7 @@ public class TestBrowserInfo extends MockitoTest {
 			mockedOsUtility.when(OSUtility::getCurrentPlatorm).thenReturn(Platform.MAC);
 			mockedFiles.when(() -> Files.list(any(Path.class))).thenReturn(streamPaths);
 			when(streamPaths.filter(any(Predicate.class))).thenReturn(streamPaths);
-			when(streamPaths.collect(any())).thenReturn(Collections.singletonList(Paths.get("/Users/user/Library/Application Support/Firefox/Profiles/")));
+			when(streamPaths.toList()).thenReturn(Collections.singletonList(Paths.get("/Users/user/Library/Application Support/Firefox/Profiles/")));
 
 			BrowserInfo bi = new BrowserInfo(BrowserType.FIREFOX, "58.0", null);
 
