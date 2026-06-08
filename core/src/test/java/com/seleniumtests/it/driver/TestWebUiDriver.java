@@ -337,6 +337,7 @@ public class TestWebUiDriver extends ReporterTest {
 		Assert.assertTrue(secondDriverInit > firstDriverCreation);
 		Assert.assertTrue(secondDriverInit > firstDriverInit);
 		Assert.assertTrue(secondDriverCreation > firstDriverCreation);
+		Assert.assertEquals(StringUtils.countMatches(logs, "Test is OK"), 2);
 	}
 
 	/**
@@ -421,6 +422,22 @@ public class TestWebUiDriver extends ReporterTest {
 	public void testUpdateFrameWithMultipleThreads() throws IOException {
 
 		ReporterTest.executeSubTest(2, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testFrameDefinition1", "testFrameDefinition2"});
+		String logs = readSeleniumRobotLogFile();
+		Assert.assertEquals(StringUtils.countMatches(logs, "Test is OK"), 2);
+	}
+
+	@Test(groups={"it"})
+	public void testUpdateParentWithMultipleThreads() throws IOException {
+
+		ReporterTest.executeSubTest(2, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testParentDefinition1", "testParentDefinition2"});
+		String logs = readSeleniumRobotLogFile();
+		Assert.assertEquals(StringUtils.countMatches(logs, "Test is OK"), 2);
+	}
+
+	@Test(groups={"it"})
+	public void testUpdateLocatorWithMultipleThreads() throws IOException {
+
+		ReporterTest.executeSubTest(2, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testLocatorDefinition1", "testLocatorDefinition2"});
 		String logs = readSeleniumRobotLogFile();
 		Assert.assertEquals(StringUtils.countMatches(logs, "Test is OK"), 2);
 	}

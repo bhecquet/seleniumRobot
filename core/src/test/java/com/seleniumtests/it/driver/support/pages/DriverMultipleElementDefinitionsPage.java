@@ -19,22 +19,32 @@ package com.seleniumtests.it.driver.support.pages;
 
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.uipage.PageObject;
+import com.seleniumtests.uipage.htmlelements.ButtonElement;
 import com.seleniumtests.uipage.htmlelements.FrameElement;
+import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.uipage.htmlelements.TextFieldElement;
 import org.openqa.selenium.By;
 
-public class DriverMultipleFrameDefinitionsPage extends PageObject {
+public class DriverMultipleElementDefinitionsPage extends PageObject {
 
 	public static final FrameElement frame = new FrameElement("frame", By.id("myIFrame"));
 	public static final FrameElement frame2 = new FrameElement("frame", By.id("myIFrame2"));
-	public static final TextFieldElement input = new TextFieldElement("input", By.id("textInIFrameWithValue"), frame);
+	public static final TextFieldElement input = new TextFieldElement("input", By.id("textInIFrameWithValue"));
 
-	public DriverMultipleFrameDefinitionsPage(BrowserType browserType) {
+	public static final HtmlElement parent1 = new HtmlElement("parent 1", By.id("parent1"));
+	public static final HtmlElement parent2 = new HtmlElement("parent 2", By.id("parent2"));
+	public static final ButtonElement submit = new ButtonElement("submit", By.tagName("button"));
+
+	public DriverMultipleElementDefinitionsPage(BrowserType browserType) {
 		super(frame, getPageUrl(browserType), browserType, "main", null);
 	}
 
 	public String _getText() {
 		return input.getValue();
+	}
+
+	public String _getButtonText() {
+		return submit.getText();
 	}
 
 	public void setFrame() {
@@ -44,11 +54,19 @@ public class DriverMultipleFrameDefinitionsPage extends PageObject {
 		input.setFrameElement(frame2);
 	}
 
+	public void setParent1() {
+		submit.setParent(parent1);
+	}
+
+	public void setParent2() {
+		submit.setParent(parent2);
+	}
+
 	public static String getPageUrl(BrowserType browserType) {
 		if (browserType == BrowserType.FIREFOX) {
-			return "file://" + Thread.currentThread().getContextClassLoader().getResource("tu/testFrameDefinitionUpdate.html").getFile();
+			return "file://" + Thread.currentThread().getContextClassLoader().getResource("tu/testElementDefinitionUpdate.html").getFile();
 		} else {
-			return "file:///" + Thread.currentThread().getContextClassLoader().getResource("tu/testFrameDefinitionUpdate.html").getFile();
+			return "file:///" + Thread.currentThread().getContextClassLoader().getResource("tu/testElementDefinitionUpdate.html").getFile();
 		}
 	}
 }

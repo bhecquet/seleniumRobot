@@ -131,16 +131,19 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     		+ "} else if(document.createEventObject) { "
     		+ "   arguments[0].fireEvent('ondblclick');"
     		+ "}";
-    
+
+	// most fields are thread local because historicaly, HtmlElement (and sub-elements) are defined as static fields (and now, it's forced in PageObject)
+	// But, in case of multithread tests, updating an element in one test may impact the same element in other tests
 	private final ThreadLocal<CustomEventFiringWebDriver> driver = new ThreadLocal<>();
 	private final ThreadLocal<WebElement> element = new ThreadLocal<>();
     protected ThreadLocal<SearchContext> searchContext = new ThreadLocal<>(); // if searchContext is a WebElement, then, element and searchContext will be the same. Used to store ShadowRoot which are not WebElements
 
-    protected HtmlElement parent;
-    protected ThreadLocal<FrameElement> frameElement = new ThreadLocal<>();
+    private final ThreadLocal<HtmlElement> parent;
+    private final ThreadLocal<FrameElement> frameElement;
     private boolean scrollToElementBeforeAction = false;
     private Integer elementIndex = -1;
-    private By by;
+    private final ThreadLocal<By> by;
+
 
     public HtmlElement() {
     	this("", By.id(""));
@@ -245,27 +248,28 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * Find the nth element using BY locator into an other element or a frame.This help focusing on a page zone for searching an element
      * Frame and parent element are mutually exclusive
      *
-     * @param   label  - element name for logging
-     * @param   by     - By type
-     * @param	frame  - frame element into which we must switch before searching the element
-     * @param	parent - Parent element to search before searching this element
-     * @param	index  - index of the element to find. In this case, robot will search the Nth element corresponding to
+     * @param   label  		- element name for logging
+     * @param   locator 	- By type
+     * @param	frame  		- frame element into which we must switch before searching the element
+     * @param	parentElement - Parent element to search before searching this element
+     * @param	index  		- index of the element to find. In this case, robot will search the Nth element corresponding to
      * 					 the By parameter. Equivalent to new HtmlElement(label, by).findElements().get(N)
      * 					 If index is null, use <code>driver.findElement(By)</code> intenally
      *  				 If index is negative, search from the last one (-1)
      *  			     If index is HtmlElement.FIRST_VISIBLE, search the first visible element
      * @param	replayTimeout - how much time we must wait for the element to be present for playing with it
      */
-    protected HtmlElement(String label, By by, FrameElement frame, HtmlElement parent, Integer index, Integer replayTimeout) {
+    protected HtmlElement(String label, By locator, FrameElement frame, HtmlElement parentElement, Integer index, Integer replayTimeout) {
 		super(label);
-    	this.by = by;
+		by = ThreadLocal.withInitial(() -> locator);
+		parent = ThreadLocal.withInitial(() -> parentElement);
     	this.elementIndex = index;
-    	this.parent = parent;
 
-    	if (parent != null && frame != null) {
+    	if (getParent() != null && frame != null) {
     		scenarioLogger.error("parent element and frame cannot be set together. If you want to search a element with parent in a frame, define a frame for this parent");
+			frameElement = ThreadLocal.withInitial(() -> null);
     	} else {
-    		this.frameElement.set(frame);
+			frameElement = ThreadLocal.withInitial(() -> frame);
     	}
     	this.replayTimeout = replayTimeout;
 
@@ -597,7 +601,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 
     	for (int i = 0; i < elements.size(); i++) {
     		// frame set to null as we expect the frames are searched in the parent element
-    		htmlElements.add(new HtmlElement("", getBy(), parent, i));
+    		htmlElements.add(new HtmlElement("", getBy(), getParent(), i));
     	}
     	return htmlElements;
     }
@@ -770,19 +774,19 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	
     	// if a parent is defined, search for it before getting the sub element
 		setDriver(updateDriver());
-        if (parent != null) {
-        	parent.findElement(false, false);
+        if (getParent() != null) {
+        	getParent().findElement(false, false);
         	
 			// issue #166: add a dot in front of xpath expression if we search the element
 			// inside a parent
-        	if (by instanceof ByXPath) {
+        	if (getBy() instanceof ByXPath) {
         		try {
 					Field xpathExpressionField = ByXPath.class.getDeclaredField("xpathExpression");
 					xpathExpressionField.setAccessible(true);
-					String xpath = (String)xpathExpressionField.get(by);
+					String xpath = (String)xpathExpressionField.get(getBy());
 					
 					if (xpath.startsWith("//")) {
-						by = By.xpath("." + xpath);
+						setBy(By.xpath("." + xpath));
 					}
 					
 				} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
@@ -791,7 +795,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         		
         	}
         	
-        	searchContext.set(findSeleniumElement(parent.searchContext.get()));
+        	searchContext.set(findSeleniumElement(getParent().searchContext.get()));
         	
 
         } else {
@@ -850,9 +854,9 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     		replaceSelector();
     		
 			if (elementIndex == null) {
-	    		seleniumElement = context.findElement(by);
+	    		seleniumElement = context.findElement(getBy());
 	    	} else {
-	    		seleniumElement = getElementByIndex(context.findElements(by));
+	    		seleniumElement = getElementByIndex(context.findElements(getBy()));
 	    	}
 	    	return seleniumElement;
     	} catch (WebDriverException e) {
@@ -897,14 +901,14 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 					return el;
 				}
 			}
-			throw new NoSuchElementException("no visible element has been found for " + by.toString());
+			throw new NoSuchElementException("no visible element has been found for " + getBy().toString());
     	} else if (elementIndex != null && elementIndex.equals(LAST_VISIBLE)) {
     		for (int counter = allElements.size() - 1; counter >= 0; counter--) {
                 if (allElements.get(counter) instanceof WebElement webElement && webElement.isDisplayed()) {
                     return allElements.get(counter);
                 }
             }
-            throw new NoSuchElementException("no visible element has been found for " + by.toString());
+            throw new NoSuchElementException("no visible element has been found for " + getBy().toString());
     	} else if (elementIndex != null && elementIndex < 0) {
     		return allElements.get(allElements.size() + elementIndex);
     	} else {
@@ -914,7 +918,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     		try {
     			return allElements.get(elementIndex);
     		} catch (IndexOutOfBoundsException e) {
-    			throw new NoSuchElementException(String.format("No element found for locator %s with index %d", by.toString(), elementIndex));
+    			throw new NoSuchElementException(String.format("No element found for locator %s with index %d", getBy().toString(), elementIndex));
     		}
     	}
     }
@@ -937,9 +941,9 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 			WebElement frameWebElement;
 			
 			SearchContext searchContext2;
-			if (frameEl.parent != null) {
-				frameEl.parent.findElement(false, false);
-				searchContext2 = frameEl.parent.getRealElementNoSearch();
+			if (frameEl.getParent() != null) {
+				frameEl.getParent().findElement(false, false);
+				searchContext2 = frameEl.getParent().getRealElementNoSearch();
 			} else {
 				searchContext2 = getDriver();
 			}
@@ -1044,10 +1048,10 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 		findElement(false, false);
 
         // issue #167: if we have a parent, search elements inside it
-        if (parent != null) {
-			return parent.getRealElementNoSearch().findElements(by);
+        if (getParent() != null) {
+			return getParent().getRealElementNoSearch().findElements(getBy());
         } else {
-			return getDriver().findElements(by);
+			return getDriver().findElements(getBy());
         }
     }
 
@@ -1111,7 +1115,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * Returns the BY locator stored in the HtmlElement.
      */
     public By getBy() {
-        return by;
+        return by.get();
     }
 
     /**
@@ -1538,8 +1542,8 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     @Override
     public String toString() {
         String elDescr = getClass().getSimpleName() + " " + getLabel() + ", by={" + getBy().toString() + "}";
-        if (parent != null) {
-        	elDescr += ", sub-element of " + parent;
+        if (getParent() != null) {
+        	elDescr += ", sub-element of " + getParent();
         }
         return elDescr;
     }
@@ -1724,7 +1728,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	 * @return	the updated element
 	 */
 	@SuppressWarnings("unchecked")
-	public <T extends HtmlElement> T changeFrame(FrameElement frameElement, Class<T> type) {
+	public <T extends HtmlElement> T changeFrame(FrameElement frameElement) {
 		setFrameElement(frameElement);
 
 		return (T)this;
@@ -1757,15 +1761,15 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	}
 	
 	public HtmlElement getParent() {
-		return parent;
+		return parent.get();
 	}
 
 	public void setParent(HtmlElement parent) {
-		this.parent = parent;
+		this.parent.set(parent);
 	}
 
 	public void setBy(By by) {
-		this.by = by;
+		this.by.set(by);
 	}
 
 	/**

@@ -24,6 +24,7 @@ import java.util.List;
 
 import com.seleniumtests.MockitoTestListener;
 import com.seleniumtests.it.driver.support.pages.*;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
@@ -135,7 +136,7 @@ public class StubTestClassForDriverTest extends StubParentClass {
 
 	@Test(groups = "stub")
 	public void testFrameDefinition1() {
-		DriverMultipleFrameDefinitionsPage page = new DriverMultipleFrameDefinitionsPage(BrowserType.CHROME);
+		DriverMultipleElementDefinitionsPage page = new DriverMultipleElementDefinitionsPage(BrowserType.CHROME);
 		page.setFrame();
 
 		for (int i = 0; i < 10; i++) {
@@ -147,13 +148,61 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	}
 	@Test(groups = "stub")
 	public void testFrameDefinition2() {
-		DriverMultipleFrameDefinitionsPage page = new DriverMultipleFrameDefinitionsPage(BrowserType.CHROME);
+		DriverMultipleElementDefinitionsPage page = new DriverMultipleElementDefinitionsPage(BrowserType.CHROME);
 		page.setFrame2();
 
 		for (int i = 0; i < 10; i++) {
 			WaitHelper.waitForSeconds(2);
 			logger.info(String.format("get text 2.%d", i));
 			Assert.assertEquals(page._getText(), "a value in iframe 2");
+		}
+	}
+
+	@Test(groups = "stub")
+	public void testParentDefinition1() {
+		DriverMultipleElementDefinitionsPage page = new DriverMultipleElementDefinitionsPage(BrowserType.CHROME);
+		page.setParent1();
+
+		for (int i = 0; i < 10; i++) {
+			WaitHelper.waitForSeconds(1);
+			logger.info(String.format("get text 1.%d", i));
+			Assert.assertEquals(page._getButtonText(), "Submit1");
+		}
+
+	}
+	@Test(groups = "stub")
+	public void testParentDefinition2() {
+		DriverMultipleElementDefinitionsPage page = new DriverMultipleElementDefinitionsPage(BrowserType.CHROME);
+		page.setParent2();
+
+		for (int i = 0; i < 10; i++) {
+			WaitHelper.waitForSeconds(1);
+			logger.info(String.format("get text 2.%d", i));
+			Assert.assertEquals(page._getButtonText(), "Submit2");
+		}
+	}
+
+	@Test(groups = "stub")
+	public void testLocatorDefinition1() {
+		DriverMultipleElementDefinitionsPage page = new DriverMultipleElementDefinitionsPage(BrowserType.CHROME);
+		page.setParent1();
+
+		for (int i = 0; i < 10; i++) {
+			WaitHelper.waitForSeconds(1);
+			logger.info(String.format("get text 1.%d", i));
+			Assert.assertEquals(DriverMultipleElementDefinitionsPage.parent1.getAttribute("data-title"), "parent1");
+		}
+
+	}
+	@Test(groups = "stub")
+	public void testLocatorDefinition2() {
+		new DriverMultipleElementDefinitionsPage(BrowserType.CHROME);
+		DriverMultipleElementDefinitionsPage.parent1.setBy(By.id("parent2"));
+
+		for (int i = 0; i < 10; i++) {
+			WaitHelper.waitForSeconds(1);
+			logger.info(String.format("get text 2.%d", i));
+			Assert.assertEquals(DriverMultipleElementDefinitionsPage.parent1.getAttribute("data-title"), "parent2");
 		}
 	}
 	
