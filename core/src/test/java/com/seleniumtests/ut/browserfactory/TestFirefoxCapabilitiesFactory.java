@@ -20,8 +20,13 @@ package com.seleniumtests.ut.browserfactory;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.openqa.selenium.MutableCapabilities;
@@ -337,14 +342,20 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 	}
 
 
+
 	@Test(groups={"ut"})
 	public void testCreateFirefoxCapabilitiesDownloadDriverPathLocal() {
-		when(config.getMode()).thenReturn(DriverMode.LOCAL);
-		when(config.getDownloadDrivers()).thenReturn(true);
+		try (MockedStatic<Files> mockedFiles = mockStatic(Files.class)) {
+			when(config.getMode()).thenReturn(DriverMode.LOCAL);
+			when(config.getDownloadDrivers()).thenReturn(true);
 
-		new FirefoxCapabilitiesFactory(config).createCapabilities();
+			new FirefoxCapabilitiesFactory(config).createCapabilities();
 
-		Assert.assertNull(System.getProperty(GeckoDriverService.GECKO_DRIVER_EXE_PROPERTY));
+			Assert.assertNull(System.getProperty(GeckoDriverService.GECKO_DRIVER_EXE_PROPERTY));
+			ArgumentCaptor<Path> pathArgumentCaptor = ArgumentCaptor.forClass(Path.class);
+			mockedFiles.verify(() -> Files.createDirectories(pathArgumentCaptor.capture()));
+			Assert.assertTrue(pathArgumentCaptor.getValue().toString().replace("\\", "/").contains(".cache/selenium"));
+		}
 	}
 	
 	@Test(groups={"ut"})

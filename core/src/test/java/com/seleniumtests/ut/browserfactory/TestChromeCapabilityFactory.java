@@ -17,17 +17,20 @@
  */
 package com.seleniumtests.ut.browserfactory;
 
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import org.apache.commons.io.FileUtils;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -424,12 +427,18 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 
 	@Test(groups={"ut"})
 	public void testCreateChromeCapabilitiesDownloadDriverPathLocal() {
-		when(config.getMode()).thenReturn(DriverMode.LOCAL);
-		when(config.getDownloadDrivers()).thenReturn(true);
+		try (MockedStatic<Files> mockedFiles = mockStatic(Files.class)) {
+			when(config.getMode()).thenReturn(DriverMode.LOCAL);
+			when(config.getDownloadDrivers()).thenReturn(true);
+			mockedFiles.when(() -> Files.createDirectories(eq(Paths.get(SeleniumTestsContextManager.getThreadContext().getDownloadOutputDirectory())))).thenCallRealMethod();
 
-		new ChromeCapabilitiesFactory(config).createCapabilities();
+			new ChromeCapabilitiesFactory(config).createCapabilities();
 
-		Assert.assertNull(System.getProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY));
+			Assert.assertNull(System.getProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY));
+			ArgumentCaptor<Path> pathArgumentCaptor = ArgumentCaptor.forClass(Path.class);
+			mockedFiles.verify(() -> Files.createDirectories(pathArgumentCaptor.capture()), times(2));
+			Assert.assertTrue(pathArgumentCaptor.getAllValues().get(1).toString().replace("\\", "/").contains(".cache/selenium"));
+		}
 	}
 	
 	@Test(groups={"ut"})

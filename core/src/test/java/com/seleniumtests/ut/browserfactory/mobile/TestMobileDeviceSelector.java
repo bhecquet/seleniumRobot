@@ -17,13 +17,17 @@
  */
 package com.seleniumtests.ut.browserfactory.mobile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 import io.appium.java_client.android.options.UiAutomator2Options;
 import io.appium.java_client.remote.options.BaseOptions;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.remote.CapabilityType;
@@ -257,21 +261,27 @@ public class TestMobileDeviceSelector extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testCapabilitiesUpdateWithDriverWithDownloadEnabled() {
-		// available devices
-		List<MobileDevice> deviceList = new ArrayList<>();
-		BrowserInfo chromeInfo = new BrowserInfo(BrowserType.CHROME, "47.0", null);
-		chromeInfo.setDriverFileName("chromedriver.exe");
-		deviceList.add(new MobileDevice("nexus 5", "1234", "android", "5.0", List.of(chromeInfo)));
-		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
 
-		UiAutomator2Options requestedCaps = new UiAutomator2Options();
-		requestedCaps.setDeviceName("Nexus 5").withBrowserName("chrome");
+		try (MockedStatic<Files> mockedFiles = mockStatic(Files.class)) {
+			// available devices
+			List<MobileDevice> deviceList = new ArrayList<>();
+			BrowserInfo chromeInfo = new BrowserInfo(BrowserType.CHROME, "47.0", null);
+			chromeInfo.setDriverFileName("chromedriver.exe");
+			deviceList.add(new MobileDevice("nexus 5", "1234", "android", "5.0", List.of(chromeInfo)));
+			when(adbWrapper.getDeviceList()).thenReturn(deviceList);
 
-		deviceSelector.setAndroidReady(true);
-		deviceSelector.setIosReady(false);
+			UiAutomator2Options requestedCaps = new UiAutomator2Options();
+			requestedCaps.setDeviceName("Nexus 5").withBrowserName("chrome");
 
-		UiAutomator2Options updatedCaps = new UiAutomator2Options(deviceSelector.updateCapabilitiesWithSelectedDevice(new MutableCapabilities(requestedCaps), DriverMode.LOCAL, true));
-		Assert.assertNull(updatedCaps.getChromedriverExecutable().orElse(null));
+			deviceSelector.setAndroidReady(true);
+			deviceSelector.setIosReady(false);
+
+			UiAutomator2Options updatedCaps = new UiAutomator2Options(deviceSelector.updateCapabilitiesWithSelectedDevice(new MutableCapabilities(requestedCaps), DriverMode.LOCAL, true));
+			Assert.assertNull(updatedCaps.getChromedriverExecutable().orElse(null));
+			ArgumentCaptor<Path> pathArgumentCaptor = ArgumentCaptor.forClass(Path.class);
+			mockedFiles.verify(() -> Files.createDirectories(pathArgumentCaptor.capture()));
+			Assert.assertTrue(pathArgumentCaptor.getValue().toString().replace("\\", "/").contains(".cache/selenium"));
+		}
 
 	}
 

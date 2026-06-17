@@ -17,19 +17,21 @@
  */
 package com.seleniumtests.ut.browserfactory;
 
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
-import com.seleniumtests.browserfactory.ChromeCapabilitiesFactory;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.openqa.selenium.*;
-import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.edge.EdgeDriverService;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.remote.CapabilityType;
@@ -425,12 +427,18 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 
 	@Test(groups={"ut"})
 	public void testCreateEdgeCapabilitiesDownloadDriverPathLocal() {
-		when(config.getMode()).thenReturn(DriverMode.LOCAL);
-		when(config.getDownloadDrivers()).thenReturn(true);
+		try (MockedStatic<Files> mockedFiles = mockStatic(Files.class)) {
+			when(config.getMode()).thenReturn(DriverMode.LOCAL);
+			when(config.getDownloadDrivers()).thenReturn(true);
+			mockedFiles.when(() -> Files.createDirectories(eq(Paths.get(SeleniumTestsContextManager.getThreadContext().getDownloadOutputDirectory())))).thenCallRealMethod();
 
-		new EdgeCapabilitiesFactory(config).createCapabilities();
+			new EdgeCapabilitiesFactory(config).createCapabilities();
 
-		Assert.assertNull(System.getProperty(EdgeDriverService.EDGE_DRIVER_EXE_PROPERTY));
+			Assert.assertNull(System.getProperty(EdgeDriverService.EDGE_DRIVER_EXE_PROPERTY));
+			ArgumentCaptor<Path> pathArgumentCaptor = ArgumentCaptor.forClass(Path.class);
+			mockedFiles.verify(() -> Files.createDirectories(pathArgumentCaptor.capture()), times(2));
+			Assert.assertTrue(pathArgumentCaptor.getAllValues().get(1).toString().replace("\\", "/").contains(".cache/selenium"));
+		}
 	}
 
 	@Test(groups={"ut"})
