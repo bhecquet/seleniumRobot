@@ -470,8 +470,8 @@ public class ImageDetector {
 			
 			if (debug) {
 				try {
-					Imgproc.rectangle(sceneImageMat, new Point(detectedRectangle.x, detectedRectangle.y), new Point(detectedRectangle.x + detectedRectangle.width,
-						detectedRectangle.y + detectedRectangle.height), new Scalar(0, 255, 0));
+					Imgproc.rectangle(sceneImageMat, new Point(detectedRectangle.x, detectedRectangle.y), new Point(detectedRectangle.x + (double)detectedRectangle.width,
+						detectedRectangle.y + (double)detectedRectangle.height), new Scalar(0, 255, 0));
 				
 					showResultingPicture(sceneImageMat);
 				} catch (IOException e) {
