@@ -949,16 +949,39 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	 */
 	@Test(groups={"it"})
 	public void testIncreaseMaxRetryInAfterConfig() throws Exception {
-		
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForListener6.testIncreaseMaxRetryInAfterTestMethod"}, "", "stub1");
-		
-		String logs = readSeleniumRobotLogFile();
-		
-		// assert 5 execution (nominal + 4 retries) has been performed (2* default retry count (2))
-		Assert.assertEquals(StringUtils.countMatches(logs, "SeleniumRobotTestListener: Start method testIncreaseMaxRetryInAfterTestMethod"), 3);
-		
-		// check "increaseMaxRetry" cannot be called outside test method
-		Assert.assertTrue(logs.contains("SeleniumRobotTestListener: RetryAnalyzer is null, 'increaseMaxRetry' can be called only inside test methods"));
+
+		try {
+			System.setProperty("increaseMaxRetryInAfterMethod", "true");
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForListener6.testIncreaseMaxRetryInConfigurationMethod"}, "", "stub1");
+
+			String logs = readSeleniumRobotLogFile();
+
+			// assert 3 execution (nominal + 2 retries) has been performed (default retry count (2))
+			Assert.assertEquals(StringUtils.countMatches(logs, "SeleniumRobotTestListener: Start method testIncreaseMaxRetryInConfigurationMethod"), 3);
+
+		} finally {
+			System.clearProperty("increaseMaxRetryInAfterMethod");
+		}
+	}
+
+	/**
+	 * Check we can increase max retry outside a test method
+	 */
+	@Test(groups={"it"})
+	public void testIncreaseMaxRetryInBeforeConfig() throws Exception {
+
+		try {
+			System.setProperty("increaseMaxRetryInBeforeMethod", "true");
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForListener6.testIncreaseMaxRetryInConfigurationMethod"}, "", "stub1");
+
+			String logs = readSeleniumRobotLogFile();
+
+			// assert 3 execution (nominal + 2 retries) has been performed (default retry count (2))
+			Assert.assertEquals(StringUtils.countMatches(logs, "SeleniumRobotTestListener: Start method testIncreaseMaxRetryInConfigurationMethod"), 5);
+
+		} finally {
+			System.clearProperty("increaseMaxRetryInBeforeMethod");
+		}
 	}
 	
 

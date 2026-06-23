@@ -152,6 +152,7 @@ public class SeleniumTestsContext {
 
     public static final String SOFT_ASSERT_ENABLED = "softAssertEnabled";		// le test ne s'arrête pas lorsqu'une assertion est rencontrée
     public static final String TEST_RETRY_COUNT = "testRetryCount";				// number of times the test can be retried
+    public static final String EFFECTIVE_TEST_RETRY_COUNT = "effectiveTestRetryCount";				// number of times the test can be retried
     public static final String MAX_SKIPPED_ON_GRID_FAILURE = "maxSkippedOnGridFailure"; // number of times we accept to skip test when node cannot be found. Default to 3
     
     public static final String OVERRIDE_SELENIUM_NATIVE_ACTION = "overrideSeleniumNativeAction";	// intercept driver.findElement and driver.frame operations to move to HtmlElement methods 
@@ -1441,6 +1442,13 @@ public class SeleniumTestsContext {
     	return (Integer) getAttribute(TEST_RETRY_COUNT);
     }
 
+    /**
+     * Returns the number of allowed retries. It's at least 'testRetryCount' value, but may be increased by 'increaseMaxRetry' method
+     */
+    public Integer getEffectiveTestRetryCount() {
+        return (Integer) Objects.requireNonNullElse(getAttribute(EFFECTIVE_TEST_RETRY_COUNT), getTestRetryCount());
+    }
+
 	public Integer getMaxSkippedOnGridFailure() {
     	return (Integer) getAttribute(MAX_SKIPPED_ON_GRID_FAILURE);
     }
@@ -2170,6 +2178,11 @@ public class SeleniumTestsContext {
     public void setTestRetryCount(Integer retry) {
         setAttribute(TEST_RETRY_COUNT, Objects.requireNonNullElse(retry, DEFAULT_TEST_RETRY_COUNT));
     }
+
+    public void setEffectiveRetryCount(Integer retry) {
+        setAttribute(EFFECTIVE_TEST_RETRY_COUNT, Objects.requireNonNullElse(retry, getTestRetryCount()));
+    }
+
     public void setMaxSkippedOnGridFailure(Integer maxSkipped) {
         setAttribute(MAX_SKIPPED_ON_GRID_FAILURE, Objects.requireNonNullElse(maxSkipped, DEFAULT_MAX_SKIPPED_ON_GRID_FAILURE));
     }

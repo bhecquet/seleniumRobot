@@ -45,16 +45,8 @@ public class TestRetryAnalyzer implements IRetryAnalyzer {
     	maxCount = maxRetryCount;
     }
 
-    public void setMaxCount(final int count) {
-        this.maxCount = count;
-    }
-
     public int getCount() {
         return this.count;
-    }
-
-    public int getMaxCount() {
-        return this.maxCount;
     }
 
     /**
@@ -69,7 +61,7 @@ public class TestRetryAnalyzer implements IRetryAnalyzer {
     	TestNGResultUtils.setRetry(result, count);
     	TestNGResultUtils.setNoMoreRetry(result, false);
 
-        if (count < maxCount) {
+        if (count < TestNGResultUtils.getSeleniumRobotTestContext(result).getEffectiveTestRetryCount()) {
         	
         	count++;
         	if (result.getThrowable() instanceof AssertionError) {
@@ -91,7 +83,7 @@ public class TestRetryAnalyzer implements IRetryAnalyzer {
         } 
         count++;
         
-        logger.log(String.format("[NOT RETRYING] max retry count (%d) reached", maxCount));
+        logger.log(String.format("[NOT RETRYING] max retry count (%d) reached", TestNGResultUtils.getSeleniumRobotTestContext(result).getEffectiveTestRetryCount()));
 
 
     	TestNGResultUtils.setNoMoreRetry(result, true);

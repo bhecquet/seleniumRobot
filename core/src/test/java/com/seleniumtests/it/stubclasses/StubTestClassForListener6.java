@@ -20,10 +20,7 @@ package com.seleniumtests.it.stubclasses;
 import java.lang.reflect.Method;
 
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 import org.testng.xml.XmlTest;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -43,18 +40,24 @@ public class StubTestClassForListener6 extends StubTestClassForListenerParent {
 		increaseMaxRetry();
 		throw new IndexOutOfBoundsException("error in count");
 	}
+
+	@BeforeMethod(groups={"stub1"})
+	public void beforeMethod(Method method, XmlTest xmlTest) {
+
+		if ("true".equals(System.getProperty("increaseMaxRetryInBeforeMethod"))) {
+			increaseMaxRetry();
+		}
+	}
 	
 	@Test(groups="stub1")
-	public void testIncreaseMaxRetryInAfterTestMethod() {
-		SeleniumTestsContextManager.getThreadContext().setAttribute("increase after method", true);
-		
+	public void testIncreaseMaxRetryInConfigurationMethod() {
 		throw new IndexOutOfBoundsException("error in count");
 	}
 	
 	@AfterMethod(groups={"stub1"})
 	public void afterMethod(Method method, XmlTest xmlTest) {
-		
-		if (Boolean.TRUE.equals(SeleniumTestsContextManager.getThreadContext().getAttribute("increase after method"))) {
+
+		if ("true".equals(System.getProperty("increaseMaxRetryInAfterMethod"))) {
 			increaseMaxRetry();
 		}
 	}

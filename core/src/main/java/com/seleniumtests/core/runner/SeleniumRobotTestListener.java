@@ -632,24 +632,15 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	/**
      * Allow to increment the maxRetry in case an event occurs
      * Increment will be allowed up to 2 times the total defined by configuration (default is 2)
+	 * It's not possible to increase 1 by 1 in BeforeMethod methods, because context is recreated on each execution,
+	 * so we increase to the maximum value directly
      */
 	public static void increaseMaxRetry() {
-		int maxAllowedRetry = Math.max(SeleniumTestsContextManager.getThreadContext().getTestRetryCount() * 2, SeleniumTestsContext.DEFAULT_TEST_RETRY_COUNT);
-    	
-    	try {
-    		TestRetryAnalyzer retryAnalyzer = (TestRetryAnalyzer)Reporter.getCurrentTestResult().getMethod().getRetryAnalyzer(Reporter.getCurrentTestResult());
-    		
-    		if (retryAnalyzer == null) {
-    			logger.info("RetryAnalyzer is null, 'increaseMaxRetry' can be called only inside test methods");
-    		} else if (retryAnalyzer.getMaxCount() < maxAllowedRetry) {
-        		retryAnalyzer.setMaxCount(retryAnalyzer.getMaxCount() + 1);
-        	} else {
-        		logger.info("cannot increase max retry, limit is reached");
-        	}
-	    } catch (ClassCastException e) {
-			logger.error("Retry analyzer is not a TestRetryAnalyzer instance");
-		} catch (NullPointerException e) {
-			logger.error("RetryAnalyzer is null, 'increaseMaxRetry' can be called only inside test methods");
+		SeleniumTestsContext context = SeleniumTestsContextManager.getThreadContext();
+		int maxAllowedRetry = Math.max(context.getTestRetryCount() * 2, SeleniumTestsContext.DEFAULT_TEST_RETRY_COUNT);
+
+		if (context.getEffectiveTestRetryCount() < maxAllowedRetry) {
+			context.setEffectiveRetryCount(maxAllowedRetry);
 		}
 	}
 
