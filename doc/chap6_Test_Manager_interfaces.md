@@ -25,6 +25,7 @@
 
 ## 0 SeleniumRobot Server ##
 SeleniumRobot server [https://github.com/bhecquet/seleniumRobot-server](https://github.com/bhecquet/seleniumRobot-server) is a server which aims to be used with SeleniumRobot, giving the following features:
+- secure sensible data (instead of putting them in code or configuration files)
 - handle test variables: instead of setting test data into env.ini file, they can be set in server, which offers more features when sharing values among test projects
 - compare snapshots: as Seleniumrobot takes snapshots, it's able to send them to server which can compare with the same step of the same test executed previously
 - record test results: Even if test results are recorded in a test manager, the full result format with snapshots may not be available directly
