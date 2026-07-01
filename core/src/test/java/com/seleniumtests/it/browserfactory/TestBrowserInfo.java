@@ -17,6 +17,8 @@
  */
 package com.seleniumtests.it.browserfactory;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.SystemUtils;
@@ -119,7 +121,7 @@ public class TestBrowserInfo extends GenericDriverTest {
 		// there should be one PID for the driver server
 		List<Long> pids = driver.getDriverPids();
 		Assert.assertEquals(driver.getDriverPids().size(), 1);
-		Assert.assertTrue(OSUtilityFactory.getInstance().getProgramNameFromPid((Long)pids.get(0)).contains("IEDriverServer"));
+		Assert.assertTrue(OSUtilityFactory.getInstance().getProgramNameFromPid((Long)pids.getFirst()).contains("IEDriverServer"));
 	}
 	
 	@Test(groups={"it"})
@@ -131,7 +133,7 @@ public class TestBrowserInfo extends GenericDriverTest {
 		// there should be one PID for the driver server
 		List<Long> pids = driver.getDriverPids();
 		Assert.assertEquals(driver.getDriverPids().size(), 1);
-		Assert.assertTrue(OSUtilityFactory.getInstance().getProgramNameFromPid((Long)pids.get(0)).contains("chromedriver"));
+		Assert.assertTrue(OSUtilityFactory.getInstance().getProgramNameFromPid((Long)pids.getFirst()).contains("chromedriver"));
 	}
 	
 	@Test(groups={"it"})
@@ -143,7 +145,7 @@ public class TestBrowserInfo extends GenericDriverTest {
 		// there should be one PID for the driver server
 		List<Long> pids = driver.getDriverPids();
 		Assert.assertEquals(driver.getDriverPids().size(), 1);
-		Assert.assertTrue(OSUtilityFactory.getInstance().getProgramNameFromPid((Long)pids.get(0)).contains("geckodriver"));
+		Assert.assertTrue(OSUtilityFactory.getInstance().getProgramNameFromPid((Long)pids.getFirst()).contains("geckodriver"));
 	}
 	
 
@@ -159,5 +161,84 @@ public class TestBrowserInfo extends GenericDriverTest {
 		// one pid for driver and at least one for browser (chrome starts several processes)
 		Assert.assertTrue(allPids.size() >= 2);
 	}
+	
+	/**
+     * Test that getChildProcessPid returns child processes of the driver process.
+     * When a browser is started, the driver process (e.g. chromedriver) spawns browser sub-processes.
+     */
+    @Test(groups = {"it"})
+    public void testGetChildProcessPid(final ITestContext testNGCtx) throws IOException {
+        initThreadContext(testNGCtx);
+        SeleniumTestsContextManager.getThreadContext().setBrowser("*chrome");
+        driver = WebUIDriver.getWebDriver(true);
+
+        List<Long> driverPids = driver.getDriverPids();
+        Assert.assertFalse(driverPids.isEmpty(), "Driver PIDs should not be empty");
+
+        // Get child processes of the driver process (chromedriver), without filtering by name
+        Long driverPid = driverPids.get(0);
+        List<Long> childPids = OSUtilityFactory.getInstance().getChildProcessPid(driverPid, null, new ArrayList<>());
+
+        // chromedriver should have spawned at least one child process (the browser itself)
+        Assert.assertFalse(childPids.isEmpty(), "chromedriver should have at least one child process");
+
+        // Verify that the driver PID itself is not in the child list
+        Assert.assertFalse(childPids.contains(driverPid), "Child PIDs should not contain the parent PID");
+    }
+
+    /**
+     * Test that getChildProcessPid filters by process name correctly
+     */
+    @Test(groups = {"it"})
+    public void testGetChildProcessPidFilteredByName(final ITestContext testNGCtx) throws IOException {
+        initThreadContext(testNGCtx);
+        SeleniumTestsContextManager.getThreadContext().setBrowser("*chrome");
+        driver = WebUIDriver.getWebDriver(true);
+
+        List<Long> driverPids = driver.getDriverPids();
+        Long driverPid = driverPids.get(0);
+
+        // Search for chrome child processes by name
+        String chromeBinaryName = SystemUtils.IS_OS_WINDOWS ? "chrome.exe" : "chrome";
+        List<Long> chromePids = OSUtilityFactory.getInstance().getChildProcessPid(driverPid, chromeBinaryName, new ArrayList<>());
+
+        // chromedriver should have spawned at least one chrome process
+        Assert.assertFalse(chromePids.isEmpty(), "There should be at least one chrome child process");
+    }
+
+    /**
+     * Test that getChildProcessPid excludes existing PIDs
+     */
+    @Test(groups = {"it"})
+    public void testGetChildProcessPidExcludesExistingPids(final ITestContext testNGCtx) throws IOException {
+        initThreadContext(testNGCtx);
+        SeleniumTestsContextManager.getThreadContext().setBrowser("*chrome");
+        driver = WebUIDriver.getWebDriver(true);
+
+        List<Long> driverPids = driver.getDriverPids();
+        Long driverPid = driverPids.get(0);
+
+        // First, get all child PIDs
+        List<Long> allChildPids = OSUtilityFactory.getInstance().getChildProcessPid(driverPid, null, new ArrayList<>());
+        Assert.assertFalse(allChildPids.isEmpty(), "Should have child processes");
+
+        // Now get child PIDs excluding the ones we already found
+        List<Long> newChildPids = OSUtilityFactory.getInstance().getChildProcessPid(driverPid, null, allChildPids);
+
+        // All previously found PIDs should be excluded
+        for (Long pid : allChildPids) {
+            Assert.assertFalse(newChildPids.contains(pid), "Existing PID " + pid + " should be excluded");
+        }
+    }
+
+    /**
+     * Test that getChildProcessPid returns empty list for an invalid/non-existent parent PID
+     */
+    @Test(groups = {"it"})
+    public void testGetChildProcessPidWithInvalidParent() throws IOException {
+        // Use a PID that is very unlikely to exist
+        List<Long> childPids = OSUtilityFactory.getInstance().getChildProcessPid(999999999L, null, new ArrayList<>());
+        Assert.assertTrue(childPids.isEmpty(), "Invalid parent PID should return empty list");
+    }
 
 }

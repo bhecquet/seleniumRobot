@@ -44,7 +44,9 @@ public class OSUtilityWindows extends OSUtility {
 	private static final String MSEDGE_EXE = "msedge.exe";
 	private static final String EXE_EXT_QUOTE = ".exe\"";
 	private static final String KEY_VERSION = "version";
+	private static final String VERSION = "Version";
 	public static final String TASKKILL_PROCESS = "taskkill";
+	public static final String TASKLIST_PROCESS = "tasklist";
 	Pattern versionPattern = Pattern.compile(".*?(\\d++\\.\\d++\\.\\d++).*?");
 		
 	@Override
@@ -52,7 +54,7 @@ public class OSUtilityWindows extends OSUtility {
 
         String output = OSCommand.executeCommandAndWait(new String[] {"reg", "query", "HKLM\\Software\\Microsoft\\Internet Explorer", "/v", "svcVersion"});
         if (output.split("\n").length < 3) {
-            output = OSCommand.executeCommandAndWait(new String[] {"reg", "query", "HKLM\\Software\\Microsoft\\Internet Explorer", "/v", "Version"});
+            output = OSCommand.executeCommandAndWait(new String[] {"reg", "query", "HKLM\\Software\\Microsoft\\Internet Explorer", "/v", VERSION});
         }
 
         String internetExplorerValue = output.split("\n")[2];
@@ -103,13 +105,7 @@ public class OSUtilityWindows extends OSUtility {
     @Override
     public String killProcess(String pid, boolean force) {
 
-    	if (force) {
-    		try {
-    			OSCommand.executeCommand(new String[] {"wmic", "process", "where", String.format("\"processid='%s'\"", pid), "delete"});
-    			return "Done";
-    		} catch (Exception e) {
-    			// use an other mean if wmic fails
-    		}
+    	if (force) {    		
     		OSCommand.executeCommand(new String[] {TASKKILL_PROCESS, "/F", "/PID", pid});
     	} else {
     		OSCommand.executeCommand(new String[] {TASKKILL_PROCESS, "/PID", pid});
@@ -124,13 +120,7 @@ public class OSUtilityWindows extends OSUtility {
      */
 	@Override
 	public String killProcessByName(String programName, boolean force) {
-		if (force) {
-			try {
-    			OSCommand.executeCommand(new String[] {"wmic", "process", "where", String.format("\"name='%s'\"", programName + getProgramExtension()), "delete"});
-    			return "Done";
-    		} catch (Exception e) {
-    			// use an other mean if wmic fails
-    		}
+		if (force) {			
 			OSCommand.executeCommand(new String[] {TASKKILL_PROCESS, "/F", "/IM", programName + getProgramExtension()});
     	} else {
     		OSCommand.executeCommand(new String[] {TASKKILL_PROCESS, "/IM", programName + getProgramExtension()});
@@ -207,11 +197,11 @@ public class OSUtilityWindows extends OSUtility {
 	}
 
 	private String getEdgeVersionFromRegistry() {
-		return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", "Version");
+		return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge", VERSION);
 	}
 	
 	private String getEdgeBetaVersionFromRegistry() {
-		return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge Beta", "Version");
+		return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Microsoft Edge Beta", VERSION);
 	}
 	
 	private String getWindowsBetaEdgeVersion(String edgeBetaPath) {
@@ -285,13 +275,9 @@ public class OSUtilityWindows extends OSUtility {
 			
 			for (String firefoxPath: searchFirefoxVersions()) {
 				String version = getFirefoxVersion(firefoxPath);
-				try {
-					browserList.get(BrowserType.FIREFOX).add(new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), firefoxPath));
-				} catch (ConfigurationException e) {
-					// ignore
-				}
+				browserList.get(BrowserType.FIREFOX).add(new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), firefoxPath));
 			}
-		} catch (IndexOutOfBoundsException e) {
+		} catch (IndexOutOfBoundsException | ConfigurationException e) {
 			// ignore
 		}
 
@@ -326,7 +312,7 @@ public class OSUtilityWindows extends OSUtility {
 			Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "");
 			String version = getIeVersionFromRegistry();
 			
-			browserList.put(BrowserType.INTERNET_EXPLORER, Arrays.asList(new BrowserInfo(BrowserType.INTERNET_EXPLORER, extractIEVersion(version), null)));
+			browserList.put(BrowserType.INTERNET_EXPLORER, List.of(new BrowserInfo(BrowserType.INTERNET_EXPLORER, extractIEVersion(version), null)));
 		} catch (Win32Exception | ConfigurationException e) {
 			logger.warn("Error searching Internet explorer installations: {}", e.getMessage());
 		}
@@ -376,8 +362,8 @@ public class OSUtilityWindows extends OSUtility {
 	}
 
 	/**
-	 * @param chromePath
-	 * @return
+	 * @param chromePath path to chrome
+	 * @return version for chrome
 	 */
 	private String getWindowsChromeVersion(String chromePath) {
 		String version;
@@ -407,34 +393,44 @@ public class OSUtilityWindows extends OSUtility {
 
 	@Override
 	public List<Long> getChildProcessPid(Long parentProcess, String processName, List<Long> existingPids) {
-		Process process = OSCommand.executeCommand(new String[] {"wmic", "process", "where", String.format("ParentProcessId=%d", parentProcess), "get", "Caption,ProcessId"});
-		Scanner scan = new Scanner(process.getInputStream());
-        scan.useDelimiter("\\A");
-        String childProcessIds =  scan.hasNext() ? scan.next() : "";
-        List<Long> namedSubprocesses = new ArrayList<>();
-        String[] splited = childProcessIds.split("\\s+");
-        for(int i =0 ; i<splited.length; i = i+2){
-        	Long pid;
-        	try {
-        		pid = Long.parseLong(splited[i+1]);
-        	} catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-        		continue;
-        	}
-            if((processName == null || processName.equalsIgnoreCase(splited[i])) && !existingPids.contains(pid)) {
-            	namedSubprocesses.add(pid);
-            }
+		Optional<ProcessHandle> parentOpt = ProcessHandle.of(parentProcess);
+        if (parentOpt.isEmpty()) {
+            return new ArrayList<>();
         }
-       
-        scan.close();
-        
-        return namedSubprocesses;
+
+        List<Long> childPids = new ArrayList<>();
+        parentOpt.get().descendants().forEach(ph -> {
+            long pid = ph.pid();
+            if (existingPids.contains(pid)) {
+                return;
+            }
+
+            if (processName == null) {
+                childPids.add(pid);
+                return;
+            }
+
+            String cmd = ph.info().command().orElse("");
+            String name = cmd.isEmpty() ? "" : Paths.get(cmd).getFileName().toString();
+            if (processName.equalsIgnoreCase(name)) {
+                childPids.add(pid);
+            }
+        });
+
+        return childPids;
 	}
 
 	@Override
 	public String getProgramNameFromPid(Long pid) {
-		String[] processNames = OSCommand.executeCommandAndWait(new String[] {"wmic", "process", "where", String.format("processId=%d", pid), "get", "name"}).trim().split("\n");
-		String processName = processNames[processNames.length - 1];
-		return processName.endsWith(".exe") ? processName: "";
+		String processName = OSCommand.executeCommandAndWait(new String[]{
+                TASKLIST_PROCESS,
+                "/fo",
+                "csv",
+                "/fi",
+                String.format("pid eq %s", pid),
+                "/nh"
+        }).trim().split(",")[0].replace("\"", "");
+        return processName.endsWith(".exe") ? processName : "";
 	}
 	
 	@Override
@@ -466,7 +462,7 @@ public class OSUtilityWindows extends OSUtility {
 	 * Set the proxy at system level
 	 * This may be used when proxy configuration is blocked at browser level
 	 *
-	 * For information: https://stackoverflow.com/questions/1564627/how-to-set-automatic-configuration-script-for-a-dial-up-connection-programmati
+	 * For information: <a href="http://stackoverflow.com/questions/1564627/how-to-set-automatic-configuration-script-for-a-dial-up-connection-programmati">SOF link</a>
 	 * HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Connections registry key has values for all connections that are defined in 'Internet Options' and for LAN settings too (DefaultConnectionSettings is for LAN). The values are byte arrays and here is the description of every byte:
 		1) Byte number zero always has a 3C or 46 - I couldnt find more information about this byte.The next three bytes are zeros.
 		2) Byte number 4 is a counter used by the 'Internet Options' property sheet (Internet explorer->Tools->Internet Options...). 
@@ -501,7 +497,7 @@ public class OSUtilityWindows extends OSUtility {
 	        String proxyExclusion = Configuration.get("proxyExclude");
 	
 	        // Build string
-	        // http://stackoverflow.com/questions/1564627/how-to-set-automatic-configuration-script-for-a-dial-up-connection-programmati
+	        // <a href="http://stackoverflow.com/questions/1564627/how-to-set-automatic-configuration-script-for-a-dial-up-connection-programmati">SOF link</a>
 	        String hexString = "460000001800000003000000";
 	
 	        try {
@@ -541,9 +537,12 @@ public class OSUtilityWindows extends OSUtility {
 
 	 */
 	public void setSystemProxy(Proxy proxy) {
-		String autoConfigUrl = proxy.getProxyAutoconfigUrl() == null ? "": proxy.getProxyAutoconfigUrl();
-        String proxyUrl = proxy.getHttpProxy() == null ? "": proxy.getHttpProxy();
-        String proxyExclusion = proxy.getNoProxy() == null ? "": proxy.getNoProxy();
+		String rawAutoConfigUrl = proxy.getProxyAutoconfigUrl();
+		String autoConfigUrl = rawAutoConfigUrl == null ? "": rawAutoConfigUrl;
+		String rawProxyUrl = proxy.getHttpProxy();
+        String proxyUrl = rawProxyUrl == null ? "": rawProxyUrl;
+        String rawProxyExclusion = proxy.getNoProxy();
+        String proxyExclusion = rawProxyExclusion == null ? "": rawProxyExclusion;
 		
 		String hexString = "46000000"; // init
 		hexString += Integer.toString(ThreadLocalRandom.current().nextInt(10, 100)) + "000000"; // counter
@@ -559,26 +558,28 @@ public class OSUtilityWindows extends OSUtility {
 			return;
 		}
 
+		String baseFormat = "%02X000000";
+		
 		// proxy
-		hexString += String.format("%02X000000", proxyUrl.length());
+		hexString += String.format(baseFormat, proxyUrl.length());
 		hexString += Hex.encodeHexString(proxyUrl.getBytes(StandardCharsets.UTF_8));
 
 		// proxy exclusion
-		hexString += String.format("%02X000000", proxyExclusion.length());
+		hexString += String.format(baseFormat, proxyExclusion.length());
 		hexString += Hex.encodeHexString(proxyExclusion.getBytes(StandardCharsets.UTF_8));
 
 		// auto configuration script
-		hexString += String.format("%02X000000", autoConfigUrl.length());
+		hexString += String.format(baseFormat, autoConfigUrl.length());
 		hexString += Hex.encodeHexString(autoConfigUrl.getBytes(StandardCharsets.UTF_8));
 		if (proxy.getProxyType() == ProxyType.PAC) {
-			 // finalisation of string
+			 // finalization of string
 			hexString +=  "0100000000000000" +
 						  "0000000000000000" +
 						  "0000000000000000" +
 						  "0000000000000000";
 		} else {
 
-			// finalisation of string
+			// finalization of string
 			hexString +=  "0000000000000000" +
 						  "0000000000000000" +
 						  "0000000000000000" +
@@ -587,7 +588,5 @@ public class OSUtilityWindows extends OSUtility {
 
         byte[] data = DatatypeConverter.parseHexBinary(hexString);
         Advapi32Util.registrySetBinaryValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Connections", "DefaultConnectionSettings", data);
-//        Advapi32Util.registrySetBinaryValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Connections", "SavedLegacySettings", data);
-
 	}	
 }
