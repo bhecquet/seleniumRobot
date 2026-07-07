@@ -21,16 +21,30 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.WebDriver.Navigation;
+import org.openqa.selenium.WebDriver.Options;
+import org.openqa.selenium.WebDriver.TargetLocator;
+import org.openqa.selenium.WebDriver.Timeouts;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.SessionId;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
+import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
+
+import static org.mockito.Mockito.*;
 
 public class TestCustomReporter extends ReporterTest {
 	
@@ -166,7 +180,11 @@ public class TestCustomReporter extends ReporterTest {
 		Assert.assertTrue(json.getJSONArray("pageLoads").getJSONObject(0).getString("name").startsWith("loading of DriverTestPage took"));
 		Assert.assertTrue(json.getJSONArray("pageLoads").getJSONObject(0).getString("url").contains("test.html"));
 		Assert.assertEquals(json.getJSONArray("pageLoads").getJSONObject(0).getString("page"), "DriverTestPage");
-
+		Assert.assertTrue(json.getLong("driverCreationDuration") > 0);
+        Assert.assertEquals(json.getInt("driverFailErrorOnHub"), 0);
+        Assert.assertEquals(json.getInt("driverFailHubUnavailable"), 0);
+        Assert.assertEquals(json.getInt("driverFailNoMatchingNode"), 0);
+        Assert.assertEquals(json.getString("nodeTags"), "[]");
 	}
 
 	/**
@@ -279,4 +297,140 @@ public class TestCustomReporter extends ReporterTest {
 		}
 	}
 
+	@Test(groups = {"it"})
+    public void testReporterWithGridNoMatchingNode() throws Exception {
+        try {
+            System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
+            System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4321/wd/hub");
+            System.setProperty(SeleniumTestsContext.NODE_TAGS, "local");
+
+            createGridHubMockWithNodeOK();
+
+            // Override RemoteWebDriver mock to simulate "no matching node" on first attempt
+            mockedRemoteWebDriver.close();
+            AtomicInteger constructionCount = new AtomicInteger(0);
+            mockedRemoteWebDriver = mockConstruction(RemoteWebDriver.class, (mock, context) -> {
+                if (constructionCount.getAndIncrement() == 0) {
+                    // First construction: stub getCapabilities to throw, simulating grid "no matching node" error
+                    // This will be triggered by rewriteCapabilities() inside getDriver()'s try block (l.250)
+                    when(mock.getCapabilities()).thenThrow(new WebDriverException("No nodes support the capabilities in the request"));
+                } else {
+                    // Subsequent constructions: normal mock setup
+                    Options mockOptions = mock(Options.class);
+                    Timeouts mockTimeouts = mock(Timeouts.class);
+                    when(mockOptions.timeouts()).thenReturn(mockTimeouts);
+                    when(mock.manage()).thenReturn(mockOptions);
+                    when(mock.getSessionId()).thenReturn(new SessionId("abcdef"));
+                    when(mock.navigate()).thenReturn(mock(Navigation.class));
+                    when(mock.switchTo()).thenReturn(mock(TargetLocator.class));
+                    when(mock.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "75.0", Platform.WINDOWS));
+                }
+            });
+
+            executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverShort"});
+
+            // check content of the file. It should contain all fields with a value
+            String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverShort", "detailed-result.json").toFile(), StandardCharsets.UTF_8);
+            Assert.assertFalse(detailedReportContent.contains(":\\\\/")); // check step has not been double encoded
+            JSONObject json = new JSONObject(detailedReportContent);
+
+            Assert.assertEquals(json.getString("nodeTags"), "[local]");
+            Assert.assertEquals(json.getInt("driverFailNoMatchingNode"), 1);
+            Assert.assertEquals(json.getInt("driverFailErrorOnHub"), 0);
+            Assert.assertEquals(json.getInt("driverFailHubUnavailable"), 0);
+        } finally {
+            System.clearProperty(SeleniumTestsContext.RUN_MODE);
+            System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
+            System.clearProperty(SeleniumTestsContext.NODE_TAGS);
+        }
+    }
+
+    @Test(groups = {"it"})
+    public void testReporterWithGridErrorOnhub() throws Exception {
+        try {
+            System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
+            System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4321/wd/hub");
+            System.setProperty(SeleniumTestsContext.NODE_TAGS, "local");
+
+            createGridHubMockWithNodeOK();
+
+            // Override RemoteWebDriver mock to simulate "no matching node" on first attempt
+            mockedRemoteWebDriver.close();
+            AtomicInteger constructionCount = new AtomicInteger(0);
+            mockedRemoteWebDriver = mockConstruction(RemoteWebDriver.class, (mock, context) -> {
+                if (constructionCount.getAndIncrement() == 0) {
+                    // First construction: stub getCapabilities to throw, simulating grid "no matching node" error
+                    // This will be triggered by rewriteCapabilities() inside getDriver()'s try block (l.250)
+                    when(mock.getCapabilities()).thenThrow(new WebDriverException("An unexpected error occured."));
+                } else {
+                    // Subsequent constructions: normal mock setup
+                    Options mockOptions = mock(Options.class);
+                    Timeouts mockTimeouts = mock(Timeouts.class);
+                    when(mockOptions.timeouts()).thenReturn(mockTimeouts);
+                    when(mock.manage()).thenReturn(mockOptions);
+                    when(mock.getSessionId()).thenReturn(new SessionId("abcdef"));
+                    when(mock.navigate()).thenReturn(mock(Navigation.class));
+                    when(mock.switchTo()).thenReturn(mock(TargetLocator.class));
+                    when(mock.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "75.0", Platform.WINDOWS));
+                }
+            });
+
+            executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverShort"});
+
+            // check content of the file. It should contain all fields with a value
+            String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverShort", "detailed-result.json").toFile(), StandardCharsets.UTF_8);
+            Assert.assertFalse(detailedReportContent.contains(":\\\\/")); // check step has not been double encoded
+            JSONObject json = new JSONObject(detailedReportContent);
+
+            Assert.assertEquals(json.getString("nodeTags"), "[local]");
+            Assert.assertEquals(json.getInt("driverFailNoMatchingNode"), 0);
+            Assert.assertEquals(json.getInt("driverFailErrorOnHub"), 1);
+            Assert.assertEquals(json.getInt("driverFailHubUnavailable"), 0);
+        } finally {
+            System.clearProperty(SeleniumTestsContext.RUN_MODE);
+            System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
+            System.clearProperty(SeleniumTestsContext.NODE_TAGS);
+        }
+    }
+
+    @Test(groups = {"it"})
+    public void testReporterWithGridHubUnavailable() throws Exception {
+        try {
+            System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
+            System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4321/wd/hub");
+            System.setProperty(SeleniumTestsContext.NODE_TAGS, "local");
+
+            createGridHubMockWithNodeOK();
+
+            // Override STATUS_SERVLET mock: first response has "ready": false to make isGridActive() return false
+            // which triggers driverFailHubUnavailable increment in getDriver() (l.244-247)
+            String gridStatusNotReady = "{"
+                    + "  \"value\": {"
+                    + "    \"ready\": false,"
+                    + "    \"message\": \"Selenium Grid not ready.\","
+                    + "    \"nodes\": []"
+                    + "  }"
+                    + "}";
+            createJsonServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200,
+                    gridStatusNotReady,             // 1st isGridActive() -> false -> driverFailHubUnavailable++
+                    GRID_STATUS_NO_SESSION,          // 2nd isGridActive() -> true (ready=true)
+                    String.format(GRID_STATUS_WITH_SESSION, "abcdef")); // getSessionInformationFromGrid -> session found
+
+            executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[]{"testDriverShort"});
+
+            // check content of the file. It should contain all fields with a value
+            String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverShort", "detailed-result.json").toFile(), StandardCharsets.UTF_8);
+            Assert.assertFalse(detailedReportContent.contains(":\\\\/")); // check step has not been double encoded
+            JSONObject json = new JSONObject(detailedReportContent);
+
+            Assert.assertEquals(json.getString("nodeTags"), "[local]");
+            Assert.assertEquals(json.getInt("driverFailNoMatchingNode"), 0);
+            Assert.assertEquals(json.getInt("driverFailErrorOnHub"), 0);
+            Assert.assertEquals(json.getInt("driverFailHubUnavailable"), 1);
+        } finally {
+            System.clearProperty(SeleniumTestsContext.RUN_MODE);
+            System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
+            System.clearProperty(SeleniumTestsContext.NODE_TAGS);
+        }
+    }
 }

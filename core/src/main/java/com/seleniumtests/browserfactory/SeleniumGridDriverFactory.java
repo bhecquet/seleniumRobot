@@ -53,6 +53,9 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 	private final List<SeleniumGridConnector> gridConnectors;
 	private SeleniumGridConnector activeGridConnector;
 	private int instanceRetryTimeout; // timeout in seconds
+	private final AtomicInteger driverFailErrorOnHub = new AtomicInteger(0);
+    private final AtomicInteger driverFailHubUnavailable = new AtomicInteger(0);
+    private final AtomicInteger driverFailNoMatchingNode = new AtomicInteger(0);
 	private static final AtomicInteger counter = new AtomicInteger(0); // a global counter counting times where we never get matching nodes
 
     public SeleniumGridDriverFactory(final DriverConfig cfg) {
@@ -230,6 +233,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 			
 				// if grid is not active, try the next one
 				if (!gridConnector.isGridActive()) {
+					driverFailHubUnavailable.getAndIncrement();
 					logger.warn("grid {} is not active, looking for the next one", gridConnector.getHubUrl());
 					continue;
 				}
@@ -253,6 +257,11 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 					break;
 				} catch (WebDriverException e) {
 					logger.warn("Error creating driver on hub {}: {}", gridConnector.getHubUrl(), e.getMessage());
+					if (e.getMessage().contains("No nodes support the capabilities in the request")) {
+                        driverFailNoMatchingNode.getAndIncrement();
+                    } else {
+                        driverFailErrorOnHub.getAndIncrement();
+                    }
 					currentException = e;
 				}
 			}
@@ -291,6 +300,9 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 			counter.set(0); 
 		}
     	
+		SeleniumTestsContextManager.getGlobalContext().getContextDataMap().put("driverFailErrorOnHub", driverFailErrorOnHub);
+        SeleniumTestsContextManager.getGlobalContext().getContextDataMap().put("driverFailHubUnavailable", driverFailHubUnavailable);
+        SeleniumTestsContextManager.getGlobalContext().getContextDataMap().put("driverFailNoMatchingNode", driverFailNoMatchingNode);
     	return driver;
     }
 
