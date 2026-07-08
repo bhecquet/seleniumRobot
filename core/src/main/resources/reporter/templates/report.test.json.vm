@@ -6,7 +6,7 @@
 #set($pageLoadTimesSize = $pageLoadTimes.size())
 {
 	"gridnode": "$gridnode",
-	"nodeTags": "$nodeTags",
+	"nodeTags": $nodeTags,
 	"errors": $errors,
 	"errorMessage": "$errorMessage",
 	"failures": $failures,

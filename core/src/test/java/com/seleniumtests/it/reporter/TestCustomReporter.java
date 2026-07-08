@@ -24,6 +24,7 @@ import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.io.FileUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver.Navigation;
@@ -184,7 +185,7 @@ public class TestCustomReporter extends ReporterTest {
         Assert.assertEquals(json.getInt("driverFailErrorOnHub"), 0);
         Assert.assertEquals(json.getInt("driverFailHubUnavailable"), 0);
         Assert.assertEquals(json.getInt("driverFailNoMatchingNode"), 0);
-        Assert.assertEquals(json.getString("nodeTags"), "[]");
+        Assert.assertEquals(json.getJSONArray("nodeTags"), new JSONArray()); // should be empty
 	}
 
 	/**
@@ -334,7 +335,7 @@ public class TestCustomReporter extends ReporterTest {
             Assert.assertFalse(detailedReportContent.contains(":\\\\/")); // check step has not been double encoded
             JSONObject json = new JSONObject(detailedReportContent);
 
-            Assert.assertEquals(json.getString("nodeTags"), "[local]");
+            Assert.assertEquals(json.getJSONArray("nodeTags").getString(0), "local");
             Assert.assertEquals(json.getInt("driverFailNoMatchingNode"), 1);
             Assert.assertEquals(json.getInt("driverFailErrorOnHub"), 0);
             Assert.assertEquals(json.getInt("driverFailHubUnavailable"), 0);
@@ -382,7 +383,7 @@ public class TestCustomReporter extends ReporterTest {
             Assert.assertFalse(detailedReportContent.contains(":\\\\/")); // check step has not been double encoded
             JSONObject json = new JSONObject(detailedReportContent);
 
-            Assert.assertEquals(json.getString("nodeTags"), "[local]");
+            Assert.assertEquals(json.getJSONArray("nodeTags").getString(0), "local");
             Assert.assertEquals(json.getInt("driverFailNoMatchingNode"), 0);
             Assert.assertEquals(json.getInt("driverFailErrorOnHub"), 1);
             Assert.assertEquals(json.getInt("driverFailHubUnavailable"), 0);
@@ -423,7 +424,7 @@ public class TestCustomReporter extends ReporterTest {
             Assert.assertFalse(detailedReportContent.contains(":\\\\/")); // check step has not been double encoded
             JSONObject json = new JSONObject(detailedReportContent);
 
-            Assert.assertEquals(json.getString("nodeTags"), "[local]");
+            Assert.assertEquals(json.getJSONArray("nodeTags").getString(0), "local");
             Assert.assertEquals(json.getInt("driverFailNoMatchingNode"), 0);
             Assert.assertEquals(json.getInt("driverFailErrorOnHub"), 0);
             Assert.assertEquals(json.getInt("driverFailHubUnavailable"), 1);
