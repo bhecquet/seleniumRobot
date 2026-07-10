@@ -30,7 +30,7 @@ public class TestAbstractWebDriverFactory extends MockitoTest {
 	private DriverConfig config;
 	
 	@Test(groups={"ut"})
-	public void testUserDefinedsCapabilities() throws Exception {
+	public void testUserDefinedsCapabilities() {
 		
 		MutableCapabilities caps = new MutableCapabilities();
 		caps.setCapability("foo", "bar");
@@ -44,9 +44,9 @@ public class TestAbstractWebDriverFactory extends MockitoTest {
 		when(context.getTestType()).thenReturn(TestType.WEB);
 		
 		// connect to grid
-		try (MockedConstruction mockedWebDriver = mockConstruction(RemoteWebDriver.class)) {
+		try (MockedConstruction<RemoteWebDriver> mockedWebDriver = mockConstruction(RemoteWebDriver.class)) {
 
-			HtmlUnitDriverFactory driverFactory = new HtmlUnitDriverFactory(config);
+			new HtmlUnitDriverFactory(config);
 
 			Assert.assertEquals(caps.getCapability("foo"), "bar");
 		}

@@ -39,6 +39,7 @@ import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.reporter.info.StringInfo;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestStep;
+import org.testng.internal.ConstructorOrMethod;
 
 public class TestTestNGResultUtil extends MockitoTest {
 
@@ -60,7 +61,9 @@ public class TestTestNGResultUtil extends MockitoTest {
 	@Mock
 	private IResultMap skippedTests; 
 	@Mock
-	private IResultMap passedTests; 
+	private IResultMap passedTests;
+	@Mock
+	private ConstructorOrMethod constructorOrMethod;
 	
 	
 	@Mock
@@ -130,8 +133,11 @@ public class TestTestNGResultUtil extends MockitoTest {
 	public void testBeforeTestNameWithoutCucumber() throws NoSuchMethodException, SecurityException {
 		when(testResult.getParameters()).thenReturn(new Object[] {TestTestNGResultUtil.class.getDeclaredMethod("testBeforeTestNameWithoutCucumber")});
 		when(testResult.getMethod()).thenReturn(testNGMethod);
+		when(testResult.getAttribute("linkedTestMethod")).thenReturn(testNGMethod);
 		when(testNGMethod.isBeforeMethodConfiguration()).thenReturn(true);
 		when(testNGMethod.getMethodName()).thenReturn("testMethod");
+		when(testNGMethod.getConstructorOrMethod()).thenReturn(constructorOrMethod);
+		when(constructorOrMethod.getMethod()).thenReturn(TestTestNGResultUtil.class.getDeclaredMethod("testBeforeTestNameWithoutCucumber"));
 		
 		Assert.assertEquals(TestNGResultUtils.getTestName(testResult), "before-testBeforeTestNameWithoutCucumber");
 	}
@@ -154,12 +160,15 @@ public class TestTestNGResultUtil extends MockitoTest {
 	
 
 	@Test(groups={"ut"})
-	public void testHashWithTestMethod() {
+	public void testHashWithTestMethod() throws NoSuchMethodException {
 		when(testNGMethod.getRealClass()).thenReturn(TestTestNGResultUtil.class);
 		when(testResult.getParameters()).thenReturn(new Object[] {});
+		when(testResult.getAttribute("linkedTestMethod")).thenReturn(testNGMethod);
 		when(testNGMethod.isBeforeMethodConfiguration()).thenReturn(false);
 		when(testNGMethod.getMethodName()).thenReturn("testMethod");
-		
+		when(testNGMethod.getConstructorOrMethod()).thenReturn(constructorOrMethod);
+		when(constructorOrMethod.getMethod()).thenReturn(TestTestNGResultUtil.class.getDeclaredMethod("testHashWithTestMethod"));
+
 		Assert.assertTrue(TestNGResultUtils.getHashForTest(testResult).startsWith("mySuite-myTest-com.seleniumtests.ut.util.TestTestNGResultUtil-testMethod-1-org.testng.ITestNGMethod"));
 		
 	}

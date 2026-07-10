@@ -140,7 +140,7 @@ public class TestStepManager {
     public static void setVideoStartDate() {
     	try {
     		SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().setVideoStartDate(OffsetDateTime.now());
-    	} catch (IndexOutOfBoundsException | ConfigurationException e) {
+    	} catch (IndexOutOfBoundsException | NullPointerException | ConfigurationException e) {
     		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
     	}
     }
@@ -153,7 +153,7 @@ public class TestStepManager {
 			if (stepManager.getVideoStartDate() != null) {
 				testStep.setVideoTimeStamp(TimeUnit.MILLISECONDS.convert(testStep.getStartDate().toInstant().toEpochMilli() - stepManager.getVideoStartDate().toInstant().toEpochMilli(), TimeUnit.MILLISECONDS));
 			}
-    	} catch (IndexOutOfBoundsException | ConfigurationException e) {
+    	} catch (IndexOutOfBoundsException | NullPointerException | ConfigurationException e) {
     		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
     	}
 	}
@@ -161,7 +161,7 @@ public class TestStepManager {
 	public static TestStep getCurrentRootTestStep() {
 		try {
 			return SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRootTestStep();
-    	} catch (IndexOutOfBoundsException | ConfigurationException e) {
+    	} catch (IndexOutOfBoundsException | NullPointerException | ConfigurationException e) {
     		// null, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
     		return null;
     	}
@@ -170,7 +170,7 @@ public class TestStepManager {
 	public static void setParentTestStep(TestStep testStep) {
 		try {
 			SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().setRunningTestStep(testStep);
-    	} catch (IndexOutOfBoundsException | ConfigurationException e) {
+    	} catch (IndexOutOfBoundsException | NullPointerException | ConfigurationException e) {
     		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
     	}
 	}
@@ -186,7 +186,7 @@ public class TestStepManager {
 			} else {
 				return lastStep;
 			}
-    	} catch (IndexOutOfBoundsException | ConfigurationException e) {
+    	} catch (IndexOutOfBoundsException | NullPointerException | ConfigurationException e) {
     		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
     		return null;
     	}
@@ -195,7 +195,7 @@ public class TestStepManager {
 	public static TestStep getParentTestStep() {
 		try {
 			return SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
-    	} catch (IndexOutOfBoundsException | ConfigurationException e) {
+    	} catch (IndexOutOfBoundsException | NullPointerException | ConfigurationException e) {
     		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
     		return null;
     	}
@@ -208,7 +208,7 @@ public class TestStepManager {
 	public static TestStepManager getInstance() {
 		try {
 			return SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager();
-    	} catch (IndexOutOfBoundsException | ConfigurationException e) {
+    	} catch (IndexOutOfBoundsException | NullPointerException | ConfigurationException e) {
     		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
     		return null;
     	}
