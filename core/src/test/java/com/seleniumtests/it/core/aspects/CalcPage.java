@@ -73,6 +73,18 @@ public class CalcPage extends PageObject {
 		Assert.assertTrue(false, "false error");
 		return this;
 	}
+	public CalcPage assertActionNoMessage() {
+		Assert.assertTrue(false);
+		return this;
+	}
+	public CalcPage assertActionOk() {
+		Assert.assertTrue(true, "No error");
+		return this;
+	}
+	public CalcPage assertActionOkNoMessage() {
+		Assert.assertTrue(true);
+		return this;
+	}
 	
 	public CalcPage assertAction2() {
 		Assert.assertTrue(false, "false error2");
@@ -169,7 +181,34 @@ public class CalcPage extends PageObject {
 		add(result, a);
 		return this;
 	}
-	
+
+	@Step(name=" ")
+	public CalcPage addWithStepEmptyName(int a) {
+		add(result, a);
+		return this;
+	}
+	@Step(description="step description")
+	public CalcPage addWithStepDescription(int a) {
+		add(result, a);
+		return this;
+	}
+	@Step(description="step description ${a}")
+	public CalcPage addWithStepDescriptionWithParameter(int a) {
+		add(result, a);
+		return this;
+	}
+	@Step(expectedResult="expected result")
+	public CalcPage addWithStepExpectedResult(int a) {
+		add(result, a);
+		return this;
+	}
+	@Step(expectedResult="expected result ${a}")
+	public CalcPage addWithStepExpectedResultWithParameter(int a) {
+		add(result, a);
+		return this;
+	}
+
+
 	public CalcPage connect(String login, String password) {
 		logger.info("login is " + login);
 		logger.info("password is " + password);

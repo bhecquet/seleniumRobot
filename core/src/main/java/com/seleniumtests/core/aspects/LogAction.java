@@ -438,24 +438,21 @@ public class LogAction {
 				stepName = step.value();
 				
 				// replaces argument placeholders with values
-				stepNameWithArgs = stepName;
-				for (Entry<String, String> entry: arguments.entrySet()) {
-					stepNameWithArgs = stepNameWithArgs.replaceAll(String.format("\\$\\{%s\\}",  entry.getKey()), entry.getValue().replace("$", "\\$"));
-				}
+				stepNameWithArgs = interpolateValue(arguments, stepName);
 				break;
 			} else if (annotation instanceof Step step) {
-				stepName = step.name();
+				if (!step.name().isBlank()) {
+					stepName = step.name();
+
+					// replaces argument placeholders with values
+					stepNameWithArgs = interpolateValue(arguments, stepName);
+				}
 				errorCause = step.errorCause();
 				errorCauseDetails = step.errorCauseDetails();
 				disableBugtracker = step.disableBugTracker();
-				description = step.description();
-				expectedResult = step.expectedResult();
-				
-				// replaces argument placeholders with values
-				stepNameWithArgs = stepName;
-				for (Entry<String, String> entry: arguments.entrySet()) {
-					stepNameWithArgs = stepNameWithArgs.replaceAll(String.format("\\$\\{%s\\}",  entry.getKey()), entry.getValue().replace("$", "\\$"));
-				}
+				description = interpolateValue(arguments, step.description());
+				expectedResult = interpolateValue(arguments, step.expectedResult());
+
 				break;
 			}
 		}
@@ -474,7 +471,15 @@ public class LogAction {
 				description,
 				expectedResult);
 	}
-	
+
+	private static String interpolateValue(Map<String, String> arguments, String nameWithArgs) {
+		String newNameWithArgs = nameWithArgs;
+		for (Entry<String, String> entry: arguments.entrySet()) {
+			newNameWithArgs = newNameWithArgs.replaceAll(String.format("\\$\\{%s\\}",  entry.getKey()), entry.getValue().replace("$", "\\$"));
+		}
+		return newNameWithArgs;
+	}
+
 	/**
 	 * Returns the value of cucumber annotation to get corresponding text
 	 * @param annotation

@@ -17,7 +17,6 @@
  */
 package com.seleniumtests.it.core.aspects;
 
-import java.io.IOException;
 import java.util.List;
 
 import com.seleniumtests.it.stubclasses.StubTestClassForDriverTest;
@@ -136,6 +135,60 @@ public class TestLogActions extends GenericTest {
 		Assert.assertEquals(steps.get(0).getStepActions().size(), 2); // Opening page + timing
 		Assert.assertEquals(steps.get(1).getStepActions().size(), 1);
 	}
+
+	/**
+	 * If Step 'name' is empty, we take the method name
+	 */
+	@Test(groups={"it"})
+	public void testSimpleNonCucumberStepLoggingWithEmptyName() {
+		new CalcPage()
+				.addWithStepEmptyName(1);
+
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
+		Assert.assertEquals(steps.get(1).getName(), "addWithStepEmptyName with args: (1, )");
+	}
+
+	/**
+	 * Check that description is stored into TestStep
+	 */
+	@Test(groups={"it"})
+	public void testSimpleNonCucumberStepLoggingWithDescription() {
+		new CalcPage()
+				.addWithStepDescription(1);
+
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
+		Assert.assertEquals(steps.get(1).getDescription(), "step description");
+		Assert.assertEquals(steps.get(1).getExpectedResult(), "");
+	}
+	@Test(groups={"it"})
+	public void testSimpleNonCucumberStepLoggingWithDescriptionInterpolation() {
+		new CalcPage()
+				.addWithStepDescriptionWithParameter(1);
+
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
+		Assert.assertEquals(steps.get(1).getDescription(), "step description 1");
+	}
+
+	/**
+	 * Check that expected result is stored into TestStep
+	 */
+	@Test(groups={"it"})
+	public void testSimpleNonCucumberStepLoggingWithExpectedResult() {
+		new CalcPage()
+				.addWithStepExpectedResult(1);
+
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
+		Assert.assertEquals(steps.get(1).getDescription(), "");
+		Assert.assertEquals(steps.get(1).getExpectedResult(), "expected result");
+	}
+	@Test(groups={"it"})
+	public void testSimpleNonCucumberStepLoggingWithExpectedResultInterpolation() {
+		new CalcPage()
+				.addWithStepExpectedResultWithParameter(1);
+
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
+		Assert.assertEquals(steps.get(1).getExpectedResult(), "expected result 1");
+	}
 	
 	/**
 	 * Only test presence of root steps. there should be:
@@ -144,7 +197,7 @@ public class TestLogActions extends GenericTest {
 	 * Checks that root steps are correctly intercepted
 	 */
 	@Test(groups={"it"})
-	public void testSimpleNonCucumberStepLoggingWithStepDescription() {
+	public void testSimpleNonCucumberStepLoggingWithStepName() {
 		new CalcPage()
 		.addWithName(1);
 
@@ -162,7 +215,7 @@ public class TestLogActions extends GenericTest {
 	 * Checks that root steps are correctly intercepted
 	 */
 	@Test(groups={"it"})
-	public void testSimpleNonCucumberStepLoggingWithStepDescriptionAndArgs() {
+	public void testSimpleNonCucumberStepLoggingWithStepNameAndArgs() {
 		new CalcPage()
 		.addWithName2(1);
 
@@ -171,7 +224,7 @@ public class TestLogActions extends GenericTest {
 		Assert.assertEquals(steps.get(1).getName(), "add 1 to total");
 		Assert.assertEquals(steps.get(1).getAction(), "add ${a} to total");
 	}
-	
+
 	/**
 	 * Only test presence of root steps. there should be:
 	 * - page opening
@@ -180,17 +233,17 @@ public class TestLogActions extends GenericTest {
 	 * Here, we check the "@Step" annotation
 	 */
 	@Test(groups={"it"})
-	public void testSimpleNonCucumberStepLoggingWithStepDescription2() {
+	public void testSimpleNonCucumberStepLoggingWithStepName2() {
 		new CalcPage()
 		.addWithNameBis(1);
-		
+
 		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
 		Assert.assertEquals(steps.get(1).getName(), "add something to total");
 		Assert.assertEquals(steps.get(1).getAction(), "add something to total");
 	}
-	
+
 	/**
 	 * Check that if step definition contains argument name, this one is replaced
 	 * - page opening
@@ -199,22 +252,22 @@ public class TestLogActions extends GenericTest {
 	 * Here, we check the "@Step" annotation
 	 */
 	@Test(groups={"it"})
-	public void testSimpleNonCucumberStepLoggingWithStepDescriptionAndArgs2() {
+	public void testSimpleNonCucumberStepLoggingWithStepNameAndArgs2() {
 		new CalcPage()
 		.addWithName2Bis(1);
-		
+
 		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(1).getName(), "add 1 to total");
 		Assert.assertEquals(steps.get(1).getAction(), "add ${a} to total");
 	}
-	
+
 	/**
 	 * Check that if step definition contains argument name and one of argument is password, it's masked
 	 * - Connect to calc with login/******
 	 */
 	@Test(groups={"it"})
-	public void testSimpleNonCucumberStepLoggingWithStepDescriptionPassword() {
+	public void testSimpleNonCucumberStepLoggingWithStepNamePassword() {
 		SeleniumTestsContextManager.getThreadContext().setMaskPassword(true);
 		new CalcPage()
 			.connectWithName("login", "somePassToConnect");
@@ -225,31 +278,31 @@ public class TestLogActions extends GenericTest {
 		Assert.assertEquals(steps.get(1).getAction(), "Connect to calc with ${login}/${password}");
 	}
 	@Test(groups={"it"})
-	public void testSimpleNonCucumberStepLoggingWithStepDescriptionPassword2() {
+	public void testSimpleNonCucumberStepLoggingWithStepNamePassword2() {
 		SeleniumTestsContextManager.getThreadContext().setMaskPassword(true);
 		new CalcPage()
 		.connectWithName("login", "$§AbCdE$DeF£GhIjKl*:?");
-		
+
 		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(1).getName(), "Connect to calc with login/******");
 	}
 	@Test(groups={"it"})
-	public void testSimpleNonCucumberStepLoggingWithStepDescriptionPassword3() {
+	public void testSimpleNonCucumberStepLoggingWithStepNamePassword3() {
 		SeleniumTestsContextManager.getThreadContext().setMaskPassword(true);
 		new CalcPage()
 		.connect("login", "$§AbCdE$DeF£GhIjKl*:?");
-		
+
 		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(1).getName(), "connect with args: (login, ******, )");
 	}
-	
+
 	/**
 	 * Check that if step definition contains argument name with array, all values are visible
 	 */
 	@Test(groups={"it"})
-	public void testSimpleNonCucumberStepLoggingWithStepDescriptionArray() {
+	public void testSimpleNonCucumberStepLoggingWithStepNameArray() {
 		SeleniumTestsContextManager.getThreadContext().setMaskPassword(true);
 		new CalcPage()
 		.addWithName3(1, 2, 3);
@@ -258,13 +311,13 @@ public class TestLogActions extends GenericTest {
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(1).getName(), "add 1 and [2,3,] to total");
 	}
-	
+
 	/**
 	 * Check that if step definition contains argument name with array, all values are visible
 	 * Here, we check the "@Step" annotation
 	 */
 	@Test(groups={"it"})
-	public void testSimpleNonCucumberStepLoggingWithStepDescriptionArray2() {
+	public void testSimpleNonCucumberStepLoggingWithStepNameArray2() {
 		SeleniumTestsContextManager.getThreadContext().setMaskPassword(true);
 		new CalcPage()
 		.addWithName3Bis(1, 2, 3);
@@ -508,4 +561,5 @@ public class TestLogActions extends GenericTest {
 		Assert.assertEquals(steps.get(1).getRootCause(), RootCause.REGRESSION);
 		Assert.assertEquals(steps.get(1).getRootCauseDetails(), "Check your scripts");
 	}
+	
 }
