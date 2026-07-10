@@ -43,10 +43,7 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -609,12 +606,17 @@ public class TestSquashTMConnector extends MockitoTest {
 		when(step1.getExpectedResult()).thenReturn("Step 1 expected");
 		when(step1.getSnapshots()).thenReturn(new ArrayList<>());
 
+		TestStep stepNoDescription = mock(TestStep.class);
+		when(stepNoDescription.getDescription()).thenReturn("");
+		when(stepNoDescription.getExpectedResult()).thenReturn("Step 2 expected");
+		when(stepNoDescription.getSnapshots()).thenReturn(new ArrayList<>());
+
 		TestStep step2 = mock(TestStep.class);
 		when(step2.getDescription()).thenReturn("Step 2 action");
-		when(step2.getExpectedResult()).thenReturn("Step 2 expected");
+		when(step2.getExpectedResult()).thenReturn("");
 		when(step2.getSnapshots()).thenReturn(new ArrayList<>());
 
-		List<TestStep> testSteps = Arrays.asList(step1, step2);
+		List<TestStep> testSteps = Arrays.asList(step1, stepNoDescription, step2);
 		SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().addAll(testSteps);
 
 		mockedSquashTestStep.when(() -> io.github.bhecquet.entities.TestStep.create(eq(1), anyMap())).thenReturn(newSquashTestStep);
@@ -633,7 +635,9 @@ public class TestSquashTMConnector extends MockitoTest {
 		mockedSquashTestStep.verify(() -> io.github.bhecquet.entities.TestStep.delete("100,101"));
 
 		// verify new steps created
-		mockedSquashTestStep.verify(() -> io.github.bhecquet.entities.TestStep.create(eq(1), anyMap()), times(2));
+		mockedSquashTestStep.verify(() -> io.github.bhecquet.entities.TestStep.create(eq(1), eq(Map.of("action", "Step 1 action", "expected_result", "Step 1 expected"))), times(1));
+		mockedSquashTestStep.verify(() -> io.github.bhecquet.entities.TestStep.create(eq(1), eq(Map.of("action", "Step 2 action", "expected_result", ""))), times(1));
+		mockedSquashTestStep.verify(() -> io.github.bhecquet.entities.TestStep.create(eq(1), anyMap()), times(2)); // only 2 steps recorded because step without description should not be recorded
 	}
 
 	/**

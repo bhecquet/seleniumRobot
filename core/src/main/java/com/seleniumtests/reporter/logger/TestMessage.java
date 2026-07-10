@@ -34,7 +34,17 @@ public class TestMessage extends TestAction {
 	}
 	
 	public TestMessage(String name, MessageType type) {
-		super(name, type == MessageType.ERROR, new ArrayList<>());
+		this(name, type, type == MessageType.ERROR);
+	}
+
+	/**
+	 * Allows subclasses to specify a failed status independent of the message type
+	 * @param name		message name
+	 * @param type		message type
+	 * @param failed	true if the message should be considered as failed
+	 */
+	protected TestMessage(String name, MessageType type, boolean failed) {
+		super(name, failed, new ArrayList<>());
 		messageType = type;
 	}
 

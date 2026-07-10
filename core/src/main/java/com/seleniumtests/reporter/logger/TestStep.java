@@ -24,6 +24,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
+import com.seleniumtests.util.StringUtility;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -68,6 +69,7 @@ public class TestStep extends TestAction {
 	private Integer stepResultId;  // the stepResult if it has been recorded on seleniumRobot-server
 	private boolean disableBugtracker;
 	private PageLoadTime pageLoadTime;
+	private String id; 				// a unique ID that depends on action name. We won't use step arguments so that we can recognize that the step is the same whatever the parameters are
 	
 	private String description;
 	private String expectedResult;
@@ -132,8 +134,13 @@ public class TestStep extends TestAction {
         this.disableBugtracker = disableBugtracker;
         this.description = description;
         this.expectedResult = expectedResult;
+		this.id = generateId();
     }
-	
+
+	public String generateId() {
+		return action == null ? "": StringUtility.md5(action).substring(0, 6);
+	}
+
 	public Long getDuration() {
 		long consolidatedDuration = duration;
 		consolidatedDuration -= getDurationToExclude();
@@ -249,6 +256,9 @@ public class TestStep extends TestAction {
 		// inherit password masking from step
 		message.maskPassword = maskPassword;
 	}
+	public void addCheck(Check check) {
+		addMessage(check);
+	}
 	public void addValue(TestValue value) {
 		value.setPosition(stepActions.size());
 		stepActions.add(value);
@@ -338,6 +348,9 @@ public class TestStep extends TestAction {
 		stepJSon.put("type", "step");
 		stepJSon.put("status", getStepStatus().toString());
 		stepJSon.put("harCaptures", new JSONArray());
+		stepJSon.put("id", this.id);
+		stepJSon.put("description", getDescription());
+		stepJSon.put("expectedResult", getExpectedResult());
 		for (HarCapture harCapture: getHarCaptures()) {
 			stepJSon.getJSONArray("harCaptures").put(harCapture.toJson());
 		}
@@ -358,6 +371,7 @@ public class TestStep extends TestAction {
 		}
 
 		stepJSon.put("pageLoadTime", pageLoadTime == null ? null : pageLoadTime.toJson());
+
 		
 		return stepJSon;
 	}
@@ -481,7 +495,6 @@ public class TestStep extends TestAction {
 
 	/**
 	 * @deprecated use 'getRootCause' instead
-	 * @return
 	 */
 	@Deprecated(forRemoval = true)
 	public RootCause getErrorCause() {
@@ -570,6 +583,8 @@ public class TestStep extends TestAction {
 		stepToEncode.errorCauseDetails = encodeString(errorCauseDetails, format);
 		stepToEncode.disableBugtracker = disableBugtracker;
 		stepToEncode.pageLoadTime = pageLoadTime == null ? null: pageLoadTime.encodeTo(format);
+		stepToEncode.expectedResult = encodeString(expectedResult, format);
+		stepToEncode.description = encodeString(description, format);
 		
 		return stepToEncode;
 	}
@@ -622,10 +637,38 @@ public class TestStep extends TestAction {
 	}
 	
     public String getDescription() {
-        return this.description;
+        return maskPasswordInString(description);
     }
 
     public String getExpectedResult() {
-        return this.expectedResult;
+        return maskPasswordInString(expectedResult);
     }
+
+	public String getId() {
+		return id;
+	}
+
+	public List<Check> getChecks() {
+		return stepActions.stream()
+				.filter(Check.class::isInstance)
+				.map(Check.class::cast)
+				.collect(Collectors.toList());
+	}
+
+	/**
+	 * Returns all checks from this TestStep and sub TestStep's
+	 * @param fromSubSteps
+	 */
+	public List<Check> getChecks(boolean fromSubSteps) {
+		List<Check> checks = getChecks();
+
+		if (fromSubSteps) {
+			checks.addAll(stepActions
+					.stream()
+					.filter(TestStep.class::isInstance)
+					.map(TestStep.class::cast)
+					.flatMap(step -> step.getChecks(true).stream()).collect(Collectors.toList()));
+		}
+		return checks;
+	}
 }

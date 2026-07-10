@@ -28,6 +28,7 @@ import java.util.List;
 import com.seleniumtests.it.core.aspects.CalcPage;
 import com.seleniumtests.reporter.logger.*;
 import com.seleniumtests.uipage.htmlelements.ButtonElement;
+import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.har.Har;
 import com.seleniumtests.util.har.Page;
 import com.seleniumtests.util.helper.WaitHelper;
@@ -62,6 +63,16 @@ public class TestTestStep extends GenericTest {
 	public void testGetFullActionNameNoOrigin() {
 		TestStep step = new TestStep("step1");
 		Assert.assertEquals(step.getFullActionName(), "step1");
+	}
+	@Test(groups = { "ut" })
+	public void testGetId() {
+		TestStep step = new TestStep("step1", "First step", this.getClass(), null, new ArrayList<>(), true);
+		Assert.assertEquals(step.getId(), StringUtility.md5("First step").substring(0, 6));
+	}
+	@Test(groups = { "ut" })
+	public void testGetIdNullAction() {
+		TestStep step = new TestStep("step1", null, this.getClass(), null, new ArrayList<>(), true);
+		Assert.assertEquals(step.getId(), "");
 	}
 	
 	/**
@@ -486,11 +497,23 @@ public class TestTestStep extends GenericTest {
 
 	@Test(groups = { "ut" })
 	public void testTestStepEncodeHtml() {
-		TestStep step = new TestStep("step1 \"'<>&\u0192", "step1 \"'<>&\u0192", this.getClass(), null, new ArrayList<>(), true, RootCause.REGRESSION, "\"'<>&\u0192", false);
+		TestStep step = new TestStep("step1 \"'<>&\u0192",
+				"step1 \"'<>&\u0192",
+				this.getClass(),
+				null,
+				new ArrayList<>(),
+				true,
+				RootCause.REGRESSION,
+				"\"'<>&\u0192",
+				false,
+				"A description <>&\u0192",
+				"An expected result <>&\u0192");
 		step.setFailed(true); // mandatory so that errorCauseDetails is not null
 		TestStep encodedTestStep = step.encodeTo("html");
 		Assert.assertEquals(encodedTestStep.toString(), "Step step1 &quot;'&lt;&gt;&amp;&fnof;");
 		Assert.assertEquals(encodedTestStep.getRootCauseDetails(), "&quot;'&lt;&gt;&amp;&fnof;");
+		Assert.assertEquals(encodedTestStep.getDescription(), "A description &lt;&gt;&amp;&fnof;");
+		Assert.assertEquals(encodedTestStep.getExpectedResult(), "An expected result &lt;&gt;&amp;&fnof;");
 	}
 
 	@Test(groups = { "ut" })
@@ -701,6 +724,9 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(stepJson.getString("type"), "step");
 		Assert.assertEquals(stepJson.getString("name"), "step1 with args: (https://myserver)");
 		Assert.assertEquals(stepJson.getString("action"), "step1");
+		Assert.assertEquals(stepJson.getString("id"), "2E957E");
+		Assert.assertEquals(stepJson.getString("description"), "A description");
+		Assert.assertEquals(stepJson.getString("expectedResult"), "An expected result");
 		Assert.assertEquals(stepJson.getString("origin"), "com.seleniumtests.ut.reporter.logger.TestTestStep");
 		Assert.assertEquals(stepJson.getString("status"), "SUCCESS");
 		Assert.assertEquals(stepJson.getLong("timestamp"), step.getTimestamp().toInstant().toEpochMilli());
@@ -767,7 +793,17 @@ public class TestTestStep extends GenericTest {
 
 	@NotNull
 	private TestStep createSetOfSteps() throws IOException {
-		TestStep step = new TestStep("step1 with args: (https://myserver)", "step1", this.getClass(), null, List.of("foobar"), true);
+		TestStep step = new TestStep("step1 with args: (https://myserver)",
+				"step1",
+				this.getClass(),
+				null,
+				List.of("foobar"),
+				true,
+				null,
+				null,
+				false,
+				"A description",
+				"An expected result");
 		step.addMessage(new TestMessage("everything OK", MessageType.INFO));
 		step.addAction(new TestAction("action2", false,
 				new ArrayList<>(),
@@ -854,7 +890,17 @@ Step step1
 	 */
 	@Test(groups = { "ut" })
 	public void testPasswordMaskingMainStep() {
-		TestStep step = new TestStep("step1 with args: (bar, passwd)", "step1 with args: (bar, passwd)", this.getClass(), null, List.of("passwd"), true);
+		TestStep step = new TestStep("step1 with args: (bar, passwd)",
+				"step1 with args: (bar, passwd)",
+				this.getClass(),
+				null,
+				List.of("passwd"),
+				true,
+				null,
+				null,
+				false,
+				"A description with password 'passwd'",
+				"An expected result with password 'passwd'");
 		TestAction action = new TestAction("action in step1 with args: (foo, passwd)", false, new ArrayList<>());
 		TestMessage message = new TestMessage("everything OK on passwd", MessageType.INFO);
 		TestStep substep = new TestStep("substep with args: (passwd)", "substep with args: (passwd)", this.getClass(), null, new ArrayList<>(), true);
@@ -871,6 +917,8 @@ Step step1 with args: (bar, ******)
   - action in step1 with args: (foo, ******)
   - everything OK on ******
   - Step substep with args: (******)""");
+		Assert.assertEquals(step.getDescription(), "A description with password '******'");
+		Assert.assertEquals(step.getExpectedResult(), "An expected result with password '******'");
 	}
 	
 	/**

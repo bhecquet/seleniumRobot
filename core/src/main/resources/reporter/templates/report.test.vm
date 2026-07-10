@@ -16,7 +16,7 @@
         #set ($timestamp = $action.getTimestamp().toLocalTime())
         #if (${action.class.name.equals("com.seleniumtests.reporter.logger.TestStep")})
             #stepActions($action false)
-        #elseif (${action.class.name.equals("com.seleniumtests.reporter.logger.TestMessage")})
+        #elseif (${action.class.name.equals("com.seleniumtests.reporter.logger.TestMessage")} || ${action.class.name.equals("com.seleniumtests.reporter.logger.Check")})
             #set ($messageType = $action.getMessageType().toString().toLowerCase())
             #set ($messageType = "message-" + $messageType)
             <div class="$messageType message-conf"><span

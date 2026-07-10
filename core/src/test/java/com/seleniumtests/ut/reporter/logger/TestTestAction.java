@@ -24,17 +24,20 @@ public class TestTestAction extends MockitoTest {
 
     @Test(groups = { "ut" })
     public void testNoPasswordMasking() throws NoSuchFieldException, IllegalAccessException {
-        TestAction action = new TestAction("Login with args (user, myPass<>)", false, List.of("myPass<>"));
+        TestAction action = new TestAction("Login myPass<> with args (user, myPass<>)", false, List.of("myPass<>"));
         Field maskPasswordField = TestAction.class.getDeclaredField("maskPassword");
         maskPasswordField.setAccessible(true);
         maskPasswordField.set(action, false);
-        Assert.assertEquals(action.getName(), "Login with args (user, myPass<>)");
+        Assert.assertEquals(action.getName(), "Login myPass<> with args (user, myPass<>)");
     }
 
+    /**
+     * Check masking is performed in name and action name
+     */
     @Test(groups = { "ut" })
     public void testPasswordMasking() {
-        TestAction action = new TestAction("Login with args (user, myPass<>)", false, List.of("myPass<>"));
-        Assert.assertEquals(action.getName(), "Login with args (user, ******)");
+        TestAction action = new TestAction("Login myPass<> with args (user, myPass<>)", false, List.of("myPass<>"));
+        Assert.assertEquals(action.getName(), "Login ****** with args (user, ******)");
     }
 
     @Test(groups = { "ut" })

@@ -294,7 +294,7 @@ public class TestAction {
 	}
 
 	public String getAction() {
-		return action;
+		return maskPasswordInString(action);
 	}
 
 	public Element getElement() {

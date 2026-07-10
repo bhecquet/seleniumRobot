@@ -2785,6 +2785,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertFalse(detailedReportContent.matches(".*<i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> Test end - 0\\.\\d+ secs</span></div><div class=\"box-body\"><div class=\"step-info\"><i class=\"fas fa-info-circle\"></i><span>Possibly caused by REGRESSION: Check your scripts</span></div>.*"));
 	}
 
+
 	@Test(groups = {"it"})
 	public void testStepAnnotationWithErrorNoDetails() throws Exception {
 
@@ -2822,6 +2823,54 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// add step is not in error, error cause is not displayed
 		Assert.assertFalse(detailedReportContent.contains("<div class=\"step-info\"><i class=\"fas fa-info-circle\"></i>"));
 
+	}
+
+	/**
+	 * Check assertion verification is logged in report, even if no error is raised
+	 */
+	@Test(groups = {"it"})
+	public void testAssertionLogging() throws Exception {
+
+		SeleniumTestsContextManager.removeThreadContext();
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForAssertionLogging"}, ParallelMode.METHODS, new String[]{"testAssertionOKIsLogged"});
+
+		String detailedReportContent = readTestMethodResultFile("testAssertionOKIsLogged");
+		detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
+
+		// Only failing step contains the information message
+		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-info message-conf\">.*?</span> Check: No error </div>.*"));
+	}
+
+	/**
+	 * Check assertion is attached to the previous step when it's called from outside PageObject
+	 */
+	@Test(groups = {"it"})
+	public void testAssertionLoggingOutsidePageObject() throws Exception {
+
+		SeleniumTestsContextManager.removeThreadContext();
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForAssertionLogging"}, ParallelMode.METHODS, new String[]{"testAssertionOKIsLogged2"});
+
+		String detailedReportContent = readTestMethodResultFile("testAssertionOKIsLogged2");
+		detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
+
+		// Check failed assertion is outside the "doNothing" subStep as it was called outside of that method
+		Assert.assertTrue(detailedReportContent.matches(".*</span> doNothing on HtmlElement none, by=\\{By.id: none\\} </div></li><div class=\"row\"></div></ul>" +
+				"<div class=\"row\"></div></ul>" +
+				"<div class=\"message-error message-conf\"><span.*?</span> Check: values are different.*"));
+	}
+
+	@Test(groups = {"it"})
+	public void testAssertionLoggingInSubStep() throws Exception {
+
+		SeleniumTestsContextManager.removeThreadContext();
+		executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForAssertionLogging"}, ParallelMode.METHODS, new String[]{"testAssertionKOIsLogged"});
+
+		String detailedReportContent = readTestMethodResultFile("testAssertionKOIsLogged");
+		detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
+
+		// Assertion message and Assertion error are present in report
+		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error message-conf\">.*?</span> Check: false error </div>.*"));
+		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error message-conf\">.*?</span> Assertion Failure: false error expected \\[true] but found \\[false] </div>.*"));
 	}
 
 	@Test(groups = {"it"})

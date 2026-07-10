@@ -234,8 +234,8 @@ public class SquashTMConnector extends TestManager {
 
                 List<TestStep> testStepList = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
                 for (TestStep testStep : testStepList) {
-                    if (StringUtils.isBlank(testStep.getDescription()) || StringUtils.isBlank(testStep.getExpectedResult())) {
-                        continue; // skip step if description or expected result is null or blank
+                    if (StringUtils.isBlank(testStep.getDescription())) {
+                        continue; // skip step if description is null or blank
                     }
                     Map<String, Object> datas = new HashMap<>();
                     datas.put("action", testStep.getDescription());
