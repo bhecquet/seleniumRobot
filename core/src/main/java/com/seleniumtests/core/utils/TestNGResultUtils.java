@@ -132,7 +132,7 @@ public class TestNGResultUtils {
     	} else {
     		// issue #137: in case we are in a BeforeMethod, take class name and method name from TestMethod
     		if (testNGResult.getMethod().isBeforeMethodConfiguration()) {
-    			Method testMethod = (Method)(testNGResult.getParameters()[0]);
+    			Method testMethod = getLinkedTestMethod(testNGResult).getConstructorOrMethod().getMethod();
     			return "before-" + testMethod.getName();
     		} else {
     			return testNGResult.getMethod().getMethodName();
@@ -183,7 +183,7 @@ public class TestNGResultUtils {
 			
     		// issue #137: in case we are in a BeforeMethod, take class name and method name from TestMethod
     		if (testNGResult.getMethod().isBeforeMethodConfiguration()) {
-    			Method testMethod = (Method)(testNGResult.getParameters()[0]);
+    			Method testMethod = getLinkedTestMethod(testNGResult).getConstructorOrMethod().getMethod();
     			className = testMethod.getDeclaringClass().getName();
     			testMethodName = "before-" + testMethod.getName();
     			testMethodParams = testMethod.getParameters();

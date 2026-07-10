@@ -288,23 +288,7 @@ public class SeleniumTestsContextManager {
      * @return	the method name of the test method
      */
     private static String getMethodNameFromMethodConfiguration(ITestResult testResult) {
-    	try {
-    		return ((Method)(testResult.getParameters()[0])).getName();
-    	} catch (Exception e) {
-    		if (testResult.getMethod().getConstructorOrMethod().getMethod().getParameterCount() == 0 
-    				|| !testResult.getMethod().getConstructorOrMethod().getMethod().getParameterTypes()[0].isAssignableFrom(Method.class) ) {
-				throw new ScenarioException("""
-						When using @BeforeMethod / @AfterMethod in tests, this method MUST have a 'java.lang.reflect.Method' object as first argument. Example:
-						
-						@BeforeMethod
-						public void beforeMethod(Method method) {
-						    SeleniumTestsContextManager.getThreadContext().setAttribute("some attribute", "attribute value");
-						}
-						""");
-    		} else {
-    			throw e;
-    		}
-		}
+		return TestNGResultUtils.getLinkedTestMethod(testResult).getConstructorOrMethod().getMethod().getName();
     }
     
     /**
@@ -313,25 +297,7 @@ public class SeleniumTestsContextManager {
      * @return the class name of the test method
      */
     private static String getClassNameFromMethodConfiguration(ITestResult testResult) {
-    	try {
-    		return ((Method)(testResult.getParameters()[0])).getDeclaringClass().getName();
-    		
-    	} catch (Exception e) {
-    		if (testResult.getMethod().getConstructorOrMethod().getMethod().getParameterCount() == 0 
-    				|| !testResult.getMethod().getConstructorOrMethod().getMethod().getParameterTypes()[0].isAssignableFrom(Method.class) ) {
-				throw new ScenarioException("""
-						When using @BeforeMethod / @AfterMethod in tests, this method MUST have a 'java.lang.reflect.Method' object as first argument. Example:
-						
-						@BeforeMethod
-						public void beforeMethod(Method method) {
-						    SeleniumTestsContextManager.getThreadContext().setAttribute("some attribute", "attribute value");
-						}
-						
-						""");
-    		} else {
-    			throw e;
-    		}
-		}
+		return TestNGResultUtils.getLinkedTestMethod(testResult).getConstructorOrMethod().getMethod().getDeclaringClass().getName();
     }
     
     /**
