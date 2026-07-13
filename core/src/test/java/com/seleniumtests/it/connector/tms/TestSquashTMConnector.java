@@ -4,12 +4,8 @@ import com.seleniumtests.GenericTest;
 import com.seleniumtests.connectors.tms.squash.SquashTMConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestVariable;
-import com.seleniumtests.driver.CustomEventFiringWebDriver;
-import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
-import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
-import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestStep;
 
@@ -24,7 +20,6 @@ import org.testng.annotations.CustomAttribute;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlTest;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;

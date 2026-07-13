@@ -243,7 +243,7 @@ public class SquashTMConnector extends TestManager {
                     io.github.bhecquet.entities.TestStep newTestStep = io.github.bhecquet.entities.TestStep.create(testCase.getId(), datas);
                     //add attachment if exists
                     for (Snapshot snapshot : testStep.getSnapshots()) {
-                        if (snapshot.getCheckSnapshot() == SnapshotCheckType.NONE) {
+                        if (snapshot.getCheckSnapshot() == SnapshotCheckType.NONE || snapshot.getCheckSnapshot() == SnapshotCheckType.FULL) {
                             newTestStep.uploadAttachment(new File(snapshot.getScreenshot().getOutputDirectory() + "/" + snapshot.getScreenshot().getImagePath()), newTestStep.getId());
                         }
                     }

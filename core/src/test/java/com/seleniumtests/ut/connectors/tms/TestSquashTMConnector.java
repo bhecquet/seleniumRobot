@@ -704,7 +704,10 @@ public class TestSquashTMConnector extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testUpdateTestCaseWithSnapshot() {
+		checkAddSnapshot(SnapshotCheckType.NONE, 1);
+	}
 
+	private void checkAddSnapshot(SnapshotCheckType checkType, int timesCalled) {
 		SquashTMConnector squash = spy(new SquashTMConnector());
 		squash.init(connect);
 		doReturn(api).when(squash).getApi();
@@ -722,10 +725,10 @@ public class TestSquashTMConnector extends MockitoTest {
 
 		Snapshot snapshot = mock(Snapshot.class);
 		ScreenShot screenShot = mock(ScreenShot.class);
-		when(snapshot.getCheckSnapshot()).thenReturn(SnapshotCheckType.NONE);
+		when(snapshot.getCheckSnapshot()).thenReturn(checkType);
 		when(snapshot.getScreenshot()).thenReturn(screenShot);
 		when(screenShot.getImagePath()).thenReturn("path/to/image.png");
-		when(step1.getSnapshots()).thenReturn(Arrays.asList(snapshot));
+		when(step1.getSnapshots()).thenReturn(List.of(snapshot));
 
 		SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().add(step1);
 
@@ -735,42 +738,23 @@ public class TestSquashTMConnector extends MockitoTest {
 		squash.updateTestCase(testResult);
 
 		// verify attachment uploaded
-		verify(newSquashTestStep).uploadAttachment(any(File.class), eq(200));
+		verify(newSquashTestStep, times(timesCalled)).uploadAttachment(any(File.class), eq(200));
 	}
 
 	/**
-	 * Check that updateTestCase does NOT upload attachments for snapshots with non-NONE check type
+	 * Check that updateTestCase does NOT upload attachments for snapshots with full check type
 	 */
 	@Test(groups={"ut"})
-	public void testUpdateTestCaseWithSnapshotNonNoneCheckType() {
+	public void testUpdateTestCaseWithSnapshotFullCheckType() {
+		checkAddSnapshot(SnapshotCheckType.FULL, 1);
+	}
 
-		SquashTMConnector squash = spy(new SquashTMConnector());
-		squash.init(connect);
-		doReturn(api).when(squash).getApi();
-
-		when(testMethod.getAttributes()).thenReturn(new CustomAttribute[] {testIdAttr, updateTestManagerAttr});
-		when(testMethod.getDescription()).thenReturn("Test description");
-
-		when(testCase.getId()).thenReturn(1);
-		when(testCase.getTestSteps()).thenReturn(new ArrayList<>());
-
-		TestStep step1 = mock(TestStep.class);
-		when(step1.getDescription()).thenReturn("Step action");
-		when(step1.getExpectedResult()).thenReturn("Expected");
-
-		Snapshot snapshot = mock(Snapshot.class);
-		when(snapshot.getCheckSnapshot()).thenReturn(SnapshotCheckType.FULL);
-		when(step1.getSnapshots()).thenReturn(Arrays.asList(snapshot));
-
-		SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().add(step1);
-
-		mockedSquashTestStep.when(() -> io.github.bhecquet.entities.TestStep.create(eq(1), anyMap())).thenReturn(newSquashTestStep);
-		when(newSquashTestStep.getId()).thenReturn(200);
-
-		squash.updateTestCase(testResult);
-
-		// verify no attachment uploaded
-		verify(newSquashTestStep, never()).uploadAttachment(any(File.class), anyInt());
+	/**
+	 * Check that updateTestCase does NOT upload attachments for snapshots with reference only type
+	 */
+	@Test(groups={"ut"})
+	public void testUpdateTestCaseWithSnapshotReferenceOnlyType() {
+		checkAddSnapshot(SnapshotCheckType.REFERENCE_ONLY, 0);
 	}
 
 	/**
