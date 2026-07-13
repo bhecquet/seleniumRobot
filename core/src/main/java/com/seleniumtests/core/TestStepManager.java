@@ -234,7 +234,7 @@ public class TestStepManager {
 
 		try {
 			List<TestStep> allSteps = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getTestSteps();
-			return allSteps.get(allSteps.size() - 1);
+			return allSteps.getLast();
 		} catch (Exception e) {
 			return null;
 		}

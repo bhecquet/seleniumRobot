@@ -123,17 +123,36 @@ public class TestLogActions extends GenericTest {
 				.add(1, 1);
 
 		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
+		SeleniumTestsContextManager.getThreadContext().resetTestStepManager(); // we don't want assertions goes into current list of steps
 		Assert.assertEquals(steps.size(), 2);
-		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
-		Assert.assertEquals(steps.get(0).getOrigin(), CalcPage.class);
-		Assert.assertEquals(steps.get(0).getAction(), "openPage");
+		Assert.assertEquals(steps.getFirst().getName(), "openPage with args: (null, )");
+		Assert.assertEquals(steps.getFirst().getOrigin(), CalcPage.class);
+		Assert.assertEquals(steps.getFirst().getAction(), "openPage");
 		Assert.assertEquals(steps.get(1).getName(), "add with args: (1, 1, )");
 		Assert.assertEquals(steps.get(1).getOrigin(), CalcPage.class);
 		Assert.assertEquals(steps.get(1).getAction(), "add");
-		Assert.assertFalse(steps.get(0).getFailed());
+		Assert.assertFalse(steps.getFirst().getFailed());
 		Assert.assertFalse(steps.get(1).getFailed());
-		Assert.assertEquals(steps.get(0).getStepActions().size(), 2); // Opening page + timing
+		Assert.assertEquals(steps.getFirst().getStepActions().size(), 2); // Opening page + timing
 		Assert.assertEquals(steps.get(1).getStepActions().size(), 1);
+	}
+
+	@Test(groups={"it"})
+	public void testSimpleNonCucumberStepLoggingOnConstructor() {
+		new CalcPage(1)
+				.addAndCallNew(1, 1);
+
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
+		SeleniumTestsContextManager.getThreadContext().resetTestStepManager(); // we don't want assertions goes into current list of steps
+		Assert.assertEquals(steps.size(), 2);
+		Assert.assertEquals(steps.getFirst().getName(), "Init application 1");
+		Assert.assertEquals(steps.getFirst().getOrigin(), CalcPage.class);
+		Assert.assertEquals(steps.getFirst().getAction(), "openPage");
+		Assert.assertEquals(steps.getFirst().getDescription(), "Option Calc application 1");
+		Assert.assertEquals(steps.getFirst().getExpectedResult(), "Application opens correctly 1");
+
+		Assert.assertEquals(steps.get(1).getName(), "addAndCallNew with args: (1, 1, )");
+		Assert.assertEquals(steps.get(1).getStepActions().getFirst().getName(), "openPage with args: (null, )"); // call to CalcPage in a sub-step does not replace step name
 	}
 
 	/**
@@ -167,6 +186,14 @@ public class TestLogActions extends GenericTest {
 
 		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
 		Assert.assertEquals(steps.get(1).getDescription(), "step description 1");
+	}
+	@Test(groups={"it"})
+	public void testSimpleNonCucumberStepLoggingWithDescriptionContainingDatasetParameterInterpolation() {
+		new CalcPage()
+				.addWithStepDescriptionWithParameterAndDataset(1);
+
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
+		Assert.assertEquals(steps.get(1).getDescription(), "step description 1 / ${value}");
 	}
 
 	/**

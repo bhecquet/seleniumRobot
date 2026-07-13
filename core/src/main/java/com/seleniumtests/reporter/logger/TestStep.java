@@ -640,9 +640,17 @@ public class TestStep extends TestAction {
         return maskPasswordInString(description);
     }
 
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
     public String getExpectedResult() {
         return maskPasswordInString(expectedResult);
     }
+
+	public void setExpectedResult(String expectedResult) {
+		this.expectedResult = expectedResult;
+	}
 
 	public String getId() {
 		return id;

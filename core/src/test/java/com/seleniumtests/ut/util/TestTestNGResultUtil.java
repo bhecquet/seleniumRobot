@@ -178,8 +178,11 @@ public class TestTestNGResultUtil extends MockitoTest {
 	public void testHashWithBeforeTestMethod() throws NoSuchMethodException, SecurityException {
 		when(testNGMethod.getRealClass()).thenReturn(TestTestNGResultUtil.class);
 		when(testResult.getParameters()).thenReturn(new Object[] {TestTestNGResultUtil.class.getDeclaredMethod("testHashWithBeforeTestMethod")});
+		when(testResult.getAttribute("linkedTestMethod")).thenReturn(testNGMethod);
 		when(testNGMethod.isBeforeMethodConfiguration()).thenReturn(true);
 		when(testNGMethod.getMethodName()).thenReturn("testHashWithBeforeTestMethod");
+		when(testNGMethod.getConstructorOrMethod()).thenReturn(constructorOrMethod);
+		when(constructorOrMethod.getMethod()).thenReturn(TestTestNGResultUtil.class.getDeclaredMethod("testHashWithBeforeTestMethod"));
 		
 		Assert.assertTrue(TestNGResultUtils.getHashForTest(testResult).startsWith("mySuite-myTest-com.seleniumtests.ut.util.TestTestNGResultUtil-before-testHashWithBeforeTestMethod-1-org.testng.ITestNGMethod"));
 		

@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.core;
 
+import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.METHOD;
 
 import java.lang.annotation.Retention;
@@ -28,7 +29,7 @@ import java.lang.annotation.Target;
  */
 
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
-@Target(METHOD)
+@Target({METHOD, CONSTRUCTOR})
 public @interface Step {
 	
 	public enum RootCause {

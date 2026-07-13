@@ -42,10 +42,20 @@ public class CalcPage extends PageObject {
 	public CalcPage() {
 		super();
 	}
+
+	@Step(name = "Init application ${initialValue}", description = "Option Calc application ${initialValue}", expectedResult = "Application opens correctly ${initialValue}")
+	public CalcPage(int initialValue) {
+		logger.info(String.format("initial value %d", initialValue));
+	}
 	
 	public CalcPage add(int a, int b) {
 		result = a + b;
 		doNothing();
+		return this;
+	}
+	public CalcPage addAndCallNew(int a, int b) {
+		result = a + b;
+		new CalcPage(b);
 		return this;
 	}
 	
@@ -195,6 +205,15 @@ public class CalcPage extends PageObject {
 	@Step(description="step description ${a}")
 	public CalcPage addWithStepDescriptionWithParameter(int a) {
 		add(result, a);
+		return this;
+	}
+
+	/**
+	 * First 'value' should be replaced while second should not as it should be considered as dataset for Test manager
+	 */
+	@Step(description="step description ${value} / $${value}")
+	public CalcPage addWithStepDescriptionWithParameterAndDataset(int value) {
+		add(result, value);
 		return this;
 	}
 	@Step(expectedResult="expected result")

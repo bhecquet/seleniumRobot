@@ -18,6 +18,8 @@
 package com.seleniumtests.core.aspects;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,6 +39,8 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.aspectj.lang.reflect.CodeSignature;
+import org.aspectj.lang.reflect.ConstructorSignature;
 import org.jetbrains.annotations.NotNull;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -206,8 +210,40 @@ public class LogAction {
 	@Around("isCucumberTest(joinPoint)")
 	public Object logCucumberTestStep(ProceedingJoinPoint joinPoint) throws Throwable {
 		return logTestStep(joinPoint, "", false);
-	}	
-	
+	}
+
+	/**
+	 * Intercept calls to constructors of PageObject subclasses annotated with @Step
+	 * In this case, update root step (openPage step) with the name defined in annotation
+	 * aspect on openPage method creates the TestStep, then this aspect updates it
+	 */
+	@Around("execution(@com.seleniumtests.core.Step com.seleniumtests.uipage.PageObject+.new(..)) && @annotation(step)")
+	public Object logPageObjectConstructorStep(ProceedingJoinPoint joinPoint, Step step) throws Throwable {
+
+		try {
+			return joinPoint.proceed(joinPoint.getArgs());
+		} finally {
+			List<String> pwdToReplace = new ArrayList<>();
+			
+			// when constructor is called at the beginning of a test scenario, outside of any PageObject method, no current step exists, so take the root step
+			TestStep testStep = TestStepManager.getCurrentOrPreviousStep();
+			if (TestStepManager.getParentTestStep() == null) {
+				Map<String, String> arguments = new HashMap<>();
+				buildArgString(joinPoint, pwdToReplace, arguments);
+				if (!step.name().isBlank()) {
+					testStep.setName(interpolateValue(arguments, step.name()));
+				}
+
+				if (!step.description().isBlank()) {
+					testStep.setDescription(interpolateValue(arguments, step.description()));
+				}
+				if (!step.expectedResult().isBlank()) {
+					testStep.setExpectedResult(interpolateValue(arguments, step.expectedResult()));
+				}
+			}
+		}
+	}
+
 	/**
 	 * Log any call to test steps (page object calls inside a SeleniumTestPlan subclass)
 	 * @param joinPoint
@@ -252,9 +288,7 @@ public class LogAction {
 	 * Log this method call as a test step
 	 * @param joinPoint			the join point
 	 * @param stepNamePrefix	string to add before step name
-	 * @param configStep		is this method call a TestNG configuration method (\@BeforeXXX or \@AfterXXX)
-	 * @return
-	 * @throws Throwable
+	 * @param configStep		is this method calls a TestNG configuration method (\@BeforeXXX or \@AfterXXX)
 	 */
 	private Object logTestStep(ProceedingJoinPoint joinPoint, String stepNamePrefix, boolean configStep)  throws Throwable {
 		
@@ -322,7 +356,7 @@ public class LogAction {
 				
 				String argName = "";
 				try {
-					argName = ((MethodSignature)joinPoint.getSignature()).getParameterNames()[paramIdx];
+					argName = ((CodeSignature)joinPoint.getSignature()).getParameterNames()[paramIdx];
 				} catch (ClassCastException | IndexOutOfBoundsException e) {
 					argName = "_";
 				}
@@ -375,10 +409,11 @@ public class LogAction {
 	 */
 	private static void addPasswordsToReplacements(JoinPoint joinPoint, List<String> stringToReplace, int paramIdx,
 			Object arg, String argName) {
-		if (arg != null && (argName.toLowerCase().contains("password") 
+		Executable executable = getExecutable(joinPoint);
+		if (arg != null && (argName.toLowerCase().contains("password")
 				|| argName.toLowerCase().contains("pwd") 
 				|| argName.toLowerCase().contains("passwd")
-				|| ((MethodSignature)joinPoint.getSignature()).getMethod().getParameters()[paramIdx].getAnnotationsByType(Mask.class).length > 0)) {
+				|| (executable != null && executable.getParameters()[paramIdx].getAnnotationsByType(Mask.class).length > 0))) {
 			if (arg instanceof CharSequence[] charSequences) {
 				for (Object obj: charSequences) {
 					stringToReplace.add(obj.toString());
@@ -393,6 +428,22 @@ public class LogAction {
 		}
 	}
 	
+	/**
+	 * Returns the java.lang.reflect.Executable (Method or Constructor) behind this joinPoint.
+	 * Allows the same code to introspect annotations / parameters whether the join point
+	 * is a method execution or a constructor execution.
+	 * @param joinPoint
+	 * @return the Executable, or null if signature is neither a MethodSignature nor a ConstructorSignature
+	 */
+	private static Executable getExecutable(JoinPoint joinPoint) {
+		if (joinPoint.getSignature() instanceof MethodSignature methodSignature) {
+			return methodSignature.getMethod();
+		} else if (joinPoint.getSignature() instanceof ConstructorSignature constructorSignature) {
+			return constructorSignature.getConstructor();
+		}
+		return null;
+	}
+
 	/**
 	 * Returns step with name depending on step type
 	 * In case of cucumber step, get the annotation value. 
@@ -475,7 +526,11 @@ public class LogAction {
 	private static String interpolateValue(Map<String, String> arguments, String nameWithArgs) {
 		String newNameWithArgs = nameWithArgs;
 		for (Entry<String, String> entry: arguments.entrySet()) {
-			newNameWithArgs = newNameWithArgs.replaceAll(String.format("\\$\\{%s\\}",  entry.getKey()), entry.getValue().replace("$", "\\$"));
+			// avoid replacing datasets ($${foo}) but replaces ${foo}
+			newNameWithArgs = newNameWithArgs.replaceAll(String.format("(?<!\\$)\\$\\{%s\\}",  entry.getKey()), entry.getValue().replace("$", "\\$"));
+
+			// then make dataset have the right format ${foo}
+			newNameWithArgs = newNameWithArgs.replace(String.format("$${%s}",  entry.getKey()), String.format("${%s}",  entry.getKey()));
 		}
 		return newNameWithArgs;
 	}
@@ -483,7 +538,6 @@ public class LogAction {
 	/**
 	 * Returns the value of cucumber annotation to get corresponding text
 	 * @param annotation
-	 * @return
 	 */
 	private String getAnnotationValue(Annotation annotation) {
 		return StringEscapeUtils.unescapeJava(annotation.toString().replaceFirst("timeout=\\d+", "")

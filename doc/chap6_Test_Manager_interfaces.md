@@ -182,10 +182,62 @@ You can override this beheviour by specifying it in variables or in test directl
     }
 ```
 
-It's also possible to set it via variables:
+It's also possible to set it via variables in launch command or XML file:
 `tms.squash.iteration`
 `tms.squash.campaign`
 `tms.squash.campaign.folder`
+
+#### Update test case when test succeeds
+
+If test succeds, it's possible to update test case description and steps
+**ALL** previous steps will be discarded
+
+To enable this, add the 'updateTestManager' attribute to test
+
+```
+@Test(attributes = {@CustomAttribute(name = "testId", values = "12"), @CustomAttribute(name = "updateTestManager", values = "true")})
+public void test() {
+ ...
+}
+```
+
+##### Add some steps
+
+Moreover, at least some of the tests will need to provide @Step annotation with at least `description`
+`expectedResult` is optional but should be provided in some steps
+See chap3_Test_writing.md for details about all options on @Step.
+
+⚠ You should only add @Step annotation on root steps (the one that are present at root level of report. If @Step annotation is on a substep, it will be ignored
+
+```
+@Step(description="step description ${value}", expectedResult="${value} should be greater that 1")
+public CalcPage add(int value) {
+    add(result, a);
+    return this;
+}
+```
+  
+Only annotated steps with description will be sent to Squash
+
+##### Add assertions
+
+Expected result will get all assertions that have been checked during this annotated step. 
+So you should add a message for all assertion if you want them to be clear in Squash TM test steps
+
+##### Add screen captures
+
+Squash will receive all captures taken during the test that have the `SnapshotCheckType.NONE` or `SnapshotCheckType.FULL`
+
+##### Add test description
+
+Test NG test description is used as test description for Squash
+
+```
+@Test(description="My test does the following", attributes = {@CustomAttribute(name = "testId", values = "12"), @CustomAttribute(name = "updateTestManager", values = "true")})
+public void test() {
+ ...
+}
+```
 
   
 ### Add an other Test Manager ###
@@ -194,9 +246,14 @@ It's possible to extend SeleniumRobot to add a new TestManager
 For this, create a class extending "TestManager" and implement at least
 
 ```java
- @Override
+    @Override
     public void recordResult(ITestResult testResult) {
         "Send your result to the Test manager here"
+    }
+    
+    @Override
+    public void updateTestCase(ITestResult testResult) {
+        "update content of test cases here
     }
 
     @Override

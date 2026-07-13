@@ -280,7 +280,7 @@ public class SeleniumTestsContext {
     private BugTracker	bugtrackerInstance;
     private BugTrackerContext bugtrackerContext;
     private SeleniumRobotServerContext seleniumRobotServerContext;
-    private final TestStepManager testStepManager; // handles logging of test steps in this context
+    private TestStepManager testStepManager; // handles logging of test steps in this context
     private boolean driverCreationBlocked = false;		// if true, inside this thread, driver creation will be forbidden
     
     // folder config
@@ -2316,6 +2316,13 @@ public class SeleniumTestsContext {
 	public SeleniumRobotServerContext seleniumServer() {
 		return seleniumRobotServerContext;
 	}
+
+    /**
+     * For tests only
+     */
+    public void resetTestStepManager() {
+        this.testStepManager = new TestStepManager();
+    }
 
     /**
      * A unique context ID for this TestNG run

@@ -496,6 +496,31 @@ Step name can also use placeholders for method parameters. They will be replaced
 	
 where method takes 'number' and 'product' arguments 
 
+##### Step description / expected result #####
+
+You can add a step description and expected result.
+This feature is useful when you connect to test manager, and updateTestManager is set, as these information will help overwriting the steps
+Both fields accept placeholders
+
+```
+@Step(description="step description ${value}", expectedResult="${value} should be greater that 1")
+public CalcPage add(int value) {
+    add(result, a);
+    return this;
+}
+```
+
+Moreover, if Test Manager handles datasets for tests, you can use the `$${...}` notation. This way, the value won't be replaced and `${...}` will be sent to TMS directly so that it replaces the fields itself
+For example, Squash TM uses the ${...} format as a placeholder inside test steps for dataset values.
+
+```
+@Step(description="step description ${value} with param $${param}", expectedResult="${value} should be greater that 1")
+public CalcPage addWithStepDescriptionWithParameter(int value) {
+    add(result, a);
+    return this;
+}
+```
+
 ##### Most probable error cause #####
 
 Through `@Step` annotation, it's possible to define the most probable cause of error when test fails at this step
