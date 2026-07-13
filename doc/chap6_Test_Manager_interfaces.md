@@ -203,6 +203,21 @@ public void test() {
 
 ##### Add some steps
 
+###### Initial step
+
+All test scenarios start by opening a page, so add a @Step on the constructor that serves as an initial step
+
+```
+@Step(name = "Init application ${initialValue}", 
+    description = "Option Calc application ${initialValue}", 
+    expectedResult = "Application opens correctly ${initialValue}")
+public CalcPage(int initialValue) {
+    logger.info(String.format("initial value %d", initialValue));
+}
+```
+
+###### other steps
+
 Moreover, at least some of the tests will need to provide @Step annotation with at least `description`
 `expectedResult` is optional but should be provided in some steps
 See chap3_Test_writing.md for details about all options on @Step.
