@@ -585,6 +585,7 @@ public class TestStep extends TestAction {
 		stepToEncode.pageLoadTime = pageLoadTime == null ? null: pageLoadTime.encodeTo(format);
 		stepToEncode.expectedResult = encodeString(expectedResult, format);
 		stepToEncode.description = encodeString(description, format);
+		stepToEncode.id = id;
 		
 		return stepToEncode;
 	}
