@@ -21,6 +21,7 @@
       - [Shadow DOM](#shadow-dom)
   - [Document your tests](#document-your-tests)
     - [Step naming](#step-naming)
+    - [Step description / expected result](#step-description--expected-result)
     - [Most probable error cause](#most-probable-error-cause)
   - [Add user defined test steps](#add-user-defined-test-steps)
   - [Add snapshots](#add-snapshots)
