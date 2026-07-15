@@ -132,6 +132,7 @@ public class TestRetry extends ReporterTest {
 	
 	/**
 	 * issue #282: check it's possible to increase dynamically the max retry count
+	 * Due to #776, increaseMaxRetry is done for each test retry, so it must be called each time the test fails
 	 */
 	@Test(groups={"it"})
 	public void testRetryOnExceptionWithDynamicMaxRetry() throws Exception {
@@ -142,26 +143,6 @@ public class TestRetry extends ReporterTest {
 		String detailedReportContent = readTestMethodResultFile("testWithExceptionAndMaxRetryIncreased");
 		Assert.assertTrue(detailedReportContent.contains("Failed in 5 times"));
 		Assert.assertTrue(detailedReportContent.contains("[RETRYING] class com.seleniumtests.it.stubclasses.StubTestClass.testWithExceptionAndMaxRetryIncreased"));
-		
-		// check that in case of retry, steps are not logged twice
-		Assert.assertTrue(detailedReportContent.contains("step 1"));
-		Assert.assertTrue(detailedReportContent.contains("played 5 times")); // only the last step is retained
-		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "step 1"), 1); 	
-	}
-	
-	/**
-	 * issue #282: check it's possible to increase dynamically the max retry count, but not above limit (2* max retry)
-	 * Default is 3, so we should not execute the test more than (2 * 2 + 1) times
-	 */
-	@Test(groups={"it"})
-	public void testRetryOnExceptionWithDynamicMaxRetryAboveLimit() throws Exception {
-		
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testWithExceptionAndMaxRetryIncreasedWithLimit"});
-		
-		// check test with exception is retried based on log. No more direct way found
-		String detailedReportContent = readTestMethodResultFile("testWithExceptionAndMaxRetryIncreasedWithLimit");
-		Assert.assertTrue(detailedReportContent.contains("Failed in 5 times"));
-		Assert.assertTrue(detailedReportContent.contains("[RETRYING] class com.seleniumtests.it.stubclasses.StubTestClass.testWithExceptionAndMaxRetryIncreasedWithLimit"));
 		
 		// check that in case of retry, steps are not logged twice
 		Assert.assertTrue(detailedReportContent.contains("step 1"));

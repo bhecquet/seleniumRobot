@@ -193,31 +193,10 @@ public class StubTestClass extends StubParentClass {
 		try {
 			throw new DriverExceptions("some exception");
 		} finally {
-			if (count < 3) {
-				increaseMaxRetry();
-			}
+			increaseMaxRetry();
 		}
 	}
-	
-	/**
-	 * Increase max retry above limit
-	 */
-	@Test(groups="stub")
-	public void testWithExceptionAndMaxRetryIncreasedWithLimit() {
-		count++;
-		TestStep step1 = new TestStep("step 1", "step 1", this.getClass(), Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
-		step1.addAction(new TestAction(String.format("played %d times", count), false, new ArrayList<>()));
-		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
-		TestStepManager.logTestStep(step1);
-		
-		try {
-			throw new DriverExceptions("some exception");
-		} finally {
-			if (count < 4) {
-				increaseMaxRetry();
-			}
-		}
-	}
+
 	
 	
 	/**
