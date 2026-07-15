@@ -300,9 +300,9 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 			counter.set(0); 
 		}
     	
-		SeleniumTestsContextManager.getGlobalContext().getContextDataMap().put("driverFailErrorOnHub", driverFailErrorOnHub);
-        SeleniumTestsContextManager.getGlobalContext().getContextDataMap().put("driverFailHubUnavailable", driverFailHubUnavailable);
-        SeleniumTestsContextManager.getGlobalContext().getContextDataMap().put("driverFailNoMatchingNode", driverFailNoMatchingNode);
+		SeleniumTestsContextManager.getThreadContext().getContextDataMap().put("driverFailErrorOnHub", driverFailErrorOnHub);
+        SeleniumTestsContextManager.getThreadContext().getContextDataMap().put("driverFailHubUnavailable", driverFailHubUnavailable);
+        SeleniumTestsContextManager.getThreadContext().getContextDataMap().put("driverFailNoMatchingNode", driverFailNoMatchingNode);
     	return driver;
     }
 

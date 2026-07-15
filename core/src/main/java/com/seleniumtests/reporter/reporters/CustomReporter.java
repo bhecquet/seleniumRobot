@@ -181,9 +181,10 @@ public class CustomReporter extends CommonReporter implements IReporter {
 				context.put(BROWSER_VERSION, seleniumTestsContext.getSeleniumGridConnector() != null && !seleniumTestsContext.getSeleniumGridConnector().getDrivers().isEmpty() ?
 						seleniumTestsContext.getSeleniumGridConnector().getDrivers().get(0).getCapabilities().getBrowserVersion()
 						: "N/A");
-				context.put(DRIVERFAILERRORONHUB, SeleniumTestsContextManager.getGlobalContext().getContextDataMap().get(DRIVERFAILERRORONHUB));
-                context.put(DRIVERFAILHUBUNAVAILABLE, SeleniumTestsContextManager.getGlobalContext().getContextDataMap().get(DRIVERFAILHUBUNAVAILABLE));
-                context.put(DRIVERFAILNONODE, SeleniumTestsContextManager.getGlobalContext().getContextDataMap().get(DRIVERFAILNONODE));
+				context.put(DRIVERFAILERRORONHUB, SeleniumTestsContextManager.getThreadContext().getContextDataMap().get(DRIVERFAILERRORONHUB));
+                context.put(DRIVERFAILHUBUNAVAILABLE, SeleniumTestsContextManager.getThreadContext().getContextDataMap().get(DRIVERFAILHUBUNAVAILABLE));
+                context.put(DRIVERFAILNONODE, SeleniumTestsContextManager.getThreadContext().getContextDataMap().get(DRIVERFAILNONODE));
+                context.put("nodeTags", SeleniumTestsContextManager.getGlobalContext().getContextDataMap().get("nodeTags"));
 			} else if (seleniumTestsContext.getRunMode().equals(DriverMode.BROWSERSTACK)) {
 				context.put(GRIDNODE, "browserstack");
 				context.put(BROWSER_VERSION, seleniumTestsContext.getSeleniumGridConnector() != null && !seleniumTestsContext.getSeleniumGridConnector().getDrivers().isEmpty() ?
@@ -192,15 +193,16 @@ public class CustomReporter extends CommonReporter implements IReporter {
 				context.put(DRIVERFAILERRORONHUB, 0);
                 context.put(DRIVERFAILHUBUNAVAILABLE, 0);
                 context.put(DRIVERFAILNONODE, 0);
+                context.put("nodeTags", new ArrayList<>());
 			} else {
 				context.put(GRIDNODE, seleniumTestsContext.getRunMode());
 				context.put(BROWSER_VERSION, Objects.requireNonNullElse(seleniumTestsContext.getWebBrowserVersion(), "N/A"));
 				context.put(DRIVERFAILERRORONHUB, 0);
                 context.put(DRIVERFAILHUBUNAVAILABLE, 0);
                 context.put(DRIVERFAILNONODE, 0);
-			}
-			context.put("nodeTags", SeleniumTestsContextManager.getGlobalContext().getContextDataMap().get("nodeTags"));
-            context.put("driverCreationDuration", SeleniumTestsContextManager.getGlobalContext().getContextDataMap().get("driverCreationDuration"));
+                context.put("nodeTags", new ArrayList<>());
+			}			
+            context.put("driverCreationDuration", SeleniumTestsContextManager.getThreadContext().getContextDataMap().get("driverCreationDuration"));
 			context.put("errors", errors);
 			context.put("newline", "\n");
 			context.put("failures", failures);

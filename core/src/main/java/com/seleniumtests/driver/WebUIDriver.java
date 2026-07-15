@@ -151,7 +151,7 @@ public class WebUIDriver {
     				cuurrentTestStep.setDurationToExclude(duration);
     			}
     			scenarioLogger.info(String.format("driver creation took: %.1f secs", duration / 1000.0));
-    			SeleniumTestsContextManager.getGlobalContext().getContextDataMap().put("driverCreationDuration", duration);
+    			SeleniumTestsContextManager.getThreadContext().getContextDataMap().put("driverCreationDuration", duration);
     		}
  
             WaitHelper.waitForSeconds(2);
