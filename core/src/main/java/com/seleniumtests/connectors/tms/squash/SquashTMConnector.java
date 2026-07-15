@@ -238,7 +238,7 @@ public class SquashTMConnector extends TestManager {
                         continue; // skip step if description is null or blank
                     }
                     Map<String, Object> datas = new HashMap<>();
-                    datas.put("action", testStep.getDescription());
+                    datas.put("action", String.format("%s - %s", testStep.getId(), testStep.getDescription()));
                     datas.put("expected_result", testStep.getExpectedResult());
                     io.github.bhecquet.entities.TestStep newTestStep = io.github.bhecquet.entities.TestStep.create(testCase.getId(), datas);
                     //add attachment if exists
