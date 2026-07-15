@@ -368,6 +368,7 @@ public class TestLogActions extends GenericTest {
 			.addC(1, 1);
 
 		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
+		SeleniumTestsContextManager.getThreadContext().resetTestStepManager();
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
 		Assert.assertEquals(steps.get(1).getName(), "^add '(\\d+)' to '(\\d+)'$ with args: (1, 1, )");
@@ -424,6 +425,7 @@ public class TestLogActions extends GenericTest {
 		}
 
 		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
+		SeleniumTestsContextManager.getThreadContext().resetTestStepManager();
 		Assert.assertEquals(steps.size(), 4);
 
 		Assert.assertFalse(steps.get(2).getFailed());
@@ -492,23 +494,24 @@ public class TestLogActions extends GenericTest {
 					.add(2);
 
 		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
+		SeleniumTestsContextManager.getThreadContext().resetTestStepManager();
 		Assert.assertEquals(steps.size(), 3);
 		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
 		Assert.assertEquals(steps.get(1).getName(), "add with args: (1, 1, )");
 		Assert.assertEquals(steps.get(2).getName(), "add with args: (2, )");
 
 		Assert.assertEquals(steps.get(1).getStepActions().size(), 1);
-		TestStep subStep = (TestStep)steps.get(1).getStepActions().get(0);
+		TestStep subStep = (TestStep)steps.get(1).getStepActions().getFirst();
 		Assert.assertEquals(subStep.getStepActions().size(), 1);
 		Assert.assertEquals(subStep.getName(), "doNothing");
-		TestAction subSubAction = subStep.getStepActions().get(0);
+		TestAction subSubAction = subStep.getStepActions().getFirst();
 		Assert.assertEquals(subSubAction.getName(), "doNothing on HtmlElement none, by={By.id: none} ");
 		
 		Assert.assertEquals(steps.get(2).getStepActions().size(), 1);
-		subStep = (TestStep)steps.get(2).getStepActions().get(0);
+		subStep = (TestStep)steps.get(2).getStepActions().getFirst();
 		Assert.assertEquals(subStep.getStepActions().size(), 1);
 		Assert.assertEquals(subStep.getName(), "add with args: (2, 2, )");
-		TestStep subSubStep = (TestStep)subStep.getStepActions().get(0);
+		TestStep subSubStep = (TestStep)subStep.getStepActions().getFirst();
 		Assert.assertEquals(subSubStep.getName(), "doNothing");
 	}
 	

@@ -35,7 +35,7 @@ public class StubTestClassForListener4 extends StubParentClass {
 	
 	@Test
 	public void test1Listener4() {
-		SeleniumTestsContextManager.getThreadContext().setAttribute("method exec", "test1Listener3");
+		SeleniumTestsContextManager.getThreadContext().setAttribute("method exec", "test1Listener4");
 
 	}
 	

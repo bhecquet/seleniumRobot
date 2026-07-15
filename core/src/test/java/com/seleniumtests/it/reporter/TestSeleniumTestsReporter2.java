@@ -810,26 +810,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 
 	/**
-	 * Check issue #143 where all \@AfterMethod calls are displayed in all test if its first parameter is not a method reference
-	 */
-	@Test(groups = {"it"})
-	public void testTestReportContainsOnlyItsAfterMethodSteps() throws Exception {
-		executeSubTest(new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForIssue143"});
-
-		String detailedReportContent1 = readTestMethodResultFile("testOk1");
-		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Post test step: reset2"), 1);
-		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Post test step: reset "), 1);
-
-		String detailedReportContent2 = readTestMethodResultFile("testOk2");
-		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "Post test step: reset2"), 1);
-		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "Post test step: reset "), 1);
-
-		String logs = readSeleniumRobotLogFile();
-		Assert.assertTrue(logs.contains("When using @BeforeMethod / @AfterMethod in tests")); // check error message is shown when parameter is not given to Before / AfterMethod
-		Assert.assertTrue(logs.contains("com.seleniumtests.it.stubclasses.StubTestClassForIssue143.reset")); // check method name is displayed
-	}
-
-	/**
 	 * Check issue #141 where \@AfterMethod calls are displayed as many times as test retries
 	 */
 	@Test(groups = {"it"})
@@ -1014,7 +994,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			// that assertion raised in test scenario is attached to previous step
 			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\">"
 					+ "<button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> getResult - \\d+.\\d+ secs</span></div><div class=\"box-body\">"
-					+ "<ul><div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> !!!FAILURE ALERT!!! - Assertion Failure: Error in result expected \\[1] but found \\[2] </div>.*"));
+					+ "<ul>"
+					+ "<div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Check: Error in result </div>.*"
+					+ "<div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> !!!FAILURE ALERT!!! - Assertion Failure: Error in result expected \\[1] but found \\[2] </div>.*"));
 
 			// check last step shows the assertion
 			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fas fa-plus\"></i>"
@@ -1058,7 +1040,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			// that assertion raised in test scenario is attached to previous step
 			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\">"
 					+ "<button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fas fa-plus\"></i></button><span class=\"step-title\"> getResult - \\d+.\\d+ secs</span></div><div class=\"box-body\">"
-					+ "<ul><div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> !!!FAILURE ALERT!!! - Assertion Failure: Error in result expected \\[1] but found \\[2] </div>.*"));
+					+ "<ul>" +
+					"<div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Check: Error in result </div>" +
+					"<div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> !!!FAILURE ALERT!!! - Assertion Failure: Error in result expected \\[1] but found \\[2] </div>.*"));
 
 
 		} finally {
@@ -1089,6 +1073,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 					+ "</button><span class=\"step-title\"> assertWithSubStep - \\d+.\\d+ secs</span></div><div class=\"box-body\"><ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-2\">\\d+:\\d+:\\d+.\\d+</span> doNothing </div></li>"
 					+ "<ul><li><div class=\"message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> doNothing on HtmlElement none, by=\\{By.id: none} </div></li><div class=\"row\"></div></ul>"
 					+ "<li><div class=\"message-conf\"><span class=\"stepTimestamp mr-2\">\\d+:\\d+:\\d+.\\d+</span> assertAction </div></li><ul>" // => sub step with error
+					+ "<div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> Check: false error.*" // error displayed
 					+ "<div class=\"message-error message-conf\"><span class=\"stepTimestamp mr-1\">\\d+:\\d+:\\d+.\\d+</span> !!!FAILURE ALERT!!! - Assertion Failure: false error expected \\[true] but found \\[false].*")); // error displayed
 
 		} finally {

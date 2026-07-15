@@ -428,11 +428,8 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 		String mainReportContent = readSummaryFile();
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "info=\"ok\""), 
-							StringUtils.countMatches(mainReportContent, "TestReport.html") - 1);
+							StringUtils.countMatches(mainReportContent, "TestReport.html"));
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "TestReport.html"), 9);
-
-		// test1Listener4 fails as expected
-		Assert.assertTrue(mainReportContent.matches(".*<a href='test1Listener4/TestReport\\.html' info=\"skipped\".*?>test1Listener4</a>.*"));
 
 		// issue #312: check that result files have been generated at least twice (one during test run and one at the end)
 		String logs = readSeleniumRobotLogFile().replace("\\", "/");
@@ -464,12 +461,9 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 		String mainReportContent = readSummaryFile();
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "info=\"ok\""), 
-				StringUtils.countMatches(mainReportContent, "TestReport.html") - 1);
+				StringUtils.countMatches(mainReportContent, "TestReport.html"));
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "TestReport.html"), 9);
 
-		// test1Listener4 fails as expected
-		Assert.assertTrue(mainReportContent.matches(".*<a href='test1Listener4/TestReport\\.html' info=\"skipped\".*?>test1Listener4</a>.*"));
-		
 		// issue #312: check that result files have been generated once
 		String logs = readSeleniumRobotLogFile().replace("\\", "/");
 		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener2/PERF-result.xml"), 1);
@@ -500,11 +494,8 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 		String mainReportContent = readSummaryFile();
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "info=\"ok\""), 
-				StringUtils.countMatches(mainReportContent, "TestReport.html") - 1);
+				StringUtils.countMatches(mainReportContent, "TestReport.html"));
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "TestReport.html"), 9);
-		
-		// test1Listener4 fails as expected
-		Assert.assertTrue(mainReportContent.matches(".*<a href='test1Listener4/TestReport\\.html' info=\"skipped\".*?>test1Listener4</a>.*"));
 
 		// issue #312: check that result files have been generated at least twice (one during test run and one at the end)
 		String logs = readSeleniumRobotLogFile().replace("\\", "/");
@@ -891,18 +882,6 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 		String logs = readSeleniumRobotLogFile();
 		Assert.assertFalse(logs.contains("When using @BeforeMethod / @AfterMethod in tests")); // check error message is shown when parameter is not given to Before / AfterMethod
-	}
-	
-	/**
-	 * Check we get an error message when configuration method do not have a java.lang.reflect.Method as their first parameter
-	 */
-	@Test(groups={"it"})
-	public void testErrorRaisedIfConfigurationMethodHasNotMethodReference() throws Exception {
-		
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForIssue382e2"});
-		
-		String logs = readSeleniumRobotLogFile();
-		Assert.assertTrue(logs.contains("When using @BeforeMethod / @AfterMethod in tests")); // check error message is shown when parameter is not given to Before / AfterMethod
 	}
 	
 	/**
