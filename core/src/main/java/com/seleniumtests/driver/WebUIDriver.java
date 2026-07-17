@@ -151,7 +151,6 @@ public class WebUIDriver {
     				cuurrentTestStep.setDurationToExclude(duration);
     			}
     			scenarioLogger.info(String.format("driver creation took: %.1f secs", duration / 1000.0));
-    			SeleniumTestsContextManager.getThreadContext().getContextDataMap().put("driverCreationDuration", duration);
     		}
  
             WaitHelper.waitForSeconds(2);
@@ -434,6 +433,9 @@ public class WebUIDriver {
 				driver.quit();
 			} catch (Exception ex) {
 				scenarioLogger.error("Exception encountered when quiting driver:" + ex.getMessage());
+			}
+			if (driver.getDriverUsage() != null) {
+				SeleniumTestsContextManager.getThreadContext().addDriverUsage(driver.getDriverUsage());
 			}
 		} catch (ExecutionException | TimeoutException e1) {
 			if (future != null) {

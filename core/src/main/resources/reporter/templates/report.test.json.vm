@@ -1,8 +1,10 @@
 #set($stepIdx = 0)
+#set($driverIdx = 0)
 #set($testInfoIdx = 0)
 #set($pageLoadTimesIdx = 0)
 #set($stepsSize = $unencodedTestSteps.size())
 #set($testInfoSize = $testInfos.size())
+#set($driversSize = $drivers.size())
 #set($pageLoadTimesSize = $pageLoadTimes.size())
 {
 	"gridnode": "$gridnode",
@@ -18,7 +20,12 @@
 	"stepNumber": $tests,
 	"duration": $duration,
 	"startTime": $time,
-	"driverCreationDuration": $driverCreationDuration,
+	"drivers": [
+		#foreach( $driverUsage in $drivers )
+			#set($driverIdx = $driverIdx + 1)
+			$driverUsage.asJson()#if( $driverIdx != $driversSize),#end
+		#end
+	],
 	"browser": "$browser",
 	"browserVersion": "$browserVersion",
 	"appVersion": "$version",

@@ -364,15 +364,14 @@ public class TestWebUIDriver extends MockitoTest {
 		CustomEventFiringWebDriver driver = WebUIDriver.getWebDriver(true);
 		driver.quit();
 		
-		List<DriverUsage> driverUsages = StatisticsStorage.getDriverUsage();
-		Assert.assertEquals(driverUsages.size(), 1);
-		Assert.assertEquals(driverUsages.get(0).getBrowserName(), "htmlunit");
-		Assert.assertEquals(driverUsages.get(0).getBrowserVersion(), "");
-		Assert.assertTrue(driverUsages.get(0).getDuration() > 0.0);
-		Assert.assertNull(driverUsages.get(0).getGridHub());
-		Assert.assertNull(driverUsages.get(0).getGridNode());
-		Assert.assertTrue(driverUsages.get(0).getStartTime() > 0);
-		Assert.assertEquals(driverUsages.get(0).getTestName(), "testCapsOnDriverQuit");
+		DriverUsage driverUsage = driver.getDriverUsage();
+		Assert.assertEquals(driverUsage.getBrowserName(), "htmlunit");
+		Assert.assertEquals(driverUsage.getBrowserVersion(), "");
+		Assert.assertTrue(driverUsage.getDuration() > 0.0);
+		Assert.assertNull(driverUsage.getGridHub());
+		Assert.assertNull(driverUsage.getGridNode());
+		Assert.assertTrue(driverUsage.getStartTime() > 0);
+		Assert.assertEquals(driverUsage.getTestName(), "testCapsOnDriverQuit");
 	}
 	
 	@Test(groups={"ut"})

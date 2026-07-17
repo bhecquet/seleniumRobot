@@ -51,9 +51,10 @@ public class CustomReporter extends CommonReporter implements IReporter {
 	private static final String FIELD_PASS = "pass";
 	public static final String BROWSER_VERSION = "browserVersion";
 	public static final String GRIDNODE = "gridnode";
-	public static final String DRIVERFAILERRORONHUB = "driverFailErrorOnHub";
-    public static final String DRIVERFAILHUBUNAVAILABLE = "driverFailHubUnavailable";
-    public static final String DRIVERFAILNONODE = "driverFailNoMatchingNode";
+	public static final String NODE_TAGS = "nodeTags";
+	public static final String DRIVER_FAIL_ERROR_ON_HUB = "driverFailErrorOnHub";
+    public static final String DRIVER_FAIL_HUB_UNAVAILABLE = "driverFailHubUnavailable";
+    public static final String DRIVER_FAIL_NO_NODE = "driverFailNoMatchingNode";
 	private List<String> generatedFiles;
 
 
@@ -67,6 +68,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 		generatedFiles = new ArrayList<>();
 		
 		Map<String, Integer> consolidatedResults = new HashMap<>();
+		List<ITestResult> testResults = new ArrayList<>();
 		consolidatedResults.put(FIELD_PASS, 0);
 		consolidatedResults.put(FIELD_FAIL, 0);
 		consolidatedResults.put(FIELD_SKIP, 0);
@@ -85,7 +87,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 				
 				// done in case it was null (issue #81)
 				SeleniumTestsContext testContext = SeleniumTestsContextManager.setThreadContextFromTestResult(entry.getKey(), testResult);
-				
+				testResults.add(testResult);
 
 				if (!TestNGResultUtils.isCustomReportCreated(testResult)) {
 					for (ReportInfo reportInfo: testContext.getCustomTestReports()) {
@@ -96,7 +98,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 		}
 		
 		for (ReportInfo reportInfo: SeleniumTestsContextManager.getGlobalContext().getCustomSummaryReports()) {
-			generateSummaryReport(consolidatedResults, reportInfo);
+			generateSummaryReport(consolidatedResults, reportInfo, testResults);
 		}
 		
 	}
@@ -173,36 +175,33 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			}
 			
 			SeleniumTestsContext seleniumTestsContext = TestNGResultUtils.getSeleniumRobotTestContext(testResult);
-	
+			context.put(BROWSER_VERSION, !seleniumTestsContext.getDriverUsages().isEmpty() ? seleniumTestsContext.getDriverUsages().getFirst().getBrowserVersion(): "N/A");
+
+
 			// if adding some information, don't forget to add them to velocity model for integration tests
 			if (seleniumTestsContext.getRunMode().equals(DriverMode.GRID)) {
 				// in case test is skipped, connector is null
 				context.put(GRIDNODE, seleniumTestsContext.getSeleniumGridConnector() != null ? seleniumTestsContext.getSeleniumGridConnector().getNodeHost() : "N/A");
-				context.put(BROWSER_VERSION, seleniumTestsContext.getSeleniumGridConnector() != null && !seleniumTestsContext.getSeleniumGridConnector().getDrivers().isEmpty() ?
-						seleniumTestsContext.getSeleniumGridConnector().getDrivers().get(0).getCapabilities().getBrowserVersion()
-						: "N/A");
-				context.put(DRIVERFAILERRORONHUB, SeleniumTestsContextManager.getThreadContext().getContextDataMap().get(DRIVERFAILERRORONHUB));
-                context.put(DRIVERFAILHUBUNAVAILABLE, SeleniumTestsContextManager.getThreadContext().getContextDataMap().get(DRIVERFAILHUBUNAVAILABLE));
-                context.put(DRIVERFAILNONODE, SeleniumTestsContextManager.getThreadContext().getContextDataMap().get(DRIVERFAILNONODE));
-                context.put("nodeTags", SeleniumTestsContextManager.getGlobalContext().getContextDataMap().get("nodeTags"));
+				context.put(DRIVER_FAIL_ERROR_ON_HUB, SeleniumTestsContextManager.getThreadContext().getDriverFailErrorOnHub());
+                context.put(DRIVER_FAIL_HUB_UNAVAILABLE, SeleniumTestsContextManager.getThreadContext().getDriverFailUnavailableHub());
+                context.put(DRIVER_FAIL_NO_NODE, SeleniumTestsContextManager.getThreadContext().getDriverFailNoMatchingNode());
+                context.put(NODE_TAGS, SeleniumTestsContextManager.getGlobalContext().getNodeTags());
+
 			} else if (seleniumTestsContext.getRunMode().equals(DriverMode.BROWSERSTACK)) {
 				context.put(GRIDNODE, "browserstack");
-				context.put(BROWSER_VERSION, seleniumTestsContext.getSeleniumGridConnector() != null && !seleniumTestsContext.getSeleniumGridConnector().getDrivers().isEmpty() ?
-						seleniumTestsContext.getSeleniumGridConnector().getDrivers().get(0).getCapabilities().getBrowserVersion()
-						: "N/A");
-				context.put(DRIVERFAILERRORONHUB, 0);
-                context.put(DRIVERFAILHUBUNAVAILABLE, 0);
-                context.put(DRIVERFAILNONODE, 0);
-                context.put("nodeTags", new ArrayList<>());
+				context.put(DRIVER_FAIL_ERROR_ON_HUB, 0);
+                context.put(DRIVER_FAIL_HUB_UNAVAILABLE, 0);
+                context.put(DRIVER_FAIL_NO_NODE, 0);
+                context.put(NODE_TAGS, new ArrayList<>());
+
 			} else {
 				context.put(GRIDNODE, seleniumTestsContext.getRunMode());
-				context.put(BROWSER_VERSION, Objects.requireNonNullElse(seleniumTestsContext.getWebBrowserVersion(), "N/A"));
-				context.put(DRIVERFAILERRORONHUB, 0);
-                context.put(DRIVERFAILHUBUNAVAILABLE, 0);
-                context.put(DRIVERFAILNONODE, 0);
-                context.put("nodeTags", new ArrayList<>());
+				context.put(DRIVER_FAIL_ERROR_ON_HUB, 0);
+                context.put(DRIVER_FAIL_HUB_UNAVAILABLE, 0);
+                context.put(DRIVER_FAIL_NO_NODE, 0);
+                context.put(NODE_TAGS, new ArrayList<>());
 			}			
-            context.put("driverCreationDuration", SeleniumTestsContextManager.getThreadContext().getContextDataMap().get("driverCreationDuration"));
+            context.put("drivers", SeleniumTestsContextManager.getThreadContext().getDriverUsages());
 			context.put("errors", errors);
 			context.put("newline", "\n");
 			context.put("failures", failures);
@@ -278,7 +277,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 		return ve;
 	}
 	
-	private void generateSummaryReport(Map<String, Integer> consolidatedResults, ReportInfo reportInfo) {
+	private void generateSummaryReport(Map<String, Integer> consolidatedResults, ReportInfo reportInfo, List<ITestResult> testResults) {
 		
 		try {
 			VelocityEngine ve = createVelocityEngine();
@@ -290,7 +289,13 @@ public class CustomReporter extends CommonReporter implements IReporter {
 				context.put(entry.getKey(), entry.getValue());
 			}
 
-			context.put("driverUsages", StatisticsStorage.getDriverUsage());
+			List<StatisticsStorage.DriverUsage> driverUsages = testResults
+					.stream().map(TestNGResultUtils::getSeleniumRobotTestContext)
+					.flatMap(c -> c.getDriverUsages().stream())
+					.toList();
+
+
+			context.put("driverUsages", driverUsages);
 			
 			StringWriter writer = new StringWriter();
 			t.merge( context, writer );

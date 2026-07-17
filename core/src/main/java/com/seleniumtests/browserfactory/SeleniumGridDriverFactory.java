@@ -299,10 +299,11 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 			// reset counter as we got a driver
 			counter.set(0); 
 		}
-    	
-		SeleniumTestsContextManager.getThreadContext().getContextDataMap().put("driverFailErrorOnHub", driverFailErrorOnHub);
-        SeleniumTestsContextManager.getThreadContext().getContextDataMap().put("driverFailHubUnavailable", driverFailHubUnavailable);
-        SeleniumTestsContextManager.getThreadContext().getContextDataMap().put("driverFailNoMatchingNode", driverFailNoMatchingNode);
+
+		// /!\ when test is retried, we loose this information, because it's stored in context which is renewed for each retry
+		SeleniumTestsContextManager.getThreadContext().setDriverFailErrorOnHub(driverFailErrorOnHub.get());
+        SeleniumTestsContextManager.getThreadContext().setDriverFailUnavailableHub(driverFailHubUnavailable.get());
+        SeleniumTestsContextManager.getThreadContext().setDriverFailNoMatchingNode(driverFailNoMatchingNode.get());
     	return driver;
     }
 

@@ -148,10 +148,10 @@ public class TestCustomReporter extends ReporterTest {
 	 */
 	@Test(groups={"it"})
 	public void testStepReport() throws IOException {
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testMultipleDriver"});
 
 		// check content of the file. It should contain all fields with a value
-		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverShort", "detailed-result.json").toFile(), StandardCharsets.UTF_8);
+		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testMultipleDriver", "detailed-result.json").toFile(), StandardCharsets.UTF_8);
 		Assert.assertFalse(detailedReportContent.contains(":\\\\/")); // check step has not been double encoded
 		JSONObject json = new JSONObject(detailedReportContent);
 
@@ -161,16 +161,16 @@ public class TestCustomReporter extends ReporterTest {
 		Assert.assertEquals(json.getString("failedStep"), "");
 		Assert.assertEquals(json.getString("gridnode"), "LOCAL");
 		Assert.assertEquals(json.getString("mobileApp"), "");
-		Assert.assertEquals(json.getJSONArray("steps").length(), 7);
+		Assert.assertEquals(json.getJSONArray("steps").length(), 13);
 		Assert.assertEquals(json.getJSONArray("steps").getJSONObject(3).getJSONObject("pageLoadTime").getString("page"), "DriverTestPage");
 		Assert.assertFalse(json.getString("platform").isEmpty());
 		Assert.assertTrue(json.getDouble("duration") > 0);
 		Assert.assertEquals(json.getInt("retries"), 0);
 		Assert.assertEquals(json.getString("browser"), "CHROME");
-		Assert.assertEquals(json.getString("browserVersion"), "N/A");
-		Assert.assertEquals(json.getString("name"), "testDriverShort");
+		Assert.assertNotEquals(json.getString("browserVersion"), "N/A");
+		Assert.assertEquals(json.getString("name"), "testMultipleDriver");
 		Assert.assertTrue(json.getLong("startTime") > 1760604347733L);
-		Assert.assertEquals(json.getInt("stepNumber"), 7);
+		Assert.assertEquals(json.getInt("stepNumber"), 13);
 		Assert.assertEquals(json.getString("device"), "");
 		Assert.assertEquals(json.getInt("errors"), 0);
 		Assert.assertEquals(json.getString("errorMessage"), "");
@@ -181,11 +181,14 @@ public class TestCustomReporter extends ReporterTest {
 		Assert.assertTrue(json.getJSONArray("pageLoads").getJSONObject(0).getString("name").startsWith("loading of DriverTestPage took"));
 		Assert.assertTrue(json.getJSONArray("pageLoads").getJSONObject(0).getString("url").contains("test.html"));
 		Assert.assertEquals(json.getJSONArray("pageLoads").getJSONObject(0).getString("page"), "DriverTestPage");
-		Assert.assertTrue(json.getLong("driverCreationDuration") > 0);
         Assert.assertEquals(json.getInt("driverFailErrorOnHub"), 0);
         Assert.assertEquals(json.getInt("driverFailHubUnavailable"), 0);
         Assert.assertEquals(json.getInt("driverFailNoMatchingNode"), 0);
         Assert.assertEquals(json.getJSONArray("nodeTags"), new JSONArray()); // should be empty
+		Assert.assertEquals(json.getJSONArray("drivers").length(), 2);
+		Assert.assertEquals(json.getJSONArray("drivers").getJSONObject(0).getString("browserName"), "chrome");
+		Assert.assertEquals(json.getJSONArray("drivers").getJSONObject(1).getString("browserName"), "chrome");
+		Assert.assertTrue(json.getJSONArray("drivers").getJSONObject(0).getInt("duration") > json.getDouble("duration"));
 	}
 
 	/**

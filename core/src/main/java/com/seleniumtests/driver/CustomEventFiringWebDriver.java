@@ -21,7 +21,6 @@ import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.browserfactory.chrome.ChromiumUtils;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
-import com.seleniumtests.core.StatisticsStorage;
 import com.seleniumtests.core.StatisticsStorage.DriverUsage;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.RetryableDriverException;
@@ -102,6 +101,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     private final List<Long> driverPids;
 	private WebDriver driver;
 	private final WebDriver originalDriver;
+	private DriverUsage driverUsage;
 	private TestType testType;
 	private boolean driverExited = false;
 	private final DriverMode driverMode;
@@ -1317,7 +1317,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		String driverSessionId = getSessionId();
 		
 		// store driver stats
-		DriverUsage usage = new DriverUsage(gridHub, 
+		driverUsage = new DriverUsage(gridHub,
 				(String) caps.getCapability(SeleniumRobotCapabilityType.GRID_NODE), 
 				(Long) internalCapabilities.getCapability(SeleniumRobotCapabilityType.START_TIME), 
 				duration, 
@@ -1327,7 +1327,6 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 				(Long) internalCapabilities.getCapability(SeleniumRobotCapabilityType.STARTUP_DURATION), 
 				(String) internalCapabilities.getCapability(SeleniumRobotCapabilityType.TEST_NAME)
 				);
-		StatisticsStorage.addDriverUsage(usage);
 		
 		try {
 			driver.quit();
@@ -1340,7 +1339,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 			// do not work as exepected
 			sessionId = driverSessionId != null ? driverSessionId: sessionId;
 			if (sessionId != null && gridConnector != null) {
-				logger.info(String.format("Try to stop session %s calling node", sessionId));
+				logger.info("Try to stop session {} calling node", sessionId);
 				gridConnector.stopSession(sessionId);
 			}
 			caps = new MutableCapabilities();
@@ -1355,6 +1354,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		    		OSUtilityFactory.getInstance().killProcess(pid.toString(), true);
 		    	}
 			}
+			setDriverExited();
 			
 		}
 	}
@@ -1987,5 +1987,9 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		} else {
 			throw new ConfigurationException("Geolocation is supported only on chrome or edge");
 		}
+	}
+
+	public DriverUsage getDriverUsage() {
+		return driverUsage;
 	}
 }

@@ -132,37 +132,6 @@ public abstract class CommonReporter implements IReporter {
 		FileUtils.write(f, content, StandardCharsets.UTF_8);
 	}
 	
-	
-	/**
-	 * Method to generate the formated stacktrace
-	 * @param exception		Exception to format
-	 * @param title			title of the exception
-	 * @param contentBuffer	
-	 * @param format		format to use to encode ('html', 'csv', 'xml', 'json')
-	 * @deprecated use {@link ExceptionUtility.generateTheStackTrace()}
-	 * 
-	 */
-	@Deprecated
-	public static void generateTheStackTrace(final Throwable exception, final String title, final StringBuilder contentBuffer, String format) {
-		contentBuffer.append(exception.getClass() + ": " + StringUtility.encodeString(title, format) + "\n");
-
-		StackTraceElement[] s1 = exception.getStackTrace();
-		Throwable t2 = exception.getCause();
-		if (t2 == exception) {
-			t2 = null;
-		}
-		for (int x = 0; x < s1.length; x++) {
-			String message = ExceptionUtility.filterStackTrace(s1[x].toString());
-			if (message != null) {
-				contentBuffer.append("\nat " + StringUtility.encodeString(message, format));
-			}
-		}
-
-		if (t2 != null) {
-			generateTheStackTrace(t2, "Caused by " + t2.getLocalizedMessage(), contentBuffer, format);
-		}
-	}
-	
 	/**
 	 * Returns the unique test name 
 	 * It's based on unique name meaning that if same test has been executed several times through dataprovider, name is suffixed by "-1, -2, ...". 

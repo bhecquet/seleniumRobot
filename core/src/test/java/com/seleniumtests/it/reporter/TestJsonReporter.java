@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,13 +20,14 @@ package com.seleniumtests.it.reporter;
 import static org.mockito.Mockito.spy;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.testng.Assert;
-import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
@@ -59,7 +60,7 @@ public class TestJsonReporter extends ReporterTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testReportGeneration(ITestContext testContext) throws Exception {
+	public void testReportGeneration() {
 		
 		reporter = spy(new CustomReporter());
 
@@ -71,7 +72,7 @@ public class TestJsonReporter extends ReporterTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testReportContent(ITestContext testContext) throws Exception {
+	public void testReportContent() throws Exception {
 		
 		reporter = spy(new CustomReporter());
 		
@@ -82,10 +83,30 @@ public class TestJsonReporter extends ReporterTest {
 		
 		// Check content of result file
 		Assert.assertEquals(jsonResult.getInt("pass"), 36);
-		Assert.assertEquals(jsonResult.getInt("fail"), 11);
+		Assert.assertEquals(jsonResult.getInt("fail"), 10);
 		Assert.assertEquals(jsonResult.getInt("skip"), 5);
-		Assert.assertEquals(jsonResult.getInt("total"), 52);
+		Assert.assertEquals(jsonResult.getInt("total"), 51);
 		
 	}
+
+	@Test(groups={"it"})
+	public void testReportContainsDriverInformation() throws IOException {
+
+		reporter = spy(new CustomReporter());
+
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
+		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
+
+		JSONObject json = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile(), StandardCharsets.UTF_8));
+
+		Assert.assertEquals(json.getJSONArray("drivers").length(), 1);
+		Assert.assertEquals(json.getJSONArray("drivers").getJSONObject(0).getString("browserName"), "chrome");
+		Assert.assertTrue(json.getJSONArray("drivers").getJSONObject(0).getInt("duration") > 0);
+		Assert.assertTrue(json.getJSONArray("drivers").getJSONObject(0).getInt("startupDuration") > 0);
+		Assert.assertNotEquals(json.getJSONArray("drivers").getJSONObject(0).getString("browserVersion"), "N/A");
+		Assert.assertEquals(json.getJSONArray("drivers").getJSONObject(0).getString("browserName"), "chrome");
+		Assert.assertEquals(json.getJSONArray("drivers").getJSONObject(0).getString("testName"), "testDriverShort");
+	}
+
 
 }

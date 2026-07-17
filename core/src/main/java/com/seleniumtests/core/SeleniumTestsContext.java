@@ -152,7 +152,6 @@ public class SeleniumTestsContext {
 
     public static final String SOFT_ASSERT_ENABLED = "softAssertEnabled";		// le test ne s'arrête pas lorsqu'une assertion est rencontrée
     public static final String TEST_RETRY_COUNT = "testRetryCount";				// number of times the test can be retried
-    public static final String EFFECTIVE_TEST_RETRY_COUNT = "effectiveTestRetryCount";				// number of times the test can be retried
     public static final String MAX_SKIPPED_ON_GRID_FAILURE = "maxSkippedOnGridFailure"; // number of times we accept to skip test when node cannot be found. Default to 3
     
     public static final String OVERRIDE_SELENIUM_NATIVE_ACTION = "overrideSeleniumNativeAction";	// intercept driver.findElement and driver.frame operations to move to HtmlElement methods 
@@ -199,13 +198,18 @@ public class SeleniumTestsContext {
     public static final String PLATFORM = "platform";							// platform on which test should execute. Ex: Windows 7, Android, iOS, Linux, OS X 10.10. 	
     public static final String LOCATION = "location";							// location from which test will be run
 
-    // internal use
+    // internal use, user may not try to set these values, they will be overwritten
     public static final String TEST_VARIABLES = "testVariables"; 				// configuration (aka variables, get via 'param()' method) used for the current test. It is not updated via XML file
     public static final String TEST_NAME = "testName";
     public static final String RELATIVE_OUTPUT_DIR = "relativeOutputDir";
     public static final String RANDOM_IN_ATTACHMENT_NAME = "randomInAttachmentName"; // by default, snapshots are renamed with a random part so that if several steps have the same name, their snapshot do not overwrite.
     																				// this option disables the behaviour FOR TEST PURPOSE
-    
+    public static final String DRIVER_FAIL_ERROR_ON_HUB = "driverFailErrorOnHub";      // number of times driver failed to create
+    public static final String DRIVER_FAIL_UNAVAILABLE_HUB = "driverFailHubUnavailable";  // number of times driver could not be created due to hub unavailable
+    public static final String DRIVER_FAIL_NO_MATCHING_NODE = "driverFailNoMatchingNode";  // number of times driver could not be created due to hub unavailable
+    public static final String EFFECTIVE_TEST_RETRY_COUNT = "effectiveTestRetryCount";	// number of times the test can be retried
+    public static final String DRIVER_USAGES = "driverUsages";                  // list of driver used with statistics
+
     // default values
     protected static final List<ReportInfo> DEFAULT_CUSTOM_TEST_REPORTS = List.of(new ReportInfo("PERF::xml::reporter/templates/report.perf.vm"), new ReportInfo("detailed::json::reporter/templates/report.test.json.vm"));
     protected static final List<ReportInfo> DEFAULT_CUSTOM_SUMMARY_REPORTS = List.of(new ReportInfo("results::json::reporter/templates/report.summary.json.vm"));
@@ -1406,11 +1410,7 @@ public class SeleniumTestsContext {
     
     public List<String> getNodeTags() {
     	List<String> extTools = (List<String>) getAttribute(NODE_TAGS);
-    	if (extTools == null) {
-    		return new ArrayList<>();
-    	} else {
-    		return extTools;
-    	}
+        return Objects.requireNonNullElseGet(extTools, ArrayList::new);
     }
 
     public List<DebugMode> getDebug() {
@@ -1527,6 +1527,18 @@ public class SeleniumTestsContext {
     
     public Integer getViewPortHeight() {
     	return (Integer) getAttribute(VIEWPORT_HEIGHT);
+    }
+    public Integer getDriverFailErrorOnHub() {
+        return Objects.requireNonNullElse((Integer) getAttribute(DRIVER_FAIL_ERROR_ON_HUB), 0);
+    }
+    public Integer getDriverFailUnavailableHub() {
+        return Objects.requireNonNullElse((Integer) getAttribute(DRIVER_FAIL_UNAVAILABLE_HUB), 0);
+    }
+    public Integer getDriverFailNoMatchingNode() {
+        return Objects.requireNonNullElse((Integer) getAttribute(DRIVER_FAIL_NO_MATCHING_NODE), 0);
+    }
+    public List<StatisticsStorage.DriverUsage> getDriverUsages() {
+        return Objects.requireNonNullElse((List<StatisticsStorage.DriverUsage>) getAttribute(DRIVER_USAGES), new ArrayList<>());
     }
 
     public boolean isTestRetrying() {
@@ -2269,7 +2281,24 @@ public class SeleniumTestsContext {
     public void setViewPortHeight(Integer height) {
     	setAttribute(VIEWPORT_HEIGHT, height);    	
     }
-    
+
+    public void setDriverFailErrorOnHub(Integer errorNumber) {
+    	setAttribute(DRIVER_FAIL_ERROR_ON_HUB, errorNumber);
+    }
+    public void setDriverFailUnavailableHub(Integer errorNumber) {
+    	setAttribute(DRIVER_FAIL_UNAVAILABLE_HUB, errorNumber);
+    }
+    public void setDriverFailNoMatchingNode(Integer errorNumber) {
+    	setAttribute(DRIVER_FAIL_NO_MATCHING_NODE, errorNumber);
+    }
+    public void addDriverUsage(StatisticsStorage.DriverUsage driverUsage) {
+        if (getDriverUsages().isEmpty()) {
+            setAttribute(DRIVER_USAGES, new ArrayList<>());
+        }
+        getDriverUsages().add(driverUsage);
+    }
+
+
     public void setDriverCreationBlocked(boolean driverCreationBlocked) {
 		this.driverCreationBlocked = driverCreationBlocked;
 	}
