@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class SquashTMConnector extends TestManager {
 	
@@ -188,12 +189,19 @@ public class SquashTMConnector extends TestManager {
 			
 			if (testResult.isSuccess()) {
 				sapi.setExecutionResult(tpi, TestPlanItemExecution.ExecutionStatus.SUCCESS);
+				Execution lastExecution = getLastExecution(tpi);
+                if (lastExecution != null) {
+                    for (ExecutionStep es : lastExecution.getExecutionSteps()) {
+                        es.setStatus(TestPlanItemExecution.ExecutionStatus.SUCCESS);
+                    }
+                }
 			} else if (testResult.getStatus() == 2){ // failed
 				String comment = null;
 				if (testResult.getThrowable() != null) {
 					comment = testResult.getThrowable().getMessage();
 				}
 				sapi.setExecutionResult(tpi, TestPlanItemExecution.ExecutionStatus.FAILURE, comment);
+				setExecutionStepStatus(tpi, testResult);
 			} else { // skipped or other reason
 				sapi.setExecutionResult(tpi, TestPlanItemExecution.ExecutionStatus.BLOCKED);
 			}
@@ -203,6 +211,63 @@ public class SquashTMConnector extends TestManager {
 		}
 	}
 
+	public void setExecutionStepStatus(IterationTestPlanItem tpi, ITestResult testResult) {
+        Execution lastExecution = getLastExecution(tpi);
+        if (lastExecution != null) {
+            List<TestStep> resultTestStepList = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
+            List<ExecutionStep> squashTestStepList = lastExecution.getExecutionSteps();
+            if (!getUpdateTestManager(testResult)) {
+                for (ExecutionStep es : squashTestStepList) {
+                    es.setStatus(TestPlanItemExecution.ExecutionStatus.BLOCKED);
+                }
+                squashTestStepList.getFirst().setStatus(TestPlanItemExecution.ExecutionStatus.FAILURE);
+            } else {
+                // Match squash steps with result steps by name pattern and propagate status.
+                // On mismatch: mark as FAILURE (or BLOCKED if a previous step already failed), then block all remaining steps.
+                int maxIndex = Math.min(squashTestStepList.size(), resultTestStepList.size());
+                boolean stepKO = false;
+                int index;
+                for (index = 0; index < maxIndex; index++) {
+                    ExecutionStep squashStep = squashTestStepList.get(index);
+                    TestStep resultStep = resultTestStepList.get(index);
+
+                    if (!squashStep.getName().matches(resultStep.getId() + " - .*")) {
+                        // Name mismatch: mark as FAILURE if no prior KO, otherwise BLOCKED
+                        squashStep.setStatus(stepKO
+                                ? TestPlanItemExecution.ExecutionStatus.BLOCKED
+                                : TestPlanItemExecution.ExecutionStatus.FAILURE);
+                        break;
+                    }
+
+                    squashStep.setStatus(switch (resultStep.getStepStatus()) {
+                        case TestStep.StepStatus.FAILED -> {
+                            stepKO = true;
+                            yield TestPlanItemExecution.ExecutionStatus.FAILURE;
+                        }
+                        case TestStep.StepStatus.SUCCESS -> TestPlanItemExecution.ExecutionStatus.SUCCESS;
+                        default -> TestPlanItemExecution.ExecutionStatus.BLOCKED;
+                    });
+                }
+
+                // Block all remaining squash steps after a mismatch or when result steps are exhausted
+                for (int remaining = index < maxIndex ? index + 1 : index; remaining < squashTestStepList.size(); remaining++) {
+                    squashTestStepList.get(remaining).setStatus(TestPlanItemExecution.ExecutionStatus.BLOCKED);
+                }
+            }
+        }
+    }
+
+    public Execution getLastExecution(IterationTestPlanItem tpi) {
+        List<Execution> allExe = tpi.getExecutions();
+        for (Execution exe : allExe) {
+            if (Objects.equals(exe.getLastExecutedOn(), tpi.getLastExecutedBy())) {
+                return exe;
+            }
+        }
+        return null;
+    }
+
+	
 	@Override
     public void updateTestCase(ITestResult testResult) {
 

@@ -85,6 +85,18 @@ public class TestSquashTMConnector extends MockitoTest {
 
 	@Mock
 	private io.github.bhecquet.entities.TestStep newSquashTestStep;
+	
+    @Mock
+    private Execution execution;
+
+    @Mock
+    private ExecutionStep executionStep1;
+
+    @Mock
+    private ExecutionStep executionStep2;
+
+    @Mock
+    private ExecutionStep executionStep3;
 
 	CustomAttribute testIdAttr = new CustomAttribute() {
 		@Override
@@ -777,4 +789,407 @@ public class TestSquashTMConnector extends MockitoTest {
 		// should not throw
 		squash.updateTestCase(testResult);
 	}
+	
+	/**
+     * Check that on success, execution steps are all set to SUCCESS when last execution is found
+     */
+    @Test(groups = {"ut"})
+    public void testRecordResultSuccessWithExecutionSteps(ITestContext testContext) {
+
+        SquashTMConnector squash = spy(new SquashTMConnector());
+        squash.init(connect);
+        doReturn(api).when(squash).getApi();
+
+        when(testResult.isSuccess()).thenReturn(true);
+        when(testMethod.getAttributes()).thenReturn(new CustomAttribute[]{testIdAttr});
+        when(iteration.addTestCase(1, null)).thenReturn(iterationTestPlanItem);
+
+        // mock getLastExecution
+        doReturn(execution).when(squash).getLastExecution(iterationTestPlanItem);
+        when(execution.getExecutionSteps()).thenReturn(Arrays.asList(executionStep1, executionStep2));
+
+        squash.recordResult(testResult);
+
+        verify(api).setExecutionResult(iterationTestPlanItem, TestPlanItemExecution.ExecutionStatus.SUCCESS);
+        verify(executionStep1).setStatus(TestPlanItemExecution.ExecutionStatus.SUCCESS);
+        verify(executionStep2).setStatus(TestPlanItemExecution.ExecutionStatus.SUCCESS);
+    }
+
+    /**
+     * Check that on failure with updateTestManager=false, all steps are BLOCKED except first which is FAILURE
+     */
+    @Test(groups = {"ut"})
+    public void testRecordResultFailureWithStepsUpdateTestManagerFalse(ITestContext testContext) {
+
+        SquashTMConnector squash = spy(new SquashTMConnector());
+        squash.init(connect);
+        doReturn(api).when(squash).getApi();
+
+        when(testResult.isSuccess()).thenReturn(false);
+        when(testResult.getStatus()).thenReturn(2);
+        when(testMethod.getAttributes()).thenReturn(new CustomAttribute[]{testIdAttr});
+        when(iteration.addTestCase(1, null)).thenReturn(iterationTestPlanItem);
+
+        doReturn(execution).when(squash).getLastExecution(iterationTestPlanItem);
+        when(execution.getExecutionSteps()).thenReturn(Arrays.asList(executionStep1, executionStep2, executionStep3));
+
+        squash.recordResult(testResult);
+
+        verify(api).setExecutionResult(iterationTestPlanItem, TestPlanItemExecution.ExecutionStatus.FAILURE, null);
+        // first step should be FAILURE, rest BLOCKED
+        // Without updateTestManager, all are first set to BLOCKED then first overridden to FAILURE
+        verify(executionStep1).setStatus(TestPlanItemExecution.ExecutionStatus.BLOCKED);
+        verify(executionStep2).setStatus(TestPlanItemExecution.ExecutionStatus.BLOCKED);
+        verify(executionStep3).setStatus(TestPlanItemExecution.ExecutionStatus.BLOCKED);
+        verify(executionStep1).setStatus(TestPlanItemExecution.ExecutionStatus.FAILURE);
+    }
+
+    /**
+     * Check that on failure with updateTestManager=true, steps are matched by name and status is propagated
+     */
+    @Test(groups = {"ut"})
+    public void testRecordResultFailureWithStepsUpdateTestManagerTrue(ITestContext testContext) {
+
+        SquashTMConnector squash = spy(new SquashTMConnector());
+        squash.init(connect);
+        doReturn(api).when(squash).getApi();
+
+        when(testResult.isSuccess()).thenReturn(false);
+        when(testResult.getStatus()).thenReturn(2);
+        when(testMethod.getAttributes()).thenReturn(new CustomAttribute[]{testIdAttr, updateTestManagerAttr});
+        when(iteration.addTestCase(1, null)).thenReturn(iterationTestPlanItem);
+
+        doReturn(execution).when(squash).getLastExecution(iterationTestPlanItem);
+        when(execution.getExecutionSteps()).thenReturn(Arrays.asList(executionStep1, executionStep2));
+
+        when(executionStep1.getName()).thenReturn("s1 - Step 1");
+        when(executionStep2.getName()).thenReturn("s2 - Step 2");
+
+        // setup result steps
+        TestStep resultStep1 = mock(TestStep.class);
+        when(resultStep1.getId()).thenReturn("s1");
+        when(resultStep1.getStepStatus()).thenReturn(TestStep.StepStatus.SUCCESS);
+
+        TestStep resultStep2 = mock(TestStep.class);
+        when(resultStep2.getId()).thenReturn("s2");
+        when(resultStep2.getStepStatus()).thenReturn(TestStep.StepStatus.FAILED);
+
+        SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().addAll(Arrays.asList(resultStep1, resultStep2));
+
+        squash.recordResult(testResult);
+
+        verify(executionStep1).setStatus(TestPlanItemExecution.ExecutionStatus.SUCCESS);
+        verify(executionStep2).setStatus(TestPlanItemExecution.ExecutionStatus.FAILURE);
+    }
+
+    /**
+     * Check that on failure with updateTestManager=true and a step with WARNING status, it's marked as BLOCKED
+     */
+    @Test(groups = {"ut"})
+    public void testRecordResultFailureWithWarningStep(ITestContext testContext) {
+
+        SquashTMConnector squash = spy(new SquashTMConnector());
+        squash.init(connect);
+        doReturn(api).when(squash).getApi();
+
+        when(testResult.isSuccess()).thenReturn(false);
+        when(testResult.getStatus()).thenReturn(2);
+        when(testMethod.getAttributes()).thenReturn(new CustomAttribute[]{testIdAttr, updateTestManagerAttr});
+        when(iteration.addTestCase(1, null)).thenReturn(iterationTestPlanItem);
+
+        doReturn(execution).when(squash).getLastExecution(iterationTestPlanItem);
+        when(execution.getExecutionSteps()).thenReturn(Arrays.asList(executionStep1));
+
+        when(executionStep1.getName()).thenReturn("s1 - Step 1");
+
+        TestStep resultStep1 = mock(TestStep.class);
+        when(resultStep1.getId()).thenReturn("s1");
+        when(resultStep1.getStepStatus()).thenReturn(TestStep.StepStatus.WARNING);
+
+        SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().add(resultStep1);
+
+        squash.recordResult(testResult);
+
+        verify(executionStep1).setStatus(TestPlanItemExecution.ExecutionStatus.BLOCKED);
+    }
+
+    /**
+     * Check that on failure with updateTestManager=true and name mismatch, step is FAILURE and remaining are BLOCKED
+     */
+    @Test(groups = {"ut"})
+    public void testRecordResultFailureWithStepNameMismatch(ITestContext testContext) {
+
+        SquashTMConnector squash = spy(new SquashTMConnector());
+        squash.init(connect);
+        doReturn(api).when(squash).getApi();
+
+        when(testResult.isSuccess()).thenReturn(false);
+        when(testResult.getStatus()).thenReturn(2);
+        when(testMethod.getAttributes()).thenReturn(new CustomAttribute[]{testIdAttr, updateTestManagerAttr});
+        when(iteration.addTestCase(1, null)).thenReturn(iterationTestPlanItem);
+
+        doReturn(execution).when(squash).getLastExecution(iterationTestPlanItem);
+        when(execution.getExecutionSteps()).thenReturn(Arrays.asList(executionStep1, executionStep2, executionStep3));
+
+        when(executionStep1.getName()).thenReturn("s1 - Step 1");
+        when(executionStep2.getName()).thenReturn("wrong - Step 2"); // mismatch
+        when(executionStep3.getName()).thenReturn("s3 - Step 3");
+
+        TestStep resultStep1 = mock(TestStep.class);
+        when(resultStep1.getId()).thenReturn("s1");
+        when(resultStep1.getStepStatus()).thenReturn(TestStep.StepStatus.SUCCESS);
+
+        TestStep resultStep2 = mock(TestStep.class);
+        when(resultStep2.getId()).thenReturn("s2");
+        when(resultStep2.getStepStatus()).thenReturn(TestStep.StepStatus.SUCCESS);
+
+        TestStep resultStep3 = mock(TestStep.class);
+        when(resultStep3.getId()).thenReturn("s3");
+        when(resultStep3.getStepStatus()).thenReturn(TestStep.StepStatus.SUCCESS);
+
+        SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().addAll(Arrays.asList(resultStep1, resultStep2, resultStep3));
+
+        squash.recordResult(testResult);
+
+        verify(executionStep1).setStatus(TestPlanItemExecution.ExecutionStatus.SUCCESS);
+        verify(executionStep2).setStatus(TestPlanItemExecution.ExecutionStatus.FAILURE); // mismatch => FAILURE
+        verify(executionStep3).setStatus(TestPlanItemExecution.ExecutionStatus.BLOCKED); // remaining => BLOCKED
+    }
+
+    /**
+     * Check that on failure with name mismatch after a failed step, mismatched step is BLOCKED (not FAILURE)
+     */
+    @Test(groups = {"ut"})
+    public void testRecordResultFailureWithStepNameMismatchAfterKO(ITestContext testContext) {
+
+        SquashTMConnector squash = spy(new SquashTMConnector());
+        squash.init(connect);
+        doReturn(api).when(squash).getApi();
+
+        when(testResult.isSuccess()).thenReturn(false);
+        when(testResult.getStatus()).thenReturn(2);
+        when(testMethod.getAttributes()).thenReturn(new CustomAttribute[]{testIdAttr, updateTestManagerAttr});
+        when(iteration.addTestCase(1, null)).thenReturn(iterationTestPlanItem);
+
+        doReturn(execution).when(squash).getLastExecution(iterationTestPlanItem);
+        when(execution.getExecutionSteps()).thenReturn(Arrays.asList(executionStep1, executionStep2, executionStep3));
+
+        when(executionStep1.getName()).thenReturn("s1 - Step 1");
+        when(executionStep2.getName()).thenReturn("wrong - Step 2"); // mismatch after KO
+        when(executionStep3.getName()).thenReturn("s3 - Step 3");
+
+        TestStep resultStep1 = mock(TestStep.class);
+        when(resultStep1.getId()).thenReturn("s1");
+        when(resultStep1.getStepStatus()).thenReturn(TestStep.StepStatus.FAILED); // first step KO
+
+        TestStep resultStep2 = mock(TestStep.class);
+        when(resultStep2.getId()).thenReturn("s2");
+        when(resultStep2.getStepStatus()).thenReturn(TestStep.StepStatus.SUCCESS);
+
+        TestStep resultStep3 = mock(TestStep.class);
+        when(resultStep3.getId()).thenReturn("s3");
+        when(resultStep3.getStepStatus()).thenReturn(TestStep.StepStatus.SUCCESS);
+
+        SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().addAll(Arrays.asList(resultStep1, resultStep2, resultStep3));
+
+        squash.recordResult(testResult);
+
+        verify(executionStep1).setStatus(TestPlanItemExecution.ExecutionStatus.FAILURE); // step KO
+        verify(executionStep2).setStatus(TestPlanItemExecution.ExecutionStatus.BLOCKED); // mismatch after KO => BLOCKED
+        verify(executionStep3).setStatus(TestPlanItemExecution.ExecutionStatus.BLOCKED); // remaining => BLOCKED
+    }
+
+    /**
+     * Check that when there are more squash steps than result steps, remaining squash steps are BLOCKED
+     */
+    @Test(groups = {"ut"})
+    public void testRecordResultFailureMoreSquashStepsThanResultSteps(ITestContext testContext) {
+
+        SquashTMConnector squash = spy(new SquashTMConnector());
+        squash.init(connect);
+        doReturn(api).when(squash).getApi();
+
+        when(testResult.isSuccess()).thenReturn(false);
+        when(testResult.getStatus()).thenReturn(2);
+        when(testMethod.getAttributes()).thenReturn(new CustomAttribute[]{testIdAttr, updateTestManagerAttr});
+        when(iteration.addTestCase(1, null)).thenReturn(iterationTestPlanItem);
+
+        doReturn(execution).when(squash).getLastExecution(iterationTestPlanItem);
+        when(execution.getExecutionSteps()).thenReturn(Arrays.asList(executionStep1, executionStep2, executionStep3));
+
+        when(executionStep1.getName()).thenReturn("s1 - Step 1");
+        when(executionStep2.getName()).thenReturn("s2 - Step 2");
+
+        // only 1 result step, but 3 squash steps
+        TestStep resultStep1 = mock(TestStep.class);
+        when(resultStep1.getId()).thenReturn("s1");
+        when(resultStep1.getStepStatus()).thenReturn(TestStep.StepStatus.SUCCESS);
+
+        SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().add(resultStep1);
+
+        squash.recordResult(testResult);
+
+        verify(executionStep1).setStatus(TestPlanItemExecution.ExecutionStatus.SUCCESS);
+        verify(executionStep2).setStatus(TestPlanItemExecution.ExecutionStatus.BLOCKED); // beyond result steps
+        verify(executionStep3).setStatus(TestPlanItemExecution.ExecutionStatus.BLOCKED);
+    }
+
+    /**
+     * Check that failure with updateTestManager=true and all matching steps works end to end
+     */
+    @Test(groups = {"ut"})
+    public void testRecordResultFailureAllStepsMatchAllSuccess(ITestContext testContext) {
+
+        SquashTMConnector squash = spy(new SquashTMConnector());
+        squash.init(connect);
+        doReturn(api).when(squash).getApi();
+
+        when(testResult.isSuccess()).thenReturn(false);
+        when(testResult.getStatus()).thenReturn(2);
+        when(testMethod.getAttributes()).thenReturn(new CustomAttribute[]{testIdAttr, updateTestManagerAttr});
+        when(iteration.addTestCase(1, null)).thenReturn(iterationTestPlanItem);
+
+        doReturn(execution).when(squash).getLastExecution(iterationTestPlanItem);
+        when(execution.getExecutionSteps()).thenReturn(Arrays.asList(executionStep1, executionStep2));
+
+        when(executionStep1.getName()).thenReturn("s1 - Step 1");
+        when(executionStep2.getName()).thenReturn("s2 - Step 2");
+
+        TestStep resultStep1 = mock(TestStep.class);
+        when(resultStep1.getId()).thenReturn("s1");
+        when(resultStep1.getStepStatus()).thenReturn(TestStep.StepStatus.SUCCESS);
+
+        TestStep resultStep2 = mock(TestStep.class);
+        when(resultStep2.getId()).thenReturn("s2");
+        when(resultStep2.getStepStatus()).thenReturn(TestStep.StepStatus.SUCCESS);
+
+        SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().addAll(Arrays.asList(resultStep1, resultStep2));
+
+        squash.recordResult(testResult);
+
+        verify(executionStep1).setStatus(TestPlanItemExecution.ExecutionStatus.SUCCESS);
+        verify(executionStep2).setStatus(TestPlanItemExecution.ExecutionStatus.SUCCESS);
+    }
+
+    /**
+     * Check that on failure with updateTestManager=true, when more result steps than squash steps, extra result steps are ignored
+     */
+    @Test(groups = {"ut"})
+    public void testRecordResultFailureMoreResultStepsThanSquashSteps(ITestContext testContext) {
+
+        SquashTMConnector squash = spy(new SquashTMConnector());
+        squash.init(connect);
+        doReturn(api).when(squash).getApi();
+
+        when(testResult.isSuccess()).thenReturn(false);
+        when(testResult.getStatus()).thenReturn(2);
+        when(testMethod.getAttributes()).thenReturn(new CustomAttribute[]{testIdAttr, updateTestManagerAttr});
+        when(iteration.addTestCase(1, null)).thenReturn(iterationTestPlanItem);
+
+        doReturn(execution).when(squash).getLastExecution(iterationTestPlanItem);
+        when(execution.getExecutionSteps()).thenReturn(Arrays.asList(executionStep1));
+
+        when(executionStep1.getName()).thenReturn("s1 - Step 1");
+
+        TestStep resultStep1 = mock(TestStep.class);
+        when(resultStep1.getId()).thenReturn("s1");
+        when(resultStep1.getStepStatus()).thenReturn(TestStep.StepStatus.FAILED);
+
+        TestStep resultStep2 = mock(TestStep.class);
+        when(resultStep2.getId()).thenReturn("s2");
+        when(resultStep2.getStepStatus()).thenReturn(TestStep.StepStatus.SUCCESS);
+
+        SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().addAll(Arrays.asList(resultStep1, resultStep2));
+
+        squash.recordResult(testResult);
+
+        verify(executionStep1).setStatus(TestPlanItemExecution.ExecutionStatus.FAILURE);
+        // executionStep2 doesn't exist in squash, so nothing should happen for it
+        verify(executionStep2, never()).setStatus(any());
+    }
+
+    /**
+     * Check that on failure with updateTestManager=false and a single step, it is set to FAILURE
+     */
+    @Test(groups = {"ut"})
+    public void testRecordResultFailureSingleStepUpdateTestManagerFalse(ITestContext testContext) {
+
+        SquashTMConnector squash = spy(new SquashTMConnector());
+        squash.init(connect);
+        doReturn(api).when(squash).getApi();
+
+        when(testResult.isSuccess()).thenReturn(false);
+        when(testResult.getStatus()).thenReturn(2);
+        when(testMethod.getAttributes()).thenReturn(new CustomAttribute[]{testIdAttr});
+        when(iteration.addTestCase(1, null)).thenReturn(iterationTestPlanItem);
+
+        doReturn(execution).when(squash).getLastExecution(iterationTestPlanItem);
+        when(execution.getExecutionSteps()).thenReturn(Arrays.asList(executionStep1));
+
+        squash.recordResult(testResult);
+
+        // single step: first set to BLOCKED, then overridden to FAILURE
+        verify(executionStep1).setStatus(TestPlanItemExecution.ExecutionStatus.BLOCKED);
+        verify(executionStep1).setStatus(TestPlanItemExecution.ExecutionStatus.FAILURE);
+    }
+
+    /**
+     * Check that on failure with a comment from exception and execution steps with updateTestManager=false
+     */
+    @Test(groups = {"ut"})
+    public void testRecordResultFailureWithCommentAndExecutionSteps(ITestContext testContext) {
+
+        SquashTMConnector squash = spy(new SquashTMConnector());
+        squash.init(connect);
+        doReturn(api).when(squash).getApi();
+
+        when(testResult.isSuccess()).thenReturn(false);
+        when(testResult.getStatus()).thenReturn(2);
+        when(testResult.getThrowable()).thenReturn(new WebDriverException("element not found"));
+        when(testMethod.getAttributes()).thenReturn(new CustomAttribute[]{testIdAttr});
+        when(iteration.addTestCase(1, null)).thenReturn(iterationTestPlanItem);
+
+        doReturn(execution).when(squash).getLastExecution(iterationTestPlanItem);
+        when(execution.getExecutionSteps()).thenReturn(Arrays.asList(executionStep1, executionStep2));
+
+        squash.recordResult(testResult);
+
+        verify(api).setExecutionResult(eq(iterationTestPlanItem), eq(TestPlanItemExecution.ExecutionStatus.FAILURE), contains("element not found"));
+        verify(executionStep1).setStatus(TestPlanItemExecution.ExecutionStatus.BLOCKED);
+        verify(executionStep2).setStatus(TestPlanItemExecution.ExecutionStatus.BLOCKED);
+        verify(executionStep1).setStatus(TestPlanItemExecution.ExecutionStatus.FAILURE);
+    }
+
+    /**
+     * Check that on failure with updateTestManager=true, when first step is a name mismatch, it's marked FAILURE
+     */
+    @Test(groups = {"ut"})
+    public void testRecordResultFailureFirstStepNameMismatch(ITestContext testContext) {
+
+        SquashTMConnector squash = spy(new SquashTMConnector());
+        squash.init(connect);
+        doReturn(api).when(squash).getApi();
+
+        when(testResult.isSuccess()).thenReturn(false);
+        when(testResult.getStatus()).thenReturn(2);
+        when(testMethod.getAttributes()).thenReturn(new CustomAttribute[]{testIdAttr, updateTestManagerAttr});
+        when(iteration.addTestCase(1, null)).thenReturn(iterationTestPlanItem);
+
+        doReturn(execution).when(squash).getLastExecution(iterationTestPlanItem);
+        when(execution.getExecutionSteps()).thenReturn(Arrays.asList(executionStep1, executionStep2));
+
+        when(executionStep1.getName()).thenReturn("wrong - Step 1"); // mismatch on first step
+
+        TestStep resultStep1 = mock(TestStep.class);
+        when(resultStep1.getId()).thenReturn("s1");
+        when(resultStep1.getStepStatus()).thenReturn(TestStep.StepStatus.SUCCESS);
+
+        SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().add(resultStep1);
+
+        squash.recordResult(testResult);
+
+        verify(executionStep1).setStatus(TestPlanItemExecution.ExecutionStatus.FAILURE); // mismatch, no prior KO => FAILURE
+        verify(executionStep2).setStatus(TestPlanItemExecution.ExecutionStatus.BLOCKED); // remaining => BLOCKED
+    }
+
 }
