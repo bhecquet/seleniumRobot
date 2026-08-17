@@ -635,6 +635,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		MockingDetails mockingDetails = Mockito.mockingDetails(driver);
 		if (isWebTest() && !testType.isMobile() && !(mockingDetails.isMock() && !mockingDetails.isSpy())) {
 			try {
+				// TODO: may be unecessary with selenium 4.47 (#17790)
 				updateBidiPort(this.driver);
 				logger.info(((HasCapabilities)driver).getCapabilities().getCapability(SE_CDP_PREFIX));
 				this.driver = new Augmenter().augment(this.driver);
