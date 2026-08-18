@@ -35,10 +35,10 @@ import org.openqa.selenium.bidi.browsingcontext.BrowsingContext;
 import org.openqa.selenium.devtools.DevTools;
 import org.openqa.selenium.devtools.DevToolsException;
 import org.openqa.selenium.devtools.HasDevTools;
-import org.openqa.selenium.devtools.v145.page.Page;
-import org.openqa.selenium.devtools.v145.page.Page.CaptureScreenshotFormat;
-import org.openqa.selenium.devtools.v145.page.Page.GetLayoutMetricsResponse;
-import org.openqa.selenium.devtools.v145.page.model.Viewport;
+import org.openqa.selenium.devtools.v150.page.Page;
+import org.openqa.selenium.devtools.v150.page.Page.CaptureScreenshotFormat;
+import org.openqa.selenium.devtools.v150.page.Page.GetLayoutMetricsResponse;
+import org.openqa.selenium.devtools.v150.page.model.Viewport;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
