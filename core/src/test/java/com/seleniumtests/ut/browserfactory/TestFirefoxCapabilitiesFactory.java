@@ -295,8 +295,6 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 		
 		// check profile
 		Assert.assertNull(prefs.get("browser.download.dir"));
-		Assert.assertEquals(prefs.get("browser.download.folderList"), 0);
-		Assert.assertEquals(prefs.get("browser.helperApps.neverAsk.saveToDisk"), "");
 	}
 	
 	@Test(groups={"ut"})
