@@ -54,9 +54,9 @@ import com.seleniumtests.util.osutility.OSUtility;
 
 public class TestEdgeCapabilityFactory extends MockitoTest {
 
-	private static final String BETA_VERSION = "145.0";
+	private static final String BETA_VERSION = "152.0";
 
-	private static final String RELEASE_VERSION = "144.0";
+	private static final String RELEASE_VERSION = "153.0";
 
 	@Mock
 	private DriverConfig config;
