@@ -18,14 +18,10 @@
 package com.seleniumtests.ut.browserfactory;
 
 import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
-import com.seleniumtests.core.SeleniumTestsContextManager;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -34,7 +30,6 @@ import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.GeckoDriverService;
 import org.openqa.selenium.remote.CapabilityType;
 import org.testng.Assert;
@@ -160,91 +155,76 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 		Assert.assertEquals(capa.getBrowserVersion(), "60.0");
 		
 	}
+
+	private Map<String, Object> getPreferences(FirefoxOptions options) {
+		return (Map<String, Object>) ((Map<String, Object>) (options.asMap().get("moz:firefoxOptions"))).get("prefs");
+	}
 	
 	@Test(groups={"ut"})
-	public void testCreateDefaultFirefoxCapabilities() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, IOException {
+	public void testCreateDefaultFirefoxCapabilities() throws SecurityException, IllegalArgumentException {
 
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		when(config.isSetAcceptUntrustedCertificates()).thenReturn(true);
 		when(config.isSetAssumeUntrustedCertificateIssuer()).thenReturn(true);
 		
-		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
+		FirefoxOptions capa = (FirefoxOptions) new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "firefox");
-		
-		FirefoxProfile profile = FirefoxProfile.fromJson((String) ((Map<String, Object>) capa
-				.getCapability(FirefoxOptions.FIREFOX_OPTIONS))
-				.get("profile"));
-		
-		// check profile
-		Field fieldAcceptUntrustedCerts = FirefoxProfile.class.getDeclaredField("acceptUntrustedCerts");
-		fieldAcceptUntrustedCerts.setAccessible(true);
-		Assert.assertTrue((boolean) fieldAcceptUntrustedCerts.get(profile));
-		Field fieldUntrustedCertIssuer = FirefoxProfile.class.getDeclaredField("untrustedCertIssuer");
-		fieldUntrustedCertIssuer.setAccessible(true);
-		Assert.assertTrue((boolean) fieldUntrustedCertIssuer.get(profile));
-				
-		Assert.assertEquals(profile.getStringPreference("capability.policy.default.Window.QueryInterface", ""), FirefoxCapabilitiesFactory.ALL_ACCESS);
-		Assert.assertEquals(profile.getStringPreference("capability.policy.default.Window.frameElement.get", ""), FirefoxCapabilitiesFactory.ALL_ACCESS);
-		Assert.assertEquals(profile.getStringPreference("capability.policy.default.HTMLDocument.compatMode.get", ""), FirefoxCapabilitiesFactory.ALL_ACCESS);
-		Assert.assertEquals(profile.getStringPreference("capability.policy.default.Document.compatMode.get", ""), FirefoxCapabilitiesFactory.ALL_ACCESS);
-		Assert.assertEquals(profile.getIntegerPreference("dom.max_chrome_script_run_time", 100), 0);
-		Assert.assertEquals(profile.getIntegerPreference("dom.max_script_run_time", 100), 0);
+
+		Map<String, Object> prefs = getPreferences(capa);
+
+		Assert.assertEquals(prefs.get("capability.policy.default.Window.QueryInterface"), FirefoxCapabilitiesFactory.ALL_ACCESS);
+		Assert.assertEquals(prefs.get("capability.policy.default.Window.frameElement.get"), FirefoxCapabilitiesFactory.ALL_ACCESS);
+		Assert.assertEquals(prefs.get("capability.policy.default.HTMLDocument.compatMode.get"), FirefoxCapabilitiesFactory.ALL_ACCESS);
+		Assert.assertEquals(prefs.get("capability.policy.default.Document.compatMode.get"), FirefoxCapabilitiesFactory.ALL_ACCESS);
+		Assert.assertEquals(prefs.get("dom.max_chrome_script_run_time"), 0);
+		Assert.assertEquals(prefs.get("dom.max_script_run_time"), 0);
 	}
 	
 	@Test(groups={"ut"})
-	public void testCreateFirefoxCapabilitiesOverrideUserAgent() throws IOException {
+	public void testCreateFirefoxCapabilitiesOverrideUserAgent() {
 		
 		when(config.getUserAgentOverride()).thenReturn("FIREFOX 55");
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		
-		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
-		
-		FirefoxProfile profile = FirefoxProfile.fromJson((String) ((Map<String, Object>) capa
-				.getCapability(FirefoxOptions.FIREFOX_OPTIONS))
-				.get("profile"));
-		
+		FirefoxOptions capa = (FirefoxOptions) new FirefoxCapabilitiesFactory(config).createCapabilities();
+		Map<String, Object> prefs = getPreferences(capa);
+
 		// check profile
-		Assert.assertEquals(profile.getStringPreference("general.useragent.override", ""), "FIREFOX 55");
+		Assert.assertEquals(prefs.get("general.useragent.override"), "FIREFOX 55");
 	}
 	
 
 	@Test(groups = {"ut"})
-	public void testCreateFirefoxCapabilitiesOverrideUserAgentWithVariables() throws IOException {
+	public void testCreateFirefoxCapabilitiesOverrideUserAgentWithVariables() {
 		
 		when(config.getUserAgentOverride()).thenReturn("FIREFOX 55 and variable ${browser}");
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		SeleniumTestsContext stc = new SeleniumTestsContext();
 		stc.setBrowser("firefox");
 		when(config.getTestContext()).thenReturn(stc);
-		
-		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
-		
-		FirefoxProfile profile = FirefoxProfile.fromJson((String) ((Map<String, Object>) capa
-				.getCapability(FirefoxOptions.FIREFOX_OPTIONS))
-				.get("profile"));
+
+		FirefoxOptions capa = (FirefoxOptions) new FirefoxCapabilitiesFactory(config).createCapabilities();
+		Map<String, Object> prefs = getPreferences(capa);
 		
 		// check profile
-		Assert.assertEquals(profile.getStringPreference("general.useragent.override", ""), "FIREFOX 55 and variable FIREFOX");
+		Assert.assertEquals(prefs.get("general.useragent.override"), "FIREFOX 55 and variable FIREFOX");
 	}
 	
 	@Test(groups = {"ut"})
-	public void testCreateFirefoxCapabilitiesOverrideUserAgentWithWrongVariables() throws IOException {
+	public void testCreateFirefoxCapabilitiesOverrideUserAgentWithWrongVariables() {
 		
 		when(config.getUserAgentOverride()).thenReturn("FIREFOX 55 and variable ${bowser}");
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		SeleniumTestsContext stc = new SeleniumTestsContext();
 		stc.setBrowser("firefox");
 		when(config.getTestContext()).thenReturn(stc);
-		
-		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
-		
-		FirefoxProfile profile = FirefoxProfile.fromJson((String) ((Map<String, Object>) capa
-				.getCapability(FirefoxOptions.FIREFOX_OPTIONS))
-				.get("profile"));
+
+		FirefoxOptions capa = (FirefoxOptions) new FirefoxCapabilitiesFactory(config).createCapabilities();
+		Map<String, Object> prefs = getPreferences(capa);
 		
 		// check profile
-		Assert.assertEquals(profile.getStringPreference("general.useragent.override", ""), "FIREFOX 55 and variable ${bowser}");
+		Assert.assertEquals(prefs.get("general.useragent.override"), "FIREFOX 55 and variable ${bowser}");
 	}
 	
 	@Test(groups={"ut"})
@@ -273,59 +253,50 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testCreateFirefoxCapabilitiesOverrideNtlmAuth() throws IOException {
+	public void testCreateFirefoxCapabilitiesOverrideNtlmAuth() {
 		
 		when(config.getNtlmAuthTrustedUris()).thenReturn("uri://uri.ntlm");
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
-		
-		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
-		
-		FirefoxProfile profile = FirefoxProfile.fromJson((String) ((Map<String, Object>) capa
-				.getCapability(FirefoxOptions.FIREFOX_OPTIONS))
-				.get("profile"));
+
+		FirefoxOptions capa = (FirefoxOptions) new FirefoxCapabilitiesFactory(config).createCapabilities();
+		Map<String, Object> prefs = getPreferences(capa);
 		
 		// check profile
-		Assert.assertEquals(profile.getStringPreference("network.automatic-ntlm-auth.trusted-uris", ""), "uri://uri.ntlm");
+		Assert.assertEquals(prefs.get("network.automatic-ntlm-auth.trusted-uris"), "uri://uri.ntlm");
 	}
 	
 	@Test(groups={"ut"})
-	public void testCreateFirefoxCapabilitiesOverrideDownloadDir() throws IOException {
+	public void testCreateFirefoxCapabilitiesOverrideDownloadDir() {
 		
 		when(config.getDownloadOutputDirectory()).thenReturn("/home/download");
 		when(config.getMode()).thenReturn(DriverMode.LOCAL);
-		
-		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
-		
-		FirefoxProfile profile = FirefoxProfile.fromJson((String) ((Map<String, Object>) capa
-				.getCapability(FirefoxOptions.FIREFOX_OPTIONS))
-				.get("profile"));
+
+		FirefoxOptions capa = (FirefoxOptions) new FirefoxCapabilitiesFactory(config).createCapabilities();
+		Map<String, Object> prefs = getPreferences(capa);
 		
 		// check profile
-		Assert.assertEquals(profile.getStringPreference("browser.download.dir", ""), "/home/download");
-		Assert.assertEquals(profile.getIntegerPreference("browser.download.folderList", 0), 2);
-        Assert.assertFalse(profile.getBooleanPreference("browser.download.manager.showWhenStarting", true));
-		Assert.assertEquals(profile.getStringPreference("browser.helperApps.neverAsk.saveToDisk", ""), "application/octet-stream,text/plain,application/pdf,application/zip,text/csv,text/html");
+		Assert.assertEquals(prefs.get("browser.download.dir"), "/home/download");
+		Assert.assertEquals(prefs.get("browser.download.folderList"), 2);
+        Assert.assertFalse((Boolean) prefs.get("browser.download.manager.showWhenStarting"));
+		Assert.assertEquals(prefs.get("browser.helperApps.neverAsk.saveToDisk"), "application/octet-stream,text/plain,application/pdf,application/zip,text/csv,text/html");
 	}
 	
 	/**
 	 * issue #365: Check DownloadDir is not set in remote
 	 */
 	@Test(groups={"ut"})
-	public void testCreateFirefoxCapabilitiesNoOverrideDownloadDirRemote() throws IOException {
+	public void testCreateFirefoxCapabilitiesNoOverrideDownloadDirRemote() {
 		
 		when(config.getDownloadOutputDirectory()).thenReturn("/home/download");
 		when(config.getMode()).thenReturn(DriverMode.GRID);
-		
-		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
-		
-		FirefoxProfile profile = FirefoxProfile.fromJson((String) ((Map<String, Object>) capa
-				.getCapability(FirefoxOptions.FIREFOX_OPTIONS))
-				.get("profile"));
+
+		FirefoxOptions capa = (FirefoxOptions) new FirefoxCapabilitiesFactory(config).createCapabilities();
+		Map<String, Object> prefs = getPreferences(capa);
 		
 		// check profile
-		Assert.assertEquals(profile.getStringPreference("browser.download.dir", ""), "");
-		Assert.assertEquals(profile.getIntegerPreference("browser.download.folderList", 0), 0);
-		Assert.assertEquals(profile.getStringPreference("browser.helperApps.neverAsk.saveToDisk", ""), "");
+		Assert.assertNull(prefs.get("browser.download.dir"));
+		Assert.assertEquals(prefs.get("browser.download.folderList"), 0);
+		Assert.assertEquals(prefs.get("browser.helperApps.neverAsk.saveToDisk"), "");
 	}
 	
 	@Test(groups={"ut"})

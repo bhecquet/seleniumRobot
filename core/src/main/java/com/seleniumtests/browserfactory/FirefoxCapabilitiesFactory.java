@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,11 +18,9 @@
 package com.seleniumtests.browserfactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.firefox.FirefoxDriverLogLevel;
 import org.openqa.selenium.firefox.FirefoxOptions;
@@ -30,13 +28,11 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.GeckoDriverService;
 import org.openqa.selenium.firefox.ProfilesIni;
 
-import com.seleniumtests.browserfactory.customprofile.FireFoxProfileMarker;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
-import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.DebugMode;
 
@@ -97,30 +93,12 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
 	
 	@Override
 	protected void updateOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
-		
 		((FirefoxOptions)options).setBinary(selectedBrowserInfo.getPath());
-		
-        FirefoxProfile profile = getFirefoxProfile();
-        configProfile(profile, webDriverConfig);
-        ((FirefoxOptions)options).setProfile(profile);
-        
-        // extensions
-        List<BrowserExtension> extensions = BrowserExtension.getExtensions(webDriverConfig.getTestContext().getConfiguration());
-        if (!extensions.isEmpty()) {
-        	for (BrowserExtension ext: extensions) {
-        		profile.addExtension(ext.getExtensionPath());
-        		for (Entry<String, String> entry: ext.getOptions().entrySet()) {
-        			profile.setPreference(entry.getKey(), entry.getValue());
-        		}
-        	}
-        	
-        }
+        configProfile((FirefoxOptions)options, webDriverConfig);
 	}
 	
 
-    protected void configProfile(final FirefoxProfile profile, final DriverConfig webDriverConfig) {
-        profile.setAcceptUntrustedCertificates(webDriverConfig.isSetAcceptUntrustedCertificates());
-        profile.setAssumeUntrustedCertificateIssuer(webDriverConfig.isSetAssumeUntrustedCertificateIssuer());
+    protected void configProfile(FirefoxOptions options, final DriverConfig webDriverConfig) {
 
         if (webDriverConfig.getUserAgentOverride() != null) {
         	// ISSUE #705 - In order to give the maximum of data available to customize the User Agent,
@@ -132,28 +110,28 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
 				testName = TestNGResultUtils.getTestName(webDriverConfig.getTestContext().getTestNGResult());
 			}
 			webDriverConfig.getTestContext().setAttribute(SeleniumTestsContext.TEST_NAME, testName);
-        	profile.setPreference("general.useragent.override", StringUtility.interpolateString(webDriverConfig.getUserAgentOverride(), webDriverConfig.getTestContext()));
+        	options.addPreference("general.useragent.override", StringUtility.interpolateString(webDriverConfig.getUserAgentOverride(), webDriverConfig.getTestContext()));
         }
 
         if (webDriverConfig.getNtlmAuthTrustedUris() != null) {
-            profile.setPreference("network.automatic-ntlm-auth.trusted-uris", webDriverConfig.getNtlmAuthTrustedUris());
+            options.addPreference("network.automatic-ntlm-auth.trusted-uris", webDriverConfig.getNtlmAuthTrustedUris());
         }
 
         if (webDriverConfig.getDownloadOutputDirectory() != null && webDriverConfig.getMode() == DriverMode.LOCAL) {
-            profile.setPreference("browser.download.dir", webDriverConfig.getDownloadOutputDirectory());
-            profile.setPreference("browser.download.folderList", 2);
-            profile.setPreference("browser.download.manager.showWhenStarting", false);
-            profile.setPreference("browser.helperApps.neverAsk.saveToDisk",
+            options.addPreference("browser.download.dir", webDriverConfig.getDownloadOutputDirectory());
+            options.addPreference("browser.download.folderList", 2);
+            options.addPreference("browser.download.manager.showWhenStarting", false);
+            options.addPreference("browser.helperApps.neverAsk.saveToDisk",
                 "application/octet-stream,text/plain,application/pdf,application/zip,text/csv,text/html");
         }
 
         // fix permission denied issues
-        profile.setPreference("capability.policy.default.Window.QueryInterface", ALL_ACCESS);
-        profile.setPreference("capability.policy.default.Window.frameElement.get", ALL_ACCESS);
-        profile.setPreference("capability.policy.default.HTMLDocument.compatMode.get", ALL_ACCESS);
-        profile.setPreference("capability.policy.default.Document.compatMode.get", ALL_ACCESS);
-        profile.setPreference("dom.max_chrome_script_run_time", 0);
-        profile.setPreference("dom.max_script_run_time", 0);
+        options.addPreference("capability.policy.default.Window.QueryInterface", ALL_ACCESS);
+        options.addPreference("capability.policy.default.Window.frameElement.get", ALL_ACCESS);
+        options.addPreference("capability.policy.default.HTMLDocument.compatMode.get", ALL_ACCESS);
+        options.addPreference("capability.policy.default.Document.compatMode.get", ALL_ACCESS);
+        options.addPreference("dom.max_chrome_script_run_time", 0);
+        options.addPreference("dom.max_script_run_time", 0);
     }
 
     protected synchronized FirefoxProfile getFirefoxProfile() {
@@ -176,7 +154,6 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
      */
 	@Override
 	protected void updateGridOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
-		FirefoxProfile profile = new FirefoxProfile();
 		if (webDriverConfig.getFirefoxProfilePath() != null) {
         	if (BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getFirefoxProfilePath()) || webDriverConfig.getFirefoxProfilePath().contains("/") || webDriverConfig.getFirefoxProfilePath().contains("\\")) {
         		options.setCapability(SeleniumRobotCapabilityType.FIREFOX_PROFILE, webDriverConfig.getFirefoxProfilePath());
@@ -186,8 +163,7 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
         	}
         }
 
-        configProfile(profile, webDriverConfig);
-        ((FirefoxOptions)options).setProfile(profile);
+        configProfile((FirefoxOptions)options, webDriverConfig);
 		
 	}
 
