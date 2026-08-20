@@ -540,6 +540,7 @@ public class TestSquashTMConnector extends MockitoTest {
 		doReturn(api).when(squash).getApi();
 
 		when(testMethod.getAttributes()).thenReturn(new CustomAttribute[] {testIdAttr});
+		when(testResult.isSuccess()).thenReturn(true);
 
 		squash.updateTestCase(testResult);
 
@@ -558,6 +559,7 @@ public class TestSquashTMConnector extends MockitoTest {
 		doReturn(api).when(squash).getApi();
 
 		when(testMethod.getAttributes()).thenReturn(new CustomAttribute[] {testIdAttr, updateTestManagerFalseAttr});
+		when(testResult.isSuccess()).thenReturn(true);
 
 		squash.updateTestCase(testResult);
 
@@ -575,6 +577,7 @@ public class TestSquashTMConnector extends MockitoTest {
 		doReturn(api).when(squash).getApi();
 
 		when(testMethod.getAttributes()).thenReturn(new CustomAttribute[] {updateTestManagerAttr});
+		when(testResult.isSuccess()).thenReturn(true);
 
 		squash.updateTestCase(testResult);
 
@@ -624,6 +627,7 @@ public class TestSquashTMConnector extends MockitoTest {
 
 		mockedSquashTestStep.when(() -> io.github.bhecquet.entities.TestStep.create(eq(1), anyMap())).thenReturn(newSquashTestStep);
 		when(newSquashTestStep.getId()).thenReturn(200);
+		when(testResult.isSuccess()).thenReturn(true);
 
 		squash.updateTestCase(testResult);
 
@@ -644,6 +648,49 @@ public class TestSquashTMConnector extends MockitoTest {
 	}
 
 	/**
+	 * Check that updateTestCase is only done when test is failed
+	 */
+	@Test(groups={"ut"})
+	public void testUpdateTestCaseNoDoneWhenTestFails() {
+
+		SquashTMConnector squash = spy(new SquashTMConnector());
+		squash.init(connect);
+		doReturn(api).when(squash).getApi();
+
+		when(testMethod.getAttributes()).thenReturn(new CustomAttribute[] {testIdAttr, updateTestManagerAttr});
+		when(testMethod.getDescription()).thenReturn("Test description");
+
+		// setup TestCase mock
+		when(testCase.getId()).thenReturn(1);
+		when(squashTestStep1.getId()).thenReturn(100);
+		when(squashTestStep2.getId()).thenReturn(101);
+		when(testCase.getTestSteps()).thenReturn(Arrays.asList(squashTestStep1, squashTestStep2));
+
+		// setup test steps from SeleniumRobot context
+		TestStep step1 = mock(TestStep.class);
+		when(step1.getId()).thenReturn("aa");
+		when(step1.getDescription()).thenReturn("Step 1 action");
+		when(step1.getExpectedResult()).thenReturn("Step 1 expected");
+		when(step1.getSnapshots()).thenReturn(new ArrayList<>());
+
+		List<TestStep> testSteps = List.of(step1);
+		SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().addAll(testSteps);
+
+		mockedSquashTestStep.when(() -> io.github.bhecquet.entities.TestStep.create(eq(1), anyMap())).thenReturn(newSquashTestStep);
+		when(newSquashTestStep.getId()).thenReturn(200);
+		when(testResult.isSuccess()).thenReturn(false);
+
+		squash.updateTestCase(testResult);
+
+		// verify test case was retrieved and completed
+		mockedTestCase.verify(() -> TestCase.get(1), never());
+		verify(testCase, never()).completeDetails();
+
+		// verify description updated
+		verify(testCase, never()).update(eq(1), anyMap());
+	}
+
+	/**
 	 * Check that updateTestCase deletes old steps even when there's only one
 	 */
 	@Test(groups={"ut"})
@@ -658,7 +705,8 @@ public class TestSquashTMConnector extends MockitoTest {
 
 		when(testCase.getId()).thenReturn(1);
 		when(squashTestStep1.getId()).thenReturn(100);
-		when(testCase.getTestSteps()).thenReturn(Arrays.asList(squashTestStep1));
+		when(testCase.getTestSteps()).thenReturn(List.of(squashTestStep1));
+		when(testResult.isSuccess()).thenReturn(true);
 
 		// no new steps
 		SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().clear();
@@ -693,6 +741,7 @@ public class TestSquashTMConnector extends MockitoTest {
 
 		mockedSquashTestStep.when(() -> io.github.bhecquet.entities.TestStep.create(eq(1), anyMap())).thenReturn(newSquashTestStep);
 		when(newSquashTestStep.getId()).thenReturn(200);
+		when(testResult.isSuccess()).thenReturn(true);
 
 		squash.updateTestCase(testResult);
 
@@ -737,6 +786,7 @@ public class TestSquashTMConnector extends MockitoTest {
 
 		mockedSquashTestStep.when(() -> io.github.bhecquet.entities.TestStep.create(eq(1), anyMap())).thenReturn(newSquashTestStep);
 		when(newSquashTestStep.getId()).thenReturn(200);
+		when(testResult.isSuccess()).thenReturn(true);
 
 		squash.updateTestCase(testResult);
 
@@ -775,6 +825,7 @@ public class TestSquashTMConnector extends MockitoTest {
 		mockedTestCase.when(() -> TestCase.get(1)).thenThrow(new SquashTmException("error"));
 
 		// should not throw
+		when(testResult.isSuccess()).thenReturn(true);
 		squash.updateTestCase(testResult);
 	}
 }
