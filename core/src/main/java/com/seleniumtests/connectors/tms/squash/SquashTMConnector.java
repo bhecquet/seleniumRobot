@@ -1,5 +1,6 @@
 package com.seleniumtests.connectors.tms.squash;
 
+import com.seleniumtests.reporter.logger.Check;
 import io.github.bhecquet.SquashTMApi;
 import io.github.bhecquet.entities.*;
 
@@ -239,7 +240,7 @@ public class SquashTMConnector extends TestManager {
                     }
                     Map<String, Object> datas = new HashMap<>();
                     datas.put("action", String.format("%s - %s", testStep.getId(), testStep.getDescription()));
-                    datas.put("expected_result", testStep.getExpectedResult());
+                    datas.put("expected_result", buildExpectedResult(testStep));
                     io.github.bhecquet.entities.TestStep newTestStep = io.github.bhecquet.entities.TestStep.create(testCase.getId(), datas);
                     //add attachment if exists
                     for (Snapshot snapshot : testStep.getSnapshots()) {
@@ -250,9 +251,23 @@ public class SquashTMConnector extends TestManager {
                 }
             }
         } catch (Exception e) {
-            logger.error(String.format("Could not update Test Case for test method %s: %s", TestNGResultUtils.getTestName(testResult), e.getMessage()));
+            logger.error("Could not update Test Case for test method {}: {}", TestNGResultUtils.getTestName(testResult), e.getMessage());
         }
-    }	
+    }
+
+	private String buildExpectedResult(TestStep testStep) {
+		StringBuilder expectedResult = new StringBuilder(testStep.getExpectedResult());
+		List<Check> checks = testStep.getChecks(true);
+		if (!checks.isEmpty()) {
+			expectedResult.append("<p>Checks:</p>");
+			expectedResult.append("<ul>");
+			for (Check check: checks) {
+				expectedResult.append("<li>").append(check.toString()).append("</li>");
+			}
+			expectedResult.append("</ul>");
+		}
+		return expectedResult.toString();
+	}
 
 	@Override
 	public void recordResultFiles(ITestResult testResult) {

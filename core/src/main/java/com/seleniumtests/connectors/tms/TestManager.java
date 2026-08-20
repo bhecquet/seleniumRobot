@@ -118,7 +118,7 @@ public abstract class TestManager implements ITestManager {
 
         for (CustomAttribute customAttribute : testNGResult.getMethod().getAttributes()) {
             if ("updateTestManager".equals(customAttribute.name()) && customAttribute.values().length > 0) {
-                return Boolean.parseBoolean(customAttribute.values()[0]);
+                return Boolean.parseBoolean(customAttribute.values()[0]) && testNGResult.isSuccess();
             }
         }
         return false;

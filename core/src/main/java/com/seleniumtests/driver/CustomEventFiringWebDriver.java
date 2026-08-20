@@ -1294,12 +1294,11 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		
 		// close windows before quitting (this is the only way to close chrome attached browser when it's not started by selenium)
 		try {
-			List<String> handles = new ArrayList<>(driver.getWindowHandles());
-	        Collections.reverse(handles);
+			List<String> handles = new ArrayList<>(driver.getWindowHandles()).reversed();
 
 	        for (String handle: handles) {
 				switchTo().window(handle);
-				driver.close();
+				driver.close(); // this raises a SocketException when the last window is closed
 			}
 
 		} catch (Exception e) {
