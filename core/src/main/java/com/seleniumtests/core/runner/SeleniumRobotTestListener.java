@@ -616,7 +616,6 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		// Handle Soft CustomAssertion
 		if (method.isTestMethod()) {
 			TestNGResultUtils.changeTestResultWithSoftAssertion(testResult);
-			TestNGResultUtils.changeTestResultWithSnapshotComparison(testResult);
 		}
 		
 		// store context in test result

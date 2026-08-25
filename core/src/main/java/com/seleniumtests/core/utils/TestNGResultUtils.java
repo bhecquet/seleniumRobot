@@ -32,19 +32,11 @@ import org.testng.annotations.Test;
 import org.testng.internal.BaseTestMethod;
 import org.testng.internal.TestResult;
 
-import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
-import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector.SnapshotComparisonResult;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.core.runner.CucumberScenarioWrapper;
-import com.seleniumtests.customexception.ScenarioException;
-import com.seleniumtests.customexception.SeleniumRobotServerException;
-import com.seleniumtests.driver.screenshots.SnapshotComparisonBehaviour;
 import com.seleniumtests.reporter.info.Info;
-import com.seleniumtests.reporter.logger.Snapshot;
-import com.seleniumtests.reporter.logger.TestStep;
-import com.seleniumtests.reporter.reporters.CommonReporter;
 import com.seleniumtests.util.ExceptionUtility;
 import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -400,63 +392,6 @@ public class TestNGResultUtils {
     	testNGResult.setAttribute(DESCRIPTION, description); // store it so that it's used in reports
     	return description;
     }
-
-    /**
-     * Change the test result when snapshot comparison fails
-     * These comparison are done for every test execution (every retry). At this point, snapshot are not recorded on server. This will be recorded in SeleniumRobotServerTestRecorder
-     * only with the last test execution.
-     */
-	public static void changeTestResultWithSnapshotComparison(final ITestResult testResult) {
-		
-		if (testResult.getStatus() == ITestResult.FAILURE  // test is already failed
-				|| !Boolean.TRUE.equals(SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerActive())
-				|| SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshotBehaviour() == SnapshotComparisonBehaviour.DISPLAY_ONLY // as the comparison result is only displayed, do not retry
-				|| SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshotBehaviour() == SnapshotComparisonBehaviour.ADD_TEST_RESULT // complicated to set the test failed, and then success again
-				|| !SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshot()) {
-			return;
-		}
-		
-		SeleniumRobotSnapshotServerConnector serverConnector = SeleniumRobotSnapshotServerConnector.getInstance();
-		
-		List<TestStep> testSteps = getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
-		if (testSteps == null) {
-			return;
-		}
-		
-		for (TestStep testStep: testSteps) {
-			for (Snapshot snapshot: new ArrayList<>(testStep.getSnapshots())) {
-				if (snapshot.getCheckSnapshot().recordSnapshotOnServerForComparison()) {
-					if (snapshot.getName() == null || snapshot.getName().isEmpty()) {
-						logger.warn("Snapshot hasn't any name, it won't be sent to server");
-						continue;
-					} 
-					
-					try {
-						String browserOrApp = CommonReporter.getBrowserOrApp();
-						browserOrApp = browserOrApp.startsWith("APP") ? "APP": browserOrApp;
-						SnapshotComparisonResult comparisonResult = serverConnector.checkSnapshotHasNoDifferences(snapshot, CommonReporter.getTestCaseName(testResult), testStep.getAction(), browserOrApp);
-						if (comparisonResult == SnapshotComparisonResult.KO) {
-							testResult.setStatus(ITestResult.FAILURE);
-							testResult.setThrowable(new ScenarioException("Snapshot comparison failed"));
-							
-							// move test from passedTests to failedTests if test is not already in failed tests
-							if (testResult.getTestContext().getPassedTests().getAllMethods().contains(testResult.getMethod())) {
-								testResult.getTestContext().getPassedTests().removeResult(testResult);
-								testResult.getTestContext().getFailedTests().addResult(testResult);
-							}
-							return;
-						}
-					} catch (SeleniumRobotServerException e) {
-						logger.error("Could not create snapshot on server", e);
-					}
-				}
-			}
-		}
-		
-
-
-	}	
-	
 
 	/**
 	 * In case test result is SUCCESS but some softAssertions were raised, change test result to 

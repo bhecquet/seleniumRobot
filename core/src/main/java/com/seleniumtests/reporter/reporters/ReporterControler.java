@@ -93,11 +93,6 @@ public class ReporterControler implements IReporter {
 					break;
 				}
 			}
-			
-			// change / add test result according to snapshot comparison results
-			if (suiteFinished) {
-				changeTestResultsWithSnapshotComparison(suites);
-			}
 
 			try {
 				if (suiteFinished) {
@@ -133,88 +128,6 @@ public class ReporterControler implements IReporter {
 		}
 	}
 
-	
-	/**
-	 * If snapshot comparison has been enabled, request snapshot server for each test result to know if comparison was successful
-	 * /!\ This method is aimed to be called only once all test suites have been completed 
-	 * @param suites	test suites
-	 */
-	private void changeTestResultsWithSnapshotComparison(List<ISuite> suites) {
-		
-		if (!(SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerActive()
-				&& SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshot())) {
-			return;
-		}
-		
-		SeleniumRobotSnapshotServerConnector snapshotServer = SeleniumRobotSnapshotServerConnector.getInstance();
-		
-		for (ISuite suite: suites) {
-			for (String suiteString: suite.getResults().keySet()) {
-				ISuiteResult suiteResult = suite.getResults().get(suiteString);
-				
-				Set<ITestResult> resultSet = new HashSet<>(); 
-				resultSet.addAll(suiteResult.getTestContext().getFailedTests().getAllResults());
-				resultSet.addAll(suiteResult.getTestContext().getPassedTests().getAllResults());
-				resultSet.addAll(suiteResult.getTestContext().getSkippedTests().getAllResults());
-				
-				for (ITestResult testResult: resultSet) {
-					
-					// check if we have an id from snapshot server
-					Integer testCaseInSessionId = TestNGResultUtils.getSnapshotTestCaseInSessionId(testResult);
-					if (testCaseInSessionId == null) {
-						continue;
-					}
-					
-					StringBuilder errorMessage = new StringBuilder();
-					int snapshotComparisonResult = snapshotServer.getTestCaseInSessionComparisonResult(testCaseInSessionId, errorMessage);
-					
-					// update snapshot comparison result of the run test.
-					TestNGResultUtils.setSnapshotComparisonResult(testResult, snapshotComparisonResult);
-
-					changeTestResultWithSnapshotComparison(suiteResult, testResult, snapshotComparisonResult);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Change the test result based on snapshot comparison result if required by test configuration
-	 * If test is OK but comparison fails, then test will be set to "KO" if 'changeTestResult' is set
-	 * @param suiteResult				the TestNG suite
-	 * @param testResult				the test result to update
-	 * @param snapshotComparisonResult	snapshot comparison result which may update the test result
-	 */
-	private void changeTestResultWithSnapshotComparison(ISuiteResult suiteResult, ITestResult testResult, int snapshotComparisonResult) {
-		// based on snapshot comparison flag, change test result only if comparison is KO
-		if (SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshotBehaviour() == SnapshotComparisonBehaviour.CHANGE_TEST_RESULT && snapshotComparisonResult == ITestResult.FAILURE ) {
-			testResult.setStatus(ITestResult.FAILURE);
-			testResult.setThrowable(new ScenarioException("Snapshot comparison failed"));
-			
-		} else if (SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshotBehaviour() == SnapshotComparisonBehaviour.ADD_TEST_RESULT) {
-			
-			ITestResult newTestResult;
-			try {
-				newTestResult = TestNGResultUtils.copy(testResult, "snapshots-" +testResult.getName(), TestNGResultUtils.getTestDescription(testResult) + " FOR SNAPSHOT COMPARISON");
-			} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-				throw new ScenarioException(e.getMessage(), e);
-			}
-			
-			// add the test result
-			newTestResult.setStatus(snapshotComparisonResult);
-			if (snapshotComparisonResult == ITestResult.SUCCESS) {
-				suiteResult.getTestContext().getPassedTests().addResult(newTestResult);
-			} else if (snapshotComparisonResult == ITestResult.FAILURE) {
-				newTestResult.setThrowable(new ScenarioException("Snapshot comparison failed"));
-				suiteResult.getTestContext().getFailedTests().addResult(newTestResult);
-			} else if (snapshotComparisonResult == ITestResult.SKIP) {
-				suiteResult.getTestContext().getSkippedTests().addResult(newTestResult);
-			}
-			
-			// add a snapshot comparison result for the newly created test result (which correspond to snapshot comparison)
-			TestNGResultUtils.setSnapshotComparisonResult(newTestResult, snapshotComparisonResult);
-		}
-	}
-	
 	/**
 	 * Add configurations methods to list of test steps so that they can be used by reporters
 	 * @param suites				List of test suite to parse

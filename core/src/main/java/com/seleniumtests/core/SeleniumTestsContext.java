@@ -25,6 +25,7 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import com.seleniumtests.connectors.tms.ITestManager;
+import com.seleniumtests.reporter.reporters.*;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 import org.openqa.selenium.Capabilities;
@@ -59,12 +60,6 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.reporter.logger.ArchiveMode;
-import com.seleniumtests.reporter.reporters.BugTrackerReporter;
-import com.seleniumtests.reporter.reporters.CustomReporter;
-import com.seleniumtests.reporter.reporters.ReportInfo;
-import com.seleniumtests.reporter.reporters.SeleniumRobotServerTestRecorder;
-import com.seleniumtests.reporter.reporters.SeleniumTestsReporter2;
-import com.seleniumtests.reporter.reporters.TestManagerReporter;
 import com.seleniumtests.uipage.htmlelements.ElementInfo;
 import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.DebugMode;
@@ -1108,6 +1103,7 @@ public class SeleniumTestsContext {
 		userDefinedClasses.add(BugTrackerReporter.class);
         userDefinedClasses.add(TestManagerReporter.class);
 		userDefinedClasses.add(SeleniumRobotServerTestRecorder.class);
+		userDefinedClasses.add(ResultUpdaterReporter.class);
         userDefinedClasses.add(SeleniumTestsReporter2.class);
         userDefinedClasses.add(CustomReporter.class); //  placed here because it needs information from selenium-server
     	

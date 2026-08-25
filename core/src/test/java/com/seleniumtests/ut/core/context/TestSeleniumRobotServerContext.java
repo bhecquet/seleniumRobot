@@ -11,7 +11,6 @@ import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.Test;
-import org.testng.xml.XmlTest;
 
 import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.GenericTest;
@@ -28,46 +27,46 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 
 
 	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
-	public void testSeleniumRobotServerActive(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testSeleniumRobotServerActive(final ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerActive(true);
 		Assert.assertFalse(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerActive());
 	}
 	@Test(groups="ut context")
-	public void testSeleniumRobotServerActiveWithoutUrl(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testSeleniumRobotServerActiveWithoutUrl(final ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerUrl("http://localhost:8000");
 		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerActive(true);
 		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerActive());
 	}
 	@Test(groups="ut context")
-	public void testSeleniumRobotServerActiveNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testSeleniumRobotServerActiveNull(final ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerActive(null);
 		Assert.assertFalse(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerActive());
 	}
 	
 	@Test(groups="ut context")
-	public void testSeleniumRobotServerUrl(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testSeleniumRobotServerUrl(final ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerUrl("http://localhost:8000");
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerUrl(), "http://localhost:8000");
 	}
 	@Test(groups="ut context")
-	public void testSeleniumRobotServerUrlNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testSeleniumRobotServerUrlNull(final ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerUrl(null);
 		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerUrl());
 	}
 	
 	@Test(groups="ut context")
-	public void testSeleniumRobotServerToken(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testSeleniumRobotServerToken(final ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerToken("123");
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerToken(), "123");
 	}
 	@Test(groups="ut context")
-	public void testSeleniumRobotServerTokenFromEnvVar(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testSeleniumRobotServerTokenFromEnvVar(final ITestContext testNGCtx) {
 		try {
 			SystemUtility.setenv(SeleniumRobotServerContext.SELENIUMROBOTSERVER_TOKEN_ENV_VAR, "456");
 			initThreadContext(testNGCtx);
@@ -77,7 +76,7 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 		}
 	}
 	@Test(groups="ut context")
-	public void testSeleniumRobotServerTokenFromEnvVarPriority(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testSeleniumRobotServerTokenFromEnvVarPriority(final ITestContext testNGCtx) {
 
 		try {
 			System.setProperty("seleniumRobotServerToken", "123");
@@ -90,85 +89,79 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 		}
 	}
 	@Test(groups="ut context")
-	public void testSeleniumRobotServerTokenNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testSeleniumRobotServerTokenNull(final ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerToken(null);
 		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerToken());
 	}
 	
 	@Test(groups="ut context")
-	public void testSeleniumRobotVariablesOlderThan(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testSeleniumRobotVariablesOlderThan(final ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerVariableOlderThan(5);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerVariableOlderThan(), (Integer)5);
 	}
 	@Test(groups="ut context")
-	public void testSeleniumRobotVariablesOlderThanNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testSeleniumRobotVariablesOlderThanNull(final ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerVariableOlderThan(null);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerVariableOlderThan(), (Integer)SeleniumRobotServerContext.DEFAULT_SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN);
 	}
 	
 	@Test(groups="ut context")
-	public void testSeleniumRobotSnapshotTtl(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testSeleniumRobotSnapshotTtl(final ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerCompareSnapshotTtl(5);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerCompareSnapshotTtl(), (Integer)5);
 	}
 	@Test(groups="ut context")
-	public void testSeleniumRobotSnapshotTtlNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testSeleniumRobotSnapshotTtlNull(final ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerCompareSnapshotTtl(null);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerCompareSnapshotTtl(), (Integer)SeleniumRobotServerContext.DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL);
 	}
 	
 	@Test(groups="ut context")
-	public void testSeleniumRobotVariableReservationDuration(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testSeleniumRobotVariableReservationDuration(final ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerVariableReservationDuration(300);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerVariableReservationDuration(), (Integer)300);
 	}
 	@Test(groups="ut context")
-	public void testSeleniumRobotVariableReservationDurationNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testSeleniumRobotVariableReservationDurationNull(final ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerVariableReservationDuration(null);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerVariableReservationDuration(), (Integer)SeleniumRobotServerContext.DEFAULT_SELENIUMROBOTSERVER_VARIABLES_RESERVATION);
 	}
 	
 	@Test(groups="ut context")
-	public void testCompareSnapshotBehaviour(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerCompareSnapshotBehaviour("addTestResult");
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerCompareSnapshotBehaviour(), SnapshotComparisonBehaviour.ADD_TEST_RESULT);
-	}
-	@Test(groups="ut context")
-	public void testCompareSnapshotBehaviourNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testCompareSnapshotBehaviourNull(final ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerCompareSnapshotBehaviour(null);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerCompareSnapshotBehaviour(), SeleniumRobotServerContext.DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR);
 	}
 	
 	@Test(groups="ut context")
-	public void testCompareSnapshot(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testCompareSnapshot(final ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerCompareSnapshot(true);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerCompareSnapshot(), true);
+        Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerCompareSnapshot());
 	}
 	@Test(groups="ut context")
-	public void testCompareSnapshotNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testCompareSnapshotNull(final ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerCompareSnapshot(null);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerCompareSnapshot(), SeleniumRobotServerContext.DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
 	}
 	
 	@Test(groups="ut context")
-	public void testRecordResults(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testRecordResults(final ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerRecordResults(true);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerRecordResults(), true);
+		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerRecordResults());
 	}
 	@Test(groups="ut context")
-	public void testRecordResultsNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testRecordResultsNull(final ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().seleniumServer().setSeleniumRobotServerRecordResults(null);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerRecordResults(), SeleniumRobotServerContext.DEFAULT_SELENIUMROBOTSERVER_RECORD_RESULTS);
@@ -178,17 +171,15 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 	/**
 	 * If parameter is defined in variable server and as JVM parameter (user
 	 * defined), the user defined parameter must be used
-	 * 
-	 * @throws Exception
 	 */
 	@Test(groups = { "ut" })
-	public void testUserDefinedParamOverridesVariableServer(final ITestContext testNGCtx, final XmlTest xmlTest)
+	public void testUserDefinedParamOverridesVariableServer(final ITestContext testNGCtx)
 			throws Exception {
 
 		Map<String, TestVariable> variables = new HashMap<>();
 		variables.put("key1", new TestVariable("key1", "val1"));
 
-		try (MockedConstruction mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
 			when(variableServer.isAlive()).thenReturn(true);
 			when(variableServer.getVariables(0, -1)).thenReturn(variables);
 		})) {
@@ -212,18 +203,14 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 
 	/**
 	 * Check variables can be get from variable server
-	 * 
-	 * @param testNGCtx
-	 * @param xmlTest
-	 * @throws Exception
 	 */
 	@Test(groups = { "ut" })
-	public void testVariablesFromVariableServer(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+	public void testVariablesFromVariableServer(final ITestContext testNGCtx) throws Exception {
 
 		Map<String, TestVariable> variables = new HashMap<>();
 		variables.put("key1", new TestVariable("key1", "val1"));
 
-		try (MockedConstruction mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
 			when(variableServer.isAlive()).thenReturn(true);
 			when(variableServer.getVariables(0, -1)).thenReturn(variables);
 		})) {
@@ -245,17 +232,14 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 	
 	/**
 	 * Check we use the parameter "seleniumRobotServerVariablesReservation" provided by user
-	 * @param testNGCtx
-	 * @param xmlTest
-	 * @throws Exception
 	 */
 	@Test(groups = { "ut" })
-	public void testVariablesFromVariableServerWithReservationDuration(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+	public void testVariablesFromVariableServerWithReservationDuration(final ITestContext testNGCtx) throws Exception {
 		
 		Map<String, TestVariable> variables = new HashMap<>();
 		variables.put("key1", new TestVariable("key1", "val1"));
 		
-		try (MockedConstruction mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
 			when(variableServer.isAlive()).thenReturn(true);
 			when(variableServer.getVariables(0, 300)).thenReturn(variables);
 		})) {
@@ -269,7 +253,7 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
 			seleniumTestsCtx.configureContext(testResult);
 			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key1").getValue(), "val1");
-			verify((SeleniumRobotVariableServerConnector)mockedVariableServerConnector.constructed().get(0)).getVariables(0, 300);
+			verify(mockedVariableServerConnector.constructed().getFirst()).getVariables(0, 300);
 			
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
@@ -280,14 +264,10 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 	
 	/**
 	 * Check we create a variable server if all connection params are present
-	 * 
-	 * @param testNGCtx
-	 * @param xmlTest
-	 * @throws Exception
 	 */
 	@Test(groups = "ut")
-	public void testVariableServerConnection(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
-		try (MockedConstruction mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+	public void testVariableServerConnection(final ITestContext testNGCtx) throws Exception {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
 			when(variableServer.isAlive()).thenReturn(true);
 		})) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
@@ -297,7 +277,7 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 			initThreadContext(testNGCtx, "myTest", testResult);
 
 			// check upsert has been called
-			verify((SeleniumRobotVariableServerConnector)mockedVariableServerConnector.constructed().get(0)).isAlive();
+			verify(mockedVariableServerConnector.constructed().getFirst()).isAlive();
 
 			Assert.assertNotNull(SeleniumTestsContextManager.getThreadContext().getVariableServer());
 
@@ -309,13 +289,9 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 
 	/**
 	 * Check we create a no variable server if all it's not active
-	 * 
-	 * @param testNGCtx
-	 * @param xmlTest
-	 * @throws Exception
 	 */
 	@Test(groups = "ut")
-	public void testNoVariableServerIfNotRequested(final ITestContext testNGCtx, final XmlTest xmlTest)
+	public void testNoVariableServerIfNotRequested(final ITestContext testNGCtx)
 			throws Exception {
 		try {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "false");
@@ -334,13 +310,9 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 
 	/**
 	 * Check we create a no variable server if no URL
-	 * 
-	 * @param testNGCtx
-	 * @param xmlTest
-	 * @throws Exception
 	 */
 	@Test(groups = "ut", expectedExceptions = ConfigurationException.class)
-	public void testNoVariableServerIfNoURL(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+	public void testNoVariableServerIfNoURL(final ITestContext testNGCtx) throws Exception {
 		try {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 
@@ -354,14 +326,10 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 
 	/**
 	 * Check we create a no variable server if not active
-	 * 
-	 * @param testNGCtx
-	 * @param xmlTest
-	 * @throws Exception
 	 */
 	@Test(groups = "ut", expectedExceptions = ConfigurationException.class)
-	public void testNoVariableServerIfNotAlive(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
-		try (MockedConstruction mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
+	public void testNoVariableServerIfNotAlive(final ITestContext testNGCtx) throws Exception {
+		try (MockedConstruction<SeleniumRobotVariableServerConnector> mockedVariableServerConnector = mockConstruction(SeleniumRobotVariableServerConnector.class, (variableServer, context) -> {
 			when(variableServer.isAlive()).thenReturn(false);
 		})) {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
@@ -371,7 +339,7 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 			initThreadContext(testNGCtx, "myTest", testResult);
 
 			// check upsert has been called
-			verify((SeleniumRobotVariableServerConnector)mockedVariableServerConnector.constructed().get(0)).isAlive();
+			verify(mockedVariableServerConnector.constructed().getFirst()).isAlive();
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
@@ -379,13 +347,13 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 	}
 
 	@Test(groups = "ut")
-	public void testInitParams(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testInitParams(final ITestContext testNGCtx) {
 
 		try {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, "addTestResult");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, "changeTestResult");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL, "25");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_VARIABLES_RESERVATION, "10");
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
@@ -394,7 +362,7 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerUrl(), "http://localhost:1234");
 			Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerActive());
 			Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerCompareSnapshot());
-			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerCompareSnapshotBehaviour(), SnapshotComparisonBehaviour.ADD_TEST_RESULT);
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerCompareSnapshotBehaviour(), SnapshotComparisonBehaviour.CHANGE_TEST_RESULT);
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerCompareSnapshotTtl(), 25);
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerVariableReservationDuration(), 10);
 			Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().seleniumServer().getSeleniumRobotServerRecordResults());
@@ -412,12 +380,10 @@ public class TestSeleniumRobotServerContext extends ConnectorsTest {
 	}
 
 	/**
-	 * Check taht if compare snapshot is set to true, recording is activated
-	 * @param testNGCtx
-	 * @param xmlTest
+	 * Check that if compare snapshot is set to true, recording is activated
 	 */
 	@Test(groups = "ut")
-	public void testInitComparSnapshot(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testInitCompareSnapshot(final ITestContext testNGCtx) {
 
 		try {
 			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
