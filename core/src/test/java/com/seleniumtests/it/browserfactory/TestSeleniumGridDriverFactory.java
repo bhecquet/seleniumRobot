@@ -142,6 +142,7 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 
 			System.clearProperty(SeleniumTestsContext.RUN_MODE);
 			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
+			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID_TIMEOUT);
 		}
 	}
 	
@@ -152,7 +153,7 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 	public void testTestsAreSkippedIfNodeIsNeverAvailable() throws Exception {
 		
 		try {
-			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID_TIMEOUT, "1");
+			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID_TIMEOUT, "5");
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, SERVER_URL + "/wd/hub");
 			createMockedWebDriver();
@@ -181,6 +182,7 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 
 			System.clearProperty(SeleniumTestsContext.RUN_MODE);
 			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
+			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID_TIMEOUT);
 		}
 	}
 	
@@ -244,6 +246,7 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 		} finally {
 			System.clearProperty(SeleniumTestsContext.RUN_MODE);
 			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
+			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID_TIMEOUT);
 		}
 	}
 

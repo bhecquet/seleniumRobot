@@ -177,7 +177,7 @@ public class TestCustomReporter extends ReporterTest {
 		Assert.assertEquals(json.getString("resultUrl"), "");
 		Assert.assertEquals(json.getJSONArray("infos").length(), 1);
 		Assert.assertEquals(json.getJSONArray("infos").getJSONObject(0).getString("key"), "Last State");
-		Assert.assertEquals(json.getJSONArray("pageLoads").length(), 1);
+		Assert.assertEquals(json.getJSONArray("pageLoads").length(), 2);
 		Assert.assertTrue(json.getJSONArray("pageLoads").getJSONObject(0).getString("name").startsWith("loading of DriverTestPage took"));
 		Assert.assertTrue(json.getJSONArray("pageLoads").getJSONObject(0).getString("url").contains("test.html"));
 		Assert.assertEquals(json.getJSONArray("pageLoads").getJSONObject(0).getString("page"), "DriverTestPage");
@@ -307,6 +307,7 @@ public class TestCustomReporter extends ReporterTest {
             System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
             System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4321/wd/hub");
             System.setProperty(SeleniumTestsContext.NODE_TAGS, "local");
+            System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID_TIMEOUT, "5");
 
             createGridHubMockWithNodeOK();
 
@@ -346,6 +347,7 @@ public class TestCustomReporter extends ReporterTest {
             System.clearProperty(SeleniumTestsContext.RUN_MODE);
             System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
             System.clearProperty(SeleniumTestsContext.NODE_TAGS);
+            System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID_TIMEOUT);
         }
     }
 
@@ -355,6 +357,7 @@ public class TestCustomReporter extends ReporterTest {
             System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
             System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4321/wd/hub");
             System.setProperty(SeleniumTestsContext.NODE_TAGS, "local");
+			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID_TIMEOUT, "5");
 
             createGridHubMockWithNodeOK();
 
@@ -394,6 +397,7 @@ public class TestCustomReporter extends ReporterTest {
             System.clearProperty(SeleniumTestsContext.RUN_MODE);
             System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
             System.clearProperty(SeleniumTestsContext.NODE_TAGS);
+            System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID_TIMEOUT);
         }
     }
 
@@ -403,6 +407,7 @@ public class TestCustomReporter extends ReporterTest {
             System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
             System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4321/wd/hub");
             System.setProperty(SeleniumTestsContext.NODE_TAGS, "local");
+			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID_TIMEOUT, "5");
 
             createGridHubMockWithNodeOK();
 
@@ -435,6 +440,7 @@ public class TestCustomReporter extends ReporterTest {
             System.clearProperty(SeleniumTestsContext.RUN_MODE);
             System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
             System.clearProperty(SeleniumTestsContext.NODE_TAGS);
+            System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID_TIMEOUT);
         }
     }
 }

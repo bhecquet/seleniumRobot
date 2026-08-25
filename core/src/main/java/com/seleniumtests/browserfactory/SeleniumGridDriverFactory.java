@@ -277,7 +277,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 				// we are here if no grid connector is available
 				logger.warn("No grid available, wait 30 secs and retry");
 				
-				// for test only, reduce wiat
+				// for test only, reduce wait
 				if (instanceRetryTimeout > 30) {
 					WaitHelper.waitForSeconds(30);
 				} else {
