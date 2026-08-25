@@ -2,6 +2,7 @@ package com.seleniumtests.reporter.reporters;
 
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.screenshots.SnapshotComparisonBehaviour;
@@ -30,6 +31,11 @@ public class ResultUpdaterReporter extends CommonReporter implements IReporter {
 
                 for (ITestResult testResult : entry.getValue()) {
 
+                    if (testResult.getStatus() == ITestResult.FAILURE) {
+                        logger.info("Not comparing snapshots as test is already KO");
+                        continue;
+                    }
+
                     // check if we have an id from snapshot server
                     Integer testCaseInSessionId = TestNGResultUtils.getSnapshotTestCaseInSessionId(testResult);
                     if (testCaseInSessionId == null) {
@@ -57,9 +63,12 @@ public class ResultUpdaterReporter extends CommonReporter implements IReporter {
      */
     private void changeTestResultWithSnapshotComparison(ITestResult testResult, int snapshotComparisonResult) {
         // based on snapshot comparison flag, change test result only if comparison is KO
-        if (SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshotBehaviour() == SnapshotComparisonBehaviour.CHANGE_TEST_RESULT && snapshotComparisonResult == ITestResult.FAILURE ) {
+        if (SeleniumTestsContextManager.getGlobalContext().seleniumServer().getSeleniumRobotServerCompareSnapshotBehaviour() == SnapshotComparisonBehaviour.CHANGE_TEST_RESULT
+                && snapshotComparisonResult == ITestResult.FAILURE ) {
             testResult.setStatus(ITestResult.FAILURE);
             testResult.setThrowable(new ScenarioException("Snapshot comparison failed"));
+
+            TestStepManager.logThrowableToTestEndStep(testResult);
         }
     }
 }
