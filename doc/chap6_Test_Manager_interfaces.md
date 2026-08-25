@@ -210,6 +210,16 @@ public void test() {
 
 ##### Add some steps
 
+Description and expected result can use method parameters in their text. To do so, use the ${...} notation (see below examples)
+In case the description also use dataset reference (valid at least for Squash TM where dataset variable is written ${...}), you can use $${...} notation
+
+```
+@Step(description="step description with data $${user}", expectedResult="$${user} is connected")
+public CalcPage add(int value) {
+    ...
+}
+```
+
 ###### Initial step
 
 All test scenarios start by opening a page, so add a @Step on the constructor that serves as an initial step
