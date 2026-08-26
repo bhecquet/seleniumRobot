@@ -58,12 +58,14 @@ public class TestNGResultUtils {
 	private static final String TEST_MANAGER_REPORT = "testManagerReport";// true if the result has already been recorded on test manager
 	private static final String BUGTRACKER_REPORT = "bugtrackerReport";// true if the failure has already been recorded on bugtracker
 	private static final String CUSTOM_REPORT = "customReport";			// true if the custom result has already been generated
+	private static final String UPDATE_RESULT_REPORT = "updateResultReport";			// true if the update result report has already been executed
 	private static final String METHOD_NAME = "methodName";				// name of the test method (or the cucumber scenario)
 	private static final String SNAPSHOT_COMPARISON_RESULT = "snapshotComparisonResult";	// the result of snapshot comparison, when enabled
 	private static final String DESCRIPTION = "description";			// description of the test method, if any
 	private static final String ERROR_CAUSE_IN_LAST_STEP = "errorCauseInLastStep"; // true when we have searched for error cause in the last step
 	private static final String ERROR_CAUSE_IN_REFERENCE = "errorCauseInReference"; // true when we have searched for error cause by comparing reference picture of the failed step
 	private static final String FINISHED = "finished"; // true when all after methods has been executed
+	private static final String RAW_RESULT = "rawResult"; // Result of the test, not taking into account snapshot comparison
 
 	private TestNGResultUtils() {
 		// nothing to do
@@ -219,7 +221,15 @@ public class TestNGResultUtils {
     public static void setTestMethodName(ITestResult testNGResult, String name) {
     	testNGResult.setAttribute(METHOD_NAME, name);
     }
-    
+
+	public static Integer getRawResult(ITestResult testNGResult) {
+    	return (Integer) testNGResult.getAttribute(RAW_RESULT);
+    }
+
+	public static void setRawResult(ITestResult testNGResult, int rawResult) {
+    	testNGResult.setAttribute(RAW_RESULT, rawResult);
+    }
+
     public static ITestNGMethod getLinkedTestMethod(ITestResult testNGResult) {
     	return (ITestNGMethod) testNGResult.getAttribute(LINKED_TEST_METHOD);
     }
@@ -289,7 +299,15 @@ public class TestNGResultUtils {
     public static void setSeleniumServerReportCreated(ITestResult testNGResult, Boolean recordedToServer) {
     	testNGResult.setAttribute(SELENIUM_SERVER_REPORT, recordedToServer);
     }
-    
+
+	public static boolean isUpdateResultReportExecuted(ITestResult testNGResult) {
+    	return isReportCreated(testNGResult, UPDATE_RESULT_REPORT);
+    }
+
+	public static void setUpdateResultReportExecuted(ITestResult testNGResult, Boolean executed) {
+		testNGResult.setAttribute(UPDATE_RESULT_REPORT, executed);
+	}
+
     /**
      * @return true if the result has already been recorded to test manager
      */
@@ -464,8 +482,13 @@ public class TestNGResultUtils {
 	 * Returns the string representation of the status: SUCCESS, ERROR, SKIPPED, ...
 	 */
 	public static String getTestStatusString(ITestResult testNGResult) {
+		return getTestStatusString(testNGResult.getStatus());
+	}
+	public static String getTestStatusString(Integer status) {
 
-        return switch (testNGResult.getStatus()) {
+
+        return switch (status) {
+			case null -> "NOT_COMPUTED";
             case -1 -> "CREATED";
             case 1 -> "SUCCESS";
             case 2 -> "FAILURE";

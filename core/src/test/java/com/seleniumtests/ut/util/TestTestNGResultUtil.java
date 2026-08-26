@@ -522,6 +522,11 @@ public class TestTestNGResultUtil extends MockitoTest {
 		Assert.assertEquals(TestNGResultUtils.getTestStatusString(testResult), "CREATED");
 	}
 	@Test(groups={"ut"})
+	public void testGetTestStatusStringNotComputed() {
+		when(testResult.getStatus()).thenReturn(-1);
+		Assert.assertEquals(TestNGResultUtils.getTestStatusString((Integer) null), "NOT_COMPUTED");
+	}
+	@Test(groups={"ut"})
 	public void testGetTestStatusStringSuccess() {
 		when(testResult.getStatus()).thenReturn(1);
 		Assert.assertEquals(TestNGResultUtils.getTestStatusString(testResult), "SUCCESS");

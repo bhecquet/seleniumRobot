@@ -23,6 +23,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
+import com.seleniumtests.core.contexts.SeleniumRobotServerContext;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -175,6 +177,11 @@ public class TestCustomReporter extends ReporterTest {
 		Assert.assertEquals(json.getInt("errors"), 0);
 		Assert.assertEquals(json.getString("errorMessage"), "");
 		Assert.assertEquals(json.getString("resultUrl"), "");
+
+		Assert.assertEquals(json.getString("status"), "SUCCESS");
+		Assert.assertEquals(json.getString("rawStatus"), "SUCCESS");
+		Assert.assertEquals(json.getString("snapshotComparisonResult"), "NOT_COMPUTED");
+		Assert.assertEquals(json.getString("snapshotComparisonBehaviour"), "NOT_REQUESTED");
 		Assert.assertEquals(json.getJSONArray("infos").length(), 1);
 		Assert.assertEquals(json.getJSONArray("infos").getJSONObject(0).getString("key"), "Last State");
 		Assert.assertEquals(json.getJSONArray("pageLoads").length(), 2);
@@ -443,4 +450,80 @@ public class TestCustomReporter extends ReporterTest {
             System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID_TIMEOUT);
         }
     }
+
+	/**
+	 * Check detailed-result.json file is updated when snapshot comparison fails
+	 */
+	@Test(groups={"it"})
+	public void testSnapshotComparisonKoChangeTestResult() throws Exception {
+		try {
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, "changeTestResult");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
+
+			configureMockedSnapshotServerConnection();
+			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false}");
+
+			SeleniumTestsContextManager.removeThreadContext();
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+
+			// check there are 1 failed results only
+			String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "detailed-result.json").toFile(), StandardCharsets.UTF_8);
+
+			Assert.assertTrue(detailedReportContent.contains("\"errors\": 1"));
+			Assert.assertTrue(detailedReportContent.contains("\"errorMessage\": \"class com.seleniumtests.customexception.ScenarioException: Snapshot comparison failed\""));
+			Assert.assertTrue(detailedReportContent.contains("\"value\": \"Snapshot comparison failed\""));
+			Assert.assertTrue(detailedReportContent.contains("\"status\": \"FAILURE\","));
+			Assert.assertTrue(detailedReportContent.contains("\"rawStatus\": \"SUCCESS\","));
+			Assert.assertTrue(detailedReportContent.contains("\"snapshotComparisonResult\": \"FAILURE\","));
+			Assert.assertTrue(detailedReportContent.contains("\"snapshotComparisonBehaviour\": \"CHANGE_TEST_RESULT\","));
+
+		} finally {
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+		}
+	}
+	/**
+	 * Check detailed-result.json file is updated when snapshot comparison fails
+	 * When displayOnly is chosen, status and rawStatus are the same
+	 */
+	@Test(groups={"it"})
+	public void testSnapshotComparisonKoDisplayOnly() throws Exception {
+		try {
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, "displayOnly");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
+
+			configureMockedSnapshotServerConnection();
+			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false}");
+
+			SeleniumTestsContextManager.removeThreadContext();
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+
+			// check there are 1 failed results only
+			String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "detailed-result.json").toFile(), StandardCharsets.UTF_8);
+
+			Assert.assertTrue(detailedReportContent.contains("\"errors\": 0"));
+			Assert.assertTrue(detailedReportContent.contains("\"errorMessage\": \"\""));
+			Assert.assertTrue(detailedReportContent.contains("\"value\": \"\""));
+			Assert.assertTrue(detailedReportContent.contains("\"status\": \"SUCCESS\","));
+			Assert.assertTrue(detailedReportContent.contains("\"rawStatus\": \"SUCCESS\","));
+			Assert.assertTrue(detailedReportContent.contains("\"snapshotComparisonResult\": \"FAILURE\","));
+			Assert.assertTrue(detailedReportContent.contains("\"snapshotComparisonBehaviour\": \"DISPLAY_ONLY\","));
+
+		} finally {
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR);
+			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+		}
+	}
 }

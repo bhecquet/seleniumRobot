@@ -240,11 +240,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			Assert.assertFalse(summaryReport.contains("<i class=\"fas fa-circle circle")); // no snapshot comparison has been performed
 			Assert.assertTrue(summaryReport.contains("info=\"ok\" data-toggle=\"tooltip\""));
 
-			String detailedReportContent = readTestMethodResultFile("testAndSubActions");
-
-			// no snapshot tab displayed
-			Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\"  style=\"display: none;\" >"));
-
 			// message saying that error occurred when contacting snapshot server
 			String logs = readSeleniumRobotLogFile();
 			Assert.assertTrue(logs.contains("request to http://localhost:4321 failed: Internal Server Error"));
@@ -284,14 +279,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			String detailedReportContent = readTestMethodResultFile("testAndSubActions");
 			detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
 
-			// tabs are shown
-			Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\" style=\"display: block;\" >"));
+			Assert.assertTrue(detailedReportContent.contains("<th>Result server Url</th><td><a href=\"http://localhost:4321/snapshot/testResults/result/15/\">Online result (with snapshot comparison)</a></td>"));
 
-			// snapshot tab not active
-			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link tab-success \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
-
-			// iframe present with the right test case id
-			Assert.assertTrue(detailedReportContent.contains("<iframe src=\"http://localhost:4321/snapshot/compare/stepList/15/?header=true\" id=\"snapshot-iframe\" frameborder=\"0\"></iframe>"));
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
@@ -329,14 +318,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			String detailedReportContent = readTestMethodResultFile("testAndSubActions");
 			detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
 
-			// tabs are shown
-			Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\" style=\"display: block;\" >"));
+			Assert.assertTrue(detailedReportContent.contains("<th>Result server Url</th><td><a href=\"http://localhost:4321/snapshot/testResults/result/15/\">Online result (with snapshot comparison)</a></td>"));
 
-			// snapshot tab active / skipped
-			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link tab-skipped \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
-
-			// iframe present with the right test case id
-			Assert.assertTrue(detailedReportContent.contains("<iframe src=\"http://localhost:4321/snapshot/compare/stepList/15/?header=true\" id=\"snapshot-iframe\" frameborder=\"0\"></iframe>"));
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
@@ -374,14 +357,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			String detailedReportContent = readTestMethodResultFile("testAndSubActions");
 			detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
 
-			// tabs are shown
-			Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\" style=\"display: block;\" >"));
+			Assert.assertTrue(detailedReportContent.contains("<th>Result server Url</th><td><a href=\"http://localhost:4321/snapshot/testResults/result/15/\">Online result (with snapshot comparison)</a></td>"));
 
-			// snapshot tab not active
-			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link tab-failed \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
 
-			// iframe present with the right test case id
-			Assert.assertTrue(detailedReportContent.contains("<iframe src=\"http://localhost:4321/snapshot/compare/stepList/15/?header=true\" id=\"snapshot-iframe\" frameborder=\"0\"></iframe>"));
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
@@ -419,14 +397,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			String detailedReportContent = readTestMethodResultFile("testAndSubActions");
 			detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
 
-			// tabs are shown
-			Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\" style=\"display: block;\" >"));
+			Assert.assertTrue(detailedReportContent.contains("<th>Result server Url</th><td><a href=\"http://localhost:4321/snapshot/testResults/result/15/\">Online result (with snapshot comparison)</a></td>"));
 
-			// snapshot tab not active
-			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link tab-failed \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
-
-			// iframe present with the right test case id
-			Assert.assertTrue(detailedReportContent.contains("<iframe src=\"http://localhost:4321/snapshot/compare/stepList/15/?header=true\" id=\"snapshot-iframe\" frameborder=\"0\"></iframe>"));
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
@@ -459,15 +431,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 			String detailedReportContent = readTestMethodResultFile("testAndSubActions");
 			detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
-			// tabs are shown
-			Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\" style=\"display: block;\" >"));
-			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link tab-skipped \" id=\"snapshot-tab\"")); // tab is in blue as comparison skipped
 
-			// snapshot tab not active
-			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link tab-skipped \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
-
-			// iframe present with the right test case id
-			Assert.assertTrue(detailedReportContent.contains("<iframe src=\"http://localhost:4321/snapshot/compare/stepList/15/?header=true\" id=\"snapshot-iframe\" frameborder=\"0\"></iframe>"));
+			Assert.assertTrue(detailedReportContent.contains("<th>Result server Url</th><td><a href=\"http://localhost:4321/snapshot/testResults/result/15/\">Online result (with snapshot comparison)</a></td>"));
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
@@ -478,7 +443,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 
 	/**
-	 * Check that when snapshot server is used, we see a tab pointing to snapshot comparison results
 	 * Moreover, a red bullet should be visible on summary result when comparison is KO
 	 * Result remains OK as behaviour is "displayOnly"
 	 */
@@ -506,15 +470,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			String detailedReportContent = readTestMethodResultFile("testAndSubActions");
 			detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
 
-			// tabs are shown
-			Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\" style=\"display: block;\" >"));
-			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link tab-skipped \" id=\"snapshot-tab\"")); // tab is in blue as comparison skipped
-
-			// snapshot tab not active
-			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link tab-skipped \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
-
-			// iframe present with the right test case id
-			Assert.assertTrue(detailedReportContent.contains("<iframe src=\"http://localhost:4321/snapshot/compare/stepList/15/?header=true\" id=\"snapshot-iframe\" frameborder=\"0\"></iframe>"));
+			Assert.assertTrue(detailedReportContent.contains("<th>Result server Url</th><td><a href=\"http://localhost:4321/snapshot/testResults/result/15/\">Online result (with snapshot comparison)</a></td>"));
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);

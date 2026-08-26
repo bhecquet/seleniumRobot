@@ -80,7 +80,7 @@
 
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
 
@@ -88,18 +88,16 @@
 
     #if ($localResources)
         #parse("reporter/templates/html.head.local.vm")
-        <script src="resources/iframeResizer.min.js"></script>
         <script src="https://kit.fontawesome.com/327b2435a4.js" crossorigin="anonymous"></script>
 
     #else
         #parse("reporter/templates/html.head.remote.vm")
-        <script src="https://cdn.jsdelivr.net/npm/iframe-resizer@4.2.10/js/iframeResizer.min.js"></script>
     #end
 
     <script src="resources/app.min.js"></script>
     <link rel="stylesheet" type="text/css" href="resources/seleniumRobot_solo.css">
 </head>
-
+<body>
 <div>
     <div class="wrapper">
     #if ($header == "passed")
@@ -113,20 +111,6 @@
         </header>
     </div>
 
-    <div id="tabs" #if ($snapshots)style="display: block;" #else style="display: none;" #end>
-        <ul class="nav nav-tabs" id="tab" role="tablist">
-            <li class="nav-item">
-                <a class="nav-link active" id="result-tab" data-toggle="tab" href="#results" role="tab"
-                   aria-controls="home"
-                   aria-selected="true">Results</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link #if ($snapshotComparisonResult && $snapshotComparisonResult == 1) tab-success #elseif(($snapshotComparisonResult && $snapshotComparisonResult == 3)) tab-skipped #else tab-failed #end"
-                   id="snapshot-tab" data-toggle="tab" href="#snapshots" role="tab" aria-controls="profile"
-                   aria-selected="false">Snapshots</a>
-            </li>
-        </ul>
-    </div>
     <div class="tab-content" id="myTabContent">
 
         <!-- Modal for displaying pictures -->
@@ -164,7 +148,7 @@
                                 #if ($resultUrl && !$resultUrl.isEmpty())
                                     <tr>
                                         <th>Result server Url</th>
-                                        <td><a href="$resultUrl">Online result</a></td>
+                                        <td><a href="$resultUrl">Online result#if ($snapshots) (with snapshot comparison)#end</a></td>
                                     </tr>
                                 #end
                                 #if ($applicationType && !$applicationType.isEmpty())
@@ -275,20 +259,6 @@
                 </section>
             </div>
         </div>
-        #if ($snapshots)
-            <div class="tab-pane fade" id="snapshots" role="tabpanel" aria-labelledby="snapshot-tab">
-                <div class="container-fluid">
-                    <section class="content">
-                        <div class="row">
-                            <div class="col-xl-12">
-                                <iframe src="${snapshotServer}/snapshot/compare/stepList/${snapshotSessionId}/?header=true"
-                                        id="snapshot-iframe" frameborder="0"></iframe>
-                            </div>
-                        </div>
-                    </section>
-                </div>
-            </div>
-        #end
     </div>
 </div>
 
@@ -312,16 +282,5 @@
 
     document.getElementById("timestampAction").addEventListener("click", toggleTimestamps);
 </script>
-
-    #if ($snapshots)
-    <script>
-        const frames = iFrameResize({log: true, autoResize: false}, '#snapshot-iframe')
-        $('#snapshot-tab').on('shown.bs.tab', function (e) {
-            console.log("resizing iframe");
-            frames[0].iFrameResizer.resize();
-            frames[0].iFrameResizer.sendMessage("resize");
-        })
-    </script>
-    #end
 </body>
 </html>

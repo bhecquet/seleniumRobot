@@ -11,6 +11,17 @@ import org.testng.*;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * This 'reporter' class aims at updating test result , based on criteria
+ * - set test result to failure when snapshot comparison is performed, is KO and behavior is set to 'changeTestResult'
+ * <p>
+ * This class MUST be executed after results are recorded onto seleniumRobot server as it uses the ID of the test case
+ * <p>
+ * By modifying test result here, after result recording on server, we have a difference between status of test
+ * - in static files (XML / JSON) where test is KO
+ * - on server where test is OK with comparison KO => server uses both information to determine whether test is OK or KO
+ *
+ */
 public class ResultUpdaterReporter extends CommonReporter implements IReporter {
 
     private static final Object lock = new Object();
@@ -36,6 +47,11 @@ public class ResultUpdaterReporter extends CommonReporter implements IReporter {
                         continue;
                     }
 
+                    if (TestNGResultUtils.isUpdateResultReportExecuted(testResult)) {
+                        continue;
+                    }
+
+
                     // check if we have an id from snapshot server
                     Integer testCaseInSessionId = TestNGResultUtils.getSnapshotTestCaseInSessionId(testResult);
                     if (testCaseInSessionId == null) {
@@ -49,6 +65,7 @@ public class ResultUpdaterReporter extends CommonReporter implements IReporter {
                     TestNGResultUtils.setSnapshotComparisonResult(testResult, snapshotComparisonResult);
 
                     changeTestResultWithSnapshotComparison(testResult, snapshotComparisonResult);
+                    TestNGResultUtils.setUpdateResultReportExecuted(testResult, true);
                 }
             }
         }
@@ -67,6 +84,8 @@ public class ResultUpdaterReporter extends CommonReporter implements IReporter {
                 && snapshotComparisonResult == ITestResult.FAILURE ) {
             testResult.setStatus(ITestResult.FAILURE);
             testResult.setThrowable(new ScenarioException("Snapshot comparison failed"));
+
+            logger.info("Setting test status to KO due to image comparison error");
 
             TestStepManager.logThrowableToTestEndStep(testResult);
         }

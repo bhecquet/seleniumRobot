@@ -56,7 +56,7 @@ public class TestBugTrackerReporter extends ReporterTest {
 	 * Check a failed test produces a issue creation
 	 */
 	@Test(groups={"it"})
-	public void testIssueIsRecorded() throws Exception {
+	public void testIssueIsRecorded() {
 		try (MockedConstruction<JiraConnector> jiraMockConstruction = mockConstruction(JiraConnector.class)) {
 			System.setProperty(BugTrackerContext.BUGTRACKER_TYPE, "jira");
 			System.setProperty(BugTrackerContext.BUGTRACKER_URL, "http://localhost:1234");
@@ -72,7 +72,7 @@ public class TestBugTrackerReporter extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testInError"});
 			
 			// check we have only one result recording for each test method
-			verify(jiraMockConstruction.constructed().get(0)).createIssue(eq("core"), eq("DEV"), anyString(), eq("testInError"), contains("Test 'testInError' failed"), testStepsArgument.capture(), issueOptionsArgument.capture());
+			verify(jiraMockConstruction.constructed().getFirst()).createIssue(eq("core"), eq("DEV"), anyString(), eq("testInError"), contains("Test 'testInError' failed"), testStepsArgument.capture(), issueOptionsArgument.capture());
 			Assert.assertEquals(testStepsArgument.getValue().size(), 6);
 			
 			Assert.assertEquals(issueOptionsArgument.getValue().size(), 3);
@@ -97,7 +97,7 @@ public class TestBugTrackerReporter extends ReporterTest {
 	 * will be created.
 	 */
 	@Test(groups={"it"})
-	public void testIssueIsRecordedWithDataProvider() throws Exception {
+	public void testIssueIsRecordedWithDataProvider() {
 		try (MockedConstruction<JiraConnector> jiraMockConstruction = mockConstruction(JiraConnector.class)) {
 			System.setProperty(BugTrackerContext.BUGTRACKER_TYPE, "jira");
 			System.setProperty(BugTrackerContext.BUGTRACKER_URL, "http://localhost:1234");
@@ -123,7 +123,7 @@ public class TestBugTrackerReporter extends ReporterTest {
 			
 
 			// check we have only one result recording for each test method
-			verify(jiraMockConstruction.constructed().get(0)).createIssue(eq("core"), eq("DEV"), anyString(), eq("testInErrorDataProvider-1"), contains("Test 'testInErrorDataProvider-1' failed"), any(), issueOptionsArgument2.capture());
+			verify(jiraMockConstruction.constructed().getFirst()).createIssue(eq("core"), eq("DEV"), anyString(), eq("testInErrorDataProvider-1"), contains("Test 'testInErrorDataProvider-1' failed"), any(), issueOptionsArgument2.capture());
 			
 			Assert.assertEquals(issueOptionsArgument2.getValue().size(), 3);
 			Assert.assertEquals(issueOptionsArgument2.getValue().get(BugTracker.BUGTRACKER_ISSUE_REPORTER), "me");
@@ -327,7 +327,7 @@ public class TestBugTrackerReporter extends ReporterTest {
 	 * With test OK, no issue is recorded but we try to close a matching issue
 	 */
 	@Test(groups={"it"})
-	public void testNoIssueIsRecordedWithTestSuccess() throws Exception {
+	public void testNoIssueIsRecordedWithTestSuccess() {
 		try (MockedConstruction<JiraConnector> jiraMockConstruction = mockConstruction(JiraConnector.class)) {
 			System.setProperty(BugTrackerContext.BUGTRACKER_TYPE, "jira");
 			System.setProperty(BugTrackerContext.BUGTRACKER_URL, "http://localhost:1234");
@@ -354,7 +354,7 @@ public class TestBugTrackerReporter extends ReporterTest {
 	 * With test Skipped, no issue is recorded
 	 */
 	@Test(groups={"it"})
-	public void testNoIssueIsRecordedWithTestSkipped() throws Exception {
+	public void testNoIssueIsRecordedWithTestSkipped() {
 		try (MockedConstruction<JiraConnector> jiraMockConstruction = mockConstruction(JiraConnector.class)) {
 			System.setProperty(BugTrackerContext.BUGTRACKER_TYPE, "jira");
 			System.setProperty(BugTrackerContext.BUGTRACKER_URL, "http://localhost:1234");
@@ -365,7 +365,7 @@ public class TestBugTrackerReporter extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testSkipped"});
 			
 			// check we have only one result recording for each test method
-			verify(jiraMockConstruction.constructed().get(0), never()).createIssue(any(), any(), any(), any(), any(), any(), any());
+			verify(jiraMockConstruction.constructed().getFirst(), never()).createIssue(any(), any(), any(), any(), any(), any(), any());
 			
 			
 		} finally {
@@ -381,7 +381,7 @@ public class TestBugTrackerReporter extends ReporterTest {
 	 * Without bugtracker instance, no issue recorded, no error raised
 	 */
 	@Test(groups={"it"})
-	public void testNoIssueIsRecordeWithoutBugTracker() throws Exception {
+	public void testNoIssueIsRecordeWithoutBugTracker() {
 		try (MockedConstruction<JiraConnector> jiraMockConstruction = mockConstruction(JiraConnector.class)) {
 			System.setProperty(BugTrackerContext.BUGTRACKER_TYPE, "foo");
 			System.setProperty(BugTrackerContext.BUGTRACKER_URL, "http://localhost:1234");
@@ -407,7 +407,7 @@ public class TestBugTrackerReporter extends ReporterTest {
 	 * Check that when a test contains description, this is set in issue
 	 */
 	@Test(groups={"it"})
-	public void testIssueDescriptionIsInterpolated() throws Exception {
+	public void testIssueDescriptionIsInterpolated() {
 		try (MockedConstruction<JiraConnector> jiraMockConstruction = mockConstruction(JiraConnector.class)) {
 			System.setProperty(BugTrackerContext.BUGTRACKER_TYPE, "jira");
 			System.setProperty(BugTrackerContext.BUGTRACKER_URL, "http://localhost:1234");
@@ -422,7 +422,7 @@ public class TestBugTrackerReporter extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassforTestDescription"}, ParallelMode.METHODS, new String[] {"testWithLineBreaksInDescription"});
 			
 			// check we have only one result recording for each test method
-			verify(jiraMockConstruction.constructed().get(0)).createIssue(eq("core"), eq("DEV"), anyString(), eq("testWithLineBreaksInDescription"), contains("Test 'testWithLineBreaksInDescription' failed\n" +
+			verify(jiraMockConstruction.constructed().getFirst()).createIssue(eq("core"), eq("DEV"), anyString(), eq("testWithLineBreaksInDescription"), contains("Test 'testWithLineBreaksInDescription' failed\n" +
 					"Test goal: a test with param http://mysite.com\n" + 
 					"and line breaks"), testStepsArgument.capture(), issueOptionsArgument.capture());
 			List<TestStep> steps = testStepsArgument.getValue();

@@ -590,6 +590,9 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		if (method.isTestMethod()) {
 			TestNGResultUtils.changeTestResultWithSoftAssertion(testResult);
 		}
+
+		// record current test result, so that we know what was the result of scenario before any further modification (ex: due to snapshot comparison)
+		TestNGResultUtils.setRawResult(testResult, testResult.getStatus());
 		
 		// store context in test result
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());

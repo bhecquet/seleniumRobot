@@ -389,9 +389,9 @@ public class TestPerformanceReporter extends ReporterTest {
 			// check there are 1 failed results only
 			String result = readTestMethodPerfFile("testAndSubActions");
 			Assert.assertTrue(result.contains("tests=\"8\""));
-			Assert.assertTrue(result.contains("errors=\"0\""));
+			Assert.assertTrue(result.contains("errors=\"1\""));
 			Assert.assertTrue(result.contains("failures=\"0\""));
-			Assert.assertTrue(result.contains("<error message=\"Snapshot comparison failed\" type=\"com.seleniumtests.customexception.ScenarioException\">"));
+			Assert.assertTrue(result.contains("<error message=\"class com.seleniumtests.customexception.ScenarioException: Snapshot comparison failed\" type=\"\">"));
 
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);

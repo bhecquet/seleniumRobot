@@ -670,6 +670,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	
 	/**
 	 * Get the comparison result of snapshots. If we cannot get the information, return true
+	 * We try several times to wait for computing to be finished
 	 * @param testCaseInSessionId		id of the test case in this test sessions.
 	 * @param errorMessage				the messages coming from server if some comparison error occurred (error during computing). 
 	 * 									An empty errorMessage means all snapshots have been processed whatever the comparison result is
@@ -680,7 +681,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		logger.info("Getting snapshot comparison result for {}", testCaseInSessionId);
 		try {
 			JSONObject response = null;
-			for (int i = 0; i < 5; i++) {
+			for (int i = 0; i < 10; i++) {
 				response = getJSonResponse(buildGetRequest(url + TESTCASEINSESSION_API_URL + testCaseInSessionId));
 				
 				// 'isOkWithSnapshots' can take 3 values
@@ -699,10 +700,10 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 				logger.info("Comparison result took too long to compute");
 				return displaySnapshotComparisonError(response, errorMessage);
 			} else {
-				logger.error("Comparison result is null, setting to 'true'");
+				logger.error("Comparison result is null, setting to 'skip'");
 				return ITestResult.SKIP;
 			}
-			
+
 		} catch (UnirestException e) {
 			logger.error("Cannot get comparison result for this test case", e);
 			return ITestResult.SKIP;
