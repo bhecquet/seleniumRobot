@@ -515,10 +515,10 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 
 		// when error occurs, exception raised is not added to the step if this error is outside of a PageObject
 		// we add it there as an exception always terminates the test (except for soft assert, but this case is handled in SoftAssertion.aj)
-		TestStepManager.logThrowableToTestEndStep(testResult);
 		WebUIDriver.logFinalDriversState(testResult);
 		tearDownStep.updateDuration();
 		TestStepManager.logTestStep(tearDownStep);
+		TestStepManager.logThrowableToTestEndStep(testResult);
 	}
 
 

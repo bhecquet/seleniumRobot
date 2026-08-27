@@ -42,7 +42,7 @@ public class TestSnapshotCheckType extends MockitoTest {
 	
 	@Test(groups= {"ut"})
 	public void testRecordSnapshotOnServerLayoutOnly() {
-		Assert.assertTrue(SnapshotCheckType.LAYOUT.recordSnapshotOnServerForComparison());
+		Assert.assertTrue(SnapshotCheckType.ZONES.recordSnapshotOnServerForComparison());
 	}
 
 	@Test(groups= {"ut"})

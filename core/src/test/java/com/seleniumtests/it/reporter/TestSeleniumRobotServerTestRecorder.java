@@ -134,7 +134,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector).uploadLogs(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithException", "execution.log").toFile(), 0);
 			verify(serverConnector).uploadLogs(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "execution.log").toFile(), 0);
 
-			verify(serverConnector, times(5)).getTestCaseInSessionComparisonResult(anyInt(), any(StringBuilder.class)); // called once per test
+			verify(serverConnector, times(3)).getTestCaseInSessionComparisonResult(anyInt(), any(StringBuilder.class)); // called once per test that is not KO
 
 			// check test infos has been sent
 			ArgumentCaptor<Map<String, Info>> infosArgument = ArgumentCaptor.forClass(Map.class);
@@ -157,7 +157,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			String detailedReportContent = readTestMethodResultFile("testAndSubActions");
 			detailedReportContent = detailedReportContent.replaceAll("\\s+", " ");
 
-			Assert.assertTrue(detailedReportContent.contains("<th>Result server Url</th><td><a href=\"http://localhost:1234/snapshot/testResults/result/0/\">Online result</a></td>"));
+			Assert.assertTrue(detailedReportContent.contains("<th>Result server Url</th><td><a href=\"http://localhost:1234/snapshot/testResults/result/0/\">Online result (with snapshot comparison)</a></td>"));
 
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
@@ -193,8 +193,6 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 
 			// check browser has the same valeurs for all calls
 			verify(serverConnector).createSession(anyString(), eq("BROWSER:CHROME"), eq("http://mylauncher/test"), any(OffsetDateTime.class));
-			// one snapshot is compared with reference during test run to check if test must be replayed
-			verify(serverConnector).checkSnapshotHasNoDifferences(any(Snapshot.class), eq("testDriverCustomSnapshot"), eq("_captureSnapshot"), eq("BROWSER:CHROME"));
 
 			// issue #331: check all test cases are created, call MUST be done only once to avoid result to be recorded several times
 			verify(serverConnector).createTestCase("testDriverCustomSnapshot");

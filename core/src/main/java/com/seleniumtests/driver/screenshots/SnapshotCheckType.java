@@ -30,7 +30,7 @@ public class SnapshotCheckType {
 	public enum Control {
 		NONE,
 		FULL,			// pixel comparison
-		LAYOUT,			// do not compare colors (not implemented), just shapes
+		ZONES,			// only compare specific zones
 		NONE_REFERENCE 	// no comparison done, it's a reference picture when step fails so that we can show to user what should have been the application if step succeed
 	}
 	
@@ -39,7 +39,7 @@ public class SnapshotCheckType {
 	
 	public static final SnapshotCheckType FULL = new SnapshotCheckType(Control.FULL);
 	
-	public static final SnapshotCheckType LAYOUT = new SnapshotCheckType(Control.LAYOUT); // not really used
+	public static final SnapshotCheckType ZONES = new SnapshotCheckType(Control.ZONES); // not really used
 	
 	// snapshot will not be compared
 	public static final SnapshotCheckType FALSE = new SnapshotCheckType(Control.NONE);

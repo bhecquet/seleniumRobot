@@ -87,6 +87,7 @@ public class ResultUpdaterReporter extends CommonReporter implements IReporter {
 
             logger.info("Setting test status to KO due to image comparison error");
 
+            // expect 'Test end' step to be present (which should be the case as this reporter is executed after test has finished
             TestStepManager.logThrowableToTestEndStep(testResult);
         }
     }

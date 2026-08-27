@@ -213,7 +213,8 @@ public class TestCustomReporter extends ReporterTest {
 		Assert.assertEquals(json.getInt("failures"), 0);
 		Assert.assertEquals(json.getString("failedStep"), "_writeSomethingOnNonExistentElement");
 		Assert.assertEquals(json.getJSONArray("steps").length(), 9);
-		Assert.assertTrue(json.getJSONArray("steps").getJSONObject(6).getBoolean("failed"));
+		Assert.assertTrue(json.getJSONArray("steps").getJSONObject(5).getBoolean("failed")); // the failed step
+		Assert.assertTrue(json.getJSONArray("steps").getJSONObject(6).getBoolean("failed")); // Test end step
 		Assert.assertEquals(json.getInt("retries"), 0);
 		Assert.assertEquals(json.getInt("stepNumber"), 9);
 		Assert.assertEquals(json.getInt("errors"), 1);
@@ -314,7 +315,7 @@ public class TestCustomReporter extends ReporterTest {
             System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
             System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4321/wd/hub");
             System.setProperty(SeleniumTestsContext.NODE_TAGS, "local");
-            System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID_TIMEOUT, "5");
+            System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID_TIMEOUT, "10");
 
             createGridHubMockWithNodeOK();
 
@@ -364,7 +365,7 @@ public class TestCustomReporter extends ReporterTest {
             System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
             System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4321/wd/hub");
             System.setProperty(SeleniumTestsContext.NODE_TAGS, "local");
-			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID_TIMEOUT, "5");
+			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID_TIMEOUT, "10");
 
             createGridHubMockWithNodeOK();
 

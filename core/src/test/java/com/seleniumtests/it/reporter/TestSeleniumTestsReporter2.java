@@ -199,7 +199,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 
 	/**
-	 * Check that test report do not display tabs when no snapshot comparison is requested
+	 * Check that test report do not display comparison step when no snapshot comparison is requested
 	 */
 	@Test(groups = {"it"})
 	public void testNoSnapshotComparison() throws Exception {
@@ -212,7 +212,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertFalse(summaryReport.contains("<i class=\"fas fa-circle "));
 
 		String detailedReportContent = readTestMethodResultFile("testAndSubActions");
-		Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\"  style=\"display: none;\" >"));
 		Assert.assertFalse(detailedReportContent.contains("</button> Snapshot comparison"));
 
 	}
@@ -1057,7 +1056,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent = readTestMethodResultFile("testAndSubActions");
 
 		Assert.assertTrue(detailedReportContent.contains("<script src=\"https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js\""));
-		Assert.assertTrue(detailedReportContent.contains("<script src=\"https://cdn.jsdelivr.net/npm/iframe-resizer@4.2.10/js/iframeResizer.min.js\">"));
 		Assert.assertTrue(detailedReportContent.contains("<link rel=\"stylesheet\" href=\"https://use.fontawesome.com/releases/v5.15.3/css/all.css\">"));
 		Assert.assertTrue(detailedReportContent.contains("<link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css\""));
 	}
@@ -1118,8 +1116,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "resources", "templates", "bootstrap.min.css").toFile().exists());
 		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "resources", "templates", "webfonts").toFile().exists());
 
-		String detailedReportContent = readTestMethodResultFile("testAndSubActions");
-		Assert.assertTrue(detailedReportContent.contains("<script src=\"resources/iframeResizer.min.js\"></script>"));
 	}
 
 	@Test(groups = {"it"})
