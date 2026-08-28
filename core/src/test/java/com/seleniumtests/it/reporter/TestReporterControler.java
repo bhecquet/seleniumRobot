@@ -176,8 +176,6 @@ public class TestReporterControler extends ReporterTest {
 
 		// check that when test is skipped, a message on test status is displayed
 		Assert.assertTrue(detailedReportContent.contains("[main] ScenarioLogger: Test has not started or has been skipped</div>"));
-				
-		
 	}
 	
 	/**

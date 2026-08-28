@@ -580,8 +580,11 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	@Test(groups= {"ut"})
 	public void testCreateSnapshot() throws UnirestException {
 		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
-		MultipartBody request = (MultipartBody) createServerMock("POST", SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL, 200, "{'id': '16', 'computed': true, 'computingError': '', 'diffPixelPercentage': 0.0, 'tooManyDiffs': false}", "body");	
-		
+		MultipartBody request = (MultipartBody) createServerMock("POST", SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL, 200, "{'id': '16', 'computed': true, 'computingError': '', 'diffPixelPercentage': 0.0, 'tooManyDiffs': false}", "body");
+
+		SnapshotCheckType checkType = SnapshotCheckType.FULL.withThreshold(0.7);
+		when(snapshot.getCheckSnapshot()).thenReturn(checkType);
+
 		Integer sessionId = connector.createSession("Session1");
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1", "SUCCESS","LOCAL", "a test description", OffsetDateTime.now());
@@ -595,7 +598,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		
 		// exclude zones are not sent as not provided
 		verify(request, never()).field(eq(SeleniumRobotSnapshotServerConnector.FIELD_EXCLUDE_ZONES), anyString());
-		verify(request).field("diffTolerance", "0.0");
+		verify(request).field("diffTolerance", "0.7");
 	}
 
 	@Test(groups= {"ut"})

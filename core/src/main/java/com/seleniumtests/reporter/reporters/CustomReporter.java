@@ -231,6 +231,10 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			context.put("failedStep", StringUtility.encodeString(failedStep, reportFormat.toLowerCase()));
 			context.put("pageLoadTimes", pageLoadTimes);
 			context.put("resultUrl", TestNGResultUtils.getSnapshotTestCaseInSessionId(testResult) == null ? "": String.format("%s/snapshot/testResults/result/%s/", SeleniumRobotSnapshotServerConnector.getInstance().getUrl(), TestNGResultUtils.getSnapshotTestCaseInSessionId(testResult)));
+			context.put("snapshotComparisonResult", TestNGResultUtils.getTestStatusString(TestNGResultUtils.getSnapshotComparisonResult(testResult)));
+			context.put("snapshotComparisonBehaviour", seleniumTestsContext.seleniumServer().getSeleniumRobotServerCompareSnapshot() ? seleniumTestsContext.seleniumServer().getSeleniumRobotServerCompareSnapshotBehaviour() : "NOT_REQUESTED");
+			context.put("status", TestNGResultUtils.getTestStatusString(testResult)); // final status of the test (test scenario + snapshot comparison)
+			context.put("rawStatus", TestNGResultUtils.getTestStatusString(TestNGResultUtils.getRawResult(testResult))); // status not modified by snapshot comparison
 
 			String testName = getTestName(testResult);
 			String logs = SeleniumRobotLogger.getTestLogs(testName);

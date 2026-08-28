@@ -962,75 +962,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			System.clearProperty("increaseMaxRetryInBeforeMethod");
 		}
 	}
-	
 
-	/**
-	 * Check that when snapshot server is used for comparison, if comparison fails, test is retried
-	 */
-	@Test(groups={"it"})
-	public void testSnapshotComparisonKoChangeTestResultAndRetried() throws Exception {
-		try {
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, "changeTestResult");
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
-			
-			configureMockedSnapshotServerConnection();
-			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false}");		
-			
-			// say that snapshot comparison if failed when checking individual snapshots
-			createServerMock("PUT", SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL, 200, "{'id': '16', 'computed': true, 'computingError': '', 'diffPixelPercentage': 1.0, 'tooManyDiffs': true}");
-			
-			SeleniumTestsContextManager.removeThreadContext();
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
-
-			// check test has been retried
-			String logs = readSeleniumRobotLogFile();
-			Assert.assertTrue(logs.contains("[RETRYING] class com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions FAILED, Retrying 1 time"));
-			
-		} finally {
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
-		}
-	}
-	
-	/**
-	 * Check that when snapshot server is used for comparison, if comparison fails, test is not retried as we are in "displayOnly"
-	 */
-	@Test(groups={"it"})
-	public void testSnapshotComparisonKoChangeTestResultNotRetried() throws Exception {
-		try {
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE, "true");
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, "displayOnly");
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
-			System.setProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
-			
-			configureMockedSnapshotServerConnection();
-			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false}");		
-			
-			// say that snapshot comparison if failed when checking individual snapshots
-			createServerMock("PUT", SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL, 200, "{'id': '16', 'computed': true, 'computingError': '', 'diffPixelPercentage': 1.0, 'tooManyDiffs': true}");
-			
-			SeleniumTestsContextManager.removeThreadContext();
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
-			
-			// check test has NOT been retried
-			String logs = readSeleniumRobotLogFile();
-			Assert.assertFalse(logs.contains("[RETRYING] class com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions FAILED, Retrying 1 time"));
-			
-		} finally {
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_URL);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR);
-			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
-		}
-	}
 
 	/**
 	 * Check finalization of test is done in each case

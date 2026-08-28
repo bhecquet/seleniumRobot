@@ -512,11 +512,13 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		} else {
 			scenarioLogger.log("Test has not started or has been skipped");
 		}
-		
-		logThrowableToTestEndStep(testResult);
+
+		// when error occurs, exception raised is not added to the step if this error is outside of a PageObject
+		// we add it there as an exception always terminates the test (except for soft assert, but this case is handled in SoftAssertion.aj)
 		WebUIDriver.logFinalDriversState(testResult);
 		tearDownStep.updateDuration();
 		TestStepManager.logTestStep(tearDownStep);
+		TestStepManager.logThrowableToTestEndStep(testResult);
 	}
 
 
@@ -547,35 +549,6 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps().add(testStep);
 
 	}
-	
-	private void logThrowableToTestEndStep(ITestResult testResult) {
-		if (testResult.getThrowable() != null) {
-			logger.error(testResult.getThrowable().getMessage());
-			
-			// when error occurs, exception raised is not added to the step if this error is outside of a PageObject
-			// we add it there as an exception always terminates the test (except for soft assert, but this case is handled in SoftAssertion.aj)
-			TestStep lastStep = TestStepManager.getCurrentRootTestStep();
-			if (lastStep == null) {
-				// when steps are automatic, they are closed (lastStep is null) once method is finished
-				try {
-					lastStep = Iterables.getLast(SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps());
-				} catch (NoSuchElementException e) {
-					// if last step does not exist, do not crash
-				} 
-			}
-			
-			if (lastStep != null) {
-				lastStep.setFailed(true);
-				lastStep.setActionException(testResult.getThrowable());
-			}
-			
-			Info lastStateInfo = TestNGResultUtils.getTestInfo(testResult).get(TestStepManager.LAST_STATE_NAME);
-			((MultipleInfo)lastStateInfo).addInfo(new LogInfo(testResult.getThrowable().getMessage()));
-		}
-	}
-	
-	
-
 
 	/**
 	 * put in thread context the test / class / method context that may have already be defined in other \@BeforeXXX method
@@ -616,8 +589,10 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		// Handle Soft CustomAssertion
 		if (method.isTestMethod()) {
 			TestNGResultUtils.changeTestResultWithSoftAssertion(testResult);
-			TestNGResultUtils.changeTestResultWithSnapshotComparison(testResult);
 		}
+
+		// record current test result, so that we know what was the result of scenario before any further modification (ex: due to snapshot comparison)
+		TestNGResultUtils.setRawResult(testResult, testResult.getStatus());
 		
 		// store context in test result
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());

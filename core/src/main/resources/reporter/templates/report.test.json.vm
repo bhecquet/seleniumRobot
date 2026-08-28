@@ -36,6 +36,10 @@
 	"platform": "$platform",
 	"failedStep": "$failedStep",
 	"resultUrl": "$resultUrl",
+	"status": "$status",
+	"rawStatus": "$rawStatus",
+	"snapshotComparisonResult": "$snapshotComparisonResult",
+	"snapshotComparisonBehaviour": "$snapshotComparisonBehaviour",
 	"infos": [
 		#foreach ($testInfo in $testInfos.entrySet())
 			#set($testInfoIdx = $testInfoIdx + 1)

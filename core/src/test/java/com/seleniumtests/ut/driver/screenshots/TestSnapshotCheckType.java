@@ -4,6 +4,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 
+import com.seleniumtests.customexception.ConfigurationException;
 import org.mockito.Mock;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriverException;
@@ -42,7 +43,23 @@ public class TestSnapshotCheckType extends MockitoTest {
 	
 	@Test(groups= {"ut"})
 	public void testRecordSnapshotOnServerLayoutOnly() {
-		Assert.assertTrue(SnapshotCheckType.LAYOUT.recordSnapshotOnServerForComparison());
+		Assert.assertTrue(SnapshotCheckType.ZONES.recordSnapshotOnServerForComparison());
+	}
+
+	@Test(groups = "ut")
+	public void testWithThreshold() {
+		SnapshotCheckType checkType = SnapshotCheckType.FULL.withThreshold(5.0);
+		Assert.assertEquals(checkType.getErrorThreshold(), 5.0);
+	}
+
+	@Test(groups = "ut", expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Error threshold bounds are \\[0 - 100]")
+	public void testWithThresholdNegative() {
+		SnapshotCheckType.FULL.withThreshold(-0.1);
+	}
+
+	@Test(groups = "ut", expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Error threshold bounds are \\[0 - 100]")
+	public void testWithThreshold101() {
+		SnapshotCheckType.FULL.withThreshold(100.1);
 	}
 
 	@Test(groups= {"ut"})
@@ -69,7 +86,7 @@ public class TestSnapshotCheckType extends MockitoTest {
 		checkType.check(snapshotTarget, 1.5);
 
 		Assert.assertEquals(checkType.getExcludeElementsRect().size(), 1);
-		Assert.assertEquals(checkType.getExcludeElementsRect().get(0), new Rectangle(2,  3,  5,  6));
+		Assert.assertEquals(checkType.getExcludeElementsRect().getFirst(), new Rectangle(2,  3,  5,  6));
 	}
 	
 	@Test(groups= {"ut"})

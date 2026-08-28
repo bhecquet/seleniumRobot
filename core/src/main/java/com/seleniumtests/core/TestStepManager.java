@@ -5,15 +5,25 @@ import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.collect.Iterables;
+import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.reporter.info.Info;
+import com.seleniumtests.reporter.info.LogInfo;
+import com.seleniumtests.reporter.info.MultipleInfo;
 import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
+import org.apache.logging.log4j.Logger;
+import org.testng.ITestResult;
 
 public class TestStepManager {
-	
+
+	private static final Logger logger = SeleniumRobotLogger.getLogger(TestStepManager.class);
 	public static final int MIN_PASSWORD_LENGTH = 5;
 	public static final String LAST_STEP_NAME = "Test end";
 	public static final String LAST_STATE_NAME = "Last State";
@@ -272,5 +282,25 @@ public class TestStepManager {
 
 	public List<String> getPwdToReplace() {
 		return pwdToReplace;
+	}
+
+
+	/**
+	 * Logs the exception to 'Test end' step
+	 * @param testResult 	the test result to update
+	 */
+	public static void logThrowableToTestEndStep(ITestResult testResult) {
+		if (testResult.getThrowable() != null) {
+			logger.error(testResult.getThrowable().getMessage());
+
+			TestStep lastStep = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getLastTestStep();
+			if (lastStep != null) {
+				lastStep.setFailed(true);
+				lastStep.setActionException(testResult.getThrowable());
+			}
+
+			Info lastStateInfo = TestNGResultUtils.getTestInfo(testResult).get(TestStepManager.LAST_STATE_NAME);
+			((MultipleInfo)lastStateInfo).addInfo(new LogInfo(testResult.getThrowable().getMessage()));
+		}
 	}
 }
