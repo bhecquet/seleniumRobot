@@ -1,5 +1,6 @@
 #set($stepIdx = 0)
 #set($driverIdx = 0)
+#set($nodeTagIdx = 0)
 #set($testInfoIdx = 0)
 #set($pageLoadTimesIdx = 0)
 #set($stepsSize = $unencodedTestSteps.size())
@@ -8,7 +9,12 @@
 #set($pageLoadTimesSize = $pageLoadTimes.size())
 {
 	"gridnode": "$gridnode",
-	"nodeTags": $nodeTags,
+	"nodeTags": [
+		#foreach( $nodeTag in $nodeTags )
+			#set($nodeTagIdx = $nodeTagIdx + 1)
+			"$nodeTag"#if( $nodeTagIdx != $nodeTags.size()),#end
+		#end
+	],
 	"errors": $errors,
 	"errorMessage": "$errorMessage",
 	"failures": $failures,

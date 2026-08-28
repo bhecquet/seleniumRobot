@@ -348,6 +348,7 @@ public class TestCustomReporter extends ReporterTest {
             JSONObject json = new JSONObject(detailedReportContent);
 
             Assert.assertEquals(json.getJSONArray("nodeTags").getString(0), "local");
+			Assert.assertTrue(detailedReportContent.contains("\"local\"")); // check nodeTag has quotes
             Assert.assertEquals(json.getInt("driverFailNoMatchingNode"), 1);
             Assert.assertEquals(json.getInt("driverFailErrorOnHub"), 0);
             Assert.assertEquals(json.getInt("driverFailHubUnavailable"), 0);
