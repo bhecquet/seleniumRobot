@@ -3,6 +3,7 @@ package com.seleniumtests.driver.screenshots;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.seleniumtests.customexception.ConfigurationException;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriverException;
@@ -22,8 +23,8 @@ public class SnapshotCheckType {
 	// TODO: check without colors, check only part of the picture (exclusion zones defined directly in test)
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SnapshotCheckType.class);
 	
-	private Control control;
-	private List<Rectangle> excludeElementsRect = new ArrayList<>();
+	private final Control control;
+	private final List<Rectangle> excludeElementsRect = new ArrayList<>();
 	private List<WebElement> excludeElements = new ArrayList<>();
 	private double errorThreshold = 0.0;
 	
@@ -51,7 +52,13 @@ public class SnapshotCheckType {
 	private SnapshotCheckType(Control controlType) {
 		this.control = controlType;
 	}
-	
+
+	private SnapshotCheckType(Control controlType, List<WebElement> excludeElements, double errorThreshold) {
+		this.control = controlType;
+		this.excludeElements = excludeElements;
+		this.errorThreshold = errorThreshold;
+	}
+
 	public String getName() {
 		return control.name();
 	}
@@ -80,7 +87,8 @@ public class SnapshotCheckType {
 	 * @param target	target of the snapshot (page, screen, ...)
 	 */
 	public void check(SnapshotTarget target, double aspectRatio) {
-		
+		excludeElementsRect.clear();
+
 		// when target is a screen, do not take into account excluded elements
 		if (target.isPageTarget()) {
 			for (WebElement el: excludeElements) {
@@ -125,7 +133,7 @@ public class SnapshotCheckType {
 			}
 		}
 	}
-	
+
 	/**
 	 * Percentage of pixels that can be different when comparing this snapshot to its reference.
 	 * ex: setting 2.3 means that with 2% of different pixels, 
@@ -133,9 +141,10 @@ public class SnapshotCheckType {
 	 * @return this
 	 */
 	public SnapshotCheckType withThreshold(double errorThreshold) {
-		SnapshotCheckType newCheck = new SnapshotCheckType(control);
-		newCheck.errorThreshold = errorThreshold;
-		return newCheck;
+		if (errorThreshold < 0 || errorThreshold > 100) {
+			throw new ConfigurationException("Error threshold bounds are [0 - 100]");
+		}
+		return new SnapshotCheckType(control, new ArrayList<>(excludeElements), errorThreshold);
 	}
 	
 	/**
@@ -157,10 +166,8 @@ public class SnapshotCheckType {
 	 * @return this
 	 */
 	public SnapshotCheckType exclude(WebElement element) {
-		SnapshotCheckType newCheck = new SnapshotCheckType(control);
-		newCheck.excludeElements = new ArrayList<>(excludeElements);
+		SnapshotCheckType newCheck = new SnapshotCheckType(control, new ArrayList<>(excludeElements), errorThreshold);
 		newCheck.excludeElements.add(element);
-		
 		return newCheck;
 	}
 
