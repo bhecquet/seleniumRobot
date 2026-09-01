@@ -749,7 +749,7 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getString("name"), "subStep with password ******");
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getJSONArray("actions").length(), 2);
 
-		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getJSONObject("pageLoadTime").length(), 5);
+		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getJSONObject("pageLoadTime").length(), 6);
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getJSONObject("pageLoadTime").getString("name"), "loading of CalcPage took 1230 ms");
 
 		Assert.assertEquals(stepJson.getJSONArray("files").getJSONObject(0).getString("type"), "file");
