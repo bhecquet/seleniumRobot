@@ -24,6 +24,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -82,6 +83,7 @@ public class PageObject extends BasePage implements IPage {
     private Instant startLoading;
     private Instant stopLoading;
     private Instant foundElementAfterLoading;
+    private long pageLoadTechnicalTimes = 0L;
 
     private static final String ERROR_ELEMENT_NOT_PRESENT = "Element %s is not present";
 
@@ -239,7 +241,7 @@ public class PageObject extends BasePage implements IPage {
         
         // in case browser has been created outside of selenium and we attach to it, get initial window handles
         if (customEventFiringWebDriver != null && attachExistingDriverPort != null && url == null) {
-            customEventFiringWebDriver.updateWindowsHandles();
+            logExecutionTime(() -> customEventFiringWebDriver.updateWindowsHandles());
         }
 
         // add calling page and field name on element
@@ -322,6 +324,20 @@ public class PageObject extends BasePage implements IPage {
     }
 
     /**
+     * Executes the given action and measures the time (in ms) spent executing it, returning the action result.
+     * Used to removed some technical operation while measuring page loads
+     * @param action        the action to execute
+     */
+    protected void logExecutionTime(Runnable action) {
+    	Instant start = Instant.now();
+    	try {
+    		action.run();
+    	} finally {
+    		pageLoadTechnicalTimes += Duration.between(start, Instant.now()).toMillis();
+    	}
+    }
+
+    /**
      * Open page 
      * Wait for page loading
      * @param url   URL to open
@@ -331,11 +347,11 @@ public class PageObject extends BasePage implements IPage {
             // update start instant in case URL is defined because we only want page loading duration, which starts when URL is sent to browser
             startLoading = Instant.now();
             open(url);
-            customEventFiringWebDriver.updateWindowsHandles();
+            logExecutionTime(() -> customEventFiringWebDriver.updateWindowsHandles());
         }
 
         // switch to the context if we are on mobile app
-        switchToContext();
+        logExecutionTime(this::switchToContext);
         stopLoading = Instant.now();
         foundElementAfterLoading = Instant.now();
 
@@ -345,11 +361,11 @@ public class PageObject extends BasePage implements IPage {
         if (customEventFiringWebDriver != null && customEventFiringWebDriver.isWebTest()) {
             waitForPageToLoad();
         } else if (SeleniumTestsContextManager.isAppTest() && captureSnapshot) {
-        	capturePageSnapshot();
+        	logExecutionTime(this::capturePageSnapshot);
         }
 
         assertCurrentPage(false, pageIdentifierElement);
-        foundElementAfterLoading = Instant.now();
+        foundElementAfterLoading = Instant.now().minus(pageLoadTechnicalTimes, ChronoUnit.MILLIS);
 
         // store the window / tab on which this page is loaded
         if (customEventFiringWebDriver != null) {
@@ -836,14 +852,14 @@ public class PageObject extends BasePage implements IPage {
 
             // Navigate to app URL for browser test
             if (customEventFiringWebDriver.isWebTest()) {
-            	setWindowToRequestedSize();
+            	logExecutionTime(this::setWindowToRequestedSize);
                 customEventFiringWebDriver.navigate().to(url);
             }
         } catch (UnreachableBrowserException e) {
         	// recreate the driver without recreating the enclosing WebUiDriver
             customEventFiringWebDriver = WebUIDriver.getWebUIDriver(false).createWebDriver();
             if (customEventFiringWebDriver.isWebTest()) {
-	            setWindowToRequestedSize();
+                logExecutionTime(this::setWindowToRequestedSize);
                 customEventFiringWebDriver.navigate().to(url);
             }
         } catch (UnsupportedCommandException e) {
@@ -851,7 +867,7 @@ public class PageObject extends BasePage implements IPage {
             // recreate the driver without recreating the enclosing WebUiDriver
             customEventFiringWebDriver = WebUIDriver.getWebUIDriver(false).createWebDriver();
             if (customEventFiringWebDriver.isWebTest()) {
-            	setWindowToRequestedSize();
+                logExecutionTime(this::setWindowToRequestedSize);
                 customEventFiringWebDriver.navigate().to(url);
             }
         } catch (org.openqa.selenium.TimeoutException ex) {
@@ -908,7 +924,7 @@ public class PageObject extends BasePage implements IPage {
         } catch (Exception ex) {
 
             try {
-                ((JavascriptExecutor) customEventFiringWebDriver).executeScript(
+                customEventFiringWebDriver.executeScript(
                     "if (window.screen){window.moveTo(0, 0);window.resizeTo(window.screen.availWidth,window.screen.availHeight);}");
             } catch (Exception ignore) {
             	logger.log("Unable to maximize browser window. Exception occured: " + ignore.getMessage());
@@ -1101,13 +1117,13 @@ public class PageObject extends BasePage implements IPage {
     		// nothing
     	}
 
-        stopLoading = Instant.now();
+        stopLoading = Instant.now().minus(pageLoadTechnicalTimes, ChronoUnit.MILLIS);
     	
 
         // populate page info
     	if (captureSnapshot) {
 	        try {
-	        	capturePageSnapshot();
+	        	logExecutionTime(this::capturePageSnapshot);
 	        } catch (Exception ex) {
 	        	internalLogger.error(ex);
 	            throw ex;

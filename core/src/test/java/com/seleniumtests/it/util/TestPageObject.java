@@ -63,8 +63,8 @@ public class TestPageObject extends GenericDriverTest {
 		
 		// 0 capture because capture snapshot is set to false
 		Assert.assertTrue(TestStepManager.getCurrentOrPreviousStep().getAllAttachments(true).isEmpty());
-
 	}
+
 	@Test(groups={"it"})
 	public void testSnapshotLogged() {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*chrome");
@@ -88,7 +88,7 @@ public class TestPageObject extends GenericDriverTest {
 		Assert.assertEquals(step1.getAction(), "openPage");
 		Assert.assertEquals(step1.getOrigin().getSimpleName(), "DriverTestPage");
 		Assert.assertTrue(step1.getPageLoadTime().getLoadTime() > 0.1);
-		Assert.assertTrue(step1.getPageLoadTime().getElementFoundTime() > 0.1);
+		Assert.assertTrue(step1.getPageLoadTime().getElementFoundTime() > step1.getPageLoadTime().getLoadTime());
 		Assert.assertTrue(step1.getPageLoadTime().getUrl().contains("test.html"));
 		Assert.assertTrue(step1.getPageLoadTime().getName().contains("loading of DriverTestPage took"));
 
