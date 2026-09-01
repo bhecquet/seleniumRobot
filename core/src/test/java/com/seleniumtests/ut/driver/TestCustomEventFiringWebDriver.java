@@ -1755,5 +1755,121 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testGeoLocationWithWrongLongitude2() {
 		eventDriver.setGeolocation(10.0, 180.01);
 	}
-	
+
+	/**
+	 * When driver has already exited, setGeolocation should do nothing and not fail, even if browserInfo is not
+	 * usable anymore (here, browserInfo.getBrowser() is not stubbed and would return null, raising a NullPointerException
+	 * if the method tried to go further)
+	 */
+	@Test(groups = {"ut"})
+	public void testGeoLocationDriverExited() {
+		eventDriver.setDriverExited();
+		eventDriver.setGeolocation(10.0, 12.0);
+		verify(browserInfo, never()).getBrowser();
+	}
+
+	/**
+	 * If driver has already exited, do not try to reach it and return an empty value
+	 */
+	@Test(groups = {"ut"})
+	public void testGetWindowHandleDriverExited() {
+		eventDriver.setDriverExited();
+		String handle = eventDriver.getWindowHandle();
+		Assert.assertEquals(handle, "");
+		verify(driver, never()).getWindowHandle();
+	}
+
+	/**
+	 * If driver has already exited, do not try to reach it and return a default url
+	 */
+	@Test(groups = {"ut"})
+	public void testGetCurrentUrlDriverExited() {
+		eventDriver.setDriverExited();
+		String url = eventDriver.getCurrentUrl();
+		Assert.assertEquals(url, "http://driver.exited");
+		verify(driver, never()).getCurrentUrl();
+	}
+
+	/**
+	 * If driver has already exited, do not try to reach it and return an empty title
+	 */
+	@Test(groups = {"ut"})
+	public void testGetTitleDriverExited() {
+		eventDriver.setDriverExited();
+		String title = eventDriver.getTitle();
+		Assert.assertEquals(title, "");
+		verify(driver, never()).getTitle();
+	}
+
+	/**
+	 * If driver has already exited, browser / app is considered closed without contacting the driver
+	 */
+	@Test(groups = {"ut"})
+	public void testIsBrowserOrAppClosedDriverExited() {
+		eventDriver.setDriverExited();
+		Assert.assertTrue(eventDriver.isBrowserOrAppClosed());
+		verify(driver, never()).getWindowHandles();
+	}
+
+	/**
+	 * If driver has already exited, default aspect ratio (1.0) is returned, without executing any javascript
+	 */
+	@Test(groups = {"ut"})
+	public void testGetDeviceAspectRatioDriverExited() {
+		eventDriver.setDriverExited();
+		Assert.assertEquals(eventDriver.getDeviceAspectRatio(), 1.0);
+	}
+
+	/**
+	 * If driver has already exited, no modal can be displayed
+	 */
+	@Test(groups = {"ut"})
+	public void testIsModalDisplayedDriverExited() {
+		eventDriver.setDriverExited();
+		Assert.assertFalse(eventDriver.isModalDisplayed());
+	}
+
+	/**
+	 * If driver has already exited, scroll position defaults to (0, 0), without executing any javascript
+	 */
+	@Test(groups = {"ut"})
+	public void testGetScrollPositionDriverExited() {
+		eventDriver.setDriverExited();
+		Point point = eventDriver.getScrollPosition();
+		Assert.assertEquals(point.x, 0);
+		Assert.assertEquals(point.y, 0);
+	}
+
+	/**
+	 * If driver has already exited, capabilities captured when the driver was created are returned instead of
+	 * calling the (dead) driver
+	 */
+	@Test(groups = {"ut"})
+	public void testGetCapabilitiesDriverExited() {
+		// before driver exits, capabilities come from live driver
+		Assert.assertEquals(eventDriver.getCapabilities(), capabilities);
+
+		eventDriver.setDriverExited();
+		clearInvocations(driver);
+
+		Capabilities caps = eventDriver.getCapabilities();
+		Assert.assertNotSame(caps, capabilities);
+		verify(driver, never()).getCapabilities();
+	}
+
+	/**
+	 * If driver has already exited, isWebTest() should rely only on test type family and must not try to contact
+	 * the (possibly dead) mobile driver through getContext()
+	 */
+	@Test(groups = {"ut"})
+	public void testIsWebTestMobileWebDriverExited() {
+		when(mobileDriver.getContext()).thenReturn("WEBVIEW");
+		eventDriver = spy(new CustomEventFiringWebDriver(mobileDriver, null, null, TestType.APPIUM_APP_ANDROID, DriverMode.LOCAL, null));
+		eventDriver.setDriverExited();
+		clearInvocations(mobileDriver); // ignore calls made during construction / driver exit handling
+
+		Assert.assertFalse(eventDriver.isWebTest());
+		verify(mobileDriver, never()).getContext();
+	}
+
 }

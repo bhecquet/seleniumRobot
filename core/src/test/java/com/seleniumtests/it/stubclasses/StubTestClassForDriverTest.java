@@ -457,4 +457,15 @@ public class StubTestClassForDriverTest extends StubParentClass {
 		dtp.getBrowserUserAgent();
 	}
 
+
+	@Test(groups="stub")
+	public void testQuitDriverDuringTest() {
+
+		new DriverTestPage(true)
+				._writeSomething()
+				._reset()
+				._quitAndDoSomething()
+				._doSomethingElse();
+	}
+
 }

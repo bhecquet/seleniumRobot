@@ -381,58 +381,62 @@ public class ScreenshotUtil {
 	private List<NamedBufferedImage> captureAllImages(SnapshotTarget target, boolean allWindows, int scrollDelay) {
 		List<NamedBufferedImage> capturedImages = new ArrayList<>();
     	
-    	// capture desktop
-    	if (target.isScreenTarget() && SeleniumTestsContextManager.isDesktopWebTest()) {
-    		capturedImages.add(new NamedBufferedImage(captureDesktop(), ""));
-    		
-    	// capture desktop
-    	} else if (target.isMainScreenTarget() && SeleniumTestsContextManager.isDesktopWebTest()) {
-    		capturedImages.add(new NamedBufferedImage(captureDesktop(true), ""));
-    			
-    	// capture web with scrolling
-    	} else if (target.isPageTarget() && driver != null && driver.isWebTest()) {
-    		removeAlert();
-    		capturedImages.addAll(captureWebPages(allWindows, scrollDelay));
-    		
-    	// capture web without scrolling on the main window
-    	} else if (target.isViewportTarget() && driver != null && driver.isWebTest()) {
-    		removeAlert();
-    		target.setSnapshotRectangle(new Rectangle(driver.getScrollPosition(), driver.getViewPortDimensionWithoutScrollbar()));
-    		capturedImages.add(new NamedBufferedImage(capturePage(0, 0), "")); // allow removing of scrollbar (a negative value would not remove it)
-    		
-    	// capture web with scrolling on the main window
-    	} else if (target.isElementTarget() && driver != null && driver.isWebTest()) {
-    		removeAlert();
-    		try {
-				double aspectRatio = driver.getDeviceAspectRatio();
-    			target.setSnapshotRectangle(getElementRectangleWithAR(target.getElement(), aspectRatio));
-    		} catch (WebDriverException e) {
-				throw new ScenarioException(String.format("Cannot check element %s snapshot as it is not available", target.getElement()));
-			}
-    		capturedImages.addAll(captureWebPages(false, scrollDelay));
-    		
-	    } else if ((target.isPageTarget() || target.isElementTarget() || target.isViewportTarget()) && SeleniumTestsContextManager.isAppTest()){
-    		capturedImages.add(new NamedBufferedImage(capturePage(-1, -1), ""));
-    		
-    	} else {
-    		throw new ScenarioException("Capturing page is only possible for web and application tests. Capturing desktop possible for desktop web tests only");
-    	}
-    	
-    	// if we want to capture an element only, crop the previous capture
-    	if (target.isElementTarget() && target.getElement() != null && !capturedImages.isEmpty()) {
-    		Rectangle elementPosition = target.getSnapshotRectangle();
-    		
-    		NamedBufferedImage wholeImage = capturedImages.remove(0);
+    	try {
+			// capture desktop
+			if (target.isScreenTarget() && SeleniumTestsContextManager.isDesktopWebTest()) {
+				capturedImages.add(new NamedBufferedImage(captureDesktop(), ""));
 
-    		BufferedImage elementImage = ImageProcessor.cropImage(wholeImage.image,
-                    elementPosition.x,
-					elementPosition.y,
-					elementPosition.width,
-					elementPosition.height);
-    		NamedBufferedImage namedElementImage = new NamedBufferedImage(elementImage, "");
-    		namedElementImage.addElementMetaDataToImage(target.getElement());
-    		capturedImages.add(0, namedElementImage);
-    	}
+				// capture desktop
+			} else if (target.isMainScreenTarget() && SeleniumTestsContextManager.isDesktopWebTest()) {
+				capturedImages.add(new NamedBufferedImage(captureDesktop(true), ""));
+
+				// capture web with scrolling
+			} else if (target.isPageTarget() && driver != null && driver.isWebTest()) {
+				removeAlert();
+				capturedImages.addAll(captureWebPages(allWindows, scrollDelay));
+
+				// capture web without scrolling on the main window
+			} else if (target.isViewportTarget() && driver != null && driver.isWebTest()) {
+				removeAlert();
+				target.setSnapshotRectangle(new Rectangle(driver.getScrollPosition(), driver.getViewPortDimensionWithoutScrollbar()));
+				capturedImages.add(new NamedBufferedImage(capturePage(0, 0), "")); // allow removing of scrollbar (a negative value would not remove it)
+
+				// capture web with scrolling on the main window
+			} else if (target.isElementTarget() && driver != null && driver.isWebTest()) {
+				removeAlert();
+				try {
+					double aspectRatio = driver.getDeviceAspectRatio();
+					target.setSnapshotRectangle(getElementRectangleWithAR(target.getElement(), aspectRatio));
+				} catch (WebDriverException e) {
+					throw new ScenarioException(String.format("Cannot check element %s snapshot as it is not available", target.getElement()));
+				}
+				capturedImages.addAll(captureWebPages(false, scrollDelay));
+
+			} else if ((target.isPageTarget() || target.isElementTarget() || target.isViewportTarget()) && SeleniumTestsContextManager.isAppTest()) {
+				capturedImages.add(new NamedBufferedImage(capturePage(-1, -1), ""));
+
+			} else {
+				throw new ScenarioException("Capturing page is only possible for web and application tests. Capturing desktop possible for desktop web tests only");
+			}
+
+			// if we want to capture an element only, crop the previous capture
+			if (target.isElementTarget() && target.getElement() != null && !capturedImages.isEmpty()) {
+				Rectangle elementPosition = target.getSnapshotRectangle();
+
+				NamedBufferedImage wholeImage = capturedImages.removeFirst();
+
+				BufferedImage elementImage = ImageProcessor.cropImage(wholeImage.image,
+						elementPosition.x,
+						elementPosition.y,
+						elementPosition.width,
+						elementPosition.height);
+				NamedBufferedImage namedElementImage = new NamedBufferedImage(elementImage, "");
+				namedElementImage.addElementMetaDataToImage(target.getElement());
+				capturedImages.addFirst(namedElementImage);
+			}
+		} catch (WebSessionEndedException e) {
+			logger.warn("Driver is closed, capture cannot be done on browser");
+		}
 		return capturedImages;
 	}
     

@@ -349,7 +349,18 @@ public class DriverTestPage extends PageObject {
     	notPresentTextElementIFrame.getTagName();
     	return this;
     }
-    
+
+	public DriverTestPage _quitAndDoSomething() {
+		driver.quit();
+		logger.info("--- driver quit ---");
+		return this;
+	}
+
+	public DriverTestPage _doSomethingElse() {
+		logger.info("do something else");
+		return this;
+	}
+
     public static String getPageUrl(BrowserType browserType) {
     	if (browserType == BrowserType.FIREFOX) {
 			return "file://" + Thread.currentThread().getContextClassLoader().getResource("tu/test.html").getFile();

@@ -109,7 +109,8 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	private final SeleniumGridConnector gridConnector;
 	private final Integer attachExistingDriverPort;
 	private final MutableCapabilities internalCapabilities = new MutableCapabilities();
-	
+	private Capabilities initialCapabilities;
+
 	/*
 	 * returns pixel aspect ratio of web site, it depends on OS and browser zoom
 	 * We can force to use PAR=1 by calling driver.executeScript("Some JS", false)
@@ -649,6 +650,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		for (WebDriverListener wdListener: wdListeners) {
 			this.driver = new EventFiringDecorator<>(wdListener).decorate(this.driver);
 		}
+		initialCapabilities = ((HasCapabilities)driver).getCapabilities();
     }
 
 	/**
@@ -708,7 +710,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	@Override
     public Set<String> getWindowHandles() {
     	
-    	if (!isWebTest() || isDriverExited()) {
+    	if (isDriverExited() || !isWebTest()) {
     		return new TreeSet<>();
     	}
     	
@@ -752,7 +754,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	@Override
     public String getWindowHandle() {
     	
-    	if (!isWebTest()) {
+    	if (isDriverExited() || !isWebTest()) {
     		return "";
     	}
     	
@@ -783,6 +785,9 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     
     @Override
     public String getCurrentUrl() {
+    	if (isDriverExited()) {
+    		return "http://driver.exited";
+    	}
     	try {
 	    	return driver.getCurrentUrl();
 	    } catch (UnhandledAlertException e) {
@@ -796,6 +801,9 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
     
     @Override
     public String getTitle() {
+    	if (isDriverExited()) {
+    		return "";
+    	}
     	try {
     		return driver.getTitle();
     	} catch (UnhandledAlertException e) {
@@ -832,14 +840,19 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	}
     
     public void setDriverExited() {
+		setDriverExited(false);
+	}
+    public void setDriverExited(boolean expected) {
 		// we detect session does not exist anymore
 		// try to quit() so that no remote session get staled
-		try {
-			logger.info("Driver / browser has crashed, try quitting");
-			driver.quit();
-			logger.warn("quitting successful");
-		} catch (Exception e) {
-			logger.warn("quitting failed");
+		if (!expected) {
+			try {
+				logger.info("Driver / browser has crashed, try quitting");
+				driver.quit();
+				logger.warn("quitting successful");
+			} catch (Exception e) {
+				logger.warn("quitting failed");
+			}
 		}
     	driverExited = true;
     }
@@ -849,6 +862,9 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	 * In case of mobile App, check the app is still there
      */
     public boolean isBrowserOrAppClosed() {
+    	if (isDriverExited()) {
+    		return true;
+    	}
     	try {
     		getSessionId();
     		getCapabilities();
@@ -906,6 +922,9 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
      * Return the device aspect ratio
      */
     public double getDeviceAspectRatio() {
+    	if (isDriverExited()) {
+    		return 1.0;
+    	}
     	if (isWebTest()) {
 			try {
 				Number devicePixelRatio = (Number) ((JavascriptExecutor) driver).executeScript(JS_PIXEL_RATIO + " return pixelRatio;", true);
@@ -1106,6 +1125,9 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	 * Check if a modal is displayed
 	 */
 	public boolean isModalDisplayed() {
+		if (isDriverExited()) {
+			return false;
+		}
 		if (isWebTest()) {
 			return (Boolean) ((JavascriptExecutor) driver).executeScript(JS_GET_MODAL);
 		} else { 
@@ -1202,6 +1224,9 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	 */
 	@SuppressWarnings("unchecked")
 	public Point getScrollPosition() {
+		if (isDriverExited()) {
+			return new Point(0, 0);
+		}
 		if (isWebTest()) {
 			try {
 				List<Number> dims = (List<Number>)((JavascriptExecutor) driver).executeScript(JS_GET_CURRENT_SCROLL_POSITION);
@@ -1354,7 +1379,7 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 		    		OSUtilityFactory.getInstance().killProcess(pid.toString(), true);
 		    	}
 			}
-			setDriverExited();
+			setDriverExited(true);
 			
 		}
 	}
@@ -1747,6 +1772,9 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	@NonNull
 	@Override
     public Capabilities getCapabilities() {
+		if (isDriverExited()) {
+			return Objects.requireNonNullElse(initialCapabilities, new MutableCapabilities());
+		}
 		try {
 			return ((HasCapabilities)driver).getCapabilities();
 		} catch (ClassCastException e) {
@@ -1857,6 +1885,9 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	 * a web test may be a desktop or mobile web test (e.g: using chrome browser), but also a mobile application test where webview context is in use
 	 */
 	public boolean isWebTest() {
+		if (isDriverExited()) {
+			return testType.family().equals(TestType.WEB);
+		}
 		return (testType.family().equals(TestType.WEB) || testType.family().equals(TestType.APP) && getContext().toLowerCase().contains("web"));
 	}
 
@@ -1974,6 +2005,10 @@ public class CustomEventFiringWebDriver implements HasCapabilities, WebDriver, J
 	 * @param longitude	the longitude
 	 */
 	public void setGeolocation(double latitude, double longitude) {
+		if (isDriverExited()) {
+			logger.warn("Cannot set geolocation, driver has already exited");
+			return;
+		}
 		if (latitude < -90 || latitude > 90) {
 			throw new ScenarioException("Latitude must be between -90 and 90 inclusive");
 		}

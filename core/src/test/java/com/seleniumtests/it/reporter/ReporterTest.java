@@ -31,6 +31,7 @@ import java.util.Random;
 
 import com.seleniumtests.reporter.reporters.SeleniumRobotServerTestRecorder;
 import org.apache.commons.io.FileUtils;
+import org.json.JSONObject;
 import org.testng.ITestContext;
 import org.testng.TestNG;
 import org.testng.annotations.AfterClass;
@@ -366,9 +367,9 @@ public class ReporterTest extends ConnectorsTest {
         return detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
     }
 
-    public static String readTestMethodDetailedFile(String testName) throws IOException {
-        String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), testName, "detailed-result.xml").toFile(), StandardCharsets.UTF_8);
-        return detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+    public static JSONObject readTestMethodDetailedFile(String testName) throws IOException {
+        String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), testName, "detailed-result.json").toFile(), StandardCharsets.UTF_8);
+        return new JSONObject(detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><"));
     }
 
     public static String readJUnitFile(String suiteName) throws IOException {

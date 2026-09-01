@@ -1,8 +1,11 @@
 package com.seleniumtests.it.driver;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
-import org.openqa.selenium.WebDriver;
+import com.seleniumtests.it.reporter.ReporterTest;
+import org.json.JSONObject;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.BeforeMethod;
@@ -14,6 +17,7 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
+import org.testng.xml.XmlSuite;
 
 public class TestCustomEventFiringWebDriver extends GenericDriverTest {
 	
@@ -102,5 +106,25 @@ public class TestCustomEventFiringWebDriver extends GenericDriverTest {
 		} finally {
 			driver.quit();
 		}
+	}
+
+	/**
+	 * When driver.quit() is called during a test, all subsequent calls to driver, made internally may fail and write tons of error logs
+	 * Check it's not the case
+	 */
+	@Test(groups={"it"})
+	public void testDriveQuitDuringTest() throws IOException {
+		ReporterTest.executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, XmlSuite.ParallelMode.METHODS, new String[]{"testQuitDriverDuringTest"});
+
+		String logs = ReporterTest.readSeleniumRobotLogFile();
+		Assert.assertTrue(logs.contains("Test is OK"));
+		Assert.assertFalse(logs.contains("browser has crashed")); // check setDriverExited does not say driver has crashed whereas quit() was wanted
+		Assert.assertFalse(logs.contains("DriverExceptionListener"));
+
+		JSONObject result = ReporterTest.readTestMethodDetailedFile("testQuitDriverDuringTest");
+		List<Object> steps = result.getJSONArray("steps").toList();
+		Assert.assertEquals(steps.size(), 11);
+		Assert.assertEquals(((Map<String, Object>)steps.get(7)).get("name"), "_doSomethingElse");
+
 	}
 }
