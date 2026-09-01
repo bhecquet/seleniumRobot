@@ -81,6 +81,7 @@ public class PageObject extends BasePage implements IPage {
     private final PageLoadStrategy pageLoadStrategy;
     private Instant startLoading;
     private Instant stopLoading;
+    private Instant foundElementAfterLoading;
 
     private static final String ERROR_ELEMENT_NOT_PRESENT = "Element %s is not present";
 
@@ -232,7 +233,9 @@ public class PageObject extends BasePage implements IPage {
         screenshotUtil = new ScreenshotUtil(customEventFiringWebDriver);
 
         // open page
-        openPage(url);
+        openPage(url, pageIdentifierElement);
+
+        logger.log("Open web page in :" + Duration.between(startLoading, stopLoading).toMillis() / 1000.0 + " seconds");
         
         // in case browser has been created outside of selenium and we attach to it, get initial window handles
         if (customEventFiringWebDriver != null && attachExistingDriverPort != null && url == null) {
@@ -242,9 +245,6 @@ public class PageObject extends BasePage implements IPage {
         // add calling page and field name on element
         setPageOnElements();
 
-        assertCurrentPage(false, pageIdentifierElement);
-
-        logger.log("Open web page in :" + Duration.between(startLoading, stopLoading).toMillis() / 1000.0 + " seconds");
 
     }
 
@@ -326,7 +326,7 @@ public class PageObject extends BasePage implements IPage {
      * Wait for page loading
      * @param url   URL to open
      */
-    private void openPage(String url) {
+    private void openPage(String url, HtmlElement pageIdentifierElement) {
     	if (url != null) {
             // update start instant in case URL is defined because we only want page loading duration, which starts when URL is sent to browser
             startLoading = Instant.now();
@@ -337,6 +337,7 @@ public class PageObject extends BasePage implements IPage {
         // switch to the context if we are on mobile app
         switchToContext();
         stopLoading = Instant.now();
+        foundElementAfterLoading = Instant.now();
 
         // Wait for page load is applicable only for web test and mobile webview
         // When running tests on an iframe embedded site then test will fail if this command is not used
@@ -345,15 +346,20 @@ public class PageObject extends BasePage implements IPage {
             waitForPageToLoad();
         } else if (SeleniumTestsContextManager.isAppTest() && captureSnapshot) {
         	capturePageSnapshot();
-        
         }
+
+        assertCurrentPage(false, pageIdentifierElement);
+        foundElementAfterLoading = Instant.now();
 
         // store the window / tab on which this page is loaded
         if (customEventFiringWebDriver != null) {
             windowHandle = customEventFiringWebDriver.getWindowHandle();
 
             // store load time
-            PageLoadTime pageLoadTime = new PageLoadTime(customEventFiringWebDriver.getCurrentUrl(), this, Duration.between(startLoading, stopLoading).toMillis());
+            PageLoadTime pageLoadTime = new PageLoadTime(customEventFiringWebDriver.getCurrentUrl(),
+                    this,
+                    Duration.between(startLoading, stopLoading).toMillis(),
+                    Duration.between(startLoading, foundElementAfterLoading).toMillis());
 
             if (TestStepManager.getCurrentOrPreviousStep() == null) {
                 logger.warn(String.format("Page load '%s' cannot be recorded - no step", pageLoadTime));
@@ -369,7 +375,7 @@ public class PageObject extends BasePage implements IPage {
     }
     
     @Override
-    protected void assertCurrentPage(boolean log, HtmlElement pageIdentifierElement) {
+    protected void  assertCurrentPage(boolean log, HtmlElement pageIdentifierElement) {
 
         if (pageIdentifierElement != null && !pageIdentifierElement.isElementPresent()) {
 

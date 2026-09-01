@@ -11,22 +11,26 @@ public class PageLoadTime extends TestAction {
 
     private String url;
     private final long loadTime;
+    private final long elementFoundTime;
     private final PageObject pageObject;
+
 
     /**
      *
-     * @param url           URL of the loaded page
-     * @param pageObject    the page object
-     * @param loadTime      load time of the page in milliseconds
+     * @param url                   URL of the loaded page
+     * @param pageObject            the page object
+     * @param loadTime              load time of the page in milliseconds
+     * @param elementFoundTime      time taken to find the element in milliseconds
      *
      * Timestamp will be the Instant of page load start
      */
-    public PageLoadTime(String url, @NonNull PageObject pageObject, long loadTime) {
+    public PageLoadTime(String url, @NonNull PageObject pageObject, long loadTime, long elementFoundTime) {
         super(String.format("loading of %s took %d ms", pageObject.getClass().getSimpleName(), loadTime), false, new ArrayList<>());
         this.url = url;
         this.loadTime = loadTime;
         this.pageObject = pageObject;
         this.timestamp = this.timestamp.minus(loadTime, ChronoUnit.MILLIS);
+        this.elementFoundTime = elementFoundTime;
     }
 
     @Override
@@ -36,6 +40,7 @@ public class PageLoadTime extends TestAction {
         actionJson.put("url", url);
         actionJson.put("name", getName());
         actionJson.put("loadTime", loadTime);
+        actionJson.put("elementFoundTime", elementFoundTime);
         actionJson.put("page", pageObject.getClass().getSimpleName());
         actionJson.put("timestamp", timestamp.toInstant().toEpochMilli());
 
@@ -44,7 +49,7 @@ public class PageLoadTime extends TestAction {
 
     @Override
     public PageLoadTime encodeTo(String format) {
-        PageLoadTime pageLoadTimeToEncode = new PageLoadTime(url, pageObject, loadTime);
+        PageLoadTime pageLoadTimeToEncode = new PageLoadTime(url, pageObject, loadTime, elementFoundTime);
         return encode(format, pageLoadTimeToEncode);
     }
 
@@ -60,6 +65,10 @@ public class PageLoadTime extends TestAction {
 
     public double getLoadTime() {
         return loadTime;
+    }
+
+    public long getElementFoundTime() {
+        return elementFoundTime;
     }
 
     public PageObject getPageObject() {

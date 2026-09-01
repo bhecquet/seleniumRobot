@@ -693,7 +693,7 @@ public class TestTestStep extends GenericTest {
 		Har har = new Har();
 		har.getLog().addPage(new Page("", "title", "a title"));
 		subStep.addNetworkCapture(new HarCapture(har, "main &"));
-		subStep.addPageLoadTime(new PageLoadTime("http://foo.bar?a=b&c=d", new CalcPage(), 1230));
+		subStep.addPageLoadTime(new PageLoadTime("http://foo.bar?a=b&c=d", new CalcPage(), 1230, 1500));
 		subStep.addValue(new TestValue("1", "key&", "value<"));
 		step.addAction(subStep);
 
@@ -832,7 +832,7 @@ public class TestTestStep extends GenericTest {
 		TestStep subStep = new TestStep("subStep with password foobar", "subStep with password foobar", this.getClass(), null, new ArrayList<>(), true);
 		subStep.addMessage(new TestMessage("everything in subStep almost OK", MessageType.WARNING));
 		subStep.addAction(new TestAction("action1", false, new ArrayList<>()));
-		subStep.addPageLoadTime(new PageLoadTime("http://localhost", new CalcPage(), 1230));
+		subStep.addPageLoadTime(new PageLoadTime("http://localhost", new CalcPage(), 1230, 1300));
 		step.addAction(subStep);
 		return step;
 	}
@@ -1222,7 +1222,7 @@ Step step1 with args: (bar, ******)
 		TestStep subStep = new TestStep("subStep1", "subStep1", this.getClass(), null, new ArrayList<>(), true);
 		step.addStep(subStep);
 
-		PageLoadTime pageLoadTime = new PageLoadTime("http://localhost", new CalcPage(), 1010);
+		PageLoadTime pageLoadTime = new PageLoadTime("http://localhost", new CalcPage(), 1010, 1300);
 		step.addPageLoadTime(pageLoadTime);
 		Assert.assertEquals(pageLoadTime.getPosition(), 1);
 		Assert.assertEquals(pageLoadTime.getParent(), step);
@@ -1254,7 +1254,7 @@ Step step1 with args: (bar, ******)
 		TestStep step1 = new TestStep("step1");
 		TestStep step2 = new TestStep("step2");
 		step1.addStep(step2);
-		step2.addPageLoadTime(new PageLoadTime("http://localhost", new CalcPage(), 1010));
+		step2.addPageLoadTime(new PageLoadTime("http://localhost", new CalcPage(), 1010, 1300));
 		Assert.assertEquals(step1.getPageLoadTimes().size(), 1);
 	}
 
@@ -1264,11 +1264,11 @@ Step step1 with args: (bar, ******)
 	@Test(groups = { "ut" })
 	public void testGetPageLoadTimesWithOrder() {
 		TestStep step1 = new TestStep("step1");
-		PageLoadTime pageLoadTime1 = new PageLoadTime("http://localhost", new CalcPage(), 1010);
+		PageLoadTime pageLoadTime1 = new PageLoadTime("http://localhost", new CalcPage(), 1010, 1300);
 		step1.addPageLoadTime(pageLoadTime1);
 		TestStep step2 = new TestStep("step2");
 		step1.addStep(step2);
-		PageLoadTime pageLoadTime2 = new PageLoadTime("http://localhost", new CalcPage(), 2500);
+		PageLoadTime pageLoadTime2 = new PageLoadTime("http://localhost", new CalcPage(), 2500, 2600);
 		step2.addPageLoadTime(pageLoadTime2);
 		Assert.assertEquals(step1.getPageLoadTimes(), List.of(pageLoadTime2, pageLoadTime1));
 	}
@@ -1278,11 +1278,11 @@ Step step1 with args: (bar, ******)
 	@Test(groups = { "ut" })
 	public void testGetPageLoadTimesWithOrder2() {
 		TestStep step1 = new TestStep("step1");
-		PageLoadTime pageLoadTime1 = new PageLoadTime("http://localhost", new CalcPage(), 2500);
+		PageLoadTime pageLoadTime1 = new PageLoadTime("http://localhost", new CalcPage(), 2500, 2500);
 		step1.addPageLoadTime(pageLoadTime1);
 		TestStep step2 = new TestStep("step2");
 		step1.addStep(step2);
-		PageLoadTime pageLoadTime2 = new PageLoadTime("http://localhost", new CalcPage(), 2000);
+		PageLoadTime pageLoadTime2 = new PageLoadTime("http://localhost", new CalcPage(), 2000, 2100);
 		step2.addPageLoadTime(pageLoadTime2);
 		Assert.assertEquals(step1.getPageLoadTimes(), List.of(pageLoadTime1, pageLoadTime2));
 	}

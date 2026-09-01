@@ -2,13 +2,13 @@
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
  * 				Copyright 2017-2019 B.Hecquet
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,7 +26,6 @@ import com.seleniumtests.util.imaging.ImageProcessor;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Rectangle;
-import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -44,7 +43,7 @@ public class TestPageObject extends GenericDriverTest {
 	
 	@Test(groups={"it"})
 	public void testResizeWindow() {
-		SeleniumTestsContextManager.getThreadContext().setBrowser("*firefox");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("*chrome");
 		driver = WebUIDriver.getWebDriver(true);
 		new DriverTestPage(true).resizeTo(600, 400);
 		Dimension viewPortSize = driver.getViewPortDimensionWithoutScrollbar();
@@ -57,7 +56,7 @@ public class TestPageObject extends GenericDriverTest {
 	 */
 	@Test(groups={"it"})
 	public void testSnapshotNotLogged() {
-		SeleniumTestsContextManager.getThreadContext().setBrowser("*firefox");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("*chrome");
 		SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(false);
 		driver = WebUIDriver.getWebDriver(true);
 		new DriverTestPage(true);
@@ -68,7 +67,7 @@ public class TestPageObject extends GenericDriverTest {
 	}
 	@Test(groups={"it"})
 	public void testSnapshotLogged() {
-		SeleniumTestsContextManager.getThreadContext().setBrowser("*firefox");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("*chrome");
 		SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(true);
 		driver = WebUIDriver.getWebDriver(true);
 		new DriverTestPage(true);
@@ -89,6 +88,7 @@ public class TestPageObject extends GenericDriverTest {
 		Assert.assertEquals(step1.getAction(), "openPage");
 		Assert.assertEquals(step1.getOrigin().getSimpleName(), "DriverTestPage");
 		Assert.assertTrue(step1.getPageLoadTime().getLoadTime() > 0.1);
+		Assert.assertTrue(step1.getPageLoadTime().getElementFoundTime() > 0.1);
 		Assert.assertTrue(step1.getPageLoadTime().getUrl().contains("test.html"));
 		Assert.assertTrue(step1.getPageLoadTime().getName().contains("loading of DriverTestPage took"));
 

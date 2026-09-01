@@ -14,10 +14,11 @@ public class TestPageLoadTime  extends GenericTest {
 
     @Test(groups={"ut"})
     public void testToJson() {
-        PageLoadTime pageLoadTime = new PageLoadTime("http://localhost", new CalcPage(), 1230);
+        PageLoadTime pageLoadTime = new PageLoadTime("http://localhost", new CalcPage(), 1230, 1300);
         JSONObject json = pageLoadTime.toJson();
         Assert.assertEquals(json.getString("url"), "http://localhost");
         Assert.assertEquals(json.getDouble("loadTime"), 1230);
+        Assert.assertEquals(json.getDouble("elementFoundTime"), 1300);
         Assert.assertEquals(json.getString("page"), "CalcPage");
         Assert.assertEquals(json.getString("name"), "loading of CalcPage took 1230 ms");
         Assert.assertTrue(json.getLong("timestamp") > 1);
@@ -26,20 +27,20 @@ public class TestPageLoadTime  extends GenericTest {
     @Test(groups={"ut"})
     public void testTimeStamp() {
         Instant now = Instant.now();
-        PageLoadTime pageLoadTime = new PageLoadTime("http://localhost", new CalcPage(), 2500);
+        PageLoadTime pageLoadTime = new PageLoadTime("http://localhost", new CalcPage(), 2500, 2501);
         Assert.assertTrue(pageLoadTime.getTimestamp().toInstant().plusMillis(2000).isBefore(now));
     }
 
     @Test(groups={"ut"})
     public void testEncodeXml() {
-        PageLoadTime pageLoadTime = new PageLoadTime("http://localhost", new CalcPage(), 1230);
+        PageLoadTime pageLoadTime = new PageLoadTime("http://localhost", new CalcPage(), 1230, 1500);
         PageLoadTime newPageLoadTime = pageLoadTime.encodeTo("xml");
         Assert.assertEquals(newPageLoadTime.getUrl(), "http://localhost");
     }
 
     @Test(groups={"ut"})
     public void testEncodeTo() {
-        PageLoadTime pageLoadTime = new PageLoadTime("http://localhost?a=b&c=d", new CalcPage(), 1230);
+        PageLoadTime pageLoadTime = new PageLoadTime("http://localhost?a=b&c=d", new CalcPage(), 1230, 1500);
         PageLoadTime encodedPageLoad = pageLoadTime.encodeTo("xml");
         Assert.assertEquals(encodedPageLoad.getTimestamp(), pageLoadTime.getTimestamp());
         Assert.assertEquals(encodedPageLoad.getUrl(), "http://localhost?a=b&amp;c=d");
@@ -49,7 +50,7 @@ public class TestPageLoadTime  extends GenericTest {
 
     @Test(groups={"ut"}, expectedExceptions = CustomSeleniumTestsException.class, expectedExceptionsMessageRegExp = ".*only escaping of 'xml', 'html', 'csv', 'json' is allowed.*")
     public void testEncodeToWrongFormat() {
-        PageLoadTime pageLoadTime = new PageLoadTime("http://localhost", new CalcPage(), 1230);
+        PageLoadTime pageLoadTime = new PageLoadTime("http://localhost", new CalcPage(), 1230, 1500);
         pageLoadTime.encodeTo("bla");
     }
 }
