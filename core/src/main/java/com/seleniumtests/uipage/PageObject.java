@@ -84,6 +84,7 @@ public class PageObject extends BasePage implements IPage {
     private Instant stopLoading;
     private Instant foundElementAfterLoading;
     private long pageLoadTechnicalTimes = 0L;
+    private final HtmlElement pageIdentifierElement;
 
     private static final String ERROR_ELEMENT_NOT_PRESENT = "Element %s is not present";
 
@@ -210,6 +211,7 @@ public class PageObject extends BasePage implements IPage {
 
         startLoading = Instant.now();
     	this.captureSnapshot = captureSnapshot;
+        this.pageIdentifierElement = pageIdentifierElement;
     	
     	if (pageLoadStrategy == null) {
     		this.pageLoadStrategy = robotConfig().getPageLoadStrategy();
@@ -235,7 +237,7 @@ public class PageObject extends BasePage implements IPage {
         screenshotUtil = new ScreenshotUtil(customEventFiringWebDriver);
 
         // open page
-        openPage(url, pageIdentifierElement);
+        openPage(url);
 
         logger.log("Open web page in :" + Duration.between(startLoading, stopLoading).toMillis() / 1000.0 + " seconds");
         
@@ -342,7 +344,7 @@ public class PageObject extends BasePage implements IPage {
      * Wait for page loading
      * @param url   URL to open
      */
-    private void openPage(String url, HtmlElement pageIdentifierElement) {
+    private void openPage(String url) {
     	if (url != null) {
             // update start instant in case URL is defined because we only want page loading duration, which starts when URL is sent to browser
             startLoading = Instant.now();
