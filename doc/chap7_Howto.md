@@ -629,9 +629,15 @@ captureElementSnapshot(<pic_name>, <myWebElement>, SnapshotCheckType.FULL);
 ```
 Only the snapshots taken this way will be sent to server.
 
-You can also compare snapshots by zones instead of pixels
+You can also compare snapshots by zones instead of pixels. For each zone, algorithm will try to match with 80% confidence in an area around the source zone
+
 ```java
 capturePageSnapshot(<pic_name>, SnapshotCheckType.ZONES);
+```
+
+In this case, if a threshold is applied, percentage of errors is calculated on the surface of zones marked as different, compared to the surface of the whole image
+```java
+captureElementSnapshot("result",  result, SnapshotCheckType.ZONES.withThreshold(1.5));
 ```
 
 This, way, a new tab will be added in HTML report, showing the comparison. 
