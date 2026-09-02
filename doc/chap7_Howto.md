@@ -620,14 +620,19 @@ To enable this feature you must:
 Then, inside your test scripts, you must add snapshots with
 
 ```java
-capturePageSnapshot(<pic_name>, SnapshotCheckType.TRUE);
+capturePageSnapshot(<pic_name>, SnapshotCheckType.FULL);
 ```
 or
 
 ```java
-captureElementSnapshot(<pic_name>, <myWebElement>, SnapshotCheckType.TRUE);
+captureElementSnapshot(<pic_name>, <myWebElement>, SnapshotCheckType.FULL);
 ```
 Only the snapshots taken this way will be sent to server.
+
+You can also compare snapshots by zones instead of pixels
+```java
+capturePageSnapshot(<pic_name>, SnapshotCheckType.ZONES);
+```
 
 This, way, a new tab will be added in HTML report, showing the comparison. 
 By default, snapshot taken this way are kept 30 days. If you want a different duration, set the parameter `seleniumRobotServerSnapshotsTtl` to another value.
@@ -636,7 +641,6 @@ Parameter `snapshotComparisonResult` allow to control the way snapshot compariso
 
 - `displayOnly` will add a `red` or `green` bullet (and color snapshot comparison tab) in HTML result. This is only an information
 - `changeTestResult` will do same as `displayOnly` but also set test result to 'KO' if functional test is 'OK' but snapshot comparison is 'KO'
-- `addTestResult` will add a new test result (in all reports, not only HTML) for storing snapshot comparison result. This result will be named 'snapshot-<test_name>'
 
 ![](images/snapshot-result.png)
 
