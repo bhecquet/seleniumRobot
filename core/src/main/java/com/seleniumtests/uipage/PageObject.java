@@ -84,7 +84,7 @@ public class PageObject extends BasePage implements IPage {
     private Instant stopLoading;
     private Instant foundElementAfterLoading;
     private long pageLoadTechnicalTimes = 0L;
-    private final HtmlElement pageIdentifierElement;
+    private Object pageIdentifierElement; // declared as Object because if we declare it as an HtmlElement, usage of PageFactory.initElements will fail
 
     private static final String ERROR_ELEMENT_NOT_PRESENT = "Element %s is not present";
 
@@ -366,7 +366,7 @@ public class PageObject extends BasePage implements IPage {
         	logExecutionTime(this::capturePageSnapshot);
         }
 
-        assertCurrentPage(false, pageIdentifierElement);
+        assertCurrentPage(false, (HtmlElement) pageIdentifierElement);
         foundElementAfterLoading = Instant.now().minus(pageLoadTechnicalTimes, ChronoUnit.MILLIS);
 
         // store the window / tab on which this page is loaded
