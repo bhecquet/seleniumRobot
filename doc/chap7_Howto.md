@@ -442,33 +442,20 @@ Then, an HAR file is recorded.
 	addStep("Reset");
 	page._reset();
 ```
-	  
-### 16 Use Neoload tool to design and record End User Experience ###
 
-Neoload is a tool that performs load testing on application. It also interfaces with Selenium to record test session timing using a real browser
-Official documentation is there: [https://www.neotys.com/documents/doc/neoload/latest/en/html/#24373.htm](https://www.neotys.com/documents/doc/neoload/latest/en/html/#24373.htm)
+### 16 Get timing information ###
 
-Selenium can be used for 2 purposes: create project details from a browsing session (design mode) and measure browsing session timing (End User Experience)
+SeleniumRobot records timing information that can be then used in tools like ELK, ...
 
-#### Design mode ####
-	  
-To enable Design mode, you have to add `-Dnl.selenium.proxy.mode=Design` to the options given to SeleniumRobot. Moreover, add the option `-DneoloadUserPath=<userPath>` so that design mode is active. UserPath is the name of the scenario being recorded
+These data are located in detailed-result.json file, in each test subdirectory
 
-In this mode, driver is configured with a proxy pointing to the neoload API (localhost:8090 by default). Other design API URL can be configured with option `-Dnl.design.api.url=<URL>`. see Configuration options [here](https://www.neotys.com/documents/doc/neoload/latest/en/html/#8278.htm) .
-<br/>
-So any other configured proxy will be overridden (BrowsermobProxy or manual proxy settings). If you need to go through a proxy for your tests (e.g: a corporate proxy), this proxy needs to be set into Neoload itself.
+You can find 
+- 'steps' data which give you among others: 'name', 'duration', 'status', ...
+- 'pageLoads' data which focus on `new SomePage()` calls where 'url', 'loadTime' and 'elementFoundTime' give you information specifically about page loading
 
-For test to start, prerequisites are:
-- Neoload is started somewhere
-- if not local, option `-Dnl.design.api.url=<URL>` is set to the remote neoload instance
-- remote neoload instance has a loaded project
-- some licences are reserved to neoload instance
-
-#### End User Experience ####
-
-To enable End User Experience, you have to add `-Dnl.selenium.proxy.mode=EndUserExperience` and `-DneoloadUserPath=<userPath>`
-
-Test MUST be started from Neoload itself, either through a java test script action or a command line action. Launching options are the same as for any other test launching. See chap4_Run_tests for details. .
+`step.duration` contains all actions from the start of the step (or sub-step). All technical duration like taking snapshots are removed
+`pageLoads.loadTime` gives the time taken by the browser to be ready
+`pageLoads.elementFoundTime` gives the time until the element(s) searched on PageObject creation is found
 	  
 ### 17 Add extension to the browser ###
 

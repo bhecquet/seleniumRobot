@@ -356,7 +356,7 @@ Example of a shopping cart class. All must inherit of PageObject class:
 		} 
 	}
 ```
-	
+	[chap7_Howto.md](chap7_Howto.md)
 **WARN:** If you write your class combined with cucumber feature (methods annotated with @Given, @When, ...), only write methods returning `void`. Else, report will contain new page create step twice.
 
 #### PageObject inheritance ####
@@ -365,7 +365,7 @@ Most of the time, Page classes will inherit from PageObject classes. But, if for
 
 #### PageObject constructors ####
 
-Each Page class will extend PageObject class, and so, calling it's constructors.
+Each Page class will extend PageObject class, and so, calling its constructors.
 
 ##### Check for presence of an element on opening #####
 Most of the time, you will call this constructor who is provided an element to check for presence. If 'myElement' is not present when page opens, then test fails
@@ -376,6 +376,19 @@ Most of the time, you will call this constructor who is provided an element to c
 	public MyPageObject() throws Exception {
 			super(myElement);
 		}
+```
+
+In case you want to wait for multiple elements before saying page is loaded, you can create a CombinedElement
+
+```java
+    class MyPage extends PageObject {
+        private static final HtmlElement el1 = new HtmlElement("element 1", By.id("el1"));
+        private static final HtmlElement el2 = new HtmlElement("element 2", By.id("el1"));
+        
+        public MyPage() {
+            super(new CombinedElement(List.of(el1, el2)));
+        }
+    }
 ```
 
 ##### Open URL and check for element present #####
