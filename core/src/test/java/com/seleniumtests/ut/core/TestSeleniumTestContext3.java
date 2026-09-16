@@ -476,6 +476,7 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 			initThreadContext(testNGCtx, "myTest", testResult);
 			
 			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
+			seleniumTestsCtx.resetVariableAlreadyRequestedFromServer(); // it's initialized during unit test start
 			seleniumTestsCtx.configureContext(testResult);
 
 			// Since the context configuration did fail, we can assert that testResult has valued attributes

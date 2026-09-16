@@ -2361,4 +2361,12 @@ public class SeleniumTestsContext {
         return contextId;
     }
 
+    /**
+     * For tests only
+     */
+    public void resetVariableAlreadyRequestedFromServer() {
+        variableAlreadyRequestedFromServer = null;
+    }
+
+
 }
