@@ -21,12 +21,13 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.Map.Entry;
 
+import com.seleniumtests.customexception.SeleniumRobotServerFetchVariablesException;
+import com.seleniumtests.customexception.SeleniumRobotServerHttpException;
+import com.seleniumtests.util.helper.WaitHelper;
 import org.apache.commons.io.FilenameUtils;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -37,7 +38,6 @@ import com.seleniumtests.customexception.SeleniumRobotServerException;
 import kong.unirest.core.GetRequest;
 import kong.unirest.core.HttpResponse;
 import kong.unirest.core.MultipartBody;
-import kong.unirest.core.Unirest;
 import kong.unirest.core.UnirestException;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
@@ -135,6 +135,9 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	 * Display a warning when a custom variable prefix "custom.test.variable." overwrites a regular one.
 	 * The custom variable will always take precedence over the regular variable because we assume that if a custom.test.variable has been created in a script,
 	 * this value is the one we need in the next execution.
+	 * <p>
+	 * The method will retry up to 3 times in case an error occurs
+	 * Not all error will trigger replay, only 5xx HTTP errors or Unirest exceptions because those may indicate a temporary error
 	 * 
 	 * @param variablesOlderThanDays 		number of days since this variable should be created before it can be returned. This only applies to variables which have a time to live (a.k.a: where destroyAfterDays parameter is > 0) 
 	 * @param name							name of the variables to retrieve. If given, only one variable will be get because server only returns one variable for each name
@@ -143,13 +146,30 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	 * @param variablesReservationDuration	Number of seconds a reservable variable will be reserved
 	 */
 	public Map<String, TestVariable> getVariables(Integer variablesOlderThanDays, String name, String value, boolean reserve, int variablesReservationDuration) {
+		int maxRetry = 3;
+		for (int i = 0; i < maxRetry; i++) {
+			try {
+				return getVariablesNoReplay(variablesOlderThanDays, name, value, reserve, variablesReservationDuration);
+			} catch (SeleniumRobotServerFetchVariablesException e) {
+				if (i >= maxRetry - 1) {
+					throw e;
+				}
+				logger.warn("{} => retry {}", e.getMessage(), (i+1));
+				WaitHelper.waitForSeconds(2);
+			}
+		}
+		return new HashMap<>();
+	}
+
+
+	private Map<String, TestVariable> getVariablesNoReplay(Integer variablesOlderThanDays, String name, String value, boolean reserve, int variablesReservationDuration) {
 		if (!active) {
 			throw new SeleniumRobotServerException("Server is not active");
 		}
 		try {
-			
+
 			List<String> varNames = new ArrayList<>();
-			
+
 			GetRequest request = buildGetRequest(url + VARIABLE_API_URL)
 					.queryString(FIELD_VERSION, versionId)
 					.queryString(FIELD_ENVIRONMENT, environmentId)
@@ -157,7 +177,7 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 					.queryString(FIELD_OLDER_THAN, variablesOlderThanDays)
 					.queryString("reserve", reserve)
 					.queryString("format", "json");
-			
+
 			if (variablesReservationDuration > 0) {
 				request = request.queryString("reservationDuration", variablesReservationDuration * 60);
 			}
@@ -167,13 +187,13 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 			if (value != null) {
 				request = request.queryString(FIELD_VALUE, value);
 			}
-			
+
 			JSONArray variablesJson = getJSonArray(request);
-			
+
 			Map<String, TestVariable> variables = new HashMap<>();
 			List<TestVariable> linkedVariables = new ArrayList<>();
 
-			for (int i=0; i < variablesJson.length(); i++) {
+			for (int i = 0; i < variablesJson.length(); i++) {
 				TestVariable variable = TestVariable.fromJsonObject(variablesJson.getJSONObject(i), applicationId, SeleniumTestsContextManager.getApplicationName());
 
 				if (varNames.contains(variable.getName())) {
@@ -203,10 +223,17 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 				}
 			}
 
+			logger.info("Fetched {} variables", variables.size());
 			return variables;
-			
+
+		} catch (SeleniumRobotServerHttpException e) {
+			if (e.getCode() >= 500) {
+				throw new SeleniumRobotServerFetchVariablesException("Error getting variables", e);
+			} else {
+				throw new SeleniumRobotServerException("Cannot get variables (HTTP 40x)", e);
+			}
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
-			throw new SeleniumRobotServerException("cannot get variables", e);
+			throw new SeleniumRobotServerFetchVariablesException("cannot get variables", e);
 		} 
 	}
 	

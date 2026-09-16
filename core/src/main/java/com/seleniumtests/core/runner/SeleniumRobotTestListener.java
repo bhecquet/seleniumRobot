@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import com.seleniumtests.reporter.logger.GenericFile;
@@ -38,7 +37,6 @@ import org.openqa.selenium.WebDriverException;
 import org.testng.*;
 import org.testng.internal.annotations.DisabledRetryAnalyzer;
 
-import com.google.common.collect.Iterables;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import com.seleniumtests.core.Mask;
 import com.seleniumtests.core.SeleniumTestsContext;
@@ -51,8 +49,6 @@ import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.reporter.info.Info;
-import com.seleniumtests.reporter.info.LogInfo;
 import com.seleniumtests.reporter.info.MultipleInfo;
 import com.seleniumtests.reporter.logger.ArchiveMode;
 import com.seleniumtests.reporter.logger.TestStep;

@@ -17,22 +17,30 @@
  */
 package com.seleniumtests.customexception;
 
-public class SeleniumRobotServer500Exception extends SeleniumRobotServerException {
+public class SeleniumRobotServerHttpException extends SeleniumRobotServerException {
 
+    private int code;
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public SeleniumRobotServer500Exception(final String message) {
+	public SeleniumRobotServerHttpException(final int code, final String message) {
         super(message);
+        this.code = code;
     }
 
-    public SeleniumRobotServer500Exception(final Throwable cause) {
+    public SeleniumRobotServerHttpException(final int code, final Throwable cause) {
         super(cause);
+        this.code = code;
     }
 
-    public SeleniumRobotServer500Exception(final String message, final Throwable cause) {
+    public SeleniumRobotServerHttpException(final int code, final String message, final Throwable cause) {
         super(message, cause);
+        this.code = code;
+    }
+
+    public int getCode() {
+        return code;
     }
 }

@@ -36,7 +36,6 @@ import org.testng.xml.XmlSuite.ParallelMode;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -88,34 +87,31 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			);
 			
 			SeleniumTestsContextManager.removeThreadContext();
-			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions", "testSkipped", "testInError"});
+			executeSubTest(1, new String[]{"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[]{"testAndSubActions"});
 			
 			// check content of summary report file
 			String mainReportContent = readSummaryFile();
 			String testOkDetailedReport = readTestMethodResultFile("testAndSubActions");
-			String testKoDetailedReport = readTestMethodResultFile("testInError");
-			String testSkipDetailedReport = readTestMethodResultFile("testSkipped");
 			
 			Assert.assertTrue(mainReportContent.matches(".*class=\"testSkipped\".*<a href='testAndSubActions/TestReport\\.html'.*?>testAndSubActions</a>.*"));
-			Assert.assertTrue(mainReportContent.matches(".*class=\"testSkipped\".*<a href='testInError/TestReport\\.html'.*?>testInError</a>.*"));
-			Assert.assertTrue(mainReportContent.matches(".*class=\"testSkipped\".*<a href='testSkipped/TestReport\\.html'.*?>testSkipped</a>.*"));
 			Assert.assertTrue(testOkDetailedReport.matches(".*Execution logs {28}</div><div class=\"box-body logs\"><div class=\"message-error\"><div>class org.testng.SkipException: An error occurred while fetching variables from the SeleniumRobot server. Skip the test execution.</div>.*"));
 
 			// cause of error on server is present
 			Assert.assertTrue(testOkDetailedReport.matches(".*Caused by request to http://localhost:4321 failed: VARIABLE NOT FOUND.*")); // check cause is also present
-			Assert.assertTrue(testKoDetailedReport.matches(".*Execution logs {28}</div><div class=\"box-body logs\"><div class=\"message-error\"><div>class org.testng.SkipException: An error occurred while fetching variables from the SeleniumRobot server. Skip the test execution.</div>.*"));
-			Assert.assertTrue(testSkipDetailedReport.matches(".*Execution logs {28}</div><div class=\"box-body logs\"><div class=\"message-error\"><div>class org.testng.SkipException: An error occurred while fetching variables from the SeleniumRobot server. Skip the test execution.</div>.*"));
 
 			// previous result only present once
 			Assert.assertEquals(StringUtils.countMatches(testOkDetailedReport, "No previous execution results, you can enable it via parameter"), 1);
-			Assert.assertEquals(StringUtils.countMatches(testKoDetailedReport, "No previous execution results, you can enable it via parameter"), 1);
-			Assert.assertEquals(StringUtils.countMatches(testSkipDetailedReport, "No previous execution results, you can enable it via parameter"), 1);
-
 			String logs = readSeleniumRobotLogFile().replace("\\", "/");;
 
 			//  check that for each test, logger is closed
 			Assert.assertTrue(logs.contains("logging started for 'testAndSubActions'"));
 			Assert.assertTrue(logs.contains("logging stopped for 'testAndSubActions'"));
+
+			// check we retry only once to get variables
+			Assert.assertEquals(StringUtils.countMatches(logs, "Error getting variables => retry 1"), 1);
+			Assert.assertEquals(StringUtils.countMatches(logs, "Error getting variables => retry 2"), 1);
+
+
 
 		} finally {
 			System.clearProperty(SeleniumRobotServerContext.SELENIUMROBOTSERVER_ACTIVE);

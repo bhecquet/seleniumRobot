@@ -83,10 +83,10 @@ public class SeleniumRobotServerContext {
 				&& getSeleniumRobotServerActive() 
 				&& getSeleniumRobotServerUrl() != null) {
 			if (System.getProperty(SeleniumRobotLogger.MAVEN_EXECUTION) == null || System.getProperty(SeleniumRobotLogger.MAVEN_EXECUTION).equals("false")) {
-				logger.info(String.format("%s key found, and set to true, trying to get variable from variable server %s [%s]", 
+				logger.info("{} key found, and set to true, trying to get variable from variable server {} [{}]",
 							SELENIUMROBOTSERVER_ACTIVE, 
 							getSeleniumRobotServerUrl(),
-							SELENIUMROBOTSERVER_URL));
+							SELENIUMROBOTSERVER_URL);
 			}
 			SeleniumRobotVariableServerConnector vServer = new SeleniumRobotVariableServerConnector(getSeleniumRobotServerActive(), getSeleniumRobotServerUrl(), TestNGResultUtils.getTestName(testNGResult).replaceAll("^before-", ""), getSeleniumRobotServerToken());
 			
@@ -98,7 +98,7 @@ public class SeleniumRobotServerContext {
 			
 		} else {
 			if (System.getProperty(SeleniumRobotLogger.MAVEN_EXECUTION) == null || System.getProperty(SeleniumRobotLogger.MAVEN_EXECUTION).equals("false")) {
-				logger.info(String.format("%s key not found or set to false, or url key %s has not been set", SELENIUMROBOTSERVER_ACTIVE, SELENIUMROBOTSERVER_URL));
+				logger.info("{} key not found or set to false, or url key {} has not been set", SELENIUMROBOTSERVER_ACTIVE, SELENIUMROBOTSERVER_URL);
 			}
 			return null;
 		}

@@ -17,22 +17,22 @@
  */
 package com.seleniumtests.customexception;
 
-public class SeleniumRobotServer404Exception extends SeleniumRobotServerHttpException {
+public class SeleniumRobotServerFetchVariablesException extends SeleniumRobotServerException {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public SeleniumRobotServer404Exception(final String message) {
-        super(404, message);
+	public SeleniumRobotServerFetchVariablesException(final String message) {
+        super(message);
     }
 
-    public SeleniumRobotServer404Exception(final Throwable cause) {
-        super(404, cause);
+    public SeleniumRobotServerFetchVariablesException(final Throwable cause) {
+        super(cause);
     }
 
-    public SeleniumRobotServer404Exception(final String message, final Throwable cause) {
-        super(404, message, cause);
+    public SeleniumRobotServerFetchVariablesException(final String message, final Throwable cause) {
+        super(message, cause);
     }
 }

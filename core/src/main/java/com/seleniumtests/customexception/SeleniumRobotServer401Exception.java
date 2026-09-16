@@ -17,7 +17,7 @@
  */
 package com.seleniumtests.customexception;
 
-public class SeleniumRobotServer401Exception extends SeleniumRobotServerException {
+public class SeleniumRobotServer401Exception extends SeleniumRobotServerHttpException {
 
 	/**
 	 * 
@@ -25,14 +25,14 @@ public class SeleniumRobotServer401Exception extends SeleniumRobotServerExceptio
 	private static final long serialVersionUID = 1L;
 
 	public SeleniumRobotServer401Exception(final String message) {
-        super(message);
+        super(401, message);
     }
 
     public SeleniumRobotServer401Exception(final Throwable cause) {
-        super(cause);
+        super(401, cause);
     }
 
     public SeleniumRobotServer401Exception(final String message, final Throwable cause) {
-        super(message, cause);
+        super(401, message, cause);
     }
 }

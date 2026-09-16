@@ -17,15 +17,11 @@
  */
 package com.seleniumtests.connectors.selenium;
 
+import com.seleniumtests.customexception.*;
 import kong.unirest.core.*;
 import org.apache.logging.log4j.Logger;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.customexception.ConfigurationException;
-import com.seleniumtests.customexception.SeleniumRobotServer401Exception;
-import com.seleniumtests.customexception.SeleniumRobotServer404Exception;
-import com.seleniumtests.customexception.SeleniumRobotServer500Exception;
-import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 import kong.unirest.core.json.JSONArray;
@@ -397,10 +393,9 @@ public abstract class SeleniumRobotServerConnector {
 
         return switch (statusCode) {
             case 401 ->
-                    new SeleniumRobotServer401Exception(message + "\nYou need to provide the API token through 'seleniumRobotServerToken' parameter");
-            case 404 -> new SeleniumRobotServer404Exception(message);
-            case 500 -> new SeleniumRobotServer500Exception(message);
-            default -> new SeleniumRobotServerException(message);
+                    new SeleniumRobotServerHttpException(401, message + "\nYou need to provide the API token through 'seleniumRobotServerToken' parameter");
+			case 404 -> new SeleniumRobotServer404Exception(message);
+			default -> new SeleniumRobotServerHttpException(statusCode, message);
         };
     }
 	

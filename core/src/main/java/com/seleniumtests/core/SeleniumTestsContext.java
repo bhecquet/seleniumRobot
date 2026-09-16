@@ -837,10 +837,14 @@ public class SeleniumTestsContext {
 			testNGResult.setAttribute("hasVariableServerFailed", false);
 			setTestConfiguration();
 		} catch (Exception e) {
+
 			// If the setTestConfiguration fails, it's probably an error from the SeleniumRobot Server
 			// In this case, add a flag to ensure that the test won't be executed but the Exception is displayed in the report
 			testNGResult.setThrowable(new SeleniumRobotServerException("An error occurred while fetching variables from the SeleniumRobot Server. Test execution is skipped.", e));
 			testNGResult.setAttribute("hasVariableServerFailed", true);
+
+            // fill the variable map with something so that we look for variables only once
+            variableAlreadyRequestedFromServer = Map.of("ERROR", new TestVariable("ERROR", e.getMessage()));
 		}
     	updateProxyConfig();
     	

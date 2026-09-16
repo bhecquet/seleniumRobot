@@ -17,9 +17,7 @@
  */
 package com.seleniumtests.ut.connectors.selenium;
 
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -402,21 +400,22 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	}
 	
 	/**
-	 * get variables failes with error on server side
+	 * get variables fails with error on server side
 	 */
-	@Test(groups= {"ut"}, expectedExceptions = SeleniumRobotServerException.class)
+	@Test(groups= {"ut"})
 	public void testGetVariablesFailed() throws UnirestException {
 
 		configureMockedVariableServerConnection();
 		createServerMock(SERVER_URL, "GET", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 404, "{}");
 
 		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
-		Map<String, TestVariable> variables = connector.getVariables();
-		Assert.assertEquals(variables.get("key1").getValue(), "value1");
-		Assert.assertEquals(variables.get("key2").getValue(), "value2");
+		Assert.assertThrows(SeleniumRobotServerException.class, connector::getVariables);
+
+		// check server is called only once for variable as it's a 4xx error
+		mockedUnirest.get().verify(() -> Unirest.get(contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL)));
 	}
 	
-	@Test(groups= {"ut"}, expectedExceptions = SeleniumRobotServerException.class)
+	@Test(groups= {"ut"})
 	public void testGetVariablesWithNetworkError() throws UnirestException {
 		
 		configureMockedVariableServerConnection();
@@ -424,12 +423,26 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		when(req.asString()).thenThrow(UnirestException.class);
 		
 		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
-		Map<String, TestVariable> variables = connector.getVariables();
-		Assert.assertEquals(variables.get("key1").getValue(), "value1");
-		Assert.assertEquals(variables.get("key2").getValue(), "value2");
+		Assert.assertThrows(SeleniumRobotServerException.class, connector::getVariables);
+
+		// check server is called 3 times because of a Unirest error
+		mockedUnirest.get().verify(() -> Unirest.get(contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL)), times(3));
+	}
+
+	@Test(groups= {"ut"})
+	public void testGetVariablesWithHttp500Error() throws UnirestException {
+
+		configureMockedVariableServerConnection();
+		createServerMock(SERVER_URL, "GET", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 500, "{}");
+
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		Assert.assertThrows(SeleniumRobotServerException.class, connector::getVariables);
+
+		// check server is called 3 times because of a "500" error
+		mockedUnirest.get().verify(() -> Unirest.get(contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL)), times(3));
 	}
 	
-	@Test(groups = {"ut"}, expectedExceptions = SeleniumRobotServerException.class)
+	@Test(groups = {"ut"})
     public void testGetVariableFileFailed() throws UnirestException {
 
         configureMockedVariableServerConnection();
@@ -438,8 +451,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 
         SeleniumRobotVariableServerConnector connector = new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
         SeleniumTestsContextManager.getThreadContext().setVariableServer(connector);
-        Map<String, TestVariable> variables = connector.getVariables();
-        connector.getVariableFile(variables.get("key3"));
+		Assert.assertThrows(SeleniumRobotServerException.class, connector::getVariables);
     }
 
 	@Test(groups= {"ut"})
