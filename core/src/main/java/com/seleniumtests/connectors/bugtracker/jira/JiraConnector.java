@@ -421,37 +421,51 @@ public class JiraConnector extends BugTracker {
 
 
 	/**
-	 * Add custom fields to the issue
-	 * @param jiraBean			the jira bean to alter
-	 * @param fieldInfos		custom fields values
-	 * @param issueBuilder		the issue builder
-	 */
-	private void setCustomFields(JiraBean jiraBean, Map<String, CimFieldInfo> fieldInfos, IssueInputBuilder issueBuilder) {
-		
-		jiraBean.getCustomFields().forEach((fieldName, fieldValue) -> {
-            if (fieldInfos.get(fieldName) != null && fields.get(fieldName) != null) {
-				String fieldType = fields.get(fieldName).getSchema().getType();
-				if ("option".equals(fieldType)) {
-					CustomFieldOption option = getOptionForField(fieldInfos, fieldName, fieldValue);
-					if (option == null) {
-						logger.warn(String.format("Value %s for field %s does not exist", fieldValue, fieldName));
-					} else {
-						issueBuilder.setFieldValue(fields.get(fieldName).getId(), option);
-					}
-				} else if ("array".equals(fieldType)) {
-					CustomFieldOption option = getOptionForField(fieldInfos, fieldName, fieldValue);
-					issueBuilder.setFieldValue(fields.get(fieldName).getId(), List.of(option));
-            	} else if ("string".equals(fieldType)) {
-            		issueBuilder.setFieldValue(fields.get(fieldName).getId(), fieldValue);
-            	} else {
-            		logger.warn(String.format("Field %s type cannot be handled", fieldName));
-            	}
-            	
-            } else {
-                logger.warn(String.format("Field %s does not exist", fieldName));
-            }
-        });
-	}
+     * Add custom fields to the issue
+     *
+     * @param jiraBean     the jira bean to alter
+     * @param fieldInfos   custom fields values
+     * @param issueBuilder the issue builder
+     */
+    private void setCustomFields(JiraBean jiraBean, Map<String, CimFieldInfo> fieldInfos, IssueInputBuilder issueBuilder) {
+
+        jiraBean.getCustomFields().forEach((fieldName, fieldValue) ->
+                setCustomField(fieldInfos, issueBuilder, fieldName, fieldValue));
+    }
+
+    private void setCustomField(Map<String, CimFieldInfo> fieldInfos, IssueInputBuilder issueBuilder,
+                                String fieldName, String fieldValue) {
+        Field field = fields.get(fieldName);
+        if (fieldInfos.get(fieldName) == null || field == null) {
+            logger.warn(String.format("Field %s does not exist", fieldName));
+            return;
+        }
+
+        switch (field.getSchema().getType()) {
+            case "option" -> setOptionField(fieldInfos, issueBuilder, field, fieldName, fieldValue);
+            case "array" -> setArrayField(fieldInfos, issueBuilder, field, fieldName, fieldValue);
+            case "string" -> issueBuilder.setFieldValue(field.getId(), fieldValue);
+            default -> logger.warn(String.format("Field %s type cannot be handled", fieldName));
+        }
+    }
+
+    private void setOptionField(Map<String, CimFieldInfo> fieldInfos, IssueInputBuilder issueBuilder,
+                                Field field, String fieldName, String fieldValue) {
+        CustomFieldOption option = getOptionForField(fieldInfos, fieldName, fieldValue);
+        if (option == null) {
+            logger.warn(String.format("Value %s for field %s does not exist", fieldValue, fieldName));
+            return;
+        }
+        issueBuilder.setFieldValue(field.getId(), option);
+    }
+
+    private void setArrayField(Map<String, CimFieldInfo> fieldInfos, IssueInputBuilder issueBuilder,
+                               Field field, String fieldName, String fieldValue) {
+        CustomFieldOption option = getOptionForField(fieldInfos, fieldName, fieldValue);
+        issueBuilder.setFieldValue(field.getId(), option == null ? List.of(fieldValue) : List.of(option));
+    }
+
+
 
     /**
      * Search the right field option among all allowed values or return null if value is not valid or field cannot be found
@@ -465,6 +479,9 @@ public class JiraConnector extends BugTracker {
 		if (fieldInfo == null) {
 			return null;
 		} else {
+			if (fieldInfo.getAllowedValues() == null) {
+                return null;
+            }
 			for (Object obj: fieldInfo.getAllowedValues()) {
 				if (obj instanceof CustomFieldOption customFieldOption && customFieldOption.getValue().equals(fieldValue)) {
 					return customFieldOption;

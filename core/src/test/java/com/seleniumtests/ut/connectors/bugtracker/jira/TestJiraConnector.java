@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 import org.joda.time.DateTime;
@@ -149,6 +150,7 @@ public class TestJiraConnector extends MockitoTest {
 
 	private FieldSchema stringSchema = new FieldSchema("string", "", null, null, null);
 	private FieldSchema optionSchema = new FieldSchema("option", "", null, null, null);
+	private FieldSchema arraySchema = new FieldSchema("array", "", null, null, null);
 	
 	private Priority priority1 = new Priority(new URI("http://foo/bar/p"), 1L, "P1", "1", "1", new URI("http://foo/bar/i"));
 	private Priority priority2 = new Priority(new URI("http://foo/bar/p"), 2L, "P2", "2", "2", new URI("http://foo/bar/i"));
@@ -156,6 +158,7 @@ public class TestJiraConnector extends MockitoTest {
 	private Field fieldApplication = new Field("13", "application", FieldType.CUSTOM, false, false, true, stringSchema);
 	private Field fieldEnvironment = new Field("23", "environment", FieldType.CUSTOM, false, false, true, stringSchema);
 	private Field fieldStep = new Field("33", "step", FieldType.CUSTOM, false, false, true, optionSchema);
+	private Field fieldTags = new Field("43", "tags", FieldType.CUSTOM, false, false, true, arraySchema);
 	
 	private BasicComponent component1 = new BasicComponent(new URI("http://foo/bar/c"), 1L, "comp1", "comp1");
 	private BasicComponent component2 = new BasicComponent(new URI("http://foo/bar/c"), 2L, "comp2", "comp2");
@@ -176,6 +179,8 @@ public class TestJiraConnector extends MockitoTest {
 	private CimFieldInfo fieldInfo1 = new CimFieldInfo("13", false, "application", stringSchema, new HashSet<>(), Arrays.asList(), null);
 	private CimFieldInfo fieldInfo2 = new CimFieldInfo("23", false, "environment", stringSchema, new HashSet<>(), Arrays.asList(), null);
 	private CimFieldInfo fieldInfo3 = new CimFieldInfo("33", false, "step", optionSchema, new HashSet<>(), Arrays.asList(optionStep1, optionStep2), null);
+	private CimFieldInfo fieldInfoTags = new CimFieldInfo("43", false, "tags", arraySchema, new HashSet<>(), Arrays.asList(optionStep1, optionStep2), null);
+    private CimFieldInfo fieldInfoTagsNoAllowedValues = new CimFieldInfo("43", false, "tags", arraySchema, new HashSet<>(), null, null);
 	
 	private BasicProject project1 = new BasicProject(new URI("http://foo/bar/pr"), "PROJECT-1", 1L, "Project 1");
 	private BasicProject project2 = new BasicProject(new URI("http://foo/bar/pr"), "PROJECT-2", 2L, "Project 2");
@@ -674,6 +679,109 @@ public class TestJiraConnector extends MockitoTest {
 		jiraConnector.createIssue(jiraBean);
 		
 	}
+	
+	/**
+     * Test issue creation with an "array" type custom field whose value matches one of the allowed options
+     * The field value is built with the matching CustomFieldOption, wrapped in a singleton list
+     */
+    @Test(groups = {"ut"})
+    public void testCreateIssueArrayFieldMatchingOption() {
+        when(promiseFields.claim()).thenReturn(Arrays.asList(fieldApplication, fieldEnvironment, fieldStep, fieldTags));
+        when(fieldInfos.getValues()).thenReturn(Arrays.asList(fieldInfo1, fieldInfo2, fieldInfo3, fieldInfoTags));
+
+        ArgumentCaptor<IssueInput> issueArgument = ArgumentCaptor.forClass(IssueInput.class);
+
+        JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
+
+        Map<String, String> fields = new HashMap<>();
+        fields.put("tags", "step1"); // matches optionStep1
+        JiraBean jiraBean = new JiraBean(null, "issue 1", "issue 1 descr", "P1", "Bug", null, null, null, null, new ArrayList<>(), null, fields, new ArrayList<>());
+        jiraConnector.createIssue(jiraBean);
+
+        verify(issueRestClient).createIssue(issueArgument.capture());
+        IssueInput issueInput = issueArgument.getValue();
+
+        List<Object> values = ImmutableList.copyOf((Iterable<Object>) issueInput.getField("43").getValue());
+        Assert.assertEquals(values.size(), 1);
+        Assert.assertTrue(values.getFirst() instanceof ComplexIssueInputFieldValue);
+        Assert.assertEquals(((ComplexIssueInputFieldValue) values.getFirst()).getValuesMap().get("value"), "step1");
+    }
+
+    /**
+     * Test issue creation with an "array" type custom field whose value does not match any of the allowed options
+     * In that case, the raw field value is used instead (wrapped in a singleton list), no error is raised
+     */
+    @Test(groups = {"ut"})
+    public void testCreateIssueArrayFieldNoMatchingOption() {
+        when(promiseFields.claim()).thenReturn(Arrays.asList(fieldApplication, fieldEnvironment, fieldStep, fieldTags));
+        when(fieldInfos.getValues()).thenReturn(Arrays.asList(fieldInfo1, fieldInfo2, fieldInfo3, fieldInfoTags));
+
+        ArgumentCaptor<IssueInput> issueArgument = ArgumentCaptor.forClass(IssueInput.class);
+
+        JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
+
+        Map<String, String> fields = new HashMap<>();
+        fields.put("tags", "unknownValue"); // does not match any allowed option
+        JiraBean jiraBean = new JiraBean(null, "issue 1", "issue 1 descr", "P1", "Bug", null, null, null, null, new ArrayList<>(), null, fields, new ArrayList<>());
+        jiraConnector.createIssue(jiraBean);
+
+        verify(issueRestClient).createIssue(issueArgument.capture());
+        IssueInput issueInput = issueArgument.getValue();
+
+        List<Object> values = ImmutableList.copyOf((Iterable<Object>) issueInput.getField("43").getValue());
+        Assert.assertEquals(values, List.of("unknownValue"));
+    }
+
+    /**
+     * Test issue creation with an "array" type custom field for which jira does not provide any allowed value
+     * (getAllowedValues() == null). This must not raise a NullPointerException and should fallback
+     * to using the raw field value
+     */
+    @Test(groups = {"ut"})
+    public void testCreateIssueArrayFieldNullAllowedValues() {
+        when(promiseFields.claim()).thenReturn(Arrays.asList(fieldApplication, fieldEnvironment, fieldStep, fieldTags));
+        when(fieldInfos.getValues()).thenReturn(Arrays.asList(fieldInfo1, fieldInfo2, fieldInfo3, fieldInfoTagsNoAllowedValues));
+
+        ArgumentCaptor<IssueInput> issueArgument = ArgumentCaptor.forClass(IssueInput.class);
+
+        JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
+
+        Map<String, String> fields = new HashMap<>();
+        fields.put("tags", "step1");
+        JiraBean jiraBean = new JiraBean(null, "issue 1", "issue 1 descr", "P1", "Bug", null, null, null, null, new ArrayList<>(), null, fields, new ArrayList<>());
+        jiraConnector.createIssue(jiraBean); // must not throw NPE
+
+        verify(issueRestClient).createIssue(issueArgument.capture());
+        IssueInput issueInput = issueArgument.getValue();
+
+        List<Object> values = ImmutableList.copyOf((Iterable<Object>) issueInput.getField("43").getValue());
+        Assert.assertEquals(values, List.of("step1"));
+    }
+
+    /**
+     * Test issue creation with an "option" type custom field for which jira does not provide any allowed value
+     * (getAllowedValues() == null). This must not raise a NullPointerException, the field is simply ignored
+     */
+    @Test(groups = {"ut"})
+    public void testCreateIssueOptionFieldNullAllowedValues() {
+        CimFieldInfo fieldInfoStepNoAllowedValues = new CimFieldInfo("33", false, "step", optionSchema, new HashSet<>(), null, null);
+        when(fieldInfos.getValues()).thenReturn(Arrays.asList(fieldInfo1, fieldInfo2, fieldInfoStepNoAllowedValues));
+
+        ArgumentCaptor<IssueInput> issueArgument = ArgumentCaptor.forClass(IssueInput.class);
+
+        JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
+
+        Map<String, String> fields = new HashMap<>();
+        fields.put("step", "step1");
+        JiraBean jiraBean = new JiraBean(null, "issue 1", "issue 1 descr", "P1", "Bug", null, null, null, null, new ArrayList<>(), null, fields, new ArrayList<>());
+        jiraConnector.createIssue(jiraBean); // must not throw NPE
+
+        verify(issueRestClient).createIssue(issueArgument.capture());
+        IssueInput issueInput = issueArgument.getValue();
+
+        // field is ignored since no option could be matched
+        Assert.assertNull(issueInput.getField("33"));
+    }
 	
 	@Test(groups= {"ut"})
 	public void testCloseIssue() {
